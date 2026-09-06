@@ -34,7 +34,7 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
-    // Note: ProcessExec covers process execution; Execute is the alias used in capability checks
+    ProcessExec,
 }
 
 #[cfg(not(feature = "standalone_test"))]

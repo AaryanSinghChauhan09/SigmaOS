@@ -1,50 +1,66 @@
-# SigmaOS Process Lifecycle, Signal ABI Translation & Supervision Guide for AI Agents
+# AI Agent Process Management Specification for SigmaOS
 
-This guide provides technical specifications, process lifecycle state machine transitions, cross-OS signal ABI translation, pseudo-terminal (PTY) master/slave pairing, process sandboxing, and service supervision rules for AI agents managing processes in SigmaOS.
-
----
-
-## 1. Zero-Dependency Process Architecture
-
-SigmaOS implements a high-performance process management engine under `#![no_std]` Rust (`src/process/advanced_process_control.rs`, `src/compatibility/abi_translator.rs`, `src/shell/terminal_emulator.rs`):
-
-* **Process Lifecycle Controller (`SovereignProcessLifecycleController`):**
-  Manages process lifecycle state transitions (`Created`, `Ready`, `Running`, `Blocked`, `Stopped`, `Zombie`, `Terminated`) under thread-safe synchronization.
-* **Cross-OS Signal & Syscall ABI Translation (`translate_syscall_abi`):**
-  Translates POSIX, Linux x86_64, and BSD syscall vectors and signal frame delivery layouts dynamically across execution environments.
-* **Pseudo-TTY Master/Slave Pairing (`PtyMasterSlavePair`):**
-  Provides termios job control, session line discipline, window resize SIGWINCH propagation, and master/slave character buffer streaming.
-* **Systemd-Free Runit Service Supervision (`SovereignRunitSupervisor`):**
-  Provides 3-stage service lifecycle supervision (`stage1` boot initialization, `stage2` process monitoring & auto-restart, `stage3` graceful shutdown).
+This document provides specifications and guidelines for AI agents developing, supervising, scheduling, and isolating processes across **SigmaOS**.
 
 ---
 
-## 2. Process Descriptor $O(1)$ Name Lookup Invariant
+## 1. Process Scheduling Architecture
 
-When modifying process structures or scheduler process descriptors:
+SigmaOS incorporates hybrid scheduling algorithms inspired by advanced Linux and BSD kernel developments:
 
-* **Task Name Optimization (`SimpleProcess` in `src/scheduler/process.rs`):**
-  `SimpleProcess` MUST store an explicit `name_len: u8` field initialized during process creation (`new()`).
-* **Slice Access:**
-  `Process::name(&self)` MUST use `&self.name_bytes[..self.name_len as usize]` to achieve $O(1)$ direct slice lookups, avoiding $O(N)$ null-byte search scans (`.position(|&b| b == 0)`).
+1. **Linux 6.12+ `sched_ext` Extensible Scheduler Framework**:
+   - Implemented in `src/distro/sovereign_nextgen_distro_leap.rs` (`SovereignSchedExtEngine`).
+   - Supports dynamic BPF policy switching across `ScxBpfland`, `ScxLavd`, `ScxCachyBore`, and `ScxCentral` with sub-microsecond preemption and NUMA node balancing.
+
+2. **CachyOS BORE (Burst-Oriented Response Enhancer)**:
+   - Implemented in `src/kernel/bore.rs` and `src/distro/linux_bsd_inspirations.rs` (`CachyBoreScheduler`).
+   - Dynamically calculates task timeslices based on burstiness and interactivity scores (0-100) to minimize user-facing latency.
+
+3. **Linux EEVDF (Earliest Eligible Virtual Deadline First)**:
+   - Implemented in `src/kernel/scheduler.rs`. Calculates Virtual Runtime (vruntime) and virtual deadlines based on task weight.
+
+4. **FreeBSD ULE Interactivity Scoring**:
+   - Implemented in `src/kernel/scheduler.rs` and `src/distro/wiki_ideas_implementation.rs` (`interactivity_score`).
+
+5. **Apache NuttX POSIX Real-Time Preemption-Threshold**:
+   - Implemented in `src/distro/open_source_distro_innovations.rs` (`NuttxRealtimeTaskGovernor`).
 
 ---
 
-## 3. Sandboxing & Resource Isolation Rules
+## 2. Process Supervision & Service Management
 
-1. **OpenBSD Pledge & Unveil Enforcement:**
-   Processes MUST enforce syscall promises (`pledge`) and restricted VFS path visibility (`unveil`) via `AutomatedSandboxPolicy` (`src/automation/system_level.rs`).
-2. **Resource Throttling:**
-   Process memory RSS, CPU percentage limits, and swap bounds MUST be enforced via FreeBSD RACCT/RCTL rules (`AutomatedRacctPolicy`).
+SigmaOS bridges all major service supervisor models via `SovereignUniversalDistroBridge::get_supervisor_type()`:
+
+- **Systemd**: `SystemdEngine` (`src/init/systemd_init.rs`)
+- **OpenRC**: `OpenRCService` (`src/distro/linux_bsd_inspirations.rs`)
+- **Runit**: `SovereignRunitSupervisor` (`src/distro/linux_bsd_inspirations.rs`) & `VoidRunitSupervisor` (`src/distro/improvements.rs`)
+- **Shepherd**: `ShepherdServiceManager` (`src/distro/linux_bsd_inspirations.rs`)
+- **Dinit / SysVInit / S6**: `S6ServiceInitSupervisor` & `ChimeraDinitSupervisor` (`src/distro/missing_distro_innovations.rs`)
 
 ---
 
-## 4. Checklist for AI Agents Managing Process Subsystems
+## 3. Process Isolation & Resource Control
 
-1. **Verify $O(1)$ Name Invariant:** Ensure process structs maintain explicit name byte length fields.
-2. **Test Process & Terminal Emulator Pipelines:**
-   Run process control and terminal emulator unit tests:
-   ```bash
-   cargo test --lib -- process::advanced_process_control::tests
-   ./run_sigma_tests.sh
-   ```
+1. **Linux Landlock LSM (v1-v5)**:
+   - Filesystem path sandboxing (`SovereignLandlockLsm`) and TCP `bind`/`connect` port gating (`LandlockV5NetworkGuard`).
+
+2. **FreeBSD Jails & RACCT/RCTL**:
+   - Process tree containment (`FreeBSDJail`) and RSS/PID/CPU resource limits (`FreeBsdRacctVnetGuard`).
+
+3. **OpenBSD Pledge & Unveil**:
+   - System call promise restriction (`OpenBSDPledge`) and path unveiling (`OpenBSDUnveil`).
+
+4. **Linux Cgroup v2 Governor**:
+   - `LinuxCgroupV2Governor` (`src/compatibility/linux_standards.rs`) for CPU quota and memory slice enforcement.
+
+---
+
+## 4. Testing & Verification Commands
+
+```bash
+# Run process scheduler inspection tests
+rustc --test src/kernel/scheduler.rs --edition=2021 -o build/test_sched && ./build/test_sched
+
+# Run full test suite
+./run_sigma_tests.sh
+```

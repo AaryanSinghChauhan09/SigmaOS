@@ -1,48 +1,68 @@
-# AGENTS.md — Access Management & Operating Guidelines for AI Agents in SigmaOS
+# AGENTS.md - AI Agent Operational & File Management Guidelines for SigmaOS
 
-## Overview
-This document specifies access control policies, security boundaries, sandboxing protocols, and operational guidelines for AI agents (such as Claude Code, Codex, Grok, Gemini, and local LLM agents managed by Herdr) operating within or interacting with SigmaOS.
-
----
-
-## 1. Access Control & Authentication Principles
-
-1. **Least Privilege Enforcement**:
-   - AI agents operate under unprivileged, sandboxed execution domains by default (`agent_domain_t`).
-   - Privileged operations (e.g., kernel module loading, system-wide configuration changes, raw disk write access) require explicit user elevation or capability tokens validated through PAM / `doas` policy enforcers.
-
-2. **Scoped Capability Delegation**:
-   - OpenBSD-inspired `pledge(2)` and `unveil(2)` syscall restriction gates are mandatory for agent subprocesses.
-   - Default pledge promises: `stdio rpath wpath cpath inet`. High-risk promises such as `exec` or `id` require explicit policy authorization.
-   - FreeBSD Capsicum capability mode restricts file descriptor rights (`CAP_READ`, `CAP_WRITE`, `CAP_SEEK`) for active agent process trees.
-
-3. **Herdr Multi-Agent Isolation**:
-   - Parallel AI agent tasks spawned via `OmarchyHerdrAiAgentManager` are isolated into separate microVM / OCI container shards (`SigmaContainer`).
-   - Inter-agent communication is restricted to encrypted IPC channels (`ZeroCopyIpcChannel` / `SovereignIpcBus`) with mandatory Dilithium-5 cryptographic message signatures.
+Welcome, AI Agent! This document outlines operational procedures, architectural conventions, and strict file management guidelines when working on the **SigmaOS** codebase.
 
 ---
 
-## 2. Sandboxing & Memory Protection
+## 1. Core Directives & Architecture Principles
 
-- **Landlock LSM v5 Rules**: File system paths outside designated project workspaces (`/app`, `/tmp/agent_sandbox`) are masked read-only or hidden entirely using Landlock path rules.
-- **Secret Memory Isolation**: Memory regions storing cryptographic credentials, user credentials, or API keys are backed by `memfd_secret(2)` to prevent unauthorized process inspection or memory dump leakage.
-- **Resource Control Quotas**: Cgroup v2 transient slices limit CPU quotas (e.g., max 200% CPU), RAM caps (e.g., 4GB max), and process thread limits to prevent denial-of-service condition or resource exhaustion.
+1. **Zero External Dependencies (`#![no_std]`)**:
+   - SigmaOS operates on a strict sovereign zero-dependency philosophy.
+   - Do **not** add external third-party crates under `[dependencies]` in `Cargo.toml`.
+   - Use `alloc::` primitives (`alloc::string::String`, `alloc::vec::Vec`, `alloc::boxed::Box`, `alloc::format!`) for heap allocations in kernel/distro space.
 
----
+2. **Multi-Architecture Support**:
+   - Maintain multi-arch abstractions across supported architectures: `x86_32`, `x86_64`, `aarch64`, `riscv64`, `loongarch64`, `powerpc64`, and `s390x`.
+   - Architectural register contexts and trap handlers live in `src/arch/portability.rs`.
 
-## 3. Mandatory Audit & Logging
-
-- Every agent-initiated system call, privilege elevation attempt, file modification, and network request is logged to the `journald` structured log stream (`UnifiedLogEntry`) with fields `_AGENT_ID`, `_AGENT_PROVIDER`, and `_CAPABILITY_TOKEN`.
-- Audit logs are protected by append-only journal storage and cryptographic Merkle tree hash chains (`Jbd2TransactionLedger`).
-
----
-
-## 4. Operational Instructions for Development Agents
-
-- **Zero-Dependency Mandate**: Do not add external crate dependencies to `Cargo.toml`. Preserve `#![no_std]` compatibility across core OS crates.
-- **Proactive Testing**: After editing files, verify changes using native test scripts (`./run_sigma_tests.sh`, `./scripts/sync_wiki.sh`, and `pytest tests/`).
-- **Git Conventions**: Commit messages must follow standard git conventions (short subject line <= 50 chars, detailed body if necessary). Branch names must start with `jules-`.
+3. **Subsystem Interoperability**:
+   - Core subsystem bridges (VFS, Init, Package Management, Security, Kernel, Memory) route through `src/distro/linux_bsd_inspirations.rs` (`SovereignUniversalDistroBridge`).
 
 ---
 
-*Last Updated: 2026*
+## 2. File Management & Organization Guidelines
+
+### 2.1 Code Base Layout
+- **Kernel Core**: `src/kernel/`, `src/klib/`, `src/memory/`, `src/arch/`
+- **Distro Innovations & Parity**: `src/distro/`
+  - `src/distro/linux_bsd_inspirations.rs` - Cross-subsystem distro bridge, Landlock v5, eBPF XDP zero-copy, OpenBSD pledge/unveil, FreeBSD jails, and Illumos zones.
+  - `src/distro/sovereign_nextgen_distro_leap.rs` - `sched_ext` BPF scheduling, CAS store, HAMMER2 CoW deduplication.
+- **Package Management Subsystem**: `src/package/`, `src/sigpkg/`
+  - `src/sigpkg/universal_adapter.rs` - Universal package format adapter router (.deb, .rpm, PKGBUILD, ebuild, apk, snap, flatpak, hpkg).
+  - `src/sigpkg/universal_oop_system.rs` - Strategy, Adapter, Factory, Decorator, and Observer pattern implementations for package management.
+- **Compatibility & Standards**: `src/compatibility/`
+- **Drivers & Hardware**: `src/drivers/`
+- **Documentation**: `docs/` and `wiki/`
+
+### 2.2 Rules for Modifying Existing Files
+1. **Targeted Editing**:
+   - Always trace imports and conditional compilation gates (`#[cfg(test)]`, `#[cfg(feature = "standalone_test")]`) before editing source files.
+   - Avoid modifying generated build artifacts under `build/` or `target/`.
+2. **Atomic & Reversible File Operations**:
+   - Use Copy-on-Write (CoW) transaction semantics when updating critical configuration or state files.
+   - Perform verification with read-only tools immediately after any file creation, modification, or deletion.
+
+### 2.3 Rules for Adding New Files
+1. Place new module source files under the appropriate domain directory (`src/distro/`, `src/package/`, `src/drivers/`, etc.).
+2. Re-export new modules in `mod.rs` and `src/lib.rs` as required.
+3. Add standalone unit test blocks or test binaries in `tests/` or via inline `#[cfg(test)]` / `#[cfg(feature = "standalone_test")]` blocks.
+
+---
+
+## 3. Testing Protocols & Verification
+
+All changes must be validated against the native SigmaOS test suite:
+
+```bash
+# Run full test suite (atomic unit tests, subsystem inspection, Python pytest suite)
+./run_sigma_tests.sh
+
+# Run standalone module tests
+rustc --edition=2021 --test --cfg 'feature="standalone_test"' src/distro/linux_bsd_inspirations.rs -o build/test_inspirations && ./build/test_inspirations
+```
+
+---
+
+## 4. Pull Request & Commit Guidelines
+- Repository git branches must follow the naming convention starting with `jules-`.
+- Maintain descriptive commit messages following standard git conventions.
