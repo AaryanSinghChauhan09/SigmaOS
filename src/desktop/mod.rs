@@ -6,6 +6,13 @@ pub mod pantheon;
 pub mod screensaver;
 pub mod web_wasm_bridge;
 pub mod zenith_compositor;
+pub mod ultimate_distro_desktop;
+
+pub use ultimate_distro_desktop::{
+    ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
+    LuminaBsdDesktopEngine, SwayRegolithWmEngine, SwayWorkspaceContainerNode, ThunarCustomAction,
+    Xfce418Engine,
+};
 
 pub use web_wasm_bridge::*;
 

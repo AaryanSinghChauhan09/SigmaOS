@@ -35,6 +35,9 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
+pub use desktop::{
+    Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
+};
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
@@ -69,7 +72,10 @@ pub use distro::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
     SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
     SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
-    ZramCompressionAlgorithm,
+    ZramCompressionAlgorithm, DebianMultiarchAptEngine, GarudaPerformanceTweakEngine,
+    HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, SolusEopkgBudgieEngine,
+    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
+    OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
 };
 pub use unimplemented_features::{
     AlpineApkPackageIndex, Android15PrivateSpaceGovernor, AndroidApexContainerModuleEngine,

@@ -531,6 +531,15 @@ pub struct SovereignDnsTlsResolverEngine {
 }
 
 impl SovereignDnsTlsResolverEngine {
+    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
+        match alias {
+            "char-major-10-200" => Some("tun"),
+            "net-pf-10" => Some("ipv6"),
+            "block-major-8-0" => Some("sda"),
+            _ => None,
+        }
+    }
+
     pub fn new(dot_server: [u8; 4]) -> Self {
         let mut engine = Self {
             upstream_dot_server: dot_server,

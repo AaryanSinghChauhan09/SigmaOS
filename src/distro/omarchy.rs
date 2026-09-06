@@ -528,4 +528,28 @@ mod tests {
         assert_eq!(gpu.kernel_headers, "linux-zen-headers");
         assert!(gpu.early_kms_enabled);
     }
+
+    #[test]
+    fn test_omarchy_terminal_font_config() {
+        let mut cfg = OmarchyTerminalFontConfig::new();
+        cfg.set_font(OmarchyNerdFont::FiraCode, 12.0);
+        assert_eq!(cfg.active_font.font_family(), "FiraCode Nerd Font");
+        assert_eq!(cfg.font_size_pt, 12.0);
+    }
+
+    #[test]
+    fn test_omarchy_neovim_preset_engine() {
+        let mut nvim = OmarchyNeovimPresetEngine::new();
+        assert!(nvim.register_lsp_server("zls"));
+        assert!(!nvim.register_lsp_server("zls")); // Duplicate check
+        assert!(nvim.lsp_servers.contains(&String::from("zls")));
+    }
+
+    #[test]
+    fn test_omarchy_pipewire_audio_config() {
+        let mut audio = OmarchyAudioPipewireConfig::new();
+        assert!(audio.set_low_latency(64));
+        assert_eq!(audio.quantum_buffer_size, 64);
+        assert!(!audio.set_low_latency(0));
+    }
 }
