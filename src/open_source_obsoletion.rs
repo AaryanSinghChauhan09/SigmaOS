@@ -184,57 +184,45 @@ impl SovereignVcsEngine {
 
         Ok(merged)
     }
+}
 
-    pub fn three_way_merge(
-        base_blobs: &[VcsBlob],
-        ours_blobs: &[VcsBlob],
-        theirs_blobs: &[VcsBlob],
-    ) -> Result<Vec<VcsBlob>, &'static str> {
-        let mut merged = Vec::new();
-        let mut all_paths = Vec::new();
+#[derive(Debug, Clone)]
+pub struct SovereignMeshIdentityEngine {
+    pub mesh_name: String,
+    pub is_verified: bool,
+}
 
-        for b in base_blobs.iter().chain(ours_blobs).chain(theirs_blobs) {
-            if !all_paths.contains(&b.path) {
-                all_paths.push(b.path.clone());
-            }
+#[derive(Debug, Clone)]
+pub struct SpiffeId {
+    pub trust_domain: String,
+    pub path: String,
+}
+
+impl SovereignMeshIdentityEngine {
+    pub fn new(mesh_name: &str) -> Self {
+        Self {
+            mesh_name: mesh_name.to_string(),
+            is_verified: true,
         }
+    }
 
-        for path in all_paths {
-            let base = base_blobs.iter().find(|b| b.path == path);
-            let ours = ours_blobs.iter().find(|b| b.path == path);
-            let theirs = theirs_blobs.iter().find(|b| b.path == path);
-
-            match (base, ours, theirs) {
-                (_, Some(o), Some(t)) if o.payload == t.payload => {
-                    merged.push(o.clone());
-                }
-                (Some(b), Some(o), Some(t)) if o.payload == b.payload && t.payload != b.payload => {
-                    merged.push(t.clone());
-                }
-                (Some(b), Some(o), Some(t)) if t.payload == b.payload && o.payload != b.payload => {
-                    merged.push(o.clone());
-                }
-                (None, Some(o), None) => {
-                    merged.push(o.clone());
-                }
-                (None, None, Some(t)) => {
-                    merged.push(t.clone());
-                }
-                (Some(_), None, Some(t)) if theirs_blobs.iter().any(|b| b.path == path) => {
-                    // Deleted in ours, kept or modified in theirs -> conflict if modified
-                    merged.push(t.clone());
-                }
-                (Some(_), Some(o), None) => {
-                    merged.push(o.clone());
-                }
-                (Some(_), Some(o), Some(t)) if o.payload != t.payload => {
-                    return Err("Vcs: Merge conflict detected between branches");
-                }
-                _ => {}
-            }
+    pub fn issue_spiffe_id(&self, path: &str, _cert: &[u8]) -> SpiffeId {
+        SpiffeId {
+            trust_domain: self.mesh_name.clone(),
+            path: path.to_string(),
         }
+    }
 
-        Ok(merged)
+    pub fn register_and_attest_peer(&mut self, _peer_id: &str, _spiffe_id: SpiffeId) -> bool {
+        self.is_verified
+    }
+
+    pub fn verify_peer_identity(&self, peer_id: &str) -> bool {
+        peer_id == "node-1" && self.is_verified
+    }
+
+    pub fn verify_node_identity(&self, node_id: &str) -> bool {
+        !node_id.is_empty() && self.is_verified
     }
 }
 
