@@ -5,6 +5,13 @@ pub mod moksha;
 pub mod pantheon;
 pub mod screensaver;
 pub mod zenith_compositor;
+pub mod ultimate_distro_desktop;
+
+pub use ultimate_distro_desktop::{
+    ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
+    LuminaBsdDesktopEngine, SwayRegolithWmEngine, SwayWorkspaceContainerNode, ThunarCustomAction,
+    Xfce418Engine,
+};
 
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
