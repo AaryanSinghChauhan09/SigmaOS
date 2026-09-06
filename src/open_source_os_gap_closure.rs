@@ -3106,39 +3106,6 @@ impl OpenSourceProjectSupremacySuite {
         Ok(record)
     }
 
-    /// FreeBSD: Throttle RACCT/RCTL process resource usage
-    pub fn throttle_racct_resource(&mut self, pid: u32, cpu_limit_pct: u32) -> bool {
-        if pid == 0 || cpu_limit_pct > 100 {
-            false
-        } else {
-            true
-        }
-    }
-
-    /// Linux: Process eBPF XDP zero-copy network packet
-    pub fn process_xdp_zero_copy_packet(&mut self, packet_len_bytes: usize) -> bool {
-        // MTU boundaries check (64 to 9000 bytes)
-        if packet_len_bytes >= 64 && packet_len_bytes <= 9000 {
-            true
-        } else {
-            false
-        }
-    }
-
-    /// Bcachefs: Scrub multi-tier storage extent integrity
-    pub fn scrub_tiered_storage_extent(&mut self, extent_id: u64) -> bool {
-        extent_id > 0
-    }
-
-    /// Systemd-free supervisor state verification
-    pub fn supervise_systemd_free_init(&mut self, service_name: &str) -> bool {
-        if service_name.is_empty() {
-            false
-        } else {
-            self.runit_services.insert(service_name.to_string(), 1001);
-            true
-        }
-    }
 
     /// Evaluates overall open-source project supremacy parity status
     pub fn evaluate_open_source_project_supremacy(&self) -> bool {

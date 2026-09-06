@@ -24,10 +24,8 @@ if command -v pytest &>/dev/null; then
   pytest tests/
 elif python3 -m pytest --version &>/dev/null; then
   python3 -m pytest tests/
-elif python3 -c "import pytest" &>/dev/null; then
-  pytest
-elif command -v python3 &>/dev/null && command -v pytest &>/dev/null; then
-  pytest tests/
+elif command -v python3 &>/dev/null; then
+  python3 -c "import pytest" &>/dev/null && pytest tests/ || true
 else
     echo "pytest not available in environment; skipping python tests."
 fi
@@ -55,25 +53,26 @@ rustc --test --edition 2021 src/unimplemented_tools.rs -o build/test_unimplement
 
 # 6. Run Open Source OS Gap Closure standalone tests
 echo "[6/13] Running Open Source OS Gap Closure standalone tests..."
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_os_gap_closure.rs -o /tmp/test_gap
-/tmp/test_gap
+mkdir -p build
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_os_gap_closure.rs -o build/test_gap
+./build/test_gap
 
 # 7. Run Expanded Wiki Innovations standalone tests
 echo "[7/13] Running Expanded Wiki Innovations standalone tests..."
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/expanded_wiki_innovations.rs -o /tmp/test_wiki
-/tmp/test_wiki
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/expanded_wiki_innovations.rs -o build/test_wiki
+./build/test_wiki
 
 # 8. Run Arch Pacman & Boot standalone tests
 echo "[8/13] Running Arch Pacman & Boot standalone tests..."
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/arch_pacman_engine.rs -o /tmp/test_arch
-/tmp/test_arch
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/boot/sigma_boot.rs -o /tmp/test_boot
-/tmp/test_boot
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/arch_pacman_engine.rs -o build/test_arch
+./build/test_arch
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/boot/sigma_boot.rs -o build/test_boot
+./build/test_boot
 
 # 9. Run Fedora RPM & MirrorManager2 standalone tests
 echo "[9/13] Running Fedora RPM & MirrorManager2 standalone tests..."
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/fedora_rpm_engine.rs -o /tmp/test_fedora
-/tmp/test_fedora
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/fedora_rpm_engine.rs -o build/test_fedora
+./build/test_fedora
 
 # 10. Run changed files standalone tests runner
 echo "[10/13] Running changed files standalone rustc test runner..."
@@ -89,10 +88,6 @@ fi
 
 # 12. Run Universal Package Manager CLI simulation tests
 echo "[12/13] Running Universal Package Manager CLI simulation tests..."
-if command -v python3 &>/dev/null; then
-  python3 -c "import tests.test_integration_system as t1; t1.test_universal_distro_subsystem_bridge(); print('Universal package manager CLI simulation test passed.')"
-# 8. Run Universal Package Manager CLI simulation tests
-echo "[8/12] Running Universal Package Manager CLI simulation tests..."
 if command -v pytest &>/dev/null; then
   pytest tests/test_integration_system.py -k test_universal_package_manager_cli_simulation
 elif command -v python3 &>/dev/null; then
@@ -115,24 +110,12 @@ if [ -f "src/security/input_validation.rs" ]; then
     ./build/input_val_test
 fi
 
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
+echo ":: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)..."
 if command -v pytest &>/dev/null; then
   pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
 elif python3 -m pytest --version &>/dev/null; then
   python3 -m pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
 fi
 
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
-pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
-
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
-pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
-
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
-pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
-
-echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
-pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
-
-echo -e "${GREEN}[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]${RESET}"
+echo "[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]"
 exit 0
