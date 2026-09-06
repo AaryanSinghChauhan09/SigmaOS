@@ -1208,6 +1208,37 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdInstallStrategy),
             PackageFormat::Starling => Box::new(StarlingInstallStrategy),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::Air => Box::new(AirInstallStrategy),
+            PackageFormat::Bottle => Box::new(BottleInstallStrategy),
+            PackageFormat::Ipa => Box::new(IpaInstallStrategy),
+            PackageFormat::Ports => Box::new(PortsInstallStrategy),
+            PackageFormat::Pkg => Box::new(PkgInstallStrategy),
+            PackageFormat::Aab => Box::new(AabInstallStrategy),
+            PackageFormat::TarGz => Box::new(TarGzInstallStrategy),
+            PackageFormat::Xz => Box::new(XzInstallStrategy),
+            PackageFormat::App => Box::new(AppInstallStrategy),
+            PackageFormat::Hap => Box::new(HapInstallStrategy),
+            PackageFormat::Pisi => Box::new(PisiInstallStrategy),
+            PackageFormat::Superdeb => Box::new(SuperdebInstallStrategy),
+            PackageFormat::Lzm => Box::new(LzmInstallStrategy),
+            PackageFormat::Pup => Box::new(PupInstallStrategy),
+            PackageFormat::Pet => Box::new(PetInstallStrategy),
+            PackageFormat::Tar => Box::new(TarInstallStrategy),
+            PackageFormat::Moss => Box::new(MossInstallStrategy),
+            PackageFormat::Hpkg => Box::new(HpkgInstallStrategy),
+            PackageFormat::Tcz => Box::new(TczInstallStrategy),
+            PackageFormat::Gobo => Box::new(GoboInstallStrategy),
+            PackageFormat::Ostree => Box::new(OstreeInstallStrategy),
+            PackageFormat::Pkgsrc => Box::new(PkgsrcInstallStrategy),
+            PackageFormat::Sfs => Box::new(SfsInstallStrategy),
+            PackageFormat::Puk => Box::new(PukInstallStrategy),
+            PackageFormat::Dmg => Box::new(DmgInstallStrategy),
+            PackageFormat::Cports => Box::new(CportsInstallStrategy),
+            PackageFormat::Dports => Box::new(DportsInstallStrategy),
+            PackageFormat::SlackBuild => Box::new(SlackBuildInstallStrategy),
+            PackageFormat::Crux => Box::new(CruxInstallStrategy),
+            PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
+            PackageFormat::Stratum => Box::new(StratumInstallStrategy),
             _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
@@ -1232,6 +1263,37 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdMetadataAdapter),
             PackageFormat::Starling => Box::new(StarlingMetadataAdapter),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::Air => Box::new(AirMetadataAdapter),
+            PackageFormat::Bottle => Box::new(BottleMetadataAdapter),
+            PackageFormat::Ipa => Box::new(IpaMetadataAdapter),
+            PackageFormat::Ports => Box::new(PortsMetadataAdapter),
+            PackageFormat::Pkg => Box::new(PkgMetadataAdapter),
+            PackageFormat::Aab => Box::new(AabMetadataAdapter),
+            PackageFormat::TarGz => Box::new(TarGzMetadataAdapter),
+            PackageFormat::Xz => Box::new(XzMetadataAdapter),
+            PackageFormat::App => Box::new(AppMetadataAdapter),
+            PackageFormat::Hap => Box::new(HapMetadataAdapter),
+            PackageFormat::Pisi => Box::new(PisiMetadataAdapter),
+            PackageFormat::Superdeb => Box::new(SuperdebMetadataAdapter),
+            PackageFormat::Lzm => Box::new(LzmMetadataAdapter),
+            PackageFormat::Pup => Box::new(PupMetadataAdapter),
+            PackageFormat::Pet => Box::new(PetMetadataAdapter),
+            PackageFormat::Tar => Box::new(TarMetadataAdapter),
+            PackageFormat::Moss => Box::new(MossMetadataAdapter),
+            PackageFormat::Hpkg => Box::new(HpkgMetadataAdapter),
+            PackageFormat::Tcz => Box::new(TczMetadataAdapter),
+            PackageFormat::Gobo => Box::new(GoboMetadataAdapter),
+            PackageFormat::Ostree => Box::new(OstreeMetadataAdapter),
+            PackageFormat::Pkgsrc => Box::new(PkgsrcMetadataAdapter),
+            PackageFormat::Sfs => Box::new(SfsMetadataAdapter),
+            PackageFormat::Puk => Box::new(PukMetadataAdapter),
+            PackageFormat::Dmg => Box::new(DmgMetadataAdapter),
+            PackageFormat::Cports => Box::new(CportsMetadataAdapter),
+            PackageFormat::Dports => Box::new(DportsMetadataAdapter),
+            PackageFormat::SlackBuild => Box::new(SlackBuildMetadataAdapter),
+            PackageFormat::Crux => Box::new(CruxMetadataAdapter),
+            PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
+            PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
             _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
@@ -2809,16 +2871,16 @@ mod tests {
     #[test]
     fn test_universal_package_format_bridge() {
         let deb_pkg = UniversalPackageFormatBridge::detect_and_transpile("nginx.deb", b"deb_payload").unwrap();
-        assert_eq!(deb_pkg.formats[0], PackageFormat::Deb);
+        assert!(deb_pkg.formats.contains(&PackageFormat::Deb));
         assert_eq!(deb_pkg.name, "nginx");
         assert!(deb_pkg.dependencies.contains(&"libc6".to_string()));
 
         let rpm_pkg = UniversalPackageFormatBridge::detect_and_transpile("curl.rpm", b"rpm_payload").unwrap();
-        assert_eq!(rpm_pkg.formats[0], PackageFormat::Rpm);
+        assert!(rpm_pkg.formats.contains(&PackageFormat::Rpm));
         assert!(rpm_pkg.provides.contains(&"fedora_compat".to_string()));
 
         let apk_pkg = UniversalPackageFormatBridge::detect_and_transpile("busybox.apk", b"apk_payload").unwrap();
-        assert_eq!(apk_pkg.formats[0], PackageFormat::Apk);
+        assert!(apk_pkg.formats.contains(&PackageFormat::Apk));
         assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
     }
 }

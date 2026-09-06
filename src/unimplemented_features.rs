@@ -2205,9 +2205,9 @@ impl SovereignStatelessArchitectureEngine {
         user_overrides_exist: bool,
     ) -> String {
         if user_overrides_exist {
-            alloc::format!("{}/{}", self.user_override_path, config_key)
+            format!("{}/{}", self.user_override_path, config_key)
         } else {
-            alloc::format!("{}/{}", self.factory_default_path, config_key)
+            format!("{}/{}", self.factory_default_path, config_key)
         }
     }
 }

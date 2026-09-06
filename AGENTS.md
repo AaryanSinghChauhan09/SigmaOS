@@ -1,62 +1,151 @@
-# 🤖 SigmaOS AI Agent Governance Specification (`AGENTS.md`)
+# AGENTS.md — AI Agent Guidelines, Versioning, Compile-Time Defenses, Clock, Circular Buffers, Cache Memory, Process, Hardware Fitting, Backend, Loading, Processor & Network Management for SigmaOS
 
-**Version:** 2.1.0
-**Scope:** Autonomous AI Agents (Bolt ⚡, Palette 🎨, Sentinel 🛡️), Process, Memory, Loader, Desktop, Paging, Allocation, Block Storage, Basic File System, Buffer Cache, Chained Allocation, Cache Broker, & Communication Operation Management
-
----
-
-## EXECUTIVE SUMMARY & AGENT ARCHITECTURE
-
-SigmaOS features an AI-native architecture where autonomous agent processes govern kernel scheduling, memory pools, dynamic module loading, desktop environments, virtual memory paging, heap allocations, block storage devices, virtual file systems, unified buffer caches, chained allocation lists, multi-tiered cache brokers, and communication channels.
-
-```
-                  +-----------------------------------+
-                  |   SIGMAOS AI AGENT GOVERNANCE     |
-                  +-----------------------------------+
-                                    |
-         +--------------------------+--------------------------+
-         |                          |                          |
-         v                          v                          v
-  ⚡ BOLT PROCESS            🎨 PALETTE PROCESS         🛡️ SENTINEL PROCESS
-  • Zero-Copy IPC Latency    • IPC Channel Visualization • PQC Encrypted IPC Check
-  • Socket RTT Optimization  • Network Socket Status     • Capability Token Audit
-  • Sub-µs Memory Access     • Semantic ARIA Tags        • Post-Quantum Verification
-```
+This document provides instructions, rules, and procedures for AI agents working in the SigmaOS repository, specifically regarding **Version Handling**, **Release Channels**, **Compile-Time Defenses & Build Hardening**, **Clock & Timer Management**, **Circular Buffer & Ring Buffer Management**, **Cache Memory Management**, **Process Lifecycle & Signal ABI Management**, **Hardware Fitting & Driver Auto-Binding**, **Network Stack & eBPF Management**, **Processor Subsystem Management**, **Backend Management**, **Bootloader & Driver Loading**, **Multi-Distro Packaging Parity**, and **Core Subsystem Changes**.
 
 ---
 
-## 1. AGENT PERSONAS & GOVERNANCE
+## 1. Core Principles & Philosophy
 
-### ⚡ Bolt (Performance Agent)
-- **Scope**: CPU scheduling, `cgroups v2`, boot speed profiling, Zenith compositor render frame-rate profiling, page translation walk profiling, heap allocation latency profiling, NVMe/AHCI storage throughput profiling, VFS file I/O latency profiling, page/buffer cache hit ratio profiling, Memory Descriptor List (MDL) scatter-gather DMA throughput profiling, multi-tiered cache broker lookup latency profiling, zero-copy IPC channel throughput and BSD socket latency profiling (`src/kernel/net/socket_layer.rs`).
-- **Rules**:
-  - Maintain zero-copy IPC throughput above 14.2 GB/s and minimize socket connection latency.
-  - Record learnings in `.jules/bolt.md`.
-
-### 🎨 Palette (UX & Accessibility Agent)
-- **Scope**: Desktop compositor layout, Control Center themes, visual memory map views, partition usage graphs, SMART drive health diagnostics, graphical file manager tree views, live page cache utilization charts, memory descriptor list chain visual diagnostic graphs, multi-tier cache utilization visual interfaces, active IPC channel and socket connection visual state views, WCAG 2.1 AA focus outlines, ARIA annotations.
-- **Rules**:
-  - Render accessible real-time network socket and IPC connection status interfaces.
-  - Record learnings in `.jules/palette.md`.
-
-### 🛡️ Sentinel (Security & Integrity Agent)
-- **Scope**: LSM auditing, OpenBSD `pledge`/`unveil`, Post-Quantum Dilithium-5 signatures, page table W^X audit, secure buffer zeroization, block device encryption validation (LUKS2/GELI), file permission validation, dirty buffer zeroization, Memory Descriptor List (MDL) bounds verification, cache zeroization and cryptographic hash verification auditing, PQC (Kyber-1024 / Dilithium-5) encrypted IPC message validation and socket capability token auditing (`src/kernel/net/socket_layer.rs`, `src/kernel/subsystem.rs`).
-- **Rules**:
-  - Enforce PQC cryptographic signature verification on all IPC channels and socket control operations.
-  - Record learnings in `.jules/sentinel.md`.
+* **Zero External Dependencies:** SigmaOS kernel and core userland maintain a 100% self-sufficient `#![no_std]` Rust architecture. Do NOT introduce third-party external crates to `Cargo.toml`.
+* **Semantic Versioning (SemVer 2.0.0):** All core components follow `MAJOR.MINOR.PATCH` versioning scheme.
+* **Always Verify Code Changes:** Run `./run_sigma_tests.sh` to ensure all 13 test execution steps (unit, integration, python verification, multi-distro adapters) pass cleanly after making modifications.
 
 ---
 
-## 2. COMMUNICATION OPERATION POLICIES (`docs/AI_AGENTS_COMMUNICATION_OPERATION_MANAGEMENT.md`)
+## 2. Versioning Standards & Rules for AI Agents
 
-- **Capability Endpoints**: IPC message passing must be gated by valid `CapabilityToken` verification.
-- **IPC Namespace Invariants**: Processes operating within isolated IPC namespaces must not leak IPC channels across namespace boundaries.
+When modifying, releasing, or updating versions in SigmaOS:
+
+### 2.1 Core Repository & Cargo Version
+* Core package version is declared in `Cargo.toml` (`version = "0.1.0"`).
+* **MAJOR (x.0.0):** Incompatible API/ABI or kernel architecture changes (e.g., breaking KABI stability).
+* **MINOR (0.x.0):** New backward-compatible kernel subsystems, drivers, or distro parity features.
+* **PATCH (0.0.x):** Backward-compatible bug fixes, performance optimizations, or security patches.
 
 ---
 
-## 3. STANDALONE TESTING & VERIFICATION PROTOCOL
+## 3. Compile-Time Defenses & Build Hardening Rules for AI Agents
 
-Every agent module must support standalone unit testing via:
-```bash
-rustc --test <module_path> --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_agent && /tmp/test_agent
-```
+When modifying build settings, profile options, or feature flags:
+
+1. **`#![no_std]` Zero-Dependency Invariant:**
+   Maintain 100% self-sufficient core Rust implementations. Do NOT add external dependencies to `Cargo.toml`.
+2. **`panic = "abort"` Unwind Protection:**
+   Both `dev` and `release` profiles MUST use `panic = "abort"` to prevent stack unwinding exploit primitives.
+3. **Compile-Time Feature Gating:**
+   Use explicit `#[cfg(feature = "...")]` attributes for optional subsystem code to minimize binary attack surface.
+
+---
+
+## 4. Clock Algorithm & Timer Management Rules for AI Agents
+
+When modifying clock page replacement or timekeeping subsystems:
+
+1. **Clock Page Replacement Hand-Pointer Traversal:**
+   Page frame eviction MUST traverse physical memory frames in a circular queue. Clear reference bits from `1` to `0` for second-chance evaluation before evicting unreferenced pages.
+2. **Monotonicity:**
+   Monotonic timers MUST guarantee non-decreasing tick progress across core CPUs and thread interrupts.
+
+---
+
+## 5. Circular Buffer & Lock-Free Ring Buffer Rules for AI Agents
+
+When implementing or modifying ring buffers in `src/klib/ring_buffer.rs`, `src/klib/ringbuf.rs`, or `src/media/sovereign_video_player.rs`:
+
+1. **Power-of-Two Capacity Rule:**
+   Ring buffer capacities MUST be powers of two ($2^k$) to perform $O(1)$ index wrapping via bitwise AND `idx & (capacity - 1)`.
+
+---
+
+## 6. Cache Memory Architecture, LRU Eviction & Package Cache Rules for AI Agents
+
+When modifying cache memory engines, key-value stores, or package cache trimmers:
+
+1. **Key Invalidation Invariant:**
+   `SovereignCacheEngine::set` MUST purge pre-existing entries with matching keys via `self.entries.retain(|e| e.key != key)` before inserting new values.
+
+---
+
+## 7. Process Lifecycle, Signal ABI Translation & Supervision Rules for AI Agents
+
+When modifying process management, signal handlers, or pseudo-terminals:
+
+1. **State Machine Transitions (`SovereignProcessLifecycleController`):**
+   Ensure process state changes (`Created`, `Ready`, `Running`, `Blocked`, `Stopped`, `Zombie`, `Terminated`) execute under thread-safe synchronization.
+
+---
+
+## 8. Hardware Fitting, Driver Auto-Binding & Device Adaptation Rules for AI Agents
+
+When writing, probing, or modifying hardware device drivers (`src/drivers/`):
+
+1. **Bus Signature Probing:**
+   Driver probe routines MUST evaluate Vendor ID (VID), Product ID (PID), and interface class codes before claiming attachment.
+
+---
+
+## 9. Network Stack, eBPF/XDP & PQC Security Rules for AI Agents
+
+When modifying networking drivers, eBPF filters, or VPN subsystems:
+
+1. **Kernel Bypass eBPF/XDP Processing:**
+   Use zero-copy DMA ring buffers (`process_xdp_zero_copy_packet`). Ensure XDP actions explicitly return `XDP_PASS`, `XDP_DROP`, `XDP_TX`, or `XDP_REDIRECT`.
+
+---
+
+## 10. Processor Topology, CPU Scheduling & Multi-Core Rules for AI Agents
+
+When modifying CPU scheduling, task management, or ISA optimization:
+
+1. **ISA Level Auto-Detection (`src/klib/isa.rs`):**
+   Support x86-64 microarchitecture levels (`v1`..`v4`). Route vectorized operations via `vectorized_memcpy` dynamically based on detected features.
+
+---
+
+## 11. Kernel, Bootloader & Driver Loading Rules for AI Agents
+
+When modifying boot sequences, driver registration, or scheduler loading:
+
+1. **Multi-Stage Boot Pipeline:**
+   Respect the 4-phase boot sequence: Bootloader -> Kernel Initialization -> Dynamic Driver Loading -> Userland Supervisor.
+
+---
+
+## 12. Backend Subsystem & Server Engine Rules for AI Agents
+
+When modifying backend services in `src/open_source_obsoletion.rs`, `src/open_source_os_gap_closure.rs`, or `src/automation/system_level.rs`:
+
+1. **Zero-Dependency Native Backend Engines:**
+   Maintain native parity for embedded DBs (`SovereignEmbeddedDb`), web servers (`SovereignWebServer`), in-memory caches (`SovereignCacheEngine`), message brokers (`SovereignMessageBroker`), secret vaults (`SovereignSecretVault`), object stores (`SovereignDistributedStorage`), and orchestrators (`SovereignK8sOrchestratorEngine`).
+
+---
+
+## 13. Checklist for AI Agents
+
+1. **Update Manifests & Documentation** when bumping versions, adding drivers, or modifying build options.
+2. **Run Standalone Subsystem Tests:**
+   ```bash
+   rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_os_gap_closure.rs
+   ```
+3. **Execute Full Pipeline:** Run `./run_sigma_tests.sh` and ensure all test steps pass.
+4. **Follow Conventional Commits:**
+   `feat(build): enforce panic abort and feature gating` or `docs(agents): add compile-time defenses guide`.
+
+---
+
+## 14. Detailed Documentation References
+
+For technical specifications, see:
+* [`docs/AGENTS_VERSION_HANDLING.md`](docs/AGENTS_VERSION_HANDLING.md)
+* [`docs/AGENTS_BACKEND_MANAGEMENT.md`](docs/AGENTS_BACKEND_MANAGEMENT.md)
+* [`docs/AGENTS_LOADING_MANAGEMENT.md`](docs/AGENTS_LOADING_MANAGEMENT.md)
+* [`docs/AGENTS_PROCESSOR_MANAGEMENT.md`](docs/AGENTS_PROCESSOR_MANAGEMENT.md)
+* [`docs/AGENTS_NETWORK_MANAGEMENT.md`](docs/AGENTS_NETWORK_MANAGEMENT.md)
+* [`docs/AGENTS_FITTING_MANAGEMENT.md`](docs/AGENTS_FITTING_MANAGEMENT.md)
+* [`docs/AGENTS_PROCESS_MANAGEMENT.md`](docs/AGENTS_PROCESS_MANAGEMENT.md)
+* [`docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md`](docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md)
+* [`docs/AGENTS_CIRCULAR_BUFFER_MANAGEMENT.md`](docs/AGENTS_CIRCULAR_BUFFER_MANAGEMENT.md)
+* [`docs/AGENTS_CLOCK_ALGORITHM_MANAGEMENT.md`](docs/AGENTS_CLOCK_ALGORITHM_MANAGEMENT.md)
+* [`docs/AGENTS_COMPILE_TIME_DEFENSES_MANAGEMENT.md`](docs/AGENTS_COMPILE_TIME_DEFENSES_MANAGEMENT.md)
+* [`docs/RELEASE_CADENCE.md`](docs/RELEASE_CADENCE.md)
+* [`docs/package-manager.md`](docs/package-manager.md)

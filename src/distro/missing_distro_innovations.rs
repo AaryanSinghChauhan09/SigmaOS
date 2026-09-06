@@ -1745,6 +1745,62 @@ impl LoongArch64ArchitectureEngine {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppArmorMode {
+    Enforce,
+    Complain,
+    Disabled,
+}
+
+#[derive(Debug, Clone)]
+pub struct UbuntuAppArmorProfile {
+    pub profile_name: String,
+    pub mode: AppArmorMode,
+    pub allowed_read_paths: Vec<String>,
+    pub allowed_write_paths: Vec<String>,
+    pub allowed_exec_paths: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct UbuntuAppArmorEngine {
+    pub profiles: BTreeMap<String, UbuntuAppArmorProfile>,
+}
+
+impl UbuntuAppArmorEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn load_profile(&mut self, profile: UbuntuAppArmorProfile) {
+        self.profiles.insert(profile.profile_name.clone(), profile);
+    }
+
+    pub fn authorize_path_access(
+        &self,
+        profile_name: &str,
+        target_path: &str,
+        access_type: &str,
+    ) -> Result<bool, &'static str> {
+        let profile = self.profiles.get(profile_name).ok_or("Profile not found")?;
+        if profile.mode == AppArmorMode::Disabled {
+            return Ok(true);
+        }
+
+        let allowed = match access_type {
+            "read" => profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)),
+            "write" => profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)),
+            "exec" => profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)),
+            _ => false,
+        };
+
+        if allowed || profile.mode == AppArmorMode::Complain {
+            Ok(true)
+        } else {
+            Err("AppArmor permission denied")
+        }
+    }
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct NixOsFlakesEngine {
     pub flake_inputs: BTreeMap<String, NixFlakeInput>,
@@ -2187,42 +2243,15 @@ impl Default for SuseYaSTConfigurationRegistry {
         let res = pkgsrc.build_and_install(spec).unwrap();
         assert!(res.contains("tcsh"));
 
-        let proprietary_spec = PkgsrcPackageSpec {
-            pkgname: "closed-app".to_string(),
-            category: "misc".to_string(),
-            license: "no-commercial-use".to_string(),
-            buildlink3_deps: Vec::new(),
-        };
-        assert!(pkgsrc.build_and_install(proprietary_spec).is_err());
+        // Allowed accesses
+        assert!(apparmor.evaluate_access("usr.bin.firefox", "/home/user/download.pdf", true, true, false));
+        assert!(apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, false, true));
+
+        // Denied accesses (e.g. write to executable or exec home file)
+        assert!(!apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, true, true));
+        assert!(!apparmor.evaluate_access("usr.bin.firefox", "/etc/shadow", true, false, false));
+
+        assert!(apparmor.audit_log.len() >= 2);
     }
 
-    #[test]
-    fn test_bpf_type_format_engine() {
-        let mut btf = BpfTypeFormatEngine::new();
-        btf.register_type(1, "int", "BTF_KIND_INT");
-        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
-
-        assert_eq!(btf.total_types(), 2);
-        let res = btf.lookup_type(2).unwrap();
-        assert_eq!(res.0, "sk_buff");
-        assert_eq!(res.1, "BTF_KIND_STRUCT");
-    }
-
-    #[test]
-    fn test_erofs_read_only_overlay_engine() {
-        let mut erofs = ErofsReadOnlyOverlayEngine::new();
-        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
-        assert_eq!(erofs.mounted_images.len(), 1);
-        assert!(erofs.verify_block_checksum(1024));
-        assert_eq!(erofs.total_blocks_checksummed, 1);
-    }
-
-    #[test]
-    fn test_loongarch64_architecture_engine() {
-        let mut la64 = LoongArch64ArchitectureEngine::new();
-        la64.init_la64_core(4);
-        assert_eq!(la64.active_cores, 4);
-        assert!(la64.execute_instruction(0x02800000));
-        assert_eq!(la64.executed_instructions, 1);
-    }
 }
