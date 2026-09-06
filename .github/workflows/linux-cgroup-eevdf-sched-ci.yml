@@ -24,5 +24,11 @@ jobs:
 
       - name: Test Kernel Scheduler Submodule
         run: |
+          mkdir -p build
           rustc --test src/kernel/scheduler.rs --edition=2021 -o build/sched_test
           ./build/sched_test
+
+      - name: Test SchedExt BPF & Microarchitecture JIT Dispatching
+        run: |
+          rustc --test src/distro/sovereign_nextgen_distro_leap.rs --edition=2021 -o build/nextgen_leap_test
+          ./build/nextgen_leap_test

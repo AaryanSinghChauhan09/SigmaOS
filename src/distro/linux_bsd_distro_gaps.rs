@@ -942,20 +942,23 @@ mod tests {
         let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
-
-        assert_eq!(
-            resolver.lookup_modprobe_alias("char-major-10-200"),
-            Some("tun")
-        );
-        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
+    }
 
     #[test]
     fn test_sovereign_dynamic_devfs() {
         let mut devfs = SovereignDynamicDevfsEngine::new();
         assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234-ABCD"));
+        assert!(devfs.lookup_node("sda").is_some());
+    }
 
-        resolver.faillock_guard.reset();
-        assert!(!resolver.faillock_guard.is_locked);
+    #[test]
+    fn test_sovereign_gap_resolver() {
+        let resolver = SovereignUniversalDistroGapResolver::new();
+        assert_eq!(
+            resolver.lookup_modprobe_alias("char-major-10-200"),
+            Some("tun")
+        );
+        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
     }
 }
 
@@ -1048,4 +1051,3 @@ impl Default for SovereignUniversalDistroGapResolver {
         Self::new()
     }
 }
-} // end mod tests

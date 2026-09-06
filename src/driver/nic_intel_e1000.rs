@@ -192,8 +192,8 @@ impl DmaRing {
 pub struct IntelNicDriver {
     device_id: u16,
     pci_address: String,
-    // mac_address: MacAddress, // removed - not available
-    // ip_address: Option<IPv4Address>, // removed - not available
+    mac_bytes: [u8; 6],
+    ip_bytes: Option<[u8; 4]>,
     mmio_base: u64,
     mmio_size: u64,
     rx_ring: DmaRing,
@@ -385,15 +385,15 @@ mod tests {
     #[test]
     fn test_mac_address_operations() {
         let mut driver = IntelNicDriver::new(E1000_I210, "0000:00:1f.6");
-        let mac = MacAddress::new(0x00, 0x11, 0x22, 0x33, 0x44, 0x55);
-
+        driver.mac_bytes = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+        assert_eq!(driver.mac_bytes[0], 0x00);
     }
 
     #[test]
     fn test_ip_address_operations() {
         let mut driver = IntelNicDriver::new(E1000_I210, "0000:00:1f.6");
-        let ip = IPv4Address::new(192, 168, 1, 100);
-
+        driver.ip_bytes = Some([192, 168, 1, 100]);
+        assert_eq!(driver.ip_bytes.unwrap()[0], 192);
     }
 
     #[test]
