@@ -1,0 +1,31 @@
+name: Pop!_OS COSMIC Window Tiling & Hybrid Graphics CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  popos-cosmic-graphics:
+    name: COSMIC Dynamic Tiling & Distro Country Flags SVG
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test COSMIC Window Tiling Engine
+        run: |
+          cargo test --lib -- unimplemented_features::tests::test_sovereign_cosmic_tiling_engine
+
+      - name: Test Graphics SVG Flag Engine
+        run: |
+          cargo test --lib -- graphics::country_flags_svg::tests

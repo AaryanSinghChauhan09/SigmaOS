@@ -1,0 +1,27 @@
+name: Haiku OS .hpkg Format & PackageFS Virtual Mount CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  haiku-packagefs:
+    name: Haiku .hpkg Manifest Parsing & PackageFS Bridge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test Haiku .hpkg Format Bridge & PackageFS
+        run: |
+          cargo test --lib -- sigpkg::universal_adapter::tests::test_haiku_hpkg_manifest_parsing_and_bridge
