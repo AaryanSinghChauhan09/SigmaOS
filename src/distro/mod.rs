@@ -224,3 +224,15 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
+
+pub mod bsd_linux_innovations;
+pub use bsd_linux_innovations::{
+    AlpineLbuDisklessPersistenceEngine, BsdDevdHardwareEventDispatcher,
+    BsdMicroVmTapBridgeController, BsdSecureNtpConstraintSync, BsdStatefulPacketFilter,
+    DevdEventType, DevdHardwareEvent, DevdRule, DragonFlyHammerFs,
+    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, InitramfsHookStage,
+    KmodDependency, LbuOverlayFile, LbuSnapshotFormat, PfRuleAction, PfStateEntry,
+    PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
+    SovereignAnonScrubber, SovereignDeltaPackageSigner, SovereignDeltaPatch,
+    SovereignInitramfsKmodHookSolver, TapInterfaceState, TlsConstraint, VirtioFsZeroCopyBridge,
+};
