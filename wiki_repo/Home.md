@@ -19,25 +19,13 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 - **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
 - **Zero-Trust Access Control & MAC:** Discretionary (DAC), Mandatory Access Control (MAC LSM Inode/Ptrace/Socket hooks), and Role-Based (RBAC) security enforcers.
 - **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
-- **AI Agents Master Guide:** [[AI_AGENTS_GUIDE]] - Authoritative reference for autonomous coding agents and subagents.
-- **AI Agents UX Management Guide:** [[AI_AGENTS_UX_MANAGEMENT_GUIDE]] - Interface, visual layout, and UX guidelines for autonomous AI agents.
-- **AI Agents Time Management Guide:** [[AI_AGENTS_TIME_MANAGEMENT_GUIDE]] - Timekeeping primitives, clock sync, and temporal architecture for autonomous AI agents.
-- **AI Agents Security Management Guide:** [[AI_AGENTS_SECURITY_MANAGEMENT_GUIDE]] - Capability sandboxing, PQC attestation, MAC, and digital forensics for autonomous AI agents.
-- **AI Agents Procedure Call Management Guide:** [[AI_AGENTS_PROCEDURE_CALL_MANAGEMENT_GUIDE]] - Syscall dispatchers, FFI bindings, zero-copy IPC ring channels, and RPC for autonomous AI agents.
-- **AI Agents Ballooning Management Guide:** [[AI_AGENTS_BALLOONING_MANAGEMENT_GUIDE]] - VirtIO memory ballooning, RAM inflation/deflation, and hypervisor overcommit management for AI agents.
-- **AI Agents Boot Management Guide:** [[AI_AGENTS_BOOT_MANAGEMENT_GUIDE]] - UEFI/BIOS handoff, Multiboot2, Secure Boot verification, boot optimization, and init handoff for AI agents.
-- **AI Agent Carry Flag Management Guide:** [[AI_AGENT_CARRY_FLAG_MANAGEMENT]] - Hardware status flags, bignum arithmetic carry chains, and ALU emulation for AI agents.
-- **AI Agent C-SCAN Policy Management Guide:** [[AI_AGENT_CIRCULAR_SCAN_POLICY_MANAGEMENT]] - Circular SCAN elevator disk scheduling, LBA sector ordering, and wrap-around semantics for AI agents.
-- **AI Agent Cloned Process Management Guide:** [[AI_AGENT_CLONED_PROCESS_MANAGEMENT]] - POSIX fork, clone flags (CLONE_VM, CLONE_FILES, CLONE_THREAD), and job object inheritance for AI agents.
-- **AI Agent Commands Management Guide:** [[AI_AGENT_COMMANDS_MANAGEMENT]] - Sovereign command suite, privilege delegation (sudo/doas), task monitoring, sysctl, and multi-distro CLI for AI agents.
-- **AI Agent Time Sharing System Management Guide:** [[AI_AGENT_TIME_SHARING_SYSTEM_MANAGEMENT]] - Quantum time slicing, POSIX SCHED_RR, EEVDF virtual deadlines, and MLFQ priority decay for AI agents.
+- **Autonomous AI Agent Resource Management:** Intelligent microkernel and userland agent governors for compute, memory (DAMON/PSI), storage (ZFS ARC/CoW), network QoS (eBPF/VNET), and thermal power tuning via ACP/MCP protocols.
 
 ---
 
 ## 📚 Documentation Index
 
 - [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
-- [High-Level Language Dependency Elimination Guide](HIGH_LEVEL_LANGUAGE_ELIMINATION_GUIDE.md)
 - [API Reference](docs/api-reference.md)
 - [Kernel Architecture](docs/kernel.md)
 - [Memory Management](docs/memory-management.md)
@@ -105,7 +93,7 @@ make test-qemu
 
 ## 📈 Recent Progress (September 2026)
 
-### v0.5 Milestone: 50% Project Completion ✅
+### v0.6 Milestone: Consolidation Complete ✅
 
 **Major Achievements**:
 - ✅ **Build System Stabilization**: Reduced 4,700+ compilation errors to 206 (95.6% reduction)
@@ -126,13 +114,7 @@ make test-qemu
 4. ⏳ Phase 4: GitHub synchronization (in progress)
 5. ⏳ Phase 5: Tier 1 features (signal delivery, mprotect, advanced scheduling)
 
-**Build Status**:
-- Errors: 4,700+ → 206 (95.6% reduction)
-- Type Inference: 4,043 → 0 (ELIMINATED)
-- Alloc Architecture: RESOLVED
-- Remaining Issues: Isolated (duplicate types, trait conflicts)
-
-For detailed progress information, see [RELEASE_NOTES_v0.5.md](RELEASE_NOTES_v0.5.md).
+For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and [wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
 
 ---
 

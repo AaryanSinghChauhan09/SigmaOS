@@ -1935,9 +1935,9 @@ To establish SigmaOS as the supreme, next-generation operating system that unifi
 
 By systematically identifying the critical flaws in proprietary kernels and legacy Linux distributions, SigmaOS synthesizes an ultimate, unified operating system architecture. It absorbs the legendary stability of Debian, the pure state-determinism of NixOS, the extreme minimalism of Arch, the security-hardened seccomp gates of OpenBSD, and the structured driver model of Windows, combining them under a single, bare-metal, high-performance platform. SigmaOS stands ready to unite developers, enterprise workstations, and mobile devices under the ultimate sovereign OS banner.
 
-*   \[x] **Phase 1 (Validation)**: Complete core traits and verification tests for standards, packages, and observability.
-*   \[x] **Phase 2 (Parity)**: Implement real-time scheduling preemption gates and FHS directory mounts.
-*   \[x] **Phase 3 (Leapfrog)**: Launch sandboxed user-defined dynamic tracing engines and fully automated, AI-driven performance optimization loops.
+*   \[ ] **Phase 1 (Validation)**: Complete core traits and verification tests for standards, packages, and observability.
+*   \[ ] **Phase 2 (Parity)**: Implement real-time scheduling preemption gates and FHS directory mounts.
+*   \[ ] **Phase 3 (Leapfrog)**: Launch sandboxed user-defined dynamic tracing engines and fully automated, AI-driven performance optimization loops.
 
 <!---->
 
@@ -4219,3 +4219,39 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 
 4. **Exploit Payload Canary Integrity Verification**:
    - Security auditing routines (`src/security/vulnerability.rs`) must evaluate stack canary byte window preservation during vulnerability payload analysis.
+
+---
+
+## 84. SOVEREIGN AI AGENT CLOUD COMPUTING OPERATIONS MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 84.1 Autonomous Agent Cloud Computing Operations Directives
+
+1. **Headless Cloud Target Initialization (`SystemTarget::Cloud`)**:
+   - Headless cloud targets (`src/init/sigmainit.rs`) booting under `cloud.target` must bypass GUI compositor loops, prioritizing E1000/xHCI zero-copy queues and maintaining a memory footprint under 16MB.
+
+2. **Capability-Gated Cloud-Init Bootstrap Engine**:
+   - First-boot cloud instance bootstrap engine (`CloudInitBootstrapEngine` in `src/distro/linux_bsd_parity_extended.rs`) must execute user-data `#cloud-config` scripts, SSH key staging, and `runcmd` directives within capability-sandboxed Ring 3 environments (`PledgeManager`).
+
+3. **Encrypted Cloud Block Storage (OpenStack Cinder Parity)**:
+   - Cinder block volume management (`CinderVolumeManager` in `src/storage/cinder.rs`) must enforce AES-256 or Kyber-1024 volume encryption, generating Copy-on-Write Merkle tree state snapshots for instant rollback.
+
+4. **Hyper-Converged Container & Micro-VM Orchestration**:
+   - Embedded k3s cluster controllers and Harvester micro-VM governors (`src/virtualization/rancher.rs`, `src/orchestration/sigmakube.rs`) must manage pod scheduling, CNI fast-packet routing, and Longhorn-style block volume pools under zero-trust capability rings.
+
+---
+
+## 85. SOVEREIGN AI AGENT STATE MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 85.1 Autonomous Agent State Management Directives
+
+1. **Declarative System State Graph & Generation Rollback**:
+   - System state mutations (`src/system/state.rs`) must generate immutable generation snapshots prior to updates, enabling $O(1)$ atomic rollback (`rollback()`) on validation failure without configuration drift.
+
+2. **Dependency Graph Validation Protocol**:
+   - Before applying system state changes, `DeclarativeStateGraph::validate()` must be invoked to confirm all node dependencies exist (`StateError::DependencyNotFound`), rejecting circular node references.
+
+3. **Kernel Process Lifecycle State Transitions**:
+   - Process lifecycle transitions (`src/kernel/process.rs`, `src/kernel/sched/task.rs`) must adhere strictly to valid state progression (`New` $\to$ `Ready` $\to$ `Running` $\to$ `BlockedWaiting` / `BlockedSuspended` $\to$ `Zombie` $\to$ `Terminated`).
+
+4. **Model-View-Intent (MVI) Reactive State Dispatch**:
+   - Unidirectional action dispatching and reducer transformations (`src/klib/store.rs`) must process state mutations asynchronously with zero lock contention.
