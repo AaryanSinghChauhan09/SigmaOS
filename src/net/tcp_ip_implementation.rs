@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #![allow(unexpected_cfgs)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Functional TCP/IP Network Stack Implementation

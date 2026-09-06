@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #![allow(unexpected_cfgs)]
 pub mod knowledgebase;
 pub use knowledgebase::*;

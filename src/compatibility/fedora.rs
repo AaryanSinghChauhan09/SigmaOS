@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #![allow(unexpected_cfgs)]
 use std::format;
 use std::vec;

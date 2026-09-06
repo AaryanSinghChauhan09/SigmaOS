@@ -40,3 +40,4 @@ pub use xfs::{
 };
 
 pub mod sigma_tmpfs;
+pub mod sigma_procfs;

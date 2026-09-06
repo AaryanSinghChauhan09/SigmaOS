@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #![allow(unexpected_cfgs)]
 
 /// OOP-based Socket API for SigmaOS

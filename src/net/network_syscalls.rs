@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
 //! Network System Calls Implementation
 //!
 //! Provides socket family syscalls with network namespace support (CLONE_NEWNET).

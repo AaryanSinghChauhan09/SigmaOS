@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #![allow(unexpected_cfgs)]
 //! Graphics Acceleration Support inspired by Mesa, Vulkan, and DRI
 //! Vulkan 1.3 / OpenGL 4.6 APIs, PRIME GPU offloading, compute shaders, and ray tracing pipelines.
