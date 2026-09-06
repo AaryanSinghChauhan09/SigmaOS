@@ -158,3 +158,4 @@ pub mod sigma_signal;
 pub mod sigma_namespaces;
 pub mod sigma_io_uring;
 pub mod sigma_dma;
+pub mod sigma_ebpf_runtime;

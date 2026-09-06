@@ -52,3 +52,5 @@ pub use ipc_namespace::{
     SharedMemoryObject, IpcNamespaceStats, MessageQueueId, SemaphoreId, SharedMemoryId,
     IpcObjectId,
 };
+
+pub mod sigma_shm;
