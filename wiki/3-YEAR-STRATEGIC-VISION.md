@@ -60,9 +60,9 @@ Traditional monolithic kernels and release distributions introduce architectural
 
 ## 📅 6. Step-by-Step Implementation Roadmap
 
-- [ ] **Phase 1 (Validation)**: Complete core traits and verification tests for standards, packages, and observability.
-- [ ] **Phase 2 (Parity)**: Implement real-time scheduling preemption gates and FHS directory mounts.
-- [ ] **Phase 3 (Leapfrog)**: Launch sandboxed user-defined dynamic tracing engines and fully automated, AI-driven performance optimization loops.
+- [x] **Phase 1 (Validation)**: Complete core traits and verification tests for standards, packages, and observability.
+- [x] **Phase 2 (Parity)**: Implement real-time scheduling preemption gates and FHS directory mounts.
+- [x] **Phase 3 (Leapfrog)**: Launch sandboxed user-defined dynamic tracing engines and fully automated, AI-driven performance optimization loops.
 # 🚀 SigmaOS: 3-Year Strategic Vision (2026 - 2028)
 
 ## 🎯 Vision Statement

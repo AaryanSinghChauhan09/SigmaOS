@@ -1,3 +1,6 @@
+pub mod gaming_layer;
+pub use gaming_layer::*;
+
 // Core Graphics and Composition Modules for SigmaOS
 pub mod compositor;
 pub mod video;
