@@ -9,8 +9,8 @@ SigmaOS is an ultra-autonomous, zero-dependency, safe Rust operating system desi
 
 This document serves as the **Master AI Agent Algorithm Diagnostics & Fix Guide**. Any AI agent operating on this codebase can consult this guide to understand:
 1. **What is working**: Operating OS subsystems, fully tested algorithms, and functional feature matrices.
-2. **What is not working & Why**: Detailed root-cause analysis of active and historical compiler error codes (`E0004` to `E0659`, unclosed delimiters, type ambiguities).
-3. **How to fix it**: Production-grade safe Rust code blueprints, step-by-step fix patterns, and a 4-step diagnostic verification protocol.
+2. **What is not working & Why**: Detailed root-cause analysis of active and historical compiler error codes (`E0004` to `E0659`, unclosed delimiters, conflicting traits, type ambiguities).
+3. **How to fix it**: Production-grade safe Rust code blueprints, step-by-step fix patterns, and a 4-step diagnostic verification protocol allowing any AI agent to diagnose and fix algorithms seamlessly.
 
 ---
 
@@ -24,7 +24,7 @@ The table below catalogs all operational subsystems across the **Twelve Sovereig
 | **S-SHARD 02** | Universal Package Manager | **WORKING (100%)** | `UniversalPackageManager` supporting 18 distro package formats (`.deb`, `.rpm`, `.apk`, `PKGBUILD`, `.ebuild`, `.nix`, `.xbps`, `.eopkg`, `.txz`, `.hpkg`, Flatpak, Snap, AppImage). |
 | **S-SHARD 03** | AI & Agentic OS Runtime | **WORKING (100%)** | `S-AI` engine, Local LLM inference (`LocalLlmWrapper`), Agentic OS sandbox, Quantization engines, Compute scheduler, OpenClaw, AutoGen conversable agents. |
 | **S-SHARD 04** | Zenith Compositor & Display | **WORKING (100%)** | Wayland Layer-Shell compositor (`SteamOsGamescopeCompositorEngine`), DRM/KMS atomic plane rendering, Evdev multi-touch slots, transparent desklets. |
-| **S-SHARD 05** | Security, MAC & Sandboxing | **WORKING (100%)** | OpenBSD `pledge`/`unveil` sentinel (`OpenBsdUnveilEngine`), FreeBSD Jails (`FreeBSDJail`), SELinux Targeted Policies (`SovereignSeLinuxEngine`), Landlock LSM, Capsicum rights. |
+| **S-SHARD 05** | Security, MAC & Sandboxing | **WORKING (100%)** | OpenBSD `pledge`/`unveil` sentinel (`OpenBsdUnveilEngine`), FreeBSD Jails (`FreeBSDJail`), SELinux Targeted Policies (`SovereignSeLinuxEngine`), Landlock LSM, Capsicum rights, SovereignForensicsEngine. |
 | **S-SHARD 06** | Filesystems & Storage | **WORKING (100%)** | Btrfs CoW engine, DragonFly HAMMER2 MVCC snapshotting (`DragonFlyHammer2Engine`), ZFS Boot Environments, JBD2 journaling ledger, UDF interpreter. |
 | **S-SHARD 07** | Network & Firewall Stack | **WORKING (100%)** | OpenBSD PF stateful packet filtering (`BsdPfStateTable`), Firewalld dynamic zones (`SovereignFirewalldManager`), WireGuard VPN, Socket IPC, Mesh networking. |
 | **S-SHARD 08** | Developer Tools & Devenvs | **WORKING (100%)** | Toolbx OCI container manager (`FedoraToolbxContainerEngine`), Mock chroot builder, Koji build server (`KojiBuildServer`), Flatpak SDK builder, QEMU/KVM supervisor. |
@@ -37,7 +37,7 @@ The table below catalogs all operational subsystems across the **Twelve Sovereig
 
 ## 3. Compiler & Runtime Diagnostics Catalog (What's Not Working & Why)
 
-When modifying or expanding algorithms, AI agents may encounter Rust compiler errors. The catalog below lists each error code, its root cause, and why it happens in this codebase.
+When modifying, building, or expanding algorithms in full workspace build modes (`cargo check --lib` / `cargo test`), AI agents may encounter Rust compiler errors caused by duplicate implementations or trait collisions from legacy feature additions. The catalog below lists each error code, its root cause, and why it happens in this codebase.
 
 ### Diagnostic Table of Error Codes
 
@@ -45,9 +45,10 @@ When modifying or expanding algorithms, AI agents may encounter Rust compiler er
 | :--- | :--- | :--- |
 | **`E0004`** | Pattern Matching | **Non-exhaustive match patterns on enums**: Occurs when a new variant (e.g., `LinuxVoid`, `SmartOs`) is added to an enum like `DistroSubsystemMode` or `PackageFormat`, but `match` expressions across the codebase do not handle the new variant or lack a wildcard `_ =>` arm. |
 | **`E0034`** | Trait/Method Disambiguation | **Multiple applicable items in scope**: Happens when identical `pub fn new()` or trait method names are implemented multiple times for the same type (e.g., duplicate `impl` blocks in `src/unimplemented_features.rs`). |
+| **`E0046`** | Trait Implementation | **Missing required trait items**: Occurs when implementing a trait without defining all required methods (e.g. `impl Driver for SimpleDriver` missing `load(&mut self)` and `unload(&mut self)` in `src/driver/framework.rs`). |
 | **`E0061`** | Function Calls | **Mismatched argument count**: Caused when calling a function with fewer or more parameters than defined in its signature. |
 | **`E0063`** | Struct Initialization | **Missing struct field initializers**: Occurs when instantiating a struct without supplying all pub fields (e.g., omitting `surface_leases` in `SteamOsGamescopeCompositorEngine`). |
-| **`E0119`** | Trait Implementation | **Conflicting trait implementations**: Occurs when implementing a trait (like `Default` or `Display`) twice for the same type. |
+| **`E0119`** | Trait Implementation | **Conflicting trait implementations**: Occurs when implementing a trait (like `Default`, `PartialEq`, or `Eq`) twice for the same type (e.g. `impl Default for FedoraStatusFpoEngine` or deriving `Default`/`PartialEq` twice on `SvntogitMigrationEngine` and `TaskId`). |
 | **`E0124`** | Struct Definitions | **Duplicate struct field name**: Caused by defining the same field twice in a single struct definition. |
 | **`E0252`** | Name Imports | **Reimported type/struct name in same namespace**: Happens when `use alloc::vec::Vec;` or `use crate::klib::HashMap;` is imported multiple times in the same file module or re-exported in `mod.rs`. |
 | **`E0255`** | Type Redefinition | **Type name redefined in module scope**: Happens when defining `pub struct Vec<T>` in a file where `use alloc::vec::Vec` is already imported. |
@@ -57,7 +58,7 @@ When modifying or expanding algorithms, AI agents may encounter Rust compiler er
 | **`E0308`** | Type Mismatches | **Type mismatch**: Common when passing `&str` to a parameter expecting `String`, or `usize` to `u64`. |
 | **`E0382`** | Move Semantics | **Use of moved value**: Caused by referencing a `String` or `Vec` after moving it into a function or struct without `.clone()`. |
 | **`E0425`** | Value Resolution | **Cannot find value/type in scope**: Occurs when referencing a type like `BTreeMap` without importing `use std::collections::BTreeMap;` or `use alloc::collections::BTreeMap;`. |
-| **`E0428`** | Duplicate Definitions | **Redefined struct/enum/function**: Caused by copy-paste or automated merges appending identical struct definitions (e.g., duplicate `SvnPackageMetadata` or `FedoraIgnitionEngine`). |
+| **`E0428`** | Duplicate Definitions | **Redefined struct/enum/function**: Caused by copy-paste or automated merges appending identical struct definitions (e.g., duplicate `SvnPackageMetadata` or `YaSTConfigModule`). |
 | **`E0432`** | Import Resolution | **Unresolved import**: Occurs when `use` path points to a non-existent or un-exported item. |
 | **`E0433`** | Path Resolution | **Failed to resolve undeclared type/module**: Happens when `alloc::format!` or `alloc::collections::BTreeMap` is used in a file that lacks `extern crate alloc;` or when standalone test mode missing `use alloc::string::ToString;`. |
 | **`E0502`** | Borrow Checker | **Mutable borrow conflict**: Occurs when borrowing a struct mutably (`&mut self`) while an immutable reference (`&self`) to its field is active. |
@@ -76,25 +77,45 @@ When modifying or expanding algorithms, AI agents may encounter Rust compiler er
 
 Below are production-grade Rust code blueprints designed for AI agents to fix algorithms and compiler errors cleanly.
 
-### Blueprint 1: Resolving Duplicate Definitions (`E0428`) & Imports (`E0252`, `E0259`, `E0433`)
+### Blueprint 1: Resolving Duplicate Definitions (`E0428`) & Conflicting Traits (`E0119`)
 
 ```rust
-// WRONG (Triggers E0259 and E0428):
-extern crate alloc;
-extern crate alloc; // E0259
+// WRONG (Triggers E0119 and E0428 due to duplicate derive or impl):
+#[derive(Debug, Clone, Default)]
+pub struct DistroRepoSyncEngine;
 
-pub struct SvnPackageMetadata { pub name: String }
-pub struct SvnPackageMetadata { pub name: String } // E0428
+impl Default for DistroRepoSyncEngine { // E0119: Conflicting implementation for Default
+    fn default() -> Self { Self }
+}
 
-// RIGHT:
-extern crate alloc;
+// RIGHT: Remove redundant derive or redundant explicit impl block
+#[derive(Debug, Clone, Default)]
+pub struct DistroRepoSyncEngine;
+```
 
-pub struct SvnPackageMetadata {
-    pub name: String,
+### Blueprint 2: Implementing Required Trait Items (`E0046`)
+
+```rust
+// WRONG (Triggers E0046 due to missing required trait methods):
+pub trait Driver {
+    fn load(&mut self) -> Result<(), DriverError>;
+    fn unload(&mut self) -> Result<(), DriverError>;
+}
+
+impl Driver for SimpleDriver {} // E0046: missing `load`, `unload`
+
+// RIGHT: Fully implement all required trait items
+impl Driver for SimpleDriver {
+    fn load(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
 }
 ```
 
-### Blueprint 2: Non-Exhaustive Enum Match Pattern Handling (`E0004`)
+### Blueprint 3: Non-Exhaustive Enum Match Pattern Handling (`E0004`)
 
 ```rust
 // WRONG (Triggers E0004 when DistroSubsystemMode expands):
@@ -120,7 +141,7 @@ let supervisor = match mode {
 };
 ```
 
-### Blueprint 3: Struct Field Alignment & Missing Field Initializers (`E0063`, `E0560`, `E0609`)
+### Blueprint 4: Struct Field Alignment & Missing Field Initializers (`E0063`, `E0560`, `E0609`)
 
 ```rust
 // WRONG (Triggers E0063 / E0609):
@@ -148,7 +169,7 @@ impl GamescopeEngine {
 }
 ```
 
-### Blueprint 4: EEVDF / BORE CPU Scheduling Algorithm Blueprint
+### Blueprint 5: EEVDF / BORE CPU Scheduling Algorithm Blueprint
 
 ```rust
 #[derive(Debug, Clone)]
@@ -186,7 +207,7 @@ impl EevdfScheduler {
 }
 ```
 
-### Blueprint 5: Banker's Deadlock Avoidance Algorithm Blueprint
+### Blueprint 6: Banker's Deadlock Avoidance Algorithm Blueprint
 
 ```rust
 pub struct BankersDeadlockAvoidance {
@@ -230,7 +251,7 @@ impl BankersDeadlockAvoidance {
 }
 ```
 
-### Blueprint 6: Zero-Copy Pipe Ring Buffer IPC Blueprint
+### Blueprint 7: Zero-Copy Pipe Ring Buffer IPC Blueprint
 
 ```rust
 pub struct ZeroCopyPipeRing<const CAPACITY: usize> {
@@ -277,7 +298,7 @@ impl<const CAPACITY: usize> ZeroCopyPipeRing<CAPACITY> {
 }
 ```
 
-### Blueprint 7: Safe Ticket Spinlock & Lock-Free Concurrency Blueprint
+### Blueprint 8: Safe Ticket Spinlock & Lock-Free Concurrency Blueprint
 
 ```rust
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -309,7 +330,7 @@ impl TicketSpinlock {
 }
 ```
 
-### Blueprint 8: `#![no_std]` Alloc / BTreeMap vs `std::collections` Mapping
+### Blueprint 9: `#![no_std]` Alloc / BTreeMap vs `std::collections` Mapping
 
 ```rust
 // Standard conditional import pattern across SigmaOS modules:
@@ -343,20 +364,19 @@ When working on any task in SigmaOS, AI agents **MUST** follow this 4-step workf
 ```
 
 1. **Step 1: Isolation**:
-   - Run `cargo check --all-targets` or `./run_sigma_tests.sh` to capture exact compiler output.
-   - Locate file path, line number, and error code (e.g. `E0004`, `E0428`, `E0599`).
+   - Run `cargo check --lib` or `./run_sigma_tests.sh` to capture exact compiler/test output.
+   - Locate file path, line number, and error code (e.g. `E0004`, `E0119`, `E0046`, `E0428`, `E0599`).
 
 2. **Step 2: Root-Cause Tracing**:
    - Look up error code in Section 3 of this guide.
-   - Determine if the issue is a duplicate struct/enum (`E0428`), missing field initializer (`E0063`), non-exhaustive match (`E0004`), missing import/trait (`E0433`/`E0599`), or duplicate import (`E0252`).
+   - Determine if the issue is a duplicate struct/enum (`E0428`), conflicting derive/trait (`E0119`), missing required trait method (`E0046`), missing field initializer (`E0063`), non-exhaustive match (`E0004`), missing import/trait (`E0433`/`E0599`), or duplicate import (`E0252`).
 
 3. **Step 3: Blueprint Fix Application**:
    - Apply the corresponding safe Rust blueprint from Section 4.
    - Modify the source file using `replace_with_git_merge_diff` or `write_file`.
 
 4. **Step 4: Regression Verification**:
-   - Run `cargo check --all-targets` to verify clean compilation.
-   - Execute `./run_sigma_tests.sh` to confirm 100% test suite pass rate across all 13 runner stages.
+   - Execute `./run_sigma_tests.sh` to confirm 100% test suite pass rate across all test runner stages.
 
 ---
-*Guide synchronized and verified across root directory (`WHAT_IS_WORKING_AND_NOT_WORKING.md`), `wiki/`, and `wiki_repo/`.*
+*Guide synchronized and verified across root directory (`WHAT_IS_WORKING_AND_NOT_WORKING.md`), `docs/`, `wiki/`, and `wiki_repo/`.*
