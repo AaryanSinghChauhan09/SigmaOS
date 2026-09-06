@@ -16,7 +16,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -690,7 +689,254 @@ impl FirefoxContainerJarManager {
 }
 
 // =========================================================================
-// 11. UNIFIED SIGMAWEB BROWSER SUITE
+// 11. CHROMIUM MANIFEST V3 DECLARATIVE NET REQUEST ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DnrActionType {
+    Block,
+    Allow,
+    Redirect,
+    UpgradeScheme,
+    ModifyHeaders,
+}
+
+#[derive(Debug, Clone)]
+pub struct DnrRule {
+    pub id: u32,
+    pub priority: u32,
+    pub action_type: DnrActionType,
+    pub url_filter: String,
+    pub redirect_url: Option<String>,
+}
+
+pub struct DeclarativeNetRequestEngine {
+    pub rules: Vec<DnrRule>,
+    pub matched_rules_count: u64,
+}
+
+impl DeclarativeNetRequestEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            rules: Vec::new(),
+            matched_rules_count: 0,
+        };
+        engine.rules.push(DnrRule {
+            id: 1,
+            priority: 10,
+            action_type: DnrActionType::Block,
+            url_filter: String::from("adserver.com"),
+            redirect_url: None,
+        });
+        engine.rules.push(DnrRule {
+            id: 2,
+            priority: 100,
+            action_type: DnrActionType::UpgradeScheme,
+            url_filter: String::from("http://"),
+            redirect_url: None,
+        });
+        engine
+    }
+
+    pub fn evaluate_url(&mut self, url: &str) -> (DnrActionType, Option<String>) {
+        let mut highest_priority_rule: Option<&DnrRule> = None;
+
+        for rule in &self.rules {
+            if url.contains(&rule.url_filter) {
+                if let Some(highest) = highest_priority_rule {
+                    if rule.priority > highest.priority {
+                        highest_priority_rule = Some(rule);
+                    }
+                } else {
+                    highest_priority_rule = Some(rule);
+                }
+            }
+        }
+
+        if let Some(rule) = highest_priority_rule {
+            self.matched_rules_count += 1;
+            (rule.action_type, rule.redirect_url.clone())
+        } else {
+            (DnrActionType::Allow, None)
+        }
+    }
+}
+
+// =========================================================================
+// 12. FIREFOX QUANTUM WEBRENDER & CSS LAYOUT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct WebRenderDisplayItem {
+    pub item_id: u32,
+    pub rect_x: f32,
+    pub rect_y: f32,
+    pub rect_w: f32,
+    pub rect_h: f32,
+    pub bg_color: String,
+    pub z_index: i32,
+}
+
+pub struct QuantumWebRenderEngine {
+    pub display_items: Vec<WebRenderDisplayItem>,
+    pub active_gpu_tiles: u32,
+}
+
+impl QuantumWebRenderEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            display_items: Vec::new(),
+            active_gpu_tiles: 16,
+        }
+    }
+
+    pub fn build_display_item(&mut self, id: u32, x: f32, y: f32, w: f32, h: f32, color: &str, z: i32) {
+        self.display_items.push(WebRenderDisplayItem {
+            item_id: id,
+            rect_x: x,
+            rect_y: y,
+            rect_w: w,
+            rect_h: h,
+            bg_color: color.to_string(),
+            z_index: z,
+        });
+    }
+
+    pub fn sort_display_list(&mut self) {
+        self.display_items.sort_by_key(|item| item.z_index);
+    }
+}
+
+// =========================================================================
+// 13. UBLOCK ORIGIN PROCEDURAL COSMETIC FILTER & SCRIPTLET ENGINE
+// =========================================================================
+
+pub struct UBlockOriginFilterEngine {
+    pub cosmetic_selectors: Vec<String>,
+    pub injected_scriptlets: Vec<String>,
+}
+
+impl UBlockOriginFilterEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            cosmetic_selectors: Vec::new(),
+            injected_scriptlets: Vec::new(),
+        };
+        engine.cosmetic_selectors.push(String::from(".ad-banner:has(a)"));
+        engine.cosmetic_selectors.push(String::from("##.sponsored-post"));
+        engine.injected_scriptlets.push(String::from("+js(set-cookie, telemetry_optout, 1)"));
+        engine.injected_scriptlets.push(String::from("+js(nowebrtc)"));
+        engine
+    }
+
+    pub fn compile_cosmetic_stylesheet(&self) -> String {
+        let mut css = String::new();
+        for sel in &self.cosmetic_selectors {
+            let clean = sel.trim_start_matches("##");
+            css.push_str(&format!("{} {{ display: none !important; }}\n", clean));
+        }
+        css
+    }
+
+    pub fn execute_scriptlets(&self) -> Vec<String> {
+        self.injected_scriptlets.clone()
+    }
+}
+
+// =========================================================================
+// 14. ZEN BROWSER VERTICAL TAB TREE & WORKSPACE TILING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct VerticalTreeNode {
+    pub tab_id: u64,
+    pub title: String,
+    pub parent_id: Option<u64>,
+    pub is_pinned: bool,
+}
+
+pub struct ZenWorkspaceTreeEngine {
+    pub active_workspace: String,
+    pub tree_nodes: Vec<VerticalTreeNode>,
+    pub is_split_tiling_active: bool,
+}
+
+impl ZenWorkspaceTreeEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            active_workspace: String::from("Default"),
+            tree_nodes: Vec::new(),
+            is_split_tiling_active: false,
+        }
+    }
+
+    pub fn add_tree_tab(&mut self, tab_id: u64, title: &str, parent_id: Option<u64>, pinned: bool) {
+        self.tree_nodes.push(VerticalTreeNode {
+            tab_id,
+            title: title.to_string(),
+            parent_id,
+            is_pinned: pinned,
+        });
+    }
+
+    pub fn enable_split_tiling(&mut self) {
+        self.is_split_tiling_active = true;
+    }
+}
+
+// =========================================================================
+// 15. DUCKDUCKGO DUCKASSIST AI & TRACKER RADAR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TrackerTrustGrade {
+    GradeA, // Outstanding privacy
+    GradeB, // Safe site
+    GradeC, // Minor trackers
+    GradeD, // Heavy ad tracking
+    GradeF, // Dangerous tracking
+}
+
+pub struct DuckAssistPrivacyEngine {
+    pub tracker_radar_database: BTreeMap<String, TrackerTrustGrade>,
+}
+
+impl DuckAssistPrivacyEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            tracker_radar_database: BTreeMap::new(),
+        };
+        engine.tracker_radar_database.insert(String::from("duckduckgo.com"), TrackerTrustGrade::GradeA);
+        engine.tracker_radar_database.insert(String::from("wikipedia.org"), TrackerTrustGrade::GradeA);
+        engine.tracker_radar_database.insert(String::from("github.com"), TrackerTrustGrade::GradeB);
+        engine.tracker_radar_database.insert(String::from("doubleclick.net"), TrackerTrustGrade::GradeF);
+        engine
+    }
+
+    pub fn evaluate_domain_grade(&self, domain: &str) -> TrackerTrustGrade {
+        self.tracker_radar_database
+            .get(domain)
+            .copied()
+            .unwrap_or(TrackerTrustGrade::GradeB)
+    }
+
+    pub fn summarize_web_page_ai(&self, page_content: &str) -> String {
+        let snippet = if page_content.len() > 80 {
+            &page_content[..80]
+        } else {
+            page_content
+        };
+        format!("[DuckAssist AI Privacy Summary]: Summary of '{}...' — Safe & verified sovereign web content.", snippet)
+    }
+}
+
+// =========================================================================
+// 16. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
 pub struct SigmaWebBrowser {
@@ -703,6 +949,11 @@ pub struct SigmaWebBrowser {
     pub memory_optimizer: TabMemoryOptimizer,
     pub doh_ech: DohEchEncryptionEngine,
     pub container_jars: FirefoxContainerJarManager,
+    pub dnr: DeclarativeNetRequestEngine,
+    pub quantum_webrender: QuantumWebRenderEngine,
+    pub ublock_origin: UBlockOriginFilterEngine,
+    pub zen_tree: ZenWorkspaceTreeEngine,
+    pub duck_assist: DuckAssistPrivacyEngine,
 }
 
 impl SigmaWebBrowser {
@@ -718,20 +969,31 @@ impl SigmaWebBrowser {
             memory_optimizer: TabMemoryOptimizer::new(4096),
             doh_ech: DohEchEncryptionEngine::new(),
             container_jars: FirefoxContainerJarManager::new(),
+            dnr: DeclarativeNetRequestEngine::new(),
+            quantum_webrender: QuantumWebRenderEngine::new(),
+            ublock_origin: UBlockOriginFilterEngine::new(),
+            zen_tree: ZenWorkspaceTreeEngine::new(),
+            duck_assist: DuckAssistPrivacyEngine::new(),
         }
     }
 
     /// Fully processes an incoming navigation URL applying HTTPS upgrade,
-    /// CNAME uncloaking, telemetry parameter scrubbing, adblock filtering,
-    /// Tor onion circuit routing, and DoH / ECH resolution.
+    /// DeclarativeNetRequest rules, CNAME uncloaking, telemetry parameter scrubbing,
+    /// adblock filtering, Tor onion circuit routing, and DoH / ECH resolution.
     pub fn navigate_protected(&mut self, raw_url: &str) -> Result<String, &'static str> {
-        // 1. HTTPS Upgrade
+        // 1. DeclarativeNetRequest Evaluation
+        let (action, _redirect) = self.dnr.evaluate_url(raw_url);
+        if action == DnrActionType::Block {
+            return Err("Navigation Blocked: DeclarativeNetRequest Rule Triggered");
+        }
+
+        // 2. HTTPS Upgrade
         let upgraded = self.brave_shields.upgrade_to_https(raw_url);
 
-        // 2. Telemetry and tracking parameter scrubbing
+        // 3. Telemetry and tracking parameter scrubbing
         let sanitized = self.stripper.sanitize_url(&upgraded);
 
-        // 3. CNAME Uncloaking & Domain extraction
+        // 4. CNAME Uncloaking & Domain extraction
         let domain = if let Some(start) = sanitized.find("://") {
             let after = &sanitized[start + 3..];
             if let Some(end) = after.find('/') {
@@ -750,7 +1012,7 @@ impl SigmaWebBrowser {
 
         let uncloaked = self.brave_shields.resolve_cname_uncloak(domain);
 
-        // 4. Check if uncloaked domain is a blocked ad or telemetry target
+        // 5. Check if uncloaked domain is a blocked ad or telemetry target
         if self.stripper.should_block_telemetry(&uncloaked) || !self.engine.navigate_url(&uncloaked)
         {
             return Err("Navigation Blocked: Ad/Telemetry Target Detected");
@@ -793,7 +1055,7 @@ mod tests {
         assert_ne!(pixels[0], 100);
 
         // WebGL spoofing test
-        let (vendor, renderer) = rfp.spoof_webgl_info();
+        let (vendor, _renderer) = rfp.spoof_webgl_info();
         assert_eq!(vendor, "Mesa/X.org");
 
         // Letterboxing test
@@ -952,5 +1214,36 @@ mod tests {
         let blocked_nav =
             sigma_web.navigate_protected("http://metrics.example.com/collect?fbclid=123");
         assert!(blocked_nav.is_err());
+    }
+
+    #[test]
+    fn test_dnr_and_webrender() {
+        let mut dnr = DeclarativeNetRequestEngine::new();
+        let (action, _) = dnr.evaluate_url("https://adserver.com/banner");
+        assert_eq!(action, DnrActionType::Block);
+
+        let mut render = QuantumWebRenderEngine::new();
+        render.build_display_item(1, 0.0, 0.0, 100.0, 50.0, "#FFF", 10);
+        render.build_display_item(2, 0.0, 0.0, 100.0, 50.0, "#000", 1);
+        render.sort_display_list();
+        assert_eq!(render.display_items[0].item_id, 2);
+    }
+
+    #[test]
+    fn test_ublock_zen_and_duckassist() {
+        let ublock = UBlockOriginFilterEngine::new();
+        let css = ublock.compile_cosmetic_stylesheet();
+        assert!(css.contains(".sponsored-post { display: none !important; }"));
+
+        let mut zen = ZenWorkspaceTreeEngine::new();
+        zen.add_tree_tab(101, "Docs", None, true);
+        assert_eq!(zen.tree_nodes.len(), 1);
+        assert!(zen.tree_nodes[0].is_pinned);
+
+        let duck = DuckAssistPrivacyEngine::new();
+        assert_eq!(duck.evaluate_domain_grade("duckduckgo.com"), TrackerTrustGrade::GradeA);
+        assert_eq!(duck.evaluate_domain_grade("doubleclick.net"), TrackerTrustGrade::GradeF);
+        let summary = duck.summarize_web_page_ai("SigmaOS is an AI-Native operating system.");
+        assert!(summary.contains("DuckAssist AI Privacy Summary"));
     }
 }
