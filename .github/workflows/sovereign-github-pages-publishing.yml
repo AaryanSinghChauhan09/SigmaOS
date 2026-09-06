@@ -1,0 +1,27 @@
+name: "Sovereign: GitHub Pages Publishing Automation"
+on:
+  push:
+    branches: [ main, master ]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  publish-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Build Web / Documentation Pages
+        run: |
+          mkdir -p build/pages
+          cp index.html build/pages/ 2>/dev/null || true
+          cp -r docs/* build/pages/ 2>/dev/null || true
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'build/pages'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

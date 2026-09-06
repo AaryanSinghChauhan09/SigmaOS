@@ -1,0 +1,20 @@
+name: "Tails OS: Amnesic RAM Scrubbing Privacy CI"
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+permissions:
+  contents: read
+jobs:
+  tails-scrub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run Tails OS amnesic RAM wiping privacy audit
+        run: |
+          mkdir -p build
+          echo "Simulating Tails OS amnesic volatile RAM wipe..."
+          ./run_sigma_tests.sh
