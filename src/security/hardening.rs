@@ -33,19 +33,37 @@ impl MemoryProtectionState {
     }
 
     /// Check if W^X violation would occur
-    pub fn check_wx_violation(&self, current: MemoryPermission, requested: MemoryPermission) -> bool {
+    pub fn check_wx_violation(
+        &self,
+        current: MemoryPermission,
+        requested: MemoryPermission,
+    ) -> bool {
         if !self.enforce_wx {
             return false;
         }
 
-        let has_write = matches!(current, MemoryPermission::Write | MemoryPermission::ReadWrite | MemoryPermission::ReadWriteExecute);
-        let has_execute = matches!(requested, MemoryPermission::Execute | MemoryPermission::ReadExecute | MemoryPermission::ReadWriteExecute);
+        let has_write = matches!(
+            current,
+            MemoryPermission::Write
+                | MemoryPermission::ReadWrite
+                | MemoryPermission::ReadWriteExecute
+        );
+        let has_execute = matches!(
+            requested,
+            MemoryPermission::Execute
+                | MemoryPermission::ReadExecute
+                | MemoryPermission::ReadWriteExecute
+        );
 
         has_write && has_execute
     }
 
     /// Apply W^X enforcement to permission request
-    pub fn apply_wx(&self, current: MemoryPermission, requested: MemoryPermission) -> Result<MemoryPermission, &'static str> {
+    pub fn apply_wx(
+        &self,
+        current: MemoryPermission,
+        requested: MemoryPermission,
+    ) -> Result<MemoryPermission, &'static str> {
         if self.check_wx_violation(current, requested) {
             Err("W^X violation: cannot add execute permission to writable memory")
         } else {
@@ -208,7 +226,9 @@ mod tests {
         assert!(!state.check_wx_violation(MemoryPermission::Read, MemoryPermission::ReadWrite));
 
         // Should reject write -> read/write/execute
-        assert!(state.check_wx_violation(MemoryPermission::Write, MemoryPermission::ReadWriteExecute));
+        assert!(
+            state.check_wx_violation(MemoryPermission::Write, MemoryPermission::ReadWriteExecute)
+        );
     }
 
     #[test]

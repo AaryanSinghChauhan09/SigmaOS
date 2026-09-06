@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 // SigmaOS Random Number Generation
 // Eliminates dependency on external rand crate
-
 #![allow(dead_code)]
 
 /// Sovereign Cryptographically Secure Random Number Generator (CSPRNG)
@@ -16,9 +15,8 @@ impl SovereignCsprng {
         let mut csprng = Self {
             state: [
                 0x61707865, 0x33322062, 0x79746520, 0x6b617932, // "expand 32-byte k"
-                0x12345678, 0x9ABCDEF0, 0xFEDCBA98, 0x76543210,
-                0x0F1E2D3C, 0x4B5A6978, 0x8796A5B4, 0xC3D2E1F0,
-                0x13579BDF, 0x2468ACE0, 0xDEADBEEF, 0xCAFEBABE,
+                0x12345678, 0x9ABCDEF0, 0xFEDCBA98, 0x76543210, 0x0F1E2D3C, 0x4B5A6978, 0x8796A5B4,
+                0xC3D2E1F0, 0x13579BDF, 0x2468ACE0, 0xDEADBEEF, 0xCAFEBABE,
             ],
             counter: 0,
         };
@@ -36,10 +34,18 @@ impl SovereignCsprng {
     }
 
     fn qr(x: &mut [u32; 16], a: usize, b: usize, c: usize, d: usize) {
-        x[a] = x[a].wrapping_add(x[b]); x[d] ^= x[a]; x[d] = x[d].rotate_left(16);
-        x[c] = x[c].wrapping_add(x[d]); x[b] ^= x[c]; x[b] = x[b].rotate_left(12);
-        x[a] = x[a].wrapping_add(x[b]); x[d] ^= x[a]; x[d] = x[d].rotate_left(8);
-        x[c] = x[c].wrapping_add(x[d]); x[b] ^= x[c]; x[b] = x[b].rotate_left(7);
+        x[a] = x[a].wrapping_add(x[b]);
+        x[d] ^= x[a];
+        x[d] = x[d].rotate_left(16);
+        x[c] = x[c].wrapping_add(x[d]);
+        x[b] ^= x[c];
+        x[b] = x[b].rotate_left(12);
+        x[a] = x[a].wrapping_add(x[b]);
+        x[d] ^= x[a];
+        x[d] = x[d].rotate_left(8);
+        x[c] = x[c].wrapping_add(x[d]);
+        x[b] ^= x[c];
+        x[b] = x[b].rotate_left(7);
     }
 
     pub fn generate_block(&mut self) -> [u8; 64] {

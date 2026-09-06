@@ -1,33 +1,50 @@
-#[cfg(feature = "standalone_test")]
 extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::boxed::Box;
+// use alloc::collections::BTreeMap;
 use alloc::format;
-use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
+
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::HashMap;
+use crate::klib::{Arc, HashMap, HashSet};
+
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+#[cfg(any(feature = "standalone_test", test))]
+use std::sync::Arc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeTargetArch,
 };
+
+#[cfg(any(feature = "standalone_test", test))]
 pub mod node_distribution_dummy {
+    use super::*;
     #[derive(Debug, Clone)]
     pub enum LibcFlavor {
         Musl,
         Glibc,
     }
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum NodeReleaseStream {
         Lts,
         Current,
+    }
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum NodeTargetArch {
         X86_64,
         Aarch64,
+    }
+    #[derive(Debug, Clone)]
     pub struct NodeBinaryPackage {
         pub version: String,
+    }
     impl NodeBinaryPackage {
         pub fn new(
             version: &str,
@@ -43,10 +60,13 @@ pub mod node_distribution_dummy {
                 version: version.to_string(),
             }
         }
+    }
+    #[derive(Debug, Clone)]
     pub struct NodeBinaryDistroEngine;
     impl NodeBinaryDistroEngine {
         pub fn new() -> Self {
             Self
+        }
         pub fn install_to_store(
             &self,
             pkg: &NodeBinaryPackage,
@@ -54,15 +74,139 @@ pub mod node_distribution_dummy {
             _npm: &str,
         ) -> Result<String, &'static str> {
             Ok(format!("/sovereign/store/node-{}-dummy", pkg.version))
+        }
+    }
 }
+
+#[cfg(any(feature = "standalone_test", test))]
 use node_distribution_dummy::*;
+
+/// Foreign distro manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
+    pub version: String,
+    pub architecture: String,
+    pub raw_dependencies: Vec<String>,
+    pub raw_provides: Vec<String>,
+    pub raw_conflicts: Vec<String>,
+    pub maintainer: String,
+}
+
+/// Helper translator converting ForeignDistroManifest to native UnifiedPackage
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        let mut pkg = UnifiedPackage::new(
+            format!("sigpkg-{}", manifest.original_name),
+            manifest.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(manifest.original_name.clone());
+
+        for dep in manifest.raw_dependencies.iter() {
+            let dep_str: &str = dep.as_str();
+            let translated_dep: &str = match dep_str {
+                "libssl-dev" | "openssl-devel" | "openssl" => "sovereign-openssl",
+                "libc6" => "sovereign-libc",
+                other => debtor_to_sovereign_name(other),
+            };
+            pkg = pkg.with_dependency(translated_dep.to_string());
+        }
+
+        for prov in manifest.raw_provides.iter() {
+            let prov_str: String = prov.clone();
+            pkg = pkg.with_provides(prov_str);
+        }
+
+        for conf in manifest.raw_conflicts.iter() {
+            let conf_str: String = conf.clone();
+            pkg = pkg.with_conflict(conf_str);
+        }
+
+        pkg
+    }
+}
+
+fn debtor_to_sovereign_name(name: &str) -> &str {
+    if name.contains("ssl") {
+        "sovereign-openssl"
+    } else if name.contains("libc") {
+        "sovereign-libc"
+    } else {
+        name
+    }
+}
+
+/// Repository representation
+#[derive(Debug, Clone)]
+pub struct RegisteredDistroRepo {
+    pub distro_name: String,
+    pub repo_url: String,
+}
+
+/// Distro repository sync engine
+#[derive(Debug, Clone)]
+pub struct DistroRepoSyncEngine {
+    pub registered_repos: Vec<RegisteredDistroRepo>,
+    pub indexed_manifests: HashMap<String, ForeignDistroManifest>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        let mut repos = Vec::new();
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Debian".to_string(),
+            repo_url: "deb.debian.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "ArchLinux".to_string(),
+            repo_url: "archlinux.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Fedora".to_string(),
+            repo_url: "fedoraproject.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Alpine".to_string(),
+            repo_url: "alpinelinux.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Void".to_string(),
+            repo_url: "voidlinux.org".to_string(),
+        });
+        Self {
+            registered_repos: repos,
+            indexed_manifests: HashMap::new(),
+        }
+    }
+
+    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
+        self.indexed_manifests
+            .insert(manifest.original_name.clone(), manifest);
+    }
+
+    pub fn total_indexed_packages(&self) -> usize {
+        self.indexed_manifests.len()
+    }
+
+    pub fn find_and_translate(&self, name: &str) -> Option<UnifiedPackage> {
+        self.indexed_manifests
+            .get(name)
+            .map(UniversalPackageTranslator::translate_to_sigma_pkg)
+    }
+}
+
+impl Default for DistroRepoSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::{HashMap, HashSet, Arc};
-use std::{collections::{HashMap, HashSet}, sync::Arc};
-/// Package format type covering 18 major distribution formats
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackagePriority {
     Essential,
     Required,
@@ -73,44 +217,44 @@ pub enum PackagePriority {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackageFormat {
-    Deb,      // apt/dpkg
-    Rpm,      // yum/dnf/zypper
-    Pacman,   // pacman/pkgbuild
-    Snap,     // snap/squashfs
-    Flatpak,  // flatpak sandbox
-    AppImage, // AppImage single-file container
-    SigmaPkg, // native SigmaOS format
-    Air,      // Adobe AIR (.air)
-    Bottle,   // Homebrew Bottle (.bottle)
-    Ipa,      // iOS App (.ipa)
-    Ports,    // BSD Ports (.ports)
-    Pkg,      // macOS / BSD / Solaris PKG (.pkg)
-    Aab,      // Android App Bundle (.aab)
-    Apk,      // Android Package / Alpine Package (.apk)
-    Eopkg,    // Solus eopkg (.eopkg)
-    Nixpkg,   // Nix store package (.nixpkg)
-    Ebuild,   // Gentoo ebuild (.ebuild / .portage)
-    TarGz,    // Compressed Tar (.tar.gz, .tgz)
-    Xz,       // Compressed XZ archive (.xz, .tar.xz)
-    App,      // macOS App bundle (.app)
-    Hap,      // HarmonyOS Ability Package (.hap)
-    Pisi,     // Pardus / Solus PiSi (.PiSi)
-    Superdeb, // Deepin Superdeb (.superdeb)
-    Lzm,      // Slax Linux Module (.lzm)
-    Pup,      // Puppy Linux Package (.pup)
-    Pet,      // Puppy Extra Tarball (.pet)
-    Tar,      // Plain tarball (.tar)
-    Xbps,     // Void Linux (.xbps)
-    Zypper,   // OpenSUSE Zypper (.zypper)
-    Guix,     // GNU Guix (.guix / .scm)
-    Moss,     // Solus Moss (.moss)
-    Hpkg,     // Haiku Package (.hpkg)
-    Tcz,      // Tiny Core Linux (.tcz)
-    Gobo,     // GoboLinux (.gobo)
-    Ostree,   // OSTree commit (.commit)
-    Pkgsrc,   // NetBSD pkgsrc (.pkgsrc)
-    Sfs,      // SquashFS (.sfs)
-    Puk,      // Portable Package (.puk)
+    Deb,        // apt/dpkg
+    Rpm,        // yum/dnf/zypper
+    Pacman,     // pacman/pkgbuild
+    Snap,       // snap/squashfs
+    Flatpak,    // flatpak sandbox
+    AppImage,   // AppImage single-file container
+    SigmaPkg,   // native SigmaOS format
+    Air,        // Adobe AIR (.air)
+    Bottle,     // Homebrew Bottle (.bottle)
+    Ipa,        // iOS App (.ipa)
+    Ports,      // BSD Ports (.ports)
+    Pkg,        // macOS / BSD / Solaris PKG (.pkg)
+    Aab,        // Android App Bundle (.aab)
+    Apk,        // Android Package / Alpine Package (.apk)
+    Eopkg,      // Solus eopkg (.eopkg)
+    Nixpkg,     // Nix store package (.nixpkg)
+    Ebuild,     // Gentoo ebuild (.ebuild / .portage)
+    TarGz,      // Compressed Tar (.tar.gz, .tgz)
+    Xz,         // Compressed XZ archive (.xz, .tar.xz)
+    App,        // macOS App bundle (.app)
+    Hap,        // HarmonyOS Ability Package (.hap)
+    Pisi,       // Pardus / Solus PiSi (.PiSi)
+    Superdeb,   // Deepin Superdeb (.superdeb)
+    Lzm,        // Slax Linux Module (.lzm)
+    Pup,        // Puppy Linux Package (.pup)
+    Pet,        // Puppy Extra Tarball (.pet)
+    Tar,        // Plain tarball (.tar)
+    Xbps,       // Void Linux (.xbps)
+    Zypper,     // OpenSUSE Zypper (.zypper)
+    Guix,       // GNU Guix (.guix / .scm)
+    Moss,       // Solus Moss (.moss)
+    Hpkg,       // Haiku Package (.hpkg)
+    Tcz,        // Tiny Core Linux (.tcz)
+    Gobo,       // GoboLinux (.gobo)
+    Ostree,     // OSTree commit (.commit)
+    Pkgsrc,     // NetBSD pkgsrc (.pkgsrc)
+    Sfs,        // SquashFS (.sfs)
+    Puk,        // Portable Package (.puk)
     Dmg,        // macOS Disk Image (.dmg)
     Cports,     // Chimera Linux (.cports)
     Cachy,      // CachyOS Package (.cachy)
@@ -119,6 +263,11 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+    Nix,        // Nix package (.nix)
+    Txz,        // FreeBSD / Slackware txz (.txz)
+    CachyOS,    // CachyOS package (.cachyos)
+    Swupd,      // Clear Linux swupd (.swupd)
+    Starling,   // Starling package (.starling)
 }
 
 impl PackageFormat {
@@ -195,7 +344,8 @@ impl PackageFormat {
             Some(PackageFormat::Cachy)
         } else if name.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
+        {
             Some(PackageFormat::SlackBuild)
         } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -244,8 +394,7 @@ pub trait PackageHook: Send + Sync {
 pub struct CustomPackageHook {
     pub name: String,
     pub timing: HookTiming,
-    pub handler:
-        alloc::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+    pub handler: Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
 }
 
 impl CustomPackageHook {
@@ -256,7 +405,7 @@ impl CustomPackageHook {
         Self {
             name: name.to_string(),
             timing,
-            handler: alloc::sync::Arc::new(handler),
+            handler: Arc::new(handler),
         }
     }
 }
@@ -374,21 +523,35 @@ pub trait InstallStrategy: Send + Sync {
 pub struct DebInstallStrategy;
 impl InstallStrategy for DebInstallStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Strategy: Unpacking deb and invoking preinst/postinst scripts for '{}'", package.name);
+        println!(
+            "Strategy: Unpacking deb and invoking preinst/postinst scripts for '{}'",
+            package.name
+        );
         Ok(())
     }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct RpmInstallStrategy;
 impl InstallStrategy for RpmInstallStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Strategy: Installing RPM package '{}' into global system database.", package.name);
+        println!(
+            "Strategy: Installing RPM package '{}' into global system database.",
+            package.name
+        );
         Ok(())
     }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct PacmanInstallStrategy;
@@ -397,113 +560,207 @@ impl InstallStrategy for PacmanInstallStrategy {
         println!("Strategy: Extracting pacman tarball for '{}'", package.name);
         Ok(())
     }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct EbuildInstallStrategy;
 impl InstallStrategy for EbuildInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct ApkInstallStrategy;
 impl InstallStrategy for ApkInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct NixInstallStrategy;
 impl InstallStrategy for NixInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct FlatpakInstallStrategy;
 impl InstallStrategy for FlatpakInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct SnapInstallStrategy;
 impl InstallStrategy for SnapInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct AppImageInstallStrategy;
 impl InstallStrategy for AppImageInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct XbpsInstallStrategy;
 impl InstallStrategy for XbpsInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct TxzInstallStrategy;
 impl InstallStrategy for TxzInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct EopkgInstallStrategy;
 impl InstallStrategy for EopkgInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct ZypperInstallStrategy;
 impl InstallStrategy for ZypperInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct GuixInstallStrategy;
 impl InstallStrategy for GuixInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct CachyOSInstallStrategy;
 impl InstallStrategy for CachyOSInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct SwupdInstallStrategy;
 impl InstallStrategy for SwupdInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct StarlingInstallStrategy;
 impl InstallStrategy for StarlingInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 pub struct SigmaPkgInstallStrategy;
 impl InstallStrategy for SigmaPkgInstallStrategy {
-    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+        Ok(true)
+    }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
+        Ok(())
+    }
 }
 
 // ============================================================================
@@ -565,105 +822,150 @@ impl PackageMetadataAdapter for PacmanMetadataAdapter {
 pub struct EbuildMetadataAdapter;
 impl PackageMetadataAdapter for EbuildMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("ebuild-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Ebuild))
+        Ok(
+            UnifiedPackage::new("ebuild-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Ebuild),
+        )
     }
 }
 
 pub struct ApkMetadataAdapter;
 impl PackageMetadataAdapter for ApkMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
+        Ok(
+            UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Apk),
+        )
     }
 }
 
 pub struct NixMetadataAdapter;
 impl PackageMetadataAdapter for NixMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("nix-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Nix))
+        Ok(
+            UnifiedPackage::new("nix-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Nix),
+        )
     }
 }
 
 pub struct FlatpakMetadataAdapter;
 impl PackageMetadataAdapter for FlatpakMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("flatpak-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Flatpak))
+        Ok(
+            UnifiedPackage::new("flatpak-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Flatpak),
+        )
     }
 }
 
 pub struct SnapMetadataAdapter;
 impl PackageMetadataAdapter for SnapMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("snap-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Snap))
+        Ok(
+            UnifiedPackage::new("snap-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Snap),
+        )
     }
 }
 
 pub struct AppImageMetadataAdapter;
 impl PackageMetadataAdapter for AppImageMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("appimage-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::AppImage))
+        Ok(
+            UnifiedPackage::new("appimage-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::AppImage),
+        )
     }
 }
 
 pub struct XbpsMetadataAdapter;
 impl PackageMetadataAdapter for XbpsMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("xbps-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Xbps))
+        Ok(
+            UnifiedPackage::new("xbps-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Xbps),
+        )
     }
 }
 
 pub struct TxzMetadataAdapter;
 impl PackageMetadataAdapter for TxzMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("txz-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Txz))
+        Ok(
+            UnifiedPackage::new("txz-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Txz),
+        )
     }
 }
 
 pub struct EopkgMetadataAdapter;
 impl PackageMetadataAdapter for EopkgMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("eopkg-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Eopkg))
+        Ok(
+            UnifiedPackage::new("eopkg-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Eopkg),
+        )
     }
 }
 
 pub struct ZypperMetadataAdapter;
 impl PackageMetadataAdapter for ZypperMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("zypper-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Zypper))
+        Ok(
+            UnifiedPackage::new("zypper-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Zypper),
+        )
     }
 }
 
 pub struct GuixMetadataAdapter;
 impl PackageMetadataAdapter for GuixMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("guix-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Guix))
+        Ok(
+            UnifiedPackage::new("guix-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Guix),
+        )
     }
 }
 
 pub struct CachyOSMetadataAdapter;
 impl PackageMetadataAdapter for CachyOSMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("cachyos-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::CachyOS))
+        Ok(
+            UnifiedPackage::new("cachyos-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::CachyOS),
+        )
     }
 }
 
 pub struct SwupdMetadataAdapter;
 impl PackageMetadataAdapter for SwupdMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("swupd-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Swupd))
+        Ok(
+            UnifiedPackage::new("swupd-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Swupd),
+        )
     }
 }
 
 pub struct StarlingMetadataAdapter;
 impl PackageMetadataAdapter for StarlingMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("starling-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Starling))
+        Ok(
+            UnifiedPackage::new("starling-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Starling),
+        )
     }
 }
 
 pub struct SigmaPkgMetadataAdapter;
 impl PackageMetadataAdapter for SigmaPkgMetadataAdapter {
     fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("sigmapkg-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::SigmaPkg))
+        Ok(
+            UnifiedPackage::new("sigmapkg-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::SigmaPkg),
+        )
     }
 }
 
@@ -686,8 +988,12 @@ impl PackageCapability for BasePackageDecorator {
     fn get_package(&self) -> &UnifiedPackage {
         &self.package
     }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> { Ok(()) }
-    fn restrict_network(&self) -> Result<(), PackageError> { Ok(()) }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        Ok(())
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        Ok(())
+    }
     fn profile_performance(&self) {}
 }
 
@@ -702,7 +1008,10 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
     fn enforce_sandbox(&self) -> Result<(), PackageError> {
         if self.is_isolated {
-            println!("SandboxDecorator: Sandboxing enforced for package '{}'!", self.get_package().name);
+            println!(
+                "SandboxDecorator: Sandboxing enforced for package '{}'!",
+                self.get_package().name
+            );
         }
         self.decorated.enforce_sandbox()
     }
@@ -727,7 +1036,11 @@ impl<T: PackageCapability> PackageCapability for NetworkRestrictionDecorator<T> 
         self.decorated.enforce_sandbox()
     }
     fn restrict_network(&self) -> Result<(), PackageError> {
-        println!("NetworkRestrictionDecorator: Network restricted for package '{}' to hosts: {:?}", self.get_package().name, self.allowed_hosts);
+        println!(
+            "NetworkRestrictionDecorator: Network restricted for package '{}' to hosts: {:?}",
+            self.get_package().name,
+            self.allowed_hosts
+        );
         self.decorated.restrict_network()
     }
     fn profile_performance(&self) {
@@ -762,6 +1075,7 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdInstallStrategy),
             PackageFormat::Starling => Box::new(StarlingInstallStrategy),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgInstallStrategy),
+            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -785,6 +1099,7 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdMetadataAdapter),
             PackageFormat::Starling => Box::new(StarlingMetadataAdapter),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgMetadataAdapter),
+            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -794,7 +1109,12 @@ impl PackageFactory {
 // ============================================================================
 
 pub trait PackageObserver: Send + Sync {
-    fn on_state_change(&self, package: &UnifiedPackage, old_state: PackageState, new_state: PackageState);
+    fn on_state_change(
+        &self,
+        package: &UnifiedPackage,
+        old_state: PackageState,
+        new_state: PackageState,
+    );
 }
 
 pub type PackageUdfHook = Arc<dyn Fn(&UnifiedPackage) -> Result<(), String> + Send + Sync>;
@@ -826,7 +1146,12 @@ impl PackageTriggerRegistry {
         self.observers.push(observer);
     }
 
-    pub fn notify_state_change(&self, package: &UnifiedPackage, old_state: PackageState, new_state: PackageState) {
+    pub fn notify_state_change(
+        &self,
+        package: &UnifiedPackage,
+        old_state: PackageState,
+        new_state: PackageState,
+    ) {
         for obs in &self.observers {
             obs.on_state_change(package, old_state, new_state);
         }
@@ -1373,9 +1698,10 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
-    pub user_hooks: Vec<alloc::sync::Arc<dyn PackageHook>>,
+    pub user_hooks: Vec<Arc<dyn PackageHook>>,
     pub node_distro_engine: NodeBinaryDistroEngine,
     pub distro_repo_sync: DistroRepoSyncEngine,
+    pub triggers: PackageTriggerRegistry,
 }
 
 impl UniversalPackageManager {
@@ -1390,6 +1716,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
@@ -1430,7 +1757,7 @@ impl UniversalPackageManager {
     }
 
     /// Registers a user-defined lifecycle hook
-    pub fn add_user_hook(&mut self, hook: alloc::sync::Arc<dyn PackageHook>) {
+    pub fn add_user_hook(&mut self, hook: Arc<dyn PackageHook>) {
         self.user_hooks.push(hook);
     }
 
@@ -1708,25 +2035,36 @@ impl UniversalPackageManager {
         // Install packages
         for dep_name in dependencies {
             if let Some(package) = self.packages.get(&dep_name).cloned() {
-                let mut installing_package = package.clone();
+                let mut installing_package: UnifiedPackage = package.clone();
                 let old_state = installing_package.state;
 
                 // Move package state to downloading
                 installing_package.state = PackageState::Downloading;
-                self.triggers.notify_state_change(&installing_package, old_state, PackageState::Downloading);
+                self.triggers.notify_state_change(
+                    &installing_package,
+                    old_state,
+                    PackageState::Downloading,
+                );
 
                 // Pre-install hooks (User-Defined Functions)
                 for hook in &self.triggers.pre_install_hooks {
                     if let Err(err_msg) = hook(&installing_package) {
                         installing_package.state = PackageState::BrokenDependency;
-                        return Err(PackageError::InstallationFailed(format!("Pre-install hook failed: {}", err_msg)));
+                        return Err(PackageError::InstallationFailed(format!(
+                            "Pre-install hook failed: {}",
+                            err_msg
+                        )));
                     }
                 }
 
                 // Move state to installing
                 let prev_state = installing_package.state;
                 installing_package.state = PackageState::Installing;
-                self.triggers.notify_state_change(&installing_package, prev_state, PackageState::Installing);
+                self.triggers.notify_state_change(
+                    &installing_package,
+                    prev_state,
+                    PackageState::Installing,
+                );
 
                 // Strategy Pattern Execution
                 if let Some(&first_format) = installing_package.formats.first() {
@@ -1741,7 +2079,10 @@ impl UniversalPackageManager {
                 for hook in &self.triggers.post_install_hooks {
                     if let Err(err_msg) = hook(&installing_package) {
                         installing_package.state = PackageState::BrokenDependency;
-                        return Err(PackageError::InstallationFailed(format!("Post-install hook failed: {}", err_msg)));
+                        return Err(PackageError::InstallationFailed(format!(
+                            "Post-install hook failed: {}",
+                            err_msg
+                        )));
                     }
                 }
 
@@ -1749,9 +2090,14 @@ impl UniversalPackageManager {
                 let final_prev_state = installing_package.state;
                 installing_package.state = PackageState::Installed;
                 installing_package.installed = true;
-                self.triggers.notify_state_change(&installing_package, final_prev_state, PackageState::Installed);
+                self.triggers.notify_state_change(
+                    &installing_package,
+                    final_prev_state,
+                    PackageState::Installed,
+                );
 
-                self.installed_packages.insert(dep_name.clone(), installing_package);
+                self.installed_packages
+                    .insert(dep_name.clone(), installing_package);
             }
         }
 
@@ -1814,15 +2160,18 @@ impl UniversalPackageManager {
                 .with_provides(package.name.clone());
 
         for dep in &package.dependencies {
-            sigpkg = sigpkg.with_dependency(dep.clone());
+            let dep_str: String = dep.clone();
+            sigpkg = sigpkg.with_dependency(dep_str);
         }
 
         for conflict in &package.conflicts {
-            sigpkg = sigpkg.with_conflict(conflict.clone());
+            let conf_str: String = conflict.clone();
+            sigpkg = sigpkg.with_conflict(conf_str);
         }
 
         for provide in &package.provides {
-            sigpkg = sigpkg.with_provides(provide.clone());
+            let prov_str: String = provide.clone();
+            sigpkg = sigpkg.with_provides(prov_str);
         }
 
         sigpkg.source = package.source.clone();
@@ -1929,7 +2278,8 @@ impl UniversalPackageManifestParser {
             Some(PackageFormat::Tar)
         } else if name.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
+        {
             Some(PackageFormat::SlackBuild)
         } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -1944,15 +2294,14 @@ impl UniversalPackageManifestParser {
         }
     }
 
-    pub fn parse_manifest_auto(filename: &str, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+    pub fn parse_manifest_auto(
+        filename: &str,
+        raw_data: &[u8],
+    ) -> Result<UnifiedPackage, &'static str> {
         let fmt = Self::detect_format_from_filename(filename)
             .ok_or("UniversalManifestParser: Unsupported or unrecognized package extension")?;
 
-        let pkg_name = filename
-            .split('.')
-            .next()
-            .unwrap_or("unknown")
-            .to_string();
+        let pkg_name = filename.split('.').next().unwrap_or("unknown").to_string();
 
         let mut pkg = UnifiedPackage::new(pkg_name, "1.0.0".to_string()).with_format(fmt);
         if !raw_data.is_empty() {
@@ -1965,11 +2314,11 @@ impl UniversalPackageManifestParser {
 /// Linux & BSD Distro Inspired Rollback Mechanics
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroRollbackType {
-    NixOsGeneration,       // NixOS atomic generation profile rollback
-    FreeBsdZfsBootEnv,     // FreeBSD ZFS boot environment (bectl / beadm) rollback
-    OpenSuseSnapper,       // openSUSE Snapper CoW snapshot rollback
-    FedoraRpmOstree,       // Fedora Silverblue / rpm-ostree deployment rollback
-    AlpineApkCache,        // Alpine Linux local apk tarball cache rollback
+    NixOsGeneration,   // NixOS atomic generation profile rollback
+    FreeBsdZfsBootEnv, // FreeBSD ZFS boot environment (bectl / beadm) rollback
+    OpenSuseSnapper,   // openSUSE Snapper CoW snapshot rollback
+    FedoraRpmOstree,   // Fedora Silverblue / rpm-ostree deployment rollback
+    AlpineApkCache,    // Alpine Linux local apk tarball cache rollback
 }
 
 #[derive(Debug, Clone)]
@@ -2020,7 +2369,11 @@ impl SovereignPackageRollbackEngine {
     }
 
     pub fn rollback(&mut self, snapshot_id: usize) -> Result<Vec<String>, &'static str> {
-        let snap = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id).ok_or("Rollback Engine: Snapshot not found")?;
+        let snap = self
+            .snapshots
+            .iter()
+            .find(|s| s.snapshot_id == snapshot_id)
+            .ok_or("Rollback Engine: Snapshot not found")?;
         self.active_snapshot_id = Some(snapshot_id);
         Ok(snap.installed_packages_state.clone())
     }
@@ -2326,7 +2679,8 @@ mod tests {
             Some(PackageFormat::Flatpak)
         );
 
-        let pkg = UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
+        let pkg =
+            UniversalPackageManifestParser::parse_manifest_auto("tool.apk", b"payload").unwrap();
         assert_eq!(pkg.name, "tool");
         assert_eq!(pkg.formats[0], PackageFormat::Apk);
     }

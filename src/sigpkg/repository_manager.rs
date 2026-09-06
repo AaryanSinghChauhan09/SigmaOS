@@ -37,35 +37,6 @@ impl PpaRepository {
     }
 }
 
-
-
-
-/// Linux Mint Sources Mirror Benchmark Engine
-#[derive(Debug, Clone)]
-pub struct MirrorBenchmark {
-    pub url: String,
-    pub latency_ms: u32,
-    pub download_speed_kbps: u32,
-}
-
-pub struct MirrorBenchmarkEngine;
-
-impl MirrorBenchmarkEngine {
-    pub fn benchmark_mirrors(mirrors: &[String]) -> Vec<MirrorBenchmark> {
-        let mut results = Vec::new();
-        for (idx, url) in mirrors.iter().enumerate() {
-            // Simulated latency and speed benchmark calculation
-            let latency = 20 + ((idx * 15) % 100) as u32;
-            let speed = 10000 - (latency * 30);
-            results.push(MirrorBenchmark {
-                url: url.clone(),
-                latency_ms: latency,
-                download_speed_kbps: speed,
-            });
-        }
-        results
-    }
-}
 /// GPG Key Verification for Repositories
 #[derive(Debug, Clone)]
 pub struct RepositoryGpgKey {
@@ -114,34 +85,10 @@ impl PpaRepository {
     }
 
     pub fn to_sources_list_entry(&self) -> String {
-        format!("deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main", self.owner, self.name)
-    }
-}
-
-/// Linux Mint Sources Mirror Benchmark Engine
-#[derive(Debug, Clone)]
-pub struct MirrorBenchmark {
-    pub url: String,
-    pub latency_ms: u32,
-    pub download_speed_kbps: u32,
-}
-
-pub struct MirrorBenchmarkEngine;
-
-impl MirrorBenchmarkEngine {
-    pub fn benchmark_mirrors(mirrors: &[String]) -> Vec<MirrorBenchmark> {
-        let mut results = Vec::new();
-        for (idx, url) in mirrors.iter().enumerate() {
-            // Simulated latency and speed benchmark calculation
-            let latency = 20 + ((idx * 15) % 100) as u32;
-            let speed = 10000 - (latency * 30);
-            results.push(MirrorBenchmark {
-                url: url.clone(),
-                latency_ms: latency,
-                download_speed_kbps: speed,
-            });
-        }
-        results
+        format!(
+            "deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main",
+            self.owner, self.name
+        )
     }
 }
 
@@ -322,12 +269,18 @@ mod tests {
     fn test_ppa_repository() {
         let ppa = PpaRepository::new("graphics-drivers", "ppa", "0x12345678");
         assert_eq!(ppa.owner, "graphics-drivers");
-        assert_eq!(ppa.to_sources_list_entry(), "deb https://ppa.launchpadcontent.net/graphics-drivers/ppa/ubuntu main");
+        assert_eq!(
+            ppa.to_sources_list_entry(),
+            "deb https://ppa.launchpadcontent.net/graphics-drivers/ppa/ubuntu main"
+        );
     }
 
     #[test]
     fn test_mirror_benchmark_engine() {
-        let mirrors = vec!["https://mirror1.org".to_string(), "https://mirror2.org".to_string()];
+        let mirrors = vec![
+            "https://mirror1.org".to_string(),
+            "https://mirror2.org".to_string(),
+        ];
         let bench = MirrorBenchmarkEngine::benchmark_mirrors(&mirrors);
         assert_eq!(bench.len(), 2);
         assert!(bench[0].latency_ms < bench[1].latency_ms);

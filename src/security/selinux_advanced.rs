@@ -2,9 +2,9 @@
 // Enhanced SELinux-inspired security with policy management and MLS support
 // Inspired by Fedora's advanced SELinux features
 
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// MLS (Multi-Level Security) level
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -15,7 +15,10 @@ pub struct MlsLevel {
 
 impl MlsLevel {
     pub fn new(sensitivity: String, categories: Vec<String>) -> Self {
-        Self { sensitivity, categories }
+        Self {
+            sensitivity,
+            categories,
+        }
     }
 
     pub fn dominates(&self, other: &MlsLevel) -> bool {
