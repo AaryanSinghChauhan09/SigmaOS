@@ -1,0 +1,20 @@
+name: "Qubes OS: Disposable VM QREXEC Isolation CI"
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+permissions:
+  contents: read
+jobs:
+  qubes-isolation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run Qubes OS QREXEC VM isolation audit
+        run: |
+          mkdir -p build
+          echo "Simulating Qubes OS QREXEC disposable VM isolation..."
+          ./run_sigma_tests.sh
