@@ -18,7 +18,7 @@
 //  12. Linux                         -> io_uring Asynchronous System Call Engine
 //  13. FreeBSD                       -> GEOM Storage Transformation Topology Engine
 
-// #![no_std]
+#![no_std]
 
 extern crate alloc;
 
