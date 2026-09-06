@@ -1,0 +1,90 @@
+name: "Supply Chain: Reproducible Builds, SBOM & Cosign Signing"
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  id-token: write
+  packages: write
+
+jobs:
+  verify-reproducible-build:
+    name: Verify Reproducible Build Determinism
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Primary Artifact (Runner 1)
+        run: |
+          mkdir -p build/runner1
+          cargo build --release --lib
+          cp target/release/libsigmaos.rlib build/runner1/
+
+      - name: Build Secondary Artifact (Runner 2 - Fresh Build)
+        run: |
+          mkdir -p build/runner2
+          cargo clean
+          cargo build --release --lib
+          cp target/release/libsigmaos.rlib build/runner2/
+
+      - name: Verify Binary Bit-for-Bit Reproducibility
+        run: |
+          echo "Comparing artifact checksums..."
+          HASH1=$(sha256sum build/runner1/libsigmaos.rlib | awk '{print $1}')
+          HASH2=$(sha256sum build/runner2/libsigmaos.rlib | awk '{print $1}')
+          echo "Runner 1 SHA256: $HASH1"
+          echo "Runner 2 SHA256: $HASH2"
+          if [ "$HASH1" != "$HASH2" ]; then
+            echo "::error::Build outputs are not bit-for-bit reproducible!"
+            exit 1
+          fi
+          echo "✅ Bit-for-bit build determinism verified!"
+
+  generate-sbom-and-sign:
+    name: Generate SBOM & Sign Artifacts with Cosign
+    needs: verify-reproducible-build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Release Artifacts
+        run: |
+          cargo build --release --lib
+
+      - name: Install SBOM Tool (Syft)
+        uses: anchore/sbom-action/download-syft@v0.18.0
+
+      - name: Generate SPDX & CycloneDX SBOM
+        run: |
+          syft dir:. -o spdx-json=sbom.spdx.json -o cyclonedx-json=sbom.cyclonedx.json
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.8.1
+
+      - name: Sign Release Artifacts with Cosign (Keyless)
+        run: |
+          echo "Signing release artifact with Sigstore Cosign..."
+          cosign sign-blob --yes target/release/libsigmaos.rlib --output-signature target/release/libsigmaos.rlib.sig
+
+      - name: Upload SBOM & Signature Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigmaos-sbom-signatures
+          path: |
+            sbom.spdx.json
+            sbom.cyclonedx.json
+            target/release/libsigmaos.rlib.sig
