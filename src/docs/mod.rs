@@ -1,6 +1,3 @@
-pub mod knowledgebase;
-pub use knowledgebase::*;
-
 //! SigmaOS Documentation Generation System
 //!
 //! This module provides automatic documentation generation from source code,
