@@ -1,8 +1,8 @@
 # SigmaOS Architecture Decision Document
 
-**Date**: September 4, 2026  
-**Decision**: Commit to **std-based architecture** (not no_std)  
-**Status**: APPROVED  
+**Date**: September 4, 2026
+**Decision**: Commit to **std-based architecture** (not no_std)
+**Status**: APPROVED
 **Impact**: Resolves 303+ build errors
 
 ---
@@ -330,10 +330,10 @@ cargo build --target riscv64-unknown-none --no-default-features
 
 ## Decision Approval
 
-**Decision**: Commit to std-based architecture  
-**Approved**: YES  
-**Implementation**: Start immediately  
-**Timeline**: 8-12 hours  
+**Decision**: Commit to std-based architecture
+**Approved**: YES
+**Implementation**: Start immediately
+**Timeline**: 8-12 hours
 **Next**: Execute Phase 1 (remove alloc remnants)
 
 ---
