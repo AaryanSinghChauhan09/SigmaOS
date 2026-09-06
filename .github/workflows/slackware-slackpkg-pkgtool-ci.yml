@@ -1,0 +1,27 @@
+name: Slackware KISS Packaging & Slackpkg Patch Engine CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  slackware-packaging:
+    name: Slackware pkgtool & Slackpkg Patch Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test Slackware Package & Patch Engine
+        run: |
+          cargo test --lib -- sigpkg::poudriere_xbps::tests::test_slackpkg_patch_engine
