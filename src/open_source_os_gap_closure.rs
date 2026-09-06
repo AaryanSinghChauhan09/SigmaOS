@@ -3275,16 +3275,6 @@ impl OpenSourceProjectSupremacySuite {
         extent_id > 0
     }
 
-    /// Systemd-free supervisor state verification
-    pub fn supervise_systemd_free_init(&mut self, service_name: &str) -> bool {
-        if service_name.is_empty() {
-            false
-        } else {
-            self.runit_services.insert(service_name.to_string(), 1001);
-            true
-        }
-    }
-
     /// Supervise systemd-free init services (OpenRC / Runit / SysV)
     pub fn supervise_systemd_free_init(&mut self, service_name: &str) -> bool {
         if service_name.is_empty() {
