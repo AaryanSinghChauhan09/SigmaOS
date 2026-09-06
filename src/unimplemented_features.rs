@@ -5,15 +5,6 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 #![allow(unexpected_cfgs)]
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
-
-use std::format;
-use std::vec;
-// Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
-// Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
-
 extern crate alloc;
 
 use alloc::boxed::Box;
@@ -3400,209 +3391,6 @@ mod extra_unimplemented_tests {
 }
 
 // =========================================================================
-// DISTRO-INSPIRED ECOSYSTEM ENCOUNTER ENFORCE ENGINES
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
-    pub major_version: u32,
-    pub errata_patches_applied: usize,
-    pub security_advisories: Vec<String>,
-}
-
-impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
-    pub fn new(major_version: u32) -> Self {
-        Self {
-            major_version,
-            errata_patches_applied: 0,
-            security_advisories: Vec::new(),
-        }
-    }
-
-    pub fn verify_abi_compatibility(&self, target_version: u32) -> bool {
-        target_version <= self.major_version
-    }
-
-    pub fn apply_errata_patch(&mut self, advisory: &str) {
-        self.errata_patches_applied += 1;
-        self.security_advisories.push(advisory.to_string());
-    }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct VoidXbpsContainerEngine {
-    pub registered_packages: Vec<String>,
-    pub runit_services_active: Vec<String>,
-}
-
-impl VoidXbpsContainerEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn install_xbps_package(&mut self, name: &str) {
-        if !self.registered_packages.contains(&name.to_string()) {
-            self.registered_packages.push(name.to_string());
-        }
-    }
-
-    pub fn start_runit_service(&mut self, service: &str) {
-        if !self.runit_services_active.contains(&service.to_string()) {
-            self.runit_services_active.push(service.to_string());
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PuppyLinuxOverlayRamdiskEngine {
-    pub ramdisk_size_mb: usize,
-    pub loaded_sfs_modules: Vec<String>,
-    pub persistence_save_file: Option<String>,
-}
-
-impl PuppyLinuxOverlayRamdiskEngine {
-    pub fn new(ramdisk_size_mb: usize) -> Self {
-        Self {
-            ramdisk_size_mb,
-            loaded_sfs_modules: Vec::new(),
-            persistence_save_file: None,
-        }
-    }
-
-    pub fn load_sfs_module(&mut self, sfs_name: &str) {
-        self.loaded_sfs_modules.push(sfs_name.to_string());
-    }
-
-    pub fn mount_persistence(&mut self, path: &str) {
-        self.persistence_save_file = Some(path.to_string());
-    }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct TinyCoreModularTczLoader {
-    pub mounted_extensions: Vec<String>,
-    pub total_ram_used_kb: usize,
-}
-
-impl TinyCoreModularTczLoader {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn mount_tcz(&mut self, tcz_name: &str, size_kb: usize) {
-        self.mounted_extensions.push(tcz_name.to_string());
-        self.total_ram_used_kb += size_kb;
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DeepinDdeControlCenterEngine {
-    pub theme_mode: String,
-    pub dock_position: String,
-}
-
-impl DeepinDdeControlCenterEngine {
-    pub fn new() -> Self {
-        Self {
-            theme_mode: "Dark".to_string(),
-            dock_position: "Bottom".to_string(),
-        }
-    }
-
-    pub fn set_theme_mode(&mut self, mode: &str) {
-        self.theme_mode = mode.to_string();
-    }
-
-    pub fn set_dock_position(&mut self, pos: &str) {
-        self.dock_position = pos.to_string();
-    }
-}
-
-impl Default for DeepinDdeControlCenterEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct ManjaroHardwareDetectionEngine {
-    pub recommended_drivers: Vec<String>,
-    pub installed_drivers: Vec<String>,
-}
-
-impl ManjaroHardwareDetectionEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn scan_pci_bus(&mut self, vendor_id: u16, _device_id: u16) {
-        if vendor_id == 0x10DE {
-            self.recommended_drivers.push("video-nvidia".to_string());
-        } else {
-            self.recommended_drivers.push("video-linux".to_string());
-        }
-    }
-
-    pub fn auto_install_recommended_drivers(&mut self) -> usize {
-        let count = self.recommended_drivers.len();
-        self.installed_drivers
-            .extend(self.recommended_drivers.clone());
-        count
-    }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct SteamOsGamescopeCompositorEngine {
-    pub fsr_enabled: bool,
-    pub target_fps_limit: u32,
-}
-
-impl SteamOsGamescopeCompositorEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn enable_fsr(&mut self, enable: bool) {
-        self.fsr_enabled = enable;
-    }
-
-    pub fn set_fps_limit(&mut self, fps: u32) {
-        self.target_fps_limit = fps;
-    }
-
-    pub fn lease_drm_surface(&self) -> u32 {
-        1
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PhoronixTestSuiteRunner {
-    pub suite_name: String,
-    pub scores: Vec<f64>,
-}
-
-impl PhoronixTestSuiteRunner {
-    pub fn new(suite_name: &str) -> Self {
-        Self {
-            suite_name: suite_name.to_string(),
-            scores: Vec::new(),
-        }
-    }
-
-    pub fn execute_benchmark(&mut self, _test_name: &str, score: f64) {
-        self.scores.push(score);
-    }
-
-    pub fn calculate_composite_score(&self) -> f64 {
-        if self.scores.is_empty() {
-            0.0
-        } else {
-            self.scores.iter().sum::<f64>() / self.scores.len() as f64
-        }
-    }
-}
-
-// =========================================================================
 // TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
 // =========================================================================
 
@@ -3823,7 +3611,548 @@ impl Default for WindowsCopilotRecallAuditor {
 }
 
 #[cfg(test)]
+
+// =========================================================================
+// GLOBAL TECH MEDIA & ENTERPRISE FOSS DISTRO PARITY ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct AppualsHardwareFixGuideEngine {
+    pub guide_title: String,
+    pub troubleshooting_steps: Vec<String>,
+    pub resolved_error_codes: Vec<u32>,
+}
+
+impl AppualsHardwareFixGuideEngine {
+    pub fn new(guide_title: &str) -> Self {
+        Self {
+            guide_title: guide_title.to_string(),
+            troubleshooting_steps: Vec::new(),
+            resolved_error_codes: Vec::new(),
+        }
+    }
+
+    pub fn add_step(&mut self, step: &str) {
+        self.troubleshooting_steps.push(step.to_string());
+    }
+
+    pub fn resolve_error_code(&mut self, code: u32) {
+        if !self.resolved_error_codes.contains(&code) {
+            self.resolved_error_codes.push(code);
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct InfoworldEnterpriseTechTrendEngine {
+    pub trend_category: String,
+    pub adoption_index: f64,
+    pub surveyed_enterprises: usize,
+}
+
+impl InfoworldEnterpriseTechTrendEngine {
+    pub fn new(category: &str) -> Self {
+        Self {
+            trend_category: category.to_string(),
+            adoption_index: 0.0,
+            surveyed_enterprises: 0,
+        }
+    }
+
+    pub fn record_survey(&mut self, sample_count: usize, adoption_rate: f64) {
+        self.surveyed_enterprises += sample_count;
+        self.adoption_index = adoption_rate;
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct ItDailyInfrastructureHealthGovernor {
+    pub monitored_servers: Vec<String>,
+    pub critical_alerts: Vec<String>,
+}
+
+impl ItDailyInfrastructureHealthGovernor {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn register_server(&mut self, hostname: &str) {
+        if !self.monitored_servers.contains(&hostname.to_string()) {
+            self.monitored_servers.push(hostname.to_string());
+        }
+    }
+
+    pub fn trigger_alert(&mut self, alert: &str) {
+        self.critical_alerts.push(alert.to_string());
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct LinuxTeckAdminAutomationEngine {
+    pub bash_scripts_compiled: usize,
+    pub ansible_playbooks_executed: usize,
+}
+
+impl LinuxTeckAdminAutomationEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn execute_playbook(&mut self, _playbook_name: &str) {
+        self.ansible_playbooks_executed += 1;
+    }
+
+    pub fn compile_script(&mut self, _script_path: &str) {
+        self.bash_scripts_compiled += 1;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MarkTechPostAiModelHub {
+    pub registered_models: Vec<String>,
+    pub max_parameters_billions: f64,
+}
+
+impl MarkTechPostAiModelHub {
+    pub fn new(max_params: f64) -> Self {
+        Self {
+            registered_models: Vec::new(),
+            max_parameters_billions: max_params,
+        }
+    }
+
+    pub fn register_model(&mut self, name: &str, params: f64) -> bool {
+        if params <= self.max_parameters_billions {
+            self.registered_models.push(name.to_string());
+            true
+        } else {
+            false
+        }
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct OpenSourceForUFossCatalog {
+    pub project_entries: Vec<String>,
+    pub total_downloads: u64,
+}
+
+impl OpenSourceForUFossCatalog {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_project(&mut self, name: &str) {
+        if !self.project_entries.contains(&name.to_string()) {
+            self.project_entries.push(name.to_string());
+        }
+    }
+
+    pub fn record_download(&mut self, count: u64) {
+        self.total_downloads += count;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PcMagTechBenchmarkSuite {
+    pub suite_title: String,
+    pub benchmark_scores: Vec<f64>,
+}
+
+impl PcMagTechBenchmarkSuite {
+    pub fn new(title: &str) -> Self {
+        Self {
+            suite_title: title.to_string(),
+            benchmark_scores: Vec::new(),
+        }
+    }
+
+    pub fn add_score(&mut self, score: f64) {
+        self.benchmark_scores.push(score);
+    }
+
+    pub fn average_score(&self) -> f64 {
+        if self.benchmark_scores.is_empty() {
+            0.0
+        } else {
+            self.benchmark_scores.iter().sum::<f64>() / self.benchmark_scores.len() as f64
+        }
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct PcWorldGpuPowerTweaker {
+    pub power_limit_watts: u32,
+    pub fan_speed_percent: u8,
+}
+
+impl PcWorldGpuPowerTweaker {
+    pub fn new(initial_power: u32) -> Self {
+        Self {
+            power_limit_watts: initial_power,
+            fan_speed_percent: 50,
+        }
+    }
+
+    pub fn set_power_limit(&mut self, watts: u32) {
+        self.power_limit_watts = watts;
+    }
+
+    pub fn set_fan_speed(&mut self, percent: u8) {
+        self.fan_speed_percent = percent.min(100);
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct TechCrunchVentureEcosystemHub {
+    pub portfolio_companies: Vec<String>,
+    pub total_funding_millions: f64,
+}
+
+impl TechCrunchVentureEcosystemHub {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_company(&mut self, company: &str, funding: f64) {
+        self.portfolio_companies.push(company.to_string());
+        self.total_funding_millions += funding;
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct TechSpotHardwarePricePerformanceGovernor {
+    pub hardware_evaluations: Vec<(String, f64)>,
+}
+
+impl TechSpotHardwarePricePerformanceGovernor {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_hardware(&mut self, name: &str, perf_per_dollar: f64) {
+        self.hardware_evaluations.push((name.to_string(), perf_per_dollar));
+    }
+
+    pub fn top_value_hardware(&self) -> Option<String> {
+        self.hardware_evaluations
+            .iter()
+            .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(core::cmp::Ordering::Equal))
+            .map(|item| item.0.clone())
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct TheNewStackCloudNativeEngine {
+    pub ebpf_programs_loaded: usize,
+    pub wasm_modules_running: usize,
+}
+
+impl TheNewStackCloudNativeEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn load_ebpf_program(&mut self, _prog_name: &str) {
+        self.ebpf_programs_loaded += 1;
+    }
+
+    pub fn run_wasm_module(&mut self, _mod_name: &str) {
+        self.wasm_modules_running += 1;
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct ZdnetEnterpriseItPolicyEngine {
+    pub compliance_rules: Vec<String>,
+    pub strict_enforcement: bool,
+}
+
+impl ZdnetEnterpriseItPolicyEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_rule(&mut self, rule: &str) {
+        self.compliance_rules.push(rule.to_string());
+    }
+
+    pub fn enable_strict_mode(&mut self) {
+        self.strict_enforcement = true;
+}
+    }
 mod new_unimplemented_tests {
+use super::*;
+
+// =========================================================================
+// GLOBAL TECH MEDIA & ENTERPRISE FOSS DISTRO PARITY ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct AppualsHardwareFixGuideEngine {
+    pub guide_title: String,
+    pub troubleshooting_steps: Vec<String>,
+    pub resolved_error_codes: Vec<u32>,
+}
+
+impl AppualsHardwareFixGuideEngine {
+    pub fn new(guide_title: &str) -> Self {
+        Self {
+            guide_title: guide_title.to_string(),
+            troubleshooting_steps: Vec::new(),
+            resolved_error_codes: Vec::new(),
+        }
+    }
+
+    pub fn add_step(&mut self, step: &str) {
+        self.troubleshooting_steps.push(step.to_string());
+    }
+
+    pub fn resolve_error_code(&mut self, code: u32) {
+        if !self.resolved_error_codes.contains(&code) {
+            self.resolved_error_codes.push(code);
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct InfoworldEnterpriseTechTrendEngine {
+    pub trend_category: String,
+    pub adoption_index: f64,
+    pub surveyed_enterprises: usize,
+}
+
+impl InfoworldEnterpriseTechTrendEngine {
+    pub fn new(category: &str) -> Self {
+        Self {
+            trend_category: category.to_string(),
+            adoption_index: 0.0,
+            surveyed_enterprises: 0,
+        }
+    }
+
+    pub fn record_survey(&mut self, sample_count: usize, adoption_rate: f64) {
+        self.surveyed_enterprises += sample_count;
+        self.adoption_index = adoption_rate;
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct ItDailyInfrastructureHealthGovernor {
+    pub monitored_servers: Vec<String>,
+    pub critical_alerts: Vec<String>,
+}
+
+impl ItDailyInfrastructureHealthGovernor {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn register_server(&mut self, hostname: &str) {
+        if !self.monitored_servers.contains(&hostname.to_string()) {
+            self.monitored_servers.push(hostname.to_string());
+        }
+    }
+
+    pub fn trigger_alert(&mut self, alert: &str) {
+        self.critical_alerts.push(alert.to_string());
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct LinuxTeckAdminAutomationEngine {
+    pub bash_scripts_compiled: usize,
+    pub ansible_playbooks_executed: usize,
+}
+
+impl LinuxTeckAdminAutomationEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn execute_playbook(&mut self, _playbook_name: &str) {
+        self.ansible_playbooks_executed += 1;
+    }
+
+    pub fn compile_script(&mut self, _script_path: &str) {
+        self.bash_scripts_compiled += 1;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MarkTechPostAiModelHub {
+    pub registered_models: Vec<String>,
+    pub max_parameters_billions: f64,
+}
+
+impl MarkTechPostAiModelHub {
+    pub fn new(max_params: f64) -> Self {
+        Self {
+            registered_models: Vec::new(),
+            max_parameters_billions: max_params,
+        }
+    }
+
+    pub fn register_model(&mut self, name: &str, params: f64) -> bool {
+        if params <= self.max_parameters_billions {
+            self.registered_models.push(name.to_string());
+            true
+        } else {
+            false
+        }
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct OpenSourceForUFossCatalog {
+    pub project_entries: Vec<String>,
+    pub total_downloads: u64,
+}
+
+impl OpenSourceForUFossCatalog {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_project(&mut self, name: &str) {
+        if !self.project_entries.contains(&name.to_string()) {
+            self.project_entries.push(name.to_string());
+        }
+    }
+
+    pub fn record_download(&mut self, count: u64) {
+        self.total_downloads += count;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PcMagTechBenchmarkSuite {
+    pub suite_title: String,
+    pub benchmark_scores: Vec<f64>,
+}
+
+impl PcMagTechBenchmarkSuite {
+    pub fn new(title: &str) -> Self {
+        Self {
+            suite_title: title.to_string(),
+            benchmark_scores: Vec::new(),
+        }
+    }
+
+    pub fn add_score(&mut self, score: f64) {
+        self.benchmark_scores.push(score);
+    }
+
+    pub fn average_score(&self) -> f64 {
+        if self.benchmark_scores.is_empty() {
+            0.0
+        } else {
+            self.benchmark_scores.iter().sum::<f64>() / self.benchmark_scores.len() as f64
+        }
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct PcWorldGpuPowerTweaker {
+    pub power_limit_watts: u32,
+    pub fan_speed_percent: u8,
+}
+
+impl PcWorldGpuPowerTweaker {
+    pub fn new(initial_power: u32) -> Self {
+        Self {
+            power_limit_watts: initial_power,
+            fan_speed_percent: 50,
+        }
+    }
+
+    pub fn set_power_limit(&mut self, watts: u32) {
+        self.power_limit_watts = watts;
+    }
+
+    pub fn set_fan_speed(&mut self, percent: u8) {
+        self.fan_speed_percent = percent.min(100);
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct TechCrunchVentureEcosystemHub {
+    pub portfolio_companies: Vec<String>,
+    pub total_funding_millions: f64,
+}
+
+impl TechCrunchVentureEcosystemHub {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_company(&mut self, company: &str, funding: f64) {
+        self.portfolio_companies.push(company.to_string());
+        self.total_funding_millions += funding;
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct TechSpotHardwarePricePerformanceGovernor {
+    pub hardware_evaluations: Vec<(String, f64)>,
+}
+
+impl TechSpotHardwarePricePerformanceGovernor {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_hardware(&mut self, name: &str, perf_per_dollar: f64) {
+        self.hardware_evaluations.push((name.to_string(), perf_per_dollar));
+    }
+
+    pub fn top_value_hardware(&self) -> Option<String> {
+        self.hardware_evaluations
+            .iter()
+            .max_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(core::cmp::Ordering::Equal))
+            .map(|item| item.0.clone())
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct TheNewStackCloudNativeEngine {
+    pub ebpf_programs_loaded: usize,
+    pub wasm_modules_running: usize,
+}
+
+impl TheNewStackCloudNativeEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn load_ebpf_program(&mut self, _prog_name: &str) {
+        self.ebpf_programs_loaded += 1;
+    }
+
+    pub fn run_wasm_module(&mut self, _mod_name: &str) {
+        self.wasm_modules_running += 1;
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct ZdnetEnterpriseItPolicyEngine {
+    pub compliance_rules: Vec<String>,
+    pub strict_enforcement: bool,
+}
+
+impl ZdnetEnterpriseItPolicyEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_rule(&mut self, rule: &str) {
+        self.compliance_rules.push(rule.to_string());
+    }
+
+    pub fn enable_strict_mode(&mut self) {
+        self.strict_enforcement = true;
+    }
+}
     use super::*;
 
     #[test]
@@ -3948,5 +4277,111 @@ mod new_unimplemented_tests {
         assert!(recall
             .capture_privacy_governed_snapshot("Banking Online")
             .is_err());
+    }
+}
+mod tech_media_tests {
+    use super::*;
+
+    #[test]
+    fn test_appuals_hardware_fix_guide() {
+        let mut guide = AppualsHardwareFixGuideEngine::new("BSOD Troubleshooting");
+        guide.add_step("Check RAM module seat");
+        guide.resolve_error_code(0x0000000A);
+        assert_eq!(guide.troubleshooting_steps.len(), 1);
+        assert_eq!(guide.resolved_error_codes.len(), 1);
+    }
+
+    #[test]
+    fn test_infoworld_enterprise_tech_trend() {
+        let mut trend = InfoworldEnterpriseTechTrendEngine::new("Cloud Native Adoption");
+        trend.record_survey(500, 0.85);
+        assert_eq!(trend.surveyed_enterprises, 500);
+        assert_eq!(trend.adoption_index, 0.85);
+    }
+
+    #[test]
+    fn test_itdaily_infrastructure_health() {
+        let mut gov = ItDailyInfrastructureHealthGovernor::new();
+        gov.register_server("srv-node-01");
+        gov.trigger_alert("High CPU Utilization");
+        assert_eq!(gov.monitored_servers.len(), 1);
+        assert_eq!(gov.critical_alerts.len(), 1);
+    }
+
+    #[test]
+    fn test_linuxteck_admin_automation() {
+        let mut auto = LinuxTeckAdminAutomationEngine::new();
+        auto.execute_playbook("deploy_k8s_cluster.yml");
+        auto.compile_script("backup_db.sh");
+        assert_eq!(auto.ansible_playbooks_executed, 1);
+        assert_eq!(auto.bash_scripts_compiled, 1);
+    }
+
+    #[test]
+    fn test_marktechpost_ai_model_hub() {
+        let mut hub = MarkTechPostAiModelHub::new(70.0);
+        assert!(hub.register_model("Llama-3-70B", 70.0));
+        assert!(!hub.register_model("DeepSeek-R1-405B", 405.0));
+        assert_eq!(hub.registered_models.len(), 1);
+    }
+
+    #[test]
+    fn test_opensourceforu_foss_catalog() {
+        let mut cat = OpenSourceForUFossCatalog::new();
+        cat.add_project("SigmaOS Kernel");
+        cat.record_download(10000);
+        assert_eq!(cat.project_entries.len(), 1);
+        assert_eq!(cat.total_downloads, 10000);
+    }
+
+    #[test]
+    fn test_pcmag_tech_benchmark() {
+        let mut bench = PcMagTechBenchmarkSuite::new("CPUMark 2026");
+        bench.add_score(1500.0);
+        bench.add_score(2500.0);
+        assert_eq!(bench.average_score(), 2000.0);
+    }
+
+    #[test]
+    fn test_pcworld_gpu_power_tweaker() {
+        let mut tweaker = PcWorldGpuPowerTweaker::new(300);
+        tweaker.set_power_limit(350);
+        tweaker.set_fan_speed(80);
+        assert_eq!(tweaker.power_limit_watts, 350);
+        assert_eq!(tweaker.fan_speed_percent, 80);
+    }
+
+    #[test]
+    fn test_techcrunch_venture_ecosystem() {
+        let mut hub = TechCrunchVentureEcosystemHub::new();
+        hub.add_company("Sigma AI Inc", 50.0);
+        assert_eq!(hub.portfolio_companies.len(), 1);
+        assert_eq!(hub.total_funding_millions, 50.0);
+    }
+
+    #[test]
+    fn test_techspot_hardware_price_perf() {
+        let mut gov = TechSpotHardwarePricePerformanceGovernor::new();
+        gov.add_hardware("GPU A", 12.5);
+        gov.add_hardware("GPU B", 18.2);
+        assert_eq!(gov.top_value_hardware().unwrap(), "GPU B");
+    }
+
+    #[test]
+    fn test_thenewstack_cloud_native() {
+        let mut engine = TheNewStackCloudNativeEngine::new();
+        engine.load_ebpf_program("trace_sys_entry");
+        engine.run_wasm_module("edge_filter.wasm");
+        assert_eq!(engine.ebpf_programs_loaded, 1);
+        assert_eq!(engine.wasm_modules_running, 1);
+    }
+
+    #[test]
+    fn test_zdnet_enterprise_it_policy() {
+        let mut pol = ZdnetEnterpriseItPolicyEngine::new();
+        pol.add_rule("Require 2FA for Root Access");
+        pol.enable_strict_mode();
+        assert_eq!(pol.compliance_rules.len(), 1);
+        assert!(pol.strict_enforcement);
     }
 }
