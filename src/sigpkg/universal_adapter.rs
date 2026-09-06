@@ -3388,6 +3388,53 @@ mod tests {
     }
 
     #[test]
+    fn test_foreign_pm_dispatcher_expanded_distros() {
+        let dispatcher = UniversalPmCommandDispatcher::new();
+
+        let emerge_act = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
+        assert_eq!(emerge_act.source_pm, "emerge");
+        assert_eq!(emerge_act.operation, UniversalPmOperation::Upgrade);
+        assert!(emerge_act.dry_run);
+
+        let nix_act = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
+        assert_eq!(nix_act.source_pm, "nix-env");
+        assert_eq!(nix_act.operation, UniversalPmOperation::Install);
+        assert_eq!(nix_act.target_packages, vec!["nixpkgs.git"]);
+
+        let flatpak_act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
+        assert_eq!(flatpak_act.source_pm, "flatpak");
+        assert_eq!(flatpak_act.operation, UniversalPmOperation::Install);
+        assert_eq!(flatpak_act.target_packages, vec!["org.gimp.GIMP"]);
+
+        let snap_act = dispatcher.dispatch_command("snap remove vlc").unwrap();
+        assert_eq!(snap_act.source_pm, "snap");
+        assert_eq!(snap_act.operation, UniversalPmOperation::Remove);
+        assert_eq!(snap_act.target_packages, vec!["vlc"]);
+
+        let slack_act = dispatcher.dispatch_command("slackpkg install htop").unwrap();
+        assert_eq!(slack_act.source_pm, "slackpkg");
+        assert_eq!(slack_act.operation, UniversalPmOperation::Install);
+        assert_eq!(slack_act.target_packages, vec!["htop"]);
+
+        let pkgman_act = dispatcher.dispatch_command("pkgman install haiku_dep").unwrap();
+        assert_eq!(pkgman_act.source_pm, "pkgman");
+        assert_eq!(pkgman_act.operation, UniversalPmOperation::Install);
+        assert_eq!(pkgman_act.target_packages, vec!["haiku_dep"]);
+
+        let swupd_act = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
+        assert_eq!(swupd_act.source_pm, "swupd");
+        assert_eq!(swupd_act.operation, UniversalPmOperation::Install);
+
+        let eopkg_act = dispatcher.dispatch_command("eopkg remove nano").unwrap();
+        assert_eq!(eopkg_act.source_pm, "eopkg");
+        assert_eq!(eopkg_act.operation, UniversalPmOperation::Remove);
+
+        let pkgin_act = dispatcher.dispatch_command("pkgin install tmux").unwrap();
+        assert_eq!(pkgin_act.source_pm, "pkgin");
+        assert_eq!(pkgin_act.operation, UniversalPmOperation::Install);
+    }
+
+    #[test]
     fn test_haiku_hpkg_manifest_parsing_and_bridge() {
         let adapter = UniversalPackageAdapter::new();
         let hpkg_text = r#"
