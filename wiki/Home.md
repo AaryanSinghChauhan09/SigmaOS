@@ -21,23 +21,7 @@
 - **AI Agents Procedure Call Management Guide:** [[AI_AGENTS_PROCEDURE_CALL_MANAGEMENT_GUIDE]] - Syscall dispatchers, FFI bindings, zero-copy IPC ring channels, and RPC for autonomous AI agents.
 - **AI Agents Ballooning Management Guide:** [[AI_AGENTS_BALLOONING_MANAGEMENT_GUIDE]] - VirtIO memory ballooning, RAM inflation/deflation, and hypervisor overcommit management for AI agents.
 - **AI Agents Boot Management Guide:** [[AI_AGENTS_BOOT_MANAGEMENT_GUIDE]] - UEFI/BIOS handoff, Multiboot2, Secure Boot verification, boot optimization, and init handoff for AI agents.
-
----
-
-## 📚 Documentation
-
-Get started with SigmaOS through our comprehensive wiki:
-
-- **[Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quick-Start)** - Build and run SigmaOS
-- **[Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)** - Core design and subsystems
-- **[Tier 1 Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Tier-1-Features)** - Feature matrix and status
-- **[Syscall Reference](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Syscall-Reference)** - Complete syscall documentation
-- **[Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing)** - Development guidelines
-- **[Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Roadmap)** - Phases 6-10 plans
-- **[Release Notes](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes)** - Version history
-- **[FAQ](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FAQ)** - Common questions
-- **[API Documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/API-Documentation)** - Public APIs
-- **[Full Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Complete documentation index
+- **AI Agent Carry Flag Management Guide:** [[AI_AGENT_CARRY_FLAG_MANAGEMENT]] - Hardware status flags, bignum arithmetic carry chains, and ALU emulation for AI agents.
 
 ---
 
