@@ -80,128 +80,13 @@ pub mod node_distribution_dummy {
 #[cfg(any(feature = "standalone_test", test))]
 use node_distribution_dummy::*;
 
-/// Foreign distro manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ForeignDistroManifest {
-    pub raw_format: PackageFormat,
-    pub original_name: String,
-    pub version: String,
-    pub architecture: String,
-    pub raw_dependencies: Vec<String>,
-    pub raw_provides: Vec<String>,
-    pub raw_conflicts: Vec<String>,
-    pub maintainer: String,
-}
-
-/// Helper translator converting ForeignDistroManifest to native UnifiedPackage
-pub struct UniversalPackageTranslator;
-
-impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let mut pkg = UnifiedPackage::new(
-            format!("sigpkg-{}", manifest.original_name),
-            manifest.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(manifest.original_name.clone());
-
-        for dep in manifest.raw_dependencies.iter() {
-            let dep_str: &str = dep.as_str();
-            let translated_dep: &str = match dep_str {
-                "libssl-dev" | "openssl-devel" | "openssl" => "sovereign-openssl",
-                "libc6" => "sovereign-libc",
-                other => debtor_to_sovereign_name(other),
-            };
-            pkg = pkg.with_dependency(translated_dep.to_string());
-        }
-
-        for prov in manifest.raw_provides.iter() {
-            let prov_str: String = prov.clone();
-            pkg = pkg.with_provides(prov_str);
-        }
-
-        for conf in manifest.raw_conflicts.iter() {
-            let conf_str: String = conf.clone();
-            pkg = pkg.with_conflict(conf_str);
-        }
-
-        pkg
-    }
-}
-
-fn debtor_to_sovereign_name(name: &str) -> &str {
-    if name.contains("ssl") {
-        "sovereign-openssl"
-    } else if name.contains("libc") {
-        "sovereign-libc"
-    } else {
-        name
-    }
-}
-
-/// Repository representation
-#[derive(Debug, Clone)]
-pub struct RegisteredDistroRepo {
-    pub distro_name: String,
-    pub repo_url: String,
-}
-
-/// Distro repository sync engine
-#[derive(Debug, Clone)]
-pub struct DistroRepoSyncEngine {
-    pub registered_repos: Vec<RegisteredDistroRepo>,
-    pub indexed_manifests: HashMap<String, ForeignDistroManifest>,
-}
-
-impl DistroRepoSyncEngine {
-    pub fn new() -> Self {
-        let mut repos = Vec::new();
-        repos.push(RegisteredDistroRepo {
-            distro_name: "Debian".to_string(),
-            repo_url: "deb.debian.org".to_string(),
-        });
-        repos.push(RegisteredDistroRepo {
-            distro_name: "ArchLinux".to_string(),
-            repo_url: "archlinux.org".to_string(),
-        });
-        repos.push(RegisteredDistroRepo {
-            distro_name: "Fedora".to_string(),
-            repo_url: "fedoraproject.org".to_string(),
-        });
-        repos.push(RegisteredDistroRepo {
-            distro_name: "Alpine".to_string(),
-            repo_url: "alpinelinux.org".to_string(),
-        });
-        repos.push(RegisteredDistroRepo {
-            distro_name: "Void".to_string(),
-            repo_url: "voidlinux.org".to_string(),
-        });
-        Self {
-            registered_repos: repos,
-            indexed_manifests: HashMap::new(),
-        }
-    }
-
-    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
-        self.indexed_manifests
-            .insert(manifest.original_name.clone(), manifest);
-    }
-
-    pub fn total_indexed_packages(&self) -> usize {
-        self.indexed_manifests.len()
-    }
-
-    pub fn find_and_translate(&self, name: &str) -> Option<UnifiedPackage> {
-        self.indexed_manifests
-            .get(name)
-            .map(UniversalPackageTranslator::translate_to_sigma_pkg)
-    }
-}
-
-impl Default for DistroRepoSyncEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageState {
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
 }
 
 /// Package format type
@@ -273,19 +158,6 @@ pub enum PackageFormat {
     ArchPkgBuild,// Arch PKGBUILD
     NixStore,   // Nix store
     Homebrew,   // Homebrew formula
-    Ipk,        // OpenWrt / opkg / Entware (.ipk)
-    Opkg,       // Yocto / OpenEmbedded (.opkg)
-    OpenBsdPkg, // OpenBSD pkg_add (.openbsd.tgz / .tgz)
-    SolarisIps, // Solaris / Illumos IPS (.p5p / .ips)
-    GuixNar,    // GNU Guix / Nix Archive (.nar)
-    Spack,      // Spack HPC package manager (.spack)
-    Conan,      // C/C++ Conan package (.conan)
-    Wheel,      // Python Wheel (.whl)
-    Crate,      // Rust Cargo crate (.crate)
-    Gem,        // RubyGems (.gem)
-    Nupkg,      // .NET NuGet (.nupkg)
-    Vcpkg,      // Microsoft Vcpkg (.vcpkg)
-    NarInfo,    // Nix/Guix NarInfo substituter manifest (.narinfo)
 }
 
 impl PackageFormat {
@@ -1377,6 +1249,80 @@ impl NodeBinaryDistroEngine {
 }
 
 
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        let name = format!("sigpkg-{}", manifest.original_name);
+        let mut pkg = UnifiedPackage::new(name, manifest.version.clone())
+            .with_format(PackageFormat::SigmaPkg);
+
+        for dep in &manifest.raw_dependencies {
+            if dep.contains("ssl") || dep.contains("crypto") {
+                pkg = pkg.with_dependency("sovereign-openssl".to_string());
+            } else if dep.contains("libc") || dep.contains("c6") {
+                pkg = pkg.with_dependency("sovereign-libc".to_string());
+            } else {
+                pkg = pkg.with_dependency(format!("sovereign-{}", dep));
+            }
+        }
+        pkg.provides.push(manifest.original_name.clone());
+        for p in &manifest.raw_provides {
+            pkg.provides.push(p.clone());
+        }
+        pkg
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DistroRepoRecord {
+    pub distro_name: String,
+    pub url: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DistroRepoSyncEngine {
+    pub synced_repos: Vec<String>,
+    pub registered_repos: Vec<DistroRepoRecord>,
+    pub indexed_manifests: Vec<ForeignDistroManifest>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            synced_repos: Vec::new(),
+            registered_repos: vec![
+                DistroRepoRecord { distro_name: "Debian".to_string(), url: "https://deb.debian.org".to_string() },
+                DistroRepoRecord { distro_name: "ArchLinux".to_string(), url: "https://archlinux.org".to_string() },
+                DistroRepoRecord { distro_name: "Fedora".to_string(), url: "https://fedoraproject.org".to_string() },
+                DistroRepoRecord { distro_name: "Alpine".to_string(), url: "https://alpinelinux.org".to_string() },
+                DistroRepoRecord { distro_name: "Void".to_string(), url: "https://voidlinux.org".to_string() },
+            ],
+            indexed_manifests: Vec::new(),
+        }
+    }
+
+    pub fn sync_all_repositories(&mut self) -> Result<usize, &'static str> {
+        self.synced_repos = self.registered_repos.iter().map(|r| r.distro_name.clone()).collect();
+        Ok(self.synced_repos.len())
+    }
+
+    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
+        self.indexed_manifests.push(manifest);
+    }
+
+    pub fn total_indexed_packages(&self) -> usize {
+        self.indexed_manifests.len()
+    }
+
+    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
+        self.indexed_manifests
+            .iter()
+            .find(|m| m.original_name == pkg_name)
+            .map(|m| UniversalPackageTranslator::translate_to_sigma_pkg(m))
+    }
+}
+
 
 // =========================================================================
 // Multi-Distro Package Adapter Execution Pipeline
@@ -1833,7 +1779,6 @@ impl UniversalPackageManager {
             triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
-            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();

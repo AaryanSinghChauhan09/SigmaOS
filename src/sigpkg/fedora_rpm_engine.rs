@@ -824,9 +824,26 @@ impl FedoraAnityaReleaseMonitoringEngine {
     ) -> Option<bool> {
         if let Some(record) = self.projects.get_mut(project_name) {
             let is_new = record.current_version != latest_version;
-            let old_ver = record.current_version.clone();
-            let proj_id = record.project_id;
-            let proj_name = record.name.clone();
+            if is_new {
+                self.messaging_bus.publish_version_update(
+                    record.project_id,
+                    &record.name,
+                    "Fedora",
+                    &record.current_version,
+                    latest_version,
+                    vec![
+                        AnityaPackageMapping {
+                            distro: "Fedora".to_string(),
+                            package_name: record.name.clone(),
+                        },
+                        AnityaPackageMapping {
+                            distro: "SigmaOS".to_string(),
+                            package_name: record.name.clone(),
+                        },
+                    ],
+                    1000000,
+                );
+            }
             record.latest_upstream_version = latest_version.to_string();
             record.updated_available = is_new;
             if is_new {

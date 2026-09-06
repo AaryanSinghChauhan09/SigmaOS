@@ -33,6 +33,8 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 - [AI Agents Block Storage Management Architecture](docs/ai-agents-block-storage-management.md)
 - [AI Agents Cache Management Architecture](docs/ai-agents-cache-management.md)
 - [AI Agents Chip Multiprocessor (CMP) Management Architecture](docs/ai-agents-chip-multiprocessor-management.md)
+- [AI Agents Client-Server Model Management Architecture](docs/ai-agents-client-server-management.md)
+- [AI Agents Queuing Operation Management Architecture](docs/ai-agents-queuing-management.md)
 - [API Reference](docs/api-reference.md)
 - [Kernel Architecture](docs/kernel.md)
 - [Memory Management](docs/memory-management.md)
