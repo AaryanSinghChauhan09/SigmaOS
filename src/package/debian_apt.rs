@@ -2,11 +2,11 @@
 // Implements Debian-style package management for SigmaOS
 // Inspired by Debian's APT for advanced package operations
 
+use crate::klib::collections::HashSet;
+use alloc::collections::BTreeMap;
+use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use crate::klib::collections::HashSet;
-use alloc::collections::{BTreeMap, BTreeSet};
 
 /// APT error types
 #[derive(Debug, Clone)]
@@ -155,7 +155,10 @@ impl SigmaAPT {
             }
 
             // Get package information
-            let pkg_info = self.database.available.get(&package)
+            let pkg_info = self
+                .database
+                .available
+                .get(&package)
                 .ok_or(AptError::PackageNotFound)?
                 .clone();
 
@@ -215,7 +218,10 @@ impl SigmaAPT {
         for (name, installed_pkg) in self.database.installed.clone() {
             if let Some(available_pkg) = self.database.available.get(&name) {
                 if available_pkg.version != installed_pkg.version {
-                    println!("Upgrading {} from {} to {}", name, installed_pkg.version, available_pkg.version);
+                    println!(
+                        "Upgrading {} from {} to {}",
+                        name, installed_pkg.version, available_pkg.version
+                    );
                     self.database.mark_installed(available_pkg.clone());
                     upgraded += 1;
                 }
@@ -235,10 +241,12 @@ impl SigmaAPT {
     /// Search for packages
     pub fn search(&self, query: &str) -> Vec<&AptPackage> {
         let query_lower = query.to_lowercase();
-        self.database.available.values()
+        self.database
+            .available
+            .values()
             .filter(|pkg| {
-                pkg.name.to_lowercase().contains(&query_lower) ||
-                pkg.description.to_lowercase().contains(&query_lower)
+                pkg.name.to_lowercase().contains(&query_lower)
+                    || pkg.description.to_lowercase().contains(&query_lower)
             })
             .collect()
     }
@@ -272,7 +280,9 @@ impl SigmaAPT {
 
     /// Find reverse dependencies
     fn find_reverse_dependencies(&self, name: &str) -> Vec<String> {
-        self.database.installed.values()
+        self.database
+            .installed
+            .values()
             .filter(|pkg| pkg.dependencies.contains(&name.to_string()))
             .map(|pkg| pkg.name.clone())
             .collect()

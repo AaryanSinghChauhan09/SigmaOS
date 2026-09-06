@@ -338,7 +338,13 @@ impl OpenBsdPfFirewallEngine {
         self.rules.push(rule);
     }
 
-    pub fn evaluate_packet(&self, iface: &str, proto: &str, src_ip: &str, dst_port: u16) -> PfAction {
+    pub fn evaluate_packet(
+        &self,
+        iface: &str,
+        proto: &str,
+        src_ip: &str,
+        dst_port: u16,
+    ) -> PfAction {
         let mut final_action = self.default_action;
         for rule in &self.rules {
             let iface_match = rule.interface == "any" || rule.interface == iface;

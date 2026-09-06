@@ -299,7 +299,10 @@ impl NixGuixCasGcProfileEngine {
         }
 
         for &path in all_store_paths {
-            if !live_paths.iter().any(|live| path.starts_with(live.as_str()) || live.starts_with(path)) {
+            if !live_paths
+                .iter()
+                .any(|live| path.starts_with(live.as_str()) || live.starts_with(path))
+            {
                 dead.push(path.to_string());
             }
         }
@@ -532,7 +535,11 @@ impl HaikuHpkgPackageFsEngine {
     }
 
     pub fn unmount_hpkg(&mut self, package_id: &str) -> bool {
-        if let Some(pkg) = self.mounted_packages.iter_mut().find(|p| p.package_id == package_id) {
+        if let Some(pkg) = self
+            .mounted_packages
+            .iter_mut()
+            .find(|p| p.package_id == package_id)
+        {
             pkg.is_active = false;
             true
         } else {
@@ -593,7 +600,8 @@ impl SlackwarePkgtoolSlackBuildEngine {
     }
 
     pub fn install_package(&mut self, record: SlackPackageRecord) {
-        self.installed_packages.insert(record.package_name.clone(), record);
+        self.installed_packages
+            .insert(record.package_name.clone(), record);
     }
 
     pub fn remove_package(&mut self, package_name: &str) -> bool {
@@ -612,11 +620,23 @@ impl SlackwarePkgtoolSlackBuildEngine {
         for line in content.lines() {
             let line = line.trim();
             if line.starts_with("PRGNAM=") {
-                prgnam = line.strip_prefix("PRGNAM=").unwrap().trim_matches('"').to_string();
+                prgnam = line
+                    .strip_prefix("PRGNAM=")
+                    .unwrap()
+                    .trim_matches('"')
+                    .to_string();
             } else if line.starts_with("VERSION=") {
-                version = line.strip_prefix("VERSION=").unwrap().trim_matches('"').to_string();
+                version = line
+                    .strip_prefix("VERSION=")
+                    .unwrap()
+                    .trim_matches('"')
+                    .to_string();
             } else if line.starts_with("HOMEPAGE=") {
-                homepage = line.strip_prefix("HOMEPAGE=").unwrap().trim_matches('"').to_string();
+                homepage = line
+                    .strip_prefix("HOMEPAGE=")
+                    .unwrap()
+                    .trim_matches('"')
+                    .to_string();
             } else if line.starts_with("DOWNLOAD=") {
                 let urls = line.strip_prefix("DOWNLOAD=").unwrap().trim_matches('"');
                 for u in urls.split_whitespace() {
@@ -633,7 +653,11 @@ impl SlackwarePkgtoolSlackBuildEngine {
                     requires.push(r.to_string());
                 }
             } else if line.starts_with("MAINTAINER=") {
-                maintainer = line.strip_prefix("MAINTAINER=").unwrap().trim_matches('"').to_string();
+                maintainer = line
+                    .strip_prefix("MAINTAINER=")
+                    .unwrap()
+                    .trim_matches('"')
+                    .to_string();
             }
         }
 
@@ -727,7 +751,8 @@ impl UbuntuPpaAptPinningEngine {
                 rule.package_pattern == package
             };
 
-            let codename_matches = rule.release_codename == "*" || rule.release_codename == codename;
+            let codename_matches =
+                rule.release_codename == "*" || rule.release_codename == codename;
 
             if pkg_matches && codename_matches {
                 if rule.pin_priority > max_prio {
@@ -814,8 +839,14 @@ impl OpenSuseZypperVendorStickinessEngine {
 
         // Sort candidates by repo priority (lower number = higher priority), then version
         candidate_offers.sort_by(|a, b| {
-            let prio_a = self.repositories.get(&a.repo_alias).map_or(99, |r| r.priority);
-            let prio_b = self.repositories.get(&b.repo_alias).map_or(99, |r| r.priority);
+            let prio_a = self
+                .repositories
+                .get(&a.repo_alias)
+                .map_or(99, |r| r.priority);
+            let prio_b = self
+                .repositories
+                .get(&b.repo_alias)
+                .map_or(99, |r| r.priority);
             prio_a.cmp(&prio_b).then_with(|| b.version.cmp(&a.version))
         });
 
@@ -861,7 +892,8 @@ impl NixFlakesDevshellResolverEngine {
     }
 
     pub fn export_devshell_var(&mut self, key: &str, val: &str) {
-        self.devshell_env_vars.insert(key.to_string(), val.to_string());
+        self.devshell_env_vars
+            .insert(key.to_string(), val.to_string());
     }
 
     pub fn add_devshell_package(&mut self, pkg: &str) {
@@ -1589,10 +1621,8 @@ mod tests {
         let gen1 = engine.create_generation("/nix/store/hash1-system-1.0", 1700000000);
         assert_eq!(gen1, 1);
 
-        let dead = engine.scan_dead_store_paths(&[
-            "/nix/store/hash1-system-1.0",
-            "/nix/store/hash2-unused-lib",
-        ]);
+        let dead = engine
+            .scan_dead_store_paths(&["/nix/store/hash1-system-1.0", "/nix/store/hash2-unused-lib"]);
         assert_eq!(dead.len(), 1);
         assert_eq!(dead[0], "/nix/store/hash2-unused-lib");
     }
@@ -1688,7 +1718,10 @@ MAINTAINER="SigmaOS"
         assert!(engine.verify_key_trusted("12345678ABCD"));
 
         engine.add_pin_rule("nvidia-*", "jammy", 1001);
-        assert_eq!(engine.resolve_effective_priority("nvidia-driver-535", "jammy"), 1001);
+        assert_eq!(
+            engine.resolve_effective_priority("nvidia-driver-535", "jammy"),
+            1001
+        );
         assert_eq!(engine.resolve_effective_priority("curl", "jammy"), 500);
     }
 
@@ -1761,10 +1794,15 @@ MAINTAINER="SigmaOS"
         engine.add_signify_key("openbsd-75-base", "pubkey_base64_data_xyz");
         engine.add_mirror("https://cdn.openbsd.org/pub/OpenBSD/7.5/packages/amd64/");
 
-        assert!(engine.verify_signify_signature("openbsd-75-base", "signed_by_pubkey_base64_data_xyz"));
+        assert!(
+            engine.verify_signify_signature("openbsd-75-base", "signed_by_pubkey_base64_data_xyz")
+        );
 
         let url = engine.resolve_package_download_url("zsh-5.9.tgz").unwrap();
-        assert_eq!(url, "https://cdn.openbsd.org/pub/OpenBSD/7.5/packages/amd64/zsh-5.9.tgz");
+        assert_eq!(
+            url,
+            "https://cdn.openbsd.org/pub/OpenBSD/7.5/packages/amd64/zsh-5.9.tgz"
+        );
     }
 
     #[test]

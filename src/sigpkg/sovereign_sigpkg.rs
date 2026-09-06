@@ -228,11 +228,24 @@ impl ReproducibleBuildContext {
 
     /// Scrub build environment variables to enforce deterministic build reproducibility
     pub fn scrub_environment(&self, env_vars: &mut BTreeMap<String, String>) {
-        let non_deterministic_keys = ["USER", "HOSTNAME", "TZ", "PWD", "LANG", "LC_ALL", "HOME", "BUILD_DIR", "TEMP"];
+        let non_deterministic_keys = [
+            "USER",
+            "HOSTNAME",
+            "TZ",
+            "PWD",
+            "LANG",
+            "LC_ALL",
+            "HOME",
+            "BUILD_DIR",
+            "TEMP",
+        ];
         for key in &non_deterministic_keys {
             env_vars.remove(*key);
         }
-        env_vars.insert("SOURCE_DATE_EPOCH".to_string(), self.source_date_epoch.to_string());
+        env_vars.insert(
+            "SOURCE_DATE_EPOCH".to_string(),
+            self.source_date_epoch.to_string(),
+        );
         env_vars.insert("LANG".to_string(), self.locale.clone());
         env_vars.insert("TZ".to_string(), self.timezone.clone());
         env_vars.insert("BUILD_PATH".to_string(), self.build_path.clone());
@@ -241,12 +254,19 @@ impl ReproducibleBuildContext {
     /// Perform diffoscope-style byte-for-byte reproducibility diagnostic audit between two binary build outputs
     pub fn audit_reproducibility(&self, bin1: &[u8], bin2: &[u8]) -> (bool, String) {
         if bin1 == bin2 {
-            return (true, "Status: 100% REPRODUCIBLE (Bit-identical match)".to_string());
+            return (
+                true,
+                "Status: 100% REPRODUCIBLE (Bit-identical match)".to_string(),
+            );
         }
         if bin1.len() != bin2.len() {
             return (
                 false,
-                format!("Status: NON-REPRODUCIBLE (Size Mismatch: {} vs {} bytes)", bin1.len(), bin2.len()),
+                format!(
+                    "Status: NON-REPRODUCIBLE (Size Mismatch: {} vs {} bytes)",
+                    bin1.len(),
+                    bin2.len()
+                ),
             );
         }
         let mut diff_offsets = Vec::new();
@@ -258,9 +278,15 @@ impl ReproducibleBuildContext {
                 }
             }
         }
-        let mut report = format!("Status: NON-REPRODUCIBLE ({} byte discrepancies found)\n", diff_offsets.len());
+        let mut report = format!(
+            "Status: NON-REPRODUCIBLE ({} byte discrepancies found)\n",
+            diff_offsets.len()
+        );
         for (off, b1, b2) in diff_offsets {
-            report.push_str(&format!("  Offset 0x{:X}: 0x{:02X} != 0x{:02X}\n", off, b1, b2));
+            report.push_str(&format!(
+                "  Offset 0x{:X}: 0x{:02X} != 0x{:02X}\n",
+                off, b1, b2
+            ));
         }
         (false, report)
     }
@@ -1401,7 +1427,10 @@ mod tests {
         ctx.scrub_environment(&mut env);
         assert!(!env.contains_key("USER"));
         assert!(!env.contains_key("HOSTNAME"));
-        assert_eq!(env.get("SOURCE_DATE_EPOCH"), Some(&"1700000000".to_string()));
+        assert_eq!(
+            env.get("SOURCE_DATE_EPOCH"),
+            Some(&"1700000000".to_string())
+        );
 
         let (is_repro, report) = ctx.audit_reproducibility(b"binaryA", b"binaryA");
         assert!(is_repro);
