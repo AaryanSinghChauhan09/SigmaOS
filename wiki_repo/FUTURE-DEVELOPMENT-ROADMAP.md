@@ -4291,3 +4291,21 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 
 4. **Banker's Deadlock Avoidance Safety Matrix**:
    - Dynamic resource allocation managers (`BankersDeadlockAvoidanceEngine`) must verify `is_safe_state()` before granting resource claims, preventing circular wait deadlocks.
+
+---
+
+## 88. SOVEREIGN AI AGENT CONCURRENT PROCESS MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 88.1 Autonomous Agent Concurrent Process Directives
+
+1. **Atomic Process Control Block (PCB) State Machine**:
+   - Process Control Block state transitions (`src/kernel/process.rs`, `src/kernel/sched/task.rs`) must update atomically across CPU cores, strictly adhering to lifecycle paths (`New` $\to$ `Ready` $\to$ `Running` $\to$ `BlockedWaiting` / `BlockedSuspended` $\to$ `Zombie` $\to$ `Terminated`).
+
+2. **Multicore Thread Affinity & NUMA Load Balancing**:
+   - EEVDF and BORE multicore thread schedulers (`src/kernel/scheduler.rs`, `src/kernel/roundrobin.rs`) must balance process tasks across CPU cores while preserving L1/L2 cache locality and NUMA memory node placement.
+
+3. **Zombie Child Reaping & PID Reclamation**:
+   - Parent processes calling `waitpid()` must reclaim child exit status codes and deallocate PCB structures; un-reaped zombie tasks must be automatically re-parented to `INIT_PID` on parent termination.
+
+4. **Signal Dispatch & Forceful Cancellation Lock Safety**:
+   - Asynchronous signal handlers and process cancellation routines (`src/process/advanced_process_control.rs`) must release all held spinlocks, file locks (`flock`), and semaphores prior to task termination to prevent system deadlocks.
