@@ -3,10 +3,6 @@
 //! This module provides automatic documentation generation from source code,
 //! including API documentation, architecture diagrams, and user guides.
 
-pub mod knowledgebase;
-pub use knowledgebase::*;
-
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::String;

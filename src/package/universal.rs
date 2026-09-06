@@ -2771,16 +2771,16 @@ mod tests {
     #[test]
     fn test_universal_package_format_bridge() {
         let deb_pkg = UniversalPackageFormatBridge::detect_and_transpile("nginx.deb", b"deb_payload").unwrap();
-        assert!(deb_pkg.formats.contains(&PackageFormat::Deb));
+        assert_eq!(deb_pkg.formats[0], PackageFormat::Deb);
         assert_eq!(deb_pkg.name, "nginx");
         assert!(deb_pkg.dependencies.contains(&"libc6".to_string()));
 
         let rpm_pkg = UniversalPackageFormatBridge::detect_and_transpile("curl.rpm", b"rpm_payload").unwrap();
-        assert!(rpm_pkg.formats.contains(&PackageFormat::Rpm));
+        assert_eq!(rpm_pkg.formats[0], PackageFormat::Rpm);
         assert!(rpm_pkg.provides.contains(&"fedora_compat".to_string()));
 
         let apk_pkg = UniversalPackageFormatBridge::detect_and_transpile("busybox.apk", b"apk_payload").unwrap();
-        assert!(apk_pkg.formats.contains(&PackageFormat::Apk));
+        assert_eq!(apk_pkg.formats[0], PackageFormat::Apk);
         assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
     }
 }
