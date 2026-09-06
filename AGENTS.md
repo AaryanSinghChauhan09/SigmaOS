@@ -24,6 +24,21 @@ Welcome, AI Engineer / Agent! This document specifies core operational guideline
 
 ---
 
+## 🎨 UI Management & Accessibility Principles
+
+1. **Native WASM / Rust UI Engine First**
+   - Implement UI event handlers, keyboard focus, and ARIA attributes in native Rust/WASM (`NativeWasmDesktopEngine` in `src/desktop/web_wasm_bridge.rs` & `zenith_desktop/src/lib.rs`). Reduce or eliminate JavaScript runtime dependencies.
+
+2. **Accessibility Standards (Palette Persona)**
+   - Icon-only buttons **must** include an `aria-label`.
+   - Support keyboard navigation (`Enter` and `Space` key activation) and focus states (`:focus-visible` / `.keyboard-focus`).
+   - Use `set_secure_text_content` (`textContent`) to prevent innerHTML XSS vulnerabilities when rendering dynamic titles or strings.
+
+3. **CSS Design Tokens**
+   - Leverage theme custom properties defined in `zenith_desktop.css` (`--accent-gold`, `--accent-blue`, `--accent-cyan`).
+
+---
+
 ## ⚙️ Testing & Verification Procedures
 
 - **Kernel Primitives (`klib`):**
