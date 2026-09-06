@@ -981,4 +981,92 @@ mod tests {
         assert_eq!(compositor.windows[0].geometry.x, 100);
         assert_eq!(compositor.windows[1].geometry.x, 140);
     }
+
+    #[test]
+    fn test_native_wasm_desktop_ui_engine() {
+        let mut ui = NativeWasmDesktopUiEngine::new();
+        ui.set_aria_label("btn-close", "Close Window");
+        assert_eq!(ui.aria_labels.get("btn-close").unwrap(), "Close Window");
+
+        ui.handle_focus("btn-close");
+        assert_eq!(ui.keyboard_focus_element.as_deref(), Some("btn-close"));
+
+        let triggered = ui.handle_keydown("btn-close", "button", "Enter");
+        assert!(triggered);
+
+        ui.handle_blur();
+        assert_eq!(ui.keyboard_focus_element, None);
+
+        ui.set_secure_text_content("title-heading", "<script>alert(1)</script>");
+        assert_eq!(
+            ui.secure_text_nodes.get("title-heading").unwrap(),
+            "<script>alert(1)</script>"
+        );
+    }
+}
+
+// =========================================================================
+// Native WebAssembly Desktop UI & Accessibility Engine (JS Reduction)
+// =========================================================================
+
+/// Native WASM Accessibility Event
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NativeWasmA11yEvent {
+    KeyDown { key: String, element_role: String },
+    Focus { element_id: String },
+    Blur { element_id: String },
+    AriaLabelUpdated { element_id: String, label: String },
+}
+
+/// Native WASM Desktop UI Manager that replaces JavaScript event handlers
+#[derive(Debug, Clone, Default)]
+pub struct NativeWasmDesktopUiEngine {
+    pub keyboard_focus_element: Option<String>,
+    pub aria_labels: HashMap<String, String>,
+    pub secure_text_nodes: HashMap<String, String>,
+    pub event_log: Vec<NativeWasmA11yEvent>,
+}
+
+impl NativeWasmDesktopUiEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Process a keydown event natively in Rust/WASM
+    pub fn handle_keydown(&mut self, element_id: &str, role: &str, key: &str) -> bool {
+        self.event_log.push(NativeWasmA11yEvent::KeyDown {
+            key: key.to_string(),
+            element_role: role.to_string(),
+        });
+        key == "Enter" || key == " "
+    }
+
+    /// Set element focus state
+    pub fn handle_focus(&mut self, element_id: &str) {
+        self.keyboard_focus_element = Some(element_id.to_string());
+        self.event_log.push(NativeWasmA11yEvent::Focus {
+            element_id: element_id.to_string(),
+        });
+    }
+
+    /// Set element blur state
+    pub fn handle_blur(&mut self) {
+        if let Some(id) = self.keyboard_focus_element.take() {
+            self.event_log.push(NativeWasmA11yEvent::Blur { element_id: id });
+        }
+    }
+
+    /// Set ARIA label natively
+    pub fn set_aria_label(&mut self, element_id: &str, label: &str) {
+        self.aria_labels.insert(element_id.to_string(), label.to_string());
+        self.event_log.push(NativeWasmA11yEvent::AriaLabelUpdated {
+            element_id: element_id.to_string(),
+            label: label.to_string(),
+        });
+    }
+
+    /// Safely set text content without innerHTML risk
+    pub fn set_secure_text_content(&mut self, element_id: &str, text: &str) {
+        self.secure_text_nodes.insert(element_id.to_string(), text.to_string());
+    }
 }

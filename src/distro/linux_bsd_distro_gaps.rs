@@ -739,10 +739,10 @@ impl SovereignDynamicDevfsEngine {
         }
     }
 
-    pub fn lookup_node(&self, path: &[u8]) -> Option<&DynamicDeviceNode> {
+    pub fn lookup_node(&self, path: &str) -> Option<&DeviceNodeEntry> {
         self.nodes
             .iter()
-            .find(|n| n.name == path || n.symlinks.iter().any(|s| s == path))
+            .find(|n| n.name == path || n.symlink_paths.iter().any(|s| *s == path))
     }
 }
 
@@ -796,21 +796,24 @@ impl SovereignStatefulNatEngine {
         dst_port: u16,
         protocol: u8,
     ) -> ([u8; 4], u16) {
+        let _ = protocol;
         // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.src_ip == src_ip
+            c.original_src == internal_src
                 && c.src_port == src_port
-                && c.dst_ip == dst_ip
+                && c.original_dst == dst_ip
                 && c.dst_port == dst_port
         }) {
             conn.packets_counter += 1;
         } else {
-            self.conntrack_table.push(ConnectionTrackEntry {
-                src_ip,
+            self.conntrack_table.push(ConntrackTableEntry {
+                original_src: internal_src,
+                original_dst: dst_ip,
                 src_port,
-                dst_ip,
                 dst_port,
-                protocol,
+                translated_ip: self.public_ip,
+                translated_port: src_port,
+                nat_type: NatType::Snat,
                 packets_counter: 1,
             });
         }
