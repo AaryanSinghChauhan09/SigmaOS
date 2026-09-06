@@ -2,7 +2,7 @@
 extern crate alloc as std_alloc;
 #[cfg(target_os = "none")]
 use std::boxed::Box;
-use std_std::boxed::Box;
+use std::boxed::Box;
 
 use std::format;
 use std::string::{String, ToString};

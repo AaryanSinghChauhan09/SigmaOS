@@ -1,0 +1,27 @@
+name: HardenedBSD PaX, CFI, ASLR & Secadm Security Audit CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  hardenedbsd-secadm:
+    name: HardenedBSD Security Hardening & Secadm Rules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test HardenedBSD Security Sandbox & DAC Control
+        run: |
+          cargo test --lib -- access::control::tests
