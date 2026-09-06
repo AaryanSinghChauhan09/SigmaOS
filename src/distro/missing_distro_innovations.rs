@@ -1526,7 +1526,7 @@ pub struct AppArmorPathRule {
 }
 
 #[derive(Debug, Clone)]
-pub struct AppArmorPathProfile {
+pub struct AppArmorProfile {
     pub profile_name: String,
     pub mode: AppArmorRuleMode,
     pub rules: Vec<AppArmorPathRule>,

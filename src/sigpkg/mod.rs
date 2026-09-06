@@ -50,7 +50,7 @@ pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
-    AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
+    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
     GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
 };
 pub mod spec;

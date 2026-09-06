@@ -1,0 +1,26 @@
+name: ASan & UBSan Sanitizer Smoke Test CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  sanitizer-smoke:
+    name: ASan & UBSan Memory Safety Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Rust Nightly Toolchain for Sanitizers
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          toolchain: nightly
+
+      - name: Run Klib Zero-Dependency Unit Tests under Nightly
+        run: cargo test --lib -- klib::json

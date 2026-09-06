@@ -737,7 +737,7 @@ pub unsafe fn exit_process(exit_code: usize) -> ! {
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std::alloc::alloc(layout)
+    std_alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
