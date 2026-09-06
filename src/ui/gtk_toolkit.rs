@@ -137,6 +137,11 @@ impl GtkCssProvider {
         }
         None
     }
+
+    pub fn resolve_property_or_default(&self, selector: &str, property: &str, default_val: &str) -> String {
+        self.resolve_property(selector, property)
+            .unwrap_or_else(|| default_val.to_string())
+    }
 }
 
 impl Default for GtkCssProvider {
@@ -588,9 +593,22 @@ impl SovereignOverviewWorkspaceSwitcher {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_gtk_css_provider_fallback_resolution() {
+        let css = GtkCssProvider::new();
+        // Unloaded property falls back to programmatic default value without requiring external CSS
+        let bg = css.resolve_property_or_default("window.main", "background-color", "#1e1e2e");
+        assert_eq!(bg, "#1e1e2e");
+
+        let mut css_with_data = GtkCssProvider::new();
+        let _ = css_with_data.load_from_data("window.main { background-color: #000000; }");
+        let bg_custom = css_with_data.resolve_property_or_default("window.main", "background-color", "#1e1e2e");
+        assert_eq!(bg_custom, "#000000");
+    }
 
     #[test]
     fn test_gtk_headerbar_and_packing() {
