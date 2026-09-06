@@ -1,0 +1,27 @@
+name: Clear Linux Stateless Architecture & ISA Optimization CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  clearlinux-stateless-isa:
+    name: Stateless Config Fallback & x86-64 ISA Auto-Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test Clear Linux Stateless Overlay & ISA Optimization
+        run: |
+          cargo test --lib -- unimplemented_features::tests::test_sovereign_stateless_architecture
