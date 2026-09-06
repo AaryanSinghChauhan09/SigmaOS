@@ -139,5 +139,3 @@ mod tests {
     }
 }
 
-pub use hashset::HashSet;
-pub use arc::Arc;

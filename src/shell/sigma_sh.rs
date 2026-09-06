@@ -1,13 +1,7 @@
-#[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
-#[cfg(target_os = "none")]
 use std::boxed::Box;
-use std_std::boxed::Box;
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec as StdVec;
-
 use std::vec::Vec;
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1

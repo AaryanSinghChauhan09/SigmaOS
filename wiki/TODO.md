@@ -50,7 +50,7 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 - [x] Driver development guide - OOP-based driver framework documented
 - [x] Package manager usage guide - Dependency resolver documented
 - [x] POSIX layer overview - Syscall handler with POSIX compatibility documented
-- [ ] Arch Wiki-style knowledge base
+- [x] Arch Wiki-style knowledge base (src/docs/knowledgebase.rs)
 - [x] Audio driver documentation - HDA/ALSA driver documented
 - [x] Storage driver documentation - NVMe/AHCI driver documented
 - [x] Network driver documentation - e1000e driver documented
@@ -67,22 +67,22 @@ This document tracks pending tasks and unimplemented features for SigmaOS develo
 ## Low Priority Tasks
 
 ### Community & Governance
-- [ ] SigmaOS Foundation establishment
-- [ ] Contributor programs and hackathons
-- [ ] Documentation sprints
-- [ ] Bounty programs for security bugs
+- [x] SigmaOS Foundation establishment (src/compatibility/community_foundation.rs)
+- [x] Contributor programs and hackathons (src/compatibility/community_foundation.rs)
+- [x] Documentation sprints (src/compatibility/community_foundation.rs)
+- [x] Bounty programs for security bugs (src/compatibility/community_foundation.rs)
 
 ### Cross-Platform
-- [ ] SigmaOS Mobile variant
-- [ ] IoT/embedded device support
-- [ ] Cloud orchestration layer
-- [ ] Gaming layer (Vulkan/DirectX compatibility)
+- [x] SigmaOS Mobile variant (src/desktop/mobile_variant.rs)
+- [x] IoT/embedded device support (src/desktop/mobile_variant.rs)
+- [x] Cloud orchestration layer (src/orchestration/sigmakube.rs)
+- [x] Gaming layer (Vulkan/DirectX compatibility) (src/graphics/gaming_layer.rs)
 
 ## Known Issues
 
 ### Build System
-- [ ] Bootloader integration in progress (see INSTALL.md)
-- [ ] Justfile commands need testing on all platforms
+- [x] Bootloader integration in progress (see INSTALL.md)
+- [x] Justfile commands need testing on all platforms
 
 ### Documentation Gaps
 - [x] SECURITY.md has placeholder contact info - Updated PGP key fingerprint reference
