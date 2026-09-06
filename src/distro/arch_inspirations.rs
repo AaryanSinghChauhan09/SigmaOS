@@ -11,9 +11,9 @@
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 // ── Rolling release model ─────────────────────────────────────────────────────
 
@@ -31,9 +31,9 @@ pub enum RollingChannel {
 impl RollingChannel {
     pub fn as_str(&self) -> &'static str {
         match self {
-            RollingChannel::Edge   => "edge",
+            RollingChannel::Edge => "edge",
             RollingChannel::Stable => "stable",
-            RollingChannel::Lts    => "lts",
+            RollingChannel::Lts => "lts",
         }
     }
 }
@@ -70,7 +70,10 @@ impl RollingReleaseManager {
 
     /// Return the installed version of `name`, if any.
     pub fn installed_version(&self, name: &str) -> Option<&str> {
-        self.installed.iter().find(|e| e.0 == name).map(|e| e.1.as_str())
+        self.installed
+            .iter()
+            .find(|e| e.0 == name)
+            .map(|e| e.1.as_str())
     }
 
     /// Simulate an upgrade pass.
@@ -83,19 +86,12 @@ impl RollingReleaseManager {
     ///
     /// Returns a list of `(name, old_version, new_version)` tuples that *would*
     /// be upgraded.
-    pub fn simulate_upgrade(
-        &self,
-        available: &[(&str, &str)],
-    ) -> Vec<(String, String, String)> {
+    pub fn simulate_upgrade(&self, available: &[(&str, &str)]) -> Vec<(String, String, String)> {
         let mut upgrades = Vec::new();
         for (name, new_ver) in available {
             if let Some(old_ver) = self.installed_version(name) {
                 if Self::version_gt(new_ver, old_ver) {
-                    upgrades.push((
-                        name.to_string(),
-                        old_ver.to_string(),
-                        new_ver.to_string(),
-                    ));
+                    upgrades.push((name.to_string(), old_ver.to_string(), new_ver.to_string()));
                 }
             }
         }
@@ -104,9 +100,8 @@ impl RollingReleaseManager {
 
     /// Naive version comparison: splits on `.` and compares numeric segments.
     fn version_gt(a: &str, b: &str) -> bool {
-        let parse_seg = |s: &str| -> Vec<u32> {
-            s.split('.').filter_map(|x| x.parse::<u32>().ok()).collect()
-        };
+        let parse_seg =
+            |s: &str| -> Vec<u32> { s.split('.').filter_map(|x| x.parse::<u32>().ok()).collect() };
         let av = parse_seg(a);
         let bv = parse_seg(b);
         let len = av.len().max(bv.len());
@@ -191,7 +186,10 @@ impl PkgBuild {
         // Helper: parse a bash array literal `(a b c)` into a Vec<String>
         fn parse_array(raw: &str) -> Vec<String> {
             let inner = raw.trim_start_matches('(').trim_end_matches(')');
-            inner.split_whitespace().map(|s| s.trim_matches('"').trim_matches('\'').to_string()).collect()
+            inner
+                .split_whitespace()
+                .map(|s| s.trim_matches('"').trim_matches('\'').to_string())
+                .collect()
         }
         // Helper: strip quotes from a scalar value
         fn scalar(raw: &str) -> String {
@@ -199,24 +197,24 @@ impl PkgBuild {
         }
 
         match key {
-            "pkgname"      => pb.pkgname      = scalar(raw),
-            "pkgver"       => pb.pkgver       = scalar(raw),
-            "pkgrel"       => pb.pkgrel       = raw.trim_matches('"').parse().unwrap_or(1),
-            "epoch"        => pb.epoch        = raw.trim_matches('"').parse().unwrap_or(0),
-            "pkgdesc"      => pb.pkgdesc      = scalar(raw),
-            "url"          => pb.url          = scalar(raw),
-            "arch"         => pb.arch         = parse_array(raw),
-            "license"      => pb.license      = parse_array(raw),
-            "depends"      => pb.depends      = parse_array(raw),
-            "makedepends"  => pb.makedepends  = parse_array(raw),
-            "optdepends"   => pb.optdepends   = parse_array(raw),
-            "provides"     => pb.provides     = parse_array(raw),
-            "conflicts"    => pb.conflicts    = parse_array(raw),
-            "replaces"     => pb.replaces     = parse_array(raw),
-            "source"       => pb.source       = parse_array(raw),
-            "sha256sums"   => pb.sha256sums   = parse_array(raw),
-            "install"      => pb.install_script = Some(scalar(raw)),
-            _              => pb.extra_vars.push((key.to_string(), scalar(raw))),
+            "pkgname" => pb.pkgname = scalar(raw),
+            "pkgver" => pb.pkgver = scalar(raw),
+            "pkgrel" => pb.pkgrel = raw.trim_matches('"').parse().unwrap_or(1),
+            "epoch" => pb.epoch = raw.trim_matches('"').parse().unwrap_or(0),
+            "pkgdesc" => pb.pkgdesc = scalar(raw),
+            "url" => pb.url = scalar(raw),
+            "arch" => pb.arch = parse_array(raw),
+            "license" => pb.license = parse_array(raw),
+            "depends" => pb.depends = parse_array(raw),
+            "makedepends" => pb.makedepends = parse_array(raw),
+            "optdepends" => pb.optdepends = parse_array(raw),
+            "provides" => pb.provides = parse_array(raw),
+            "conflicts" => pb.conflicts = parse_array(raw),
+            "replaces" => pb.replaces = parse_array(raw),
+            "source" => pb.source = parse_array(raw),
+            "sha256sums" => pb.sha256sums = parse_array(raw),
+            "install" => pb.install_script = Some(scalar(raw)),
+            _ => pb.extra_vars.push((key.to_string(), scalar(raw))),
         }
     }
 }
@@ -289,10 +287,7 @@ impl MakePkg {
         let mut results = Vec::new();
 
         // Phase 1: validate PKGBUILD
-        results.push((
-            "validate".to_string(),
-            self.phase_validate(pkgbuild),
-        ));
+        results.push(("validate".to_string(), self.phase_validate(pkgbuild)));
         if results.last().map(|(_, s)| s) == Some(&BuildStatus::Success) {
             // nothing — continue
         }
@@ -367,7 +362,10 @@ impl MakePkg {
             "{}-{}-{}.pkg.tar.zst",
             pb.pkgname,
             pb.full_version(),
-            pb.arch.first().cloned().unwrap_or_else(|| "any".to_string())
+            pb.arch
+                .first()
+                .cloned()
+                .unwrap_or_else(|| "any".to_string())
         );
         BuildStatus::Success
     }
@@ -401,7 +399,9 @@ pub struct SurIndex {
 
 impl SurIndex {
     pub fn new() -> Self {
-        SurIndex { packages: Vec::new() }
+        SurIndex {
+            packages: Vec::new(),
+        }
     }
 
     pub fn add(&mut self, pkg: SurPackage) {
@@ -432,7 +432,9 @@ impl SurIndex {
                 let mut j = i;
                 while j >= gap && sorted[j - gap].votes < sorted[j].votes {
                     sorted.swap(j - gap, j);
-                    if j < gap { break; }
+                    if j < gap {
+                        break;
+                    }
                     j -= gap;
                 }
             }

@@ -58,7 +58,11 @@ impl NewMaintainerPipeline {
     }
 
     /// Advocate a candidate (Debian Advocate parity)
-    pub fn advocate_candidate(&mut self, username: &str, advocate: &str) -> Result<(), &'static str> {
+    pub fn advocate_candidate(
+        &mut self,
+        username: &str,
+        advocate: &str,
+    ) -> Result<(), &'static str> {
         if let Some(cand) = self.candidates.get_mut(username) {
             cand.advocate_username = Some(advocate.to_string());
             cand.stage = MaintainerStage::Advocated;
@@ -69,7 +73,11 @@ impl NewMaintainerPipeline {
     }
 
     /// Promote candidate to full committer access
-    pub fn promote_to_committer(&mut self, username: &str, mentor: &str) -> Result<(), &'static str> {
+    pub fn promote_to_committer(
+        &mut self,
+        username: &str,
+        mentor: &str,
+    ) -> Result<(), &'static str> {
         if let Some(cand) = self.candidates.get_mut(username) {
             if cand.stage < MaintainerStage::Advocated {
                 return Err("MaintainerPipeline: Candidate must be advocated before promotion");
@@ -152,7 +160,10 @@ impl ContribPackageVerifier {
             .ok_or("ContribVerifier: Recipe not found")?;
 
         // Linting rules: must contain pkgname/name, version, and non-empty recipe text
-        if recipe.package_name.is_empty() || recipe.version.is_empty() || recipe.recipe_text.is_empty() {
+        if recipe.package_name.is_empty()
+            || recipe.version.is_empty()
+            || recipe.recipe_text.is_empty()
+        {
             return Ok(false);
         }
 
@@ -290,7 +301,11 @@ impl ContribBountyEngine {
         id
     }
 
-    pub fn claim_and_resolve(&mut self, bounty_id: u64, contributor: &str) -> Result<u32, &'static str> {
+    pub fn claim_and_resolve(
+        &mut self,
+        bounty_id: u64,
+        contributor: &str,
+    ) -> Result<u32, &'static str> {
         if let Some(bounty) = self.bounties.get_mut(&bounty_id) {
             bounty.assignee = Some(contributor.to_string());
             bounty.is_resolved = true;
@@ -350,7 +365,9 @@ mod tests {
             MaintainerStage::Advocated
         );
 
-        assert!(pipeline.promote_to_committer("alice", "charlie_lead").is_ok());
+        assert!(pipeline
+            .promote_to_committer("alice", "charlie_lead")
+            .is_ok());
         assert_eq!(
             pipeline.candidates.get("alice").unwrap().stage,
             MaintainerStage::CommitterAccess
@@ -385,7 +402,10 @@ mod tests {
         assert!(rfc.vote_rfc(rfc_id, true).is_ok());
         assert!(rfc.vote_rfc(rfc_id, true).is_ok());
 
-        assert_eq!(rfc.proposals.get(&rfc_id).unwrap().status, RfcStatus::Accepted);
+        assert_eq!(
+            rfc.proposals.get(&rfc_id).unwrap().status,
+            RfcStatus::Accepted
+        );
     }
 
     #[test]
