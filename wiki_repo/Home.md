@@ -24,46 +24,9 @@
 - **AI Agents Procedure Call Management Guide:** [[AI_AGENTS_PROCEDURE_CALL_MANAGEMENT_GUIDE]] - Syscall dispatchers, FFI bindings, zero-copy IPC ring channels, and RPC for autonomous AI agents.
 - **AI Agents Ballooning Management Guide:** [[AI_AGENTS_BALLOONING_MANAGEMENT_GUIDE]] - VirtIO memory ballooning, RAM inflation/deflation, and hypervisor overcommit management for AI agents.
 - **AI Agents Boot Management Guide:** [[AI_AGENTS_BOOT_MANAGEMENT_GUIDE]] - UEFI/BIOS handoff, Multiboot2, Secure Boot verification, boot optimization, and init handoff for AI agents.
-- **AI Agent Carry Flag Management Guide:** [[AI_AGENT_CARRY_FLAG_MANAGEMENT]] - Hardware status flags, bignum arithmetic carry chains, and ALU emulation for AI agents.
-- **AI Agent C-SCAN Policy Management Guide:** [[AI_AGENT_CIRCULAR_SCAN_POLICY_MANAGEMENT]] - Circular SCAN elevator disk scheduling, LBA sector ordering, and wrap-around semantics for AI agents.
-
-- **Sovereign Microkernel Core**: Zero-allocation, capability-gated microkernel with isolated userspace shards (`BuddyAllocator`, `CapabilityGate`).
-- **NixOS / Guix Parity**: Purely declarative system state configurations, content-addressed package store (CAS), and instant atomic rollbacks.
-- **Arch Linux & Gentoo Parity**: SAT-based zero-allocation dependency solver (`SatSolver`), PKGBUILD recipe sandbox compiler, and Portage USE-flag compilation.
-- **Clear Linux Parity**: Stateless `/usr` configuration overlay architecture (`ClearLinuxStatelessOverlayEngine`).
-- **OpenBSD Security Hardening**: Hardware-enforced process restriction (`pledge`), file path masking (`unveil`), W^X memory execution policies, and Retguard return-address canaries.
-- **FreeBSD Isolation**: Jails virtualization with nested hierarchies, RACCT/RCTL resource controls, and Capsicum descriptor capability delegation.
-- **DragonFly BSD & openSUSE Parity**: HAMMER2 PFS multi-version B-tree filesystem, variant symlinks (`varsyms`), and Snapper CoW pre/post transaction recovery.
-- **Zenith Desktop Compositor**: Direct-to-hardware framebuffer rendering without Wayland/X11 bloat, featuring HiDPI fractional scaling, Variable Refresh Rate (VRR), Sway-style tiling matrices, and Gamescope-inspired direct scanout blitting.
-
----
-
-- [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
-- [API Reference](docs/api-reference.md)
-- [Kernel Architecture](docs/kernel.md)
-- [Memory Management](docs/memory-management.md)
-- [Security Architecture](docs/security.md)
-- [Package Management](docs/package-manager.md)
-- [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
-
----
-
-- Rust nightly toolchain
-- QEMU (`qemu-system-x86_64`)
-- GCC / G++ toolchain
-
-Get started with SigmaOS through our comprehensive wiki:
-
-- **[Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quick-Start)** - Build and run SigmaOS
-- **[Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)** - Core design and subsystems
-- **[Tier 1 Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Tier-1-Features)** - Feature matrix and status
-- **[Syscall Reference](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Syscall-Reference)** - Complete syscall documentation
-- **[Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing)** - Development guidelines
-- **[Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Roadmap)** - Phases 6-10 plans
-- **[Release Notes](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes)** - Version history
-- **[FAQ](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FAQ)** - Common questions
-- **[API Documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/API-Documentation)** - Public APIs
-- **[Full Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Complete documentation index
+- **AI Agents Process Management Guide:** [[AI_AGENTS_PROCESS_MANAGEMENT_GUIDE]] - EEVDF/BORE scheduling algorithms, ELF loading, POSIX process control, and cgroups v2 job objects.
+- **AI Agents Capability Tickets Guide:** [[AI_AGENTS_CAPABILITY_TICKETS_GUIDE]] - PQC Dilithium-5 capability tickets, POSIX bitmasks, Pledge promise tokens, and Capsicum descriptor rights.
+- **AI Agents Circular Wait Management Guide:** [[AI_AGENTS_CIRCULAR_WAIT_MANAGEMENT_GUIDE]] - Coffman deadlock conditions, RAG cycle detection, lock hierarchy, and Banker's algorithm.
 
 ---
 

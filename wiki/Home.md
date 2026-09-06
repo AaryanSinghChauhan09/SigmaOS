@@ -30,18 +30,25 @@
 
 ## 📚 Documentation
 
-Get started with SigmaOS through our comprehensive wiki:
-
-- **[Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quick-Start)** - Build and run SigmaOS
-- **[Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)** - Core design and subsystems
-- **[Tier 1 Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Tier-1-Features)** - Feature matrix and status
-- **[Syscall Reference](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Syscall-Reference)** - Complete syscall documentation
-- **[Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing)** - Development guidelines
-- **[Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Roadmap)** - Phases 6-10 plans
-- **[Release Notes](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes)** - Version history
-- **[FAQ](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FAQ)** - Common questions
-- **[API Documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/API-Documentation)** - Public APIs
-- **[Full Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Complete documentation index
+- **Sovereign Microkernel Core:** Memory isolation, CachyOS BORE / EEVDF scheduler, capability bounding sets, and zero-copy IPC channels.
+- **Systemd Betsy Init Supervisor:** Full unit parsing, Cgroup v2 slice memory quotas, watchdog health monitoring, and alternative init bridging.
+- **GTK & Libadwaita Sovereign UI Toolkit:** `GtkHeaderBar` CSD, `AdwPreferencesPage`, `AdwActionRow`, `GtkCssProvider`, `GtkSignalDispatcher`, status bar panel, dock bar, and workspace overview.
+- **Sovereign Network Discovery Engine:** ZeroConf mDNS / DNS-SD, UPnP / SSDP M-SEARCH, LLMNR / NBNS host resolution, and ICMPv6 NDP neighbor table tracking.
+- **Interactive `sigma-sh` REPL:** Zsh/Fish syntax-highlighted line editor (`ReplLineEditor`), Fish auto-suggestions (`AutoSuggestTabPopup`), job control (`jobs`/`fg`/`bg`), and OpenBSD pledge/unveil capability sandboxing.
+- **Multi-Distro Compatibility & Parity:** Dependency installers and translation adapters for Arch Linux (ALPM/Pacman), Debian/Ubuntu (APT/dpkg), Gentoo (Portage USE flags), Fedora (RPM/SELinux), Linux Mint (Cinnamon, mintupgrade, mintstick, mintmenu), and FreeBSD (Jails/Capsicum/GEOM).
+- **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
+- **Zero-Trust Access Control & MAC:** Discretionary (DAC), Mandatory Access Control (MAC LSM Inode/Ptrace/Socket hooks), and Role-Based (RBAC) security enforcers.
+- **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
+- **AI Agents Master Guide:** [[AI_AGENTS_GUIDE]] - Authoritative reference for autonomous coding agents and subagents.
+- **AI Agents UX Management Guide:** [[AI_AGENTS_UX_MANAGEMENT_GUIDE]] - Interface, visual layout, and UX guidelines for autonomous AI agents.
+- **AI Agents Time Management Guide:** [[AI_AGENTS_TIME_MANAGEMENT_GUIDE]] - Timekeeping primitives, clock sync, and temporal architecture for autonomous AI agents.
+- **AI Agents Security Management Guide:** [[AI_AGENTS_SECURITY_MANAGEMENT_GUIDE]] - Capability sandboxing, PQC attestation, MAC, and digital forensics for autonomous AI agents.
+- **AI Agents Procedure Call Management Guide:** [[AI_AGENTS_PROCEDURE_CALL_MANAGEMENT_GUIDE]] - Syscall dispatchers, FFI bindings, zero-copy IPC ring channels, and RPC for autonomous AI agents.
+- **AI Agents Ballooning Management Guide:** [[AI_AGENTS_BALLOONING_MANAGEMENT_GUIDE]] - VirtIO memory ballooning, RAM inflation/deflation, and hypervisor overcommit management for AI agents.
+- **AI Agents Boot Management Guide:** [[AI_AGENTS_BOOT_MANAGEMENT_GUIDE]] - UEFI/BIOS handoff, Multiboot2, Secure Boot verification, boot optimization, and init handoff for AI agents.
+- **AI Agents Process Management Guide:** [[AI_AGENTS_PROCESS_MANAGEMENT_GUIDE]] - EEVDF/BORE scheduling algorithms, ELF loading, POSIX process control, and cgroups v2 job objects.
+- **AI Agents Capability Tickets Guide:** [[AI_AGENTS_CAPABILITY_TICKETS_GUIDE]] - PQC Dilithium-5 capability tickets, POSIX bitmasks, Pledge promise tokens, and Capsicum descriptor rights.
+- **AI Agents Circular Wait Management Guide:** [[AI_AGENTS_CIRCULAR_WAIT_MANAGEMENT_GUIDE]] - Coffman deadlock conditions, RAG cycle detection, lock hierarchy, and Banker's algorithm.
 
 ---
 
