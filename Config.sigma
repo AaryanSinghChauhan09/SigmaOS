@@ -1,3 +1,0 @@
-# Auto-generated from defconfig target
-system.profile = "standalone"
-system.arch = "x86_64"
