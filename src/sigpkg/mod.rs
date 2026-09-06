@@ -49,10 +49,6 @@ pub mod rpm_compat;
 pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
-pub use sovereign_package_innovations::{
-    AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
-    GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
-};
 pub mod spec;
 pub mod store;
 pub mod transaction;
@@ -150,10 +146,6 @@ pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use sovereign_package_innovations::{
-    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
-    NixFlakeHermeticCacheStore,
-};
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,

@@ -98,7 +98,7 @@ pub enum PackagePriority {
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
@@ -106,6 +106,7 @@ pub enum PackageFormat {
     Snap,       // snap/squashfs
     Flatpak,    // flatpak sandbox
     AppImage,   // AppImage single-file container
+    #[default]
     SigmaPkg,   // native SigmaOS format
     Air,        // Adobe AIR (.air)
     Bottle,     // Homebrew Bottle (.bottle)
@@ -341,6 +342,7 @@ pub struct UnifiedPackage {
     pub installed: bool,
     pub state: PackageState,
     pub properties: HashMap<String, String>,
+    pub checksum: String,
 }
 
 impl UnifiedPackage {
@@ -356,6 +358,7 @@ impl UnifiedPackage {
             installed: false,
             state: PackageState::Uninstalled,
             properties: HashMap::new(),
+            checksum: String::new(),
         }
     }
 
@@ -1270,8 +1273,7 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ForeignDistroManifest {
     pub raw_format: PackageFormat,
     pub original_name: String,

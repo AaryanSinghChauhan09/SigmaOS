@@ -18,7 +18,7 @@
 // Designed to minimize dependency on predefined library allocators.
 
 #[allow(dead_code)]
-use std::{GlobalAlloc, Layout};
+use core::alloc::{GlobalAlloc, Layout};
 use core::cell::UnsafeCell;
 use core::ptr;
 use core::sync::atomic::{AtomicUsize, Ordering};

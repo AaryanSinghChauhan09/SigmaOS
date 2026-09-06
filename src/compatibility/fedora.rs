@@ -3713,26 +3713,6 @@ impl FedoraToolbxContainerEngine {
         }
     }
 
-    pub fn stop_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            c.running = false;
-            Ok(format!("Toolbx container '{}' stopped", c.name))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn run_command(&mut self, name: &str, command: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            if !c.running {
-                c.running = true;
-            }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
     pub fn add_host_mount(&mut self, name: &str, host_path: &str) -> bool {
         if let Some(c) = self.active_containers.get_mut(name) {
             if !c.host_mounts.contains(&host_path.to_string()) {
@@ -3755,6 +3735,41 @@ impl Default for FedoraToolbxContainerEngine {
 // Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
 // =========================================================================
 
+#[derive(Debug, Clone, Default)]
+pub struct FedoraOfflineUpdateEngine {
+    pub staged_packages: Vec<String>,
+    pub is_offline_update_pending: bool,
+    pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
+        for pkg in packages {
+            self.staged_packages.push(pkg.to_string());
+        }
+        self.is_offline_update_pending = true;
+    }
+
+    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
+        if !self.is_offline_update_pending {
+            return Err("No offline packages staged for update");
+        }
+        self.trigger_reboot_flag = true;
+        Ok(self.staged_packages.len())
+    }
+
+    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
+        self.staged_packages.clear();
+        self.is_offline_update_pending = false;
+        self.trigger_reboot_flag = false;
+        Ok(())
+    }
+}
+
 
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -3768,12 +3783,6 @@ pub struct IgnitionSystemdUnit {
 /// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
 /// (files, users, systemd units) before userspace init handoff.
 
-
-impl Default for FedoraIgnitionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine

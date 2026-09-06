@@ -147,9 +147,11 @@ impl SimpleAIAgent {
             name_str.push(byte as char);
         }
         SimpleAIAgent {
-            name: name.to_string(),
+            name: name_str,
             version,
             execution_count: AtomicUsize::new(0),
+            capability,
+            patterns: Vec::new(),
             mcp_tools: Vec::new(),
             prompt_optim_weight: 0.5,
         }
@@ -466,6 +468,7 @@ impl Default for ManagerCapability {
 /// Simple AI agent manager
 pub struct SimpleAIAgentManager {
     pub agents: Vec<Box<dyn AIAgent>>,
+    pub stats: AIStats,
 }
 
 impl SimpleAIAgentManager {
@@ -513,6 +516,10 @@ impl AIAgentManager for SimpleAIAgentManager {
             Err(AIError::InvalidInput)
         }
     }
+
+    fn stats(&self) -> AIStats {
+        self.stats
+    }
 }
 
 #[cfg(test)]
@@ -521,7 +528,7 @@ mod tests {
 
     #[test]
     fn test_ai_agent_parsing() {
-        let mut agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
+        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         let intent = agent.parse("run diagnostic check").unwrap();
         assert_eq!(intent.intent_type, IntentType::SystemCommand);
         assert_eq!(intent.command, "sys_exec");
@@ -530,7 +537,7 @@ mod tests {
 
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
-        let mut agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
+        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         agent.register_mcp_tool(
             "fetch_weather".to_string(),
             "MCP weather fetcher".to_string(),
@@ -544,7 +551,7 @@ mod tests {
     #[test]
     fn test_ai_agent_manager_process() {
         let mut manager = SimpleAIAgentManager::new();
-        let agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
+        let agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         let id = manager.register_agent(Box::new(agent)).unwrap();
 
         let response = manager.process_request(id, "read file /etc/hosts").unwrap();
