@@ -935,7 +935,7 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Pkg)
         } else if f.ends_with(".aab") {
             Some(PackageFormat::Aab)
-        } else if f.ends_with(".openbsd.tgz") || f.ends_with(".openbsd.tar.gz") {
+        } else if f.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
         } else if f.ends_with(".tar.gz") || f.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
@@ -2148,8 +2148,9 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "-C" | "--unmerge" | "--deselect" => operation = UniversalPmOperation::Remove,
-                        "-u" | "-uDN" | "--update" => operation = UniversalPmOperation::Upgrade,
+                        "-a" | "--ask" | "-pv" | "--pretend" | "-p" => dry_run = true,
+                        "-u" | "-uN" | "-uDN" | "--update" | "@world" => operation = UniversalPmOperation::Upgrade,
+                        "-C" | "--unmerge" | "deselect" => operation = UniversalPmOperation::Remove,
                         "-s" | "--search" => operation = UniversalPmOperation::Search,
                         "--info" => operation = UniversalPmOperation::QueryInfo,
                         "-p" | "--pretend" | "-a" | "--ask" => dry_run = true,
@@ -2192,7 +2193,30 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "snap" => {
+            "pkgin" | "pkg_delete" => {
+                if pm == "pkg_delete" {
+                    operation = UniversalPmOperation::Remove;
+                }
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "in" | "install" => operation = UniversalPmOperation::Install,
+                        "rm" | "remove" => operation = UniversalPmOperation::Remove,
+                        "ug" | "full-upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "se" | "search" => operation = UniversalPmOperation::Search,
+                        "-n" | "-s" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "slackpkg" | "installpkg" | "removepkg" => {
+                if pm == "installpkg" {
+                    operation = UniversalPmOperation::Install;
+                } else if pm == "removepkg" {
+                    operation = UniversalPmOperation::Remove;
+                }
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2262,6 +2286,21 @@ impl UniversalPmCommandDispatcher {
                             target_packages.push(arg.to_string());
                         }
                     }
+                }
+            }
+            "flatpak" | "snap" | "pkgman" | "swupd" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" | "bundle-add" => operation = UniversalPmOperation::Install,
+                        "remove" | "uninstall" | "remove-bundle" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "bundle-upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "find" => operation = UniversalPmOperation::Search,
+                        "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
                 }
             }
             _ => {
