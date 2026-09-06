@@ -985,6 +985,8 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Pkg)
         } else if f.ends_with(".aab") {
             Some(PackageFormat::Aab)
+        } else if f.ends_with(".openbsd.tgz") || f.ends_with(".openbsd.tar.gz") {
+            Some(PackageFormat::OpenBsdPkg)
         } else if f.ends_with(".tar.gz") || f.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
         } else if f.ends_with(".tar.xz") || f.ends_with(".xz") {
@@ -1051,6 +1053,30 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Yum)
         } else if f.ends_with(".stratum") {
             Some(PackageFormat::Sovereign)
+        } else if f.ends_with(".ipk") {
+            Some(PackageFormat::Ipk)
+        } else if f.ends_with(".opkg") {
+            Some(PackageFormat::Opkg)
+        } else if f.ends_with(".p5p") || f.ends_with(".ips") {
+            Some(PackageFormat::SolarisIps)
+        } else if f.ends_with(".nar") {
+            Some(PackageFormat::GuixNar)
+        } else if f.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if f.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if f.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if f.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if f.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if f.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if f.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if f.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
         } else {
             None
         }
@@ -1097,6 +1123,32 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Sovereign) // Bedrock Linux Stratum magic
         } else if data.starts_with(b"SLAK") {
             Some(PackageFormat::TarGz) // Slackware SlackBuild magic
+        } else if data.starts_with(b"IPK!") {
+            Some(PackageFormat::Ipk) // OpenWrt / opkg magic
+        } else if data.starts_with(b"OPKG") {
+            Some(PackageFormat::Opkg) // Yocto / opkg magic
+        } else if data.starts_with(b"P5P!") {
+            Some(PackageFormat::SolarisIps) // Solaris IPS magic
+        } else if data.starts_with(b"NARS") {
+            Some(PackageFormat::GuixNar) // Nix / Guix NAR archive magic
+        } else if data.starts_with(b"OBSD") {
+            Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
+        } else if data.starts_with(b"SPAK") {
+            Some(PackageFormat::Spack) // Spack HPC package magic
+        } else if data.starts_with(b"CONA") {
+            Some(PackageFormat::Conan) // Conan C/C++ package magic
+        } else if data.starts_with(b"WHEL") {
+            Some(PackageFormat::Wheel) // Python Wheel magic
+        } else if data.starts_with(b"CRAT") {
+            Some(PackageFormat::Crate) // Rust Cargo crate magic
+        } else if data.starts_with(b"GEMS") {
+            Some(PackageFormat::Gem) // RubyGems magic
+        } else if data.starts_with(b"NUPK") {
+            Some(PackageFormat::Nupkg) // .NET NuGet magic
+        } else if data.starts_with(b"VCPK") {
+            Some(PackageFormat::Vcpkg) // Microsoft Vcpkg magic
+        } else if data.starts_with(b"NARI") {
+            Some(PackageFormat::NarInfo) // Nix/Guix NarInfo substituter magic
         } else {
             None
         }
@@ -1223,6 +1275,33 @@ impl UniversalPackageAdapter {
                     &deps,
                 )
             }
+            Some(PackageFormat::Ipk) | Some(PackageFormat::Opkg) => {
+                let deb = self.parse_apt_control(raw_text)?;
+                self.translate_to_native_package(
+                    &deb.package,
+                    &deb.version,
+                    &deb.description,
+                    &deb.depends,
+                )
+            }
+            Some(PackageFormat::OpenBsdPkg) => {
+                let obs = self.parse_openbsd_contents(raw_text)?;
+                self.translate_to_native_package(
+                    &obs.pkgname,
+                    &obs.version,
+                    &obs.comment,
+                    &obs.depends,
+                )
+            }
+            Some(PackageFormat::Hpkg) => {
+                let hpkg = self.parse_haiku_hpkg(raw_text)?;
+                self.translate_to_native_package(
+                    &hpkg.name,
+                    &hpkg.version,
+                    &hpkg.summary,
+                    &hpkg.requires,
+                )
+            }
             _ => {
                 // Heuristic inspection if extension detection wasn't definitive
                 if raw_text.contains("Package:") && raw_text.contains("Version:") {
@@ -1322,6 +1401,14 @@ impl UniversalPackageAdapter {
                         &slack.version,
                         &slack.description,
                         &slack.slack_required,
+                    )
+                } else if raw_text.contains("name ") && raw_text.contains("summary ") {
+                    let hpkg = self.parse_haiku_hpkg(raw_text)?;
+                    self.translate_to_native_package(
+                        &hpkg.name,
+                        &hpkg.version,
+                        &hpkg.summary,
+                        &hpkg.requires,
                     )
                 } else {
                     Err("Unrecognized package manifest format")
@@ -1753,7 +1840,6 @@ impl UniversalDependencyMapper {
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
-            "python3-dev" => "python".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
@@ -1981,6 +2067,22 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
+            "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" => operation = UniversalPmOperation::Install,
+                        "uninstall" | "remove" | "rm" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "find" => operation = UniversalPmOperation::Search,
+                        "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        "--dry-run" | "--dryrun" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
             "pacman" => {
                 let mut i = 0;
                 while i < args.len() {
@@ -2031,7 +2133,23 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkg_add" => {
+            "opkg" | "ipkg" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" => operation = UniversalPmOperation::Install,
+                        "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "find" | "search" => operation = UniversalPmOperation::Search,
+                        "info" | "status" => operation = UniversalPmOperation::QueryInfo,
+                        "--noaction" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pkg" | "pkg_add" | "pkgsend" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2676,6 +2794,58 @@ mod tests {
             adapter.detect_format_by_extension("recipe.cports"),
             Some(PackageFormat::Cports)
         );
+        assert_eq!(
+            adapter.detect_format_by_extension("router.ipk"),
+            Some(PackageFormat::Ipk)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("yocto.opkg"),
+            Some(PackageFormat::Opkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("solaris.p5p"),
+            Some(PackageFormat::SolarisIps)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("store.nar"),
+            Some(PackageFormat::GuixNar)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("base.openbsd.tgz"),
+            Some(PackageFormat::OpenBsdPkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("hpc.spack"),
+            Some(PackageFormat::Spack)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("cpp.conan"),
+            Some(PackageFormat::Conan)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("python.whl"),
+            Some(PackageFormat::Wheel)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("rust.crate"),
+            Some(PackageFormat::Crate)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("ruby.gem"),
+            Some(PackageFormat::Gem)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("dotnet.nupkg"),
+            Some(PackageFormat::Nupkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("ms.vcpkg"),
+            Some(PackageFormat::Vcpkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("nix.narinfo"),
+            Some(PackageFormat::NarInfo)
+        );
 
         // Check format detection by header signature magic
         assert_eq!(
@@ -2713,6 +2883,58 @@ mod tests {
         assert_eq!(
             adapter.detect_format_by_header(b"SPKG0001header"),
             Some(PackageFormat::Sovereign)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"IPK!hdr"),
+            Some(PackageFormat::Ipk)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"OPKGhdr"),
+            Some(PackageFormat::Opkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"P5P!hdr"),
+            Some(PackageFormat::SolarisIps)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NARShdr"),
+            Some(PackageFormat::GuixNar)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"OBSDhdr"),
+            Some(PackageFormat::OpenBsdPkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"SPAKhdr"),
+            Some(PackageFormat::Spack)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"CONAhdr"),
+            Some(PackageFormat::Conan)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"WHELhdr"),
+            Some(PackageFormat::Wheel)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"CRAThdr"),
+            Some(PackageFormat::Crate)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"GEMShdr"),
+            Some(PackageFormat::Gem)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NUPKhdr"),
+            Some(PackageFormat::Nupkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"VCPKhdr"),
+            Some(PackageFormat::Vcpkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NARIhdr"),
+            Some(PackageFormat::NarInfo)
         );
     }
 
