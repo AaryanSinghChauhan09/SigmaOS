@@ -59,7 +59,7 @@ All changes must be validated against the native SigmaOS test suite:
 
 # Run standalone module tests
 rustc --edition=2021 --test --cfg 'feature="standalone_test"' src/distro/linux_bsd_inspirations.rs -o build/test_inspirations && ./build/test_inspirations
-<<<<<<< HEAD
+
 # 🤖 SigmaOS AI Agent Governance Specification (`AGENTS.md`)
 
 **Version:** 1.3.0
@@ -83,8 +83,6 @@ SigmaOS features an AI-native architecture where autonomous agent processes gove
   • Render Frame Profiling   • Theme & Layout Engine     • Desktop App Sandbox Audit
   • Compositor Optimization  • WCAG 2.1 AA Focus Outlines • Web2App IPC Channel Check
   • Sub-µs Memory Access     • Semantic ARIA Tags        • Post-Quantum Verification
-=======
->>>>>>> cdd7f6adb3be9e46d13c1a3c423441c9d42dbd18
 ```
 
 ---
@@ -92,7 +90,7 @@ SigmaOS features an AI-native architecture where autonomous agent processes gove
 ## 4. Pull Request & Commit Guidelines
 - Repository git branches must follow the naming convention starting with `jules-`.
 - Maintain descriptive commit messages following standard git conventions.
-<<<<<<< HEAD
+
 ## 1. AGENT PERSONAS & GOVERNANCE
 
 ### ⚡ Bolt (Performance Agent)
@@ -128,5 +126,3 @@ Every agent module must support standalone unit testing via:
 ```bash
 rustc --test <module_path> --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_agent && /tmp/test_agent
 ```
-=======
->>>>>>> cdd7f6adb3be9e46d13c1a3c423441c9d42dbd18
