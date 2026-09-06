@@ -3,6 +3,7 @@ use std::boxed::Box;
 // use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
+use std::sync::Arc;
 use std::vec;
 use std::vec::Vec;
 
@@ -14,10 +15,6 @@ use crate::klib::{HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
-<<<<<<< HEAD
-=======
-use std::sync::Arc;
->>>>>>> origin/main-191590731792487084
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -26,7 +23,6 @@ use crate::runtime::node_distribution::{
 
 #[cfg(any(feature = "standalone_test", test))]
 pub mod node_distribution_dummy {
-    use super::*;
 
     #[derive(Debug, Clone)]
     pub enum LibcFlavor {
@@ -89,15 +85,6 @@ pub enum PackageState {
     BrokenDependency,
 }
 
-/// Package format type covering 18 major distribution formats
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PackageState {
-    Uninstalled,
-    Downloading,
-    Installing,
-    Installed,
-    BrokenDependency,
-}
 
 pub enum PackagePriority {
     Essential,
@@ -1535,44 +1522,6 @@ impl PackageAdapter {
         }
     }
 
-    pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
-        let mut pledges = Vec::new();
-        for arg in &manifest.finish_args {
-            if arg.contains("network") {
-                pledges.push("network".to_string());
-            } else if arg.contains("ipc") {
-                pledges.push("ipc".to_string());
-            } else if arg.contains("filesystem") || arg.contains("host") {
-                pledges.push("unveil_all".to_string());
-            }
-        }
-        pledges
-    }
-
-    pub fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> String {
-        if manifest.confinement == "strict" {
-            "strict_pledge_sandbox".to_string()
-        } else {
-            "classic_sandbox".to_string()
-        }
-    }
-
-    pub fn mount_appimage_squashfs(&self, app_runtime: &AppImageRuntime) -> Result<String, PackageError> {
-        if app_runtime.signature_offset == 0 || app_runtime.squashfs_offset == 0 {
-            Err(PackageError::InstallationFailed("Invalid AppImage offsets".to_string()))
-        } else {
-            Ok(format!("/tmp/.mount_{}_squashfs", app_runtime.app_name))
-        }
-    }
-
-    pub fn query_apt_repository(&self, _config: &AptRepoConfig) -> bool {
-        true
-    }
-
-    pub fn query_dnf_repository(&self, _config: &DnfRepoConfig) -> bool {
-        true
-    }
-
     pub fn _can_handle(&self, package: &UnifiedPackage) -> bool {
         package.formats.contains(&self.format)
     }
@@ -1839,7 +1788,6 @@ impl UniversalPackageManager {
             triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
-            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();

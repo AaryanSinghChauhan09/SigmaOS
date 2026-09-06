@@ -23,7 +23,7 @@ pub use tcp_ip_implementation::{
 };
 
 pub use network_namespace::{
-    NetworkNamespace, NetworkNamespaceId, NetworkInterface, Route, FirewallRule, FirewallAction,
+    NetworkNamespace, NetworkNamespaceId, NetworkInterface, Route as NamespaceRoute, FirewallRule, FirewallAction,
     VirtualBridge, NetworkNamespaceManager,
 };
 

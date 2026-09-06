@@ -1,6 +1,3 @@
-pub mod udev_devd_rules;
-pub use udev_devd_rules::*;
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -17,9 +14,13 @@ pub use udev_devd_rules::*;
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Device Module
+pub mod udev_devd_rules;
+pub use udev_devd_rules::*;
+
 pub mod manager;
 
 pub use manager::{
     Device, DeviceClass, DeviceDriver, DeviceError, DeviceHotplug, DeviceID, DeviceManager,
     SimpleDevice, SimpleDeviceDriver, SimpleDeviceHotplug, SimpleDeviceManager,
 };
+

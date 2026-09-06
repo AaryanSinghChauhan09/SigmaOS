@@ -1532,7 +1532,7 @@ pub struct AppArmorProfile {
     pub rules: Vec<AppArmorPathRule>,
 }
 
-pub type AppArmorProfile = AppArmorPathProfile;
+pub type AppArmorPathProfile = AppArmorProfile;
 
 pub struct AppArmorPathRuleEngine {
     pub profiles: BTreeMap<String, AppArmorPathProfile>,
@@ -1793,13 +1793,13 @@ impl UbuntuAppArmorEngine {
             return Ok(true);
         }
 
-        let allowed = self.rule_engine.evaluate_access(
-            profile_name,
-            target_path,
-            need_read,
-            need_write,
-            need_exec,
-        );
+        let need_read = access_type.contains('r');
+        let need_write = access_type.contains('w');
+        let need_exec = access_type.contains('x');
+
+        let allowed = (!need_read || profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)))
+            && (!need_write || profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)))
+            && (!need_exec || profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)));
 
         if allowed || matches!(profile.mode, UbuntuAppArmorMode::Complain) {
             Ok(true)

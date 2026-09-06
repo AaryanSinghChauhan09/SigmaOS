@@ -37,7 +37,7 @@ pub struct SysctlRule {
 #[derive(Debug, Clone)]
 pub struct DoasRule {
     pub permit: bool,
-    pub identity: String,  # e.g. "wheel" or "alice"
+    pub identity: String,  // e.g. "wheel" or "alice"
     pub target_user: String, // e.g. "root"
     pub command: Option<String>, // None matches all commands
     pub nopass: bool,

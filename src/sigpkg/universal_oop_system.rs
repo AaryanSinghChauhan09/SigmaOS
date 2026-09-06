@@ -27,21 +27,8 @@ use std::vec::Vec;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::klib::HashMap;
 
 use std::sync::Arc;
-
-#[cfg(any(feature = "standalone_test", test))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Version {
-    pub major: u64,
-    pub minor: u64,
-    pub patch: u64,
-}
 
 #[cfg(any(feature = "standalone_test", test))]
 impl core::fmt::Display for Version {

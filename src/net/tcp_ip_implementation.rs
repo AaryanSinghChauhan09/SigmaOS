@@ -10,6 +10,20 @@ use core::time::Duration;
 
 use crate::net::stack::*;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketType {
+    Stream,
+    Datagram,
+    Raw,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketProtocol {
+    Tcp,
+    Udp,
+    Raw,
+}
+
 // ============================================================================
 // IP Address & Port Management
 // ============================================================================
@@ -629,6 +643,7 @@ impl TcpIpStack {
                 let addr = SocketAddr::new_ipv4(0, [0, 0, 0, 0]);
                 self.udp_sockets.insert(socket_id, UdpSocket::new(addr));
             }
+            SocketType::Raw => {}
         }
 
         Ok(socket_id)

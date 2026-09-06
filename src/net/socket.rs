@@ -68,6 +68,9 @@ pub trait Socket {
     fn is_connected(&self) -> bool;
     fn is_bound(&self) -> bool;
 
+    fn set_bound(&mut self, bound: bool);
+    fn set_connected(&mut self, connected: bool);
+
     // BSD/Linux-style Socket Option getters/setters
     fn set_opt(&mut self, option: SocketOption, value: u32) -> Result<(), SocketError>;
     fn get_opt(&self, option: SocketOption) -> Result<u32, SocketError>;
@@ -121,6 +124,14 @@ impl Socket for SimpleSocket {
     }
     fn is_bound(&self) -> bool {
         self.bound.load(Ordering::SeqCst) == 1
+    }
+
+    fn set_bound(&mut self, bound: bool) {
+        self.bound.store(if bound { 1 } else { 0 }, Ordering::SeqCst);
+    }
+
+    fn set_connected(&mut self, connected: bool) {
+        self.connected.store(if connected { 1 } else { 0 }, Ordering::SeqCst);
     }
 
     fn set_opt(&mut self, option: SocketOption, value: u32) -> Result<(), SocketError> {
@@ -218,7 +229,7 @@ impl SocketManager for SimpleSocketManager {
         for socket_option in &mut self.sockets {
             if let Some(ref mut socket) = *socket_option {
                 if socket.id() == id {
-                    socket.bound.store(1, Ordering::SeqCst);
+                    socket.set_bound(true);
                     return Ok(());
                 }
             }
@@ -230,7 +241,7 @@ impl SocketManager for SimpleSocketManager {
         for socket_option in &mut self.sockets {
             if let Some(ref mut socket) = *socket_option {
                 if socket.id() == id {
-                    socket.connected.store(1, Ordering::SeqCst);
+                    socket.set_connected(true);
                     return Ok(());
                 }
             }
@@ -370,6 +381,7 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -381,6 +393,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
@@ -391,6 +404,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
@@ -401,6 +415,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;

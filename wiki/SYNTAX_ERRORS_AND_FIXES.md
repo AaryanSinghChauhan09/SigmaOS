@@ -11,56 +11,36 @@ During workspace compilation, several compile-time syntax, type, and trait error
 * **Root Cause:** `AccessibilityFeature` is used as a key in `BTreeMap<AccessibilityFeature, AccessibilitySetting>`, which requires the key type to implement `Ord` and `PartialOrd`.
 * **Suggested Fix:**
   ```rust
-  <<<<<<< SEARCH
-  #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
   pub enum AccessibilityFeature {
-  =======
-  #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-  pub enum AccessibilityFeature {
-  >>>>>>> REPLACE
-  ```
+    ```
 
 ### File: `src/distro/certification.rs` (Line 56)
 * **Error:** The trait bound `ComponentType: Ord` is not satisfied.
 * **Root Cause:** Used as a key in `BTreeMap<ComponentType, CertificationStatus>` on line 78.
 * **Suggested Fix:**
   ```rust
-  <<<<<<< SEARCH
-  #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
   pub enum ComponentType {
-  =======
-  #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-  pub enum ComponentType {
-  >>>>>>> REPLACE
-  ```
+    ```
 
 ### File: `src/distro/compat_layers.rs` (Line 95)
 * **Error:** The trait bound `GdiObjectType: Ord` is not satisfied.
 * **Root Cause:** Used as a key in `BTreeMap<GdiObjectType, u32>` on line 104.
 * **Suggested Fix:**
   ```rust
-  <<<<<<< SEARCH
-  #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
   pub enum GdiObjectType {
-  =======
-  #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-  pub enum GdiObjectType {
-  >>>>>>> REPLACE
-  ```
+    ```
 
 ### File: `src/distro/developer.rs` (Line 23)
 * **Error:** The trait bound `TargetArch: Ord` is not satisfied.
 * **Root Cause:** Used as a key in `BTreeMap<TargetArch, String>` on line 145.
 * **Suggested Fix:**
   ```rust
-  <<<<<<< SEARCH
-  #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
   pub enum TargetArch {
-  =======
-  #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-  pub enum TargetArch {
-  >>>>>>> REPLACE
-  ```
+    ```
 
 ---
 
@@ -71,19 +51,10 @@ During workspace compilation, several compile-time syntax, type, and trait error
 * **Root Cause:** `HashSet<T>` wraps a `BTreeMap<T, ()>`, but its structural declaration does not constrain `T: Ord`.
 * **Suggested Fix:**
   ```rust
-  <<<<<<< SEARCH
-  pub struct HashSet<T> {
+    pub struct HashSet<T> {
       map: BTreeMap<T, ()>,
   }
-  =======
-  pub struct HashSet<T>
-  where
-      T: Ord,
-  {
-      map: BTreeMap<T, ()>,
-  }
-  >>>>>>> REPLACE
-  ```
+    ```
 
 ---
 
@@ -96,18 +67,11 @@ During workspace compilation, several compile-time syntax, type, and trait error
   Update the method signature in the trait implementation to match (returning a boolean and handling/logging internal errors), or modify the trait definition to return a `Result`.
   * **Option A (Returning bool to match trait):**
     ```rust
-    <<<<<<< SEARCH
-        fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
+            fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
             // ...
             Ok(true)
         }
-    =======
-        fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
-            // ...
-            true
-        }
-    >>>>>>> REPLACE
-    ```
+        ```
 
 ---
 

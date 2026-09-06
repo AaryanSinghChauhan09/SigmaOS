@@ -449,7 +449,7 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
     pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> {
         self.buckets
             .iter()
-            .filter_map(|slot| slot.as_ref().map(|(k, v)| (k, v)))
+            .filter_map(|slot| slot.as_ref().map(|pair| (&pair.0, &pair.1)))
     }
 
     // ── private helpers ──────────────────────────────────────────────────────

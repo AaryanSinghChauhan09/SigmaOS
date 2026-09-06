@@ -211,6 +211,8 @@ impl IntelNicDriver {
         IntelNicDriver {
             device_id,
             pci_address: pci_addr.to_string(),
+            mac_bytes: [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
+            ip_bytes: None,
             mmio_base: 0,
             mmio_size: 0,
             rx_ring: DmaRing::new(0, 0, 256),

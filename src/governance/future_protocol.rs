@@ -9,20 +9,11 @@
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 
-<<<<<<< HEAD
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-=======
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
->>>>>>> origin/jules/modular-test-suite-4921081580612261961
 
 // ============================================================================
 // 📑 1. GOVERNANCE MODEL & SPECIAL INTEREST GROUPS (SIGs)
@@ -349,11 +340,7 @@ impl Default for SigmaFutureDevelopmentProtocolEngine {
 // UNIT TESTS
 // ============================================================================
 
-<<<<<<< HEAD
 #[cfg(test_disabled)]
-=======
-#[cfg(test)]
->>>>>>> origin/jules/modular-test-suite-4921081580612261961
 mod tests {
     use super::*;
 

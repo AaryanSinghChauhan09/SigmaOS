@@ -490,6 +490,101 @@ impl PasswordlessSudoExpiryGuard {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OmarchyNerdFont {
+    FiraCode,
+    JetBrainsMono,
+    Hack,
+    Meslo,
+}
+
+impl OmarchyNerdFont {
+    pub fn font_family(&self) -> &'static str {
+        match self {
+            Self::FiraCode => "FiraCode Nerd Font",
+            Self::JetBrainsMono => "JetBrainsMono Nerd Font",
+            Self::Hack => "Hack Nerd Font",
+            Self::Meslo => "MesloLGS Nerd Font",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyTerminalFontConfig {
+    pub active_font: OmarchyNerdFont,
+    pub font_size_pt: f32,
+}
+
+impl OmarchyTerminalFontConfig {
+    pub fn new() -> Self {
+        Self {
+            active_font: OmarchyNerdFont::JetBrainsMono,
+            font_size_pt: 11.0,
+        }
+    }
+
+    pub fn set_font(&mut self, font: OmarchyNerdFont, size_pt: f32) {
+        self.active_font = font;
+        self.font_size_pt = size_pt;
+    }
+}
+
+impl Default for OmarchyTerminalFontConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct OmarchyNeovimPresetEngine {
+    pub lsp_servers: Vec<String>,
+}
+
+impl OmarchyNeovimPresetEngine {
+    pub fn new() -> Self {
+        Self {
+            lsp_servers: Vec::new(),
+        }
+    }
+
+    pub fn register_lsp_server(&mut self, server: &str) -> bool {
+        if self.lsp_servers.iter().any(|s| s == server) {
+            false
+        } else {
+            self.lsp_servers.push(server.to_string());
+            true
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyAudioPipewireConfig {
+    pub quantum_buffer_size: u32,
+}
+
+impl OmarchyAudioPipewireConfig {
+    pub fn new() -> Self {
+        Self {
+            quantum_buffer_size: 256,
+        }
+    }
+
+    pub fn set_low_latency(&mut self, quantum: u32) -> bool {
+        if quantum == 0 {
+            false
+        } else {
+            self.quantum_buffer_size = quantum;
+            true
+        }
+    }
+}
+
+impl Default for OmarchyAudioPipewireConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
