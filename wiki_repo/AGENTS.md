@@ -1,68 +1,62 @@
-# SigmaOS Architecture Guide for AI Agents (`docs/AGENTS.md`)
+# 🤖 SigmaOS AI Agent Governance Specification (`AGENTS.md`)
 
-This document provides specialized architectural reference documentation for AI agents working within the `docs/` and `src/` hierarchy of SigmaOS.
-
----
-
-## 1. System Architecture Overview
-
-SigmaOS is designed as a **sovereign, zero-dependency, `#![no_std]` compliant operating system** in Rust. The architecture is divided into modular, decoupled layers:
-
-### A. Architectural Pillars
-1. **Multi-Architecture Portability Layer (`src/arch/`)**:
-   - Hardware Abstraction Layer (HAL) supporting `x86_32`, `x86_64`, `aarch64`, `riscv64`, `loongarch64`, `powerpc64`, and `s390x`.
-   - Context switching and trap frame handling via `SovereignContextSwitchEngine`.
-   - CPU ISA feature auto-detection (x86-64-v1..v4, AVX-512, AMX, ARM64 Neoverse, RISC-V Vector) via `cpu_features.rs`.
-
-2. **Kernel Core Subsystems (`src/kernel/` & `src/klib/`)**:
-   - Hybrid Process Scheduling: EEVDF lag compensation, CachyOS BORE score calculations, FreeBSD ULE interactivity ranking, and Apache NuttX POSIX RT preemption-threshold gating.
-   - Demand Paging & Memory Management: Lazy zone allocation, page fault handling, slab object caching, and buddy allocation.
-   - Zero-Copy IPC: High-throughput lock-free ring buffers and Unix domain socket emulation.
-
-3. **Distro Leapfrog & Parity Engines (`src/distro/`)**:
-   - `SovereignSchedExtEngine`: Linux 6.12+ extensible BPF scheduler.
-   - `SovereignLandlockV5Guard`: Linux Landlock v5 + FreeBSD Capsicum + OpenBSD Pledge/Unveil security.
-   - `SovereignHermeticCasStoreEngine`: Nix/Guix Content-Addressed Storage store.
-   - `SovereignMicroarchJitEngine`: Microarchitecture SIMD auto-tuning & JIT path routing.
-   - `SovereignHammer2DeduplicationEngine`: DragonFly BSD HAMMER2 multi-master CoW block deduplication.
-
-4. **Universal Package Management (`src/package/` & `src/sigpkg/`)**:
-   - Multi-format package translation (DEB, RPM, Pacman, APK, Flatpak, Snap, AppImage, XBPS, Ebuild, Ports, PKG).
-   - AUR integration, PKGBUILD recipe auditing, and generation-based package snapshot rollbacks.
-
-5. **Clean-Room Compatibility Layers (`src/compatibility/`)**:
-   - Fedora/RHEL core tooling (DNF, SELinux, Bodhi, Ignition, status.fpo, systemd-offline-update).
-   - BSD subsystem parity (FreeBSD Jails, OpenBSD PF firewall).
-   - LSB & FHS compliance tools, PAM, Cgroup v2 governor.
+**Version:** 1.9.0
+**Scope:** Autonomous AI Agents (Bolt ⚡, Palette 🎨, Sentinel 🛡️), Process, Memory, Loader, Desktop, Paging, Allocation, Block Storage, Basic File System, Buffer Cache, & Chained Allocation Management
 
 ---
 
-## 2. Coding Standards & Conventions for AI Agents
+## EXECUTIVE SUMMARY & AGENT ARCHITECTURE
 
-When implementing features or bug fixes in SigmaOS:
+SigmaOS features an AI-native architecture where autonomous agent processes govern kernel scheduling, memory pools, dynamic module loading, desktop environments, virtual memory paging, heap allocations, block storage devices, virtual file systems, unified buffer caches, and chained allocation lists.
 
-1. **Zero External Dependencies**: Maintain `[dependencies]` in `Cargo.toml` empty. Do not add third-party crates.
-2. **Strict `#![no_std]` Compatibility**: Use `alloc::` primitives (`alloc::format`, `alloc::string::String`, `alloc::vec::Vec`, `alloc::collections::BTreeMap`) instead of `std` imports for `src/` modules.
-3. **Trait Derivations**: Always derive `Debug`, `Clone`, and `PartialEq` where appropriate on data structures.
-4. **Error Handling**: Use explicit `Result<T, &'static str>` or domain-specific enums instead of panicking.
-
----
-
-## 3. Verification & Execution Commands
-
-AI agents must verify their work using the following commands:
-
-```bash
-# 1. Compile & run standalone module unit tests
-rustc --edition=2021 --test src/distro/sovereign_nextgen_distro_leap.rs -o build/test_nextgen_leap && ./build/test_nextgen_leap
-rustc --edition=2021 --test src/arch/portability.rs -o build/test_arch_portability && ./build/test_arch_portability
-
-# 2. Run global test suite
-./run_sigma_tests.sh
-
-# 3. Perform compilation check
-cargo check
+```
+                  +-----------------------------------+
+                  |   SIGMAOS AI AGENT GOVERNANCE     |
+                  +-----------------------------------+
+                                    |
+         +--------------------------+--------------------------+
+         |                          |                          |
+         v                          v                          v
+  ⚡ BOLT PROCESS            🎨 PALETTE PROCESS         🛡️ SENTINEL PROCESS
+  • MDL DMA Throughput       • Memory Descriptor Graphs  • Intrusive Link Pointer Audit
+  • Slab Chain Traversal     • Slab Chain Visualization  • MDL Bounds Verification
+  • Sub-µs Memory Access     • Semantic ARIA Tags        • Post-Quantum Verification
 ```
 
 ---
-*End of docs/AGENTS.md*
+
+## 1. AGENT PERSONAS & GOVERNANCE
+
+### ⚡ Bolt (Performance Agent)
+- **Scope**: CPU scheduling, `cgroups v2`, boot speed profiling, Zenith compositor render frame-rate profiling, page translation walk profiling, heap allocation latency profiling, NVMe/AHCI storage throughput profiling, VFS file I/O latency profiling, page/buffer cache hit ratio profiling, Memory Descriptor List (MDL) scatter-gather DMA throughput and slab allocation chain traversal latency profiling (`src/process/kernel_data.rs`, `src/klib/linked_list.rs`).
+- **Rules**:
+  - Optimize scatter-gather MDL DMA chains and maximize intrusive node cache locality.
+  - Record learnings in `.jules/bolt.md`.
+
+### 🎨 Palette (UX & Accessibility Agent)
+- **Scope**: Desktop compositor layout, Control Center themes, visual memory map views, partition usage graphs, SMART drive health diagnostics, graphical file manager tree views, live page cache utilization charts, memory descriptor list chain visual diagnostic graphs, WCAG 2.1 AA focus outlines, ARIA annotations.
+- **Rules**:
+  - Render clear visual diagnostic representations of chained memory allocations and task lists.
+  - Record learnings in `.jules/palette.md`.
+
+### 2. Sentinel (Security & Integrity Agent)
+- **Scope**: LSM auditing, OpenBSD `pledge`/`unveil`, Post-Quantum Dilithium-5 signatures, page table W^X audit, secure buffer zeroization, block device encryption validation (LUKS2/GELI), file permission validation, dirty buffer zeroization, Memory Descriptor List (MDL) bounds verification and intrusive link pointer auditing (`src/process/kernel_data.rs`, `src/klib/linked_list.rs`).
+- **Rules**:
+  - Audit MDL buffer boundaries and prevent intrusive node link corruption or dangling pointers.
+  - Record learnings in `.jules/sentinel.md`.
+
+---
+
+## 2. CHAINED ALLOCATION POLICIES (`docs/AI_AGENTS_CHAINED_ALLOCATION_MANAGEMENT.md`)
+
+- **Scatter-Gather DMA**: Hardware controllers process linked `MemoryDescriptorList` chains for zero-copy I/O without intermediate contiguous re-allocations.
+- **Intrusive Node Safety**: Intrusive nodes in `LinkedList<T>` are exclusively owned by the containing chain.
+
+---
+
+## 3. STANDALONE TESTING & VERIFICATION PROTOCOL
+
+Every agent module must support standalone unit testing via:
+```bash
+rustc --test <module_path> --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_agent && /tmp/test_agent
+```
