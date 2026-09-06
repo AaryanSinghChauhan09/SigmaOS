@@ -65,26 +65,14 @@ pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-#[path = "../package/bsd_linux_package_innovations.rs"]
-pub mod bsd_linux_package_innovations;
-pub use bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
-    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
-    CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
-    DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
-    DebianDebconfStatoverrideEngine, DebianDpkgTriggersAptListbugsGuardEngine, DnfActionKind,
-    DnfActionRecord, DnfTransactionItem, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
-    DragonFlyDportsHammer2SnapshotEngine, EbuildSlotRecord, FedoraDnf5AdvisoryAndDeltaRpmEngine,
-    FedoraDnfHistoryRollbackJournalEngine, FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine,
-    GentooPortageEapiSlotOperatorEngine, GentooPortageSubslotAndUseExpandEngine,
-    HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot, MicroarchRepoRoute, MicroarchitectureLevel,
-    NetBsdPkginBinaryDatabaseEngine, NetBsdPkgsrcOptionsFrameworkEngine,
-    NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
-    OpenSuseZypperVendorStickinessEngine, PkgSummaryRecord, PkgsrcOptionSpec, PortageEapiLevel,
-    PpaRepository, RestrictedPackageSpec, SlackBuildInfo, SlackPackageRecord,
-    SlackwarePkgtoolSlackBuildEngine, SlotOperator, UbuntuPpaAptPinningEngine,
-    XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
-    ZypperRepository,
+pub use zero_alloc_resolver::{
+    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
+};
+pub use universal_adapter::{
+    PackageFormatAdapter, UniversalPackageManager, AdapterError,
+};
+pub use universal_oop_system::{
+    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
 };
 pub use sovereign_sigpkg::*;
 pub use universal_adapter::{
@@ -146,9 +134,10 @@ pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use sovereign_package_innovations::{
-    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
-    NixFlakeHermeticCacheStore,
+pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
+pub use transaction::Transaction;
+pub use universal_adapter::{
+    AptDebManifest, UniversalPackageAdapter,
 };
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
@@ -156,15 +145,6 @@ pub use spec::{
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
-pub use store::{
-    BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
-};
-pub use svntogit_repro::{
-    BuildArtifact, ConvertedGitCommit, ReproducibilityAttestationReport,
-    ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
-    SvnBranchType, SvnRevisionLog,
-};
-pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer

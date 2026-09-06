@@ -50,8 +50,32 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-use crate::security::Permission;
-use crate::sigpkg::universal_engine::PackageFormat;
+/// Description of Snapcraft Manifest (snap parity)
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub description: String,
+    pub confinement: String,
+    pub grade: String,
+    pub apps: Vec<String>,
+    pub plugs: Vec<String>,
+}
+/// Description of Flatpak Manifest (flatpak parity)
+pub struct FlatpakManifest {
+    pub id: String,
+    pub runtime: String,
+    pub runtime_version: String,
+    pub sdk: String,
+    pub command: String,
+    pub finish_args: Vec<String>,
+}
+#[derive(Debug, Clone)]
+pub enum AdapterError {
+    ParseError(String),
+    ValidationError(String),
+    UnsupportedFormat(String),
+}
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
