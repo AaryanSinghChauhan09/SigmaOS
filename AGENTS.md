@@ -6,21 +6,28 @@ Welcome, AI Engineer / Agent! This document specifies core operational guideline
 
 ## 🧠 Memory Management Principles in SigmaOS
 
-1. **Zero-Allocation Primitives (`klib`)**
-   - Core kernel and low-level subsystem primitives (`src/klib/`) operate in `#![no_std]` environment.
-   - Prefer stack-based formatting (`format_u64_stack` in `src/klib/conversion.rs`) and FNV-1a zero-allocation hashing (`fnv1a_hash_64`) over dynamic heap allocations.
-
-2. **Single-Buffer In-Place Formatting**
-   - When serializing structured data (e.g. JSON in `src/klib/json.rs`), use `append_json_string` or single-buffer mutators rather than returning newly allocated `String` objects per field/key.
-
-3. **Safe Memory Allocation Layering**
-   - Userland components (`src/desktop/`, `src/sigpkg/`) use standard `alloc::vec::Vec` and `alloc::boxed::Box`.
-   - Kernel memory management (`src/memory/`) usesBuddy Allocator (`sigma_buddy.rs`), Slab Cache (`slab.rs`), and Physical Memory Manager (`pmm_vmm.rs`). Never create custom unsafe `Vec<T>` structs.
-
-4. **Virtual Memory Paging Indexing**
-   - In 4-level paging (`SimpleVMM` in `src/klib/paging.rs`), maintain unique table indexing:
-     - `pd_table_idx = pml4_idx * 512 + pdpt_idx`
-     - `pt_table_idx = (pml4_idx * 512 + pdpt_idx) * 512 + pd_idx`
+1. **Zero-Dependency & Self-Containment (`no_std`):**
+   * The kernel core and primary subsystems are designed to target bare-metal targets (`#![no_std]`).
+   * Avoid adding runtime dependencies on standard `std` libraries inside microkernel shard components unless conditionally gated under test environments (`#[cfg(not(target_os = "none"))]`).
+2. **Capability-Based Security Model:**
+   * Never introduce generic root/admin ACL checks. System call access is authorized exclusively via hardware-enforced 64-bit `CapabilityToken` verification gates.
+3. **Windows NT & Distro Parity Standards:**
+   * Hardware drivers must follow the WDM-style `IoManager`, `DriverObject`, `DeviceObject`, and `DeviceExtension` abstractions.
+   * Kernel memory allocations must respect tagged `Paged` (swappable) and `NonPaged` (always resident) memory pool boundaries.
+4. **Bit Table & Hardware Field Standards:**
+   * For bit tables, physical frame allocators, page table entry flags, and capability bitmasks, follow [docs/AGENTS_BIT_TABLE_MANAGEMENT.md](docs/AGENTS_BIT_TABLE_MANAGEMENT.md).
+5. **Cache Memory Optimization & Coherency:**
+   * For L1/L2/L3 cache alignment, false sharing prevention, non-temporal stores, and page/buffer cache management, follow [docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md](docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md).
+6. **Cache Operation & Hardware Controls:**
+   * For explicit CPU cache flushing (`clflushopt`/`clwb`), DMA cache coherency, JIT $I\$/D\$$ cache sync, and memory fences, follow [docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md](docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md).
+7. **Cloud vs. Fog Computing Orchestration:**
+   * For real-time edge processing, P2P mesh discovery, workload offloading cost function, and CRDT synchronization, follow [docs/AGENTS_CLOUD_VS_FOG_MANAGEMENT.md](docs/AGENTS_CLOUD_VS_FOG_MANAGEMENT.md).
+8. **Commercial Operating System Architecture:**
+   * For enterprise licensing tiers, statutory compliance governors, software certification programs, and open-core preservation rules, follow [docs/AGENTS_COMMERCIAL_OPERATION_SYSTEM.md](docs/AGENTS_COMMERCIAL_OPERATION_SYSTEM.md).
+9. **Concurrency & Synchronization Operations:**
+   * For classic concurrency problems (Barbershop, Dining Philosophers, Dekker's), deadlock elimination, RCU/Seqlocks/Futexes, and zero-copy message passing, follow [docs/AGENTS_CONCURRENCY_OPERATION_MANAGEMENT.md](docs/AGENTS_CONCURRENCY_OPERATION_MANAGEMENT.md).
+10. **Concurrent Thread Lifecycle & Stack Management:**
+   * For SystemThread TCBs, hybrid 1:1 / M:N fiber models, context switching, stack guard pages, and work-stealing thread pools, follow [docs/AGENTS_CONCURRENT_THREAD_MANAGEMENT.md](docs/AGENTS_CONCURRENT_THREAD_MANAGEMENT.md).
 
 ---
 
