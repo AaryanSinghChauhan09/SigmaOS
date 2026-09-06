@@ -4273,3 +4273,21 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 
 4. **Absolute Zero-Dependency Purity**:
    - All top-level component modules operate under strict `#![no_std]` zero-dependency rules, utilizing custom `klib` allocation primitives and bare-metal memory mappings (`0x...`).
+
+---
+
+## 87. SOVEREIGN AI AGENT MUTUAL EXCLUSION, MONITORS & PETERSON ALGORITHM SPECIFICATION
+
+### 87.1 Autonomous Agent Mutual Exclusion & Synchronization Directives
+
+1. **Peterson's Lock Sequential Consistency Memory Fences**:
+   - Software 2-process and N-process critical section entry/exit protocols (`PetersonLock`) must execute `core::sync::atomic::fence(Ordering::SeqCst)` memory barriers between flag stores and turn evaluations to prevent out-of-order CPU instruction reordering.
+
+2. **High-Level Monitor & Condition Queue Encapsulation**:
+   - Bounded buffer monitors (`BoundedBufferMonitor` in `src/kernel/linux_bsd_innovations.rs`) must fully encapsulate mutex locks, shared buffer states, and producer/consumer condition queues (`cond_var`), preventing un-monitored direct buffer access.
+
+3. **Counting Semaphores & IPC Namespace Registration**:
+   - IPC semaphores (`SemaphoreObject` in `src/ipc/ipc_namespace.rs`) must enforce atomic `P()` (wait) and `V()` (signal) state transitions, placing blocked threads into `ProcessState::BlockedWaiting` without spinlock deadlocks.
+
+4. **Banker's Deadlock Avoidance Safety Matrix**:
+   - Dynamic resource allocation managers (`BankersDeadlockAvoidanceEngine`) must verify `is_safe_state()` before granting resource claims, preventing circular wait deadlocks.
