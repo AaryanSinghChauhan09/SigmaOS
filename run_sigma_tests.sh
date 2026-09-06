@@ -57,25 +57,26 @@ rustc --test --edition 2021 src/unimplemented_tools.rs -o build/test_unimplement
 
 # 6. Run Open Source OS Gap Closure standalone tests
 echo "[6/13] Running Open Source OS Gap Closure standalone tests..."
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_os_gap_closure.rs -o /tmp/test_gap
-/tmp/test_gap
+mkdir -p build
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_os_gap_closure.rs -o build/test_gap
+./build/test_gap
 
 # 7. Run Expanded Wiki Innovations standalone tests
 echo "[7/13] Running Expanded Wiki Innovations standalone tests..."
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/expanded_wiki_innovations.rs -o /tmp/test_wiki
-/tmp/test_wiki
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/expanded_wiki_innovations.rs -o build/test_wiki
+./build/test_wiki
 
 # 8. Run Arch Pacman & Boot standalone tests
 echo "[8/13] Running Arch Pacman & Boot standalone tests..."
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/arch_pacman_engine.rs -o /tmp/test_arch
-/tmp/test_arch
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/boot/sigma_boot.rs -o /tmp/test_boot
-/tmp/test_boot
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/arch_pacman_engine.rs -o build/test_arch
+./build/test_arch
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/boot/sigma_boot.rs -o build/test_boot
+./build/test_boot
 
 # 9. Run Fedora RPM & MirrorManager2 standalone tests
 echo "[9/13] Running Fedora RPM & MirrorManager2 standalone tests..."
-rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/fedora_rpm_engine.rs -o /tmp/test_fedora
-/tmp/test_fedora
+rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/fedora_rpm_engine.rs -o build/test_fedora
+./build/test_fedora
 
 # 10. Run changed files standalone tests runner
 echo "[10/13] Running changed files standalone rustc test runner..."

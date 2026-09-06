@@ -1783,7 +1783,7 @@ impl UbuntuAppArmorEngine {
     }
 
     pub fn authorize_path_access(
-        &self,
+        &mut self,
         profile_name: &str,
         target_path: &str,
         access_type: &str,
@@ -1793,12 +1793,13 @@ impl UbuntuAppArmorEngine {
             return Ok(true);
         }
 
-        let allowed = match access_type {
-            "read" => profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)),
-            "write" => profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)),
-            "exec" => profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)),
-            _ => false,
-        };
+        let allowed = self.rule_engine.evaluate_access(
+            profile_name,
+            target_path,
+            need_read,
+            need_write,
+            need_exec,
+        );
 
         if allowed || matches!(profile.mode, UbuntuAppArmorMode::Complain) {
             Ok(true)

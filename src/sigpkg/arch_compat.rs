@@ -827,10 +827,6 @@ mod tests {
         sync.register_installed("gcc", Version::new(12, 2, 0));
         sync.register_installed("make", Version::new(4, 3, 0));
 
-        let mut build_depends = KVec::new();
-        build_depends.push(SigmaString::from("gcc"));
-        build_depends.push(SigmaString::from("make"));
-
         let source_pkg = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
@@ -841,11 +837,6 @@ mod tests {
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
-
-        let mut build_depends_missing = KVec::new();
-        build_depends_missing.push(SigmaString::from("gcc"));
-        build_depends_missing.push(SigmaString::from("make"));
-        build_depends_missing.push(SigmaString::from("libc-dev"));
 
         let source_pkg_missing = DebianSbuildPackage {
             name: crate::klib::string::SigmaString::from("coreutils"),
@@ -941,10 +932,10 @@ mod tests {
         assert_eq!(engine.state, AlpmTransactionState::Init);
 
         engine.add_target("nginx").unwrap();
-        let pre_cmds = engine.prepare().unwrap();
+        let _pre_cmds = engine.prepare().unwrap();
         assert_eq!(engine.state, AlpmTransactionState::Prepared);
 
-        let post_cmds = engine.commit().unwrap();
+        let _post_cmds = engine.commit().unwrap();
         assert_eq!(engine.state, AlpmTransactionState::Committed);
         assert!(engine.installed.contains_key(&SigmaString::from("nginx")));
 
