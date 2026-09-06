@@ -184,7 +184,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
     assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
