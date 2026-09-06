@@ -14,8 +14,7 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 # Test dependencies
 
 [features]
-default = ["core-build"]
-standalone_test = []
+default = []
 desktop = []
 drivers = []
 ai = []

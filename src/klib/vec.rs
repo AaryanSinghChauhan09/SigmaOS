@@ -39,9 +39,7 @@ impl<T> Vec<T> {
             return Self::new();
         }
         let size = mem::size_of::<T>() * capacity;
-        // SAFETY: `size` is non-zero (capacity > 0 and size_of::<T>() >= 1 for non-ZST).
-        // The returned pointer is either null (checked by callers) or valid for `size` bytes.
-        let new_data = unsafe { alloc(size) as *mut T };
+        let new_data = unsafe { alloc(size) } as *mut T;
         Vec {
             data: new_data,
             len: 0,

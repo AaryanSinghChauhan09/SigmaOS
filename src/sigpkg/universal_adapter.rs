@@ -12,17 +12,7 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-#[cfg(all(test, not(feature = "sigmaos_lib")))]
-#[path = "universal_oop_system.rs"]
-pub mod universal_oop_system;
-
-#[cfg(all(test, not(feature = "sigmaos_lib")))]
-pub use universal_oop_system::*;
-
-#[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
-use crate::sigpkg::universal_oop_system;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(test)]
@@ -61,12 +51,33 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-
-// PackageFormat: use standalone_test-specific import when in that build mode
-#[cfg(feature = "standalone_test")]
-use crate::sigpkg::universal_engine::PackageFormat;
-/// UniversalPackageManager: only import directly when NOT using the glob re-export
-#[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
+/// Description of Snapcraft Manifest (snap parity)
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub description: String,
+    pub confinement: String,
+    pub grade: String,
+    pub apps: Vec<String>,
+    pub plugs: Vec<String>,
+}
+/// Description of Flatpak Manifest (flatpak parity)
+pub struct FlatpakManifest {
+    pub id: String,
+    pub runtime: String,
+    pub runtime_version: String,
+    pub sdk: String,
+    pub command: String,
+    pub finish_args: Vec<String>,
+}
+#[derive(Debug, Clone)]
+pub enum AdapterError {
+    ParseError(String),
+    ValidationError(String),
+    UnsupportedFormat(String),
+}
+/// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -98,80 +109,6 @@ pub trait PackageFormatAdapter {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct AptDebManifest {
-    pub package: String,
-    pub version: String,
-    pub depends: Vec<String>,
-    pub description: String,
-    pub priority: PackagePriority,
-}
-
-#[derive(Debug, Clone)]
-pub struct PacmanPkgbuildV2 {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub depends: Vec<String>,
-}
-
-/// Description of Arch Linux .PKGINFO binary manifest (pacman standard)
-#[derive(Debug, Clone)]
-pub struct ArchPkgInfoManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub depends: Vec<String>,
-    pub architecture: String,
-}
-
-/// Description of Gentoo ebuild manifest (Portage standard)
-#[derive(Debug, Clone)]
-pub struct GentooEbuildMetadata {
-    pub category: String,
-    pub package_name: String,
-    pub version: String,
-    pub rdepend: Vec<String>,
-    pub depend: Vec<String>,
-    pub description: String,
-    pub use_flags: Vec<String>,
-}
-
-/// Description of Alpine Linux APKINDEX manifest (apk standard)
-#[derive(Debug, Clone)]
-pub struct ApkIndexManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub depends: Vec<String>,
-}
-
-/// Description of Void Linux XBPS manifest
-#[derive(Debug, Clone)]
-pub struct XbpsManifest {
-    pub pkgname: String,
-    pub version: String,
-    pub short_desc: String,
-    pub run_depends: Vec<String>,
-}
-
-/// Description of Haiku .hpkg package manifest
-#[derive(Debug, Clone)]
-pub struct HaikuHpkgManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub architecture: String,
-    pub requires: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub confinement: String, // "strict", "classic", "devmode"
-    pub plugs: Vec<String>,
-}
 
 #[derive(Debug, Clone)]
 pub struct FlatpakManifest {

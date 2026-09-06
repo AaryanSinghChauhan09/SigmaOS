@@ -12,7 +12,7 @@ pub use scheduler::{
     DeadlineSchedClass, FairSchedClass, IdleSchedClass, RealtimeSchedClass, RunQueue, SchedClass,
     Scheduler, StopSchedClass,
 };
+pub use task::{Cred, ProcessState, SchedPolicy, Task, INIT_PID, PID_MAX_LIMIT};
 pub use sigma_mlfq::{MlfqSchedClass, MlfqScheduler};
 pub use sigma_thermal_sched::{SchedulingDecision, ThermalSchedClass, ThermalScheduler};
 pub use sigma_transformer_sched::{TransformerSchedClass, TransformerScheduler};
-pub use task::{Cred, ProcessState, SchedPolicy, Task, INIT_PID, PID_MAX_LIMIT};

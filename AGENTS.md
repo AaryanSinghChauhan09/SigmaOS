@@ -6,16 +6,22 @@ Welcome, AI Agent! This file contains repository-specific directives, architectu
 
 ## 1. Primary Directives & Code Conventions
 
-1. **Zero External Crates Requirement:** SigmaOS is a zero-dependency operating system written in Rust nightly (`#![no_std]` core with optional `std` features for test binaries). Do NOT add external dependencies to `Cargo.toml`.
-2. **Testing Standards:**
-   - Always verify changes locally before completing steps.
-   - Run the complete test suite using `./run_sigma_tests.sh`. This executes:
-     1. C++ native test runners (`test_runner`).
-     2. Rust inspection test binaries in `build/` using `rustc --edition 2021 --test`.
-     3. Python pytest suites (`tests/test_unit_core.py`, `tests/test_integration_system.py`, `tests/test_stress_fuzz_bench.py`).
-   - For standalone rustc testing on modified files, use `./scripts/changed_files_rustc_tests.sh`.
-3. **Commit Branch Convention:**
-   - Branch names MUST start with a valid prefix: `feat/`, `fix/`, `docs/`, `style/`, `refactor/`, `perf/`, `test/`, `chore/`, `revert/`, `impl/`, `driver/`, `security/`, `kernel/`, `arch/`, `ci/`, `pkg/`, `ai/`, `ux/`, `sdk/`, `boot/`, `bolt/`, `palette/`, `sentinel/`, or `jules-`.
+1. **Zero-Dependency & Self-Containment (`no_std`):**
+   * The kernel core and primary subsystems are designed to target bare-metal targets (`#![no_std]`).
+   * Avoid adding runtime dependencies on standard `std` libraries inside microkernel shard components unless conditionally gated under test environments (`#[cfg(not(target_os = "none"))]`).
+2. **Capability-Based Security Model:**
+   * Never introduce generic root/admin ACL checks. System call access is authorized exclusively via hardware-enforced 64-bit `CapabilityToken` verification gates.
+3. **Windows NT & Distro Parity Standards:**
+   * Hardware drivers must follow the WDM-style `IoManager`, `DriverObject`, `DeviceObject`, and `DeviceExtension` abstractions.
+   * Kernel memory allocations must respect tagged `Paged` (swappable) and `NonPaged` (always resident) memory pool boundaries.
+4. **Bit Table & Hardware Field Standards:**
+   * For bit tables, physical frame allocators, page table entry flags, and capability bitmasks, follow [docs/AGENTS_BIT_TABLE_MANAGEMENT.md](docs/AGENTS_BIT_TABLE_MANAGEMENT.md).
+5. **Cache Memory Optimization & Coherency:**
+   * For L1/L2/L3 cache alignment, false sharing prevention, non-temporal stores, and page/buffer cache management, follow [docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md](docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md).
+6. **Cache Operation & Hardware Controls:**
+   * For explicit CPU cache flushing (`clflushopt`/`clwb`), DMA cache coherency, JIT $I\$/D\$$ cache sync, and memory fences, follow [docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md](docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md).
+7. **Cloud vs. Fog Computing Orchestration:**
+   * For real-time edge processing, P2P mesh discovery, workload offloading cost function, and CRDT synchronization, follow [docs/AGENTS_CLOUD_VS_FOG_MANAGEMENT.md](docs/AGENTS_CLOUD_VS_FOG_MANAGEMENT.md).
 
 ---
 

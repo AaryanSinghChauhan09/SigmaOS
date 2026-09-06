@@ -56,6 +56,13 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 
+pub use qubes_isolation::{
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+};
+
+pub use qubes_isolation::*;
+pub use root_improvement::*;
+
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
     AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,

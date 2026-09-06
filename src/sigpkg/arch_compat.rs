@@ -3,11 +3,9 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
-use crate::klib::Vec;
-use crate::klib::{HashMap, SigmaString};
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec as AllocVec;
+extern crate alloc;
+use crate::klib::collections::HashMap;
+use crate::klib;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

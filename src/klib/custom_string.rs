@@ -36,8 +36,9 @@ pub mod uuid {
     }
 }
 
-use std::string::String;
-use std::vec::Vec;
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Clone)]
 pub struct SigmaString {

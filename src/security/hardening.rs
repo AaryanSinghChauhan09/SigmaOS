@@ -2,17 +2,79 @@
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations
 
-use core::sync::atomic::{AtomicU64, Ordering};
+#[cfg(feature = "standalone_test")]
+use alloc::vec::Vec;
+use crate::security::Permission;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
-/// Memory protection flags
+/// Secure Memory Zeroization utility
+/// Overwrites memory containing sensitive keys, credentials, or capability data
+/// Uses volatile writes to guarantee that the compiler does not optimize away the memory wipe (preventing CVE leaks)
+pub fn secure_zeroize<T: Copy + Default>(slice: &mut [T]) {
+    for item in slice.iter_mut() {
+        unsafe {
+            core::ptr::write_volatile(item as *mut T, T::default());
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MemoryPermission {
-    Read,
-    Write,
-    Execute,
-    ReadWrite,
-    ReadExecute,
-    ReadWriteExecute,
+pub enum IntrusionSeverity {
+    Low = 0,
+    Medium = 1,
+    High = 2,
+    Critical = 3,
+}
+
+/// A highly secure, rate-limiting intrusion monitor tracking process capability violations
+pub struct IntrusionMonitor {
+    pub max_allowed_violations: usize,
+    pub violation_count: AtomicUsize,
+    pub is_quarantined: core::sync::atomic::AtomicBool,
+}
+
+impl IntrusionMonitor {
+    pub fn new(max_violations: usize) -> Self {
+        IntrusionMonitor {
+            max_allowed_violations: max_violations,
+            violation_count: AtomicUsize::new(0),
+            is_quarantined: core::sync::atomic::AtomicBool::new(false),
+        }
+    }
+
+    /// Records a capability violation, returning the severity level and quarantine status
+    pub fn record_violation(&self, pid: u64) -> (IntrusionSeverity, bool) {
+        let count = self.violation_count.fetch_add(1, Ordering::SeqCst) + 1;
+        let mut quarantined = false;
+
+        let severity = if count >= self.max_allowed_violations {
+            self.is_quarantined.store(true, Ordering::SeqCst);
+            quarantined = true;
+            IntrusionSeverity::Critical
+        } else if count >= self.max_allowed_violations / 2 {
+            IntrusionSeverity::High
+        } else {
+            IntrusionSeverity::Medium
+        };
+
+        if quarantined {
+            // Logs to virtual security console
+            let _ = pid; // simulate quarantine notification
+        }
+
+        (severity, quarantined)
+    }
+
+    pub fn reset(&self) {
+        self.violation_count.store(0, Ordering::SeqCst);
+        self.is_quarantined.store(false, Ordering::SeqCst);
+    }
+}
+
+impl Default for IntrusionMonitor {
+    fn default() -> Self {
+        Self::new(5)
+    }
 }
 
 /// Memory protection state

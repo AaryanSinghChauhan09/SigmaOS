@@ -7,6 +7,15 @@
 pub mod append_rights;
 pub mod control;
 
+pub use crate::filesystem::ext4_ntfs_security::{
+    NtfsAce, NtfsDacl, NtfsSacl, NtfsSecurityDescriptor,
+};
+pub use control::{
+    AccessControlMatrix, AclEntry, AclTag, AclType, CapBoundingSet, DacPermission, FilterPolicy,
+    MacAddressFilter, MacSecurityLabel, PosixAcl, SensitivityLevel, ZeroTrustAccessGate,
+};
+pub use control::*;
+pub use append_rights::*;
 pub use crate::filesystem::ext4_ntfs_security::*;
 
 use std::string::{String, ToString};

@@ -32,3 +32,10 @@ pub use uefi::{
     MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
     SovereignBootWatchdog, UEFIBootloader, UsbHostController,
 };
+pub use firmware::{
+    CpuMicrocodePatchEngine, EfiVariable, EfiVariableStore, EsrtEntry, EsrtFirmwareType,
+    FirmwareCapsuleUpdateManager, IommuArchitecture, IommuFirmwareEngine, MicrocodeHeader,
+    MicrocodeVendor, SmbiosFirmwareParser, SmbiosType0BiosInfo, SmbiosType1SystemInfo,
+    SmbiosType2BaseboardInfo, SmbiosType3ChassisInfo, EFI_GLOBAL_VARIABLE_GUID,
+    SECURITY_DATABASE_GUID, efi_attr,
+};

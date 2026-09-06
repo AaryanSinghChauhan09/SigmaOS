@@ -950,8 +950,39 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_shell_redirection_parsing() {
-        let mut parser = Parser::new("echo hello > output.txt");
+    fn test_output_redirection_parsing_and_execution() {
+        let mut shell = Shell::new();
+        let res = shell.execute_line("echo hello world > output.txt");
+        assert!(res.is_ok());
+        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
+            log.contains("REDIRECT: FD 1 -> file 'output.txt'")
+        }));
+        let captured = shell.redirection_engine.get_captured_output(1).unwrap();
+        assert_eq!(captured, b"hello world\n");
+    }
+    #[test]
+    fn test_explicit_fd_stderr_redirection() {
+        let mut shell = Shell::new();
+        let res = shell.execute_line("echo error_msg 2> err.log");
+        assert!(res.is_ok());
+        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
+            log.contains("REDIRECT: FD 2 -> file 'err.log'")
+        }));
+    }
+
+    #[test]
+    fn test_fd_duplication_2_to_1() {
+        let mut shell = Shell::new();
+        let res = shell.execute_line("echo test 2>&1");
+        assert!(res.is_ok());
+        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
+            log.contains("REDIRECT: Dup Output FD 2 -> FD 1")
+        }));
+    }
+
+    #[test]
+    fn test_here_string_parsing() {
+        let mut parser = Parser::new("cat <<< 'sovereign_data'");
         let cmd = parser.parse().unwrap();
         match cmd {
             ShellCommand::Redirect(_child, redir) => {
@@ -961,59 +992,68 @@ mod tests {
             }
             _ => panic!("Expected Redirect command"),
         }
+    }
 
-        let mut parser2 = Parser::new("cat < input.txt");
-        let cmd2 = parser2.parse().unwrap();
-        match cmd2 {
-            ShellCommand::Redirect(_, redir) => {
-                assert_eq!(redir.src_fd, 0);
-                assert_eq!(redir.path, "input.txt");
-                assert_eq!(redir.kind, RedirectKind::Input);
+    #[test]
+    fn test_here_doc_parsing() {
+        let mut parser = Parser::new("cat << EOF\nline 1\nline 2\nEOF");
+        let cmd = parser.parse().unwrap();
+        match cmd {
+            ShellCommand::Redirect(_, RedirectSpec::HereDoc { delimiter, content, .. }) => {
+                assert_eq!(delimiter, "EOF");
+                assert!(content.contains("line 1"));
+                assert!(content.contains("line 2"));
             }
-            _ => panic!("Expected Redirect command"),
-        }
-
-        let mut parser3 = Parser::new("ls 2> error.log");
-        let cmd3 = parser3.parse().unwrap();
-        match cmd3 {
-            ShellCommand::Redirect(_, redir) => {
-                assert_eq!(redir.src_fd, 2);
-                assert_eq!(redir.path, "error.log");
-                assert_eq!(redir.kind, RedirectKind::Output);
-            }
-            _ => panic!("Expected Redirect command"),
-        }
-
-        let mut parser4 = Parser::new("command 2>&1");
-        let cmd4 = parser4.parse().unwrap();
-        match cmd4 {
-            ShellCommand::Redirect(_, redir) => {
-                assert_eq!(redir.src_fd, 2);
-                assert_eq!(redir.target_fd, Some(1));
-                assert_eq!(redir.kind, RedirectKind::DupOutput);
-            }
-            _ => panic!("Expected Redirect command"),
-        }
-
-        let mut parser5 = Parser::new("grep fn <<< fn main()");
-        let cmd5 = parser5.parse().unwrap();
-        match cmd5 {
-            ShellCommand::Redirect(_, redir) => {
-                assert_eq!(redir.src_fd, 0);
-                assert_eq!(redir.path, "fn main()");
-                assert_eq!(redir.kind, RedirectKind::HereString);
-            }
-            _ => panic!("Expected Redirect command"),
+            _ => panic!("Expected HereDoc redirect"),
         }
     }
 
     #[test]
-    fn test_shell_redirection_execution() {
-        let mut shell = Shell::new();
-        assert!(shell.execute_line("echo hello 2>&1").is_ok());
-        assert_eq!(shell.env.vars.get("FD_2_REDIRECT").unwrap(), "FD:1");
+    fn test_combined_output_redirection() {
+        let mut parser = Parser::new("echo hello &> combined.log");
+        let cmd = parser.parse().unwrap();
+        match cmd {
+            ShellCommand::Redirect(_, RedirectSpec::CombinedOutput { path, append }) => {
+                assert_eq!(path, "combined.log");
+                assert!(!append);
+            }
+            _ => panic!("Expected CombinedOutput redirect"),
+        }
+    }
 
-        assert!(shell.execute_line("cat << EOF").is_ok());
-        assert_eq!(shell.env.vars.get("FD_0_HEREDOC").unwrap(), "EOF");
+    #[test]
+    fn test_process_substitution_parsing() {
+        let mut parser = Parser::new("cat <(echo internal_sub)");
+        let cmd = parser.parse().unwrap();
+        match cmd {
+            ShellCommand::Redirect(_, RedirectSpec::ProcessSubInput { command, .. }) => {
+                match *command {
+                    ShellCommand::Simple(args) => {
+                        assert_eq!(args, alloc::vec!["echo", "internal_sub"]);
+                    }
+                    _ => panic!("Expected simple subcommand"),
+                }
+            }
+            _ => panic!("Expected ProcessSubInput redirect"),
+        }
+    }
+
+    #[test]
+    fn test_multiple_chained_redirections() {
+        let mut shell = Shell::new();
+        let res = shell.execute_line("echo chained > out.txt 2>&1");
+        assert!(res.is_ok());
+        assert!(shell.redirection_engine.redirection_log.iter().any(|log| log.contains("file 'out.txt'")));
+    }
+    #[test]
+    fn test_brace_expansion_and_arithmetic() {
+        let env = Environment::new();
+        assert_eq!(Environment::eval_arithmetic_expr("10 + 20"), 30);
+        assert_eq!(Environment::eval_arithmetic_expr("50 - 15"), 35);
+        assert_eq!(Environment::eval_arithmetic_expr("6 * 7"), 42);
+        let expanded = env.expand("Result is $(( 5 + 5 ))");
+        assert_eq!(expanded, "Result is 10");
+        let files = Environment::expand_braces("img_{1,2}.png");
+        assert_eq!(files, alloc::vec!["img_1.png", "img_2.png"]);
     }
 }

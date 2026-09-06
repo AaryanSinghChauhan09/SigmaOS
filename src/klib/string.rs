@@ -4,7 +4,6 @@ use std::string::{String, ToString};
 
 use super::vec::SigmaVec;
 use core::fmt;
-use core::ops::{Deref, DerefMut};
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

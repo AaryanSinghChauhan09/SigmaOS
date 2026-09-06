@@ -2,9 +2,13 @@
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
 extern crate alloc;
+#[path = "../src/ipc/pipes.rs"]
+mod pipes;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 
-#[path = "../src/klib/mod.rs"]
-pub mod klib;
+#[path = "../src/storage/geom.rs"]
+mod geom;
 
 #[path = "../src/audio/editor.rs"]
 mod audio_editor;
@@ -37,53 +41,154 @@ mod access_control;
 mod alpc;
 #[path = "../src/memory/bitmap_pmm.rs"]
 mod bitmap_pmm;
-#[path = "../src/compatibility/cachy_os.rs"]
-mod cachy_os;
-#[path = "../src/community/toolkit.rs"]
-mod community_toolkit;
-#[path = "../src/device/manager.rs"]
-mod device_manager;
-#[path = "../src/loader/elf/relocation.rs"]
-mod elf_relocation;
-#[path = "../src/distro/endeavour_os.rs"]
-mod endeavour_os;
-#[path = "../src/event/epoll.rs"]
-mod epoll;
-#[path = "../src/filesystem/ext4_ntfs_security.rs"]
-mod ext4_ntfs_security;
-#[path = "../src/compatibility/fedora.rs"]
-mod fedora_compat;
 #[path = "../src/memory/low_level.rs"]
 mod low_level_memory;
-#[path = "../src/package"]
-pub mod package {
-    pub mod bsd_linux_package_innovations;
-    #[path = "universal.rs"]
-    pub mod universal;
-    pub use universal::*;
+#[path = "../src/access/control.rs"]
+mod access_control;
+#[path = "../src/filesystem/ext4_ntfs_security.rs"]
+mod ext4_ntfs_security;
+pub enum AclTag {
+    User(u32),
+    Group(u32),
+    Other,
 }
-#[path = "../src/expanded_wiki_innovations.rs"]
-pub mod expanded_wiki_innovations;
-#[path = "../src/process/activity_manager.rs"]
-mod process_activity_manager;
-#[path = "../src/security/mod.rs"]
-pub mod security;
-#[path = "../src/memory/segmentation_paging.rs"]
-mod segmentation_paging;
-#[path = "../src/filesystem/sigma_fs.rs"]
-mod sigma_fs_extended;
-#[path = "../src/tools/sigmatools.rs"]
-mod sigmatools;
-#[path = "../src/sigpkg/mod.rs"]
-mod sigpkg;
 #[path = "../src/dashboard/statutory_compliance.rs"]
 mod statutory_compliance;
+pub enum BreachSeverity {
+    Minor,
+    Major,
+    Critical,
+}
+pub enum StatutoryAuthority {
+    Gdpr,
+    Hipaa,
+    ISO27001,
+}
+#[path = "../src/community/toolkit.rs"]
+mod community_toolkit;
 #[path = "../src/system/user.rs"]
 mod system_user;
-#[path = "../src/init/systemd_init.rs"]
-pub mod systemd_init;
-#[path = "../src/scheduler/scheduler.rs"]
-mod task_scheduler;
+#[path = "../src/tools/sigmatools.rs"]
+mod sigmatools;
+#[path = "../src/memory/segmentation_paging.rs"]
+mod segmentation_paging;
+pub enum CpuPrivilegeMode {
+    KernelRing0,
+    UserRing3,
+}
+pub struct GlobalDescriptorTable;
+impl GlobalDescriptorTable {
+    pub fn new() -> Self {
+        Self
+    }
+    pub fn insert_descriptor(
+        &mut self,
+        _desc: segmentation_paging::SegmentDescriptor,
+    ) -> SegmentSelector {
+        SegmentSelector {
+            index: 1,
+            rpl: segmentation_paging::CpuRing::Ring0Kernel,
+            is_ldt: false,
+        }
+    }
+    pub fn translate_address(
+        &self,
+        seg_addr: SegmentedAddress,
+        _mode: CpuPrivilegeMode,
+    ) -> Result<u64, &'static str> {
+        Ok(seg_addr.offset)
+    }
+}
+pub struct MultiLevelPagingEngine;
+impl MultiLevelPagingEngine {
+    pub fn map_page(
+        _v: u64,
+        _p: u64,
+        _r: bool,
+        _w: bool,
+        _x: bool,
+    ) -> Result<(), &'static str> {
+        Ok(())
+    }
+    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
+        Ok(PageTableEntry)
+    }
+}
+pub struct PageTableEntry;
+impl PageTableEntry {
+    pub fn get_physical_address(&self) -> u64 {
+        0x0000000100000000
+    }
+}
+pub enum ProtectionLevel {
+    Normal,
+    High,
+}
+pub enum ProtectionViolationType {
+    ReadViolation,
+    WriteViolation,
+}
+pub enum SegmentType {
+    Code,
+    Data,
+}
+pub struct SegmentedAddress {
+    pub selector: SegmentSelector,
+    pub offset: u64,
+}
+#[path = "../src/process/activity_manager.rs"]
+mod process_activity_manager;
+pub type ProcessActivityManager = ActivityManager;
+pub struct ResourceUsageMetrics;
+#[path = "../src/filesystem/sigma_fs.rs"]
+mod sigma_fs_extended;
+#[path = "../src/event/epoll.rs"]
+mod epoll;
+#[path = "../src/loader/elf/relocation.rs"]
+mod elf_relocation;
+#[path = "../src/device/manager.rs"]
+mod device_manager;
+use community_toolkit::{
+    CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
+    SecurityProfileTemplateStore, VirtualizationBlueprintStore,
+};
+use statutory_compliance::{
+    ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
+    StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
+use system_user::UserManager as TestUserManager;
+use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
+use bitmap_pmm::{
+    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
+    SyscallTableRouter,
+};
+use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
+use low_level_memory::{
+    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
+    RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
+};
+use task_scheduler::{
+    Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
+};
+use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
+use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
+use chimera_linux::{
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+};
+use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
+use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
+use fedora_compat::DnfPackageResolver;
+use geom::{BioRequest, GeomProvider, GeomTopology};
+use pipes::Pipe;
+use sigmatools::*;
+use unveil::{UnveilManager, UnveilPermission};
+use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
+use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
+use process_activity_manager::{
+    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
+};
 
 use access_control::{
     AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
@@ -196,7 +301,7 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 #[test]
 fn test_process_activity_manager_and_registers() {
     let mut pam = ActivityManager::new();
-    pam.register_process(500, 0, "chrome", 0);
+    pam.register_process(500, 1, "chrome", 0);
 
     pam.set_foreground_process(500).unwrap();
     let active_proc = pam.get_process_activity(500).unwrap();

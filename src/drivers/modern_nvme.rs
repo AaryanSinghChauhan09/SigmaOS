@@ -101,15 +101,6 @@ pub struct AhciCommandHeader {
 }
 
 
-/// AHCI Command Header Structure (alternative)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AhciCommandHeaderV2 {
-    pub opts: u8,
-    pub prdtl: u16,
-    pub prdbc: u16,
-    pub ctba: u32,
-    pub reserved: [u8; 4],
-}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
