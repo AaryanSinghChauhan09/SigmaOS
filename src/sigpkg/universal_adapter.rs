@@ -1,6 +1,4 @@
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
