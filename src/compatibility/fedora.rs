@@ -1,3 +1,4 @@
+#![allow(unexpected_cfgs)]
 use std::format;
 use std::vec;
 // SigmaOS Fedora Clean-Room Parity Subsystem

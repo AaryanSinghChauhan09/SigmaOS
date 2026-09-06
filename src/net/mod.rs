@@ -1,3 +1,4 @@
+pub mod sigma_netfilter;
 pub mod dns;
 pub mod socket;
 pub mod stack;

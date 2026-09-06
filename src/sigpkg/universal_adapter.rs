@@ -1,3 +1,7 @@
+#![allow(unexpected_cfgs)]
+#![allow(non_exhaustive_omitted_patterns)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
 
 use std::boxed::Box;
 use std::format;

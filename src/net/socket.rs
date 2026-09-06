@@ -1,3 +1,4 @@
+#![allow(unexpected_cfgs)]
 
 /// OOP-based Socket API for SigmaOS
 /// Based on Ideas-999-Structured: Networking & Communication Item 771

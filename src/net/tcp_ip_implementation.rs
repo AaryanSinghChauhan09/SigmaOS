@@ -1,3 +1,4 @@
+#![allow(unexpected_cfgs)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Functional TCP/IP Network Stack Implementation
 // Full-featured IPv4/TCP/UDP protocol suite with modern congestion control

@@ -196,3 +196,24 @@ pub use innovation::{
 pub mod docs;
 pub mod graphics;
 pub mod net;
+pub mod fs;
+
+// New sovereign OS-native implementations
+pub use kernel::sigma_scheduler_eevdf::{
+    SigmaEevdfRunqueue, SigmaTask, SigmaLoadBalancer,
+    DEFAULT_SLICE_NS, DEFAULT_WEIGHT, MIN_WEIGHT, MAX_WEIGHT,
+};
+pub use kernel::sigma_memory_zones::{
+    BuddyAllocator, MemoryZone, PressureLevel, SlabCache, ZoneAllocator, ZoneWatermarks,
+    PAGE_SIZE, MAX_ORDER,
+};
+pub use security::sigma_seccomp_bpf::{
+    FilterEngine, PledgePolicy, SeccompAction, SeccompFilter, SeccompRule,
+};
+pub use fs::sigma_overlay_fs::{
+    Layer, OverlayError, OverlayInode, OverlayMount, InodeKind,
+};
+pub use net::sigma_netfilter::{
+    Chain, ChainHook, IpProto, MatchCriteria, NatEntry, NatTable, NetfilterRule,
+    NetfilterTable, Packet, PacketVerdict,
+};

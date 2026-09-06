@@ -16,6 +16,7 @@
 // SigmaOS Filesystem Module
 // Virtual filesystem, journaling filesystems (Btrfs, XFS), and storage support
 
+pub mod sigma_overlay_fs;
 pub mod btrfs;
 // pub mod filesystem;
 pub mod sigmacas;

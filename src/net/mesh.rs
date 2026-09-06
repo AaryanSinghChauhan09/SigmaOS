@@ -1,3 +1,4 @@
+#![allow(unexpected_cfgs)]
 // SigmaNet Mesh: Stateless, zero-configuration peer-to-peer mesh networking
 // for collaborative secure file sharing in SigmaOS.
 

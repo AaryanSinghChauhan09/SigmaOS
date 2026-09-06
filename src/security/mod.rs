@@ -3,6 +3,7 @@ pub mod system_policy_rules;
 pub use system_policy_rules::*;
 
 // SigmaOS Security Subsystem
+pub mod sigma_seccomp_bpf;
 pub mod audit;
 pub mod capability;
 pub mod seccomp;
