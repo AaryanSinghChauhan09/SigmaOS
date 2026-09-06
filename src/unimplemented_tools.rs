@@ -5161,7 +5161,7 @@ impl NixGuixStoreGarbageCollectorTool {
 
 #[derive(Debug, Default, Clone)]
 pub struct OpenBsdUnveilAuditTool {
-    pub unveiled_rules: alloc::collections::BTreeMap<String, String>,
+    pub unveiled_rules: std::collections::BTreeMap<String, String>,
 }
 
 impl OpenBsdUnveilAuditTool {
@@ -5175,7 +5175,7 @@ impl OpenBsdUnveilAuditTool {
 
     pub fn check_path_access(&self, path: &str, requested_perm: char) -> bool {
         if let Some(perms) = self.unveiled_rules.get(path) {
-            perms.contains(requested_perm)
+            perms.chars().any(|c| c == requested_perm)
         } else {
             false
         }
