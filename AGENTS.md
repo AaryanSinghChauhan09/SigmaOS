@@ -9,6 +9,7 @@ This file provides instructions and guidelines for AI coding agents (Sentinel, P
 
 ## 2. Testing & Verification Requirements
 * **Primary Test Runner:** Always execute `./run_sigma_tests.sh` to run all 326 atomic tests, 57 subsystem inspection tests, and 11 security validation tests.
+* **Comprehensive Testing Guide:** Refer to `docs/AGENTS_TESTING_GUIDE.md` for full test suite management procedures.
 * **Standalone Subsystem Tests:** Subsystem unit tests can also be executed directly using `rustc --test`:
   * Security Input Validation: `rustc --test src/security/input_validation.rs --edition=2021 -o build/input_val_test && ./build/input_val_test`
   * Distro Innovations: `rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/missing_distros_test && ./build/missing_distros_test`
@@ -16,6 +17,8 @@ This file provides instructions and guidelines for AI coding agents (Sentinel, P
   * Ecosystem Bridge: `rustc --test src/compatibility/linux_bsd_ecosystem_bridge.rs --edition=2021 -o build/ecosystem_bridge_test && ./build/ecosystem_bridge_test`
   * Media Engine: `rustc --test src/media/distro_media_engine.rs --edition=2021 -o build/distro_media_test && ./build/distro_media_test`
   * Sovereign Commands: `rustc --test src/tools/sovereign_commands.rs --edition=2021 -o build/tools_test && ./build/tools_test`
+* **Python Integration & Stress Tests:** Run `pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py` or `python3 -m unittest discover -s tests -p "test_*.py"`.
+* **C11 Host Tests:** Compile C11 verification tests using `mkdir -p build/cpp_host_build && cd build/cpp_host_build && cmake ../../tests/cpp_host && make && ./host_tests`.
 
 ## 3. Security & Vulnerability Guidelines
 * **Input Validation:** Ensure strict validation on IP addresses, port numbers, usernames, and path traversal strings in `src/security/input_validation.rs`.

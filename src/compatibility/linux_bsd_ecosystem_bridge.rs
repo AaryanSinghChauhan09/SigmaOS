@@ -1,8 +1,8 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 /// Target ABI ecosystem family
@@ -39,8 +39,8 @@ impl UniversalSyscallAbiShim {
     pub fn translate_syscall(
         &mut self,
         syscall_num: u64,
-        arg1: u64,
-        arg2: u64,
+        _arg1: u64,
+        _arg2: u64,
         arg3: u64,
     ) -> SyscallTranslationResult {
         self.syscall_counter += 1;
