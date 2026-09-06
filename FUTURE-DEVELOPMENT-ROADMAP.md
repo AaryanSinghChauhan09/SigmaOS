@@ -4203,3 +4203,33 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 3. **Recycle Bin Bounds & 64-Byte CPU Cache Line Alignment**:
    - Lock-free recycle bins in `src/klib/custom_allocator.rs` must cap chunk retention at 64 entries.
    - Hot spinlock flags and ring buffer head/tail pointers must enforce 64-byte alignment (`#[repr(align(64))]`) to eliminate CPU cache false sharing.
+
+---
+
+## 86. SOVEREIGN AI AGENT CLOUD CARRIER OPERATION ARCHITECTURE SPECIFICATION
+
+### 86.1 Autonomous Agent Cloud Carrier Governance Rules
+
+1. **Sub-Second CARP / VRRP Failover**:
+   - Master and backup node failover state transitions (`src/network/distro_net.rs`) must automatically migrate Virtual IPs (VIPs) within < 50ms upon master node heartbeat loss.
+
+2. **OpenStack Cinder Volume Provisioning & Encryption**:
+   - Cloud block volume allocation (`src/open_source_os_gap_closure.rs`) must enforce AES/PQC volume encryption masks and tenant volume capacity limits.
+
+3. **5G/6G Cellular Slicing & OpenTelemetry Metrics**:
+   - Cellular carrier network slices (`src/unimplemented_features.rs`) must maintain strict cryptographic multi-tenant isolation and stream ingress telemetry to `SovereignOpenTelemetryMetricsCollector`.
+
+---
+
+## 87. SOVEREIGN AI AGENT CACHE OPERATION MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 87.1 Autonomous Agent Cache Operation Governance Rules
+
+1. **Explicit Cache Line Flushing (`clwb` / `clflushopt`)**:
+   - Persistent memory and NVDIMM structure updates must issue explicit `clwb`/`clflushopt` instructions followed by `sfence` barriers before transaction commits.
+
+2. **SMP Inter-Processor Interrupt (IPI) TLB Shootdowns**:
+   - Multi-core TLB page invalidations (`src/memory/tlb_associative.rs`) must issue IPI shootdown signals (`invlpg` / `tlbi`) to all active cores before freeing physical frames.
+
+3. **JIT Instruction Cache Synchronization**:
+   - Rosetta and eBPF dynamic binary code generation must flush and invalidate data/instruction caches (`isb`) prior to branch target jumps.
