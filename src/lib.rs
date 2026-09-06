@@ -202,6 +202,8 @@ pub mod ml;
 pub mod performance;
 
 pub mod distro;
+pub mod distro_innovations;
+pub mod distro_inspirations;
 pub mod innovation;
 pub use innovation::{
     BootStageKind, BootStageRecipe, ComposableBootSequencesEngine, DriverShard,
