@@ -4233,3 +4233,18 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 
 3. **JIT Instruction Cache Synchronization**:
    - Rosetta and eBPF dynamic binary code generation must flush and invalidate data/instruction caches (`isb`) prior to branch target jumps.
+
+---
+
+## 88. SOVEREIGN AI AGENT COMPUTER AIDED DESIGN (CAD) MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 88.1 Autonomous Agent CAD Management Governance Rules
+
+1. **Double Precision Geometry Representation**:
+   - 2D/3D parametric vector Drafting Engines (`src/unimplemented_tools.rs`) must maintain `f64` double precision floating point coordinates to prevent cumulative rounding errors in spatial transformations.
+
+2. **Parametric Geometric Constraint Solvers**:
+   - Dimension constraints (coincident, parallel, perpendicular, concentric) and quantity takeoff estimators (`src/compatibility/india_professional_tools.rs`) must converge iteratively without numerical overflow.
+
+3. **GPU-Accelerated Mesh Tessellation**:
+   - B-rep and NURBS surfaces must tessellate into 64-byte aligned GPU vertex/index buffers for scanout rendering via Zenith compositor graphics pipelines.

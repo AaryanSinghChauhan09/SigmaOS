@@ -2113,7 +2113,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkg_add" | "pkgsend" => {
+            "pkg" | "pkgsend" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
