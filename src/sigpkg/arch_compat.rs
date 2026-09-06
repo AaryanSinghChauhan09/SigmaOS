@@ -992,44 +992,6 @@ mod tests {
         assert_eq!(pkg_file.as_str(), "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
     }
-} // end mod tests (arch_compat first block)
-
-    #[test]
-    fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
-        let mut verifier = SAurP2pVerifier::new(
-            "swarm_arch_community_001",
-            "merkle_root_99887766554433221100",
-        );
-        assert!(verifier.verify_chunk_hash(0, b"chunk0_data_block"));
-        assert!(verifier.verify_chunk_hash(1, b"chunk1_data_block"));
-        assert_eq!(verifier.verified_chunks, 2);
-        assert!(verifier.is_swarm_integrity_valid());
-
-        let compiler = SAbsSimdCompiler::new(SimdTarget::Avx512, 3);
-        let flags = compiler.generate_compiler_flags();
-        assert!(flags.contains("skylake-avx512"));
-        assert!(flags.contains("opt-level=3"));
-
-        let compiled = compiler.compile_vectorized_binary("fn main() {}");
-        assert!(compiled.len() > 20);
-        let compiled_str = String::from_utf8_lossy(&compiled);
-        assert!(compiled_str.contains("S-ABS_SIMD_BINARY"));
-        assert!(compiled_str.contains("Avx512"));
-    }
-
-    #[test]
-    fn test_svntogit_migration_engine() {
-        let mut engine = SvntogitMigrationEngine::new();
-        let pkgbuild = "pkgname=linux-zen\npkgver=6.8.1";
-
-        let result = engine.migrate_svn_repo_layout("linux-zen", "extra", 450123, pkgbuild);
-        assert!(result.is_ok());
-        assert!(result.unwrap().contains("packages/linux-zen"));
-        assert_eq!(engine.migrated_packages.len(), 1);
-
-        let fail_res = engine.migrate_svn_repo_layout("empty-pkg", "extra", 450124, "");
-        assert!(fail_res.is_err());
-    }
 }
 
 // --- Arch Linux svntogit Repository Migration Engine ---
@@ -1077,5 +1039,46 @@ impl SvntogitMigrationEngine {
             "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
             pkgname, svn_revision, pkgname
         ))
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
+        let mut verifier = SAurP2pVerifier::new(
+            "swarm_arch_community_001",
+            "merkle_root_99887766554433221100",
+        );
+        assert!(verifier.verify_chunk_hash(0, b"chunk0_data_block"));
+        assert!(verifier.verify_chunk_hash(1, b"chunk1_data_block"));
+        assert_eq!(verifier.verified_chunks, 2);
+        assert!(verifier.is_swarm_integrity_valid());
+
+        let compiler = SAbsSimdCompiler::new(SimdTarget::Avx512, 3);
+        let flags = compiler.generate_compiler_flags();
+        assert!(flags.contains("skylake-avx512"));
+        assert!(flags.contains("opt-level=3"));
+
+        let compiled = compiler.compile_vectorized_binary("fn main() {}");
+        assert!(compiled.len() > 20);
+        let compiled_str = String::from_utf8_lossy(&compiled);
+        assert!(compiled_str.contains("S-ABS_SIMD_BINARY"));
+        assert!(compiled_str.contains("Avx512"));
+    }
+
+    #[test]
+    fn test_svntogit_migration_engine() {
+        let mut engine = SvntogitMigrationEngine::new();
+        let pkgbuild = "pkgname=linux-zen\npkgver=6.8.1";
+
+        let result = engine.migrate_svn_repo_layout("linux-zen", "extra", 450123, pkgbuild);
+        assert!(result.is_ok());
+        assert!(result.unwrap().contains("packages/linux-zen"));
+        assert_eq!(engine.migrated_packages.len(), 1);
+
+        let fail_res = engine.migrate_svn_repo_layout("empty-pkg", "extra", 450124, "");
+        assert!(fail_res.is_err());
     }
 }

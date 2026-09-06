@@ -12,9 +12,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::BTreeMap;

@@ -2,9 +2,9 @@
 // Implements NixOS/Guix-style declarative package management and functional store
 // Inspired by NixOS's declarative generations and Guix's functional package management
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Store path (NixOS-style hash-addressed paths)
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

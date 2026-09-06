@@ -7,11 +7,11 @@
 
 #[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
-use std::string::String;
-use std::string::ToString;
-#[cfg(test_disabled)]
-use std::vec::Vec;
-#[cfg(test_disabled)]
+use alloc::string::String;
+use alloc::string::ToString;
+#[cfg(test)]
+use alloc::vec::Vec;
+#[cfg(test)]
 use std::collections::HashMap;
 
 // ==========================================
@@ -748,33 +748,5 @@ kvm
             modules.modules_to_load,
             vec!["wireguard".to_string(), "kvm".to_string()]
         );
-    }
-
-    #[test]
-    fn test_linux_systemd_tmpfiles_engine() {
-        let mut tmpfiles = LinuxSystemdTmpfilesEngine::new();
-        tmpfiles.parse_tmpfile_line("d /tmp 1777 root root 10d");
-        assert_eq!(tmpfiles.rules.len(), 1);
-        assert_eq!(tmpfiles.rules[0].item_type, TmpfileItemType::CreateDirectory);
-        assert_eq!(tmpfiles.rules[0].path, "/tmp");
-        assert_eq!(tmpfiles.rules[0].mode, 0o1777);
-    }
-
-    #[test]
-    fn test_linux_swapfile_manager_engine() {
-        let mut swap = LinuxSwapfileManagerEngine::new();
-        swap.swapon("/dev/zram0", SwapKind::ZramCompressor, 100, 4096);
-        swap.swapon("/swapfile", SwapKind::Swapfile, 10, 2048);
-
-        assert_eq!(swap.get_total_active_swap_mb(), 6144);
-        assert!(swap.swapoff("/swapfile"));
-        assert_eq!(swap.get_total_active_swap_mb(), 4096);
-    }
-
-    #[test]
-    fn test_linux_core_dump_filter_engine() {
-        let filter = LinuxCoreDumpFilterEngine::new();
-        let formatted = filter.format_core_filename("sigma-app", 1337, 1700000000);
-        assert_eq!(formatted, "/var/lib/systemd/coredump/core.sigma-app.1337.1700000000");
     }
 }

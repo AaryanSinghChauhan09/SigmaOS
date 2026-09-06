@@ -205,19 +205,20 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
-            DistroSubsystemMode::LinuxAlpine
-            | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
+                DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                    supervisor == ServiceSupervisorType::Runit
+                }
 
-            DistroSubsystemMode::LinuxNix
-            | DistroSubsystemMode::LinuxGuix => supervisor == ServiceSupervisorType::Shepherd,
+                DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
+                    supervisor == ServiceSupervisorType::Shepherd
+                }
 
-            DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
-            DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-        };
-
-        !pkg_spec.is_empty() && !vfs_etc.is_empty() && supervisor_valid
+                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
+                DistroSubsystemMode::LinuxSlackware => {
+                    supervisor == ServiceSupervisorType::Sysvinit
+                }
+                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+            }
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
@@ -231,17 +232,20 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
-            DistroSubsystemMode::LinuxFedora
-            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
+            DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxOpenSuse => {
+                format!("{}.rpm", input_pkg)
+            }
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
-            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
+            DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
@@ -4914,7 +4918,7 @@ mod tests {
             ),
             (
                 DistroSubsystemMode::LinuxClear,
-                "bundle",
+                "swupd",
                 ServiceSupervisorType::Systemd,
             ),
             (

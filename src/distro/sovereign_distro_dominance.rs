@@ -871,7 +871,7 @@ impl SovereignDistroDominanceSuite {
             filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
             microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
             pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
-            popos_scheduler: popos_sched,
+            popos_scheduler: PopOsSystem76AutoScheduler::new(),
             talos_cluster: TalosHeadlessMtlsClusterEngine::new(
                 "talos-master-01",
                 "hash_init_declarative_001",

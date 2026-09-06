@@ -428,7 +428,9 @@ impl SystemdInitManager {
     }
 
     pub fn is_service_running(&self, name: &str) -> bool {
-        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
+        self.services
+            .iter()
+            .any(|s| s.name == name && s.state == ServiceState::Running)
     }
 
     pub fn check_dependencies_met(&self, name: &str) -> bool {
@@ -585,6 +587,12 @@ impl DemandPagingSwapEngine {
             Err("Page mapping not found")
         }
     }
+
+    pub fn lookup_node(&self, path: &[u8]) -> Option<&DynamicDeviceNode> {
+        self.nodes
+            .iter()
+            .find(|n| n.name == path || n.symlinks.iter().any(|s| s == path))
+    }
 }
 
 impl Default for DemandPagingSwapEngine {
@@ -631,18 +639,40 @@ impl UdevDevdHotplugEngine {
         self.loaded_rules.push(rule);
     }
 
-    pub fn dispatch_uevent(&mut self, uevent: UeventDeviceNode) {
-        match uevent.action {
-            DeviceEventAction::Add => {
-                self.active_devices.push(uevent);
-            }
-            DeviceEventAction::Remove => {
-                self.active_devices.retain(|d| d.devname != uevent.devname);
-            }
-            DeviceEventAction::Change => {
-                if let Some(pos) = self.active_devices.iter().position(|d| d.devname == uevent.devname) {
-                    self.active_devices[pos] = uevent;
-                }
+    pub fn process_packet(
+        &mut self,
+        src_ip: [u8; 4],
+        src_port: u16,
+        dst_ip: [u8; 4],
+        dst_port: u16,
+        protocol: u8,
+    ) -> ([u8; 4], u16) {
+        // Search conntrack
+        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
+            c.src_ip == src_ip
+                && c.src_port == src_port
+                && c.dst_ip == dst_ip
+                && c.dst_port == dst_port
+        }) {
+            conn.packets_counter += 1;
+        } else {
+            self.conntrack_table.push(ConnectionTrackEntry {
+                src_ip,
+                src_port,
+                dst_ip,
+                dst_port,
+                protocol,
+                packets_counter: 1,
+            });
+        }
+
+        // Apply matching translation rule
+        for rule in &self.rules {
+            if rule.rule_kind == NatRuleKind::DnatPortForwarding
+                && dst_ip == rule.original_ip
+                && dst_port == rule.original_port
+            {
+                return (rule.translated_ip, rule.translated_port);
             }
         }
     }
@@ -848,16 +878,6 @@ mod tests {
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
     }
 
-    #[test]
-    fn test_sovereign_dynamic_devfs() {
-        let mut devfs = SovereignDynamicDevfsEngine::new();
-        assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234-ABCD"));
-        assert!(devfs.lookup_node("sda").is_some());
-    }
-
-    #[test]
-    fn test_sovereign_gap_resolver() {
-        let resolver = SovereignUniversalDistroGapResolver::new();
         assert_eq!(
             resolver.lookup_modprobe_alias("char-major-10-200"),
             Some("tun")

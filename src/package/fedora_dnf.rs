@@ -2,9 +2,9 @@
 // Implements Fedora-style package management for SigmaOS
 // Inspired by Fedora's DNF for modern package operations
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// DNF error types
 #[derive(Debug, Clone)]

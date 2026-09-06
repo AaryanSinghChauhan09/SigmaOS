@@ -2,10 +2,11 @@
 // Implements Debian-style package management for SigmaOS
 // Inspired by Debian's APT for advanced package operations
 
-use crate::klib::HashSet;
-use std::collections::{BTreeMap, BTreeSet};
-use std::string::String;
-use std::vec::Vec;
+use crate::klib::collections::HashSet;
+use alloc::collections::BTreeMap;
+use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// APT error types
 #[derive(Debug, Clone)]

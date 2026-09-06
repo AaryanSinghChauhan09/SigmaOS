@@ -1854,4 +1854,17 @@ mod advanced_shell_tests {
     }
 
 
+        let line = "git checkout main";
+        let highlighted = repl.line_editor.highlight_line(line);
+        assert!(highlighted.contains("\x1B[32mgit\x1B[0m"));
+
+        let suggestion = repl.suggest_completion("git ch");
+        assert_eq!(suggestion, Some("checkout".to_string()));
+
+        let exec_res = repl.execute_repl_command("export KEY=VAL");
+        assert!(exec_res.is_ok());
+
+        let job_str = repl.jobs_cmd();
+        assert_eq!(job_str, "No active background jobs");
+    }
 }

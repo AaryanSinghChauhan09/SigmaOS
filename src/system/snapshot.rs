@@ -219,7 +219,7 @@ impl SnapshotStorage for FileSnapshotStorage {
             .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let _snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
+        let snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
         Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         Ok(())
@@ -360,7 +360,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
             .remove(&key)
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
-        let _snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
+        let snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
         Err("fs not available").map_err(|e| SnapshotError::IoError(e.to_string()))?;
 
         Ok(())

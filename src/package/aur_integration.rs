@@ -1,11 +1,13 @@
-use std::format;
-use std::vec;
+use alloc::format;
+use alloc::vec;
+extern crate alloc;
 // Enhanced AUR Integration for SigmaOS
 // Inspired by Arch Linux AUR with modern security features
 
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// AUR package metadata
 #[derive(Debug, Clone)]

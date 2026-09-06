@@ -30,6 +30,7 @@ pub mod gap_filling;
 pub mod generation_manager;
 pub mod io_uring;
 pub mod ipc;
+pub mod kqueue;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
@@ -69,6 +70,7 @@ pub use gap_closing::{
 pub use generation_manager::{Generation, GenerationManager};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
+pub use linux_bsd_innovations::*;
 pub use linux_bsd_innovations::{
     AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
     BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
@@ -111,31 +113,7 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use namespaces::{
-    KernelNamespace, NamespaceId, KernelNamespaceType, NamespaceConfig, NamespaceError,
-    NamespaceIdGenerator, next_namespace_id, MAX_NAMESPACES, MAX_PIDS_PER_NAMESPACE,
-};
+#[allow(ambiguous_glob_reexports)]
+pub use structures::*;
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-pub use linux_bsd_innovations::{
-    ArchUserRepoManager, BsdPfStateTable, PfFiveTuple, PfStateEntry,
-    LinuxFutexEngine, FutexOp, FutexWaiter, FreeBsdVfsNullfs, NullfsLayerNode,
-    AlpineHardenedEnv, OpenBsdPledge, BoundedBufferProducerConsumer,
-    BottomHalfKernelThread, SoftIrqType, AndroidBroadcastReceiverRegistry, BroadcastReceiver,
-    MultikernelMessagePassing, MultikernelMessage, NinePProtocolTranslator, NinePResource,
-    MicrokernelTranslatorRegistry, HurdTranslator, NanokernelHardwareBroker, NanokernelIrq,
-    SovereignZonesManager, SovereignZone, KmdfDriver, KmdfPnpState, KmdfPowerState, KmdfIoRequest,
-    AndroidBinderIpc, BinderNode, GcdDispatchQueue, GcdPriority, GcdTask, EbpfRuntime, EbpfInstruction,
-    HammerHistoryFilesystem, HammerBlockTransaction, CarpSecurityRouter, SovereignSwapEngine, SwapPage,
-    SovereignNamespaceContainer, NamespaceType, SovereignEventReactor, ReactorRegistration, ReactorEvent,
-    HybridKernelManager, NtExecutiveService, MicrokernelCore, ExokernelHardwareMultiplexer, ResourceBinding,
-    NetBsdRumpKernel, RumpComponent, DynamicLkmLoader, KernelModule, CapabilityDerivationTree, KernelCapability,
-    FreeBsdJail, NixOsDeclarativeManager, GentooUseFlags, VoidRunitInit,
-    SovereignCgroupGovernor, SovereignCgroupEntry, CgroupResourceLimits,
-    KernelFastPacketEngine, FastPacketFrame, XdpAction,
-    KernelAccessController, LandlockPathRule, LandlockAccessRight, PLEDGE_STDIO, PLEDGE_RPATH, PLEDGE_WPATH, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_INET, PLEDGE_UNIX, PLEDGE_EXEC,
-    InteractiveHybridScheduler, HybridTask,
-    CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
-    MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock,
-};
-pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};

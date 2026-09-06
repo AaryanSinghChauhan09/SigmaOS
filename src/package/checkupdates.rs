@@ -2,9 +2,9 @@
 // Implements Arch Linux's checkupdates functionality
 // Scans repository index diffs without locking the primary package database
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Package update information
 #[derive(Debug, Clone)]

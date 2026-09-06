@@ -14,10 +14,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-// (no_std only applicable at crate root - removed)
-
-use std::string::String;
-use std::vec::Vec;
+extern crate alloc;
+use alloc::format;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
@@ -961,8 +962,7 @@ mod tests {
     #[test]
     fn test_orphan_recovery() {
         let analyzer = ForensicAnalyzer::new();
-        let mut disk = std::vec![0u8; 2048];
-        // Inject a fake PNG signature
+        let mut disk = alloc::vec![0u8; 2048];
         let magic = b"\x89PNG\r\n\x1A\n";
         disk[500..500 + magic.len()].copy_from_slice(magic);
 

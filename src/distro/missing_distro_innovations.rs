@@ -862,16 +862,36 @@ impl MissingDistroComponentsEngine {
             records: BTreeMap::new(),
         };
 
-        engine.register_component("Portage USE Flags", "Gentoo", ComponentParityStatus::Implemented);
-        engine.register_component("APK Trigger Hooks", "Alpine", ComponentParityStatus::Implemented);
-        engine.register_component("AUR Recipe Helper", "Arch Linux", ComponentParityStatus::Implemented);
-        engine.register_component("Pledge & Unveil", "OpenBSD", ComponentParityStatus::Implemented);
-        engine.register_component("Jails & ZFS BootEnv", "FreeBSD", ComponentParityStatus::Implemented);
-        engine.register_component("RPM-OSTree Atomic Trees", "Fedora Silverblue", ComponentParityStatus::Implemented);
-        engine.register_component("AppArmor MAC Profiles", "Ubuntu", ComponentParityStatus::Implemented);
-        engine.register_component("Nix Flakes Lock System", "NixOS", ComponentParityStatus::Implemented);
-        engine.register_component("HAMMER2 PFS Clustering", "DragonFly BSD", ComponentParityStatus::Implemented);
-        engine.register_component("pkgsrc Cross-Platform Infrastructure", "NetBSD", ComponentParityStatus::Implemented);
+        engine.register_component(
+            "Portage USE Flags",
+            "Gentoo",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "APK Trigger Hooks",
+            "Alpine",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "AUR Recipe Helper",
+            "Arch Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Pledge & Unveil",
+            "OpenBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Jails & ZFS BootEnv",
+            "FreeBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "RPM-OSTree Atomic Trees",
+            "Fedora Silverblue",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
     }
@@ -1939,29 +1959,15 @@ mod tests {
         assert_eq!(stack.ip_address, "10.0.0.5");
     }
 
-// =========================================================================
-// NETBSD RUMP KERNEL SERVER ENGINE (NETBSD RUMP KERNEL USERLAND PARITY)
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct RumpKernelServer {
-    pub server_id: usize,
-    pub component_name: String,
-    pub _socket_path: String,
-    pub is_active: bool,
-}
-
-pub struct NetBsdRumpKernelServerEngine {
-    pub servers: Vec<RumpKernelServer>,
-    pub next_id: usize,
-}
-
-impl NetBsdRumpKernelServerEngine {
-    pub fn new() -> Self {
-        Self {
-            servers: Vec::new(),
-            next_id: 1,
-        }
+    #[test]
+    fn test_dragonfly_hammer2_emergency_cow() {
+        let mut hammer = DragonFlyHammer2EmergencyCowEngine::new(5 * 1024 * 1024);
+        let h1 = hammer.write_data_block(0, b"DATA_PAYLOAD_BLOCK").unwrap();
+        let h2 = hammer
+            .write_data_block(4096, b"DATA_PAYLOAD_BLOCK")
+            .unwrap();
+        assert_eq!(h1, h2);
+        assert_eq!(hammer.total_dedup_savings_bytes, 18);
     }
 
     pub fn start_rump_server(&mut self, component_name: &str) -> usize {

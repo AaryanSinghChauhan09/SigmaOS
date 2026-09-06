@@ -171,12 +171,10 @@ pub use mate_betsy::{
     MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
 };
 pub use mint_linux::{
-    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
-    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
-};
-pub use legacy_adapters::{
-    KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
+    Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
+    MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert, MintReportSystem,
+    MintSoftwareManager, MintTimeshiftEngine, MintUpdateManager, MintUpdatePackage,
+    TimeshiftSnapshot,
 };
 
 pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};
