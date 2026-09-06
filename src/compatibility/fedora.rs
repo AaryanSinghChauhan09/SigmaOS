@@ -4999,6 +4999,151 @@ mod tests {
     }
 
     #[test]
+    fn test_fedora_planet_and_infrastructures() {
+        // 1. Planet Aggregator
+        let mut planet = FedoraPlanetAggregationEngine::new();
+        planet.fetch_and_parse_feed("Matthew Miller", "Fedora 40 Release Update", "https://mattdm.org/f40", 1700000000);
+        assert_eq!(planet.posts.len(), 1);
+        assert_eq!(planet.get_latest_posts(1)[0].author_name, "Matthew Miller");
+
+        // 2. The New Hotness (Anitya)
+        let mut hotness = FedoraTheNewHotnessEngine::new();
+        hotness.register_upstream_project("python-requests", "https://requests.readthedocs.io");
+        let trigger_res = hotness.process_upstream_release_event("python-requests", "2.32.0").unwrap();
+        assert!(trigger_res.contains("python-requests version 2.32.0"));
+        assert!(hotness.monitored_projects[0].is_triggering_scratch_build);
+
+        // 3. rpmautospec Engine
+        let mut autospec = FedoraRpmAutoSpecEngine::new(42);
+        autospec.add_commit_log("Upstream release 2.32.0");
+        autospec.add_commit_log("Fix CVE-2024-XXXX vulnerability");
+        assert_eq!(autospec.generate_autorelease(1), "1.42");
+        let changelog = autospec.generate_autochangelog();
+        assert!(changelog.contains("%autochangelog"));
+        assert!(changelog.contains("Upstream release 2.32.0"));
+
+        // 4. Status FPO Engine
+        let mut status = FedoraStatusFpoEngine::new();
+        assert_eq!(status.query_service_health("koji"), FedoraServiceStatusState::Good);
+        status.set_service_status("bodhi", FedoraServiceStatusState::MinorOutage);
+        assert_eq!(status.query_service_health("bodhi"), FedoraServiceStatusState::MinorOutage);
+
+        // 5. FASJSON Client Engine
+        let mut fasjson = FedoraFasjsonClientEngine::new();
+        fasjson.register_user("alice", "Alice Developer", "alice@fedoraproject.org", &["packager", "sysadmin-main"]);
+        let user = fasjson.get_user_info("alice").unwrap();
+        assert_eq!(user.human_name, "Alice Developer");
+        assert!(fasjson.is_user_in_group("alice", "packager"));
+        assert!(!fasjson.is_user_in_group("alice", "provenpackager"));
+    }
+
+    #[test]
+    fn test_fedora_tahrir_identity_api_engine() {
+        let mut tahrir = FedoraTahrirIdentityApiEngine::new();
+
+        // 1. Register avatar
+        let email_hash = tahrir.register_user_avatar(
+            "alice_developer",
+            "alice@fedoraproject.org",
+            b"<svg>ALICE_AVATAR</svg>",
+            "image/svg+xml",
+        );
+        assert!(!email_hash.is_empty());
+
+        // 2. Resolve avatar by Libravatar email hash
+        let resolved = tahrir.resolve_avatar_by_hash(&email_hash).unwrap();
+        assert_eq!(resolved.user_id, "alice_developer");
+        assert_eq!(resolved.mime_type, "image/svg+xml");
+        assert_eq!(resolved.avatar_data, b"<svg>ALICE_AVATAR</svg>");
+
+        // 3. Issue OpenBadges assertion
+        let assertion = tahrir.issue_badge_assertion(
+            "package_artisan_2024",
+            "alice@fedoraproject.org",
+            "fedora_badges_bot",
+            1700000000,
+        );
+        assert_eq!(assertion.badge_id, "package_artisan_2024");
+        assert_eq!(assertion.recipient_email_hash, email_hash);
+        assert!(assertion.evidence_url.contains("package_artisan_2024"));
+
+        // 4. Verify OpenBadges assertion
+        assert!(tahrir.verify_badge_assertion(&assertion));
+
+        let fake_assertion = TahrirBadgeAssertion {
+            badge_id: "fake_badge".to_string(),
+            recipient_email_hash: "0000000000000000".to_string(),
+            issuer_id: "fake_issuer".to_string(),
+            issued_on_epoch: 0,
+            evidence_url: "".to_string(),
+            assertion_digest: "invalid_digest".to_string(),
+        };
+        assert!(!tahrir.verify_badge_assertion(&fake_assertion));
+    }
+
+    #[test]
+    fn test_fedora_fmn_messaging_engine() {
+        let mut fmn = FedoraFmnMessagingEngine::new();
+
+        // Register rule for user alice: interested in kernel builds via Matrix
+        fmn.register_filter_rule(FmnFilterRule {
+            rule_id: "rule-01".to_string(),
+            user_id: "alice@fedora".to_string(),
+            package_pattern: "kernel".to_string(),
+            topic_pattern: "buildsys".to_string(),
+            min_severity: FmnEventSeverity::Medium,
+            preferred_transport: FmnNotificationTransport::Matrix,
+        });
+
+        // Register rule for user bob: interested in critical alerts across all packages via Email
+        fmn.register_filter_rule(FmnFilterRule {
+            rule_id: "rule-02".to_string(),
+            user_id: "bob@fedora".to_string(),
+            package_pattern: "*".to_string(),
+            topic_pattern: "*".to_string(),
+            min_severity: FmnEventSeverity::Critical,
+            preferred_transport: FmnNotificationTransport::Email,
+        });
+
+        // Event 1: Low severity kernel build event -> Alice (min Medium) ignored, Bob (min Critical) ignored
+        let count1 = fmn.publish_event(FmnMessageEvent {
+            event_id: "evt-01".to_string(),
+            topic: "org.fedoraproject.prod.buildsys.task".to_string(),
+            package_name: "kernel".to_string(),
+            severity: FmnEventSeverity::Low,
+            summary: "Kernel scratch build started".to_string(),
+            timestamp_epoch: 1700000000,
+        });
+        assert_eq!(count1, 0);
+
+        // Event 2: High severity kernel build completed -> Alice matches!
+        let count2 = fmn.publish_event(FmnMessageEvent {
+            event_id: "evt-02".to_string(),
+            topic: "org.fedoraproject.prod.buildsys.task".to_string(),
+            package_name: "kernel".to_string(),
+            severity: FmnEventSeverity::High,
+            summary: "Kernel 6.8.0-1.fc40 build completed successfully".to_string(),
+            timestamp_epoch: 1700000100,
+        });
+        assert_eq!(count2, 1);
+        assert_eq!(fmn.dispatched_notifications_log[0].0, "alice@fedora");
+        assert_eq!(fmn.dispatched_notifications_log[0].1, FmnNotificationTransport::Matrix);
+
+        // Event 3: Critical security update for openssl -> Bob matches!
+        let count3 = fmn.publish_event(FmnMessageEvent {
+            event_id: "evt-03".to_string(),
+            topic: "org.fedoraproject.prod.bodhi.update.critical".to_string(),
+            package_name: "openssl".to_string(),
+            severity: FmnEventSeverity::Critical,
+            summary: "Critical security advisory FEDORA-2024-SEC01".to_string(),
+            timestamp_epoch: 1700000200,
+        });
+        assert_eq!(count3, 1);
+        assert_eq!(fmn.dispatched_notifications_log[1].0, "bob@fedora");
+        assert_eq!(fmn.dispatched_notifications_log[1].1, FmnNotificationTransport::Email);
+    }
+
+    #[test]
     fn test_fedora_btrfs_snapper_snapshot_engine() {
         let mut snapper = FedoraBtrfsSnapperSnapshotEngine::new("/.snapshots/1/snapshot");
         let sid = snapper.create_pre_transaction_snapshot("Pre-dnf update");

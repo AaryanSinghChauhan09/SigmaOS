@@ -2314,9 +2314,7 @@ impl UniversalFormatConverter {
 
         match format {
             PackageFormat::Apt => {
-                let parsed = adapter
-                    .parse_apt_control(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
+                let parsed = adapter.parse_apt_control(&text).map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -2332,9 +2330,7 @@ impl UniversalFormatConverter {
                     .map_err(|e: &'static str| e.to_string())
             }
             PackageFormat::Pacman => {
-                let parsed = adapter
-                    .parse_pacman_pkgbuild(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
+                let parsed = adapter.parse_pacman_pkgbuild(&text).map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -2349,10 +2345,8 @@ impl UniversalFormatConverter {
                     )
                     .map_err(|e: &'static str| e.to_string())
             }
-            PackageFormat::Yum | PackageFormat::Pisi => {
-                let parsed = adapter
-                    .parse_rpm_spec(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
+            PackageFormat::Yum => {
+                let parsed = adapter.parse_rpm_spec(&text).map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .requires
                     .iter()
@@ -2367,143 +2361,11 @@ impl UniversalFormatConverter {
                     )
                     .map_err(|e: &'static str| e.to_string())
             }
-            PackageFormat::Apk => {
-                let parsed = adapter
-                    .parse_apkindex(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
-                let canonical_deps: Vec<String> = parsed
-                    .depends
-                    .iter()
-                    .map(|d| self.dep_mapper.to_canonical_name(d))
-                    .collect();
-                adapter
-                    .translate_to_native_package(
-                        &parsed.pkgname,
-                        &parsed.pkgver,
-                        &parsed.pkgdesc,
-                        &canonical_deps,
-                    )
-                    .map_err(|e: &'static str| e.to_string())
-            }
-            PackageFormat::Xbps => {
-                let parsed = adapter
-                    .parse_xbps_manifest(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
-                let canonical_deps: Vec<String> = parsed
-                    .run_depends
-                    .iter()
-                    .map(|d| self.dep_mapper.to_canonical_name(d))
-                    .collect();
-                adapter
-                    .translate_to_native_package(
-                        &parsed.pkgname,
-                        &parsed.version,
-                        &parsed.short_desc,
-                        &canonical_deps,
-                    )
-                    .map_err(|e: &'static str| e.to_string())
-            }
-            PackageFormat::Portage => {
-                let parsed = adapter
-                    .parse_gentoo_ebuild("package.ebuild", &text)
-                    .map_err(|e: &'static str| e.to_string())?;
-                let mut raw_deps = parsed.rdepend.clone();
-                raw_deps.extend(parsed.depend.clone());
-                let canonical_deps: Vec<String> = raw_deps
-                    .iter()
-                    .map(|d| self.dep_mapper.to_canonical_name(d))
-                    .collect();
-                adapter
-                    .translate_to_native_package(
-                        &parsed.package_name,
-                        &parsed.version,
-                        &parsed.description,
-                        &canonical_deps,
-                    )
-                    .map_err(|e: &'static str| e.to_string())
-            }
-            PackageFormat::Snap => {
-                let parsed = adapter
-                    .parse_snapcraft_yaml(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
-                let canonical_deps: Vec<String> = parsed
-                    .plugs
-                    .iter()
-                    .map(|d| self.dep_mapper.to_canonical_name(d))
-                    .collect();
-                adapter
-                    .translate_to_native_package(
-                        &parsed.name,
-                        &parsed.version,
-                        &parsed.summary,
-                        &canonical_deps,
-                    )
-                    .map_err(|e: &'static str| e.to_string())
-            }
-            PackageFormat::Flatpak => {
-                let parsed = adapter
-                    .parse_flatpak_json(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
-                let canonical_deps: Vec<String> = parsed
-                    .finish_args
-                    .iter()
-                    .map(|d| self.dep_mapper.to_canonical_name(d))
-                    .collect();
-                adapter
-                    .translate_to_native_package(
-                        &parsed.app_id,
-                        "1.0.0",
-                        "Flatpak Sandboxed App",
-                        &canonical_deps,
-                    )
-                    .map_err(|e: &'static str| e.to_string())
-            }
             _ => {
-                if text.contains("Package:") && text.contains("Version:") {
-                    let deb = adapter
-                        .parse_apt_control(&text)
-                        .map_err(|e: &'static str| e.to_string())?;
-                    let canonical_deps: Vec<String> = deb
-                        .depends
-                        .iter()
-                        .map(|d| self.dep_mapper.to_canonical_name(d))
-                        .collect();
-                    adapter
-                        .translate_to_native_package(
-                            &deb.package,
-                            &deb.version,
-                            &deb.description,
-                            &canonical_deps,
-                        )
-                        .map_err(|e: &'static str| e.to_string())
-                } else if text.contains("pkgname=") && text.contains("pkgver=") {
-                    let pkgbuild = adapter
-                        .parse_pacman_pkgbuild(&text)
-                        .map_err(|e: &'static str| e.to_string())?;
-                    let canonical_deps: Vec<String> = pkgbuild
-                        .depends
-                        .iter()
-                        .map(|d| self.dep_mapper.to_canonical_name(d))
-                        .collect();
-                    adapter
-                        .translate_to_native_package(
-                            &pkgbuild.pkgname,
-                            &pkgbuild.pkgver,
-                            &pkgbuild.pkgdesc,
-                            &canonical_deps,
-                        )
-                        .map_err(|e: &'static str| e.to_string())
-                } else {
-                    let name = format!("{:?}-converted-pkg", format).to_lowercase();
-                    adapter
-                        .translate_to_native_package(
-                            &name,
-                            "1.0.0",
-                            "Converted foreign package",
-                            &[],
-                        )
-                        .map_err(|e: &'static str| e.to_string())
-                }
+                let name = format!("{:?}-converted-pkg", format).to_lowercase();
+                adapter
+                    .translate_to_native_package(&name, "1.0.0", "Converted foreign package", &[])
+                    .map_err(|e: &'static str| e.to_string())
             }
         }
     }

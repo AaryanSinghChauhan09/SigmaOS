@@ -1,58 +1,48 @@
-# AI Agent Directives & Coding Guidelines for SigmaOS
+# AGENTS.md — Access Management & Operating Guidelines for AI Agents in SigmaOS
 
-This file provides instructions and guidelines for AI coding agents (Sentinel, Palette, Bolt, Jules) working on the SigmaOS codebase.
+## Overview
+This document specifies access control policies, security boundaries, sandboxing protocols, and operational guidelines for AI agents (such as Claude Code, Codex, Grok, Gemini, and local LLM agents managed by Herdr) operating within or interacting with SigmaOS.
 
-## 1. Zero-Dependency & `#![no_std]` Architecture Rules
-* **Core Primitives:** `src/klib/` provides `#![no_std]` native Rust replacements for standard data structures (`BTreeMap`, `Vec`, `HashMap`, `JsonParser`, `String`).
-* **Zero Allocation Primitives:** Prefer stack-based, zero-allocation primitives in cold paths (e.g. `u64_to_hex_str_stack`, `parse_u64_str` in `src/klib/conversion.rs`).
-* **C++ Dependency Reduction:** Write new host/kernel code in safe, native Rust or standard C11. Avoid introducing new C++ dependencies.
+---
 
-## 2. Testing & Verification Requirements
-* **Primary Test Runner:** Always execute `./run_sigma_tests.sh` to run all 326 atomic tests, 57 subsystem inspection tests, and 11 security validation tests.
-* **Comprehensive Testing Guide:** Refer to `docs/AGENTS_TESTING_GUIDE.md` for full test suite management procedures.
-* **Standalone Subsystem Tests:** Subsystem unit tests can also be executed directly using `rustc --test`:
-  * Security Input Validation: `rustc --test src/security/input_validation.rs --edition=2021 -o build/input_val_test && ./build/input_val_test`
-  * Distro Innovations: `rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/missing_distros_test && ./build/missing_distros_test`
-  * Distro Gaps: `rustc --test src/distro/linux_bsd_distro_gaps.rs --edition=2021 -o build/distro_gaps_test && ./build/distro_gaps_test`
-  * Ecosystem Bridge: `rustc --test src/compatibility/linux_bsd_ecosystem_bridge.rs --edition=2021 -o build/ecosystem_bridge_test && ./build/ecosystem_bridge_test`
-  * Media Engine: `rustc --test src/media/distro_media_engine.rs --edition=2021 -o build/distro_media_test && ./build/distro_media_test`
-  * Sovereign Commands: `rustc --test src/tools/sovereign_commands.rs --edition=2021 -o build/tools_test && ./build/tools_test`
-* **Python Integration & Stress Tests:** Run `pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py` or `python3 -m unittest discover -s tests -p "test_*.py"`.
-* **C11 Host Tests:** Compile C11 verification tests using `mkdir -p build/cpp_host_build && cd build/cpp_host_build && cmake ../../tests/cpp_host && make && ./host_tests`.
+## 1. Access Control & Authentication Principles
 
-## 3. Security & Vulnerability Guidelines
-* **Input Validation:** Ensure strict validation on IP addresses, port numbers, usernames, and path traversal strings in `src/security/input_validation.rs`.
-* **IPv4 Validation:** Never allow leading zeros in multi-digit IPv4 octets (e.g. reject `010.0.0.1`) to prevent octal parser differential attacks and SSRF bypasses.
-* **CI/CD Hardening:** All GitHub Actions workflows in `.github/workflows/` must pin third-party actions to immutable 40-character commit SHAs and specify explicit least-privilege `permissions: contents: read`.
+1. **Least Privilege Enforcement**:
+   - AI agents operate under unprivileged, sandboxed execution domains by default (`agent_domain_t`).
+   - Privileged operations (e.g., kernel module loading, system-wide configuration changes, raw disk write access) require explicit user elevation or capability tokens validated through PAM / `doas` policy enforcers.
 
-## 4. Context & Persona Switching Directives
-* **Persona Roles:** Follow `docs/AGENTS_SWITCHING_GUIDE.md` when transitioning operational focus between **Sentinel** (Security), **Palette** (UX/a11y), **Bolt** (Performance), and **Jules** (Engineering).
-* **State Handoff Verification:** Always run `./run_sigma_tests.sh` and call `initiate_memory_recording` before switching persona operational contexts or submitting pull requests.
+2. **Scoped Capability Delegation**:
+   - OpenBSD-inspired `pledge(2)` and `unveil(2)` syscall restriction gates are mandatory for agent subprocesses.
+   - Default pledge promises: `stdio rpath wpath cpath inet`. High-risk promises such as `exec` or `id` require explicit policy authorization.
+   - FreeBSD Capsicum capability mode restricts file descriptor rights (`CAP_READ`, `CAP_WRITE`, `CAP_SEEK`) for active agent process trees.
 
-## 5. Spinlock & Synchronization Directives
-* **Spinlock Guide:** Adhere to `docs/AGENTS_SPINLOCK_MANAGEMENT_GUIDE.md` for `#![no_std]` spinlock primitives, atomic memory ordering (`Acquire`/`Release`/`SeqCst`), interrupt-safe `lock_irqsave` wrappers, and deadlock prevention rules.
-* **No Std Mutexes:** Never import `std::sync::Mutex` or `std::sync::RwLock` in core kernel and `klib` modules.
+3. **Herdr Multi-Agent Isolation**:
+   - Parallel AI agent tasks spawned via `OmarchyHerdrAiAgentManager` are isolated into separate microVM / OCI container shards (`SigmaContainer`).
+   - Inter-agent communication is restricted to encrypted IPC channels (`ZeroCopyIpcChannel` / `SovereignIpcBus`) with mandatory Dilithium-5 cryptographic message signatures.
 
-## 6. Protection Access Rights & Memory Security Directives
-* **Protection Rights Guide:** Adhere to `docs/AGENTS_PROTECTION_RIGHTS_GUIDE.md` for `mprotect` W^X page protection rules, TLB `invlpg` invalidation, OpenBSD `pledge`/`unveil` monotonic privilege reduction, FreeBSD Capsicum descriptor rights limits, and AppArmor MAC profile enforcement.
-* **W^X Rule:** Never assign `PROT_WRITE` and `PROT_EXEC` to the same virtual memory page frame simultaneously.
+---
 
-## 7. Block Device & Storage Directives
-* **Block Storage Guide:** Adhere to `docs/AGENTS_BLOCKS_MANAGEMENT_GUIDE.md` for NVMe/VirtIO block drivers, Kyber/BFQ I/O schedulers, JBD2 Merkle transactional logging, and HAMMER2 block deduplication.
-* **CoW Safety:** Never overwrite active CoW snapshot blocks directly; use Copy-on-Write allocation guards.
+## 2. Sandboxing & Memory Protection
 
-## 8. Class Operation & Subsystem Vtable Directives
-* **Class Operation Guide:** Adhere to `docs/AGENTS_CLASS_OPERATION_MANAGEMENT_GUIDE.md` for zero-allocation kernel vtable structures (`FileOperations`, `VnodeOps`, `SchedClass`, `NetDeviceOps`, `BlockDeviceOps`), atomic class registration, and C11 FFI interoperability.
-* **Zero Heap Allocation:** Never allocate heap objects inside core vtable method dispatch paths.
+- **Landlock LSM v5 Rules**: File system paths outside designated project workspaces (`/app`, `/tmp/agent_sandbox`) are masked read-only or hidden entirely using Landlock path rules.
+- **Secret Memory Isolation**: Memory regions storing cryptographic credentials, user credentials, or API keys are backed by `memfd_secret(2)` to prevent unauthorized process inspection or memory dump leakage.
+- **Resource Control Quotas**: Cgroup v2 transient slices limit CPU quotas (e.g., max 200% CPU), RAM caps (e.g., 4GB max), and process thread limits to prevent denial-of-service condition or resource exhaustion.
 
-## 9. Task Assignment & Governance Directives
-* **Assignment Guide:** Follow `docs/AGENTS_ASSIGNMENT_MANAGEMENT_GUIDE.md` for task routing, triage protocols, subagent delegation rules, and submission criteria.
-* **Persona Routing:** Route security tasks to **Sentinel**, UI/a11y to **Palette**, performance to **Bolt**, and distro infrastructure to **Jules**.
+---
 
-## 10. Information Management & Knowledge Base Directives
-* **Information Guide:** Adhere to `docs/AGENTS_INFORMATION_MANAGEMENT_GUIDE.md` for knowledgebase lookup protocols, memory recording requirements, and context prioritization (User Directives > Source Code State > Memory Context).
-* **Memory Recording:** Always call `initiate_memory_recording` before completing a task or submitting code.
+## 3. Mandatory Audit & Logging
 
-## 11. Documentation & Wiki Alignment
-* **In-Tree Troff Man Pages:** Keep `docs/man/man1/` and `docs/man/man8/` troff manual pages up to date when modifying commands or system utilities.
-* **Wiki Sync Utility:** Run `./scripts/sync_wiki.sh` after updating documentation assets to synchronize files across `WIKI/`, `wiki/`, and `wiki_repo/`.
+- Every agent-initiated system call, privilege elevation attempt, file modification, and network request is logged to the `journald` structured log stream (`UnifiedLogEntry`) with fields `_AGENT_ID`, `_AGENT_PROVIDER`, and `_CAPABILITY_TOKEN`.
+- Audit logs are protected by append-only journal storage and cryptographic Merkle tree hash chains (`Jbd2TransactionLedger`).
+
+---
+
+## 4. Operational Instructions for Development Agents
+
+- **Zero-Dependency Mandate**: Do not add external crate dependencies to `Cargo.toml`. Preserve `#![no_std]` compatibility across core OS crates.
+- **Proactive Testing**: After editing files, verify changes using native test scripts (`./run_sigma_tests.sh`, `./scripts/sync_wiki.sh`, and `pytest tests/`).
+- **Git Conventions**: Commit messages must follow standard git conventions (short subject line <= 50 chars, detailed body if necessary). Branch names must start with `jules-`.
+
+---
+
+*Last Updated: 2026*

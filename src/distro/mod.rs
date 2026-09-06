@@ -176,3 +176,55 @@ pub use ready_to_use::{
     UserAccount, SessionEnvironment, InteractiveUserEnvironment, DeviceCategory,
     HardwareEvent, DeviceNode, PlugAndPlayHardwareManager,
 };
+
+pub use missing_distro_innovations::{
+    ClearLinuxStatelessEngine, TailsAmnesicEngine, DinitServiceState, DinitService,
+    ChimeraDinitSupervisor, SolusEopkgManager, MageiaUrpmiEngine, BedrockStratum,
+    BedrockLinuxStrataEngine, SmartOsVmBrand, SmartOsVmState, SmartOsImage, SmartOsVmConfig,
+    SmartOsZoneEngine,
+};
+
+pub use linux_bsd_inspirations::{
+    SovereignUniversalDistroBridge, DistroSubsystemMode, ServiceSupervisorType,
+    SovereignEbpfEngine, ArchDependencyResolver, FreeBSDJail, OpenBSDUnveil, OpenBSDPledge,
+    NixStyleStore, AptPinStore, NetBsdRumpRouter, GentooUseFlagsManager, OpenRCService,
+    SovereignIoUring, SovereignLandlockLsm, SovereignRingBuffer, DrmModeInfo, SovereignBpfCoReEngine,
+    BsdCapsicumRights, Hammer2MultiVersionEngine, SovereignOstreeEngine, SovereignRunitSupervisor,
+    SovereignZfsPoolEngine, SovereignKaslrWxAllocator, SovereignDTraceEngine, SovereignRaidSelfHealer,
+    SovereignDeclarativeSystemEngine, SovereignPrivSepSandbox, SerpentMossEngine, CachyBoreScheduler,
+    FreeBsdRacctVnetGuard, OpenBsdPledgeUnveilSentinel, SovereignBcachefsTieringEngine,
+    SovereignIllumosZonesEngine, SovereignDragonflyNpotEngine, StorageTier, ZoneBrand, ZoneState,
+    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+    HermeticStoreClosureEngine, StoreClosurePackage, System76PowerGovernor, PowerProfileMode,
+    GpuSwitchMode, Hammer2PfsClusterQuorumEngine, PfsNodeVote, HardenedBsdPaxGuardEngine,
+    PaxViolationType, PaxViolationLog, ApkXbpsHookEngine, OpenBsdRetguardEngine,
+};
+
+pub use sovereign_distro_dominance::{
+    SovereignDistroDominanceSuite, NixGuixZeroCopyStore, CachyBoreDynamicAiScheduler,
+    OpenBsdHardenedCapsicumPledge, ZfsBtrfsHybridSelfHealingCoW, SovereignMicrovmHypervisorGateway,
+    SovereignPqcWireguardVpnEngine, MicrovmState, VirtioConfig, WireguardPeer,
+};
+
+pub mod void_xbps_src;
+pub mod nextgen_innovations;
+pub mod omarchy_inspiration;
+
+pub use omarchy_inspiration::{
+    OmarchyQuickshellEngine, ShellComponentKind, QuickshellWidget,
+    OmarchySystemThemeStudio, OmarchyThemePalette,
+    OmarchyLuaConfigEngine,
+    OmarchyPluginMarketplace, OmarchyPluginEntry,
+    OmarchyHerdrAiAgentManager, AiAgentProvider, HerdrAgentTask,
+    OmarchyReleaseChannelSnapshotEngine, OmarchyReleaseChannel, PreflightSnapshot,
+};
+pub mod universal_distro_super_matrix;
+pub use universal_distro_super_matrix::{UniversalDistroSuperMatrix, DistroCategory, DistroCapabilityProfile};
+pub use nextgen_innovations::{
+    SigmaHyperKernel, PredictedTask, WorkloadLatencyClass, SigmaCacheFlow, AdaptiveCacheModule,
+    SigmaVector, SimdInstructionSet, SigmaThermal, ThermalGovernorState, SigmaMod,
+    KernelModuleHeader, SigmaContainer, NativeContainerSpec, SigmaProfile, OperatingProfileKind,
+    SigmaLayer, OSLayer, SigmaLink, NetworkMediaKind, SigmaEdgeNet, SigmaSecureNet, SigmaCollab,
+    CollabWorkspacePeer, SigmaAssist, TroubleshootingDiagnostic, SigmaRollback, SystemSnapshot,
+    SigmaDoc, DocumentationTopic, SigmaRescue,
+};

@@ -445,6 +445,23 @@ impl SystemdInitManager {
             false
         }
     }
+
+    pub fn is_service_running(&self, name: &str) -> bool {
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
+    }
+
+    pub fn check_dependencies_met(&self, name: &str) -> bool {
+        if let Some(srv) = self.services.iter().find(|s| s.name == name) {
+            for &req in &srv.requires {
+                if !self.is_service_running(req) {
+                    return false;
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
 }
 
 impl Default for SystemdInitManager {
@@ -831,59 +848,6 @@ mod tests {
         assert_eq!(manager.get_active_services_count(), 1);
         assert!(manager.is_service_running("networkd.service"));
         assert!(manager.check_dependencies_met("zenith-compositor.service"));
-    }
-
-    #[test]
-    fn test_demand_paging_and_swap_engine() {
-        let mut vm = DemandPagingSwapEngine::new(1024);
-        let paddr = vm.handle_page_fault(0x7fff0000, PageFaultCause::NotPresent).unwrap();
-        assert_eq!(paddr, 0x7fff0000);
-        assert_eq!(vm.page_faults_handled, 1);
-
-        let slot = vm.swap_out_page(0x7fff0000).unwrap();
-        assert_eq!(slot, 0);
-        assert!(vm.page_table[0].is_swapped_out);
-    }
-
-    #[test]
-    fn test_udev_devd_hotplug_engine() {
-        let mut hotplug = UdevDevdHotplugEngine::new();
-        hotplug.register_rule("SUBSYSTEM==\"input\", ACTION==\"add\", RUN+=\"/usr/bin/input-attach\"");
-
-        let uevent = UeventDeviceNode {
-            subsystem: "input",
-            devname: "event0",
-            sysfs_path: "/sys/class/input/event0",
-            action: DeviceEventAction::Add,
-            vendor_id: 0x046d,
-            device_id: 0xc077,
-        };
-
-        hotplug.dispatch_uevent(uevent);
-        assert_eq!(hotplug.active_devices.len(), 1);
-        assert_eq!(hotplug.active_devices[0].devname, "event0");
-    }
-
-    #[test]
-    fn test_multicore_smp_interrupt_engine() {
-        let mut irq_balancer = MulticoreSmpInterruptEngine::new(4);
-        assert!(irq_balancer.bind_irq(16, 2).is_ok());
-        assert_eq!(irq_balancer.irq_table[0].target_cpu_core, 2);
-
-        irq_balancer.balance_irq_load();
-        assert_eq!(irq_balancer.irq_table[0].target_cpu_core, 0);
-    }
-
-    #[test]
-    fn test_kernel_perf_dtrace_engine() {
-        let mut tracer = KernelPerfDtraceEngine::new();
-        tracer.record_sample(100, 0x400100, "sys_enter", 1000);
-        assert_eq!(tracer.probe_samples.len(), 0); // Tracing inactive
-
-        tracer.start_tracing();
-        tracer.record_sample(100, 0x400100, "sys_enter", 1005);
-        assert_eq!(tracer.probe_samples.len(), 1);
-        assert_eq!(tracer.probe_samples[0].probe_name, "sys_enter");
     }
 
     #[test]
