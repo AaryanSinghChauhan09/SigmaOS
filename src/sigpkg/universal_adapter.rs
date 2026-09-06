@@ -23,11 +23,11 @@ use crate::sigpkg::universal_oop_system;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
+#[cfg(test)]
+pub use crate::sigpkg::Version;
 
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::universal_engine::PackageFormat;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
