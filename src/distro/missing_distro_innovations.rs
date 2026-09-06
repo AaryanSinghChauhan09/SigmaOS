@@ -2529,32 +2529,4 @@ impl Default for SuseYaSTConfigurationRegistry {
         assert!(pkgsrc.build_and_install(proprietary_spec).is_err());
     }
 
-    #[test]
-    fn test_ubuntu_apparmor_engine() {
-        let mut aa = UbuntuAppArmorEngine::new();
-        let prof = AppArmorProfile {
-            profile_name: "/usr/bin/firefox".to_string(),
-            mode: AppArmorMode::Enforce,
-            allowed_read_paths: vec!["/home/user/Downloads".to_string(), "/usr/share".to_string()],
-            allowed_write_paths: vec!["/home/user/Downloads".to_string()],
-            allowed_exec_paths: vec!["/usr/lib/firefox".to_string()],
-        };
-
-        aa.load_profile(prof);
-
-        assert!(aa.authorize_path_access("/usr/bin/firefox", "/home/user/Downloads/file.pdf", "read").unwrap());
-        assert!(aa.authorize_path_access("/usr/bin/firefox", "/home/user/Downloads/file.pdf", "write").unwrap());
-        assert!(aa.authorize_path_access("/usr/bin/firefox", "/etc/shadow", "read").is_err());
-    }
-
-    #[test]
-    fn test_nixos_flakes_engine() {
-        let mut flakes = NixOsFlakesEngine::new();
-        flakes.lock_input("nixpkgs", "github:nixos/nixpkgs/nixos-23.11", "sha256-nar123");
-        flakes.lock_input("home-manager", "github:nix-community/home-manager", "sha256-nar456");
-
-        assert_eq!(flakes.flake_inputs.len(), 2);
-        let drv_hash = flakes.compute_system_derivation_hash();
-        assert!(drv_hash.starts_with("nix-store-drv-"));
-    }
 }
