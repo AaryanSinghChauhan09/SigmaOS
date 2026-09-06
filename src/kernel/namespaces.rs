@@ -9,8 +9,7 @@
 //! - **NamespaceRegistry**: Central registry for namespace management
 //! - **Specific namespace implementations**: PID, IPC, Network, etc. (PID implemented here)
 
-use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
-use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::string::String;
 
 /// Maximum number of namespaces in the system

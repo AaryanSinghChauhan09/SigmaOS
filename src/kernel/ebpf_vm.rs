@@ -479,7 +479,7 @@ pub fn is_valid_register(reg: u8) -> bool {
 }
 
 /// Check if an immediate value is valid (32-bit)
-pub fn is_valid_immediate(imm: u32) -> bool {
+pub fn is_valid_immediate(_imm: u32) -> bool {
     // All u32 values are valid
     true
 }

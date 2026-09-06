@@ -3,7 +3,6 @@
 //! GNOME 46 (Mutter fractional scaling & Shell extensions), XFCE 4.18 (Thunar custom actions & Panel plugins),
 //! Lumina BSD Desktop (BSD hardware sysctl & Lumina-FM ZFS snapshot restore), and Sway / Regolith (Tree-based Tiling WM).
 
-use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;

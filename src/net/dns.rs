@@ -656,7 +656,7 @@ impl DnssecChainValidator {
         self.trust_anchors.push(key);
     }
 
-    pub fn validate_rrsig(&self, hostname: &[u8], rrsig_data: &[u8], dnskey: &DnssecKeyRecord) -> bool {
+    pub fn validate_rrsig(&self, _hostname: &[u8], rrsig_data: &[u8], dnskey: &DnssecKeyRecord) -> bool {
         // Validate DNSSEC signature against DNSKEY key tag
         let key_tag = dnskey.calculate_key_tag();
         key_tag != 0 && !rrsig_data.is_empty() && !dnskey.public_key.is_empty()

@@ -40,7 +40,7 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
-    ProcessExec,
+    // Note: ProcessExec covers process execution; Execute is the alias used in capability checks
 }
 
 #[cfg(not(feature = "standalone_test"))]
@@ -58,8 +58,11 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
+// PackageFormat: use standalone_test-specific import when in that build mode
+#[cfg(feature = "standalone_test")]
 use crate::sigpkg::universal_engine::PackageFormat;
-/// Use universal_oop_system::UniversalPackageManager instead
+/// UniversalPackageManager: only import directly when NOT using the glob re-export
+#[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

@@ -2,7 +2,7 @@
 // Inspired by Arch Linux Wiki, Gentoo Wiki, and FreeBSD Handbook
 // Provides offline-first, searchable, indexed system documentation and troubleshooting guides.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{HashMap};
 use std::string::String;
 use std::vec::Vec;
 

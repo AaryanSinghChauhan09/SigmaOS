@@ -3,7 +3,6 @@
 //! NetBSD (RUMP kernel userland driver virtualization), HardenedBSD (PaX & CFI security),
 //! Garuda / EndeavourOS (Auto-CPU-FREQ & zram performance tuning), and Debian (Multiarch & APT Pinning).
 
-use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;

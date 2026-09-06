@@ -696,7 +696,7 @@ mod tests {
         let mut opt = StartupOptimizer::new(Box::new(AdvancedStartupOptimizer::new()));
         opt.create_default_services();
 
-        let analysis = opt.analyze();
+        let _analysis = opt.analyze();
         assert_eq!(analysis.total_services, 4);
         assert_eq!(analysis.enabled_services, 4);
         assert_eq!(analysis.critical_path_time_ms, 500);

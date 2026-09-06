@@ -4,7 +4,6 @@
 
 use std::collections::HashMap;
 use std::string::String;
-use std::vec::Vec;
 
 /// Graphics API translation backend
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -1,9 +1,9 @@
+#![allow(unexpected_cfgs)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
 
 
-use std::string::ToString;
 use std::vec;
 use std::vec::Vec;
 

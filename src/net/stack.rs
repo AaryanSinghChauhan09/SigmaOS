@@ -12,7 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::string::{String, ToString};
+use std::string::String;
 use std::boxed::Box;
 // SigmaOS Network Protocol Layer
 
@@ -20,7 +20,6 @@ use std::boxed::Box;
 
 use std::vec::Vec;
 
-use crate::filesystem::FsError;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {

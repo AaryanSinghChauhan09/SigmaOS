@@ -4,7 +4,6 @@
 
 use std::collections::HashMap;
 use std::string::String;
-use std::vec::Vec;
 
 /// Target form factor profile
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

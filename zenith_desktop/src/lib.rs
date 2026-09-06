@@ -1033,7 +1033,7 @@ impl NativeWasmDesktopUiEngine {
     }
 
     /// Process a keydown event natively in Rust/WASM
-    pub fn handle_keydown(&mut self, element_id: &str, role: &str, key: &str) -> bool {
+    pub fn handle_keydown(&mut self, _element_id: &str, role: &str, key: &str) -> bool {
         self.event_log.push(NativeWasmA11yEvent::KeyDown {
             key: key.to_string(),
             element_role: role.to_string(),

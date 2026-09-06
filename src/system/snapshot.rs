@@ -186,7 +186,7 @@ impl SnapshotStorage for FileSnapshotStorage {
             .ok_or_else(|| SnapshotError::SnapshotNotFound(snapshot_id.to_string()))?;
 
         let snapshot_path = format!("{}/{}", self.base_path, snapshot_id);
-        let data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
+        let _data_path = format!("{}/{}", snapshot_path, "snapshot.bin");
 
         if data_path.is_empty() {
             return Err(SnapshotError::FileNotFound(data_path.to_string()));
