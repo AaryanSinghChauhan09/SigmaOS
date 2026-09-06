@@ -48,3 +48,5 @@ pub use firmware::{
     SmbiosType2BaseboardInfo, SmbiosType3ChassisInfo, EFI_GLOBAL_VARIABLE_GUID,
     SECURITY_DATABASE_GUID, efi_attr,
 };
+
+pub mod sigma_bootloader;

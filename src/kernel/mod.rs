@@ -157,3 +157,4 @@ pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
 pub mod sigma_namespaces;
 pub mod sigma_io_uring;
+pub mod sigma_dma;
