@@ -7,11 +7,19 @@ use alloc::format;
 pub mod okr;
 pub mod rfc;
 pub mod strategic_vision;
+pub mod future_protocol;
 
 pub use okr::*;
 pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,
+};
+pub use future_protocol::{
+    SigCategory, SigmaSpecialInterestGroup, SigGovernanceModel, RoadmapHorizonHorizon,
+    RoadmapGoalItem, RollingTwoYearRoadmap, FeatureBranchReview, RfcDevelopmentWorkflow,
+    AppShardListing, ShardsMarketplaceRegistry, ContributorHallOfFameRecord,
+    CommunityContributorRecognition, SovereigntySecurityAuditPolicy, LivingWikiEntry,
+    LivingDeveloperWikiEngine, SigmaFutureDevelopmentProtocolEngine,
 };
 use crate::klib::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};

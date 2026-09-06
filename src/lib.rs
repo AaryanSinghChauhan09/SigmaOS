@@ -49,8 +49,6 @@ pub mod unimplemented_tools;
 pub mod userland;
 
 pub use unimplemented_features::{
-    AndroidApexContainerModuleEngine, AndroidApexModule, DistroWatchParityMetricsHub,
-    PhoronixAutomatedBenchmarkEngine, RosettaDynamicBinaryTranslator, TargetArch,
     AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
     LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
@@ -63,6 +61,8 @@ pub use unimplemented_features::{
 pub use distro::{
     ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
     HermeticStoreClosureEngine, StoreClosurePackage,
+    OmarchyQuickshellEngine, OmarchySystemThemeStudio, OmarchyLuaConfigEngine,
+    OmarchyPluginMarketplace, OmarchyHerdrAiAgentManager, OmarchyReleaseChannelSnapshotEngine,
     missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
 };
 pub use security::{
