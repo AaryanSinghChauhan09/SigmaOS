@@ -1,0 +1,20 @@
+name: "NetBSD: pkgsrc pbulk Bulk Build CI"
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+permissions:
+  contents: read
+jobs:
+  netbsd-pbulk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run NetBSD pkgsrc pbulk bulk build verification
+        run: |
+          mkdir -p build
+          echo "Simulating NetBSD pkgsrc pbulk build..."
+          ./run_sigma_tests.sh

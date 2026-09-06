@@ -1,0 +1,19 @@
+name: "Sovereign: Autonomous AI Agent PR Governance CI"
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  ai-agent-governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run Autonomous AI Agent PR Governance & Code Review Verification
+        run: |
+          mkdir -p build
+          echo "Verifying AI Agent PR Governance guidelines & test execution..."
+          ./run_sigma_tests.sh

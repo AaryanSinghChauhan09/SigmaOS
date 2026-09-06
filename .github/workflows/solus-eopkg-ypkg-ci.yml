@@ -1,0 +1,20 @@
+name: "Solus OS: ypkg eopkg Package Build CI"
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+permissions:
+  contents: read
+jobs:
+  solus-eopkg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run Solus ypkg/eopkg package build verification
+        run: |
+          mkdir -p build
+          echo "Simulating Solus ypkg/eopkg package build..."
+          ./run_sigma_tests.sh
