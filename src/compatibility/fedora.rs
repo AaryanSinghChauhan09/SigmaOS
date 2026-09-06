@@ -3937,10 +3937,45 @@ impl Default for FedoraToolbxContainerEngine {
 // Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
 // =========================================================================
 
+#[derive(Debug, Clone, Default)]
 pub struct FedoraOfflineUpdateEngine {
-    pub staged_packages: Vec<String>,
     pub is_offline_update_pending: bool,
+    pub staged_packages: Vec<String>,
     pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
+        for p in packages {
+            self.staged_packages.push((*p).to_string());
+        }
+        self.is_offline_update_pending = !self.staged_packages.is_empty();
+    }
+
+    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
+        self.trigger_reboot_flag = true;
+        Ok(self.staged_packages.len())
+    }
+
+    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
+        self.is_offline_update_pending = false;
+        self.trigger_reboot_flag = false;
+        self.staged_packages.clear();
+        Ok(())
+    }
+}
+
+
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IgnitionSystemdUnit {
+    pub name: String,
+    pub enabled: bool,
+    pub contents: String,
 }
 
 impl FedoraOfflineUpdateEngine {
@@ -3951,38 +3986,6 @@ impl FedoraOfflineUpdateEngine {
             trigger_reboot_flag: false,
         }
     }
-
-    pub fn stage_offline_packages(&mut self, pkgs: &[&str]) {
-        for pkg in pkgs {
-            self.staged_packages.push((*pkg).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        if !self.is_offline_update_pending {
-            return Err("No staged offline packages pending");
-        }
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        if !self.is_offline_update_pending || !self.trigger_reboot_flag {
-            return Err("Offline update transaction not properly triggered");
-        }
-        self.staged_packages.clear();
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        Ok(())
-    }
-}
-
-impl Default for FedoraOfflineUpdateEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine

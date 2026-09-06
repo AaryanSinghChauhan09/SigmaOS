@@ -31,12 +31,13 @@ pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_distro_gaps::{
-    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeType,
-    DnsRecord, DynamicDeviceNode, JournalBinaryRecord, JournalLogLevel, NatRule, NatRuleKind,
-    NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SovereignDnsTlsResolverEngine,
-    SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine,
-    SystemdInitManager, SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver,
-    UsbHidModifierKeys, WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
+    BluetoothDevice, BootMenuEntry, BootloaderType, ConntrackTableEntry, CronJobEntry,
+    CronJobScheduler, DeviceNodeEntry, DeviceNodeType, DnsRecordEntry, JournaldLogRecord,
+    NatType, NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine,
+    SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine,
+    SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine, SystemdInitManager,
+    SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
+    WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
 };
 
 pub use garuda_nomad_innovations::{

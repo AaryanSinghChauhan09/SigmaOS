@@ -1265,9 +1265,10 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct NodeBinaryPackage {
-    pub name: String,
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
     pub version: String,
 }
 

@@ -1,15 +1,10 @@
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Native WebAssembly Desktop Bridge Module
 // Replaces JavaScript UI event routing and DOM manipulation with native Rust/WASM abstractions
 
 use std::collections::HashMap;
 use std::string::String;
+use std::vec::Vec;
 
 /// Native WebAssembly Desktop Engine
 /// Bypasses JavaScript engine overheads for desktop event handling and ARIA accessibility
@@ -26,7 +21,7 @@ impl NativeWasmDesktopEngine {
         Self::default()
     }
 
-    pub fn dispatch_key_event(&mut self, element_id: &str, _role: &str, key: &str) -> bool {
+    pub fn dispatch_key_event(&mut self, element_id: &str, role: &str, key: &str) -> bool {
         self.key_events_count += 1;
         let is_activation = key == "Enter" || key == " ";
         if is_activation {

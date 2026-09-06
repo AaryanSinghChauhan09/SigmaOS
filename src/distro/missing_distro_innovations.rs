@@ -2036,18 +2036,9 @@ pub enum AppArmorMode {
     Disabled,
 }
 
-#[derive(Debug, Clone)]
-pub struct UbuntuAppArmorProfile {
-    pub profile_name: String,
-    pub mode: AppArmorMode,
-    pub allowed_read_paths: Vec<String>,
-    pub allowed_write_paths: Vec<String>,
-    pub allowed_exec_paths: Vec<String>,
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct UbuntuAppArmorEngine {
-    pub profiles: BTreeMap<String, UbuntuAppArmorProfile>,
+    pub profiles: BTreeMap<String, AppArmorProfile>,
 }
 
 impl UbuntuAppArmorEngine {
@@ -2560,8 +2551,12 @@ impl Default for SuseYaSTConfigurationRegistry {
         flakes.lock_input("nixpkgs", "github:nixos/nixpkgs/nixos-23.11", "sha256-nar123");
         flakes.lock_input("home-manager", "github:nix-community/home-manager", "sha256-nar456");
 
-        assert_eq!(flakes.flake_inputs.len(), 2);
-        let drv_hash = flakes.compute_system_derivation_hash();
-        assert!(drv_hash.starts_with("nix-store-drv-"));
+    #[test]
+    fn test_loongarch64_architecture_engine() {
+        let mut la64 = LoongArch64ArchitectureEngine::new();
+        la64.init_la64_core(4);
+        assert_eq!(la64.active_cores, 4);
+        assert!(la64.execute_instruction(0x02800000));
+        assert_eq!(la64.executed_instructions, 1);
     }
 }

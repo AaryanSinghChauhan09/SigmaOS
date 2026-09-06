@@ -265,6 +265,28 @@ mod tests {
     }
 
     #[test]
+    fn test_service_health_check_monitoring() {
+        let mut supervisor = RunitSupervisor::new();
+        let mut service = RunitService::new("httpd".to_string(), "/usr/bin/httpd".to_string());
+        service.max_allowed_failures = 2;
+        supervisor.add_service(service);
+
+        supervisor.run_stage2();
+        assert_eq!(
+            supervisor.get_service_status("httpd").unwrap().state,
+            ServiceState::Running
+        );
+
+        // First failure: should remain running but increment failure count
+        let state1 = supervisor.monitor_service_health("httpd", false).unwrap();
+        assert_eq!(state1, ServiceState::Running);
+
+        // Second failure: reaches threshold and transitions to Failed
+        let state2 = supervisor.monitor_service_health("httpd", false).unwrap();
+        assert_eq!(state2, ServiceState::Failed);
+    }
+
+    #[test]
     fn test_service_dependencies() {
         let mut supervisor = RunitSupervisor::new();
 

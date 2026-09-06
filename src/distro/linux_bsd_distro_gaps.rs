@@ -547,45 +547,10 @@ impl DemandPagingSwapEngine {
         }
     }
 
-    pub fn handle_page_fault(&mut self, vaddr: u64, cause: PageFaultCause) -> Result<u64, &'static str> {
-        self.page_faults_handled += 1;
-        match cause {
-            PageFaultCause::NotPresent => {
-                // Demand page allocation
-                let paddr = vaddr & !0xFFF;
-                self.page_table.push(VirtualPageMapping {
-                    vaddr,
-                    paddr,
-                    is_present: true,
-                    is_writable: true,
-                    is_swapped_out: false,
-                    swap_slot_idx: None,
-                });
-                Ok(paddr)
-            }
-            PageFaultCause::WriteToReadOnlyCoW => {
-                // Copy-On-Write duplicate physical frame
-                let new_paddr = (vaddr & !0xFFF) + 0x1000;
-                Ok(new_paddr)
-            }
-            PageFaultCause::ProtectionViolation => Err("SIGSEGV: Invalid page protection access"),
-        }
-    }
-
-    pub fn swap_out_page(&mut self, vaddr: u64) -> Result<usize, &'static str> {
-        if self.used_swap_slots_mb >= self.total_swap_slots_mb {
-            return Err("ENOSPC: Swap space exhausted");
-        }
-        if let Some(page) = self.page_table.iter_mut().find(|p| p.vaddr == vaddr) {
-            page.is_present = false;
-            page.is_swapped_out = true;
-            let slot = self.used_swap_slots_mb;
-            page.swap_slot_idx = Some(slot);
-            self.used_swap_slots_mb += 1;
-            Ok(slot)
-        } else {
-            Err("Page mapping not found")
-        }
+    pub fn lookup_node(&self, path: &str) -> Option<&DeviceNodeEntry> {
+        self.nodes
+            .iter()
+            .find(|n| n.name == path || n.symlink_paths.iter().any(|s| *s == path))
     }
 }
 
@@ -680,17 +645,33 @@ impl MulticoreSmpInterruptEngine {
         }
     }
 
-    pub fn bind_irq(&mut self, irq: u32, target_core: usize) -> Result<(), &'static str> {
-        if target_core >= self.num_cpu_cores {
-            return Err("Target CPU core exceeds available SMP cores");
-        }
-        if let Some(entry) = self.irq_table.iter_mut().find(|e| e.irq_line == irq) {
-            entry.target_cpu_core = target_core;
+    pub fn create_snat_mapping(
+        &mut self,
+        internal_src: [u8; 4],
+        dst_ip: [u8; 4],
+        src_port: u16,
+        dst_port: u16,
+        protocol: u8,
+    ) -> ([u8; 4], u16) {
+        let _ = protocol;
+        // Search conntrack
+        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
+            c.original_src == internal_src
+                && c.src_port == src_port
+                && c.original_dst == dst_ip
+                && c.dst_port == dst_port
+        }) {
+            conn.packets_counter += 1;
         } else {
-            self.irq_table.push(IrqRoutingEntry {
-                irq_line: irq,
-                target_cpu_core: target_core,
-                interrupt_count: 0,
+            self.conntrack_table.push(ConntrackTableEntry {
+                original_src: internal_src,
+                original_dst: dst_ip,
+                src_port,
+                dst_port,
+                translated_ip: self.public_ip,
+                translated_port: src_port,
+                nat_type: NatType::Snat,
+                packets_counter: 1,
             });
         }
         Ok(())

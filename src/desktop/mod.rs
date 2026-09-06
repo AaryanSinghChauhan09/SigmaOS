@@ -26,6 +26,8 @@ pub use ultimate_distro_desktop::{
 
 // web_wasm_bridge items accessed via pub mod web_wasm_bridge above
 
+pub use web_wasm_bridge::*;
+
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
     MateBetsyDesktopEnvironment, PlumaTextEditor,
