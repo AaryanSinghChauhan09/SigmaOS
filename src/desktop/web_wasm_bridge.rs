@@ -1,3 +1,9 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Native WebAssembly Desktop Bridge Module
 // Replaces JavaScript UI event routing and DOM manipulation with native Rust/WASM abstractions

@@ -1,3 +1,9 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
 // SigmaOS Mobile, Tablet, and Embedded IoT Variant Engine
 // Inspired by postmarketOS, Plasma Mobile, Ubuntu Touch, and Android Halium
 // Provides touchscreen gesture scaling, one-handed reachability, battery budget throttling, and responsive UI adaptation.

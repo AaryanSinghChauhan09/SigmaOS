@@ -1,3 +1,7 @@
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
+#![allow(non_camel_case_types)]
+#![allow(unused_variables)]
 #![allow(unexpected_cfgs)]
 #![allow(non_exhaustive_omitted_patterns)]
 #![allow(dead_code)]

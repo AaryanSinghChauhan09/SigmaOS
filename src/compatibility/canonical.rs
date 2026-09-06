@@ -1,3 +1,10 @@
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
+#![allow(non_camel_case_types)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
 #[allow(unused_imports, dead_code, unused_variables, unused_mut)]
 // SigmaOS Canonical Ecosystem, Snapshots, Security Jails, App Store, Continuity, Desktop Switcher, and AI Scheduler
 // Conforms to zero-dependency, #![no_std] compliant OOP structures

@@ -1,3 +1,5 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
 #![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]

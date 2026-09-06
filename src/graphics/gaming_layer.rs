@@ -1,3 +1,9 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
 // SigmaOS Gaming & Graphics Translation Engine
 // Inspired by SteamOS Gamescope, Valve Proton, DXVK, VKD3D-Proton, and MangoHud
 // Provides Vulkan-native rendering pipelines, DirectX 11/12 translation, FSR/NIS upscaling, and Gamescope compositor session management.

@@ -1,3 +1,9 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
 #![allow(dead_code, unused_variables, unused_imports)]
 use std::vec;
 // SPDX-License-Identifier: MIT

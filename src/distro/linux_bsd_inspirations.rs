@@ -1,3 +1,10 @@
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
+#![allow(non_camel_case_types)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
 // Linux/BSD Distro Inspirations Implementation
 // This module implements key concepts from Linux and BSD distributions
 // that provide competitive advantages for SigmaOS

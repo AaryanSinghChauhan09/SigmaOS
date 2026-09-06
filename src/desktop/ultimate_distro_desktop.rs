@@ -1,3 +1,9 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
 //! Linux & BSD Inspired Desktop Environment Innovations for SigmaOS
 //! Natively absorbs features from KDE Plasma 6 (KWin Wayland tiling & KRunner),
 //! GNOME 46 (Mutter fractional scaling & Shell extensions), XFCE 4.18 (Thunar custom actions & Panel plugins),

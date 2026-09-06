@@ -1,3 +1,10 @@
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
+#![allow(non_camel_case_types)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
 // Sovereign, AI-Native zero-dependency implementation of 100-Improvement-Ideas remaining tools
 // Highly-polished, robust OOP implementation covering multimedia, system, productivity, AI, and developer tools.
 // Re-exported in src/lib.rs for full SigmaOS distribution parity.

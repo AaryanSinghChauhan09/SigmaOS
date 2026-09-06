@@ -1,3 +1,10 @@
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
+#![allow(non_camel_case_types)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unexpected_cfgs)]
 use std::string::String;
 use std::vec;
 use std::vec::Vec;

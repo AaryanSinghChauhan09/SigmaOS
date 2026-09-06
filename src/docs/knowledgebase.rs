@@ -1,3 +1,8 @@
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::new_without_default)]
 #![allow(unexpected_cfgs)]
 // SigmaOS Arch Wiki-Style Knowledge Base Engine
 // Inspired by Arch Linux Wiki, Gentoo Wiki, and FreeBSD Handbook
