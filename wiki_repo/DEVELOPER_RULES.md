@@ -1,7 +1,7 @@
 # 📋 SigmaOS Developer Rules & Guidelines
 
-**Version:** 1.0.0  
-**Last Updated:** September 2026  
+**Version:** 1.0.0
+**Last Updated:** September 2026
 **Scope:** All developers, designers, contributors, and AI agents
 
 ---
@@ -591,27 +591,27 @@ Keep GitHub Wiki updated with:
 ## Special Interest Groups (SIGs)
 
 ### SIG-Kernel
-**Focus:** Low-level OS primitives  
-**Scope:** Scheduling, virtual memory, IPC, eBPF, syscall interfaces  
-**Lead:** [TBD]  
+**Focus:** Low-level OS primitives
+**Scope:** Scheduling, virtual memory, IPC, eBPF, syscall interfaces
+**Lead:** [TBD]
 **Meeting:** Bi-weekly (virtual)
 
 ### SIG-Drivers
-**Focus:** Hardware abstraction and drivers  
-**Scope:** HAL design, PCIe, NVMe, NICs, USB, HDA  
-**Lead:** [TBD]  
+**Focus:** Hardware abstraction and drivers
+**Scope:** HAL design, PCIe, NVMe, NICs, USB, HDA
+**Lead:** [TBD]
 **Meeting:** Bi-weekly (virtual)
 
 ### SIG-Apps & Shards
-**Focus:** Application ecosystem  
-**Scope:** .sigma-app manifests, SquashFS/OverlayFS, Shards Marketplace  
-**Lead:** [TBD]  
+**Focus:** Application ecosystem
+**Scope:** .sigma-app manifests, SquashFS/OverlayFS, Shards Marketplace
+**Lead:** [TBD]
 **Meeting:** Weekly (virtual)
 
 ### SIG-Security
-**Focus:** Security and cryptography  
-**Scope:** Sandboxing (pledge/unveil), MAC policies, PQC, binary hardening  
-**Lead:** [TBD]  
+**Focus:** Security and cryptography
+**Scope:** Sandboxing (pledge/unveil), MAC policies, PQC, binary hardening
+**Lead:** [TBD]
 **Meeting:** Bi-weekly (virtual)
 
 **Participation:**
@@ -786,8 +786,8 @@ Consequences for guideline violations:
 
 ---
 
-**Last Updated:** September 4, 2026  
-**Maintained By:** SigmaOS Core Team  
+**Last Updated:** September 4, 2026
+**Maintained By:** SigmaOS Core Team
 **License:** MIT (same as SigmaOS)
 
 > "Sovereignty is the ultimate efficiency." — SigmaOS Principle
