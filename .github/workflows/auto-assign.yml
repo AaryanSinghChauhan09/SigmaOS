@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Assign Maintainers
-        uses: actions/github-script@v7
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v7.0.1
         with:
           script: |
             const isPR = !!context.payload.pull_request;
