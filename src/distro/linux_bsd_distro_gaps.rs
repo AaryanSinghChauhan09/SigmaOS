@@ -432,7 +432,9 @@ impl SystemdInitManager {
     }
 
     pub fn is_service_running(&self, name: &str) -> bool {
-        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
+        self.services
+            .iter()
+            .any(|s| s.name == name && s.state == ServiceState::Running)
     }
 
     pub fn check_dependencies_met(&self, name: &str) -> bool {
@@ -626,7 +628,9 @@ impl SovereignDynamicDevfsEngine {
     }
 
     pub fn lookup_node(&self, path: &[u8]) -> Option<&DynamicDeviceNode> {
-        self.nodes.iter().find(|n| n.name == path || n.symlinks.iter().any(|s| s == path))
+        self.nodes
+            .iter()
+            .find(|n| n.name == path || n.symlinks.iter().any(|s| s == path))
     }
 }
 
@@ -694,7 +698,10 @@ impl SovereignStatefulNatEngine {
     ) -> ([u8; 4], u16) {
         // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.src_ip == src_ip && c.src_port == src_port && c.dst_ip == dst_ip && c.dst_port == dst_port
+            c.src_ip == src_ip
+                && c.src_port == src_port
+                && c.dst_ip == dst_ip
+                && c.dst_port == dst_port
         }) {
             conn.packets_counter += 1;
         } else {
@@ -886,7 +893,10 @@ mod tests {
         assert_eq!(resolver.resolve_dracut_initramfs_dependencies(), 5);
         assert!(resolver.verify_bsd_geom_storage_readiness());
 
-        assert_eq!(resolver.lookup_modprobe_alias("char-major-10-200"), Some("tun"));
+        assert_eq!(
+            resolver.lookup_modprobe_alias("char-major-10-200"),
+            Some("tun")
+        );
         assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
 
         assert!(!resolver.faillock_guard.record_failure());
@@ -952,7 +962,13 @@ impl SovereignUniversalDistroGapResolver {
         auto_modprobe_aliases.push(("block-major-8-0", "sd_mod"));
 
         Self {
-            dracut_modules_loaded: vec!["bash", "systemd", "kernel-modules", "rootfs-generator", "network"],
+            dracut_modules_loaded: vec![
+                "bash",
+                "systemd",
+                "kernel-modules",
+                "rootfs-generator",
+                "network",
+            ],
             faillock_guard: PamFaillockGuard::new(3),
             bsd_geom_layers: vec!["geom_mirror", "geom_stripe", "geom_eli"],
             auto_modprobe_aliases,

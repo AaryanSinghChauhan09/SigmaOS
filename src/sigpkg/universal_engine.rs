@@ -503,8 +503,15 @@ impl IPackageAdapter for DportsPackageAdapter {
             hash: [0x2D; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("DragonFly DPorts Adapter: Building ports snapshot overlay in: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "DragonFly DPorts Adapter: Building ports snapshot overlay in: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -527,8 +534,15 @@ impl IPackageAdapter for SlackBuildPackageAdapter {
             hash: [0x2E; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Slackware SlackBuild Adapter: Compiling SlackBuild script into target store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Slackware SlackBuild Adapter: Compiling SlackBuild script into target store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -551,8 +565,15 @@ impl IPackageAdapter for CruxPackageAdapter {
             hash: [0x2F; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("CRUX Adapter: Extracting pkgmk tarball into store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "CRUX Adapter: Extracting pkgmk tarball into store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -575,8 +596,15 @@ impl IPackageAdapter for DrpmPackageAdapter {
             hash: [0x30; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Delta RPM Adapter: Reconstructing full RPM binary delta in store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Delta RPM Adapter: Reconstructing full RPM binary delta in store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -599,8 +627,15 @@ impl IPackageAdapter for StratumPackageAdapter {
             hash: [0x31; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Bedrock Stratum Adapter: Mounting subsystem stratum into store: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Bedrock Stratum Adapter: Mounting subsystem stratum into store: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -2132,58 +2167,58 @@ mod tests {
         );
     }
 
-// =========================================================================
-// P2P CAS MIRROR NETWORK (NIX CAS & IPFS DISTRIBUTED MIRROR PARITY)
-// =========================================================================
+    // =========================================================================
+    // P2P CAS MIRROR NETWORK (NIX CAS & IPFS DISTRIBUTED MIRROR PARITY)
+    // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct CasBlobDescriptor {
-    pub hash_id: String,
-    pub size_bytes: u64,
-    pub peer_sources: Vec<String>,
-    pub is_pinned: bool,
-}
+    #[derive(Debug, Clone)]
+    pub struct CasBlobDescriptor {
+        pub hash_id: String,
+        pub size_bytes: u64,
+        pub peer_sources: Vec<String>,
+        pub is_pinned: bool,
+    }
 
-pub struct P2pCasMirrorNetwork {
-    pub pinned_blobs: Vec<CasBlobDescriptor>,
-}
+    pub struct P2pCasMirrorNetwork {
+        pub pinned_blobs: Vec<CasBlobDescriptor>,
+    }
 
-impl P2pCasMirrorNetwork {
-    pub fn new() -> Self {
-        Self {
-            pinned_blobs: Vec::new(),
+    impl P2pCasMirrorNetwork {
+        pub fn new() -> Self {
+            Self {
+                pinned_blobs: Vec::new(),
+            }
+        }
+
+        pub fn pin_blob(&mut self, hash_id: &str, size_bytes: u64, peers: &[&str]) {
+            let descriptor = CasBlobDescriptor {
+                hash_id: hash_id.to_string(),
+                size_bytes,
+                peer_sources: peers.iter().map(|s| s.to_string()).collect(),
+                is_pinned: true,
+            };
+            self.pinned_blobs.push(descriptor);
+        }
+
+        pub fn get_blob(&self, hash_id: &str) -> Option<&CasBlobDescriptor> {
+            self.pinned_blobs.iter().find(|b| b.hash_id == hash_id)
+        }
+
+        pub fn unpin_blob(&mut self, hash_id: &str) -> bool {
+            if let Some(pos) = self.pinned_blobs.iter().position(|b| b.hash_id == hash_id) {
+                self.pinned_blobs.remove(pos);
+                true
+            } else {
+                false
+            }
         }
     }
 
-    pub fn pin_blob(&mut self, hash_id: &str, size_bytes: u64, peers: &[&str]) {
-        let descriptor = CasBlobDescriptor {
-            hash_id: hash_id.to_string(),
-            size_bytes,
-            peer_sources: peers.iter().map(|s| s.to_string()).collect(),
-            is_pinned: true,
-        };
-        self.pinned_blobs.push(descriptor);
-    }
-
-    pub fn get_blob(&self, hash_id: &str) -> Option<&CasBlobDescriptor> {
-        self.pinned_blobs.iter().find(|b| b.hash_id == hash_id)
-    }
-
-    pub fn unpin_blob(&mut self, hash_id: &str) -> bool {
-        if let Some(pos) = self.pinned_blobs.iter().position(|b| b.hash_id == hash_id) {
-            self.pinned_blobs.remove(pos);
-            true
-        } else {
-            false
+    impl Default for P2pCasMirrorNetwork {
+        fn default() -> Self {
+            Self::new()
         }
     }
-}
-
-impl Default for P2pCasMirrorNetwork {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
     #[test]
     fn test_p2p_cas_mirror_network() {
