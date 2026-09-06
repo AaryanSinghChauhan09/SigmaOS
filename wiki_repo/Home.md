@@ -4,6 +4,8 @@
 [![Rust](https://img.shields.io/badge/Language-Rust-orange.svg)](https://www.rust-lang.org/)
 [![Version](https://img.shields.io/badge/Version-v1.0.0--sovereign-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
 
+SigmaOS is an advanced, sovereign, microkernel-based operating system built from scratch in Rust with a zero-dependency `#![no_std]` architecture. Designed for performance, security, and versatility, SigmaOS bridges modern microkernel security with bare-metal performance across `x86_64`, `aarch64`, and `riscv64` hardware platforms.
+
 ---
 
 ## 🌟 Architectural Highlights
@@ -17,33 +19,19 @@
 - **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
 - **Zero-Trust Access Control & MAC:** Discretionary (DAC), Mandatory Access Control (MAC LSM Inode/Ptrace/Socket hooks), and Role-Based (RBAC) security enforcers.
 - **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
-- **AI Agents Master Guide:** [[AI_AGENTS_GUIDE]] - Authoritative reference for autonomous coding agents and subagents.
-- **AI Agents UX Management Guide:** [[AI_AGENTS_UX_MANAGEMENT_GUIDE]] - Interface, visual layout, and UX guidelines for autonomous AI agents.
-- **AI Agents Time Management Guide:** [[AI_AGENTS_TIME_MANAGEMENT_GUIDE]] - Timekeeping primitives, clock sync, and temporal architecture for autonomous AI agents.
-- **AI Agents Security Management Guide:** [[AI_AGENTS_SECURITY_MANAGEMENT_GUIDE]] - Capability sandboxing, PQC attestation, MAC, and digital forensics for autonomous AI agents.
-- **AI Agents Procedure Call Management Guide:** [[AI_AGENTS_PROCEDURE_CALL_MANAGEMENT_GUIDE]] - Syscall dispatchers, FFI bindings, zero-copy IPC ring channels, and RPC for autonomous AI agents.
-- **AI Agents Ballooning Management Guide:** [[AI_AGENTS_BALLOONING_MANAGEMENT_GUIDE]] - VirtIO memory ballooning, RAM inflation/deflation, and hypervisor overcommit management for AI agents.
-- **AI Agents Boot Management Guide:** [[AI_AGENTS_BOOT_MANAGEMENT_GUIDE]] - UEFI/BIOS handoff, Multiboot2, Secure Boot verification, boot optimization, and init handoff for AI agents.
-- **AI Agents Process Management Guide:** [[AI_AGENTS_PROCESS_MANAGEMENT_GUIDE]] - EEVDF/BORE scheduling algorithms, ELF loading, POSIX process control, and cgroups v2 job objects.
-- **AI Agents Capability Tickets Guide:** [[AI_AGENTS_CAPABILITY_TICKETS_GUIDE]] - PQC Dilithium-5 capability tickets, POSIX bitmasks, Pledge promise tokens, and Capsicum descriptor rights.
-- **AI Agents Circular Wait Management Guide:** [[AI_AGENTS_CIRCULAR_WAIT_MANAGEMENT_GUIDE]] - Coffman deadlock conditions, RAG cycle detection, lock hierarchy, and Banker's algorithm.
+- **Autonomous AI Agent Resource Management:** Intelligent microkernel and userland agent governors for compute, memory (DAMON/PSI), storage (ZFS ARC/CoW), network QoS (eBPF/VNET), and thermal power tuning via ACP/MCP protocols.
 
 ---
 
-## 📚 Documentation
+## 📚 Documentation Index
 
-Get started with SigmaOS through our comprehensive wiki:
-
-- **[Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quick-Start)** - Build and run SigmaOS
-- **[Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)** - Core design and subsystems
-- **[Tier 1 Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Tier-1-Features)** - Feature matrix and status
-- **[Syscall Reference](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Syscall-Reference)** - Complete syscall documentation
-- **[Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing)** - Development guidelines
-- **[Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Roadmap)** - Phases 6-10 plans
-- **[Release Notes](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes)** - Version history
-- **[FAQ](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FAQ)** - Common questions
-- **[API Documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/API-Documentation)** - Public APIs
-- **[Full Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Complete documentation index
+- [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
+- [API Reference](docs/api-reference.md)
+- [Kernel Architecture](docs/kernel.md)
+- [Memory Management](docs/memory-management.md)
+- [Security Architecture](docs/security.md)
+- [Package Management](docs/package-manager.md)
+- [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
 
 ---
 
