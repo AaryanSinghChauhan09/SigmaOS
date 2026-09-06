@@ -676,7 +676,6 @@ impl Default for SimpleNetworkStack {
 }
 
 
-
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);

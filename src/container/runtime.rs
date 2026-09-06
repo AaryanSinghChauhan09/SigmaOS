@@ -191,14 +191,6 @@ impl NamespaceConfig {
 }
 
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SeccompAction {
-    Allow,
-    Deny,
-    Log,
-    Trace,
-}
-
 impl SeccompProfileV2 {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened {
