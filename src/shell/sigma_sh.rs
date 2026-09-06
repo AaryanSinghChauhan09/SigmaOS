@@ -1,4 +1,5 @@
-use std::boxed::Box;
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
 use std::boxed::Box;
 
 use std::format;
