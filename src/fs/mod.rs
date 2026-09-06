@@ -38,3 +38,5 @@ pub use xfs::{
     AllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal,
     XfsState,
 };
+
+pub mod sigma_tmpfs;

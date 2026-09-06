@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::string::String;
-use std::boxed::Box;
 // SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)

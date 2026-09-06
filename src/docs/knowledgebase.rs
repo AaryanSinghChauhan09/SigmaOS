@@ -1,3 +1,4 @@
+#![allow(unexpected_cfgs)]
 // SigmaOS Arch Wiki-Style Knowledge Base Engine
 // Inspired by Arch Linux Wiki, Gentoo Wiki, and FreeBSD Handbook
 // Provides offline-first, searchable, indexed system documentation and troubleshooting guides.

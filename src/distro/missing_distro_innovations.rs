@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_variables, unused_imports)]
 extern crate alloc;
 
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem

@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_variables, unused_imports)]
 use std::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Open Source Obsoletion Subsystem (`src/open_source_obsoletion.rs`)
