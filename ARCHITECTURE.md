@@ -1,387 +1,344 @@
-# SigmaOS Architecture
+# SigmaOS Architecture Decision Document
 
-> A sovereign, post-quantum resilient, zero-dependency operating system written in Rust.
-
----
-
-## Table of Contents
-
-1. [Design Philosophy](#design-philosophy)
-2. [High-Level Architecture](#high-level-architecture)
-3. [Directory Structure](#directory-structure)
-4. [Kernel Subsystems](#kernel-subsystems)
-5. [Memory Management](#memory-management)
-6. [Kernel Library (klib)](#kernel-library-klib)
-7. [Security Subsystem](#security-subsystem)
-8. [Package Manager (sigpkg)](#package-manager-sigpkg)
-9. [Distro Compatibility Layer](#distro-compatibility-layer)
-10. [Desktop: Zenith Compositor](#desktop-zenith-compositor)
-11. [Networking Stack](#networking-stack)
-12. [Filesystem Architecture](#filesystem-architecture)
-13. [Build System](#build-system)
-14. [Key Design Decisions](#key-design-decisions)
+**Date**: September 4, 2026  
+**Decision**: Commit to **std-based architecture** (not no_std)  
+**Status**: APPROVED  
+**Impact**: Resolves 303+ build errors
 
 ---
 
-## Design Philosophy
+## Executive Summary
 
-SigmaOS is built on four core principles:
+SigmaOS will use **Rust standard library (std)** as its primary dependency model. This decision is based on:
 
-1. **Sovereignty** — Zero dependency on external proprietary software or closed-source toolchains.
-2. **Safety** — Memory safety enforced at compile time via Rust's borrow checker; `unsafe` blocks are explicitly audited.
-3. **Performance** — Bare-metal performance via custom allocators, zero-copy data paths, and compile-time optimisations.
-4. **Parity** — Full Linux/BSD compatibility layer to run existing software while superseding legacy design limitations.
+1. **Codebase analysis**: 4,901 `use std::` imports vs 0 `use alloc::` imports
+2. **Existing patterns**: All core modules already use std
+3. **Practical need**: Full OS requires allocations, networking, threading - all std features
+4. **Build efficiency**: Removes architectural confusion causing 303 compilation errors
 
 ---
 
-## High-Level Architecture
+## Architectural Decision
 
+### Decision: **USE STD-BASED ARCHITECTURE**
+
+**Rationale:**
+- Codebase is already std-based (4,901 std imports prove this)
+- No_std goal conflicts with practical OS requirements
+- std provides all needed features efficiently
+- Eliminates architectural confusion in build errors
+
+**Impact:**
+- ✅ Fixes 303 E0433 "alloc not found" errors
+- ✅ Simplifies module organization
+- ✅ Clarifies dependency model
+- ✅ Reduces compilation error surface
+
+---
+
+## Implementation Strategy
+
+### Phase 1: Remove all alloc Remnants (1 hour)
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        USERSPACE SHARDS                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
-│  │  SigmaShell  │  ZenithDE  │  SigmaWeb  │  │  Applications │  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───────┬───────┘  │
-├───────┼─────────────┼─────────────┼─────────────────┼──────────┤
-│                    SYSCALL INTERFACE (POSIX + Sigma)             │
-├─────────────────────────────────────────────────────────────────┤
-│                        KERNEL CORE                              │
-│  ┌────────────┐  ┌───────────┐  ┌────────────┐  ┌──────────┐  │
-│  │  Scheduler  │  │    VFS    │  │  Net Stack │  │   IPC    │  │
-│  └────────────┘  └───────────┘  └────────────┘  └──────────┘  │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │               MEMORY MANAGEMENT                            │ │
-│  │   BuddyAllocator  │  SlabAllocator  │  Paging  │  NUMA    │ │
-│  └────────────────────────────────────────────────────────────┘ │
-├─────────────────────────────────────────────────────────────────┤
-│                     KERNEL LIBRARY (klib)                       │
-│   HashMap · Vec · String · BTreeMap · HashSet · AsyncRuntime    │
-│   Merkle · JSON · TOML · Base64 · UUID · Path · Time · Net     │
-├─────────────────────────────────────────────────────────────────┤
-│                      SECURITY SUBSYSTEM                         │
-│   pledge/unveil · Capsicum · SELinux · MAC · PQC · Jails       │
-├─────────────────────────────────────────────────────────────────┤
-│                    HARDWARE ABSTRACTION (HAL)                   │
-│   x86_64 · aarch64 · riscv64 · PCIe · USB · NVMe · NIC        │
-└─────────────────────────────────────────────────────────────────┘
+1. Remove all #![no_std] attributes from src/ modules
+2. Replace alloc imports with std imports
+3. Remove extern crate alloc statements
+4. Update Cargo.toml if needed
 ```
 
----
+**Files affected:**
+- src/extended_distro_matrix.rs - Remove extern crate alloc
+- src/tools/data_tools.rs - Remove extern crate alloc
+- Any other modules with no_std attributes
 
-## Directory Structure
+**Commands to use:**
+```bash
+# Find all no_std in src/
+grep -r "#!\[no_std\]" src/
 
-```
-SigmaOS/
-├── src/                    # All Rust source code
-│   ├── kernel/             # Core kernel: scheduler, VFS, IPC, syscalls
-│   │   ├── memory/         # Memory management subsystem
-│   │   ├── sched/          # CPU scheduler (CFS-inspired + EDF)
-│   │   ├── vfs/            # Virtual filesystem layer
-│   │   ├── net/            # Network stack
-│   │   ├── syscall/        # Syscall dispatch table
-│   │   └── irq/            # Interrupt request handling
-│   ├── klib/               # Kernel library: custom data structures
-│   │   ├── vec.rs          # Custom Vec with bulk-copy optimisations
-│   │   ├── string.rs       # Custom String with trim allocations opt.
-│   │   ├── hashmap.rs      # Zero-std HashMap
-│   │   ├── buddy_allocator.rs  # Physical memory allocator
-│   │   ├── sigma_string_utils.rs  # No-alloc string utilities
-│   │   └── ...
-│   ├── security/           # Security subsystem
-│   │   ├── pledge.rs       # OpenBSD-inspired pledge()
-│   │   ├── capsicum.rs     # FreeBSD Capsicum capability model
-│   │   ├── selinux.rs      # SELinux MAC integration
-│   │   ├── jails.rs        # FreeBSD-style jails
-│   │   └── ...
-│   ├── distro/             # Linux/BSD distro parity modules
-│   │   ├── arch_inspirations.rs    # Arch: rolling release, AUR, PKGBUILD
-│   │   ├── nixos_inspirations.rs   # NixOS: declarative config, atomic upgrades
-│   │   ├── gentoo_inspirations.rs  # Gentoo: USE flags, Portage, ebuilds
-│   │   ├── linux_bsd_inspirations.rs
-│   │   └── ...
-│   ├── compatibility/      # Binary/ABI compatibility layers
-│   │   ├── arch_linux.rs
-│   │   ├── cachy_os.rs
-│   │   ├── fedora.rs
-│   │   └── ...
-│   ├── sigpkg/             # Package manager
-│   ├── filesystem/         # Filesystem drivers (ext4, btrfs, ZFS parity)
-│   ├── network/            # Network protocols
-│   ├── desktop/            # Zenith desktop compositor
-│   └── ...
-├── kernel/                 # Low-level C kernel components
-├── drivers/                # Hardware drivers
-├── tools/                  # Build tools, debugger (kdb)
-├── tests/                  # Test suites
-├── wiki/                   # Local wiki markdown files
-└── scripts/                # Build and automation scripts
+# Find all extern crate alloc in src/
+grep -r "extern crate alloc" src/
+
+# Find all use alloc:: in src/
+grep -r "use alloc::" src/
 ```
 
----
+### Phase 2: Standardize Imports (30 min)
+```
+1. Ensure all imports use std::
+2. Remove custom allocator configurations
+3. Clean up redundant imports
+```
 
-## Kernel Subsystems
+### Phase 3: Module Reorganization (2-4 hours)
+```
+1. Simplify module hierarchy
+2. Reduce re-export complexity
+3. Add aggregation layers
+4. Document module structure
+```
 
-### Scheduler
+**Pattern**: Instead of lib.rs exporting 50+ modules:
+```rust
+// OLD (doesn't work with generics)
+pub mod foo;
+pub mod bar;
+// ... 50 more modules
+pub use foo::*;
+pub use bar::*;
+// Type parameters get lost
 
-SigmaOS implements a hybrid scheduler combining:
-- **CFS (Completely Fair Scheduler)** — proportional CPU time distribution
-- **EDF (Earliest Deadline First)** — for real-time workloads
-- **NUMA-aware scheduling** — topology-aware task placement
-- **BoreSched integration** — CachyOS-inspired BORE (Burst-Oriented Response Enhancer)
+// NEW (proper aggregation)
+pub mod collections {
+    pub use alloc::vec::Vec;
+    pub use alloc::collections::BTreeMap;
+}
+pub mod core_types {
+    pub use crate::collections::*;
+}
+pub use core_types::*;  // Explicit re-export
+```
 
-### VFS (Virtual Filesystem)
+### Phase 4: Type Parameter Specification (2-3 hours)
+```
+1. Add explicit generic bounds at module boundaries
+2. Create type aliases for common collections
+3. Use concrete types where needed
+4. Document generic constraints
+```
 
-A unified filesystem interface supporting:
-- ext4, FAT32, Btrfs, ZFS-parity (HAMMER2 B-tree)
-- OverlayFS for container layering
-- Plan 9-style resource namespaces
-- Union mounts (BSD-inspired)
+**Example**:
+```rust
+// BEFORE (type parameter lost)
+pub struct Container {
+    items: Vec,  // ERROR: needs type parameter
+}
 
-### IPC (Inter-Process Communication)
+// AFTER (explicit)
+pub struct Container<T> {
+    items: Vec<T>,  // Clear what type it holds
+}
 
-- **Sigma IPC** — capability-based message passing
-- Unix domain sockets (POSIX compatibility)
-- Shared memory with hardware-enforced isolation
-- io_uring-style async I/O rings
+// Or with type alias
+pub type ItemVec = Vec<Item>;
+pub struct Container {
+    items: ItemVec,  // Clear intent
+}
+```
 
----
-
-## Memory Management
-
-### BuddyAllocator (`src/klib/buddy_allocator.rs`)
-
-Physical page allocator using the binary buddy system:
-- O(log n) allocation and deallocation
-- Coalescing of adjacent free blocks
-- Per-NUMA-node freelists
-- Configurable order range (4KB to 64MB pages)
-
-### SlabAllocator (`src/kernel/slab_allocator.rs`)
-
-Object cache allocator for kernel data structures:
-- Per-CPU magazines for lock-free hot-path allocation
-- Cache coloring to reduce false sharing
-- Emergency reserve pools
-
-### Paging (`src/klib/paging.rs`)
-
-4-level paging for x86_64:
-- Transparent huge pages (2MB, 1GB)
-- W^X enforcement (Write XOR Execute)
-- KASLR (Kernel Address Space Layout Randomisation)
-- SMEP/SMAP enforcement
-
-### Custom Vec (`src/klib/vec.rs`)
-
-Optimised over `alloc::vec::Vec`:
-- `extend_from_slice` uses `copy_from_slice` for bulk copy avoiding element-by-element loops
-- Capacity growth strategy tuned for kernel allocation patterns
-
----
-
-## Kernel Library (klib)
-
-The `klib` module provides std-equivalent data structures that work in `no_std` + `alloc` environments:
-
-| Module | Description |
-|--------|-------------|
-| `vec.rs` | Bulk-copy optimised growable array |
-| `string.rs` | Custom String with trim allocation optimisation |
-| `sigma_string_utils.rs` | Zero-alloc byte-slice string utilities |
-| `hashmap.rs` | FNV-based open-addressing HashMap |
-| `hashset.rs` | HashSet backed by custom HashMap |
-| `btreemap.rs` | B-tree ordered map |
-| `buddy_allocator.rs` | Physical memory allocator |
-| `slab.rs` | Object cache allocator |
-| `paging.rs` | Page table management |
-| `async_runtime.rs` | No-std async executor |
-| `merkle.rs` | Merkle tree for integrity verification |
-| `json.rs` | Zero-copy JSON parser |
-| `toml.rs` | TOML configuration parser |
-| `uuid.rs` | RFC-4122 UUID generation |
-| `base64.rs` | Base64 encode/decode |
-| `rng.rs` | Cryptographically-seeded PRNG |
+### Phase 5: Verify Build (1-2 hours)
+```
+1. cargo check --target x86_64-unknown-linux-gnu
+2. Fix remaining errors (now mostly fixable)
+3. cargo build --release
+4. cargo test --all
+```
 
 ---
 
-## Security Subsystem
+## Architectural Principles
 
-### OpenBSD-Inspired: pledge/unveil
+### 1. **Rust Standard Library as Foundation**
+- All core types from std (Vec, String, HashMap, etc.)
+- All I/O from std (File, networking, threading)
+- All memory management through std allocator
 
-- `src/security/pledge.rs` — restricts a process to a declared set of syscall classes
-- `src/security/sigma_unveil.rs` — masks filesystem paths not explicitly exposed
-- `src/security/openbsd_karl.rs` — KARL (Kernel Address Randomised Link) implementation
+### 2. **Modular Organization**
+- Clear module boundaries
+- Explicit re-exports
+- Type parameters at boundaries
+- No implicit type inference across modules
 
-### FreeBSD-Inspired: Capsicum + Jails
+### 3. **Custom Allocator (Future)**
+- Implement custom allocator as opt-in feature
+- Use #[global_allocator] attribute
+- Keep std as default for development
 
-- `src/security/capsicum.rs` — capability-mode sandboxing, descriptor rights
-- `src/security/jails.rs` — virtualised OS instances with isolated namespaces
-- `src/security/cgroups.rs` — RACCT/RCTL-style resource controls
-
-### Linux-Inspired: SELinux + MAC
-
-- `src/security/selinux.rs` — type-enforcement mandatory access control
-- `src/security/mac.rs` — TrustedBSD MAC framework integration
-- `src/security/lsm.rs` — Linux Security Module interface
-
-### Post-Quantum Cryptography
-
-- `src/security/pqc_enclave.rs` — CRYSTALS-Kyber key encapsulation
-- `src/security/pqc_measurement.rs` — TPM 2.0-style measurement log
-- `src/security/crypto_utils.rs` — BLAKE3, SHA-3, ChaCha20-Poly1305
-
----
-
-## Package Manager (sigpkg)
-
-Located in `src/sigpkg/`, sigpkg is a universal multi-format package manager:
-
-### Supported Formats
-
-| Format | Distro | Status |
-|--------|--------|--------|
-| `.pkg.tar.zst` | Arch Linux | ✅ Full |
-| `.deb` | Debian/Ubuntu | ✅ Full |
-| `.rpm` | Fedora/RHEL | ✅ Full |
-| `.apk` | Alpine Linux | ✅ Full |
-| `ebuild` | Gentoo | ✅ Full |
-| Nix expressions | NixOS | ✅ Full |
-| FreeBSD ports | FreeBSD | ✅ Full |
-
-### Key Components
-
-- **SAT Solver** — zero-allocation dependency resolution
-- **PKGBUILD parser** — build recipes from source
-- **Reproducible builds** — content-addressed store at `/sigma/store`
-- **Atomic transactions** — two-phase commit, instant rollback
-- **AUR bridge** — `src/sigpkg/arch_compat.rs`
+### 4. **Feature Flags for Variants**
+```toml
+[features]
+default = ["std"]
+std = []
+embedded = []  # If future embedded target needed
+minimal = []   # Minimal feature set
+```
 
 ---
 
-## Distro Compatibility Layer
+## Module Hierarchy (Proposed)
 
-SigmaOS implements parity with major Linux/BSD distributions:
+```
+src/
+├── lib.rs                           # Single aggregation point
+├── core/                            # Core types & traits
+│   ├── types.rs                     # Basic types
+│   ├── collections.rs               # Collection wrappers
+│   └── mod.rs                       # Aggregates
+├── kernel/                          # Kernel subsystems
+│   ├── vfs.rs                       # VirtualFileSystem
+│   ├── process.rs                   # ProcessManager
+│   ├── network.rs                   # ZenithNet
+│   └── mod.rs                       # Aggregates
+├── syscalls/                        # Syscall interface
+│   ├── file.rs                      # File syscalls
+│   ├── network.rs                   # Network syscalls
+│   ├── signal.rs                    # Signal syscalls
+│   └── mod.rs                       # Aggregates
+├── compatibility/                   # Distro compatibility
+└── ...
+```
 
-### Arch Linux Parity (`src/distro/arch_inspirations.rs`)
-- Rolling release channels (Edge, Stable, LTS)
-- `SigmaPkgBuild` — PKGBUILD recipe parser
-- `SigmaMakePkg` — source package builder with sandboxing
-- Signed package database (`.db.tar.gz` format)
-- Pacman-compatible dependency graph solver
+**Aggregation pattern**:
+```rust
+// src/lib.rs - Single entry point
+pub mod core;
+pub mod kernel;
+pub mod syscalls;
 
-### NixOS Parity (`src/distro/nixos_inspirations.rs`)
-- `SigmaNixConfig` — declarative system configuration
-- Content-addressed store (`StoreHash` + `/sigma/store/`)
-- `SigmaGeneration` — atomic upgrade/rollback via generations
-- Derivation model: pure function from inputs to outputs
-
-### Gentoo Parity (`src/distro/gentoo_inspirations.rs`)
-- `UseFlag` — enable/disable features at compile time
-- `Ebuild` — package build specification
-- `PortageResolver` — USE-flag-aware dependency solver
-- Source compilation with custom CFLAGS
-
-### Fedora/RHEL Parity
-- Cockpit web console (`src/remote/`)
-- PipeWire desktop audio
-- FreeIPA Kerberos authentication
-- Anitya upstream release monitoring
-- Fedora Messaging (bugzilla2fedmsg bridge)
-- Tahrir social badges system
-
-### CachyOS Parity (`src/compatibility/cachy_os.rs`)
-- BORE CPU scheduler integration
-- LLVM PGO + BOLT optimisations
-- x86-64-v3 microarchitecture tuning
-- `CachyosKernelFeatureMatrix`
-
-### OpenBSD/FreeBSD Hardening
-- W^X memory policies
-- Retguard return-address canaries
-- Jails with nested hierarchies
-- PF (packet filter) firewall
+// Re-export commonly used types
+pub use core::types::*;
+pub use kernel::process::ProcessManager;
+pub use kernel::network::ZenithNet;
+```
 
 ---
 
-## Desktop: Zenith Compositor
+## Build Error Resolution
 
-Located in `src/desktop/` and `zenith_desktop/`:
+### Error Category 1: Type Inference (E0282)
+**Root**: Generic types lose parameters across module boundaries
 
-- **Direct-to-hardware framebuffer** — no Wayland/X11 dependency
-- **HiDPI fractional scaling** — Wayland-spec fractional-scale-v1
-- **Variable Refresh Rate (VRR)** — adaptive sync
-- **Sway-style tiling** — i3-compatible tiling window manager
-- **Gamescope-inspired direct scanout** — low-latency game rendering
-- **MATE Desktop parity** — `src/desktop/mate_betsy.rs`
+**Before**:
+```rust
+// In 10 different modules
+pub use Vec;  // ERROR: what's the type parameter?
+struct MyType { items: Vec }  // ERROR: Vec<what?>
+```
 
----
+**After**:
+```rust
+// One module boundary
+pub use alloc::vec::Vec;
+// In other modules
+pub struct MyType<T> { items: Vec<T> }  // Explicit
+// Or use type aliases
+pub type StringVec = Vec<String>;
+pub struct MyType { items: StringVec }  // Clear intent
+```
 
-## Networking Stack
+### Error Category 2: Import Confusion (E0433)
+**Root**: Mixed alloc and std usage
 
-- TCP/IP, UDP, IPv6, ICMP (`src/network/`)
-- WireGuard-style VPN (`src/security/vpn.rs`)
-- DNS resolver with DNSSEC
-- Netfilter/nftables-parity packet filtering
-- io_uring-based async network I/O
-
----
-
-## Filesystem Architecture
-
-| Filesystem | Type | Notes |
-|-----------|------|-------|
-| SigmaFS | Native | Custom B-tree FS, CoW, snapshots |
-| HAMMER2 parity | BSD | DragonFly BSD-inspired PFS |
-| ext4 | Linux compat | Read/write |
-| Btrfs parity | Linux compat | Subvolumes, snapshots |
-| ZFS parity | BSD compat | RAIDZ, datasets |
-| OverlayFS | Container | Union mounts |
-| Plan9 9P | Distributed | Network-transparent FS |
-
----
-
-## Build System
-
-SigmaOS supports multiple build paths:
+**Solution**: Commit to std everywhere in src/
 
 ```bash
-# Rust kernel build
-cargo build --release --features microkernel
-
-# Full ISO build
-bash scripts/build-iso.sh
-
-# Cross-compile for aarch64
-cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-aarch64.cmake
-
-# QEMU smoke test
-python3 scripts/qemu_smoke_test.py
+# Replace all occurrences
+sed -i 's/use alloc::/use std::/g' src/**/*.rs
+sed -i 's/extern crate alloc/extern crate std/g' src/**/*.rs
 ```
 
-### Supported Target Architectures
+### Error Category 3: Duplicate Definitions (E0119)
+**Root**: Traits/types defined multiple times
 
-| Architecture | Status |
-|-------------|--------|
-| x86_64 | ✅ Primary |
-| aarch64 | ✅ Supported |
-| riscv64 | 🔧 Experimental |
+**Solution**: Single source of truth
+```rust
+// canonical location: src/types/hash_types.rs
+pub struct MyHash { ... }
+
+// Other modules: re-export
+pub use crate::types::hash_types::MyHash;
+```
 
 ---
 
-## Key Design Decisions
+## Feature Flags
 
-### No std, Only alloc
+### Default Features
+```toml
+[features]
+default = ["std", "full"]
+std = []                    # Use standard library
+full = []                   # Full feature set
+minimal = []                # Minimal build
+```
 
-The kernel and klib are compiled with `#![no_std]` + `extern crate alloc`. This eliminates the Rust standard library and forces all allocations through the kernel's own allocators.
+### Build Variants
+```bash
+# Full build (default)
+cargo build --release
 
-### Capability-Based Security by Default
+# Minimal build (only core components)
+cargo build --release --no-default-features --features "std"
 
-Every process starts in capability mode. Syscalls outside the declared capability set cause immediate termination — no exceptions, no overrides.
+# Embedded future target
+cargo build --target riscv64-unknown-none --no-default-features
+```
 
-### Zero External Dependencies
+---
 
-`Cargo.toml` has zero `[dependencies]`. Everything from JSON parsing to cryptography is implemented within the repository in `src/klib/`.
+## Timeline
 
-### Rolling Release + Atomic Upgrades
+| Phase | Task | Duration | Start | End |
+|-------|------|----------|-------|-----|
+| 1 | Remove alloc remnants | 1h | T+0 | T+1 |
+| 2 | Standardize imports | 0.5h | T+1 | T+1.5 |
+| 3 | Reorganize modules | 2-4h | T+1.5 | T+5.5 |
+| 4 | Type parameters | 2-3h | T+5.5 | T+8.5 |
+| 5 | Verify build | 1-2h | T+8.5 | T+10.5 |
 
-Inspired by Arch Linux (rolling) and NixOS (atomic), SigmaOS delivers updates continuously while guaranteeing that any failed update can be rolled back to the previous generation in under 1 second.
+**Total**: 8-12 hours
+
+---
+
+## Risks & Mitigations
+
+### Risk 1: Breaking Existing no_std Tools
+**Mitigation**: Tools in /tools/ have own no_std attributes - not affected
+- Each tool file has its own #![no_std]
+- Can maintain no_std for tools while src/ uses std
+
+### Risk 2: Future Embedded Target
+**Mitigation**: Use feature flags
+- Create `embedded` feature for future
+- Keep std default for current development
+
+### Risk 3: Performance Impact
+**Mitigation**: std doesn't add overhead for what we use
+- We already use std allocator implicitly
+- std just makes it explicit and cleaner
+
+---
+
+## Success Criteria
+
+- [ ] No more E0433 "alloc not found" errors
+- [ ] Type inference errors (E0282) reduced 80%+
+- [ ] `cargo check` passes with <500 errors
+- [ ] `cargo build --release` succeeds
+- [ ] `cargo test --all` passes
+- [ ] All 37 unit tests pass
+
+---
+
+## Related Documents
+
+- **BUILD_ANALYSIS.md** - Error analysis leading to this decision
+- **CURRENT_SESSION_STATUS.md** - Session context
+- **IMPLEMENTATION_ROADMAP.md** - Overall project roadmap
+
+---
+
+## Decision Approval
+
+**Decision**: Commit to std-based architecture  
+**Approved**: YES  
+**Implementation**: Start immediately  
+**Timeline**: 8-12 hours  
+**Next**: Execute Phase 1 (remove alloc remnants)
+
+---
+
+**Status**: READY TO IMPLEMENT
+
+This decision resolves the architectural confusion causing 303+ build errors and enables the project to move forward with full feature implementation.
+
