@@ -7,18 +7,13 @@ use std::vec;
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
-extern crate alloc;
-
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::collections::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(test)]
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -1831,9 +1826,21 @@ impl GamifiedProductivityLayer {
             daily_streak_days: 1,
             last_activity_timestamp: 0,
             badges: [
-                AchievementBadge { badge_id: "pkg_builder", name: "Package Artisan", unlocked: false },
-                AchievementBadge { badge_id: "shard_debugger", name: "Shard Whisperer", unlocked: false },
-                AchievementBadge { badge_id: "security_sentinel", name: "Security Sentinel", unlocked: false },
+                AchievementBadge {
+                    badge_id: "pkg_builder",
+                    name: "Package Artisan",
+                    unlocked: false,
+                },
+                AchievementBadge {
+                    badge_id: "shard_debugger",
+                    name: "Shard Whisperer",
+                    unlocked: false,
+                },
+                AchievementBadge {
+                    badge_id: "security_sentinel",
+                    name: "Security Sentinel",
+                    unlocked: false,
+                },
             ],
         }
     }
@@ -1981,7 +1988,12 @@ impl GentooUseFlagEngine {
             self.disabled_flags.push(name.clone());
             self.enabled_flags.retain(|f| f != &name);
         } else {
-            let name = if flag.starts_with('+') { &flag[1..] } else { flag }.to_string();
+            let name = if flag.starts_with('+') {
+                &flag[1..]
+            } else {
+                flag
+            }
+            .to_string();
             self.enabled_flags.push(name.clone());
             self.disabled_flags.retain(|f| f != &name);
         }
@@ -1992,14 +2004,14 @@ impl GentooUseFlagEngine {
     }
 
     pub fn resolve_conflicts(&self, mutually_exclusive: (&str, &str)) -> Result<(), &'static str> {
-        if self.is_flag_enabled(mutually_exclusive.0) && self.is_flag_enabled(mutually_exclusive.1) {
+        if self.is_flag_enabled(mutually_exclusive.0) && self.is_flag_enabled(mutually_exclusive.1)
+        {
             Err("Gentoo USE flag conflict: mutually exclusive flags enabled")
         } else {
             Ok(())
         }
     }
 }
-
 
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
@@ -2184,7 +2196,11 @@ impl SovereignStatelessArchitectureEngine {
         self.detected_isa_level
     }
 
-    pub fn resolve_configuration_path(&self, config_key: &str, user_overrides_exist: bool) -> String {
+    pub fn resolve_configuration_path(
+        &self,
+        config_key: &str,
+        user_overrides_exist: bool,
+    ) -> String {
         if user_overrides_exist {
             format!("{}/{}", self.user_override_path, config_key)
         } else {
@@ -2281,8 +2297,8 @@ impl SovereignCosmicTilingEngine {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitStage {
     OneOneTimeInit, // Stage 1: Initial boot mounts and initialization
-    TwoRunsvDir,     // Stage 2: Main supervision loop (runsvdir)
-    ThreeShutdown,   // Stage 3: System halt/reboot cleanup
+    TwoRunsvDir,    // Stage 2: Main supervision loop (runsvdir)
+    ThreeShutdown,  // Stage 3: System halt/reboot cleanup
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -2375,7 +2391,8 @@ impl AlpineApkPackageIndexV2 {
     }
 
     pub fn register_package(&mut self, name: &str, checksum: &str, size: u64) {
-        self.package_entries.push((name.to_string(), checksum.to_string(), size));
+        self.package_entries
+            .push((name.to_string(), checksum.to_string(), size));
     }
 
     pub fn find_package(&self, name: &str) -> Option<&(String, String, u64)> {
@@ -2585,7 +2602,10 @@ impl MageiaUrpmiMccResolver {
     }
 
     pub fn resolve_package_deps(&self, pkg_name: &str) -> Result<Vec<String>, &'static str> {
-        let pkg = self.synthesis_db.iter().find(|p| p.name == pkg_name)
+        let pkg = self
+            .synthesis_db
+            .iter()
+            .find(|p| p.name == pkg_name)
             .ok_or("Mageia URPMI: Package missing in synthesis.hdlist.cz")?;
         let mut deps = Vec::new();
         for req in &pkg.requires {
@@ -2631,7 +2651,11 @@ impl DragonFlyHammer2DeduplicationEngine {
     }
 
     pub fn write_or_dedup_block(&mut self, offset: u64, size: usize, merkle_hash: u64) -> bool {
-        if let Some(existing) = self.blocks.iter_mut().find(|b| b.merkle_hash == merkle_hash) {
+        if let Some(existing) = self
+            .blocks
+            .iter_mut()
+            .find(|b| b.merkle_hash == merkle_hash)
+        {
             existing.ref_count += 1;
             self.saved_bytes += size as u64;
             true // Deduplicated
@@ -2708,8 +2732,15 @@ impl NetBsdRumpComponentEngine {
         count
     }
 
-    pub fn dispatch_rump_hypercall(&self, component_name: &str, syscall_id: u32) -> Result<u64, &'static str> {
-        let comp = self.components.iter().find(|c| c.name == component_name)
+    pub fn dispatch_rump_hypercall(
+        &self,
+        component_name: &str,
+        syscall_id: u32,
+    ) -> Result<u64, &'static str> {
+        let comp = self
+            .components
+            .iter()
+            .find(|c| c.name == component_name)
             .ok_or("NetBSD Rump: Component not found")?;
         if !comp.is_initialized {
             return Err("NetBSD Rump: Component uninitialized");
@@ -2749,7 +2780,11 @@ impl AndroidApexContainerModuleEngine {
     }
 
     pub fn register_apex_module(&mut self, name: &str, version: u64, mount_path: &str) -> bool {
-        if self.modules.iter().any(|m| m.name == name && m.version == version) {
+        if self
+            .modules
+            .iter()
+            .any(|m| m.name == name && m.version == version)
+        {
             return false;
         }
         self.modules.push(AndroidApexModule {
@@ -2762,7 +2797,10 @@ impl AndroidApexContainerModuleEngine {
     }
 
     pub fn activate_module(&mut self, name: &str, version: u64) -> Result<(), &'static str> {
-        let module = self.modules.iter_mut().find(|m| m.name == name && m.version == version)
+        let module = self
+            .modules
+            .iter_mut()
+            .find(|m| m.name == name && m.version == version)
             .ok_or("APEX module not found")?;
         if !module.active {
             module.active = true;
@@ -2772,7 +2810,10 @@ impl AndroidApexContainerModuleEngine {
     }
 
     pub fn rollback_module(&mut self, name: &str) -> Result<u64, &'static str> {
-        let module = self.modules.iter_mut().find(|m| m.name == name && m.active)
+        let module = self
+            .modules
+            .iter_mut()
+            .find(|m| m.name == name && m.active)
             .ok_or("Active APEX module not found")?;
         module.active = false;
         if self.active_mounts > 0 {
@@ -2964,7 +3005,10 @@ impl VoidXbpsContainerEngine {
     }
 
     pub fn start_runit_service(&mut self, service_name: &str) {
-        if !self.runit_services_active.iter().any(|s| s == service_name) {
+        if !self
+            .runit_services_active
+            .contains(&service_name.to_string())
+        {
             self.runit_services_active.push(service_name.to_string());
         }
     }
@@ -3185,6 +3229,227 @@ mod extra_unimplemented_tests {
     }
 
     #[test]
+    fn test_section_7_distro_parity_innovations() {
+        // 1. Fedora rpm-ostree
+        let mut ostree = RpmOstreeDeployEngine::new();
+        let idx0 = ostree.stage_commit([1u8; 32], "6.8.0-sigma", 1700000000);
+        ostree.add_layered_package(idx0, "htop");
+        assert!(ostree.switch_active_deployment(idx0));
+        assert_eq!(ostree.deployments[idx0].1, OstreeDeploymentState::Active);
+
+        let idx1 = ostree.stage_commit([2u8; 32], "6.8.1-sigma", 1700000100);
+        assert!(ostree.switch_active_deployment(idx1));
+        assert_eq!(
+            ostree.deployments[idx0].1,
+            OstreeDeploymentState::RollbackTarget
+        );
+        assert_eq!(ostree.rollback(), Some(idx0));
+
+        // 2. Ubuntu Netplan & Cloud-init
+        let mut netplan = NetplanConfigEngine::new();
+        netplan.add_interface(NetplanInterface {
+            name: "eth0".to_string(),
+            if_type: NetplanInterfaceType::Ethernet,
+            dhcp4: true,
+            addresses: vec![],
+            gateway4: None,
+            nameservers: vec!["1.1.1.1".to_string()],
+        });
+        netplan.set_cloud_init(
+            "sigma-server-1",
+            &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."],
+        );
+        let rendered = netplan.render_systemd_networkd_config("eth0").unwrap();
+        assert!(rendered.contains("Name=eth0"));
+        assert!(rendered.contains("DHCP=yes"));
+
+        // 3. Debian Apt Pinning & Multiarch
+        let mut apt = MultiArchAptPinningResolver::new(ArchitectureTarget::X86_64);
+        apt.enable_foreign_architecture(ArchitectureTarget::I386);
+        assert_eq!(apt.supported_architectures.len(), 2);
+        apt.add_pin_rule(AptPinRule {
+            package_pattern: "*".to_string(),
+            release_channel: "experimental".to_string(),
+            priority_score: 990,
+        });
+        assert_eq!(apt.evaluate_pin_priority("libc6", "experimental"), 990);
+        assert_eq!(apt.evaluate_pin_priority("libc6", "stable"), 500);
+
+        // 4. Arch Linux PKGBUILD runner
+        let runner = PkgBuildChrootRunner::new("/var/lib/sigma_chroot");
+        let pkg_spec = PkgBuildSpec {
+            pkgname: "sigma-tool".to_string(),
+            pkgver: "1.0.0".to_string(),
+            pkgrel: 1,
+            source_url: "https://sigmaos.org/src.tar.gz".to_string(),
+            sha256_sum: [0u8; 32],
+            build_commands: vec!["cargo build --release".to_string()],
+        };
+        let artifact = runner.execute_build(&pkg_spec).unwrap();
+        assert_eq!(artifact, "sigma-tool-1.0.0-1-x86_64.pkg.tar.zst");
+
+        // 5. OpenBSD CARP & pf sync
+        let mut carp = BsdCarpFailoverEngine::new(1, 1, 100);
+        assert_eq!(carp.current_state, CarpState::Init);
+        carp.handle_advertisement(150); // peer skew 150 > local skew 100 -> local higher priority
+        assert_eq!(carp.current_state, CarpState::Master);
+
+        carp.handle_advertisement(50); // peer skew 50 < local skew 100 -> peer higher priority
+        assert_eq!(carp.current_state, CarpState::Backup);
+        carp.sync_pf_state_entry();
+        assert_eq!(carp.state_table_sync_count, 1);
+    }
+
+    #[test]
+    fn test_alpine_apk_package_index() {
+        let mut index = AlpineApkPackageIndex::new();
+        let pubkey = [0xAA; 32];
+
+        assert!(index.verify_index_signature(&pubkey));
+
+        index.add_package(ApkPackageEntry {
+            name: "musl".to_string(),
+            version: "1.2.4".to_string(),
+            arch: "x86_64".to_string(),
+            sha256_hash: [0x12; 32],
+            dependencies: vec![],
+        });
+
+        index.add_package(ApkPackageEntry {
+            name: "busybox".to_string(),
+            version: "1.36.1".to_string(),
+            arch: "x86_64".to_string(),
+            sha256_hash: [0x34; 32],
+            dependencies: vec!["musl".to_string()],
+        });
+
+        let pkg = index.find_package("busybox").unwrap();
+        assert_eq!(pkg.version, "1.36.1");
+
+        let deps = index.resolve_dependencies("busybox");
+        assert_eq!(deps, vec!["musl"]);
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_snapshot() {
+        let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
+        hammer2.register_cluster_node(10, "10.0.0.1");
+
+        let snap_id = hammer2.create_pfs_snapshot("@ROOT_SNAP_1", 0xAABBCCDD, 1700000000);
+        assert_eq!(snap_id, 1);
+
+        assert!(hammer2.replicate_snapshot_to_node(snap_id, 10).is_ok());
+        assert!(hammer2.replicate_snapshot_to_node(snap_id, 99).is_err());
+
+        let merkle = hammer2.rollback_pfs("@ROOT_SNAP_1", snap_id).unwrap();
+        assert_eq!(merkle, 0xAABBCCDD);
+    }
+
+    #[test]
+    fn test_sovereign_amnesic_engine_ram_wipe() {
+        let mut amnesic = SovereignAmnesicEngine::new();
+        assert!(amnesic.is_amnesic_mode);
+
+        let spoofed = amnesic.spoof_mac_address(0x123456);
+        assert!(amnesic.mac_spoofed);
+        assert_eq!(spoofed[0..3], [0x00, 0x16, 0x3E]);
+
+        let mut buffer = [0xFFu8; 1024];
+        let wiped = amnesic.wipe_volatile_ram_patterns(&mut buffer);
+        assert_eq!(wiped, 1024);
+        assert!(buffer.iter().all(|&b| b == 0x00));
+    }
+
+    #[test]
+    fn test_sovereign_runit_supervisor_stages() {
+        let mut supervisor = SovereignRunitSupervisor::new();
+        assert_eq!(supervisor.active_stage, RunitStage::OneOneTimeInit);
+
+        supervisor.transition_stage(RunitStage::TwoRunsvDir);
+        assert_eq!(supervisor.active_stage, RunitStage::TwoRunsvDir);
+
+        assert!(supervisor.register_service("dbus").is_ok());
+        assert!(supervisor.start_service("dbus", 1001).is_ok());
+
+        assert_eq!(
+            supervisor.services[0].as_ref().unwrap().status,
+            RunitServiceStatus::Up
+        );
+        assert_eq!(supervisor.services[0].as_ref().unwrap().pid, 1001);
+
+        assert!(supervisor.stop_service("dbus").is_ok());
+        assert_eq!(
+            supervisor.services[0].as_ref().unwrap().status,
+            RunitServiceStatus::Down
+        );
+    }
+
+    #[test]
+    fn test_sovereign_stateless_architecture_isa() {
+        let mut engine = SovereignStatelessArchitectureEngine::new();
+        assert_eq!(
+            engine.resolve_configuration_path("hostname", false),
+            "/usr/share/factory/etc/hostname"
+        );
+        assert_eq!(
+            engine.resolve_configuration_path("hostname", true),
+            "/etc/hostname"
+        );
+
+        let level_v4 = engine.auto_detect_isa_level(true, true);
+        assert_eq!(level_v4, X86IsaLevel::V4Sapphire);
+
+        let level_v1 = engine.auto_detect_isa_level(false, false);
+        assert_eq!(level_v1, X86IsaLevel::V1Baseline);
+    }
+
+    #[test]
+    fn test_sovereign_nix_gc_engine() {
+        let mut gc = SovereignNixGcEngine::new();
+        gc.register_store_path("/nix/store/pkg1", true);
+        gc.register_store_path("/nix/store/pkg2", false);
+        gc.register_store_path("/nix/store/pkg3", false);
+
+        let pruned = gc.collect_garbage();
+        assert_eq!(pruned, 2);
+        assert_eq!(gc.store_nodes.len(), 1);
+        assert_eq!(gc.reclaimed_bytes, 2 * 1024 * 1024);
+    }
+
+    #[test]
+    fn test_sovereign_cosmic_tiling_engine() {
+        let mut tiling = SovereignCosmicTilingEngine::new();
+        tiling.set_gpu_offload(GpuRenderPreference::DiscreteNvidia);
+        assert_eq!(tiling.gpu_preference, GpuRenderPreference::DiscreteNvidia);
+
+        let dir1 = tiling.split_tile();
+        assert_eq!(dir1, BspSplitDirection::Horizontal);
+
+        let dir2 = tiling.split_tile();
+        assert_eq!(dir2, BspSplitDirection::Vertical);
+    }
+
+    #[test]
+    fn test_nixos_declarative_config() {
+        let mut nix = NixOsDeclarativeConfigEngine::new();
+
+        let gen1 = nix.build_generation(0x11223344, 1700000000, 120, "loglevel=4 quiet");
+        assert_eq!(gen1, 1);
+        assert_eq!(nix.active_generation, 1);
+
+        let gen2 = nix.build_generation(0x55667788, 1700000100, 125, "loglevel=7 debug");
+        assert_eq!(gen2, 2);
+        assert_eq!(nix.active_generation, 2);
+
+        let rolled_back = nix.rollback_generation().unwrap();
+        assert_eq!(rolled_back.gen_number, 1);
+        assert_eq!(nix.active_generation, 1);
+
+        nix.switch_generation(2).unwrap();
+        assert_eq!(nix.active_generation, 2);
+    }
+
+    #[test]
     fn test_antix_low_ram_sysvinit_governor() {
         let mut gov = AntiXLowRamSysVInitGovernor::new(256);
         assert!(gov.disable_compositing);
@@ -3334,4 +3599,611 @@ mod extra_unimplemented_tests {
         assert_eq!(dispatch_res, 0x8000_0005);
     }
 
+    #[test]
+    fn test_android_apex_container_module_engine() {
+        let mut engine = AndroidApexContainerModuleEngine::new();
+        assert!(engine.register_apex_module(
+            "com.android.runtime",
+            330000000,
+            "/apex/com.android.runtime"
+        ));
+        assert!(!engine.register_apex_module(
+            "com.android.runtime",
+            330000000,
+            "/apex/com.android.runtime"
+        ));
+
+        assert!(engine
+            .activate_module("com.android.runtime", 330000000)
+            .is_ok());
+        assert_eq!(engine.active_mounts, 1);
+
+        let version = engine.rollback_module("com.android.runtime").unwrap();
+        assert_eq!(version, 330000000);
+        assert_eq!(engine.active_mounts, 0);
+    }
+
+    #[test]
+    fn test_rosetta_dynamic_binary_translator() {
+        let mut translator = RosettaDynamicBinaryTranslator::new(TargetArch::AArch64);
+        let x86_code = [0x90, 0x90, 0xc3]; // NOP NOP RET
+        let translated1 = translator.translate_instruction_block(0x400000, &x86_code);
+        assert_eq!(translator.total_translations, 1);
+        assert_eq!(translator.translation_cache[0].hit_count, 1);
+
+        let translated2 = translator.translate_instruction_block(0x400000, &x86_code);
+        assert_eq!(translated1, translated2);
+        assert_eq!(translator.total_translations, 1);
+        assert_eq!(translator.translation_cache[0].hit_count, 2);
+    }
+
+    #[test]
+    fn test_phoronix_automated_benchmark_engine() {
+        let mut phoronix = PhoronixAutomatedBenchmarkEngine::new("Kernel Scheduler Suite");
+        phoronix.run_test("7-Zip Compression", "MIPS", 45000.0);
+        phoronix.run_test("Sysbench CPU", "events/sec", 15000.0);
+        assert_eq!(phoronix.results.len(), 2);
+        assert_eq!(phoronix.compute_composite_index(), 30000.0);
+    }
+
+    #[test]
+    fn test_distrowatch_parity_metrics_hub() {
+        let mut hub = DistroWatchParityMetricsHub::new();
+        hub.record_distro_parity("Arch Linux", 100);
+        hub.record_distro_parity("FreeBSD", 90);
+        assert_eq!(hub.distros.len(), 2);
+        assert_eq!(hub.average_ecosystem_parity(), 95.0);
+    }
+}
+
+// =========================================================================
+// DISTRO-INSPIRED ECOSYSTEM ENCOUNTER ENFORCE ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub major_version: u32,
+    pub errata_patches_applied: usize,
+    pub security_advisories: Vec<String>,
+}
+
+impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
+    pub fn new(major_version: u32) -> Self {
+        Self {
+            major_version,
+            errata_patches_applied: 0,
+            security_advisories: Vec::new(),
+        }
+    }
+
+    pub fn verify_abi_compatibility(&self, target_version: u32) -> bool {
+        target_version <= self.major_version
+    }
+
+    pub fn apply_errata_patch(&mut self, advisory: &str) {
+        self.errata_patches_applied += 1;
+        self.security_advisories.push(advisory.to_string());
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct VoidXbpsContainerEngine {
+    pub registered_packages: Vec<String>,
+    pub runit_services_active: Vec<String>,
+}
+
+impl VoidXbpsContainerEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn install_xbps_package(&mut self, name: &str) {
+        if !self.registered_packages.contains(&name.to_string()) {
+            self.registered_packages.push(name.to_string());
+        }
+    }
+
+    pub fn start_runit_service(&mut self, service: &str) {
+        if !self.runit_services_active.contains(&service.to_string()) {
+            self.runit_services_active.push(service.to_string());
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PuppyLinuxOverlayRamdiskEngine {
+    pub ramdisk_size_mb: usize,
+    pub loaded_sfs_modules: Vec<String>,
+    pub persistence_save_file: Option<String>,
+}
+
+impl PuppyLinuxOverlayRamdiskEngine {
+    pub fn new(ramdisk_size_mb: usize) -> Self {
+        Self {
+            ramdisk_size_mb,
+            loaded_sfs_modules: Vec::new(),
+            persistence_save_file: None,
+        }
+    }
+
+    pub fn load_sfs_module(&mut self, sfs_name: &str) {
+        self.loaded_sfs_modules.push(sfs_name.to_string());
+    }
+
+    pub fn mount_persistence(&mut self, path: &str) {
+        self.persistence_save_file = Some(path.to_string());
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct TinyCoreModularTczLoader {
+    pub mounted_extensions: Vec<String>,
+    pub total_ram_used_kb: usize,
+}
+
+impl TinyCoreModularTczLoader {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn mount_tcz(&mut self, tcz_name: &str, size_kb: usize) {
+        self.mounted_extensions.push(tcz_name.to_string());
+        self.total_ram_used_kb += size_kb;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeepinDdeControlCenterEngine {
+    pub theme_mode: String,
+    pub dock_position: String,
+}
+
+impl DeepinDdeControlCenterEngine {
+    pub fn new() -> Self {
+        Self {
+            theme_mode: "Dark".to_string(),
+            dock_position: "Bottom".to_string(),
+        }
+    }
+
+    pub fn set_theme_mode(&mut self, mode: &str) {
+        self.theme_mode = mode.to_string();
+    }
+
+    pub fn set_dock_position(&mut self, pos: &str) {
+        self.dock_position = pos.to_string();
+    }
+}
+
+impl Default for DeepinDdeControlCenterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct ManjaroHardwareDetectionEngine {
+    pub recommended_drivers: Vec<String>,
+    pub installed_drivers: Vec<String>,
+}
+
+impl ManjaroHardwareDetectionEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn scan_pci_bus(&mut self, vendor_id: u16, _device_id: u16) {
+        if vendor_id == 0x10DE {
+            self.recommended_drivers.push("video-nvidia".to_string());
+        } else {
+            self.recommended_drivers.push("video-linux".to_string());
+        }
+    }
+
+    pub fn auto_install_recommended_drivers(&mut self) -> usize {
+        let count = self.recommended_drivers.len();
+        self.installed_drivers
+            .extend(self.recommended_drivers.clone());
+        count
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct SteamOsGamescopeCompositorEngine {
+    pub fsr_enabled: bool,
+    pub target_fps_limit: u32,
+}
+
+impl SteamOsGamescopeCompositorEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn enable_fsr(&mut self, enable: bool) {
+        self.fsr_enabled = enable;
+    }
+
+    pub fn set_fps_limit(&mut self, fps: u32) {
+        self.target_fps_limit = fps;
+    }
+
+    pub fn lease_drm_surface(&self) -> u32 {
+        1
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PhoronixTestSuiteRunner {
+    pub suite_name: String,
+    pub scores: Vec<f64>,
+}
+
+impl PhoronixTestSuiteRunner {
+    pub fn new(suite_name: &str) -> Self {
+        Self {
+            suite_name: suite_name.to_string(),
+            scores: Vec::new(),
+        }
+    }
+
+    pub fn execute_benchmark(&mut self, _test_name: &str, score: f64) {
+        self.scores.push(score);
+    }
+
+    pub fn calculate_composite_score(&self) -> f64 {
+        if self.scores.is_empty() {
+            0.0
+        } else {
+            self.scores.iter().sum::<f64>() / self.scores.len() as f64
+        }
+    }
+}
+
+// =========================================================================
+// TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DocField {
+    pub fieldname: String,
+    pub fieldtype: String,
+    pub label: String,
+    pub reqd: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FrappeFrameworkDocTypeEngine {
+    pub doctype_name: String,
+    pub fields: Vec<DocField>,
+    pub workflow_state: String,
+    pub is_submittable: bool,
+}
+
+impl FrappeFrameworkDocTypeEngine {
+    pub fn new(doctype_name: &str) -> Self {
+        Self {
+            doctype_name: doctype_name.to_string(),
+            fields: Vec::new(),
+            workflow_state: "Draft".to_string(),
+            is_submittable: true,
+        }
+    }
+
+    pub fn add_field(&mut self, fieldname: &str, fieldtype: &str, label: &str, reqd: bool) {
+        self.fields.push(DocField {
+            fieldname: fieldname.to_string(),
+            fieldtype: fieldtype.to_string(),
+            label: label.to_string(),
+            reqd,
+        });
+    }
+
+    pub fn transition_workflow(&mut self, action: &str) -> Result<String, &'static str> {
+        match action {
+            "submit" => {
+                if self.is_submittable {
+                    self.workflow_state = "Submitted".to_string();
+                    Ok(self.workflow_state.clone())
+                } else {
+                    Err("DocType is not submittable")
+                }
+            }
+            "cancel" => {
+                if self.workflow_state == "Submitted" {
+                    self.workflow_state = "Cancelled".to_string();
+                    Ok(self.workflow_state.clone())
+                } else {
+                    Err("Only submitted documents can be cancelled")
+                }
+            }
+            _ => Err("Unknown workflow action"),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct HwbustersPowerSupplyMonitor {
+    pub psu_wattage_rating: u32,
+    pub current_load_watts: f64,
+    pub rail_12v_ripple_mv: f64,
+    pub atx_3_0_power_excursion_watts: f64,
+}
+
+impl HwbustersPowerSupplyMonitor {
+    pub fn new(wattage: u32) -> Self {
+        Self {
+            psu_wattage_rating: wattage,
+            current_load_watts: 0.0,
+            rail_12v_ripple_mv: 15.0,
+            atx_3_0_power_excursion_watts: 0.0,
+        }
+    }
+
+    pub fn record_load(&mut self, load_watts: f64, ripple_mv: f64) {
+        self.current_load_watts = load_watts;
+        self.rail_12v_ripple_mv = ripple_mv;
+    }
+
+    pub fn calculate_efficiency_percent(&self) -> f64 {
+        let load_factor = self.current_load_watts / (self.psu_wattage_rating as f64);
+        if load_factor >= 0.2 && load_factor <= 0.8 {
+            92.5
+        } else {
+            87.0
+        }
+    }
+
+    pub fn handle_atx_3_0_power_spike(&mut self, spike_watts: f64) -> bool {
+        self.atx_3_0_power_excursion_watts = spike_watts;
+        spike_watts <= (self.psu_wattage_rating as f64) * 2.0
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Android15PrivateSpaceGovernor {
+    pub is_locked: bool,
+    pub biometric_auth_required: bool,
+    pub private_apps: Vec<String>,
+    pub suspended_processes: Vec<u32>,
+}
+
+impl Android15PrivateSpaceGovernor {
+    pub fn new() -> Self {
+        Self {
+            is_locked: true,
+            biometric_auth_required: true,
+            private_apps: Vec::new(),
+            suspended_processes: Vec::new(),
+        }
+    }
+
+    pub fn register_private_app(&mut self, app_id: &str) {
+        self.private_apps.push(app_id.to_string());
+    }
+
+    pub fn unlock_space(&mut self, biometric_passed: bool) -> bool {
+        if biometric_passed || !self.biometric_auth_required {
+            self.is_locked = false;
+            true
+        } else {
+            self.is_locked = true;
+            false
+        }
+    }
+
+    pub fn lock_space_and_suspend_bg(&mut self) -> usize {
+        self.is_locked = true;
+        let suspended = self.private_apps.len();
+        self.suspended_processes = (0..suspended as u32).collect();
+        suspended
+    }
+}
+
+impl Default for Android15PrivateSpaceGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MacOsSequoiaWindowManager {
+    pub active_layout: String,
+    pub iphone_mirroring_connected: bool,
+    pub pqc_encrypted_airplay_channel: bool,
+}
+
+impl MacOsSequoiaWindowManager {
+    pub fn new() -> Self {
+        Self {
+            active_layout: "Halves".to_string(),
+            iphone_mirroring_connected: false,
+            pqc_encrypted_airplay_channel: true,
+        }
+    }
+
+    pub fn set_tile_layout(&mut self, layout: &str) {
+        self.active_layout = layout.to_string();
+    }
+
+    pub fn pair_iphone_mirroring(&mut self, device_id: &str) -> bool {
+        if !device_id.is_empty() && self.pqc_encrypted_airplay_channel {
+            self.iphone_mirroring_connected = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for MacOsSequoiaWindowManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WindowsCopilotRecallAuditor {
+    pub snapshots_taken: usize,
+    pub pqc_encryption_active: bool,
+    pub sensitive_data_masked: bool,
+}
+
+impl WindowsCopilotRecallAuditor {
+    pub fn new() -> Self {
+        Self {
+            snapshots_taken: 0,
+            pqc_encryption_active: true,
+            sensitive_data_masked: true,
+        }
+    }
+
+    pub fn capture_privacy_governed_snapshot(
+        &mut self,
+        app_window: &str,
+    ) -> Result<String, &'static str> {
+        if app_window.contains("Banking") || app_window.contains("Password") {
+            Err("Snapshot blocked by AI privacy sandbox policy")
+        } else {
+            self.snapshots_taken += 1;
+            Ok(format!(
+                "Snapshot #{} encrypted and stored in Kyber-1024 sandbox",
+                self.snapshots_taken
+            ))
+        }
+    }
+}
+
+impl Default for WindowsCopilotRecallAuditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod new_unimplemented_tests {
+    use super::*;
+
+    #[test]
+    fn test_rocky_alma_enterprise_lifecycle_governor() {
+        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9);
+        assert!(gov.verify_abi_compatibility(8));
+        assert!(gov.verify_abi_compatibility(9));
+        assert!(!gov.verify_abi_compatibility(10));
+
+        gov.apply_errata_patch("RHSA-2026:1234");
+        assert_eq!(gov.errata_patches_applied, 1);
+        assert_eq!(gov.security_advisories[0], "RHSA-2026:1234");
+    }
+
+    #[test]
+    fn test_void_xbps_container_engine() {
+        let mut xbps = VoidXbpsContainerEngine::new();
+        xbps.install_xbps_package("xbps-src");
+        xbps.start_runit_service("dhcpcd");
+        xbps.start_runit_service("dhcpcd"); // duplicate check
+        assert_eq!(xbps.registered_packages.len(), 1);
+        assert_eq!(xbps.runit_services_active.len(), 1);
+    }
+
+    #[test]
+    fn test_puppy_linux_overlay_ramdisk_engine() {
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048);
+        puppy.load_sfs_module("puppy_sigma_2.0.sfs");
+        puppy.mount_persistence("/mnt/home/sigmasave.2fs");
+        assert_eq!(puppy.loaded_sfs_modules.len(), 1);
+        assert_eq!(
+            puppy.persistence_save_file.unwrap(),
+            "/mnt/home/sigmasave.2fs"
+        );
+    }
+
+    #[test]
+    fn test_tinycore_modular_tcz_loader() {
+        let mut tcz = TinyCoreModularTczLoader::new();
+        tcz.mount_tcz("wifi.tcz", 1024);
+        tcz.mount_tcz("openssh.tcz", 2048);
+        assert_eq!(tcz.mounted_extensions.len(), 2);
+        assert_eq!(tcz.total_ram_used_kb, 3072);
+    }
+
+    #[test]
+    fn test_deepin_dde_control_center_engine() {
+        let mut dde = DeepinDdeControlCenterEngine::new();
+        dde.set_theme_mode("Light");
+        dde.set_dock_position("Top");
+        assert_eq!(dde.theme_mode, "Light");
+        assert_eq!(dde.dock_position, "Top");
+    }
+
+    #[test]
+    fn test_manjaro_hardware_detection_engine() {
+        let mut mhwd = ManjaroHardwareDetectionEngine::new();
+        mhwd.scan_pci_bus(0x10DE, 0x1E84);
+        assert_eq!(mhwd.recommended_drivers[0], "video-nvidia");
+        assert_eq!(mhwd.auto_install_recommended_drivers(), 1);
+    }
+
+    #[test]
+    fn test_steamos_gamescope_compositor_engine() {
+        let mut gamescope = SteamOsGamescopeCompositorEngine::new();
+        gamescope.enable_fsr(true);
+        gamescope.set_fps_limit(120);
+        let leased = gamescope.lease_drm_surface();
+        assert!(gamescope.fsr_enabled);
+        assert_eq!(gamescope.target_fps_limit, 120);
+        assert_eq!(leased, 1);
+    }
+
+    #[test]
+    fn test_phoronix_test_suite_runner() {
+        let mut phoronix = PhoronixTestSuiteRunner::new("Graphics Suite");
+        phoronix.execute_benchmark("Unigine Heaven", 120.0);
+        phoronix.execute_benchmark("Shadow of Tomb Raider", 80.0);
+        assert_eq!(phoronix.calculate_composite_score(), 100.0);
+    }
+
+    #[test]
+    fn test_frappe_framework_doctype_engine() {
+        let mut frappe = FrappeFrameworkDocTypeEngine::new("Customer Order");
+        frappe.add_field("customer_name", "Data", "Customer Name", true);
+        assert_eq!(frappe.fields.len(), 1);
+        assert_eq!(frappe.transition_workflow("submit").unwrap(), "Submitted");
+        assert_eq!(frappe.transition_workflow("cancel").unwrap(), "Cancelled");
+    }
+
+    #[test]
+    fn test_hwbusters_power_supply_monitor() {
+        let mut psu = HwbustersPowerSupplyMonitor::new(1000);
+        psu.record_load(500.0, 12.0);
+        assert_eq!(psu.calculate_efficiency_percent(), 92.5);
+        assert!(psu.handle_atx_3_0_power_spike(1800.0));
+    }
+
+    #[test]
+    fn test_android15_private_space_governor() {
+        let mut space = Android15PrivateSpaceGovernor::new();
+        space.register_private_app("com.bank.app");
+        assert!(space.unlock_space(true));
+        assert_eq!(space.lock_space_and_suspend_bg(), 1);
+        assert!(space.is_locked);
+    }
+
+    #[test]
+    fn test_macos_sequoia_window_manager() {
+        let mut sequoia = MacOsSequoiaWindowManager::new();
+        sequoia.set_tile_layout("Grid");
+        assert_eq!(sequoia.active_layout, "Grid");
+        assert!(sequoia.pair_iphone_mirroring("iphone_16_pro"));
+    }
+
+    #[test]
+    fn test_windows_copilot_recall_auditor() {
+        let mut recall = WindowsCopilotRecallAuditor::new();
+        assert!(recall
+            .capture_privacy_governed_snapshot("Terminal - zsh")
+            .is_ok());
+        assert!(recall
+            .capture_privacy_governed_snapshot("Banking Online")
+            .is_err());
+    }
 }

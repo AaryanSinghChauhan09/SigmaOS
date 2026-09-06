@@ -50,32 +50,8 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-/// Description of Snapcraft Manifest (snap parity)
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub description: String,
-    pub confinement: String,
-    pub grade: String,
-    pub apps: Vec<String>,
-    pub plugs: Vec<String>,
-}
-/// Description of Flatpak Manifest (flatpak parity)
-pub struct FlatpakManifest {
-    pub id: String,
-    pub runtime: String,
-    pub runtime_version: String,
-    pub sdk: String,
-    pub command: String,
-    pub finish_args: Vec<String>,
-}
-#[derive(Debug, Clone)]
-pub enum AdapterError {
-    ParseError(String),
-    ValidationError(String),
-    UnsupportedFormat(String),
-}
+use crate::security::Permission;
+use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -915,8 +891,6 @@ impl UniversalPackageAdapter {
         } else if f.ends_with(".pkg.tar.zst")
             || f.ends_with(".pkg.tar.xz")
             || f.ends_with(".pkg.tar.gz")
-            || f.contains("pacman")
-            || f.ends_with(".pacman")
         {
             Some(PackageFormat::Pacman)
         } else if f.ends_with(".apk") {
@@ -1227,15 +1201,6 @@ impl UniversalPackageAdapter {
                     &deps,
                 )
             }
-            Some(PackageFormat::Hpkg) => {
-                let hpkg = self.parse_haiku_hpkg(raw_text)?;
-                self.translate_to_native_package(
-                    &hpkg.name,
-                    &hpkg.version,
-                    &hpkg.summary,
-                    &hpkg.requires,
-                )
-            }
             _ => {
                 // Heuristic inspection if extension detection wasn't definitive
                 if raw_text.contains("Package:") && raw_text.contains("Version:") {
@@ -1335,14 +1300,6 @@ impl UniversalPackageAdapter {
                         &slack.version,
                         &slack.description,
                         &slack.slack_required,
-                    )
-                } else if raw_text.contains("requires {") || (raw_text.contains("summary \"") && raw_text.contains("architecture ")) {
-                    let hpkg = self.parse_haiku_hpkg(raw_text)?;
-                    self.translate_to_native_package(
-                        &hpkg.name,
-                        &hpkg.version,
-                        &hpkg.summary,
-                        &hpkg.requires,
                     )
                 } else {
                     Err("Unrecognized package manifest format")
@@ -1643,15 +1600,6 @@ impl SigPkgUniversalBridgeEngine {
                     &net.version,
                     &net.comment,
                     &net.depends,
-                )
-            }
-            PackageFormat::Hpkg => {
-                let hpkg = self.adapter.parse_haiku_hpkg(&manifest_text)?;
-                self.adapter.translate_to_native_package(
-                    &hpkg.name,
-                    &hpkg.version,
-                    &hpkg.summary,
-                    &hpkg.requires,
                 )
             }
             _ => self
@@ -2313,7 +2261,9 @@ impl UniversalFormatConverter {
 
         match format {
             PackageFormat::Apt => {
-                let parsed = adapter.parse_apt_control(&text).map_err(|e: &'static str| e.to_string())?;
+                let parsed = adapter
+                    .parse_apt_control(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -2329,7 +2279,9 @@ impl UniversalFormatConverter {
                     .map_err(|e: &'static str| e.to_string())
             }
             PackageFormat::Pacman => {
-                let parsed = adapter.parse_pacman_pkgbuild(&text).map_err(|e: &'static str| e.to_string())?;
+                let parsed = adapter
+                    .parse_pacman_pkgbuild(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -2344,8 +2296,10 @@ impl UniversalFormatConverter {
                     )
                     .map_err(|e: &'static str| e.to_string())
             }
-            PackageFormat::Yum => {
-                let parsed = adapter.parse_rpm_spec(&text).map_err(|e: &'static str| e.to_string())?;
+            PackageFormat::Yum | PackageFormat::Pisi => {
+                let parsed = adapter
+                    .parse_rpm_spec(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .requires
                     .iter()
@@ -2360,11 +2314,143 @@ impl UniversalFormatConverter {
                     )
                     .map_err(|e: &'static str| e.to_string())
             }
-            _ => {
-                let name = format!("{:?}-converted-pkg", format).to_lowercase();
+            PackageFormat::Apk => {
+                let parsed = adapter
+                    .parse_apkindex(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = parsed
+                    .depends
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
                 adapter
-                    .translate_to_native_package(&name, "1.0.0", "Converted foreign package", &[])
+                    .translate_to_native_package(
+                        &parsed.pkgname,
+                        &parsed.pkgver,
+                        &parsed.pkgdesc,
+                        &canonical_deps,
+                    )
                     .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Xbps => {
+                let parsed = adapter
+                    .parse_xbps_manifest(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = parsed
+                    .run_depends
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.pkgname,
+                        &parsed.version,
+                        &parsed.short_desc,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Portage => {
+                let parsed = adapter
+                    .parse_gentoo_ebuild("package.ebuild", &text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let mut raw_deps = parsed.rdepend.clone();
+                raw_deps.extend(parsed.depend.clone());
+                let canonical_deps: Vec<String> = raw_deps
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.package_name,
+                        &parsed.version,
+                        &parsed.description,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Snap => {
+                let parsed = adapter
+                    .parse_snapcraft_yaml(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = parsed
+                    .plugs
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.name,
+                        &parsed.version,
+                        &parsed.summary,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Flatpak => {
+                let parsed = adapter
+                    .parse_flatpak_json(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = parsed
+                    .finish_args
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &parsed.app_id,
+                        "1.0.0",
+                        "Flatpak Sandboxed App",
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            _ => {
+                if text.contains("Package:") && text.contains("Version:") {
+                    let deb = adapter
+                        .parse_apt_control(&text)
+                        .map_err(|e: &'static str| e.to_string())?;
+                    let canonical_deps: Vec<String> = deb
+                        .depends
+                        .iter()
+                        .map(|d| self.dep_mapper.to_canonical_name(d))
+                        .collect();
+                    adapter
+                        .translate_to_native_package(
+                            &deb.package,
+                            &deb.version,
+                            &deb.description,
+                            &canonical_deps,
+                        )
+                        .map_err(|e: &'static str| e.to_string())
+                } else if text.contains("pkgname=") && text.contains("pkgver=") {
+                    let pkgbuild = adapter
+                        .parse_pacman_pkgbuild(&text)
+                        .map_err(|e: &'static str| e.to_string())?;
+                    let canonical_deps: Vec<String> = pkgbuild
+                        .depends
+                        .iter()
+                        .map(|d| self.dep_mapper.to_canonical_name(d))
+                        .collect();
+                    adapter
+                        .translate_to_native_package(
+                            &pkgbuild.pkgname,
+                            &pkgbuild.pkgver,
+                            &pkgbuild.pkgdesc,
+                            &canonical_deps,
+                        )
+                        .map_err(|e: &'static str| e.to_string())
+                } else {
+                    let name = format!("{:?}-converted-pkg", format).to_lowercase();
+                    adapter
+                        .translate_to_native_package(
+                            &name,
+                            "1.0.0",
+                            "Converted foreign package",
+                            &[],
+                        )
+                        .map_err(|e: &'static str| e.to_string())
+                }
             }
         }
     }
@@ -2664,7 +2750,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Eopkg)
+            Some(PackageFormat::Pisi)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
@@ -2739,58 +2825,6 @@ mod tests {
             adapter.detect_format_by_extension("recipe.cports"),
             Some(PackageFormat::Cports)
         );
-        assert_eq!(
-            adapter.detect_format_by_extension("router.ipk"),
-            Some(PackageFormat::Ipk)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("yocto.opkg"),
-            Some(PackageFormat::Opkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("solaris.p5p"),
-            Some(PackageFormat::SolarisIps)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("store.nar"),
-            Some(PackageFormat::GuixNar)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("base.openbsd.tgz"),
-            Some(PackageFormat::OpenBsdPkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("hpc.spack"),
-            Some(PackageFormat::Spack)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("cpp.conan"),
-            Some(PackageFormat::Conan)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("python.whl"),
-            Some(PackageFormat::Wheel)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("rust.crate"),
-            Some(PackageFormat::Crate)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("ruby.gem"),
-            Some(PackageFormat::Gem)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("dotnet.nupkg"),
-            Some(PackageFormat::Nupkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("ms.vcpkg"),
-            Some(PackageFormat::Vcpkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("nix.narinfo"),
-            Some(PackageFormat::NarInfo)
-        );
 
         // Check format detection by header signature magic
         assert_eq!(
@@ -2828,58 +2862,6 @@ mod tests {
         assert_eq!(
             adapter.detect_format_by_header(b"SPKG0001header"),
             Some(PackageFormat::Sovereign)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"IPK!hdr"),
-            Some(PackageFormat::Ipk)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"OPKGhdr"),
-            Some(PackageFormat::Opkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"P5P!hdr"),
-            Some(PackageFormat::SolarisIps)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"NARShdr"),
-            Some(PackageFormat::GuixNar)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"OBSDhdr"),
-            Some(PackageFormat::OpenBsdPkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"SPAKhdr"),
-            Some(PackageFormat::Spack)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"CONAhdr"),
-            Some(PackageFormat::Conan)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"WHELhdr"),
-            Some(PackageFormat::Wheel)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"CRAThdr"),
-            Some(PackageFormat::Crate)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"GEMShdr"),
-            Some(PackageFormat::Gem)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"NUPKhdr"),
-            Some(PackageFormat::Nupkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"VCPKhdr"),
-            Some(PackageFormat::Vcpkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"NARIhdr"),
-            Some(PackageFormat::NarInfo)
         );
     }
 

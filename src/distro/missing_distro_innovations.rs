@@ -863,16 +863,36 @@ impl MissingDistroComponentsEngine {
             records: BTreeMap::new(),
         };
 
-        engine.register_component("Portage USE Flags", "Gentoo", ComponentParityStatus::Implemented);
-        engine.register_component("APK Trigger Hooks", "Alpine", ComponentParityStatus::Implemented);
-        engine.register_component("AUR Recipe Helper", "Arch Linux", ComponentParityStatus::Implemented);
-        engine.register_component("Pledge & Unveil", "OpenBSD", ComponentParityStatus::Implemented);
-        engine.register_component("Jails & ZFS BootEnv", "FreeBSD", ComponentParityStatus::Implemented);
-        engine.register_component("RPM-OSTree Atomic Trees", "Fedora Silverblue", ComponentParityStatus::Implemented);
-        engine.register_component("AppArmor MAC Profiles", "Ubuntu", ComponentParityStatus::Implemented);
-        engine.register_component("Nix Flakes Lock System", "NixOS", ComponentParityStatus::Implemented);
-        engine.register_component("HAMMER2 PFS Clustering", "DragonFly BSD", ComponentParityStatus::Implemented);
-        engine.register_component("pkgsrc Cross-Platform Infrastructure", "NetBSD", ComponentParityStatus::Implemented);
+        engine.register_component(
+            "Portage USE Flags",
+            "Gentoo",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "APK Trigger Hooks",
+            "Alpine",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "AUR Recipe Helper",
+            "Arch Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Pledge & Unveil",
+            "OpenBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Jails & ZFS BootEnv",
+            "FreeBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "RPM-OSTree Atomic Trees",
+            "Fedora Silverblue",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
     }

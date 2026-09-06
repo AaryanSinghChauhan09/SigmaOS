@@ -15,6 +15,8 @@ use crate::klib::{Arc, HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
+#[cfg(any(feature = "standalone_test", test))]
+use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -79,13 +81,128 @@ pub mod node_distribution_dummy {
 #[cfg(any(feature = "standalone_test", test))]
 use node_distribution_dummy::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PackageState {
-    Uninstalled,
-    Downloading,
-    Installing,
-    Installed,
-    BrokenDependency,
+/// Foreign distro manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ForeignDistroManifest {
+    pub raw_format: PackageFormat,
+    pub original_name: String,
+    pub version: String,
+    pub architecture: String,
+    pub raw_dependencies: Vec<String>,
+    pub raw_provides: Vec<String>,
+    pub raw_conflicts: Vec<String>,
+    pub maintainer: String,
+}
+
+/// Helper translator converting ForeignDistroManifest to native UnifiedPackage
+pub struct UniversalPackageTranslator;
+
+impl UniversalPackageTranslator {
+    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
+        let mut pkg = UnifiedPackage::new(
+            format!("sigpkg-{}", manifest.original_name),
+            manifest.version.clone(),
+        )
+        .with_format(PackageFormat::SigmaPkg)
+        .with_provides(manifest.original_name.clone());
+
+        for dep in manifest.raw_dependencies.iter() {
+            let dep_str: &str = dep.as_str();
+            let translated_dep: &str = match dep_str {
+                "libssl-dev" | "openssl-devel" | "openssl" => "sovereign-openssl",
+                "libc6" => "sovereign-libc",
+                other => debtor_to_sovereign_name(other),
+            };
+            pkg = pkg.with_dependency(translated_dep.to_string());
+        }
+
+        for prov in manifest.raw_provides.iter() {
+            let prov_str: String = prov.clone();
+            pkg = pkg.with_provides(prov_str);
+        }
+
+        for conf in manifest.raw_conflicts.iter() {
+            let conf_str: String = conf.clone();
+            pkg = pkg.with_conflict(conf_str);
+        }
+
+        pkg
+    }
+}
+
+fn debtor_to_sovereign_name(name: &str) -> &str {
+    if name.contains("ssl") {
+        "sovereign-openssl"
+    } else if name.contains("libc") {
+        "sovereign-libc"
+    } else {
+        name
+    }
+}
+
+/// Repository representation
+#[derive(Debug, Clone)]
+pub struct RegisteredDistroRepo {
+    pub distro_name: String,
+    pub repo_url: String,
+}
+
+/// Distro repository sync engine
+#[derive(Debug, Clone)]
+pub struct DistroRepoSyncEngine {
+    pub registered_repos: Vec<RegisteredDistroRepo>,
+    pub indexed_manifests: HashMap<String, ForeignDistroManifest>,
+}
+
+impl DistroRepoSyncEngine {
+    pub fn new() -> Self {
+        let mut repos = Vec::new();
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Debian".to_string(),
+            repo_url: "deb.debian.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "ArchLinux".to_string(),
+            repo_url: "archlinux.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Fedora".to_string(),
+            repo_url: "fedoraproject.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Alpine".to_string(),
+            repo_url: "alpinelinux.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Void".to_string(),
+            repo_url: "voidlinux.org".to_string(),
+        });
+        Self {
+            registered_repos: repos,
+            indexed_manifests: HashMap::new(),
+        }
+    }
+
+    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
+        self.indexed_manifests
+            .insert(manifest.original_name.clone(), manifest);
+    }
+
+    pub fn total_indexed_packages(&self) -> usize {
+        self.indexed_manifests.len()
+    }
+
+    pub fn find_and_translate(&self, name: &str) -> Option<UnifiedPackage> {
+        self.indexed_manifests
+            .get(name)
+            .map(UniversalPackageTranslator::translate_to_sigma_pkg)
+    }
+}
+
+impl Default for DistroRepoSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Package format type
@@ -152,11 +269,11 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    Portage,    // Gentoo Portage
-    FreeBsdPkg, // FreeBSD pkg
-    ArchPkgBuild,// Arch PKGBUILD
-    NixStore,   // Nix store
-    Homebrew,   // Homebrew formula
+    Nix,        // Nix package (.nix)
+    Txz,        // FreeBSD / Slackware txz (.txz)
+    CachyOS,    // CachyOS package (.cachyos)
+    Swupd,      // Clear Linux swupd (.swupd)
+    Starling,   // Starling package (.starling)
 }
 
 impl PackageFormat {
@@ -1061,37 +1178,6 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdInstallStrategy),
             PackageFormat::Starling => Box::new(StarlingInstallStrategy),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgInstallStrategy),
-            PackageFormat::Air => Box::new(AirInstallStrategy),
-            PackageFormat::Bottle => Box::new(BottleInstallStrategy),
-            PackageFormat::Ipa => Box::new(IpaInstallStrategy),
-            PackageFormat::Ports => Box::new(PortsInstallStrategy),
-            PackageFormat::Pkg => Box::new(PkgInstallStrategy),
-            PackageFormat::Aab => Box::new(AabInstallStrategy),
-            PackageFormat::TarGz => Box::new(TarGzInstallStrategy),
-            PackageFormat::Xz => Box::new(XzInstallStrategy),
-            PackageFormat::App => Box::new(AppInstallStrategy),
-            PackageFormat::Hap => Box::new(HapInstallStrategy),
-            PackageFormat::Pisi => Box::new(PisiInstallStrategy),
-            PackageFormat::Superdeb => Box::new(SuperdebInstallStrategy),
-            PackageFormat::Lzm => Box::new(LzmInstallStrategy),
-            PackageFormat::Pup => Box::new(PupInstallStrategy),
-            PackageFormat::Pet => Box::new(PetInstallStrategy),
-            PackageFormat::Tar => Box::new(TarInstallStrategy),
-            PackageFormat::Moss => Box::new(MossInstallStrategy),
-            PackageFormat::Hpkg => Box::new(HpkgInstallStrategy),
-            PackageFormat::Tcz => Box::new(TczInstallStrategy),
-            PackageFormat::Gobo => Box::new(GoboInstallStrategy),
-            PackageFormat::Ostree => Box::new(OstreeInstallStrategy),
-            PackageFormat::Pkgsrc => Box::new(PkgsrcInstallStrategy),
-            PackageFormat::Sfs => Box::new(SfsInstallStrategy),
-            PackageFormat::Puk => Box::new(PukInstallStrategy),
-            PackageFormat::Dmg => Box::new(DmgInstallStrategy),
-            PackageFormat::Cports => Box::new(CportsInstallStrategy),
-            PackageFormat::Dports => Box::new(DportsInstallStrategy),
-            PackageFormat::SlackBuild => Box::new(SlackBuildInstallStrategy),
-            PackageFormat::Crux => Box::new(CruxInstallStrategy),
-            PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
-            PackageFormat::Stratum => Box::new(StratumInstallStrategy),
             _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
@@ -1116,37 +1202,6 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdMetadataAdapter),
             PackageFormat::Starling => Box::new(StarlingMetadataAdapter),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgMetadataAdapter),
-            PackageFormat::Air => Box::new(AirMetadataAdapter),
-            PackageFormat::Bottle => Box::new(BottleMetadataAdapter),
-            PackageFormat::Ipa => Box::new(IpaMetadataAdapter),
-            PackageFormat::Ports => Box::new(PortsMetadataAdapter),
-            PackageFormat::Pkg => Box::new(PkgMetadataAdapter),
-            PackageFormat::Aab => Box::new(AabMetadataAdapter),
-            PackageFormat::TarGz => Box::new(TarGzMetadataAdapter),
-            PackageFormat::Xz => Box::new(XzMetadataAdapter),
-            PackageFormat::App => Box::new(AppMetadataAdapter),
-            PackageFormat::Hap => Box::new(HapMetadataAdapter),
-            PackageFormat::Pisi => Box::new(PisiMetadataAdapter),
-            PackageFormat::Superdeb => Box::new(SuperdebMetadataAdapter),
-            PackageFormat::Lzm => Box::new(LzmMetadataAdapter),
-            PackageFormat::Pup => Box::new(PupMetadataAdapter),
-            PackageFormat::Pet => Box::new(PetMetadataAdapter),
-            PackageFormat::Tar => Box::new(TarMetadataAdapter),
-            PackageFormat::Moss => Box::new(MossMetadataAdapter),
-            PackageFormat::Hpkg => Box::new(HpkgMetadataAdapter),
-            PackageFormat::Tcz => Box::new(TczMetadataAdapter),
-            PackageFormat::Gobo => Box::new(GoboMetadataAdapter),
-            PackageFormat::Ostree => Box::new(OstreeMetadataAdapter),
-            PackageFormat::Pkgsrc => Box::new(PkgsrcMetadataAdapter),
-            PackageFormat::Sfs => Box::new(SfsMetadataAdapter),
-            PackageFormat::Puk => Box::new(PukMetadataAdapter),
-            PackageFormat::Dmg => Box::new(DmgMetadataAdapter),
-            PackageFormat::Cports => Box::new(CportsMetadataAdapter),
-            PackageFormat::Dports => Box::new(DportsMetadataAdapter),
-            PackageFormat::SlackBuild => Box::new(SlackBuildMetadataAdapter),
-            PackageFormat::Crux => Box::new(CruxMetadataAdapter),
-            PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
-            PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
             _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
@@ -1760,6 +1815,7 @@ impl UniversalPackageManager {
             triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();

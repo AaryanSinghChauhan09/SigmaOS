@@ -524,16 +524,26 @@ impl SovereignSystemdParityEngine {
     }
 
     pub fn start_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
-        let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
+        let unit = self
+            .units
+            .get_mut(name)
+            .ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Active;
-        self.journal_logs.push(format!("Journal: Unit {} transitioned to Active", name));
+        unit.active_state = SystemdUnitActiveState::Active;
+        self.journal_logs
+            .push(format!("Journal: Unit {} transitioned to Active", name));
         Ok(SystemdUnitActiveState::Active)
     }
 
     pub fn stop_unit(&mut self, name: &str) -> Result<SystemdUnitActiveState, String> {
-        let unit = self.units.get_mut(name).ok_or_else(|| format!("Unit {} not found", name))?;
+        let unit = self
+            .units
+            .get_mut(name)
+            .ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Inactive;
-        self.journal_logs.push(format!("Journal: Unit {} transitioned to Inactive", name));
+        unit.active_state = SystemdUnitActiveState::Inactive;
+        self.journal_logs
+            .push(format!("Journal: Unit {} transitioned to Inactive", name));
         Ok(SystemdUnitActiveState::Inactive)
     }
 

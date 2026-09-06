@@ -5564,4 +5564,39 @@ mod tests {
         assert_eq!(roles.applied_roles.len(), 2);
         assert_eq!(roles.configured_firewall_ports.len(), 3);
     }
+
+    #[test]
+    fn test_fedora_the_new_hotness_engine() {
+        let mut hotness = FedoraTheNewHotnessEngine::new();
+        hotness.register_anitya_mapping(1234, "curl", "curl", "8.2.0");
+
+        assert_eq!(hotness.mappings.len(), 1);
+        assert_eq!(hotness.mappings[0].current_stable_version, "8.2.0");
+
+        // Same version check -> no event
+        let no_event = hotness
+            .process_upstream_release_check(1234, "8.2.0", "https://curl.se/release", 1700000000)
+            .unwrap();
+        assert!(no_event.is_none());
+
+        // New version release check -> event generated & fedmsg published
+        let event = hotness
+            .process_upstream_release_check(
+                1234,
+                "8.3.0",
+                "https://curl.se/release-8.3.0",
+                1700000100,
+            )
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(event.old_version, "8.2.0");
+        assert_eq!(event.new_version, "8.3.0");
+        assert_eq!(event.fedora_package_name, "curl");
+        assert_eq!(hotness.release_events.len(), 1);
+        assert_eq!(hotness.messaging_engine.published_messages.len(), 1);
+        assert!(hotness.messaging_engine.published_messages[0]
+            .topic
+            .contains("org.fedoraproject.prod.hotness.update.curl"));
+    }
 }
