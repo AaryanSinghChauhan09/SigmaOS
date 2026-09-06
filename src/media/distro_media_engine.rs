@@ -1,8 +1,9 @@
+extern crate alloc;
 
-use std::collections::BTreeMap;
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// 1. GStreamerPulseAudioPipeline
 /// GStreamer multimedia framework and PipeWire/PulseAudio sink routing engine inspired by Ubuntu & Debian.
@@ -320,7 +321,7 @@ impl Default for LinuxBsdDistroMediaSuite {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

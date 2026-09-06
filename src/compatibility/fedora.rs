@@ -3488,311 +3488,6 @@ impl Default for FedoraIgnitionEngine {
 }
 
 // =========================================================================
-// Fedora Dracut Initramfs Builder Engine
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DracutModule {
-    pub name: String,
-    pub hook_stage: String, // "cmdline", "pre-udev", "pre-pivot", "cleanup"
-    pub drivers: Vec<String>,
-}
-
-/// Fedora Dracut Modular Initramfs Generation & Hook Engine
-/// Assembles initramfs boot images with modular drivers, Plymouth splash hooks, and early rootfs pivot setup.
-pub struct FedoraDracutInitramfsEngine {
-    pub modules: Vec<DracutModule>,
-    pub kernel_version: String,
-    pub compression_format: String, // "zstd", "xz", "gzip"
-}
-
-impl FedoraDracutInitramfsEngine {
-    pub fn new(kernel_version: &str) -> Self {
-        let mut engine = Self {
-            modules: Vec::new(),
-            kernel_version: kernel_version.to_string(),
-            compression_format: "zstd".to_string(),
-        };
-        engine.load_default_dracut_modules();
-        engine
-    }
-
-    fn load_default_dracut_modules(&mut self) {
-        self.modules.push(DracutModule {
-            name: "90crypt".to_string(),
-            hook_stage: "cmdline".to_string(),
-            drivers: vec!["dm_crypt".to_string(), "aes_x86_64".to_string()],
-        });
-        self.modules.push(DracutModule {
-            name: "95rootfs".to_string(),
-            hook_stage: "pre-pivot".to_string(),
-            drivers: vec!["ext4".to_string(), "btrfs".to_string(), "nvme".to_string()],
-        });
-    }
-
-    pub fn include_module(&mut self, name: &str, stage: &str, drivers: &[&str]) {
-        self.modules.push(DracutModule {
-            name: name.to_string(),
-            hook_stage: stage.to_string(),
-            drivers: drivers.iter().map(|d| d.to_string()).collect(),
-        });
-    }
-
-    pub fn generate_initramfs_img(&self) -> Result<String, &'static str> {
-        if self.modules.is_empty() {
-            Err("Dracut: No modules included in initramfs build")
-        } else {
-            Ok(format!(
-                "/boot/initramfs-{}.img ({} modules, compressed with {})",
-                self.kernel_version,
-                self.modules.len(),
-                self.compression_format
-            ))
-        }
-    }
-}
-
-// =========================================================================
-// Fedora ABRT (Automatic Bug Reporting Tool) Engine
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AbrtCrashReport {
-    pub crash_id: String,
-    pub executable_path: String,
-    pub signal_name: String,
-    pub stack_trace: String,
-    pub kernel_release: String,
-    pub timestamp_secs: u64,
-    pub count: u32,
-    pub reported_to_bugzilla: bool,
-}
-
-/// Fedora ABRT (Automatic Bug Reporting Tool) Crash Daemon
-/// Captures application/kernel crashes, deduplicates crash reports by backtrace signature,
-/// anonymizes personal data, and dispatches crash telemetry over Fedora Messaging.
-pub struct FedoraAbrtCrashDaemon {
-    pub captured_crashes: HashMap<String, AbrtCrashReport>, // crash_id -> report
-    pub messaging_engine: FedoraMessagingEngine,
-    pub total_crashes_handled: u64,
-}
-
-impl FedoraAbrtCrashDaemon {
-    pub fn new() -> Self {
-        Self {
-            captured_crashes: HashMap::new(),
-            messaging_engine: FedoraMessagingEngine::new(),
-            total_crashes_handled: 0,
-        }
-    }
-
-    pub fn capture_crash(
-        &mut self,
-        exe_path: &str,
-        signal: &str,
-        backtrace: &str,
-        kernel_ver: &str,
-        timestamp_secs: u64,
-    ) -> AbrtCrashReport {
-        self.total_crashes_handled += 1;
-        let signature = format!("{}:{}:{}", exe_path, signal, backtrace);
-        let crash_id = format!("abrt-{:08x}", self.total_crashes_handled);
-
-        if let Some(existing) = self.captured_crashes.get_mut(&signature) {
-            existing.count += 1;
-            return existing.clone();
-        }
-
-        let report = AbrtCrashReport {
-            crash_id: crash_id.clone(),
-            executable_path: exe_path.to_string(),
-            signal_name: signal.to_string(),
-            stack_trace: backtrace.to_string(),
-            kernel_release: kernel_ver.to_string(),
-            timestamp_secs,
-            count: 1,
-            reported_to_bugzilla: false,
-        };
-
-        let topic = format!(
-            "org.fedoraproject.prod.abrt.crash.{}",
-            signal.to_lowercase()
-        );
-        let body = format!("ABRT Crash Event in {}: {}", exe_path, signal);
-        self.messaging_engine
-            .publish_message(&topic, &body, timestamp_secs);
-
-        self.captured_crashes.insert(signature, report.clone());
-        report
-    }
-
-    pub fn mark_reported(&mut self, crash_id: &str) -> bool {
-        for report in self.captured_crashes.values_mut() {
-            if report.crash_id == crash_id {
-                report.reported_to_bugzilla = true;
-                return true;
-            }
-        }
-        false
-    }
-}
-
-impl Default for FedoraAbrtCrashDaemon {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// Fedora Toolbx OCI Development Container Engine
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ToolbxContainer {
-    pub name: String,
-    pub image: String,
-    pub host_mounts: Vec<String>,
-    pub environment_vars: HashMap<String, String>,
-    pub running: bool,
-}
-
-/// Fedora Toolbx Interactive OCI Development Environment Manager
-/// Provides seamless integration between host desktop tools and isolated OCI development containers with automatic bind-mounts.
-pub struct FedoraToolbxContainerEngine {
-    pub active_containers: HashMap<String, ToolbxContainer>,
-}
-
-impl FedoraToolbxContainerEngine {
-    pub fn new() -> Self {
-        Self {
-            active_containers: HashMap::new(),
-        }
-    }
-
-    pub fn create_toolbx(&mut self, name: &str, image: &str) -> ToolbxContainer {
-        let default_mounts = vec![
-            "/home".to_string(),
-            "/var/srv".to_string(),
-            "/dev".to_string(),
-            "/run/host".to_string(),
-        ];
-        let mut env = HashMap::new();
-        env.insert("TOOLBX_NAME".to_string(), name.to_string());
-        env.insert("SHELL".to_string(), "/bin/bash".to_string());
-
-        let container = ToolbxContainer {
-            name: name.to_string(),
-            image: image.to_string(),
-            host_mounts: default_mounts,
-            environment_vars: env,
-            running: false,
-        };
-
-        self.active_containers
-            .insert(name.to_string(), container.clone());
-        container
-    }
-
-    pub fn start_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            c.running = true;
-            Ok(format!(
-                "Toolbx container '{}' started using image '{}'",
-                c.name, c.image
-            ))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn stop_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            c.running = false;
-            Ok(format!("Toolbx container '{}' stopped", c.name))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn run_command(&mut self, name: &str, command: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            if !c.running {
-                c.running = true;
-            }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn add_host_mount(&mut self, name: &str, host_path: &str) -> bool {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            if !c.host_mounts.contains(&host_path.to_string()) {
-                c.host_mounts.push(host_path.to_string());
-            }
-            true
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for FedoraToolbxContainerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
-// =========================================================================
-
-#[derive(Debug, Clone, Default)]
-pub struct FedoraOfflineUpdateEngine {
-    pub is_offline_update_pending: bool,
-    pub staged_packages: Vec<String>,
-    pub trigger_reboot_flag: bool,
-}
-
-impl FedoraOfflineUpdateEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
-    }
-}
-
-
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IgnitionSystemdUnit {
-    pub name: String,
-    pub enabled: bool,
-    pub contents: String,
-}
-
-/// Fedora Ignition First-Boot Declarative Provisioning Engine
-/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
-/// (files, users, systemd units) before userspace init handoff.
-
-// =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine
 // =========================================================================
 
@@ -4105,9 +3800,7 @@ pub enum SystemRoleKind {
     Storage,
 }
 
-
-
-#[derive(Debug, Clone)]
+/// Fedora System Roles (linux-system-roles) Declarative Automation Engine
 pub struct FedoraSystemRolesEngine {
     pub applied_roles: Vec<SystemRoleKind>,
     pub chrony_ntp_servers: Vec<String>,
@@ -4148,7 +3841,7 @@ impl Default for FedoraSystemRolesEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -4225,6 +3918,136 @@ mod tests {
         assert!(toolbx.add_host_mount("fedora-toolbox-39", "/home/sovereign"));
         let output = toolbx.run_command("fedora-toolbox-39", "dnf install -y gcc").unwrap();
         assert!(output.contains("gcc"));
+    }
+
+    #[test]
+    fn test_fedora_mirror_manager_2_engine() {
+        let mut mm2 = FedoraMirrorManager2Engine::new(3600); // 1 hour max lag
+
+        let m1 = FedoraMirrorHost {
+            host_id: "us-mirror-1".to_string(),
+            base_url: "https://us.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 7018,
+            bandwidth_mbps: 10000,
+            protocols: vec![MirrorProtocol::Https, MirrorProtocol::Http],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 300,
+        };
+
+        let m2 = FedoraMirrorHost {
+            host_id: "us-local-asn-mirror".to_string(),
+            base_url: "https://asn.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345, // Client ASN match
+            bandwidth_mbps: 1000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 600,
+        };
+
+        let m3 = FedoraMirrorHost {
+            host_id: "eu-high-bw-mirror".to_string(),
+            base_url: "https://eu.dl.fedoraproject.org".to_string(),
+            country_code: "DE".to_string(),
+            asn: 3320,
+            bandwidth_mbps: 40000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 1200,
+        };
+
+        let m_outdated = FedoraMirrorHost {
+            host_id: "outdated-mirror".to_string(),
+            base_url: "https://outdated.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345,
+            bandwidth_mbps: 100000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::Outdated,
+            lag_seconds: 86400,
+        };
+
+        mm2.register_mirror(m1);
+        mm2.register_mirror(m2);
+        mm2.register_mirror(m3);
+        mm2.register_mirror(m_outdated);
+
+        let client = ClientLocationContext {
+            client_ip: "192.0.2.1".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345,
+            preferred_protocol: MirrorProtocol::Https,
+        };
+
+        let optimal = mm2.select_optimal_mirrors(&client);
+        assert_eq!(optimal.len(), 3); // m_outdated excluded due to sync status / lag
+
+        // First choice should be ASN match (us-local-asn-mirror)
+        assert_eq!(optimal[0].host_id, "us-local-asn-mirror");
+        // Second choice should be same country (us-mirror-1)
+        assert_eq!(optimal[1].host_id, "us-mirror-1");
+        // Third choice should be EU high-bandwidth mirror
+        assert_eq!(optimal[2].host_id, "eu-high-bw-mirror");
+    }
+
+    #[test]
+    fn test_fedora_shared_system_manager() {
+        let mut mgr = FedoraSharedSystemManager::new(1000);
+        assert_eq!(mgr.runtime_env.runtime_dir, "/run/user/1000");
+
+        // Register shared library
+        mgr.register_shared_library(
+            "libc.so.6",
+            "/usr/lib64/libc.so.6",
+            "GLIBC_2.38",
+            &["malloc", "free", "printf"],
+        );
+        assert!(mgr.resolve_shared_library_symbol("libc.so.6", "malloc"));
+        assert!(!mgr.resolve_shared_library_symbol("libc.so.6", "nonexistent_symbol"));
+
+        // DNF Shared Cache Lock
+        assert!(mgr.acquire_dnf_cache_lock(4201).is_ok());
+        assert!(mgr.acquire_dnf_cache_lock(4201).is_ok()); // Re-entrant same PID ok
+        assert!(mgr.acquire_dnf_cache_lock(9999).is_err()); // Other PID blocked
+        assert!(mgr.release_dnf_cache_lock(9999).is_err()); // Invalid owner release
+        assert!(mgr.release_dnf_cache_lock(4201).is_ok()); // Valid release
+
+        // Shared Memory Allocation
+        let shm_path = mgr.allocate_shared_memory_block("sigma_ipc_shm", 4096);
+        assert_eq!(shm_path, "/dev/shm/sigma_ipc_shm");
+        assert_eq!(
+            mgr.runtime_env.allocated_shm_blocks.get("sigma_ipc_shm"),
+            Some(&4096)
+        );
+    }
+
+    #[test]
+    fn test_fedora_badges_engine() {
+        let mut badges = FedoraBadgesEngine::new();
+        assert_eq!(badges.badges.len(), 2);
+
+        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
+        assert_eq!(pts1, 10);
+
+        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
+        assert_eq!(pts2, 25);
+
+        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
+    }
+
+    #[test]
+    fn test_fedora_system_roles_engine() {
+        let mut roles = FedoraSystemRolesEngine::new();
+        assert!(roles.applied_roles.is_empty());
+
+        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
+        assert_eq!(roles.applied_roles.len(), 1);
+        assert_eq!(roles.chrony_ntp_servers.len(), 2);
+
+        roles.apply_firewall_role(&[80, 443, 8080]);
+        assert_eq!(roles.applied_roles.len(), 2);
+        assert_eq!(roles.configured_firewall_ports.len(), 3);
     }
 
     #[test]

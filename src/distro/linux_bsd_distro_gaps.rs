@@ -511,298 +511,249 @@ impl Default for CronJobScheduler {
 }
 
 // ============================================================================
-// 7. Encrypted DNS-over-TLS & DNSSEC Resolver Engine (systemd-resolved / Unbound)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain_name: &'static str,
-    pub ip_address: [u8; 4],
-    pub ttl_seconds: u32,
-    pub dnssec_validated: bool,
-}
-
-#[derive(Debug)]
-pub struct SovereignDnsTlsResolverEngine {
-    pub upstream_dot_server: [u8; 4], // e.g. 1.1.1.1
-    pub dot_port: u16,                // 853
-    pub local_cache: Vec<DnsRecordEntry>,
-    pub dnssec_enforced: bool,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-        match alias {
-            "char-major-10-200" => Some("tun"),
-            "net-pf-10" => Some("ipv6"),
-            "block-major-8-0" => Some("sda"),
-            _ => None,
-        }
-    }
-
-    pub fn new(dot_server: [u8; 4]) -> Self {
-        let mut engine = Self {
-            upstream_dot_server: dot_server,
-            dot_port: 853,
-            local_cache: Vec::new(),
-            dnssec_enforced: true,
-        };
-
-        // Pre-populate localhost & sovereign system records
-        engine.cache_record("localhost", [127, 0, 0, 1], 86400, true);
-        engine.cache_record("sigma.local", [192, 168, 1, 250], 3600, true);
-
-        engine
-    }
-
-    pub fn cache_record(
-        &mut self,
-        domain: &'static str,
-        ip: [u8; 4],
-        ttl: u32,
-        dnssec_validated: bool,
-    ) {
-        if let Some(existing) = self.local_cache.iter_mut().find(|r| r.domain_name == domain) {
-            existing.ip_address = ip;
-            existing.ttl_seconds = ttl;
-            existing.dnssec_validated = dnssec_validated;
-        } else {
-            self.local_cache.push(DnsRecordEntry {
-                domain_name: domain,
-                ip_address: ip,
-                ttl_seconds: ttl,
-                dnssec_validated,
-            });
-        }
-    }
-
-    pub fn resolve_domain(&mut self, domain: &'static str) -> Result<[u8; 4], &'static str> {
-        if let Some(record) = self.local_cache.iter().find(|r| r.domain_name == domain) {
-            if self.dnssec_enforced && !record.dnssec_validated {
-                return Err("DNSSEC validation failed for cached record");
-            }
-            return Ok(record.ip_address);
-        }
-
-        // Simulate DNS-over-TLS query over TLS port 853
-        let resolved_ip = [93, 184, 216, 34]; // example.com
-        self.cache_record(domain, resolved_ip, 300, true);
-        Ok(resolved_ip)
-    }
-}
-
-// ============================================================================
-// 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
+// 7. Demand Paging & Swapping Subsystem (Linux / BSD VM Parity)
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    Block,
-    Character,
+pub enum PageFaultCause {
+    NotPresent,
+    ProtectionViolation,
+    WriteToReadOnlyCoW,
 }
 
 #[derive(Debug, Clone)]
-pub struct DeviceNodeEntry {
-    pub name: &'static str,
-    pub node_type: DeviceNodeType,
-    pub major: u32,
-    pub minor: u32,
-    pub owner_uid: u32,
-    pub group_gid: u32,
-    pub mode_octal: u16,
-    pub symlink_paths: Vec<&'static str>,
+pub struct VirtualPageMapping {
+    pub vaddr: u64,
+    pub paddr: u64,
+    pub is_present: bool,
+    pub is_writable: bool,
+    pub is_swapped_out: bool,
+    pub swap_slot_idx: Option<usize>,
 }
 
-#[derive(Debug)]
-pub struct SovereignDynamicDevfsEngine {
-    pub devices: Vec<DeviceNodeEntry>,
+pub struct DemandPagingSwapEngine {
+    pub page_table: Vec<VirtualPageMapping>,
+    pub total_swap_slots_mb: usize,
+    pub used_swap_slots_mb: usize,
+    pub page_faults_handled: u64,
 }
 
-impl SovereignDynamicDevfsEngine {
-    pub fn new() -> Self {
-        let mut devfs = Self {
-            devices: Vec::new(),
-        };
-
-        // Populate default device nodes
-        devfs.create_node("null", DeviceNodeType::Character, 1, 3, 0, 0, 0o666);
-        devfs.create_node("zero", DeviceNodeType::Character, 1, 5, 0, 0, 0o666);
-        devfs.create_node("sda", DeviceNodeType::Block, 8, 0, 0, 6, 0o660);
-
-        devfs
-    }
-
-    pub fn create_node(
-        &mut self,
-        name: &'static str,
-        node_type: DeviceNodeType,
-        major: u32,
-        minor: u32,
-        owner_uid: u32,
-        group_gid: u32,
-        mode_octal: u16,
-    ) {
-        self.devices.push(DeviceNodeEntry {
-            name,
-            node_type,
-            major,
-            minor,
-            owner_uid,
-            group_gid,
-            mode_octal,
-            symlink_paths: Vec::new(),
-        });
-    }
-
-    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &'static str) -> bool {
-        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink);
-            true
-        } else {
-            false
+impl DemandPagingSwapEngine {
+    pub fn new(swap_size_mb: usize) -> Self {
+        Self {
+            page_table: Vec::new(),
+            total_swap_slots_mb: swap_size_mb,
+            used_swap_slots_mb: 0,
+            page_faults_handled: 0,
         }
     }
 
-    pub fn lookup_node(&self, path: &str) -> Option<&DeviceNodeEntry> {
-        self.nodes
-            .iter()
-            .find(|n| n.name == path || n.symlink_paths.iter().any(|s| *s == path))
+    pub fn handle_page_fault(&mut self, vaddr: u64, cause: PageFaultCause) -> Result<u64, &'static str> {
+        self.page_faults_handled += 1;
+        match cause {
+            PageFaultCause::NotPresent => {
+                // Demand page allocation
+                let paddr = vaddr & !0xFFF;
+                self.page_table.push(VirtualPageMapping {
+                    vaddr,
+                    paddr,
+                    is_present: true,
+                    is_writable: true,
+                    is_swapped_out: false,
+                    swap_slot_idx: None,
+                });
+                Ok(paddr)
+            }
+            PageFaultCause::WriteToReadOnlyCoW => {
+                // Copy-On-Write duplicate physical frame
+                let new_paddr = (vaddr & !0xFFF) + 0x1000;
+                Ok(new_paddr)
+            }
+            PageFaultCause::ProtectionViolation => Err("SIGSEGV: Invalid page protection access"),
+        }
+    }
+
+    pub fn swap_out_page(&mut self, vaddr: u64) -> Result<usize, &'static str> {
+        if self.used_swap_slots_mb >= self.total_swap_slots_mb {
+            return Err("ENOSPC: Swap space exhausted");
+        }
+        if let Some(page) = self.page_table.iter_mut().find(|p| p.vaddr == vaddr) {
+            page.is_present = false;
+            page.is_swapped_out = true;
+            let slot = self.used_swap_slots_mb;
+            page.swap_slot_idx = Some(slot);
+            self.used_swap_slots_mb += 1;
+            Ok(slot)
+        } else {
+            Err("Page mapping not found")
+        }
     }
 }
 
-impl Default for SovereignDynamicDevfsEngine {
+impl Default for DemandPagingSwapEngine {
+    fn default() -> Self {
+        Self::new(2048)
+    }
+}
+
+// ============================================================================
+// 8. Dynamic Device Hotplugging Engine (Linux udev / BSD devd Parity)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceEventAction {
+    Add,
+    Remove,
+    Change,
+}
+
+#[derive(Debug, Clone)]
+pub struct UeventDeviceNode {
+    pub subsystem: &'static str,
+    pub devname: &'static str,
+    pub sysfs_path: &'static str,
+    pub action: DeviceEventAction,
+    pub vendor_id: u16,
+    pub device_id: u16,
+}
+
+pub struct UdevDevdHotplugEngine {
+    pub active_devices: Vec<UeventDeviceNode>,
+    pub loaded_rules: Vec<&'static str>,
+}
+
+impl UdevDevdHotplugEngine {
+    pub fn new() -> Self {
+        Self {
+            active_devices: Vec::new(),
+            loaded_rules: Vec::new(),
+        }
+    }
+
+    pub fn register_rule(&mut self, rule: &'static str) {
+        self.loaded_rules.push(rule);
+    }
+
+    pub fn dispatch_uevent(&mut self, uevent: UeventDeviceNode) {
+        match uevent.action {
+            DeviceEventAction::Add => {
+                self.active_devices.push(uevent);
+            }
+            DeviceEventAction::Remove => {
+                self.active_devices.retain(|d| d.devname != uevent.devname);
+            }
+            DeviceEventAction::Change => {
+                if let Some(pos) = self.active_devices.iter().position(|d| d.devname == uevent.devname) {
+                    self.active_devices[pos] = uevent;
+                }
+            }
+        }
+    }
+}
+
+impl Default for UdevDevdHotplugEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
+// 9. Multicore SMP Interrupt Load Balancing Engine (APIC / GIC / PLIC)
 // ============================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-}
-
 #[derive(Debug, Clone)]
-pub struct ConntrackTableEntry {
-    pub original_src: [u8; 4],
-    pub original_dst: [u8; 4],
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub translated_ip: [u8; 4],
-    pub translated_port: u16,
-    pub nat_type: NatType,
-    pub packets_counter: u64,
+pub struct IrqRoutingEntry {
+    pub irq_line: u32,
+    pub target_cpu_core: usize,
+    pub interrupt_count: u64,
 }
 
-#[derive(Debug)]
-pub struct SovereignStatefulNatEngine {
-    pub conntrack_table: Vec<ConntrackTableEntry>,
-    pub public_ip: [u8; 4],
+pub struct MulticoreSmpInterruptEngine {
+    pub irq_table: Vec<IrqRoutingEntry>,
+    pub num_cpu_cores: usize,
 }
 
-impl SovereignStatefulNatEngine {
-    pub fn new(public_ip: [u8; 4]) -> Self {
+impl MulticoreSmpInterruptEngine {
+    pub fn new(cores: usize) -> Self {
         Self {
-            conntrack_table: Vec::new(),
-            public_ip,
+            irq_table: Vec::new(),
+            num_cpu_cores: cores,
         }
     }
 
-    pub fn create_snat_mapping(
-        &mut self,
-        internal_src: [u8; 4],
-        dst_ip: [u8; 4],
-        src_port: u16,
-        dst_port: u16,
-        _protocol: u8,
-    ) -> ([u8; 4], u16) {
-        let _ = protocol;
-        // Search conntrack
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
-                && c.src_port == src_port
-                && c.original_dst == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
+    pub fn bind_irq(&mut self, irq: u32, target_core: usize) -> Result<(), &'static str> {
+        if target_core >= self.num_cpu_cores {
+            return Err("Target CPU core exceeds available SMP cores");
+        }
+        if let Some(entry) = self.irq_table.iter_mut().find(|e| e.irq_line == irq) {
+            entry.target_cpu_core = target_core;
         } else {
-            self.conntrack_table.push(ConntrackTableEntry {
-                original_src: internal_src,
-                original_dst: dst_ip,
-                src_port,
-                dst_port,
-                translated_ip: self.public_ip,
-                translated_port: src_port,
-                nat_type: NatType::Snat,
-                packets_counter: 1,
+            self.irq_table.push(IrqRoutingEntry {
+                irq_line: irq,
+                target_cpu_core: target_core,
+                interrupt_count: 0,
             });
         }
-        (self.public_ip, src_port)
+        Ok(())
     }
 
-    pub fn lookup_conntrack(
-        &mut self,
-        translated_dst_ip: [u8; 4],
-        translated_dst_port: u16,
-    ) -> Option<([u8; 4], u16)> {
-        for entry in &mut self.conntrack_table {
-            if entry.translated_ip == translated_dst_ip && entry.translated_port == translated_dst_port {
-                entry.packets_counter += 1;
-                return Some((entry.original_src, entry.src_port));
-            }
+    pub fn balance_irq_load(&mut self) {
+        for (i, entry) in self.irq_table.iter_mut().enumerate() {
+            entry.target_cpu_core = i % self.num_cpu_cores;
         }
-        None
+    }
+}
+
+impl Default for MulticoreSmpInterruptEngine {
+    fn default() -> Self {
+        Self::new(8)
     }
 }
 
 // ============================================================================
-// 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
+// 10. Kernel Profiling & Trace Engine (Linux perf / BSD DTrace Parity)
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_unix_epoch: u64,
-    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
-    pub unit_name: &'static str,
-    pub message: &'static str,
+pub struct PerfProbeSample {
+    pub timestamp_ns: u64,
+    pub pid: usize,
+    pub rip: u64,
+    pub probe_name: &'static str,
 }
 
-#[derive(Debug)]
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub logs: Vec<JournaldLogRecord>,
-    pub max_logs_capacity: usize,
+pub struct KernelPerfDtraceEngine {
+    pub is_tracing_active: bool,
+    pub probe_samples: Vec<PerfProbeSample>,
 }
 
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new(capacity: usize) -> Self {
+impl KernelPerfDtraceEngine {
+    pub fn new() -> Self {
         Self {
-            logs: Vec::new(),
-            max_logs_capacity: capacity,
+            is_tracing_active: false,
+            probe_samples: Vec::new(),
         }
     }
 
-    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
-        if self.logs.len() >= self.max_logs_capacity {
-            self.logs.remove(0); // Journal rotation
+    pub fn start_tracing(&mut self) {
+        self.is_tracing_active = true;
+    }
+
+    pub fn record_sample(&mut self, pid: usize, rip: u64, name: &'static str, time_ns: u64) {
+        if self.is_tracing_active {
+            self.probe_samples.push(PerfProbeSample {
+                timestamp_ns: time_ns,
+                pid,
+                rip,
+                probe_name: name,
+            });
         }
-        self.logs.push(JournaldLogRecord {
-            timestamp_unix_epoch: timestamp,
-            priority,
-            unit_name: unit,
-            message: msg,
-        });
     }
+}
 
-    pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.unit_name == unit).collect()
-    }
-
-    pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
+impl Default for KernelPerfDtraceEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
