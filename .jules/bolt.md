@@ -17,3 +17,7 @@
 ## 2026-09-05 - In-Place Buffer Appending for JSON Serialization
 **Learning:** In recursive data structure serialization (like JSON trees), calling `to_json_string()` on child elements or cloning keys (`key.clone()`) creates $O(N)$ temporary `String` heap allocations that are immediately concatenated and dropped. Passing a single mutable output buffer (`&mut String`) down the recursion tree and escaping string slices directly into the buffer eliminates all intermediate heap allocations during serialization.
 **Action:** When serializing structured values, prefer buffer-appending methods (`append_to_buf(&self, out: &mut String)`) over returning owned temporary `String` objects from recursive methods.
+
+## 2026-09-06 - `ptr::copy` Over `ptr::copy_nonoverlapping` for Intra-Collection Element Shifts
+**Learning:** When shifting trailing elements left or right within the same array allocation (e.g. during `Vec::insert`, `Vec::remove`, `Drain::drop`, or `SigmaString::remove`), the source and destination slice ranges overlap. Using `copy_nonoverlapping` violates `unsafe` preconditions and triggers a UB panic. Using `core::ptr::copy` (which emits a `memmove` intrinsic) handles overlapping memory ranges safely while converting $O(N)$ loop overhead into a single bulk SIMD block shift.
+**Action:** When shifting elements within the same contiguous buffer allocation, always use `core::ptr::copy` instead of `copy_nonoverlapping` or element-by-element loops.

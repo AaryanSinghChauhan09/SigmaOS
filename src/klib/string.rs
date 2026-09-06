@@ -7,12 +7,13 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+use core::fmt;
+use core::ops::{Deref, DerefMut};
 use std::string::{String, ToString};
 // Custom string implementation for SigmaOS
 // This module provides no_std alternatives to std::string and reduces dependency on predefined functions
 
 use super::vec::SigmaVec;
-use core::fmt;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -135,6 +136,7 @@ impl SigmaString {
     }
 
     /// Remove a character at a specific position
+    /// Optimized by Bolt ⚡: uses bulk `ptr::copy` memory copy (memmove) rather than looping byte copy.
     pub fn remove(&mut self, idx: usize) -> char {
         let slice = self.as_str();
         let mut char_iter = slice.char_indices();
@@ -142,9 +144,13 @@ impl SigmaString {
         let char_len = ch.len_utf8();
         let byte_end = byte_start + char_len;
 
-        // Remove the character bytes
-        for i in byte_end..self.len {
-            self.data.as_mut_slice()[byte_start + (i - byte_end)] = self.data.as_slice()[i];
+        // Remove the character bytes in bulk
+        let count = self.len - byte_end;
+        if count > 0 {
+            unsafe {
+                let ptr = self.data.as_mut_slice().as_mut_ptr();
+                core::ptr::copy(ptr.add(byte_end), ptr.add(byte_start), count);
+            }
         }
 
         self.len -= char_len;
@@ -154,56 +160,51 @@ impl SigmaString {
     }
 
     /// Insert a character at a specific position
+    /// Optimized by Bolt ⚡: uses bulk memory copy routines rather than element-by-element loops.
     pub fn insert(&mut self, idx: usize, ch: char) {
-        let byte_idx = if idx == self.len() {
-            self.len
-        } else {
-            let slice = self.as_str();
-            let mut char_iter = slice.char_indices();
-            char_iter
-                .nth(idx)
-                .map_or(self.len, |(byte_start, _)| byte_start)
-        };
-
         let mut buf = [0u8; 4];
         let bytes = ch.encode_utf8(&mut buf);
-        let char_len = bytes.len();
-
-        // Make space for the new character
-        for i in (byte_idx..self.len).rev() {
-            self.data.as_mut_slice()[i + char_len] = self.data.as_slice()[i];
-        }
-
-        // Insert the character bytes
-        for (i, &byte) in bytes.as_bytes().iter().enumerate() {
-            self.data.as_mut_slice()[byte_idx + i] = byte;
-        }
-
-        self.len += char_len;
+        self.insert_bytes_at(idx, bytes.as_bytes());
     }
 
     /// Insert a string slice at a specific position
+    /// Optimized by Bolt ⚡: uses bulk memory copy routines rather than element-by-element loops.
     pub fn insert_str(&mut self, idx: usize, s: &str) {
-        let byte_idx = if idx == self.len() {
-            self.len
+        self.insert_bytes_at(idx, s.as_bytes());
+    }
+
+    /// Helper method to insert bytes at character position `idx` using bulk `ptr::copy` / `copy_nonoverlapping`.
+    fn insert_bytes_at(&mut self, idx: usize, bytes: &[u8]) {
+        let s_len = bytes.len();
+        if s_len == 0 {
+            return;
+        }
+
+        let old_len = self.len;
+        let byte_idx = if idx == old_len {
+            old_len
         } else {
             let slice = self.as_str();
             let mut char_iter = slice.char_indices();
             char_iter
                 .nth(idx)
-                .map_or(self.len, |(byte_start, _)| byte_start)
+                .map_or(old_len, |(byte_start, _)| byte_start)
         };
 
-        let s_len = s.len();
-
-        // Make space for the new string
-        for i in (byte_idx..self.len).rev() {
-            self.data.as_mut_slice()[i + s_len] = self.data.as_slice()[i];
+        // Reserve space and extend data length
+        self.data.reserve(s_len);
+        for &b in bytes {
+            self.data.push(b);
         }
 
-        // Insert the string bytes
-        for (i, &byte) in s.as_bytes().iter().enumerate() {
-            self.data.as_mut_slice()[byte_idx + i] = byte;
+        // Shift existing tail right and copy new bytes into place
+        let tail_count = old_len - byte_idx;
+        unsafe {
+            let ptr = self.data.as_mut_slice().as_mut_ptr();
+            if tail_count > 0 {
+                core::ptr::copy(ptr.add(byte_idx), ptr.add(byte_idx + s_len), tail_count);
+            }
+            core::ptr::copy_nonoverlapping(bytes.as_ptr(), ptr.add(byte_idx), s_len);
         }
 
         self.len += s_len;
@@ -466,7 +467,7 @@ where
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -528,5 +529,28 @@ mod tests {
         let s = SigmaString::from_str("hello world");
         let replaced = s.replace("world", "sigma");
         assert_eq!(replaced.as_str(), "hello sigma");
+    }
+
+    #[test]
+    fn test_sigmastring_insert_remove() {
+        let mut s = SigmaString::from_str("hello world");
+
+        s.insert(5, ',');
+        assert_eq!(s.as_str(), "hello, world");
+
+        s.insert_str(6, " beautiful");
+        assert_eq!(s.as_str(), "hello, beautiful world");
+
+        let removed = s.remove(5);
+        assert_eq!(removed, ',');
+        assert_eq!(s.as_str(), "hello beautiful world");
+
+        let mut utf8_str = SigmaString::from_str("hello 🚀 world");
+        utf8_str.insert(6, '✨');
+        assert_eq!(utf8_str.as_str(), "hello ✨🚀 world");
+
+        let removed_rocket = utf8_str.remove(7);
+        assert_eq!(removed_rocket, '🚀');
+        assert_eq!(utf8_str.as_str(), "hello ✨ world");
     }
 }
