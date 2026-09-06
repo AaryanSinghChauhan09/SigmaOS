@@ -1,94 +1,60 @@
-# SigmaOS AGENTS.md — AI Agent Operating Instructions & Process Management Protocols
+# SigmaOS AI Agent Memory Management & Codebase Directives
 
-Welcome to the **SigmaOS** repository! This document outlines guidelines and operational rules for AI coding agents (such as Jules, Copilot, Herdr, or custom subagents) interacting with the codebase, managing system processes, access control, virtual machines, filesystems, TTY character queues, disk caching, binary semaphores, buffering, system state, backups, and optimizing power usage in SigmaOS.
+This document defines core directives, architecture rules, and memory management invariants for all AI agents (Jules, Sentinel, Palette, Bolt) operating on the SigmaOS codebase.
 
----
+## 1. Zero-Dependency Bare-Metal Memory Architecture
+- **No External Allocators**: All memory management routines must utilize internal `klib` and kernel allocators (`src/memory/pmm_vmm.rs`, `src/memory/manager.rs`, `src/klib/custom_allocator.rs`, `src/klib/buddy_allocator.rs`).
+- **`#![no_std]` Compatibility**: Kernel core modules must maintain strict `#![no_std]` + `extern crate alloc` compatibility.
 
-## 🤖 Core Directives for AI Agents
+## 2. Memory Subsystem Invariants & Safeguards
+- **Physical & Virtual Memory Management**: PMM/VMM operations in `src/memory/pmm_vmm.rs` must enforce 4KiB page alignment and 2MiB/1GiB huge page boundaries.
+- **Guard Pages & Hardened Allocations**: Heap and stack allocations must use hardened guard page allocators (`src/memory/resource_allocator.rs`) and ASLR randomized malloc guards (`src/klib/custom_allocator.rs`).
+- **Memory Descriptor List (MDL) Pinning**: I/O and DMA memory buffers must pin memory ranges before descriptor transfers to prevent page fault race conditions under high concurrency.
+- **Volatile Scrubbing**: Memory deallocations containing sensitive cryptographic material or keys must perform explicit volatile memory wipes (`AmnesicRamWipe` / zeroization) before returning pages to the buddy allocator.
 
-1. **Zero-Trust Capability Sandboxing & Access Control**
-   - Every AI agent process spawned in SigmaOS must execute inside a capability-bounded sandbox (`PLEDGE_STDIO | PLEDGE_RPATH | PLEDGE_WPATH | PLEDGE_INET`).
-   - Use `process.pledge()` and `process.unveil()` before executing arbitrary userland commands.
-   - Refer to [`docs/ai-agent-access-management.md`](docs/ai-agent-access-management.md) for RBAC/ABAC capability token guidelines.
+## 3. Multi-Architecture Paging & Interrupt Balancing
+- **x86_64 / x86_32**: PML4/PML5 vs 2-level PAE page tables and x2APIC/PIC8259 IRQ routing (`src/hal/multi_arch.rs`).
+- **ARM64 / ARM32**: TTBR0_EL1 4-level 48-bit/52-bit translation vs Armv7 2-level paging with GICv3/GICv2 IRQ controllers.
+- **RISC-V 64 / 32**: Sv39/Sv48 3/4-level vs Sv32 2-level paging with PLIC/CLINT timers.
 
-2. **TTY Character Queue & Terminal Stream Handling**
-   - Manage TTY character queues under canonical or raw modes, respecting `XON`/`XOFF` flow control.
-   - Restore TTY termios state upon subagent terminal session exit. Refer to [`docs/ai-agent-character-queue-management.md`](docs/ai-agent-character-queue-management.md).
+## 4. AI Agent Testing & Verification Directives
+- **Proactive Unit Testing**: Every code change or newly introduced feature must be accompanied by unit tests.
+- **Master Test Runner**: Run `./run_sigma_tests.sh` to verify 100% test pass rate across Rust, C++, and Python test suites.
+- **Standalone Module Testing**: Fast-verify specific modules using `rustc --test --edition 2021 <filepath> -o build/test_bin && ./build/test_bin`.
 
-3. **Disk Cache Management & Dirty Page Flushing**
-   - Leverage VFS page cache with ARC/2Q eviction algorithms for high-performance file I/O.
-   - Execute `fsync()` on critical files and pass `posix_fadvise()` sequential hints to prevent cache pollution. Refer to [`docs/ai-agent-disk-cache-management.md`](docs/ai-agent-disk-cache-management.md).
+## 5. AI Agent Performance & Efficiency Directives
+- **Zero-Allocation Hot Paths**: Avoid dynamic heap allocations inside fast-path syscall and packet handlers.
+- **ISA Auto-Vectorization**: Route memory copies and hashing through SIMD feature routing (`src/klib/isa.rs`).
+- **Optimal Lookups**: Use O(1) or O(log N) lookup data structures to minimize CPU cache miss rates.
 
-4. **Zero-Copy Buffering & Ring Buffer Streams**
-   - Use bounded producer-consumer monitors (`BoundedBufferProducerConsumer`) and `io_uring` ring entries (`IoUringEngine`) for high-throughput I/O.
-   - Reuse allocations and flush line buffers prior to subagent thread exit. Refer to [`docs/ai-agent-buffering-management.md`](docs/ai-agent-buffering-management.md).
+## 6. AI Agent Kernel Management Directives
+- **Zero Ring 0 Panics**: All kernel routines must return `Result<T, &'static str>` or error codes.
+- **Syscall Audit Logging**: All syscall entrypoints must log invocations to `SovereignSyscallAuditLogger` (`src/syscall/table.rs`).
+- **Capability Sandboxing**: Process creation must inherit minimal capability tokens (`src/security/capability.rs`, `src/security/sigma_unveil.rs`).
 
-5. **Stateless System Configs & Atomic Updates**
-   - Place local system config overrides in `/etc`, keeping `/usr/share/defaults` factory-clean.
-   - Perform atomic A/B slot updates via `SovereignSystemUpdateAndTestingEngine` with PQC Dilithium signature verification. Refer to [`docs/ai-agent-system-state-management.md`](docs/ai-agent-system-state-management.md).
+## 7. AI Agent Filesystem Management Directives
+- **Atomic File Writes**: Perform file updates through staged temporary buffers followed by atomic rename operations.
+- **CoW Subvolume Snapshots**: Duplicate extent pointers during subvolume modifications (`src/filesystem/cow_snapshot.rs`, `src/filesystem/btrfs_inspired.rs`).
+- **Unveil Path Restrictions**: Enforce OpenBSD `unveil` permissions (`r`, `w`, `c`, `x`) before filesystem operations (`src/security/sigma_unveil.rs`).
 
-6. **Binary Semaphores & Mutex Synchronization**
-   - Coordinate shared memory access between subagent threads using `BinarySemaphore` primitives backed by `LinuxFutexEngine`.
-   - Strictly follow lock hierarchy ordering and RAII guard patterns to prevent deadlocks. Refer to [`docs/ai-agent-semaphores-management.md`](docs/ai-agent-semaphores-management.md).
+## 8. AI Agent Block Device Drivers Management Directives
+- **Physical Memory DMA Alignment**: Command list buffers and scatter-gather lists must enforce physical memory page alignment (`src/driver/ahci_sata_controller.rs`).
+- **Driver Shard Sandboxing**: Driver shards must execute inside isolated containers with I/O byte quotas (`src/drivers/sovereign_driver_lifecycle.rs`).
+- **Doorbell & Submission Queues**: Validate sector ranges and PRP page boundaries before ringing controller doorbells.
 
-7. **Filesystem Unveil & CoW Snapshot Management**
-   - Restrict visible filesystem paths via OpenBSD `unveil()` prior to file modifications.
-   - Leverage Copy-on-Write (CoW) snapshots when performing multi-file refactoring operations. Refer to [`docs/ai-agent-filesystem-management.md`](docs/ai-agent-filesystem-management.md).
+## 9. AI Agent Bottom Half Kernel Threads Directives
+- **Top-Half/Bottom-Half Split**: Keep top-half hard IRQ handlers under 1 microsecond (`src/interrupt/handler.rs`).
+- **Non-Blocking Softirqs**: Softirq vectors (`src/kernel/irq/softirq.rs`) must never sleep or wait on locks.
+- **kworker Thread Deferral**: Defer process-context work to system workqueues (`src/kernel/irq/workqueue.rs`).
 
-8. **Pre-Task System Snapshots & Backup Safeguards**
-   - Agents performing high-risk system changes (package updates, driver installs, config edits) MUST create a pre-task snapshot via `SelfHealingModule::create_snapshot()`.
-   - Verify Merkle-tree snapshot integrity before executing atomic disaster recovery rollbacks. Refer to [`docs/ai-agent-backup-management.md`](docs/ai-agent-backup-management.md).
+## 10. AI Agent Main Memory Management Directives
+- **Physical Memory Zoning**: Enforce physical memory zone constraints (`ZONE_DMA`, `ZONE_DMA32`, `ZONE_NORMAL`, `ZONE_HIGHMEM`) in `src/memory/zone.rs`.
+- **Watermark Reclamation**: Trigger asynchronous `kswapd` page reclamation when free pages hit `Watermark::Low` (`src/memory/kswapd.rs`).
+- **Kernel Heap Guard Alignment**: Kernel heap expansion must maintain 4KiB page boundary alignment and ASLR guard page protection (`src/memory/heap.rs`).
 
-9. **Cgroup Resource Quotas & Rate Limits**
-   - AI agent task execution threads must be attached to the `/sys/fs/cgroup/system.slice/sigma-agent.service` cgroup.
-   - Enforce memory quotas (`memory.max = 2G`) and CPU limits (`cpu.max = 50000 100000`) to prevent runaway resource consumption.
+## 11. AI Agent Cache Size Management Directives
+- **Bounded Slab Caches**: Specify maximum capacity quotas per slab object type in `src/klib/slab.rs` and `src/memory/resource_allocator.rs`.
+- **Package Cache Pruning**: Registry proxy caches must perform bulk `copy_from_slice` memory transfers (`src/package/cache.rs`) and enforce `paccache` version pruning.
+- **CPU Cache Line Alignment**: Align spinlocks and ring buffer head/tail pointers to 64-byte boundaries (`#[repr(align(64))]`).
 
-10. **IPC & Subagent Communication Channels**
-    - Inter-agent communication MUST utilize `ZeroCopyIpcChannel` or `AndroidBinderIpc` with cryptographic token verification (`security_token`).
-    - Direct memory sharing between agent processes without capability-gated handles is strictly forbidden.
-
-11. **Virtual Machine Guest Provisioning**
-    - Agents executing untrusted or experimental code MUST spawn an isolated guest VM via `VirtualizationOrchestrator` using KVM/Bhyve backends.
-    - Attach virtio-fs shared paths with strict OpenBSD `unveil()` read-only restrictions.
-
-12. **Power & Thermal Awareness**
-    - Agents must check system power profiles and CPU temperature via `PowerGovernor` before launching compute-intensive subtasks.
-    - Restrict concurrency and defer heavy background AI model indexing on battery power (`powersave` / `conservative` governor modes).
-
-13. **Zero-Dependency Core Systems**
-    - Avoid adding third-party standard C++ or non-vetted external dependencies.
-    - Core kernel, driver, and shell primitives must rely on `ZeroDependencyPrimitiveHub` and `klib`.
-
----
-
-## 🛠️ Build & Verification Instructions
-
-AI agents making code changes must run the following checks before submitting pull requests:
-
-```bash
-# 1. Run quality gate verification
-./scripts/sigma_quality_check.sh
-
-# 2. Run UI/UX & accessibility verification
-./scripts/uiux_accessibility_test.sh
-
-# 3. Synchronize documentation mirrors
-./sync_wiki.sh
-```
-
----
-
-## 📌 Related Documentation
-- Process Management Architecture: [`docs/process-management.md`](docs/process-management.md)
-- AI Agent Process Management Guidelines: [`docs/ai-agent-process-management.md`](docs/ai-agent-process-management.md)
-- AI Agent Access Control Guidelines: [`docs/ai-agent-access-management.md`](docs/ai-agent-access-management.md)
-- AI Agent Character Queue Management: [`docs/ai-agent-character-queue-management.md`](docs/ai-agent-character-queue-management.md)
-- AI Agent Disk Cache Management Guidelines: [`docs/ai-agent-disk-cache-management.md`](docs/ai-agent-disk-cache-management.md)
-- AI Agent Buffering Management Guidelines: [`docs/ai-agent-buffering-management.md`](docs/ai-agent-buffering-management.md)
-- AI Agent System State & Update Guidelines: [`docs/ai-agent-system-state-management.md`](docs/ai-agent-system-state-management.md)
-- AI Agent Binary Semaphores Management: [`docs/ai-agent-semaphores-management.md`](docs/ai-agent-semaphores-management.md)
-- AI Agent Filesystem Management Guidelines: [`docs/ai-agent-filesystem-management.md`](docs/ai-agent-filesystem-management.md)
-- AI Agent Backup & Recovery Guidelines: [`docs/ai-agent-backup-management.md`](docs/ai-agent-backup-management.md)
-- AI Agent Virtual Machine Management: [`docs/ai-agent-vm-management.md`](docs/ai-agent-vm-management.md)
-- AI Agent Power & Thermal Management: [`docs/ai-agent-power-management.md`](docs/ai-agent-power-management.md)
-- Sovereign Developer Guide: [`DEVELOPER_RULES.md`](DEVELOPER_RULES.md)
+For detailed specifications, see `docs/AGENTS_MEMORY_MANAGEMENT.md`, `docs/AGENTS_TESTING_GUIDELINES.md`, `docs/AGENTS_EFFICIENCY_GUIDELINES.md`, `docs/AGENTS_KERNEL_MANAGEMENT.md`, `docs/AGENTS_FILESYSTEM_MANAGEMENT.md`, `docs/AGENTS_BLOCK_DEVICE_DRIVERS_MANAGEMENT.md`, `docs/AGENTS_BOTTOM_HALF_THREADS.md`, `docs/AGENTS_MAIN_MEMORY_MANAGEMENT.md`, `docs/AGENTS_CACHE_SIZE_MANAGEMENT.md`, and `docs/memory-management.md`.

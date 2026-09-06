@@ -15,7 +15,6 @@
 use std::vec;
 
 use std::boxed::Box;
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 use std::format;
 use std::string::{String, ToString};

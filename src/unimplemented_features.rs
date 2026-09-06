@@ -10,9 +10,8 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::collections::HashMap;
-
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
