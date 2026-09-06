@@ -684,7 +684,7 @@ impl SshDaemon {
                 return Err("SSHD: Password authentication is disabled.");
             }
             // Simple password check
-            if credentials == b"sovereign_pass" {
+            if credentials == b"<SIGMA_TEST_CREDENTIAL>" {
                 auth_success = true;
             }
         } else if auth_method == "pubkey" {
@@ -1578,7 +1578,7 @@ mod tests {
                 "192.168.1.1",
                 "secure_user",
                 "password",
-                b"sovereign_pass",
+                b"<SIGMA_TEST_CREDENTIAL>",
                 None,
             )
             .unwrap();
@@ -1586,7 +1586,7 @@ mod tests {
 
         // 5. Test root login permission check (root permitted is false)
         let root_res =
-            daemon.authenticate("192.168.1.1", "root", "password", b"sovereign_pass", None);
+            daemon.authenticate("192.168.1.1", "root", "password", b"<SIGMA_TEST_CREDENTIAL>", None);
         assert!(root_res.is_err());
 
         // 6. Test PAM-like MFA support
@@ -1594,7 +1594,7 @@ mod tests {
             "192.168.1.1",
             "secure_user",
             "password",
-            b"sovereign_pass",
+            b"<SIGMA_TEST_CREDENTIAL>",
             Some("wrong_token"),
         );
         assert!(mfa_failed.is_err());
@@ -1604,7 +1604,7 @@ mod tests {
                 "192.168.1.1",
                 "secure_user",
                 "password",
-                b"sovereign_pass",
+                b"<SIGMA_TEST_CREDENTIAL>",
                 Some("123456"),
             )
             .unwrap();
@@ -1629,7 +1629,7 @@ mod tests {
         // Blocklisted after 2 attempts
         assert!(daemon.blocklisted_ips.contains(&ip.to_string()));
 
-        let res_blocked = daemon.authenticate(ip, "user1", "password", b"sovereign_pass", None);
+        let res_blocked = daemon.authenticate(ip, "user1", "password", b"<SIGMA_TEST_CREDENTIAL>", None);
         assert!(res_blocked.is_err());
     }
 

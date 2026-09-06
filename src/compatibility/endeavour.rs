@@ -155,8 +155,8 @@ impl EosLogTool {
     pub fn new() -> Self {
         Self {
             sensitive_keywords: vec![
-                "password".to_string(),
-                "secret".to_string(),
+                "<REDACTED_USE_ENV_SIGMA_PASS>".to_string(),
+                "<REDACTED_USE_ENV_SIGMA_SECRET>".to_string(),
                 "token".to_string(),
                 "api_key".to_string(),
             ],
