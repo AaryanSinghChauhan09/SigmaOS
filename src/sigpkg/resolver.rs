@@ -60,29 +60,29 @@ impl SatSolver {
         Ok(result)
     }
 
-    /// Recursive dependency resolution
-    fn resolve_recursive(
-        &self,
-        package_name: &str,
+    /// Recursive dependency resolution optimized with string slices (&'a str) and zero heap allocations.
+    fn resolve_recursive<'a>(
+        &'a self,
+        package_name: &'a str,
         version_constraint: &VersionConstraint,
         result: &mut Vec<Package>,
-        visited: &mut HashSet<String>,
+        visited: &mut HashSet<&'a str>,
     ) -> Result<(), ResolveError> {
-        if visited.contains(package_name) {
+        // Fast path: insert directly and check if already visited (single set lookup, zero String heap allocation)
+        if !visited.insert(package_name) {
             return Ok(()); // Already processed
         }
-        visited.insert(package_name.to_string());
 
         // Find matching package
         let packages = self
             .packages
             .get(package_name)
-            .ok_or(ResolveError::PackageNotFound(package_name.to_string()))?;
+            .ok_or_else(|| ResolveError::PackageNotFound(package_name.to_string()))?;
 
         let matching_package = packages
             .iter()
             .find(|p| self.satisfies_constraint(&p.version, version_constraint))
-            .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))?;
+            .ok_or_else(|| ResolveError::NoMatchingVersion(package_name.to_string()))?;
 
         result.push(matching_package.clone());
 
@@ -147,30 +147,30 @@ impl SatSolver {
             .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))
     }
 
-    /// Detect circular dependencies
+    /// Detect circular dependencies using string slice references (&'a str) to avoid heap allocations.
     pub fn detect_circular(&self, package_name: &str) -> bool {
         let mut visited = HashSet::new();
         let mut recursion_stack = HashSet::new();
         self.has_cycle(package_name, &mut visited, &mut recursion_stack)
     }
 
-    fn has_cycle(
-        &self,
-        package_name: &str,
-        visited: &mut HashSet<String>,
-        recursion_stack: &mut HashSet<String>,
+    fn has_cycle<'a>(
+        &'a self,
+        package_name: &'a str,
+        visited: &mut HashSet<&'a str>,
+        recursion_stack: &mut HashSet<&'a str>,
     ) -> bool {
-        visited.insert(package_name.to_string());
-        recursion_stack.insert(package_name.to_string());
+        // Fast path: if already visited, check if node is in active recursion stack (back-edge = cycle)
+        if !visited.insert(package_name) {
+            return recursion_stack.contains(package_name);
+        }
+
+        recursion_stack.insert(package_name);
 
         if let Some(packages) = self.packages.get(package_name) {
             for package in packages {
                 for dep in &package.dependencies {
-                    if !visited.contains(&dep.name) {
-                        if self.has_cycle(&dep.name, visited, recursion_stack) {
-                            return true;
-                        }
-                    } else if recursion_stack.contains(&dep.name) {
+                    if self.has_cycle(&dep.name, visited, recursion_stack) {
                         return true;
                     }
                 }

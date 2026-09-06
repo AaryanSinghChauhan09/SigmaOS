@@ -17,3 +17,7 @@
 ## 2026-09-05 - In-Place Buffer Appending for JSON Serialization
 **Learning:** In recursive data structure serialization (like JSON trees), calling `to_json_string()` on child elements or cloning keys (`key.clone()`) creates $O(N)$ temporary `String` heap allocations that are immediately concatenated and dropped. Passing a single mutable output buffer (`&mut String`) down the recursion tree and escaping string slices directly into the buffer eliminates all intermediate heap allocations during serialization.
 **Action:** When serializing structured values, prefer buffer-appending methods (`append_to_buf(&self, out: &mut String)`) over returning owned temporary `String` objects from recursive methods.
+
+## 2026-09-06 - Zero-Allocation Borrowed Slice Set Tracking in Graph Traversal
+**Learning:** In graph algorithms (like package dependency resolution and cycle detection), keeping track of `visited` or active recursion paths using sets of owned `HashSet<String>` causes $O(N)$ heap allocations (`to_string()`) and double set lookups (`contains()` followed by `insert()`). By using string slice references `BTreeSet<&'a str>` tied to the lifetime of the graph container (`&'a self`), traversal creates 0 heap allocations and `!set.insert(item)` combines lookup and insertion into a single operation.
+**Action:** In graph traversal methods on owned collections, always track visited nodes using sets of borrowed string slices (`HashSet<&'a str>`) and test insertion boolean return values directly.
