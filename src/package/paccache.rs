@@ -91,7 +91,8 @@ impl PaccacheEngine {
             alloc::collections::BTreeMap::new();
 
         for entry in &self.cache_entries {
-            grouped.entry(entry.name.clone())
+            grouped
+                .entry(entry.name.clone())
                 .or_insert_with(Vec::new)
                 .push(entry);
         }
@@ -126,10 +127,7 @@ impl PaccacheEngine {
 
     /// Calculate space that would be freed
     pub fn calculate_freed_space(&self) -> u64 {
-        self.get_packages_to_remove()
-            .iter()
-            .map(|e| e.size)
-            .sum()
+        self.get_packages_to_remove().iter().map(|e| e.size).sum()
     }
 
     /// Remove old packages from cache
@@ -151,7 +149,8 @@ impl PaccacheEngine {
         }
 
         // Remove from cache_entries
-        self.cache_entries.retain(|e| !to_remove_paths.contains(&e.file_path));
+        self.cache_entries
+            .retain(|e| !to_remove_paths.contains(&e.file_path));
 
         removed_files
     }

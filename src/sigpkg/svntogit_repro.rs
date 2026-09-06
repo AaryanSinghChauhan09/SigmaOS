@@ -4,10 +4,10 @@
 
 extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // ============================================================================
 // 1. SovereignSvnToGitMigrator (svntogit parity)
@@ -78,8 +78,12 @@ impl SovereignSvnToGitMigrator {
             let email = format!("{}@{}", log.author, default_domain);
             let git_branch = match log.branch_type {
                 SvnBranchType::Trunk => "main".to_string(),
-                SvnBranchType::Branch => format!("packages/{}", log.path.split('/').last().unwrap_or("pkg")),
-                SvnBranchType::Tag => format!("tags/{}", log.path.split('/').last().unwrap_or("v1.0")),
+                SvnBranchType::Branch => {
+                    format!("packages/{}", log.path.split('/').last().unwrap_or("pkg"))
+                }
+                SvnBranchType::Tag => {
+                    format!("tags/{}", log.path.split('/').last().unwrap_or("v1.0"))
+                }
             };
 
             let commit = ConvertedGitCommit {
