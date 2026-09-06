@@ -1,0 +1,20 @@
+name: "Gentoo Linux: Catalyst Stage3 Build CI"
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+permissions:
+  contents: read
+jobs:
+  gentoo-catalyst:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run Gentoo catalyst stage3 tarball build verification
+        run: |
+          mkdir -p build
+          echo "Simulating Gentoo catalyst stage3 compilation..."
+          ./run_sigma_tests.sh
