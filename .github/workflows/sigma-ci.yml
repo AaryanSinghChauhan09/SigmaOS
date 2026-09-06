@@ -61,12 +61,11 @@ jobs:
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@stable
 
-        with:
-          toolchain: stable
-          profile: minimal
-          toolchain: stable
-          target: ${{ matrix.toolchain }}
-          override: true
+      with:
+        toolchain: stable
+        profile: minimal
+        target: ${{ matrix.toolchain }}
+        override: true
 
     - name: Cache build artifacts
       uses: actions/cache@v4
@@ -139,7 +138,7 @@ jobs:
 
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v4 # v4.1.9
+      uses: actions/download-artifact@cc203385981b70ca67e3a982f6e5f6e62f59a86e # v4.1.9
 
       with:
         name: sigmaos-${{ matrix.arch }}-iso
@@ -191,11 +190,11 @@ jobs:
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@stable
 
-        with:
-          profile: minimal
-          toolchain: stable
-          target: x86_64-unknown-none
-          override: true
+      with:
+        profile: minimal
+        toolchain: stable
+        target: x86_64-unknown-none
+        override: true
 
     - name: Build first image
       run: |
@@ -260,10 +259,6 @@ jobs:
     name: Performance Benchmarks
     needs: boot-test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-      pull-requests: write
 
     steps:
     - name: Checkout code
@@ -271,7 +266,7 @@ jobs:
 
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v4 # v4.1.9
+      uses: actions/download-artifact@cc203385981b70ca67e3a982f6e5f6e62f59a86e # v4.1.9
 
       with:
         name: sigmaos-x86_64-iso
@@ -374,10 +369,10 @@ jobs:
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@stable
 
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
 
     - name: Run tests
       run: |
