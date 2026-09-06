@@ -225,7 +225,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
     assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
@@ -245,4 +245,21 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("pacman.pkg.tar.zst"), Some(PackageFormat::Pacman));
     assert_eq!(adapter.detect_format_by_extension("plain.tar"), Some(PackageFormat::Tar));
     assert_eq!(adapter.detect_format_by_extension("puppy.pet"), Some(PackageFormat::Pet));
+
+    // Additional bare names, spaced extensions, and uppercase variations
+    assert_eq!(adapter.detect_format_by_extension("pup"), Some(PackageFormat::Pup));
+    assert_eq!(adapter.detect_format_by_extension("pet"), Some(PackageFormat::Pet));
+    assert_eq!(adapter.detect_format_by_extension("pacman"), Some(PackageFormat::Pacman));
+    assert_eq!(adapter.detect_format_by_extension("archive .tar .gz"), Some(PackageFormat::TarGz));
+    assert_eq!(adapter.detect_format_by_extension("FLATPAK.FLATPAK"), Some(PackageFormat::Flatpak));
+    assert_eq!(adapter.detect_format_by_extension("Application.APPIMAGE"), Some(PackageFormat::AppImage));
+
+    // Test parse_and_translate_manifest
+    let deb_text = "Package: nginx\nVersion: 1.24.0\nDepends: libc, libssl\nDescription: High performance HTTP server\n";
+    let pkg = adapter.parse_and_translate_manifest("nginx.deb", deb_text).unwrap();
+    assert_eq!(pkg.name, "nginx");
+
+    let ebuild_text = "DESCRIPTION=\"The Portage Package Manager\"\nRDEPEND=\"dev-lang/python\"\n";
+    let ebuild_pkg = adapter.parse_and_translate_manifest("sys-apps/portage-3.0.30.ebuild", ebuild_text).unwrap();
+    assert_eq!(ebuild_pkg.name, "portage");
 }
