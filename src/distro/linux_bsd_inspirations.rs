@@ -244,8 +244,47 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
         }
+    }
+
+    pub fn dispatch_cross_subsystem_action(
+        &self,
+        action: &str,
+        target_mode: DistroSubsystemMode,
+    ) -> Result<String, &'static str> {
+        if action.is_empty() {
+            return Err("Action cannot be empty");
+        }
+        let src_pkg = self.translate_package_specifier(action);
+        let dst_pkg = match target_mode {
+            DistroSubsystemMode::LinuxDebian
+            | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxTails => format!("{}.deb", action),
+            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
+            DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
+            DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
+            DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
+            DistroSubsystemMode::LinuxGuix => format!("{}.scm", action),
+            DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", action),
+            DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", action),
+            DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", action),
+            DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
+                format!("{}.pkg", action)
+            }
+            DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
+            DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
+            DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
+        };
+
+        Ok(format!(
+            "CrossSubsystemDispatch[{:?}->{:?}]: {} mapped to target package format {}",
+            self.mode, target_mode, src_pkg, dst_pkg
+        ))
     }
 
     pub fn enforce_security_isolation(
@@ -1617,6 +1656,58 @@ impl SovereignLandlockLsm {
 impl Default for SovereignLandlockLsm {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod cross_subsystem_tests {
+    use super::*;
+
+    #[test]
+    fn test_cross_subsystem_dispatch_actions() {
+        let bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        let res = bridge.dispatch_cross_subsystem_action("neofetch", DistroSubsystemMode::FreeBsd);
+        assert!(res.is_ok());
+        let msg = res.unwrap();
+        assert!(msg.contains("LinuxArch"));
+        assert!(msg.contains("FreeBsd"));
+        assert!(msg.contains("neofetch.pkg.tar.zst"));
+        assert!(msg.contains("neofetch.pkg"));
+
+        let res_err = bridge.dispatch_cross_subsystem_action("", DistroSubsystemMode::OpenBsd);
+        assert!(res_err.is_err());
+    }
+
+    #[test]
+    fn test_all_distro_subsystem_modes_verification() {
+        let modes = [
+            DistroSubsystemMode::LinuxArch,
+            DistroSubsystemMode::LinuxDebian,
+            DistroSubsystemMode::LinuxAlpine,
+            DistroSubsystemMode::LinuxNix,
+            DistroSubsystemMode::LinuxGentoo,
+            DistroSubsystemMode::LinuxFedora,
+            DistroSubsystemMode::LinuxVoid,
+            DistroSubsystemMode::LinuxOpenSuse,
+            DistroSubsystemMode::LinuxSolus,
+            DistroSubsystemMode::LinuxClear,
+            DistroSubsystemMode::LinuxSlackware,
+            DistroSubsystemMode::FreeBsd,
+            DistroSubsystemMode::OpenBsd,
+            DistroSubsystemMode::NetBsd,
+            DistroSubsystemMode::DragonFlyBsd,
+            DistroSubsystemMode::SolarisIllumos,
+            DistroSubsystemMode::SmartOs,
+            DistroSubsystemMode::BedrockLinux,
+            DistroSubsystemMode::LinuxPopOs,
+            DistroSubsystemMode::LinuxTails,
+            DistroSubsystemMode::LinuxGuix,
+        ];
+
+        for m in modes {
+            let bridge = SovereignUniversalDistroBridge::new(m);
+            assert!(bridge.verify_all_subsystems_compatibility());
+        }
     }
 }
 

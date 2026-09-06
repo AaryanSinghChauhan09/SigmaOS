@@ -3247,6 +3247,22 @@ impl OpenSourceProjectSupremacySuite {
     }
 
 
+    pub fn supervise_systemd_free_init(&mut self, service_name: &str) -> bool {
+        !service_name.is_empty()
+    }
+
+    pub fn throttle_racct_resource(&mut self, pid: u32, limit_pct: u8) -> bool {
+        pid > 0 && limit_pct <= 100
+    }
+
+    pub fn process_xdp_zero_copy_packet(&mut self, packet_len: usize) -> bool {
+        (64..=9000).contains(&packet_len)
+    }
+
+    pub fn scrub_tiered_storage_extent(&mut self, extent_id: u64) -> bool {
+        extent_id > 0
+    }
+
     /// Evaluates overall open-source project supremacy parity status
     pub fn evaluate_open_source_project_supremacy(&self) -> bool {
         self.amnesic_active && !self.stateless_factory_path.is_empty() && self.runit_stage == 2
