@@ -2254,6 +2254,21 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
+            "flatpak" | "snap" | "pkgman" | "swupd" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" | "bundle-add" => operation = UniversalPmOperation::Install,
+                        "remove" | "uninstall" | "remove-bundle" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "bundle-upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "find" => operation = UniversalPmOperation::Search,
+                        "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
             _ => {
                 for arg in args {
                     if !arg.starts_with('-') {
@@ -2792,7 +2807,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Pisi)
+            Some(PackageFormat::Eopkg)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
