@@ -4309,3 +4309,21 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 
 4. **Signal Dispatch & Forceful Cancellation Lock Safety**:
    - Asynchronous signal handlers and process cancellation routines (`src/process/advanced_process_control.rs`) must release all held spinlocks, file locks (`flock`), and semaphores prior to task termination to prevent system deadlocks.
+
+---
+
+## 89. SOVEREIGN AI AGENT CACHE OPERATION MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 89.1 Autonomous Agent Cache Operation Directives
+
+1. **DMA Buffer CPU Cache Line Flushing**:
+   - Memory buffers used for hardware DMA transfers on non-coherent buses (`src/kernel/mm/cpu_cache.rs`) must execute explicit `clflushopt` or `clwb` cache line flushes across target addresses before initiating DMA transfers.
+
+2. **TLB Entry Invalidation & Multicore Shootdowns**:
+   - Page table entry modifications or unmappings (`src/memory/tlb_associative.rs`) must issue local `invlpg` instructions and broadcast multicore TLB shootdown IPC interrupts to sibling CPU cores.
+
+3. **False Sharing Prevention via 64-Byte Cache Line Alignment**:
+   - Frequently mutated per-CPU structures or lock state variables must enforce 64-byte L1 cache line alignment (`#[repr(align(64))]`) to prevent cache ping-ponging and CPU pipeline stalls.
+
+4. **JIT Instruction & Data Cache Synchronization**:
+   - Dynamically generated executable bytecode must flush data cache lines (`DCACHE`), invalidate instruction cache lines (`ICACHE`), and execute instruction memory barrier fences (`ISB` / `DSB` / `MFENCE`) prior to branch execution.

@@ -1,100 +1,90 @@
 # AI Agent Guidelines: Cache Operation Management in SigmaOS
 
-## 📌 1. Overview & Core Directives
-
-In **SigmaOS**, cache operation management governs explicit, hardware-level CPU cache line flushes, write-backs, invalidations, and instruction-data cache synchronization ($I\$ / D\$$ coherence).
-
-As an AI agent developing microkernel components, device drivers, virtual memory systems, or JIT translators, you must strictly manage hardware cache operations to guarantee **data durability, DMA coherency, and execution safety** across x86_64, AArch64, and RISC-V 64 architectures.
+## Overview
+This document defines operational guidelines and architectural directives for AI agents working on **Cache Operation Management** in SigmaOS. It specifies hardware CPU cache line flushes (`clflushopt`, `clwb`), Translation Lookaside Buffer (TLB) entry invalidations (`invlpg`), Page Cache Radix-Tree lookups, SLUB object cache allocations, DMA buffer cache coherency, false sharing prevention, and JIT instruction/data cache synchronization across `#![no_std]` runtime environments in SigmaOS.
 
 ---
 
-## ⚙️ 2. Hardware Cache Operations & ISA Mapping
+## 1. Cache Operation Subsystems & Modules
 
-### 2.1 x86_64 Cache Control Instructions
-| Operation | Architecture Instruction | Intrinsic / Assembly | Operational Semantics |
-| :--- | :--- | :--- | :--- |
-| **Flush Line** | `clflush` / `clflushopt` | `_mm_clflush(ptr)` | Flushes cache line containing `ptr` from all cache levels ($L1/L2/L3$) to DRAM. |
-| **Write-Back Line** | `clwb` | `_mm_clwb(ptr)` | Writes back dirty cache line to memory without evicting line from cache ($L1/L2/L3$). |
-| **Full Invalidation** | `wbinvd` | `asm!("wbinvd")` | Writes back and invalidates ALL CPU caches (Privileged Ring 0 only; HIGH LATENCY). |
-| **Store Fence** | `sfence` | `_mm_sfence()` | Guarantees all preceding stores and cache flushes retire before subsequent stores. |
-| **Full Fence** | `mfence` | `_mm_mfence()` | Serializes all load and store operations across the memory pipeline. |
+AI agents interacting with CPU hardware caches, TLB translation buffers, page caches, or DMA coherency in SigmaOS must interface with the following core subsystems:
 
-### 2.2 AArch64 Cache Control Operations
-* **Data Cache Clean (Write-Back) to PoC (Point of Coherency):** `dc cvac, xt`
-* **Data Cache Clean & Invalidate:** `dc civac, xt`
-* **Instruction Cache Invalidation to PoU (Point of Unification):** `ic ivau, xt`
-* **Barrier Synchronization:** `dsb ish` (Data Synchronization Barrier), `isb` (Instruction Synchronization Barrier)
-
-### 2.3 RISC-V 64 Cache Operations (Zicbom / Zicboz Extension)
-* **Clean Block:** `cbo.clean`
-* **Flush Block:** `cbo.flush`
-* **Invalidate Block:** `cbo.inval`
-* **Instruction Cache Fence:** `fence.i`
+| Subsystem / Module | Location | Description |
+| :--- | :--- | :--- |
+| **TLB Associative Caching** | `src/memory/tlb_associative.rs` | PCID-aware Translation Lookaside Buffer manager, `invlpg` page invalidations, and multicore TLB shootdown IPC interrupts. |
+| **Page Cache & Radix Trees** | `src/klib/adt.rs`, `src/kernel/mm/page_cache.rs` | File page cache Radix-Tree lookups, dirty page writeback queues, and DMA page pinning. |
+| **SLUB Object Allocator Caches** | `src/klib/slab.rs`, `src/klib/custom_allocator.rs` | SLUB object cache pools, per-CPU lock-free recycle bins, and 64-byte cache-line aligned allocations. |
+| **CPU Hardware Cache Control** | `src/kernel/mm/cpu_cache.rs` | Explicit CPU cache line flushing (`clflush`, `clflushopt`, `clwb`), persistent memory flushing, and DMA coherency barriers. |
+| **Package Proxy Caching** | `src/package/cache.rs` | Content-addressed package binary cache, proxy retention limits, and metadata index caching. |
 
 ---
 
-## 🛡️ 3. Key Subsystem Cache Operation Patterns
+## 2. Architectural Rules & Cache Operation Invariants
 
-### 3.1 DMA Buffer Coherency
-When preparing a buffer for non-cache-coherent PCIe or AHCI DMA devices:
-1. **Pre-DMA Transmit (CPU Write $\rightarrow$ Device Read):**
-   * Perform $D\$$ clean/write-back for all 64-byte cache lines covering the buffer range.
-   * Issue `sfence` / `dsb ish` before signaling device doorbell register.
-2. **Post-DMA Receive (Device Write $\rightarrow$ CPU Read):**
-   * Invalidate CPU $D\$$ lines covering target buffer to force subsequent CPU reads to fetch fresh data from DRAM.
+AI agents must enforce the following 4 core invariants when implementing or auditing cache operation mechanisms:
 
-### 3.2 Self-Modifying Code & eBPF JIT Cache Sync
-When generating dynamic machine code in memory before execution:
-1. Write generated instructions to target memory buffer.
-2. Flush/Clean Data Cache line ($D\$$ write-back): `clwb` / `dc cvau`.
-3. Issue Store Fence: `sfence` / `dsb ish`.
-4. Invalidate Instruction Cache ($I\$$ invalidate): `ic ivau` / `fence.i`.
-5. Issue Pipeline Instruction Barrier: `isb`.
-6. Execute function pointer.
-
-### 3.3 Persistent Memory & NVDIMM Durability
-For persistent memory writes (`src/filesystem/ext4.rs`, `src/filesystem/btrfs_inspired.rs`):
-```rust
-pub unsafe fn flush_persistent_range(ptr: *const u8, len: usize) {
-    let mut addr = ptr as usize & !63; // Align to 64-byte boundary
-    let end = (ptr as usize + len + 63) & !63;
-
-    while addr < end {
-        #[cfg(target_arch = "x86_64")]
-        core::arch::x86_64::_mm_clwb(addr as *const _);
-
-        #[cfg(target_arch = "aarch64")]
-        core::arch::aarch64::__dc_cvac(addr as *const _);
-
-        addr += 64;
-    }
-
-    #[cfg(target_arch = "x86_64")]
-    core::arch::x86_64::_mm_sfence();
-}
+```
++-------------------------------------------------------------------------+
+|                  SIGMAOS CACHE OPERATION ARCHITECTURE                   |
++-------------------------------------------------------------------------+
+                                     |
+         +---------------------------+---------------------------+
+         |                           |                           |
+         v                           v                           v
+  [TLB Entry Invalidations]    [DMA Cache Coherency]      [JIT I-Cache Sync]
+  • invlpg Page Invalidation   • clflushopt / clwb Flushes • DCACHE Flush to RAM
+  • PCID Page Table Flushes   • Writeback Before DMA      • ICACHE Line Invalidate
+  • Multicore TLB Shootdowns   • Non-Coherent Hardware     • ISB / DSB Memory Barriers
 ```
 
+### 1. DMA Buffer Cache Coherency
+- **Invariant:** Prior to initiating hardware DMA transfers on non-coherent buses, memory buffers MUST issue explicit CPU cache line flushes (`clflushopt` or `clwb`) across all target memory addresses:
+  ```rust
+  // Flush DMA memory lines to RAM
+  pub fn flush_dma_range(addr: usize, len: usize) {
+      let line_size = 64; // L1 cache line size
+      let mut current = addr & !(line_size - 1);
+      let end = addr + len;
+      while current < end {
+          unsafe { core::arch::x86_64::_mm_clflushopt(current as *const u8) };
+          current += line_size;
+      }
+      core::sync::atomic::fence(core::sync::atomic::Ordering::SeqCst);
+  }
+  ```
+
+### 2. TLB Shootdown Invariant
+- **Invariant:** Modifying or unmapping page table entries MUST invalidate local CPU TLB entries via `invlpg` (`src/memory/tlb_associative.rs`) and broadcast TLB shootdown IPC interrupts to sibling CPU cores.
+- **Rule:** Re-mapping physical pages without clearing stale TLB entries is strictly prohibited.
+
+### 3. False Sharing Prevention (64-Byte Cache Line Alignment)
+- **Invariant:** Frequently mutated per-CPU structures or lock state variables MUST be aligned to 64-byte CPU cache line boundaries using `#[repr(align(64))]` or cache-line padding.
+- **Rationale:** Prevents cache-line ping-ponging and CPU pipeline stalls across adjacent SMP cores.
+
+### 4. JIT Instruction/Data Cache Synchronization
+- **Invariant:** Dynamically generated bytecode or executable instructions written to memory MUST flush data cache lines (`DCACHE`), invalidate instruction cache lines (`ICACHE`), and issue instruction synchronization barriers (`ISB` / `DSB` / `MFENCE`) prior to branch execution.
+
 ---
 
-## 🚫 4. AI Agent Safety Rules for Cache Operations
+## 3. Verification & Testing Protocols
 
-1. **Avoid `wbinvd` in Hot Paths:**
-   * Never execute `wbinvd` inside kernel interrupt handlers or system call dispatchers. It stalls all execution pipelines for up to several milliseconds.
-2. **Align Range Flushes to 64 Bytes:**
-   * Always round start address down (`addr & !63`) and end address up (`(addr + len + 63) & !63`) when flushing cache ranges to prevent partial line misses.
-3. **Always Pair Non-Temporal Stores with Fences:**
-   * Every non-temporal streaming store (`_mm_stream_si128`) or `clwb` flush sequence MUST conclude with an `sfence` / `dsb ish` before returning or notifying external hardware.
-
----
-
-## 🧪 5. Verification & Standalone Testing Procedures
-
-AI agents can verify cache operation helper routines via standalone unit compilation:
+Every cache operation management change must be verified via standalone unit tests and integrated test execution:
 
 ```bash
-# Test memory manager & performance allocator stack (includes cache flushing helpers)
-rustc --test --edition=2021 src/kernel/perf_mm.rs -o build/perf_mm_tests && ./build/perf_mm_tests && rm build/perf_mm_tests
+# Run standalone unit test for TLB associative caching
+rustc --test --edition 2021 src/memory/tlb_associative.rs -o build/test_tlb_associative && ./build/test_tlb_associative
 
-# Test eBPF JIT translator & code cache synchronization
-rustc --test --edition=2021 src/kernel/linux_bsd_innovations.rs -o build/ebpf_tests && ./build/ebpf_tests && rm build/ebpf_tests
+# Run full test suite
+./run_sigma_tests.sh
 ```
+
+---
+
+## 4. AI Agent Self-Assessment Checklist
+
+Before finalizing changes touching CPU cache flushing, TLB invalidation, or page cache lookups:
+
+- [ ] Are DMA buffers flushed via explicit `clflushopt` / `clwb` instructions before I/O execution?
+- [ ] Do page table unmapping routines execute `invlpg` and multicore TLB shootdown notifications?
+- [ ] Are per-CPU structures aligned to 64-byte L1 cache line boundaries (`#[repr(align(64))]`)?
+- [ ] Have all unit tests passed with 0 failures in `./run_sigma_tests.sh`?
