@@ -31,6 +31,9 @@
 - **AI Agent Time Sharing System Management Guide:** [[AI_AGENT_TIME_SHARING_SYSTEM_MANAGEMENT]] - Quantum time slicing, POSIX SCHED_RR, EEVDF virtual deadlines, and MLFQ priority decay for AI agents.
 - **AI Agent Semaphores Management Guide:** [[AI_AGENT_SEMAPHORES_MANAGEMENT]] - IPC namespace counting semaphores, System V IPC, eventfd EFD_SEMAPHORE, and NT semaphores for AI agents.
 - **AI Agent Semaphores Operation Management Guide:** [[AI_AGENT_SEMAPHORES_OPERATION_MANAGEMENT]] - Atomic wait (P/down), signal (V/up), SEM_UNDO auto-reversal, and wait queue wakeups for AI agents.
+- **AI Agent Consolidation Ratio Management Guide:** [[AI_AGENT_CONSOLIDATION_RATIO_MANAGEMENT]] - VirtIO memory ballooning, RAM overcommit ratios, KSM page deduplication, and VM density for AI agents.
+- **AI Agent Context Data Operation Management Guide:** [[AI_AGENT_CONTEXT_DATA_OPERATION_MANAGEMENT]] - Context Virtual MMU page allocation, PawThreeLayerMemory live context pruning, and token budgeting for AI agents.
+- **AI Agent Contiguous Allocation Operation Management Guide:** [[AI_AGENT_CONTIGUOUS_ALLOCATION_OPERATION_MANAGEMENT]] - CMA physical reservation, DMA buffer coalescing, and vmalloc virtual contiguity for AI agents.
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
 
 ---
@@ -50,7 +53,6 @@
 - [Security Architecture](docs/security.md)
 - [Package Management](docs/package-manager.md)
 - [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
->>>>>>> origin/feature/linux-bsd-distro-cross-subsystem-interop-12882498947621137375
 
 ---
 
