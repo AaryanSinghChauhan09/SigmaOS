@@ -926,7 +926,7 @@ impl UniversalFormatConverter {
 
         match format {
             PackageFormat::Apt => {
-                let parsed = adapter.parse_apt_control(&text).map_err(|e| e.to_string())?;
+                let parsed = adapter.parse_apt_control(&text).map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -939,10 +939,10 @@ impl UniversalFormatConverter {
                         &parsed.description,
                         &canonical_deps,
                     )
-                    .map_err(|e| e.to_string())
+                    .map_err(|e: &'static str| e.to_string())
             }
             PackageFormat::Pacman => {
-                let parsed = adapter.parse_pacman_pkgbuild(&text).map_err(|e| e.to_string())?;
+                let parsed = adapter.parse_pacman_pkgbuild(&text).map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -955,10 +955,10 @@ impl UniversalFormatConverter {
                         &parsed.pkgdesc,
                         &canonical_deps,
                     )
-                    .map_err(|e| e.to_string())
+                    .map_err(|e: &'static str| e.to_string())
             }
             PackageFormat::Yum => {
-                let parsed = adapter.parse_rpm_spec(&text).map_err(|e| e.to_string())?;
+                let parsed = adapter.parse_rpm_spec(&text).map_err(|e: &'static str| e.to_string())?;
                 let canonical_deps: Vec<String> = parsed
                     .requires
                     .iter()
@@ -971,13 +971,13 @@ impl UniversalFormatConverter {
                         &parsed.summary,
                         &canonical_deps,
                     )
-                    .map_err(|e| e.to_string())
+                    .map_err(|e: &'static str| e.to_string())
             }
             _ => {
                 let name = format!("{:?}-converted-pkg", format).to_lowercase();
                 adapter
                     .translate_to_native_package(&name, "1.0.0", "Converted foreign package", &[])
-                    .map_err(|e| e.to_string())
+                    .map_err(|e: &'static str| e.to_string())
             }
         }
     }

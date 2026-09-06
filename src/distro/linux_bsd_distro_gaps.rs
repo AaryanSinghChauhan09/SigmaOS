@@ -88,6 +88,34 @@ impl SigmaBootloaderEngine {
         }
         cfg
     }
+
+    pub fn generate_systemd_boot_entries(&self) -> Vec<(Vec<u8>, Vec<u8>)> {
+        let mut entries = Vec::new();
+        for (i, entry) in self.entries.iter().enumerate() {
+            let filename = if i == 0 {
+                Vec::from("sigma.conf")
+            } else {
+                let mut name = Vec::from("sigma-");
+                name.extend_from_slice(i.to_string().as_bytes());
+                name.extend_from_slice(b".conf");
+                name
+            };
+
+            let mut content = Vec::new();
+            content.extend_from_slice(b"title ");
+            content.extend_from_slice(entry.title.as_bytes());
+            content.extend_from_slice(b"\nlinux ");
+            content.extend_from_slice(entry.kernel_path.as_bytes());
+            content.extend_from_slice(b"\ninitrd ");
+            content.extend_from_slice(entry.initrd_path.as_bytes());
+            content.extend_from_slice(b"\noptions ");
+            content.extend_from_slice(entry.cmdline.as_bytes());
+            content.extend_from_slice(b"\n");
+
+            entries.push((filename, content));
+        }
+        entries
+    }
 }
 
 // ============================================================================
@@ -300,6 +328,10 @@ impl NetworkTcpUdpStack {
         let packet_length = 14 + 20 + 8 + payload.len();
         Ok(packet_length)
     }
+
+    pub fn filter_can_frame(&self, can_id: u32, mask: u32, filter_id: u32) -> bool {
+        (can_id & mask) == (filter_id & mask)
+    }
 }
 
 impl Default for NetworkTcpUdpStack {
@@ -369,6 +401,23 @@ impl SystemdInitManager {
 
     pub fn get_active_services_count(&self) -> usize {
         self.services.iter().filter(|s| s.state == ServiceState::Running).count()
+    }
+
+    pub fn is_service_running(&self, name: &str) -> bool {
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
+    }
+
+    pub fn check_dependencies_met(&self, name: &str) -> bool {
+        if let Some(srv) = self.services.iter().find(|s| s.name == name) {
+            for &req in &srv.requires {
+                if !self.is_service_running(req) {
+                    return false;
+                }
+            }
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -452,6 +501,10 @@ mod tests {
 
         let grub_cfg = engine.generate_grub_cfg();
         assert!(!grub_cfg.is_empty());
+
+        let sd_entries = engine.generate_systemd_boot_entries();
+        assert_eq!(sd_entries.len(), 2);
+        assert_eq!(sd_entries[0].0, b"sigma.conf");
     }
 
     #[test]
@@ -486,6 +539,9 @@ mod tests {
 
         let bytes_sent = stack.send_udp_datagram([192, 168, 1, 1], 53, b"DNS_QUERY").unwrap();
         assert_eq!(bytes_sent, 14 + 20 + 8 + 9);
+
+        assert!(stack.filter_can_frame(0x123, 0x7FF, 0x123));
+        assert!(!stack.filter_can_frame(0x123, 0x7FF, 0x456));
     }
 
     #[test]
@@ -493,8 +549,11 @@ mod tests {
         let mut manager = SystemdInitManager::new();
         assert_eq!(manager.get_active_services_count(), 0);
 
+        assert!(!manager.check_dependencies_met("zenith-compositor.service"));
         assert!(manager.start_service("networkd.service").is_ok());
         assert_eq!(manager.get_active_services_count(), 1);
+        assert!(manager.is_service_running("networkd.service"));
+        assert!(manager.check_dependencies_met("zenith-compositor.service"));
     }
 
     #[test]
