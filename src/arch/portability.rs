@@ -6,15 +6,7 @@ use core::mem;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Architecture {
-    X86_32 = 0,
-    X86_64 = 1,
-    ARM64 = 2,
-    RISCV64 = 3,
-    LoongArch64 = 4,
-    PowerPC64 = 5,
-    S390x = 6,
-}
+pub enum Architecture { X86 = 0, X86_64 = 1, ARM64 = 2, RISCV64 = 3, LOONGARCH64 = 4, PPC64LE = 5 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

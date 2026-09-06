@@ -2651,7 +2651,8 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("slax.lzm"), Some(PackageFormat::Lzm));
         assert_eq!(PackageFormat::from_filename("puppy.pup"), Some(PackageFormat::Pup));
         assert_eq!(PackageFormat::from_filename("canonical.snap"), Some(PackageFormat::Snap));
-        assert_eq!(PackageFormat::from_filename("arch_pkg.pkg"), Some(PackageFormat::Pkg));
+        assert_eq!(PackageFormat::from_filename("arch_pacman.pkg"), Some(PackageFormat::Pacman));
+        assert_eq!(PackageFormat::from_filename("freebsd.pkg"), Some(PackageFormat::Pkg));
         assert_eq!(PackageFormat::from_filename("plain.tar"), Some(PackageFormat::Tar));
         assert_eq!(PackageFormat::from_filename("puppy.pet"), Some(PackageFormat::Pet));
         assert_eq!(PackageFormat::from_filename("router.ipk"), Some(PackageFormat::Ipk));
