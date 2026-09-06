@@ -1,0 +1,26 @@
+name: Linux Mint Major LTS System Upgrade CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  linuxmint-system-upgrade:
+    name: Linux Mint Major LTS Upgrade Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Run Mint Upgrade Engine Unit Tests
+        run: cargo test --lib test_mint_upgrade_engine

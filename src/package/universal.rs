@@ -1270,8 +1270,7 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ForeignDistroManifest {
     pub raw_format: PackageFormat,
     pub original_name: String,
