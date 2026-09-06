@@ -964,8 +964,6 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Pup)
         } else if f == "pet" || f.ends_with(".pet") {
             Some(PackageFormat::Pet)
-        } else if f.ends_with(".ebuild") {
-            Some(PackageFormat::Portage)
         } else if f.ends_with(".nixpkg") || f.ends_with(".nix") {
             Some(PackageFormat::Nix)
         } else if f.ends_with(".eopkg") {
