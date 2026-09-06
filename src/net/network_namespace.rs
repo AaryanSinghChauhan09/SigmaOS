@@ -1,10 +1,11 @@
+#![allow(unexpected_cfgs)]
 //! Network Namespace Implementation
 //!
 //! Provides network stack isolation per namespace (CLONE_NEWNET equivalent).
 //! Isolates network interfaces, routing tables, and firewall rules.
 
 use std::collections::HashMap;
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::net::IpAddr;
 use std::sync::{Arc, Mutex, atomic::{AtomicU64, Ordering}};
 
 // Re-export socket types for convenience

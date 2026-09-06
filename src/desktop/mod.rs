@@ -18,8 +18,7 @@ pub use ultimate_distro_desktop::{
     Xfce418Engine,
 };
 
-pub use web_wasm_bridge::*;
-
+// web_wasm_bridge items accessed via pub mod web_wasm_bridge above
 
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,

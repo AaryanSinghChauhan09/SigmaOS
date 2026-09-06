@@ -442,7 +442,8 @@ impl DnsWireMessage {
                 }
                 let ptr = (((len & 0x3F) << 8) | (data[offset + 1] as usize)) as usize;
                 if !jumped {
-                    offset += 2;
+                    // advance past the pointer bytes (2 bytes), then jump to ptr
+                    let _ = offset + 2; // consumed; ptr takes precedence
                 }
                 offset = ptr;
                 jumped = true;

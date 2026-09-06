@@ -10,7 +10,6 @@ use std::boxed::Box;
 #[cfg(not(target_os = "none"))]
 use std::vec::Vec;
 
-use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;
