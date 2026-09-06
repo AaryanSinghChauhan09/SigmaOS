@@ -43,15 +43,6 @@ pub enum ContainerState {
     Failed = 4,
 }
 
-/// Container capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
 
 impl ContainerCapability {
     pub const fn new() -> Self {
@@ -94,7 +85,7 @@ pub enum ContainerError {
 
 /// Container info
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ContainerInfo {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -221,12 +212,6 @@ impl NamespaceConfig {
     }
 }
 
-/// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
 
 
 impl SeccompProfile {
@@ -495,9 +480,6 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
-pub type ContainerCapability = RuntimeCapability;
-
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
@@ -723,8 +705,6 @@ pub mod oci {
     use crate::container::runtime::NamespaceConfig;
     use alloc::string::{String, ToString};
     use crate::container::ContainerError;
-    use alloc::string::String;
-    use alloc::string::ToString;
     use alloc::vec::Vec;
 
     pub struct NamespaceSet {
