@@ -5161,7 +5161,7 @@ impl NixGuixStoreGarbageCollectorTool {
 
 #[derive(Debug, Default, Clone)]
 pub struct OpenBsdUnveilAuditTool {
-    pub unveiled_rules: alloc::collections::BTreeMap<String, String>,
+    pub unveiled_rules: std::collections::BTreeMap<String, String>,
 }
 
 impl OpenBsdUnveilAuditTool {
