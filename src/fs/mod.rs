@@ -18,6 +18,7 @@
 
 pub mod sigma_overlay_fs;
 pub mod btrfs;
+pub mod sigma_vfs;
 // pub mod filesystem;
 pub mod sigmacas;
 pub mod sigmafs;

@@ -2,6 +2,8 @@
 // SigmaOS Kernel Module
 pub mod sigma_scheduler_eevdf;
 pub mod sigma_memory_zones;
+pub mod sigma_rcu;
+pub mod sigma_spinlock;
 pub mod architecture;
 pub mod atomic_extended;
 pub mod cgroup_v2;

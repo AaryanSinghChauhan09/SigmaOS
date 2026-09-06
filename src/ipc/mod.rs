@@ -16,6 +16,8 @@
 pub mod ipc;
 pub mod mechanism;
 pub mod message;
+pub mod sigma_pipe;
+pub mod sigma_message_queue;
 pub mod unix_socket;
 pub mod signals;
 pub mod async_io;
