@@ -1788,6 +1788,7 @@ impl UniversalPackageManager {
             triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
