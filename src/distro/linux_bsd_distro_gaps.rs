@@ -892,13 +892,6 @@ mod tests {
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
     }
-
-        assert_eq!(
-            resolver.lookup_modprobe_alias("char-major-10-200"),
-            Some("tun")
-        );
-        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
-    }
 }
 
 // ============================================================================

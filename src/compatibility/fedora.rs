@@ -3995,6 +3995,7 @@ impl FedoraOfflineUpdateEngine {
             trigger_reboot_flag: false,
         }
     }
+}
 
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine

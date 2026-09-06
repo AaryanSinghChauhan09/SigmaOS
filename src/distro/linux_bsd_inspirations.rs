@@ -226,7 +226,7 @@ impl SovereignUniversalDistroBridge {
                     supervisor == ServiceSupervisorType::Sysvinit
                 }
                 DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            }
+            };
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {

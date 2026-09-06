@@ -54,16 +54,6 @@ test = false
 required-features = ["microkernel"]
 
 [[bin]]
-name = "sigma_drivers"
-path = "src/drivers/main.rs"
-test = false
-required-features = ["microkernel"]
-
-[[bin]]
-name = "sigma_userspace"
-path = "src/userspace/main.rs"
-
-[[bin]]
 name = "sovereign_edition_builder"
 path = "tools/build/SovereignEditionBuilder.rs"
 

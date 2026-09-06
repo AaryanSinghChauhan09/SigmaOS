@@ -15,7 +15,7 @@ pub mod capability;
 pub mod seccomp;
 pub mod seccomp_ebpf;
 pub mod syscall_filter;
-pub mod defensive_audit;
+// pub mod defensive_audit; // TODO: Implement defensive_audit module
 pub mod hardening;
 pub mod kernel_hardening;
 pub mod user_namespace;
@@ -38,7 +38,7 @@ pub mod pledge;
 pub mod pqc_enclave;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod kali_stack;
-pub mod parrot;
+// pub mod parrot; // TODO: Implement parrot module
 pub mod parrot_kali;
 pub mod parrot_linux;
 pub mod parrot_parity;

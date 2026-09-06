@@ -41,7 +41,7 @@ pub mod gap_filling;
 pub mod generation_manager;
 pub mod io_uring;
 pub mod ipc;
-pub mod kqueue;
+// pub mod kqueue; // TODO: Implement kqueue module
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;

@@ -1,6 +1,3 @@
-pub mod udev_devd_rules;
-pub use udev_devd_rules::*;
-
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
