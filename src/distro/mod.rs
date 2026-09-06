@@ -1,4 +1,10 @@
 pub mod omarchy;
+pub use omarchy::{
+    FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
+    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
+    OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
+    WebAppSpec,
+};
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_inspirations;
 pub mod arch_parity;
@@ -220,3 +226,9 @@ pub use open_source_distro_innovations::{
     IllumosDTraceProbeProvider, DTraceProbe, GentooPortageEapi8SlotResolver, EbuildPackageRecord,
 };
 
+pub mod ultimate_distro_innovations;
+pub use ultimate_distro_innovations::{
+    AptPinRule, CpuGovernorMode as UltimateCpuGovernorMode, DebianMultiarchAptEngine,
+    GarudaPerformanceTweakEngine, HardenedBsdPaxCfiEngine, IoSchedulerMode, NetBsdRumpUserlandEngine,
+    RumpDriverType, SolusEopkgBudgieEngine,
+};

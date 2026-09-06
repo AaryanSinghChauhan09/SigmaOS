@@ -490,6 +490,138 @@ impl PasswordlessSudoExpiryGuard {
     }
 }
 
+/// Omarchy Curated Terminal Font & Starship Prompt Config
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OmarchyNerdFont {
+    JetBrainsMono,
+    FiraCode,
+    Hack,
+    CascadiaCode,
+    MesloLgs,
+}
+
+impl OmarchyNerdFont {
+    pub fn font_family(&self) -> &'static str {
+        match self {
+            Self::JetBrainsMono => "JetBrainsMono Nerd Font",
+            Self::FiraCode => "FiraCode Nerd Font",
+            Self::Hack => "Hack Nerd Font",
+            Self::CascadiaCode => "CaskaydiaCove Nerd Font",
+            Self::MesloLgs => "MesloLGS NF",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyTerminalFontConfig {
+    pub active_font: OmarchyNerdFont,
+    pub font_size_pt: f32,
+    pub ligatures_enabled: bool,
+    pub starship_prompt_theme: String,
+}
+
+impl OmarchyTerminalFontConfig {
+    pub fn new() -> Self {
+        Self {
+            active_font: OmarchyNerdFont::JetBrainsMono,
+            font_size_pt: 11.5,
+            ligatures_enabled: true,
+            starship_prompt_theme: String::from("tokyo-night-starship"),
+        }
+    }
+
+    pub fn set_font(&mut self, font: OmarchyNerdFont, size_pt: f32) {
+        self.active_font = font;
+        self.font_size_pt = size_pt;
+    }
+}
+
+impl Default for OmarchyTerminalFontConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Neovim LazyVim / Kickstart IDE Preset Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyNeovimPresetEngine {
+    pub preset_name: String, // "LazyVim" or "Kickstart"
+    pub lsp_servers: Vec<String>,
+    pub mason_packages: Vec<String>,
+    pub auto_format_on_save: bool,
+}
+
+impl OmarchyNeovimPresetEngine {
+    pub fn new() -> Self {
+        Self {
+            preset_name: String::from("LazyVim"),
+            lsp_servers: vec![
+                String::from("rust_analyzer"),
+                String::from("clangd"),
+                String::from("pyright"),
+                String::from("gopls"),
+                String::from("tsserver"),
+            ],
+            mason_packages: vec![
+                String::from("stylua"),
+                String::from("prettier"),
+                String::from("black"),
+            ],
+            auto_format_on_save: true,
+        }
+    }
+
+    pub fn register_lsp_server(&mut self, lsp_name: &str) -> bool {
+        if lsp_name.is_empty() || self.lsp_servers.contains(&lsp_name.to_string()) {
+            false
+        } else {
+            self.lsp_servers.push(lsp_name.to_string());
+            true
+        }
+    }
+}
+
+impl Default for OmarchyNeovimPresetEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy PipeWire High-Bitrate Audio & EasyEffects DSP Config
+#[derive(Debug, Clone)]
+pub struct OmarchyAudioPipewireConfig {
+    pub sample_rate_hz: u32,
+    pub quantum_buffer_size: u32, // e.g. 64, 128, 256 for low latency
+    pub bluetooth_preferred_codec: String, // "ldac", "aptx_hd", "aac"
+    pub easyeffects_preset: String,
+}
+
+impl OmarchyAudioPipewireConfig {
+    pub fn new() -> Self {
+        Self {
+            sample_rate_hz: 48000,
+            quantum_buffer_size: 128,
+            bluetooth_preferred_codec: String::from("ldac"),
+            easyeffects_preset: String::from("Omarchy-Perfect-Clarity"),
+        }
+    }
+
+    pub fn set_low_latency(&mut self, quantum: u32) -> bool {
+        if quantum == 0 || quantum > 2048 {
+            false
+        } else {
+            self.quantum_buffer_size = quantum;
+            true
+        }
+    }
+}
+
+impl Default for OmarchyAudioPipewireConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -527,5 +659,29 @@ mod tests {
         assert_eq!(gpu.driver_package, "nvidia-open-dkms");
         assert_eq!(gpu.kernel_headers, "linux-zen-headers");
         assert!(gpu.early_kms_enabled);
+    }
+
+    #[test]
+    fn test_omarchy_terminal_font_config() {
+        let mut cfg = OmarchyTerminalFontConfig::new();
+        cfg.set_font(OmarchyNerdFont::FiraCode, 12.0);
+        assert_eq!(cfg.active_font.font_family(), "FiraCode Nerd Font");
+        assert_eq!(cfg.font_size_pt, 12.0);
+    }
+
+    #[test]
+    fn test_omarchy_neovim_preset_engine() {
+        let mut nvim = OmarchyNeovimPresetEngine::new();
+        assert!(nvim.register_lsp_server("zls"));
+        assert!(!nvim.register_lsp_server("zls")); // Duplicate check
+        assert!(nvim.lsp_servers.contains(&String::from("zls")));
+    }
+
+    #[test]
+    fn test_omarchy_pipewire_audio_config() {
+        let mut audio = OmarchyAudioPipewireConfig::new();
+        assert!(audio.set_low_latency(64));
+        assert_eq!(audio.quantum_buffer_size, 64);
+        assert!(!audio.set_low_latency(0));
     }
 }
