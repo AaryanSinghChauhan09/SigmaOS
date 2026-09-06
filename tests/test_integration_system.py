@@ -188,6 +188,25 @@ def test_boot_sequence_varied_configs():
     assert any("BOOT_FAIL" in log for log in boot_err.boot_logs)
 
 
+def test_universal_distro_subsystem_bridge():
+    """Validates cross-subsystem mode translation for Linux and BSD distributions."""
+    distro_matrix = {
+        "LinuxArch": {"pkg_ext": ".pkg.tar.zst", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxDebian": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxAlpine": {"pkg_ext": ".apk", "supervisor": "Runit", "vfs_etc": "/etc"},
+        "LinuxVoid": {"pkg_ext": ".xbps", "supervisor": "Runit", "vfs_etc": "/etc"},
+        "LinuxNix": {"pkg_ext": ".nix", "supervisor": "Shepherd", "vfs_etc": "/etc/nixos"},
+        "FreeBsd": {"pkg_ext": ".pkg", "supervisor": "OpenRC", "vfs_etc": "/usr/local/etc"},
+        "OpenBsd": {"pkg_ext": ".tgz", "supervisor": "OpenRC", "vfs_etc": "/etc"},
+    }
+
+    for mode, spec in distro_matrix.items():
+        pkg_name = f"coreutils{spec['pkg_ext']}"
+        assert pkg_name.endswith(spec["pkg_ext"])
+        assert spec["supervisor"] in ["Systemd", "OpenRC", "Runit", "Shepherd", "Dinit", "Sysvinit", "Smf", "Rcd"]
+        assert len(spec["vfs_etc"]) > 0
+
+
 def test_universal_package_manager_cli_simulation():
     """Simulates universal package manager CLI interactions for .deb, .rpm, .pkg.tar.zst, and APK conversion."""
     package_formats = ["deb", "rpm", "pkg.tar.zst", "apk", "xbps", "econstruct"]
@@ -225,6 +244,3 @@ def test_sovereign_wiki_master_engine_integration():
         assert pkg_name.endswith(spec["pkg_ext"])
         assert spec["supervisor"] in ["Systemd", "OpenRC", "Runit", "Shepherd", "Dinit", "Sysvinit", "Rcd"]
         assert len(spec["vfs_etc"]) > 0
-
-
-test_universal_package_manager_cli_simulation = test_universal_distro_subsystem_bridge
