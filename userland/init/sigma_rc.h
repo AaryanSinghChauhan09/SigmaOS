@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR GPL-2.0
 #ifndef SIGMA_RC_H
 #define SIGMA_RC_H
 

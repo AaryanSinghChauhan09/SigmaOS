@@ -136,9 +136,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-
     - name: Download build artifacts
-      uses: actions/download-artifact@v4 # v4.1.9
+      uses: actions/download-artifact@v4
 
       with:
         name: sigmaos-${{ matrix.arch }}-iso
@@ -268,9 +267,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-
     - name: Download build artifacts
-      uses: actions/download-artifact@v4 # v4.1.9
+      uses: actions/download-artifact@v4
 
       with:
         name: sigmaos-x86_64-iso
@@ -338,7 +336,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-
     - name: Install cargo-audit
       run: cargo install cargo-audit --locked
 
@@ -368,7 +365,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
 
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@stable

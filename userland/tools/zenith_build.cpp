@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR GPL-2.0
 /**
  * =========================================================================
  * Σ ZENITH SDK BUILDER CLI (PHASE 9)

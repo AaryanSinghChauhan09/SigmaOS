@@ -1,0 +1,27 @@
+name: Illumos Solaris DTrace, ZFS ARC & Zones Container CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  illumos-dtrace-zones:
+    name: Illumos Kernel DTrace, ZFS ARC & Zones Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test OpenSource Gap Closure Supremacy Engine
+        run: |
+          cargo test --lib -- open_source_os_gap_closure::tests

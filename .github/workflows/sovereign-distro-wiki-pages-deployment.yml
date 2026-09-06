@@ -1,0 +1,27 @@
+name: Linux & BSD Distro Wiki Pages Build & Sync Automation
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  distro-wiki-pages-build:
+    name: Build & Verify Distro Wiki Pages Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test Wiki Page Documentation Generators
+        run: |
+          cargo test --lib -- expanded_wiki_innovations::tests

@@ -1759,7 +1759,7 @@ pub enum AppArmorMode {
 }
 
 #[derive(Debug, Clone)]
-pub struct AppArmorProfile {
+pub struct UbuntuAppArmorProfile {
     pub profile_name: String,
     pub mode: AppArmorMode,
     pub allowed_read_paths: Vec<String>,
@@ -1769,7 +1769,7 @@ pub struct AppArmorProfile {
 
 #[derive(Debug, Clone, Default)]
 pub struct UbuntuAppArmorEngine {
-    pub profiles: BTreeMap<String, AppArmorProfile>,
+    pub profiles: BTreeMap<String, UbuntuAppArmorProfile>,
 }
 
 impl UbuntuAppArmorEngine {
@@ -1777,7 +1777,7 @@ impl UbuntuAppArmorEngine {
         Self::default()
     }
 
-    pub fn load_profile(&mut self, profile: AppArmorProfile) {
+    pub fn load_profile(&mut self, profile: UbuntuAppArmorProfile) {
         self.profiles.insert(profile.profile_name.clone(), profile);
     }
 
@@ -2078,93 +2078,4 @@ mod tests {
         assert!(apparmor.audit_log.len() >= 2);
     }
 
-    #[test]
-    fn test_bpf_type_format_engine() {
-        let mut btf = BpfTypeFormatEngine::new();
-        btf.register_type(1, "int", "BTF_KIND_INT");
-        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
-
-        assert_eq!(btf.total_types(), 2);
-        let res = btf.lookup_type(2).unwrap();
-        assert_eq!(res.0, "sk_buff");
-        assert_eq!(res.1, "BTF_KIND_STRUCT");
-    }
-
-    #[test]
-    fn test_erofs_read_only_overlay_engine() {
-        let mut erofs = ErofsReadOnlyOverlayEngine::new();
-        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
-        assert_eq!(erofs.mounted_images.len(), 1);
-        assert!(erofs.verify_block_checksum(1024));
-        assert_eq!(erofs.total_blocks_checksummed, 1);
-    }
-
-    #[test]
-    fn test_loongarch64_architecture_engine() {
-        let mut la64 = LoongArch64ArchitectureEngine::new();
-        la64.init_la64_core(4);
-        assert_eq!(la64.active_cores, 4);
-        assert!(la64.execute_instruction(0x02800000));
-        assert_eq!(la64.executed_instructions, 1);
-    }
-
-    #[test]
-    fn test_bpf_type_format_engine() {
-        let mut btf = BpfTypeFormatEngine::new();
-        btf.register_type(1, "int", "BTF_KIND_INT");
-        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
-
-        assert_eq!(btf.total_types(), 2);
-        let res = btf.lookup_type(2).unwrap();
-        assert_eq!(res.0, "sk_buff");
-        assert_eq!(res.1, "BTF_KIND_STRUCT");
-    }
-
-    #[test]
-    fn test_erofs_read_only_overlay_engine() {
-        let mut erofs = ErofsReadOnlyOverlayEngine::new();
-        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
-        assert_eq!(erofs.mounted_images.len(), 1);
-        assert!(erofs.verify_block_checksum(1024));
-        assert_eq!(erofs.total_blocks_checksummed, 1);
-    }
-
-    #[test]
-    fn test_loongarch64_architecture_engine() {
-        let mut la64 = LoongArch64ArchitectureEngine::new();
-        la64.init_la64_core(4);
-        assert_eq!(la64.active_cores, 4);
-        assert!(la64.execute_instruction(0x02800000));
-        assert_eq!(la64.executed_instructions, 1);
-    }
-
-    #[test]
-    fn test_bpf_type_format_engine() {
-        let mut btf = BpfTypeFormatEngine::new();
-        btf.register_type(1, "int", "BTF_KIND_INT");
-        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
-
-        assert_eq!(btf.total_types(), 2);
-        let res = btf.lookup_type(2).unwrap();
-        assert_eq!(res.0, "sk_buff");
-        assert_eq!(res.1, "BTF_KIND_STRUCT");
-    }
-
-    #[test]
-    fn test_erofs_read_only_overlay_engine() {
-        let mut erofs = ErofsReadOnlyOverlayEngine::new();
-        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
-        assert_eq!(erofs.mounted_images.len(), 1);
-        assert!(erofs.verify_block_checksum(1024));
-        assert_eq!(erofs.total_blocks_checksummed, 1);
-    }
-
-    #[test]
-    fn test_loongarch64_architecture_engine() {
-        let mut la64 = LoongArch64ArchitectureEngine::new();
-        la64.init_la64_core(4);
-        assert_eq!(la64.active_cores, 4);
-        assert!(la64.execute_instruction(0x02800000));
-        assert_eq!(la64.executed_instructions, 1);
-    }
 }
