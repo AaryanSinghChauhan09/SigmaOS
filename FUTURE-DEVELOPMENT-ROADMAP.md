@@ -4039,3 +4039,25 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
    - Single-file JSON/TOML `.sigmaprofile` manifest capturing extensions, custom themes, and keybindings.
 5. **Per-Workspace Resource Quota Governor (`WorkspaceResourceCgroupGovernor`)**:
    - Dynamic CPU, RAM, and network I/O throttling per workspace group via Linux cgroups v2 and FreeBSD RACCT.
+
+---
+
+## 77. SOVEREIGN AI AGENT MEMORY MANAGEMENT ARCHITECTURE & GOVERNANCE SPECIFICATION
+
+### 77.1 Autonomous Agent Memory Governance Rules
+
+1. **Bare-Metal Zero-Dependency Memory Directives**:
+   - AI engineering agents (Jules, Sentinel, Palette, Bolt) must use native `klib` and kernel allocators (`src/memory/pmm_vmm.rs`, `src/memory/manager.rs`, `src/klib/custom_allocator.rs`, `src/klib/buddy_allocator.rs`).
+   - Core kernel crates must maintain strict `#![no_std]` + `extern crate alloc` compatibility.
+
+2. **Physical & Virtual Memory Management Invariants (PMM / VMM)**:
+   - Physical memory frame tracking must enforce 4KiB page alignment and 2MiB/1GiB huge page boundaries (`src/memory/pmm_vmm.rs`).
+   - Virtual memory mappings must enforce Copy-On-Write (CoW) page flags and hardened guard page allocators (`src/memory/resource_allocator.rs`).
+
+3. **Buddy & Slab Allocator Safety Rules**:
+   - Power-of-two memory block splitting and coalescing in `src/memory/buddy_allocator.rs` and `src/klib/buddy_allocator.rs` must enforce order bounds (Order 0 through Order 10).
+   - Custom slab caches (`src/klib/custom_allocator.rs`, `src/klib/slab.rs`) must utilize ASLR guard pages and lock-free recycle bins.
+
+4. **MDL Pinning & Volatile Memory Wiping**:
+   - Memory Descriptor List (MDL) pinning must be invoked on DMA buffers before transfers to prevent page fault races under high concurrency.
+   - Cryptographic keys or sensitive buffers must execute volatile memory scrubbing (`AmnesicRamWipe` / zeroization) prior to page deallocation.
