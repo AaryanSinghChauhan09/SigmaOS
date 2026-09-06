@@ -4084,3 +4084,19 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 
 4. **Zero Test Skipping Rule**:
    - Agents must never comment out or ignore failing assertions; underlying logic bugs must be diagnosed and resolved directly.
+
+---
+
+## 79. SOVEREIGN AI AGENT EFFICIENCY ARCHITECTURE & PERFORMANCE GOVERNANCE SPECIFICATION
+
+### 79.1 Autonomous Agent Performance Directives
+
+1. **Zero-Allocation Fast Paths**:
+   - Syscall dispatchers (`src/syscall/dispatcher.rs`), packet filters (`src/kernel/linux_bsd_innovations.rs`), and scheduler loops (`src/scheduler/scheduler.rs`) must perform zero dynamic heap allocations during execution.
+
+2. **SIMD Vectorization & ISA Auto-Routing**:
+   - Memory copy (`memcpy`), string parsing, and hashing operations must route through ISA auto-detection (`src/klib/isa.rs`) to utilize AVX2/AVX-512, NEON, SVE2, or RISC-V Vector 1.0 hardware acceleration instructions.
+
+3. **Optimal Time Complexity & Cache Locality**:
+   - Avoid O(N^2) search loops; utilize O(1) static hash maps and O(log N) B-trees.
+   - Maintain cache-friendly contiguous vector and ring buffer layouts (`src/klib/ringbuf.rs`, `src/klib/ring_buffer.rs`) to minimize CPU cache miss rates.

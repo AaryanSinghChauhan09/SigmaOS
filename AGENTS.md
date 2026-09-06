@@ -22,4 +22,9 @@ This document defines core directives, architecture rules, and memory management
 - **Master Test Runner**: Run `./run_sigma_tests.sh` to verify 100% test pass rate across Rust, C++, and Python test suites.
 - **Standalone Module Testing**: Fast-verify specific modules using `rustc --test --edition 2021 <filepath> -o build/test_bin && ./build/test_bin`.
 
-For detailed specifications, see `docs/AGENTS_MEMORY_MANAGEMENT.md`, `docs/AGENTS_TESTING_GUIDELINES.md`, and `docs/memory-management.md`.
+## 5. AI Agent Performance & Efficiency Directives
+- **Zero-Allocation Hot Paths**: Avoid dynamic heap allocations inside fast-path syscall and packet handlers.
+- **ISA Auto-Vectorization**: Route memory copies and hashing through SIMD feature routing (`src/klib/isa.rs`).
+- **Optimal Lookups**: Use O(1) or O(log N) lookup data structures to minimize CPU cache miss rates.
+
+For detailed specifications, see `docs/AGENTS_MEMORY_MANAGEMENT.md`, `docs/AGENTS_TESTING_GUIDELINES.md`, `docs/AGENTS_EFFICIENCY_GUIDELINES.md`, and `docs/memory-management.md`.
