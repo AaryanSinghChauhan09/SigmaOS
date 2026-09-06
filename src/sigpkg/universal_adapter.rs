@@ -3458,4 +3458,33 @@ requires {
         assert_eq!(pkg.name, "haiku_dep");
         assert!(engine.is_package_registered("haiku_dep"));
     }
+
+    #[test]
+    fn test_sovereign_multi_format_manifest_parsing() {
+        let adapter = UniversalPackageAdapter::new();
+
+        // 1. Debian control file (.deb)
+        let deb_control = "Package: nginx\nVersion: 1.24.0\nArchitecture: amd64\nDepends: libc6 (>= 2.34), libssl3\nDescription: high performance web server\n";
+        let deb_manifest = adapter.parse_apt_control(deb_control).unwrap();
+        assert_eq!(deb_manifest.package, "nginx");
+        assert_eq!(deb_manifest.version, "1.24.0");
+
+        // 2. Arch Linux PKGBUILD
+        let pkgbuild = "pkgname=zsh\npkgver=5.9\npkgdesc='Z shell'\ndepends=('ncurses' 'pcre2')\n";
+        let pkg_manifest = adapter.parse_pacman_pkgbuild(pkgbuild).unwrap();
+        assert_eq!(pkg_manifest.pkgname, "zsh");
+        assert_eq!(pkg_manifest.pkgver, "5.9");
+
+        // 3. FreeBSD +MANIFEST
+        let freebsd_ucl = "name: curl\nversion: \"8.4.0\"\ncomment: Command line tool for transferring data\ndeps: {\n  openssl: {origin: \"security/openssl\"}\n}\n";
+        let bsd_manifest = adapter.parse_freebsd_ucl_manifest(freebsd_ucl).unwrap();
+        assert_eq!(bsd_manifest.name, "curl");
+        assert_eq!(bsd_manifest.version, "8.4.0");
+
+        // 4. OpenBSD +CONTENTS
+        let openbsd_contents = "@name htop-3.2.2\n@depend sysutils/lsof\n@comment interactive process viewer\n";
+        let obsd_manifest = adapter.parse_openbsd_contents(openbsd_contents).unwrap();
+        assert_eq!(obsd_manifest.name, "htop");
+        assert_eq!(obsd_manifest.version, "3.2.2");
+    }
 }
