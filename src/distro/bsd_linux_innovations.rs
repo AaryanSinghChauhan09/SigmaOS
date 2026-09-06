@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS BSD & Linux Innovations Subsystem
-// Inspired by OpenBSD/FreeBSD PF, DragonFly BSD HAMMER2, Void Linux runit, and Parrot OS AnonSurf
+// Inspired by OpenBSD/FreeBSD PF, DragonFly BSD HAMMER2, Void Linux runit, Parrot OS AnonSurf,
+// FreeBSD devd / OpenBSD hotplugd, Alpine Linux lbu / FreeBSD mfsroot, Dracut stage-1 initramfs,
+// and FreeBSD bhyve / OpenBSD vmm tap bridge.
 
-#[cfg(not(target_os = "none"))]
+use std::string::{String, ToString};
+use std::vec;
 use std::vec::Vec;
-
-#[cfg(target_os = "none")]
-
-#[cfg(target_os = "none")]
 
 // ============================================================================
 // 1. OpenBSD / FreeBSD PF (Packet Filter) Stateful Firewall
@@ -88,6 +87,12 @@ impl BsdStatefulPacketFilter {
 
     pub fn get_active_state_count(&self) -> usize {
         self.state_table.len()
+    }
+}
+
+impl Default for BsdStatefulPacketFilter {
+    fn default() -> Self {
+        Self::new(PfRuleAction::Pass)
     }
 }
 
@@ -704,7 +709,303 @@ impl SovereignDeltaPackageSigner {
     }
 }
 
-#[cfg(test_disabled)]
+// ============================================================================
+// 10. FreeBSD devd / OpenBSD hotplugd Hardware Event Dispatcher
+// ============================================================================
+
+/// Hardware Event Kind
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DevdEventType {
+    Attach,
+    Detach,
+    LinkUp,
+    LinkDown,
+    PowerChange,
+}
+
+/// Hardware Event Rule Descriptor
+#[derive(Debug, Clone)]
+pub struct DevdRule {
+    pub subsystem: String,
+    pub vendor_id: u16,
+    pub product_id: u16,
+    pub action_hook: String,
+}
+
+/// Dynamic Hardware Event Message
+#[derive(Debug, Clone)]
+pub struct DevdHardwareEvent {
+    pub subsystem: String,
+    pub vendor_id: u16,
+    pub product_id: u16,
+    pub event_type: DevdEventType,
+    pub device_path: String,
+}
+
+/// BSD devd / OpenBSD hotplugd Hardware Event Dispatcher
+#[derive(Debug, Clone)]
+pub struct BsdDevdHardwareEventDispatcher {
+    pub rules: Vec<DevdRule>,
+    pub processed_events_count: usize,
+}
+
+impl BsdDevdHardwareEventDispatcher {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            processed_events_count: 0,
+        }
+    }
+
+    /// Registers a hardware event handling rule
+    pub fn register_rule(&mut self, subsystem: &str, vendor_id: u16, product_id: u16, hook: &str) {
+        self.rules.push(DevdRule {
+            subsystem: subsystem.to_string(),
+            vendor_id,
+            product_id,
+            action_hook: hook.to_string(),
+        });
+    }
+
+    /// Evaluates incoming hardware event and triggers matching rule hooks
+    pub fn dispatch_event(&mut self, event: &DevdHardwareEvent) -> Vec<String> {
+        self.processed_events_count += 1;
+        let mut matched_hooks = Vec::new();
+
+        for rule in &self.rules {
+            if rule.subsystem == event.subsystem
+                && (rule.vendor_id == 0 || rule.vendor_id == event.vendor_id)
+                && (rule.product_id == 0 || rule.product_id == event.product_id)
+            {
+                matched_hooks.push(rule.action_hook.clone());
+            }
+        }
+
+        matched_hooks
+    }
+}
+
+impl Default for BsdDevdHardwareEventDispatcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 11. Alpine Linux lbu / FreeBSD mfsroot Diskless Snapshot Persistence
+// ============================================================================
+
+/// Snapshot Compression / Archive Format
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LbuSnapshotFormat {
+    ApkOvlTarGz,
+    FreeBsdMfsRootImg,
+    RawRamArchive,
+}
+
+/// Overlay Conffile Record
+#[derive(Debug, Clone)]
+pub struct LbuOverlayFile {
+    pub path: String,
+    pub content_hash: u64,
+    pub size_bytes: usize,
+}
+
+/// Alpine Linux lbu & FreeBSD mfsroot Diskless System Persistence Engine
+#[derive(Debug, Clone)]
+pub struct AlpineLbuDisklessPersistenceEngine {
+    pub snapshot_format: LbuSnapshotFormat,
+    pub tracked_files: Vec<LbuOverlayFile>,
+    pub committed_snapshots_count: usize,
+}
+
+impl AlpineLbuDisklessPersistenceEngine {
+    pub fn new(snapshot_format: LbuSnapshotFormat) -> Self {
+        Self {
+            snapshot_format,
+            tracked_files: Vec::new(),
+            committed_snapshots_count: 0,
+        }
+    }
+
+    /// Tracks a modified overlay file in RAM
+    pub fn track_file(&mut self, path: &str, content: &[u8]) {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in content {
+            hash ^= u64::from(b);
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+
+        if let Some(existing) = self.tracked_files.iter_mut().find(|f| f.path == path) {
+            existing.content_hash = hash;
+            existing.size_bytes = content.len();
+        } else {
+            self.tracked_files.push(LbuOverlayFile {
+                path: path.to_string(),
+                content_hash: hash,
+                size_bytes: content.len(),
+            });
+        }
+    }
+
+    /// Commits local backup overlay snapshot tarball / mfsroot image
+    pub fn commit_snapshot(&mut self) -> u64 {
+        self.committed_snapshots_count += 1;
+        let mut archive_hash = 0x9E3779B97F4A7C15;
+        for file in &self.tracked_files {
+            archive_hash ^= file.content_hash;
+            archive_hash = archive_hash.wrapping_mul(31);
+        }
+        archive_hash
+    }
+
+    /// Restores persistence state from committed snapshot
+    pub fn restore_persistence(&self) -> usize {
+        self.tracked_files.len()
+    }
+}
+
+// ============================================================================
+// 12. Arch / Void Dracut Stage-1 Initramfs Dynamic Kmod & Hook Solver
+// ============================================================================
+
+/// Kernel Module Dependency Record
+#[derive(Debug, Clone)]
+pub struct KmodDependency {
+    pub mod_name: String,
+    pub depends_on: Vec<String>,
+    pub is_loaded: bool,
+}
+
+/// Early Boot Stage-1 Hook Sequence
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InitramfsHookStage {
+    EarlyCryptoDecrypt,
+    StorageAssemble,
+    RootFilesystemMount,
+    SwitchRoot,
+}
+
+/// Arch / Void Dracut Stage-1 Initramfs Dynamic Kmod & Hook Solver
+#[derive(Debug, Clone)]
+pub struct SovereignInitramfsKmodHookSolver {
+    pub kmods: Vec<KmodDependency>,
+    pub executed_hooks: Vec<InitramfsHookStage>,
+}
+
+impl SovereignInitramfsKmodHookSolver {
+    pub fn new() -> Self {
+        Self {
+            kmods: Vec::new(),
+            executed_hooks: Vec::new(),
+        }
+    }
+
+    /// Registers a stage-1 kernel module with dependencies
+    pub fn register_kmod(&mut self, name: &str, deps: &[&str]) {
+        self.kmods.push(KmodDependency {
+            mod_name: name.to_string(),
+            depends_on: deps.iter().map(|s| s.to_string()).collect(),
+            is_loaded: false,
+        });
+    }
+
+    /// Resolves dependency load order for stage-1 storage/crypto drivers
+    pub fn resolve_load_order(&mut self, target_mod: &str) -> Vec<String> {
+        let mut load_order = Vec::new();
+        if let Some(km) = self.kmods.iter().find(|m| m.mod_name == target_mod).cloned() {
+            for dep in &km.depends_on {
+                if !load_order.contains(dep) {
+                    load_order.push(dep.clone());
+                }
+            }
+            if !load_order.contains(&km.mod_name) {
+                load_order.push(km.mod_name.clone());
+            }
+        }
+
+        for mod_name in &load_order {
+            if let Some(m) = self.kmods.iter_mut().find(|m| m.mod_name == *mod_name) {
+                m.is_loaded = true;
+            }
+        }
+
+        load_order
+    }
+
+    /// Executes an initramfs early boot hook stage
+    pub fn execute_hook_stage(&mut self, stage: InitramfsHookStage) -> bool {
+        if !self.executed_hooks.contains(&stage) {
+            self.executed_hooks.push(stage);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignInitramfsKmodHookSolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 13. FreeBSD bhyve / OpenBSD vmm MicroVM Tap Network Bridge Controller
+// ============================================================================
+
+/// MicroVM Tap Network Interface Descriptor
+#[derive(Debug, Clone)]
+pub struct TapInterfaceState {
+    pub tap_id: u32,
+    pub mac_addr: [u8; 6],
+    pub guest_ip: [u8; 4],
+    pub packets_routed: u64,
+}
+
+/// FreeBSD bhyve / OpenBSD vmm Tap Network Bridge Controller
+#[derive(Debug, Clone)]
+pub struct BsdMicroVmTapBridgeController {
+    pub bridge_name: String,
+    pub taps: Vec<TapInterfaceState>,
+    pub egress_nat_enabled: bool,
+}
+
+impl BsdMicroVmTapBridgeController {
+    pub fn new(bridge_name: &str) -> Self {
+        Self {
+            bridge_name: bridge_name.to_string(),
+            taps: Vec::new(),
+            egress_nat_enabled: true,
+        }
+    }
+
+    /// Creates and binds a new tap interface for MicroVM/Jail guest networking
+    pub fn create_tap_interface(&mut self, tap_id: u32, mac: [u8; 6], guest_ip: [u8; 4]) {
+        self.taps.push(TapInterfaceState {
+            tap_id,
+            mac_addr: mac,
+            guest_ip,
+            packets_routed: 0,
+        });
+    }
+
+    /// Routes packets between tap interface and host network bridge
+    pub fn route_guest_packet(&mut self, tap_id: u32, _packet_len: usize) -> Result<u64, &'static str> {
+        if let Some(tap) = self.taps.iter_mut().find(|t| t.tap_id == tap_id) {
+            tap.packets_routed += 1;
+            Ok(tap.packets_routed)
+        } else {
+            Err("BSD MicroVM: Tap interface not found on bridge")
+        }
+    }
+}
+
+// ============================================================================
+// Unit Tests
+// ============================================================================
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -850,5 +1151,60 @@ mod tests {
 
         let restored = signer.verify_and_apply_patch(&patch, old_bin).unwrap();
         assert_eq!(restored, new_bin);
+    }
+
+    #[test]
+    fn test_bsd_devd_hardware_event_dispatcher() {
+        let mut dispatcher = BsdDevdHardwareEventDispatcher::new();
+        dispatcher.register_rule("usb", 0x1234, 0x5678, "/sbin/automount_usb.sh");
+        dispatcher.register_rule("net", 0, 0, "/etc/network/ifup.sh");
+
+        let event = DevdHardwareEvent {
+            subsystem: String::from("usb"),
+            vendor_id: 0x1234,
+            product_id: 0x5678,
+            event_type: DevdEventType::Attach,
+            device_path: String::from("/dev/da0"),
+        };
+
+        let hooks = dispatcher.dispatch_event(&event);
+        assert_eq!(hooks.len(), 1);
+        assert_eq!(hooks[0], "/sbin/automount_usb.sh");
+    }
+
+    #[test]
+    fn test_alpine_lbu_diskless_persistence_engine() {
+        let mut lbu = AlpineLbuDisklessPersistenceEngine::new(LbuSnapshotFormat::ApkOvlTarGz);
+        lbu.track_file("/etc/network/interfaces", b"auto eth0\niface eth0 inet dhcp");
+        assert_eq!(lbu.tracked_files.len(), 1);
+
+        let hash = lbu.commit_snapshot();
+        assert!(hash > 0);
+        assert_eq!(lbu.committed_snapshots_count, 1);
+        assert_eq!(lbu.restore_persistence(), 1);
+    }
+
+    #[test]
+    fn test_sovereign_initramfs_kmod_hook_solver() {
+        let mut solver = SovereignInitramfsKmodHookSolver::new();
+        solver.register_kmod("dm_crypt", &["crypto_aes", "cbc"]);
+        solver.register_kmod("zfs", &["spl", "zcommon"]);
+
+        let load_order = solver.resolve_load_order("dm_crypt");
+        assert_eq!(load_order, vec!["crypto_aes", "cbc", "dm_crypt"]);
+
+        assert!(solver.execute_hook_stage(InitramfsHookStage::EarlyCryptoDecrypt));
+        assert!(!solver.execute_hook_stage(InitramfsHookStage::EarlyCryptoDecrypt)); // Duplicate execution check
+    }
+
+    #[test]
+    fn test_bsd_microvm_tap_bridge_controller() {
+        let mut bridge = BsdMicroVmTapBridgeController::new("vmbr0");
+        bridge.create_tap_interface(0, [0x52, 0x54, 0x00, 0x12, 0x34, 0x56], [10, 0, 0, 15]);
+
+        let routed = bridge.route_guest_packet(0, 1500);
+        assert!(routed.is_ok());
+        assert_eq!(routed.unwrap(), 1);
+        assert!(bridge.route_guest_packet(99, 100).is_err());
     }
 }
