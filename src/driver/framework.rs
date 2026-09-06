@@ -81,6 +81,7 @@ impl SimpleStorageDriver {
 
 impl Driver for SimpleStorageDriver {
     fn id(&self) -> DriverID { self.id }
+    fn name(&self) -> &str { "SimpleStorageDriver" }
     fn driver_type(&self) -> DriverType { self.driver_type }
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
@@ -115,6 +116,9 @@ impl Driver for SimpleDriver {
     fn id(&self) -> DriverID {
         self.id
     }
+    fn name(&self) -> &str {
+        "SimpleDriver"
+    }
     fn driver_type(&self) -> DriverType {
         self.driver_type
     }
@@ -147,28 +151,6 @@ impl SimpleStorageDriver {
     }
 }
 
-impl Driver for SimpleStorageDriver {
-    fn id(&self) -> DriverID {
-        self.id
-    }
-    fn name(&self) -> &str {
-        "SimpleStorageDriver"
-    }
-    fn driver_type(&self) -> DriverType {
-        self.driver_type
-    }
-    fn state(&self) -> DriverState {
-        self.state
-    }
-    fn load(&mut self) -> Result<(), DriverError> {
-        self.state = DriverState::Active;
-        Ok(())
-    }
-    fn unload(&mut self) -> Result<(), DriverError> {
-        self.state = DriverState::Unloaded;
-        Ok(())
-    }
-}
 
 // =========================================================================
 // WDM & WDF (KMDF / UMDF) Specification Subsystems

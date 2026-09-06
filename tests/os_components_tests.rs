@@ -8,26 +8,8 @@ use segmentation_paging::{
 extern crate alloc;
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
-use sigmaos::ipc::pipes::Pipe;
-use sigmaos::security::sigma_unveil::{UnveilManager, UnveilPermission};
-use sigmaos::filesystem::geom::{GeomProvider, GeomTopology, BioRequest};
-use sigmaos::audio::editor::{MultiTrackSession, AudioTrack, SpectralNoiseSuppressionEffect, AudioEffect};
-use sigmaos::graphics::video::{VideoTimeline, VideoTrack, VideoClip, ExportProfile, ExportFormat};
-use sigmaos::compatibility::chimera_linux::{DinitServiceManager, DinitService, BsdUserlandCompat, ApkPackageStore, ApkPackageMetadata};
-use sigmaos::compatibility::debian::{DebianAlternativesSystem, AptRepositorySync, DebianChannel};
-use sigmaos::compatibility::cachy_os::{BoreSchedulerGovernor, AnanicyManager, SchedPolicy};
-use sigmaos::distro::endeavour_os::{ReflectorMirrorManager, PacmanMirror, YayParuHelper, AurPackageSpec};
-use sigmaos::compatibility::fedora::{DnfPackageResolver, SeLinuxEngine, SeLinuxContext};
-use sigmaos::scheduler::scheduler::{Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskState, TaskWorkloadType};
-
-use sigmaos::ipc::alpc::{AlpcFacility, AlpcManager, AlpcMessage, alpc_flags};
-use sigmaos::memory::bitmap_pmm::{BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine, SyscallTableRouter};
-use sigmaos::memory::low_level::{CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix, RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator, posix_syscall_nr};
-use sigmaos::access::control::{AclEntry, AclType, CpuPrivilegeEnforcer, ExecutionRingMode, FileAttributeAccessControl, Nfs4Ace, Nfs4AceType, Nfs4Acl, PosixAcl, file_attribute_flags, nfs4_flags, nfs4_mask};
-use sigmaos::dashboard::statutory_compliance::{ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryAuthority, StatutoryFramework, StatutoryGovernanceLayer, StatutoryGovernanceRule};
-use sigmaos::community::toolkit::{CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore};
-use sigmaos::system::user::{ShadowEntry, SudoPolicyEngine, SudoersRule, UserError, UserManager as TestUserManager};
-use sigmaos::tools::sigmatools::*;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
 
 #[path = "../src/storage/geom.rs"]
 mod geom;
@@ -73,10 +55,12 @@ pub enum BreachSeverity {
     Minor,
     Major,
     Critical,
+}
 pub enum StatutoryAuthority {
     Gdpr,
     Hipaa,
     ISO27001,
+}
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
 #[path = "../src/system/user.rs"]
@@ -88,6 +72,7 @@ mod segmentation_paging;
 pub enum CpuPrivilegeMode {
     KernelRing0,
     UserRing3,
+}
 pub struct GlobalDescriptorTable;
 impl GlobalDescriptorTable {
     pub fn new() -> Self {
@@ -102,12 +87,15 @@ impl GlobalDescriptorTable {
             rpl: segmentation_paging::CpuRing::Ring0Kernel,
             is_ldt: false,
         }
+    }
     pub fn translate_address(
         &self,
         seg_addr: SegmentedAddress,
         _mode: CpuPrivilegeMode,
     ) -> Result<u64, &'static str> {
         Ok(seg_addr.offset)
+    }
+}
 pub struct MultiLevelPagingEngine;
 impl MultiLevelPagingEngine {
     pub fn map_page(
@@ -118,24 +106,33 @@ impl MultiLevelPagingEngine {
         _x: bool,
     ) -> Result<(), &'static str> {
         Ok(())
+    }
     pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
         Ok(PageTableEntry)
+    }
+}
 pub struct PageTableEntry;
 impl PageTableEntry {
     pub fn get_physical_address(&self) -> u64 {
         0x0000000100000000
+    }
+}
 pub enum ProtectionLevel {
     Normal,
     High,
+}
 pub enum ProtectionViolationType {
     ReadViolation,
     WriteViolation,
+}
 pub enum SegmentType {
     Code,
     Data,
+}
 pub struct SegmentedAddress {
     pub selector: SegmentSelector,
     pub offset: u64,
+}
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
 pub type ProcessActivityManager = ActivityManager;
@@ -155,21 +152,26 @@ use community_toolkit::{
 use statutory_compliance::{
     ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
     StatutoryGovernanceLayer, StatutoryGovernanceRule,
+};
 use system_user::UserManager as TestUserManager;
 use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
 use bitmap_pmm::{
     BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
     SyscallTableRouter,
+};
 use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
 use low_level_memory::{
     posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
     RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
+};
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
+};
 use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
 use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
 use chimera_linux::{
     ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+};
 use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
 use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
 use fedora_compat::DnfPackageResolver;
@@ -183,11 +185,7 @@ use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
 use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
 use process_activity_manager::{
     ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
-use sigmaos::memory::segmentation_paging::{AddressBindingMode, AslrEntropyConfig, CpuRing, ExecutableAddressBinding, RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SpaceProtectionFlags, SegmentationPagingEngine};
-use sigmaos::process::activity_manager::{ActivityManager, ActivityState, AddressSpaceBinding, ProcessActivityRecord, RegisterSnapshot as ProcRegisterSnapshot};
-use sigmaos::filesystem::sigma_fs::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use sigmaos::event::epoll::{EpollInstance, EpollOp, EpollEvent, EPOLLIN, EPOLLET};
-use sigmaos::loader::elf::relocation::{ElfRelocator, ElfSymbol, ElfRelaEntry, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+};
 
 use access_control::{
     AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,
@@ -254,8 +252,7 @@ fn test_hammer2_pfs_namespaces_and_blake3_dedup() {
 #[test]
 fn test_process_activity_manager_and_registers() {
     let mut pam = ActivityManager::new();
-    pam.register_process(500, "chrome", "/usr/bin/chrome").unwrap();
-    pam.register_thread(500, 501, "render_main").unwrap();
+    pam.register_process(500, 1, "chrome", 0);
 
     pam.set_foreground_process(500).unwrap();
     let active_proc = pam.get_process_activity(500).unwrap();
@@ -369,7 +366,7 @@ fn test_audio_dsp_mixing_and_effects() {
     assert!((mix[0] - 0.8).abs() < 1e-5);
 
     let mut dsp_buf: [f32; 3] = [0.02, 0.80, -0.01];
-    let noise_suppress = SpectralNoiseSuppressionEffect::new(0.05, 12.0);
+    let noise_suppress = SpectralNoiseSuppressionEffect::new(0.05);
     noise_suppress.apply(&mut dsp_buf);
     assert!(
         if dsp_buf[0] < 0.0 {

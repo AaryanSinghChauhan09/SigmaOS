@@ -8,7 +8,6 @@ use core::default::Default;
 use core::option::Option::{self, Some, None};
 use core::result::Result::{self, Ok, Err};
 use crate::sigpkg::{Package, Version, VersionConstraint};
-use alloc::string::String;
 
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]

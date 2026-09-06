@@ -40,7 +40,6 @@ pub mod uuid {
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-use core::fmt;
 
 #[derive(Clone)]
 pub struct SigmaString {
@@ -125,8 +124,6 @@ impl core::ops::Deref for SigmaString {
         self.as_str()
     }
 }
-
-use core::fmt;
 
 // ------------------------------------------------------------------
 // fmt::Debug
