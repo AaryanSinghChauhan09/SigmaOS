@@ -1,3 +1,6 @@
+pub mod mobile_variant;
+pub use mobile_variant::*;
+
 // SigmaOS Desktop Module
 pub mod mate_betsy;
 pub mod mint_tools;

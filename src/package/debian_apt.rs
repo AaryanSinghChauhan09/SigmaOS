@@ -1,10 +1,8 @@
-use std::collections::BTreeSet;
 // SigmaOS APT (Advanced Package Tool) Implementation
 // Implements Debian-style package management for SigmaOS
 // Inspired by Debian's APT for advanced package operations
 
-use crate::klib::collections::HashSet;
-use std::collections::BTreeMap;
+use crate::klib::HashSet;
 use std::collections::{BTreeMap, BTreeSet};
 use std::string::String;
 use std::vec::Vec;
