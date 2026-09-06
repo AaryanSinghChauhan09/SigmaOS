@@ -669,19 +669,12 @@ pub struct SimpleNetworkStack {
     pub interfaces: Vec<NetworkInterface>,
 }
 
-impl SimpleNetworkStack {
-    pub fn new() -> Self {
-        Self {
-            sockets: Vec::new(),
-            next_id: AtomicUsize::new(1),
-            firewall: SimpleFirewall::new(),
-            congestion: RenoCongestionControl::new(),
-            netfilter: NetfilterFirewall::new(),
-            routing_table: RoutingTable::new(),
-            interfaces: Vec::new(),
-        }
+impl Default for SimpleNetworkStack {
+    fn default() -> Self {
+        Self::new()
     }
 }
+
 
 
 impl NetworkStack for SimpleNetworkStack {

@@ -90,14 +90,10 @@ pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
 pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
-    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
-    FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
-    ZypperSpecManifest, SlackwarePkgManifest,
-    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
-    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
-    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
-    DispatchedPmAction, UniversalPmCommandDispatcher, UniversalPmOperation,
+    PackageFormatAdapter, UniversalPackageManager, AdapterError,
+};
+pub use universal_oop_system::{
+    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
 };
 pub use sovereign_sigpkg::*;
 pub use universal_adapter::{
@@ -159,9 +155,10 @@ pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use sovereign_package_innovations::{
-    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
-    NixFlakeHermeticCacheStore,
+pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
+pub use transaction::Transaction;
+pub use universal_adapter::{
+    AptDebManifest, UniversalPackageAdapter,
 };
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
@@ -169,15 +166,6 @@ pub use spec::{
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
-pub use store::{
-    BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
-};
-pub use svntogit_repro::{
-    BuildArtifact, ConvertedGitCommit, ReproducibilityAttestationReport,
-    ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
-    SvnBranchType, SvnRevisionLog,
-};
-pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer

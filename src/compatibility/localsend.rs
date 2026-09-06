@@ -12,13 +12,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
-// SigmaOS Distro Compatibility Layer
-// SigmaOS LocalSend Protocol Compatibility Bridge
-// Implements the LocalSend REST/UDP v2.1 protocol format
-// to enable offline peer-to-peer secure file transfer within local networks.
 
 extern crate alloc;
 use crate::security::capability::CapabilityToken;
