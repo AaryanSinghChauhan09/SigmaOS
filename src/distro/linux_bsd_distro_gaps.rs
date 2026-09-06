@@ -428,9 +428,13 @@ impl SystemdInitManager {
     }
 
     pub fn is_service_running(&self, name: &str) -> bool {
+<<<<<<< HEAD
         self.services
             .iter()
             .any(|s| s.name == name && s.state == ServiceState::Running)
+=======
+        self.services.iter().any(|s| s.name == name && s.state == ServiceState::Running)
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
     }
 
     pub fn check_dependencies_met(&self, name: &str) -> bool {
@@ -445,7 +449,10 @@ impl SystemdInitManager {
             false
         }
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
 }
 
 impl Default for SystemdInitManager {
@@ -881,6 +888,7 @@ mod tests {
         assert_eq!(manager.get_active_services_count(), 1);
         assert!(manager.is_service_running("networkd.service"));
         assert!(manager.check_dependencies_met("zenith-compositor.service"));
+<<<<<<< HEAD
     }
 
     #[test]
@@ -934,6 +942,8 @@ mod tests {
         tracer.record_sample(100, 0x400100, "sys_enter", 1005);
         assert_eq!(tracer.probe_samples.len(), 1);
         assert_eq!(tracer.probe_samples[0].probe_name, "sys_enter");
+=======
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
     }
 
     #[test]

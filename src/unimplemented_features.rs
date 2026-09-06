@@ -3599,6 +3599,7 @@ mod extra_unimplemented_tests {
         assert_eq!(dispatch_res, 0x8000_0005);
     }
 
+<<<<<<< HEAD
     #[test]
     fn test_android_apex_container_module_engine() {
         let mut engine = AndroidApexContainerModuleEngine::new();
@@ -4260,4 +4261,6 @@ mod governance_and_cross_platform_tests {
         gaming.set_frame_rate_target(240);
         assert_eq!(gaming.target_fps, 240);
     }
+=======
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
 }

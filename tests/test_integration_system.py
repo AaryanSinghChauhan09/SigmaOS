@@ -186,6 +186,7 @@ def test_boot_sequence_varied_configs():
     assert boot_err.execute_boot() is False
     assert boot_err.state == "BOOT_ERROR"
     assert any("BOOT_FAIL" in log for log in boot_err.boot_logs)
+<<<<<<< HEAD
 
 
 def test_universal_distro_subsystem_bridge():
@@ -255,3 +256,5 @@ def test_universal_package_manager_cli_simulation():
         "superdeb", "lzm", "pup", "snap", "pacman", "tar", "pet"
     ]
     assert len(package_formats) >= 30
+=======
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961

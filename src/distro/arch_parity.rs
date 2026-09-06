@@ -348,9 +348,15 @@ impl Default for SandboxedCompiler {
 /// ArchISO Profile Type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ArchIsoProfileType {
+<<<<<<< HEAD
     Releng,         // Standard ArchISO release engineering profile
     Baseline,       // Minimal recovery baseline image
     PersistentLive, // Live boot with Copy-on-Write persistent storage
+=======
+    Releng,            // Standard ArchISO release engineering profile
+    Baseline,          // Minimal recovery baseline image
+    PersistentLive,    // Live boot with Copy-on-Write persistent storage
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
 }
 
 /// ArchISO Profile Configuration
@@ -393,9 +399,13 @@ impl ArchIsoProfile {
                     "e2fsprogs".to_string(),
                     "btrfs-progs".to_string(),
                 ],
+<<<<<<< HEAD
                 "archisobasedir=arch archisolabel=".to_string()
                     + iso_label
                     + " cow_device=/dev/disk/by-label/SIGMA_COW",
+=======
+                "archisobasedir=arch archisolabel=".to_string() + iso_label + " cow_device=/dev/disk/by-label/SIGMA_COW",
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
             ),
         };
 
@@ -701,9 +711,13 @@ sha256sums=('SKIP')
             "SIGMA_2026",
         );
         assert_eq!(releng_profile.profile_type, ArchIsoProfileType::Releng);
+<<<<<<< HEAD
         assert!(releng_profile
             .airootfs_packages
             .contains(&"archinstall".to_string()));
+=======
+        assert!(releng_profile.airootfs_packages.contains(&"archinstall".to_string()));
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
         assert!(releng_profile.enable_efi_boot);
         assert!(releng_profile.enable_bios_boot);
 

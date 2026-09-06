@@ -58,6 +58,7 @@ pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
 
+<<<<<<< HEAD
 pub use distro::{
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
@@ -119,6 +120,24 @@ pub use package::bsd_linux_package_innovations::{
     SlotOperator, SovereignPackageBuildProvenanceEngine, UbuntuPpaAptPinningEngine, XbpsCachedPkg,
     XbpsDowngradeRepoEngine, XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine,
     ZypperPackageOffer, ZypperRepository,
+=======
+pub use unimplemented_features::{
+    AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
+    GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
+    LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
+    SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
+    ZorinWinAppDbRegistry, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
+    SlackwarePkgtoolEngine, SlackwarePackage, SolusEopkgRavenGovernor, SolusEopkgDeltaPackage, RavenWidgetState,
+    MageiaUrpmiMccResolver, MageiaSynthesisPackage, MageiaMirror, DragonFlyHammer2DeduplicationEngine, Hammer2Block,
+    NetBsdRumpComponentEngine, RumpComponent, RumpComponentType,
+};
+pub use distro::{
+    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+    HermeticStoreClosureEngine, StoreClosurePackage,
+    OmarchyQuickshellEngine, OmarchySystemThemeStudio, OmarchyLuaConfigEngine,
+    OmarchyPluginMarketplace, OmarchyHerdrAiAgentManager, OmarchyReleaseChannelSnapshotEngine,
+    missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
 };
 pub use security::{
     Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, GksuAuthBackend,

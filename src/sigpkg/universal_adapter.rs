@@ -2345,9 +2345,13 @@ impl UniversalFormatConverter {
 
         match format {
             PackageFormat::Apt => {
+<<<<<<< HEAD
                 let parsed = adapter
                     .parse_apt_control(&text)
                     .map_err(|e: &'static str| e.to_string())?;
+=======
+                let parsed = adapter.parse_apt_control(&text).map_err(|e: &'static str| e.to_string())?;
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -2363,9 +2367,13 @@ impl UniversalFormatConverter {
                     .map_err(|e: &'static str| e.to_string())
             }
             PackageFormat::Pacman => {
+<<<<<<< HEAD
                 let parsed = adapter
                     .parse_pacman_pkgbuild(&text)
                     .map_err(|e: &'static str| e.to_string())?;
+=======
+                let parsed = adapter.parse_pacman_pkgbuild(&text).map_err(|e: &'static str| e.to_string())?;
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
                 let canonical_deps: Vec<String> = parsed
                     .depends
                     .iter()
@@ -2380,10 +2388,15 @@ impl UniversalFormatConverter {
                     )
                     .map_err(|e: &'static str| e.to_string())
             }
+<<<<<<< HEAD
             PackageFormat::Yum | PackageFormat::Pisi => {
                 let parsed = adapter
                     .parse_rpm_spec(&text)
                     .map_err(|e: &'static str| e.to_string())?;
+=======
+            PackageFormat::Yum => {
+                let parsed = adapter.parse_rpm_spec(&text).map_err(|e: &'static str| e.to_string())?;
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
                 let canonical_deps: Vec<String> = parsed
                     .requires
                     .iter()
@@ -2397,6 +2410,7 @@ impl UniversalFormatConverter {
                         &canonical_deps,
                     )
                     .map_err(|e: &'static str| e.to_string())
+<<<<<<< HEAD
             }
             PackageFormat::Apk => {
                 let parsed = adapter
@@ -2553,6 +2567,14 @@ impl UniversalFormatConverter {
                         )
                         .map_err(|e: &'static str| e.to_string())
                 }
+=======
+            }
+            _ => {
+                let name = format!("{:?}-converted-pkg", format).to_lowercase();
+                adapter
+                    .translate_to_native_package(&name, "1.0.0", "Converted foreign package", &[])
+                    .map_err(|e: &'static str| e.to_string())
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
             }
         }
     }

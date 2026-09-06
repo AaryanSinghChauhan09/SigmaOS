@@ -9,11 +9,20 @@
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 
+<<<<<<< HEAD
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+=======
+extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
 
 // ============================================================================
 // ⚡ PERFORMANCE ENHANCEMENTS
@@ -395,11 +404,15 @@ impl SigmaLayer {
         self.layers.insert(layer.layer_name.clone(), layer);
     }
 
+<<<<<<< HEAD
     pub fn upgrade_layer(
         &mut self,
         layer_name: &str,
         new_version: &str,
     ) -> Result<(), &'static str> {
+=======
+    pub fn upgrade_layer(&mut self, layer_name: &str, new_version: &str) -> Result<(), &'static str> {
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
         if let Some(layer) = self.layers.get_mut(layer_name) {
             layer.version = new_version.to_string();
             Ok(())
@@ -590,15 +603,23 @@ impl SigmaAssist {
             if log.contains("Out of memory") {
                 diagnostics.push(TroubleshootingDiagnostic {
                     issue_detected: "Memory Pressure Critical".to_string(),
+<<<<<<< HEAD
                     recommended_fix: "Purge cache or increase swap space via sigma-swap"
                         .to_string(),
+=======
+                    recommended_fix: "Purge cache or increase swap space via sigma-swap".to_string(),
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
                     can_auto_remediate: true,
                 });
             } else if log.contains("Kernel panic") {
                 diagnostics.push(TroubleshootingDiagnostic {
                     issue_detected: "Kernel Crash Detected".to_string(),
+<<<<<<< HEAD
                     recommended_fix: "Boot into SigmaRescue mode or trigger instant rollback"
                         .to_string(),
+=======
+                    recommended_fix: "Boot into SigmaRescue mode or trigger instant rollback".to_string(),
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
                     can_auto_remediate: false,
                 });
             }
@@ -646,6 +667,7 @@ impl SigmaRollback {
         self.current_active_snapshot = snapshot_id;
     }
 
+<<<<<<< HEAD
     pub fn rollback_to_snapshot(
         &mut self,
         snapshot_id: u64,
@@ -655,6 +677,10 @@ impl SigmaRollback {
             .iter()
             .position(|s| s.snapshot_id == snapshot_id)
         {
+=======
+    pub fn rollback_to_snapshot(&mut self, snapshot_id: u64) -> Result<&SystemSnapshot, &'static str> {
+        if let Some(pos) = self.snapshots.iter().position(|s| s.snapshot_id == snapshot_id) {
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
             self.current_active_snapshot = snapshot_id;
             Ok(&self.snapshots[pos])
         } else {
@@ -743,7 +769,11 @@ impl Default for SigmaRescue {
 // UNIT TESTS
 // ============================================================================
 
+<<<<<<< HEAD
 #[cfg(test_disabled)]
+=======
+#[cfg(test)]
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
 mod tests {
     use super::*;
 
@@ -813,10 +843,14 @@ mod tests {
         let mut updated = header;
         updated.version = "1.1.0".to_string();
         assert!(modules.hot_swap_module(updated).is_ok());
+<<<<<<< HEAD
         assert_eq!(
             modules.loaded_modules.get("ext4_fs").unwrap().version,
             "1.1.0"
         );
+=======
+        assert_eq!(modules.loaded_modules.get("ext4_fs").unwrap().version, "1.1.0");
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
     }
 
     #[test]
@@ -837,9 +871,13 @@ mod tests {
     #[test]
     fn test_sigma_profile() {
         let profile = SigmaProfile::new(OperatingProfileKind::Gamer);
+<<<<<<< HEAD
         assert!(profile
             .active_subsystems
             .contains(&"LowLatencyAudio".to_string()));
+=======
+        assert!(profile.active_subsystems.contains(&"LowLatencyAudio".to_string()));
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
     }
 
     #[test]
@@ -890,6 +928,7 @@ mod tests {
         });
 
         assert!(collab.sync_cursor_position("user_alice", (50, 60)));
+<<<<<<< HEAD
         assert_eq!(
             collab
                 .connected_peers
@@ -898,6 +937,9 @@ mod tests {
                 .cursor_position,
             (50, 60)
         );
+=======
+        assert_eq!(collab.connected_peers.get("user_alice").unwrap().cursor_position, (50, 60));
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
     }
 
     #[test]

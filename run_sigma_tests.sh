@@ -82,6 +82,7 @@ rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/sigpkg/fedora_
 echo "[10/13] Running changed files standalone rustc test runner..."
 ./scripts/changed_files_rustc_tests.sh || true
 
+<<<<<<< HEAD
 # 11. Run UI/UX accessibility tests
 echo "[11/13] Running UI/UX accessibility tests..."
 if [ -f "./scripts/uiux_accessibility_test.sh" ]; then
@@ -122,4 +123,10 @@ elif python3 -m pytest --version &>/dev/null; then
 fi
 
 echo "[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]"
+=======
+echo -e "${CYAN}:: Running Modular Python Test Suite (Unit, Integration, System, Stress, Fuzzing, Benchmarks)...${RESET}"
+pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py
+
+echo -e "${GREEN}[OK] All Sovereign Atomic, Subsystem & Inspection Tests completed successfully. [✓]${RESET}"
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
 exit 0

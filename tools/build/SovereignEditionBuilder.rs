@@ -152,11 +152,19 @@ impl Edition {
 #[repr(C)]
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum DistroImageProfileKind {
+<<<<<<< HEAD
     LiveDesktopMintPop,   // Linux Mint / Pop!_OS inspired Live Workstation ISO
     NetInstallArchDebian, // Arch / Debian inspired minimal NetInstall ISO
     HardenedAmnesicTails, // Tails / OpenBSD inspired RAM-wiped Amnesic Hardened ISO
     CloudHeadlessTalos,   // Talos / Alpine inspired immutable Cloud-Init Headless image
     GamingHybridGpuCachy, // CachyOS / Fedora inspired BORE/PRIME Hybrid GPU Workstation
+=======
+    LiveDesktopMintPop,     // Linux Mint / Pop!_OS inspired Live Workstation ISO
+    NetInstallArchDebian,   // Arch / Debian inspired minimal NetInstall ISO
+    HardenedAmnesicTails,   // Tails / OpenBSD inspired RAM-wiped Amnesic Hardened ISO
+    CloudHeadlessTalos,     // Talos / Alpine inspired immutable Cloud-Init Headless image
+    GamingHybridGpuCachy,   // CachyOS / Fedora inspired BORE/PRIME Hybrid GPU Workstation
+>>>>>>> origin/jules/modular-test-suite-4921081580612261961
 }
 
 /// Image Profile Manifest Metadata
