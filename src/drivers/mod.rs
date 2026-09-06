@@ -47,8 +47,20 @@ pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 pub use distro_device_expansion::{
-    CanBusSocketDriver, IntelI2cSmbusControllerDriver, IntelIgbNicDriver, IntelIwfWifiDriver,
+    CanBusSocketDriver, Cxl3MemoryExpanderDriver, FloppyDiskControllerDriver,
+    IntelI2cSmbusControllerDriver, IntelIgbNicDriver, IntelIwfWifiDriver, IntelXeArcGpuDriver,
     Mpt3SasControllerDriver, RadeonKmsGpuDriver, RaspberryPiGpioMailboxDriver,
-    RealtekAlcAudioDriver, RealtekRtl8169Driver, SynapticsTouchpadDriver,
-    VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
+    RealtekAlcAudioDriver, RealtekRtl8169Driver, SoundBlaster16IsaDriver, SynapticsTouchpadDriver,
+    ThreeCom3c59xEthernetDriver, VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
+};
+
+pub mod sovereign_hardware_roadmap;
+pub use sovereign_hardware_roadmap::{
+    SigmaDriverShard, ForeignDriverOrigin, CrossOsDriverAdapter, DeclarativeDriverProfileConfig,
+    SigmaHotplugOrchestrator, DriverSandboxDomain, SigmaSandboxedHardwareModule,
+    SigmaFirmwareBridge, SigmaFirmwareFreeDriver, SecurePeripheralIsolationGuard,
+    SigmaDriverLayeringSystem, ClusterDeviceResource, SigmaDeviceClusterPool,
+    SigmaProgrammableIoStack, TargetCpuArch, CrossArchDriverPortability,
+    DriverSovereigntyPolicy, SigmaHardwarePolicyEngine, SigmaCryptographicBootChain,
+    SigmaHardwareSovereigntyRoadmapEngine,
 };
