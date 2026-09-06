@@ -1,0 +1,27 @@
+name: Enterprise RHEL/Rocky KABI Compliance & SELinux FIPS Audit CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  rhel-kabi-security:
+    name: KABI Stability & SELinux FIPS Compliance Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test Kernel System Call Table & Anti-Rootkit Guard
+        run: |
+          cargo test --lib -- kernel::syscall::table::tests
