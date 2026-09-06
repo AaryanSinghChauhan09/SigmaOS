@@ -5,7 +5,25 @@ Covers: Shell ↔ Syscall routing, Hardware Driver mocking (disk/network),
 Network sockets, Security policy enforcement, and Cold Boot configurations.
 """
 
-import pytest
+try:
+    import pytest
+except ImportError:
+    class _RaisesContext:
+        def __init__(self, expected_exception):
+            self.expected_exception = expected_exception
+        def __enter__(self):
+            return self
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            if exc_type is None:
+                raise AssertionError(f"Expected exception {self.expected_exception} was not raised")
+            return issubclass(exc_type, self.expected_exception)
+
+    class _PytestShim:
+        @staticmethod
+        def raises(exc):
+            return _RaisesContext(exc)
+
+    pytest = _PytestShim()
 import time
 
 
@@ -208,7 +226,7 @@ def test_universal_distro_subsystem_bridge():
         assert len(spec["vfs_etc"]) > 0
 
 
-def test_universal_package_manager_cli_simulation():
+def test_universal_package_manager_cli_simulation_basic():
     """Simulates universal package manager CLI interactions for .deb, .rpm, .pkg.tar.zst, and APK conversion."""
     package_formats = ["deb", "rpm", "pkg.tar.zst", "apk", "xbps", "econstruct"]
     assert len(package_formats) == 6
@@ -247,7 +265,7 @@ def test_sovereign_wiki_master_engine_integration():
         assert len(spec["vfs_etc"]) > 0
 
 
-def test_universal_package_manager_cli_simulation():
+def test_universal_package_manager_cli_simulation_extended():
     """Simulates universal package manager CLI interactions for all supported package formats."""
     package_formats = [
         "deb", "rpm", "pkg.tar.xz", "apk", "xbps", "econstruct", "air", "bottle",
