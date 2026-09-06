@@ -1,6 +1,4 @@
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
@@ -42,6 +40,7 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
+    ProcessExec,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -2202,7 +2201,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_add" | "pkg_delete" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
