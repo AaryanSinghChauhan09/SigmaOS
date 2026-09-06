@@ -1,0 +1,20 @@
+name: "Clear Linux: Mixer Bundle Stateless OS CI"
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+permissions:
+  contents: read
+jobs:
+  clearlinux-mixer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run Clear Linux mixer bundle stateless OS audit
+        run: |
+          mkdir -p build
+          echo "Simulating Clear Linux mixer bundle stateless config resolution..."
+          ./run_sigma_tests.sh

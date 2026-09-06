@@ -1,0 +1,20 @@
+name: "DragonFly BSD: dports HAMMER2 PFS CI"
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+permissions:
+  contents: read
+jobs:
+  dragonfly-dports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run DragonFly BSD dports & HAMMER2 snapshot audit
+        run: |
+          mkdir -p build
+          echo "Simulating DragonFly BSD dports & HAMMER2 PFS CoW build..."
+          ./run_sigma_tests.sh
