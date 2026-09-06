@@ -932,7 +932,7 @@ impl Default for MissingDistroComponentsEngine {
 pub struct RumpKernelServer {
     pub server_id: usize,
     pub component_name: String,
-    pub socket_path: String,
+    pub _socket_path: String,
     pub is_active: bool,
 }
 
@@ -957,7 +957,7 @@ impl NetBsdRumpKernelServerEngine {
         let server = RumpKernelServer {
             server_id,
             component_name: component_name.to_string(),
-            socket_path,
+            _socket_path: socket_path,
             is_active: true,
         };
 
@@ -1146,7 +1146,7 @@ impl Default for VanillaOsApxSubsystemEngine {
 #[derive(Debug, Clone)]
 pub struct YaSTConfigModule {
     pub module_name: String,
-    pub schema_version: String,
+    pub _schema_version: String,
     pub config_data: Vec<(String, String)>,
     pub is_applied: bool,
 }
@@ -1165,7 +1165,7 @@ impl SuseYaSTConfigurationRegistry {
     pub fn register_module(&mut self, module_name: &str, schema_version: &str) {
         let module = YaSTConfigModule {
             module_name: module_name.to_string(),
-            schema_version: schema_version.to_string(),
+            _schema_version: schema_version.to_string(),
             config_data: Vec::new(),
             is_applied: false,
         };
