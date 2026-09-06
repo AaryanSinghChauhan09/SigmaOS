@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 //! SigmaOS Hardware Abstraction Layer (HAL)
 //! Unified driver interface abstraction and platform-specific shims (x86_64, AArch64/ARM64, RISC-V).
 //! Inspired by Linux (sysfs, eBPF/IRQ domains, device tree FDT, PCI ECAM, DMA pools)

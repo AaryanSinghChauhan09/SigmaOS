@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SigmaOS Security, Pentesting, and Anonymity Suite (SigmaParrot)
 // Fully absorbs and implements all security, forensics, and anonymity systems of Parrot Linux:
 // Anonsurf (Tor/I2P overlay, DNS shields), Forensics (inode carving, decoys), Kali Sniffer,

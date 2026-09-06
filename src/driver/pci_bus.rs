@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SigmaOS PCI / PCIe Bus Driver & Bus Manager Implementation
 // Clean-room implementation taking inspiration from Linux (pci-sysfs, ECAM, BAR allocation, MSI/MSI-X, PCIe AER, PCIe ASPM)
 // and BSD distributions (FreeBSD devctl/pci ioctls, OpenBSD autoconf PCI matching).

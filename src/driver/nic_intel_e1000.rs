@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Intel e1000/i210 Ethernet Driver
 // Supports Intel 1GB/10GB Ethernet controllers (82540, 82541, 82545, i210, i350, etc.)

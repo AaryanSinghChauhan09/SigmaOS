@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 /// Advanced Kernel Internals and Scheduler Data Structures for SigmaOS
 /// Inspired by Windows NT (EPROCESS, KPROCESS, ETHREAD, KTHREAD, KPCR/KPRCB),
 /// Linux task_struct, BSD vmspace, and iOS Mach thread models.

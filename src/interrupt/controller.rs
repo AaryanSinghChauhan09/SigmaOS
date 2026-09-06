@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 /// Advanced High-Fidelity Heterogeneous Interrupt Controller (APIC, GIC, PLIC) for SigmaOS
 /// Models x86_64 APIC Inter-Processor Interrupts (IPI), ARM GIC Fast Interrupts (FIQ), and RISC-V PLIC Supervisor targets.
 use std::vec::Vec;

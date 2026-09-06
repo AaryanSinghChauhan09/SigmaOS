@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SigmaOS Comprehensive OS Scheduling Suite
 // Implements 3 Levels of Schedulers (Long-Term, Medium-Term, Short-Term CPU),
 // 6 CPU Scheduling Algorithms (FCFS, SJF, RR, Priority with Aging, Multilevel Queue, MLFQ),

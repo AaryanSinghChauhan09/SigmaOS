@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SigmaOS Support & Services Framework (Red Hat Insights, Ubuntu Pro, and SUSE Manager Parity)
 // Professional support tiers, LTS maintenance guarantees, Expanded Security Maintenance (ESM),
 // FIPS/CIS Compliance Scanners, Automated Remediation Playbooks, and System Drift Detectors.

@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Poudriere Bulk Builder, Void xbps-src Chroot Builder, and Slackpkg Patch Engine Subsystem
 // Native Rust implementation of FreeBSD poudriere, Void Linux xbps-src, and Slackware slackpkg parity

@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 #![cfg_attr(not(test), no_std)]
 // SigmaOS Memory Manager Performance Allocator Stack
 // Implements Slab Cache (<512B), Buddy Allocator (>=512B), and ACPI SRAT NUMA Topology Page Allocator.

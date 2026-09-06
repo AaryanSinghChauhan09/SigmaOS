@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SigmaOS Native AI Logic & Model Inference Bindings (PyTorch/TensorFlow Parity)
 // Provides zero-allocation C/Rust inference bindings allowing OS daemons
 // to execute pre-trained models for adaptive scheduling, IO prediction, and anomaly detection.

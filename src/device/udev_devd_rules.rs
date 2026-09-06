@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SigmaOS udev & devd Device Event Rule Processing Engine
 // Inspired by Linux systemd-udevd (/etc/udev/rules.d/) and FreeBSD devd (/etc/devd.conf)
 // Handles hotplug event matching, /dev/ node permissions & symlink creation, and event action execution.

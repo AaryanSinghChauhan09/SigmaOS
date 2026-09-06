@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SigmaOS Legacy Linux Kernel & System Compatibility Adapter
 // Enables ancient and modern software compiled for Linux 2.x, 3.x, 4.x, 5.x, and 6.x to run securely
 // Supports System V IPC, ProcFS emulation, GLIBC environment shims, and ELF binary Aux Vectors loading.

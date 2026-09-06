@@ -34,6 +34,15 @@ pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(test)]
 pub use crate::sigpkg::Version;
 
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
+
+
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
 

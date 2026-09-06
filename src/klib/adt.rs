@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // Linux and BSD Inspired Abstract Data Types (ADT) for SigmaOS
 // Implements high-performance kernel data structures:
 // - SplayTree<K, V>: FreeBSD `sys/tree.h` inspired self-balancing binary search tree

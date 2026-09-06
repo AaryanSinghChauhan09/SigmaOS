@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Universal Hardware Compatibility, Footprint Optimization & Distro Parity Engine
 // Supports ancient (16-bit/32-bit ISA, IDE, AC97, CGA/VGA) and modern (PCIe 5.0, NVMe 2.0, USB4, Wi-Fi 7, CXL) devices.

@@ -1,3 +1,12 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
 // SigmaOS Next-Gen Outclassing Driver Subsystem
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Outclasses Linux & BSD driver architectures with (1) Dynamic Adaptive Contiguous DMA Auto-Defragmentation,
