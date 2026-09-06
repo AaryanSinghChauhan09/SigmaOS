@@ -42,6 +42,7 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
+    ProcessExec,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -2123,7 +2124,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkg_add" | "pkgsend" => {
+            "pkg" | "pkgsend" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
