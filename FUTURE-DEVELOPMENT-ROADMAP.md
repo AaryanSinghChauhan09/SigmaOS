@@ -3950,3 +3950,153 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
    - Provides zero-copy buffer slicing and flushing mechanisms for userland file utilities.
 7. **s6 Service Init Supervisor (`S6ServiceInitSupervisor`)**:
    - Manages s6-style readiness notification and exponential backoff restart supervision for critical daemons.
+
+---
+
+## 75. SOVEREIGN NEXT-GEN DISTRO INNOVATIONS & LONG-TERM OPERATING SYSTEM EVOLUTION
+
+### 75.1 High-Priority Architectural Innovations Inspired by Linux & BSD
+
+1. **Microkernel IPC & Hardware Driver Isolation (seL4 / Genode / NetBSD Rump Kernel Inspired)**:
+   - *Vision*: Transition graphics, Wi-Fi, audio, and USB drivers from kernel ring 0 into zero-copy capability-isolated microkernel driver shards.
+   - *Impact*: Eliminates 99% of kernel panic crash vectors caused by third-party peripheral drivers.
+
+2. **Declarative Hermetic System Configuration (NixOS / Guix / Nix Flakes Inspired)**:
+   - *Vision*: Express the entire SigmaOS operating system state, installed packages, firewall rules, and kernel sysctls in a single declarative configuration file.
+   - *Impact*: Enables 100% reproducible OS deployments, instant rollback to previous system generations, and clean-room dev environments.
+
+3. **Post-Quantum Cryptographic Kernel Security (OpenBSD / PQC Hybrid Inspired)**:
+   - *Vision*: Replace classical TLS and SSH primitive negotiation with hybrid Dilithium-5 and Kyber-1024 post-quantum key exchange across kernel memory structures, package signatures, and IPC channels.
+   - *Impact*: Ensures future-proof quantum resistance across system state, storage, and network communications.
+
+4. **Autonomous AI Kernel Optimization & Self-Healing Scheduler (CachyOS BORE / eBPF Inspired)**:
+   - *Vision*: Embed lightweight on-device AI models into the EEVDF scheduler to dynamically tune thread priority, NUMA memory node placement, and power governors based on active workloads (gaming, compiling, AI inference).
+   - *Impact*: Delivers up to 25% lower latency in interactive applications and automated self-healing during memory exhaustion or deadlocks.
+
+5. **Universal High-Performance Zero-Copy I/O Subsystem (Linux io_uring / FreeBSD Netmap Inspired)**:
+   - *Vision*: Provide a unified ring-buffer asynchronous I/O engine for storage, network, and zero-copy IPC channels.
+   - *Impact*: Reduces kernel-userland context switches by 90% and achieves wire-speed 100GbE packet throughput.
+
+6. **Distributed Cluster-Native Kernel & Shared Peripheral Fabric (DragonFly BSD HAMMER2 / Plan 9 Inspired)**:
+   - *Vision*: Expose connected GPUs, NVMe storage arrays, and AI NPUs across local network nodes as if they were local devices attached to PCIe buses.
+   - *Impact*: Allows seamless cluster computing without specialized multi-node IPC frameworks.
+
+---
+
+## 76. SOVEREIGN DISTRO-INSPIRED BROWSER & OS CONVERGENCE SPECIFICATION
+
+### 76.1 Ten Master Distro-Inspired Subsystem Philosophies
+
+1. **Philosophy & Dual-Channel Release Model**:
+   - *LTS vs Rolling Channels*: Offer both Debian/FreeBSD-style LTS releases for mission-critical enterprise environments and Arch-style rolling releases for bleeding-edge updates.
+   - *Minimal Auditable Core*: Maintain a zero-dependency, microkernel-style browser/OS core and load extra capabilities dynamically as signed, sandboxed modules.
+   - *Declarative Config-as-Code*: Maintain 100% reproducible profiles versioned in Git (`.sigmaprofile` manifests).
+
+2. **Security, Sandboxing & Capability Model**:
+   - *Tab Jails & Process Isolation*: Per-tab and per-workspace sandboxing via FreeBSD jails, Linux namespaces, and OpenBSD pledge/unveil policies.
+   - *Least-Privilege Extension Caps*: Granular permission tokens required for network, filesystem, and IPC calls.
+   - *Reproducible Signed Builds*: PQC Dilithium-5 and Sigstore attestation for all updates and extensions.
+
+3. **Package & Extension Management**:
+   - *Native Package Manager (`sigpkg`) / Ports System*: Integrated CLI/GUI manager (`browserctl`) for finding, building, pinning, and auditing extensions.
+   - *Source-Based Build Profiles*: Gentoo-style USE flags and local source compilation for power users.
+
+4. **Session State, Storage & Snapshotting**:
+   - *ZFS/HAMMER2-style Workspace Snapshots*: Instant, zero-copy snapshots of tabs, cookies, window layouts, and local storage state with one-click rollback.
+   - *Declarative Session Exports*: Exportable, encrypted session profiles for cross-device sync and disaster recovery.
+
+5. **Modularity, Customization & Theming**:
+   - *Modular Window/Tab Components*: Compositor-level choice between tiling (Sway/i3), spatial floating, and tabbed sidebar layouts.
+   - *Community Theme Ports Tree*: Centralized, signed repository of themes and UI assets.
+
+6. **Performance & Resource Control**:
+   - *cgroups v2 / RACCT Workspace Quotas*: Hard limits on CPU, memory, and bandwidth per workspace/tab group.
+   - *Alpine-style Demand-Spawn Minimalism*: Idle tab freezing and lazy-loaded background daemons.
+
+7. **Developer & Power-User Tooling**:
+   - *Unified CLI (`browserctl` / `sigmactl`)*: Systemctl/xbps-style command-line administration.
+   - *Searchable Offline Manpages*: Local man(1) and man(7) documentation pages for commands and configuration keys.
+
+8. **Privacy, Telemetry & Governance**:
+   - *Opt-In Auditable Telemetry*: Zero tracking by default with open-source privacy audit trails.
+   - *Community Governance & Vulnerability Disclosures*: Formal CVE disclosures and security advisory channels.
+
+9. **Integration & System Services**:
+   - *Daemon Service Supervisor (`rc.d` / `s6` inspired)*: Isolated background helpers for clipboard, sync, and indexing managed as togglable services.
+
+10. **UX Distro Spins & Workflow Profiles**:
+    - *Pre-Curated Workspace Spins*: Pre-configured profiles for Developers, Security Researchers, Content Creators, and Minimalists.
+
+### 76.2 Top 5 First-Phase Concrete Prototype Features
+
+1. **Workspace Snapshot + Rollback UI (`SovereignWorkspaceSnapshotEngine`)**:
+   - Instant zero-copy snapshot of open tabs, DOM state, cookies, and layout stored in B-tree CAS snapshots.
+2. **Signed Extension Package Manager & Registry (`SigmaPkgExtensionRegistry`)**:
+   - PQC Dilithium-5 signed package manifest, dependency resolver, and release channel channels (Stable, Beta, Edge).
+3. **Tab Jails & Capability Sandboxing Governor (`SovereignTabJailGovernor`)**:
+   - Isolated renderer helpers using OpenBSD `pledge`/`unveil` and Linux seccomp BPF filters per tab.
+4. **Declarative Profile Manifest Importer/Exporter (`SigmaProfileDeclarativeEngine`)**:
+   - Single-file JSON/TOML `.sigmaprofile` manifest capturing extensions, custom themes, and keybindings.
+5. **Per-Workspace Resource Quota Governor (`WorkspaceResourceCgroupGovernor`)**:
+   - Dynamic CPU, RAM, and network I/O throttling per workspace group via Linux cgroups v2 and FreeBSD RACCT.
+
+---
+
+## 77. SOVEREIGN AI AGENT MEMORY MANAGEMENT ARCHITECTURE & GOVERNANCE SPECIFICATION
+
+### 77.1 Autonomous Agent Memory Governance Rules
+
+1. **Bare-Metal Zero-Dependency Memory Directives**:
+   - AI engineering agents (Jules, Sentinel, Palette, Bolt) must use native `klib` and kernel allocators (`src/memory/pmm_vmm.rs`, `src/memory/manager.rs`, `src/klib/custom_allocator.rs`, `src/klib/buddy_allocator.rs`).
+   - Core kernel crates must maintain strict `#![no_std]` + `extern crate alloc` compatibility.
+
+2. **Physical & Virtual Memory Management Invariants (PMM / VMM)**:
+   - Physical memory frame tracking must enforce 4KiB page alignment and 2MiB/1GiB huge page boundaries (`src/memory/pmm_vmm.rs`).
+   - Virtual memory mappings must enforce Copy-On-Write (CoW) page flags and hardened guard page allocators (`src/memory/resource_allocator.rs`).
+
+3. **Buddy & Slab Allocator Safety Rules**:
+   - Power-of-two memory block splitting and coalescing in `src/memory/buddy_allocator.rs` and `src/klib/buddy_allocator.rs` must enforce order bounds (Order 0 through Order 10).
+   - Custom slab caches (`src/klib/custom_allocator.rs`, `src/klib/slab.rs`) must utilize ASLR guard pages and lock-free recycle bins.
+
+4. **MDL Pinning & Volatile Memory Wiping**:
+   - Memory Descriptor List (MDL) pinning must be invoked on DMA buffers before transfers to prevent page fault races under high concurrency.
+   - Cryptographic keys or sensitive buffers must execute volatile memory scrubbing (`AmnesicRamWipe` / zeroization) prior to page deallocation.
+
+---
+
+## 78. SOVEREIGN AI AGENT TESTING ARCHITECTURE & VERIFICATION SPECIFICATION
+
+### 78.1 Autonomous Agent Testing Directives
+
+1. **Mandatory 100% Pass Rate Policy**:
+   - AI engineering agents (Jules, Sentinel, Palette, Bolt) must achieve a 100% pass rate across all Rust (224+ unit tests), Python, and C++ test suites prior to submission.
+   - Code changes must include proactive unit test coverage for every newly added struct, enum, function, or module.
+
+2. **Master Integrated Test Execution (`./run_sigma_tests.sh`)**:
+   - Orchestrates Rust unit tests, security input validation benchmarks, Python modular system tests, universal package format adapter tests, and unimplemented feature/tool tests.
+
+3. **Standalone Module Fast-Verification (`rustc --test`)**:
+   - Allows rapid isolated verification of modified modules without full crate compilation overhead:
+     - `rustc --test --edition 2021 src/memory/pmm_vmm.rs -o build/test_pmm_vmm && ./build/test_pmm_vmm`
+     - `rustc --test --edition 2021 src/hal/multi_arch.rs -o build/test_multi_arch && ./build/test_multi_arch`
+     - `rustc --test --edition 2021 src/unimplemented_features.rs -o build/test_unimplemented_features && ./build/test_unimplemented_features`
+     - `rustc --test --edition 2021 src/unimplemented_tools.rs -o build/test_unimplemented_tools && ./build/test_unimplemented_tools`
+
+4. **Zero Test Skipping Rule**:
+   - Agents must never comment out or ignore failing assertions; underlying logic bugs must be diagnosed and resolved directly.
+
+---
+
+## 79. SOVEREIGN AI AGENT EFFICIENCY ARCHITECTURE & PERFORMANCE GOVERNANCE SPECIFICATION
+
+### 79.1 Autonomous Agent Performance Directives
+
+1. **Zero-Allocation Fast Paths**:
+   - Syscall dispatchers (`src/syscall/dispatcher.rs`), packet filters (`src/kernel/linux_bsd_innovations.rs`), and scheduler loops (`src/scheduler/scheduler.rs`) must perform zero dynamic heap allocations during execution.
+
+2. **SIMD Vectorization & ISA Auto-Routing**:
+   - Memory copy (`memcpy`), string parsing, and hashing operations must route through ISA auto-detection (`src/klib/isa.rs`) to utilize AVX2/AVX-512, NEON, SVE2, or RISC-V Vector 1.0 hardware acceleration instructions.
+
+3. **Optimal Time Complexity & Cache Locality**:
+   - Avoid O(N^2) search loops; utilize O(1) static hash maps and O(log N) B-trees.
+   - Maintain cache-friendly contiguous vector and ring buffer layouts (`src/klib/ringbuf.rs`, `src/klib/ring_buffer.rs`) to minimize CPU cache miss rates.
