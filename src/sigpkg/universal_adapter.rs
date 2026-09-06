@@ -984,6 +984,8 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Pkg)
         } else if f.ends_with(".aab") {
             Some(PackageFormat::Aab)
+        } else if f.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
         } else if f.ends_with(".tar.gz") || f.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
         } else if f.ends_with(".tar.xz") || f.ends_with(".xz") {
