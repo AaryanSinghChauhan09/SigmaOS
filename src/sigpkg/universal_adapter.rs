@@ -2068,6 +2068,22 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
+            "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" => operation = UniversalPmOperation::Install,
+                        "uninstall" | "remove" | "rm" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "find" => operation = UniversalPmOperation::Search,
+                        "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        "--dry-run" | "--dryrun" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
             "pacman" => {
                 let mut i = 0;
                 while i < args.len() {

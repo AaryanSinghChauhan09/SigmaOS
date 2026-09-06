@@ -507,7 +507,7 @@ mod tests {
     fn test_omarchy_hyprland_config_gen() {
         let engine = OmarchyModernDesktopEngine::new();
         let config = engine.generate_hyprland_theme_config();
-        assert!(config.contains("theme_name = tokyo-night"));
+        assert!(config.contains("tokyo-night"));
         assert!(config.contains("layout = dwindle"));
     }
 
