@@ -3980,3 +3980,62 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 6. **Distributed Cluster-Native Kernel & Shared Peripheral Fabric (DragonFly BSD HAMMER2 / Plan 9 Inspired)**:
    - *Vision*: Expose connected GPUs, NVMe storage arrays, and AI NPUs across local network nodes as if they were local devices attached to PCIe buses.
    - *Impact*: Allows seamless cluster computing without specialized multi-node IPC frameworks.
+
+---
+
+## 76. SOVEREIGN DISTRO-INSPIRED BROWSER & OS CONVERGENCE SPECIFICATION
+
+### 76.1 Ten Master Distro-Inspired Subsystem Philosophies
+
+1. **Philosophy & Dual-Channel Release Model**:
+   - *LTS vs Rolling Channels*: Offer both Debian/FreeBSD-style LTS releases for mission-critical enterprise environments and Arch-style rolling releases for bleeding-edge updates.
+   - *Minimal Auditable Core*: Maintain a zero-dependency, microkernel-style browser/OS core and load extra capabilities dynamically as signed, sandboxed modules.
+   - *Declarative Config-as-Code*: Maintain 100% reproducible profiles versioned in Git (`.sigmaprofile` manifests).
+
+2. **Security, Sandboxing & Capability Model**:
+   - *Tab Jails & Process Isolation*: Per-tab and per-workspace sandboxing via FreeBSD jails, Linux namespaces, and OpenBSD pledge/unveil policies.
+   - *Least-Privilege Extension Caps*: Granular permission tokens required for network, filesystem, and IPC calls.
+   - *Reproducible Signed Builds*: PQC Dilithium-5 and Sigstore attestation for all updates and extensions.
+
+3. **Package & Extension Management**:
+   - *Native Package Manager (`sigpkg`) / Ports System*: Integrated CLI/GUI manager (`browserctl`) for finding, building, pinning, and auditing extensions.
+   - *Source-Based Build Profiles*: Gentoo-style USE flags and local source compilation for power users.
+
+4. **Session State, Storage & Snapshotting**:
+   - *ZFS/HAMMER2-style Workspace Snapshots*: Instant, zero-copy snapshots of tabs, cookies, window layouts, and local storage state with one-click rollback.
+   - *Declarative Session Exports*: Exportable, encrypted session profiles for cross-device sync and disaster recovery.
+
+5. **Modularity, Customization & Theming**:
+   - *Modular Window/Tab Components*: Compositor-level choice between tiling (Sway/i3), spatial floating, and tabbed sidebar layouts.
+   - *Community Theme Ports Tree*: Centralized, signed repository of themes and UI assets.
+
+6. **Performance & Resource Control**:
+   - *cgroups v2 / RACCT Workspace Quotas*: Hard limits on CPU, memory, and bandwidth per workspace/tab group.
+   - *Alpine-style Demand-Spawn Minimalism*: Idle tab freezing and lazy-loaded background daemons.
+
+7. **Developer & Power-User Tooling**:
+   - *Unified CLI (`browserctl` / `sigmactl`)*: Systemctl/xbps-style command-line administration.
+   - *Searchable Offline Manpages*: Local man(1) and man(7) documentation pages for commands and configuration keys.
+
+8. **Privacy, Telemetry & Governance**:
+   - *Opt-In Auditable Telemetry*: Zero tracking by default with open-source privacy audit trails.
+   - *Community Governance & Vulnerability Disclosures*: Formal CVE disclosures and security advisory channels.
+
+9. **Integration & System Services**:
+   - *Daemon Service Supervisor (`rc.d` / `s6` inspired)*: Isolated background helpers for clipboard, sync, and indexing managed as togglable services.
+
+10. **UX Distro Spins & Workflow Profiles**:
+    - *Pre-Curated Workspace Spins*: Pre-configured profiles for Developers, Security Researchers, Content Creators, and Minimalists.
+
+### 76.2 Top 5 First-Phase Concrete Prototype Features
+
+1. **Workspace Snapshot + Rollback UI (`SovereignWorkspaceSnapshotEngine`)**:
+   - Instant zero-copy snapshot of open tabs, DOM state, cookies, and layout stored in B-tree CAS snapshots.
+2. **Signed Extension Package Manager & Registry (`SigmaPkgExtensionRegistry`)**:
+   - PQC Dilithium-5 signed package manifest, dependency resolver, and release channel channels (Stable, Beta, Edge).
+3. **Tab Jails & Capability Sandboxing Governor (`SovereignTabJailGovernor`)**:
+   - Isolated renderer helpers using OpenBSD `pledge`/`unveil` and Linux seccomp BPF filters per tab.
+4. **Declarative Profile Manifest Importer/Exporter (`SigmaProfileDeclarativeEngine`)**:
+   - Single-file JSON/TOML `.sigmaprofile` manifest capturing extensions, custom themes, and keybindings.
+5. **Per-Workspace Resource Quota Governor (`WorkspaceResourceCgroupGovernor`)**:
+   - Dynamic CPU, RAM, and network I/O throttling per workspace group via Linux cgroups v2 and FreeBSD RACCT.
