@@ -915,6 +915,8 @@ impl UniversalPackageAdapter {
         } else if f.ends_with(".pkg.tar.zst")
             || f.ends_with(".pkg.tar.xz")
             || f.ends_with(".pkg.tar.gz")
+            || f.contains("pacman")
+            || f.ends_with(".pacman")
         {
             Some(PackageFormat::Pacman)
         } else if f.ends_with(".apk") {
@@ -957,8 +959,6 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Pup)
         } else if f == "pet" || f.ends_with(".pet") {
             Some(PackageFormat::Pet)
-        } else if f.ends_with(".ebuild") {
-            Some(PackageFormat::Portage)
         } else if f.ends_with(".nixpkg") || f.ends_with(".nix") {
             Some(PackageFormat::Nix)
         } else if f.ends_with(".eopkg") {
