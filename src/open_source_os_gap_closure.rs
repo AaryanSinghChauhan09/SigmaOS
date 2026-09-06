@@ -2,7 +2,7 @@
 // SigmaOS Missing Open Source Operating Systems Gap Closure Subsystem
 // (`src/open_source_os_gap_closure.rs`)
 //
-// Sovereign, zero-dependency `#![no_std]` Rust implementations absorbing
+// Sovereign, zero-dependency `// #![no_std]` Rust implementations absorbing
 // key paradigms and distinctive ideas from classic & modern open-source operating systems:
 //   1. Plan 9 from Bell Labs / 9front -> 9P2000 RPC Protocol Engine & `rfork` Namespace Isolation
 //   2. Minix 3                       -> Reincarnation Server (RS) Driver Self-Healing Supervisor
