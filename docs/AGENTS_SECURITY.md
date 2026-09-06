@@ -19,7 +19,11 @@ AI security agents operating within SigmaOS perform the following automated func
    - Enforce FreeBSD Capsicum capability rights on open file descriptors (`FreeBsdCapsicumDescriptorDelegate`).
 
 3. **Memory Safety & Process Isolation:**
-   - Audit kernel memory allocation for hardened guard page isolation (`HardenedGuardPageAllocator`).
+   - Enforce guard page allocations (`alloc_with_guard_page`), stack clash protection (`has_guard_page`), and non-executable stack/heap (NX/DEP) policies.
+   - Refer to `AGENTS_BUFFER_OVERFLOW.md`, `AGENTS_BUFFER_OVERRUN.md`, `docs/AGENTS_BUFFER_OVERFLOW.md`, and `docs/AGENTS_BUFFER_OVERRUN.md` for AI agent memory safety protocols.
+   - Refer to `AGENTS_BITMAP_OPERATIONS.md` and `docs/AGENTS_BITMAP_OPERATIONS.md` for atomic bitmap resource tracking protocols.
+   - Refer to `AGENTS_BOOT_BLOCK.md` and `docs/AGENTS_BOOT_BLOCK.md` for measured bootloader management protocols.
+   - Refer to `AGENTS_CIRCULAR_BUFFER.md` and `docs/AGENTS_CIRCULAR_BUFFER.md` for lock-free ring buffer IPC synchronization protocols.
    - Enforce Seccomp system call filtering and `pinsyscall(2)` security rules (`OpenBsdPinSyscallEnforcer`).
    - Manage container isolation across FreeBSD Jails, OpenBSD Pledge/Unveil, and Illumos Zones.
 

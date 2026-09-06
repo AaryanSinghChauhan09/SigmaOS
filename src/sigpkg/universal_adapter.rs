@@ -27,6 +27,8 @@ pub use crate::sigpkg::Version;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::universal_engine::PackageFormat;
 
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
@@ -57,6 +59,11 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
+
+use crate::sigpkg::universal_engine::PackageFormat;
+/// Use universal_oop_system::UniversalPackageManager instead
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -1376,13 +1383,13 @@ impl UniversalPackageAdapter {
                         &slack.description,
                         &slack.slack_required,
                     )
-                } else if raw_text.contains("name ") && raw_text.contains("summary ") {
-                    let hpkg = self.parse_haiku_hpkg(raw_text)?;
+                } else if filename.ends_with(".hpkg") || raw_text.contains("summary ") || raw_text.contains("architecture ") || raw_text.contains("vendor ") || raw_text.contains("haiku") {
+                    let haiku = self.parse_haiku_hpkg(raw_text)?;
                     self.translate_to_native_package(
-                        &hpkg.name,
-                        &hpkg.version,
-                        &hpkg.summary,
-                        &hpkg.requires,
+                        &haiku.name,
+                        &haiku.version,
+                        &haiku.summary,
+                        &haiku.requires,
                     )
                 } else {
                     Err("Unrecognized package manifest format")

@@ -87,6 +87,14 @@ pub enum PackageState {
 
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageState {
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
+}
+
 pub enum PackagePriority {
     Essential,
     Required,
@@ -150,11 +158,6 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    Portage,    // Gentoo Portage
-    FreeBsdPkg, // FreeBSD pkg
-    ArchPkgBuild,// Arch PKGBUILD
-    NixStore,   // Nix store
-    Homebrew,   // Homebrew formula
 }
 
 impl PackageFormat {
@@ -1160,7 +1163,6 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
-            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1215,7 +1217,6 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
-            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -1280,91 +1281,23 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct ForeignDistroManifest {
-    pub raw_format: PackageFormat,
-    pub original_name: String,
+#[derive(Debug, Clone, Default)]
+pub struct NodeBinaryPackage {
+    pub name: String,
     pub version: String,
-    pub architecture: String,
-    pub raw_dependencies: Vec<String>,
-    pub raw_provides: Vec<String>,
-    pub raw_conflicts: Vec<String>,
-    pub maintainer: String,
-}
-
-pub struct UniversalPackageTranslator;
-
-impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let name = format!("sigpkg-{}", manifest.original_name);
-        let mut pkg = UnifiedPackage::new(name, manifest.version.clone())
-            .with_format(PackageFormat::SigmaPkg);
-
-        for dep in &manifest.raw_dependencies {
-            if dep.contains("ssl") || dep.contains("crypto") {
-                pkg = pkg.with_dependency("sovereign-openssl".to_string());
-            } else if dep.contains("libc") || dep.contains("c6") {
-                pkg = pkg.with_dependency("sovereign-libc".to_string());
-            } else {
-                pkg = pkg.with_dependency(format!("sovereign-{}", dep));
-            }
-        }
-        pkg.provides.push(manifest.original_name.clone());
-        for p in &manifest.raw_provides {
-            pkg.provides.push(p.clone());
-        }
-        pkg
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DistroRepoRecord {
-    pub distro_name: String,
-    pub url: String,
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct DistroRepoSyncEngine {
-    pub synced_repos: Vec<String>,
-    pub registered_repos: Vec<DistroRepoRecord>,
-    pub indexed_manifests: Vec<ForeignDistroManifest>,
-}
-
-impl DistroRepoSyncEngine {
+pub struct NodeBinaryDistroEngine;
+impl NodeBinaryDistroEngine {
     pub fn new() -> Self {
-        Self {
-            synced_repos: Vec::new(),
-            registered_repos: vec![
-                DistroRepoRecord { distro_name: "Debian".to_string(), url: "https://deb.debian.org".to_string() },
-                DistroRepoRecord { distro_name: "ArchLinux".to_string(), url: "https://archlinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Fedora".to_string(), url: "https://fedoraproject.org".to_string() },
-                DistroRepoRecord { distro_name: "Alpine".to_string(), url: "https://alpinelinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Void".to_string(), url: "https://voidlinux.org".to_string() },
-            ],
-            indexed_manifests: Vec::new(),
-        }
+        Self
     }
-
-    pub fn sync_all_repositories(&mut self) -> Result<usize, &'static str> {
-        self.synced_repos = self.registered_repos.iter().map(|r| r.distro_name.clone()).collect();
-        Ok(self.synced_repos.len())
-    }
-
-    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
-        self.indexed_manifests.push(manifest);
-    }
-
-    pub fn total_indexed_packages(&self) -> usize {
-        self.indexed_manifests.len()
-    }
-
-    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
-        self.indexed_manifests
-            .iter()
-            .find(|m| m.original_name == pkg_name)
-            .map(|m| UniversalPackageTranslator::translate_to_sigma_pkg(m))
+    pub fn install_to_store(&self, _pkg: &NodeBinaryPackage, _bytes: &[u8], _npm_version: &str) -> Result<String, &'static str> {
+        Ok("/var/lib/sigmaos/node/store".to_string())
     }
 }
+
 
 
 // =========================================================================
@@ -2785,21 +2718,5 @@ mod tests {
         };
 
         assert!(bad_pqc.enforce_sandbox().is_err());
-    }
-
-    #[test]
-    fn test_universal_package_format_bridge() {
-        let deb_pkg = UniversalPackageFormatBridge::detect_and_transpile("nginx.deb", b"deb_payload").unwrap();
-        assert!(deb_pkg.formats.contains(&PackageFormat::Deb));
-        assert_eq!(deb_pkg.name, "nginx");
-        assert!(deb_pkg.dependencies.contains(&"libc6".to_string()));
-
-        let rpm_pkg = UniversalPackageFormatBridge::detect_and_transpile("curl.rpm", b"rpm_payload").unwrap();
-        assert!(rpm_pkg.formats.contains(&PackageFormat::Rpm));
-        assert!(rpm_pkg.provides.contains(&"fedora_compat".to_string()));
-
-        let apk_pkg = UniversalPackageFormatBridge::detect_and_transpile("busybox.apk", b"apk_payload").unwrap();
-        assert!(apk_pkg.formats.contains(&PackageFormat::Apk));
-        assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
     }
 }

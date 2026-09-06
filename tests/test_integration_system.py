@@ -262,3 +262,5 @@ def test_sovereign_wiki_master_engine_integration():
         assert pkg_name.endswith(spec["pkg_ext"])
         assert spec["supervisor"] in ["Systemd", "OpenRC", "Runit", "Shepherd", "Dinit", "Sysvinit", "Rcd"]
         assert len(spec["vfs_etc"]) > 0
+
+
