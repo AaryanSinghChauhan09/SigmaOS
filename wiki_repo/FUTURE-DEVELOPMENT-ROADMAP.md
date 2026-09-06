@@ -1935,9 +1935,9 @@ To establish SigmaOS as the supreme, next-generation operating system that unifi
 
 By systematically identifying the critical flaws in proprietary kernels and legacy Linux distributions, SigmaOS synthesizes an ultimate, unified operating system architecture. It absorbs the legendary stability of Debian, the pure state-determinism of NixOS, the extreme minimalism of Arch, the security-hardened seccomp gates of OpenBSD, and the structured driver model of Windows, combining them under a single, bare-metal, high-performance platform. SigmaOS stands ready to unite developers, enterprise workstations, and mobile devices under the ultimate sovereign OS banner.
 
-*   \[x] **Phase 1 (Validation)**: Complete core traits and verification tests for standards, packages, and observability.
-*   \[x] **Phase 2 (Parity)**: Implement real-time scheduling preemption gates and FHS directory mounts.
-*   \[x] **Phase 3 (Leapfrog)**: Launch sandboxed user-defined dynamic tracing engines and fully automated, AI-driven performance optimization loops.
+*   \[ ] **Phase 1 (Validation)**: Complete core traits and verification tests for standards, packages, and observability.
+*   \[ ] **Phase 2 (Parity)**: Implement real-time scheduling preemption gates and FHS directory mounts.
+*   \[ ] **Phase 3 (Leapfrog)**: Launch sandboxed user-defined dynamic tracing engines and fully automated, AI-driven performance optimization loops.
 
 <!---->
 
@@ -4100,3 +4100,41 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 3. **Optimal Time Complexity & Cache Locality**:
    - Avoid O(N^2) search loops; utilize O(1) static hash maps and O(log N) B-trees.
    - Maintain cache-friendly contiguous vector and ring buffer layouts (`src/klib/ringbuf.rs`, `src/klib/ring_buffer.rs`) to minimize CPU cache miss rates.
+
+---
+
+## 80. SOVEREIGN AI AGENT KERNEL MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 80.1 Autonomous Agent Kernel Directives
+
+1. **Syscall Dispatch & Audit Protocol**:
+   - System calls (`src/syscall/dispatcher.rs`, `src/syscall/table.rs`) must be logged to `SovereignSyscallAuditLogger` and filtered via `LinuxSeccompBpfSyscallFilter` or `OpenBsdUnveilPathSandbox`.
+
+2. **Real-Time Scheduler Deadlines & CPU Affinity**:
+   - Virtual runtime calculations in `src/scheduler/scheduler.rs` (EEVDF / BORE) must preserve process CPU core cache affinity and prevent thread starvation under heavy concurrency.
+
+3. **Multi-Arch HAL IRQ Routing & Fault Handlers**:
+   - Interrupt controllers (x2APIC/8259 PIC, GICv3/v2, PLIC/CLINT, ExtIOI, XIVE) in `src/hal/multi_arch.rs` and `src/kernel/hal.rs` must prevent handler registration collisions.
+   - MMIO page fault handlers must check faulting addresses for NULL pointer violations (`0`).
+
+4. **Zero Ring 0 Panics Rule**:
+   - Kernel functions must return explicit `Result<T, &'static str>` status values instead of triggering unhandled kernel panics.
+
+---
+
+## 81. SOVEREIGN AI AGENT FILESYSTEM MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 81.1 Autonomous Agent Filesystem Governance Rules
+
+1. **Virtual File System (VFS) & Mount Namespace Isolation**:
+   - Process file access must be scoped within container mount namespaces (`src/filesystem/mount_namespace.rs`) and VFS inode caches (`docs/filesystem.md`).
+
+2. **Copy-On-Write (CoW) Snapshots & Journaling Invariants**:
+   - Subvolume updates must preserve CoW extent tree integrity (`src/filesystem/cow_snapshot.rs`, `src/filesystem/btrfs_inspired.rs`) and commit metadata writes to JBD2 journals (`src/filesystem/ext4.rs`).
+   - Block deduplication in multi-volume pools must verify CAS payload hashes.
+
+3. **OpenBSD Unveil Path Sandbox Enforcers**:
+   - File access permissions (`r`, `w`, `c`, `x`) must pass OpenBSD `unveil(2)` path sandbox validation (`src/security/sigma_unveil.rs`).
+
+4. **Atomic Write Guarantee**:
+   - AI agents updating system configuration or storage state must write to temporary buffers before executing atomic rename commits.
