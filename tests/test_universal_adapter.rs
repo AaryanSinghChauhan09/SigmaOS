@@ -206,3 +206,44 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
     assert_eq!(apk_cmd.operation, UniversalPmOperation::Install);
     assert_eq!(apk_cmd.target_packages, vec!["bash"]);
 }
+
+#[test]
+fn test_all_prompt_package_formats() {
+    use universal_adapter::UniversalPackageAdapter;
+    use universal_adapter::universal_oop_system::PackageFormat;
+
+    let adapter = UniversalPackageAdapter::new();
+
+    // Verify detection for all 29 Linux & BSD distro formats specified in prompt
+    assert_eq!(adapter.detect_format_by_extension("app.air"), Some(PackageFormat::Air));
+    assert_eq!(adapter.detect_format_by_extension("pkg.bottle"), Some(PackageFormat::Bottle));
+    assert_eq!(adapter.detect_format_by_extension("app.ipa"), Some(PackageFormat::Ipa));
+    assert_eq!(adapter.detect_format_by_extension("bsd.ports"), Some(PackageFormat::Ports));
+    assert_eq!(adapter.detect_format_by_extension("mac.pkg"), Some(PackageFormat::Pkg));
+    assert_eq!(adapter.detect_format_by_extension("app.aab"), Some(PackageFormat::Aab));
+    assert_eq!(adapter.detect_format_by_extension("app.apk"), Some(PackageFormat::Apk));
+    assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
+    assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
+    assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
+    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
+    assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
+    assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
+    assert_eq!(adapter.detect_format_by_extension("compressed.xz"), Some(PackageFormat::TarXz));
+    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Yum));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
+    assert_eq!(adapter.detect_format_by_extension("app.flatpak"), Some(PackageFormat::Flatpak));
+    assert_eq!(adapter.detect_format_by_extension("macos.app"), Some(PackageFormat::AppBundle));
+    assert_eq!(adapter.detect_format_by_extension("harmony.hap"), Some(PackageFormat::Hap));
+    assert_eq!(adapter.detect_format_by_extension("pardus.PiSi"), Some(PackageFormat::Pisi));
+    assert_eq!(adapter.detect_format_by_extension("archive.tgz"), Some(PackageFormat::TarGz));
+    assert_eq!(adapter.detect_format_by_extension("deepin.superdeb"), Some(PackageFormat::Superdeb));
+    assert_eq!(adapter.detect_format_by_extension("slax.lzm"), Some(PackageFormat::Lzm));
+    assert_eq!(adapter.detect_format_by_extension("puppy.pup"), Some(PackageFormat::Pup));
+    assert_eq!(adapter.detect_format_by_extension("canonical.snap"), Some(PackageFormat::Snap));
+    assert_eq!(adapter.detect_format_by_extension("pacman.pkg.tar.zst"), Some(PackageFormat::Pacman));
+    assert_eq!(adapter.detect_format_by_extension("plain.tar"), Some(PackageFormat::Tar));
+    assert_eq!(adapter.detect_format_by_extension("puppy.pet"), Some(PackageFormat::Pet));
+>>>>>>> 65768c93a851a9618cca6aec019dd2808d10e604
+}
