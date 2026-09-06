@@ -872,95 +872,6 @@ impl SovereignZonesManager {
     }
 }
 
-// ================= Sovereign Linux Cgroup v2 Governor =================
-
-#[derive(Debug, Clone, Copy, Default)]
-pub struct CgroupResourceLimits {
-    pub cpu_quota_us: u64,
-    pub cpu_period_us: u64,
-    pub memory_max_bytes: u64,
-    pub memory_high_bytes: u64,
-    pub memory_swap_max_bytes: u64,
-    pub io_weight: u32,
-}
-
-pub struct CgroupGroup {
-    pub path: String,
-    pub limits: CgroupResourceLimits,
-    pub pids: Vec<u32>,
-    pub used_cpu_us: u64,
-    pub allocated_memory_bytes: u64,
-}
-
-pub struct SovereignCgroupGovernor {
-    pub groups: HashMap<String, CgroupGroup>,
-}
-
-impl Default for SovereignCgroupGovernor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl SovereignCgroupGovernor {
-    pub fn new() -> Self {
-        Self {
-            groups: HashMap::new(),
-        }
-    }
-
-    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
-        if self.groups.contains_key(path) {
-            return Err("Group already exists");
-        }
-        self.groups.insert(
-            path.to_string(),
-            CgroupGroup {
-                path: path.to_string(),
-                limits: CgroupResourceLimits::default(),
-                pids: Vec::new(),
-                used_cpu_us: 0,
-                allocated_memory_bytes: 0,
-            },
-        );
-        Ok(())
-    }
-
-    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
-        let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        group.limits = limits;
-        Ok(())
-    }
-
-    pub fn attach_pid(&mut self, path: &str, pid: u32) -> Result<(), &'static str> {
-        let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        group.pids.push(pid);
-        Ok(())
-    }
-
-    pub fn check_cpu_budget(&mut self, path: &str, usage_us: u64) -> Result<bool, &'static str> {
-        let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        if group.used_cpu_us + usage_us <= group.limits.cpu_quota_us {
-            group.used_cpu_us += usage_us;
-            Ok(true)
-        } else {
-            Ok(false)
-        }
-    }
-
-    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
-        let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        if group.allocated_memory_bytes + bytes <= group.limits.memory_max_bytes {
-            group.allocated_memory_bytes += bytes;
-            Ok(())
-        } else {
-            Err("Memory quota exceeded")
-        }
-    }
-}
-
-// ================= Windows KMDF Driver Framework Parity =================
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KmdfPnpState {
     PnpActive,
@@ -1927,112 +1838,6 @@ impl CapabilityDerivationTree {
     }
 }
 
-/// Linux cgroups v2 resource governor
-pub struct SovereignCgroupGovernor {
-    pub groups: HashMap<String, CgroupResourceLimits>,
-    pub pids: HashMap<String, Vec<u64>>,
-    pub cpu_usage: HashMap<String, u64>,
-    pub mem_usage: HashMap<String, u64>,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct CgroupResourceLimits {
-    pub cpu_quota_us: u64,
-    pub cpu_period_us: u64,
-    pub memory_max_bytes: u64,
-    pub memory_high_bytes: u64,
-    pub memory_swap_max_bytes: u64,
-    pub io_weight: u32,
-}
-
-impl Default for CgroupResourceLimits {
-    fn default() -> Self {
-        Self {
-            cpu_quota_us: 100_000,
-            cpu_period_us: 100_000,
-            memory_max_bytes: u64::MAX,
-            memory_high_bytes: u64::MAX,
-            memory_swap_max_bytes: 0,
-            io_weight: 100,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CgroupGroup {
-    pub path: String,
-    pub limits: CgroupResourceLimits,
-    pub pids: Vec<u64>,
-    pub current_cpu_usage_us: u64,
-    pub current_memory_bytes: u64,
-}
-
-pub struct SovereignCgroupGovernor {
-    pub groups: HashMap<String, CgroupGroup>,
-}
-
-impl SovereignCgroupGovernor {
-    pub fn new() -> Self {
-        Self {
-            cgroups: HashMap::new(),
-        }
-    }
-
-    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
-        if self.cgroups.contains_key(path) {
-            return Err("cgroup path already exists");
-        }
-        self.cgroups.insert(path.to_string(), SovereignCgroupEntry {
-            path: path.to_string(),
-            limits: CgroupResourceLimits {
-                cpu_quota_us: 100_000,
-                cpu_period_us: 100_000,
-                memory_max_bytes: 1024 * 1024 * 1024,
-                memory_high_bytes: 512 * 1024 * 1024,
-                memory_swap_max_bytes: 0,
-                io_weight: 100,
-            },
-            attached_pids: Vec::new(),
-            current_memory_used: 0,
-            cpu_time_used_us: 0,
-        });
-        Ok(())
-    }
-
-    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
-        let entry = self.cgroups.get_mut(path).ok_or("cgroup path not found")?;
-        entry.limits = limits;
-        Ok(())
-    }
-
-    pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
-        let entry = self.cgroups.get_mut(path).ok_or("cgroup path not found")?;
-        if !entry.attached_pids.contains(&pid) {
-            entry.attached_pids.push(pid);
-        }
-        Ok(())
-    }
-
-    pub fn check_cpu_budget(&mut self, path: &str, time_requested_us: u64) -> Result<bool, &'static str> {
-        let entry = self.cgroups.get_mut(path).ok_or("cgroup path not found")?;
-        if entry.cpu_time_used_us + time_requested_us > entry.limits.cpu_quota_us {
-            Ok(false) // Quota exceeded
-        } else {
-            entry.cpu_time_used_us += time_requested_us;
-            Ok(true)
-        }
-    }
-
-    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
-        let entry = self.cgroups.get_mut(path).ok_or("cgroup path not found")?;
-        if entry.current_memory_used + bytes > entry.limits.memory_max_bytes {
-            Err("cgroup OOM: memory_max_bytes limit exceeded")
-        } else {
-            entry.current_memory_used += bytes;
-            Ok(())
-        }
-    }
-}
 
 // ================= Linux XDP & FreeBSD Netmap High-Performance Fast Packet Engine =================
 
@@ -2436,7 +2241,152 @@ impl MemoryCompactionSuperpagesAllocator {
     }
 }
 
-#[cfg(test)]
+/// FreeBSD inspired Jails (capability-based isolation)
+pub struct FreeBsdJail {
+    pub id: u32,
+    pub parent_id: Option<u32>,
+    pub isolated: bool,
+}
+
+impl FreeBsdJail {
+    pub fn create(id: u32) -> Self {
+        Self {
+            id,
+            parent_id: None,
+            isolated: true,
+        }
+    }
+
+    pub fn create_nested(id: u32, parent_id: u32) -> Self {
+        Self {
+            id,
+            parent_id: Some(parent_id),
+            isolated: true,
+        }
+    }
+
+    pub fn is_isolated(&self) -> bool {
+        self.isolated
+    }
+
+    /// Recursively check if this jail is a descendant of the target parent jail ID
+    pub fn is_descendant_of(&self, target_parent_id: u32) -> bool {
+        if let Some(pid) = self.parent_id {
+            if pid == target_parent_id {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+/// NixOS inspired Declarative package management
+pub struct NixOsDeclarativeManager {
+    pub configuration: Vec<String>,
+    pub previous_generations: Vec<Vec<String>>,
+}
+
+impl NixOsDeclarativeManager {
+    pub fn new() -> Self {
+        Self {
+            configuration: Vec::new(),
+            previous_generations: Vec::new(),
+        }
+    }
+
+    pub fn apply_configuration(&mut self, config: &[&str]) -> Result<(), &'static str> {
+        // Save previous generation before applying new one
+        if !self.configuration.is_empty() {
+            self.previous_generations.push(self.configuration.clone());
+        }
+        self.configuration.clear();
+        for c in config {
+            self.configuration.push(c.to_string());
+        }
+        Ok(())
+    }
+
+    /// Rollbacks to the previous configuration generation atomically
+    pub fn rollback(&mut self) -> Result<(), &'static str> {
+        if let Some(prev) = self.previous_generations.pop() {
+            self.configuration = prev;
+            Ok(())
+        } else {
+            Err("No previous generations available for rollback")
+        }
+    }
+}
+
+/// Gentoo inspired USE flags / compile-time feature selection
+pub struct GentooUseFlags {
+    pub flags: HashMap<String, bool>,
+    pub dependencies: HashMap<String, String>, // (flag -> required companion flag)
+}
+
+impl GentooUseFlags {
+    pub fn new() -> Self {
+        Self {
+            flags: HashMap::new(),
+            dependencies: HashMap::new(),
+        }
+    }
+
+    pub fn set_flag(&mut self, flag: &str, enabled: bool) {
+        self.flags.insert(flag.to_string(), enabled);
+    }
+
+    pub fn add_dependency(&mut self, flag: &str, required_companion: &str) {
+        self.dependencies
+            .insert(flag.to_string(), required_companion.to_string());
+    }
+
+    pub fn has_feature(&self, flag: &str) -> bool {
+        if let Some(&val) = self.flags.get(flag) {
+            val
+        } else {
+            false
+        }
+    }
+
+    /// Check if all active USE-flags have their required companion dependencies enabled
+    pub fn check_dependencies(&self) -> bool {
+        for (flag, required) in &self.dependencies {
+            if self.has_feature(flag) && !self.has_feature(required) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+/// Void Linux inspired runit init system inspiration
+pub struct VoidRunitInit {
+    services: Vec<String>,
+}
+
+impl VoidRunitInit {
+    pub fn new() -> Self {
+        Self {
+            services: Vec::new(),
+        }
+    }
+
+    pub fn start_service(&mut self, service: &str) {
+        self.services.push(service.to_string());
+    }
+
+    pub fn is_running(&self, service: &str) -> bool {
+        for s in &self.services {
+            let s: &String = s;
+            if s.as_str() == service {
+                return true;
+            }
+        }
+        false
+
+
+    }
+}
 
 mod tests {
     use super::*;
@@ -3044,126 +2994,6 @@ mod tests {
         );
     }
 
-#[derive(Debug, Clone)]
-pub struct CgroupResourceLimits {
-    pub cpu_quota_us: u64,
-    pub cpu_period_us: u64,
-    pub memory_max_bytes: u64,
-    pub memory_high_bytes: u64,
-    pub memory_swap_max_bytes: u64,
-    pub io_weight: u32,
-}
-
-#[derive(Debug, Clone)]
-pub struct SovereignCgroupGroup {
-    pub name: String,
-    pub limits: Option<CgroupResourceLimits>,
-    pub pids: Vec<u64>,
-    pub cpu_used_us: u64,
-    pub memory_allocated: u64,
-}
-
-pub struct SovereignCgroupGovernor {
-    pub groups: HashMap<String, SovereignCgroupGroup>,
-}
-
-impl SovereignCgroupGovernor {
-    pub fn new() -> Self {
-        Self {
-            groups: HashMap::new(),
-        }
-    }
-
-    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
-        self.groups.insert(path.to_string(), SovereignCgroupGroup {
-            name: path.to_string(),
-            limits: None,
-            pids: Vec::new(),
-            cpu_used_us: 0,
-            memory_allocated: 0,
-        });
-        Ok(())
-    }
-
-    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
-        let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-        grp.limits = Some(limits);
-        Ok(())
-    }
-
-    pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
-        let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-        grp.pids.push(pid);
-        Ok(())
-    }
-
-    pub fn check_cpu_budget(&mut self, path: &str, used_us: u64) -> Result<bool, &'static str> {
-        let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-        let quota = grp.limits.as_ref().map(|l| l.cpu_quota_us).unwrap_or(u64::MAX);
-        if grp.cpu_used_us + used_us > quota {
-            Ok(false)
-        } else {
-            grp.cpu_used_us += used_us;
-            Ok(true)
-        }
-    }
-
-    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
-        let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-        let max_mem = grp.limits.as_ref().map(|l| l.memory_max_bytes).unwrap_or(u64::MAX);
-        if grp.memory_allocated + bytes > max_mem {
-            Err("Memory limit exceeded")
-        } else {
-            grp.memory_allocated += bytes;
-            Ok(())
-        }
-    }
-}
-
-    #[test]
-    fn test_sovereign_cgroup_governor() {
-        let mut gov = SovereignCgroupGovernor::new();
-        gov.create_group("/sys/fs/cgroup/db").unwrap();
-
-        let limits = CgroupResourceLimits {
-            cpu_quota_us: 50_000,
-            cpu_period_us: 100_000,
-            memory_max_bytes: 1024 * 1024,
-            memory_high_bytes: 512 * 1024,
-            memory_swap_max_bytes: 0,
-            io_weight: 500,
-        };
-        gov.configure_limits("/sys/fs/cgroup/db", limits).unwrap();
-        gov.attach_pid("/sys/fs/cgroup/db", 1001).unwrap();
-
-        assert!(gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap());
-        assert!(!gov.check_cpu_budget("/sys/fs/cgroup/db", 30_000).unwrap());
-
-        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 500_000).is_ok());
-        assert!(gov.allocate_memory("/sys/fs/cgroup/db", 600_000).is_err());
-    }
-
-    #[test]
-    fn test_sovereign_zones_manager() {
-
-        let mut manager = SovereignZonesManager::new();
-        manager.create_zone("db_zone", 50, 1024 * 1024).unwrap();
-        manager.create_zone("web_zone", 150, 2048 * 1024).unwrap();
-
-        assert!(manager.create_zone("db_zone", 10, 123).is_err());
-
-        // CPU Shares percentages
-        let db_percentage = manager.calculate_cpu_percentage("db_zone").unwrap();
-        assert!((db_percentage - 25.0).abs() < 1e-5); // 50 / 200 = 25%
-
-        let web_percentage = manager.calculate_cpu_percentage("web_zone").unwrap();
-        assert!((web_percentage - 75.0).abs() < 1e-5); // 150 / 200 = 75%
-
-        // VNIC setup
-        manager.configure_vnic("db_zone", "10.0.0.5").unwrap();
-        assert_eq!(manager.zones.get("db_zone").unwrap().vnic_ips[0], "10.0.0.5");
-    }
-
     #[test]
     fn test_bsd_pf_state_table() {
         let mut pf = BsdPfStateTable::new(60);
@@ -3319,150 +3149,5 @@ impl SovereignCgroupGovernor {
         assert_eq!(pfn, 0);
         assert!(alloc.frames[0].is_compound_2mb);
         assert!(!alloc.frames[0].is_free);
-    }
-}
-
-/// FreeBSD inspired Jails (capability-based isolation)
-pub struct FreeBsdJail {
-    pub id: u32,
-    pub parent_id: Option<u32>,
-    pub isolated: bool,
-}
-
-impl FreeBsdJail {
-    pub fn create(id: u32) -> Self {
-        Self {
-            id,
-            parent_id: None,
-            isolated: true,
-        }
-    }
-
-    pub fn create_nested(id: u32, parent_id: u32) -> Self {
-        Self {
-            id,
-            parent_id: Some(parent_id),
-            isolated: true,
-        }
-    }
-
-    pub fn is_isolated(&self) -> bool {
-        self.isolated
-    }
-
-    /// Recursively check if this jail is a descendant of the target parent jail ID
-    pub fn is_descendant_of(&self, target_parent_id: u32) -> bool {
-        if let Some(pid) = self.parent_id {
-            if pid == target_parent_id {
-                return true;
-            }
-        }
-        false
-    }
-}
-
-/// NixOS inspired Declarative package management
-pub struct NixOsDeclarativeManager {
-    pub configuration: Vec<String>,
-    pub previous_generations: Vec<Vec<String>>,
-}
-
-impl NixOsDeclarativeManager {
-    pub fn new() -> Self {
-        Self {
-            configuration: Vec::new(),
-            previous_generations: Vec::new(),
-        }
-    }
-
-    pub fn apply_configuration(&mut self, config: &[&str]) -> Result<(), &'static str> {
-        // Save previous generation before applying new one
-        if !self.configuration.is_empty() {
-            self.previous_generations.push(self.configuration.clone());
-        }
-        self.configuration.clear();
-        for c in config {
-            self.configuration.push(c.to_string());
-        }
-        Ok(())
-    }
-
-    /// Rollbacks to the previous configuration generation atomically
-    pub fn rollback(&mut self) -> Result<(), &'static str> {
-        if let Some(prev) = self.previous_generations.pop() {
-            self.configuration = prev;
-            Ok(())
-        } else {
-            Err("No previous generations available for rollback")
-        }
-    }
-}
-
-/// Gentoo inspired USE flags / compile-time feature selection
-pub struct GentooUseFlags {
-    pub flags: HashMap<String, bool>,
-    pub dependencies: HashMap<String, String>, // (flag -> required companion flag)
-}
-
-impl GentooUseFlags {
-    pub fn new() -> Self {
-        Self {
-            flags: HashMap::new(),
-            dependencies: HashMap::new(),
-        }
-    }
-
-    pub fn set_flag(&mut self, flag: &str, enabled: bool) {
-        self.flags.insert(flag.to_string(), enabled);
-    }
-
-    pub fn add_dependency(&mut self, flag: &str, required_companion: &str) {
-        self.dependencies
-            .insert(flag.to_string(), required_companion.to_string());
-    }
-
-    pub fn has_feature(&self, flag: &str) -> bool {
-        if let Some(&val) = self.flags.get(flag) {
-            val
-        } else {
-            false
-        }
-    }
-
-    /// Check if all active USE-flags have their required companion dependencies enabled
-    pub fn check_dependencies(&self) -> bool {
-        for (flag, required) in &self.dependencies {
-            if self.has_feature(flag) && !self.has_feature(required) {
-                return false;
-            }
-        }
-        true
-    }
-}
-
-/// Void Linux inspired runit init system inspiration
-pub struct VoidRunitInit {
-    services: Vec<String>,
-}
-
-impl VoidRunitInit {
-    pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-        }
-    }
-
-    pub fn start_service(&mut self, service: &str) {
-        self.services.push(service.to_string());
-    }
-
-    pub fn is_running(&self, service: &str) -> bool {
-        for s in &self.services {
-            let s: &String = s;
-            if s.as_str() == service {
-                return true;
-            }
-        }
-        false
     }
 }
