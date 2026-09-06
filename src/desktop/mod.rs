@@ -24,6 +24,8 @@ pub use web_wasm_bridge::*;
 
 pub use web_wasm_bridge::*;
 
+pub use web_wasm_bridge::*;
+
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
     MateBetsyDesktopEnvironment, PlumaTextEditor,

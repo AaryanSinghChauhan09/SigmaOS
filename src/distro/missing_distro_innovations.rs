@@ -1760,19 +1760,11 @@ pub enum UbuntuAppArmorMode {
     Disabled,
 }
 
-#[derive(Debug, Clone)]
-pub struct UbuntuAppArmorProfile {
-    pub profile_name: String,
-    pub mode: UbuntuAppArmorMode,
-    pub allowed_read_paths: Vec<String>,
-    pub allowed_write_paths: Vec<String>,
-    pub allowed_exec_paths: Vec<String>,
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct UbuntuAppArmorEngine {
-    pub profiles: BTreeMap<String, UbuntuAppArmorProfile>,
+    pub profiles: BTreeMap<String, AppArmorProfile>,
 }
+
 impl UbuntuAppArmorEngine {
     pub fn new() -> Self {
         Self::default()
@@ -2109,5 +2101,4 @@ mod tests {
         assert!(la64.execute_instruction(0x02800000));
         assert_eq!(la64.executed_instructions, 1);
     }
-
 }

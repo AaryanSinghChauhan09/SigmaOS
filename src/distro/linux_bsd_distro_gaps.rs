@@ -664,7 +664,7 @@ impl SovereignDynamicDevfsEngine {
     }
 
     pub fn lookup_node(&self, path: &str) -> Option<&DeviceNodeEntry> {
-        self.devices
+        self.nodes
             .iter()
             .find(|n| n.name == path || n.symlink_paths.iter().any(|s| *s == path))
     }
@@ -720,7 +720,7 @@ impl SovereignStatefulNatEngine {
         dst_port: u16,
         _protocol: u8,
     ) -> ([u8; 4], u16) {
-
+        let _ = protocol;
         // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
             c.original_src == internal_src

@@ -193,7 +193,7 @@ pub fn pci_read_u8(addr: PciAddress, offset: u8) -> u8 {
         let _port_addr = 0x0CF8u16;
         // SAFETY: Writing to PCI config ports is platform standard
         // core::arch::x86_64::_outl( // stub:port_addr, config_address);
-        let _data_port = 0x0CFCu16;
+        let data_port = 0x0CFCu16;
         let value = 0u32; // core::arch::x86_64::_inl( stub:data_port);
         ((value >> ((offset & 3) * 8)) & 0xff) as u8
     }
@@ -205,7 +205,7 @@ pub fn pci_read_u16(addr: PciAddress, offset: u8) -> u16 {
     unsafe {
         let _port_addr = 0x0CF8u16;
         // core::arch::x86_64::_outl( // stub:port_addr, config_address);
-        let _data_port = 0x0CFCu16;
+        let data_port = 0x0CFCu16;
         let value = 0u32; // core::arch::x86_64::_inl( stub:data_port);
         ((value >> ((offset & 2) * 8)) & 0xffff) as u16
     }

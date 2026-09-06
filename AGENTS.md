@@ -1,128 +1,116 @@
-# AGENTS.md - AI Agent Operational & File Management Guidelines for SigmaOS
+# AI Agent Directives & Memory Management Guide for SigmaOS
 
-Welcome, AI Agent! This document outlines operational procedures, architectural conventions, and strict file management guidelines when working on the **SigmaOS** codebase.
-
----
-
-## 1. Core Directives & Architecture Principles
-
-1. **Zero External Dependencies (`#![no_std]`)**:
-   - SigmaOS operates on a strict sovereign zero-dependency philosophy.
-   - Do **not** add external third-party crates under `[dependencies]` in `Cargo.toml`.
-   - Use `alloc::` primitives (`alloc::string::String`, `alloc::vec::Vec`, `alloc::boxed::Box`, `alloc::format!`) for heap allocations in kernel/distro space.
-
-2. **Multi-Architecture Support**:
-   - Maintain multi-arch abstractions across supported architectures: `x86_32`, `x86_64`, `aarch64`, `riscv64`, `loongarch64`, `powerpc64`, and `s390x`.
-   - Architectural register contexts and trap handlers live in `src/arch/portability.rs`.
-
-3. **Subsystem Interoperability**:
-   - Core subsystem bridges (VFS, Init, Package Management, Security, Kernel, Memory) route through `src/distro/linux_bsd_inspirations.rs` (`SovereignUniversalDistroBridge`).
+Welcome, AI Engineer / Agent! This document specifies core operational guidelines and memory management procedures for working with the SigmaOS codebase.
 
 ---
 
-## 2. File Management & Organization Guidelines
+## 🧠 Memory Management Principles in SigmaOS
 
-### 2.1 Code Base Layout
-- **Kernel Core**: `src/kernel/`, `src/klib/`, `src/memory/`, `src/arch/`
-- **Distro Innovations & Parity**: `src/distro/`
-  - `src/distro/linux_bsd_inspirations.rs` - Cross-subsystem distro bridge, Landlock v5, eBPF XDP zero-copy, OpenBSD pledge/unveil, FreeBSD jails, and Illumos zones.
-  - `src/distro/sovereign_nextgen_distro_leap.rs` - `sched_ext` BPF scheduling, CAS store, HAMMER2 CoW deduplication.
-- **Package Management Subsystem**: `src/package/`, `src/sigpkg/`
-  - `src/sigpkg/universal_adapter.rs` - Universal package format adapter router (.deb, .rpm, PKGBUILD, ebuild, apk, snap, flatpak, hpkg).
-  - `src/sigpkg/universal_oop_system.rs` - Strategy, Adapter, Factory, Decorator, and Observer pattern implementations for package management.
-- **Compatibility & Standards**: `src/compatibility/`
-- **Drivers & Hardware**: `src/drivers/`
-- **Documentation**: `docs/` and `wiki/`
+1. **Zero-Allocation Primitives (`klib`)**
+   - Core kernel and low-level subsystem primitives (`src/klib/`) operate in `#![no_std]` environment.
+   - Prefer stack-based formatting (`format_u64_stack` in `src/klib/conversion.rs`) and FNV-1a zero-allocation hashing (`fnv1a_hash_64`) over dynamic heap allocations.
 
-### 2.2 Rules for Modifying Existing Files
-1. **Targeted Editing**:
-   - Always trace imports and conditional compilation gates (`#[cfg(test)]`, `#[cfg(feature = "standalone_test")]`) before editing source files.
-   - Avoid modifying generated build artifacts under `build/` or `target/`.
-2. **Atomic & Reversible File Operations**:
-   - Use Copy-on-Write (CoW) transaction semantics when updating critical configuration or state files.
-   - Perform verification with read-only tools immediately after any file creation, modification, or deletion.
+2. **Single-Buffer In-Place Formatting**
+   - When serializing structured data (e.g. JSON in `src/klib/json.rs`), use `append_json_string` or single-buffer mutators rather than returning newly allocated `String` objects per field/key.
 
-### 2.3 Rules for Adding New Files
-1. Place new module source files under the appropriate domain directory (`src/distro/`, `src/package/`, `src/drivers/`, etc.).
-2. Re-export new modules in `mod.rs` and `src/lib.rs` as required.
-3. Add standalone unit test blocks or test binaries in `tests/` or via inline `#[cfg(test)]` / `#[cfg(feature = "standalone_test")]` blocks.
+3. **Safe Memory Allocation Layering**
+   - Userland components (`src/desktop/`, `src/sigpkg/`) use standard `alloc::vec::Vec` and `alloc::boxed::Box`.
+   - Kernel memory management (`src/memory/`) usesBuddy Allocator (`sigma_buddy.rs`), Slab Cache (`slab.rs`), and Physical Memory Manager (`pmm_vmm.rs`). Never create custom unsafe `Vec<T>` structs.
+
+4. **Virtual Memory Paging Indexing**
+   - In 4-level paging (`SimpleVMM` in `src/klib/paging.rs`), maintain unique table indexing:
+     - `pd_table_idx = pml4_idx * 512 + pdpt_idx`
+     - `pt_table_idx = (pml4_idx * 512 + pdpt_idx) * 512 + pd_idx`
 
 ---
 
-## 3. Testing Protocols & Verification
+## 🎨 UI Management & Accessibility Principles
 
-All changes must be validated against the native SigmaOS test suite:
+1. **Native WASM / Rust UI Engine First**
+   - Implement UI event handlers, keyboard focus, and ARIA attributes in native Rust/WASM (`NativeWasmDesktopEngine` in `src/desktop/web_wasm_bridge.rs` & `zenith_desktop/src/lib.rs`). Reduce or eliminate JavaScript runtime dependencies.
 
-```bash
-# Run full test suite (atomic unit tests, subsystem inspection, Python pytest suite)
-./run_sigma_tests.sh
+2. **Accessibility Standards (Palette Persona)**
+   - Icon-only buttons **must** include an `aria-label`.
+   - Support keyboard navigation (`Enter` and `Space` key activation) and focus states (`:focus-visible` / `.keyboard-focus`).
+   - Use `set_secure_text_content` (`textContent`) to prevent innerHTML XSS vulnerabilities when rendering dynamic titles or strings.
 
-# Run standalone module tests
-rustc --edition=2021 --test --cfg 'feature="standalone_test"' src/distro/linux_bsd_inspirations.rs -o build/test_inspirations && ./build/test_inspirations
-
-# 🤖 SigmaOS AI Agent Governance Specification (`AGENTS.md`)
-
-**Version:** 1.3.0
-**Scope:** Autonomous AI Agents (Bolt ⚡, Palette 🎨, Sentinel 🛡️), Process, Memory, Loader, & Desktop Management
+3. **CSS Design Tokens**
+   - Leverage theme custom properties defined in `zenith_desktop.css` (`--accent-gold`, `--accent-blue`, `--accent-cyan`).
 
 ---
 
-## EXECUTIVE SUMMARY & AGENT ARCHITECTURE
+## 🌐 Network Management & Security Validation Principles
 
-SigmaOS features an AI-native architecture where autonomous agent processes govern kernel scheduling, memory pools, dynamic module loading, and desktop environments.
+1. **IPv4 & IPv6 Address Parsing Security (`src/security/input_validation.rs`)**
+   - In `validate_ipv4`: Reject leading zeros in multi-digit octets (e.g. `010.0.0.1`) to prevent octal parser differential SSRF vulnerabilities.
+   - In `validate_ipv6`: Track explicit block count alongside `double_colon` compressed blocks. Reject addresses with 8 or more explicit blocks (`blocks >= 8`) when compressed notation is used.
 
-```
-                  +-----------------------------------+
-                  |   SIGMAOS AI AGENT GOVERNANCE     |
-                  +-----------------------------------+
-                                    |
-         +--------------------------+--------------------------+
-         |                          |                          |
-         v                          v                          v
-  ⚡ BOLT PROCESS            🎨 PALETTE PROCESS         🛡️ SENTINEL PROCESS
-  • Render Frame Profiling   • Theme & Layout Engine     • Desktop App Sandbox Audit
-  • Compositor Optimization  • WCAG 2.1 AA Focus Outlines • Web2App IPC Channel Check
-  • Sub-µs Memory Access     • Semantic ARIA Tags        • Post-Quantum Verification
-```
+2. **Cross-Platform Firewall Translation (`src/network/`)**
+   - Provide interoperable rule translation across OpenBSD `pf` (`pf_firewall.rs`), Linux `nftables` (`nftables.rs`), and NetBSD `npf` (`npf_firewall.rs`).
+   - Enforce FreeBSD VNET per-jail network stack isolation (`distro_net.rs`).
 
 ---
 
-## 4. Pull Request & Commit Guidelines
-- Repository git branches must follow the naming convention starting with `jules-`.
-- Maintain descriptive commit messages following standard git conventions.
+## 🔄 System State Management Principles
 
-## 1. AGENT PERSONAS & GOVERNANCE
+1. **Declarative State Graph (`src/system/state.rs`)**
+   - Use NixOS-inspired `DeclarativeStateGraph` to manage system configuration nodes (`StateNode`).
+   - Call `validate()` before committing state transitions to verify dependency IDs exist.
 
-### ⚡ Bolt (Performance Agent)
-- **Scope**: CPU scheduling, `cgroups v2`, boot speed profiling (`src/tools/bootloader.rs`), Zenith compositor render frame-rate profiling (`zenith_desktop/`), zero-allocation hot paths.
-- **Rules**:
-  - Maintain 60+ FPS compositor rendering and eliminate window layout recalculation bottlenecks.
-  - Record learnings in `.jules/bolt.md`.
+2. **Atomic Generation Rollback**
+   - Trigger `create_generation` before performing major configuration updates, enabling instant atomic rollback (`rollback()`) on failure.
 
-### 🎨 Palette (UX & Accessibility Agent)
-- **Scope**: Desktop compositor layout, Control Center themes (`TokyoNight`, `Catppuccin`, `Nord`), boot splash graphics, WCAG 2.1 AA focus visible outlines, ARIA annotations.
-- **Rules**:
-  - Enforce WCAG 2.1 AA compliance across all desktop controls and web console interfaces.
-  - Record learnings in `.jules/palette.md`.
-
-### 🛡️ Sentinel (Security & Integrity Agent)
-- **Scope**: LSM auditing, OpenBSD `pledge`/`unveil`, Post-Quantum Dilithium-5 module signatures, desktop process sandbox isolation (`DistrictSandbox`).
-- **Rules**:
-  - Enforce process isolation for desktop applets and web2app launchers.
-  - Record learnings in `.jules/sentinel.md`.
+3. **MVI Reactive Store (`src/klib/store.rs`)**
+   - For UI and userland reactivity, dispatch immutable actions through `StateStore<S, A>` and pure `Reducer<S, A>` functions.
 
 ---
 
-## 2. DESKTOP ENVIRONMENT & COMPOSITOR POLICIES (`docs/AI_AGENTS_DESKTOP_ENVIRONMENTS_MANAGEMENT.md`)
+## 🔒 Spinlock System Synchronization Principles
 
-- **Wayland Ozone Launchers**: Third-party web applications must be launched with Wayland Ozone isolation flags (`--ozone-platform=wayland`).
-- **Accessibility Invariants**: All interactive UI elements must render high-contrast focus rings on keyboard TAB focus.
+1. **Ticket Spinlock Fairness (`TicketSpinlock` in `src/kernel/classic_os.rs`)**
+   - Use atomic ticket/now_serving counters with exponential backoff (`core::hint::spin_loop()`) to ensure SMP lock fairness.
+
+2. **Fine-Grained Contention Tracking (`FineGrainedSpinlock` in `src/kernel/core/sovereign_scheduler.rs`)**
+   - Track `acquire_count` and `contention_count` for latency diagnostics (FreeBSD `mtx` & Linux `spinlock_t` parity).
+
+3. **Deadlock & Interrupt Safety**
+   - Never perform dynamic memory allocation or blocking operations while holding a spinlock.
+   - Acquire multiple spinlocks in strict ascending hierarchical order.
 
 ---
 
-## 3. STANDALONE TESTING & VERIFICATION PROTOCOL
+## 💾 Block-Oriented Device Management Principles
 
-Every agent module must support standalone unit testing via:
-```bash
-rustc --test <module_path> --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_agent && /tmp/test_agent
-```
+1. **Unified Device Abstraction (`src/storage/block.rs`)**
+   - Implement `BlockOrientedDevice` for block drivers (`SsdBlockDevice`, `NvmeBlockDevice`).
+   - Check `dev.is_write_blocked()` before all destructive operations (`Write`, `DiscardTrim`, `SecureErase`).
+
+2. **Buffer Alignment & Bound Checks**
+   - Ensure read/write buffers match `dev.block_size()` and verify `block_num < dev.total_blocks()` to prevent out-of-bounds access (`BlockError::OutOfBounds`).
+
+3. **Cache & Partition Synchronization**
+   - Invalidate matching blocks in `SimpleBlockCache` when performing discard or secure erase ops.
+
+---
+
+## ⌨️ Character Device Driver Management Principles
+
+1. **Stream-Oriented Line Disciplines (`src/kernel/tty.rs`)**
+   - Support canonical mode editing (`ICANON`), signal interjection (`ISIG`), and software flow control (`IXON`/`IXOFF`).
+
+2. **Termios Signal & Echo Flushing**
+   - Flush input buffers (`flush_input()`) upon processing signal bytes (`VINTR`, `VQUIT`, `VSUSP`) when `ISIG` is active.
+
+3. **Lock-Free Hardware FIFO Operations (`src/kernel/drivers/legacy/uart_8250.rs`)**
+   - Maintain zero heap allocations during high-frequency character transfer interrupt routines.
+
+---
+
+## ⚙️ Testing & Verification Procedures
+
+- **Kernel Primitives (`klib`):**
+  `cargo test --lib -- klib::json` or `./run_sigma_tests.sh`
+- **Linux/BSD System Gap Engines:**
+  `rustc --test src/distro/linux_bsd_distro_gaps.rs --edition=2021 -o build/distro_gaps_test && ./build/distro_gaps_test`
+- **Python Integration Suite:**
+  `pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py`

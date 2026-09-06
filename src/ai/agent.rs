@@ -517,7 +517,7 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 
     fn stats(&self) -> AIStats {
-        self.stats_data
+        self.stats
     }
 }
 
