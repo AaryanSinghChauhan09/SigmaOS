@@ -116,7 +116,7 @@ impl BsdPfStateTable {
 
     pub fn expire_states(&mut self, now_sec: u64) -> usize {
         let mut expired_keys: Vec<PfFiveTuple> = Vec::new();
-        for (tuple, state) in &self.states {
+        for (tuple, state) in self.states.iter() {
             if now_sec
                 > state
                     .last_seen_timestamp_sec
@@ -192,8 +192,7 @@ impl LinuxFutexEngine {
     pub fn futex_wake(&mut self, uaddr: u64, val_wake: usize) -> usize {
         let mut woken = 0;
         if let Some(waiters) = self.buckets.get_mut(&uaddr) {
-            let waiters_len: usize = waiters.len();
-            let count = val_wake.min(waiters_len);
+            let count = val_wake.min(waiters.len());
             for _ in 0..count {
                 if !waiters.is_empty() {
                     waiters.remove(0);
@@ -257,7 +256,7 @@ impl FreeBsdVfsNullfs {
         overlay_path: &str,
         is_write: bool,
     ) -> Result<(String, Option<u32>), &'static str> {
-        for (mp, node) in &self.mounts {
+        for (mp, node) in self.mounts.iter() {
             let mp: &String = mp;
             if overlay_path == mp
                 || (overlay_path.starts_with(mp.as_str())
@@ -426,7 +425,7 @@ impl Default for EbpfXdpFastPacketEngine {
 }
 
 // ============================================================================
-// 1. Linux `perf_event_open` Hardware PMU Performance Counters
+// Intel Clear Linux Stateless Architecture Engine
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -4868,29 +4867,112 @@ impl GentooUseFlags {
     }
 }
 
-/// Void Linux inspired runit init system inspiration
-pub struct VoidRunitInit {
-    services: Vec<String>,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl VoidRunitInit {
-    pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-        }
+    #[test]
+    fn test_bsd_pf_state_table() {
+        let mut pf = BsdPfStateTable::new(60);
+        let tuple = PfFiveTuple {
+            src_ip: "192.168.1.100".to_string(),
+            dst_ip: "1.1.1.1".to_string(),
+            src_port: 5000,
+            dst_port: 443,
+            protocol: "TCP".to_string(),
+        };
+
+        pf.create_state(tuple.clone(), Some("203.0.113.5"), Some(40000), 1000);
+
+        let nat_res = pf.process_packet(&tuple, 1010).unwrap();
+        assert!(nat_res.is_some());
+        let (nat_ip, nat_port) = nat_res.unwrap();
+        assert_eq!(nat_ip, "203.0.113.5");
+        assert_eq!(nat_port, 40000);
+
+        // Expire state
+        assert_eq!(pf.expire_states(1100), 1);
+        assert!(pf.process_packet(&tuple, 1105).is_err());
     }
 
-    pub fn start_service(&mut self, service: &str) {
-        self.services.push(service.to_string());
+    #[test]
+    fn test_linux_futex_engine() {
+        let mut futex = LinuxFutexEngine::new();
+        let uaddr = 0x7fff0000;
+
+        // Memory value changed (EAGAIN)
+        assert!(futex.futex_wait(uaddr, 1, 0, 101, None).is_err());
+
+        // Successful wait enqueue
+        assert!(futex.futex_wait(uaddr, 0, 0, 101, None).is_ok());
+        assert!(futex.futex_wait(uaddr, 0, 0, 102, None).is_ok());
+
+        // Wake 1 thread
+        let woken = futex.futex_wake(uaddr, 1);
+        assert_eq!(woken, 1);
+        assert_eq!(futex.buckets.get(&uaddr).unwrap().len(), 1);
+
+        // Wake remaining
+        let woken_all = futex.futex_wake(uaddr, 5);
+        assert_eq!(woken_all, 1);
+        assert!(futex.buckets.get(&uaddr).is_none());
     }
 
-    pub fn is_running(&self, service: &str) -> bool {
-        for s in &self.services {
-            let s: &String = s;
-            if s.as_str() == service {
-                return true;
-            }
-        }
-        false
+    #[test]
+    fn test_freebsd_vfs_nullfs() {
+        let mut nullfs = FreeBsdVfsNullfs::new();
+        nullfs
+            .mount_nullfs("/usr/src/sys", "/sys", true, Some(0o755))
+            .unwrap();
+
+        let (resolved, perm) = nullfs
+            .resolve_overlay_path("/sys/kern/vfs_subr.c", false)
+            .unwrap();
+        assert_eq!(resolved, "/usr/src/sys/kern/vfs_subr.c");
+        assert_eq!(perm, Some(0o755));
+
+        // Write to read-only nullfs layer should fail
+        assert!(nullfs
+            .resolve_overlay_path("/sys/kern/vfs_subr.c", true)
+            .is_err());
+    }
+
+    #[test]
+    fn test_openbsd_pledge() {
+        let mut pledge = OpenBsdPledge::new();
+        assert!(pledge.check_permission("exec"));
+
+        pledge.pledge("stdio rpath wpath").unwrap();
+        assert!(pledge.check_permission("stdio"));
+        assert!(pledge.check_permission("rpath"));
+        assert!(!pledge.check_permission("exec"));
+
+        pledge.pledge("stdio").unwrap();
+        assert!(pledge.check_permission("stdio"));
+        assert!(!pledge.check_permission("rpath"));
+
+        assert!(pledge.pledge("stdio rpath").is_err());
+    }
+
+    #[test]
+    fn test_intel_clear_linux_stateless() {
+        let mut stateless = IntelClearLinuxStatelessEngine::new();
+        stateless.register_default_config("/etc/hostname", "sigma-default");
+        assert_eq!(
+            stateless.resolve_config("/etc/hostname").unwrap(),
+            "sigma-default"
+        );
+
+        stateless.set_user_override("/etc/hostname", "sigma-custom");
+        assert_eq!(
+            stateless.resolve_config("/etc/hostname").unwrap(),
+            "sigma-custom"
+        );
+
+        stateless.reset_etc_to_stateless();
+        assert_eq!(
+            stateless.resolve_config("/etc/hostname").unwrap(),
+            "sigma-default"
+        );
     }
 }

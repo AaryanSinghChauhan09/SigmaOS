@@ -771,9 +771,179 @@ impl ArchitectureHal for RISCV64HAL {
 // ==============================================================================
 
 pub enum Architecture {
+    X86,
     X86_64,
     ARM64,
     RISCV64,
+    LoongArch64,
+}
+
+/// 32-bit x86 Hardware Abstraction Layer
+pub struct X86HAL {
+    cr3_root: AtomicU64,
+    interrupts_active: AtomicBool,
+    irq_domain: HalIrqDomain,
+}
+
+impl X86HAL {
+    pub fn new() -> Self {
+        let mut irq_domain = HalIrqDomain::new("x86-pic");
+        for i in 0..16 {
+            irq_domain.map_hwirq(i, 32 + i, IrqTriggerMode::EdgeRising);
+        }
+        Self {
+            cr3_root: AtomicU64::new(0x1000),
+            interrupts_active: AtomicBool::new(false),
+            irq_domain,
+        }
+    }
+}
+
+impl Default for X86HAL {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl PlatformHAL for X86HAL {
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn enumerate_pci(&self) -> Result<(), DriverError> { Ok(()) }
+    fn parse_acpi(&self) -> Result<(), DriverError> { Ok(()) }
+    fn configure_apic(&self) -> Result<(), DriverError> { Ok(()) }
+}
+
+impl ArchitectureHal for X86HAL {
+    unsafe fn switch_address_space(&mut self, root_table_phys: u64) -> Result<(), DriverError> {
+        self.cr3_root.store(root_table_phys, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn set_interrupt_enabled(&self, enabled: bool) -> bool {
+        self.interrupts_active.swap(enabled, Ordering::SeqCst)
+    }
+
+    fn read_monotonic_cycles(&self) -> u64 {
+        500_000_000
+    }
+
+    unsafe fn invalidate_tlb_page(&self, vaddr: u64) {
+        let _ = vaddr;
+    }
+
+    fn allocate_dma_buffer(&self, size: usize, alignment: usize) -> Result<HalDmaBuffer, DriverError> {
+        let tag = HalDmaTag::new(alignment, size);
+        Ok(HalDmaBuffer {
+            phys_addr: 0x100000,
+            virt_addr: 0xC0100000,
+            size,
+            tag,
+            direction: HalDmaDirection::Bidirectional,
+        })
+    }
+
+    fn register_irq_handler(
+        &mut self,
+        vector: u32,
+        _handler: Box<dyn Fn() + Send + Sync>,
+    ) -> Result<(), DriverError> {
+        if let Some(v) = self.irq_domain.vectors.get_mut(&vector) {
+            v.handler_registered = true;
+            Ok(())
+        } else {
+            Err(DriverError::IRQError)
+        }
+    }
+
+    fn power_transition(&mut self, state: HalPowerState) -> Result<(), DriverError> {
+        if state == HalPowerState::Shutdown || state == HalPowerState::Reboot {
+            self.interrupts_active.store(false, Ordering::SeqCst);
+        }
+        Ok(())
+    }
+}
+
+/// LoongArch64 Hardware Abstraction Layer
+pub struct LoongArch64HAL {
+    pgdl_reg: AtomicU64,
+    interrupts_active: AtomicBool,
+    irq_domain: HalIrqDomain,
+}
+
+impl LoongArch64HAL {
+    pub fn new() -> Self {
+        let mut irq_domain = HalIrqDomain::new("loongarch-extioi");
+        for i in 0..32 {
+            irq_domain.map_hwirq(i, i, IrqTriggerMode::EdgeRising);
+        }
+        Self {
+            pgdl_reg: AtomicU64::new(0x2000),
+            interrupts_active: AtomicBool::new(false),
+            irq_domain,
+        }
+    }
+}
+
+impl Default for LoongArch64HAL {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl PlatformHAL for LoongArch64HAL {
+    fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
+    fn enumerate_pci(&self) -> Result<(), DriverError> { Ok(()) }
+    fn parse_acpi(&self) -> Result<(), DriverError> { Ok(()) }
+    fn configure_apic(&self) -> Result<(), DriverError> { Ok(()) }
+}
+
+impl ArchitectureHal for LoongArch64HAL {
+    unsafe fn switch_address_space(&mut self, root_table_phys: u64) -> Result<(), DriverError> {
+        self.pgdl_reg.store(root_table_phys, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn set_interrupt_enabled(&self, enabled: bool) -> bool {
+        self.interrupts_active.swap(enabled, Ordering::SeqCst)
+    }
+
+    fn read_monotonic_cycles(&self) -> u64 {
+        1_200_000_000
+    }
+
+    unsafe fn invalidate_tlb_page(&self, vaddr: u64) {
+        let _ = vaddr;
+    }
+
+    fn allocate_dma_buffer(&self, size: usize, alignment: usize) -> Result<HalDmaBuffer, DriverError> {
+        let tag = HalDmaTag::new(alignment, size);
+        Ok(HalDmaBuffer {
+            phys_addr: 0x90000000,
+            virt_addr: 0x9000000090000000,
+            size,
+            tag,
+            direction: HalDmaDirection::Bidirectional,
+        })
+    }
+
+    fn register_irq_handler(
+        &mut self,
+        vector: u32,
+        _handler: Box<dyn Fn() + Send + Sync>,
+    ) -> Result<(), DriverError> {
+        if let Some(v) = self.irq_domain.vectors.get_mut(&vector) {
+            v.handler_registered = true;
+            Ok(())
+        } else {
+            Err(DriverError::IRQError)
+        }
+    }
+
+    fn power_transition(&mut self, state: HalPowerState) -> Result<(), DriverError> {
+        if state == HalPowerState::Shutdown || state == HalPowerState::Reboot {
+            self.interrupts_active.store(false, Ordering::SeqCst);
+        }
+        Ok(())
+    }
 }
 
 pub struct HALFactory;
@@ -781,17 +951,21 @@ pub struct HALFactory;
 impl HALFactory {
     pub fn create(arch: Architecture) -> Box<dyn PlatformHAL> {
         match arch {
+            Architecture::X86 => Box::new(X86HAL::new()),
             Architecture::X86_64 => Box::new(X86_64HAL::new()),
             Architecture::ARM64 => Box::new(ARM64HAL::new()),
             Architecture::RISCV64 => Box::new(RISCV64HAL::new()),
+            Architecture::LoongArch64 => Box::new(LoongArch64HAL::new()),
         }
     }
 
     pub fn create_arch_hal(arch: Architecture) -> Box<dyn ArchitectureHal> {
         match arch {
+            Architecture::X86 => Box::new(X86HAL::new()),
             Architecture::X86_64 => Box::new(X86_64HAL::new()),
             Architecture::ARM64 => Box::new(ARM64HAL::new()),
             Architecture::RISCV64 => Box::new(RISCV64HAL::new()),
+            Architecture::LoongArch64 => Box::new(LoongArch64HAL::new()),
         }
     }
 }
@@ -1051,6 +1225,9 @@ mod tests {
 
     #[test]
     fn test_hal_factory_and_irq_domain() {
+        let mut factory_x86_32 = HALFactory::create_arch_hal(Architecture::X86);
+        assert!(factory_x86_32.register_irq_handler(32, Box::new(|| {})).is_ok());
+
         let mut factory_x86 = HALFactory::create_arch_hal(Architecture::X86_64);
         assert!(factory_x86.register_irq_handler(32, Box::new(|| {})).is_ok());
 
@@ -1059,5 +1236,8 @@ mod tests {
 
         let mut factory_riscv = HALFactory::create_arch_hal(Architecture::RISCV64);
         assert!(factory_riscv.register_irq_handler(10, Box::new(|| {})).is_ok());
+
+        let mut factory_loongarch = HALFactory::create_arch_hal(Architecture::LoongArch64);
+        assert!(factory_loongarch.register_irq_handler(5, Box::new(|| {})).is_ok());
     }
 }
