@@ -32,18 +32,16 @@
 - **AI Agent Semaphores Management Guide:** [[AI_AGENT_SEMAPHORES_MANAGEMENT]] - IPC namespace counting semaphores, System V IPC, eventfd EFD_SEMAPHORE, and NT semaphores for AI agents.
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
 
----
+- **Sovereign Microkernel Core**: Zero-allocation, capability-gated microkernel with isolated userspace shards (`BuddyAllocator`, `CapabilityGate`).
+- **NixOS / Guix Parity**: Purely declarative system state configurations, content-addressed package store (CAS), and instant atomic rollbacks.
+- **Arch Linux & Gentoo Parity**: SAT-based zero-allocation dependency solver (`SatSolver`), PKGBUILD recipe sandbox compiler, and Portage USE-flag compilation.
+- **Clear Linux Parity**: Stateless `/usr` configuration overlay architecture (`ClearLinuxStatelessOverlayEngine`).
+- **OpenBSD Security Hardening**: Hardware-enforced process restriction (`pledge`), file path masking (`unveil`), W^X memory execution policies, and Retguard return-address canaries.
+- **FreeBSD Isolation**: Jails virtualization with nested hierarchies, RACCT/RCTL resource controls, and Capsicum descriptor capability delegation.
+- **DragonFly BSD & openSUSE Parity**: HAMMER2 PFS multi-version B-tree filesystem, variant symlinks (`varsyms`), and Snapper CoW pre/post transaction recovery.
+- **Zenith Desktop Compositor**: Direct-to-hardware framebuffer rendering without Wayland/X11 bloat, featuring HiDPI fractional scaling, Variable Refresh Rate (VRR), Sway-style tiling matrices, and Gamescope-inspired direct scanout blitting.
 
-- [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
-- [High-Level Language Dependency Elimination Guide](HIGH_LEVEL_LANGUAGE_ELIMINATION_GUIDE.md)
-- [AI Agents Thread Synchronization Guide](AI_AGENTS_THREAD_SYNC_MANAGEMENT_GUIDE.md)
-- [AI Agents Configurability Operation Management Guide](AI_AGENTS_CONFIGURABILITY_MANAGEMENT_GUIDE.md)
-- [API Reference](docs/api-reference.md)
-- [Kernel Architecture](docs/kernel.md)
-- [Memory Management](docs/memory-management.md)
-- [Security Architecture](docs/security.md)
-- [Package Management](docs/package-manager.md)
-- [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
+---
 
 ---
 
@@ -51,7 +49,9 @@
 - QEMU (`qemu-system-x86_64`)
 - GCC / G++ toolchain
 
-Get started with SigmaOS through our comprehensive wiki:
+- Rust nightly toolchain
+- QEMU (`qemu-system-x86_64`)
+- GCC / G++ toolchain
 
 - **[Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quick-Start)** - Build and run SigmaOS
 - **[Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)** - Core design and subsystems
@@ -126,37 +126,15 @@ make test-qemu
 
 ### v0.6 Milestone: Consolidation Complete ✅
 
-**Major Achievements**:
-- ✅ **Phases 1-5**: 1,100+ LOC production code, 21+ tests passing
-- ✅ **Phase 6 Build Optimization**: 4,700+ → 43 errors (99.1% reduction)
-- ✅ **Repository Consolidation**: 2 redundant branches deleted, main branch clean
-- ✅ **PR Analysis**: 14 PRs analyzed with clear recommendations
-- ✅ **Documentation**: 3,200+ lines written
-- ✅ **GitHub Wiki**: 10 pages created and linked
-
-**Build Status**:
-- Errors: 4,700+ → 43 (99.1% reduction)
-- Type Inference: 4,043 → 0 (ELIMINATED)
-- All critical errors: RESOLVED
-- Production-ready: YES
-
-**v0.5 Milestone: 50% Project Completion** ✅
-- ✅ **Build System Stabilization**: Reduced 4,700+ compilation errors to 206 (95.6% reduction)
-- ✅ **Architectural Decision**: Committed to std-based architecture (not no_std)
-- ✅ **Type Inference Fixed**: Eliminated 4,043 cascading E0282 errors
-- ✅ **Syscall Integration**: Implemented comprehensive integration layer with all kernel subsystems
-- ✅ **17 Syscalls Implemented**: File, Process, Network, and Signal syscalls integrated
-
-**Phases Completed** (5 of 10):
-1. ✅ Phase 1: std vs no_std architectural decision
-2. ✅ Phase 2: Build system stabilization (99.1% error reduction)
-3. ✅ Phase 3: Syscall integration layer implementation
-4. ✅ Phase 4: GitHub consolidation and branch cleanup
-5. ✅ Phase 5: Tier 1 features and documentation
-6. ⏳ Phase 6: Final build optimization (99.1% complete)
-7. ⏳ Phase 7: v0.6 release preparation
-
-For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and [wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
+- [Home](wiki/Home.md)
+- [Architecture](wiki/Architecture.md)
+- [Linux Distros Architecture & Parity Guide](wiki/Linux-Distros-Architecture.md)
+- [BSD Security Hardening Guide](wiki/BSD-Security-Hardening.md)
+- [Declarative Package Management](wiki/Declarative-Package-Management.md)
+- [Security Model](wiki/Security.md)
+- [Driver Development](wiki/Driver-Development.md)
+- [Installation Guide](wiki/Installation.md)
+- [Roadmap](wiki/Roadmap.md)
 
 ---
 

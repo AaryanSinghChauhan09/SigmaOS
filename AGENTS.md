@@ -1,171 +1,66 @@
-# AGENTS.md — AI Agent Guidelines, Versioning, HTML Dependency Reduction, Compile-Time Defenses, Clock, Circular Buffers, Cache Memory, Process, Hardware Fitting, Backend, Loading, Processor & Network Management for SigmaOS
+# AI Agent Directives & Coding Guidelines for SigmaOS
 
-This document provides instructions, rules, and procedures for AI agents working in the SigmaOS repository, specifically regarding **Version Handling**, **Release Channels**, **HTML Dependency Reduction & Text-First Architecture**, **Compile-Time Defenses & Build Hardening**, **Clock & Timer Management**, **Circular Buffer & Ring Buffer Management**, **Cache Memory Management**, **Process Lifecycle & Signal ABI Management**, **Hardware Fitting & Driver Auto-Binding**, **Network Stack & eBPF Management**, **Processor Subsystem Management**, **Backend Management**, **Bootloader & Driver Loading**, **Multi-Distro Packaging Parity**, and **Core Subsystem Changes**.
+This file provides instructions and guidelines for AI coding agents (Sentinel, Palette, Bolt, Jules) working on the SigmaOS codebase.
 
----
+## 1. Zero-Dependency & `#![no_std]` Architecture Rules
+* **Core Primitives:** `src/klib/` provides `#![no_std]` native Rust replacements for standard data structures (`BTreeMap`, `Vec`, `HashMap`, `JsonParser`, `String`).
+* **Zero Allocation Primitives:** Prefer stack-based, zero-allocation primitives in cold paths (e.g. `u64_to_hex_str_stack`, `parse_u64_str` in `src/klib/conversion.rs`).
+* **C++ Dependency Reduction:** Write new host/kernel code in safe, native Rust or standard C11. Avoid introducing new C++ dependencies.
 
-## 1. Core Principles & Philosophy
+## 2. Testing & Verification Requirements
+* **Primary Test Runner:** Always execute `./run_sigma_tests.sh` to run all 326 atomic tests, 57 subsystem inspection tests, and 11 security validation tests.
+* **Comprehensive Testing Guide:** Refer to `docs/AGENTS_TESTING_GUIDE.md` for full test suite management procedures.
+* **Standalone Subsystem Tests:** Subsystem unit tests can also be executed directly using `rustc --test`:
+  * Security Input Validation: `rustc --test src/security/input_validation.rs --edition=2021 -o build/input_val_test && ./build/input_val_test`
+  * Distro Innovations: `rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/missing_distros_test && ./build/missing_distros_test`
+  * Distro Gaps: `rustc --test src/distro/linux_bsd_distro_gaps.rs --edition=2021 -o build/distro_gaps_test && ./build/distro_gaps_test`
+  * Ecosystem Bridge: `rustc --test src/compatibility/linux_bsd_ecosystem_bridge.rs --edition=2021 -o build/ecosystem_bridge_test && ./build/ecosystem_bridge_test`
+  * Media Engine: `rustc --test src/media/distro_media_engine.rs --edition=2021 -o build/distro_media_test && ./build/distro_media_test`
+  * Sovereign Commands: `rustc --test src/tools/sovereign_commands.rs --edition=2021 -o build/tools_test && ./build/tools_test`
+* **Python Integration & Stress Tests:** Run `pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py` or `python3 -m unittest discover -s tests -p "test_*.py"`.
+* **C11 Host Tests:** Compile C11 verification tests using `mkdir -p build/cpp_host_build && cd build/cpp_host_build && cmake ../../tests/cpp_host && make && ./host_tests`.
 
-1. **Zero-Dependency & Self-Containment (`no_std`):**
-   * The kernel core and primary subsystems are designed to target bare-metal targets (`#![no_std]`).
-   * Avoid adding runtime dependencies on standard `std` libraries inside microkernel shard components unless conditionally gated under test environments (`#[cfg(not(target_os = "none"))]`).
-2. **Capability-Based Security Model:**
-   * Never introduce generic root/admin ACL checks. System call access is authorized exclusively via hardware-enforced 64-bit `CapabilityToken` verification gates.
-3. **Windows NT & Distro Parity Standards:**
-   * Hardware drivers must follow the WDM-style `IoManager`, `DriverObject`, `DeviceObject`, and `DeviceExtension` abstractions.
-   * Kernel memory allocations must respect tagged `Paged` (swappable) and `NonPaged` (always resident) memory pool boundaries.
-4. **Bit Table & Hardware Field Standards:**
-   * For bit tables, physical frame allocators, page table entry flags, and capability bitmasks, follow [docs/AGENTS_BIT_TABLE_MANAGEMENT.md](docs/AGENTS_BIT_TABLE_MANAGEMENT.md).
-5. **Cache Memory Optimization & Coherency:**
-   * For L1/L2/L3 cache alignment, false sharing prevention, non-temporal stores, and page/buffer cache management, follow [docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md](docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md).
-6. **Cache Operation & Hardware Controls:**
-   * For explicit CPU cache flushing (`clflushopt`/`clwb`), DMA cache coherency, JIT $I\$/D\$$ cache sync, and memory fences, follow [docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md](docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md).
-7. **Cloud vs. Fog Computing Orchestration:**
-   * For real-time edge processing, P2P mesh discovery, workload offloading cost function, and CRDT synchronization, follow [docs/AGENTS_CLOUD_VS_FOG_MANAGEMENT.md](docs/AGENTS_CLOUD_VS_FOG_MANAGEMENT.md).
-8. **Commercial Operating System Architecture:**
-   * For enterprise licensing tiers, statutory compliance governors, software certification programs, and open-core preservation rules, follow [docs/AGENTS_COMMERCIAL_OPERATION_SYSTEM.md](docs/AGENTS_COMMERCIAL_OPERATION_SYSTEM.md).
-9. **Concurrency & Synchronization Operations:**
-   * For classic concurrency problems (Barbershop, Dining Philosophers, Dekker's), deadlock elimination, RCU/Seqlocks/Futexes, and zero-copy message passing, follow [docs/AGENTS_CONCURRENCY_OPERATION_MANAGEMENT.md](docs/AGENTS_CONCURRENCY_OPERATION_MANAGEMENT.md).
-10. **Concurrent Thread Lifecycle & Stack Management:**
-   * For SystemThread TCBs, hybrid 1:1 / M:N fiber models, context switching, stack guard pages, and work-stealing thread pools, follow [docs/AGENTS_CONCURRENT_THREAD_MANAGEMENT.md](docs/AGENTS_CONCURRENT_THREAD_MANAGEMENT.md).
+## 3. Security & Vulnerability Guidelines
+* **Input Validation:** Ensure strict validation on IP addresses, port numbers, usernames, and path traversal strings in `src/security/input_validation.rs`.
+* **IPv4 Validation:** Never allow leading zeros in multi-digit IPv4 octets (e.g. reject `010.0.0.1`) to prevent octal parser differential attacks and SSRF bypasses.
+* **CI/CD Hardening:** All GitHub Actions workflows in `.github/workflows/` must pin third-party actions to immutable 40-character commit SHAs and specify explicit least-privilege `permissions: contents: read`.
 
----
+## 4. Context & Persona Switching Directives
+* **Persona Roles:** Follow `docs/AGENTS_SWITCHING_GUIDE.md` when transitioning operational focus between **Sentinel** (Security), **Palette** (UX/a11y), **Bolt** (Performance), and **Jules** (Engineering).
+* **State Handoff Verification:** Always run `./run_sigma_tests.sh` and call `initiate_memory_recording` before switching persona operational contexts or submitting pull requests.
 
-## 2. Versioning Standards & Rules for AI Agents
+## 5. Spinlock & Synchronization Directives
+* **Spinlock Guide:** Adhere to `docs/AGENTS_SPINLOCK_MANAGEMENT_GUIDE.md` for `#![no_std]` spinlock primitives, atomic memory ordering (`Acquire`/`Release`/`SeqCst`), interrupt-safe `lock_irqsave` wrappers, and deadlock prevention rules.
+* **No Std Mutexes:** Never import `std::sync::Mutex` or `std::sync::RwLock` in core kernel and `klib` modules.
 
-When modifying, releasing, or updating versions in SigmaOS:
+## 6. Protection Access Rights & Memory Security Directives
+* **Protection Rights Guide:** Adhere to `docs/AGENTS_PROTECTION_RIGHTS_GUIDE.md` for `mprotect` W^X page protection rules, TLB `invlpg` invalidation, OpenBSD `pledge`/`unveil` monotonic privilege reduction, FreeBSD Capsicum descriptor rights limits, and AppArmor MAC profile enforcement.
+* **W^X Rule:** Never assign `PROT_WRITE` and `PROT_EXEC` to the same virtual memory page frame simultaneously.
 
-### 2.1 Core Repository & Cargo Version
-* Core package version is declared in `Cargo.toml` (`version = "0.1.0"`).
-* **MAJOR (x.0.0):** Incompatible API/ABI or kernel architecture changes (e.g., breaking KABI stability).
-* **MINOR (0.x.0):** New backward-compatible kernel subsystems, drivers, or distro parity features.
-* **PATCH (0.0.x):** Backward-compatible bug fixes, performance optimizations, or security patches.
+## 7. Block Device & Storage Directives
+* **Block Storage Guide:** Adhere to `docs/AGENTS_BLOCKS_MANAGEMENT_GUIDE.md` for NVMe/VirtIO block drivers, Kyber/BFQ I/O schedulers, JBD2 Merkle transactional logging, and HAMMER2 block deduplication.
+* **CoW Safety:** Never overwrite active CoW snapshot blocks directly; use Copy-on-Write allocation guards.
 
----
+## 8. Class Operation & Subsystem Vtable Directives
+* **Class Operation Guide:** Adhere to `docs/AGENTS_CLASS_OPERATION_MANAGEMENT_GUIDE.md` for zero-allocation kernel vtable structures (`FileOperations`, `VnodeOps`, `SchedClass`, `NetDeviceOps`, `BlockDeviceOps`), atomic class registration, and C11 FFI interoperability.
+* **Zero Heap Allocation:** Never allocate heap objects inside core vtable method dispatch paths.
 
-## 3. HTML Dependency Reduction & Text-Based Interface Rules for AI Agents
+## 9. Readers/Writers Synchronization Directives
+* **Readers/Writers Guide:** Adhere to `docs/AGENTS_READERS_WRITERS_MANAGEMENT_GUIDE.md` for Readers/Writers synchronization rules (`AtomicRwLock`, RCU lock-free pathways, writer starvation prevention, and interrupt-safe `read_irqsave` / `write_irqsave` locks).
+* **No Std RwLock:** Never import `std::sync::RwLock` in kernel space.
 
-When creating or modifying documentation, dashboards, or user interfaces:
+## 10. Data & Memory Confidentiality Directives
+* **Confidentiality Guide:** Adhere to `docs/AGENTS_CONFIDENTIALITY_MANAGEMENT_GUIDE.md` for data confidentiality, volatile memory zeroization upon drop, constant-time comparison algorithms, and confidential computing (AMD SEV-SNP / Intel TDX) guest state isolation.
+* **Volatile Scrubbing:** Always use `write_volatile` to zero secret buffers upon deallocation.
 
-1. **Text-First & Terminal Preference:**
-   Prioritize Markdown (`DocFormat::Markdown`), AsciiDoc (`DocFormat::AsciiDoc`), or ANSI terminal output over HTML web rendering.
-2. **HTML Entity Escaping (`escape_html`):**
-   If HTML string output is necessary, ALL dynamic string parameters MUST be sanitized via `escape_html` in `src/docs/mod.rs` to neutralize XSS vectors (`<`, `>`, `&`, `"`, `'`).
-3. **Progressive Enhancement:**
-   Web interfaces MUST support zero-JS progressive enhancement fallbacks without requiring dynamic HTML DOM injection.
+## 11. Task Assignment & Governance Directives
+* **Assignment Guide:** Follow `docs/AGENTS_ASSIGNMENT_MANAGEMENT_GUIDE.md` for task routing, triage protocols, subagent delegation rules, and submission criteria.
+* **Persona Routing:** Route security tasks to **Sentinel**, UI/a11y to **Palette**, performance to **Bolt**, and distro infrastructure to **Jules**.
 
----
+## 12. Information Management & Knowledge Base Directives
+* **Information Guide:** Adhere to `docs/AGENTS_INFORMATION_MANAGEMENT_GUIDE.md` for knowledgebase lookup protocols, memory recording requirements, and context prioritization (User Directives > Source Code State > Memory Context).
+* **Memory Recording:** Always call `initiate_memory_recording` before completing a task or submitting code.
 
-## 4. Compile-Time Defenses & Build Hardening Rules for AI Agents
-
-When modifying build settings, profile options, or feature flags:
-
-1. **`#![no_std]` Zero-Dependency Invariant:**
-   Maintain 100% self-sufficient core Rust implementations. Do NOT add external dependencies to `Cargo.toml`.
-2. **`panic = "abort"` Unwind Protection:**
-   Both `dev` and `release` profiles MUST use `panic = "abort"` to prevent stack unwinding exploit primitives.
-
----
-
-## 5. Clock Algorithm & Timer Management Rules for AI Agents
-
-When modifying clock page replacement or timekeeping subsystems:
-
-1. **Clock Page Replacement Hand-Pointer Traversal:**
-   Page frame eviction MUST traverse physical memory frames in a circular queue. Clear reference bits from `1` to `0` for second-chance evaluation before evicting unreferenced pages.
-
----
-
-## 6. Circular Buffer & Lock-Free Ring Buffer Rules for AI Agents
-
-When implementing or modifying ring buffers in `src/klib/ring_buffer.rs`, `src/klib/ringbuf.rs`, or `src/media/sovereign_video_player.rs`:
-
-1. **Power-of-Two Capacity Rule:**
-   Ring buffer capacities MUST be powers of two ($2^k$) to perform $O(1)$ index wrapping via bitwise AND `idx & (capacity - 1)`.
-
----
-
-## 7. Cache Memory Architecture, LRU Eviction & Package Cache Rules for AI Agents
-
-When modifying cache memory engines, key-value stores, or package cache trimmers:
-
-1. **Key Invalidation Invariant:**
-   `SovereignCacheEngine::set` MUST purge pre-existing entries with matching keys via `self.entries.retain(|e| e.key != key)` before inserting new values.
-
----
-
-## 8. Process Lifecycle, Signal ABI Translation & Supervision Rules for AI Agents
-
-When modifying process management, signal handlers, or pseudo-terminals:
-
-1. **State Machine Transitions (`SovereignProcessLifecycleController`):**
-   Ensure process state changes (`Created`, `Ready`, `Running`, `Blocked`, `Stopped`, `Zombie`, `Terminated`) execute under thread-safe synchronization.
-
----
-
-## 9. Hardware Fitting, Driver Auto-Binding & Device Adaptation Rules for AI Agents
-
-When writing, probing, or modifying hardware device drivers (`src/drivers/`):
-
-1. **Bus Signature Probing:**
-   Driver probe routines MUST evaluate Vendor ID (VID), Product ID (PID), and interface class codes before claiming attachment.
-
----
-
-## 10. Network Stack, eBPF/XDP & PQC Security Rules for AI Agents
-
-When modifying networking drivers, eBPF filters, or VPN subsystems:
-
-1. **Kernel Bypass eBPF/XDP Processing:**
-   Use zero-copy DMA ring buffers (`process_xdp_zero_copy_packet`). Ensure XDP actions explicitly return `XDP_PASS`, `XDP_DROP`, `XDP_TX`, or `XDP_REDIRECT`.
-
----
-
-## 11. Processor Topology, CPU Scheduling & Multi-Core Rules for AI Agents
-
-When modifying CPU scheduling, task management, or ISA optimization:
-
-1. **ISA Level Auto-Detection (`src/klib/isa.rs`):**
-   Support x86-64 microarchitecture levels (`v1`..`v4`). Route vectorized operations via `vectorized_memcpy` dynamically based on detected features.
-
----
-
-## 12. Backend Subsystem & Server Engine Rules for AI Agents
-
-When modifying backend services in `src/open_source_obsoletion.rs`, `src/open_source_os_gap_closure.rs`, or `src/automation/system_level.rs`:
-
-1. **Zero-Dependency Native Backend Engines:**
-   Maintain native parity for embedded DBs (`SovereignEmbeddedDb`), web servers (`SovereignWebServer`), in-memory caches (`SovereignCacheEngine`), message brokers (`SovereignMessageBroker`), secret vaults (`SovereignSecretVault`), object stores (`SovereignDistributedStorage`), and orchestrators (`SovereignK8sOrchestratorEngine`).
-
----
-
-## 13. Checklist for AI Agents
-
-1. **Update Manifests & Documentation** when bumping versions, adding drivers, or modifying HTML/UI logic.
-2. **Run Standalone Subsystem Tests:**
-   ```bash
-   rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/open_source_os_gap_closure.rs
-   ```
-3. **Execute Full Pipeline:** Run `./run_sigma_tests.sh` and ensure all test steps pass.
-4. **Follow Conventional Commits:**
-   `docs(agents): add HTML dependency reduction guide` or `fix(docs): escape HTML special characters`.
-
----
-
-## 14. Detailed Documentation References
-
-For technical specifications, see:
-* [`docs/AGENTS_VERSION_HANDLING.md`](docs/AGENTS_VERSION_HANDLING.md)
-* [`docs/AGENTS_BACKEND_MANAGEMENT.md`](docs/AGENTS_BACKEND_MANAGEMENT.md)
-* [`docs/AGENTS_LOADING_MANAGEMENT.md`](docs/AGENTS_LOADING_MANAGEMENT.md)
-* [`docs/AGENTS_PROCESSOR_MANAGEMENT.md`](docs/AGENTS_PROCESSOR_MANAGEMENT.md)
-* [`docs/AGENTS_NETWORK_MANAGEMENT.md`](docs/AGENTS_NETWORK_MANAGEMENT.md)
-* [`docs/AGENTS_FITTING_MANAGEMENT.md`](docs/AGENTS_FITTING_MANAGEMENT.md)
-* [`docs/AGENTS_PROCESS_MANAGEMENT.md`](docs/AGENTS_PROCESS_MANAGEMENT.md)
-* [`docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md`](docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md)
-* [`docs/AGENTS_CIRCULAR_BUFFER_MANAGEMENT.md`](docs/AGENTS_CIRCULAR_BUFFER_MANAGEMENT.md)
-* [`docs/AGENTS_CLOCK_ALGORITHM_MANAGEMENT.md`](docs/AGENTS_CLOCK_ALGORITHM_MANAGEMENT.md)
-* [`docs/AGENTS_COMPILE_TIME_DEFENSES_MANAGEMENT.md`](docs/AGENTS_COMPILE_TIME_DEFENSES_MANAGEMENT.md)
-* [`docs/AGENTS_REDUCING_HTML_DEPENDENCY.md`](docs/AGENTS_REDUCING_HTML_DEPENDENCY.md)
-* [`docs/RELEASE_CADENCE.md`](docs/RELEASE_CADENCE.md)
-* [`docs/package-manager.md`](docs/package-manager.md)
+## 13. Documentation & Wiki Alignment
+* **In-Tree Troff Man Pages:** Keep `docs/man/man1/` and `docs/man/man8/` troff manual pages up to date when modifying commands or system utilities.
+* **Wiki Sync Utility:** Run `./scripts/sync_wiki.sh` after updating documentation assets to synchronize files across `WIKI/`, `wiki/`, and `wiki_repo/`.
