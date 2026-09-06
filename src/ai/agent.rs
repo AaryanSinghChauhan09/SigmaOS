@@ -513,6 +513,10 @@ impl AIAgentManager for SimpleAIAgentManager {
             Err(AIError::InvalidInput)
         }
     }
+
+    fn stats(&self) -> AIStats {
+        self.stats
+    }
 }
 
 #[cfg(test)]

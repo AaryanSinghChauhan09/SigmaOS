@@ -3755,6 +3755,38 @@ impl Default for FedoraToolbxContainerEngine {
 // Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
 // =========================================================================
 
+#[derive(Debug, Clone, Default)]
+pub struct FedoraOfflineUpdateEngine {
+    pub is_offline_update_pending: bool,
+    pub staged_packages: Vec<String>,
+    pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
+        for p in packages {
+            self.staged_packages.push((*p).to_string());
+        }
+        self.is_offline_update_pending = !self.staged_packages.is_empty();
+    }
+
+    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
+        self.trigger_reboot_flag = true;
+        Ok(self.staged_packages.len())
+    }
+
+    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
+        self.is_offline_update_pending = false;
+        self.trigger_reboot_flag = false;
+        self.staged_packages.clear();
+        Ok(())
+    }
+}
+
 
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -3767,13 +3799,6 @@ pub struct IgnitionSystemdUnit {
 /// Fedora Ignition First-Boot Declarative Provisioning Engine
 /// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
 /// (files, users, systemd units) before userspace init handoff.
-
-
-impl Default for FedoraIgnitionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine

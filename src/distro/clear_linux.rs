@@ -145,13 +145,13 @@ impl SwupdUpdateManager {
     pub fn install_bundle(&mut self, bundle_name: &str) -> Result<(), String> {
         if let Some(bundle) = self.bundles.get(bundle_name).cloned() {
             // Install dependencies first
-            for dep in &deps {
+            for dep in &bundle.dependencies {
                 if !self.installed_bundles.contains(dep) {
                     self.install_bundle(dep)?;
                 }
             }
 
-            println!("Installing bundle: {} ({})", bundle_name, version);
+            println!("Installing bundle: {} ({})", bundle_name, bundle.version);
             self.installed_bundles.push(bundle_name.to_string());
             Ok(())
         } else {
