@@ -69,8 +69,6 @@ provides = ["my-package-compat"]
 replaces = ["my-package-legacy"]
 ```
 
-For detailed specifications on version parsing, SemVer normalization algorithms, constraints, and automated testing procedures, see [Version Handling Documentation](version_handling.md).
-
 ## Repositories
 
 ```toml

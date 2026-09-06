@@ -84,90 +84,90 @@
 ## v0.2.0 — Stability & Compatibility (Target: Q4 2026)
 
 ### Kernel
-- [x] Fully functional SMP (symmetric multi-processing) — tested on 64 cores
-- [x] io_uring v2 — batch syscall rings for high-throughput I/O
-- [x] eBPF runtime — in-kernel programmable hooks
-- [x] kTLS — kernel-space TLS termination for zero-copy HTTPS
-- [x] VFIO — PCI passthrough for virtualisation
-- [x] IOMMU support (VT-d, AMD-Vi)
-- [x] Fuseblk — filesystem-in-userspace bridge
+- [ ] Fully functional SMP (symmetric multi-processing) — tested on 64 cores
+- [ ] io_uring v2 — batch syscall rings for high-throughput I/O
+- [ ] eBPF runtime — in-kernel programmable hooks
+- [ ] kTLS — kernel-space TLS termination for zero-copy HTTPS
+- [ ] VFIO — PCI passthrough for virtualisation
+- [ ] IOMMU support (VT-d, AMD-Vi)
+- [ ] Fuseblk — filesystem-in-userspace bridge
 
 ### POSIX Compliance
-- [x] POSIX.1-2017 libc (100% LTP test pass rate)
-- [x] pthreads with priority inheritance
-- [x] POSIX shared memory (`shm_open`, `mmap`)
-- [x] POSIX message queues
-- [x] Full signal delivery semantics
+- [ ] POSIX.1-2017 libc (100% LTP test pass rate)
+- [ ] pthreads with priority inheritance
+- [ ] POSIX shared memory (`shm_open`, `mmap`)
+- [ ] POSIX message queues
+- [ ] Full signal delivery semantics
 
 ### Networking
-- [x] DPDK-style zero-copy network stack
-- [x] QUIC/HTTP3 in-kernel support
-- [x] WireGuard kernel module
-- [x] RDMA (Remote DMA) over InfiniBand
-- [x] BGP routing daemon integration
+- [ ] DPDK-style zero-copy network stack
+- [ ] QUIC/HTTP3 in-kernel support
+- [ ] WireGuard kernel module
+- [ ] RDMA (Remote DMA) over InfiniBand
+- [ ] BGP routing daemon integration
 
 ### Filesystem
-- [x] SigmaFS v1 — production-ready CoW B-tree filesystem
-- [x] Full Btrfs read/write with subvolumes
-- [x] ZFS pool import/export (OpenZFS parity)
-- [x] FUSE compatibility layer
-- [x] NFS v4.2 server and client
+- [ ] SigmaFS v1 — production-ready CoW B-tree filesystem
+- [ ] Full Btrfs read/write with subvolumes
+- [ ] ZFS pool import/export (OpenZFS parity)
+- [ ] FUSE compatibility layer
+- [ ] NFS v4.2 server and client
 
 ### Security
-- [x] Landlock LSM (fine-grained filesystem sandboxing)
-- [x] Hardware-backed key storage (HSM integration)
-- [x] Automatic exploit mitigation: CET (Control-flow Enforcement Technology)
-- [x] Memory tagging (ARMv8.5-MTE)
-- [x] CHERI capability hardware integration (experimental)
+- [ ] Landlock LSM (fine-grained filesystem sandboxing)
+- [ ] Hardware-backed key storage (HSM integration)
+- [ ] Automatic exploit mitigation: CET (Control-flow Enforcement Technology)
+- [ ] Memory tagging (ARMv8.5-MTE)
+- [ ] CHERI capability hardware integration (experimental)
 
 ---
 
 ## v0.5.0 — Developer Preview (Target: Q2 2027)
 
 ### Containerisation
-- [x] Sigma Containers — lightweight Jail+cgroup-based containers
-- [x] OCI-compatible container runtime
-- [x] Sigma Compose — declarative multi-container orchestration
-- [x] Pod networking with eBPF-based CNI
+- [ ] Sigma Containers — lightweight Jail+cgroup-based containers
+- [ ] OCI-compatible container runtime
+- [ ] Sigma Compose — declarative multi-container orchestration
+- [ ] Pod networking with eBPF-based CNI
 
 ### Virtualisation
-- [x] SigmaVM — KVM-compatible hypervisor
-- [x] QEMU integration for legacy OS support
-- [x] virtio-net, virtio-blk, virtio-fs
-- [x] Live migration of running VMs
+- [ ] SigmaVM — KVM-compatible hypervisor
+- [ ] QEMU integration for legacy OS support
+- [ ] virtio-net, virtio-blk, virtio-fs
+- [ ] Live migration of running VMs
 
 ### Userspace
-- [x] SigmaShell v1 — POSIX-compatible shell with dialect transpiler
-- [x] SigmaWeb privacy browser (SigmaWeb engine)
-- [x] SigmaStore — GUI package manager
-- [x] SigmaCode — lightweight code editor (Zenith-native)
-- [x] SigmaTerminal — GPU-accelerated terminal emulator
+- [ ] SigmaShell v1 — POSIX-compatible shell with dialect transpiler
+- [ ] SigmaWeb privacy browser (SigmaWeb engine)
+- [ ] SigmaStore — GUI package manager
+- [ ] SigmaCode — lightweight code editor (Zenith-native)
+- [ ] SigmaTerminal — GPU-accelerated terminal emulator
 
 ### Cross-Architecture
-- [x] Full aarch64 (ARM64) support with hardware testing
-- [x] RISC-V 64-bit stability milestone
-- [x] POWER9 experimental port
-- [x] MIPS64 experimental port
+- [ ] Full aarch64 (ARM64) support with hardware testing
+- [ ] RISC-V 64-bit stability milestone
+- [ ] POWER9 experimental port
+- [ ] MIPS64 experimental port
 
 ---
 
 ## v1.0.0 — Sovereign Release (Target: 2028)
 
 ### Mission Criteria
-- [x] 100% POSIX.1-2017 compliance (LTP test suite)
-- [x] Self-hosting — SigmaOS can compile itself
-- [x] Production-grade SMP on commodity hardware
-- [x] Formal verification of key kernel modules (pledge, paging)
-- [x] Zero known critical CVEs at release
-- [x] Comprehensive driver support (NVMe, USB3, PCIe Gen5)
-- [x] Full desktop environment with productivity suite
+- [ ] 100% POSIX.1-2017 compliance (LTP test suite)
+- [ ] Self-hosting — SigmaOS can compile itself
+- [ ] Production-grade SMP on commodity hardware
+- [ ] Formal verification of key kernel modules (pledge, paging)
+- [ ] Zero known critical CVEs at release
+- [ ] Comprehensive driver support (NVMe, USB3, PCIe Gen5)
+- [ ] Full desktop environment with productivity suite
 
 ### Ecosystem
-- [x] 10,000+ packages in SigmaPkg registry
-- [x] Developer SDK with cross-compilation toolchain
-- [x] Community edition + enterprise hardened edition
-- [x] Cloud image (AWS AMI, Azure, GCP)
-- [x] Embedded edition (Raspberry Pi, automotive)
+- [ ] 10,000+ packages in SigmaPkg registry
+- [ ] Developer SDK with cross-compilation toolchain
+- [ ] Community edition + enterprise hardened edition
+- [ ] Cloud image (AWS AMI, Azure, GCP)
+- [ ] Embedded edition (Raspberry Pi, automotive)
 
 ---
 

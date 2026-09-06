@@ -4,10 +4,7 @@
 
 > ✅ **Build Status:** 0 compilation errors as of September 2026. All 14 open PRs merged.
 
-## Development
-- [API Reference](Documentation-API-Reference-v0.9)
-- [Contributing Guidelines](Community-Contributing-Guidelines)
-- [Security Policy](Documentation-Security-Policy)
+---
 
 ## 🚀 Getting Started
 
