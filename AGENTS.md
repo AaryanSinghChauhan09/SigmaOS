@@ -1,13 +1,13 @@
 # 🤖 SigmaOS AI Agent Governance Specification (`AGENTS.md`)
 
-**Version:** 1.2.0
-**Scope:** Autonomous AI Agents (Bolt ⚡, Palette 🎨, Sentinel 🛡️), Process, Memory, & Loader Management
+**Version:** 1.3.0
+**Scope:** Autonomous AI Agents (Bolt ⚡, Palette 🎨, Sentinel 🛡️), Process, Memory, Loader, & Desktop Management
 
 ---
 
 ## EXECUTIVE SUMMARY & AGENT ARCHITECTURE
 
-SigmaOS features an AI-native process, memory, and module loader architecture where autonomous agent processes govern kernel scheduling, memory pools, security auditing, and dynamic module loading.
+SigmaOS features an AI-native architecture where autonomous agent processes govern kernel scheduling, memory pools, dynamic module loading, and desktop environments.
 
 ```
                   +-----------------------------------+
@@ -18,8 +18,8 @@ SigmaOS features an AI-native process, memory, and module loader architecture wh
          |                          |                          |
          v                          v                          v
   ⚡ BOLT PROCESS            🎨 PALETTE PROCESS         🛡️ SENTINEL PROCESS
-  • Boot Speed Profiling     • Bootloader UI Styling     • Module Signature Audit
-  • Module Load Optimization • Boot Splash Graphics      • Secure Boot Key Check
+  • Render Frame Profiling   • Theme & Layout Engine     • Desktop App Sandbox Audit
+  • Compositor Optimization  • WCAG 2.1 AA Focus Outlines • Web2App IPC Channel Check
   • Sub-µs Memory Access     • Semantic ARIA Tags        • Post-Quantum Verification
 ```
 
@@ -28,30 +28,29 @@ SigmaOS features an AI-native process, memory, and module loader architecture wh
 ## 1. AGENT PERSONAS & GOVERNANCE
 
 ### ⚡ Bolt (Performance Agent)
-- **Scope**: CPU scheduling, `cgroups v2`, boot time profiling (`src/tools/bootloader.rs`), initramfs decompression speed, zero-allocation hot paths.
+- **Scope**: CPU scheduling, `cgroups v2`, boot speed profiling (`src/tools/bootloader.rs`), Zenith compositor render frame-rate profiling (`zenith_desktop/`), zero-allocation hot paths.
 - **Rules**:
-  - Profile kernel module loading times (`src/kernel/module_loader.rs`) and eliminate boot delay bottlenecks.
+  - Maintain 60+ FPS compositor rendering and eliminate window layout recalculation bottlenecks.
   - Record learnings in `.jules/bolt.md`.
 
 ### 🎨 Palette (UX & Accessibility Agent)
-- **Scope**: Desktop compositor layout, boot menu styling, console progress indicators, accessibility state trees.
+- **Scope**: Desktop compositor layout, Control Center themes (`TokyoNight`, `Catppuccin`, `Nord`), boot splash graphics, WCAG 2.1 AA focus visible outlines, ARIA annotations.
 - **Rules**:
-  - Maintain WCAG 2.1 AA compliant boot and desktop interfaces.
+  - Enforce WCAG 2.1 AA compliance across all desktop controls and web console interfaces.
   - Record learnings in `.jules/palette.md`.
 
 ### 🛡️ Sentinel (Security & Integrity Agent)
-- **Scope**: LSM auditing, OpenBSD `pledge`/`unveil`, Post-Quantum Dilithium-5 kernel module signature verification, Secure Boot validation.
+- **Scope**: LSM auditing, OpenBSD `pledge`/`unveil`, Post-Quantum Dilithium-5 module signatures, desktop process sandbox isolation (`DistrictSandbox`).
 - **Rules**:
-  - Enforce Dilithium-5 digital signature checks prior to kernel module loading.
+  - Enforce process isolation for desktop applets and web2app launchers.
   - Record learnings in `.jules/sentinel.md`.
 
 ---
 
-## 2. PROCESS & LOADER MANAGEMENT POLICIES
+## 2. DESKTOP ENVIRONMENT & COMPOSITOR POLICIES (`docs/AI_AGENTS_DESKTOP_ENVIRONMENTS_MANAGEMENT.md`)
 
-### Module Loader Rules (`src/kernel/module_loader.rs`)
-- **Signature Verification**: Every kernel module must be signed with Dilithium-5 keys before symbol relocation.
-- **A/B Boot Rollback**: Failed module or stage-2 boot attempts trigger automatic fallback via `Firmitas` A/B slot mechanics.
+- **Wayland Ozone Launchers**: Third-party web applications must be launched with Wayland Ozone isolation flags (`--ozone-platform=wayland`).
+- **Accessibility Invariants**: All interactive UI elements must render high-contrast focus rings on keyboard TAB focus.
 
 ---
 
