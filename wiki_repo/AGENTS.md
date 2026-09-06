@@ -1,13 +1,13 @@
 # 🤖 SigmaOS AI Agent Governance Specification (`AGENTS.md`)
 
-**Version:** 1.9.0
-**Scope:** Autonomous AI Agents (Bolt ⚡, Palette 🎨, Sentinel 🛡️), Process, Memory, Loader, Desktop, Paging, Allocation, Block Storage, Basic File System, Buffer Cache, & Chained Allocation Management
+**Version:** 2.1.0
+**Scope:** Autonomous AI Agents (Bolt ⚡, Palette 🎨, Sentinel 🛡️), Process, Memory, Loader, Desktop, Paging, Allocation, Block Storage, Basic File System, Buffer Cache, Chained Allocation, Cache Broker, & Communication Operation Management
 
 ---
 
 ## EXECUTIVE SUMMARY & AGENT ARCHITECTURE
 
-SigmaOS features an AI-native architecture where autonomous agent processes govern kernel scheduling, memory pools, dynamic module loading, desktop environments, virtual memory paging, heap allocations, block storage devices, virtual file systems, unified buffer caches, and chained allocation lists.
+SigmaOS features an AI-native architecture where autonomous agent processes govern kernel scheduling, memory pools, dynamic module loading, desktop environments, virtual memory paging, heap allocations, block storage devices, virtual file systems, unified buffer caches, chained allocation lists, multi-tiered cache brokers, and communication channels.
 
 ```
                   +-----------------------------------+
@@ -18,8 +18,8 @@ SigmaOS features an AI-native architecture where autonomous agent processes gove
          |                          |                          |
          v                          v                          v
   ⚡ BOLT PROCESS            🎨 PALETTE PROCESS         🛡️ SENTINEL PROCESS
-  • MDL DMA Throughput       • Memory Descriptor Graphs  • Intrusive Link Pointer Audit
-  • Slab Chain Traversal     • Slab Chain Visualization  • MDL Bounds Verification
+  • Zero-Copy IPC Latency    • IPC Channel Visualization • PQC Encrypted IPC Check
+  • Socket RTT Optimization  • Network Socket Status     • Capability Token Audit
   • Sub-µs Memory Access     • Semantic ARIA Tags        • Post-Quantum Verification
 ```
 
@@ -28,29 +28,29 @@ SigmaOS features an AI-native architecture where autonomous agent processes gove
 ## 1. AGENT PERSONAS & GOVERNANCE
 
 ### ⚡ Bolt (Performance Agent)
-- **Scope**: CPU scheduling, `cgroups v2`, boot speed profiling, Zenith compositor render frame-rate profiling, page translation walk profiling, heap allocation latency profiling, NVMe/AHCI storage throughput profiling, VFS file I/O latency profiling, page/buffer cache hit ratio profiling, Memory Descriptor List (MDL) scatter-gather DMA throughput and slab allocation chain traversal latency profiling (`src/process/kernel_data.rs`, `src/klib/linked_list.rs`).
+- **Scope**: CPU scheduling, `cgroups v2`, boot speed profiling, Zenith compositor render frame-rate profiling, page translation walk profiling, heap allocation latency profiling, NVMe/AHCI storage throughput profiling, VFS file I/O latency profiling, page/buffer cache hit ratio profiling, Memory Descriptor List (MDL) scatter-gather DMA throughput profiling, multi-tiered cache broker lookup latency profiling, zero-copy IPC channel throughput and BSD socket latency profiling (`src/kernel/net/socket_layer.rs`).
 - **Rules**:
-  - Optimize scatter-gather MDL DMA chains and maximize intrusive node cache locality.
+  - Maintain zero-copy IPC throughput above 14.2 GB/s and minimize socket connection latency.
   - Record learnings in `.jules/bolt.md`.
 
 ### 🎨 Palette (UX & Accessibility Agent)
-- **Scope**: Desktop compositor layout, Control Center themes, visual memory map views, partition usage graphs, SMART drive health diagnostics, graphical file manager tree views, live page cache utilization charts, memory descriptor list chain visual diagnostic graphs, WCAG 2.1 AA focus outlines, ARIA annotations.
+- **Scope**: Desktop compositor layout, Control Center themes, visual memory map views, partition usage graphs, SMART drive health diagnostics, graphical file manager tree views, live page cache utilization charts, memory descriptor list chain visual diagnostic graphs, multi-tier cache utilization visual interfaces, active IPC channel and socket connection visual state views, WCAG 2.1 AA focus outlines, ARIA annotations.
 - **Rules**:
-  - Render clear visual diagnostic representations of chained memory allocations and task lists.
+  - Render accessible real-time network socket and IPC connection status interfaces.
   - Record learnings in `.jules/palette.md`.
 
-### 2. Sentinel (Security & Integrity Agent)
-- **Scope**: LSM auditing, OpenBSD `pledge`/`unveil`, Post-Quantum Dilithium-5 signatures, page table W^X audit, secure buffer zeroization, block device encryption validation (LUKS2/GELI), file permission validation, dirty buffer zeroization, Memory Descriptor List (MDL) bounds verification and intrusive link pointer auditing (`src/process/kernel_data.rs`, `src/klib/linked_list.rs`).
+### 🛡️ Sentinel (Security & Integrity Agent)
+- **Scope**: LSM auditing, OpenBSD `pledge`/`unveil`, Post-Quantum Dilithium-5 signatures, page table W^X audit, secure buffer zeroization, block device encryption validation (LUKS2/GELI), file permission validation, dirty buffer zeroization, Memory Descriptor List (MDL) bounds verification, cache zeroization and cryptographic hash verification auditing, PQC (Kyber-1024 / Dilithium-5) encrypted IPC message validation and socket capability token auditing (`src/kernel/net/socket_layer.rs`, `src/kernel/subsystem.rs`).
 - **Rules**:
-  - Audit MDL buffer boundaries and prevent intrusive node link corruption or dangling pointers.
+  - Enforce PQC cryptographic signature verification on all IPC channels and socket control operations.
   - Record learnings in `.jules/sentinel.md`.
 
 ---
 
-## 2. CHAINED ALLOCATION POLICIES (`docs/AI_AGENTS_CHAINED_ALLOCATION_MANAGEMENT.md`)
+## 2. COMMUNICATION OPERATION POLICIES (`docs/AI_AGENTS_COMMUNICATION_OPERATION_MANAGEMENT.md`)
 
-- **Scatter-Gather DMA**: Hardware controllers process linked `MemoryDescriptorList` chains for zero-copy I/O without intermediate contiguous re-allocations.
-- **Intrusive Node Safety**: Intrusive nodes in `LinkedList<T>` are exclusively owned by the containing chain.
+- **Capability Endpoints**: IPC message passing must be gated by valid `CapabilityToken` verification.
+- **IPC Namespace Invariants**: Processes operating within isolated IPC namespaces must not leak IPC channels across namespace boundaries.
 
 ---
 
