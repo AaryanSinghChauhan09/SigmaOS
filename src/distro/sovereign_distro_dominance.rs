@@ -218,6 +218,7 @@ impl OpenBsdHardenedCapsicumPledge {
             pledged_promises: Vec::new(),
             fd_capability_rights: BTreeMap::new(),
             unveiled_paths: BTreeMap::new(),
+            is_pledged: false,
         }
     }
 
@@ -861,6 +862,9 @@ impl SovereignDistroDominanceSuite {
         let mut security_sentinel = OpenBsdHardenedCapsicumPledge::new();
         security_sentinel.pledge(&["stdio", "rpath", "wpath", "exec", "proc"]);
 
+        let mut popos_sched = PopOsSystem76AutoScheduler::new();
+        popos_sched.register_process(1, "init", ProcessPowerProfile::InteractiveUi);
+
         Self {
             nix_store: NixGuixZeroCopyStore::new(),
             scheduler: CachyBoreDynamicAiScheduler::new(),
@@ -868,7 +872,7 @@ impl SovereignDistroDominanceSuite {
             filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
             microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
             pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
-            popos_scheduler: PopOsSystem76AutoScheduler::new(),
+            popos_scheduler: popos_sched,
             talos_cluster: TalosHeadlessMtlsClusterEngine::new(
                 "talos-master-01",
                 "hash_init_declarative_001",
@@ -901,7 +905,7 @@ impl SovereignDistroDominanceSuite {
         if !self.pqc_vpn.interface_name.is_empty() {
             score += 20;
         }
-        if self.popos_scheduler.managed_processes.capacity() >= 0 {
+        if !self.popos_scheduler.managed_processes.is_empty() {
             score += 20;
         }
         score += 20; // Zero-copy CAS + PQC VPN dominance guarantee
