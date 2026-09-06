@@ -1142,13 +1142,18 @@ fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
         assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), expected_pkg_db);
         assert!(bridge.enforce_security_isolation(1001, "/sandbox/root").is_ok());
 
-        assert!(bridge.dispatch_cross_subsystem_operation("init", "start").is_ok());
-        assert!(bridge.dispatch_cross_subsystem_operation("package", "zsh").is_ok());
-        assert!(bridge.dispatch_cross_subsystem_operation("vfs", "/etc").is_ok());
-        assert!(bridge.dispatch_cross_subsystem_operation("security", "/sandbox").is_ok());
-        assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
-        assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
-        assert!(bridge.dispatch_cross_subsystem_operation("power", "saver").is_ok());
+        let all_subsystems = [
+            "init", "package", "vfs", "security", "storage", "kernel", "network",
+            "graphics", "power", "audio", "ipc", "containers", "time", "memory",
+            "ui", "process", "virt", "audit", "ai", "auth", "bluetooth", "boot",
+            "cloud", "compliance", "compression", "config", "device", "diagnostics",
+            "event", "filesystem", "input", "i18n", "installer", "iot", "logging",
+            "performance", "print", "privacy", "recovery", "resource", "rt",
+            "runtime", "shell", "smartcard", "thermal", "toolchain",
+        ];
+        for sub in all_subsystems {
+            assert!(bridge.dispatch_cross_subsystem_operation(sub, "action_item").is_ok());
+        }
     }
 
     let bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);

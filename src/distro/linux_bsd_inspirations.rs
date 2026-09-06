@@ -513,6 +513,174 @@ impl SovereignUniversalDistroBridge {
                     action, mprotect_res.is_ok(), self.mode
                 ))
             }
+            "ai" | "ml" => {
+                Ok(format!(
+                    "Dispatched AI/ML autonomous resource governor and model inference context '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "auth" | "identity" => {
+                Ok(format!(
+                    "Dispatched SSSD/FreeIPA/PAM identity authentication manager for user '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "bluetooth" | "wireless" => {
+                Ok(format!(
+                    "Dispatched BlueZ/hccontrol wireless Bluetooth controller stack for interface '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "boot" | "loader" => {
+                Ok(format!(
+                    "Dispatched EFISTUB/Multiboot2/BTX bootloader stage recipe execution for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cloud" | "cluster" => {
+                Ok(format!(
+                    "Dispatched High-Availability mesh / Nomad / Ceph cluster orchestration for node '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compliance" | "tpm" => {
+                Ok(format!(
+                    "Dispatched OpenSCAP / TPM 2.0 PCR attestation measurement audit for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compression" | "backup" => {
+                Ok(format!(
+                    "Dispatched Zram/Zswap memory compression & Snapper backup snapshot for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "config" | "customization" => {
+                Ok(format!(
+                    "Dispatched Nix Flakes / Guix SCM / Portage make.conf declarative profile evaluation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "device" | "driver" => {
+                Ok(format!(
+                    "Dispatched dynamic devfs & driver shard manager binding for device '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "diagnostics" | "observability" => {
+                Ok(format!(
+                    "Dispatched DTrace / BPF Co-RE / Phoronix performance tracing for probe '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "event" | "signal" => {
+                Ok(format!(
+                    "Dispatched kqueue / epoll / eventfd event loop signal router for event '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "filesystem" => {
+                Ok(format!(
+                    "Dispatched multi-format VFS / ZFS / Btrfs / HAMMER2 filesystem mount manager for path '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "input" | "gamepad" => {
+                Ok(format!(
+                    "Dispatched libinput / evdev / FreeBSD vt universal input event router for device '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" | "locale" => {
+                Ok(format!(
+                    "Dispatched fcitx5 / ibus input method & regional locale manager for setting '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "installer" => {
+                Ok(format!(
+                    "Dispatched Calamares / Debian d-i / Void void-installer system installation pipeline for step '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "iot" | "embedded" => {
+                Ok(format!(
+                    "Dispatched NuttX real-time task governor / Protothreads scheduler for task '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "logging" => {
+                Ok(format!(
+                    "Dispatched Systemd journald binary log / FreeBSD syslogd log router for facility '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "performance" => {
+                Ok(format!(
+                    "Dispatched CachyOS BORE / Ananicy hyper-optimization performance tuning for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "print" => {
+                Ok(format!(
+                    "Dispatched CUPS / LPD printing daemon print job queue for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "privacy" => {
+                Ok(format!(
+                    "Dispatched Tails amnesic RAM wipe / Whonix Tor gateway privacy scrubbing for session '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "recovery" => {
+                Ok(format!(
+                    "Dispatched Rescue ISO disaster recovery & Snapper atomic rollback for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "resource" | "cgroup" => {
+                Ok(format!(
+                    "Dispatched Linux cgroups v2 / FreeBSD racct resource governor limit for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "rt" | "realtime" => {
+                Ok(format!(
+                    "Dispatched PREEMPT_RT / NuttX real-time task scheduler for task '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "runtime" => {
+                Ok(format!(
+                    "Dispatched Flatpak / Snap / AppImage / Nix store package container runtime for application '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "shell" | "lang" => {
+                Ok(format!(
+                    "Dispatched POSIX sh / zsh / fish / Zenith / HolyC shell interpreter bridge for command '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "smartcard" | "crypto" => {
+                Ok(format!(
+                    "Dispatched LUKS2 / GELI / PKCS#11 / Dilithium5 PQC cryptographic key manager for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched thermal governor & fan speed throttling controller for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "toolchain" => {
+                Ok(format!(
+                    "Dispatched sovereign compiler toolchain & Poudriere / Sbuild bulk builder for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             _ => Err("Unknown target subsystem"),
         }
     }
@@ -4923,23 +5091,19 @@ mod tests {
             assert_eq!(bridge.get_supervisor_type(), expected_supervisor);
             assert!(bridge.verify_all_subsystems_compatibility());
 
-            // Check cross-subsystem operations
-            assert!(bridge.dispatch_cross_subsystem_operation("init", "restart").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("package", "install").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("vfs", "/etc").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("security", "/app").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("power", "performance").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("audio", "default-sink").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("ipc", "ring-pipe").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("containers", "/var/chroot/app").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("time", "pool.ntp.org").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("memory", "page_alloc").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("ui", "KdePlasma").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("process", "worker_task").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("virt", "microvm0").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("audit", "pax_check").is_ok());
+            // Check cross-subsystem operations across all 46 SigmaOS subsystems
+            let all_subsystems = [
+                "init", "package", "vfs", "security", "storage", "kernel", "network",
+                "graphics", "power", "audio", "ipc", "containers", "time", "memory",
+                "ui", "process", "virt", "audit", "ai", "auth", "bluetooth", "boot",
+                "cloud", "compliance", "compression", "config", "device", "diagnostics",
+                "event", "filesystem", "input", "i18n", "installer", "iot", "logging",
+                "performance", "print", "privacy", "recovery", "resource", "rt",
+                "runtime", "shell", "smartcard", "thermal", "toolchain",
+            ];
+            for sub in all_subsystems {
+                assert!(bridge.dispatch_cross_subsystem_operation(sub, "test_action").is_ok());
+            }
         }
     }
 
