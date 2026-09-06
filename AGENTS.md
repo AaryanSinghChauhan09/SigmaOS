@@ -1,62 +1,59 @@
-# 🤖 SigmaOS AI Agent Governance Specification (`AGENTS.md`)
+# AGENTS.md — AI Agent Operating Instructions for SigmaOS
 
-**Version:** 1.9.0
-**Scope:** Autonomous AI Agents (Bolt ⚡, Palette 🎨, Sentinel 🛡️), Process, Memory, Loader, Desktop, Paging, Allocation, Block Storage, Basic File System, Buffer Cache, & Chained Allocation Management
-
----
-
-## EXECUTIVE SUMMARY & AGENT ARCHITECTURE
-
-SigmaOS features an AI-native architecture where autonomous agent processes govern kernel scheduling, memory pools, dynamic module loading, desktop environments, virtual memory paging, heap allocations, block storage devices, virtual file systems, unified buffer caches, and chained allocation lists.
-
-```
-                  +-----------------------------------+
-                  |   SIGMAOS AI AGENT GOVERNANCE     |
-                  +-----------------------------------+
-                                    |
-         +--------------------------+--------------------------+
-         |                          |                          |
-         v                          v                          v
-  ⚡ BOLT PROCESS            🎨 PALETTE PROCESS         🛡️ SENTINEL PROCESS
-  • MDL DMA Throughput       • Memory Descriptor Graphs  • Intrusive Link Pointer Audit
-  • Slab Chain Traversal     • Slab Chain Visualization  • MDL Bounds Verification
-  • Sub-µs Memory Access     • Semantic ARIA Tags        • Post-Quantum Verification
-```
+Welcome, AI Agent! This file provides essential context, coding standards, instructions, and verification commands for working with the **SigmaOS** repository.
 
 ---
 
-## 1. AGENT PERSONAS & GOVERNANCE
+## ⚡ Tri-Agent Roles & Responsibilities
 
-### ⚡ Bolt (Performance Agent)
-- **Scope**: CPU scheduling, `cgroups v2`, boot speed profiling, Zenith compositor render frame-rate profiling, page translation walk profiling, heap allocation latency profiling, NVMe/AHCI storage throughput profiling, VFS file I/O latency profiling, page/buffer cache hit ratio profiling, Memory Descriptor List (MDL) scatter-gather DMA throughput and slab allocation chain traversal latency profiling (`src/process/kernel_data.rs`, `src/klib/linked_list.rs`).
-- **Rules**:
-  - Optimize scatter-gather MDL DMA chains and maximize intrusive node cache locality.
-  - Record learnings in `.jules/bolt.md`.
+1. **Bolt ⚡ (Performance & Speed Optimization)**
+   - Hunt for bottlenecks, heap allocation overhead, $O(N^2)$ algorithm loops, and cache misses.
+   - Implement clean, measurable performance optimizations (<50 lines) without sacrificing readability.
+   - Log critical performance learnings in `.jules/bolt.md`.
 
-### 🎨 Palette (UX & Accessibility Agent)
-- **Scope**: Desktop compositor layout, Control Center themes, visual memory map views, partition usage graphs, SMART drive health diagnostics, graphical file manager tree views, live page cache utilization charts, memory descriptor list chain visual diagnostic graphs, WCAG 2.1 AA focus outlines, ARIA annotations.
-- **Rules**:
-  - Render clear visual diagnostic representations of chained memory allocations and task lists.
-  - Record learnings in `.jules/palette.md`.
+2. **Palette 🎨 (UX, Ergonomics & Accessibility)**
+   - Enhance CLI output, Web UI components, and desktop tools.
+   - Ensure WCAG 2.1 AA compliance, visible focus indicators (`:focus-visible`), and explicit ARIA annotations (`role="tablist"`, `aria-label`).
+   - Log critical UX learnings in `.jules/palette.md`.
 
-### 2. Sentinel (Security & Integrity Agent)
-- **Scope**: LSM auditing, OpenBSD `pledge`/`unveil`, Post-Quantum Dilithium-5 signatures, page table W^X audit, secure buffer zeroization, block device encryption validation (LUKS2/GELI), file permission validation, dirty buffer zeroization, Memory Descriptor List (MDL) bounds verification and intrusive link pointer auditing (`src/process/kernel_data.rs`, `src/klib/linked_list.rs`).
-- **Rules**:
-  - Audit MDL buffer boundaries and prevent intrusive node link corruption or dangling pointers.
-  - Record learnings in `.jules/sentinel.md`.
+3. **Sentinel 🛡️ (Security, PQC Integrity & Compliance)**
+   - Protect memory safety, driver execution boundaries, PII data masking (GDPR/HIPAA), and Dilithium-5 post-quantum signature verifications.
+   - Ensure mock test credentials use `mock_` or `test_` variable prefixes.
+   - Log critical security learnings in `.jules/sentinel.md`.
 
 ---
 
-## 2. CHAINED ALLOCATION POLICIES (`docs/AI_AGENTS_CHAINED_ALLOCATION_MANAGEMENT.md`)
+## 🚗 Driver Management Protocols for AI Agents
 
-- **Scatter-Gather DMA**: Hardware controllers process linked `MemoryDescriptorList` chains for zero-copy I/O without intermediate contiguous re-allocations.
-- **Intrusive Node Safety**: Intrusive nodes in `LinkedList<T>` are exclusively owned by the containing chain.
+When working on or interacting with the **Driver Subsystem** (`src/driver/`):
+- Refer to `docs/AI_AGENT_DRIVER_MANAGEMENT.md` for complete driver lifecycle directives.
+- Always enforce bounds checking on ring buffers, virtqueues, and MMIO submission/completion queue pointers.
+- Ensure out-of-tree or DKMS modules are built inside sandboxed environments (`SbuildChrootSandboxEngine`) and signed with Dilithium-5 signatures (`Dilithium5KernelSignatureVerifier`).
+- Ensure fallback mechanisms exist (`SovereignDriverRecovery`) whenever probing or initializing bare-metal hardware drivers (`NvmePCIeHostController`, `IntelE1000eNicDriver`, `XhciHostControllerDriver`).
 
 ---
 
-## 3. STANDALONE TESTING & VERIFICATION PROTOCOL
+## 🧪 Testing & Verification Commands
 
-Every agent module must support standalone unit testing via:
+### Cargo & Standalone Test Suites
 ```bash
-rustc --test <module_path> --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_agent && /tmp/test_agent
+# Verify library compilation
+cargo check --lib
+
+# Run standalone test runners for specific modules
+rustc --test src/package/universal.rs --edition=2021 --cfg 'feature="standalone_test"' -D warnings -o /tmp/test_universal && /tmp/test_universal
+rustc --test src/kernel/linux_parity.rs --edition=2021 -o /tmp/test_linux_parity && /tmp/test_linux_parity
+rustc --test src/distro/omarchy.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_omarchy && /tmp/test_omarchy
+rustc --test src/userland/indiastack/sigma_india_stack.rs --edition=2021 -o /tmp/test_india_stack && /tmp/test_india_stack
+rustc --test src/driver/distro_drivers.rs --edition=2021 -o /tmp/test_distro_drivers && /tmp/test_distro_drivers
+
+# Run integration test suites
+cargo check --test distro_inspirations_tests
+cargo check --test namespace_integration_full
 ```
+
+---
+
+## 📌 Commit & Submission Guidelines
+- Commits must be made directly to the `main` branch without creating Pull Requests.
+- Update `ImprovementPlan.md` and `NEXT_STEPS_GUIDELINES.md` with audit progress and strategic roadmap entries.
