@@ -37,6 +37,7 @@ pub enum Permission {
     NetworkUdp,
     FileRead,
     FileWrite,
+    ProcessExec,
     AudioPlayback,
     DisplayAccess,
     Ipc,
@@ -958,7 +959,7 @@ impl UniversalPackageAdapter {
 
     /// Detects package format based on file extension
     pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
-        let f = filename.to_lowercase();
+        let f = filename.to_lowercase().trim().replace(" ", "");
         if f.ends_with(".deb") || f.ends_with(".udeb") {
             Some(PackageFormat::Apt)
         } else if f.ends_with(".rpm") {
@@ -1008,12 +1009,14 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Pet)
         } else if f.ends_with(".ebuild") {
             Some(PackageFormat::Portage)
+        } else if f.ends_with(".nixpkg") || f.ends_with(".nix") {
+            Some(PackageFormat::Nix)
         } else if f.ends_with(".eopkg") {
-            Some(PackageFormat::Pisi)
+            Some(PackageFormat::Eopkg)
         } else if f.ends_with(".flatpak") {
-            Some(PackageFormat::Apt)
+            Some(PackageFormat::Flatpak)
         } else if f.ends_with(".snap") {
-            Some(PackageFormat::Apt)
+            Some(PackageFormat::Snap)
         } else if f.ends_with(".appimage") {
             Some(PackageFormat::AppImage)
         } else if f.ends_with(".moss") {
@@ -1821,6 +1824,9 @@ impl UniversalDependencyMapper {
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
+            "python" | "python3" | "python3-dev" | "python3-devel" | "dev-lang/python" | "lang/python" => {
+                "python".to_string()
+            }
             "curl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl" | "net-misc/curl" => "curl".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
             "libx11" | "libx11-dev" | "libx11-devel" | "x11-libs/libx11" | "x11-proto/xorgproto" | "xorg-x11-server" => "libx11".to_string(),
@@ -2162,8 +2168,8 @@ impl UniversalPmCommandDispatcher {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "-a" | "--ask" | "-pv" | "--pretend" => dry_run = true,
-                        "-u" | "-uN" | "--update" | "@world" => operation = UniversalPmOperation::Upgrade,
+                        "-a" | "--ask" | "-pv" | "--pretend" | "-p" => dry_run = true,
+                        "-u" | "-uN" | "-uDN" | "--update" | "@world" => operation = UniversalPmOperation::Upgrade,
                         "-C" | "--unmerge" | "deselect" => operation = UniversalPmOperation::Remove,
                         "-s" | "--search" => operation = UniversalPmOperation::Search,
                         "-S" | "--searchdesc" => operation = UniversalPmOperation::Search,
@@ -2205,7 +2211,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_add" | "pkg_delete" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
@@ -2251,6 +2257,21 @@ impl UniversalPmCommandDispatcher {
                         "r" | "remove" => operation = UniversalPmOperation::Remove,
                         "u" | "update" => operation = UniversalPmOperation::Upgrade,
                         "s" | "search" => operation = UniversalPmOperation::Search,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "flatpak" | "snap" | "pkgman" | "swupd" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" | "bundle-add" => operation = UniversalPmOperation::Install,
+                        "remove" | "uninstall" | "remove-bundle" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "bundle-upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "find" => operation = UniversalPmOperation::Search,
+                        "info" | "show" => operation = UniversalPmOperation::QueryInfo,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
@@ -2813,7 +2834,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Pisi)
+            Some(PackageFormat::Eopkg)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
