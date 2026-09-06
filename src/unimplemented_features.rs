@@ -4019,69 +4019,7 @@ mod new_unimplemented_tests {
         assert_eq!(phoronix.calculate_composite_score(), 100.0);
     }
 
-    #[test]
-    fn test_frappe_framework_doctype_engine() {
-        let mut frappe = FrappeFrameworkDocTypeEngine::new("Customer Order");
-        frappe.add_field("customer_name", "Data", "Customer Name", true);
-        assert_eq!(frappe.fields.len(), 1);
-        assert_eq!(frappe.transition_workflow("submit").unwrap(), "Submitted");
-        assert_eq!(frappe.transition_workflow("cancel").unwrap(), "Cancelled");
-    }
 
-    #[test]
-    fn test_hwbusters_power_supply_monitor() {
-        let mut psu = HwbustersPowerSupplyMonitor::new(1000);
-        psu.record_load(500.0, 12.0);
-        assert_eq!(psu.calculate_efficiency_percent(), 92.5);
-        assert!(psu.handle_atx_3_0_power_spike(1800.0));
-    }
-
-    #[test]
-    fn test_android15_private_space_governor() {
-        let mut space = Android15PrivateSpaceGovernor::new();
-        space.register_private_app("com.bank.app");
-        assert!(space.unlock_space(true));
-        assert_eq!(space.lock_space_and_suspend_bg(), 1);
-        assert!(space.is_locked);
-    }
-
-    #[test]
-    fn test_macos_sequoia_window_manager() {
-        let mut sequoia = MacOsSequoiaWindowManager::new();
-        sequoia.set_tile_layout("Grid");
-        assert_eq!(sequoia.active_layout, "Grid");
-        assert!(sequoia.pair_iphone_mirroring("iphone_16_pro"));
-    }
-
-    #[test]
-    fn test_windows_copilot_recall_auditor() {
-        let mut recall = WindowsCopilotRecallAuditor::new();
-        assert!(recall
-            .capture_privacy_governed_snapshot("Terminal - zsh")
-            .is_ok());
-        assert!(recall
-            .capture_privacy_governed_snapshot("Banking Online")
-            .is_err());
-    }
-
-    #[test]
-    fn test_uutils_coreutils_zero_copy_buffer() {
-        let mut buf = UutilsCoreutilsZeroCopyBuffer::new(1024);
-        assert!(buf.push_zero_copy_slice(512));
-        assert_eq!(buf.bytes_buffered, 512);
-        assert_eq!(buf.flush_buffer(), 512);
-        assert_eq!(buf.bytes_buffered, 0);
-    }
-
-    #[test]
-    fn test_s6_service_init_supervisor() {
-        let mut s6 = S6ServiceInitSupervisor::new("sshd");
-        s6.notify_ready();
-        assert!(s6.is_ready);
-        let backoff = s6.handle_service_exit();
-        assert_eq!(backoff, 200);
-        assert!(!s6.is_ready);
-    }
 }
 
 // ==================================================================

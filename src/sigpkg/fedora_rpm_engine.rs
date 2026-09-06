@@ -4,7 +4,7 @@ use std::vec;
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(test, feature = "standalone_test")))]
 use crate::klib::collections::HashMap;
 #[cfg(feature = "standalone_test")]
 use std::collections::BTreeMap as HashMap;
@@ -223,7 +223,7 @@ impl RpmSpecParser {
         // Extract from %files section (usually contains some metadata)
         if let Some(files_lines) = self.sections.get("%files") {
             for line in files_lines {
-                let l_str: &str = line.as_str();
+                let l_str: &str = line;
                 if l_str.starts_with("%doc") || l_str.starts_with("%config") {
                     // Process file markers
                 }

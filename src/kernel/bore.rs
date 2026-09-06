@@ -28,6 +28,8 @@ pub struct BoreTask {
     pub is_real_time: bool, // Real-Time task bypass lane
     pub burst_history: u64, // CachyOS BORE sliding window burst history
     pub wakeup_boost_ms: u64, // CachyOS BORE interactive thread wakeup time-slice grant
+    pub preemption_threshold: u8, // Apache NuttX POSIX RT preemption-threshold
+    pub netpoll_priority_boost: bool, // DragonFly BSD netpoll polling priority boost
 }
 
 impl BoreTask {
@@ -43,6 +45,8 @@ impl BoreTask {
             is_real_time: false,
             burst_history: 0,
             wakeup_boost_ms: 0,
+            preemption_threshold: 0,
+            netpoll_priority_boost: false,
         }
     }
 
@@ -59,6 +63,16 @@ impl BoreTask {
     }
 
     /// Grants CachyOS interactive wakeup boost time-slice
+    /// Sets Apache NuttX POSIX RT preemption threshold (0..255)
+    pub fn with_preemption_threshold(mut self, threshold: u8) -> Self {
+        self.preemption_threshold = threshold;
+        self
+    }
+
+    /// Grants DragonFly BSD netpoll network latency priority boost
+    pub fn apply_netpoll_boost(&mut self, active: bool) {
+        self.netpoll_priority_boost = active;
+    }
     pub fn apply_wakeup_boost(&mut self, boost_ms: u64) {
         self.wakeup_boost_ms = boost_ms;
     }
@@ -113,6 +127,11 @@ impl BoreTask {
         // Apply CachyOS BORE wakeup boost reduction
         if self.wakeup_boost_ms > 0 {
             penalty = penalty.saturating_sub(self.wakeup_boost_ms * 2);
+        }
+
+        // Apply DragonFly BSD netpoll priority boost
+        if self.netpoll_priority_boost {
+            penalty = penalty.saturating_sub(30);
         }
 
         // Nice-value weight adjustment (Linux CFS inspired):

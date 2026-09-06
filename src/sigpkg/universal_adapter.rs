@@ -28,9 +28,8 @@ use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::security::Permission;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
     NetworkTcp,
@@ -45,6 +44,9 @@ pub enum Permission {
     Execute,
     ProcessExec,
 }
+
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::security::Permission;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]

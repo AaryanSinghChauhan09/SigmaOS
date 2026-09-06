@@ -88,6 +88,14 @@ pub enum PackageState {
 
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageState {
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
+}
+
 pub enum PackagePriority {
     Essential,
     Required,
@@ -1479,6 +1487,43 @@ pub struct PackageAdapter {
 }
 
 impl PackageAdapter {
+    pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
+        let mut pledges = Vec::new();
+        for arg in &manifest.finish_args {
+            if arg.contains("network") {
+                pledges.push("network".to_string());
+            } else if arg.contains("ipc") {
+                pledges.push("ipc".to_string());
+            } else if arg.contains("filesystem") {
+                pledges.push("unveil_all".to_string());
+            }
+        }
+        pledges
+    }
+
+    pub fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> String {
+        if manifest.confinement == "strict" {
+            "strict_pledge_sandbox".to_string()
+        } else {
+            "unconfined_host".to_string()
+        }
+    }
+
+    pub fn mount_appimage_squashfs(&self, runtime: &AppImageRuntime) -> Result<String, &'static str> {
+        if runtime.squashfs_offset == 0 {
+            Err("Invalid squashfs offset")
+        } else {
+            Ok(format!("/tmp/.mount_{}_squashfs", runtime.app_name))
+        }
+    }
+
+    pub fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
+        !config.sourcelist_url.is_empty()
+    }
+
+    pub fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
+        config.enabled
+    }
     pub fn new(format: PackageFormat, adapter_name: String) -> Self {
         Self {
             format,
@@ -1877,13 +1922,13 @@ impl UniversalPackageManager {
             (PackageFormat::Snap, "snap"),
             (PackageFormat::Flatpak, "flatpak"),
             (PackageFormat::SigmaPkg, "sigpkg"),
-            (PackageFormat::Portage, "portage_ebuild"),
-            (PackageFormat::FreeBsdPkg, "freebsd_pkg"),
-            (PackageFormat::ArchPkgBuild, "arch_pkgbuild"),
-            (PackageFormat::NixStore, "nix_store"),
+            (PackageFormat::Ebuild, "portage_ebuild"),
+            (PackageFormat::Pkg, "freebsd_pkg"),
+            (PackageFormat::Nixpkg, "nix_store"),
             (PackageFormat::AppImage, "appimage"),
-            (PackageFormat::Homebrew, "homebrew_formula"),
+            (PackageFormat::Bottle, "homebrew_formula"),
             (PackageFormat::Apk, "apk"),
+            (PackageFormat::Xbps, "xbps"),
         ];
 
         for (fmt, name) in formats {

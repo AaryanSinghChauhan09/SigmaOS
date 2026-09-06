@@ -591,6 +591,7 @@ pub struct RealtimeTask {
     pub deadline_us: u64,
     pub wcet_us: u64,
     pub numa_node: u32,
+    pub preemption_threshold: u8,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -643,6 +644,20 @@ impl SovereignHybridSchedulerInnovations {
         self.rt_tasks.values().next()
     }
 
+    /// Apache NuttX POSIX RT preemption-threshold gating: true if task priority exceeds threshold
+    pub fn evaluate_nuttx_preemption_threshold(&self, priority: u8, threshold: u8) -> bool {
+        priority >= threshold
+    }
+
+    /// FreeBSD ULE interactivity score calculation (0..100)
+    pub fn evaluate_ule_interactivity_boost(&self, run_ms: u64, sleep_ms: u64) -> u32 {
+        let total = run_ms + sleep_ms;
+        if total == 0 {
+            100
+        } else {
+            ((sleep_ms * 100) / total) as u32
+        }
+    }
     /// Selects optimal NUMA node for memory and thread affinity binding.
     pub fn select_optimal_numa_node(&self, cpu_core: usize) -> Option<usize> {
         self.numa_nodes

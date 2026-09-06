@@ -861,6 +861,9 @@ impl SovereignDistroDominanceSuite {
         let mut security_sentinel = OpenBsdHardenedCapsicumPledge::new();
         security_sentinel.pledge(&["stdio", "rpath", "wpath", "exec", "proc"]);
 
+        let mut popos_sched = PopOsSystem76AutoScheduler::new();
+        popos_sched.register_process(1, "init", ProcessPowerProfile::InteractiveUi);
+
         Self {
             nix_store: NixGuixZeroCopyStore::new(),
             scheduler: CachyBoreDynamicAiScheduler::new(),
@@ -868,7 +871,7 @@ impl SovereignDistroDominanceSuite {
             filesystem_cow: ZfsBtrfsHybridSelfHealingCoW::new(),
             microvm_gateway: SovereignMicrovmHypervisorGateway::new(),
             pqc_vpn: SovereignPqcWireguardVpnEngine::new("wg-sovereign0"),
-            popos_scheduler: PopOsSystem76AutoScheduler::new(),
+            popos_scheduler: popos_sched,
             talos_cluster: TalosHeadlessMtlsClusterEngine::new(
                 "talos-master-01",
                 "hash_init_declarative_001",

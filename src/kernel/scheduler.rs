@@ -33,6 +33,7 @@ pub struct Process {
     pub priority: Priority,
     pub state: ProcessState,
     pub runtime: Duration,
+    pub sleep_time: Duration,
     pub virtual_runtime: u64,  // EEVDF vruntime (ticks)
     pub virtual_deadline: u64, // EEVDF virtual deadline
     pub time_slice: Duration,
@@ -49,6 +50,7 @@ impl Process {
             priority,
             state: ProcessState::Ready,
             runtime: Duration::from_secs(0),
+            sleep_time: Duration::from_secs(0),
             virtual_runtime: 0,
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
@@ -92,7 +94,6 @@ impl Process {
         let bore_penalty = self.burst_score / 2;
         self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
     }
-}
 
 #[derive(Debug, Clone)]
 pub struct NumaNode {
@@ -304,6 +305,13 @@ impl CfsScheduler {
         }
     }
 
+    pub fn tick(&mut self) {
+        self.current_time += 1;
+    }
+
+    pub fn schedule(&mut self) -> Option<Task> {
+        self.pick_next_task()
+    }
     pub fn pick_next_task(&mut self) -> Option<Task> {
         if self.task_count > 0 {
             let task = self.tasks[0].take();
