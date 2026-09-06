@@ -4061,3 +4061,26 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 4. **MDL Pinning & Volatile Memory Wiping**:
    - Memory Descriptor List (MDL) pinning must be invoked on DMA buffers before transfers to prevent page fault races under high concurrency.
    - Cryptographic keys or sensitive buffers must execute volatile memory scrubbing (`AmnesicRamWipe` / zeroization) prior to page deallocation.
+
+---
+
+## 78. SOVEREIGN AI AGENT TESTING ARCHITECTURE & VERIFICATION SPECIFICATION
+
+### 78.1 Autonomous Agent Testing Directives
+
+1. **Mandatory 100% Pass Rate Policy**:
+   - AI engineering agents (Jules, Sentinel, Palette, Bolt) must achieve a 100% pass rate across all Rust (224+ unit tests), Python, and C++ test suites prior to submission.
+   - Code changes must include proactive unit test coverage for every newly added struct, enum, function, or module.
+
+2. **Master Integrated Test Execution (`./run_sigma_tests.sh`)**:
+   - Orchestrates Rust unit tests, security input validation benchmarks, Python modular system tests, universal package format adapter tests, and unimplemented feature/tool tests.
+
+3. **Standalone Module Fast-Verification (`rustc --test`)**:
+   - Allows rapid isolated verification of modified modules without full crate compilation overhead:
+     - `rustc --test --edition 2021 src/memory/pmm_vmm.rs -o build/test_pmm_vmm && ./build/test_pmm_vmm`
+     - `rustc --test --edition 2021 src/hal/multi_arch.rs -o build/test_multi_arch && ./build/test_multi_arch`
+     - `rustc --test --edition 2021 src/unimplemented_features.rs -o build/test_unimplemented_features && ./build/test_unimplemented_features`
+     - `rustc --test --edition 2021 src/unimplemented_tools.rs -o build/test_unimplemented_tools && ./build/test_unimplemented_tools`
+
+4. **Zero Test Skipping Rule**:
+   - Agents must never comment out or ignore failing assertions; underlying logic bugs must be diagnosed and resolved directly.

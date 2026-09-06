@@ -17,8 +17,9 @@ This document defines core directives, architecture rules, and memory management
 - **ARM64 / ARM32**: TTBR0_EL1 4-level 48-bit/52-bit translation vs Armv7 2-level paging with GICv3/GICv2 IRQ controllers.
 - **RISC-V 64 / 32**: Sv39/Sv48 3/4-level vs Sv32 2-level paging with PLIC/CLINT timers.
 
-## 4. AI Agent Workflow Rules
-- **Verify All Changes**: Every memory management modification in `src/memory/` or `src/klib/` must be verified using standalone unit test compilation (`rustc --test`) or `./run_sigma_tests.sh`.
-- **Zero Memory Leaks**: All custom allocations must be bounded and explicitly deallocated or dropped within ownership scopes.
+## 4. AI Agent Testing & Verification Directives
+- **Proactive Unit Testing**: Every code change or newly introduced feature must be accompanied by unit tests.
+- **Master Test Runner**: Run `./run_sigma_tests.sh` to verify 100% test pass rate across Rust, C++, and Python test suites.
+- **Standalone Module Testing**: Fast-verify specific modules using `rustc --test --edition 2021 <filepath> -o build/test_bin && ./build/test_bin`.
 
-For detailed memory management specifications, see `docs/AGENTS_MEMORY_MANAGEMENT.md` and `docs/memory-management.md`.
+For detailed specifications, see `docs/AGENTS_MEMORY_MANAGEMENT.md`, `docs/AGENTS_TESTING_GUIDELINES.md`, and `docs/memory-management.md`.
