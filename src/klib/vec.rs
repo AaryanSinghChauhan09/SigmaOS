@@ -38,7 +38,7 @@ impl<T> Vec<T> {
             return Self::new();
         }
         let size = mem::size_of::<T>() * capacity;
-        let new_data = alloc(size) as *mut T;
+        let new_data = unsafe { alloc(size) } as *mut T;
         Vec {
             data: new_data,
             len: 0,
