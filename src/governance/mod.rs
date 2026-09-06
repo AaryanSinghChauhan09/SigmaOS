@@ -19,8 +19,12 @@ pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,
 };
-pub use strategic_vision::{
-    MilestoneCategory, OkrError, OkrTracker, StrategicMilestone, StrategicOkrEvaluator,
+pub use future_protocol::{
+    SigCategory, SigmaSpecialInterestGroup, SigGovernanceModel, RoadmapHorizonHorizon,
+    RoadmapGoalItem, RollingTwoYearRoadmap, FeatureBranchReview, RfcDevelopmentWorkflow,
+    AppShardListing, ShardsMarketplaceRegistry, ContributorHallOfFameRecord,
+    CommunityContributorRecognition, SovereigntySecurityAuditPolicy, LivingWikiEntry,
+    LivingDeveloperWikiEngine, SigmaFutureDevelopmentProtocolEngine,
 };
 use crate::klib::HashMap;
 use core::sync::atomic::{AtomicUsize, Ordering};

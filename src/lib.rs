@@ -51,24 +51,22 @@ pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
 
+pub use unimplemented_features::{
+    AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager, BareMetalUnifiedPeripheral,
+    GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine, Jbd2TransactionLedger,
+    LegacyController, ModernController, PciBusScanner, PowerState, SatSolverEngine,
+    SerenityIpcEvent, SerenityOsAsyncIpcLoop, SovereignIpcBus, UdfVm, ZorinAppMapping,
+    ZorinWinAppDbRegistry, AlpineApkPackageIndex, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine,
+    SlackwarePkgtoolEngine, SlackwarePackage, SolusEopkgRavenGovernor, SolusEopkgDeltaPackage, RavenWidgetState,
+    MageiaUrpmiMccResolver, MageiaSynthesisPackage, MageiaMirror, DragonFlyHammer2DeduplicationEngine, Hammer2Block,
+    NetBsdRumpComponentEngine, RumpComponent, RumpComponentType,
+};
 pub use distro::{
-    missing_distro_innovations::{
-        CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
-    },
-    ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode,
-    DragonFlyHammer2EmergencyCowEngine, FedoraSelinuxMlsMcsGovernor, FreeBsdGeomVdevTopology,
-    GarudaZenPerformanceEngine, GentooPortageSlotOperatorEngine, GeomVdevNode,
-    GuixShepherdServiceEngine, HaStateEntry, HermeticClosureRecord, HermeticStoreClosureEngine,
-    LandlockAccessType, LandlockV5Rule, NomadBsdLivePersistenceEngine, NomadBsdZfsDataset,
-    OpenBsdFdPledgeGate, SchedExtTask, ScxSchedulerKind, ScxTaskState, SovereignDistroLeapSuite,
-    SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignFastInitramfsGenerator,
-    SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
-    SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
-    SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
-    ZramCompressionAlgorithm, DebianMultiarchAptEngine, GarudaPerformanceTweakEngine,
-    HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, SolusEopkgBudgieEngine,
-    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
-    OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
+    ApkChrootBuildSandboxEngine, OpenBsdFdPledgeGate, FreeBsdGeomVdevTopology, GeomVdevNode,
+    HermeticStoreClosureEngine, StoreClosurePackage,
+    OmarchyQuickshellEngine, OmarchySystemThemeStudio, OmarchyLuaConfigEngine,
+    OmarchyPluginMarketplace, OmarchyHerdrAiAgentManager, OmarchyReleaseChannelSnapshotEngine,
+    missing_distro_innovations::{LinuxBsdSysctlEngine, IoUringEngine, IoUringOp, SubmissionQueueEntry, CompletionQueueEntry},
 };
 
 pub use package::bsd_linux_package_innovations::{

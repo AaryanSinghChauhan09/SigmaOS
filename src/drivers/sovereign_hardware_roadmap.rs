@@ -9,11 +9,12 @@
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 
-use std::collections::BTreeMap;
-use std::format;
-use std::string::{String, ToString};
-use std::vec;
-use std::vec::Vec;
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // ============================================================================
 // 🔹 PHASE 1: COMPATIBILITY FOUNDATION (Years 1–2)
@@ -389,7 +390,7 @@ impl SigmaHardwareSovereigntyRoadmapEngine {
 // UNIT TESTS
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

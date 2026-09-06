@@ -713,11 +713,11 @@ impl SnapperIntegration {
 
 /// Service supervisor inspired by Void Linux runit.
 pub struct VoidRunitSupervisor {
-    pub services: std::vec::Vec<RunitService>,
+    pub services: alloc::vec::Vec<RunitService>,
 }
 
 pub struct RunitService {
-    pub name: std::string::String,
+    pub name: alloc::string::String,
     pub is_running: bool,
     pub pid: u32,
 }
@@ -725,13 +725,13 @@ pub struct RunitService {
 impl VoidRunitSupervisor {
     pub fn new() -> Self {
         Self {
-            services: std::vec::Vec::new(),
+            services: alloc::vec::Vec::new(),
         }
     }
 
     pub fn register_service(&mut self, name: &str) {
         self.services.push(RunitService {
-            name: std::string::String::from(name),
+            name: alloc::string::String::from(name),
             is_running: false,
             pid: 0,
         });
@@ -754,19 +754,19 @@ impl VoidRunitSupervisor {
 
 /// Gentoo-inspired USE-flag constraint solver.
 pub struct GentooPortageUseSolver {
-    pub enabled_flags: std::vec::Vec<std::string::String>,
+    pub enabled_flags: alloc::vec::Vec<alloc::string::String>,
 }
 
 impl GentooPortageUseSolver {
     pub fn new() -> Self {
         Self {
-            enabled_flags: std::vec::Vec::new(),
+            enabled_flags: alloc::vec::Vec::new(),
         }
     }
 
     pub fn enable_flag(&mut self, flag: &str) {
         if !self.enabled_flags.iter().any(|f| f == flag) {
-            self.enabled_flags.push(std::string::String::from(flag));
+            self.enabled_flags.push(alloc::string::String::from(flag));
         }
     }
 
@@ -781,16 +781,16 @@ impl GentooPortageUseSolver {
 
 /// YaST2-inspired modular control center setting plug.
 pub struct Yast2ModulePlug {
-    pub module_id: std::string::String,
-    pub title: std::string::String,
+    pub module_id: alloc::string::String,
+    pub title: alloc::string::String,
     pub active: bool,
 }
 
 impl Yast2ModulePlug {
     pub fn new(id: &str, title: &str) -> Self {
         Self {
-            module_id: std::string::String::from(id),
-            title: std::string::String::from(title),
+            module_id: alloc::string::String::from(id),
+            title: alloc::string::String::from(title),
             active: true,
         }
     }

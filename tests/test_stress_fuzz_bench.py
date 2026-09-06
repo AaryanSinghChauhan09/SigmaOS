@@ -4,25 +4,7 @@ Pushes system to its limits, feeds random/invalid inputs to syscall interfaces,
 and compares simulated performance metrics against Linux baseline standards.
 """
 
-try:
-    import pytest
-except ImportError:
-    class _RaisesContext:
-        def __init__(self, expected_exception):
-            self.expected_exception = expected_exception
-        def __enter__(self):
-            return self
-        def __exit__(self, exc_type, exc_val, exc_tb):
-            if exc_type is None:
-                raise AssertionError(f"Expected exception {self.expected_exception} was not raised")
-            return issubclass(exc_type, self.expected_exception)
-
-    class _PytestShim:
-        @staticmethod
-        def raises(exc):
-            return _RaisesContext(exc)
-
-    pytest = _PytestShim()
+import pytest
 import random
 import string
 import time

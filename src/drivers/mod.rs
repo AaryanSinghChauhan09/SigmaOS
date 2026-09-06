@@ -61,3 +61,14 @@ pub use distro_device_expansion::{
     RealtekAlcAudioDriver, RealtekRtl8169Driver, SoundBlaster16IsaDriver, SynapticsTouchpadDriver,
     ThreeCom3c59xEthernetDriver, VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
 };
+
+pub mod sovereign_hardware_roadmap;
+pub use sovereign_hardware_roadmap::{
+    SigmaDriverShard, ForeignDriverOrigin, CrossOsDriverAdapter, DeclarativeDriverProfileConfig,
+    SigmaHotplugOrchestrator, DriverSandboxDomain, SigmaSandboxedHardwareModule,
+    SigmaFirmwareBridge, SigmaFirmwareFreeDriver, SecurePeripheralIsolationGuard,
+    SigmaDriverLayeringSystem, ClusterDeviceResource, SigmaDeviceClusterPool,
+    SigmaProgrammableIoStack, TargetCpuArch, CrossArchDriverPortability,
+    DriverSovereigntyPolicy, SigmaHardwarePolicyEngine, SigmaCryptographicBootChain,
+    SigmaHardwareSovereigntyRoadmapEngine,
+};

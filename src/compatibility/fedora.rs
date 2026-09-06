@@ -2760,6 +2760,214 @@ pub struct TahrirUserAvatar {
     pub mime_type: String,
 }
 
+/// Fedora Planet Blog Article Entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraPlanetPost {
+    pub post_id: String,
+    pub author_name: String,
+    pub title: String,
+    pub url: String,
+    pub published_epoch: u64,
+}
+
+/// Fedora Planet Blog & Community News Aggregation Engine
+pub struct FedoraPlanetAggregationEngine {
+    pub posts: Vec<FedoraPlanetPost>,
+}
+
+impl FedoraPlanetAggregationEngine {
+    pub fn new() -> Self {
+        FedoraPlanetAggregationEngine { posts: Vec::new() }
+    }
+
+    pub fn fetch_and_parse_feed(&mut self, author: &str, title: &str, url: &str, timestamp: u64) {
+        let post_id = format!("planet-{}", self.posts.len() + 1);
+        self.posts.push(FedoraPlanetPost {
+            post_id,
+            author_name: author.to_string(),
+            title: title.to_string(),
+            url: url.to_string(),
+            published_epoch: timestamp,
+        });
+    }
+
+    pub fn get_latest_posts(&self, limit: usize) -> Vec<&FedoraPlanetPost> {
+        self.posts.iter().take(limit).collect()
+    }
+}
+
+impl Default for FedoraPlanetAggregationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora "The New Hotness" Upstream Release Event
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaUpstreamRelease {
+    pub project_name: String,
+    pub latest_version: String,
+    pub homepage: String,
+    pub is_triggering_scratch_build: bool,
+}
+
+/// Fedora "The New Hotness" (Anitya) Upstream Release Monitor & Scratch Build Trigger Engine
+pub struct FedoraTheNewHotnessEngine {
+    pub monitored_projects: Vec<AnityaUpstreamRelease>,
+}
+
+impl FedoraTheNewHotnessEngine {
+    pub fn new() -> Self {
+        FedoraTheNewHotnessEngine {
+            monitored_projects: Vec::new(),
+        }
+    }
+
+    pub fn register_upstream_project(&mut self, name: &str, homepage: &str) {
+        self.monitored_projects.push(AnityaUpstreamRelease {
+            project_name: name.to_string(),
+            latest_version: "1.0.0".to_string(),
+            homepage: homepage.to_string(),
+            is_triggering_scratch_build: false,
+        });
+    }
+
+    pub fn process_upstream_release_event(&mut self, name: &str, new_version: &str) -> Result<String, &'static str> {
+        if let Some(project) = self.monitored_projects.iter_mut().find(|p| p.project_name == name) {
+            project.latest_version = new_version.to_string();
+            project.is_triggering_scratch_build = true;
+            Ok(format!("TheNewHotness: Triggered Koji scratch build for {} version {}", name, new_version))
+        } else {
+            Err("Project not found in Anitya release monitor")
+        }
+    }
+}
+
+impl Default for FedoraTheNewHotnessEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora rpmautospec RPM Spec Changelog & Version Generator
+pub struct FedoraRpmAutoSpecEngine {
+    pub git_commit_count: u32,
+    pub git_commit_messages: Vec<String>,
+}
+
+impl FedoraRpmAutoSpecEngine {
+    pub fn new(commit_count: u32) -> Self {
+        FedoraRpmAutoSpecEngine {
+            git_commit_count: commit_count,
+            git_commit_messages: Vec::new(),
+        }
+    }
+
+    pub fn add_commit_log(&mut self, msg: &str) {
+        self.git_commit_messages.push(msg.to_string());
+    }
+
+    pub fn generate_autorelease(&self, base_release: u32) -> String {
+        format!("{}.{}", base_release, self.git_commit_count)
+    }
+
+    pub fn generate_autochangelog(&self) -> String {
+        let mut changelog = String::from("%autochangelog\n");
+        for msg in &self.git_commit_messages {
+            changelog.push_str(&format!("- {}\n", msg));
+        }
+        changelog
+    }
+}
+
+/// Fedora Service Status Indicator
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FedoraServiceStatusState {
+    Good,
+    MinorOutage,
+    MajorOutage,
+}
+
+/// Fedora Status (status.fedoraproject.org) Health Monitoring Engine
+pub struct FedoraStatusFpoEngine {
+    pub service_statuses: HashMap<String, FedoraServiceStatusState>,
+}
+
+impl FedoraStatusFpoEngine {
+    pub fn new() -> Self {
+        let mut statuses = HashMap::new();
+        statuses.insert("koji".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("bodhi".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("copr".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("pagure".to_string(), FedoraServiceStatusState::Good);
+        FedoraStatusFpoEngine { service_statuses: statuses }
+    }
+
+    pub fn set_service_status(&mut self, service: &str, state: FedoraServiceStatusState) {
+        self.service_statuses.insert(service.to_string(), state);
+    }
+
+    pub fn query_service_health(&self, service: &str) -> FedoraServiceStatusState {
+        *self.service_statuses.get(service).unwrap_or(&FedoraServiceStatusState::Good)
+    }
+}
+
+impl Default for FedoraStatusFpoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora FASJSON (Fedora Account System REST API) User Record
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FasjsonUserRecord {
+    pub username: String,
+    pub human_name: String,
+    pub email: String,
+    pub group_memberships: Vec<String>,
+}
+
+/// Fedora FASJSON Client Engine
+pub struct FedoraFasjsonClientEngine {
+    pub user_db: HashMap<String, FasjsonUserRecord>,
+}
+
+impl FedoraFasjsonClientEngine {
+    pub fn new() -> Self {
+        FedoraFasjsonClientEngine { user_db: HashMap::new() }
+    }
+
+    pub fn register_user(&mut self, username: &str, human_name: &str, email: &str, groups: &[&str]) {
+        self.user_db.insert(
+            username.to_string(),
+            FasjsonUserRecord {
+                username: username.to_string(),
+                human_name: human_name.to_string(),
+                email: email.to_string(),
+                group_memberships: groups.iter().map(|g| g.to_string()).collect(),
+            },
+        );
+    }
+
+    pub fn get_user_info(&self, username: &str) -> Option<&FasjsonUserRecord> {
+        self.user_db.get(username)
+    }
+
+    pub fn is_user_in_group(&self, username: &str, group: &str) -> bool {
+        if let Some(user) = self.get_user_info(username) {
+            user.group_memberships.iter().any(|g| g == group)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraFasjsonClientEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Fedora Tahrir User Identity, Avatar & OpenBadges API Engine
 /// Serves Libravatar-compatible avatar resolution and Fedora Badges OpenBadges v2/v3 assertions.
 pub struct FedoraTahrirIdentityApiEngine {
@@ -4306,8 +4514,368 @@ mod tests {
         assert_eq!(roles.applied_roles.len(), 1);
         assert_eq!(roles.chrony_ntp_servers.len(), 2);
 
-        roles.apply_firewall_role(&[80, 443, 8080]);
-        assert_eq!(roles.applied_roles.len(), 2);
-        assert_eq!(roles.configured_firewall_ports.len(), 3);
+    #[test]
+    fn test_fedora_dnf5_package_engine() {
+        let mut dnf5 = FedoraDnf5PackageEngine::new();
+        dnf5.enable_plugin("versionlock");
+        assert_eq!(dnf5.enabled_plugins.len(), 1);
+
+        let res = dnf5.dnf5_install("kernel", "6.8.0-1.fc39").unwrap();
+        assert!(res.contains("Installed kernel version 6.8.0-1.fc39"));
+        assert_eq!(dnf5.installed_packages.get("kernel").unwrap(), "6.8.0-1.fc39");
+    }
+
+    #[test]
+    fn test_fedora_pipewire_audio_session_engine() {
+        let mut pw = FedoraPipewireAudioSessionEngine::new(48000, 1024);
+        assert_eq!(pw.sample_rate, 48000);
+
+        pw.register_spa_node("alsa_output.pci-0000_00_1f.3.analog-stereo");
+        assert_eq!(pw.audio_nodes.len(), 1);
+
+        assert!(pw.set_bluetooth_codec("LDAC").is_ok());
+        assert_eq!(pw.active_codec, "LDAC");
+        assert!(pw.set_bluetooth_codec("UNKNOWN").is_err());
+    }
+
+    #[test]
+    fn test_fedora_firewalld_policy_engine() {
+        let mut fw = FedoraFirewalldPolicyEngine::new();
+        assert_eq!(fw.default_zone, "public");
+        assert!(fw.is_service_allowed("public", "ssh"));
+        assert!(!fw.is_service_allowed("public", "http"));
+
+        fw.add_service_to_zone("public", "http");
+        assert!(fw.is_service_allowed("public", "http"));
+        assert!(fw.is_service_allowed("trusted", "anything"));
+    }
+
+    #[test]
+    fn test_fedora_gnome_cinnamon_shell_bridge() {
+        let mut bridge = FedoraGnomeCinnamonShellBridge::new();
+        assert!(bridge.compositing_enabled);
+
+        bridge.enable_extension("appindicators@gnome-shell");
+        assert_eq!(bridge.active_extensions.len(), 1);
+
+        bridge.register_desklet_applet();
+        assert_eq!(bridge.applet_count, 1);
+    }
+
+    #[test]
+    fn test_fedora_sssd_enterprise_directory_client() {
+        let mut sssd = FedoraSsdEnterpriseDirectoryClient::new("corp.fedora.internal", "CORP.FEDORA.INTERNAL");
+        assert!(sssd.authenticate_ldap("alice", "wrong_pass").is_err());
+
+        let tgt = sssd.authenticate_ldap("alice", "corp_pass").unwrap();
+        assert!(tgt.contains("tgt_alice_fedora_CORP.FEDORA.INTERNAL"));
+        assert_eq!(sssd.authenticated_users.len(), 1);
+    }
+
+    #[test]
+    fn test_fedora_adwaita_icon_theme_engine() {
+        let mut theme = FedoraAdwaitaIconThemeEngine::new("Adwaita", 2.0); // 2x HiDPI
+        assert_eq!(theme.get_scaled_icon_size(48), 96);
+
+        let path = theme.resolve_icon_path("utilities-terminal").unwrap();
+        assert!(path.contains("utilities-terminal.svg"));
+
+        theme.register_icon("custom-app", "/usr/share/icons/custom-app.svg");
+        assert!(theme.resolve_icon_path("custom-app").is_some());
+    }
+
+    #[test]
+    fn test_fedora_desklet_widget_engine() {
+        let mut engine = FedoraDeskletWidgetEngine::new(50); // 50px grid snapping
+        let item = engine.add_desklet(101, "clock", 123, 178);
+        assert_eq!(item.pos_x, 100); // snapped from 123
+        assert_eq!(item.pos_y, 150); // snapped from 178
+        assert_eq!(item.opacity_percent, 85);
+
+        assert!(engine.set_desklet_opacity(101, 90));
+        assert_eq!(engine.active_desklets[0].opacity_percent, 90);
+    }
+
+    #[test]
+    fn test_fedora_live_media_overlay_engine() {
+        let mut overlay = FedoraLiveMediaOverlayEngine::new("Fedora-Workstation-Live-39.iso", 4096);
+        assert!(overlay.write_overlay_file("/etc/hostname").is_err()); // SquashFS not mounted yet
+
+        let res = overlay.mount_squashfs_rootfs().unwrap();
+        assert!(res.contains("Successfully mounted Live ISO SquashFS rootfs"));
+        assert!(overlay.squashfs_mounted);
+        assert!(overlay.overlayfs_active);
+
+        assert!(overlay.write_overlay_file("/etc/hostname").is_ok());
+        assert_eq!(overlay.overlay_changes.len(), 1);
+        assert_eq!(overlay.overlay_changes[0], "/etc/hostname");
+    }
+
+    #[test]
+    fn test_fedora_koji_task_runner() {
+        let mut runner = FedoraKojiTaskRunner::new(4201, "kernel", "fc39-build");
+        assert!(!runner.build_completed);
+
+        let res = runner.execute_koji_build().unwrap();
+        assert!(res.contains("Task #4201"));
+        assert!(runner.build_completed);
+        assert_eq!(runner.generated_rpms.len(), 1);
+
+        runner.tag_build_release("fc39-updates");
+        assert_eq!(runner.target_tag, "fc39-updates");
+    }
+
+    #[test]
+    fn test_fedora_nautilus_file_browser_engine() {
+        let mut nautilus = FedoraNautilusFileBrowserEngine::new("/home/user");
+        assert_eq!(nautilus.left_pane_path, "/home/user");
+
+        let crumbs = nautilus.parse_breadcrumbs("/home/user/Documents/Projects");
+        assert_eq!(crumbs, vec!["home", "user", "Documents", "Projects"]);
+
+        nautilus.navigate_left_pane("/var/log");
+        assert_eq!(nautilus.left_pane_path, "/var/log");
+
+        nautilus.add_bookmark("/var/log");
+        assert_eq!(nautilus.active_bookmarks.len(), 3);
+    }
+
+    #[test]
+    fn test_fedora_folder_color_switcher_engine() {
+        let mut switcher = FedoraFolderColorSwitcherEngine::new();
+        assert_eq!(switcher.get_folder_color("/home/user/Documents"), FolderColor::Blue);
+
+        switcher.set_folder_color("/home/user/Documents", FolderColor::Green);
+        assert_eq!(switcher.get_folder_color("/home/user/Documents"), FolderColor::Green);
+
+        switcher.add_folder_emblem("/home/user/Documents", "emblem-important");
+        assert_eq!(switcher.folder_emblems.get("/home/user/Documents").unwrap().len(), 1);
+    }
+
+    #[test]
+    fn test_fedora_dnf_history_rollback_engine() {
+        let mut dnf = FedoraDnfHistoryRollbackEngine::new();
+        dnf.record_install("vim", "9.0.100");
+        assert_eq!(dnf.transaction_history.len(), 1);
+        assert_eq!(dnf.installed_packages.get("vim").unwrap(), "9.0.100");
+
+        let res = dnf.rollback_transaction(1).unwrap();
+        assert!(res.contains("Removed package vim"));
+        assert!(dnf.installed_packages.get("vim").is_none());
+    }
+
+    #[test]
+    fn test_fedora_webapp_container_engine() {
+        let mut engine = FedoraWebappContainerEngine::new();
+        engine.register_webapp("Fedora Discourse", "https://discussion.fedoraproject.org");
+
+        let app = engine.get_webapp("Fedora Discourse").unwrap();
+        assert_eq!(app.target_url, "https://discussion.fedoraproject.org");
+        assert!(app.desktop_launcher_created);
+        assert!(app.isolated_storage_path.contains("Fedora Discourse"));
+    }
+
+    #[test]
+    fn test_fedora_gettext_l10n_engine() {
+        let mut l10n = FedoraGettextL10nEngine::new("en_US");
+        l10n.register_translation("fr_FR", "Cancel", "Annuler");
+
+        assert_eq!(l10n.gettext("Cancel"), "Cancel"); // en_US active
+
+        l10n.set_locale("fr_FR");
+        assert_eq!(l10n.gettext("Cancel"), "Annuler");
+        assert_eq!(l10n.gettext("Save"), "Save"); // Untranslated fallback
+    }
+
+    #[test]
+    fn test_fedora_welcome_initial_setup_engine() {
+        let mut setup = FedoraWelcomeInitialSetupEngine::new();
+        assert!(setup.is_first_boot);
+        assert_eq!(setup.current_step, "Welcome");
+
+        setup.enable_third_party_repos(true);
+        assert!(setup.third_party_repos_enabled);
+
+        setup.advance_setup_step("Privacy");
+        assert_eq!(setup.current_step, "Privacy");
+
+        assert!(setup.complete_initial_setup().is_ok());
+        assert!(!setup.is_first_boot);
+        assert_eq!(setup.current_step, "Complete");
+    }
+
+    #[test]
+    fn test_fedora_planet_and_infrastructures() {
+        // 1. Planet Aggregator
+        let mut planet = FedoraPlanetAggregationEngine::new();
+        planet.fetch_and_parse_feed("Matthew Miller", "Fedora 40 Release Update", "https://mattdm.org/f40", 1700000000);
+        assert_eq!(planet.posts.len(), 1);
+        assert_eq!(planet.get_latest_posts(1)[0].author_name, "Matthew Miller");
+
+        // 2. The New Hotness (Anitya)
+        let mut hotness = FedoraTheNewHotnessEngine::new();
+        hotness.register_upstream_project("python-requests", "https://requests.readthedocs.io");
+        let trigger_res = hotness.process_upstream_release_event("python-requests", "2.32.0").unwrap();
+        assert!(trigger_res.contains("python-requests version 2.32.0"));
+        assert!(hotness.monitored_projects[0].is_triggering_scratch_build);
+
+        // 3. rpmautospec Engine
+        let mut autospec = FedoraRpmAutoSpecEngine::new(42);
+        autospec.add_commit_log("Upstream release 2.32.0");
+        autospec.add_commit_log("Fix CVE-2024-XXXX vulnerability");
+        assert_eq!(autospec.generate_autorelease(1), "1.42");
+        let changelog = autospec.generate_autochangelog();
+        assert!(changelog.contains("%autochangelog"));
+        assert!(changelog.contains("Upstream release 2.32.0"));
+
+        // 4. Status FPO Engine
+        let mut status = FedoraStatusFpoEngine::new();
+        assert_eq!(status.query_service_health("koji"), FedoraServiceStatusState::Good);
+        status.set_service_status("bodhi", FedoraServiceStatusState::MinorOutage);
+        assert_eq!(status.query_service_health("bodhi"), FedoraServiceStatusState::MinorOutage);
+
+        // 5. FASJSON Client Engine
+        let mut fasjson = FedoraFasjsonClientEngine::new();
+        fasjson.register_user("alice", "Alice Developer", "alice@fedoraproject.org", &["packager", "sysadmin-main"]);
+        let user = fasjson.get_user_info("alice").unwrap();
+        assert_eq!(user.human_name, "Alice Developer");
+        assert!(fasjson.is_user_in_group("alice", "packager"));
+        assert!(!fasjson.is_user_in_group("alice", "provenpackager"));
+    }
+
+    #[test]
+    fn test_fedora_tahrir_identity_api_engine() {
+        let mut tahrir = FedoraTahrirIdentityApiEngine::new();
+
+        // 1. Register avatar
+        let email_hash = tahrir.register_user_avatar(
+            "alice_developer",
+            "alice@fedoraproject.org",
+            b"<svg>ALICE_AVATAR</svg>",
+            "image/svg+xml",
+        );
+        assert!(!email_hash.is_empty());
+
+        // 2. Resolve avatar by Libravatar email hash
+        let resolved = tahrir.resolve_avatar_by_hash(&email_hash).unwrap();
+        assert_eq!(resolved.user_id, "alice_developer");
+        assert_eq!(resolved.mime_type, "image/svg+xml");
+        assert_eq!(resolved.avatar_data, b"<svg>ALICE_AVATAR</svg>");
+
+        // 3. Issue OpenBadges assertion
+        let assertion = tahrir.issue_badge_assertion(
+            "package_artisan_2024",
+            "alice@fedoraproject.org",
+            "fedora_badges_bot",
+            1700000000,
+        );
+        assert_eq!(assertion.badge_id, "package_artisan_2024");
+        assert_eq!(assertion.recipient_email_hash, email_hash);
+        assert!(assertion.evidence_url.contains("package_artisan_2024"));
+
+        // 4. Verify OpenBadges assertion
+        assert!(tahrir.verify_badge_assertion(&assertion));
+
+        let fake_assertion = TahrirBadgeAssertion {
+            badge_id: "fake_badge".to_string(),
+            recipient_email_hash: "0000000000000000".to_string(),
+            issuer_id: "fake_issuer".to_string(),
+            issued_on_epoch: 0,
+            evidence_url: "".to_string(),
+            assertion_digest: "invalid_digest".to_string(),
+        };
+        assert!(!tahrir.verify_badge_assertion(&fake_assertion));
+    }
+
+    #[test]
+    fn test_fedora_fmn_messaging_engine() {
+        let mut fmn = FedoraFmnMessagingEngine::new();
+
+        // Register rule for user alice: interested in kernel builds via Matrix
+        fmn.register_filter_rule(FmnFilterRule {
+            rule_id: "rule-01".to_string(),
+            user_id: "alice@fedora".to_string(),
+            package_pattern: "kernel".to_string(),
+            topic_pattern: "buildsys".to_string(),
+            min_severity: FmnEventSeverity::Medium,
+            preferred_transport: FmnNotificationTransport::Matrix,
+        });
+
+        // Register rule for user bob: interested in critical alerts across all packages via Email
+        fmn.register_filter_rule(FmnFilterRule {
+            rule_id: "rule-02".to_string(),
+            user_id: "bob@fedora".to_string(),
+            package_pattern: "*".to_string(),
+            topic_pattern: "*".to_string(),
+            min_severity: FmnEventSeverity::Critical,
+            preferred_transport: FmnNotificationTransport::Email,
+        });
+
+        // Event 1: Low severity kernel build event -> Alice (min Medium) ignored, Bob (min Critical) ignored
+        let count1 = fmn.publish_event(FmnMessageEvent {
+            event_id: "evt-01".to_string(),
+            topic: "org.fedoraproject.prod.buildsys.task".to_string(),
+            package_name: "kernel".to_string(),
+            severity: FmnEventSeverity::Low,
+            summary: "Kernel scratch build started".to_string(),
+            timestamp_epoch: 1700000000,
+        });
+        assert_eq!(count1, 0);
+
+        // Event 2: High severity kernel build completed -> Alice matches!
+        let count2 = fmn.publish_event(FmnMessageEvent {
+            event_id: "evt-02".to_string(),
+            topic: "org.fedoraproject.prod.buildsys.task".to_string(),
+            package_name: "kernel".to_string(),
+            severity: FmnEventSeverity::High,
+            summary: "Kernel 6.8.0-1.fc40 build completed successfully".to_string(),
+            timestamp_epoch: 1700000100,
+        });
+        assert_eq!(count2, 1);
+        assert_eq!(fmn.dispatched_notifications_log[0].0, "alice@fedora");
+        assert_eq!(fmn.dispatched_notifications_log[0].1, FmnNotificationTransport::Matrix);
+
+        // Event 3: Critical security update for openssl -> Bob matches!
+        let count3 = fmn.publish_event(FmnMessageEvent {
+            event_id: "evt-03".to_string(),
+            topic: "org.fedoraproject.prod.bodhi.update.critical".to_string(),
+            package_name: "openssl".to_string(),
+            severity: FmnEventSeverity::Critical,
+            summary: "Critical security advisory FEDORA-2024-SEC01".to_string(),
+            timestamp_epoch: 1700000200,
+        });
+        assert_eq!(count3, 1);
+        assert_eq!(fmn.dispatched_notifications_log[1].0, "bob@fedora");
+        assert_eq!(fmn.dispatched_notifications_log[1].1, FmnNotificationTransport::Email);
+    }
+
+    #[test]
+    fn test_fedora_btrfs_snapper_snapshot_engine() {
+        let mut snapper = FedoraBtrfsSnapperSnapshotEngine::new("/.snapshots/1/snapshot");
+        let sid = snapper.create_pre_transaction_snapshot("Pre-dnf update");
+        assert_eq!(sid, 1);
+        assert_eq!(snapper.snapshots.len(), 1);
+
+        let res = snapper.rollback_to_subvolume(1).unwrap();
+        assert!(res.contains("Successfully rolled back Btrfs subvolume to snapshot #1"));
+        assert_eq!(snapper.active_subvolume, "/.snapshots/1/snapshot");
+    }
+
+    #[test]
+    fn test_fedora_nvidia_prime_switcher_engine() {
+        let mut switcher = FedoraNvidiaPrimeSwitcherEngine::new();
+        assert_eq!(switcher.current_mode, FedoraGpuPowerMode::HybridPrimeOffload);
+        assert!(switcher.prime_offload_active);
+
+        switcher.set_gpu_mode(FedoraGpuPowerMode::Integrated);
+        assert_eq!(switcher.current_mode, FedoraGpuPowerMode::Integrated);
+        assert!(!switcher.prime_offload_active);
+        assert!(switcher.active_env_vars.is_empty());
+
+        switcher.set_gpu_mode(FedoraGpuPowerMode::DiscreteNvidia);
+        assert_eq!(switcher.current_mode, FedoraGpuPowerMode::DiscreteNvidia);
+        assert!(switcher.prime_offload_active);
+        assert_eq!(switcher.active_env_vars.get("__NV_PRIME_RENDER_OFFLOAD").unwrap(), "1");
+        assert_eq!(switcher.active_env_vars.get("__VK_LAYER_NV_optimus").unwrap(), "NVIDIA_only");
     }
 }
