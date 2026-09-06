@@ -17,7 +17,13 @@ SigmaOS synthesizes best-of-breed innovations from major Linux and BSD distribut
 * **NixOS:** `NixOsFlakesEngine`, `NixOsDeclarativeConfigEngine`, `SovereignNixGcEngine`.
 * **FreeBSD / OpenBSD / NetBSD:** `FreeBsdJailSandboxEngine`, `FreeBsdCapsicumEngine`, `OpenBsdUnveilFilter`, `NetBsdPkgsrcEngine`, `MpvFreeBsdSndioEngine`.
 
-## 3. Development Workflow & Verification Protocol
+## 3. Kernel Class Operation Vtable Architecture
+
+When extending or creating kernel drivers and subsystems:
+* Refer to `docs/AGENTS_CLASS_OPERATION_MANAGEMENT_GUIDE.md` for class operation vtable patterns (`FileOperations`, `VnodeOps`, `SchedClass`, `NetDeviceOps`, `BlockDeviceOps`).
+* Ensure zero heap allocations inside vtable methods, atomic class registration, and `#[repr(C)]` FFI compatibility.
+
+## 4. Development Workflow & Verification Protocol
 
 1. **Pre-Flight Verification:** Run `./run_sigma_tests.sh` to establish baseline test status.
 2. **Implementation:** Modify source files in `src/`, adding companion unit tests in `#[cfg(test)] mod tests` blocks.

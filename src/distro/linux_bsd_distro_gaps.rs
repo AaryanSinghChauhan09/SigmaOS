@@ -587,12 +587,6 @@ impl DemandPagingSwapEngine {
             Err("Page mapping not found")
         }
     }
-
-    pub fn lookup_node(&self, path: &[u8]) -> Option<&DynamicDeviceNode> {
-        self.nodes
-            .iter()
-            .find(|n| n.name == path || n.symlinks.iter().any(|s| s == path))
-    }
 }
 
 impl Default for DemandPagingSwapEngine {
@@ -639,40 +633,18 @@ impl UdevDevdHotplugEngine {
         self.loaded_rules.push(rule);
     }
 
-    pub fn process_packet(
-        &mut self,
-        src_ip: [u8; 4],
-        src_port: u16,
-        dst_ip: [u8; 4],
-        dst_port: u16,
-        protocol: u8,
-    ) -> ([u8; 4], u16) {
-        // Search conntrack
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.src_ip == src_ip
-                && c.src_port == src_port
-                && c.dst_ip == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConnectionTrackEntry {
-                src_ip,
-                src_port,
-                dst_ip,
-                dst_port,
-                protocol,
-                packets_counter: 1,
-            });
-        }
-
-        // Apply matching translation rule
-        for rule in &self.rules {
-            if rule.rule_kind == NatRuleKind::DnatPortForwarding
-                && dst_ip == rule.original_ip
-                && dst_port == rule.original_port
-            {
-                return (rule.translated_ip, rule.translated_port);
+    pub fn dispatch_uevent(&mut self, uevent: UeventDeviceNode) {
+        match uevent.action {
+            DeviceEventAction::Add => {
+                self.active_devices.push(uevent);
+            }
+            DeviceEventAction::Remove => {
+                self.active_devices.retain(|d| d.devname != uevent.devname);
+            }
+            DeviceEventAction::Change => {
+                if let Some(pos) = self.active_devices.iter().position(|d| d.devname == uevent.devname) {
+                    self.active_devices[pos] = uevent;
+                }
             }
         }
     }
@@ -859,6 +831,59 @@ mod tests {
         assert_eq!(manager.get_active_services_count(), 1);
         assert!(manager.is_service_running("networkd.service"));
         assert!(manager.check_dependencies_met("zenith-compositor.service"));
+    }
+
+    #[test]
+    fn test_demand_paging_and_swap_engine() {
+        let mut vm = DemandPagingSwapEngine::new(1024);
+        let paddr = vm.handle_page_fault(0x7fff0000, PageFaultCause::NotPresent).unwrap();
+        assert_eq!(paddr, 0x7fff0000);
+        assert_eq!(vm.page_faults_handled, 1);
+
+        let slot = vm.swap_out_page(0x7fff0000).unwrap();
+        assert_eq!(slot, 0);
+        assert!(vm.page_table[0].is_swapped_out);
+    }
+
+    #[test]
+    fn test_udev_devd_hotplug_engine() {
+        let mut hotplug = UdevDevdHotplugEngine::new();
+        hotplug.register_rule("SUBSYSTEM==\"input\", ACTION==\"add\", RUN+=\"/usr/bin/input-attach\"");
+
+        let uevent = UeventDeviceNode {
+            subsystem: "input",
+            devname: "event0",
+            sysfs_path: "/sys/class/input/event0",
+            action: DeviceEventAction::Add,
+            vendor_id: 0x046d,
+            device_id: 0xc077,
+        };
+
+        hotplug.dispatch_uevent(uevent);
+        assert_eq!(hotplug.active_devices.len(), 1);
+        assert_eq!(hotplug.active_devices[0].devname, "event0");
+    }
+
+    #[test]
+    fn test_multicore_smp_interrupt_engine() {
+        let mut irq_balancer = MulticoreSmpInterruptEngine::new(4);
+        assert!(irq_balancer.bind_irq(16, 2).is_ok());
+        assert_eq!(irq_balancer.irq_table[0].target_cpu_core, 2);
+
+        irq_balancer.balance_irq_load();
+        assert_eq!(irq_balancer.irq_table[0].target_cpu_core, 0);
+    }
+
+    #[test]
+    fn test_kernel_perf_dtrace_engine() {
+        let mut tracer = KernelPerfDtraceEngine::new();
+        tracer.record_sample(100, 0x400100, "sys_enter", 1000);
+        assert_eq!(tracer.probe_samples.len(), 0); // Tracing inactive
+
+        tracer.start_tracing();
+        tracer.record_sample(100, 0x400100, "sys_enter", 1005);
+        assert_eq!(tracer.probe_samples.len(), 1);
+        assert_eq!(tracer.probe_samples[0].probe_name, "sys_enter");
     }
 
     #[test]
