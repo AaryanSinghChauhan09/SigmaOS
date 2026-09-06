@@ -14,10 +14,12 @@ When modifying, extending, or debugging the SigmaOS repository, AI agents MUST a
 2. **Linux & BSD Subsystem Interoperability**:
    - All package managers, security mechanisms, and service init systems must support cross-subsystem dispatching via `SovereignUniversalDistroBridge` (`src/distro/linux_bsd_inspirations.rs`).
    - Support all 21 `DistroSubsystemMode` variants (Arch, Debian, Alpine, NixOS, Gentoo, Fedora, Void, FreeBSD, OpenBSD, NetBSD, DragonFly BSD, Solaris/Illumos, etc.).
-3. **Mandatory Test Verification**:
+3. **UX & UI Interface Management Guidelines**:
+   - Adhere to `AI_AGENTS_UX_MANAGEMENT_GUIDE.md` for visual-first, GTK/Libadwaita toolkit bindings, WCAG AA contrast compliance, and Zenith Desktop layout presets (`KdePlasma`, `GnomeShell`, `XfceModular`, `CinnamonMint`, `LuminaBsd`, `CosmicRust`).
+4. **Mandatory Test Verification**:
    - Always run `./run_sigma_tests.sh` to verify changes.
    - Do NOT run `cargo test --lib` directly due to `#![no_std]` bare-metal test harness constraints; invoke `./run_sigma_tests.sh` which handles the 13-stage test pipeline correctly.
-4. **Memory Recording & Knowledge Persistence**:
+5. **Memory Recording & Knowledge Persistence**:
    - Call `initiate_memory_recording` upon completing code reviews and verifying test pass rates to record key learnings, bug fixes, and architectural advancements.
 
 ---
