@@ -1,6 +1,6 @@
 # SigmaOS AGENTS.md — AI Agent Operating Instructions & Process Management Protocols
 
-Welcome to the **SigmaOS** repository! This document outlines guidelines and operational rules for AI coding agents (such as Jules, Copilot, Herdr, or custom subagents) interacting with the codebase and managing system processes in SigmaOS.
+Welcome to the **SigmaOS** repository! This document outlines guidelines and operational rules for AI coding agents (such as Jules, Copilot, Herdr, or custom subagents) interacting with the codebase, managing system processes, and optimizing power usage in SigmaOS.
 
 ---
 
@@ -18,7 +18,11 @@ Welcome to the **SigmaOS** repository! This document outlines guidelines and ope
    - Inter-agent communication MUST utilize `ZeroCopyIpcChannel` or `AndroidBinderIpc` with cryptographic token verification (`security_token`).
    - Direct memory sharing between agent processes without capability-gated handles is strictly forbidden.
 
-4. **Zero-Dependency Core Systems**
+4. **Power & Thermal Awareness**
+   - Agents must check system power profiles and CPU temperature via `PowerGovernor` before launching compute-intensive subtasks.
+   - Restrict concurrency and defer heavy background AI model indexing on battery power (`powersave` / `conservative` governor modes).
+
+5. **Zero-Dependency Core Systems**
    - Avoid adding third-party standard C++ or non-vetted external dependencies.
    - Core kernel, driver, and shell primitives must rely on `ZeroDependencyPrimitiveHub` and `klib`.
 
@@ -44,4 +48,5 @@ AI agents making code changes must run the following checks before submitting pu
 ## 📌 Related Documentation
 - Process Management Architecture: [`docs/process-management.md`](docs/process-management.md)
 - AI Agent Process Management Guidelines: [`docs/ai-agent-process-management.md`](docs/ai-agent-process-management.md)
+- AI Agent Power & Thermal Management: [`docs/ai-agent-power-management.md`](docs/ai-agent-power-management.md)
 - Sovereign Developer Guide: [`DEVELOPER_RULES.md`](DEVELOPER_RULES.md)
