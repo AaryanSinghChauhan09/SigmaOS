@@ -666,124 +666,18 @@ impl SovereignUniversalDistroBridge {
             "smartcard" | "crypto" => {
                 Ok(format!(
                     "Dispatched LUKS2 / GELI / PKCS#11 / Dilithium5 PQC cryptographic key manager for target '{}' under distro mode '{:?}'",
-=======
-            "ipc" => {
-                let mut ipc = SovereignZeroCopyIpcBridge::new();
-                let bytes = ipc.splice_channel(1, 2, action.as_bytes().len())?;
-                Ok(format!(
-                    "Dispatched IPC zero-copy splice '{}' (spliced: {} bytes) under distro mode '{:?}'",
-                    action, bytes, self.mode
-                ))
-            }
-            "auth" => {
-                let mut auth = SovereignSystemdHomedAuthBridge::new();
-                let status = auth.authenticate_and_mount("user", action)?;
-                Ok(format!(
-                    "Dispatched auth systemd-homed LUKS/PAM check for user under distro mode '{:?}' (status: {})",
-                    self.mode, status
-                ))
-            }
-            "audit" => {
-                let mut dtrace = SovereignDTraceEngine::new();
-                let probe_id = dtrace.register_probe(DTraceProvider::Fbt, "kernel", action, "entry");
-                dtrace.enable_probe(probe_id);
-                let fired = dtrace.fire_probe(probe_id, 1001, 0, 0);
-                Ok(format!(
-                    "Dispatched DTrace probe audit for '{}' (probe_id: {}, fired: {}) under distro mode '{:?}'",
-                    action, probe_id, fired, self.mode
-                ))
-            }
-            "boot" => {
-                let mut boot = SovereignMultiArchBootChainBridge::new();
-                let entry = boot.configure_boot_entry(action, "root=UUID=sigma_root quiet")?;
-                Ok(format!(
-                    "Dispatched boot entry configuration '{}' under distro mode '{:?}'",
-                    entry, self.mode
-                ))
-            }
-            "container" => {
-                let mut mgr = SovereignCrossDistroContainerManager::new(self.mode);
-                let container_id = mgr.spawn_isolated_container("app_container", action)?;
-                Ok(format!(
-                    "Dispatched container creation ID {} for path '{}' under distro mode '{:?}'",
-                    container_id, action, self.mode
-                ))
-            }
-            "virtualization" => {
-                match self.mode {
-                    DistroSubsystemMode::FreeBsd => Ok(format!(
-                        "Dispatched FreeBSD bhyve microVM guest hypervisor for '{}' under distro mode '{:?}'",
-                        action, self.mode
-                    )),
-                    DistroSubsystemMode::OpenBsd => Ok(format!(
-                        "Dispatched OpenBSD vmm/vmd guest hypervisor for '{}' under distro mode '{:?}'",
-                        action, self.mode
-                    )),
-                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(format!(
-                        "Dispatched Illumos Zones brand hypervisor for '{}' under distro mode '{:?}'",
-                        action, self.mode
-                    )),
-                    _ => Ok(format!(
-                        "Dispatched SovereignVMM / KVM hypervisor vCPU launch for '{}' under distro mode '{:?}'",
-                        action, self.mode
-                    )),
-                }
-            }
-            "audio" => {
-                Ok(format!(
-                    "Dispatched PipeWire/ALSA zero-latency audio stream routing for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "input" => {
-                Ok(format!(
-                    "Dispatched USB HID / evdev input event mapping for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
             "thermal" => {
                 Ok(format!(
-                    "Dispatched thermal governor trip-point monitoring for '{}' under distro mode '{:?}'",
+                    "Dispatched thermal governor & fan speed throttling controller for target '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "memory" => {
-                let mut alloc = SovereignKaslrWxAllocator::new(0x12345678);
-                let virt_addr = alloc.allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute)?;
+            "toolchain" => {
                 Ok(format!(
-                    "Dispatched memory KARL/W^X allocation at {:#X} for '{}' under distro mode '{:?}'",
-                    virt_addr, action, self.mode
-                ))
-            }
-            "syscall" => {
-                let mut translator = SovereignMultiArchSyscallTranslator::new(self.mode);
-                let res = translator.translate_and_dispatch(action)?;
-                Ok(format!(
-                    "Dispatched syscall translation for '{}' (result: {}) under distro mode '{:?}'",
-                    action, res, self.mode
-                ))
-            }
-            "device" => {
-                Ok(format!(
-                    "Dispatched dynamic devfs/udev auto-probe binding for device '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "crypto" => {
-                Ok(format!(
-                    "Dispatched PQC Dilithium-5 / Csprng entropy operation for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "ai" => {
-                Ok(format!(
-                    "Dispatched Herdr LLM agent KV-cache inference job for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "monitoring" => {
-                Ok(format!(
-                    "Dispatched structured journald binary storage telemetry query for '{}' under distro mode '{:?}'",
+                    "Dispatched sovereign compiler toolchain & Poudriere / Sbuild bulk builder for target '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
