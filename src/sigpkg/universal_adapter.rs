@@ -964,6 +964,8 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Pup)
         } else if f == "pet" || f.ends_with(".pet") {
             Some(PackageFormat::Pet)
+        } else if f.ends_with(".ebuild") {
+            Some(PackageFormat::Portage)
         } else if f.ends_with(".nixpkg") || f.ends_with(".nix") {
             Some(PackageFormat::Nix)
         } else if f.ends_with(".eopkg") {
@@ -2265,6 +2267,21 @@ impl UniversalPmCommandDispatcher {
                             target_packages.push(arg.to_string());
                         }
                     }
+                }
+            }
+            "flatpak" | "snap" | "pkgman" | "swupd" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" | "bundle-add" => operation = UniversalPmOperation::Install,
+                        "remove" | "uninstall" | "remove-bundle" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "bundle-upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "find" => operation = UniversalPmOperation::Search,
+                        "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
                 }
             }
             "flatpak" | "snap" | "pkgman" | "swupd" => {
