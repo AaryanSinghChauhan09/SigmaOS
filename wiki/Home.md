@@ -16,6 +16,7 @@
 - **Linux io_uring Parity**: Asynchronous I/O engine for high-performance networking and storage.
 - **Zero-Trust Access Control & MAC:** Discretionary (DAC), Mandatory Access Control (MAC LSM Inode/Ptrace/Socket hooks), and Role-Based (RBAC) security enforcers.
 - **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
+- **Autonomous AI Agent Resource Management:** Intelligent microkernel and userland agent governors for compute, memory (DAMON/PSI), storage (ZFS ARC/CoW), network QoS (eBPF/VNET), and thermal power tuning via ACP/MCP protocols.
 - **AI Agents Master Guide:** [[AI_AGENTS_GUIDE]] - Authoritative reference for autonomous coding agents and subagents.
 - **AI Agents UX Management Guide:** [[AI_AGENTS_UX_MANAGEMENT_GUIDE]] - Interface, visual layout, and UX guidelines for autonomous AI agents.
 - **AI Agents Time Management Guide:** [[AI_AGENTS_TIME_MANAGEMENT_GUIDE]] - Timekeeping primitives, clock sync, and temporal architecture for autonomous AI agents.
@@ -31,6 +32,25 @@
 - **AI Agent Semaphores Management Guide:** [[AI_AGENT_SEMAPHORES_MANAGEMENT]] - IPC namespace counting semaphores, System V IPC, eventfd EFD_SEMAPHORE, and NT semaphores for AI agents.
 - **AI Agent Semaphores Operation Management Guide:** [[AI_AGENT_SEMAPHORES_OPERATION_MANAGEMENT]] - Atomic wait (P/down), signal (V/up), SEM_UNDO auto-reversal, and wait queue wakeups for AI agents.
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
+
+---
+
+## 📚 Documentation Index
+
+- [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
+- [High-Level Language Dependency Elimination Guide](HIGH_LEVEL_LANGUAGE_ELIMINATION_GUIDE.md)
+- [AI Agents Thread Synchronization Guide](AI_AGENTS_THREAD_SYNC_MANAGEMENT_GUIDE.md)
+- [AI Agents Configurability Operation Management Guide](AI_AGENTS_CONFIGURABILITY_MANAGEMENT_GUIDE.md)
+- [AI Agents Configuration Operation Management Guide](AI_AGENT_CONFIGURATION_OPERATION_MANAGEMENT.md)
+- [AI Agents Allocation Operation Management Guide](AI_AGENT_ALLOCATION_OPERATION_MANAGEMENT.md)
+- [AI Agents Readers-Writers Management Guide](AI_AGENTS_READERS_WRITERS_MANAGEMENT_GUIDE.md)
+- [API Reference](docs/api-reference.md)
+- [Kernel Architecture](docs/kernel.md)
+- [Memory Management](docs/memory-management.md)
+- [Security Architecture](docs/security.md)
+- [Package Management](docs/package-manager.md)
+- [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
+>>>>>>> origin/feature/linux-bsd-distro-cross-subsystem-interop-12882498947621137375
 
 ---
 

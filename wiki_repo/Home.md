@@ -43,6 +43,8 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 - [High-Level Language Dependency Elimination Guide](HIGH_LEVEL_LANGUAGE_ELIMINATION_GUIDE.md)
 - [AI Agents Thread Synchronization Guide](AI_AGENTS_THREAD_SYNC_MANAGEMENT_GUIDE.md)
 - [AI Agents Configurability Operation Management Guide](AI_AGENTS_CONFIGURABILITY_MANAGEMENT_GUIDE.md)
+- [AI Agents Configuration Operation Management Guide](AI_AGENT_CONFIGURATION_OPERATION_MANAGEMENT.md)
+- [AI Agents Allocation Operation Management Guide](AI_AGENT_ALLOCATION_OPERATION_MANAGEMENT.md)
 - [AI Agents Readers-Writers Management Guide](AI_AGENTS_READERS_WRITERS_MANAGEMENT_GUIDE.md)
 - [API Reference](docs/api-reference.md)
 - [Kernel Architecture](docs/kernel.md)
