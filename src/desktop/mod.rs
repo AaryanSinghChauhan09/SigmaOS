@@ -2,6 +2,7 @@
 pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
+pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
 pub mod zenith_compositor;
@@ -35,4 +36,9 @@ pub use moksha::{
 pub use zenith_compositor::{
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
+};
+
+pub use omarchy_omakase::{
+    AgenticWorkstationLayout, AgenticWorkstationOrchestrator, OmakasePresetConfig,
+    OmarchySystemEngine, WorkstationPane, WorkstationPaneRole,
 };
