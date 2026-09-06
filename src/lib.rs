@@ -78,27 +78,6 @@ pub use distro::{
     OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
 };
 
-pub use distro::{
-    missing_distro_innovations::{
-        CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
-    },
-    ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode,
-    DragonFlyHammer2EmergencyCowEngine, FedoraSelinuxMlsMcsGovernor, FreeBsdGeomVdevTopology,
-    GarudaZenPerformanceEngine, GentooPortageSlotOperatorEngine, GeomVdevNode,
-    GuixShepherdServiceEngine, HaStateEntry, HermeticClosureRecord, HermeticStoreClosureEngine,
-    LandlockAccessType, LandlockV5Rule, NomadBsdLivePersistenceEngine, NomadBsdZfsDataset,
-    OpenBsdFdPledgeGate, SchedExtTask, ScxSchedulerKind, ScxTaskState, SovereignDistroLeapSuite,
-    SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignFastInitramfsGenerator,
-    SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
-    SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
-    SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
-    ZramCompressionAlgorithm,
-};
-pub use driver::{
-    DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
-    UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
-    UbuntuLivepatchDriverHook,
-};
 pub use package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ApkIndexMetadata, ApkSignatureKey, ApkV3SignatureEngine,
     AptBugReport, AptMarkRecord, AptMarkState, AptPinRule, ArchCachyosMicroarchOptimizationEngine,
