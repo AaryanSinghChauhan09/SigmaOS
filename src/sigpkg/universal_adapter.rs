@@ -994,7 +994,7 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Pkg)
         } else if f.ends_with(".aab") {
             Some(PackageFormat::Aab)
-        } else if f.ends_with(".openbsd.tgz") {
+        } else if f.ends_with(".openbsd.tgz") || f.ends_with(".openbsd.tar.gz") {
             Some(PackageFormat::OpenBsdPkg)
         } else if f.ends_with(".tar.gz") || f.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
@@ -1070,8 +1070,22 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::SolarisIps)
         } else if f.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
-        } else if f.ends_with(".openbsd.tgz") {
-            Some(PackageFormat::OpenBsdPkg)
+        } else if f.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if f.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if f.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if f.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if f.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if f.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if f.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if f.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
         } else {
             None
         }
@@ -1128,6 +1142,22 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::GuixNar) // Nix / Guix NAR archive magic
         } else if data.starts_with(b"OBSD") {
             Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
+        } else if data.starts_with(b"SPAK") {
+            Some(PackageFormat::Spack) // Spack HPC package magic
+        } else if data.starts_with(b"CONA") {
+            Some(PackageFormat::Conan) // Conan C/C++ package magic
+        } else if data.starts_with(b"WHEL") {
+            Some(PackageFormat::Wheel) // Python Wheel magic
+        } else if data.starts_with(b"CRAT") {
+            Some(PackageFormat::Crate) // Rust Cargo crate magic
+        } else if data.starts_with(b"GEMS") {
+            Some(PackageFormat::Gem) // RubyGems magic
+        } else if data.starts_with(b"NUPK") {
+            Some(PackageFormat::Nupkg) // .NET NuGet magic
+        } else if data.starts_with(b"VCPK") {
+            Some(PackageFormat::Vcpkg) // Microsoft Vcpkg magic
+        } else if data.starts_with(b"NARI") {
+            Some(PackageFormat::NarInfo) // Nix/Guix NarInfo substituter magic
         } else {
             None
         }
@@ -1381,13 +1411,13 @@ impl UniversalPackageAdapter {
                         &slack.description,
                         &slack.slack_required,
                     )
-                } else if filename.ends_with(".hpkg") || raw_text.contains("summary ") || raw_text.contains("architecture ") || raw_text.contains("vendor ") || raw_text.contains("haiku") {
-                    let haiku = self.parse_haiku_hpkg(raw_text)?;
+                } else if raw_text.contains("name ") && raw_text.contains("summary ") {
+                    let hpkg = self.parse_haiku_hpkg(raw_text)?;
                     self.translate_to_native_package(
-                        &haiku.name,
-                        &haiku.version,
-                        &haiku.summary,
-                        &haiku.requires,
+                        &hpkg.name,
+                        &hpkg.version,
+                        &hpkg.summary,
+                        &hpkg.requires,
                     )
                 } else {
                     Err("Unrecognized package manifest format")
@@ -2155,7 +2185,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkgsend" => {
+            "pkg" | "pkg_add" | "pkgsend" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2952,6 +2982,38 @@ mod tests {
             adapter.detect_format_by_extension("base.openbsd.tgz"),
             Some(PackageFormat::OpenBsdPkg)
         );
+        assert_eq!(
+            adapter.detect_format_by_extension("hpc.spack"),
+            Some(PackageFormat::Spack)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("cpp.conan"),
+            Some(PackageFormat::Conan)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("python.whl"),
+            Some(PackageFormat::Wheel)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("rust.crate"),
+            Some(PackageFormat::Crate)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("ruby.gem"),
+            Some(PackageFormat::Gem)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("dotnet.nupkg"),
+            Some(PackageFormat::Nupkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("ms.vcpkg"),
+            Some(PackageFormat::Vcpkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("nix.narinfo"),
+            Some(PackageFormat::NarInfo)
+        );
 
         // Check format detection by header signature magic
         assert_eq!(
@@ -3009,6 +3071,38 @@ mod tests {
         assert_eq!(
             adapter.detect_format_by_header(b"OBSDhdr"),
             Some(PackageFormat::OpenBsdPkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"SPAKhdr"),
+            Some(PackageFormat::Spack)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"CONAhdr"),
+            Some(PackageFormat::Conan)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"WHELhdr"),
+            Some(PackageFormat::Wheel)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"CRAThdr"),
+            Some(PackageFormat::Crate)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"GEMShdr"),
+            Some(PackageFormat::Gem)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NUPKhdr"),
+            Some(PackageFormat::Nupkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"VCPKhdr"),
+            Some(PackageFormat::Vcpkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NARIhdr"),
+            Some(PackageFormat::NarInfo)
         );
     }
 

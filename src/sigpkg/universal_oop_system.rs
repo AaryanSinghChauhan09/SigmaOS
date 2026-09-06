@@ -232,6 +232,22 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
+    // Spack HPC package manager (.spack)
+    Spack,
+    // C/C++ Conan package (.conan)
+    Conan,
+    // Python Wheel (.whl)
+    Wheel,
+    // Rust Cargo crate (.crate)
+    Crate,
+    // RubyGems (.gem)
+    Gem,
+    // .NET NuGet (.nupkg)
+    Nupkg,
+    // Microsoft Vcpkg (.vcpkg)
+    Vcpkg,
+    // Nix/Guix NarInfo substituter manifest (.narinfo)
+    NarInfo,
 }
 
 impl PackageFormat {
@@ -342,6 +358,24 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
         } else {
             None
         }

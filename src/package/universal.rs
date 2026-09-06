@@ -158,6 +158,24 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+    Portage,    // Gentoo Portage
+    FreeBsdPkg, // FreeBSD pkg
+    ArchPkgBuild,// Arch PKGBUILD
+    NixStore,   // Nix store
+    Homebrew,   // Homebrew formula
+    Ipk,        // OpenWrt / opkg / Entware (.ipk)
+    Opkg,       // Yocto / OpenEmbedded (.opkg)
+    OpenBsdPkg, // OpenBSD pkg_add (.openbsd.tgz / .tgz)
+    SolarisIps, // Solaris / Illumos IPS (.p5p / .ips)
+    GuixNar,    // GNU Guix / Nix Archive (.nar)
+    Spack,      // Spack HPC package manager (.spack)
+    Conan,      // C/C++ Conan package (.conan)
+    Wheel,      // Python Wheel (.whl)
+    Crate,      // Rust Cargo crate (.crate)
+    Gem,        // RubyGems (.gem)
+    Nupkg,      // .NET NuGet (.nupkg)
+    Vcpkg,      // Microsoft Vcpkg (.vcpkg)
+    NarInfo,    // Nix/Guix NarInfo substituter manifest (.narinfo)
 }
 
 impl PackageFormat {
@@ -273,6 +291,24 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
         } else {
             None
         }
@@ -2637,6 +2673,14 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("solaris.p5p"), Some(PackageFormat::SolarisIps));
         assert_eq!(PackageFormat::from_filename("store.nar"), Some(PackageFormat::GuixNar));
         assert_eq!(PackageFormat::from_filename("base.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
+        assert_eq!(PackageFormat::from_filename("hpc.spack"), Some(PackageFormat::Spack));
+        assert_eq!(PackageFormat::from_filename("cpp.conan"), Some(PackageFormat::Conan));
+        assert_eq!(PackageFormat::from_filename("python.whl"), Some(PackageFormat::Wheel));
+        assert_eq!(PackageFormat::from_filename("rust.crate"), Some(PackageFormat::Crate));
+        assert_eq!(PackageFormat::from_filename("ruby.gem"), Some(PackageFormat::Gem));
+        assert_eq!(PackageFormat::from_filename("dotnet.nupkg"), Some(PackageFormat::Nupkg));
+        assert_eq!(PackageFormat::from_filename("ms.vcpkg"), Some(PackageFormat::Vcpkg));
+        assert_eq!(PackageFormat::from_filename("nix.narinfo"), Some(PackageFormat::NarInfo));
     }
 
     #[test]

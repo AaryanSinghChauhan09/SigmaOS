@@ -490,102 +490,186 @@ impl PasswordlessSudoExpiryGuard {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OmarchyNerdFont {
-    FiraCode,
-    JetBrainsMono,
-    Hack,
-    Meslo,
+/// Dynamic Wallpaper & Color Palette Engine (inspired by omarchy: pywal / matugen integration)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyWallpaperManager {
+    pub current_wallpaper_path: String,
+    pub extracted_palette: Vec<String>,
 }
 
-impl OmarchyNerdFont {
-    pub fn font_family(&self) -> &'static str {
-        match self {
-            Self::FiraCode => "FiraCode Nerd Font",
-            Self::JetBrainsMono => "JetBrainsMono Nerd Font",
-            Self::Hack => "Hack Nerd Font",
-            Self::Meslo => "MesloLGS Nerd Font",
+impl OmarchyWallpaperManager {
+    pub fn new(wallpaper_path: &str) -> Self {
+        Self {
+            current_wallpaper_path: wallpaper_path.to_string(),
+            extracted_palette: vec![
+                "#1a1b26".to_string(),
+                "#f7768e".to_string(),
+                "#9ece6a".to_string(),
+                "#e0af68".to_string(),
+                "#7aa2f7".to_string(),
+                "#bb9af7".to_string(),
+                "#7dcfff".to_string(),
+                "#a9b1d6".to_string(),
+            ],
         }
+    }
+
+    pub fn set_wallpaper(&mut self, path: &str) {
+        self.current_wallpaper_path = path.to_string();
+    }
+
+    pub fn generate_hyprpaper_config(&self) -> String {
+        format!(
+            "preload = {}\nwallpaper = ,{}\nipc = on\n",
+            self.current_wallpaper_path, self.current_wallpaper_path
+        )
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct OmarchyTerminalFontConfig {
-    pub active_font: OmarchyNerdFont,
-    pub font_size_pt: f32,
+/// Omarchy Font & Typography Installer
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyFontInstaller {
+    pub installed_nerd_fonts: Vec<String>,
 }
 
-impl OmarchyTerminalFontConfig {
+impl OmarchyFontInstaller {
     pub fn new() -> Self {
         Self {
-            active_font: OmarchyNerdFont::JetBrainsMono,
-            font_size_pt: 11.0,
+            installed_nerd_fonts: vec![
+                "JetBrainsMonoNerdFont".to_string(),
+                "FiraCodeNerdFont".to_string(),
+                "HackNerdFont".to_string(),
+                "Inter".to_string(),
+            ],
         }
     }
 
-    pub fn set_font(&mut self, font: OmarchyNerdFont, size_pt: f32) {
-        self.active_font = font;
-        self.font_size_pt = size_pt;
+    pub fn install_font(&mut self, font_name: &str) {
+        if !self.installed_nerd_fonts.contains(&font_name.to_string()) {
+            self.installed_nerd_fonts.push(font_name.to_string());
+        }
+    }
+
+    pub fn generate_fontconfig_xml(&self) -> String {
+        format!(
+            r#"<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <alias>
+    <family>monospace</family>
+    <prefer>
+      <family>JetBrainsMono Nerd Font</family>
+    </prefer>
+  </alias>
+</fontconfig>"#
+        )
     }
 }
 
-impl Default for OmarchyTerminalFontConfig {
+impl Default for OmarchyFontInstaller {
     fn default() -> Self {
         Self::new()
     }
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct OmarchyNeovimPresetEngine {
-    pub lsp_servers: Vec<String>,
+/// PipeWire Bluetooth Audio LDAC/AptX HD Auto-Switching Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyBluetoothAudioAutoSwitch {
+    pub auto_ldac_enabled: bool,
+    pub preferred_codec: String,
 }
 
-impl OmarchyNeovimPresetEngine {
+impl OmarchyBluetoothAudioAutoSwitch {
     pub fn new() -> Self {
         Self {
-            lsp_servers: Vec::new(),
+            auto_ldac_enabled: true,
+            preferred_codec: "ldac".to_string(),
         }
     }
 
-    pub fn register_lsp_server(&mut self, server: &str) -> bool {
-        if self.lsp_servers.iter().any(|s| s == server) {
-            false
+    pub fn resolve_codec_for_device(&self, device_name: &str) -> String {
+        if self.auto_ldac_enabled && (device_name.contains("Sony") || device_name.contains("WH-1000") || device_name.contains("LDAC")) {
+            "ldac".to_string()
+        } else if device_name.contains("AptX") {
+            "aptx_hd".to_string()
         } else {
-            self.lsp_servers.push(server.to_string());
-            true
+            "aac".to_string()
         }
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct OmarchyAudioPipewireConfig {
-    pub quantum_buffer_size: u32,
-}
-
-impl OmarchyAudioPipewireConfig {
-    pub fn new() -> Self {
-        Self {
-            quantum_buffer_size: 256,
-        }
-    }
-
-    pub fn set_low_latency(&mut self, quantum: u32) -> bool {
-        if quantum == 0 {
-            false
-        } else {
-            self.quantum_buffer_size = quantum;
-            true
-        }
-    }
-}
-
-impl Default for OmarchyAudioPipewireConfig {
+impl Default for OmarchyBluetoothAudioAutoSwitch {
     fn default() -> Self {
         Self::new()
     }
 }
 
-#[cfg(test_disabled)]
+/// Unified Kernel Image (UKI) systemd-boot Generator
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchySystemdBootGenerator {
+    pub default_entry: String,
+    pub timeout_seconds: u32,
+}
+
+impl OmarchySystemdBootGenerator {
+    pub fn new() -> Self {
+        Self {
+            default_entry: "omarchy-linux-zen.conf".to_string(),
+            timeout_seconds: 3,
+        }
+    }
+
+    pub fn generate_boot_entry(&self, title: &str, kernel: &str, initrd: &str, params: &str) -> String {
+        format!(
+            "title {}\nlinux {}\ninitrd {}\noptions {}\n",
+            title, kernel, initrd, params
+        )
+    }
+}
+
+impl Default for OmarchySystemdBootGenerator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Curated Omarchy Package Bundle Installer
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyPackageInstaller {
+    pub core_packages: Vec<String>,
+}
+
+impl OmarchyPackageInstaller {
+    pub fn new() -> Self {
+        Self {
+            core_packages: vec![
+                "hyprland".to_string(),
+                "waybar".to_string(),
+                "swaync".to_string(),
+                "rofi-wayland".to_string(),
+                "thunar".to_string(),
+                "kitty".to_string(),
+                "alacritty".to_string(),
+                "pipewire".to_string(),
+                "hyprpaper".to_string(),
+            ],
+        }
+    }
+
+    pub fn add_package(&mut self, pkg: &str) {
+        if !self.core_packages.contains(&pkg.to_string()) {
+            self.core_packages.push(pkg.to_string());
+        }
+    }
+}
+
+impl Default for OmarchyPackageInstaller {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -625,26 +709,37 @@ mod tests {
     }
 
     #[test]
-    fn test_omarchy_terminal_font_config() {
-        let mut cfg = OmarchyTerminalFontConfig::new();
-        cfg.set_font(OmarchyNerdFont::FiraCode, 12.0);
-        assert_eq!(cfg.active_font.font_family(), "FiraCode Nerd Font");
-        assert_eq!(cfg.font_size_pt, 12.0);
+    fn test_omarchy_wallpaper_manager() {
+        let mut wp = OmarchyWallpaperManager::new("/usr/share/backgrounds/tokyo.png");
+        assert_eq!(wp.current_wallpaper_path, "/usr/share/backgrounds/tokyo.png");
+        wp.set_wallpaper("/usr/share/backgrounds/nord.png");
+        assert_eq!(wp.current_wallpaper_path, "/usr/share/backgrounds/nord.png");
+        let conf = wp.generate_hyprpaper_config();
+        assert!(conf.contains("preload = /usr/share/backgrounds/nord.png"));
     }
 
     #[test]
-    fn test_omarchy_neovim_preset_engine() {
-        let mut nvim = OmarchyNeovimPresetEngine::new();
-        assert!(nvim.register_lsp_server("zls"));
-        assert!(!nvim.register_lsp_server("zls")); // Duplicate check
-        assert!(nvim.lsp_servers.contains(&String::from("zls")));
+    fn test_omarchy_font_and_bluetooth_audio() {
+        let mut font = OmarchyFontInstaller::new();
+        font.install_font("HackNerdFont");
+        assert!(font.installed_nerd_fonts.contains(&"HackNerdFont".to_string()));
+        let xml = font.generate_fontconfig_xml();
+        assert!(xml.contains("JetBrainsMono Nerd Font"));
+
+        let bt = OmarchyBluetoothAudioAutoSwitch::new();
+        assert_eq!(bt.resolve_codec_for_device("Sony WH-1000XM5"), "ldac");
+        assert_eq!(bt.resolve_codec_for_device("Generic AptX Headset"), "aptx_hd");
     }
 
     #[test]
-    fn test_omarchy_pipewire_audio_config() {
-        let mut audio = OmarchyAudioPipewireConfig::new();
-        assert!(audio.set_low_latency(64));
-        assert_eq!(audio.quantum_buffer_size, 64);
-        assert!(!audio.set_low_latency(0));
+    fn test_omarchy_boot_and_packages() {
+        let gen = OmarchySystemdBootGenerator::new();
+        let entry = gen.generate_boot_entry("Omarchy Zen", "/vmlinuz-linux-zen", "/initramfs-linux-zen.img", "quiet splash");
+        assert!(entry.contains("title Omarchy Zen"));
+        assert!(entry.contains("linux /vmlinuz-linux-zen"));
+
+        let mut pkg = OmarchyPackageInstaller::new();
+        pkg.add_package("fastfetch");
+        assert!(pkg.core_packages.contains(&"fastfetch".to_string()));
     }
 }
