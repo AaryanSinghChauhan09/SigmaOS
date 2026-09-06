@@ -779,6 +779,38 @@ input:checked + .slider:before {
 }
 
 /* Accessibility: High Contrast Mode Overrides */
+@media (prefers-contrast: high), (forced-colors: active) {
+    :root {
+        --bg-dark: #000000;
+        --bg-charcoal: #000000;
+        --bg-glass: #000000;
+        --bg-glass-heavy: #000000;
+        --accent-gold: #ffffff;
+        --accent-gold-bright: #ffffff;
+        --accent-blue: #ffffff;
+        --text-white: #ffffff;
+        --text-muted: #ffffff;
+        --border-glass: #ffffff;
+        --border-bright: #ffffff;
+        --shadow-premium: none;
+        --glass-blur: 0px;
+    }
+
+    .window, .top-bar, .dock-container {
+        background: Canvas !important;
+        color: CanvasText !important;
+        border: 2px solid CanvasText !important;
+        box-shadow: none !important;
+    }
+
+    button, .fm-btn, .wizard-btn {
+        background: Highlight !important;
+        color: HighlightText !important;
+        border: 2px solid CanvasText !important;
+        font-weight: 700 !important;
+    }
+}
+
 body.high-contrast-active {
     --bg-dark: #000000;
     --bg-charcoal: #000000;

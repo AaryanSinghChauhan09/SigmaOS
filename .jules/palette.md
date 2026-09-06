@@ -5,3 +5,7 @@
 ## 2026-09-04 - Accessible Web Desktop Window Tab Navigation
 **Learning:** Web OS window tabs built using generic `<div>` tags lack keyboard focusability, screen reader role identification, and active tab state announcements (`aria-selected`).
 **Action:** Convert window tab navigation bars into `<div role="tablist">` with `<button type="button" role="tab">` elements linking via `aria-controls` to corresponding `<div role="tabpanel">` content blocks, dynamically synchronizing `aria-selected` upon selection.
+
+## 2026-10-15 - System High-Contrast & Forced-Colors Media Query Support
+**Learning:** Hardcoded `!important` hex colors in CSS high-contrast rules override user-configured system accessibility palettes in Windows High Contrast / Forced Colors mode; using standard CSS system colors (`Canvas`, `CanvasText`, `Highlight`, `HighlightText`) alongside media query feature detection (`prefers-contrast: high` and `forced-colors: active`) ensures compliance with WCAG 2.1 Level AA without breaking custom themes.
+**Action:** Use CSS system keywords (`Canvas`, `CanvasText`, `Highlight`) inside `(forced-colors: active)` media queries and auto-initialize high-contrast detection listeners on DOM ready.
