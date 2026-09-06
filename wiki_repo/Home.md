@@ -30,15 +30,7 @@
 - **AI Agent Commands Management Guide:** [[AI_AGENT_COMMANDS_MANAGEMENT]] - Sovereign command suite, privilege delegation (sudo/doas), task monitoring, sysctl, and multi-distro CLI for AI agents.
 - **AI Agent Time Sharing System Management Guide:** [[AI_AGENT_TIME_SHARING_SYSTEM_MANAGEMENT]] - Quantum time slicing, POSIX SCHED_RR, EEVDF virtual deadlines, and MLFQ priority decay for AI agents.
 - **AI Agent Semaphores Management Guide:** [[AI_AGENT_SEMAPHORES_MANAGEMENT]] - IPC namespace counting semaphores, System V IPC, eventfd EFD_SEMAPHORE, and NT semaphores for AI agents.
-
-- **Sovereign Microkernel Core**: Zero-allocation, capability-gated microkernel with isolated userspace shards (`BuddyAllocator`, `CapabilityGate`).
-- **NixOS / Guix Parity**: Purely declarative system state configurations, content-addressed package store (CAS), and instant atomic rollbacks.
-- **Arch Linux & Gentoo Parity**: SAT-based zero-allocation dependency solver (`SatSolver`), PKGBUILD recipe sandbox compiler, and Portage USE-flag compilation.
-- **Clear Linux Parity**: Stateless `/usr` configuration overlay architecture (`ClearLinuxStatelessOverlayEngine`).
-- **OpenBSD Security Hardening**: Hardware-enforced process restriction (`pledge`), file path masking (`unveil`), W^X memory execution policies, and Retguard return-address canaries.
-- **FreeBSD Isolation**: Jails virtualization with nested hierarchies, RACCT/RCTL resource controls, and Capsicum descriptor capability delegation.
-- **DragonFly BSD & openSUSE Parity**: HAMMER2 PFS multi-version B-tree filesystem, variant symlinks (`varsyms`), and Snapper CoW pre/post transaction recovery.
-- **Zenith Desktop Compositor**: Direct-to-hardware framebuffer rendering without Wayland/X11 bloat, featuring HiDPI fractional scaling, Variable Refresh Rate (VRR), Sway-style tiling matrices, and Gamescope-inspired direct scanout blitting.
+- **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
 
 ---
 

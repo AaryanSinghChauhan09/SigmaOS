@@ -29,21 +29,7 @@
 - **AI Agent Commands Management Guide:** [[AI_AGENT_COMMANDS_MANAGEMENT]] - Sovereign command suite, privilege delegation (sudo/doas), task monitoring, sysctl, and multi-distro CLI for AI agents.
 - **AI Agent Time Sharing System Management Guide:** [[AI_AGENT_TIME_SHARING_SYSTEM_MANAGEMENT]] - Quantum time slicing, POSIX SCHED_RR, EEVDF virtual deadlines, and MLFQ priority decay for AI agents.
 - **AI Agent Semaphores Management Guide:** [[AI_AGENT_SEMAPHORES_MANAGEMENT]] - IPC namespace counting semaphores, System V IPC, eventfd EFD_SEMAPHORE, and NT semaphores for AI agents.
-
----
-
-## 📚 Documentation
-
-- [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
-- [High-Level Language Dependency Elimination Guide](HIGH_LEVEL_LANGUAGE_ELIMINATION_GUIDE.md)
-- [AI Agents Thread Synchronization Guide](AI_AGENTS_THREAD_SYNC_MANAGEMENT_GUIDE.md)
-- [AI Agents Configurability Operation Management Guide](AI_AGENTS_CONFIGURABILITY_MANAGEMENT_GUIDE.md)
-- [API Reference](docs/api-reference.md)
-- [Kernel Architecture](docs/kernel.md)
-- [Memory Management](docs/memory-management.md)
-- [Security Architecture](docs/security.md)
-- [Package Management](docs/package-manager.md)
-- [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
+- **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
 
 ---
 
