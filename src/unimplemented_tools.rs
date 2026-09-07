@@ -5342,7 +5342,7 @@ impl NetworkPcapForensicSniffer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod new_unimplemented_tools_tests {
     use super::*;
 

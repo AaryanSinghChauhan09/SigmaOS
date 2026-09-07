@@ -3660,11 +3660,7 @@ mod extra_unimplemented_tests {
     }
 }
 
-
 // =========================================================================
-// TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
-// =========================================================================
-
 #[derive(Debug, Clone)]
 pub struct DocField {
     pub fieldname: String,
@@ -3673,7 +3669,6 @@ pub struct DocField {
     pub reqd: bool,
 }
 
-#[derive(Debug, Clone)]
 pub struct FrappeFrameworkDocTypeEngine {
     pub doctype_name: String,
     pub fields: Vec<DocField>,
@@ -3973,7 +3968,7 @@ mod new_unimplemented_tests {
 
     #[test]
     fn test_puppy_linux_overlay_ramdisk_engine() {
-        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048, 4096);
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048, 2048);
         puppy.load_sfs_module("puppy_sigma_2.0.sfs");
         puppy.mount_persistence("/mnt/home/sigmasave.2fs");
         assert_eq!(puppy.loaded_sfs_modules.len(), 1);

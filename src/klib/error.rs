@@ -1,49 +1,78 @@
-// Typed Error Hierarchy for SigmaOS
-// Definitively structures system-wide errors into five major subsystems.
+#![allow(dead_code)]
+// SigmaOS Kernel Library - Error Subsystem
+// Inspired by Linux POSIX errno standards and FreeBSD kernel error abstractions
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SigmaError {
-    Kernel(KernelError),
-    Fs(FsError),
-    Net(NetError),
-    Security(SecurityError),
-    Crypto(CryptoError),
+#[repr(i32)]
+pub enum Errno {
+    Success = 0,
+    OperationNotPermitted = 1,  // EPERM
+    NoSuchFileOrDirectory = 2, // ENOENT
+    NoSuchProcess = 3,         // ESRCH
+    InterruptedSyscall = 4,    // EINTR
+    IoError = 5,               // EIO
+    NoSuchDeviceOrAddress = 6, // ENXIO
+    InvalidArgument = 22,      // EINVAL
+    OutOfMemory = 12,          // ENOMEM
+    PermissionDenied = 13,     // EACCES
+    DeviceOrResourceBusy = 16, // EBUSY
+    FileExists = 17,           // EEXIST
+    NotADirectory = 20,        // ENOTDIR
+    IsADirectory = 21,         // EISDIR
+    ResourceTemporarilyUnavailable = 11, // EAGAIN
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KernelError {
-    OutOfMemory,
-    InvalidSyscall,
-    TaskCreationFailed,
-    SchedulerError,
+impl Errno {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Errno::Success => "Success",
+            Errno::OperationNotPermitted => "Operation not permitted",
+            Errno::NoSuchFileOrDirectory => "No such file or directory",
+            Errno::NoSuchProcess => "No such process",
+            Errno::InterruptedSyscall => "Interrupted system call",
+            Errno::IoError => "I/O error",
+            Errno::NoSuchDeviceOrAddress => "No such device or address",
+            Errno::InvalidArgument => "Invalid argument",
+            Errno::OutOfMemory => "Out of memory",
+            Errno::PermissionDenied => "Permission denied",
+            Errno::DeviceOrResourceBusy => "Device or resource busy",
+            Errno::FileExists => "File exists",
+            Errno::NotADirectory => "Not a directory",
+            Errno::IsADirectory => "Is a directory",
+            Errno::ResourceTemporarilyUnavailable => "Resource temporarily unavailable",
+        }
+    }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FsError {
-    FileNotFound,
-    PermissionDenied,
-    IsADirectory,
-    DiskFull,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KlibError {
+    pub code: Errno,
+    pub message: &'static str,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NetError {
-    ConnectionRefused,
-    Timeout,
-    InvalidAddress,
-    PortAlreadyInUse,
+impl KlibError {
+    pub fn new(code: Errno, message: &'static str) -> Self {
+        Self { code, message }
+    }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SecurityError {
-    PrivilegeEscalationDetected,
-    InvalidToken,
-    AccessDenied,
-}
+pub type KlibResult<T> = Result<T, KlibError>;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CryptoError {
-    VerificationFailed,
-    DecryptionFailed,
-    KeyGenerationFailed,
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_errno_strings() {
+        assert_eq!(Errno::Success.as_str(), "Success");
+        assert_eq!(Errno::InvalidArgument.as_str(), "Invalid argument");
+        assert_eq!(Errno::OutOfMemory.as_str(), "Out of memory");
+    }
+
+    #[test]
+    fn test_klib_error() {
+        let err = KlibError::new(Errno::OutOfMemory, "Failed kernel allocation");
+        assert_eq!(err.code, Errno::OutOfMemory);
+        assert_eq!(err.message, "Failed kernel allocation");
+    }
 }

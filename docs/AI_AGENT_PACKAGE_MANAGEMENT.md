@@ -56,7 +56,11 @@ When extending binary signature parsing, register the magic byte header signatur
 | **SquashFS / TCZ** | `.tcz`, `.sfs` | `hsqs` / `sqsh` | Tiny Core / Puppy / Slax |
 | **Apple DMG** | `.dmg` | `koly` | macOS Disk Image |
 | **Bedrock Stratum** | `.stratum` | `BRLK` | Bedrock Linux |
-| **Slackware** | `.slackbuild` | `SLAK` | Slackware Linux |
+| **Slackware** | `.slackbuild`, `.txz`, `.tlz`, `.tbz` | `SLAK` | Slackware Linux |
+| **Void Linux** | `.xbps` | `XBPS` | Void Linux |
+| **Tiny Core Linux** | `.tcz` | `sqsh` | Tiny Core Linux |
+| **NetBSD** | `.pkgsrc` | `PKG3` | NetBSD / pkgsrc |
+| **FreeBSD / DragonFly** | `.ports`, `.dports` | `PORT` | FreeBSD / DragonFly BSD |
 
 ---
 
