@@ -214,6 +214,8 @@ impl PackageFormat {
             Some(PackageFormat::Nixpkg)
         } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
             Some(PackageFormat::Ebuild)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
         } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
@@ -276,8 +278,6 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
-        } else if normalized.ends_with(".openbsd.tgz") {
-            Some(PackageFormat::OpenBsdPkg)
         } else {
             None
         }
@@ -2651,6 +2651,7 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("gentoo.portage"), Some(PackageFormat::Ebuild));
         assert_eq!(PackageFormat::from_filename("debian.deb"), Some(PackageFormat::Deb));
         assert_eq!(PackageFormat::from_filename("archive.tar.gz"), Some(PackageFormat::TarGz));
+        assert_eq!(PackageFormat::from_filename("archive.tar .gz"), Some(PackageFormat::TarGz));
         assert_eq!(PackageFormat::from_filename("archive.tgz"), Some(PackageFormat::TarGz));
         assert_eq!(PackageFormat::from_filename("compressed.xz"), Some(PackageFormat::Xz));
         assert_eq!(PackageFormat::from_filename("fedora.rpm"), Some(PackageFormat::Rpm));

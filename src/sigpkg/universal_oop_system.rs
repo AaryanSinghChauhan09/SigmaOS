@@ -288,6 +288,8 @@ impl PackageFormat {
             Some(PackageFormat::Nix)
         } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
             Some(PackageFormat::Ebuild)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
         } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
@@ -348,8 +350,6 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
-        } else if normalized.ends_with(".openbsd.tgz") {
-            Some(PackageFormat::OpenBsdPkg)
         } else {
             None
         }
