@@ -49,7 +49,11 @@ impl PackageSigningEngine {
     }
 
     /// Verify package signature
-    pub fn verify_signature(&self, signature: &PackageSignature, package_data: &[u8]) -> PackageVerificationResult {
+    pub fn verify_signature(
+        &self,
+        signature: &PackageSignature,
+        package_data: &[u8],
+    ) -> PackageVerificationResult {
         // Check if key is trusted
         if !self.signing_keys.contains(&signature.key_id) {
             return PackageVerificationResult::UnknownKey;
@@ -61,7 +65,11 @@ impl PackageSigningEngine {
     }
 
     /// Sign package data
-    pub fn sign_package(&self, key_id: &str, package_data: &[u8]) -> Result<PackageSignature, &'static str> {
+    pub fn sign_package(
+        &self,
+        key_id: &str,
+        package_data: &[u8],
+    ) -> Result<PackageSignature, &'static str> {
         if !self.signing_keys.contains(&key_id.to_string()) {
             return Err("Key not found in trusted keys");
         }
@@ -104,9 +112,16 @@ impl PackageSecurityMetadata {
     }
 
     /// Verify all signatures
-    pub fn verify_all_signatures(&self, engine: &PackageSigningEngine, package_data: &[u8]) -> bool {
+    pub fn verify_all_signatures(
+        &self,
+        engine: &PackageSigningEngine,
+        package_data: &[u8],
+    ) -> bool {
         self.signatures.iter().all(|sig| {
-            matches!(engine.verify_signature(sig, package_data), PackageVerificationResult::Valid)
+            matches!(
+                engine.verify_signature(sig, package_data),
+                PackageVerificationResult::Valid
+            )
         })
     }
 }

@@ -11,11 +11,11 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
 use alloc::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use alloc::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 
 // ==========================================
 // 1. Nix-Style Store Derivations
@@ -204,7 +204,12 @@ impl GentooPortageReproducibleEbuildEngine {
     }
 
     pub fn compute_ebuild_build_hash(&self) -> String {
-        let key = format!("{}:{}:{}", self.category_atom, self.slot, self.active_use_flags.join(","));
+        let key = format!(
+            "{}:{}:{}",
+            self.category_atom,
+            self.slot,
+            self.active_use_flags.join(",")
+        );
         let mut hash_val = 5381u64;
         for b in key.bytes() {
             hash_val = hash_val.wrapping_mul(33).wrapping_add(b as u64);
@@ -253,7 +258,11 @@ impl ReproducibleBuildDiffInspector {
     pub fn inspect_diffs(artifact_a: &[u8], artifact_b: &[u8]) -> Vec<String> {
         let mut diffs = Vec::new();
         if artifact_a.len() != artifact_b.len() {
-            diffs.push(format!("Size mismatch: {} bytes vs {} bytes", artifact_a.len(), artifact_b.len()));
+            diffs.push(format!(
+                "Size mismatch: {} bytes vs {} bytes",
+                artifact_a.len(),
+                artifact_b.len()
+            ));
             return diffs;
         }
 
@@ -261,7 +270,10 @@ impl ReproducibleBuildDiffInspector {
         for (i, (&byte_a, &byte_b)) in artifact_a.iter().zip(artifact_b.iter()).enumerate() {
             if byte_a != byte_b {
                 if mismatch_count < 3 {
-                    diffs.push(format!("Byte mismatch at offset 0x{:x}: 0x{:02x} vs 0x{:02x}", i, byte_a, byte_b));
+                    diffs.push(format!(
+                        "Byte mismatch at offset 0x{:x}: 0x{:02x} vs 0x{:02x}",
+                        i, byte_a, byte_b
+                    ));
                 }
                 mismatch_count += 1;
             }
@@ -303,7 +315,8 @@ impl ArchLinuxReproBuildInspector {
                 let pkg = line["installed = ".len()..].to_string();
                 let mut parts = pkg.split('-');
                 if let (Some(name), Some(ver)) = (parts.next(), parts.next()) {
-                    self.installed_pkgs.insert(name.to_string(), ver.to_string());
+                    self.installed_pkgs
+                        .insert(name.to_string(), ver.to_string());
                 }
             }
         }
@@ -327,7 +340,10 @@ pub struct DebianDiffoscopeEngine;
 impl DebianDiffoscopeEngine {
     pub fn diff_elf_build_ids(build_id_a: &str, build_id_b: &str) -> Option<String> {
         if build_id_a != build_id_b {
-            Some(format!("ELF Build ID mismatch: {} vs {}", build_id_a, build_id_b))
+            Some(format!(
+                "ELF Build ID mismatch: {} vs {}",
+                build_id_a, build_id_b
+            ))
         } else {
             None
         }
@@ -480,10 +496,16 @@ mod tests {
         let mut ebuild2 = GentooPortageReproducibleEbuildEngine::new("dev-libs/openssl", "0/1.1");
         ebuild2.set_use_flags(&["zlib", "asm", "tls-compression"]);
 
-        assert_eq!(ebuild1.compute_ebuild_build_hash(), ebuild2.compute_ebuild_build_hash());
+        assert_eq!(
+            ebuild1.compute_ebuild_build_hash(),
+            ebuild2.compute_ebuild_build_hash()
+        );
 
         ebuild2.set_use_flags(&["asm", "zlib"]);
-        assert_ne!(ebuild1.compute_ebuild_build_hash(), ebuild2.compute_ebuild_build_hash());
+        assert_ne!(
+            ebuild1.compute_ebuild_build_hash(),
+            ebuild2.compute_ebuild_build_hash()
+        );
     }
 
     #[test]
@@ -519,7 +541,10 @@ mod tests {
         inspector.parse_buildinfo(content);
 
         assert_eq!(inspector.buildenv.len(), 2);
-        assert_eq!(inspector.installed_pkgs.get("glibc").map(|s| s.as_str()), Some("2.38"));
+        assert_eq!(
+            inspector.installed_pkgs.get("glibc").map(|s| s.as_str()),
+            Some("2.38")
+        );
         assert!(!inspector.compute_buildinfo_hash().is_empty());
     }
 
@@ -528,159 +553,175 @@ mod tests {
         let diff_id = DebianDiffoscopeEngine::diff_elf_build_ids("sha_a", "sha_b");
         assert!(diff_id.unwrap().contains("ELF Build ID mismatch"));
 
-        let diff_hdr = DebianDiffoscopeEngine::diff_archive_headers(&["bin/bash"], &["bin/bash", "bin/zsh"]);
+        let diff_hdr =
+            DebianDiffoscopeEngine::diff_archive_headers(&["bin/bash"], &["bin/bash", "bin/zsh"]);
         assert_eq!(diff_hdr.len(), 1);
         assert!(diff_hdr[0].contains("bin/zsh"));
     }
 
-// =========================================================================
-// SOVEREIGN HERMETIC CHROOT SANDBOX (ARCH EXTRA-BUILD & POUDRIERE PARITY)
-// =========================================================================
+    // =========================================================================
+    // SOVEREIGN HERMETIC CHROOT SANDBOX (ARCH EXTRA-BUILD & POUDRIERE PARITY)
+    // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct SovereignHermeticChrootSandbox {
-    pub chroot_path: String,
-    pub source_date_epoch: u64,
-    pub sanitized_env: Vec<(String, String)>,
-    pub active_mounts: Vec<String>,
-}
-
-impl SovereignHermeticChrootSandbox {
-    pub fn new(chroot_path: &str, source_date_epoch: u64) -> Self {
-        let mut sanitized_env = Vec::new();
-        sanitized_env.push(("SOURCE_DATE_EPOCH".to_string(), source_date_epoch.to_string()));
-        sanitized_env.push(("LC_ALL".to_string(), "C.UTF-8".to_string()));
-        sanitized_env.push(("LANG".to_string(), "C.UTF-8".to_string()));
-        sanitized_env.push(("TZ".to_string(), "UTC".to_string()));
-        sanitized_env.push(("PATH".to_string(), "/usr/bin:/bin".to_string()));
-
-        Self {
-            chroot_path: chroot_path.to_string(),
-            source_date_epoch,
-            sanitized_env,
-            active_mounts: vec!["/proc".to_string(), "/sys".to_string(), "/dev/shm".to_string()],
-        }
+    #[derive(Debug, Clone)]
+    pub struct SovereignHermeticChrootSandbox {
+        pub chroot_path: String,
+        pub source_date_epoch: u64,
+        pub sanitized_env: Vec<(String, String)>,
+        pub active_mounts: Vec<String>,
     }
 
-    pub fn prepare_clean_room(&mut self) -> Result<(), &'static str> {
-        if self.chroot_path.is_empty() {
-            return Err("HermeticChroot: Path empty");
-        }
-        Ok(())
-    }
-
-    pub fn execute_hermetic_build(&self, build_cmd: &str) -> (bool, Vec<u8>) {
-        let mut output = Vec::new();
-        output.extend_from_slice(b"HermeticChroot: Executed [");
-        output.extend_from_slice(build_cmd.as_bytes());
-        output.extend_from_slice(b"] with SOURCE_DATE_EPOCH=");
-        output.extend_from_slice(self.source_date_epoch.to_string().as_bytes());
-
-        (true, output)
-    }
-}
-
-// =========================================================================
-// DIFFOSCOPE STRUCTURAL DIFF ENGINE (DEBIAN DIFFOSCOPE STRUCTURAL PARITY)
-// =========================================================================
-
-pub struct DiffoscopeStructuralDiffEngine;
-
-impl DiffoscopeStructuralDiffEngine {
-    pub fn diff_elf_build_id(build_id1: &str, build_id2: &str) -> Option<String> {
-        if build_id1 != build_id2 {
-            Some(format!(
-                "Diffoscope: ELF .gnu.build-id mismatch: [{}] vs [{}]",
-                build_id1, build_id2
-            ))
-        } else {
-            None
-        }
-    }
-
-    pub fn diff_binary_structure(bin1: &[u8], bin2: &[u8]) -> Vec<String> {
-        let mut diffs = Vec::new();
-        if bin1.len() != bin2.len() {
-            diffs.push(format!(
-                "Diffoscope: Size mismatch ({} bytes vs {} bytes)",
-                bin1.len(), bin2.len()
+    impl SovereignHermeticChrootSandbox {
+        pub fn new(chroot_path: &str, source_date_epoch: u64) -> Self {
+            let mut sanitized_env = Vec::new();
+            sanitized_env.push((
+                "SOURCE_DATE_EPOCH".to_string(),
+                source_date_epoch.to_string(),
             ));
-        }
+            sanitized_env.push(("LC_ALL".to_string(), "C.UTF-8".to_string()));
+            sanitized_env.push(("LANG".to_string(), "C.UTF-8".to_string()));
+            sanitized_env.push(("TZ".to_string(), "UTC".to_string()));
+            sanitized_env.push(("PATH".to_string(), "/usr/bin:/bin".to_string()));
 
-        let min_len = bin1.len().min(bin2.len());
-        let mut mismatch_count = 0;
-        for i in 0..min_len {
-            if bin1[i] != bin2[i] {
-                mismatch_count += 1;
-                if diffs.len() < 5 {
-                    diffs.push(format!(
-                        "Diffoscope: Byte offset 0x{:x}: 0x{:02x} != 0x{:02x}",
-                        i, bin1[i], bin2[i]
-                    ));
-                }
+            Self {
+                chroot_path: chroot_path.to_string(),
+                source_date_epoch,
+                sanitized_env,
+                active_mounts: vec![
+                    "/proc".to_string(),
+                    "/sys".to_string(),
+                    "/dev/shm".to_string(),
+                ],
             }
         }
 
-        if mismatch_count > 0 {
-            diffs.push(format!(
-                "Diffoscope: Total mismatched bytes = {}",
-                mismatch_count
-            ));
+        pub fn prepare_clean_room(&mut self) -> Result<(), &'static str> {
+            if self.chroot_path.is_empty() {
+                return Err("HermeticChroot: Path empty");
+            }
+            Ok(())
         }
 
-        diffs
-    }
-}
+        pub fn execute_hermetic_build(&self, build_cmd: &str) -> (bool, Vec<u8>) {
+            let mut output = Vec::new();
+            output.extend_from_slice(b"HermeticChroot: Executed [");
+            output.extend_from_slice(build_cmd.as_bytes());
+            output.extend_from_slice(b"] with SOURCE_DATE_EPOCH=");
+            output.extend_from_slice(self.source_date_epoch.to_string().as_bytes());
 
-// =========================================================================
-// SOVEREIGN PACKAGE REPRODUCIBILITY AUDITOR (HYDRA & REPRO BUILDS PARITY)
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct ReproducibilityAuditReport {
-    pub package_name: String,
-    pub is_reproducible: bool,
-    pub build1_hash: String,
-    pub build2_hash: String,
-    pub diffs: Vec<String>,
-}
-
-pub struct SovereignPackageReproducibilityAuditor {
-    pub sandbox: SovereignHermeticChrootSandbox,
-}
-
-impl SovereignPackageReproducibilityAuditor {
-    pub fn new(chroot_path: &str, source_date_epoch: u64) -> Self {
-        Self {
-            sandbox: SovereignHermeticChrootSandbox::new(chroot_path, source_date_epoch),
+            (true, output)
         }
     }
 
-    pub fn audit_dual_build(
-        &mut self,
-        package_name: &str,
-        bin1: &[u8],
-        bin2: &[u8],
-    ) -> ReproducibilityAuditReport {
-        let diffs = DiffoscopeStructuralDiffEngine::diff_binary_structure(bin1, bin2);
-        let is_reproducible = diffs.is_empty();
+    // =========================================================================
+    // DIFFOSCOPE STRUCTURAL DIFF ENGINE (DEBIAN DIFFOSCOPE STRUCTURAL PARITY)
+    // =========================================================================
 
-        let hash1 = format!("{:x}", bin1.len() * 31 + bin1.first().copied().unwrap_or(0) as usize);
-        let hash2 = format!("{:x}", bin2.len() * 31 + bin2.first().copied().unwrap_or(0) as usize);
+    pub struct DiffoscopeStructuralDiffEngine;
 
-        ReproducibilityAuditReport {
-            package_name: package_name.to_string(),
-            is_reproducible,
-            build1_hash: hash1,
-            build2_hash: hash2,
-            diffs,
+    impl DiffoscopeStructuralDiffEngine {
+        pub fn diff_elf_build_id(build_id1: &str, build_id2: &str) -> Option<String> {
+            if build_id1 != build_id2 {
+                Some(format!(
+                    "Diffoscope: ELF .gnu.build-id mismatch: [{}] vs [{}]",
+                    build_id1, build_id2
+                ))
+            } else {
+                None
+            }
+        }
+
+        pub fn diff_binary_structure(bin1: &[u8], bin2: &[u8]) -> Vec<String> {
+            let mut diffs = Vec::new();
+            if bin1.len() != bin2.len() {
+                diffs.push(format!(
+                    "Diffoscope: Size mismatch ({} bytes vs {} bytes)",
+                    bin1.len(),
+                    bin2.len()
+                ));
+            }
+
+            let min_len = bin1.len().min(bin2.len());
+            let mut mismatch_count = 0;
+            for i in 0..min_len {
+                if bin1[i] != bin2[i] {
+                    mismatch_count += 1;
+                    if diffs.len() < 5 {
+                        diffs.push(format!(
+                            "Diffoscope: Byte offset 0x{:x}: 0x{:02x} != 0x{:02x}",
+                            i, bin1[i], bin2[i]
+                        ));
+                    }
+                }
+            }
+
+            if mismatch_count > 0 {
+                diffs.push(format!(
+                    "Diffoscope: Total mismatched bytes = {}",
+                    mismatch_count
+                ));
+            }
+
+            diffs
         }
     }
-}
+
+    // =========================================================================
+    // SOVEREIGN PACKAGE REPRODUCIBILITY AUDITOR (HYDRA & REPRO BUILDS PARITY)
+    // =========================================================================
+
+    #[derive(Debug, Clone)]
+    pub struct ReproducibilityAuditReport {
+        pub package_name: String,
+        pub is_reproducible: bool,
+        pub build1_hash: String,
+        pub build2_hash: String,
+        pub diffs: Vec<String>,
+    }
+
+    pub struct SovereignPackageReproducibilityAuditor {
+        pub sandbox: SovereignHermeticChrootSandbox,
+    }
+
+    impl SovereignPackageReproducibilityAuditor {
+        pub fn new(chroot_path: &str, source_date_epoch: u64) -> Self {
+            Self {
+                sandbox: SovereignHermeticChrootSandbox::new(chroot_path, source_date_epoch),
+            }
+        }
+
+        pub fn audit_dual_build(
+            &mut self,
+            package_name: &str,
+            bin1: &[u8],
+            bin2: &[u8],
+        ) -> ReproducibilityAuditReport {
+            let diffs = DiffoscopeStructuralDiffEngine::diff_binary_structure(bin1, bin2);
+            let is_reproducible = diffs.is_empty();
+
+            let hash1 = format!(
+                "{:x}",
+                bin1.len() * 31 + bin1.first().copied().unwrap_or(0) as usize
+            );
+            let hash2 = format!(
+                "{:x}",
+                bin2.len() * 31 + bin2.first().copied().unwrap_or(0) as usize
+            );
+
+            ReproducibilityAuditReport {
+                package_name: package_name.to_string(),
+                is_reproducible,
+                build1_hash: hash1,
+                build2_hash: hash2,
+                diffs,
+            }
+        }
+    }
 
     #[test]
     fn test_sovereign_package_reproducibility_auditor() {
-        let mut auditor = SovereignPackageReproducibilityAuditor::new("/var/chroot/repro", 1700000000);
+        let mut auditor =
+            SovereignPackageReproducibilityAuditor::new("/var/chroot/repro", 1700000000);
         let bin = b"identical_binary_bytes";
 
         let report_pass = auditor.audit_dual_build("zsh", bin, bin);
@@ -702,7 +743,8 @@ impl SovereignPackageReproducibilityAuditor {
         assert!(!diffs.is_empty());
         assert!(diffs[0].contains("Byte offset"));
 
-        let build_id_diff = DiffoscopeStructuralDiffEngine::diff_elf_build_id("sha1_abc", "sha1_xyz");
+        let build_id_diff =
+            DiffoscopeStructuralDiffEngine::diff_elf_build_id("sha1_abc", "sha1_xyz");
         assert!(build_id_diff.unwrap().contains("mismatch"));
     }
 

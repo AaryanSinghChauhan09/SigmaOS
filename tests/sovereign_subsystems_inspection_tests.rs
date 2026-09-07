@@ -80,7 +80,13 @@ fn test_open_source_obsoletion_subsystem_inspection() {
     assert_eq!(pgvector.search_top_k(&[1.0, 0.0], 1).len(), 1);
 
     let mut redis_cls = SovereignRedisClusterEngine::new();
-    redis_cls.add_node("m1", "127.0.0.1:7000", ClusterNodeRole::Master, vec![0], None);
+    redis_cls.add_node(
+        "m1",
+        "127.0.0.1:7000",
+        ClusterNodeRole::Master,
+        vec![0],
+        None,
+    );
     assert_eq!(redis_cls.nodes.len(), 1);
 
     let mut cilium = SovereignCiliumBpfNetworkEngine::new();

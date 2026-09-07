@@ -154,7 +154,8 @@ fn rancheros_cloud_config_and_elevate_migration_work() {
     assert!(cfg.has_dual_daemons());
     cfg.set("ssh_authorized_keys", "abc");
     assert_eq!(
-        cfg.get("ssh_authorized_keys").map(|s: &alloc::string::String| s.as_str()),
+        cfg.get("ssh_authorized_keys")
+            .map(|s: &alloc::string::String| s.as_str()),
         Some("abc")
     );
 

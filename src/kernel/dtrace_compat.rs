@@ -372,7 +372,12 @@ impl TraceprobeManager {
         }
     }
 
-    pub fn attach_kprobe(&mut self, provider: &'static str, module: &'static str, function: &'static str) -> usize {
+    pub fn attach_kprobe(
+        &mut self,
+        provider: &'static str,
+        module: &'static str,
+        function: &'static str,
+    ) -> usize {
         let probe = Probe::new(provider, module, function, "entry", ProbeType::Entry);
         let idx = self.engine.register(probe);
         self.engine.enable_probe(idx);

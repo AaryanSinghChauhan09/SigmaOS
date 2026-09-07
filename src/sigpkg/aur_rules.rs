@@ -4,10 +4,10 @@
 
 extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // ============================================================================
 // 1. AurRuleEngine (namcap & AUR security rules parity)
@@ -70,16 +70,22 @@ impl AurRuleEngine {
                 findings.push(AurLintFinding {
                     rule_id: "AUR-SEC-002".to_string(),
                     severity: LintSeverity::CriticalSecurityViolation,
-                    message: "Unsafe destructive 'rm -rf' path traversal pattern detected".to_string(),
+                    message: "Unsafe destructive 'rm -rf' path traversal pattern detected"
+                        .to_string(),
                     line_number: Some(line_no),
                 });
             }
 
-            if trimmed.starts_with("arch=") && !trimmed.contains("x86_64") && !trimmed.contains("any") && !trimmed.contains("riscv64") {
+            if trimmed.starts_with("arch=")
+                && !trimmed.contains("x86_64")
+                && !trimmed.contains("any")
+                && !trimmed.contains("riscv64")
+            {
                 findings.push(AurLintFinding {
                     rule_id: "AUR-PKG-003".to_string(),
                     severity: LintSeverity::Warning,
-                    message: "Architecture array missing standard target (x86_64/any/riscv64)".to_string(),
+                    message: "Architecture array missing standard target (x86_64/any/riscv64)"
+                        .to_string(),
                     line_number: Some(line_no),
                 });
             }
@@ -110,7 +116,9 @@ impl AurRuleEngine {
 
     /// Derives an isolated compilation sandbox policy based on the linted findings
     pub fn derive_sandbox_policy(&self, findings: &[AurLintFinding]) -> AurSandboxPolicy {
-        let has_critical = findings.iter().any(|f| f.severity == LintSeverity::CriticalSecurityViolation);
+        let has_critical = findings
+            .iter()
+            .any(|f| f.severity == LintSeverity::CriticalSecurityViolation);
 
         AurSandboxPolicy {
             allow_network: false, // Strict offline compilation sandbox
@@ -169,7 +177,10 @@ impl MakepkgReproduciblePipeline {
     ) -> MakepkgBuildResult {
         // Step 1: Security Linting
         let findings = self.linter.lint_pkgbuild(pkgbuild_script);
-        if findings.iter().any(|f| f.severity == LintSeverity::CriticalSecurityViolation || f.severity == LintSeverity::Error) {
+        if findings.iter().any(|f| {
+            f.severity == LintSeverity::CriticalSecurityViolation
+                || f.severity == LintSeverity::Error
+        }) {
             return MakepkgBuildResult {
                 status: MakepkgBuildStatus::LintError,
                 package_filename: String::new(),
@@ -216,11 +227,14 @@ mod tests {
     #[test]
     fn test_aur_rule_engine_linting() {
         let linter = AurRuleEngine::new();
-        let bad_pkgbuild = "pkgname=bad-app\npkgver=1.0\narch=('x86_64')\nbuild() {\n  sudo make install\n}";
+        let bad_pkgbuild =
+            "pkgname=bad-app\npkgver=1.0\narch=('x86_64')\nbuild() {\n  sudo make install\n}";
 
         let findings = linter.lint_pkgbuild(bad_pkgbuild);
         assert!(findings.iter().any(|f| f.rule_id == "AUR-SEC-001"));
-        assert!(findings.iter().any(|f| f.severity == LintSeverity::CriticalSecurityViolation));
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == LintSeverity::CriticalSecurityViolation));
 
         let policy = linter.derive_sandbox_policy(&findings);
         assert!(!policy.allow_network);
@@ -232,9 +246,13 @@ mod tests {
         let pipeline = MakepkgReproduciblePipeline::new();
         let valid_pkgbuild = "pkgname=valid-app\npkgver=1.0.0\narch=('x86_64')\nsha256sums=('abcdef1234567890')\nbuild() {\n  make\n}";
 
-        let result = pipeline.build_and_package("valid-app", "1.0.0", valid_pkgbuild, Some("key-0x9E5A"));
+        let result =
+            pipeline.build_and_package("valid-app", "1.0.0", valid_pkgbuild, Some("key-0x9E5A"));
         assert_eq!(result.status, MakepkgBuildStatus::Success);
-        assert_eq!(result.package_filename, "valid-app-1.0.0-x86_64.pkg.tar.zst");
+        assert_eq!(
+            result.package_filename,
+            "valid-app-1.0.0-x86_64.pkg.tar.zst"
+        );
         assert!(result.sig_filename.unwrap().contains("key-0x9E5A"));
     }
 }

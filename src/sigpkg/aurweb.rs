@@ -44,8 +44,8 @@ pub struct AurPackageRecord {
 /// Structured JSON/RPC v5 response
 #[derive(Debug, Clone)]
 pub struct AurRpcResponse {
-    pub version: u32,             // Always 5
-    pub type_name: String,        // "search", "info", "error"
+    pub version: u32,      // Always 5
+    pub type_name: String, // "search", "info", "error"
     pub result_count: usize,
     pub results: Vec<AurPackageRecord>,
     pub error_message: Option<String>,
@@ -183,7 +183,11 @@ impl AurBuildSandbox {
     }
 
     /// Execute PKGBUILD build script within isolated sandbox
-    pub fn execute_build(&self, pkg_name: &str, pkgbuild_script: &str) -> Result<String, &'static str> {
+    pub fn execute_build(
+        &self,
+        pkg_name: &str,
+        pkgbuild_script: &str,
+    ) -> Result<String, &'static str> {
         if pkgbuild_script.is_empty() {
             return Err("AurBuildSandbox: PKGBUILD script is empty");
         }
@@ -206,7 +210,7 @@ impl AurBuildSandbox {
 
 #[derive(Debug, Clone)]
 pub struct AurPackageFlavor {
-    pub flavor_name: String,       // e.g. "py311", "qt6", "minimal", "wayland"
+    pub flavor_name: String, // e.g. "py311", "qt6", "minimal", "wayland"
     pub description: String,
     pub extra_depends: Vec<String>,
     pub configure_args: Vec<String>,
@@ -221,14 +225,19 @@ pub struct AurPackageOptionsEngine {
 impl AurPackageOptionsEngine {
     pub fn new() -> Self {
         Self {
-            enabled_use_flags: vec![String::from("ssl"), String::from("lto"), String::from("wayland")],
+            enabled_use_flags: vec![
+                String::from("ssl"),
+                String::from("lto"),
+                String::from("wayland"),
+            ],
             selected_flavor: None,
             available_flavors: BTreeMap::new(),
         }
     }
 
     pub fn register_flavor(&mut self, flavor: AurPackageFlavor) {
-        self.available_flavors.insert(flavor.flavor_name.clone(), flavor);
+        self.available_flavors
+            .insert(flavor.flavor_name.clone(), flavor);
     }
 
     pub fn select_flavor(&mut self, flavor_name: &str) -> Result<(), &'static str> {
@@ -326,7 +335,9 @@ impl NamcapSecurityAuditor {
             results.push(NamcapLintResult {
                 rule_id: String::from("SEC-002"),
                 severity: NamcapIssueSeverity::SecurityVulnerability,
-                message: String::from("Privilege escalation commands (sudo/doas) prohibited in build script"),
+                message: String::from(
+                    "Privilege escalation commands (sudo/doas) prohibited in build script",
+                ),
             });
         }
 
@@ -440,7 +451,12 @@ impl AurGitRepoManager {
         }
     }
 
-    pub fn create_repository(&mut self, package_base: &str, pkgbuild: &str, srcinfo: &str) -> String {
+    pub fn create_repository(
+        &mut self,
+        package_base: &str,
+        pkgbuild: &str,
+        srcinfo: &str,
+    ) -> String {
         let clone_url = format!("https://aur.archlinux.org/{}.git", package_base);
         let repo = AurGitRepository {
             package_base: package_base.to_string(),
@@ -472,11 +488,18 @@ impl AurGitRepoManager {
     }
 
     /// Migrates legacy Subversion (SVN) package bases to Git repositories (Arch Linux svntogit parity)
-    pub fn migrate_svn_pkgbase(&mut self, pkgbase: &str, svn_url: &str) -> Result<String, &'static str> {
+    pub fn migrate_svn_pkgbase(
+        &mut self,
+        pkgbase: &str,
+        svn_url: &str,
+    ) -> Result<String, &'static str> {
         if svn_url.is_empty() {
             return Err("SvnToGit: Invalid SVN repository URL");
         }
-        let pkgbuild = format!("# Migrated from SVN {}\npkgname={}\npkgver=1.0.0\n", svn_url, pkgbase);
+        let pkgbuild = format!(
+            "# Migrated from SVN {}\npkgname={}\npkgver=1.0.0\n",
+            svn_url, pkgbase
+        );
         let srcinfo = format!("pkgbase = {}\n\tpkgver = 1.0.0\n", pkgbase);
         Ok(self.create_repository(pkgbase, &pkgbuild, &srcinfo))
     }
@@ -633,7 +656,9 @@ impl SovereignAurWebEngine {
 
         if let Some(pkg) = self.packages.get_mut(pkg_name) {
             pkg.NumVotes = votes;
-            pkg.Popularity = self.voting_system.calculate_popularity(pkg_name, pkg.LastModified);
+            pkg.Popularity = self
+                .voting_system
+                .calculate_popularity(pkg_name, pkg.LastModified);
         }
 
         Ok(votes)
@@ -700,14 +725,23 @@ mod tests {
     #[test]
     fn test_aurweb_git_repository_commit_push() {
         let mut git_mgr = AurGitRepoManager::new();
-        let clone_url = git_mgr.create_repository("spotify", "pkgname=spotify", "pkgname = spotify");
+        let clone_url =
+            git_mgr.create_repository("spotify", "pkgname=spotify", "pkgname = spotify");
         assert_eq!(clone_url, "https://aur.archlinux.org/spotify.git");
 
         assert!(git_mgr
-            .push_pkgbuild_commit("spotify", "b2c3d4e5f6a1", "pkgname=spotify\npkgver=1.2.0", "pkgname = spotify")
+            .push_pkgbuild_commit(
+                "spotify",
+                "b2c3d4e5f6a1",
+                "pkgname=spotify\npkgver=1.2.0",
+                "pkgname = spotify"
+            )
             .is_ok());
 
-        assert_eq!(git_mgr.repositories.get("spotify").unwrap().head_commit_sha, "b2c3d4e5f6a1");
+        assert_eq!(
+            git_mgr.repositories.get("spotify").unwrap().head_commit_sha,
+            "b2c3d4e5f6a1"
+        );
     }
 
     #[test]
@@ -760,9 +794,16 @@ mod tests {
         assert_eq!(overlay_mgr.overlays.len(), 1);
 
         let mut tu_pipeline = AurTrustedUserPipeline::new();
-        let promoted = tu_pipeline.vote_and_promote_package("tu_lead", "proton-ge-custom", "extra", 15);
+        let promoted =
+            tu_pipeline.vote_and_promote_package("tu_lead", "proton-ge-custom", "extra", 15);
         assert_eq!(promoted, Ok(true));
-        assert_eq!(tu_pipeline.package_promotions.get("proton-ge-custom").unwrap(), "extra");
+        assert_eq!(
+            tu_pipeline
+                .package_promotions
+                .get("proton-ge-custom")
+                .unwrap(),
+            "extra"
+        );
     }
 
     #[test]

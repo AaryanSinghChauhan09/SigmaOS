@@ -397,7 +397,11 @@ impl SovereignStreamingPool {
             unsafe {
                 let first = ::core::ptr::read(self.queue.data);
                 for i in 1..self.queue.len {
-                    ::core::ptr::copy_nonoverlapping(self.queue.data.add(i), self.queue.data.add(i - 1), 1);
+                    ::core::ptr::copy_nonoverlapping(
+                        self.queue.data.add(i),
+                        self.queue.data.add(i - 1),
+                        1,
+                    );
                 }
                 self.queue.len -= 1;
                 Some(first)
@@ -432,7 +436,11 @@ impl SovereignPpoOptimizer {
 
         let mut last_gae = 0.0;
         for i in (0..len).rev() {
-            let next_value = if i + 1 < len { trajectory.values[i + 1] } else { 0.0 };
+            let next_value = if i + 1 < len {
+                trajectory.values[i + 1]
+            } else {
+                0.0
+            };
             let delta = trajectory.rewards[i] + self.gamma * next_value - trajectory.values[i];
             last_gae = delta + self.gamma * self.lamba * last_gae;
             advantages[i] = last_gae;
@@ -442,7 +450,11 @@ impl SovereignPpoOptimizer {
     }
 
     /// Optimize Policy Parameters natively
-    pub fn ppo_update_step(&self, agent: &mut SovereignChatAgent, trajectory: &SovereignTrajectory) -> f32 {
+    pub fn ppo_update_step(
+        &self,
+        agent: &mut SovereignChatAgent,
+        trajectory: &SovereignTrajectory,
+    ) -> f32 {
         let mut total_loss = 0.0;
         let len = trajectory.token_ids.len;
 
@@ -570,7 +582,9 @@ impl<T: Clone> Clone for Vec<T> {
 
 impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_list().entries((0..self.len).map(|i| &self[i])).finish()
+        f.debug_list()
+            .entries((0..self.len).map(|i| &self[i]))
+            .finish()
     }
 }
 

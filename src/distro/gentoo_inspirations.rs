@@ -8,9 +8,9 @@
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 // ── USE flags ─────────────────────────────────────────────────────────────────
 
@@ -25,11 +25,19 @@ pub struct UseFlag {
 
 impl UseFlag {
     pub fn enabled(name: &str, desc: &str) -> Self {
-        UseFlag { name: name.to_string(), enabled: true, description: desc.to_string() }
+        UseFlag {
+            name: name.to_string(),
+            enabled: true,
+            description: desc.to_string(),
+        }
     }
 
     pub fn disabled(name: &str, desc: &str) -> Self {
-        UseFlag { name: name.to_string(), enabled: false, description: desc.to_string() }
+        UseFlag {
+            name: name.to_string(),
+            enabled: false,
+            description: desc.to_string(),
+        }
     }
 
     /// Returns `"+name"` or `"-name"`.
@@ -94,12 +102,20 @@ impl UseFlags {
 
     /// Return all enabled flag names.
     pub fn enabled_flags(&self) -> Vec<&str> {
-        self.flags.iter().filter(|f| f.enabled).map(|f| f.name.as_str()).collect()
+        self.flags
+            .iter()
+            .filter(|f| f.enabled)
+            .map(|f| f.name.as_str())
+            .collect()
     }
 
     /// Return all disabled flag names.
     pub fn disabled_flags(&self) -> Vec<&str> {
-        self.flags.iter().filter(|f| !f.enabled).map(|f| f.name.as_str()).collect()
+        self.flags
+            .iter()
+            .filter(|f| !f.enabled)
+            .map(|f| f.name.as_str())
+            .collect()
     }
 
     /// Parse a USE string such as `"openssl -gnutls ipv6 -doc"`.
@@ -165,7 +181,11 @@ pub struct UseDep {
 
 impl UseDep {
     pub fn unconditional(atom: &str) -> Self {
-        UseDep { use_flag: None, when_enabled: true, atom: atom.to_string() }
+        UseDep {
+            use_flag: None,
+            when_enabled: true,
+            atom: atom.to_string(),
+        }
     }
 
     pub fn conditional(flag: &str, when_enabled: bool, atom: &str) -> Self {
@@ -182,7 +202,11 @@ impl UseDep {
             None => true,
             Some(flag) => {
                 let flag_on = use_flags.is_enabled(flag);
-                if self.when_enabled { flag_on } else { !flag_on }
+                if self.when_enabled {
+                    flag_on
+                } else {
+                    !flag_on
+                }
             }
         }
     }
@@ -200,10 +224,10 @@ pub struct Ebuild {
     pub license: String,
     pub slot: String,
     pub keywords: Vec<Keyword>,
-    pub iuse: Vec<String>,        // declared USE flags this ebuild recognises
-    pub depend: Vec<UseDep>,      // build-time dependencies
-    pub rdepend: Vec<UseDep>,     // run-time dependencies
-    pub bdepend: Vec<UseDep>,     // build-host dependencies
+    pub iuse: Vec<String>,    // declared USE flags this ebuild recognises
+    pub depend: Vec<UseDep>,  // build-time dependencies
+    pub rdepend: Vec<UseDep>, // run-time dependencies
+    pub bdepend: Vec<UseDep>, // build-host dependencies
     pub src_uri: Vec<String>,
     pub eapi: u32,
 }
@@ -212,7 +236,10 @@ impl Ebuild {
     /// Full atom: `category/name-version[-rN]`.
     pub fn atom(&self) -> String {
         if self.revision > 0 {
-            format!("{}/{}-{}-r{}", self.category, self.name, self.version, self.revision)
+            format!(
+                "{}/{}-{}-r{}",
+                self.category, self.name, self.version, self.revision
+            )
         } else {
             format!("{}/{}-{}", self.category, self.name, self.version)
         }
@@ -251,7 +278,9 @@ pub struct PortageTree {
 
 impl PortageTree {
     pub fn new() -> Self {
-        PortageTree { ebuilds: Vec::new() }
+        PortageTree {
+            ebuilds: Vec::new(),
+        }
     }
 
     pub fn add(&mut self, eb: Ebuild) {
@@ -259,12 +288,20 @@ impl PortageTree {
     }
 
     /// Find the latest stable or testing ebuild for `category/name` on `arch`.
-    pub fn best_version<'a>(&'a self, category: &str, name: &str, arch: &str) -> Option<&'a Ebuild> {
-        let candidates: Vec<&Ebuild> = self.ebuilds
+    pub fn best_version<'a>(
+        &'a self,
+        category: &str,
+        name: &str,
+        arch: &str,
+    ) -> Option<&'a Ebuild> {
+        let candidates: Vec<&Ebuild> = self
+            .ebuilds
             .iter()
             .filter(|e| e.category == category && e.name == name)
             .filter(|e| {
-                e.keyword_for_arch(arch).map(|k| !matches!(k, Keyword::Broken(_))).unwrap_or(false)
+                e.keyword_for_arch(arch)
+                    .map(|k| !matches!(k, Keyword::Broken(_)))
+                    .unwrap_or(false)
             })
             .collect();
         // Return the last one (simple version ordering — a real impl would
@@ -297,15 +334,15 @@ pub enum EmergePhase {
 impl EmergePhase {
     pub fn as_str(&self) -> &'static str {
         match self {
-            EmergePhase::Fetch     => "fetch",
-            EmergePhase::Unpack    => "unpack",
-            EmergePhase::Prepare   => "prepare",
+            EmergePhase::Fetch => "fetch",
+            EmergePhase::Unpack => "unpack",
+            EmergePhase::Prepare => "prepare",
             EmergePhase::Configure => "configure",
-            EmergePhase::Compile   => "compile",
-            EmergePhase::Test      => "test",
-            EmergePhase::Install   => "install",
-            EmergePhase::QaCheck   => "qa-check",
-            EmergePhase::Merge     => "merge",
+            EmergePhase::Compile => "compile",
+            EmergePhase::Test => "test",
+            EmergePhase::Install => "install",
+            EmergePhase::QaCheck => "qa-check",
+            EmergePhase::Merge => "merge",
         }
     }
 }
@@ -368,16 +405,14 @@ impl<'a> EmergeRunner<'a> {
     /// Run all phases for `ebuild` and return the outcome.
     pub fn emerge(&self, ebuild: &Ebuild) -> EmergeResult {
         // Validate keyword acceptance.
-        let arch_ok = ebuild.keywords.iter().any(|k| {
-            match k {
-                Keyword::Stable(a) => self.config.accept_keywords.contains(a),
-                Keyword::Testing(a) => {
-                    let tilde = format!("~{}", a);
-                    self.config.accept_keywords.contains(&tilde)
-                        || self.config.accept_keywords.contains(&"**".to_string())
-                }
-                Keyword::Broken(_) => false,
+        let arch_ok = ebuild.keywords.iter().any(|k| match k {
+            Keyword::Stable(a) => self.config.accept_keywords.contains(a),
+            Keyword::Testing(a) => {
+                let tilde = format!("~{}", a);
+                self.config.accept_keywords.contains(&tilde)
+                    || self.config.accept_keywords.contains(&"**".to_string())
             }
+            Keyword::Broken(_) => false,
         });
         if !arch_ok {
             return EmergeResult::Blocked(format!(

@@ -1,14 +1,13 @@
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 extern crate alloc;
 // Enhanced AUR Integration for SigmaOS
 // Inspired by Arch Linux AUR with modern security features
 
-
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use alloc::boxed::Box;
 
 /// AUR package metadata
 #[derive(Debug, Clone)]
@@ -162,7 +161,11 @@ impl AurClient {
     }
 
     /// Build package from PKGBUILD
-    pub fn build_package(&self, recipe: &PkgBuildRecipe, sandbox: &BuildSandboxConfig) -> Result<BuiltPackage, BuildError> {
+    pub fn build_package(
+        &self,
+        recipe: &PkgBuildRecipe,
+        sandbox: &BuildSandboxConfig,
+    ) -> Result<BuiltPackage, BuildError> {
         // In a real implementation, this would:
         // 1. Create chroot environment
         // 2. Download sources
@@ -174,7 +177,10 @@ impl AurClient {
         Ok(BuiltPackage {
             name: recipe.pkgname.clone(),
             version: format!("{}-{}", recipe.pkgver, recipe.pkgrel),
-            file_path: format!("{}/{}.pkg.tar.zst", sandbox.output_dest_path, recipe.pkgname),
+            file_path: format!(
+                "{}/{}.pkg.tar.zst",
+                sandbox.output_dest_path, recipe.pkgname
+            ),
             signature: None,
             build_time_ms: 5000,
         })
@@ -203,13 +209,19 @@ impl AurClient {
         );
 
         if full_script.contains("rm -rf /") || full_script.contains("rm -rf /*") {
-            return Err("PKGBUILD Audit Failure: Dangerous root directory removal command detected");
+            return Err(
+                "PKGBUILD Audit Failure: Dangerous root directory removal command detected",
+            );
         }
         if full_script.contains("curl ") && full_script.contains("| sh") {
-            return Err("PKGBUILD Audit Failure: Unverified pipe-to-shell download execution detected");
+            return Err(
+                "PKGBUILD Audit Failure: Unverified pipe-to-shell download execution detected",
+            );
         }
         if full_script.contains("sudo ") {
-            return Err("PKGBUILD Audit Failure: Sudo privilege escalation inside build sandbox forbidden");
+            return Err(
+                "PKGBUILD Audit Failure: Sudo privilege escalation inside build sandbox forbidden",
+            );
         }
 
         Ok(())
@@ -353,13 +365,21 @@ mod tests {
 
     #[test]
     fn test_aur_client_creation() {
-        let client = AurClient::new("https://aur.archlinux.org", "/var/cache/aur", "/var/tmp/aur");
+        let client = AurClient::new(
+            "https://aur.archlinux.org",
+            "/var/cache/aur",
+            "/var/tmp/aur",
+        );
         assert_eq!(client.api_url, "https://aur.archlinux.org");
     }
 
     #[test]
     fn test_package_search() {
-        let mut client = AurClient::new("https://aur.archlinux.org", "/var/cache/aur", "/var/tmp/aur");
+        let mut client = AurClient::new(
+            "https://aur.archlinux.org",
+            "/var/cache/aur",
+            "/var/tmp/aur",
+        );
         let results = client.search("network").unwrap();
         assert!(!results.is_empty());
     }
@@ -385,7 +405,11 @@ source=("https://example.com/source.tar.gz")
 
     #[test]
     fn test_build_sandbox_creation() {
-        let client = AurClient::new("https://aur.archlinux.org", "/var/cache/aur", "/var/tmp/aur");
+        let client = AurClient::new(
+            "https://aur.archlinux.org",
+            "/var/cache/aur",
+            "/var/tmp/aur",
+        );
         let recipe = PkgBuildRecipe {
             pkgname: String::from("test"),
             pkgver: String::from("1.0.0"),
@@ -414,7 +438,11 @@ source=("https://example.com/source.tar.gz")
 
     #[test]
     fn test_package_build() {
-        let client = AurClient::new("https://aur.archlinux.org", "/var/cache/aur", "/var/tmp/aur");
+        let client = AurClient::new(
+            "https://aur.archlinux.org",
+            "/var/cache/aur",
+            "/var/tmp/aur",
+        );
         let recipe = PkgBuildRecipe {
             pkgname: String::from("test"),
             pkgver: String::from("1.0.0"),
@@ -443,7 +471,11 @@ source=("https://example.com/source.tar.gz")
 
     #[test]
     fn test_pkgbuild_security_audit_and_dependencies() {
-        let client = AurClient::new("https://aur.archlinux.org", "/var/cache/aur", "/var/tmp/aur");
+        let client = AurClient::new(
+            "https://aur.archlinux.org",
+            "/var/cache/aur",
+            "/var/tmp/aur",
+        );
         let safe_recipe = PkgBuildRecipe {
             pkgname: String::from("htop"),
             pkgver: String::from("3.2.2"),

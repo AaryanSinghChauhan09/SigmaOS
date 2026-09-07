@@ -48,7 +48,10 @@ impl OstreeAbPartitionUpdater {
         }
     }
 
-    pub fn stage_update(&mut self, new_version: &'static str) -> Result<PartitionSlot, &'static str> {
+    pub fn stage_update(
+        &mut self,
+        new_version: &'static str,
+    ) -> Result<PartitionSlot, &'static str> {
         let target_slot = match self.state.active_slot {
             PartitionSlot::SlotA => PartitionSlot::SlotB,
             PartitionSlot::SlotB => PartitionSlot::SlotA,
@@ -292,7 +295,10 @@ impl SovereignSystemUpdateAndTestingEngine {
         }
     }
 
-    pub fn check_and_apply_system_update(&mut self, target_version: &'static str) -> Result<PartitionSlot, &'static str> {
+    pub fn check_and_apply_system_update(
+        &mut self,
+        target_version: &'static str,
+    ) -> Result<PartitionSlot, &'static str> {
         let diagnostics = self.run_system_functionality_diagnostics();
         if !diagnostics.overall_passed {
             return Err("System update blocked: Pre-update functionality self-tests failed");
@@ -387,9 +393,11 @@ mod tests {
         sig[0] = payload.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
         let pub_key = [0u8; 32];
 
-        assert!(PostQuantumSignedUpdateVerifier::verify_dilithium5_update_package(
-            payload, &sig, &pub_key
-        ));
+        assert!(
+            PostQuantumSignedUpdateVerifier::verify_dilithium5_update_package(
+                payload, &sig, &pub_key
+            )
+        );
     }
 
     #[test]

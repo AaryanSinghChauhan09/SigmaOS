@@ -138,27 +138,41 @@ impl UnveilState {
                 // Check if the required permission is granted
                 match required {
                     UnveilPermission::Read => {
-                        return matches!(unveiled.permissions,
-                            UnveilPermission::Read | UnveilPermission::ReadWrite |
-                            UnveilPermission::ReadExecute | UnveilPermission::ReadWriteExecute);
+                        return matches!(
+                            unveiled.permissions,
+                            UnveilPermission::Read
+                                | UnveilPermission::ReadWrite
+                                | UnveilPermission::ReadExecute
+                                | UnveilPermission::ReadWriteExecute
+                        );
                     }
                     UnveilPermission::Write => {
-                        return matches!(unveiled.permissions,
-                            UnveilPermission::Write | UnveilPermission::ReadWrite |
-                            UnveilPermission::ReadWriteExecute);
+                        return matches!(
+                            unveiled.permissions,
+                            UnveilPermission::Write
+                                | UnveilPermission::ReadWrite
+                                | UnveilPermission::ReadWriteExecute
+                        );
                     }
                     UnveilPermission::Execute => {
-                        return matches!(unveiled.permissions,
-                            UnveilPermission::Execute | UnveilPermission::ReadExecute |
-                            UnveilPermission::ReadWriteExecute);
+                        return matches!(
+                            unveiled.permissions,
+                            UnveilPermission::Execute
+                                | UnveilPermission::ReadExecute
+                                | UnveilPermission::ReadWriteExecute
+                        );
                     }
                     UnveilPermission::ReadWrite => {
-                        return matches!(unveiled.permissions,
-                            UnveilPermission::ReadWrite | UnveilPermission::ReadWriteExecute);
+                        return matches!(
+                            unveiled.permissions,
+                            UnveilPermission::ReadWrite | UnveilPermission::ReadWriteExecute
+                        );
                     }
                     UnveilPermission::ReadExecute => {
-                        return matches!(unveiled.permissions,
-                            UnveilPermission::ReadExecute | UnveilPermission::ReadWriteExecute);
+                        return matches!(
+                            unveiled.permissions,
+                            UnveilPermission::ReadExecute | UnveilPermission::ReadWriteExecute
+                        );
                     }
                     UnveilPermission::ReadWriteExecute => {
                         return unveiled.permissions == UnveilPermission::ReadWriteExecute;
@@ -252,6 +266,8 @@ mod tests {
         security.init_defaults();
 
         assert!(security.pledge.has_promise(PledgePromise::Stdio));
-        assert!(security.unveil.check_permission("/dev/stdin", UnveilPermission::Read));
+        assert!(security
+            .unveil
+            .check_permission("/dev/stdin", UnveilPermission::Read));
     }
 }

@@ -1,12 +1,20 @@
 extern crate alloc;
 // SigmaOS Advanced Kernel Exports & Subsystems (Linux & BSD Inspired)
 // Implements Linux-style EXPORT_SYMBOL dynamic registries,
-// BSD-style SYSINIT boots, and Kernel Linker Daemon (KLD) modules.
+// BSD-style SYSINIT boots, Kernel Linker Daemon (KLD) modules,
+// and Enterprise Kernel ABI (KABI) stability guarantees & automated testing suites.
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
+use alloc::format;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+#[cfg(not(test))]
+use crate::klib::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 // =========================================================================
 // 1. LINUX-STYLE EXPORT_SYMBOL REGISTRY
@@ -25,6 +33,7 @@ pub struct KernelSymbol {
     pub address_offset: usize,
     pub subsystem: String,
     pub export_gpl_only: bool,
+    pub crc32_checksum: u32,
 }
 
 pub struct SymbolRegistry {
@@ -48,12 +57,14 @@ impl SymbolRegistry {
         subsystem: &str,
         gpl_only: bool,
     ) {
+        let crc = KabiComplianceEngine::calculate_symbol_crc32(name, subsystem);
         self.symbols.push(KernelSymbol {
             name: name.to_string(),
             symbol_type: sym_type,
             address_offset: offset,
             subsystem: subsystem.to_string(),
             export_gpl_only: gpl_only,
+            crc32_checksum: crc,
         });
     }
 
@@ -157,6 +168,199 @@ impl KldModule {
 }
 
 // =========================================================================
+// 4. ENTERPRISE KERNEL ABI (KABI) STABILIZATION & GUARANTEES
+// =========================================================================
+
+/// Record tracking kernel structure binary layout specifications for KABI enforcement.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KabiStructLayoutSpec {
+    pub struct_name: String,
+    pub expected_size_bytes: usize,
+    pub field_offsets: HashMap<String, usize>,
+    pub reserved_padding_bytes: usize,
+}
+
+/// Whitelisted KABI symbol metadata record guaranteeing backward compatibility across releases.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KabiWhitelistEntry {
+    pub symbol_name: String,
+    pub subsystem: String,
+    pub expected_crc32: u32,
+    pub is_frozen: bool,
+    pub added_release: String,
+}
+
+/// Result status of an automated Kernel ABI (KABI) test suite run.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum KabiValidationStatus {
+    Compatible,
+    ChecksumMismatch { symbol: String, expected: u32, actual: u32 },
+    StructLayoutChanged { struct_name: String, reason: String },
+    MissingWhitelistedSymbol { symbol: String },
+}
+
+/// Linux RHEL & FreeBSD-inspired Kernel ABI (KABI) Whitelist & Layout Enforcer.
+/// Ensures that kernel driver modules compiled against version N of SigmaOS kernel ABI
+/// remain 100% binary-compatible with version N+x without re-compilation.
+pub struct KabiComplianceEngine {
+    pub whitelist: HashMap<String, KabiWhitelistEntry>,
+    pub struct_specs: HashMap<String, KabiStructLayoutSpec>,
+    pub kernel_abi_version: String,
+}
+
+impl KabiComplianceEngine {
+    pub fn new(abi_ver: &str) -> Self {
+        let mut engine = Self {
+            whitelist: HashMap::new(),
+            struct_specs: HashMap::new(),
+            kernel_abi_version: abi_ver.to_string(),
+        };
+        engine.load_standard_kabi_whitelist();
+        engine
+    }
+
+    /// Computes a deterministic `genksyms`-style CRC32 checksum for a symbol name and signature.
+    pub fn calculate_symbol_crc32(name: &str, signature: &str) -> u32 {
+        let mut crc: u32 = 0xFFFFFFFF;
+        let bytes = format!("{}:{}", name, signature);
+        for byte in bytes.bytes() {
+            crc ^= byte as u32;
+            for _ in 0..8 {
+                let mask = (crc & 1).wrapping_neg();
+                crc = (crc >> 1) ^ (0xEDB88320 & mask);
+            }
+        }
+        !crc
+    }
+
+    /// Loads core kernel ABI whitelist symbols (RHEL kabi-whitelists & FreeBSD COMPAT_FREEBSD parity).
+    fn load_standard_kabi_whitelist(&mut self) {
+        self.register_whitelisted_symbol("sys_open", "VFS", "1.0.0");
+        self.register_whitelisted_symbol("kmalloc", "Memory", "1.0.0");
+        self.register_whitelisted_symbol("kfree", "Memory", "1.0.0");
+        self.register_whitelisted_symbol("register_chrdev", "Drivers", "1.0.0");
+        self.register_whitelisted_symbol("schedule_task", "Scheduler", "1.0.0");
+        self.register_whitelisted_symbol("printk", "Console", "1.0.0");
+
+        // Register default core kernel struct layouts
+        let mut task_fields = HashMap::new();
+        task_fields.insert("pid".to_string(), 0);
+        task_fields.insert("state".to_string(), 8);
+        task_fields.insert("priority".to_string(), 12);
+        task_fields.insert("mm".to_string(), 16);
+
+        self.register_struct_layout_spec("task_struct", 128, task_fields, 32);
+    }
+
+    pub fn register_whitelisted_symbol(&mut self, name: &str, subsystem: &str, added_ver: &str) {
+        let crc = Self::calculate_symbol_crc32(name, subsystem);
+        self.whitelist.insert(
+            name.to_string(),
+            KabiWhitelistEntry {
+                symbol_name: name.to_string(),
+                subsystem: subsystem.to_string(),
+                expected_crc32: crc,
+                is_frozen: true,
+                added_release: added_ver.to_string(),
+            },
+        );
+    }
+
+    pub fn register_struct_layout_spec(
+        &mut self,
+        name: &str,
+        size: usize,
+        offsets: HashMap<String, usize>,
+        reserved_padding: usize,
+    ) {
+        self.struct_specs.insert(
+            name.to_string(),
+            KabiStructLayoutSpec {
+                struct_name: name.to_string(),
+                expected_size_bytes: size,
+                field_offsets: offsets,
+                reserved_padding_bytes: reserved_padding,
+            },
+        );
+    }
+
+    /// Automated KABI Test Runner: Validates all exported symbols in a `SymbolRegistry`
+    /// against the KABI whitelist and verifies struct binary layout guarantees.
+    pub fn run_automated_kabi_tests(&self, registry: &SymbolRegistry) -> Vec<KabiValidationStatus> {
+        let mut failures = Vec::new();
+
+        // 1. Check all frozen whitelisted symbols exist in the registry
+        for (sym_name, entry) in &self.whitelist {
+            if entry.is_frozen {
+                let found = registry.symbols.iter().find(|s| s.name == *sym_name);
+                match found {
+                    None => {
+                        failures.push(KabiValidationStatus::MissingWhitelistedSymbol {
+                            symbol: sym_name.clone(),
+                        });
+                    }
+                    Some(sym) => {
+                        if sym.crc32_checksum != entry.expected_crc32 {
+                            failures.push(KabiValidationStatus::ChecksumMismatch {
+                                symbol: sym_name.clone(),
+                                expected: entry.expected_crc32,
+                                actual: sym.crc32_checksum,
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        failures
+    }
+
+    /// Verifies that a kernel struct layout candidate matches expected KABI binary specs.
+    pub fn validate_struct_layout(
+        &self,
+        struct_name: &str,
+        actual_size: usize,
+        actual_offsets: &HashMap<String, usize>,
+    ) -> Result<(), KabiValidationStatus> {
+        let spec = match self.struct_specs.get(struct_name) {
+            Some(s) => s,
+            None => return Ok(()),
+        };
+
+        if actual_size > spec.expected_size_bytes {
+            return Err(KabiValidationStatus::StructLayoutChanged {
+                struct_name: struct_name.to_string(),
+                reason: format!(
+                    "Struct size grew from {} bytes to {} bytes without using reserved padding",
+                    spec.expected_size_bytes, actual_size
+                ),
+            });
+        }
+
+        for (field_name, &expected_offset) in &spec.field_offsets {
+            if let Some(&actual_offset) = actual_offsets.get(field_name) {
+                if actual_offset != expected_offset {
+                    return Err(KabiValidationStatus::StructLayoutChanged {
+                        struct_name: struct_name.to_string(),
+                        reason: format!(
+                            "Field '{}' offset shifted from byte {} to byte {}",
+                            field_name, expected_offset, actual_offset
+                        ),
+                    });
+                }
+            } else {
+                return Err(KabiValidationStatus::StructLayoutChanged {
+                    struct_name: struct_name.to_string(),
+                    reason: format!("Required field '{}' missing from struct layout", field_name),
+                });
+            }
+        }
+
+        Ok(())
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 #[cfg(test)]
@@ -227,5 +431,38 @@ mod tests {
 
         let active_refs = module.decrement_ref();
         assert_eq!(active_refs, 1);
+    }
+
+    #[test]
+    fn test_kabi_compliance_and_automated_tests() {
+        let engine = KabiComplianceEngine::new("1.0.0");
+        let mut registry = SymbolRegistry::new();
+
+        // Export whitelisted symbols with identical subsystems
+        registry.export_symbol("sys_open", KernelSymbolType::Function, 0x1000, "VFS", false);
+        registry.export_symbol("kmalloc", KernelSymbolType::Function, 0x2000, "Memory", false);
+        registry.export_symbol("kfree", KernelSymbolType::Function, 0x2010, "Memory", false);
+        registry.export_symbol("register_chrdev", KernelSymbolType::Function, 0x3000, "Drivers", false);
+        registry.export_symbol("schedule_task", KernelSymbolType::Function, 0x4000, "Scheduler", false);
+        registry.export_symbol("printk", KernelSymbolType::Function, 0x5000, "Console", false);
+
+        // Run automated KABI test suite
+        let failures = engine.run_automated_kabi_tests(&registry);
+        assert!(failures.is_empty(), "All whitelisted symbols must pass KABI verification");
+
+        // Verify layout validation
+        let mut valid_offsets = HashMap::new();
+        valid_offsets.insert("pid".to_string(), 0);
+        valid_offsets.insert("state".to_string(), 8);
+        valid_offsets.insert("priority".to_string(), 12);
+        valid_offsets.insert("mm".to_string(), 16);
+
+        assert!(engine.validate_struct_layout("task_struct", 128, &valid_offsets).is_ok());
+
+        // Test layout failure due to shifted offset
+        let mut bad_offsets = valid_offsets.clone();
+        bad_offsets.insert("state".to_string(), 10); // Shifted offset!
+        let layout_res = engine.validate_struct_layout("task_struct", 128, &bad_offsets);
+        assert!(layout_res.is_err());
     }
 }

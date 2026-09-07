@@ -170,7 +170,10 @@ impl SvntogitPackageMigrator {
     }
 
     /// Converts an old SVN repository layout (trunk/PKGBUILD) to modern Arch Git pkgctl structure
-    pub fn convert_svn_layout_to_git_pkgctl(&mut self, pkg_name: &str) -> Result<String, &'static str> {
+    pub fn convert_svn_layout_to_git_pkgctl(
+        &mut self,
+        pkg_name: &str,
+    ) -> Result<String, &'static str> {
         if self.svn_repo_path.is_empty() {
             return Err("svntogit: Invalid SVN repository source path");
         }
@@ -429,7 +432,9 @@ mod tests {
         assert!(res.contains("extra"));
 
         let mut invalid_migrator = SvntogitPackageMigrator::new("", "core");
-        assert!(invalid_migrator.convert_svn_layout_to_git_pkgctl("bash").is_err());
+        assert!(invalid_migrator
+            .convert_svn_layout_to_git_pkgctl("bash")
+            .is_err());
     }
 
     #[test]

@@ -93,7 +93,8 @@ impl InspirationFeatureMatrix {
             name: "QEMU/KVM Hypervisor Core".to_string(),
             tier: OpenSourceInspirationTier::LinuxKernel,
             is_enabled: true,
-            description: "QEMU VirtIO device virtualization and KVM dirty-ring tracking".to_string(),
+            description: "QEMU VirtIO device virtualization and KVM dirty-ring tracking"
+                .to_string(),
         });
         self.features.push(InspirationFeature {
             name: "WireGuard Mesh VPN".to_string(),

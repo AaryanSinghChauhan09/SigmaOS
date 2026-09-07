@@ -190,12 +190,7 @@ impl GuixShepherdServiceEngine {
             services: BTreeMap::new(),
         };
 
-        engine.register_service(
-            "file-systems",
-            "file-systems",
-            Vec::new(),
-            true,
-        );
+        engine.register_service("file-systems", "file-systems", Vec::new(), true);
 
         engine.register_service(
             "networking",

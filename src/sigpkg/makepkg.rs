@@ -24,7 +24,11 @@ pub struct Version {
 #[cfg(feature = "standalone_test")]
 impl Version {
     pub fn new(major: u32, minor: u32, patch: u32) -> Self {
-        Self { major, minor, patch }
+        Self {
+            major,
+            minor,
+            patch,
+        }
     }
     pub fn parse(s: &str) -> Option<Self> {
         Some(Self::new(1, 0, 0))
@@ -43,28 +47,40 @@ pub struct Package {
 
 #[cfg(feature = "standalone_test")]
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<String>, maintainer: String) -> Self {
-        Self { name, version, description, dependencies, maintainer }
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<String>,
+        maintainer: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            maintainer,
+        }
     }
 }
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
 
 /// PKGBUILD parser for Arch Linux package recipes
 pub struct PkgbuildParser {

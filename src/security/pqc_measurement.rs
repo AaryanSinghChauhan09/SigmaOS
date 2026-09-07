@@ -17,9 +17,9 @@ use merkle::{MerkleAccumulator, MerkleHash};
 #[cfg(test)]
 #[path = "pqc_enclave.rs"]
 mod pqc_enclave;
+use alloc::vec::Vec;
 #[cfg(test)]
 use pqc_enclave::KyberKem;
-use alloc::vec::Vec;
 
 /// Hybrid PQC signature state combining lattice-based KEM with firmware measurements
 pub struct HybridPqcMeasurementEngine {
@@ -136,7 +136,10 @@ pub struct Tpm2PcrBank {
 
 impl Tpm2PcrBank {
     pub fn new() -> Self {
-        let mut pcrs = [Tpm2PcrRegister { pcr_index: 0, digest: [0u8; 32] }; TPM2_PCR_COUNT];
+        let mut pcrs = [Tpm2PcrRegister {
+            pcr_index: 0,
+            digest: [0u8; 32],
+        }; TPM2_PCR_COUNT];
         for i in 0..TPM2_PCR_COUNT {
             pcrs[i].pcr_index = i as u8;
         }
@@ -144,7 +147,11 @@ impl Tpm2PcrBank {
     }
 
     /// Extend PCR register: PCR[i] = Hash(PCR[i] || event_data)
-    pub fn extend_pcr(&mut self, pcr_index: u8, event_data: &[u8]) -> Result<[u8; 32], &'static str> {
+    pub fn extend_pcr(
+        &mut self,
+        pcr_index: u8,
+        event_data: &[u8],
+    ) -> Result<[u8; 32], &'static str> {
         if pcr_index as usize >= TPM2_PCR_COUNT {
             return Err("TPM 2.0 PCR index out of bounds (0..23)");
         }
@@ -326,9 +333,7 @@ mod tests {
         let signature = HybridPqcMeasurementEngine::digest_of(&expected);
 
         assert!(Dilithium5KernelSignatureVerifier::verify_kernel_artifact(
-            kernel,
-            &signature,
-            &pubkey
+            kernel, &signature, &pubkey
         ));
 
         let wrong_pubkey = [0x99; 32];

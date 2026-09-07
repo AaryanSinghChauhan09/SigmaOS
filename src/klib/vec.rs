@@ -280,11 +280,7 @@ impl<T> Vec<T> {
         // `self.data.add(self.len + other.len())` is within the allocation.
         // `T: Copy` means no drop glue is needed for the source elements.
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                other.as_ptr(),
-                self.data.add(self.len),
-                other.len(),
-            );
+            core::ptr::copy_nonoverlapping(other.as_ptr(), self.data.add(self.len), other.len());
             self.len += other.len();
         }
     }

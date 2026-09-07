@@ -2,9 +2,9 @@
 // Implements Void Linux's runit supervision system
 // Inspired by Void Linux's 3-stage process supervision
 
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// Service state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -54,7 +54,10 @@ impl RunitService {
     pub fn restart(&mut self) {
         self.restart_count += 1;
         self.state = ServiceState::Restarting;
-        println!("Restarting service: {} (restart #{})", self.name, self.restart_count);
+        println!(
+            "Restarting service: {} (restart #{})",
+            self.name, self.restart_count
+        );
         self.state = ServiceState::Running;
     }
 
@@ -167,7 +170,9 @@ impl RunitSupervisor {
     /// Check if service can stop (no dependents still running)
     fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
         for (_, service) in &self.services {
-            if service.dependencies.contains(&name.to_string()) && service.state == ServiceState::Running {
+            if service.dependencies.contains(&name.to_string())
+                && service.state == ServiceState::Running
+            {
                 return false;
             }
         }
@@ -186,7 +191,8 @@ impl RunitSupervisor {
 
     /// Get services by state
     pub fn get_services_by_state(&self, state: ServiceState) -> Vec<&RunitService> {
-        self.services.values()
+        self.services
+            .values()
             .filter(|s| s.state == state)
             .collect()
     }
@@ -204,7 +210,8 @@ mod tests {
 
     #[test]
     fn test_runit_service() {
-        let mut service = RunitService::new("test-service".to_string(), "/usr/bin/test".to_string());
+        let mut service =
+            RunitService::new("test-service".to_string(), "/usr/bin/test".to_string());
         service.start();
         assert_eq!(service.state, ServiceState::Running);
     }
@@ -217,7 +224,12 @@ mod tests {
         supervisor.add_service(service);
 
         supervisor.run_stage2();
-        assert_eq!(supervisor.get_services_by_state(ServiceState::Running).len(), 1);
+        assert_eq!(
+            supervisor
+                .get_services_by_state(ServiceState::Running)
+                .len(),
+            1
+        );
     }
 
     #[test]
@@ -234,7 +246,13 @@ mod tests {
         supervisor.run_stage2();
 
         // Service1 should start first
-        assert_eq!(supervisor.get_service_status("service1").unwrap().state, ServiceState::Running);
-        assert_eq!(supervisor.get_service_status("service2").unwrap().state, ServiceState::Running);
+        assert_eq!(
+            supervisor.get_service_status("service1").unwrap().state,
+            ServiceState::Running
+        );
+        assert_eq!(
+            supervisor.get_service_status("service2").unwrap().state,
+            ServiceState::Running
+        );
     }
 }

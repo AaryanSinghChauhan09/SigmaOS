@@ -315,18 +315,53 @@ impl PortageEapi8PhaseEngine {
     pub fn execute_phase(&mut self, phase: EapiPhase, pkg_name: &str) -> String {
         self.executed_phases.push(phase);
         match phase {
-            EapiPhase::PkgPretend => format!("EAPI 8 [pkg_pretend]: Checked pre-requisites for {}", pkg_name),
-            EapiPhase::PkgSetup => format!("EAPI 8 [pkg_setup]: Configured environment and build user for {}", pkg_name),
-            EapiPhase::SrcUnpack => format!("EAPI 8 [src_unpack]: Unpacked source distfiles into $S for {}", pkg_name),
-            EapiPhase::SrcPrepare => format!("EAPI 8 [src_prepare]: Applied eapply patches and eautoreconf for {}", pkg_name),
-            EapiPhase::SrcConfigure => format!("EAPI 8 [src_configure]: Executed econf / cmake / meson for {}", pkg_name),
-            EapiPhase::SrcCompile => format!("EAPI 8 [src_compile]: Executed emake / ninja build for {}", pkg_name),
-            EapiPhase::SrcTest => format!("EAPI 8 [src_test]: Executed test suite (emake check) for {}", pkg_name),
-            EapiPhase::SrcInstall => format!("EAPI 8 [src_install]: Installed into sandbox image $D for {}", pkg_name),
-            EapiPhase::PkgPreinst => format!("EAPI 8 [pkg_preinst]: Pre-installation checks on live root $ROOT for {}", pkg_name),
-            EapiPhase::PkgPostinst => format!("EAPI 8 [pkg_postinst]: Merged files and ran post-install hooks for {}", pkg_name),
-            EapiPhase::PkgPrerm => format!("EAPI 8 [pkg_prerm]: Preparing unmerge for {}", pkg_name),
-            EapiPhase::PkgPostrm => format!("EAPI 8 [pkg_postrm]: Cleaning up unmerged directories for {}", pkg_name),
+            EapiPhase::PkgPretend => format!(
+                "EAPI 8 [pkg_pretend]: Checked pre-requisites for {}",
+                pkg_name
+            ),
+            EapiPhase::PkgSetup => format!(
+                "EAPI 8 [pkg_setup]: Configured environment and build user for {}",
+                pkg_name
+            ),
+            EapiPhase::SrcUnpack => format!(
+                "EAPI 8 [src_unpack]: Unpacked source distfiles into $S for {}",
+                pkg_name
+            ),
+            EapiPhase::SrcPrepare => format!(
+                "EAPI 8 [src_prepare]: Applied eapply patches and eautoreconf for {}",
+                pkg_name
+            ),
+            EapiPhase::SrcConfigure => format!(
+                "EAPI 8 [src_configure]: Executed econf / cmake / meson for {}",
+                pkg_name
+            ),
+            EapiPhase::SrcCompile => format!(
+                "EAPI 8 [src_compile]: Executed emake / ninja build for {}",
+                pkg_name
+            ),
+            EapiPhase::SrcTest => format!(
+                "EAPI 8 [src_test]: Executed test suite (emake check) for {}",
+                pkg_name
+            ),
+            EapiPhase::SrcInstall => format!(
+                "EAPI 8 [src_install]: Installed into sandbox image $D for {}",
+                pkg_name
+            ),
+            EapiPhase::PkgPreinst => format!(
+                "EAPI 8 [pkg_preinst]: Pre-installation checks on live root $ROOT for {}",
+                pkg_name
+            ),
+            EapiPhase::PkgPostinst => format!(
+                "EAPI 8 [pkg_postinst]: Merged files and ran post-install hooks for {}",
+                pkg_name
+            ),
+            EapiPhase::PkgPrerm => {
+                format!("EAPI 8 [pkg_prerm]: Preparing unmerge for {}", pkg_name)
+            }
+            EapiPhase::PkgPostrm => format!(
+                "EAPI 8 [pkg_postrm]: Cleaning up unmerged directories for {}",
+                pkg_name
+            ),
         }
     }
 
@@ -389,8 +424,10 @@ impl GentooKeywordsAcceptanceEngine {
     }
 
     pub fn allow_testing_keywords(&mut self, pkg_name: &str) {
-        self.accept_keywords.insert(format!("~{}", self.target_arch));
-        self.accept_keywords.insert(format!("{} ~{}", pkg_name, self.target_arch));
+        self.accept_keywords
+            .insert(format!("~{}", self.target_arch));
+        self.accept_keywords
+            .insert(format!("{} ~{}", pkg_name, self.target_arch));
     }
 
     pub fn allow_unkeyworded(&mut self) {
@@ -407,7 +444,12 @@ impl GentooKeywordsAcceptanceEngine {
                 return KeywordStatus::Accepted;
             }
             let kw_string = kw.to_string();
-            if kw.starts_with('~') && (self.accept_keywords.contains(&kw_string) || self.accept_keywords.contains(&format!("~{}", self.target_arch))) {
+            if kw.starts_with('~')
+                && (self.accept_keywords.contains(&kw_string)
+                    || self
+                        .accept_keywords
+                        .contains(&format!("~{}", self.target_arch)))
+            {
                 return KeywordStatus::Accepted;
             }
             if kw.starts_with('~') && kw[1..] == self.target_arch {
@@ -453,7 +495,9 @@ pub struct GentooDistfilesDigestEngine {
 
 impl GentooDistfilesDigestEngine {
     pub fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 
     pub fn add_manifest_entry(
@@ -577,9 +621,10 @@ impl OpenRcRunlevelSupervisor {
             .ok_or("OpenRC service not found")?;
 
         for need in &service.needs {
-            let need_active = self.services.iter().any(|s| {
-                (s.name == *need || s.provides.contains(need)) && s.is_active
-            });
+            let need_active = self
+                .services
+                .iter()
+                .any(|s| (s.name == *need || s.provides.contains(need)) && s.is_active);
             if !need_active {
                 // Attempt auto-start of needed service
                 let target_need = need.clone();
@@ -767,29 +812,52 @@ mod tests {
     #[test]
     fn test_gentoo_accept_keywords() {
         let mut engine = GentooKeywordsAcceptanceEngine::new("amd64");
-        assert_eq!(engine.evaluate_keywords(&["amd64"]), KeywordStatus::Accepted);
-        assert_eq!(engine.evaluate_keywords(&["~amd64"]), KeywordStatus::TestingKeywordRequired);
+        assert_eq!(
+            engine.evaluate_keywords(&["amd64"]),
+            KeywordStatus::Accepted
+        );
+        assert_eq!(
+            engine.evaluate_keywords(&["~amd64"]),
+            KeywordStatus::TestingKeywordRequired
+        );
 
         engine.allow_testing_keywords("app-editors/neovim");
-        assert_eq!(engine.evaluate_keywords(&["~amd64"]), KeywordStatus::Accepted);
+        assert_eq!(
+            engine.evaluate_keywords(&["~amd64"]),
+            KeywordStatus::Accepted
+        );
 
         assert_eq!(engine.evaluate_keywords(&["-*"]), KeywordStatus::MaskedArch);
-        assert_eq!(engine.evaluate_keywords(&["arm64"]), KeywordStatus::Unkeyworded);
+        assert_eq!(
+            engine.evaluate_keywords(&["arm64"]),
+            KeywordStatus::Unkeyworded
+        );
 
         engine.allow_unkeyworded();
-        assert_eq!(engine.evaluate_keywords(&["arm64"]), KeywordStatus::Accepted);
+        assert_eq!(
+            engine.evaluate_keywords(&["arm64"]),
+            KeywordStatus::Accepted
+        );
     }
 
     #[test]
     fn test_gentoo_distfiles_manifest_digest() {
         let mut digest_engine = GentooDistfilesDigestEngine::new();
         let sample_bytes = b"GENTOO_EBUILD_SOURCE_TARBALL_DATA_2026";
-        digest_engine.add_manifest_entry(ManifestEntryType::Dist, "portage-3.0.30.tar.bz2", sample_bytes);
+        digest_engine.add_manifest_entry(
+            ManifestEntryType::Dist,
+            "portage-3.0.30.tar.bz2",
+            sample_bytes,
+        );
 
-        assert!(digest_engine.verify_file("portage-3.0.30.tar.bz2", sample_bytes).is_ok());
+        assert!(digest_engine
+            .verify_file("portage-3.0.30.tar.bz2", sample_bytes)
+            .is_ok());
 
         let corrupted = b"CORRUPTED_TARBALL_DATA";
-        assert!(digest_engine.verify_file("portage-3.0.30.tar.bz2", corrupted).is_err());
+        assert!(digest_engine
+            .verify_file("portage-3.0.30.tar.bz2", corrupted)
+            .is_err());
     }
 
     #[test]

@@ -366,7 +366,9 @@ mod tests {
         let mut curl = CurlIntegration::default();
         assert_eq!(curl.active_handles, 0);
 
-        let res = curl.perform_transfer("https://pkg.sigmaos.org/repo").unwrap();
+        let res = curl
+            .perform_transfer("https://pkg.sigmaos.org/repo")
+            .unwrap();
         assert!(res.starts_with(b"HTTP/1.1 200 OK"));
         assert_eq!(curl.active_handles, 1);
 

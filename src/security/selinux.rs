@@ -2,9 +2,9 @@
 // Implements Fedora-style mandatory access control adapted for capability-based security
 // Inspired by Fedora's SELinux for enhanced security architecture
 
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// Security context
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -17,7 +17,12 @@ pub struct SecurityContext {
 
 impl SecurityContext {
     pub fn new(user: String, role: String, type_: String, level: String) -> Self {
-        Self { user, role, type_, level }
+        Self {
+            user,
+            role,
+            type_,
+            level,
+        }
     }
 
     pub fn from_string(s: &str) -> Result<Self, String> {
@@ -135,10 +140,26 @@ impl SELinuxPolicy {
     }
 
     /// Check if operation is allowed
-    pub fn check_permission(&self, source_type: &str, target_type: &str, target_class: &str, permission: &str) -> bool {
+    pub fn check_permission(
+        &self,
+        source_type: &str,
+        target_type: &str,
+        target_class: &str,
+        permission: &str,
+    ) -> bool {
         for rule in &self.rules {
-            if let PolicyRule::Allow { source_type: src, target_type: tgt, target_class: cls, permissions } = rule {
-                if src == source_type && tgt == target_type && cls == target_class && permissions.contains(&permission.to_string()) {
+            if let PolicyRule::Allow {
+                source_type: src,
+                target_type: tgt,
+                target_class: cls,
+                permissions,
+            } = rule
+            {
+                if src == source_type
+                    && tgt == target_type
+                    && cls == target_class
+                    && permissions.contains(&permission.to_string())
+                {
                     return true;
                 }
             }
@@ -208,7 +229,8 @@ impl SigmaSELinux {
         }
 
         if let Some(context) = self.get_context(path) {
-            self.policy.check_permission(source_type, &context.type_, "file", permission)
+            self.policy
+                .check_permission(source_type, &context.type_, "file", permission)
         } else {
             false
         }
@@ -220,13 +242,23 @@ impl SigmaSELinux {
             return true;
         }
 
-        self.policy.check_permission(source_type, target_type, "process", "transition")
+        self.policy
+            .check_permission(source_type, target_type, "process", "transition")
     }
 
     /// Get status
     pub fn get_status(&self) -> String {
-        let mode = if self.enforcement { "Enforcing" } else { "Permissive" };
-        format!("SELinux status: {}\nBooleans: {}\nContexts: {}", mode, self.booleans.len(), self.contexts.len())
+        let mode = if self.enforcement {
+            "Enforcing"
+        } else {
+            "Permissive"
+        };
+        format!(
+            "SELinux status: {}\nBooleans: {}\nContexts: {}",
+            mode,
+            self.booleans.len(),
+            self.contexts.len()
+        )
     }
 }
 
@@ -242,7 +274,12 @@ mod tests {
 
     #[test]
     fn test_security_context() {
-        let ctx = SecurityContext::new("user_u".to_string(), "user_r".to_string(), "user_t".to_string(), "s0".to_string());
+        let ctx = SecurityContext::new(
+            "user_u".to_string(),
+            "user_r".to_string(),
+            "user_t".to_string(),
+            "s0".to_string(),
+        );
         assert_eq!(ctx.to_string(), "user_u:user_r:user_t:s0");
     }
 

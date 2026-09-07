@@ -12,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 use core::net::IpAddr;
 
 // SigmaOS Network Traffic Analyzer
@@ -53,8 +53,6 @@ pub struct TrafficAlert {
     pub timestamp: Instant,
     pub related_ips: Vec<IpAddr>,
 }
-
-
 
 pub struct NetworkTrafficAnalyzer {
     pub buffer: AlpineZeroAllocCaptureBuffer<1024>,

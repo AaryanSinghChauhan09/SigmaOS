@@ -2,9 +2,9 @@
 // Implements Arch Linux's pactree functionality
 // Renders ASCII dependency trees for installed packages and recipes
 
+use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 
 /// Dependency tree node
 #[derive(Debug, Clone)]
@@ -96,7 +96,11 @@ impl PactreeEngine {
         tree.push_str(" is required by:\n");
 
         for (i, dep) in dependents.iter().enumerate() {
-            let prefix = if i == dependents.len() - 1 { "└─" } else { "├─" };
+            let prefix = if i == dependents.len() - 1 {
+                "└─"
+            } else {
+                "├─"
+            };
             tree.push_str(prefix);
             tree.push_str(dep);
             tree.push('\n');
