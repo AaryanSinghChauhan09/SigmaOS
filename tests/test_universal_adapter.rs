@@ -245,5 +245,4 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("pacman.pkg.tar.zst"), Some(PackageFormat::Pacman));
     assert_eq!(adapter.detect_format_by_extension("plain.tar"), Some(PackageFormat::Tar));
     assert_eq!(adapter.detect_format_by_extension("puppy.pet"), Some(PackageFormat::Pet));
->>>>>>> 65768c93a851a9618cca6aec019dd2808d10e604
 }

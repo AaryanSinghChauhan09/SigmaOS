@@ -585,7 +585,14 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-#[cfg(test_disabled)]
+pub use crate::distro::omarchy_inspiration::{
+    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
+    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
+    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
+    QuickshellWidget, ShellComponentKind,
+};
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
