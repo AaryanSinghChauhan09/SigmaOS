@@ -31,6 +31,9 @@ SigmaOS incorporates clean-room, zero-dependency safe-Rust implementations of Re
 8. **`FedoraMirrorManager2Engine` (`src/compatibility/fedora.rs`)**
    - MirrorManager 2 GeoIP, BGP ASN, and bandwidth-weighted mirror selection algorithm filtering for up-to-date sync status and latency bounds.
 
+50. **`FedoraCoprAutoBuildEngine` (`src/compatibility/fedora.rs`)**
+    - Webhook-triggered automated COPR package compilation and RPM artifact publishing.
+
 ---
 
 ## 🛡️ Security, Access Control & Cryptography
@@ -80,6 +83,9 @@ SigmaOS incorporates clean-room, zero-dependency safe-Rust implementations of Re
 
 22. **`FedoraLiveMediaOverlayEngine` (`src/compatibility/fedora.rs`)**
     - Workstation Live ISO SquashFS read-only rootfs mount and CoW overlayfs RAM persistence manager.
+
+51. **`FedoraCoreOsStreamSelector` (`src/compatibility/fedora.rs`)**
+    - Fedora CoreOS (FCOS) and Fedora IoT release stream selector engine (`stable`, `testing`, `next`), Ignition JSON configuration validation, and ostree stream rebase URL resolution.
 
 ---
 
@@ -169,6 +175,9 @@ SigmaOS incorporates clean-room, zero-dependency safe-Rust implementations of Re
 
 49. **`FedoraAlu` (`src/compatibility/fedora.rs`)**
     - High-reliability ALU emulator with saturated arithmetic and flag tracking (`carry`, `zero`, `sign`, `overflow`).
+
+52. **`FedoraPagureForgeEngine` (`src/compatibility/fedora.rs`)**
+    - Fedora Pagure git forge issue tracking, dist-git package repository management, and pull request review workflows.
 
 ---
 

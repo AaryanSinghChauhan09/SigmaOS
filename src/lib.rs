@@ -2,10 +2,7 @@
 // Core library for SigmaOS operating system
 
 // Core working modules
-pub mod community;
-pub mod governance;
 pub mod accessibility;
-pub mod access;
 pub mod ai;
 pub mod app;
 pub mod auth;
@@ -39,12 +36,16 @@ pub mod sigpkg;
 pub mod storage;
 pub mod thread;
 pub use process::{
-    ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
-    JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
-    ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
-    ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
-    SigQueuePayload, AdvancedIpcHub,
+    AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
+    JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
+    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessJobEntry,
+    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess,
+    SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
+    WNOHANG, WUNTRACED,
 };
+pub mod access;
+pub mod community;
+pub mod open_source_os_gap_closure;
 pub mod tools;
 pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;
@@ -55,16 +56,6 @@ pub mod unimplemented_tools;
 pub mod userland;
 
 pub use distro::{
-    distro_inspiration_engine::{
-        AlpineLbuApkOverlayEngine, ApkovlCommit, ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine,
-        DragonFlyHammer2ClusterEngine, FreeBsdZfsArcGeomEngine, GenerationRecord, Hammer2DedupEntry,
-        IsaLevel, MuslLightweightInitEngine, MuslStaticService,
-        NixOsDeclarativeStateReconciliationEngine, NixOsPureStoreDerivationEngine,
-        OpenBsdStatefulPacketFilterEngine, OpenWrtUciSqmRouterEngine, PaxSecurityLevel, PfProtocol,
-        PfStateEntry, PortageUseFlag, PortageUseFlagGovernor, QubeDomainType,
-        QubesHardenedBsdSecurityGuard, RunitStage, ServiceRunState, SqmAlgorithm, StoreDerivationPath,
-        UciSection, UseFlagState, VoidRunitStageController,
-    },
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
@@ -78,26 +69,13 @@ pub use distro::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
     SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
     SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
-    ZramCompressionAlgorithm, DebianMultiarchAptEngine, EndeavourReflectorMirrorRanker,
-    FreeBsdZfsBootEnvManager, GarudaDracutBtrfsSnapper, GarudaPerformanceTweakEngine,
-    HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, NixOsFlakeProfileManager,
-    OpenBsdDoasPrivilegeManager, SolusEopkgBudgieEngine, BodhiUpdateRecord, BodhiUpdateStatus,
-    AlpmHook, AlpmHookWhen, ArchGpgKey, ArchKeyringEngine, ArchPacmanHookManager,
-    ArchReflectorEngine, ArchinstallEngine, ArchFilesystemType, ArchInstallerProfile,
-    KeyTrustLevel, ReflectorMirror, ReflectorSortKey,
-    DesktopLayoutPreset, HardwareQuirkRule, ManjaroBranch, ManjaroBranchManager,
-    ManjaroHelloSetupEngine, ManjaroTimeshiftAutoSnap, MhwdHardwareQuirkDatabase,
-    MhwdKernelDriverAutobuilder, PackageSearchResult, PamacTransactionEntry,
-    PamacTransactionJournalEngine, PamacUnifiedSearchEngine, PrimeOffloadMode,
-    SearchResultBackend, SetupWizardTask, ManjaroSnapshotMode, TimeshiftSnapshot,
-    PamacTransactionType, VendorHardwareType,
-    FedoraBodhiUpdateEngine, FedoraIgnitionProvisionEngine, FedoraKojiDistGitBuilder,
-    FedoraRpmOstreeEngine, IgnitionFile, IgnitionUnit, KojiBuildTask, OstreeDeploymentPin,
-    FedoraTargetArchitecture,
-    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
-    OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
+    ZramCompressionAlgorithm,
 };
-
+pub use driver::{
+    DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
+    UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
+    UbuntuLivepatchDriverHook,
+};
 pub use package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ApkIndexMetadata, ApkSignatureKey, ApkV3SignatureEngine,
     AptBugReport, AptMarkRecord, AptMarkState, AptPinRule, ArchCachyosMicroarchOptimizationEngine,
@@ -140,6 +118,18 @@ pub use security::{
     SovereignKaslrEngine, SplitTunnelRule, Tpm2PcrBank, Tpm2PcrRegister, WifiFrameType,
     TPM2_PCR_COUNT,
 };
+pub use security::{
+    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, GksuAuthBackend,
+    GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult, GksuSecurityGuard,
+    HardenedSyscallDispatcher, HardenedSyscallError, HybridPqcMeasurementEngine,
+    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
+    LibGksuGraphicalSudoEngine, MemoryAccessError, PagePermissions, PcapPacketHeader,
+    PiaDedicatedIpBinding, PiaMaceAdBlocker, PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine,
+    PiaServerRegion, PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager,
+    RetpolineKptiMitigationEngine, SmepSmapEnforcer, SovereignFirmitasAttestationEngine,
+    SovereignKaslrEngine, SplitTunnelRule, Tpm2PcrBank, Tpm2PcrRegister, WifiFrameType,
+    TPM2_PCR_COUNT,
+};
 pub use unimplemented_features::{
     AlpineApkPackageIndex, Android15PrivateSpaceGovernor, AndroidApexContainerModuleEngine,
     AndroidApexModule, AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager,
@@ -152,17 +142,10 @@ pub use unimplemented_features::{
     NixOsDeclarativeConfigEngine, PciBusScanner, PhoronixAutomatedBenchmarkEngine,
     PhoronixTestSuiteRunner, PowerState, PuppyLinuxOverlayRamdiskEngine, RavenWidgetState,
     RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator, RumpComponent,
-    RumpComponentType, S6ServiceInitSupervisor, SatSolverEngine, SerenityIpcEvent,
-    SerenityOsAsyncIpcLoop, SlackwarePackage, SlackwarePkgtoolEngine, SolusEopkgDeltaPackage,
-    SolusEopkgRavenGovernor, SovereignIpcBus, SteamOsGamescopeCompositorEngine, TargetArch,
-    TinyCoreModularTczLoader, UdfVm, UutilsCoreutilsZeroCopyBuffer, VoidXbpsContainerEngine,
-    WindowsCopilotRecallAuditor, ZorinAppMapping, ZorinWinAppDbRegistry,
-};
-pub use unimplemented_tools::{
-    ChainedAuditTrailLedger, DiskImageSignatureCarver, DistroWatchTrendAnalyzerTool,
-    MetadataExifAntiForensicScrubber, NetworkPcapForensicSniffer, NixGuixStoreGarbageCollectorTool,
-    OpenBsdUnveilAuditTool, PhoronixSuiteAutomatedBenchmarkRunnerTool,
-    VolatileMemoryDumpForensicEngine,
+    RumpComponentType, SatSolverEngine, SerenityIpcEvent, SerenityOsAsyncIpcLoop, SlackwarePackage,
+    SlackwarePkgtoolEngine, SolusEopkgDeltaPackage, SolusEopkgRavenGovernor, SovereignIpcBus,
+    SteamOsGamescopeCompositorEngine, TargetArch, TinyCoreModularTczLoader, UdfVm,
+    VoidXbpsContainerEngine, WindowsCopilotRecallAuditor, ZorinAppMapping, ZorinWinAppDbRegistry,
 };
 pub mod expanded_wiki_innovations;
 pub use expanded_wiki_innovations::{
@@ -196,6 +179,13 @@ pub use system::{AutomationTaskKind, SovereignAutomationEngine, TaskStatus};
 pub mod update {
     pub mod distro_update_parity;
 }
+pub use update::distro_update_parity::{
+    SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
+};
+pub mod installer;
+pub mod iot;
+pub mod ml;
+pub mod performance;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,

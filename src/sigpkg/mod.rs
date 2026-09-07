@@ -1,5 +1,6 @@
-use std::string::String;
-use std::vec::Vec;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
@@ -50,7 +51,7 @@ pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
-    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
+    AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
     GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
 };
 pub mod spec;
@@ -85,21 +86,18 @@ pub use bsd_linux_package_innovations::{
     XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
     ZypperRepository,
 };
-pub use zero_alloc_resolver::{
-    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
-};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager, AdapterError,
-};
-pub use universal_oop_system::{
-    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
-};
 pub use sovereign_sigpkg::*;
-
+pub use universal_adapter::{
+    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
+    PackagePriority, PacmanPkgbuildV2, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
+    UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
+    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
+};
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
-    AlpmHook as ArchCompatAlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
+    AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager, SvnPackageMetadata, SvntogitMigrationEngine,
 };
 pub use arch_pacman_engine::{
@@ -148,10 +146,9 @@ pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
-pub use transaction::Transaction;
-pub use universal_adapter::{
-    AptDebManifest, UniversalPackageAdapter,
+pub use sovereign_package_innovations::{
+    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
+    NixFlakeHermeticCacheStore,
 };
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
@@ -159,6 +156,15 @@ pub use spec::{
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
+pub use store::{
+    BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
+};
+pub use svntogit_repro::{
+    BuildArtifact, ConvertedGitCommit, ReproducibilityAttestationReport,
+    ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
+    SvnBranchType, SvnRevisionLog,
+};
+pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer

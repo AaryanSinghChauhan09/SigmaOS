@@ -52,7 +52,7 @@ impl PackageSigningEngine {
     pub fn verify_signature(
         &self,
         signature: &PackageSignature,
-        _package_data: &[u8],
+        package_data: &[u8],
     ) -> PackageVerificationResult {
         // Check if key is trusted
         if !self.signing_keys.contains(&signature.key_id) {
@@ -68,7 +68,7 @@ impl PackageSigningEngine {
     pub fn sign_package(
         &self,
         key_id: &str,
-        _package_data: &[u8],
+        package_data: &[u8],
     ) -> Result<PackageSignature, &'static str> {
         if !self.signing_keys.contains(&key_id.to_string()) {
             return Err("Key not found in trusted keys");

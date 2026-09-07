@@ -662,10 +662,10 @@ impl SovereignDynamicDevfsEngine {
         }
     }
 
-    pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
-        self.devices
+    pub fn lookup_node(&self, path: &[u8]) -> Option<&DynamicDeviceNode> {
+        self.nodes
             .iter()
-            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| *s == name))
+            .find(|n| n.name == path || n.symlinks.iter().any(|s| s == path))
     }
 }
 
@@ -722,9 +722,9 @@ impl SovereignStatefulNatEngine {
 
         // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
+            c.src_ip == src_ip
                 && c.src_port == src_port
-                && c.original_dst == dst_ip
+                && c.dst_ip == dst_ip
                 && c.dst_port == dst_port
         }) {
             conn.packets_counter += 1;
@@ -1134,7 +1134,17 @@ mod tests {
         assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
         assert!(resolver.verify_bsd_geom_storage_readiness());
 
-        resolver.faillock_guard.record_failure();
+        assert_eq!(
+            resolver.lookup_modprobe_alias("char-major-10-200"),
+            Some("tun")
+        );
+        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
+
+        assert!(!resolver.faillock_guard.record_failure());
+        assert!(!resolver.faillock_guard.record_failure());
+        assert!(resolver.faillock_guard.record_failure());
+        assert!(resolver.faillock_guard.is_locked);
+
         resolver.faillock_guard.reset();
         assert!(!resolver.faillock_guard.is_locked);
     }

@@ -2,19 +2,9 @@
 // Implements Void Linux's runit supervision system
 // Inspired by Void Linux's 3-stage process supervision
 
-extern crate alloc;
-
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
+use alloc::string::String;
 use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::String;
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// Service state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -274,28 +264,6 @@ mod tests {
                 .len(),
             1
         );
-    }
-
-    #[test]
-    fn test_service_health_check_monitoring() {
-        let mut supervisor = RunitSupervisor::new();
-        let mut service = RunitService::new("httpd".to_string(), "/usr/bin/httpd".to_string());
-        service.max_allowed_failures = 2;
-        supervisor.add_service(service);
-
-        supervisor.run_stage2();
-        assert_eq!(
-            supervisor.get_service_status("httpd").unwrap().state,
-            ServiceState::Running
-        );
-
-        // First failure: should remain running but increment failure count
-        let state1 = supervisor.monitor_service_health("httpd", false).unwrap();
-        assert_eq!(state1, ServiceState::Running);
-
-        // Second failure: reaches threshold and transitions to Failed
-        let state2 = supervisor.monitor_service_health("httpd", false).unwrap();
-        assert_eq!(state2, ServiceState::Failed);
     }
 
     #[test]

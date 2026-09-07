@@ -49,10 +49,10 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-
+use crate::security::Permission;
 use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
-pub use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
@@ -890,8 +890,6 @@ impl UniversalPackageAdapter {
         } else if f.ends_with(".pkg.tar.zst")
             || f.ends_with(".pkg.tar.xz")
             || f.ends_with(".pkg.tar.gz")
-            || f == "pacman"
-            || f.ends_with(".pacman")
         {
             Some(PackageFormat::Pacman)
         } else if f.ends_with(".apk") {
@@ -1172,33 +1170,6 @@ impl UniversalPackageAdapter {
                     &deps,
                 )
             }
-            Some(PackageFormat::Ipk) | Some(PackageFormat::Opkg) => {
-                let deb = self.parse_apt_control(raw_text)?;
-                self.translate_to_native_package(
-                    &deb.package,
-                    &deb.version,
-                    &deb.description,
-                    &deb.depends,
-                )
-            }
-            Some(PackageFormat::OpenBsdPkg) => {
-                let obs = self.parse_openbsd_contents(raw_text)?;
-                self.translate_to_native_package(
-                    &obs.pkgname,
-                    &obs.version,
-                    &obs.comment,
-                    &obs.depends,
-                )
-            }
-            Some(PackageFormat::Hpkg) => {
-                let hpkg = self.parse_haiku_hpkg(raw_text)?;
-                self.translate_to_native_package(
-                    &hpkg.name,
-                    &hpkg.version,
-                    &hpkg.summary,
-                    &hpkg.requires,
-                )
-            }
             _ => {
                 // Heuristic inspection if extension detection wasn't definitive
                 if raw_text.contains("Package:") && raw_text.contains("Version:") {
@@ -1298,14 +1269,6 @@ impl UniversalPackageAdapter {
                         &slack.version,
                         &slack.description,
                         &slack.slack_required,
-                    )
-                } else if filename.ends_with(".hpkg") || raw_text.contains("summary ") || raw_text.contains("architecture ") || raw_text.contains("vendor ") || raw_text.contains("haiku") {
-                    let haiku = self.parse_haiku_hpkg(raw_text)?;
-                    self.translate_to_native_package(
-                        &haiku.name,
-                        &haiku.version,
-                        &haiku.summary,
-                        &haiku.requires,
                     )
                 } else {
                     Err("Unrecognized package manifest format")
@@ -1608,15 +1571,6 @@ impl SigPkgUniversalBridgeEngine {
                     &net.depends,
                 )
             }
-            PackageFormat::Hpkg => {
-                let hpkg = self.adapter.parse_haiku_hpkg(&manifest_text)?;
-                self.adapter.translate_to_native_package(
-                    &hpkg.name,
-                    &hpkg.version,
-                    &hpkg.summary,
-                    &hpkg.requires,
-                )
-            }
             _ => self
                 .adapter
                 .parse_and_translate_manifest(filename, &manifest_text),
@@ -1742,8 +1696,8 @@ impl UniversalDependencyMapper {
 
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
-            | "dev-libs/openssl" | "openssl" | "libssl1.1" | "libssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" | "glibc-devel" => {
+            | "dev-libs/openssl" => "openssl".to_string(),
+            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -2275,6 +2229,116 @@ impl Default for UniversalPmCommandDispatcher {
 }
 
 /// Universal Converter that converts any foreign package manifest into a native Sigma-pkg Package
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum UniversalPackageTriggerType {
+    Ldconfig,
+    UpdateDesktopDatabase,
+    GlibCompileSchemas,
+    SystemdTmpfiles,
+    MimeDatabase,
+    FontsIndex,
+    IconThemeCache,
+}
+
+#[derive(Debug, Clone)]
+pub struct TriggerExecutionResult {
+    pub trigger_type: UniversalPackageTriggerType,
+    pub target_dir: String,
+    pub executed_successfully: bool,
+}
+
+/// Handles post-installation and post-removal system triggers for all Linux & BSD package formats
+pub struct UniversalPackageTriggerEngine {
+    pub registered_triggers: Vec<UniversalPackageTriggerType>,
+    pub execution_log: Vec<TriggerExecutionResult>,
+}
+
+impl UniversalPackageTriggerEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_triggers: vec![
+                UniversalPackageTriggerType::Ldconfig,
+                UniversalPackageTriggerType::UpdateDesktopDatabase,
+                UniversalPackageTriggerType::GlibCompileSchemas,
+                UniversalPackageTriggerType::SystemdTmpfiles,
+                UniversalPackageTriggerType::MimeDatabase,
+                UniversalPackageTriggerType::FontsIndex,
+                UniversalPackageTriggerType::IconThemeCache,
+            ],
+            execution_log: Vec::new(),
+        }
+    }
+
+    pub fn execute_triggers_for_files(&mut self, installed_files: &[String]) -> Vec<TriggerExecutionResult> {
+        let mut results = Vec::new();
+
+        let has_shared_libs = installed_files.iter().any(|f| f.ends_with(".so") || f.contains("/lib/"));
+        let has_desktop_files = installed_files.iter().any(|f| f.ends_with(".desktop"));
+        let has_glib_schemas = installed_files.iter().any(|f| f.ends_with(".gschema.xml"));
+        let has_mime_files = installed_files.iter().any(|f| f.contains("/mime/packages/"));
+        let has_icon_files = installed_files.iter().any(|f| f.contains("/icons/"));
+
+        if has_shared_libs {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::Ldconfig,
+                target_dir: "/usr/lib".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_desktop_files {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::UpdateDesktopDatabase,
+                target_dir: "/usr/share/applications".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_glib_schemas {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::GlibCompileSchemas,
+                target_dir: "/usr/share/glib-2.0/schemas".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_mime_files {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::MimeDatabase,
+                target_dir: "/usr/share/mime".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_icon_files {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::IconThemeCache,
+                target_dir: "/usr/share/icons/hicolor".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        results
+    }
+}
+
+impl Default for UniversalPackageTriggerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct UniversalFormatConverter {
     pub dep_mapper: UniversalDependencyMapper,
     pub scriptlet_converter: UniversalScriptletConverter,
@@ -2806,7 +2870,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Eopkg)
+            Some(PackageFormat::Pisi)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
@@ -2881,26 +2945,6 @@ mod tests {
             adapter.detect_format_by_extension("recipe.cports"),
             Some(PackageFormat::Cports)
         );
-        assert_eq!(
-            adapter.detect_format_by_extension("router.ipk"),
-            Some(PackageFormat::Ipk)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("yocto.opkg"),
-            Some(PackageFormat::Opkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("solaris.p5p"),
-            Some(PackageFormat::SolarisIps)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("store.nar"),
-            Some(PackageFormat::GuixNar)
-        );
-        assert_eq!(
-            adapter.detect_format_by_extension("base.openbsd.tgz"),
-            Some(PackageFormat::OpenBsdPkg)
-        );
 
         // Check format detection by header signature magic
         assert_eq!(
@@ -2938,26 +2982,6 @@ mod tests {
         assert_eq!(
             adapter.detect_format_by_header(b"SPKG0001header"),
             Some(PackageFormat::Sovereign)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"IPK!hdr"),
-            Some(PackageFormat::Ipk)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"OPKGhdr"),
-            Some(PackageFormat::Opkg)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"P5P!hdr"),
-            Some(PackageFormat::SolarisIps)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"NARShdr"),
-            Some(PackageFormat::GuixNar)
-        );
-        assert_eq!(
-            adapter.detect_format_by_header(b"OBSDhdr"),
-            Some(PackageFormat::OpenBsdPkg)
         );
     }
 

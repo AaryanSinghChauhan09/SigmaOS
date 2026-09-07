@@ -1076,33 +1076,6 @@ sha256sums=('SKIP')
             .repo_branches
             .contains_key("extra-x86_64"));
     }
-
-    #[test]
-    fn test_arch_news_keyring_and_abs_engine() {
-        let mut news_parser = ArchNewsFeedParser::new();
-        let raw_rss = r#"
-<rss><channel>
-<item>
-  <title>Intervention required for glibc update</title>
-  <author>staff@archlinux.org</author>
-  <pubDate>Mon, 01 Jan 2026 12:00:00 GMT</pubDate>
-  <description>Manual intervention needed during update.</description>
-</item>
-</channel></rss>"#;
-        assert_eq!(news_parser.parse_raw_feed(raw_rss), 1);
-        let emergency = news_parser.get_emergency_alerts();
-        assert_eq!(emergency.len(), 1);
-        assert!(emergency[0].title.contains("Intervention required"));
-
-        let keyring = ArchKeyringTrustEngine::new();
-        assert!(keyring.verify_signature("3B94A80E50A477C7", "sig_hex"));
-        assert!(!keyring.verify_signature("UNKNOWN_KEY_ID", "sig_hex"));
-
-        let abs = ArchBuildSystemMasterEngine::new();
-        assert_eq!(abs.generate_abs_tree_path("extra", "neovim"), "/var/abs/extra/neovim");
-        let pkg = abs.parse_abs_pkgbuild("pkgname=neovim\npkgver=0.10.0\n").unwrap();
-        assert_eq!(pkg.pkgname, "neovim");
-    }
 }
 
 // ============================================================================

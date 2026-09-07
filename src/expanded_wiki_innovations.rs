@@ -21,8 +21,6 @@
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
-extern crate alloc;
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
@@ -57,7 +55,7 @@ impl ArchPacmanContribEngine {
         &self,
         remote_versions: &[(String, String)],
     ) -> Vec<(String, String, String)> {
-        let mut pending: Vec<(String, String, String)> = Vec::new();
+        let mut pending = Vec::new();
         for (pkg, remote_ver) in remote_versions {
             if let Some((_, local_ver)) = self.cached_pkg_versions.iter().find(|(p, _)| p == pkg) {
                 if local_ver != remote_ver {
@@ -97,7 +95,7 @@ impl ArchPacmanContribEngine {
         target_dep: &str,
         pkg_deps_map: &[(String, Vec<String>)],
     ) -> Vec<String> {
-        let mut dependents: Vec<String> = Vec::new();
+        let mut dependents = Vec::new();
         for (pkg, deps) in pkg_deps_map {
             if deps.iter().any(|d: &String| d == target_dep) {
                 dependents.push(pkg.clone());
@@ -172,7 +170,7 @@ impl FreeBsdPkgAuditEngine {
         &self,
         installed_pkgs: &[String],
     ) -> Vec<(String, String, String)> {
-        let mut found: Vec<(String, String, String)> = Vec::new();
+        let mut found = Vec::new();
         for (pkg, cve, sev) in &self.vulnerability_cve_db {
             if installed_pkgs.iter().any(|p: &String| p.starts_with(pkg.as_str())) {
                 found.push((pkg.clone(), cve.clone(), sev.clone()));
@@ -328,7 +326,7 @@ impl MiseUniversalVersionManager {
         self.runtimes
             .iter()
             .find(|(r, _)| r == runtime)
-            .map(|(_, v): &(String, String)| v.clone())
+            .map(|(_, v)| v.clone())
     }
 }
 

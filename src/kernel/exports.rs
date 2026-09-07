@@ -3,14 +3,16 @@
 // BSD-style SYSINIT boots, Kernel Linker Daemon (KLD) modules,
 // and Enterprise Kernel ABI (KABI) stability guarantees & automated testing suites.
 
-use std::string::{String, ToString};
-use std::format;
-use std::vec::Vec;
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::format;
+use alloc::vec;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::HashMap;
 
 // =========================================================================

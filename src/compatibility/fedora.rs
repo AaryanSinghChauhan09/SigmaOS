@@ -2743,7 +2743,96 @@ pub struct TahrirBadgeAssertion {
     pub assertion_digest: String,
 }
 
-/// Fedora Tahrir User Avatar Record (Libravatar/Gravatar Compatible)
+/// Fedora "The New Hotness" & Anitya Upstream Release Monitoring Engine
+/// Tracks upstream project releases, compares version semantics, maps Anitya project IDs
+/// to Fedora RPM packages, and dispatches `org.fedoraproject.prod.hotness.update` fedmsg events.
+pub struct FedoraTheNewHotnessEngine {
+    pub mappings: Vec<AnityaPackageMapping>,
+    pub release_events: Vec<UpstreamReleaseEvent>,
+    pub messaging_engine: FedoraMessagingEngine,
+}
+
+impl FedoraTheNewHotnessEngine {
+    pub fn new() -> Self {
+        Self {
+            mappings: Vec::new(),
+            release_events: Vec::new(),
+            messaging_engine: FedoraMessagingEngine::new(),
+        }
+    }
+
+    pub fn register_anitya_mapping(
+        &mut self,
+        anitya_project_id: u64,
+        upstream_name: &str,
+        fedora_pkg_name: &str,
+        current_version: &str,
+    ) {
+        self.mappings
+            .retain(|m| m.anitya_project_id != anitya_project_id);
+        self.mappings.push(AnityaPackageMapping {
+            anitya_project_id,
+            upstream_name: upstream_name.to_string(),
+            fedora_package_name: fedora_pkg_name.to_string(),
+            current_stable_version: current_version.to_string(),
+        });
+    }
+
+    pub fn process_upstream_release_check(
+        &mut self,
+        anitya_project_id: u64,
+        latest_upstream_version: &str,
+        release_url: &str,
+        timestamp_secs: u64,
+    ) -> Result<Option<UpstreamReleaseEvent>, &'static str> {
+        let mapping_idx = self
+            .mappings
+            .iter()
+            .position(|m| m.anitya_project_id == anitya_project_id)
+            .ok_or("TheNewHotness: Anitya project ID not mapped")?;
+
+        let old_ver = self.mappings[mapping_idx].current_stable_version.clone();
+
+        if old_ver != latest_upstream_version {
+            let fedora_pkg = self.mappings[mapping_idx].fedora_package_name.clone();
+            self.mappings[mapping_idx].current_stable_version = latest_upstream_version.to_string();
+
+            let event = UpstreamReleaseEvent {
+                project_id: anitya_project_id,
+                fedora_package_name: fedora_pkg.clone(),
+                old_version: old_ver.clone(),
+                new_version: latest_upstream_version.to_string(),
+                release_url: release_url.to_string(),
+                timestamp_secs,
+            };
+
+            let topic = format!("org.fedoraproject.prod.hotness.update.{}", fedora_pkg);
+            let body = format!(
+                "{{\"project_id\": {}, \"package\": \"{}\", \"old_version\": \"{}\", \"version\": \"{}\", \"url\": \"{}\"}}",
+                anitya_project_id, fedora_pkg, old_ver, latest_upstream_version, release_url
+            );
+
+            self.messaging_engine
+                .publish_message(&topic, &body, timestamp_secs);
+            self.release_events.push(event.clone());
+
+            Ok(Some(event))
+        } else {
+            Ok(None)
+        }
+    }
+}
+
+impl Default for FedoraTheNewHotnessEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Planet Fedora Aggregator Engine
+// =========================================================================
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TahrirUserAvatar {
     pub user_id: String,
@@ -2768,14 +2857,13 @@ impl FedoraPlanetAggregationEngine {
         FedoraPlanetAggregationEngine { posts: Vec::new() }
     }
 
-    pub fn fetch_and_parse_feed(&mut self, author: &str, title: &str, url: &str, timestamp: u64) {
-        let post_id = format!("planet-{}", self.posts.len() + 1);
-        self.posts.push(FedoraPlanetPost {
-            post_id,
-            author_name: author.to_string(),
-            title: title.to_string(),
-            url: url.to_string(),
-            published_epoch: timestamp,
+    pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
+        self.registered_feeds
+            .retain(|f| f.fas_account != fas_account);
+        self.registered_feeds.push(PlanetUserFeed {
+            fas_account: fas_account.to_string(),
+            feed_url: feed_url.to_string(),
+            active: true,
         });
     }
 
@@ -3364,26 +3452,6 @@ impl FedoraToolbxContainerEngine {
                 "Toolbx container '{}' started using image '{}'",
                 c.name, c.image
             ))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn stop_toolbx(&mut self, name: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            c.running = false;
-            Ok(format!("Toolbx container '{}' stopped", c.name))
-        } else {
-            Err("Toolbx container not found")
-        }
-    }
-
-    pub fn run_command(&mut self, name: &str, command: &str) -> Result<String, &'static str> {
-        if let Some(c) = self.active_containers.get_mut(name) {
-            if !c.running {
-                c.running = true;
-            }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
         } else {
             Err("Toolbx container not found")
         }
@@ -3979,10 +4047,10 @@ mod tests {
         bodhi.submit_update("FEDORA-2023-A8F8");
 
         assert_eq!(
-            bodhi.update_statuses.get("FEDORA-2023-A8F8"),
-            Some(&BodhiUpdateStatus::Testing)
+            bodhi.get_update_status("FEDORA-2023-A8F8"),
+            Some(BodhiUpdateStatus::Testing)
         );
-        assert!(!bodhi.stable_gated.get("FEDORA-2023-A8F8").copied().unwrap_or(false));
+        assert!(!bodhi.is_promoted_to_stable("FEDORA-2023-A8F8"));
 
         // Increase karma
         let k1 = bodhi.submit_feedback("FEDORA-2023-A8F8", 1).unwrap();
@@ -3992,10 +4060,10 @@ mod tests {
         // Direct promotion
         bodhi.advance_testing_days("FEDORA-2023-A8F8", 3);
         bodhi.submit_feedback("FEDORA-2023-A8F8", 2).unwrap();
-        assert!(bodhi.stable_gated.get("FEDORA-2023-A8F8").copied().unwrap_or(false));
+        assert!(bodhi.is_promoted_to_stable("FEDORA-2023-A8F8"));
         assert_eq!(
-            bodhi.update_statuses.get("FEDORA-2023-A8F8"),
-            Some(&BodhiUpdateStatus::Stable)
+            bodhi.get_update_status("FEDORA-2023-A8F8"),
+            Some(BodhiUpdateStatus::Stable)
         );
 
         // Side-tag and security waiver testing
@@ -4006,7 +4074,7 @@ mod tests {
         assert!(bodhi
             .apply_security_karma_waiver("FEDORA-2023-SEC1")
             .is_ok());
-        assert!(bodhi.stable_gated.get("FEDORA-2023-SEC1").copied().unwrap_or(false));
+        assert!(bodhi.is_promoted_to_stable("FEDORA-2023-SEC1"));
     }
 
     #[test]
@@ -4909,8 +4977,18 @@ mod tests {
     #[test]
     fn test_fedora_ignition_engine() {
         let mut ignition = FedoraIgnitionEngine::new();
-        ignition.add_file("/etc/motd", "Welcome to Sovereign SigmaOS\n", 0o644);
-        ignition.add_user("sovereign", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."], &["wheel", "sudo"]);
+
+        ignition.add_file("/etc/hostname", "sigmaos-node-1", 0o644);
+        ignition.add_user(
+            "admin",
+            &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."],
+            &["wheel", "docker"],
+        );
+        ignition.add_systemd_unit(
+            "node-exporter.service",
+            true,
+            "[Unit]\nDescription=Node Exporter\n",
+        );
 
         assert_eq!(ignition.files.len(), 1);
         assert_eq!(ignition.users.len(), 1);
@@ -4951,18 +5029,26 @@ mod tests {
         assert!(mgr.resolve_shared_library_symbol("libc.so.6", "malloc"));
         assert!(!mgr.resolve_shared_library_symbol("libc.so.6", "nonexistent_symbol"));
 
-        assert!(toolbx.add_host_mount("fedora-toolbox-39", "/mnt/data"));
-        assert!(toolbx
+        let container = engine.create_toolbx(
+            "fedora-toolbox-39",
+            "registry.fedoraproject.org/fedora-toolbox:39",
+        );
+        assert_eq!(container.name, "fedora-toolbox-39");
+        assert!(container.host_mounts.contains(&"/home".to_string()));
+        assert!(!container.running);
+
+        assert!(engine.add_host_mount("fedora-toolbox-39", "/mnt/data"));
+        assert!(engine
             .active_containers
             .get("fedora-toolbox-39")
             .unwrap()
             .host_mounts
             .contains(&"/mnt/data".to_string()));
 
-        let start_res = toolbx.start_toolbx("fedora-toolbox-39").unwrap();
+        let start_res = engine.start_toolbx("fedora-toolbox-39").unwrap();
         assert!(start_res.contains("started using image"));
         assert!(
-            toolbx
+            engine
                 .active_containers
                 .get("fedora-toolbox-39")
                 .unwrap()
@@ -5145,11 +5231,16 @@ mod tests {
         assert!(sssd.is_tgt_valid());
     }
 
-    #[test]
-    fn test_fedora_pipewire_wireplumber_policy() {
-        let mut wireplumber = FedoraPipewireWireplumberPolicyGovernor::new();
-        wireplumber.register_audio_node(101, "alsa_output.pci-0000_00_1f.3.analog-stereo", "sink");
-        wireplumber.register_audio_node(201, "alsa_input.pci-0000_00_1f.3.analog-stereo", "source");
+        // New version release check -> event generated & fedmsg published
+        let event = hotness
+            .process_upstream_release_check(
+                1234,
+                "8.3.0",
+                "https://curl.se/release-8.3.0",
+                1700000100,
+            )
+            .unwrap()
+            .unwrap();
 
         assert!(wireplumber.set_default_node("sink", 101));
         assert_eq!(wireplumber.default_sink_node, Some(101));

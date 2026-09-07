@@ -2,9 +2,9 @@
 // Implements Alpine Linux's APK package manager
 // Inspired by Alpine's lightweight, security-focused package management
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// APK package
 #[derive(Debug, Clone)]
