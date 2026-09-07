@@ -138,7 +138,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
-            _ => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -236,9 +235,7 @@ impl SovereignUniversalDistroBridge {
                     supervisor == ServiceSupervisorType::Sysvinit
                 }
                 DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-                _ => true,
-            };
-        supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
+            }
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
@@ -265,10 +262,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
-            _ => format!("{}.pkg", input_pkg),
         }
     }
 
@@ -304,7 +299,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
-            _ => format!("{}.pkg", action),
         };
 
         Ok(format!(
@@ -522,72 +516,12 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "container" | "containers" => {
+            "containers" => {
                 let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
                 chroot_engine.enter_chroot()?;
                 Ok(format!(
                     "Dispatched container build sandbox '{}' (active: {}) under distro mode '{:?}'",
                     action, chroot_engine.is_active, self.mode
-                ))
-            }
-            "auth" => {
-                Ok(format!(
-                    "Dispatched PAM/SSSD authentication verification for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "boot" => {
-                Ok(format!(
-                    "Dispatched bootloader initramfs verification for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "virtualization" | "virt" => {
-                Ok(format!(
-                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "input" => {
-                Ok(format!(
-                    "Dispatched libinput event router for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "thermal" => {
-                Ok(format!(
-                    "Dispatched DTS digital thermal sensor monitoring for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "syscall" => {
-                Ok(format!(
-                    "Dispatched syscall filter policy verification for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "device" => {
-                Ok(format!(
-                    "Dispatched device udev/geom enumeration for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "crypto" => {
-                Ok(format!(
-                    "Dispatched PQC Dilithium/Kyber crypto operations for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "ai" => {
-                Ok(format!(
-                    "Dispatched AI model inference queue for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "monitoring" => {
-                Ok(format!(
-                    "Dispatched telemetry monitoring collector for '{}' under distro mode '{:?}'",
-                    action, self.mode
                 ))
             }
             "time" => {
@@ -625,6 +559,12 @@ impl SovereignUniversalDistroBridge {
                 Ok(format!(
                     "Dispatched EEVDF/BORE process scheduling for '{}' (timeslice: {}ns) under distro mode '{:?}'",
                     action, timeslice, self.mode
+                ))
+            }
+            "virt" => {
+                Ok(format!(
+                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
+                    action, self.mode
                 ))
             }
             "audit" => {

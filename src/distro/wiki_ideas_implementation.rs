@@ -6,7 +6,6 @@
 // eBPF-inspired lightweight syscall policy verifiers,
 // and FreeBSD Capsicum descriptor capability delegation.
 
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
