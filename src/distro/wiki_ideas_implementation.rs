@@ -6,11 +6,29 @@
 // eBPF-inspired lightweight syscall policy verifiers,
 // and FreeBSD Capsicum descriptor capability delegation.
 
+extern crate alloc;
+
+#[cfg(not(test))]
 use alloc::collections::BTreeMap;
+#[cfg(not(test))]
 use alloc::format;
+#[cfg(not(test))]
 use alloc::string::{String, ToString};
+#[cfg(not(test))]
 use alloc::vec;
+#[cfg(not(test))]
 use alloc::vec::Vec;
+
+#[cfg(test)]
+use std::collections::BTreeMap;
+#[cfg(test)]
+use std::format;
+#[cfg(test)]
+use std::string::{String, ToString};
+#[cfg(test)]
+use std::vec;
+#[cfg(test)]
+use std::vec::Vec;
 
 /// 1. NixOS-Style Declarative System Configuration & Generation Manager
 #[derive(Debug, Clone, PartialEq, Eq)]
