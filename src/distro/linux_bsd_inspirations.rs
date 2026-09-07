@@ -456,7 +456,7 @@ impl SovereignUniversalDistroBridge {
                     entry, self.mode
                 ))
             }
-            "container" => {
+            "container" | "containers" => {
                 let mut mgr = SovereignCrossDistroContainerManager::new(self.mode);
                 let container_id = mgr.spawn_isolated_container("app_container", action)?;
                 Ok(format!(
@@ -464,7 +464,7 @@ impl SovereignUniversalDistroBridge {
                     container_id, action, self.mode
                 ))
             }
-            "virtualization" => {
+            "virtualization" | "virt" => {
                 match self.mode {
                     DistroSubsystemMode::FreeBsd => Ok(format!(
                         "Dispatched FreeBSD bhyve microVM guest hypervisor for '{}' under distro mode '{:?}'",
@@ -542,136 +542,199 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
-            "desktop" | "ui" => {
-                Ok(format!(
-                    "Dispatched Zenith desktop environment GTK/Qt theme rendering for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
             "bluetooth" => {
                 Ok(format!(
-                    "Dispatched BlueZ / net80211 bluetooth adapter routing for '{}' under distro mode '{:?}'",
+                    "Dispatched BlueZ / BSD Netgraph Bluetooth stack binding for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
             "camera" => {
                 Ok(format!(
-                    "Dispatched V4L2 / GStreamer zero-copy camera video stream for '{}' under distro mode '{:?}'",
+                    "Dispatched OpenBSD uvideo(4) / V4L2 zero-copy video stream for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "sensor" => {
+            "cloud" => {
                 Ok(format!(
-                    "Dispatched IIO / devd sensor event telemetry routing for '{}' under distro mode '{:?}'",
+                    "Dispatched OpenStack / Cloud-init / Ignition provisioner for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "print" => {
+            "compliance" => {
                 Ok(format!(
-                    "Dispatched CUPS / BSD lpd print queue spooling for '{}' under distro mode '{:?}'",
+                    "Dispatched Debian DFSG / FSF RYF / CIS compliance audit for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "backup" | "compression" => {
+            "compression" => {
                 Ok(format!(
-                    "Dispatched Zstd/ZFS send-recv Timeshift/Snapper rollback for '{}' under distro mode '{:?}'",
+                    "Dispatched Zstd parallel / LZ4 fast initramfs compression for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "cloud" | "cluster" => {
+            "config" => {
                 Ok(format!(
-                    "Dispatched Kubernetes / Cilium eBPF CNI Ceph RBD cluster node for '{}' under distro mode '{:?}'",
+                    "Dispatched Nix/Guix declarative config & sysctl governor for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "orchestration" | "automation" => {
+            "diagnostics" => {
                 Ok(format!(
-                    "Dispatched Nix declarative / Ansible orchestration for '{}' under distro mode '{:?}'",
+                    "Dispatched systemd-analyze blame & DTrace diagnostic probe for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "developer" | "toolchain" => {
+            "event" => {
                 Ok(format!(
-                    "Dispatched Sbuild / Gentoo crossdev / Nix sandbox toolchain for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "compliance" | "governance" => {
-                Ok(format!(
-                    "Dispatched SPDX license compliance governance auditor for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "recovery" | "resilience" => {
-                Ok(format!(
-                    "Dispatched Kdump / FreeBSD savecore crashdump recovery for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "time" => {
-                Ok(format!(
-                    "Dispatched Chrony NTP / BSD microtime clock synchronization for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "shell" => {
-                Ok(format!(
-                    "Dispatched Sovereign shell completions / editline for '{}' under distro mode '{:?}'",
+                    "Dispatched kqueue / epoll unified event loop router for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
             "filesystem" => {
                 Ok(format!(
-                    "Dispatched Ext4 / Btrfs / OpenZFS / HAMMER2 filesystem dispatch for '{}' under distro mode '{:?}'",
+                    "Dispatched ZFS / HAMMER2 / CoW / bcachefs multi-tier FS operation for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "identity" => {
+            "i18n" => {
                 Ok(format!(
-                    "Dispatched OIDC / PAM / Kerberos identity federation for '{}' under distro mode '{:?}'",
+                    "Dispatched NCERT Indic / gettext multi-language locale engine for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "tracing" | "metrics" => {
+            "installer" => {
                 Ok(format!(
-                    "Dispatched bpftrace / DTrace USDT probe tracer for '{}' under distro mode '{:?}'",
+                    "Dispatched Anaconda Kickstart / Preseed / Archiso installer for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "iot" | "embedded" => {
+            "iot" => {
                 Ok(format!(
-                    "Dispatched Yocto / Buildroot / ROS2 robotics stack for '{}' under distro mode '{:?}'",
+                    "Dispatched CoAP IoT messaging & EdgeNet telemetry governor for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "accessibility" => {
+            "logging" => {
                 Ok(format!(
-                    "Dispatched AccessKit / AT-SPI2 screen reader accessibility for '{}' under distro mode '{:?}'",
+                    "Dispatched unified journald / syslog structured log stream for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "gaming" | "gamepad" => {
+            "performance" => {
                 Ok(format!(
-                    "Dispatched Proton / Vulkan DirectX gaming input layer for '{}' under distro mode '{:?}'",
+                    "Dispatched Ananicy-cpp auto-tuner & BORE scheduler tuner for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "fingerprint" | "smartcard" => {
+            "print" => {
                 Ok(format!(
-                    "Dispatched FIDO2 / PC-SC smartcard authentication for '{}' under distro mode '{:?}'",
+                    "Dispatched CUPS / LPD spooler print job manager for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "location" => {
+            "privacy" => {
                 Ok(format!(
-                    "Dispatched GeoClue / GPSD location provider for '{}' under distro mode '{:?}'",
+                    "Dispatched Tails amnesic RAM wipe & Tor isolation gateway for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "finance" => {
+            "recovery" => {
                 Ok(format!(
-                    "Dispatched ISO 20022 sovereign cryptographic wallet isolation for '{}' under distro mode '{:?}'",
+                    "Dispatched Snapper CoW snapshot rollback & Rescuezilla ISO for '{}' under distro mode '{:?}'",
                     action, self.mode
+                ))
+            }
+            "resource" => {
+                Ok(format!(
+                    "Dispatched FreeBSD racct/rctl & cgroups v2 slice governor for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "rt" => {
+                Ok(format!(
+                    "Dispatched Apache NuttX POSIX RT preemption-threshold governor for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "runtime" => {
+                Ok(format!(
+                    "Dispatched Wasmtime / eBPF / JVM runtime engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "shell" => {
+                Ok(format!(
+                    "Dispatched Sovereign Bash/Zsh parity shell & KRunner HUD for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "smartcard" => {
+                Ok(format!(
+                    "Dispatched PKCS#11 / PC/SC smartcard authentication gate for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "time" => {
+                Ok(format!(
+                    "Dispatched PTP / NTP chrony time synchronization governor for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "toolchain" => {
+                Ok(format!(
+                    "Dispatched Portage EAPI 8 / GCC / Clang / Rustc toolchain for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "ui" | "desktop" => {
+                Ok(format!(
+                    "Dispatched Zenith GTK / Quickshell / COSMIC / YaST UI manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "update" => {
+                Ok(format!(
+                    "Dispatched Fedora offline update / OSTree atomic deployment for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "robotics" => {
+                Ok(format!(
+                    "Dispatched ROS2 / CANbus autonomous robotics controller for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "sensor" => {
+                Ok(format!(
+                    "Dispatched IIO / hwmon industrial sensor telemetry driver for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "tpm" => {
+                Ok(format!(
+                    "Dispatched TPM 2.0 PCR attestation & sealing manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "tracing" => {
+                Ok(format!(
+                    "Dispatched DTrace USDT & eBPF raw tracepoint engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "workflow" => {
+                Ok(format!(
+                    "Dispatched systemd DAG / Runit process workflow orchestrator for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "process" => {
+                let pid = self
+                    .schedule_distro_task(202, action, 100)
+                    .ok_or("Scheduler task registration failed")?;
+                Ok(format!(
+                    "Dispatched process control manager task '{}' for PID {} under distro mode '{:?}'",
+                    action, pid, self.mode
                 ))
             }
             _ => Err("Unknown target subsystem"),
@@ -682,12 +745,13 @@ impl SovereignUniversalDistroBridge {
         let subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
             "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
+            "boot", "container", "containers", "virtualization", "virt", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "bluetooth", "camera", "sensor", "print", "backup",
-            "cloud", "orchestration", "developer", "compliance", "recovery", "time",
-            "shell", "filesystem", "identity", "tracing", "iot", "accessibility",
-            "gaming", "fingerprint", "location", "finance",
+            "bluetooth", "camera", "cloud", "compliance", "compression", "config",
+            "diagnostics", "event", "filesystem", "i18n", "installer", "iot",
+            "logging", "performance", "print", "privacy", "recovery", "resource",
+            "rt", "runtime", "shell", "smartcard", "time", "toolchain", "ui", "desktop",
+            "update", "robotics", "sensor", "tpm", "tracing", "workflow", "process",
         ];
 
         for sub in subsystems {
@@ -2015,12 +2079,13 @@ mod cross_subsystem_tests {
         let target_subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
             "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
+            "boot", "container", "containers", "virtualization", "virt", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "bluetooth", "camera", "sensor", "print", "backup",
-            "cloud", "orchestration", "developer", "compliance", "recovery", "time",
-            "shell", "filesystem", "identity", "tracing", "iot", "accessibility",
-            "gaming", "fingerprint", "location", "finance",
+            "bluetooth", "camera", "cloud", "compliance", "compression", "config",
+            "diagnostics", "event", "filesystem", "i18n", "installer", "iot",
+            "logging", "performance", "print", "privacy", "recovery", "resource",
+            "rt", "runtime", "shell", "smartcard", "time", "toolchain", "ui", "desktop",
+            "update", "robotics", "sensor", "tpm", "tracing", "workflow", "process",
         ];
 
         for m in modes {

@@ -25,6 +25,6 @@ jobs:
       - name: Run Network Discovery Security Tests
         run: |
           mkdir -p build
-          rustc --edition=2021 --test src/network/discovery.rs -o build/disc_test
+          mkdir -p build && rustc --edition=2021 --test src/network/discovery.rs -o build/disc_test
           ./build/disc_test
           rm -f build/disc_test

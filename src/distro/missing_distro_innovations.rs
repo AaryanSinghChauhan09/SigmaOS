@@ -1823,6 +1823,7 @@ pub struct AppArmorRuleProfile {
     pub rules: Vec<AppArmorPathRule>,
 }
 
+pub type AppArmorProfile = AppArmorRuleProfile;
 pub type AppArmorPathProfile = AppArmorRuleProfile;
 
 pub struct AppArmorPathRuleEngine {
