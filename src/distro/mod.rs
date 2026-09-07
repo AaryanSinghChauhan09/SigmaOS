@@ -63,6 +63,11 @@ pub use garuda_nomad_innovations::{
 };
 pub mod linux_ideas;
 pub mod manjaro;
+pub use manjaro::{
+    ManjaroBranch, ManjaroBranchManager, ManjaroTimeshiftAutoSnap, MhwdKernelDriverAutobuilder,
+    PackageSearchResult, PamacUnifiedSearchEngine, PrimeOffloadMode, SearchResultBackend,
+    SnapshotMode as ManjaroSnapshotMode, TimeshiftSnapshot,
+};
 pub mod missing_distro_innovations;
 pub mod nextgen;
 pub mod nixos_inspirations;
