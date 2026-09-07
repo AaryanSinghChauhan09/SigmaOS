@@ -63,3 +63,5 @@ pub use json::{SovereignJsonParser, SovereignJsonValue};
 pub use path::PathBuf;
 pub use string::SigmaString;
 pub use alloc::string::{String, ToString};
+pub mod error;
+pub mod math_ops;

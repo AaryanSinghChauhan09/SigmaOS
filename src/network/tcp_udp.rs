@@ -683,6 +683,12 @@ impl SimpleNetworkStack {
     }
 }
 
+impl Default for SimpleNetworkStack {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {

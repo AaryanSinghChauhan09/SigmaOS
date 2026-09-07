@@ -138,4 +138,10 @@ pub use linux_bsd_innovations::{
     CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock,
 };
-pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
+
+pub mod sigma_kthread;
+pub mod sigma_timer;
+pub mod sigma_workqueue;
+pub mod sigma_cgroup_v2;
+pub mod sigma_signal;
+pub mod kqueue;
