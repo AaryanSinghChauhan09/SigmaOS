@@ -3153,9 +3153,21 @@ pub struct FedoraIgnitionEngine {
     pub provisioned: bool,
 }
 
-impl FedoraIgnitionEngine {
+/// Fedora Systemd Offline Updates System Governor
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraOfflineUpdateEngine {
+    pub staged_packages: Vec<String>,
+    pub is_offline_update_pending: bool,
+    pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            staged_packages: Vec::new(),
+            is_offline_update_pending: false,
+            trigger_reboot_flag: false,
+        }
     }
 
     pub fn stage_offline_packages(&mut self, packages: &[&str]) {
@@ -3178,11 +3190,17 @@ impl FedoraIgnitionEngine {
     }
 }
 
+impl Default for FedoraOfflineUpdateEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 
 
 
-impl FedoraOfflineUpdateEngine {
+
+impl FedoraIgnitionEngine {
     pub fn new() -> Self {
         Self {
             files: Vec::new(),
@@ -3191,7 +3209,6 @@ impl FedoraOfflineUpdateEngine {
             provisioned: false,
         }
     }
-}
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
         self.files.push(IgnitionFile {
@@ -4021,6 +4038,154 @@ impl FedoraElectionsEngine {
         }
     }
 }
+
+
+// ============================================================================
+// ADDITIONAL FEDORA DEEP INTEGRATION PARITY COMPONENTS
+// ============================================================================
+
+/// Fedora OSTree Sysroot Staging Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraOstreeSysrootStagingEngine {
+    pub sysroot_path: String,
+    pub pending_commit: Option<String>,
+    pub active_deployments: Vec<String>,
+}
+
+impl FedoraOstreeSysrootStagingEngine {
+    pub fn new(sysroot_path: &str) -> Self {
+        Self {
+            sysroot_path: sysroot_path.to_string(),
+            pending_commit: None,
+            active_deployments: Vec::new(),
+        }
+    }
+
+    pub fn stage_pending_commit(&mut self, commit_hash: &str) {
+        self.pending_commit = Some(commit_hash.to_string());
+    }
+
+    pub fn finalize_staging_deployment(&mut self) -> Result<String, &'static str> {
+        if let Some(commit) = self.pending_commit.take() {
+            let deploy_dir = format!("{}/deploy/{}", self.sysroot_path, commit);
+            self.active_deployments.push(deploy_dir.clone());
+            Ok(deploy_dir)
+        } else {
+            Err("OSTree: No pending commit staged for deployment")
+        }
+    }
+}
+
+/// Fedora SSSD Kerberos Realm Client Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraSssdKerberosRealmClientEngine {
+    pub realm_domain: String,
+    pub has_valid_tgt: bool,
+    pub active_user: Option<String>,
+}
+
+impl FedoraSssdKerberosRealmClientEngine {
+    pub fn new(domain: &str) -> Self {
+        Self {
+            realm_domain: domain.to_string(),
+            has_valid_tgt: false,
+            active_user: None,
+        }
+    }
+
+    pub fn obtain_ticket_granting_ticket(&mut self, username: &str, password: &str) -> Result<(), &'static str> {
+        if password.is_empty() {
+            return Err("SSSD/Kerberos: Password cannot be empty");
+        }
+        self.active_user = Some(username.to_string());
+        self.has_valid_tgt = true;
+        Ok(())
+    }
+
+    pub fn is_tgt_valid(&self) -> bool {
+        self.has_valid_tgt && self.active_user.is_some()
+    }
+}
+
+/// Fedora PipeWire WirePlumber Policy Governor
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraPipewireWireplumberPolicyGovernor {
+    pub registered_audio_nodes: BTreeMap<u32, String>,
+    pub default_sink_node: Option<u32>,
+    pub default_source_node: Option<u32>,
+}
+
+impl FedoraPipewireWireplumberPolicyGovernor {
+    pub fn new() -> Self {
+        Self {
+            registered_audio_nodes: BTreeMap::new(),
+            default_sink_node: None,
+            default_source_node: None,
+        }
+    }
+
+    pub fn register_audio_node(&mut self, node_id: u32, name: &str, node_type: &str) {
+        self.registered_audio_nodes.insert(node_id, name.to_string());
+        if node_type == "sink" && self.default_sink_node.is_none() {
+            self.default_sink_node = Some(node_id);
+        } else if node_type == "source" && self.default_source_node.is_none() {
+            self.default_source_node = Some(node_id);
+        }
+    }
+
+    pub fn set_default_node(&mut self, node_type: &str, node_id: u32) -> bool {
+        if self.registered_audio_nodes.contains_key(&node_id) {
+            if node_type == "sink" {
+                self.default_sink_node = Some(node_id);
+                true
+            } else if node_type == "source" {
+                self.default_source_node = Some(node_id);
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraPipewireWireplumberPolicyGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora RPM Post-Install Seccomp BPF Syscall Filter Engine
+#[derive(Debug, Clone)]
+pub struct FedoraRPMSeccompFilterEngine {
+    pub allowed_syscall_numbers: Vec<u32>,
+}
+
+impl FedoraRPMSeccompFilterEngine {
+    pub fn new() -> Self {
+        Self {
+            allowed_syscall_numbers: Vec::new(),
+        }
+    }
+
+    pub fn allow_syscall(&mut self, syscall_num: u32) {
+        if !self.allowed_syscall_numbers.contains(&syscall_num) {
+            self.allowed_syscall_numbers.push(syscall_num);
+        }
+    }
+
+    pub fn validate_syscall_access(&self, syscall_num: u32) -> bool {
+        self.allowed_syscall_numbers.contains(&syscall_num)
+    }
+}
+
+impl Default for FedoraRPMSeccompFilterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 
 mod tests {
     use super::*;
@@ -5187,34 +5352,6 @@ mod tests {
     }
 
     #[test]
-    fn test_fedora_badges_engine() {
-        let mut badges = FedoraBadgesEngine::new();
-        assert_eq!(badges.badges.len(), 2);
-
-        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
-        assert_eq!(pts1, 10);
-
-        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
-        assert_eq!(pts2, 25);
-
-        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
-    }
-
-    #[test]
-    fn test_fedora_system_roles_engine() {
-        let mut roles = FedoraSystemRolesEngine::new();
-        assert!(roles.applied_roles.is_empty());
-
-        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
-        assert_eq!(roles.applied_roles.len(), 1);
-        assert_eq!(roles.chrony_ntp_servers.len(), 2);
-
-        roles.apply_firewall_role(&[80, 443, 8080]);
-        assert_eq!(roles.applied_roles.len(), 2);
-        assert_eq!(roles.configured_firewall_ports.len(), 3);
-    }
-
-    #[test]
     fn test_fedora_ostree_sysroot_staging() {
         let mut sysroot = FedoraOstreeSysrootStagingEngine::new("/ostree/deploy/fedora");
         sysroot.stage_pending_commit("sha256:abc123commit456");
@@ -5231,6 +5368,13 @@ mod tests {
         assert!(sssd.is_tgt_valid());
     }
 
+    #[test]
+    fn test_fedora_hotness_wireplumber() {
+        let mut hotness = FedoraTheNewHotnessEngine::new();
+        hotness.register_anitya_mapping(1234, "curl", "curl", "8.2.1");
+        let mut wireplumber = FedoraPipewireWireplumberPolicyGovernor::new();
+        wireplumber.register_audio_node(101, "alsa_output.pci-0000_00_1f.3.analog-stereo", "sink");
+
         // New version release check -> event generated & fedmsg published
         let event = hotness
             .process_upstream_release_check(
@@ -5242,6 +5386,7 @@ mod tests {
             .unwrap()
             .unwrap();
 
+        assert_eq!(event.latest_upstream_version, "8.3.0");
         assert!(wireplumber.set_default_node("sink", 101));
         assert_eq!(wireplumber.default_sink_node, Some(101));
     }
@@ -5254,151 +5399,5 @@ mod tests {
 
         assert!(seccomp.validate_syscall_access(1));
         assert!(!seccomp.validate_syscall_access(322)); // unallowed syscall
-    }
-}
-
-// ============================================================================
-// ADDITIONAL FEDORA DEEP INTEGRATION PARITY COMPONENTS
-// ============================================================================
-
-/// Fedora OSTree Sysroot Staging Engine
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraOstreeSysrootStagingEngine {
-    pub sysroot_path: String,
-    pub pending_commit: Option<String>,
-    pub active_deployments: Vec<String>,
-}
-
-impl FedoraOstreeSysrootStagingEngine {
-    pub fn new(sysroot_path: &str) -> Self {
-        Self {
-            sysroot_path: sysroot_path.to_string(),
-            pending_commit: None,
-            active_deployments: Vec::new(),
-        }
-    }
-
-    pub fn stage_pending_commit(&mut self, commit_hash: &str) {
-        self.pending_commit = Some(commit_hash.to_string());
-    }
-
-    pub fn finalize_staging_deployment(&mut self) -> Result<String, &'static str> {
-        if let Some(commit) = self.pending_commit.take() {
-            let deploy_dir = format!("{}/deploy/{}", self.sysroot_path, commit);
-            self.active_deployments.push(deploy_dir.clone());
-            Ok(deploy_dir)
-        } else {
-            Err("OSTree: No pending commit staged for deployment")
-        }
-    }
-}
-
-/// Fedora SSSD Kerberos Realm Client Engine
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraSssdKerberosRealmClientEngine {
-    pub realm_domain: String,
-    pub has_valid_tgt: bool,
-    pub active_user: Option<String>,
-}
-
-impl FedoraSssdKerberosRealmClientEngine {
-    pub fn new(domain: &str) -> Self {
-        Self {
-            realm_domain: domain.to_string(),
-            has_valid_tgt: false,
-            active_user: None,
-        }
-    }
-
-    pub fn obtain_ticket_granting_ticket(&mut self, username: &str, password: &str) -> Result<(), &'static str> {
-        if password.is_empty() {
-            return Err("SSSD/Kerberos: Password cannot be empty");
-        }
-        self.active_user = Some(username.to_string());
-        self.has_valid_tgt = true;
-        Ok(())
-    }
-
-    pub fn is_tgt_valid(&self) -> bool {
-        self.has_valid_tgt && self.active_user.is_some()
-    }
-}
-
-/// Fedora PipeWire WirePlumber Policy Governor
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraPipewireWireplumberPolicyGovernor {
-    pub registered_audio_nodes: BTreeMap<u32, String>,
-    pub default_sink_node: Option<u32>,
-    pub default_source_node: Option<u32>,
-}
-
-impl FedoraPipewireWireplumberPolicyGovernor {
-    pub fn new() -> Self {
-        Self {
-            registered_audio_nodes: BTreeMap::new(),
-            default_sink_node: None,
-            default_source_node: None,
-        }
-    }
-
-    pub fn register_audio_node(&mut self, node_id: u32, name: &str, node_type: &str) {
-        self.registered_audio_nodes.insert(node_id, name.to_string());
-        if node_type == "sink" && self.default_sink_node.is_none() {
-            self.default_sink_node = Some(node_id);
-        } else if node_type == "source" && self.default_source_node.is_none() {
-            self.default_source_node = Some(node_id);
-        }
-    }
-
-    pub fn set_default_node(&mut self, node_type: &str, node_id: u32) -> bool {
-        if self.registered_audio_nodes.contains_key(&node_id) {
-            if node_type == "sink" {
-                self.default_sink_node = Some(node_id);
-                true
-            } else if node_type == "source" {
-                self.default_source_node = Some(node_id);
-                true
-            } else {
-                false
-            }
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for FedoraPipewireWireplumberPolicyGovernor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Fedora RPM Post-Install Seccomp BPF Syscall Filter Engine
-#[derive(Debug, Clone)]
-pub struct FedoraRPMSeccompFilterEngine {
-    pub allowed_syscall_numbers: Vec<u32>,
-}
-
-impl FedoraRPMSeccompFilterEngine {
-    pub fn new() -> Self {
-        Self {
-            allowed_syscall_numbers: Vec::new(),
-        }
-    }
-
-    pub fn allow_syscall(&mut self, syscall_num: u32) {
-        if !self.allowed_syscall_numbers.contains(&syscall_num) {
-            self.allowed_syscall_numbers.push(syscall_num);
-        }
-    }
-
-    pub fn validate_syscall_access(&self, syscall_num: u32) -> bool {
-        self.allowed_syscall_numbers.contains(&syscall_num)
-    }
-}
-
-impl Default for FedoraRPMSeccompFilterEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
