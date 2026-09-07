@@ -180,8 +180,11 @@ pub use mate_betsy::{
     MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
 };
 pub use mint_linux::{
-    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
-    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+    CinnamonPreset, CinnamonThemeEngine, Mint4WinInstallationConfig, Mint4WinInstallerEngine,
+    MintAppMetadata, MintBackupTool, MintCinnamonStyling, MintDriverInfo, MintDriverManager,
+    MintReportAlert, MintReportAlertSeverity, MintReportSystem, MintSoftwareManager,
+    MintTimeshiftEngine, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+    TimeshiftSystemRestorer,
 };
 pub use legacy_adapters::{
     KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
