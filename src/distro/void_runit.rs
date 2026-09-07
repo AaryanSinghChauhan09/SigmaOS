@@ -5,8 +5,6 @@
  * health checking, and automatic restart policy governance.
  */
 
-#![cfg_attr(not(test), no_std)]
-
 #[cfg(not(test))]
 extern crate alloc;
 
