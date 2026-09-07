@@ -16,10 +16,26 @@ pub mod compat_layers;
 pub mod compliance;
 pub mod debian_parity;
 pub mod developer;
+pub mod distro_inspiration_engine;
+pub use distro_inspiration_engine::{
+    AlpineLbuApkOverlayEngine, ApkovlCommit, ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine,
+    DragonFlyHammer2ClusterEngine, FreeBsdZfsArcGeomEngine, GenerationRecord, Hammer2DedupEntry,
+    IsaLevel, MuslLightweightInitEngine, MuslStaticService,
+    NixOsDeclarativeStateReconciliationEngine, NixOsPureStoreDerivationEngine,
+    OpenBsdStatefulPacketFilterEngine, OpenWrtUciSqmRouterEngine, PaxSecurityLevel, PfProtocol,
+    PfStateEntry, PortageUseFlag, PortageUseFlagGovernor, QubeDomainType,
+    QubesHardenedBsdSecurityGuard, RunitStage, ServiceRunState, SqmAlgorithm, StoreDerivationPath,
+    UciSection, UseFlagState, VoidRunitStageController,
+};
 pub mod ecosystem_dimensions;
 pub mod endeavour_os;
 pub mod enterprise;
 pub mod fedora_parity;
+pub use fedora_parity::{
+    BodhiUpdateRecord, BodhiUpdateStatus, FedoraBodhiUpdateEngine, FedoraIgnitionProvisionEngine,
+    FedoraKojiDistGitBuilder, FedoraRpmOstreeEngine, IgnitionFile, IgnitionUnit, KojiBuildTask,
+    OstreeDeploymentPin, TargetArchitecture as FedoraTargetArchitecture,
+};
 pub mod garuda_nomad_innovations;
 pub mod gentoo;
 pub mod gentoo_inspirations;
@@ -47,6 +63,14 @@ pub use garuda_nomad_innovations::{
 };
 pub mod linux_ideas;
 pub mod manjaro;
+pub use manjaro::{
+    DesktopLayoutPreset, HardwareQuirkRule, ManjaroBranch, ManjaroBranchManager,
+    ManjaroHelloSetupEngine, ManjaroTimeshiftAutoSnap, MhwdHardwareQuirkDatabase,
+    MhwdKernelDriverAutobuilder, PackageSearchResult, PamacTransactionEntry,
+    PamacTransactionJournalEngine, PamacUnifiedSearchEngine, PrimeOffloadMode,
+    SearchResultBackend, SetupWizardTask, SnapshotMode as ManjaroSnapshotMode, TimeshiftSnapshot,
+    TransactionType as PamacTransactionType, VendorHardwareType,
+};
 pub mod missing_distro_innovations;
 pub mod nextgen;
 pub mod nixos_inspirations;
