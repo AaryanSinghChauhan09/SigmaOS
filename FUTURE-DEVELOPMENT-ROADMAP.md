@@ -2854,6 +2854,33 @@ To defeat traditional Linux distributions and establish SigmaOS as the premier s
 ### 93.3 Strategic Outcome by 2028
 By Q4 2028, SigmaOS positions itself as the **world's first sovereign operating system**: modular, cluster-native, firmware-free, and declarative — offering clarity, resilience, and uncompromised performance where legacy Linux distros remain fragmented.
 
+---
+
+## 94. SOVEREIGN C++ REDUCTION & RUST-FIRST MIGRATION ARCHITECTURE SPECIFICATION
+
+To ensure absolute memory safety, eliminate non-deterministic exception handling runtime overheads, and establish a pure zero-dependency microkernel, SigmaOS executes a systematic C++ reduction and Rust-first migration architecture.
+
+### 94.1 Strategic Rationale for C++ Reduction
+1. **Elimination of Hidden C++ Runtimes**: Traditional bare-metal C++ relies on RTTI structures and C++ exception unwinding libraries (`libgcc_s` / `libstdc++`), introducing binary bloat and unpredictable latency spikes during fault conditions.
+2. **Compiler-Guaranteed Memory Safety**: Transitioning legacy C++ drivers and kernel daemons to Rust eliminates spatial/temporal memory vulnerabilities (use-after-free, buffer overflows, data races) at compile time via the Rust borrow checker.
+3. **Unified Codebase Architecture**: Consolidating microkernel drivers, VFS operations, IPC delivery, and userland tools into `#![no_std]` Rust modules eliminates header synchronization drift between `.hpp` files and Rust traits.
+
+### 94.2 Subsystem Migration Roadmap
+* **Kernel Driver Management (`kernel/drivers/sigma_driver_manager.cpp`)**: Replaced by pure `#![no_std]` Rust driver lifecycle managers (`src/driver/framework.rs`, `src/drivers/sovereign_driver_lifecycle.rs`).
+* **Atomic IPC & VFS Resolvers (`sigmaos/core/src/atomic_ipc_deliver.cpp`, `atomic_vfs_resolve.cpp`)**: Replaced by lock-free Rust IPC channels (`src/kernel/ipc.rs`) and zero-copy VFS page cache managers (`src/filesystem/support.rs`).
+* **Post-Quantum Cryptographic Verification (`sigmaos/core/src/atomic_pqc_verify.cpp`)**: Replaced by pure Rust Kyber-1024 / Dilithium-5 verification modules (`src/security/pki.rs`, `src/open_source_obsoletion.rs`).
+* **Userland Init & Daemons (`userland/init/sigma_init.cpp`, `userland/daemons/`)**: Replaced by `#![no_std]` Rust init supervisors (`src/userland/init.rs`, `src/init/sigmainit.rs`).
+* **Zenith Compositor (`userland/gui/zenith_compositor.cpp`)**: Replaced by direct framebuffer Rust graphics engines (`src/graphics/compositor.rs`).
+
+### 94.3 Transitional C-ABI Interoperability (`extern "C"`)
+* Exported Rust kernel APIs use `#[no_mangle] pub extern "C" fn` entry points with explicit, C-compatible scalar types (`u32`, `u64`, `usize`, `*mut c_void`, `*const u8`).
+* Legacy C++ callers interact strictly via C FFI shims during incremental migration stages.
+
+### 94.4 Phased C++ Deprecation Protocol
+1. **Phase 1 (Strict Policy Enforcement)**: Zero new C++ source files (`.cpp`/`.hpp`) permitted. All new subsystems MUST be written in Rust.
+2. **Phase 2 (Subsystem Component Swap)**: Replace legacy C++ kernel drivers and userland daemons with pure Rust equivalents and update `CMakeLists.txt`.
+3. **Phase 3 (Full C++ Elimination)**: Remove legacy C++ toolchain requirements (`g++`/`clang++`) from the build environment, achieving a 100% pure Rust sovereign microkernel.
+
 ## 🛠️ SECTION 45: SOVEREIGN ALL-SPECTRUM OPEN-SOURCE OPERATING SYSTEM VICTORY & TOTAL ECOSYSTEM OBSOLESCENCE MASTER SPECIFICATION
 
 ### 45.1 All-Spectrum Open-Source OS Inspiration, Absorption & Obsolescence Mechanics

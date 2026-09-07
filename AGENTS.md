@@ -38,6 +38,8 @@ These instructions provide actionable guidance, testing procedures, and architec
    * For Kyber/BFQ/mq-deadline I/O schedulers, NVMe SQ/CQ multi-queue ring buffers, AHCI SATA PRDT tables, and TRIM/Deallocate discard commands, follow [docs/AGENTS_DISK_OPERATION_MANAGEMENT.md](docs/AGENTS_DISK_OPERATION_MANAGEMENT.md).
 14. **Zombie Process Harvesting & Orphan Adoption:**
    * For POSIX `waitpid()` collection (`WNOHANG`), Init PID 1 orphan reaper loops, two-stage resource reclamation, and PCB table leak prevention, follow [docs/AGENTS_ZOMBIE_SYSTEMS_OPERATION_MANAGEMENT.md](docs/AGENTS_ZOMBIE_SYSTEMS_OPERATION_MANAGEMENT.md).
+15. **Reducing C++ Dependency & Rust-First Migration:**
+   * For migrating legacy C++ sources (`.cpp`/`.hpp`) to zero-dependency `#![no_std]` Rust modules and C-ABI FFI shims (`extern "C"`), follow [docs/AGENTS_REDUCING_CPP_DEPENDENCY.md](docs/AGENTS_REDUCING_CPP_DEPENDENCY.md).
 
 ---
 
