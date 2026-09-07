@@ -144,8 +144,9 @@ impl RunitSupervisor {
 
         // Start all services respecting dependencies
         let mut started = Vec::new();
+        let service_names: Vec<String> = self.services.keys().cloned().collect();
 
-        for (name, _service) in self.services.clone() {
+        for name in service_names {
             if self.can_start_service(&name, &started) {
                 if let Some(s) = self.services.get_mut(&name) {
                     s.start();
@@ -163,8 +164,9 @@ impl RunitSupervisor {
 
         // Stop all services in reverse dependency order
         let mut stopped = Vec::new();
+        let service_names: Vec<String> = self.services.keys().cloned().collect();
 
-        for (name, _service) in self.services.clone() {
+        for name in service_names {
             if self.can_stop_service(&name, &stopped) {
                 if let Some(s) = self.services.get_mut(&name) {
                     s.stop();
@@ -236,7 +238,7 @@ impl Default for RunitSupervisor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
