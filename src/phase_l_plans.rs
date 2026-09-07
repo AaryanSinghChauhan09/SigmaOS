@@ -389,7 +389,8 @@ pub mod zenithnet {
 // ============================================================================
 
 pub mod roadmap_innovations {
-    use alloc::vec::Vec;
+    extern crate alloc;
+use alloc::vec::Vec;
     use alloc::string::String;
     use alloc::string::ToString;
     use alloc::collections::BTreeSet;

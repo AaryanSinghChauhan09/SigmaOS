@@ -19,8 +19,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Netfilter — stateless and stateful packet filtering
 /// Absorbs Linux netfilter hooks: PREROUTING, INPUT, FORWARD, OUTPUT, POSTROUTING
 /// Supports: ACCEPT, DROP, REJECT, LOG actions; conntrack state matching
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
+extern crate alloc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NfHookpoint {

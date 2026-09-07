@@ -16,7 +16,7 @@ use std::format;
 use std::collections::{HashMap, HashSet};
 
 
-use crate::accessibility::{
+use crate::accessibility::framework::{
     AccessibilityFeature, AccessibilityFramework,
     AccessibilitySetting,
 };

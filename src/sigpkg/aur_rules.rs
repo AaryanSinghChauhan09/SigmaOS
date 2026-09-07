@@ -12,6 +12,7 @@
 // Native Rust implementation of Arch Linux AUR security linting (namcap parity) & makepkg pipeline
 
 
+extern crate alloc;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;

@@ -11,6 +11,7 @@
 // Implements NixOS/Guix-style declarative package management and functional store
 // Inspired by NixOS's declarative generations and Guix's functional package management
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;

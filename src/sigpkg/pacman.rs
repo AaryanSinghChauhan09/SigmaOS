@@ -11,6 +11,7 @@
 #[cfg(test_disabled)]
 extern crate std;
 
+extern crate alloc;
 use alloc::vec::Vec;
 /// Arch Linux-inspired rolling release build engine (makepkg) and package manager (pacman) for SigmaOS.
 /// Provides PKGBUILD parsing, source compilation simulation, and rolling release dependency installations.

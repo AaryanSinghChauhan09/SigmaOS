@@ -16,6 +16,7 @@ use std::vec;
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::collections::HashMap;
 #[cfg(feature = "standalone_test")]
+extern crate alloc;
 use alloc::collections::BTreeMap as HashMap;
 
 use std::string::{String, ToString};

@@ -11,6 +11,7 @@
 // Enhanced SELinux-inspired security with policy management and MLS support
 // Inspired by Fedora's advanced SELinux features
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;

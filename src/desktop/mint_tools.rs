@@ -11,6 +11,7 @@
 // Implements Linux Mint-style desktop utilities for SigmaOS
 // Inspired by Linux Mint's user-friendly system tools
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;

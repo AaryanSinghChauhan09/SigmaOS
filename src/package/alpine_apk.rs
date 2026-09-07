@@ -11,6 +11,7 @@
 // Implements Alpine Linux's APK package manager
 // Inspired by Alpine's lightweight, security-focused package management
 
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;

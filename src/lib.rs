@@ -23,7 +23,6 @@ pub mod dashboard;
 pub mod desktop;
 pub mod device;
 pub mod driver;
-pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
 pub mod kernel;
@@ -369,7 +368,6 @@ pub use tools::{
     UserIdentity as LibUserIdentity,
 };
 
-pub mod open_source_obsoletion;
 pub use open_source_obsoletion::*;
 
 pub use unimplemented_features::*;

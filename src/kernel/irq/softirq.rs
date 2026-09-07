@@ -97,7 +97,8 @@ impl Default for SoftirqEngine {
 mod tests {
     use super::*;
     use core::sync::atomic::{AtomicUsize, Ordering};
-    use alloc::sync::Arc;
+    extern crate alloc;
+use alloc::sync::Arc;
 
     static CALLED_COUNT: AtomicUsize = AtomicUsize::new(0);
 

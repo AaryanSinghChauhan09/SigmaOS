@@ -256,7 +256,7 @@ pub use chakra::{
     TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
 };
 pub use legacy_adapters::{
-    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, GraphicsBridge,
+    APITimelineManager, DiscontinuedFS, DriverBridge, GraphicsBridge,
     KernelPersona, KernelPersonaVM, LegacyBus, LegacyPluginManager, LibcVersion, NetworkBridge,
     StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM,
     GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,

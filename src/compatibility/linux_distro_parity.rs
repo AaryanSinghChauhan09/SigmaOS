@@ -16,6 +16,7 @@
 
 #[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
+extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
 #[cfg(test)]

@@ -12,7 +12,7 @@
 // Inspired by Debian's APT for advanced package operations
 
 use crate::klib::collections::HashSet;
-use alloc::collections::BTreeMap;
+extern crate alloc;
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::string::String;
 use alloc::vec::Vec;
