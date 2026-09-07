@@ -37,6 +37,7 @@
 - **AI Agent Data Operation Management Guide:** [[AI_AGENT_DATA_OPERATION_MANAGEMENT]] - Content-Addressed Storage DAG nodes, PQC data signing, transactional journaling, and Soft Updates for AI agents.
 - **AI Agent Zones Operation Management Guide:** [[AI_AGENT_ZONES_OPERATION_MANAGEMENT]] - Solaris container zones, VNIC networking, FreeBSD VM zones, and thermal power zones for AI agents.
 - **AI Agent C Language Elimination Guide:** [[AI_AGENT_C_LANGUAGE_ELIMINATION]] - C dependency reduction, malloc/free replacement, RAII memory safety, and pure Rust driver frameworks for AI agents.
+- **Master Linux & BSD Distro Strategic Roadmap:** [[MASTER_LINUX_BSD_GAP_CLOSURE_STRATEGIC_PLAN]] - Master strategic plan, gap closure roadmap, 2026-2029+ timeline, and strategy to surpass Linux distros.
 - **AI Agent Universal Package Management Guide:** [[AI_AGENT_UNIVERSAL_PACKAGE_MANAGEMENT]] - Foreign package adapters (.deb, .rpm, PKGBUILD, ebuild, apk, hpkg), dependency canonicalization, and Universal PM for AI agents.
 - **AI Agent GitHub Workflows Management Guide:** [[AI_AGENT_GITHUB_WORKFLOWS_MANAGEMENT]] - CI/CD, multi-distro matrix, reproducible SBOMs, Cosign signing, and Pages auto-deploy workflows for AI agents.
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
