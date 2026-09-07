@@ -1856,8 +1856,9 @@ mod advanced_shell_tests {
             "git commit -m 'Initial commit'"
         );
     }
-
-
+    #[test]
+    fn test_repl_editor_integration() {
+        let mut repl = SovereignSigmaShRepl::new();
         let line = "git checkout main";
         let highlighted = repl.line_editor.highlight_line(line);
         assert!(highlighted.contains("\x1B[32mgit\x1B[0m"));
