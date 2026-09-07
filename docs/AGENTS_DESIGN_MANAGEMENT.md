@@ -4,35 +4,32 @@ This document provides specifications and guidelines for AI agents working on de
 
 ---
 
-## 1. UI/UX & Zenith Desktop Architecture
+## 1. Primary Strategy: Reducing Dependency on External CSS
 
-SigmaOS features the **Zenith Desktop Environment**, driven by lightweight, sovereign web and native rendering engines:
+SigmaOS prioritizes **native Rust UI toolkit widgets and compiled programmatic style engines** (`src/ui/gtk_toolkit.rs`, `src/ui/gtk.rs`) over reliance on raw, external CSS stylesheets.
 
-- **Desktop Shell**: `zenith_desktop/` (`index.html`, `zenith_desktop.css`, `dashboard/`)
-- **Control Center / Settings**: Integrated with `DeepinDdeControlCenterEngine` and `Yast2ModulePlug`.
-- **Dynamic Theming**: Live theme switching supported via `OmarchySystemThemeStudio` (`src/distro/omarchy_inspiration.rs`).
-- **Compositing**: Wayland/DRM atomic modesetting (`DrmModeInfo`) and `SteamOsGamescopeCompositorEngine` (FSR upscaling & FPS limiting).
+- **Native Programmatic UI Toolkits**: Use `SovereignGtkToolkit`, `GtkSignalDispatcher`, and `GtkCssProvider` in `src/ui/gtk_toolkit.rs` to construct UI hierarchies (`GtkHeaderBar`, `AdwActionRow`, `AdwPreferencesGroup`, `AdwPreferencesPage`, `GtkBox`, `GtkButton`).
+- **Native Desktop Shell & Dock**: `SovereignSystemStatusPanel` and `SovereignDockBar` handle top-bar applets and desktop dock items programmatically rather than depending on web-based CSS styling rules.
+- **Dynamic Native Theme Engine**: System themes and accent color switches are managed via `OmarchySystemThemeStudio` (`src/distro/omarchy_inspiration.rs`) and `ThemeEngine` (`src/customization/theme.rs`).
+- **Legacy CSS Minimization**: External CSS (`zenith_desktop.css`, `web_ui/styles/style.css`) is kept strictly to a minimum for legacy web shell rendering, with new UI components built natively in Rust.
 
 ---
 
-## 2. CSS & Design Tokens Conventions
+## 2. Native Style Tokens & Widget Conventions
 
-1. **CSS Variables & Color Palettes**:
-   - Primary theme tokens defined in `zenith_desktop.css`:
-     - `--bg-primary`, `--bg-secondary`, `--accent-color`, `--text-primary`, `--border-color`.
-   - Maintain high contrast ratios (WCAG 2.1 AA compliant) for readability across dark and light modes.
+1. **Native Color Palettes & Tokens**:
+   - Use `SovereignCssColorEngine` (`src/customization/theme.rs`) for native hex color parsing and RGBA conversion.
+   - Maintain high contrast ratios (WCAG 2.1 Level AA compliant) across light and dark theme modes (`AdwColorScheme`).
 
-2. **Typography & Layout**:
-   - Use system sans-serif fonts with fallback stacks (`Inter`, `system-ui`, `-apple-system`, `sans-serif`).
-   - Use CSS Grid and Flexbox for responsive desktop layouts across varying display resolutions.
+2. **Programmatic Layouts**:
+   - Prefer native container layouts (`GtkBox`, `GtkHeaderBar`, `AdwPreferencesGroup`) with explicit orientation (`GtkOrientation::Horizontal`, `GtkOrientation::Vertical`) over external CSS Grid/Flexbox stylesheets.
 
 ---
 
 ## 3. Accessibility & Visual Verification Protocols
 
 1. **Accessibility (a11y) Standards**:
-   - Ensure all interactive elements include proper ARIA attributes (`aria-label`, `role`, `tabindex`).
-   - Support keyboard navigation (`Tab`, `Enter`, `Escape`, arrow keys) for all desktop widgets and windows.
+   - Ensure all interactive native widgets support keyboard focus (`focus-visible`) and signal emission (`g_signal_emit`).
    - Run accessibility test scripts when present (`./scripts/uiux_accessibility_test.sh`).
 
 2. **Frontend Visual Verification Workflow**:
@@ -44,6 +41,9 @@ SigmaOS features the **Zenith Desktop Environment**, driven by lightweight, sove
 ## 4. Testing & Verification Commands
 
 ```bash
+# Run atomic Rust UI toolkit unit tests
+rustc --test --edition=2021 src/ui/gtk_toolkit.rs -o build/test_gtk_toolkit && ./build/test_gtk_toolkit
+
 # Run UI/UX accessibility test script if present
 ./scripts/uiux_accessibility_test.sh
 
