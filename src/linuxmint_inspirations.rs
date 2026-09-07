@@ -1605,7 +1605,7 @@ impl XAppTextEditor {
 }
 
 // =========================================================================
-// Unit tests (verified via the integration harness; the `#[cfg(test_disabled)]` module
+// Unit tests (verified via the integration harness; the `#[cfg(test)]` module
 // is kept in parity with sibling files).
 // =========================================================================
 
