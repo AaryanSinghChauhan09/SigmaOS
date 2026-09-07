@@ -1464,6 +1464,93 @@ pub struct SovereignLandlockLsm {
     pub is_enforced: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LandlockNetAccess {
+    TcpBind,
+    TcpConnect,
+}
+
+#[derive(Debug, Clone)]
+pub struct LandlockNetPortRule {
+    pub port: u16,
+    pub access: LandlockNetAccess,
+}
+
+pub struct LandlockV5NetworkGuard {
+    pub net_rules: Vec<LandlockNetPortRule>,
+    pub is_enforced: bool,
+}
+
+impl LandlockV5NetworkGuard {
+    pub fn new() -> Self {
+        Self {
+            net_rules: Vec::new(),
+            is_enforced: false,
+        }
+    }
+
+    pub fn add_net_port_rule(&mut self, port: u16, access: LandlockNetAccess) -> Result<(), &'static str> {
+        if self.is_enforced {
+            return Err("Landlock v5 Network Ruleset is already enforced");
+        }
+        self.net_rules.push(LandlockNetPortRule { port, access });
+        Ok(())
+    }
+
+    pub fn restrict_network(&mut self) {
+        self.is_enforced = true;
+    }
+
+    pub fn check_net_access(&self, port: u16, access: LandlockNetAccess) -> bool {
+        if !self.is_enforced {
+            return true;
+        }
+        self.net_rules.iter().any(|r| r.port == port && r.access == access)
+    }
+}
+
+impl Default for LandlockV5NetworkGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct EbpfXdpZeroCopyRedirector {
+    pub interface_map: Vec<(u32, String)>, // ifindex -> ifname
+    pub redirected_packets_count: u64,
+}
+
+impl EbpfXdpZeroCopyRedirector {
+    pub fn new() -> Self {
+        Self {
+            interface_map: Vec::new(),
+            redirected_packets_count: 0,
+        }
+    }
+
+    pub fn map_interface(&mut self, ifindex: u32, ifname: &str) {
+        self.interface_map.push((ifindex, ifname.to_string()));
+    }
+
+    pub fn redirect_packet_zero_copy(&mut self, from_ifindex: u32, to_ifindex: u32, packet_bytes: &[u8]) -> Result<usize, &'static str> {
+        let src_valid = self.interface_map.iter().any(|(idx, _)| *idx == from_ifindex);
+        let dst_valid = self.interface_map.iter().any(|(idx, _)| *idx == to_ifindex);
+
+        if !src_valid || !dst_valid {
+            return Err("Invalid XDP interface index for zero-copy redirection");
+        }
+
+        self.redirected_packets_count += 1;
+        Ok(packet_bytes.len())
+    }
+}
+
+impl Default for EbpfXdpZeroCopyRedirector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SovereignLandlockLsm {
     pub fn new() -> Self {
         Self {
@@ -5127,6 +5214,34 @@ mod tests {
 
         // /etc/shadow has no rules so it is denied by default under enforcement
         assert!(!lsm.check_access("/etc/shadow", LandlockAccess::ReadOnly));
+    }
+
+    #[test]
+    fn test_landlock_v5_network_guard_and_xdp_redirect() {
+        let mut net_guard = LandlockV5NetworkGuard::new();
+        assert!(net_guard.add_net_port_rule(8080, LandlockNetAccess::TcpBind).is_ok());
+        assert!(net_guard.add_net_port_rule(443, LandlockNetAccess::TcpConnect).is_ok());
+
+        // Prior to enforcement, everything is allowed
+        assert!(net_guard.check_net_access(80, LandlockNetAccess::TcpConnect));
+
+        net_guard.restrict_network();
+        assert!(net_guard.add_net_port_rule(22, LandlockNetAccess::TcpConnect).is_err());
+
+        assert!(net_guard.check_net_access(8080, LandlockNetAccess::TcpBind));
+        assert!(net_guard.check_net_access(443, LandlockNetAccess::TcpConnect));
+        assert!(!net_guard.check_net_access(80, LandlockNetAccess::TcpConnect));
+
+        // eBPF XDP zero-copy packet redirect test
+        let mut redirector = EbpfXdpZeroCopyRedirector::new();
+        redirector.map_interface(1, "eth0");
+        redirector.map_interface(2, "eth1");
+
+        let pkt = vec![0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
+        let bytes = redirector.redirect_packet_zero_copy(1, 2, &pkt).unwrap();
+        assert_eq!(bytes, 6);
+        assert_eq!(redirector.redirected_packets_count, 1);
+        assert!(redirector.redirect_packet_zero_copy(1, 99, &pkt).is_err());
     }
 
     #[test]

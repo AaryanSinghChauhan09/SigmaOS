@@ -26,10 +26,10 @@ use std::vec::Vec;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(not(test))]
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
 
-#[cfg(test_disabled)]
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
 use std::sync::Arc;
@@ -3242,7 +3242,7 @@ impl DebianTriggerManager {
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
                 let paths_ref: Vec<&str> =
-                    matched_paths.iter().map(|s: &String| s.as_str()).collect();
+                    matched_paths.iter().map(|s| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
