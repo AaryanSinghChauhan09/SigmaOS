@@ -967,7 +967,7 @@ impl UniversalPackageAdapter {
         } else if f.ends_with(".pkg.tar.zst")
             || f.ends_with(".pkg.tar.xz")
             || f.ends_with(".pkg.tar.gz")
-            || f.contains("pacman")
+            || f == "pacman"
             || f.ends_with(".pacman")
         {
             Some(PackageFormat::Pacman)
