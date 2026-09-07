@@ -11,8 +11,13 @@
 // Implements Intel Clear Linux's stateless configuration and immutable root layers
 // Inspired by Clear Linux's performance-optimized architecture
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec;
 use alloc::vec::Vec;
 
 /// Configuration file location
@@ -200,7 +205,7 @@ impl Default for SwupdUpdateManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
