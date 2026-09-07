@@ -100,8 +100,10 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse
-            | DistroSubsystemMode::LinuxSolus
-            | DistroSubsystemMode::LinuxClear => ServiceSupervisorType::Systemd,
+            | DistroSubsystemMode::LinuxClear
+            | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxTails
+            | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
@@ -216,7 +218,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
@@ -4561,7 +4562,7 @@ mod tests {
             ),
             (
                 DistroSubsystemMode::LinuxClear,
-                "swupd",
+                "bundle",
                 ServiceSupervisorType::Systemd,
             ),
             (
@@ -5955,4 +5956,3 @@ impl Default for ShepherdServiceManager {
         Self::new()
     }
 }
-
