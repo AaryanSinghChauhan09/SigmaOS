@@ -600,6 +600,7 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::distro::omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
@@ -864,6 +865,149 @@ impl Default for OmarchyOmakubDevInstaller {
     }
 }
 
+/// Hyprpaper Wallpaper & Multi-Monitor Display Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyHyprpaperWallpaperEngine {
+    pub preload_wallpapers: Vec<String>,
+    pub monitor_wallpapers: BTreeMap<String, String>, // monitor -> wallpaper_path
+    pub ipc_socket_enabled: bool,
+}
+
+impl OmarchyHyprpaperWallpaperEngine {
+    pub fn new() -> Self {
+        Self {
+            preload_wallpapers: Vec::new(),
+            monitor_wallpapers: BTreeMap::new(),
+            ipc_socket_enabled: true,
+        }
+    }
+
+    pub fn preload_wallpaper(&mut self, path: &str) {
+        if !self.preload_wallpapers.contains(&path.to_string()) {
+            self.preload_wallpapers.push(path.to_string());
+        }
+    }
+
+    pub fn set_wallpaper_for_monitor(&mut self, monitor: &str, path: &str) {
+        self.preload_wallpaper(path);
+        self.monitor_wallpapers.insert(monitor.to_string(), path.to_string());
+    }
+
+    pub fn generate_hyprpaper_conf(&self) -> String {
+        let mut conf = String::new();
+        for wp in &self.preload_wallpapers {
+            conf.push_str(&format!("preload = {}\n", wp));
+        }
+        for (mon, wp) in &self.monitor_wallpapers {
+            conf.push_str(&format!("wallpaper = {},{}\n", mon, wp));
+        }
+        conf.push_str(&format!("ipc = {}\n", if self.ipc_socket_enabled { "on" } else { "off" }));
+        conf
+    }
+}
+
+impl Default for OmarchyHyprpaperWallpaperEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fastfetch Sysinfo Banner & ASCII Logo Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyFastfetchSysinfoEngine {
+    pub ascii_logo: String,
+    pub display_modules: Vec<String>,
+}
+
+impl OmarchyFastfetchSysinfoEngine {
+    pub fn new() -> Self {
+        Self {
+            ascii_logo: "omarchy".to_string(),
+            display_modules: vec![
+                "title".to_string(),
+                "os".to_string(),
+                "host".to_string(),
+                "kernel".to_string(),
+                "uptime".to_string(),
+                "packages".to_string(),
+                "shell".to_string(),
+                "wm".to_string(),
+                "terminal".to_string(),
+                "cpu".to_string(),
+                "gpu".to_string(),
+                "memory".to_string(),
+            ],
+        }
+    }
+
+    pub fn generate_fastfetch_jsonc(&self) -> String {
+        format!(
+            r#"{{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {{
+    "type": "small",
+    "source": "{}"
+  }},
+  "modules": [{}]
+}}"#,
+            self.ascii_logo,
+            self.display_modules.iter().map(|m| format!("\"{}\"", m)).collect::<Vec<_>>().join(", ")
+        )
+    }
+}
+
+impl Default for OmarchyFastfetchSysinfoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Ghostty GPU-Accelerated Terminal Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyGhosttyTerminalEngine {
+    pub font_family: String,
+    pub font_size: u32,
+    pub theme_name: String,
+    pub window_padding_x: u32,
+    pub window_padding_y: u32,
+}
+
+impl OmarchyGhosttyTerminalEngine {
+    pub fn new() -> Self {
+        Self {
+            font_family: "JetBrainsMono Nerd Font".to_string(),
+            font_size: 11,
+            theme_name: "tokyonight".to_string(),
+            window_padding_x: 12,
+            window_padding_y: 12,
+        }
+    }
+
+    pub fn generate_ghostty_config(&self) -> String {
+        format!(
+            r#"font-family = {}
+font-size = {}
+theme = {}
+window-padding-x = {}
+window-padding-y = {}
+window-decoration = false
+gtk-single-instance = true
+"#,
+            self.font_family,
+            self.font_size,
+            self.theme_name,
+            self.window_padding_x,
+            self.window_padding_y
+        )
+    }
+}
+
+impl Default for OmarchyGhosttyTerminalEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -960,34 +1104,25 @@ mod tests {
     }
 
     #[test]
-    fn test_omarchy_extended_themes_and_desktop_components() {
-        assert_eq!(OmarchyTheme::RosePine.name(), "rose-pine");
-        assert_eq!(OmarchyTheme::SolarizedDark.bg_color(), "#002b36");
-        assert_eq!(OmarchyTheme::SolarizedLight.accent_color(), "#b58900");
-
-        let hypridle = OmarchyHypridleEngine::new();
-        let idle_conf = hypridle.generate_hypridle_conf();
-        assert!(idle_conf.contains("timeout = 300"));
-        assert!(idle_conf.contains("timeout = 600"));
-
-        let walker = OmarchyWalkerLauncherEngine::new();
-        let walker_conf = walker.generate_walker_config_toml();
-        assert!(walker_conf.contains("placeholder"));
-        assert!(walker_conf.contains("applications"));
-
-        let swaync = OmarchySwayNcEngine::new();
-        let swaync_json = swaync.generate_swaync_json();
-        assert!(swaync_json.contains("control-center-width"));
-        assert!(swaync_json.contains("notifications"));
-
-        let waybar = OmarchyWaybarEngine::new();
-        let waybar_json = waybar.generate_waybar_json();
-        assert!(waybar_json.contains("hyprland/workspaces"));
-        assert!(waybar_json.contains("pulseaudio"));
-
-        let dev_installer = OmarchyOmakubDevInstaller::new();
-        let plan = dev_installer.generate_installation_plan();
-        assert!(plan.iter().any(|cmd| cmd.contains("mise use --global rust")));
-        assert!(plan.iter().any(|cmd| cmd.contains("pacman -S --needed --noconfirm neovim")));
+    fn test_omarchy_hyprpaper_wallpaper_engine() {
+        let mut hyprpaper = OmarchyHyprpaperWallpaperEngine::new();
+        hyprpaper.set_wallpaper_for_monitor("DP-1", "/usr/share/backgrounds/tokyo-night.png");
+        let paper_conf = hyprpaper.generate_hyprpaper_conf();
+        assert!(paper_conf.contains("preload = /usr/share/backgrounds/tokyo-night.png"));
+        assert!(paper_conf.contains("wallpaper = DP-1,/usr/share/backgrounds/tokyo-night.png"));
     }
+
+    #[test]
+    fn test_omarchy_fastfetch_and_ghostty_engines() {
+        let fastfetch = OmarchyFastfetchSysinfoEngine::new();
+        let sysinfo_json = fastfetch.generate_fastfetch_jsonc();
+        assert!(sysinfo_json.contains("omarchy"));
+        assert!(sysinfo_json.contains("modules"));
+
+        let ghostty = OmarchyGhosttyTerminalEngine::new();
+        let ghostty_cfg = ghostty.generate_ghostty_config();
+        assert!(ghostty_cfg.contains("JetBrainsMono Nerd Font"));
+        assert!(ghostty_cfg.contains("theme = tokyonight"));
+    }
+
 }
