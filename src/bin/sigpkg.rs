@@ -9,9 +9,10 @@ use std::process::exit;
 
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
 use sigmaos::sigpkg::{
-    ContentAddressedStore, CryptoVerifier, Dependency, Package, SigpkgDaemon,
+    ContentAddressedStore, CryptoVerifier, DispatchedPmAction, Package, SigpkgDaemon,
     SovereignPackageSnapshotRollbackEngine, UniversalDependencyMapper, UniversalDryRunSimulator,
-    UniversalPackageAdapter, Version, VersionConstraint,
+    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation, Version,
+    VersionConstraint,
 };
 
 fn usage() -> ! {
@@ -81,7 +82,7 @@ fn cmd_dispatch(args: &[String]) {
         exit(2);
     }
     let full_cmd = args.join(" ");
-    let dispatcher = sigmaos::sigpkg::UniversalPmCommandDispatcher::new();
+    let dispatcher = UniversalPmCommandDispatcher::new();
     match dispatcher.dispatch_command(&full_cmd) {
         Ok(action) => execute_dispatched_action(action),
         Err(err) => {
@@ -97,7 +98,7 @@ fn cmd_foreign_pm(pm_name: &str, args: &[String]) {
         full_cmd.push(' ');
         full_cmd.push_str(&args.join(" "));
     }
-    let dispatcher = sigmaos::sigpkg::UniversalPmCommandDispatcher::new();
+    let dispatcher = UniversalPmCommandDispatcher::new();
     match dispatcher.dispatch_command(&full_cmd) {
         Ok(action) => execute_dispatched_action(action),
         Err(err) => {
@@ -107,45 +108,45 @@ fn cmd_foreign_pm(pm_name: &str, args: &[String]) {
     }
 }
 
-fn execute_dispatched_action(action: sigmaos::sigpkg::DispatchedPmAction) {
+fn execute_dispatched_action(action: DispatchedPmAction) {
     println!(
         "Translated foreign PM command [{}] -> Canonical Action: {:?} (Dry-Run: {})",
         action.source_pm, action.operation, action.dry_run
     );
     match action.operation {
-        sigmaos::sigpkg::UniversalPmOperation::Install => {
+        UniversalPmOperation::Install => {
             if action.target_packages.is_empty() {
                 println!("No target packages specified for installation.");
                 exit(0);
             }
             cmd_install(&action.target_packages);
         }
-        sigmaos::sigpkg::UniversalPmOperation::Remove => {
+        UniversalPmOperation::Remove => {
             if action.target_packages.is_empty() {
                 println!("No target packages specified for removal.");
                 exit(0);
             }
             cmd_remove(&action.target_packages);
         }
-        sigmaos::sigpkg::UniversalPmOperation::Search => {
+        UniversalPmOperation::Search => {
             if action.target_packages.is_empty() {
                 println!("No search query specified.");
                 exit(0);
             }
             cmd_search(&action.target_packages);
         }
-        sigmaos::sigpkg::UniversalPmOperation::Upgrade => {
+        UniversalPmOperation::Upgrade => {
             println!("Performing universal store upgrade...");
             cmd_update(&[]);
         }
-        sigmaos::sigpkg::UniversalPmOperation::QueryInfo => {
+        UniversalPmOperation::QueryInfo => {
             if action.target_packages.is_empty() {
                 cmd_status(&[]);
             } else {
                 cmd_search(&action.target_packages);
             }
         }
-        sigmaos::sigpkg::UniversalPmOperation::CleanCache => {
+        UniversalPmOperation::CleanCache => {
             cmd_daemon(&["gc".to_string()]);
         }
     }
