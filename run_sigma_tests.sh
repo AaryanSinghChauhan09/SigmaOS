@@ -17,3 +17,10 @@ if [ -f "src/security/input_validation.rs" ]; then
 fi
 
 echo "=== All SigmaOS Tests Passed ==="
+
+if [ -f "src/launch_ready/mod.rs" ]; then
+    echo "Running launch readiness & distro parity test suite..."
+    mkdir -p build
+    rustc --test src/launch_ready/mod.rs --edition=2021 -o build/launch_ready_test
+    ./build/launch_ready_test
+fi
