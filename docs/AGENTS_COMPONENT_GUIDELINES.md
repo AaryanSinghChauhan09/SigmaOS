@@ -54,6 +54,10 @@ Components receiving open file descriptors enter capability mode (`enter_capabil
 * **Automated Rollback Engine**: CoreOS update health checks and automatic rollback (`FedoraCoreosAutomatedRollbackEngine`).
 * **Koji & Bodhi Integration**: RPC build clients (`FedoraKojiBuildSystemClientEngine`) and update feedback / karma submission (`FedoraBodhiUpdateFeedbackEngine`).
 * **Automated Packaging**: Spec file generation and RPM packaging engine (`FedoraPaugusAutomatedPackagingEngine`).
+* **OSTree Sysroot Staging**: rpm-ostree deployment sysroot, pending deployment commit, and bootloader entry staging (`FedoraOstreeSysrootStagingEngine`).
+* **SSSD Kerberos Realm**: Active Directory / FreeIPA Kerberos ticket granting service client (`FedoraSssdKerberosRealmClientEngine`).
+* **PipeWire WirePlumber Policy**: Audio session wireplumber Lua policy & device node routing governor (`FedoraPipewireWireplumberPolicyGovernor`).
+* **RPM Seccomp Syscall Filter**: Post-install Seccomp BPF syscall filter validator (`FedoraRPMSeccompFilterEngine`).
 
 ### 3.4 Arch Linux Parity & Keyring Components (`src/compatibility/arch_linux.rs`)
 * **GnuPG Keyring & Trust Database**: Web of Trust keyring initialization, key import, and revocation (`ArchKeyringTrustDatabaseEngine`).
