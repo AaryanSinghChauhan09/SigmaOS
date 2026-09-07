@@ -28,7 +28,6 @@ jobs:
         uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-          toolchain: stable
 
       - name: Install cargo-audit
         run: cargo install cargo-audit --locked
@@ -121,9 +120,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-      uses: dtolnay/rust-toolchain@v1
-      with:
-        toolchain: nightly
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
           components: rust-src
       - name: Run security-specific tests
         run: |

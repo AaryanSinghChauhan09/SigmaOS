@@ -24,7 +24,6 @@ jobs:
         uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable
-          toolchain: stable
 
       - name: Verify Security Hardening & PQC Attestation
         run: |
