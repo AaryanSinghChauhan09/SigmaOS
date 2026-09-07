@@ -7,6 +7,8 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+extern crate alloc;
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -53,6 +55,7 @@ pub use process::{
     WNOHANG, WUNTRACED,
 };
 pub mod tools;
+pub mod open_source_os_gap_closure;
 pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
