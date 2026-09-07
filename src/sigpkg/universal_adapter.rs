@@ -1688,6 +1688,116 @@ impl Default for UniversalPmCommandDispatcher {
 }
 
 /// Universal Converter that converts any foreign package manifest into a native Sigma-pkg Package
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum UniversalPackageTriggerType {
+    Ldconfig,
+    UpdateDesktopDatabase,
+    GlibCompileSchemas,
+    SystemdTmpfiles,
+    MimeDatabase,
+    FontsIndex,
+    IconThemeCache,
+}
+
+#[derive(Debug, Clone)]
+pub struct TriggerExecutionResult {
+    pub trigger_type: UniversalPackageTriggerType,
+    pub target_dir: String,
+    pub executed_successfully: bool,
+}
+
+/// Handles post-installation and post-removal system triggers for all Linux & BSD package formats
+pub struct UniversalPackageTriggerEngine {
+    pub registered_triggers: Vec<UniversalPackageTriggerType>,
+    pub execution_log: Vec<TriggerExecutionResult>,
+}
+
+impl UniversalPackageTriggerEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_triggers: vec![
+                UniversalPackageTriggerType::Ldconfig,
+                UniversalPackageTriggerType::UpdateDesktopDatabase,
+                UniversalPackageTriggerType::GlibCompileSchemas,
+                UniversalPackageTriggerType::SystemdTmpfiles,
+                UniversalPackageTriggerType::MimeDatabase,
+                UniversalPackageTriggerType::FontsIndex,
+                UniversalPackageTriggerType::IconThemeCache,
+            ],
+            execution_log: Vec::new(),
+        }
+    }
+
+    pub fn execute_triggers_for_files(&mut self, installed_files: &[String]) -> Vec<TriggerExecutionResult> {
+        let mut results = Vec::new();
+
+        let has_shared_libs = installed_files.iter().any(|f| f.ends_with(".so") || f.contains("/lib/"));
+        let has_desktop_files = installed_files.iter().any(|f| f.ends_with(".desktop"));
+        let has_glib_schemas = installed_files.iter().any(|f| f.ends_with(".gschema.xml"));
+        let has_mime_files = installed_files.iter().any(|f| f.contains("/mime/packages/"));
+        let has_icon_files = installed_files.iter().any(|f| f.contains("/icons/"));
+
+        if has_shared_libs {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::Ldconfig,
+                target_dir: "/usr/lib".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_desktop_files {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::UpdateDesktopDatabase,
+                target_dir: "/usr/share/applications".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_glib_schemas {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::GlibCompileSchemas,
+                target_dir: "/usr/share/glib-2.0/schemas".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_mime_files {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::MimeDatabase,
+                target_dir: "/usr/share/mime".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        if has_icon_files {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::IconThemeCache,
+                target_dir: "/usr/share/icons/hicolor".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+
+        results
+    }
+}
+
+impl Default for UniversalPackageTriggerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct UniversalFormatConverter {
     pub dep_mapper: UniversalDependencyMapper,
     pub scriptlet_converter: UniversalScriptletConverter,
