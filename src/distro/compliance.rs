@@ -281,6 +281,14 @@ impl Default for LinuxBsdDistroGuidelineRules {
     }
 
     #[test]
+    fn test_linux_bsd_distro_guidelines_compliance() {
+        let rules = LinuxBsdDistroGuidelineRules::new();
+        assert!(rules.verify_all_standards());
+        assert!(rules.verify_guideline_compliance(DistroGuidelineStandard::ArchSimplicityPurity));
+        assert!(rules.verify_guideline_compliance(DistroGuidelineStandard::FreeBsdCapsicumJails));
+    }
+
+    #[test]
     fn test_compliance_audit_logger() {
         let mut logger = ComplianceAuditLogger::new();
         logger.enable_framework(ComplianceFramework::HIPAA);

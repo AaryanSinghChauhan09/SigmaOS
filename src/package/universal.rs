@@ -205,8 +205,16 @@ impl Default for DistroRepoSyncEngine {
     }
 }
 
-/// Package format type
-// Unified system absorbing all 18 major distribution formats.
+/// Package format type covering 18 major distribution formats
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageState {
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
+}
+
 pub enum PackagePriority {
     Essential,
     Required,
@@ -269,11 +277,6 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    Nix,        // Nix package (.nix)
-    Txz,        // FreeBSD / Slackware txz (.txz)
-    CachyOS,    // CachyOS package (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling package (.starling)
 }
 
 impl PackageFormat {
@@ -1176,7 +1179,37 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdInstallStrategy),
             PackageFormat::Starling => Box::new(StarlingInstallStrategy),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgInstallStrategy),
-            _ => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::Air => Box::new(AirInstallStrategy),
+            PackageFormat::Bottle => Box::new(BottleInstallStrategy),
+            PackageFormat::Ipa => Box::new(IpaInstallStrategy),
+            PackageFormat::Ports => Box::new(PortsInstallStrategy),
+            PackageFormat::Pkg => Box::new(PkgInstallStrategy),
+            PackageFormat::Aab => Box::new(AabInstallStrategy),
+            PackageFormat::TarGz => Box::new(TarGzInstallStrategy),
+            PackageFormat::Xz => Box::new(XzInstallStrategy),
+            PackageFormat::App => Box::new(AppInstallStrategy),
+            PackageFormat::Hap => Box::new(HapInstallStrategy),
+            PackageFormat::Pisi => Box::new(PisiInstallStrategy),
+            PackageFormat::Superdeb => Box::new(SuperdebInstallStrategy),
+            PackageFormat::Lzm => Box::new(LzmInstallStrategy),
+            PackageFormat::Pup => Box::new(PupInstallStrategy),
+            PackageFormat::Pet => Box::new(PetInstallStrategy),
+            PackageFormat::Tar => Box::new(TarInstallStrategy),
+            PackageFormat::Moss => Box::new(MossInstallStrategy),
+            PackageFormat::Hpkg => Box::new(HpkgInstallStrategy),
+            PackageFormat::Tcz => Box::new(TczInstallStrategy),
+            PackageFormat::Gobo => Box::new(GoboInstallStrategy),
+            PackageFormat::Ostree => Box::new(OstreeInstallStrategy),
+            PackageFormat::Pkgsrc => Box::new(PkgsrcInstallStrategy),
+            PackageFormat::Sfs => Box::new(SfsInstallStrategy),
+            PackageFormat::Puk => Box::new(PukInstallStrategy),
+            PackageFormat::Dmg => Box::new(DmgInstallStrategy),
+            PackageFormat::Cports => Box::new(CportsInstallStrategy),
+            PackageFormat::Dports => Box::new(DportsInstallStrategy),
+            PackageFormat::SlackBuild => Box::new(SlackBuildInstallStrategy),
+            PackageFormat::Crux => Box::new(CruxInstallStrategy),
+            PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
+            PackageFormat::Stratum => Box::new(StratumInstallStrategy),
         }
     }
 
@@ -1200,7 +1233,37 @@ impl PackageFactory {
             PackageFormat::Swupd => Box::new(SwupdMetadataAdapter),
             PackageFormat::Starling => Box::new(StarlingMetadataAdapter),
             PackageFormat::SigmaPkg => Box::new(SigmaPkgMetadataAdapter),
-            _ => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::Air => Box::new(AirMetadataAdapter),
+            PackageFormat::Bottle => Box::new(BottleMetadataAdapter),
+            PackageFormat::Ipa => Box::new(IpaMetadataAdapter),
+            PackageFormat::Ports => Box::new(PortsMetadataAdapter),
+            PackageFormat::Pkg => Box::new(PkgMetadataAdapter),
+            PackageFormat::Aab => Box::new(AabMetadataAdapter),
+            PackageFormat::TarGz => Box::new(TarGzMetadataAdapter),
+            PackageFormat::Xz => Box::new(XzMetadataAdapter),
+            PackageFormat::App => Box::new(AppMetadataAdapter),
+            PackageFormat::Hap => Box::new(HapMetadataAdapter),
+            PackageFormat::Pisi => Box::new(PisiMetadataAdapter),
+            PackageFormat::Superdeb => Box::new(SuperdebMetadataAdapter),
+            PackageFormat::Lzm => Box::new(LzmMetadataAdapter),
+            PackageFormat::Pup => Box::new(PupMetadataAdapter),
+            PackageFormat::Pet => Box::new(PetMetadataAdapter),
+            PackageFormat::Tar => Box::new(TarMetadataAdapter),
+            PackageFormat::Moss => Box::new(MossMetadataAdapter),
+            PackageFormat::Hpkg => Box::new(HpkgMetadataAdapter),
+            PackageFormat::Tcz => Box::new(TczMetadataAdapter),
+            PackageFormat::Gobo => Box::new(GoboMetadataAdapter),
+            PackageFormat::Ostree => Box::new(OstreeMetadataAdapter),
+            PackageFormat::Pkgsrc => Box::new(PkgsrcMetadataAdapter),
+            PackageFormat::Sfs => Box::new(SfsMetadataAdapter),
+            PackageFormat::Puk => Box::new(PukMetadataAdapter),
+            PackageFormat::Dmg => Box::new(DmgMetadataAdapter),
+            PackageFormat::Cports => Box::new(CportsMetadataAdapter),
+            PackageFormat::Dports => Box::new(DportsMetadataAdapter),
+            PackageFormat::SlackBuild => Box::new(SlackBuildMetadataAdapter),
+            PackageFormat::Crux => Box::new(CruxMetadataAdapter),
+            PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
+            PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
         }
     }
 }
@@ -1686,7 +1749,6 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
-            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();

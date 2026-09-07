@@ -254,7 +254,6 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
@@ -5077,7 +5076,7 @@ mod tests {
             ),
             (
                 DistroSubsystemMode::LinuxClear,
-                "swupd",
+                "bundle",
                 ServiceSupervisorType::Systemd,
             ),
             (

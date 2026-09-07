@@ -49,7 +49,7 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-use crate::security::Permission;
+
 use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
@@ -1269,6 +1269,14 @@ impl UniversalPackageAdapter {
                         &slack.version,
                         &slack.description,
                         &slack.slack_required,
+                    )
+                } else if filename.ends_with(".hpkg") || raw_text.contains("summary ") || raw_text.contains("architecture ") || raw_text.contains("vendor ") || raw_text.contains("haiku") {
+                    let haiku = self.parse_haiku_hpkg(raw_text)?;
+                    self.translate_to_native_package(
+                        &haiku.name,
+                        &haiku.version,
+                        &haiku.summary,
+                        &haiku.requires,
                     )
                 } else {
                     Err("Unrecognized package manifest format")

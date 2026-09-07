@@ -112,6 +112,203 @@ impl Default for LubuntuSystemManager {
 }
 
 // =========================================================================
+// 7. LXQT POWER MANAGER (`LubuntuPowerManager`)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LidCloseAction {
+    Suspend,
+    Hibernate,
+    LockScreen,
+    DoNothing,
+}
+
+pub struct LubuntuPowerManager {
+    pub battery_percent: u8,
+    pub is_charging: bool,
+    pub brightness_pct: AtomicU8,
+    pub lid_close_action: LidCloseAction,
+    pub dpms_idle_timeout_seconds: u32,
+}
+
+impl LubuntuPowerManager {
+    pub fn new() -> Self {
+        Self {
+            battery_percent: 85,
+            is_charging: false,
+            brightness_pct: AtomicU8::new(100),
+            lid_close_action: LidCloseAction::Suspend,
+            dpms_idle_timeout_seconds: 600, // 10 minutes
+        }
+    }
+
+    pub fn set_brightness(&self, pct: u8) {
+        self.brightness_pct.store(pct.min(100), Ordering::SeqCst);
+    }
+
+    pub fn handle_lid_close(&self) -> LidCloseAction {
+        self.lid_close_action
+    }
+}
+
+impl Default for LubuntuPowerManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 8. NM-APPLET NETWORK TRAY (`LubuntuNetworkTrayAdapter`)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct WifiAccessPointNode {
+    pub ssid: String,
+    pub signal_strength_pct: u8,
+    pub is_encrypted: bool,
+}
+
+pub struct LubuntuNetworkTrayAdapter {
+    pub connected_ssid: Option<String>,
+    pub scanned_aps: Vec<WifiAccessPointNode>,
+    pub is_ethernet_active: bool,
+}
+
+impl LubuntuNetworkTrayAdapter {
+    pub fn new() -> Self {
+        Self {
+            connected_ssid: None,
+            scanned_aps: Vec::new(),
+            is_ethernet_active: true,
+        }
+    }
+
+    pub fn scan_networks(&mut self) {
+        self.scanned_aps.clear();
+        self.scanned_aps.push(WifiAccessPointNode {
+            ssid: String::from("Lubuntu-Home-WiFi"),
+            signal_strength_pct: 90,
+            is_encrypted: true,
+        });
+        self.scanned_aps.push(WifiAccessPointNode {
+            ssid: String::from("Lubuntu-Guest"),
+            signal_strength_pct: 65,
+            is_encrypted: false,
+        });
+    }
+
+    pub fn connect_wifi(&mut self, ssid: &str) -> bool {
+        if self.scanned_aps.iter().any(|ap| ap.ssid == ssid) {
+            self.connected_ssid = Some(String::from(ssid));
+            return true;
+        }
+        false
+    }
+}
+
+impl Default for LubuntuNetworkTrayAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 9. LXQT GLOBALKEYS MANAGER (`LubuntuGlobalHotkeyManager`)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct HotkeyBindingNode {
+    pub shortcut: String,
+    pub command: String,
+}
+
+pub struct LubuntuGlobalHotkeyManager {
+    pub bindings: Vec<HotkeyBindingNode>,
+}
+
+impl LubuntuGlobalHotkeyManager {
+    pub fn new() -> Self {
+        let mut bindings = Vec::new();
+        bindings.push(HotkeyBindingNode { shortcut: String::from("Ctrl+Alt+T"), command: String::from("qterminal") });
+        bindings.push(HotkeyBindingNode { shortcut: String::from("Super+L"), command: String::from("lxqt-leave --lockscreen") });
+        bindings.push(HotkeyBindingNode { shortcut: String::from("XF86AudioRaiseVolume"), command: String::from("pactl set-sink-volume @DEFAULT_SINK@ +5%") });
+
+        Self { bindings }
+    }
+
+    pub fn register_binding(&mut self, shortcut: &str, cmd: &str) {
+        self.bindings.push(HotkeyBindingNode {
+            shortcut: String::from(shortcut),
+            command: String::from(cmd),
+        });
+    }
+
+    pub fn trigger_shortcut(&self, shortcut: &str) -> Option<&str> {
+        self.bindings.iter().find(|b| b.shortcut == shortcut).map(|b| b.command.as_str())
+    }
+}
+
+impl Default for LubuntuGlobalHotkeyManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 10. LXQT NOTIFICATION DAEMON (`LubuntuNotificationDaemon`)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct NotificationPopup {
+    pub id: usize,
+    pub title: String,
+    pub body: String,
+}
+
+pub struct LubuntuNotificationDaemon {
+    pub active_popups: Vec<NotificationPopup>,
+    pub next_id: AtomicUsize,
+    pub do_not_disturb: bool,
+}
+
+impl LubuntuNotificationDaemon {
+    pub fn new() -> Self {
+        Self {
+            active_popups: Vec::new(),
+            next_id: AtomicUsize::new(1),
+            do_not_disturb: false,
+        }
+    }
+
+    pub fn notify(&mut self, title: &str, body: &str) -> Option<usize> {
+        if self.do_not_disturb {
+            return None;
+        }
+        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
+        self.active_popups.push(NotificationPopup {
+            id,
+            title: String::from(title),
+            body: String::from(body),
+        });
+        Some(id)
+    }
+
+    pub fn dismiss(&mut self, id: usize) -> bool {
+        if let Some(idx) = self.active_popups.iter().position(|n| n.id == id) {
+            self.active_popups.remove(idx);
+            return true;
+        }
+        false
+    }
+}
+
+impl Default for LubuntuNotificationDaemon {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // 1. LXQT SESSION MANAGER (`LxqtSessionManager`)
 // =========================================================================
 
@@ -576,6 +773,45 @@ mod tests {
         assert_eq!(term.tabs[0].active_process, "htop");
 
         assert!(term.execute_command(999, "ls").is_err());
+    }
+
+    #[test]
+    fn test_lubuntu_power_manager() {
+        let power = LubuntuPowerManager::new();
+        assert_eq!(power.battery_percent, 85);
+        power.set_brightness(75);
+        assert_eq!(power.brightness_pct.load(Ordering::SeqCst), 75);
+        assert_eq!(power.handle_lid_close(), LidCloseAction::Suspend);
+    }
+
+    #[test]
+    fn test_lubuntu_network_tray() {
+        let mut tray = LubuntuNetworkTrayAdapter::new();
+        assert!(tray.is_ethernet_active);
+        tray.scan_networks();
+        assert_eq!(tray.scanned_aps.len(), 2);
+        assert!(tray.connect_wifi("Lubuntu-Home-WiFi"));
+        assert_eq!(tray.connected_ssid.as_deref(), Some("Lubuntu-Home-WiFi"));
+    }
+
+    #[test]
+    fn test_lubuntu_global_hotkey() {
+        let mut hotkey = LubuntuGlobalHotkeyManager::new();
+        assert_eq!(hotkey.trigger_shortcut("Ctrl+Alt+T"), Some("qterminal"));
+        hotkey.register_binding("Super+E", "pcmanfm-qt");
+        assert_eq!(hotkey.trigger_shortcut("Super+E"), Some("pcmanfm-qt"));
+    }
+
+    #[test]
+    fn test_lubuntu_notification_daemon() {
+        let mut notif = LubuntuNotificationDaemon::new();
+        let id1 = notif.notify("Update", "Packages ready").unwrap();
+        assert_eq!(notif.active_popups.len(), 1);
+        assert!(notif.dismiss(id1));
+        assert_eq!(notif.active_popups.len(), 0);
+
+        notif.do_not_disturb = true;
+        assert!(notif.notify("Alert", "Ignored").is_none());
     }
 
     #[test]

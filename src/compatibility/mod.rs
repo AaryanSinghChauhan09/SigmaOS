@@ -155,7 +155,11 @@ pub use cross_platform::{
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
-pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
+pub use lubuntu::{
+    CpuGovernor, LidCloseAction, LubuntuGlobalHotkeyManager, LubuntuHealthReport,
+    LubuntuNetworkTrayAdapter, LubuntuNotificationDaemon, LubuntuPowerManager, LubuntuSystemManager,
+    SystemPressure, WifiAccessPointNode,
+};
 
 pub use cross_platform_kernel::{
     DeferredProcedureCall, IdtEntry, Idtr, Irql, IrqlController, Kpcr, Kpcrb, MemoryArch,
