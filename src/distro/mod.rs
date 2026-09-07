@@ -134,11 +134,12 @@ pub use gentoo::{
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
 pub use linux_bsd_parity_extended::{
-    CloudInitBootstrapEngine, CrossbowVnic, GNUGuixShepherdSupervisor, GuixDerivation,
-    GuixFunctionalStore, NetBsdRumpKernel, NetplanInterface, NetplanYamlRenderer, OstreeDeployment,
-    OstreeDeploymentEngine, RumpKernelServer, ShepherdServiceState, SlackBuildCompiler,
+    AlpineApkVolatileOverlayEngine, CloudInitBootstrapEngine, CrossbowVnic,
+    GNUGuixShepherdSupervisor, GuixDerivation, GuixFunctionalStore, NetBsdRumpKernel,
+    NetplanInterface, NetplanYamlRenderer, OstreeDeployment, OstreeDeploymentEngine,
+    RumpKernelServer, RunitService, RunitServiceState, ShepherdServiceState, SlackBuildCompiler,
     SlackPackage, SlackwarePkgTools, SnapperBtrfsEngine, SnapperSnapshot, SnapperType,
-    SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
+    SolarisCrossbowVnicEngine, VoidRunitServiceSupervisorEngine, Yast2ControlCenter, YastSetting,
 };
 pub use nextgen::{
     AdminAction, AiSysAdmin, AtomicTrampolineGenerator, IntegrityState,

@@ -13,8 +13,17 @@
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
 extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::collections::HashMap;
-use crate::klib;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
+
+pub type SigmaString = String;
+pub type AllocVec<T> = Vec<T>;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -133,11 +142,11 @@ impl AurRecipeCompiler {
             Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
 
         Ok(Package::new(
-            crate::klib::string::SigmaString::from(pkgname),
+            SigmaString::from(pkgname),
             parsed_ver,
-            crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
+            SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
             depends,
-            crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
+            SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
 }
@@ -252,11 +261,11 @@ impl PacmanDbAdapter {
             Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
-            crate::klib::string::SigmaString::from(name),
+            SigmaString::from(name),
             parsed_ver,
-            crate::klib::string::SigmaString::from(desc),
+            SigmaString::from(desc),
             std::vec::Vec::<Dependency>::new(),
-            crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
+            SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
 }
@@ -316,10 +325,10 @@ impl AlpmHookManager {
         }
 
         self.add_hook(AlpmHook {
-            name: crate::klib::string::SigmaString::from(name),
+            name: SigmaString::from(name),
             when,
-            target_pattern: crate::klib::string::SigmaString::from(target_pattern),
-            exec_cmd: crate::klib::string::SigmaString::from(exec_cmd),
+            target_pattern: SigmaString::from(target_pattern),
+            exec_cmd: SigmaString::from(exec_cmd),
         });
 
         Ok(())
@@ -329,7 +338,7 @@ impl AlpmHookManager {
         &self,
         when: HookWhen,
         changed_file: &str,
-    ) -> std::vec::Vec<crate::klib::string::SigmaString> {
+    ) -> std::vec::Vec<SigmaString> {
         let mut triggered_cmds = std::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -553,15 +562,15 @@ pub struct MkinitcpioBuilder {
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
         let mut hooks = std::vec::Vec::new();
-        hooks.push(crate::klib::string::SigmaString::from("base"));
-        hooks.push(crate::klib::string::SigmaString::from("udev"));
-        hooks.push(crate::klib::string::SigmaString::from("autodetect"));
-        hooks.push(crate::klib::string::SigmaString::from("modconf"));
-        hooks.push(crate::klib::string::SigmaString::from("block"));
-        hooks.push(crate::klib::string::SigmaString::from("filesystems"));
+        hooks.push(SigmaString::from("base"));
+        hooks.push(SigmaString::from("udev"));
+        hooks.push(SigmaString::from("autodetect"));
+        hooks.push(SigmaString::from("modconf"));
+        hooks.push(SigmaString::from("block"));
+        hooks.push(SigmaString::from("filesystems"));
         Self {
             hooks,
-            compression: crate::klib::string::SigmaString::from("zstd"),
+            compression: SigmaString::from("zstd"),
         }
     }
 
@@ -784,155 +793,6 @@ impl MakepkgBuilder {
         Ok((archive_name, archive_content))
     }
 }
-// --- Arch Linux svntogit Repository Migration Engine ---
-#[derive(Debug, Clone)]
-pub struct SvntoGitEngine {
-    pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
-}
-
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
-    }
-}
-
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
-    }
-}
-
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -945,23 +805,23 @@ mod tests {
         sync.register_installed("make", Version::new(4, 3, 0));
 
         let source_pkg = DebianSbuildPackage {
-            name: crate::klib::string::SigmaString::from("coreutils"),
+            name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
             build_depends: std::vec![
-                crate::klib::string::SigmaString::from("gcc"),
-                crate::klib::string::SigmaString::from("make")
+                SigmaString::from("gcc"),
+                SigmaString::from("make")
             ],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
 
         let source_pkg_missing = DebianSbuildPackage {
-            name: crate::klib::string::SigmaString::from("coreutils"),
+            name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
             build_depends: std::vec![
-                crate::klib::string::SigmaString::from("gcc"),
-                crate::klib::string::SigmaString::from("make"),
-                crate::klib::string::SigmaString::from("libc-dev"),
+                SigmaString::from("gcc"),
+                SigmaString::from("make"),
+                SigmaString::from("libc-dev"),
             ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));

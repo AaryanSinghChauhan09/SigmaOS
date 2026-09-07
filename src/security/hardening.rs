@@ -13,8 +13,18 @@
 
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
-use crate::security::Permission;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MemoryPermission {
+    None,
+    Read,
+    Write,
+    Execute,
+    ReadWrite,
+    ReadExecute,
+    ReadWriteExecute,
+}
 
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data
@@ -165,9 +175,9 @@ fn canary_base() -> u64 {
         return existing;
     }
 
-    // Compile-time constant: djb2 hash over the build-manifest directory bytes.
+    // Compile-time constant: djb2 hash over default seed string
     const FILE_PATH_HASH: u64 = {
-        let bytes = env!("CARGO_MANIFEST_DIR").as_bytes();
+        let bytes = b"SIGMAOS_SECURITY_HARDENING_CANARY_SEED";
         let mut h: u64 = 5381;
         let mut i = 0;
         while i < bytes.len() {
@@ -271,60 +281,6 @@ impl Default for SecurityHardeningConfig {
     }
 }
 
-pub fn secure_zeroize(buffer: &mut [u8]) {
-    for byte in buffer.iter_mut() {
-        unsafe { core::ptr::write_volatile(byte, 0) };
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum IntrusionSeverity {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
-
-#[derive(Debug, Clone)]
-pub struct AuditLogEntry {
-    pub timestamp_ms: u64,
-    pub event: std::string::String,
-    pub severity: IntrusionSeverity,
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct HardenedAuditTrail {
-    pub logs: std::vec::Vec<AuditLogEntry>,
-}
-
-impl HardenedAuditTrail {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn record_event(&mut self, event: &str, severity: IntrusionSeverity) {
-        self.logs.push(AuditLogEntry {
-            timestamp_ms: 1000,
-            event: event.into(),
-            severity,
-        });
-    }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct IntrusionMonitor {
-    pub audit_trail: HardenedAuditTrail,
-}
-
-impl IntrusionMonitor {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn log_intrusion_attempt(&mut self, source: &str, severity: IntrusionSeverity) {
-        self.audit_trail.record_event(source, severity);
-    }
-}
 
 #[cfg(test_disabled)]
 mod tests {

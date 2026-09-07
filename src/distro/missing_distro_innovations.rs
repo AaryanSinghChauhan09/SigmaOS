@@ -1020,12 +1020,6 @@ impl NixOsFlakesEngine {
     }
 }
 
-impl Default for NixOsFlakesEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // =========================================================================
 // DRAGONFLY BSD HAMMER2 PSEUDO FILE SYSTEM (PFS) CLUSTERING & SNAPSHOT ENGINE
 // =========================================================================
@@ -2085,7 +2079,7 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct NixOsFlakesEngine {
     pub flake_inputs: BTreeMap<String, NixFlakeInput>,
     pub lock_version: u32,
@@ -2310,21 +2304,6 @@ mod tests {
         assert_eq!(hammer.total_dedup_savings_bytes, 18);
     }
 
-    pub fn start_rump_server(&mut self, component_name: &str) -> usize {
-        let server_id = self.next_id;
-        self.next_id += 1;
-
-        let socket_path = format!("/tmp/rump_{}.sock", component_name);
-        let server = RumpKernelServer {
-            server_id,
-            component_name: component_name.to_string(),
-            _socket_path: socket_path,
-            is_active: true,
-        };
-
-        self.servers.push(server);
-        server_id
-    }
 
     #[test]
     fn test_gentoo_portage_slot_operator() {
@@ -2345,79 +2324,8 @@ mod tests {
         assert!(!selinux.authorize_mls_mcs_access(100, 1, &[4])); // Missing category
     }
 
-    pub fn fire_probe(&mut self, provider: &str, function: &str, payload: &str) {
-        if let Some(p) = self.probes.iter().find(|p| p.provider == provider && p.function == function) {
-            if p.is_enabled {
-                let entry = format!("dtrace:{}:{}:{}:{}: [{}]", p.provider, p.module, p.function, p.name, payload);
-                self.trace_buffer.push(entry);
-            }
-        }
-    }
 }
 
-impl Default for IllumosDTraceProbeEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// SUSE YAST CONFIGURATION REGISTRY (OPENSUSE YAST / AUTOYAST PARITY)
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct YaSTConfigModule {
-    pub module_name: String,
-    pub _schema_version: String,
-    pub config_data: Vec<(String, String)>,
-    pub is_applied: bool,
-}
-
-pub struct SuseYaSTConfigurationRegistry {
-    pub modules: Vec<YaSTConfigModule>,
-}
-
-impl SuseYaSTConfigurationRegistry {
-    pub fn new() -> Self {
-        Self {
-            modules: Vec::new(),
-        }
-    }
-
-    pub fn register_module(&mut self, module_name: &str, schema_version: &str) {
-        let module = YaSTConfigModule {
-            module_name: module_name.to_string(),
-            _schema_version: schema_version.to_string(),
-            config_data: Vec::new(),
-            is_applied: false,
-        };
-        self.modules.push(module);
-    }
-
-    pub fn set_value(&mut self, module_name: &str, key: &str, val: &str) -> Result<(), &'static str> {
-        if let Some(m) = self.modules.iter_mut().find(|m| m.module_name == module_name) {
-            m.config_data.push((key.to_string(), val.to_string()));
-            Ok(())
-        } else {
-            Err("YaSTRegistry: Module not found")
-        }
-    }
-
-    pub fn apply_configuration(&mut self, module_name: &str) -> Result<bool, &'static str> {
-        if let Some(m) = self.modules.iter_mut().find(|m| m.module_name == module_name) {
-            m.is_applied = true;
-            Ok(true)
-        } else {
-            Err("YaSTRegistry: Module not found")
-        }
-    }
-}
-
-impl Default for SuseYaSTConfigurationRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
     #[test]
     fn test_suse_yast_configuration_registry() {

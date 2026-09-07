@@ -24,6 +24,8 @@ use crate::klib::{Arc, HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
+#[cfg(any(feature = "standalone_test", test))]
+use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -225,6 +227,7 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -276,11 +279,22 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    Nix,        // Nix package (.nix)
-    Txz,        // FreeBSD / Slackware txz (.txz)
-    CachyOS,    // CachyOS package (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling package (.starling)
+    OpenBsdPkg, // OpenBSD Package (.pkg / .tgz)
+    Ipk,        // OpenWrt IPK (.ipk)
+    Opkg,       // Opkg package (.opkg)
+    SolarisIps, // Solaris IPS (.ips / .p5p)
+    GuixNar,    // GNU Guix NAR archive (.nar / .nar.xz)
+}
+
+/// Lifecycle state of a unified package
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum PackageState {
+    #[default]
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
 }
 
 impl PackageFormat {
@@ -1336,98 +1350,7 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct ForeignDistroManifest {
-    pub raw_format: PackageFormat,
-    pub original_name: String,
-    pub version: String,
-}
 
-#[derive(Debug, Clone)]
-pub struct NodeBinaryDistroEngine;
-impl NodeBinaryDistroEngine {
-    pub fn new() -> Self {
-        Self
-    }
-    pub fn install_to_store(&self, _pkg: &NodeBinaryPackage, _bytes: &[u8], _npm_version: &str) -> Result<String, &'static str> {
-        Ok("/var/lib/sigmaos/node/store".to_string())
-    }
-}
-
-
-pub struct UniversalPackageTranslator;
-
-impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let name = format!("sigpkg-{}", manifest.original_name);
-        let mut pkg = UnifiedPackage::new(name, manifest.version.clone())
-            .with_format(PackageFormat::SigmaPkg);
-
-        for dep in &manifest.raw_dependencies {
-            if dep.contains("ssl") || dep.contains("crypto") {
-                pkg = pkg.with_dependency("sovereign-openssl".to_string());
-            } else if dep.contains("libc") || dep.contains("c6") {
-                pkg = pkg.with_dependency("sovereign-libc".to_string());
-            } else {
-                pkg = pkg.with_dependency(format!("sovereign-{}", dep));
-            }
-        }
-        pkg.provides.push(manifest.original_name.clone());
-        for p in &manifest.raw_provides {
-            pkg.provides.push(p.clone());
-        }
-        pkg
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DistroRepoRecord {
-    pub distro_name: String,
-    pub url: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct DistroRepoSyncEngine {
-    pub synced_repos: Vec<String>,
-    pub registered_repos: Vec<DistroRepoRecord>,
-    pub indexed_manifests: Vec<ForeignDistroManifest>,
-}
-
-impl DistroRepoSyncEngine {
-    pub fn new() -> Self {
-        Self {
-            synced_repos: Vec::new(),
-            registered_repos: vec![
-                DistroRepoRecord { distro_name: "Debian".to_string(), url: "https://deb.debian.org".to_string() },
-                DistroRepoRecord { distro_name: "ArchLinux".to_string(), url: "https://archlinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Fedora".to_string(), url: "https://fedoraproject.org".to_string() },
-                DistroRepoRecord { distro_name: "Alpine".to_string(), url: "https://alpinelinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Void".to_string(), url: "https://voidlinux.org".to_string() },
-            ],
-            indexed_manifests: Vec::new(),
-        }
-    }
-
-    pub fn sync_all_repositories(&mut self) -> Result<usize, &'static str> {
-        self.synced_repos = self.registered_repos.iter().map(|r| r.distro_name.clone()).collect();
-        Ok(self.synced_repos.len())
-    }
-
-    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
-        self.indexed_manifests.push(manifest);
-    }
-
-    pub fn total_indexed_packages(&self) -> usize {
-        self.indexed_manifests.len()
-    }
-
-    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
-        self.indexed_manifests
-            .iter()
-            .find(|m| m.original_name == pkg_name)
-            .map(|m| UniversalPackageTranslator::translate_to_sigma_pkg(m))
-    }
-}
 
 
 // =========================================================================
@@ -1581,43 +1504,6 @@ impl PackageAdapter {
         }
     }
 
-    pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
-        let mut pledges = Vec::new();
-        for arg in &manifest.finish_args {
-            if arg.contains("network") {
-                pledges.push("network".to_string());
-            } else if arg.contains("ipc") {
-                pledges.push("ipc".to_string());
-            } else if arg.contains("filesystem") || arg.contains("host") {
-                pledges.push("unveil_all".to_string());
-            }
-        }
-        pledges
-    }
-
-    pub fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> String {
-        if manifest.confinement == "strict" {
-            "strict_pledge_sandbox".to_string()
-        } else {
-            "classic_sandbox".to_string()
-        }
-    }
-
-    pub fn mount_appimage_squashfs(&self, app_runtime: &AppImageRuntime) -> Result<String, PackageError> {
-        if app_runtime.signature_offset == 0 || app_runtime.squashfs_offset == 0 {
-            Err(PackageError::InstallationFailed("Invalid AppImage offsets".to_string()))
-        } else {
-            Ok(format!("/tmp/.mount_{}_squashfs", app_runtime.app_name))
-        }
-    }
-
-    pub fn query_apt_repository(&self, _config: &AptRepoConfig) -> bool {
-        true
-    }
-
-    pub fn query_dnf_repository(&self, _config: &DnfRepoConfig) -> bool {
-        true
-    }
 
     pub fn _can_handle(&self, package: &UnifiedPackage) -> bool {
         package.formats.contains(&self.format)
@@ -1882,7 +1768,6 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
-            triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
             triggers: PackageTriggerRegistry::new(),

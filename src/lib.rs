@@ -11,6 +11,8 @@
 // Core library for SigmaOS operating system
 
 // Core working modules
+pub mod community;
+pub mod governance;
 pub mod accessibility;
 pub mod ai;
 pub mod app;
@@ -228,7 +230,7 @@ pub use driver::pci_bus::{
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,
     SimulatedPciHardwareAccess,
 };
-pub use drivers::{
+pub use driver::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
     EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,

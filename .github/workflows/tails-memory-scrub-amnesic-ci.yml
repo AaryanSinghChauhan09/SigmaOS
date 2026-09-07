@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
       - name: Run Tails OS amnesic RAM wiping privacy audit
         run: |
           mkdir -p build
