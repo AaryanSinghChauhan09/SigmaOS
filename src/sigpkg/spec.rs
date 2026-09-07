@@ -14,8 +14,6 @@
 /// Based on Roadmap Item 21: Implement sigpkg spec
 use std::boxed::Box;
 
-
-
 /// Package version
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -491,8 +489,9 @@ impl PackageManager for SimplePackageManager {
             for package_option in &self.packages {
                 if let Some(ref pkg) = *package_option {
                     let p_ref: &dyn Package = pkg.as_ref();
-                    // p_ref.name() already returns a slice trimmed to name_len (no zero-byte scan required).
-                    if dep_slice == p_ref.name() {
+                    let pkg_name = p_ref.name();
+                    let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(pkg_name.len());
+                    if dep_slice == &pkg_name[..pkg_len] {
                         found = true;
                         break;
                     }
@@ -625,7 +624,10 @@ impl UniversalPackageType {
             Some(UniversalPackageType::Ebuild)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(UniversalPackageType::TarArchive)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(UniversalPackageType::Txz)
         } else if normalized.ends_with(".xbps") {
             Some(UniversalPackageType::Xbps)
