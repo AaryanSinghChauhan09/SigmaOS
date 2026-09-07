@@ -438,95 +438,124 @@ impl SovereignUniversalDistroBridge {
                     governor.current_profile, governor.cpu_freq_cap_mhz, self.mode
                 ))
             }
-            "audio" => {
-                match self.mode {
-                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
-                        Ok(format!(
-                            "Dispatched sndio audio server stream connection for '{}' under distro mode '{:?}'",
-                            action, self.mode
-                        ))
-                    }
-                    _ => {
-                        Ok(format!(
-                            "Dispatched PipeWire graph audio node routing for '{}' under distro mode '{:?}'",
-                            action, self.mode
-                        ))
-                    }
-                }
-            }
             "ipc" => {
-                match self.mode {
-                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::FreeBsd => {
-                        Ok(format!(
-                            "Dispatched Capsicum/Pledge descriptor IPC passing for '{}' under distro mode '{:?}'",
-                            action, self.mode
-                        ))
-                    }
-                    _ => {
-                        Ok(format!(
-                            "Dispatched zero-copy ring pipe IPC channel for '{}' under distro mode '{:?}'",
-                            action, self.mode
-                        ))
-                    }
-                }
-            }
-            "containers" => {
-                let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
-                chroot_engine.enter_chroot()?;
+                let mut ipc = SovereignZeroCopyIpcBridge::new();
+                let bytes = ipc.splice_channel(1, 2, action.as_bytes().len())?;
                 Ok(format!(
-                    "Dispatched container build sandbox '{}' (active: {}) under distro mode '{:?}'",
-                    action, chroot_engine.is_active, self.mode
+                    "Dispatched IPC zero-copy splice '{}' (spliced: {} bytes) under distro mode '{:?}'",
+                    action, bytes, self.mode
                 ))
             }
-            "time" => {
+            "auth" => {
+                let mut auth = SovereignSystemdHomedAuthBridge::new();
+                let status = auth.authenticate_and_mount("user", action)?;
                 Ok(format!(
-                    "Dispatched Chrony/NTP clock synchronization for target '{}' under distro mode '{:?}'",
+                    "Dispatched auth systemd-homed LUKS/PAM check for user under distro mode '{:?}' (status: {})",
+                    self.mode, status
+                ))
+            }
+            "audit" => {
+                let mut dtrace = SovereignDTraceEngine::new();
+                let probe_id = dtrace.register_probe(DTraceProvider::Fbt, "kernel", action, "entry");
+                dtrace.enable_probe(probe_id);
+                let fired = dtrace.fire_probe(probe_id, 1001, 0, 0);
+                Ok(format!(
+                    "Dispatched DTrace probe audit for '{}' (probe_id: {}, fired: {}) under distro mode '{:?}'",
+                    action, probe_id, fired, self.mode
+                ))
+            }
+            "boot" => {
+                let mut boot = SovereignMultiArchBootChainBridge::new();
+                let entry = boot.configure_boot_entry(action, "root=UUID=sigma_root quiet")?;
+                Ok(format!(
+                    "Dispatched boot entry configuration '{}' under distro mode '{:?}'",
+                    entry, self.mode
+                ))
+            }
+            "container" => {
+                let mut mgr = SovereignCrossDistroContainerManager::new(self.mode);
+                let container_id = mgr.spawn_isolated_container("app_container", action)?;
+                Ok(format!(
+                    "Dispatched container creation ID {} for path '{}' under distro mode '{:?}'",
+                    container_id, action, self.mode
+                ))
+            }
+            "virtualization" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd => Ok(format!(
+                        "Dispatched FreeBSD bhyve microVM guest hypervisor for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD vmm/vmd guest hypervisor for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(format!(
+                        "Dispatched Illumos Zones brand hypervisor for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched SovereignVMM / KVM hypervisor vCPU launch for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "audio" => {
+                Ok(format!(
+                    "Dispatched PipeWire/ALSA zero-latency audio stream routing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "input" => {
+                Ok(format!(
+                    "Dispatched USB HID / evdev input event mapping for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched thermal governor trip-point monitoring for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
             "memory" => {
-                let mut alloc = SovereignKaslrWxAllocator::new(0xABCDEF12);
+                let mut alloc = SovereignKaslrWxAllocator::new(0x12345678);
                 let virt_addr = alloc.allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute)?;
                 Ok(format!(
-                    "Dispatched KARL W^X memory page allocation at {:#X} under distro mode '{:?}'",
-                    virt_addr, self.mode
+                    "Dispatched memory KARL/W^X allocation at {:#X} for '{}' under distro mode '{:?}'",
+                    virt_addr, action, self.mode
                 ))
             }
-            "ui" => {
+            "syscall" => {
+                let mut translator = SovereignMultiArchSyscallTranslator::new(self.mode);
+                let res = translator.translate_and_dispatch(action)?;
                 Ok(format!(
-                    "Dispatched Zenith Zenith/COSMIC desktop inspiration UI theme '{}' under distro mode '{:?}'",
+                    "Dispatched syscall translation for '{}' (result: {}) under distro mode '{:?}'",
+                    action, res, self.mode
+                ))
+            }
+            "device" => {
+                Ok(format!(
+                    "Dispatched dynamic devfs/udev auto-probe binding for device '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "process" => {
-                let mut bore_sched = CachyBoreScheduler::new(10_000_000);
-                bore_sched.register_task(BoreTaskProfile {
-                    task_id: 1001,
-                    name: action.to_string(),
-                    priority: 20,
-                    interactive_score: 80,
-                    burst_time_ns: 1_000_000,
-                    preferred_core: CoreTypePreference::PerformancePCore,
-                    ipc_intensity: 50,
-                });
-                let timeslice = bore_sched.calculate_timeslice_ns(1001);
+            "crypto" => {
                 Ok(format!(
-                    "Dispatched EEVDF/BORE process scheduling for '{}' (timeslice: {}ns) under distro mode '{:?}'",
-                    action, timeslice, self.mode
-                ))
-            }
-            "virt" => {
-                Ok(format!(
-                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
+                    "Dispatched PQC Dilithium-5 / Csprng entropy operation for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "audit" => {
-                let mut pax_engine = HardenedBsdPaxGuardEngine::new();
-                let mprotect_res = pax_engine.check_mprotect(100, 0x1000, false, true);
+            "ai" => {
                 Ok(format!(
-                    "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
-                    action, mprotect_res.is_ok(), self.mode
+                    "Dispatched Herdr LLM agent KV-cache inference job for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                Ok(format!(
+                    "Dispatched structured journald binary storage telemetry query for '{}' under distro mode '{:?}'",
+                    action, self.mode
                 ))
             }
             _ => Err("Unknown target subsystem"),
@@ -537,10 +566,8 @@ impl SovereignUniversalDistroBridge {
         let subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
             "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "containers", "virtualization", "virt", "audio", "input",
+            "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
-            "recovery", "time",
         ];
 
         for sub in subsystems {
@@ -1868,10 +1895,8 @@ mod cross_subsystem_tests {
         let target_subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
             "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "containers", "virtualization", "virt", "audio", "input",
+            "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
-            "recovery", "time",
         ];
 
         for m in modes {

@@ -12,28 +12,33 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
-/// OOP-based Hotkey Manager for SigmaOS
-/// Based on Ideas-999-Structured: Automation & Scripting Item 876
-/// Implements hotkey registration and handling
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+
+/// Modifier bitmasks inspired by Linux & BSD window managers (i3, Sway, Hyprland, xmonad, dwm)
+pub const MOD_NONE: u8 = 0b0000_0000;
+pub const MOD_SHIFT: u8 = 0b0000_0001;
+pub const MOD_CTRL: u8 = 0b0000_0010;
+pub const MOD_ALT: u8 = 0b0000_0100;
+pub const MOD_SUPER: u8 = 0b0000_1000; // Meta / Win / Cmd key
+pub const MOD_HYPER: u8 = 0b0001_0000;
 
 pub type HotkeyID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum HotkeyError { Success = 0, NotFound = 1, Conflict = 2 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HotkeyError {
+    Success = 0,
+    NotFound = 1,
+    Conflict = 2,
+    InvalidProfile = 3,
+}
 
-pub trait Hotkey {
+pub trait Hotkey: Send + Sync {
     fn id(&self) -> HotkeyID;
     fn modifiers(&self) -> u8;
     fn key(&self) -> u8;
@@ -65,9 +70,15 @@ impl SimpleHotkey {
 }
 
 impl Hotkey for SimpleHotkey {
-    fn id(&self) -> HotkeyID { self.id }
-    fn modifiers(&self) -> u8 { self.modifiers.load(Ordering::SeqCst) as u8 }
-    fn key(&self) -> u8 { self.key.load(Ordering::SeqCst) as u8 }
+    fn id(&self) -> HotkeyID {
+        self.id
+    }
+    fn modifiers(&self) -> u8 {
+        self.modifiers.load(Ordering::SeqCst) as u8
+    }
+    fn key(&self) -> u8 {
+        self.key.load(Ordering::SeqCst) as u8
+    }
     fn action(&self) -> &[u8] {
         let len = self.action.iter().position(|&b| b == 0).unwrap_or(64);
         &self.action[..len]
@@ -75,7 +86,12 @@ impl Hotkey for SimpleHotkey {
 }
 
 pub trait HotkeyManager {
-    fn register_hotkey(&mut self, modifiers: u8, key: u8, action: &[u8]) -> Result<HotkeyID, HotkeyError>;
+    fn register_hotkey(
+        &mut self,
+        modifiers: u8,
+        key: u8,
+        action: &[u8],
+    ) -> Result<HotkeyID, HotkeyError>;
     fn unregister_hotkey(&mut self, id: HotkeyID) -> Result<(), HotkeyError>;
     fn trigger_hotkey(&self, modifiers: u8, key: u8) -> Option<&[u8]>;
 }
@@ -87,7 +103,6 @@ pub struct SimpleHotkeyManager {
 }
 
 impl SimpleHotkeyManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleHotkeyManager {
             hotkeys: Vec::new(),
@@ -97,7 +112,12 @@ impl SimpleHotkeyManager {
 }
 
 impl HotkeyManager for SimpleHotkeyManager {
-    fn register_hotkey(&mut self, modifiers: u8, key: u8, action: &[u8]) -> Result<HotkeyID, HotkeyError> {
+    fn register_hotkey(
+        &mut self,
+        modifiers: u8,
+        key: u8,
+        action: &[u8],
+    ) -> Result<HotkeyID, HotkeyError> {
         for hotkey_option in &self.hotkeys {
             if let Some(ref hotkey) = *hotkey_option {
                 if hotkey.modifiers() == modifiers && hotkey.key() == key {
@@ -110,18 +130,19 @@ impl HotkeyManager for SimpleHotkeyManager {
         self.hotkeys.push(Some(Box::new(hotkey)));
         Ok(id)
     }
-    
+
     fn unregister_hotkey(&mut self, id: HotkeyID) -> Result<(), HotkeyError> {
         for hotkey_option in &mut self.hotkeys {
             if let Some(ref hotkey) = *hotkey_option {
                 if hotkey.id() == id {
+                    *hotkey_option = None;
                     return Ok(());
                 }
             }
         }
         Err(HotkeyError::NotFound)
     }
-    
+
     fn trigger_hotkey(&self, modifiers: u8, key: u8) -> Option<&[u8]> {
         for hotkey_option in &self.hotkeys {
             if let Some(ref hotkey) = *hotkey_option {
@@ -134,107 +155,144 @@ impl HotkeyManager for SimpleHotkeyManager {
     }
 }
 
-pub trait HotkeyProfile {
-    fn save_profile(&self, name: &[u8]) -> Result<(), HotkeyError>;
-    fn load_profile(&mut self, name: &[u8]) -> Result<(), HotkeyError>;
+/// Linux & BSD Window Manager Shortcut Preset Profiles
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum WindowManagerProfileType {
+    I3Sway,          // i3wm / Sway tiling window manager shortcuts
+    Hyprland,        // Hyprland Wayland compositor shortcuts
+    FreeBsdXmonadDwm, // FreeBSD xmonad / dwm keyboard shortcuts
+    MacOsParity,     // macOS desktop hotkeys
 }
 
-#[repr(C)]
-pub struct SimpleHotkeyProfile {
-    pub profiles: Vec<([u8; 64], Vec<(u8, u8, [u8; 64])>)>,
+#[derive(Debug, Clone)]
+pub struct HotkeyBinding {
+    pub name: String,
+    pub modifiers: u8,
+    pub key: u8,
+    pub action_command: String,
 }
 
-impl SimpleHotkeyProfile {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        SimpleHotkeyProfile {
-            profiles: Vec::new(),
-        }
+pub struct SovereignWindowManagerHotkeyEngine {
+    pub active_profile: WindowManagerProfileType,
+    pub manager: SimpleHotkeyManager,
+    pub loaded_bindings: Vec<HotkeyBinding>,
+}
+
+impl SovereignWindowManagerHotkeyEngine {
+    pub fn new(profile: WindowManagerProfileType) -> Self {
+        let mut engine = SovereignWindowManagerHotkeyEngine {
+            active_profile: profile.clone(),
+            manager: SimpleHotkeyManager::new(),
+            loaded_bindings: Vec::new(),
+        };
+        engine.load_preset_profile(profile);
+        engine
     }
-}
 
-impl HotkeyProfile for SimpleHotkeyProfile {
-    fn save_profile(&self, _name: &[u8]) -> Result<(), HotkeyError> {
-        Ok(())
-    }
-    
-    fn load_profile(&mut self, name: &[u8]) -> Result<(), HotkeyError> {
-        let mut name_array = [0u8; 64];
-        let name_len = name.len().min(63);
-        for i in 0..name_len {
-            name_array[i] = name[i];
-        }
-        self.profiles.push((name_array, Vec::new()));
-        Ok(())
-    }
-}
+    pub fn load_preset_profile(&mut self, profile: WindowManagerProfileType) {
+        self.active_profile = profile.clone();
+        self.loaded_bindings.clear();
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+        match profile {
+            WindowManagerProfileType::I3Sway => {
+                // i3 / Sway shortcuts: Super+Enter (Terminal), Super+Shift+Q (Kill), Super+D (Launcher)
+                self.add_binding("terminal", MOD_SUPER, b'\n', "exec terminal");
+                self.add_binding("kill_window", MOD_SUPER | MOD_SHIFT, b'q', "kill");
+                self.add_binding("app_launcher", MOD_SUPER, b'd', "exec dmenu");
+                self.add_binding("workspace_1", MOD_SUPER, b'1', "workspace 1");
+                self.add_binding("workspace_2", MOD_SUPER, b'2', "workspace 2");
+                self.add_binding("fullscreen", MOD_SUPER, b'f', "fullscreen toggle");
+            }
+            WindowManagerProfileType::Hyprland => {
+                // Hyprland shortcuts: Super+Q (Terminal), Super+C (Kill), Super+M (Exit)
+                self.add_binding("terminal", MOD_SUPER, b'q', "exec hyprctl dispatch exec kitty");
+                self.add_binding("kill_window", MOD_SUPER, b'c', "killactive");
+                self.add_binding("exit_hyprland", MOD_SUPER | MOD_SHIFT, b'm', "exit");
+                self.add_binding("toggle_floating", MOD_SUPER, b'v', "togglefloating");
+                self.add_binding("screenshot", MOD_NONE, 110, "exec hyprshot -m region"); // F10 screenshot
+            }
+            WindowManagerProfileType::FreeBsdXmonadDwm => {
+                // xmonad / dwm: Alt+Shift+Enter (Terminal), Alt+Shift+C (Close)
+                self.add_binding("terminal", MOD_ALT | MOD_SHIFT, b'\n', "spawn st");
+                self.add_binding("close_window", MOD_ALT | MOD_SHIFT, b'c', "killclient");
+                self.add_binding("next_layout", MOD_ALT, b' ', "nextlayout");
+                self.add_binding("toggle_bar", MOD_ALT, b'b', "togglebar");
+            }
+            WindowManagerProfileType::MacOsParity => {
+                // macOS shortcuts: Cmd+Space (Spotlight), Cmd+Q (Quit), Cmd+Tab (App Switcher)
+                self.add_binding("spotlight", MOD_SUPER, b' ', "open spotlight");
+                self.add_binding("quit_app", MOD_SUPER, b'q', "quit");
+                self.add_binding("app_switcher", MOD_SUPER, b'\t', "next window");
             }
         }
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    fn add_binding(&mut self, name: &str, modifiers: u8, key: u8, command: &str) {
+        let binding = HotkeyBinding {
+            name: name.to_string(),
+            modifiers,
+            key,
+            action_command: command.to_string(),
+        };
+        let _ = self.manager.register_hotkey(modifiers, key, command.as_bytes());
+        self.loaded_bindings.push(binding);
+    }
+
+    pub fn trigger(&self, modifiers: u8, key: u8) -> Option<String> {
+        self.manager
+            .trigger_hotkey(modifiers, key)
+            .map(|action| String::from_utf8_lossy(action).to_string())
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
+    #[test]
+    fn test_modifier_bitmasks_and_hotkey_registration() {
+        let mut mgr = SimpleHotkeyManager::new();
+        let id1 = mgr
+            .register_hotkey(MOD_SUPER | MOD_SHIFT, b'q', b"close_window")
+            .unwrap();
+        assert_eq!(id1, 1);
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
+        let conflict = mgr.register_hotkey(MOD_SUPER | MOD_SHIFT, b'q', b"duplicate");
+        assert_eq!(conflict.err(), Some(HotkeyError::Conflict));
+
+        let triggered = mgr.trigger_hotkey(MOD_SUPER | MOD_SHIFT, b'q').unwrap();
+        assert_eq!(triggered, b"close_window");
     }
-}
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
+    #[test]
+    fn test_i3_sway_preset_profile() {
+        let engine = SovereignWindowManagerHotkeyEngine::new(WindowManagerProfileType::I3Sway);
+        assert_eq!(
+            engine.trigger(MOD_SUPER, b'd'),
+            Some("exec dmenu".to_string())
+        );
+        assert_eq!(
+            engine.trigger(MOD_SUPER | MOD_SHIFT, b'q'),
+            Some("kill".to_string())
+        );
     }
-}
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
+    #[test]
+    fn test_hyprland_preset_profile() {
+        let engine = SovereignWindowManagerHotkeyEngine::new(WindowManagerProfileType::Hyprland);
+        assert_eq!(
+            engine.trigger(MOD_SUPER, b'c'),
+            Some("killactive".to_string())
+        );
     }
-}
 
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+    #[test]
+    fn test_freebsd_xmonad_dwm_profile() {
+        let engine =
+            SovereignWindowManagerHotkeyEngine::new(WindowManagerProfileType::FreeBsdXmonadDwm);
+        assert_eq!(
+            engine.trigger(MOD_ALT | MOD_SHIFT, b'c'),
+            Some("killclient".to_string())
+        );
     }
 }
