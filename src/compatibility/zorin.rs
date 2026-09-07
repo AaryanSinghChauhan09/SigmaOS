@@ -248,7 +248,119 @@ impl ZorinWindowsAppSupport {
     }
 }
 
-#[cfg(test_disabled)]
+/// Zorin OS Grid Window Tiling & Snap Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZorinSnapPosition {
+    LeftHalf,
+    RightHalf,
+    TopLeftQuarter,
+    TopRightQuarter,
+    BottomLeftQuarter,
+    BottomRightQuarter,
+    Maximized,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZorinGridWindowTilingEngine {
+    pub screen_width: u32,
+    pub screen_height: u32,
+    pub enable_auto_tiling: bool,
+}
+
+impl ZorinGridWindowTilingEngine {
+    pub fn new(screen_width: u32, screen_height: u32) -> Self {
+        Self {
+            screen_width,
+            screen_height,
+            enable_auto_tiling: true,
+        }
+    }
+
+    pub fn calculate_snap_rect(&self, position: ZorinSnapPosition) -> (u32, u32, u32, u32) {
+        let half_w = self.screen_width / 2;
+        let half_h = self.screen_height / 2;
+
+        match position {
+            ZorinSnapPosition::LeftHalf => (0, 0, half_w, self.screen_height),
+            ZorinSnapPosition::RightHalf => (half_w, 0, half_w, self.screen_height),
+            ZorinSnapPosition::TopLeftQuarter => (0, 0, half_w, half_h),
+            ZorinSnapPosition::TopRightQuarter => (half_w, 0, half_w, half_h),
+            ZorinSnapPosition::BottomLeftQuarter => (0, half_h, half_w, half_h),
+            ZorinSnapPosition::BottomRightQuarter => (half_w, half_h, half_w, half_h),
+            ZorinSnapPosition::Maximized => (0, 0, self.screen_width, self.screen_height),
+        }
+    }
+}
+
+impl Default for ZorinGridWindowTilingEngine {
+    fn default() -> Self {
+        Self::new(1920, 1080)
+    }
+}
+
+/// Zorin OS Sound Theme & Event Audio Feedback Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZorinSoundManager {
+    pub sound_theme: String,
+    pub enable_event_sounds: bool,
+    pub volume_level_percent: u8,
+}
+
+impl ZorinSoundManager {
+    pub fn new() -> Self {
+        Self {
+            sound_theme: "zorin".to_string(),
+            enable_event_sounds: true,
+            volume_level_percent: 80,
+        }
+    }
+
+    pub fn get_sound_file_path(&self, event_name: &str) -> String {
+        format!("/usr/share/sounds/{}/stereo/{}.ogg", self.sound_theme, event_name)
+    }
+}
+
+impl Default for ZorinSoundManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Zorin OS Taskbar & Panel Customizer
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZorinTaskbarCustomizer {
+    pub transparency_percent: u8,
+    pub auto_hide: bool,
+    pub icon_size_px: u32,
+    pub show_window_previews: bool,
+}
+
+impl ZorinTaskbarCustomizer {
+    pub fn new() -> Self {
+        Self {
+            transparency_percent: 20,
+            auto_hide: false,
+            icon_size_px: 32,
+            show_window_previews: true,
+        }
+    }
+
+    pub fn generate_panel_css(&self) -> String {
+        format!(
+            ".zorin-panel {{ background: rgba(0, 0, 0, {:.2}); icon-size: {}px; }}",
+            1.0 - (self.transparency_percent as f32 / 100.0),
+            self.icon_size_px
+        )
+    }
+}
+
+impl Default for ZorinTaskbarCustomizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -329,5 +441,24 @@ mod tests {
 
         let res_none = ZorinWindowsAppSupport::inspect_package_format("native_pkg.sigpkg");
         assert!(res_none.is_none());
+    }
+
+    #[test]
+    fn test_zorin_grid_tiling_sound_and_taskbar() {
+        let grid = ZorinGridWindowTilingEngine::new(1920, 1080);
+        let left_rect = grid.calculate_snap_rect(ZorinSnapPosition::LeftHalf);
+        assert_eq!(left_rect, (0, 0, 960, 1080));
+
+        let top_right_rect = grid.calculate_snap_rect(ZorinSnapPosition::TopRightQuarter);
+        assert_eq!(top_right_rect, (960, 0, 960, 540));
+
+        let sound_mgr = ZorinSoundManager::new();
+        let login_sound = sound_mgr.get_sound_file_path("desktop-login");
+        assert_eq!(login_sound, "/usr/share/sounds/zorin/stereo/desktop-login.ogg");
+
+        let taskbar = ZorinTaskbarCustomizer::new();
+        let css = taskbar.generate_panel_css();
+        assert!(css.contains(".zorin-panel"));
+        assert!(css.contains("icon-size: 32px"));
     }
 }
