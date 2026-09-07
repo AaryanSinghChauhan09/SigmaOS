@@ -2983,6 +2983,128 @@ SigmaOS guarantees bare-metal execution across 30+ years of hardware innovations
 2.  **Privacy & Statutory Governance**: Built-in compliance layers for GDPR, CCPA, HIPAA, and Indian statutory legislations (DPDP Act, GST, IBC, RERA).
 3.  **Security & Cryptography**: CIS Benchmarks enforcement, Kyber-1024 / Dilithium-5 post-quantum cryptography, hardware zero-trust capability rings, and Software Bill of Materials (SBOM) generation.
 
+---
+
+## 92. SOVEREIGN MASTER STRATEGIC VISION: CORE SYSTEM ENHANCEMENTS, APPLICATION ECOSYSTEM, NETWORK-NATIVE CLUSTER & COMMUNITY ROADMAP
+
+To ensure SigmaOS achieves absolute competitive supremacy over Linux, BSD, Windows, and macOS, the following master strategic roadmap specifies the mandatory core system enhancements, application ecosystem paradigms, network-native cluster features, collaboration framework, and phased timeline.
+
+### 92.1 Core System Enhancements
+1. **Unified Hardware Abstraction Layer (HAL)**:
+   * Provides a unified, zero-overhead abstraction layer simplifying hardware driver development across x86_64, AArch64, RISC-V 64, LoongArch64, and PowerPC 64 LE target architectures (`src/hal/multi_arch.rs`, `src/kernel/hal.rs`).
+2. **Firmware-Free Transparent Drivers**:
+   * Replaces opaque binary vendor blobs with transparent, memory-safe, firmware-free Rust driver shards operating inside isolated microkernel driver containers (`src/drivers/sovereign_driver_lifecycle.rs`).
+3. **Programmable User-Defined Scheduler**:
+   * Extends the CachyOS BORE and EEVDF kernel schedulers with User-Defined Functions (UDFs), allowing application developers to dynamically define scheduling policies for real-time graphics rendering, batch compute jobs, or ultra-low-latency audio/networking pipelines.
+4. **Cryptographic Post-Quantum Boot Chain**:
+   * Guarantees tamper-proof startup and hardware sovereignty from 16-bit BIOS / UEFI 2.10 secure boot stage down to userland via Post-Quantum Cryptographic signatures (Dilithium-5 / Kyber-1024) and TPM 2.0 PCR measured attestation.
+
+### 92.2 Application & Ecosystem Support
+1. **Native Compatibility Layers**:
+   * Natively executes Linux (`.elf`/`glibc`/`musl`) and Windows (`.exe`/`.dll`/Win32/ReactOS GDI) applications without emulation overhead using zero-copy ABI translation shims (`src/compatibility/cross_platform.rs`).
+2. **Shards Marketplace**:
+   * A curated, decentralized, post-quantum-signed ecosystem for discovering, installing, and managing sandboxed, modular SigmaOS application shards (`src/sigpkg/universal_oop_system.rs`).
+3. **Declarative Application Manifests (`.sigmaprofile`)**:
+   * Single-file declarative JSON/YAML manifest defining all application dependencies, hardware access policies, network capabilities, and OpenBSD-style `pledge`/`unveil` permissions (`src/package/universal.rs`).
+4. **Immutable Application Layers**:
+   * Uses Copy-on-Write (CoW) Merkle tree storage and content-addressed storage (CAS) to provide atomic application installs, zero-drift updates, and instant rollback snapshots.
+
+### 92.3 Networking & Clustered OS State
+1. **Clustered Device Pooling**:
+   * Enables seamless sharing of GPUs, NVMe storage pools, AI accelerators, and peripheral sensors across interconnected SigmaOS nodes in a local LAN/WAN mesh.
+2. **Network-Native OS State Splicing**:
+   * Pause an active desktop/session state on one physical device and resume seamlessly on another device using serialized state graph splicing (`src/system/state.rs`, `src/orchestration/mod.rs`).
+3. **Temporal Filesystem & Time-Travel Engine**:
+   * Native time-travel filesystem engine providing sub-millisecond atomic system state inspection, file history navigation, and zero-data-loss system rollbacks.
+
+### 92.4 Collaboration, Community & Governance
+1. **Contributor Charter**:
+   * Formal, transparent governance, code of conduct, and contributor standards (`CONTRIBUTING.md`, `docs/RULES.md`).
+2. **Public Developer Roadmap**:
+   * Living public roadmap with quarterly milestones, architectural specifications, and transparent release tracking.
+3. **Hackathons & Sprints**:
+   * Structured community sprints, bug-bounty programs, and developer hackathons to accelerate ecosystem growth and test next-generation microkernel innovations.
+4. **Living Documentation Knowledge Base**:
+   * GitHub Wiki synchronized continuously across repository mirrors (`WIKI/`, `wiki/`, `wiki_repo/`) via `./scripts/sync_wiki.sh`.
+
+### 92.5 Phased Strategic Action Timeline
+1. **Short-Term Horizon (Next 12–18 Months)**:
+   * Expand native Linux/Windows application compatibility shims.
+   * Refine the zero-Wayland Zenith desktop compositor and inclusive accessibility framework.
+   * Establish automated CI/CD pipelines, fuzzing runners, and license compliance scanners.
+2. **Mid-Term Horizon (2–4 Years)**:
+   * Deploy the full suite of modular core driver shards and firmware-free Rust drivers.
+   * Implement programmable user-defined scheduling policies across all desktop and server workloads.
+   * Finalize composable boot sequences and immutable system layer snapshots.
+3. **Long-Term Horizon (5+ Years — Sovereign Computing Era)**:
+   * Achieve total sovereign computing dominance via hardware-enforced post-quantum cryptographic boot chains.
+   * Standardize declarative hardware policies, zero-trust capability rings, and cluster-native peripheral sharing across global deployments.
+
+---
+
+## 93. SOVEREIGN PROTOCOL TO DEFEAT LINUX DISTROS & FORMAL 2-YEAR ROADMAP (Q4 2026 – Q4 2028)
+
+To defeat traditional Linux distributions and establish SigmaOS as the premier sovereign operating system alternative, SigmaOS executes a radical differentiation strategy focused on **clarity, hardware sovereignty, and cluster-native design**.
+
+### 93.1 Formal 2-Year Roadmap (Q4 2026 – Q4 2028)
+
+#### 🔹 Phase 1: Q4 2026 – Q2 2027 (Compatibility, Immutability & Governance)
+* **Native Compatibility Layers**: Seamless, zero-emulation execution of Linux (`.elf`/`glibc`/`musl`) and Windows (`.exe`/`.dll`/Win32/ReactOS GDI) applications via high-performance ABI translation shims (`src/compatibility/cross_platform.rs`).
+* **Immutable Userland Layers**: Atomic, transactional system and userland updates with zero dependency conflicts or configuration drift.
+* **Contributor Charter**: Publication of formal governance, code of conduct, and contributor standards (`CONTRIBUTING.md`, `docs/RULES.md`).
+* **Zenith Desktop Refinement**: Polishing the zero-Wayland/zero-X11 framebuffer compositor for fluid animations, multi-monitor spaces, and WCAG 2.1 accessibility.
+
+#### 🔹 Phase 2: Q3 2027 – Q1 2028 (Shards, Firmware-Free Drivers & Clustered Peripherals)
+* **Core Shard Rollout**: Deployment of modular microkernel shards for Media, Networking, Storage, AI, Compositor, Drivers, Security, Virtualization, System, Package, IPC, and Hardware.
+* **Firmware-Free Drivers**: Replacement of opaque vendor binary blobs with transparent, memory-safe, firmware-free Rust drivers running inside isolated driver containers (`src/drivers/sovereign_driver_lifecycle.rs`).
+* **Composable Boot Sequences**: Scriptable, post-quantum-encrypted boot flows supporting multi-boot and cryptographic hardware attestation.
+* **Clustered Peripherals**: Cluster-wide device pooling allowing nodes to share GPUs, NVMe arrays, AI accelerators, and peripheral sensors across local networks.
+
+#### 🔹 Phase 3: Q2 2028 – Q4 2028 (Programmable Scheduling, State Splicing & Temporal File Engine)
+* **Programmable Scheduler**: Kernel-level user-defined scheduling policies (UDFs) enabling custom latency/throughput tuning for graphics, batch compute, and low-latency audio.
+* **Network-Native OS State Splicing**: Seamless session pausing on one physical device and instant resumption on another device via serialized state graph splicing (`src/system/state.rs`, `src/orchestration/mod.rs`).
+* **Shards Marketplace**: Curated, post-quantum-signed ecosystem for modular SigmaOS applications (`src/sigpkg/universal_oop_system.rs`).
+* **Temporal Filesystem**: Native time-travel filesystem engine providing sub-millisecond atomic system state inspection, file history navigation, and zero-data-loss rollbacks.
+
+### 93.2 Strategic Pillars to Defeat Linux Distros
+1. **Sovereignty Over Hardware**: While Linux relies heavily on opaque vendor blobs, SigmaOS enforces firmware-free, open-source Rust drivers.
+2. **Declarative Simplicity**: Replaces Linux's fragmented package ecosystem (`apt`/`dnf`/`pacman`) with single-file declarative manifests (`.sigmaprofile`) and immutable CoW layers.
+3. **Cluster-Native Microkernel Design**: While Linux treats servers as isolated instances, SigmaOS treats all connected network devices as pooled, cluster-native resources.
+4. **Security by Design**: Combines OpenBSD-style `pledge`/`unveil` privilege reduction with Rust memory safety and Post-Quantum Cryptography (Dilithium-5 / Kyber-1024).
+5. **Unified System Vision**: While Linux is fragmented across hundreds of incompatible distributions, SigmaOS provides a coherent, single modular path through its 12-shard microkernel architecture.
+
+### 93.3 Strategic Outcome by 2028
+By Q4 2028, SigmaOS positions itself as the **world's first sovereign operating system**: modular, cluster-native, firmware-free, and declarative — offering clarity, resilience, and uncompromised performance where legacy Linux distros remain fragmented.
+
+---
+
+## 94. SOVEREIGN C++ REDUCTION & RUST-FIRST MIGRATION ARCHITECTURE SPECIFICATION
+
+To ensure absolute memory safety, eliminate non-deterministic exception handling runtime overheads, and establish a pure zero-dependency microkernel, SigmaOS executes a systematic C++ reduction and Rust-first migration architecture.
+
+### 94.1 Strategic Rationale for C++ Reduction
+1. **Elimination of Hidden C++ Runtimes**: Traditional bare-metal C++ relies on RTTI structures and C++ exception unwinding libraries (`libgcc_s` / `libstdc++`), introducing binary bloat and unpredictable latency spikes during fault conditions.
+2. **Compiler-Guaranteed Memory Safety**: Transitioning legacy C++ drivers and kernel daemons to Rust eliminates spatial/temporal memory vulnerabilities (use-after-free, buffer overflows, data races) at compile time via the Rust borrow checker.
+3. **Unified Codebase Architecture**: Consolidating microkernel drivers, VFS operations, IPC delivery, and userland tools into `#![no_std]` Rust modules eliminates header synchronization drift between `.hpp` files and Rust traits.
+
+### 94.2 Subsystem Migration Roadmap
+* **Kernel Driver Management (`kernel/drivers/sigma_driver_manager.cpp`)**: Replaced by pure `#![no_std]` Rust driver lifecycle managers (`src/driver/framework.rs`, `src/drivers/sovereign_driver_lifecycle.rs`).
+* **Atomic IPC & VFS Resolvers (`sigmaos/core/src/atomic_ipc_deliver.cpp`, `atomic_vfs_resolve.cpp`)**: Replaced by lock-free Rust IPC channels (`src/kernel/ipc.rs`) and zero-copy VFS page cache managers (`src/filesystem/support.rs`).
+* **Post-Quantum Cryptographic Verification (`sigmaos/core/src/atomic_pqc_verify.cpp`)**: Replaced by pure Rust Kyber-1024 / Dilithium-5 verification modules (`src/security/pki.rs`, `src/open_source_obsoletion.rs`).
+* **Userland Init & Daemons (`userland/init/sigma_init.cpp`, `userland/daemons/`)**: Replaced by `#![no_std]` Rust init supervisors (`src/userland/init.rs`, `src/init/sigmainit.rs`).
+* **Zenith Compositor (`userland/gui/zenith_compositor.cpp`)**: Replaced by direct framebuffer Rust graphics engines (`src/graphics/compositor.rs`).
+
+### 94.3 Transitional C-ABI Interoperability (`extern "C"`)
+* Exported Rust kernel APIs use `#[no_mangle] pub extern "C" fn` entry points with explicit, C-compatible scalar types (`u32`, `u64`, `usize`, `*mut c_void`, `*const u8`).
+* Legacy C++ callers interact strictly via C FFI shims during incremental migration stages.
+
+### 94.4 Phased C++ Deprecation Protocol
+1. **Phase 1 (Strict Policy Enforcement)**: Zero new C++ source files (`.cpp`/`.hpp`) permitted. All new subsystems MUST be written in Rust.
+2. **Phase 2 (Subsystem Component Swap)**: Replace legacy C++ kernel drivers and userland daemons with pure Rust equivalents and update `CMakeLists.txt`.
+3. **Phase 3 (Full C++ Elimination)**: Remove legacy C++ toolchain requirements (`g++`/`clang++`) from the build environment, achieving a 100% pure Rust sovereign microkernel.
+
+---
+
 ## 🛠️ SECTION 45: SOVEREIGN ALL-SPECTRUM OPEN-SOURCE OPERATING SYSTEM VICTORY & TOTAL ECOSYSTEM OBSOLESCENCE MASTER SPECIFICATION
 
 ### 45.1 All-Spectrum Open-Source OS Inspiration, Absorption & Obsolescence Mechanics
@@ -4249,23 +4371,258 @@ To outmatch the hardware support breadth and flexibility of Linux, Windows, and 
 3. **GPU-Accelerated Mesh Tessellation**:
    - B-rep and NURBS surfaces must tessellate into 64-byte aligned GPU vertex/index buffers for scanout rendering via Zenith compositor graphics pipelines.
 
-4. **Signal Dispatch & Forceful Cancellation Lock Safety**:
-   - Asynchronous signal handlers and process cancellation routines (`src/process/advanced_process_control.rs`) must release all held spinlocks, file locks (`flock`), and semaphores prior to task termination to prevent system deadlocks.
+---
+
+## 89. SOVEREIGN AI AGENT PROCESS INTERACTION MANAGEMENT ARCHITECTURE SPECIFICATION
+
+### 89.1 Autonomous Agent Process Interaction Governance Rules
+
+1. **Lock-Free Zero-Copy IPC Channels**:
+   - All high-frequency inter-process communication channels (`src/klib/ringbuf.rs`, `src/klib/ring_buffer.rs`) must utilize lock-free atomic ring buffers to prevent microkernel scheduler blocking.
+
+2. **Capability-Gated Inter-Process Signaling**:
+   - Inter-process signaling (`SIGKILL`, `SIGTERM`, `SIGUSR1`) and process state inspection must require explicit `CapabilityGate` grants (`src/security/capability.rs`, `src/security/sigma_unveil.rs`).
+
+3. **Zero-Copy Virtual Memory Page Loans**:
+   - Inter-process shared memory transfers must operate through zero-copy page loans (`uvm_page_loans` in `src/klib/uvm.rs`), verifying `Permission::MemDirectAccess` before physical page mapping.
 
 ---
 
-## 89. SOVEREIGN AI AGENT CACHE OPERATION MANAGEMENT ARCHITECTURE SPECIFICATION
+## 90. SOVEREIGN AI AGENT THREAD SYNCHRONIZATION OPERATION MANAGEMENT ARCHITECTURE SPECIFICATION
 
-### 89.1 Autonomous Agent Cache Operation Directives
+### 90.1 Autonomous Agent Thread Synchronization Governance Rules
 
-1. **DMA Buffer CPU Cache Line Flushing**:
-   - Memory buffers used for hardware DMA transfers on non-coherent buses (`src/kernel/mm/cpu_cache.rs`) must execute explicit `clflushopt` or `clwb` cache line flushes across target addresses before initiating DMA transfers.
+1. **RCU Read-Path Supremacy for Read-Heavy Subsystems**:
+   - High-frequency kernel lookup tables (routing tables, credential tables, VFS dentry maps) must use lock-free RCU read locks (`rcu_read_lock` / `rcu_read_unlock`) with $O(1)$ zero-wait access.
 
-2. **TLB Entry Invalidation & Multicore Shootdowns**:
-   - Page table entry modifications or unmappings (`src/memory/tlb_associative.rs`) must issue local `invlpg` instructions and broadcast multicore TLB shootdown IPC interrupts to sibling CPU cores.
+2. **Sequential Consistency Fences for Peterson Algorithm Software Locks**:
+   - Software mutual exclusion algorithms (`src/klib/sync.rs`, `src/security/hardening.rs`) must issue strict sequential consistency memory barriers (`core::sync::atomic::fence(Ordering::SeqCst)`) to prevent cross-core instruction reordering.
 
-3. **False Sharing Prevention via 64-Byte Cache Line Alignment**:
-   - Frequently mutated per-CPU structures or lock state variables must enforce 64-byte L1 cache line alignment (`#[repr(align(64))]`) to prevent cache ping-ponging and CPU pipeline stalls.
+3. **Priority Inheritance Protocol (PIP) for Blocking Mutexes**:
+   - Mutex primitives used in real-time `BORE` or `EEVDF` scheduler task contexts must enforce Priority Inheritance Protocol (PIP) to prevent priority inversion deadlocks.
 
-4. **JIT Instruction & Data Cache Synchronization**:
-   - Dynamically generated executable bytecode must flush data cache lines (`DCACHE`), invalidate instruction cache lines (`ICACHE`), and execute instruction memory barrier fences (`ISB` / `DSB` / `MFENCE`) prior to branch execution.
+---
+
+## 92. SOVEREIGN 12-SHARD ARCHITECTURE & STRATEGIC DEVELOPMENT ROADMAP
+
+### 92.1 Core Architectural Principles (Main Branch Standards)
+1. **Boot to Web Efficiency**: Fast ~3s cold boot from minimal Linux / Buildroot base directly into Chromium-based shell environment.
+2. **Browser as Shell Shell Paradigm**: Workspaces, window management, and hardware interfaces powered by native web applications and Zenith visual core synthesis.
+3. **Unix Philosophy for Web Applications**: Progressive Web Applications (PWAs) gain raw capability-gated access to Unix primitives (`pipe`, `spawn`, `mmap`, and `/dev` virtual filesystem devices).
+4. **Zero-Bloat Package Management**: Universal package absorption (Alpine `.apk`, Debian `.deb`, Arch `.pkg.tar.zst`) executed directly via browser APIs and `SigmaPkg` transpilation.
+5. **Strict Capabilities Sandboxing**: Mandatory per-origin explicit permission requests (`pledge`/`unveil`/seccomp) before granted hardware or filesystem path access.
+
+### 92.2 Safe-Rust 12-Shard Microkernel Taxonomy
+SigmaOS replaces 500+ legacy monad userland applications with 12 sovereign Safe-Rust microkernel shards:
+1. **Media Shard**: Audio/video decoding, PipeWire zero-copy streaming, screen recording, and hardware acceleration.
+2. **Networking Shard**: eBPF packet routing, CARP high-availability failover, zero-copy socket IPC, and 5G/6G slicing.
+3. **Storage Shard**: VFS inode management, CoW snapshots, NVMe multi-queue submission, and block deduplication.
+4. **AI Shard**: On-device 4-bit INT4/NF4 quantized LLM inference, local Whisper voice commands, and predictive UX tuning.
+5. **Compositor Shard**: Zenith Wayland/DRM compositor, Gamescope FSR scaling, and 64-byte aligned GPU vertex buffers.
+6. **Drivers Shard**: Sandboxed driver containers (`DriverShardManager`), hot-swappable PCI modules, and firmware-free abstractions.
+7. **Security Shard**: Dilithium-5/Kyber PQC verifications, TPM 2.0 PCR attestation, capabilities auditing, and amnesic scrubbing.
+8. **Virtualization Shard**: KVM micro-VMs, LXD/LXC containers, and Wasm/eBPF runtime isolation.
+9. **System Shard**: NixOS-style declarative state graphs, atomic generation rollbacks, and `sigmainit` process supervision.
+10. **Package Shard**: `SigmaPkg` universal package transpiler, APK v3 index parser, and hermetic build environments.
+11. **IPC Shard**: Lock-free zero-copy ring buffers, capability-gated signaling, and virtual memory page loans.
+12. **Hardware Shard**: HAL multi-arch IRQ routing (x86_64, AArch64, RISC-V, LoongArch64, Ppc64Le), ACPI, and power governors.
+
+### 92.3 Phased Execution Roadmap
+
+#### 🔹 Short-Term (Next 12–18 Months)
+- **Application Compatibility Expansion**: Expand binary translation layers (Wine/Proton, Rosetta, Android APEX/APK) for Windows and Linux software.
+- **Developer SDK & Shard APIs**: Publish open Rust SDKs, comprehensive documentation, and boilerplates for third-party shard development.
+- **Desktop UX & Zenith Refinement**: Enhance Zenith visual compositor, workspace tiling, and multi-monitor hot-plugging.
+- **Automated CI/CD & SBOM Auditing**: Deploy reproducible builds with Sigstore/Cosign signing, SBOM generation, and continuous fuzzing.
+
+#### 🔹 Mid-Term (2–4 Years)
+- **Incremental Shard Deployment**: Roll out production core shards starting with Media, Networking, Storage, and AI.
+- **Composable Scriptable Boot Sequences**: Implement scriptable boot flows supporting multi-boot setups and encrypted startup policies.
+- **Firmware-Free Driver Architecture**: Replace opaque proprietary vendor blobs with open, transparent Safe-Rust drivers.
+- **Clustered Peripheral Pooling**: Enable network-transparent peripheral sharing across distributed SigmaOS nodes.
+
+#### 🔹 Long-Term (5+ Years)
+- **Cryptographic Boot Chain Supremacy**: Tamper-proof hardware-rooted initialization enforcing zero-trust boot integrity.
+- **Declarative Hardware Sovereignty Policies**: User-controlled declarative policies governing open vs proprietary driver usage.
+- **Temporal Filesystem Core**: Native time-travel filesystem state inspection and $O(1)$ generational rollbacks.
+- **Complete Shard Ecosystem Supremacy**: Full deprecation and replacement of legacy monad applications with 12 sovereign shards.
+
+---
+
+## 93. SOVEREIGN OS PUBLIC LAUNCH ANNOUNCEMENT, WHITEPAPER & CONTRIBUTOR CHARTER
+
+### 93.1 Public Launch Announcement Manifesto
+SigmaOS is officially announced as the world’s first **sovereign operating system**, engineered in Safe-Rust to deliver clarity, resilience, and security beyond legacy monolithic Linux and BSD operating systems.
+- **Declarative Init System**: Rust-safe parallel service manager with deterministic dependency tracking.
+- **Universal Package Manager (`SigmaPkg`)**: Immutable layers, $O(1)$ rollback safety, reproducible builds, and multi-format transpilation (`.deb`, `.rpm`, `.apk`, `.pkg.tar.zst`).
+- **Cluster-Native Networking**: Distributed device pooling treating heterogeneous hardware nodes as one unified operating system.
+- **Temporal Filesystem**: Native time-travel state rollback and extent-based transaction logging.
+- **Rust-Native Utilities**: High-performance, zero-bloat POSIX-compliant replacements.
+- **Post-Quantum Cryptographic Security**: Hardware-rooted startup with Dilithium-5 signatures and OpenBSD `pledge`/`unveil` path sandboxing.
+
+### 93.2 Whitepaper Core Architecture Summary
+1. **Introduction**: SigmaOS is designed to surpass Linux and BSD by unifying where they fragment, securing where they compromise, and innovating where they stagnate.
+2. **Subsystems Overview**:
+   - *Init Subsystem*: Parallelized boot, sandboxed daemons, unified observability.
+   - *Package Subsystem*: Immutable layer caching, signed channels, cluster-aware deployment.
+   - *Network Stack*: eBPF packet routing, sub-50ms CARP failover, cluster-native socket IPC.
+   - *Storage Stack*: CoW extents, Btrfs/ZFS/UFS compatibility, temporal filesystem rollbacks.
+   - *Advanced Subsystems*: KVM micro-VMs, OCI container runtimes, Wasm micro-execution.
+
+### 93.3 Contributor Charter Governance Framework
+1. **Purpose**: Establishes principles, roles, processes, and community standards for contributing to the sovereign SigmaOS ecosystem.
+2. **Core Governance Principles**:
+   - *Sovereignty*: Independence from proprietary blobs, closed vendor telemetry, or opaque firmware.
+   - *Clarity*: Declarative manifests, transparent codebases, and comprehensive documentation.
+   - *Resilience*: Strict rollback guarantees, fault-tolerant state recovery, and cluster pooling.
+   - *Security*: Non-negotiable Rust memory safety, capability sandboxing, and PQC integrity.
+3. **Contributor Roles**:
+   - *Core Developers*: Maintain kernel microkernel shards, init engine, package manager, and networking.
+   - *Module Maintainers*: Oversee specific shards (drivers, utilities, desktop, AI).
+   - *Community Contributors*: Submit patches, documentation, translation, and accessibility enhancements.
+   - *Institutional Partners*: Academic labs, universities, and sovereign computing institutions.
+
+### 93.4 Formal 4-Phase Execution Roadmap (2026+)
+- **Phase 1: Foundation (Q4 2026 – Q2 2027)**: Init engine, package manager, core userland utilities -> Daily-driver ready.
+- **Phase 2: Parity (Q3 2027 – Q1 2028)**: Asynchronous networking, filesystems, driver shards -> Linux/BSD feature parity.
+- **Phase 3: Competitiveness (Q2 2028 – Q4 2028)**: OCI containers, Rust hypervisor, transactional updates -> Production server & DevOps ready.
+- **Phase 4: Sovereignty (2029+)**: PQC boot chain, amnesic RAM scrubbing, universal accessibility, internationalization -> Sovereign OS ecosystem supremacy.
+
+---
+
+## 94. SOVEREIGN AI AGENT AUTONOMOUS REPOSITORY INTELLIGENCE, BUG SOLVING & DEPENDENCY ELIMINATION SPECIFICATION
+
+### 94.1 Multi-Specialist AI Agent Composite Roles
+SigmaOS development is governed by an autonomous AI Development Agent acting as a composite of specialized engineering roles:
+1. **System / Architecture Designer**: Owns subsystem boundaries (`kernel/`, `hal/`, `drivers/`, `fs/`, `net/`, `crypto/`, `zenith_desktop/`, `userland/`), enforcing zero-dependency interfaces and resolving architecture conflicts.
+2. **Kernel / Systems Engineer**: Oversees scheduling (`SovereignSched`), syscall dispatches, memory management (`SovereignVMM`), IPC, and capability-ring invariants.
+3. **Device Driver Engineer**: Architects bare-metal drivers (NVMe, xHCI, E1000/RTL8139, AHCI, IDE, ISA) with complete DMA, IRQ, MSI-X, and hot-unplug handling following official hardware datasheets.
+4. **OS Security Engineer / Bug Bounty Responder**: Conducts threat modeling, PQC validation (Kyber-1024 / Dilithium-5), capability sandboxing (`pledge`/`unveil`), and automated regression test generation.
+5. **Filesystem & Storage Engineer**: Enforces Ext4/JBD2/SigmaFS journal correctness, Copy-on-Write extents, Merkle root tree validation, and crash-consistency guarantees.
+6. **Build / Release / QA Engineer**: Manages multi-profile builds (`make PROFILE=<target>`), cross-compilation toolchains, reproducible builds, and automated test runners.
+7. **UI/UX Developer**: Maintains Zenith compositor rendering directly to hardware framebuffers without X11/Wayland dependencies, declarative Nix-style JSON settings, and WCAG 2.1 accessibility.
+8. **Compiler & Toolchain Engineer**: Maintains zero-dependency Rust, Zig, Nim, and C-ABI toolchains, runtime shims, and bare-metal user-defined function (UDF) primitives.
+9. **Storage & Database Engineer**: Builds native zero-dependency atomic storage engines, page cache radix trees, and distributed edge storage pools.
+10. **Networking Engineer**: Develops lock-free asynchronous TCP/IP, IPv6, QUIC, eBPF packet filters, and sub-50ms CARP failover protocols.
+11. **Testing & QA Engineer**: Generates unit, integration, stress, fuzz, and property-based kernel tests, enforcing 100% test suite pass rates.
+12. **Documentation & DevRel Specialist**: Maintains synchronized documentation across root `.md` files, `docs/`, `WIKI/`, `wiki/`, and `wiki_repo/` targets.
+13. **Performance & Optimization Specialist**: Profiles CPU/GPU/memory bottlenecks, zero-allocation hot paths, SIMD vectorization, and cache alignment.
+14. **Accessibility & i18n Specialist**: Implements full-spectrum accessibility (screen readers, voice control, high contrast) and native multi-language translation layers.
+15. **Governance & Community Manager**: Manages contributor charters, transparent voting mechanisms, CLA enforcement, and public roadmap dashboards.
+
+### 94.2 Universal Repository Auditor & Self-Healing Engine
+1. **Repository Audit Discovery Categories**: Continuously scans for compiler errors, runtime exceptions, logic flaws, race conditions, memory leaks, resource leaks, deadlocks, integer overflows, buffer overruns, missing validation, broken documentation, and missing security protections across 30+ explicit audit categories.
+2. **Issue Severity Classification**: Classifies all discovered anomalies into five strict tiers: `Critical`, `High`, `Medium`, `Low`, and `Suggestion`.
+3. **Autonomous Bug Solver Protocol**:
+   - Identifies root cause, source module, and upstream/downstream impact.
+   - Evaluates multi-strategy repair candidates in isolated test sandboxes.
+   - Rejects any patch that decreases performance, introduces regressions, or degrades system stability.
+   - Validates code fixes via `./run_sigma_tests.sh` and standalone test suites.
+
+### 94.3 GitHub Feature Extractor & Knowledge Transfer Engine
+1. **Open-Source Intelligence Monitoring**: Continuously monitors 500+ upstream repositories (Linux kernel, systemd, LLVM, musl, FreeBSD, OpenBSD, Haiku, Redox, COSMIC, Android, Windows Subsystem for Linux).
+2. **Algorithmic Extraction**: Extracts state-of-the-art algorithms, I/O scheduling strategies, memory allocator patterns, and network optimizations.
+3. **Native Transpilation & Re-implementation**: Re-implements useful open-source algorithms into zero-dependency, bare-metal Safe-Rust/Zig/Nim modules without copy-pasting third-party code.
+4. **Attribution & Licensing Compliance**: Records full attribution, license compatibility (GPL, MIT, Apache, BSD), and SPDX header compliance via `./scripts/check-spdx.sh`.
+
+### 94.4 Dependency Detector & Elimination Architecture
+1. **Dependency Analysis**: Inspects every external library, wrapper, framework, runtime, and third-party dependency to determine its performance cost, security risk, and static compilation impact.
+2. **Complete Elimination Directive**: Systematically eliminates external dependencies by replacing them with self-contained internal abstractions, bare-metal UDFs, and zero-allocation kernel utilities.
+3. **Self-Hosting Toolchain Supremacy**: Replaces external compilers, linkers, assemblers, init systems, container runtimes, package managers, and editors with native SigmaOS equivalents (`SigmaPkg`, `sigmainit`, `Zenith`, `SovereignVMM`).
+
+---
+
+## 95. SOVEREIGN UNIVERSAL HARDWARE ADAPTATION BLUEPRINT: ANCIENT 1980s TO MODERN 2026+ ARCHITECTURES
+
+### 95.1 Universal Multi-Era Hardware Adaptation Matrix
+SigmaOS is engineered to execute flawlessly across five decades of computing hardware without external proprietary blobs or runtime dependencies:
+
+| Era / Generation | Target Architecture | Bus & Interface Layer | Driver Abstraction & Control | Key Hardware Targets |
+| :--- | :--- | :--- | :--- | :--- |
+| **Ancient (1980s–1990s)** | x86_32, PC/AT | ISA Bus, 8259 PIC, Real-Mode BIOS | Direct I/O Port Mapping (`inb`/`outb`), PIO Mode | IDE/PATA Disks, Sound Blaster 16, PS/2 Keyboard/Mouse, VGA Text Mode (0xB8000) |
+| **Legacy (2000s–2010s)** | x86_64, AArch32 | PCI / PCI-X, ACPI 2.0, APIC / IOAPIC | Memory-Mapped I/O (MMIO), Bus Master DMA | AHCI SATA PRDT, E1000 Gigabit NIC, RTL8139, VESA VBE Framebuffer, USB 1.1/2.0 (UHCI/OHCI/EHCI) |
+| **Modern (2011–2020)** | x86_64, AArch64, RISC-V | PCIe Gen3/4, MSI-X, UEFI GOP | Multi-Queue Ring Buffers, IOMMU DMA Isolation | NVMe 1.3/1.4 SQ/CQ, xHCI USB 3.0/3.2, Intel I210, DRM/KMS Framebuffers |
+| **Next-Gen (2021–2026+)** | x86_64, AArch64, RISC-V 64, LoongArch64, Ppc64Le | PCIe Gen5/6/7, CXL 3.0 Cache-Coherent Interconnect | Lock-Free Direct Memory Access, PQC HSM Hardware Accel | NVMe 2.0 ZNS, 100G/400G SmartNICs, Kyber/Dilithium PQC HSM, TPM 2.0 PCR Attestation |
+
+### 95.2 Principle-Driven Object-Oriented Driver Architecture
+Drivers in SigmaOS are designed as pure, modular objects using object-oriented design patterns tailored for bare metal:
+1. **Encapsulation**: Hardware control registers, MMIO ranges, and DMA buffer pointers are encapsulated within immutable, isolated driver structs, prohibiting uncontrolled memory access.
+2. **Inheritance & Hierarchy**:
+   - Base abstract `Driver` trait defines unified lifecycle methods (`init`, `probe`, `reset`, `shutdown`, `suspend`, `resume`).
+   - Derived `StorageDriver` extended by `NvmeDriver`, `AhciDriver`, `IdeDriver`, and `RamDiskDriver`.
+   - Derived `NetworkDriver` extended by `E1000Driver`, `Rtl8139Driver`, and `VirtIoNetDriver`.
+3. **Factory Design Pattern**: `DriverFactory` dynamically instantiates driver objects at boot or during hot-plug events by matching PCI Vendor/Device IDs or ACPI Hardware Identifiers.
+4. **Adapter Design Pattern**: Legacy hardware adapters wrap ancient PIO or BIOS interface calls to expose unified, modern asynchronous block and packet interfaces to the VFS and network stack.
+5. **Observer Design Pattern**: Event notification subsystem notifies registered kernel subscribers when driver hardware states change (e.g., link up/down, drive removal, thermal throttling).
+6. **Singleton Design Pattern**: `DriverShardManager` serves as the central coordination instance managing driver sandboxing, capability ring assignments, and resource isolation.
+
+---
+
+## 96. SOVEREIGN LINUX DISTRO CRUSHING & PACKAGE ABSORPTION SPECIFICATION
+
+### 96.1 Universal PackageAbsorption Engine (`SigmaPkg`)
+SigmaOS systematically defeats Linux package fragmentation through `SigmaPkg`—a declarative, reproducible, sandboxed universal package manager:
+1. **Multi-Format Package Absorption**:
+   - Transpiles Debian/Ubuntu `.deb` (dpkg control/data tarballs), Fedora `.rpm` (cpio payloads), Arch `.pkg.tar.zst` (libarchive), Alpine `.apk` (APK v3 index/tarballs), and Nix `.nix` store paths into unified, signed `.sigmapkg` bundles.
+   - Provides runtime translation wrappers and glibc/musl syscall emulation shims to execute absorbed binaries natively or within capability-gated sandboxes.
+2. **Declarative State & $O(1)$ Atomic Rollbacks**:
+   - System state is represented as a deterministic Nix-style acyclic graph (`DeclarativeStateGraph`).
+   - Package operations create immutable generational snapshots; rollbacks execute in $O(1)$ constant time by updating atomic generation symlinks.
+3. **Sandboxed Package Execution**:
+   - Every package installation and execution is isolated within OpenBSD-style `pledge`/`unveil` paths, mount namespaces, and cgroups v2 resource quotas.
+
+### 96.2 Zenith Unified Desktop Environment Synthesis
+Zenith Desktop eliminates X11/Wayland dependencies by rendering directly to bare-metal DRM/KMS or UEFI GOP framebuffers while absorbing the finest UX innovations across all operating systems:
+1. **GNOME Feature Absorption**: Clean, distraction-free minimalist workflows, integrated system overlays, and cohesive full-spectrum accessibility architectures.
+2. **KDE Plasma Feature Absorption**: Extreme modularity, granular widget separation, customizable desktop panels, and dynamic layout overlays.
+3. **COSMIC Feature Absorption**: Safe multi-threaded tiling window management, sub-millisecond layout calculations, and Rust memory safety.
+4. **macOS & Windows Feature Absorption**: Fluid typography engines, animated window state transitions, intuitive search overlays, and multi-display display arrangement.
+
+### 96.3 Preloaded Ready-to-Code Developer Environment
+SigmaOS ships with a complete, ready-to-code toolchain without requiring external downloads or setup friction:
+1. **Preloaded dormant toolchains**: Native zero-dependency compilers (Rust, Zig, Nim, C/C++ UDF toolchains), debuggers, linkers, and build systems instantly available on invocation.
+2. **On-demand resource loading**: Dormant tools consume zero background memory or CPU cycles until invoked by the user or build pipeline.
+3. **Embedded DevOps & Virtualization**: Preconfigured KVM micro-VM engines, lightweight container runtimes, and local compliance dashboards out-of-the-box.
+
+---
+
+## 97. SOVEREIGN OS SUBSYSTEM DOMAINS & UNIFIED COMPLIANCE ARCHITECTURE SPECIFICATION
+
+### 97.1 Comprehensive Subsystem Domain Blueprint
+1. **Networking & Connectivity**: Custom asynchronous TCP/IPv4/IPv6 and QUIC stack, eBPF packet routing, sub-50ms CARP high-availability failover, and built-in WireGuard VPN encryption.
+2. **Filesystem & Storage**: Copy-on-Write extents, Merkle tree root validation, JBD2 crash-consistent journaling, universal filesystem compatibility (Ext4, ZFS, Btrfs, NTFS, FAT32), and native temporal state rollbacks.
+3. **Process & Resource Scheduling**: AI-driven `SovereignSched` balancing CPU, GPU, and TPU workloads, predictive power scaling, thermal throttling protection, and energy-aware eco-modes.
+4. **Update & Self-Healing Maintenance**: Transactional delta updates, $O(1)$ state rollbacks, and self-healing modules that detect and repair corrupted system binaries automatically.
+5. **Cross-Platform Compatibility**: Native Linux ELF, Windows PE/Wine, and Android runtime shims operating under zero-trust capability rings.
+6. **Edge & IoT Readiness**: Lightweight SigmaOS embedded profiles supporting MQTT, CoAP, and Matter protocols with secure Over-The-Air (OTA) updates.
+7. **Accessibility & Inclusivity**: Full WCAG 2.1 AAA compliance including native screen readers, high-contrast themes, voice navigation, and real-time multi-language translation layers.
+
+### 97.2 Unified Compliance & Governance Framework
+SigmaOS incorporates an enterprise-grade, multi-domain compliance stack:
+
+| Compliance Domain | Industry Standard / Regulation | SigmaOS Implementation & Enforcement Mechanism |
+| :--- | :--- | :--- |
+| **Licensing & Legal** | GPL, MIT, Apache 2.0, BSD, SPDX | Automatic license scanning via `./scripts/check-spdx.sh`, Contributor License Agreements (CLA), dual-use export control auditing. |
+| **Information Security** | ISO/IEC 27001, SOC 2 Type II | Immutable append-only audit logging, PQC Kyber-1024 / Dilithium-5 signatures, amnesic RAM scrubbing, zero-trust RBAC. |
+| **Data Privacy** | GDPR, CCPA, HIPAA, Indian IT Act | Zero telemetry by default, AES-256 data encryption at rest, TLS 1.3 in transit, user-controlled privacy overlays. |
+| **Accessibility** | WCAG 2.1 AAA, Section 508 | Native screen reader engine (`src/accessibility/mod.rs`), voice command control, high-contrast color palettes. |
+| **Container & Cloud** | CIS Benchmarks, FedRAMP | Pre-hardened container security policies, signed OCI image layers, cloud compliance monitoring dashboards. |
+
+---
+
+## 98. SOVEREIGN AI AGENT DAILY CONTINUOUS IMPROVEMENT & WIKI SYNCHRONIZATION SPECIFICATION
+
+### 98.1 Daily Continuous Discovery & Execution Workflow
+The AI Development Agent executes a continuous 5-step daily improvement pipeline:
+1. **Open-Source Discovery**: Scans trending GitHub repositories across operating systems, kernel drivers, filesystems, and security tooling.
+2. **Feature Extraction & Knowledge Transfer**: Extracts key algorithmic enhancements, performance optimizations, and security patches, translating them into bare-metal UDFs.
+3. **Compliance & Security Audit**: Conducts daily CVE vulnerability scans, dependency health checks, and license audits across all repository files.
+4. **Plan Generation & Priority Ranking**: Produces a structured improvement plan categorizing tasks by priority (`Critical`, `High`, `Medium`, `Low`).
+5. **Automated Wiki Synchronization**: Synchronizes repository documentation, roadmap updates, and compliance dashboards across all wiki targets (`WIKI/`, `wiki/`, `wiki_repo/`) using `./scripts/sync_wiki.sh`.
+
+### 98.2 Strict Zero-Dependency & Pure Low-Level Engineering Directives
+1. **Modern Systems Programming Restriction**: All kernel modules, drivers, VFS extensions, and networking code must be written exclusively in modern systems languages (Rust, Zig, Nim).
+2. **Absolute `#![no_std]` Zero-Dependency Rule**: The standard library (`std::`), predefined high-level runtime functions, and third-party crate dependencies are strictly forbidden in kernel space. Every data structure, math operation, memory allocator, and system call must be built directly from bare-metal hardware addresses and user-defined primitives.
+3. **Bare-Metal Object-Oriented Principles**: Architecture must enforce encapsulation, inheritance/traits, polymorphism, and classical design patterns (Factory, Observer, Adapter, Singleton) operating directly on physical memory mapped registers.
+4. **Single Strategic Documentation Target**: All roadmap updates, technical proposals, and architectural specifications must be consolidated into `FUTURE-DEVELOPMENT-ROADMAP.md` and synchronized across wiki targets without creating duplicate roadmap files.
+
