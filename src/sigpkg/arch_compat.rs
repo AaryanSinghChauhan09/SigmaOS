@@ -926,7 +926,7 @@ impl SvntogitMigrationEngine {
 }
 
 #[cfg(test)]
-mod tests_disabled {
+mod tests {
     use super::*;
 
     #[test]
@@ -1140,3 +1140,4 @@ mod tests_disabled {
         let fail_res = engine.migrate_svn_repo_layout("empty-pkg", "extra", 450124, "");
         assert!(fail_res.is_err());
     }
+}

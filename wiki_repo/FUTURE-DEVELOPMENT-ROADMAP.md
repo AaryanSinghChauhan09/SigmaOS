@@ -4324,3 +4324,44 @@ SigmaOS replaces 500+ legacy monad userland applications with 12 sovereign Safe-
 - **Declarative Hardware Sovereignty Policies**: User-controlled declarative policies governing open vs proprietary driver usage.
 - **Temporal Filesystem Core**: Native time-travel filesystem state inspection and $O(1)$ generational rollbacks.
 - **Complete Shard Ecosystem Supremacy**: Full deprecation and replacement of legacy monad applications with 12 sovereign shards.
+
+---
+
+## 93. SOVEREIGN OS PUBLIC LAUNCH ANNOUNCEMENT, WHITEPAPER & CONTRIBUTOR CHARTER
+
+### 93.1 Public Launch Announcement Manifesto
+SigmaOS is officially announced as the world’s first **sovereign operating system**, engineered in Safe-Rust to deliver clarity, resilience, and security beyond legacy monolithic Linux and BSD operating systems.
+- **Declarative Init System**: Rust-safe parallel service manager with deterministic dependency tracking.
+- **Universal Package Manager (`SigmaPkg`)**: Immutable layers, $O(1)$ rollback safety, reproducible builds, and multi-format transpilation (`.deb`, `.rpm`, `.apk`, `.pkg.tar.zst`).
+- **Cluster-Native Networking**: Distributed device pooling treating heterogeneous hardware nodes as one unified operating system.
+- **Temporal Filesystem**: Native time-travel state rollback and extent-based transaction logging.
+- **Rust-Native Utilities**: High-performance, zero-bloat POSIX-compliant replacements.
+- **Post-Quantum Cryptographic Security**: Hardware-rooted startup with Dilithium-5 signatures and OpenBSD `pledge`/`unveil` path sandboxing.
+
+### 93.2 Whitepaper Core Architecture Summary
+1. **Introduction**: SigmaOS is designed to surpass Linux and BSD by unifying where they fragment, securing where they compromise, and innovating where they stagnate.
+2. **Subsystems Overview**:
+   - *Init Subsystem*: Parallelized boot, sandboxed daemons, unified observability.
+   - *Package Subsystem*: Immutable layer caching, signed channels, cluster-aware deployment.
+   - *Network Stack*: eBPF packet routing, sub-50ms CARP failover, cluster-native socket IPC.
+   - *Storage Stack*: CoW extents, Btrfs/ZFS/UFS compatibility, temporal filesystem rollbacks.
+   - *Advanced Subsystems*: KVM micro-VMs, OCI container runtimes, Wasm micro-execution.
+
+### 93.3 Contributor Charter Governance Framework
+1. **Purpose**: Establishes principles, roles, processes, and community standards for contributing to the sovereign SigmaOS ecosystem.
+2. **Core Governance Principles**:
+   - *Sovereignty*: Independence from proprietary blobs, closed vendor telemetry, or opaque firmware.
+   - *Clarity*: Declarative manifests, transparent codebases, and comprehensive documentation.
+   - *Resilience*: Strict rollback guarantees, fault-tolerant state recovery, and cluster pooling.
+   - *Security*: Non-negotiable Rust memory safety, capability sandboxing, and PQC integrity.
+3. **Contributor Roles**:
+   - *Core Developers*: Maintain kernel microkernel shards, init engine, package manager, and networking.
+   - *Module Maintainers*: Oversee specific shards (drivers, utilities, desktop, AI).
+   - *Community Contributors*: Submit patches, documentation, translation, and accessibility enhancements.
+   - *Institutional Partners*: Academic labs, universities, and sovereign computing institutions.
+
+### 93.4 Formal 4-Phase Execution Roadmap (2026+)
+- **Phase 1: Foundation (Q4 2026 – Q2 2027)**: Init engine, package manager, core userland utilities -> Daily-driver ready.
+- **Phase 2: Parity (Q3 2027 – Q1 2028)**: Asynchronous networking, filesystems, driver shards -> Linux/BSD feature parity.
+- **Phase 3: Competitiveness (Q2 2028 – Q4 2028)**: OCI containers, Rust hypervisor, transactional updates -> Production server & DevOps ready.
+- **Phase 4: Sovereignty (2029+)**: PQC boot chain, amnesic RAM scrubbing, universal accessibility, internationalization -> Sovereign OS ecosystem supremacy.
