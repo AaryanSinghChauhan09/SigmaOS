@@ -32,14 +32,15 @@ pub mod universal_engine;
 pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
-pub mod universal_adapter;
-pub mod sovereign_sigpkg;
 
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
 pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager, AdapterError, DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
+    PackageFormatAdapter, UniversalPackageManager, AdapterError,
+};
+pub use universal_oop_system::{
+    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
 };
 pub use sovereign_sigpkg::*;
 
@@ -64,17 +65,13 @@ pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseF
 pub use transaction::Transaction;
 pub use universal_adapter::{
     AptDebManifest, UniversalPackageAdapter,
+};
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,
     PackageManager as SpecPackageManager, PackageStats, PackageVersion, SimplePackage,
     SimplePackageManager, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
-pub use store::{
-    BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
-};
-pub use transaction::Transaction;
-pub use universal_adapter::{AptDebManifest, UniversalPackageManager as UniversalPackageAdapter};
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer

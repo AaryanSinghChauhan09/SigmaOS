@@ -101,15 +101,6 @@ pub struct AhciCommandHeader {
 }
 
 
-/// AHCI Command Header Structure
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AhciCommandHeader {
-    pub opts: u8,
-    pub prdtl: u16,
-    pub prdbc: u16,
-    pub ctba: u32,
-    pub reserved: [u8; 4],
-}
 
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
