@@ -186,11 +186,6 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    Nix,        // Nix package (.nix)
-    Txz,        // FreeBSD / Slackware txz (.txz)
-    CachyOS,    // CachyOS package (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling package (.starling)
 }
 
 impl PackageFormat {
