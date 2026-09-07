@@ -55,6 +55,12 @@ Components receiving open file descriptors enter capability mode (`enter_capabil
 * **Koji & Bodhi Integration**: RPC build clients (`FedoraKojiBuildSystemClientEngine`) and update feedback / karma submission (`FedoraBodhiUpdateFeedbackEngine`).
 * **Automated Packaging**: Spec file generation and RPM packaging engine (`FedoraPaugusAutomatedPackagingEngine`).
 
+### 3.4 Arch Linux Parity & Keyring Components (`src/compatibility/arch_linux.rs`)
+* **GnuPG Keyring & Trust Database**: Web of Trust keyring initialization, key import, and revocation (`ArchKeyringTrustDatabaseEngine`).
+* **Reflector Mirrorlist Ranking**: Dynamic mirror ranking by download speed, country code, and completion rate (`ArchReflectorMirrorlistEngine`).
+* **Archiso Bootstrap Generator**: Headless chroot bootstrap TAR and profile builder (`ArchisoBootstrapGeneratorEngine`).
+* **AUR v5 RPC Client**: JSON RPC API client and dependency tree solver (`ArchUserRepositoryRpcClientEngine`).
+
 ---
 
 ## 4. Component Lifecycle State Machine
