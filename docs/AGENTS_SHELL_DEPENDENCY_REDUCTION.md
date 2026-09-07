@@ -1,19 +1,31 @@
-# AI Agent Guidelines for Shell Language Dependency Reduction in SigmaOS
+# AI Agent Shell Dependency Reduction Specification for SigmaOS
 
-## 1. Overview
-SigmaOS enforces a strict policy reducing external shell script dependencies in favor of native Rust tools (`src/tools/sigma_cli.rs`), zero-dependency shell REPL modules (`src/userland/shell.rs`), and native Rust test harnesses.
-
-## 2. Guidelines for AI Agents
-
-### 2.1 Native Rust Tool Execution
-- **Prefer `sigma_cli`**: AI agents executing system tasks must invoke `sigma` subcommands (`sigma build`, `sigma run`, `sigma attest`, `sigma publish`) rather than invoking external `.sh` scripts.
-- **WASM Hostcall Fast-Paths**: Administrative tasks run via WASM hostcalls inside `sigma_cli` with zero external shell process spawning overhead.
-
-### 2.2 Shell REPL Builtin Redirection (`src/userland/shell.rs`)
-- **Native Redirection**: Parameter expansions (`${VAR:-default}`), stream redirections (`> file`, `2>&1`), and pipeline chains operate via `RedirectionEngine` in Rust rather than passing commands to `/bin/sh -c`.
-
-### 2.3 Testing Strategy
-- **Rust Harnesses First**: Testing agents invoke `./run_sigma_tests.sh` or `cargo test --lib` directly. New test scenarios must be implemented as Rust tests (`#[test]`) or Python pytest fixtures rather than new bash scripts.
+This document specifies operational standards for AI agents reducing Shell programming language dependencies and migrating build/test scripts to pure Rust in **SigmaOS**.
 
 ---
-*Maintained by the SigmaOS Architecture Steering Committee.*
+
+## 1. Shell Script Reduction Guidelines
+
+AI agents refactoring or replacing shell scripts (`.sh`, `.bash`) must follow these rules:
+
+1. **Rust First Automation**:
+   - Implement build, packaging, testing, and ISO staging logic in pure Rust (`src/`, `src/bin/`, `build.rs`).
+
+2. **REPL Builtins**:
+   - Integrate shell userland command builtins into `src/shell/repl.rs` and `src/shell/zsh_bash_parity.rs`.
+
+3. **Safe Subprocess Invocation**:
+   - Avoid `sh -c` string execution. Pass structured argument arrays via `Command::new()`.
+
+4. **Path & Environment Safety**:
+   - Use `PathBuf` for cross-platform filesystem path manipulation.
+
+---
+
+## 2. Verification Protocol
+
+- Run `./run_sigma_tests.sh` and verify all Cargo build targets pass without shell script dependencies.
+
+---
+
+*Maintained by the SigmaOS Core Architecture Committee.*

@@ -2226,7 +2226,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "flatpak" | "snap" | "pkgman" | "swupd" => {
+            "flatpak" | "snap" | "pkgman" | "swupd" | "brew" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2235,6 +2235,37 @@ impl UniversalPmCommandDispatcher {
                         "update" | "upgrade" | "bundle-upgrade" => operation = UniversalPmOperation::Upgrade,
                         "search" | "find" => operation = UniversalPmOperation::Search,
                         "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        "-n" | "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pkg_add" | "pkg_info" => {
+                if pm == "pkg_add" {
+                    operation = UniversalPmOperation::Install;
+                } else {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
+                for arg in args {
+                    if *arg == "-n" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
+            "pisi" | "urpmi" | "slapt-get" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "it" | "install" | "i" => operation = UniversalPmOperation::Install,
+                        "rm" | "remove" | "er" => operation = UniversalPmOperation::Remove,
+                        "up" | "upgrade" | "ur" => operation = UniversalPmOperation::Upgrade,
+                        "sr" | "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-s" | "--simulate" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }

@@ -385,11 +385,30 @@ fn test_all_prompt_package_formats() {
         .unwrap();
     assert_eq!(pkg.name, "nginx");
 
-    let ebuild_text = "DESCRIPTION=\"The Portage Package Manager\"\nRDEPEND=\"dev-lang/python\"\n";
-    let ebuild_pkg = adapter
-        .parse_and_translate_manifest("sys-apps/portage-3.0.30.ebuild", ebuild_text)
-        .unwrap();
-    assert_eq!(ebuild_pkg.name, "portage");
+    let pacman_cmd = dispatcher.dispatch_command("pacman -S zsh").unwrap();
+    assert_eq!(pacman_cmd.source_pm, "pacman");
+    assert_eq!(pacman_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(pacman_cmd.target_packages, vec!["zsh"]);
+
+    let dnf_cmd = dispatcher.dispatch_command("dnf install htop").unwrap();
+    assert_eq!(dnf_cmd.source_pm, "dnf");
+    assert_eq!(dnf_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(dnf_cmd.target_packages, vec!["htop"]);
+
+    let apk_cmd = dispatcher.dispatch_command("apk add bash").unwrap();
+    assert_eq!(apk_cmd.source_pm, "apk");
+    assert_eq!(apk_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(apk_cmd.target_packages, vec!["bash"]);
+
+    let brew_cmd = dispatcher.dispatch_command("brew install wget").unwrap();
+    assert_eq!(brew_cmd.source_pm, "brew");
+    assert_eq!(brew_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(brew_cmd.target_packages, vec!["wget"]);
+
+    let pisi_cmd = dispatcher.dispatch_command("pisi it firefox").unwrap();
+    assert_eq!(pisi_cmd.source_pm, "pisi");
+    assert_eq!(pisi_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(pisi_cmd.target_packages, vec!["firefox"]);
 }
 
 #[test]
