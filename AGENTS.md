@@ -36,6 +36,8 @@ These instructions provide actionable guidance, testing procedures, and architec
    * For ELF/PE section layouts (`.text`, `.rodata`, `.data`, `.bss`, `.got`), page table permission flags, $4\text{ KB}$ alignment, and RELRO lockdown, follow [docs/AGENTS_SECTION_OPERATION_MANAGEMENT.md](docs/AGENTS_SECTION_OPERATION_MANAGEMENT.md).
 13. **Disk Operation & Block I/O Schedulers:**
    * For Kyber/BFQ/mq-deadline I/O schedulers, NVMe SQ/CQ multi-queue ring buffers, AHCI SATA PRDT tables, and TRIM/Deallocate discard commands, follow [docs/AGENTS_DISK_OPERATION_MANAGEMENT.md](docs/AGENTS_DISK_OPERATION_MANAGEMENT.md).
+14. **Zombie Process Harvesting & Orphan Adoption:**
+   * For POSIX `waitpid()` collection (`WNOHANG`), Init PID 1 orphan reaper loops, two-stage resource reclamation, and PCB table leak prevention, follow [docs/AGENTS_ZOMBIE_SYSTEMS_OPERATION_MANAGEMENT.md](docs/AGENTS_ZOMBIE_SYSTEMS_OPERATION_MANAGEMENT.md).
 
 ---
 
