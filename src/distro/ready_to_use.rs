@@ -107,7 +107,7 @@ impl DistroServiceManager {
         let mut active: Vec<String> = Vec::new();
         for (name, unit) in self.services.iter() {
             if unit.state == ServiceState::Running {
-                let s_name: String = String::from(name.as_str());
+                let s_name: String = name.to_string();
                 active.push(s_name);
             }
         }
@@ -399,7 +399,7 @@ impl PlugAndPlayHardwareManager {
                 for (driver_name, supported_cats) in self.registered_drivers.iter() {
                     let cats: &Vec<DeviceCategory> = supported_cats;
                     if cats.contains(&category) {
-                        let d_name: String = String::from(driver_name.as_str());
+                        let d_name: String = driver_name.to_string();
                         bound_driver = Some(d_name);
                         break;
                     }
@@ -423,7 +423,7 @@ impl PlugAndPlayHardwareManager {
         let mut list: Vec<String> = Vec::new();
         for (path, node) in self.devices.iter() {
             if node.driver_bound.is_some() {
-                let d_path: String = String::from(path.as_str());
+                let d_path: String = path.to_string();
                 list.push(d_path);
             }
         }

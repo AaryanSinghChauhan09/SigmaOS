@@ -104,7 +104,7 @@ impl CommunityHandbookCatalog {
             .filter(|a| {
                 a.title.to_lowercase().contains(&q)
                     || a.content.to_lowercase().contains(&q)
-                    || a.tags.iter().any(|t| t.to_lowercase().contains(&q))
+                    || a.tags.iter().any(|t: &String| t.to_lowercase().contains(&q))
             })
             .collect()
     }
