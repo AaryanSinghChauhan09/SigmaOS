@@ -35,6 +35,19 @@ The table below catalogs all operational subsystems across the **Twelve Sovereig
 
 ---
 
+## 2.1 High-Level Language & Python Dependency Elimination Protocol
+
+SigmaOS enforces a strict **Zero External Runtime Policy** to eliminate security vulnerabilities, memory overhead, and interpreter startup latency associated with Python, Node.js V8, Java JVM, and Go runtimes.
+
+### Key Python Reduction Directives for AI Agents:
+1. **Native Rust `klib` Equivalents**: All system utilities, scripting tools, and automation tasks must be written in safe Rust using `#![no_std]` `klib` primitives (`crate::klib::io`, `crate::klib::toml`, `crate::klib::json`, `crate::klib::merkle`).
+2. **Eliminating Python Script Invocation**:
+   - Replace Python build & benchmark scripts (`generate-benchmark-report.py`, `competitor_scan.py`) with native Rust binary targets compiled directly via `cargo`.
+   - Replace Python merge scripts (`merge_all_branches.py`, `merge_markdown.py`) with `crate::tools::sovereign_commands` native Markdown and file processing pipelines.
+3. **Foreign Scripting Bridges**: Where POSIX shell or Python compatibility is required for external legacy packages, use `SovereignUniversalDistroBridge` in `src/distro/linux_bsd_inspirations.rs` to transpile and run shell commands directly through native system call dispatchers rather than spawning Python interpreter child processes.
+
+---
+
 ## 3. Compiler & Runtime Diagnostics Catalog (What's Not Working & Why)
 
 When modifying, building, or expanding algorithms in full workspace build modes (`cargo check --lib` / `cargo test`), AI agents may encounter Rust compiler errors caused by duplicate implementations or trait collisions from legacy feature additions. The catalog below lists each error code, its root cause, and why it happens in this codebase.
