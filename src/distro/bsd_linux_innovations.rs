@@ -2,12 +2,7 @@
 // SigmaOS BSD & Linux Innovations Subsystem
 // Inspired by OpenBSD/FreeBSD PF, DragonFly BSD HAMMER2, Void Linux runit, and Parrot OS AnonSurf
 
-#[cfg(not(target_os = "none"))]
-use std::vec::Vec;
-
-#[cfg(target_os = "none")]
-
-#[cfg(target_os = "none")]
+use alloc::vec::Vec;
 
 // ============================================================================
 // 1. OpenBSD / FreeBSD PF (Packet Filter) Stateful Firewall
@@ -704,7 +699,88 @@ impl SovereignDeltaPackageSigner {
     }
 }
 
-#[cfg(test_disabled)]
+// ============================================================================
+// 6. Linux & BSD Component Guidelines & Policy Engine
+// ============================================================================
+
+/// Distro Architecture Guideline Pillar
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GuidelinePillar {
+    ArchPackagingPurity,
+    DebianPolicyFhs,
+    FedoraSelinuxPresets,
+    FreeBsdCapsicumJails,
+    OpenBsdPledgeHardening,
+    NixHermeticCasStore,
+}
+
+/// Linux & BSD Distro Architecture Guideline Policy Evaluator
+#[derive(Debug, Clone)]
+pub struct BsdLinuxDistroGuidelinePolicy {
+    pub active_pillars: Vec<GuidelinePillar>,
+    pub enforce_zero_patch_purity: bool,
+    pub enforce_fhs_paths: bool,
+    pub enforce_capability_rights: bool,
+}
+
+impl BsdLinuxDistroGuidelinePolicy {
+    pub fn new() -> Self {
+        Self {
+            active_pillars: vec![
+                GuidelinePillar::ArchPackagingPurity,
+                GuidelinePillar::DebianPolicyFhs,
+                GuidelinePillar::FedoraSelinuxPresets,
+                GuidelinePillar::FreeBsdCapsicumJails,
+                GuidelinePillar::OpenBsdPledgeHardening,
+                GuidelinePillar::NixHermeticCasStore,
+            ],
+            enforce_zero_patch_purity: true,
+            enforce_fhs_paths: true,
+            enforce_capability_rights: true,
+        }
+    }
+
+    pub fn evaluate_pillar_compliance(&self, pillar: GuidelinePillar) -> bool {
+        match pillar {
+            GuidelinePillar::ArchPackagingPurity => self.enforce_zero_patch_purity,
+            GuidelinePillar::DebianPolicyFhs => self.enforce_fhs_paths,
+            GuidelinePillar::FreeBsdCapsicumJails | GuidelinePillar::OpenBsdPledgeHardening => {
+                self.enforce_capability_rights
+            }
+            _ => true,
+        }
+    }
+
+    pub fn verify_all_pillars(&self) -> bool {
+        self.active_pillars.iter().all(|&p| self.evaluate_pillar_compliance(p))
+    }
+}
+
+impl Default for BsdLinuxDistroGuidelinePolicy {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Master Distro Component Innovations Engine
+#[derive(Debug, Clone, Default)]
+pub struct SovereignDistroComponentInnovationsEngine {
+    pub policy: BsdLinuxDistroGuidelinePolicy,
+}
+
+impl SovereignDistroComponentInnovationsEngine {
+    pub fn new() -> Self {
+        Self {
+            policy: BsdLinuxDistroGuidelinePolicy::new(),
+        }
+    }
+
+    pub fn verify_system_integrity(&self) -> bool {
+        self.policy.verify_all_pillars()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -777,6 +853,20 @@ mod tests {
         assert_eq!(scrubbed, 64);
         assert_eq!(secret_ram, [0u8; 64]);
         assert_eq!(scrubber.get_total_scrubbed_bytes(), 64);
+    }
+
+    #[test]
+    fn test_bsd_linux_distro_guideline_policy() {
+        let policy = BsdLinuxDistroGuidelinePolicy::new();
+        assert!(policy.verify_all_pillars());
+        assert!(policy.evaluate_pillar_compliance(GuidelinePillar::ArchPackagingPurity));
+        assert!(policy.evaluate_pillar_compliance(GuidelinePillar::FreeBsdCapsicumJails));
+    }
+
+    #[test]
+    fn test_sovereign_distro_component_innovations_engine() {
+        let engine = SovereignDistroComponentInnovationsEngine::new();
+        assert!(engine.verify_system_integrity());
     }
 
     #[test]

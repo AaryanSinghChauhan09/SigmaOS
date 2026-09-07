@@ -1115,13 +1115,28 @@ mod tests {
         let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
+    }
 
-        let gap_resolver = SovereignUniversalDistroGapResolver::new();
+    #[test]
+    fn test_sovereign_dynamic_devfs() {
+        let mut devfs = SovereignDynamicDevfsEngine::new();
+        assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234-ABCD"));
+        assert!(devfs.lookup_node("disk/by-uuid/1234-ABCD").is_some());
+    }
+
+    #[test]
+    fn test_sovereign_universal_distro_gap_resolver() {
+        let mut resolver = SovereignUniversalDistroGapResolver::new();
         assert_eq!(
-            gap_resolver.lookup_modprobe_alias("char-major-10-200"),
+            resolver.lookup_modprobe_alias("char-major-10-200"),
             Some("tun")
         );
-        assert_eq!(gap_resolver.lookup_modprobe_alias("unknown-alias"), None);
+        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
+        assert!(resolver.verify_bsd_geom_storage_readiness());
+
+        resolver.faillock_guard.record_failure();
+        resolver.faillock_guard.reset();
+        assert!(!resolver.faillock_guard.is_locked);
     }
 }
 

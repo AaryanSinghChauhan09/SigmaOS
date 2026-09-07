@@ -9,7 +9,6 @@ pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
-pub mod web_wasm_bridge;
 pub mod zenith_compositor;
 pub mod ultimate_distro_desktop;
 

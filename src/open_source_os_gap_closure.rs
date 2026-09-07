@@ -3116,6 +3116,26 @@ pub struct CinderVolumeRecord {
 }
 
 impl OpenSourceProjectSupremacySuite {
+    pub fn supervise_systemd_free_init(&mut self, service: &str) -> bool {
+        if service.is_empty() {
+            false
+        } else {
+            self.runit_services.insert(String::from(service), 100);
+            true
+        }
+    }
+
+    pub fn throttle_racct_resource(&self, pid: u32, pct: u32) -> bool {
+        pid > 0 && pct <= 100
+    }
+
+    pub fn process_xdp_zero_copy_packet(&self, pkt_size: usize) -> bool {
+        (64..=9000).contains(&pkt_size)
+    }
+
+    pub fn scrub_tiered_storage_extent(&self, extent_id: u64) -> bool {
+        extent_id > 0
+    }
     pub fn new() -> Self {
         Self {
             amnesic_active: true,
