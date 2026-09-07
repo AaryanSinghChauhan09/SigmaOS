@@ -191,7 +191,7 @@ impl Default for SwupdUpdateManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
