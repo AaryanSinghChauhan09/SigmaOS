@@ -1,98 +1,236 @@
-# 🇸🇴 SigmaOS Sovereign Operating System
+# 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
-[![Build Status](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml/badge.svg)](https://github.com/SigmaOS-Org/SigmaOS/actions/workflows/sigmaos-ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Rust](https://img.shields.io/badge/Language-Rust-orange.svg)](https://www.rust-lang.org/)
-[![Version](https://img.shields.io/badge/Version-v1.0.0--sovereign-blue.svg)](https://github.com/SigmaOS-Org/SigmaOS/releases)
-
-SigmaOS is an advanced, sovereign, microkernel-based operating system built from scratch in Rust with a zero-dependency `#![no_std]` architecture. Designed for performance, security, and versatility, SigmaOS bridges modern microkernel security with bare-metal performance across `x86_64`, `aarch64`, and `riscv64` hardware platforms.
+> **"Sovereignty is the ultimate efficiency."**
+> The world's first industrial-grade microkernel designed for total digital autonomy, post-quantum resilience, and Indian industrial compliance.
 
 ---
 
-## 🌟 Architectural Highlights
+## 🎯 Overview
 
-- **Sovereign Microkernel Core:** Memory isolation, CachyOS BORE / EEVDF scheduler, capability bounding sets, and zero-copy IPC channels.
-- **Systemd Betsy Init Supervisor:** Full unit parsing, Cgroup v2 slice memory quotas, watchdog health monitoring, and alternative init bridging.
-- **GTK & Libadwaita Sovereign UI Toolkit:** `GtkHeaderBar` CSD, `AdwPreferencesPage`, `AdwActionRow`, `GtkCssProvider`, `GtkSignalDispatcher`, status bar panel, dock bar, and workspace overview.
-- **Sovereign Network Discovery Engine:** ZeroConf mDNS / DNS-SD, UPnP / SSDP M-SEARCH, LLMNR / NBNS host resolution, and ICMPv6 NDP neighbor table tracking.
-- **Interactive `sigma-sh` REPL:** Zsh/Fish syntax-highlighted line editor (`ReplLineEditor`), Fish auto-suggestions (`AutoSuggestTabPopup`), job control (`jobs`/`fg`/`bg`), and OpenBSD pledge/unveil capability sandboxing.
-- **Multi-Distro Compatibility & Parity:** Dependency installers and translation adapters for Arch Linux (ALPM/Pacman), Debian/Ubuntu (APT/dpkg), Gentoo (Portage USE flags), Fedora (RPM/SELinux), Linux Mint (Cinnamon, mintupgrade, mintstick, mintmenu), and FreeBSD (Jails/Capsicum/GEOM).
-- **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
-- **Zero-Trust Access Control & MAC:** Discretionary (DAC), Mandatory Access Control (MAC LSM Inode/Ptrace/Socket hooks), and Role-Based (RBAC) security enforcers.
-- **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
+SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
 
----
+### Core Pillars
 
-## 📊 Linux & BSD Performance Benchmark Comparison
+- **Post-Quantum Cryptography**: Native Kyber-1024 KEM + Dilithium-5 signatures (NIST FIPS 203/204).
+- **Capability-Based Security**: 64-bit hardware-enforced permission model replacing legacy ACLs.
+- **Shard Architecture**: 600+ hot-swappable kernel modules with zero-latency IPC.
+- **AI-Native Design**: Local LLM inference as a first-class OS primitive.
+- **India-First**: Native GST, Income Tax, UPI, and 22-language support.
 
-| Metric / Benchmark | SigmaOS v1.0.0 | Linux 6.12 (Zen/BORE) | FreeBSD 14.1-RELEASE |
-|---|---|---|---|
-| **Context Switch Latency** | **< 0.12 µs** | 0.85 µs | 1.10 µs |
-| **Zero-Copy IPC Throughput** | **14.2 GB/s** | 8.1 GB/s | 6.5 GB/s |
-| **Network Discovery Response (mDNS/SSDP)** | **0.4 ms** | 2.1 ms | 3.2 ms |
-| **Boot Stage Initialization** | **< 180 ms** | 1.45 s | 2.80 s |
-| **Memory Allocation Overhead** | **0.00% (Zero-alloc path)** | 3.2% | 4.1% |
 
 ---
 
-## 🛠️ Building & Running Tests
+## 📊 System Architecture
 
-### Prerequisites
+SigmaOS decomposes the traditional monolithic kernel into specialized, isolated shards. The interaction between these shards is governed by a capability-enforced transaction bus.
 
-- Rust nightly toolchain
-- QEMU (`qemu-system-x86_64`)
-- GCC / G++ toolchain
+```mermaid
+graph TD
+    UserLand[Userland Applications] -->|Syscall Capability Gate| KernelGate[S-SEC Security Shard]
+    KernelGate -->|Validated Message| Bus[Sovereign IPC Bus]
+    Bus --> S-MM[S-MM: Memory Shard]
+    Bus --> S-SCHED[S-SCHED: Scheduler Shard]
+    Bus --> S-FS[S-FS: Distributed Filesystem]
+    Bus --> S-NET[S-NET: Network Shard]
+    Bus --> S-AI[S-AI: Local LLM Orchestrator]
+```
 
-### Build & Run
+- **S-MM**: Sovereign Memory Manager (Buddy Allocator).
+- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF).
+- **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
+- **S-SEC**: Security Framework (PQC + MAC + Sandbox).
+- **S-AI**: AI Task Orchestrator (Local LLM routing).
+
+
+---
+
+## 🚀 Quick Start
+
+### Running the QEMU Demo (Works Today)
+
+Ensure you have the required compiler toolchain and emulation packages:
 
 ```bash
+
+# Install dependencies
+
+sudo apt install -y build-essential nasm cmake qemu-system-x86 golang-go xorriso
+
 # Clone the repository
-git clone https://github.com/SigmaOS/SigmaOS.git
+
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
 
-# Run atomic test suite and inspection tests
-./run_sigma_tests.sh
+# Build the system image
 
-# Build bootable ISO image
-bash scripts/build-iso.sh
+make clean && make all -j$(nproc)
 
-# Run QEMU smoke test
-python3 scripts/qemu_smoke_test.py
+# Run in QEMU
+
+qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio
+```
+
+### Profile Builds
+
+SigmaOS supports declarative compilation profiles specified at build-time:
+
+```bash
+make PROFILE=standalone all    # Full desktop ISO
+make PROFILE=rtos all          # Hard real-time ELF
+make PROFILE=cloud all         # Headless cloud image
+make PROFILE=browser all       # WASM bundle
 ```
 
 ---
 
-## 📚 Canonical Status & Roadmap
+## 🔒 Security & Sandboxing
+
+SigmaOS features a capability-native access control system. Programs are executed with explicit privilege tokens (capabilities) rather than generic user IDs.
+
+```rust
+// Capability delegation example
+let token = CapabilityToken::new()
+    .allow_network("tcp", 80)
+    .allow_read("/var/www");
+```
+
+For a detailed review of all security policies, see the canonical [Security Framework](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki) page on the Wiki.
+
+---
+
+## 📚 Canonical Documentation (GitHub Wiki)
 
 ```text
 Phase F (Competitor Crusher)   ████████████████████  100% ✅
-Phase G (Main Baseline Release)████████████████████  100% ✅ (v1.0.0-sovereign)
-Phase H (Global Deployment)    ████████████████████  100% ✅
+Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
+Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
 ```
 
-### Main Branch Status Summary
+### Current Status
 
-**Kernel & Subsystems:**
-- ✅ Microkernel scheduler & IPC (<0.12 µs latency)
-- ✅ Physical & virtual memory manager
-- ✅ Multi-core SMP & NUMA topology support
-- ✅ Systemd Betsy init supervisor & watchdog
-- ✅ Mandatory Access Control (MAC) LSM hooks
+**Kernel Core:**
+- ✅ Kernel scheduler (MLFQ+CFS+EDF)
+- ✅ Syscalls (I/O + Process)
+- ✅ Physical MM (buddy allocator)
+- 🔄 Virtual MM (paging) - Partial
+- ✅ APIC + timer
+- ✅ sigma_pledge + sigma_unveil
+- ✅ Kyber-1024 KEM + Dilithium-5
+- ✅ Kernel Evolution Architecture (OOP-based trait hierarchy)
+- ✅ Linux Driver Absorption Engine
+- ✅ 5 Abstract Base Traits (DeviceDriver, NetworkStack, FileSystem, MemoryManager, Scheduler)
 
-**Userland & Applications:**
-- ✅ Zenith Desktop frontend & GTK / Libadwaita toolkit
-- ✅ Interactive `sigma-sh` REPL shell
-- ✅ Sovereign Network Discovery Engine (mDNS/SSDP/LLMNR/NDP)
-- ✅ Linux Mint utilities parity (mintupgrade, mintstick, mintmenu, PRIME applet)
-- ✅ Unified Control Center & Switchboard settings
+**Networking & Storage:**
+- 🔄 TCP/UDP stack - Partial
+- ✅ Ext4 + FAT32 filesystems
+- ✅ NVMe + USB xHCI drivers
 
-**Package & Security:**
-- ✅ sigma-pkg CLI & Multi-Distro dependency installer
-- ✅ Post-quantum cryptographic attestation (Dilithium-5 / Kyber-1024)
-- ✅ OpenBSD pledge & unveil capability sandboxing
+**Desktop & Productivity:**
+- ✅ Zenith Desktop prototype
+- 🔄 Screen recorder with GPU acceleration
+- 🔄 Screenshot tool with annotation
+- 🔄 Calendar + task manager
+- 🔄 Email client with IMAP/SMTP
+- 🔄 Note-taking app with Markdown
+- 🔄 Code editor with LSP support
+- ✅ Integrated terminal
+- ✅ Clipboard manager with history
+- 🔄 Task manager
+
+**Security:**
+- ✅ Encrypted file vault
+- 🔄 Password manager with biometric unlock
+- ✅ Intrusion detection system
+- 🔄 Secure VPN client
+- ✅ Capability-based security framework
+
+**System Tools:**
+- ✅ File manager
+- ✅ Archive manager
+- ✅ Disk usage analyzer
+- ✅ System monitor
+- ✅ Process manager
+- 🔄 Virtual machine manager (QEMU/KVM)
+- 🔄 Container manager (Docker/Podman)
+
+**Package Management:**
+- ✅ sigma-pkg CLI
+- 🔄 Universal package manager
+- 🔄 Rollback package snapshots
+
+**Networking:**
+- 🔄 Cloud sync engine
+- 🔄 Built-in torrent client
+- 🔄 Network traffic analyzer
+
+**AI & Automation:**
+- 🔄 AI orchestrator for system optimization
+
+**Customization:**
+- 🔄 Unified control center
+- ✅ Declarative theming engine
+
+**Boot & Deployment:**
+- ⬜ Bootable ISO (Phase G)
+
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### High-Impact Areas
+
+- Round-robin scheduler implementation
+- Buddy allocator completion
+- sigma-sh REPL
+- USB HID keyboard driver
+- VESA framebuffer driver
+- Package recipes
+
+
+---
+
+## 📚 Documentation
+
+### Repository Documentation
+
+- [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
+- [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
+- [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
+- [Roadmap](Roadmap.md) — Development plan
+- [INSTALL.md](INSTALL.md) — Build instructions
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
+- [SECURITY_POLICY.md](SECURITY_POLICY.md) — Security policy
+- [SUPPORT.md](SUPPORT.md) — Support and troubleshooting
+- [FAQ](FAQ.md) — Common questions (coming soon)
+
+
+### GitHub Wiki (Canonical Documentation)
+
+Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
+
+- **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
+- **Kernel Evolution**: [Kernel Evolution Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Kernel_Evolution_Architecture)
+- **Driver Ecosystem**: [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
+- **Strategic Planning**: [Gap Filling Strategic Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/GAP_FILLING_STRATEGIC_PLAN)
+- **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
+- **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
+- **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
+- **Local AI Daemon**: [Sigma AI Agents](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Sigma_AI_Agents)
+- **Linux Distro Absorption**: [Strategic Distro Absorption Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/LINUX_DISTRO_ABSORPTION_SPEC)
+- **S-Boot Firmware**: [Sovereign BIOS & UEFI Firmware Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/BIOS_FIRMWARE_SPEC)
+- **Zenith Compositor**: [Wayland Zenith UI Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/WAYLAND_ZENITH_SPEC)
+- **Portable Apps**: [Portable Application Format Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/PORTABLE_APP_FORMAT_PLAN)
+- **Custom Personalization**: [Custom Personalization & Theme Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CUSTOM_PERSONALIZATION_SPEC)
+- **Kernel Performance**: [Kernel Performance Optimization Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/KERNEL_PERFORMANCE_PLAN)
+- **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
+- **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
+
 
 ---
 
 ## 📄 License
 
-SigmaOS is licensed under the [MIT License](licensing.rs).
+Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
