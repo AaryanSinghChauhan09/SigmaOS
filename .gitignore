@@ -25,6 +25,5 @@ wiki/
 WIKI/
 __pycache__/
 
-/build/
 /tmp/
 *.tmp
