@@ -31,6 +31,11 @@ pub mod ecosystem_dimensions;
 pub mod endeavour_os;
 pub mod enterprise;
 pub mod fedora_parity;
+pub use fedora_parity::{
+    BodhiUpdateRecord, BodhiUpdateStatus, FedoraBodhiUpdateEngine, FedoraIgnitionProvisionEngine,
+    FedoraKojiDistGitBuilder, FedoraRpmOstreeEngine, IgnitionFile, IgnitionUnit, KojiBuildTask,
+    OstreeDeploymentPin, TargetArchitecture as FedoraTargetArchitecture,
+};
 pub mod garuda_nomad_innovations;
 pub mod gentoo;
 pub mod gentoo_inspirations;

@@ -81,7 +81,10 @@ pub use distro::{
     ZramCompressionAlgorithm, DebianMultiarchAptEngine, EndeavourReflectorMirrorRanker,
     FreeBsdZfsBootEnvManager, GarudaDracutBtrfsSnapper, GarudaPerformanceTweakEngine,
     HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, NixOsFlakeProfileManager,
-    OpenBsdDoasPrivilegeManager, SolusEopkgBudgieEngine,
+    OpenBsdDoasPrivilegeManager, SolusEopkgBudgieEngine, BodhiUpdateRecord, BodhiUpdateStatus,
+    FedoraBodhiUpdateEngine, FedoraIgnitionProvisionEngine, FedoraKojiDistGitBuilder,
+    FedoraRpmOstreeEngine, IgnitionFile, IgnitionUnit, KojiBuildTask, OstreeDeploymentPin,
+    FedoraTargetArchitecture,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
     OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
 };
