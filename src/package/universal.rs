@@ -24,6 +24,7 @@ use crate::klib::{Arc, HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
+use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -214,6 +215,15 @@ impl Default for DistroRepoSyncEngine {
 
 /// Package format type
 // Unified system absorbing all 18 major distribution formats.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageState {
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
+}
+
 pub enum PackagePriority {
     Essential,
     Required,
@@ -225,6 +235,21 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    OpenBsdPkg,
+    Ipk,
+    Opkg,
+    SolarisIps,
+    GuixNar,
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+
+    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -276,11 +301,6 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    Nix,        // Nix package (.nix)
-    Txz,        // FreeBSD / Slackware txz (.txz)
-    CachyOS,    // CachyOS package (.cachyos)
-    Swupd,      // Clear Linux swupd (.swupd)
-    Starling,   // Starling package (.starling)
 }
 
 impl PackageFormat {
@@ -399,6 +419,22 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
         } else {
             None
         }
@@ -1133,6 +1169,74 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
+
+pub struct HardwareOptimizationDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub target_microarch_level: String,
+    pub required_simd_features: Vec<String>,
+}
+
+impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        println!("HardwareOptimizationDecorator: Microarch target level {}", self.target_microarch_level);
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct ResourceLimitDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub max_memory_bytes: u64,
+    pub cpu_quota_percent: u32,
+}
+
+impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        println!("ResourceLimitDecorator: Memory limit {}", self.max_memory_bytes);
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct PqcSignedDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub dilithium_signature: String,
+}
+
+impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        if !self.dilithium_signature.contains("valid") || self.dilithium_signature.contains("invalid") {
+            return Err(PackageError::InstallationFailed("Invalid PQC signature".to_string()));
+        }
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -1336,103 +1440,6 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct ForeignDistroManifest {
-    pub raw_format: PackageFormat,
-    pub original_name: String,
-    pub version: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct NodeBinaryDistroEngine;
-impl NodeBinaryDistroEngine {
-    pub fn new() -> Self {
-        Self
-    }
-    pub fn install_to_store(&self, _pkg: &NodeBinaryPackage, _bytes: &[u8], _npm_version: &str) -> Result<String, &'static str> {
-        Ok("/var/lib/sigmaos/node/store".to_string())
-    }
-}
-
-
-pub struct UniversalPackageTranslator;
-
-impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let name = format!("sigpkg-{}", manifest.original_name);
-        let mut pkg = UnifiedPackage::new(name, manifest.version.clone())
-            .with_format(PackageFormat::SigmaPkg);
-
-        for dep in &manifest.raw_dependencies {
-            if dep.contains("ssl") || dep.contains("crypto") {
-                pkg = pkg.with_dependency("sovereign-openssl".to_string());
-            } else if dep.contains("libc") || dep.contains("c6") {
-                pkg = pkg.with_dependency("sovereign-libc".to_string());
-            } else {
-                pkg = pkg.with_dependency(format!("sovereign-{}", dep));
-            }
-        }
-        pkg.provides.push(manifest.original_name.clone());
-        for p in &manifest.raw_provides {
-            pkg.provides.push(p.clone());
-        }
-        pkg
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DistroRepoRecord {
-    pub distro_name: String,
-    pub url: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct DistroRepoSyncEngine {
-    pub synced_repos: Vec<String>,
-    pub registered_repos: Vec<DistroRepoRecord>,
-    pub indexed_manifests: Vec<ForeignDistroManifest>,
-}
-
-impl DistroRepoSyncEngine {
-    pub fn new() -> Self {
-        Self {
-            synced_repos: Vec::new(),
-            registered_repos: vec![
-                DistroRepoRecord { distro_name: "Debian".to_string(), url: "https://deb.debian.org".to_string() },
-                DistroRepoRecord { distro_name: "ArchLinux".to_string(), url: "https://archlinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Fedora".to_string(), url: "https://fedoraproject.org".to_string() },
-                DistroRepoRecord { distro_name: "Alpine".to_string(), url: "https://alpinelinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Void".to_string(), url: "https://voidlinux.org".to_string() },
-            ],
-            indexed_manifests: Vec::new(),
-        }
-    }
-
-    pub fn sync_all_repositories(&mut self) -> Result<usize, &'static str> {
-        self.synced_repos = self.registered_repos.iter().map(|r| r.distro_name.clone()).collect();
-        Ok(self.synced_repos.len())
-    }
-
-    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
-        self.indexed_manifests.push(manifest);
-    }
-
-    pub fn total_indexed_packages(&self) -> usize {
-        self.indexed_manifests.len()
-    }
-
-    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
-        self.indexed_manifests
-            .iter()
-            .find(|m| m.original_name == pkg_name)
-            .map(|m| UniversalPackageTranslator::translate_to_sigma_pkg(m))
-    }
-}
-
-
-// =========================================================================
-// Multi-Distro Package Adapter Execution Pipeline
-// =========================================================================
 
 /// Universal Distro Adapter Pipeline executing cross-distro package installations
 pub struct UniversalDistroAdapterPipeline;
@@ -1536,43 +1543,6 @@ pub struct PackageAdapter {
 }
 
 impl PackageAdapter {
-    pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
-        let mut pledges = Vec::new();
-        for arg in &manifest.finish_args {
-            if arg.contains("network") {
-                pledges.push("network".to_string());
-            } else if arg.contains("ipc") {
-                pledges.push("ipc".to_string());
-            } else if arg.contains("filesystem") {
-                pledges.push("unveil_all".to_string());
-            }
-        }
-        pledges
-    }
-
-    pub fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> String {
-        if manifest.confinement == "strict" {
-            "strict_pledge_sandbox".to_string()
-        } else {
-            "unconfined_host".to_string()
-        }
-    }
-
-    pub fn mount_appimage_squashfs(&self, runtime: &AppImageRuntime) -> Result<String, &'static str> {
-        if runtime.squashfs_offset == 0 {
-            Err("Invalid squashfs offset")
-        } else {
-            Ok(format!("/tmp/.mount_{}_squashfs", runtime.app_name))
-        }
-    }
-
-    pub fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
-        !config.sourcelist_url.is_empty()
-    }
-
-    pub fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
-        config.enabled
-    }
     pub fn new(format: PackageFormat, adapter_name: String) -> Self {
         Self {
             format,
@@ -1882,7 +1852,6 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
-            triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
             triggers: PackageTriggerRegistry::new(),
@@ -1937,7 +1906,7 @@ impl UniversalPackageManager {
         package: &UnifiedPackage,
     ) -> Result<(), PackageError> {
         for hook in &self.user_hooks {
-            if hook.timing() == timing {
+            if PackageHook::timing(hook.as_ref()) == timing {
                 hook.execute(package)?;
             }
         }
@@ -2225,67 +2194,7 @@ pub struct UniversalPackageManifestParser;
 
 impl UniversalPackageManifestParser {
     pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
-        let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".superdeb") {
-            Some(PackageFormat::Deb)
-        } else if name.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") {
-            Some(PackageFormat::Pacman)
-        } else if name.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
-        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
-            Some(PackageFormat::Nixpkg)
-        } else if name.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if name.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if name.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if name.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if name.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if name.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if name.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if name.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if name.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if name.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
-            Some(PackageFormat::TarGz)
-        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
-            Some(PackageFormat::Xz)
-        } else if name.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else if name.ends_with(".dports") {
-            Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
-        {
-            Some(PackageFormat::SlackBuild)
-        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
-            Some(PackageFormat::Crux)
-        } else if name.ends_with(".drpm") {
-            Some(PackageFormat::Drpm)
-        } else if name.ends_with(".stratum") {
-            Some(PackageFormat::Stratum)
-        } else if name.ends_with(".app") {
-            Some(PackageFormat::App)
-        } else {
-            None
-        }
+        PackageFormat::from_filename(filename)
     }
 
     pub fn parse_manifest_auto(
@@ -2433,7 +2342,7 @@ impl UniversalPackageFormatBridge {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
