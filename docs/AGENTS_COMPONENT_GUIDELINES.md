@@ -51,6 +51,9 @@ Components receiving open file descriptors enter capability mode (`enter_capabil
 ### 3.3 Fedora AppStream & Modularity (`FedoraModulemdComponentEngine`)
 * **Component Grouping**: Software packages are grouped via Fedora `comps.xml` definitions (`Mandatory`, `Default`, `Optional`, `Conditional`).
 * **Stream Switching**: Components support multi-stream version selection (`ModulemdStream`) enabling parallel component runtimes (e.g., Node.js 18 vs Node.js 20).
+* **Automated Rollback Engine**: CoreOS update health checks and automatic rollback (`FedoraCoreosAutomatedRollbackEngine`).
+* **Koji & Bodhi Integration**: RPC build clients (`FedoraKojiBuildSystemClientEngine`) and update feedback / karma submission (`FedoraBodhiUpdateFeedbackEngine`).
+* **Automated Packaging**: Spec file generation and RPM packaging engine (`FedoraPaugusAutomatedPackagingEngine`).
 
 ---
 
