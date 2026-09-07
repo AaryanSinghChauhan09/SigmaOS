@@ -112,6 +112,6 @@ pub use store::{
      GLOBAL_SOFTWARE_STORE,
 };
 pub use universal::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    AptDebManifest, ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };

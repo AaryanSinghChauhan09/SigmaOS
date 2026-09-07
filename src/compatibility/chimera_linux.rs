@@ -162,6 +162,7 @@ impl ApkPackageStore {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
+    use core::sync::atomic::Ordering;
 
     #[test]
     fn test_dinit_service_manager() {

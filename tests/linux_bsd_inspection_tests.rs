@@ -131,6 +131,15 @@ mod firmware;
 #[path = "../src/unimplemented_features.rs"]
 mod unimplemented_features;
 
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
@@ -139,6 +148,7 @@ use unimplemented_features::{
     NixOsDeclarativeConfigEngine,
 };
 use unveil::{UnveilManager, UnveilPermission};
+use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
