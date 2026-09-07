@@ -7,6 +7,10 @@
 
 extern crate alloc;
 
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+extern crate alloc;
+
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use alloc::collections::BTreeMap;
 #[cfg(not(test))]
 use alloc::string::String;

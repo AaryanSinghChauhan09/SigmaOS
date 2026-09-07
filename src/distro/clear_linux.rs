@@ -20,6 +20,13 @@ use alloc::string::ToString;
 use alloc::vec;
 use alloc::vec::Vec;
 
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::String;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
+
 /// Configuration file location
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConfigLocation {
