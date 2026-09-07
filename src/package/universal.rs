@@ -15,6 +15,8 @@ use crate::klib::{HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
+#[cfg(any(feature = "standalone_test", test))]
+use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -97,6 +99,7 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -149,16 +152,22 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    Portage,    // Gentoo Portage
-    FreeBsdPkg, // FreeBSD pkg
-    ArchPkgBuild,// Arch PKGBUILD
-    NixStore,   // Nix store
-    Homebrew,   // Homebrew formula
-    Ipk,        // OpenWrt / opkg / Entware (.ipk)
-    Opkg,       // Yocto / OpenEmbedded (.opkg)
-    OpenBsdPkg, // OpenBSD pkg_add (.openbsd.tgz / .tgz)
-    SolarisIps, // Solaris / Illumos IPS (.p5p / .ips)
-    GuixNar,    // GNU Guix / Nix Archive (.nar)
+    OpenBsdPkg, // OpenBSD Package (.pkg / .tgz)
+    Ipk,        // OpenWrt IPK (.ipk)
+    Opkg,       // Opkg package (.opkg)
+    SolarisIps, // Solaris IPS (.ips / .p5p)
+    GuixNar,    // GNU Guix NAR archive (.nar / .nar.xz)
+}
+
+/// Lifecycle state of a unified package
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum PackageState {
+    #[default]
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
 }
 
 impl PackageFormat {
@@ -1284,91 +1293,7 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct ForeignDistroManifest {
-    pub raw_format: PackageFormat,
-    pub original_name: String,
-    pub version: String,
-    pub architecture: String,
-    pub raw_dependencies: Vec<String>,
-    pub raw_provides: Vec<String>,
-    pub raw_conflicts: Vec<String>,
-    pub maintainer: String,
-}
 
-pub struct UniversalPackageTranslator;
-
-impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let name = format!("sigpkg-{}", manifest.original_name);
-        let mut pkg = UnifiedPackage::new(name, manifest.version.clone())
-            .with_format(PackageFormat::SigmaPkg);
-
-        for dep in &manifest.raw_dependencies {
-            if dep.contains("ssl") || dep.contains("crypto") {
-                pkg = pkg.with_dependency("sovereign-openssl".to_string());
-            } else if dep.contains("libc") || dep.contains("c6") {
-                pkg = pkg.with_dependency("sovereign-libc".to_string());
-            } else {
-                pkg = pkg.with_dependency(format!("sovereign-{}", dep));
-            }
-        }
-        pkg.provides.push(manifest.original_name.clone());
-        for p in &manifest.raw_provides {
-            pkg.provides.push(p.clone());
-        }
-        pkg
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DistroRepoRecord {
-    pub distro_name: String,
-    pub url: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct DistroRepoSyncEngine {
-    pub synced_repos: Vec<String>,
-    pub registered_repos: Vec<DistroRepoRecord>,
-    pub indexed_manifests: Vec<ForeignDistroManifest>,
-}
-
-impl DistroRepoSyncEngine {
-    pub fn new() -> Self {
-        Self {
-            synced_repos: Vec::new(),
-            registered_repos: vec![
-                DistroRepoRecord { distro_name: "Debian".to_string(), url: "https://deb.debian.org".to_string() },
-                DistroRepoRecord { distro_name: "ArchLinux".to_string(), url: "https://archlinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Fedora".to_string(), url: "https://fedoraproject.org".to_string() },
-                DistroRepoRecord { distro_name: "Alpine".to_string(), url: "https://alpinelinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Void".to_string(), url: "https://voidlinux.org".to_string() },
-            ],
-            indexed_manifests: Vec::new(),
-        }
-    }
-
-    pub fn sync_all_repositories(&mut self) -> Result<usize, &'static str> {
-        self.synced_repos = self.registered_repos.iter().map(|r| r.distro_name.clone()).collect();
-        Ok(self.synced_repos.len())
-    }
-
-    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
-        self.indexed_manifests.push(manifest);
-    }
-
-    pub fn total_indexed_packages(&self) -> usize {
-        self.indexed_manifests.len()
-    }
-
-    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
-        self.indexed_manifests
-            .iter()
-            .find(|m| m.original_name == pkg_name)
-            .map(|m| UniversalPackageTranslator::translate_to_sigma_pkg(m))
-    }
-}
 
 
 // =========================================================================
@@ -1521,6 +1446,7 @@ impl PackageAdapter {
             capabilities: Vec::new(),
         }
     }
+
 
     pub fn _can_handle(&self, package: &UnifiedPackage) -> bool {
         package.formats.contains(&self.format)
@@ -1785,7 +1711,6 @@ impl UniversalPackageManager {
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
             user_hooks: Vec::new(),
-            triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
         };

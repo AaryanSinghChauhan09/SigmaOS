@@ -171,3 +171,12 @@ For technical specifications, see:
 * [`docs/AGENTS_THREAD_SYNC_MANAGEMENT.md`](docs/AGENTS_THREAD_SYNC_MANAGEMENT.md)
 * [`docs/RELEASE_CADENCE.md`](docs/RELEASE_CADENCE.md)
 * [`docs/package-manager.md`](docs/package-manager.md)
+
+---
+
+## 17. Linux & BSD Distro Parity Directives
+
+When integrating or refining Linux & BSD distro capability engines in `src/distro/`:
+1. **Zero-Dependency Subsystem Parity:** Implement clean-room, `#![no_std]` Rust modules that absorb and emulate key distro innovations (e.g. Void Linux runit service supervision in `VoidRunitServiceSupervisorEngine`, Alpine Linux tmpfs apk volatile overlays in `AlpineApkVolatileOverlayEngine`, openSUSE YaST2/Snapper, NetBSD rump kernels, Ubuntu netplan/cloud-init, GNU Guix Shepherd/store derivations).
+2. **Re-export Invariants:** Always re-export newly implemented distro engines in `src/distro/mod.rs` and `src/lib.rs`.
+3. **Verification:** Validate all distro parity engines using standalone unit tests (`rustc --test --edition 2021`) and `./run_sigma_tests.sh`.

@@ -7,9 +7,11 @@
 //   • Reproducible builds via locked inputs
 
 
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // ── Content-addressed store ───────────────────────────────────────────────────
 

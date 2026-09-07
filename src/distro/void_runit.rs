@@ -2,8 +2,21 @@
 // Implements Void Linux's runit supervision system
 // Inspired by Void Linux's 3-stage process supervision
 
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+extern crate alloc;
+
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use alloc::collections::BTreeMap;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use alloc::string::String;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::string::String;
+#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 /// Service state
@@ -146,6 +159,7 @@ impl RunitSupervisor {
         let mut started = Vec::new();
         let service_names: Vec<String> = self.services.keys().cloned().collect();
 
+        let service_names: Vec<String> = self.services.keys().cloned().collect();
         for name in service_names {
             if self.can_start_service(&name, &started) {
                 if let Some(s) = self.services.get_mut(&name) {
@@ -166,6 +180,7 @@ impl RunitSupervisor {
         let mut stopped = Vec::new();
         let service_names: Vec<String> = self.services.keys().cloned().collect();
 
+        let service_names: Vec<String> = self.services.keys().cloned().collect();
         for name in service_names {
             if self.can_stop_service(&name, &stopped) {
                 if let Some(s) = self.services.get_mut(&name) {

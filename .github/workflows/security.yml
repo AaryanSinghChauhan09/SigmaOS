@@ -28,8 +28,6 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-        with:
-          toolchain: stable
 
       - name: Install cargo-audit
         run: cargo install cargo-audit --locked

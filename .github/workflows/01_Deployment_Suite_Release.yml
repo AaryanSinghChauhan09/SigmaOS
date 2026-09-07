@@ -37,8 +37,6 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-        with:
-          toolchain: stable
 
       - name: Build Sovereign System Images
         run: |
