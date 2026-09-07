@@ -2057,82 +2057,7 @@ impl LoongArch64ArchitectureEngine {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UbuntuAppArmorMode {
-    Enforce,
-    Complain,
-    Disabled,
-}
-
-#[derive(Debug, Clone)]
-pub struct UbuntuAppArmorProfile {
-    pub profile_name: String,
-    pub mode: UbuntuAppArmorMode,
-    pub allowed_read_paths: Vec<String>,
-    pub allowed_write_paths: Vec<String>,
-    pub allowed_exec_paths: Vec<String>,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct UbuntuAppArmorEngine {
-    pub profiles: BTreeMap<String, UbuntuAppArmorProfile>,
-}
-impl UbuntuAppArmorEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn load_profile(&mut self, profile: UbuntuAppArmorProfile) {
-        self.profiles.insert(profile.profile_name.clone(), profile);
-    }
-
-    pub fn authorize_path_access(
-        &mut self,
-        profile_name: &str,
-        target_path: &str,
-        access_type: &str,
-    ) -> Result<bool, &'static str> {
-        let profile = self.profiles.get(profile_name).ok_or("Profile not found")?;
-        if matches!(profile.mode, UbuntuAppArmorMode::Disabled) {
-            return Ok(true);
-        }
-
-        let need_read = access_type.contains('r');
-        let need_write = access_type.contains('w');
-        let need_exec = access_type.contains('x');
-
-        let allowed = (!need_read || profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)))
-            && (!need_write || profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)))
-            && (!need_exec || profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)));
-
-        if allowed || matches!(profile.mode, UbuntuAppArmorMode::Complain) {
-            Ok(true)
-        } else {
-            Err("AppArmor permission denied")
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct NixOsFlakesEngine {
-    pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
-}
-
-impl NixOsFlakesEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn lock_input(&mut self, name: &str, url: &str, hash: &str) {
-        self.flake_inputs.insert(name.to_string(), (url.to_string(), hash.to_string()));
-    }
-
-    pub fn compute_system_derivation_hash(&self) -> String {
-        format!("nix-store-drv-{:x}", self.flake_inputs.len())
-    }
-}
-
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -2306,7 +2231,7 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 13);
+        assert_eq!(engine.records.len(), 6);
         assert!(engine.is_all_components_implemented());
     }
 
