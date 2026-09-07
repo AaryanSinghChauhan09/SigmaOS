@@ -55,6 +55,16 @@ pub mod unimplemented_tools;
 pub mod userland;
 
 pub use distro::{
+    distro_inspiration_engine::{
+        AlpineLbuApkOverlayEngine, ApkovlCommit, ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine,
+        DragonFlyHammer2ClusterEngine, FreeBsdZfsArcGeomEngine, GenerationRecord, Hammer2DedupEntry,
+        IsaLevel, MuslLightweightInitEngine, MuslStaticService,
+        NixOsDeclarativeStateReconciliationEngine, NixOsPureStoreDerivationEngine,
+        OpenBsdStatefulPacketFilterEngine, OpenWrtUciSqmRouterEngine, PaxSecurityLevel, PfProtocol,
+        PfStateEntry, PortageUseFlag, PortageUseFlagGovernor, QubeDomainType,
+        QubesHardenedBsdSecurityGuard, RunitStage, ServiceRunState, SqmAlgorithm, StoreDerivationPath,
+        UciSection, UseFlagState, VoidRunitStageController,
+    },
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
