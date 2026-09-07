@@ -22,7 +22,7 @@ use std::vec::Vec;
 // OOP-based system snapshot and restore functionality
 
 use crate::klib::path::PathBuf;
-use crate::klib::BTreeMap;
+use std::collections::BTreeMap;
 
 pub struct SystemTime;
 pub const UNIX_EPOCH: u64 = 0;

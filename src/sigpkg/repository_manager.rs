@@ -9,6 +9,22 @@ use core::option::Option::{self, Some, None};
 use core::result::Result::{self, Ok, Err};
 use crate::sigpkg::{Package, Version, VersionConstraint};
 
+#[derive(Debug, Clone)]
+pub struct RepositoryGpgKey {
+    pub key_id: String,
+    pub fingerprint: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum OfficialArchiveSource {
+    #[default]
+    Main,
+    Contrib,
+    NonFree,
+    Universe,
+    Multiverse,
+}
+
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]
 pub struct Repository {

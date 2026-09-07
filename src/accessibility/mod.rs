@@ -1,5 +1,8 @@
 // SigmaOS Accessibility & Screen Reader Subsystem
 
+pub mod framework;
+pub use framework::*;
+
 pub struct AccessibilityEngine;
 
 impl AccessibilityEngine {

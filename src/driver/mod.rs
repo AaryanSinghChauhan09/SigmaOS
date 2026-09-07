@@ -28,6 +28,10 @@ pub mod ahci_sata_controller;
 pub mod hid_input_device;
 pub mod audio_codec_hda;
 
+pub use framework::*;
+pub use distro_drivers::*;
+pub use gpu_framework::*;
+pub use network_framework::*;
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
     DriverTestRunner, TestResult, TestStatus, TestSummary, GpuTestSuite, NicTestSuite,

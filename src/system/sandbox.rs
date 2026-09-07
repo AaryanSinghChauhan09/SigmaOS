@@ -21,7 +21,7 @@ use std::vec::Vec;
 // SigmaOS Process Sandbox Manager
 // OOP-based process sandboxing with capability-based security
 
-use crate::klib::BTreeMap;
+use std::collections::BTreeMap;
 pub type Path = str;
 pub type PathBuf = String;
 

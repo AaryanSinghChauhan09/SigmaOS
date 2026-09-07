@@ -5,8 +5,6 @@ use std::vec::Vec;
 /// Implements security event logging and audit trails
 extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 
 pub type EventID = usize;
 

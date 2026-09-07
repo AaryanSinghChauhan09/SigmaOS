@@ -2,7 +2,8 @@ use std::format;
 // SigmaOS Cron Daemon - Linux-inspired task scheduler
 // Zero-dependency implementation of cron-like functionality
 
-use crate::klib::{BTreeMap, Vec};
+use std::collections::BTreeMap;
+use std::vec::Vec;
 use std::string::{String, ToString};
 
 /// Cron job specification

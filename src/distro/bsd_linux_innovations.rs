@@ -2,12 +2,7 @@
 // SigmaOS BSD & Linux Innovations Subsystem
 // Inspired by OpenBSD/FreeBSD PF, DragonFly BSD HAMMER2, Void Linux runit, and Parrot OS AnonSurf
 
-#[cfg(not(target_os = "none"))]
 use std::vec::Vec;
-
-#[cfg(target_os = "none")]
-
-#[cfg(target_os = "none")]
 
 // ============================================================================
 // 1. OpenBSD / FreeBSD PF (Packet Filter) Stateful Firewall

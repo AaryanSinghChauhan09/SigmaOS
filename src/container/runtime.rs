@@ -208,6 +208,33 @@ pub enum SeccompAction {
     Trace,
 }
 
+#[derive(Debug, Clone)]
+pub struct SeccompProfileV2 {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeccompProfile {
+    pub default_action: SeccompAction,
+    pub blocked_syscalls: Vec<u32>,
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if !self.hardened {
+            return false;
+        }
+        if syscall_id < 32 {
+            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
+        } else {
+            self.blocked_syscalls.contains(&syscall_id)
+        }
+    }
+}
+
 impl SeccompProfileV2 {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened {

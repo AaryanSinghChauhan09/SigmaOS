@@ -21,6 +21,7 @@
 use std::boxed::Box;
 use std::string::String;
 use std::vec::Vec;
+use crate::driver::device::DeviceObject;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
 
@@ -575,7 +576,7 @@ pub struct IrpStackLocation {
     pub ioctl_code: u32,
 }
 
-pub type CompletionRoutine = fn(&DeviceObjectX86, &mut Irp) -> u32;
+pub type CompletionRoutine = fn(&DeviceObject, &mut Irp) -> u32;
 
 pub struct Irp {
     pub major_function: IrpMajorFunction,
@@ -635,12 +636,7 @@ impl Irp {
     pub fn complete_request(&mut self, status: u32) {
         self.status = status;
         if let Some(routine) = self.completion_routine {
-            let dummy_dev = DeviceObjectX86 {
-                device_type: DeviceType::Functional,
-                driver_name: "dummy",
-                next_device: None,
-                attached_device: None,
-            };
+            let dummy_dev = DeviceObject::new(b"dummy", crate::driver::device::DeviceType::Character);
             routine(&dummy_dev, self);
         }
     }

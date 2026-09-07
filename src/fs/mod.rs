@@ -17,13 +17,20 @@
 // Virtual filesystem, journaling filesystems (Btrfs, XFS), and storage support
 
 pub mod btrfs;
-// pub mod filesystem;
+pub mod filesystem;
 pub mod sigmacas;
 pub mod sigmafs;
-// pub mod support;
-// pub mod vfs;
+pub mod support;
+pub mod vfs;
 pub mod xfs;
+pub mod sigma_vfs;
+pub mod sigma_procfs;
+pub mod sigma_sysfs;
+pub mod sigma_tmpfs;
+pub mod sigma_overlay_fs;
 
+pub use filesystem::*;
+pub use vfs::*;
 pub use btrfs::{
     BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, ChecksumType, CompressionType,
 };

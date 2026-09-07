@@ -223,7 +223,6 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
-    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -249,6 +248,11 @@ pub enum PackageFormat {
     Pisi,       // Pardus / Solus PiSi (.PiSi)
     Superdeb,   // Deepin Superdeb (.superdeb)
     Lzm,        // Slax Linux Module (.lzm)
+    OpenBsdPkg, // OpenBSD .tgz / .tar.gz
+    Ipk,        // OpenWrt / Optware .ipk
+    Opkg,       // OpenWrt .opkg
+    SolarisIps, // Solaris IPS package
+    GuixNar,    // GNU Guix NAR archive
     Pup,        // Puppy Linux Package (.pup)
     Pet,        // Puppy Extra Tarball (.pet)
     Tar,        // Plain tarball (.tar)
@@ -1438,6 +1442,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: String,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)

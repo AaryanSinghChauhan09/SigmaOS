@@ -8,16 +8,12 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
+pub use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::universal_oop_system;
 
 #[cfg(test)]
 pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -32,11 +28,73 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
-    ProcessExec,
 }
 
 #[cfg(not(feature = "standalone_test"))]
 pub use crate::security::Permission;
+
+use crate::package::universal::PackageFormat;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub architecture: String,
+    pub summary: String,
+    pub vendor: String,
+    pub requires: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+    pub homepage: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub description: String,
+    pub grade: String,
+    pub confinement: String,
+    pub plugs: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkIndexManifest {
+    pub package_name: String,
+    pub pkgname: String,
+    pub version: String,
+    pub pkgver: String,
+    pub description: String,
+    pub depends: Vec<String>,
+    pub checksum_sha256: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+    pub architecture: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub package_name: String,
+    pub version: String,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+    pub use_flags: Vec<String>,
+}
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -50,7 +108,6 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 pub use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -397,10 +454,13 @@ impl UniversalPackageAdapter {
         }
 
         Ok(ApkIndexManifest {
+            package_name: pkgname.clone(),
             pkgname,
+            version: pkgver.clone(),
             pkgver,
-            pkgdesc,
+            description: pkgdesc,
             depends,
+            checksum_sha256: String::new(),
         })
     }
 
@@ -1466,14 +1526,14 @@ impl Default for UniversalServerImageAdapter {
 /// into native Sigma-pkg models, mapping dependencies, sandboxing capabilities, and registering with Universal PM.
 pub struct SigPkgUniversalBridgeEngine {
     adapter: UniversalPackageAdapter,
-    pm: universal_oop_system::UniversalPackageManager,
+    pm: crate::sigpkg::universal_oop_system::UniversalPackageManager,
 }
 
 impl SigPkgUniversalBridgeEngine {
     pub fn new() -> Self {
         Self {
             adapter: UniversalPackageAdapter::new(),
-            pm: universal_oop_system::UniversalPackageManager::new(),
+            pm: crate::sigpkg::universal_oop_system::UniversalPackageManager::new(),
         }
     }
 

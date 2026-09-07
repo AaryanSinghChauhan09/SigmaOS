@@ -2762,6 +2762,10 @@ pub struct FedoraPlanetPost {
     pub published_epoch: u64,
 }
 
+#[derive(Debug, Clone)]
+pub struct FedoraPlanetAggregationEngine {
+    pub posts: Vec<FedoraPlanetPost>,
+}
 
 impl FedoraPlanetAggregationEngine {
     pub fn new() -> Self {

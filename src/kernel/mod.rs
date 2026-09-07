@@ -50,6 +50,8 @@ pub mod sched;
 pub mod scheduler;
 pub mod structures;
 pub mod traits;
+pub mod virtual_cpu;
+pub mod vmm_paging;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;
@@ -69,32 +71,7 @@ pub use gap_closing::{
 pub use generation_manager::{Generation, GenerationManager};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use linux_bsd_innovations::{
-    AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
-    BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
-    BsdPfStateTable, CapabilityDerivationTree, CarpSecurityRouter, CgroupResourceLimits, CowBlock,
-    CowStorageEngine, CpuIsaMicroarch, DevlinkHealthReporter, DynamicLkmLoader, EbpfInstruction,
-    EbpfRuntime, ExokernelHardwareMultiplexer, FastPacketFrame, FreeBsdCapsicumEngine,
-    FreeBsdGeomTopology, FreeBsdJail, FreeBsdVfsNullfs, FreeBsdVnetManager, FutexOp, FutexWaiter,
-    GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
-    Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
-    HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
-    KernelAccessController, KernelCapability, KernelFastPacketEngine, KernelModule, KmdfDriver,
-    KmdfIoRequest, KmdfPnpState, KmdfPowerState, LandlockAccessRight, LandlockPathRule,
-    LinuxDevlinkHealthMonitor, LinuxFutexEngine, LinuxLandlockLsmRuleEngine,
-    MemoryCompactionSuperpagesAllocator, MicrokernelCore, MicrokernelTranslatorRegistry,
-    MultikernelMessage, MultikernelMessagePassing, NamespaceType, NanokernelHardwareBroker,
-    NanokernelIrq, NetBsdRumpKernel, NinePProtocolTranslator, NinePResource,
-    NixOsDeclarativeManager, NtExecutiveService, NullfsLayerNode, OpenBsdPledge,
-    OpenBsdUnveilEngine, OpenSuseSnapperEngine, PfFiveTuple, PfStateEntry, PhysicalFrameBlock,
-    ReactorEvent, ReactorRegistration, ResourceBinding, RumpComponent, SnapperSnapshot,
-    SoftIrqType, SovereignCgroupGovernor, SovereignEventReactor, SovereignNamespaceContainer,
-    SovereignSwapEngine, SovereignZone, SovereignZonesManager, SwapDeviceConfig, SwapPage,
-    UnveilPathRule, VnetNetworkStack, VoidLinuxRunitSupervisor, VoidRunitInit, VoidRunitService,
-    VoidRunitStage, XdpAction, ZramCompressedPage, CAP_MMAP_FLAG, CAP_READ_FLAG, CAP_SEEK_FLAG,
-    CAP_WRITE_FLAG, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_EXEC, PLEDGE_INET, PLEDGE_RPATH,
-    PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
-};
+pub use linux_bsd_innovations::*;
 pub use linux_parity::*;
 pub use memory::{
     BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
@@ -117,31 +94,9 @@ pub use namespaces::{
 };
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-pub use linux_bsd_innovations::{
-    ArchUserRepoManager, BsdPfStateTable, PfFiveTuple, PfStateEntry,
-    LinuxFutexEngine, FutexOp, FutexWaiter, FreeBsdVfsNullfs, NullfsLayerNode,
-    AlpineHardenedEnv, OpenBsdPledge, BoundedBufferProducerConsumer,
-    BottomHalfKernelThread, SoftIrqType, AndroidBroadcastReceiverRegistry, BroadcastReceiver,
-    MultikernelMessagePassing, MultikernelMessage, NinePProtocolTranslator, NinePResource,
-    MicrokernelTranslatorRegistry, HurdTranslator, NanokernelHardwareBroker, NanokernelIrq,
-    SovereignZonesManager, SovereignZone, KmdfDriver, KmdfPnpState, KmdfPowerState, KmdfIoRequest,
-    AndroidBinderIpc, BinderNode, GcdDispatchQueue, GcdPriority, GcdTask, EbpfRuntime, EbpfInstruction,
-    HammerHistoryFilesystem, HammerBlockTransaction, CarpSecurityRouter, SovereignSwapEngine, SwapPage,
-    SovereignNamespaceContainer, NamespaceType, SovereignEventReactor, ReactorRegistration, ReactorEvent,
-    HybridKernelManager, NtExecutiveService, MicrokernelCore, ExokernelHardwareMultiplexer, ResourceBinding,
-    NetBsdRumpKernel, RumpComponent, DynamicLkmLoader, KernelModule, CapabilityDerivationTree, KernelCapability,
-    FreeBsdJail, NixOsDeclarativeManager, GentooUseFlags, VoidRunitInit,
-    SovereignCgroupGovernor, SovereignCgroupEntry, CgroupResourceLimits,
-    KernelFastPacketEngine, FastPacketFrame, XdpAction,
-    KernelAccessController, LandlockPathRule, LandlockAccessRight, PLEDGE_STDIO, PLEDGE_RPATH, PLEDGE_WPATH, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_INET, PLEDGE_UNIX, PLEDGE_EXEC,
-    InteractiveHybridScheduler, HybridTask,
-    CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
-    MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock,
-};
 
 pub mod sigma_kthread;
 pub mod sigma_timer;
 pub mod sigma_workqueue;
 pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
-pub mod kqueue;

@@ -176,10 +176,6 @@ pub use mint_linux::{
     MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
     MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
 };
-pub use legacy_adapters::{
-    KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
-};
 
 pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};
 pub use community_foundation::{
@@ -247,10 +243,4 @@ pub use canonical::{
 pub use chakra::{
     AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
     TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
-};
-pub use legacy_adapters::{
-    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, GraphicsBridge,
-    KernelPersona, KernelPersonaVM, LegacyBus, LegacyPluginManager, LibcVersion, NetworkBridge,
-    StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM,
-    GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };

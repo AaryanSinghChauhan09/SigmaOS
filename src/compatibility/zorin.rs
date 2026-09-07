@@ -5,6 +5,7 @@
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Switchable desktop layout personas
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
