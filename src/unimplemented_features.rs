@@ -1993,3 +1993,92 @@ mod tests {
     }
 }
 
+// =========================================================================
+// DISTRO-INSPIRED ECOSYSTEM ENCOUNTER ENFORCE ENGINES
+// =========================================================================
+
+#[cfg(test)]
+mod new_unimplemented_tests {
+    use super::*;
+
+    #[test]
+    fn test_rocky_alma_enterprise_lifecycle_governor() {
+        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9, 9);
+        assert!(gov.verify_abi_compatibility(8));
+        assert!(gov.verify_abi_compatibility(9));
+        assert!(!gov.verify_abi_compatibility(10));
+
+        gov.apply_errata_patch("RHSA-2026:1234");
+        assert_eq!(gov.errata_patches_applied, 1);
+        assert_eq!(gov.security_advisories[0], "RHSA-2026:1234");
+    }
+
+    #[test]
+    fn test_void_xbps_container_engine() {
+        let mut xbps = VoidXbpsContainerEngine::new();
+        xbps.install_xbps_package("xbps-src");
+        xbps.start_runit_service("dhcpcd");
+        xbps.start_runit_service("dhcpcd"); // duplicate check
+        assert_eq!(xbps.registered_packages.len(), 1);
+        assert_eq!(xbps.runit_services_active.len(), 1);
+    }
+
+    #[test]
+    fn test_puppy_linux_overlay_ramdisk_engine() {
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048, 2048);
+        puppy.load_sfs_module("puppy_sigma_2.0.sfs");
+        puppy.mount_persistence("/mnt/home/sigmasave.2fs");
+        assert_eq!(puppy.loaded_sfs_modules.len(), 1);
+        assert_eq!(
+            puppy.persistence_save_file.unwrap(),
+            "/mnt/home/sigmasave.2fs"
+        );
+    }
+
+    #[test]
+    fn test_tinycore_modular_tcz_loader() {
+        let mut tcz = TinyCoreModularTczLoader::new();
+        tcz.mount_tcz("wifi.tcz", 1024);
+        tcz.mount_tcz("openssh.tcz", 2048);
+        assert_eq!(tcz.mounted_extensions.len(), 2);
+        assert_eq!(tcz.total_ram_used_kb, 3072);
+    }
+
+    #[test]
+    fn test_deepin_dde_control_center_engine() {
+        let mut dde = DeepinDdeControlCenterEngine::new();
+        dde.set_theme_mode("Light");
+        dde.set_dock_position("Top");
+        assert_eq!(dde.theme_mode, "Light");
+        assert_eq!(dde.dock_position, "Top");
+    }
+
+    #[test]
+    fn test_manjaro_hardware_detection_engine() {
+        let mut mhwd = ManjaroHardwareDetectionEngine::new();
+        mhwd.scan_pci_bus(0x10DE, 0x1E84);
+        assert_eq!(mhwd.recommended_drivers[0], "video-nvidia");
+        assert_eq!(mhwd.auto_install_recommended_drivers(), 1);
+    }
+
+    #[test]
+    fn test_steamos_gamescope_compositor_engine() {
+        let mut gamescope = SteamOsGamescopeCompositorEngine::new();
+        gamescope.enable_fsr(true);
+        gamescope.set_fps_limit(120);
+        let leased = gamescope.lease_drm_surface();
+        assert!(gamescope.fsr_enabled);
+        assert_eq!(gamescope.target_fps_limit, 120);
+        assert_eq!(leased, 1);
+    }
+
+    #[test]
+    fn test_phoronix_test_suite_runner() {
+        let mut phoronix = PhoronixTestSuiteRunner::new("Graphics Suite");
+        phoronix.execute_benchmark("Unigine Heaven", 120.0);
+        phoronix.execute_benchmark("Shadow of Tomb Raider", 80.0);
+        assert_eq!(phoronix.calculate_composite_score(), 100.0);
+    }
+
+
+}

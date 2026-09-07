@@ -4,8 +4,7 @@
 
 #[cfg(not(any(test, feature = "standalone_test")))]
 use crate::klib::collections::HashMap;
-#[cfg(feature = "standalone_test")]
-extern crate alloc;
+#[cfg(any(test, feature = "standalone_test"))]
 use alloc::collections::BTreeMap as HashMap;
 
 extern crate alloc;

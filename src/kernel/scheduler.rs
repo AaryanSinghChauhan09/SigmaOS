@@ -1,7 +1,12 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TaskId(pub u64);
 
-
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
+}
 
 impl Task {
     pub fn new(id: u64, vruntime: u64) -> Self {
