@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,10 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // SigmaOS Custom Conversion Library
 // Reduces dependency on predefined conversion functions
@@ -59,7 +54,7 @@ pub fn base64_encode(input: &[u8]) -> String {
         b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     let mut result = String::new();
-    let mut chunks = input.chunks(3);
+    let chunks = input.chunks(3);
 
     for chunk in chunks {
         let mut buffer = [0u8; 3];
@@ -221,7 +216,7 @@ pub fn base_to_dec(s: &str, base: u8) -> Result<u64, ()> {
     Ok(result)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

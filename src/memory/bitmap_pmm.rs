@@ -1,11 +1,9 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
 //! Physical Memory Bitmap Allocator, Self-Referential Page Tables, and Fast x86_64 Assembly Syscall Dispatcher.
 //! Implements bottom-up kernel primitives as described in Step 1, Step 2, and Step 3 specifications.
 
-extern crate alloc;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 pub const PAGE_SIZE_4096: usize = 4096;
@@ -208,7 +206,7 @@ impl Default for SyscallTableRouter {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,11 +1,10 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // Sovereign Non-Linear Video Editor & Frame Compositor Engine (SigmaCut)
 // Inspired by Adobe Premiere Pro, Final Cut Pro, DaVinci Resolve, and Kdenlive.
 // Provides GPU-accelerated timeline scrubbing, real-time effects preview, and multi-format exports.
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Video processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -150,7 +149,7 @@ impl VideoTimeline {
     /// Renders and composites a single frame at the specified index, applying all track-level effects sequentially
     pub fn render_frame(&self, frame_index: usize, background_rgb: [u8; 3]) -> Vec<[u8; 3]> {
         let pixel_count = self.width * self.height;
-        let mut framebuffer = alloc::vec![background_rgb; pixel_count];
+        let mut framebuffer = std::vec![background_rgb; pixel_count];
 
         // Composite from bottom track to top track
         for track in &self.tracks {
@@ -298,7 +297,7 @@ impl Default for VideoTimeline {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

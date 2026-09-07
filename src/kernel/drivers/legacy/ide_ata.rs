@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,9 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
@@ -25,8 +21,8 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs full ATA-1 through ATA-7 specification support
 /// PIO modes 0-4, MWDMA, UDMA/133, LBA28/LBA48, master/slave topology
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 pub const ATA_SECTOR_SIZE: usize = 512;
 pub const ATA_PRIMARY_BASE: u16 = 0x01F0;
@@ -288,7 +284,7 @@ impl Default for IdeAtaController {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

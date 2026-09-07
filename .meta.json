@@ -1,0 +1,116 @@
+{
+  "tasks": {
+    "8.1.1-pid-namespace-core": {
+      "status": "not_started",
+      "depends_on": []
+    },
+    "8.1.2-ipc-namespace-core": {
+      "status": "not_started",
+      "depends_on": ["8.1.1-pid-namespace-core"]
+    },
+    "8.1.3-mount-namespace-core": {
+      "status": "not_started",
+      "depends_on": ["8.1.1-pid-namespace-core"]
+    },
+    "8.1.4-namespace-syscalls": {
+      "status": "not_started",
+      "depends_on": ["8.1.2-ipc-namespace-core", "8.1.3-mount-namespace-core"]
+    },
+    "8.1.5-namespace-integration": {
+      "status": "not_started",
+      "depends_on": ["8.1.4-namespace-syscalls"]
+    },
+    "8.2.1-file-watch-infrastructure": {
+      "status": "not_started",
+      "depends_on": ["8.1.5-namespace-integration"]
+    },
+    "8.2.2-inotify-syscalls": {
+      "status": "not_started",
+      "depends_on": ["8.2.1-file-watch-infrastructure"]
+    },
+    "8.2.3-event-queue-system": {
+      "status": "not_started",
+      "depends_on": ["8.2.2-inotify-syscalls"]
+    },
+    "8.2.4-file-monitoring-tests": {
+      "status": "not_started",
+      "depends_on": ["8.2.3-event-queue-system"]
+    },
+    "8.3.1-cgroups-framework": {
+      "status": "not_started",
+      "depends_on": ["8.2.4-file-monitoring-tests"]
+    },
+    "8.3.2-memory-quota": {
+      "status": "not_started",
+      "depends_on": ["8.3.1-cgroups-framework"]
+    },
+    "8.3.3-cpu-limiting": {
+      "status": "not_started",
+      "depends_on": ["8.3.2-memory-quota"]
+    },
+    "8.3.4-resource-limits-tests": {
+      "status": "not_started",
+      "depends_on": ["8.3.3-cpu-limiting"]
+    },
+    "8.4.1-seccomp-filtering": {
+      "status": "not_started",
+      "depends_on": ["8.3.4-resource-limits-tests"]
+    },
+    "8.4.2-syscall-filtering": {
+      "status": "not_started",
+      "depends_on": ["8.4.1-seccomp-filtering"]
+    },
+    "8.4.3-sandbox-infrastructure": {
+      "status": "not_started",
+      "depends_on": ["8.4.2-syscall-filtering"]
+    },
+    "8.4.4-security-tests": {
+      "status": "not_started",
+      "depends_on": ["8.4.3-sandbox-infrastructure"]
+    },
+    "8.5.1-kqueue-implementation": {
+      "status": "not_started",
+      "depends_on": ["8.4.4-security-tests"]
+    },
+    "8.5.2-event-notification": {
+      "status": "not_started",
+      "depends_on": ["8.5.1-kqueue-implementation"]
+    },
+    "8.5.3-kevent-syscalls": {
+      "status": "not_started",
+      "depends_on": ["8.5.2-event-notification"]
+    },
+    "8.5.4-event-system-tests": {
+      "status": "not_started",
+      "depends_on": ["8.5.3-kevent-syscalls"]
+    },
+    "8.6.1-end-to-end-testing": {
+      "status": "not_started",
+      "depends_on": ["8.5.4-event-system-tests"]
+    },
+    "8.6.2-performance-testing": {
+      "status": "not_started",
+      "depends_on": ["8.6.1-end-to-end-testing"]
+    },
+    "8.6.3-integration-verification": {
+      "status": "not_started",
+      "depends_on": ["8.6.2-performance-testing"]
+    },
+    "8.7.1-wiki-pages": {
+      "status": "not_started",
+      "depends_on": ["8.6.3-integration-verification"]
+    },
+    "8.7.2-api-documentation": {
+      "status": "not_started",
+      "depends_on": ["8.7.1-wiki-pages"]
+    },
+    "8.7.3-release-notes": {
+      "status": "not_started",
+      "depends_on": ["8.7.2-api-documentation"]
+    },
+    "8.7.4-github-sync": {
+      "status": "not_started",
+      "depends_on": ["8.7.3-release-notes"]
+    }
+  }
+}

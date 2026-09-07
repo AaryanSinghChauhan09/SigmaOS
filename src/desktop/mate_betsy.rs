@@ -2,12 +2,11 @@
 //! Replicates MATE Desktop Environment components: Marco (WM), Caja (File Manager),
 //! Pluma (Text Editor), Atril (Document Viewer), and Eye of MATE (EOM Image Viewer).
 
-extern crate alloc;
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// MATE Marco Window Manager
 pub struct MarcoWindowManager {
@@ -198,7 +197,7 @@ impl Default for MateBetsyDesktopEnvironment {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

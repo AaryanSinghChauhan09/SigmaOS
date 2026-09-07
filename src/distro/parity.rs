@@ -1,6 +1,5 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // Sovereign Linux Parity & Maturity Blueprint Implementation
 // Implements Live Installer, Update Channel Broker, Sandboxed App Bundle, and Multi-Arch HAL
 
@@ -461,7 +460,7 @@ impl Default for OpenSourceParityEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

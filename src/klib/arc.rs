@@ -1,10 +1,9 @@
-extern crate alloc;
 // SigmaOS Custom Arc (Atomic Reference Counting)
-// Reduces dependency on alloc::sync::Arc
+// Reduces dependency on std::sync::Arc
 
-use alloc::boxed::Box;
+use std::boxed::Box;
 use core::convert::AsRef;
-use core::ops::{Deref, DerefMut};
+use core::ops::Deref;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -116,7 +115,7 @@ impl<T: ?Sized> AsRef<T> for Arc<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

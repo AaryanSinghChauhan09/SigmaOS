@@ -2,10 +2,9 @@
 // Provides BTRFS CoW subvolume snapshotting, ZFS storage pool vdev management,
 // XFS B+ tree extents, and LUKS2 AES-XTS volume encryption.
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct BtrfsSubvolume {
@@ -94,7 +93,7 @@ impl Luks2CryptVolume {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

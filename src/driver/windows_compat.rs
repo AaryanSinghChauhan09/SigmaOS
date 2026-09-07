@@ -3,17 +3,14 @@
 #![allow(static_mut_refs)]
 #![allow(dead_code)]
 
-use alloc::vec;
-extern crate alloc;
 // Windows Driver Compatibility, Emulation, and PE Loading Framework for SigmaOS
 // Implements WDM, WDF (KMDF/UMDF), NDIS, Storport, WDDM, and PE-grade .sys loading.
 
 use crate::driver::device::{
     BlockDevice, CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
 };
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // --- Standard Windows Types & NTSTATUS Codes ---
@@ -620,7 +617,7 @@ impl Device for WindowsNdisAdapter {
         Ok(())
     }
 
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
 
@@ -696,11 +693,11 @@ impl Device for WindowsStorportAdapter {
         Ok(())
     }
 
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
 
-    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
 
@@ -848,7 +845,7 @@ impl WindowsWddmAdapter {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

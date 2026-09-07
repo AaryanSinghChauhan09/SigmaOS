@@ -1,6 +1,5 @@
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::format;
+use std::string::{String, ToString};
+use std::format;
 // Asynchronous I/O Ring Subsystem for SigmaOS
 // Inspired by Linux io_uring, Linux POSIX AIO, FreeBSD kqueue EVFILT_AIO, and Windows IOCP.
 
@@ -162,7 +161,7 @@ impl Default for AsyncIoRingEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

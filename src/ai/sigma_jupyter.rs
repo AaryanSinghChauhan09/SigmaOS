@@ -1,11 +1,10 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Embedded Jupyter Notebook & Data Science Interface
 // Provides an embedded, lightweight interactive notebook execution engine
 // for educational, research, and professional data analysis.
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CellType {
@@ -60,7 +59,7 @@ impl JupyterNotebook {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

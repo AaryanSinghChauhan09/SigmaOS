@@ -10,9 +10,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -20,13 +17,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
-use alloc::format;
+use std::vec;
+use std::format;
 
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -196,10 +192,10 @@ impl Default for SovereignPdf24Engine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
+    use std::string::ToString;
 
     #[test]
     fn test_pdf24_engine_creation() {

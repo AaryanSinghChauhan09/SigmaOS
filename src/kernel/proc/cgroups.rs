@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,13 +12,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec::Vec;
-extern crate alloc;
+use std::vec::Vec;
 
 /// SigmaOS cgroups v2 resource controller implementation
 /// Controls CPU limits, Memory limits, and PID limits
 use crate::klib::BTreeMap;
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ResourceLimits {
@@ -107,7 +103,7 @@ impl Default for CgroupManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

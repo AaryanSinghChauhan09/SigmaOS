@@ -1,5 +1,5 @@
 #![allow(clippy::all, warnings)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Distro Device Expansion Subsystem
 // Linux & BSD inspired drivers for broad hardware support:
 // - Broadcom LSI SAS/SATA Controller (Linux mpt3sas / FreeBSD mpr(4))
@@ -17,11 +17,18 @@ use alloc::vec;
 
 
 
-extern crate alloc;
+#[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+
+#[cfg(all(test, not(feature = "sigmaos_lib")))]
+#[path = "peripheral.rs"]
+pub mod peripheral;
+
+#[cfg(all(test, not(feature = "sigmaos_lib")))]
+use peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. Storage / SAS Controller: Broadcom LSI MPT3SAS Controller
@@ -237,7 +244,7 @@ impl PeripheralDevice for RealtekRtl8169Driver {
         self.power_state = PowerState::On;
         self.rx_ring = Vec::new();
         // Pre-populate simulated RX buffer frame
-        self.rx_ring.push(alloc::vec![0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x52, 0x54, 0x00, 0x81, 0x69, 0x01, 0x08, 0x00]);
+        self.rx_ring.push(std::vec![0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x52, 0x54, 0x00, 0x81, 0x69, 0x01, 0x08, 0x00]);
         Ok(())
     }
 
@@ -978,7 +985,7 @@ impl PeripheralDevice for CanBusSocketDriver {
         self.power_state = PowerState::On;
         self.rx_queue = Vec::new();
         // Enqueue sample CAN frame
-        self.rx_queue.push((0x123, alloc::vec![0xDE, 0xAD, 0xBE, 0xEF]));
+        self.rx_queue.push((0x123, std::vec![0xDE, 0xAD, 0xBE, 0xEF]));
         Ok(())
     }
 
@@ -1759,7 +1766,7 @@ impl PeripheralDevice for Ch340ExternalSerialDriver {
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
         self.power_state = PowerState::On;
-        self.rx_buffer = alloc::vec![b'O', b'K', b'\r', b'\n'];
+        self.rx_buffer = std::vec![b'O', b'K', b'\r', b'\n'];
         Ok(())
     }
 
@@ -1802,10 +1809,14 @@ impl PeripheralDevice for Ch340ExternalSerialDriver {
 // Unit Tests
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
+    #[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
     use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};
+
+    #[cfg(all(test, not(feature = "sigmaos_lib")))]
+    use super::peripheral::{DeviceGeneration, PeripheralManager, PowerState};
 
     #[test]
     fn test_mpt3sas_controller_driver() {

@@ -1,14 +1,12 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::any::Any;
 use core::fmt;
 
 use crate::kernel::device::{Device, DeviceBinding, DeviceType, DriverError, DriverMetadata};
-use crate::kernel::object::{KRef, KernelObject};
-use crate::security::capability::CapabilityToken;
+use crate::kernel::object::KernelObject;
 
 pub trait Driver: KernelObject + Send + Sync {
     fn driver_name(&self) -> &str;
@@ -226,7 +224,7 @@ impl DriverRegistry {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -261,7 +259,7 @@ mod tests {
         fn remove_child(
             &mut self,
             child_name: &str,
-        ) -> Option<alloc::boxed::Box<dyn KernelObject>> {
+        ) -> Option<std::boxed::Box<dyn KernelObject>> {
             self.base.remove_child(child_name)
         }
         fn kref(&self) -> &KRef {

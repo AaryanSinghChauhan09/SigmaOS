@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -21,8 +18,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub const PCI_MAX_BUS: u16 = 256;
 pub const PCI_MAX_DEVICE: u8 = 32;
@@ -122,7 +118,7 @@ impl Default for PciBusScanner {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

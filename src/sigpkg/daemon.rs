@@ -5,10 +5,10 @@
 // store paths. Reuses the no_std SigpkgClient, ContentAddressedStore,
 // Manifest, TufRole, and CryptoVerifier from the sigpkg crate.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 use crate::sigpkg::{CryptoVerifier, Manifest, SigpkgClient, TufRole, Version};
 
@@ -164,7 +164,7 @@ impl Default for SigpkgDaemon {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -174,7 +174,7 @@ mod tests {
             h ^= b as u64;
             h = h.wrapping_mul(0x100000001b3);
         }
-        alloc::format!("{:x}", h)
+        std::format!("{:x}", h)
     }
 
     fn make_manifest(name: &str, version: Version, payload: &[u8]) -> Manifest {

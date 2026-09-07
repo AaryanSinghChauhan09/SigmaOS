@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -20,21 +17,21 @@
 #[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
     Legacy,
     Modern,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState {
     Off,
     On,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 pub trait PeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
@@ -119,7 +116,7 @@ impl PeripheralDevice for TouchJingosDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

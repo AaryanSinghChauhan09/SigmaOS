@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,14 +12,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
-use alloc::format;
+use std::format;
+use std::vec;
 use core::net::IpAddr;
 
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis
 
-extern crate alloc;
 use crate::klib::BTreeMap;
 
 /// Network security alert classification
@@ -42,8 +38,8 @@ pub enum AlertSeverity {
     High,
     Critical,
 }
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 pub trait AnalysisStrategy {
     fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert>;
@@ -56,8 +52,6 @@ pub struct TrafficAlert {
     pub timestamp: Instant,
     pub related_ips: Vec<IpAddr>,
 }
-
-
 
 pub struct NetworkTrafficAnalyzer {
     pub buffer: AlpineZeroAllocCaptureBuffer<1024>,

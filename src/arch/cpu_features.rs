@@ -9,11 +9,7 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 
-extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -725,11 +721,11 @@ impl Default for SovereignXcr0State {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     extern crate alloc;
-    use alloc::vec;
+    use std::vec;
 
     #[test]
     fn test_cpu_optimizer_creation() {

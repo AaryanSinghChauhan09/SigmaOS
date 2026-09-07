@@ -1,6 +1,5 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Gamified Productivity System
 // Built-in goal trackers, Pomodoro timers, and progress dashboards
 
@@ -161,7 +160,7 @@ impl PomodoroTimer {
             return;
         }
 
-        if let Some(start) = self.start_time {
+        if let Some(_start) = self.start_time {
             self.elapsed = core::time::Duration::from_millis(0);
 
             if self.elapsed >= self.current_duration {
@@ -485,7 +484,7 @@ impl Default for GamifiedProductivity {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

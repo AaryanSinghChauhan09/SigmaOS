@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,11 +12,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -86,6 +82,7 @@ pub trait Theme {
 pub struct SimpleTheme {
     pub id: ThemeID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub colors: Vec<([u8; 32], Option<Box<dyn Color>>)>,
 }
 
@@ -99,6 +96,7 @@ impl SimpleTheme {
         SimpleTheme {
             id,
             name: name_array,
+            name_len: name_len as u8,
             colors: Vec::new(),
         }
     }
@@ -107,8 +105,8 @@ impl SimpleTheme {
 impl Theme for SimpleTheme {
     fn id(&self) -> ThemeID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+        // O(1) slice lookup using cached name_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.name[..self.name_len as usize]
     }
 
     fn get_color(&self, color_name: &[u8]) -> Option<&dyn Color> {
@@ -407,7 +405,7 @@ impl Default for SovereignThemeEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

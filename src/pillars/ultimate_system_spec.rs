@@ -1,12 +1,11 @@
-extern crate alloc;
 // Sovereign SigmaOS Ultimate System Specification & Development Engine
 // Zero-dependency, safe Rust, no_std compatible architecture
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. CRASH-CONSISTENT FILESYSTEM (SIGMAFS) & MERKLE JOURNAL

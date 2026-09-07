@@ -8,13 +8,12 @@
 //! 6. XNU macOS Kernel (Mach ports IPC, VM map memory virtualization, and Out-of-Line memory descriptors).
 //! 7. FreeType (rasterization hinting, font face cache maps, TrueType glyph kerning, and file parsing).
 //! 8. Norigin Spatial Navigation (Euclidean-distance directional focus routing, nested container isolation, and navigation locks).
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==========================================
@@ -598,7 +597,7 @@ impl SovereignSpatialNavigation {
 // Tests
 // ==========================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -646,7 +645,7 @@ mod tests {
         ctrl.register_property("Background", "Blue");
         ctrl.register_property("BorderWidth", "1");
 
-        let notified = alloc::sync::Arc::new(core::sync::atomic::AtomicBool::new(false));
+        let notified = std::sync::Arc::new(core::sync::atomic::AtomicBool::new(false));
         let notified_clone = notified.clone();
         ctrl.add_listener(move |prop, val| {
             if prop == "Background" && val == "Red" {

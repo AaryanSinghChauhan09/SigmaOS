@@ -1,25 +1,15 @@
-// SigmaOS Accessibility Module
-pub mod framework;
-pub mod keyboard;
-pub mod magnifier;
-pub mod screenreader;
+// SigmaOS Accessibility & Screen Reader Subsystem
 
-pub use framework::{
-    AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
-    AccessibilityProfile, AccessibilitySetting,
-};
+pub struct AccessibilityEngine;
 
-pub use screenreader::{
-    BrailleDisplay, ScreenReader, SimpleBrailleDisplay, SimpleScreenReader, SimpleVoice, Voice,
-    VoiceGender, VoiceID,
-};
+impl AccessibilityEngine {
+    pub fn new() -> Self {
+        Self
+    }
+}
 
-pub use magnifier::{
-    ColorFilter, Magnifier, MagnifierID, MagnifierManager, SimpleColorFilter, SimpleMagnifier,
-    SimpleMagnifierManager,
-};
-
-pub use keyboard::{
-    KeyID, KeyType, OnScreenKeyboard, SimpleOnScreenKeyboard, SimpleStickyKeys, SimpleVirtualKey,
-    StickyKeys, VirtualKey,
-};
+impl Default for AccessibilityEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}

@@ -5,13 +5,11 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 
 // SigmaOS Memory Module
 // Virtual memory management, paging, physical memory allocation, and TLB caching
 
+pub mod quota;
 pub mod cgroups;
 pub mod kswapd;
 pub mod paging;
@@ -33,3 +31,4 @@ pub use segmentation_paging::{
 };
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};
+pub use quota::{MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, ProcessMemoryAccount, PageCacheStat};

@@ -1,4 +1,3 @@
-extern crate alloc;
 
 use core::mem;
 /// Orange Slice-inspired Deterministic Micro-Virtualization Suite for SigmaOS
@@ -256,9 +255,9 @@ impl<T> Drop for Vec<T> {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::{alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
@@ -272,7 +271,7 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

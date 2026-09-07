@@ -1,10 +1,26 @@
+pub mod mobile_variant;
+pub use mobile_variant::*;
+
 // SigmaOS Desktop Module
 pub mod mate_betsy;
 pub mod mint_tools;
 pub mod moksha;
+pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
+pub mod sovereign_navigation_engine;
 pub mod zenith_compositor;
+pub mod ultimate_distro_desktop;
+
+pub use sovereign_navigation_engine::*;
+
+pub use ultimate_distro_desktop::{
+    ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
+    LuminaBsdDesktopEngine, SwayRegolithWmEngine, SwayWorkspaceContainerNode, ThunarCustomAction,
+    Xfce418Engine,
+};
+
+pub use web_wasm_bridge::*;
 
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,
@@ -12,8 +28,8 @@ pub use mate_betsy::{
 };
 
 pub use mint_tools::{
-    MintUpdateManager, UpdatePackage, UpdateLevel, MintTimeshiftEngine, TimeshiftSnapshot,
-    SnapshotType, MintSoftwareManager, AppMetadata,
+    AppMetadata, MintSoftwareManager, MintTimeshiftEngine, MintUpdateManager, SnapshotType,
+    TimeshiftSnapshot, UpdateLevel, UpdatePackage,
 };
 
 pub use screensaver::{
@@ -35,4 +51,10 @@ pub use moksha::{
 pub use zenith_compositor::{
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
+};
+
+pub use sovereign_navigation_engine::{
+    AppCategory, GnomePopLauncherNav, HudActionResult, KrunnerRofiCommandHud, LauncherAppItem,
+    NavDirection, RangerDolphinSpatialFileNav, SovereignUniversalNavigationEngine,
+    SystemControlNode, TilingWindowManagerNav, WindowNode, YastBsdConfigControlTreeNav,
 };

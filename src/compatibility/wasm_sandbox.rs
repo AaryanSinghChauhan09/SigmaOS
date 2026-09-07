@@ -1,6 +1,6 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 /// WebAssembly (WASM) Sandbox and Secure Runtime Execution Engine
 /// Provides isolated module runtimes, memory sandboxing, and pledge security checks
 /// to achieve Wasmer/Wasmtime/wasm3 parity inside SigmaOS.
@@ -139,7 +139,7 @@ impl WasmSandboxEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

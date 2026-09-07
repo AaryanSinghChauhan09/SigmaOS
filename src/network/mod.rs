@@ -6,6 +6,9 @@ pub mod sovereign_remote_sharing;
 pub mod tcp;
 pub mod tcp_udp;
 pub mod wireless_manager;
+pub mod zenithnet;
+pub mod routing;
+pub mod socket;
 
 pub use discovery::{
     DiscoveredNetworkService, DiscoveryProtocolType, Icmpv6NdpEntry, LlmnrNbnsResolver,
@@ -27,3 +30,14 @@ pub use sovereign_remote_sharing::{
 };
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use wireless_manager::{BluetoothDevice, WifiProfile, WifiSecurity, WirelessManager};
+
+// ZenithNet TCP/IP Stack
+pub use zenithnet::{
+    EthernetFrame, Ipv4Addr, Ipv4Header, IpProtocol, MacAddr, NetworkError, NetworkInterface,
+    PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
+};
+pub use routing::{ForwardingDecision, RouteEntry, RoutingEngine, RoutingTable};
+pub use socket::{
+    AddressFamily, Socket, SocketAddr, SocketError, SocketOptions, SocketState, SocketTable,
+    SocketType,
+};

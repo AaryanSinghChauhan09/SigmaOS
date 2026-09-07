@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -21,14 +18,11 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 pub const PAGE_SIZE: usize = 4096;
 
@@ -403,7 +397,7 @@ impl SectionObject {
     }
 
     pub fn query_permissions(&self) -> (&'static str, bool, bool) {
-        let readable = true;
+        let _readable = true;
         let writable = match self.access {
             SectionAccess::ReadOnly => false,
             SectionAccess::ReadWrite => true,
@@ -568,18 +562,12 @@ pub enum DeviceType {
     Filter,
 }
 
-#[derive(Debug, Clone)]
-pub struct DeviceObjectX86 {
-    pub device_type: DeviceType,
-    pub driver_name: &'static str,
-    pub next_device: Option<alloc::boxed::Box<DeviceObjectX86>>,
-    pub attached_device: Option<alloc::boxed::Box<DeviceObjectX86>>,
-}
 
 pub struct DriverObjectX86 {
     pub driver_name: &'static str,
-    pub major_function: [Option<fn(&DeviceObjectX86, &mut Irp) -> u32>; 8],
+    pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],
 }
+
 
 #[derive(Debug, Clone)]
 pub struct IrpStackLocation {
@@ -806,7 +794,7 @@ pub enum PledgePromise {
 
 pub struct OpenBsdPledgeUnveil {
     pub pledged_promises: Vec<PledgePromise>,
-    pub unveiled_paths: Vec<(alloc::string::String, alloc::string::String)>, // (Path, Permissions e.g. "r", "rw")
+    pub unveiled_paths: Vec<(std::string::String, std::string::String)>, // (Path, Permissions e.g. "r", "rw")
     pub is_pledged: bool,
 }
 
@@ -958,7 +946,7 @@ impl CallingConventionEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

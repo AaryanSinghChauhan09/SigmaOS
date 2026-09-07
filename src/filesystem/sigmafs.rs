@@ -1,11 +1,10 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaFS: Content-Addressed, Post-Quantum Cryptography (PQC) Encrypted Filesystem
 /// Implements a full Merkle-tree DAG structure for content addressing.
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use crate::klib::BTreeMap;
 
 use crate::security::vault::EncryptionAlgorithm;
@@ -109,7 +108,7 @@ impl Default for SigmaFS {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

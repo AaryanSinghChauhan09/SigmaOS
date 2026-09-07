@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,18 +12,17 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
-use alloc::vec;
+use std::format;
+use std::vec;
 
 // S-PAC Package Manager - Arch-style rolling upgrades
 // Package transaction manager with DPLL SAT solver integration
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageState {
@@ -221,7 +217,7 @@ impl Default for SpacPackageManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

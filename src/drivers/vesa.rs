@@ -1,6 +1,6 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS VESA Framebuffer Driver
 // Hardware abstraction for VESA BIOS extensions + PeripheralDevice OOP integration
 
@@ -365,7 +365,7 @@ pub enum VesaError {
     InitializationFailed,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

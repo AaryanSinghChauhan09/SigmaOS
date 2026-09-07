@@ -1,5 +1,4 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 
 use core::mem;
 /// OOP-based Filesystem Support for SigmaOS
@@ -129,10 +128,10 @@ impl BtrfsFeatures for SimpleBtrfsFS {
     }
 
     fn delete_subvolume(&mut self, path: &[u8]) -> Result<(), FilesystemError> {
+        let p_len = path.len().min(256);
         for i in 0..self.subvolumes.len() {
             let subvol = &self.subvolumes[i];
-            let len = subvol.iter().position(|&b| b == 0).unwrap_or(256);
-            if &subvol[..len] == path {
+            if &subvol[..p_len] == path && (p_len == 256 || subvol[p_len] == 0) {
                 self.subvolumes.remove(i);
                 return Ok(());
             }
@@ -195,10 +194,10 @@ impl ZFSFeatures for SimpleZFS {
     }
 
     fn rollback_snapshot(&mut self, snapshot: &[u8]) -> Result<(), FilesystemError> {
+        let s_len = snapshot.len().min(256);
         for i in 0..self.snapshots.len() {
             let snap = &self.snapshots[i];
-            let len = snap.iter().position(|&b| b == 0).unwrap_or(256);
-            if &snap[..len] == snapshot {
+            if &snap[..s_len] == snapshot && (s_len == 256 || snap[s_len] == 0) {
                 return Ok(());
             }
         }
@@ -391,9 +390,9 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]

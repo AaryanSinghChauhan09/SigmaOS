@@ -1,5 +1,3 @@
-extern crate alloc;
-use alloc::vec::Vec;
 // SigmaOS Compatibility Module
 pub mod abi_extended;
 pub mod abi_translator;
@@ -59,13 +57,6 @@ pub mod lattice_grid;
 pub mod legacy_adapters;
 pub mod linux_adapter;
 pub mod linux_bsd_ecosystem_bridge;
-pub mod distro_parity_ultimate;
-
-pub use distro_parity_ultimate::{
-    AlpmMirror, AlpmParallelSyncEngine, ApkIndexTriggerEngine, ApkTriggerHook,
-    AptPinRule, AptPinningMultiArchResolver, OpenBsdMonotonicSandbox, XbpsPackageHeader,
-    XbpsSignatureVerifier,
-};
 pub mod linux_compat;
 
 pub use linux_bsd_ecosystem_bridge::{
@@ -74,6 +65,13 @@ pub use linux_bsd_ecosystem_bridge::{
     UniversalSyscallAbiShim,
 };
 pub mod linux_distro_parity;
+pub use linux_distro_parity::{
+    FstabEntry, LinuxCoreDumpFilterEngine, LinuxFstabEngine, LinuxLdSoLoader,
+    LinuxModulesLoadEngine, LinuxPamAuthenticationEngine, LinuxRunlevel, LinuxRunlevelGovernor,
+    LinuxSwapfileManagerEngine, LinuxSysctlGovernor, LinuxSystemdTmpfilesEngine,
+    LinuxUdevRulesEngine, LsbReleaseGovernor, LsbReleaseInfo, SharedLibrary, SwapDevice,
+    SwapKind, TmpfileItemType, TmpfileRule, UdevRule,
+};
 pub mod linux_init;
 pub mod linux_network;
 pub mod linux_security;
@@ -84,8 +82,8 @@ pub mod lubuntu;
 pub mod macos_darwin;
 pub mod mate_betsy;
 pub mod mesh_hub;
-pub mod mint_linux;
 pub mod mint_ecosystem;
+pub mod mint_linux;
 
 pub use mint_ecosystem::{
     CaptainMintManager, CinnamonSpiceDesklet, CinnamonSpiceTheme, CinnamonSpicesEngine,
@@ -123,11 +121,13 @@ pub use wsl::*;
 pub use zorin::*;
 
 pub use gap_closure::{
-    AiTaskOrchestrator, BuildLedgerSystem, DriverRepositoryManager, FirmwareBridgeManager,
-    HidGraphicsDriver, KernelModuleManager, NetworkStackGateway, OpenSourceCompetitorOrchestrator,
+    AiTaskOrchestrator, AlpineLinuxDisklessLbuPersistence, BuildLedgerSystem,
+    DriverRepositoryManager, FirmwareBridgeManager, FreeBsdGeomStorageStack, HidGraphicsDriver,
+    KernelModuleManager, NetworkStackGateway, NixOsHermeticClosureEngine,
+    OpenBsdSelfReportingSecurityGovernor, OpenSourceCompetitorOrchestrator,
     PeripheralEmulationLibrary, SecurityPolicyManager, SovereignDistroAbsorptionEngine,
     SyscallCompatibilityRegistry, TargetDistroFamily, VirtualMemoryManager,
-    ZorinAppearanceSwitcher,
+    VoidLinuxRunitServiceSupervisor, ZorinAppearanceSwitcher,
 };
 pub use superiority::{
     LockFreeQueue, NumaCfsScheduler, ShardIgnitor, SovereignCloudFS, SovereignForensics,
@@ -146,7 +146,6 @@ pub use arch_linux::{
     YayParuAdapter,
 };
 
-pub use open_source_dominance::*;
 pub use open_source_tier1::{
     LibsodiumIntegration, SmolTcpIntegration, SqliteIntegration, WasmerIntegration,
 };
@@ -170,15 +169,16 @@ pub use historic_linux::{
     VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
-pub use legacy_adapters::{LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter};
-pub use mate_betsy::{MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine};
+pub use mate_betsy::{
+    MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
+};
 pub use mint_linux::{
-    LoopbackDiskFormat, LoopbackDiskImage, Mint4WinConfig, Mint4WinInstallationConfig,
-    Mint4WinInstaller, Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
-    MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert,
-    MintReportAlertSeverity, MintReportSystem, MintSoftwareManager, MintTimeshiftEngine,
-    MintUpdateLevel, MintUpdateManager, MintUpdatePackage, NtfsFastStartupState, TimeshiftSnapshot,
-    UninstallerRegistryEntry, WindowsBootloaderType,
+    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
+    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+};
+pub use legacy_adapters::{
+    KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
 };
 
 pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};

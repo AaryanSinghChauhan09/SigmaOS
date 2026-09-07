@@ -1,10 +1,9 @@
-extern crate alloc;
 // Runit Supervision Engine for SigmaOS
 // Location: src/init/runit.rs
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
+use std::collections::BTreeMap;
 use super::init_abstraction::{InitSystem, InitSystemType, ServiceStatus, InitError};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

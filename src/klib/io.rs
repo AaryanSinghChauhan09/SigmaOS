@@ -1,7 +1,4 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::vec::Vec;
 // SigmaOS Custom I/O Implementation
 // Reduces dependency on std::io by providing custom implementations
 
@@ -21,7 +18,7 @@ impl SigmaBuffer {
         }
     }
 
-    pub fn with_capacity(capacity: usize) -> Self {
+    pub fn with_capacity(_capacity: usize) -> Self {
         SigmaBuffer {
             data: Vec::new(),
             position: 0,

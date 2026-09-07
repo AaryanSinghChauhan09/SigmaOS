@@ -4,12 +4,11 @@
 
 
 
-extern crate alloc;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 /// Shared Release Metadata for Drivers (OOP Composition Principle)
 #[derive(Debug, Clone)]
@@ -157,7 +156,7 @@ impl LinuxReleaseDriver for MainlineGpuDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};

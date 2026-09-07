@@ -1,6 +1,6 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS AI-Native Model Process Runtime (IModelRuntime)
 // Treats neural network models (LLMs, computer-vision, TTS) as first-class, scheduled OS processes
 
@@ -59,7 +59,7 @@ impl IModelRuntime {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

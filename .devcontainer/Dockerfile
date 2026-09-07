@@ -40,10 +40,19 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
         libssl-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Rust toolchain (Debian/Arch/Alpine parity)
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile default \
+# Install Rust toolchain (nightly required for no_std kernel features)
+# Also add stable for host tooling (cargo fmt, clippy).
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly --profile default \
     && chmod -R a+w $RUSTUP_HOME $CARGO_HOME \
-    && rustup component add clippy rustfmt
+    && rustup toolchain install stable \
+    && rustup component add clippy rustfmt --toolchain stable \
+    && rustup component add rust-src llvm-tools-preview --toolchain nightly \
+    && rustup target add \
+        x86_64-unknown-none \
+        aarch64-unknown-none \
+        riscv64gc-unknown-none-elf \
+        wasm32-unknown-unknown \
+    && cargo install cargo-binutils 2>/dev/null || true
 
 # Install Zig toolchain
 RUN ZIG_VERSION="0.11.0" \

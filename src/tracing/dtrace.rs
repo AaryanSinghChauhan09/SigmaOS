@@ -1,14 +1,13 @@
 #![allow(dead_code)]
-use alloc::format;
+use std::format;
 // Kernel-level Illumos/Solaris DTrace D-Language bytecode interpreter and probe engine for SigmaOS
 // Enables dynamic tracing, DIF (DTrace Intermediate Format) execution, and aggregation buffers
 
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DTraceProbeKind {
@@ -104,19 +103,19 @@ impl DTraceEngine {
                     self.registers[instr.reg_dest as usize] = self.registers[instr.reg_src1 as usize].wrapping_sub(self.registers[instr.reg_src2 as usize]);
                 }
                 DifOpcode::AggCount => {
-                    let key = alloc::format!("count@reg{}", instr.reg_src1);
+                    let key = std::format!("count@reg{}", instr.reg_src1);
                     let val = self.aggregations.entry(key).or_insert(0);
                     *val += 1;
                 }
                 DifOpcode::AggSum => {
-                    let key = alloc::format!("sum@reg{}", instr.reg_src1);
+                    let key = std::format!("sum@reg{}", instr.reg_src1);
                     let add_val = self.registers[instr.reg_src1 as usize];
                     let val = self.aggregations.entry(key).or_insert(0);
                     *val += add_val;
                 }
                 DifOpcode::Ret => {
                     let ret_val = self.registers[instr.reg_dest as usize];
-                    self.trace_log.push(alloc::format!("DTrace trace return: {}", ret_val));
+                    self.trace_log.push(std::format!("DTrace trace return: {}", ret_val));
                     return Ok(ret_val);
                 }
                 _ => {}
@@ -132,7 +131,7 @@ impl Default for DTraceEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

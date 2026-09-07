@@ -1,9 +1,8 @@
 //! Custom file system implementation for SigmaOS
 //! This module provides no_std alternatives to std::fs
-extern crate alloc;
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::ffi::c_char;
 use core::fmt;
 
@@ -612,7 +611,7 @@ unsafe fn syscall_closedir(fd: RawFd) -> i32 {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

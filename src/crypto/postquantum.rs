@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,9 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec::Vec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -207,10 +202,10 @@ impl FullDiskEncryption for SimpleFDE {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+impl<T> VecImpl<T> {
+    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
@@ -236,44 +231,19 @@ impl<T> Vec<T> {
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a VecImpl<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
+        if self.data.is_null() || self.len == 0 {
+            [].iter()
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+        }
     }
 }
 
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}

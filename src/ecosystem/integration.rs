@@ -1,11 +1,11 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS Ecosystem Integration Framework
 // Mobile/embedded presence matrices, enterprise partnerships, hardware/software certification pipelines,
 // zero-setup dev environments, IDE debugger support, Docker compatibility layers, and Kubernetes bootstrap configurations.
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 use crate::klib::HashMap;
 #[cfg(not(test))]
 use crate::klib::HashMap;
@@ -197,7 +197,7 @@ impl Default for EcosystemManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

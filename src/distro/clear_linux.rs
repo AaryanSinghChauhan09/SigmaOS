@@ -2,16 +2,27 @@
 // Implements Intel Clear Linux's stateless configuration and immutable root layers
 // Inspired by Clear Linux's performance-optimized architecture
 
-use alloc::string::String;
-use alloc::vec::Vec;
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::String;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Configuration file location
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConfigLocation {
-    Defaults,  // /usr/share/defaults
-    System,    // /etc
-    Runtime,   // /run
+    Defaults, // /usr/share/defaults
+    System,   // /etc
+    Runtime,  // /run
 }
 
 /// Configuration state
@@ -92,7 +103,9 @@ impl ClearLinuxStatelessEngine {
 
     /// Get state status
     pub fn get_status(&self) -> String {
-        let overridden = self.configs.values()
+        let overridden = self
+            .configs
+            .values()
             .filter(|s| s.location == ConfigLocation::System)
             .count();
 
@@ -141,7 +154,7 @@ impl SwupdUpdateManager {
 
     /// Install bundle
     pub fn install_bundle(&mut self, bundle_name: &str) -> Result<(), String> {
-        if let Some(bundle) = self.bundles.get(bundle_name) {
+        if let Some(bundle) = self.bundles.get(bundle_name).cloned() {
             // Install dependencies first
             for dep in &bundle.dependencies {
                 if !self.installed_bundles.contains(dep) {
@@ -176,7 +189,8 @@ impl SwupdUpdateManager {
     /// Search bundles
     pub fn search_bundles(&self, query: &str) -> Vec<&SwupdBundle> {
         let query_lower = query.to_lowercase();
-        self.bundles.values()
+        self.bundles
+            .values()
             .filter(|b| b.name.to_lowercase().contains(&query_lower))
             .collect()
     }
@@ -188,7 +202,7 @@ impl Default for SwupdUpdateManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
 

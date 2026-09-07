@@ -1,15 +1,17 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
-use crate::klib;
-use crate::klib::Vec;
-use crate::klib::{HashMap, SigmaString, Vec as KVec};
+extern crate alloc;
 use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec as AllocVec;
+
+use crate::klib::collections::HashMap;
+use crate::klib::string::SigmaString;
+use crate::klib;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -58,7 +60,7 @@ pub struct Package {
     pub name: SigmaString,
     pub version: Version,
     pub description: SigmaString,
-    pub dependencies: alloc::vec::Vec<Dependency>,
+    pub dependencies: std::vec::Vec<Dependency>,
     pub checksum: SigmaString,
 }
 
@@ -67,7 +69,7 @@ impl Package {
         name: SigmaString,
         version: Version,
         description: SigmaString,
-        dependencies: alloc::vec::Vec<Dependency>,
+        dependencies: std::vec::Vec<Dependency>,
         checksum: SigmaString,
     ) -> Self {
         Self {
@@ -97,7 +99,7 @@ impl AurRecipeCompiler {
     pub fn compile_pkgbuild(&self, pkgbuild_content: &str) -> Result<Package, &'static str> {
         let mut pkgname = "";
         let mut pkgver = "1.0.0";
-        let mut depends = alloc::vec::Vec::new();
+        let mut depends = std::vec::Vec::new();
 
         for line in pkgbuild_content.lines() {
             let line = line.trim();
@@ -128,11 +130,11 @@ impl AurRecipeCompiler {
             Version::parse(pkgver).map_err(|_| "Invalid version format in PKGBUILD")?;
 
         Ok(Package::new(
-            crate::klib::string::SigmaString::from(pkgname),
+            SigmaString::from(pkgname),
             parsed_ver,
-            crate::klib::string::SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
+            SigmaString::from(format!("Compiled AUR Package: {}", pkgname)),
             depends,
-            crate::klib::string::SigmaString::from("sha256_compiled_mock_hash_value"),
+            SigmaString::from("sha256_compiled_mock_hash_value"),
         ))
     }
 }
@@ -148,7 +150,7 @@ impl Default for AurRecipeCompiler {
 pub struct DebianSbuildPackage {
     pub name: SigmaString,
     pub version: Version,
-    pub build_depends: alloc::vec::Vec<SigmaString>,
+    pub build_depends: std::vec::Vec<SigmaString>,
 }
 
 /// Rolling Release System Synchronizer
@@ -247,11 +249,11 @@ impl PacmanDbAdapter {
             Version::parse(base_version).map_err(|_| "Failed to parse legacy version")?;
 
         Ok(Package::new(
-            crate::klib::string::SigmaString::from(name),
+            SigmaString::from(name),
             parsed_ver,
-            crate::klib::string::SigmaString::from(desc),
-            alloc::vec::Vec::<Dependency>::new(),
-            crate::klib::string::SigmaString::from("sha256_imported_legacy_hash_value"),
+            SigmaString::from(desc),
+            std::vec::Vec::<Dependency>::new(),
+            SigmaString::from("sha256_imported_legacy_hash_value"),
         ))
     }
 }
@@ -311,10 +313,10 @@ impl AlpmHookManager {
         }
 
         self.add_hook(AlpmHook {
-            name: crate::klib::string::SigmaString::from(name),
+            name: SigmaString::from(name),
             when,
-            target_pattern: crate::klib::string::SigmaString::from(target_pattern),
-            exec_cmd: crate::klib::string::SigmaString::from(exec_cmd),
+            target_pattern: SigmaString::from(target_pattern),
+            exec_cmd: SigmaString::from(exec_cmd),
         });
 
         Ok(())
@@ -324,8 +326,8 @@ impl AlpmHookManager {
         &self,
         when: HookWhen,
         changed_file: &str,
-    ) -> alloc::vec::Vec<crate::klib::string::SigmaString> {
-        let mut triggered_cmds = alloc::vec::Vec::new();
+    ) -> std::vec::Vec<SigmaString> {
+        let mut triggered_cmds = std::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
                 let pattern = hook.target_pattern.trim_end_matches('*');
@@ -388,7 +390,9 @@ impl AlpmTransactionEngine {
 
         let mut pre_cmds = AllocVec::new();
         for target in &self.targets {
-            let cmds = self.hook_manager.trigger_hooks(HookWhen::PreTransaction, target.as_str());
+            let cmds = self
+                .hook_manager
+                .trigger_hooks(HookWhen::PreTransaction, target.as_str());
             pre_cmds.extend(cmds);
         }
 
@@ -405,7 +409,9 @@ impl AlpmTransactionEngine {
         let mut post_cmds = AllocVec::new();
         for target in &self.targets {
             self.installed.insert(target.clone(), Version::new(1, 0, 0));
-            let cmds = self.hook_manager.trigger_hooks(HookWhen::PostTransaction, target.as_str());
+            let cmds = self
+                .hook_manager
+                .trigger_hooks(HookWhen::PostTransaction, target.as_str());
             post_cmds.extend(cmds);
         }
 
@@ -451,7 +457,9 @@ pub struct AlpmDatabaseSync {
 
 impl AlpmDatabaseSync {
     pub fn new() -> Self {
-        Self { entries: Vec::new() }
+        Self {
+            entries: Vec::new(),
+        }
     }
 
     /// Parses Pacman formatted `.db.tar.gz` sync metadata content
@@ -472,13 +480,17 @@ impl AlpmDatabaseSync {
             } else if line == "%PROVIDES%" {
                 while let Some(nxt) = lines.next() {
                     let nxt = nxt.trim();
-                    if nxt.is_empty() || nxt.starts_with('%') { break; }
+                    if nxt.is_empty() || nxt.starts_with('%') {
+                        break;
+                    }
                     cur_provides.push(nxt.to_string());
                 }
             } else if line == "%CONFLICTS%" {
                 while let Some(nxt) = lines.next() {
                     let nxt = nxt.trim();
-                    if nxt.is_empty() || nxt.starts_with('%') { break; }
+                    if nxt.is_empty() || nxt.starts_with('%') {
+                        break;
+                    }
                     cur_conflicts.push(nxt.to_string());
                 }
             }
@@ -514,7 +526,9 @@ impl AlpmConflictSolver {
     pub fn check_conflicts(entries: &[AlpmSyncEntry], target_pkg: &str) -> Option<String> {
         let target = entries.iter().find(|e| e.name == target_pkg)?;
         for other in entries {
-            if other.name == target_pkg { continue; }
+            if other.name == target_pkg {
+                continue;
+            }
             for conflict in &target.conflicts {
                 if other.name == *conflict || other.provides.contains(conflict) {
                     return Some(other.name.clone());
@@ -529,22 +543,22 @@ impl AlpmConflictSolver {
 
 #[derive(Debug, Clone)]
 pub struct MkinitcpioBuilder {
-    pub hooks: alloc::vec::Vec<SigmaString>,
+    pub hooks: std::vec::Vec<SigmaString>,
     pub compression: SigmaString,
 }
 
 impl MkinitcpioBuilder {
     pub fn new() -> Self {
-        let mut hooks = alloc::vec::Vec::new();
-        hooks.push(crate::klib::string::SigmaString::from("base"));
-        hooks.push(crate::klib::string::SigmaString::from("udev"));
-        hooks.push(crate::klib::string::SigmaString::from("autodetect"));
-        hooks.push(crate::klib::string::SigmaString::from("modconf"));
-        hooks.push(crate::klib::string::SigmaString::from("block"));
-        hooks.push(crate::klib::string::SigmaString::from("filesystems"));
+        let mut hooks = std::vec::Vec::new();
+        hooks.push(SigmaString::from("base"));
+        hooks.push(SigmaString::from("udev"));
+        hooks.push(SigmaString::from("autodetect"));
+        hooks.push(SigmaString::from("modconf"));
+        hooks.push(SigmaString::from("block"));
+        hooks.push(SigmaString::from("filesystems"));
         Self {
             hooks,
-            compression: crate::klib::string::SigmaString::from("zstd"),
+            compression: SigmaString::from("zstd"),
         }
     }
 
@@ -668,6 +682,54 @@ impl SAbsSimdCompiler {
     }
 }
 
+// --- Arch Linux svntogit Repository Migration Engine ---
+
+#[derive(Debug, Clone)]
+pub struct SvnPackageMetadata {
+    pub pkgname: String,
+    pub repo: String, // e.g. "core", "extra", "community"
+    pub svn_revision: u64,
+    pub has_pkgbuild: bool,
+}
+
+#[derive(Debug, Default)]
+pub struct SvntogitMigrationEngine {
+    pub migrated_packages: std::collections::BTreeMap<String, SvnPackageMetadata>,
+}
+
+impl SvntogitMigrationEngine {
+    pub fn new() -> Self {
+        Self {
+            migrated_packages: std::collections::BTreeMap::new(),
+        }
+    }
+
+    pub fn migrate_svn_repo_layout(
+        &mut self,
+        pkgname: &str,
+        repo: &str,
+        svn_revision: u64,
+        pkgbuild_content: &str,
+    ) -> Result<String, &'static str> {
+        if pkgbuild_content.is_empty() {
+            return Err("svntogit: Cannot migrate empty PKGBUILD");
+        }
+
+        let metadata = SvnPackageMetadata {
+            pkgname: pkgname.to_string(),
+            repo: repo.to_string(),
+            svn_revision,
+            has_pkgbuild: true,
+        };
+
+        self.migrated_packages.insert(pkgname.to_string(), metadata);
+        Ok(format!(
+            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
+            pkgname, svn_revision, pkgname
+        ))
+    }
+}
+
 // --- makepkg Package Builder ---
 
 #[derive(Debug, Clone)]
@@ -719,55 +781,11 @@ impl MakepkgBuilder {
         Ok((archive_name, archive_content))
     }
 }
-
 // --- Arch Linux svntogit Repository Migration Engine ---
-
 #[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
+pub struct SvntoGitEngine {
+    pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
 }
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -778,33 +796,24 @@ mod tests {
         sync.register_installed("gcc", Version::new(12, 2, 0));
         sync.register_installed("make", Version::new(4, 3, 0));
 
-        let mut build_depends = KVec::new();
-        build_depends.push(SigmaString::from("gcc"));
-        build_depends.push(SigmaString::from("make"));
-
         let source_pkg = DebianSbuildPackage {
-            name: crate::klib::string::SigmaString::from("coreutils"),
+            name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: alloc::vec![
-                crate::klib::string::SigmaString::from("gcc"),
-                crate::klib::string::SigmaString::from("make")
+            build_depends: std::vec![
+                SigmaString::from("gcc"),
+                SigmaString::from("make")
             ],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
 
-        let mut build_depends_missing = KVec::new();
-        build_depends_missing.push(SigmaString::from("gcc"));
-        build_depends_missing.push(SigmaString::from("make"));
-        build_depends_missing.push(SigmaString::from("libc-dev"));
-
         let source_pkg_missing = DebianSbuildPackage {
-            name: crate::klib::string::SigmaString::from("coreutils"),
+            name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: alloc::vec![
-                crate::klib::string::SigmaString::from("gcc"),
-                crate::klib::string::SigmaString::from("make"),
-                crate::klib::string::SigmaString::from("libc-dev"),
+            build_depends: std::vec![
+                SigmaString::from("gcc"),
+                SigmaString::from("make"),
+                SigmaString::from("libc-dev"),
             ],
         };
         assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
@@ -892,10 +901,10 @@ mod tests {
         assert_eq!(engine.state, AlpmTransactionState::Init);
 
         engine.add_target("nginx").unwrap();
-        let pre_cmds = engine.prepare().unwrap();
+        let _pre_cmds = engine.prepare().unwrap();
         assert_eq!(engine.state, AlpmTransactionState::Prepared);
 
-        let post_cmds = engine.commit().unwrap();
+        let _post_cmds = engine.commit().unwrap();
         assert_eq!(engine.state, AlpmTransactionState::Committed);
         assert!(engine.installed.contains_key(&SigmaString::from("nginx")));
 

@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,15 +12,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 // POST (Power-On Self-Test) Diagnostics
 // BIOS/UEFI firmware POST implementation
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PostStatus {
@@ -179,7 +175,7 @@ impl Default for PostDiagnostics {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

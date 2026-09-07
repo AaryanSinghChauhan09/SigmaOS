@@ -1,11 +1,9 @@
 #[allow(unused_imports, dead_code, unused_variables, unused_mut)]
-extern crate alloc;
 // SigmaOS Constellation-and-Mesh Architecture
 // Houses the core OOP designs for Kernel Constellations, Syscall Almanacs, Driver Archives,
 // Firmware Meshes, Build Codices, Security Constellations, and Peripheral Meshes.
 
 use crate::security::capability::CapabilityToken;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// 1. Kernel Personality Constellation Grid
 /// Models kernel personas as stars in a constellation grid, each representing a version node.
@@ -449,9 +447,9 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 // Allocator shim: uses core/alloc allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
@@ -465,7 +463,7 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

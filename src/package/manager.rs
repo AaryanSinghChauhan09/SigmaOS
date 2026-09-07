@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,15 +12,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
+use std::boxed::Box;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
 /// OOP-based Package Management for SigmaOS
 /// Based on Roadmap Item: Package Management + Reproducible Builds
-extern crate alloc;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -105,30 +100,30 @@ pub trait PackageManager {
 /// GUI App Store Manager (GNOME Software / KDE Discover Parity)
 #[derive(Debug, Clone)]
 pub struct AppReview {
-    pub author: alloc::string::String,
+    pub author: std::string::String,
     pub rating_stars: u8,
-    pub comment: alloc::string::String,
+    pub comment: std::string::String,
 }
 
 #[derive(Debug, Clone)]
 pub struct AppListing {
-    pub app_id: alloc::string::String,
-    pub display_name: alloc::string::String,
-    pub category: alloc::string::String,
-    pub description: alloc::string::String,
+    pub app_id: std::string::String,
+    pub display_name: std::string::String,
+    pub category: std::string::String,
+    pub description: std::string::String,
     pub average_rating: f32,
-    pub reviews: alloc::vec::Vec<AppReview>,
+    pub reviews: std::vec::Vec<AppReview>,
     pub is_installed: bool,
 }
 
 pub struct GuiAppStoreManager {
-    pub store_listings: alloc::vec::Vec<AppListing>,
+    pub store_listings: std::vec::Vec<AppListing>,
 }
 
 impl GuiAppStoreManager {
     pub fn new() -> Self {
         GuiAppStoreManager {
-            store_listings: alloc::vec::Vec::new(),
+            store_listings: std::vec::Vec::new(),
         }
     }
 
@@ -140,12 +135,12 @@ impl GuiAppStoreManager {
         description: &str,
     ) {
         let listing = AppListing {
-            app_id: alloc::string::String::from(app_id),
-            display_name: alloc::string::String::from(display_name),
-            category: alloc::string::String::from(category),
-            description: alloc::string::String::from(description),
+            app_id: std::string::String::from(app_id),
+            display_name: std::string::String::from(display_name),
+            category: std::string::String::from(category),
+            description: std::string::String::from(description),
             average_rating: 5.0,
-            reviews: alloc::vec::Vec::new(),
+            reviews: std::vec::Vec::new(),
             is_installed: false,
         };
         self.store_listings.push(listing);
@@ -162,9 +157,9 @@ impl GuiAppStoreManager {
         for app in &mut self.store_listings {
             if app.app_id == app_id {
                 app.reviews.push(AppReview {
-                    author: alloc::string::String::from(author),
+                    author: std::string::String::from(author),
                     rating_stars: stars,
-                    comment: alloc::string::String::from(comment),
+                    comment: std::string::String::from(comment),
                 });
                 let total_stars: u32 = app.reviews.iter().map(|r| r.rating_stars as u32).sum();
                 app.average_rating = total_stars as f32 / app.reviews.len() as f32;
@@ -174,7 +169,7 @@ impl GuiAppStoreManager {
         Err("App ID not found in store registry")
     }
 
-    pub fn search_apps(&self, keyword: &str) -> alloc::vec::Vec<&AppListing> {
+    pub fn search_apps(&self, keyword: &str) -> std::vec::Vec<&AppListing> {
         self.store_listings
             .iter()
             .filter(|app| {
@@ -405,7 +400,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

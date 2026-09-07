@@ -1,8 +1,5 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::boxed::Box;
+use std::vec::Vec;
 
 /// OOP-based Key Derivation Function for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
@@ -14,11 +11,11 @@ use core::mem;
 pub type KDFID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KDFAlgorithm { HKDF_SHA256 = 0, HKDF_SHA512 = 1, PBKDF2 = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KDFError { Success = 0, InvalidKey = 1, InvalidLength = 2 }
 
 pub trait KeyDerivation {
@@ -154,10 +151,10 @@ impl PasswordHashing for SimplePasswordHashing {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct VecImpl<T> { data: *mut T, len: usize, capacity: usize }
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+impl<T> VecImpl<T> {
+    fn new() -> Self { VecImpl { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }

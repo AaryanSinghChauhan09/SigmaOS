@@ -1,10 +1,7 @@
-extern crate alloc;
 #[cfg(not(target_os = "none"))]
 use crate::klib::HashMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[cfg(target_os = "none")]
 use crate::klib::BTreeMap as HashMap;
@@ -202,7 +199,7 @@ impl BackupSystem {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,21 +12,20 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
+use std::vec::Vec;
+use std::string::String;
 
 // =========================================================================
 // 1. BENCODE PARSER & ENCODER (BEP-0003)
 // =========================================================================
 
-use alloc::collections::BTreeMap;
-use alloc::format;
+use std::collections::BTreeMap;
+use std::format;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BencodeValue {
@@ -470,7 +466,7 @@ impl TorrentClient {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

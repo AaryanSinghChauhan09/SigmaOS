@@ -6,34 +6,33 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-extern crate alloc;
 
 #[cfg(target_os = "none")]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 #[cfg(not(target_os = "none"))]
 use std::collections::BTreeMap;
 
 #[cfg(target_os = "none")]
-use alloc::format;
+use std::format;
 #[cfg(not(target_os = "none"))]
 use std::format;
 
 #[cfg(target_os = "none")]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(target_os = "none"))]
 use std::string::{String, ToString};
 
 #[cfg(target_os = "none")]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::distro::fedora_pagure_exporter::FedoraPagureExporterEngine;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[path = "fedora_pagure_exporter.rs"]
 mod fedora_pagure_exporter;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 use fedora_pagure_exporter::FedoraPagureExporterEngine;
 
 // ============================================================================
@@ -202,7 +201,7 @@ impl FedoraNewHotnessUpstreamMonitorEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

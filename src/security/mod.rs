@@ -1,9 +1,16 @@
+pub mod system_policy_rules;
+pub use system_policy_rules::*;
+
 // SigmaOS Security Subsystem
 pub mod audit;
 pub mod capability;
+pub mod seccomp;
+pub mod seccomp_ebpf;
+pub mod syscall_filter;
 pub mod defensive_audit;
 pub mod hardening;
 pub mod kernel_hardening;
+pub mod user_namespace;
 
 pub mod bridge;
 pub mod bsd_hardening;
@@ -28,6 +35,10 @@ pub mod parrot_kali;
 pub mod parrot_linux;
 pub mod parrot_parity;
 pub mod pqc_measurement;
+pub use pqc_measurement::{
+    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
+    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
+};
 pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
@@ -43,12 +54,19 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 
+pub use qubes_isolation::{
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+};
+
+pub use qubes_isolation::*;
+pub use root_improvement::*;
+
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
-    PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
-    UnveilManager as BsdUnveilManager, UnveilPermission as BsdUnveilPermission, UnveilEntry as BsdUnveilEntry,
-    WxEnforcer, MemoryPermission, PaxMprotect, AslrEngine, CapsicumManager,
-    CapsicumCapability, BsdHardeningSuite,
+    AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,
+    PaxMprotect, PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
+    UnveilEntry as BsdUnveilEntry, UnveilManager as BsdUnveilManager,
+    UnveilPermission as BsdUnveilPermission, WxEnforcer,
 };
 pub use capability::{
     CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission,
@@ -68,15 +86,16 @@ pub use defensive_audit::{
 };
 pub use forensics::*;
 pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
 };
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
 pub use kali_stack::{
-    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
-    PcapPacketHeader, WifiFrameType,
+    KaliAirgeddonWifiAudit, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter,
+    KaliSqlmapInjectionAuditor, KaliUndercoverThemeMode, KaliWiresharkPacketAnalyzer,
+    PcapPacketHeader, UndercoverDisguiseTheme, WifiFrameType,
 };
 pub use kernel_hardening::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError, PagePermissions,
@@ -96,7 +115,10 @@ pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
-pub use pledge::{promises, PledgeError, PledgeManager as OriginalPledgeManager, PledgePromise as OriginalPledgePromise};
+pub use pledge::{
+    promises, PledgeError, PledgeManager as OriginalPledgeManager,
+    PledgePromise as OriginalPledgePromise,
+};
 pub use qubes_isolation::*;
 pub use root_improvement::*;
 pub use rules::{
@@ -105,14 +127,12 @@ pub use rules::{
     SovereignSandboxingRulesEngine, SovereignSecurelevelRuleEngine, SovereignSysctlHardeningRules,
     SysctlParameterRule, UnveilRule,
 };
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityLabel, SecurityPolicy,
-    SecurityRule, SelinuxPermission,
-};
-pub use selinux_advanced::{AdvancedSELinuxManager, SELinuxBoolean, SELinuxModule, MlsLevel, SecurityContext};
+pub use selinux::{PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux};
+pub use selinux_advanced::{AdvancedSELinuxManager, MlsLevel, SELinuxBoolean, SELinuxModule};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
-    UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions, UnveilState,
+    UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions,
+    UnveilState,
 };
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
@@ -130,3 +150,7 @@ pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, SimpleVulnerabilityScanner,
     VulnerabilityClass, VulnerabilityReport,
 };
+pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
+pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};
+pub mod defensive_audit;
+pub mod parrot;

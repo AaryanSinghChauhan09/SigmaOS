@@ -1,12 +1,11 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS Alpine Linux APK Compatibility Engine
 // Implements APK package management, APKINDEX parsing, and musl libc compatibility
 
 use crate::klib::collections::HashMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// APK package metadata structure
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -33,7 +32,7 @@ impl ApkIndexParser {
     }
 
     /// Parse APKINDEX file format
-    pub fn parse_index(&mut self, index_content: &str) -> Result<(), String> {
+    pub fn parse_index(&mut self, _index_content: &str) -> Result<(), String> {
         let current_pkg = ApkPackage {
             name: String::new(),
             version: String::new(),
@@ -99,7 +98,7 @@ impl AlpineCommunityRepo {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

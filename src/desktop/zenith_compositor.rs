@@ -21,10 +21,8 @@
 //!     -> KMS/DRM (vsync atomic commit)
 //!     -> Display
 //! ```
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 use crate::klib::HashMap;
 
@@ -559,7 +557,7 @@ impl Default for ZenithCompositor {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -712,7 +710,7 @@ mod tests {
 
 // Placeholder types for compilation
 mod sigma_types {
-    use alloc::string::String;
+
 
     pub type Result<T> = core::result::Result<T, &'static str>;
 

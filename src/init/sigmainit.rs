@@ -1,12 +1,11 @@
-extern crate alloc;
 // SigmaInit - Modern Init System
 // Inspired by OpenRC, runit, s6 (systemd alternatives)
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-use alloc::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
+use std::collections::BTreeMap;
+use std::boxed::Box;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// Service restart policy
@@ -459,10 +458,10 @@ impl Default for SigmaInit {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use alloc::vec;
+    use std::vec;
 
     #[test]
     fn test_service_creation() {

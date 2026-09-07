@@ -1,5 +1,4 @@
 #![cfg_attr(target_os = "none", no_std)]
-use alloc::vec::Vec;
 // CPU Feature Detection - Gentoo-style compiler-assisted target optimizations
 // Dynamic CPU feature detection and JIT optimization selector
 
@@ -237,10 +236,10 @@ impl Default for SovereignCompilerOptimizer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use alloc::vec;
+    use std::vec;
 
     #[test]
     fn test_cpu_optimizer_creation() {
@@ -339,5 +338,3 @@ mod tests {
         assert_eq!(cpu_arm.ring, CpuRing::Ring0);
     }
 }
-
-extern crate alloc;

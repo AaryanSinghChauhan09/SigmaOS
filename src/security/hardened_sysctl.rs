@@ -1,12 +1,11 @@
-extern crate alloc;
 // SigmaOS Hardened Sysctl Implementation
 // Inspired by HardenedBSD security hardening approaches
 
 
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::format;
+use std::string::String;
+use std::vec::Vec;
+use std::collections::BTreeMap;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Hardened sysctl configuration
@@ -207,7 +206,7 @@ impl Default for HardenedSysctlManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

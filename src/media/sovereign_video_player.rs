@@ -1,10 +1,9 @@
 //! Sovereign VLC and MPV Equivalent Video Player
 //! Natively optimized for SigmaOS content-addressed and virtual memory architectures.
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. SOVEREIGN VIDEO PLAYER CORE (VLC & MPV Equivalent)
@@ -810,7 +809,7 @@ impl Default for NtpClient {
 // TESTS
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

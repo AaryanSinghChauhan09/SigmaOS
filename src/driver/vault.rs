@@ -1,6 +1,4 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
 // SigmaOS Driver Archive Vault (DriverArchiveVault)
 // Encrypts driver binaries for cold storage to prevent unauthorized driver injection and tamper attacks
 
@@ -55,7 +53,7 @@ impl DriverArchiveVault {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

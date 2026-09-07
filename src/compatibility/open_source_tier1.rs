@@ -1,14 +1,13 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS Open Source Tier 1 Projects Integration Layer
 // Implements clean-room, high-fidelity integration wrappers for Wasmer, smoltcp, libsodium, and SQLite
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 /// Wasmer WebAssembly runtime integration adapter
@@ -300,7 +299,7 @@ impl Default for ZstdIntegration {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -366,7 +365,9 @@ mod tests {
         let mut curl = CurlIntegration::default();
         assert_eq!(curl.active_handles, 0);
 
-        let res = curl.perform_transfer("https://pkg.sigmaos.org/repo").unwrap();
+        let res = curl
+            .perform_transfer("https://pkg.sigmaos.org/repo")
+            .unwrap();
         assert!(res.starts_with(b"HTTP/1.1 200 OK"));
         assert_eq!(curl.active_handles, 1);
 

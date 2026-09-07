@@ -1,13 +1,12 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Extended Linux & BSD Distro Parity Subsystem
 // Clean-room implementations of Slackware PkgTools / SlackBuilds, GNU Guix & Shepherd,
 // Fedora Silverblue OSTree, Illumos/Solaris Crossbow & NetBSD RUMP, Netplan & Cloud-Init, and openSUSE YaST2 & Snapper.
 
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Slackware & LFS: PkgTools & SlackBuild Compiler (SlackwarePkgTools / SlackBuildCompiler)
@@ -74,6 +73,131 @@ impl SlackwarePkgTools {
 }
 
 impl Default for SlackwarePkgTools {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// VOID LINUX RUNIT SERVICE SUPERVISOR ENGINE
+// =========================================================================
+
+/// State of a runit supervised service
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitServiceState {
+    Down,
+    Run,
+    Unsupervised,
+}
+
+/// Void Linux runit service entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RunitService {
+    pub name: String,
+    pub state: RunitServiceState,
+    pub pid: u32,
+    pub auto_restart: bool,
+}
+
+/// Void Linux Runit Service Supervisor Engine
+/// Manages /var/service symlinks, supervises runit run/finish scripts, and tracks PID states.
+pub struct VoidRunitServiceSupervisorEngine {
+    pub services: Vec<RunitService>,
+    pub next_pid: u32,
+}
+
+impl VoidRunitServiceSupervisorEngine {
+    pub fn new() -> Self {
+        Self {
+            services: Vec::new(),
+            next_pid: 1000,
+        }
+    }
+
+    pub fn enable_service(&mut self, name: &str, auto_restart: bool) {
+        if let Some(s) = self.services.iter_mut().find(|s| s.name == name) {
+            s.auto_restart = auto_restart;
+        } else {
+            self.services.push(RunitService {
+                name: String::from(name),
+                state: RunitServiceState::Down,
+                pid: 0,
+                auto_restart,
+            });
+        }
+    }
+
+    pub fn start_service(&mut self, name: &str) -> Result<u32, &'static str> {
+        if let Some(s) = self.services.iter_mut().find(|s| s.name == name) {
+            self.next_pid += 1;
+            s.state = RunitServiceState::Run;
+            s.pid = self.next_pid;
+            Ok(s.pid)
+        } else {
+            Err("VoidRunit: Service not found in /etc/sv")
+        }
+    }
+
+    pub fn stop_service(&mut self, name: &str) -> bool {
+        if let Some(s) = self.services.iter_mut().find(|s| s.name == name) {
+            s.state = RunitServiceState::Down;
+            s.pid = 0;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for VoidRunitServiceSupervisorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// ALPINE LINUX APK VOLATILE OVERLAY ENGINE
+// =========================================================================
+
+/// Alpine Linux Apk Volatile Overlay Engine
+/// Manages diskless tmpfs overlays, lbu (Local Backup Utility) commit states, and package staging.
+pub struct AlpineApkVolatileOverlayEngine {
+    pub staged_packages: Vec<String>,
+    pub volatile_tmpfs_bytes: usize,
+    pub lbu_commit_hash: u64,
+    pub is_committed: bool,
+}
+
+impl AlpineApkVolatileOverlayEngine {
+    pub fn new() -> Self {
+        Self {
+            staged_packages: Vec::new(),
+            volatile_tmpfs_bytes: 0,
+            lbu_commit_hash: 0,
+            is_committed: false,
+        }
+    }
+
+    pub fn stage_volatile_apk(&mut self, package_name: &str, size_bytes: usize) {
+        self.staged_packages.push(String::from(package_name));
+        self.volatile_tmpfs_bytes += size_bytes;
+        self.is_committed = false;
+    }
+
+    pub fn lbu_commit(&mut self) -> u64 {
+        let mut hash_acc = 0u64;
+        for pkg in &self.staged_packages {
+            for &b in pkg.as_bytes() {
+                hash_acc = hash_acc.wrapping_mul(31).wrapping_add(b as u64);
+            }
+        }
+        self.lbu_commit_hash = hash_acc;
+        self.is_committed = true;
+        hash_acc
+    }
+}
+
+impl Default for AlpineApkVolatileOverlayEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -847,5 +971,27 @@ mod tests {
         let removed = snapper.cleanup_old_snapshots(1);
         assert_eq!(removed, 1);
         assert_eq!(snapper.snapshots.len(), 1);
+    }
+
+    #[test]
+    fn test_void_runit_and_alpine_apk_overlay() {
+        let mut runit = VoidRunitServiceSupervisorEngine::new();
+        runit.enable_service("sshd", true);
+        let pid = runit.start_service("sshd").unwrap();
+        assert!(pid > 1000);
+        assert_eq!(runit.services[0].state, RunitServiceState::Run);
+        assert!(runit.stop_service("sshd"));
+        assert_eq!(runit.services[0].state, RunitServiceState::Down);
+
+        let mut apk_overlay = AlpineApkVolatileOverlayEngine::new();
+        apk_overlay.stage_volatile_apk("curl", 2048);
+        apk_overlay.stage_volatile_apk("htop", 1024);
+        assert_eq!(apk_overlay.staged_packages.len(), 2);
+        assert_eq!(apk_overlay.volatile_tmpfs_bytes, 3072);
+        assert!(!apk_overlay.is_committed);
+
+        let hash = apk_overlay.lbu_commit();
+        assert!(hash > 0);
+        assert!(apk_overlay.is_committed);
     }
 }

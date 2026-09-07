@@ -13,7 +13,7 @@ def get_file_line_count(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
             return len(f.readlines())
-    except:
+    except OSError:
         return 0
 
 def get_git_log_for_file(filepath, repo_root):

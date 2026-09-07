@@ -19,10 +19,11 @@ pub use sovereign_screen_recorder::{
 
 pub use browser::{
     AdBlockFilter, BraveShieldsEngine, BrowserContainerType, BrowserProcess, BrowserProcessType,
-    BrowserTabInstance, GlobalPrivacyControl, OnionCircuitNode, ResistFingerprintingEngine,
+    BrowserTabInstance, DeclarativeNetRequestEngine, DnrActionType, DuckAssistPrivacyEngine,
+    GlobalPrivacyControl, OnionCircuitNode, QuantumWebRenderEngine, ResistFingerprintingEngine,
     SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser,
     SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager,
-    TorSecurityLevel,
+    TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine, ZenWorkspaceTreeEngine,
 };
 
 pub use sovereign_video_player::{

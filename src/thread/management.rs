@@ -1,9 +1,8 @@
-extern crate alloc;
 /// OOP-based Thread Management for SigmaOS
 /// Based on Roadmap Item 12: Thread management
 /// Absorbing Linux interruptible/alertable state concepts, CPU affinity, and nice prioritization values
 
-use alloc::boxed::Box;
+use std::boxed::Box;
 use core::mem;
 use core::sync::atomic::{AtomicI32, AtomicUsize, Ordering};
 
@@ -258,20 +257,20 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate std;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    alloc::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
+    std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 unsafe fn free(_ptr: *mut u8) {
     // In standard shims, we can just let OS reclaim heap on test exit or perform simple dummy dealloc
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

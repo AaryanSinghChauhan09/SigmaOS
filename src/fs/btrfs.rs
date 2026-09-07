@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,15 +12,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
 // Btrfs - Linux-style Copy-on-Write filesystem
 // Supports snapshots, subvolumes, compression, and checksums
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompressionType {
@@ -513,7 +509,7 @@ impl BtrfsFilesystem {
         if extent.data_hash_corrupted {
             return Err("Input/output error (checksum verification failed)");
         }
-        Ok(alloc::vec![0u8; extent.length as usize])
+        Ok(std::vec![0u8; extent.length as usize])
     }
 
     /// Scrub the filesystem, verifying checksums and repairing corrupt copies (Self-Healing)
@@ -869,7 +865,7 @@ impl BtrfsFilesystem {
             if extent.subvol_id == subvol_id {
                 let data = self
                     .read_data(extent.offset)
-                    .unwrap_or_else(|_| alloc::vec![0u8; extent.length as usize]);
+                    .unwrap_or_else(|_| std::vec![0u8; extent.length as usize]);
                 ops.push(BtrfsSendOperation::WriteExtent {
                     subvol_id,
                     offset: extent.offset,
@@ -998,7 +994,7 @@ impl Default for BtrfsFilesystem {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,4 +1,3 @@
-extern crate alloc;
 // Intel e1000 Gigabit Network Interface Card Driver
 // Conforms to SigmaOS UnifiedPeripheral interface
 
@@ -6,7 +5,7 @@ use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState}
 use crate::security::CapabilityToken;
 use core::ptr::{read_volatile, write_volatile};
 
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 // Register Offsets (MMIO)
 const REG_CTRL: u32 = 0x0000; // Device Control Register

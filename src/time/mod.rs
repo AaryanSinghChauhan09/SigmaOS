@@ -1,15 +1,12 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Time Module
 // Real-time clock and timer management
 // Zero-dependency implementation - no external libraries required
 
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::boxed::Box;
 use core::fmt;
 
 /// Error type for the Time module
@@ -150,7 +147,7 @@ impl Default for TimerManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     

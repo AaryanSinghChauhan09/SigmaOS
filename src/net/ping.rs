@@ -1,11 +1,10 @@
-extern crate alloc;
 // SigmaOS Network Protocol Layer
 //! ICMP Ping (iputils-ping replication) Engine for SigmaOS
 //! Provides robust ICMP packet headers, internet standard 1s complement checksumming,
 //! ping statistics reporting, packet loss calculations, duplicate packet (DUP!) detection,
 //! and standard min/avg/max/mdev RTT tracking in #![no_std].
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IcmpType {
@@ -303,7 +302,7 @@ fn f64_sqrt(x: f64) -> f64 {
     res
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

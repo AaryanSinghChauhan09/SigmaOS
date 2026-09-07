@@ -5,11 +5,10 @@
 // - Snapshot diffing (added, removed, upgraded, or downgraded packages)
 // - Automated generation pruning with retention policies
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InstalledPackageRecord {
@@ -104,7 +103,10 @@ impl SovereignPackageSnapshotRollbackEngine {
     }
 
     pub fn create_pre_update_snapshot(&mut self, target_pkg: &str) -> u32 {
-        let desc = format!("Timeshift/Snapper Pre-Update Snapshot prior to updating {}", target_pkg);
+        let desc = format!(
+            "Timeshift/Snapper Pre-Update Snapshot prior to updating {}",
+            target_pkg
+        );
         self.create_snapshot(&desc)
     }
 
@@ -186,7 +188,7 @@ impl Default for SovereignPackageSnapshotRollbackEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

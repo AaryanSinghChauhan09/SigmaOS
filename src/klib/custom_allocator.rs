@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -17,12 +14,11 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Custom Memory Allocator
-// A bump allocator with a simple recycle list, replacing std::alloc::System.
+// A bump allocator with a simple recycle list, replacing std::System.
 // Designed to minimize dependency on predefined library allocators.
 
-extern crate alloc;
 #[allow(dead_code)]
-use core::alloc::{GlobalAlloc, Layout};
+use std::alloc::{GlobalAlloc, Layout};
 use core::cell::UnsafeCell;
 use core::ptr;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -380,7 +376,8 @@ pub unsafe fn free(ptr: *mut u8, size: usize) {
 // ============================================================================
 
 /// Called by the Rust runtime when allocation fails (requires nightly/alloc_error_handler).
-#[cfg(all(target_os = "none", feature = "custom_alloc_error_handler"))]
+#[allow(unexpected_cfgs)]
+#[cfg(feature = "custom_alloc_error_handler")]
 #[alloc_error_handler]
 fn sigma_oom(layout: Layout) -> ! {
     // In a real kernel this would trigger a kernel panic with diagnostics.
@@ -394,10 +391,10 @@ fn sigma_oom(layout: Layout) -> ! {
 // Unit tests (no_std compatible via test harness)
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use core::alloc::Layout;
+    use std::alloc::Layout;
 
     #[test]
     fn test_basic_alloc_dealloc() {

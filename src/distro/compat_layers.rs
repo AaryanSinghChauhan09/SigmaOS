@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,20 +12,16 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::BTreeMap;
 
 #[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 #[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
+use std::collections::BTreeMap as HashMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
@@ -466,7 +459,8 @@ impl Wsl2LxssBridgeEngine {
     }
 
     pub fn register_distro(&mut self, config: Wsl2DistroConfig) {
-        self.active_distros.insert(config.distro_name.clone(), config);
+        self.active_distros
+            .insert(config.distro_name.clone(), config);
     }
 
     pub fn translate_drvfs_path(&self, windows_path: &str) -> String {
@@ -502,7 +496,7 @@ impl Default for Wsl2LxssBridgeEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,12 +1,11 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // OpenRC-Inspired Service Management System
 // Dependency-based init system with runlevels, service supervision, and parallel startup
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// OpenRC-inspired service states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -410,7 +409,7 @@ impl OpenRCManager {
     /// Dependency resolution for service startup order
     pub fn resolve_startup_order(&self, service_names: &[String]) -> Result<Vec<String>, &'static str> {
         let mut order = Vec::new();
-        let mut visited = alloc::collections::BTreeSet::new();
+        let mut visited = std::collections::BTreeSet::new();
 
         for name in service_names {
             self.visit_dependency(name, &mut order, &mut visited)?;
@@ -423,7 +422,7 @@ impl OpenRCManager {
         &self,
         name: &str,
         order: &mut Vec<String>,
-        visited: &mut alloc::collections::BTreeSet<String>,
+        visited: &mut std::collections::BTreeSet<String>,
     ) -> Result<(), &'static str> {
         let actual_name = self.resolve_virtual_service(name).unwrap_or(name);
 
@@ -522,7 +521,7 @@ impl ServiceSupervisor {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

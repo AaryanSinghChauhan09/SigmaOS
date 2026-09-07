@@ -1,6 +1,5 @@
-use alloc::string::{String, ToString};
-use alloc::boxed::Box;
-extern crate alloc;
+use std::string::{String, ToString};
+use std::boxed::Box;
 
 /// OOP-based Configuration Loader for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 201
@@ -220,9 +219,9 @@ impl<T> Vec<T> {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::{alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]

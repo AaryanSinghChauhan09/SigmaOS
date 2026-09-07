@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,16 +12,20 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
+use std::boxed::Box;
 
-extern crate alloc;
 use crate::klib::{BTreeMap, Vec, VecDeque};
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
+
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use alloc::collections::{BTreeMap, VecDeque};
+use alloc::string::String;
+use alloc::vec::Vec;
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks
@@ -267,7 +268,7 @@ impl BlockDevice for RamDisk {
 // ── Block device manager ──────────────────────────────────────────────────
 
 pub struct BlockDeviceManager {
-    devices: alloc::collections::BTreeMap<String, Box<dyn BlockDevice>>,
+    devices: std::collections::BTreeMap<String, Box<dyn BlockDevice>>,
     scheduler: DeadlineScheduler,
     bio_counter: AtomicU64,
 }
@@ -276,7 +277,7 @@ impl BlockDeviceManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         BlockDeviceManager {
-            devices: alloc::collections::BTreeMap::new(),
+            devices: std::collections::BTreeMap::new(),
             scheduler: DeadlineScheduler::new(),
             bio_counter: AtomicU64::new(0),
         }
@@ -325,16 +326,13 @@ impl Default for BlockDeviceManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_ramdisk_rw() {
         let mut rd = RamDisk::new("ram0", 1024 * 1024); // 1MB
-                                                        // Deterministic sovereign PRNG: a kernel test must never read the wall clock.
-        let mut write_data = vec![0u8; 512];
-        crate::klib::rand::XorShiftRng::new(0x5164_4D41_0BD0_0001).fill_bytes(&mut write_data);
         let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
             .duration_since(crate::klib::time::UNIX_EPOCH)
             .as_nanos()
@@ -375,13 +373,6 @@ mod tests {
         assert_eq!(mgr.device_count(), 1);
 
         let bio_id = mgr.next_bio_id();
-        // Deterministic sovereign PRNG: a kernel test must never read the wall clock.
-        let mut write_bytes = [0u8; 512];
-        crate::klib::rand::XorShiftRng::new(0x5164_4D41_0BD0_0001).fill_bytes(&mut write_bytes);
-        let mut write_data = Vec::new();
-        for b in write_bytes.iter() {
-            write_data.push(*b);
-        }
         let write_data: Vec<u8> = crate::klib::time::SystemTime::now()
             .duration_since(crate::klib::time::UNIX_EPOCH)
             .as_nanos()

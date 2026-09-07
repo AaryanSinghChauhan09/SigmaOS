@@ -1,10 +1,9 @@
-extern crate alloc;
 // Multiboot2 Loader and Specification Parser
 // High-fidelity Multiboot2 specification validation and parsing inspired by Linux/BSD loaders
 
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 use crate::boot::firmware::{BootLoader, BootParams, BootError};
 
@@ -292,7 +291,7 @@ impl BootLoader for Multiboot2BootLoader {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

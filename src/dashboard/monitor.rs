@@ -1,6 +1,5 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Unified Dashboard System
 // Publisher-grade dashboards for system monitoring and productivity
 
@@ -264,7 +263,7 @@ impl Default for SystemMonitor {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

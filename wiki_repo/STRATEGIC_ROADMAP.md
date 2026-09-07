@@ -1,74 +1,77 @@
-# 🛣️ SigmaOS Strategic Development Roadmap
+# 🗺️ SigmaOS Strategic Roadmap: Catch-Up, Parity & Leapfrog Timeline
 
-This document outlines the structured, stepwise roadmap for SigmaOS, prioritizing kernel resilience, transactional filesystem safety, compliance automation, visual security overlays, and container orchestration.
+This strategic roadmap outlines the dual-track evolution of SigmaOS. It details both the **Catch-Up Path** (closing foundational gaps with Linux Mint, Ubuntu, and FreeBSD) and the **Leapfrog Path** (pioneering breakthrough capabilities like Adaptive UI, AI Orchestration, Quantum Kernel Scheduling, and Statutory Compliance Dashboards).
 
-***
+---
 
-## 🔑 Immediate Actions (0–6 Months)
+## 📅 Phased Dual-Track Timeline (0–36 Months)
 
-*   **Kernel Hybrid Development:**
-    *   Begin modular microkernel experiments to improve resilience and fault isolation.
-    *   Separate core microkernel services (IPC, VFS, driver isolation) from memory management and task scheduling.
-*   **Transactional Filesystem:**
-    *   Prototype rollback-safe filesystem operations with compliance-friendly journaling.
-    *   Integrate Merkle tree integrity verification and copy-on-write (CoW) snapshot state tracking.
-*   **Compliance Handbook:**
-    *   Draft comprehensive documentation covering $\ge 70%$ of core modules for developer and regulator adoption.
-    *   Document statutory compliance overlays (HIPAA, GDPR, PCI-DSS, SOC2, FIPS 140-3).
+| Phase | Priority Tier | Linux/Mint Benchmark | SigmaOS Gap | Catch-Up Action (Foundations) | Leapfrog Opportunity (Moonshots) |
+|---|---|---|---|---|---|
+| **0–12 Months** | **Critical** | Cinnamon DE, HWE kernels, apt, Update Manager + Timeshift | No DE, missing hotplugging, CLI updates, no rollback | Build `SigmaDE`, implement APIC/ACPI hotplugging, launch `sigpkg` universal PM, add transactional rollback snapshots | **Adaptive UI**: Context-aware dynamic dashboards beyond static desktop environments |
+| **12–24 Months** | **Important** | Pre-installed codecs, Driver Manager, remote desktop (xRDP/VNC/RustDesk) | Missing codec stack, GUI driver manager, remote desktop/VPN | Integrate PipeWire codec stack, GUI software & driver manager, remote desktop & WireGuard/Pia VPN modules | **AI Orchestration**: Predictive workload & resource balancing vs manual tuning tools |
+| **24–36 Months** | **Nice-to-Have** | Large community, polished UX, accessibility overlays | Evolving UI, documentation gaps, limited accessibility | Expand developer wiki, polish UI consistency, add comprehensive accessibility overlays | **Quantum Kernel + Compliance Dashboards**: Hybrid quantum/classical scheduling & automated legal/regulatory compliance |
 
-***
+---
 
-## ⚙️ Mid-Term Actions (6–12 Months)
+## 🔑 Strategic Overlay Layers
 
-*   **Adaptive Scheduler:**
-    *   Implement workload-aware scheduling policies for real-time, batch, and compliance tasks.
-    *   Integrate CachyOS BORE scheduler heuristics and EEVDF fair queuing.
-*   **Visual Sandboxing GUI:**
-    *   Build drag-and-drop security profiles for applications, simplifying policy enforcement.
-    *   Visual rule builders for Landlock, OpenBSD pledge/unveil, and Linux LSM capabilities.
-*   **Unified Firewall Dashboard:**
-    *   Integrate firewall + VPN orchestration into a visual dashboard.
-    *   Provide real-time traffic filtering, PIA kill-switch controls, and network domain routing.
+1. **Catch-Up Layer (Foundations)**:
+   - Microkernel VM demand paging, dynamic device hotplugging (`udev`/`devd` parity), `sigpkg` universal package management, and Btrfs/ZFS transactional rollback snapshots.
+2. **Parity Layer (Usability & Friendliness)**:
+   - Out-of-the-box multimedia codec stack, GUI Driver & Software Manager, remote desktop servers, and zero-trust VPN modules.
+3. **Leapfrog Layer (Differentiating Moonshots)**:
+   - Adaptive persona-based UI, predictive AI workload orchestrator, quantum/classical hybrid scheduler, and statutory compliance monitoring.
 
-***
+---
 
-## 🚀 Long-Term Actions (12–18 Months)
+## 📌 Dual-Track Visual Timeline Concept
 
-*   **Native Container Orchestration:**
-    *   Lightweight VM + container integration for developer workflows.
-    *   OCI runtime compatibility, Firecracker microVM integration, and unprivileged rootless pods.
-*   **Zenith Overlays:**
-    *   Adaptive desktop UX with compliance dashboards and dynamic tiling overlays.
-    *   Real-time system health metrics, security posture indicators, and Wayland Zenith compositing.
-*   **Distributed Filesystem Overlay:**
-    *   Collaborative storage layer for multi-user environments.
-    *   P2P IPFS/Web3FS integration, distributed Ceph/MinIO object stores, and cross-cluster dataset sync.
+```
+===================================================================================
+[TOP TRACK: LEAPFROG MOONSHOTS]
+   Adaptive UI Dashboards  ──>  AI Predictive Orchestration  ──>  Quantum Kernel & Compliance
+===================================================================================
+[BOTTOM TRACK: CATCH-UP FOUNDATIONS]
+   SigmaDE & Rollback FS   ──>  Codec Stack & Driver GUI     ──>  Polished UX & Accessibility
+===================================================================================
+   0–12 Months (Critical)       12–24 Months (Important)          24–36 Months (Ecosystem)
+```
 
-***
+---
 
-## 📊 Strategic Dependencies
+## 📊 Quadrant Matrix (Catch-Up vs. Leapfrog × Short-Term vs. Long-Term)
 
-    [Kernel Hybrid] ──────────► [Adaptive Scheduler] + [Filesystem Stability]
-    [Transactional FS] ────────► [Snapshot Rollback] + [Visual Sandboxing]
-    [Security Overlays] ──────► [Compliance Differentiator]
-    [UX Overlays (Zenith)] ───► [Enterprise Adoption Driver]
-    [Compliance Handbook] ────► [Parallel Transparency & Trust Engine]
+| Quadrant | Short-Term (0–12 Months) | Long-Term (12–36 Months) |
+|---|---|---|
+| **Catch-Up (Parity Focus)** | • `SigmaDE` desktop environment<br>• APIC/ACPI hotplugging<br>• `sigpkg` package manager<br>• Transactional rollback snapshots | • Integrated multimedia codec stack<br>• GUI Driver & Software Manager<br>• Remote desktop (xRDP/VNC)<br>• Accessibility overlays |
+| **Leapfrog (Innovation Focus)** | • Adaptive persona dashboards<br>• PQC Kyber/Dilithium boot chain<br>• Zero-trust capability gates | • AI predictive workload orchestrator<br>• Quantum/classical hybrid scheduler<br>• Statutory compliance dashboards |
 
-1.  **Kernel Hybrid Development** $\rightarrow$ Unlocks adaptive scheduler performance and filesystem stability.
-2.  **Transactional FS** $\rightarrow$ Supports instant snapshot rollback and visual sandboxing security.
-3.  **Security Overlays (Sandbox + Firewall)** $\rightarrow$ Serves as key compliance differentiator.
-4.  **UX Overlays (Zenith)** $\rightarrow$ Drives developer and enterprise user adoption.
-5.  **Documentation & Handbook** $\rightarrow$ Runs in parallel, ensuring visibility, auditability, and regulator trust.
+---
 
-***
+## 🔑 Dependency Flow & Execution Roadmap
 
-## 🌟 Strategic Differentiators
+```
+[Phase 1: Critical Foundations]
+  ├── Microkernel VM Demand Paging & Hotplugging
+  ├── Transactional Rollback Snapshots
+  └── Universal Package Manager (sigpkg)
+         │
+         ▼
+[Phase 2: Parity & Usability]
+  ├── Multimedia Codec Integration
+  ├── GUI Driver & Software Manager
+  └── Remote Desktop & VPN Subsystems
+         │
+         ▼
+[Phase 3: Ecosystem & Moonshots]
+  ├── Adaptive Persona Desktop (Zenith)
+  ├── Predictive AI Resource Orchestrator
+  └── Quantum Kernel & Statutory Compliance Suite
+```
 
-*   **Compliance-First Positioning:** SigmaOS as the trusted OS for regulated industries (healthcare, fintech, defense, enterprise).
-*   **Visual-First Dashboards:** Replace CLI-heavy administrative workflows with intuitive graphical overlays.
-*   **Resilience Implants:** Snapshot rollback + immutable root layers for update safety and zero-downtime upgrades.
-*   **Community-Driven Modules:** Encourage third-party contributions with compliance verification pipelines.
+---
 
-***
+## 🎯 Strategic Summary
 
-*This roadmap ensures SigmaOS evolves systematically: **Foundation $\rightarrow$ Expansion $\rightarrow$ Differentiation**, while maintaining competitive dominance over Linux and BSD distributions.*
+SigmaOS systematically closes critical usability gaps to establish baseline credibility, matches legacy distros in out-of-the-box friendliness, and leapfrogs ahead with futuristic capabilities—redefining the next generation of sovereign operating systems.

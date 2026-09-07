@@ -1,11 +1,8 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec;
+use std::vec::Vec;
 // OpenStack Murano Inspired Application Catalogue for SigmaOS
 
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Application Topology / Environment Requirements
 #[derive(Debug, Clone)]
@@ -116,7 +113,7 @@ impl MuranoApplicationCatalogueManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

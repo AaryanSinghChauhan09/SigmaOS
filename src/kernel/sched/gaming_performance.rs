@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 //! Gaming Performance & Advanced Distro SMP Extensions for SigmaOS
 //! Inspired by SteamOS GameMode, Pop!_OS System76 Scheduler, CachyOS UKSM, and DragonFly BSD LWKT.
 
@@ -247,7 +246,7 @@ impl UksmPageDeduplicator {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

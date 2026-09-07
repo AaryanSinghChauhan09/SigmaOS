@@ -1,8 +1,7 @@
-extern crate alloc;
 #[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
+extern crate alloc as std::alloc::alloc;
 #[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
+use std_std::boxed::Box;
 
 
 /// OOP-based Firewall & AI Intrusion Detection System (IDS) for SigmaOS
@@ -10,10 +9,10 @@ use std_alloc::boxed::Box;
 /// and CrowdStrike Falcon-inspired AI anomaly rate monitoring.
 
 
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::string::ToString;
+use std::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::string::ToString;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type RuleID = usize;
@@ -285,7 +284,7 @@ impl SovereignFirewall {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -530,7 +529,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

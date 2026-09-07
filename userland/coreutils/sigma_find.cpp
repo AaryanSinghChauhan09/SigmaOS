@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR GPL-2.0
 /*
  * =========================================================================
  * Σ SIGMAOS: COGNITIVE COREUTILS (sigma-find)

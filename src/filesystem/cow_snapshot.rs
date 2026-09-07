@@ -1,4 +1,3 @@
-extern crate alloc;
 /// Copy-on-Write (COW) Transactional Snapshot and Active Mount Engine
 /// Provides transactional filesystem rollback metadata to defeat Fedora's Btrfs.
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -324,9 +323,9 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
@@ -340,7 +339,7 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

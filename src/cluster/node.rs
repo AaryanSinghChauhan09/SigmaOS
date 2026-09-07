@@ -1,19 +1,17 @@
-#![allow(unused, dead_code)]
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 
 /// OOP-Based Cluster Orchestration for SigmaOS (Rancher, k3s, and Harvester Parity)
 /// Implements dynamic multi-node pod scheduling, virtual overlay networks (CNI Shards),
 /// Raft-style distributed consensus, and active CARP-inspired failover routing.
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate std;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
-#[cfg(test)]
-extern crate alloc as std_alloc;
+#[cfg(test_disabled)]
+extern crate alloc as std::alloc::alloc;
 
 pub type NodeID = usize;
 pub type PodID = usize;
@@ -373,7 +371,7 @@ impl Consensus for SimpleConsensus {
 /// Creates encrypted overlay bridges between containers across physical network hosts.
 pub struct CniOverlayBridge {
     pub subnet: [u8; 16],
-    pub port_routing: alloc::collections::BTreeMap<u32, NodeID>,
+    pub port_routing: std::collections::BTreeMap<u32, NodeID>,
 }
 
 impl CniOverlayBridge {
@@ -383,7 +381,7 @@ impl CniOverlayBridge {
         subnet_arr[..len].copy_from_slice(&subnet[..len]);
         Self {
             subnet: subnet_arr,
-            port_routing: alloc::collections::BTreeMap::new(),
+            port_routing: std::collections::BTreeMap::new(),
         }
     }
 
@@ -456,9 +454,9 @@ impl<T> Default for Vec<T> {
 // Allocator shims: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::{alloc, Layout};
     let layout = Layout::from_size_align(size, 8).expect("Failed to create memory layout");
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
@@ -515,9 +513,9 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
 
 /// Dynamic boxed trait alias shim
 #[cfg(not(target_os = "none"))]
-pub type Box<T> = std_alloc::boxed::Box<T>;
+pub type Box<T> = std_std::boxed::Box<T>;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

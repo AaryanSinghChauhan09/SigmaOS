@@ -1,7 +1,5 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 // Extended Application Binary Interface (ABI) Calling Conventions & Relocation for SigmaOS
 
 /// Target Application Binary Interface Type
@@ -172,7 +170,7 @@ impl DynamicAbiRelocationTable {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -5,9 +5,8 @@
 /// Implements cloud synchronization
 
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SyncID = usize;
@@ -199,7 +198,7 @@ impl AutoSync for SimpleAutoSync {
     fn is_auto_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

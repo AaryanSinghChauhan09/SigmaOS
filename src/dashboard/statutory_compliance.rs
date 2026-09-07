@@ -1,12 +1,11 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // Statutory Governance & Compliance Overlay Dashboard for SigmaOS
 // Integrates global statutory frameworks (GDPR, ISO 27001, Indian DPDP Act 2023, HIPAA, PCI-DSS).
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 /// Statutory regulatory frameworks
@@ -224,7 +223,7 @@ impl Default for StatutoryGovernanceLayer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

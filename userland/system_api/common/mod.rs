@@ -1,1 +1,0 @@
-// SigmaOS common API stub

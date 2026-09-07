@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,16 +12,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
-use core::mem;
 /// OOP-based Dependency Resolver Engine for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 5
 /// Implements deterministic solver with conflict diagnostics
@@ -329,7 +322,11 @@ impl SimpleConflictResolver {
 }
 
 impl ConflictResolver for SimpleConflictResolver {
-    fn resolve_conflict(&mut self, pkg1: PackageID, pkg2: PackageID) -> Result<PackageID, ResolverError> {
+    fn resolve_conflict(
+        &mut self,
+        pkg1: PackageID,
+        pkg2: PackageID,
+    ) -> Result<PackageID, ResolverError> {
         let strategy = match self.strategy.load(Ordering::SeqCst) {
             0 => ResolutionStrategy::Newest,
             1 => ResolutionStrategy::Oldest,
@@ -350,4 +347,3 @@ impl ConflictResolver for SimpleConflictResolver {
         }
     }
 }
-

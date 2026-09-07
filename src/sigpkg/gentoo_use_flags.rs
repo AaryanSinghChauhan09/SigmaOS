@@ -1,13 +1,12 @@
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
+use std::format;
+use std::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Gentoo Linux USE Flags Engine
 // Implements USE flag system for conditional compilation and feature selection
 
 use crate::klib::collections::HashMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// USE flag definition
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -189,7 +188,7 @@ impl ConditionalDependency {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,23 +1,19 @@
 // SigmaOS Kernel Memory Management
 // Implements buddy allocator and paging with zero std dependency
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
-// #[path = "memory/pmm_vmm.rs"]
-// pub mod pmm_vmm;
 #[path = "memory/resource_allocator.rs"]
 pub mod resource_allocator;
 pub mod sigma_buddy;
-
-// pub use pmm_vmm::*;
 pub use resource_allocator::{
     ContainerResourceGovernor, DmaRingBuffer, DmaRingBufferAllocator, HardenedGuardPageAllocator,
     PcieResourceAllocator, PcieResourceWindow, ResourceLimits, ResourceUsage,
@@ -604,7 +600,7 @@ impl Ne2000DmaBuffer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

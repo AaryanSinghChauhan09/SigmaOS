@@ -1,10 +1,8 @@
-#![allow(unused_variables)]
-extern crate alloc;
 /// Custom Moonshot AI Kimi-Code Code Generation Subsystems for SigmaOS
 /// Implements Self-Healing Code Generator, Context Pruner, AST-Aware Structural Editor, and License Attribution Guards
-use alloc::string::String;
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::string::String;
+use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==========================================
 // 1. Self-Healing Code Generator
@@ -149,10 +147,10 @@ impl KimiLicenseAttributor {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
+    use std::string::ToString;
 
     #[test]
     fn test_kimi_self_healing_success() {

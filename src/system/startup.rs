@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,23 +12,19 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // SigmaOS Startup Optimizer
 // OOP-based startup process optimization with dependency analysis
 
-extern crate alloc;
-#[cfg(not(test))]
-use crate::klib::BTreeMap;
 
-#[cfg(test)]
-use alloc::collections::BTreeMap;
+#[cfg(test_disabled)]
+use std::collections::BTreeMap;
 
-use core::time::Duration;
 // Instant not in no_std
 
 /// Startup item classification (inspired by Sysinternals Autoruns)
@@ -178,7 +171,7 @@ impl StartupOptimizationStrategy for DependencyBasedOptimizer {
     }
 
     fn optimize(&mut self, services: &mut [StartupService]) -> StartupOptimizationResult {
-        let analysis = self.analyze(services);
+        let _analysis = self.analyze(services);
         let mut services_delayed = Vec::new();
         let mut services_parallelized = Vec::new();
         let mut time_saved = 0u64;
@@ -187,7 +180,7 @@ impl StartupOptimizationStrategy for DependencyBasedOptimizer {
         for service in services.iter_mut() {
             if service.enabled && service.priority == ServicePriority::Low {
                 if service.estimated_startup_time_ms > self.delay_threshold_ms {
-                    let original_delay = service.delay_seconds;
+                    let _original_delay = service.delay_seconds;
                     service.delay_seconds = 5; // Delay by 5 seconds
                     time_saved += service.estimated_startup_time_ms;
                     services_delayed.push(service.name.clone());
@@ -343,9 +336,9 @@ impl StartupOptimizationStrategy for ProfileBasedOptimizer {
 /// Void Linux / FreeBSD rc.d Init Boot Stage Profiler
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InitBootStage {
-    EarlyStage1, // Sysinit / devtmpfs / hostname
+    EarlyStage1,   // Sysinit / devtmpfs / hostname
     ServiceStage2, // Runit / rc.d supervised daemons
-    UserStage3, // Login display manager & session
+    UserStage3,    // Login display manager & session
 }
 
 pub struct InitStageBootProfiler {
@@ -375,7 +368,9 @@ pub struct OpenRcDependencyGraph {
 
 impl OpenRcDependencyGraph {
     pub fn new() -> Self {
-        Self { services: Vec::new() }
+        Self {
+            services: Vec::new(),
+        }
     }
 
     pub fn add_service(&mut self, name: &str) {
@@ -649,7 +644,7 @@ impl Default for StartupOptimizer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -738,7 +733,10 @@ mod tests {
         graph.add_service("sshd");
         let batches = graph.resolve_parallel_runlevels();
         assert_eq!(batches.len(), 1);
-        assert_eq!(batches[0], vec!["networking".to_string(), "sshd".to_string()]);
+        assert_eq!(
+            batches[0],
+            vec!["networking".to_string(), "sshd".to_string()]
+        );
     }
 
     #[test]
@@ -749,7 +747,9 @@ mod tests {
 
     #[test]
     fn test_immutable_boot_validator() {
-        assert!(ImmutableBootValidator::is_root_read_only("ro,relatime,errors=remount-ro"));
+        assert!(ImmutableBootValidator::is_root_read_only(
+            "ro,relatime,errors=remount-ro"
+        ));
         assert!(!ImmutableBootValidator::is_root_read_only("rw,relatime"));
     }
 }

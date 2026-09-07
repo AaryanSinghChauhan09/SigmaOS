@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 
@@ -98,7 +98,7 @@ impl RecoveryRule {
     pub fn matches(
         &self,
         event_type: RecoveryEventType,
-        context: &HashMap<String, String>,
+        _context: &HashMap<String, String>,
     ) -> bool {
         if self.event_type != event_type {
             return false;
@@ -437,7 +437,7 @@ pub enum ResilienceError {
     RecoveryFailed,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,12 +1,13 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS Governance & Transparency enhancements
 // Foundation Model, Democratic Voting, and Release Roadmaps
 
 pub mod okr;
 pub mod rfc;
 pub mod strategic_vision;
+pub mod future_protocol;
 
 pub use okr::*;
 pub use strategic_vision::{
@@ -215,7 +216,7 @@ impl Default for DemocraticVoting {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

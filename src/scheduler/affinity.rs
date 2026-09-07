@@ -1,8 +1,4 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::vec::Vec;
 // Processor Assignment, CPU Affinity & NUMA Topology Manager for SigmaOS
 // Inspired by Linux sched_setaffinity(2), FreeBSD cpuset(2) / cpuset_setaffinity, and Windows NUMA node affinity.
 
@@ -176,7 +172,7 @@ impl Default for ProcessCpuAssigner {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

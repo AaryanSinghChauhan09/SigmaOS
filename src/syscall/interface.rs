@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -22,7 +19,6 @@
 /// OOP-based Syscall Interface for SigmaOS
 /// Based on Roadmap Item 11: Syscall interface
 
-extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -44,7 +40,7 @@ impl SyscallType {
 }
 
 /// Minimal Vec implementation for no-std syscall interface.
-/// Uses a raw allocator (extern "C" alloc/free) since alloc::vec::Vec
+/// Uses a raw allocator (extern "C" alloc/free) since std::vec::Vec
 /// requires a global allocator which may not be available in early boot.
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 

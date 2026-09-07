@@ -1,11 +1,10 @@
-extern crate alloc;
 
 /// OOP-based Power Management Stack for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 8
 /// Implements advanced power profiles, CPU governor tuning, thermal management
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type PowerProfileID = usize;

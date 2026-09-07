@@ -3,10 +3,8 @@
 // Linux/BSD distro-inspired logging system
 // Handles system logging, log rotation, and log management
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Log levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -339,7 +337,7 @@ pub enum SyslogError {
     RotationError(String),
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

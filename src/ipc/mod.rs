@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -23,6 +20,7 @@ pub mod unix_socket;
 pub mod signals;
 pub mod async_io;
 pub mod std_streams;
+pub mod ipc_namespace;
 
 pub use ipc::{
     IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
@@ -45,4 +43,10 @@ pub use async_io::{
 pub use std_streams::{
     StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
     STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO,
+};
+
+pub use ipc_namespace::{
+    IpcNamespace, IpcObjectRegistry, IpcObjectType, MessageQueueObject, SemaphoreObject,
+    SharedMemoryObject, IpcNamespaceStats, MessageQueueId, SemaphoreId, SharedMemoryId,
+    IpcObjectId,
 };

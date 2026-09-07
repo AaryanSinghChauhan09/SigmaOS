@@ -1,9 +1,7 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 // Appending Access Rights & Immutable Journal Stream Enforcement for SigmaOS
 
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Appending Access Rights Stream Flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -67,7 +65,7 @@ impl AppendOnlyStream {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

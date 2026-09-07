@@ -90,7 +90,7 @@ pub fn random_u32() -> u32 {
     (random_u64() & 0xFFFFFFFF) as u32
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

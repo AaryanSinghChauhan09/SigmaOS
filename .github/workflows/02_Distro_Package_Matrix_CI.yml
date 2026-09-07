@@ -1,0 +1,46 @@
+name: "02 📦 Distro Package Integration & Multi-Ecosystem Matrix"
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  package-ecosystem-matrix:
+    name: Package Format & Engine Audit (${{ matrix.format }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - format: Debian (.deb / dpkg / apt)
+            test_filter: sigpkg::debian_dpkg_engine
+          - format: Arch Linux (PKGBUILD / pacman / AUR)
+            test_filter: sigpkg::arch_pacman_engine
+          - format: Fedora / Red Hat (.rpm / dnf / ostree)
+            test_filter: sigpkg::fedora_rpm_engine
+          - format: Gentoo (.ebuild / portage)
+            test_filter: package::universal
+          - format: Alpine Linux (.apk / apk-tools)
+            test_filter: sigpkg::universal_adapter
+          - format: Nix / NixOS (nix store / derivation)
+            test_filter: package::universal
+          - format: Universal Transpiler & Foreign Bridge
+            test_filter: package::universal
+      fail-fast: false
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Verify Package Subsystem Compatibility
+        run: |
+          ./run_sigma_tests.sh

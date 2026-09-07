@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -35,7 +32,12 @@ pub mod snapshot;
 pub mod startup;
 pub mod state;
 pub mod syslog;
+pub mod automation;
 pub mod user;
+
+pub use automation::{
+    AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus,
+};
 
 pub use cleanup::{
     CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
@@ -44,10 +46,7 @@ pub use cleanup::{
 pub use config::{
     ConfigEntry, ConfigError, ConfigType, ServiceManager, ServiceUnit, SystemConfigManager,
 };
-pub use cron::{
-    CronDaemon, CronError, CronField, CronJob, CronSchedule, CronSpoolDirectory, CronSpoolFile,
-    InotifyCrontabWatcher, SovereignCronDaemon,
-};
+pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
 pub use defrag::{
     DefragError, DefragResult, DefragStrategy, DiskDefragmenter, FileBlockInfo,
     FragmentationReport, SigmaFsDefragStrategy,

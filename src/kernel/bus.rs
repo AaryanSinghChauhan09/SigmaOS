@@ -1,10 +1,9 @@
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
+use std::boxed::Box;
+use std::format;
+use std::vec;
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::any::Any;
 
 use crate::kernel::object::{KObject, KRef, KernelObject};

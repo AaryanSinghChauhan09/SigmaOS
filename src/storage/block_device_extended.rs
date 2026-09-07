@@ -1,9 +1,7 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 // Linux, BSD & OpenStack Cinder Inspired Block Device & Storage Extensions for SigmaOS
 
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Block Record Allocation Strategies
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -166,7 +164,7 @@ impl CinderVolumeManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

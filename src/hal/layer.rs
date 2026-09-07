@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,7 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -23,7 +20,6 @@ use alloc::boxed::Box;
 /// OOP-based Hardware Abstraction Layer for SigmaOS
 /// Based on Roadmap Item 2: Hardware abstraction layer
 
-extern crate alloc;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -135,9 +131,9 @@ impl<T> Vec<T> {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::{alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]

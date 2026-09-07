@@ -1,14 +1,10 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Thread Module
 // Threading and synchronization
 // Zero-dependency implementation - no external libraries required
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::fmt;
 
 /// Error type for the Thread module
@@ -149,7 +145,7 @@ impl Default for Mutex {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

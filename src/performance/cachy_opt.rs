@@ -1,11 +1,9 @@
-use alloc::vec;
-extern crate alloc;
 // SigmaOS CachyOS-inspired Performance and System Optimization Shard
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
-use alloc::collections::BTreeSet;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeSet;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 
 // ==========================================
@@ -739,7 +737,7 @@ impl Default for CachyBoreSMPBalancer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

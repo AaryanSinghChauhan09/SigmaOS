@@ -2,9 +2,19 @@
 // Implements Void Linux's runit supervision system
 // Inspired by Void Linux's 3-stage process supervision
 
-use alloc::string::String;
-use alloc::vec::Vec;
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::String;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Service state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -24,6 +34,8 @@ pub struct RunitService {
     pub dependencies: Vec<String>,
     pub restart_count: u32,
     pub log_enabled: bool,
+    pub health_check_failures: u32,
+    pub max_allowed_failures: u32,
 }
 
 impl RunitService {
@@ -35,7 +47,28 @@ impl RunitService {
             dependencies: Vec::new(),
             restart_count: 0,
             log_enabled: true,
+            health_check_failures: 0,
+            max_allowed_failures: 3,
         }
+    }
+
+    /// Perform automated health check
+    pub fn check_health(&mut self, is_healthy: bool) -> ServiceState {
+        if self.state == ServiceState::Running {
+            if is_healthy {
+                self.health_check_failures = 0;
+            } else {
+                self.health_check_failures += 1;
+                if self.health_check_failures >= self.max_allowed_failures {
+                    self.state = ServiceState::Failed;
+                    println!(
+                        "Service {} health check failed {} times. State set to Failed.",
+                        self.name, self.health_check_failures
+                    );
+                }
+            }
+        }
+        self.state
     }
 
     /// Start service
@@ -54,7 +87,10 @@ impl RunitService {
     pub fn restart(&mut self) {
         self.restart_count += 1;
         self.state = ServiceState::Restarting;
-        println!("Restarting service: {} (restart #{})", self.name, self.restart_count);
+        println!(
+            "Restarting service: {} (restart #{})",
+            self.name, self.restart_count
+        );
         self.state = ServiceState::Running;
     }
 
@@ -118,8 +154,9 @@ impl RunitSupervisor {
 
         // Start all services respecting dependencies
         let mut started = Vec::new();
+        let service_names: Vec<String> = self.services.keys().cloned().collect();
 
-        for (name, service) in self.services.clone() {
+        for name in service_names {
             if self.can_start_service(&name, &started) {
                 if let Some(s) = self.services.get_mut(&name) {
                     s.start();
@@ -137,8 +174,9 @@ impl RunitSupervisor {
 
         // Stop all services in reverse dependency order
         let mut stopped = Vec::new();
+        let service_names: Vec<String> = self.services.keys().cloned().collect();
 
-        for (name, service) in self.services.clone() {
+        for name in service_names {
             if self.can_stop_service(&name, &stopped) {
                 if let Some(s) = self.services.get_mut(&name) {
                     s.stop();
@@ -165,9 +203,11 @@ impl RunitSupervisor {
     }
 
     /// Check if service can stop (no dependents still running)
-    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+    fn can_stop_service(&self, name: &str, _stopped: &[String]) -> bool {
         for (_, service) in &self.services {
-            if service.dependencies.contains(&name.to_string()) && service.state == ServiceState::Running {
+            if service.dependencies.contains(&name.to_string())
+                && service.state == ServiceState::Running
+            {
                 return false;
             }
         }
@@ -186,9 +226,19 @@ impl RunitSupervisor {
 
     /// Get services by state
     pub fn get_services_by_state(&self, state: ServiceState) -> Vec<&RunitService> {
-        self.services.values()
+        self.services
+            .values()
             .filter(|s| s.state == state)
             .collect()
+    }
+
+    /// Monitor and update health for a specific supervised service
+    pub fn monitor_service_health(&mut self, name: &str, is_healthy: bool) -> Option<ServiceState> {
+        if let Some(service) = self.services.get_mut(name) {
+            Some(service.check_health(is_healthy))
+        } else {
+            None
+        }
     }
 }
 
@@ -198,13 +248,14 @@ impl Default for RunitSupervisor {
     }
 }
 
-#[cfg(test)]
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
 
     #[test]
     fn test_runit_service() {
-        let mut service = RunitService::new("test-service".to_string(), "/usr/bin/test".to_string());
+        let mut service =
+            RunitService::new("test-service".to_string(), "/usr/bin/test".to_string());
         service.start();
         assert_eq!(service.state, ServiceState::Running);
     }
@@ -217,14 +268,41 @@ mod tests {
         supervisor.add_service(service);
 
         supervisor.run_stage2();
-        assert_eq!(supervisor.get_services_by_state(ServiceState::Running).len(), 1);
+        assert_eq!(
+            supervisor
+                .get_services_by_state(ServiceState::Running)
+                .len(),
+            1
+        );
+    }
+
+    #[test]
+    fn test_service_health_check_monitoring() {
+        let mut supervisor = RunitSupervisor::new();
+        let mut service = RunitService::new("httpd".to_string(), "/usr/bin/httpd".to_string());
+        service.max_allowed_failures = 2;
+        supervisor.add_service(service);
+
+        supervisor.run_stage2();
+        assert_eq!(
+            supervisor.get_service_status("httpd").unwrap().state,
+            ServiceState::Running
+        );
+
+        // First failure: should remain running but increment failure count
+        let state1 = supervisor.monitor_service_health("httpd", false).unwrap();
+        assert_eq!(state1, ServiceState::Running);
+
+        // Second failure: reaches threshold and transitions to Failed
+        let state2 = supervisor.monitor_service_health("httpd", false).unwrap();
+        assert_eq!(state2, ServiceState::Failed);
     }
 
     #[test]
     fn test_service_dependencies() {
         let mut supervisor = RunitSupervisor::new();
 
-        let mut service1 = RunitService::new("service1".to_string(), "/usr/bin/s1".to_string());
+        let service1 = RunitService::new("service1".to_string(), "/usr/bin/s1".to_string());
         let mut service2 = RunitService::new("service2".to_string(), "/usr/bin/s2".to_string());
         service2.dependencies = vec!["service1".to_string()];
 
@@ -234,7 +312,13 @@ mod tests {
         supervisor.run_stage2();
 
         // Service1 should start first
-        assert_eq!(supervisor.get_service_status("service1").unwrap().state, ServiceState::Running);
-        assert_eq!(supervisor.get_service_status("service2").unwrap().state, ServiceState::Running);
+        assert_eq!(
+            supervisor.get_service_status("service1").unwrap().state,
+            ServiceState::Running
+        );
+        assert_eq!(
+            supervisor.get_service_status("service2").unwrap().state,
+            ServiceState::Running
+        );
     }
 }

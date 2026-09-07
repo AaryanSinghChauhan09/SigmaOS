@@ -1,86 +1,101 @@
-# AI Agent Directives & Coding Guidelines for SigmaOS
+# SigmaOS AI Agent Security Management Directive (`AGENTS.md`)
 
-This file provides instructions and guidelines for AI coding agents (Sentinel, Palette, Bolt, Jules) working on the SigmaOS codebase.
+This document defines operational guidelines, security policies, and verification instructions for autonomous AI engineering agents working on the SigmaOS codebase.
 
-## 1. Zero-Dependency & `#![no_std]` Architecture Rules
-* **Core Primitives:** `src/klib/` provides `#![no_std]` native Rust replacements for standard data structures (`BTreeMap`, `Vec`, `HashMap`, `JsonParser`, `String`).
-* **Zero Allocation Primitives:** Prefer stack-based, zero-allocation primitives in cold paths (e.g. `u64_to_hex_str_stack`, `parse_u64_str` in `src/klib/conversion.rs`).
-* **C++ Dependency Reduction:** Write new host/kernel code in safe, native Rust or standard C11. Avoid introducing new C++ dependencies.
+---
 
-## 2. Testing & Verification Requirements
-* **Primary Test Runner:** Always execute `./run_sigma_tests.sh` to run all 326 atomic tests, 57 subsystem inspection tests, and 11 security validation tests.
-* **Comprehensive Testing Guide:** Refer to `docs/AGENTS_TESTING_GUIDE.md` for full test suite management procedures.
-* **Standalone Subsystem Tests:** Subsystem unit tests can also be executed directly using `rustc --test`:
-  * Security Input Validation: `rustc --test src/security/input_validation.rs --edition=2021 -o build/input_val_test && ./build/input_val_test`
-  * Distro Innovations: `rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/missing_distros_test && ./build/missing_distros_test`
-  * Distro Gaps: `rustc --test src/distro/linux_bsd_distro_gaps.rs --edition=2021 -o build/distro_gaps_test && ./build/distro_gaps_test`
-  * Ecosystem Bridge: `rustc --test src/compatibility/linux_bsd_ecosystem_bridge.rs --edition=2021 -o build/ecosystem_bridge_test && ./build/ecosystem_bridge_test`
-  * Media Engine: `rustc --test src/media/distro_media_engine.rs --edition=2021 -o build/distro_media_test && ./build/distro_media_test`
-  * Sovereign Commands: `rustc --test src/tools/sovereign_commands.rs --edition=2021 -o build/tools_test && ./build/tools_test`
-* **Python Integration & Stress Tests:** Run `pytest tests/test_unit_core.py tests/test_integration_system.py tests/test_stress_fuzz_bench.py` or `python3 -m unittest discover -s tests -p "test_*.py"`.
-* **C11 Host Tests:** Compile C11 verification tests using `mkdir -p build/cpp_host_build && cd build/cpp_host_build && cmake ../../tests/cpp_host && make && ./host_tests`.
+## 1. Core Principles for AI Agents
 
-## 3. Security & Vulnerability Guidelines
-* **Input Validation:** Ensure strict validation on IP addresses, port numbers, usernames, and path traversal strings in `src/security/input_validation.rs`.
-* **IPv4 Validation:** Never allow leading zeros in multi-digit IPv4 octets (e.g. reject `010.0.0.1`) to prevent octal parser differential attacks and SSRF bypasses.
-* **CI/CD Hardening:** All GitHub Actions workflows in `.github/workflows/` must pin third-party actions to immutable 40-character commit SHAs and specify explicit least-privilege `permissions: contents: read`.
+1. **Zero External Third-Party Dependencies:**
+   - SigmaOS strictly follows a zero-dependency `#![no_std]` design philosophy.
+   - Do NOT add external crates under `[dependencies]` in `Cargo.toml`.
+   - Use `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`) and native `#![no_std]` structures.
 
-## 4. Context & Persona Switching Directives
-* **Persona Roles:** Follow `docs/AGENTS_SWITCHING_GUIDE.md` when transitioning operational focus between **Sentinel** (Security), **Palette** (UX/a11y), **Bolt** (Performance), and **Jules** (Engineering).
-* **State Handoff Verification:** Always run `./run_sigma_tests.sh` and call `initiate_memory_recording` before switching persona operational contexts or submitting pull requests.
+2. **Cross-OS Subsystem Interoperability:**
+   - Every security or kernel component must maintain compatibility across Linux and BSD distribution modes (`LinuxArch`, `LinuxDebian`, `LinuxFedora`, `LinuxNix`, `FreeBsd`, `OpenBsd`, `NetBsd`, `DragonFlyBsd`, `SolarisIllumos`, etc.).
+   - Sandboxing rules must bridge Linux Landlock v5 with FreeBSD Capsicum rights (`FreeBsdCapsicumDescriptorDelegate`) and OpenBSD pledge/unveil (`OpenBsdUnveilAuditor`).
 
-## 5. Spinlock & Synchronization Directives
-* **Spinlock Guide:** Adhere to `docs/AGENTS_SPINLOCK_MANAGEMENT_GUIDE.md` for `#![no_std]` spinlock primitives, atomic memory ordering (`Acquire`/`Release`/`SeqCst`), interrupt-safe `lock_irqsave` wrappers, and deadlock prevention rules.
-* **No Std Mutexes:** Never import `std::sync::Mutex` or `std::sync::RwLock` in core kernel and `klib` modules.
+3. **Autonomous Verification:**
+   - Always run `./run_sigma_tests.sh` and `pytest` after making modifications.
+   - Individual standalone tests can be compiled and verified using `rustc --edition=2021 --test <file_path>`.
 
-## 6. Protection Access Rights & Memory Security Directives
-* **Protection Rights Guide:** Adhere to `docs/AGENTS_PROTECTION_RIGHTS_GUIDE.md` for `mprotect` W^X page protection rules, TLB `invlpg` invalidation, OpenBSD `pledge`/`unveil` monotonic privilege reduction, FreeBSD Capsicum descriptor rights limits, and AppArmor MAC profile enforcement.
-* **W^X Rule:** Never assign `PROT_WRITE` and `PROT_EXEC` to the same virtual memory page frame simultaneously.
+---
 
-## 7. Block Device & Storage Directives
-* **Block Storage Guide:** Adhere to `docs/AGENTS_BLOCKS_MANAGEMENT_GUIDE.md` for NVMe/VirtIO block drivers, Kyber/BFQ I/O schedulers, JBD2 Merkle transactional logging, and HAMMER2 block deduplication.
-* **CoW Safety:** Never overwrite active CoW snapshot blocks directly; use Copy-on-Write allocation guards.
+## 🏎️ Subsystem Management Protocols for AI Agents
 
-## 8. Class Operation & Subsystem Vtable Directives
-* **Class Operation Guide:** Adhere to `docs/AGENTS_CLASS_OPERATION_MANAGEMENT_GUIDE.md` for zero-allocation kernel vtable structures (`FileOperations`, `VnodeOps`, `SchedClass`, `NetDeviceOps`, `BlockDeviceOps`), atomic class registration, and C11 FFI interoperability.
-* **Zero Heap Allocation:** Never allocate heap objects inside core vtable method dispatch paths.
+- **Driver Management**: Refer to `docs/AI_AGENT_DRIVER_MANAGEMENT.md` for driver lifecycle directives.
+- **Cache Operation Management**: Refer to `docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md` for explicit CPU cache line flushing (`clflush`, `clflushopt`, `clwb`), TLB invalidation/shootdown, Page Cache Radix-Tree operations, SLUB object cache recycling, `#[repr(align(64))]` CPU cache alignment, and JIT instruction cache synchronization rules.
+- **Zones Operation Management**: Refer to `docs/AGENTS_ZONES_OPERATION_MANAGEMENT.md` for physical memory zones (`ZONE_DMA`, `ZONE_DMA32`, `ZONE_NORMAL`, `ZONE_HIGHMEM`), FreeBSD UMA (Universal Memory Allocator) zone management (`uma_zcreate`, `uma_zalloc`, `uma_zfree`, `uma_zdrain`), watermark-driven page reclamation, and double-free protection invariants.
+- **4-Bit Operation Management**: Refer to `docs/AGENTS_FOUR_BIT_OPERATION_MANAGEMENT.md` for 4-bit nibble packing/unpacking bitwise standards, INT4/NF4 AI model weight quantization (`src/ai/quantization.rs`, `src/ai/voice.rs`), Binary Coded Decimal (BCD) RTC decoding, and 4-bit control register bitfield masking.
+- **12-Shard Sovereign Architecture**: Refer to `docs/AGENTS_12_SHARD_SOVEREIGN_ARCHITECTURE.md` for the 12 Safe-Rust microkernel shards taxonomy (Media, Networking, Storage, AI, Compositor, Drivers, Security, Virtualization, System, Package, IPC, Hardware), browser shell integration, Unix primitives for PWAs (`pipe`, `spawn`, `mmap`, `/dev`), and firmware-free driver isolation directives.
+- **Component Subsystem Guidelines**: Refer to `docs/AGENTS_COMPONENT_GUIDELINES.md` for Genode-style hierarchical component tree ownership (`src/kernel/component.rs`), parent-child resource delegation, FreeBSD Capsicum FD rights sandboxing, OpenBSD Pledge/Unveil path scoping, Fedora AppStream/modulemd profiles, and component lifecycle supervision.
+- **Task Management Guidelines**: Refer to `docs/AGENTS_TASK_GUIDELINES.md` for task lifecycle state machines (`TaskState::Pending`, `Running`, `Blocked`, `Completed`, `Evicted`, `Failed`), EEVDF/BORE task scheduling priorities, BSD `kqueue(2)` event loop waits, fine-grained `pledge`/`unveil` sandboxing, cgroups v2 resource envelopes, and atomic task state rollback protocols.
+- **Python Dependency Reduction**: Refer to `docs/AGENTS_REDUCING_PYTHON_DEPENDENCY.md` for guidelines on replacing external Python scripts (`scripts/*.py`, `tests/*.py`) with zero-dependency Rust executables (`src/tools/`), POSIX shell scripts (`scripts/*.sh`), or WebAssembly (Wasm) micro-runtimes.
+- **Public Launch & Governance**: Refer to `docs/LAUNCH_ANNOUNCEMENT.md` (Launch Manifesto), `docs/WHITEPAPER.md` (Technical Whitepaper), `docs/PRESS_KIT.md` (Press Assets & Media FAQ), and `docs/GOVERNANCE_CHARTER.md` (Contributor Charter).
 
-## 9. Readers/Writers Synchronization Directives
-* **Readers/Writers Guide:** Adhere to `docs/AGENTS_READERS_WRITERS_MANAGEMENT_GUIDE.md` for Readers/Writers synchronization rules (`AtomicRwLock`, RCU lock-free pathways, writer starvation prevention, and interrupt-safe `read_irqsave` / `write_irqsave` locks).
-* **No Std RwLock:** Never import `std::sync::RwLock` in kernel space.
+---
 
-## 10. Data & Memory Confidentiality Directives
-* **Confidentiality Guide:** Adhere to `docs/AGENTS_CONFIDENTIALITY_MANAGEMENT_GUIDE.md` for data confidentiality, volatile memory zeroization upon drop, constant-time comparison algorithms, and confidential computing (AMD SEV-SNP / Intel TDX) guest state isolation.
-* **Volatile Scrubbing:** Always use `write_volatile` to zero secret buffers upon deallocation.
+## 🚗 Driver Management Protocols for AI Agents
 
-## 11. Peterson's Algorithm Mutual Exclusion Directives
-* **Peterson's Algorithm Guide:** Adhere to `docs/AGENTS_PETERSON_ALGORITHM_MANAGEMENT_GUIDE.md` for two-thread Peterson's mutual exclusion algorithm implementations (`flag: [AtomicBool; 2]`, `turn: AtomicUsize`, `SeqCst` ordering, and explicit `fence(Ordering::SeqCst)` memory barriers).
-* **Sequential Consistency:** Always enforce `SeqCst` ordering and explicit memory fences in software-based mutual exclusion algorithms.
+### A. Access Control & Sandboxing
+- **Landlock v5 + Pledge + Unveil + Capsicum:**
+  - File path access must be scoped using `SovereignLandlockV5Guard`.
+  - System call promises must be constrained using OpenBSD pledge/unveil enforcers.
+  - File descriptors must delegate fine-grained rights via FreeBSD Capsicum.
 
-## 12. Context Providers Directives
-* **Context Providers Guide:** Adhere to `docs/AGENTS_CONTEXT_PROVIDERS_MANAGEMENT_GUIDE.md` for kernel process contexts (`TaskControlBlock`, PCID/TLB), shell/terminal environment contexts (`ShellContext`, `ContextualCompleter`), and Model Context Protocol (MCP) tool schemas (`KimiCodeAgent`).
-* **Zero Allocation:** Enforce zero-allocation context snapshots on execution context switch paths.
+### B. Cryptographic Integrity & Livepatching
+- Post-Quantum Cryptography (Dilithium-5 / Kyber-1024) and Ed25519 signature verification must be enforced for package manifests and livepatching trampolines (`KernelPatchVerificationEngine`).
+- Differential rollback snapshots (`SigmaDeltaStateSnapshotEngine`, `SovereignPackageRollbackEngine`) must allow sub-1ms state restoration.
 
-## 13. Visual & Compliance Dashboard Directives
-* **Dashboard Guide:** Adhere to `docs/AGENTS_DASHBOARD_MANAGEMENT_GUIDE.md` for system monitor widgets (`UnifiedDashboard`), network/hardware telemetry (`VisualDashboardManager`), privacy lockdown controls (`PrivacyDashboard`), compliance alert tracking (`ComplianceOverviewDashboard`), and OliveTin web execution.
-* **ARIA Accessibility:** Ensure all rendered dashboard controls include ARIA labels and keyboard focus states.
+### C. Vulnerability & Audit Auditing
+- Maintain vulnerability classification (`Vulnerable`, `Fixed`, `Unaffected`) in `SecurityAdvisoryTracker`.
+- Perform QA signoff quorum checks (`PackageSignoff`) requiring `qa_tested`, `build_reproducible`, and `security_audited` flags.
 
-## 14. On-Demand OS Techniques Directives
-* **Demand Techniques Guide:** Adhere to `docs/AGENTS_DEMAND_TECHNIQUES_MANAGEMENT_GUIDE.md` for demand paging and swapping (`DemandPagingSwapEngine`), Copy-on-Write page duplication, on-demand GPU offloading (`NvidiaOnDemand`), and loopback module mounting.
-* **Zeroed Frame Allocations:** Always return zeroed physical frames on demand anonymous fault handling.
+### D. Buffer Overflow & Buffer Overrun Management
+- Follow technical directives in `AGENTS_BUFFER_OVERFLOW.md`, `AGENTS_BUFFER_OVERRUN.md`, `docs/AGENTS_BUFFER_OVERFLOW.md`, and `docs/AGENTS_BUFFER_OVERRUN.md`.
+- Enforce guard page allocations (`alloc_with_guard_page`), stack clash protection (`has_guard_page`), bounds-checked FFI c-string helpers (`cstrlen`), ring buffers, and W^X / DEP policies.
 
-## 15. Aborting Processes Directives
-* **Aborting Processes Guide:** Adhere to `docs/AGENTS_ABORTING_PROCESSES_MANAGEMENT_GUIDE.md` for fatal signal process aborts (`abort_process` in `src/process/advanced_process_control.rs`), core dump metadata capturing, orphan process reparenting to init (PID 1), and IPC channel cleanup.
-* **No Kernel Panics:** Ensure userland process aborts perform clean termination without triggering kernel panics.
+### E. Bitmap Operations & Resource Allocation
+- Follow technical directives in `AGENTS_BITMAP_OPERATIONS.md` and `docs/AGENTS_BITMAP_OPERATIONS.md`.
+- Utilize lock-free `AtomicBitmap` for page frames, PIDs, and IRQ vector allocations with atomic memory ordering.
 
-## 16. Task Assignment & Governance Directives
-* **Assignment Guide:** Follow `docs/AGENTS_ASSIGNMENT_MANAGEMENT_GUIDE.md` for task routing, triage protocols, subagent delegation rules, and submission criteria.
-* **Persona Routing:** Route security tasks to **Sentinel**, UI/a11y to **Palette**, performance to **Bolt**, and distro infrastructure to **Jules**.
+### F. Boot Block & Bootloader Management
+- Follow technical directives in `AGENTS_BOOT_BLOCK.md` and `docs/AGENTS_BOOT_BLOCK.md`.
+- Ensure `SigmaBootloaderEngine` systemd-boot loader entries and GRUB configs enforce measured boot TPM PCR measurements (`TPM_PCR_4`) and path validation.
 
-## 17. Information Management & Knowledge Base Directives
-* **Information Guide:** Adhere to `docs/AGENTS_INFORMATION_MANAGEMENT_GUIDE.md` for knowledgebase lookup protocols, memory recording requirements, and context prioritization (User Directives > Source Code State > Memory Context).
-* **Memory Recording:** Always call `initiate_memory_recording` before completing a task or submitting code.
+### G. Circular Buffer Management & Lock-Free IPC
+- Follow technical directives in `AGENTS_CIRCULAR_BUFFER.md` and `docs/AGENTS_CIRCULAR_BUFFER.md`.
+- Enforce power-of-two capacity alignment, atomic head/tail pointer ordering (`Acquire`/`Release`), and lock-free bounds checking on `RingBuf` and `RingBuffer`.
 
-## 18. Documentation & Wiki Alignment
-* **In-Tree Troff Man Pages:** Keep `docs/man/man1/` and `docs/man/man8/` troff manual pages up to date when modifying commands or system utilities.
-* **Wiki Sync Utility:** Run `./scripts/sync_wiki.sh` after updating documentation assets to synchronize files across `WIKI/`, `wiki/`, and `wiki_repo/`.
+### H. Clock Interrupt & Timer Management
+- Follow technical directives in `AGENTS_CLOCK_INTERRUPT.md` and `docs/AGENTS_CLOCK_INTERRUPT.md`.
+- Ensure clock interrupt handlers avoid blocking locks or allocations, and manage `TimerDescriptor` state transitions atomically.
+
+### I. Coarse Parallelism & Threading Management
+- Follow technical directives in `AGENTS_THREADING_PARALLELISM.md` and `docs/AGENTS_THREADING_PARALLELISM.md`.
+- Ensure multi-threaded tasks respect RCU synchronization epochs (`rcu_epoch`), adaptive thread quanta (`adaptive_thread_quantum_multiplier`), and stack guard isolation (`has_guard_page`).
+
+### J. Microprocessor Operation Management
+- Follow technical directives in `AGENTS_MICROPROCESSOR_OPERATIONS.md` and `docs/AGENTS_MICROPROCESSOR_OPERATIONS.md`.
+- Enforce multi-architecture context switching (`CpuContextState`), microarchitecture ISA auto-detection (`x86-64-v1`..`v4`), IRQL execution level guards (`DispatchLevel`), and thermal power governance.
+
+### K. Constrained Application Protocol (CoAP) Management
+- Follow technical directives in `AGENTS_COAP_MANAGEMENT.md` and `docs/AGENTS_COAP_MANAGEMENT.md`.
+- Ensure IoT CoAP resource endpoints (`CoAPResource`), request methods (`CoAPMethod`), and error codes (`CoAPError`) maintain `#![no_std]` compliance and payload bounds safety.
+
+### L. Control Mode Operation Management
+- Follow technical directives in `AGENTS_CONTROL_MODE.md` and `docs/AGENTS_CONTROL_MODE.md`.
+- Validate terminal control mode notification parsers (`tmux`), enforce `AccessControlMatrix` rights, and manage remote controller session transitions safely.
+
+### M. Comprehensive Access Operations Management
+- Follow technical directives in `AGENTS_ACCESS_MANAGEMENT.md` and `docs/AGENTS_ACCESS_MANAGEMENT.md`.
+- Manage the complete access lifecycle across LDAP directory services (`LdapAccessClient`), anonymous/authenticated client tiers, direct/relative path canonicalization, memory access protection (`W^X`), read/write permission enforcers (`FileAttributeAccessControl`), RAT remote files, and wireless access points.
+
+---
+
+## 3. Pre-Commit Verification Checklist for AI Agents
+
+Before submitting changes, AI agents must execute:
+1. `./run_sigma_tests.sh` to run 220+ atomic Rust unit tests and Python integration tests.
+2. `cargo fmt` to verify code formatting.
+3. Validate standalone builds for modified modules (`rustc --edition=2021 --test <modified_file.rs>`).

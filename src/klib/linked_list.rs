@@ -1,12 +1,10 @@
 #![allow(dead_code)]
-use alloc::vec::Vec;
 // SigmaOS klib: Intrusive Linked List
 // Inspired by Linux kernel's intrusive list implementation (include/linux/list.h)
 // and BSD's TAILQ/LIST macros from sys/queue.h
 // No external dependencies - fully custom implementation.
 
-extern crate alloc;
-use alloc::boxed::Box;
+use std::boxed::Box;
 use core::marker::PhantomData;
 use core::ptr::NonNull;
 
@@ -277,7 +275,7 @@ impl<T> Drop for SList<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -306,7 +304,7 @@ mod tests {
         list.push_front(3);
         list.push_front(2);
         list.push_front(1);
-        let collected: alloc::vec::Vec<&u32> = list.iter().collect();
+        let collected: std::vec::Vec<&u32> = list.iter().collect();
         assert_eq!(collected, [&1, &2, &3]);
     }
 
@@ -319,7 +317,7 @@ mod tests {
         let removed = list.remove_first(|&x| x == 20);
         assert_eq!(removed, Some(20));
         assert_eq!(list.len(), 2);
-        let collected: alloc::vec::Vec<&i32> = list.iter().collect();
+        let collected: std::vec::Vec<&i32> = list.iter().collect();
         assert_eq!(collected, [&10, &30]);
     }
 

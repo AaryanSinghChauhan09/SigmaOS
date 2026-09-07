@@ -1,5 +1,6 @@
 pub mod hal;
 pub mod portability;
+pub use portability::*;
 pub mod cpu_sys;
 pub mod cpu_features;
 pub mod comprehensive;
@@ -18,9 +19,13 @@ pub use comprehensive::{
     TaskState as LinuxTaskState, TaskStruct as LinuxTaskStruct, RcuSynchronizer as LinuxRcuSynchronizer,
     KqueueFilter as BsdKqueueFilter, Kevent as BsdKevent, KqueueMultiplexer as BsdKqueueMultiplexer,
     SysctlNode as BsdSysctlNode, SysctlRegistry as BsdSysctlRegistry,
+    SovereignIsaArchitecture, X86Registers, X64Registers, AArch64Registers, Riscv64Registers,
+    LoongArch64Registers, SovereignRegisterContext,
 };
 
 pub use arm_bx_formats::{
     ArmBxBranchExchangeDecoder, ArmExecutionState, BranchExchangeType, DecodedBxInstruction,
     DataEndianness, SovereignBytecodeEncryptor, SovereignDataWordFormatter, WordWidth,
 };
+pub mod sovereign_multiarch_hal;
+pub use sovereign_multiarch_hal::*;

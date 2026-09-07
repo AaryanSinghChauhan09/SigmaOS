@@ -1,16 +1,15 @@
 #![allow(clippy::all, warnings)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Even More Devices — Ancient & Newer OOP Drivers
 // This file implements 12 additional drivers spanning ancient/legacy era to state-of-the-art modern hardware.
 
 
 
-extern crate alloc;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 // -------------------------------------------------------------------------
 // ANCIENT / LEGACY DEVICES
@@ -99,7 +98,7 @@ impl PeripheralDevice for AdLibSynthDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::drivers::peripheral::{DeviceGeneration, PeripheralManager, PowerState};

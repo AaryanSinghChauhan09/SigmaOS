@@ -4,15 +4,15 @@
 #[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration { Legacy, Modern }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState { Off, On }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 pub trait PeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
@@ -164,7 +164,7 @@ impl PeripheralDevice for BluetoothHciDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

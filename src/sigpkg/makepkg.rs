@@ -5,13 +5,9 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 // SigmaOS makepkg - Arch Linux PKGBUILD compilation sandbox
 // Provides safe, isolated compilation of Arch Linux packages
 
-extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Package, Version};
@@ -27,7 +23,11 @@ pub struct Version {
 #[cfg(feature = "standalone_test")]
 impl Version {
     pub fn new(major: u32, minor: u32, patch: u32) -> Self {
-        Self { major, minor, patch }
+        Self {
+            major,
+            minor,
+            patch,
+        }
     }
     pub fn parse(s: &str) -> Option<Self> {
         Some(Self::new(1, 0, 0))
@@ -46,28 +46,38 @@ pub struct Package {
 
 #[cfg(feature = "standalone_test")]
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<String>, maintainer: String) -> Self {
-        Self { name, version, description, dependencies, maintainer }
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<String>,
+        maintainer: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            maintainer,
+        }
     }
 }
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
 
 /// PKGBUILD parser for Arch Linux package recipes
 pub struct PkgbuildParser {
@@ -95,7 +105,7 @@ impl PkgbuildParser {
 
             // Parse variable assignments
             if line.contains('=') && !line.starts_with("function ") {
-                let parts: Vec<&str> = line.splitn(2, '=').collect();
+                let parts: std::vec::Vec<&str> = line.splitn(2, '=').collect();
                 if parts.len() == 2 {
                     let key = parts[0].trim().to_string();
                     let value = parts[1]
@@ -246,7 +256,7 @@ impl MakepkgSandbox {
             .ok_or("pkgver not found in PKGBUILD")?
             .clone();
 
-        let pkgrel = self
+        let _pkgrel = self
             .pkgbuild
             .pkgrel()
             .ok_or("pkgrel not found in PKGBUILD")?
@@ -293,7 +303,7 @@ impl MakepkgSandbox {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

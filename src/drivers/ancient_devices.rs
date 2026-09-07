@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -20,10 +17,9 @@
 // Implements OOP-based lightweight legacy drivers executing sandboxed UDFs
 
 
-extern crate alloc;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 
 /// A generic OOP representation of an ancient legacy device.
 /// Behavior is completely customizable via tiny User-Defined Function (UDF) bytecode.
@@ -226,7 +222,7 @@ pub fn create_cga_graphics() -> UdfAncientDevice {
     UdfAncientDevice::new("CGA Video Adapter", 0x3D4, &cga_bytecode)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

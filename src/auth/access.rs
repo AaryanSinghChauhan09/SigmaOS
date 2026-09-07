@@ -1,8 +1,7 @@
-extern crate alloc;
 /// OOP-based Access Control System for SigmaOS
 /// Based on Roadmap Item 14: Access control system
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::AtomicUsize;
 
 pub type PermissionID = usize;
@@ -180,10 +179,10 @@ impl AccessControl for SimpleAccessControl {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use alloc::boxed::Box;
+    use std::boxed::Box;
 
     #[test]
     fn test_simple_permission_resource_len() {

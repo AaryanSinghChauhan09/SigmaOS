@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,15 +12,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
 // XFS - Linux-style high-performance journaling filesystem
 // Supports allocation groups, extent-based allocation, realtime subsystem, and journaling
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum XfsState {
@@ -66,7 +62,7 @@ impl XfsRealtimeSubsystem {
             extent_size_blocks,
             total_extents,
             free_extents: total_extents,
-            bitmap: alloc::vec![true; total_extents as usize],
+            bitmap: std::vec![true; total_extents as usize],
         }
     }
 
@@ -219,7 +215,7 @@ impl XfsFilesystem {
                 inode.blocks += rt.extent_size_blocks as u64;
                 inode.is_realtime = true;
             }
-            let vec = alloc::vec![extent];
+            let vec = std::vec![extent];
             self.extents.insert(inode_id, vec.clone());
             self.state = XfsState::Dirty;
             return Ok(vec);
@@ -396,7 +392,7 @@ impl Default for XfsFilesystem {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Package Importer Framework
 // Facilitates importing and translating packages from Debian (.deb), RPM (Fedora/RHEL),
 // and Pacman (Arch Linux) formats into native SigmaOS package recipes.

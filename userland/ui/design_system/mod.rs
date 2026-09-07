@@ -1,1 +1,0 @@
-// SigmaOS design system stub

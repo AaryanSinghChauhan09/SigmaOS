@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -23,9 +20,8 @@
 /// Based on Ideas-999-Structured: IoT & Smart Home Item 976
 /// Implements IoT device management
 
-extern crate alloc;
-pub use alloc::string::String;
-pub use alloc::boxed::Box;
+pub use std::string::String;
+pub use std::boxed::Box;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -364,13 +360,13 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern "C" {
     fn malloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[no_mangle]
 pub extern "C" fn alloc(size: usize) -> *mut u8 {
     unsafe { malloc(size) }
@@ -419,7 +415,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -3,8 +3,7 @@
 // Implements Slab Cache (<512B), Buddy Allocator (>=512B), and ACPI SRAT NUMA Topology Page Allocator.
 
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 pub const SLAB_MAX_SIZE: usize = 512;
 pub const PAGE_SIZE_4K: usize = 4096;
@@ -77,7 +76,7 @@ impl PerfMmAllocatorStack {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

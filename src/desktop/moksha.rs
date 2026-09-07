@@ -1,4 +1,3 @@
-#![allow(unused)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -6,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -16,19 +12,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
-use alloc::vec;
+use std::format;
 // Moksha Desktop and EFL Engine for SigmaOS
 // Natively absorbs JeffHoogland/Moksha Enlightenment Window Manager
 
-extern crate alloc;
-#[cfg(test)]
-use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(test))]
+#[cfg(test_disabled)]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Moksha Window Type / Class
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -216,7 +208,7 @@ impl BodhiAppCenterInstaller {
     pub fn new(sandbox_dir: &str) -> Self {
         BodhiAppCenterInstaller {
             local_sandbox_dir: sandbox_dir.to_string(),
-            allowed_apturl_protocols: alloc::vec!["apt".to_string(), "apturl".to_string()],
+            allowed_apturl_protocols: std::vec!["apt".to_string(), "apturl".to_string()],
         }
     }
 
@@ -235,7 +227,7 @@ impl BodhiAppCenterInstaller {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

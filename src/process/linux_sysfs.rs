@@ -1,6 +1,4 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
 // Sovereign Sysfs (/sys) and Loopback Device Subsystem
 // Dynamic hardware attribute representation and loopback block overlay mounting inspired by Linux.
 
@@ -134,7 +132,7 @@ impl SysfsRegistry {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

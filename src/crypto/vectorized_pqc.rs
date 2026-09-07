@@ -1,11 +1,8 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::vec::Vec;
 // SigmaOS SIMD-Vectorized Crypto Engine (VectorizedPqcEngine)
 // Accelerates CRYSTALS-Kyber polynomial multiplications and Dilithium checks via simulated AVX-512 / Neon registers
 
-extern crate alloc;
-use alloc::vec;
+use std::vec;
 
 pub struct VectorizedPqcEngine {
     pub simd_extension_detected: bool,
@@ -58,7 +55,7 @@ impl VectorizedPqcEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

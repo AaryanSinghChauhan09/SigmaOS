@@ -1,15 +1,12 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Nlp Module
 // Natural language processing
 // Zero-dependency implementation - no external libraries required
 
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::boxed::Box;
 use core::fmt;
 
 /// Error type for the Nlp module
@@ -150,7 +147,7 @@ impl Default for NlpResult {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     

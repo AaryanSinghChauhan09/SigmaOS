@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR GPL-2.0
 /**
  * @file sigma_shell.cpp
  * @brief Sovereign Shell — Full interactive CLI with builtins, pipelines, and scripting

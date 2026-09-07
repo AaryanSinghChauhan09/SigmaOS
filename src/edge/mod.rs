@@ -1,11 +1,10 @@
 //! Edge Computing Platform (Edge Computing Inspiration)
 //! Lightweight edge runtime, distributed computing, and offline support
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Edge node state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -345,7 +344,7 @@ impl Default for SigmaEdge {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

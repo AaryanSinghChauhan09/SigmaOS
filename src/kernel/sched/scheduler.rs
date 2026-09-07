@@ -1,11 +1,10 @@
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::filesystem::FsError;
-use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task, PID_MAX_LIMIT};
+use crate::kernel::sched::task::{SchedPolicy, Task};
 
 pub struct RunQueue {
     pub cfs_rq: CfsRunQueue,

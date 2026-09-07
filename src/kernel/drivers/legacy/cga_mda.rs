@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,9 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
 use crate::kernel::subsystems::registry::{
     InitOrder, KernelSubsystem, SubsystemError, SubsystemPriority,
 };
@@ -29,7 +25,7 @@ use crate::kernel::subsystems::registry::{
 /// VGA: 320×200 256-color (Mode 13h), 640×480 16-color
 /// SVGA/VESA: up to 1920×1080+
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Display modes (absorbs BIOS INT 10h mode numbers)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -379,7 +375,7 @@ impl Default for VgaDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

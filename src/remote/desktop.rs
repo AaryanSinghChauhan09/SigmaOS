@@ -1,8 +1,7 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SessionID = usize;

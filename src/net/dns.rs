@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,7 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 // SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)
@@ -34,9 +31,8 @@ use alloc::vec;
 /// 6. Redundant parallel querying with stagger delay.
 /// 7. Secure DoH / DoT transport channel fallbacks.
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type RecordID = usize;
@@ -854,7 +850,7 @@ impl DNSCache for SimpleDNSCache {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

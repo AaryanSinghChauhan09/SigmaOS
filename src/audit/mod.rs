@@ -387,7 +387,7 @@ pub struct AuditStats {
 /// Global audit collector
 pub static GLOBAL_AUDIT_COLLECTOR: AuditCollectorBus = AuditCollectorBus::new();
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

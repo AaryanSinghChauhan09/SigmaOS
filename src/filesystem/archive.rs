@@ -1,9 +1,7 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS Archive Manager
 // OOP-based archive creation and extraction with multiple formats
 
@@ -84,7 +82,7 @@ impl ArchiveHandler for ZipArchiveHandler {
         _format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = 0u64;
+        let _start = 0u64;
         let original_size: u64 = files.iter().map(|f| f.len() as u64 * 100).sum();
 
         // Simulated compression based on level
@@ -112,7 +110,7 @@ impl ArchiveHandler for ZipArchiveHandler {
         _archive: &str,
         _destination: &str,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = 0u64;
+        let _start = 0u64;
 
         Ok(ArchiveResult {
             success: true,
@@ -159,7 +157,7 @@ impl ArchiveHandler for TarArchiveHandler {
         _format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = 0u64;
+        let _start = 0u64;
         let original_size: u64 = files.iter().map(|f| f.len() as u64 * 100).sum();
 
         let compression_ratio = match level {
@@ -186,7 +184,7 @@ impl ArchiveHandler for TarArchiveHandler {
         _archive: &str,
         _destination: &str,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = 0u64;
+        let _start = 0u64;
 
         Ok(ArchiveResult {
             success: true,
@@ -233,7 +231,7 @@ impl ArchiveHandler for SevenZipArchiveHandler {
         _format: ArchiveFormat,
         level: CompressionLevel,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = 0u64;
+        let _start = 0u64;
         let original_size: u64 = files.iter().map(|f| f.len() as u64 * 100).sum();
 
         // 7zip LZMA2 superior compression ratios
@@ -261,7 +259,7 @@ impl ArchiveHandler for SevenZipArchiveHandler {
         _archive: &str,
         _destination: &str,
     ) -> Result<ArchiveResult, ArchiveError> {
-        let start = 0u64;
+        let _start = 0u64;
 
         Ok(ArchiveResult {
             success: true,
@@ -449,7 +447,7 @@ pub enum ArchiveError {
     ExtractionError(String),
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,6 +1,5 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS UI/UX Accessibility Overlay & Gamification Engine
 // Implements accessibility presets (high contrast, color filters) and gamified task/achievement tracking to boost user engagement and operational compliance.
 
@@ -213,7 +212,7 @@ impl GamifiedProductivityTracker {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

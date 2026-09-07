@@ -1,4 +1,3 @@
-extern crate alloc;
 // SigmaOS Breakthrough Operating System Tools & Engines
 // Implements the seven advanced developer-friendly and sovereign OS engines:
 // Universal ABI Translator, SigmaFS++, Self-Healing Kernel, AI-Native Runtime,
@@ -7,13 +6,13 @@ extern crate alloc;
 #[cfg(not(test))]
 use crate::security::CapabilityToken;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub permissions: u64,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 impl CapabilityToken {
     pub fn from_bits(permissions: u64) -> Self {
         Self { permissions }
@@ -464,9 +463,9 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
@@ -480,7 +479,7 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

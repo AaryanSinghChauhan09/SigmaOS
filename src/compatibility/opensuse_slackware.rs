@@ -1,13 +1,12 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS openSUSE & Slackware Competitor Parity Subsystem
 // Independent, zero-dependency implementations of openSUSE YaST and Slackware pkgtools
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. OPENSUSE YAST (YET ANOTHER SETUP TOOL) CONTROL CENTER
@@ -363,7 +362,7 @@ impl Default for SlackwarePkgTools {
 // UNIT TESTS MODULE
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

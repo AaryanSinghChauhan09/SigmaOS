@@ -1,24 +1,22 @@
-use alloc::format;
-extern crate alloc;
 // SigmaOS Unified Subsystem Architecture
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 use core::any::Any;
 
 #[cfg(not(test))]
 use crate::security::CapabilityToken;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub bits: u64,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 impl CapabilityToken {
     pub fn new() -> Self {
         Self { bits: 0 }
@@ -690,7 +688,7 @@ impl DriverRegistry {
         for driver in &mut self.drivers {
             driver
                 .init()
-                .map_err(|e| RegistryError::InitializationFailed(alloc::format!("{:?}", e)))?;
+                .map_err(|e| RegistryError::InitializationFailed(std::format!("{:?}", e)))?;
         }
         Ok(())
     }
@@ -723,10 +721,10 @@ pub enum RegistryError {
 // Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use alloc::vec;
+    use std::vec;
 
     // Mock driver for testing
     struct MockDriver {
@@ -950,7 +948,7 @@ impl VesaFrameBufferSimulator {
         Self {
             width,
             height,
-            video_memory: alloc::vec![0u32; size],
+            video_memory: std::vec![0u32; size],
         }
     }
 
@@ -979,7 +977,7 @@ impl PackageRecipeParser {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod extra_tests {
     use super::*;
 

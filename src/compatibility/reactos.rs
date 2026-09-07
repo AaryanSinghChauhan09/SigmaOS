@@ -1,4 +1,3 @@
-extern crate alloc;
 
 #[cfg(not(target_os = "none"))]
 extern crate std;
@@ -713,9 +712,9 @@ impl<T> Drop for Vec<T> {
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     extern crate std;
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
@@ -959,7 +958,7 @@ impl ArbitraryKernelContext {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

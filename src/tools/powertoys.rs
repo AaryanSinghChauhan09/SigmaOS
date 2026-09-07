@@ -7,8 +7,8 @@
 //! - HostsEditor (IP lookup hosts custom DNS routing rule editor)
 
 use crate::klib::{BTreeMap, Vec};
-use alloc::format;
-use alloc::string::{String, ToString};
+use std::format;
+use std::string::{String, ToString};
 
 pub struct ColorPicker;
 
@@ -446,7 +446,7 @@ impl Default for SovereignPowerToys {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

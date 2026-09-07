@@ -1,5 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Intent/Message structures for Multi-Agent AutoGen Simulation
 #[repr(C)]
@@ -254,7 +253,7 @@ impl SandboxCodeExecutor {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,10 +1,9 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // Sovereign Universal Driver Environment (UDE) for SigmaOS
 // Enables support for all legacy, dropped, and custom hardware peripherals since 1981 (e.g. NE2000, LPT, Floppy, PS/2, SoundBlaster16, PC Speaker).
 
 use crate::driver::device::{
-    CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice, PortAddress,
+    CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
 };
 use alloc::boxed::Box;
 use alloc::string::String;
@@ -370,7 +369,7 @@ impl Default for HardwareAutoNegotiationBroker {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

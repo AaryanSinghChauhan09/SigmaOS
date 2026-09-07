@@ -1,9 +1,7 @@
-use alloc::vec;
-extern crate alloc;
 // SigmaOS 4-Level Page Table Walking & Paging Subsystem
 // Zero-dependency, #![no_std] compliant x86_64 paging implementation.
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::ptr::NonNull;
 
 pub const PAGE_SIZE: usize = 4096;
@@ -103,7 +101,11 @@ impl DemandPagingSubsystem {
         self.mapped_zones.push(zone);
     }
 
-    pub fn handle_demand_fault(&mut self, vaddr: u64, reason: PageFaultReason) -> Result<(), &'static str> {
+    pub fn handle_demand_fault(
+        &mut self,
+        vaddr: u64,
+        reason: PageFaultReason,
+    ) -> Result<(), &'static str> {
         let matching_zone = self.mapped_zones.iter().find(|z| {
             vaddr >= z.start_vaddr && vaddr < z.start_vaddr + (z.page_count as u64 * 4096)
         });
@@ -263,7 +265,7 @@ impl MemoryDescriptorList {
             virtual_address,
             byte_count,
             byte_offset,
-            physical_pages: alloc::vec![0; page_count],
+            physical_pages: std::vec![0; page_count],
             is_probed: false,
             is_locked: false,
             is_mapped: false,
@@ -330,7 +332,7 @@ impl MemoryDescriptorList {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

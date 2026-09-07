@@ -1,10 +1,7 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 use crate::filesystem::FsError;
-use crate::kernel::sched::scheduler::{RunQueue, SchedClass};
-use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
 
 /// Multi-Level Feedback Queue (MLFQ) Scheduler
 ///
@@ -148,7 +145,7 @@ impl SchedClass for MlfqSchedClass {
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

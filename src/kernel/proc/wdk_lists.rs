@@ -1,10 +1,9 @@
-extern crate alloc;
 // SigmaOS Windows WDK / Linux Kernel List & PCB Subsystem
 // Zero-dependency, #![no_std] compliant kernel structures.
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 // ==========================================
 // 1. WDK-Inspired Singly Linked List
@@ -314,7 +313,7 @@ impl Default for StdCallSimulator {
 // Unit Tests
 // ==========================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

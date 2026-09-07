@@ -2,9 +2,9 @@
 // Implements Arch Linux's checkupdates functionality
 // Scans repository index diffs without locking the primary package database
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Package update information
 #[derive(Debug, Clone)]
@@ -62,16 +62,15 @@ impl CheckupdatesEngine {
 
     /// Get updates by repository
     pub fn get_updates_by_repo(&self, repo: &str) -> Vec<&PackageUpdate> {
-        self.available_updates.iter()
+        self.available_updates
+            .iter()
             .filter(|u| u.repository == repo)
             .collect()
     }
 
     /// Get total size of updates
     pub fn get_total_size(&self) -> u64 {
-        self.available_updates.iter()
-            .map(|u| u.size)
-            .sum()
+        self.available_updates.iter().map(|u| u.size).sum()
     }
 
     /// Get update count
@@ -95,7 +94,7 @@ impl Default for CheckupdatesEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

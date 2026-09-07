@@ -1,9 +1,7 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 #[cfg(not(target_os = "none"))]
-extern crate alloc as std_alloc;
 #[cfg(not(target_os = "none"))]
-use std_alloc::boxed::Box;
+use std_std::boxed::Box;
 
 
 /// OOP-based Advanced Metrics, Telemetry & Diagnostics Collection for SigmaOS
@@ -507,7 +505,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -202,7 +202,7 @@ pub fn strlen(ptr: [*]const i8) usize {
     return len;
 }
 
-pub fn strncpy_safe_safe_safe_safe_safe(dest: [*]i8, src: [*]const i8) [*]i8 {
+pub fn strncpy_secure(dest: [*]i8, src: [*]const i8) [*]i8 {
     var i: usize = 0;
     while (src[i] != 0) {
         dest[i] = src[i];
@@ -253,7 +253,7 @@ pub fn strncmp(s1: [*]const i8, s2: [*]const i8, n: usize) i32 {
 
 pub fn strcat(dest: [*]i8, src: [*]const i8) [*]i8 {
     const dest_len = strlen(dest);
-    strncpy_safe_safe_safe_safe_safe(dest + dest_len, src);
+    strncpy_secure(dest + dest_len, src);
     return dest;
 }
 

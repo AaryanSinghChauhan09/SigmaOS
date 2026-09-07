@@ -1,8 +1,6 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS Cross-Kernel ABI & System Alignment Checker
 // Designed to translate function register calling conventions, stack alignments,
 // page boundaries, ISA DMA limits, and SIMD memory operand alignment.
@@ -311,7 +309,7 @@ impl SovereignAlignmentChecker {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

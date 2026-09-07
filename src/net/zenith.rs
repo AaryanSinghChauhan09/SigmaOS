@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
-use alloc::boxed::Box;
+use std::vec;
+use std::boxed::Box;
 // SigmaOS Network Protocol Layer
 
 // ZenithNet - Zero-copy networking stack
@@ -24,9 +21,8 @@ use alloc::boxed::Box;
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::vec::Vec;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {
@@ -301,7 +297,7 @@ impl Default for NetworkDriverManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

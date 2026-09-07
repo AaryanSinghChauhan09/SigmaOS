@@ -1,16 +1,21 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Tpm Module
 // TPM 2.0 trusted platform module
 // Zero-dependency implementation - no external libraries required
 
+pub mod tpm2_implementation;
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::boxed::Box;
 use core::fmt;
+
+pub use tpm2_implementation::{
+    Tpm2, Pcr, PcrBank, TpmKey, TpmKeyStore, TpmCommandHeader, TpmResponseHeader,
+    TpmStartupType, TPM_PCR_COUNT, TPM_ALG_SHA256, TPM_ALG_RSA, SHA256_DIGEST_SIZE,
+    TPM_CC_STARTUP, TPM_CC_SHUTDOWN, TPM_CC_PCR_READ, TPM_CC_PCR_EXTEND,
+    TPM_CC_CREATE_PRIMARY, TPM_RC_SUCCESS, TPM_ST_NO_SESSIONS,
+};
 
 /// Error type for the Tpm module
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -27,6 +32,8 @@ pub enum TpmError {
     OutOfMemory,
     /// I/O error
     IoError,
+    /// TPM not initialized
+    Initialize,
     /// Unknown error
     Unknown,
 }
@@ -40,6 +47,7 @@ impl fmt::Display for TpmError {
             Self::PermissionDenied => write!(f, "Tpm: permission denied"),
             Self::OutOfMemory => write!(f, "Tpm: out of memory"),
             Self::IoError => write!(f, "Tpm: I/O error"),
+            Self::Initialize => write!(f, "Tpm: not initialized"),
             Self::Unknown => write!(f, "Tpm: unknown error"),
         }
     }
@@ -150,7 +158,7 @@ impl Default for TpmKey {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     

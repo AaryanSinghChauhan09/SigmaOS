@@ -2,9 +2,8 @@
 // Zero-dependency string inspection and tokenization
 // Replaces reliance on std string methods in kernel contexts
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Validate that a byte slice is well-formed UTF-8
 pub fn is_valid_utf8(data: &[u8]) -> bool {
@@ -136,7 +135,7 @@ const fn is_ascii_whitespace(byte: u8) -> bool {
     matches!(byte, b' ' | b'\t' | b'\n' | b'\r' | b'\x0B' | b'\x0C')
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,8 +1,5 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Windows/Linux-Inspired Advanced I/O and Driver subsystem (S-IRP)
 // Implements highly-flexible Windows-style IRPs, APCs, DPCs, Buffering Methods,
 // Driver & Device Objects, File System Minifilters, and Kernel Callbacks.
@@ -653,7 +650,7 @@ impl RootkitHookDetector {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

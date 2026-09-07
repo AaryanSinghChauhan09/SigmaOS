@@ -1,6 +1,5 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 // SigmaOS Chakra Linux Parity Implementation
 // Implements Akabei package bundling, Kapudan configuration, and Tribe installer
 

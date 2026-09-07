@@ -1,4 +1,3 @@
-extern crate alloc;
 use core::fmt;
 // Custom String and Allocator types for klib
 
@@ -6,15 +5,15 @@ pub mod custom_allocator {
     pub struct CustomAllocator;
     pub static GLOBAL_CUSTOM_ALLOCATOR: CustomAllocator = CustomAllocator;
     impl CustomAllocator {
-        pub fn alloc(&self, _layout: core::alloc::Layout) -> *mut u8 {
+        pub fn alloc(&self, _layout: std::alloc::Layout) -> *mut u8 {
             core::ptr::null_mut()
         }
-        pub fn dealloc(&self, _ptr: *mut u8, _layout: core::alloc::Layout) {}
+        pub fn dealloc(&self, _ptr: *mut u8, _layout: std::alloc::Layout) {}
     }
     pub unsafe fn alloc(size: usize) -> *mut u8 {
-        use alloc::alloc::{alloc as std_alloc, Layout};
-        let layout = Layout::from_size_align(size, 8).unwrap();
-        std_alloc(layout)
+        use std::alloc::Layout;
+        let _layout = Layout::from_size_align(size, 8).unwrap();
+        core::ptr::null_mut()
     }
     pub unsafe fn free(_ptr: *mut u8) {}
 }
@@ -37,6 +36,7 @@ pub mod uuid {
     }
 }
 
+extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -94,7 +94,7 @@ impl SigmaString {
         self.data.contains(pat)
     }
 
-    pub fn join(&self, sep: &str) -> String {
+    pub fn join(&self, _sep: &str) -> String {
         self.data.clone()
     }
 }

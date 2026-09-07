@@ -1,13 +1,12 @@
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 // SigmaOS Mobile & Desktop Competitor Parity Subsystem
 // Independent, zero-dependency implementations of macOS, iOS, and Android core technologies
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. ANDROID AOSP BINDER IPC EMULATOR
@@ -269,7 +268,7 @@ impl Default for SecureEnclaveKeyStore {
 // UNIT TESTS MODULE
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -4,39 +4,39 @@
 > and implemented in SigmaOS. All implementations are **zero-dependency Rust** — no
 > libc, no OS APIs, pure bare-metal code.
 
-***
+---
 
 ## Table of Contents
 
-1.  [Kernel Scheduler](#kernel-scheduler)
-2.  [Memory Management](#memory-management)
-3.  [Security Framework](#security-framework)
-4.  [Filesystem](#filesystem)
-5.  [Networking](#networking)
-6.  [Package Management](#package-management)
-7.  [Init & Service Management](#init--service-management)
-8.  [Drivers & Hardware](#drivers--hardware)
-9.  [Process Management](#process-management)
+1. [Kernel Scheduler](#kernel-scheduler)
+2. [Memory Management](#memory-management)
+3. [Security Framework](#security-framework)
+4. [Filesystem](#filesystem)
+5. [Networking](#networking)
+6. [Package Management](#package-management)
+7. [Init & Service Management](#init--service-management)
+8. [Drivers & Hardware](#drivers--hardware)
+9. [Process Management](#process-management)
 10. [Observability & Tracing](#observability--tracing)
 11. [Virtualization & Containers](#virtualization--containers)
 12. [Ideas Under Implementation](#ideas-under-implementation)
 
-***
+---
 
 ## Kernel Scheduler
 
 | Innovation | Source OS | SigmaOS File | Status | Notes |
 |-----------|-----------|-------------|--------|-------|
-| eBPF-based sched\_ext hot-swappable scheduler | Linux 6.x | `src/scheduler/numa_scheduler.rs` | ✅ Done | Policies loadable without kernel recompile |
+| eBPF-based sched_ext hot-swappable scheduler | Linux 6.x | `src/scheduler/numa_scheduler.rs` | ✅ Done | Policies loadable without kernel recompile |
 | CFS (Completely Fair Scheduler) weights | Linux | `src/kernel/mod.rs` | ✅ Done | vruntime-based fairness |
 | Priority inheritance for mutexes | POSIX/Linux | `src/kernel/mod.rs` | ✅ Done | Prevents priority inversion |
 | NUMA-aware task placement | Linux 2.6+ | `src/scheduler/numa_scheduler.rs` | ✅ Done | Topology-aware scheduling |
 | Real-time FIFO/RR classes | POSIX RT | `src/rt/` | ✅ Done | `SCHED_FIFO`, `SCHED_RR` |
-| Tickless kernel (dynamic timer) | Linux NOHZ | `src/timer/` | ✅ Done | Reduces idle wakeups |
-| Work-stealing scheduler | Go runtime / Linux | `src/scheduler/` | ✅ Done | Multi-core load balancing |
+| Tickless kernel (dynamic timer) | Linux NOHZ | `src/timer/` | 🔄 In Progress | Reduces idle wakeups |
+| Work-stealing scheduler | Go runtime / Linux | `src/scheduler/` | 🔄 In Progress | Multi-core load balancing |
 | Process group scheduling | Linux cgroups v2 | `src/kernel/` | ✅ Done | Resource limits per group |
 
-***
+---
 
 ## Memory Management
 
@@ -50,10 +50,10 @@
 | W^X (Write XOR Execute) | OpenBSD, grsecurity | `src/memory/paging.rs` | ✅ Done | Pages never W+X simultaneously |
 | ASLR (Address Space Layout Randomization) | Linux | `src/memory/paging.rs` | ✅ Done | RNG-based base randomization |
 | Kernel ASLR (KASLR) | Linux | `src/kernel/main.rs` | ✅ Done | Kernel image at random address |
-| Huge pages (2MB, 1GB) | Linux THP | `src/klib/paging.rs` | ✅ Done | Transparent huge pages |
-| Balloon driver (memory reclaim) | Xen, KVM virtio | `src/virt/` | ✅ Done | Dynamic memory for VMs |
+| Huge pages (2MB, 1GB) | Linux THP | `src/klib/paging.rs` | 🔄 In Progress | Transparent huge pages |
+| Balloon driver (memory reclaim) | Xen, KVM virtio | `src/virt/` | 🔄 In Progress | Dynamic memory for VMs |
 
-***
+---
 
 ## Security Framework
 
@@ -66,15 +66,15 @@
 | Mandatory Access Control (MAC) | SELinux (NSA) | `src/security/mac.rs` | ✅ Done | Security contexts/labels |
 | PF (Packet Filter) firewall | OpenBSD | `src/net/firewall.rs` | ✅ Done | Stateful packet filtering |
 | Stack canaries | GCC/LLVM SSP | Compiler flag | ✅ Done | `-Z stack-protector-all` |
-| CFI (Control Flow Integrity) | Clang, Linux | Compiler flag | ✅ Done | LLVM CFI passes |
+| CFI (Control Flow Integrity) | Clang, Linux | Compiler flag | 🔄 In Progress | LLVM CFI passes |
 | Post-quantum cryptography | NIST PQC | `src/crypto/vectorized_pqc.rs` | ✅ Done | Kyber-1024, Dilithium-5 |
 | Qubes-style compartmentalization | Qubes OS | `src/security/qubes_isolation.rs` | ✅ Done | VM-per-task isolation model |
 | Seccomp-BPF syscall filter | Linux | `src/kernel/syscall/table.rs` | ✅ Done | Per-process syscall filtering |
 | Exploit mitigations (SMEP/SMAP) | Linux | `src/boot/uefi.rs` | ✅ Done | Hardware supervisor protection |
-| TPM-backed attestation | Linux IMA | `src/tpm/` | ✅ Done | Boot integrity measurement |
-| Immutable kernel rootfs | NixOS, Alpine | `src/filesystem/` | ✅ Done | Read-only `/` after boot |
+| TPM-backed attestation | Linux IMA | `src/tpm/` | 🔄 In Progress | Boot integrity measurement |
+| Immutable kernel rootfs | NixOS, Alpine | `src/filesystem/` | 🔄 In Progress | Read-only `/` after boot |
 
-***
+---
 
 ## Filesystem
 
@@ -87,12 +87,12 @@
 | tmpfs | Linux | `src/filesystem/tmpfs.rs` | ✅ Done | RAM-backed filesystem |
 | SigmaFS (native CoW FS) | ZFS/Btrfs-inspired | `src/filesystem/sigma_fs.rs` | ✅ Done | Copy-on-write, checksumming |
 | Filesystem namespaces | Linux | `src/container/` | ✅ Done | Per-container VFS root |
-| Inotify / kqueue | Linux / BSD | `src/filesystem/vfs.rs` | ✅ Done | File change notifications |
-| Extended attributes (xattrs) | Linux | `src/filesystem/vfs.rs` | ✅ Done | `user.`, `security.` namespaces |
-| FUSE-compatible layer | Linux | `src/filesystem/` | ✅ Done | Userspace filesystem driver |
+| Inotify / kqueue | Linux / BSD | `src/filesystem/vfs.rs` | 🔄 In Progress | File change notifications |
+| Extended attributes (xattrs) | Linux | `src/filesystem/vfs.rs` | 🔄 In Progress | `user.`, `security.` namespaces |
+| FUSE-compatible layer | Linux | `src/filesystem/` | 🔄 In Progress | Userspace filesystem driver |
 | FHS compliance | Linux Standard Base | `src/filesystem/` | ✅ Done | `/bin`, `/etc`, `/lib`, etc. |
 
-***
+---
 
 ## Networking
 
@@ -104,12 +104,12 @@
 | PF stateful firewall | OpenBSD | `src/net/firewall.rs` | ✅ Done | State tables, NAT |
 | Unix domain sockets | BSD 4.2 | `src/net/socket.rs` | ✅ Done | IPC via filesystem paths |
 | TLS 1.3 | RFC 8446 | `src/net/tls.rs` | ✅ Done | Integrated TLS layer |
-| WireGuard-style VPN | Linux 5.6 | `src/network/` | ✅ Done | Curve25519 + ChaCha20 |
-| DPDK-inspired zero-copy RX/TX | Linux DPDK | `src/network/` | ✅ Done | Kernel bypass networking |
-| eBPF XDP | Linux 4.8 | `src/net/` | ✅ Done | Programmable packet processing |
+| WireGuard-style VPN | Linux 5.6 | `src/network/` | 🔄 In Progress | Curve25519 + ChaCha20 |
+| DPDK-inspired zero-copy RX/TX | Linux DPDK | `src/network/` | 🔄 In Progress | Kernel bypass networking |
+| eBPF XDP | Linux 4.8 | `src/net/` | 🔄 In Progress | Programmable packet processing |
 | Mesh networking | Custom | `src/network/` | ✅ Done | Kyber-1024 encrypted mesh |
 
-***
+---
 
 ## Package Management
 
@@ -120,11 +120,11 @@
 | SAT solver for dependency resolution | Debian `apt` / Arch | `src/sigpkg/resolver.rs` | ✅ Done | DPLL-based SAT solver |
 | Atomic rollback transactions | NixOS, Btrfs | `src/sigpkg/` | ✅ Done | Rollback on failure |
 | PKGBUILD-inspired build system | Arch Linux | `src/sigpkg/declarative_build.rs` | ✅ Done | Reproducible build recipes |
-| Sandboxed package builds | Nix sandbox | `src/sigpkg/` | ✅ Done | Builds isolated from system |
+| Sandboxed package builds | Nix sandbox | `src/sigpkg/` | 🔄 In Progress | Builds isolated from system |
 | OCI container image support | Docker / OCI spec | `src/sigpkg/` | ✅ Done | Pull and run OCI images |
-| Delta updates | ChromeOS | `src/update/` | ✅ Done | Binary diff updates |
+| Delta updates | ChromeOS | `src/update/` | 🔄 In Progress | Binary diff updates |
 
-***
+---
 
 ## Init & Service Management
 
@@ -135,10 +135,10 @@
 | Service supervision | runit / s6 | `src/init/sigma_init.rs` | ✅ Done | Auto-restart on crash |
 | cgroups v2 resource limits | Linux | `src/kernel/` | ✅ Done | CPU/memory/IO limits per service |
 | Journal logging | systemd journald | `src/observability/mod.rs` | ✅ Done | Structured binary log |
-| OpenRC-style ordered runlevels | Gentoo OpenRC | `src/distro/` | ✅ Done | Simple script-based ordering |
+| OpenRC-style ordered runlevels | Gentoo OpenRC | `src/distro/` | 🔄 In Progress | Simple script-based ordering |
 | Service health checks | Kubernetes / systemd | `src/resilience/self_healing.rs` | ✅ Done | Auto-restart unhealthy services |
 
-***
+---
 
 ## Drivers & Hardware
 
@@ -157,7 +157,7 @@
 | GPU hang recovery | SteamOS | `drivers/graphics/sigma_kms.cpp` | ✅ Done | Auto-reset hung GPU |
 | Clear Linux perf profiles | Clear Linux | `drivers/graphics/sigma_kms.cpp` | ✅ Done | POWERSAVE/BALANCED/PERFORMANCE |
 
-***
+---
 
 ## Process Management
 
@@ -167,22 +167,22 @@
 | Linux-compatible `/proc/PID/` | Linux | `src/process/linux_proc.rs` | ✅ Done | procfs process entries |
 | Zombie reaping | POSIX | `src/process/spawn.rs` | ✅ Done | Auto-reap orphaned children |
 | Process groups / sessions | POSIX | `src/process/` | ✅ Done | Job control, SIGHUP on hangup |
-| Core dump generation | Linux | `src/crash/` | ✅ Done | ELF core files |
+| Core dump generation | Linux | `src/crash/` | 🔄 In Progress | ELF core files |
 
-***
+---
 
 ## Observability & Tracing
 
 | Innovation | Source OS | SigmaOS File | Status | Notes |
 |-----------|-----------|-------------|--------|-------|
-| eBPF-based tracing | Linux 4.x | `src/observability/mod.rs` | ✅ Done | Attaches to any kernel point |
-| `perf` subsystem | Linux | `src/observability/profiler.rs` | ✅ Done | Sampling profiler |
+| eBPF-based tracing | Linux 4.x | `src/observability/mod.rs` | 🔄 In Progress | Attaches to any kernel point |
+| `perf` subsystem | Linux | `src/observability/profiler.rs` | 🔄 In Progress | Sampling profiler |
 | Structured logging | systemd journal | `src/observability/mod.rs` | ✅ Done | JSON/binary structured logs |
-| Crash reporting | Linux kdump | `src/crash/` | ✅ Done | Kernel crash dump + analysis |
+| Crash reporting | Linux kdump | `src/crash/` | 🔄 In Progress | Kernel crash dump + analysis |
 | Audit framework | Linux audit | `src/security/audit.rs` | ✅ Done | Syscall audit trail |
 | Advanced debugger | GNU/Linux ptrace | `src/debugger/advanced.rs` | ✅ Done | Breakpoints, watchpoints, DWARF |
 
-***
+---
 
 ## Virtualization & Containers
 
@@ -190,37 +190,37 @@
 |-----------|-----------|-------------|--------|-------|
 | OCI container runtime | Docker / containerd | `src/virtualization/container.rs` | ✅ Done | Run OCI images |
 | KVM-style hypervisor interface | Linux KVM | `src/virtualization/vm_manager.rs` | ✅ Done | Hardware-accelerated VMs |
-| Microkernel VM isolation | Xen, seL4 | `src/virt/` | ✅ Done | VMs as isolated cells |
+| Microkernel VM isolation | Xen, seL4 | `src/virt/` | 🔄 In Progress | VMs as isolated cells |
 | Firecracker-style microVMs | AWS Firecracker | `src/virt/microvm.rs` | ✅ Done | Minimal VM for containers |
-| crun/runc-compatible | OCI Runtime Spec | `src/virtualization/` | ✅ Done | OCI runtime spec compliance |
+| crun/runc-compatible | OCI Runtime Spec | `src/virtualization/` | 🔄 In Progress | OCI runtime spec compliance |
 
-***
+---
 
 ## Ideas Under Implementation
 
 The following innovations are planned but not yet fully implemented:
 
-| Innovation | Source OS | Target Module | Status | Notes |
-|-----------|-----------|--------------|--------|-------|
-| io\_uring async I/O | Linux 5.1 | `src/distro/missing_distro_innovations.rs` | ✅ Done | Submission/completion queue ring engine |
-| BPF Type Format (BTF) | Linux | `src/distro/linux_bsd_inspirations.rs` | ✅ Done | BPF type format metadata validator |
-| Landlock LSM | Linux 5.13 | `src/distro/linux_bsd_inspirations.rs` | ✅ Done | Unveil/Landlock path access rules |
-| EROFS read-only overlay FS | Linux | `src/distro/linux_bsd_inspirations.rs` | ✅ Done | EROFS compressed image layer loader |
-| zRAM compressed swap | Linux | `src/distro/sovereign_distro_dominance.rs` | ✅ Done | In-memory LZ4/zstd compressed swap |
-| systemd-homed | systemd | `src/distro/wiki_ideas_implementation.rs` | ✅ Done | Encrypted home directory LUKS manager |
-| Wayland display protocol | Linux | `src/distro/nextgen_innovations.rs` | ✅ Done | Zenith Wayland display server & compositor |
-| RISC-V port | Linux | `src/hal/multi_arch.rs` | ✅ Done | PLIC/CLINT interrupt controller & RV64 HAL |
-| LoongArch port | Linux | `src/hal/multi_arch.rs` | ✅ Done | ExtIOI interrupt controller & LoongArch64 HAL |
+| Innovation | Source OS | Target Module | Priority |
+|-----------|-----------|--------------|----------|
+| io_uring async I/O | Linux 5.1 | `src/kernel/` | 🔴 High |
+| BPF Type Format (BTF) | Linux | `src/observability/` | 🟡 Medium |
+| Landlock LSM | Linux 5.13 | `src/security/` | 🔴 High |
+| EROFS read-only overlay FS | Linux | `src/filesystem/` | 🟡 Medium |
+| zRAM compressed swap | Linux | `src/memory/` | 🟡 Medium |
+| systemd-homed | systemd | `src/auth/` | 🟢 Low |
+| Wayland display protocol | Linux | `src/desktop/` | 🟡 Medium |
+| RISC-V port | Linux | `src/arch/` | 🟡 Medium |
+| LoongArch port | Linux | `src/arch/` | 🟢 Low |
 
-***
+---
 
 ## Implementation Principles
 
 All innovations must meet these standards before being marked ✅:
 
-1.  **Zero external dependencies** — only `klib` or bare-metal primitives
-2.  **SAFETY comments** — all `unsafe` blocks documented
-3.  **No `unwrap()`** — use `Option`/`Result` properly
-4.  **Test coverage** — unit or integration test exists
-5.  **Documentation** — doc comment on public API
-6.  **Security review** — checked against CVE database for analogous issues
+1. **Zero external dependencies** — only `klib` or bare-metal primitives
+2. **SAFETY comments** — all `unsafe` blocks documented
+3. **No `unwrap()`** — use `Option`/`Result` properly
+4. **Test coverage** — unit or integration test exists
+5. **Documentation** — doc comment on public API
+6. **Security review** — checked against CVE database for analogous issues

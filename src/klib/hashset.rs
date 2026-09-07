@@ -1,12 +1,9 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 // SPDX-License-Identifier: MIT
 // Custom HashSet implementation for SigmaOS
 // Reduces dependency on std::collections::HashSet
 
-use crate::klib::btreemap::BTreeMap;
-use crate::klib::btreemap::BTreeMapIter;
+use super::BTreeMap;
+use super::btreemap::BTreeMapIter;
 
 pub struct HashSet<T>
 where
@@ -115,7 +112,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

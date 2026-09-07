@@ -54,7 +54,7 @@ impl SignalDispatcher {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

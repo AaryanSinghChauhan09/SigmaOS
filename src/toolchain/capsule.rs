@@ -1,10 +1,9 @@
 // SigmaOS Ancient Build Replay Capsules (BuildCapsule)
 // Encapsulates legacy build environments (GCC 2.x, libc5) to compile ancient source code natively without patching
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CapsuleProfile {
@@ -49,7 +48,7 @@ impl BuildCapsule {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

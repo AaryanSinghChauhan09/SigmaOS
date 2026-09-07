@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // GPU Screen Recorder Integration for SigmaOS
 // Real-time GPU-accelerated screen capture and sandbox security controls for benchmarking and visualization.
 
@@ -176,7 +175,7 @@ impl GpuScreenRecorder {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

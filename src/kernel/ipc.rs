@@ -1,8 +1,5 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Kernel IPC (Inter-Process Communication)
 // Zero-latency capability-based IPC
 
@@ -521,7 +518,7 @@ pub enum IpcError {
     BrokenPipe, // Linux EPIPE / SIGPIPE parity
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

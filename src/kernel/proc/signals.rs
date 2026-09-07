@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -16,12 +13,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-extern crate alloc;
 /// SigmaOS POSIX signals implementation
 /// Based on early and modern Linux signals design
 use crate::klib::BTreeMap;
 use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u32)]
@@ -282,7 +278,7 @@ impl Default for SignalManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};

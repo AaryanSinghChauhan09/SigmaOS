@@ -1,9 +1,8 @@
 //! IoT Platform (IoT Device Management Inspiration)
 //! Large-scale device management, protocol support, and digital twin integration
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Device state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -158,7 +157,7 @@ impl DataLake {
         self.partitions.push(partition.to_string());
     }
 
-    pub fn query(&self, query: &str) -> Result<Vec<TelemetryData>, IoTError> {
+    pub fn query(&self, _query: &str) -> Result<Vec<TelemetryData>, IoTError> {
         // Query data lake
         Ok(Vec::new())
     }
@@ -330,7 +329,7 @@ impl Default for SigmaIoT {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

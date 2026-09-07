@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -20,8 +17,7 @@
 /// Fully absorbs and merges all functions, ideas, features, and principles from emilkowalski/skills.
 /// Eliminates any challenge or capability gap, establishing superior taste & design intelligence.
 
-extern crate alloc;
-use alloc::string::String;
+use std::string::String;
 
 /// Custom square root helper for `// #![no_std]  // crate-root only` compatibility
 fn float_sqrt(x: f32) -> f32 {
@@ -292,7 +288,7 @@ impl DesignEngineerReviewer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

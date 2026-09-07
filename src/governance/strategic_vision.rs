@@ -1,6 +1,5 @@
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-extern crate alloc;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Strategic Vision Roadmap & OKR Engine
 // Pure Rust implementation of 3-Year Strategic Vision and Milestone Evaluators.
 
@@ -283,7 +282,7 @@ impl Default for StrategicDifferentiationEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

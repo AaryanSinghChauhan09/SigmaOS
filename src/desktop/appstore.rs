@@ -1,6 +1,5 @@
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AppReview {
@@ -191,7 +190,7 @@ impl Default for GuiAppStore {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

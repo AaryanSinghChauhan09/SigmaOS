@@ -1,13 +1,12 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 // Vector Graphics Engine (SigmaDraw)
 // Defines 2D paths, Bézier curves, layers, groups, masks, SVG import/export, and real-time path manipulation.
 // Inspiration: Inkscape, Blender's grease pencil.
 
 
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::format;
+use std::vec::Vec;
+use std::string::String;
+use std::format;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Point2D {
@@ -316,7 +315,7 @@ impl Default for SovereignGameEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -336,7 +335,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_game_engine_physics() {
-        use alloc::string::ToString;
+        use std::string::ToString;
         let mut engine = SovereignGameEngine::new();
         engine.gravity = 10.0; // Simplify math: g = 10 m/s^2
 

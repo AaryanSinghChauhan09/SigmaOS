@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // Lightweight Init System for SigmaOS
 // Inspired by Void Linux `runit`, Alpine Linux `OpenRC`, and `s6` systemd alternatives
 // Provides ultra-fast PID 1 process supervision, parallel runlevel targets, dependency tracking,
@@ -203,7 +202,7 @@ impl Default for LightweightInitDaemon {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

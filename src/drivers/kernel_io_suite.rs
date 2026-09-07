@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,8 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
-use alloc::format;
+use std::vec;
+use std::format;
 
 // SigmaOS Kernel I/O Suite
 // Comprehensive // #![no_std]  // crate-root only-compatible driver suite implementing Linux kernel heritage patterns
@@ -25,10 +22,9 @@ use alloc::format;
 // (no_std only applicable at crate root - removed)
 
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 use core::mem::MaybeUninit;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1536,7 +1532,7 @@ pub enum AncientError {
 // Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

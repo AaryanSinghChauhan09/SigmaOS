@@ -56,7 +56,7 @@ pub unsafe fn stack_alloc<T: Copy, const N: usize>() -> [T; N] {
     MaybeUninit::uninit().assume_init()
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

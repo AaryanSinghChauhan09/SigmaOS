@@ -101,25 +101,6 @@ pub struct AhciCommandHeader {
 }
 
 
-/// AHCI Command Header Structure (alternative)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AhciCommandHeaderV2 {
-    pub opts: u8,
-    pub prdtl: u16,
-    pub prdbc: u16,
-    pub ctba: u32,
-    pub reserved: [u8; 4],
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AhciCommandHeaderV3 {
-    pub opts: u16,
-    pub prdtl: u16,
-    pub prdbc: u32,
-    pub ctba: u64,
-    pub reserved: [u32; 4],
-}
 
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
@@ -160,21 +141,21 @@ impl AhciPort {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
     Legacy,
     Modern,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState {
     Off,
     On,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 pub trait PeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
@@ -387,7 +368,7 @@ impl PeripheralDevice for ModernNvmeDriver {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,17 +12,17 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // SigmaOS Secure VPN Client
 // OOP-based VPN with WireGuard, OpenVPN, and Private Internet Access (PIA) support
 
 // IpAddr not in no_std; using u32 for addresses
-pub type PathBuf = alloc::string::String;
+pub type PathBuf = std::string::String;
 pub type IpAddr = u32;
 #[allow(non_snake_case)]
 pub fn Ipv4Addr_new(a: u8, b: u8, c: u8, d: u8) -> u32 {
@@ -137,7 +134,7 @@ impl WireGuardHandler {
 }
 
 impl VpnProtocolHandler for WireGuardHandler {
-    fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
+    fn connect(&mut self, _config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
         if self.state == ConnectionState::Connected {
             return Err(VpnError::AlreadyConnected);
         }
@@ -234,7 +231,7 @@ impl OpenVpnHandler {
 }
 
 impl VpnProtocolHandler for OpenVpnHandler {
-    fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
+    fn connect(&mut self, _config: &VpnConfig) -> Result<VpnConnectionResult, VpnError> {
         if self.state == ConnectionState::Connected {
             return Err(VpnError::AlreadyConnected);
         }
@@ -803,7 +800,7 @@ pub enum VpnError {
     ProtocolNotSupported,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

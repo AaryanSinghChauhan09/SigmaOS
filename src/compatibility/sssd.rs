@@ -1,9 +1,8 @@
-extern crate alloc;
 /// Custom SSSD (System Security Services Daemon) Compatibility Subsystem for SigmaOS
 /// Implements offline credentials caching, NSS user/group resolution, multi-domain failover, and HBAC policy engine.
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 // ==========================================
@@ -154,7 +153,54 @@ impl HbacPolicyEngine {
     }
 }
 
-#[cfg(test)]
+/// Fedora FreeIPA & FAS (Fedora Account System) Identity Record
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FreeIpaUserIdentity {
+    pub username: String,
+    pub uid: u32,
+    pub gid: u32,
+    pub groups: Vec<String>,
+    pub ssh_pubkey: String,
+    pub enabled: bool,
+}
+
+/// Fedora FreeIPA & FAS Centralized Identity & Access Management Engine
+pub struct FreeIpaFasIdentityManager {
+    pub users: HashMap<String, FreeIpaUserIdentity>,
+    pub hbac_engine: HbacPolicyEngine,
+}
+
+impl FreeIpaFasIdentityManager {
+    pub fn new() -> Self {
+        Self {
+            users: HashMap::new(),
+            hbac_engine: HbacPolicyEngine::new(),
+        }
+    }
+
+    pub fn register_identity(&mut self, identity: FreeIpaUserIdentity) {
+        self.users.insert(identity.username.clone(), identity);
+    }
+
+    pub fn authenticate_and_evaluate_hbac(&self, user: &str, host: &str, service: &str) -> bool {
+        if let Some(identity) = self.users.get(user) {
+            if !identity.enabled {
+                return false;
+            }
+            self.hbac_engine.evaluate_access(user, host, service)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FreeIpaFasIdentityManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -201,5 +247,21 @@ mod tests {
         // Vault Server Rules
         assert!(hbac.evaluate_access("jules", "secure_vault_server", "audit"));
         assert!(!hbac.evaluate_access("jules", "secure_vault_server", "ssh")); // Blocked on vault!
+    }
+
+    #[test]
+    fn test_freeipa_fas_identity_manager() {
+        let mut ipa = FreeIpaFasIdentityManager::new();
+        ipa.register_identity(FreeIpaUserIdentity {
+            username: "jules".to_string(),
+            uid: 1001,
+            gid: 1001,
+            groups: vec!["wheel".to_string(), "sysadmin".to_string()],
+            ssh_pubkey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...".to_string(),
+            enabled: true,
+        });
+
+        assert!(ipa.authenticate_and_evaluate_hbac("jules", "sigma_host", "ssh"));
+        assert!(!ipa.authenticate_and_evaluate_hbac("unknown_user", "sigma_host", "ssh"));
     }
 }

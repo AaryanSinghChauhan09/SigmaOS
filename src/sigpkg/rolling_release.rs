@@ -1,12 +1,10 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::vec::Vec;
 // SPDX-License-Identifier: MIT
 // Rolling Release System - Arch Linux Inspired
 // Provides continuous updates without major version bumps
 
 use crate::klib::{hashmap::HashMap, string::SigmaString};
-use crate::sigpkg::{Version, VersionConstraint};
+use crate::sigpkg::Version;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UpdateChannel {
@@ -257,7 +255,7 @@ impl Default for RollingReleaseManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

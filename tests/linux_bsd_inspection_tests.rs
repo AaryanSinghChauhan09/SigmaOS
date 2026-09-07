@@ -6,46 +6,28 @@ extern crate alloc;
 #[path = "../src/klib/mod.rs"]
 pub mod klib;
 
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-#[path = "../src/distro/linux_bsd_parity.rs"]
-mod linux_bsd_parity;
-#[path = "../src/kernel/sysctl.rs"]
-mod sysctl;
-#[path = "../src/security/root_improvement.rs"]
-mod root_improvement;
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
 #[path = "../src/kernel/bore.rs"]
 mod bore;
+#[path = "../src/compatibility/distro_bridge.rs"]
+mod distro_bridge;
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
 #[path = "../src/filesystem/bsd_linux_innovations.rs"]
 mod fs_bsd_linux_innovations;
-#[path = "../src/memory/tlb_associative.rs"]
-mod tlb_associative;
-#[path = "../src/desktop/zenith_advanced_features.rs"]
-mod zenith_advanced;
 #[path = "../src/compatibility/gap_closure.rs"]
 mod gap_closure;
+#[path = "../src/compatibility/garuda_zen.rs"]
+mod garuda_zen;
+#[path = "../src/security/hardening.rs"]
+mod hardening;
 #[path = "../src/virtualization/kvm_vcpu.rs"]
 mod kvm_vcpu;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
-#[path = "../src/logging/unified.rs"]
-mod unified;
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
-#[path = "../src/distro/sovereign_distro_dominance.rs"]
-mod sovereign_distro_dominance;
-#[path = "../src/distro/universal_distro_super_matrix.rs"]
-mod universal_distro_super_matrix;
-#[path = "../src/init/systemd_init.rs"]
-mod systemd_init;
 #[path = "../src/distro/linux_bsd_inspirations.rs"]
 mod linux_bsd_inspirations;
 #[path = "../src/distro/linux_bsd_parity.rs"]
@@ -58,26 +40,133 @@ mod module_loader;
 mod package_repository;
 #[path = "../src/network/protocols.rs"]
 mod protocols;
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+#[path = "../src/distro/ready_to_use.rs"]
+mod ready_to_use;
 #[path = "../src/distro/ready_to_use.rs"]
 mod ready_to_use;
 #[path = "../src/security/root_improvement.rs"]
 mod root_improvement;
 #[path = "../src/boot/sigma_boot.rs"]
 mod sigma_boot;
->>>>>>> origin/fix/test-suite-stabilization-and-deduplication-9630726706765058914
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
 #[path = "../src/process/sovereign_process_engine.rs"]
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
-#[path = "../src/package/repository.rs"]
-mod package_repository;
-#[path = "../src/kernel/module_loader.rs"]
-mod module_loader;
-#[path = "../src/distro/missing_distro_innovations.rs"]
-mod missing_distro_innovations;
+#[path = "../src/kernel/sysctl.rs"]
+mod sysctl;
+#[path = "../src/init/systemd_init.rs"]
+mod systemd_init;
+#[path = "../src/memory/tlb_associative.rs"]
+mod tlb_associative;
+#[path = "../src/logging/unified.rs"]
+mod unified;
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+#[path = "../src/distro/universal_distro_super_matrix.rs"]
+mod universal_distro_super_matrix;
+#[path = "../src/security/unveil.rs"]
+mod unveil;
+#[path = "../src/virtualization/vm_manager.rs"]
+mod vm_manager;
+#[path = "../src/desktop/zenith_advanced_features.rs"]
+mod zenith_advanced;
+#[path = "../src/compatibility/zorin.rs"]
+mod zorin;
 
-use bsd_compat::{FreeBsdJailManager, NetBsdRumpKernelRouter, RumpHypercall, OpenBsdSysctlKernelMib};
-use wiki_ideas_implementation as wiki_ideas;
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
+use bsd::*;
+use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
+use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
+use unimplemented_features::{
+    AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot,
+    NixOsDeclarativeConfigEngine,
+};
+use unveil::{UnveilManager, UnveilPermission};
+use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -260,9 +349,14 @@ fn test_wiki_distro_innovations_inspection() {
         Ok(SystemdUnitActiveState::Active)
     );
     // 8. Real-Time Hybrid Scheduler
-    use wiki_ideas_implementation::{RealtimeTask, SchedulerClass, SovereignHybridSchedulerInnovations};
     let mut sched = SovereignHybridSchedulerInnovations::new();
-    sched.add_task(distro::wiki_ideas_implementation::RealtimeTask { pid: 1, class: distro::wiki_ideas_implementation::SchedulerClass::RTLane, deadline_us: 50, wcet_us: 5, numa_node: 0 });
+    sched.add_task(wiki_ideas_implementation::RealtimeTask {
+        pid: 1,
+        class: wiki_ideas_implementation::SchedulerClass::RTLane,
+        deadline_us: 50,
+        wcet_us: 5,
+        numa_node: 0,
+    });
     assert_eq!(sched.select_next_rt_task().unwrap().pid, 1);
 
     // 9. Sovereign Process Engine (Process Spawning, I/O, Background Execution & IPC)
@@ -346,8 +440,19 @@ fn test_wiki_distro_innovations_inspection() {
     assert_eq!(ls_out.len(), 1);
     assert!(ls_out[0].contains("virtio_gpu 16384 0"));
 
-    kmod_mgr.set_module_parameter("virtio_gpu", "modeset", "1").unwrap();
-    assert_eq!(kmod_mgr.loaded_modules.get("virtio_gpu").unwrap().parameters.get("modeset").map(|s: &String| s.as_str()), Some("1"));
+    kmod_mgr
+        .set_module_parameter("virtio_gpu", "modeset", "1")
+        .unwrap();
+    assert_eq!(
+        kmod_mgr
+            .loaded_modules
+            .get("virtio_gpu")
+            .unwrap()
+            .parameters
+            .get("modeset")
+            .map(|s: &String| s.as_str()),
+        Some("1")
+    );
 
     kmod_mgr.unload_module("virtio_gpu").unwrap();
     assert_eq!(kmod_mgr.loaded_modules.len(), 0);
@@ -696,26 +801,27 @@ fn test_bgp_routing_table_manager_inspection() {
 
 #[test]
 fn test_pam_authentication_policy_engine_inspection() {
-    use hardening::{PamAuthenticationPolicyEngine, PamControlFlag, PamModuleType};
-    let mut pam = PamAuthenticationPolicyEngine::new(true);
-    pam.add_rule(
-        PamModuleType::Auth,
-        PamControlFlag::Required,
-        "pam_unix",
-        true,
+    use root_improvement::{
+        PamControlFlag, PamEngine, PamGroup, PamResult, PamRule, PamUnixModule,
+    };
+    let mut engine = PamEngine::new();
+    let db = vec![("admin".to_string(), "hash_secret".to_string())];
+    let unix_mod = std::sync::Arc::new(PamUnixModule::new(db));
+    engine.add_rule(
+        PamGroup::Auth,
+        PamRule {
+            control_flag: PamControlFlag::Required,
+            module: unix_mod,
+        },
     );
-    pam.add_rule(
-        PamModuleType::Auth,
-        PamControlFlag::Required,
-        "pam_tpm2",
-        true,
+    assert_eq!(
+        engine.execute_group(PamGroup::Auth, "admin", "hash_secret"),
+        PamResult::Success
     );
-    assert!(pam
-        .authenticate_pam_stack(PamModuleType::Auth, true)
-        .unwrap());
-    assert!(pam
-        .authenticate_pam_stack(PamModuleType::Auth, false)
-        .is_err());
+    assert_eq!(
+        engine.execute_group(PamGroup::Auth, "admin", "wrong_hash"),
+        PamResult::AuthError
+    );
 }
 
 #[test]
@@ -833,9 +939,10 @@ fn test_systemd_unit_dependency_engine_inspection() {
     );
 
     // Systemd Init Innovations Security & Diagnostics Inspection Test
-    use super::systemd_init::{
-        BsdRcParallelStageSolver, ProtectHomeLevel, ProtectSystemLevel, SystemdEngine, SystemdSecurityAuditor,
-        SystemdUnit as SovSystemdUnit, SystemdUnitHardeningProfile, UnitType as SovUnitType,
+    use systemd_init::{
+        BsdRcParallelStageSolver, ProtectHomeLevel, ProtectSystemLevel, SystemdEngine,
+        SystemdSecurityAuditor, SystemdUnit as SovSystemdUnit, SystemdUnitHardeningProfile,
+        UnitType as SovUnitType,
     };
 
     let mut sys_engine = SystemdEngine::new();
@@ -1044,8 +1151,9 @@ fn test_sovereign_distro_boot_stage_handoff_integration() {
 #[test]
 fn test_pacman_contrib_suite_inspection() {
     use sigpkg::pacman_contrib::{
-        PacCacheTrimmer, PackageCacheEntry, PacDiffConfigResolver, PacDiffCandidate, PacDiffAction,
-        CheckUpdatesEngine, InstalledPackage, SyncPackage, PacListRepoFilter, UpdPkgSumsGenerator, PacLogAuditor,
+        CheckUpdatesEngine, InstalledPackage, PacCacheTrimmer, PacDiffAction, PacDiffCandidate,
+        PacDiffConfigResolver, PacListRepoFilter, PacLogAuditor, PackageCacheEntry, SyncPackage,
+        UpdPkgSumsGenerator,
     };
 
     // 1. Paccache trimmer
@@ -1077,13 +1185,23 @@ fn test_pacman_contrib_suite_inspection() {
         current_content: "ILoveBar".to_string(),
         new_content: "ILoveBar\nVerbosePkgLists".to_string(),
     };
-    let merged = resolver.resolve(&candidate, PacDiffAction::Merge3Way).unwrap();
+    let merged = resolver
+        .resolve(&candidate, PacDiffAction::Merge3Way)
+        .unwrap();
     assert!(merged.contains("VerbosePkgLists"));
 
     // 3. Checkupdates
     let chk = CheckUpdatesEngine::new();
-    let inst = vec![InstalledPackage { name: "bash".to_string(), current_version: "5.1".to_string(), repository: "core".to_string() }];
-    let sync = vec![SyncPackage { name: "bash".to_string(), sync_version: "5.2".to_string(), repository: "core".to_string() }];
+    let inst = vec![InstalledPackage {
+        name: "bash".to_string(),
+        current_version: "5.1".to_string(),
+        repository: "core".to_string(),
+    }];
+    let sync = vec![SyncPackage {
+        name: "bash".to_string(),
+        sync_version: "5.2".to_string(),
+        repository: "core".to_string(),
+    }];
     let updates = chk.check_updates(&inst, &sync);
     assert_eq!(updates.len(), 1);
     assert_eq!(updates[0].new_version, "5.2");
@@ -1095,7 +1213,8 @@ fn test_pacman_contrib_suite_inspection() {
 
     // 5. Updpkgsums
     let upd = UpdPkgSumsGenerator::new();
-    let updated_pkgbuild = upd.update_pkgbuild_sums("pkgname=test\nsha256sums=('old')", &[b"payload"]);
+    let updated_pkgbuild =
+        upd.update_pkgbuild_sums("pkgname=test\nsha256sums=('old')", &[b"payload"]);
     assert!(updated_pkgbuild.contains("sha256sums=('"));
 
     // 6. Paclog
@@ -1105,10 +1224,184 @@ fn test_pacman_contrib_suite_inspection() {
 }
 
 #[test]
+fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
+    use linux_bsd_inspirations::{
+        DistroSubsystemMode, ServiceSupervisorType, SovereignUniversalDistroBridge,
+    };
+
+    let modes = [
+        (
+            DistroSubsystemMode::LinuxArch,
+            "zsh.pkg.tar.zst",
+            ServiceSupervisorType::Systemd,
+            "/var/lib/pacman",
+        ),
+        (
+            DistroSubsystemMode::LinuxDebian,
+            "zsh.deb",
+            ServiceSupervisorType::Systemd,
+            "/var/lib/dpkg",
+        ),
+        (
+            DistroSubsystemMode::LinuxAlpine,
+            "zsh.apk",
+            ServiceSupervisorType::Runit,
+            "/lib/apk/db",
+        ),
+        (
+            DistroSubsystemMode::LinuxNix,
+            "zsh.nix",
+            ServiceSupervisorType::Shepherd,
+            "/nix/store",
+        ),
+        (
+            DistroSubsystemMode::LinuxGentoo,
+            "zsh.ebuild",
+            ServiceSupervisorType::OpenRC,
+            "/var/db/pkg",
+        ),
+        (
+            DistroSubsystemMode::LinuxFedora,
+            "zsh.rpm",
+            ServiceSupervisorType::Systemd,
+            "/var/lib/rpm",
+        ),
+        (
+            DistroSubsystemMode::FreeBsd,
+            "zsh.pkg",
+            ServiceSupervisorType::OpenRC,
+            "/var/db/pkg",
+        ),
+        (
+            DistroSubsystemMode::OpenBsd,
+            "zsh.tgz",
+            ServiceSupervisorType::OpenRC,
+            "/var/db/pkg",
+        ),
+        (
+            DistroSubsystemMode::NetBsd,
+            "zsh.tgz",
+            ServiceSupervisorType::OpenRC,
+            "/var/db/pkg",
+        ),
+        (
+            DistroSubsystemMode::DragonFlyBsd,
+            "zsh.pkg",
+            ServiceSupervisorType::OpenRC,
+            "/var/db/pkg",
+        ),
+        (
+            DistroSubsystemMode::SolarisIllumos,
+            "zsh.p5p",
+            ServiceSupervisorType::Smf,
+            "/var/lib/pkg",
+        ),
+        (
+            DistroSubsystemMode::SmartOs,
+            "zsh.tgz",
+            ServiceSupervisorType::Rcd,
+            "/var/lib/pkg",
+        ),
+        (
+            DistroSubsystemMode::BedrockLinux,
+            "zsh.stratum",
+            ServiceSupervisorType::Systemd,
+            "/var/lib/pkg",
+        ),
+        (
+            DistroSubsystemMode::LinuxPopOs,
+            "zsh.deb",
+            ServiceSupervisorType::Systemd,
+            "/var/lib/pkg",
+        ),
+        (
+            DistroSubsystemMode::LinuxTails,
+            "zsh.deb",
+            ServiceSupervisorType::Systemd,
+            "/var/lib/pkg",
+        ),
+        (
+            DistroSubsystemMode::LinuxGuix,
+            "zsh.scm",
+            ServiceSupervisorType::Shepherd,
+            "/var/lib/pkg",
+        ),
+    ];
+
+    for (mode, expected_pkg, expected_supervisor, expected_pkg_db) in modes {
+        let mut bridge = SovereignUniversalDistroBridge::new(mode);
+        assert_eq!(bridge.translate_package_specifier("zsh"), expected_pkg);
+        assert_eq!(bridge.get_supervisor_type(), expected_supervisor);
+        assert_eq!(bridge.translate_vfs_path("/var/lib/pkg"), expected_pkg_db);
+        assert!(bridge
+            .enforce_security_isolation(1001, "/sandbox/root")
+            .is_ok());
+
+        let all_subsystems = [
+            "init",
+            "package",
+            "vfs",
+            "security",
+            "storage",
+            "kernel",
+            "network",
+            "graphics",
+            "power",
+            "audio",
+            "ipc",
+            "containers",
+            "time",
+            "memory",
+            "ui",
+            "process",
+            "virt",
+            "audit",
+            "ai",
+            "auth",
+            "bluetooth",
+            "boot",
+            "cloud",
+            "compliance",
+            "compression",
+            "config",
+            "device",
+            "diagnostics",
+            "event",
+            "filesystem",
+            "input",
+            "i18n",
+            "installer",
+            "iot",
+            "logging",
+            "performance",
+            "print",
+            "privacy",
+            "recovery",
+            "resource",
+            "rt",
+            "runtime",
+            "shell",
+            "smartcard",
+            "thermal",
+            "toolchain",
+        ];
+        for sub in all_subsystems {
+            assert!(bridge
+                .dispatch_cross_subsystem_operation(sub, "action_item")
+                .is_ok());
+        }
+    }
+
+    let bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+    assert!(bridge.verify_all_subsystems_compatibility());
+}
+
+#[test]
 fn test_svntogit_repro_and_aur_rules_inspection() {
     use sigpkg::{
-        SovereignSvnToGitMigrator, SvnRevisionLog, SvnBranchType, ReproduciblePackageBuilder, ReproducibleBuildEnvironment,
-        AurRuleEngine, MakepkgReproduciblePipeline, MakepkgBuildStatus,
+        AurRuleEngine, MakepkgBuildStatus, MakepkgReproduciblePipeline,
+        ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
+        SvnBranchType, SvnRevisionLog,
     };
 
     // 1. SVN-to-Git Migrator
@@ -1138,7 +1431,60 @@ fn test_svntogit_repro_and_aur_rules_inspection() {
     assert!(findings.len() >= 1);
 
     let pipeline = MakepkgReproduciblePipeline::new();
-    let res = pipeline.build_and_package("zstd", "1.5.5", "pkgname=zstd\npkgver=1.5.5\narch=('x86_64')\nsha256sums=('1234')\nbuild() { make; }", Some("0x123"));
+    let res = pipeline.build_and_package(
+        "zstd",
+        "1.5.5",
+        "pkgname=zstd\npkgver=1.5.5\narch=('x86_64')\nsha256sums=('1234')\nbuild() { make; }",
+        Some("0x123"),
+    );
     assert_eq!(res.status, MakepkgBuildStatus::Success);
     assert_eq!(res.package_filename, "zstd-1.5.5-x86_64.pkg.tar.zst");
+}
+
+#[test]
+fn test_open_source_project_supremacy_suite_inspection() {
+    use open_source_os_gap_closure::OpenSourceProjectSupremacySuite;
+
+    let mut suite = OpenSourceProjectSupremacySuite::new();
+
+    // 1. Tails OS Amnesic Volatile RAM Wiping
+    let mut ram_buf = [0xFFu8; 1024];
+    assert_eq!(suite.amnesic_ram_wipe(&mut ram_buf), 1024);
+    assert!(ram_buf.iter().all(|&b| b == 0));
+
+    // 2. Clear Linux Stateless Architecture
+    assert_eq!(
+        suite.resolve_stateless_config("issue", false),
+        "/usr/share/factory/etc/issue"
+    );
+
+    // 3. NixOS CAS GC
+    suite.register_nix_gc_root("/nix/store/kernel-6.8", true);
+    suite.register_nix_gc_root("/nix/store/old-build", false);
+    assert_eq!(suite.prune_nix_gc_roots(), 1);
+
+    // 4. Void Linux Runit Supervision
+    assert!(suite.register_runit_service("dinitd").is_ok());
+    assert!(suite.start_runit_service("dinitd", 200).is_ok());
+
+    // 5. Pop!_OS COSMIC Dynamic BSP Auto-Tiling
+    assert_ne!(suite.split_cosmic_tile(), "Unknown");
+
+    // 6. FreeBSD/OpenBSD Security Capabilities
+    assert!(suite
+        .apply_pledge_and_unveil(&["stdio", "rpath"], "/usr", "r")
+        .is_ok());
+
+    // 7. DragonFly BSD HAMMER2 PFS CoW
+    suite.write_hammer2_block("@root", 42, b"block_data_merkle");
+    assert!(suite.verify_hammer2_pfs("@root"));
+
+    // 8. OpenStack Cinder Block Volume
+    let vol = suite
+        .provision_cinder_volume("cinder-vol-100", 500, true)
+        .unwrap();
+    assert_eq!(vol.capacity_gb, 500);
+    assert!(vol.encrypted);
+
+    assert!(suite.evaluate_open_source_project_supremacy());
 }

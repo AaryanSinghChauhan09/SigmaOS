@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 /// OOP-based Filesystem Support for SigmaOS
 /// Implements filesystem using OOP principles with traits and structs

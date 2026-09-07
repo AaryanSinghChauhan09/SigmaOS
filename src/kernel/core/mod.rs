@@ -1,4 +1,3 @@
-extern crate alloc;
 pub mod stack_alloc;
 pub mod object_pool;
 

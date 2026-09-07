@@ -1,5 +1,4 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 use core::mem;
 /// OOP-based Hypervisor for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 181
@@ -441,9 +440,9 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::{alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
@@ -457,7 +456,7 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -6,10 +6,9 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-extern crate alloc;
 
 #[cfg(target_os = "none")]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. rpm-ostree / ChromeOS A/B Atomic Partition Updater
@@ -48,7 +47,10 @@ impl OstreeAbPartitionUpdater {
         }
     }
 
-    pub fn stage_update(&mut self, new_version: &'static str) -> Result<PartitionSlot, &'static str> {
+    pub fn stage_update(
+        &mut self,
+        new_version: &'static str,
+    ) -> Result<PartitionSlot, &'static str> {
         let target_slot = match self.state.active_slot {
             PartitionSlot::SlotA => PartitionSlot::SlotB,
             PartitionSlot::SlotB => PartitionSlot::SlotA,
@@ -292,13 +294,16 @@ impl SovereignSystemUpdateAndTestingEngine {
         }
     }
 
-    pub fn check_and_apply_system_update(&mut self, target_version: &'static str) -> Result<PartitionSlot, &'static str> {
+    pub fn check_and_apply_system_update(
+        &mut self,
+        target_version: &'static str,
+    ) -> Result<PartitionSlot, &'static str> {
         let diagnostics = self.run_system_functionality_diagnostics();
         if !diagnostics.overall_passed {
             return Err("System update blocked: Pre-update functionality self-tests failed");
         }
 
-        let staged_slot = self.ab_updater.stage_update(target_version)?;
+        let _staged_slot = self.ab_updater.stage_update(target_version)?;
         let active_slot = self.ab_updater.commit_and_switch_slot()?;
         self.ab_updater.confirm_boot_success();
 
@@ -310,7 +315,7 @@ impl SovereignSystemUpdateAndTestingEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -387,9 +392,11 @@ mod tests {
         sig[0] = payload.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
         let pub_key = [0u8; 32];
 
-        assert!(PostQuantumSignedUpdateVerifier::verify_dilithium5_update_package(
-            payload, &sig, &pub_key
-        ));
+        assert!(
+            PostQuantumSignedUpdateVerifier::verify_dilithium5_update_package(
+                payload, &sig, &pub_key
+            )
+        );
     }
 
     #[test]

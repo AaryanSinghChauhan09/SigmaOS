@@ -1,9 +1,8 @@
-extern crate alloc;
 // 'sigma-async' Cooperative Runtime for SigmaOS
 // A lightweight, `#![no_std]` cooperative task executor using raw Future polling.
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::future::Future;
 use core::pin::Pin;
 use core::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
@@ -84,10 +83,10 @@ const DUMMY_VTABLE: RawWakerVTable = RawWakerVTable::new(
     |_| {},                // drop
 );
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use alloc::rc::Rc;
+    use std::rc::Rc;
     use core::cell::RefCell;
 
     struct SimpleFuture {

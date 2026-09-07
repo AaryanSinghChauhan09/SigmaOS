@@ -1,5 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 use crate::filesystem::vfs::{Inode, FileType, FilePermissions};
 
 pub struct DevFs {

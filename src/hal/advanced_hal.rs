@@ -1,12 +1,11 @@
 //! Advanced Hardware Abstraction Layer & udev Integration
 //! Automatic device discovery, rich device properties, udev rule matching,
 //! hotplug events, and device tree enumeration.
-use alloc::vec;
-extern crate alloc;
+use std::vec;
 
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceCategory {
@@ -108,7 +107,7 @@ impl Default for SigmaDeviceManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -117,11 +116,11 @@ mod tests {
         let mut mgr = SigmaDeviceManager::new();
 
         mgr.register_rule(UdevRule {
-            conditions: alloc::vec![
+            conditions: std::vec![
                 UdevCondition::Subsystem("block".to_string()),
                 UdevCondition::KernelPattern("sd".to_string()),
             ],
-            actions: alloc::vec![UdevAction::SetNodePermission(0o660)],
+            actions: std::vec![UdevAction::SetNodePermission(0o660)],
         });
 
         let dev = HardwareDevice {

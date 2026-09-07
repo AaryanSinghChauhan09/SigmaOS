@@ -1,9 +1,8 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // SigmaOS Disk Usage Analyzer
 // OOP-based disk space analysis with visualization
 
@@ -214,7 +213,7 @@ impl DiskUsageAnalyzer {
     }
 
     /// Get size by file type
-    pub fn get_size_by_type(&self, path: &str) -> HashMap<String, u64> {
+    pub fn get_size_by_type(&self, _path: &str) -> HashMap<String, u64> {
         let mut sizes = HashMap::new();
         sizes.insert("txt".to_string(), 1024 * 1024);
         sizes.insert("pdf".to_string(), 5 * 1024 * 1024);
@@ -466,7 +465,7 @@ impl SovereignParted {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

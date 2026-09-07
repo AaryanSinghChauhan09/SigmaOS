@@ -6,7 +6,6 @@
 SigmaOS.wiki/
 
 node_modules/
-
 # Build artifacts and compiled binaries
 build/*
 !build/.gitkeep
@@ -25,3 +24,6 @@ wiki_push
 wiki/
 WIKI/
 __pycache__/
+
+/tmp/
+*.tmp

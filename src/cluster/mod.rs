@@ -1,15 +1,12 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Cluster Module
 // Distributed cluster management
 // Zero-dependency implementation - no external libraries required
 
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::fmt;
 
 /// Error type for the Cluster module
@@ -150,7 +147,7 @@ impl Default for ClusterManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

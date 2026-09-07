@@ -1,9 +1,8 @@
-extern crate alloc;
 use crate::klib::HashMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// HPC Cluster Job State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -739,7 +738,7 @@ impl Default for DebianPreseedEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

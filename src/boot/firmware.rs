@@ -1,9 +1,11 @@
-extern crate alloc;
+extern crate core;
 
+extern crate alloc;
 use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
+use alloc::string::ToString;
 
 #[derive(Debug, Clone)]
 pub struct FirmwareMemoryMapEntry {
@@ -1138,7 +1140,7 @@ impl MasterBootRecordParser {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

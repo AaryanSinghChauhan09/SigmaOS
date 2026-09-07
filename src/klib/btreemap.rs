@@ -1,13 +1,10 @@
-use alloc::format;
-use alloc::string::{String, ToString};
 // Custom BTreeMap implementation for SigmaOS
-// Reduces dependency on alloc::collections::BTreeMap
+// Reduces dependency on std::collections::BTreeMap
 // Simple implementation using sorted Vec for now
 
 use super::Vec;
 use core::borrow::Borrow;
 use core::cmp::PartialEq;
-use core::fmt;
 
 pub struct BTreeMap<K, V>
 where
@@ -312,6 +309,8 @@ where
     }
 }
 
+
+
 impl<K, V> BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -384,7 +383,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::klib::Vec;

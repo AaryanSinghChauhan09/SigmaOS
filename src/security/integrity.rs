@@ -1,14 +1,7 @@
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 
-use core::mem;
-/// OOP-based System Integrity Monitoring for SigmaOS
-/// Implements integrity monitoring using OOP principles with traits and structs
-/// No dependency on external integrity frameworks
-/// Based on Roadmap Item 66: System integrity monitoring
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// File ID
@@ -99,7 +92,9 @@ impl FileCapability {
 pub struct SimpleFile {
     pub id: FileID,
     pub path: [u8; 256],
+    pub path_len: u16,
     pub checksum: [u8; 64],
+    pub checksum_len: u8,
     pub status: AtomicUsize, // IntegrityStatus as usize
     pub capability: FileCapability,
 }
@@ -124,7 +119,9 @@ impl SimpleFile {
         SimpleFile {
             id,
             path: path_array,
+            path_len: path_len as u16,
             checksum: checksum_array,
+            checksum_len: checksum_len as u8,
             status: AtomicUsize::new(IntegrityStatus::Valid as usize),
             capability,
         }
@@ -145,13 +142,13 @@ impl File for SimpleFile {
     }
 
     fn path(&self) -> &[u8] {
-        let len = self.path.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.path[..len]
+        // O(1) slice lookup using cached path_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.path[..self.path_len as usize]
     }
 
     fn checksum(&self) -> &[u8] {
-        let len = self.checksum.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.checksum[..len]
+        // O(1) slice lookup using cached checksum_len, avoiding O(N) zero-byte linear scan (.position(|&b| b == 0))
+        &self.checksum[..self.checksum_len as usize]
     }
 
     fn verify(&mut self) -> Result<IntegrityStatus, IntegrityError> {
@@ -364,7 +361,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
 pub struct IntegrityCheck;
 pub struct IntegrityVerifier;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

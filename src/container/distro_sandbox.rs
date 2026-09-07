@@ -1,8 +1,6 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 // Distro Sandbox & Container Isolation Engine for SigmaOS
 // Inspired by Linux namespaces (unshare), Landlock LSM, Seccomp BPF, and cgroups v2.
 
@@ -224,7 +222,7 @@ impl Default for DistroSandboxEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

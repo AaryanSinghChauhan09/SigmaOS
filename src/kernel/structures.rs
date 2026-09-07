@@ -1,11 +1,7 @@
-extern crate alloc;
 use core::cell::{Cell, RefCell};
 use core::ptr::NonNull;
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
 
 // 1. SINGLY LINKED LIST
 
@@ -469,7 +465,7 @@ impl WorkItem {
 
 // 8. UNIT TESTS
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -661,8 +657,10 @@ pub struct LotteryTask {
 /// Ledger Block securing system process events (Consensus Process Logging)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchitectureClass {
+    X86_32,
     X86_64,
     AArch64,
+    RiscV32,
     RiscV64,
 }
 

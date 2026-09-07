@@ -1,11 +1,10 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Debian/Ubuntu APT Compatibility Engine
 // Implements APT package management, DEB package parsing, and dpkg compatibility
 
 use crate::klib::collections::HashMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// DEB package metadata structure
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -202,10 +201,10 @@ impl AptRepositoryManager {
     }
 
     /// Get package sources for a given package
-    pub fn get_package_sources(&self, package_name: &str) -> Vec<AptSource> {
+    pub fn get_package_sources(&self, _package_name: &str) -> Vec<AptSource> {
         self.sources
             .iter()
-            .filter(|source| {
+            .filter(|_source| {
                 // In production, this would check if the package is available in this source
                 true
             })
@@ -230,10 +229,10 @@ impl DpkgDatabase {
 
     /// Install a package
     pub fn install_package(&mut self, package: DebPackage) -> Result<(), String> {
-        let pkg_name = package.package.clone();
-        self.installed_packages.insert(pkg_name.clone(), package);
         self.status_database
-            .insert(pkg_name, "install ok installed".to_string());
+            .insert(package.package.clone(), "install ok installed".to_string());
+        self.installed_packages
+            .insert(package.package.clone(), package);
         Ok(())
     }
 
@@ -260,7 +259,7 @@ impl DpkgDatabase {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

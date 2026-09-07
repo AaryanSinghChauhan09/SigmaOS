@@ -1,7 +1,6 @@
 // SigmaOS AI Module
 // S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, quantization, and Agentic OS runtime
 
-extern crate alloc;
 
 pub mod agent;
 pub mod agentic_os_runtime;
@@ -26,12 +25,10 @@ pub mod system;
 pub mod tensor_memory;
 pub mod voice;
 pub mod wandr;
-pub mod wiki;
 
 pub use local_llm::{
     LocalLlmWrapper, QuantizationType as LocalQuantizationType, WhisperSpeechToText,
 };
-pub use sigma_data::{KMeansClustering, PrincipalComponentAnalysis};
 
 pub use agentic_os_runtime::{
     AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,
@@ -45,11 +42,6 @@ pub use agent::{AIAgent, SimpleAIAgent};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,
-};
-pub use developer_platform::{
-    AiSafetyPolicyEngine, DefaultDenyNetworkPolicy, DeviceTarget, ExperimentRun,
-    LocalLlmOrchestrator, MarketplaceModel, MlExperimentTracker, OpenShellAgentSandbox,
-    PrivacyRouter, SignedModelMarketplace,
 };
 pub use llm::{
     BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,

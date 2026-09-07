@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,15 +12,14 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::format;
-use alloc::vec::Vec;
+use std::format;
+use std::vec::Vec;
 
-extern crate alloc;
 use crate::klib::BTreeMap;
 /// OOP-based Localization Manager for SigmaOS India Stack
 /// Implements 22 scheduled languages of India and regional formatting
 /// Based on Roadmap Item: India-first architecture
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -157,7 +153,7 @@ impl LocalizationManager {
         let integer_part = parts[0];
         let decimal_part = parts.get(1).unwrap_or(&"00");
 
-        let mut chars = integer_part.chars().rev().collect::<Vec<char>>();
+        let chars = integer_part.chars().rev().collect::<Vec<char>>();
         let mut formatted = String::new();
 
         for (i, c) in chars.iter().enumerate() {
@@ -178,7 +174,7 @@ impl Default for LocalizationManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

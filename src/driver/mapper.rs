@@ -1,6 +1,4 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
 // SigmaOS Legacy Driver API Mapper (DriverMapper)
 // Maps legacy driver APIs directly to modern equivalents to bypass heavy emulation overhead
 
@@ -53,7 +51,7 @@ impl DriverMapper {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

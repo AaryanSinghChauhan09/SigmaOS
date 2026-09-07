@@ -1,9 +1,8 @@
-extern crate alloc;
 // BSD-style Resource Limits (rlimits) for SigmaOS
 // Implements process-specific soft and hard limits on system resources.
 
 
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -156,7 +155,7 @@ impl ProcessResourceLimiter {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

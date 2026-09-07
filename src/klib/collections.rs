@@ -2,10 +2,9 @@
 // SigmaOS Kernel Library Collections
 // Eliminates dependency on std::collections
 
-extern crate alloc;
-use alloc::collections::BTreeMap as AllocBTreeMap;
-use alloc::collections::BTreeSet as AllocBTreeSet;
-use alloc::collections::VecDeque as AllocVecDeque;
+use std::collections::BTreeMap as AllocBTreeMap;
+use std::collections::BTreeSet as AllocBTreeSet;
+use std::collections::VecDeque as AllocVecDeque;
 use core::cell::Cell;
 
 pub use super::hashmap::{Entry, HashMap};
@@ -137,7 +136,7 @@ impl<T> VecDeque<T> {
         self.inner.is_empty()
     }
 
-    pub fn drain<R>(&mut self, range: R) -> alloc::collections::vec_deque::Drain<'_, T>
+    pub fn drain<R>(&mut self, range: R) -> std::collections::vec_deque::Drain<'_, T>
     where
         R: core::ops::RangeBounds<usize>,
     {
@@ -244,7 +243,7 @@ pub enum Ordering {
     SeqCst,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

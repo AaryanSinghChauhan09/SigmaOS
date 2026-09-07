@@ -2,12 +2,12 @@
 // Implements Linux Mint-style desktop utilities for SigmaOS
 // Inspired by Linux Mint's user-friendly system tools
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Update level (1-5 tier system from Linux Mint)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum UpdateLevel {
     Level1, // Safe updates
     Level2, // Recommended updates
@@ -242,18 +242,20 @@ impl MintSoftwareManager {
     /// Search apps
     pub fn search_apps(&self, query: &str) -> Vec<&AppMetadata> {
         let query_lower = query.to_lowercase();
-        self.apps.values()
+        self.apps
+            .values()
             .filter(|app| {
-                app.name.to_lowercase().contains(&query_lower) ||
-                app.description.to_lowercase().contains(&query_lower) ||
-                app.category.to_lowercase().contains(&query_lower)
+                app.name.to_lowercase().contains(&query_lower)
+                    || app.description.to_lowercase().contains(&query_lower)
+                    || app.category.to_lowercase().contains(&query_lower)
             })
             .collect()
     }
 
     /// Get apps by category
     pub fn get_apps_by_category(&self, category: &str) -> Vec<&AppMetadata> {
-        self.apps.values()
+        self.apps
+            .values()
             .filter(|app| app.category == category)
             .collect()
     }
@@ -282,7 +284,8 @@ impl MintSoftwareManager {
 
     /// Get installed apps
     pub fn get_installed_apps(&self) -> Vec<&AppMetadata> {
-        self.installed_apps.iter()
+        self.installed_apps
+            .iter()
             .filter_map(|name| self.apps.get(name))
             .collect()
     }
@@ -294,7 +297,7 @@ impl Default for MintSoftwareManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

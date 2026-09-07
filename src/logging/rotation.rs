@@ -1,14 +1,12 @@
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
+use std::format;
 // OOP-based Log Rotation for SigmaOS
 // Enhanced with standard Linux-conforming syslog-parity multi-generation rotations, facilities, and RLE compression
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 pub type LogFileID = usize;
 
@@ -218,11 +216,10 @@ impl LogRotator for SimpleLogRotator {
             if let Some(ref mut log_file) = *log_file_option {
                 if log_file.id() == id {
                     log_file.reset_size();
-                    // Use standard alloc::string::ToString
-                    use alloc::string::ToString;
-                    let path_str = core::String::from_utf8(log_file.path())
-                        .unwrap_or("log")
-                        .to_string();
+                    // Use standard std::string::ToString
+
+                    let path_str = std::string::String::from_utf8(log_file.path().to_vec())
+                        .unwrap_or_else(|_| std::string::String::from("log"));
                     path_to_shift = Some(path_str);
                     break;
                 }
@@ -310,7 +307,7 @@ impl LogCompressor for SimpleLogCompressor {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

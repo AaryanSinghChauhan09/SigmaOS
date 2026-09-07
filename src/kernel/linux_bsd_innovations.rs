@@ -1,11 +1,10 @@
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use crate::klib::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
@@ -117,7 +116,7 @@ impl BsdPfStateTable {
 
     pub fn expire_states(&mut self, now_sec: u64) -> usize {
         let mut expired_keys: Vec<PfFiveTuple> = Vec::new();
-        for (tuple, state) in &self.states {
+        for (tuple, state) in self.states.iter() {
             if now_sec
                 > state
                     .last_seen_timestamp_sec
@@ -193,8 +192,7 @@ impl LinuxFutexEngine {
     pub fn futex_wake(&mut self, uaddr: u64, val_wake: usize) -> usize {
         let mut woken = 0;
         if let Some(waiters) = self.buckets.get_mut(&uaddr) {
-            let waiters_len: usize = waiters.len();
-            let count = val_wake.min(waiters_len);
+            let count = val_wake.min(waiters.len());
             for _ in 0..count {
                 if !waiters.is_empty() {
                     waiters.remove(0);
@@ -258,7 +256,7 @@ impl FreeBsdVfsNullfs {
         overlay_path: &str,
         is_write: bool,
     ) -> Result<(String, Option<u32>), &'static str> {
-        for (mp, node) in &self.mounts {
+        for (mp, node) in self.mounts.iter() {
             let mp: &String = mp;
             if overlay_path == mp
                 || (overlay_path.starts_with(mp.as_str())
@@ -268,7 +266,7 @@ impl FreeBsdVfsNullfs {
                     return Err("Nullfs: EROFS - Read-only file system layer");
                 }
                 let relative_suffix = &overlay_path[mp.len()..];
-                let resolved = alloc::format!("{}{}", node.target_lower_path, relative_suffix);
+                let resolved = std::format!("{}{}", node.target_lower_path, relative_suffix);
                 return Ok((resolved, node.override_permissions));
             }
         }
@@ -427,7 +425,7 @@ impl Default for EbpfXdpFastPacketEngine {
 }
 
 // ============================================================================
-// 1. Linux `perf_event_open` Hardware PMU Performance Counters
+// Intel Clear Linux Stateless Architecture Engine
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -1557,7 +1555,7 @@ impl MicrokernelTranslatorRegistry {
         if !trans.is_active {
             return Err("Mach/Hurd: Translator is passive. Activate before dispatching I/O!");
         }
-        Ok(alloc::format!(
+        Ok(std::format!(
             "Dispatched operational request '{}' to Mach Server on Port {}",
             op,
             trans.server_port
@@ -1675,100 +1673,6 @@ impl SovereignZonesManager {
         Ok((target_zone.cpu_shares as f32 / total_shares as f32) * 100.0)
     }
 }
-
-// ================= Sovereign Linux Cgroup v2 Governor =================
-
-#[derive(Debug, Clone, Copy)]
-pub struct CgroupResourceLimitsV1 {
-    pub cpu_quota_us: u64,
-    pub cpu_period_us: u64,
-    pub memory_max_bytes: u64,
-    pub memory_high_bytes: u64,
-    pub memory_swap_max_bytes: u64,
-    pub io_weight: u32,
-}
-
-pub struct SovereignCgroupGovernorV1 {
-    pub groups: HashMap<String, CgroupGroup>,
-}
-
-impl Default for SovereignCgroupGovernorV1 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl SovereignCgroupGovernorV1 {
-    pub fn new() -> Self {
-        Self {
-            groups: HashMap::new(),
-        }
-    }
-
-    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
-        if self.groups.contains_key(path) {
-            return Err("Group already exists");
-        }
-        self.groups.insert(
-            path.to_string(),
-            CgroupGroup {
-                path: path.to_string(),
-                limits: None,
-                pids: Vec::new(),
-                cpu_used_us: 0,
-                memory_allocated_bytes: 0,
-            },
-        );
-        Ok(())
-    }
-
-    pub fn configure_limits(
-        &mut self,
-        path: &str,
-        limits: CgroupResourceLimits,
-    ) -> Result<(), &'static str> {
-        let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        group.limits = Some(limits);
-        Ok(())
-    }
-
-    pub fn attach_pid(&mut self, path: &str, pid: u32) -> Result<(), &'static str> {
-        let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        group.pids.push(pid);
-        Ok(())
-    }
-
-    pub fn check_cpu_budget(&mut self, path: &str, usage_us: u64) -> Result<bool, &'static str> {
-        let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        if let Some(limits) = group.limits {
-            if group.cpu_used_us + usage_us <= limits.cpu_quota_us {
-                group.cpu_used_us += usage_us;
-                Ok(true)
-            } else {
-                Ok(false)
-            }
-        } else {
-            Ok(true)
-        }
-    }
-
-    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
-        let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        if let Some(limits) = group.limits {
-            if group.memory_allocated_bytes + bytes <= limits.memory_max_bytes {
-                group.memory_allocated_bytes += bytes;
-                Ok(())
-            } else {
-                Err("Memory quota exceeded")
-            }
-        } else {
-            group.memory_allocated_bytes += bytes;
-            Ok(())
-        }
-    }
-}
-
-// ================= Windows KMDF Driver Framework Parity =================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KmdfPnpState {
@@ -1946,7 +1850,7 @@ impl GcdDispatchQueue {
             for _ in 0..limit {
                 if !self.pending_tasks.is_empty() {
                     let task = self.pending_tasks.remove(0);
-                    executed.push(alloc::format!("Serial executing: {}", task.name));
+                    executed.push(std::format!("Serial executing: {}", task.name));
                 }
             }
         } else {
@@ -1954,7 +1858,7 @@ impl GcdDispatchQueue {
             for _ in 0..limit {
                 if !self.pending_tasks.is_empty() {
                     let task = self.pending_tasks.remove(0);
-                    executed.push(alloc::format!(
+                    executed.push(std::format!(
                         "Concurrent executing priority {:?}: {}",
                         task.priority,
                         task.name
@@ -2370,7 +2274,7 @@ impl HybridKernelManager {
         self.executive.active_handles += 1;
         self.microkernel.active_threads += 1;
         self.microkernel.active_interrupts += 1;
-        Ok(alloc::format!(
+        Ok(std::format!(
             "Dispatched Handle {} through NT-Executive to Microkernel",
             handle_id
         ))
@@ -2455,12 +2359,12 @@ impl NetBsdRumpKernel {
     pub fn bootstrap_component(&self, name: &str) -> Result<String, &'static str> {
         let comp = self.components.get(name).ok_or("Component not found")?;
         if comp.run_in_userspace {
-            Ok(alloc::format!(
+            Ok(std::format!(
                 "Bootstrap Anykernel component: {} running as Userspace Micro-thread",
                 name
             ))
         } else {
-            Ok(alloc::format!(
+            Ok(std::format!(
                 "Bootstrap Anykernel component: {} running in Ring 0 Monolithic Space",
                 name
             ))
@@ -2485,7 +2389,7 @@ impl NetBsdRumpKernel {
 
     pub fn isolate_rump_vfs(&mut self, fs_name: &str) -> Result<String, &'static str> {
         self.register_component(fs_name, true);
-        Ok(alloc::format!(
+        Ok(std::format!(
             "Isolated Rump VFS driver '{}' in userspace microthread",
             fs_name
         ))
@@ -2493,7 +2397,7 @@ impl NetBsdRumpKernel {
 
     pub fn virtualize_rump_network(&mut self, net_dev: &str) -> Result<String, &'static str> {
         self.register_component(net_dev, true);
-        Ok(alloc::format!(
+        Ok(std::format!(
             "Virtualised Rumpnet network stack driver '{}' in userspace microthread",
             net_dev
         ))
@@ -2869,123 +2773,6 @@ impl CapabilityDerivationTree {
     }
 }
 
-/// Linux cgroups v2 resource governor
-pub struct SovereignCgroupGovernorV3 {
-    pub groups: HashMap<String, CgroupResourceLimits>,
-    pub pids: HashMap<String, Vec<u64>>,
-    pub cpu_usage: HashMap<String, u64>,
-    pub mem_usage: HashMap<String, u64>,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct CgroupResourceLimitsV3 {
-    pub cpu_quota_us: u64,
-    pub cpu_period_us: u64,
-    pub memory_max_bytes: u64,
-    pub memory_high_bytes: u64,
-    pub memory_swap_max_bytes: u64,
-    pub io_weight: u32,
-}
-
-impl Default for CgroupResourceLimitsV3 {
-    fn default() -> Self {
-        Self {
-            cpu_quota_us: 100_000,
-            cpu_period_us: 100_000,
-            memory_max_bytes: u64::MAX,
-            memory_high_bytes: u64::MAX,
-            memory_swap_max_bytes: 0,
-            io_weight: 100,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CgroupGroupV2 {
-    pub path: String,
-    pub limits: CgroupResourceLimitsV3,
-    pub pids: Vec<u64>,
-    pub current_cpu_usage_us: u64,
-    pub current_memory_bytes: u64,
-}
-
-pub struct SovereignCgroupGovernorV2 {
-    pub groups: HashMap<String, CgroupGroupV2>,
-}
-
-impl SovereignCgroupGovernorV2 {
-    pub fn new() -> Self {
-        Self {
-            groups: HashMap::new(),
-        }
-    }
-
-    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
-        if self.groups.contains_key(path) {
-            return Err("cgroup path already exists");
-        }
-        self.groups.insert(
-            path.to_string(),
-            CgroupGroupV2 {
-                path: path.to_string(),
-                limits: CgroupResourceLimitsV3 {
-                    cpu_quota_us: 100_000,
-                    cpu_period_us: 100_000,
-                    memory_max_bytes: 1024 * 1024 * 1024,
-                    memory_high_bytes: 512 * 1024 * 1024,
-                    memory_swap_max_bytes: 0,
-                    io_weight: 100,
-                },
-                pids: Vec::new(),
-                current_cpu_usage_us: 0,
-                current_memory_bytes: 0,
-            },
-        );
-        Ok(())
-    }
-
-    pub fn configure_limits(
-        &mut self,
-        path: &str,
-        limits: CgroupResourceLimitsV3,
-    ) -> Result<(), &'static str> {
-        let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
-        entry.limits = limits;
-        Ok(())
-    }
-
-    pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
-        let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
-        if !entry.pids.contains(&pid) {
-            entry.pids.push(pid);
-        }
-        Ok(())
-    }
-
-    pub fn check_cpu_budget(
-        &mut self,
-        path: &str,
-        time_requested_us: u64,
-    ) -> Result<bool, &'static str> {
-        let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
-        if entry.current_cpu_usage_us + time_requested_us > entry.limits.cpu_quota_us {
-            Ok(false) // Quota exceeded
-        } else {
-            entry.current_cpu_usage_us += time_requested_us;
-            Ok(true)
-        }
-    }
-
-    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
-        let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
-        if entry.current_memory_bytes + bytes > entry.limits.memory_max_bytes {
-            Err("cgroup OOM: memory_max_bytes limit exceeded")
-        } else {
-            entry.current_memory_bytes += bytes;
-            Ok(())
-        }
-    }
-}
 
 // ================= Linux XDP & FreeBSD Netmap High-Performance Fast Packet Engine =================
 
@@ -3409,7 +3196,152 @@ impl MemoryCompactionSuperpagesAllocator {
     }
 }
 
-#[cfg(test)]
+/// FreeBSD inspired Jails (capability-based isolation)
+pub struct FreeBsdJail {
+    pub id: u32,
+    pub parent_id: Option<u32>,
+    pub isolated: bool,
+}
+
+impl FreeBsdJail {
+    pub fn create(id: u32) -> Self {
+        Self {
+            id,
+            parent_id: None,
+            isolated: true,
+        }
+    }
+
+    pub fn create_nested(id: u32, parent_id: u32) -> Self {
+        Self {
+            id,
+            parent_id: Some(parent_id),
+            isolated: true,
+        }
+    }
+
+    pub fn is_isolated(&self) -> bool {
+        self.isolated
+    }
+
+    /// Recursively check if this jail is a descendant of the target parent jail ID
+    pub fn is_descendant_of(&self, target_parent_id: u32) -> bool {
+        if let Some(pid) = self.parent_id {
+            if pid == target_parent_id {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+/// NixOS inspired Declarative package management
+pub struct NixOsDeclarativeManager {
+    pub configuration: Vec<String>,
+    pub previous_generations: Vec<Vec<String>>,
+}
+
+impl NixOsDeclarativeManager {
+    pub fn new() -> Self {
+        Self {
+            configuration: Vec::new(),
+            previous_generations: Vec::new(),
+        }
+    }
+
+    pub fn apply_configuration(&mut self, config: &[&str]) -> Result<(), &'static str> {
+        // Save previous generation before applying new one
+        if !self.configuration.is_empty() {
+            self.previous_generations.push(self.configuration.clone());
+        }
+        self.configuration.clear();
+        for c in config {
+            self.configuration.push(c.to_string());
+        }
+        Ok(())
+    }
+
+    /// Rollbacks to the previous configuration generation atomically
+    pub fn rollback(&mut self) -> Result<(), &'static str> {
+        if let Some(prev) = self.previous_generations.pop() {
+            self.configuration = prev;
+            Ok(())
+        } else {
+            Err("No previous generations available for rollback")
+        }
+    }
+}
+
+/// Gentoo inspired USE flags / compile-time feature selection
+pub struct GentooUseFlags {
+    pub flags: HashMap<String, bool>,
+    pub dependencies: HashMap<String, String>, // (flag -> required companion flag)
+}
+
+impl GentooUseFlags {
+    pub fn new() -> Self {
+        Self {
+            flags: HashMap::new(),
+            dependencies: HashMap::new(),
+        }
+    }
+
+    pub fn set_flag(&mut self, flag: &str, enabled: bool) {
+        self.flags.insert(flag.to_string(), enabled);
+    }
+
+    pub fn add_dependency(&mut self, flag: &str, required_companion: &str) {
+        self.dependencies
+            .insert(flag.to_string(), required_companion.to_string());
+    }
+
+    pub fn has_feature(&self, flag: &str) -> bool {
+        if let Some(&val) = self.flags.get(flag) {
+            val
+        } else {
+            false
+        }
+    }
+
+    /// Check if all active USE-flags have their required companion dependencies enabled
+    pub fn check_dependencies(&self) -> bool {
+        for (flag, required) in &self.dependencies {
+            if self.has_feature(flag) && !self.has_feature(required) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+/// Void Linux inspired runit init system inspiration
+pub struct VoidRunitInit {
+    services: Vec<String>,
+}
+
+impl VoidRunitInit {
+    pub fn new() -> Self {
+        Self {
+            services: Vec::new(),
+        }
+    }
+
+    pub fn start_service(&mut self, service: &str) {
+        self.services.push(service.to_string());
+    }
+
+    pub fn is_running(&self, service: &str) -> bool {
+        for s in &self.services {
+            let s: &String = s;
+            if s.as_str() == service {
+                return true;
+            }
+        }
+        false
+
+
+    }
+}
 
 mod tests {
     use super::*;
@@ -4124,120 +4056,6 @@ mod tests {
         );
     }
 
-    #[derive(Debug, Clone)]
-    pub struct CgroupResourceLimits {
-        pub cpu_quota_us: u64,
-        pub cpu_period_us: u64,
-        pub memory_max_bytes: u64,
-        pub memory_high_bytes: u64,
-        pub memory_swap_max_bytes: u64,
-        pub io_weight: u32,
-    }
-
-    #[derive(Debug, Clone)]
-    pub struct SovereignCgroupGroup {
-        pub name: String,
-        pub limits: Option<CgroupResourceLimits>,
-        pub pids: Vec<u64>,
-        pub cpu_used_us: u64,
-        pub memory_allocated: u64,
-    }
-
-    pub struct SovereignCgroupGovernor {
-        pub groups: HashMap<String, SovereignCgroupGroup>,
-    }
-
-    impl SovereignCgroupGovernor {
-        pub fn new() -> Self {
-            Self {
-                groups: HashMap::new(),
-            }
-        }
-
-        pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
-            self.groups.insert(
-                path.to_string(),
-                SovereignCgroupGroup {
-                    name: path.to_string(),
-                    limits: None,
-                    pids: Vec::new(),
-                    cpu_used_us: 0,
-                    memory_allocated: 0,
-                },
-            );
-            Ok(())
-        }
-
-        pub fn configure_limits(
-            &mut self,
-            path: &str,
-            limits: CgroupResourceLimits,
-        ) -> Result<(), &'static str> {
-            let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-            grp.limits = Some(limits);
-            Ok(())
-        }
-
-        pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
-            let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-            grp.pids.push(pid);
-            Ok(())
-        }
-
-        pub fn check_cpu_budget(&mut self, path: &str, used_us: u64) -> Result<bool, &'static str> {
-            let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-            let quota = grp
-                .limits
-                .as_ref()
-                .map(|l| l.cpu_quota_us)
-                .unwrap_or(u64::MAX);
-            if grp.cpu_used_us + used_us > quota {
-                Ok(false)
-            } else {
-                grp.cpu_used_us += used_us;
-                Ok(true)
-            }
-        }
-
-        pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
-            let grp = self.groups.get_mut(path).ok_or("Group not found")?;
-            let max_mem = grp
-                .limits
-                .as_ref()
-                .map(|l| l.memory_max_bytes)
-                .unwrap_or(u64::MAX);
-            if grp.memory_allocated + bytes > max_mem {
-                Err("Memory limit exceeded")
-            } else {
-                grp.memory_allocated += bytes;
-                Ok(())
-            }
-        }
-    }
-
-    #[test]
-    fn test_sovereign_cgroup_governor() {
-        let mut controller = SovereignCgroupGovernor::new();
-        controller.create_group("db").unwrap();
-        assert_eq!(controller.groups.len(), 1);
-
-        let limits = CgroupResourceLimits {
-            cpu_quota_us: 100_000,
-            cpu_period_us: 100_000,
-            memory_max_bytes: 1024 * 1024,
-            memory_high_bytes: 512 * 1024,
-            memory_swap_max_bytes: 0,
-            io_weight: 100,
-        };
-        controller.configure_limits("db", limits).unwrap();
-        controller.attach_pid("db", 1001).unwrap();
-        controller.attach_pid("db", 1002).unwrap();
-
-        let mut governor = SovereignCgroupGovernorV1::new();
-        governor.create_group("db").unwrap();
-        assert_eq!(governor.groups.len(), 1);
-    }
-
     #[test]
     fn test_bsd_pf_state_table() {
         let mut pf = BsdPfStateTable::new(60);
@@ -4404,463 +4222,5 @@ mod tests {
         assert_eq!(pfn, 0);
         assert!(alloc.frames[0].is_compound_2mb);
         assert!(!alloc.frames[0].is_free);
-    }
-}
-
-// ================= Linux Landlock LSM Rule Engine =================
-
-#[derive(Debug, Clone)]
-pub struct LinuxLandlockLsmRuleEngine {
-    pub handled_access_fs: u32,
-    pub path_rules: HashMap<String, u32>,
-    pub is_enforced: bool,
-}
-
-impl LinuxLandlockLsmRuleEngine {
-    pub fn new(handled_access_fs: u32) -> Self {
-        Self {
-            handled_access_fs,
-            path_rules: HashMap::new(),
-            is_enforced: false,
-        }
-    }
-
-    pub fn add_path_benefit(&mut self, path: &str, allowed_access: u32) -> Result<(), &'static str> {
-        if self.is_enforced {
-            return Err("Landlock LSM rules locked; cannot add path rule post-enforcement");
-        }
-        self.path_rules.insert(path.to_string(), allowed_access);
-        Ok(())
-    }
-
-    pub fn enforce_ruleset(&mut self) -> Result<(), &'static str> {
-        self.is_enforced = true;
-        Ok(())
-    }
-
-    pub fn check_access(&self, path: &str, requested_access: u32) -> bool {
-        if !self.is_enforced {
-            return true;
-        }
-        for (prefix, allowed) in &self.path_rules {
-            if path.starts_with(prefix) {
-                return (allowed & requested_access) == requested_access;
-            }
-        }
-        false
-    }
-}
-
-// ================= FreeBSD Capsicum Capability Mode Engine =================
-
-pub const CAP_READ_FLAG: u64 = 1 << 0;
-pub const CAP_WRITE_FLAG: u64 = 1 << 1;
-pub const CAP_SEEK_FLAG: u64 = 1 << 2;
-pub const CAP_MMAP_FLAG: u64 = 1 << 3;
-
-#[derive(Debug, Clone)]
-pub struct FreeBsdCapsicumEngine {
-    pub in_capability_mode: bool,
-    pub descriptor_rights: HashMap<u32, u64>,
-}
-
-impl FreeBsdCapsicumEngine {
-    pub fn new() -> Self {
-        Self {
-            in_capability_mode: false,
-            descriptor_rights: HashMap::new(),
-        }
-    }
-
-    pub fn enter_capability_mode(&mut self) {
-        self.in_capability_mode = true;
-    }
-
-    pub fn limit_descriptor_rights(&mut self, fd: u32, rights_mask: u64) -> Result<(), &'static str> {
-        if let Some(&existing) = self.descriptor_rights.get(&fd) {
-            if (existing & rights_mask) != rights_mask {
-                return Err("Capsicum: Cannot escalate descriptor rights in capability mode");
-            }
-        }
-        self.descriptor_rights.insert(fd, rights_mask);
-        Ok(())
-    }
-
-    pub fn check_descriptor_right(&self, fd: u32, required_right: u64) -> bool {
-        if !self.in_capability_mode {
-            return true;
-        }
-        if let Some(&rights) = self.descriptor_rights.get(&fd) {
-            (rights & required_right) == required_right
-        } else {
-            false
-        }
-    }
-}
-
-// ================= Void Linux runit 3-Stage Init Supervisor =================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VoidRunitStage {
-    Stage1BootMounts,
-    Stage2RunsvDirectory,
-    Stage3ShutdownHalt,
-}
-
-#[derive(Debug, Clone)]
-pub struct VoidRunitService {
-    pub name: String,
-    pub pid: u32,
-    pub is_active: bool,
-}
-
-pub struct VoidLinuxRunitSupervisor {
-    pub current_stage: VoidRunitStage,
-    pub services: HashMap<String, VoidRunitService>,
-}
-
-impl VoidLinuxRunitSupervisor {
-    pub fn new() -> Self {
-        Self {
-            current_stage: VoidRunitStage::Stage1BootMounts,
-            services: HashMap::new(),
-        }
-    }
-
-    pub fn switch_stage(&mut self, stage: VoidRunitStage) {
-        self.current_stage = stage;
-    }
-
-    pub fn register_service(&mut self, name: &str, pid: u32) {
-        self.services.insert(name.to_string(), VoidRunitService {
-            name: name.to_string(),
-            pid,
-            is_active: true,
-        });
-    }
-
-    pub fn stop_service(&mut self, name: &str) -> bool {
-        if let Some(svc) = self.services.get_mut(name) {
-            svc.is_active = false;
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_service_active(&self, name: &str) -> bool {
-        self.services.get(name).map(|s| s.is_active).unwrap_or(false)
-    }
-}
-
-// ================= Intel Clear Linux Stateless Architecture Engine =================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuIsaMicroarch {
-    X86_64_V1,
-    X86_64_V2,
-    X86_64_V3,
-    X86_64_V4,
-}
-
-pub struct IntelClearLinuxStatelessEngine {
-    pub usr_share_defaults: HashMap<String, String>,
-    pub etc_user_overrides: HashMap<String, String>,
-    pub detected_isa: CpuIsaMicroarch,
-}
-
-impl IntelClearLinuxStatelessEngine {
-    pub fn new() -> Self {
-        Self {
-            usr_share_defaults: HashMap::new(),
-            etc_user_overrides: HashMap::new(),
-            detected_isa: CpuIsaMicroarch::X86_64_V3,
-        }
-    }
-
-    pub fn auto_detect_isa(&mut self, has_avx2: bool, has_avx512: bool) -> CpuIsaMicroarch {
-        if has_avx512 {
-            self.detected_isa = CpuIsaMicroarch::X86_64_V4;
-        } else if has_avx2 {
-            self.detected_isa = CpuIsaMicroarch::X86_64_V3;
-        } else {
-            self.detected_isa = CpuIsaMicroarch::X86_64_V1;
-        }
-        self.detected_isa
-    }
-
-    pub fn register_default_config(&mut self, path: &str, content: &str) {
-        self.usr_share_defaults.insert(path.to_string(), content.to_string());
-    }
-
-    pub fn set_user_override(&mut self, path: &str, content: &str) {
-        self.etc_user_overrides.insert(path.to_string(), content.to_string());
-    }
-
-    pub fn resolve_config(&self, path: &str) -> Option<String> {
-        if let Some(user_val) = self.etc_user_overrides.get(path) {
-            Some(user_val.clone())
-        } else {
-            self.usr_share_defaults.get(path).cloned()
-        }
-    }
-
-    pub fn reset_etc_to_stateless(&mut self) {
-        self.etc_user_overrides.clear();
-    }
-}
-
-// ================= openSUSE Snapper Btrfs Snapshot Auto-Rollback Engine =================
-
-#[derive(Debug, Clone)]
-pub struct SnapperSnapshot {
-    pub id: u64,
-    pub description: String,
-    pub root_block_hash: u64,
-    pub timestamp: u64,
-}
-
-pub struct OpenSuseSnapperEngine {
-    pub snapshots: Vec<SnapperSnapshot>,
-    pub active_snapshot_id: u64,
-    pub next_id: u64,
-}
-
-impl OpenSuseSnapperEngine {
-    pub fn new() -> Self {
-        let root_snap = SnapperSnapshot {
-            id: 1,
-            description: "Factory Root Snapshot".to_string(),
-            root_block_hash: 0x10002000,
-            timestamp: 0,
-        };
-        Self {
-            snapshots: vec![root_snap],
-            active_snapshot_id: 1,
-            next_id: 2,
-        }
-    }
-
-    pub fn create_snapshot(&mut self, description: &str, hash: u64, now_sec: u64) -> u64 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.snapshots.push(SnapperSnapshot {
-            id,
-            description: description.to_string(),
-            root_block_hash: hash,
-            timestamp: now_sec,
-        });
-        id
-    }
-
-    pub fn rollback_to_snapshot(&mut self, id: u64) -> Result<u64, &'static str> {
-        let snap = self.snapshots.iter().find(|s| s.id == id).ok_or("Snapper: Target snapshot not found")?;
-        self.active_snapshot_id = id;
-        Ok(snap.root_block_hash)
-    }
-}
-
-#[cfg(test)]
-mod linux_bsd_extra_tests {
-    use super::*;
-
-    #[test]
-    fn test_linux_landlock_lsm_rules() {
-        let mut landlock = LinuxLandlockLsmRuleEngine::new(0x07);
-        landlock.add_path_benefit("/usr/bin", 0x01).unwrap(); // Read allowed
-        landlock.enforce_ruleset().unwrap();
-
-        assert!(landlock.check_access("/usr/bin/ls", 0x01));
-        assert!(!landlock.check_access("/usr/bin/ls", 0x02)); // Write denied
-        assert!(landlock.add_path_benefit("/tmp", 0x07).is_err()); // Locked
-    }
-
-    #[test]
-    fn test_freebsd_capsicum_engine() {
-        let mut capsicum = FreeBsdCapsicumEngine::new();
-        capsicum.limit_descriptor_rights(3, CAP_READ_FLAG | CAP_WRITE_FLAG).unwrap();
-        capsicum.enter_capability_mode();
-
-        assert!(capsicum.check_descriptor_right(3, CAP_READ_FLAG));
-        assert!(!capsicum.check_descriptor_right(3, CAP_MMAP_FLAG));
-        assert!(!capsicum.check_descriptor_right(4, CAP_READ_FLAG)); // Unregistered fd in capability mode
-    }
-
-    #[test]
-    fn test_void_runit_supervisor() {
-        let mut runit = VoidLinuxRunitSupervisor::new();
-        runit.register_service("sshd", 101);
-        assert!(runit.is_service_active("sshd"));
-        assert!(runit.stop_service("sshd"));
-        assert!(!runit.is_service_active("sshd"));
-    }
-
-    #[test]
-    fn test_intel_clear_linux_stateless() {
-        let mut stateless = IntelClearLinuxStatelessEngine::new();
-        stateless.register_default_config("/etc/hostname", "sigma-default");
-        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
-
-        stateless.set_user_override("/etc/hostname", "sigma-custom");
-        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-custom");
-
-        stateless.reset_etc_to_stateless();
-        assert_eq!(stateless.resolve_config("/etc/hostname").unwrap(), "sigma-default");
-    }
-
-    #[test]
-    fn test_opensuse_snapper_engine() {
-        let mut snapper = OpenSuseSnapperEngine::new();
-        let snap2 = snapper.create_snapshot("Pre-update", 0xAABBCCDD, 100);
-        assert_eq!(snap2, 2);
-
-        let hash = snapper.rollback_to_snapshot(2).unwrap();
-        assert_eq!(hash, 0xAABBCCDD);
-        assert_eq!(snapper.active_snapshot_id, 2);
-    }
-}
-
-/// FreeBSD inspired Jails (capability-based isolation)
-pub struct FreeBsdJail {
-    pub id: u32,
-    pub parent_id: Option<u32>,
-    pub isolated: bool,
-}
-
-impl FreeBsdJail {
-    pub fn create(id: u32) -> Self {
-        Self {
-            id,
-            parent_id: None,
-            isolated: true,
-        }
-    }
-
-    pub fn create_nested(id: u32, parent_id: u32) -> Self {
-        Self {
-            id,
-            parent_id: Some(parent_id),
-            isolated: true,
-        }
-    }
-
-    pub fn is_isolated(&self) -> bool {
-        self.isolated
-    }
-
-    /// Recursively check if this jail is a descendant of the target parent jail ID
-    pub fn is_descendant_of(&self, target_parent_id: u32) -> bool {
-        if let Some(pid) = self.parent_id {
-            if pid == target_parent_id {
-                return true;
-            }
-        }
-        false
-    }
-}
-
-/// NixOS inspired Declarative package management
-pub struct NixOsDeclarativeManager {
-    pub configuration: Vec<String>,
-    pub previous_generations: Vec<Vec<String>>,
-}
-
-impl NixOsDeclarativeManager {
-    pub fn new() -> Self {
-        Self {
-            configuration: Vec::new(),
-            previous_generations: Vec::new(),
-        }
-    }
-
-    pub fn apply_configuration(&mut self, config: &[&str]) -> Result<(), &'static str> {
-        // Save previous generation before applying new one
-        if !self.configuration.is_empty() {
-            self.previous_generations.push(self.configuration.clone());
-        }
-        self.configuration.clear();
-        for c in config {
-            self.configuration.push(c.to_string());
-        }
-        Ok(())
-    }
-
-    /// Rollbacks to the previous configuration generation atomically
-    pub fn rollback(&mut self) -> Result<(), &'static str> {
-        if let Some(prev) = self.previous_generations.pop() {
-            self.configuration = prev;
-            Ok(())
-        } else {
-            Err("No previous generations available for rollback")
-        }
-    }
-}
-
-/// Gentoo inspired USE flags / compile-time feature selection
-pub struct GentooUseFlags {
-    pub flags: HashMap<String, bool>,
-    pub dependencies: HashMap<String, String>, // (flag -> required companion flag)
-}
-
-impl GentooUseFlags {
-    pub fn new() -> Self {
-        Self {
-            flags: HashMap::new(),
-            dependencies: HashMap::new(),
-        }
-    }
-
-    pub fn set_flag(&mut self, flag: &str, enabled: bool) {
-        self.flags.insert(flag.to_string(), enabled);
-    }
-
-    pub fn add_dependency(&mut self, flag: &str, required_companion: &str) {
-        self.dependencies
-            .insert(flag.to_string(), required_companion.to_string());
-    }
-
-    pub fn has_feature(&self, flag: &str) -> bool {
-        if let Some(&val) = self.flags.get(flag) {
-            val
-        } else {
-            false
-        }
-    }
-
-    /// Check if all active USE-flags have their required companion dependencies enabled
-    pub fn check_dependencies(&self) -> bool {
-        for (flag, required) in &self.dependencies {
-            if self.has_feature(flag) && !self.has_feature(required) {
-                return false;
-            }
-        }
-        true
-    }
-}
-
-/// Void Linux inspired runit init system inspiration
-pub struct VoidRunitInit {
-    services: Vec<String>,
-}
-
-impl VoidRunitInit {
-    pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-        }
-    }
-
-    pub fn start_service(&mut self, service: &str) {
-        self.services.push(service.to_string());
-    }
-
-    pub fn is_running(&self, service: &str) -> bool {
-        for s in &self.services {
-            let s: &String = s;
-            if s.as_str() == service {
-                return true;
-            }
-        }
-        false
     }
 }

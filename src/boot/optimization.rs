@@ -1,16 +1,6 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::ops::{Deref, DerefMut};
+use std::boxed::Box;
+use std::vec::Vec;
 
-use core::mem;
-/// OOP-based Boot Performance Optimization for SigmaOS
-/// Implements boot optimization using OOP principles with traits and structs
-/// No dependency on external optimization frameworks
-/// Based on Roadmap Item 20: Boot performance optimization
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Service ID

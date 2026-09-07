@@ -2,9 +2,8 @@
 // SigmaOS Comprehensive TTY/PTY Subsystem
 // Includes full Termios line discipline, signaling, and ANSI buffering
 
-extern crate alloc;
-use alloc::collections::VecDeque;
-use alloc::vec::Vec;
+use std::collections::VecDeque;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // POSIX Termios Constants

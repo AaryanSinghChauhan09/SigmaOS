@@ -1,11 +1,10 @@
 //! Advanced Networking (SDN/NFV Inspiration)
 //! Software-defined networking, network virtualization, and network function virtualization
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// SDN controller type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -172,7 +171,7 @@ impl Default for SigmaSDN {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

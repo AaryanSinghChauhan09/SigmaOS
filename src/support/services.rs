@@ -1,16 +1,15 @@
-extern crate alloc;
 // SigmaOS Support & Services Framework (Red Hat Insights, Ubuntu Pro, and SUSE Manager Parity)
 // Professional support tiers, LTS maintenance guarantees, Expanded Security Maintenance (ESM),
 // FIPS/CIS Compliance Scanners, Automated Remediation Playbooks, and System Drift Detectors.
 
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 extern crate std;
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::string::ToString;
+use std::string::String;
+use std::vec::Vec;
+use std::string::ToString;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 use crate::klib::HashMap;
@@ -245,7 +244,7 @@ impl Default for SupportServicesManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

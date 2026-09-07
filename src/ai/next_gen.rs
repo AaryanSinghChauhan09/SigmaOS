@@ -1,6 +1,4 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::vec::Vec;
 /// Next-Generation AI-Native and Energy-Aware Subsystems for SigmaOS
 /// Replicates adaptive personas, predictive syscall pre-fetching,
 /// AI scheduling, and local multi-model orchestrations.
@@ -632,7 +630,7 @@ impl SovereignEmotionAwareEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

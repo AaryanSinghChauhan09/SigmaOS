@@ -1,4 +1,3 @@
-extern crate alloc;
 
 /// OOP-based Lightweight Init System for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 5
@@ -6,8 +5,8 @@ extern crate alloc;
 
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::boxed::Box;
 
 pub type ServiceID = usize;
 
@@ -281,6 +280,104 @@ impl SimpleDependencyResolver {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RestartPolicy {
+    Never,
+    Always,
+    OnFailure,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SandboxConfig {
+    pub isolated_namespaces: bool,
+    pub read_only_root: bool,
+    pub memory_limit_mb: u32,
+}
+
+impl Default for SandboxConfig {
+    fn default() -> Self {
+        Self {
+            isolated_namespaces: true,
+            read_only_root: true,
+            memory_limit_mb: 256,
+        }
+    }
+}
+
+/// Declarative service manifest definition matching sovereign Init blueprint
+#[derive(Debug, Clone)]
+pub struct SovereignServiceManifest {
+    pub id: ServiceID,
+    pub name: [u8; 32],
+    pub exec_path: [u8; 64],
+    pub dependencies: Vec<ServiceID>,
+    pub restart_policy: RestartPolicy,
+    pub sandbox: SandboxConfig,
+}
+
+impl SovereignServiceManifest {
+    pub fn new(id: ServiceID, name_str: &str, exec: &str, deps: &[ServiceID]) -> Self {
+        let mut name = [0u8; 32];
+        let mut exec_path = [0u8; 64];
+        let n_len = name_str.len().min(31);
+        let e_len = exec.len().min(63);
+        name[..n_len].copy_from_slice(&name_str.as_bytes()[..n_len]);
+        exec_path[..e_len].copy_from_slice(&exec.as_bytes()[..e_len]);
+
+        Self {
+            id,
+            name,
+            exec_path,
+            dependencies: deps.to_vec(),
+            restart_policy: RestartPolicy::OnFailure,
+            sandbox: SandboxConfig::default(),
+        }
+    }
+}
+
+/// Sovereign Journal Logger for unified boot & daemon log observability
+#[derive(Debug, Clone)]
+pub struct SovereignJournalLogger {
+    pub log_buffer: Vec<[u8; 128]>,
+}
+
+impl SovereignJournalLogger {
+    pub fn new() -> Self {
+        Self { log_buffer: Vec::new() }
+    }
+
+    pub fn log_entry(&mut self, service_id: ServiceID, message: &str) {
+        let mut entry = [0u8; 128];
+        let prefix = b"SvcLog[";
+        let mut idx = 0;
+        entry[..prefix.len()].copy_from_slice(prefix);
+        idx += prefix.len();
+
+        let id_byte = b'0' + (service_id % 10) as u8;
+        entry[idx] = id_byte;
+        idx += 1;
+
+        let mid = b"]: ";
+        entry[idx..idx + mid.len()].copy_from_slice(mid);
+        idx += mid.len();
+
+        let msg_bytes = message.as_bytes();
+        let copy_len = msg_bytes.len().min(128 - idx - 1);
+        entry[idx..idx + copy_len].copy_from_slice(&msg_bytes[..copy_len]);
+        self.log_buffer.push(entry);
+    }
+
+    pub fn entries_count(&self) -> usize {
+        self.log_buffer.len()
+    }
+}
+
+impl Default for SovereignJournalLogger {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub trait ServiceMonitor {
     fn monitor_service(&mut self, id: ServiceID) -> Result<(), InitError>;
     fn auto_restart(&mut self, id: ServiceID) -> Result<(), InitError>;
@@ -482,5 +579,43 @@ mod tests {
         let web_id = r_init.launch_container("nginx", "user-nginx", ContainerDaemonType::UserDaemon).unwrap();
         assert_eq!(web_id, 1);
         assert_eq!(r_init.user_containers.len(), 1);
+    }
+
+    #[test]
+    fn test_sovereign_init_manifest_and_journal() {
+        // 1. Filesystem service (no deps)
+        let fs_svc = SimpleService::new(1, b"filesystem");
+        // 2. Networking service (depends on filesystem)
+        let mut net_svc = SimpleService::new(2, b"networking");
+        net_svc.deps.push(1);
+        // 3. Shell service (depends on networking)
+        let mut shell_svc = SimpleService::new(3, b"shell");
+        shell_svc.deps.push(2);
+
+        let mut init = SigmaInit::new();
+        init.register_service(Box::new(fs_svc)).unwrap();
+        init.register_service(Box::new(net_svc)).unwrap();
+        init.register_service(Box::new(shell_svc)).unwrap();
+
+        // Check startup order with resolver
+        let resolver = SimpleDependencyResolver::new(SigmaInit::new());
+        assert!(!resolver.detect_cycles(&[1, 2, 3]));
+
+        // Start shell_svc (should cascade & start filesystem and networking)
+        assert!(init.start_service(3).is_ok());
+        assert_eq!(init.get_service(1).unwrap().state() as usize, ServiceState::Running as usize);
+        assert_eq!(init.get_service(2).unwrap().state() as usize, ServiceState::Running as usize);
+        assert_eq!(init.get_service(3).unwrap().state() as usize, ServiceState::Running as usize);
+
+        // Validate SovereignManifest & SovereignJournalLogger
+        let fs_manifest = SovereignServiceManifest::new(1, "filesystem", "/usr/bin/fsd", &[]);
+        assert_eq!(fs_manifest.restart_policy, RestartPolicy::OnFailure);
+        assert!(fs_manifest.sandbox.isolated_namespaces);
+
+        let mut logger = SovereignJournalLogger::new();
+        logger.log_entry(1, "filesystem shard mounted successfully");
+        logger.log_entry(2, "networking daemon initialized");
+        logger.log_entry(3, "interactive shell started");
+        assert_eq!(logger.entries_count(), 3);
     }
 }

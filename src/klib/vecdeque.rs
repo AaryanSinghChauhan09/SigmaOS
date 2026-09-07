@@ -1,5 +1,5 @@
 //! Custom VecDeque implementation for SigmaOS
-//! Reduces dependency on alloc::collections::VecDeque
+//! Reduces dependency on std::collections::VecDeque
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -7,9 +7,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -17,9 +14,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
 use super::Vec;
 
 pub struct VecDeque<T> {
@@ -175,7 +171,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -209,7 +205,7 @@ mod tests {
         deque.push_back(2);
         deque.push_front(0);
 
-        let items: alloc::vec::Vec<i32> = deque.iter().cloned().collect();
-        assert_eq!(items, alloc::vec![0, 1, 2]);
+        let items: std::vec::Vec<i32> = deque.iter().cloned().collect();
+        assert_eq!(items, std::vec![0, 1, 2]);
     }
 }

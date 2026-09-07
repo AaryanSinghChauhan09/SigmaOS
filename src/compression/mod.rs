@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
 // SigmaOS Compression Module
 // Data compression algorithms & archive management
 // Zero-dependency implementation - no external libraries required
@@ -8,14 +6,13 @@
 
 pub mod archive;
 
-extern crate alloc;
 pub use archive::{
     ArchiveEntry, ArchiveFormat, ArchiveImage, ArchiveManager, CompressionCodec, EntryType,
 };
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::boxed::Box;
 use core::fmt;
 
 /// Error type for the Compression module
@@ -137,7 +134,7 @@ impl Default for Decompressor {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     

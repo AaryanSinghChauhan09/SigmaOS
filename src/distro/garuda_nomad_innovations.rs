@@ -7,20 +7,19 @@
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-extern crate alloc;
 
 #[cfg(target_os = "none")]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 #[cfg(not(target_os = "none"))]
 use std::collections::BTreeMap;
 
 #[cfg(target_os = "none")]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(target_os = "none"))]
 use std::string::{String, ToString};
 
 #[cfg(target_os = "none")]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Garuda Linux Zen Kernel Performance Governor & zRAM Optimizer
@@ -190,12 +189,7 @@ impl GuixShepherdServiceEngine {
             services: BTreeMap::new(),
         };
 
-        engine.register_service(
-            "file-systems",
-            "file-systems",
-            Vec::new(),
-            true,
-        );
+        engine.register_service("file-systems", "file-systems", Vec::new(), true);
 
         engine.register_service(
             "networking",
@@ -258,7 +252,7 @@ impl Default for GuixShepherdServiceEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

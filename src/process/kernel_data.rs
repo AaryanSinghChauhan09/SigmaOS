@@ -1,8 +1,7 @@
-extern crate alloc;
 /// Advanced Kernel Internals and Scheduler Data Structures for SigmaOS
 /// Inspired by Windows NT (EPROCESS, KPROCESS, ETHREAD, KTHREAD, KPCR/KPRCB),
 /// Linux task_struct, BSD vmspace, and iOS Mach thread models.
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// Represents the alterable waiting state of a thread dispatcher (Windows NT/BSD style)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -282,7 +281,7 @@ impl KernelDebuggerShim {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

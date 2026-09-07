@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,11 +12,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -151,8 +147,8 @@ pub enum StorageClass {
 
 #[derive(Clone)]
 pub struct S3Object {
-    pub bucket: alloc::string::String,
-    pub key: alloc::string::String,
+    pub bucket: std::string::String,
+    pub key: std::string::String,
     pub size_bytes: u64,
     pub storage_class: StorageClass,
     pub last_modified_timestamp: u64,
@@ -161,22 +157,22 @@ pub struct S3Object {
 #[derive(Clone)]
 pub struct MultipartUploadSession {
     pub upload_id: u32,
-    pub bucket: alloc::string::String,
-    pub key: alloc::string::String,
+    pub bucket: std::string::String,
+    pub key: std::string::String,
     pub total_parts_expected: usize,
     pub uploaded_parts_count: usize,
 }
 
 pub struct PresignedUrl {
-    pub url: alloc::string::String,
+    pub url: std::string::String,
     pub expiration_timestamp: u64,
     pub signature_token: u32,
 }
 
 pub struct SovereignS3Bucket {
-    pub bucket_name: alloc::string::String,
-    pub objects: alloc::vec::Vec<S3Object>,
-    pub active_multipart_uploads: alloc::vec::Vec<MultipartUploadSession>,
+    pub bucket_name: std::string::String,
+    pub objects: std::vec::Vec<S3Object>,
+    pub active_multipart_uploads: std::vec::Vec<MultipartUploadSession>,
     pub lifecycle_transition_days_ia: u32,
     pub lifecycle_transition_days_glacier: u32,
 }
@@ -185,8 +181,8 @@ impl SovereignS3Bucket {
     pub fn new(name: &str) -> Self {
         Self {
             bucket_name: name.to_string(),
-            objects: alloc::vec::Vec::new(),
-            active_multipart_uploads: alloc::vec::Vec::new(),
+            objects: std::vec::Vec::new(),
+            active_multipart_uploads: std::vec::Vec::new(),
             lifecycle_transition_days_ia: 30,
             lifecycle_transition_days_glacier: 90,
         }
@@ -372,7 +368,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

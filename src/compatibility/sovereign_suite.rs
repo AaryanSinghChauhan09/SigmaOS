@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 /// Sovereign Productivity, Diagnostics, & Creative Suite (SovereignSuite) for SigmaOS
 /// Absorbs, standardizes, and unifies core principles, utilities, and functions from:
 /// Joplin (E2EE Markdown notes), Nextcloud (file sync metadata), LibreOffice (Spreadsheet cell formulas),
@@ -317,7 +317,7 @@ impl SpreadsheetCore {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

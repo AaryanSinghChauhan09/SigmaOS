@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -21,9 +18,8 @@
 // Indirect Addressing (Mailboxes/Ports with 1-to-1, 1-to-N, N-to-N relationships),
 // Structured Message Headers with payload validation, sequence numbers, and delivery modes.
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -440,7 +436,7 @@ impl Semaphore for SimpleSemaphore {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

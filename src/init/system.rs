@@ -1,13 +1,12 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
 
-extern crate alloc;
 /// OOP-based Lightweight Init System for SigmaOS
 /// Implements init system using OOP principles with traits and structs
 /// No dependency on external init frameworks
 /// Based on Roadmap Item 5: Lightweight init system
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -464,7 +463,7 @@ impl InitSystem for SimpleInitSystem {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

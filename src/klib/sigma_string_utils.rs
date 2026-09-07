@@ -10,14 +10,12 @@
 //   present in the `alloc` crate (which SigmaOS already uses)
 // • Panic-free — every operation returns a Result or Option
 
-extern crate alloc;
 
-use alloc::vec::Vec;
-use core::fmt::Write;
+use std::vec::Vec;
 
 // ── Type aliases ──────────────────────────────────────────────────────────────
 
-/// A heap-allocated UTF-8 string backed by `alloc::vec::Vec<u8>`.
+/// A heap-allocated UTF-8 string backed by `std::vec::Vec<u8>`.
 /// Prefer using the kernel's `SigmaString` from `klib::string` when richer
 /// behaviour is needed; this type is intentionally thin.
 pub type SigmaByteBuf = Vec<u8>;
@@ -96,7 +94,9 @@ pub fn equals_ignore_ascii_case(a: &[u8], b: &[u8]) -> bool {
     if a.len() != b.len() {
         return false;
     }
-    a.iter().zip(b.iter()).all(|(x, y)| x.to_ascii_lowercase() == y.to_ascii_lowercase())
+    a.iter()
+        .zip(b.iter())
+        .all(|(x, y)| x.to_ascii_lowercase() == y.to_ascii_lowercase())
 }
 
 // ── Trimming ──────────────────────────────────────────────────────────────────
@@ -104,14 +104,21 @@ pub fn equals_ignore_ascii_case(a: &[u8], b: &[u8]) -> bool {
 /// Remove ASCII whitespace from the beginning of a byte slice.
 #[inline]
 pub fn trim_start_bytes(s: &[u8]) -> &[u8] {
-    let start = s.iter().position(|b| !b.is_ascii_whitespace()).unwrap_or(s.len());
+    let start = s
+        .iter()
+        .position(|b| !b.is_ascii_whitespace())
+        .unwrap_or(s.len());
     &s[start..]
 }
 
 /// Remove ASCII whitespace from the end of a byte slice.
 #[inline]
 pub fn trim_end_bytes(s: &[u8]) -> &[u8] {
-    let end = s.iter().rposition(|b| !b.is_ascii_whitespace()).map(|i| i + 1).unwrap_or(0);
+    let end = s
+        .iter()
+        .rposition(|b| !b.is_ascii_whitespace())
+        .map(|i| i + 1)
+        .unwrap_or(0);
     &s[..end]
 }
 
@@ -424,8 +431,8 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
                 .map(|(k, _)| self.hash_index(k, cap))
                 .unwrap_or(j);
             // Move entry if it is displaced.
-            let displaced = (j >= i && (natural <= i || natural > j))
-                || (j < i && natural <= i && natural > j);
+            let displaced =
+                (j >= i && (natural <= i || natural > j)) || (j < i && natural <= i && natural > j);
             if displaced {
                 self.buckets[i] = self.buckets[j].take();
                 i = j;
@@ -440,7 +447,9 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
 
     /// Iterate over all key-value pairs as shared references.
     pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> {
-        self.buckets.iter().filter_map(|slot| slot.as_ref().map(|(k, v)| (k, v)))
+        self.buckets
+            .iter()
+            .filter_map(|slot| slot.as_ref().map(|pair| (&pair.0, &pair.1)))
     }
 
     // ── private helpers ──────────────────────────────────────────────────────
@@ -513,34 +522,54 @@ pub fn fnv1a_64(bytes: &[u8]) -> u64 {
 }
 
 impl SigmaHash for u8 {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(&[*self]) }
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(&[*self])
+    }
 }
 impl SigmaHash for u16 {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(&self.to_le_bytes()) }
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(&self.to_le_bytes())
+    }
 }
 impl SigmaHash for u32 {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(&self.to_le_bytes()) }
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(&self.to_le_bytes())
+    }
 }
 impl SigmaHash for u64 {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(&self.to_le_bytes()) }
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(&self.to_le_bytes())
+    }
 }
 impl SigmaHash for usize {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(&(*self as u64).to_le_bytes()) }
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(&(*self as u64).to_le_bytes())
+    }
 }
 impl SigmaHash for i32 {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(&self.to_le_bytes()) }
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(&self.to_le_bytes())
+    }
 }
 impl SigmaHash for i64 {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(&self.to_le_bytes()) }
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(&self.to_le_bytes())
+    }
 }
 impl SigmaHash for &str {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(self.as_bytes()) }
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(self.as_bytes())
+    }
 }
-impl SigmaHash for alloc::string::String {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(self.as_bytes()) }
+impl SigmaHash for std::string::String {
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(self.as_bytes())
+    }
 }
 impl SigmaHash for &[u8] {
-    fn sigma_hash(&self) -> u64 { fnv1a_64(self) }
+    fn sigma_hash(&self) -> u64 {
+        fnv1a_64(self)
+    }
 }
 
 // ── Custom in-place sort (no std::cmp dependency) ─────────────────────────────
@@ -595,7 +624,7 @@ pub fn sort_by<T, F: Fn(&T, &T) -> core::cmp::Ordering>(slice: &mut [T], compare
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

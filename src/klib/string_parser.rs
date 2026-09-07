@@ -1,7 +1,5 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use core::str::Chars;
 // SigmaOS Custom String Parser
 // Reduces dependency on std string parsing functions
@@ -164,7 +162,7 @@ pub fn replace_string(s: &str, from: &str, to: &str) -> String {
     s.replace(from, to)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

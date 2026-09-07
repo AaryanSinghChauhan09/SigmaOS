@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,17 +12,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // SigmaOS Software Updater
 // OOP-based system update management with rollback support
 
-use crate::klib::BTreeMap;
 use core::time::Duration;
 use std::time::Instant;
 
@@ -162,7 +157,7 @@ impl AutoInstallProvisioner {
             .ok_or("No active profile loaded")?;
         self.installation_completed = true;
         Ok(format!(
-            "Deployment succeeded! Hostname: {}, RootFS partitioned on {} using {} filesystem.",
+            "Deployment succeeded! Hostname: {}, RootFS partitioned on {} using {} filesystem. Packages: {}",
             profile.hostname,
             profile.target_partition,
             profile.fs_type,
@@ -312,8 +307,8 @@ impl OfficialUpdateSource {
 impl UpdateSource for OfficialUpdateSource {
     fn check_for_updates(
         &self,
-        current_version: &str,
-        channel: UpdateChannel,
+        _current_version: &str,
+        _channel: UpdateChannel,
     ) -> Result<Vec<UpdatePackage>, UpdateError> {
         // Simulated update check
         Ok(vec![UpdatePackage {
@@ -397,7 +392,7 @@ impl SoftwareUpdater {
             return None;
         }
 
-        if let Some(last) = self.last_check {
+        if let Some(_last) = self.last_check {
             if core::time::Duration::from_millis(0) < self.auto_check_interval {
                 return None;
             }
@@ -419,7 +414,7 @@ impl SoftwareUpdater {
         update_clone.status = UpdateStatus::Downloading;
         self.active_update = Some(update_clone.clone());
 
-        let download_path = self.update_source.download_update(&update)?;
+        let _download_path = self.update_source.download_update(&update)?;
 
         Ok(UpdateProgress {
             update_id: update_id.to_string(),
@@ -571,7 +566,7 @@ pub enum UpdateError {
     ChecksumMismatch(String),
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,5 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::ptr;
 
 const HBA_PxCMD_ST: u32 = 0x0001;

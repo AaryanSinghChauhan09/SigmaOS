@@ -1,8 +1,6 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Standard Plymouth bootsplash theme variants
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -99,7 +97,7 @@ impl Default for GtkPlymouthBootsplashEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

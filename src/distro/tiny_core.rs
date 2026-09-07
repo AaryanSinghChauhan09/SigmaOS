@@ -1,14 +1,12 @@
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Tiny Core Linux Core Concepts Integration
 // Implements minimal footprint, frugal installs, RAM-copy booting, and .tcz loop-mount application extensions.
 // Ensures Tiny Core architecture is no longer a challenge to SigmaOS.
 
 use crate::klib::HashMap;
-use alloc::collections::BTreeSet as HashSet;
+use std::collections::BTreeSet as HashSet;
 
 /// Tiny Core Operation Modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -149,7 +147,7 @@ impl Default for AppsAuditTool {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

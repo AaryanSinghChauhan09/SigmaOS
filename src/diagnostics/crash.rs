@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,14 +12,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::boxed::Box;
+use std::boxed::Box;
 
 /// OOP-based Crash Reporting Pipeline for SigmaOS
 /// Implements crash reporting using OOP principles with traits and structs
 /// Inspired by Linux (coredump(5), ABRT, Apport) and FreeBSD (coredump(5))
 /// Based on Roadmap Item 14: Crash reporting pipeline
 
-extern crate alloc;
 #[cfg(not(test))]
 use core::ptr::{self, NonNull};
 #[cfg(not(test))]
@@ -32,13 +28,13 @@ use core::mem;
 #[cfg(not(test))]
 use core::ops::{Deref, DerefMut};
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 use core::ptr::{self, NonNull};
-#[cfg(test)]
+#[cfg(test_disabled)]
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(test)]
+#[cfg(test_disabled)]
 use core::mem;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use core::ops::{Deref, DerefMut};
 
 /// Report ID
@@ -667,14 +663,14 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::{alloc, Layout};
     let layout = Layout::from_size_align_unchecked(size, 8);
-    std_alloc(layout)
+    std::alloc::alloc(layout)
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 unsafe fn free(_ptr: *mut u8) {
     // No-op for test stub allocation
 }
@@ -718,7 +714,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

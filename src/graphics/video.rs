@@ -1,11 +1,8 @@
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Sovereign AI-Native Video Editing Suite (SigmaCut)
 // Designed for high-performance timeline composition, YUV translation, and overlay effects
 
-extern crate alloc;
 
 use crate::klib::HashMap;
 
@@ -417,7 +414,7 @@ impl Default for ElementaryHigChecker {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

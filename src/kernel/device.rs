@@ -1,11 +1,10 @@
-use alloc::boxed::Box;
-extern crate alloc;
+use std::boxed::Box;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::any::Any;
 
-use crate::kernel::object::{KRef, KernelObject};
+use crate::kernel::object::KernelObject;
 use crate::security::capability::CapabilityToken;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

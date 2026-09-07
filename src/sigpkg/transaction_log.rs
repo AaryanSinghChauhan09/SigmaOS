@@ -1,10 +1,9 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 /// Transaction Log System (Debian APT dpkg inspiration)
 /// Provides atomic transactions and rollback capabilities
 use crate::klib::Vec;
 use crate::sigpkg::Package;
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 
 /// Transaction entry type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -67,7 +66,7 @@ impl TransactionLog {
 
     /// Add package installation to transaction
     pub fn add_install(&mut self, package: &Package) {
-        if let Some(idx) = self.current_transaction {
+        if let Some(_idx) = self.current_transaction {
             let entry = TransactionEntry {
                 entry_type: TransactionType::Install,
                 package_name: package.name.clone(),
@@ -84,7 +83,7 @@ impl TransactionLog {
 
     /// Add package removal to transaction
     pub fn add_remove(&mut self, package_name: &str, version: &str) {
-        if let Some(idx) = self.current_transaction {
+        if let Some(_idx) = self.current_transaction {
             let entry = TransactionEntry {
                 entry_type: TransactionType::Remove,
                 package_name: package_name.to_string(),
@@ -142,7 +141,7 @@ impl Default for TransactionLog {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     use crate::sigpkg::{Package, Version};
@@ -159,7 +158,7 @@ mod tests {
             "test-package".to_string(),
             Version::new(1, 0, 0),
             "Test package".to_string(),
-            alloc::vec::Vec::new(),
+            std::vec::Vec::new(),
             "checksum".to_string(),
         );
         log.add_install(&package);

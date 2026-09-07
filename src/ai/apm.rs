@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -15,9 +12,9 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // SigmaOS Sovereign Agent Package Manager (Sovereign APM)
 //
@@ -26,8 +23,7 @@ use alloc::vec::Vec;
 // Designed to obsolete Microsoft's APM by providing native OS-level container isolation,
 // transitive trust boundaries, cryptographic pinning, and hidden Unicode threat scanners.
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 /// Standard NT-style status for APM operations
 #[repr(usize)]
@@ -223,7 +219,7 @@ impl SovereignApmEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

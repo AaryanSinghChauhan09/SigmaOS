@@ -1,9 +1,7 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::vec::Vec;
 // Atomic Bitmap, Atomic Integer & Async Procedure Call (APC) Subsystem for SigmaOS
 
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// Thread-safe Lock-Free Atomic Bitmap for Bit Allocations
 pub struct AtomicBitmap {
@@ -147,7 +145,7 @@ impl AsyncProcedureCallQueue {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

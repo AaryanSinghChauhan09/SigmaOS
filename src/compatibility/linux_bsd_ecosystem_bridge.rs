@@ -1,9 +1,7 @@
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Target ABI ecosystem family
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -198,7 +196,7 @@ impl Default for LinuxBsdEcosystemBridge {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

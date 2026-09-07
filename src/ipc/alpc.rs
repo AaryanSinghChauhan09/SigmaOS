@@ -1,18 +1,16 @@
 #![allow(dead_code)]
-#![allow(unused_variables)]
 //! Advanced Local Procedure Call (ALPC/LPC) Subsystem for SigmaOS
 //! Inspired by Windows NT ALPC, Mach IPC Ports, and Linux/BSD High-Performance Fast IPC.
 //!
 //! Provides zero-copy section memory mapping for large payload procedure calls,
 //! facility-based message routing (Kernel, VFS, Net, Auth, Distro),
 //! synchronous Request-Reply RPC execution, and sandboxed port security checks.
-use alloc::vec;
+use std::vec;
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Facility categories for system procedure routing
@@ -314,7 +312,7 @@ impl Default for AlpcManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

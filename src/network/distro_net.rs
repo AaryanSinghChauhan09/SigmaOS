@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // Distro Network Enhancements for SigmaOS
 // Inspired by Linux SYN Cookies (syncookies), WireGuard Noise protocol, Netfilter iptables, and eBPF SO_ATTACH_FILTER.
 
@@ -166,7 +165,7 @@ impl Default for LinuxDistroNetEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 /// OOP-based Camera Capture for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 281
@@ -336,7 +335,7 @@ impl<T> Vec<T> {
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

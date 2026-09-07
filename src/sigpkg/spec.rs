@@ -1,15 +1,11 @@
-extern crate alloc;
 
 /// OOP-based SigPkg Package Specification for SigmaOS
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
-use alloc::boxed::Box;
+use std::boxed::Box;
 
-use core::mem;
 
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Package version
 #[repr(C)]
@@ -509,7 +505,6 @@ impl PackageManager for SimplePackageManager {
     }
 }
 
-
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchLevel {
@@ -574,6 +569,83 @@ pub enum UniversalPackageType {
     Guix,
     Sigma,
 }
+
+impl UniversalPackageType {
+    pub fn detect_type_from_filename(filename: &str) -> Option<Self> {
+        let name = filename.to_lowercase();
+        let name = name.trim();
+        let normalized = name.replace(" ", "");
+
+        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(UniversalPackageType::Apt)
+        } else if normalized.ends_with(".superdeb") {
+            Some(UniversalPackageType::SuperDeb)
+        } else if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+            Some(UniversalPackageType::Rpm)
+        } else if normalized.ends_with(".pkg.tar.zst")
+            || normalized.ends_with(".pkg.tar.xz")
+            || normalized.ends_with(".pkg.tar.gz")
+            || normalized.contains("pacman")
+        {
+            Some(UniversalPackageType::Pacman)
+        } else if normalized.ends_with(".snap") {
+            Some(UniversalPackageType::Snap)
+        } else if normalized.ends_with(".flatpak") {
+            Some(UniversalPackageType::Flatpak)
+        } else if normalized.ends_with(".appimage") {
+            Some(UniversalPackageType::AppImage)
+        } else if normalized.ends_with(".air") {
+            Some(UniversalPackageType::Air)
+        } else if normalized.ends_with(".bottle") {
+            Some(UniversalPackageType::Bottle)
+        } else if normalized.ends_with(".ipa") {
+            Some(UniversalPackageType::Ipa)
+        } else if normalized.ends_with(".ports") {
+            Some(UniversalPackageType::Ports)
+        } else if normalized.ends_with(".pkg") {
+            Some(UniversalPackageType::Pkg)
+        } else if normalized.ends_with(".aab") {
+            Some(UniversalPackageType::Aab)
+        } else if normalized.ends_with(".apk") {
+            Some(UniversalPackageType::Apk)
+        } else if normalized.ends_with(".eopkg") {
+            Some(UniversalPackageType::Eopkg)
+        } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
+            Some(UniversalPackageType::NixPkg)
+        } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
+            Some(UniversalPackageType::Ebuild)
+        } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+            Some(UniversalPackageType::TarArchive)
+        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+            Some(UniversalPackageType::Txz)
+        } else if normalized.ends_with(".xbps") {
+            Some(UniversalPackageType::Xbps)
+        } else if normalized.ends_with(".zypper") {
+            Some(UniversalPackageType::Zypper)
+        } else if normalized.ends_with(".guix") || normalized.ends_with(".scm") {
+            Some(UniversalPackageType::Guix)
+        } else if normalized.ends_with(".app") {
+            Some(UniversalPackageType::App)
+        } else if normalized.ends_with(".hap") {
+            Some(UniversalPackageType::Hap)
+        } else if normalized.ends_with(".pisi") {
+            Some(UniversalPackageType::Pisi)
+        } else if normalized.ends_with(".lzm") {
+            Some(UniversalPackageType::Lzm)
+        } else if normalized.ends_with(".pup") {
+            Some(UniversalPackageType::Pup)
+        } else if normalized.ends_with(".pet") {
+            Some(UniversalPackageType::Pet)
+        } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
+            Some(UniversalPackageType::Sigma)
+        } else if normalized.ends_with(".tar") {
+            Some(UniversalPackageType::TarArchive)
+        } else {
+            None
+        }
+    }
+}
+
 pub struct UserDefinedPackageHook;
 
 // ==============================================================================

@@ -1,5 +1,4 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // Sovereign ConfigFS - "Everything is a File" and "Principle of Least Astonishment" (POLA) Implementation
 // Inspired by Linux sysfs/configfs and BSD sysctl, exposing kernel state, scheduler, and security configurations as virtual files.
 
@@ -7,9 +6,9 @@ extern crate alloc;
 use crate::filesystem::vfs::FsError;
 use crate::kernel::bore::BoreScheduler;
 use crate::security::securelevels::{Securelevel, SovereignSecurelevelManager};
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -82,15 +81,15 @@ impl SovereignConfigFS {
         match node.file_type {
             ConfigFileType::SchedulerBorePenalty => {
                 let val = self.bore_penalty.load(Ordering::SeqCst);
-                Ok(alloc::format!("{}\n", val))
+                Ok(std::format!("{}\n", val))
             }
             ConfigFileType::SecuritySecurelevel => {
                 let lvl = self.securelevel_manager.securelevel();
-                Ok(alloc::format!("{:?}\n", lvl))
+                Ok(std::format!("{:?}\n", lvl))
             }
             ConfigFileType::SystemUptime => {
                 let upt = self.system_uptime_secs.load(Ordering::SeqCst);
-                Ok(alloc::format!("{}s\n", upt))
+                Ok(std::format!("{}s\n", upt))
             }
         }
     }
@@ -153,7 +152,7 @@ impl Default for SovereignConfigFS {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

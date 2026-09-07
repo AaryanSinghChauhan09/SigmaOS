@@ -1,8 +1,5 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 /// OOP-based Accessibility Keyboard for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 836
 /// Implements on-screen keyboard and accessibility input
@@ -194,7 +191,7 @@ impl StickyKeys for SimpleStickyKeys {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

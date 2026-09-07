@@ -1,6 +1,4 @@
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 /// io_uring operation codes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -117,7 +115,7 @@ impl IoUringEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

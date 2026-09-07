@@ -1,11 +1,26 @@
-//! EEVDF Scheduler with SMP Work Stealing & NUMA Topology Support for SigmaOS
-use alloc::vec;
-extern crate alloc;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct TaskId(pub u64);
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::cmp::Ordering;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
+}
+
+impl Task {
+    pub fn new(id: u64, vruntime: u64) -> Self {
+        Self {
+            id: TaskId(id),
+            vruntime,
+            priority: 1,
+        }
+    }
+}
+
 use core::time::Duration;
+use std::string::String;
+use std::vec::Vec;
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -15,24 +30,6 @@ pub enum Priority {
     Normal = 2,
     High = 3,
     Realtime = 4,
-}
-
-/// Task Identifier
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TaskId(pub u32);
-
-/// Task structure for CFS compatibility
-#[derive(Debug, Clone, Copy)]
-pub struct Task {
-    pub id: TaskId,
-    pub vruntime: u64,
-    pub priority: u32,
-}
-
-impl PartialEq for Task {
-    fn eq(&self, other: &Self) -> bool {
-        self.vruntime == other.vruntime
-    }
 }
 
 /// Process state
@@ -54,6 +51,7 @@ pub struct Process {
     pub priority: Priority,
     pub state: ProcessState,
     pub runtime: Duration,
+    pub sleep_time: Duration,
     pub virtual_runtime: u64,  // EEVDF vruntime (ticks)
     pub virtual_deadline: u64, // EEVDF virtual deadline
     pub time_slice: Duration,
@@ -70,6 +68,7 @@ impl Process {
             priority,
             state: ProcessState::Ready,
             runtime: Duration::from_secs(0),
+            sleep_time: Duration::from_secs(0),
             virtual_runtime: 0,
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
@@ -113,6 +112,35 @@ impl Process {
         let bore_penalty = self.burst_score / 2;
         self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
     }
+
+    pub fn interactivity_score(&self) -> u32 {
+        let run_ms = self.runtime.as_millis() as u64;
+        let sleep_ms = self.sleep_time.as_millis() as u64;
+        let total = run_ms + sleep_ms;
+        if total == 0 {
+            100
+        } else {
+            ((sleep_ms * 100) / total) as u32
+        }
+    }
+
+    /// Linux EEVDF Lag Compensation: positive lag = process is owed CPU time
+    pub fn calculate_lag(&self, system_vtime: u64) -> i64 {
+        (system_vtime as i64) - (self.virtual_runtime as i64)
+    }
+
+    /// Update virtual deadline considering ULE interactivity and EEVDF lag
+    pub fn update_virtual_deadline_ule(&mut self, system_vtime: u64) {
+        let weight = self.get_weight();
+        let q = 10u64;
+        let base_slice = (q / weight).max(1);
+        let inter = self.interactivity_score();
+        // Boost interactive tasks (> 70) by shortening their deadline window
+        let boost = if inter > 70 { (inter as u64 - 70) / 10 } else { 0 };
+        let slice = base_slice.saturating_sub(boost).max(1);
+        self.virtual_deadline = self.virtual_runtime + slice;
+    }
+
 }
 
 #[derive(Debug, Clone)]
@@ -154,20 +182,7 @@ impl WorkStealingQueue {
     }
 }
 
-impl Eq for Task {}
-
-impl PartialOrd for Task {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for Task {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.vruntime.cmp(&other.vruntime)
-    }
-}
-
+/// EEVDF Scheduler Engine
 pub struct Scheduler {
     pub processes: Vec<Process>,
     pub current_time: u64,
@@ -178,7 +193,7 @@ pub struct Scheduler {
 
 impl Scheduler {
     pub fn new() -> Self {
-        Self {
+        Scheduler {
             processes: Vec::new(),
             current_time: 0,
             system_vtime: 0,
@@ -188,12 +203,14 @@ impl Scheduler {
     }
 
     pub fn add_process(&mut self, mut process: Process) {
+        // Set initial vruntime to system virtual time to prevent newly spawned process from hogging CPU
         process.virtual_runtime = self.system_vtime;
         process.update_virtual_deadline(self.system_vtime);
         self.processes.push(process);
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
+        // 1. Filter ready processes
         let mut ready_indices = Vec::new();
         for (idx, p) in self.processes.iter().enumerate() {
             if p.state == ProcessState::Ready {
@@ -267,7 +284,8 @@ impl Scheduler {
             let weight = p.get_weight();
             let delta = (ticks_executed / weight).max(1);
             p.virtual_runtime = p.virtual_runtime.saturating_add(delta);
-            p.update_virtual_deadline(self.system_vtime);
+            let sys_vtime = self.system_vtime;
+            p.update_virtual_deadline(sys_vtime);
             p.runtime += Duration::from_millis(ticks_executed * 10);
         }
     }
@@ -311,7 +329,7 @@ pub struct CfsScheduler {
 impl CfsScheduler {
     pub const fn new() -> Self {
         CfsScheduler {
-            tasks: [None; 64],
+            tasks: [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
             task_count: 0,
             current_time: 0,
         }
@@ -319,17 +337,23 @@ impl CfsScheduler {
 
     pub fn add_task(&mut self, task: Task) {
         if self.task_count < 64 {
-            self.tasks[self.task_count] = Some(task);
+            self.tasks[self.task_count] = Some(task.clone());
             self.task_count += 1;
             self.sort_tasks();
         }
     }
 
+    pub fn tick(&mut self) {
+        self.current_time += 1;
+    }
+
+    pub fn schedule(&mut self) -> Option<Task> {
+        self.pick_next_task()
+    }
     pub fn pick_next_task(&mut self) -> Option<Task> {
         if self.task_count > 0 {
             let task = self.tasks[0].take();
-            self.tasks[0] = self.tasks[self.task_count - 1];
-            self.tasks[self.task_count - 1] = None;
+            self.tasks[0] = self.tasks[self.task_count - 1].take();
             self.task_count -= 1;
             self.sort_tasks();
             task
@@ -338,10 +362,27 @@ impl CfsScheduler {
         }
     }
 
+    pub fn tick(&mut self) {
+        self.current_time += 1;
+        if self.task_count > 0 {
+            if let Some(ref mut task) = self.tasks[0] {
+                task.vruntime += 1;
+            }
+            self.sort_tasks();
+        }
+    }
+
+    pub fn schedule(&mut self) -> Option<Task> {
+        self.pick_next_task()
+    }
+
     fn sort_tasks(&mut self) {
         for i in 1..self.task_count {
             let mut j = i;
-            while j > 0 && self.tasks[j - 1].unwrap().vruntime > self.tasks[j].unwrap().vruntime {
+            while j > 0
+                && self.tasks[j - 1].as_ref().map_or(u64::MAX, |t| t.vruntime)
+                    > self.tasks[j].as_ref().map_or(u64::MAX, |t| t.vruntime)
+            {
                 self.tasks.swap(j - 1, j);
                 j -= 1;
             }
@@ -381,7 +422,11 @@ mod tests {
         };
         scheduler.add_task(task);
 
-        let scheduled = scheduler.pick_next_task();
+        for _ in 0..5 {
+            scheduler.tick();
+        }
+
+        let scheduled = scheduler.schedule();
         assert!(scheduled.is_some());
     }
 
@@ -411,11 +456,11 @@ mod tests {
 
         let node0 = NumaNode {
             node_id: 0,
-            processor_ids: alloc::vec![0, 1],
+            processor_ids: std::vec![0, 1],
         };
         let node1 = NumaNode {
             node_id: 1,
-            processor_ids: alloc::vec![2, 3],
+            processor_ids: std::vec![2, 3],
         };
         numa_nodes.push(node0);
         numa_nodes.push(node1);
@@ -438,34 +483,28 @@ mod tests {
     fn test_bore_scheduling_prioritization() {
         let mut scheduler = Scheduler::new();
 
-        // 1. Create a CPU-bound process and an interactive process with identical priorities
         let p_cpu = Process::new(1, "cpu_bound".to_string(), Priority::Normal);
         let p_interactive = Process::new(2, "interactive".to_string(), Priority::Normal);
 
-        // Add both to scheduler
         scheduler.add_process(p_cpu);
         scheduler.add_process(p_interactive);
 
-        // 2. Simulate CPU-bound process running for long bursts, accumulating high burst score
-        scheduler.charge_process_burst(1, 50); // charge 50 burst penalty to cpu_bound
+        scheduler.charge_process_burst(1, 50);
 
-        // Assert that the CPU-bound process now has a significantly higher virtual deadline (penalized)
         let proc_cpu = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
         let proc_interactive = scheduler.processes.iter().find(|p| p.pid == 2).unwrap();
         assert!(proc_cpu.virtual_deadline > proc_interactive.virtual_deadline);
 
-        // 3. Advancing scheduler time ticks and scheduling should pick the interactive process first
         for _ in 0..10 {
             scheduler.tick();
         }
 
         let chosen = scheduler.schedule().unwrap();
-        assert_eq!(chosen.pid, 2); // interactive should be scheduled first
+        assert_eq!(chosen.pid, 2);
         assert_eq!(chosen.name, "interactive");
 
-        // 4. Test decay of burst scores
         scheduler.decay_process_bursts();
         let proc_cpu_decayed = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
-        assert_eq!(proc_cpu_decayed.burst_score, 49); // decayed by 1
+        assert_eq!(proc_cpu_decayed.burst_score, 49);
     }
 }

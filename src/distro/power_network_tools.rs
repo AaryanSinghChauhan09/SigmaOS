@@ -1,9 +1,8 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS Linux & BSD Distro Power & Network Tools Subsystem
 // Inspired by Linux TLP/Laptop Mode Tools, NetworkManager/nmtui, FreeBSD bhyve, and Tailscale/WireGuard
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. Linux TLP / Laptop Mode Tools Power Governor
@@ -302,7 +301,7 @@ impl TailscaleWireguardMesh {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

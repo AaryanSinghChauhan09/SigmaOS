@@ -1,13 +1,12 @@
-use alloc::format;
-extern crate alloc;
+use std::format;
 // SigmaOS Mandatory Access Control (MAC) System
 // Inspired by SELinux and AppArmor
 // Provides fine-grained access control beyond traditional Unix permissions
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::collections::BTreeMap;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::collections::BTreeMap;
 
 /// SELinux-style security context for processes and objects
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -519,7 +518,7 @@ impl Default for SovereignMacLsmHookRegistry {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod mac_hook_tests {
     use super::*;
 

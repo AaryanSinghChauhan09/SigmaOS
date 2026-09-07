@@ -5,9 +5,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -22,9 +19,19 @@ pub mod hash;
 pub mod kdf;
 pub mod keys;
 pub mod libsodium;
+pub mod post_quantum;
 pub mod postquantum;
 pub mod pqc_dilithium;
 pub mod primitives;
 pub mod random;
 pub mod rsa;
 pub mod vectorized_pqc;
+pub mod aegis_vault;
+
+pub use aegis_vault::{
+    AegisEncryptedContainer, AegisVaultEncryptionCompressionEngine, AegisVaultError,
+};
+pub use post_quantum::{
+    PostQuantumCryptoManager, DilithiumSecretKey, DilithiumPublicKey, DilithiumSignature,
+    KyberSecretKey, KyberPublicKey, KyberCiphertext, KyberSharedSecret, HybridCryptoMode,
+};

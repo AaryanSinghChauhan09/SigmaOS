@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT OR GPL-2.0
 /*
  * =========================================================================
  * Σ SIGMAOS: SIGMA-IME — UNIVERSAL INPUT METHOD EDITOR DAEMON

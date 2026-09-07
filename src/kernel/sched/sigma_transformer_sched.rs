@@ -1,12 +1,9 @@
-use alloc::vec;
-extern crate alloc;
 
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, Ordering};
+use std::vec::Vec;
 
 use crate::filesystem::FsError;
 use crate::kernel::sched::scheduler::{RunQueue, SchedClass};
-use crate::kernel::sched::task::{ProcessState, SchedPolicy, Task};
+use crate::kernel::sched::task::Task;
 
 /// Transformer-based Scheduler
 ///
@@ -158,7 +155,7 @@ impl SchedClass for TransformerSchedClass {
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

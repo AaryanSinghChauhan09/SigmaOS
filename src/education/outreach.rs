@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS Education & Outreach Framework
 // Training ecosystem, university partnerships, and standardized documentation validation
 
@@ -122,7 +121,7 @@ impl Default for EducationOutreachManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

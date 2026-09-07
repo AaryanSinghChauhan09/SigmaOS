@@ -1,6 +1,4 @@
-use alloc::vec;
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
 /// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.
@@ -164,6 +162,7 @@ impl ApkPackageStore {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use core::sync::atomic::Ordering;
 
     #[test]
     fn test_dinit_service_manager() {

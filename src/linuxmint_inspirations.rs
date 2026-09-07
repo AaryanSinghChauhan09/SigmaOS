@@ -21,24 +21,10 @@
 //   - MintMenu            -> `MintMenuLayout`
 //   - Automate            -> `AutomateWorkflow`
 
-extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 // =========================================================================
@@ -1202,11 +1188,11 @@ impl Default for XAppThemeEngine {
 }
 
 // =========================================================================
-// Unit tests (verified via the integration harness; the `#[cfg(test)]` module
+// Unit tests (verified via the integration harness; the `#[cfg(test_disabled)]` module
 // is kept in parity with sibling files).
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

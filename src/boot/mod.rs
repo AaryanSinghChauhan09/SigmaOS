@@ -24,11 +24,18 @@ pub use pci::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
 pub use plymouth::{GtkPlymouthBootsplashEngine, PlymouthMode, PlymouthTheme};
 pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
 pub use sigma_boot::{
-    BootEntry, BootManager, BootStageDescriptor, BootTheme, HandoffProtocol, OpenBsdBootDirective,
+    BootEntry, BootManager, BootStageDescriptor, BootTheme, HandoffProtocol,
     SovereignDistroBootStageHandoff, SovereignFastBootServicePipeline,
 };
 pub use uefi::{
     AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,
     MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
     SovereignBootWatchdog, UEFIBootloader, UsbHostController,
+};
+pub use firmware::{
+    CpuMicrocodePatchEngine, EfiVariable, EfiVariableStore, EsrtEntry, EsrtFirmwareType,
+    FirmwareCapsuleUpdateManager, IommuArchitecture, IommuFirmwareEngine, MicrocodeHeader,
+    MicrocodeVendor, SmbiosFirmwareParser, SmbiosType0BiosInfo, SmbiosType1SystemInfo,
+    SmbiosType2BaseboardInfo, SmbiosType3ChassisInfo, EFI_GLOBAL_VARIABLE_GUID,
+    SECURITY_DATABASE_GUID, efi_attr,
 };

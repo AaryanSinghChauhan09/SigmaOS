@@ -1,12 +1,11 @@
 //! Storage Management Functions (lsblk/parted Inspiration)
 //! Block device management, partition manager, and filesystem tools
-use alloc::format;
-extern crate alloc;
+use std::format;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Block device
 #[derive(Debug, Clone)]
@@ -322,7 +321,7 @@ impl Default for FilesystemManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

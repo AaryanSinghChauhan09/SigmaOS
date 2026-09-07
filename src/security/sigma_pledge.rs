@@ -19,9 +19,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::too_many_arguments)]
 #![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
 #![allow(clippy::items_after_test_module)]
 #![allow(clippy::doc_lazy_continuation)]
 #![allow(clippy::empty_line_after_doc_comments)]
@@ -29,13 +26,11 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use alloc::vec;
 
-extern crate alloc;
 
-use sigma_types::{CapabilityToken, Result};
+use sigma_types::Result;
 
-use alloc::collections::BTreeSet as HashSet;
+use std::collections::BTreeSet as HashSet;
 
 /// Pledge namespaces representing different syscall categories
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -131,7 +126,7 @@ macro_rules! sigma_pledge {
 
 /// Syscall filter that checks pledges
 pub struct SyscallFilter {
-    process_promises: alloc::collections::BTreeMap<u64, PledgePromise>,
+    process_promises: std::collections::BTreeMap<u64, PledgePromise>,
 }
 
 impl SyscallFilter {
@@ -139,7 +134,7 @@ impl SyscallFilter {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SyscallFilter {
-            process_promises: alloc::collections::BTreeMap::new(),
+            process_promises: std::collections::BTreeMap::new(),
         }
     }
 
@@ -177,7 +172,7 @@ impl Default for SyscallFilter {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

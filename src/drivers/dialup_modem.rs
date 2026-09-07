@@ -1,10 +1,9 @@
-extern crate alloc;
 // SigmaOS Dial-up 56K Modem Driver (S-Modem)
 // Zero-dependency, #![no_std] compliant, emulating iconic telephone AT commands.
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 pub struct DialupModemDriver {

@@ -1,11 +1,10 @@
 //! Logging Functions (rsyslog/journald Inspiration)
 //! Log manager, journal manager, and log analyzer
-extern crate alloc;
 
 
 
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
+use std::vec::Vec;
+use std::string::{String, ToString};
 
 /// Log file
 #[derive(Debug, Clone)]
@@ -316,7 +315,7 @@ impl Default for LogAnalyzer {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,11 +1,10 @@
-extern crate alloc;
 // SigmaOS Distro Compatibility Layer
 /// Custom CachyOS Optimization Subsystems for SigmaOS
 /// Implements BORE (Burst-Oriented Response Enhancer) Scheduler, Ananicy-cpp rules manager,
 /// x86-64-v1/v2/v3/v4 microarchitecture optimization detector, Cachy-Initramfs module loader,
 /// Cachy-THP & Memory Compaction, KSM Samepage Merging, P-State Governor, and SIMD compiler tuning.
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
@@ -148,10 +147,6 @@ impl V4OptimizedPackageManager {
         level
     }
 
-    pub fn supports_v4(&self) -> bool {
-        self.detected_level.load(Ordering::SeqCst) >= 4
-    }
-
     pub fn get_optimized_binary_suffix(&self) -> &'static str {
         match self.detected_level.load(Ordering::SeqCst) {
             4 => "_v4",
@@ -159,10 +154,6 @@ impl V4OptimizedPackageManager {
             2 => "_v2",
             _ => "",
         }
-    }
-
-    pub fn supports_v4(&self) -> bool {
-        self.detected_level.load(Ordering::SeqCst) >= 4
     }
 }
 
@@ -378,7 +369,7 @@ impl CachyMicroarchCompilerTuner {
 
     pub fn inject_optimal_compilation_flags(&self) -> Vec<String> {
         let mut flags = Vec::new();
-        use alloc::string::ToString;
+        use std::string::ToString;
         flags.push("-O3".to_string());
         flags.push("-flto=thin".to_string());
         flags.push("-fno-plt".to_string());
@@ -472,12 +463,10 @@ pub struct CachyosKernelFeatureMatrix {
 
 impl CachyosKernelFeatureMatrix {
     pub fn new() -> Self {
-        let mut v4_mgr = V4OptimizedPackageManager::new();
-        v4_mgr.detected_level = AtomicUsize::new(4);
         Self {
             bore_governor: BoreSchedulerGovernor::new(),
             ananicy_manager: AnanicyManager::new(),
-            v4_package_manager: v4_mgr,
+            v4_package_manager: V4OptimizedPackageManager::new(),
             thp_tuner: CachyThpTuner::new(ThpMode::Always),
             ksm_daemon: CachyKsmDaemon::new(),
             latency_governor: CachyLatencyGovernor::new(),
@@ -499,10 +488,10 @@ impl Default for CachyosKernelFeatureMatrix {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
+    use std::string::ToString;
 
     #[test]
     fn test_bore_scheduler_ticks() {

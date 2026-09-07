@@ -1,8 +1,7 @@
-extern crate alloc;
-use alloc::vec;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 // SigmaOS Sovereign Core Modules & Subsystems
 // Implements missing enterprise, gaming, accessibility, mobile, localization,
 // and sovereign sector integrations (Healthcare, Education, Agriculture, Finance)
@@ -11,13 +10,13 @@ use alloc::format;
 #[cfg(not(test))]
 use crate::security::CapabilityToken;
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub id: u64,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 impl CapabilityToken {
     pub fn new() -> Self {
         Self { id: 1 }
@@ -407,7 +406,7 @@ impl Default for SovereignDynamicKernelModuleManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

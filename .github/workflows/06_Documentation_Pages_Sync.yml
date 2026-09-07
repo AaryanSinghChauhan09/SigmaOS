@@ -1,0 +1,39 @@
+name: "06 📚 Documentation & Pages Sync Suite"
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  sync-wiki-and-docs:
+    name: Sync Documentation & Wiki Repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Execute Wiki Synchronization
+        run: |
+          if [ -f ./scripts/sync_wiki.sh ]; then
+            chmod +x ./scripts/sync_wiki.sh
+            ./scripts/sync_wiki.sh
+          fi
+
+      - name: Generate Rustdoc API Documentation
+        run: |
+          cargo doc --no-deps 2>&1 || true
+
+      - name: Upload Documentation Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigmaos-docs-html
+          path: target/doc

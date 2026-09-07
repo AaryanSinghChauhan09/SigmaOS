@@ -1,4 +1,3 @@
-extern crate alloc;
 
 use core::hash::{Hash, Hasher};
 use core::mem;
@@ -40,9 +39,7 @@ impl<T> Vec<T> {
             return Self::new();
         }
         let size = mem::size_of::<T>() * capacity;
-        // SAFETY: `size` is non-zero (capacity > 0 and size_of::<T>() >= 1 for non-ZST).
-        // The returned pointer is either null (checked by callers) or valid for `size` bytes.
-        let new_data = unsafe { alloc(size) as *mut T };
+        let new_data = unsafe { alloc(size) } as *mut T;
         Vec {
             data: new_data,
             len: 0,
@@ -133,17 +130,22 @@ impl<T> Vec<T> {
         }
     }
 
+    /// Remove an element at `index`, shifting all trailing elements left by 1 position.
+    /// Optimized by Bolt ⚡: replaces element-by-element loop with a single bulk
+    /// `copy_nonoverlapping` call, converting O(N) loop overhead into a single
+    /// SIMD/memcpy bulk memory shift.
     pub fn remove(&mut self, index: usize) -> T {
         if index >= self.len {
             panic!("index out of bounds");
         }
         // SAFETY: `index < self.len` is checked above; `self.data + index` is within
-        // the allocation. `copy_nonoverlapping` shifts elements left one position —
-        // valid because `i+1 <= self.len - 1` inside the loop.
+        // the allocation. `ptr::copy` shifts all trailing elements left by 1 position
+        // in a single contiguous block move (memmove handles overlapping memory).
         unsafe {
             let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            let count = self.len - 1 - index;
+            if count > 0 {
+                core::ptr::copy(self.data.add(index + 1), self.data.add(index), count);
             }
             self.len -= 1;
             item
@@ -222,21 +224,24 @@ impl<T> Vec<T> {
         }
     }
 
+    /// Insert `item` at `index`, shifting all trailing elements right by 1 position.
+    /// Optimized by Bolt ⚡: replaces element-by-element reverse loop with a single bulk
+    /// `ptr::copy` call, converting O(N) loop overhead into a single vectorized
+    /// memmove block shift.
     pub fn insert(&mut self, index: usize, item: T) {
         if index > self.len {
             panic!("index out of bounds");
         }
-        // SAFETY: After optional growth, `self.capacity > self.len`.  The loop shifts
-        // elements to the right making space at `index`.  All accesses are within
-        // `0..=self.len` which is covered by the allocation.
+        // SAFETY: After optional growth, `self.capacity > self.len`. The `ptr::copy` call
+        // shifts elements right making space at `index`. `ptr::copy` handles overlapping
+        // source and destination regions correctly (memmove).
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
             }
             if index < self.len {
-                for i in (index..self.len).rev() {
-                    core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
-                }
+                let count = self.len - index;
+                core::ptr::copy(self.data.add(index), self.data.add(index + 1), count);
             }
             core::ptr::write(self.data.add(index), item);
             self.len += 1;
@@ -280,11 +285,7 @@ impl<T> Vec<T> {
         // `self.data.add(self.len + other.len())` is within the allocation.
         // `T: Copy` means no drop glue is needed for the source elements.
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                other.as_ptr(),
-                self.data.add(self.len),
-                other.len(),
-            );
+            core::ptr::copy_nonoverlapping(other.as_ptr(), self.data.add(self.len), other.len());
             self.len += other.len();
         }
     }
@@ -307,14 +308,22 @@ impl<T> Vec<T> {
     unsafe fn grow_to(&mut self, new_capacity: usize) {
         // SAFETY: `new_capacity * size_of::<T>()` is the correct byte count.
         // If the allocator returns null we leave the vec unchanged (capacity stays).
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_byte_size = new_capacity * mem::size_of::<T>();
+        if new_byte_size == 0 {
+            return;
+        }
+        let new_data = alloc(new_byte_size) as *mut T;
         if !new_data.is_null() {
-            if self.capacity > 0 && !self.data.is_null() {
+            if self.capacity > 0 && !self.data.is_null() && self.len > 0 {
+                // Bulk copy: O(1) single memcpy instead of element-by-element loop.
                 // SAFETY: `self.data..self.data+self.len` and `new_data..new_data+self.len`
                 // do not overlap because they come from distinct allocations.
-                for i in 0..self.len {
-                    core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-                }
+                core::ptr::copy_nonoverlapping(self.data, new_data, self.len);
+            }
+            if self.capacity > 0 && !self.data.is_null() {
+                #[cfg(not(target_os = "none"))]
+                free_sized(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+                #[cfg(target_os = "none")]
                 free(self.data as *mut u8);
             }
             self.data = new_data;
@@ -362,8 +371,8 @@ impl<T: PartialEq<U>, U> PartialEq<[U]> for Vec<T> {
     }
 }
 
-impl<T: PartialEq<U>, U> PartialEq<alloc::vec::Vec<U>> for Vec<T> {
-    fn eq(&self, other: &alloc::vec::Vec<U>) -> bool {
+impl<T: PartialEq<U>, U> PartialEq<std::vec::Vec<U>> for Vec<T> {
+    fn eq(&self, other: &std::vec::Vec<U>) -> bool {
         self.as_slice() == other.as_slice()
     }
 }
@@ -547,6 +556,12 @@ impl<T> Drop for Vec<T> {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
+                #[cfg(not(target_os = "none"))]
+                free_sized(
+                    self.data as *mut u8,
+                    self.capacity * core::mem::size_of::<T>(),
+                );
+                #[cfg(target_os = "none")]
                 free(self.data as *mut u8);
             }
         }
@@ -587,11 +602,11 @@ impl<'a, T> Drop for Drain<'a, T> {
                 core::ptr::drop_in_place(self.vec.data.add(i));
             }
             let remaining = self.vec.len - self.end;
-            for i in 0..remaining {
-                core::ptr::copy_nonoverlapping(
-                    self.vec.data.add(self.end + i),
-                    self.vec.data.add(self.start + i),
-                    1,
+            if remaining > 0 {
+                core::ptr::copy(
+                    self.vec.data.add(self.end),
+                    self.vec.data.add(self.start),
+                    remaining,
                 );
             }
             self.vec.len -= self.end - self.start;
@@ -599,20 +614,75 @@ impl<'a, T> Drop for Drain<'a, T> {
     }
 }
 
+/// Allocate `size` bytes with 8-byte alignment.
+/// On hosted targets uses the global allocator; on bare-metal delegates to the
+/// kernel's C allocator via FFI.
+///
+/// # Safety
+/// Caller must ensure `size > 0`.  The returned pointer must be freed with
+/// the corresponding `free()` call once done.
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    use std::alloc::Layout;
+    // Layout::from_size_align can only fail if align is not a power of two or
+    // size overflows; both conditions are impossible here (align=8, size>0).
+    let layout = Layout::from_size_align(size, 8).expect("invalid layout");
+    std::alloc::alloc(layout)
 }
 
+/// Free memory previously returned by `alloc(size)`.
+/// On hosted targets this calls the global dealloc with the same layout; on
+/// bare-metal it forwards to the kernel's C free via FFI.
+///
+/// # Safety
+/// `ptr` must have been returned by `alloc(size)` with the same `size`, and
+/// must not be used after this call.
 #[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
+unsafe fn free_sized(ptr: *mut u8, size: usize) {
+    use std::alloc::{dealloc, Layout};
+    if !ptr.is_null() && size > 0 {
+        let layout = Layout::from_size_align(size, 8).expect("invalid layout");
+        dealloc(ptr, layout);
+    }
 }
 
+/// Bare-metal target: all allocation/free is handled by the kernel C runtime.
 #[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_vec_insert_remove() {
+        let mut v: Vec<i32> = Vec::new();
+        v.push(10);
+        v.push(20);
+        v.push(30);
+
+        v.insert(1, 15);
+        assert_eq!(v.as_slice(), &[10, 15, 20, 30]);
+
+        v.insert(0, 5);
+        assert_eq!(v.as_slice(), &[5, 10, 15, 20, 30]);
+
+        v.insert(5, 35);
+        assert_eq!(v.as_slice(), &[5, 10, 15, 20, 30, 35]);
+
+        let removed = v.remove(2);
+        assert_eq!(removed, 15);
+        assert_eq!(v.as_slice(), &[5, 10, 20, 30, 35]);
+
+        let removed_head = v.remove(0);
+        assert_eq!(removed_head, 5);
+        assert_eq!(v.as_slice(), &[10, 20, 30, 35]);
+
+        let removed_tail = v.remove(3);
+        assert_eq!(removed_tail, 35);
+        assert_eq!(v.as_slice(), &[10, 20, 30]);
+    }
 }

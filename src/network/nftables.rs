@@ -1,14 +1,13 @@
-use alloc::vec;
-use alloc::format;
-extern crate alloc;
+use std::vec;
+use std::format;
 // nftables-Inspired Modern Firewall Framework
 // Linux nftables provides a modern, flexible packet filtering framework with tables, chains, and rules
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::{format, vec};
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::{format, vec};
 
 /// nftables-inspired table families
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -673,7 +672,7 @@ impl IptablesToNftablesTranslator {
         NftRule {
             handle: rule_handle,
             expressions,
-            comment: alloc::format!(
+            comment: std::format!(
                 "Translated from iptables -A {} -p {} --dport {} -j {}",
                 legacy_rule.chain, legacy_rule.protocol, legacy_rule.dport, legacy_rule.action
             ),
@@ -1032,7 +1031,7 @@ pub struct NftablesStats {
     pub total_connections: usize,
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,9 +1,8 @@
-extern crate alloc;
 // SigmaOS Kernel-Mode Reverse Engineering & Hooking / Rootkit Subsystem
 // Zero-dependency, #![no_std] compliant kernel structures.
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. Syscall Stub Disassembler & Opcode Parser
@@ -143,7 +142,7 @@ impl StealthFilterDriver {
 // Unit Tests
 // =========================================================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

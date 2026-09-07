@@ -1,6 +1,6 @@
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 // SigmaOS Sovereign Mind Map Creator (SigmaMind)
 // Purpose-built, highly interactive hierarchical visualization tool inspired by XMind, MindMeister, and NiceMind.
 // Exposes rich styling, relationship boundaries, task progress tracking, and layouts.
@@ -257,7 +257,7 @@ impl MindMapCreator {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

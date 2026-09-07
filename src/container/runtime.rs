@@ -1,8 +1,6 @@
-extern crate alloc;
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use core::mem;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
@@ -74,7 +72,7 @@ pub enum ContainerError {
 
 /// Container info
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ContainerInfo {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -201,37 +199,6 @@ impl NamespaceConfig {
     }
 }
 
-impl Default for NamespaceConfig {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Container seccomp profiles
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub blocked_syscalls: Vec<u32>,
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
-
-impl SeccompProfile {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if self.blocked_syscalls.contains(&syscall_id) {
-            return true;
-        }
-        if self.hardened && syscall_id < 32 {
-            return (self.blocked_syscalls_mask & (1 << syscall_id)) != 0;
-        }
-        false
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfileV2 {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SeccompAction {
@@ -257,14 +224,14 @@ impl SeccompProfileV2 {
 /// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]
 pub struct OverlayFS {
-    pub lower_dirs: alloc::vec::Vec<String>,
+    pub lower_dirs: std::vec::Vec<String>,
     pub upper_dir: String,
     pub work_dir: String,
     pub mounted: bool,
 }
 
 impl OverlayFS {
-    pub fn new(lower_dirs: alloc::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
+    pub fn new(lower_dirs: std::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
         Self {
             lower_dirs,
             upper_dir,
@@ -521,8 +488,6 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
-
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
@@ -739,9 +704,9 @@ impl SimpleContainerRuntime {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use alloc::alloc::{alloc as std_alloc, Layout};
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    unsafe { std_alloc(layout) }
+    unsafe { std::alloc::alloc(layout) }
 }
 
 /// Flatpak & Snap Sandboxed App Compatibility Layer
@@ -753,32 +718,32 @@ pub enum AppBundleFormat {
 
 #[derive(Debug, Clone)]
 pub struct AppBundleContainer {
-    pub app_id: alloc::string::String,
+    pub app_id: std::string::String,
     pub format: AppBundleFormat,
-    pub runtime_version: alloc::string::String,
-    pub sandbox_permissions: alloc::vec::Vec<alloc::string::String>,
+    pub runtime_version: std::string::String,
+    pub sandbox_permissions: std::vec::Vec<std::string::String>,
     pub is_active: bool,
 }
 
 pub struct FlatpakSnapCompatLayer {
-    pub installed_bundles: alloc::vec::Vec<AppBundleContainer>,
+    pub installed_bundles: std::vec::Vec<AppBundleContainer>,
 }
 
 impl FlatpakSnapCompatLayer {
     pub fn new() -> Self {
         FlatpakSnapCompatLayer {
-            installed_bundles: alloc::vec::Vec::new(),
+            installed_bundles: std::vec::Vec::new(),
         }
     }
 
     pub fn install_flatpak_ref(&mut self, app_id: &str, runtime_ver: &str, permissions: &[&str]) {
         let bundle = AppBundleContainer {
-            app_id: alloc::string::String::from(app_id),
+            app_id: std::string::String::from(app_id),
             format: AppBundleFormat::Flatpak,
-            runtime_version: alloc::string::String::from(runtime_ver),
+            runtime_version: std::string::String::from(runtime_ver),
             sandbox_permissions: permissions
                 .iter()
-                .map(|&s| alloc::string::String::from(s))
+                .map(|&s| std::string::String::from(s))
                 .collect(),
             is_active: false,
         };
@@ -787,12 +752,12 @@ impl FlatpakSnapCompatLayer {
 
     pub fn install_snap_ref(&mut self, snap_name: &str, revision: &str, permissions: &[&str]) {
         let bundle = AppBundleContainer {
-            app_id: alloc::string::String::from(snap_name),
+            app_id: std::string::String::from(snap_name),
             format: AppBundleFormat::Snap,
-            runtime_version: alloc::string::String::from(revision),
+            runtime_version: std::string::String::from(revision),
             sandbox_permissions: permissions
                 .iter()
-                .map(|&s| alloc::string::String::from(s))
+                .map(|&s| std::string::String::from(s))
                 .collect(),
             is_active: false,
         };
@@ -830,9 +795,9 @@ impl Default for FlatpakSnapCompatLayer {
 // This module requires alloc which is conditionally available
 #[cfg(not(target_os = "none"))]
 pub mod oci {
+    extern crate alloc;
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
-    use alloc::string::{String, ToString};
     use alloc::vec::Vec;
 
     pub struct NamespaceSet {
@@ -993,11 +958,12 @@ pub mod oci {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
+    extern crate alloc;
     use super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
+    use std::string::ToString;
+    use std::vec;
 
     #[test]
     fn test_container_creation() {

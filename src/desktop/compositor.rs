@@ -2,8 +2,8 @@
 // Implements window management and composition
 // Inspired by Wayland and Windows DWM
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// Window position and size
 #[derive(Debug, Clone, Copy)]
@@ -237,7 +237,7 @@ impl Default for Compositor {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

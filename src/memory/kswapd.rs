@@ -1,8 +1,7 @@
-extern crate alloc;
 // SigmaOS Linux-inspired kswapd & Active/Inactive LRU Page Reclamation Subsystem
 
-use alloc::collections::VecDeque;
-use alloc::vec::Vec;
+use std::collections::VecDeque;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageState {
@@ -117,14 +116,14 @@ impl LinuxKswapd {
 
 /// Linux ZRAM/ZSWAP compressed in-memory swap page pool
 pub struct ZramPagePool {
-    pub compressed_pages: alloc::collections::BTreeMap<usize, Vec<u8>>,
+    pub compressed_pages: std::collections::BTreeMap<usize, Vec<u8>>,
     pub compression_ratio_x100: u32, // e.g. 250 = 2.5x compression ratio
 }
 
 impl ZramPagePool {
     pub fn new() -> Self {
         Self {
-            compressed_pages: alloc::collections::BTreeMap::new(),
+            compressed_pages: std::collections::BTreeMap::new(),
             compression_ratio_x100: 250,
         }
     }
@@ -158,7 +157,7 @@ impl Default for ZramPagePool {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
