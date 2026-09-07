@@ -446,3 +446,8 @@ mod tests {
         assert_eq!(boot_count, 2);
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct FsSnapshot;
+
+pub static GLOBAL_TIMESHIFT: Option<SigmaTimeshift> = None;

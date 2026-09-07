@@ -459,3 +459,24 @@ impl<'a, T> IntoIterator for &'a mut UefiVec<T> {
         self.deref_mut().iter_mut()
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct AcpiParser;
+
+#[derive(Debug, Clone)]
+pub struct GopFramebuffer;
+
+#[derive(Debug, Clone)]
+pub struct GopSplashCanvas;
+
+#[derive(Debug, Clone)]
+pub struct MicrokernelProfile;
+
+#[derive(Debug, Clone)]
+pub struct MultiKernelBootSelector;
+
+#[derive(Debug, Clone)]
+pub struct SovereignBootWatchdog;
+
+#[derive(Debug, Clone)]
+pub struct UsbHostController;

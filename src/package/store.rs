@@ -110,3 +110,11 @@ mod tests {
         assert_eq!(update_count, 1);
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct SoftwareRegistryEntry {
+    pub name: String,
+    pub size: usize,
+}
+
+pub static GLOBAL_SOFTWARE_STORE: Option<SigmaSoftwareStore> = None;

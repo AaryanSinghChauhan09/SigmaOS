@@ -264,6 +264,24 @@ impl Package {
     }
 }
 
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
+}
+
 /// Package dependency
 #[derive(Debug, Clone)]
 pub struct Dependency {
@@ -307,3 +325,26 @@ mod tests {
         assert!(v1 < v2);
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct PackageDependencyResolver;
+
+pub const MAX_RECIPE_DEPENDENCIES: usize = 16;
+
+#[derive(Debug, Clone)]
+pub struct PackageFormatAdapter;
+
+#[derive(Debug, Clone)]
+pub struct UniversalPackageManager;
+
+#[derive(Debug, Clone)]
+pub struct AdapterError;
+
+#[derive(Debug, Clone)]
+pub struct DebAdapter;
+
+#[derive(Debug, Clone)]
+pub struct RpmAdapter;
+
+#[derive(Debug, Clone)]
+pub struct PacmanAdapter;

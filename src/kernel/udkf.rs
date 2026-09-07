@@ -20,13 +20,13 @@ pub enum UdkfHook {
     FsCachePreload,
 }
 
-pub struct UserDefinedKernelFunctions {
+pub struct UdkfScriptingEngine {
     pub registered_scripts: Vec<(UdkfHook, String)>,
 }
 
-impl UserDefinedKernelFunctions {
+impl UdkfScriptingEngine {
     pub fn new() -> Self {
-        UserDefinedKernelFunctions {
+        UdkfScriptingEngine {
             registered_scripts: Vec::new(),
         }
     }

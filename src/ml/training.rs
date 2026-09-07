@@ -198,7 +198,7 @@ impl Trainer for SimpleTrainer {
     }
 
     fn get_session(&self, id: TrainingID) -> Option<&dyn TrainingSession> {
-        for session_option in &self.sessions {
+        for session_option in self.sessions.iter() {
             if let Some(ref session) = *session_option {
                 if session.id() == id {
                     return Some(session);
@@ -504,6 +504,27 @@ pub struct Vec<T> {
     pub data: *mut T,
     pub len: usize,
     pub capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
 }
 
 impl<T> Vec<T> {
