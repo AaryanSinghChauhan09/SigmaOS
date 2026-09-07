@@ -15,7 +15,6 @@
 use std::vec;
 
 use std::boxed::Box;
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 use std::format;
 use std::string::{String, ToString};
@@ -28,7 +27,7 @@ use std::vec::Vec;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(all(test, not(feature = "standalone_test")))]
+#[cfg(test)]
 pub use crate::sigpkg::Version;
 
 

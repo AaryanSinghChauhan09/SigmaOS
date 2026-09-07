@@ -61,6 +61,29 @@ export function setSecureTextContent(element, text) {
 }
 
 /**
+ * Safe object deep merge that prevents prototype pollution vulnerabilities.
+ * Explicitly rejects `__proto__`, `constructor`, and `prototype` keys.
+ */
+export function safeDeepMerge(target, source) {
+  if (!source || typeof source !== "object" || Array.isArray(source)) {
+    return source;
+  }
+  target = target && typeof target === "object" && !Array.isArray(target) ? target : {};
+  for (const key of Object.keys(source)) {
+    if (key === "__proto__" || key === "constructor" || key === "prototype") {
+      continue;
+    }
+    const val = source[key];
+    if (val && typeof val === "object" && !Array.isArray(val)) {
+      target[key] = safeDeepMerge(target[key], val);
+    } else {
+      target[key] = val;
+    }
+  }
+  return target;
+}
+
+/**
  * Initializes listeners for system high-contrast accessibility mode (WCAG 2.1 Level AA).
  * Responds to prefers-contrast: high and forced-colors: active media queries.
  */

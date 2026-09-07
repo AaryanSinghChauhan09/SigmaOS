@@ -12,13 +12,6 @@ pub enum OomPolicy {
     PanicSystem,          // Trigger system panic
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OomPolicy {
-    KillHeuristicProcess, // Kill process with largest memory footprint
-    KillYoungest,         // Kill process with highest PID
-    PanicSystem,          // Trigger system panic
-}
-
 #[derive(Debug, Clone)]
 pub struct MemCgroup {
     pub id: usize,

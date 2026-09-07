@@ -1,46 +1,27 @@
-# HTML Language Dependency Reduction Architecture in SigmaOS
+# SigmaOS HTML Programming Language Dependency Reduction Plan
 
-## Architecture Blueprint
+## 1. Executive Overview
+SigmaOS aims to minimize dependency on web-based HTML/CSS DOM interfaces by migrating userland desktop components, control panels, installer interfaces, and system monitors to high-performance, native Rust Wayland compositors (`Zenith`), GTK/Qt desktop engines (`CinnamonThemeEngine`, `Gnome46MutterEngine`, `KdePlasma6Engine`), GTK Plymouth bootsplash engines (`GtkPlymouthBootsplashEngine`), and zero-dependency terminal TUIs (`src/shell/zsh_bash_parity.rs`).
 
-```
-+---------------------------------------------------------------------------------+
-|                       SigmaOS Zenith Wayland Compositor                         |
-|     (GPU-Accelerated DRM/KMS Framebuffer, Vulkan / OpenGL ES Surface Render)    |
-+---------------------------------------------------------------------------------+
-                                        |
-                                        v
-+---------------------------------------------------------------------------------+
-|               Native GTK / Qt / Cinnamon Desktop Environment Engine             |
-|       (CinnamonThemeEngine, Gnome46MutterEngine, KdePlasma6Engine, Xfce418)     |
-+---------------------------------------------------------------------------------+
-                                        |
-       +--------------------------------+--------------------------------+
-       |                                |                                |
-       v                                v                                v
-+-----------------------+   +-----------------------+   +-----------------------+
-| Plymouth GTK Bootsplash|  | Zero-Alloc Terminal TUI|  | Native Desktop Portals|
-| (GtkPlymouthBootsplash|   | (ANSI Powerline REPL) |   | (Capability-Gated IPC)|
-+-----------------------+   +-----------------------+   +-----------------------+
-       |                                |                                |
-       +--------------------------------+--------------------------------+
-                                        |
-                                        v
-+---------------------------------------------------------------------------------+
-|                         SigmaOS Kernel & VFS Drivers                            |
-|             (Pure Rust Kernel, Zero-Dependency klib, Multi-Arch HAL)            |
-+---------------------------------------------------------------------------------+
-```
+## 2. HTML Dependency Assessment
+An assessment of HTML files reveals legacy web frontend stubs in:
+- `./web_ui/index.html`
+- `./index.html`
 
-## Architectural Components
+While HTML/CSS DOM interfaces provided lightweight web browser prototypes during initial phases, relying on HTML web views introduces browser engine memory overhead (Electron/Chromium bloat), DOM text XSS security risks, and slow rendering performance compared to direct GPU-accelerated DRM/KMS Wayland surface rendering.
 
-1. **Zenith Wayland Compositor**:
-   - Replaces HTML web views with direct GPU-accelerated Wayland surface rendering on DRM/KMS framebuffers.
+## 3. Native Rust UI Substitution Roadmap
 
-2. **Native GTK, Cinnamon & Desktop Engines**:
-   - Native GTK and Cinnamon theme engines replace HTML control panels and web settings dashboards.
+### Phase 1: Native Wayland & DRM/KMS Display Compositing (`Zenith`)
+- **Zenith Wayland Compositor**: Replaces browser-based HTML windows with native Wayland surface compositing (`Zenith`) rendered directly to Direct Rendering Manager (DRM) / Kernel Mode Setting (KMS) framebuffers.
+- **Hardware Acceleration**: Executes hardware-accelerated Vulkan and OpenGL ES rendering pipelines without HTML DOM parsing overhead.
 
-3. **ANSI Terminal TUI Engine**:
-   - High-performance, zero-dependency ANSI terminal TUI buffers (`src/shell/zsh_bash_parity.rs`) replace web-based admin dashboards.
+### Phase 2: Native GTK, Cinnamon & Desktop Environment Engines
+- **Native GTK & Cinnamon Themes**: Replaces HTML control panels with native `CinnamonThemeEngine` (`src/compatibility/mint_linux.rs`), `Gnome46MutterEngine`, and `KdePlasma6Engine` (`src/desktop/ultimate_distro_desktop.rs`).
+- **Plymouth GTK Bootsplash**: `GtkPlymouthBootsplashEngine` (`src/boot/plymouth.rs`) renders native boot animations and LUKS password prompts directly to framebuffer consoles without HTML web rendering.
 
-4. **Wiki Syncing**:
-   This document is mirrored in `./wiki/` and `./wiki_repo/` for GitHub Wiki access.
+### Phase 3: Zero-Dependency Terminal TUIs
+- **Rich Terminal TUIs**: Shell REPL interfaces and system monitors (`btop`, `fastfetch`, `lscpu`, `journalctl`, `nvmeinfo`) render via zero-dependency ANSI terminal TUI buffers (`src/shell/zsh_bash_parity.rs`), eliminating the need for web-based admin dashboards.
+
+---
+*Maintained by the SigmaOS Desktop, UI & Zero-Dependency Steering Committee.*

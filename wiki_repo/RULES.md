@@ -5,7 +5,7 @@ This document establishes the fundamental architectural, security, and contribut
 ---
 
 ## 1. Bare-Metal Zero-Dependency Rule (Linux & BSD Kernel Parity)
-- **Principle:** Core kernel modules, memory allocators, drivers, and fundamental userland tools must be written in bare-metal, zero-dependency Rust or C++ without relying on heavy external third-party libraries or standard dynamic C runtimes (`glibc`/`musl`).
+- **Principle:** Core kernel modules, memory allocators, drivers, and fundamental userland tools must be written in bare-metal, zero-dependency, memory-safe Rust without relying on heavy external third-party libraries, legacy C++ codebases, or standard dynamic C runtimes (`glibc`/`musl`).
 - **Enforcement:** Crate root `#![no_std]` compliance; isolated `klib` collections.
 
 ---

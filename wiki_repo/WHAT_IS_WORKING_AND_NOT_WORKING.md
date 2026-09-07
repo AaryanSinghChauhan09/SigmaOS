@@ -20,7 +20,7 @@ The table below catalogs all operational subsystems across the **Twelve Sovereig
 
 | System Shard | Subsystem Engine | Status | Verified Functionality & Test Coverage |
 | :--- | :--- | :--- | :--- |
-| **S-SHARD 01** | Kernel & Core Schedulers | **WORKING (100%)** | Multi-Arch HAL (`X86_32Hal`, `X86_64Hal`, `AArch64Hal`, `RiscV32Hal`, `RiscV64Hal`), EEVDF/BORE hybrid CPU scheduler (`InteractiveHybridScheduler`), Banker's deadlock avoidance, `sys_futex` mutex queue (`LinuxFutexEngine`), eBPF XDP fast packet filter, RetGuard stack canary verification. |
+| **S-SHARD 01** | Kernel & Core Schedulers | **WORKING (100%)** | EEVDF/BORE hybrid CPU scheduler (`InteractiveHybridScheduler`), Banker's deadlock avoidance, `sys_futex` mutex queue (`LinuxFutexEngine`), eBPF XDP fast packet filter, RetGuard stack canary verification. |
 | **S-SHARD 02** | Universal Package Manager | **WORKING (100%)** | `UniversalPackageManager` supporting 18 distro package formats (`.deb`, `.rpm`, `.apk`, `PKGBUILD`, `.ebuild`, `.nix`, `.xbps`, `.eopkg`, `.txz`, `.hpkg`, Flatpak, Snap, AppImage). |
 | **S-SHARD 03** | AI & Agentic OS Runtime | **WORKING (100%)** | `S-AI` engine, Local LLM inference (`LocalLlmWrapper`), Agentic OS sandbox, Quantization engines, Compute scheduler, OpenClaw, AutoGen conversable agents. |
 | **S-SHARD 04** | Zenith Compositor & Display | **WORKING (100%)** | Wayland Layer-Shell compositor (`SteamOsGamescopeCompositorEngine`), DRM/KMS atomic plane rendering, Evdev multi-touch slots, transparent desklets. |
