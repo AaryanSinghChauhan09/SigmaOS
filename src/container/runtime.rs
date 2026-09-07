@@ -21,15 +21,6 @@ pub enum ContainerState {
     Failed = 4,
 }
 
-/// Container capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
 
 impl ContainerCapability {
     pub const fn new() -> Self {
@@ -199,24 +190,6 @@ impl NamespaceConfig {
     }
 }
 
-
-impl SeccompProfile {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if self.blocked_syscalls.contains(&syscall_id) {
-            return true;
-        }
-        if self.hardened && syscall_id < 32 {
-            return (self.blocked_syscalls_mask & (1 << syscall_id)) != 0;
-        }
-        false
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfileV2 {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SeccompAction {

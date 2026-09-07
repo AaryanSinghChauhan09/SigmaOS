@@ -89,14 +89,10 @@ pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
 pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
-    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
-    FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
-    ZypperSpecManifest, SlackwarePkgManifest,
-    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
-    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
-    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
-    DispatchedPmAction, UniversalPmCommandDispatcher, UniversalPmOperation,
+    PackageFormatAdapter, UniversalPackageManager, AdapterError,
+};
+pub use universal_oop_system::{
+    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
 };
 pub use sovereign_sigpkg::*;
 

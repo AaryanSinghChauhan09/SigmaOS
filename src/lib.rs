@@ -363,10 +363,37 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub mod docs;
-pub mod graphics;
-pub mod net;
-pub use net::{
-    FreeBsdNetgraphGraphRouter, LinuxBbrCongestionEngine, OpenBsdPfCarpPfsyncStateEngine,
-    WireguardPqcTunnelEngine, XdpZeroCopyPacketRingEngine,
+pub mod init {
+    pub mod systemd_init;
+}
+pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
+
+pub use ai::next_gen::{
+    AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType, EnergyGovernorMode, ModelType,
+    MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
 };
+pub use ai::wandr::{
+    ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
+};
+
+pub use community::toolkit::{
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, HybridFirewallTemplateStore,
+    PackageRecipe as CommunityPackageRecipe, RecipeSourceFormat, ReproduciblePackageRecipeManager,
+    SecurityModelType, SecurityProfileTemplateStore, SecurityTemplate,
+    VirtualizationBlueprintStore,
+};
+
+pub use tools::{
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
+    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
+    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
+    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
+    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
+    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    UserIdentity as LibUserIdentity,
+};
+
+pub mod open_source_obsoletion;
+pub use open_source_obsoletion::*;
+
+pub use unimplemented_features::*;

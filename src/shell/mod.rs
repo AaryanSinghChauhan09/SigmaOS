@@ -27,9 +27,6 @@ pub use command::{
     CommandError, CommandParser, CommandRegistry, ShellCommand, ShellSession,
     SimpleCommandRegistry, SimpleShellSession,
 };
-pub use sovereign_shell_parity::{
-    ParsedPipelineCommand, RedirectionType, SovereignBashZshParityShell,
-};
 pub use terminal_emulator::{
     TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor,
     BsdConsoleColorPalette, BsdConsoleTheme,
