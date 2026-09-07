@@ -289,7 +289,7 @@ impl UniversalPackageAdapter {
         text: &str,
     ) -> Result<GentooEbuildMetadata, &'static str> {
         let mut category = String::from("app-misc");
-        let mut package_name = String::new();
+        let mut package_name;
         let mut version = String::from("1.0.0");
         let mut rdepend = Vec::new();
         let mut depend = Vec::new();
