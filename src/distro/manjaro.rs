@@ -20,8 +20,11 @@ use std::vec::Vec;
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-#[cfg(not(test))]
+#[cfg(all(not(test), not(target_os = "none")))]
 use crate::klib::HashMap;
+
+#[cfg(all(not(test), target_os = "none"))]
+use crate::klib::BTreeMap as HashMap;
 
 #[cfg(test)]
 use std::collections::HashMap;
