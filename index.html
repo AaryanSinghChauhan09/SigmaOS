@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Σ SigmaOS Zenith | Sovereign Lattice Desktop</title>
     <meta name="description" content="SigmaOS Zenith v15.0 - Glassmorphic high-performance sovereign operating system interface.">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="zenith_desktop.css">
 </head>
 <body>
@@ -23,7 +22,7 @@
             <div class="vital-item">CPU: <span id="telemetry-cpu">0%</span></div>
             <div class="vital-item">MEM: <span id="telemetry-mem">0.0 GB</span></div>
             <div class="vital-item">FPS: <span id="telemetry-fps">60.0ms</span></div>
-            <div class="vital-item">Silicon Attestation: <span class="auto-style-0">Kyber-1024</span></div>
+            <div class="vital-item">Silicon Attestation: <span class="">Kyber-1024</span></div>
         </div>
         <div class="top-bar-right">
             <span id="clock-date">Sunday, May 17</span>
@@ -32,10 +31,10 @@
     </header>
 
     <!-- Draggable Premium Windows -->
-    <div class="desktop-area auto-style-1">
+    <div class="desktop-area">
         
         <!-- App: OmniShell Terminal -->
-        <div class="window auto-style-2" id="terminal-win">
+        <div class="window" id="terminal-win">
             <div class="window-header">
                 <div class="window-title">💻 <span>OmniShell v5.1</span></div>
                 <div class="window-controls">
@@ -44,7 +43,7 @@
                     <button type="button" class="control-dot close" onclick="closeWindow('terminal-win')" aria-label="Close OmniShell Terminal" title="Close OmniShell Terminal"></button>
                 </div>
             </div>
-            <div class="window-body auto-style-3">
+            <div class="window-body">
                 <div class="terminal-container">
                     <div class="terminal-output" id="terminal-output"></div>
                     <div class="terminal-input-line">
@@ -56,7 +55,7 @@
         </div>
 
         <!-- App: File Manager -->
-        <div class="window auto-style-4" id="file-manager-win">
+        <div class="window" id="file-manager-win">
             <div class="window-header">
                 <div class="window-title">📂 <span>Sovereign VFS Browser</span></div>
                 <div class="window-controls">
@@ -77,7 +76,7 @@
         </div>
 
         <!-- App: Observability & Core Vitals -->
-        <div class="window auto-style-5" id="browser-win">
+        <div class="window" id="browser-win">
             <div class="window-header">
                 <div class="window-title">📊 <span>Observability Matrix</span></div>
                 <div class="window-controls">
@@ -86,20 +85,20 @@
                     <button type="button" class="control-dot close" onclick="closeWindow('browser-win')" aria-label="Close Observability Matrix" title="Close Observability Matrix"></button>
                 </div>
             </div>
-            <div class="window-body auto-style-6">
-                <h3 class="auto-style-7">Σ Sovereign Observer</h3>
+            <div class="window-body">
+                <h3 class="">Σ Sovereign Observer</h3>
                 <sigma-monitor></sigma-monitor>
-                <div class="auto-style-8">
+                <div class="">
                     <sigma-pool-inspector></sigma-pool-inspector>
                 </div>
-                <div class="auto-style-9">
+                <div class="">
                     <sigma-logs max-entries="50"></sigma-logs>
                 </div>
             </div>
         </div>
 
         <!-- App: AI Research Assistant -->
-        <div class="window auto-style-10" id="ai-assistant-win">
+        <div class="window" id="ai-assistant-win">
             <div class="window-header">
                 <div class="window-title">🧠 <span>Lattice Neural Core</span></div>
                 <div class="window-controls">
@@ -108,20 +107,20 @@
                     <button type="button" class="control-dot close" onclick="closeWindow('ai-assistant-win')" aria-label="Close Lattice Neural Core" title="Close Lattice Neural Core"></button>
                 </div>
             </div>
-            <div class="window-body auto-style-11">
-                <div class="auto-style-12">
-                    <h4 class="auto-style-13">Edge ML Failure Model</h4>
-                    <p class="auto-style-14">Predictive attestation running continuously inside Ring-0.</p>
+            <div class="window-body">
+                <div class="">
+                    <h4 class="">Edge ML Failure Model</h4>
+                    <p class="">Predictive attestation running continuously inside Ring-0.</p>
                 </div>
                 <sigma-ai-dispatch></sigma-ai-dispatch>
-                <div class="auto-style-15">
+                <div class="">
                     <sigma-neural-demo></sigma-neural-demo>
                 </div>
             </div>
         </div>
 
         <!-- App: Lattice Settings -->
-        <div class="window auto-style-16" id="lattice-settings-win">
+        <div class="window" id="lattice-settings-win">
             <div class="window-header">
                 <div class="window-title">⚙️ <span>Lattice System Settings</span></div>
                 <div class="window-controls">
@@ -180,7 +179,7 @@
         </div>
 
         <!-- App: Utility Nexus (Statutory Calculators) -->
-        <div class="window auto-style-17" id="utility-nexus-win">
+        <div class="window" id="utility-nexus-win">
             <div class="window-header">
                 <div class="window-title">🔧 <span>Sovereign Pro Calculators</span></div>
                 <div class="window-controls">
@@ -189,29 +188,29 @@
                     <button type="button" class="control-dot close" onclick="closeWindow('utility-nexus-win')" aria-label="Close Sovereign Pro Calculators" title="Close Sovereign Pro Calculators"></button>
                 </div>
             </div>
-            <div class="window-body auto-style-18">
+            <div class="window-body">
                 <div class="settings-content">
                     <div class="settings-group">
-                        <h4 class="auto-style-19">Zero-Loss paise GST Calculator</h4>
-                        <div class="auto-style-20">
-                            <input class="cmd-input auto-style-21" type="number" id="gst-amount" placeholder="Amount (in paise)" aria-label="GST amount in paise">
-                            <input class="cmd-input auto-style-22" type="number" id="gst-rate" placeholder="GST Rate %" aria-label="GST rate percentage">
+                        <h4 class="">Zero-Loss paise GST Calculator</h4>
+                        <div class="">
+                            <input class="cmd-input" type="number" id="gst-amount" placeholder="Amount (in paise)" aria-label="GST amount in paise">
+                            <input class="cmd-input" type="number" id="gst-rate" placeholder="GST Rate %" aria-label="GST rate percentage">
                         </div>
-                        <button type="button" class="wizard-btn auto-style-23" onclick="calculateGST()" aria-label="Compute GST calculation">COMPUTE GST</button>
-                        <div class="auto-style-24" id="gst-result">> Result: Ready</div>
+                        <button type="button" class="wizard-btn" onclick="calculateGST()" aria-label="Compute GST calculation">COMPUTE GST</button>
+                        <div class="" id="gst-result">> Result: Ready</div>
                     </div>
                     <div class="settings-group">
-                        <h4 class="auto-style-25">BNS Legal Complier</h4>
-                        <input class="cmd-input auto-style-26" type="text" id="legal-query" placeholder="Search BNS section..." aria-label="Search BNS legal section">
-                        <button type="button" class="wizard-btn auto-style-27" onclick="checkLegalCompliance()" aria-label="Map legal compliance section">MAP COMPLIANCE</button>
-                        <div class="auto-style-28" id="legal-result">> Mapping Status: Active</div>
+                        <h4 class="">BNS Legal Complier</h4>
+                        <input class="cmd-input" type="text" id="legal-query" placeholder="Search BNS section..." aria-label="Search BNS legal section">
+                        <button type="button" class="wizard-btn" onclick="checkLegalCompliance()" aria-label="Map legal compliance section">MAP COMPLIANCE</button>
+                        <div class="" id="legal-result">> Mapping Status: Active</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- App: Sovereign App Store (Marketplace) -->
-        <div class="window auto-style-29" id="sigma-market-win">
+        <div class="window" id="sigma-market-win">
             <div class="window-header">
                 <div class="window-title">🛒 <span>Lattice Shard Marketplace</span></div>
                 <div class="window-controls">
@@ -220,89 +219,89 @@
                     <button type="button" class="control-dot close" onclick="closeWindow('sigma-market-win')" aria-label="Close Lattice Shard Marketplace" title="Close Lattice Shard Marketplace"></button>
                 </div>
             </div>
-            <div class="window-body auto-style-30">
-                <div class="auto-style-31" style="display: flex; gap: 10px; margin-bottom: 12px;" role="tablist" aria-label="Marketplace Navigation Tabs">
+            <div class="window-body">
+                <div class="" style="display: flex; gap: 10px; margin-bottom: 12px;" role="tablist" aria-label="Marketplace Navigation Tabs">
                     <button type="button" role="tab" id="tab-market-core" aria-selected="true" aria-controls="market-core-shards" class="fm-btn active" onclick="switchMarketTab('core-shards')">Core Shards</button>
                     <button type="button" role="tab" id="tab-market-foss" aria-selected="false" aria-controls="market-foss-apps" class="fm-btn" onclick="switchMarketTab('foss-apps')">FOSS Lattice</button>
                     <button type="button" role="tab" id="tab-market-archweb" aria-selected="false" aria-controls="market-archweb-hub" class="fm-btn" onclick="switchMarketTab('archweb-hub')">ArchWeb Package DB</button>
                 </div>
                 
                 <div id="market-core-shards" role="tabpanel" aria-labelledby="tab-market-core">
-                    <h3 class="auto-style-32">Attested Core Shards</h3>
-                    <div class="shard-grid auto-style-33" id="shardContainer">
+                    <h3 class="">Attested Core Shards</h3>
+                    <div class="shard-grid" id="shardContainer">
                         <!-- Dynamically populated from kernel_loader.js -->
                     </div>
                 </div>
 
-                <div id="market-foss-apps" class="auto-style-34" role="tabpanel" aria-labelledby="tab-market-foss" style="display: none;">
-                    <h3 class="auto-style-35">FOSS Lattice Packages</h3>
-                    <p class="auto-style-36">Inject verified open-source environments directly into your running shard.</p>
+                <div id="market-foss-apps" class="" role="tabpanel" aria-labelledby="tab-market-foss" style="display: none;">
+                    <h3 class="">FOSS Lattice Packages</h3>
+                    <p class="">Inject verified open-source environments directly into your running shard.</p>
                     
-                    <div class="auto-style-37">
+                    <div class="">
                         <!-- AI & Machine Learning Category -->
                         <div class="settings-group">
-                            <h4 class="auto-style-38">🧠 AI & Large Language Models</h4>
-                            <div class="auto-style-39">
-                                <div class="auto-style-40">
+                            <h4 class="">🧠 AI & Large Language Models</h4>
+                            <div class="">
+                                <div class="">
                                     <strong>DeepSeek / Gemma / Qwen</strong><br>
-                                    <span class="auto-style-41">LLM Inference Engines</span><br>
-                                    <button type="button" class="fm-btn auto-style-42" aria-label="Inject DeepSeek LLM Inference Engine" onclick="injectFOSS('DeepSeek-LLM')">INJECT ENGINE</button>
+                                    <span class="">LLM Inference Engines</span><br>
+                                    <button type="button" class="fm-btn" aria-label="Inject DeepSeek LLM Inference Engine" onclick="injectFOSS('DeepSeek-LLM')">INJECT ENGINE</button>
                                 </div>
-                                <div class="auto-style-43">
+                                <div class="">
                                     <strong>eSpeak & eSpeak NG</strong><br>
-                                    <span class="auto-style-44">Speech Synthesis & Speech Recognition</span><br>
-                                    <button type="button" class="fm-btn auto-style-45" aria-label="Inject eSpeak Speech Synthesis Shard" onclick="injectFOSS('eSpeak-Speech')">INJECT SHARD</button>
+                                    <span class="">Speech Synthesis & Speech Recognition</span><br>
+                                    <button type="button" class="fm-btn" aria-label="Inject eSpeak Speech Synthesis Shard" onclick="injectFOSS('eSpeak-Speech')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- CAD & EDA Simulation Category -->
                         <div class="settings-group">
-                            <h4 class="auto-style-46">🔌 CAD, CAE & EDA Simulation</h4>
-                            <div class="auto-style-47">
-                                <div class="auto-style-48">
+                            <h4 class="">🔌 CAD, CAE & EDA Simulation</h4>
+                            <div class="">
+                                <div class="">
                                     <strong>KiCad & Fritzing</strong><br>
-                                    <span class="auto-style-49">EDA Electronic Design Simulation</span><br>
-                                    <button type="button" class="fm-btn auto-style-50" aria-label="Inject KiCad EDA Workspace" onclick="injectFOSS('KiCad-EDA')">INJECT WORKSPACE</button>
+                                    <span class="">EDA Electronic Design Simulation</span><br>
+                                    <button type="button" class="fm-btn" aria-label="Inject KiCad EDA Workspace" onclick="injectFOSS('KiCad-EDA')">INJECT WORKSPACE</button>
                                 </div>
-                                <div class="auto-style-51">
+                                <div class="">
                                     <strong>FreeCAD & OpenSCAD</strong><br>
-                                    <span class="auto-style-52">3D Mechanical Design Models</span><br>
-                                    <button type="button" class="fm-btn auto-style-53" aria-label="Inject FreeCAD 3D Design Workspace" onclick="injectFOSS('FreeCAD-3D')">INJECT WORKSPACE</button>
+                                    <span class="">3D Mechanical Design Models</span><br>
+                                    <button type="button" class="fm-btn" aria-label="Inject FreeCAD 3D Design Workspace" onclick="injectFOSS('FreeCAD-3D')">INJECT WORKSPACE</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Forensics & Security Audit Category -->
                         <div class="settings-group">
-                            <h4 class="auto-style-54">🔐 Security & Hardened Forensics</h4>
-                            <div class="auto-style-55">
-                                <div class="auto-style-56">
+                            <h4 class="">🔐 Security & Hardened Forensics</h4>
+                            <div class="">
+                                <div class="">
                                     <strong>Kali Arsenal (Nmap / Ghidra / Volatility)</strong><br>
-                                    <span class="auto-style-57">Security Audit Core Vitals</span><br>
-                                    <button type="button" class="fm-btn auto-style-58" aria-label="Inject Kali Arsenal Security Tools" onclick="injectFOSS('Kali-Arsenal')">INJECT SECURITY</button>
+                                    <span class="">Security Audit Core Vitals</span><br>
+                                    <button type="button" class="fm-btn" aria-label="Inject Kali Arsenal Security Tools" onclick="injectFOSS('Kali-Arsenal')">INJECT SECURITY</button>
                                 </div>
-                                <div class="auto-style-59">
+                                <div class="">
                                     <strong>RescueZilla Recovery Hub</strong><br>
-                                    <span class="auto-style-60">Declarative Snapshot Rollbacks</span><br>
-                                    <button type="button" class="fm-btn auto-style-61" aria-label="Inject RescueZilla Recovery Shard" onclick="injectFOSS('RescueZilla-Core')">INJECT SHARD</button>
+                                    <span class="">Declarative Snapshot Rollbacks</span><br>
+                                    <button type="button" class="fm-btn" aria-label="Inject RescueZilla Recovery Shard" onclick="injectFOSS('RescueZilla-Core')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Data & Mathematics Category -->
                         <div class="settings-group">
-                            <h4 class="auto-style-62">🧮 Mathematics, GIS & Science</h4>
-                            <div class="auto-style-63">
-                                <div class="auto-style-64">
+                            <h4 class="">🧮 Mathematics, GIS & Science</h4>
+                            <div class="">
+                                <div class="">
                                     <strong>SageMath / Octave / GeoGebra</strong><br>
-                                    <span class="auto-style-65">Numerical Science & Calculus Libraries</span><br>
-                                    <button type="button" class="fm-btn auto-style-66" aria-label="Inject SageMath Calculus Toolkit" onclick="injectFOSS('SageMath-Calculus')">INJECT TOOLKIT</button>
+                                    <span class="">Numerical Science & Calculus Libraries</span><br>
+                                    <button type="button" class="fm-btn" aria-label="Inject SageMath Calculus Toolkit" onclick="injectFOSS('SageMath-Calculus')">INJECT TOOLKIT</button>
                                 </div>
-                                <div class="auto-style-67">
+                                <div class="">
                                     <strong>QGIS & OpenStreetMap</strong><br>
-                                    <span class="auto-style-68">Geographical Information Systems</span><br>
-                                    <button type="button" class="fm-btn auto-style-69" aria-label="Inject QGIS Geographical System Shard" onclick="injectFOSS('QGIS-GIS')">INJECT SHARD</button>
+                                    <span class="">Geographical Information Systems</span><br>
+                                    <button type="button" class="fm-btn" aria-label="Inject QGIS Geographical System Shard" onclick="injectFOSS('QGIS-GIS')">INJECT SHARD</button>
                                 </div>
                             </div>
                         </div>
@@ -311,9 +310,9 @@
                 </div>
 
                 <!-- ArchWeb / BSD Ports Universal Package Hub -->
-                <div id="market-archweb-hub" class="auto-style-34" role="tabpanel" aria-labelledby="tab-market-archweb" style="display: none;">
-                    <h3 class="auto-style-35">ArchWeb & BSD Ports Universal Package Database</h3>
-                    <p class="auto-style-36">Search official binary packages, AUR PKGBUILDs, and FreeBSD ports with Kyber-1024 mirror attestation.</p>
+                <div id="market-archweb-hub" class="" role="tabpanel" aria-labelledby="tab-market-archweb" style="display: none;">
+                    <h3 class="">ArchWeb & BSD Ports Universal Package Database</h3>
+                    <p class="">Search official binary packages, AUR PKGBUILDs, and FreeBSD ports with Kyber-1024 mirror attestation.</p>
                     <div class="settings-group" style="margin-top: 10px;">
                         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
                             <input type="text" id="archweb-search" class="cmd-input" placeholder="Search packages (e.g. linux-zen, hyprland, zfs, gcc)..." aria-label="Search ArchWeb & BSD Ports package database">
@@ -330,7 +329,7 @@
         </div>
 
         <!-- App: Markup Forge -->
-        <div class="window auto-style-70" id="markup-forge-win">
+        <div class="window" id="markup-forge-win">
             <div class="window-header">
                 <div class="window-title">📥 <span>Zenith System Installer</span></div>
                 <div class="window-controls">
@@ -530,7 +529,7 @@
     </div>
 
     <!-- Floating System Log Feed -->
-    <div id="kernel-logs" class="auto-style-73"></div>
+    <div id="kernel-logs" class=""></div>
 
     <!-- Bottom Dock -->
     <nav class="dock-container" aria-label="Desktop Dock" role="toolbar">
@@ -545,7 +544,7 @@
         <button type="button" class="dock-icon" aria-label="Launch Developer Portal" data-tooltip="Developer Portal" onclick="launchApp('Dev Portal')">📖</button>
         <button type="button" class="dock-icon" aria-label="Launch Kernel Emulator" data-tooltip="Kernel Emulator" onclick="launchApp('Emulator')">💿</button>
         <button type="button" class="dock-icon" aria-label="Launch Build Analytics" data-tooltip="Build Analytics" onclick="launchApp('Analytics')">📈</button>
-        <div class="auto-style-74" role="separator"></div>
+        <div class="" role="separator"></div>
         <button type="button" class="dock-icon" aria-label="Open Help Matrix" data-tooltip="Help Matrix" onclick="toggleHelp()">❓</button>
     </nav>
 
@@ -554,7 +553,7 @@
         <div class="context-item" onclick="contextAction('refresh')">🔄 Force Refresh</div>
         <div class="context-item" onclick="contextAction('cleanup')">🧹 Purge Caches</div>
         <div class="context-item" onclick="contextAction('audit')">🛡️ Attest System</div>
-        <div class="auto-style-75"></div>
+        <div class=""></div>
         <div class="context-item" onclick="toggleHelp()">❓ Help Matrix</div>
     </div>
 
