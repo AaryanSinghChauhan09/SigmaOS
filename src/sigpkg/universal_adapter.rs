@@ -9,6 +9,7 @@ use alloc::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -31,6 +32,7 @@ pub struct SnapcraftManifest {
     pub grade: String,
     pub apps: Vec<String>,
     pub plugs: Vec<String>,
+}
 /// Description of Flatpak Manifest (flatpak parity)
 pub struct FlatpakManifest {
     pub id: String,
@@ -39,21 +41,13 @@ pub struct FlatpakManifest {
     pub sdk: String,
     pub command: String,
     pub finish_args: Vec<String>,
+}
 #[derive(Debug, Clone)]
 pub enum AdapterError {
     ParseError(String),
     ValidationError(String),
     UnsupportedFormat(String),
-/// Permission structure for package format validation
-pub struct Permission {
-pub trait PackageFormatAdapter {
-    fn format_name(&self) -> &str;
-    fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
-    fn parse_package(&self, raw: &[u8]) -> Result<Package, String> { self.parse_manifest(raw) }
-    fn validate_permissions(&self, raw: &[u8]) -> Result<Vec<Permission>, String>;
-    fn validate(&self, _raw: &[u8]) -> Result<bool, String> { Ok(true) }
-    fn process_hook(&self, _hook: &str) -> Result<(), String> { Ok(()) }
-    fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> { Ok(Vec::new()) }
+}
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -87,30 +81,6 @@ pub trait PackageFormatAdapter {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct AptDebManifest {
-    pub package: String,
-    pub version: String,
-    pub depends: Vec<String>,
-    pub description: String,
-    pub priority: PackagePriority,
-}
-
-#[derive(Debug, Clone)]
-pub struct PacmanPkgbuild {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub depends: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub confinement: String, // "strict", "classic", "devmode"
-    pub plugs: Vec<String>,
-}
 
 #[derive(Debug, Clone)]
 pub struct FlatpakManifest {

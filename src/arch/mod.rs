@@ -1,5 +1,6 @@
 pub mod hal;
 pub mod portability;
+pub use portability::*;
 pub mod cpu_sys;
 pub mod cpu_features;
 pub mod comprehensive;

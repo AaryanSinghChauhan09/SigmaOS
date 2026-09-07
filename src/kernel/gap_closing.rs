@@ -568,22 +568,12 @@ pub enum DeviceType {
     Filter,
 }
 
-#[derive(Debug, Clone)]
-pub struct DeviceObject {
-    pub device_type: DeviceType,
-    pub driver_name: &'static str,
-    pub next_device: Option<alloc::boxed::Box<DeviceObject>>,
-    pub attached_device: Option<alloc::boxed::Box<DeviceObject>>,
-}
 
 pub struct DriverObject {
     pub driver_name: &'static str,
     pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],
 }
 
-pub fn io_attach_device_to_device_stack(source: &mut DeviceObject, target: &mut DeviceObject) {
-    source.next_device = Some(alloc::boxed::Box::new(target.clone()));
-}
 
 #[derive(Debug, Clone)]
 pub struct IrpStackLocation {

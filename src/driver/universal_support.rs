@@ -10,9 +10,6 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-#[path = "device.rs"]
-mod device;
-use device::{Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice, CharacterDevice, PortAddress};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
