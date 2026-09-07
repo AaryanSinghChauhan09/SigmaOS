@@ -1,75 +1,123 @@
-# 📑 SigmaOS Contributor Guidelines
+# Contributing to SigmaOS
 
-Thank you for your interest in contributing to SigmaOS! SigmaOS is a sovereign, modular, post-quantum resilient operating system. These guidelines set clear expectations, facilitate onboarding, and provide a structured path for community collaboration.
+Thank you for your interest in contributing to SigmaOS! This document provides guidelines and instructions for contributing to the core operating system, hardware drivers, application compatibility layers, and declarative app shards.
 
----
+## Code of Conduct
 
-## 🔹 1. Code of Conduct
+- Be respectful and inclusive
+- Focus on what is best for the community and open sovereign computing
+- Show empathy towards other community members
 
-- **Respectful Communication**: Maintain respectful, professional communication in GitHub issues, pull requests, and discussions.
-- **Zero Tolerance**: Discrimination, harassment, or non-constructive behavior will not be tolerated.
-- **Collaborative Spirit**: Assume good intent, offer constructive feedback, and focus on collaborative solutions that advance digital sovereignty.
+## Special Interest Groups (SIGs)
 
----
+To foster specialized collaboration, SigmaOS organizes community work into Special Interest Groups (SIGs):
 
-## 🔹 2. Getting Started
+- **SIG-Kernel**: Low-level kernel scheduling, virtual memory (VMM), IPC, eBPF, and syscall gates.
+- **SIG-Drivers**: Hardware abstraction layers (HAL), PCIe, NVMe, e1000e NICs, xHCI USB, Intel HDA, and net80211/iwlwifi.
+- **SIG-Apps & Shards**: Declarative app manifests (`.sigma-app`), immutable SquashFS/OverlayFS layers, and Shards Marketplace ecosystem.
+- **SIG-Security**: OpenBSD-style `pledge`/`unveil`, SELinux MAC policies, PQC cryptographic enclaves, and binary hardening.
 
-- **Fork & Clone**: Fork the SigmaOS repository and clone your local copy.
-  ```bash
-  git clone https://github.com/your-username/SigmaOS.git
-  cd SigmaOS
-  ```
-- **Rust Toolchain**: Ensure you have the Rust toolchain installed.
-  ```bash
-  rustup toolchain install stable
-  ```
-- **Build & Test**: Verify your setup by compiling and executing tests before making changes:
-  ```bash
-  cargo build
-  ./run_sigma_tests.sh
-  ```
-- **Explore Ecosystem Modules**: Familiarize yourself with core modules including the **Zenith Desktop Compositor** (`src/desktop/`), **Shards Application Ecosystem** (`src/package/`), and **Kernel/Driver Architecture** (`src/kernel/`, `src/driver/`).
+## Getting Started
 
----
+### Prerequisites
 
-## 🔹 3. Contribution Workflow
+- Rust (latest stable version)
+- Cargo (comes with Rust)
+- Git
+- QEMU / KVM (for OS testing)
+- Make & GCC/Clang
 
-- **Issues First**: Open an issue or join an existing discussion before commencing major architectural changes or new feature implementations.
-- **Feature Branches**: Use descriptive feature branch names starting with a valid prefix (`feat/`, `fix/`, `docs/`, `refactor/`, `kernel/`, `pkg/`, `arch/`):
-  ```bash
-  git checkout -b feat/zenith-gesture-support
-  ```
-- **Pull Requests**: Submit pull requests against `main` with clear descriptions, linked issues, and detailed context.
-- **Verification**: Ensure all unit tests pass, documentation is updated, and quality checks (`./scripts/sigma_quality_check.sh`) succeed.
+### Setting Up Development Environment
 
----
+```bash
+# Clone the repository
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
 
-## 🔹 4. Coding Standards
+# Build the project
+cargo build
 
-- **Formatting & Linting**: Format code with `rustfmt` (`cargo fmt`) and check with Clippy (`cargo clippy`).
-- **Modular Architecture**: Keep components small, composable, and loosely coupled under `#![no_std]` / `alloc` capability bounds.
-- **API Documentation**: Document all public modules, structs, traits, and functions using Rustdoc comments (`///`).
-- **Security & Safety First**: Prefer safe Rust. Avoid `unsafe` blocks unless explicitly required for low-level driver/hardware interface interop, and document all safety invariants.
-- **PQC Cryptographic Verification**: Ensure driver modules and package recipes adhere to post-quantum signature verification models.
+# Run core library unit tests
+cargo test --lib
 
----
+# Run the interactive REPL shell
+cargo run --bin sigma_userspace
+```
 
-## 🔹 5. Areas to Contribute
+## Declarative App Manifests & Shards Packaging
 
-- **Kernel Subsystems**: Microkernel hybrid primitives, EEVDF scheduler, eBPF tracing, device drivers.
-- **Userland & Utilities**: Universal shell compatibility, init system services, package manager adapters (`.deb`, `.rpm`, `.pkg.tar.zst`, `.apk`, `.nix`, `.xbps`, `.moss`).
-- **Zenith Desktop**: Compositor layout engines, GTK3/GTK4 native UI toolkit adapters, display management.
-- **Shards Ecosystem**: Sandboxed applications, productivity suites, multimedia tools, and security auditing stacks.
-- **Documentation & Wiki**: Architecture guides, API reference docs, installation manuals, and tutorial examples.
+Developers are encouraged to package applications as declarative SigmaOS Shards using single-file `.sigma-app` specs:
 
----
+```toml
+# Example Declarative App Manifest
+name = "my-sovereign-app"
+version = "1.0.0"
+entrypoint = "/bin/myapp"
+description = "High-performance modular app"
+allow_gpu = "true"
+allow_audio = "true"
+allow_network = "false"
+depends = "sigma-libc"
+env.APP_MODE = "production"
+```
 
-## 🔹 6. Community Engagement
+App shards run in immutable, read-only layers with atomic zero-downtime slot updates and capability permission enforcement.
 
-- **GitHub Discussions**: Participate in roadmap discussions, strategic planning, and architectural reviews.
-- **Sprints & Sagas**: Join community hackathons, bug triages, and release sprints.
-- **Future Feature Ideas**: Share and collaborate on visionary features such as temporal filesystems, clustered peripheral virtualization, and autonomous AI system governors.
+## Development Workflow
 
----
+### Branching Strategy
 
-*Thank you for helping build a sovereign, resilient, and ultra-modular operating system with SigmaOS!*
+- `main` - The main development branch
+- All changes should be made through pull requests
+- Feature branches should be named `feature/description`
+- Bugfix branches should be named `fix/description`
+- Shard / package updates should be named `shard/app-name`
+
+### Commit Guidelines
+
+- Use clear, descriptive commit messages
+- Follow conventional commit format: `type(scope): description`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `shard`
+
+### Code Style
+
+- Follow Rust standard formatting: `cargo fmt`
+- Use clippy for linting: `cargo clippy`
+- Write unit tests for new functionality
+- Document public APIs with rustdoc
+
+## Testing & Verification
+
+```bash
+# Run all unit tests
+cargo test --lib
+
+# Run binary executable target checks
+cargo check --bins
+
+# Run specific driver test
+cargo test --lib drivers::modern_nvme
+```
+
+## Hackathons, Community Sprints & Roadmap
+
+- **Developer Roadmap**: Check `ROADMAP.md` and `3-YEAR-STRATEGIC-VISION.md` to align your contributions with current milestones.
+- **Community Hackathons & Sprints**: We host quarterly virtual hackathons and monthly bug-hunting sprints. Announcements and sign-ups are posted in GitHub Discussions.
+
+## Pull Request Process
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes and add unit tests
+4. Update documentation or manifest specs as needed
+5. Submit a pull request
+6. Address review feedback from SIG maintainers
+7. Obtain approval and merge
+
+## Questions & Discussions
+
+- Join discussions in **GitHub Discussions**
+- File bug reports and feature proposals via **GitHub Issues**
+- Reach out to SIG leads in relevant subproject channels
+
+Thank you for building the future of sovereign, AI-native operating systems with SigmaOS!
