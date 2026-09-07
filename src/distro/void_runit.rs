@@ -24,6 +24,8 @@ pub struct RunitService {
     pub dependencies: Vec<String>,
     pub restart_count: u32,
     pub log_enabled: bool,
+    pub health_check_failures: u32,
+    pub max_allowed_failures: u32,
 }
 
 impl RunitService {
@@ -35,7 +37,28 @@ impl RunitService {
             dependencies: Vec::new(),
             restart_count: 0,
             log_enabled: true,
+            health_check_failures: 0,
+            max_allowed_failures: 3,
         }
+    }
+
+    /// Perform automated health check
+    pub fn check_health(&mut self, is_healthy: bool) -> ServiceState {
+        if self.state == ServiceState::Running {
+            if is_healthy {
+                self.health_check_failures = 0;
+            } else {
+                self.health_check_failures += 1;
+                if self.health_check_failures >= self.max_allowed_failures {
+                    self.state = ServiceState::Failed;
+                    println!(
+                        "Service {} health check failed {} times. State set to Failed.",
+                        self.name, self.health_check_failures
+                    );
+                }
+            }
+        }
+        self.state
     }
 
     /// Start service
@@ -196,6 +219,15 @@ impl RunitSupervisor {
             .filter(|s| s.state == state)
             .collect()
     }
+
+    /// Monitor and update health for a specific supervised service
+    pub fn monitor_service_health(&mut self, name: &str, is_healthy: bool) -> Option<ServiceState> {
+        if let Some(service) = self.services.get_mut(name) {
+            Some(service.check_health(is_healthy))
+        } else {
+            None
+        }
+    }
 }
 
 impl Default for RunitSupervisor {
@@ -230,6 +262,28 @@ mod tests {
                 .len(),
             1
         );
+    }
+
+    #[test]
+    fn test_service_health_check_monitoring() {
+        let mut supervisor = RunitSupervisor::new();
+        let mut service = RunitService::new("httpd".to_string(), "/usr/bin/httpd".to_string());
+        service.max_allowed_failures = 2;
+        supervisor.add_service(service);
+
+        supervisor.run_stage2();
+        assert_eq!(
+            supervisor.get_service_status("httpd").unwrap().state,
+            ServiceState::Running
+        );
+
+        // First failure: should remain running but increment failure count
+        let state1 = supervisor.monitor_service_health("httpd", false).unwrap();
+        assert_eq!(state1, ServiceState::Running);
+
+        // Second failure: reaches threshold and transitions to Failed
+        let state2 = supervisor.monitor_service_health("httpd", false).unwrap();
+        assert_eq!(state2, ServiceState::Failed);
     }
 
     #[test]

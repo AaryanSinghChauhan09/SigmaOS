@@ -106,7 +106,7 @@ pub struct SimpleAuthService {
 impl SimpleAuthService {
     pub fn new() -> Self {
         SimpleAuthService {
-            users: SovereignVec::new(),
+            users: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
     }

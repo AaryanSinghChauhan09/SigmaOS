@@ -4,7 +4,10 @@ pub mod mint_tools;
 pub mod moksha;
 pub mod pantheon;
 pub mod screensaver;
+pub mod web_wasm_bridge;
 pub mod zenith_compositor;
+
+pub use web_wasm_bridge::*;
 
 pub use mate_betsy::{
     AtrilDocumentViewer, CajaFileManager, EyeOfMateImageViewer, MarcoWindowManager,

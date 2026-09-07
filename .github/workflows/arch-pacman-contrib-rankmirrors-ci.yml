@@ -1,0 +1,26 @@
+name: Arch Linux Pacman-Contrib & Mirror Ranking CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  arch-pacman-contrib:
+    name: Arch pacman-contrib & Rankmirrors Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Run Arch Pacman-Contrib Unit Tests
+        run: cargo test --lib -- sigpkg::arch_pacman_engine::tests

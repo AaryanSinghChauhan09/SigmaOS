@@ -393,6 +393,26 @@ impl SovereignOpenBsdDoas {
             Err(format!("[doas] Access denied for user '{}' on command '{}'", user, command))
         }
     }
+
+    pub fn validate_doas_rule_with_args(
+        &self,
+        user: &str,
+        target_user: &str,
+        command: &str,
+        args: &[&str],
+    ) -> Result<bool, String> {
+        let full_cmd = if args.is_empty() {
+            command.to_string()
+        } else {
+            format!("{} {}", command, args.join(" "))
+        };
+
+        if self.execute_doas(user, &full_cmd).is_ok() && (target_user == "root" || target_user == user) {
+            Ok(true)
+        } else {
+            Err(format!("[doas] User '{}' is not permitted to run '{}' as '{}'", user, full_cmd, target_user))
+        }
+    }
 }
 
 impl Default for SovereignOpenBsdDoas {
@@ -493,5 +513,8 @@ mod tests {
 
         let denied = doas.execute_doas("guest", "rm -rf /");
         assert!(denied.is_err());
+
+        assert!(doas.validate_doas_rule_with_args("sovereign", "root", "sigma-pkg", &["upgrade", "--yes"]).unwrap());
+        assert!(doas.validate_doas_rule_with_args("guest", "root", "rm", &["-rf", "/"]).is_err());
     }
 }

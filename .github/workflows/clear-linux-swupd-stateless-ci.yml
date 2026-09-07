@@ -1,0 +1,26 @@
+name: Clear Linux Swupd Stateless Bundles CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  clear-linux-swupd:
+    name: Clear Linux swupd Stateless Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Run Clear Linux Unit Tests
+        run: mkdir -p build && rustc --test src/distro/clear_linux.rs --edition=2021 -o build/clear_linux_test && ./build/clear_linux_test
