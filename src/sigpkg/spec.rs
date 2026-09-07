@@ -14,8 +14,6 @@
 /// Based on Roadmap Item 21: Implement sigpkg spec
 use std::boxed::Box;
 
-
-
 /// Package version
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -482,17 +480,18 @@ impl PackageManager for SimplePackageManager {
         let dependencies = package.dependencies();
 
         for dep in dependencies {
+            // Bolt performance optimization: hoist dependency name slicing out of the inner package loop.
+            // Avoid O(N) zero-byte scans on every package candidate (reduces scans from O(D * P) to O(D)).
+            let dep_len = dep.name.iter().position(|&b| b == 0).unwrap_or(64);
+            let dep_slice = &dep.name[..dep_len];
+
             let mut found = false;
             for package_option in &self.packages {
                 if let Some(ref pkg) = *package_option {
                     let p_ref: &dyn Package = pkg.as_ref();
-                    let dep_name = dep.name;
                     let pkg_name = p_ref.name();
-
-                    let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(64);
-                    let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(64);
-
-                    if &dep_name[..dep_len] == &pkg_name[..pkg_len] {
+                    let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(pkg_name.len());
+                    if dep_slice == &pkg_name[..pkg_len] {
                         found = true;
                         break;
                     }
@@ -625,7 +624,10 @@ impl UniversalPackageType {
             Some(UniversalPackageType::Ebuild)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(UniversalPackageType::TarArchive)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(UniversalPackageType::Txz)
         } else if normalized.ends_with(".xbps") {
             Some(UniversalPackageType::Xbps)
@@ -979,5 +981,49 @@ pub struct SignedReleaseManifest {
 impl SignedReleaseManifest {
     pub fn is_trusted(&self) -> bool {
         self.signatures_obtained >= self.required_signatures
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_resolve_dependencies_success() {
+        let mut manager = SimplePackageManager::new(ManagerCapability::full());
+
+        let dep_pkg = SimplePackage::new(
+            b"libssl",
+            PackageVersion::new(1, 1, 1),
+            PackageCapability::full(),
+        );
+        manager.add_package(Box::new(dep_pkg)).unwrap();
+
+        let mut app_pkg = SimplePackage::new(
+            b"my-app",
+            PackageVersion::new(1, 0, 0),
+            PackageCapability::full(),
+        );
+        app_pkg.add_dependency(b"libssl", b">=1.1.0");
+
+        let resolved = manager.resolve_dependencies(&app_pkg).unwrap();
+        assert_eq!(resolved.len(), 1);
+        let dep_name_len = resolved[0].name.iter().position(|&b| b == 0).unwrap_or(64);
+        assert_eq!(&resolved[0].name[..dep_name_len], b"libssl");
+    }
+
+    #[test]
+    fn test_resolve_dependencies_not_found() {
+        let manager = SimplePackageManager::new(ManagerCapability::full());
+
+        let mut app_pkg = SimplePackage::new(
+            b"my-app",
+            PackageVersion::new(1, 0, 0),
+            PackageCapability::full(),
+        );
+        app_pkg.add_dependency(b"missing-lib", b">=1.0.0");
+
+        let res = manager.resolve_dependencies(&app_pkg);
+        assert!(matches!(res, Err(PackageError::DependencyNotFound)));
     }
 }
