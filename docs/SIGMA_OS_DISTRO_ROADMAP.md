@@ -52,3 +52,39 @@ This roadmap details prioritized development initiatives inspired by leading Lin
 - **Status:** Implemented in `zenith_desktop/src/lib.rs` & `src/desktop/web_wasm_bridge.rs`.
 - **Target:** Direct Rust/WASM event routing for keyboard focus, ARIA attributes, and DOM manipulation without JavaScript runtime overhead.
 - **Metric:** 0ms JavaScript event loop blockage during desktop navigation.
+
+---
+
+## 📑 5. Formal Strategic Roadmap (Next 2 Years)
+
+### 🔹 Q4 2026 – Q2 2027
+- **Compatibility layers** → Seamless support for Linux/Windows apps.
+- **Immutable userland layers** → Atomic updates, eliminating dependency conflicts.
+- **Contributor charter** → Publish governance and contribution guidelines.
+- **Zenith desktop refinement** → Improve usability and polish.
+
+### 🔹 Q3 2027 – Q1 2028
+- **Shard implementation** → Roll out core shards (media, networking, storage).
+- **Firmware‑free drivers** → Replace opaque blobs with transparent Rust drivers.
+- **Composable boot sequences** → Scriptable boot flows for multi‑boot and encrypted startup.
+- **Clustered peripherals** → Enable device pooling across SigmaOS nodes.
+
+### 🔹 Q2 2028 – Q4 2028
+- **Programmable scheduler** → User‑defined scheduling policies.
+- **Network‑native OS state** → Pause a session on one device, resume seamlessly on another.
+- **Shards marketplace** → Curated ecosystem for modular SigmaOS apps.
+- **Temporal filesystem** → Native time‑travel for system state.
+
+---
+
+## ⚔️ 6. Strategy to Defeat Linux Distros
+- **Sovereignty over hardware** → Linux still depends on vendor blobs; SigmaOS must enforce firmware‑free drivers.
+- **Declarative simplicity** → Replace Linux’s fragmented package ecosystem with declarative manifests and immutable layers.
+- **Cluster‑native design** → Linux dominates servers, but SigmaOS can leap ahead by treating devices as pooled resources across nodes.
+- **Security by design** → Rust safety + OpenBSD‑style hardening = stronger guarantees than Linux.
+- **Unified vision** → Linux is fragmented across distros; SigmaOS must remain coherent, with shards as the single modular path.
+
+---
+
+## 🌍 7. Outcome
+By 2028, SigmaOS will position itself as the **first sovereign OS**: modular, cluster‑native, firmware‑free, and declarative — offering clarity and resilience where Linux distros remain fragmented.
