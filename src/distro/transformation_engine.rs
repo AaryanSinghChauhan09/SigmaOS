@@ -245,7 +245,8 @@ impl DeveloperToolkitConverter {
         }
     }
 
-    /// Converts C++ constructs (`#include`, `extern "C"`, `std::cout`, `class`, `std::vector`, `std::string`)
+    /// Converts C++ constructs (`#include`, `extern "C"`, `std::cout`, `class`, `std::vector`, `std::string`,
+    /// `std::unique_ptr`, `std::shared_ptr`, `std::map`, `std::unordered_map`, `printf`, `throw std::runtime_error`)
     /// into idiomatic memory-safe Rust code to eliminate C++ dependencies.
     pub fn convert_cpp_to_rust(&self, cpp_code: &str) -> Result<String, &'static str> {
         let mut rust_code = cpp_code.to_string();
@@ -259,11 +260,20 @@ impl DeveloperToolkitConverter {
         if rust_code.contains("#include <string>") {
             rust_code = rust_code.replace("#include <string>", "// std::string::String used natively in Rust");
         }
+        if rust_code.contains("#include <memory>") {
+            rust_code = rust_code.replace("#include <memory>", "// Box and Arc used natively in Rust");
+        }
+        if rust_code.contains("#include <map>") || rust_code.contains("#include <unordered_map>") {
+            rust_code = rust_code.replace("#include <map>", "// BTreeMap used natively in Rust").replace("#include <unordered_map>", "// HashMap used natively in Rust");
+        }
         if rust_code.contains("extern \"C\" {") {
             rust_code = rust_code.replace("extern \"C\" {", "pub extern \"C\" fn ");
         }
         if rust_code.contains("std::cout << \"") {
             rust_code = rust_code.replace("std::cout << \"", "println!(\"").replace("\";", "\");");
+        }
+        if rust_code.contains("printf(\"") {
+            rust_code = rust_code.replace("printf(\"", "print!(\"");
         }
         if rust_code.contains("std::vector<") {
             rust_code = rust_code.replace("std::vector<", "Vec<");
@@ -271,8 +281,23 @@ impl DeveloperToolkitConverter {
         if rust_code.contains("std::string") {
             rust_code = rust_code.replace("std::string", "String");
         }
+        if rust_code.contains("std::unique_ptr<") {
+            rust_code = rust_code.replace("std::unique_ptr<", "Box<");
+        }
+        if rust_code.contains("std::shared_ptr<") {
+            rust_code = rust_code.replace("std::shared_ptr<", "Arc<");
+        }
+        if rust_code.contains("std::map<") {
+            rust_code = rust_code.replace("std::map<", "BTreeMap<");
+        }
+        if rust_code.contains("std::unordered_map<") {
+            rust_code = rust_code.replace("std::unordered_map<", "HashMap<");
+        }
         if rust_code.contains("class ") {
             rust_code = rust_code.replace("class ", "pub struct ");
+        }
+        if rust_code.contains("throw std::runtime_error(") {
+            rust_code = rust_code.replace("throw std::runtime_error(", "return Err(");
         }
 
         if rust_code != cpp_code || cpp_code.contains("void") || cpp_code.contains("int main") {
@@ -399,6 +424,13 @@ mod tests {
         assert!(cpp_class_rust.contains("pub struct MatrixEngine"));
         assert!(cpp_class_rust.contains("Vec<int>"));
         assert!(cpp_class_rust.contains("String name;"));
+
+        let cpp_pointers_rust = converter.convert_cpp_to_rust("#include <memory>\nstd::unique_ptr<int> u;\nstd::shared_ptr<int> s;").unwrap();
+        assert!(cpp_pointers_rust.contains("Box<int> u;"));
+        assert!(cpp_pointers_rust.contains("Arc<int> s;"));
+
+        let cpp_maps_rust = converter.convert_cpp_to_rust("#include <map>\nstd::map<String, int> m;").unwrap();
+        assert!(cpp_maps_rust.contains("BTreeMap<String, int> m;"));
     }
 
     #[test]

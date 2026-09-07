@@ -921,8 +921,178 @@ impl XhciHostControllerDriver {
     }
 }
 
+// ============================================================================
+// 15. FreeBSD GEOM Storage Transformation Provider & CAM SCSI Target Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeomClassType {
+    Disk,
+    Mirror,
+    Stripe,
+    Concat,
+}
+
+pub struct GeomDiskProvider {
+    pub name: String,
+    pub class_type: GeomClassType,
+    pub sector_size: u32,
+    pub total_sectors: u64,
+    pub consumers: Vec<String>,
+}
+
+impl GeomDiskProvider {
+    pub fn new(name: &str, class_type: GeomClassType, sector_size: u32, sectors: u64) -> Self {
+        Self {
+            name: String::from(name),
+            class_type,
+            sector_size,
+            total_sectors: sectors,
+            consumers: Vec::new(),
+        }
+    }
+
+    pub fn attach_consumer(&mut self, consumer_name: &str) {
+        self.consumers.push(String::from(consumer_name));
+    }
+
+    pub fn capacity_bytes(&self) -> u64 {
+        self.total_sectors * (self.sector_size as u64)
+    }
+}
+
+pub struct CamScsiTarget {
+    pub target_id: u8,
+    pub lun: u8,
+    pub vendor_id: String,
+    pub product_id: String,
+    pub commands_processed: u64,
+}
+
+impl CamScsiTarget {
+    pub fn new(target_id: u8, lun: u8, vendor: &str, product: &str) -> Self {
+        Self {
+            target_id,
+            lun,
+            vendor_id: String::from(vendor),
+            product_id: String::from(product),
+            commands_processed: 0,
+        }
+    }
+
+    pub fn dispatch_cdb(&mut self, cdb: &[u8]) -> Result<usize, &'static str> {
+        if cdb.is_empty() {
+            return Err("Empty SCSI CDB command descriptor block");
+        }
+        self.commands_processed += 1;
+        match cdb[0] {
+            0x00 => Ok(0),  // TEST UNIT READY
+            0x12 => Ok(36), // INQUIRY
+            0x28 => Ok(512 * (cdb[8] as usize)), // READ(10)
+            0x2A => Ok(512 * (cdb[8] as usize)), // WRITE(10)
+            _ => Ok(0),
+        }
+    }
+}
+
+// ============================================================================
+// 16. Linux eBPF XDP (eXpress Data Path) Zero-Copy Network Driver Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XdpAction {
+    XdpPass,
+    XdpDrop,
+    XdpTx,
+    XdpRedirect,
+}
+
+pub struct XdpDriverEngine {
+    pub is_xdp_loaded: bool,
+    pub dropped_packets: u64,
+    pub redirected_packets: u64,
+    pub passed_packets: u64,
+}
+
+impl XdpDriverEngine {
+    pub fn new() -> Self {
+        Self {
+            is_xdp_loaded: true,
+            dropped_packets: 0,
+            redirected_packets: 0,
+            passed_packets: 0,
+        }
+    }
+
+    pub fn process_rx_frame(&mut self, packet: &[u8]) -> XdpAction {
+        if packet.is_empty() {
+            self.dropped_packets += 1;
+            return XdpAction::XdpDrop;
+        }
+        // Inspect EtherType (bytes 12..14)
+        if packet.len() >= 14 {
+            let ethertype = u16::from_be_bytes([packet[12], packet[13]]);
+            if ethertype == 0x88F7 { // Precision Time Protocol (PTP) -> Direct Redirect
+                self.redirected_packets += 1;
+                return XdpAction::XdpRedirect;
+            }
+        }
+        self.passed_packets += 1;
+        XdpAction::XdpPass
+    }
+}
+
+impl Default for XdpDriverEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 17. OpenBSD & FreeBSD Capsicum Driver Sandboxing Guard
+// ============================================================================
+
+pub struct BsdDriverSandboxGuard {
+    pub driver_name: String,
+    pub is_pledged: bool,
+    pub allowed_mmio_start: usize,
+    pub allowed_mmio_end: usize,
+    pub allowed_irqs: Vec<u8>,
+}
+
+impl BsdDriverSandboxGuard {
+    pub fn new(name: &str, start: usize, end: usize, irqs: &[u8]) -> Self {
+        Self {
+            driver_name: String::from(name),
+            is_pledged: false,
+            allowed_mmio_start: start,
+            allowed_mmio_end: end,
+            allowed_irqs: irqs.to_vec(),
+        }
+    }
+
+    pub fn pledge_sandbox(&mut self) {
+        self.is_pledged = true;
+    }
+
+    pub fn validate_access(&self, addr: usize, irq: Option<u8>) -> bool {
+        if !self.is_pledged {
+            return true;
+        }
+        if addr < self.allowed_mmio_start || addr > self.allowed_mmio_end {
+            return false;
+        }
+        if let Some(irq_num) = irq {
+            if !self.allowed_irqs.contains(&irq_num) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
 mod tests {
-    
+    use super::*;
 
     #[test]
     fn test_linux_devtmpfs() {
@@ -1123,5 +1293,34 @@ mod tests {
         let slot = xhci.enumerate_usb_device(1).unwrap();
         assert_eq!(slot, 1);
         assert_eq!(xhci.command_ring.len(), 1);
+    }
+
+    #[test]
+    fn test_freebsd_geom_cam_xdp_and_bsd_sandbox_drivers() {
+        // 1. FreeBSD GEOM Provider
+        let mut geom = GeomDiskProvider::new("ada0", GeomClassType::Mirror, 512, 2_000_000);
+        geom.attach_consumer("mirror/gm0");
+        assert_eq!(geom.capacity_bytes(), 1024_000_000);
+        assert_eq!(geom.consumers.len(), 1);
+
+        // 2. FreeBSD CAM SCSI Target
+        let mut scsi = CamScsiTarget::new(0, 0, "Sovereign", "NVMe_SCSI_Shim");
+        let inquiry_res = scsi.dispatch_cdb(&[0x12, 0x00, 0x00, 0x00, 0x24, 0x00]).unwrap();
+        assert_eq!(inquiry_res, 36);
+        assert_eq!(scsi.commands_processed, 1);
+
+        // 3. Linux eBPF XDP Engine
+        let mut xdp = XdpDriverEngine::new();
+        let ptp_pkt = [0u8; 12].iter().chain(&[0x88, 0xF7]).cloned().collect::<Vec<u8>>();
+        let act = xdp.process_rx_frame(&ptp_pkt);
+        assert_eq!(act, XdpAction::XdpRedirect);
+        assert_eq!(xdp.redirected_packets, 1);
+
+        // 4. OpenBSD Driver Sandbox Guard
+        let mut guard = BsdDriverSandboxGuard::new("e1000", 0xFE00_0000, 0xFE00_FFFF, &[11, 12]);
+        guard.pledge_sandbox();
+        assert!(guard.validate_access(0xFE00_0100, Some(11)));
+        assert!(!guard.validate_access(0xFE00_0100, Some(15))); // Blocked IRQ 15
+        assert!(!guard.validate_access(0xFF00_0000, Some(11))); // Out-of-bounds MMIO
     }
 }

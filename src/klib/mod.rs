@@ -24,7 +24,7 @@ pub mod conversion;
 pub mod custom_allocator;
 pub mod custom_string;
 pub mod env;
-// pub mod error; // TODO: Implement error module
+pub mod error;
 pub mod ffi;
 pub mod fs;
 pub mod hash;
@@ -35,7 +35,7 @@ pub mod isa;
 pub mod json;
 pub mod linked_list;
 pub mod math;
-// pub mod math_ops; // TODO: Implement math_ops module
+pub mod math_ops;
 pub mod merkle;
 pub mod net;
 pub mod paging;
