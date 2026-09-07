@@ -17,6 +17,9 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+#[path = "open_source_os_gap_closure.rs"]
+mod open_source_os_gap_closure;
+
 // =========================================================================
 // 1. SOVEREIGN VCS ENGINE (Superseding Git, GitHub CLI, Mercurial)
 // =========================================================================
@@ -1718,7 +1721,7 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub cilium_bpf: SovereignCiliumBpfNetworkEngine,
     pub k8s_orchestrator: SovereignK8sOrchestratorEngine,
     pub ansible: SovereignAnsibleAutomationEngine,
-    pub supremacy_suite: crate::open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
+    pub supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
     pub total_obsoleted_projects_count: u32,
 }
 
@@ -1756,7 +1759,7 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             cilium_bpf: SovereignCiliumBpfNetworkEngine::new(),
             k8s_orchestrator: SovereignK8sOrchestratorEngine::new(),
             ansible: SovereignAnsibleAutomationEngine::new(),
-            supremacy_suite: crate::open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
+            supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
             total_obsoleted_projects_count: 43,
         }
     }
@@ -3666,7 +3669,7 @@ impl Default for SovereignK8sOrchestratorEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
