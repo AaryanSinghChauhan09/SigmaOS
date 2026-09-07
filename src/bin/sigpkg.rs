@@ -229,6 +229,75 @@ fn cmd_install(args: &[String]) {
             "--ostree" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ostree)
             }
+            "--air" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Air)
+            }
+            "--bottle" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Bottle)
+            }
+            "--ipa" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipa)
+            }
+            "--ports" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ports)
+            }
+            "--aab" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Aab)
+            }
+            "--hap" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Hap)
+            }
+            "--superdeb" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Superdeb)
+            }
+            "--lzm" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Lzm)
+            }
+            "--pup" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pup)
+            }
+            "--pet" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pet)
+            }
+            "--tar" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tar)
+            }
+            "--tgz" | "--targz" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::TarGz)
+            }
+            "--xz" | "--tarxz" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::TarXz)
+            }
+            "--app" | "--appbundle" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::AppBundle)
+            }
+            "--puk" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Puk)
+            }
+            "--dmg" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dmg)
+            }
+            "--cports" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Cports)
+            }
+            "--dports" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dports)
+            }
+            "--ipk" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipk)
+            }
+            "--opkg" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Opkg)
+            }
+            "--ips" | "--p5p" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::SolarisIps)
+            }
+            "--nar" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::GuixNar)
+            }
+            "--openbsd" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::OpenBsdPkg)
+            }
             a if a.starts_with('-') => {
                 // Ignore operational flags like -y or --yes
             }

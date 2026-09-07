@@ -32,7 +32,12 @@ pub mod snapshot;
 pub mod startup;
 pub mod state;
 pub mod syslog;
+pub mod automation;
 pub mod user;
+
+pub use automation::{
+    AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus,
+};
 
 pub use cleanup::{
     CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
