@@ -6,6 +6,12 @@ pub use omarchy::{
     WebAppSpec,
 };
 // SigmaOS Distro/Ecosystem Maturity Module
+pub mod arch;
+pub use arch::{
+    AlpmHook, AlpmHookWhen, ArchGpgKey, ArchKeyringEngine, ArchPacmanHookManager,
+    ArchReflectorEngine, ArchinstallEngine, FilesystemType as ArchFilesystemType,
+    InstallerProfile as ArchInstallerProfile, KeyTrustLevel, ReflectorMirror, ReflectorSortKey,
+};
 pub mod arch_inspirations;
 pub mod arch_parity;
 pub mod certification;
