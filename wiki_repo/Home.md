@@ -1,8 +1,8 @@
-# SigmaOS Wiki
+# Welcome to SigmaOS
 
-**SigmaOS** is a sovereign, secure, next-generation operating system written in Rust — designed for zero-dependency bare-metal execution with full Linux/BSD distro compatibility.
+**SigmaOS** is a sovereign, zero-dependency operating system written in Rust, designed to defeat Linux and BSD distros through superior architecture, security, and performance.
 
-> ✅ **Build Status:** 0 compilation errors as of September 2026. All 14 open PRs merged.
+## 🚀 Core Features
 
 ---
 
@@ -33,34 +33,37 @@
 
 ---
 
-## 📦 Package Management
+## 🛡️ Security Architecture
 
-| Page | Description |
-|------|-------------|
-| [PACKAGE_MANAGEMENT](PACKAGE_MANAGEMENT) | Complete sigpkg reference |
-| [package-manager](package-manager) | Package manager architecture |
-| [LINUX_BSD_DISTRO_COMPATIBILITY_GUIDE](LINUX_BSD_DISTRO_COMPATIBILITY_GUIDE) | Linux/BSD distro compatibility |
-| [FEDORA_PARITY_FEATURES](FEDORA_PARITY_FEATURES) | Fedora-parity features |
+- **Post-Quantum Cryptography**: Dilithium-5 module signatures and Kyber-712 key exchange.
+- **LSM (Linux Security Modules)**: Inode, Ptrace, and Socket hooks for mandatory access control.
+- **OpenBSD pledge/unveil**: Capability-based process sandboxing and filesystem path unveiling.
+- **FreeBSD Capsicum**: Capability mode for fine-grained privilege separation.
+- **eBPF XDP Zero-Copy**: Express BPF with XDP zero-copy socket redirection for high-performance networking.
 
 ---
 
 ## 🔐 Security
 
-| Page | Description |
-|------|-------------|
-| [SECURITY](SECURITY) | Security model and policies |
-| [security](security) | Security subsystem internals |
-| [api-reference](api-reference) | Public API reference |
+SigmaOS follows strict software engineering principles:
+
+- **OOPS**: Objects, Classes, Instances, Encapsulation, Abstraction, Inheritance, Polymorphism
+- **SOLID**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
+- **DRY**: Don't Repeat Yourself
+- **KISS**: Keep It Simple, Stupid
+- **YAGNI**: You Aren't Gonna Need It
+- **Separation of Concerns**
+- **Composition Over Inheritance**
+- **Design by Contract**
 
 ---
 
-## 📋 API & Namespace
+## 🔗 Quick Links
 
-| Page | Description |
-|------|-------------|
-| [API_DOCUMENTATION_v0.9](API_DOCUMENTATION_v0.9) | Full API documentation v0.9 |
-| [NAMESPACE_IMPLEMENTATION](NAMESPACE_IMPLEMENTATION) | Namespace implementation details |
-| [NAMESPACE_SYSCALLS_API_REFERENCE](NAMESPACE_SYSCALLS_API_REFERENCE) | Namespace syscall API |
+- **[Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)** - Source code and issues
+- **[Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Full documentation
+- **[AGENTS.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/AGENTS.md)** - AI Agent operational guidelines
+- **[LICENSE](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LICENSE)** - MIT License
 
 ---
 
