@@ -2,7 +2,7 @@
 
 ## Overview
 
-SigmaOS drivers live in `src/driver/`, `src/drivers/`, and the C++ layer in `drivers/`. All Rust drivers implement the `SigmaDriver` trait.
+SigmaOS drivers live in `src/driver/` and `src/drivers/`, written natively in memory-safe Rust (minimizing legacy C++ driver dependencies). All Rust drivers implement the `SigmaDriver` trait.
 
 ## Driver Architecture
 
