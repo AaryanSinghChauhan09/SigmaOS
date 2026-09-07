@@ -422,6 +422,97 @@ impl SovereignUniversalDistroBridge {
                     governor.current_profile, governor.cpu_freq_cap_mhz, self.mode
                 ))
             }
+            "audio" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
+                        Ok(format!(
+                            "Dispatched sndio audio server stream connection for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched PipeWire graph audio node routing for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "ipc" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::FreeBsd => {
+                        Ok(format!(
+                            "Dispatched Capsicum/Pledge descriptor IPC passing for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched zero-copy ring pipe IPC channel for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "containers" => {
+                let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
+                chroot_engine.enter_chroot()?;
+                Ok(format!(
+                    "Dispatched container build sandbox '{}' (active: {}) under distro mode '{:?}'",
+                    action, chroot_engine.is_active, self.mode
+                ))
+            }
+            "time" => {
+                Ok(format!(
+                    "Dispatched Chrony/NTP clock synchronization for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "memory" => {
+                let mut alloc = SovereignKaslrWxAllocator::new(0xABCDEF12);
+                let virt_addr = alloc.allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute)?;
+                Ok(format!(
+                    "Dispatched KARL W^X memory page allocation at {:#X} under distro mode '{:?}'",
+                    virt_addr, self.mode
+                ))
+            }
+            "ui" => {
+                Ok(format!(
+                    "Dispatched Zenith Zenith/COSMIC desktop inspiration UI theme '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "process" => {
+                let mut bore_sched = CachyBoreScheduler::new(10_000_000);
+                bore_sched.register_task(BoreTaskProfile {
+                    task_id: 1001,
+                    name: action.to_string(),
+                    priority: 20,
+                    interactive_score: 80,
+                    burst_time_ns: 1_000_000,
+                    preferred_core: CoreTypePreference::PerformancePCore,
+                    ipc_intensity: 50,
+                });
+                let timeslice = bore_sched.calculate_timeslice_ns(1001);
+                Ok(format!(
+                    "Dispatched EEVDF/BORE process scheduling for '{}' (timeslice: {}ns) under distro mode '{:?}'",
+                    action, timeslice, self.mode
+                ))
+            }
+            "virt" => {
+                Ok(format!(
+                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "audit" => {
+                let mut pax_engine = HardenedBsdPaxGuardEngine::new();
+                let mprotect_res = pax_engine.check_mprotect(100, 0x1000, false, true);
+                Ok(format!(
+                    "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
+                    action, mprotect_res.is_ok(), self.mode
+                ))
+            }
             _ => Err("Unknown target subsystem"),
         }
     }
@@ -4840,6 +4931,15 @@ mod tests {
             assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
             assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
             assert!(bridge.dispatch_cross_subsystem_operation("power", "performance").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("audio", "default-sink").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("ipc", "ring-pipe").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("containers", "/var/chroot/app").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("time", "pool.ntp.org").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("memory", "page_alloc").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("ui", "KdePlasma").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("process", "worker_task").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("virt", "microvm0").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("audit", "pax_check").is_ok());
         }
     }
 
