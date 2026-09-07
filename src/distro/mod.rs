@@ -67,8 +67,17 @@ pub mod recovery;
 pub mod sovereign_system_innovations;
 pub mod specialized;
 pub mod stable_components;
+pub mod open_source_distro_innovations;
 pub mod tiny_core;
 pub mod transformation_engine;
+
+pub use open_source_distro_innovations::{
+    DTraceProbe, EbuildPackageRecord, GentooPortageEapi8SlotResolver,
+    IllumosDTraceProbeProvider, InitramfsFileEntry, MicroVmGuest,
+    NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge,
+    SelinuxContext, SovereignHammer2CoWEngine, SovereignInitramfsGenerator,
+    SovereignSelinuxMlsMcsGovernor, SovereignSuperiorDistroInnovationsMatrix, VmState,
+};
 
 pub use clear_linux::{
     ClearLinuxStatelessEngine, ConfigLocation, ConfigState, SwupdBundle, SwupdUpdateManager,
