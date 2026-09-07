@@ -817,3 +817,27 @@ Consequences for guideline violations:
 ### 5. Release Engineering Policy
 - **Tag & Release Signing**: All release artifacts, ISO images, and Git tags must be signed using GPG or Post-Quantum Dilithium-5 keys.
 - **Reproducible Build Verification**: Build outputs must be validated bit-for-bit against published SHA-256 build provenance hashes and SBOM manifests.
+
+### 6. Linux & BSD Distribution-Inspired Task Guidelines & Subsystem Standards
+- **OpenBSD Security Design Principles**:
+  - **Pledge & Unveil Strict Sandboxing**: Every userland process must immediately restrict system call scope using `pledge(promises, execpromises)` and filesystem paths using `unveil(path, permissions)`. Once `unveil(NULL, NULL)` is called, the filesystem layout is permanently locked.
+  - **W^X / ASLR / Guard Pages**: Enforce Non-Executable stack/heap pages (`W^X`) and random stack canary placement across all process memory spaces.
+- **FreeBSD Storage, Jail & Networking Architecture**:
+  - **GEOM Modular Storage Framework**: Disk storage layers must follow FreeBSD's GEOM provider-filter-consumer pipeline (`geom_disk`, `geom_stripe`, `geom_mirror`, `geom_eli` encryption).
+  - **VNET & Jail Container Virtualization**: Network interfaces must support FreeBSD VNET virtualized network stack isolation for lightweight container/jail sandboxing.
+  - **BSD `pf` Packet Filter**: Firewall rules must implement stateful BSD `pf` packet filtering with NAT, table lookups, and traffic shaping (`altq`).
+- **Void Linux Runit Supervision & Fast Boot**:
+  - **3-Stage Supervision Model**: Process supervision must mirror runit's 3 stages: Stage 1 (one-time boot init/mounts), Stage 2 (concurrent supervised service state tracking and automated health check restarts), and Stage 3 (clean shutdown/unmounting).
+  - **Minimal Dependencies**: Service supervision must avoid complex IPC dependencies or dynamic linkers in early boot paths.
+- **Gentoo Ebuild, USE-Flag & Slotting Systems**:
+  - **USE-Flag Conditional Compilation**: Package dependencies and features must support conditional USE-flags (`+ssl`, `-X`, `python_targets`).
+  - **Portage Slotting & Dual-ABI Support**: Support multiple concurrent versions of libraries or runtimes installed in distinct slots (e.g. `gcc:12`, `python:3.11`).
+- **NixOS Pure Declarative & Immutable Store Architecture**:
+  - **Content-Addressed Immutable Store**: Packages must be installed into `/sigma/store/<hash>-<name>-<version>` where `<hash>` is derived from input dependencies and build sources.
+  - **Atomic Profile Rollbacks & Garbage Collection**: System profiles must be atomic symlinks (`/sigma/profiles/system-1-link`) enabling zero-downtime rollbacks and garbage collection of unreferenced store paths.
+- **Arch Linux PKGBUILD & Chroot Cleanroom Builds**:
+  - **Declarative PKGBUILD Recipes**: Maintain clean human-readable package recipes (`pkgname`, `pkgver`, `pkgrel`, `depends`, `makedepends`, `build()`, `package()`).
+  - **Isolated Chroot Cleanrooms**: Package compilation must execute inside isolated ephemeral chroot build environments (`makechrootpkg`).
+- **Linux cgroups v2, eBPF & Modern Kernel Primitives**:
+  - **cgroups v2 Unified Hierarchy**: Resource allocation (CPU, Memory, I/O, PID limits) must use the unified cgroups v2 resource tree.
+  - **eBPF & XDP Programmability**: High-performance packet processing, tracing, and security auditing must leverage eBPF virtual machine probes and XDP (eXpress Data Path) drivers.
