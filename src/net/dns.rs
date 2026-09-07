@@ -1,6 +1,3 @@
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -444,8 +441,7 @@ impl DnsWireMessage {
                 }
                 let ptr = (((len & 0x3F) << 8) | (data[offset + 1] as usize)) as usize;
                 if !jumped {
-                    // advance past the pointer bytes (2 bytes), then jump to ptr
-                    let _ = offset + 2; // consumed; ptr takes precedence
+                    offset += 2;
                 }
                 offset = ptr;
                 jumped = true;
@@ -660,7 +656,7 @@ impl DnssecChainValidator {
         self.trust_anchors.push(key);
     }
 
-    pub fn validate_rrsig(&self, _hostname: &[u8], rrsig_data: &[u8], dnskey: &DnssecKeyRecord) -> bool {
+    pub fn validate_rrsig(&self, hostname: &[u8], rrsig_data: &[u8], dnskey: &DnssecKeyRecord) -> bool {
         // Validate DNSSEC signature against DNSKEY key tag
         let key_tag = dnskey.calculate_key_tag();
         key_tag != 0 && !rrsig_data.is_empty() && !dnskey.public_key.is_empty()

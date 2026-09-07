@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 #![allow(non_camel_case_types)]
 #![allow(unpredictable_function_pointer_comparisons)]
 #![allow(static_mut_refs)]
@@ -18,9 +9,9 @@
 use crate::driver::device::{
     BlockDevice, CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
 };
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // --- Standard Windows Types & NTSTATUS Codes ---
 pub type NTSTATUS = i32;

@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -90,6 +81,8 @@ impl CryptoVerifier {
 
     /// Compute SHA3-256 hash
     fn compute_hash(&self, data: &[u8]) -> String {
+        
+
         let mut hash_val: u64 = 0xcbf29ce484222325;
         for &byte in data {
             hash_val ^= byte as u64;

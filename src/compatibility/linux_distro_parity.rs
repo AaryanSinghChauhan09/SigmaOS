@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 //! Complete Linux Distribution Parity Subsystem for SigmaOS
 //! Implements essential Linux OS capabilities to ensure seamless compatibility with standard Linux distributions:
 //! - LSB (Linux Standard Base) release metadata and /etc/os-release parsing (`LsbReleaseGovernor`)
@@ -16,11 +7,11 @@
 
 #[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
-use alloc::string::String;
-use alloc::string::ToString;
-#[cfg(test)]
-use alloc::vec::Vec;
-#[cfg(test)]
+use std::string::String;
+use std::string::ToString;
+#[cfg(test_disabled)]
+use std::vec::Vec;
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 // ==========================================
@@ -463,10 +454,10 @@ impl Default for LinuxModulesLoadEngine {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TmpfileItemType {
-    CreateDirectory,  // 'd'
-    CreateFile,       // 'f'
-    CreateSymlink,    // 'L'
-    CleanupDirectory, // 'e'
+    CreateDirectory, // 'd'
+    CreateFile,      // 'f'
+    CreateSymlink,   // 'L'
+    CleanupDirectory,// 'e'
 }
 
 #[derive(Debug, Clone)]
@@ -505,10 +496,7 @@ impl LinuxSystemdTmpfilesEngine {
             };
 
             let path = parts[1].to_string();
-            let mode = parts
-                .get(2)
-                .and_then(|m| u16::from_str_radix(m, 8).ok())
-                .unwrap_or(0o755);
+            let mode = parts.get(2).and_then(|m| u16::from_str_radix(m, 8).ok()).unwrap_or(0o755);
             let uid = parts.get(3).unwrap_or(&"root").to_string();
             let gid = parts.get(4).unwrap_or(&"root").to_string();
             let age = parts.get(5).map(|s| s.to_string());
@@ -557,9 +545,7 @@ pub struct LinuxSwapfileManagerEngine {
 
 impl LinuxSwapfileManagerEngine {
     pub fn new() -> Self {
-        Self {
-            devices: Vec::new(),
-        }
+        Self { devices: Vec::new() }
     }
 
     pub fn swapon(&mut self, path: &str, kind: SwapKind, priority: i32, size_mb: u64) {
@@ -587,11 +573,7 @@ impl LinuxSwapfileManagerEngine {
     }
 
     pub fn get_total_active_swap_mb(&self) -> u64 {
-        self.devices
-            .iter()
-            .filter(|d| d.active)
-            .map(|d| d.size_mb)
-            .sum()
+        self.devices.iter().filter(|d| d.active).map(|d| d.size_mb).sum()
     }
 }
 
@@ -766,5 +748,33 @@ kvm
             modules.modules_to_load,
             vec!["wireguard".to_string(), "kvm".to_string()]
         );
+    }
+
+    #[test]
+    fn test_linux_systemd_tmpfiles_engine() {
+        let mut tmpfiles = LinuxSystemdTmpfilesEngine::new();
+        tmpfiles.parse_tmpfile_line("d /tmp 1777 root root 10d");
+        assert_eq!(tmpfiles.rules.len(), 1);
+        assert_eq!(tmpfiles.rules[0].item_type, TmpfileItemType::CreateDirectory);
+        assert_eq!(tmpfiles.rules[0].path, "/tmp");
+        assert_eq!(tmpfiles.rules[0].mode, 0o1777);
+    }
+
+    #[test]
+    fn test_linux_swapfile_manager_engine() {
+        let mut swap = LinuxSwapfileManagerEngine::new();
+        swap.swapon("/dev/zram0", SwapKind::ZramCompressor, 100, 4096);
+        swap.swapon("/swapfile", SwapKind::Swapfile, 10, 2048);
+
+        assert_eq!(swap.get_total_active_swap_mb(), 6144);
+        assert!(swap.swapoff("/swapfile"));
+        assert_eq!(swap.get_total_active_swap_mb(), 4096);
+    }
+
+    #[test]
+    fn test_linux_core_dump_filter_engine() {
+        let filter = LinuxCoreDumpFilterEngine::new();
+        let formatted = filter.format_core_filename("sigma-app", 1337, 1700000000);
+        assert_eq!(formatted, "/var/lib/systemd/coredump/core.sigma-app.1337.1700000000");
     }
 }

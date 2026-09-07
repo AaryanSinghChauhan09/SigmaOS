@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // SigmaPkg — Sovereign Universal Package Manager CLI
 // Implements the `sigpkg` commands documented in docs/PACKAGE_MANAGEMENT.md,
@@ -31,8 +22,8 @@ fn usage() -> ! {
          USAGE:\n\
          \x20 sigpkg install [--fmt] <pkg|file>... Add package(s) or foreign (.deb/.rpm/PKGBUILD/.apk/.xbps/e.t.c.) to store\n\
          \x20 sigpkg convert <file>                Dry-run convert foreign package manifest & print metadata\n\
-         \x20 sigpkg dispatch \"<foreign cmd>\"       Dispatch raw foreign PM command (apt, pacman, dnf, apk, pkg, zypper, emerge, nix, etc.)\n\
-         \x20 sigpkg apt|dnf|pacman|apk|pkg|zypper|xbps|emerge|nix|guix|flatpak|snap|slackpkg|pkgman|swupd|eopkg|pkgin <cmd> Foreign PM command alias\n\
+         \x20 sigpkg dispatch \"<foreign cmd>\"       Dispatch raw foreign PM command (apt, pacman, dnf, apk, pkg, emerge, nix, etc.)\n\
+         \x20 sigpkg apt|dnf|pacman|apk|pkg|zypper|xbps|emerge|eopkg|nix|guix|pkgin|slackpkg <cmd> Foreign PM command alias\n\
          \x20 sigpkg remove <package>              Remove a package from the store\n\
          \x20 sigpkg search <package>              Show a stored package's metadata\n\
          \x20 sigpkg status                        List stored packages and counts\n\
@@ -61,11 +52,10 @@ fn main() {
         "install" => cmd_install(&args[1..]),
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
-        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "microdnf" | "rpm" | "pacman" | "yay"
-        | "paru" | "pikaur" | "trizen" | "aura" | "apk" | "pkg" | "pkg_add" | "pkg_delete"
-        | "pkg_info" | "zypper" | "xbps" | "xbps-install" | "xbps-remove" | "emerge" | "ebuild"
-        | "nix" | "nix-env" | "guix" | "flatpak" | "snap" | "slackpkg" | "installpkg"
-        | "removepkg" | "pkgman" | "swupd" | "eopkg" | "moss" | "pkgin" => {
+        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "apk" | "pkg" | "pkg_add"
+        | "pkg_delete" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
+        | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env" | "guix"
+        | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),
@@ -212,7 +202,9 @@ fn cmd_install(args: &[String]) {
             "--eopkg" | "--pisi" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pisi)
             }
-            "--nix" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nix),
+            "--nix" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nix)
+            }
             "--guix" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Guix)
             }
@@ -228,59 +220,14 @@ fn cmd_install(args: &[String]) {
             "--moss" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Moss)
             }
-            "--tcz" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tcz),
+            "--tcz" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tcz)
+            }
             "--gobo" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Gobo)
             }
             "--ostree" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ostree)
-            }
-            "--air" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Air),
-            "--bottle" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Bottle)
-            }
-            "--ipa" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipa),
-            "--ports" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ports)
-            }
-            "--aab" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Aab),
-            "--hap" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Hap),
-            "--superdeb" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Superdeb)
-            }
-            "--lzm" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Lzm),
-            "--pup" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pup),
-            "--pet" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pet),
-            "--tar" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tar),
-            "--tgz" | "--targz" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::TarGz)
-            }
-            "--xz" | "--tarxz" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::TarXz)
-            }
-            "--app" | "--appbundle" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::AppBundle)
-            }
-            "--puk" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Puk),
-            "--dmg" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dmg),
-            "--cports" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Cports)
-            }
-            "--dports" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dports)
-            }
-            "--ipk" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipk),
-            "--opkg" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Opkg)
-            }
-            "--ips" | "--p5p" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::SolarisIps)
-            }
-            "--nar" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::GuixNar)
-            }
-            "--openbsd" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::OpenBsdPkg)
             }
             a if a.starts_with('-') => {
                 // Ignore operational flags like -y or --yes
@@ -335,11 +282,7 @@ fn cmd_install(args: &[String]) {
             let canonical_name = dep_mapper.to_canonical_name(clean_name);
             let fmt_desc = forced_format
                 .map(|f| format!("{:?}", f))
-                .or_else(|| {
-                    adapter
-                        .detect_format_by_extension(target)
-                        .map(|f| format!("{:?}", f))
-                })
+                .or_else(|| adapter.detect_format_by_extension(target).map(|f| format!("{:?}", f)))
                 .unwrap_or_else(|| "Sovereign".to_string());
             let pkg = Package::new(
                 canonical_name.clone(),

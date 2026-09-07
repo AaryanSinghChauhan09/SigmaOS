@@ -1,19 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Functional TCP/IP Network Stack Implementation
 // Full-featured IPv4/TCP/UDP protocol suite with modern congestion control
 
-// Box is provided by std prelude; explicit import removed
+use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::vec::Vec;
 use core::sync::atomic::{AtomicU16, Ordering};
@@ -268,7 +257,7 @@ impl UdpSocket {
         Ok(buf.len())
     }
 
-    pub fn send_to(&mut self, buf: &[u8], _dest: &SocketAddr) -> Result<usize, NetworkError> {
+    pub fn send_to(&mut self, buf: &[u8], dest: &SocketAddr) -> Result<usize, NetworkError> {
         // In real implementation, would transmit UDP packet via network device
         Ok(buf.len())
     }
@@ -314,7 +303,7 @@ impl TcpSocket {
         Ok(())
     }
 
-    pub fn listen(&mut self, _backlog_size: u32) -> Result<(), NetworkError> {
+    pub fn listen(&mut self, backlog_size: u32) -> Result<(), NetworkError> {
         if self.ccb.state != TcpConnectionState::Closed {
             return Err(NetworkError::SocketError);
         }
@@ -641,7 +630,7 @@ impl TcpIpStack {
         self.interface_mac = mac;
     }
 
-    pub fn socket(&mut self, socket_type: SocketType, _protocol: SocketProtocol) -> Result<u32, NetworkError> {
+    pub fn socket(&mut self, socket_type: SocketType, protocol: SocketProtocol) -> Result<u32, NetworkError> {
         let socket_id = self.next_socket_id;
         self.next_socket_id += 1;
 

@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS — gentoo_inspirations.rs
 // Implements Gentoo-inspired features:
 //   • USE flags system
@@ -15,9 +6,10 @@
 //   • ebuilds metadata model
 //   • World set and dependency graph
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ── USE flags ─────────────────────────────────────────────────────────────────
 

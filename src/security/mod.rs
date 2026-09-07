@@ -1,10 +1,3 @@
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
-#![allow(ambiguous_glob_reexports)]
 pub mod system_policy_rules;
 pub use system_policy_rules::*;
 
@@ -13,9 +6,8 @@ pub mod audit;
 pub mod capability;
 pub mod seccomp;
 pub mod seccomp_ebpf;
-pub mod sigma_seccomp_bpf;
 pub mod syscall_filter;
-// pub mod defensive_audit; // TODO: Implement defensive_audit module
+pub mod defensive_audit;
 pub mod hardening;
 pub mod kernel_hardening;
 pub mod user_namespace;
@@ -38,7 +30,7 @@ pub mod pledge;
 pub mod pqc_enclave;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod kali_stack;
-// pub mod parrot; // TODO: Implement parrot module
+pub mod parrot;
 pub mod parrot_kali;
 pub mod parrot_linux;
 pub mod parrot_parity;
@@ -61,13 +53,6 @@ pub mod unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-};
-
-pub use qubes_isolation::*;
-pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
@@ -93,7 +78,9 @@ pub use defensive_audit::{
     SIGNATURE_LEN,
 };
 pub use forensics::*;
-pub use hardening::{MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary};
+pub use hardening::{
+    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
+};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
@@ -132,19 +119,12 @@ pub use rules::{
     SovereignSandboxingRulesEngine, SovereignSecurelevelRuleEngine, SovereignSysctlHardeningRules,
     SysctlParameterRule, UnveilRule,
 };
-pub use seccomp::{
-    ArgumentConstraint, CompareOp, FilterRule, SeccompAction, SeccompContext, SeccompFilter,
-    SeccompManager,
-};
 pub use selinux::{PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux};
 pub use selinux_advanced::{AdvancedSELinuxManager, MlsLevel, SELinuxBoolean, SELinuxModule};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
     UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions,
     UnveilState,
-};
-pub use syscall_filter::{
-    FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy,
 };
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
@@ -162,3 +142,5 @@ pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, SimpleVulnerabilityScanner,
     VulnerabilityClass, VulnerabilityReport,
 };
+pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
+pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};

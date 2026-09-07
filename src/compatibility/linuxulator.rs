@@ -1,20 +1,11 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::vec;
 // Sovereign Linuxulator - Native Linux ELF Binary Loader and Syscall Translation Engine for SigmaOS
 // Inspired by the FreeBSD linuxulator, allowing unmodified Linux x86_64 binaries to run natively under microkernel isolation.
 
 use crate::interrupt::handler::RegisterSet;
-use core::sync::atomic::{AtomicU64, Ordering};
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxulatorError {

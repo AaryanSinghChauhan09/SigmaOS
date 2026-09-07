@@ -1,22 +1,13 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 #![allow(dead_code)]
 //! Low-Level Memory Management & Fast System Calls Subsystem for SigmaOS
 //! Implements Two-Tier Allocation (Buddy + Slab), Recursive Page Tables,
 //! Copy-on-Write (COW) Forking, x86_64 Fast Syscalls (IA32_LSTAR MSR),
 //! and Minimal POSIX Syscall Matrix.
 
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. Two-Tier Allocator: Buddy Allocator + Slab Allocator

@@ -1,21 +1,11 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
-pub mod knowledgebase;
-pub use knowledgebase::*;
-
 //! SigmaOS Documentation Generation System
 //!
 //! This module provides automatic documentation generation from source code,
 //! including API documentation, architecture diagrams, and user guides.
+
+pub mod knowledgebase;
+pub use knowledgebase::*;
+
 
 use std::collections::BTreeMap;
 use std::format;

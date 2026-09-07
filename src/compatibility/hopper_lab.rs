@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::format;
 // SigmaOS Distro-Hopper Laboratory (Pillar 6 - Wave 3)
 // Implements experience, philosophy, and community parity features for Linux hoppers:
@@ -17,9 +8,9 @@ use std::format;
 // 5. Hopping Philosophy Guides & Migration Tutorials (Arch, Ubuntu, Fedora)
 // 6. WASM Runtime & Unikernel Execution Scheduler
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. CUSTOMIZABILITY LAYER

@@ -1,19 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS AUR (Arch User Repository) Implementation
 // Implements AUR-like package system for SigmaOS
 // Inspired by Arch Linux's AUR for community-driven packages
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// AUR package metadata
 #[derive(Debug, Clone)]

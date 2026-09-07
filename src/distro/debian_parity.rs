@@ -1,18 +1,9 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Debian/Ubuntu Parity Implementation
 // Implements Debian packaging system, APT, and Ubuntu-specific features
 
 use crate::klib::Vec;
-use core::cell::Cell;
 use std::string::String;
+use core::cell::Cell;
 
 /// Debian package management with APT parity
 pub struct DebianPackageManager {

@@ -1,19 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
+use std::vec;
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
 use crate::klib::collections::HashMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
-use std::vec;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ── Address Families & Socket Types ──────────────────────────────────────
 

@@ -1,20 +1,9 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::string::{String, ToString};
 // SigmaOS Daemonless Container & Micro-VM Orchestration Subsystem (S-RANCHER)
 // Absorbs and obsoletes Rancher OS, k3os, Bottlerocket, and containerd
 // by executing daemonless OCI containers directly on microkernel capabilities.
 
-#[cfg(not(test))]
-use crate::security::capability::CapabilityToken;
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {

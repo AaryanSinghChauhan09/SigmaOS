@@ -17,10 +17,10 @@
 //! inspired by Genode OS framework. Provides hierarchical security isolation and
 //! fine-grained privilege scoping through capability-based security.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Component identifier (Genode-style capability-based)
 pub type ComponentId = usize;

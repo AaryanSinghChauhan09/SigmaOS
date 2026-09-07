@@ -1,18 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 /// Inspired by systemd-boot, GRUB2, and Plymouth from popular Linux distributions.
-extern crate alloc;
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use std::vec::Vec;
+use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BootStatus = usize;
 
@@ -459,24 +451,3 @@ impl<'a, T> IntoIterator for &'a mut UefiVec<T> {
         self.deref_mut().iter_mut()
     }
 }
-
-#[derive(Debug, Clone)]
-pub struct AcpiParser;
-
-#[derive(Debug, Clone)]
-pub struct GopFramebuffer;
-
-#[derive(Debug, Clone)]
-pub struct GopSplashCanvas;
-
-#[derive(Debug, Clone)]
-pub struct MicrokernelProfile;
-
-#[derive(Debug, Clone)]
-pub struct MultiKernelBootSelector;
-
-#[derive(Debug, Clone)]
-pub struct SovereignBootWatchdog;
-
-#[derive(Debug, Clone)]
-pub struct UsbHostController;

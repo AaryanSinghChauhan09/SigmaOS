@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS — sigma_string_utils.rs
 // Custom string manipulation utilities that avoid std::string wherever possible.
 // All functions operate on raw byte slices (&[u8] / &mut [u8]) or the crate's
@@ -18,6 +9,7 @@
 // • No dependency on std::string::String or std::str beyond what is already
 //   present in the `alloc` crate (which SigmaOS already uses)
 // • Panic-free — every operation returns a Result or Option
+
 
 use std::vec::Vec;
 
@@ -457,7 +449,7 @@ impl<K: Eq + SigmaHash + Clone, V: Clone> SigmaHashMap<K, V> {
     pub fn iter(&self) -> impl Iterator<Item = (&K, &V)> {
         self.buckets
             .iter()
-            .filter_map(|slot| slot.as_ref().map(|(k, v)| (k, v)))
+            .filter_map(|slot| slot.as_ref().map(|pair| (&pair.0, &pair.1)))
     }
 
     // ── private helpers ──────────────────────────────────────────────────────
@@ -569,7 +561,7 @@ impl SigmaHash for &str {
         fnv1a_64(self.as_bytes())
     }
 }
-impl SigmaHash for alloc::string::String {
+impl SigmaHash for std::string::String {
     fn sigma_hash(&self) -> u64 {
         fnv1a_64(self.as_bytes())
     }

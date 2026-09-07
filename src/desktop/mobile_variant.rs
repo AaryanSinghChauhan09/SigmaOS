@@ -1,15 +1,10 @@
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
 // SigmaOS Mobile, Tablet, and Embedded IoT Variant Engine
 // Inspired by postmarketOS, Plasma Mobile, Ubuntu Touch, and Android Halium
 // Provides touchscreen gesture scaling, one-handed reachability, battery budget throttling, and responsive UI adaptation.
 
 use std::collections::HashMap;
 use std::string::String;
+use std::vec::Vec;
 
 /// Target form factor profile
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -124,15 +119,9 @@ mod tests {
         };
 
         engine.register_mobile_app(app1);
-        assert!(engine
-            .launch_app_to_foreground("org.sigmaos.browser")
-            .is_ok());
+        assert!(engine.launch_app_to_foreground("org.sigmaos.browser").is_ok());
         assert_eq!(
-            engine
-                .installed_mobile_apps
-                .get("org.sigmaos.browser")
-                .unwrap()
-                .execution_policy,
+            engine.installed_mobile_apps.get("org.sigmaos.browser").unwrap().execution_policy,
             MobileExecutionPolicy::ActiveForeground
         );
 

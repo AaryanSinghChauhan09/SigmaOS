@@ -12,10 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // SigmaOS Custom Conversion Library
 // Reduces dependency on predefined conversion functions
@@ -165,11 +163,7 @@ pub fn parse_u64_str(s: &str) -> Result<u64, ()> {
             return Err(());
         }
         let digit = (b - b'0') as u64;
-        val = val
-            .checked_mul(10)
-            .ok_or(())?
-            .checked_add(digit)
-            .ok_or(())?;
+        val = val.checked_mul(10).ok_or(())?.checked_add(digit).ok_or(())?;
     }
     Ok(val)
 }

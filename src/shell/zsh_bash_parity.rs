@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::vec;
 // SigmaOS Advanced Zsh, Bash, Fish & BSD Shell Parity Engine
 // Zero-dependency, #![no_std] compliant, zero-allocation shell enhancements
@@ -1344,10 +1335,7 @@ impl UniversalScriptTranspiler {
                 return format!("export {}={}", var, val);
             }
         } else if l.starts_with("set -e ") || l.starts_with("set -e") {
-            let var = l
-                .trim_start_matches("set -e ")
-                .trim_start_matches("set -e")
-                .trim();
+            let var = l.trim_start_matches("set -e ").trim_start_matches("set -e").trim();
             return format!("unset {}", var);
         } else if l.starts_with("set -g ") || l.starts_with("set ") {
             let rest = l.trim_start_matches("set -g ").trim_start_matches("set ");

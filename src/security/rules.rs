@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 #![cfg_attr(not(test), no_std)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Security Rules Subsystem (`src/security/rules.rs`)
@@ -517,13 +508,7 @@ impl SovereignCapsicumRightsRules {
     }
 
     pub fn limit_fd_rights(&mut self, fd: i32, rights: u64) {
-        self.fd_rules.insert(
-            fd,
-            CapsicumFdRule {
-                fd,
-                allowed_rights: rights,
-            },
-        );
+        self.fd_rules.insert(fd, CapsicumFdRule { fd, allowed_rights: rights });
     }
 
     pub fn check_fd_right(&self, fd: i32, required_right: u64) -> bool {

@@ -1,62 +1,68 @@
-# 🤖 SigmaOS AI Agent Governance Specification (`AGENTS.md`)
+# SigmaOS Architecture Guide for AI Agents (`docs/AGENTS.md`)
 
-**Version:** 2.1.0
-**Scope:** Autonomous AI Agents (Bolt ⚡, Palette 🎨, Sentinel 🛡️), Process, Memory, Loader, Desktop, Paging, Allocation, Block Storage, Basic File System, Buffer Cache, Chained Allocation, Cache Broker, & Communication Operation Management
-
----
-
-## EXECUTIVE SUMMARY & AGENT ARCHITECTURE
-
-SigmaOS features an AI-native architecture where autonomous agent processes govern kernel scheduling, memory pools, dynamic module loading, desktop environments, virtual memory paging, heap allocations, block storage devices, virtual file systems, unified buffer caches, chained allocation lists, multi-tiered cache brokers, and communication channels.
-
-```
-                  +-----------------------------------+
-                  |   SIGMAOS AI AGENT GOVERNANCE     |
-                  +-----------------------------------+
-                                    |
-         +--------------------------+--------------------------+
-         |                          |                          |
-         v                          v                          v
-  ⚡ BOLT PROCESS            🎨 PALETTE PROCESS         🛡️ SENTINEL PROCESS
-  • Zero-Copy IPC Latency    • IPC Channel Visualization • PQC Encrypted IPC Check
-  • Socket RTT Optimization  • Network Socket Status     • Capability Token Audit
-  • Sub-µs Memory Access     • Semantic ARIA Tags        • Post-Quantum Verification
-```
+This document provides specialized architectural reference documentation for AI agents working within the `docs/` and `src/` hierarchy of SigmaOS.
 
 ---
 
-## 1. AGENT PERSONAS & GOVERNANCE
+## 1. System Architecture Overview
 
-### ⚡ Bolt (Performance Agent)
-- **Scope**: CPU scheduling, `cgroups v2`, boot speed profiling, Zenith compositor render frame-rate profiling, page translation walk profiling, heap allocation latency profiling, NVMe/AHCI storage throughput profiling, VFS file I/O latency profiling, page/buffer cache hit ratio profiling, Memory Descriptor List (MDL) scatter-gather DMA throughput profiling, multi-tiered cache broker lookup latency profiling, zero-copy IPC channel throughput and BSD socket latency profiling (`src/kernel/net/socket_layer.rs`).
-- **Rules**:
-  - Maintain zero-copy IPC throughput above 14.2 GB/s and minimize socket connection latency.
-  - Record learnings in `.jules/bolt.md`.
+SigmaOS is designed as a **sovereign, zero-dependency, `#![no_std]` compliant operating system** in Rust. The architecture is divided into modular, decoupled layers:
 
-### 🎨 Palette (UX & Accessibility Agent)
-- **Scope**: Desktop compositor layout, Control Center themes, visual memory map views, partition usage graphs, SMART drive health diagnostics, graphical file manager tree views, live page cache utilization charts, memory descriptor list chain visual diagnostic graphs, multi-tier cache utilization visual interfaces, active IPC channel and socket connection visual state views, WCAG 2.1 AA focus outlines, ARIA annotations.
-- **Rules**:
-  - Render accessible real-time network socket and IPC connection status interfaces.
-  - Record learnings in `.jules/palette.md`.
+### A. Architectural Pillars
+1. **Multi-Architecture Portability Layer (`src/arch/`)**:
+   - Hardware Abstraction Layer (HAL) supporting `x86_32`, `x86_64`, `aarch64`, `riscv64`, `loongarch64`, `powerpc64`, and `s390x`.
+   - Context switching and trap frame handling via `SovereignContextSwitchEngine`.
+   - CPU ISA feature auto-detection (x86-64-v1..v4, AVX-512, AMX, ARM64 Neoverse, RISC-V Vector) via `cpu_features.rs`.
 
-### 🛡️ Sentinel (Security & Integrity Agent)
-- **Scope**: LSM auditing, OpenBSD `pledge`/`unveil`, Post-Quantum Dilithium-5 signatures, page table W^X audit, secure buffer zeroization, block device encryption validation (LUKS2/GELI), file permission validation, dirty buffer zeroization, Memory Descriptor List (MDL) bounds verification, cache zeroization and cryptographic hash verification auditing, PQC (Kyber-1024 / Dilithium-5) encrypted IPC message validation and socket capability token auditing (`src/kernel/net/socket_layer.rs`, `src/kernel/subsystem.rs`).
-- **Rules**:
-  - Enforce PQC cryptographic signature verification on all IPC channels and socket control operations.
-  - Record learnings in `.jules/sentinel.md`.
+2. **Kernel Core Subsystems (`src/kernel/` & `src/klib/`)**:
+   - Hybrid Process Scheduling: EEVDF lag compensation, CachyOS BORE score calculations, FreeBSD ULE interactivity ranking, and Apache NuttX POSIX RT preemption-threshold gating.
+   - Demand Paging & Memory Management: Lazy zone allocation, page fault handling, slab object caching, and buddy allocation.
+   - Zero-Copy IPC: High-throughput lock-free ring buffers and Unix domain socket emulation.
+
+3. **Distro Leapfrog & Parity Engines (`src/distro/`)**:
+   - `SovereignSchedExtEngine`: Linux 6.12+ extensible BPF scheduler.
+   - `SovereignLandlockV5Guard`: Linux Landlock v5 + FreeBSD Capsicum + OpenBSD Pledge/Unveil security.
+   - `SovereignHermeticCasStoreEngine`: Nix/Guix Content-Addressed Storage store.
+   - `SovereignMicroarchJitEngine`: Microarchitecture SIMD auto-tuning & JIT path routing.
+   - `SovereignHammer2DeduplicationEngine`: DragonFly BSD HAMMER2 multi-master CoW block deduplication.
+
+4. **Universal Package Management (`src/package/` & `src/sigpkg/`)**:
+   - Multi-format package translation (DEB, RPM, Pacman, APK, Flatpak, Snap, AppImage, XBPS, Ebuild, Ports, PKG).
+   - AUR integration, PKGBUILD recipe auditing, and generation-based package snapshot rollbacks.
+
+5. **Clean-Room Compatibility Layers (`src/compatibility/`)**:
+   - Fedora/RHEL core tooling (DNF, SELinux, Bodhi, Ignition, status.fpo, systemd-offline-update).
+   - BSD subsystem parity (FreeBSD Jails, OpenBSD PF firewall).
+   - LSB & FHS compliance tools, PAM, Cgroup v2 governor.
 
 ---
 
-## 2. COMMUNICATION OPERATION POLICIES (`docs/AI_AGENTS_COMMUNICATION_OPERATION_MANAGEMENT.md`)
+## 2. Coding Standards & Conventions for AI Agents
 
-- **Capability Endpoints**: IPC message passing must be gated by valid `CapabilityToken` verification.
-- **IPC Namespace Invariants**: Processes operating within isolated IPC namespaces must not leak IPC channels across namespace boundaries.
+When implementing features or bug fixes in SigmaOS:
+
+1. **Zero External Dependencies**: Maintain `[dependencies]` in `Cargo.toml` empty. Do not add third-party crates.
+2. **Strict `#![no_std]` Compatibility**: Use `alloc::` primitives (`alloc::format`, `alloc::string::String`, `alloc::vec::Vec`, `alloc::collections::BTreeMap`) instead of `std` imports for `src/` modules.
+3. **Trait Derivations**: Always derive `Debug`, `Clone`, and `PartialEq` where appropriate on data structures.
+4. **Error Handling**: Use explicit `Result<T, &'static str>` or domain-specific enums instead of panicking.
 
 ---
 
-## 3. STANDALONE TESTING & VERIFICATION PROTOCOL
+## 3. Verification & Execution Commands
 
-Every agent module must support standalone unit testing via:
+AI agents must verify their work using the following commands:
+
 ```bash
-rustc --test <module_path> --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_agent && /tmp/test_agent
+# 1. Compile & run standalone module unit tests
+rustc --edition=2021 --test src/distro/sovereign_nextgen_distro_leap.rs -o build/test_nextgen_leap && ./build/test_nextgen_leap
+rustc --edition=2021 --test src/arch/portability.rs -o build/test_arch_portability && ./build/test_arch_portability
+
+# 2. Run global test suite
+./run_sigma_tests.sh
+
+# 3. Perform compilation check
+cargo check
 ```
+
+---
+*End of docs/AGENTS.md*

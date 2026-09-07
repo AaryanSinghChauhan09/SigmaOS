@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Wiki & Distro Innovations Subsystem
 // Incorporates declarative system configurations (NixOS pattern),
 // Arch-style plaintext recipe sandbox compilation (Arch pattern),
@@ -15,11 +6,11 @@
 // eBPF-inspired lightweight syscall policy verifiers,
 // and FreeBSD Capsicum descriptor capability delegation.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// 1. NixOS-Style Declarative System Configuration & Generation Manager
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -538,6 +529,7 @@ impl SovereignSystemdParityEngine {
             .get_mut(name)
             .ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Active;
+        unit.active_state = SystemdUnitActiveState::Active;
         self.journal_logs
             .push(format!("Journal: Unit {} transitioned to Active", name));
         Ok(SystemdUnitActiveState::Active)
@@ -548,6 +540,7 @@ impl SovereignSystemdParityEngine {
             .units
             .get_mut(name)
             .ok_or_else(|| format!("Unit {} not found", name))?;
+        unit.active_state = SystemdUnitActiveState::Inactive;
         unit.active_state = SystemdUnitActiveState::Inactive;
         self.journal_logs
             .push(format!("Journal: Unit {} transitioned to Inactive", name));

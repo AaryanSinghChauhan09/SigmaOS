@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Package Hardening Module
 // Package signing, verification, and security
 // Inspired by Arch pacman and FreeBSD pkg security
@@ -61,7 +52,7 @@ impl PackageSigningEngine {
     pub fn verify_signature(
         &self,
         signature: &PackageSignature,
-        package_data: &[u8],
+        _package_data: &[u8],
     ) -> PackageVerificationResult {
         // Check if key is trusted
         if !self.signing_keys.contains(&signature.key_id) {
@@ -77,7 +68,7 @@ impl PackageSigningEngine {
     pub fn sign_package(
         &self,
         key_id: &str,
-        package_data: &[u8],
+        _package_data: &[u8],
     ) -> Result<PackageSignature, &'static str> {
         if !self.signing_keys.contains(&key_id.to_string()) {
             return Err("Key not found in trusted keys");

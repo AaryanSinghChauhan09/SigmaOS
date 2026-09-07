@@ -1,19 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 #![allow(dead_code)]
 //! Physical Memory Bitmap Allocator, Self-Referential Page Tables, and Fast x86_64 Assembly Syscall Dispatcher.
 //! Implements bottom-up kernel primitives as described in Step 1, Step 2, and Step 3 specifications.
 
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::vec;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 pub const PAGE_SIZE_4096: usize = 4096;
 pub const HIGHER_HALF_OFFSET: u64 = 0xFFFFFFFF80000000;

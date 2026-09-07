@@ -1,17 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // Kernel Performance - Zero-Copy IPC & UDF Scheduler VM
 // High-speed zero-copy IPC and autonomic UDF CPU scheduling engine
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IpcError {

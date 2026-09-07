@@ -1,21 +1,12 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 #![allow(dead_code)]
 // SigmaOS klib: Intrusive Linked List
 // Inspired by Linux kernel's intrusive list implementation (include/linux/list.h)
 // and BSD's TAILQ/LIST macros from sys/queue.h
 // No external dependencies - fully custom implementation.
 
+use std::boxed::Box;
 use core::marker::PhantomData;
 use core::ptr::NonNull;
-use std::boxed::Box;
 
 /// A doubly-linked list node.
 /// Inspired by Linux's `struct list_head` and BSD's `TAILQ_ENTRY`.

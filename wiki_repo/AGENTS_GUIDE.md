@@ -17,7 +17,25 @@ SigmaOS synthesizes best-of-breed innovations from major Linux and BSD distribut
 * **NixOS:** `NixOsFlakesEngine`, `NixOsDeclarativeConfigEngine`, `SovereignNixGcEngine`.
 * **FreeBSD / OpenBSD / NetBSD:** `FreeBsdJailSandboxEngine`, `FreeBsdCapsicumEngine`, `OpenBsdUnveilFilter`, `NetBsdPkgsrcEngine`, `MpvFreeBsdSndioEngine`.
 
-## 3. Development Workflow & Verification Protocol
+## 3. Kernel Class Operation Vtable Architecture
+
+When extending or creating kernel drivers and subsystems:
+* Refer to `docs/AGENTS_CLASS_OPERATION_MANAGEMENT_GUIDE.md` for class operation vtable patterns (`FileOperations`, `VnodeOps`, `SchedClass`, `NetDeviceOps`, `BlockDeviceOps`).
+* Ensure zero heap allocations inside vtable methods, atomic class registration, and `#[repr(C)]` FFI compatibility.
+
+## 4. Concurrency & Readers/Writers Management
+
+When handling concurrent read-write shared resources:
+* Refer to `docs/AGENTS_READERS_WRITERS_MANAGEMENT_GUIDE.md` for Readers/Writers synchronization rules (`AtomicRwLock`, RCU lock-free reading, writer-preference locks).
+* Avoid writer starvation and never import standard library mutexes/rwlocks in core `#![no_std]` modules.
+
+## 5. Data Confidentiality & Confidential Computing
+
+When handling sensitive buffers, keys, or enclave memory:
+* Refer to `docs/AGENTS_CONFIDENTIALITY_MANAGEMENT_GUIDE.md` for zeroization standards, constant-time algorithms, and confidential computing (AMD SEV-SNP / Intel TDX) guest state isolation.
+* Enforce volatile zeroization on drop and ensure no unencrypted secret memory spills into crash dumps.
+
+## 6. Development Workflow & Verification Protocol
 
 1. **Pre-Flight Verification:** Run `./run_sigma_tests.sh` to establish baseline test status.
 2. **Implementation:** Modify source files in `src/`, adding companion unit tests in `#[cfg(test)] mod tests` blocks.

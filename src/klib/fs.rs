@@ -1,19 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 //! Custom file system implementation for SigmaOS
 //! This module provides no_std alternatives to std::fs
 
-use core::ffi::c_char;
-use core::fmt;
 use std::string::String;
 use std::vec::Vec;
+use core::ffi::c_char;
+use core::fmt;
 
 /// Raw file descriptor type
 pub type RawFd = i32;

@@ -1,20 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::boxed::Box;
 use std::vec::Vec;
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
 /// Implements security event logging and audit trails
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type EventID = usize;

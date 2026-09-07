@@ -1,17 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 
 #[cfg(test_disabled)]
 extern crate std;
 
-use alloc::vec::Vec;
+use std::vec::Vec;
 /// Arch Linux-inspired rolling release build engine (makepkg) and package manager (pacman) for SigmaOS.
 /// Provides PKGBUILD parsing, source compilation simulation, and rolling release dependency installations.
 use core::sync::atomic::{AtomicUsize, Ordering};

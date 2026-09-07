@@ -1,19 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Linux Mint Parity Tools
 // Implements Linux Mint-style desktop utilities for SigmaOS
 // Inspired by Linux Mint's user-friendly system tools
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Update level (1-5 tier system from Linux Mint)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

@@ -1,17 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 /// Sovereign Linux Kernel Parity Subsystem for SigmaOS
 /// Clean-room implementation of Linux io_uring, memfd_secret, BPF LSM, and Page Folios
 /// Designed for bare-metal zero-dependency performance and zero-trust security
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 // ============================================================================
 // 1. Linux io_uring Asynchronous Ring Buffer Engine (KernelIoUringEngine)

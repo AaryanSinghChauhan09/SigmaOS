@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Software Store & Safety Scanner Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Evaluates package installations against security/safety scores and sandboxing requirements.
@@ -110,11 +101,3 @@ mod tests {
         assert_eq!(update_count, 1);
     }
 }
-
-#[derive(Debug, Clone)]
-pub struct SoftwareRegistryEntry {
-    pub name: String,
-    pub size: usize,
-}
-
-pub static GLOBAL_SOFTWARE_STORE: Option<SigmaSoftwareStore> = None;

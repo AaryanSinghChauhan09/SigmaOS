@@ -1,13 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
-pub mod sigma_netfilter;
 pub mod dns;
 pub mod socket;
 pub mod stack;
@@ -42,5 +32,3 @@ pub use network_syscalls::{
     CLONE_NEWNET, AF_INET, AF_INET6, AF_UNIX, SOCK_STREAM, SOCK_DGRAM, SOCK_RAW,
     IPPROTO_TCP, IPPROTO_UDP, IPPROTO_IP,
 };
-
-pub mod sigma_wireguard;

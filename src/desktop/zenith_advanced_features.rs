@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 #![cfg_attr(not(test), no_std)]
 use std::vec;
 // SigmaOS Zenith Advanced Desktop Features
@@ -22,25 +13,25 @@ use std::vec::Vec;
 /// Advanced window layout modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowLayoutMode {
-    Tiling,      // Automatic tiling (i3/sway-style)
-    Stacking,    // Traditional stacking
-    Tabbed,      // Tabbed windows
-    Floating,    // Floating windows
-    Grid,        // Grid layout
-    Spiral,      // Spiral layout
-    MasterStack, // BSD Lumina & DWM-inspired Master+Stack
-    DynamicBSP,  // Pop!_OS COSMIC-inspired dynamic binary space partitioning
+    Tiling,     // Automatic tiling (i3/sway-style)
+    Stacking,   // Traditional stacking
+    Tabbed,     // Tabbed windows
+    Floating,   // Floating windows
+    Grid,       // Grid layout
+    Spiral,     // Spiral layout
+    MasterStack,// BSD Lumina & DWM-inspired Master+Stack
+    DynamicBSP, // Pop!_OS COSMIC-inspired dynamic binary space partitioning
 }
 
 /// Linux & BSD Desktop Environment Inspiration Presets
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DesktopInspirationPreset {
-    KdePlasma,    // KDE Plasma widget-centric panel & floating desktop
-    GnomeShell,   // GNOME 40+ overview & workspace gestures
-    XfceModular,  // XFCE / MATE light modular dual-panel layout
-    CinnamonMint, // Linux Mint Cinnamon taskbar & applet tray
-    LuminaBsd,    // FreeBSD / TrueOS Lumina clean Qt/ZFS desktop
-    CosmicRust,   // Pop!_OS COSMIC auto-tiling Rust workspace
+    KdePlasma,   // KDE Plasma widget-centric panel & floating desktop
+    GnomeShell,  // GNOME 40+ overview & workspace gestures
+    XfceModular, // XFCE / MATE light modular dual-panel layout
+    CinnamonMint,// Linux Mint Cinnamon taskbar & applet tray
+    LuminaBsd,   // FreeBSD / TrueOS Lumina clean Qt/ZFS desktop
+    CosmicRust,  // Pop!_OS COSMIC auto-tiling Rust workspace
 }
 
 impl ZenithDesktopEnvironment {

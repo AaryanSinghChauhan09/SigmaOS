@@ -1,23 +1,14 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::boxed::Box;
 use std::vec;
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
-use std::collections::HashMap;
-use std::path::PathBuf;
+use std::collections::BTreeMap as HashMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::collections::BTreeMap as HashMap;
+use std::format;
 
 /// VM configuration
 #[derive(Debug, Clone)]
@@ -214,13 +205,13 @@ impl VhostUserDevice {
 pub enum KvmExitReason {
     Unknown,
     Io,
-    Mmio,
-    Hypercall,
     Interrupt,
     IoIn { port: u16, size: u8 },
     IoOut { port: u16, size: u8, data: u32 },
+    Mmio,
     MmioRead { addr: u64, len: u8 },
     MmioWrite { addr: u64, len: u8, data: u64 },
+    Hypercall,
     Hlt,
     Shutdown,
     InternalError,
@@ -1550,10 +1541,7 @@ impl VmManager {
             VmSnapshot {
                 id: snapshot_id.clone(),
                 name: name.to_string(),
-                created_at: std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap()
-                    .as_secs(),
+                created_at: 1700000000u64,
                 snapshot_path: format!("/var/lib/vm/snapshots/{}", snapshot_id),
             },
         );

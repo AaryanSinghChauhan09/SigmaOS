@@ -18,11 +18,11 @@
 
 // (no_std only applicable at crate root - removed)
 
-use core::option::Option::{self, None, Some};
-use core::result::Result::{self, Err, Ok};
 use std::boxed::Box;
 use std::string::String;
 use std::vec::Vec;
+use core::option::Option::{self, None, Some};
+use core::result::Result::{self, Err, Ok};
 
 pub const PAGE_SIZE: usize = 4096;
 
@@ -562,9 +562,17 @@ pub enum DeviceType {
     Filter,
 }
 
+#[derive(Debug, Clone)]
+pub struct DeviceObjectX86 {
+    pub device_type: DeviceType,
+    pub driver_name: &'static str,
+    pub next_device: Option<std::boxed::Box<DeviceObjectX86>>,
+    pub attached_device: Option<std::boxed::Box<DeviceObjectX86>>,
+}
+
 pub struct DriverObjectX86 {
     pub driver_name: &'static str,
-    pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],
+    pub major_function: [Option<fn(&DeviceObjectX86, &mut Irp) -> u32>; 8],
 }
 
 #[derive(Debug, Clone)]

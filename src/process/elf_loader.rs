@@ -1,15 +1,6 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
-use core::fmt;
 use std::vec::Vec;
+use core::fmt;
 
 /// ELF Header Magic Number
 const ELF_MAGIC: &[u8; 4] = b"\x7FELF";
@@ -322,47 +313,23 @@ impl ElfLoader {
             ]);
 
             let file_offset = u64::from_le_bytes([
-                segment_data[8],
-                segment_data[9],
-                segment_data[10],
-                segment_data[11],
-                segment_data[12],
-                segment_data[13],
-                segment_data[14],
-                segment_data[15],
+                segment_data[8], segment_data[9], segment_data[10], segment_data[11],
+                segment_data[12], segment_data[13], segment_data[14], segment_data[15],
             ]);
 
             let vaddr = u64::from_le_bytes([
-                segment_data[16],
-                segment_data[17],
-                segment_data[18],
-                segment_data[19],
-                segment_data[20],
-                segment_data[21],
-                segment_data[22],
-                segment_data[23],
+                segment_data[16], segment_data[17], segment_data[18], segment_data[19],
+                segment_data[20], segment_data[21], segment_data[22], segment_data[23],
             ]);
 
             let file_size = u64::from_le_bytes([
-                segment_data[32],
-                segment_data[33],
-                segment_data[34],
-                segment_data[35],
-                segment_data[36],
-                segment_data[37],
-                segment_data[38],
-                segment_data[39],
+                segment_data[32], segment_data[33], segment_data[34], segment_data[35],
+                segment_data[36], segment_data[37], segment_data[38], segment_data[39],
             ]);
 
             let memory_size = u64::from_le_bytes([
-                segment_data[40],
-                segment_data[41],
-                segment_data[42],
-                segment_data[43],
-                segment_data[44],
-                segment_data[45],
-                segment_data[46],
-                segment_data[47],
+                segment_data[40], segment_data[41], segment_data[42], segment_data[43],
+                segment_data[44], segment_data[45], segment_data[46], segment_data[47],
             ]);
 
             segments.push(LoadableSegment {

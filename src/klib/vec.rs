@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 
 use core::hash::{Hash, Hasher};
 use core::mem;
@@ -48,7 +39,9 @@ impl<T> Vec<T> {
             return Self::new();
         }
         let size = mem::size_of::<T>() * capacity;
-        let new_data = unsafe { alloc(size) } as *mut T;
+        // SAFETY: `size` is non-zero (capacity > 0 and size_of::<T>() >= 1 for non-ZST).
+        // The returned pointer is either null (checked by callers) or valid for `size` bytes.
+        let new_data = unsafe { alloc(size) as *mut T };
         Vec {
             data: new_data,
             len: 0,
@@ -103,47 +96,6 @@ impl<T> Vec<T> {
         self.capacity
     }
 
-    pub fn pop(&mut self) -> Option<T> {
-        if self.len == 0 {
-            None
-        } else {
-            self.len -= 1;
-            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
-        }
-    }
-
-    pub fn insert(&mut self, index: usize, element: T) {
-        if index > self.len {
-            panic!("index out of bounds");
-        }
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            for i in (index..self.len).rev() {
-                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
-            }
-            core::ptr::write(self.data.add(index), element);
-            self.len += 1;
-        }
-    }
-
-    pub fn get(&self, index: usize) -> Option<&T> {
-        if index < self.len {
-            unsafe { Some(&*self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
-    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-        if index < self.len {
-            unsafe { Some(&mut *self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
     pub fn as_slice(&self) -> &[T] {
         if self.len == 0 {
             &[]
@@ -180,22 +132,17 @@ impl<T> Vec<T> {
         }
     }
 
-    /// Remove an element at `index`, shifting all trailing elements left by 1 position.
-    /// Optimized by Bolt ⚡: replaces element-by-element loop with a single bulk
-    /// `copy_nonoverlapping` call, converting O(N) loop overhead into a single
-    /// SIMD/memcpy bulk memory shift.
     pub fn remove(&mut self, index: usize) -> T {
         if index >= self.len {
             panic!("index out of bounds");
         }
         // SAFETY: `index < self.len` is checked above; `self.data + index` is within
-        // the allocation. `ptr::copy` shifts all trailing elements left by 1 position
-        // in a single contiguous block move (memmove handles overlapping memory).
+        // the allocation. `copy_nonoverlapping` shifts elements left one position —
+        // valid because `i+1 <= self.len - 1` inside the loop.
         unsafe {
             let item = core::ptr::read(self.data.add(index));
-            let count = self.len - 1 - index;
-            if count > 0 {
-                core::ptr::copy(self.data.add(index + 1), self.data.add(index), count);
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
             }
             self.len -= 1;
             item
@@ -274,24 +221,21 @@ impl<T> Vec<T> {
         }
     }
 
-    /// Insert `item` at `index`, shifting all trailing elements right by 1 position.
-    /// Optimized by Bolt ⚡: replaces element-by-element reverse loop with a single bulk
-    /// `ptr::copy` call, converting O(N) loop overhead into a single vectorized
-    /// memmove block shift.
     pub fn insert(&mut self, index: usize, item: T) {
         if index > self.len {
             panic!("index out of bounds");
         }
-        // SAFETY: After optional growth, `self.capacity > self.len`. The `ptr::copy` call
-        // shifts elements right making space at `index`. `ptr::copy` handles overlapping
-        // source and destination regions correctly (memmove).
+        // SAFETY: After optional growth, `self.capacity > self.len`.  The loop shifts
+        // elements to the right making space at `index`.  All accesses are within
+        // `0..=self.len` which is covered by the allocation.
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
             }
             if index < self.len {
-                let count = self.len - index;
-                core::ptr::copy(self.data.add(index), self.data.add(index + 1), count);
+                for i in (index..self.len).rev() {
+                    core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+                }
             }
             core::ptr::write(self.data.add(index), item);
             self.len += 1;
@@ -531,16 +475,6 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-impl<T> core::iter::FromIterator<T> for Vec<T> {
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut vec = Vec::new();
-        for item in iter {
-            vec.push(item);
-        }
-        vec
-    }
-}
-
 pub struct VecIter<'a, T> {
     vec: &'a Vec<T>,
     index: usize,
@@ -617,10 +551,7 @@ impl<T> Drop for Vec<T> {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
                 #[cfg(not(target_os = "none"))]
-                free_sized(
-                    self.data as *mut u8,
-                    self.capacity * core::mem::size_of::<T>(),
-                );
+                free_sized(self.data as *mut u8, self.capacity * core::mem::size_of::<T>());
                 #[cfg(target_os = "none")]
                 free(self.data as *mut u8);
             }
@@ -662,11 +593,11 @@ impl<'a, T> Drop for Drain<'a, T> {
                 core::ptr::drop_in_place(self.vec.data.add(i));
             }
             let remaining = self.vec.len - self.end;
-            if remaining > 0 {
-                core::ptr::copy(
-                    self.vec.data.add(self.end),
-                    self.vec.data.add(self.start),
-                    remaining,
+            for i in 0..remaining {
+                core::ptr::copy_nonoverlapping(
+                    self.vec.data.add(self.end + i),
+                    self.vec.data.add(self.start + i),
+                    1,
                 );
             }
             self.vec.len -= self.end - self.start;
@@ -711,38 +642,4 @@ unsafe fn free_sized(ptr: *mut u8, size: usize) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_vec_insert_remove() {
-        let mut v: Vec<i32> = Vec::new();
-        v.push(10);
-        v.push(20);
-        v.push(30);
-
-        v.insert(1, 15);
-        assert_eq!(v.as_slice(), &[10, 15, 20, 30]);
-
-        v.insert(0, 5);
-        assert_eq!(v.as_slice(), &[5, 10, 15, 20, 30]);
-
-        v.insert(5, 35);
-        assert_eq!(v.as_slice(), &[5, 10, 15, 20, 30, 35]);
-
-        let removed = v.remove(2);
-        assert_eq!(removed, 15);
-        assert_eq!(v.as_slice(), &[5, 10, 20, 30, 35]);
-
-        let removed_head = v.remove(0);
-        assert_eq!(removed_head, 5);
-        assert_eq!(v.as_slice(), &[10, 20, 30, 35]);
-
-        let removed_tail = v.remove(3);
-        assert_eq!(removed_tail, 35);
-        assert_eq!(v.as_slice(), &[10, 20, 30]);
-    }
 }

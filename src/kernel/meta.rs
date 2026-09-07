@@ -1,13 +1,7 @@
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
-#![allow(non_camel_case_types)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
 use std::boxed::Box;
 // SigmaOS Meta-Kernel Orchestration, OOP Plugins, Micro-Drivers, and Legacy Pods
 // Allows parallel execution of legacy kernel personas (2.x -> 6.x) alongside modern ABIs.
+
 
 /// 1. Meta-Kernel Orchestration
 /// Supervisory kernel managing multiple kernel personas simultaneously.

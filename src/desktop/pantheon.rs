@@ -1,22 +1,13 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Pantheon Desktop Environment (elementary OS Parity)
 // Implements Gala Window Manager, Wingpanel Status Bar, Plank Dock, Slingshot Launcher, AppCenter, and Greeter.
 
 #[cfg(test_disabled)]
 extern crate std;
 
-use core::sync::atomic::{AtomicBool, Ordering};
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, Ordering};
 
 use crate::klib::HashMap;
 

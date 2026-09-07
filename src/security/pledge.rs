@@ -1,19 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 
 use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-#[cfg(test)]
-#[cfg(test)]
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 
 use core::sync::atomic::{AtomicBool, Ordering};
@@ -176,8 +165,7 @@ impl PledgeManager {
             buf
         };
         let lower_path = core::str::from_utf8(&lower[..path.len().min(512)]).unwrap_or("");
-        if lower_path.contains("%2e%2e") || lower_path.contains("%2f") || lower_path.contains("%5c")
-        {
+        if lower_path.contains("%2e%2e") || lower_path.contains("%2f") || lower_path.contains("%5c") {
             return false;
         }
 

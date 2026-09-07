@@ -1,14 +1,6 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS AI Module
 // S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, quantization, and Agentic OS runtime
+
 
 pub mod agent;
 pub mod agentic_os_runtime;
@@ -50,6 +42,11 @@ pub use agent::{AIAgent, SimpleAIAgent};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,
+};
+pub use developer_platform::{
+    AiSafetyPolicyEngine, DefaultDenyNetworkPolicy, DeviceTarget, ExperimentRun,
+    LocalLlmOrchestrator, MarketplaceModel, MlExperimentTracker, OpenShellAgentSandbox,
+    PrivacyRouter, SignedModelMarketplace,
 };
 pub use llm::{
     BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,

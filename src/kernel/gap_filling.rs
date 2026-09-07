@@ -18,10 +18,10 @@
 
 // (no_std only applicable at crate root - removed)
 
+use std::vec::Vec;
 use core::default::Default;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
-use std::vec::Vec;
 
 pub const MAX_IPC_MESSAGE_SIZE: usize = 64;
 pub const IPC_QUEUE_CAPACITY: usize = 8;

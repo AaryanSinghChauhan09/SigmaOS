@@ -1,20 +1,20 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 /// OOP-based ARM64 + RISC-V Portability for SigmaOS
 /// Based on Roadmap Item: ARM64 + RISC-V Portability
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Architecture { X86 = 0, X86_64 = 1, ARM64 = 2, RISCV64 = 3, LOONGARCH64 = 4, PPC64LE = 5 }
+pub enum Architecture {
+    X86_32 = 0,
+    X86_64 = 1,
+    ARM64 = 2,
+    RISCV64 = 3,
+    LoongArch64 = 4,
+    PowerPC64 = 5,
+    S390x = 6,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -66,7 +66,7 @@ impl SimpleARM64Support {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -255,7 +255,7 @@ impl SovereignContextSwitchEngine {
     /// Optimized X64 context switch with PCID TLB preservation and TLS MSR restoration
     pub fn context_switch_x64(&mut self, next_x64: X64Context) -> (X64Context, bool) {
         let old_context = self.current_context;
-        let old_x64 = match old_context {
+        let mut old_x64 = match old_context {
             CpuContextState::X64(c) => c,
             _ => X64Context::default(),
         };

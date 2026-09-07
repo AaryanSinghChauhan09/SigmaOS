@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 //! # PID Namespace Implementation
 //!
 //! This module implements PID namespace functionality for process isolation in SigmaOS.
@@ -20,13 +11,12 @@
 //! - **Namespace Inheritance**: Child processes inherit parent's namespace
 //! - **Namespace Cloning**: Support for creating child namespaces
 
-use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
+use std::collections::BTreeMap;
 
 use crate::kernel::namespaces::{
-    next_namespace_id, KernelNamespace, KernelNamespaceType, NamespaceError, NamespaceId,
-    MAX_PIDS_PER_NAMESPACE,
+    KernelNamespace, NamespaceId, KernelNamespaceType, NamespaceError, next_namespace_id, MAX_PIDS_PER_NAMESPACE,
 };
 
 /// Process ID type
@@ -176,7 +166,9 @@ impl PidNamespace {
     /// Get the number of used PIDs in this namespace
     pub fn used_pid_count(&self) -> u32 {
         let pids = self.used_pids.lock().unwrap();
-        pids.values().filter(|&&used| used).count() as u32
+        pids.values()
+            .filter(|&&used| used)
+            .count() as u32
     }
 
     /// Get the number of free PIDs in this namespace
@@ -331,10 +323,7 @@ mod tests {
 
         assert_eq!(child_ns.namespace_type(), NamespaceType::Pid);
         assert!(child_ns.parent().is_some());
-        assert_eq!(
-            child_ns.parent().unwrap().namespace_id(),
-            parent_ns.namespace_id()
-        );
+        assert_eq!(child_ns.parent().unwrap().namespace_id(), parent_ns.namespace_id());
     }
 
     #[test]

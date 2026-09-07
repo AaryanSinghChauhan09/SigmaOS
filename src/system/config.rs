@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -120,7 +111,7 @@ impl SystemConfigManager {
 
         // Ensure directory exists
         if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
+            fs::create_dir_all(parent).map_err(|e: std::io::Error| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
         }
 
         let entries = self
@@ -319,7 +310,7 @@ impl ServiceManager {
         let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
 
         let content =
-            fs::read_to_string(&file_path).map_err(|e| ConfigError::ReadError(file_path, e))?;
+            fs::read_to_string(&file_path).map_err(|e: std::io::Error| ConfigError::ReadError(file_path, e.to_string()))?;
 
         let service = self.parse_service_unit(&content, name);
         self.services.insert(name.to_string(), service);
@@ -396,7 +387,7 @@ impl ServiceManager {
         let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
 
         if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.clone(), e))?;
+            fs::create_dir_all(parent).map_err(|e: std::io::Error| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
         }
 
         fs::write(&file_path, service.to_unit_file())

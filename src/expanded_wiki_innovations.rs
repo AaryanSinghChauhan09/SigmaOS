@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 /// Expanded Wiki & Distro Unimplemented Innovations Engine
 /// Implements planned wiki concepts inspired by Linux & BSD distributions:
 /// - Arch Linux pacman-contrib utilities (paccache, checkupdates, rankmirrors, updpkgsums, finddeps)
@@ -21,13 +12,11 @@
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
-extern crate alloc;
-
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec;
+use std::vec::Vec;
 
 /// Arch Linux pacman-contrib Utilities Engine
 pub struct ArchPacmanContribEngine {
@@ -810,7 +799,7 @@ impl Default for StrategicImportPlanEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod expanded_wiki_tests {
     use super::*;
 

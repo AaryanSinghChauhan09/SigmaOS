@@ -1,9 +1,3 @@
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
 pub mod mobile_variant;
 pub use mobile_variant::*;
 
@@ -14,9 +8,9 @@ pub mod moksha;
 pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
-pub mod ultimate_distro_desktop;
 pub mod web_wasm_bridge;
 pub mod zenith_compositor;
+pub mod ultimate_distro_desktop;
 
 pub use ultimate_distro_desktop::{
     ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
@@ -24,7 +18,7 @@ pub use ultimate_distro_desktop::{
     Xfce418Engine,
 };
 
-// web_wasm_bridge items accessed via pub mod web_wasm_bridge above
+pub use web_wasm_bridge::*;
 
 pub use web_wasm_bridge::*;
 

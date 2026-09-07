@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // eBPF VM Foundation - Complete Instruction Set & Core Engine
 // Phase 9.4 Part 1: BPF Instruction Set Definition and Virtual Machine Implementation
 //
@@ -26,7 +17,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 pub trait BpfHelper: Send + Sync {
     /// Get the helper function ID
     fn id(&self) -> u32;
-
+    
     /// Execute the helper function
     /// Takes VM state and arguments in R1-R5, returns result in R0
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String>;
@@ -53,14 +44,14 @@ impl BpfHelper for MapLookupHelper {
     fn id(&self) -> u32 {
         helper_ids::BPF_MAP_LOOKUP_ELEM
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // R1: map pointer (u64)
         // R2: key pointer (u64)
         // Returns: value pointer or 0 if not found
         let _map_ptr = vm.get_register(1)?;
         let _key_ptr = vm.get_register(2)?;
-
+        
         // In a real implementation, would look up in actual map
         // For now, return 0 (not found)
         vm.set_register(0, 0)?;
@@ -75,7 +66,7 @@ impl BpfHelper for MapUpdateHelper {
     fn id(&self) -> u32 {
         helper_ids::BPF_MAP_UPDATE_ELEM
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // R1: map pointer (u64)
         // R2: key pointer (u64)
@@ -86,7 +77,7 @@ impl BpfHelper for MapUpdateHelper {
         let _key_ptr = vm.get_register(2)?;
         let _value_ptr = vm.get_register(3)?;
         let _flags = vm.get_register(4)?;
-
+        
         // In a real implementation, would update actual map
         vm.set_register(0, 0)?;
         Ok(0)
@@ -100,14 +91,14 @@ impl BpfHelper for MapDeleteHelper {
     fn id(&self) -> u32 {
         helper_ids::BPF_MAP_DELETE_ELEM
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // R1: map pointer (u64)
         // R2: key pointer (u64)
         // Returns: 0 on success, negative on error
         let _map_ptr = vm.get_register(1)?;
         let _key_ptr = vm.get_register(2)?;
-
+        
         // In a real implementation, would delete from actual map
         vm.set_register(0, 0)?;
         Ok(0)
@@ -121,7 +112,7 @@ impl BpfHelper for ProbeReadHelper {
     fn id(&self) -> u32 {
         helper_ids::BPF_PROBE_READ
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // R1: destination pointer (u64)
         // R2: size (u64)
@@ -130,7 +121,7 @@ impl BpfHelper for ProbeReadHelper {
         let _dst_ptr = vm.get_register(1)?;
         let _size = vm.get_register(2)?;
         let _src_ptr = vm.get_register(3)?;
-
+        
         // In a real implementation, would safely read memory
         vm.set_register(0, 0)?;
         Ok(0)
@@ -144,13 +135,13 @@ impl BpfHelper for KtimeGetNsHelper {
     fn id(&self) -> u32 {
         helper_ids::BPF_KTIME_GET_NS
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // Returns: current time in nanoseconds since boot
         let duration = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map_err(|e| format!("Failed to get system time: {}", e))?;
-
+        
         let nanos = duration.as_secs() * 1_000_000_000 + duration.subsec_nanos() as u64;
         vm.set_register(0, nanos)?;
         Ok(nanos)
@@ -164,7 +155,7 @@ impl BpfHelper for GetCurrentPidTgidHelper {
     fn id(&self) -> u32 {
         helper_ids::BPF_GET_CURRENT_PID_TGID
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // Returns: upper 32 bits = tgid, lower 32 bits = pid
         // For now, use dummy values
@@ -183,7 +174,7 @@ impl BpfHelper for GetCurrentUidGidHelper {
     fn id(&self) -> u32 {
         helper_ids::BPF_GET_CURRENT_UID_GID
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // Returns: upper 32 bits = gid, lower 32 bits = uid
         let uid = 1000u32;
@@ -201,7 +192,7 @@ impl BpfHelper for GetSysctlHelper {
     fn id(&self) -> u32 {
         helper_ids::BPF_GET_SYSCTL
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // R1: sysctl name pointer
         // R2: size
@@ -210,7 +201,7 @@ impl BpfHelper for GetSysctlHelper {
         let _name_ptr = vm.get_register(1)?;
         let _size = vm.get_register(2)?;
         let _flags = vm.get_register(3)?;
-
+        
         // In a real implementation, would read actual sysctl
         vm.set_register(0, 0)?;
         Ok(0)
@@ -224,7 +215,7 @@ impl BpfHelper for TracePrintkHelper {
     fn id(&self) -> u32 {
         helper_ids::BPF_TRACE_PRINTK
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // R1: format string pointer
         // R2: format string size
@@ -234,7 +225,7 @@ impl BpfHelper for TracePrintkHelper {
         let _arg1 = vm.get_register(3)?;
         let _arg2 = vm.get_register(4)?;
         let _arg3 = vm.get_register(5)?;
-
+        
         // In a real implementation, would print formatted output
         // For now, just return success
         vm.set_register(0, 0)?;
@@ -249,7 +240,7 @@ impl BpfHelper for GetPrandomU32Helper {
     fn id(&self) -> u32 {
         helper_ids::BPF_GET_PRANDOM_U32
     }
-
+    
     fn execute(&self, vm: &mut BpfVm) -> Result<u64, String> {
         // Returns: random u32 value
         use std::time::SystemTime;
@@ -257,7 +248,7 @@ impl BpfHelper for GetPrandomU32Helper {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .subsec_nanos();
-
+        
         // Simple PRNG based on time
         let random = ((nanos as u64).wrapping_mul(1103515245).wrapping_add(12345)) >> 16;
         vm.set_register(0, random & 0xFFFFFFFF)?;
@@ -274,66 +265,45 @@ impl HelperRegistry {
     /// Create a new helper registry with all standard helpers
     pub fn new() -> Self {
         let mut helpers: HashMap<u32, Arc<dyn BpfHelper>> = HashMap::new();
-
+        
         let map_lookup = Arc::new(MapLookupHelper);
-        helpers.insert(
-            helper_ids::BPF_MAP_LOOKUP_ELEM,
-            map_lookup as Arc<dyn BpfHelper>,
-        );
-
+        helpers.insert(helper_ids::BPF_MAP_LOOKUP_ELEM, map_lookup as Arc<dyn BpfHelper>);
+        
         let map_update = Arc::new(MapUpdateHelper);
-        helpers.insert(
-            helper_ids::BPF_MAP_UPDATE_ELEM,
-            map_update as Arc<dyn BpfHelper>,
-        );
-
+        helpers.insert(helper_ids::BPF_MAP_UPDATE_ELEM, map_update as Arc<dyn BpfHelper>);
+        
         let map_delete = Arc::new(MapDeleteHelper);
-        helpers.insert(
-            helper_ids::BPF_MAP_DELETE_ELEM,
-            map_delete as Arc<dyn BpfHelper>,
-        );
-
+        helpers.insert(helper_ids::BPF_MAP_DELETE_ELEM, map_delete as Arc<dyn BpfHelper>);
+        
         let probe_read = Arc::new(ProbeReadHelper);
         helpers.insert(helper_ids::BPF_PROBE_READ, probe_read as Arc<dyn BpfHelper>);
-
+        
         let ktime_get = Arc::new(KtimeGetNsHelper);
-        helpers.insert(
-            helper_ids::BPF_KTIME_GET_NS,
-            ktime_get as Arc<dyn BpfHelper>,
-        );
-
+        helpers.insert(helper_ids::BPF_KTIME_GET_NS, ktime_get as Arc<dyn BpfHelper>);
+        
         let pid_tgid = Arc::new(GetCurrentPidTgidHelper);
-        helpers.insert(
-            helper_ids::BPF_GET_CURRENT_PID_TGID,
-            pid_tgid as Arc<dyn BpfHelper>,
-        );
-
+        helpers.insert(helper_ids::BPF_GET_CURRENT_PID_TGID, pid_tgid as Arc<dyn BpfHelper>);
+        
         let uid_gid = Arc::new(GetCurrentUidGidHelper);
-        helpers.insert(
-            helper_ids::BPF_GET_CURRENT_UID_GID,
-            uid_gid as Arc<dyn BpfHelper>,
-        );
-
+        helpers.insert(helper_ids::BPF_GET_CURRENT_UID_GID, uid_gid as Arc<dyn BpfHelper>);
+        
         let sysctl = Arc::new(GetSysctlHelper);
         helpers.insert(helper_ids::BPF_GET_SYSCTL, sysctl as Arc<dyn BpfHelper>);
-
+        
         let trace = Arc::new(TracePrintkHelper);
         helpers.insert(helper_ids::BPF_TRACE_PRINTK, trace as Arc<dyn BpfHelper>);
-
+        
         let prandom = Arc::new(GetPrandomU32Helper);
-        helpers.insert(
-            helper_ids::BPF_GET_PRANDOM_U32,
-            prandom as Arc<dyn BpfHelper>,
-        );
-
+        helpers.insert(helper_ids::BPF_GET_PRANDOM_U32, prandom as Arc<dyn BpfHelper>);
+        
         HelperRegistry { helpers }
     }
-
+    
     /// Get a helper by ID
     pub fn get_helper(&self, id: u32) -> Option<Arc<dyn BpfHelper>> {
         self.helpers.get(&id).cloned()
     }
-
+    
     /// Register a custom helper
     pub fn register_helper(&mut self, helper: Arc<dyn BpfHelper>) {
         self.helpers.insert(helper.id(), helper);
@@ -353,40 +323,19 @@ pub enum BpfInstruction {
     /// Load 64-bit immediate into destination register
     LoadImm64 { dst_reg: u8, imm64: u64 },
     /// Load 64-bit value from memory (register + offset) into destination
-    LoadReg64 {
-        dst_reg: u8,
-        src_reg: u8,
-        offset: i16,
-    },
+    LoadReg64 { dst_reg: u8, src_reg: u8, offset: i16 },
     /// Load 32-bit value from memory (register + offset) into destination
-    LoadReg32 {
-        dst_reg: u8,
-        src_reg: u8,
-        offset: i16,
-    },
+    LoadReg32 { dst_reg: u8, src_reg: u8, offset: i16 },
     /// Store 64-bit value from src_reg to memory (dst_reg + offset)
-    StoreReg64 {
-        dst_reg: u8,
-        offset: i16,
-        src_reg: u8,
-    },
+    StoreReg64 { dst_reg: u8, offset: i16, src_reg: u8 },
     /// Store 32-bit value from src_reg to memory (dst_reg + offset)
-    StoreReg32 {
-        dst_reg: u8,
-        offset: i16,
-        src_reg: u8,
-    },
+    StoreReg32 { dst_reg: u8, offset: i16, src_reg: u8 },
     /// Store 64-bit immediate value to memory (dst_reg + offset)
     StoreImm64 { dst_reg: u8, offset: i16, imm: u64 },
     /// Load absolute - from packet data at offset, size bytes
     LoadAbs { dst: u8, offset: u32, size: u8 },
     /// Load indirect - from packet data at (src_reg + offset), size bytes
-    LoadInd {
-        dst: u8,
-        src_reg: u8,
-        offset: u32,
-        size: u8,
-    },
+    LoadInd { dst: u8, src_reg: u8, offset: u32, size: u8 },
 
     // ============ ARITHMETIC INSTRUCTIONS ============
     /// Add two registers: dst = dst + src (64-bit)
@@ -430,41 +379,17 @@ pub enum BpfInstruction {
     /// Unconditional jump: pc += offset
     Ja { offset: i32 },
     /// Jump if equal: if dst == src { pc += offset }
-    Jeq {
-        dst_reg: u8,
-        src_reg: u8,
-        offset: i32,
-    },
+    Jeq { dst_reg: u8, src_reg: u8, offset: i32 },
     /// Jump if not equal: if dst != src { pc += offset }
-    Jne {
-        dst_reg: u8,
-        src_reg: u8,
-        offset: i32,
-    },
+    Jne { dst_reg: u8, src_reg: u8, offset: i32 },
     /// Jump if greater: if dst > src { pc += offset }
-    Jgt {
-        dst_reg: u8,
-        src_reg: u8,
-        offset: i32,
-    },
+    Jgt { dst_reg: u8, src_reg: u8, offset: i32 },
     /// Jump if greater or equal: if dst >= src { pc += offset }
-    Jge {
-        dst_reg: u8,
-        src_reg: u8,
-        offset: i32,
-    },
+    Jge { dst_reg: u8, src_reg: u8, offset: i32 },
     /// Jump if less: if dst < src { pc += offset }
-    Jlt {
-        dst_reg: u8,
-        src_reg: u8,
-        offset: i32,
-    },
+    Jlt { dst_reg: u8, src_reg: u8, offset: i32 },
     /// Jump if less or equal: if dst <= src { pc += offset }
-    Jle {
-        dst_reg: u8,
-        src_reg: u8,
-        offset: i32,
-    },
+    Jle { dst_reg: u8, src_reg: u8, offset: i32 },
     /// Jump if equal to immediate: if dst == imm { pc += offset }
     JeqImm { dst_reg: u8, imm: u32, offset: i32 },
 
@@ -509,7 +434,8 @@ impl BpfInstruction {
             | BpfInstruction::Arsh { dst_reg, .. }
             | BpfInstruction::Mov { dst_reg, .. }
             | BpfInstruction::MovImm { dst_reg, .. } => Some(*dst_reg),
-            BpfInstruction::LoadAbs { dst, .. } | BpfInstruction::LoadInd { dst, .. } => Some(*dst),
+            BpfInstruction::LoadAbs { dst, .. }
+            | BpfInstruction::LoadInd { dst, .. } => Some(*dst),
             _ => None,
         }
     }
@@ -553,7 +479,7 @@ pub fn is_valid_register(reg: u8) -> bool {
 }
 
 /// Check if an immediate value is valid (32-bit)
-pub fn is_valid_immediate(_imm: u32) -> bool {
+pub fn is_valid_immediate(imm: u32) -> bool {
     // All u32 values are valid
     true
 }
@@ -568,11 +494,7 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
             }
             Ok(())
         }
-        BpfInstruction::LoadReg64 {
-            dst_reg,
-            src_reg,
-            offset,
-        } => {
+        BpfInstruction::LoadReg64 { dst_reg, src_reg, offset } => {
             if !is_valid_register(*dst_reg) {
                 return Err(format!("Invalid destination register: {}", dst_reg));
             }
@@ -585,11 +507,7 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
             }
             Ok(())
         }
-        BpfInstruction::LoadReg32 {
-            dst_reg,
-            src_reg,
-            offset,
-        } => {
+        BpfInstruction::LoadReg32 { dst_reg, src_reg, offset } => {
             if !is_valid_register(*dst_reg) {
                 return Err(format!("Invalid destination register: {}", dst_reg));
             }
@@ -601,11 +519,7 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
             }
             Ok(())
         }
-        BpfInstruction::StoreReg64 {
-            dst_reg,
-            src_reg,
-            offset,
-        } => {
+        BpfInstruction::StoreReg64 { dst_reg, src_reg, offset } => {
             if !is_valid_register(*dst_reg) {
                 return Err(format!("Invalid destination register: {}", dst_reg));
             }
@@ -617,11 +531,7 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
             }
             Ok(())
         }
-        BpfInstruction::StoreReg32 {
-            dst_reg,
-            src_reg,
-            offset,
-        } => {
+        BpfInstruction::StoreReg32 { dst_reg, src_reg, offset } => {
             if !is_valid_register(*dst_reg) {
                 return Err(format!("Invalid destination register: {}", dst_reg));
             }
@@ -633,9 +543,7 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
             }
             Ok(())
         }
-        BpfInstruction::StoreImm64 {
-            dst_reg, offset, ..
-        } => {
+        BpfInstruction::StoreImm64 { dst_reg, offset, .. } => {
             if !is_valid_register(*dst_reg) {
                 return Err(format!("Invalid destination register: {}", dst_reg));
             }
@@ -649,16 +557,11 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
                 return Err(format!("Invalid destination register: {}", dst));
             }
             if *size != 1 && *size != 2 && *size != 4 && *size != 8 {
-                return Err(format!(
-                    "Invalid load size: {}, must be 1, 2, 4, or 8",
-                    size
-                ));
+                return Err(format!("Invalid load size: {}, must be 1, 2, 4, or 8", size));
             }
             Ok(())
         }
-        BpfInstruction::LoadInd {
-            dst, src_reg, size, ..
-        } => {
+        BpfInstruction::LoadInd { dst, src_reg, size, .. } => {
             if !is_valid_register(*dst) {
                 return Err(format!("Invalid destination register: {}", dst));
             }
@@ -666,10 +569,7 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
                 return Err(format!("Invalid source register: {}", src_reg));
             }
             if *size != 1 && *size != 2 && *size != 4 && *size != 8 {
-                return Err(format!(
-                    "Invalid load size: {}, must be 1, 2, 4, or 8",
-                    size
-                ));
+                return Err(format!("Invalid load size: {}, must be 1, 2, 4, or 8", size));
             }
             Ok(())
         }
@@ -714,24 +614,12 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
         }
 
         // Jump validations
-        BpfInstruction::Jeq {
-            dst_reg, src_reg, ..
-        }
-        | BpfInstruction::Jne {
-            dst_reg, src_reg, ..
-        }
-        | BpfInstruction::Jgt {
-            dst_reg, src_reg, ..
-        }
-        | BpfInstruction::Jge {
-            dst_reg, src_reg, ..
-        }
-        | BpfInstruction::Jlt {
-            dst_reg, src_reg, ..
-        }
-        | BpfInstruction::Jle {
-            dst_reg, src_reg, ..
-        } => {
+        BpfInstruction::Jeq { dst_reg, src_reg, .. }
+        | BpfInstruction::Jne { dst_reg, src_reg, .. }
+        | BpfInstruction::Jgt { dst_reg, src_reg, .. }
+        | BpfInstruction::Jge { dst_reg, src_reg, .. }
+        | BpfInstruction::Jlt { dst_reg, src_reg, .. }
+        | BpfInstruction::Jle { dst_reg, src_reg, .. } => {
             if !is_valid_register(*dst_reg) {
                 return Err(format!("Invalid destination register: {}", dst_reg));
             }
@@ -741,11 +629,7 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
             Ok(())
         }
 
-        BpfInstruction::JeqImm {
-            dst_reg,
-            imm: _,
-            offset: _,
-        } => {
+        BpfInstruction::JeqImm { dst_reg, imm: _, offset: _ } => {
             if !is_valid_register(*dst_reg) {
                 return Err(format!("Invalid destination register: {}", dst_reg));
             }
@@ -771,9 +655,7 @@ pub fn validate_instruction(instr: &BpfInstruction) -> Result<(), String> {
         }
 
         // Call and Return are always valid
-        BpfInstruction::Call { .. }
-        | BpfInstruction::Return
-        | BpfInstruction::Ja { .. }
+        BpfInstruction::Call { .. } | BpfInstruction::Return | BpfInstruction::Ja { .. }
         | BpfInstruction::Nop => Ok(()),
     }
 }
@@ -821,8 +703,9 @@ impl BpfVm {
     pub fn load_program(&mut self, program: Vec<BpfInstruction>) -> Result<(), String> {
         // Validate all instructions
         for (idx, instr) in program.iter().enumerate() {
-            validate_instruction(instr)
-                .map_err(|e| format!("Instruction {} validation failed: {}", idx, e))?;
+            validate_instruction(instr).map_err(|e| {
+                format!("Instruction {} validation failed: {}", idx, e)
+            })?;
         }
 
         // Check that program ends with Return
@@ -846,11 +729,7 @@ impl BpfVm {
             BpfInstruction::LoadImm64 { dst_reg, imm64 } => {
                 self.set_register(*dst_reg, *imm64)?;
             }
-            BpfInstruction::LoadReg64 {
-                dst_reg,
-                src_reg,
-                offset,
-            } => {
+            BpfInstruction::LoadReg64 { dst_reg, src_reg, offset } => {
                 let base = self.get_register(*src_reg)?;
                 let addr = (base as i64 + *offset as i64) as usize;
                 if addr + 8 <= self.stack.len() {
@@ -862,11 +741,7 @@ impl BpfVm {
                     return Err("Load address out of bounds".to_string());
                 }
             }
-            BpfInstruction::LoadReg32 {
-                dst_reg,
-                src_reg,
-                offset,
-            } => {
+            BpfInstruction::LoadReg32 { dst_reg, src_reg, offset } => {
                 let base = self.get_register(*src_reg)?;
                 let addr = (base as i64 + *offset as i64) as usize;
                 if addr + 4 <= self.stack.len() {
@@ -878,11 +753,7 @@ impl BpfVm {
                     return Err("Load address out of bounds".to_string());
                 }
             }
-            BpfInstruction::StoreReg64 {
-                dst_reg,
-                offset,
-                src_reg,
-            } => {
+            BpfInstruction::StoreReg64 { dst_reg, offset, src_reg } => {
                 let dst_base = self.get_register(*dst_reg)?;
                 let addr = (dst_base as i64 + *offset as i64) as usize;
                 let value = self.get_register(*src_reg)?;
@@ -893,11 +764,7 @@ impl BpfVm {
                     return Err("Store address out of bounds".to_string());
                 }
             }
-            BpfInstruction::StoreReg32 {
-                dst_reg,
-                offset,
-                src_reg,
-            } => {
+            BpfInstruction::StoreReg32 { dst_reg, offset, src_reg } => {
                 let dst_base = self.get_register(*dst_reg)?;
                 let addr = (dst_base as i64 + *offset as i64) as usize;
                 let value = self.get_register(*src_reg)? as u32;
@@ -908,11 +775,7 @@ impl BpfVm {
                     return Err("Store address out of bounds".to_string());
                 }
             }
-            BpfInstruction::StoreImm64 {
-                dst_reg,
-                offset,
-                imm,
-            } => {
+            BpfInstruction::StoreImm64 { dst_reg, offset, imm } => {
                 let dst_base = self.get_register(*dst_reg)?;
                 let addr = (dst_base as i64 + *offset as i64) as usize;
                 if addr + 8 <= self.stack.len() {
@@ -1028,11 +891,7 @@ impl BpfVm {
                 let new_pc = (self.program_counter as i64 + *offset as i64) as u64;
                 self.set_program_counter(new_pc)?;
             }
-            BpfInstruction::Jeq {
-                dst_reg,
-                src_reg,
-                offset,
-            } => {
+            BpfInstruction::Jeq { dst_reg, src_reg, offset } => {
                 let dst_val = self.get_register(*dst_reg)?;
                 let src_val = self.get_register(*src_reg)?;
                 if dst_val == src_val {
@@ -1040,11 +899,7 @@ impl BpfVm {
                     self.set_program_counter(new_pc)?;
                 }
             }
-            BpfInstruction::Jne {
-                dst_reg,
-                src_reg,
-                offset,
-            } => {
+            BpfInstruction::Jne { dst_reg, src_reg, offset } => {
                 let dst_val = self.get_register(*dst_reg)?;
                 let src_val = self.get_register(*src_reg)?;
                 if dst_val != src_val {
@@ -1052,11 +907,7 @@ impl BpfVm {
                     self.set_program_counter(new_pc)?;
                 }
             }
-            BpfInstruction::Jgt {
-                dst_reg,
-                src_reg,
-                offset,
-            } => {
+            BpfInstruction::Jgt { dst_reg, src_reg, offset } => {
                 let dst_val = self.get_register(*dst_reg)?;
                 let src_val = self.get_register(*src_reg)?;
                 if dst_val > src_val {
@@ -1064,11 +915,7 @@ impl BpfVm {
                     self.set_program_counter(new_pc)?;
                 }
             }
-            BpfInstruction::Jge {
-                dst_reg,
-                src_reg,
-                offset,
-            } => {
+            BpfInstruction::Jge { dst_reg, src_reg, offset } => {
                 let dst_val = self.get_register(*dst_reg)?;
                 let src_val = self.get_register(*src_reg)?;
                 if dst_val >= src_val {
@@ -1076,11 +923,7 @@ impl BpfVm {
                     self.set_program_counter(new_pc)?;
                 }
             }
-            BpfInstruction::Jlt {
-                dst_reg,
-                src_reg,
-                offset,
-            } => {
+            BpfInstruction::Jlt { dst_reg, src_reg, offset } => {
                 let dst_val = self.get_register(*dst_reg)?;
                 let src_val = self.get_register(*src_reg)?;
                 if dst_val < src_val {
@@ -1088,11 +931,7 @@ impl BpfVm {
                     self.set_program_counter(new_pc)?;
                 }
             }
-            BpfInstruction::Jle {
-                dst_reg,
-                src_reg,
-                offset,
-            } => {
+            BpfInstruction::Jle { dst_reg, src_reg, offset } => {
                 let dst_val = self.get_register(*dst_reg)?;
                 let src_val = self.get_register(*src_reg)?;
                 if dst_val <= src_val {
@@ -1100,11 +939,7 @@ impl BpfVm {
                     self.set_program_counter(new_pc)?;
                 }
             }
-            BpfInstruction::JeqImm {
-                dst_reg,
-                imm,
-                offset,
-            } => {
+            BpfInstruction::JeqImm { dst_reg, imm, offset } => {
                 let dst_val = self.get_register(*dst_reg)?;
                 if dst_val == *imm as u64 {
                     let new_pc = (self.program_counter as i64 + *offset as i64) as u64;
@@ -1114,11 +949,9 @@ impl BpfVm {
 
             // ============ FUNCTION CALLS ============
             BpfInstruction::Call { func_id } => {
-                let registry = self
-                    .helper_registry
-                    .lock()
+                let registry = self.helper_registry.lock()
                     .map_err(|e| format!("Failed to lock helper registry: {}", e))?;
-
+                
                 if let Some(helper) = registry.get_helper(*func_id) {
                     drop(registry); // Release lock before executing helper
                     helper.execute(self)?;
@@ -1247,9 +1080,7 @@ impl BpfVm {
 
     /// Register a custom helper function
     pub fn register_helper(&mut self, helper: Arc<dyn BpfHelper>) -> Result<(), String> {
-        let mut registry = self
-            .helper_registry
-            .lock()
+        let mut registry = self.helper_registry.lock()
             .map_err(|e| format!("Failed to lock helper registry: {}", e))?;
         registry.register_helper(helper);
         Ok(())
@@ -1833,30 +1664,18 @@ mod tests {
     #[test]
     fn test_helper_registry_creation() {
         let registry = HelperRegistry::new();
-
+        
         // Verify all 10 helpers are registered
-        assert!(registry
-            .get_helper(helper_ids::BPF_MAP_LOOKUP_ELEM)
-            .is_some());
-        assert!(registry
-            .get_helper(helper_ids::BPF_MAP_UPDATE_ELEM)
-            .is_some());
-        assert!(registry
-            .get_helper(helper_ids::BPF_MAP_DELETE_ELEM)
-            .is_some());
+        assert!(registry.get_helper(helper_ids::BPF_MAP_LOOKUP_ELEM).is_some());
+        assert!(registry.get_helper(helper_ids::BPF_MAP_UPDATE_ELEM).is_some());
+        assert!(registry.get_helper(helper_ids::BPF_MAP_DELETE_ELEM).is_some());
         assert!(registry.get_helper(helper_ids::BPF_PROBE_READ).is_some());
         assert!(registry.get_helper(helper_ids::BPF_KTIME_GET_NS).is_some());
-        assert!(registry
-            .get_helper(helper_ids::BPF_GET_CURRENT_PID_TGID)
-            .is_some());
-        assert!(registry
-            .get_helper(helper_ids::BPF_GET_CURRENT_UID_GID)
-            .is_some());
+        assert!(registry.get_helper(helper_ids::BPF_GET_CURRENT_PID_TGID).is_some());
+        assert!(registry.get_helper(helper_ids::BPF_GET_CURRENT_UID_GID).is_some());
         assert!(registry.get_helper(helper_ids::BPF_GET_SYSCTL).is_some());
         assert!(registry.get_helper(helper_ids::BPF_TRACE_PRINTK).is_some());
-        assert!(registry
-            .get_helper(helper_ids::BPF_GET_PRANDOM_U32)
-            .is_some());
+        assert!(registry.get_helper(helper_ids::BPF_GET_PRANDOM_U32).is_some());
     }
 
     #[test]
@@ -1869,7 +1688,7 @@ mod tests {
     fn test_bpf_vm_helper_registry() {
         let vm = BpfVm::new();
         let registry = vm.get_helper_registry();
-
+        
         let locked = registry.lock().unwrap();
         assert!(locked.get_helper(helper_ids::BPF_KTIME_GET_NS).is_some());
     }
@@ -1877,17 +1696,15 @@ mod tests {
     #[test]
     fn test_helper_call_ktime_get_ns() {
         let mut vm = BpfVm::new();
-
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_KTIME_GET_NS,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_KTIME_GET_NS },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Result should be a positive nanosecond value
         assert!(result > 0);
     }
@@ -1895,21 +1712,19 @@ mod tests {
     #[test]
     fn test_helper_call_get_current_pid_tgid() {
         let mut vm = BpfVm::new();
-
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_GET_CURRENT_PID_TGID,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_GET_CURRENT_PID_TGID },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Extract pid and tgid
         let pid = (result & 0xFFFFFFFF) as u32;
         let tgid = ((result >> 32) & 0xFFFFFFFF) as u32;
-
+        
         // Both should be reasonable values
         assert_eq!(pid, 1000);
         assert_eq!(tgid, 1000);
@@ -1918,21 +1733,19 @@ mod tests {
     #[test]
     fn test_helper_call_get_current_uid_gid() {
         let mut vm = BpfVm::new();
-
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_GET_CURRENT_UID_GID,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_GET_CURRENT_UID_GID },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Extract uid and gid
         let uid = (result & 0xFFFFFFFF) as u32;
         let gid = ((result >> 32) & 0xFFFFFFFF) as u32;
-
+        
         // Both should be reasonable values
         assert_eq!(uid, 1000);
         assert_eq!(gid, 1000);
@@ -1941,28 +1754,23 @@ mod tests {
     #[test]
     fn test_helper_call_get_prandom_u32() {
         let mut vm = BpfVm::new();
-
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_GET_PRANDOM_U32,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_GET_PRANDOM_U32 },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result1 = vm.run().unwrap();
-
+        
         // Run again to get different random value
         let mut vm2 = BpfVm::new();
         vm2.load_program(vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_GET_PRANDOM_U32,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_GET_PRANDOM_U32 },
             BpfInstruction::Return,
-        ])
-        .unwrap();
+        ]).unwrap();
         let result2 = vm2.run().unwrap();
-
+        
         // Both should be u32 values
         assert!(result1 <= 0xFFFFFFFF);
         assert!(result2 <= 0xFFFFFFFF);
@@ -1971,21 +1779,19 @@ mod tests {
     #[test]
     fn test_helper_call_map_lookup_elem() {
         let mut vm = BpfVm::new();
-
+        
         // Set up R1 (map pointer) and R2 (key pointer)
         vm.set_register(1, 0x1000).unwrap();
         vm.set_register(2, 0x2000).unwrap();
-
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_MAP_LOOKUP_ELEM,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_MAP_LOOKUP_ELEM },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Should return 0 (not found in empty map)
         assert_eq!(result, 0);
     }
@@ -1993,23 +1799,21 @@ mod tests {
     #[test]
     fn test_helper_call_map_update_elem() {
         let mut vm = BpfVm::new();
-
+        
         // Set up arguments
         vm.set_register(1, 0x1000).unwrap(); // map pointer
         vm.set_register(2, 0x2000).unwrap(); // key pointer
         vm.set_register(3, 0x3000).unwrap(); // value pointer
-        vm.set_register(4, 0).unwrap(); // flags
-
+        vm.set_register(4, 0).unwrap();      // flags
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_MAP_UPDATE_ELEM,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_MAP_UPDATE_ELEM },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Should return 0 (success)
         assert_eq!(result, 0);
     }
@@ -2017,21 +1821,19 @@ mod tests {
     #[test]
     fn test_helper_call_map_delete_elem() {
         let mut vm = BpfVm::new();
-
+        
         // Set up arguments
         vm.set_register(1, 0x1000).unwrap(); // map pointer
         vm.set_register(2, 0x2000).unwrap(); // key pointer
-
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_MAP_DELETE_ELEM,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_MAP_DELETE_ELEM },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Should return 0 (success)
         assert_eq!(result, 0);
     }
@@ -2039,22 +1841,20 @@ mod tests {
     #[test]
     fn test_helper_call_probe_read() {
         let mut vm = BpfVm::new();
-
+        
         // Set up arguments
         vm.set_register(1, 0x1000).unwrap(); // dst pointer
-        vm.set_register(2, 64).unwrap(); // size
+        vm.set_register(2, 64).unwrap();     // size
         vm.set_register(3, 0x2000).unwrap(); // src pointer
-
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_PROBE_READ,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_PROBE_READ },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Should return 0 (success)
         assert_eq!(result, 0);
     }
@@ -2062,22 +1862,20 @@ mod tests {
     #[test]
     fn test_helper_call_get_sysctl() {
         let mut vm = BpfVm::new();
-
+        
         // Set up arguments
         vm.set_register(1, 0x1000).unwrap(); // sysctl name pointer
-        vm.set_register(2, 64).unwrap(); // size
-        vm.set_register(3, 0).unwrap(); // flags
-
+        vm.set_register(2, 64).unwrap();     // size
+        vm.set_register(3, 0).unwrap();      // flags
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_GET_SYSCTL,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_GET_SYSCTL },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Should return 0 (success)
         assert_eq!(result, 0);
     }
@@ -2085,24 +1883,22 @@ mod tests {
     #[test]
     fn test_helper_call_trace_printk() {
         let mut vm = BpfVm::new();
-
+        
         // Set up arguments
         vm.set_register(1, 0x1000).unwrap(); // format string pointer
-        vm.set_register(2, 64).unwrap(); // format string size
-        vm.set_register(3, 100).unwrap(); // arg1
-        vm.set_register(4, 200).unwrap(); // arg2
-        vm.set_register(5, 300).unwrap(); // arg3
-
+        vm.set_register(2, 64).unwrap();     // format string size
+        vm.set_register(3, 100).unwrap();    // arg1
+        vm.set_register(4, 200).unwrap();    // arg2
+        vm.set_register(5, 300).unwrap();    // arg3
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_TRACE_PRINTK,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_TRACE_PRINTK },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Should return 0 (success)
         assert_eq!(result, 0);
     }
@@ -2110,15 +1906,15 @@ mod tests {
     #[test]
     fn test_unknown_helper_call_fails() {
         let mut vm = BpfVm::new();
-
+        
         let program = vec![
             BpfInstruction::Call { func_id: 9999 },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run();
-
+        
         // Should fail with unknown helper error
         assert!(result.is_err());
     }
@@ -2126,21 +1922,17 @@ mod tests {
     #[test]
     fn test_multiple_helper_calls() {
         let mut vm = BpfVm::new();
-
+        
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_GET_CURRENT_PID_TGID,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_GET_CURRENT_PID_TGID },
             BpfInstruction::MovImm { dst_reg: 1, imm: 0 },
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_GET_PRANDOM_U32,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_GET_PRANDOM_U32 },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let result = vm.run().unwrap();
-
+        
         // Result should be from the second helper call (random u32)
         assert!(result <= 0xFFFFFFFF);
     }
@@ -2150,7 +1942,7 @@ mod tests {
         let vm = BpfVm::new();
         let registry = vm.get_helper_registry();
         let locked = registry.lock().unwrap();
-
+        
         // Verify all 10 standard helpers exist and have correct IDs
         let helpers_to_check = vec![
             helper_ids::BPF_MAP_LOOKUP_ELEM,
@@ -2164,7 +1956,7 @@ mod tests {
             helper_ids::BPF_TRACE_PRINTK,
             helper_ids::BPF_GET_PRANDOM_U32,
         ];
-
+        
         for id in helpers_to_check {
             let helper = locked.get_helper(id);
             assert!(helper.is_some(), "Helper {} not found", id);
@@ -2176,22 +1968,20 @@ mod tests {
     fn test_helper_state_isolation() {
         // Verify that helpers get the correct register values
         let mut vm = BpfVm::new();
-
+        
         vm.set_register(1, 0x1234).unwrap();
         vm.set_register(2, 0x5678).unwrap();
         vm.set_register(3, 0x9ABC).unwrap();
-
+        
         // Call map_lookup_elem which reads R1 and R2
         let program = vec![
-            BpfInstruction::Call {
-                func_id: helper_ids::BPF_MAP_LOOKUP_ELEM,
-            },
+            BpfInstruction::Call { func_id: helper_ids::BPF_MAP_LOOKUP_ELEM },
             BpfInstruction::Return,
         ];
-
+        
         vm.load_program(program).unwrap();
         let _ = vm.run().unwrap();
-
+        
         // Verify registers weren't corrupted
         assert_eq!(vm.get_register(1).unwrap(), 0x1234);
         assert_eq!(vm.get_register(2).unwrap(), 0x5678);

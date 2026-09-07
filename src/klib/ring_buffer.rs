@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 
 // SigmaOS klib: Lock-free Ring Buffer (Circular Queue)
 // Inspired by Linux kernel's kfifo and FreeBSD's ring buffer implementations
@@ -150,7 +141,7 @@ impl<T> HeapRingBuffer<T> {
     /// Create a new heap-allocated ring buffer with given capacity (rounded up to power of two).
     pub fn new(capacity: usize) -> Self {
         let cap = capacity.next_power_of_two();
-        let layout = std::alloc::Layout::array::<core::mem::MaybeUninit<T>>(cap).unwrap();
+        let layout = Layout::array::<core::mem::MaybeUninit<T>>(cap).unwrap();
         // SAFETY: we use the global allocator
         let data = unsafe { std::alloc::alloc(layout) as *mut core::mem::MaybeUninit<T> };
         if data.is_null() {
@@ -207,7 +198,7 @@ impl<T> HeapRingBuffer<T> {
 impl<T> Drop for HeapRingBuffer<T> {
     fn drop(&mut self) {
         while self.pop().is_some() {}
-        let layout = std::alloc::Layout::array::<core::mem::MaybeUninit<T>>(self.cap).unwrap();
+        let layout = Layout::array::<core::mem::MaybeUninit<T>>(self.cap).unwrap();
         unsafe {
             std::alloc::dealloc(self.data as *mut u8, layout);
         }

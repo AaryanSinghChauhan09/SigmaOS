@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 
 use core::mem;
 /// Advanced Enterprise Networking Suite for SigmaOS
@@ -131,10 +122,10 @@ impl SecureVpnTunnel {
             return Err(EnterpriseNetworkError::EncryptionFailed);
         }
 
-        // Optimized by Bolt ⚡: Single-pass iterator chain eliminates integer modulo division (% 32)
-        // and index bounds-checking for every byte, facilitating compiler auto-vectorization (SIMD).
-        for ((out_byte, &in_byte), &mask) in encrypted_buffer.iter_mut().zip(payload.iter()).zip(self.preshared_key.iter().cycle()) {
-            *out_byte = in_byte ^ mask;
+        // Mock stream cipher using key masking
+        for i in 0..payload.len() {
+            let mask = self.preshared_key[i % 32];
+            encrypted_buffer[i] = payload[i] ^ mask;
         }
 
         Ok(payload.len())
@@ -154,10 +145,9 @@ impl SecureVpnTunnel {
             return Err(EnterpriseNetworkError::EncryptionFailed);
         }
 
-        // Optimized by Bolt ⚡: Single-pass iterator chain eliminates integer modulo division (% 32)
-        // and index bounds-checking for every byte, facilitating compiler auto-vectorization (SIMD).
-        for ((out_byte, &in_byte), &mask) in decrypted_buffer.iter_mut().zip(encrypted_payload.iter()).zip(self.preshared_key.iter().cycle()) {
-            *out_byte = in_byte ^ mask;
+        for i in 0..encrypted_payload.len() {
+            let mask = self.preshared_key[i % 32];
+            decrypted_buffer[i] = encrypted_payload[i] ^ mask;
         }
 
         Ok(encrypted_payload.len())

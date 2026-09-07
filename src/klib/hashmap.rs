@@ -1,19 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 //! Custom BTreeMap implementation for SigmaOS
 //! Reduces dependency on std::collections::BTreeMap
 
 use crate::klib::hash::SimpleHasher;
+use std::vec::Vec;
 use core::borrow::Borrow;
 use core::hash::{Hash, Hasher};
-use std::vec::Vec;
 
 pub type HashMap<K, V> = BTreeMap<K, V>;
 

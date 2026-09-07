@@ -1,9 +1,3 @@
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
 //! Graphics Acceleration Support inspired by Mesa, Vulkan, and DRI
 //! Vulkan 1.3 / OpenGL 4.6 APIs, PRIME GPU offloading, compute shaders, and ray tracing pipelines.
 

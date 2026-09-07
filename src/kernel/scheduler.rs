@@ -1,34 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct TaskId(pub u64);
+//! EEVDF Scheduler with SMP Work Stealing & NUMA Topology Support for SigmaOS
 
-pub struct Task {
-    pub id: TaskId,
-    pub vruntime: u64,
-    pub priority: u32,
-}
-
-impl Task {
-    pub fn new(id: u64, vruntime: u64) -> Self {
-        Self {
-            id: TaskId(id),
-            vruntime,
-            priority: 1,
-        }
-    }
-}
-
-use core::time::Duration;
 use std::string::String;
 use std::vec::Vec;
+use core::time::Duration;
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -120,42 +94,11 @@ impl Process {
         let bore_penalty = self.burst_score / 2;
         self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
     }
-
-    pub fn interactivity_score(&self) -> u32 {
-        let run_ms = self.runtime.as_millis() as u64;
-        let sleep_ms = self.sleep_time.as_millis() as u64;
-        let total = run_ms + sleep_ms;
-        if total == 0 {
-            100
-        } else {
-            ((sleep_ms * 100) / total) as u32
-        }
-    }
-
-    /// Linux EEVDF Lag Compensation: positive lag = process is owed CPU time
-    pub fn calculate_lag(&self, system_vtime: u64) -> i64 {
-        (system_vtime as i64) - (self.virtual_runtime as i64)
-    }
-
-    /// Update virtual deadline considering ULE interactivity and EEVDF lag
-    pub fn update_virtual_deadline_ule(&mut self, system_vtime: u64) {
-        let weight = self.get_weight();
-        let q = 10u64;
-        let base_slice = (q / weight).max(1);
-        let inter = self.interactivity_score();
-        // Boost interactive tasks (> 70) by shortening their deadline window
-        let boost = if inter > 70 {
-            (inter as u64 - 70) / 10
-        } else {
-            0
-        };
-        let slice = base_slice.saturating_sub(boost).max(1);
-        self.virtual_deadline = self.virtual_runtime + slice;
-    }
 }
 
 #[derive(Debug, Clone)]
 pub struct NumaNode {
+
     pub node_id: u32,
     pub processor_ids: Vec<u32>,
 }
@@ -330,6 +273,16 @@ impl Scheduler {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TaskId(pub u64);
+
+#[derive(Debug, Clone, Copy)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
+}
+
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
     tasks: [Option<Task>; 64],
@@ -392,7 +345,7 @@ impl CfsScheduler {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

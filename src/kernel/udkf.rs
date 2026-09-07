@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS User-Defined Kernel Functions (UDKF) Scripting Engine
 // Allows safe, in-kernel customization of allocators, scheduling algorithms, and filesystems without recompilation
 
@@ -20,13 +11,13 @@ pub enum UdkfHook {
     FsCachePreload,
 }
 
-pub struct UdkfScriptingEngine {
+pub struct UserDefinedKernelFunctions {
     pub registered_scripts: Vec<(UdkfHook, String)>,
 }
 
-impl UdkfScriptingEngine {
+impl UserDefinedKernelFunctions {
     pub fn new() -> Self {
-        UdkfScriptingEngine {
+        UserDefinedKernelFunctions {
             registered_scripts: Vec::new(),
         }
     }

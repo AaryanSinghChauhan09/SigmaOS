@@ -1,16 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -28,6 +19,16 @@ pub enum ContainerState {
     Paused = 2,
     Stopped = 3,
     Failed = 4,
+}
+
+/// Container capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
 }
 
 impl ContainerCapability {
@@ -71,7 +72,7 @@ pub enum ContainerError {
 
 /// Container info
 #[repr(C)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContainerInfo {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -196,6 +197,46 @@ impl NamespaceConfig {
     pub fn all(&self) -> bool {
         self.pid && self.mnt && self.net && self.uts && self.ipc && self.user && self.cgroup
     }
+}
+
+impl Default for NamespaceConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Container seccomp profiles
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub blocked_syscalls: Vec<u32>,
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if self.blocked_syscalls.contains(&syscall_id) {
+            return true;
+        }
+        if self.hardened && syscall_id < 32 {
+            return (self.blocked_syscalls_mask & (1 << syscall_id)) != 0;
+        }
+        false
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfileV2 {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SeccompAction {
+    Allow,
+    Deny,
+    Log,
+    Trace,
 }
 
 impl SeccompProfileV2 {
@@ -478,6 +519,8 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
+
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
@@ -788,7 +831,8 @@ pub mod oci {
     extern crate alloc;
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
-    use alloc::vec::Vec;
+    use std::string::{String, ToString};
+    use std::vec::Vec;
 
     pub struct NamespaceSet {
         pub pidns: Option<usize>,

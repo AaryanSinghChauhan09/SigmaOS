@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // File Monitoring Infrastructure for SigmaOS
 // Provides foundational file watch system with event types, watch management,
 // and thread-safe event queue operations.
@@ -19,8 +10,8 @@
 // - Thread-safe operations using Arc/Mutex
 
 use std::collections::HashMap;
-use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use std::path::PathBuf;
 
 /// Unique identifier for a watch
 pub type WatchId = u64;
@@ -407,14 +398,7 @@ impl WatchManager {
             .map_err(|_| "Failed to get timestamp".to_string())?
             .as_secs();
 
-        let event = FileEvent::with_related_path(
-            event_id,
-            event_type,
-            path,
-            related_path,
-            watch_id,
-            timestamp,
-        );
+        let event = FileEvent::with_related_path(event_id, event_type, path, related_path, watch_id, timestamp);
 
         let mut watches = self
             .watches
@@ -607,10 +591,8 @@ mod tests {
     #[test]
     fn test_event_filter_by_type() {
         let filter = EventFilter::new().with_event_type(FileEventType::Create);
-        let create_event =
-            FileEvent::new(1, FileEventType::Create, PathBuf::from("/test"), 1, 1000);
-        let delete_event =
-            FileEvent::new(2, FileEventType::Delete, PathBuf::from("/test"), 1, 1000);
+        let create_event = FileEvent::new(1, FileEventType::Create, PathBuf::from("/test"), 1, 1000);
+        let delete_event = FileEvent::new(2, FileEventType::Delete, PathBuf::from("/test"), 1, 1000);
 
         assert!(filter.matches(&create_event));
         assert!(!filter.matches(&delete_event));
@@ -619,20 +601,10 @@ mod tests {
     #[test]
     fn test_event_filter_by_pattern() {
         let filter = EventFilter::new().with_path_pattern("/var/log".to_string());
-        let matching_event = FileEvent::new(
-            1,
-            FileEventType::Create,
-            PathBuf::from("/var/log/app.log"),
-            1,
-            1000,
-        );
-        let non_matching_event = FileEvent::new(
-            2,
-            FileEventType::Create,
-            PathBuf::from("/tmp/test"),
-            1,
-            1000,
-        );
+        let matching_event =
+            FileEvent::new(1, FileEventType::Create, PathBuf::from("/var/log/app.log"), 1, 1000);
+        let non_matching_event =
+            FileEvent::new(2, FileEventType::Create, PathBuf::from("/tmp/test"), 1, 1000);
 
         assert!(filter.matches(&matching_event));
         assert!(!filter.matches(&non_matching_event));
@@ -644,27 +616,9 @@ mod tests {
             .with_event_type(FileEventType::Create)
             .with_path_pattern("/var".to_string());
 
-        let matching_event = FileEvent::new(
-            1,
-            FileEventType::Create,
-            PathBuf::from("/var/test"),
-            1,
-            1000,
-        );
-        let wrong_type = FileEvent::new(
-            2,
-            FileEventType::Delete,
-            PathBuf::from("/var/test"),
-            1,
-            1000,
-        );
-        let wrong_path = FileEvent::new(
-            3,
-            FileEventType::Create,
-            PathBuf::from("/tmp/test"),
-            1,
-            1000,
-        );
+        let matching_event = FileEvent::new(1, FileEventType::Create, PathBuf::from("/var/test"), 1, 1000);
+        let wrong_type = FileEvent::new(2, FileEventType::Delete, PathBuf::from("/var/test"), 1, 1000);
+        let wrong_path = FileEvent::new(3, FileEventType::Create, PathBuf::from("/tmp/test"), 1, 1000);
 
         assert!(filter.matches(&matching_event));
         assert!(!filter.matches(&wrong_type));
@@ -700,13 +654,7 @@ mod tests {
         let config = WatchConfig::new();
         let mut watch = Watch::new(1, path, config);
 
-        let event = FileEvent::new(
-            1,
-            FileEventType::Create,
-            PathBuf::from("/test/file.txt"),
-            1,
-            1000,
-        );
+        let event = FileEvent::new(1, FileEventType::Create, PathBuf::from("/test/file.txt"), 1, 1000);
         watch.add_event(event.clone());
 
         assert_eq!(watch.event_count(), 1);
@@ -719,13 +667,7 @@ mod tests {
         let config = WatchConfig::new();
         let mut watch = Watch::new(1, path, config);
 
-        let event = FileEvent::new(
-            1,
-            FileEventType::Create,
-            PathBuf::from("/test/file.txt"),
-            1,
-            1000,
-        );
+        let event = FileEvent::new(1, FileEventType::Create, PathBuf::from("/test/file.txt"), 1, 1000);
         watch.add_event(event.clone());
 
         assert_eq!(watch.event_count(), 1);
@@ -741,13 +683,8 @@ mod tests {
         let mut watch = Watch::new(1, path, config);
 
         for i in 0..5 {
-            let event = FileEvent::new(
-                i,
-                FileEventType::Create,
-                PathBuf::from("/test/file.txt"),
-                1,
-                1000 + i,
-            );
+            let event =
+                FileEvent::new(i, FileEventType::Create, PathBuf::from("/test/file.txt"), 1, 1000 + i);
             watch.add_event(event);
         }
 
@@ -760,24 +697,13 @@ mod tests {
     #[test]
     fn test_watch_filter_applied() {
         let path = PathBuf::from("/test");
-        let config = WatchConfig::new()
-            .with_filter(EventFilter::new().with_event_type(FileEventType::Create));
+        let config = WatchConfig::new().with_filter(
+            EventFilter::new().with_event_type(FileEventType::Create)
+        );
         let mut watch = Watch::new(1, path, config);
 
-        let create_event = FileEvent::new(
-            1,
-            FileEventType::Create,
-            PathBuf::from("/test/file.txt"),
-            1,
-            1000,
-        );
-        let delete_event = FileEvent::new(
-            2,
-            FileEventType::Delete,
-            PathBuf::from("/test/file.txt"),
-            1,
-            1001,
-        );
+        let create_event = FileEvent::new(1, FileEventType::Create, PathBuf::from("/test/file.txt"), 1, 1000);
+        let delete_event = FileEvent::new(2, FileEventType::Delete, PathBuf::from("/test/file.txt"), 1, 1001);
 
         watch.add_event(create_event);
         watch.add_event(delete_event);
@@ -794,13 +720,8 @@ mod tests {
         let mut watch = Watch::new(1, path, config);
 
         for i in 0..3 {
-            let event = FileEvent::new(
-                i,
-                FileEventType::Create,
-                PathBuf::from("/test/file.txt"),
-                1,
-                1000 + i,
-            );
+            let event =
+                FileEvent::new(i, FileEventType::Create, PathBuf::from("/test/file.txt"), 1, 1000 + i);
             watch.add_event(event);
         }
 
@@ -827,12 +748,8 @@ mod tests {
         let manager = WatchManager::new();
         let config = WatchConfig::new();
 
-        let id1 = manager
-            .register_watch(PathBuf::from("/test1"), config.clone())
-            .unwrap();
-        let id2 = manager
-            .register_watch(PathBuf::from("/test2"), config)
-            .unwrap();
+        let id1 = manager.register_watch(PathBuf::from("/test1"), config.clone()).unwrap();
+        let id2 = manager.register_watch(PathBuf::from("/test2"), config).unwrap();
 
         assert_eq!(id1, 1);
         assert_eq!(id2, 2);
@@ -864,16 +781,10 @@ mod tests {
     fn test_watch_manager_add_event() {
         let manager = WatchManager::new();
         let config = WatchConfig::new();
-        let watch_id = manager
-            .register_watch(PathBuf::from("/test"), config)
-            .unwrap();
+        let watch_id = manager.register_watch(PathBuf::from("/test"), config).unwrap();
 
         let event_id = manager
-            .add_event(
-                watch_id,
-                FileEventType::Create,
-                PathBuf::from("/test/file.txt"),
-            )
+            .add_event(watch_id, FileEventType::Create, PathBuf::from("/test/file.txt"))
             .unwrap();
         assert_eq!(event_id, 0);
 
@@ -885,16 +796,10 @@ mod tests {
     fn test_watch_manager_get_event() {
         let manager = WatchManager::new();
         let config = WatchConfig::new();
-        let watch_id = manager
-            .register_watch(PathBuf::from("/test"), config)
-            .unwrap();
+        let watch_id = manager.register_watch(PathBuf::from("/test"), config).unwrap();
 
         let _ = manager
-            .add_event(
-                watch_id,
-                FileEventType::Create,
-                PathBuf::from("/test/file.txt"),
-            )
+            .add_event(watch_id, FileEventType::Create, PathBuf::from("/test/file.txt"))
             .unwrap();
 
         let event = manager.get_event(watch_id).unwrap();
@@ -906,16 +811,10 @@ mod tests {
     fn test_watch_manager_peek_event() {
         let manager = WatchManager::new();
         let config = WatchConfig::new();
-        let watch_id = manager
-            .register_watch(PathBuf::from("/test"), config)
-            .unwrap();
+        let watch_id = manager.register_watch(PathBuf::from("/test"), config).unwrap();
 
         let _ = manager
-            .add_event(
-                watch_id,
-                FileEventType::Create,
-                PathBuf::from("/test/file.txt"),
-            )
+            .add_event(watch_id, FileEventType::Create, PathBuf::from("/test/file.txt"))
             .unwrap();
 
         // Peek should not remove event
@@ -929,9 +828,7 @@ mod tests {
     fn test_watch_manager_add_event_with_related() {
         let manager = WatchManager::new();
         let config = WatchConfig::new();
-        let watch_id = manager
-            .register_watch(PathBuf::from("/test"), config)
-            .unwrap();
+        let watch_id = manager.register_watch(PathBuf::from("/test"), config).unwrap();
 
         let _ = manager
             .add_event_with_related(
@@ -944,24 +841,21 @@ mod tests {
 
         let event = manager.get_event(watch_id).unwrap().unwrap();
         assert_eq!(event.event_type, FileEventType::Rename);
-        assert_eq!(event.related_path.unwrap(), PathBuf::from("/test/new.txt"));
+        assert_eq!(
+            event.related_path.unwrap(),
+            PathBuf::from("/test/new.txt")
+        );
     }
 
     #[test]
     fn test_watch_manager_get_all_events() {
         let manager = WatchManager::new();
         let config = WatchConfig::new();
-        let watch_id = manager
-            .register_watch(PathBuf::from("/test"), config)
-            .unwrap();
+        let watch_id = manager.register_watch(PathBuf::from("/test"), config).unwrap();
 
         for i in 0..3 {
             let _ = manager
-                .add_event(
-                    watch_id,
-                    FileEventType::Create,
-                    PathBuf::from(&format!("/test/file{}.txt", i)),
-                )
+                .add_event(watch_id, FileEventType::Create, PathBuf::from(&format!("/test/file{}.txt", i)))
                 .unwrap();
         }
 
@@ -973,17 +867,11 @@ mod tests {
     fn test_watch_manager_clear_events() {
         let manager = WatchManager::new();
         let config = WatchConfig::new();
-        let watch_id = manager
-            .register_watch(PathBuf::from("/test"), config)
-            .unwrap();
+        let watch_id = manager.register_watch(PathBuf::from("/test"), config).unwrap();
 
         for _ in 0..3 {
             let _ = manager
-                .add_event(
-                    watch_id,
-                    FileEventType::Create,
-                    PathBuf::from("/test/file.txt"),
-                )
+                .add_event(watch_id, FileEventType::Create, PathBuf::from("/test/file.txt"))
                 .unwrap();
         }
 
@@ -996,9 +884,7 @@ mod tests {
     fn test_watch_manager_update_config() {
         let manager = WatchManager::new();
         let config = WatchConfig::new().with_recursive(false);
-        let watch_id = manager
-            .register_watch(PathBuf::from("/test"), config)
-            .unwrap();
+        let watch_id = manager.register_watch(PathBuf::from("/test"), config).unwrap();
 
         let new_config = WatchConfig::new().with_recursive(true);
         manager.update_watch_config(watch_id, new_config).unwrap();
@@ -1015,11 +901,7 @@ mod tests {
         let watch_id = manager.register_watch(path.clone(), config).unwrap();
 
         let _ = manager
-            .add_event(
-                watch_id,
-                FileEventType::Create,
-                PathBuf::from("/test/file.txt"),
-            )
+            .add_event(watch_id, FileEventType::Create, PathBuf::from("/test/file.txt"))
             .unwrap();
 
         let (info_path, count, recursive) = manager.get_watch_info(watch_id).unwrap();
@@ -1032,16 +914,10 @@ mod tests {
     fn test_watch_manager_clone() {
         let manager = WatchManager::new();
         let config = WatchConfig::new();
-        let watch_id = manager
-            .register_watch(PathBuf::from("/test"), config)
-            .unwrap();
+        let watch_id = manager.register_watch(PathBuf::from("/test"), config).unwrap();
 
         let _ = manager
-            .add_event(
-                watch_id,
-                FileEventType::Create,
-                PathBuf::from("/test/file.txt"),
-            )
+            .add_event(watch_id, FileEventType::Create, PathBuf::from("/test/file.txt"))
             .unwrap();
 
         // Clone manager
@@ -1059,26 +935,14 @@ mod tests {
         let manager = WatchManager::new();
         let config = WatchConfig::new();
 
-        let watch_id1 = manager
-            .register_watch(PathBuf::from("/test1"), config.clone())
-            .unwrap();
-        let watch_id2 = manager
-            .register_watch(PathBuf::from("/test2"), config)
-            .unwrap();
+        let watch_id1 = manager.register_watch(PathBuf::from("/test1"), config.clone()).unwrap();
+        let watch_id2 = manager.register_watch(PathBuf::from("/test2"), config).unwrap();
 
         let _ = manager
-            .add_event(
-                watch_id1,
-                FileEventType::Create,
-                PathBuf::from("/test1/file1.txt"),
-            )
+            .add_event(watch_id1, FileEventType::Create, PathBuf::from("/test1/file1.txt"))
             .unwrap();
         let _ = manager
-            .add_event(
-                watch_id2,
-                FileEventType::Modify,
-                PathBuf::from("/test2/file2.txt"),
-            )
+            .add_event(watch_id2, FileEventType::Modify, PathBuf::from("/test2/file2.txt"))
             .unwrap();
 
         let event1 = manager.get_event(watch_id1).unwrap().unwrap();
@@ -1103,12 +967,9 @@ mod tests {
             .with_event_type(FileEventType::Create)
             .with_event_type(FileEventType::Delete);
 
-        let create_event =
-            FileEvent::new(1, FileEventType::Create, PathBuf::from("/test"), 1, 1000);
-        let delete_event =
-            FileEvent::new(2, FileEventType::Delete, PathBuf::from("/test"), 1, 1000);
-        let modify_event =
-            FileEvent::new(3, FileEventType::Modify, PathBuf::from("/test"), 1, 1000);
+        let create_event = FileEvent::new(1, FileEventType::Create, PathBuf::from("/test"), 1, 1000);
+        let delete_event = FileEvent::new(2, FileEventType::Delete, PathBuf::from("/test"), 1, 1000);
+        let modify_event = FileEvent::new(3, FileEventType::Modify, PathBuf::from("/test"), 1, 1000);
 
         assert!(filter.matches(&create_event));
         assert!(filter.matches(&delete_event));

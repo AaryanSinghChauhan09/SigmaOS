@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Universal Distro Super-Convergence & Innovation Engine
 // (src/distro/universal_distro_super_matrix.rs)
@@ -14,6 +5,7 @@
 // Native no_std implementation providing end-to-end integration and algorithmic
 // absorption of advanced capabilities across General-Purpose, Lightweight, Security,
 // Enterprise, Privacy, Specialized, Container, and Rolling Linux Distributions.
+
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};

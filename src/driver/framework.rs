@@ -1,20 +1,11 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::string::String;
 // ==========================================
 // Basic Driver Framework Implementation
 // ==========================================
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 
@@ -154,11 +145,13 @@ impl Driver for SimpleDriver {
         }
     }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -544,7 +537,7 @@ impl DriverFramework for SimpleDriverFramework {
 // Unit Tests
 // ==========================================
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

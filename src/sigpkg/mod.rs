@@ -1,15 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
@@ -60,8 +50,8 @@ pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
-    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
-    NixFlakeHermeticCacheStore,
+    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
+    GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
 };
 pub mod spec;
 pub mod store;
@@ -74,23 +64,46 @@ pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use sovereign_sigpkg::*;
-pub use universal_adapter::{AdapterError, PackageFormatAdapter, UniversalPackageManager};
+#[path = "../package/bsd_linux_package_innovations.rs"]
+pub mod bsd_linux_package_innovations;
+pub use bsd_linux_package_innovations::{
+    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
+    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
+    CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
+    DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
+    DebianDebconfStatoverrideEngine, DebianDpkgTriggersAptListbugsGuardEngine, DnfActionKind,
+    DnfActionRecord, DnfTransactionItem, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
+    DragonFlyDportsHammer2SnapshotEngine, EbuildSlotRecord, FedoraDnf5AdvisoryAndDeltaRpmEngine,
+    FedoraDnfHistoryRollbackJournalEngine, FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine,
+    GentooPortageEapiSlotOperatorEngine, GentooPortageSubslotAndUseExpandEngine,
+    HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot, MicroarchRepoRoute, MicroarchitectureLevel,
+    NetBsdPkginBinaryDatabaseEngine, NetBsdPkgsrcOptionsFrameworkEngine,
+    NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
+    OpenSuseZypperVendorStickinessEngine, PkgSummaryRecord, PkgsrcOptionSpec, PortageEapiLevel,
+    PpaRepository, RestrictedPackageSpec, SlackBuildInfo, SlackPackageRecord,
+    SlackwarePkgtoolSlackBuildEngine, SlotOperator, UbuntuPpaAptPinningEngine,
+    XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
+    ZypperRepository,
+};
+pub use zero_alloc_resolver::{
+    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
+};
 pub use universal_adapter::{
-    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuildV2, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
-    UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
-    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
+    PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
+    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
+    FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
+    ZypperSpecManifest, SlackwarePkgManifest,
+    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
+    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
+    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
+    UniversalPmCommandDispatcher, UniversalPmOperation, DispatchedPmAction,
 };
-pub use universal_oop_system::{
-    ApkAdapter, DebAdapter, EbuildAdapter, NixAdapter, PacmanAdapter, RpmAdapter,
-};
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
+pub use sovereign_sigpkg::*;
+
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
-    AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
+    AlpmHook as ArchCompatAlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager, SvnPackageMetadata, SvntogitMigrationEngine,
 };
 pub use arch_pacman_engine::{
@@ -148,8 +161,12 @@ pub use spec::{
 pub use store::{
     BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore,
 };
+pub use svntogit_repro::{
+    BuildArtifact, ConvertedGitCommit, ReproducibilityAttestationReport,
+    ReproducibleBuildEnvironment, ReproduciblePackageBuilder, SovereignSvnToGitMigrator,
+    SvnBranchType, SvnRevisionLog,
+};
 pub use transaction::Transaction;
-pub use universal_adapter::{AptDebManifest, UniversalPackageAdapter};
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
@@ -260,24 +277,6 @@ impl Package {
     }
 }
 
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
-
 /// Package dependency
 #[derive(Debug, Clone)]
 pub struct Dependency {
@@ -321,26 +320,3 @@ mod tests {
         assert!(v1 < v2);
     }
 }
-
-#[derive(Debug, Clone)]
-pub struct PackageDependencyResolver;
-
-pub const MAX_RECIPE_DEPENDENCIES: usize = 16;
-
-#[derive(Debug, Clone)]
-pub struct PackageFormatAdapter;
-
-#[derive(Debug, Clone)]
-pub struct UniversalPackageManager;
-
-#[derive(Debug, Clone)]
-pub struct AdapterError;
-
-#[derive(Debug, Clone)]
-pub struct DebAdapter;
-
-#[derive(Debug, Clone)]
-pub struct RpmAdapter;
-
-#[derive(Debug, Clone)]
-pub struct PacmanAdapter;

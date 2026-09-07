@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // OOP-based ML Training for SigmaOS
 // Based on Ideas-999-Structured: AI & Machine Learning Item 936
@@ -198,7 +189,7 @@ impl Trainer for SimpleTrainer {
     }
 
     fn get_session(&self, id: TrainingID) -> Option<&dyn TrainingSession> {
-        for session_option in self.sessions.iter() {
+        for session_option in &self.sessions {
             if let Some(ref session) = *session_option {
                 if session.id() == id {
                     return Some(session);
@@ -400,19 +391,7 @@ impl SovereignStreamingPool {
         if self.queue.is_empty() {
             None
         } else {
-            // Move items up and return the first element
-            unsafe {
-                let first = ::core::ptr::read(self.queue.data);
-                for i in 1..self.queue.len {
-                    ::core::ptr::copy_nonoverlapping(
-                        self.queue.data.add(i),
-                        self.queue.data.add(i - 1),
-                        1,
-                    );
-                }
-                self.queue.len -= 1;
-                Some(first)
-            }
+            Some(self.queue.remove(0))
         }
     }
 }
@@ -499,140 +478,8 @@ impl SovereignPpoOptimizer {
 // ============================================================================
 // Using std::vec::Vec for all collection operations
 // ============================================================================
-
-pub struct Vec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.len == 0 {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.len == 0 {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: ::core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                ::core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                ::core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> ::core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> ::core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    ::core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            new_vec.push(self[i].clone());
-        }
-        new_vec
-    }
-}
-
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_list()
-            .entries((0..self.len).map(|i| &self[i]))
-            .finish()
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+// The custom Vec implementation has been replaced with std::vec::Vec to ensure
+// full compatibility with Rust iterators and standard library methods
 
 // ============================================================================
 // 🧪 Automated Unit Tests

@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS DNS, mDNS, QUIC, TCP/IP, UDP, DHCP, HTTP, HTTPS, FTP, SSH, SMTP, TLS, WebSocket, BGP Network Implementations
 // Full-protocol stack support for bare-metal kernel and userspace layers
 
@@ -1594,13 +1585,8 @@ mod tests {
         assert!(session.is_authenticated);
 
         // 5. Test root login permission check (root permitted is false)
-        let root_res = daemon.authenticate(
-            "192.168.1.1",
-            "root",
-            "password",
-            b"<SIGMA_TEST_CREDENTIAL>",
-            None,
-        );
+        let root_res =
+            daemon.authenticate("192.168.1.1", "root", "password", b"<SIGMA_TEST_CREDENTIAL>", None);
         assert!(root_res.is_err());
 
         // 6. Test PAM-like MFA support
@@ -1643,8 +1629,7 @@ mod tests {
         // Blocklisted after 2 attempts
         assert!(daemon.blocklisted_ips.contains(&ip.to_string()));
 
-        let res_blocked =
-            daemon.authenticate(ip, "user1", "password", b"<SIGMA_TEST_CREDENTIAL>", None);
+        let res_blocked = daemon.authenticate(ip, "user1", "password", b"<SIGMA_TEST_CREDENTIAL>", None);
         assert!(res_blocked.is_err());
     }
 

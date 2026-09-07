@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // kqueue-like Event Notification System for SigmaOS
 // Implements BSD kqueue semantics for efficient event multiplexing
 
@@ -165,9 +156,7 @@ impl Kqueue {
 
     /// Register interest
     pub fn add_interest(&self, event: Kevent) -> Result<(), String> {
-        let mut data = self
-            .data
-            .lock()
+        let mut data = self.data.lock()
             .map_err(|_| "Failed to acquire lock".to_string())?;
         let key = (event.ident, event.filter);
         data.interests.insert(key, Interest::new(event));
@@ -176,9 +165,7 @@ impl Kqueue {
 
     /// Remove interest
     pub fn remove_interest(&self, ident: u64, filter: FilterType) -> Result<(), String> {
-        let mut data = self
-            .data
-            .lock()
+        let mut data = self.data.lock()
             .map_err(|_| "Failed to acquire lock".to_string())?;
         let key = (ident, filter);
         if data.interests.remove(&key).is_some() {
@@ -190,9 +177,7 @@ impl Kqueue {
 
     /// Trigger event
     pub fn trigger_event(&self, ident: u64, filter: FilterType, data: i64) -> Result<(), String> {
-        let mut kdata = self
-            .data
-            .lock()
+        let mut kdata = self.data.lock()
             .map_err(|_| "Failed to acquire lock".to_string())?;
 
         if let Some(interest) = kdata.interests.get_mut(&(ident, filter)) {
@@ -217,45 +202,35 @@ impl Kqueue {
 
     /// Get next event
     pub fn get_event(&self) -> Result<Option<Kevent>, String> {
-        let mut data = self
-            .data
-            .lock()
+        let mut data = self.data.lock()
             .map_err(|_| "Failed to acquire lock".to_string())?;
         Ok(data.event_queue.pop_front())
     }
 
     /// Peek next event
     pub fn peek_event(&self) -> Result<Option<Kevent>, String> {
-        let data = self
-            .data
-            .lock()
+        let data = self.data.lock()
             .map_err(|_| "Failed to acquire lock".to_string())?;
         Ok(data.event_queue.front().cloned())
     }
 
     /// Get event count in queue
     pub fn event_count(&self) -> Result<usize, String> {
-        let data = self
-            .data
-            .lock()
+        let data = self.data.lock()
             .map_err(|_| "Failed to acquire lock".to_string())?;
         Ok(data.event_queue.len())
     }
 
     /// Get interest count
     pub fn interest_count(&self) -> Result<usize, String> {
-        let data = self
-            .data
-            .lock()
+        let data = self.data.lock()
             .map_err(|_| "Failed to acquire lock".to_string())?;
         Ok(data.interests.len())
     }
 
     /// Clear all events and interests
     pub fn clear(&self) -> Result<(), String> {
-        let mut data = self
-            .data
-            .lock()
+        let mut data = self.data.lock()
             .map_err(|_| "Failed to acquire lock".to_string())?;
         data.event_queue.clear();
         data.interests.clear();
@@ -291,18 +266,14 @@ impl KqueueManager {
 
     /// Create new kqueue
     pub fn kqueue(&self) -> Result<i32, String> {
-        let mut fd_guard = self
-            .next_fd
-            .lock()
+        let mut fd_guard = self.next_fd.lock()
             .map_err(|_| "Failed to acquire FD lock".to_string())?;
         let fd = *fd_guard;
         *fd_guard = fd.wrapping_add(1);
         drop(fd_guard);
 
         let kqueue = Kqueue::new(fd);
-        let mut kqueues = self
-            .kqueues
-            .lock()
+        let mut kqueues = self.kqueues.lock()
             .map_err(|_| "Failed to acquire kqueues lock".to_string())?;
         kqueues.insert(fd, kqueue);
 
@@ -311,9 +282,7 @@ impl KqueueManager {
 
     /// Close kqueue
     pub fn close(&self, fd: i32) -> Result<(), String> {
-        let mut kqueues = self
-            .kqueues
-            .lock()
+        let mut kqueues = self.kqueues.lock()
             .map_err(|_| "Failed to acquire kqueues lock".to_string())?;
         if kqueues.remove(&fd).is_some() {
             Ok(())
@@ -324,9 +293,7 @@ impl KqueueManager {
 
     /// Register interest
     pub fn kevent_add(&self, fd: i32, event: Kevent) -> Result<(), String> {
-        let kqueues = self
-            .kqueues
-            .lock()
+        let kqueues = self.kqueues.lock()
             .map_err(|_| "Failed to acquire kqueues lock".to_string())?;
 
         if let Some(kqueue) = kqueues.get(&fd) {
@@ -338,9 +305,7 @@ impl KqueueManager {
 
     /// Remove interest
     pub fn kevent_delete(&self, fd: i32, ident: u64, filter: FilterType) -> Result<(), String> {
-        let kqueues = self
-            .kqueues
-            .lock()
+        let kqueues = self.kqueues.lock()
             .map_err(|_| "Failed to acquire kqueues lock".to_string())?;
 
         if let Some(kqueue) = kqueues.get(&fd) {
@@ -351,16 +316,8 @@ impl KqueueManager {
     }
 
     /// Trigger event
-    pub fn trigger_event(
-        &self,
-        fd: i32,
-        ident: u64,
-        filter: FilterType,
-        data: i64,
-    ) -> Result<(), String> {
-        let kqueues = self
-            .kqueues
-            .lock()
+    pub fn trigger_event(&self, fd: i32, ident: u64, filter: FilterType, data: i64) -> Result<(), String> {
+        let kqueues = self.kqueues.lock()
             .map_err(|_| "Failed to acquire kqueues lock".to_string())?;
 
         if let Some(kqueue) = kqueues.get(&fd) {
@@ -372,9 +329,7 @@ impl KqueueManager {
 
     /// Get events
     pub fn kevent_get(&self, fd: i32, max_count: usize) -> Result<Vec<Kevent>, String> {
-        let kqueues = self
-            .kqueues
-            .lock()
+        let kqueues = self.kqueues.lock()
             .map_err(|_| "Failed to acquire kqueues lock".to_string())?;
 
         if let Some(kqueue) = kqueues.get(&fd) {
@@ -394,9 +349,7 @@ impl KqueueManager {
 
     /// Get event count
     pub fn event_count(&self, fd: i32) -> Result<usize, String> {
-        let kqueues = self
-            .kqueues
-            .lock()
+        let kqueues = self.kqueues.lock()
             .map_err(|_| "Failed to acquire kqueues lock".to_string())?;
 
         if let Some(kqueue) = kqueues.get(&fd) {
@@ -408,9 +361,7 @@ impl KqueueManager {
 
     /// Get interest count
     pub fn interest_count(&self, fd: i32) -> Result<usize, String> {
-        let kqueues = self
-            .kqueues
-            .lock()
+        let kqueues = self.kqueues.lock()
             .map_err(|_| "Failed to acquire kqueues lock".to_string())?;
 
         if let Some(kqueue) = kqueues.get(&fd) {
@@ -422,9 +373,7 @@ impl KqueueManager {
 
     /// Get kqueue count
     pub fn kqueue_count(&self) -> Result<usize, String> {
-        let kqueues = self
-            .kqueues
-            .lock()
+        let kqueues = self.kqueues.lock()
             .map_err(|_| "Failed to acquire kqueues lock".to_string())?;
         Ok(kqueues.len())
     }

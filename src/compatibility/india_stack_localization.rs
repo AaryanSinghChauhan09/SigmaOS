@@ -16,11 +16,11 @@ use std::format;
 use std::vec::Vec;
 
 use crate::klib::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Localization Manager for SigmaOS India Stack
 /// Implements 22 scheduled languages of India and regional formatting
 /// Based on Roadmap Item: India-first architecture
 use std::string::{String, ToString};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum IndianLanguage {

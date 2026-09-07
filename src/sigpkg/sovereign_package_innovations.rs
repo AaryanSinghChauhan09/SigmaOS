@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // Sovereign Package Management Innovations for SigmaOS
 // Features Gentoo Ebuild USE flag solver, FreeBSD pkg DB, Arch ALPM hooks, Nix Flakes cache,
 // Slackware SlackBuild compiler, Zypper Boolean SAT resolver, and Solus Moss stateless transaction engine.
@@ -222,10 +213,7 @@ impl SlackwareBuildPackageEngine {
         _files: &[&str],
         _desc: &str,
     ) -> Result<String, &'static str> {
-        let script = self
-            .scripts
-            .get(pkg_name)
-            .ok_or("SlackBuild script not found")?;
+        let script = self.scripts.get(pkg_name).ok_or("SlackBuild script not found")?;
         let filename = format!(
             "{}-{}-{}-{}.txz",
             script.name, script.version, script.arch, script.build_number
@@ -234,10 +222,7 @@ impl SlackwareBuildPackageEngine {
     }
 
     pub fn explode_txz_archive(&self, txz_filename: &str) -> Result<Vec<String>, &'static str> {
-        let name = txz_filename
-            .split('-')
-            .next()
-            .ok_or("Invalid txz package format")?;
+        let name = txz_filename.split('-').next().ok_or("Invalid txz package format")?;
         if self.scripts.contains_key(name) {
             Ok(vec![
                 "/usr/bin/htop".to_string(),
@@ -304,8 +289,7 @@ impl ZypperSatDependencyResolver {
 
         if !self.vendor_change_allowed {
             if let Some(installed) = current_installed {
-                if let Some(same_vendor) = candidates.iter().find(|c| c.vendor == installed.vendor)
-                {
+                if let Some(same_vendor) = candidates.iter().find(|c| c.vendor == installed.vendor) {
                     return Ok((*same_vendor).clone());
                 }
             }
@@ -438,11 +422,7 @@ mod tests {
         });
 
         let txz = engine
-            .compile_slackbuild(
-                "htop",
-                &["/usr/bin/htop", "/usr/man/man1/htop.1"],
-                "htop process viewer",
-            )
+            .compile_slackbuild("htop", &["/usr/bin/htop", "/usr/man/man1/htop.1"], "htop process viewer")
             .unwrap();
         assert_eq!(txz, "htop-3.2.1-x86_64-1.txz");
 

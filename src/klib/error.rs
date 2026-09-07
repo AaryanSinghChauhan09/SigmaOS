@@ -1,32 +1,49 @@
-// SigmaOS Kernel Library Error Abstractions
+// Typed Error Hierarchy for SigmaOS
+// Definitively structures system-wide errors into five major subsystems.
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SigmaError {
+    Kernel(KernelError),
+    Fs(FsError),
+    Net(NetError),
+    Security(SecurityError),
+    Crypto(CryptoError),
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KernelError {
     OutOfMemory,
-    InvalidAddress,
-    PermissionDenied,
-    NotFound,
-    AlreadyExists,
-    IoError,
-    Busy,
-    InvalidArgument,
-    Timeout,
-    NotSupported,
+    InvalidSyscall,
+    TaskCreationFailed,
+    SchedulerError,
 }
 
-impl KernelError {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            KernelError::OutOfMemory => "Out of Memory",
-            KernelError::InvalidAddress => "Invalid Address",
-            KernelError::PermissionDenied => "Permission Denied",
-            KernelError::NotFound => "Not Found",
-            KernelError::AlreadyExists => "Already Exists",
-            KernelError::IoError => "I/O Error",
-            KernelError::Busy => "Resource Busy",
-            KernelError::InvalidArgument => "Invalid Argument",
-            KernelError::Timeout => "Operation Timed Out",
-            KernelError::NotSupported => "Operation Not Supported",
-        }
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FsError {
+    FileNotFound,
+    PermissionDenied,
+    IsADirectory,
+    DiskFull,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetError {
+    ConnectionRefused,
+    Timeout,
+    InvalidAddress,
+    PortAlreadyInUse,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SecurityError {
+    PrivilegeEscalationDetected,
+    InvalidToken,
+    AccessDenied,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CryptoError {
+    VerificationFailed,
+    DecryptionFailed,
+    KeyGenerationFailed,
 }

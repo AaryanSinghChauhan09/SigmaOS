@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Debian/Ubuntu APT Compatibility Engine
 // Implements APT package management, DEB package parsing, and dpkg compatibility
@@ -238,10 +229,10 @@ impl DpkgDatabase {
 
     /// Install a package
     pub fn install_package(&mut self, package: DebPackage) -> Result<(), String> {
+        let pkg_name = package.package.clone();
+        self.installed_packages.insert(pkg_name.clone(), package);
         self.status_database
-            .insert(package.package.clone(), "install ok installed".to_string());
-        self.installed_packages
-            .insert(package.package.clone(), package);
+            .insert(pkg_name, "install ok installed".to_string());
         Ok(())
     }
 

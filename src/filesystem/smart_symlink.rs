@@ -1,21 +1,12 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Smart Symbolic Link Engine
 // Zero-dependency, #![no_std] compliant, highly-optimized
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
 
 use crate::compatibility::{KernelPersona, SyscallAbi};
 use crate::klib::HashMap;
+use std::string::{String, ToString};
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
-use std::string::{String, ToString};
 
 const MAX_SYMLINK_RECURSION: usize = 8;
 const MAX_FALLBACK_PATHS: usize = 4;

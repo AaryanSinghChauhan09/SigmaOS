@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Post-Quantum Hybrid Signature & Firmware Measurement Engine
 // Combines Kyber-1024 KEM with a firmware measurement hash chain
 // for secure-boot / measured-boot narrative
@@ -25,8 +16,8 @@ use merkle::{MerkleAccumulator, MerkleHash};
 #[cfg(test_disabled)]
 #[path = "pqc_enclave.rs"]
 mod pqc_enclave;
-use alloc::vec::Vec;
-#[cfg(test)]
+use std::vec::Vec;
+#[cfg(test_disabled)]
 use pqc_enclave::KyberKem;
 
 /// Hybrid PQC signature state combining lattice-based KEM with firmware measurements

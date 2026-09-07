@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS: Mint Competitor Suite
 // Fully-featured, zero-dependency, safe Rust implementation of standard-defeating
 // desktop features matching and crushing Linux Mint (Cinnamon, Software/Update/Driver Managers)
@@ -474,8 +465,8 @@ impl SovereignMintStickEngine {
     /// Format target USB device with selected filesystem (mintstick -m format)
     pub fn format_usb_drive(
         &mut self,
-        fs: UsbFileSystem,
-        volume_label: &str,
+        _fs: UsbFileSystem,
+        _volume_label: &str,
     ) -> Result<(), &'static str> {
         if self.target_device.is_empty() || self.target_device == "/dev/sda" {
             self.mode = MintStickMode::Failed;

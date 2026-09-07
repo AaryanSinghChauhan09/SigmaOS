@@ -1,27 +1,16 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Advanced Kernel Exports & Subsystems (Linux & BSD Inspired)
 // Implements Linux-style EXPORT_SYMBOL dynamic registries,
 // BSD-style SYSINIT boots, Kernel Linker Daemon (KLD) modules,
 // and Enterprise Kernel ABI (KABI) stability guarantees & automated testing suites.
 
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::string::{String, ToString};
+use std::format;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 // =========================================================================
@@ -202,18 +191,9 @@ pub struct KabiWhitelistEntry {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum KabiValidationStatus {
     Compatible,
-    ChecksumMismatch {
-        symbol: String,
-        expected: u32,
-        actual: u32,
-    },
-    StructLayoutChanged {
-        struct_name: String,
-        reason: String,
-    },
-    MissingWhitelistedSymbol {
-        symbol: String,
-    },
+    ChecksumMismatch { symbol: String, expected: u32, actual: u32 },
+    StructLayoutChanged { struct_name: String, reason: String },
+    MissingWhitelistedSymbol { symbol: String },
 }
 
 /// Linux RHEL & FreeBSD-inspired Kernel ABI (KABI) Whitelist & Layout Enforcer.
@@ -457,42 +437,15 @@ mod tests {
 
         // Export whitelisted symbols with identical subsystems
         registry.export_symbol("sys_open", KernelSymbolType::Function, 0x1000, "VFS", false);
-        registry.export_symbol(
-            "kmalloc",
-            KernelSymbolType::Function,
-            0x2000,
-            "Memory",
-            false,
-        );
+        registry.export_symbol("kmalloc", KernelSymbolType::Function, 0x2000, "Memory", false);
         registry.export_symbol("kfree", KernelSymbolType::Function, 0x2010, "Memory", false);
-        registry.export_symbol(
-            "register_chrdev",
-            KernelSymbolType::Function,
-            0x3000,
-            "Drivers",
-            false,
-        );
-        registry.export_symbol(
-            "schedule_task",
-            KernelSymbolType::Function,
-            0x4000,
-            "Scheduler",
-            false,
-        );
-        registry.export_symbol(
-            "printk",
-            KernelSymbolType::Function,
-            0x5000,
-            "Console",
-            false,
-        );
+        registry.export_symbol("register_chrdev", KernelSymbolType::Function, 0x3000, "Drivers", false);
+        registry.export_symbol("schedule_task", KernelSymbolType::Function, 0x4000, "Scheduler", false);
+        registry.export_symbol("printk", KernelSymbolType::Function, 0x5000, "Console", false);
 
         // Run automated KABI test suite
         let failures = engine.run_automated_kabi_tests(&registry);
-        assert!(
-            failures.is_empty(),
-            "All whitelisted symbols must pass KABI verification"
-        );
+        assert!(failures.is_empty(), "All whitelisted symbols must pass KABI verification");
 
         // Verify layout validation
         let mut valid_offsets = HashMap::new();
@@ -501,9 +454,7 @@ mod tests {
         valid_offsets.insert("priority".to_string(), 12);
         valid_offsets.insert("mm".to_string(), 16);
 
-        assert!(engine
-            .validate_struct_layout("task_struct", 128, &valid_offsets)
-            .is_ok());
+        assert!(engine.validate_struct_layout("task_struct", 128, &valid_offsets).is_ok());
 
         // Test layout failure due to shifted offset
         let mut bad_offsets = valid_offsets.clone();

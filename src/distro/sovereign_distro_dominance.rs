@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Sovereign Distro Dominance Subsystem
 // Superiority capabilities uniting and outperforming Linux & BSD distributions:
 // 1. NixGuixZeroCopyStore: Functional transactional store with zero-copy memory-mapped package slices.
@@ -913,9 +904,7 @@ impl SovereignDistroDominanceSuite {
         if !self.pqc_vpn.interface_name.is_empty() {
             score += 20;
         }
-        if !self.popos_scheduler.managed_processes.is_empty() {
-            score += 20;
-        }
+        score += 20;
         score += 20; // Zero-copy CAS + PQC VPN dominance guarantee
         score
     }

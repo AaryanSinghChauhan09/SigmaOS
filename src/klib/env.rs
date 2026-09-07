@@ -1,21 +1,12 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: Apache-2.0
 //! Custom environment variable access for SigmaOS
 //! Inspired by Linux & BSD distribution standards (XDG Base Directory, OpenBSD secure_getenv, FreeBSD defaults)
 
-use core::ffi::c_char;
-use core::sync::atomic::{AtomicBool, Ordering};
 use std::boxed::Box;
 use std::string::FromUtf8Error as Utf8Error;
 use std::string::String;
+use core::ffi::c_char;
+use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Process privilege state flag for OpenBSD issetugid() parity
 static IS_TAINTED: AtomicBool = AtomicBool::new(false);

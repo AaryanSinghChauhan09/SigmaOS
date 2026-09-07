@@ -1,30 +1,28 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 #![allow(dead_code)]
 // SigmaOS Thread Module
 // Threading and synchronization
 // Zero-dependency implementation - no external libraries required
 
-use core::fmt;
 use std::string::String;
 use std::vec::Vec;
+use core::fmt;
 
 /// Error type for the Thread module
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ThreadError {
+    /// Operation not supported
     NotSupported,
+    /// Invalid parameter
     InvalidParam,
+    /// Resource not found
     NotFound,
+    /// Permission denied
     PermissionDenied,
+    /// Out of memory
     OutOfMemory,
+    /// I/O error
     IoError,
+    /// Unknown error
     Unknown,
 }
 
@@ -42,8 +40,10 @@ impl fmt::Display for ThreadError {
     }
 }
 
+/// Result type alias for Thread operations
 pub type ThreadResult<T> = Result<T, ThreadError>;
 
+/// Thread - primary abstraction for this module
 #[derive(Debug, Clone)]
 pub struct Thread {
     pub id: u64,
@@ -52,6 +52,7 @@ pub struct Thread {
 }
 
 impl Thread {
+    /// Create a new Thread with the given name
     pub fn new(name: &str) -> Self {
         Self {
             id: 0,
@@ -78,6 +79,7 @@ impl Thread {
     }
 }
 
+/// Manager for Thread resources
 #[derive(Debug)]
 pub struct Mutex {
     resources: Vec<Thread>,
@@ -85,6 +87,7 @@ pub struct Mutex {
 }
 
 impl Mutex {
+    /// Create a new Mutex
     pub fn new() -> Self {
         Self {
             resources: Vec::new(),

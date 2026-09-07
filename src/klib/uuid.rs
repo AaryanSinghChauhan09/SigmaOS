@@ -1,18 +1,9 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 use std::format;
 // Simple UUID implementation for SigmaOS
 // Reduces dependency on external uuid crate
 
-use core::fmt;
 use std::string::String;
+use core::fmt;
 
 /// Simple UUID v4 implementation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

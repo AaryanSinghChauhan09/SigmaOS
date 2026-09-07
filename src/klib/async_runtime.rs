@@ -1,20 +1,11 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // 'sigma-async' Cooperative Runtime for SigmaOS
 // A lightweight, `#![no_std]` cooperative task executor using raw Future polling.
 
+use std::boxed::Box;
+use std::vec::Vec;
 use core::future::Future;
 use core::pin::Pin;
 use core::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
-use std::boxed::Box;
-use std::vec::Vec;
 
 /// A spawnable cooperative asynchronous task
 pub struct Task {
@@ -95,8 +86,8 @@ const DUMMY_VTABLE: RawWakerVTable = RawWakerVTable::new(
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use core::cell::RefCell;
     use std::rc::Rc;
+    use core::cell::RefCell;
 
     struct SimpleFuture {
         polls_remaining: u32,

@@ -1,19 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Broadcom WiFi Driver
 // Supports modern Broadcom/Cypress WiFi chipsets (802.11ac/ax)
 
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::boxed::Box;
 use std::string::String;
+use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
 
 use crate::driver::pci_enumeration::{PciDeviceInfo, PciDriver};
 
@@ -25,16 +16,16 @@ pub const BROADCOM_VENDOR_ID: u16 = 0x14E4;
 pub const CYPRESS_VENDOR_ID: u16 = 0x02D0;
 
 // Broadcom WiFi Device IDs (various chipsets)
-pub const BCM4318: u16 = 0x4318; // BCM4318 802.11b/g
-pub const BCM4311: u16 = 0x4311; // BCM4311 802.11b/g
-pub const BCM4313: u16 = 0x4313; // BCM4313 802.11n
-pub const BCM43142: u16 = 0xF5; // BCM43142 802.11n
-pub const BCM43455: u16 = 0x43A3; // BCM43455 802.11ac
-pub const BCM4356: u16 = 0x4356; // BCM4356 802.11ac
+pub const BCM4318: u16 = 0x4318;   // BCM4318 802.11b/g
+pub const BCM4311: u16 = 0x4311;   // BCM4311 802.11b/g
+pub const BCM4313: u16 = 0x4313;   // BCM4313 802.11n
+pub const BCM43142: u16 = 0xF5;    // BCM43142 802.11n
+pub const BCM43455: u16 = 0x43A3;  // BCM43455 802.11ac
+pub const BCM4356: u16 = 0x4356;   // BCM4356 802.11ac
 
 // Cypress WiFi Device IDs (802.11ax)
-pub const CYW89820: u16 = 0x0AE0; // CYW89820 802.11ax
-pub const CYW54591: u16 = 0x0AE0; // CYW54591 WiFi 6E
+pub const CYW89820: u16 = 0x0AE0;  // CYW89820 802.11ax
+pub const CYW54591: u16 = 0x0AE0;  // CYW54591 WiFi 6E
 
 // MMIO Register Base
 pub const MMIO_SIZE: u32 = 512 * 1024; // 512 KB typical
@@ -76,11 +67,11 @@ pub const REG_WPA_KEY: u32 = 0x604;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WifiStandard {
-    IEEE80211B,  // 2.4 GHz, 11 Mbps
-    IEEE80211G,  // 2.4 GHz, 54 Mbps
-    IEEE80211N,  // 2.4/5 GHz, 300 Mbps
-    IEEE80211AC, // 5 GHz, 1300 Mbps
-    IEEE80211AX, // 2.4/5 GHz, 9.6 Gbps
+    IEEE80211B,    // 2.4 GHz, 11 Mbps
+    IEEE80211G,    // 2.4 GHz, 54 Mbps
+    IEEE80211N,    // 2.4/5 GHz, 300 Mbps
+    IEEE80211AC,   // 5 GHz, 1300 Mbps
+    IEEE80211AX,   // 2.4/5 GHz, 9.6 Gbps
 }
 
 #[derive(Debug, Clone, Copy)]

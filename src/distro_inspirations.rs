@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Distributed Distro Inspiration Subsystem
 // (`src/distro_inspirations.rs`)
@@ -246,10 +237,7 @@ impl TorStreamIsolation {
 
     pub fn add(&mut self, app: &str, port: u16) -> Result<(), String> {
         if self.circuit_map.values().any(|p| *p == port) {
-            return Err(format!(
-                "port {} already assigned; would share a circuit",
-                port
-            ));
+            return Err(format!("port {} already assigned; would share a circuit", port));
         }
         self.circuit_map.insert(app.to_string(), port);
         Ok(())
@@ -919,12 +907,7 @@ impl TinyCoreExtensionManager {
         }
     }
 
-    pub fn load_extension_on_demand(
-        &mut self,
-        name: &str,
-        loop_dev: &str,
-        ram: bool,
-    ) -> Result<(), &'static str> {
+    pub fn load_extension_on_demand(&mut self, name: &str, loop_dev: &str, ram: bool) -> Result<(), &'static str> {
         if self.extensions.contains_key(name) {
             return Err("Extension already mounted");
         }
@@ -1038,10 +1021,7 @@ impl RescuezillaBackupEngine {
     }
 
     pub fn verify_image(&self, name: &str) -> bool {
-        self.images
-            .get(name)
-            .map(|img| img.checksum_verified)
-            .unwrap_or(false)
+        self.images.get(name).map(|img| img.checksum_verified).unwrap_or(false)
     }
 }
 
@@ -1096,3 +1076,4 @@ impl ClearLinuxAutoOptimizer {
         }
     }
 }
+

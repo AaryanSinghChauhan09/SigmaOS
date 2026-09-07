@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Native WebAssembly Desktop Bridge Module
 // Replaces JavaScript UI event routing and DOM manipulation with native Rust/WASM abstractions
@@ -40,13 +31,11 @@ impl NativeWasmDesktopEngine {
     }
 
     pub fn set_aria_label(&mut self, element_id: &str, label: &str) {
-        self.aria_attributes
-            .insert(element_id.to_string(), label.to_string());
+        self.aria_attributes.insert(element_id.to_string(), label.to_string());
     }
 
     pub fn set_secure_text(&mut self, element_id: &str, text: &str) {
-        self.text_node_contents
-            .insert(element_id.to_string(), text.to_string());
+        self.text_node_contents.insert(element_id.to_string(), text.to_string());
     }
 }
 
@@ -59,10 +48,7 @@ mod tests {
         let mut engine = NativeWasmDesktopEngine::new();
         engine.set_aria_label("dock-launcher", "Application Launcher");
         assert_eq!(
-            engine
-                .aria_attributes
-                .get("dock-launcher")
-                .map(|s| s.as_str()),
+            engine.aria_attributes.get("dock-launcher").map(|s| s.as_str()),
             Some("Application Launcher")
         );
 
@@ -72,10 +58,7 @@ mod tests {
 
         engine.set_secure_text("app-title", "SigmaOS Zenith Desktop");
         assert_eq!(
-            engine
-                .text_node_contents
-                .get("app-title")
-                .map(|s| s.as_str()),
+            engine.text_node_contents.get("app-title").map(|s| s.as_str()),
             Some("SigmaOS Zenith Desktop")
         );
     }

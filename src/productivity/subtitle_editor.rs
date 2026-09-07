@@ -1,21 +1,12 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // Aegisub & Subtitle Edit Parity Engines for SigmaOS
 // This module provides zero-dependency, no-std compliant implementations of subtitle editors,
 // style processors, and audio-timing synchronizers inspired by Aegisub & Subtitle Edit.
 
-use core::time::Duration;
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::time::Duration;
 
 /// Supported subtitle formats.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

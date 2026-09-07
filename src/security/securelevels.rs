@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // Sovereign BSD Securelevels and Granular Linux Capabilities Subsystem
 // Integrates core security paradigms from BSD securelevels and Linux capabilities into a unified microkernel privilege manager.
 
@@ -25,8 +16,8 @@ pub enum SecurityError {
 pub enum SigmaError {
     Security(SecurityError),
 }
-use core::sync::atomic::{AtomicU8, Ordering};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU8, Ordering};
 
 /// Granular system capabilities inspired by Linux capability sets
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

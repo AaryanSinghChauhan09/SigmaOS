@@ -1,17 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SessionID = usize;
 
@@ -94,7 +85,7 @@ pub trait RemoteDesktop {
 }
 
 pub struct SimpleRemoteDesktop {
-    pub sessions: Vec<Option<SimpleRemoteSession>>,
+    pub sessions: Vec<Option<Box<dyn RemoteSession>>>,
     pub next_id: AtomicUsize,
 }
 
@@ -104,17 +95,6 @@ impl SimpleRemoteDesktop {
             sessions: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
-    }
-
-    pub fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
-        for session_option in self.sessions.iter() {
-            if let Some(ref session) = *session_option {
-                if session.id() == id {
-                    return Some(session as &dyn RemoteSession);
-                }
-            }
-        }
-        None
     }
 }
 
@@ -128,12 +108,12 @@ impl RemoteDesktop for SimpleRemoteDesktop {
     fn connect(&mut self, host: &[u8], _port: u16) -> Result<SessionID, RemoteError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let session = SimpleRemoteSession::new(id, host);
-        self.sessions.push(Some(session));
+        self.sessions.push(Some(Box::new(session)));
         Ok(id)
     }
 
     fn disconnect(&mut self, id: SessionID) -> Result<(), RemoteError> {
-        for session_option in self.sessions.iter_mut() {
+        for session_option in &mut self.sessions {
             if let Some(ref mut session) = *session_option {
                 if session.id() == id {
                     session.set_state(SessionState::Disconnected);
@@ -162,6 +142,17 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         } else {
             Err(RemoteError::NotFound)
         }
+    }
+
+    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
+        for session_option in &self.sessions {
+            if let Some(ref session) = *session_option {
+                if session.id() == id {
+                    return Some(session.as_ref());
+                }
+            }
+        }
+        None
     }
 }
 

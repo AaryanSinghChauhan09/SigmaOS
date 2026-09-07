@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 //! Custom, OOP-driven High-Performance Graphics Compositor for SigmaOS
 //! Implements screen composition, double buffering, and screen capturing
 
@@ -650,7 +641,6 @@ impl Compositor for SimpleCompositor {
 
                         let back_stride = back.info().stride as usize / 4;
                         let back_data = back.data_mut();
-                        let opacity = window.get_opacity();
 
                         for y in 0..window_rect.size.height as usize {
                             for x in 0..window_rect.size.width as usize {

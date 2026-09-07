@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 //! Advanced Compatibility & Ecosystem Absorption Module for SigmaOS
 //! Absorbs core ideas, principles, features, and functions from:
 //! 1. MoonshotAI's Kimi Code CLI (already exists in src/shell/kimi_code_agent.rs and src/compatibility/kimi_code.rs, but we enrich compatibility or build on it).
@@ -19,11 +10,11 @@
 //! 8. Norigin Spatial Navigation (Euclidean-distance directional focus routing, nested container isolation, and navigation locks).
 use std::vec;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==========================================
 // 1. NumPy Parity: SovereignNumPy

@@ -16,9 +16,7 @@
 // SigmaOS Filesystem Module
 // Virtual filesystem, journaling filesystems (Btrfs, XFS), and storage support
 
-pub mod sigma_overlay_fs;
 pub mod btrfs;
-pub mod sigma_vfs;
 // pub mod filesystem;
 pub mod sigmacas;
 pub mod sigmafs;
@@ -38,7 +36,3 @@ pub use xfs::{
     AllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal,
     XfsState,
 };
-
-pub mod sigma_tmpfs;
-pub mod sigma_procfs;
-pub mod sigma_sysfs;

@@ -1,6 +1,3 @@
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -15,13 +12,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::string::String;
+use std::string::{String, ToString};
+use std::boxed::Box;
 // SigmaOS Network Protocol Layer
 
 // (no_std only applicable at crate root - removed)
 
 use std::vec::Vec;
 
+use crate::filesystem::FsError;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {

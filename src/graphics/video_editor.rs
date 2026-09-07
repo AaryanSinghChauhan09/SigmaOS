@@ -1,9 +1,4 @@
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
+use std::vec;
 // Sovereign Non-Linear Video Editor & Frame Compositor Engine (SigmaCut)
 // Inspired by Adobe Premiere Pro, Final Cut Pro, DaVinci Resolve, and Kdenlive.
 // Provides GPU-accelerated timeline scrubbing, real-time effects preview, and multi-format exports.

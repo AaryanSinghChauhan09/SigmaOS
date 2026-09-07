@@ -1,10 +1,3 @@
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
-#![allow(non_camel_case_types)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
 use std::string::String;
 use std::vec;
 use std::vec::Vec;
@@ -468,6 +461,15 @@ impl SystemServiceDescriptorTable {
             self.service_table[id] = Some(handler);
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchitectureClass {
+    X86_32,
+    X86_64,
+    AArch64,
+    RiscV32,
+    RiscV64,
 }
 
 // 6. Unified Architecture Engine

@@ -1,12 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 //! # Namespace Infrastructure Module
 //!
 //! This module provides the core namespace infrastructure for process isolation in SigmaOS.
@@ -18,8 +9,9 @@
 //! - **NamespaceRegistry**: Central registry for namespace management
 //! - **Specific namespace implementations**: PID, IPC, Network, etc. (PID implemented here)
 
+use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use std::sync::Arc;
 use std::string::String;
-use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Maximum number of namespaces in the system
 pub const MAX_NAMESPACES: usize = 1024;
@@ -49,7 +41,7 @@ pub enum KernelNamespaceType {
     Pid,
     Ipc,
     Network,
-    Uts, // UTS (hostname/domainname)
+    Uts,  // UTS (hostname/domainname)
     User,
     Cgroup,
     Mount,

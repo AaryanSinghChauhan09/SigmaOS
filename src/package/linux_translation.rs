@@ -1,17 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Linux Package & Driver Translation Subsystem
 // Zero-dependency, #![no_std] compliant, zero-allocation
 // Integrates foreign Linux package frameworks (.deb, .rpm, pacman) directly with the SigmaOS Driver system.
 
-use crate::driver::framework::{DriverError, DriverID, DriverState, DriverType, SimpleDriver};
+use crate::driver::framework::{DriverType, SimpleDriver};
 use crate::package::PackageFormat;
 use core::sync::atomic::{AtomicBool, Ordering};
 

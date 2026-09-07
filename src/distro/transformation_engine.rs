@@ -1,15 +1,6 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 // SigmaOS Sovereign Future-Ready Operating System Transformation Engine
 // Implements accessibility overlays, automation routines, forensic audit trails,
 // global legal compliance dashboards, cross-language developer tools, and IoT mesh orchestration.
@@ -54,16 +45,12 @@ impl AccessibilityOverlayManager {
     }
 
     pub fn register_voice_action(&mut self, voice_trigger: &str) {
-        self.registered_voice_actions
-            .insert(voice_trigger.to_string());
+        self.registered_voice_actions.insert(voice_trigger.to_string());
     }
 
     pub fn process_voice_action(&self, voice_input: &str) -> Option<String> {
         if self.registered_voice_actions.contains(voice_input) {
-            Some(format!(
-                "Accessibility Overlay: Voice command '{}' matched and executed.",
-                voice_input
-            ))
+            Some(format!("Accessibility Overlay: Voice command '{}' matched and executed.", voice_input))
         } else {
             None
         }
@@ -106,13 +93,7 @@ impl AutomationRoutineController {
         }
     }
 
-    pub fn add_routine(
-        &mut self,
-        id: &str,
-        trigger: RoutineTrigger,
-        condition: &str,
-        action: &str,
-    ) {
+    pub fn add_routine(&mut self, id: &str, trigger: RoutineTrigger, condition: &str, action: &str) {
         let routine = SmartRoutine {
             routine_id: id.to_string(),
             trigger_type: trigger,
@@ -122,19 +103,12 @@ impl AutomationRoutineController {
         self.routines.insert(id.to_string(), routine);
     }
 
-    pub fn evaluate_and_trigger(
-        &mut self,
-        trigger: RoutineTrigger,
-        current_state: &str,
-    ) -> Vec<String> {
+    pub fn evaluate_and_trigger(&mut self, trigger: RoutineTrigger, current_state: &str) -> Vec<String> {
         let mut triggered = Vec::new();
         for routine in self.routines.values() {
             if routine.trigger_type == trigger && routine.condition_value == current_state {
                 triggered.push(routine.action_command.clone());
-                self.executed_actions_log.push(format!(
-                    "Routine '{}' triggered action '{}'",
-                    routine.routine_id, routine.action_command
-                ));
+                self.executed_actions_log.push(format!("Routine '{}' triggered action '{}'", routine.routine_id, routine.action_command));
             }
         }
         triggered
@@ -224,21 +198,9 @@ impl GlobalComplianceDashboard {
             + self.social_security_verifications.len()
             + self.technical_standard_verifications.len();
 
-        let passed = self
-            .labor_law_verifications
-            .values()
-            .filter(|&&v| v)
-            .count()
-            + self
-                .social_security_verifications
-                .values()
-                .filter(|&&v| v)
-                .count()
-            + self
-                .technical_standard_verifications
-                .values()
-                .filter(|&&v| v)
-                .count();
+        let passed = self.labor_law_verifications.values().filter(|&&v| v).count()
+            + self.social_security_verifications.values().filter(|&&v| v).count()
+            + self.technical_standard_verifications.values().filter(|&&v| v).count();
 
         if total == 0 {
             100
@@ -266,15 +228,9 @@ impl DeveloperToolkitConverter {
 
     pub fn convert_python_to_rust(&self, python_code: &str) -> Result<String, &'static str> {
         if python_code.contains("print(\"") {
-            Ok(python_code
-                .replace("print(\"", "println!(\"")
-                .replace("\")", "\");"))
+            Ok(python_code.replace("print(\"", "println!(\"").replace("\")", "\");"))
         } else if python_code.contains("def ") {
-            Ok(python_code
-                .replace("def ", "fn ")
-                .replace(":", " {")
-                .to_string()
-                + "\n}")
+            Ok(python_code.replace("def ", "fn ").replace(":", " {").to_string() + "\n}")
         } else {
             Err("Converter: Unrecognized or complex python construct")
         }
@@ -286,28 +242,19 @@ impl DeveloperToolkitConverter {
         let mut rust_code = cpp_code.to_string();
 
         if rust_code.contains("#include <iostream>") {
-            rust_code =
-                rust_code.replace("#include <iostream>", "// Rust standard IO auto-imported");
+            rust_code = rust_code.replace("#include <iostream>", "// Rust standard IO auto-imported");
         }
         if rust_code.contains("#include <vector>") {
-            rust_code = rust_code.replace(
-                "#include <vector>",
-                "// std::vec::Vec used natively in Rust",
-            );
+            rust_code = rust_code.replace("#include <vector>", "// std::vec::Vec used natively in Rust");
         }
         if rust_code.contains("#include <string>") {
-            rust_code = rust_code.replace(
-                "#include <string>",
-                "// std::string::String used natively in Rust",
-            );
+            rust_code = rust_code.replace("#include <string>", "// std::string::String used natively in Rust");
         }
         if rust_code.contains("extern \"C\" {") {
             rust_code = rust_code.replace("extern \"C\" {", "pub extern \"C\" fn ");
         }
         if rust_code.contains("std::cout << \"") {
-            rust_code = rust_code
-                .replace("std::cout << \"", "println!(\"")
-                .replace("\";", "\");");
+            rust_code = rust_code.replace("std::cout << \"", "println!(\"").replace("\";", "\");");
         }
         if rust_code.contains("std::vector<") {
             rust_code = rust_code.replace("std::vector<", "Vec<");
@@ -360,15 +307,11 @@ impl IotDeviceMeshOrchestrator {
             last_telemetry_payload: String::new(),
             connection_healthy: true,
         };
-        self.registered_mesh_devices
-            .insert(dev_id.to_string(), device);
+        self.registered_mesh_devices.insert(dev_id.to_string(), device);
     }
 
     pub fn sync_iot_telemetry(&mut self, dev_id: &str, payload: &str) -> Result<(), &'static str> {
-        let device = self
-            .registered_mesh_devices
-            .get_mut(dev_id)
-            .ok_or("Device not found in mesh")?;
+        let device = self.registered_mesh_devices.get_mut(dev_id).ok_or("Device not found in mesh")?;
         device.last_telemetry_payload = payload.to_string();
         device.connection_healthy = true;
         Ok(())
@@ -397,10 +340,7 @@ mod tests {
         overlay.register_voice_action("open files");
         assert_eq!(
             overlay.process_voice_action("open files"),
-            Some(
-                "Accessibility Overlay: Voice command 'open files' matched and executed."
-                    .to_string()
-            )
+            Some("Accessibility Overlay: Voice command 'open files' matched and executed.".to_string())
         );
         assert_eq!(overlay.process_voice_action("close files"), None);
     }
@@ -408,12 +348,7 @@ mod tests {
     #[test]
     fn test_automation_routines() {
         let mut controller = AutomationRoutineController::new();
-        controller.add_routine(
-            "dark_mode_9pm",
-            RoutineTrigger::TimeTick,
-            "21:00",
-            "enable_dark_theme",
-        );
+        controller.add_routine("dark_mode_9pm", RoutineTrigger::TimeTick, "21:00", "enable_dark_theme");
 
         let triggered = controller.evaluate_and_trigger(RoutineTrigger::TimeTick, "21:00");
         assert_eq!(triggered.len(), 1);
@@ -444,22 +379,14 @@ mod tests {
     fn test_dev_toolkit_converter() {
         let converter = DeveloperToolkitConverter::new();
 
-        let py_rust = converter
-            .convert_python_to_rust("print(\"Hello World\")")
-            .unwrap();
+        let py_rust = converter.convert_python_to_rust("print(\"Hello World\")").unwrap();
         assert_eq!(py_rust, "println!(\"Hello World\");");
 
-        let cpp_rust = converter
-            .convert_cpp_to_rust("#include <iostream>\nstd::cout << \"Hello World\";")
-            .unwrap();
+        let cpp_rust = converter.convert_cpp_to_rust("#include <iostream>\nstd::cout << \"Hello World\";").unwrap();
         assert!(cpp_rust.contains("println!(\"Hello World\");"));
         assert!(cpp_rust.contains("// Rust standard IO auto-imported"));
 
-        let cpp_class_rust = converter
-            .convert_cpp_to_rust(
-                "class MatrixEngine {\n std::vector<int> data;\n std::string name;\n};",
-            )
-            .unwrap();
+        let cpp_class_rust = converter.convert_cpp_to_rust("class MatrixEngine {\n std::vector<int> data;\n std::string name;\n};").unwrap();
         assert!(cpp_class_rust.contains("pub struct MatrixEngine"));
         assert!(cpp_class_rust.contains("Vec<int>"));
         assert!(cpp_class_rust.contains("String name;"));
@@ -470,15 +397,9 @@ mod tests {
         let mut orchestrator = IotDeviceMeshOrchestrator::new();
         orchestrator.register_iot_device("DEV_SMART_LIGHT", "Wipro Smart Bulb");
 
-        assert!(orchestrator
-            .sync_iot_telemetry("DEV_SMART_LIGHT", "brightness_percent=80")
-            .is_ok());
+        assert!(orchestrator.sync_iot_telemetry("DEV_SMART_LIGHT", "brightness_percent=80").is_ok());
         assert_eq!(
-            orchestrator
-                .registered_mesh_devices
-                .get("DEV_SMART_LIGHT")
-                .unwrap()
-                .last_telemetry_payload,
+            orchestrator.registered_mesh_devices.get("DEV_SMART_LIGHT").unwrap().last_telemetry_payload,
             "brightness_percent=80"
         );
     }

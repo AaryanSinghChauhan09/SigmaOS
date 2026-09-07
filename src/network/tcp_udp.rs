@@ -1,22 +1,9 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
-use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
-/// OOP-based Networking Stack (TCP/UDP) for SigmaOS
-/// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
-/// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
-/// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
-// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
-// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+//! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
+//! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+
 use std::boxed::Box;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -191,18 +178,14 @@ pub trait TCPConnection {
 
 impl TCPConnection for SimpleSocket {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
-        self.remote_port
-            .store(remote_port as usize, Ordering::SeqCst);
-        self.state
-            .store(TCPState::SynSent as usize, Ordering::SeqCst);
-        self.state
-            .store(TCPState::Established as usize, Ordering::SeqCst);
+        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+        self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state.store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
 
     fn listen(&mut self) -> Result<(), NetworkError> {
-        self.state
-            .store(TCPState::Listen as usize, Ordering::SeqCst);
+        self.state.store(TCPState::Listen as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -232,8 +215,7 @@ impl TCPConnection for SimpleSocket {
     }
 
     fn close(&mut self) -> Result<(), NetworkError> {
-        self.state
-            .store(TCPState::Closed as usize, Ordering::SeqCst);
+        self.state.store(TCPState::Closed as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -261,8 +243,7 @@ pub trait UDPSocket {
 
 impl UDPSocket for SimpleSocket {
     fn sendto(&mut self, data: &[u8], remote_port: Port) -> Result<usize, NetworkError> {
-        self.remote_port
-            .store(remote_port as usize, Ordering::SeqCst);
+        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
         Ok(data.len())
     }
 
@@ -499,8 +480,7 @@ impl ZeroCopyNetwork {
 
 impl ZeroCopy for ZeroCopyNetwork {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError> {
-        self.dma_buffer
-            .store(data.as_ptr() as usize, Ordering::SeqCst);
+        self.dma_buffer.store(data.as_ptr() as usize, Ordering::SeqCst);
         Ok(data.len())
     }
 
@@ -684,6 +664,20 @@ pub struct SimpleNetworkStack {
     pub interfaces: Vec<NetworkInterface>,
 }
 
+impl SimpleNetworkStack {
+    pub fn new() -> Self {
+        Self {
+            sockets: Vec::new(),
+            next_id: AtomicUsize::new(1),
+            firewall: SimpleFirewall::new(),
+            congestion: RenoCongestionControl::new(),
+            netfilter: NetfilterFirewall::new(),
+            routing_table: RoutingTable::new(),
+            interfaces: Vec::new(),
+        }
+    }
+}
+
 impl Default for SimpleNetworkStack {
     fn default() -> Self {
         Self::new()
@@ -699,11 +693,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        if let Some(pos) = self
-            .sockets
-            .iter()
-            .position(|s| s.as_ref().map_or(false, |s| s.id() == id))
-        {
+        if let Some(pos) = self.sockets.iter().position(|s| s.as_ref().map_or(false, |s| s.id() == id)) {
             self.sockets.remove(pos);
             Ok(())
         } else {

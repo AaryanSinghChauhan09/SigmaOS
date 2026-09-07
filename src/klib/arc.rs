@@ -1,20 +1,11 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
 // SigmaOS Custom Arc (Atomic Reference Counting)
 // Reduces dependency on std::sync::Arc
 
+use std::boxed::Box;
 use core::convert::AsRef;
 use core::ops::Deref;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::boxed::Box;
 
 /// ArcInner - Internal structure for Arc
 #[repr(C)]
