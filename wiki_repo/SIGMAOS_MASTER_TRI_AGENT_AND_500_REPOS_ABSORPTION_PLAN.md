@@ -673,7 +673,42 @@ SigmaOS incorporates specialized, profession-aware toolkits tailored for Indian 
 
 ---
 
-### 4. Multi-Phase Execution Roadmap (5-Year Plan)
+### 4. Strategy to Surpass & Defeat Linux Distros
+
+To establish SigmaOS as a sovereign alternative, SigmaOS implements a radical differentiation protocol:
+
+- 🛡️ **Sovereignty Over Hardware**: Unlike Linux which relies heavily on closed vendor binary blobs, SigmaOS enforces transparent, firmware-free Rust drivers and open hardware initialization.
+- 📜 **Declarative Simplicity**: Replaces Linux's fragmented package ecosystem with single-manifest declarative layers and atomic immutable state.
+- 🌐 **Cluster-Native Design**: Treats multi-node devices as a single pooled resource (shared GPUs, RAM, storage, sensors) rather than siloed single-server installations.
+- 🔐 **Security by Design**: Adopts OpenBSD-style Pledge/Unveil hardening combined with Rust memory safety guarantees and post-quantum cryptographic attestation.
+- 🎯 **Unified Vision**: Eliminates Linux distro fragmentation by maintaining a coherent modular architecture driven by the Shards framework.
+- ⚙️ **HTML Dependency Elimination**: Reduces reliance on static HTML markup by rendering Zenith desktop interfaces programmatically via Web Components, WebAssembly, and native Canvas/Wayland compositing.
+
+---
+
+### 5. Formal 2-Year Strategic Roadmap (2026 – 2028)
+
+#### 🔹 Q4 2026 – Q2 2027: Foundation & Immutable Userland
+- **Compatibility Layers**: Run Linux/Windows apps seamlessly without emulation overhead.
+- **Immutable Userland Layers**: Atomic updates and immutable rootfs to eliminate dependency hell.
+- **Contributor Charter**: Publish formal governance, security boundaries, and contribution guidelines.
+- **Zenith Desktop Refinement**: Improve Wayland microcompositor polish, accessibility, and WCAG compliance.
+
+#### 🔹 Q3 2027 – Q1 2028: Modular Shards & Firmware Sovereignty
+- **Shard Implementation**: Roll out core modular shards (media, networking, storage, AI).
+- **Firmware-Free Drivers**: Replace opaque vendor binary blobs with transparent, open-source Rust drivers.
+- **Composable Boot Sequences**: Scriptable, cryptographic boot flows for multi-boot and encrypted startup.
+- **Clustered Peripherals**: Enable device pooling across networked SigmaOS nodes.
+
+#### 🔹 Q2 2028 – Q4 2028: Programmable Kernel & Temporal State
+- **Programmable Scheduler**: User-defined scheduling policies at the kernel level for graphics, batch, and RT workloads.
+- **Network-Native OS State**: Pause an active session on one device and resume seamlessly on another node.
+- **Shards Marketplace**: Curated, attested ecosystem for modular SigmaOS applications and system extensions.
+- **Temporal Filesystem**: Native time-travel filesystem for instantaneous system rollback and state inspection.
+
+---
+
+### 6. Multi-Phase Execution Roadmap (5-Year Extended Plan)
 
 ```
 ========================================================================================
@@ -687,7 +722,7 @@ Phase 2: Universal Package & Multi-OS Parity (Months 13-24)
 
 Phase 3: Zenith Desktop & Accessible UX (Months 25-36)
 - WCAG 2.1 AA screen reader & keyboard desktop interface (Palette 🎨)
-- PipeWire zero-latency audio routing graph
+- PipeWire zero-latency audio routing graph & HTML-free programmatic UI rendering
 
 Phase 4: Cloud, MicroVMs & AI Acceleration (Months 37-48)
 - Firecracker microVM lightweight boot execution
