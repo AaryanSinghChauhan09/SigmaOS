@@ -3153,7 +3153,14 @@ pub struct FedoraIgnitionEngine {
     pub provisioned: bool,
 }
 
-impl FedoraIgnitionEngine {
+#[derive(Debug, Clone, Default)]
+pub struct FedoraOfflineUpdateEngine {
+    pub staged_packages: Vec<String>,
+    pub is_offline_update_pending: bool,
+    pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {
         Self::default()
     }
@@ -3178,11 +3185,7 @@ impl FedoraIgnitionEngine {
     }
 }
 
-
-
-
-
-impl FedoraOfflineUpdateEngine {
+impl FedoraIgnitionEngine {
     pub fn new() -> Self {
         Self {
             files: Vec::new(),
@@ -3191,7 +3194,6 @@ impl FedoraOfflineUpdateEngine {
             provisioned: false,
         }
     }
-}
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
         self.files.push(IgnitionFile {
@@ -5229,21 +5231,6 @@ mod tests {
         let mut sssd = FedoraSssdKerberosRealmClientEngine::new("FEDORA.ORGANIZATION.ORG");
         assert!(sssd.obtain_ticket_granting_ticket("jules_admin", "SecretPgpPass").is_ok());
         assert!(sssd.is_tgt_valid());
-    }
-
-        // New version release check -> event generated & fedmsg published
-        let event = hotness
-            .process_upstream_release_check(
-                1234,
-                "8.3.0",
-                "https://curl.se/release-8.3.0",
-                1700000100,
-            )
-            .unwrap()
-            .unwrap();
-
-        assert!(wireplumber.set_default_node("sink", 101));
-        assert_eq!(wireplumber.default_sink_node, Some(101));
     }
 
     #[test]

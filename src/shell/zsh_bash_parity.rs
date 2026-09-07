@@ -471,7 +471,7 @@ impl Default for ZshSyntaxHighlighter {
 pub struct BashParameterExpansion;
 
 impl BashParameterExpansion {
-    /// Expands bash parameter syntax: ${VAR:-default}, ${VAR#prefix}, ${VAR%suffix}, ${#VAR}, ${VAR//pattern/replacement}, ${VAR:offset:length}
+    /// Expands bash parameter syntax: ${VAR:-default}, ${VAR#prefix}, ${VAR%suffix}, ${#VAR}, ${VAR//pattern/replacement}, ${VAR/pattern/replacement}, ${VAR:offset:length}, ${!VAR}, ${VAR^^}, ${VAR,,}
     pub fn expand(expr: &str, env: &BTreeMap<String, String>) -> String {
         if !expr.starts_with("${") || !expr.ends_with('}') {
             return expr.to_string();
@@ -479,17 +479,45 @@ impl BashParameterExpansion {
 
         let inner = &expr[2..expr.len() - 1];
 
-        // 1. ${#VAR} - string length
+        // 1. Indirect expansion: ${!VAR}
+        if inner.starts_with('!') {
+            let indirect_var = &inner[1..];
+            if let Some(target_var) = env.get(indirect_var) {
+                return env.get(target_var).cloned().unwrap_or_default();
+            }
+            return String::new();
+        }
+
+        // 2. String length: ${#VAR}
         if inner.starts_with('#') {
             let var_name = &inner[1..];
             let val = env.get(var_name).cloned().unwrap_or_default();
             return val.len().to_string();
         }
 
-        // 2. ${VAR//search/replace} - global replace
-        if let Some(pos) = inner.find("//") {
-            let var_name = &inner[..pos];
-            let rest = &inner[pos + 2..];
+        // Separate variable identifier from operator/rest
+        let mut var_len = 0;
+        let bytes = inner.as_bytes();
+        while var_len < bytes.len() && (bytes[var_len].is_ascii_alphanumeric() || bytes[var_len] == b'_') {
+            var_len += 1;
+        }
+
+        let var_name = &inner[..var_len];
+        let op_and_rest = &inner[var_len..];
+
+        // 3. Case conversion: ${VAR^^} / ${VAR,,}
+        if op_and_rest == "^^" {
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            return val.to_uppercase();
+        }
+        if op_and_rest == ",," {
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            return val.to_lowercase();
+        }
+
+        // 4. Global replacement: ${VAR//search/replace}
+        if op_and_rest.starts_with("//") {
+            let rest = &op_and_rest[2..];
             let val = env.get(var_name).cloned().unwrap_or_default();
             if let Some(sep) = rest.find('/') {
                 let pattern = &rest[..sep];
@@ -500,33 +528,53 @@ impl BashParameterExpansion {
             }
         }
 
-        // 3. ${VAR:offset:length} - substring slicing
-        if let Some(pos) = inner.find(':') {
-            if !inner.contains(":-") {
-                let var_name = &inner[..pos];
-                let slice_spec = &inner[pos + 1..];
-                let val = env.get(var_name).cloned().unwrap_or_default();
-                if let Some(len_pos) = slice_spec.find(':') {
-                    let offset: usize = slice_spec[..len_pos].parse().unwrap_or(0);
-                    let length: usize = slice_spec[len_pos + 1..].parse().unwrap_or(val.len());
-                    if offset < val.len() {
-                        let end = (offset + length).min(val.len());
-                        return val[offset..end].to_string();
-                    }
-                    return String::new();
-                } else if let Ok(offset) = slice_spec.parse::<usize>() {
-                    if offset < val.len() {
-                        return val[offset..].to_string();
-                    }
-                    return String::new();
+        // 5. Single replacement: ${VAR/search/replace}
+        if op_and_rest.starts_with('/') {
+            let rest = &op_and_rest[1..];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            if let Some(sep) = rest.find('/') {
+                let pattern = &rest[..sep];
+                let replacement = &rest[sep + 1..];
+                if let Some(match_idx) = val.find(pattern) {
+                    let mut res = val[..match_idx].to_string();
+                    res.push_str(replacement);
+                    res.push_str(&val[match_idx + pattern.len()..]);
+                    return res;
                 }
+                return val;
+            } else {
+                if let Some(match_idx) = val.find(rest) {
+                    let mut res = val[..match_idx].to_string();
+                    res.push_str(&val[match_idx + rest.len()..]);
+                    return res;
+                }
+                return val;
             }
         }
 
-        // 4. ${VAR:-default} - default value
-        if let Some(pos) = inner.find(":-") {
-            let var_name = &inner[..pos];
-            let default_val = &inner[pos + 2..];
+        // 6. Substring slicing: ${VAR:offset:length}
+        if op_and_rest.starts_with(':') && !op_and_rest.starts_with(":-") {
+            let slice_spec = &op_and_rest[1..];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            if let Some(len_pos) = slice_spec.find(':') {
+                let offset: usize = slice_spec[..len_pos].parse().unwrap_or(0);
+                let length: usize = slice_spec[len_pos + 1..].parse().unwrap_or(val.len());
+                if offset < val.len() {
+                    let end = (offset + length).min(val.len());
+                    return val[offset..end].to_string();
+                }
+                return String::new();
+            } else if let Ok(offset) = slice_spec.parse::<usize>() {
+                if offset < val.len() {
+                    return val[offset..].to_string();
+                }
+                return String::new();
+            }
+        }
+
+        // 7. Default value: ${VAR:-default}
+        if op_and_rest.starts_with(":-") {
+            let default_val = &op_and_rest[2..];
             if let Some(val) = env.get(var_name) {
                 if !val.is_empty() {
                     return val.clone();
@@ -535,10 +583,9 @@ impl BashParameterExpansion {
             return default_val.to_string();
         }
 
-        // 5. ${VAR#prefix} - strip prefix
-        if let Some(pos) = inner.find('#') {
-            let var_name = &inner[..pos];
-            let prefix = &inner[pos + 1..];
+        // 8. Strip prefix: ${VAR#prefix}
+        if op_and_rest.starts_with('#') {
+            let prefix = &op_and_rest[1..];
             let val = env.get(var_name).cloned().unwrap_or_default();
             if val.starts_with(prefix) {
                 return val[prefix.len()..].to_string();
@@ -546,10 +593,9 @@ impl BashParameterExpansion {
             return val;
         }
 
-        // 6. ${VAR%suffix} - strip suffix
-        if let Some(pos) = inner.find('%') {
-            let var_name = &inner[..pos];
-            let suffix = &inner[pos + 1..];
+        // 9. Strip suffix: ${VAR%suffix}
+        if op_and_rest.starts_with('%') {
+            let suffix = &op_and_rest[1..];
             let val = env.get(var_name).cloned().unwrap_or_default();
             if val.ends_with(suffix) {
                 return val[..val.len() - suffix.len()].to_string();
@@ -558,7 +604,7 @@ impl BashParameterExpansion {
         }
 
         // Direct variable lookup
-        env.get(inner).cloned().unwrap_or_default()
+        env.get(var_name).cloned().unwrap_or_default()
     }
 }
 
@@ -1259,6 +1305,14 @@ impl UniversalShellCompatibilityEngine {
         }
         Ok(pipelines)
     }
+
+    /// Executes any script regardless of dialect (Bash, Zsh, Fish, Tcsh, Ksh, Dash, Sh) natively transpiled to universal POSIX pipelines
+    pub fn execute_multi_dialect_script(
+        &mut self,
+        script: &str,
+    ) -> Result<Vec<ShellPipeline>, &'static str> {
+        self.execute_script_as_sh(script)
+    }
 }
 
 pub struct UniversalScriptTranspiler;
@@ -1353,17 +1407,31 @@ impl UniversalScriptTranspiler {
             l = format!("|| {}", &l[3..]);
         }
 
-        // 5. Fish 'function foo' -> 'foo() {'
+        // 5. Fish 'for var in list' -> 'for var in list; do'
+        if l.starts_with("for ") && !l.contains("; do") && !l.contains(" do") {
+            return format!("{}; do", l);
+        }
+
+        // 6. Fish 'while cond' -> 'while cond; do'
+        if l.starts_with("while ") && !l.contains("; do") && !l.contains(" do") {
+            return format!("{}; do", l);
+        }
+
+        // 7. Fish 'function foo' -> 'foo() {'
         if l.starts_with("function ") {
             let func_name = l.trim_start_matches("function ").trim();
             *in_function = true;
             return format!("{}() {{", func_name);
         }
 
-        // 6. Fish 'end' -> '}' if in function
-        if l == "end" && *in_function {
-            *in_function = false;
-            return "}".to_string();
+        // 8. Fish 'end' -> '}' or 'done'
+        if l == "end" {
+            if *in_function {
+                *in_function = false;
+                return "}".to_string();
+            } else {
+                return "done".to_string();
+            }
         }
 
         l
@@ -1404,13 +1472,54 @@ impl UniversalScriptTranspiler {
             }
         }
 
+        // 5. Tcsh 'foreach item ( list )' -> 'for item in list; do'
+        if l.starts_with("foreach ") {
+            let rest = l.trim_start_matches("foreach ").trim();
+            if let Some(open) = rest.find('(') {
+                if let Some(close) = rest.find(')') {
+                    let var = rest[..open].trim();
+                    let items = rest[open + 1..close].trim();
+                    return format!("for {} in {}; do", var, items);
+                }
+            }
+        }
+
+        // 6. Tcsh 'if ( cond ) then' -> 'if [ cond ]; then'
+        if l.starts_with("if (") && l.contains("then") {
+            if let (Some(open), Some(close)) = (l.find('('), l.find(')')) {
+                let cond = l[open + 1..close].trim();
+                return format!("if [ {} ]; then", cond);
+            }
+        }
+
+        // 7. Tcsh 'endif' -> 'fi'
+        if l == "endif" {
+            return "fi".to_string();
+        }
+
         l
     }
 
     fn transpile_bash_zsh_line(line: &str) -> String {
         let mut l = line.to_string();
 
-        // 1. Process substitution: <(cmd) -> subshell evaluation bridge
+        // 1. Zsh global alias: alias -g FOO=BAR -> alias FOO=BAR
+        if l.starts_with("alias -g ") {
+            l = format!("alias {}", &l[9..]);
+        }
+
+        // 2. Ksh typesets: typeset -i var -> var=0, typeset -a var -> var=""
+        if l.starts_with("typeset -i ") {
+            let var = l.trim_start_matches("typeset -i ").trim();
+            return format!("{}0", if var.contains('=') { var.to_string() } else { format!("{}=", var) });
+        } else if l.starts_with("typeset -a ") || l.starts_with("typeset ") {
+            let var = l.trim_start_matches("typeset -a ").trim_start_matches("typeset ").trim();
+            if !var.contains('=') {
+                return format!("{}=\"\"", var);
+            }
+        }
+
+        // 3. Process substitution: <(cmd) -> subshell evaluation bridge
         while let Some(start) = l.find("<(") {
             if let Some(end) = l[start..].find(')') {
                 let absolute_end = start + end;
@@ -1421,17 +1530,17 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Zsh zero-based array index fix: $var[0] -> ${var[1]}
+        // 4. Zsh zero-based array index fix: $var[0] -> ${var[1]}
         if l.contains("$") && l.contains("[0]") {
             l = l.replace("[0]", "[1]");
         }
 
-        // 3. [[ expr ]] -> [ expr ]
+        // 5. [[ expr ]] -> [ expr ]
         if l.contains("[[") && l.contains("]]") {
             l = l.replace("[[", "[").replace("]]", "]");
         }
 
-        // 4. <<< "here string" -> echo "here string" |
+        // 6. <<< "here string" -> echo "here string" |
         if l.contains("<<<") {
             if let Some(pos) = l.find("<<<") {
                 let cmd = &l[..pos].trim();
@@ -1440,7 +1549,7 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 5. function foo() -> foo()
+        // 7. function foo() -> foo()
         if l.starts_with("function ") {
             let rest = l.trim_start_matches("function ").trim();
             if !rest.contains("()") {
@@ -1468,7 +1577,7 @@ impl Default for UniversalShellCompatibilityEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1571,6 +1680,19 @@ mod tests {
 
         // Substring slicing
         assert_eq!(BashParameterExpansion::expand("${USER:0:5}", &env), "sover");
+
+        // Case conversion
+        assert_eq!(BashParameterExpansion::expand("${USER^^}", &env), "SOVEREIGN");
+        assert_eq!(BashParameterExpansion::expand("${USER,,}", &env), "sovereign");
+
+        // Indirect expansion
+        env.insert("POINTER".to_string(), "USER".to_string());
+        assert_eq!(BashParameterExpansion::expand("${!POINTER}", &env), "sovereign");
+
+        // Single replacement vs global replacement
+        env.insert("NAME".to_string(), "banana".to_string());
+        assert_eq!(BashParameterExpansion::expand("${NAME/a/o}", &env), "bonana");
+        assert_eq!(BashParameterExpansion::expand("${NAME//a/o}", &env), "bonono");
     }
 
     #[test]

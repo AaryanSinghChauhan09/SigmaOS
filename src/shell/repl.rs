@@ -214,6 +214,9 @@ pub enum ShellCommand {
         path: String,
         permissions: String,
     },
+    Sh {
+        script: String,
+    },
 
     Unknown(String),
 }
@@ -845,6 +848,14 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "sh" | "source" | "script" => {
+                let script = if parts.len() >= 2 {
+                    parts[1..].join(" ")
+                } else {
+                    String::new()
+                };
+                ShellCommand::Sh { script }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -1435,6 +1446,19 @@ impl ShellRepl {
             ShellCommand::Unveil { path, permissions } => {
                 Ok(format!("Unveiled path '{}' with permissions '{}'", path, permissions))
             }
+            ShellCommand::Sh { script } => {
+                if script.is_empty() {
+                    Ok("sh: Execute script in universal POSIX format across Linux & BSD dialects (bash, zsh, fish, tcsh, ksh)".to_string())
+                } else {
+                    let mut compat = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::new();
+                    match compat.execute_multi_dialect_script(&script) {
+                        Ok(pipelines) => {
+                            Ok(format!("Executed script as universal POSIX sh: {} pipelines processed successfully.", pipelines.len()))
+                        }
+                        Err(err) => Err(format!("sh: Error executing script: {}", err)),
+                    }
+                }
+            }
 
             ShellCommand::Echo { message } => Ok(message.clone()),
             ShellCommand::Set { variable, value } => {
@@ -1459,7 +1483,7 @@ impl Default for ShellRepl {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
