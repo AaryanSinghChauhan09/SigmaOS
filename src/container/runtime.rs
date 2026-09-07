@@ -190,19 +190,6 @@ impl NamespaceConfig {
     }
 }
 
-impl Default for NamespaceConfig {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Container seccomp profiles
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub blocked_syscalls: Vec<u32>,
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
 
 impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
@@ -510,8 +497,6 @@ pub struct SimpleContainerRuntime {
 }
 
 /// Runtime capability
-
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
@@ -822,8 +807,7 @@ pub mod oci {
     extern crate alloc;
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
-    use std::string::{String, ToString};
-    use std::vec::Vec;
+    use alloc::vec::Vec;
 
     pub struct NamespaceSet {
         pub pidns: Option<usize>,

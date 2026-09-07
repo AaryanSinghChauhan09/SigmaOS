@@ -5,8 +5,10 @@ use std::vec;
 use crate::driver::device::{
     CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
 };
-use std::string::String;
-use std::vec::Vec;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {

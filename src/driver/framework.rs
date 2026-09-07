@@ -83,15 +83,9 @@ impl SimpleStorageDriver {
 }
 
 impl Driver for SimpleStorageDriver {
-    fn id(&self) -> DriverID {
-        self.id
-    }
-    fn name(&self) -> &str {
-        "SimpleStorageDriver"
-    }
-    fn driver_type(&self) -> DriverType {
-        self.driver_type
-    }
+    fn id(&self) -> DriverID { self.id }
+    fn name(&self) -> &str { "SimpleStorageDriver" }
+    fn driver_type(&self) -> DriverType { self.driver_type }
     fn state(&self) -> DriverState {
         match self.state.load(Ordering::SeqCst) {
             1 => DriverState::Active,
@@ -128,14 +122,6 @@ impl SimpleDriver {
 }
 
 impl Driver for SimpleDriver {
-    fn load(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
-        Ok(())
-    }
-    fn unload(&mut self) -> Result<(), DriverError> {
-        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
-        Ok(())
-    }
     fn id(&self) -> DriverID {
         self.id
     }
@@ -146,11 +132,7 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-        match self.state.load(Ordering::SeqCst) {
-            1 => DriverState::Active,
-            2 => DriverState::Failed,
-            _ => DriverState::Unloaded,
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state.store(DriverState::Active as usize, Ordering::SeqCst);
@@ -161,6 +143,23 @@ impl Driver for SimpleDriver {
         Ok(())
     }
 }
+
+pub struct SimpleStorageDriver {
+    id: DriverID,
+    driver_type: DriverType,
+    state: DriverState,
+}
+
+impl SimpleStorageDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        Self {
+            id,
+            driver_type,
+            state: DriverState::Unloaded,
+        }
+    }
+}
+
 
 // =========================================================================
 // WDM & WDF (KMDF / UMDF) Specification Subsystems

@@ -1,5 +1,10 @@
-//! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
-//! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+use core::mem;
+/// OOP-based Networking Stack (TCP/UDP) for SigmaOS
+/// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
+/// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
+/// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
+// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
+// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
 use std::boxed::Box;
 use std::vec::Vec;
@@ -678,11 +683,6 @@ impl SimpleNetworkStack {
     }
 }
 
-impl Default for SimpleNetworkStack {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {

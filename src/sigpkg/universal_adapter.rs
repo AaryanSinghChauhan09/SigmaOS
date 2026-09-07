@@ -8,7 +8,7 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-pub use crate::package::AptDebManifest;
+use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(test)]
@@ -105,80 +105,6 @@ pub trait PackageFormatAdapter {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct AptDebManifest {
-    pub package: String,
-    pub version: String,
-    pub depends: Vec<String>,
-    pub description: String,
-    pub priority: PackagePriority,
-}
-
-#[derive(Debug, Clone)]
-pub struct PacmanPkgbuildV2 {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub depends: Vec<String>,
-}
-
-/// Description of Arch Linux .PKGINFO binary manifest (pacman standard)
-#[derive(Debug, Clone)]
-pub struct ArchPkgInfoManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub depends: Vec<String>,
-    pub architecture: String,
-}
-
-/// Description of Gentoo ebuild manifest (Portage standard)
-#[derive(Debug, Clone)]
-pub struct GentooEbuildMetadata {
-    pub category: String,
-    pub package_name: String,
-    pub version: String,
-    pub rdepend: Vec<String>,
-    pub depend: Vec<String>,
-    pub description: String,
-    pub use_flags: Vec<String>,
-}
-
-/// Description of Alpine Linux APKINDEX manifest (apk standard)
-#[derive(Debug, Clone)]
-pub struct ApkIndexManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub depends: Vec<String>,
-}
-
-/// Description of Void Linux XBPS manifest
-#[derive(Debug, Clone)]
-pub struct XbpsManifest {
-    pub pkgname: String,
-    pub version: String,
-    pub short_desc: String,
-    pub run_depends: Vec<String>,
-}
-
-/// Description of Haiku .hpkg package manifest
-#[derive(Debug, Clone)]
-pub struct HaikuHpkgManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub architecture: String,
-    pub requires: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub confinement: String, // "strict", "classic", "devmode"
-    pub plugs: Vec<String>,
-}
 
 #[derive(Debug, Clone)]
 pub struct FlatpakManifest {

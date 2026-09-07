@@ -38,18 +38,13 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
-pub use desktop::{
-    Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
-};
 pub use process::{
-    AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
-    JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
-    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessJobEntry,
-    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess,
-    SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
-    WNOHANG, WUNTRACED,
+    ProcessControlError, ProcessVmReadWriteEngine, JobState, CoreDumpMetadata, ProcessJobEntry,
+    JobControlLifecycleEngine, WNOHANG, WUNTRACED, WCONTINUED, BsdRusage, WaitStatus,
+    ProcessWaiterAndRusageCollector, CancellationType, ProcessCancelState,
+    ProcessCancellationAndTerminationManager, PosixMessage, PosixMessageQueue, EventFd,
+    SigQueuePayload, AdvancedIpcHub,
 };
-pub mod open_source_os_gap_closure;
 pub mod tools;
 pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;
@@ -353,24 +348,38 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-pub mod installer;
-pub mod iot;
-pub mod ml;
-pub mod performance;
 
-pub mod distro;
-pub mod distro_innovations;
-pub mod distro_inspirations;
-pub mod innovation;
-pub use innovation::{
-    BootStageKind, BootStageRecipe, ComposableBootSequencesEngine, DriverShard,
-    FilesystemAsDatabaseEngine, HardwareAbstractionShardsEngine, ImmutableUserlandLayersEngine,
-    KernelPersonality, LayeredKernelPersonalitiesEngine, LegacyAbiEnvironment,
-    NetworkNativeOsStateEngine, OsSessionState, ProgrammableSchedulerEngine,
-    RetroSandboxSession, RetrocompatibilitySandboxEngine, SchedulingPolicyRule,
-    UserlandOverlayLayer, VfsObjectRecord,
+pub mod init {
+    pub mod systemd_init;
+}
+pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
+
+pub use ai::next_gen::{
+    AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType, EnergyGovernorMode, ModelType,
+    MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
+};
+pub use ai::wandr::{
+    ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
 };
 
-pub mod docs;
-pub mod graphics;
-pub mod net;
+pub use community::toolkit::{
+    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, HybridFirewallTemplateStore,
+    PackageRecipe as CommunityPackageRecipe, RecipeSourceFormat, ReproduciblePackageRecipeManager,
+    SecurityModelType, SecurityProfileTemplateStore, SecurityTemplate,
+    VirtualizationBlueprintStore,
+};
+
+pub use tools::{
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
+    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
+    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
+    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
+    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
+    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    UserIdentity as LibUserIdentity,
+};
+
+pub mod open_source_obsoletion;
+pub use open_source_obsoletion::*;
+
+pub use unimplemented_features::*;

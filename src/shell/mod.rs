@@ -31,5 +31,17 @@ pub use sovereign_shell_parity::{
     ParsedPipelineCommand, RedirectionType, SovereignBashZshParityShell,
 };
 pub use terminal_emulator::{
-    AnsiColor, AutoSuggestionEngine, TerminalSession, UserDefinedFunction,
+    TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor,
+    BsdConsoleColorPalette, BsdConsoleTheme,
+    TermiosInputEvent, TermiosInputMode, TermiosLineDiscipline,
+};
+pub use alias_system::{AliasManager, SigmaAlias, AliasType};
+pub use zsh_bash_parity::{
+    PowerlinePromptBuilder, PromptTheme, FuzzyCompletionEngine, CompletionCandidate, CandidateCategory,
+    ZshSyntaxHighlighter, SyntaxTokenKind, HighlightedToken, BashParameterExpansion, WildcardGlobMatcher,
+    ShellPipelineParser, ShellPipeline, PipelineCommand, BsdDirectoryStack, ShellJobControl, ShellJob, JobState,
+};
+pub use sigma_sh::{
+    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
+    PipelineExecutor, ShellPledgeUnveilGuard, ShellSyntaxHighlighter, ZshPromptFormatter,
 };

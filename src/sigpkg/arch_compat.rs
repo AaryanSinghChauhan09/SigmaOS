@@ -10,11 +10,7 @@ use alloc::vec::Vec;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::collections::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-
-pub type SigmaString = String;
-pub type AllocVec<T> = Vec<T>;
+use crate::klib;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

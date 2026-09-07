@@ -4,18 +4,8 @@
 
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MemoryPermission {
-    None,
-    Read,
-    Write,
-    Execute,
-    ReadWrite,
-    ReadExecute,
-    ReadWriteExecute,
-}
+use crate::security::Permission;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data

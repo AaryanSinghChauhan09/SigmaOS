@@ -108,13 +108,11 @@ impl PacmanDatabase {
     /// Update system (pacman -Syu)
     pub fn update_system(&mut self) -> Result<(), String> {
         self.refresh_databases()?;
-        let pkg_names: Vec<String> = self.local_packages.iter().map(|p| p.name.clone()).collect();
-        for name in pkg_names {
-            if let Some(updated) = self.find_package(&name) {
-                if let Some(pkg) = self.local_packages.iter_mut().find(|p| p.name == name) {
-                    if updated.version != pkg.version {
-                        *pkg = updated;
-                    }
+        for i in 0..self.local_packages.len() {
+            let pkg_name = self.local_packages[i].name.clone();
+            if let Some(updated) = self.find_package(&pkg_name) {
+                if updated.version != self.local_packages[i].version {
+                    self.local_packages[i] = updated;
                 }
             }
         }
