@@ -817,3 +817,9 @@ Consequences for guideline violations:
 ### 5. Release Engineering Policy
 - **Tag & Release Signing**: All release artifacts, ISO images, and Git tags must be signed using GPG or Post-Quantum Dilithium-5 keys.
 - **Reproducible Build Verification**: Build outputs must be validated bit-for-bit against published SHA-256 build provenance hashes and SBOM manifests.
+
+### 6. Linux & BSD Distro Innovation & Compatibility Policy
+- **Syscall ABI Translation Invariants**: `UniversalSyscallAbiShim` must preserve zero-copy register state for Linux System V x86_64 and BSD POSIX syscall ABI translation vectors.
+- **Stateless Configuration Fallback**: Inspired by Clear Linux, system default configurations must reside under `/usr/share/defaults/` while user overrides in `/etc/` take precedence without corrupting vendor defaults.
+- **Sandboxing Standards**: Userland services must enforce OpenBSD `pledge`/`unveil` path isolation or FreeBSD Capsicum capability rights before listening on untrusted network interfaces.
+- **Declarative State Reconciliation**: Subsystems inspired by NixOS/Guix must support Content-Addressable Store (CAS) hash tracking and atomic generation rollback without modifying live binaries during execution.

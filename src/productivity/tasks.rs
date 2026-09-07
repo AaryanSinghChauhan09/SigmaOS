@@ -94,6 +94,21 @@ pub struct KanbanColumn {
     pub wip_limit: Option<usize>,
 }
 
+/// Distro-inspired notification action mode
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DistroReminderDispatchMode {
+    /// Linux crontab expression & scheduled execution trigger
+    CronSchedule(String),
+    /// systemd.timer OnCalendar event trigger
+    SystemdTimerOnCalendar(String),
+    /// FreeBSD multi-TTY wall / terminal broadcast alert
+    FreeBsdWallNotify { tty_device: String },
+    /// OpenBSD pledge/unveil sandboxed execution trigger
+    OpenBsdPledgeSandbox { promises: String },
+    /// Default native SigmaOS system overlay notification
+    StandardNotification,
+}
+
 /// Reminder
 #[derive(Debug, Clone)]
 pub struct Reminder {
@@ -102,6 +117,9 @@ pub struct Reminder {
     pub reminder_time: u64,
     pub reminder_type: ReminderType,
     pub is_dismissed: bool,
+    pub snooze_until: Option<u64>,
+    pub dispatch_mode: DistroReminderDispatchMode,
+    pub cgroup_weight: u32,
 }
 
 /// Reminder type
@@ -110,6 +128,8 @@ pub enum ReminderType {
     DueSoon,
     Overdue,
     Custom,
+    SystemdTimerEvent,
+    CronSchedule,
 }
 
 /// OOP trait for task storage strategies
@@ -401,20 +421,81 @@ impl TaskManager {
             reminder_time,
             reminder_type,
             is_dismissed: false,
+            snooze_until: None,
+            dispatch_mode: DistroReminderDispatchMode::StandardNotification,
+            cgroup_weight: 100,
         });
     }
 
-    /// Check reminders
+    /// Set distro-inspired reminder with custom dispatch mode and cgroups priority weight
+    pub fn schedule_distro_reminder(
+        &mut self,
+        task_id: &str,
+        reminder_time: u64,
+        reminder_type: ReminderType,
+        dispatch_mode: DistroReminderDispatchMode,
+        cgroup_weight: u32,
+    ) -> String {
+        let reminder_id = format!("distro_reminder_{}", self.reminders.len());
+        self.reminders.push(Reminder {
+            id: reminder_id.clone(),
+            task_id: task_id.to_string(),
+            reminder_time,
+            reminder_type,
+            is_dismissed: false,
+            snooze_until: None,
+            dispatch_mode,
+            cgroup_weight,
+        });
+        reminder_id
+    }
+
+    /// Dismiss a reminder by ID
+    pub fn dismiss_reminder(&mut self, reminder_id: &str) -> bool {
+        if let Some(reminder) = self.reminders.iter_mut().find(|r| r.id == reminder_id) {
+            reminder.is_dismissed = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Snooze a reminder until specified timestamp
+    pub fn snooze_reminder(&mut self, reminder_id: &str, snooze_until: u64) -> bool {
+        if let Some(reminder) = self.reminders.iter_mut().find(|r| r.id == reminder_id) {
+            reminder.snooze_until = Some(snooze_until);
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Check reminders at current timestamp
     pub fn check_reminders(&mut self) -> Vec<Reminder> {
         let now = 1700000000u64;
+        self.process_distro_reminders(now)
+    }
 
-        let due_reminders: Vec<Reminder> = self
+    /// Process distro-inspired reminders evaluated against given timestamp and cgroups priority order
+    pub fn process_distro_reminders(&mut self, current_time: u64) -> Vec<Reminder> {
+        let mut due_reminders: Vec<Reminder> = self
             .reminders
             .iter()
-            .filter(|r| !r.is_dismissed && r.reminder_time <= now)
+            .filter(|r| {
+                if r.is_dismissed {
+                    return false;
+                }
+                if let Some(snooze) = r.snooze_until {
+                    snooze <= current_time
+                } else {
+                    r.reminder_time <= current_time
+                }
+            })
             .cloned()
             .collect();
 
+        // Sort reminders by cgroup weight descending (higher priority first)
+        due_reminders.sort_by(|a, b| b.cgroup_weight.cmp(&a.cgroup_weight));
         due_reminders
     }
 
@@ -478,7 +559,7 @@ pub enum TaskError {
     StorageError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -537,5 +618,73 @@ mod tests {
         manager.complete_task(&task_id).unwrap();
         let task = manager.get_task(&task_id).unwrap();
         assert_eq!(task.status, TaskStatus::Done);
+    }
+
+    #[test]
+    fn test_distro_inspired_reminders() {
+        let mut manager = TaskManager::default();
+        let task_id = "task_cron_1";
+
+        // Schedule cron-style reminder
+        let r1 = manager.schedule_distro_reminder(
+            task_id,
+            1000,
+            ReminderType::CronSchedule,
+            DistroReminderDispatchMode::CronSchedule("0 9 * * 1-5".to_string()),
+            150,
+        );
+
+        // Schedule systemd timer OnCalendar style reminder
+        let r2 = manager.schedule_distro_reminder(
+            task_id,
+            1000,
+            ReminderType::SystemdTimerEvent,
+            DistroReminderDispatchMode::SystemdTimerOnCalendar("Mon..Fri *-*-* 09:00:00".to_string()),
+            250,
+        );
+
+        // Schedule FreeBSD wall broadcast reminder
+        let r3 = manager.schedule_distro_reminder(
+            task_id,
+            1000,
+            ReminderType::Custom,
+            DistroReminderDispatchMode::FreeBsdWallNotify {
+                tty_device: "/dev/pts/1".to_string(),
+            },
+            100,
+        );
+
+        // Schedule OpenBSD pledge sandbox reminder
+        let r4 = manager.schedule_distro_reminder(
+            task_id,
+            1000,
+            ReminderType::Custom,
+            DistroReminderDispatchMode::OpenBsdPledgeSandbox {
+                promises: "stdio rpath".to_string(),
+            },
+            200,
+        );
+
+        // Process reminders at t = 1000 and verify sorting by cgroup weight descending (250, 200, 150, 100)
+        let due = manager.process_distro_reminders(1000);
+        assert_eq!(due.len(), 4);
+        assert_eq!(due[0].id, r2); // weight 250
+        assert_eq!(due[1].id, r4); // weight 200
+        assert_eq!(due[2].id, r1); // weight 150
+        assert_eq!(due[3].id, r3); // weight 100
+
+        // Test snooze & dismiss
+        assert!(manager.snooze_reminder(&r2, 2000));
+        assert!(manager.dismiss_reminder(&r4));
+
+        let due2 = manager.process_distro_reminders(1000);
+        assert_eq!(due2.len(), 2); // r1 and r3 remain
+        assert_eq!(due2[0].id, r1);
+        assert_eq!(due2[1].id, r3);
+
+        // At t = 2000, snoozed r2 is due again
+        let due3 = manager.process_distro_reminders(2000);
+        assert_eq!(due3.len(), 3);
+        assert_eq!(due3[0].id, r2);
     }
 }

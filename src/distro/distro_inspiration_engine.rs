@@ -74,6 +74,129 @@ impl MuslLightweightInitEngine {
         }
         booted
     }
+
+    pub fn check_service_health(&mut self, name: &'static str) -> ServiceRunState {
+        for service_opt in self.services.iter_mut() {
+            if let Some(ref mut svc) = service_opt {
+                if svc.name == name {
+                    return svc.state;
+                }
+            }
+        }
+        ServiceRunState::Failed
+    }
+}
+
+/// Void Linux Runit 3-Stage Process Supervision
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1BootInit,
+    Stage2Supervision,
+    Stage3Shutdown,
+}
+
+#[derive(Debug, Clone)]
+pub struct VoidRunitStageController {
+    pub current_stage: RunitStage,
+    pub supervised_count: usize,
+}
+
+impl Default for VoidRunitStageController {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl VoidRunitStageController {
+    pub fn new() -> Self {
+        Self {
+            current_stage: RunitStage::Stage1BootInit,
+            supervised_count: 0,
+        }
+    }
+
+    pub fn transition_to_stage2(&mut self, service_count: usize) {
+        self.current_stage = RunitStage::Stage2Supervision;
+        self.supervised_count = service_count;
+    }
+
+    pub fn transition_to_stage3(&mut self) {
+        self.current_stage = RunitStage::Stage3Shutdown;
+        self.supervised_count = 0;
+    }
+}
+
+/// NixOS / Guix Declarative System State Reconciliation Engine
+#[derive(Debug, Clone, Copy)]
+pub struct GenerationRecord {
+    pub generation_id: u32,
+    pub cas_store_hash: [u8; 8],
+    pub is_active: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct NixOsDeclarativeStateReconciliationEngine {
+    pub generations: [Option<GenerationRecord>; 8],
+    pub active_generation: u32,
+    pub count: usize,
+}
+
+impl Default for NixOsDeclarativeStateReconciliationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl NixOsDeclarativeStateReconciliationEngine {
+    pub fn new() -> Self {
+        Self {
+            generations: [None; 8],
+            active_generation: 0,
+            count: 0,
+        }
+    }
+
+    pub fn build_generation(&mut self, cas_hash: [u8; 8]) -> u32 {
+        let next_gen = self.active_generation + 1;
+        if self.count < 8 {
+            self.generations[self.count] = Some(GenerationRecord {
+                generation_id: next_gen,
+                cas_store_hash: cas_hash,
+                is_active: true,
+            });
+            // Mark previous active as inactive
+            if self.active_generation > 0 {
+                for gen_opt in self.generations.iter_mut() {
+                    if let Some(ref mut g) = gen_opt {
+                        if g.generation_id == self.active_generation {
+                            g.is_active = false;
+                        }
+                    }
+                }
+            }
+            self.active_generation = next_gen;
+            self.count += 1;
+        }
+        self.active_generation
+    }
+
+    pub fn rollback_generation(&mut self, target_gen: u32) -> bool {
+        let mut found = false;
+        for gen_opt in self.generations.iter_mut() {
+            if let Some(ref mut g) = gen_opt {
+                if g.generation_id == target_gen {
+                    g.is_active = true;
+                    found = true;
+                } else {
+                    g.is_active = false;
+                }
+            }
+        }
+        if found {
+            self.active_generation = target_gen;
+        }
+        found
+    }
 }
 
 /// 2. Gentoo Linux Portage USE Flag & Compiler Optimizer Governor
@@ -370,5 +493,31 @@ mod tests {
     fn test_clear_linux_isa_selector() {
         let selector = ClearLinuxIsaSelectorEngine::new(IsaLevel::X86_64_V3_Avx2);
         assert_eq!(selector.dispatch_optimized_fn(), "avx2_fma_vector_impl");
+    }
+
+    #[test]
+    fn test_void_runit_stage_controller() {
+        let mut runit = VoidRunitStageController::new();
+        assert_eq!(runit.current_stage, RunitStage::Stage1BootInit);
+        runit.transition_to_stage2(12);
+        assert_eq!(runit.current_stage, RunitStage::Stage2Supervision);
+        assert_eq!(runit.supervised_count, 12);
+        runit.transition_to_stage3();
+        assert_eq!(runit.current_stage, RunitStage::Stage3Shutdown);
+        assert_eq!(runit.supervised_count, 0);
+    }
+
+    #[test]
+    fn test_nixos_declarative_reconciliation() {
+        let mut nix = NixOsDeclarativeStateReconciliationEngine::new();
+        let gen1 = nix.build_generation([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]);
+        assert_eq!(gen1, 1);
+        let gen2 = nix.build_generation([0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10]);
+        assert_eq!(gen2, 2);
+        assert_eq!(nix.active_generation, 2);
+
+        // Rollback to gen 1
+        assert!(nix.rollback_generation(1));
+        assert_eq!(nix.active_generation, 1);
     }
 }
