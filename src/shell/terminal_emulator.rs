@@ -4,8 +4,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::{vec, vec::Vec};
-use alloc::collections::BTreeMap;
+use alloc::vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnsiColor {
@@ -664,119 +663,6 @@ pub struct TerminalSession {
     pub search_engine: ScrollbackSearchEngine,
     pub keybinding_engine: TerminalKeybindingEngine,
     pub visual_bell_config: VisualBellConfig,
-}
-
-/// Sixel & Kitty Graphics Protocol Data Frame
-#[derive(Debug, Clone)]
-pub struct SixelGraphicFrame {
-    pub id: u32,
-    pub width_px: u32,
-    pub height_px: u32,
-    pub raw_data: Vec<u8>,
-}
-
-/// Tmux / BSD Split Pane Direction
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PaneSplitDirection {
-    Horizontal,
-    Vertical,
-}
-
-/// Terminal Pane for Tmux / BSD-style terminal multiplexing
-#[derive(Debug, Clone)]
-pub struct TerminalPane {
-    pub pane_id: u32,
-    pub width: usize,
-    pub height: usize,
-    pub active_command: String,
-    pub is_focused: bool,
-}
-
-/// Tmux / BSD-style Terminal Multiplexer Engine
-#[derive(Debug, Clone)]
-pub struct TerminalMultiplexer {
-    pub panes: Vec<TerminalPane>,
-    pub active_pane_id: u32,
-    pub next_pane_id: u32,
-}
-
-impl TerminalMultiplexer {
-    pub fn new(initial_width: usize, initial_height: usize) -> Self {
-        let first_pane = TerminalPane {
-            pane_id: 1,
-            width: initial_width,
-            height: initial_height,
-            active_command: String::from("sigma-sh"),
-            is_focused: true,
-        };
-        Self {
-            panes: alloc::vec![first_pane],
-            active_pane_id: 1,
-            next_pane_id: 2,
-        }
-    }
-
-    pub fn split_pane(&mut self, direction: PaneSplitDirection) -> u32 {
-        let new_id = self.next_pane_id;
-        self.next_pane_id += 1;
-
-        if let Some(pos) = self
-            .panes
-            .iter()
-            .position(|p| p.pane_id == self.active_pane_id)
-        {
-            let cur_w = self.panes[pos].width;
-            let cur_h = self.panes[pos].height;
-
-            match direction {
-                PaneSplitDirection::Horizontal => {
-                    let half_h = cur_h / 2;
-                    self.panes[pos].height = half_h;
-                    let new_pane = TerminalPane {
-                        pane_id: new_id,
-                        width: cur_w,
-                        height: cur_h.saturating_sub(half_h),
-                        active_command: String::from("sigma-sh"),
-                        is_focused: false,
-                    };
-                    self.panes.push(new_pane);
-                }
-                PaneSplitDirection::Vertical => {
-                    let half_w = cur_w / 2;
-                    self.panes[pos].width = half_w;
-                    let new_pane = TerminalPane {
-                        pane_id: new_id,
-                        width: cur_w.saturating_sub(half_w),
-                        height: cur_h,
-                        active_command: String::from("sigma-sh"),
-                        is_focused: false,
-                    };
-                    self.panes.push(new_pane);
-                }
-            }
-        }
-        new_id
-    }
-
-    pub fn focus_pane(&mut self, pane_id: u32) -> bool {
-        if self.panes.iter().any(|p| p.pane_id == pane_id) {
-            for pane in &mut self.panes {
-                pane.is_focused = pane.pane_id == pane_id;
-            }
-            self.active_pane_id = pane_id;
-            true
-        } else {
-            false
-        }
-    }
-}
-
-/// Trigger Rule for Kitty/iTerm2-style automatic text highlighting & URL detection
-#[derive(Debug, Clone)]
-pub struct TriggerRule {
-    pub pattern: String,
-    pub highlight_color: AnsiColor,
-    pub action_command: Option<String>,
 }
 
 impl TriggerRule {
