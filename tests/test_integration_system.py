@@ -107,6 +107,31 @@ class ColdBootPipeline:
         return True
 
 
+class UniversalDistroSubsystemBridge:
+    def __init__(self, mode: str = "LinuxArch"):
+        self.mode = mode
+        self.distro_matrix = {
+            "LinuxArch": {"pkg_ext": ".pkg.tar.zst", "supervisor": "Systemd", "vfs_etc": "/etc"},
+            "LinuxDebian": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc"},
+            "LinuxFedora": {"pkg_ext": ".rpm", "supervisor": "Systemd", "vfs_etc": "/etc"},
+            "LinuxAlpine": {"pkg_ext": ".apk", "supervisor": "Runit", "vfs_etc": "/etc"},
+            "LinuxVoid": {"pkg_ext": ".xbps", "supervisor": "Runit", "vfs_etc": "/etc"},
+            "LinuxNix": {"pkg_ext": ".nix", "supervisor": "Shepherd", "vfs_etc": "/etc/nixos"},
+            "LinuxGentoo": {"pkg_ext": ".ebuild", "supervisor": "OpenRC", "vfs_etc": "/etc"},
+            "FreeBsd": {"pkg_ext": ".pkg", "supervisor": "OpenRC", "vfs_etc": "/usr/local/etc"},
+            "OpenBsd": {"pkg_ext": ".tgz", "supervisor": "OpenRC", "vfs_etc": "/etc"},
+            "NetBsd": {"pkg_ext": ".tgz", "supervisor": "OpenRC", "vfs_etc": "/etc"},
+            "DragonFlyBsd": {"pkg_ext": ".pkg", "supervisor": "OpenRC", "vfs_etc": "/usr/local/etc"},
+        }
+
+    def get_distro_parameters(self) -> dict:
+        return self.distro_matrix.get(self.mode, {"pkg_ext": ".sigpkg", "supervisor": "Systemd", "vfs_etc": "/etc"})
+
+    def dispatch_operation(self, subsystem: str, action: str) -> str:
+        params = self.get_distro_parameters()
+        return f"Dispatched {subsystem} operation '{action}' under {self.mode} [pkg: {params['pkg_ext']}, supervisor: {params['supervisor']}]"
+
+
 # --- Integration & System Test Cases ---
 
 def test_shell_syscall_interaction():
@@ -186,3 +211,28 @@ def test_boot_sequence_varied_configs():
     assert boot_err.execute_boot() is False
     assert boot_err.state == "BOOT_ERROR"
     assert any("BOOT_FAIL" in log for log in boot_err.boot_logs)
+
+
+def test_universal_distro_subsystem_bridge():
+    subsystems = [
+        "init", "package", "vfs", "security", "storage", "kernel",
+        "network", "graphics", "power", "ipc", "auth", "audit",
+        "boot", "container", "virtualization", "audio", "input",
+        "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+        "desktop", "bluetooth", "camera", "sensor", "print", "backup",
+        "cloud", "orchestration", "developer", "compliance", "recovery", "time",
+        "shell", "filesystem", "identity", "tracing", "iot", "accessibility",
+        "gaming", "fingerprint", "location", "finance"
+    ]
+    distros = ["LinuxArch", "LinuxDebian", "LinuxFedora", "LinuxAlpine", "LinuxVoid", "LinuxNix", "LinuxGentoo", "FreeBsd", "OpenBsd", "NetBsd", "DragonFlyBsd"]
+
+    for d in distros:
+        bridge = UniversalDistroSubsystemBridge(mode=d)
+        params = bridge.get_distro_parameters()
+        assert params["pkg_ext"] != ""
+        assert params["supervisor"] != ""
+
+        for sub in subsystems:
+            res = bridge.dispatch_operation(sub, "test_action")
+            assert d in res
+            assert sub in res
