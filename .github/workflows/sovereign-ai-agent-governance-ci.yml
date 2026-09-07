@@ -12,8 +12,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
       - name: Run Autonomous AI Agent PR Governance & Code Review Verification
         run: |
           mkdir -p build

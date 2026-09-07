@@ -22,8 +22,6 @@ jobs:
 
       - name: Setup Rust Stable
         uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
 
       - name: Build Primary Artifact (Runner 1)
         run: |
@@ -62,8 +60,6 @@ jobs:
 
       - name: Setup Rust Stable
         uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
 
       - name: Build Release Artifacts
         run: |
