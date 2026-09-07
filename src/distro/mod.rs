@@ -161,12 +161,9 @@ pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
 };
 pub use specialized::{
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
-    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
-};
-pub use tiny_core::{
-    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+    AptCacheSimulator, CanFrame, DebianPolicyEnforcer, DebianSocialContract, DpkgMultiArch,
+    EcuController, EduChallenge, EduPlayground, FreezeBasedStabilization, HpcClusterJob,
+    HpcJobState, MpiCommunicator, ThreeTierReleaseModel,
 };
 pub use bsd_linux_innovations::{
     BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,

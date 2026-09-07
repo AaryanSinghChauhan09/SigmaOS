@@ -56,6 +56,7 @@ pub use process::{
 };
 pub mod tools;
 pub mod open_source_os_gap_closure;
+pub mod tools;
 pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;

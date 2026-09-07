@@ -136,6 +136,8 @@ pub struct SegmentedAddress {
     pub selector: SegmentSelector,
     pub offset: u64,
 }
+#[path = "../src/expanded_wiki_innovations.rs"]
+pub mod expanded_wiki_innovations;
 #[path = "../src/process/activity_manager.rs"]
 mod process_activity_manager;
 pub type ProcessActivityManager = ActivityManager;

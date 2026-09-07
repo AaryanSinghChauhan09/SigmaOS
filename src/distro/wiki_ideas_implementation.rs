@@ -538,7 +538,8 @@ impl SovereignSystemdParityEngine {
             .get_mut(name)
             .ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Active;
-        self.journal_logs.push(format!("Journal: Unit {} transitioned to Active", name));
+        self.journal_logs
+            .push(format!("Journal: Unit {} transitioned to Active", name));
         Ok(SystemdUnitActiveState::Active)
     }
 
@@ -548,7 +549,8 @@ impl SovereignSystemdParityEngine {
             .get_mut(name)
             .ok_or_else(|| format!("Unit {} not found", name))?;
         unit.active_state = SystemdUnitActiveState::Inactive;
-        self.journal_logs.push(format!("Journal: Unit {} transitioned to Inactive", name));
+        self.journal_logs
+            .push(format!("Journal: Unit {} transitioned to Inactive", name));
         Ok(SystemdUnitActiveState::Inactive)
     }
 

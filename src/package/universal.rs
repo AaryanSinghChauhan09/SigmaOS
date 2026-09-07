@@ -186,6 +186,11 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+    Nix,        // Nix package (.nix)
+    Txz,        // FreeBSD / Slackware txz (.txz)
+    CachyOS,    // CachyOS package (.cachyos)
+    Swupd,      // Clear Linux swupd (.swupd)
+    Starling,   // Starling package (.starling)
 }
 
 impl PackageFormat {
@@ -1781,6 +1786,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
