@@ -78,16 +78,6 @@ pub mod node_distribution_dummy {
 #[cfg(any(feature = "standalone_test", test))]
 use node_distribution_dummy::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PackageState {
-    Uninstalled,
-    Downloading,
-    Installing,
-    Installed,
-    BrokenDependency,
-}
-
-
 pub enum PackagePriority {
     Essential,
     Required,
