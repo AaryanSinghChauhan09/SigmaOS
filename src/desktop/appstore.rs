@@ -21,6 +21,53 @@ impl AppReview {
     }
 }
 
+/// Flathub / GNOME Software Sandbox Permission Matrix
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AppSandboxPermissions {
+    pub network_access: bool,
+    pub filesystem_full_access: bool,
+    pub audio_access: bool,
+    pub camera_access: bool,
+    pub gpu_acceleration: bool,
+}
+
+impl AppSandboxPermissions {
+    pub fn strict_default() -> Self {
+        Self {
+            network_access: false,
+            filesystem_full_access: false,
+            audio_access: false,
+            camera_access: false,
+            gpu_acceleration: true,
+        }
+    }
+}
+
+/// Elementary AppCenter / Pop!_OS Pop_Shop Pay-What-You-Want Monetization Tier
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AppMonetizationTier {
+    Free,
+    PayWhatYouWant { suggested_amount_usd: u32 },
+    Commercial { price_usd: u32 },
+}
+
+/// Arch AUR / FreeBSD Ports Build-from-Source Configuration
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BuildFromSourceConfig {
+    pub enabled: bool,
+    pub custom_cflags: String,
+    pub make_jobs: u32,
+}
+
+/// NixOS / Flatpak Delta Updates & Restore Snapshot
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SoftwareUpdateSnapshot {
+    pub snapshot_id: u64,
+    pub app_name: String,
+    pub previous_version: String,
+    pub delta_size_bytes: u64,
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct AppStoreItem {
     pub name: String,
@@ -31,6 +78,9 @@ pub struct AppStoreItem {
     pub size_bytes: u64,
     pub installed: bool,
     pub reviews: Vec<AppReview>,
+    pub sandbox_permissions: AppSandboxPermissions,
+    pub monetization_tier: AppMonetizationTier,
+    pub build_from_source: BuildFromSourceConfig,
 }
 
 impl AppStoreItem {
@@ -44,6 +94,13 @@ impl AppStoreItem {
             size_bytes: size,
             installed: false,
             reviews: Vec::new(),
+            sandbox_permissions: AppSandboxPermissions::strict_default(),
+            monetization_tier: AppMonetizationTier::Free,
+            build_from_source: BuildFromSourceConfig {
+                enabled: false,
+                custom_cflags: "-O2 -pipe".to_string(),
+                make_jobs: 4,
+            },
         }
     }
 
@@ -131,5 +188,43 @@ impl GuiAppStore {
 impl Default for GuiAppStore {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_app_sandbox_permissions() {
+        let perms = AppSandboxPermissions::strict_default();
+        assert!(!perms.network_access);
+        assert!(!perms.filesystem_full_access);
+        assert!(perms.gpu_acceleration);
+    }
+
+    #[test]
+    fn test_app_monetization_tier() {
+        let app = AppStoreItem::new("GIMP", "2.10", "GIMP Team", "Image Editor", "Graphics", 120_000_000);
+        assert_eq!(app.monetization_tier, AppMonetizationTier::Free);
+    }
+
+    #[test]
+    fn test_build_from_source_config() {
+        let app = AppStoreItem::new("Neovim", "0.9", "Neovim Core", "Text Editor", "Development", 15_000_000);
+        assert_eq!(app.build_from_source.custom_cflags, "-O2 -pipe");
+        assert_eq!(app.build_from_source.make_jobs, 4);
+    }
+
+    #[test]
+    fn test_software_update_snapshot() {
+        let snapshot = SoftwareUpdateSnapshot {
+            snapshot_id: 101,
+            app_name: "Firefox".to_string(),
+            previous_version: "115.0".to_string(),
+            delta_size_bytes: 5_400_000,
+        };
+        assert_eq!(snapshot.snapshot_id, 101);
+        assert_eq!(snapshot.app_name, "Firefox");
     }
 }

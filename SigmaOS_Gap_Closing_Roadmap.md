@@ -4,6 +4,246 @@ This document serves as the master engineering roadmap to systematically resolve
 
 ---
 
+## 📊 0. Feature Mega-Matrix: SigmaOS vs Linux vs BSD
+
+| Domain | Linux Strengths | BSD Strengths | SigmaOS Opportunity |
+|----------------|----------------|----------------|----------------|
+| **Kernel** | Modular monolithic, wide hardware support | Clean design, stability | Hybrid microkernel + modular services |
+| **Scheduler** | CFS / EEVDF (fair scheduling) | ULE (low latency interactivity) | Policy-driven adaptive scheduler (real-time, batch, compliance) |
+| **Filesystem** | Btrfs (snapshots, checksums) | ZFS (deduplication, rollback, storage pools) | Transactional FS with compliance-friendly journaling |
+| **Security** | SELinux, AppArmor, Landlock | Capsicum sandboxing, pledge/unveil | Visual sandboxing + immutable system layers |
+| **Networking** | nftables, iptables, eBPF XDP | PF firewall, Netgraph | Unified firewall + VPN GUI dashboard |
+| **Virtualization** | KVM/QEMU, Podman, Docker | bhyve, FreeBSD Jails | Native container orchestration + lightweight VM integration |
+| **Desktop/UX** | GNOME/KDE, tiling WMs | Lightweight DEs | Adaptive Zenith overlays (tiling + compliance dashboards) |
+| **Docs** | Arch Wiki | FreeBSD Handbook | Publisher-grade compliance handbook with benchmarking tables |
+
+---
+
+## 🚀 0.1 Phased Development Roadmap
+
+### Phase 1 — Foundation (Short-term)
+- **Kernel Hybrid**: Begin modular microkernel experiments with capability-token delegation.
+- **Transactional FS**: Implement rollback-safe file operations & atomic CoW snapshot trees.
+- **Compliance Handbook**: Document core features in publisher-grade style with benchmarking tables.
+
+### Phase 2 — Expansion (Mid-term)
+- **Adaptive Scheduler**: Introduce workload-aware scheduling policies (interactivity, real-time, compliance).
+- **Visual Sandboxing**: Build GUI-driven security profiles & capability inspectors.
+- **Unified Firewall Dashboard**: Integrate firewall (nftables/PF parity) + VPN orchestration.
+
+### Phase 3 — Differentiation (Long-term)
+- **Native Containers**: Lightweight container orchestration for dev workflows.
+- **Zenith Overlays**: Adaptive desktop UX with compliance dashboards & Plasma activity spaces.
+- **Distributed FS Overlay**: Enable collaborative storage environments with Merkle-tree verification.
+
+---
+
+## 🌟 0.2 Strategic Differentiators for SigmaOS
+- **Compliance-First Design**: Unlike traditional Linux/BSD, SigmaOS positions itself as the default OS for regulated industries (HIPAA, SOC2, ISO 27001).
+- **Visual-First Dashboards**: Make system management, security profiles, and firewall policies intuitive rather than CLI-heavy.
+- **Resilience Implants**: Snapshot rollback + read-only immutable system layers for high stability.
+- **Community-Driven Modules**: Encourage contributions backed by automated compliance verification pipelines.
+
+---
+
+## 🍃 0.2.1 Linux Mint Ecosystem Integration Matrix
+
+| Linux Mint Project | Function & Purpose | SigmaOS Sovereign Counterpart |
+| :--- | :--- | :--- |
+| **bulky** | Bulk file renamer utility | `SigmaFileRenamer` (regex & batch rename engine in `filemanager.rs`) |
+| **webapp-manager** | Isolated web application container launcher | `WebappManager` (isolated browser profile container in `linuxmint_inspirations.rs`) |
+| **mint-upgrade-info** | Release upgrade lifecycle & migration metadata | `ReleaseLifecycleMeta` (upgrade preflight checker in `updater.rs`) |
+| **lightdm-settings** | Display manager & greeter configuration tool | `MdmGreeterTheme` (greeter configuration in `display_manager.rs`) |
+| **folder-color-switcher**| Per-directory icon accent color switcher | `SymbolicIconTintEngine` (directory tinting in `theme.rs`) |
+| **mintwelcome** | First-boot welcome screen & system setup wizard | `WelcomeWizardOverlay` (Zenith onboarding wizard) |
+| **circle-flags / flags**| Country & locale flag icon collections | `LocaleManager` (flag & locale resolver in `i18n.rs`) |
+| **celluloid** | Modern GTK frontend for mpv media player | `SigmaPlayerEngine` (VLC/mpv GPU media player) |
+| **blueman** | Desktop Bluetooth manager & device paired control | `SovereignBluetoothManager` (Bluetooth 5.3 stack) |
+| **gdebi** | Standalone package installer with auto-deps | `UniversalPackageImporter` (standalone package installer in `sigma_pkg.rs`) |
+| **signstar** | Arch Linux package & artifact signing service | `SignstarSigningService` (dual OpenPGP + PQC HSM signing in `verifier.rs`) |
+| **diffoscope** | Reproducible builds byte diagnostic tool | `ReproducibleBuildContext::audit_reproducibility` (in `sovereign_sigpkg.rs`) |
+| **pacman-contrib** | Arch package utilities (paccache, checkupdates) | `PaccacheEngine`, `CheckupdatesEngine`, `RankmirrorsEngine`, `PactreeEngine` (in `pacman.rs`) |
+| **svntogit** | Arch SVN-to-Git pkgctl migration engine | `SvntogitPackageMigrator` (in `aur.rs`) |
+| **noggin** | Fedora self-service FreeIPA/LDAP user portal | `FedoraNogginUserPortal` (in `src/auth/user.rs`) |
+
+---
+
+## ⚔️ 0.3 SigmaOS Competitive Strike Map
+
+### Kernel & Core
+- **Linux**: Modular monolithic kernel.
+- **BSD**: Clean monolithic design.
+- **SigmaOS Strike**: Hybrid microkernel → combines modularity + stability.
+- **Effect**: Linux/BSD look outdated when SigmaOS offers resilience + portability.
+
+---
+
+### Filesystem
+- **Linux**: Btrfs snapshots, ext4 reliability.
+- **BSD**: ZFS rollback, deduplication.
+- **SigmaOS Strike**: Transactional filesystem → rollback + compliance journaling.
+- **Effect**: SigmaOS becomes the compliance-safe FS, making ZFS/Btrfs feel niche.
+
+---
+
+### Scheduler
+- **Linux**: CFS (fair scheduling).
+- **BSD**: ULE (low latency).
+- **SigmaOS Strike**: Adaptive scheduler → workload-aware (real-time, batch, compliance).
+- **Effect**: SigmaOS outperforms Linux/BSD in regulated industries.
+
+---
+
+### Security
+- **Linux**: SELinux/AppArmor (complex).
+- **BSD**: Capsicum sandboxing (secure but niche).
+- **SigmaOS Strike**: Visual sandboxing GUI + immutable layers.
+- **Effect**: SigmaOS makes security intuitive and audit-ready, while Linux/BSD remain CLI-heavy.
+
+---
+
+### Networking
+- **Linux**: nftables, iptables.
+- **BSD**: PF firewall.
+- **SigmaOS Strike**: Unified firewall dashboard with VPN orchestration.
+- **Effect**: SigmaOS simplifies networking → Linux/BSD tools feel fragmented.
+
+---
+
+### Virtualization
+- **Linux**: KVM/QEMU, Docker.
+- **BSD**: bhyve.
+- **SigmaOS Strike**: Native containers + lightweight VM orchestration.
+- **Effect**: SigmaOS integrates containers natively → Linux/BSD need external tools.
+
+---
+
+### Desktop/UX
+- **Linux**: GNOME/KDE, tiling WMs.
+- **BSD**: Lightweight DEs.
+- **SigmaOS Strike**: Zenith overlays → adaptive UX with compliance dashboards.
+- **Effect**: SigmaOS makes system management visual-first, Linux/BSD remain developer-centric.
+
+---
+
+### Documentation
+- **Linux**: Arch Wiki, Fedora Docs.
+- **BSD**: FreeBSD Handbook.
+- **SigmaOS Strike**: Compliance handbook + community compliance modules.
+- **Effect**: SigmaOS builds trust in regulated industries → Linux/BSD docs feel generic.
+
+---
+
+### 🌟 Strategic Outcome
+- **Linux**: Modular, community-driven, CLI-heavy.
+- **BSD**: Stable, secure, conservative.
+- **SigmaOS**: Compliance-first, resilience-driven, visual-first → making Linux/BSD irrelevant for industries demanding reliability, compliance, and intuitive control.
+
+---
+
+## 🚨 0.3.1 Ranked Gap Analysis: SigmaOS vs Linux & BSD
+
+### 🚨 Critical Gaps (Must Close First)
+- **Demand Paging & Swapping**: SigmaOS requires mature demand paging and swap management to match Linux page caching and FreeBSD UVM memory management.
+- **Dynamic Hotplugging**: Parity with Linux `udev` and FreeBSD `devd` for real-time USB, PCI, and NVMe device detection.
+- **Multicore Interrupt Balancing**: APIC/ACPI interrupt routing load-balancing across multi-core NUMA topologies.
+- **Application Ecosystem**: Standalone package distribution readiness via `UniversalPackageImporter` and `sigpkg`.
+
+---
+
+### ⚡ Important Gaps (Next Priority)
+- **Fault Tolerance**: Task orchestration for burst-parallel workloads under heavy multi-core stress.
+- **Enterprise Integration**: Authentication hooks for Active Directory, LDAP, Kerberos, and compliance certifications.
+- **Documentation & Governance**: Structured handbooks matching the FreeBSD Handbook and Linux man pages.
+
+---
+
+### 🌀 Optional Gaps (Long-term Polish)
+- **Proc Start-up Scaling**: Sub-10ms cold start scaling for large-scale container workloads.
+- **Community Ecosystem**: Expanding contributor base through verified compliance modules.
+- **UI/UX Consistency**: Adaptive desktop overlays (Zenith) matching modern desktop expectations.
+
+---
+
+### 📊 Ranked Gap Dashboard Summary
+
+| Tier | Gap Area | Competitor Strength | SigmaOS Opportunity |
+| :--- | :--- | :--- | :--- |
+| **Critical** | Memory Mgmt, Hotplugging, Interrupts, App Ecosystem | Mature VM, udev/devd, SMP, rich packages | Demand paging, udev/devd parity, APIC balancing, sigpkg apps |
+| **Important** | Fault Tolerance, Enterprise, Docs | Robust orchestration, AD/LDAP, handbooks | Task resilience, AD/LDAP hooks, compliance handbook |
+| **Optional** | Proc Scaling, Community, UI | Large scaling, strong communities, polished UX | Workload scaling, contributor verification, Zenith overlays |
+
+---
+
+## ⚔️ 0.4 SigmaOS Battle Plan & Dependency Flowchart
+
+### ⚔️ Stage-by-Stage Battle Plan
+- **Stage 1 — Kernel & Core System**: Hybrid microkernel with modular services neutralizing Linux/BSD monolithic kernel complexity.
+- **Stage 2 — Filesystem & Storage**: Transactional filesystem with compliance journaling and automatic CoW rollback making ZFS/Btrfs feel niche.
+- **Stage 3 — Scheduling & Performance**: Adaptive scheduler tuned for real-time, batch, and compliance workloads outperforming CFS and ULE.
+- **Stage 4 — Security & Compliance**: Visual sandboxing GUI + immutable system layers replacing CLI SELinux/AppArmor/Capsicum complexity.
+- **Stage 5 — Networking**: Unified firewall dashboard with VPN orchestration simplifying nftables/PF fragmentation.
+- **Stage 6 — Virtualization & Containers**: Native containers + lightweight VM orchestration integrated natively into the OS kernel.
+- **Stage 7 — Desktop & UX**: Zenith adaptive overlays making system management visual-first for non-technical users.
+- **Stage 8 — Documentation & Community**: Compliance handbook + community compliance modules building trust in regulated industries.
+
+---
+
+### 📐 Dependency Flowchart
+```
+[Kernel Hybrid]
+      ↓
+[Transactional Filesystem]
+      ↓
+[Adaptive Scheduler]
+      ↓
+[Visual Sandbox GUI]
+      ↓
+[Unified Firewall Dashboard]
+      ↓
+[Native Containers + VM Orchestration]
+      ↓
+[Zenith Desktop Overlays]
+      ↓
+[Compliance Handbook + Community Modules]
+```
+
+---
+
+### 📅 Q1–Q6 Quarterly Roadmap Tracker
+
+#### Q1 (Foundation Start)
+- Kernel hybrid prototype → Boot stability ≥ 95%
+- Transactional FS baseline → Rollback tested on 50+ scenarios
+- Compliance handbook draft → Coverage ≥ 50% of core modules
+
+#### Q2 (Foundation Completion)
+- Kernel refinement → Boot stability ≥ 97%
+- FS rollback expansion → ≥ 99% success rate
+- Handbook expansion → Coverage ≥ 70%
+
+#### Q3 (Expansion Start)
+- Adaptive scheduler rollout → Latency < 10ms under stress
+- Visual sandbox GUI prototype → Policy adoption ≥ 60% test users
+- Firewall dashboard alpha → Rule accuracy ≥ 95%
+
+#### Q4 (Expansion Completion)
+- Scheduler optimization → Latency < 8ms
+- Sandbox GUI refinement → Policy adoption ≥ 80%
+- Firewall dashboard beta → Rule accuracy ≥ 99%
+
+#### Q5 (Differentiation Start)
+- Native container orchestration → Launch time < 2s
+- Zenith overlays prototype → Stability ≥ 90% uptime
+- Distributed FS overlay alpha → Sync accuracy ≥ 98%
+
+#### Q6 (Differentiation Completion)
+- Container optimization → Launch time < 1.5s
+- Zenith overlays refinement → Stability ≥ 95% uptime
+- Distributed FS overlay beta → Sync accuracy ≥ 99.9%
+
+---
+
 ## 📅 1. Multi-Stage Gap-Closing Milestones
 
 ### 🎯 PHASE 1: FOUNDATION HARDENING (Months 1-6)

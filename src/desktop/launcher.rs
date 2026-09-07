@@ -201,6 +201,122 @@ impl RecentApps for SimpleRecentApps {
     }
 }
 
+/// freedesktop.org `.desktop` Entry Configuration Spec
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopEntryType {
+    Application,
+    Link,
+    Directory,
+}
+
+pub struct XdgDesktopEntrySpec {
+    pub name: [u8; 64],
+    pub exec: [u8; 256],
+    pub icon: [u8; 128],
+    pub entry_type: DesktopEntryType,
+    pub terminal: bool,
+    pub categories: [u8; 128],
+}
+
+impl XdgDesktopEntrySpec {
+    pub fn new(name: &[u8], exec: &[u8], icon: &[u8]) -> Self {
+        let mut n = [0u8; 64];
+        let mut e = [0u8; 256];
+        let mut i = [0u8; 128];
+        let nlen = name.len().min(63);
+        let elen = exec.len().min(255);
+        let ilen = icon.len().min(127);
+        n[..nlen].copy_from_slice(&name[..nlen]);
+        e[..elen].copy_from_slice(&exec[..elen]);
+        i[..ilen].copy_from_slice(&icon[..ilen]);
+
+        XdgDesktopEntrySpec {
+            name: n,
+            exec: e,
+            icon: i,
+            entry_type: DesktopEntryType::Application,
+            terminal: false,
+            categories: [0u8; 128],
+        }
+    }
+}
+
+/// KDE `.desktop` / `.kdelnk` Action Group (Right-click quick actions)
+pub struct KdeDesktopActionGroup {
+    pub action_name: [u8; 32],
+    pub exec_cmd: [u8; 128],
+}
+
+impl KdeDesktopActionGroup {
+    pub fn new(name: &[u8], exec: &[u8]) -> Self {
+        let mut n = [0u8; 32];
+        let mut e = [0u8; 128];
+        let nlen = name.len().min(31);
+        let elen = exec.len().min(127);
+        n[..nlen].copy_from_slice(&name[..nlen]);
+        e[..elen].copy_from_slice(&exec[..elen]);
+
+        KdeDesktopActionGroup {
+            action_name: n,
+            exec_cmd: e,
+        }
+    }
+}
+
+/// macOS / iOS `.plist` Info.plist App Bundle Configuration
+pub struct PlistBundleConfig {
+    pub bundle_identifier: [u8; 64],
+    pub bundle_executable: [u8; 128],
+    pub bundle_icon_file: [u8; 64],
+}
+
+impl PlistBundleConfig {
+    pub fn new(bundle_id: &[u8], exec: &[u8], icon: &[u8]) -> Self {
+        let mut b = [0u8; 64];
+        let mut e = [0u8; 128];
+        let mut i = [0u8; 64];
+        let blen = bundle_id.len().min(63);
+        let elen = exec.len().min(127);
+        let ilen = icon.len().min(63);
+        b[..blen].copy_from_slice(&bundle_id[..blen]);
+        e[..elen].copy_from_slice(&exec[..elen]);
+        i[..ilen].copy_from_slice(&icon[..ilen]);
+
+        PlistBundleConfig {
+            bundle_identifier: b,
+            bundle_executable: e,
+            bundle_icon_file: i,
+        }
+    }
+}
+
+/// Windows `.lnk` / `.ini` Desktop Shortcut Configuration
+pub struct IniDesktopConfig {
+    pub target_path: [u8; 256],
+    pub icon_location: [u8; 128],
+    pub working_dir: [u8; 128],
+}
+
+impl IniDesktopConfig {
+    pub fn new(target: &[u8], icon: &[u8], work_dir: &[u8]) -> Self {
+        let mut t = [0u8; 256];
+        let mut i = [0u8; 128];
+        let mut w = [0u8; 128];
+        let tlen = target.len().min(255);
+        let ilen = icon.len().min(127);
+        let wlen = work_dir.len().min(127);
+        t[..tlen].copy_from_slice(&target[..tlen]);
+        i[..ilen].copy_from_slice(&icon[..ilen]);
+        w[..wlen].copy_from_slice(&work_dir[..wlen]);
+
+        IniDesktopConfig {
+            target_path: t,
+            icon_location: i,
+            working_dir: w,
+        }
+    }
+}
+
 // ==============================================================================
 // 1. Slingshot Application Launcher (Paginated Grid, Categories, Search)
 // ==============================================================================
@@ -498,5 +614,34 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_xdg_desktop_entry_spec() {
+        let entry = XdgDesktopEntrySpec::new(b"Firefox", b"/usr/bin/firefox", b"firefox");
+        assert_eq!(entry.entry_type, DesktopEntryType::Application);
+    }
+
+    #[test]
+    fn test_kde_desktop_action_group() {
+        let action = KdeDesktopActionGroup::new(b"New Private Window", b"firefox --private-window");
+        assert!(!action.action_name.is_empty());
+    }
+
+    #[test]
+    fn test_plist_bundle_config() {
+        let plist = PlistBundleConfig::new(b"org.mozilla.firefox", b"Contents/MacOS/firefox", b"firefox.icns");
+        assert!(!plist.bundle_identifier.is_empty());
+    }
+
+    #[test]
+    fn test_ini_desktop_config() {
+        let ini = IniDesktopConfig::new(b"C:\\Program Files\\Firefox\\firefox.exe", b"firefox.ico", b"C:\\Program Files\\Firefox");
+        assert!(!ini.target_path.is_empty());
     }
 }

@@ -7,6 +7,13 @@ use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OomPolicy {
+    KillHeuristicProcess, // Kill process with largest memory footprint
+    KillYoungest,         // Kill process with highest PID
+    PanicSystem,          // Trigger system panic
+}
+
 #[derive(Debug, Clone)]
 pub struct MemCgroup {
     pub id: usize,
@@ -123,6 +130,39 @@ impl MemCgroupManager {
 
         target_pid
     }
+
+    /// OOM Killer execution with policy selection
+    pub fn trigger_oom_killer_with_policy(
+        &mut self,
+        cgroup_id: usize,
+        processes: &mut Vec<(usize, usize, bool)>, // (pid, memory_usage, alive)
+        policy: OomPolicy,
+    ) -> Option<usize> {
+        match policy {
+            OomPolicy::PanicSystem => None,
+            OomPolicy::KillYoungest => {
+                let mut target_pid = None;
+                let mut max_pid = 0;
+                for (pid, _usage, alive) in processes.iter() {
+                    if *alive && *pid > max_pid {
+                        max_pid = *pid;
+                        target_pid = Some(*pid);
+                    }
+                }
+                if let Some(pid) = target_pid {
+                    for (p, usage, alive) in processes.iter_mut() {
+                        if *p == pid {
+                            *alive = false;
+                            self.uncharge_memory(cgroup_id, *usage);
+                            break;
+                        }
+                    }
+                }
+                target_pid
+            }
+            OomPolicy::KillHeuristicProcess => self.trigger_oom_killer(cgroup_id, processes),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -162,5 +202,20 @@ mod tests {
         assert_eq!(processes[1].2, false); // pid 102 is now terminated
         assert_eq!(manager.groups.get(&container_cg).unwrap().usage, 150 * 1024);
         // Memory uncharged from 400KB to 150KB
+    }
+
+    #[test]
+    fn test_oom_policy_selection() {
+        let mut manager = MemCgroupManager::new();
+        let container_cg = manager.create_cgroup("/docker/container-2", Some(0), 1024 * 1024);
+
+        let mut processes = vec![
+            (101, 100 * 1024, true),
+            (205, 50 * 1024, true), // Highest PID (youngest)
+        ];
+
+        let killed = manager.trigger_oom_killer_with_policy(container_cg, &mut processes, OomPolicy::KillYoungest).unwrap();
+        assert_eq!(killed, 205);
+        assert_eq!(processes[1].2, false);
     }
 }

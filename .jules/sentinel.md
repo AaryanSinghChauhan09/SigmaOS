@@ -52,3 +52,8 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 ## 2026-08-23 - Multi-Layer Packet Inspection with Post-Quantum Signatures and Hash Verification
 **Learning:** Combining sliding-window rate limiting, asymmetric post-quantum public key signature checking (Dilithium-5), zero-trust subnet filtering, and deep packet session hash matching prevents spoofing, replay attacks, and denial-of-service vectors at the network layer.
 **Action:** Enforce strict 4-stage validation (rate limit -> PQC signature -> subnet check -> payload hash) on all zero-trust network router interfaces.
+
+## 2026-08-29 - Path Traversal Component Separator Enforcement
+**Vulnerability:** Checking path traversal sequences (`..`) using only `/` and `\` directory separators allowed bypasses on non-standard URI schemes and Windows drive relative paths (e.g. `C:..\passwd` or `file:../secret.txt`).
+**Learning:** Path traversal detection logic must include scheme and drive specifiers (e.g., `:`) alongside directory delimiters (`/` and `\`) when determining path component boundaries.
+**Prevention:** Treat colons (`:`) as valid boundary delimiters when evaluating relative dot-dot traversal sequences in path sanitization routines.

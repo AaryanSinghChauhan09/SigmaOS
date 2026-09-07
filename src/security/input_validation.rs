@@ -56,13 +56,13 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
             return Err(ValidationError::NullByte);
         }
     }
-    // Reject any `..` component separated by `/` or `\` or at the boundaries.
+    // Reject any `..` component separated by `/`, `\`, `:` or at the boundaries.
     let mut i = 0usize;
     while i < path.len() {
         if path[i] == b'.' {
             if i + 1 < path.len() && path[i + 1] == b'.' {
-                let before_ok = i == 0 || path[i - 1] == b'/' || path[i - 1] == b'\\';
-                let after_ok = i + 2 >= path.len() || path[i + 2] == b'/' || path[i + 2] == b'\\';
+                let before_ok = i == 0 || path[i - 1] == b'/' || path[i - 1] == b'\\' || path[i - 1] == b':';
+                let after_ok = i + 2 >= path.len() || path[i + 2] == b'/' || path[i + 2] == b'\\' || path[i + 2] == b':';
                 if before_ok && after_ok {
                     return Err(ValidationError::PathTraversal);
                 }
@@ -355,12 +355,16 @@ mod tests {
         assert!(validate_path(b"..\\..\\etc\\passwd").is_err());
         assert!(validate_path(b"C:\\foo\\..\\bar").is_err());
         assert!(validate_path(b"foo\\..").is_err());
+        assert!(validate_path(b"C:..\\passwd").is_err());
+        assert!(validate_path(b"file:../secret.txt").is_err());
     }
 
     #[test]
     fn test_valid_path() {
         assert!(validate_path(b"/usr/share/sigma/config").is_ok());
         assert!(validate_path(b"/home/user/.config").is_ok());
+        assert!(validate_path(b"/var/log/app..log").is_ok());
+        assert!(validate_path(b"foo/..bar").is_ok());
     }
 
     #[test]

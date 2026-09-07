@@ -247,6 +247,110 @@ impl AudioDevice {
     }
 }
 
+/// Ubuntu `indicator-sound` Sound Theme Spec Event Types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SoundEventType {
+    SystemBoot,
+    SystemLogout,
+    DevicePlug,
+    DeviceUnplug,
+    VolumeChangeFeedback,
+    NotificationAlert,
+    BatteryLow,
+}
+
+/// Sound Event Feedback Theme Dispatcher
+pub struct SoundEventThemeDispatcher {
+    pub current_theme: String,
+    pub feedback_enabled: bool,
+}
+
+impl SoundEventThemeDispatcher {
+    pub fn new(theme_name: &str) -> Self {
+        Self {
+            current_theme: theme_name.to_string(),
+            feedback_enabled: true,
+        }
+    }
+
+    pub fn get_sound_file_uri(&self, event: SoundEventType) -> String {
+        let file_name = match event {
+            SoundEventType::SystemBoot => "desktop-login.ogg",
+            SoundEventType::SystemLogout => "desktop-logout.ogg",
+            SoundEventType::DevicePlug => "device-added.ogg",
+            SoundEventType::DeviceUnplug => "device-removed.ogg",
+            SoundEventType::VolumeChangeFeedback => "audio-volume-change.ogg",
+            SoundEventType::NotificationAlert => "message-new-instant.ogg",
+            SoundEventType::BatteryLow => "battery-low.ogg",
+        };
+        format!("/usr/share/sounds/{}/stereo/{}", self.current_theme, file_name)
+    }
+}
+
+/// Ubuntu `indicator-sound` Canonical Sound Indicator Controller
+pub struct IndicatorSoundController {
+    pub master_volume_percent: u8,
+    pub master_muted: bool,
+    pub allow_overamplification: bool, // Up to 150% volume boost
+}
+
+impl IndicatorSoundController {
+    pub fn new() -> Self {
+        Self {
+            master_volume_percent: 80,
+            master_muted: false,
+            allow_overamplification: true,
+        }
+    }
+
+    pub fn set_master_volume(&mut self, volume: u8) {
+        let max_vol = if self.allow_overamplification { 150 } else { 100 };
+        self.master_volume_percent = volume.min(max_vol);
+    }
+
+    pub fn toggle_mute(&mut self) {
+        self.master_muted = !self.master_muted;
+    }
+}
+
+/// Per-App Volume & Mute Overrides (PulseAudio / PipeWire pavucontrol)
+#[derive(Debug, Clone)]
+pub struct AppVolumeControl {
+    pub app_name: String,
+    pub volume_percent: u8,
+    pub is_muted: bool,
+}
+
+impl AppVolumeControl {
+    pub fn new(app_name: &str) -> Self {
+        Self {
+            app_name: app_name.to_string(),
+            volume_percent: 100,
+            is_muted: false,
+        }
+    }
+}
+
+/// PulseAudio / PipeWire Peak Meter & Over-Amplification Warning
+pub struct AudioPeakMeter {
+    pub current_peak_db: f32,
+    pub clipping_warning: bool,
+}
+
+impl AudioPeakMeter {
+    pub fn new() -> Self {
+        Self {
+            current_peak_db: -60.0,
+            clipping_warning: false,
+        }
+    }
+
+    pub fn update_peak(&mut self, peak_db: f32) {
+        self.current_peak_db = peak_db;
+        self.clipping_warning = peak_db > 0.0; // Above 0 dB causes digital clipping
+    }
+}
+
 /// Audio session
 #[derive(Debug, Clone)]
 pub struct AudioSession {
@@ -419,5 +523,36 @@ mod tests {
         let device = AudioDevice::new("test-device", DeviceType::Playback);
         audio.add_device(device);
         assert_eq!(audio.list_devices().len(), 1);
+    }
+
+    #[test]
+    fn test_indicator_sound_controller() {
+        let mut ctrl = IndicatorSoundController::new();
+        ctrl.set_master_volume(120);
+        assert_eq!(ctrl.master_volume_percent, 120);
+        ctrl.toggle_mute();
+        assert!(ctrl.master_muted);
+    }
+
+    #[test]
+    fn test_sound_event_theme_dispatcher() {
+        let dispatcher = SoundEventThemeDispatcher::new("ubuntu");
+        let uri = dispatcher.get_sound_file_uri(SoundEventType::SystemBoot);
+        assert_eq!(uri, "/usr/share/sounds/ubuntu/stereo/desktop-login.ogg");
+    }
+
+    #[test]
+    fn test_app_volume_control() {
+        let app_vol = AppVolumeControl::new("VLC");
+        assert_eq!(app_vol.app_name, "VLC");
+        assert_eq!(app_vol.volume_percent, 100);
+    }
+
+    #[test]
+    fn test_audio_peak_meter() {
+        let mut meter = AudioPeakMeter::new();
+        assert!(!meter.clipping_warning);
+        meter.update_peak(3.5);
+        assert!(meter.clipping_warning);
     }
 }

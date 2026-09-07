@@ -81,6 +81,14 @@ pub mod crypto {
     pub mod vectorized_pqc;
 }
 
+pub mod logging;
+pub mod ai;
+pub mod system;
+pub mod installer;
+pub mod performance;
+pub mod ml;
+pub mod iot;
+
 // Temporarily disabled problematic modules
 // pub mod accessibility;
 // pub mod automation;

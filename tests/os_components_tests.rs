@@ -3,6 +3,9 @@
 
 extern crate alloc;
 
+#[path = "../src/klib/mod.rs"]
+pub mod klib;
+
 #[path = "../src/ipc/pipes.rs"]
 mod pipes;
 #[path = "../src/security/unveil.rs"]

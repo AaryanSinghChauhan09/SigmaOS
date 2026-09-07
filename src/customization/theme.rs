@@ -236,6 +236,158 @@ impl BuiltInThemeProvider {
             },
         );
 
+        // Arch Linux Forum Dark
+        themes.insert(
+            "arch_forum_dark".to_string(),
+            Theme {
+                name: "Arch Forum Dark".to_string(),
+                mode: ThemeMode::Dark,
+                colors: ColorPalette {
+                    primary: "#1793D1".to_string(),
+                    secondary: "#333333".to_string(),
+                    accent: "#1793D1".to_string(),
+                    background: "#121212".to_string(),
+                    foreground: "#EEEEEE".to_string(),
+                    success: "#55FF55".to_string(),
+                    warning: "#FFFF55".to_string(),
+                    error: "#FF5555".to_string(),
+                },
+                typography: TypographySettings {
+                    font_family: "Cantarell".to_string(),
+                    font_size: 15,
+                    font_weight: 400,
+                    line_height: 1.4,
+                    letter_spacing: 0.0,
+                },
+                spacing: SpacingSettings {
+                    unit: 8,
+                    padding_small: 6,
+                    padding_medium: 12,
+                    padding_large: 18,
+                    margin_small: 6,
+                    margin_medium: 12,
+                    margin_large: 18,
+                },
+                border_radius: BorderRadiusSettings { small: 2, medium: 4, large: 8, full: false },
+                shadows: ShadowSettings { enabled: false, blur: 0, spread: 0, color: "#000".to_string(), opacity: 0.0 },
+                animations: AnimationSettings { enabled: true, duration_ms: 150, easing: "ease".to_string() },
+            },
+        );
+
+        // FreeBSD Forum Classic Maroon & Gold
+        themes.insert(
+            "freebsd_forum_classic".to_string(),
+            Theme {
+                name: "FreeBSD Forum Classic".to_string(),
+                mode: ThemeMode::Dark,
+                colors: ColorPalette {
+                    primary: "#AB2B28".to_string(),
+                    secondary: "#800000".to_string(),
+                    accent: "#E5A93C".to_string(),
+                    background: "#1E1A1A".to_string(),
+                    foreground: "#F0E6D2".to_string(),
+                    success: "#2ECC71".to_string(),
+                    warning: "#E5A93C".to_string(),
+                    error: "#E74C3C".to_string(),
+                },
+                typography: TypographySettings {
+                    font_family: "Liberation Sans".to_string(),
+                    font_size: 15,
+                    font_weight: 400,
+                    line_height: 1.5,
+                    letter_spacing: 0.0,
+                },
+                spacing: SpacingSettings {
+                    unit: 8,
+                    padding_small: 8,
+                    padding_medium: 16,
+                    padding_large: 24,
+                    margin_small: 8,
+                    margin_medium: 16,
+                    margin_large: 24,
+                },
+                border_radius: BorderRadiusSettings { small: 3, medium: 6, large: 12, full: false },
+                shadows: ShadowSettings { enabled: true, blur: 8, spread: 0, color: "#000".to_string(), opacity: 0.2 },
+                animations: AnimationSettings { enabled: true, duration_ms: 200, easing: "ease-in-out".to_string() },
+            },
+        );
+
+        // Ubuntu Discourse Warm Aubergine & Orange
+        themes.insert(
+            "ubuntu_discourse_warm".to_string(),
+            Theme {
+                name: "Ubuntu Discourse Warm".to_string(),
+                mode: ThemeMode::Light,
+                colors: ColorPalette {
+                    primary: "#E95420".to_string(),
+                    secondary: "#77216F".to_string(),
+                    accent: "#5E2750".to_string(),
+                    background: "#F7F7F7".to_string(),
+                    foreground: "#333333".to_string(),
+                    success: "#388E3C".to_string(),
+                    warning: "#F57C00".to_string(),
+                    error: "#D32F2F".to_string(),
+                },
+                typography: TypographySettings {
+                    font_family: "Ubuntu".to_string(),
+                    font_size: 16,
+                    font_weight: 400,
+                    line_height: 1.5,
+                    letter_spacing: 0.0,
+                },
+                spacing: SpacingSettings {
+                    unit: 8,
+                    padding_small: 8,
+                    padding_medium: 16,
+                    padding_large: 24,
+                    margin_small: 8,
+                    margin_medium: 16,
+                    margin_large: 24,
+                },
+                border_radius: BorderRadiusSettings { small: 4, medium: 8, large: 12, full: false },
+                shadows: ShadowSettings { enabled: true, blur: 6, spread: 0, color: "#000".to_string(), opacity: 0.1 },
+                animations: AnimationSettings { enabled: true, duration_ms: 250, easing: "ease".to_string() },
+            },
+        );
+
+        // Fedora Forum Clean Navy & Cyan
+        themes.insert(
+            "fedora_forum_clean".to_string(),
+            Theme {
+                name: "Fedora Forum Clean".to_string(),
+                mode: ThemeMode::Light,
+                colors: ColorPalette {
+                    primary: "#294172".to_string(),
+                    secondary: "#3C6EB4".to_string(),
+                    accent: "#00C3F3".to_string(),
+                    background: "#FFFFFF".to_string(),
+                    foreground: "#222222".to_string(),
+                    success: "#27AE60".to_string(),
+                    warning: "#F39C12".to_string(),
+                    error: "#C0392B".to_string(),
+                },
+                typography: TypographySettings {
+                    font_family: "Red Hat Display".to_string(),
+                    font_size: 16,
+                    font_weight: 400,
+                    line_height: 1.5,
+                    letter_spacing: 0.0,
+                },
+                spacing: SpacingSettings {
+                    unit: 8,
+                    padding_small: 8,
+                    padding_medium: 16,
+                    padding_large: 24,
+                    margin_small: 8,
+                    margin_medium: 16,
+                    margin_large: 24,
+                },
+                border_radius: BorderRadiusSettings { small: 4, medium: 8, large: 16, full: false },
+                shadows: ShadowSettings { enabled: true, blur: 10, spread: 0, color: "#294172".to_string(), opacity: 0.08 },
+                animations: AnimationSettings { enabled: true, duration_ms: 200, easing: "ease-in-out".to_string() },
+            },
+        );
+
         Self {
             themes,
             current_theme: "light".to_string(),
@@ -621,11 +773,80 @@ impl Default for SigmaSoundscape {
     }
 }
 
+/// freedesktop.org Icon Theme Spec Category Context
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IconCategoryContext {
+    Actions,
+    Applications,
+    Categories,
+    Devices,
+    Emblems,
+    MimeTypes,
+    Places,
+    Status,
+}
+
+/// freedesktop.org Icon Theme Specification Index representation
+#[derive(Debug, Clone)]
+pub struct IconThemeSpecIndex {
+    pub name: String,
+    pub comment: String,
+    pub inherits: Vec<String>,
+    pub directories: Vec<String>,
+}
+
+impl IconThemeSpecIndex {
+    pub fn new(name: &str, comment: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            comment: comment.to_string(),
+            inherits: Vec::new(),
+            directories: Vec::new(),
+        }
+    }
+
+    pub fn add_inherits(&mut self, parent_theme: &str) {
+        self.inherits.push(parent_theme.to_string());
+    }
+
+    pub fn add_directory(&mut self, dir_path: &str) {
+        self.directories.push(dir_path.to_string());
+    }
+}
+
+/// Fallback Theme Inherits Chain Resolver
+pub struct IconInheritsResolver;
+
+impl IconInheritsResolver {
+    pub fn resolve_lookup_chain(theme_index: &IconThemeSpecIndex) -> Vec<String> {
+        let mut chain = vec![theme_index.name.clone()];
+        for parent in &theme_index.inherits {
+            if !chain.contains(parent) {
+                chain.push(parent.clone());
+            }
+        }
+        if !chain.contains(&"hicolor".to_string()) {
+            chain.push("hicolor".to_string()); // freedesktop.org mandatory default fallback
+        }
+        chain
+    }
+}
+
+/// Symbolic SVG / PNG Tinting Engine for UI theme adaptation
+pub struct SymbolicIconTintEngine;
+
+impl SymbolicIconTintEngine {
+    pub fn tint_symbolic_color(svg_content: &str, foreground_hex: &str) -> String {
+        svg_content.replace("#000000", foreground_hex).replace("fill:black", &format!("fill:{}", foreground_hex))
+    }
+}
+
 /// IconThemeEngine - Hardware-Aware dynamic DPI icon scaler
 pub struct IconThemeEngine {
     pub active_icon_pack: String,
     pub base_icon_size: u16,
     pub screen_dpi: f32,
+    pub spec_index: IconThemeSpecIndex,
 }
 
 /// Native, zero-dependency Sovereign CSS Color Engine
@@ -675,10 +896,15 @@ impl SovereignCssColorEngine {
 
 impl IconThemeEngine {
     pub fn new(pack: &str, dpi: f32) -> Self {
+        let mut spec = IconThemeSpecIndex::new(pack, "SigmaOS Native Icon Pack");
+        spec.add_inherits("Adwaita");
+        spec.add_inherits("hicolor");
+
         Self {
             active_icon_pack: pack.to_string(),
             base_icon_size: 48,
             screen_dpi: dpi,
+            spec_index: spec,
         }
     }
 
@@ -713,7 +939,22 @@ mod tests {
     fn test_built_in_theme_provider() {
         let provider = BuiltInThemeProvider::new();
         assert_eq!(provider.name(), "BuiltInThemeProvider");
-        assert_eq!(provider.themes.len(), 2);
+        assert_eq!(provider.themes.len(), 6);
+    }
+
+    #[test]
+    fn test_community_forum_theme_presets() {
+        let provider = BuiltInThemeProvider::new();
+        assert!(provider.get_theme_by_name("arch_forum_dark").is_some());
+        assert!(provider.get_theme_by_name("freebsd_forum_classic").is_some());
+        assert!(provider.get_theme_by_name("ubuntu_discourse_warm").is_some());
+        assert!(provider.get_theme_by_name("fedora_forum_clean").is_some());
+
+        let arch = provider.get_theme_by_name("arch_forum_dark").unwrap();
+        assert_eq!(arch.colors.primary, "#1793D1");
+
+        let freebsd = provider.get_theme_by_name("freebsd_forum_classic").unwrap();
+        assert_eq!(freebsd.colors.primary, "#AB2B28");
     }
 
     #[test]
@@ -783,5 +1024,29 @@ mod tests {
     fn test_icon_theme_scaling() {
         let pack = IconThemeEngine::new("SovereignIcons", 144.0); // 1.5x scaling
         assert_eq!(pack.get_scaled_icon_size(), 72);
+    }
+
+    #[test]
+    fn test_icon_theme_spec_index() {
+        let mut index = IconThemeSpecIndex::new("Yaru", "Ubuntu Yaru Icon Theme");
+        index.add_inherits("Adwaita");
+        index.add_directory("48x48/apps");
+        assert_eq!(index.name, "Yaru");
+        assert_eq!(index.inherits, vec!["Adwaita".to_string()]);
+    }
+
+    #[test]
+    fn test_icon_inherits_resolver() {
+        let mut index = IconThemeSpecIndex::new("Breeze", "KDE Breeze Icon Theme");
+        index.add_inherits("oxygen");
+        let chain = IconInheritsResolver::resolve_lookup_chain(&index);
+        assert_eq!(chain, vec!["Breeze".to_string(), "oxygen".to_string(), "hicolor".to_string()]);
+    }
+
+    #[test]
+    fn test_symbolic_icon_tint_engine() {
+        let svg = "<path fill=\"#000000\" d=\"M0 0h24v24H0z\"/>";
+        let tinted = SymbolicIconTintEngine::tint_symbolic_color(svg, "#3584E4");
+        assert_eq!(tinted, "<path fill=\"#3584E4\" d=\"M0 0h24v24H0z\"/>");
     }
 }
