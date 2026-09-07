@@ -232,6 +232,7 @@ pub enum PackageFormat {
     Snap,       // snap/squashfs
     Flatpak,    // flatpak sandbox
     AppImage,   // AppImage single-file container
+    #[default]
     SigmaPkg,   // native SigmaOS format
     Air,        // Adobe AIR (.air)
     Bottle,     // Homebrew Bottle (.bottle)
@@ -277,7 +278,13 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
+    Ipk,        // Opkg / OpenWrt IPK (.ipk)
+    Opkg,       // Opkg package (.opkg)
+    SolarisIps, // Solaris IPS package (.p5p, .ips)
+    GuixNar,    // Guix NAR archive (.nar)
 }
+
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
@@ -1210,6 +1217,10 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
+            PackageFormat::OpenBsdPkg => Box::new(PkgInstallStrategy),
+            PackageFormat::Ipk | PackageFormat::Opkg => Box::new(ApkInstallStrategy),
+            PackageFormat::SolarisIps => Box::new(PkgInstallStrategy),
+            PackageFormat::GuixNar => Box::new(GuixInstallStrategy),
         }
     }
 
@@ -1264,6 +1275,10 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
+            PackageFormat::OpenBsdPkg => Box::new(PkgMetadataAdapter),
+            PackageFormat::Ipk | PackageFormat::Opkg => Box::new(ApkMetadataAdapter),
+            PackageFormat::SolarisIps => Box::new(PkgMetadataAdapter),
+            PackageFormat::GuixNar => Box::new(GuixMetadataAdapter),
         }
     }
 }
@@ -1749,6 +1764,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
