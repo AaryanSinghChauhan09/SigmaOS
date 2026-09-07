@@ -7,12 +7,12 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-use std::boxed::Box;
-use std::vec::Vec;
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91
 /// Implements device detection, registration, and management
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
+use std::vec::Vec;
 
 pub type DeviceID = usize;
 

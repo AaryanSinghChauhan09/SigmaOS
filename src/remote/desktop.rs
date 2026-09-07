@@ -9,9 +9,9 @@
 #![allow(clippy::type_complexity)]
 // SPDX-License-Identifier: MIT
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SessionID = usize;
 

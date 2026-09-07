@@ -101,7 +101,13 @@ pub struct SigmaTimer {
 
 impl SigmaTimer {
     /// Create a new one-shot timer.
-    pub fn new_oneshot(id: TimerId, deadline_ns: u64, cb: TimerCallback, data: u64, name: &str) -> Self {
+    pub fn new_oneshot(
+        id: TimerId,
+        deadline_ns: u64,
+        cb: TimerCallback,
+        data: u64,
+        name: &str,
+    ) -> Self {
         Self {
             id,
             deadline_ns,
@@ -114,7 +120,14 @@ impl SigmaTimer {
     }
 
     /// Create a new periodic timer.
-    pub fn new_periodic(id: TimerId, first_ns: u64, period_ns: u64, cb: TimerCallback, data: u64, name: &str) -> Self {
+    pub fn new_periodic(
+        id: TimerId,
+        first_ns: u64,
+        period_ns: u64,
+        cb: TimerCallback,
+        data: u64,
+        name: &str,
+    ) -> Self {
         Self {
             id,
             deadline_ns: first_ns,
@@ -128,14 +141,20 @@ impl SigmaTimer {
 
     /// Returns whether this is a periodic timer.
     #[inline]
-    pub fn is_periodic(&self) -> bool { self.period_ns > 0 }
+    pub fn is_periodic(&self) -> bool {
+        self.period_ns > 0
+    }
 
     /// Returns the deadline in nanoseconds.
     #[inline]
-    pub fn deadline_ns(&self) -> u64 { self.deadline_ns }
+    pub fn deadline_ns(&self) -> u64 {
+        self.deadline_ns
+    }
 
     /// Returns the timer name.
-    pub fn name(&self) -> &str { &self.name }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
 }
 
 // ============================================================
@@ -205,7 +224,13 @@ impl SigmaTimerWheel {
     ///
     /// # Returns
     /// A `TimerId` that can be used to cancel the timer.
-    pub fn add_timer(&mut self, deadline_ns: u64, cb: TimerCallback, data: u64, name: &str) -> TimerId {
+    pub fn add_timer(
+        &mut self,
+        deadline_ns: u64,
+        cb: TimerCallback,
+        data: u64,
+        name: &str,
+    ) -> TimerId {
         let id = TimerId(self.next_id);
         self.next_id += 1;
         let timer = SigmaTimer::new_oneshot(id, deadline_ns, cb, data, name);
@@ -215,7 +240,14 @@ impl SigmaTimerWheel {
     }
 
     /// Add a periodic timer, first firing at `first_ns`, then every `period_ns`.
-    pub fn add_periodic_timer(&mut self, first_ns: u64, period_ns: u64, cb: TimerCallback, data: u64, name: &str) -> TimerId {
+    pub fn add_periodic_timer(
+        &mut self,
+        first_ns: u64,
+        period_ns: u64,
+        cb: TimerCallback,
+        data: u64,
+        name: &str,
+    ) -> TimerId {
         let id = TimerId(self.next_id);
         self.next_id += 1;
         let timer = SigmaTimer::new_periodic(id, first_ns, period_ns, cb, data, name);
@@ -250,7 +282,8 @@ impl SigmaTimerWheel {
         let deadline = self.now_ns;
 
         // Collect expired timers
-        let expired: Vec<TimerId> = self.timers
+        let expired: Vec<TimerId> = self
+            .timers
             .iter()
             .filter(|(_, t)| t.active && t.deadline_ns <= deadline)
             .map(|(id, _)| *id)
@@ -275,24 +308,36 @@ impl SigmaTimerWheel {
 
     /// Get the current monotonic time in nanoseconds.
     #[inline]
-    pub fn get_monotonic_ns(&self) -> u64 { self.now_ns }
+    pub fn get_monotonic_ns(&self) -> u64 {
+        self.now_ns
+    }
 
     /// Get the current monotonic time in microseconds.
     #[inline]
-    pub fn get_monotonic_us(&self) -> u64 { self.now_ns / 1_000 }
+    pub fn get_monotonic_us(&self) -> u64 {
+        self.now_ns / 1_000
+    }
 
     /// Get the current monotonic time in milliseconds.
     #[inline]
-    pub fn get_monotonic_ms(&self) -> u64 { self.now_ns / 1_000_000 }
+    pub fn get_monotonic_ms(&self) -> u64 {
+        self.now_ns / 1_000_000
+    }
 
     /// Return a reference to the runtime statistics.
-    pub fn stats(&self) -> &TimerWheelStats { &self.stats }
+    pub fn stats(&self) -> &TimerWheelStats {
+        &self.stats
+    }
 
     /// Returns active timer count.
-    pub fn active_count(&self) -> usize { self.timers.len() }
+    pub fn active_count(&self) -> usize {
+        self.timers.len()
+    }
 
     /// Returns the clock source in use.
-    pub fn clock_source(&self) -> SigmaClockSource { self.clock_source }
+    pub fn clock_source(&self) -> SigmaClockSource {
+        self.clock_source
+    }
 }
 
 // ============================================================
@@ -349,12 +394,18 @@ impl SigmaClockManager {
     }
 
     /// Delegate timer operations to the wheel.
-    pub fn wheel_mut(&mut self) -> &mut SigmaTimerWheel { &mut self.wheel }
-    pub fn wheel(&self) -> &SigmaTimerWheel { &self.wheel }
+    pub fn wheel_mut(&mut self) -> &mut SigmaTimerWheel {
+        &mut self.wheel
+    }
+    pub fn wheel(&self) -> &SigmaTimerWheel {
+        &self.wheel
+    }
 }
 
 impl Default for SigmaClockManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================

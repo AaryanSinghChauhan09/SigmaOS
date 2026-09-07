@@ -18,10 +18,11 @@ pub mod zsh_bash_parity;
 
 pub use sigma_sh::{
     AutoSuggestTabPopup, ContextualCompleter, HistoryExpansionEngine, JobControlManager,
-    ParameterExpansionEngine, PipelineExecutor, PipelinePlan, ReplLineEditor, ShellPledgeUnveilGuard, SimpleShell,
-    SovereignSigmaShRepl, ZshPromptFormatter,
+    ParameterExpansionEngine, PipelineExecutor, PipelinePlan, ReplLineEditor,
+    ShellPledgeUnveilGuard, SimpleShell, SovereignSigmaShRepl, ZshPromptFormatter,
 };
 
+pub use alias_system::{AliasManager, AliasType, SigmaAlias};
 pub use repl::ShellRepl;
 pub use zsh_bash_parity::{
     BashParameterExpansion, BsdDirectoryStack, DashPosixShValidator, FishAbbreviationEngine,
@@ -30,24 +31,23 @@ pub use zsh_bash_parity::{
     TcshHistorySubstitutionEngine, UniversalScriptTranspiler, UniversalShellCompatibilityEngine,
     WildcardGlobMatcher, ZshSyntaxHighlighter,
 };
-pub use alias_system::{AliasManager, AliasType, SigmaAlias};
 pub mod zsh_bash_parity;
+pub use alias_system::{AliasManager, AliasType, SigmaAlias};
 pub use command::{
     CommandError, CommandParser, CommandRegistry, ShellCommand, ShellSession,
     SimpleCommandRegistry, SimpleShellSession,
 };
-pub use terminal_emulator::{
-    TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor,
-    BsdConsoleColorPalette, BsdConsoleTheme,
-    TermiosInputEvent, TermiosInputMode, TermiosLineDiscipline,
-};
-pub use alias_system::{AliasManager, SigmaAlias, AliasType};
-pub use zsh_bash_parity::{
-    PowerlinePromptBuilder, PromptTheme, FuzzyCompletionEngine, CompletionCandidate, CandidateCategory,
-    ZshSyntaxHighlighter, SyntaxTokenKind, HighlightedToken, BashParameterExpansion, WildcardGlobMatcher,
-    ShellPipelineParser, ShellPipeline, PipelineCommand, BsdDirectoryStack, ShellJobControl, ShellJob, JobState,
-};
 pub use sigma_sh::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
     PipelineExecutor, ShellPledgeUnveilGuard, ShellSyntaxHighlighter, ZshPromptFormatter,
+};
+pub use terminal_emulator::{
+    AnsiColor, AutoSuggestionEngine, BsdConsoleColorPalette, BsdConsoleTheme, TerminalSession,
+    TermiosInputEvent, TermiosInputMode, TermiosLineDiscipline, UserDefinedFunction,
+};
+pub use zsh_bash_parity::{
+    BashParameterExpansion, BsdDirectoryStack, CandidateCategory, CompletionCandidate,
+    FuzzyCompletionEngine, HighlightedToken, JobState, PipelineCommand, PowerlinePromptBuilder,
+    PromptTheme, ShellJob, ShellJobControl, ShellPipeline, ShellPipelineParser, SyntaxTokenKind,
+    WildcardGlobMatcher, ZshSyntaxHighlighter,
 };

@@ -7,9 +7,9 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
@@ -57,6 +57,7 @@ use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
     ZshSyntaxHighlighter,
 };
+use crate::shell::{BashParameterExpansion, HistoryExpansionEngine, JobControlManager};
 use crate::virtualization::{
     Container, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
 };

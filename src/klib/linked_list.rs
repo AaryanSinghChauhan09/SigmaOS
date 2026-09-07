@@ -13,9 +13,9 @@
 // and BSD's TAILQ/LIST macros from sys/queue.h
 // No external dependencies - fully custom implementation.
 
-use std::boxed::Box;
 use core::marker::PhantomData;
 use core::ptr::NonNull;
+use std::boxed::Box;
 
 /// A doubly-linked list node.
 /// Inspired by Linux's `struct list_head` and BSD's `TAILQ_ENTRY`.

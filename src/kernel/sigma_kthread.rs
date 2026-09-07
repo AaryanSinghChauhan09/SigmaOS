@@ -214,23 +214,45 @@ impl SigmaKthread {
     }
 
     /// Set CPU affinity. -1 = any CPU.
-    pub fn set_cpu_affinity(&mut self, cpu: i32) { self.cpu_affinity = cpu; }
+    pub fn set_cpu_affinity(&mut self, cpu: i32) {
+        self.cpu_affinity = cpu;
+    }
 
     /// Set scheduling priority.
-    pub fn set_priority(&mut self, p: KthreadPriority) { self.priority = p; }
+    pub fn set_priority(&mut self, p: KthreadPriority) {
+        self.priority = p;
+    }
 
     /// Set stack size.
-    pub fn set_stack_size(&mut self, sz: usize) { self.stack_size = sz; }
+    pub fn set_stack_size(&mut self, sz: usize) {
+        self.stack_size = sz;
+    }
 
     // Accessors
-    pub fn id(&self) -> KthreadId { self.id }
-    pub fn name(&self) -> &str { &self.name }
-    pub fn state(&self) -> KthreadState { self.state }
-    pub fn priority(&self) -> KthreadPriority { self.priority }
-    pub fn cpu_affinity(&self) -> i32 { self.cpu_affinity }
-    pub fn cpu_time_ns(&self) -> u64 { self.cpu_time_ns }
-    pub fn wake_count(&self) -> u64 { self.wake_count }
-    pub fn data(&self) -> u64 { self.data }
+    pub fn id(&self) -> KthreadId {
+        self.id
+    }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn state(&self) -> KthreadState {
+        self.state
+    }
+    pub fn priority(&self) -> KthreadPriority {
+        self.priority
+    }
+    pub fn cpu_affinity(&self) -> i32 {
+        self.cpu_affinity
+    }
+    pub fn cpu_time_ns(&self) -> u64 {
+        self.cpu_time_ns
+    }
+    pub fn wake_count(&self) -> u64 {
+        self.wake_count
+    }
+    pub fn data(&self) -> u64 {
+        self.data
+    }
 }
 
 // ============================================================
@@ -281,16 +303,26 @@ impl KthreadPool {
     }
 
     /// Returns current thread count.
-    pub fn size(&self) -> usize { self.threads.len() }
+    pub fn size(&self) -> usize {
+        self.threads.len()
+    }
 
     /// Returns whether the pool needs more threads.
-    pub fn needs_more(&self) -> bool { self.threads.len() < self.target_size }
+    pub fn needs_more(&self) -> bool {
+        self.threads.len() < self.target_size
+    }
 
     /// Returns whether the pool can shrink.
-    pub fn can_shrink(&self) -> bool { self.threads.len() > self.min_threads }
+    pub fn can_shrink(&self) -> bool {
+        self.threads.len() > self.min_threads
+    }
 
-    pub fn name(&self) -> &str { &self.name }
-    pub fn thread_ids(&self) -> &[KthreadId] { &self.threads }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn thread_ids(&self) -> &[KthreadId] {
+        &self.threads
+    }
 }
 
 // ============================================================
@@ -355,7 +387,10 @@ impl KthreadManager {
 
     /// Unpark a parked thread.
     pub fn unpark(&mut self, id: KthreadId) -> Result<(), &'static str> {
-        self.threads.get_mut(&id).ok_or("thread not found")?.unpark();
+        self.threads
+            .get_mut(&id)
+            .ok_or("thread not found")?
+            .unpark();
         Ok(())
     }
 
@@ -379,38 +414,54 @@ impl KthreadManager {
 
     /// Create a named thread pool.
     pub fn create_pool(&mut self, name: &str, min: usize, max: usize) {
-        self.pools.insert(name.into(), KthreadPool::new(name, min, max));
+        self.pools
+            .insert(name.into(), KthreadPool::new(name, min, max));
     }
 
     /// Add thread to a pool.
     pub fn add_to_pool(&mut self, pool: &str, id: KthreadId) -> Result<(), &'static str> {
-        self.pools.get_mut(pool).ok_or("pool not found")?.add_thread(id)
+        self.pools
+            .get_mut(pool)
+            .ok_or("pool not found")?
+            .add_thread(id)
     }
 
     /// Get reference to thread.
-    pub fn get(&self, id: KthreadId) -> Option<&SigmaKthread> { self.threads.get(&id) }
+    pub fn get(&self, id: KthreadId) -> Option<&SigmaKthread> {
+        self.threads.get(&id)
+    }
     /// Get mutable reference to thread.
-    pub fn get_mut(&mut self, id: KthreadId) -> Option<&mut SigmaKthread> { self.threads.get_mut(&id) }
+    pub fn get_mut(&mut self, id: KthreadId) -> Option<&mut SigmaKthread> {
+        self.threads.get_mut(&id)
+    }
 
     /// Find all threads with a given name.
     pub fn find_by_name(&self, name: &str) -> Vec<KthreadId> {
-        self.threads.iter()
+        self.threads
+            .iter()
             .filter(|(_, t)| t.name() == name)
             .map(|(&id, _)| id)
             .collect()
     }
 
     /// Returns total thread count.
-    pub fn count(&self) -> usize { self.threads.len() }
+    pub fn count(&self) -> usize {
+        self.threads.len()
+    }
 
     /// Returns count of running threads.
     pub fn running_count(&self) -> usize {
-        self.threads.values().filter(|t| t.state() == KthreadState::Running).count()
+        self.threads
+            .values()
+            .filter(|t| t.state() == KthreadState::Running)
+            .count()
     }
 }
 
 impl Default for KthreadManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================
@@ -496,7 +547,10 @@ mod tests {
         assert!(!mgr.find_by_name("kswapd0").is_empty());
         assert!(!mgr.find_by_name("migration/0").is_empty());
         let migration_id = mgr.find_by_name("migration/0")[0];
-        assert_eq!(mgr.get(migration_id).unwrap().priority(), KthreadPriority::RealTime);
+        assert_eq!(
+            mgr.get(migration_id).unwrap().priority(),
+            KthreadPriority::RealTime
+        );
     }
 
     #[test]

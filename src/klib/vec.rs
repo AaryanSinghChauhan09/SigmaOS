@@ -617,7 +617,10 @@ impl<T> Drop for Vec<T> {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
                 #[cfg(not(target_os = "none"))]
-                free_sized(self.data as *mut u8, self.capacity * core::mem::size_of::<T>());
+                free_sized(
+                    self.data as *mut u8,
+                    self.capacity * core::mem::size_of::<T>(),
+                );
                 #[cfg(target_os = "none")]
                 free(self.data as *mut u8);
             }

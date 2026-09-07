@@ -12,8 +12,8 @@
 // Complete PCI bus enumeration, BAR allocation, and device driver binding
 
 use std::collections::BTreeMap;
-use std::vec::Vec;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 use crate::driver::pci_bus::PciAddress;
 
@@ -171,7 +171,9 @@ pub struct PciBar {
 impl PciBar {
     pub fn new(index: u8) -> Self {
         PciBar {
-            bar_type: PciBarType::Memory32Bit { prefetchable: false },
+            bar_type: PciBarType::Memory32Bit {
+                prefetchable: false,
+            },
             address: 0,
             size: 0,
             index,
@@ -410,9 +412,14 @@ impl PciEnumerator {
 
                             pci_write_u32(device.address, bar_offset_high, 0xffffffff);
                             let size_mask_high = pci_read_u32(device.address, bar_offset_high);
-                            pci_write_u32(device.address, bar_offset_high, (address_high & 0xffffffff) as u32);
+                            pci_write_u32(
+                                device.address,
+                                bar_offset_high,
+                                (address_high & 0xffffffff) as u32,
+                            );
 
-                            let size = ((((size_mask_high as u64) << 32) | (size_mask_low as u64)) & 0xfffffffffffffff0)
+                            let size = ((((size_mask_high as u64) << 32) | (size_mask_low as u64))
+                                & 0xfffffffffffffff0)
                                 .wrapping_add(1);
                             bar.size = size;
 
@@ -498,10 +505,8 @@ impl PciDriverManager {
         for device in enumerator.get_devices() {
             for driver in &mut self.drivers {
                 if driver.probe(device)? {
-                    self.bound_devices.insert(
-                        device.address.sysfs_format(),
-                        driver.name().to_string(),
-                    );
+                    self.bound_devices
+                        .insert(device.address.sysfs_format(), driver.name().to_string());
                     bound_count += 1;
                     break; // Device is now handled by this driver
                 }

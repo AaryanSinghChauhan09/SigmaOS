@@ -209,7 +209,11 @@ impl<T> SigmaRwSpinlock<T> {
             let s = self.state.load(Ordering::Acquire);
             if s & WRITE_LOCK_BIT == 0 {
                 // No writer; try to increment reader count.
-                if self.state.compare_exchange(s, s + 1, Ordering::Acquire, Ordering::Relaxed).is_ok() {
+                if self
+                    .state
+                    .compare_exchange(s, s + 1, Ordering::Acquire, Ordering::Relaxed)
+                    .is_ok()
+                {
                     break;
                 }
             }
@@ -228,7 +232,11 @@ impl<T> SigmaRwSpinlock<T> {
             let s = self.state.load(Ordering::Acquire);
             // Acquire write lock when no readers and no other writer.
             if s == 0 {
-                if self.state.compare_exchange(0, WRITE_LOCK_BIT, Ordering::Acquire, Ordering::Relaxed).is_ok() {
+                if self
+                    .state
+                    .compare_exchange(0, WRITE_LOCK_BIT, Ordering::Acquire, Ordering::Relaxed)
+                    .is_ok()
+                {
                     break;
                 }
             }

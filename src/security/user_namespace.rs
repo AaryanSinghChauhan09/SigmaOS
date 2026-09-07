@@ -8,13 +8,13 @@
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
 //! User Namespace Implementation
-//! 
+//!
 //! Provides user/group isolation per-namespace with UID/GID mapping,
 //! capability sets, and thread-safe namespace management.
 
-use std::sync::{Arc, Mutex, RwLock};
 use std::collections::HashMap;
 use std::fmt;
+use std::sync::{Arc, Mutex, RwLock};
 
 /// Unique identifier for a user namespace
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -139,14 +139,13 @@ impl UidGidMapping {
 
     /// Check if a container ID falls within this mapping
     pub fn contains_container_id(&self, container_id: u32) -> bool {
-        container_id >= self.container_id && 
-        container_id < self.container_id.saturating_add(self.count)
+        container_id >= self.container_id
+            && container_id < self.container_id.saturating_add(self.count)
     }
 
     /// Check if a host ID falls within this mapping
     pub fn contains_host_id(&self, host_id: u32) -> bool {
-        host_id >= self.host_id &&
-        host_id < self.host_id.saturating_add(self.count)
+        host_id >= self.host_id && host_id < self.host_id.saturating_add(self.count)
     }
 
     /// Get the container ID for a given host ID
@@ -172,11 +171,7 @@ impl UidGidMapping {
 
 impl fmt::Display for UidGidMapping {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{}:{}:{}",
-            self.container_id, self.host_id, self.count
-        )
+        write!(f, "{}:{}:{}", self.container_id, self.host_id, self.count)
     }
 }
 
@@ -284,12 +279,7 @@ impl SubuidAllocationTracker {
     }
 
     /// Allocate a range for a user
-    pub fn allocate_range(
-        &self,
-        user: &str,
-        start: u32,
-        count: u32,
-    ) -> Result<(u32, u32), String> {
+    pub fn allocate_range(&self, user: &str, start: u32, count: u32) -> Result<(u32, u32), String> {
         // Check for conflicts
         self.check_conflict(user, start, count)?;
 
@@ -470,11 +460,7 @@ pub struct UserNamespace {
 
 impl UserNamespace {
     /// Create a new user namespace
-    pub fn new(
-        id: UserNamespaceId,
-        owner_uid: u32,
-        parent_id: Option<UserNamespaceId>,
-    ) -> Self {
+    pub fn new(id: UserNamespaceId, owner_uid: u32, parent_id: Option<UserNamespaceId>) -> Self {
         Self {
             id,
             uid_map: Vec::new(),
@@ -819,7 +805,7 @@ mod tests {
         {
             let mut locked = ns.lock().unwrap();
             assert!(!locked.has_capability(CapabilitySet::CapChown));
-            
+
             let result = locked.grant_capability(CapabilitySet::CapChown);
             assert!(result.is_ok());
             assert!(locked.has_capability(CapabilitySet::CapChown));
@@ -833,12 +819,12 @@ mod tests {
     #[test]
     fn test_uid_gid_mapping_contains() {
         let mapping = UidGidMapping::new(0, 100000, 65536);
-        
+
         assert!(mapping.contains_container_id(0));
         assert!(mapping.contains_container_id(32768));
         assert!(mapping.contains_container_id(65535));
         assert!(!mapping.contains_container_id(65536));
-        
+
         assert!(mapping.contains_host_id(100000));
         assert!(mapping.contains_host_id(132768));
         assert!(mapping.contains_host_id(165535));
@@ -849,10 +835,10 @@ mod tests {
     fn test_namespace_count() {
         let manager = UserNamespaceManager::new();
         assert_eq!(manager.count().unwrap(), 0);
-        
+
         manager.create_namespace(1000, None).unwrap();
         assert_eq!(manager.count().unwrap(), 1);
-        
+
         manager.create_namespace(2000, None).unwrap();
         assert_eq!(manager.count().unwrap(), 2);
     }
@@ -1171,14 +1157,14 @@ mod tests {
     #[test]
     fn test_allocation_prevents_overlaps() {
         let tracker = SubuidAllocationTracker::new();
-        
+
         // Allocate range 1
         tracker.allocate_range("user1", 100000, 100).unwrap();
-        
+
         // Try non-overlapping (should succeed)
         let result = tracker.allocate_range("user1", 100100, 100);
         assert!(result.is_ok());
-        
+
         // Try overlapping (should fail)
         let result = tracker.allocate_range("user1", 100050, 100);
         assert!(result.is_err());
@@ -1187,7 +1173,7 @@ mod tests {
     #[test]
     fn test_subuid_entry_contains() {
         let entry = SubuidEntry::new("user1".to_string(), 100000, 65536);
-        
+
         assert!(entry.contains_uid(100000));
         assert!(entry.contains_uid(100500));
         assert!(entry.contains_uid(165535));
@@ -1198,7 +1184,7 @@ mod tests {
     #[test]
     fn test_subgid_entry_contains() {
         let entry = SubgidEntry::new("user1".to_string(), 100000, 65536);
-        
+
         assert!(entry.contains_gid(100000));
         assert!(entry.contains_gid(100500));
         assert!(entry.contains_gid(165535));

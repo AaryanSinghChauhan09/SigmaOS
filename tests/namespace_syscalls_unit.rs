@@ -25,7 +25,7 @@ mod tests {
     #[test]
     fn test_clone_flags_multiple_namespaces() {
         let flags = 0x20000000 | 0x08000000 | 0x00020000u32;
-        
+
         assert_eq!(flags & 0x20000000, 0x20000000);
         assert_eq!(flags & 0x08000000, 0x08000000);
         assert_eq!(flags & 0x00020000, 0x00020000);
@@ -36,7 +36,7 @@ mod tests {
         let all_flags = 0xFF000000u32;
         let ns_mask = 0x7E020000u32;
         let ns_flags = all_flags & ns_mask;
-        
+
         assert!(ns_flags > 0);
     }
 
@@ -95,7 +95,7 @@ mod tests {
     fn test_namespace_id_allocation() {
         let ns_id_1 = 1u64;
         let ns_id_2 = 2u64;
-        
+
         assert_ne!(ns_id_1, ns_id_2);
         assert!(ns_id_1 > 0);
         assert!(ns_id_2 > 0);
@@ -168,7 +168,7 @@ mod tests {
         let create_pid = false;
         let create_ipc = false;
         let create_mount = false;
-        
+
         assert!(!create_pid);
         assert!(!create_ipc);
         assert!(!create_mount);
@@ -179,7 +179,7 @@ mod tests {
         let create_pid = true;
         let create_ipc = false;
         let create_mount = false;
-        
+
         assert!(create_pid);
         assert!(!create_ipc);
         assert!(!create_mount);
@@ -190,7 +190,7 @@ mod tests {
         let create_pid = true;
         let create_ipc = true;
         let create_mount = true;
-        
+
         assert!(create_pid);
         assert!(create_ipc);
         assert!(create_mount);
@@ -200,13 +200,13 @@ mod tests {
     #[test]
     fn test_supported_namespace_flags_mask() {
         let supported_mask = 0x7E020000u32;
-        
+
         // PID namespace (0x20000000) is supported
         assert_eq!(0x20000000 & supported_mask, 0x20000000);
-        
+
         // IPC namespace (0x08000000) is supported
         assert_eq!(0x08000000 & supported_mask, 0x08000000);
-        
+
         // Mount namespace (0x00020000) is supported
         assert_eq!(0x00020000 & supported_mask, 0x00020000);
     }
@@ -253,7 +253,7 @@ mod tests {
     fn test_process_namespace_pid_isolation() {
         let system_pid = 1000u32;
         let namespace_pid = 1u32;
-        
+
         assert_ne!(system_pid, namespace_pid);
     }
 
@@ -337,7 +337,7 @@ mod tests {
         let ns_type = "pid";
         let ref_count = 1u32;
         let owner_pid = 1000u32;
-        
+
         assert!(ns_id > 0);
         assert_eq!(ns_type.len(), 3);
         assert!(ref_count > 0);
@@ -379,7 +379,7 @@ mod tests {
         let pid_ns = 100u64;
         let ipc_ns = 200u64;
         let mount_ns = 300u64;
-        
+
         assert_ne!(pid_ns, ipc_ns);
         assert_ne!(pid_ns, mount_ns);
         assert_ne!(ipc_ns, mount_ns);
@@ -407,21 +407,21 @@ mod tests {
     #[test]
     fn test_namespace_registry_thread_safety_concept() {
         use std::sync::{Arc, Mutex};
-        
+
         let counter = Arc::new(Mutex::new(0i32));
         let c1 = counter.clone();
         let c2 = counter.clone();
-        
+
         {
             let mut val = c1.lock().unwrap();
             *val += 1;
         }
-        
+
         {
             let mut val = c2.lock().unwrap();
             *val += 1;
         }
-        
+
         assert_eq!(*counter.lock().unwrap(), 2);
     }
 }

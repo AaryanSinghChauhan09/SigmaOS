@@ -7,9 +7,9 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+use core::str::Chars;
 use std::string::String;
 use std::vec::Vec;
-use core::str::Chars;
 // SigmaOS Custom String Parser
 // Reduces dependency on std string parsing functions
 

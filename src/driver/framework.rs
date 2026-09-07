@@ -12,9 +12,9 @@ use std::string::String;
 // Basic Driver Framework Implementation
 // ==========================================
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 
@@ -92,9 +92,15 @@ impl SimpleStorageDriver {
 }
 
 impl Driver for SimpleStorageDriver {
-    fn id(&self) -> DriverID { self.id }
-    fn name(&self) -> &str { "SimpleStorageDriver" }
-    fn driver_type(&self) -> DriverType { self.driver_type }
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn name(&self) -> &str {
+        "SimpleStorageDriver"
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
     fn state(&self) -> DriverState {
         match self.state.load(Ordering::SeqCst) {
             1 => DriverState::Active,
@@ -156,7 +162,6 @@ impl Driver for SimpleDriver {
         Ok(())
     }
 }
-
 
 // =========================================================================
 // WDM & WDF (KMDF / UMDF) Specification Subsystems

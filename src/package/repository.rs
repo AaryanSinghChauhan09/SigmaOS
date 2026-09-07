@@ -11,9 +11,7 @@
 // Linux & BSD distro-inspired package repository handling
 // Manages package repositories, sources, APT/DNF-style pinning, signature verification,
 // rankmirrors/reflector mirror failover, drpm delta indexes, and Nix/Guix content-addressed stores.
-
 #![cfg_attr(not(test), no_std)]
-
 
 use std::collections::BTreeMap;
 use std::format;

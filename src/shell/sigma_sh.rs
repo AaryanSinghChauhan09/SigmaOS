@@ -15,12 +15,12 @@ use std::boxed::Box;
 
 use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec as StdVec;
-use std::vec::Vec;
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
 /// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec as StdVec;
+use std::vec::Vec;
 
 pub type CommandID = usize;
 
@@ -972,7 +972,6 @@ mod repl_tests {
     }
 }
 
-
 // =========================================================================
 // ADVANCED ZSH, BASH, TCSH & KSH SHELL INNOVATIONS
 // =========================================================================
@@ -1663,7 +1662,9 @@ impl SovereignSigmaShRepl {
 
     pub fn suggest_completion(&self, input: &str) -> Option<String> {
         let completions = self.completer.complete(input);
-        completions.first().map(|(sub, _): &(String, String)| sub.clone())
+        completions
+            .first()
+            .map(|(sub, _): &(String, String)| sub.clone())
     }
 
     pub fn execute_repl_command(&mut self, cmd: &str) -> Result<(), String> {

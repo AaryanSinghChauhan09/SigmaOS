@@ -26,9 +26,9 @@ impl Task {
     }
 }
 
+use core::time::Duration;
 use std::string::String;
 use std::vec::Vec;
-use core::time::Duration;
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -144,16 +144,18 @@ impl Process {
         let base_slice = (q / weight).max(1);
         let inter = self.interactivity_score();
         // Boost interactive tasks (> 70) by shortening their deadline window
-        let boost = if inter > 70 { (inter as u64 - 70) / 10 } else { 0 };
+        let boost = if inter > 70 {
+            (inter as u64 - 70) / 10
+        } else {
+            0
+        };
         let slice = base_slice.saturating_sub(boost).max(1);
         self.virtual_deadline = self.virtual_runtime + slice;
     }
-
 }
 
 #[derive(Debug, Clone)]
 pub struct NumaNode {
-
     pub node_id: u32,
     pub processor_ids: Vec<u32>,
 }

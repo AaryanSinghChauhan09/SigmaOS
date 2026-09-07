@@ -95,19 +95,31 @@ impl SovereignLinuxCommandSuite {
     }
 
     pub fn pacman(args: &[&str]) -> String {
-        format!("pacman: synchronized 124 repositories, executed operation {:?}", args)
+        format!(
+            "pacman: synchronized 124 repositories, executed operation {:?}",
+            args
+        )
     }
 
     pub fn dnf(args: &[&str]) -> String {
-        format!("dnf: metadata refreshed, transaction verified for {:?}", args)
+        format!(
+            "dnf: metadata refreshed, transaction verified for {:?}",
+            args
+        )
     }
 
     pub fn apt_get(args: &[&str]) -> String {
-        format!("apt-get: reading package lists... done. Executed {:?}", args)
+        format!(
+            "apt-get: reading package lists... done. Executed {:?}",
+            args
+        )
     }
 
     pub fn apk(args: &[&str]) -> String {
-        format!("apk: world file updated, transaction completed for {:?}", args)
+        format!(
+            "apk: world file updated, transaction completed for {:?}",
+            args
+        )
     }
 
     pub fn run_native_test_suite() -> Result<String, String> {
@@ -391,10 +403,16 @@ impl SovereignBsdSysctl {
     pub fn new() -> Self {
         let mut tree = BTreeMap::new();
         tree.insert(String::from("kern.ostype"), String::from("SigmaOS"));
-        tree.insert(String::from("kern.osrelease"), String::from("1.0.0-SOVEREIGN"));
+        tree.insert(
+            String::from("kern.osrelease"),
+            String::from("1.0.0-SOVEREIGN"),
+        );
         tree.insert(String::from("hw.ncpu"), String::from("16"));
         tree.insert(String::from("hw.physmem"), String::from("34359738368"));
-        tree.insert(String::from("security.bsd.unprivileged_proc_debug"), String::from("0"));
+        tree.insert(
+            String::from("security.bsd.unprivileged_proc_debug"),
+            String::from("0"),
+        );
         tree.insert(String::from("net.inet.tcp.sack.enable"), String::from("1"));
         Self { mib_tree: tree }
     }
@@ -404,7 +422,8 @@ impl SovereignBsdSysctl {
     }
 
     pub fn set_mib(&mut self, mib_name: &str, value: &str) -> Result<String, String> {
-        self.mib_tree.insert(mib_name.to_string(), value.to_string());
+        self.mib_tree
+            .insert(mib_name.to_string(), value.to_string());
         Ok(format!("{} -> {}", mib_name, value))
     }
 }
@@ -431,11 +450,19 @@ impl SovereignOpenBsdDoas {
     }
 
     pub fn execute_doas(&self, user: &str, command: &str) -> Result<String, String> {
-        let is_allowed = user == "sovereign" || user == "root" || self.permitted_rules.iter().any(|r| r.contains(user));
+        let is_allowed = user == "sovereign"
+            || user == "root"
+            || self.permitted_rules.iter().any(|r| r.contains(user));
         if is_allowed {
-            Ok(format!("[doas] Executing '{}' as root for user '{}'", command, user))
+            Ok(format!(
+                "[doas] Executing '{}' as root for user '{}'",
+                command, user
+            ))
         } else {
-            Err(format!("[doas] Access denied for user '{}' on command '{}'", user, command))
+            Err(format!(
+                "[doas] Access denied for user '{}' on command '{}'",
+                user, command
+            ))
         }
     }
 
@@ -452,10 +479,15 @@ impl SovereignOpenBsdDoas {
             format!("{} {}", command, args.join(" "))
         };
 
-        if self.execute_doas(user, &full_cmd).is_ok() && (target_user == "root" || target_user == user) {
+        if self.execute_doas(user, &full_cmd).is_ok()
+            && (target_user == "root" || target_user == user)
+        {
             Ok(true)
         } else {
-            Err(format!("[doas] User '{}' is not permitted to run '{}' as '{}'", user, full_cmd, target_user))
+            Err(format!(
+                "[doas] User '{}' is not permitted to run '{}' as '{}'",
+                user, full_cmd, target_user
+            ))
         }
     }
 }
@@ -526,7 +558,9 @@ mod tests {
         assert_eq!(SovereignLinuxCommandSuite::journalctl(&[]).len(), 2);
         assert!(SovereignLinuxCommandSuite::systemd_analyze().contains("Startup finished"));
         assert!(SovereignLinuxCommandSuite::pacman(&["-Syu"]).contains("synchronized"));
-        assert!(SovereignLinuxCommandSuite::dnf(&["install", "curl"]).contains("metadata refreshed"));
+        assert!(
+            SovereignLinuxCommandSuite::dnf(&["install", "curl"]).contains("metadata refreshed")
+        );
         assert!(SovereignLinuxCommandSuite::apt_get(&["update"]).contains("reading package lists"));
         assert!(SovereignLinuxCommandSuite::apk(&["add", "bash"]).contains("world file updated"));
 
@@ -565,7 +599,11 @@ mod tests {
         let denied = doas.execute_doas("guest", "rm -rf /");
         assert!(denied.is_err());
 
-        assert!(doas.validate_doas_rule_with_args("sovereign", "root", "sigma-pkg", &["upgrade", "--yes"]).unwrap());
-        assert!(doas.validate_doas_rule_with_args("guest", "root", "rm", &["-rf", "/"]).is_err());
+        assert!(doas
+            .validate_doas_rule_with_args("sovereign", "root", "sigma-pkg", &["upgrade", "--yes"])
+            .unwrap());
+        assert!(doas
+            .validate_doas_rule_with_args("guest", "root", "rm", &["-rf", "/"])
+            .is_err());
     }
 }

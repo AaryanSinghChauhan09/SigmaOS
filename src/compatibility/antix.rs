@@ -7,9 +7,9 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+use core::sync::atomic::{AtomicU8, Ordering};
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU8, Ordering};
 // SigmaOS antiX-Linux Parity & Legacy Hardware Optimization Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Bypasses standard resource overhead through a systemd-free init model, custom task trimmers, and zero-allocation visual swap profiles.

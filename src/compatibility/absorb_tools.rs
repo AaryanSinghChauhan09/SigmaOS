@@ -7,11 +7,11 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-use std::vec::Vec;
 /// Open-Source Absorption and Synchronization Subsystem for SigmaOS
 /// Implements Pledge/Unveil sandboxing, Post-Quantum Cryptography secure channels,
 /// DPLL SAT-solving package dependency resolvers, and Content-Addressed Storage.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 // ==========================================
 // 1. Process Privilege Reduction (Pledge & Unveil)

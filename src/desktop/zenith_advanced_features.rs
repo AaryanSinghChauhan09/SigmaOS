@@ -22,25 +22,25 @@ use std::vec::Vec;
 /// Advanced window layout modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowLayoutMode {
-    Tiling,     // Automatic tiling (i3/sway-style)
-    Stacking,   // Traditional stacking
-    Tabbed,     // Tabbed windows
-    Floating,   // Floating windows
-    Grid,       // Grid layout
-    Spiral,     // Spiral layout
-    MasterStack,// BSD Lumina & DWM-inspired Master+Stack
-    DynamicBSP, // Pop!_OS COSMIC-inspired dynamic binary space partitioning
+    Tiling,      // Automatic tiling (i3/sway-style)
+    Stacking,    // Traditional stacking
+    Tabbed,      // Tabbed windows
+    Floating,    // Floating windows
+    Grid,        // Grid layout
+    Spiral,      // Spiral layout
+    MasterStack, // BSD Lumina & DWM-inspired Master+Stack
+    DynamicBSP,  // Pop!_OS COSMIC-inspired dynamic binary space partitioning
 }
 
 /// Linux & BSD Desktop Environment Inspiration Presets
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DesktopInspirationPreset {
-    KdePlasma,   // KDE Plasma widget-centric panel & floating desktop
-    GnomeShell,  // GNOME 40+ overview & workspace gestures
-    XfceModular, // XFCE / MATE light modular dual-panel layout
-    CinnamonMint,// Linux Mint Cinnamon taskbar & applet tray
-    LuminaBsd,   // FreeBSD / TrueOS Lumina clean Qt/ZFS desktop
-    CosmicRust,  // Pop!_OS COSMIC auto-tiling Rust workspace
+    KdePlasma,    // KDE Plasma widget-centric panel & floating desktop
+    GnomeShell,   // GNOME 40+ overview & workspace gestures
+    XfceModular,  // XFCE / MATE light modular dual-panel layout
+    CinnamonMint, // Linux Mint Cinnamon taskbar & applet tray
+    LuminaBsd,    // FreeBSD / TrueOS Lumina clean Qt/ZFS desktop
+    CosmicRust,   // Pop!_OS COSMIC auto-tiling Rust workspace
 }
 
 impl ZenithDesktopEnvironment {

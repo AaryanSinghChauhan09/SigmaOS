@@ -7,11 +7,11 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-use std::vec::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
 /// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 /// Chimera Linux dinit service management compatibility
 pub struct DinitService {

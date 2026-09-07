@@ -184,6 +184,43 @@ fn test_universal_adapter_all_formats() {
     assert_eq!(action.source_pm, "apt");
     assert_eq!(action.operation, UniversalPmOperation::Install);
     assert_eq!(action.target_packages, vec!["curl"]);
+
+    // Test new foreign PM command aliases (yay, paru, microdnf, rpm, pkg_add, pkg_delete)
+    let yay_action = dispatcher
+        .dispatch_command("yay -Syu --noconfirm neovim")
+        .unwrap();
+    assert_eq!(yay_action.source_pm, "yay");
+    assert_eq!(yay_action.operation, UniversalPmOperation::Install);
+    assert_eq!(yay_action.target_packages, vec!["neovim"]);
+
+    let rpm_action = dispatcher.dispatch_command("rpm -i htop.rpm").unwrap();
+    assert_eq!(rpm_action.source_pm, "rpm");
+    assert_eq!(rpm_action.operation, UniversalPmOperation::Install);
+    assert_eq!(rpm_action.target_packages, vec!["htop.rpm"]);
+
+    let openbsd_action = dispatcher.dispatch_command("pkg_add -n rsync").unwrap();
+    assert_eq!(openbsd_action.source_pm, "pkg_add");
+    assert_eq!(openbsd_action.operation, UniversalPmOperation::Install);
+    assert!(openbsd_action.dry_run);
+
+    let microdnf_action = dispatcher
+        .dispatch_command("microdnf remove httpd")
+        .unwrap();
+    assert_eq!(microdnf_action.source_pm, "microdnf");
+    assert_eq!(microdnf_action.operation, UniversalPmOperation::Remove);
+    assert_eq!(microdnf_action.target_packages, vec!["httpd"]);
+
+    // 8. Dependency Mapper Canonicalization
+    use universal_adapter::UniversalDependencyMapper;
+    let dep_mapper = UniversalDependencyMapper::new();
+    assert_eq!(dep_mapper.to_canonical_name("libffi-dev"), "libffi");
+    assert_eq!(dep_mapper.to_canonical_name("glib2-devel"), "glib");
+    assert_eq!(dep_mapper.to_canonical_name("libpcre2-dev"), "pcre");
+    assert_eq!(dep_mapper.to_canonical_name("libuv-devel"), "libuv");
+    assert_eq!(dep_mapper.to_canonical_name("net-misc/openssh"), "openssh");
+    assert_eq!(dep_mapper.to_canonical_name("media-libs/mesa"), "mesa");
+    assert_eq!(dep_mapper.to_canonical_name("dev-vcs/git"), "git");
+    assert_eq!(dep_mapper.to_canonical_name("dev-build/cmake"), "cmake");
 }
 
 #[test]

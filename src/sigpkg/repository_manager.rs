@@ -10,13 +10,13 @@
 /// Repository Management System (Debian APT + Arch Pacman Inspiration)
 /// Manages package repositories, mirrors, and metadata
 use crate::klib::BTreeMap;
+use crate::sigpkg::{Package, Version, VersionConstraint};
+use core::default::Default;
+use core::option::Option::{self, None, Some};
+use core::result::Result::{self, Err, Ok};
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::default::Default;
-use core::option::Option::{self, Some, None};
-use core::result::Result::{self, Ok, Err};
-use crate::sigpkg::{Package, Version, VersionConstraint};
 
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]

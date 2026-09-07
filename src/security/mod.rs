@@ -9,11 +9,11 @@ pub mod system_policy_rules;
 pub use system_policy_rules::*;
 
 // SigmaOS Security Subsystem
-pub mod sigma_seccomp_bpf;
 pub mod audit;
 pub mod capability;
 pub mod seccomp;
 pub mod seccomp_ebpf;
+pub mod sigma_seccomp_bpf;
 pub mod syscall_filter;
 // pub mod defensive_audit; // TODO: Implement defensive_audit module
 pub mod hardening;
@@ -93,9 +93,7 @@ pub use defensive_audit::{
     SIGNATURE_LEN,
 };
 pub use forensics::*;
-pub use hardening::{
-    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
-};
+pub use hardening::{MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
@@ -134,12 +132,19 @@ pub use rules::{
     SovereignSandboxingRulesEngine, SovereignSecurelevelRuleEngine, SovereignSysctlHardeningRules,
     SysctlParameterRule, UnveilRule,
 };
+pub use seccomp::{
+    ArgumentConstraint, CompareOp, FilterRule, SeccompAction, SeccompContext, SeccompFilter,
+    SeccompManager,
+};
 pub use selinux::{PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux};
 pub use selinux_advanced::{AdvancedSELinuxManager, MlsLevel, SELinuxBoolean, SELinuxModule};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
     UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions,
     UnveilState,
+};
+pub use syscall_filter::{
+    FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy,
 };
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
@@ -157,5 +162,3 @@ pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, SimpleVulnerabilityScanner,
     VulnerabilityClass, VulnerabilityReport,
 };
-pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
-pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};

@@ -49,9 +49,9 @@ pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};
 pub use bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ApkIndexMetadata, ApkSignatureKey, ApkV3SignatureEngine,
-    AptBugReport, AptMarkRecord, AptMarkState, AptPinRule, ArchCachyosMicroarchOptimizationEngine,
-    ArchCachyOsMicroarchBuildProfileEngine, ArchSplitPackageHookRunnerEngine, CasStorePath,
-    CachedPackageFile, CommunityPackageBuildSource, CommunityRepoBackend,
+    AptBugReport, AptMarkRecord, AptMarkState, AptPinRule, ArchCachyOsMicroarchBuildProfileEngine,
+    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
+    CasStorePath, CommunityPackageBuildSource, CommunityRepoBackend,
     CoprAurBuildRepositoryGatewayEngine, DebconfPreseedEntry, DebconfQuestionType,
     DebianAptMarkPackageStateGovernor, DebianDebconfStatoverrideEngine,
     DebianDpkgTriggersAptListbugsGuardEngine, DeltaRpmSpec, DnfActionKind, DnfActionRecord,
@@ -61,15 +61,16 @@ pub use bsd_linux_package_innovations::{
     FedoraDnfHistoryRollbackJournalEngine, FlakeInputLock, FreeBsdPkgAuditEngine,
     FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageEapiSlotOperatorEngine,
     GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot,
-    MicroarchCompilerFlags, MicroarchRepoRoute, MicroarchitectureLevel, NetBsdPkginBinaryDatabaseEngine,
-    NetBsdPkgsrcOptionsFrameworkEngine, NixCasStoreGcGovernor, NixFlakesDevshellResolverEngine,
-    NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine, OpenBsdSignifyBinaryIntegrityEngine,
-    OpenSuseZypperVendorStickinessEngine, PacmanGpgKey, PacmanKeyTrust, PacmanKeyringEngine,
-    PackageBuildAttestation, PackageBuildEnvironment, PkgAuditAdvisory, PkgSummaryRecord,
-    PkgsrcOptionSpec, PortageEnvProfile, PortageEapiLevel, PortagePackageEnvEngine, PpaRepository,
-    RestrictedPackageSpec, RpmDeltaReconstitutionEngine, SecurityAdvisoryDetail,
-    SignifyPqcSignatureHeader, SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine,
-    SlotOperator, SovereignPackageBuildProvenanceEngine, UbuntuPpaAptPinningEngine, XbpsCachedPkg,
+    MicroarchCompilerFlags, MicroarchRepoRoute, MicroarchitectureLevel,
+    NetBsdPkginBinaryDatabaseEngine, NetBsdPkgsrcOptionsFrameworkEngine, NixCasStoreGcGovernor,
+    NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
+    OpenBsdSignifyBinaryIntegrityEngine, OpenSuseZypperVendorStickinessEngine,
+    PackageBuildAttestation, PackageBuildEnvironment, PacmanGpgKey, PacmanKeyTrust,
+    PacmanKeyringEngine, PkgAuditAdvisory, PkgSummaryRecord, PkgsrcOptionSpec, PortageEapiLevel,
+    PortageEnvProfile, PortagePackageEnvEngine, PpaRepository, RestrictedPackageSpec,
+    RpmDeltaReconstitutionEngine, SecurityAdvisoryDetail, SignifyPqcSignatureHeader,
+    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine, SlotOperator,
+    SovereignPackageBuildProvenanceEngine, UbuntuPpaAptPinningEngine, XbpsCachedPkg,
     XbpsDowngradeRepoEngine, XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine,
     ZypperPackageOffer, ZypperRepository,
 };
@@ -108,10 +109,12 @@ pub use repository::{
     TransactionJournalEntry,
 };
 pub use store::{
-    SigmaSoftwareStore, SoftwareRegistryEntry, /* StoreApp, StoreError, */ // store module not available
-     GLOBAL_SOFTWARE_STORE,
+    SigmaSoftwareStore,
+    SoftwareRegistryEntry, /* StoreApp, StoreError, */
+    // store module not available
+    GLOBAL_SOFTWARE_STORE,
 };
 pub use universal::{
-    AptDebManifest, ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    AptDebManifest, ConflictResolution, DependencyResolver, PackageAdapter, PackageError,
+    PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager,
 };

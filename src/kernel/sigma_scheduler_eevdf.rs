@@ -186,10 +186,7 @@ impl SigmaEevdfRunqueue {
     /// Returns the task if it was found, `None` otherwise.
     pub fn dequeue_task(&mut self, id: TaskId) -> Option<SigmaTask> {
         // We need to find the key first (scan by id).
-        let key = self.tasks
-            .iter()
-            .find(|(_, t)| t.id == id)
-            .map(|(k, _)| *k);
+        let key = self.tasks.iter().find(|(_, t)| t.id == id).map(|(k, _)| *k);
 
         if let Some(k) = key {
             let mut task = self.tasks.remove(&k).unwrap();
@@ -218,7 +215,8 @@ impl SigmaEevdfRunqueue {
         }
 
         // First pass: find eligible task with smallest deadline.
-        let eligible = self.tasks
+        let eligible = self
+            .tasks
             .iter()
             .find(|(_, t)| t.is_eligible(self.min_vruntime))
             .map(|(k, _)| *k);
@@ -245,10 +243,7 @@ impl SigmaEevdfRunqueue {
         };
 
         // Find and update the task.
-        let key = self.tasks
-            .iter()
-            .find(|(_, t)| t.id == id)
-            .map(|(k, _)| *k);
+        let key = self.tasks.iter().find(|(_, t)| t.id == id).map(|(k, _)| *k);
 
         if let Some(k) = key {
             let mut task = self.tasks.remove(&k).unwrap();
@@ -278,14 +273,16 @@ impl SigmaEevdfRunqueue {
         };
 
         // Find current task's deadline.
-        let curr_deadline = self.tasks
+        let curr_deadline = self
+            .tasks
             .iter()
             .find(|(_, t)| t.id == curr_id)
             .map(|(k, _)| k.0)
             .unwrap_or(u64::MAX);
 
         // Slice exhaustion check.
-        let curr_slice = self.tasks
+        let curr_slice = self
+            .tasks
             .iter()
             .find(|(_, t)| t.id == curr_id)
             .map(|(_, t)| t.slice_ns)
@@ -377,7 +374,8 @@ impl SigmaLoadBalancer {
             return None;
         }
 
-        let imbalance = self.runqueues[src].nr_running
+        let imbalance = self.runqueues[src]
+            .nr_running
             .saturating_sub(self.runqueues[dst].nr_running);
 
         if imbalance < IMBALANCE_THRESHOLD {
@@ -388,7 +386,8 @@ impl SigmaLoadBalancer {
         let dst_cpu = dst as u32;
         let candidate_key = {
             let src_rq = &self.runqueues[src];
-            src_rq.tasks
+            src_rq
+                .tasks
                 .iter()
                 .filter(|(_, t)| {
                     Some(t.id) != src_rq.curr

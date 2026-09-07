@@ -7,11 +7,11 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-use std::vec;
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
 use std::string::{String, ToString};
+use std::vec;
 use std::vec::Vec;
 
 /// Trait for DSP Audio Effects
@@ -94,7 +94,12 @@ impl MultiTrackSession {
 
     pub fn mix_session(&self) -> Vec<f32> {
         let has_solo = self.tracks.iter().any(|t| t.is_solo);
-        let max_len = self.tracks.iter().map(|t| t.samples.len()).max().unwrap_or(0);
+        let max_len = self
+            .tracks
+            .iter()
+            .map(|t| t.samples.len())
+            .max()
+            .unwrap_or(0);
         let mut mixed = alloc::vec![0.0f32; max_len];
 
         for track in &self.tracks {

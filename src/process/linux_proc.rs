@@ -266,8 +266,7 @@ impl ProcFileSystem {
         let pgid = ppid; // Default to parent's pgid
         let sid = ppid; // Default to parent's session id
 
-        let entry =
-            LinuxProcessEntry::new(next_pid, ppid, pgid, sid, name, nice, cgroup, cmdline);
+        let entry = LinuxProcessEntry::new(next_pid, ppid, pgid, sid, name, nice, cgroup, cmdline);
 
         // Add to cgroup list of PIDs
         if let Some(cg) = self.cgroups.get_mut(cgroup) {

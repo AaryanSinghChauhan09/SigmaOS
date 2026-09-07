@@ -20,12 +20,13 @@
 //! - **Namespace Inheritance**: Child processes inherit parent's namespace
 //! - **Namespace Cloning**: Support for creating child namespaces
 
+use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
-use std::collections::BTreeMap;
 
 use crate::kernel::namespaces::{
-    KernelNamespace, NamespaceId, KernelNamespaceType, NamespaceError, next_namespace_id, MAX_PIDS_PER_NAMESPACE,
+    next_namespace_id, KernelNamespace, KernelNamespaceType, NamespaceError, NamespaceId,
+    MAX_PIDS_PER_NAMESPACE,
 };
 
 /// Process ID type
@@ -175,9 +176,7 @@ impl PidNamespace {
     /// Get the number of used PIDs in this namespace
     pub fn used_pid_count(&self) -> u32 {
         let pids = self.used_pids.lock().unwrap();
-        pids.values()
-            .filter(|&&used| used)
-            .count() as u32
+        pids.values().filter(|&&used| used).count() as u32
     }
 
     /// Get the number of free PIDs in this namespace
@@ -332,7 +331,10 @@ mod tests {
 
         assert_eq!(child_ns.namespace_type(), NamespaceType::Pid);
         assert!(child_ns.parent().is_some());
-        assert_eq!(child_ns.parent().unwrap().namespace_id(), parent_ns.namespace_id());
+        assert_eq!(
+            child_ns.parent().unwrap().namespace_id(),
+            parent_ns.namespace_id()
+        );
     }
 
     #[test]

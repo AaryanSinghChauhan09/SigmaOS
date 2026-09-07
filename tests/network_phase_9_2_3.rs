@@ -2,7 +2,7 @@
 //!
 //! Standalone test suite that focuses on the new network_syscalls and
 //! extended network_namespace functionality.
-//! 
+//!
 //! These tests validate:
 //! - Socket syscalls with namespace support
 //! - Network namespace isolation
@@ -13,27 +13,32 @@ use std::net::{IpAddr, Ipv4Addr};
 
 // Import from sigmaos::net module
 use sigmaos::net::network_namespace::{
-    NetworkNamespaceManager, NetworkNamespaceId, NetworkInterface, Route, FirewallRule,
-    FirewallAction,
+    FirewallAction, FirewallRule, NetworkInterface, NetworkNamespaceId, NetworkNamespaceManager,
+    Route,
 };
 
 use sigmaos::net::network_syscalls::{
-    NetworkSyscalls, SocketFd, SockAddr,
-    AF_INET, SOCK_STREAM, SOCK_DGRAM, IPPROTO_TCP, IPPROTO_UDP,
+    NetworkSyscalls, SockAddr, SocketFd, AF_INET, IPPROTO_TCP, IPPROTO_UDP, SOCK_DGRAM, SOCK_STREAM,
 };
 
 #[test]
 fn test_basic_namespace_creation() {
     let manager = NetworkNamespaceManager::new();
-    let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
+    let ns_id = manager
+        .create_namespace(None)
+        .expect("Failed to create namespace");
     assert_ne!(ns_id.raw(), 0);
 }
 
 #[test]
 fn test_interface_management() {
     let manager = NetworkNamespaceManager::new();
-    let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-    let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+    let ns_id = manager
+        .create_namespace(None)
+        .expect("Failed to create namespace");
+    let ns_arc = manager
+        .get_namespace(ns_id)
+        .expect("Failed to get namespace");
     let ns = ns_arc.lock().expect("Failed to lock namespace");
 
     let iface = NetworkInterface::new("eth0".to_string());
@@ -47,8 +52,12 @@ fn test_interface_management() {
 #[test]
 fn test_route_management() {
     let manager = NetworkNamespaceManager::new();
-    let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-    let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+    let ns_id = manager
+        .create_namespace(None)
+        .expect("Failed to create namespace");
+    let ns_arc = manager
+        .get_namespace(ns_id)
+        .expect("Failed to get namespace");
     let ns = ns_arc.lock().expect("Failed to lock namespace");
 
     let route = Route::new(
@@ -65,8 +74,12 @@ fn test_route_management() {
 #[test]
 fn test_firewall_rule_management() {
     let manager = NetworkNamespaceManager::new();
-    let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-    let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+    let ns_id = manager
+        .create_namespace(None)
+        .expect("Failed to create namespace");
+    let ns_arc = manager
+        .get_namespace(ns_id)
+        .expect("Failed to get namespace");
     let ns = ns_arc.lock().expect("Failed to lock namespace");
 
     let rule = FirewallRule::new(FirewallAction::Allow);
@@ -82,9 +95,10 @@ fn test_socket_syscall_creation() {
     let syscalls = NetworkSyscalls::new();
     let ns_id = NetworkNamespaceId::new(1);
 
-    let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+    let fd = syscalls
+        .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
         .expect("Failed to create socket");
-    
+
     assert_ne!(fd.raw(), 0);
 }
 
@@ -93,7 +107,8 @@ fn test_socket_bind() {
     let syscalls = NetworkSyscalls::new();
     let ns_id = NetworkNamespaceId::new(1);
 
-    let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+    let fd = syscalls
+        .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
         .expect("Failed to create socket");
 
     let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
@@ -105,7 +120,8 @@ fn test_socket_listen() {
     let syscalls = NetworkSyscalls::new();
     let ns_id = NetworkNamespaceId::new(1);
 
-    let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+    let fd = syscalls
+        .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
         .expect("Failed to create socket");
 
     let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
@@ -118,16 +134,16 @@ fn test_socket_accept() {
     let syscalls = NetworkSyscalls::new();
     let ns_id = NetworkNamespaceId::new(1);
 
-    let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+    let fd = syscalls
+        .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
         .expect("Failed to create socket");
 
     let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
     syscalls.sys_bind(fd, addr, ns_id).expect("Failed to bind");
     syscalls.sys_listen(fd, 5, ns_id).expect("Failed to listen");
 
-    let (conn_fd, _peer_addr) = syscalls.sys_accept(fd, ns_id)
-        .expect("Failed to accept");
-    
+    let (conn_fd, _peer_addr) = syscalls.sys_accept(fd, ns_id).expect("Failed to accept");
+
     assert_ne!(conn_fd.raw(), fd.raw());
 }
 
@@ -136,19 +152,26 @@ fn test_socket_connect() {
     let syscalls = NetworkSyscalls::new();
     let ns_id = NetworkNamespaceId::new(1);
 
-    let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+    let fd = syscalls
+        .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
         .expect("Failed to create socket");
 
     let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
-    syscalls.sys_connect(fd, addr, ns_id).expect("Failed to connect");
+    syscalls
+        .sys_connect(fd, addr, ns_id)
+        .expect("Failed to connect");
 }
 
 #[test]
 fn test_namespace_isolation_interfaces() {
     let manager = NetworkNamespaceManager::new();
 
-    let ns1_id = manager.create_namespace(None).expect("Failed to create ns1");
-    let ns2_id = manager.create_namespace(None).expect("Failed to create ns2");
+    let ns1_id = manager
+        .create_namespace(None)
+        .expect("Failed to create ns1");
+    let ns2_id = manager
+        .create_namespace(None)
+        .expect("Failed to create ns2");
 
     let ns1_arc = manager.get_namespace(ns1_id).expect("Failed to get ns1");
     let ns2_arc = manager.get_namespace(ns2_id).expect("Failed to get ns2");
@@ -170,8 +193,12 @@ fn test_namespace_isolation_interfaces() {
 fn test_namespace_isolation_routes() {
     let manager = NetworkNamespaceManager::new();
 
-    let ns1_id = manager.create_namespace(None).expect("Failed to create ns1");
-    let ns2_id = manager.create_namespace(None).expect("Failed to create ns2");
+    let ns1_id = manager
+        .create_namespace(None)
+        .expect("Failed to create ns1");
+    let ns2_id = manager
+        .create_namespace(None)
+        .expect("Failed to create ns2");
 
     let ns1_arc = manager.get_namespace(ns1_id).expect("Failed to get ns1");
     let ns2_arc = manager.get_namespace(ns2_id).expect("Failed to get ns2");
@@ -179,8 +206,16 @@ fn test_namespace_isolation_routes() {
     let ns1 = ns1_arc.lock().expect("Failed to lock ns1");
     let ns2 = ns2_arc.lock().expect("Failed to lock ns2");
 
-    let route1 = Route::new(IpAddr::V4(Ipv4Addr::new(10, 0, 0, 0)), 24, "eth0".to_string());
-    let route2 = Route::new(IpAddr::V4(Ipv4Addr::new(172, 16, 0, 0)), 16, "eth1".to_string());
+    let route1 = Route::new(
+        IpAddr::V4(Ipv4Addr::new(10, 0, 0, 0)),
+        24,
+        "eth0".to_string(),
+    );
+    let route2 = Route::new(
+        IpAddr::V4(Ipv4Addr::new(172, 16, 0, 0)),
+        16,
+        "eth1".to_string(),
+    );
 
     ns1.add_route(route1).expect("Failed to add route to ns1");
     ns2.add_route(route2).expect("Failed to add route to ns2");
@@ -196,8 +231,12 @@ fn test_namespace_isolation_routes() {
 fn test_namespace_isolation_firewall() {
     let manager = NetworkNamespaceManager::new();
 
-    let ns1_id = manager.create_namespace(None).expect("Failed to create ns1");
-    let ns2_id = manager.create_namespace(None).expect("Failed to create ns2");
+    let ns1_id = manager
+        .create_namespace(None)
+        .expect("Failed to create ns1");
+    let ns2_id = manager
+        .create_namespace(None)
+        .expect("Failed to create ns2");
 
     let ns1_arc = manager.get_namespace(ns1_id).expect("Failed to get ns1");
     let ns2_arc = manager.get_namespace(ns2_id).expect("Failed to get ns2");
@@ -223,20 +262,28 @@ fn test_socket_isolation_across_namespaces() {
     let ns1 = NetworkNamespaceId::new(1);
     let ns2 = NetworkNamespaceId::new(2);
 
-    let fd1 = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns1)
+    let fd1 = syscalls
+        .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns1)
         .expect("Failed to create socket in ns1");
-    let fd2 = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns2)
+    let fd2 = syscalls
+        .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns2)
         .expect("Failed to create socket in ns2");
 
     let addr1 = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
     let addr2 = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 9090);
 
-    syscalls.sys_bind(fd1, addr1, ns1).expect("Failed to bind in ns1");
-    syscalls.sys_bind(fd2, addr2, ns2).expect("Failed to bind in ns2");
+    syscalls
+        .sys_bind(fd1, addr1, ns1)
+        .expect("Failed to bind in ns1");
+    syscalls
+        .sys_bind(fd2, addr2, ns2)
+        .expect("Failed to bind in ns2");
 
-    let bound1 = syscalls.sys_getsockname(fd1, ns1)
+    let bound1 = syscalls
+        .sys_getsockname(fd1, ns1)
         .expect("Failed to get socket name from ns1");
-    let bound2 = syscalls.sys_getsockname(fd2, ns2)
+    let bound2 = syscalls
+        .sys_getsockname(fd2, ns2)
         .expect("Failed to get socket name from ns2");
 
     assert_eq!(bound1.port, 8080);
@@ -247,10 +294,16 @@ fn test_socket_isolation_across_namespaces() {
 fn test_hierarchical_namespaces() {
     let manager = NetworkNamespaceManager::new();
 
-    let parent_id = manager.create_namespace(None).expect("Failed to create parent");
-    let child_id = manager.create_namespace(Some(parent_id)).expect("Failed to create child");
+    let parent_id = manager
+        .create_namespace(None)
+        .expect("Failed to create parent");
+    let child_id = manager
+        .create_namespace(Some(parent_id))
+        .expect("Failed to create child");
 
-    let child_arc = manager.get_namespace(child_id).expect("Failed to get child");
+    let child_arc = manager
+        .get_namespace(child_id)
+        .expect("Failed to get child");
     let child = child_arc.lock().expect("Failed to lock child");
 
     assert_eq!(child.parent_id(), Some(parent_id));
@@ -259,8 +312,12 @@ fn test_hierarchical_namespaces() {
 #[test]
 fn test_many_interfaces() {
     let manager = NetworkNamespaceManager::new();
-    let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-    let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+    let ns_id = manager
+        .create_namespace(None)
+        .expect("Failed to create namespace");
+    let ns_arc = manager
+        .get_namespace(ns_id)
+        .expect("Failed to get namespace");
     let ns = ns_arc.lock().expect("Failed to lock namespace");
 
     for i in 0..20 {
@@ -275,8 +332,12 @@ fn test_many_interfaces() {
 #[test]
 fn test_many_routes() {
     let manager = NetworkNamespaceManager::new();
-    let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-    let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+    let ns_id = manager
+        .create_namespace(None)
+        .expect("Failed to create namespace");
+    let ns_arc = manager
+        .get_namespace(ns_id)
+        .expect("Failed to get namespace");
     let ns = ns_arc.lock().expect("Failed to lock namespace");
 
     for i in 0..20 {
@@ -292,8 +353,12 @@ fn test_many_routes() {
 #[test]
 fn test_many_firewall_rules() {
     let manager = NetworkNamespaceManager::new();
-    let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-    let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+    let ns_id = manager
+        .create_namespace(None)
+        .expect("Failed to create namespace");
+    let ns_arc = manager
+        .get_namespace(ns_id)
+        .expect("Failed to get namespace");
     let ns = ns_arc.lock().expect("Failed to lock namespace");
 
     for i in 0..20 {
@@ -315,7 +380,8 @@ fn test_socket_state_transitions() {
     let syscalls = NetworkSyscalls::new();
     let ns_id = NetworkNamespaceId::new(1);
 
-    let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+    let fd = syscalls
+        .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
         .expect("Failed to create socket");
 
     let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
@@ -327,18 +393,22 @@ fn test_socket_state_transitions() {
 #[test]
 fn test_interface_with_ip_configuration() {
     let manager = NetworkNamespaceManager::new();
-    let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-    let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+    let ns_id = manager
+        .create_namespace(None)
+        .expect("Failed to create namespace");
+    let ns_arc = manager
+        .get_namespace(ns_id)
+        .expect("Failed to get namespace");
     let ns = ns_arc.lock().expect("Failed to lock namespace");
 
     let iface = NetworkInterface::new("eth0".to_string())
         .with_ip(IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)));
-    
+
     ns.add_interface(iface).expect("Failed to add interface");
 
     let retrieved = ns.get_interface("eth0").expect("Failed to get interface");
     let iface_lock = retrieved.lock().expect("Failed to lock interface");
-    
+
     if let Some(IpAddr::V4(ip)) = iface_lock.ip_addr {
         assert_eq!(ip, Ipv4Addr::new(192, 168, 1, 1));
     }
@@ -350,7 +420,9 @@ fn test_multiple_namespaces() {
 
     let mut ns_ids = Vec::new();
     for _ in 0..10 {
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
         ns_ids.push(ns_id);
     }
 
@@ -359,7 +431,9 @@ fn test_multiple_namespaces() {
 
     // Verify each namespace is independent
     for (i, ns_id) in ns_ids.iter().enumerate() {
-        let ns_arc = manager.get_namespace(*ns_id).expect("Failed to get namespace");
+        let ns_arc = manager
+            .get_namespace(*ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         ns.add_interface(NetworkInterface::new(format!("eth{}", i)))
@@ -367,7 +441,9 @@ fn test_multiple_namespaces() {
     }
 
     for (i, ns_id) in ns_ids.iter().enumerate() {
-        let ns_arc = manager.get_namespace(*ns_id).expect("Failed to get namespace");
+        let ns_arc = manager
+            .get_namespace(*ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         let ifaces = ns.list_interfaces().expect("Failed to list interfaces");
@@ -382,10 +458,14 @@ fn test_socket_error_cases() {
     let ns_id = NetworkNamespaceId::new(1);
 
     // Invalid domain
-    assert!(syscalls.sys_socket(999, SOCK_STREAM, IPPROTO_TCP, ns_id).is_err());
+    assert!(syscalls
+        .sys_socket(999, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        .is_err());
 
     // Invalid socket type
-    assert!(syscalls.sys_socket(AF_INET, 999, IPPROTO_TCP, ns_id).is_err());
+    assert!(syscalls
+        .sys_socket(AF_INET, 999, IPPROTO_TCP, ns_id)
+        .is_err());
 }
 
 #[test]
@@ -405,9 +485,11 @@ fn test_multiple_sockets_per_namespace() {
     let syscalls = NetworkSyscalls::new();
     let ns_id = NetworkNamespaceId::new(1);
 
-    let fd1 = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+    let fd1 = syscalls
+        .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
         .expect("Failed to create TCP socket");
-    let fd2 = syscalls.sys_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, ns_id)
+    let fd2 = syscalls
+        .sys_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, ns_id)
         .expect("Failed to create UDP socket");
 
     assert_ne!(fd1.raw(), fd2.raw());

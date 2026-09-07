@@ -9,10 +9,10 @@
 #![allow(clippy::type_complexity)]
 #![cfg_attr(target_os = "none", no_main)]
 
-use std::boxed::Box;
 use core::mem;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::boxed::Box;
 
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs

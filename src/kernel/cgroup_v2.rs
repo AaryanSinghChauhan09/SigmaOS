@@ -10,8 +10,8 @@
 // cgroups v2 Framework for SigmaOS (Fixed version using enum instead of trait objects)
 
 use std::collections::{HashMap, HashSet};
-use std::sync::{Arc, Mutex};
 use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
 
 /// cgroup identifier
 pub type CgroupId = u64;
@@ -176,71 +176,55 @@ impl Controller {
 
     pub fn set_limit(&mut self, key: &str, value: u64) -> Result<(), String> {
         match self {
-            Controller::Cpu(cpu) => {
-                match key {
-                    "cpu.max" => cpu.cpu_quota_us = value,
-                    "cpu.weight" => cpu.cpu_shares = value,
-                    "cpu.period_us" => cpu.cpu_period_us = value,
-                    _ => return Err(format!("Unknown CPU limit key: {}", key)),
-                }
-            }
-            Controller::Memory(mem) => {
-                match key {
-                    "memory.max" => mem.memory_limit = value,
-                    "memory.soft_limit_in_bytes" => mem.memory_soft_limit = value,
-                    "memory.high" => mem.memory_high = value,
-                    _ => return Err(format!("Unknown memory limit key: {}", key)),
-                }
-            }
-            Controller::Pids(pids) => {
-                match key {
-                    "pids.max" => pids.pids_max = value,
-                    _ => return Err(format!("Unknown pids limit key: {}", key)),
-                }
-            }
-            Controller::Io(io) => {
-                match key {
-                    "io.bandwidth" => io.io_bandwidth_limit = value,
-                    "io.iops" => io.io_iops_limit = value,
-                    _ => return Err(format!("Unknown io limit key: {}", key)),
-                }
-            }
+            Controller::Cpu(cpu) => match key {
+                "cpu.max" => cpu.cpu_quota_us = value,
+                "cpu.weight" => cpu.cpu_shares = value,
+                "cpu.period_us" => cpu.cpu_period_us = value,
+                _ => return Err(format!("Unknown CPU limit key: {}", key)),
+            },
+            Controller::Memory(mem) => match key {
+                "memory.max" => mem.memory_limit = value,
+                "memory.soft_limit_in_bytes" => mem.memory_soft_limit = value,
+                "memory.high" => mem.memory_high = value,
+                _ => return Err(format!("Unknown memory limit key: {}", key)),
+            },
+            Controller::Pids(pids) => match key {
+                "pids.max" => pids.pids_max = value,
+                _ => return Err(format!("Unknown pids limit key: {}", key)),
+            },
+            Controller::Io(io) => match key {
+                "io.bandwidth" => io.io_bandwidth_limit = value,
+                "io.iops" => io.io_iops_limit = value,
+                _ => return Err(format!("Unknown io limit key: {}", key)),
+            },
         }
         Ok(())
     }
 
     pub fn get_limit(&self, key: &str) -> Result<u64, String> {
         match self {
-            Controller::Cpu(cpu) => {
-                match key {
-                    "cpu.max" => Ok(cpu.cpu_quota_us),
-                    "cpu.weight" => Ok(cpu.cpu_shares),
-                    "cpu.period_us" => Ok(cpu.cpu_period_us),
-                    _ => Err(format!("Unknown CPU limit key: {}", key)),
-                }
-            }
-            Controller::Memory(mem) => {
-                match key {
-                    "memory.max" => Ok(mem.memory_limit),
-                    "memory.soft_limit_in_bytes" => Ok(mem.memory_soft_limit),
-                    "memory.high" => Ok(mem.memory_high),
-                    _ => Err(format!("Unknown memory limit key: {}", key)),
-                }
-            }
-            Controller::Pids(pids) => {
-                match key {
-                    "pids.max" => Ok(pids.pids_max),
-                    "pids.current" => Ok(pids.pids_current),
-                    _ => Err(format!("Unknown pids limit key: {}", key)),
-                }
-            }
-            Controller::Io(io) => {
-                match key {
-                    "io.bandwidth" => Ok(io.io_bandwidth_limit),
-                    "io.iops" => Ok(io.io_iops_limit),
-                    _ => Err(format!("Unknown io limit key: {}", key)),
-                }
-            }
+            Controller::Cpu(cpu) => match key {
+                "cpu.max" => Ok(cpu.cpu_quota_us),
+                "cpu.weight" => Ok(cpu.cpu_shares),
+                "cpu.period_us" => Ok(cpu.cpu_period_us),
+                _ => Err(format!("Unknown CPU limit key: {}", key)),
+            },
+            Controller::Memory(mem) => match key {
+                "memory.max" => Ok(mem.memory_limit),
+                "memory.soft_limit_in_bytes" => Ok(mem.memory_soft_limit),
+                "memory.high" => Ok(mem.memory_high),
+                _ => Err(format!("Unknown memory limit key: {}", key)),
+            },
+            Controller::Pids(pids) => match key {
+                "pids.max" => Ok(pids.pids_max),
+                "pids.current" => Ok(pids.pids_current),
+                _ => Err(format!("Unknown pids limit key: {}", key)),
+            },
+            Controller::Io(io) => match key {
+                "io.bandwidth" => Ok(io.io_bandwidth_limit),
+                "io.iops" => Ok(io.io_iops_limit),
+                _ => Err(format!("Unknown io limit key: {}", key)),
+            },
         }
     }
 }
@@ -400,7 +384,11 @@ impl CgroupHierarchy {
     }
 
     /// Create child cgroup
-    pub fn create_cgroup(&self, path: PathBuf, parent_id: Option<CgroupId>) -> Result<CgroupId, String> {
+    pub fn create_cgroup(
+        &self,
+        path: PathBuf,
+        parent_id: Option<CgroupId>,
+    ) -> Result<CgroupId, String> {
         let mut id_guard = self
             .next_id
             .lock()
@@ -466,7 +454,11 @@ impl CgroupHierarchy {
     }
 
     /// Add process to cgroup
-    pub fn add_process_to_cgroup(&self, cgroup_id: CgroupId, process_id: u32) -> Result<(), String> {
+    pub fn add_process_to_cgroup(
+        &self,
+        cgroup_id: CgroupId,
+        process_id: u32,
+    ) -> Result<(), String> {
         let cgroups = self
             .cgroups
             .lock()
@@ -484,7 +476,11 @@ impl CgroupHierarchy {
     }
 
     /// Remove process from cgroup
-    pub fn remove_process_from_cgroup(&self, cgroup_id: CgroupId, process_id: u32) -> Result<(), String> {
+    pub fn remove_process_from_cgroup(
+        &self,
+        cgroup_id: CgroupId,
+        process_id: u32,
+    ) -> Result<(), String> {
         let cgroups = self
             .cgroups
             .lock()
@@ -502,7 +498,11 @@ impl CgroupHierarchy {
     }
 
     /// Register controller in cgroup
-    pub fn register_controller(&self, cgroup_id: CgroupId, controller: Controller) -> Result<(), String> {
+    pub fn register_controller(
+        &self,
+        cgroup_id: CgroupId,
+        controller: Controller,
+    ) -> Result<(), String> {
         let cgroups = self
             .cgroups
             .lock()

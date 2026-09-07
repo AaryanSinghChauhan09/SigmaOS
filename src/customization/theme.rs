@@ -17,7 +17,6 @@
 // OOP-based declarative theming with light/dark/auto modes
 // Enhanced with Material-You style dynamic color palettes and workspace density profiling
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};

@@ -1809,7 +1809,7 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -2095,17 +2095,53 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "-S" | "-Sy" => operation = UniversalPmOperation::Install,
-                        "-R" | "-Rns" => operation = UniversalPmOperation::Remove,
-                        "-Syu" | "-Syyu" => operation = UniversalPmOperation::Upgrade,
+                        "-S" | "-Sy" | "-Syu" => operation = UniversalPmOperation::Install,
+                        "-R" | "-Rns" | "-Rs" => operation = UniversalPmOperation::Remove,
+                        "-Syyu" => operation = UniversalPmOperation::Upgrade,
                         "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
                         "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
                         "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
-                        "--print" | "--dryrun" => dry_run = true,
+                        "--print" | "--dryrun" | "--noconfirm" => {
+                            if args[i] == "--print" || args[i] == "--dryrun" {
+                                dry_run = true;
+                            }
+                        }
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pkg_add" | "pkg_delete" | "pkg_info" => {
+                if pm == "pkg_delete" {
+                    operation = UniversalPmOperation::Remove;
+                } else if pm == "pkg_info" {
+                    operation = UniversalPmOperation::QueryInfo;
+                } else {
+                    operation = UniversalPmOperation::Install;
+                }
+                for arg in args {
+                    if *arg == "-n" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
+            "microdnf" | "rpm" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "in" | "-i" | "-U" => operation = UniversalPmOperation::Install,
+                        "remove" | "erase" | "-e" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "-q" | "-qa" => operation = UniversalPmOperation::Search,
+                        "info" | "-qi" => operation = UniversalPmOperation::QueryInfo,
+                        "--dry-run" | "--test" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }

@@ -11,9 +11,9 @@
 // SigmaOS EXT4 Filesystem Mount System
 // Supports mounting and managing ext4 filesystems
 
-use std::vec::Vec;
-use std::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
+use std::string::String;
+use std::vec::Vec;
 
 // ============================================================================
 // EXT4 Constants
@@ -309,7 +309,11 @@ impl Ext4FilesystemManager {
     }
 
     pub fn unmount(&mut self, mount_point: &str) -> Result<(), &'static str> {
-        if let Some(pos) = self.mounts.iter().position(|m| m.mount_point == mount_point) {
+        if let Some(pos) = self
+            .mounts
+            .iter()
+            .position(|m| m.mount_point == mount_point)
+        {
             let mount = &self.mounts[pos];
 
             if mount.is_dirty {
@@ -369,7 +373,12 @@ impl Ext4FilesystemManager {
         self.create_inode(parent_inode, dirname, EXT4_INODE_TYPE_DIRECTORY)
     }
 
-    pub fn read_file(&self, inode_num: u32, _offset: u32, size: u32) -> Result<Vec<u8>, &'static str> {
+    pub fn read_file(
+        &self,
+        inode_num: u32,
+        _offset: u32,
+        size: u32,
+    ) -> Result<Vec<u8>, &'static str> {
         if let Some(inode) = self.inodes.iter().find(|i| i.inode_number == inode_num) {
             if !inode.is_regular_file() {
                 return Err("Not a regular file");

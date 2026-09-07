@@ -7,11 +7,11 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-use std::vec::Vec;
 /// Next-Generation AI-Native and Energy-Aware Subsystems for SigmaOS
 /// Replicates adaptive personas, predictive syscall pre-fetching,
 /// AI scheduling, and local multi-model orchestrations.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 // ==========================================
 // 1. Adaptive Kernel Personas

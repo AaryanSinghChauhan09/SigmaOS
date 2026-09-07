@@ -46,8 +46,8 @@ pub struct SysctlRule {
 #[derive(Debug, Clone)]
 pub struct DoasRule {
     pub permit: bool,
-    pub identity: String,  // e.g. "wheel" or "alice"
-    pub target_user: String, // e.g. "root"
+    pub identity: String,        // e.g. "wheel" or "alice"
+    pub target_user: String,     // e.g. "root"
     pub command: Option<String>, // None matches all commands
     pub nopass: bool,
     pub setenv: Vec<String>,
@@ -87,9 +87,21 @@ impl SovereignSystemPolicyRuleEngine {
         );
 
         // Sysctl hardening: 99-sovereign-security.conf
-        self.set_sysctl("kernel.randomize_va_space", "2", "/etc/sysctl.d/99-sovereign-security.conf");
-        self.set_sysctl("net.ipv4.conf.all.rp_filter", "1", "/etc/sysctl.d/99-sovereign-security.conf");
-        self.set_sysctl("fs.protected_symlinks", "1", "/etc/sysctl.d/99-sovereign-security.conf");
+        self.set_sysctl(
+            "kernel.randomize_va_space",
+            "2",
+            "/etc/sysctl.d/99-sovereign-security.conf",
+        );
+        self.set_sysctl(
+            "net.ipv4.conf.all.rp_filter",
+            "1",
+            "/etc/sysctl.d/99-sovereign-security.conf",
+        );
+        self.set_sysctl(
+            "fs.protected_symlinks",
+            "1",
+            "/etc/sysctl.d/99-sovereign-security.conf",
+        );
 
         // doas.conf: permit nopass :wheel as root
         self.doas_rules.push(DoasRule {
@@ -169,7 +181,11 @@ mod tests {
     fn test_sysctl_policy_and_doas() {
         let mut engine = SovereignSystemPolicyRuleEngine::new();
         assert_eq!(
-            engine.sysctl_parameters.get("kernel.randomize_va_space").unwrap().value,
+            engine
+                .sysctl_parameters
+                .get("kernel.randomize_va_space")
+                .unwrap()
+                .value,
             "2"
         );
 

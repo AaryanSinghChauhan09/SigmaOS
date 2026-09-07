@@ -1718,13 +1718,20 @@ impl FedoraSilverblueRpmOstreeEngine {
         }
     }
 
-    pub fn rebase_stream(&mut self, new_stream: &str, target_commit: &str) -> Result<String, &'static str> {
+    pub fn rebase_stream(
+        &mut self,
+        new_stream: &str,
+        target_commit: &str,
+    ) -> Result<String, &'static str> {
         if new_stream.is_empty() || target_commit.is_empty() {
             return Err("Stream and target commit cannot be empty");
         }
         self.current_stream = new_stream.to_string();
         self.stage_upgrade(target_commit);
-        Ok(format!("Rebased to stream '{}' at commit '{}'", new_stream, target_commit))
+        Ok(format!(
+            "Rebased to stream '{}' at commit '{}'",
+            new_stream, target_commit
+        ))
     }
 
     pub fn overlay_layer_package(&mut self, pkg: &str) {
@@ -1861,14 +1868,16 @@ impl FedoraKeyringPamModule {
         // Security: Never use hardcoded credentials in production.
         // Authentication must be verified against a secure credential store (PAM, SSSD, etc.)
         // This implementation uses a constant-time comparison against the configured credential.
-        let expected = std::env::var("SIGMA_PAM_TEST_SECRET")
-            .unwrap_or_else(|_| String::new());
+        let expected = std::env::var("SIGMA_PAM_TEST_SECRET").unwrap_or_else(|_| String::new());
         // Constant-time comparison to prevent timing attacks
         let pass_bytes = pass.as_bytes();
         let expected_bytes = expected.as_bytes();
         let matches = if pass_bytes.len() == expected_bytes.len() && !expected.is_empty() {
-            pass_bytes.iter().zip(expected_bytes.iter())
-                .fold(0u8, |acc, (a, b)| acc | (a ^ b)) == 0
+            pass_bytes
+                .iter()
+                .zip(expected_bytes.iter())
+                .fold(0u8, |acc, (a, b)| acc | (a ^ b))
+                == 0
         } else {
             false
         };
@@ -2829,10 +2838,18 @@ pub struct FedoraFasjsonClientEngine {
 
 impl FedoraFasjsonClientEngine {
     pub fn new() -> Self {
-        FedoraFasjsonClientEngine { user_db: HashMap::new() }
+        FedoraFasjsonClientEngine {
+            user_db: HashMap::new(),
+        }
     }
 
-    pub fn register_user(&mut self, username: &str, human_name: &str, email: &str, groups: &[&str]) {
+    pub fn register_user(
+        &mut self,
+        username: &str,
+        human_name: &str,
+        email: &str,
+        groups: &[&str],
+    ) {
         self.user_db.insert(
             username.to_string(),
             FasjsonUserRecord {
@@ -2888,7 +2905,13 @@ impl FedoraTahrirIdentityApiEngine {
         format!("{:016x}", hash)
     }
 
-    pub fn register_user_avatar(&mut self, user_id: &str, email: &str, avatar_data: &[u8], mime: &str) -> String {
+    pub fn register_user_avatar(
+        &mut self,
+        user_id: &str,
+        email: &str,
+        avatar_data: &[u8],
+        mime: &str,
+    ) -> String {
         let email_hash = Self::calculate_email_hash(email);
         self.user_avatars.retain(|a| a.user_id != user_id);
         self.user_avatars.push(TahrirUserAvatar {
@@ -2901,10 +2924,18 @@ impl FedoraTahrirIdentityApiEngine {
     }
 
     pub fn resolve_avatar_by_hash(&self, email_hash: &str) -> Option<&TahrirUserAvatar> {
-        self.user_avatars.iter().find(|a| a.email_sha256 == email_hash)
+        self.user_avatars
+            .iter()
+            .find(|a| a.email_sha256 == email_hash)
     }
 
-    pub fn issue_badge_assertion(&mut self, badge_id: &str, recipient_email: &str, issuer: &str, timestamp: u64) -> TahrirBadgeAssertion {
+    pub fn issue_badge_assertion(
+        &mut self,
+        badge_id: &str,
+        recipient_email: &str,
+        issuer: &str,
+        timestamp: u64,
+    ) -> TahrirBadgeAssertion {
         let recipient_hash = Self::calculate_email_hash(recipient_email);
         let digest = format!("{}:{}:{}:{}", badge_id, recipient_hash, issuer, timestamp);
         let assertion = TahrirBadgeAssertion {
@@ -2920,7 +2951,9 @@ impl FedoraTahrirIdentityApiEngine {
     }
 
     pub fn verify_badge_assertion(&self, assertion: &TahrirBadgeAssertion) -> bool {
-        self.issued_badges.iter().any(|b| b.assertion_digest == assertion.assertion_digest)
+        self.issued_badges
+            .iter()
+            .any(|b| b.assertion_digest == assertion.assertion_digest)
     }
 }
 
@@ -2956,8 +2989,10 @@ impl FedoraFmnMessagingEngine {
         let mut dispatched_count = 0;
 
         for rule in &self.filter_rules {
-            let pkg_match = rule.package_pattern == "*" || rule.package_pattern == event.package_name;
-            let topic_match = rule.topic_pattern == "*" || event.topic.contains(&rule.topic_pattern);
+            let pkg_match =
+                rule.package_pattern == "*" || rule.package_pattern == event.package_name;
+            let topic_match =
+                rule.topic_pattern == "*" || event.topic.contains(&rule.topic_pattern);
             let severity_match = event.severity >= rule.min_severity;
 
             if pkg_match && topic_match && severity_match {
@@ -5248,14 +5283,21 @@ mod tests {
     fn test_fedora_planet_and_infrastructures() {
         // 1. Planet Aggregator
         let mut planet = FedoraPlanetAggregationEngine::new();
-        planet.fetch_and_parse_feed("Matthew Miller", "Fedora 40 Release Update", "https://mattdm.org/f40", 1700000000);
+        planet.fetch_and_parse_feed(
+            "Matthew Miller",
+            "Fedora 40 Release Update",
+            "https://mattdm.org/f40",
+            1700000000,
+        );
         assert_eq!(planet.posts.len(), 1);
         assert_eq!(planet.get_latest_posts(1)[0].author_name, "Matthew Miller");
 
         // 2. The New Hotness (Anitya)
         let mut hotness = FedoraTheNewHotnessEngine::new();
         hotness.register_upstream_project("python-requests", "https://requests.readthedocs.io");
-        let trigger_res = hotness.process_upstream_release_event("python-requests", "2.32.0").unwrap();
+        let trigger_res = hotness
+            .process_upstream_release_event("python-requests", "2.32.0")
+            .unwrap();
         assert!(trigger_res.contains("python-requests version 2.32.0"));
         assert!(hotness.monitored_projects[0].is_triggering_scratch_build);
 
@@ -5270,13 +5312,24 @@ mod tests {
 
         // 4. Status FPO Engine
         let mut status = FedoraStatusFpoEngine::new();
-        assert_eq!(status.query_service_health("koji"), FedoraServiceStatusState::Good);
+        assert_eq!(
+            status.query_service_health("koji"),
+            FedoraServiceStatusState::Good
+        );
         status.set_service_status("bodhi", FedoraServiceStatusState::MinorOutage);
-        assert_eq!(status.query_service_health("bodhi"), FedoraServiceStatusState::MinorOutage);
+        assert_eq!(
+            status.query_service_health("bodhi"),
+            FedoraServiceStatusState::MinorOutage
+        );
 
         // 5. FASJSON Client Engine
         let mut fasjson = FedoraFasjsonClientEngine::new();
-        fasjson.register_user("alice", "Alice Developer", "alice@fedoraproject.org", &["packager", "sysadmin-main"]);
+        fasjson.register_user(
+            "alice",
+            "Alice Developer",
+            "alice@fedoraproject.org",
+            &["packager", "sysadmin-main"],
+        );
         let user = fasjson.get_user_info("alice").unwrap();
         assert_eq!(user.human_name, "Alice Developer");
         assert!(fasjson.is_user_in_group("alice", "packager"));
@@ -5373,7 +5426,10 @@ mod tests {
         });
         assert_eq!(count2, 1);
         assert_eq!(fmn.dispatched_notifications_log[0].0, "alice@fedora");
-        assert_eq!(fmn.dispatched_notifications_log[0].1, FmnNotificationTransport::Matrix);
+        assert_eq!(
+            fmn.dispatched_notifications_log[0].1,
+            FmnNotificationTransport::Matrix
+        );
 
         // Event 3: Critical security update for openssl -> Bob matches!
         let count3 = fmn.publish_event(FmnMessageEvent {
@@ -5386,7 +5442,10 @@ mod tests {
         });
         assert_eq!(count3, 1);
         assert_eq!(fmn.dispatched_notifications_log[1].0, "bob@fedora");
-        assert_eq!(fmn.dispatched_notifications_log[1].1, FmnNotificationTransport::Email);
+        assert_eq!(
+            fmn.dispatched_notifications_log[1].1,
+            FmnNotificationTransport::Email
+        );
     }
 
     #[test]
@@ -5608,7 +5667,10 @@ mod tests {
             "gnome-shell",
             11,
             "SIGSEGV in st_widget_get_theme_node()",
-            &["#0 0x00007f1234 in st_widget_get_theme_node ()", "#1 0x00007f5678 in main ()"],
+            &[
+                "#0 0x00007f1234 in st_widget_get_theme_node ()",
+                "#1 0x00007f5678 in main ()",
+            ],
         );
 
         assert_eq!(report_id, 1);
@@ -5618,7 +5680,12 @@ mod tests {
     #[test]
     fn test_fedora_toolbx_container() {
         let mut toolbx = FedoraToolbxContainerEngine::new();
-        let container_name = toolbx.create_toolbx("fedora-toolbox-39", "registry.fedoraproject.org/fedora-toolbox:39").unwrap();
+        let container_name = toolbx
+            .create_toolbx(
+                "fedora-toolbox-39",
+                "registry.fedoraproject.org/fedora-toolbox:39",
+            )
+            .unwrap();
         assert_eq!(container_name, "fedora-toolbox-39");
 
         let container = engine.create_toolbx(

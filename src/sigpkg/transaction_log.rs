@@ -7,11 +7,11 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-use std::format;
 /// Transaction Log System (Debian APT dpkg inspiration)
 /// Provides atomic transactions and rollback capabilities
 use crate::klib::Vec;
 use crate::sigpkg::Package;
+use std::format;
 use std::string::{String, ToString};
 
 /// Transaction entry type

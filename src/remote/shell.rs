@@ -9,11 +9,11 @@
 #![allow(clippy::type_complexity)]
 use std::boxed::Box;
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Remote Shell for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 966
 /// Implements remote shell access
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ShellID = usize;
 

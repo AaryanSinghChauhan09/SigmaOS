@@ -17,9 +17,9 @@ use std::format;
 // 5. Hopping Philosophy Guides & Migration Tutorials (Arch, Ubuntu, Fedora)
 // 6. WASM Runtime & Unikernel Execution Scheduler
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. CUSTOMIZABILITY LAYER

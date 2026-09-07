@@ -38,34 +38,34 @@
 #![allow(unused_variables)]
 
 use std::collections::HashMap;
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 // ── Syscall Numbers (representative subset) ──────────────────────────────────
 
 /// Commonly filtered syscall numbers (x86-64 ABI).
 pub mod syscalls {
-    pub const SYS_READ: u64          = 0;
-    pub const SYS_WRITE: u64         = 1;
-    pub const SYS_OPEN: u64          = 2;
-    pub const SYS_CLOSE: u64         = 3;
-    pub const SYS_STAT: u64          = 4;
-    pub const SYS_MMAP: u64          = 9;
-    pub const SYS_MPROTECT: u64      = 10;
-    pub const SYS_MUNMAP: u64        = 11;
-    pub const SYS_BRK: u64           = 12;
-    pub const SYS_IOCTL: u64         = 16;
-    pub const SYS_SOCKET: u64        = 41;
-    pub const SYS_CONNECT: u64       = 42;
-    pub const SYS_ACCEPT: u64        = 43;
-    pub const SYS_BIND: u64          = 49;
-    pub const SYS_LISTEN: u64        = 50;
-    pub const SYS_FORK: u64          = 57;
-    pub const SYS_EXECVE: u64        = 59;
-    pub const SYS_EXIT: u64          = 60;
-    pub const SYS_KILL: u64          = 62;
-    pub const SYS_PTRACE: u64        = 101;
-    pub const SYS_PRCTL: u64         = 157;
+    pub const SYS_READ: u64 = 0;
+    pub const SYS_WRITE: u64 = 1;
+    pub const SYS_OPEN: u64 = 2;
+    pub const SYS_CLOSE: u64 = 3;
+    pub const SYS_STAT: u64 = 4;
+    pub const SYS_MMAP: u64 = 9;
+    pub const SYS_MPROTECT: u64 = 10;
+    pub const SYS_MUNMAP: u64 = 11;
+    pub const SYS_BRK: u64 = 12;
+    pub const SYS_IOCTL: u64 = 16;
+    pub const SYS_SOCKET: u64 = 41;
+    pub const SYS_CONNECT: u64 = 42;
+    pub const SYS_ACCEPT: u64 = 43;
+    pub const SYS_BIND: u64 = 49;
+    pub const SYS_LISTEN: u64 = 50;
+    pub const SYS_FORK: u64 = 57;
+    pub const SYS_EXECVE: u64 = 59;
+    pub const SYS_EXIT: u64 = 60;
+    pub const SYS_KILL: u64 = 62;
+    pub const SYS_PTRACE: u64 = 101;
+    pub const SYS_PRCTL: u64 = 157;
 }
 
 // ── SeccompAction ─────────────────────────────────────────────────────────────
@@ -115,7 +115,11 @@ pub enum ArgComparator {
     /// `arg[index] >= value`
     GreaterEqual { index: ArgIndex, value: u64 },
     /// `arg[index] & mask == mask` (all bits set)
-    MaskedEqual { index: ArgIndex, mask: u64, value: u64 },
+    MaskedEqual {
+        index: ArgIndex,
+        mask: u64,
+        value: u64,
+    },
 }
 
 impl ArgComparator {
@@ -220,25 +224,29 @@ impl SeccompFilter {
 
     /// Add an unconditional allow rule for `syscall_nr`.
     pub fn allow(mut self, syscall_nr: u64) -> Self {
-        self.rules.push(SeccompRule::new(syscall_nr, SeccompAction::Allow));
+        self.rules
+            .push(SeccompRule::new(syscall_nr, SeccompAction::Allow));
         self
     }
 
     /// Add an unconditional deny (kill) rule.
     pub fn deny(mut self, syscall_nr: u64) -> Self {
-        self.rules.push(SeccompRule::new(syscall_nr, SeccompAction::Kill));
+        self.rules
+            .push(SeccompRule::new(syscall_nr, SeccompAction::Kill));
         self
     }
 
     /// Add an unconditional log-and-allow rule.
     pub fn log(mut self, syscall_nr: u64) -> Self {
-        self.rules.push(SeccompRule::new(syscall_nr, SeccompAction::Log));
+        self.rules
+            .push(SeccompRule::new(syscall_nr, SeccompAction::Log));
         self
     }
 
     /// Add an errno rule.
     pub fn errno(mut self, syscall_nr: u64, errno: i32) -> Self {
-        self.rules.push(SeccompRule::new(syscall_nr, SeccompAction::Errno(errno)));
+        self.rules
+            .push(SeccompRule::new(syscall_nr, SeccompAction::Errno(errno)));
         self
     }
 
@@ -391,17 +399,35 @@ pub struct PledgePolicy {
 
 impl PledgePolicy {
     /// Allow stdio syscalls (read, write, close, …).
-    pub fn stdio(mut self) -> Self { self.allow_stdio = true; self }
+    pub fn stdio(mut self) -> Self {
+        self.allow_stdio = true;
+        self
+    }
     /// Allow networking syscalls (socket, connect, …).
-    pub fn network(mut self) -> Self { self.allow_network = true; self }
+    pub fn network(mut self) -> Self {
+        self.allow_network = true;
+        self
+    }
     /// Allow exec syscalls.
-    pub fn exec(mut self) -> Self { self.allow_exec = true; self }
+    pub fn exec(mut self) -> Self {
+        self.allow_exec = true;
+        self
+    }
     /// Allow file-read syscalls.
-    pub fn file_read(mut self) -> Self { self.allow_file_read = true; self }
+    pub fn file_read(mut self) -> Self {
+        self.allow_file_read = true;
+        self
+    }
     /// Allow file-write syscalls.
-    pub fn file_write(mut self) -> Self { self.allow_file_write = true; self }
+    pub fn file_write(mut self) -> Self {
+        self.allow_file_write = true;
+        self
+    }
     /// Allow process-control syscalls (fork, kill, …).
-    pub fn proc(mut self) -> Self { self.allow_proc = true; self }
+    pub fn proc(mut self) -> Self {
+        self.allow_proc = true;
+        self
+    }
 
     /// Build a [`SeccompFilter`] from this policy.
     pub fn build(self, name: impl Into<String>) -> SeccompFilter {
@@ -409,7 +435,11 @@ impl PledgePolicy {
         let mut f = SeccompFilter::new(name).with_default(SeccompAction::Kill);
 
         if self.allow_stdio {
-            f = f.allow(SYS_READ).allow(SYS_WRITE).allow(SYS_CLOSE).allow(SYS_EXIT);
+            f = f
+                .allow(SYS_READ)
+                .allow(SYS_WRITE)
+                .allow(SYS_CLOSE)
+                .allow(SYS_EXIT);
         }
         if self.allow_file_read {
             f = f.allow(SYS_OPEN).allow(SYS_STAT);
@@ -418,8 +448,12 @@ impl PledgePolicy {
             f = f.allow(SYS_OPEN);
         }
         if self.allow_network {
-            f = f.allow(SYS_SOCKET).allow(SYS_CONNECT).allow(SYS_BIND)
-                  .allow(SYS_LISTEN).allow(SYS_ACCEPT);
+            f = f
+                .allow(SYS_SOCKET)
+                .allow(SYS_CONNECT)
+                .allow(SYS_BIND)
+                .allow(SYS_LISTEN)
+                .allow(SYS_ACCEPT);
         }
         if self.allow_exec {
             f = f.allow(SYS_EXECVE);
@@ -435,8 +469,8 @@ impl PledgePolicy {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::syscalls::*;
+    use super::*;
 
     #[test]
     fn test_filter_allow() {
@@ -463,7 +497,11 @@ mod tests {
 
     #[test]
     fn test_comparator_masked_equal() {
-        let cmp = ArgComparator::MaskedEqual { index: 0, mask: 0xFF, value: 0x02 };
+        let cmp = ArgComparator::MaskedEqual {
+            index: 0,
+            mask: 0xFF,
+            value: 0x02,
+        };
         let mut args = [0u64; 6];
         args[0] = 0x1002; // 0x1002 & 0xFF = 0x02
         assert!(cmp.matches(&args));
@@ -473,9 +511,7 @@ mod tests {
     fn test_engine_most_restrictive() {
         let mut engine = FilterEngine::new();
         // First filter: allow everything.
-        engine.install_filter(
-            SeccompFilter::new("allow-all").with_default(SeccompAction::Allow),
-        );
+        engine.install_filter(SeccompFilter::new("allow-all").with_default(SeccompAction::Allow));
         // Second filter: kill socket.
         engine.install_filter(
             SeccompFilter::new("no-socket")

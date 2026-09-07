@@ -33,21 +33,21 @@ use alloc::vec::Vec;
 #[repr(u8)]
 pub enum Signal {
     /// Hangup (terminal disconnect)
-    SIGHUP  = 1,
+    SIGHUP = 1,
     /// Interrupt (Ctrl+C)
-    SIGINT  = 2,
+    SIGINT = 2,
     /// Quit (core dump)
     SIGQUIT = 3,
     /// Illegal instruction
-    SIGILL  = 4,
+    SIGILL = 4,
     /// Trap (debug breakpoint)
     SIGTRAP = 5,
     /// Abort
     SIGABRT = 6,
     /// Bus error (misaligned access)
-    SIGBUS  = 7,
+    SIGBUS = 7,
     /// Floating-point exception
-    SIGFPE  = 8,
+    SIGFPE = 8,
     /// Kill (cannot be caught or ignored)
     SIGKILL = 9,
     /// User-defined signal 1
@@ -77,7 +77,7 @@ pub enum Signal {
     /// Terminal output from background process
     SIGTTOU = 22,
     /// Urgent I/O condition
-    SIGURG  = 23,
+    SIGURG = 23,
     /// CPU time limit exceeded
     SIGXCPU = 24,
     /// File size limit exceeded
@@ -89,31 +89,44 @@ pub enum Signal {
     /// Window resize
     SIGWINCH = 28,
     /// I/O possible
-    SIGIO   = 29,
+    SIGIO = 29,
     /// Power failure
-    SIGPWR  = 30,
+    SIGPWR = 30,
     /// Bad system call
-    SIGSYS  = 31,
+    SIGSYS = 31,
 }
 
 impl Signal {
     /// Returns the signal number (1-31).
-    pub fn number(self) -> u8 { self as u8 }
+    pub fn number(self) -> u8 {
+        self as u8
+    }
 
     /// Returns the signal name as a string.
     pub fn name(self) -> &'static str {
         match self {
-            Self::SIGHUP => "SIGHUP", Self::SIGINT => "SIGINT",
-            Self::SIGQUIT => "SIGQUIT", Self::SIGILL => "SIGILL",
-            Self::SIGTRAP => "SIGTRAP", Self::SIGABRT => "SIGABRT",
-            Self::SIGBUS => "SIGBUS", Self::SIGFPE => "SIGFPE",
-            Self::SIGKILL => "SIGKILL", Self::SIGUSR1 => "SIGUSR1",
-            Self::SIGSEGV => "SIGSEGV", Self::SIGUSR2 => "SIGUSR2",
-            Self::SIGPIPE => "SIGPIPE", Self::SIGALRM => "SIGALRM",
-            Self::SIGTERM => "SIGTERM", Self::SIGCHLD => "SIGCHLD",
-            Self::SIGCONT => "SIGCONT", Self::SIGSTOP => "SIGSTOP",
-            Self::SIGTSTP => "SIGTSTP", Self::SIGIO => "SIGIO",
-            Self::SIGWINCH => "SIGWINCH", Self::SIGSYS => "SIGSYS",
+            Self::SIGHUP => "SIGHUP",
+            Self::SIGINT => "SIGINT",
+            Self::SIGQUIT => "SIGQUIT",
+            Self::SIGILL => "SIGILL",
+            Self::SIGTRAP => "SIGTRAP",
+            Self::SIGABRT => "SIGABRT",
+            Self::SIGBUS => "SIGBUS",
+            Self::SIGFPE => "SIGFPE",
+            Self::SIGKILL => "SIGKILL",
+            Self::SIGUSR1 => "SIGUSR1",
+            Self::SIGSEGV => "SIGSEGV",
+            Self::SIGUSR2 => "SIGUSR2",
+            Self::SIGPIPE => "SIGPIPE",
+            Self::SIGALRM => "SIGALRM",
+            Self::SIGTERM => "SIGTERM",
+            Self::SIGCHLD => "SIGCHLD",
+            Self::SIGCONT => "SIGCONT",
+            Self::SIGSTOP => "SIGSTOP",
+            Self::SIGTSTP => "SIGTSTP",
+            Self::SIGIO => "SIGIO",
+            Self::SIGWINCH => "SIGWINCH",
+            Self::SIGSYS => "SIGSYS",
             _ => "SIGUNKNOWN",
         }
     }
@@ -127,11 +140,20 @@ impl Signal {
     pub fn default_action(self) -> SignalDisposition {
         match self {
             Self::SIGCHLD | Self::SIGURG | Self::SIGWINCH => SignalDisposition::Ignore,
-            Self::SIGSTOP | Self::SIGTSTP | Self::SIGTTIN | Self::SIGTTOU => SignalDisposition::Stop,
+            Self::SIGSTOP | Self::SIGTSTP | Self::SIGTTIN | Self::SIGTTOU => {
+                SignalDisposition::Stop
+            }
             Self::SIGCONT => SignalDisposition::Continue,
-            Self::SIGABRT | Self::SIGBUS | Self::SIGFPE | Self::SIGILL |
-            Self::SIGQUIT | Self::SIGSEGV | Self::SIGSYS | Self::SIGTRAP |
-            Self::SIGXCPU | Self::SIGXFSZ => SignalDisposition::CoreDump,
+            Self::SIGABRT
+            | Self::SIGBUS
+            | Self::SIGFPE
+            | Self::SIGILL
+            | Self::SIGQUIT
+            | Self::SIGSEGV
+            | Self::SIGSYS
+            | Self::SIGTRAP
+            | Self::SIGXCPU
+            | Self::SIGXFSZ => SignalDisposition::CoreDump,
             _ => SignalDisposition::Terminate,
         }
     }
@@ -195,16 +217,32 @@ impl Default for SigAction {
 pub struct SigSet(u64);
 
 impl SigSet {
-    pub fn empty() -> Self { Self(0) }
-    pub fn full() -> Self { Self(u64::MAX) }
+    pub fn empty() -> Self {
+        Self(0)
+    }
+    pub fn full() -> Self {
+        Self(u64::MAX)
+    }
 
-    pub fn add(&mut self, sig: Signal) { self.0 |= 1u64 << (sig.number() - 1); }
-    pub fn remove(&mut self, sig: Signal) { self.0 &= !(1u64 << (sig.number() - 1)); }
-    pub fn contains(&self, sig: Signal) -> bool { (self.0 >> (sig.number() - 1)) & 1 == 1 }
-    pub fn is_empty(&self) -> bool { self.0 == 0 }
+    pub fn add(&mut self, sig: Signal) {
+        self.0 |= 1u64 << (sig.number() - 1);
+    }
+    pub fn remove(&mut self, sig: Signal) {
+        self.0 &= !(1u64 << (sig.number() - 1));
+    }
+    pub fn contains(&self, sig: Signal) -> bool {
+        (self.0 >> (sig.number() - 1)) & 1 == 1
+    }
+    pub fn is_empty(&self) -> bool {
+        self.0 == 0
+    }
 
-    pub fn union(self, other: Self) -> Self { Self(self.0 | other.0) }
-    pub fn intersection(self, other: Self) -> Self { Self(self.0 & other.0) }
+    pub fn union(self, other: Self) -> Self {
+        Self(self.0 | other.0)
+    }
+    pub fn intersection(self, other: Self) -> Self {
+        Self(self.0 & other.0)
+    }
 }
 
 // ============================================================
@@ -216,19 +254,27 @@ impl SigSet {
 pub struct SigActionFlags(u32);
 
 impl SigActionFlags {
-    pub fn empty() -> Self { Self(0) }
+    pub fn empty() -> Self {
+        Self(0)
+    }
     /// Restart syscall interrupted by signal
-    pub const SA_RESTART:  u32 = 0x10000000;
+    pub const SA_RESTART: u32 = 0x10000000;
     /// Provide siginfo_t to handler
-    pub const SA_SIGINFO:  u32 = 0x00000004;
+    pub const SA_SIGINFO: u32 = 0x00000004;
     /// Clear handler after delivery (one-shot)
     pub const SA_RESETHAND: u32 = 0x80000000;
     /// Don't generate SIGCHLD when child stops
     pub const SA_NOCLDSTOP: u32 = 0x00000001;
 
-    pub fn has_restart(&self) -> bool { (self.0 & Self::SA_RESTART) != 0 }
-    pub fn has_siginfo(&self) -> bool { (self.0 & Self::SA_SIGINFO) != 0 }
-    pub fn has_resethand(&self) -> bool { (self.0 & Self::SA_RESETHAND) != 0 }
+    pub fn has_restart(&self) -> bool {
+        (self.0 & Self::SA_RESTART) != 0
+    }
+    pub fn has_siginfo(&self) -> bool {
+        (self.0 & Self::SA_SIGINFO) != 0
+    }
+    pub fn has_resethand(&self) -> bool {
+        (self.0 & Self::SA_RESETHAND) != 0
+    }
 }
 
 // ============================================================
@@ -286,7 +332,9 @@ impl SigmaSignalState {
 
     /// Install a new signal action (sigaction).
     pub fn sigaction(&mut self, sig: Signal, action: SigAction) -> Result<SigAction, &'static str> {
-        if sig.is_unblockable() { return Err("SIGKILL and SIGSTOP cannot be caught"); }
+        if sig.is_unblockable() {
+            return Err("SIGKILL and SIGSTOP cannot be caught");
+        }
         let old = self.actions[sig.number() as usize].clone();
         self.actions[sig.number() as usize] = action;
         Ok(old)
@@ -320,13 +368,20 @@ impl SigmaSignalState {
     /// Send a signal to this process.
     pub fn send_signal(&mut self, sig: Signal, sender_pid: u32) {
         // Drop signal if blocked and not RT signal
-        if self.blocked.contains(sig) && !sig.is_unblockable() { return; }
+        if self.blocked.contains(sig) && !sig.is_unblockable() {
+            return;
+        }
 
         // Don't queue duplicate non-RT signals
-        if self.pending.iter().any(|p| p.signal == sig) { return; }
+        if self.pending.iter().any(|p| p.signal == sig) {
+            return;
+        }
 
         self.pending.push_back(PendingSignal {
-            signal: sig, sender_pid, si_code: 0, si_addr: 0,
+            signal: sig,
+            sender_pid,
+            si_code: 0,
+            si_addr: 0,
         });
     }
 
@@ -334,9 +389,10 @@ impl SigmaSignalState {
     ///
     /// Returns None if no unblocked signal is pending.
     pub fn dequeue_signal(&mut self) -> Option<PendingSignal> {
-        let pos = self.pending.iter().position(|p| {
-            !self.blocked.contains(p.signal) || p.signal.is_unblockable()
-        })?;
+        let pos = self
+            .pending
+            .iter()
+            .position(|p| !self.blocked.contains(p.signal) || p.signal.is_unblockable())?;
         self.pending.remove(pos)
     }
 
@@ -357,8 +413,12 @@ impl SigmaSignalState {
                         SignalDisposition::Terminate | SignalDisposition::CoreDump => {
                             self.exit_code = Some(sig.number());
                         }
-                        SignalDisposition::Stop => { self.is_stopped = true; }
-                        SignalDisposition::Continue => { self.is_stopped = false; }
+                        SignalDisposition::Stop => {
+                            self.is_stopped = true;
+                        }
+                        SignalDisposition::Continue => {
+                            self.is_stopped = false;
+                        }
                         _ => {}
                     }
                     d
@@ -373,11 +433,21 @@ impl SigmaSignalState {
         results
     }
 
-    pub fn pid(&self) -> u32 { self.pid }
-    pub fn is_stopped(&self) -> bool { self.is_stopped }
-    pub fn exit_code(&self) -> Option<u8> { self.exit_code }
-    pub fn pending_count(&self) -> usize { self.pending.len() }
-    pub fn blocked_mask(&self) -> SigSet { self.blocked }
+    pub fn pid(&self) -> u32 {
+        self.pid
+    }
+    pub fn is_stopped(&self) -> bool {
+        self.is_stopped
+    }
+    pub fn exit_code(&self) -> Option<u8> {
+        self.exit_code
+    }
+    pub fn pending_count(&self) -> usize {
+        self.pending.len()
+    }
+    pub fn blocked_mask(&self) -> SigSet {
+        self.blocked
+    }
 }
 
 // ============================================================
@@ -392,7 +462,11 @@ pub struct SigmaSignalManager {
 }
 
 impl SigmaSignalManager {
-    pub fn new() -> Self { Self { states: BTreeMap::new() } }
+    pub fn new() -> Self {
+        Self {
+            states: BTreeMap::new(),
+        }
+    }
 
     /// Register a process.
     pub fn register_process(&mut self, pid: u32) {
@@ -400,10 +474,17 @@ impl SigmaSignalManager {
     }
 
     /// Unregister a process (on exit).
-    pub fn unregister_process(&mut self, pid: u32) { self.states.remove(&pid); }
+    pub fn unregister_process(&mut self, pid: u32) {
+        self.states.remove(&pid);
+    }
 
     /// Send a signal to a process (kill(pid, sig)).
-    pub fn kill(&mut self, target_pid: u32, sig: Signal, sender_pid: u32) -> Result<(), &'static str> {
+    pub fn kill(
+        &mut self,
+        target_pid: u32,
+        sig: Signal,
+        sender_pid: u32,
+    ) -> Result<(), &'static str> {
         let state = self.states.get_mut(&target_pid).ok_or("no such process")?;
         state.send_signal(sig, sender_pid);
         Ok(())
@@ -423,7 +504,8 @@ impl SigmaSignalManager {
 
     /// Process pending signals for a PID. Returns actions taken.
     pub fn deliver(&mut self, pid: u32) -> Vec<(Signal, SignalDisposition)> {
-        self.states.get_mut(&pid)
+        self.states
+            .get_mut(&pid)
             .map(|s| s.process_pending())
             .unwrap_or_default()
     }
@@ -433,12 +515,18 @@ impl SigmaSignalManager {
         self.states.get_mut(&pid)
     }
 
-    pub fn state(&self, pid: u32) -> Option<&SigmaSignalState> { self.states.get(&pid) }
-    pub fn process_count(&self) -> usize { self.states.len() }
+    pub fn state(&self, pid: u32) -> Option<&SigmaSignalState> {
+        self.states.get(&pid)
+    }
+    pub fn process_count(&self) -> usize {
+        self.states.len()
+    }
 }
 
 impl Default for SigmaSignalManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================

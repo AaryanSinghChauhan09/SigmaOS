@@ -8,7 +8,6 @@
 // SigmaOS makepkg - Arch Linux PKGBUILD compilation sandbox
 // Provides safe, isolated compilation of Arch Linux packages
 
-
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Package, Version};
 
@@ -64,8 +63,6 @@ impl Package {
 }
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
@@ -75,6 +72,8 @@ use alloc::format;
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use std::collections::BTreeMap;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;

@@ -3,11 +3,11 @@
 
 #[cfg(test)]
 mod phase9_benchmarks {
-    use sigmaos::kernel::ebpf_vm::BpfInstruction;
     use sigmaos::kernel::cgroup_controllers::{
-        HugetlbController, HugepageSize, PidsController, RdmaController,
+        HugepageSize, HugetlbController, PidsController, RdmaController,
     };
-    use sigmaos::syscall::bpf_syscalls::{BpfProgramRegistry, BpfProgType};
+    use sigmaos::kernel::ebpf_vm::BpfInstruction;
+    use sigmaos::syscall::bpf_syscalls::{BpfProgType, BpfProgramRegistry};
     use std::time::Instant;
 
     fn measure_time<F>(f: F) -> u128
@@ -22,7 +22,10 @@ mod phase9_benchmarks {
     #[test]
     fn benchmark_ebpf_program_loading() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 42,
+            },
             BpfInstruction::Return,
         ];
 
@@ -45,8 +48,14 @@ mod phase9_benchmarks {
         let mut registry = BpfProgramRegistry::new();
 
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 10 },
-            BpfInstruction::AddImm { dst_reg: 0, imm: 32 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 10,
+            },
+            BpfInstruction::AddImm {
+                dst_reg: 0,
+                imm: 32,
+            },
             BpfInstruction::Return,
         ];
 
@@ -70,9 +79,18 @@ mod phase9_benchmarks {
         let mut registry = BpfProgramRegistry::new();
 
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 100 },
-            BpfInstruction::LoadImm64 { dst_reg: 1, imm64: 50 },
-            BpfInstruction::LoadImm64 { dst_reg: 2, imm64: 25 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 100,
+            },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 1,
+                imm64: 50,
+            },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 2,
+                imm64: 25,
+            },
             BpfInstruction::Add {
                 dst_reg: 0,
                 src_reg: 1,
@@ -96,7 +114,10 @@ mod phase9_benchmarks {
 
         let avg_time = duration / 1000;
         println!("Complex eBPF Execution: {} µs per execution", avg_time);
-        assert!(avg_time < 200, "Complex execution should be reasonably fast");
+        assert!(
+            avg_time < 200,
+            "Complex execution should be reasonably fast"
+        );
     }
 
     #[test]
@@ -167,11 +188,7 @@ mod phase9_benchmarks {
                 BpfInstruction::Return,
             ];
 
-            let _ = registry.load_program(
-                BpfProgType::Tracing,
-                program,
-                format!("prog{}", i),
-            );
+            let _ = registry.load_program(BpfProgType::Tracing, program, format!("prog{}", i));
         }
 
         let total_time = base_time.elapsed().as_micros();
@@ -214,7 +231,10 @@ mod phase9_benchmarks {
         rdma.set_qp_limit(500);
 
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 42,
+            },
             BpfInstruction::Return,
         ];
 
@@ -222,11 +242,8 @@ mod phase9_benchmarks {
 
         for i in 0..100 {
             // Load eBPF program
-            let _ = registry.load_program(
-                BpfProgType::Tracing,
-                program.clone(),
-                format!("prog{}", i),
-            );
+            let _ =
+                registry.load_program(BpfProgType::Tracing, program.clone(), format!("prog{}", i));
 
             // Allocate PID
             let _ = pids.fork_process();
@@ -238,10 +255,7 @@ mod phase9_benchmarks {
         }
 
         let total_time = start.elapsed().as_micros();
-        println!(
-            "Mixed Operations (100 iterations): {} µs total",
-            total_time
-        );
+        println!("Mixed Operations (100 iterations): {} µs total", total_time);
         println!("Average per iteration: {} µs", total_time / 100);
 
         // Verify all operations succeeded
@@ -258,7 +272,10 @@ mod phase9_benchmarks {
 
         // Benchmark eBPF execution throughput
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 100 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 100,
+            },
             BpfInstruction::SubImm { dst_reg: 0, imm: 1 },
             BpfInstruction::Return,
         ];
@@ -293,7 +310,13 @@ mod phase9_benchmarks {
         println!("PID Allocation Throughput: {} pids/sec", pid_throughput);
 
         // Both should have reasonable throughput
-        assert!(ebpf_throughput > 100_000, "eBPF should execute >100k programs/sec");
-        assert!(pid_throughput > 50_000, "PID allocation should handle >50k/sec");
+        assert!(
+            ebpf_throughput > 100_000,
+            "eBPF should execute >100k programs/sec"
+        );
+        assert!(
+            pid_throughput > 50_000,
+            "PID allocation should handle >50k/sec"
+        );
     }
 }

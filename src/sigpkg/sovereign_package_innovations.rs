@@ -222,7 +222,10 @@ impl SlackwareBuildPackageEngine {
         _files: &[&str],
         _desc: &str,
     ) -> Result<String, &'static str> {
-        let script = self.scripts.get(pkg_name).ok_or("SlackBuild script not found")?;
+        let script = self
+            .scripts
+            .get(pkg_name)
+            .ok_or("SlackBuild script not found")?;
         let filename = format!(
             "{}-{}-{}-{}.txz",
             script.name, script.version, script.arch, script.build_number
@@ -231,7 +234,10 @@ impl SlackwareBuildPackageEngine {
     }
 
     pub fn explode_txz_archive(&self, txz_filename: &str) -> Result<Vec<String>, &'static str> {
-        let name = txz_filename.split('-').next().ok_or("Invalid txz package format")?;
+        let name = txz_filename
+            .split('-')
+            .next()
+            .ok_or("Invalid txz package format")?;
         if self.scripts.contains_key(name) {
             Ok(vec![
                 "/usr/bin/htop".to_string(),
@@ -298,7 +304,8 @@ impl ZypperSatDependencyResolver {
 
         if !self.vendor_change_allowed {
             if let Some(installed) = current_installed {
-                if let Some(same_vendor) = candidates.iter().find(|c| c.vendor == installed.vendor) {
+                if let Some(same_vendor) = candidates.iter().find(|c| c.vendor == installed.vendor)
+                {
                     return Ok((*same_vendor).clone());
                 }
             }
@@ -431,7 +438,11 @@ mod tests {
         });
 
         let txz = engine
-            .compile_slackbuild("htop", &["/usr/bin/htop", "/usr/man/man1/htop.1"], "htop process viewer")
+            .compile_slackbuild(
+                "htop",
+                &["/usr/bin/htop", "/usr/man/man1/htop.1"],
+                "htop process viewer",
+            )
             .unwrap();
         assert_eq!(txz, "htop-3.2.1-x86_64-1.txz");
 

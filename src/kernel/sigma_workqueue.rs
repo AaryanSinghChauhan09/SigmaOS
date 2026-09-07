@@ -96,11 +96,17 @@ impl WorkItem {
     }
 
     /// Returns the item name.
-    pub fn name(&self) -> &str { &self.name }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
     /// Returns the item priority.
-    pub fn priority(&self) -> WorkPriority { self.priority }
+    pub fn priority(&self) -> WorkPriority {
+        self.priority
+    }
     /// Returns the delay in ns.
-    pub fn delay_ns(&self) -> u64 { self.delay_ns }
+    pub fn delay_ns(&self) -> u64 {
+        self.delay_ns
+    }
 }
 
 // ============================================================
@@ -189,7 +195,10 @@ impl SigmaWorkQueue {
         item.scheduled_at_ns = self.now_ns;
         // Insert in priority order (higher priority first) for unordered queues
         if !self.ordered {
-            let pos = self.queue.iter().position(|i| i.priority < item.priority)
+            let pos = self
+                .queue
+                .iter()
+                .position(|i| i.priority < item.priority)
                 .unwrap_or(self.queue.len());
             self.queue.insert(pos, item);
         } else {
@@ -226,7 +235,9 @@ impl SigmaWorkQueue {
     /// Number of items executed.
     pub fn flush(&mut self) -> usize {
         let mut count = 0;
-        while self.process_one() { count += 1; }
+        while self.process_one() {
+            count += 1;
+        }
         count
     }
 
@@ -247,13 +258,21 @@ impl SigmaWorkQueue {
     }
 
     /// Returns the queue name.
-    pub fn name(&self) -> &str { &self.name }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
     /// Returns pending item count.
-    pub fn pending(&self) -> usize { self.queue.len() }
+    pub fn pending(&self) -> usize {
+        self.queue.len()
+    }
     /// Returns statistics.
-    pub fn stats(&self) -> &WorkQueueStats { &self.stats }
+    pub fn stats(&self) -> &WorkQueueStats {
+        &self.stats
+    }
     /// Returns whether queue is empty.
-    pub fn is_empty(&self) -> bool { self.queue.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.queue.is_empty()
+    }
 }
 
 // ============================================================
@@ -284,14 +303,22 @@ impl BoundWorkQueue {
     }
 
     /// Set CPU online status.
-    pub fn set_cpu_online(&mut self, online: bool) { self.cpu_online = online; }
+    pub fn set_cpu_online(&mut self, online: bool) {
+        self.cpu_online = online;
+    }
 
     /// Returns the bound CPU ID.
-    pub fn cpu_id(&self) -> usize { self.cpu_id }
+    pub fn cpu_id(&self) -> usize {
+        self.cpu_id
+    }
 
     /// Flush work if CPU is online.
     pub fn flush_if_online(&mut self) -> usize {
-        if self.cpu_online { self.inner.flush() } else { 0 }
+        if self.cpu_online {
+            self.inner.flush()
+        } else {
+            0
+        }
     }
 
     /// Submit work to this CPU queue.
@@ -300,8 +327,12 @@ impl BoundWorkQueue {
     }
 
     /// Access inner queue.
-    pub fn inner(&self) -> &SigmaWorkQueue { &self.inner }
-    pub fn inner_mut(&mut self) -> &mut SigmaWorkQueue { &mut self.inner }
+    pub fn inner(&self) -> &SigmaWorkQueue {
+        &self.inner
+    }
+    pub fn inner_mut(&mut self) -> &mut SigmaWorkQueue {
+        &mut self.inner
+    }
 }
 
 // ============================================================
@@ -320,7 +351,10 @@ pub struct WorkQueueSystem {
 impl WorkQueueSystem {
     /// Create a new empty system.
     pub fn new() -> Self {
-        Self { queues: Vec::new(), bound_queues: Vec::new() }
+        Self {
+            queues: Vec::new(),
+            bound_queues: Vec::new(),
+        }
     }
 
     /// Register a new work queue.
@@ -336,8 +370,12 @@ impl WorkQueueSystem {
     /// Flush all queues. Returns total items executed.
     pub fn flush_all(&mut self) -> usize {
         let mut total = 0;
-        for q in &mut self.queues { total += q.flush(); }
-        for q in &mut self.bound_queues { total += q.flush_if_online(); }
+        for q in &mut self.queues {
+            total += q.flush();
+        }
+        for q in &mut self.bound_queues {
+            total += q.flush_if_online();
+        }
         total
     }
 
@@ -353,7 +391,9 @@ impl WorkQueueSystem {
 }
 
 impl Default for WorkQueueSystem {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================
@@ -366,14 +406,18 @@ mod tests {
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static EXEC_COUNT: AtomicU64 = AtomicU64::new(0);
-    fn work_fn(_: u64) { EXEC_COUNT.fetch_add(1, Ordering::Relaxed); }
+    fn work_fn(_: u64) {
+        EXEC_COUNT.fetch_add(1, Ordering::Relaxed);
+    }
 
     #[test]
     fn test_basic_submit_flush() {
         EXEC_COUNT.store(0, Ordering::Relaxed);
         let mut wq = SigmaWorkQueue::new("test", false);
-        wq.submit(WorkItem::new(work_fn, 0, "item1", WorkPriority::Normal)).unwrap();
-        wq.submit(WorkItem::new(work_fn, 0, "item2", WorkPriority::High)).unwrap();
+        wq.submit(WorkItem::new(work_fn, 0, "item1", WorkPriority::Normal))
+            .unwrap();
+        wq.submit(WorkItem::new(work_fn, 0, "item2", WorkPriority::High))
+            .unwrap();
         let count = wq.flush();
         assert_eq!(count, 2);
         assert_eq!(EXEC_COUNT.load(Ordering::Relaxed), 2);
@@ -382,9 +426,17 @@ mod tests {
     #[test]
     fn test_priority_ordering() {
         let mut wq = SigmaWorkQueue::new("prio-test", false);
-        wq.submit(WorkItem::new(work_fn, 1, "bg", WorkPriority::Background)).unwrap();
-        wq.submit(WorkItem::new(work_fn, 2, "critical", WorkPriority::Critical)).unwrap();
-        wq.submit(WorkItem::new(work_fn, 3, "normal", WorkPriority::Normal)).unwrap();
+        wq.submit(WorkItem::new(work_fn, 1, "bg", WorkPriority::Background))
+            .unwrap();
+        wq.submit(WorkItem::new(
+            work_fn,
+            2,
+            "critical",
+            WorkPriority::Critical,
+        ))
+        .unwrap();
+        wq.submit(WorkItem::new(work_fn, 3, "normal", WorkPriority::Normal))
+            .unwrap();
         // First item should be Critical
         let item = wq.queue.front().unwrap();
         assert_eq!(item.priority(), WorkPriority::Critical);
@@ -393,9 +445,13 @@ mod tests {
     #[test]
     fn test_bounded_queue_drops() {
         let mut wq = SigmaWorkQueue::new_bounded("bounded", false, 2);
-        wq.submit(WorkItem::new(work_fn, 0, "a", WorkPriority::Normal)).unwrap();
-        wq.submit(WorkItem::new(work_fn, 0, "b", WorkPriority::Normal)).unwrap();
-        assert!(wq.submit(WorkItem::new(work_fn, 0, "c", WorkPriority::Normal)).is_err());
+        wq.submit(WorkItem::new(work_fn, 0, "a", WorkPriority::Normal))
+            .unwrap();
+        wq.submit(WorkItem::new(work_fn, 0, "b", WorkPriority::Normal))
+            .unwrap();
+        assert!(wq
+            .submit(WorkItem::new(work_fn, 0, "c", WorkPriority::Normal))
+            .is_err());
         assert_eq!(wq.stats().dropped, 1);
     }
 
@@ -403,7 +459,8 @@ mod tests {
     fn test_delayed_work() {
         EXEC_COUNT.store(0, Ordering::Relaxed);
         let mut wq = SigmaWorkQueue::new("delayed", true);
-        wq.submit(WorkItem::new_delayed(work_fn, 0, "delayed", 10_000_000)).unwrap();
+        wq.submit(WorkItem::new_delayed(work_fn, 0, "delayed", 10_000_000))
+            .unwrap();
         wq.process_one(); // Should not execute — delay not met
         assert_eq!(EXEC_COUNT.load(Ordering::Relaxed), 0);
         wq.advance_time(15_000_000); // Advance past delay

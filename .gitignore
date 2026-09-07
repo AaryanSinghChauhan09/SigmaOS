@@ -24,3 +24,7 @@ wiki_push
 wiki/
 WIKI/
 __pycache__/
+
+/build/
+/tmp/
+*.tmp

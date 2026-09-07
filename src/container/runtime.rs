@@ -8,9 +8,9 @@
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -29,7 +29,6 @@ pub enum ContainerState {
     Stopped = 3,
     Failed = 4,
 }
-
 
 impl ContainerCapability {
     pub const fn new() -> Self {
@@ -198,7 +197,6 @@ impl NamespaceConfig {
         self.pid && self.mnt && self.net && self.uts && self.ipc && self.user && self.cgroup
     }
 }
-
 
 impl SeccompProfileV2 {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {

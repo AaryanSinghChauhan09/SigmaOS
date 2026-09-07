@@ -15,7 +15,6 @@
 //   • Content-addressed package store (/sigma/store)
 //   • Reproducible builds via locked inputs
 
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

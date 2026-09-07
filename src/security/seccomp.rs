@@ -139,7 +139,8 @@ impl FilterRule {
 
         // Check all constraints
         for constraint in &self.constraints {
-            if constraint.arg_index < 6 && !constraint.matches(args[constraint.arg_index as usize]) {
+            if constraint.arg_index < 6 && !constraint.matches(args[constraint.arg_index as usize])
+            {
                 return false;
             }
         }
