@@ -6,6 +6,13 @@ pub mod torrent;
 pub mod tcp_ip_implementation;
 pub mod network_namespace;
 pub mod network_syscalls;
+pub mod linux_bsd_network_innovations;
+
+pub use linux_bsd_network_innovations::{
+    BbrState, CongestionAlgorithm, FreeBsdNetgraphGraphRouter, LinuxBbrCongestionEngine,
+    NetgraphNode, NetgraphNodeType, OpenBsdPfCarpPfsyncStateEngine, PfStateEntry, WireguardPqcTunnelEngine,
+    XdpAction, XdpZeroCopyPacketRingEngine,
+};
 
 pub use torrent::{
     BencodeValue, DhtNode, DhtRoutingTable, MagnetLink, PieceDescriptor, PieceManager,

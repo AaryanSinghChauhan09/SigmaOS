@@ -967,6 +967,8 @@ impl UniversalPackageAdapter {
         } else if f.ends_with(".pkg.tar.zst")
             || f.ends_with(".pkg.tar.xz")
             || f.ends_with(".pkg.tar.gz")
+            || f == "pacman"
+            || f.ends_with(".pacman")
         {
             Some(PackageFormat::Pacman)
         } else if f.ends_with(".apk") {
@@ -979,8 +981,10 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Bottle)
         } else if f.ends_with(".ipa") {
             Some(PackageFormat::Ipa)
-        } else if f.ends_with(".ports") || f.ends_with(".portage") {
+        } else if f.ends_with(".ports") {
             Some(PackageFormat::Ports)
+        } else if f.ends_with(".portage") || f.ends_with(".ebuild") {
+            Some(PackageFormat::Portage)
         } else if f.ends_with(".pkg") {
             Some(PackageFormat::Pkg)
         } else if f.ends_with(".aab") {
@@ -1003,12 +1007,10 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Superdeb)
         } else if f.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if f.ends_with(".pup") {
+        } else if f == "pup" || f.ends_with(".pup") {
             Some(PackageFormat::Pup)
-        } else if f.ends_with(".pet") {
+        } else if f == "pet" || f.ends_with(".pet") {
             Some(PackageFormat::Pet)
-        } else if f.ends_with(".ebuild") {
-            Some(PackageFormat::Portage)
         } else if f.ends_with(".nixpkg") || f.ends_with(".nix") {
             Some(PackageFormat::Nix)
         } else if f.ends_with(".eopkg") {
@@ -2279,7 +2281,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "flatpak" | "snap" | "pkgman" | "swupd" => {
+            "flatpak" | "snap" | "pkgman" | "swupd" | "brew" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2288,6 +2290,37 @@ impl UniversalPmCommandDispatcher {
                         "update" | "upgrade" | "bundle-upgrade" => operation = UniversalPmOperation::Upgrade,
                         "search" | "find" => operation = UniversalPmOperation::Search,
                         "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        "-n" | "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pkg_add" | "pkg_info" => {
+                if pm == "pkg_add" {
+                    operation = UniversalPmOperation::Install;
+                } else {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
+                for arg in args {
+                    if *arg == "-n" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
+            "pisi" | "urpmi" | "slapt-get" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "it" | "install" | "i" => operation = UniversalPmOperation::Install,
+                        "rm" | "remove" | "er" => operation = UniversalPmOperation::Remove,
+                        "up" | "upgrade" | "ur" => operation = UniversalPmOperation::Upgrade,
+                        "sr" | "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-s" | "--simulate" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
