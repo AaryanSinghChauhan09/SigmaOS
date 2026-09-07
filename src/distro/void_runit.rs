@@ -2,14 +2,11 @@
 // Implements Void Linux's runit supervision system
 // Inspired by Void Linux's 3-stage process supervision
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 extern crate alloc;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use alloc::collections::BTreeMap;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use alloc::string::String;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -159,7 +156,6 @@ impl RunitSupervisor {
         let mut started = Vec::new();
         let service_names: Vec<String> = self.services.keys().cloned().collect();
 
-        let service_names: Vec<String> = self.services.keys().cloned().collect();
         for name in service_names {
             if self.can_start_service(&name, &started) {
                 if let Some(s) = self.services.get_mut(&name) {
@@ -180,7 +176,6 @@ impl RunitSupervisor {
         let mut stopped = Vec::new();
         let service_names: Vec<String> = self.services.keys().cloned().collect();
 
-        let service_names: Vec<String> = self.services.keys().cloned().collect();
         for name in service_names {
             if self.can_stop_service(&name, &stopped) {
                 if let Some(s) = self.services.get_mut(&name) {
@@ -253,7 +248,7 @@ impl Default for RunitSupervisor {
     }
 }
 
-#[cfg(test)]
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
 
@@ -307,7 +302,7 @@ mod tests {
     fn test_service_dependencies() {
         let mut supervisor = RunitSupervisor::new();
 
-        let mut service1 = RunitService::new("service1".to_string(), "/usr/bin/s1".to_string());
+        let service1 = RunitService::new("service1".to_string(), "/usr/bin/s1".to_string());
         let mut service2 = RunitService::new("service2".to_string(), "/usr/bin/s2".to_string());
         service2.dependencies = vec!["service1".to_string()];
 

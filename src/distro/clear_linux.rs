@@ -2,14 +2,12 @@
 // Implements Intel Clear Linux's stateless configuration and immutable root layers
 // Inspired by Clear Linux's performance-optimized architecture
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 extern crate alloc;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use alloc::collections::BTreeMap;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use alloc::string::String;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -204,7 +202,7 @@ impl Default for SwupdUpdateManager {
     }
 }
 
-#[cfg(test)]
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
 
