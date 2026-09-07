@@ -18,9 +18,7 @@ pub mod udev_devd_rules;
 pub use udev_devd_rules::*;
 
 pub mod manager;
+pub mod udev_devd_rules;
 
-pub use manager::{
-    Device, DeviceClass, DeviceDriver, DeviceError, DeviceHotplug, DeviceID, DeviceManager,
-    SimpleDevice, SimpleDeviceDriver, SimpleDeviceHotplug, SimpleDeviceManager,
-};
-
+pub use manager::*;
+pub use udev_devd_rules::*;
