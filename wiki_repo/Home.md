@@ -41,13 +41,6 @@
 - **AI Agent GitHub Workflows Management Guide:** [[AI_AGENT_GITHUB_WORKFLOWS_MANAGEMENT]] - CI/CD, multi-distro matrix, reproducible SBOMs, Cosign signing, and Pages auto-deploy workflows for AI agents.
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
 
----
-
-## 🛠️ Quick Start & Building
-```bash
-# Build the core library
-cargo check --lib
-
 # Run the native test suite
 ./run_sigma_tests.sh
 ```
