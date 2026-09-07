@@ -2761,6 +2761,126 @@ SigmaOS guarantees bare-metal execution across 30+ years of hardware innovations
 2. **Privacy & Statutory Governance**: Built-in compliance layers for GDPR, CCPA, HIPAA, and Indian statutory legislations (DPDP Act, GST, IBC, RERA).
 3. **Security & Cryptography**: CIS Benchmarks enforcement, Kyber-1024 / Dilithium-5 post-quantum cryptography, hardware zero-trust capability rings, and Software Bill of Materials (SBOM) generation.
 
+---
+
+## 92. SOVEREIGN MASTER STRATEGIC VISION: CORE SYSTEM ENHANCEMENTS, APPLICATION ECOSYSTEM, NETWORK-NATIVE CLUSTER & COMMUNITY ROADMAP
+
+To ensure SigmaOS achieves absolute competitive supremacy over Linux, BSD, Windows, and macOS, the following master strategic roadmap specifies the mandatory core system enhancements, application ecosystem paradigms, network-native cluster features, collaboration framework, and phased timeline.
+
+### 92.1 Core System Enhancements
+1. **Unified Hardware Abstraction Layer (HAL)**:
+   * Provides a unified, zero-overhead abstraction layer simplifying hardware driver development across x86_64, AArch64, RISC-V 64, LoongArch64, and PowerPC 64 LE target architectures (`src/hal/multi_arch.rs`, `src/kernel/hal.rs`).
+2. **Firmware-Free Transparent Drivers**:
+   * Replaces opaque binary vendor blobs with transparent, memory-safe, firmware-free Rust driver shards operating inside isolated microkernel driver containers (`src/drivers/sovereign_driver_lifecycle.rs`).
+3. **Programmable User-Defined Scheduler**:
+   * Extends the CachyOS BORE and EEVDF kernel schedulers with User-Defined Functions (UDFs), allowing application developers to dynamically define scheduling policies for real-time graphics rendering, batch compute jobs, or ultra-low-latency audio/networking pipelines.
+4. **Cryptographic Post-Quantum Boot Chain**:
+   * Guarantees tamper-proof startup and hardware sovereignty from 16-bit BIOS / UEFI 2.10 secure boot stage down to userland via Post-Quantum Cryptographic signatures (Dilithium-5 / Kyber-1024) and TPM 2.0 PCR measured attestation.
+
+### 92.2 Application & Ecosystem Support
+1. **Native Compatibility Layers**:
+   * Natively executes Linux (`.elf`/`glibc`/`musl`) and Windows (`.exe`/`.dll`/Win32/ReactOS GDI) applications without emulation overhead using zero-copy ABI translation shims (`src/compatibility/cross_platform.rs`).
+2. **Shards Marketplace**:
+   * A curated, decentralized, post-quantum-signed ecosystem for discovering, installing, and managing sandboxed, modular SigmaOS application shards (`src/sigpkg/universal_oop_system.rs`).
+3. **Declarative Application Manifests (`.sigmaprofile`)**:
+   * Single-file declarative JSON/YAML manifest defining all application dependencies, hardware access policies, network capabilities, and OpenBSD-style `pledge`/`unveil` permissions (`src/package/universal.rs`).
+4. **Immutable Application Layers**:
+   * Uses Copy-on-Write (CoW) Merkle tree storage and content-addressed storage (CAS) to provide atomic application installs, zero-drift updates, and instant rollback snapshots.
+
+### 92.3 Networking & Clustered OS State
+1. **Clustered Device Pooling**:
+   * Enables seamless sharing of GPUs, NVMe storage pools, AI accelerators, and peripheral sensors across interconnected SigmaOS nodes in a local LAN/WAN mesh.
+2. **Network-Native OS State Splicing**:
+   * Pause an active desktop/session state on one physical device and resume seamlessly on another device using serialized state graph splicing (`src/system/state.rs`, `src/orchestration/mod.rs`).
+3. **Temporal Filesystem & Time-Travel Engine**:
+   * Native time-travel filesystem engine providing sub-millisecond atomic system state inspection, file history navigation, and zero-data-loss system rollbacks.
+
+### 92.4 Collaboration, Community & Governance
+1. **Contributor Charter**:
+   * Formal, transparent governance, code of conduct, and contributor standards (`CONTRIBUTING.md`, `docs/RULES.md`).
+2. **Public Developer Roadmap**:
+   * Living public roadmap with quarterly milestones, architectural specifications, and transparent release tracking.
+3. **Hackathons & Sprints**:
+   * Structured community sprints, bug-bounty programs, and developer hackathons to accelerate ecosystem growth and test next-generation microkernel innovations.
+4. **Living Documentation Knowledge Base**:
+   * GitHub Wiki synchronized continuously across repository mirrors (`WIKI/`, `wiki/`, `wiki_repo/`) via `./scripts/sync_wiki.sh`.
+
+### 92.5 Phased Strategic Action Timeline
+1. **Short-Term Horizon (Next 12–18 Months)**:
+   * Expand native Linux/Windows application compatibility shims.
+   * Refine the zero-Wayland Zenith desktop compositor and inclusive accessibility framework.
+   * Establish automated CI/CD pipelines, fuzzing runners, and license compliance scanners.
+2. **Mid-Term Horizon (2–4 Years)**:
+   * Deploy the full suite of modular core driver shards and firmware-free Rust drivers.
+   * Implement programmable user-defined scheduling policies across all desktop and server workloads.
+   * Finalize composable boot sequences and immutable system layer snapshots.
+3. **Long-Term Horizon (5+ Years — Sovereign Computing Era)**:
+   * Achieve total sovereign computing dominance via hardware-enforced post-quantum cryptographic boot chains.
+   * Standardize declarative hardware policies, zero-trust capability rings, and cluster-native peripheral sharing across global deployments.
+
+---
+
+## 93. SOVEREIGN PROTOCOL TO DEFEAT LINUX DISTROS & FORMAL 2-YEAR ROADMAP (Q4 2026 – Q4 2028)
+
+To defeat traditional Linux distributions and establish SigmaOS as the premier sovereign operating system alternative, SigmaOS executes a radical differentiation strategy focused on **clarity, hardware sovereignty, and cluster-native design**.
+
+### 93.1 Formal 2-Year Roadmap (Q4 2026 – Q4 2028)
+
+#### 🔹 Phase 1: Q4 2026 – Q2 2027 (Compatibility, Immutability & Governance)
+* **Native Compatibility Layers**: Seamless, zero-emulation execution of Linux (`.elf`/`glibc`/`musl`) and Windows (`.exe`/`.dll`/Win32/ReactOS GDI) applications via high-performance ABI translation shims (`src/compatibility/cross_platform.rs`).
+* **Immutable Userland Layers**: Atomic, transactional system and userland updates with zero dependency conflicts or configuration drift.
+* **Contributor Charter**: Publication of formal governance, code of conduct, and contributor standards (`CONTRIBUTING.md`, `docs/RULES.md`).
+* **Zenith Desktop Refinement**: Polishing the zero-Wayland/zero-X11 framebuffer compositor for fluid animations, multi-monitor spaces, and WCAG 2.1 accessibility.
+
+#### 🔹 Phase 2: Q3 2027 – Q1 2028 (Shards, Firmware-Free Drivers & Clustered Peripherals)
+* **Core Shard Rollout**: Deployment of modular microkernel shards for Media, Networking, Storage, AI, Compositor, Drivers, Security, Virtualization, System, Package, IPC, and Hardware.
+* **Firmware-Free Drivers**: Replacement of opaque vendor binary blobs with transparent, memory-safe, firmware-free Rust drivers running inside isolated driver containers (`src/drivers/sovereign_driver_lifecycle.rs`).
+* **Composable Boot Sequences**: Scriptable, post-quantum-encrypted boot flows supporting multi-boot and cryptographic hardware attestation.
+* **Clustered Peripherals**: Cluster-wide device pooling allowing nodes to share GPUs, NVMe arrays, AI accelerators, and peripheral sensors across local networks.
+
+#### 🔹 Phase 3: Q2 2028 – Q4 2028 (Programmable Scheduling, State Splicing & Temporal File Engine)
+* **Programmable Scheduler**: Kernel-level user-defined scheduling policies (UDFs) enabling custom latency/throughput tuning for graphics, batch compute, and low-latency audio.
+* **Network-Native OS State Splicing**: Seamless session pausing on one physical device and instant resumption on another device via serialized state graph splicing (`src/system/state.rs`, `src/orchestration/mod.rs`).
+* **Shards Marketplace**: Curated, post-quantum-signed ecosystem for modular SigmaOS applications (`src/sigpkg/universal_oop_system.rs`).
+* **Temporal Filesystem**: Native time-travel filesystem engine providing sub-millisecond atomic system state inspection, file history navigation, and zero-data-loss rollbacks.
+
+### 93.2 Strategic Pillars to Defeat Linux Distros
+1. **Sovereignty Over Hardware**: While Linux relies heavily on opaque vendor blobs, SigmaOS enforces firmware-free, open-source Rust drivers.
+2. **Declarative Simplicity**: Replaces Linux's fragmented package ecosystem (`apt`/`dnf`/`pacman`) with single-file declarative manifests (`.sigmaprofile`) and immutable CoW layers.
+3. **Cluster-Native Microkernel Design**: While Linux treats servers as isolated instances, SigmaOS treats all connected network devices as pooled, cluster-native resources.
+4. **Security by Design**: Combines OpenBSD-style `pledge`/`unveil` privilege reduction with Rust memory safety and Post-Quantum Cryptography (Dilithium-5 / Kyber-1024).
+5. **Unified System Vision**: While Linux is fragmented across hundreds of incompatible distributions, SigmaOS provides a coherent, single modular path through its 12-shard microkernel architecture.
+
+### 93.3 Strategic Outcome by 2028
+By Q4 2028, SigmaOS positions itself as the **world's first sovereign operating system**: modular, cluster-native, firmware-free, and declarative — offering clarity, resilience, and uncompromised performance where legacy Linux distros remain fragmented.
+
+---
+
+## 94. SOVEREIGN C++ REDUCTION & RUST-FIRST MIGRATION ARCHITECTURE SPECIFICATION
+
+To ensure absolute memory safety, eliminate non-deterministic exception handling runtime overheads, and establish a pure zero-dependency microkernel, SigmaOS executes a systematic C++ reduction and Rust-first migration architecture.
+
+### 94.1 Strategic Rationale for C++ Reduction
+1. **Elimination of Hidden C++ Runtimes**: Traditional bare-metal C++ relies on RTTI structures and C++ exception unwinding libraries (`libgcc_s` / `libstdc++`), introducing binary bloat and unpredictable latency spikes during fault conditions.
+2. **Compiler-Guaranteed Memory Safety**: Transitioning legacy C++ drivers and kernel daemons to Rust eliminates spatial/temporal memory vulnerabilities (use-after-free, buffer overflows, data races) at compile time via the Rust borrow checker.
+3. **Unified Codebase Architecture**: Consolidating microkernel drivers, VFS operations, IPC delivery, and userland tools into `#![no_std]` Rust modules eliminates header synchronization drift between `.hpp` files and Rust traits.
+
+### 94.2 Subsystem Migration Roadmap
+* **Kernel Driver Management (`kernel/drivers/sigma_driver_manager.cpp`)**: Replaced by pure `#![no_std]` Rust driver lifecycle managers (`src/driver/framework.rs`, `src/drivers/sovereign_driver_lifecycle.rs`).
+* **Atomic IPC & VFS Resolvers (`sigmaos/core/src/atomic_ipc_deliver.cpp`, `atomic_vfs_resolve.cpp`)**: Replaced by lock-free Rust IPC channels (`src/kernel/ipc.rs`) and zero-copy VFS page cache managers (`src/filesystem/support.rs`).
+* **Post-Quantum Cryptographic Verification (`sigmaos/core/src/atomic_pqc_verify.cpp`)**: Replaced by pure Rust Kyber-1024 / Dilithium-5 verification modules (`src/security/pki.rs`, `src/open_source_obsoletion.rs`).
+* **Userland Init & Daemons (`userland/init/sigma_init.cpp`, `userland/daemons/`)**: Replaced by `#![no_std]` Rust init supervisors (`src/userland/init.rs`, `src/init/sigmainit.rs`).
+* **Zenith Compositor (`userland/gui/zenith_compositor.cpp`)**: Replaced by direct framebuffer Rust graphics engines (`src/graphics/compositor.rs`).
+
+### 94.3 Transitional C-ABI Interoperability (`extern "C"`)
+* Exported Rust kernel APIs use `#[no_mangle] pub extern "C" fn` entry points with explicit, C-compatible scalar types (`u32`, `u64`, `usize`, `*mut c_void`, `*const u8`).
+* Legacy C++ callers interact strictly via C FFI shims during incremental migration stages.
+
+### 94.4 Phased C++ Deprecation Protocol
+1. **Phase 1 (Strict Policy Enforcement)**: Zero new C++ source files (`.cpp`/`.hpp`) permitted. All new subsystems MUST be written in Rust.
+2. **Phase 2 (Subsystem Component Swap)**: Replace legacy C++ kernel drivers and userland daemons with pure Rust equivalents and update `CMakeLists.txt`.
+3. **Phase 3 (Full C++ Elimination)**: Remove legacy C++ toolchain requirements (`g++`/`clang++`) from the build environment, achieving a 100% pure Rust sovereign microkernel.
+
 ## 🛠️ SECTION 45: SOVEREIGN ALL-SPECTRUM OPEN-SOURCE OPERATING SYSTEM VICTORY & TOTAL ECOSYSTEM OBSOLESCENCE MASTER SPECIFICATION
 
 ### 45.1 All-Spectrum Open-Source OS Inspiration, Absorption & Obsolescence Mechanics

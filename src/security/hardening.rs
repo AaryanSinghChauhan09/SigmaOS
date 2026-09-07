@@ -8,21 +8,6 @@ extern crate alloc;
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 use crate::security::Permission;
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    FileRead,
-    FileWrite,
-    NetworkTcp,
-}
-#[cfg(test)]
-use std::vec::Vec;
-#[cfg(not(test))]
-    NetworkTcp = 0,
-    FileRead = 1,
-use crate::security::capability::Permission;
-#[cfg(not(feature = "standalone_test"))]
-    SystemAdmin,
-    KernelModuleLoad,
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
