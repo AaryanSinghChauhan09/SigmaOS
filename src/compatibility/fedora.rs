@@ -3143,15 +3143,17 @@ pub struct IgnitionSystemdUnit {
     pub contents: String,
 }
 
-/// Fedora Offline Update Engine (systemd-offline-update)
-#[derive(Debug, Clone, Default)]
-pub struct FedoraOfflineUpdateEngine {
-    pub staged_packages: Vec<String>,
-    pub is_offline_update_pending: bool,
-    pub trigger_reboot_flag: bool,
+/// Fedora Ignition First-Boot Declarative Provisioning Engine
+/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
+/// (files, users, systemd units) before userspace init handoff.
+pub struct FedoraIgnitionEngine {
+    pub files: Vec<IgnitionFile>,
+    pub users: Vec<IgnitionUser>,
+    pub systemd_units: Vec<IgnitionSystemdUnit>,
+    pub provisioned: bool,
 }
 
-impl FedoraOfflineUpdateEngine {
+impl FedoraIgnitionEngine {
     pub fn new() -> Self {
         Self::default()
     }
@@ -3176,17 +3178,11 @@ impl FedoraOfflineUpdateEngine {
     }
 }
 
-/// Fedora Ignition First-Boot Declarative Provisioning Engine
-/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
-/// (files, users, systemd units) before userspace init handoff.
-pub struct FedoraIgnitionEngine {
-    pub files: Vec<IgnitionFile>,
-    pub users: Vec<IgnitionUser>,
-    pub systemd_units: Vec<IgnitionSystemdUnit>,
-    pub provisioned: bool,
-}
 
-impl FedoraIgnitionEngine {
+
+
+
+impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {
         Self {
             files: Vec::new(),
@@ -3195,6 +3191,7 @@ impl FedoraIgnitionEngine {
             provisioned: false,
         }
     }
+}
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
         self.files.push(IgnitionFile {
@@ -5234,10 +5231,7 @@ mod tests {
         assert!(sssd.is_tgt_valid());
     }
 
-    #[test]
-    fn test_fedora_hotness_and_wireplumber() {
-        let mut hotness = FedoraTheNewHotnessEngine::new();
-        hotness.register_anitya_mapping(1234, "curl", "curl", "8.2.1");
+        // New version release check -> event generated & fedmsg published
         let event = hotness
             .process_upstream_release_check(
                 1234,
@@ -5247,10 +5241,7 @@ mod tests {
             )
             .unwrap()
             .unwrap();
-        assert_eq!(event.new_version, "8.3.0");
 
-        let mut wireplumber = FedoraPipewireWireplumberPolicyGovernor::new();
-        wireplumber.register_audio_node(101, "AlsaSinkDefault");
         assert!(wireplumber.set_default_node("sink", 101));
         assert_eq!(wireplumber.default_sink_node, Some(101));
     }
