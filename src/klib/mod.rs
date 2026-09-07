@@ -59,3 +59,5 @@ pub use hashmap::HashMap;
 pub use collections::VecDeque;
 pub use string::SigmaString;
 pub use alloc::string::{String, ToString};
+pub mod error;
+pub mod math_ops;

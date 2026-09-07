@@ -124,3 +124,11 @@ For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and 
 ## 📄 License
 
 SigmaOS is licensed under the [MIT License](LICENSE).
+
+---
+
+## 📜 Key Project Resources & Public Launch Documents
+- 🚀 **Public Launch Announcement**: [docs/LAUNCH_ANNOUNCEMENT.md](docs/LAUNCH_ANNOUNCEMENT.md)
+- 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
+- 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
+- ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
