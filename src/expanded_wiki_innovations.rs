@@ -1,20 +1,26 @@
-#![no_std]
-
-// Expanded Wiki & Distro Unimplemented Innovations Engine
-// Implements planned wiki concepts inspired by Linux & BSD distributions:
-// - Arch Linux pacman-contrib utilities (paccache, checkupdates, rankmirrors, updpkgsums, finddeps)
-// - Debian dpkg triggers & post-transaction processing engine
-// - FreeBSD pkg audit vulnerability scanner & orphan package autoremove engine
-// - Fedora system-wide crypto policies engine (DEFAULT, LEGACY, FUTURE, FIPS)
-// - Fedora Toolbox OCI dev container engine
-// - NixOS Home-Manager declarative user environments
-// - Mise / Asdf universal multi-runtime version manager
-// - Devenv nix-based reproducible dev environments
-// - Aircrack-ng / Wireshark wireless frame auditor
-// - Ubuntu Pro Livepatch kernel hot-patching engine
-// - Flatpak SDK container builder
-// - Clear Linux Stateless /usr Configuration Overlay Engine
-
+#![allow(clippy::new_without_default)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(non_camel_case_types)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::type_complexity)]
+/// Expanded Wiki & Distro Unimplemented Innovations Engine
+/// Implements planned wiki concepts inspired by Linux & BSD distributions:
+/// - Arch Linux pacman-contrib utilities (paccache, checkupdates, rankmirrors, updpkgsums, finddeps)
+/// - Debian dpkg triggers & post-transaction processing engine
+/// - FreeBSD pkg audit vulnerability scanner & orphan package autoremove engine
+/// - Fedora system-wide crypto policies engine (DEFAULT, LEGACY, FUTURE, FIPS)
+/// - Fedora Toolbox OCI dev container engine
+/// - NixOS Home-Manager declarative user environments
+/// - Mise / Asdf universal multi-runtime version manager
+/// - Devenv nix-based reproducible dev environments
+/// - Aircrack-ng / Wireshark wireless frame auditor
+/// - Ubuntu Pro Livepatch kernel hot-patching engine
+/// - Flatpak SDK container builder
+/// - Clear Linux Stateless /usr Configuration Overlay Engine
 extern crate alloc;
 
 use alloc::format;
