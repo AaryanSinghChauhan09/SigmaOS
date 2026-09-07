@@ -687,35 +687,60 @@ To establish SigmaOS as a sovereign alternative, SigmaOS implements a radical di
 
 ---
 
-### 5. Fresh Core System & Ecosystem Innovations
+### 5. Fresh Core System & Subsystem Design Blueprints
 
-#### 🔧 Core OS Innovations
-- **Microkernel Modularity**: Split kernel services into isolated Rust modules (`src/kernel/`) for sub-microsecond resilience and failure containment.
-- **Self-Healing OS**: Automatic detection and instantaneous rollback of corrupted configurations, drivers, or software updates via temporal snapshots.
-- **Energy-Aware Kernel**: AI-driven scheduler balancing peak performance, latency targets, and battery efficiency.
-- **Universal App Packaging**: Single `SigPkg` format running seamlessly across desktop, mobile, edge, and cloud builds.
+#### Step 1: Init System Design
+- **Goal**: Replace ad-hoc boot scripts with `sigmctl`, a Rust-based service manager.
+- **Features**: Declarative unit files (like `systemd` / `runit` services), parallelized boot execution, built-in logging (`journald` equivalent), dependency tracking, and secure daemon sandboxing.
+- **Outcome**: SigmaOS boots predictably, services are managed cleanly, and failures are isolated.
 
-#### 📦 Application Ecosystem & Portability
-- **Declarative App Manifests**: Define dependencies, sandboxing permissions, and hardware access capabilities in a single unified configuration.
-- **Shards Marketplace**: Curated, cryptographically attested ecosystem for modular SigmaOS applications and system extensions.
-- **Cross-Architecture Portability**: Native execution across x86_64, AArch64, and RISC-V 64-bit architectures.
-- **Immutable App Layers**: Applications execute in read-only sandboxed environments, updated atomically without partial state corruption.
+#### Step 2: Package Manager Architecture
+- **Goal**: Expand `sigpkg` into a universal, multi-distro package engine.
+- **Features**: Declarative manifests (dependencies, permissions, hardware access), immutable layers with atomic updates, rollback support (NixOS / Silverblue style), and reproducible builds.
+- **Outcome**: Zero dependency hell, consistent environments, and sovereign software control.
 
-#### 🌐 Networking, Distributed & Cluster Features
-- **Distributed OS Mode**: Treat multiple physical devices as one unified OS instance with shared execution states.
-- **Clustered Device Pooling**: Seamlessly share remote GPUs, storage pools, and hardware sensors across SigmaOS cluster nodes.
-- **Network-Native OS State**: Pause an active application session on one device and resume it instantly on another.
+#### Step 3: Networking Stack Expansion
+- **Goal**: Full networking parity with Linux and BSD.
+- **Features**: Memory-safe Rust TCP/IP stack, firewall inspired by BSD `pf`, WireGuard VPN / IPsec tunneling, eBPF XDP zero-copy packet redirect, and BGP/OSPF dynamic routing.
+- **Outcome**: SigmaOS becomes viable for production servers, edge clusters, and sovereign networking.
 
-#### 🔒 Security, Sovereignty & Governance
-- **Cryptographic Boot Chain**: End-to-end tamper-proof hardware initialization and attestation.
-- **Privacy-First Telemetry**: Transparent userland control dashboard where users exercise granular authority over system telemetry.
-- **Sandboxed Hardware Modules**: Isolate risky or proprietary legacy drivers in unprivileged userland sandboxes (`RumpKernel`).
-- **Firmware-Free Drivers**: Replace opaque vendor binary blobs with transparent, open-source Rust driver implementations.
-- **Contributor Charter & Roadmap**: Clear governance rules, public quarterly milestones, developer sprints, and living GitHub Wiki knowledge base.
+#### Step 4: Filesystem Support
+- **Goal**: Support advanced storage engines beyond prototype filesystem.
+- **Features**: ext4 for legacy compatibility, ZFS / Btrfs / HAMMER2 for snapshots, Merkle checksums, CoW datasets, UFS for BSD-style simplicity, and Temporal filesystem for native time-travel rollback.
+- **Outcome**: Advanced storage sovereignty, data resilience, and instant recovery.
+
+#### Step 5: Userland Utilities
+- **Goal**: Provide complete scripting, automation, and POSIX toolkits.
+- **Features**: Port GNU/BSD coreutils (`grep`, `sed`, `awk`, `bash`), provide Rust-native equivalents (`sigma_sh`), and enforce strict POSIX compliance for developer familiarity.
+- **Outcome**: SigmaOS becomes daily-driver capable for scripting, compilation, and system administration.
+
+#### Step 6: Advanced Features
+- **Containerization**: Native support for Docker/Podman OCI containers and BSD jails.
+- **Virtualization**: Rust-safe hypervisor (KVM/QEMU/bhyve equivalent and Firecracker microVMs).
+- **Transactional Updates**: Atomic system updates and rollback safety like NixOS.
+- **Observability**: OpenTelemetry metrics collector, syslog/journald ring buffers, and DTrace dynamic tracing.
+- **Accessibility & i18n**: WCAG 2.1 AA screen readers, voice control, focus indicators, and internationalization.
+
+#### Step 7: Security & Sovereignty
+- **MAC Frameworks**: SELinux / AppArmor policy enforcement and FreeBSD Capsicum / OpenBSD Pledge & Unveil sandboxing.
+- **Cryptographic Boot Chain**: Dilithium-5 / Secure Boot tamper-proof hardware startup.
+- **Sandboxed Drivers**: Isolate risky or proprietary modules in userland RUMP containers.
+- **Privacy-First Telemetry**: Transparent userland dashboard for absolute user data control.
 
 ---
 
-### 5. Formal 2-Year Strategic Roadmap (2026 – 2028)
+### 6. Roadmap Sequencing & Milestone Matrix
+
+| **Phase** | **Focus Areas** | **Outcome** |
+|-----------|-----------------|-------------|
+| **Q4 2026 – Q2 2027** | Init system, package manager `sigpkg`, userland utilities | SigmaOS becomes daily-driver capable |
+| **Q3 2027 – Q1 2028** | Networking stack, filesystem expansion (ext4/ZFS/Btrfs), drivers | SigmaOS gains parity with Linux/BSD basics |
+| **Q2 2028 – Q4 2028** | Containerization, virtualization, transactional updates | SigmaOS becomes competitive for servers & devops |
+| **2029+** | Security frameworks (MAC/Capsicum), accessibility, i18n | SigmaOS matures into a fully sovereign OS ecosystem |
+
+---
+
+### 7. Formal 2-Year Strategic Roadmap (2026 – 2028)
 
 #### 🔹 Q4 2026 – Q2 2027: Foundation & Immutable Userland
 - **Compatibility Layers**: Run Linux/Windows apps seamlessly without emulation overhead.
