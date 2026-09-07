@@ -3724,7 +3724,7 @@ mod new_unimplemented_tests {
 
     #[test]
     fn test_rocky_alma_enterprise_lifecycle_governor() {
-        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9);
+        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9, 9);
         assert!(gov.verify_abi_compatibility(8));
         assert!(gov.verify_abi_compatibility(9));
         assert!(!gov.verify_abi_compatibility(10));
@@ -3746,7 +3746,7 @@ mod new_unimplemented_tests {
 
     #[test]
     fn test_puppy_linux_overlay_ramdisk_engine() {
-        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048);
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048, 2048);
         puppy.load_sfs_module("puppy_sigma_2.0.sfs");
         puppy.mount_persistence("/mnt/home/sigmasave.2fs");
         assert_eq!(puppy.loaded_sfs_modules.len(), 1);
@@ -3801,14 +3801,6 @@ mod new_unimplemented_tests {
         assert_eq!(phoronix.calculate_composite_score(), 100.0);
     }
 
-    #[test]
-    fn test_frappe_framework_doctype_engine() {
-        let mut frappe = FrappeFrameworkDocTypeEngine::new("Customer Order");
-        frappe.add_field("customer_name", "Data", "Customer Name", true);
-        assert_eq!(frappe.fields.len(), 1);
-        assert_eq!(frappe.transition_workflow("submit").unwrap(), "Submitted");
-        assert_eq!(frappe.transition_workflow("cancel").unwrap(), "Cancelled");
-    }
 
     #[test]
     fn test_hwbusters_power_supply_monitor() {

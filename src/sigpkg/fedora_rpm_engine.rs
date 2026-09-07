@@ -13,9 +13,9 @@ use std::vec;
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(test, feature = "standalone_test")))]
 use crate::klib::collections::HashMap;
-#[cfg(feature = "standalone_test")]
+#[cfg(any(test, feature = "standalone_test"))]
 use alloc::collections::BTreeMap as HashMap;
 
 use std::string::{String, ToString};

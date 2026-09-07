@@ -660,7 +660,7 @@ impl MulticoreSmpInterruptEngine {
         dst_ip: [u8; 4],
         src_port: u16,
         dst_port: u16,
-        protocol: u8,
+        _protocol: u8,
     ) -> ([u8; 4], u16) {
         let _ = protocol;
         // Search conntrack
