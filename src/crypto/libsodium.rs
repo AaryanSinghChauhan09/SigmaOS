@@ -121,7 +121,6 @@ impl Auth {
     fn hmac_sha256(&self, message: &[u8], key: &[u8]) -> Vec<u8> {
         // Placeholder for actual HMAC-SHA256
         // This would use the SHA256 implementation from the hash module
-        
 
         let mut combined = key.to_vec();
         combined.extend_from_slice(message);
@@ -144,14 +143,16 @@ pub struct BoxCipher {
 
 impl BoxCipher {
     /// Generate a new keypair
-    pub fn keypair() -> ([u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
-                         [u8; constants::CRYPTO_BOX_SECRETKEYBYTES]) {
+    pub fn keypair() -> (
+        [u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
+        [u8; constants::CRYPTO_BOX_SECRETKEYBYTES],
+    ) {
         // Simplified key generation
         let mut public_key = [0u8; constants::CRYPTO_BOX_PUBLICKEYBYTES];
         let secret_key = [0u8; constants::CRYPTO_BOX_SECRETKEYBYTES];
 
         // Use random number generator
-        
+
         for _i in 0..constants::CRYPTO_BOX_SECRETKEYBYTES {
             // secret_key[i] = random::random_byte(); // removed - not available
         }
@@ -162,22 +163,31 @@ impl BoxCipher {
             fold_state ^= secret_key[i] as u64;
             fold_state = fold_state.wrapping_mul(0x100000001b3);
             let derived_byte = (fold_state ^ (fold_state >> 32)) as u8;
-            public_key[i % constants::CRYPTO_BOX_PUBLICKEYBYTES] = secret_key[i].wrapping_add(derived_byte);
+            public_key[i % constants::CRYPTO_BOX_PUBLICKEYBYTES] =
+                secret_key[i].wrapping_add(derived_byte);
         }
 
         (public_key, secret_key)
     }
 
     /// Create a new box cipher with existing keys
-    pub fn new(public_key: [u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
-               secret_key: [u8; constants::CRYPTO_BOX_SECRETKEYBYTES]) -> Self {
-        BoxCipher { public_key, secret_key }
+    pub fn new(
+        public_key: [u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
+        secret_key: [u8; constants::CRYPTO_BOX_SECRETKEYBYTES],
+    ) -> Self {
+        BoxCipher {
+            public_key,
+            secret_key,
+        }
     }
 
     /// Encrypt a message
-    pub fn encrypt(&self, message: &[u8], nonce: &[u8; constants::CRYPTO_BOX_NONCEBYTES],
-                   recipient_public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES])
-                   -> Vec<u8> {
+    pub fn encrypt(
+        &self,
+        message: &[u8],
+        nonce: &[u8; constants::CRYPTO_BOX_NONCEBYTES],
+        recipient_public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
+    ) -> Vec<u8> {
         // Simplified encryption (X25519+XSalsa20+Poly1305)
         let mut ciphertext = Vec::with_capacity(message.len() + constants::CRYPTO_BOX_MACBYTES);
 
@@ -202,9 +212,12 @@ impl BoxCipher {
     }
 
     /// Decrypt a message
-    pub fn decrypt(&self, ciphertext: &[u8], nonce: &[u8; constants::CRYPTO_BOX_NONCEBYTES],
-                   sender_public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES])
-                   -> Result<Vec<u8>, &'static str> {
+    pub fn decrypt(
+        &self,
+        ciphertext: &[u8],
+        nonce: &[u8; constants::CRYPTO_BOX_NONCEBYTES],
+        sender_public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES],
+    ) -> Result<Vec<u8>, &'static str> {
         if ciphertext.len() < constants::CRYPTO_BOX_MACBYTES {
             return Err("Ciphertext too short");
         }
@@ -240,8 +253,7 @@ impl BoxCipher {
     }
 
     /// Simplified Diffie-Hellman key exchange
-    fn diffie_hellman(&self, public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES])
-                      -> Vec<u8> {
+    fn diffie_hellman(&self, public_key: &[u8; constants::CRYPTO_BOX_PUBLICKEYBYTES]) -> Vec<u8> {
         let mut shared = vec![0u8; 32];
         for i in 0..32 {
             shared[i] = self.secret_key[i] ^ public_key[i];
@@ -262,9 +274,13 @@ impl SecretBox {
     }
 
     /// Encrypt a message
-    pub fn encrypt(&self, message: &[u8], nonce: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES])
-                   -> Vec<u8> {
-        let mut ciphertext = Vec::with_capacity(message.len() + constants::CRYPTO_SECRETBOX_MACBYTES);
+    pub fn encrypt(
+        &self,
+        message: &[u8],
+        nonce: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES],
+    ) -> Vec<u8> {
+        let mut ciphertext =
+            Vec::with_capacity(message.len() + constants::CRYPTO_SECRETBOX_MACBYTES);
 
         // XSalsa20 encryption (simplified)
         for (i, byte) in message.iter().enumerate() {
@@ -284,8 +300,11 @@ impl SecretBox {
     }
 
     /// Decrypt a message
-    pub fn decrypt(&self, ciphertext: &[u8], nonce: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES])
-                   -> Result<Vec<u8>, &'static str> {
+    pub fn decrypt(
+        &self,
+        ciphertext: &[u8],
+        nonce: &[u8; constants::CRYPTO_SECRETBOX_NONCEBYTES],
+    ) -> Result<Vec<u8>, &'static str> {
         if ciphertext.len() < constants::CRYPTO_SECRETBOX_MACBYTES {
             return Err("Ciphertext too short");
         }
@@ -304,7 +323,8 @@ impl SecretBox {
         let tag_offset = message_len;
         let mut valid = true;
         for i in 0..constants::CRYPTO_SECRETBOX_MACBYTES {
-            if ciphertext[tag_offset + i] != (self.key[i % self.key.len()] ^ nonce[i % nonce.len()]) {
+            if ciphertext[tag_offset + i] != (self.key[i % self.key.len()] ^ nonce[i % nonce.len()])
+            {
                 valid = false;
                 break;
             }
@@ -326,12 +346,13 @@ pub struct Sign {
 
 impl Sign {
     /// Generate a new signing keypair
-    pub fn keypair() -> ([u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES],
-                        [u8; constants::CRYPTO_SIGN_SECRETKEYBYTES]) {
+    pub fn keypair() -> (
+        [u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES],
+        [u8; constants::CRYPTO_SIGN_SECRETKEYBYTES],
+    ) {
         let mut public_key = [0u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES];
         let secret_key = [0u8; constants::CRYPTO_SIGN_SECRETKEYBYTES];
-        
-        
+
         for _i in 0..constants::CRYPTO_SIGN_SECRETKEYBYTES {
             // secret_key[i] = random::random_byte(); // removed - not available
         }
@@ -345,9 +366,14 @@ impl Sign {
     }
 
     /// Create a new signer with existing keys
-    pub fn new(public_key: [u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES],
-               secret_key: [u8; constants::CRYPTO_SIGN_SECRETKEYBYTES]) -> Self {
-        Sign { public_key, secret_key }
+    pub fn new(
+        public_key: [u8; constants::CRYPTO_SIGN_PUBLICKEYBYTES],
+        secret_key: [u8; constants::CRYPTO_SIGN_SECRETKEYBYTES],
+    ) -> Self {
+        Sign {
+            public_key,
+            secret_key,
+        }
     }
 
     /// Sign a message
@@ -367,8 +393,7 @@ impl Sign {
     }
 
     /// Verify a signature
-    pub fn verify(&self, signature: &[u8; constants::CRYPTO_SIGN_BYTES],
-                  message: &[u8]) -> bool {
+    pub fn verify(&self, signature: &[u8; constants::CRYPTO_SIGN_BYTES], message: &[u8]) -> bool {
         let computed = self.sign(message);
 
         // Constant-time comparison
@@ -415,9 +440,10 @@ pub struct ScalarMult;
 
 impl ScalarMult {
     /// Scalar multiplication
-    pub fn scalar_mult(scalar: &[u8; constants::CRYPTO_SCALARMULT_SCALARBYTES],
-                       point: &[u8; constants::CRYPTO_SCALARMULT_BYTES])
-                       -> [u8; constants::CRYPTO_SCALARMULT_BYTES] {
+    pub fn scalar_mult(
+        scalar: &[u8; constants::CRYPTO_SCALARMULT_SCALARBYTES],
+        point: &[u8; constants::CRYPTO_SCALARMULT_BYTES],
+    ) -> [u8; constants::CRYPTO_SCALARMULT_BYTES] {
         let mut result = [0u8; constants::CRYPTO_SCALARMULT_BYTES];
 
         // Simplified Curve25519 scalar multiplication
@@ -429,8 +455,9 @@ impl ScalarMult {
     }
 
     /// Scalar multiplication base
-    pub fn scalar_mult_base(scalar: &[u8; constants::CRYPTO_SCALARMULT_SCALARBYTES])
-                            -> [u8; constants::CRYPTO_SCALARMULT_BYTES] {
+    pub fn scalar_mult_base(
+        scalar: &[u8; constants::CRYPTO_SCALARMULT_SCALARBYTES],
+    ) -> [u8; constants::CRYPTO_SCALARMULT_BYTES] {
         let mut result = [0u8; constants::CRYPTO_SCALARMULT_BYTES];
 
         // Simplified base point multiplication
@@ -447,9 +474,12 @@ pub struct Stream;
 
 impl Stream {
     /// Generate stream cipher output
-    pub fn stream_xor(output: &mut [u8], input: &[u8],
-                      nonce: &[u8; constants::CRYPTO_STREAM_NONCEBYTES],
-                      key: &[u8; constants::CRYPTO_STREAM_KEYBYTES]) {
+    pub fn stream_xor(
+        output: &mut [u8],
+        input: &[u8],
+        nonce: &[u8; constants::CRYPTO_STREAM_NONCEBYTES],
+        key: &[u8; constants::CRYPTO_STREAM_KEYBYTES],
+    ) {
         let len = output.len().min(input.len());
 
         for i in 0..len {
@@ -460,9 +490,11 @@ impl Stream {
     }
 
     /// Generate stream cipher output (in-place)
-    pub fn stream_xor_inplace(data: &mut [u8],
-                              nonce: &[u8; constants::CRYPTO_STREAM_NONCEBYTES],
-                              key: &[u8; constants::CRYPTO_STREAM_KEYBYTES]) {
+    pub fn stream_xor_inplace(
+        data: &mut [u8],
+        nonce: &[u8; constants::CRYPTO_STREAM_NONCEBYTES],
+        key: &[u8; constants::CRYPTO_STREAM_KEYBYTES],
+    ) {
         for i in 0..data.len() {
             let key_byte = key[i % key.len()];
             let nonce_byte = nonce[i % nonce.len()];
@@ -496,7 +528,6 @@ pub mod utils {
 
     /// Generate random bytes
     pub fn randombytes(buf: &mut [u8]) {
-        
         for _byte in buf.iter_mut() {
             // *byte = random::random_byte(); // not available
         }

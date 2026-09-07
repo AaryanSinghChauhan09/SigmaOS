@@ -8,13 +8,13 @@
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
 use crate::klib::collections::HashMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS TCP State Machine — RFC 793 full implementation
 /// States: CLOSED → LISTEN → SYN_SENT / SYN_RCVD → ESTABLISHED →
 ///         FIN_WAIT_1 → FIN_WAIT_2 → TIME_WAIT → CLOSED
 ///         ESTABLISHED → CLOSE_WAIT → LAST_ACK → CLOSED
 use std::collections::VecDeque;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ── TCP States (RFC 793 §3.2) ─────────────────────────────────────────────
 

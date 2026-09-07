@@ -51,7 +51,11 @@ impl AurPkgbuild {
             pkgver: pkgver.to_string(),
             pkgrel,
             pkgdesc: pkgdesc.to_string(),
-            arch: vec!["x86_64".to_string(), "aarch64".to_string(), "riscv64".to_string()],
+            arch: vec![
+                "x86_64".to_string(),
+                "aarch64".to_string(),
+                "riscv64".to_string(),
+            ],
             depends: Vec::new(),
             makedepends: Vec::new(),
             provides: Vec::new(),
@@ -266,7 +270,8 @@ impl ApkPackageIndex {
     }
 
     pub fn register(&mut self, name: &str, checksum_hex: &str) {
-        self.packages.insert(name.to_string(), checksum_hex.to_string());
+        self.packages
+            .insert(name.to_string(), checksum_hex.to_string());
     }
 
     pub fn verify_integrity(&self, name: &str, hash: &str) -> bool {
@@ -287,7 +292,10 @@ impl DebianUnattendedUpgradesEngine {
     pub fn new() -> Self {
         DebianUnattendedUpgradesEngine {
             automatic_security_updates: true,
-            allowed_origins: vec!["Debian-Security".to_string(), "SigmaOS-Security".to_string()],
+            allowed_origins: vec![
+                "Debian-Security".to_string(),
+                "SigmaOS-Security".to_string(),
+            ],
             package_blacklists: Vec::new(),
         }
     }
@@ -303,15 +311,15 @@ impl DebianUnattendedUpgradesEngine {
     }
 }
 
-    #[test]
-    fn test_debian_unattended_upgrades_engine() {
-        let mut engine = DebianUnattendedUpgradesEngine::new();
-        assert!(engine.should_auto_upgrade("libc6", "Debian-Security"));
-        assert!(!engine.should_auto_upgrade("untrusted-app", "UntrustedOrigin"));
+#[test]
+fn test_debian_unattended_upgrades_engine() {
+    let mut engine = DebianUnattendedUpgradesEngine::new();
+    assert!(engine.should_auto_upgrade("libc6", "Debian-Security"));
+    assert!(!engine.should_auto_upgrade("untrusted-app", "UntrustedOrigin"));
 
-        engine.package_blacklists.push("libc6".to_string());
-        assert!(!engine.should_auto_upgrade("libc6", "Debian-Security"));
-    }
+    engine.package_blacklists.push("libc6".to_string());
+    assert!(!engine.should_auto_upgrade("libc6", "Debian-Security"));
+}
 
 /// 8. Void Linux: XBPS Transaction Graph
 #[derive(Debug, Clone)]
@@ -321,7 +329,9 @@ pub struct XbpsTransactionEngine {
 
 impl XbpsTransactionEngine {
     pub fn new() -> Self {
-        Self { install_queue: Vec::new() }
+        Self {
+            install_queue: Vec::new(),
+        }
     }
 
     pub fn enqueue_unique(&mut self, pkg: &str) {
@@ -413,7 +423,12 @@ mod tests {
 
     #[test]
     fn test_aur_pkgbuild() {
-        let mut pkg = AurPkgbuild::new("rust-analyzer-bin", "2026.08.29", 1, "Rust IDE language server");
+        let mut pkg = AurPkgbuild::new(
+            "rust-analyzer-bin",
+            "2026.08.29",
+            1,
+            "Rust IDE language server",
+        );
         pkg.add_dependency("rust");
         assert!(pkg.can_coexist_with("gcc"));
         assert_eq!(pkg.depends.len(), 1);
@@ -446,8 +461,14 @@ mod tests {
         apt.add_rule("*", "unstable", AptPriority::Standard);
         apt.add_rule("sigmaos-kernel", "stable", AptPriority::Preferred);
 
-        assert_eq!(apt.evaluate_priority("sigmaos-kernel", "stable"), AptPriority::Preferred);
-        assert_eq!(apt.evaluate_priority("firefox", "unstable"), AptPriority::Standard);
+        assert_eq!(
+            apt.evaluate_priority("sigmaos-kernel", "stable"),
+            AptPriority::Preferred
+        );
+        assert_eq!(
+            apt.evaluate_priority("firefox", "unstable"),
+            AptPriority::Standard
+        );
     }
 
     #[test]
@@ -470,6 +491,9 @@ mod tests {
 
         let stateless = ClearLinuxStatelessRoot::new();
         assert_eq!(stateless.resolve_config_priority(true), "/etc");
-        assert_eq!(stateless.resolve_config_priority(false), "/usr/share/defaults");
+        assert_eq!(
+            stateless.resolve_config_priority(false),
+            "/usr/share/defaults"
+        );
     }
 }

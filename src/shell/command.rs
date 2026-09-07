@@ -7,8 +7,8 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
-use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 pub type ShellVec<T> = std::vec::Vec<T>;
 pub type CommandID = usize;

@@ -12,9 +12,9 @@
 // Threading and synchronization
 // Zero-dependency implementation - no external libraries required
 
+use core::fmt;
 use std::string::String;
 use std::vec::Vec;
-use core::fmt;
 
 /// Error type for the Thread module
 #[derive(Debug, Clone, PartialEq, Eq)]

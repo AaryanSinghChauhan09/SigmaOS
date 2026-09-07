@@ -203,7 +203,10 @@ pub struct CgroupPidsController {
 
 impl Default for CgroupPidsController {
     fn default() -> Self {
-        Self { pids_max: u64::MAX, pids_current: 0 }
+        Self {
+            pids_max: u64::MAX,
+            pids_current: 0,
+        }
     }
 }
 
@@ -310,18 +313,30 @@ impl CgroupNode {
     }
 
     /// Returns true if this node is a leaf (no children).
-    pub fn is_leaf(&self) -> bool { self.children.is_empty() }
+    pub fn is_leaf(&self) -> bool {
+        self.children.is_empty()
+    }
 
     /// Returns the node name.
-    pub fn name(&self) -> &str { &self.name }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
     /// Returns the full path.
-    pub fn path(&self) -> &str { &self.path }
+    pub fn path(&self) -> &str {
+        &self.path
+    }
     /// Returns the node ID.
-    pub fn id(&self) -> u64 { self.id }
+    pub fn id(&self) -> u64 {
+        self.id
+    }
     /// Returns task list.
-    pub fn tasks(&self) -> &[u32] { &self.tasks }
+    pub fn tasks(&self) -> &[u32] {
+        &self.tasks
+    }
     /// Returns enabled controllers.
-    pub fn enabled_controllers(&self) -> &[CgroupController] { &self.enabled_controllers }
+    pub fn enabled_controllers(&self) -> &[CgroupController] {
+        &self.enabled_controllers
+    }
 }
 
 // ============================================================
@@ -362,7 +377,9 @@ impl SigmaCgroupV2 {
     /// # Returns
     /// The new node's ID, or Err if parent doesn't exist.
     pub fn mkdir(&mut self, parent_id: u64, name: &str) -> Result<u64, &'static str> {
-        let parent_path = self.nodes.get(&parent_id)
+        let parent_path = self
+            .nodes
+            .get(&parent_id)
             .map(|n| n.path.clone())
             .ok_or("parent cgroup not found")?;
 
@@ -389,11 +406,17 @@ impl SigmaCgroupV2 {
     pub fn rmdir(&mut self, id: u64) -> Result<(), &'static str> {
         let (parent_id, is_leaf, has_tasks) = {
             let node = self.nodes.get(&id).ok_or("cgroup not found")?;
-            if id == self.root_id { return Err("cannot remove root cgroup"); }
+            if id == self.root_id {
+                return Err("cannot remove root cgroup");
+            }
             (node.parent_id, node.is_leaf(), !node.tasks.is_empty())
         };
-        if !is_leaf { return Err("cgroup has children"); }
-        if has_tasks { return Err("cgroup has active tasks"); }
+        if !is_leaf {
+            return Err("cgroup has children");
+        }
+        if has_tasks {
+            return Err("cgroup has active tasks");
+        }
         self.nodes.remove(&id);
         if let Some(pid) = parent_id {
             if let Some(parent) = self.nodes.get_mut(&pid) {
@@ -460,19 +483,31 @@ impl SigmaCgroupV2 {
     }
 
     /// Get a reference to a cgroup node.
-    pub fn get(&self, id: u64) -> Option<&CgroupNode> { self.nodes.get(&id) }
+    pub fn get(&self, id: u64) -> Option<&CgroupNode> {
+        self.nodes.get(&id)
+    }
     /// Get a mutable reference to a cgroup node.
-    pub fn get_mut(&mut self, id: u64) -> Option<&mut CgroupNode> { self.nodes.get_mut(&id) }
+    pub fn get_mut(&mut self, id: u64) -> Option<&mut CgroupNode> {
+        self.nodes.get_mut(&id)
+    }
     /// Returns the root node ID.
-    pub fn root_id(&self) -> u64 { self.root_id }
+    pub fn root_id(&self) -> u64 {
+        self.root_id
+    }
     /// Returns total cgroup count.
-    pub fn count(&self) -> usize { self.nodes.len() }
+    pub fn count(&self) -> usize {
+        self.nodes.len()
+    }
     /// Returns the cgroup ID for a given PID.
-    pub fn task_cgroup(&self, pid: u32) -> Option<u64> { self.task_map.get(&pid).copied() }
+    pub fn task_cgroup(&self, pid: u32) -> Option<u64> {
+        self.task_map.get(&pid).copied()
+    }
 }
 
 impl Default for SigmaCgroupV2 {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================

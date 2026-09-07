@@ -3,9 +3,7 @@
 //! This module tests the IPC namespace core implementation with all IPC object types
 //! including message queues, semaphores, and shared memory isolation.
 
-use sigmaos::ipc::{
-    IpcNamespace, IpcObjectType, MessageQueueId, SemaphoreId, SharedMemoryId,
-};
+use sigmaos::ipc::{IpcNamespace, IpcObjectType, MessageQueueId, SemaphoreId, SharedMemoryId};
 use sigmaos::kernel::namespaces::KernelNamespaceType;
 
 #[test]
@@ -23,7 +21,9 @@ fn test_message_queue_creation() {
         .expect("Failed to create message queue");
     assert!(mq_id > 0);
 
-    let mq = ns.get_message_queue(mq_id).expect("Failed to get message queue");
+    let mq = ns
+        .get_message_queue(mq_id)
+        .expect("Failed to get message queue");
     assert_eq!(mq.name, "test_mq");
     assert_eq!(mq.capacity, 100);
     assert_eq!(mq.creator_pid, 1);

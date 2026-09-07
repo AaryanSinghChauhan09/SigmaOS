@@ -11,7 +11,6 @@
 // OpenBSD KARL (Kernel Address Randomized Link) engine for SigmaOS
 // Randomizes kernel section order, function alignments, and symbol offsets on boot
 
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;

@@ -90,8 +90,6 @@ impl CryptoVerifier {
 
     /// Compute SHA3-256 hash
     fn compute_hash(&self, data: &[u8]) -> String {
-        
-
         let mut hash_val: u64 = 0xcbf29ce484222325;
         for &byte in data {
             hash_val ^= byte as u64;

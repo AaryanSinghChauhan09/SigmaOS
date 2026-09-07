@@ -18,12 +18,12 @@ pub mod auth;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
+pub mod crypto;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
 pub mod device;
 pub mod driver;
-pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
 pub mod kernel;
@@ -135,7 +135,6 @@ pub mod virtualization;
 
 pub mod interrupt;
 
-
 pub mod hardware {
     pub mod compatibility;
     pub mod win32;
@@ -231,42 +230,39 @@ pub use driver::pci_bus::{
 pub use drivers::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
-    EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
-    I2cSpiGpioBusController, InputDriver, InputEvent, InputType, IsochannelMode,
-    IsolationRingLevel, LeAudioCodec, LinuxBsdWifi6e7Driver, LinuxUrb, LinuxUrbQueue,
-    MultiTouchSlot, NetBsdRumpDriverHost, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    Nvme2ZnsFabricsDriver, NvmeFabricsTransport, NvmeZoneDescriptor, NvmeZoneState,
-    OpenBsdDriverPledge, PacketSlot, StorageCommand, StorageDriver, StorageError, StorageType,
-    Uac3IntelHdaAudioDspDriver, UrbTransferType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
-    Virgl3dCmd, Virgl3dResource, VirtioGpuVirgl3dDriver, WifiBand, WifiMloLink, WifiProtocolMode,
+    EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState, GpuCommand,
+    GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, I2cSpiGpioBusController,
+    InputDriver, InputEvent, InputType, IsochannelMode, IsolationRingLevel, LeAudioCodec,
+    LinuxBsdWifi6e7Driver, LinuxUrb, LinuxUrbQueue, MultiTouchSlot, NetBsdRumpDriverHost,
+    NetworkCommand, NetworkDriver, NetworkError, NetworkType, Nvme2ZnsFabricsDriver,
+    NvmeFabricsTransport, NvmeZoneDescriptor, NvmeZoneState, OpenBsdDriverPledge, PacketSlot,
+    StorageCommand, StorageDriver, StorageError, StorageType, Uac3IntelHdaAudioDspDriver,
+    UrbTransferType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo, Virgl3dCmd,
+    Virgl3dResource, VirtioGpuVirgl3dDriver, WifiBand, WifiMloLink, WifiProtocolMode,
     ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use governance::{
-    FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
-    DemocraticProposal, DemocraticVoting,
+    DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
+    RoadmapMilestone, TransparentRoadmap,
 };
 // pub use ipc::{
 //     StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
 //     STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO,
 // };
-pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, Message, MemoryBlock, PAGE_SIZE,
-    Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    VirtualCpu,
-    IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry,
-    BoundedBufferProducerConsumer, SoftIrqType, BottomHalfKernelThread, BroadcastReceiver,
-    AndroidBroadcastReceiverRegistry,
-    KernelFastPacketEngine, FastPacketFrame, XdpAction,
-    KernelAccessController, LandlockPathRule, LandlockAccessRight,
-    InteractiveHybridScheduler, HybridTask,
-    CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
-    MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
-};
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
+pub use kernel::{
+    AndroidBroadcastReceiverRegistry, BottomHalfKernelThread, BoundedBufferProducerConsumer,
+    BroadcastReceiver, BuddyAllocator, CgroupResourceLimits, Channel, CompletionQueueEntry,
+    CowBlock, CowStorageEngine, FastPacketFrame, Hammer2PfsSnapshot, HybridTask,
+    InteractiveHybridScheduler, IoUringEngine, IoUringOpcode, IpcError, IpcManager,
+    KernelAccessController, KernelFastPacketEngine, LandlockAccessRight, LandlockPathRule,
+    MemoryBlock, MemoryCompactionSuperpagesAllocator, Message, PhysicalFrameBlock, Priority,
+    Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SoftIrqType,
+    SovereignCgroupGovernor, SubmissionQueueEntry, VirtualCpu, XdpAction, PAGE_SIZE,
+};
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
@@ -285,16 +281,15 @@ pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use remote::{
-    FileTransfer, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
-    SimpleShellManager,
-};
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
     PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
     TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
+};
+pub use remote::{
+    FileTransfer, RemoteDesktop, RemoteError, RemoteSession, RemoteShell, SessionID, SessionState,
+    ShellError, ShellID, ShellManager, SimpleFileTransfer, SimpleRemoteDesktop,
+    SimpleRemoteSession, SimpleScreenSharing, SimpleShellManager,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
@@ -305,10 +300,6 @@ pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
     CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
     SandboxPolicy,
-};
-pub use userland::shell::{
-    Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
-    StreamTarget,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
@@ -331,6 +322,10 @@ pub use unimplemented_tools::{
     PluginMarketplace, PodcastRecorder, PrivacyDashboard, SecureContainer, SecureFileSharing,
     SmartNotificationManager, StaticAnalyzer, SubtitleEditor, VoiceControl, VrArRuntime,
 };
+pub use userland::shell::{
+    Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
+    StreamTarget,
+};
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
@@ -340,16 +335,15 @@ pub mod distro;
 pub mod distro_innovations;
 pub mod distro_inspirations;
 pub mod innovation;
+pub use ai::wandr::{
+    ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
+};
 pub use innovation::{
     BootStageKind, BootStageRecipe, ComposableBootSequencesEngine, DriverShard,
     FilesystemAsDatabaseEngine, HardwareAbstractionShardsEngine, ImmutableUserlandLayersEngine,
     KernelPersonality, LayeredKernelPersonalitiesEngine, LegacyAbiEnvironment,
-    NetworkNativeOsStateEngine, OsSessionState, ProgrammableSchedulerEngine,
-    RetroSandboxSession, RetrocompatibilitySandboxEngine, SchedulingPolicyRule,
-    UserlandOverlayLayer, VfsObjectRecord,
-};
-pub use ai::wandr::{
-    ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
+    NetworkNativeOsStateEngine, OsSessionState, ProgrammableSchedulerEngine, RetroSandboxSession,
+    RetrocompatibilitySandboxEngine, SchedulingPolicyRule, UserlandOverlayLayer, VfsObjectRecord,
 };
 
 pub use community::toolkit::{

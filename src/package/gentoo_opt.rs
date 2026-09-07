@@ -10,9 +10,9 @@
 // SigmaOS Gentoo-inspired Compilation Optimization and Portage Parity Shard
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
+use core::sync::atomic::{AtomicBool, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, Ordering};
 
 // ==========================================
 // 1. USE-FLAG MANAGER (PROFILE SELECTION)

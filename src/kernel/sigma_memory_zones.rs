@@ -27,8 +27,8 @@
 #![allow(unused_variables)]
 
 use std::collections::{HashMap, VecDeque};
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -160,8 +160,7 @@ impl BuddyAllocator {
     /// The entire region is inserted into the free list at the largest possible order.
     pub fn new(zone: MemoryZone, base_addr: usize, total_pages: usize) -> Self {
         // BTreeMap is not const-initializable; use array init trick.
-        let free_lists: [VecDeque<usize>; MAX_ORDER] =
-            std::array::from_fn(|_| VecDeque::new());
+        let free_lists: [VecDeque<usize>; MAX_ORDER] = std::array::from_fn(|_| VecDeque::new());
 
         let watermarks = ZoneWatermarks::from_total(total_pages);
 
@@ -214,8 +213,7 @@ impl BuddyAllocator {
         }
 
         // Find the smallest available order >= requested order.
-        let avail_order = (order..MAX_ORDER)
-            .find(|&o| !self.free_lists[o].is_empty())?;
+        let avail_order = (order..MAX_ORDER).find(|&o| !self.free_lists[o].is_empty())?;
 
         let mut block = self.free_lists[avail_order].pop_front().unwrap();
         self.free_pages -= 1 << avail_order;
@@ -231,9 +229,9 @@ impl BuddyAllocator {
         }
 
         self.free_pages -= 1 << order; // already subtracted avail_order above; fix double count
-        // Recalculate: we subtracted 2^avail_order, then added back split buddies.
-        // The net is: we consumed 2^order pages.
-        // Re-add the over-subtracted amount:
+                                       // Recalculate: we subtracted 2^avail_order, then added back split buddies.
+                                       // The net is: we consumed 2^order pages.
+                                       // Re-add the over-subtracted amount:
         self.free_pages += (1 << avail_order) - (1 << order);
 
         Some(block * PAGE_SIZE)
@@ -263,7 +261,7 @@ impl BuddyAllocator {
             if let Some(idx) = pos {
                 self.free_lists[current_order].remove(idx);
                 self.free_pages -= 1 << current_order; // buddy removed from free count
-                // Merge: lower block address becomes the merged block.
+                                                       // Merge: lower block address becomes the merged block.
                 block = block.min(buddy);
                 current_order += 1;
             } else {

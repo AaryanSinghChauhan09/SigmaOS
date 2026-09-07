@@ -9,7 +9,6 @@ use std::boxed::Box;
 // SigmaOS Meta-Kernel Orchestration, OOP Plugins, Micro-Drivers, and Legacy Pods
 // Allows parallel execution of legacy kernel personas (2.x -> 6.x) alongside modern ABIs.
 
-
 /// 1. Meta-Kernel Orchestration
 /// Supervisory kernel managing multiple kernel personas simultaneously.
 pub struct MetaKernel {

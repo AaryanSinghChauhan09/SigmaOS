@@ -34,8 +34,8 @@ pub struct UdevRule {
     pub driver_match: Option<String>,
     pub env_matches: HashMap<String, String>,
     pub symlink_name: Option<String>,
-    pub mode: u32,       // e.g. 0o660
-    pub group: String,   // e.g. "input", "disk", "video"
+    pub mode: u32,     // e.g. 0o660
+    pub group: String, // e.g. "input", "disk", "video"
     pub run_command: Option<String>,
 }
 
@@ -136,11 +136,13 @@ impl UdevDevdRuleEngine {
                     matched += 1;
                     if let Some(symlink) = &rule.symlink_name {
                         let dev_path = format!("/dev/{}", event.sysname);
-                        self.created_symlinks.insert(format!("/dev/{}", symlink), dev_path);
+                        self.created_symlinks
+                            .insert(format!("/dev/{}", symlink), dev_path);
                     }
 
                     if let Some(cmd) = &rule.run_command {
-                        self.executed_actions.push(format!("RUN: {} {}", cmd, event.sysname));
+                        self.executed_actions
+                            .push(format!("RUN: {} {}", cmd, event.sysname));
                     }
                 }
             }
@@ -158,7 +160,8 @@ impl UdevDevdRuleEngine {
                 && rule.type_event == devd_event_type
             {
                 matched += 1;
-                self.executed_actions.push(format!("DEVD_ACTION: {}", rule.action_script));
+                self.executed_actions
+                    .push(format!("DEVD_ACTION: {}", rule.action_script));
             }
         }
 
@@ -191,7 +194,10 @@ mod tests {
         let matches = engine.process_event(&mouse_event);
         assert!(matches >= 1);
         assert_eq!(
-            engine.created_symlinks.get("/dev/input/by-id/mouse-event").unwrap(),
+            engine
+                .created_symlinks
+                .get("/dev/input/by-id/mouse-event")
+                .unwrap(),
             "/dev/mouse0"
         );
     }
@@ -210,6 +216,9 @@ mod tests {
 
         let matches = engine.process_event(&usb_event);
         assert!(matches >= 1);
-        assert!(engine.executed_actions.iter().any(|a| a.contains("DEVD_ACTION")));
+        assert!(engine
+            .executed_actions
+            .iter()
+            .any(|a| a.contains("DEVD_ACTION")));
     }
 }

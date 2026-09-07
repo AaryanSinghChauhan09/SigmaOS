@@ -10,7 +10,6 @@
 // SPDX-License-Identifier: MIT
 /// SigmaOS: Network Routing Engine
 /// Implements packet routing, forwarding, and network lookup
-
 use super::zenithnet::{Ipv4Addr, NetworkError};
 use std::string::String;
 use std::vec::Vec;
@@ -60,9 +59,7 @@ pub struct RoutingTable {
 
 impl RoutingTable {
     pub fn new() -> Self {
-        Self {
-            routes: Vec::new(),
-        }
+        Self { routes: Vec::new() }
     }
 
     /// Add route
@@ -231,7 +228,9 @@ mod tests {
         let mut engine = RoutingEngine::new();
         engine.add_local_address(Ipv4Addr::new(192, 168, 1, 1));
 
-        let decision = engine.forward_packet(Ipv4Addr::new(192, 168, 1, 1)).unwrap();
+        let decision = engine
+            .forward_packet(Ipv4Addr::new(192, 168, 1, 1))
+            .unwrap();
         assert!(matches!(decision, ForwardingDecision::LocalDelivery));
     }
 

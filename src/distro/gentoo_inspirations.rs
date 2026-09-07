@@ -15,7 +15,6 @@
 //   • ebuilds metadata model
 //   • World set and dependency graph
 
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

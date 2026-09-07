@@ -963,9 +963,11 @@ mod tests {
         let mut shell = Shell::new();
         let res = shell.execute_line("echo hello world > output.txt");
         assert!(res.is_ok());
-        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
-            log.contains("REDIRECT: FD 1 -> file 'output.txt'")
-        }));
+        assert!(shell
+            .redirection_engine
+            .redirection_log
+            .iter()
+            .any(|log| { log.contains("REDIRECT: FD 1 -> file 'output.txt'") }));
         let captured = shell.redirection_engine.get_captured_output(1).unwrap();
         assert_eq!(captured, b"hello world\n");
     }
@@ -974,9 +976,11 @@ mod tests {
         let mut shell = Shell::new();
         let res = shell.execute_line("echo error_msg 2> err.log");
         assert!(res.is_ok());
-        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
-            log.contains("REDIRECT: FD 2 -> file 'err.log'")
-        }));
+        assert!(shell
+            .redirection_engine
+            .redirection_log
+            .iter()
+            .any(|log| { log.contains("REDIRECT: FD 2 -> file 'err.log'") }));
     }
 
     #[test]
@@ -984,9 +988,11 @@ mod tests {
         let mut shell = Shell::new();
         let res = shell.execute_line("echo test 2>&1");
         assert!(res.is_ok());
-        assert!(shell.redirection_engine.redirection_log.iter().any(|log| {
-            log.contains("REDIRECT: Dup Output FD 2 -> FD 1")
-        }));
+        assert!(shell
+            .redirection_engine
+            .redirection_log
+            .iter()
+            .any(|log| { log.contains("REDIRECT: Dup Output FD 2 -> FD 1") }));
     }
 
     #[test]
@@ -1008,7 +1014,12 @@ mod tests {
         let mut parser = Parser::new("cat << EOF\nline 1\nline 2\nEOF");
         let cmd = parser.parse().unwrap();
         match cmd {
-            ShellCommand::Redirect(_, RedirectSpec::HereDoc { delimiter, content, .. }) => {
+            ShellCommand::Redirect(
+                _,
+                RedirectSpec::HereDoc {
+                    delimiter, content, ..
+                },
+            ) => {
                 assert_eq!(delimiter, "EOF");
                 assert!(content.contains("line 1"));
                 assert!(content.contains("line 2"));
@@ -1052,7 +1063,11 @@ mod tests {
         let mut shell = Shell::new();
         let res = shell.execute_line("echo chained > out.txt 2>&1");
         assert!(res.is_ok());
-        assert!(shell.redirection_engine.redirection_log.iter().any(|log| log.contains("file 'out.txt'")));
+        assert!(shell
+            .redirection_engine
+            .redirection_log
+            .iter()
+            .any(|log| log.contains("file 'out.txt'")));
     }
     #[test]
     fn test_brace_expansion_and_arithmetic() {

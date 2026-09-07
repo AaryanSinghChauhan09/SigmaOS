@@ -52,22 +52,27 @@ impl NamespaceType {
     /// The clone flag bit corresponding to this namespace type.
     pub fn clone_flag(self) -> u64 {
         match self {
-            Self::Pid    => 0x20000000, // CLONE_NEWPID
-            Self::Net    => 0x40000000, // CLONE_NEWNET
-            Self::Mnt    => 0x00020000, // CLONE_NEWNS
-            Self::Uts    => 0x04000000, // CLONE_NEWUTS
-            Self::Ipc    => 0x08000000, // CLONE_NEWIPC
-            Self::User   => 0x10000000, // CLONE_NEWUSER
+            Self::Pid => 0x20000000,    // CLONE_NEWPID
+            Self::Net => 0x40000000,    // CLONE_NEWNET
+            Self::Mnt => 0x00020000,    // CLONE_NEWNS
+            Self::Uts => 0x04000000,    // CLONE_NEWUTS
+            Self::Ipc => 0x08000000,    // CLONE_NEWIPC
+            Self::User => 0x10000000,   // CLONE_NEWUSER
             Self::Cgroup => 0x02000000, // CLONE_NEWCGROUP
-            Self::Time   => 0x00000080, // CLONE_NEWTIME
+            Self::Time => 0x00000080,   // CLONE_NEWTIME
         }
     }
 
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::Pid => "pid", Self::Net => "net", Self::Mnt => "mnt",
-            Self::Uts => "uts", Self::Ipc => "ipc", Self::User => "user",
-            Self::Cgroup => "cgroup", Self::Time => "time",
+            Self::Pid => "pid",
+            Self::Net => "net",
+            Self::Mnt => "mnt",
+            Self::Uts => "uts",
+            Self::Ipc => "ipc",
+            Self::User => "user",
+            Self::Cgroup => "cgroup",
+            Self::Time => "time",
         }
     }
 }
@@ -83,7 +88,9 @@ pub struct NsId(u64);
 static NEXT_NS_ID: AtomicU64 = AtomicU64::new(1);
 
 impl NsId {
-    fn alloc() -> Self { Self(NEXT_NS_ID.fetch_add(1, Ordering::Relaxed)) }
+    fn alloc() -> Self {
+        Self(NEXT_NS_ID.fetch_add(1, Ordering::Relaxed))
+    }
 }
 
 // ============================================================
@@ -117,8 +124,13 @@ impl UtsNamespace {
         }
     }
 
-    pub fn set_hostname(&mut self, name: &str) { self.hostname = name.into(); self.nodename = name.into(); }
-    pub fn set_domainname(&mut self, name: &str) { self.domainname = name.into(); }
+    pub fn set_hostname(&mut self, name: &str) {
+        self.hostname = name.into();
+        self.nodename = name.into();
+    }
+    pub fn set_domainname(&mut self, name: &str) {
+        self.domainname = name.into();
+    }
 }
 
 // ============================================================
@@ -147,13 +159,25 @@ pub struct PidNamespace {
 
 impl PidNamespace {
     pub fn new_root() -> Self {
-        Self { id: NsId::alloc(), level: 0, parent: None, next_pid: 1,
-            pid_map: BTreeMap::new(), init_pid: 1 }
+        Self {
+            id: NsId::alloc(),
+            level: 0,
+            parent: None,
+            next_pid: 1,
+            pid_map: BTreeMap::new(),
+            init_pid: 1,
+        }
     }
 
     pub fn new_child(parent: &PidNamespace) -> Self {
-        Self { id: NsId::alloc(), level: parent.level + 1, parent: Some(parent.id),
-            next_pid: 1, pid_map: BTreeMap::new(), init_pid: 0 }
+        Self {
+            id: NsId::alloc(),
+            level: parent.level + 1,
+            parent: Some(parent.id),
+            next_pid: 1,
+            pid_map: BTreeMap::new(),
+            init_pid: 0,
+        }
     }
 
     /// Allocate a new PID within this namespace, mapping to global_pid.
@@ -161,12 +185,16 @@ impl PidNamespace {
         let local = self.next_pid;
         self.next_pid += 1;
         self.pid_map.insert(local, global_pid);
-        if local == 1 { self.init_pid = global_pid; }
+        if local == 1 {
+            self.init_pid = global_pid;
+        }
         local
     }
 
     /// Translate local PID to global PID.
-    pub fn to_global(&self, local: u32) -> Option<u32> { self.pid_map.get(&local).copied() }
+    pub fn to_global(&self, local: u32) -> Option<u32> {
+        self.pid_map.get(&local).copied()
+    }
 }
 
 // ============================================================
@@ -191,8 +219,14 @@ pub struct IpcNamespace {
 
 impl IpcNamespace {
     pub fn new() -> Self {
-        Self { id: NsId::alloc(), mq_count: 0, mq_max: 256, sem_count: 0, shm_count: 0,
-            shmall: 8 * 1024 * 1024 * 1024 } // 8GB default
+        Self {
+            id: NsId::alloc(),
+            mq_count: 0,
+            mq_max: 256,
+            sem_count: 0,
+            shm_count: 0,
+            shmall: 8 * 1024 * 1024 * 1024,
+        } // 8GB default
     }
 }
 
@@ -228,22 +262,47 @@ impl UserNamespace {
     pub fn new_root() -> Self {
         // Root namespace: identity mapping
         Self {
-            id: NsId::alloc(), parent: None,
-            uid_map: vec![IdMapEntry { ns_id: 0, host_id: 0, count: u32::MAX }],
-            gid_map: vec![IdMapEntry { ns_id: 0, host_id: 0, count: u32::MAX }],
+            id: NsId::alloc(),
+            parent: None,
+            uid_map: vec![IdMapEntry {
+                ns_id: 0,
+                host_id: 0,
+                count: u32::MAX,
+            }],
+            gid_map: vec![IdMapEntry {
+                ns_id: 0,
+                host_id: 0,
+                count: u32::MAX,
+            }],
             owner_uid: 0,
         }
     }
 
     pub fn new_child(owner_uid: u32, parent: &UserNamespace) -> Self {
-        Self { id: NsId::alloc(), parent: Some(parent.id),
-            uid_map: Vec::new(), gid_map: Vec::new(), owner_uid }
+        Self {
+            id: NsId::alloc(),
+            parent: Some(parent.id),
+            uid_map: Vec::new(),
+            gid_map: Vec::new(),
+            owner_uid,
+        }
     }
 
     /// Add a UID mapping. Maps ns_ids [ns_start..ns_start+count) → host [host_start..host_start+count).
-    pub fn add_uid_map(&mut self, ns_start: u32, host_start: u32, count: u32) -> Result<(), &'static str> {
-        if self.uid_map.len() >= 5 { return Err("too many uid_map entries"); }
-        self.uid_map.push(IdMapEntry { ns_id: ns_start, host_id: host_start, count });
+    pub fn add_uid_map(
+        &mut self,
+        ns_start: u32,
+        host_start: u32,
+        count: u32,
+    ) -> Result<(), &'static str> {
+        if self.uid_map.len() >= 5 {
+            return Err("too many uid_map entries");
+        }
+        self.uid_map.push(IdMapEntry {
+            ns_id: ns_start,
+            host_id: host_start,
+            count,
+        });
         Ok(())
     }
 
@@ -294,9 +353,9 @@ pub struct NamespaceSet {
 /// Maintains the full namespace hierarchy and provides
 /// clone/unshare/setns operations.
 pub struct SigmaNamespaceManager {
-    pub uts_ns:  BTreeMap<NsId, UtsNamespace>,
-    pub pid_ns:  BTreeMap<NsId, PidNamespace>,
-    pub ipc_ns:  BTreeMap<NsId, IpcNamespace>,
+    pub uts_ns: BTreeMap<NsId, UtsNamespace>,
+    pub pid_ns: BTreeMap<NsId, PidNamespace>,
+    pub ipc_ns: BTreeMap<NsId, IpcNamespace>,
     pub user_ns: BTreeMap<NsId, UserNamespace>,
     /// Map from PID to its NamespaceSet
     process_ns: BTreeMap<u32, NamespaceSet>,
@@ -307,20 +366,27 @@ pub struct SigmaNamespaceManager {
 impl SigmaNamespaceManager {
     /// Create a new manager with host/initial namespaces.
     pub fn new() -> Self {
-        let uts  = UtsNamespace::new("sigmaos");
-        let pid  = PidNamespace::new_root();
-        let ipc  = IpcNamespace::new();
+        let uts = UtsNamespace::new("sigmaos");
+        let pid = PidNamespace::new_root();
+        let ipc = IpcNamespace::new();
         let user = UserNamespace::new_root();
 
         let init_ns = NamespaceSet {
-            uts: uts.id, pid: pid.id, ipc: ipc.id,
-            user: user.id, mnt: NsId(0), net: NsId(0),
+            uts: uts.id,
+            pid: pid.id,
+            ipc: ipc.id,
+            user: user.id,
+            mnt: NsId(0),
+            net: NsId(0),
         };
 
         let mut mgr = Self {
-            uts_ns: BTreeMap::new(), pid_ns: BTreeMap::new(),
-            ipc_ns: BTreeMap::new(), user_ns: BTreeMap::new(),
-            process_ns: BTreeMap::new(), initial_ns: init_ns.clone(),
+            uts_ns: BTreeMap::new(),
+            pid_ns: BTreeMap::new(),
+            ipc_ns: BTreeMap::new(),
+            user_ns: BTreeMap::new(),
+            process_ns: BTreeMap::new(),
+            initial_ns: init_ns.clone(),
         };
         mgr.uts_ns.insert(uts.id, uts);
         mgr.pid_ns.insert(pid.id, pid);
@@ -335,7 +401,9 @@ impl SigmaNamespaceManager {
     }
 
     /// Unregister a process (on exit).
-    pub fn unregister_process(&mut self, pid: u32) { self.process_ns.remove(&pid); }
+    pub fn unregister_process(&mut self, pid: u32) {
+        self.process_ns.remove(&pid);
+    }
 
     /// Create new namespaces for a process (clone/unshare flags).
     ///
@@ -343,13 +411,24 @@ impl SigmaNamespaceManager {
     /// * `pid` — PID requesting the unshare
     /// * `flags` — Bitmask of CLONE_NEW* flags
     pub fn unshare(&mut self, pid: u32, flags: u64) -> Result<(), &'static str> {
-        let ns_set = self.process_ns.get(&pid).cloned().ok_or("process not found")?;
+        let ns_set = self
+            .process_ns
+            .get(&pid)
+            .cloned()
+            .ok_or("process not found")?;
 
         let mut new_ns = ns_set;
 
         if flags & NamespaceType::Uts.clone_flag() != 0 {
-            let old_uts = self.uts_ns.get(&new_ns.uts).cloned().ok_or("uts ns not found")?;
-            let new_uts = UtsNamespace { id: NsId::alloc(), ..old_uts };
+            let old_uts = self
+                .uts_ns
+                .get(&new_ns.uts)
+                .cloned()
+                .ok_or("uts ns not found")?;
+            let new_uts = UtsNamespace {
+                id: NsId::alloc(),
+                ..old_uts
+            };
             let id = new_uts.id;
             self.uts_ns.insert(id, new_uts);
             new_ns.uts = id;
@@ -376,15 +455,29 @@ impl SigmaNamespaceManager {
 
     /// Set hostname within a process's UTS namespace.
     pub fn sethostname(&mut self, pid: u32, hostname: &str) -> Result<(), &'static str> {
-        let uts_id = self.process_ns.get(&pid).map(|n| n.uts).ok_or("process not found")?;
-        self.uts_ns.get_mut(&uts_id).ok_or("uts ns not found")?.set_hostname(hostname);
+        let uts_id = self
+            .process_ns
+            .get(&pid)
+            .map(|n| n.uts)
+            .ok_or("process not found")?;
+        self.uts_ns
+            .get_mut(&uts_id)
+            .ok_or("uts ns not found")?
+            .set_hostname(hostname);
         Ok(())
     }
 
     /// Get hostname from a process's UTS namespace.
     pub fn gethostname(&self, pid: u32) -> Result<&str, &'static str> {
-        let uts_id = self.process_ns.get(&pid).map(|n| n.uts).ok_or("process not found")?;
-        self.uts_ns.get(&uts_id).map(|u| u.hostname.as_str()).ok_or("uts ns not found")
+        let uts_id = self
+            .process_ns
+            .get(&pid)
+            .map(|n| n.uts)
+            .ok_or("process not found")?;
+        self.uts_ns
+            .get(&uts_id)
+            .map(|u| u.hostname.as_str())
+            .ok_or("uts ns not found")
     }
 
     /// Get namespace set for a process.
@@ -398,7 +491,9 @@ impl SigmaNamespaceManager {
 }
 
 impl Default for SigmaNamespaceManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================

@@ -37,16 +37,16 @@ mod video_editor;
 use distro::linux_bsd_inspirations as distro_inspirations;
 #[path = "../src/access/control.rs"]
 mod access_control;
+#[path = "../src/access/control.rs"]
+mod access_control;
 #[path = "../src/ipc/alpc.rs"]
 mod alpc;
 #[path = "../src/memory/bitmap_pmm.rs"]
 mod bitmap_pmm;
-#[path = "../src/memory/low_level.rs"]
-mod low_level_memory;
-#[path = "../src/access/control.rs"]
-mod access_control;
 #[path = "../src/filesystem/ext4_ntfs_security.rs"]
 mod ext4_ntfs_security;
+#[path = "../src/memory/low_level.rs"]
+mod low_level_memory;
 pub enum AclTag {
     User(u32),
     Group(u32),
@@ -66,12 +66,12 @@ pub enum StatutoryAuthority {
 }
 #[path = "../src/community/toolkit.rs"]
 mod community_toolkit;
-#[path = "../src/system/user.rs"]
-mod system_user;
-#[path = "../src/tools/sigmatools.rs"]
-mod sigmatools;
 #[path = "../src/memory/segmentation_paging.rs"]
 mod segmentation_paging;
+#[path = "../src/tools/sigmatools.rs"]
+mod sigmatools;
+#[path = "../src/system/user.rs"]
+mod system_user;
 pub enum CpuPrivilegeMode {
     KernelRing0,
     UserRing3,
@@ -101,13 +101,7 @@ impl GlobalDescriptorTable {
 }
 pub struct MultiLevelPagingEngine;
 impl MultiLevelPagingEngine {
-    pub fn map_page(
-        _v: u64,
-        _p: u64,
-        _r: bool,
-        _w: bool,
-        _x: bool,
-    ) -> Result<(), &'static str> {
+    pub fn map_page(_v: u64, _p: u64, _r: bool, _w: bool, _x: bool) -> Result<(), &'static str> {
         Ok(())
     }
     pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
@@ -140,55 +134,55 @@ pub struct SegmentedAddress {
 mod process_activity_manager;
 pub type ProcessActivityManager = ActivityManager;
 pub struct ResourceUsageMetrics;
-#[path = "../src/filesystem/sigma_fs.rs"]
-mod sigma_fs_extended;
-#[path = "../src/event/epoll.rs"]
-mod epoll;
-#[path = "../src/loader/elf/relocation.rs"]
-mod elf_relocation;
 #[path = "../src/device/manager.rs"]
 mod device_manager;
+#[path = "../src/loader/elf/relocation.rs"]
+mod elf_relocation;
+#[path = "../src/event/epoll.rs"]
+mod epoll;
+#[path = "../src/filesystem/sigma_fs.rs"]
+mod sigma_fs_extended;
+use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
+use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
+use bitmap_pmm::{
+    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
+    SyscallTableRouter,
+};
+use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
+use chimera_linux::{
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+};
 use community_toolkit::{
     CommunityHandbookCatalog, HybridFirewallTemplateStore, ReproduciblePackageRecipeManager,
     SecurityProfileTemplateStore, VirtualizationBlueprintStore,
 };
+use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
+use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
+use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
+use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
+use fedora_compat::DnfPackageResolver;
+use geom::{BioRequest, GeomProvider, GeomTopology};
+use low_level_memory::{
+    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
+    RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
+};
+use pipes::Pipe;
+use process_activity_manager::{
+    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
+};
+use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
+use sigmatools::*;
 use statutory_compliance::{
     ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
     StatutoryGovernanceLayer, StatutoryGovernanceRule,
 };
 use system_user::UserManager as TestUserManager;
-use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
-use bitmap_pmm::{
-    BitmapPhysicalMemoryManager, SelfReferentialPagingEngine as SelfRefPagingEngine,
-    SyscallTableRouter,
-};
-use ext4_ntfs_security::{AceType as Nfs4AceType, NtfsAce as Nfs4Ace};
-use low_level_memory::{
-    posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
-    RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
-};
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
 };
-use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
-use cachy_os::{AnanicyManager, BoreSchedulerGovernor, SchedPolicy};
-use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-};
-use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
-use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
-use fedora_compat::DnfPackageResolver;
-use geom::{BioRequest, GeomProvider, GeomTopology};
-use pipes::Pipe;
-use sigmatools::*;
 use unveil::{UnveilManager, UnveilPermission};
 use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
-use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
-use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
-use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-use process_activity_manager::{
-    ActivityManager, ActivityState, RegisterSnapshot as ProcRegisterSnapshot,
-};
 
 use access_control::{
     AclEntry, AclTag as ControlAclTag, CapBoundingSet, DacPermission, FilterPolicy,

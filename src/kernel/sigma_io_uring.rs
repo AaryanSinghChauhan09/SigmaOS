@@ -106,26 +106,66 @@ pub struct IoUringSqe {
 impl IoUringSqe {
     /// Create a read SQE.
     pub fn read(fd: i32, buf_addr: u64, len: u32, off: i64, user_data: u64) -> Self {
-        Self { opcode: IoUringOp::Read, flags: 0, fd, off, addr: buf_addr, len,
-            user_data, ioprio: 0, personality: 0, buf_index: 0 }
+        Self {
+            opcode: IoUringOp::Read,
+            flags: 0,
+            fd,
+            off,
+            addr: buf_addr,
+            len,
+            user_data,
+            ioprio: 0,
+            personality: 0,
+            buf_index: 0,
+        }
     }
 
     /// Create a write SQE.
     pub fn write(fd: i32, buf_addr: u64, len: u32, off: i64, user_data: u64) -> Self {
-        Self { opcode: IoUringOp::Write, flags: 0, fd, off, addr: buf_addr, len,
-            user_data, ioprio: 0, personality: 0, buf_index: 0 }
+        Self {
+            opcode: IoUringOp::Write,
+            flags: 0,
+            fd,
+            off,
+            addr: buf_addr,
+            len,
+            user_data,
+            ioprio: 0,
+            personality: 0,
+            buf_index: 0,
+        }
     }
 
     /// Create a nop SQE (used for testing).
     pub fn nop(user_data: u64) -> Self {
-        Self { opcode: IoUringOp::Nop, flags: 0, fd: -1, off: 0, addr: 0, len: 0,
-            user_data, ioprio: 0, personality: 0, buf_index: 0 }
+        Self {
+            opcode: IoUringOp::Nop,
+            flags: 0,
+            fd: -1,
+            off: 0,
+            addr: 0,
+            len: 0,
+            user_data,
+            ioprio: 0,
+            personality: 0,
+            buf_index: 0,
+        }
     }
 
     /// Create a timeout SQE.
     pub fn timeout(timeout_ns: u64, user_data: u64) -> Self {
-        Self { opcode: IoUringOp::Timeout, flags: 0, fd: -1, off: 0,
-            addr: timeout_ns, len: 0, user_data, ioprio: 0, personality: 0, buf_index: 0 }
+        Self {
+            opcode: IoUringOp::Timeout,
+            flags: 0,
+            fd: -1,
+            off: 0,
+            addr: timeout_ns,
+            len: 0,
+            user_data,
+            ioprio: 0,
+            personality: 0,
+            buf_index: 0,
+        }
     }
 }
 
@@ -150,18 +190,34 @@ pub struct IoUringCqe {
 impl IoUringCqe {
     /// Create a successful CQE.
     pub fn ok(user_data: u64, bytes: i32) -> Self {
-        Self { user_data, res: bytes, flags: 0 }
+        Self {
+            user_data,
+            res: bytes,
+            flags: 0,
+        }
     }
 
     /// Create an error CQE.
     pub fn err(user_data: u64, errno: i32) -> Self {
-        Self { user_data, res: -errno.abs(), flags: 0 }
+        Self {
+            user_data,
+            res: -errno.abs(),
+            flags: 0,
+        }
     }
 
     /// Returns true if operation succeeded.
-    pub fn is_ok(&self) -> bool { self.res >= 0 }
+    pub fn is_ok(&self) -> bool {
+        self.res >= 0
+    }
     /// Returns the error code if failed.
-    pub fn error(&self) -> Option<i32> { if self.res < 0 { Some(-self.res) } else { None } }
+    pub fn error(&self) -> Option<i32> {
+        if self.res < 0 {
+            Some(-self.res)
+        } else {
+            None
+        }
+    }
 }
 
 // ============================================================
@@ -180,31 +236,47 @@ impl<T: Clone> RingBuffer<T> {
     fn new(capacity: usize) -> Self {
         // Capacity must be power of 2
         let cap = capacity.next_power_of_two();
-        Self { entries: (0..cap).map(|_| None).collect(), head: 0, tail: 0, capacity: cap }
+        Self {
+            entries: (0..cap).map(|_| None).collect(),
+            head: 0,
+            tail: 0,
+            capacity: cap,
+        }
     }
 
     fn push(&mut self, item: T) -> bool {
         let next_tail = (self.tail + 1) & (self.capacity - 1);
-        if next_tail == self.head { return false; } // full
+        if next_tail == self.head {
+            return false;
+        } // full
         self.entries[self.tail] = Some(item);
         self.tail = next_tail;
         true
     }
 
     fn pop(&mut self) -> Option<T> {
-        if self.head == self.tail { return None; } // empty
+        if self.head == self.tail {
+            return None;
+        } // empty
         let item = self.entries[self.head].take();
         self.head = (self.head + 1) & (self.capacity - 1);
         item
     }
 
     fn len(&self) -> usize {
-        if self.tail >= self.head { self.tail - self.head }
-        else { self.capacity - self.head + self.tail }
+        if self.tail >= self.head {
+            self.tail - self.head
+        } else {
+            self.capacity - self.head + self.tail
+        }
     }
 
-    fn is_empty(&self) -> bool { self.head == self.tail }
-    fn is_full(&self) -> bool { ((self.tail + 1) & (self.capacity - 1)) == self.head }
+    fn is_empty(&self) -> bool {
+        self.head == self.tail
+    }
+    fn is_full(&self) -> bool {
+        ((self.tail + 1) & (self.capacity - 1)) == self.head
+    }
 }
 
 // ============================================================
@@ -241,8 +313,8 @@ pub struct IoUring {
 }
 
 /// io_uring setup flags.
-pub const IORING_SETUP_SQPOLL:    u32 = 1 << 1; // Kernel polling thread
-pub const IORING_SETUP_IOPOLL:    u32 = 1 << 0; // I/O polling (no IRQ)
+pub const IORING_SETUP_SQPOLL: u32 = 1 << 1; // Kernel polling thread
+pub const IORING_SETUP_IOPOLL: u32 = 1 << 0; // I/O polling (no IRQ)
 pub const IORING_SETUP_SINGLE_ISSUER: u32 = 1 << 12; // Single submitter
 
 impl IoUring {
@@ -255,7 +327,9 @@ impl IoUring {
     pub fn new(id: u32, depth: u32, flags: u32) -> Self {
         let depth = depth.next_power_of_two().min(32768);
         Self {
-            id, depth, flags,
+            id,
+            depth,
+            flags,
             sq: RingBuffer::new(depth as usize),
             cq: RingBuffer::new(depth as usize * 2),
             stats: IoUringStats::default(),
@@ -275,7 +349,9 @@ impl IoUring {
     pub fn submit_batch(&mut self, sqes: &[IoUringSqe]) -> usize {
         let mut count = 0;
         for sqe in sqes {
-            if self.sq.push(sqe.clone()) { count += 1; }
+            if self.sq.push(sqe.clone()) {
+                count += 1;
+            }
         }
         self.stats.submitted += count as u64;
         count
@@ -284,7 +360,9 @@ impl IoUring {
     /// Submit a single SQE.
     pub fn submit_one(&mut self, sqe: IoUringSqe) -> bool {
         let ok = self.sq.push(sqe);
-        if ok { self.stats.submitted += 1; }
+        if ok {
+            self.stats.submitted += 1;
+        }
         ok
     }
 
@@ -298,12 +376,16 @@ impl IoUring {
     pub fn process(&mut self) -> usize {
         let mut count = 0;
         let mut pending: Vec<IoUringSqe> = Vec::new();
-        while let Some(sqe) = self.sq.pop() { pending.push(sqe); }
+        while let Some(sqe) = self.sq.pop() {
+            pending.push(sqe);
+        }
 
         for sqe in pending {
             let cqe = self.execute_sqe(&sqe);
             if let Some(ref c) = cqe {
-                if c.res < 0 { self.stats.errors += 1; }
+                if c.res < 0 {
+                    self.stats.errors += 1;
+                }
             }
             if let Some(cqe) = cqe {
                 self.cq.push(cqe);
@@ -347,9 +429,7 @@ impl IoUring {
             IoUringOp::Fsync => Some(IoUringCqe::ok(sqe.user_data, 0)),
             IoUringOp::Timeout => Some(IoUringCqe::ok(sqe.user_data, 0)),
 
-            IoUringOp::PollAdd | IoUringOp::PollRemove => {
-                Some(IoUringCqe::ok(sqe.user_data, 0))
-            }
+            IoUringOp::PollAdd | IoUringOp::PollRemove => Some(IoUringCqe::ok(sqe.user_data, 0)),
 
             _ => Some(IoUringCqe::err(sqe.user_data, 38)), // ENOSYS
         }
@@ -358,7 +438,9 @@ impl IoUring {
     /// Collect all available CQEs.
     pub fn collect_completions(&mut self) -> Vec<IoUringCqe> {
         let mut cqes = Vec::new();
-        while let Some(cqe) = self.cq.pop() { cqes.push(cqe); }
+        while let Some(cqe) = self.cq.pop() {
+            cqes.push(cqe);
+        }
         cqes
     }
 
@@ -369,11 +451,21 @@ impl IoUring {
         self.collect_completions()
     }
 
-    pub fn id(&self) -> u32 { self.id }
-    pub fn depth(&self) -> u32 { self.depth }
-    pub fn sq_ready(&self) -> usize { self.sq.len() }
-    pub fn cq_ready(&self) -> usize { self.cq.len() }
-    pub fn stats(&self) -> &IoUringStats { &self.stats }
+    pub fn id(&self) -> u32 {
+        self.id
+    }
+    pub fn depth(&self) -> u32 {
+        self.depth
+    }
+    pub fn sq_ready(&self) -> usize {
+        self.sq.len()
+    }
+    pub fn cq_ready(&self) -> usize {
+        self.cq.len()
+    }
+    pub fn stats(&self) -> &IoUringStats {
+        &self.stats
+    }
 }
 
 // ============================================================
@@ -387,7 +479,12 @@ pub struct IoUringManager {
 }
 
 impl IoUringManager {
-    pub fn new() -> Self { Self { instances: BTreeMap::new(), next_id: 1 } }
+    pub fn new() -> Self {
+        Self {
+            instances: BTreeMap::new(),
+            next_id: 1,
+        }
+    }
 
     /// Create a new io_uring instance. Returns the instance ID.
     pub fn setup(&mut self, depth: u32, flags: u32) -> u32 {
@@ -398,15 +495,27 @@ impl IoUringManager {
     }
 
     /// Destroy an io_uring instance.
-    pub fn destroy(&mut self, id: u32) { self.instances.remove(&id); }
+    pub fn destroy(&mut self, id: u32) {
+        self.instances.remove(&id);
+    }
 
     /// Get mutable reference to an instance.
-    pub fn get_mut(&mut self, id: u32) -> Option<&mut IoUring> { self.instances.get_mut(&id) }
-    pub fn get(&self, id: u32) -> Option<&IoUring> { self.instances.get(&id) }
-    pub fn count(&self) -> usize { self.instances.len() }
+    pub fn get_mut(&mut self, id: u32) -> Option<&mut IoUring> {
+        self.instances.get_mut(&id)
+    }
+    pub fn get(&self, id: u32) -> Option<&IoUring> {
+        self.instances.get(&id)
+    }
+    pub fn count(&self) -> usize {
+        self.instances.len()
+    }
 }
 
-impl Default for IoUringManager { fn default() -> Self { Self::new() } }
+impl Default for IoUringManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 // ============================================================
 // Tests
@@ -463,7 +572,7 @@ mod tests {
     #[test]
     fn test_ring_wrap() {
         let mut ring = IoUring::new(1, 8, 0); // depth=8
-        // Submit 8 nops (fill the ring)
+                                              // Submit 8 nops (fill the ring)
         for i in 0..8u64 {
             ring.submit_one(IoUringSqe::nop(i));
         }

@@ -124,9 +124,15 @@ mod tests {
         };
 
         engine.register_mobile_app(app1);
-        assert!(engine.launch_app_to_foreground("org.sigmaos.browser").is_ok());
+        assert!(engine
+            .launch_app_to_foreground("org.sigmaos.browser")
+            .is_ok());
         assert_eq!(
-            engine.installed_mobile_apps.get("org.sigmaos.browser").unwrap().execution_policy,
+            engine
+                .installed_mobile_apps
+                .get("org.sigmaos.browser")
+                .unwrap()
+                .execution_policy,
             MobileExecutionPolicy::ActiveForeground
         );
 

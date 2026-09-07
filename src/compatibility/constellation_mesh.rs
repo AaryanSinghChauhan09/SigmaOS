@@ -11,7 +11,6 @@
 // SigmaOS Constellation-and-Mesh Architecture
 // Houses the core OOP designs for Kernel Constellations, Syscall Almanacs, Driver Archives,
 // Firmware Meshes, Build Codices, Security Constellations, and Peripheral Meshes.
-
 use crate::security::capability::CapabilityToken;
 
 /// 1. Kernel Personality Constellation Grid

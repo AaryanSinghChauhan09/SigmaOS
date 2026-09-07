@@ -10,9 +10,9 @@
 pub mod omarchy;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
-    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
-    OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
-    WebAppSpec,
+    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNeovimPresetEngine,
+    OmarchyNerdFont, OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard,
+    SovereignAgentKind, WebAppSpec,
 };
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_inspirations;
@@ -41,12 +41,11 @@ pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_distro_gaps::{
     BluetoothDevice, BootMenuEntry, BootloaderType, ConntrackTableEntry, CronJobEntry,
-    CronJobScheduler, DeviceNodeEntry, DeviceNodeType, DnsRecordEntry, JournaldLogRecord,
-    NatType, NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine,
-    SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine,
-    SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine, SystemdInitManager,
-    SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver, UsbHidModifierKeys,
-    WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
+    CronJobScheduler, DeviceNodeEntry, DeviceNodeType, DnsRecordEntry, JournaldLogRecord, NatType,
+    NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SovereignDnsTlsResolverEngine,
+    SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine,
+    SystemdInitManager, SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver,
+    UsbHidModifierKeys, WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
 };
 
 pub use garuda_nomad_innovations::{
@@ -90,20 +89,25 @@ pub use visual_dashboard::{
 pub use void_runit::{
     RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
 };
-pub mod sovereign_distro_dominance;
 pub mod distro_inspiration_engine;
+pub mod sovereign_distro_dominance;
 
 pub use distro_inspiration_engine::{
-    MuslLightweightInitEngine, MuslStaticService, ServiceRunState,
-    PortageUseFlagGovernor, PortageUseFlag, UseFlagState,
-    OpenBsdStatefulPacketFilterEngine, PfStateEntry, PfProtocol,
-    FreeBsdZfsArcGeomEngine, ArcCacheBlock, ArcState,
-    ClearLinuxIsaSelectorEngine, IsaLevel,
+    ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine, FreeBsdZfsArcGeomEngine, IsaLevel,
+    MuslLightweightInitEngine, MuslStaticService, OpenBsdStatefulPacketFilterEngine, PfProtocol,
+    PfStateEntry, PortageUseFlag, PortageUseFlagGovernor, ServiceRunState, UseFlagState,
 };
 
 pub use arch_parity::{
     AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
     SvntogitPackageRepo,
+};
+pub use bsd_linux_innovations::{
+    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
+    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
+    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
+    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner, SovereignDeltaPatch,
+    TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -157,32 +161,23 @@ pub use ready_to_use::{
     MountEntry, MountType, PlugAndPlayHardwareManager, ServiceUnit, SessionEnvironment,
     UniversalMountEngine, UserAccount,
 };
+pub use ready_to_use::{
+    DeviceCategory, DeviceNode, DistroServiceManager, HardwareEvent, InteractiveUserEnvironment,
+    MountEntry, MountType, PlugAndPlayHardwareManager, ServiceUnit, SessionEnvironment,
+    UniversalMountEngine, UserAccount,
+};
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
 };
 pub use specialized::{
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
-    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
+    AptCacheSimulator, CanFrame, DebianPolicyEnforcer, DebianSocialContract, DpkgMultiArch,
+    EcuController, EduChallenge, EduPlayground, FreezeBasedStabilization, HpcClusterJob,
+    HpcJobState, MpiCommunicator, ThreeTierReleaseModel,
 };
-pub use tiny_core::{
-    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-};
-pub use bsd_linux_innovations::{
-    BsdSecureNtpConstraintSync, BsdStatefulPacketFilter, DaxMemoryRegion, DragonFlyHammerFs,
-    Hammer2MultiMasterPfsReplication, Hammer2Snapshot, Hammer2TxgRecord, PfRuleAction,
-    PfStateEntry, PfStateSynchronizationEngine, PfSyncMessage, PfSyncMsgType, PfsClusterNode,
-    RunitServiceState, SovereignAnonScrubber, SovereignDeltaPackageSigner,
-    SovereignDeltaPatch, TlsConstraint, VirtioFsZeroCopyBridge, VoidRunitManager,
-};
+pub use tiny_core::{AppsAuditTool, TczExtensionManager, TinyCoreMode, TinyCoreRAMEngine};
 pub use wiki_ideas_implementation::{
-    Generation, NixDeclarativeSystemState, SigpkgRecipe, ArchRecipeSandboxCompiler,
-    SnapperSnapshot, SnapperTransactionGuard, SigmaZeroCopySpliceEngine,
-    PolicyAction, EbpfSyscallPolicyVerifier, CapsicumCapability, FreeBsdCapsicumDescriptorDelegate,
-    CAP_READ, CAP_WRITE, CAP_SEEK, CAP_FSTAT,
-};
-pub use ready_to_use::{
-    DistroServiceManager, ServiceUnit, MountEntry, MountType, UniversalMountEngine,
-    UserAccount, SessionEnvironment, InteractiveUserEnvironment, DeviceCategory,
-    HardwareEvent, DeviceNode, PlugAndPlayHardwareManager,
+    ArchRecipeSandboxCompiler, CapsicumCapability, EbpfSyscallPolicyVerifier,
+    FreeBsdCapsicumDescriptorDelegate, Generation, NixDeclarativeSystemState, PolicyAction,
+    SigmaZeroCopySpliceEngine, SigpkgRecipe, SnapperSnapshot, SnapperTransactionGuard, CAP_FSTAT,
+    CAP_READ, CAP_SEEK, CAP_WRITE,
 };

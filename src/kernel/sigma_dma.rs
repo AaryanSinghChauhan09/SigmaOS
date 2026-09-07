@@ -48,7 +48,9 @@ pub struct DmaAddr(pub u64);
 
 impl DmaAddr {
     pub const NULL: Self = Self(0);
-    pub fn is_null(&self) -> bool { self.0 == 0 }
+    pub fn is_null(&self) -> bool {
+        self.0 == 0
+    }
 }
 
 // ============================================================
@@ -82,15 +84,26 @@ pub struct ScatterGatherList {
 
 impl ScatterGatherList {
     pub fn new(direction: DmaDirection) -> Self {
-        Self { entries: Vec::new(), total_bytes: 0, direction, is_mapped: false }
+        Self {
+            entries: Vec::new(),
+            total_bytes: 0,
+            direction,
+            is_mapped: false,
+        }
     }
 
     pub fn add_entry(&mut self, dma_addr: DmaAddr, length: u32, offset: u32) {
         self.total_bytes += length as u64;
-        self.entries.push(SgEntry { dma_addr, length, offset });
+        self.entries.push(SgEntry {
+            dma_addr,
+            length,
+            offset,
+        });
     }
 
-    pub fn entry_count(&self) -> usize { self.entries.len() }
+    pub fn entry_count(&self) -> usize {
+        self.entries.len()
+    }
 }
 
 // ============================================================
@@ -159,23 +172,45 @@ pub struct IommuDomain {
 
 impl IommuDomain {
     pub fn new(id: u64, iova_base: u64, iova_limit: u64) -> Self {
-        Self { id, mappings: BTreeMap::new(), next_iova: iova_base, iova_base, iova_limit }
+        Self {
+            id,
+            mappings: BTreeMap::new(),
+            next_iova: iova_base,
+            iova_base,
+            iova_limit,
+        }
     }
 
     /// Map a physical region into the IOMMU domain.
-    pub fn map(&mut self, phys: PhysAddr, size: usize, read: bool, write: bool, device_id: u32)
-        -> Result<DmaAddr, &'static str> {
+    pub fn map(
+        &mut self,
+        phys: PhysAddr,
+        size: usize,
+        read: bool,
+        write: bool,
+        device_id: u32,
+    ) -> Result<DmaAddr, &'static str> {
         // Align size to 4KB pages
         let aligned_size = (size + 0xFFF) & !0xFFF;
         let iova = self.alloc_iova(aligned_size)?;
-        let entry = IommuEntry { iova: DmaAddr(iova), phys, size: aligned_size, read, write, device_id };
+        let entry = IommuEntry {
+            iova: DmaAddr(iova),
+            phys,
+            size: aligned_size,
+            read,
+            write,
+            device_id,
+        };
         self.mappings.insert(iova, entry);
         Ok(DmaAddr(iova))
     }
 
     /// Unmap a previously mapped IOVA.
     pub fn unmap(&mut self, iova: DmaAddr) -> Result<(), &'static str> {
-        self.mappings.remove(&iova.0).map(|_| ()).ok_or("mapping not found")
+        self.mappings
+            .remove(&iova.0)
+            .map(|_| ())
+            .ok_or("mapping not found")
     }
 
     /// Translate IOVA to physical address.
@@ -193,12 +228,16 @@ impl IommuDomain {
     fn alloc_iova(&mut self, size: usize) -> Result<u64, &'static str> {
         let iova = self.next_iova;
         let next = iova + size as u64;
-        if next > self.iova_limit { return Err("IOMMU: IOVA space exhausted"); }
+        if next > self.iova_limit {
+            return Err("IOMMU: IOVA space exhausted");
+        }
         self.next_iova = next;
         Ok(iova)
     }
 
-    pub fn mapping_count(&self) -> usize { self.mappings.len() }
+    pub fn mapping_count(&self) -> usize {
+        self.mappings.len()
+    }
 }
 
 // ============================================================
@@ -236,14 +275,27 @@ pub struct DmaChannel {
 
 impl DmaChannel {
     pub fn new(id: u32) -> Self {
-        Self { id, pending: Vec::new(), completed: Vec::new(), next_desc_id: 1, bytes_transferred: 0 }
+        Self {
+            id,
+            pending: Vec::new(),
+            completed: Vec::new(),
+            next_desc_id: 1,
+            bytes_transferred: 0,
+        }
     }
 
     /// Submit a DMA transfer descriptor.
     pub fn submit(&mut self, src: DmaAddr, dst: DmaAddr, len: u32, dir: DmaDirection) -> u64 {
         let id = self.next_desc_id;
         self.next_desc_id += 1;
-        self.pending.push(DmaDescriptor { id, src, dst, len, direction: dir, status: DmaStatus::Pending });
+        self.pending.push(DmaDescriptor {
+            id,
+            src,
+            dst,
+            len,
+            direction: dir,
+            status: DmaStatus::Pending,
+        });
         id
     }
 
@@ -266,7 +318,10 @@ impl DmaChannel {
     /// Wait for a specific transfer to complete.
     pub fn wait(&mut self, desc_id: u64) -> Option<DmaStatus> {
         self.issue_pending();
-        self.completed.iter().find(|d| d.id == desc_id).map(|d| d.status)
+        self.completed
+            .iter()
+            .find(|d| d.id == desc_id)
+            .map(|d| d.status)
     }
 }
 
@@ -304,7 +359,9 @@ impl SigmaDmaSubsystem {
             total_bytes_transferred: 0,
         };
         // Create default channels (0=mem-to-mem, 1=device-to-mem, 2=mem-to-device)
-        for i in 0..4u32 { sys.channels.insert(i, DmaChannel::new(i)); }
+        for i in 0..4u32 {
+            sys.channels.insert(i, DmaChannel::new(i));
+        }
         sys
     }
 
@@ -321,31 +378,52 @@ impl SigmaDmaSubsystem {
     /// Allocate a coherent DMA buffer.
     ///
     /// Analogous to `dma_alloc_coherent()`.
-    pub fn alloc_coherent(&mut self, size: usize, device_id: u32) -> Result<&DmaCoherentBuffer, &'static str> {
+    pub fn alloc_coherent(
+        &mut self,
+        size: usize,
+        device_id: u32,
+    ) -> Result<&DmaCoherentBuffer, &'static str> {
         let aligned = (size + 0xFFF) & !0xFFF;
         let phys = PhysAddr(self.next_phys);
         self.next_phys += aligned as u64;
 
         // Create or find domain for device
-        let domain_id = if let Some((&did, _)) = self.domains.iter().find(|(_, d)| {
-            d.mappings.values().any(|m| m.device_id == device_id)
-        }) { did } else { self.create_domain(device_id) };
+        let domain_id = if let Some((&did, _)) = self
+            .domains
+            .iter()
+            .find(|(_, d)| d.mappings.values().any(|m| m.device_id == device_id))
+        {
+            did
+        } else {
+            self.create_domain(device_id)
+        };
 
-        let dma_addr = self.domains.get_mut(&domain_id)
+        let dma_addr = self
+            .domains
+            .get_mut(&domain_id)
             .ok_or("domain not found")?
             .map(phys, size, true, true, device_id)?;
 
         let buf = DmaCoherentBuffer {
-            phys, dma_addr, virt_addr: phys.0, // In simulation, virt == phys
-            size: aligned, device_id,
+            phys,
+            dma_addr,
+            virt_addr: phys.0, // In simulation, virt == phys
+            size: aligned,
+            device_id,
         };
         self.coherent_buffers.push(buf);
         Ok(self.coherent_buffers.last().unwrap())
     }
 
     /// Submit a DMA transfer on a channel.
-    pub fn submit_transfer(&mut self, channel: u32, src: DmaAddr, dst: DmaAddr,
-                            len: u32, dir: DmaDirection) -> Result<u64, &'static str> {
+    pub fn submit_transfer(
+        &mut self,
+        channel: u32,
+        src: DmaAddr,
+        dst: DmaAddr,
+        len: u32,
+        dir: DmaDirection,
+    ) -> Result<u64, &'static str> {
         let ch = self.channels.get_mut(&channel).ok_or("channel not found")?;
         Ok(ch.submit(src, dst, len, dir))
     }
@@ -360,9 +438,17 @@ impl SigmaDmaSubsystem {
     }
 
     /// Map memory into an IOMMU domain.
-    pub fn iommu_map(&mut self, domain_id: u64, phys: PhysAddr, size: usize,
-                      read: bool, write: bool, device_id: u32) -> Result<DmaAddr, &'static str> {
-        self.domains.get_mut(&domain_id)
+    pub fn iommu_map(
+        &mut self,
+        domain_id: u64,
+        phys: PhysAddr,
+        size: usize,
+        read: bool,
+        write: bool,
+        device_id: u32,
+    ) -> Result<DmaAddr, &'static str> {
+        self.domains
+            .get_mut(&domain_id)
             .ok_or("domain not found")?
             .map(phys, size, read, write, device_id)
     }
@@ -372,13 +458,21 @@ impl SigmaDmaSubsystem {
         self.domains.get(&domain_id)?.translate(iova)
     }
 
-    pub fn domain_count(&self) -> usize { self.domains.len() }
-    pub fn channel_count(&self) -> usize { self.channels.len() }
-    pub fn coherent_buffer_count(&self) -> usize { self.coherent_buffers.len() }
+    pub fn domain_count(&self) -> usize {
+        self.domains.len()
+    }
+    pub fn channel_count(&self) -> usize {
+        self.channels.len()
+    }
+    pub fn coherent_buffer_count(&self) -> usize {
+        self.coherent_buffers.len()
+    }
 }
 
 impl Default for SigmaDmaSubsystem {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================
@@ -402,7 +496,9 @@ mod tests {
     #[test]
     fn test_iommu_unmap() {
         let mut domain = IommuDomain::new(1, 0x1000_0000, 0x8000_0000);
-        let iova = domain.map(PhysAddr(0x1234_0000), 4096, true, false, 1).unwrap();
+        let iova = domain
+            .map(PhysAddr(0x1234_0000), 4096, true, false, 1)
+            .unwrap();
         assert_eq!(domain.mapping_count(), 1);
         domain.unmap(iova).unwrap();
         assert_eq!(domain.mapping_count(), 0);
@@ -411,7 +507,12 @@ mod tests {
     #[test]
     fn test_dma_channel_submit() {
         let mut ch = DmaChannel::new(0);
-        let id = ch.submit(DmaAddr(0x1000), DmaAddr(0x2000), 4096, DmaDirection::ToDevice);
+        let id = ch.submit(
+            DmaAddr(0x1000),
+            DmaAddr(0x2000),
+            4096,
+            DmaDirection::ToDevice,
+        );
         assert_eq!(ch.pending.len(), 1);
         ch.issue_pending();
         assert_eq!(ch.bytes_transferred, 4096);

@@ -12,7 +12,6 @@
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
 
-
 use std::vec;
 use std::vec::Vec;
 
@@ -616,7 +615,11 @@ impl UdevDevdHotplugEngine {
                 self.active_devices.retain(|d| d.devname != uevent.devname);
             }
             DeviceEventAction::Change => {
-                if let Some(pos) = self.active_devices.iter().position(|d| d.devname == uevent.devname) {
+                if let Some(pos) = self
+                    .active_devices
+                    .iter()
+                    .position(|d| d.devname == uevent.devname)
+                {
                     self.active_devices[pos] = uevent;
                 }
             }
@@ -826,7 +829,9 @@ mod tests {
     #[test]
     fn test_demand_paging_and_swap_engine() {
         let mut vm = DemandPagingSwapEngine::new(1024);
-        let paddr = vm.handle_page_fault(0x7fff0000, PageFaultCause::NotPresent).unwrap();
+        let paddr = vm
+            .handle_page_fault(0x7fff0000, PageFaultCause::NotPresent)
+            .unwrap();
         assert_eq!(paddr, 0x7fff0000);
         assert_eq!(vm.page_faults_handled, 1);
 
@@ -838,7 +843,8 @@ mod tests {
     #[test]
     fn test_udev_devd_hotplug_engine() {
         let mut hotplug = UdevDevdHotplugEngine::new();
-        hotplug.register_rule("SUBSYSTEM==\"input\", ACTION==\"add\", RUN+=\"/usr/bin/input-attach\"");
+        hotplug
+            .register_rule("SUBSYSTEM==\"input\", ACTION==\"add\", RUN+=\"/usr/bin/input-attach\"");
 
         let uevent = UeventDeviceNode {
             subsystem: "input",

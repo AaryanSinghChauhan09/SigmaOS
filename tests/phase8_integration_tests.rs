@@ -12,7 +12,7 @@ mod phase8_integration {
         let mut namespaces = std::collections::HashMap::new();
         namespaces.insert(1, "root_ns");
         namespaces.insert(2, "container_ns");
-        
+
         assert_eq!(namespaces.len(), 2);
     }
 
@@ -20,11 +20,8 @@ mod phase8_integration {
     #[test]
     fn test_file_monitoring_with_namespaces() {
         // File monitoring should work within namespace boundaries
-        let watched_paths = vec![
-            PathBuf::from("/app/data"),
-            PathBuf::from("/app/logs"),
-        ];
-        
+        let watched_paths = vec![PathBuf::from("/app/data"), PathBuf::from("/app/logs")];
+
         assert_eq!(watched_paths.len(), 2);
     }
 
@@ -35,12 +32,12 @@ mod phase8_integration {
             memory: u64,
             cpu: u64,
         }
-        
+
         let limit = ResourceLimit {
             memory: 512 * 1024 * 1024, // 512MB
             cpu: 1000,
         };
-        
+
         assert!(limit.memory > 0);
         assert!(limit.cpu > 0);
     }
@@ -59,12 +56,18 @@ mod phase8_integration {
             ident: u64,
             event_type: u32,
         }
-        
+
         let events = vec![
-            Event { ident: 1, event_type: 1 }, // read
-            Event { ident: 2, event_type: 2 }, // write
+            Event {
+                ident: 1,
+                event_type: 1,
+            }, // read
+            Event {
+                ident: 2,
+                event_type: 2,
+            }, // write
         ];
-        
+
         assert_eq!(events.len(), 2);
     }
 
@@ -73,20 +76,20 @@ mod phase8_integration {
     fn test_containerized_app_scenario() {
         // Create namespace for app
         let namespace_id = 1;
-        
+
         // Set up file monitoring
         let watch_dirs = vec!["/app", "/var/log"];
-        
+
         // Apply resource limits
         let mem_limit = 256 * 1024 * 1024; // 256MB
         let cpu_limit = 500; // 50% of one core
-        
+
         // Enable security filtering
         let allowed_syscalls = vec![0, 1, 2, 3, 4, 5]; // read, write, open, close, stat, fstat
-        
+
         // Create event multiplexer
         let kqueue_fd = 1;
-        
+
         // Verify all systems operational
         assert!(namespace_id > 0);
         assert!(!watch_dirs.is_empty());
@@ -103,17 +106,29 @@ mod phase8_integration {
             namespace_id: u32,
             memory_limit: u64,
         }
-        
+
         let processes = vec![
-            Process { pid: 100, namespace_id: 1, memory_limit: 256 * 1024 * 1024 },
-            Process { pid: 101, namespace_id: 1, memory_limit: 256 * 1024 * 1024 },
-            Process { pid: 102, namespace_id: 2, memory_limit: 512 * 1024 * 1024 },
+            Process {
+                pid: 100,
+                namespace_id: 1,
+                memory_limit: 256 * 1024 * 1024,
+            },
+            Process {
+                pid: 101,
+                namespace_id: 1,
+                memory_limit: 256 * 1024 * 1024,
+            },
+            Process {
+                pid: 102,
+                namespace_id: 2,
+                memory_limit: 512 * 1024 * 1024,
+            },
         ];
-        
+
         // Processes in namespace 1 should have independent memory limits
         let ns1_procs: Vec<_> = processes.iter().filter(|p| p.namespace_id == 1).collect();
         assert_eq!(ns1_procs.len(), 2);
-        
+
         // Process in namespace 2 is isolated
         let ns2_procs: Vec<_> = processes.iter().filter(|p| p.namespace_id == 2).collect();
         assert_eq!(ns2_procs.len(), 1);
@@ -125,7 +140,7 @@ mod phase8_integration {
         // Events should be filtered by security policy
         let events_generated = 100;
         let events_allowed = 80; // 80% pass security filter
-        
+
         assert!(events_allowed < events_generated);
     }
 
@@ -134,11 +149,11 @@ mod phase8_integration {
     fn test_performance_no_excessive_allocations() {
         let iterations = 1000;
         let mut allocated = 0;
-        
+
         for _ in 0..iterations {
             allocated += 1;
         }
-        
+
         assert_eq!(allocated, iterations);
     }
 
@@ -147,11 +162,12 @@ mod phase8_integration {
     fn test_stress_many_watches() {
         const MAX_WATCHES: usize = 10000;
         let mut watches = Vec::with_capacity(MAX_WATCHES);
-        
-        for i in 0..1000 { // Test subset for unit test speed
+
+        for i in 0..1000 {
+            // Test subset for unit test speed
             watches.push(i);
         }
-        
+
         assert_eq!(watches.len(), 1000);
     }
 
@@ -166,16 +182,16 @@ mod phase8_integration {
             syscall_whitelist: Vec<u32>,
             event_fd: i32,
         }
-        
+
         let container = Container {
             namespace_id: 1,
             watches: 5,
             memory_limit: 1024 * 1024 * 1024, // 1GB
-            cpu_limit: 2000, // 2 cores
+            cpu_limit: 2000,                  // 2 cores
             syscall_whitelist: (0..20).collect(),
             event_fd: 1,
         };
-        
+
         // Verify all subsystems initialized
         assert!(container.namespace_id > 0);
         assert!(container.watches > 0);

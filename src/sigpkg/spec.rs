@@ -14,8 +14,6 @@
 /// Based on Roadmap Item 21: Implement sigpkg spec
 use std::boxed::Box;
 
-
-
 /// Package version
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -625,7 +623,10 @@ impl UniversalPackageType {
             Some(UniversalPackageType::Ebuild)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(UniversalPackageType::TarArchive)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(UniversalPackageType::Txz)
         } else if normalized.ends_with(".xbps") {
             Some(UniversalPackageType::Xbps)

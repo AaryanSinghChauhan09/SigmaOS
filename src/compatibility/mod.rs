@@ -78,8 +78,8 @@ pub use linux_distro_parity::{
     FstabEntry, LinuxCoreDumpFilterEngine, LinuxFstabEngine, LinuxLdSoLoader,
     LinuxModulesLoadEngine, LinuxPamAuthenticationEngine, LinuxRunlevel, LinuxRunlevelGovernor,
     LinuxSwapfileManagerEngine, LinuxSysctlGovernor, LinuxSystemdTmpfilesEngine,
-    LinuxUdevRulesEngine, LsbReleaseGovernor, LsbReleaseInfo, SharedLibrary, SwapDevice,
-    SwapKind, TmpfileItemType, TmpfileRule, UdevRule,
+    LinuxUdevRulesEngine, LsbReleaseGovernor, LsbReleaseInfo, SharedLibrary, SwapDevice, SwapKind,
+    TmpfileItemType, TmpfileRule, UdevRule,
 };
 pub mod linux_init;
 pub mod linux_network;
@@ -176,16 +176,14 @@ pub use historic_linux::{
     VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
-pub use mate_betsy::{
-    MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
+pub use legacy_adapters::{
+    BinaryCompatMatrix, KernelPersona, KernelPersonaVM, LegacyDriverAdapter, LegacyFSAdapter,
+    LegacyProtocolAdapter, LibcVersion, SyscallAbi,
 };
+pub use mate_betsy::{MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine};
 pub use mint_linux::{
     MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
     MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
-};
-pub use legacy_adapters::{
-    KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
 };
 
 pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};

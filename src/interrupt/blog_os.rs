@@ -10,7 +10,6 @@
 // GDT, IDT, and VGA Text Buffer architectures for SigmaOS
 // Integrates core bare-metal concepts from phil-opp/blog_os under `#![no_std]`.
 
-
 // ==========================================
 // 1. GLOBAL DESCRIPTOR TABLE & TSS
 // ==========================================

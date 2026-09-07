@@ -23,43 +23,43 @@ use alloc::vec::Vec;
 // ============================================================
 
 /// eBPF opcode classes.
-pub const BPF_LD:   u8 = 0x00;
-pub const BPF_LDX:  u8 = 0x01;
-pub const BPF_ST:   u8 = 0x02;
-pub const BPF_STX:  u8 = 0x03;
-pub const BPF_ALU:  u8 = 0x04;
-pub const BPF_JMP:  u8 = 0x05;
+pub const BPF_LD: u8 = 0x00;
+pub const BPF_LDX: u8 = 0x01;
+pub const BPF_ST: u8 = 0x02;
+pub const BPF_STX: u8 = 0x03;
+pub const BPF_ALU: u8 = 0x04;
+pub const BPF_JMP: u8 = 0x05;
 pub const BPF_JMP32: u8 = 0x06;
 pub const BPF_ALU64: u8 = 0x07;
 
 /// ALU operation codes.
-pub const BPF_ADD:  u8 = 0x00;
-pub const BPF_SUB:  u8 = 0x10;
-pub const BPF_MUL:  u8 = 0x20;
-pub const BPF_DIV:  u8 = 0x30;
-pub const BPF_OR:   u8 = 0x40;
-pub const BPF_AND:  u8 = 0x50;
-pub const BPF_LSH:  u8 = 0x60;
-pub const BPF_RSH:  u8 = 0x70;
-pub const BPF_NEG:  u8 = 0x80;
-pub const BPF_MOD:  u8 = 0x90;
-pub const BPF_XOR:  u8 = 0xa0;
-pub const BPF_MOV:  u8 = 0xb0;
+pub const BPF_ADD: u8 = 0x00;
+pub const BPF_SUB: u8 = 0x10;
+pub const BPF_MUL: u8 = 0x20;
+pub const BPF_DIV: u8 = 0x30;
+pub const BPF_OR: u8 = 0x40;
+pub const BPF_AND: u8 = 0x50;
+pub const BPF_LSH: u8 = 0x60;
+pub const BPF_RSH: u8 = 0x70;
+pub const BPF_NEG: u8 = 0x80;
+pub const BPF_MOD: u8 = 0x90;
+pub const BPF_XOR: u8 = 0xa0;
+pub const BPF_MOV: u8 = 0xb0;
 pub const BPF_ARSH: u8 = 0xc0;
 
 /// JMP operation codes.
-pub const BPF_JA:   u8 = 0x00;
-pub const BPF_JEQ:  u8 = 0x10;
-pub const BPF_JGT:  u8 = 0x20;
-pub const BPF_JGE:  u8 = 0x30;
+pub const BPF_JA: u8 = 0x00;
+pub const BPF_JEQ: u8 = 0x10;
+pub const BPF_JGT: u8 = 0x20;
+pub const BPF_JGE: u8 = 0x30;
 pub const BPF_JSET: u8 = 0x40;
-pub const BPF_JNE:  u8 = 0x50;
+pub const BPF_JNE: u8 = 0x50;
 pub const BPF_JSGT: u8 = 0x60;
 pub const BPF_JSGE: u8 = 0x70;
 pub const BPF_CALL: u8 = 0x80;
 pub const BPF_EXIT: u8 = 0x90;
-pub const BPF_JLT:  u8 = 0xa0;
-pub const BPF_JLE:  u8 = 0xb0;
+pub const BPF_JLT: u8 = 0xa0;
+pub const BPF_JLE: u8 = 0xb0;
 
 /// Source flag: register (vs immediate).
 pub const BPF_X: u8 = 0x08;
@@ -77,23 +77,43 @@ pub struct BpfInsn {
 
 impl BpfInsn {
     pub fn new(opcode: u8, dst: u8, src: u8, off: i16, imm: i32) -> Self {
-        Self { opcode, dst_reg: dst & 0xF, src_reg: src & 0xF, off, imm }
+        Self {
+            opcode,
+            dst_reg: dst & 0xF,
+            src_reg: src & 0xF,
+            off,
+            imm,
+        }
     }
 
     /// ALU64 move immediate: dst = imm
-    pub fn mov64_imm(dst: u8, imm: i32) -> Self { Self::new(BPF_ALU64 | BPF_MOV | BPF_K, dst, 0, 0, imm) }
+    pub fn mov64_imm(dst: u8, imm: i32) -> Self {
+        Self::new(BPF_ALU64 | BPF_MOV | BPF_K, dst, 0, 0, imm)
+    }
     /// ALU64 move register: dst = src
-    pub fn mov64_reg(dst: u8, src: u8) -> Self { Self::new(BPF_ALU64 | BPF_MOV | BPF_X, dst, src, 0, 0) }
+    pub fn mov64_reg(dst: u8, src: u8) -> Self {
+        Self::new(BPF_ALU64 | BPF_MOV | BPF_X, dst, src, 0, 0)
+    }
     /// ALU64 add immediate: dst += imm
-    pub fn add64_imm(dst: u8, imm: i32) -> Self { Self::new(BPF_ALU64 | BPF_ADD | BPF_K, dst, 0, 0, imm) }
+    pub fn add64_imm(dst: u8, imm: i32) -> Self {
+        Self::new(BPF_ALU64 | BPF_ADD | BPF_K, dst, 0, 0, imm)
+    }
     /// ALU64 add register: dst += src
-    pub fn add64_reg(dst: u8, src: u8) -> Self { Self::new(BPF_ALU64 | BPF_ADD | BPF_X, dst, src, 0, 0) }
+    pub fn add64_reg(dst: u8, src: u8) -> Self {
+        Self::new(BPF_ALU64 | BPF_ADD | BPF_X, dst, src, 0, 0)
+    }
     /// Conditional jump: if dst == imm, jump +off instructions
-    pub fn jeq_imm(dst: u8, imm: i32, off: i16) -> Self { Self::new(BPF_JMP | BPF_JEQ | BPF_K, dst, 0, off, imm) }
+    pub fn jeq_imm(dst: u8, imm: i32, off: i16) -> Self {
+        Self::new(BPF_JMP | BPF_JEQ | BPF_K, dst, 0, off, imm)
+    }
     /// Exit: return r0
-    pub fn exit() -> Self { Self::new(BPF_JMP | BPF_EXIT, 0, 0, 0, 0) }
+    pub fn exit() -> Self {
+        Self::new(BPF_JMP | BPF_EXIT, 0, 0, 0, 0)
+    }
     /// Call helper function
-    pub fn call(helper: i32) -> Self { Self::new(BPF_JMP | BPF_CALL, 0, 0, 0, helper) }
+    pub fn call(helper: i32) -> Self {
+        Self::new(BPF_JMP | BPF_CALL, 0, 0, 0, helper)
+    }
 }
 
 // ============================================================
@@ -168,11 +188,29 @@ pub struct BpfMap {
 }
 
 impl BpfMap {
-    pub fn new(id: u32, map_type: BpfMapType, key_size: u32, value_size: u32, max_entries: u32) -> Self {
+    pub fn new(
+        id: u32,
+        map_type: BpfMapType,
+        key_size: u32,
+        value_size: u32,
+        max_entries: u32,
+    ) -> Self {
         let array = if map_type == BpfMapType::Array || map_type == BpfMapType::PercpuArray {
-            (0..max_entries).map(|_| vec![0u8; value_size as usize]).collect()
-        } else { Vec::new() };
-        Self { id, map_type, key_size, value_size, max_entries, data: BTreeMap::new(), array }
+            (0..max_entries)
+                .map(|_| vec![0u8; value_size as usize])
+                .collect()
+        } else {
+            Vec::new()
+        };
+        Self {
+            id,
+            map_type,
+            key_size,
+            value_size,
+            max_entries,
+            data: BTreeMap::new(),
+            array,
+        }
     }
 
     /// bpf_map_lookup_elem
@@ -188,12 +226,18 @@ impl BpfMap {
 
     /// bpf_map_update_elem
     pub fn update(&mut self, key: &[u8], value: &[u8]) -> Result<(), &'static str> {
-        if key.len() != self.key_size as usize { return Err("invalid key size"); }
-        if value.len() != self.value_size as usize { return Err("invalid value size"); }
+        if key.len() != self.key_size as usize {
+            return Err("invalid key size");
+        }
+        if value.len() != self.value_size as usize {
+            return Err("invalid value size");
+        }
         match self.map_type {
             BpfMapType::Array | BpfMapType::PercpuArray => {
                 let idx = u32::from_le_bytes(key.try_into().map_err(|_| "bad key")?) as usize;
-                if idx >= self.max_entries as usize { return Err("index out of bounds"); }
+                if idx >= self.max_entries as usize {
+                    return Err("index out of bounds");
+                }
                 self.array[idx] = value.to_vec();
             }
             BpfMapType::Hash | BpfMapType::LruHash => {
@@ -201,14 +245,18 @@ impl BpfMap {
                     if self.map_type == BpfMapType::LruHash {
                         // Evict first entry
                         let first_key = self.data.keys().next().cloned();
-                        if let Some(k) = first_key { self.data.remove(&k); }
+                        if let Some(k) = first_key {
+                            self.data.remove(&k);
+                        }
                     } else {
                         return Err("map full");
                     }
                 }
                 self.data.insert(key.to_vec(), value.to_vec());
             }
-            _ => { self.data.insert(key.to_vec(), value.to_vec()); }
+            _ => {
+                self.data.insert(key.to_vec(), value.to_vec());
+            }
         }
         Ok(())
     }
@@ -218,9 +266,13 @@ impl BpfMap {
         match self.map_type {
             BpfMapType::Array | BpfMapType::PercpuArray => {
                 let idx = u32::from_le_bytes(key.try_into().map_err(|_| "bad key")?) as usize;
-                if idx < self.array.len() { self.array[idx] = vec![0u8; self.value_size as usize]; }
+                if idx < self.array.len() {
+                    self.array[idx] = vec![0u8; self.value_size as usize];
+                }
             }
-            _ => { self.data.remove(key); }
+            _ => {
+                self.data.remove(key);
+            }
         }
         Ok(())
     }
@@ -241,9 +293,15 @@ impl BpfMap {
 pub struct BpfRegisters([u64; 11]);
 
 impl BpfRegisters {
-    fn new() -> Self { Self([0u64; 11]) }
-    fn get(&self, r: u8) -> u64 { self.0[r.min(10) as usize] }
-    fn set(&mut self, r: u8, v: u64) { self.0[r.min(10) as usize] = v; }
+    fn new() -> Self {
+        Self([0u64; 11])
+    }
+    fn get(&self, r: u8) -> u64 {
+        self.0[r.min(10) as usize]
+    }
+    fn set(&mut self, r: u8, v: u64) {
+        self.0[r.min(10) as usize] = v;
+    }
 }
 
 /// eBPF helper function IDs (Linux-compatible numbering).
@@ -335,7 +393,8 @@ impl BpfVm {
             }
             if insns_executed >= self.insn_limit {
                 return BpfRunResult {
-                    return_value: 0, insns_executed,
+                    return_value: 0,
+                    insns_executed,
                     exited_normally: false,
                     error: Some("instruction limit exceeded".into()),
                 };
@@ -345,33 +404,52 @@ impl BpfVm {
             insns_executed += 1;
 
             let op_class = insn.opcode & 0x07;
-            let op_src   = insn.opcode & 0x08;
-            let op_code  = insn.opcode & 0xF0;
+            let op_src = insn.opcode & 0x08;
+            let op_code = insn.opcode & 0xF0;
 
             match op_class {
                 c if c == BPF_ALU64 || c == BPF_ALU => {
                     let dst = insn.dst_reg;
-                    let src_val = if op_src == BPF_X { self.regs.get(insn.src_reg) }
-                                  else { insn.imm as i64 as u64 };
+                    let src_val = if op_src == BPF_X {
+                        self.regs.get(insn.src_reg)
+                    } else {
+                        insn.imm as i64 as u64
+                    };
                     let dst_val = self.regs.get(dst);
                     let result = match op_code {
-                        o if o == BPF_MOV  => src_val,
-                        o if o == BPF_ADD  => dst_val.wrapping_add(src_val),
-                        o if o == BPF_SUB  => dst_val.wrapping_sub(src_val),
-                        o if o == BPF_MUL  => dst_val.wrapping_mul(src_val),
-                        o if o == BPF_DIV  => if src_val == 0 { 0 } else { dst_val / src_val },
-                        o if o == BPF_OR   => dst_val | src_val,
-                        o if o == BPF_AND  => dst_val & src_val,
-                        o if o == BPF_XOR  => dst_val ^ src_val,
-                        o if o == BPF_LSH  => dst_val << (src_val & 63),
-                        o if o == BPF_RSH  => dst_val >> (src_val & 63),
+                        o if o == BPF_MOV => src_val,
+                        o if o == BPF_ADD => dst_val.wrapping_add(src_val),
+                        o if o == BPF_SUB => dst_val.wrapping_sub(src_val),
+                        o if o == BPF_MUL => dst_val.wrapping_mul(src_val),
+                        o if o == BPF_DIV => {
+                            if src_val == 0 {
+                                0
+                            } else {
+                                dst_val / src_val
+                            }
+                        }
+                        o if o == BPF_OR => dst_val | src_val,
+                        o if o == BPF_AND => dst_val & src_val,
+                        o if o == BPF_XOR => dst_val ^ src_val,
+                        o if o == BPF_LSH => dst_val << (src_val & 63),
+                        o if o == BPF_RSH => dst_val >> (src_val & 63),
                         o if o == BPF_ARSH => ((dst_val as i64) >> (src_val & 63)) as u64,
-                        o if o == BPF_MOD  => if src_val == 0 { dst_val } else { dst_val % src_val },
-                        o if o == BPF_NEG  => (-(dst_val as i64)) as u64,
+                        o if o == BPF_MOD => {
+                            if src_val == 0 {
+                                dst_val
+                            } else {
+                                dst_val % src_val
+                            }
+                        }
+                        o if o == BPF_NEG => (-(dst_val as i64)) as u64,
                         _ => dst_val,
                     };
                     // For ALU32, mask to 32 bits
-                    let result = if c == BPF_ALU { result & 0xFFFF_FFFF } else { result };
+                    let result = if c == BPF_ALU {
+                        result & 0xFFFF_FFFF
+                    } else {
+                        result
+                    };
                     self.regs.set(dst, result);
                     pc += 1;
                 }
@@ -393,20 +471,25 @@ impl BpfVm {
                     }
 
                     let dst_val = self.regs.get(insn.dst_reg);
-                    let src_val = if op_src == BPF_X { self.regs.get(insn.src_reg) }
-                                  else { insn.imm as i64 as u64 };
+                    let src_val = if op_src == BPF_X {
+                        self.regs.get(insn.src_reg)
+                    } else {
+                        insn.imm as i64 as u64
+                    };
                     let (dst_v, src_v) = if c == BPF_JMP32 {
                         (dst_val & 0xFFFF_FFFF, src_val & 0xFFFF_FFFF)
-                    } else { (dst_val, src_val) };
+                    } else {
+                        (dst_val, src_val)
+                    };
 
                     let taken = match op_code {
-                        o if o == BPF_JA   => true,
-                        o if o == BPF_JEQ  => dst_v == src_v,
-                        o if o == BPF_JNE  => dst_v != src_v,
-                        o if o == BPF_JGT  => dst_v > src_v,
-                        o if o == BPF_JGE  => dst_v >= src_v,
-                        o if o == BPF_JLT  => dst_v < src_v,
-                        o if o == BPF_JLE  => dst_v <= src_v,
+                        o if o == BPF_JA => true,
+                        o if o == BPF_JEQ => dst_v == src_v,
+                        o if o == BPF_JNE => dst_v != src_v,
+                        o if o == BPF_JGT => dst_v > src_v,
+                        o if o == BPF_JGE => dst_v >= src_v,
+                        o if o == BPF_JLT => dst_v < src_v,
+                        o if o == BPF_JLE => dst_v <= src_v,
                         o if o == BPF_JSGT => (dst_v as i64) > (src_v as i64),
                         o if o == BPF_JSGE => (dst_v as i64) >= (src_v as i64),
                         o if o == BPF_JSET => dst_v & src_v != 0,
@@ -415,14 +498,16 @@ impl BpfVm {
                     pc += 1 + if taken { insn.off as i64 } else { 0 };
                 }
 
-                _ => { pc += 1; } // Unhandled instruction class — skip
+                _ => {
+                    pc += 1;
+                } // Unhandled instruction class — skip
             }
         }
     }
 
     fn call_helper(&mut self, helper_id: i32, maps: &mut BTreeMap<u32, BpfMap>) -> u64 {
         match helper_id {
-            5 => self.now_ns, // bpf_ktime_get_ns
+            5 => self.now_ns,              // bpf_ktime_get_ns
             14 => self.current_pid as u64, // bpf_get_current_pid_tgid
             15 => self.current_uid as u64, // bpf_get_current_uid_gid
             _ => 0,
@@ -444,30 +529,58 @@ pub struct BpfRegistry {
 
 impl BpfRegistry {
     pub fn new() -> Self {
-        Self { programs: BTreeMap::new(), maps: BTreeMap::new(), next_prog_id: 1, next_map_id: 1 }
+        Self {
+            programs: BTreeMap::new(),
+            maps: BTreeMap::new(),
+            next_prog_id: 1,
+            next_map_id: 1,
+        }
     }
 
     /// Load and verify an eBPF program.
     pub fn load_program(&mut self, name: &str, insns: Vec<BpfInsn>, prog_type: BpfProgType) -> u32 {
         let id = self.next_prog_id;
         self.next_prog_id += 1;
-        self.programs.insert(id, BpfProgram { id, name: name.into(), instructions: insns,
-            prog_type, verified: true, jit_code: None });
+        self.programs.insert(
+            id,
+            BpfProgram {
+                id,
+                name: name.into(),
+                instructions: insns,
+                prog_type,
+                verified: true,
+                jit_code: None,
+            },
+        );
         id
     }
 
     /// Create a BPF map.
-    pub fn create_map(&mut self, map_type: BpfMapType, key_size: u32, value_size: u32, max_entries: u32) -> u32 {
+    pub fn create_map(
+        &mut self,
+        map_type: BpfMapType,
+        key_size: u32,
+        value_size: u32,
+        max_entries: u32,
+    ) -> u32 {
         let id = self.next_map_id;
         self.next_map_id += 1;
-        self.maps.insert(id, BpfMap::new(id, map_type, key_size, value_size, max_entries));
+        self.maps.insert(
+            id,
+            BpfMap::new(id, map_type, key_size, value_size, max_entries),
+        );
         id
     }
 
     /// Run a program by ID.
-    pub fn run(&mut self, prog_id: u32, context: Vec<u8>, now_ns: u64, pid: u32, uid: u32)
-        -> Option<BpfRunResult>
-    {
+    pub fn run(
+        &mut self,
+        prog_id: u32,
+        context: Vec<u8>,
+        now_ns: u64,
+        pid: u32,
+        uid: u32,
+    ) -> Option<BpfRunResult> {
         let prog = self.programs.get(&prog_id)?.clone();
         let mut vm = BpfVm::new();
         vm.set_context(context);
@@ -477,8 +590,12 @@ impl BpfRegistry {
         Some(vm.run(&prog, &mut self.maps))
     }
 
-    pub fn program_count(&self) -> usize { self.programs.len() }
-    pub fn map_count(&self) -> usize { self.maps.len() }
+    pub fn program_count(&self) -> usize {
+        self.programs.len()
+    }
+    pub fn map_count(&self) -> usize {
+        self.maps.len()
+    }
 }
 
 // ============================================================
@@ -490,8 +607,14 @@ mod tests {
     use super::*;
 
     fn simple_prog(insns: Vec<BpfInsn>) -> BpfProgram {
-        BpfProgram { id: 1, name: "test".into(), instructions: insns,
-            prog_type: BpfProgType::KProbe, verified: true, jit_code: None }
+        BpfProgram {
+            id: 1,
+            name: "test".into(),
+            instructions: insns,
+            prog_type: BpfProgType::KProbe,
+            verified: true,
+            jit_code: None,
+        }
     }
 
     #[test]
@@ -559,10 +682,11 @@ mod tests {
     fn test_registry() {
         let mut reg = BpfRegistry::new();
         let map_id = reg.create_map(BpfMapType::Array, 4, 8, 256);
-        let prog_id = reg.load_program("test", vec![
-            BpfInsn::mov64_imm(0, 7),
-            BpfInsn::exit(),
-        ], BpfProgType::KProbe);
+        let prog_id = reg.load_program(
+            "test",
+            vec![BpfInsn::mov64_imm(0, 7), BpfInsn::exit()],
+            BpfProgType::KProbe,
+        );
         assert_eq!(reg.program_count(), 1);
         assert_eq!(reg.map_count(), 1);
         let result = reg.run(prog_id, vec![], 0, 0, 0).unwrap();

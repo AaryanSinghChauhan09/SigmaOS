@@ -12,9 +12,9 @@ use std::vec;
 // Inspired by the FreeBSD linuxulator, allowing unmodified Linux x86_64 binaries to run natively under microkernel isolation.
 
 use crate::interrupt::handler::RegisterSet;
+use core::sync::atomic::{AtomicU64, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxulatorError {

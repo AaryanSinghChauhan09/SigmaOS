@@ -11,9 +11,9 @@
 // Implements cpufreq-compatible CpuGovernors, active frequency scaling cores,
 // TLP/powertop-compatible PCIe Active State Power Management (ASPM), and Energy-Aware Thread Balancers.
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. CPU FREQUENCY GOVERNORS

@@ -13,7 +13,6 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(test)]
-
 #[cfg(test)]
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 
@@ -177,7 +176,8 @@ impl PledgeManager {
             buf
         };
         let lower_path = core::str::from_utf8(&lower[..path.len().min(512)]).unwrap_or("");
-        if lower_path.contains("%2e%2e") || lower_path.contains("%2f") || lower_path.contains("%5c") {
+        if lower_path.contains("%2e%2e") || lower_path.contains("%2f") || lower_path.contains("%5c")
+        {
             return false;
         }
 

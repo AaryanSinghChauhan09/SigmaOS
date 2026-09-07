@@ -18,10 +18,10 @@
 //! - Fast Terminal & Development Environment Provisioner
 
 use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
 use std::vec;
+use std::vec::Vec;
 
 /// Supported Omarchy Curated Themes
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -348,7 +348,6 @@ impl Default for OmarchyModernDesktopEngine {
     }
 }
 
-
 /// Sovereign Agent Definition (inspired by omacom/omarchy: ori-agent, hermes-agent, openclaw-agent, add-default-agent)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SovereignAgentKind {
@@ -427,9 +426,15 @@ impl FactoryResetGuardian {
 
     pub fn plan_rollback_instructions(&self) -> Vec<String> {
         vec![
-            format!("btrfs subvolume snapshot -r {} {}", self.btrfs_subvolume_root, "/@pre-reset-backup"),
+            format!(
+                "btrfs subvolume snapshot -r {} {}",
+                self.btrfs_subvolume_root, "/@pre-reset-backup"
+            ),
             format!("btrfs subvolume delete {}", self.btrfs_subvolume_root),
-            format!("btrfs subvolume snapshot {} {}", self.btrfs_subvolume_factory, self.btrfs_subvolume_root),
+            format!(
+                "btrfs subvolume snapshot {} {}",
+                self.btrfs_subvolume_factory, self.btrfs_subvolume_root
+            ),
             "systemctl reboot".to_string(),
         ]
     }
@@ -461,7 +466,9 @@ impl HardwareQuirkAdapter {
 
     /// Framework 16 & ASUS ROG Keyboard RGB / Backlight Quirk
     pub fn probe_rgb_keyboard(device_name: &str) -> Option<Self> {
-        if device_name.to_lowercase().contains("framework16") || device_name.to_lowercase().contains("asus-rog") {
+        if device_name.to_lowercase().contains("framework16")
+            || device_name.to_lowercase().contains("asus-rog")
+        {
             Some(Self {
                 pci_id: "usb:input-rgb".to_string(),
                 device_name: device_name.to_string(),
@@ -597,7 +604,11 @@ impl OmarchyBluetoothAudioAutoSwitch {
     }
 
     pub fn resolve_codec_for_device(&self, device_name: &str) -> String {
-        if self.auto_ldac_enabled && (device_name.contains("Sony") || device_name.contains("WH-1000") || device_name.contains("LDAC")) {
+        if self.auto_ldac_enabled
+            && (device_name.contains("Sony")
+                || device_name.contains("WH-1000")
+                || device_name.contains("LDAC"))
+        {
             "ldac".to_string()
         } else if device_name.contains("AptX") {
             "aptx_hd".to_string()
@@ -628,7 +639,13 @@ impl OmarchySystemdBootGenerator {
         }
     }
 
-    pub fn generate_boot_entry(&self, title: &str, kernel: &str, initrd: &str, params: &str) -> String {
+    pub fn generate_boot_entry(
+        &self,
+        title: &str,
+        kernel: &str,
+        initrd: &str,
+        params: &str,
+    ) -> String {
         format!(
             "title {}\nlinux {}\ninitrd {}\noptions {}\n",
             title, kernel, initrd, params
@@ -702,7 +719,11 @@ mod tests {
     #[test]
     fn test_omarchy_web2app_registration() {
         let mut engine = OmarchyModernDesktopEngine::new();
-        engine.register_webapp("Slack", "https://app.slack.com/", "https://example.com/slack.png");
+        engine.register_webapp(
+            "Slack",
+            "https://app.slack.com/",
+            "https://example.com/slack.png",
+        );
         let desktop = engine.generate_desktop_entry("Slack").unwrap();
         assert!(desktop.contains("Name=Slack"));
         assert!(desktop.contains("--ozone-platform=wayland"));
@@ -720,7 +741,10 @@ mod tests {
     #[test]
     fn test_omarchy_wallpaper_manager() {
         let mut wp = OmarchyWallpaperManager::new("/usr/share/backgrounds/tokyo.png");
-        assert_eq!(wp.current_wallpaper_path, "/usr/share/backgrounds/tokyo.png");
+        assert_eq!(
+            wp.current_wallpaper_path,
+            "/usr/share/backgrounds/tokyo.png"
+        );
         wp.set_wallpaper("/usr/share/backgrounds/nord.png");
         assert_eq!(wp.current_wallpaper_path, "/usr/share/backgrounds/nord.png");
         let conf = wp.generate_hyprpaper_config();
@@ -731,19 +755,29 @@ mod tests {
     fn test_omarchy_font_and_bluetooth_audio() {
         let mut font = OmarchyFontInstaller::new();
         font.install_font("HackNerdFont");
-        assert!(font.installed_nerd_fonts.contains(&"HackNerdFont".to_string()));
+        assert!(font
+            .installed_nerd_fonts
+            .contains(&"HackNerdFont".to_string()));
         let xml = font.generate_fontconfig_xml();
         assert!(xml.contains("JetBrainsMono Nerd Font"));
 
         let bt = OmarchyBluetoothAudioAutoSwitch::new();
         assert_eq!(bt.resolve_codec_for_device("Sony WH-1000XM5"), "ldac");
-        assert_eq!(bt.resolve_codec_for_device("Generic AptX Headset"), "aptx_hd");
+        assert_eq!(
+            bt.resolve_codec_for_device("Generic AptX Headset"),
+            "aptx_hd"
+        );
     }
 
     #[test]
     fn test_omarchy_boot_and_packages() {
         let gen = OmarchySystemdBootGenerator::new();
-        let entry = gen.generate_boot_entry("Omarchy Zen", "/vmlinuz-linux-zen", "/initramfs-linux-zen.img", "quiet splash");
+        let entry = gen.generate_boot_entry(
+            "Omarchy Zen",
+            "/vmlinuz-linux-zen",
+            "/initramfs-linux-zen.img",
+            "quiet splash",
+        );
         assert!(entry.contains("title Omarchy Zen"));
         assert!(entry.contains("linux /vmlinuz-linux-zen"));
 

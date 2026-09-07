@@ -12,9 +12,9 @@
 #[cfg(test)]
 mod tests {
     use sigmaos::net::{
-        NetworkNamespaceManager, NetworkNamespaceId, NetworkInterface, Route, FirewallRule,
-        FirewallAction, NetworkSyscalls, SocketFd, SockAddr, SocketState,
-        AF_INET, SOCK_STREAM, SOCK_DGRAM, IPPROTO_TCP, IPPROTO_UDP,
+        FirewallAction, FirewallRule, NetworkInterface, NetworkNamespaceId,
+        NetworkNamespaceManager, NetworkSyscalls, Route, SockAddr, SocketFd, SocketState, AF_INET,
+        IPPROTO_TCP, IPPROTO_UDP, SOCK_DGRAM, SOCK_STREAM,
     };
     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
@@ -27,8 +27,12 @@ mod tests {
         let manager = NetworkNamespaceManager::new();
 
         // Create two separate namespaces
-        let ns1_id = manager.create_namespace(None).expect("Failed to create ns1");
-        let ns2_id = manager.create_namespace(None).expect("Failed to create ns2");
+        let ns1_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns1");
+        let ns2_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns2");
 
         // Get namespace objects
         let ns1_arc = manager.get_namespace(ns1_id).expect("Failed to get ns1");
@@ -40,21 +44,27 @@ mod tests {
         // Add eth0 interface to ns1
         let iface1 = NetworkInterface::new("eth0".to_string())
             .with_ip(IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)));
-        ns1.add_interface(iface1).expect("Failed to add eth0 to ns1");
+        ns1.add_interface(iface1)
+            .expect("Failed to add eth0 to ns1");
 
         // Add eth0 interface to ns2 with different IP
         let iface2 = NetworkInterface::new("eth0".to_string())
             .with_ip(IpAddr::V4(Ipv4Addr::new(192, 168, 2, 1)));
-        ns2.add_interface(iface2).expect("Failed to add eth0 to ns2");
+        ns2.add_interface(iface2)
+            .expect("Failed to add eth0 to ns2");
 
         // Verify interfaces are separate
-        let iface1_retrieved = ns1.get_interface("eth0").expect("Failed to get eth0 from ns1");
+        let iface1_retrieved = ns1
+            .get_interface("eth0")
+            .expect("Failed to get eth0 from ns1");
         let iface1_lock = iface1_retrieved.lock().expect("Failed to lock iface1");
         if let Some(IpAddr::V4(ip)) = iface1_lock.ip_addr {
             assert_eq!(ip, Ipv4Addr::new(192, 168, 1, 1));
         }
 
-        let iface2_retrieved = ns2.get_interface("eth0").expect("Failed to get eth0 from ns2");
+        let iface2_retrieved = ns2
+            .get_interface("eth0")
+            .expect("Failed to get eth0 from ns2");
         let iface2_lock = iface2_retrieved.lock().expect("Failed to lock iface2");
         if let Some(IpAddr::V4(ip)) = iface2_lock.ip_addr {
             assert_eq!(ip, Ipv4Addr::new(192, 168, 2, 1));
@@ -65,8 +75,12 @@ mod tests {
     fn test_interface_not_visible_across_namespaces() {
         let manager = NetworkNamespaceManager::new();
 
-        let ns1_id = manager.create_namespace(None).expect("Failed to create ns1");
-        let ns2_id = manager.create_namespace(None).expect("Failed to create ns2");
+        let ns1_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns1");
+        let ns2_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns2");
 
         let ns1_arc = manager.get_namespace(ns1_id).expect("Failed to get ns1");
         let ns2_arc = manager.get_namespace(ns2_id).expect("Failed to get ns2");
@@ -92,7 +106,11 @@ mod tests {
 
         // Verify ns1 still has 3 interfaces (no change)
         let ns1_interfaces = ns1.list_interfaces().expect("Failed to list interfaces");
-        assert_eq!(ns1_interfaces.len(), 3, "ns1 should still have 3 interfaces");
+        assert_eq!(
+            ns1_interfaces.len(),
+            3,
+            "ns1 should still have 3 interfaces"
+        );
 
         // Verify ns1 doesn't see wlan0
         let result = ns1.get_interface("wlan0");
@@ -102,8 +120,12 @@ mod tests {
     #[test]
     fn test_multiple_interfaces_per_namespace() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         // Add multiple interfaces
@@ -128,12 +150,17 @@ mod tests {
     #[test]
     fn test_interface_duplicate_prevention() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         let iface = NetworkInterface::new("eth0".to_string());
-        ns.add_interface(iface).expect("Failed to add eth0 first time");
+        ns.add_interface(iface)
+            .expect("Failed to add eth0 first time");
 
         // Try to add duplicate
         let iface_dup = NetworkInterface::new("eth0".to_string());
@@ -149,8 +176,12 @@ mod tests {
     fn test_route_isolation_between_namespaces() {
         let manager = NetworkNamespaceManager::new();
 
-        let ns1_id = manager.create_namespace(None).expect("Failed to create ns1");
-        let ns2_id = manager.create_namespace(None).expect("Failed to create ns2");
+        let ns1_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns1");
+        let ns2_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns2");
 
         let ns1_arc = manager.get_namespace(ns1_id).expect("Failed to get ns1");
         let ns2_arc = manager.get_namespace(ns2_id).expect("Failed to get ns2");
@@ -194,15 +225,31 @@ mod tests {
     #[test]
     fn test_routing_table_consistency() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         // Add multiple routes
         let routes = vec![
-            Route::new(IpAddr::V4(Ipv4Addr::new(10, 0, 0, 0)), 8, "eth0".to_string()),
-            Route::new(IpAddr::V4(Ipv4Addr::new(192, 168, 0, 0)), 16, "eth1".to_string()),
-            Route::new(IpAddr::V4(Ipv4Addr::new(172, 16, 0, 0)), 12, "eth2".to_string()),
+            Route::new(
+                IpAddr::V4(Ipv4Addr::new(10, 0, 0, 0)),
+                8,
+                "eth0".to_string(),
+            ),
+            Route::new(
+                IpAddr::V4(Ipv4Addr::new(192, 168, 0, 0)),
+                16,
+                "eth1".to_string(),
+            ),
+            Route::new(
+                IpAddr::V4(Ipv4Addr::new(172, 16, 0, 0)),
+                12,
+                "eth2".to_string(),
+            ),
         ];
 
         for route in routes.iter() {
@@ -214,24 +261,34 @@ mod tests {
         assert_eq!(stored_routes.len(), 3, "Should have 3 routes");
 
         // Verify specific routes
-        let has_10_0_0_0 = stored_routes.iter()
-            .any(|r| if let IpAddr::V4(ip) = r.destination {
+        let has_10_0_0_0 = stored_routes.iter().any(|r| {
+            if let IpAddr::V4(ip) = r.destination {
                 ip == Ipv4Addr::new(10, 0, 0, 0)
-            } else { false });
+            } else {
+                false
+            }
+        });
         assert!(has_10_0_0_0, "Should have route for 10.0.0.0");
 
-        let has_172_16 = stored_routes.iter()
-            .any(|r| if let IpAddr::V4(ip) = r.destination {
+        let has_172_16 = stored_routes.iter().any(|r| {
+            if let IpAddr::V4(ip) = r.destination {
                 ip == Ipv4Addr::new(172, 16, 0, 0)
-            } else { false });
+            } else {
+                false
+            }
+        });
         assert!(has_172_16, "Should have route for 172.16.0.0");
     }
 
     #[test]
     fn test_route_metrics_preserved() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         let mut route = Route::new(
@@ -255,8 +312,12 @@ mod tests {
     fn test_firewall_rule_isolation() {
         let manager = NetworkNamespaceManager::new();
 
-        let ns1_id = manager.create_namespace(None).expect("Failed to create ns1");
-        let ns2_id = manager.create_namespace(None).expect("Failed to create ns2");
+        let ns1_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns1");
+        let ns2_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns2");
 
         let ns1_arc = manager.get_namespace(ns1_id).expect("Failed to get ns1");
         let ns2_arc = manager.get_namespace(ns2_id).expect("Failed to get ns2");
@@ -266,15 +327,21 @@ mod tests {
 
         // Add ALLOW rule to ns1
         let rule1 = FirewallRule::new(FirewallAction::Allow);
-        ns1.add_firewall_rule(rule1).expect("Failed to add rule to ns1");
+        ns1.add_firewall_rule(rule1)
+            .expect("Failed to add rule to ns1");
 
         // Add DENY rule to ns2
         let rule2 = FirewallRule::new(FirewallAction::Deny);
-        ns2.add_firewall_rule(rule2).expect("Failed to add rule to ns2");
+        ns2.add_firewall_rule(rule2)
+            .expect("Failed to add rule to ns2");
 
         // Verify isolation
-        let rules1 = ns1.get_firewall_rules().expect("Failed to get rules from ns1");
-        let rules2 = ns2.get_firewall_rules().expect("Failed to get rules from ns2");
+        let rules1 = ns1
+            .get_firewall_rules()
+            .expect("Failed to get rules from ns1");
+        let rules2 = ns2
+            .get_firewall_rules()
+            .expect("Failed to get rules from ns2");
 
         assert_eq!(rules1.len(), 1);
         assert_eq!(rules2.len(), 1);
@@ -285,8 +352,12 @@ mod tests {
     #[test]
     fn test_firewall_rule_with_addresses() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         let mut rule = FirewallRule::new(FirewallAction::Allow);
@@ -308,8 +379,12 @@ mod tests {
     #[test]
     fn test_multiple_firewall_rules() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         // Add multiple rules with different actions
@@ -343,9 +418,10 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls
+            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
-        
+
         assert_ne!(fd.raw(), 0, "Socket FD should be valid");
     }
 
@@ -354,14 +430,18 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls
+            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
-        syscalls.sys_bind(fd, addr, ns_id).expect("Failed to bind socket");
+        syscalls
+            .sys_bind(fd, addr, ns_id)
+            .expect("Failed to bind socket");
 
         // Verify binding
-        let bound_addr = syscalls.sys_getsockname(fd, ns_id)
+        let bound_addr = syscalls
+            .sys_getsockname(fd, ns_id)
             .expect("Failed to get socket name");
         assert_eq!(bound_addr.port, 8080);
     }
@@ -371,16 +451,16 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls
+            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
         syscalls.sys_bind(fd, addr, ns_id).expect("Failed to bind");
         syscalls.sys_listen(fd, 5, ns_id).expect("Failed to listen");
 
-        let (conn_fd, peer_addr) = syscalls.sys_accept(fd, ns_id)
-            .expect("Failed to accept");
-        
+        let (conn_fd, peer_addr) = syscalls.sys_accept(fd, ns_id).expect("Failed to accept");
+
         assert_ne!(conn_fd.raw(), fd.raw(), "Connection FD should be different");
         assert_ne!(peer_addr.port, 0, "Peer address should be set");
     }
@@ -390,14 +470,18 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls
+            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
-        syscalls.sys_connect(fd, addr, ns_id).expect("Failed to connect");
+        syscalls
+            .sys_connect(fd, addr, ns_id)
+            .expect("Failed to connect");
 
         // Verify connection
-        let peer = syscalls.sys_getpeername(fd, ns_id)
+        let peer = syscalls
+            .sys_getpeername(fd, ns_id)
             .expect("Failed to get peer name");
         assert_eq!(peer.port, 8080);
     }
@@ -412,9 +496,11 @@ mod tests {
         let ns1 = NetworkNamespaceId::new(1);
         let ns2 = NetworkNamespaceId::new(2);
 
-        let fd1 = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns1)
+        let fd1 = syscalls
+            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns1)
             .expect("Failed to create socket in ns1");
-        let fd2 = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns2)
+        let fd2 = syscalls
+            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns2)
             .expect("Failed to create socket in ns2");
 
         // Same FD number in different namespaces is allowed
@@ -424,13 +510,19 @@ mod tests {
         let addr1 = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
         let addr2 = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 9090);
 
-        syscalls.sys_bind(fd1, addr1, ns1).expect("Failed to bind in ns1");
-        syscalls.sys_bind(fd2, addr2, ns2).expect("Failed to bind in ns2");
+        syscalls
+            .sys_bind(fd1, addr1, ns1)
+            .expect("Failed to bind in ns1");
+        syscalls
+            .sys_bind(fd2, addr2, ns2)
+            .expect("Failed to bind in ns2");
 
         // Verify different bindings
-        let bound1 = syscalls.sys_getsockname(fd1, ns1)
+        let bound1 = syscalls
+            .sys_getsockname(fd1, ns1)
             .expect("Failed to get name from ns1");
-        let bound2 = syscalls.sys_getsockname(fd2, ns2)
+        let bound2 = syscalls
+            .sys_getsockname(fd2, ns2)
             .expect("Failed to get name from ns2");
 
         assert_eq!(bound1.port, 8080, "ns1 socket should be on port 8080");
@@ -443,7 +535,8 @@ mod tests {
         let ns1 = NetworkNamespaceId::new(1);
         let ns2 = NetworkNamespaceId::new(2);
 
-        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns1)
+        let fd = syscalls
+            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns1)
             .expect("Failed to create socket in ns1");
 
         // ns2 should not see the socket from ns1
@@ -458,8 +551,11 @@ mod tests {
 
         // Create multiple sockets
         let fds: Vec<_> = (0..5)
-            .map(|_| syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
-                .expect("Failed to create socket"))
+            .map(|_| {
+                syscalls
+                    .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+                    .expect("Failed to create socket")
+            })
             .collect();
 
         // All should have different FD numbers
@@ -508,7 +604,8 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls
+            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let result = syscalls.sys_listen(fd, 5, ns_id);
@@ -520,7 +617,8 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls.sys_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, ns_id)
+        let fd = syscalls
+            .sys_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, ns_id)
             .expect("Failed to create UDP socket");
 
         let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
@@ -535,11 +633,15 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls
+            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let result = syscalls.sys_accept(fd, ns_id);
-        assert!(result.is_err(), "Should fail to accept on non-listening socket");
+        assert!(
+            result.is_err(),
+            "Should fail to accept on non-listening socket"
+        );
     }
 
     // ============================================================================
@@ -550,21 +652,29 @@ mod tests {
     fn test_hierarchical_namespaces_with_interfaces() {
         let manager = NetworkNamespaceManager::new();
 
-        let parent_id = manager.create_namespace(None)
+        let parent_id = manager
+            .create_namespace(None)
             .expect("Failed to create parent namespace");
-        let child_id = manager.create_namespace(Some(parent_id))
+        let child_id = manager
+            .create_namespace(Some(parent_id))
             .expect("Failed to create child namespace");
 
-        let parent_arc = manager.get_namespace(parent_id).expect("Failed to get parent");
-        let child_arc = manager.get_namespace(child_id).expect("Failed to get child");
+        let parent_arc = manager
+            .get_namespace(parent_id)
+            .expect("Failed to get parent");
+        let child_arc = manager
+            .get_namespace(child_id)
+            .expect("Failed to get child");
 
         let parent = parent_arc.lock().expect("Failed to lock parent");
         let child = child_arc.lock().expect("Failed to lock child");
 
         // Add interfaces to both
-        parent.add_interface(NetworkInterface::new("eth0".to_string()))
+        parent
+            .add_interface(NetworkInterface::new("eth0".to_string()))
             .expect("Failed to add eth0 to parent");
-        child.add_interface(NetworkInterface::new("eth0".to_string()))
+        child
+            .add_interface(NetworkInterface::new("eth0".to_string()))
             .expect("Failed to add eth0 to child");
 
         // Verify they are separate
@@ -587,8 +697,12 @@ mod tests {
     fn test_virtual_bridge_connection() {
         let manager = NetworkNamespaceManager::new();
 
-        let ns1_id = manager.create_namespace(None).expect("Failed to create ns1");
-        let ns2_id = manager.create_namespace(None).expect("Failed to create ns2");
+        let ns1_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns1");
+        let ns2_id = manager
+            .create_namespace(None)
+            .expect("Failed to create ns2");
 
         let ns1_arc = manager.get_namespace(ns1_id).expect("Failed to get ns1");
         let ns2_arc = manager.get_namespace(ns2_id).expect("Failed to get ns2");
@@ -606,15 +720,22 @@ mod tests {
 
         // ns2 should not see the bridge
         let bridge_result_ns2 = ns2.get_virtual_bridge("br0");
-        assert!(bridge_result_ns2.is_err(), "ns2 should not see ns1's bridge");
+        assert!(
+            bridge_result_ns2.is_err(),
+            "ns2 should not see ns1's bridge"
+        );
     }
 
     #[test]
     fn test_namespace_reference_counting() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
 
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         // Initial refcount should be 1
@@ -642,7 +763,8 @@ mod tests {
         // Create 100 namespaces
         let mut ns_ids = Vec::new();
         for _ in 0..100 {
-            let ns_id = manager.create_namespace(None)
+            let ns_id = manager
+                .create_namespace(None)
                 .expect("Failed to create namespace");
             ns_ids.push(ns_id);
         }
@@ -652,7 +774,9 @@ mod tests {
 
         // Verify each namespace is independent
         for (i, ns_id) in ns_ids.iter().enumerate() {
-            let ns_arc = manager.get_namespace(*ns_id).expect("Failed to get namespace");
+            let ns_arc = manager
+                .get_namespace(*ns_id)
+                .expect("Failed to get namespace");
             let ns = ns_arc.lock().expect("Failed to lock namespace");
 
             ns.add_interface(NetworkInterface::new(format!("eth{}", i)))
@@ -661,7 +785,9 @@ mod tests {
 
         // Verify each namespace has only its own interface
         for (i, ns_id) in ns_ids.iter().enumerate() {
-            let ns_arc = manager.get_namespace(*ns_id).expect("Failed to get namespace");
+            let ns_arc = manager
+                .get_namespace(*ns_id)
+                .expect("Failed to get namespace");
             let ns = ns_arc.lock().expect("Failed to lock namespace");
 
             let ifaces = ns.list_interfaces().expect("Failed to list interfaces");
@@ -673,8 +799,12 @@ mod tests {
     #[test]
     fn test_many_interfaces_per_namespace() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         // Add 50 interfaces
@@ -690,18 +820,18 @@ mod tests {
     #[test]
     fn test_many_routes_per_namespace() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         // Add 50 routes
         for i in 0..50 {
             let ip = Ipv4Addr::new(10, i as u8, 0, 0);
-            let route = Route::new(
-                IpAddr::V4(ip),
-                16,
-                format!("eth{}", i % 5),
-            );
+            let route = Route::new(IpAddr::V4(ip), 16, format!("eth{}", i % 5));
             ns.add_route(route).expect("Failed to add route");
         }
 
@@ -712,8 +842,12 @@ mod tests {
     #[test]
     fn test_many_firewall_rules_per_namespace() {
         let manager = NetworkNamespaceManager::new();
-        let ns_id = manager.create_namespace(None).expect("Failed to create namespace");
-        let ns_arc = manager.get_namespace(ns_id).expect("Failed to get namespace");
+        let ns_id = manager
+            .create_namespace(None)
+            .expect("Failed to create namespace");
+        let ns_arc = manager
+            .get_namespace(ns_id)
+            .expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
 
         // Add 50 firewall rules

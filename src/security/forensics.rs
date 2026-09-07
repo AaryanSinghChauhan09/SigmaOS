@@ -193,15 +193,28 @@ impl SovereignForensicsEngine {
     /// Generates an automated e-discovery report summarising evidence items and timeline
     pub fn generate_ediscovery_report(&self) -> String {
         let mut report = String::from("Sovereign OS Digital Forensics & e-Discovery Report:\n");
-        report.push_str(&format!("Total Evidence Artifacts: {}\n", self.evidence_vault.len()));
+        report.push_str(&format!(
+            "Total Evidence Artifacts: {}\n",
+            self.evidence_vault.len()
+        ));
         for (id, item) in &self.evidence_vault {
             report.push_str(&format!(
                 "  - Evidence [{}]: {:?} from '{}' (Size: {} bytes, Hash: {})\n",
-                id, item.artifact_kind, item.source_location, item.size_bytes, item.data_hash_sha256
+                id,
+                item.artifact_kind,
+                item.source_location,
+                item.size_bytes,
+                item.data_hash_sha256
             ));
-            report.push_str(&format!("    Chain of Custody Entries: {}\n", item.chain_of_custody.len()));
+            report.push_str(&format!(
+                "    Chain of Custody Entries: {}\n",
+                item.chain_of_custody.len()
+            ));
         }
-        report.push_str(&format!("Total Correlated Timeline Events: {}\n", self.timeline_events.len()));
+        report.push_str(&format!(
+            "Total Correlated Timeline Events: {}\n",
+            self.timeline_events.len()
+        ));
         report
     }
 }
@@ -750,11 +763,15 @@ impl EvtxAuditJournalAnalyzer {
     }
 
     pub fn detect_privilege_escalation(&self, events: &[SecurityAuditEvent]) -> bool {
-        events.iter().any(|e| e.event_id == 4672 || e.message.contains("privilege"))
+        events
+            .iter()
+            .any(|e| e.event_id == 4672 || e.message.contains("privilege"))
     }
 
     pub fn detect_log_clearing(&self, events: &[SecurityAuditEvent]) -> bool {
-        events.iter().any(|e| e.event_id == 1102 || e.message.contains("cleared"))
+        events
+            .iter()
+            .any(|e| e.event_id == 1102 || e.message.contains("cleared"))
     }
 }
 
@@ -923,7 +940,12 @@ mod tests {
         let item = engine.evidence_vault.get(&id).unwrap();
         assert_eq!(item.chain_of_custody.len(), 2);
 
-        engine.log_timeline_event(1700000000, "Kernel Audit", "Suspicious raw disk read", "High");
+        engine.log_timeline_event(
+            1700000000,
+            "Kernel Audit",
+            "Suspicious raw disk read",
+            "High",
+        );
         let report = engine.generate_ediscovery_report();
         assert!(report.contains("Digital Forensics & e-Discovery Report"));
         assert!(report.contains("Total Evidence Artifacts: 1"));

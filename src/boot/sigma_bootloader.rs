@@ -55,13 +55,19 @@ pub enum BootArch {
 impl BootArch {
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::X86_32 => "x86", Self::X86_64 => "x86_64",
-            Self::AArch64 => "aarch64", Self::RiscV64 => "riscv64",
-            Self::RiscV32 => "riscv32", Self::Mips64 => "mips64",
+            Self::X86_32 => "x86",
+            Self::X86_64 => "x86_64",
+            Self::AArch64 => "aarch64",
+            Self::RiscV64 => "riscv64",
+            Self::RiscV32 => "riscv32",
+            Self::Mips64 => "mips64",
         }
     }
     pub fn is_64bit(self) -> bool {
-        matches!(self, Self::X86_64 | Self::AArch64 | Self::RiscV64 | Self::Mips64)
+        matches!(
+            self,
+            Self::X86_64 | Self::AArch64 | Self::RiscV64 | Self::Mips64
+        )
     }
 }
 
@@ -103,8 +109,12 @@ pub struct MemoryRegion {
 }
 
 impl MemoryRegion {
-    pub fn end(&self) -> u64 { self.base + self.length }
-    pub fn is_usable(&self) -> bool { self.mem_type == MemoryType::Available }
+    pub fn end(&self) -> u64 {
+        self.base + self.length
+    }
+    pub fn is_usable(&self) -> bool {
+        self.mem_type == MemoryType::Available
+    }
 }
 
 /// The full system memory map as provided to the kernel.
@@ -118,18 +128,35 @@ pub struct BootMemoryMap {
 }
 
 impl BootMemoryMap {
-    pub fn new() -> Self { Self { regions: Vec::new(), total_available: 0, top_of_memory: 0 } }
+    pub fn new() -> Self {
+        Self {
+            regions: Vec::new(),
+            total_available: 0,
+            top_of_memory: 0,
+        }
+    }
 
     pub fn add_region(&mut self, base: u64, length: u64, mem_type: MemoryType) {
-        if mem_type == MemoryType::Available { self.total_available += length; }
+        if mem_type == MemoryType::Available {
+            self.total_available += length;
+        }
         let end = base + length;
-        if end > self.top_of_memory { self.top_of_memory = end; }
-        self.regions.push(MemoryRegion { base, length, mem_type });
+        if end > self.top_of_memory {
+            self.top_of_memory = end;
+        }
+        self.regions.push(MemoryRegion {
+            base,
+            length,
+            mem_type,
+        });
     }
 
     /// Returns the largest contiguous available region.
     pub fn largest_available(&self) -> Option<&MemoryRegion> {
-        self.regions.iter().filter(|r| r.is_usable()).max_by_key(|r| r.length)
+        self.regions
+            .iter()
+            .filter(|r| r.is_usable())
+            .max_by_key(|r| r.length)
     }
 
     /// Returns available regions in order.
@@ -150,17 +177,30 @@ pub struct FramebufferInfo {
     pub height: u32,
     pub pitch: u32,
     pub bpp: u8,
-    pub red_shift: u8, pub red_mask: u8,
-    pub green_shift: u8, pub green_mask: u8,
-    pub blue_shift: u8, pub blue_mask: u8,
+    pub red_shift: u8,
+    pub red_mask: u8,
+    pub green_shift: u8,
+    pub green_mask: u8,
+    pub blue_shift: u8,
+    pub blue_mask: u8,
 }
 
 impl FramebufferInfo {
     /// Standard 1920×1080 RGB32 framebuffer.
     pub fn standard_1080p(addr: u64) -> Self {
-        Self { addr, width: 1920, height: 1080, pitch: 1920 * 4, bpp: 32,
-            red_shift: 16, red_mask: 8, green_shift: 8, green_mask: 8,
-            blue_shift: 0, blue_mask: 8 }
+        Self {
+            addr,
+            width: 1920,
+            height: 1080,
+            pitch: 1920 * 4,
+            bpp: 32,
+            red_shift: 16,
+            red_mask: 8,
+            green_shift: 8,
+            green_mask: 8,
+            blue_shift: 0,
+            blue_mask: 8,
+        }
     }
 }
 
@@ -186,7 +226,10 @@ impl KernelCmdline {
                 params.insert(token.into(), None);
             }
         }
-        Self { raw: cmdline.into(), params }
+        Self {
+            raw: cmdline.into(),
+            params,
+        }
     }
 
     /// Get a parameter value by key.
@@ -195,21 +238,39 @@ impl KernelCmdline {
     }
 
     /// Check if a boolean flag is present.
-    pub fn has_flag(&self, key: &str) -> bool { self.params.contains_key(key) }
+    pub fn has_flag(&self, key: &str) -> bool {
+        self.params.contains_key(key)
+    }
 
     /// Get `root=` parameter.
-    pub fn root_device(&self) -> Option<&str> { self.get("root") }
+    pub fn root_device(&self) -> Option<&str> {
+        self.get("root")
+    }
     /// Get `init=` parameter (default: /sbin/init).
-    pub fn init_path(&self) -> &str { self.get("init").unwrap_or("/sbin/init") }
+    pub fn init_path(&self) -> &str {
+        self.get("init").unwrap_or("/sbin/init")
+    }
     /// Get `loglevel=` (default: 4).
-    pub fn log_level(&self) -> u8 { self.get("loglevel").and_then(|s| s.parse().ok()).unwrap_or(4) }
+    pub fn log_level(&self) -> u8 {
+        self.get("loglevel")
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(4)
+    }
     /// Check for `quiet` flag.
-    pub fn is_quiet(&self) -> bool { self.has_flag("quiet") }
+    pub fn is_quiet(&self) -> bool {
+        self.has_flag("quiet")
+    }
     /// Check for `ro` (read-only root).
-    pub fn is_readonly_root(&self) -> bool { self.has_flag("ro") }
+    pub fn is_readonly_root(&self) -> bool {
+        self.has_flag("ro")
+    }
 
-    pub fn raw(&self) -> &str { &self.raw }
-    pub fn param_count(&self) -> usize { self.params.len() }
+    pub fn raw(&self) -> &str {
+        &self.raw
+    }
+    pub fn param_count(&self) -> usize {
+        self.params.len()
+    }
 }
 
 // ============================================================
@@ -244,7 +305,10 @@ impl BootEntry {
         self
     }
 
-    pub fn set_default(mut self) -> Self { self.is_default = true; self }
+    pub fn set_default(mut self) -> Self {
+        self.is_default = true;
+        self
+    }
 }
 
 // ============================================================
@@ -327,16 +391,22 @@ impl SigmaBootInfo {
 
     /// Validate the boot info structure.
     pub fn validate(&self) -> Result<(), &'static str> {
-        if self.sigma_magic != SIGMA_BOOT_MAGIC { return Err("invalid boot magic"); }
+        if self.sigma_magic != SIGMA_BOOT_MAGIC {
+            return Err("invalid boot magic");
+        }
         if self.memory_map.total_available < 64 * 1024 * 1024 {
             return Err("insufficient memory");
         }
-        if self.kernel_entry == 0 { return Err("kernel entry point not set"); }
+        if self.kernel_entry == 0 {
+            return Err("kernel entry point not set");
+        }
         Ok(())
     }
 
     /// Returns total RAM in MB.
-    pub fn total_ram_mb(&self) -> u64 { self.memory_map.total_available / (1024 * 1024) }
+    pub fn total_ram_mb(&self) -> u64 {
+        self.memory_map.total_available / (1024 * 1024)
+    }
 }
 
 // ============================================================
@@ -352,19 +422,33 @@ pub struct SigmaBootManager {
 
 impl SigmaBootManager {
     pub fn new() -> Self {
-        Self { entries: Vec::new(), timeout_secs: 3, default_entry: 0 }
+        Self {
+            entries: Vec::new(),
+            timeout_secs: 3,
+            default_entry: 0,
+        }
     }
 
     pub fn add_entry(&mut self, entry: BootEntry) {
-        if entry.is_default { self.default_entry = self.entries.len(); }
+        if entry.is_default {
+            self.default_entry = self.entries.len();
+        }
         self.entries.push(entry);
     }
 
-    pub fn set_timeout(&mut self, secs: u32) { self.timeout_secs = secs; }
+    pub fn set_timeout(&mut self, secs: u32) {
+        self.timeout_secs = secs;
+    }
 
-    pub fn default_entry(&self) -> Option<&BootEntry> { self.entries.get(self.default_entry) }
-    pub fn entry_count(&self) -> usize { self.entries.len() }
-    pub fn entries(&self) -> &[BootEntry] { &self.entries }
+    pub fn default_entry(&self) -> Option<&BootEntry> {
+        self.entries.get(self.default_entry)
+    }
+    pub fn entry_count(&self) -> usize {
+        self.entries.len()
+    }
+    pub fn entries(&self) -> &[BootEntry] {
+        &self.entries
+    }
 
     /// Generate a boot menu display string.
     pub fn menu_string(&self) -> String {
@@ -424,12 +508,20 @@ mod tests {
     fn test_boot_manager() {
         let mut mgr = SigmaBootManager::new();
         mgr.add_entry(
-            BootEntry::new("SigmaOS", "/boot/sigmaos", "root=/dev/sda1 quiet", BootArch::X86_64)
-                .set_default()
+            BootEntry::new(
+                "SigmaOS",
+                "/boot/sigmaos",
+                "root=/dev/sda1 quiet",
+                BootArch::X86_64,
+            )
+            .set_default(),
         );
-        mgr.add_entry(
-            BootEntry::new("SigmaOS (recovery)", "/boot/sigmaos", "root=/dev/sda1 recovery", BootArch::X86_64)
-        );
+        mgr.add_entry(BootEntry::new(
+            "SigmaOS (recovery)",
+            "/boot/sigmaos",
+            "root=/dev/sda1 recovery",
+            BootArch::X86_64,
+        ));
         assert_eq!(mgr.entry_count(), 2);
         let def = mgr.default_entry().unwrap();
         assert!(def.cmdline.is_quiet());

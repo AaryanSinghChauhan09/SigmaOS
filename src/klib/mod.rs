@@ -62,9 +62,9 @@ pub mod uuid;
 pub mod uvm;
 pub mod vec;
 
-pub use btreemap::BTreeMap;
-pub use vec::Vec;
-pub use hashmap::HashMap;
-pub use collections::VecDeque;
-pub use string::SigmaString;
 pub use alloc::string::{String, ToString};
+pub use btreemap::BTreeMap;
+pub use collections::VecDeque;
+pub use hashmap::HashMap;
+pub use string::SigmaString;
+pub use vec::Vec;

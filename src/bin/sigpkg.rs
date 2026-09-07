@@ -212,9 +212,7 @@ fn cmd_install(args: &[String]) {
             "--eopkg" | "--pisi" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pisi)
             }
-            "--nix" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nix)
-            }
+            "--nix" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nix),
             "--guix" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Guix)
             }
@@ -230,48 +228,30 @@ fn cmd_install(args: &[String]) {
             "--moss" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Moss)
             }
-            "--tcz" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tcz)
-            }
+            "--tcz" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tcz),
             "--gobo" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Gobo)
             }
             "--ostree" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ostree)
             }
-            "--air" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Air)
-            }
+            "--air" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Air),
             "--bottle" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Bottle)
             }
-            "--ipa" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipa)
-            }
+            "--ipa" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipa),
             "--ports" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ports)
             }
-            "--aab" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Aab)
-            }
-            "--hap" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Hap)
-            }
+            "--aab" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Aab),
+            "--hap" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Hap),
             "--superdeb" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Superdeb)
             }
-            "--lzm" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Lzm)
-            }
-            "--pup" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pup)
-            }
-            "--pet" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pet)
-            }
-            "--tar" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tar)
-            }
+            "--lzm" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Lzm),
+            "--pup" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pup),
+            "--pet" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pet),
+            "--tar" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tar),
             "--tgz" | "--targz" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::TarGz)
             }
@@ -281,21 +261,15 @@ fn cmd_install(args: &[String]) {
             "--app" | "--appbundle" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::AppBundle)
             }
-            "--puk" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Puk)
-            }
-            "--dmg" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dmg)
-            }
+            "--puk" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Puk),
+            "--dmg" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dmg),
             "--cports" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Cports)
             }
             "--dports" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dports)
             }
-            "--ipk" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipk)
-            }
+            "--ipk" => forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipk),
             "--opkg" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Opkg)
             }
@@ -361,7 +335,11 @@ fn cmd_install(args: &[String]) {
             let canonical_name = dep_mapper.to_canonical_name(clean_name);
             let fmt_desc = forced_format
                 .map(|f| format!("{:?}", f))
-                .or_else(|| adapter.detect_format_by_extension(target).map(|f| format!("{:?}", f)))
+                .or_else(|| {
+                    adapter
+                        .detect_format_by_extension(target)
+                        .map(|f| format!("{:?}", f))
+                })
                 .unwrap_or_else(|| "Sovereign".to_string());
             let pkg = Package::new(
                 canonical_name.clone(),

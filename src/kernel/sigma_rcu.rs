@@ -190,7 +190,10 @@ impl<T> RcuCell<T> {
         // (because writers call `synchronize_rcu` which spins until
         // READER_COUNT is 0 before returning).
         let data = unsafe { &*self.inner.get() };
-        RcuReadGuard { data, _generation: gen }
+        RcuReadGuard {
+            data,
+            _generation: gen,
+        }
     }
 
     /// Publish a new value, analogous to `rcu_assign_pointer`.

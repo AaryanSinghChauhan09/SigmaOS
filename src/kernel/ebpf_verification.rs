@@ -23,20 +23,45 @@ use std::collections::HashSet;
 /// Verification error types
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum VerificationError {
-    OutOfBoundsJump { pc: usize, target: usize, program_len: usize },
-    InfiniteLoop { pc: usize },
-    UnreachableCode { pc: usize },
-    InvalidRegister { reg: u8, pc: usize },
-    InvalidMemoryAccess { pc: usize },
-    DivisionByZero { pc: usize },
-    StackOverflow { pc: usize },
+    OutOfBoundsJump {
+        pc: usize,
+        target: usize,
+        program_len: usize,
+    },
+    InfiniteLoop {
+        pc: usize,
+    },
+    UnreachableCode {
+        pc: usize,
+    },
+    InvalidRegister {
+        reg: u8,
+        pc: usize,
+    },
+    InvalidMemoryAccess {
+        pc: usize,
+    },
+    DivisionByZero {
+        pc: usize,
+    },
+    StackOverflow {
+        pc: usize,
+    },
 }
 
 impl std::fmt::Display for VerificationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            VerificationError::OutOfBoundsJump { pc, target, program_len } => {
-                write!(f, "Out of bounds jump at PC {}: target {} >= program length {}", pc, target, program_len)
+            VerificationError::OutOfBoundsJump {
+                pc,
+                target,
+                program_len,
+            } => {
+                write!(
+                    f,
+                    "Out of bounds jump at PC {}: target {} >= program length {}",
+                    pc, target, program_len
+                )
             }
             VerificationError::InfiniteLoop { pc } => {
                 write!(f, "Infinite loop detected starting at PC {}", pc)
@@ -115,7 +140,8 @@ impl BpfProgramVerifier {
     /// Run complete verification on the program
     pub fn verify(&mut self) -> Result<VerificationReport, String> {
         if self.program.is_empty() {
-            self.report.add_error(VerificationError::InvalidMemoryAccess { pc: 0 });
+            self.report
+                .add_error(VerificationError::InvalidMemoryAccess { pc: 0 });
             return Err("Program is empty".to_string());
         }
 
@@ -188,23 +214,26 @@ impl BpfProgramVerifier {
         for (pc, instr) in self.program.iter().enumerate() {
             if let Some(dst_reg) = instr.dst_register() {
                 if !is_valid_register(dst_reg) {
-                    self.report.add_error(VerificationError::InvalidRegister { reg: dst_reg, pc });
+                    self.report
+                        .add_error(VerificationError::InvalidRegister { reg: dst_reg, pc });
                 }
             }
 
             if let Some(src_reg) = instr.src_register() {
                 if !is_valid_register(src_reg) {
-                    self.report.add_error(VerificationError::InvalidRegister { reg: src_reg, pc });
+                    self.report
+                        .add_error(VerificationError::InvalidRegister { reg: src_reg, pc });
                 }
             }
 
             // Additional validation for store instructions
-            if let BpfInstruction::StoreReg64 { dst_reg, .. } | BpfInstruction::StoreReg32 { dst_reg, .. } | BpfInstruction::StoreImm64 { dst_reg, .. } = instr {
+            if let BpfInstruction::StoreReg64 { dst_reg, .. }
+            | BpfInstruction::StoreReg32 { dst_reg, .. }
+            | BpfInstruction::StoreImm64 { dst_reg, .. } = instr
+            {
                 if !is_valid_register(*dst_reg) {
-                    self.report.add_error(VerificationError::InvalidRegister {
-                        reg: *dst_reg,
-                        pc,
-                    });
+                    self.report
+                        .add_error(VerificationError::InvalidRegister { reg: *dst_reg, pc });
                 }
             }
         }
@@ -238,7 +267,8 @@ impl BpfProgramVerifier {
 
                     // Check offset doesn't exceed stack size
                     if offset.abs() > STACK_SIZE {
-                        self.report.add_error(VerificationError::StackOverflow { pc });
+                        self.report
+                            .add_error(VerificationError::StackOverflow { pc });
                     }
                 }
                 _ => {}
@@ -266,7 +296,8 @@ impl BpfProgramVerifier {
             if self.has_cycle(start_pc, &mut visited, &mut rec_stack) {
                 // Check if this is actually an infinite loop (no exit)
                 if !self.can_exit_from(start_pc) {
-                    self.report.add_error(VerificationError::InfiniteLoop { pc: start_pc });
+                    self.report
+                        .add_error(VerificationError::InfiniteLoop { pc: start_pc });
                 }
             }
         }
@@ -279,7 +310,12 @@ impl BpfProgramVerifier {
     }
 
     /// DFS-based cycle detection
-    fn has_cycle(&self, pc: usize, visited: &mut HashSet<usize>, rec_stack: &mut HashSet<usize>) -> bool {
+    fn has_cycle(
+        &self,
+        pc: usize,
+        visited: &mut HashSet<usize>,
+        rec_stack: &mut HashSet<usize>,
+    ) -> bool {
         visited.insert(pc);
         rec_stack.insert(pc);
 
@@ -364,7 +400,7 @@ impl BpfProgramVerifier {
                 vec![pc + 1, self.calculate_jump_target(pc, *offset)]
             }
             BpfInstruction::Return => vec![], // No next instruction
-            _ => vec![pc + 1], // Most instructions just continue
+            _ => vec![pc + 1],                // Most instructions just continue
         }
     }
 
@@ -409,7 +445,8 @@ impl BpfProgramVerifier {
         // Report unreachable code
         for (pc, is_reachable) in reachable.iter().enumerate() {
             if !is_reachable {
-                self.report.add_error(VerificationError::UnreachableCode { pc });
+                self.report
+                    .add_error(VerificationError::UnreachableCode { pc });
             }
         }
 
@@ -433,7 +470,10 @@ mod tests {
     #[test]
     fn test_verifier_creation() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 42,
+            },
             BpfInstruction::Return,
         ];
         let verifier = BpfProgramVerifier::new(program);
@@ -443,7 +483,10 @@ mod tests {
     #[test]
     fn test_verify_simple_program() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 42,
+            },
             BpfInstruction::Return,
         ];
         let mut verifier = BpfProgramVerifier::new(program);
@@ -455,7 +498,10 @@ mod tests {
     #[test]
     fn test_bounds_checking_out_of_bounds_jump() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 0 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 0,
+            },
             BpfInstruction::Ja { offset: 1000 }, // Jump way out of bounds
         ];
         let mut verifier = BpfProgramVerifier::new(program);
@@ -466,7 +512,10 @@ mod tests {
     #[test]
     fn test_bounds_checking_valid_jump() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 0 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 0,
+            },
             BpfInstruction::Ja { offset: 0 }, // Jump back (loop)
             BpfInstruction::Return,
         ];
@@ -493,8 +542,14 @@ mod tests {
     #[test]
     fn test_register_validation_valid_registers() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 10 },
-            BpfInstruction::LoadImm64 { dst_reg: 1, imm64: 20 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 10,
+            },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 1,
+                imm64: 20,
+            },
             BpfInstruction::Add {
                 dst_reg: 0,
                 src_reg: 1,
@@ -509,7 +564,10 @@ mod tests {
     #[test]
     fn test_infinite_loop_detection() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 0 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 0,
+            },
             BpfInstruction::Ja { offset: -1 }, // Jump back to instruction 0
         ];
         let mut verifier = BpfProgramVerifier::new(program);
@@ -520,8 +578,14 @@ mod tests {
     #[test]
     fn test_valid_conditional_jump() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 5 },
-            BpfInstruction::LoadImm64 { dst_reg: 1, imm64: 5 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 5,
+            },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 1,
+                imm64: 5,
+            },
             BpfInstruction::Jeq {
                 dst_reg: 0,
                 src_reg: 1,
@@ -538,7 +602,10 @@ mod tests {
     #[test]
     fn test_unreachable_code_detection() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 42,
+            },
             BpfInstruction::Return,
             BpfInstruction::LoadImm64 {
                 dst_reg: 1,
@@ -554,7 +621,10 @@ mod tests {
     #[test]
     fn test_stack_overflow_detection() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 42,
+            },
             BpfInstruction::StoreReg64 {
                 dst_reg: 10,
                 offset: 1000, // Huge offset
@@ -570,7 +640,10 @@ mod tests {
     #[test]
     fn test_memory_access_validation() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 0 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 0,
+            },
             BpfInstruction::LoadReg64 {
                 dst_reg: 1,
                 src_reg: 10,
@@ -587,7 +660,10 @@ mod tests {
     #[test]
     fn test_verification_report_accuracy() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 42,
+            },
             BpfInstruction::Return,
         ];
         let mut verifier = BpfProgramVerifier::new(program);
@@ -600,16 +676,28 @@ mod tests {
     #[test]
     fn test_complex_program_with_branching() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 10 },
-            BpfInstruction::LoadImm64 { dst_reg: 1, imm64: 5 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 10,
+            },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 1,
+                imm64: 5,
+            },
             BpfInstruction::Jgt {
                 dst_reg: 0,
                 src_reg: 1,
                 offset: 2,
             },
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 0 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 0,
+            },
             BpfInstruction::Ja { offset: 1 },
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 1 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 1,
+            },
             BpfInstruction::Return,
         ];
         let mut verifier = BpfProgramVerifier::new(program);

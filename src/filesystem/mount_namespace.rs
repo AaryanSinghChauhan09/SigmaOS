@@ -26,7 +26,7 @@ use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 
 use crate::kernel::namespaces::{
-    KernelNamespace, KernelNamespaceType, NamespaceError, NamespaceId, next_namespace_id,
+    next_namespace_id, KernelNamespace, KernelNamespaceType, NamespaceError, NamespaceId,
 };
 
 /// Unique mount identifier within a namespace
@@ -221,9 +221,7 @@ impl MountTable {
 
     /// Get a mount by path
     fn get_mount_by_path(&self, path: &str) -> Option<&MountInfo> {
-        self.path_index
-            .get(path)
-            .and_then(|id| self.mounts.get(id))
+        self.path_index.get(path).and_then(|id| self.mounts.get(id))
     }
 
     /// Remove a mount point
@@ -424,11 +422,7 @@ impl MountNamespace {
     /// Get mount namespace statistics
     pub fn get_stats(&self) -> MountNamespaceStats {
         let table = self.mount_table.lock().unwrap();
-        let total_refs: u64 = table
-            .mounts
-            .values()
-            .map(|m| m.ref_count as u64)
-            .sum();
+        let total_refs: u64 = table.mounts.values().map(|m| m.ref_count as u64).sum();
 
         MountNamespaceStats {
             namespace_id: self.id,

@@ -246,7 +246,10 @@ impl TorStreamIsolation {
 
     pub fn add(&mut self, app: &str, port: u16) -> Result<(), String> {
         if self.circuit_map.values().any(|p| *p == port) {
-            return Err(format!("port {} already assigned; would share a circuit", port));
+            return Err(format!(
+                "port {} already assigned; would share a circuit",
+                port
+            ));
         }
         self.circuit_map.insert(app.to_string(), port);
         Ok(())
@@ -916,7 +919,12 @@ impl TinyCoreExtensionManager {
         }
     }
 
-    pub fn load_extension_on_demand(&mut self, name: &str, loop_dev: &str, ram: bool) -> Result<(), &'static str> {
+    pub fn load_extension_on_demand(
+        &mut self,
+        name: &str,
+        loop_dev: &str,
+        ram: bool,
+    ) -> Result<(), &'static str> {
         if self.extensions.contains_key(name) {
             return Err("Extension already mounted");
         }
@@ -1030,7 +1038,10 @@ impl RescuezillaBackupEngine {
     }
 
     pub fn verify_image(&self, name: &str) -> bool {
-        self.images.get(name).map(|img| img.checksum_verified).unwrap_or(false)
+        self.images
+            .get(name)
+            .map(|img| img.checksum_verified)
+            .unwrap_or(false)
     }
 }
 
@@ -1085,4 +1096,3 @@ impl ClearLinuxAutoOptimizer {
         }
     }
 }
-

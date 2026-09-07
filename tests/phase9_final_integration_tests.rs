@@ -3,13 +3,13 @@
 
 #[cfg(test)]
 mod phase9_e2e_tests {
-    use sigmaos::kernel::ebpf_vm::BpfInstruction;
     use sigmaos::kernel::cgroup_controllers::{
-        DeviceController, DeviceRule, DeviceType, HugetlbController, HugepageSize,
-        PidsController, RdmaController, NetClsController, Controller,
+        Controller, DeviceController, DeviceRule, DeviceType, HugepageSize, HugetlbController,
+        NetClsController, PidsController, RdmaController,
     };
-    use sigmaos::syscall::bpf_syscalls::{BpfProgramRegistry, BpfProgType};
-    use sigmaos::security::seccomp_ebpf::{SyscallInfo, BpfSeccompFilter};
+    use sigmaos::kernel::ebpf_vm::BpfInstruction;
+    use sigmaos::security::seccomp_ebpf::{BpfSeccompFilter, SyscallInfo};
+    use sigmaos::syscall::bpf_syscalls::{BpfProgType, BpfProgramRegistry};
 
     // ============ MULTI-FEATURE INTEGRATION TESTS ============
 
@@ -17,7 +17,10 @@ mod phase9_e2e_tests {
     fn test_ebpf_program_with_cgroups() {
         let mut registry = BpfProgramRegistry::new();
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 42,
+            },
             BpfInstruction::Return,
         ];
 
@@ -107,13 +110,22 @@ mod phase9_e2e_tests {
         let mut registry = BpfProgramRegistry::new();
 
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 100 },
-            BpfInstruction::LoadImm64 { dst_reg: 1, imm64: 50 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 100,
+            },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 1,
+                imm64: 50,
+            },
             BpfInstruction::Sub {
                 dst_reg: 0,
                 src_reg: 1,
             },
-            BpfInstruction::LoadImm64 { dst_reg: 2, imm64: 25 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 2,
+                imm64: 25,
+            },
             BpfInstruction::Add {
                 dst_reg: 0,
                 src_reg: 2,
@@ -132,7 +144,10 @@ mod phase9_e2e_tests {
     #[test]
     fn test_syscall_filtering_with_arguments() {
         let program = vec![
-            BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 0 },
+            BpfInstruction::LoadImm64 {
+                dst_reg: 0,
+                imm64: 0,
+            },
             BpfInstruction::Return,
         ];
 
@@ -140,12 +155,14 @@ mod phase9_e2e_tests {
             .expect("Filter creation failed");
 
         let syscall = SyscallInfo::with_args(
-            4, // sys_write
+            4,                         // sys_write
             [1, 0x1000, 100, 0, 0, 0], // fd, buf, size
         );
 
         assert!(filter.is_loaded());
-        let result = filter.execute_filter(&syscall).expect("Filter execution failed");
+        let result = filter
+            .execute_filter(&syscall)
+            .expect("Filter execution failed");
         assert!(result.error_code >= 0 || true); // Test passes
     }
 
@@ -179,21 +196,45 @@ mod phase9_e2e_tests {
         let mut registry = BpfProgramRegistry::new();
 
         let programs_to_load = vec![
-            ("prog_add", BpfProgType::Tracing, vec![
-                BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 10 },
-                BpfInstruction::AddImm { dst_reg: 0, imm: 5 },
-                BpfInstruction::Return,
-            ]),
-            ("prog_mul", BpfProgType::Xdp, vec![
-                BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 6 },
-                BpfInstruction::MulImm { dst_reg: 0, imm: 7 },
-                BpfInstruction::Return,
-            ]),
-            ("prog_sub", BpfProgType::Socket, vec![
-                BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 100 },
-                BpfInstruction::SubImm { dst_reg: 0, imm: 30 },
-                BpfInstruction::Return,
-            ]),
+            (
+                "prog_add",
+                BpfProgType::Tracing,
+                vec![
+                    BpfInstruction::LoadImm64 {
+                        dst_reg: 0,
+                        imm64: 10,
+                    },
+                    BpfInstruction::AddImm { dst_reg: 0, imm: 5 },
+                    BpfInstruction::Return,
+                ],
+            ),
+            (
+                "prog_mul",
+                BpfProgType::Xdp,
+                vec![
+                    BpfInstruction::LoadImm64 {
+                        dst_reg: 0,
+                        imm64: 6,
+                    },
+                    BpfInstruction::MulImm { dst_reg: 0, imm: 7 },
+                    BpfInstruction::Return,
+                ],
+            ),
+            (
+                "prog_sub",
+                BpfProgType::Socket,
+                vec![
+                    BpfInstruction::LoadImm64 {
+                        dst_reg: 0,
+                        imm64: 100,
+                    },
+                    BpfInstruction::SubImm {
+                        dst_reg: 0,
+                        imm: 30,
+                    },
+                    BpfInstruction::Return,
+                ],
+            ),
         ];
 
         let mut loaded_fds = vec![];
@@ -222,7 +263,10 @@ mod phase9_e2e_tests {
         assert_eq!(pids.get_max_pids(), 50);
 
         let mut device = DeviceController::new();
-        assert!(device.update_setting("allow", "8:0").is_err() || device.update_setting("allow", "8:0").is_ok());
+        assert!(
+            device.update_setting("allow", "8:0").is_err()
+                || device.update_setting("allow", "8:0").is_ok()
+        );
     }
 
     #[test]
@@ -255,19 +299,31 @@ mod phase9_e2e_tests {
         let mut context = BpfSeccompFilterContext::new();
 
         let programs = vec![
-            ("allow_all", vec![
-                BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 0 },
-                BpfInstruction::Return,
-            ]),
-            ("deny_all", vec![
-                BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 1 },
-                BpfInstruction::Return,
-            ]),
+            (
+                "allow_all",
+                vec![
+                    BpfInstruction::LoadImm64 {
+                        dst_reg: 0,
+                        imm64: 0,
+                    },
+                    BpfInstruction::Return,
+                ],
+            ),
+            (
+                "deny_all",
+                vec![
+                    BpfInstruction::LoadImm64 {
+                        dst_reg: 0,
+                        imm64: 1,
+                    },
+                    BpfInstruction::Return,
+                ],
+            ),
         ];
 
         for (name, program) in programs {
-            let filter = BpfSeccompFilter::new(program, name.to_string())
-                .expect("Filter creation failed");
+            let filter =
+                BpfSeccompFilter::new(program, name.to_string()).expect("Filter creation failed");
             context.add_filter(name.to_string(), filter);
         }
 

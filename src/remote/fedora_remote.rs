@@ -14,7 +14,6 @@
 // - PipeWire Wayland Screen Sharing & Remote Desktop (`FedoraPipeWireRemoteDesktop`)
 // - FreeIPA Enterprise Realm & Kerberos GSSAPI Single Sign-On (`FedoraFreeIpaKerberosAuth`)
 
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

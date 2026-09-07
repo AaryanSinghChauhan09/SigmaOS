@@ -11,7 +11,6 @@ use std::string::String;
 use std::vec::Vec;
 // Linux, BSD & OpenStack Cinder Inspired Block Device & Storage Extensions for SigmaOS
 
-
 /// Block Record Allocation Strategies
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BlockRecordStrategy {

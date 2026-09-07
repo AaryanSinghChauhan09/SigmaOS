@@ -11,9 +11,9 @@
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations
 
+use crate::security::Permission;
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
-use crate::security::Permission;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
@@ -179,7 +179,8 @@ fn canary_base() -> u64 {
     };
 
     // compare_exchange ensures only one writer wins in concurrent contexts.
-    match CANARY_BASE_SEED.compare_exchange(0, FILE_PATH_HASH, Ordering::SeqCst, Ordering::Relaxed) {
+    match CANARY_BASE_SEED.compare_exchange(0, FILE_PATH_HASH, Ordering::SeqCst, Ordering::Relaxed)
+    {
         Ok(_) => FILE_PATH_HASH,
         Err(winner) => winner,
     }

@@ -11,7 +11,6 @@ use std::string::String;
 use std::vec::Vec;
 // Linux & BSD Inspired Blocked Process States & Process Control Block (PCB) Management for SigmaOS
 
-
 /// Detailed Blocked / Suspended Process State (Linux D / S / T / t states & BSD SSLEEP / SSTOP parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BlockedProcessState {

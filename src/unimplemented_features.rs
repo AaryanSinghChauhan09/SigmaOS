@@ -1736,10 +1736,6 @@ impl GestureVoiceControlEngine {
     }
 }
 
-
-
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1771,17 +1767,42 @@ mod tests {
         let mut vm = UdfVm::new(0, 16);
 
         let program = [
-            UdfInstruction { opcode: OP_WRITE, reg_dest: 0, reg_src: 0, address_or_imm: 4 }, // write R0 (0) to addr 4
-            UdfInstruction { opcode: OP_READ, reg_dest: 1, reg_src: 0, address_or_imm: 4 },  // read addr 4 to R1
-            UdfInstruction { opcode: OP_ADD, reg_dest: 1, reg_src: 1, address_or_imm: 0 },   // R1 = R1 + R1
-            UdfInstruction { opcode: OP_HALT, reg_dest: 1, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction {
+                opcode: OP_WRITE,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 4,
+            }, // write R0 (0) to addr 4
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 1,
+                reg_src: 0,
+                address_or_imm: 4,
+            }, // read addr 4 to R1
+            UdfInstruction {
+                opcode: OP_ADD,
+                reg_dest: 1,
+                reg_src: 1,
+                address_or_imm: 0,
+            }, // R1 = R1 + R1
+            UdfInstruction {
+                opcode: OP_HALT,
+                reg_dest: 1,
+                reg_src: 0,
+                address_or_imm: 0,
+            },
         ];
 
         let res = vm.execute_program(&program, &mut dev).unwrap();
         assert_eq!(res, 0);
 
         let invalid_program = [
-            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 }, // out of bounds
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 100,
+            }, // out of bounds
         ];
         assert!(vm.execute_program(&invalid_program, &mut dev).is_err());
     }
@@ -1799,7 +1820,9 @@ mod tests {
                     min_version: PkgVersion { major: 2, minor: 0 },
                     max_version: PkgVersion { major: 2, minor: 5 },
                 }),
-                None, None, None,
+                None,
+                None,
+                None,
             ],
         };
 

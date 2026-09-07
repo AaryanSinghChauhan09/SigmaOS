@@ -9,7 +9,6 @@
 #![allow(clippy::type_complexity)]
 // SigmaOS Linux & BSD Distro Inspiration Engine
 // Combines architectural paradigms from Alpine, Gentoo, OpenBSD, FreeBSD, and Clear Linux.
-
 #![allow(dead_code)]
 #![allow(non_camel_case_types)]
 
@@ -44,7 +43,12 @@ impl MuslLightweightInitEngine {
         }
     }
 
-    pub fn register_service(&mut self, name: &'static str, exec_path: &'static str, essential: bool) -> bool {
+    pub fn register_service(
+        &mut self,
+        name: &'static str,
+        exec_path: &'static str,
+        essential: bool,
+    ) -> bool {
         if self.service_count >= 8 {
             return false;
         }
@@ -181,7 +185,12 @@ impl OpenBsdStatefulPacketFilterEngine {
         // Check if state exists
         for slot in self.state_table.iter_mut() {
             if let Some(ref mut entry) = slot {
-                if entry.proto == proto && entry.src_ip == src_ip && entry.dst_ip == dst_ip && entry.src_port == src_port && entry.dst_port == dst_port {
+                if entry.proto == proto
+                    && entry.src_ip == src_ip
+                    && entry.dst_ip == dst_ip
+                    && entry.src_port == src_port
+                    && entry.dst_port == dst_port
+                {
                     entry.packets_counter += 1;
                     return true;
                 }
@@ -318,7 +327,10 @@ mod tests {
         init.register_service("syslogd", "/sbin/syslogd", false);
         let booted = init.boot_essential_services();
         assert_eq!(booted, 1);
-        assert_eq!(init.services[0].as_ref().unwrap().state, ServiceRunState::Running);
+        assert_eq!(
+            init.services[0].as_ref().unwrap().state,
+            ServiceRunState::Running
+        );
     }
 
     #[test]
@@ -333,9 +345,11 @@ mod tests {
     #[test]
     fn test_openbsd_pf_firewall() {
         let mut pf = OpenBsdStatefulPacketFilterEngine::new();
-        let tracked = pf.track_connection(PfProtocol::Tcp, [192, 168, 1, 10], [10, 0, 0, 1], 12345, 80);
+        let tracked =
+            pf.track_connection(PfProtocol::Tcp, [192, 168, 1, 10], [10, 0, 0, 1], 12345, 80);
         assert!(tracked);
-        let tracked_again = pf.track_connection(PfProtocol::Tcp, [192, 168, 1, 10], [10, 0, 0, 1], 12345, 80);
+        let tracked_again =
+            pf.track_connection(PfProtocol::Tcp, [192, 168, 1, 10], [10, 0, 0, 1], 12345, 80);
         assert!(tracked_again);
         assert_eq!(pf.state_table[0].as_ref().unwrap().packets_counter, 2);
     }
@@ -346,7 +360,10 @@ mod tests {
         assert!(!zfs.access_block(101));
         assert!(zfs.access_block(101));
         assert!(zfs.access_block(101));
-        assert_eq!(zfs.cache[0].as_ref().unwrap().state, ArcState::MostFrequentlyUsed);
+        assert_eq!(
+            zfs.cache[0].as_ref().unwrap().state,
+            ArcState::MostFrequentlyUsed
+        );
     }
 
     #[test]
