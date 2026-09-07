@@ -14,9 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Device Module
-pub mod udev_devd_rules;
-pub use udev_devd_rules::*;
-
 pub mod manager;
 pub mod udev_devd_rules;
 

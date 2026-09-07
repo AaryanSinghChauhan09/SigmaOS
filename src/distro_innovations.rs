@@ -1,4 +1,4 @@
-#![no_std]
+// (no_std only applicable at crate root - removed)
 //! # 🌐 SigmaOS Next-Gen Linux & BSD Distro Innovations Engine
 //!
 //! Pure safe-Rust implementation of breakthrough architectural concepts from across

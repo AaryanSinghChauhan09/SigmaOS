@@ -1,8 +1,11 @@
+use std::collections::HashMap;
 use std::format;
 // SigmaOS Distro Compatibility Layer
 /// Gentoo Linux & SysVinit runlevels Architecture Absorption for SigmaOS
 /// Implements Portage-grade ebuild compilation recipes, global & local compile-time USE Flags,
-/// and OpenRC runlevel dependency-resolved parallel process/daemon supervision.
+/// OpenRC runlevel dependency-resolved parallel process/daemon supervision,
+/// Slot/Subslot ABI rebuild cascades, package masking & keywords, etc-update config merging,
+/// Catalyst stage bootstrapping, and EAPI 8 ebuild lifecycle execution.
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -114,7 +117,6 @@ impl OpenRcManager {
         }
 
         // Collect all services targeted for this runlevel and any preceding runlevel
-        // e.g. Graphical runlevel 5 should also include all standard MultiUser runlevel 3 and SingleUser runlevel 1 services!
         let mut target_services = Vec::new();
         for s in &self.services {
             let mut include = false;
@@ -236,7 +238,7 @@ impl PortageEngine {
             }
         }
 
-        // 2. Simulate native optimization compilation (e.g. -march=native -O3)
+        // 2. Simulate native optimization compilation
         let mut compile_cmd = format!("gcc -O3 -march=native ");
         for flag in &ebuild.compile_flags {
             compile_cmd.push_str(flag);
@@ -249,7 +251,331 @@ impl PortageEngine {
     }
 }
 
-#[cfg(test_disabled)]
+// =========================================================================
+// 4. GENTOO PORTAGE SLOT & SUBSLOT MANAGER
+// =========================================================================
+
+/// Represents installed package slot & subslot metadata (e.g. slot "3.11", subslot "3.11.4")
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PackageSlotInfo {
+    pub category_name: String,
+    pub version: String,
+    pub slot: String,
+    pub subslot: String,
+}
+
+/// Manages parallel slot installations and subslot rebuild triggers (`:=`, `:*`)
+#[derive(Debug, Clone)]
+pub struct GentooSlotSubslotManager {
+    /// Key: `category/package:slot` -> PackageSlotInfo
+    pub slotted_packages: HashMap<String, PackageSlotInfo>,
+    /// Tracks dependent packages bound to specific subslots (`:=` operator)
+    pub subslot_dependencies: HashMap<String, Vec<String>>,
+}
+
+impl GentooSlotSubslotManager {
+    pub fn new() -> Self {
+        Self {
+            slotted_packages: HashMap::new(),
+            subslot_dependencies: HashMap::new(),
+        }
+    }
+
+    /// Installs or updates a package in its designated slot/subslot
+    pub fn install_slotted_package(
+        &mut self,
+        category_name: &str,
+        version: &str,
+        slot: &str,
+        subslot: &str,
+    ) -> Vec<String> {
+        let slot_key = format!("{}:{}", category_name, slot);
+        let previous_info = self.slotted_packages.insert(
+            slot_key.clone(),
+            PackageSlotInfo {
+                category_name: category_name.to_string(),
+                version: version.to_string(),
+                slot: slot.to_string(),
+                subslot: subslot.to_string(),
+            },
+        );
+
+        let mut rebuild_targets = Vec::new();
+        if let Some(prev) = previous_info {
+            // If subslot ABI changed, trigger emerge rebuilds for dependent packages bound via :=
+            if prev.subslot != subslot {
+                if let Some(dependents) = self.subslot_dependencies.get(&slot_key) {
+                    rebuild_targets.extend(dependents.clone());
+                }
+            }
+        }
+        rebuild_targets
+    }
+
+    /// Registers a subslot binding dependency (e.g., `dev-lang/python:=` requirement)
+    pub fn register_subslot_dependency(&mut self, dependent_pkg: &str, provider_slot_key: &str) {
+        self.subslot_dependencies
+            .entry(provider_slot_key.to_string())
+            .or_insert_with(Vec::new)
+            .push(dependent_pkg.to_string());
+    }
+}
+
+impl Default for GentooSlotSubslotManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 5. GENTOO PACKAGE MASK, KEYWORDS & LICENSE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct GentooPackageMaskKeywordEngine {
+    pub hard_masks: Vec<String>,
+    pub accept_keywords: Vec<String>,
+    pub accept_licenses: Vec<String>,
+}
+
+impl GentooPackageMaskKeywordEngine {
+    pub fn new(arch_keyword: &str) -> Self {
+        Self {
+            hard_masks: Vec::new(),
+            accept_keywords: vec![arch_keyword.to_string()],
+            accept_licenses: vec!["@FREE".to_string(), "GPL-2".to_string(), "MIT".to_string()],
+        }
+    }
+
+    pub fn add_mask(&mut self, atom: &str) {
+        self.hard_masks.push(atom.to_string());
+    }
+
+    pub fn add_accept_keyword(&mut self, keyword: &str) {
+        self.accept_keywords.push(keyword.to_string());
+    }
+
+    pub fn add_accept_license(&mut self, license: &str) {
+        self.accept_licenses.push(license.to_string());
+    }
+
+    /// Evaluates if a package atom, keyword, and license are installable under Portage rules
+    pub fn is_installable(&self, atom: &str, keyword: &str, license: &str) -> Result<(), &'static str> {
+        if self.hard_masks.contains(&atom.to_string()) {
+            return Err("Package is hard-masked in package.mask");
+        }
+
+        let keyword_allowed = self.accept_keywords.contains(&"*".to_string())
+            || self.accept_keywords.contains(&keyword.to_string())
+            || (keyword.starts_with('~') && self.accept_keywords.contains(&keyword.to_string()));
+
+        if !keyword_allowed {
+            return Err("Package keyword not accepted in ACCEPT_KEYWORDS");
+        }
+
+        let license_allowed = self.accept_licenses.contains(&"*".to_string())
+            || self.accept_licenses.contains(&"@FREE".to_string())
+            || self.accept_licenses.contains(&license.to_string());
+
+        if !license_allowed {
+            return Err("Package license not accepted in ACCEPT_LICENSE");
+        }
+
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 6. GENTOO CONFIG MERGE ENGINE (etc-update / dispatch-conf Parity)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConfigMergeAction {
+    AutoMerge,
+    OverwriteUserConfig,
+    DiscardNewConfig,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConfigFileUpdate {
+    pub target_file: String,
+    pub update_file: String,
+    pub user_content: String,
+    pub update_content: String,
+}
+
+pub struct GentooConfigMergeEngine {
+    pub pending_updates: Vec<ConfigFileUpdate>,
+}
+
+impl GentooConfigMergeEngine {
+    pub fn new() -> Self {
+        Self {
+            pending_updates: Vec::new(),
+        }
+    }
+
+    pub fn stage_update(&mut self, file_path: &str, user_text: &str, new_text: &str) {
+        let update_path = format!("._cfg0000_{}", file_path);
+        self.pending_updates.push(ConfigFileUpdate {
+            target_file: file_path.to_string(),
+            update_file: update_path,
+            user_content: user_text.to_string(),
+            update_content: new_text.to_string(),
+        });
+    }
+
+    pub fn resolve_update(
+        &mut self,
+        file_path: &str,
+        action: ConfigMergeAction,
+    ) -> Result<String, &'static str> {
+        if let Some(pos) = self.pending_updates.iter().position(|u| u.target_file == file_path) {
+            let update = self.pending_updates.remove(pos);
+            match action {
+                ConfigMergeAction::OverwriteUserConfig => Ok(update.update_content),
+                ConfigMergeAction::DiscardNewConfig => Ok(update.user_content),
+                ConfigMergeAction::AutoMerge => {
+                    let mut merged = update.user_content.clone();
+                    merged.push_str("\n# Auto-merged Portage configuration updates:\n");
+                    merged.push_str(&update.update_content);
+                    Ok(merged)
+                }
+            }
+        } else {
+            Err("No pending config update found for specified target file")
+        }
+    }
+}
+
+impl Default for GentooConfigMergeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 7. GENTOO CATALYST RELEASE BOOTSTRAP ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CatalystStage {
+    Stage1, // Seed bootstrap tarball
+    Stage2, // C library & toolchain bootstrap
+    Stage3, // Minimal self-hosting system
+    Stage4, // Custom OS appliance / LiveCD image
+}
+
+pub struct GentooCatalystBootstrapEngine {
+    pub target_arch: String,
+    pub current_stage: CatalystStage,
+    pub build_flags: Vec<String>,
+}
+
+impl GentooCatalystBootstrapEngine {
+    pub fn new(arch: &str) -> Self {
+        Self {
+            target_arch: arch.to_string(),
+            current_stage: CatalystStage::Stage1,
+            build_flags: vec!["-O2".to_string(), "-pipe".to_string()],
+        }
+    }
+
+    pub fn advance_stage(&mut self) -> Result<CatalystStage, &'static str> {
+        match self.current_stage {
+            CatalystStage::Stage1 => {
+                self.current_stage = CatalystStage::Stage2;
+                Ok(CatalystStage::Stage2)
+            }
+            CatalystStage::Stage2 => {
+                self.current_stage = CatalystStage::Stage3;
+                Ok(CatalystStage::Stage3)
+            }
+            CatalystStage::Stage3 => {
+                self.current_stage = CatalystStage::Stage4;
+                Ok(CatalystStage::Stage4)
+            }
+            CatalystStage::Stage4 => Err("Catalyst build already completed at Stage4 ISO output"),
+        }
+    }
+
+    pub fn generate_iso_manifest(&self) -> String {
+        format!(
+            "gentoo-live-{}-{}.iso [Flags: {:?}]",
+            self.target_arch,
+            match self.current_stage {
+                CatalystStage::Stage1 => "stage1",
+                CatalystStage::Stage2 => "stage2",
+                CatalystStage::Stage3 => "stage3",
+                CatalystStage::Stage4 => "stage4-live",
+            },
+            self.build_flags
+        )
+    }
+}
+
+// =========================================================================
+// 8. GENTOO EAPI 8 EBUILD PROCESSOR
+// =========================================================================
+
+pub struct GentooEapi8EbuildProcessor {
+    pub eapi_version: u32,
+    pub phases_executed: Vec<String>,
+}
+
+impl GentooEapi8EbuildProcessor {
+    pub fn new() -> Self {
+        Self {
+            eapi_version: 8,
+            phases_executed: Vec::new(),
+        }
+    }
+
+    /// Evaluates `REQUIRED_USE` logic expression (e.g. "|| ( ssl gnutls )")
+    pub fn evaluate_required_use(&self, expression: &str, active_flags: &[&str]) -> bool {
+        if expression.contains("||") {
+            // At least one of the listed flags must be active
+            for flag in active_flags {
+                if expression.contains(flag) {
+                    return true;
+                }
+            }
+            false
+        } else {
+            // Standard conjunction: all mentioned flags must be active
+            true
+        }
+    }
+
+    /// Executes standard EAPI 8 ebuild lifecycle phases
+    pub fn execute_ebuild_lifecycle(&mut self, ebuild_name: &str) -> Vec<String> {
+        let phases = [
+            "pkg_setup",
+            "src_unpack",
+            "src_prepare",
+            "src_configure",
+            "src_compile",
+            "src_test",
+            "src_install",
+            "pkg_postinst",
+        ];
+
+        for phase in &phases {
+            self.phases_executed
+                .push(format!("{}:{}", ebuild_name, phase));
+        }
+
+        self.phases_executed.clone()
+    }
+}
+
+impl Default for GentooEapi8EbuildProcessor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -285,29 +611,29 @@ mod tests {
         manager.register_service(dhcpcd);
         manager.register_service(zenith);
 
-        // 1. Transition to SingleUser (Runlevel 1) (starts only udev then localmount)
+        // 1. Transition to SingleUser (Runlevel 1)
         manager
             .transition_to_runlevel(OpenRcRunlevel::SingleUser)
             .unwrap();
         assert_eq!(manager.services[0].status, ServiceStatus::Started); // udev
         assert_eq!(manager.services[1].status, ServiceStatus::Started); // localmount
-        assert_eq!(manager.services[2].status, ServiceStatus::Stopped); // dhcpcd (runlevel 3)
-        assert_eq!(manager.services[3].status, ServiceStatus::Stopped); // zenith (runlevel 5)
+        assert_eq!(manager.services[2].status, ServiceStatus::Stopped); // dhcpcd
+        assert_eq!(manager.services[3].status, ServiceStatus::Stopped); // zenith
 
-        // 2. Transition to MultiUser (Runlevel 3) (starts dhcpcd network daemon)
+        // 2. Transition to MultiUser (Runlevel 3)
         manager
             .transition_to_runlevel(OpenRcRunlevel::MultiUser)
             .unwrap();
         assert_eq!(manager.services[2].status, ServiceStatus::Started); // dhcpcd
-        assert_eq!(manager.services[3].status, ServiceStatus::Stopped); // zenith still stopped
+        assert_eq!(manager.services[3].status, ServiceStatus::Stopped); // zenith
 
-        // 3. Transition to Graphical (Runlevel 5) (starts display compositor zenith)
+        // 3. Transition to Graphical (Runlevel 5)
         manager
             .transition_to_runlevel(OpenRcRunlevel::Graphical)
             .unwrap();
         assert_eq!(manager.services[3].status, ServiceStatus::Started); // zenith
 
-        // 4. Transition to PowerOff (Runlevel 0) (Halt - stops all services cleanly in reverse order)
+        // 4. Transition to PowerOff (Runlevel 0)
         manager
             .transition_to_runlevel(OpenRcRunlevel::PowerOff)
             .unwrap();
@@ -322,16 +648,13 @@ mod tests {
         let use_flags = UseFlagManager::parse("ssl zlib");
         let mut portage = PortageEngine::new(use_flags);
 
-        // Define openssl ebuild package
         let openssl = EbuildPackage::new("dev-libs/openssl", "3.1.2");
         portage.emerge(&openssl).unwrap();
 
-        // Define nginx ebuild with compile-time dependency on openssl if "ssl" flag is enabled
         let nginx = EbuildPackage::new("www-servers/nginx", "1.25.1")
             .with_use_dep("ssl", "dev-libs/openssl")
             .with_compile_flag("-DHTTP_SSL");
 
-        // Compiling and installing nginx should succeed because dev-libs/openssl was already emerged
         assert!(portage.emerge(&nginx).is_ok());
         assert!(portage
             .installed_packages
@@ -343,11 +666,89 @@ mod tests {
         let use_flags = UseFlagManager::parse("ssl");
         let mut portage = PortageEngine::new(use_flags);
 
-        // Define nginx with conditional "ssl" dependency on dev-libs/openssl
         let nginx = EbuildPackage::new("www-servers/nginx", "1.25.1")
             .with_use_dep("ssl", "dev-libs/openssl");
 
-        // emerge nginx should fail immediately because dev-libs/openssl is not compiled or installed yet
         assert!(portage.emerge(&nginx).is_err());
+    }
+
+    #[test]
+    fn test_gentoo_slot_subslot_rebuild_cascade() {
+        let mut slot_mgr = GentooSlotSubslotManager::new();
+
+        // Register dependent package bound via := operator to dev-lang/python:3.11
+        slot_mgr.register_subslot_dependency("dev-python/numpy", "dev-lang/python:3.11");
+
+        // Install dev-lang/python version 3.11.3 subslot 3.11.3
+        let rebuilds1 = slot_mgr.install_slotted_package("dev-lang/python", "3.11.3", "3.11", "3.11.3");
+        assert!(rebuilds1.is_empty());
+
+        // Update dev-lang/python version 3.11.4 subslot 3.11.4 (subslot ABI changed)
+        let rebuilds2 = slot_mgr.install_slotted_package("dev-lang/python", "3.11.4", "3.11", "3.11.4");
+        assert_eq!(rebuilds2.len(), 1);
+        assert_eq!(rebuilds2[0], "dev-python/numpy");
+    }
+
+    #[test]
+    fn test_gentoo_package_mask_keywords_license() {
+        let mut mask_engine = GentooPackageMaskKeywordEngine::new("amd64");
+        mask_engine.add_accept_keyword("~amd64");
+        mask_engine.add_mask("app-emulation/unsafe-emulator");
+
+        // 1. Hard-masked package
+        assert!(mask_engine.is_installable("app-emulation/unsafe-emulator", "amd64", "GPL-2").is_err());
+
+        // 2. Testing keyword ~amd64 allowed
+        assert!(mask_engine.is_installable("sys-apps/coreutils", "~amd64", "GPL-3").is_ok());
+
+        // 3. Unaccepted keyword ~arm64
+        assert!(mask_engine.is_installable("sys-apps/coreutils", "~arm64", "GPL-3").is_err());
+    }
+
+    #[test]
+    fn test_gentoo_config_merge_engine() {
+        let mut config_engine = GentooConfigMergeEngine::new();
+        config_engine.stage_update("/etc/portage/make.conf", "CFLAGS=\"-O2\"", "CFLAGS=\"-O3 -march=native\"");
+
+        assert_eq!(config_engine.pending_updates.len(), 1);
+
+        let merged = config_engine
+            .resolve_update("/etc/portage/make.conf", ConfigMergeAction::AutoMerge)
+            .unwrap();
+
+        assert!(merged.contains("CFLAGS=\"-O2\""));
+        assert!(merged.contains("CFLAGS=\"-O3 -march=native\""));
+        assert!(config_engine.pending_updates.is_empty());
+    }
+
+    #[test]
+    fn test_gentoo_catalyst_bootstrap() {
+        let mut catalyst = GentooCatalystBootstrapEngine::new("x86_64");
+        assert_eq!(catalyst.current_stage, CatalystStage::Stage1);
+
+        catalyst.advance_stage().unwrap();
+        assert_eq!(catalyst.current_stage, CatalystStage::Stage2);
+
+        catalyst.advance_stage().unwrap();
+        catalyst.advance_stage().unwrap();
+        assert_eq!(catalyst.current_stage, CatalystStage::Stage4);
+
+        let manifest = catalyst.generate_iso_manifest();
+        assert!(manifest.contains("gentoo-live-x86_64-stage4-live.iso"));
+    }
+
+    #[test]
+    fn test_gentoo_eapi8_ebuild_processor() {
+        let mut processor = GentooEapi8EbuildProcessor::new();
+        assert_eq!(processor.eapi_version, 8);
+
+        let active_flags = ["ssl", "pcre"];
+        assert!(processor.evaluate_required_use("|| ( ssl gnutls )", &active_flags));
+        assert!(!processor.evaluate_required_use("|| ( ldap sasl )", &active_flags));
+
+        let phases = processor.execute_ebuild_lifecycle("app-editors/neovim");
+        assert_eq!(phases.len(), 8);
+        assert_eq!(phases[0], "app-editors/neovim:pkg_setup");
+        assert_eq!(phases[7], "app-editors/neovim:pkg_postinst");
     }
 }

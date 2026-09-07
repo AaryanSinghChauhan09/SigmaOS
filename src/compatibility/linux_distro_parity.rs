@@ -5,14 +5,10 @@
 //! - `/etc/fstab` filesystem mount table entry parsing (`LinuxFstabEngine`)
 //! - Dynamic shared library symbol loader resolution simulation (`LinuxLdSoLoader`)
 
-#[cfg(not(test))]
-use crate::klib::{HashMap, Vec};
+use std::collections::HashMap;
 use std::string::String;
 use std::string::ToString;
-#[cfg(test_disabled)]
 use std::vec::Vec;
-#[cfg(test_disabled)]
-use std::collections::HashMap;
 
 // ==========================================
 // 1. Linux Standard Base (LSB) & /etc/os-release
