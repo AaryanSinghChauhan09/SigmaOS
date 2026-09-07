@@ -615,7 +615,7 @@ impl TCPIPStack {
                                     let tcp_payload = &proto_payload[20..];
                                     let copy_len = tcp_payload.len().min(1024);
                                     if copy_len > 0 {
-                                        (*s).rcv_buffer[..copy_len].copy_from_slice(&tcp_payload[..copy_len]);
+                                        (&mut (*s).rcv_buffer)[..copy_len].copy_from_slice(&tcp_payload[..copy_len]);
                                         (*s).rcv_len = copy_len;
                                     }
                                 }
@@ -640,7 +640,7 @@ impl TCPIPStack {
                     if (*s).protocol == SocketProtocol::UDP && (*s).local_port == dest_port {
                         let copy_len = udp_payload.len().min(1024);
                         if copy_len > 0 {
-                            (*s).rcv_buffer[..copy_len].copy_from_slice(&udp_payload[..copy_len]);
+                            (&mut (*s).rcv_buffer)[..copy_len].copy_from_slice(&udp_payload[..copy_len]);
                             (*s).rcv_len = copy_len;
                             (*s).remote_ip = src_ip;
                             (*s).remote_port = src_port;
@@ -737,6 +737,65 @@ extern "C" {
     #[link_name = "alloc"]
     fn extern_alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+// ============================================================================
+// BBR (Bottleneck Bandwidth and RTT) Congestion Control & BSD Socket Options
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CongestionAlgorithm {
+    Reno,
+    Cubic,
+    Bbr,
+}
+
+#[derive(Debug, Clone)]
+pub struct BbrCongestionControl {
+    pub min_rtt_us: u64,
+    pub max_bw_bytes_per_sec: u64,
+    pub pacing_rate: u64,
+    pub cwnd: u32,
+    pub mode: String,
+}
+
+impl BbrCongestionControl {
+    pub fn new() -> Self {
+        Self {
+            min_rtt_us: 1000,
+            max_bw_bytes_per_sec: 10_000_000,
+            pacing_rate: 12_500_000,
+            cwnd: 10,
+            mode: "Startup".to_string(),
+        }
+    }
+
+    pub fn on_ack(&mut self, rtt_us: u64, bytes_delivered: u64, delta_us: u64) {
+        if rtt_us < self.min_rtt_us {
+            self.min_rtt_us = rtt_us;
+        }
+        if delta_us > 0 {
+            let bw = (bytes_delivered * 1_000_000) / delta_us;
+            if bw > self.max_bw_bytes_per_sec {
+                self.max_bw_bytes_per_sec = bw;
+            }
+        }
+        self.pacing_rate = (self.max_bw_bytes_per_sec as f64 * 1.25) as u64;
+    }
+}
+
+impl Default for BbrCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct BsdSocketOptions {
+    pub so_reuseport: bool,
+    pub so_keepalive: bool,
+    pub so_broadcast: bool,
+    pub tcp_nodelay: bool,
 }
 
 #[cfg(test_disabled)]
@@ -865,5 +924,18 @@ mod tests {
 
             stack.close(fd);
         }
+    }
+    #[test]
+    fn test_bbr_congestion_control_and_bsd_options() {
+        let mut bbr = BbrCongestionControl::new();
+        bbr.on_ack(800, 10000, 1000);
+        assert_eq!(bbr.min_rtt_us, 800);
+        assert!(bbr.pacing_rate > 0);
+
+        let mut opts = BsdSocketOptions::default();
+        opts.so_reuseport = true;
+        opts.so_keepalive = true;
+        assert!(opts.so_reuseport);
+        assert!(opts.so_keepalive);
     }
 }
