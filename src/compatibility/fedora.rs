@@ -2780,84 +2780,6 @@ pub struct FedoraPlanetPost {
     pub published_epoch: u64,
 }
 
-/// Fedora Planet Blog & Community News Aggregation Engine
-pub struct FedoraPlanetAggregationEngine {
-    pub posts: Vec<FedoraPlanetPost>,
-}
-
-impl FedoraPlanetAggregationEngine {
-    pub fn new() -> Self {
-        FedoraPlanetAggregationEngine { posts: Vec::new() }
-    }
-
-    pub fn fetch_and_parse_feed(&mut self, author: &str, title: &str, url: &str, timestamp: u64) {
-        let post_id = format!("planet-{}", self.posts.len() + 1);
-        self.posts.push(FedoraPlanetPost {
-            post_id,
-            author_name: author.to_string(),
-            title: title.to_string(),
-            url: url.to_string(),
-            published_epoch: timestamp,
-        });
-    }
-
-    pub fn get_latest_posts(&self, limit: usize) -> Vec<&FedoraPlanetPost> {
-        self.posts.iter().take(limit).collect()
-    }
-}
-
-impl Default for FedoraPlanetAggregationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Fedora "The New Hotness" Upstream Release Event
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AnityaUpstreamRelease {
-    pub project_name: String,
-    pub latest_version: String,
-    pub homepage: String,
-    pub is_triggering_scratch_build: bool,
-}
-
-/// Fedora "The New Hotness" (Anitya) Upstream Release Monitor & Scratch Build Trigger Engine
-pub struct FedoraTheNewHotnessEngine {
-    pub monitored_projects: Vec<AnityaUpstreamRelease>,
-}
-
-impl FedoraTheNewHotnessEngine {
-    pub fn new() -> Self {
-        FedoraTheNewHotnessEngine {
-            monitored_projects: Vec::new(),
-        }
-    }
-
-    pub fn register_upstream_project(&mut self, name: &str, homepage: &str) {
-        self.monitored_projects.push(AnityaUpstreamRelease {
-            project_name: name.to_string(),
-            latest_version: "1.0.0".to_string(),
-            homepage: homepage.to_string(),
-            is_triggering_scratch_build: false,
-        });
-    }
-
-    pub fn process_upstream_release_event(&mut self, name: &str, new_version: &str) -> Result<String, &'static str> {
-        if let Some(project) = self.monitored_projects.iter_mut().find(|p| p.project_name == name) {
-            project.latest_version = new_version.to_string();
-            project.is_triggering_scratch_build = true;
-            Ok(format!("TheNewHotness: Triggered Koji scratch build for {} version {}", name, new_version))
-        } else {
-            Err("Project not found in Anitya release monitor")
-        }
-    }
-}
-
-impl Default for FedoraTheNewHotnessEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// Fedora rpmautospec RPM Spec Changelog & Version Generator
 pub struct FedoraRpmAutoSpecEngine {
@@ -2890,43 +2812,6 @@ impl FedoraRpmAutoSpecEngine {
     }
 }
 
-/// Fedora Service Status Indicator
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FedoraServiceStatusState {
-    Good,
-    MinorOutage,
-    MajorOutage,
-}
-
-/// Fedora Status (status.fedoraproject.org) Health Monitoring Engine
-pub struct FedoraStatusFpoEngine {
-    pub service_statuses: HashMap<String, FedoraServiceStatusState>,
-}
-
-impl FedoraStatusFpoEngine {
-    pub fn new() -> Self {
-        let mut statuses = HashMap::new();
-        statuses.insert("koji".to_string(), FedoraServiceStatusState::Good);
-        statuses.insert("bodhi".to_string(), FedoraServiceStatusState::Good);
-        statuses.insert("copr".to_string(), FedoraServiceStatusState::Good);
-        statuses.insert("pagure".to_string(), FedoraServiceStatusState::Good);
-        FedoraStatusFpoEngine { service_statuses: statuses }
-    }
-
-    pub fn set_service_status(&mut self, service: &str, state: FedoraServiceStatusState) {
-        self.service_statuses.insert(service.to_string(), state);
-    }
-
-    pub fn query_service_health(&self, service: &str) -> FedoraServiceStatusState {
-        *self.service_statuses.get(service).unwrap_or(&FedoraServiceStatusState::Good)
-    }
-}
-
-impl Default for FedoraStatusFpoEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// Fedora FASJSON (Fedora Account System REST API) User Record
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -3979,13 +3864,6 @@ impl FedoraOfflineUpdateEngine {
 }
 
 
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IgnitionSystemdUnit {
-    pub name: String,
-    pub enabled: bool,
-    pub contents: String,
-}
 
 impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {
