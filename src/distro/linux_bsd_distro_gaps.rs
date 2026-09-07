@@ -901,13 +901,13 @@ mod tests {
         let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
-    }
 
+        let gap_resolver = SovereignUniversalDistroGapResolver::new();
         assert_eq!(
-            resolver.lookup_modprobe_alias("char-major-10-200"),
+            gap_resolver.lookup_modprobe_alias("char-major-10-200"),
             Some("tun")
         );
-        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
+        assert_eq!(gap_resolver.lookup_modprobe_alias("unknown-alias"), None);
     }
 }
 
