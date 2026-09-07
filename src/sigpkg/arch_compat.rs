@@ -6,10 +6,11 @@
 extern crate alloc;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::vec;
+use alloc::vec::Vec as AllocVec;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::collections::HashMap;
+use crate::klib::string::SigmaString;
 use crate::klib;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -731,60 +732,6 @@ impl SvntogitMigrationEngine {
 
 // --- makepkg Package Builder ---
 
-#[derive(Debug, Clone)]
-pub struct MakepkgBuilder {
-    pub pkgname: SigmaString,
-    pub pkgver: SigmaString,
-    pub arch: SigmaString,
-    pub expected_sha256: SigmaString,
-}
-
-impl MakepkgBuilder {
-    pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
-        Self {
-            pkgname: SigmaString::from(pkgname),
-            pkgver: SigmaString::from(pkgver),
-            arch: SigmaString::from(arch),
-            expected_sha256: SigmaString::from(expected_sha256),
-        }
-    }
-
-    pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
-        let mut checksum = 0u64;
-        for &b in source_data {
-            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
-        }
-        let computed = SigmaString::from(format!("{:016x}", checksum));
-        computed == self.expected_sha256 || self.expected_sha256 == SigmaString::from("SKIP")
-    }
-
-    pub fn build_package_archive(
-        &self,
-        source_data: &[u8],
-    ) -> Result<(SigmaString, Vec<u8>), &'static str> {
-        if !self.verify_source_integrity(source_data) {
-            return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
-        }
-
-        let archive_name = SigmaString::from(format!(
-            "{}-{}-{}.pkg.tar.zst",
-            self.pkgname, self.pkgver, self.arch
-        ));
-        let mut archive_content = SigmaString::from(format!(
-            "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
-            self.pkgname, self.pkgver, self.arch
-        ))
-        .into_bytes();
-
-        archive_content.extend_from_slice(source_data);
-        Ok((archive_name, archive_content))
-    }
-}
-// --- Arch Linux svntogit Repository Migration Engine ---
-#[derive(Debug, Clone)]
-pub struct SvntoGitEngine {
-    pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
-}
 #[cfg(test)]
 mod tests {
     use super::*;

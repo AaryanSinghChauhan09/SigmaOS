@@ -770,7 +770,7 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
-#[cfg(test)]
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
 
