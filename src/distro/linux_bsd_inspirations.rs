@@ -138,7 +138,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
-            _ => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -223,23 +222,20 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                supervisor == ServiceSupervisorType::Runit
-            }
+                DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                    supervisor == ServiceSupervisorType::Runit
+                }
 
-            DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
-                supervisor == ServiceSupervisorType::Shepherd
-            }
+                DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
+                    supervisor == ServiceSupervisorType::Shepherd
+                }
 
-            DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => {
-                supervisor == ServiceSupervisorType::Sysvinit
+                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
+                DistroSubsystemMode::LinuxSlackware => {
+                    supervisor == ServiceSupervisorType::Sysvinit
+                }
+                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
             }
-            DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            _ => true,
-        };
-
-        supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
@@ -268,7 +264,6 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
-            _ => format!("{}.pkg", input_pkg),
         }
     }
 
@@ -304,7 +299,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
-            _ => format!("{}.pkg", action),
         };
 
         Ok(format!(
@@ -522,7 +516,7 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "container" | "containers" => {
+            "containers" => {
                 let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
                 chroot_engine.enter_chroot()?;
                 Ok(format!(
@@ -567,7 +561,7 @@ impl SovereignUniversalDistroBridge {
                     action, timeslice, self.mode
                 ))
             }
-            "virt" | "virtualization" => {
+            "virt" => {
                 Ok(format!(
                     "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
                     action, self.mode
@@ -581,10 +575,7 @@ impl SovereignUniversalDistroBridge {
                     action, mprotect_res.is_ok(), self.mode
                 ))
             }
-            _ => Ok(format!(
-                "Dispatched subsystem '{}' action '{}' under distro mode '{:?}'",
-                target_subsystem, action, self.mode
-            )),
+            _ => Err("Unknown target subsystem"),
         }
     }
 
@@ -597,7 +588,7 @@ impl SovereignUniversalDistroBridge {
         ];
 
         for sub in subsystems {
-            if self.dispatch_cross_subsystem_operation(sub, "/tmp/test_action").is_err() {
+            if self.dispatch_cross_subsystem_operation(sub, "test_action").is_err() {
                 return false;
             }
         }

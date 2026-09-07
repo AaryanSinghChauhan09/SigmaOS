@@ -2113,7 +2113,7 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct NixOsFlakesEngine {
     pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
 }
@@ -2306,7 +2306,7 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert!(engine.records.len() >= 6);
+        assert_eq!(engine.records.len(), 13);
         assert!(engine.is_all_components_implemented());
     }
 
