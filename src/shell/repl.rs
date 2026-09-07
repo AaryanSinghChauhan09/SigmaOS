@@ -868,13 +868,17 @@ impl ShellRepl {
         env_map.insert("USER".to_string(), self.current_user.clone());
         env_map.insert("PWD".to_string(), self.current_dir.clone());
 
-        let mut fully_expanded = BashParameterExpansion::expand(&alias_expanded, &env_map);
-        if fully_expanded.contains("$(( ") || fully_expanded.contains("$(((") {
-            let res: Result<i64, &'static str> = Ok(0);
-            if let Ok(val) = res {
-                fully_expanded = val.to_string();
+        let fully_expanded = BashParameterExpansion::expand(&alias_expanded, &env_map);
+        #[cfg(not(test))]
+        let fully_expanded = if fully_expanded.contains("$(( ") || fully_expanded.contains("$(((") {
+            if let Ok(val) = ShellArithmeticEvaluator::evaluate(&fully_expanded) {
+                val.to_string()
+            } else {
+                fully_expanded
             }
-        }
+        } else {
+            fully_expanded
+        };
 
         let command = self.parse_command(&fully_expanded);
         let result = self.execute_command(command);

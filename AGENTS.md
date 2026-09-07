@@ -1,6 +1,6 @@
 # SigmaOS AGENTS.md — AI Agent Operating Instructions & Process Management Protocols
 
-Welcome to the **SigmaOS** repository! This document outlines guidelines and operational rules for AI coding agents (such as Jules, Copilot, Herdr, or custom subagents) interacting with the codebase, managing system processes, access control, security policies, instruction execution, configurability, cluster operations, virtual machines, filesystems, TTY character queues, disk caching, binary & counting semaphores, deadlock prevention, buffering, system state, backups, and optimizing power usage in SigmaOS.
+Welcome to the **SigmaOS** repository! This document outlines guidelines and operational rules for AI coding agents (such as Jules, Copilot, Herdr, or custom subagents) interacting with the codebase, managing system processes, access control, security policies, instruction execution, configurability, cluster operations, virtual machines, filesystems, TTY character queues, disk caching, binary & counting semaphores, deadlock prevention, buffering, system state, backups, 4-bit INT4 quantization operation management, and optimizing power usage in SigmaOS.
 
 ---
 
@@ -63,23 +63,27 @@ Welcome to the **SigmaOS** repository! This document outlines guidelines and ope
     - Agents performing high-risk system changes (package updates, driver installs, config edits) MUST create a pre-task snapshot via `SelfHealingModule::create_snapshot()`.
     - Verify Merkle-tree snapshot integrity before executing atomic disaster recovery rollbacks. Refer to [`docs/ai-agent-backup-management.md`](docs/ai-agent-backup-management.md).
 
-15. **Cgroup Resource Quotas & Rate Limits**
+15. **4-Bit Operation & INT4 Quantization Management**
+    - Manage 4-bit integer quantized weight packing (two elements per byte) and block scaling factors (`TensorDtype::Int4`).
+    - Enforce RAM footprints for edge local models (<2GB RAM) and dispatch SIMD hardware primitives (AVX-512 VNNI, ARM NEON SDOT, RISC-V rvv). Refer to [`docs/ai-agent-4bit-operation-management.md`](docs/ai-agent-4bit-operation-management.md).
+
+16. **Cgroup Resource Quotas & Rate Limits**
     - AI agent task execution threads must be attached to the `/sys/fs/cgroup/system.slice/sigma-agent.service` cgroup.
     - Enforce memory quotas (`memory.max = 2G`) and CPU limits (`cpu.max = 50000 100000`) to prevent runaway resource consumption.
 
-16. **IPC & Subagent Communication Channels**
+17. **IPC & Subagent Communication Channels**
     - Inter-agent communication MUST utilize `ZeroCopyIpcChannel` or `AndroidBinderIpc` with cryptographic token verification (`security_token`).
     - Direct memory sharing between agent processes without capability-gated handles is strictly forbidden.
 
-17. **Virtual Machine Guest Provisioning**
+18. **Virtual Machine Guest Provisioning**
     - Agents executing untrusted or experimental code MUST spawn an isolated guest VM via `VirtualizationOrchestrator` using KVM/Bhyve backends.
     - Attach virtio-fs shared paths with strict OpenBSD `unveil()` read-only restrictions.
 
-18. **Power & Thermal Awareness**
+19. **Power & Thermal Awareness**
     - Agents must check system power profiles and CPU temperature via `PowerGovernor` before launching compute-intensive subtasks.
     - Restrict concurrency and defer heavy background AI model indexing on battery power (`powersave` / `conservative` governor modes).
 
-19. **Zero-Dependency Core Systems**
+20. **Zero-Dependency Core Systems**
     - Avoid adding third-party standard C++ or non-vetted external dependencies.
     - Core kernel, driver, and shell primitives must rely on `ZeroDependencyPrimitiveHub` and `klib`.
 
@@ -119,6 +123,7 @@ AI agents making code changes must run the following checks before submitting pu
 - AI Agent Binary Semaphores Management: [`docs/ai-agent-semaphores-management.md`](docs/ai-agent-semaphores-management.md)
 - AI Agent Filesystem Management Guidelines: [`docs/ai-agent-filesystem-management.md`](docs/ai-agent-filesystem-management.md)
 - AI Agent Backup & Recovery Guidelines: [`docs/ai-agent-backup-management.md`](docs/ai-agent-backup-management.md)
+- AI Agent 4-Bit Operation Management Guidelines: [`docs/ai-agent-4bit-operation-management.md`](docs/ai-agent-4bit-operation-management.md)
 - AI Agent Virtual Machine Management: [`docs/ai-agent-vm-management.md`](docs/ai-agent-vm-management.md)
 - AI Agent Power & Thermal Management: [`docs/ai-agent-power-management.md`](docs/ai-agent-power-management.md)
 - Sovereign Developer Guide: [`DEVELOPER_RULES.md`](DEVELOPER_RULES.md)
