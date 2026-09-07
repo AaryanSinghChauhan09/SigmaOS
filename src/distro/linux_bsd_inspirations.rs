@@ -137,7 +137,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
-            DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
+            DistroSubsystemMode::SmartOs | DistroSubsystemMode::LinuxParrot => ServiceSupervisorType::Rcd,
         }
     }
 
@@ -234,8 +234,14 @@ impl SovereignUniversalDistroBridge {
                 DistroSubsystemMode::LinuxSlackware => {
                     supervisor == ServiceSupervisorType::Sysvinit
                 }
-                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            }
+                DistroSubsystemMode::SmartOs | DistroSubsystemMode::LinuxParrot => {
+                    supervisor == ServiceSupervisorType::Rcd
+                }
+                DistroSubsystemMode::SolarisIllumos => {
+                    supervisor == ServiceSupervisorType::Smf
+                }
+            };
+        supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
@@ -262,6 +268,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
+            DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
@@ -298,6 +306,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
+            DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
         };
 
@@ -582,9 +591,8 @@ impl SovereignUniversalDistroBridge {
     pub fn verify_all_subsystems_compatibility_matrix(&mut self) -> bool {
         let subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
-            "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
-            "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "network", "graphics", "power", "ipc", "containers", "time",
+            "memory", "ui", "process", "virt", "audit",
         ];
 
         for sub in subsystems {
@@ -1940,9 +1948,8 @@ mod cross_subsystem_tests {
 
         let target_subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
-            "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
-            "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "network", "graphics", "power", "ipc", "containers", "time",
+            "memory", "ui", "process", "virt", "audit",
         ];
 
         for m in modes {
