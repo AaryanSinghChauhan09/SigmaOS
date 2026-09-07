@@ -542,6 +542,138 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "desktop" | "ui" => {
+                Ok(format!(
+                    "Dispatched Zenith desktop environment GTK/Qt theme rendering for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "bluetooth" => {
+                Ok(format!(
+                    "Dispatched BlueZ / net80211 bluetooth adapter routing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "camera" => {
+                Ok(format!(
+                    "Dispatched V4L2 / GStreamer zero-copy camera video stream for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "sensor" => {
+                Ok(format!(
+                    "Dispatched IIO / devd sensor event telemetry routing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "print" => {
+                Ok(format!(
+                    "Dispatched CUPS / BSD lpd print queue spooling for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "backup" | "compression" => {
+                Ok(format!(
+                    "Dispatched Zstd/ZFS send-recv Timeshift/Snapper rollback for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cloud" | "cluster" => {
+                Ok(format!(
+                    "Dispatched Kubernetes / Cilium eBPF CNI Ceph RBD cluster node for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "orchestration" | "automation" => {
+                Ok(format!(
+                    "Dispatched Nix declarative / Ansible orchestration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "developer" | "toolchain" => {
+                Ok(format!(
+                    "Dispatched Sbuild / Gentoo crossdev / Nix sandbox toolchain for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compliance" | "governance" => {
+                Ok(format!(
+                    "Dispatched SPDX license compliance governance auditor for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "recovery" | "resilience" => {
+                Ok(format!(
+                    "Dispatched Kdump / FreeBSD savecore crashdump recovery for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "time" => {
+                Ok(format!(
+                    "Dispatched Chrony NTP / BSD microtime clock synchronization for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "shell" => {
+                Ok(format!(
+                    "Dispatched Sovereign shell completions / editline for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "filesystem" => {
+                Ok(format!(
+                    "Dispatched Ext4 / Btrfs / OpenZFS / HAMMER2 filesystem dispatch for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "identity" => {
+                Ok(format!(
+                    "Dispatched OIDC / PAM / Kerberos identity federation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "tracing" | "metrics" => {
+                Ok(format!(
+                    "Dispatched bpftrace / DTrace USDT probe tracer for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "iot" | "embedded" => {
+                Ok(format!(
+                    "Dispatched Yocto / Buildroot / ROS2 robotics stack for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "accessibility" => {
+                Ok(format!(
+                    "Dispatched AccessKit / AT-SPI2 screen reader accessibility for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "gaming" | "gamepad" => {
+                Ok(format!(
+                    "Dispatched Proton / Vulkan DirectX gaming input layer for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "fingerprint" | "smartcard" => {
+                Ok(format!(
+                    "Dispatched FIDO2 / PC-SC smartcard authentication for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "location" => {
+                Ok(format!(
+                    "Dispatched GeoClue / GPSD location provider for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "finance" => {
+                Ok(format!(
+                    "Dispatched ISO 20022 sovereign cryptographic wallet isolation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             _ => Err("Unknown target subsystem"),
         }
     }
@@ -552,6 +684,10 @@ impl SovereignUniversalDistroBridge {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "desktop", "bluetooth", "camera", "sensor", "print", "backup",
+            "cloud", "orchestration", "developer", "compliance", "recovery", "time",
+            "shell", "filesystem", "identity", "tracing", "iot", "accessibility",
+            "gaming", "fingerprint", "location", "finance",
         ];
 
         for sub in subsystems {
@@ -1881,6 +2017,10 @@ mod cross_subsystem_tests {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "desktop", "bluetooth", "camera", "sensor", "print", "backup",
+            "cloud", "orchestration", "developer", "compliance", "recovery", "time",
+            "shell", "filesystem", "identity", "tracing", "iot", "accessibility",
+            "gaming", "fingerprint", "location", "finance",
         ];
 
         for m in modes {

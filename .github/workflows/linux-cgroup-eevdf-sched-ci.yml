@@ -30,5 +30,6 @@ jobs:
 
       - name: Test SchedExt BPF & Microarchitecture JIT Dispatching
         run: |
+          mkdir -p build
           rustc --test src/distro/sovereign_nextgen_distro_leap.rs --edition=2021 -o build/nextgen_leap_test
           ./build/nextgen_leap_test
