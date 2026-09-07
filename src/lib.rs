@@ -398,3 +398,4 @@ pub use open_source_obsoletion::*;
 
 pub use unimplemented_features::*;
 pub use klib::zero_dependency_elimination::ZeroDependencyMasterHub;
+pub use tools::dependency_reduction::MasterDependencyReductionSuite;
