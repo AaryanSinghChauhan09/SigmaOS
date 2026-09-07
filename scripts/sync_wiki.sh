@@ -113,14 +113,16 @@ WikiSyncEngine_run_sync() {
         cp README.md "$wiki_dir/Home.md"
     fi
 
-    # Synchronize core documentation files from root and docs/ to target_dir
-    local core_docs=("SECURITY.md" "INSTALL.md" "ARCHITECTURE.md" "ROADMAP.md" "docs/PACKAGE_MANAGER.md" "docs/DISTRO_COMPAT.md" "docs/KERNEL.md")
+    # Synchronize core documentation files from root and docs/ to target_dir safely
+    local core_docs=("SECURITY.md" "INSTALL.md" "ARCHITECTURE.md" "docs/PACKAGE_MANAGER.md" "docs/DISTRO_COMPAT.md" "docs/KERNEL.md")
     for doc in "${core_docs[@]}"; do
         if [ -f "$doc" ]; then
             local base
             base=$(basename "$doc")
-            echo "  [WikiSyncEngine::run_sync] Syncing core doc: $doc -> $target_dir/$base"
-            cp "$doc" "$target_dir/$base"
+            if [ ! -f "$target_dir/$base" ]; then
+                echo "  [WikiSyncEngine::run_sync] Syncing core doc: $doc -> $target_dir/$base"
+                cp "$doc" "$target_dir/$base"
+            fi
         fi
     done
 

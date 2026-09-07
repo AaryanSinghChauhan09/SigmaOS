@@ -21,6 +21,8 @@
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
+extern crate alloc;
+
 use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
@@ -808,7 +810,7 @@ impl Default for StrategicImportPlanEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod expanded_wiki_tests {
     use super::*;
 
