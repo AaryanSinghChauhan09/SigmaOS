@@ -79,8 +79,11 @@ pub use intrusion::{
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
 pub use kali_stack::{
-    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
-    PcapPacketHeader, WifiFrameType,
+    HashMode, KaliAirgeddonWifiAudit, KaliBurpSuiteWebProxy, KaliHashcatGpuCracker,
+    KaliHydraPasswordBruteforce, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter,
+    KaliNiktoWebScanner, KaliNmapPortScanner, KaliSqlmapInjectionAuditor, KaliUndercoverThemeMode,
+    KaliWiresharkPacketAnalyzer, PcapPacketHeader, ScanTechnique, UndercoverDisguiseTheme,
+    WifiFrameType,
 };
 pub use kernel_hardening::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError, PagePermissions,

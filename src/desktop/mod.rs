@@ -4,6 +4,7 @@ pub mod mint_tools;
 pub mod moksha;
 pub mod pantheon;
 pub mod screensaver;
+pub mod sovereign_navigation_engine;
 pub mod zenith_compositor;
 
 pub use mate_betsy::{
@@ -35,4 +36,10 @@ pub use moksha::{
 pub use zenith_compositor::{
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
+};
+
+pub use sovereign_navigation_engine::{
+    AppCategory, GnomePopLauncherNav, HudActionResult, KrunnerRofiCommandHud, LauncherAppItem,
+    NavDirection, RangerDolphinSpatialFileNav, SovereignUniversalNavigationEngine,
+    SystemControlNode, TilingWindowManagerNav, WindowNode, YastBsdConfigControlTreeNav,
 };
