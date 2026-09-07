@@ -33,9 +33,8 @@ use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::security::Permission;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
     NetworkTcp,
@@ -49,6 +48,9 @@ pub enum Permission {
     Execute,
 }
 
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::security::Permission;
+
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PacmanPkgbuild {
@@ -61,7 +63,6 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-use crate::security::Permission;
 use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
@@ -1329,191 +1330,20 @@ impl UniversalPackageAdapter {
                         &slack.description,
                         &slack.slack_required,
                     )
+                } else if filename.ends_with(".hpkg") || raw_text.contains("summary ") || raw_text.contains("architecture ") || raw_text.contains("vendor ") || raw_text.contains("haiku") {
+                    let haiku = self.parse_haiku_hpkg(raw_text)?;
+                    self.translate_to_native_package(
+                        &haiku.name,
+                        &haiku.version,
+                        &haiku.summary,
+                        &haiku.requires,
+                    )
                 } else {
                     Err("Unrecognized package manifest format")
                 }
             }
         }
     }
-
-    pub fn parse_openbsd_contents(&self, raw: &str) -> Result<OpenBsdContentsManifest, &'static str> {
-        let mut pkgname = String::new();
-        let mut version = String::new();
-        let mut comment = String::new();
-        let mut depends = Vec::new();
-        let mut exec_commands = Vec::new();
-        let mut unexec_commands = Vec::new();
-
-        for line in raw.lines() {
-            let line = line.trim();
-            if line.starts_with("@name ") {
-                let full = line.trim_start_matches("@name ").trim();
-                if let Some(idx) = full.rfind('-') {
-                    pkgname = full[..idx].to_string();
-                    version = full[idx+1..].to_string();
-                } else {
-                    pkgname = full.to_string();
-                    version = "1.0.0".to_string();
-                }
-            } else if line.starts_with("@comment ") {
-                comment = line.trim_start_matches("@comment ").trim().to_string();
-            } else if line.starts_with("@depend ") || line.starts_with("@pkgdep ") {
-                let dep = line.split_whitespace().nth(1).unwrap_or("").to_string();
-                depends.push(dep);
-            } else if line.starts_with("@exec ") {
-                exec_commands.push(line.trim_start_matches("@exec ").trim().to_string());
-            } else if line.starts_with("@unexec ") {
-                unexec_commands.push(line.trim_start_matches("@unexec ").trim().to_string());
-            }
-        }
-        if pkgname.is_empty() { pkgname = "openbsd-pkg".to_string(); }
-        if version.is_empty() { version = "1.0.0".to_string(); }
-        Ok(OpenBsdContentsManifest { pkgname, version, comment, depends, exec_commands, unexec_commands })
-    }
-
-    pub fn parse_freebsd_ucl_manifest(&self, raw: &str) -> Result<FreeBsdUclManifest, &'static str> {
-        let mut name = String::new();
-        let mut version = String::new();
-        let mut comment = String::new();
-        let mut deps = Vec::new();
-
-        for line in raw.lines() {
-            let line = line.trim();
-            if line.starts_with("name:") {
-                name = line.trim_start_matches("name:").trim().trim_matches('"').to_string();
-            } else if line.starts_with("version:") {
-                version = line.trim_start_matches("version:").trim().trim_matches('"').to_string();
-            } else if line.starts_with("comment:") {
-                comment = line.trim_start_matches("comment:").trim().trim_matches('"').to_string();
-            } else if line.contains("origin:") && !line.starts_with("origin:") {
-                let dep_name = line.split(':').next().unwrap_or("").trim().trim_matches('"');
-                if !dep_name.is_empty() {
-                    deps.push(dep_name.to_string());
-                }
-            }
-        }
-        if name.is_empty() { name = "freebsd-pkg".to_string(); }
-        if version.is_empty() { version = "1.0.0".to_string(); }
-        Ok(FreeBsdUclManifest { name, version, comment, deps })
-    }
-
-    pub fn parse_slackware_pkg(&self, raw: &str) -> Result<SlackwarePkgManifest, &'static str> {
-        let mut name = String::new();
-        let mut version = String::new();
-        let mut description = String::new();
-        let mut slack_required = Vec::new();
-
-        for line in raw.lines() {
-            let line = line.trim();
-            if line.starts_with("PRGNAM=") {
-                name = line.trim_start_matches("PRGNAM=").trim().trim_matches('"').to_string();
-            } else if line.starts_with("VERSION=") {
-                version = line.trim_start_matches("VERSION=").trim().trim_matches('"').to_string();
-            } else if line.starts_with("slack-desc:") {
-                description = line.trim_start_matches("slack-desc:").trim().to_string();
-            } else if line.starts_with("REQUIRES=") {
-                slack_required = line.trim_start_matches("REQUIRES=").trim().trim_matches('"')
-                    .split_whitespace().map(|s| s.to_string()).collect();
-            }
-        }
-        if name.is_empty() { name = "slackware-pkg".to_string(); }
-        if version.is_empty() { version = "1.0.0".to_string(); }
-        Ok(SlackwarePkgManifest { name, version, description, slack_required })
-    }
-
-    pub fn parse_zypper_spec(&self, raw: &str) -> Result<ZypperSpecManifest, &'static str> {
-        let mut name = String::new();
-        let mut version = String::new();
-        let mut summary = String::new();
-        let mut requires = Vec::new();
-
-        for line in raw.lines() {
-            let line = line.trim();
-            if line.starts_with("Name:") {
-                name = line.trim_start_matches("Name:").trim().to_string();
-            } else if line.starts_with("Version:") {
-                version = line.trim_start_matches("Version:").trim().to_string();
-            } else if line.starts_with("Summary:") {
-                summary = line.trim_start_matches("Summary:").trim().to_string();
-            } else if line.starts_with("Requires:") {
-                requires.push(line.trim_start_matches("Requires:").trim().to_string());
-            }
-        }
-        if name.is_empty() { name = "zypper-pkg".to_string(); }
-        if version.is_empty() { version = "1.0.0".to_string(); }
-        Ok(ZypperSpecManifest { name, version, summary, requires })
-    }
-
-    pub fn parse_netbsd_pkgsrc(&self, raw: &str) -> Result<NetBsdPkgsrcManifest, &'static str> {
-        let mut pkgname = String::new();
-        let mut version = String::new();
-        let mut comment = String::new();
-        let mut depends = Vec::new();
-
-        for line in raw.lines() {
-            let line = line.trim();
-            if line.starts_with("PKGNAME=") {
-                let full = line.trim_start_matches("PKGNAME=").trim();
-                if let Some(idx) = full.rfind('-') {
-                    pkgname = full[..idx].to_string();
-                    version = full[idx+1..].to_string();
-                } else {
-                    pkgname = full.to_string();
-                    version = "1.0.0".to_string();
-                }
-            } else if line.starts_with("COMMENT=") {
-                comment = line.trim_start_matches("COMMENT=").trim().to_string();
-            } else if line.starts_with("REQUIRES=") || line.starts_with("DEPENDS=") {
-                let dep = line.split('=').nth(1).unwrap_or("").trim().to_string();
-                depends.push(dep);
-            }
-        }
-        if pkgname.is_empty() { pkgname = "netbsd-pkg".to_string(); }
-        if version.is_empty() { version = "1.0.0".to_string(); }
-        Ok(NetBsdPkgsrcManifest { pkgname, version, comment, depends })
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct OpenBsdContentsManifest {
-    pub pkgname: String,
-    pub version: String,
-    pub comment: String,
-    pub depends: Vec<String>,
-    pub exec_commands: Vec<String>,
-    pub unexec_commands: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FreeBsdUclManifest {
-    pub name: String,
-    pub version: String,
-    pub comment: String,
-    pub deps: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SlackwarePkgManifest {
-    pub name: String,
-    pub version: String,
-    pub description: String,
-    pub slack_required: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ZypperSpecManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub requires: Vec<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NetBsdPkgsrcManifest {
-    pub pkgname: String,
-    pub version: String,
-    pub comment: String,
-    pub depends: Vec<String>,
 }
 
 impl Default for UniversalPackageAdapter {
@@ -1938,7 +1768,6 @@ impl UniversalDependencyMapper {
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
-            "python3-dev" => "python".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
@@ -1995,14 +1824,14 @@ impl UniversalScriptletConverter {
         content: &str,
     ) -> Option<MappedScriptletHook> {
         let hook_type = match format {
-            PackageFormat::Apt | PackageFormat::Deb => match script_name {
+            PackageFormat::Apt => match script_name {
                 "preinst" => Some(SigmaPkgHookType::PreInstall),
                 "postinst" => Some(SigmaPkgHookType::PostInstall),
                 "prerm" => Some(SigmaPkgHookType::PreRemove),
                 "postrm" => Some(SigmaPkgHookType::PostRemove),
                 _ => None,
             },
-            PackageFormat::Yum | PackageFormat::Rpm => match script_name {
+            PackageFormat::Yum => match script_name {
                 "%pre" => Some(SigmaPkgHookType::PreInstall),
                 "%post" | "%posttrans" => Some(SigmaPkgHookType::PostInstall),
                 "%preun" => Some(SigmaPkgHookType::PreRemove),

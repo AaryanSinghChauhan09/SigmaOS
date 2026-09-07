@@ -227,4 +227,3 @@ def test_sovereign_wiki_master_engine_integration():
         assert len(spec["vfs_etc"]) > 0
 
 
-test_universal_package_manager_cli_simulation = test_universal_distro_subsystem_bridge

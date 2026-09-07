@@ -5,9 +5,9 @@ extern crate alloc;
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(test, feature = "standalone_test")))]
 use crate::klib::collections::HashMap;
-#[cfg(feature = "standalone_test")]
+#[cfg(any(test, feature = "standalone_test"))]
 use alloc::collections::BTreeMap as HashMap;
 
 use alloc::string::{String, ToString};
@@ -224,7 +224,7 @@ impl RpmSpecParser {
         // Extract from %files section (usually contains some metadata)
         if let Some(files_lines) = self.sections.get("%files") {
             for line in files_lines {
-                let l_str: &str = line.as_str();
+                let l_str: &str = line;
                 if l_str.starts_with("%doc") || l_str.starts_with("%config") {
                     // Process file markers
                 }
@@ -803,12 +803,14 @@ impl Default for AnityaFedoraMessagingEngine {
 /// Fedora Anitya Upstream Release Monitoring Engine
 pub struct FedoraAnityaReleaseMonitoringEngine {
     pub projects: HashMap<String, AnityaProjectRecord>,
+    pub messaging_bus: AnityaFedoraMessagingEngine,
 }
 
 impl FedoraAnityaReleaseMonitoringEngine {
     pub fn new() -> Self {
         Self {
             projects: HashMap::new(),
+            messaging_bus: AnityaFedoraMessagingEngine::new(),
         }
     }
 
@@ -823,8 +825,31 @@ impl FedoraAnityaReleaseMonitoringEngine {
     ) -> Option<bool> {
         if let Some(record) = self.projects.get_mut(project_name) {
             let is_new = record.current_version != latest_version;
+            let old_ver = record.current_version.clone();
+            let proj_id = record.project_id;
+            let proj_name = record.name.clone();
             record.latest_upstream_version = latest_version.to_string();
             record.updated_available = is_new;
+            if is_new {
+                let mut pkgs = Vec::new();
+                pkgs.push(AnityaPackageMapping {
+                    distro: "Fedora".to_string(),
+                    package_name: proj_name.clone(),
+                });
+                pkgs.push(AnityaPackageMapping {
+                    distro: "CentOS".to_string(),
+                    package_name: proj_name.clone(),
+                });
+                self.messaging_bus.publish_version_update(
+                    proj_id,
+                    &proj_name,
+                    "fedora",
+                    &old_ver,
+                    latest_version,
+                    pkgs,
+                    1700000000,
+                );
+            }
             Some(is_new)
         } else {
             None
