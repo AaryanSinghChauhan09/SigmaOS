@@ -793,7 +793,99 @@ impl Default for ManjaroSettingsManager {
     }
 }
 
-#[cfg(test_disabled)]
+/// Manjaro Release Branch Tier (Stable, Testing, Unstable)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ManjaroBranchTier {
+    Stable,
+    Testing,
+    Unstable,
+}
+
+/// Manjaro Branch Switcher Engine (pacman-mirrors -api -set-branch parity)
+#[derive(Debug, Clone)]
+pub struct ManjaroBranchSwitcher {
+    pub current_branch: ManjaroBranchTier,
+    pub branch_sync_timestamps: HashMap<String, u64>,
+}
+
+impl ManjaroBranchSwitcher {
+    pub fn new() -> Self {
+        let mut syncs = HashMap::new();
+        syncs.insert("Stable".to_string(), 1700000000);
+        syncs.insert("Testing".to_string(), 1700050000);
+        syncs.insert("Unstable".to_string(), 1700100000);
+
+        Self {
+            current_branch: ManjaroBranchTier::Stable,
+            branch_sync_timestamps: syncs,
+        }
+    }
+
+    pub fn set_branch(&mut self, branch: ManjaroBranchTier) -> Result<String, &'static str> {
+        self.current_branch = branch;
+        let branch_name = format!("{:?}", branch);
+        Ok(format!("Switched pacman-mirrors branch to '{}'", branch_name))
+    }
+}
+
+impl Default for ManjaroBranchSwitcher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Manjaro Architect CLI Netinstaller Engine
+#[derive(Debug, Clone)]
+pub struct ArchitectInstallerProfile {
+    pub profile_name: String,
+    pub desktop_environment: String,
+    pub selected_kernel: ManjaroKernelRelease,
+    pub btrfs_subvolumes_enabled: bool,
+    pub zfs_root_enabled: bool,
+    pub custom_packages: Vec<String>,
+}
+
+pub struct ArchitectInstallerEngine {
+    pub profiles: Vec<ArchitectInstallerProfile>,
+}
+
+impl ArchitectInstallerEngine {
+    pub fn new() -> Self {
+        Self {
+            profiles: Vec::new(),
+        }
+    }
+
+    pub fn register_profile(&mut self, profile: ArchitectInstallerProfile) {
+        self.profiles.push(profile);
+    }
+
+    pub fn generate_installation_manifest(&self, profile_name: &str) -> Result<String, &'static str> {
+        let profile = self
+            .profiles
+            .iter()
+            .find(|p| p.profile_name == profile_name)
+            .ok_or("Architect installation profile not found")?;
+
+        Ok(format!(
+            "Manjaro Architect Manifest [{}]\nDesktop: {}\nKernel: {:?}\nBtrfs Subvols: {}\nZFS Root: {}\nPackages: {:?}",
+            profile.profile_name,
+            profile.desktop_environment,
+            profile.selected_kernel,
+            profile.btrfs_subvolumes_enabled,
+            profile.zfs_root_enabled,
+            profile.custom_packages
+        ))
+    }
+}
+
+impl Default for ArchitectInstallerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -873,5 +965,34 @@ mod tests {
             PowerProfile::Performance
         );
         assert_eq!(msm.power_governor.target_cpu_freq_mhz, 4800);
+    }
+
+    #[test]
+    fn test_manjaro_branch_switcher() {
+        let mut switcher = ManjaroBranchSwitcher::new();
+        assert_eq!(switcher.current_branch, ManjaroBranchTier::Stable);
+
+        let res = switcher.set_branch(ManjaroBranchTier::Testing).unwrap();
+        assert!(res.contains("Switched pacman-mirrors branch to 'Testing'"));
+        assert_eq!(switcher.current_branch, ManjaroBranchTier::Testing);
+    }
+
+    #[test]
+    fn test_architect_installer_engine() {
+        let mut architect = ArchitectInstallerEngine::new();
+        let profile = ArchitectInstallerProfile {
+            profile_name: "custom_kde_btrfs".to_string(),
+            desktop_environment: "KDE Plasma".to_string(),
+            selected_kernel: ManjaroKernelRelease::LinuxLts,
+            btrfs_subvolumes_enabled: true,
+            zfs_root_enabled: false,
+            custom_packages: vec!["neovim".to_string(), "zsh".to_string()],
+        };
+
+        architect.register_profile(profile);
+        let manifest = architect.generate_installation_manifest("custom_kde_btrfs").unwrap();
+        assert!(manifest.contains("custom_kde_btrfs"));
+        assert!(manifest.contains("KDE Plasma"));
+        assert!(manifest.contains("LinuxLts"));
     }
 }

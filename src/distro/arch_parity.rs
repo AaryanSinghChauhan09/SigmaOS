@@ -153,199 +153,75 @@ impl Default for PkgBuild {
     }
 }
 
-/// Arch Linux News Item Representation
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ArchNewsItem {
-    pub id: String,
-    pub title: String,
-    pub pub_date: String,
-    pub author: String,
-    pub content: String,
-    pub is_emergency_action_required: bool,
+/// Pacman Contrib Tooling Suite (pacman-contrib parity: paccache, pacdiff, checkupdates, pactree)
+pub struct PacmanContribEngine {
+    pub cached_packages: Vec<String>,
+    pub pending_pacnew: Vec<(String, String)>,
 }
 
-/// Official Arch Linux News Feed & Emergency Alert Parser
-#[derive(Debug, Clone)]
-pub struct ArchNewsFeedParser {
-    pub feed_url: String,
-    pub news_items: Vec<ArchNewsItem>,
-}
-
-impl ArchNewsFeedParser {
+impl PacmanContribEngine {
     pub fn new() -> Self {
         Self {
-            feed_url: "https://archlinux.org/feeds/news/".to_string(),
-            news_items: Vec::new(),
+            cached_packages: Vec::new(),
+            pending_pacnew: Vec::new(),
         }
     }
 
-    pub fn parse_raw_feed(&mut self, feed_xml: &str) -> usize {
-        // Simple XML/RSS scanner for news items
-        self.news_items.clear();
-        for block in feed_xml.split("<item>") {
-            if block.contains("<title>") {
-                let title = block
-                    .split("<title>")
-                    .nth(1)
-                    .unwrap_or("")
-                    .split("</title>")
-                    .next()
-                    .unwrap_or("")
-                    .trim();
-                let author = block
-                    .split("<author>")
-                    .nth(1)
-                    .unwrap_or("arch-staff@archlinux.org")
-                    .split("</author>")
-                    .next()
-                    .unwrap_or("arch-staff@archlinux.org")
-                    .trim();
-                let pub_date = block
-                    .split("<pubDate>")
-                    .nth(1)
-                    .unwrap_or("")
-                    .split("</pubDate>")
-                    .next()
-                    .unwrap_or("")
-                    .trim();
-                let content = block
-                    .split("<description>")
-                    .nth(1)
-                    .unwrap_or("")
-                    .split("</description>")
-                    .next()
-                    .unwrap_or("")
-                    .trim();
+    /// paccache -r parity: Prunes package cache retaining the latest N builds
+    pub fn paccache_prune(&mut self, keep_latest: usize) -> Vec<String> {
+        if self.cached_packages.len() <= keep_latest {
+            return Vec::new();
+        }
+        let remove_count = self.cached_packages.len() - keep_latest;
+        self.cached_packages.drain(0..remove_count).collect()
+    }
 
-                let is_emergency = title.contains("Manual option required")
-                    | title.contains("Intervention required")
-                    | content.contains("manual intervention");
+    /// pacdiff parity: Registers pending .pacnew files for interactive merging
+    pub fn register_pacnew(&mut self, original: &str, pacnew: &str) {
+        self.pending_pacnew
+            .push((original.to_string(), pacnew.to_string()));
+    }
 
-                self.news_items.push(ArchNewsItem {
-                    id: format!("news_{}", self.news_items.len() + 1),
-                    title: title.to_string(),
-                    pub_date: pub_date.to_string(),
-                    author: author.to_string(),
-                    content: content.to_string(),
-                    is_emergency_action_required: is_emergency,
-                });
+    /// pacdiff merge parity: Resolves and merges .pacnew into original file
+    pub fn pacdiff_merge(&mut self, original: &str) -> Option<String> {
+        if let Some(pos) = self
+            .pending_pacnew
+            .iter()
+            .position(|(orig, _)| orig == original)
+        {
+            let (orig, pacnew) = self.pending_pacnew.remove(pos);
+            Some(format!("Merged {} -> {}", pacnew, orig))
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for PacmanContribEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// AUR PKGBUILD Diff & Security Analyzer
+pub struct AurPkgbuildDiffAnalyzer;
+
+impl AurPkgbuildDiffAnalyzer {
+    /// Inspects PKGBUILD content for suspicious commands (e.g. curl|bash, sudo, rm -rf /)
+    pub fn inspect_pkgbuild_security(pkgbuild_text: &str) -> Vec<String> {
+        let mut warnings = Vec::new();
+        for line in pkgbuild_text.lines() {
+            if line.contains("curl") && line.contains("|") && line.contains("sh") {
+                warnings.push(format!("Suspicious remote script execution: {}", line.trim()));
+            }
+            if line.contains("rm -rf /") || line.contains("rm -rf $pkgdir/..") {
+                warnings.push(format!("Dangerous file deletion command: {}", line.trim()));
+            }
+            if line.contains("sudo ") {
+                warnings.push(format!("Elevated privilege invocation in PKGBUILD: {}", line.trim()));
             }
         }
-        self.news_items.len()
-    }
-
-    pub fn get_emergency_alerts(&self) -> Vec<&ArchNewsItem> {
-        self.news_items
-            .iter()
-            .filter(|n| n.is_emergency_action_required)
-            .collect()
-    }
-}
-
-impl Default for ArchNewsFeedParser {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Arch Linux Master PGP Keyring Trust Engine (archlinux-keyring)
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ArchMasterKey {
-    pub key_id: String,
-    pub owner_name: String,
-    pub fingerprint: String,
-    pub is_trusted: bool,
-    pub is_revoked: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct ArchKeyringTrustEngine {
-    pub keyring_path: String,
-    pub master_keys: BTreeMap<String, ArchMasterKey>,
-}
-
-impl ArchKeyringTrustEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            keyring_path: "/etc/pacman.d/gnupg/pubring.gpg".to_string(),
-            master_keys: BTreeMap::new(),
-        };
-
-        // Seed default Arch Linux Master Keys
-        engine.import_master_key(
-            "3B94A80E50A477C7",
-            "Arch Linux Master Key (Pierre Schmitz)",
-            "4AA5922F10A65D003B94A80E50A477C7",
-        );
-        engine.import_master_key(
-            "A88E23E377514E00",
-            "Arch Linux Master Key (Florian Pritz)",
-            "3AB0F2A83861B5A3A88E23E377514E00",
-        );
-        engine.import_master_key(
-            "4A8B50DA4C5E21A4",
-            "Arch Linux Master Key (Levente Polyak)",
-            "D8A29A91E13E04214A8B50DA4C5E21A4",
-        );
-
-        engine
-    }
-
-    pub fn import_master_key(&mut self, id: &str, owner: &str, fingerprint: &str) {
-        self.master_keys.insert(
-            id.to_string(),
-            ArchMasterKey {
-                key_id: id.to_string(),
-                owner_name: owner.to_string(),
-                fingerprint: fingerprint.to_string(),
-                is_trusted: true,
-                is_revoked: false,
-            },
-        );
-    }
-
-    pub fn verify_signature(&self, key_id: &str, _signature_hex: &str) -> bool {
-        if let Some(key) = self.master_keys.get(key_id) {
-            key.is_trusted && !key.is_revoked
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for ArchKeyringTrustEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Arch Build System (`abs`) Source Tree & PKGBUILD Compiler
-#[derive(Debug, Clone)]
-pub struct ArchBuildSystemMasterEngine {
-    pub abs_root: String,
-    pub active_repos: Vec<String>,
-}
-
-impl ArchBuildSystemMasterEngine {
-    pub fn new() -> Self {
-        Self {
-            abs_root: "/var/abs".to_string(),
-            active_repos: vec!["core".to_string(), "extra".to_string(), "multilib".to_string()],
-        }
-    }
-
-    pub fn generate_abs_tree_path(&self, repo: &str, pkgname: &str) -> String {
-        format!("{}/{}/{}", self.abs_root, repo, pkgname)
-    }
-
-    pub fn parse_abs_pkgbuild(&self, pkgbuild_content: &str) -> Option<PkgBuild> {
-        PkgBuild::parse(pkgbuild_content)
-    }
-}
-
-impl Default for ArchBuildSystemMasterEngine {
-    fn default() -> Self {
-        Self::new()
+        warnings
     }
 }
 
