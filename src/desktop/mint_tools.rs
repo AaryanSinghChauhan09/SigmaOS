@@ -2,9 +2,10 @@
 // Implements Linux Mint-style desktop utilities for SigmaOS
 // Inspired by Linux Mint's user-friendly system tools
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Update level (1-5 tier system from Linux Mint)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

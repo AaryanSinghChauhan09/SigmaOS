@@ -16,6 +16,7 @@
 /// SigmaOS IPv4 Network Stack
 /// ARP, IPv4 routing, ICMP echo, raw packet I/O
 /// Absorbs Linux net/ipv4/: arp.c, ip_input.c, ip_output.c, icmp.c
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

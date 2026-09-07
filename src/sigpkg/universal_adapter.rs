@@ -85,15 +85,6 @@ pub trait PackageFormatAdapter {
 
 
 #[derive(Debug, Clone)]
-pub struct FlatpakManifest {
-    pub id: String,
-    pub app_id: String,
-    pub command: String,
-    pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"
-}
-
-/// Description of FreeBSD UCL (+MANIFEST) pkg manifest
-#[derive(Debug, Clone)]
 pub struct FreeBsdUclManifest {
     pub name: String,
     pub version: String,

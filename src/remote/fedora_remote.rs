@@ -6,8 +6,10 @@
 // - FreeIPA Enterprise Realm & Kerberos GSSAPI Single Sign-On (`FedoraFreeIpaKerberosAuth`)
 
 
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // ============================================================================
 // 1. FedoraCockpitRemoteBridge (Fedora Cockpit Remote Web Console)

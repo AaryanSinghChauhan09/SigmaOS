@@ -1,6 +1,8 @@
 
-use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;

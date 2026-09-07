@@ -5,6 +5,7 @@ use std::vec;
 use crate::driver::device::{
     CharacterDevice, Device, DeviceError, DeviceInfo, DeviceType, NetworkDevice,
 };
+extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;

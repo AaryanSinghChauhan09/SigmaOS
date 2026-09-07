@@ -142,6 +142,7 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+
 }
 
 impl PackageFormat {
@@ -1264,7 +1265,6 @@ impl Default for PackageTriggerRegistry {
         Self::new()
     }
 }
-
 
 
 

@@ -7,11 +7,12 @@
 
 #[cfg(not(test))]
 use crate::klib::{HashMap, Vec};
-use std::string::String;
-use std::string::ToString;
-#[cfg(test_disabled)]
-use std::vec::Vec;
-#[cfg(test_disabled)]
+extern crate alloc;
+use alloc::string::String;
+use alloc::string::ToString;
+#[cfg(test)]
+use alloc::vec::Vec;
+#[cfg(test)]
 use std::collections::HashMap;
 
 // ==========================================
