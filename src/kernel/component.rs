@@ -1094,7 +1094,164 @@ impl Default for FedoraComponentHealthAuditorEngine {
     }
 }
 
-#[cfg(test_disabled)]
+// ============================================================================
+// BSD & LINUX-INSPIRED COMPONENT INNOVATIONS
+// ============================================================================
+
+/// FreeBSD Capsicum capability-based component sandbox wrapper
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FreeBsdCapsicumComponentSandbox {
+    pub component_id: ComponentId,
+    pub in_capability_mode: bool,
+    pub allowed_fd_rights: BTreeMap<u32, u64>, // FD -> Bitmask of Capsicum rights
+}
+
+impl FreeBsdCapsicumComponentSandbox {
+    pub fn new(component_id: ComponentId) -> Self {
+        Self {
+            component_id,
+            in_capability_mode: false,
+            allowed_fd_rights: BTreeMap::new(),
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.in_capability_mode = true;
+    }
+
+    pub fn limit_fd_rights(&mut self, fd: u32, rights_mask: u64) {
+        self.allowed_fd_rights.insert(fd, rights_mask);
+    }
+
+    pub fn check_fd_right(&self, fd: u32, required_right: u64) -> bool {
+        if !self.in_capability_mode {
+            return true; // Not in capability sandbox yet
+        }
+        if let Some(&rights) = self.allowed_fd_rights.get(&fd) {
+            (rights & required_right) == required_right
+        } else {
+            false
+        }
+    }
+}
+
+/// OpenBSD Pledge / Unveil security sandbox engine for components
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OpenBsdPledgeUnveilComponentSandboxEngine {
+    pub active_pledges: Vec<String>,
+    pub unveiled_paths: BTreeMap<String, String>, // Path -> Permissions (e.g., "r", "rw")
+}
+
+impl OpenBsdPledgeUnveilComponentSandboxEngine {
+    pub fn new() -> Self {
+        Self {
+            active_pledges: Vec::new(),
+            unveiled_paths: BTreeMap::new(),
+        }
+    }
+
+    pub fn pledge(&mut self, promises: &str) {
+        for promise in promises.split_whitespace() {
+            if !self.active_pledges.contains(&promise.to_string()) {
+                self.active_pledges.push(promise.to_string());
+            }
+        }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+    }
+
+    pub fn allows_path_access(&self, path: &str, req_perm: char) -> bool {
+        for (unveiled_path, perms) in &self.unveiled_paths {
+            if path.starts_with(unveiled_path) {
+                return perms.contains(req_perm);
+            }
+        }
+        false
+    }
+}
+
+impl Default for OpenBsdPledgeUnveilComponentSandboxEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// NetBSD Rump Kernel modular driver component type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RumpComponentType {
+    FileSystem,
+    NetworkStack,
+    CryptoAccelerator,
+    StorageDriver,
+}
+
+/// NetBSD Rump Kernel userland component container
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NetBsdRumpComponentDriverEngine {
+    pub component_name: String,
+    pub component_type: RumpComponentType,
+    pub is_hypercall_bound: bool,
+    pub status: String,
+}
+
+impl NetBsdRumpComponentDriverEngine {
+    pub fn new(name: &str, comp_type: RumpComponentType) -> Self {
+        Self {
+            component_name: name.to_string(),
+            component_type: comp_type,
+            is_hypercall_bound: false,
+            status: "Initialized".to_string(),
+        }
+    }
+
+    pub fn bind_hypercall_interface(&mut self) {
+        self.is_hypercall_bound = true;
+        self.status = "Bound".to_string();
+    }
+}
+
+/// Void Linux runit service state
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VoidRunitServiceState {
+    Setup,
+    Running,
+    Down,
+    Finish,
+}
+
+/// Void Linux runit-style component service supervisor
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VoidRunitComponentServiceEngine {
+    pub service_name: String,
+    pub state: VoidRunitServiceState,
+    pub auto_restart: bool,
+    pub pid: Option<u32>,
+}
+
+impl VoidRunitComponentServiceEngine {
+    pub fn new(service_name: &str) -> Self {
+        Self {
+            service_name: service_name.to_string(),
+            state: VoidRunitServiceState::Setup,
+            auto_restart: true,
+            pid: None,
+        }
+    }
+
+    pub fn start(&mut self, pid: u32) {
+        self.state = VoidRunitServiceState::Running;
+        self.pid = Some(pid);
+    }
+
+    pub fn stop(&mut self) {
+        self.state = VoidRunitServiceState::Down;
+        self.pid = None;
+    }
+}
+
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
 
@@ -1225,5 +1382,30 @@ mod tests {
         assert!(!bad_report.is_compliant);
         assert!(bad_report.security_score < 7.0);
         assert_eq!(bad_report.audit_issues.len(), 2);
+    }
+
+    #[test]
+    fn test_bsd_and_linux_component_innovations() {
+        let mut capsicum = FreeBsdCapsicumComponentSandbox::new(10);
+        capsicum.enter_capability_mode();
+        capsicum.limit_fd_rights(3, 0x01); // READ right
+        assert!(capsicum.check_fd_right(3, 0x01));
+        assert!(!capsicum.check_fd_right(3, 0x02)); // WRITE right not permitted
+
+        let mut openbsd = OpenBsdPledgeUnveilComponentSandboxEngine::new();
+        openbsd.pledge("stdio rpath");
+        openbsd.unveil("/etc/sigmaos", "r");
+        assert!(openbsd.allows_path_access("/etc/sigmaos/config.toml", 'r'));
+        assert!(!openbsd.allows_path_access("/etc/sigmaos/config.toml", 'w'));
+
+        let mut rump = NetBsdRumpComponentDriverEngine::new("nvme_rump", RumpComponentType::StorageDriver);
+        rump.bind_hypercall_interface();
+        assert!(rump.is_hypercall_bound);
+        assert_eq!(rump.status, "Bound");
+
+        let mut runit = VoidRunitComponentServiceEngine::new("network_daemon");
+        runit.start(1042);
+        assert_eq!(runit.state, VoidRunitServiceState::Running);
+        assert_eq!(runit.pid, Some(1042));
     }
 }
