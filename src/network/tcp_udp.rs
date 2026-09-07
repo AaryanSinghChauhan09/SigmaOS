@@ -3,8 +3,8 @@ use core::mem;
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
-//! Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
-//! Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
+// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
+// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -640,23 +640,6 @@ impl Default for SimpleNetworkStack {
     }
 }
 
-impl NetworkStack for SimpleNetworkStack {
-    fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst) as usize;
-        let socket = SimpleSocket::new(id, protocol, port);
-        self.sockets.push(Box::new(socket));
-        Ok(id)
-    }
-
-    fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        if let Some(pos) = self.sockets.iter().position(|s: &Box<dyn Socket>| s.id() == id) {
-            self.sockets.remove(pos);
-            Ok(())
-        } else {
-            Err(NetworkError::InvalidSocket)
-        }
-    }
-}
 
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {

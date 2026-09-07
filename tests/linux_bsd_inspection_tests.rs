@@ -46,10 +46,20 @@ mod wiki_ideas_implementation;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
 
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unveil::{UnveilManager, UnveilPermission};
+use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
@@ -121,7 +131,6 @@ fn test_vm_manager_kvm_qemu_inspection() {
         HypervisorBackend, KvmExitReason, KvmHypervisor, OsType, VirtioBlockDeviceConfig,
         VirtioNetDeviceConfig, VmConfig, VmState,
     };
-    use vm_manager::{KvmHypervisor, VmConfig, OsType, VmState, KvmExitReason, VirtioBlockDeviceConfig, VirtioNetDeviceConfig, HypervisorBackend};
 
     let mut kvm = KvmHypervisor::new();
     assert_eq!(kvm.name(), "KVM/QEMU Hardware Virtualization");
