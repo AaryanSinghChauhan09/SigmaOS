@@ -20,11 +20,14 @@ use std::vec::Vec;
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-#[cfg(not(target_os = "none"))]
+#[cfg(all(not(test), not(target_os = "none")))]
 use crate::klib::HashMap;
 
-#[cfg(target_os = "none")]
+#[cfg(all(not(test), target_os = "none"))]
 use crate::klib::BTreeMap as HashMap;
+
+#[cfg(test)]
+use std::collections::HashMap;
 
 /// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -519,7 +522,92 @@ impl Default for ManjaroSettingsManager {
     }
 }
 
-#[cfg(test_disabled)]
+/// Manjaro rolling update branch types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ManjaroBranchType {
+    Stable,
+    Testing,
+    Unstable,
+}
+
+/// Manjaro pacman-mirrors Branch Switcher & Fasttrack Mirror Engine
+#[derive(Debug, Clone)]
+pub struct ManjaroBranchSwitcherEngine {
+    pub current_branch: ManjaroBranchType,
+    pub fasttrack_mirrors_count: usize,
+    pub sync_database_url: String,
+}
+
+impl ManjaroBranchSwitcherEngine {
+    pub fn new() -> Self {
+        Self {
+            current_branch: ManjaroBranchType::Stable,
+            fasttrack_mirrors_count: 10,
+            sync_database_url: String::from("https://repo.manjaro.org/repo/stable/$repo/$arch"),
+        }
+    }
+
+    pub fn switch_branch(&mut self, target_branch: ManjaroBranchType) -> String {
+        self.current_branch = target_branch;
+        match target_branch {
+            ManjaroBranchType::Stable => {
+                self.sync_database_url = String::from("https://repo.manjaro.org/repo/stable/$repo/$arch");
+            }
+            ManjaroBranchType::Testing => {
+                self.sync_database_url = String::from("https://repo.manjaro.org/repo/testing/$repo/$arch");
+            }
+            ManjaroBranchType::Unstable => {
+                self.sync_database_url = String::from("https://repo.manjaro.org/repo/unstable/$repo/$arch");
+            }
+        }
+        self.sync_database_url.clone()
+    }
+}
+
+impl Default for ManjaroBranchSwitcherEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Manjaro Architect CLI Net-Installer Profile & Subvolume Generator
+#[derive(Debug, Clone)]
+pub struct ManjaroArchitectProfileGenerator {
+    pub desktop_edition: String, // "KDE", "XFCE", "GNOME", "Minimal"
+    pub filesystem_type: String, // "btrfs", "zfs", "ext4", "f2fs"
+    pub selected_packages: Vec<String>,
+}
+
+impl ManjaroArchitectProfileGenerator {
+    pub fn new(edition: &str, fs: &str) -> Self {
+        Self {
+            desktop_edition: edition.to_string(),
+            filesystem_type: fs.to_string(),
+            selected_packages: Vec::new(),
+        }
+    }
+
+    pub fn add_package(&mut self, pkg: &str) {
+        if !self.selected_packages.contains(&pkg.to_string()) {
+            self.selected_packages.push(pkg.to_string());
+        }
+    }
+
+    pub fn generate_installer_script(&self) -> String {
+        let mut script = format!(
+            "#!/bin/bash\n# Manjaro Architect Net-Installer Script\n# Edition: {}\n# Filesystem: {}\n\n",
+            self.desktop_edition, self.filesystem_type
+        );
+        script.push_str("basestrap /mnt base linux612 manjaro-system\n");
+        script.push_str("fstabgen -U /mnt >> /mnt/etc/fstab\n");
+        if !self.selected_packages.is_empty() {
+            script.push_str(&format!("manjaro-chroot /mnt pacman -S --noconfirm {}\n", self.selected_packages.join(" ")));
+        }
+        script
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -599,5 +687,31 @@ mod tests {
             PowerProfile::Performance
         );
         assert_eq!(msm.power_governor.target_cpu_freq_mhz, 4800);
+    }
+
+    #[test]
+    fn test_manjaro_branch_switcher_engine() {
+        let mut switcher = ManjaroBranchSwitcherEngine::new();
+        assert_eq!(switcher.current_branch, ManjaroBranchType::Stable);
+
+        let testing_url = switcher.switch_branch(ManjaroBranchType::Testing);
+        assert_eq!(switcher.current_branch, ManjaroBranchType::Testing);
+        assert!(testing_url.contains("testing"));
+
+        let unstable_url = switcher.switch_branch(ManjaroBranchType::Unstable);
+        assert_eq!(switcher.current_branch, ManjaroBranchType::Unstable);
+        assert!(unstable_url.contains("unstable"));
+    }
+
+    #[test]
+    fn test_manjaro_architect_profile_generator() {
+        let mut arch = ManjaroArchitectProfileGenerator::new("KDE", "btrfs");
+        arch.add_package("pamac-gtk");
+        arch.add_package("zsh");
+
+        let script = arch.generate_installer_script();
+        assert!(script.contains("Edition: KDE"));
+        assert!(script.contains("Filesystem: btrfs"));
+        assert!(script.contains("pamac-gtk zsh"));
     }
 }
