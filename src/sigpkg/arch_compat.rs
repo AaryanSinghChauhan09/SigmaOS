@@ -780,7 +780,11 @@ impl MakepkgBuilder {
         Ok((archive_name, archive_content))
     }
 }
-
+// --- Arch Linux svntogit Repository Migration Engine ---
+#[derive(Debug, Clone)]
+pub struct SvntoGitEngine {
+    pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -958,11 +962,6 @@ mod tests {
         assert_eq!(pkg_file.as_str(), "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
     }
-} // end mod tests (arch_compat first block)
-
-#[cfg(test_disabled)]
-mod extra_tests {
-    use super::*;
 
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
