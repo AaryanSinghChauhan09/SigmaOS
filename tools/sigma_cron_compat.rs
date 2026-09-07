@@ -582,6 +582,9 @@ pub unsafe extern "C" fn cron_get_job_count() -> SigmaU32 {
 
 /// Parse cron field helper supporting ranges (e.g. "1-5") and step increments (e.g. "*/15")
 unsafe fn parse_cron_field(field: *const u8, output: &mut [u8]) {
+    if field.is_null() {
+        return;
+    }
     let max_val = output.len();
     for i in 0..max_val {
         output[i] = 0;
