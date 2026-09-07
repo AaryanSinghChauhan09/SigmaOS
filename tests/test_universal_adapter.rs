@@ -131,6 +131,7 @@ fn test_universal_adapter_all_formats() {
         UniversalPmCommandDispatcher, UniversalPmOperation, ZypperSpecManifest,
     };
 
+    use universal_adapter::Version;
     let adapter = UniversalPackageAdapter::new();
 
     // 1. FreeBSD UCL (+MANIFEST)
