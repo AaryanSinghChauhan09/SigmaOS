@@ -1,16 +1,16 @@
-use std::format;
-use std::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::collections::HashMap;
-#[cfg(feature = "standalone_test")]
-use alloc::collections::BTreeMap as HashMap;
+#![no_std]
 
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::collections::BTreeMap as HashMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// RPM package metadata structure
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -432,7 +432,7 @@ impl RpmDependencyResolver {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

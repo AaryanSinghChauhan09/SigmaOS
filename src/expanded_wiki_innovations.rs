@@ -1,20 +1,24 @@
-/// Expanded Wiki & Distro Unimplemented Innovations Engine
-/// Implements planned wiki concepts inspired by Linux & BSD distributions:
-/// - Arch Linux pacman-contrib utilities (paccache, checkupdates, rankmirrors, updpkgsums, finddeps)
-/// - Debian dpkg triggers & post-transaction processing engine
-/// - FreeBSD pkg audit vulnerability scanner & orphan package autoremove engine
-/// - Fedora system-wide crypto policies engine (DEFAULT, LEGACY, FUTURE, FIPS)
-/// - Fedora Toolbox OCI dev container engine
-/// - NixOS Home-Manager declarative user environments
-/// - Mise / Asdf universal multi-runtime version manager
-/// - Devenv nix-based reproducible dev environments
-/// - Aircrack-ng / Wireshark wireless frame auditor
-/// - Ubuntu Pro Livepatch kernel hot-patching engine
-/// - Flatpak SDK container builder
-/// - Clear Linux Stateless /usr Configuration Overlay Engine
+#![no_std]
+
+// Expanded Wiki & Distro Unimplemented Innovations Engine
+// Implements planned wiki concepts inspired by Linux & BSD distributions:
+// - Arch Linux pacman-contrib utilities (paccache, checkupdates, rankmirrors, updpkgsums, finddeps)
+// - Debian dpkg triggers & post-transaction processing engine
+// - FreeBSD pkg audit vulnerability scanner & orphan package autoremove engine
+// - Fedora system-wide crypto policies engine (DEFAULT, LEGACY, FUTURE, FIPS)
+// - Fedora Toolbox OCI dev container engine
+// - NixOS Home-Manager declarative user environments
+// - Mise / Asdf universal multi-runtime version manager
+// - Devenv nix-based reproducible dev environments
+// - Aircrack-ng / Wireshark wireless frame auditor
+// - Ubuntu Pro Livepatch kernel hot-patching engine
+// - Flatpak SDK container builder
+// - Clear Linux Stateless /usr Configuration Overlay Engine
+
+extern crate alloc;
+
 use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
@@ -47,7 +51,7 @@ impl ArchPacmanContribEngine {
         &self,
         remote_versions: &[(String, String)],
     ) -> Vec<(String, String, String)> {
-        let mut pending = Vec::new();
+        let mut pending: Vec<(String, String, String)> = Vec::new();
         for (pkg, remote_ver) in remote_versions {
             if let Some((_, local_ver)) = self.cached_pkg_versions.iter().find(|(p, _)| p == pkg) {
                 if local_ver != remote_ver {
@@ -87,9 +91,9 @@ impl ArchPacmanContribEngine {
         target_dep: &str,
         pkg_deps_map: &[(String, Vec<String>)],
     ) -> Vec<String> {
-        let mut dependents = Vec::new();
+        let mut dependents: Vec<String> = Vec::new();
         for (pkg, deps) in pkg_deps_map {
-            if deps.iter().any(|d| d == target_dep) {
+            if deps.iter().any(|d: &String| d == target_dep) {
                 dependents.push(pkg.clone());
             }
         }
@@ -162,9 +166,9 @@ impl FreeBsdPkgAuditEngine {
         &self,
         installed_pkgs: &[String],
     ) -> Vec<(String, String, String)> {
-        let mut found = Vec::new();
+        let mut found: Vec<(String, String, String)> = Vec::new();
         for (pkg, cve, sev) in &self.vulnerability_cve_db {
-            if installed_pkgs.iter().any(|p| p.starts_with(pkg)) {
+            if installed_pkgs.iter().any(|p: &String| p.starts_with(pkg.as_str())) {
                 found.push((pkg.clone(), cve.clone(), sev.clone()));
             }
         }
@@ -318,7 +322,7 @@ impl MiseUniversalVersionManager {
         self.runtimes
             .iter()
             .find(|(r, _)| r == runtime)
-            .map(|(_, v)| v.clone())
+            .map(|(_, v): &(String, String)| v.clone())
     }
 }
 
@@ -799,7 +803,7 @@ impl Default for StrategicImportPlanEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod expanded_wiki_tests {
     use super::*;
 
