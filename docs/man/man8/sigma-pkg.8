@@ -1,0 +1,27 @@
+.\" SPDX-License-Identifier: MIT
+.TH SIGMA-PKG 8 "March 2026" "SigmaOS 1.0" "SigmaOS System Manager's Manual"
+.SH NAME
+sigma-pkg \- Sovereign Content-Addressed Package Manager for SigmaOS
+.SH SYNOPSIS
+.B sigma-pkg
+<\fICOMMAND\fR> [\fIOPTIONS\fR] [\fIPACKAGE\fR...]
+.SH DESCRIPTION
+.B sigma-pkg
+is the native package management tool for SigmaOS. It handles declarative package installations, content-addressed CAS store queries, transaction rollbacks, multi-distro package conversions (.deb, .rpm, .pkg.tar.zst, .apk), and Signstar PQC signature verifications.
+.SH COMMANDS
+.TP
+.B install \fIPACKAGE\fR...
+Install one or more packages transactionally.
+.TP
+.B remove \fIPACKAGE\fR...
+Remove specified packages and purge unneeded orphaned dependencies.
+.TP
+.B search \fIQUERY\fR
+Search local and remote repository metadata for matching packages.
+.TP
+.B rollback \fICHECKPOINT_ID\fR
+Perform atomic sub-second rollback to a previous transaction checkpoint.
+.SH SEE ALSO
+.BR sigma-sh (1)
+.SH AUTHORS
+SigmaOS Core Maintainers <maintainers@sigmaos.org>

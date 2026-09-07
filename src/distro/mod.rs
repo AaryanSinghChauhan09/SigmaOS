@@ -63,6 +63,15 @@ pub use sovereign_system_innovations::{
     VisualPolicyRule, VisualSandboxPolicyManager, WorkloadType, WmLayoutMode,
 };
 pub mod sovereign_distro_dominance;
+pub mod distro_inspiration_engine;
+
+pub use distro_inspiration_engine::{
+    MuslLightweightInitEngine, MuslStaticService, ServiceRunState,
+    PortageUseFlagGovernor, PortageUseFlag, UseFlagState,
+    OpenBsdStatefulPacketFilterEngine, PfStateEntry, PfProtocol,
+    FreeBsdZfsArcGeomEngine, ArcCacheBlock, ArcState,
+    ClearLinuxIsaSelectorEngine, IsaLevel,
+};
 
 pub use arch_parity::{
     AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,

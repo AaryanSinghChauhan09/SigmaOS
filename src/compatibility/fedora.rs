@@ -2797,6 +2797,360 @@ impl Default for FedoraOfflineUpdateEngine {
     }
 }
 
+// =========================================================================
+// Fedora MirrorManager 2 (mirrormanager2) System Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum MirrorProtocol {
+    Https,
+    Http,
+    Rsync,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MirrorSyncStatus {
+    UpToDate,
+    Syncing,
+    Outdated,
+    Unreachable,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraMirrorHost {
+    pub host_id: String,
+    pub base_url: String,
+    pub country_code: String,
+    pub asn: u32,
+    pub bandwidth_mbps: u32,
+    pub protocols: Vec<MirrorProtocol>,
+    pub sync_status: MirrorSyncStatus,
+    pub lag_seconds: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct ClientLocationContext {
+    pub client_ip: String,
+    pub country_code: String,
+    pub asn: u32,
+    pub preferred_protocol: MirrorProtocol,
+}
+
+/// Fedora MirrorManager 2 GeoIP, BGP ASN, and Bandwidth-Weighted Routing Engine
+pub struct FedoraMirrorManager2Engine {
+    pub mirrors: Vec<FedoraMirrorHost>,
+    pub max_allowed_lag_secs: u64,
+}
+
+impl FedoraMirrorManager2Engine {
+    pub fn new(max_lag_secs: u64) -> Self {
+        Self {
+            mirrors: Vec::new(),
+            max_allowed_lag_secs: max_lag_secs,
+        }
+    }
+
+    pub fn register_mirror(&mut self, mirror: FedoraMirrorHost) {
+        self.mirrors.retain(|m| m.host_id != mirror.host_id);
+        self.mirrors.push(mirror);
+    }
+
+    pub fn update_mirror_status(
+        &mut self,
+        host_id: &str,
+        status: MirrorSyncStatus,
+        lag_secs: u64,
+    ) -> bool {
+        if let Some(m) = self.mirrors.iter_mut().find(|m| m.host_id == host_id) {
+            m.sync_status = status;
+            m.lag_seconds = lag_secs;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn select_optimal_mirrors(&self, client: &ClientLocationContext) -> Vec<FedoraMirrorHost> {
+        let mut candidates: Vec<FedoraMirrorHost> = self
+            .mirrors
+            .iter()
+            .filter(|m| {
+                m.sync_status == MirrorSyncStatus::UpToDate
+                    && m.lag_seconds <= self.max_allowed_lag_secs
+                    && m.protocols.contains(&client.preferred_protocol)
+            })
+            .cloned()
+            .collect();
+
+        candidates.sort_by(|a, b| {
+            let a_asn = a.asn == client.asn;
+            let b_asn = b.asn == client.asn;
+            if a_asn != b_asn {
+                return b_asn.cmp(&a_asn);
+            }
+
+            let a_country = a.country_code == client.country_code;
+            let b_country = b.country_code == client.country_code;
+            if a_country != b_country {
+                return b_country.cmp(&a_country);
+            }
+
+            b.bandwidth_mbps.cmp(&a.bandwidth_mbps)
+        });
+
+        candidates
+    }
+}
+
+// =========================================================================
+// Fedora Shared System Infrastructure & Runtime Manager
+// =========================================================================
+
+/// Fedora Shared Library Dependency & Soname Entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraSharedLibraryEntry {
+    pub soname: String,
+    pub real_path: String,
+    pub abi_version: String,
+    pub exported_symbols: Vec<String>,
+}
+
+/// Fedora Shared DNF Repository Cache Transaction Lock
+#[derive(Debug, Clone)]
+pub struct FedoraDnfSharedCacheLock {
+    pub lock_file_path: String,
+    pub is_locked: bool,
+    pub lock_owner_pid: u32,
+}
+
+/// Fedora System-wide Shared Runtime Environment (/run/user/UID & /dev/shm)
+#[derive(Debug, Clone)]
+pub struct FedoraSharedRuntimeEnvironment {
+    pub runtime_dir: String,
+    pub shm_dir: String,
+    pub allocated_shm_blocks: HashMap<String, usize>,
+}
+
+/// Fedora-inspired Shared System Manager for SigmaOS
+pub struct FedoraSharedSystemManager {
+    pub shared_libraries: HashMap<String, FedoraSharedLibraryEntry>,
+    pub cache_lock: FedoraDnfSharedCacheLock,
+    pub runtime_env: FedoraSharedRuntimeEnvironment,
+}
+
+impl FedoraSharedSystemManager {
+    pub fn new(uid: u32) -> Self {
+        Self {
+            shared_libraries: HashMap::new(),
+            cache_lock: FedoraDnfSharedCacheLock {
+                lock_file_path: "/var/cache/dnf/metadata_lock.pid".to_string(),
+                is_locked: false,
+                lock_owner_pid: 0,
+            },
+            runtime_env: FedoraSharedRuntimeEnvironment {
+                runtime_dir: format!("/run/user/{}", uid),
+                shm_dir: "/dev/shm".to_string(),
+                allocated_shm_blocks: HashMap::new(),
+            },
+        }
+    }
+
+    pub fn register_shared_library(
+        &mut self,
+        soname: &str,
+        path: &str,
+        abi_ver: &str,
+        symbols: &[&str],
+    ) {
+        let sym_vec = symbols.iter().map(|s| s.to_string()).collect();
+        self.shared_libraries.insert(
+            soname.to_string(),
+            FedoraSharedLibraryEntry {
+                soname: soname.to_string(),
+                real_path: path.to_string(),
+                abi_version: abi_ver.to_string(),
+                exported_symbols: sym_vec,
+            },
+        );
+    }
+
+    pub fn acquire_dnf_cache_lock(&mut self, pid: u32) -> Result<(), &'static str> {
+        if self.cache_lock.is_locked {
+            if self.cache_lock.lock_owner_pid == pid {
+                return Ok(());
+            }
+            return Err("FedoraDnfSharedCache: Lock currently held by another process");
+        }
+        self.cache_lock.is_locked = true;
+        self.cache_lock.lock_owner_pid = pid;
+        Ok(())
+    }
+
+    pub fn release_dnf_cache_lock(&mut self, pid: u32) -> Result<(), &'static str> {
+        if !self.cache_lock.is_locked {
+            return Ok(());
+        }
+        if self.cache_lock.lock_owner_pid != pid {
+            return Err("FedoraDnfSharedCache: Cannot release lock owned by another process");
+        }
+        self.cache_lock.is_locked = false;
+        self.cache_lock.lock_owner_pid = 0;
+        Ok(())
+    }
+
+    pub fn allocate_shared_memory_block(&mut self, key: &str, size_bytes: usize) -> String {
+        self.runtime_env
+            .allocated_shm_blocks
+            .insert(key.to_string(), size_bytes);
+        format!("{}/{}", self.runtime_env.shm_dir, key)
+    }
+
+    pub fn resolve_shared_library_symbol(&self, soname: &str, symbol: &str) -> bool {
+        if let Some(lib) = self.shared_libraries.get(soname) {
+            lib.exported_symbols.contains(&symbol.to_string())
+        } else {
+            false
+        }
+    }
+}
+
+// =========================================================================
+// Fedora Badges (badges.fedoraproject.org) Community Achievement Engine
+// =========================================================================
+
+/// Fedora Community Contribution Badge Alignment
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraBadge {
+    pub badge_id: String,
+    pub name: String,
+    pub description: String,
+    pub category: String, // "development", "qa", "community", "governance"
+    pub points: u32,
+}
+
+/// Fedora Badges & OpenBadges Community Achievement Engine
+pub struct FedoraBadgesEngine {
+    pub badges: HashMap<String, FedoraBadge>,
+    pub user_awarded_badges: HashMap<String, Vec<String>>, // fas_username -> badge_ids
+}
+
+impl FedoraBadgesEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            badges: HashMap::new(),
+            user_awarded_badges: HashMap::new(),
+        };
+        engine.register_default_badges();
+        engine
+    }
+
+    fn register_default_badges(&mut self) {
+        self.badges.insert(
+            "pkg-first-build".to_string(),
+            FedoraBadge {
+                badge_id: "pkg-first-build".to_string(),
+                name: "First Package Build".to_string(),
+                description: "Built first official RPM package in Koji/Copr".to_string(),
+                category: "development".to_string(),
+                points: 10,
+            },
+        );
+        self.badges.insert(
+            "qa-test-day".to_string(),
+            FedoraBadge {
+                badge_id: "qa-test-day".to_string(),
+                name: "QA Test Day Hero".to_string(),
+                description: "Participated in official Fedora QA test day".to_string(),
+                category: "qa".to_string(),
+                points: 15,
+            },
+        );
+    }
+
+    pub fn award_badge(&mut self, fas_username: &str, badge_id: &str) -> Result<u32, &'static str> {
+        if !self.badges.contains_key(badge_id) {
+            return Err("FedoraBadges: Invalid badge ID");
+        }
+        let user_badges = self
+            .user_awarded_badges
+            .entry(fas_username.to_string())
+            .or_insert_with(Vec::new);
+
+        if !user_badges.contains(&badge_id.to_string()) {
+            user_badges.push(badge_id.to_string());
+        }
+
+        let total_points = user_badges
+            .iter()
+            .filter_map(|id| self.badges.get(id))
+            .map(|b| b.points)
+            .sum();
+
+        Ok(total_points)
+    }
+}
+
+impl Default for FedoraBadgesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora System Roles (linux-system-roles) Declarative Engine
+// =========================================================================
+
+/// Fedora System Role Category
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemRoleKind {
+    Timesync,
+    Network,
+    Firewall,
+    Selinux,
+    Storage,
+}
+
+/// Fedora System Roles (linux-system-roles) Declarative Automation Engine
+pub struct FedoraSystemRolesEngine {
+    pub applied_roles: Vec<SystemRoleKind>,
+    pub chrony_ntp_servers: Vec<String>,
+    pub configured_firewall_ports: Vec<u16>,
+}
+
+impl FedoraSystemRolesEngine {
+    pub fn new() -> Self {
+        Self {
+            applied_roles: Vec::new(),
+            chrony_ntp_servers: Vec::new(),
+            configured_firewall_ports: Vec::new(),
+        }
+    }
+
+    pub fn apply_timesync_role(&mut self, ntp_servers: &[&str]) {
+        self.chrony_ntp_servers = ntp_servers.iter().map(|s| s.to_string()).collect();
+        if !self.applied_roles.contains(&SystemRoleKind::Timesync) {
+            self.applied_roles.push(SystemRoleKind::Timesync);
+        }
+    }
+
+    pub fn apply_firewall_role(&mut self, open_ports: &[u16]) {
+        for &p in open_ports {
+            if !self.configured_firewall_ports.contains(&p) {
+                self.configured_firewall_ports.push(p);
+            }
+        }
+        if !self.applied_roles.contains(&SystemRoleKind::Firewall) {
+            self.applied_roles.push(SystemRoleKind::Firewall);
+        }
+    }
+}
+
+impl Default for FedoraSystemRolesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3619,5 +3973,135 @@ mod tests {
 
         let empty_cat = planet.query_entries_by_category("python");
         assert!(empty_cat.is_empty());
+    }
+
+    #[test]
+    fn test_fedora_mirror_manager_2_engine() {
+        let mut mm2 = FedoraMirrorManager2Engine::new(3600); // 1 hour max lag
+
+        let m1 = FedoraMirrorHost {
+            host_id: "us-mirror-1".to_string(),
+            base_url: "https://us.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 7018,
+            bandwidth_mbps: 10000,
+            protocols: vec![MirrorProtocol::Https, MirrorProtocol::Http],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 300,
+        };
+
+        let m2 = FedoraMirrorHost {
+            host_id: "us-local-asn-mirror".to_string(),
+            base_url: "https://asn.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345, // Client ASN match
+            bandwidth_mbps: 1000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 600,
+        };
+
+        let m3 = FedoraMirrorHost {
+            host_id: "eu-high-bw-mirror".to_string(),
+            base_url: "https://eu.dl.fedoraproject.org".to_string(),
+            country_code: "DE".to_string(),
+            asn: 3320,
+            bandwidth_mbps: 40000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::UpToDate,
+            lag_seconds: 1200,
+        };
+
+        let m_outdated = FedoraMirrorHost {
+            host_id: "outdated-mirror".to_string(),
+            base_url: "https://outdated.dl.fedoraproject.org".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345,
+            bandwidth_mbps: 100000,
+            protocols: vec![MirrorProtocol::Https],
+            sync_status: MirrorSyncStatus::Outdated,
+            lag_seconds: 86400,
+        };
+
+        mm2.register_mirror(m1);
+        mm2.register_mirror(m2);
+        mm2.register_mirror(m3);
+        mm2.register_mirror(m_outdated);
+
+        let client = ClientLocationContext {
+            client_ip: "192.0.2.1".to_string(),
+            country_code: "US".to_string(),
+            asn: 12345,
+            preferred_protocol: MirrorProtocol::Https,
+        };
+
+        let optimal = mm2.select_optimal_mirrors(&client);
+        assert_eq!(optimal.len(), 3); // m_outdated excluded due to sync status / lag
+
+        // First choice should be ASN match (us-local-asn-mirror)
+        assert_eq!(optimal[0].host_id, "us-local-asn-mirror");
+        // Second choice should be same country (us-mirror-1)
+        assert_eq!(optimal[1].host_id, "us-mirror-1");
+        // Third choice should be EU high-bandwidth mirror
+        assert_eq!(optimal[2].host_id, "eu-high-bw-mirror");
+    }
+
+    #[test]
+    fn test_fedora_shared_system_manager() {
+        let mut mgr = FedoraSharedSystemManager::new(1000);
+        assert_eq!(mgr.runtime_env.runtime_dir, "/run/user/1000");
+
+        // Register shared library
+        mgr.register_shared_library(
+            "libc.so.6",
+            "/usr/lib64/libc.so.6",
+            "GLIBC_2.38",
+            &["malloc", "free", "printf"],
+        );
+        assert!(mgr.resolve_shared_library_symbol("libc.so.6", "malloc"));
+        assert!(!mgr.resolve_shared_library_symbol("libc.so.6", "nonexistent_symbol"));
+
+        // DNF Shared Cache Lock
+        assert!(mgr.acquire_dnf_cache_lock(4201).is_ok());
+        assert!(mgr.acquire_dnf_cache_lock(4201).is_ok()); // Re-entrant same PID ok
+        assert!(mgr.acquire_dnf_cache_lock(9999).is_err()); // Other PID blocked
+        assert!(mgr.release_dnf_cache_lock(9999).is_err()); // Invalid owner release
+        assert!(mgr.release_dnf_cache_lock(4201).is_ok()); // Valid release
+
+        // Shared Memory Allocation
+        let shm_path = mgr.allocate_shared_memory_block("sigma_ipc_shm", 4096);
+        assert_eq!(shm_path, "/dev/shm/sigma_ipc_shm");
+        assert_eq!(
+            mgr.runtime_env.allocated_shm_blocks.get("sigma_ipc_shm"),
+            Some(&4096)
+        );
+    }
+
+    #[test]
+    fn test_fedora_badges_engine() {
+        let mut badges = FedoraBadgesEngine::new();
+        assert_eq!(badges.badges.len(), 2);
+
+        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
+        assert_eq!(pts1, 10);
+
+        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
+        assert_eq!(pts2, 25);
+
+        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
+    }
+
+    #[test]
+    fn test_fedora_system_roles_engine() {
+        let mut roles = FedoraSystemRolesEngine::new();
+        assert!(roles.applied_roles.is_empty());
+
+        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
+        assert_eq!(roles.applied_roles.len(), 1);
+        assert_eq!(roles.chrony_ntp_servers.len(), 2);
+
+        roles.apply_firewall_role(&[80, 443, 8080]);
+        assert_eq!(roles.applied_roles.len(), 2);
+        assert_eq!(roles.configured_firewall_ports.len(), 3);
     }
 }
