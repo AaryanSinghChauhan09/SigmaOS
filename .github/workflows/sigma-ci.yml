@@ -352,7 +352,7 @@ jobs:
         cargo clippy --all-targets --all-features -- -D warnings
 
     - name: Check for secrets
-      uses: trufflesecurity/trufflehog@main
+      uses: trufflesecurity/trufflehog@v3.88.2
 
       with:
         path: ./
