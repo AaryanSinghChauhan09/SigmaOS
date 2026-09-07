@@ -1204,6 +1204,31 @@ mod tests {
     }
 
     #[test]
+    fn test_linux_bsd_principles_integration() {
+        let mut openbsd = OpenBsdSelfReportingSecurityGovernor::new();
+        openbsd.apply_pledge("stdio rpath wpath");
+        assert!(openbsd.check_pledge("rpath"));
+        assert!(!openbsd.check_pledge("exec"));
+
+        let mut geom = FreeBsdGeomStorageStack::new();
+        geom.add_geom_provider("mirror0", "geom_mirror", 1_000_000_000);
+        assert_eq!(geom.providers.len(), 1);
+
+        let mut runit = VoidLinuxRunitServiceSupervisor::new();
+        runit.register_service("sshd");
+        assert!(runit.start_service("sshd"));
+        assert_eq!(runit.running_services.len(), 1);
+
+        let mut lbu = AlpineLinuxDisklessLbuPersistence::new();
+        lbu.commit_overlay_backup("/mnt/media/apkovl.tar.gz");
+        assert_eq!(lbu.backup_tarball_path.unwrap(), "/mnt/media/apkovl.tar.gz");
+
+        let mut nix = NixOsHermeticClosureEngine::new();
+        nix.add_store_path("/nix/store/123-glibc-2.38");
+        assert!(nix.verify_closure("/nix/store/123-glibc-2.38"));
+    }
+
+    #[test]
     fn test_gap_closure_roadmap_phase_evaluation() {
         let engine = SovereignDistroAbsorptionEngine::new();
         assert_eq!(engine.current_phase, GapClosurePhase::Phase1Critical);

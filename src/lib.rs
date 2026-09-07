@@ -72,8 +72,10 @@ pub use distro::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
     SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
     SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
-    ZramCompressionAlgorithm, DebianMultiarchAptEngine, GarudaPerformanceTweakEngine,
-    HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, SolusEopkgBudgieEngine,
+    ZramCompressionAlgorithm, DebianMultiarchAptEngine, EndeavourReflectorMirrorRanker,
+    FreeBsdZfsBootEnvManager, GarudaDracutBtrfsSnapper, GarudaPerformanceTweakEngine,
+    HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, NixOsFlakeProfileManager,
+    OpenBsdDoasPrivilegeManager, SolusEopkgBudgieEngine,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
     OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
 };
@@ -169,6 +171,7 @@ pub mod toolchain {
 pub mod scheduler;
 pub mod logging;
 pub mod system;
+pub use system::{AutomationTaskKind, SovereignAutomationEngine, TaskStatus};
 pub mod update {
     pub mod distro_update_parity;
 }
@@ -196,3 +199,7 @@ pub use innovation::{
 pub mod docs;
 pub mod graphics;
 pub mod net;
+pub use net::{
+    FreeBsdNetgraphGraphRouter, LinuxBbrCongestionEngine, OpenBsdPfCarpPfsyncStateEngine,
+    WireguardPqcTunnelEngine, XdpZeroCopyPacketRingEngine,
+};

@@ -189,11 +189,13 @@ pub use linux_bsd_inspirations::{
 
 pub use sovereign_distro_dominance::{
     AlpineApkCASPackageCache, CachyBoreDynamicAiScheduler, CasPackageBlob, ClusterNodeConfig,
-    FreeBsdBhyveMicrovmJailBridge, HybridIsolationInstance, IsolationType, ManagedProcessAffinity,
-    MicrovmState, NixGuixZeroCopyStore, OpenBsdHardenedCapsicumPledge, PopOsSystem76AutoScheduler,
-    ProcessPowerProfile, SovereignDistroDominanceSuite, SovereignMicrovmHypervisorGateway,
-    SovereignPqcWireguardVpnEngine, TalosHeadlessMtlsClusterEngine, VirtioConfig, WireguardPeer,
-    ZfsBtrfsHybridSelfHealingCoW,
+    DoasRule, EndeavourReflectorMirrorRanker, FreeBsdBhyveMicrovmJailBridge,
+    FreeBsdZfsBootEnvManager, GarudaDracutBtrfsSnapper, HybridIsolationInstance, IsolationType,
+    ManagedProcessAffinity, MicrovmState, MirrorInfo, NixGuixZeroCopyStore,
+    NixOsFlakeProfileManager, OpenBsdDoasPrivilegeManager, OpenBsdHardenedCapsicumPledge,
+    PopOsSystem76AutoScheduler, ProcessPowerProfile, SovereignDistroDominanceSuite,
+    SovereignMicrovmHypervisorGateway, SovereignPqcWireguardVpnEngine,
+    TalosHeadlessMtlsClusterEngine, VirtioConfig, WireguardPeer, ZfsBtrfsHybridSelfHealingCoW,
 };
 
 pub mod nextgen_innovations;

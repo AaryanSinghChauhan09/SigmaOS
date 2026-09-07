@@ -1088,4 +1088,209 @@ mod tests {
         let score = suite.eval_sovereign_dominance_score();
         assert_eq!(score, 100);
     }
+
+    #[test]
+    fn test_endeavour_reflector_mirror_ranker() {
+        let mut ranker = EndeavourReflectorMirrorRanker::new();
+        ranker.add_mirror("https://mirror.arch.org", 15, 100_000);
+        ranker.add_mirror("https://fast.mirror.org", 5, 200_000);
+        let best = ranker.rank_best_mirror().unwrap();
+        assert_eq!(best, "https://fast.mirror.org");
+    }
+
+    #[test]
+    fn test_garuda_dracut_btrfs_snapper() {
+        let mut snapper = GarudaDracutBtrfsSnapper::new();
+        let snap_id = snapper.create_snapshot("pre-upgrade-6.6");
+        assert_eq!(snap_id, 1);
+        assert!(snapper.rollback_to_snapshot(snap_id));
+        assert_eq!(snapper.active_snapshot_id, 1);
+    }
+
+    #[test]
+    fn test_nixos_flake_profile_manager() {
+        let mut nix = NixOsFlakeProfileManager::new();
+        let gen = nix.build_flake_generation("github:SigmaOS/config#system");
+        assert_eq!(gen, 1);
+        assert!(nix.switch_generation(gen));
+        assert_eq!(nix.current_generation, 1);
+    }
+
+    #[test]
+    fn test_freebsd_zfs_boot_env_manager() {
+        let mut be = FreeBsdZfsBootEnvManager::new();
+        be.create_boot_environment("default_2026");
+        be.create_boot_environment("upgrade_temp");
+        assert!(be.activate_boot_environment("upgrade_temp"));
+        assert_eq!(be.active_environment, "upgrade_temp");
+    }
+
+    #[test]
+    fn test_openbsd_doas_privilege_manager() {
+        let mut doas = OpenBsdDoasPrivilegeManager::new();
+        doas.add_rule("root", true, true);
+        doas.add_rule("user", false, true);
+        assert!(doas.evaluate_privilege("root"));
+        assert!(!doas.evaluate_privilege("user"));
+    }
+}
+
+// ============================================================================
+// Linux & BSD Distro Component Innovations
+// ============================================================================
+
+/// EndeavourOS / Arch Linux Reflector mirror ranking engine
+#[derive(Debug, Clone)]
+pub struct MirrorInfo {
+    pub url: String,
+    pub latency_ms: u32,
+    pub bw_bps: u64,
+}
+
+pub struct EndeavourReflectorMirrorRanker {
+    pub mirrors: Vec<MirrorInfo>,
+}
+
+impl EndeavourReflectorMirrorRanker {
+    pub fn new() -> Self {
+        Self { mirrors: Vec::new() }
+    }
+
+    pub fn add_mirror(&mut self, url: &str, latency_ms: u32, bw_bps: u64) {
+        self.mirrors.push(MirrorInfo {
+            url: url.to_string(),
+            latency_ms,
+            bw_bps,
+        });
+    }
+
+    pub fn rank_best_mirror(&self) -> Option<String> {
+        self.mirrors
+            .iter()
+            .min_by_key(|m| m.latency_ms)
+            .map(|m| m.url.clone())
+    }
+}
+
+/// Garuda Linux / openSUSE Dracut initramfs Btrfs snapper hook
+pub struct GarudaDracutBtrfsSnapper {
+    pub snapshots: Vec<(u32, String)>,
+    pub active_snapshot_id: u32,
+}
+
+impl GarudaDracutBtrfsSnapper {
+    pub fn new() -> Self {
+        Self {
+            snapshots: Vec::new(),
+            active_snapshot_id: 0,
+        }
+    }
+
+    pub fn create_snapshot(&mut self, name: &str) -> u32 {
+        let id = (self.snapshots.len() as u32) + 1;
+        self.snapshots.push((id, name.to_string()));
+        id
+    }
+
+    pub fn rollback_to_snapshot(&mut self, id: u32) -> bool {
+        if self.snapshots.iter().any(|(s_id, _)| *s_id == id) {
+            self.active_snapshot_id = id;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// NixOS Flakes reproducible profile generation switcher
+pub struct NixOsFlakeProfileManager {
+    pub generations: Vec<(u32, String)>,
+    pub current_generation: u32,
+}
+
+impl NixOsFlakeProfileManager {
+    pub fn new() -> Self {
+        Self {
+            generations: Vec::new(),
+            current_generation: 0,
+        }
+    }
+
+    pub fn build_flake_generation(&mut self, flake_uri: &str) -> u32 {
+        let gen_id = (self.generations.len() as u32) + 1;
+        self.generations.push((gen_id, flake_uri.to_string()));
+        gen_id
+    }
+
+    pub fn switch_generation(&mut self, gen_id: u32) -> bool {
+        if self.generations.iter().any(|(id, _)| *id == gen_id) {
+            self.current_generation = gen_id;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// FreeBSD bectl ZFS boot environment manager
+pub struct FreeBsdZfsBootEnvManager {
+    pub environments: Vec<String>,
+    pub active_environment: String,
+}
+
+impl FreeBsdZfsBootEnvManager {
+    pub fn new() -> Self {
+        Self {
+            environments: vec!["default".to_string()],
+            active_environment: "default".to_string(),
+        }
+    }
+
+    pub fn create_boot_environment(&mut self, name: &str) {
+        self.environments.push(name.to_string());
+    }
+
+    pub fn activate_boot_environment(&mut self, name: &str) -> bool {
+        if self.environments.contains(&name.to_string()) {
+            self.active_environment = name.to_string();
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// OpenBSD doas privilege escalation rule evaluator
+#[derive(Debug, Clone)]
+pub struct DoasRule {
+    pub identity: String,
+    pub permit: bool,
+    pub nopass: bool,
+}
+
+pub struct OpenBsdDoasPrivilegeManager {
+    pub rules: Vec<DoasRule>,
+}
+
+impl OpenBsdDoasPrivilegeManager {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, identity: &str, permit: bool, nopass: bool) {
+        self.rules.push(DoasRule {
+            identity: identity.to_string(),
+            permit,
+            nopass,
+        });
+    }
+
+    pub fn evaluate_privilege(&self, identity: &str) -> bool {
+        for rule in self.rules.iter().rev() {
+            if rule.identity == identity {
+                return rule.permit;
+            }
+        }
+        false
+    }
 }
