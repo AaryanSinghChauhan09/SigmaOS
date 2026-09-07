@@ -33,9 +33,6 @@ pub use crate::sigpkg::Version;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-
 use std::sync::Arc;
 
 #[cfg(feature = "standalone_test")]
