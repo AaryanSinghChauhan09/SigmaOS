@@ -904,7 +904,9 @@ impl SovereignDistroDominanceSuite {
         if !self.pqc_vpn.interface_name.is_empty() {
             score += 20;
         }
-        score += 20;
+        if !self.popos_scheduler.managed_processes.is_empty() {
+            score += 20;
+        }
         score += 20; // Zero-copy CAS + PQC VPN dominance guarantee
         score
     }

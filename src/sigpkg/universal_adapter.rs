@@ -17,6 +17,8 @@ pub use crate::sigpkg::Version;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::universal_engine::PackageFormat;
 
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
@@ -47,32 +49,8 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-/// Description of Snapcraft Manifest (snap parity)
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub description: String,
-    pub confinement: String,
-    pub grade: String,
-    pub apps: Vec<String>,
-    pub plugs: Vec<String>,
-}
-/// Description of Flatpak Manifest (flatpak parity)
-pub struct FlatpakManifest {
-    pub id: String,
-    pub runtime: String,
-    pub runtime_version: String,
-    pub sdk: String,
-    pub command: String,
-    pub finish_args: Vec<String>,
-}
-#[derive(Debug, Clone)]
-pub enum AdapterError {
-    ParseError(String),
-    ValidationError(String),
-    UnsupportedFormat(String),
-}
+
+use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 pub use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -1321,13 +1299,13 @@ impl UniversalPackageAdapter {
                         &slack.description,
                         &slack.slack_required,
                     )
-                } else if raw_text.contains("name ") && raw_text.contains("summary ") {
-                    let hpkg = self.parse_haiku_hpkg(raw_text)?;
+                } else if filename.ends_with(".hpkg") || raw_text.contains("summary ") || raw_text.contains("architecture ") || raw_text.contains("vendor ") || raw_text.contains("haiku") {
+                    let haiku = self.parse_haiku_hpkg(raw_text)?;
                     self.translate_to_native_package(
-                        &hpkg.name,
-                        &hpkg.version,
-                        &hpkg.summary,
-                        &hpkg.requires,
+                        &haiku.name,
+                        &haiku.version,
+                        &haiku.summary,
+                        &haiku.requires,
                     )
                 } else {
                     Err("Unrecognized package manifest format")

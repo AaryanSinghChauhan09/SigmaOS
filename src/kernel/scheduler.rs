@@ -1,17 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(unexpected_cfgs)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-#![allow(non_camel_case_types)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::type_complexity)]
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TaskId(pub u64);
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Task {
     pub id: TaskId,
     pub vruntime: u64,
@@ -146,14 +136,11 @@ impl Process {
         let base_slice = (q / weight).max(1);
         let inter = self.interactivity_score();
         // Boost interactive tasks (> 70) by shortening their deadline window
-        let boost = if inter > 70 {
-            (inter as u64 - 70) / 10
-        } else {
-            0
-        };
+        let boost = if inter > 70 { (inter as u64 - 70) / 10 } else { 0 };
         let slice = base_slice.saturating_sub(boost).max(1);
         self.virtual_deadline = self.virtual_runtime + slice;
     }
+
 }
 
 #[derive(Debug, Clone)]
@@ -356,6 +343,13 @@ impl CfsScheduler {
         }
     }
 
+    pub fn tick(&mut self) {
+        self.current_time += 1;
+    }
+
+    pub fn schedule(&mut self) -> Option<Task> {
+        self.pick_next_task()
+    }
     pub fn pick_next_task(&mut self) -> Option<Task> {
         if self.task_count > 0 {
             let task = self.tasks[0].take();

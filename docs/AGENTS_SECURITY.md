@@ -24,6 +24,12 @@ AI security agents operating within SigmaOS perform the following automated func
    - Refer to `AGENTS_BITMAP_OPERATIONS.md` and `docs/AGENTS_BITMAP_OPERATIONS.md` for atomic bitmap resource tracking protocols.
    - Refer to `AGENTS_BOOT_BLOCK.md` and `docs/AGENTS_BOOT_BLOCK.md` for measured bootloader management protocols.
    - Refer to `AGENTS_CIRCULAR_BUFFER.md` and `docs/AGENTS_CIRCULAR_BUFFER.md` for lock-free ring buffer IPC synchronization protocols.
+   - Refer to `AGENTS_CLOCK_INTERRUPT.md` and `docs/AGENTS_CLOCK_INTERRUPT.md` for timer interrupt handling protocols.
+   - Refer to `AGENTS_THREADING_PARALLELISM.md` and `docs/AGENTS_THREADING_PARALLELISM.md` for RCU synchronization and thread quantum management protocols.
+   - Refer to `AGENTS_MICROPROCESSOR_OPERATIONS.md` and `docs/AGENTS_MICROPROCESSOR_OPERATIONS.md` for multi-architecture CPU context switching and ISA level detection protocols.
+   - Refer to `AGENTS_COAP_MANAGEMENT.md` and `docs/AGENTS_COAP_MANAGEMENT.md` for Constrained Application Protocol (CoAP) IoT messaging security protocols.
+   - Refer to `AGENTS_CONTROL_MODE.md` and `docs/AGENTS_CONTROL_MODE.md` for control mode terminal parsing and access control matrix protocols.
+   - Refer to `AGENTS_ACCESS_MANAGEMENT.md` and `docs/AGENTS_ACCESS_MANAGEMENT.md` for comprehensive access operations protocols (LDAP, RAT, WAP, path canonicalization, read/write permissions).
    - Enforce Seccomp system call filtering and `pinsyscall(2)` security rules (`OpenBsdPinSyscallEnforcer`).
    - Manage container isolation across FreeBSD Jails, OpenBSD Pledge/Unveil, and Illumos Zones.
 

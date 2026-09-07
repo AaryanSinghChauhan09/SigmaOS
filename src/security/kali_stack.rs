@@ -1,5 +1,5 @@
 
-use crate::klib::Vec;
+use alloc::vec::Vec;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS
 /// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
 /// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.
@@ -524,6 +524,138 @@ mod tests {
             original_length: 32,
         };
         assert!(!analyzer.analyze_packet(&invalid_hdr, &payload));
+    }
+
+/// Kali Undercover Mode desktop disguised theme toggle
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UndercoverDisguiseTheme {
+    StandardKali,
+    Windows10Disguise,
+    Windows11Disguise,
+    MacOsSonomaDisguise,
+}
+
+pub struct KaliUndercoverThemeMode {
+    pub current_theme: UndercoverDisguiseTheme,
+    pub is_active: bool,
+}
+
+impl KaliUndercoverThemeMode {
+    pub fn new() -> Self {
+        Self {
+            current_theme: UndercoverDisguiseTheme::StandardKali,
+            is_active: false,
+        }
+    }
+
+    pub fn toggle_undercover(&mut self, target_disguise: UndercoverDisguiseTheme) {
+        if self.is_active && self.current_theme == target_disguise {
+            self.current_theme = UndercoverDisguiseTheme::StandardKali;
+            self.is_active = false;
+        } else {
+            self.current_theme = target_disguise;
+            self.is_active = true;
+        }
+    }
+}
+
+impl Default for KaliUndercoverThemeMode {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// SQLMap-inspired SQL injection vulnerability scanner
+pub struct KaliSqlmapInjectionAuditor {
+    pub total_scanned: AtomicUsize,
+    pub vulnerabilities_found: AtomicUsize,
+}
+
+impl KaliSqlmapInjectionAuditor {
+    pub fn new() -> Self {
+        Self {
+            total_scanned: AtomicUsize::new(0),
+            vulnerabilities_found: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn inspect_sql_payload(&self, query: &[u8]) -> bool {
+        self.total_scanned.fetch_add(1, Ordering::SeqCst);
+        let sql_signatures = [b"UNION SELECT" as &[u8], b"1=1", b"OR '1'='1'", b"'; DROP TABLE"];
+        for sig in &sql_signatures {
+            if query.windows(sig.len()).any(|window| window.eq_ignore_ascii_case(sig)) {
+                self.vulnerabilities_found.fetch_add(1, Ordering::SeqCst);
+                return true; // SQL injection vulnerability detected!
+            }
+        }
+        false
+    }
+}
+
+impl Default for KaliSqlmapInjectionAuditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// John the Ripper-inspired offline password hash cracking analyzer
+pub struct KaliJohnTheRipperCracker {
+    pub total_hashes_processed: AtomicUsize,
+    pub cracked_hashes_count: AtomicUsize,
+}
+
+impl KaliJohnTheRipperCracker {
+    pub fn new() -> Self {
+        Self {
+            total_hashes_processed: AtomicUsize::new(0),
+            cracked_hashes_count: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn attempt_dictionary_attack(&self, target_hash: &[u8; 16], dictionary: &[[u8; 16]]) -> Option<usize> {
+        self.total_hashes_processed.fetch_add(1, Ordering::SeqCst);
+        for (idx, candidate) in dictionary.iter().enumerate() {
+            if candidate == target_hash {
+                self.cracked_hashes_count.fetch_add(1, Ordering::SeqCst);
+                return Some(idx);
+            }
+        }
+        None
+    }
+}
+
+impl Default for KaliJohnTheRipperCracker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+    #[test]
+    fn test_kali_undercover_mode() {
+        let mut undercover = KaliUndercoverThemeMode::new();
+        assert!(!undercover.is_active);
+        undercover.toggle_undercover(UndercoverDisguiseTheme::Windows11Disguise);
+        assert!(undercover.is_active);
+        assert_eq!(undercover.current_theme, UndercoverDisguiseTheme::Windows11Disguise);
+        undercover.toggle_undercover(UndercoverDisguiseTheme::Windows11Disguise);
+        assert!(!undercover.is_active);
+        assert_eq!(undercover.current_theme, UndercoverDisguiseTheme::StandardKali);
+    }
+
+    #[test]
+    fn test_kali_sqlmap_auditor() {
+        let sqlmap = KaliSqlmapInjectionAuditor::new();
+        assert!(sqlmap.inspect_sql_payload(b"SELECT * FROM users WHERE id = 1 OR '1'='1'"));
+        assert!(!sqlmap.inspect_sql_payload(b"SELECT * FROM users WHERE id = 123"));
+    }
+
+    #[test]
+    fn test_kali_john_the_ripper_cracker() {
+        let john = KaliJohnTheRipperCracker::new();
+        let target = [0xAAu8; 16];
+        let dict = [[0x00u8; 16], [0xAAu8; 16], [0xFFu8; 16]];
+        let found = john.attempt_dictionary_attack(&target, &dict);
+        assert_eq!(found, Some(1));
     }
 
     #[test]

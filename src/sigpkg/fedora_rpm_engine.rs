@@ -2,7 +2,10 @@
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
-#![no_std]
+#[cfg(not(any(test, feature = "standalone_test")))]
+use crate::klib::collections::HashMap;
+#[cfg(any(test, feature = "standalone_test"))]
+use alloc::collections::BTreeMap as HashMap;
 
 extern crate alloc;
 
@@ -825,19 +828,24 @@ impl FedoraAnityaReleaseMonitoringEngine {
         if let Some(record) = self.projects.get_mut(project_name) {
             let is_new = record.current_version != latest_version;
             let old_ver = record.current_version.clone();
+            let proj_id = record.project_id;
+            let proj_name = record.name.clone();
             record.latest_upstream_version = latest_version.to_string();
             record.updated_available = is_new;
             if is_new {
-                let project_id = record.project_id;
-                let name = record.name.clone();
-                let pkgs = vec![
-                    AnityaPackageMapping { distro: "Fedora".to_string(), package_name: name.clone() },
-                    AnityaPackageMapping { distro: "SigmaOS".to_string(), package_name: name.clone() },
-                ];
+                let mut pkgs = Vec::new();
+                pkgs.push(AnityaPackageMapping {
+                    distro: "Fedora".to_string(),
+                    package_name: proj_name.clone(),
+                });
+                pkgs.push(AnityaPackageMapping {
+                    distro: "CentOS".to_string(),
+                    package_name: proj_name.clone(),
+                });
                 self.messaging_bus.publish_version_update(
-                    project_id,
-                    &name,
-                    "pypi/crates/rpm",
+                    proj_id,
+                    &proj_name,
+                    "fedora",
                     &old_ver,
                     latest_version,
                     pkgs,
