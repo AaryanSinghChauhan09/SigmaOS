@@ -6,18 +6,42 @@ This document defines operational guidelines, security policies, and verificatio
 
 ## 1. Core Principles for AI Agents
 
-1. **Zero External Third-Party Dependencies:**
-   - SigmaOS strictly follows a zero-dependency `#![no_std]` design philosophy.
-   - Do NOT add external crates under `[dependencies]` in `Cargo.toml`.
-   - Use `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`) and native `#![no_std]` structures.
-
-2. **Cross-OS Subsystem Interoperability:**
-   - Every security or kernel component must maintain compatibility across Linux and BSD distribution modes (`LinuxArch`, `LinuxDebian`, `LinuxFedora`, `LinuxNix`, `FreeBsd`, `OpenBsd`, `NetBsd`, `DragonFlyBsd`, `SolarisIllumos`, etc.).
-   - Sandboxing rules must bridge Linux Landlock v5 with FreeBSD Capsicum rights (`FreeBsdCapsicumDescriptorDelegate`) and OpenBSD pledge/unveil (`OpenBsdUnveilAuditor`).
-
-3. **Autonomous Verification:**
-   - Always run `./run_sigma_tests.sh` and `pytest` after making modifications.
-   - Individual standalone tests can be compiled and verified using `rustc --edition=2021 --test <file_path>`.
+1. **Zero-Dependency & Self-Containment (`no_std`):**
+   * The kernel core and primary subsystems are designed to target bare-metal targets (`#![no_std]`).
+   * Avoid adding runtime dependencies on standard `std` libraries inside microkernel shard components unless conditionally gated under test environments (`#[cfg(not(target_os = "none"))]`).
+2. **Capability-Based Security Model:**
+   * Never introduce generic root/admin ACL checks. System call access is authorized exclusively via hardware-enforced 64-bit `CapabilityToken` verification gates.
+3. **Windows NT & Distro Parity Standards:**
+   * Hardware drivers must follow the WDM-style `IoManager`, `DriverObject`, `DeviceObject`, and `DeviceExtension` abstractions.
+   * Kernel memory allocations must respect tagged `Paged` (swappable) and `NonPaged` (always resident) memory pool boundaries.
+4. **Bit Table & Hardware Field Standards:**
+   * For bit tables, physical frame allocators, page table entry flags, and capability bitmasks, follow [docs/AGENTS_BIT_TABLE_MANAGEMENT.md](docs/AGENTS_BIT_TABLE_MANAGEMENT.md).
+5. **Cache Memory Optimization & Coherency:**
+   * For L1/L2/L3 cache alignment, false sharing prevention, non-temporal stores, and page/buffer cache management, follow [docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md](docs/AGENTS_CACHE_MEMORY_MANAGEMENT.md).
+6. **Cache Operation & Hardware Controls:**
+   * For explicit CPU cache flushing (`clflushopt`/`clwb`), DMA cache coherency, JIT $I\$/D\$$ cache sync, and memory fences, follow [docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md](docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md).
+7. **Cloud vs. Fog Computing Orchestration:**
+   * For real-time edge processing, P2P mesh discovery, workload offloading cost function, and CRDT synchronization, follow [docs/AGENTS_CLOUD_VS_FOG_MANAGEMENT.md](docs/AGENTS_CLOUD_VS_FOG_MANAGEMENT.md).
+8. **Commercial Operating System Architecture:**
+   * For enterprise licensing tiers, statutory compliance governors, software certification programs, and open-core preservation rules, follow [docs/AGENTS_COMMERCIAL_OPERATION_SYSTEM.md](docs/AGENTS_COMMERCIAL_OPERATION_SYSTEM.md).
+9. **Concurrency & Synchronization Operations:**
+   * For classic concurrency problems (Barbershop, Dining Philosophers, Dekker's), deadlock elimination, RCU/Seqlocks/Futexes, and zero-copy message passing, follow [docs/AGENTS_CONCURRENCY_OPERATION_MANAGEMENT.md](docs/AGENTS_CONCURRENCY_OPERATION_MANAGEMENT.md).
+10. **Concurrent Thread Lifecycle & Stack Management:**
+   * For SystemThread TCBs, hybrid 1:1 / M:N fiber models, context switching, stack guard pages, and work-stealing thread pools, follow [docs/AGENTS_CONCURRENT_THREAD_MANAGEMENT.md](docs/AGENTS_CONCURRENT_THREAD_MANAGEMENT.md).
+11. **Consumable Resource & Depletion Management:**
+   * For entropy pools, energy/power budgets, ephemeral ports, backpressure flow control, and consumable IPC signals, follow [docs/AGENTS_CONSUMABLE_RESOURCE_MANAGEMENT.md](docs/AGENTS_CONSUMABLE_RESOURCE_MANAGEMENT.md).
+12. **Binary Section Operation & W^X Enforcement:**
+   * For ELF/PE section layouts (`.text`, `.rodata`, `.data`, `.bss`, `.got`), page table permission flags, $4\text{ KB}$ alignment, and RELRO lockdown, follow [docs/AGENTS_SECTION_OPERATION_MANAGEMENT.md](docs/AGENTS_SECTION_OPERATION_MANAGEMENT.md).
+13. **Disk Operation & Block I/O Schedulers:**
+   * For Kyber/BFQ/mq-deadline I/O schedulers, NVMe SQ/CQ multi-queue ring buffers, AHCI SATA PRDT tables, and TRIM/Deallocate discard commands, follow [docs/AGENTS_DISK_OPERATION_MANAGEMENT.md](docs/AGENTS_DISK_OPERATION_MANAGEMENT.md).
+14. **Zombie Process Harvesting & Orphan Adoption:**
+   * For POSIX `waitpid()` collection (`WNOHANG`), Init PID 1 orphan reaper loops, two-stage resource reclamation, and PCB table leak prevention, follow [docs/AGENTS_ZOMBIE_SYSTEMS_OPERATION_MANAGEMENT.md](docs/AGENTS_ZOMBIE_SYSTEMS_OPERATION_MANAGEMENT.md).
+15. **Reducing C++ Dependency & Rust-First Migration:**
+   * For migrating legacy C++ sources (`.cpp`/`.hpp`) to zero-dependency `#![no_std]` Rust modules and C-ABI FFI shims (`extern "C"`), follow [docs/AGENTS_REDUCING_CPP_DEPENDENCY.md](docs/AGENTS_REDUCING_CPP_DEPENDENCY.md).
+16. **Multi-Architecture Hardware HAL Support:**
+   * For multi-target HAL traits (`PlatformHAL`), interrupt domain routing (APIC/GIC/PLIC/ExtIOI), and multi-arch CPU dispatches (x86_64, x86_32, AArch64, AArch32, RISC-V 64/32, LoongArch64, PPC64LE), follow [docs/AGENTS_MULTI_ARCHITECTURE_SUPPORT.md](docs/AGENTS_MULTI_ARCHITECTURE_SUPPORT.md).
+17. **Linux & BSD Distribution Parity Guidelines:**
+   * For FreeBSD Capsicum/jails/netmap, OpenBSD pledge/unveil/signify, NetBSD Rump kernels, DragonFly HAMMER2, NixOS declarative flakes, and universal package transpilation, follow [docs/AGENTS_DISTRO_PARITY_GUIDELINES.md](docs/AGENTS_DISTRO_PARITY_GUIDELINES.md).
 
 ---
 

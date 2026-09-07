@@ -22,6 +22,7 @@ pub use zsh_bash_parity::{
     WildcardGlobMatcher, ZshSyntaxHighlighter,
 };
 pub use alias_system::{AliasManager, AliasType, SigmaAlias};
+pub mod zsh_bash_parity;
 pub use command::{
     CommandError, CommandParser, CommandRegistry, ShellCommand, ShellSession,
     SimpleCommandRegistry, SimpleShellSession,

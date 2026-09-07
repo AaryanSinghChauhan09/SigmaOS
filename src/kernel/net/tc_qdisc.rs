@@ -19,9 +19,9 @@ use std::vec::Vec;
 
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
 /// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel
-extern crate alloc;
 use alloc::collections::VecDeque;
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// A network packet in the qdisc layer (simplified)
