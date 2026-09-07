@@ -780,7 +780,150 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
-#[cfg(test)]
+
+
+// ============================================================================
+// Arch Linux Parity Engines: devtools, pkgctl, archweb, archinstall, arch-wiki
+// ============================================================================
+
+/// Arch Linux devtools Cleanroom Chroot Build Engine
+#[derive(Debug, Clone)]
+pub struct ArchChrootProfile {
+    pub target: String,
+    pub chroot_dir: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ArchCdevtoolsEngine {
+    pub profiles: Vec<ArchChrootProfile>,
+}
+
+impl ArchCdevtoolsEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { profiles: Vec::new() };
+        engine.profiles.push(ArchChrootProfile { target: "extra-x86_64-build".to_string(), chroot_dir: "/var/lib/archbuild/extra-x86_64".to_string() });
+        engine.profiles.push(ArchChrootProfile { target: "multilib-build".to_string(), chroot_dir: "/var/lib/archbuild/multilib".to_string() });
+        engine
+    }
+
+    pub fn build_in_chroot(&self, target: &str, pkg_name: &str) -> Result<String, &'static str> {
+        if let Some(prof) = self.profiles.iter().find(|p| p.target == target) {
+            Ok(format!("arch-nspawn {}/root pacman -Syu && build {}", prof.chroot_dir, pkg_name))
+        } else {
+            Err("ArchCdevtoolsEngine: Unknown build target profile")
+        }
+    }
+}
+
+/// Arch Linux pkgctl Packaging & Git Repo Engine
+#[derive(Debug, Clone)]
+pub struct ArchPkgctlEngine {
+    pub active_repos: Vec<String>,
+}
+
+impl ArchPkgctlEngine {
+    pub fn new() -> Self {
+        Self { active_repos: Vec::new() }
+    }
+
+    pub fn clone_pkg_repo(&mut self, pkg_name: &str) -> String {
+        let repo = format!("https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git", pkg_name);
+        self.active_repos.push(pkg_name.to_string());
+        repo
+    }
+
+    pub fn release_package(&self, pkg_name: &str, tag: &str) -> String {
+        format!("pkgctl release --pkg {} --tag {}", pkg_name, tag)
+    }
+}
+
+/// Arch Linux archweb Package Search Portal
+#[derive(Debug, Clone)]
+pub struct ArchwebEntry {
+    pub pkgname: String,
+    pub repo: String,
+    pub maintainer: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ArchArchwebEngine {
+    pub entries: Vec<ArchwebEntry>,
+}
+
+impl ArchArchwebEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { entries: Vec::new() };
+        engine.entries.push(ArchwebEntry { pkgname: "linux".to_string(), repo: "core".to_string(), maintainer: "arch-kernel".to_string() });
+        engine.entries.push(ArchwebEntry { pkgname: "pacman".to_string(), repo: "core".to_string(), maintainer: "arch-pacman".to_string() });
+        engine
+    }
+
+    pub fn search(&self, pkg_name: &str) -> Vec<&ArchwebEntry> {
+        self.entries.iter().filter(|e| e.pkgname.contains(pkg_name)).collect()
+    }
+}
+
+/// Arch Linux archinstall Automated Declarative Installer Engine
+#[derive(Debug, Clone)]
+pub struct ArchinstallConfig {
+    pub disk_path: String,
+    pub profile: String,
+    pub username: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ArchArchinstallEngine {
+    pub config: Option<ArchinstallConfig>,
+}
+
+impl ArchArchinstallEngine {
+    pub fn new() -> Self {
+        Self { config: None }
+    }
+
+    pub fn set_config(&mut self, disk: &str, profile: &str, user: &str) {
+        self.config = Some(ArchinstallConfig {
+            disk_path: disk.to_string(),
+            profile: profile.to_string(),
+            username: user.to_string(),
+        });
+    }
+
+    pub fn execute_installation(&self) -> Result<String, &'static str> {
+        if let Some(cfg) = &self.config {
+            Ok(format!("archinstall --disk {} --profile {} --user {}", cfg.disk_path, cfg.profile, cfg.username))
+        } else {
+            Err("Archinstall: Missing configuration")
+        }
+    }
+}
+
+/// Arch Linux arch-wiki-docs Offline Search Engine
+#[derive(Debug, Clone)]
+pub struct WikiArticle {
+    pub title: String,
+    pub content: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ArchWikiOfflineEngine {
+    pub articles: Vec<WikiArticle>,
+}
+
+impl ArchWikiOfflineEngine {
+    pub fn new() -> Self {
+        let mut wiki = Self { articles: Vec::new() };
+        wiki.articles.push(WikiArticle { title: "Arch_Linux".to_string(), content: "Arch Linux is an x86-64 general-purpose Linux distribution.".to_string() });
+        wiki.articles.push(WikiArticle { title: "Pacman".to_string(), content: "Pacman is the package manager for Arch Linux.".to_string() });
+        wiki
+    }
+
+    pub fn search(&self, query: &str) -> Vec<&WikiArticle> {
+        let q = query.to_lowercase();
+        self.articles.iter().filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)).collect()
+    }
+}
+
 mod tests {
     #[test]
     fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
