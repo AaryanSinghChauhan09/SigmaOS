@@ -69,14 +69,18 @@ This file provides instructions and guidelines for AI coding agents (Sentinel, P
 * **Demand Techniques Guide:** Adhere to `docs/AGENTS_DEMAND_TECHNIQUES_MANAGEMENT_GUIDE.md` for demand paging and swapping (`DemandPagingSwapEngine`), Copy-on-Write page duplication, on-demand GPU offloading (`NvidiaOnDemand`), and loopback module mounting.
 * **Zeroed Frame Allocations:** Always return zeroed physical frames on demand anonymous fault handling.
 
-## 15. Task Assignment & Governance Directives
+## 15. Aborting Processes Directives
+* **Aborting Processes Guide:** Adhere to `docs/AGENTS_ABORTING_PROCESSES_MANAGEMENT_GUIDE.md` for fatal signal process aborts (`abort_process` in `src/process/advanced_process_control.rs`), core dump metadata capturing, orphan process reparenting to init (PID 1), and IPC channel cleanup.
+* **No Kernel Panics:** Ensure userland process aborts perform clean termination without triggering kernel panics.
+
+## 16. Task Assignment & Governance Directives
 * **Assignment Guide:** Follow `docs/AGENTS_ASSIGNMENT_MANAGEMENT_GUIDE.md` for task routing, triage protocols, subagent delegation rules, and submission criteria.
 * **Persona Routing:** Route security tasks to **Sentinel**, UI/a11y to **Palette**, performance to **Bolt**, and distro infrastructure to **Jules**.
 
-## 16. Information Management & Knowledge Base Directives
+## 17. Information Management & Knowledge Base Directives
 * **Information Guide:** Adhere to `docs/AGENTS_INFORMATION_MANAGEMENT_GUIDE.md` for knowledgebase lookup protocols, memory recording requirements, and context prioritization (User Directives > Source Code State > Memory Context).
 * **Memory Recording:** Always call `initiate_memory_recording` before completing a task or submitting code.
 
-## 17. Documentation & Wiki Alignment
+## 18. Documentation & Wiki Alignment
 * **In-Tree Troff Man Pages:** Keep `docs/man/man1/` and `docs/man/man8/` troff manual pages up to date when modifying commands or system utilities.
 * **Wiki Sync Utility:** Run `./scripts/sync_wiki.sh` after updating documentation assets to synchronize files across `WIKI/`, `wiki/`, and `wiki_repo/`.

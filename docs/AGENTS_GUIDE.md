@@ -55,7 +55,12 @@ When managing telemetry, visual dashboards, or privacy/compliance scores:
 When managing demand paging, Copy-on-Write, or dynamic GPU offloading:
 * Refer to `docs/AGENTS_DEMAND_TECHNIQUES_MANAGEMENT_GUIDE.md` for `DemandPagingSwapEngine` fault handling, zeroed frame allocations, and `NvidiaOnDemand` GPU offload profiles.
 
-## 10. Development Workflow & Verification Protocol
+## 10. Process Abort & Core Dump Management
+
+When handling process aborts, fatal signals, or core dumps:
+* Refer to `docs/AGENTS_ABORTING_PROCESSES_MANAGEMENT_GUIDE.md` for `abort_process` isolation rules, core dump metadata generation, and orphan child reparenting.
+
+## 11. Development Workflow & Verification Protocol
 
 1. **Pre-Flight Verification:** Run `./run_sigma_tests.sh` to establish baseline test status.
 2. **Implementation:** Modify source files in `src/`, adding companion unit tests in `#[cfg(test)] mod tests` blocks.
