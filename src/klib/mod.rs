@@ -63,3 +63,5 @@ pub use json::{SovereignJsonParser, SovereignJsonValue};
 pub use path::PathBuf;
 pub use string::SigmaString;
 pub use alloc::string::{String, ToString};
+pub mod zero_dependency_elimination;
+pub use zero_dependency_elimination::*;
