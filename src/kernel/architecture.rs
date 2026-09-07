@@ -1,5 +1,18 @@
+// SigmaOS Kernel Architecture Module - Multi-arch support (x86, x64, ARM, RISC-V, CISC/RISC)
+// Inspired by Linux/BSD multi-architecture kernel design patterns
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::String;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
 use std::string::String;
+#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 // 1. Instructions and CPU Initialization
 

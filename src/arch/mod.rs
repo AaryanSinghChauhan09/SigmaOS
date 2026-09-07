@@ -26,3 +26,5 @@ pub use arm_bx_formats::{
     ArmBxBranchExchangeDecoder, ArmExecutionState, BranchExchangeType, DecodedBxInstruction,
     DataEndianness, SovereignBytecodeEncryptor, SovereignDataWordFormatter, WordWidth,
 };
+pub mod sovereign_multiarch_hal;
+pub use sovereign_multiarch_hal::*;
