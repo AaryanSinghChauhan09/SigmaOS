@@ -5,6 +5,7 @@
 pub mod community;
 pub mod governance;
 pub mod accessibility;
+pub mod access;
 pub mod ai;
 pub mod app;
 pub mod auth;
@@ -48,8 +49,6 @@ pub use process::{
     SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
     WNOHANG, WUNTRACED,
 };
-pub mod access;
-pub mod community;
 pub mod open_source_os_gap_closure;
 pub mod tools;
 pub use open_source_os_gap_closure::*;

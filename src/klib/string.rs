@@ -9,9 +9,15 @@
 #![allow(clippy::type_complexity)]
 use core::fmt;
 use core::ops::{Deref, DerefMut};
-use std::string::{String, ToString};
 // Custom string implementation for SigmaOS
 // This module provides no_std alternatives to std::string and reduces dependency on predefined functions
+// Use alloc for no_std kernel kernel compatibility
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
 
 use super::vec::SigmaVec;
 
