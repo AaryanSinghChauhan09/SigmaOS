@@ -3257,11 +3257,7 @@ impl OpenSourceProjectSupremacySuite {
 
     /// FreeBSD: Throttle RACCT/RCTL process resource usage
     pub fn throttle_racct_resource(&mut self, pid: u32, cpu_limit_pct: u32) -> bool {
-        if pid == 0 || cpu_limit_pct > 100 {
-            false
-        } else {
-            true
-        }
+        pid > 0 && cpu_limit_pct <= 100
     }
 
     /// Linux: Process eBPF XDP zero-copy network packet
@@ -3282,21 +3278,6 @@ impl OpenSourceProjectSupremacySuite {
         }
         self.runit_services.insert(service_name.to_string(), 1);
         true
-    }
-
-    /// Throttle FreeBSD racct / cgroups v2 process resource consumption
-    pub fn throttle_racct_resource(&self, pid: u32, limit_pct: u8) -> bool {
-        pid > 0 && limit_pct <= 100
-    }
-
-    /// Process XDP zero-copy packet buffer
-    pub fn process_xdp_zero_copy_packet(&self, pkt_len: usize) -> bool {
-        (64..=9000).contains(&pkt_len)
-    }
-
-    /// Scrub FreeBSD ZFS / Btrfs tiered storage extents
-    pub fn scrub_tiered_storage_extent(&self, extent_id: u64) -> bool {
-        extent_id > 0
     }
 
     /// Evaluates overall open-source project supremacy parity status
