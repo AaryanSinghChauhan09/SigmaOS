@@ -55,6 +55,16 @@ pub mod unimplemented_tools;
 pub mod userland;
 
 pub use distro::{
+    distro_inspiration_engine::{
+        AlpineLbuApkOverlayEngine, ApkovlCommit, ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine,
+        DragonFlyHammer2ClusterEngine, FreeBsdZfsArcGeomEngine, GenerationRecord, Hammer2DedupEntry,
+        IsaLevel, MuslLightweightInitEngine, MuslStaticService,
+        NixOsDeclarativeStateReconciliationEngine, NixOsPureStoreDerivationEngine,
+        OpenBsdStatefulPacketFilterEngine, OpenWrtUciSqmRouterEngine, PaxSecurityLevel, PfProtocol,
+        PfStateEntry, PortageUseFlag, PortageUseFlagGovernor, QubeDomainType,
+        QubesHardenedBsdSecurityGuard, RunitStage, ServiceRunState, SqmAlgorithm, StoreDerivationPath,
+        UciSection, UseFlagState, VoidRunitStageController,
+    },
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
@@ -71,7 +81,13 @@ pub use distro::{
     ZramCompressionAlgorithm, DebianMultiarchAptEngine, EndeavourReflectorMirrorRanker,
     FreeBsdZfsBootEnvManager, GarudaDracutBtrfsSnapper, GarudaPerformanceTweakEngine,
     HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, NixOsFlakeProfileManager,
-    OpenBsdDoasPrivilegeManager, SolusEopkgBudgieEngine,
+    OpenBsdDoasPrivilegeManager, SolusEopkgBudgieEngine, BodhiUpdateRecord, BodhiUpdateStatus,
+    ManjaroBranch, ManjaroBranchManager, ManjaroTimeshiftAutoSnap, MhwdKernelDriverAutobuilder,
+    PackageSearchResult, PamacUnifiedSearchEngine, PrimeOffloadMode, SearchResultBackend,
+    ManjaroSnapshotMode, TimeshiftSnapshot,
+    FedoraBodhiUpdateEngine, FedoraIgnitionProvisionEngine, FedoraKojiDistGitBuilder,
+    FedoraRpmOstreeEngine, IgnitionFile, IgnitionUnit, KojiBuildTask, OstreeDeploymentPin,
+    FedoraTargetArchitecture,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
     OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
 };
