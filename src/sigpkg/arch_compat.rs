@@ -6,7 +6,6 @@
 extern crate alloc;
 use crate::klib::collections::HashMap;
 use crate::klib;
-use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

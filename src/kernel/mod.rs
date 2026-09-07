@@ -39,9 +39,6 @@ pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
 pub mod traits;
-pub mod gap_closing;
-pub mod generation_manager;
-pub mod atomic_extended;
 
 pub use architecture::*;
 pub use bus::*;
@@ -77,7 +74,6 @@ pub mod vmm_paging;
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-pub use io_uring::{IoUringEngine, IoUringOpcode, SubmissionQueueEntry, CompletionQueueEntry};
 pub use linux_bsd_innovations::{
     ArchUserRepoManager, BsdPfStateTable, PfFiveTuple, PfStateEntry,
     LinuxFutexEngine, FutexOp, FutexWaiter, FreeBsdVfsNullfs, NullfsLayerNode,

@@ -6,7 +6,6 @@ use core::ops::{Deref, DerefMut};
 use core::slice;
 use core::str;
 use core::fmt;
-use super::vec::SigmaVec;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

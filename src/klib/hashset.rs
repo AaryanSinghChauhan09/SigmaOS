@@ -4,7 +4,6 @@
 
 use super::BTreeMap;
 use super::btreemap::BTreeMapIter;
-use super::hashmap::BTreeMapIter;
 
 pub struct HashSet<T>
 where
