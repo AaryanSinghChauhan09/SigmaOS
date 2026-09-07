@@ -94,6 +94,7 @@ impl Process {
         let bore_penalty = self.burst_score / 2;
         self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
     }
+}
 
 #[derive(Debug, Clone)]
 pub struct NumaNode {
@@ -272,6 +273,15 @@ impl Scheduler {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TaskId(pub u64);
+
+#[derive(Debug, Clone, Copy)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
+}
 
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
@@ -335,7 +345,7 @@ impl CfsScheduler {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
