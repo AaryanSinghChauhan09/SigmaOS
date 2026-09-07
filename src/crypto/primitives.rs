@@ -371,7 +371,7 @@ pub fn random_bytes(buf: &mut [u8]) {
     static mut RNG: Option<XorshiftRNG> = None;
 
     unsafe {
-        if RNG.is_none() {
+        if (*&raw mut RNG).is_none() {
             // Enhanced entropy collection with multiple sources
             let mut seed = 0u64;
 
@@ -382,7 +382,7 @@ pub fn random_bytes(buf: &mut [u8]) {
             }
 
             // 2. Dynamic pointer-derived ASLR context mixing
-            let aslr_ptr = &RNG as *const _ as usize as u64;
+            let aslr_ptr = &raw const RNG as usize as u64;
             seed ^= aslr_ptr;
 
             // 3. Stack address entropy
