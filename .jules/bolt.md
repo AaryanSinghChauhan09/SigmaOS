@@ -21,3 +21,7 @@
 ## 2026-09-06 - `ptr::copy` Over `ptr::copy_nonoverlapping` for Intra-Collection Element Shifts
 **Learning:** When shifting trailing elements left or right within the same array allocation (e.g. during `Vec::insert`, `Vec::remove`, `Drain::drop`, or `SigmaString::remove`), the source and destination slice ranges overlap. Using `copy_nonoverlapping` violates `unsafe` preconditions and triggers a UB panic. Using `core::ptr::copy` (which emits a `memmove` intrinsic) handles overlapping memory ranges safely while converting $O(N)$ loop overhead into a single bulk SIMD block shift.
 **Action:** When shifting elements within the same contiguous buffer allocation, always use `core::ptr::copy` instead of `copy_nonoverlapping` or element-by-element loops.
+
+## 2026-09-07 - In-Place Mutation and Buffer Reuse in Bounded Cache Engines
+**Learning:** Updating cached key-value entries in a bounded vector cache by executing `retain(|e| e.key != key)` followed by `push(CacheEntry)` forces $O(N)$ element shifts, drops existing entry buffers, and allocates new heap memory for `String` and `Vec<u8>`. Finding the existing entry via `iter_mut().find()` and mutating its `Vec<u8>` value in place (via `clear()` and `extend_from_slice()`) re-uses existing heap buffer capacities, avoiding memory allocations and vector re-indexing on key updates.
+**Action:** When updating existing entries in collection-backed caching layers, prefer in-place buffer mutation (`clear()` + `extend_from_slice()`) over remove-and-push patterns.

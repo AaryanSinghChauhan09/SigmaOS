@@ -878,8 +878,16 @@ impl SovereignCacheEngine {
 
     pub fn set(&mut self, key: &str, value: &[u8], ttl_secs: u64) {
         self.current_tick += 1;
-        // Remove existing key if present to allow update
-        self.entries.retain(|e| e.key != key);
+
+        // Bolt performance optimization: mutate existing cache entry in place
+        // Re-uses key String and value Vec buffers to eliminate heap re-allocations and element shifts
+        if let Some(entry) = self.entries.iter_mut().find(|e| e.key == key) {
+            entry.value.clear();
+            entry.value.extend_from_slice(value);
+            entry.ttl_secs = ttl_secs;
+            entry.last_access_tick = self.current_tick;
+            return;
+        }
 
         if self.entries.len() >= self.capacity {
             let lru_idx = self
