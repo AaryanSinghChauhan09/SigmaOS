@@ -60,10 +60,12 @@ impl Version {
         }
     }
     pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let mut parts = s.split('.');
-        let major = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
-        let minor = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
-        let patch = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        let clean: String = s.chars().map(|c| if c.is_ascii_digit() || c == '.' { c } else { ' ' }).collect();
+        let first_num = clean.split_whitespace().next().unwrap_or("1.0.0");
+        let parts: Vec<&str> = first_num.split('.').collect();
+        let major = parts.get(0).and_then(|p| p.parse().ok()).unwrap_or(1);
+        let minor = parts.get(1).and_then(|p| p.parse().ok()).unwrap_or(0);
+        let patch = parts.get(2).and_then(|p| p.parse().ok()).unwrap_or(0);
         Ok(Self::new(major, minor, patch))
     }
 }
