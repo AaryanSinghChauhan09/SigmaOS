@@ -54,7 +54,7 @@ When high-priority real-time threads wait on condition variables held by lower-p
 
 ---
 
-## 4. AI Agent Operational Rules
+## 4. AI Agent Operational Guidelines
 
 1. **Bolt ⚡ (Performance)**: Use `signal()` over `broadcast()` when only a single worker thread can process the available item to avoid thundering herd contention on the mutex.
 2. **Palette 🎨 (UX & Interactivity)**: Ensure UI rendering and desktop event loops use `wait_timeout()` with non-blocking UI state updates to prevent frame drops.

@@ -3257,7 +3257,6 @@ impl OpenSourceProjectSupremacySuite {
 
     /// Linux: Process eBPF XDP zero-copy network packet
     pub fn process_xdp_zero_copy_packet(&mut self, packet_len_bytes: usize) -> bool {
-        // MTU boundaries check (64 to 9000 bytes)
         (64..=9000).contains(&packet_len_bytes)
     }
 

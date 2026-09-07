@@ -11,6 +11,7 @@ This specification establishes the single master blueprint for:
 1. **Tri-Agent Framework Deployment**: Full integration of **Bolt ⚡** (Performance), **Palette 🎨** (UX/Accessibility), and **Sentinel 🛡️** (Security) philosophies, daily processes, boundaries, coding standards, favorite patterns, and critical journal learnings.
 2. **500+ Repository Absorption Catalog**: Comprehensive classification of over 500 top-tier open-source GitHub repositories across 32 domain categories, identifying exact algorithms, features, UI/UX, and security primitives to integrate.
 3. **Architectural Blueprints**: Technical strategies in Rust (`src/klib/`, `src/kernel/`, `src/package/`, `src/security/`, `src/ui/`, `src/integration/`, `src/container/`), zero-dependency decoupling, BSD/Parrot OS security parity, India Stack Professional Toolkits, and execution timelines.
+4. **Strategy to Surpass Linux Distros**: Radical differentiation protocols, firmware-free drivers, cluster-native resource pooling, and HTML dependency reduction policy.
 
 ---
 
