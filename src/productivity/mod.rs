@@ -33,4 +33,3 @@ pub use mint_competitor::{
     NvidiaPrimeTelemetry, OffloadCommand, SovereignDriverManager, SovereignNvidiaPrimeEngine,
     SovereignSoftwareStore, SovereignUpdateManager,
 };
-pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};

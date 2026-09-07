@@ -24,15 +24,6 @@ pub enum ThreadState {
     Terminated,
 }
 
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86_32,
-    X86_64,
-    AArch64,
-    RiscV32,
-    RiscV64,
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptClass {
