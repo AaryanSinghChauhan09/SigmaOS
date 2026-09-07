@@ -3063,6 +3063,58 @@ mod tests {
             adapter.detect_format_by_extension("recipe.cports"),
             Some(PackageFormat::Cports)
         );
+        assert_eq!(
+            adapter.detect_format_by_extension("router.ipk"),
+            Some(PackageFormat::Ipk)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("yocto.opkg"),
+            Some(PackageFormat::Opkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("solaris.p5p"),
+            Some(PackageFormat::SolarisIps)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("store.nar"),
+            Some(PackageFormat::GuixNar)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("base.openbsd.tgz"),
+            Some(PackageFormat::OpenBsdPkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("hpc.spack"),
+            Some(PackageFormat::Spack)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("cpp.conan"),
+            Some(PackageFormat::Conan)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("python.whl"),
+            Some(PackageFormat::Wheel)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("rust.crate"),
+            Some(PackageFormat::Crate)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("ruby.gem"),
+            Some(PackageFormat::Gem)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("dotnet.nupkg"),
+            Some(PackageFormat::Nupkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("ms.vcpkg"),
+            Some(PackageFormat::Vcpkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("nix.narinfo"),
+            Some(PackageFormat::NarInfo)
+        );
 
         // Check format detection by header signature magic
         assert_eq!(
@@ -3100,6 +3152,58 @@ mod tests {
         assert_eq!(
             adapter.detect_format_by_header(b"SPKG0001header"),
             Some(PackageFormat::Sovereign)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"IPK!hdr"),
+            Some(PackageFormat::Ipk)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"OPKGhdr"),
+            Some(PackageFormat::Opkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"P5P!hdr"),
+            Some(PackageFormat::SolarisIps)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NARShdr"),
+            Some(PackageFormat::GuixNar)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"OBSDhdr"),
+            Some(PackageFormat::OpenBsdPkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"SPAKhdr"),
+            Some(PackageFormat::Spack)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"CONAhdr"),
+            Some(PackageFormat::Conan)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"WHELhdr"),
+            Some(PackageFormat::Wheel)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"CRAThdr"),
+            Some(PackageFormat::Crate)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"GEMShdr"),
+            Some(PackageFormat::Gem)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NUPKhdr"),
+            Some(PackageFormat::Nupkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"VCPKhdr"),
+            Some(PackageFormat::Vcpkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NARIhdr"),
+            Some(PackageFormat::NarInfo)
         );
     }
 
