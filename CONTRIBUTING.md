@@ -73,3 +73,12 @@ Thank you for your interest in contributing to SigmaOS! SigmaOS is a sovereign, 
 ---
 
 *Thank you for helping build a sovereign, resilient, and ultra-modular operating system with SigmaOS!*
+
+---
+
+## 📜 Contributor Charter & Governance Principles
+All contributions to SigmaOS must uphold the core principles defined in the **SigmaOS Contributor Charter** (`docs/GOVERNANCE_CHARTER.md`):
+- **Sovereignty**: Code contributions must remain transparent and free of closed proprietary vendor lock-in.
+- **Clarity**: Architecture, code structure, and documentation must be explicit and self-documenting.
+- **Resilience**: Every modification must preserve $O(1)$ state rollback safety and fault tolerance.
+- **Security**: Non-negotiable Safe-Rust memory safety, Post-Quantum Cryptography (Dilithium-5/Kyber), and capability sandboxing (`pledge`/`unveil`).
