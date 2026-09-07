@@ -23,4 +23,4 @@ jobs:
           toolchain: stable
 
       - name: Run Clear Linux Unit Tests
-        run: mkdir -p build && rustc --test src/distro/clear_linux.rs --edition=2021 -o build/clear_linux_test && ./build/clear_linux_test
+        run: mkdir -p build && rustc --test src/distro/missing_distro_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/clear_linux_test && ./build/clear_linux_test
