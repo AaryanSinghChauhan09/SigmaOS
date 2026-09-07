@@ -136,7 +136,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
-
     - name: Download build artifacts
       uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
 
@@ -268,7 +267,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
-
     - name: Download build artifacts
       uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
 
@@ -338,7 +336,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
-
     - name: Install cargo-audit
       run: cargo install cargo-audit --locked
 
@@ -368,7 +365,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-
 
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af
