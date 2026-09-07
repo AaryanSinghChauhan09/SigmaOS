@@ -411,7 +411,7 @@ fn test_all_prompt_package_formats() {
 }
 
 #[test]
-fn test_all_prompt_package_formats() {
+fn test_all_prompt_package_formats_extended() {
     use universal_adapter::UniversalPackageAdapter;
     use universal_adapter::universal_oop_system::PackageFormat;
 

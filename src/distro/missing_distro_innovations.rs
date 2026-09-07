@@ -1843,6 +1843,7 @@ pub struct AppArmorRuleProfile {
 }
 
 pub type AppArmorPathProfile = AppArmorRuleProfile;
+pub type AppArmorProfile = AppArmorRuleProfile;
 
 pub struct AppArmorPathRuleEngine {
     pub profiles: BTreeMap<String, AppArmorPathProfile>,
