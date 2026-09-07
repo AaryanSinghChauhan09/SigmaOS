@@ -2699,6 +2699,485 @@ impl Default for FedoraDnf5AdvisorySecurityEngine {
     }
 }
 
+// =========================================================================
+// 37. Debian / Ubuntu apt-listchanges Changelog & News Inspector Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ChangelogUrgency {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChangelogNewsItem {
+    pub package_name: String,
+    pub version: String,
+    pub urgency: ChangelogUrgency,
+    pub summary: String,
+    pub full_news_text: String,
+}
+
+pub struct AptListChangesChangelogAuditorEngine {
+    pub news_db: Vec<ChangelogNewsItem>,
+    pub min_alert_urgency: ChangelogUrgency,
+}
+
+impl AptListChangesChangelogAuditorEngine {
+    pub fn new() -> Self {
+        Self {
+            news_db: Vec::new(),
+            min_alert_urgency: ChangelogUrgency::High,
+        }
+    }
+
+    pub fn add_news_item(&mut self, item: ChangelogNewsItem) {
+        self.news_db.push(item);
+    }
+
+    pub fn inspect_package_updates(&self, package_name: &str) -> Vec<ChangelogNewsItem> {
+        self.news_db
+            .iter()
+            .filter(|n| n.package_name == package_name)
+            .cloned()
+            .collect()
+    }
+
+    pub fn has_breaking_news(&self, package_name: &str) -> (bool, Vec<String>) {
+        let items = self.inspect_package_updates(package_name);
+        let mut warnings = Vec::new();
+        let mut breaking = false;
+
+        for item in items {
+            if item.urgency >= self.min_alert_urgency {
+                breaking = true;
+                warnings.push(format!(
+                    "[{:?}] {}: {}",
+                    item.urgency, item.version, item.summary
+                ));
+            }
+        }
+        (breaking, warnings)
+    }
+}
+
+impl Default for AptListChangesChangelogAuditorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 38. Arch Linux pacdiff / pacnew Configuration Drift & 3-Way Merger Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConfigDriftStatus {
+    PacnewPending,
+    PacsavePending,
+    Merged,
+    KeptOriginal,
+    Overwritten,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ConfigDriftRecord {
+    pub target_file: String,
+    pub pacnew_path: String,
+    pub status: ConfigDriftStatus,
+    pub base_content: String,
+    pub current_content: String,
+    pub new_content: String,
+}
+
+pub struct PacdiffConfigMergeGovernorEngine {
+    pub drift_records: BTreeMap<String, ConfigDriftRecord>,
+}
+
+impl PacdiffConfigMergeGovernorEngine {
+    pub fn new() -> Self {
+        Self {
+            drift_records: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_drift(&mut self, record: ConfigDriftRecord) {
+        self.drift_records.insert(record.target_file.clone(), record);
+    }
+
+    pub fn scan_pending_pacnew(&self) -> Vec<String> {
+        self.drift_records
+            .values()
+            .filter(|r| r.status == ConfigDriftStatus::PacnewPending)
+            .map(|r| r.target_file.clone())
+            .collect()
+    }
+
+    pub fn perform_3way_merge(&mut self, target_file: &str) -> Result<String, &'static str> {
+        let record = self
+            .drift_records
+            .get_mut(target_file)
+            .ok_or("Config drift record not found")?;
+
+        let merged = format!(
+            "# Merged config for {}\n# Current:\n{}\n# New:\n{}",
+            target_file, record.current_content, record.new_content
+        );
+
+        record.status = ConfigDriftStatus::Merged;
+        Ok(merged)
+    }
+}
+
+impl Default for PacdiffConfigMergeGovernorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 39. Gentoo Portage etc-update & Git Configuration Backup Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EtcUpdateItem {
+    pub target_file: String,
+    pub update_source_file: String,
+    pub package_owner: String,
+    pub timestamp_sec: u64,
+}
+
+pub struct PortageEtcUpdateGitOverlayEngine {
+    pub pending_updates: BTreeMap<String, EtcUpdateItem>,
+    pub git_backups: Vec<String>,
+}
+
+impl PortageEtcUpdateGitOverlayEngine {
+    pub fn new() -> Self {
+        Self {
+            pending_updates: BTreeMap::new(),
+            git_backups: Vec::new(),
+        }
+    }
+
+    pub fn register_etc_update(&mut self, item: EtcUpdateItem) {
+        self.pending_updates.insert(item.target_file.clone(), item);
+    }
+
+    pub fn create_git_snapshot(&mut self, file_path: &str, content: &str) -> String {
+        let commit_sha = format!("sha_{}_{}", file_path.len(), content.len());
+        self.git_backups.push(commit_sha.clone());
+        commit_sha
+    }
+
+    pub fn apply_update(&mut self, target_file: &str) -> Result<bool, &'static str> {
+        if self.pending_updates.remove(target_file).is_some() {
+            Ok(true)
+        } else {
+            Err("No pending etc-update for file")
+        }
+    }
+}
+
+impl Default for PortageEtcUpdateGitOverlayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 40. Void / Debian System Alternatives Symlink Governor Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlternativeProvider {
+    pub provider_name: String,
+    pub binary_path: String,
+    pub priority: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlternativeGroup {
+    pub group_name: String, // e.g. "editor", "cc"
+    pub symlink_path: String,
+    pub auto_mode: bool,
+    pub selected_provider: Option<String>,
+    pub providers: Vec<AlternativeProvider>,
+}
+
+pub struct XbpsDebianAlternativesGovernorEngine {
+    pub groups: BTreeMap<String, AlternativeGroup>,
+}
+
+impl XbpsDebianAlternativesGovernorEngine {
+    pub fn new() -> Self {
+        Self {
+            groups: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_group(&mut self, group_name: &str, symlink_path: &str) {
+        self.groups.insert(
+            group_name.to_string(),
+            AlternativeGroup {
+                group_name: group_name.to_string(),
+                symlink_path: symlink_path.to_string(),
+                auto_mode: true,
+                selected_provider: None,
+                providers: Vec::new(),
+            },
+        );
+    }
+
+    pub fn register_provider(&mut self, group_name: &str, provider: AlternativeProvider) -> bool {
+        if let Some(group) = self.groups.get_mut(group_name) {
+            group.providers.retain(|p| p.provider_name != provider.provider_name);
+            group.providers.push(provider);
+
+            if group.auto_mode {
+                let best = group.providers.iter().max_by_key(|p| p.priority);
+                if let Some(b) = best {
+                    group.selected_provider = Some(b.provider_name.clone());
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_active_binary_path(&self, group_name: &str) -> Option<String> {
+        let group = self.groups.get(group_name)?;
+        let selected_name = group.selected_provider.as_ref()?;
+        group
+            .providers
+            .iter()
+            .find(|p| &p.provider_name == selected_name)
+            .map(|p| p.binary_path.clone())
+    }
+}
+
+impl Default for XbpsDebianAlternativesGovernorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 41. FreeBSD pkg-message Directive & Post-Install Notifier Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PkgMessageTrigger {
+    Always,
+    Install,
+    Upgrade,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PkgMessageDirective {
+    pub package_name: String,
+    pub trigger: PkgMessageTrigger,
+    pub message: String,
+}
+
+pub struct FreeBsdPkgMessageNotifierEngine {
+    pub directives: Vec<PkgMessageDirective>,
+}
+
+impl FreeBsdPkgMessageNotifierEngine {
+    pub fn new() -> Self {
+        Self {
+            directives: Vec::new(),
+        }
+    }
+
+    pub fn add_directive(&mut self, directive: PkgMessageDirective) {
+        self.directives.push(directive);
+    }
+
+    pub fn collect_messages(&self, package_name: &str, trigger: PkgMessageTrigger) -> Vec<String> {
+        self.directives
+            .iter()
+            .filter(|d| d.package_name == package_name && (d.trigger == PkgMessageTrigger::Always || d.trigger == trigger))
+            .map(|d| d.message.clone())
+            .collect()
+    }
+}
+
+impl Default for FreeBsdPkgMessageNotifierEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 42. OpenBSD Pledge & Unveil Sandboxed Scriptlet Engine
+// =========================================================================
+
+pub struct OpenBsdPledgeUnveilSandboxScriptletEngine {
+    pub unveiled_paths: BTreeMap<String, String>, // path -> permissions e.g. "r", "rw"
+    pub pledged_promises: Vec<String>,
+}
+
+impl OpenBsdPledgeUnveilSandboxScriptletEngine {
+    pub fn new() -> Self {
+        Self {
+            unveiled_paths: BTreeMap::new(),
+            pledged_promises: Vec::new(),
+        }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+    }
+
+    pub fn pledge(&mut self, promises: &[&str]) {
+        for p in promises {
+            if !self.pledged_promises.contains(&p.to_string()) {
+                self.pledged_promises.push(p.to_string());
+            }
+        }
+    }
+
+    pub fn is_path_accessible(&self, path: &str, mode: &str) -> bool {
+        for (unveiled, perms) in &self.unveiled_paths {
+            if path.starts_with(unveiled) && perms.contains(mode) {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn is_promise_permitted(&self, promise: &str) -> bool {
+        self.pledged_promises.contains(&promise.to_string())
+    }
+}
+
+impl Default for OpenBsdPledgeUnveilSandboxScriptletEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 43. Alpine Linux apk-cache Peer Sync & LAN Package Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkCachedPackage {
+    pub package_name: String,
+    pub version: String,
+    pub sha256_checksum: String,
+    pub size_bytes: u64,
+    pub local_path: String,
+}
+
+pub struct AlpineApkCachePeerSyncEngine {
+    pub cache: BTreeMap<String, ApkCachedPackage>,
+    pub known_peers: Vec<String>,
+}
+
+impl AlpineApkCachePeerSyncEngine {
+    pub fn new() -> Self {
+        Self {
+            cache: BTreeMap::new(),
+            known_peers: Vec::new(),
+        }
+    }
+
+    pub fn register_cache(&mut self, pkg: ApkCachedPackage) {
+        self.cache.insert(pkg.package_name.clone(), pkg);
+    }
+
+    pub fn add_peer_node(&mut self, peer_ip: &str) {
+        if !self.known_peers.contains(&peer_ip.to_string()) {
+            self.known_peers.push(peer_ip.to_string());
+        }
+    }
+
+    pub fn verify_integrity(&self, pkg_name: &str, sha256: &str) -> bool {
+        if let Some(pkg) = self.cache.get(pkg_name) {
+            pkg.sha256_checksum.eq_ignore_ascii_case(sha256)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for AlpineApkCachePeerSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 44. Fedora rpm-ostree Layered System Deployment Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OstreeDeploymentSpec {
+    pub commit_hash: String,
+    pub base_version: String,
+    pub layered_packages: Vec<String>,
+    pub is_active_boot: bool,
+}
+
+pub struct RpmOstreeLayeredImageGovernorEngine {
+    pub deployments: Vec<OstreeDeploymentSpec>,
+}
+
+impl RpmOstreeLayeredImageGovernorEngine {
+    pub fn new() -> Self {
+        Self {
+            deployments: Vec::new(),
+        }
+    }
+
+    pub fn create_deployment(&mut self, commit_hash: &str, base_version: &str) -> usize {
+        let is_first = self.deployments.is_empty();
+        self.deployments.push(OstreeDeploymentSpec {
+            commit_hash: commit_hash.to_string(),
+            base_version: base_version.to_string(),
+            layered_packages: Vec::new(),
+            is_active_boot: is_first,
+        });
+        self.deployments.len() - 1
+    }
+
+    pub fn add_layered_package(&mut self, deployment_idx: usize, package_name: &str) -> bool {
+        if let Some(dep) = self.deployments.get_mut(deployment_idx) {
+            if !dep.layered_packages.contains(&package_name.to_string()) {
+                dep.layered_packages.push(package_name.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn rollback_deployment(&mut self) -> Result<String, &'static str> {
+        if self.deployments.len() < 2 {
+            return Err("No prior deployment available for rollback");
+        }
+        let old = self.deployments.pop().unwrap();
+        if let Some(active) = self.deployments.last_mut() {
+            active.is_active_boot = true;
+            Ok(active.commit_hash.clone())
+        } else {
+            Err("Failed to activate previous deployment")
+        }
+    }
+}
+
+impl Default for RpmOstreeLayeredImageGovernorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3402,5 +3881,142 @@ MAINTAINER="SigmaOS"
 
         let (blocked_ok, _) = sec_engine.is_installation_blocked("safe-pkg");
         assert!(!blocked_ok);
+    }
+
+    #[test]
+    fn test_apt_listchanges_changelog_auditor() {
+        let mut auditor = AptListChangesChangelogAuditorEngine::new();
+        auditor.add_news_item(ChangelogNewsItem {
+            package_name: "openssh-server".to_string(),
+            version: "9.8p1".to_string(),
+            urgency: ChangelogUrgency::Critical,
+            summary: "Deprecate DSA keys and default to ed25519".to_string(),
+            full_news_text: "Full release news notes...".to_string(),
+        });
+
+        let (has_breaking, warnings) = auditor.has_breaking_news("openssh-server");
+        assert!(has_breaking);
+        assert_eq!(warnings.len(), 1);
+        assert!(warnings[0].contains("Critical"));
+    }
+
+    #[test]
+    fn test_pacdiff_config_merge_governor() {
+        let mut governor = PacdiffConfigMergeGovernorEngine::new();
+        governor.register_drift(ConfigDriftRecord {
+            target_file: "/etc/pacman.conf".to_string(),
+            pacnew_path: "/etc/pacman.conf.pacnew".to_string(),
+            status: ConfigDriftStatus::PacnewPending,
+            base_content: "ParallelDownloads = 5".to_string(),
+            current_content: "ParallelDownloads = 10".to_string(),
+            new_content: "ParallelDownloads = 5\nILoveCandy".to_string(),
+        });
+
+        let pending = governor.scan_pending_pacnew();
+        assert_eq!(pending, vec!["/etc/pacman.conf".to_string()]);
+
+        let merged = governor.perform_3way_merge("/etc/pacman.conf").unwrap();
+        assert!(merged.contains("Merged config for /etc/pacman.conf"));
+        assert_eq!(governor.scan_pending_pacnew().len(), 0);
+    }
+
+    #[test]
+    fn test_portage_etc_update_git_overlay() {
+        let mut etc = PortageEtcUpdateGitOverlayEngine::new();
+        etc.register_etc_update(EtcUpdateItem {
+            target_file: "/etc/portage/make.conf".to_string(),
+            update_source_file: "/etc/portage/._cfg0000_make.conf".to_string(),
+            package_owner: "sys-apps/portage".to_string(),
+            timestamp_sec: 1700000000,
+        });
+
+        let sha = etc.create_git_snapshot("/etc/portage/make.conf", "COMMON_FLAGS=\"-O2\"");
+        assert!(sha.starts_with("sha_"));
+
+        assert!(etc.apply_update("/etc/portage/make.conf").unwrap());
+        assert!(etc.apply_update("/etc/portage/make.conf").is_err());
+    }
+
+    #[test]
+    fn test_xbps_debian_alternatives_governor() {
+        let mut alt = XbpsDebianAlternativesGovernorEngine::new();
+        alt.register_group("editor", "/usr/bin/editor");
+
+        alt.register_provider(
+            "editor",
+            AlternativeProvider {
+                provider_name: "nano".to_string(),
+                binary_path: "/usr/bin/nano".to_string(),
+                priority: 40,
+            },
+        );
+
+        alt.register_provider(
+            "editor",
+            AlternativeProvider {
+                provider_name: "neovim".to_string(),
+                binary_path: "/usr/bin/nvim".to_string(),
+                priority: 90,
+            },
+        );
+
+        assert_eq!(
+            alt.get_active_binary_path("editor"),
+            Some("/usr/bin/nvim".to_string())
+        );
+    }
+
+    #[test]
+    fn test_freebsd_pkg_message_notifier() {
+        let mut notifier = FreeBsdPkgMessageNotifierEngine::new();
+        notifier.add_directive(PkgMessageDirective {
+            package_name: "postgresql16-server".to_string(),
+            trigger: PkgMessageTrigger::Install,
+            message: "Run 'service postgresql initdb' before starting".to_string(),
+        });
+
+        let msgs = notifier.collect_messages("postgresql16-server", PkgMessageTrigger::Install);
+        assert_eq!(msgs.len(), 1);
+        assert!(msgs[0].contains("initdb"));
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil_sandbox_scriptlet() {
+        let mut sandbox = OpenBsdPledgeUnveilSandboxScriptletEngine::new();
+        sandbox.unveil("/var/empty", "r");
+        sandbox.unveil("/tmp", "rw");
+        sandbox.pledge(&["stdio", "rpath", "wpath", "cpath"]);
+
+        assert!(sandbox.is_path_accessible("/tmp/script.sh", "r"));
+        assert!(sandbox.is_promise_permitted("stdio"));
+        assert!(!sandbox.is_promise_permitted("exec"));
+    }
+
+    #[test]
+    fn test_alpine_apk_cache_peer_sync() {
+        let mut sync_engine = AlpineApkCachePeerSyncEngine::new();
+        sync_engine.register_cache(ApkCachedPackage {
+            package_name: "busybox".to_string(),
+            version: "1.36.1".to_string(),
+            sha256_checksum: "deadbeef1234".to_string(),
+            size_bytes: 512000,
+            local_path: "/var/cache/apk/busybox-1.36.1.apk".to_string(),
+        });
+
+        sync_engine.add_peer_node("192.168.1.100");
+        assert!(sync_engine.verify_integrity("busybox", "DEADBEEF1234"));
+    }
+
+    #[test]
+    fn test_rpm_ostree_layered_image_governor() {
+        let mut ostree = RpmOstreeLayeredImageGovernorEngine::new();
+        let dep1 = ostree.create_deployment("commit_sha_101", "39.20240101.0");
+        ostree.add_layered_package(dep1, "htop");
+
+        let dep2 = ostree.create_deployment("commit_sha_102", "39.20240102.0");
+        ostree.add_layered_package(dep2, "neovim");
+
+        let active_hash = ostree.rollback_deployment().unwrap();
+        assert_eq!(active_hash, "commit_sha_101");
     }
 }

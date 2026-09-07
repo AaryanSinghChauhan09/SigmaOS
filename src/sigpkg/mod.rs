@@ -60,8 +60,15 @@ pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
-    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
-    GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
+    AlpineApkCachePeerSyncEngine, AlternativeGroup, AlternativeProvider, ApkCachedPackage,
+    AptListChangesChangelogAuditorEngine, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine,
+    BsdPkgRecord, ChangelogNewsItem, ChangelogUrgency, ConfigDriftRecord, ConfigDriftStatus,
+    EtcUpdateItem, FreeBsdPkgMessageNotifierEngine, GentooEbuildUseFlagSolver,
+    NixFlakeHermeticCacheStore, OpenBsdPledgeUnveilSandboxScriptletEngine, OstreeDeploymentSpec,
+    PacdiffConfigMergeGovernorEngine, PkgMessageDirective, PkgMessageTrigger,
+    PortageEtcUpdateGitOverlayEngine, RpmOstreeLayeredImageGovernorEngine,
+    SlackBuildScript, SlackwareBuildPackageEngine, SolusMossStatelessTransactionEngine,
+    XbpsDebianAlternativesGovernorEngine, ZypperPackageSpec, ZypperSatDependencyResolver,
 };
 pub mod spec;
 pub mod store;
