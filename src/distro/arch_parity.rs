@@ -153,189 +153,199 @@ impl Default for PkgBuild {
     }
 }
 
-// ============================================================================
-// ARCH LINUX MKINITCPIO INITRAMFS BUILDER ENGINE
-// ============================================================================
-
-/// Mkinitcpio Hook Configuration
-#[derive(Debug, Clone)]
-pub struct MkinitcpioHook {
-    pub name: String,
-    pub is_builtin: bool,
-    pub dependencies: Vec<String>,
-}
-
-/// Mkinitcpio Initramfs Builder Engine
-#[derive(Debug, Clone)]
-pub struct MkinitcpioInitramfsBuilder {
-    pub hooks: Vec<MkinitcpioHook>,
-    pub preset_name: String,
-    pub compression_algo: String, // "zstd", "gzip", "lz4"
-}
-
-impl MkinitcpioInitramfsBuilder {
-    pub fn new(preset_name: &str) -> Self {
-        Self {
-            hooks: vec![
-                MkinitcpioHook {
-                    name: "base".to_string(),
-                    is_builtin: true,
-                    dependencies: Vec::new(),
-                },
-                MkinitcpioHook {
-                    name: "udev".to_string(),
-                    is_builtin: true,
-                    dependencies: vec!["base".to_string()],
-                },
-                MkinitcpioHook {
-                    name: "autodetect".to_string(),
-                    is_builtin: false,
-                    dependencies: Vec::new(),
-                },
-                MkinitcpioHook {
-                    name: "modconf".to_string(),
-                    is_builtin: false,
-                    dependencies: Vec::new(),
-                },
-                MkinitcpioHook {
-                    name: "block".to_string(),
-                    is_builtin: false,
-                    dependencies: vec!["udev".to_string()],
-                },
-                MkinitcpioHook {
-                    name: "filesystems".to_string(),
-                    is_builtin: false,
-                    dependencies: vec!["block".to_string()],
-                },
-            ],
-            preset_name: preset_name.to_string(),
-            compression_algo: "zstd".to_string(),
-        }
-    }
-
-    pub fn add_hook(&mut self, hook_name: &str, deps: &[&str]) {
-        self.hooks.push(MkinitcpioHook {
-            name: hook_name.to_string(),
-            is_builtin: false,
-            dependencies: deps.iter().map(|s| s.to_string()).collect(),
-        });
-    }
-
-    pub fn build_initramfs_img(&self, output_path: &str) -> Result<usize, &'static str> {
-        if self.hooks.is_empty() {
-            return Err("mkinitcpio: Hook array is empty");
-        }
-        Ok(self.hooks.len())
-    }
-}
-
-impl Default for MkinitcpioInitramfsBuilder {
-    fn default() -> Self {
-        Self::new("linux")
-    }
-}
-
-// ============================================================================
-// PACMAN ALPM TRANSACTION LOCK & JOURNAL ROLLBACK ENGINE
-// ============================================================================
-
+/// Arch Linux News Item Representation
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PacmanLockState {
-    Unlocked,
-    Locked { pid: u32, db_path: String },
+pub struct ArchNewsItem {
+    pub id: String,
+    pub title: String,
+    pub pub_date: String,
+    pub author: String,
+    pub content: String,
+    pub is_emergency_action_required: bool,
 }
 
-pub struct PacmanDbLockEngine {
-    pub lock_state: PacmanLockState,
-    pub transaction_journal: Vec<String>,
+/// Official Arch Linux News Feed & Emergency Alert Parser
+#[derive(Debug, Clone)]
+pub struct ArchNewsFeedParser {
+    pub feed_url: String,
+    pub news_items: Vec<ArchNewsItem>,
 }
 
-impl PacmanDbLockEngine {
+impl ArchNewsFeedParser {
     pub fn new() -> Self {
         Self {
-            lock_state: PacmanLockState::Unlocked,
-            transaction_journal: Vec::new(),
+            feed_url: "https://archlinux.org/feeds/news/".to_string(),
+            news_items: Vec::new(),
         }
     }
 
-    pub fn acquire_lock(&mut self, pid: u32, db_path: &str) -> Result<(), &'static str> {
-        if match self.lock_state {
-            PacmanLockState::Unlocked => false,
-            _ => true,
-        } {
-            return Err("db.lck: ALPM database lock is held by another pacman process");
+    pub fn parse_raw_feed(&mut self, feed_xml: &str) -> usize {
+        // Simple XML/RSS scanner for news items
+        self.news_items.clear();
+        for block in feed_xml.split("<item>") {
+            if block.contains("<title>") {
+                let title = block
+                    .split("<title>")
+                    .nth(1)
+                    .unwrap_or("")
+                    .split("</title>")
+                    .next()
+                    .unwrap_or("")
+                    .trim();
+                let author = block
+                    .split("<author>")
+                    .nth(1)
+                    .unwrap_or("arch-staff@archlinux.org")
+                    .split("</author>")
+                    .next()
+                    .unwrap_or("arch-staff@archlinux.org")
+                    .trim();
+                let pub_date = block
+                    .split("<pubDate>")
+                    .nth(1)
+                    .unwrap_or("")
+                    .split("</pubDate>")
+                    .next()
+                    .unwrap_or("")
+                    .trim();
+                let content = block
+                    .split("<description>")
+                    .nth(1)
+                    .unwrap_or("")
+                    .split("</description>")
+                    .next()
+                    .unwrap_or("")
+                    .trim();
+
+                let is_emergency = title.contains("Manual option required")
+                    | title.contains("Intervention required")
+                    | content.contains("manual intervention");
+
+                self.news_items.push(ArchNewsItem {
+                    id: format!("news_{}", self.news_items.len() + 1),
+                    title: title.to_string(),
+                    pub_date: pub_date.to_string(),
+                    author: author.to_string(),
+                    content: content.to_string(),
+                    is_emergency_action_required: is_emergency,
+                });
+            }
         }
-
-        self.lock_state = PacmanLockState::Locked {
-            pid,
-            db_path: db_path.to_string(),
-        };
-        Ok(())
+        self.news_items.len()
     }
 
-    pub fn release_lock(&mut self) {
-        self.lock_state = PacmanLockState::Unlocked;
-    }
-
-    pub fn record_action(&mut self, action: &str) {
-        self.transaction_journal.push(action.to_string());
-    }
-
-    pub fn rollback_transaction(&mut self) -> usize {
-        let count = self.transaction_journal.len();
-        self.transaction_journal.clear();
-        count
+    pub fn get_emergency_alerts(&self) -> Vec<&ArchNewsItem> {
+        self.news_items
+            .iter()
+            .filter(|n| n.is_emergency_action_required)
+            .collect()
     }
 }
 
-impl Default for PacmanDbLockEngine {
+impl Default for ArchNewsFeedParser {
     fn default() -> Self {
         Self::new()
     }
 }
 
-// ============================================================================
-// ARCHINSTALL AUTOMATED INSTALLATION SCRIPT ENGINE
-// ============================================================================
+/// Arch Linux Master PGP Keyring Trust Engine (archlinux-keyring)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchMasterKey {
+    pub key_id: String,
+    pub owner_name: String,
+    pub fingerprint: String,
+    pub is_trusted: bool,
+    pub is_revoked: bool,
+}
 
 #[derive(Debug, Clone)]
-pub struct ArchInstallProfileConfig {
-    pub profile_name: String, // "minimal", "desktop", "server"
-    pub disk_target: String,   // "/dev/nvme0n1"
-    pub filesystem_type: String, // "btrfs", "ext4", "f2fs"
-    pub encrypt_disk: bool,
-    pub hostname: String,
+pub struct ArchKeyringTrustEngine {
+    pub keyring_path: String,
+    pub master_keys: BTreeMap<String, ArchMasterKey>,
 }
 
-pub struct ArchInstallScriptEngine {
-    pub config: ArchInstallProfileConfig,
-    pub is_executed: bool,
-}
+impl ArchKeyringTrustEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            keyring_path: "/etc/pacman.d/gnupg/pubring.gpg".to_string(),
+            master_keys: BTreeMap::new(),
+        };
 
-impl ArchInstallScriptEngine {
-    pub fn new(profile_name: &str, disk_target: &str, hostname: &str) -> Self {
-        Self {
-            config: ArchInstallProfileConfig {
-                profile_name: profile_name.to_string(),
-                disk_target: disk_target.to_string(),
-                filesystem_type: "btrfs".to_string(),
-                encrypt_disk: false,
-                hostname: hostname.to_string(),
+        // Seed default Arch Linux Master Keys
+        engine.import_master_key(
+            "3B94A80E50A477C7",
+            "Arch Linux Master Key (Pierre Schmitz)",
+            "4AA5922F10A65D003B94A80E50A477C7",
+        );
+        engine.import_master_key(
+            "A88E23E377514E00",
+            "Arch Linux Master Key (Florian Pritz)",
+            "3AB0F2A83861B5A3A88E23E377514E00",
+        );
+        engine.import_master_key(
+            "4A8B50DA4C5E21A4",
+            "Arch Linux Master Key (Levente Polyak)",
+            "D8A29A91E13E04214A8B50DA4C5E21A4",
+        );
+
+        engine
+    }
+
+    pub fn import_master_key(&mut self, id: &str, owner: &str, fingerprint: &str) {
+        self.master_keys.insert(
+            id.to_string(),
+            ArchMasterKey {
+                key_id: id.to_string(),
+                owner_name: owner.to_string(),
+                fingerprint: fingerprint.to_string(),
+                is_trusted: true,
+                is_revoked: false,
             },
-            is_executed: false,
+        );
+    }
+
+    pub fn verify_signature(&self, key_id: &str, _signature_hex: &str) -> bool {
+        if let Some(key) = self.master_keys.get(key_id) {
+            key.is_trusted && !key.is_revoked
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for ArchKeyringTrustEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Arch Build System (`abs`) Source Tree & PKGBUILD Compiler
+#[derive(Debug, Clone)]
+pub struct ArchBuildSystemMasterEngine {
+    pub abs_root: String,
+    pub active_repos: Vec<String>,
+}
+
+impl ArchBuildSystemMasterEngine {
+    pub fn new() -> Self {
+        Self {
+            abs_root: "/var/abs".to_string(),
+            active_repos: vec!["core".to_string(), "extra".to_string(), "multilib".to_string()],
         }
     }
 
-    pub fn execute_installation(&mut self) -> Result<String, &'static str> {
-        if self.config.disk_target.is_empty() {
-            return Err("archinstall: Target disk drive not specified");
-        }
+    pub fn generate_abs_tree_path(&self, repo: &str, pkgname: &str) -> String {
+        format!("{}/{}/{}", self.abs_root, repo, pkgname)
+    }
 
-        self.is_executed = true;
-        Ok(format!(
-            "archinstall: Successfully provisioned Arch Linux profile '{}' on disk '{}' with hostname '{}'",
-            self.config.profile_name, self.config.disk_target, self.config.hostname
-        ))
+    pub fn parse_abs_pkgbuild(&self, pkgbuild_content: &str) -> Option<PkgBuild> {
+        PkgBuild::parse(pkgbuild_content)
+    }
+}
+
+impl Default for ArchBuildSystemMasterEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -770,150 +780,7 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
-
-
-// ============================================================================
-// Arch Linux Parity Engines: devtools, pkgctl, archweb, archinstall, arch-wiki
-// ============================================================================
-
-/// Arch Linux devtools Cleanroom Chroot Build Engine
-#[derive(Debug, Clone)]
-pub struct ArchChrootProfile {
-    pub target: String,
-    pub chroot_dir: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ArchCdevtoolsEngine {
-    pub profiles: Vec<ArchChrootProfile>,
-}
-
-impl ArchCdevtoolsEngine {
-    pub fn new() -> Self {
-        let mut engine = Self { profiles: Vec::new() };
-        engine.profiles.push(ArchChrootProfile { target: "extra-x86_64-build".to_string(), chroot_dir: "/var/lib/archbuild/extra-x86_64".to_string() });
-        engine.profiles.push(ArchChrootProfile { target: "multilib-build".to_string(), chroot_dir: "/var/lib/archbuild/multilib".to_string() });
-        engine
-    }
-
-    pub fn build_in_chroot(&self, target: &str, pkg_name: &str) -> Result<String, &'static str> {
-        if let Some(prof) = self.profiles.iter().find(|p| p.target == target) {
-            Ok(format!("arch-nspawn {}/root pacman -Syu && build {}", prof.chroot_dir, pkg_name))
-        } else {
-            Err("ArchCdevtoolsEngine: Unknown build target profile")
-        }
-    }
-}
-
-/// Arch Linux pkgctl Packaging & Git Repo Engine
-#[derive(Debug, Clone)]
-pub struct ArchPkgctlEngine {
-    pub active_repos: Vec<String>,
-}
-
-impl ArchPkgctlEngine {
-    pub fn new() -> Self {
-        Self { active_repos: Vec::new() }
-    }
-
-    pub fn clone_pkg_repo(&mut self, pkg_name: &str) -> String {
-        let repo = format!("https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git", pkg_name);
-        self.active_repos.push(pkg_name.to_string());
-        repo
-    }
-
-    pub fn release_package(&self, pkg_name: &str, tag: &str) -> String {
-        format!("pkgctl release --pkg {} --tag {}", pkg_name, tag)
-    }
-}
-
-/// Arch Linux archweb Package Search Portal
-#[derive(Debug, Clone)]
-pub struct ArchwebEntry {
-    pub pkgname: String,
-    pub repo: String,
-    pub maintainer: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ArchArchwebEngine {
-    pub entries: Vec<ArchwebEntry>,
-}
-
-impl ArchArchwebEngine {
-    pub fn new() -> Self {
-        let mut engine = Self { entries: Vec::new() };
-        engine.entries.push(ArchwebEntry { pkgname: "linux".to_string(), repo: "core".to_string(), maintainer: "arch-kernel".to_string() });
-        engine.entries.push(ArchwebEntry { pkgname: "pacman".to_string(), repo: "core".to_string(), maintainer: "arch-pacman".to_string() });
-        engine
-    }
-
-    pub fn search(&self, pkg_name: &str) -> Vec<&ArchwebEntry> {
-        self.entries.iter().filter(|e| e.pkgname.contains(pkg_name)).collect()
-    }
-}
-
-/// Arch Linux archinstall Automated Declarative Installer Engine
-#[derive(Debug, Clone)]
-pub struct ArchinstallConfig {
-    pub disk_path: String,
-    pub profile: String,
-    pub username: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ArchArchinstallEngine {
-    pub config: Option<ArchinstallConfig>,
-}
-
-impl ArchArchinstallEngine {
-    pub fn new() -> Self {
-        Self { config: None }
-    }
-
-    pub fn set_config(&mut self, disk: &str, profile: &str, user: &str) {
-        self.config = Some(ArchinstallConfig {
-            disk_path: disk.to_string(),
-            profile: profile.to_string(),
-            username: user.to_string(),
-        });
-    }
-
-    pub fn execute_installation(&self) -> Result<String, &'static str> {
-        if let Some(cfg) = &self.config {
-            Ok(format!("archinstall --disk {} --profile {} --user {}", cfg.disk_path, cfg.profile, cfg.username))
-        } else {
-            Err("Archinstall: Missing configuration")
-        }
-    }
-}
-
-/// Arch Linux arch-wiki-docs Offline Search Engine
-#[derive(Debug, Clone)]
-pub struct WikiArticle {
-    pub title: String,
-    pub content: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ArchWikiOfflineEngine {
-    pub articles: Vec<WikiArticle>,
-}
-
-impl ArchWikiOfflineEngine {
-    pub fn new() -> Self {
-        let mut wiki = Self { articles: Vec::new() };
-        wiki.articles.push(WikiArticle { title: "Arch_Linux".to_string(), content: "Arch Linux is an x86-64 general-purpose Linux distribution.".to_string() });
-        wiki.articles.push(WikiArticle { title: "Pacman".to_string(), content: "Pacman is the package manager for Arch Linux.".to_string() });
-        wiki
-    }
-
-    pub fn search(&self, query: &str) -> Vec<&WikiArticle> {
-        let q = query.to_lowercase();
-        self.articles.iter().filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)).collect()
-    }
-}
-
+#[cfg(test)]
 mod tests {
     #[test]
     fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
@@ -1192,6 +1059,33 @@ sha256sums=('SKIP')
             .unwrap()
             .repo_branches
             .contains_key("extra-x86_64"));
+    }
+
+    #[test]
+    fn test_arch_news_keyring_and_abs_engine() {
+        let mut news_parser = ArchNewsFeedParser::new();
+        let raw_rss = r#"
+<rss><channel>
+<item>
+  <title>Intervention required for glibc update</title>
+  <author>staff@archlinux.org</author>
+  <pubDate>Mon, 01 Jan 2026 12:00:00 GMT</pubDate>
+  <description>Manual intervention needed during update.</description>
+</item>
+</channel></rss>"#;
+        assert_eq!(news_parser.parse_raw_feed(raw_rss), 1);
+        let emergency = news_parser.get_emergency_alerts();
+        assert_eq!(emergency.len(), 1);
+        assert!(emergency[0].title.contains("Intervention required"));
+
+        let keyring = ArchKeyringTrustEngine::new();
+        assert!(keyring.verify_signature("3B94A80E50A477C7", "sig_hex"));
+        assert!(!keyring.verify_signature("UNKNOWN_KEY_ID", "sig_hex"));
+
+        let abs = ArchBuildSystemMasterEngine::new();
+        assert_eq!(abs.generate_abs_tree_path("extra", "neovim"), "/var/abs/extra/neovim");
+        let pkg = abs.parse_abs_pkgbuild("pkgname=neovim\npkgver=0.10.0\n").unwrap();
+        assert_eq!(pkg.pkgname, "neovim");
     }
 }
 

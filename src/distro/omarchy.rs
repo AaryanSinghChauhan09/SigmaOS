@@ -864,6 +864,263 @@ impl Default for OmarchyOmakubDevInstaller {
     }
 }
 
+/// Hypridle Power & Idle Lock Management Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyHypridleEngine {
+    pub lock_timeout_seconds: u32,
+    pub dpms_off_seconds: u32,
+    pub suspend_seconds: u32,
+}
+
+impl OmarchyHypridleEngine {
+    pub fn new() -> Self {
+        Self {
+            lock_timeout_seconds: 300,  // 5 mins
+            dpms_off_seconds: 600,     // 10 mins
+            suspend_seconds: 1800,     // 30 mins
+        }
+    }
+
+    pub fn generate_hypridle_conf(&self) -> String {
+        format!(
+            r#"general {{
+    lock_cmd = pidof hyprlock || hyprlock
+    before_sleep_cmd = loginctl lock-session
+    after_sleep_cmd = hyprctl dispatch dpms on
+}}
+
+listener {{
+    timeout = {}
+    on-timeout = loginctl lock-session
+}}
+
+listener {{
+    timeout = {}
+    on-timeout = hyprctl dispatch dpms off
+    on-resume = hyprctl dispatch dpms on
+}}
+
+listener {{
+    timeout = {}
+    on-timeout = systemctl suspend
+}}
+"#,
+            self.lock_timeout_seconds, self.dpms_off_seconds, self.suspend_seconds
+        )
+    }
+}
+
+impl Default for OmarchyHypridleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Walker Application & Fuzzy Launcher Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyWalkerLauncherEngine {
+    pub hotkey: String,
+    pub placeholder_prompt: String,
+    pub registered_modules: Vec<String>,
+}
+
+impl OmarchyWalkerLauncherEngine {
+    pub fn new() -> Self {
+        Self {
+            hotkey: "SUPER Space".to_string(),
+            placeholder_prompt: "Type to launch application or run command...".to_string(),
+            registered_modules: vec![
+                "applications".to_string(),
+                "runner".to_string(),
+                "finder".to_string(),
+                "commands".to_string(),
+                "calc".to_string(),
+                "websearch".to_string(),
+            ],
+        }
+    }
+
+    pub fn generate_walker_config_toml(&self) -> String {
+        format!(
+            r#"[ui]
+placeholder = "{}"
+hotkey = "{}"
+
+[modules]
+enabled = [{}]
+"#,
+            self.placeholder_prompt,
+            self.hotkey,
+            self.registered_modules
+                .iter()
+                .map(|m| format!("\"{}\"", m))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
+impl Default for OmarchyWalkerLauncherEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// SwayNC Notification Hub & Control Center Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchySwayNcEngine {
+    pub position: String,
+    pub control_center_width: u32,
+    pub widgets: Vec<String>,
+}
+
+impl OmarchySwayNcEngine {
+    pub fn new() -> Self {
+        Self {
+            position: "top-right".to_string(),
+            control_center_width: 380,
+            widgets: vec![
+                "title".to_string(),
+                "dnd".to_string(),
+                "mpris".to_string(),
+                "volume".to_string(),
+                "backlight".to_string(),
+                "notifications".to_string(),
+            ],
+        }
+    }
+
+    pub fn generate_swaync_json(&self) -> String {
+        format!(
+            r#"{{
+  "positionX": "right",
+  "positionY": "top",
+  "control-center-width": {},
+  "widgets": [{}]
+}}"#,
+            self.control_center_width,
+            self.widgets
+                .iter()
+                .map(|w| format!("\"{}\"", w))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    }
+}
+
+impl Default for OmarchySwayNcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Waybar Status Bar & Tray Manager
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyWaybarEngine {
+    pub height: u32,
+    pub modules_left: Vec<String>,
+    pub modules_center: Vec<String>,
+    pub modules_right: Vec<String>,
+}
+
+impl OmarchyWaybarEngine {
+    pub fn new() -> Self {
+        Self {
+            height: 32,
+            modules_left: vec!["hyprland/workspaces".to_string(), "hyprland/window".to_string()],
+            modules_center: vec!["clock".to_string()],
+            modules_right: vec![
+                "cpu".to_string(),
+                "memory".to_string(),
+                "network".to_string(),
+                "pulseaudio".to_string(),
+                "tray".to_string(),
+            ],
+        }
+    }
+
+    pub fn generate_waybar_json(&self) -> String {
+        format!(
+            r#"{{
+  "layer": "top",
+  "position": "top",
+  "height": {},
+  "modules-left": [{}],
+  "modules-center": [{}],
+  "modules-right": [{}]
+}}"#,
+            self.height,
+            self.modules_left.iter().map(|m| format!("\"{}\"", m)).collect::<Vec<_>>().join(", "),
+            self.modules_center.iter().map(|m| format!("\"{}\"", m)).collect::<Vec<_>>().join(", "),
+            self.modules_right.iter().map(|m| format!("\"{}\"", m)).collect::<Vec<_>>().join(", ")
+        )
+    }
+}
+
+impl Default for OmarchyWaybarEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omakub Developer Toolchain & Workstation Installer Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmarchyOmakubDevInstaller {
+    pub dev_languages: Vec<String>,
+    pub cli_tools: Vec<String>,
+    pub desktop_apps: Vec<String>,
+}
+
+impl OmarchyOmakubDevInstaller {
+    pub fn new() -> Self {
+        Self {
+            dev_languages: vec![
+                "rust".to_string(),
+                "go".to_string(),
+                "node".to_string(),
+                "python".to_string(),
+                "ruby".to_string(),
+            ],
+            cli_tools: vec![
+                "neovim".to_string(),
+                "tmux".to_string(),
+                "ripgrep".to_string(),
+                "fd".to_string(),
+                "bat".to_string(),
+                "fzf".to_string(),
+                "lazygit".to_string(),
+            ],
+            desktop_apps: vec![
+                "alacritty".to_string(),
+                "google-chrome".to_string(),
+                "visual-studio-code-bin".to_string(),
+                "docker".to_string(),
+                "postman".to_string(),
+            ],
+        }
+    }
+
+    pub fn generate_installation_plan(&self) -> Vec<String> {
+        let mut plan = Vec::new();
+        for lang in &self.dev_languages {
+            plan.push(format!("mise use --global {}", lang));
+        }
+        for tool in &self.cli_tools {
+            plan.push(format!("pacman -S --needed --noconfirm {}", tool));
+        }
+        for app in &self.desktop_apps {
+            plan.push(format!("yay -S --needed --noconfirm {}", app));
+        }
+        plan
+    }
+}
+
+impl Default for OmarchyOmakubDevInstaller {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -925,6 +1182,38 @@ mod tests {
         assert!(audio.set_low_latency(64));
         assert_eq!(audio.quantum_buffer_size, 64);
         assert!(!audio.set_low_latency(0));
+    }
+
+    #[test]
+    fn test_omarchy_extended_themes_and_desktop_components() {
+        assert_eq!(OmarchyTheme::RosePine.name(), "rose-pine");
+        assert_eq!(OmarchyTheme::SolarizedDark.bg_color(), "#002b36");
+        assert_eq!(OmarchyTheme::SolarizedLight.accent_color(), "#b58900");
+
+        let hypridle = OmarchyHypridleEngine::new();
+        let idle_conf = hypridle.generate_hypridle_conf();
+        assert!(idle_conf.contains("timeout = 300"));
+        assert!(idle_conf.contains("timeout = 600"));
+
+        let walker = OmarchyWalkerLauncherEngine::new();
+        let walker_conf = walker.generate_walker_config_toml();
+        assert!(walker_conf.contains("placeholder"));
+        assert!(walker_conf.contains("applications"));
+
+        let swaync = OmarchySwayNcEngine::new();
+        let swaync_json = swaync.generate_swaync_json();
+        assert!(swaync_json.contains("control-center-width"));
+        assert!(swaync_json.contains("notifications"));
+
+        let waybar = OmarchyWaybarEngine::new();
+        let waybar_json = waybar.generate_waybar_json();
+        assert!(waybar_json.contains("hyprland/workspaces"));
+        assert!(waybar_json.contains("pulseaudio"));
+
+        let dev_installer = OmarchyOmakubDevInstaller::new();
+        let plan = dev_installer.generate_installation_plan();
+        assert!(plan.iter().any(|cmd| cmd.contains("mise use --global rust")));
+        assert!(plan.iter().any(|cmd| cmd.contains("pacman -S --needed --noconfirm neovim")));
     }
 
     #[test]
