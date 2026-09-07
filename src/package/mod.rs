@@ -14,7 +14,7 @@
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)
+#![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Package Module
 pub mod alpine_apk;

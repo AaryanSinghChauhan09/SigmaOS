@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
-project(cpp_host_tests)
+project(c_host_tests C)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 11)
 
-add_executable(host_tests test_host.cpp)
+add_executable(host_tests test_host.c)
 
 add_custom_target(test_kernel DEPENDS host_tests)
 
