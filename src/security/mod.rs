@@ -53,6 +53,13 @@ pub mod unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod kali_components;
+
+pub use kali_components::{
+    HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,
+    KaliPcapDissector, KaliRamMemoryForensics, KaliWebVulnScanner, PacketHeader, ProcessArtifact,
+    ScanResult, ScanType, VulnType, WebVulnReport,
+};
 
 pub use qubes_isolation::{
     DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
