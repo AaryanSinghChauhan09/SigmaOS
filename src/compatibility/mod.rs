@@ -59,6 +59,13 @@ pub mod lattice_grid;
 pub mod legacy_adapters;
 pub mod linux_adapter;
 pub mod linux_bsd_ecosystem_bridge;
+pub mod distro_parity_ultimate;
+
+pub use distro_parity_ultimate::{
+    AlpmMirror, AlpmParallelSyncEngine, ApkIndexTriggerEngine, ApkTriggerHook,
+    AptPinRule, AptPinningMultiArchResolver, OpenBsdMonotonicSandbox, XbpsPackageHeader,
+    XbpsSignatureVerifier,
+};
 pub mod linux_compat;
 
 pub use linux_bsd_ecosystem_bridge::{
