@@ -2,7 +2,7 @@
 //!
 //! Implements Linux-compatible UTS namespace syscalls:
 //! - sys_sethostname(2)
-//! - sys_gethostname(2)  
+//! - sys_gethostname(2)
 //! - sys_clone with CLONE_NEWUTS support
 
 use crate::kernel::uts_namespace::{UtsNamespaceManager, NamespaceId};
@@ -40,7 +40,7 @@ pub fn sys_sethostname(
     if len > 255 {
         return -22; // EINVAL
     }
-    
+
     if len == 0 {
         return -22; // EINVAL - empty hostname
     }
@@ -202,7 +202,7 @@ mod tests {
     fn test_sethostname_success() {
         let manager = get_uts_manager();
         let ns = manager.create_namespace(None).expect("Failed to create namespace");
-        
+
         let hostname = b"test-host".to_vec();
         let result = sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len());
         assert_eq!(result, 0);
@@ -212,7 +212,7 @@ mod tests {
     fn test_sethostname_too_long() {
         let manager = get_uts_manager();
         let ns = manager.create_namespace(None).expect("Failed to create namespace");
-        
+
         let hostname = "a".repeat(256).into_bytes();
         let result = sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len());
         assert_eq!(result, -22); // EINVAL
@@ -222,7 +222,7 @@ mod tests {
     fn test_sethostname_empty() {
         let manager = get_uts_manager();
         let ns = manager.create_namespace(None).expect("Failed to create namespace");
-        
+
         let result = sys_sethostname(ns.raw(), std::ptr::null(), 0);
         assert_eq!(result, -22); // EINVAL
     }
@@ -231,14 +231,14 @@ mod tests {
     fn test_gethostname_success() {
         let manager = get_uts_manager();
         let ns = manager.create_namespace(None).expect("Failed to create namespace");
-        
+
         let hostname = b"test-host".to_vec();
         sys_sethostname(ns.raw(), hostname.as_ptr(), hostname.len());
-        
+
         let mut buffer = vec![0u8; 256];
         let result = sys_gethostname(ns.raw(), buffer.as_mut_ptr(), 256);
         assert_eq!(result, 0);
-        
+
         let retrieved = String::from_utf8(buffer.iter().copied().take_while(|&b| b != 0).collect()).unwrap();
         assert_eq!(retrieved, "test-host");
     }
@@ -248,22 +248,22 @@ mod tests {
         let manager = get_uts_manager();
         let ns1 = manager.create_namespace(None).expect("Failed to create ns1");
         let ns2 = manager.create_namespace(None).expect("Failed to create ns2");
-        
+
         let host1 = b"host1".to_vec();
         let host2 = b"host2".to_vec();
-        
+
         sys_sethostname(ns1.raw(), host1.as_ptr(), host1.len());
         sys_sethostname(ns2.raw(), host2.as_ptr(), host2.len());
-        
+
         let mut buf1 = vec![0u8; 256];
         let mut buf2 = vec![0u8; 256];
-        
+
         sys_gethostname(ns1.raw(), buf1.as_mut_ptr(), 256);
         sys_gethostname(ns2.raw(), buf2.as_mut_ptr(), 256);
-        
+
         let h1 = String::from_utf8(buf1.iter().copied().take_while(|&b| b != 0).collect()).unwrap();
         let h2 = String::from_utf8(buf2.iter().copied().take_while(|&b| b != 0).collect()).unwrap();
-        
+
         assert_eq!(h1, "host1");
         assert_eq!(h2, "host2");
         assert_ne!(h1, h2);

@@ -262,7 +262,7 @@ impl SyscallDispatcher {
         // O_RDONLY=0, O_WRONLY=1, O_RDWR=2, O_CREAT=0x40, O_APPEND=0x400
         let _flags = flags; // Suppress warning
         let _mode = mode;
-        
+
         // Return new file descriptor (would come from VFS layer)
         // For now: allocate next available FD starting from 3
         3
@@ -292,7 +292,7 @@ impl SyscallDispatcher {
     unsafe fn sys_stat(&self, args: SyscallArgs) -> SigmaI64 {
         let _pathname = args.arg0 as *const u8;
         let _statbuf = args.arg1 as *mut u8;
-        
+
         // Stub: Returns -1 (ENOENT) - file not found
         // Full implementation requires VFS integration with proper stat structure
         -1
@@ -301,7 +301,7 @@ impl SyscallDispatcher {
     unsafe fn sys_fstat(&self, args: SyscallArgs) -> SigmaI64 {
         let _fd = args.arg0 as i32;
         let _statbuf = args.arg1 as *mut u8;
-        
+
         // Stub: Returns -1 for invalid fd, 0 for valid ones
         if _fd < 0 {
             return -1;
@@ -312,7 +312,7 @@ impl SyscallDispatcher {
     unsafe fn sys_lstat(&self, args: SyscallArgs) -> SigmaI64 {
         let _pathname = args.arg0 as *const u8;
         let _statbuf = args.arg1 as *mut u8;
-        
+
         // Stub: Similar to sys_stat but doesn't follow symlinks
         -1
     }
@@ -321,7 +321,7 @@ impl SyscallDispatcher {
         let fd = args.arg0 as i32;
         let _offset = args.arg1 as i64;
         let _whence = args.arg2 as i32;
-        
+
         // Stub: Validate fd and return current position (0)
         if fd < 0 {
             return -1;
@@ -354,7 +354,7 @@ impl SyscallDispatcher {
         let _addr = args.arg0;
         let _len = args.arg1;
         let _prot = args.arg2 as i32;
-        
+
         // Stub: Validate parameters and return success
         // Full implementation requires MMU integration for page table updates
         if _len == 0 {
@@ -390,7 +390,7 @@ impl SyscallDispatcher {
         let _addr = args.arg0;
         let _len = args.arg1;
         let _advice = args.arg2 as i32;
-        
+
         // Stub: Memory advisory - just return success
         // Advises kernel on expected use pattern (prefetch, sequential, etc)
         if _len == 0 {
@@ -407,7 +407,7 @@ impl SyscallDispatcher {
         let _flags = args.arg2 as i32;
         let _arg = args.arg3;
         let _ptid = args.arg4;
-        
+
         // Stub: Clone syscall - creates new process with shared resources
         // Returns child PID to parent, 0 to child
         // Full implementation requires process descriptor management
@@ -416,7 +416,7 @@ impl SyscallDispatcher {
 
     unsafe fn sys_fork(&self, args: SyscallArgs) -> SigmaI64 {
         let _ = args;
-        
+
         // Stub: Fork - complete process duplication
         // Returns child PID to parent, 0 to child
         2 // Return dummy child PID
@@ -424,7 +424,7 @@ impl SyscallDispatcher {
 
     unsafe fn sys_vfork(&self, args: SyscallArgs) -> SigmaI64 {
         let _ = args;
-        
+
         // Stub: Virtual fork - lightweight fork for exec
         // Parent blocks until child execs
         2 // Return dummy child PID
@@ -434,7 +434,7 @@ impl SyscallDispatcher {
         let _pathname = args.arg0 as *const u8;
         let _argv = args.arg1 as *const *const u8;
         let _envp = args.arg2 as *const *const u8;
-        
+
         // Stub: Execute program - replaces current process image
         // On success, does not return
         // Full implementation requires ELF loader
@@ -457,7 +457,7 @@ impl SyscallDispatcher {
         let _wstatus = args.arg1 as *mut i32;
         let _options = args.arg2 as i32;
         let _rusage = args.arg3;
-        
+
         // Stub: Wait for child process - returns -1 (no children)
         // Full implementation requires process tracking
         -1
@@ -466,7 +466,7 @@ impl SyscallDispatcher {
     unsafe fn sys_kill(&self, args: SyscallArgs) -> SigmaI64 {
         let _pid = args.arg0 as i32;
         let _sig = args.arg1 as i32;
-        
+
         // Stub: Send signal to process
         if _pid < 0 {
             return -1; // Invalid PID
@@ -481,7 +481,7 @@ impl SyscallDispatcher {
         let _act = args.arg1;
         let _oldact = args.arg2;
         let _sigsetsize = args.arg3 as usize;
-        
+
         // Stub: Register signal handler
         0
     }
@@ -491,7 +491,7 @@ impl SyscallDispatcher {
         let _set = args.arg1;
         let _oldset = args.arg2;
         let _sigsetsize = args.arg3 as usize;
-        
+
         // Stub: Manipulate signal mask
         0
     }
@@ -499,7 +499,7 @@ impl SyscallDispatcher {
     unsafe fn sys_sigaltstack(&self, args: SyscallArgs) -> SigmaI64 {
         let _ss = args.arg0;
         let _old_ss = args.arg1;
-        
+
         // Stub: Set alternate signal stack
         0
     }
@@ -510,7 +510,7 @@ impl SyscallDispatcher {
         let _fds = args.arg0;
         let _nfds = args.arg1 as usize;
         let _timeout = args.arg2 as i32;
-        
+
         // Stub: Poll file descriptors for I/O readiness
         0
     }
@@ -520,7 +520,7 @@ impl SyscallDispatcher {
         let _readfds = args.arg1;
         let _writefds = args.arg2;
         let _exceptfds = args.arg3;
-        
+
         // Stub: Select file descriptors - monitors multiple fds
         0
     }
@@ -529,7 +529,7 @@ impl SyscallDispatcher {
         let _fd = args.arg0 as i32;
         let _request = args.arg1 as u32;
         let _argp = args.arg2;
-        
+
         // Stub: Device-specific control operations
         if _fd < 0 {
             return -1;
@@ -541,7 +541,7 @@ impl SyscallDispatcher {
         let _fd = args.arg0 as i32;
         let _iov = args.arg1;
         let _iovcnt = args.arg2 as i32;
-        
+
         // Stub: Read into multiple buffers (scatter)
         if _fd < 0 || _iovcnt <= 0 {
             return -1;
@@ -553,7 +553,7 @@ impl SyscallDispatcher {
         let _fd = args.arg0 as i32;
         let _iov = args.arg1;
         let _iovcnt = args.arg2 as i32;
-        
+
         // Stub: Write from multiple buffers (gather)
         if _fd < 0 || _iovcnt <= 0 {
             return -1;
@@ -563,7 +563,7 @@ impl SyscallDispatcher {
 
     unsafe fn sys_pipe(&self, args: SyscallArgs) -> SigmaI64 {
         let _pipefd = args.arg0 as *mut i32;
-        
+
         // Stub: Create uni-directional data channel
         if _pipefd.is_null() {
             return -1;
@@ -577,7 +577,7 @@ impl SyscallDispatcher {
         let _domain = args.arg0 as i32;
         let _type_ = args.arg1 as i32;
         let _protocol = args.arg2 as i32;
-        
+
         // Stub: Create socket - returns file descriptor
         3 // Return dummy FD
     }
@@ -586,7 +586,7 @@ impl SyscallDispatcher {
         let _sockfd = args.arg0 as i32;
         let _addr = args.arg1;
         let _addrlen = args.arg2 as u32;
-        
+
         // Stub: Connect socket to address
         if _sockfd < 0 || _addr == 0 {
             return -1;
@@ -598,7 +598,7 @@ impl SyscallDispatcher {
         let _sockfd = args.arg0 as i32;
         let _addr = args.arg1;
         let _addrlen = args.arg2;
-        
+
         // Stub: Accept incoming connection
         if _sockfd < 0 {
             return -1;
@@ -611,7 +611,7 @@ impl SyscallDispatcher {
         let _buf = args.arg1;
         let _len = args.arg2 as usize;
         let _flags = args.arg3 as i32;
-        
+
         // Stub: Send data on socket
         if _sockfd < 0 || _len == 0 {
             return -1;
@@ -624,7 +624,7 @@ impl SyscallDispatcher {
         let _buf = args.arg1;
         let _len = args.arg2 as usize;
         let _flags = args.arg3 as i32;
-        
+
         // Stub: Receive data on socket
         if _sockfd < 0 || _len == 0 {
             return -1;
@@ -636,7 +636,7 @@ impl SyscallDispatcher {
         let _sockfd = args.arg0 as i32;
         let _addr = args.arg1;
         let _addrlen = args.arg2 as u32;
-        
+
         // Stub: Bind socket to address
         if _sockfd < 0 || _addr == 0 {
             return -1;
@@ -647,7 +647,7 @@ impl SyscallDispatcher {
     unsafe fn sys_listen(&self, args: SyscallArgs) -> SigmaI64 {
         let _sockfd = args.arg0 as i32;
         let _backlog = args.arg1 as i32;
-        
+
         // Stub: Mark socket as listening
         if _sockfd < 0 || _backlog < 0 {
             return -1;
@@ -659,7 +659,7 @@ impl SyscallDispatcher {
         let _sockfd = args.arg0 as i32;
         let _addr = args.arg1;
         let _addrlen = args.arg2;
-        
+
         // Stub: Get socket local address
         if _sockfd < 0 || _addr == 0 {
             return -1;
@@ -671,7 +671,7 @@ impl SyscallDispatcher {
         let _sockfd = args.arg0 as i32;
         let _addr = args.arg1;
         let _addrlen = args.arg2;
-        
+
         // Stub: Get socket peer address
         if _sockfd < 0 || _addr == 0 {
             return -1;
@@ -684,7 +684,7 @@ impl SyscallDispatcher {
         let _type_ = args.arg1 as i32;
         let _protocol = args.arg2 as i32;
         let _sv = args.arg3;
-        
+
         // Stub: Create socket pair
         if _sv == 0 {
             return -1;
@@ -696,7 +696,7 @@ impl SyscallDispatcher {
         let _sockfd = args.arg0 as i32;
         let _level = args.arg1 as i32;
         let _optname = args.arg2 as i32;
-        
+
         // Stub: Set socket option
         if _sockfd < 0 {
             return -1;
@@ -708,7 +708,7 @@ impl SyscallDispatcher {
         let _sockfd = args.arg0 as i32;
         let _level = args.arg1 as i32;
         let _optname = args.arg2 as i32;
-        
+
         // Stub: Get socket option
         if _sockfd < 0 {
             return -1;
@@ -720,7 +720,7 @@ impl SyscallDispatcher {
 
     unsafe fn sys_dup(&self, args: SyscallArgs) -> SigmaI64 {
         let _oldfd = args.arg0 as i32;
-        
+
         // Stub: Duplicate file descriptor
         if _oldfd < 0 {
             return -1;
@@ -731,7 +731,7 @@ impl SyscallDispatcher {
     unsafe fn sys_dup2(&self, args: SyscallArgs) -> SigmaI64 {
         let _oldfd = args.arg0 as i32;
         let _newfd = args.arg1 as i32;
-        
+
         // Stub: Duplicate fd to specific number
         if _oldfd < 0 || _newfd < 0 {
             return -1;
@@ -742,7 +742,7 @@ impl SyscallDispatcher {
     unsafe fn sys_nanosleep(&self, args: SyscallArgs) -> SigmaI64 {
         let _req = args.arg0;
         let _rem = args.arg1;
-        
+
         // Stub: Sleep for nanoseconds
         0
     }
@@ -752,7 +752,7 @@ impl SyscallDispatcher {
         let _in_fd = args.arg1 as i32;
         let _offset = args.arg2;
         let _count = args.arg3 as usize;
-        
+
         // Stub: Zero-copy file transfer
         if _out_fd < 0 || _in_fd < 0 {
             return -1;

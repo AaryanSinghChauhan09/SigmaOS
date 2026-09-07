@@ -65,7 +65,7 @@ pub mod pqc {
     pub fn dilithium5_keygen() -> (PublicKey, SecretKey);
     pub fn dilithium5_sign(sk: &SecretKey, msg: &[u8]) -> Signature;
     pub fn dilithium5_verify(pk: &PublicKey, msg: &[u8], sig: &Signature) -> bool;
-    
+
     pub fn kyber1024_keygen() -> (EncapsKey, DecapsKey);
     pub fn kyber1024_encapsulate(ek: &EncapsKey) -> (Ciphertext, SharedSecret);
     pub fn kyber1024_decapsulate(dk: &DecapsKey, ct: &Ciphertext) -> SharedSecret;

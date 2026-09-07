@@ -1,7 +1,7 @@
 # Tier 1 Features Implementation
 
-**Date**: September 4, 2026  
-**Phase**: 5 (Tier 1 Features)  
+**Date**: September 4, 2026
+**Phase**: 5 (Tier 1 Features)
 **Status**: ✅ COMPLETE
 
 ---
@@ -131,7 +131,7 @@ extern "C" fn handle_sigterm(_sig: i32) {
 fn main() {
     // Register handler (via rt_sigaction syscall)
     signal(SIGTERM, handle_sigterm);
-    
+
     // Do work...
     // When SIGTERM arrives:
     // 1. Kernel interrupts current code
@@ -268,13 +268,13 @@ pub fn mprotect(
 // In user space
 fn main() {
     let code_buf = alloc_page();
-    
+
     // Make readable and executable, not writable
     mprotect(code_buf, 4096, PROT_READ | PROT_EXEC);
-    
+
     // Copy code to buffer
     copy_to_buffer(code_buf);  // ✓ Works
-    
+
     // Try to write - triggers page fault
     write_to_buffer(code_buf);  // ✗ Segfault (W^X enforcement!)
 }

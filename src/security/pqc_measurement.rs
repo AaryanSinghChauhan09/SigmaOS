@@ -16,9 +16,8 @@ use merkle::{MerkleAccumulator, MerkleHash};
 #[cfg(test_disabled)]
 #[path = "pqc_enclave.rs"]
 mod pqc_enclave;
-extern crate alloc;
-use alloc::vec::Vec;
-#[cfg(test)]
+use std::vec::Vec;
+#[cfg(test_disabled)]
 use pqc_enclave::KyberKem;
 
 /// Hybrid PQC signature state combining lattice-based KEM with firmware measurements

@@ -202,7 +202,7 @@ impl NamespaceRegistry {
     /// Register a new PID namespace
     pub fn register_pid_namespace(&self, ns_id: u64, owner_pid: u32) -> Result<(), NamespaceSyscallError> {
         let mut namespaces = self.pid_namespaces.lock().map_err(|_| NamespaceSyscallError::NoMemory)?;
-        
+
         if namespaces.contains_key(&ns_id) {
             return Err(NamespaceSyscallError::InvalidArgument);
         }
@@ -223,7 +223,7 @@ impl NamespaceRegistry {
     /// Register a new IPC namespace
     pub fn register_ipc_namespace(&self, ns_id: u64, owner_pid: u32) -> Result<(), NamespaceSyscallError> {
         let mut namespaces = self.ipc_namespaces.lock().map_err(|_| NamespaceSyscallError::NoMemory)?;
-        
+
         if namespaces.contains_key(&ns_id) {
             return Err(NamespaceSyscallError::InvalidArgument);
         }
@@ -244,7 +244,7 @@ impl NamespaceRegistry {
     /// Register a new mount namespace
     pub fn register_mount_namespace(&self, ns_id: u64, owner_pid: u32) -> Result<(), NamespaceSyscallError> {
         let mut namespaces = self.mount_namespaces.lock().map_err(|_| NamespaceSyscallError::NoMemory)?;
-        
+
         if namespaces.contains_key(&ns_id) {
             return Err(NamespaceSyscallError::InvalidArgument);
         }
@@ -272,7 +272,7 @@ impl NamespaceRegistry {
         };
 
         let mut namespaces = ns_map.lock().map_err(|_| NamespaceSyscallError::NoMemory)?;
-        
+
         if let Some(info) = namespaces.get_mut(&ns_id) {
             info.ref_count = info.ref_count.saturating_add(1);
             Ok(())
@@ -291,7 +291,7 @@ impl NamespaceRegistry {
         };
 
         let mut namespaces = ns_map.lock().map_err(|_| NamespaceSyscallError::NoMemory)?;
-        
+
         if let Some(info) = namespaces.get_mut(&ns_id) {
             info.ref_count = info.ref_count.saturating_sub(1);
             if info.ref_count == 0 {
@@ -431,7 +431,7 @@ pub fn sys_clone(
             Ok(r) => r,
             Err(_) => return NamespaceSyscallError::NoMemory.code() as i64,
         };
-        
+
         if ns_config.create_pid_ns {
             let ns_id = ProcessNamespaceContext::allocate_namespace_id();
             if reg.register_pid_namespace(ns_id, child_pid as u32).is_err() {
@@ -492,7 +492,7 @@ pub fn sys_unshare(flags: u32) -> i64 {
         Ok(r) => r,
         Err(_) => return NamespaceSyscallError::NoMemory.code() as i64,
     };
-    
+
     if unshare_flags.unshare_newpid() {
         let ns_id = ProcessNamespaceContext::allocate_namespace_id();
         let current_pid = 1; // Would be actual PID in real implementation
@@ -535,7 +535,7 @@ pub fn sys_unshare(flags: u32) -> i64 {
 /// - On error: Negative error code (Linux convention)
 pub fn sys_setns(nsfd: u64, nstype: i32) -> i64 {
     // In this implementation, nsfd is the namespace ID
-    
+
     // Validate namespace ID
     if nsfd == 0 {
         return NamespaceSyscallError::InvalidArgument.code() as i64;
@@ -555,7 +555,7 @@ pub fn sys_setns(nsfd: u64, nstype: i32) -> i64 {
         Ok(r) => r,
         Err(_) => return NamespaceSyscallError::NoMemory.code() as i64,
     };
-    
+
     if !reg.namespace_exists(nsfd, ns_type) {
         return NamespaceSyscallError::InvalidArgument.code() as i64;
     }
@@ -572,7 +572,7 @@ pub fn sys_setns(nsfd: u64, nstype: i32) -> i64 {
 fn rand_simple() -> u32 {
     use std::sync::atomic::{AtomicU32, Ordering};
     static SEED: AtomicU32 = AtomicU32::new(12345);
-    
+
     let seed = SEED.load(Ordering::Relaxed);
     let next_seed = seed.wrapping_mul(1103515245).wrapping_add(12345);
     SEED.store(next_seed, Ordering::Relaxed);
@@ -678,12 +678,12 @@ mod tests {
     fn test_namespace_registry_ref_count() {
         let registry = NamespaceRegistry::new();
         let _ = registry.register_pid_namespace(100, 1000);
-        
+
         let _ = registry.increment_ref(100, "pid");
         let _ = registry.increment_ref(100, "pid");
-        
+
         assert!(registry.namespace_exists(100, "pid"));
-        
+
         let _ = registry.decrement_ref(100, "pid");
         assert!(registry.namespace_exists(100, "pid"));
     }
@@ -701,7 +701,7 @@ mod tests {
         let base_ctx = ProcessNamespaceContext::new();
         let flags = CloneFlags::new(0x20000000 | 0x08000000);
         let ctx = ProcessNamespaceContext::from_clone_flags(flags, &base_ctx).unwrap();
-        
+
         assert!(ctx.pid_namespace_id.is_some());
         assert!(ctx.ipc_namespace_id.is_some());
         assert!(ctx.mount_namespace_id.is_none());
@@ -747,7 +747,7 @@ mod tests {
     fn test_sys_setns_with_valid_namespace() {
         let registry = NamespaceRegistry::new();
         let _ = registry.register_pid_namespace(500, 1000);
-        
+
         // Note: The actual sys_setns uses the global registry, so this test
         // verifies the local registry behavior
         assert!(registry.namespace_exists(500, "pid"));

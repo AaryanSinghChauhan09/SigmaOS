@@ -204,7 +204,7 @@ All fallible operations return `Result<T, String>`:
 
 ```rust
 pub fn operation() -> Result<T, String> {
-    // ... 
+    // ...
     if error_condition {
         return Err("Descriptive error message".to_string());
     }
@@ -275,4 +275,3 @@ pub fn operation() -> Result<T, String> {
 5. Performance acceptable (< 100µs operations)
 6. Documentation complete
 7. Code reviewed and approved
-

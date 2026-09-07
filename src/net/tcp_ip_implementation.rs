@@ -128,7 +128,7 @@ pub struct TcpConnectionControlBlock {
     state: TcpConnectionState,
     local_addr: SocketAddr,
     remote_addr: SocketAddr,
-    
+
     // Send sequence variables (RFC 793)
     snd_una: u32, // Send unacknowledged
     snd_nxt: u32, // Send next
@@ -136,27 +136,27 @@ pub struct TcpConnectionControlBlock {
     snd_wl1: u32, // Segment length used for last window update
     snd_wl2: u32, // Acknowledgement number used for last window update
     iss: u32,     // Initial send sequence number
-    
+
     // Receive sequence variables
     rcv_nxt: u32, // Receive next
     rcv_wnd: u32, // Receive window
     irs: u32,     // Initial receive sequence number
-    
+
     // Send buffer
     send_buffer: Vec<u8>,
     send_buffer_unacked: usize,
-    
+
     // Receive buffer
     recv_buffer: Vec<u8>,
     recv_buffer_ptr: usize,
-    
+
     // Congestion control
     cwnd: u32,           // Congestion window
     ssthresh: u32,       // Slow start threshold
     mss: u32,            // Maximum segment size
     rtt: Duration,       // Round-trip time estimate
     retransmit_count: u32,
-    
+
     // Connection metadata
     keepalive_enabled: bool,
     nodelay_enabled: bool,

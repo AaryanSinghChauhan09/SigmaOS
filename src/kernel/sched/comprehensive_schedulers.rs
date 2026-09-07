@@ -4,9 +4,8 @@
 // and Advanced Disk/I/O Schedulers (Anticipatory I/O, CFQ, BFQ, Deadline).
 // Inspired by Linux (CFQ/BFQ/eBPF) & BSD (CAM/ULE/Kqueue) architectures under #![no_std]
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessLifecycleState {

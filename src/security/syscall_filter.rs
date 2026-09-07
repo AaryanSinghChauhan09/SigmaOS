@@ -248,7 +248,7 @@ impl SyscallFilterManager {
             .map_err(|_| "Failed to acquire filters lock".to_string())?;
 
         let parent = filters.get(&parent_id).cloned();
-        
+
         if parent.is_some() && filters.contains_key(&child_id) {
             if let Some(parent) = parent {
                 if let Some(child) = filters.get_mut(&child_id) {
@@ -257,7 +257,7 @@ impl SyscallFilterManager {
                 }
             }
         }
-        
+
         Err("Parent or child process not found".to_string())
     }
 

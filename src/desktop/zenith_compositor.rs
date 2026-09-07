@@ -710,7 +710,7 @@ mod tests {
 
 // Placeholder types for compilation
 mod sigma_types {
-    
+
 
     pub type Result<T> = core::result::Result<T, &'static str>;
 

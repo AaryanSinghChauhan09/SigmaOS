@@ -66,12 +66,9 @@ impl Package {
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-use alloc::format;
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;

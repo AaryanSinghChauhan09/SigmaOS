@@ -273,37 +273,37 @@ pub struct NamespaceRegistry {
 
 impl NamespaceRegistry {
     pub fn new() -> Self;
-    
+
     pub fn register_pid_namespace(
         &self,
         ns_id: u64,
         owner_pid: u32,
     ) -> Result<(), NamespaceSyscallError>;
-    
+
     pub fn register_ipc_namespace(
         &self,
         ns_id: u64,
         owner_pid: u32,
     ) -> Result<(), NamespaceSyscallError>;
-    
+
     pub fn register_mount_namespace(
         &self,
         ns_id: u64,
         owner_pid: u32,
     ) -> Result<(), NamespaceSyscallError>;
-    
+
     pub fn increment_ref(
         &self,
         ns_id: u64,
         ns_type: &str,
     ) -> Result<(), NamespaceSyscallError>;
-    
+
     pub fn decrement_ref(
         &self,
         ns_id: u64,
         ns_type: &str,
     ) -> Result<(), NamespaceSyscallError>;
-    
+
     pub fn namespace_exists(&self, ns_id: u64, ns_type: &str) -> bool;
 }
 ```
@@ -323,12 +323,12 @@ pub struct ProcessNamespaceContext {
 
 impl ProcessNamespaceContext {
     pub fn new() -> Self;
-    
+
     pub fn from_clone_flags(
         flags: CloneFlags,
         base_context: &ProcessNamespaceContext,
     ) -> Result<Self, NamespaceSyscallError>;
-    
+
     pub fn in_namespace(&self, ns_id: u64, ns_type: &str) -> bool;
 }
 ```
@@ -350,7 +350,7 @@ int main() {
         perror("unshare");
         return 1;
     }
-    
+
     pid_t pid = fork();
     if (pid == 0) {
         // Child process
@@ -361,7 +361,7 @@ int main() {
         printf("Parent PID: %d\n", getpid());
         waitpid(pid, NULL, 0);
     }
-    
+
     return 0;
 }
 ```
@@ -376,14 +376,14 @@ int main() {
 int main() {
     // Create new PID, IPC, and mount namespaces
     int flags = CLONE_NEWPID | CLONE_NEWIPC | CLONE_NEWNS;
-    
+
     if (sys_unshare(flags) < 0) {
         perror("unshare");
         return 1;
     }
-    
+
     printf("Process isolated in new namespaces\n");
-    
+
     // Subsequent operations are namespace-isolated
     return 0;
 }
@@ -401,9 +401,9 @@ int main() {
         perror("setns");
         return 1;
     }
-    
+
     printf("Successfully joined namespace 100\n");
-    
+
     // Now part of namespace 100
     return 0;
 }

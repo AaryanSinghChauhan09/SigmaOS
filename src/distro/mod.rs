@@ -49,8 +49,8 @@ pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_distro_gaps::{
     BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeType,
-    DnsRecordEntry, SovereignDynamicDevfsEngine, JournaldLogRecord, WifiAccessPoint, WifiSecurity, 
-    SovereignStatefulNatEngine, NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, 
+    DnsRecordEntry, SovereignDynamicDevfsEngine, JournaldLogRecord, WifiAccessPoint, WifiSecurity,
+    SovereignStatefulNatEngine, NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine,
     SovereignDnsTlsResolverEngine, SovereignJournaldBinaryStorageEngine,
     SystemdInitManager, SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver,
     UsbHidModifierKeys, WirelessBluetoothStack,
@@ -63,11 +63,6 @@ pub use garuda_nomad_innovations::{
 };
 pub mod linux_ideas;
 pub mod manjaro;
-pub use manjaro::{
-    ManjaroBranch, ManjaroBranchManager, ManjaroTimeshiftAutoSnap, MhwdKernelDriverAutobuilder,
-    PackageSearchResult, PamacUnifiedSearchEngine, PrimeOffloadMode, SearchResultBackend,
-    SnapshotMode as ManjaroSnapshotMode, TimeshiftSnapshot,
-};
 pub mod missing_distro_innovations;
 pub mod nextgen;
 pub mod nixos_inspirations;

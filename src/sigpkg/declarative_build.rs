@@ -10,8 +10,7 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-extern crate alloc;
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]

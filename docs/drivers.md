@@ -83,22 +83,22 @@ unsafe impl Sync for MyDriver {}
 
 impl SigmaDriver for MyDriver {
     fn name(&self) -> &str { "my-device" }
-    
+
     fn probe(&mut self, device: &DeviceInfo) -> Result<(), DriverError> {
         // Map MMIO, configure hardware
         Ok(())
     }
-    
+
     fn read(&self, _offset: usize, buf: &mut [u8]) -> Result<usize, DriverError> {
         // Read from hardware
         Ok(buf.len())
     }
-    
+
     fn write(&mut self, _offset: usize, buf: &[u8]) -> Result<usize, DriverError> {
         // Write to hardware
         Ok(buf.len())
     }
-    
+
     fn remove(&mut self) -> Result<(), DriverError> {
         // Clean up
         Ok(())

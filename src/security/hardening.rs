@@ -3,7 +3,6 @@
 // Inspired by OpenBSD and Linux security mitigations
 
 #[cfg(feature = "standalone_test")]
-extern crate alloc;
 use alloc::vec::Vec;
 use crate::security::Permission;
 use core::sync::atomic::{AtomicUsize, Ordering};

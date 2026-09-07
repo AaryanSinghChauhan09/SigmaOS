@@ -1,5 +1,5 @@
 //! # Process Descriptor
-//! 
+//!
 //! This module provides ProcessDescriptor which tracks the complete lifecycle
 //! of a process including its namespace context and resource associations.
 
@@ -161,7 +161,7 @@ mod tests {
 
         assert_eq!(isolated_child.kernel_pid, 2);
         assert!(isolated_child.is_isolated);
-        
+
         // Namespaces should be different metadata from parent
         assert_ne!(
             parent.namespace_context.metadata_summary(),
@@ -214,7 +214,7 @@ mod tests {
     fn test_descriptor_metadata() {
         let descriptor = ProcessDescriptor::new_root(1, 1, 0, "init".to_string()).unwrap();
         let metadata = descriptor.metadata();
-        
+
         assert!(metadata.contains("ProcessDescriptor"));
         assert!(metadata.contains("init"));
         assert!(metadata.contains("isolated: true"));

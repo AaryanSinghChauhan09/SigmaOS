@@ -142,4 +142,3 @@ Implement all advanced Linux/BSD features for SigmaOS Phase 9:
 - Week 5-6: 9.6 Filtering, 9.7 Release
 
 ETA: 7-10 weeks to v0.9
-

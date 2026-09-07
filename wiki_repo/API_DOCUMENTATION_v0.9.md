@@ -403,7 +403,7 @@ impl BpfSeccompFilter {
     pub fn new(program: Vec<BpfInstruction>, name: String) -> Result<Self, String>;
     pub fn is_loaded(&self) -> bool;
     pub fn unload(&mut self);
-    pub fn execute_filter(&mut self, syscall_info: &SyscallInfo) 
+    pub fn execute_filter(&mut self, syscall_info: &SyscallInfo)
         -> Result<BpfFilterResult, String>;
     pub fn get_stats(&self) -> HashMap<String, u64>;
 }

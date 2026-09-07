@@ -3,10 +3,7 @@ use std::string::{String, ToString};
 // Absorbs and obsoletes Rancher OS, k3os, Bottlerocket, and containerd
 // by executing daemonless OCI containers directly on microkernel capabilities.
 
-#[cfg(not(test))]
-use crate::security::capability::CapabilityToken;
-extern crate alloc;
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {

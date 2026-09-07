@@ -27,28 +27,28 @@ impl NamespaceId {
 pub struct UtsNamespace {
     /// Unique identifier for this namespace
     id: NamespaceId,
-    
+
     /// Hostname for this namespace (max 255 bytes)
     hostname: String,
-    
+
     /// Domainname for this namespace (max 255 bytes)
     domainname: String,
-    
+
     /// Nodename for this namespace
     nodename: String,
-    
+
     /// Release version
     release: String,
-    
+
     /// Version information
     version: String,
-    
+
     /// Machine type (e.g., "x86_64")
     machine: String,
-    
+
     /// Parent namespace ID (for hierarchical namespaces)
     parent_id: Option<NamespaceId>,
-    
+
     /// Reference count for this namespace
     refcount: Arc<AtomicU64>,
 }
@@ -155,7 +155,7 @@ impl UtsNamespace {
 pub struct UtsNamespaceManager {
     /// Map of namespace ID to UTS namespace
     namespaces: Arc<Mutex<HashMap<NamespaceId, Arc<Mutex<UtsNamespace>>>>>,
-    
+
     /// Atomic counter for generating unique namespace IDs
     id_counter: Arc<AtomicU64>,
 }
@@ -329,9 +329,9 @@ mod tests {
     fn test_namespace_deletion() {
         let manager = UtsNamespaceManager::new();
         let ns = manager.create_namespace(None).expect("Failed to create namespace");
-        
+
         manager.delete_namespace(ns).expect("Failed to delete namespace");
-        
+
         let result = manager.get_namespace(ns);
         assert!(result.is_err());
     }
@@ -360,7 +360,7 @@ mod tests {
 
         let ns_arc = manager.get_namespace(child).expect("Failed to get namespace");
         let ns = ns_arc.lock().expect("Failed to lock namespace");
-        
+
         assert_eq!(ns.parent_id(), Some(parent));
     }
 
@@ -369,7 +369,7 @@ mod tests {
         let manager = UtsNamespaceManager::new();
         manager.create_namespace(None).expect("Failed to create ns1");
         manager.create_namespace(None).expect("Failed to create ns2");
-        
+
         let count = manager.count().expect("Failed to get count");
         assert_eq!(count, 2);
     }

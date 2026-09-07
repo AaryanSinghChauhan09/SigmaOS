@@ -17,6 +17,7 @@ pub mod dashboard;
 pub mod desktop;
 pub mod device;
 pub mod driver;
+pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
 pub mod kernel;
@@ -81,9 +82,6 @@ pub use distro::{
     FreeBsdZfsBootEnvManager, GarudaDracutBtrfsSnapper, GarudaPerformanceTweakEngine,
     HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, NixOsFlakeProfileManager,
     OpenBsdDoasPrivilegeManager, SolusEopkgBudgieEngine, BodhiUpdateRecord, BodhiUpdateStatus,
-    ManjaroBranch, ManjaroBranchManager, ManjaroTimeshiftAutoSnap, MhwdKernelDriverAutobuilder,
-    PackageSearchResult, PamacUnifiedSearchEngine, PrimeOffloadMode, SearchResultBackend,
-    ManjaroSnapshotMode, TimeshiftSnapshot,
     FedoraBodhiUpdateEngine, FedoraIgnitionProvisionEngine, FedoraKojiDistGitBuilder,
     FedoraRpmOstreeEngine, IgnitionFile, IgnitionUnit, KojiBuildTask, OstreeDeploymentPin,
     FedoraTargetArchitecture,
@@ -402,3 +400,5 @@ pub mod open_source_obsoletion;
 pub use open_source_obsoletion::*;
 
 pub use unimplemented_features::*;
+pub use klib::zero_dependency_elimination::ZeroDependencyMasterHub;
+pub use tools::dependency_reduction::MasterDependencyReductionSuite;

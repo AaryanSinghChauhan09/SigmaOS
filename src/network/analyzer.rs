@@ -12,9 +12,8 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::format;
-use alloc::vec;
+use std::format;
+use std::vec;
 use core::net::IpAddr;
 
 // SigmaOS Network Traffic Analyzer

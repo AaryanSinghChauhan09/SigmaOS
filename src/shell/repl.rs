@@ -7,7 +7,7 @@ use std::format;
 use std::collections::{HashMap, HashSet};
 
 
-use crate::accessibility::framework::{
+use crate::accessibility::{
     AccessibilityFeature, AccessibilityFramework,
     AccessibilitySetting,
 };

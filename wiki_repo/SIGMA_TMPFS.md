@@ -75,7 +75,7 @@ let (used, avail) = fs.usage();
 ## Use Cases
 
 - `/tmp` — temporary files
-- `/run` — runtime state (PID files, sockets)  
+- `/run` — runtime state (PID files, sockets)
 - `/dev/shm` — POSIX shared memory
 - Build system scratch space
 - Container overlay layers

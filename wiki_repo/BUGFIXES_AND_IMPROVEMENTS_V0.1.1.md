@@ -1,6 +1,6 @@
 # SigmaOS v0.1.1 Bug Fixes & Improvements
 
-**Release Date:** September 3, 2026  
+**Release Date:** September 3, 2026
 **Branch Consolidation:** All 23 development branches merged into main
 
 ---

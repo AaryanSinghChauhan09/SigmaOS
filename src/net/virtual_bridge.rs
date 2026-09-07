@@ -130,7 +130,7 @@ impl VirtualBridgeDevice {
         dst_ns: NetworkNamespaceId,
     ) -> Result<(), String> {
         let mut rules = self.forwarding_rules.lock().map_err(|e| e.to_string())?;
-        
+
         // Check if rule already exists
         for rule in rules.iter_mut() {
             if rule.src_ns == src_ns && rule.dst_ns == dst_ns {
@@ -156,7 +156,7 @@ impl VirtualBridgeDevice {
         dst_ns: NetworkNamespaceId,
     ) -> Result<(), String> {
         let mut rules = self.forwarding_rules.lock().map_err(|e| e.to_string())?;
-        
+
         for rule in rules.iter_mut() {
             if rule.src_ns == src_ns && rule.dst_ns == dst_ns {
                 rule.enabled = false;
@@ -174,7 +174,7 @@ impl VirtualBridgeDevice {
         dst_ns: NetworkNamespaceId,
     ) -> Result<bool, String> {
         let rules = self.forwarding_rules.lock().map_err(|e| e.to_string())?;
-        
+
         for rule in rules.iter() {
             if rule.src_ns == src_ns && rule.dst_ns == dst_ns {
                 return Ok(rule.enabled);
@@ -191,12 +191,12 @@ impl VirtualBridgeDevice {
         ns2: NetworkNamespaceId,
     ) -> Result<VethPair, String> {
         let pairs = self.veth_pairs.lock().map_err(|e| e.to_string())?;
-        
+
         // Try both orderings
         if let Some(veth) = pairs.get(&(ns1, ns2)) {
             return Ok(veth.clone());
         }
-        
+
         if let Some(veth) = pairs.get(&(ns2, ns1)) {
             return Ok(VethPair {
                 left_name: veth.right_name.clone(),
@@ -231,7 +231,7 @@ impl VirtualBridgeDevice {
         ns2: NetworkNamespaceId,
     ) -> Result<(), String> {
         let mut pairs = self.veth_pairs.lock().map_err(|e| e.to_string())?;
-        
+
         if pairs.remove(&(ns1, ns2)).is_some() || pairs.remove(&(ns2, ns1)).is_some() {
             Ok(())
         } else {
@@ -254,7 +254,7 @@ mod tests {
     fn test_veth_pair_creation() {
         let ns1 = NetworkNamespaceId::new(1);
         let ns2 = NetworkNamespaceId::new(2);
-        
+
         let veth = VethPair::new(ns1, ns2);
         assert_eq!(veth.left_ns, ns1);
         assert_eq!(veth.right_ns, ns2);
@@ -265,7 +265,7 @@ mod tests {
     fn test_mac_generation() {
         let mac1 = VethPair::generate_mac(1);
         let mac2 = VethPair::generate_mac(2);
-        
+
         assert_eq!(mac1[0], 0x02); // Locally administered
         assert_ne!(mac1, mac2);
     }
@@ -297,7 +297,7 @@ mod tests {
 
         let veth = VethPair::new(ns1, ns2);
         let pairs = bridge.veth_pairs.lock().expect("Failed to lock");
-        
+
         // Manually store for testing
         drop(pairs); // Release lock before next operation
     }

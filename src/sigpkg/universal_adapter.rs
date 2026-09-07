@@ -49,32 +49,8 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-/// Description of Snapcraft Manifest (snap parity)
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub description: String,
-    pub confinement: String,
-    pub grade: String,
-    pub apps: Vec<String>,
-    pub plugs: Vec<String>,
-}
-/// Description of Flatpak Manifest (flatpak parity)
-pub struct FlatpakManifest {
-    pub id: String,
-    pub runtime: String,
-    pub runtime_version: String,
-    pub sdk: String,
-    pub command: String,
-    pub finish_args: Vec<String>,
-}
-#[derive(Debug, Clone)]
-pub enum AdapterError {
-    ParseError(String),
-    ValidationError(String),
-    UnsupportedFormat(String),
-}
+
+use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 pub use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -107,6 +83,52 @@ pub trait PackageFormatAdapter {
     }
 }
 
+
+#[derive(Debug, Clone)]
+pub struct FlatpakManifest {
+    pub id: String,
+    pub app_id: String,
+    pub command: String,
+    pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"
+}
+
+/// Description of FreeBSD UCL (+MANIFEST) pkg manifest
+#[derive(Debug, Clone)]
+pub struct FreeBsdUclManifest {
+    pub name: String,
+    pub version: String,
+    pub comment: String,
+    pub deps: Vec<String>,
+}
+
+/// Description of OpenBSD +CONTENTS pkg manifest
+#[derive(Debug, Clone)]
+pub struct OpenBsdContentsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub comment: String,
+    pub depends: Vec<String>,
+    pub exec_commands: Vec<String>,
+    pub unexec_commands: Vec<String>,
+}
+
+/// Description of NetBSD pkgsrc manifest
+#[derive(Debug, Clone)]
+pub struct NetBsdPkgsrcManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub comment: String,
+    pub depends: Vec<String>,
+}
+
+/// Description of openSUSE Zypper RPM spec/manifest
+#[derive(Debug, Clone)]
+pub struct ZypperSpecManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub requires: Vec<String>,
+}
 
 /// Description of Slackware package manifest
 #[derive(Debug, Clone)]

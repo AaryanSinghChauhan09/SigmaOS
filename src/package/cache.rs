@@ -12,12 +12,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::vec::Vec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
+
 /// OOP-based Local Package Cache & Proxy for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 11
 /// Implements offline-first package caching and registry proxy

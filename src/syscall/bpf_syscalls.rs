@@ -288,13 +288,13 @@ fn sys_bpf_prog_load(
 ) -> Result<u32, BpfError> {
     // In a real implementation, would parse attr struct
     // For now, create a test program and load it
-    
+
     let prog_type = BpfProgType::Tracing;
     let instructions = vec![
         BpfInstruction::LoadImm64 { dst_reg: 0, imm64: 42 },
         BpfInstruction::Return,
     ];
-    
+
     let mut registry = GLOBAL_BPF_REGISTRY.lock().unwrap();
     let fd = registry.load_program(
         prog_type,

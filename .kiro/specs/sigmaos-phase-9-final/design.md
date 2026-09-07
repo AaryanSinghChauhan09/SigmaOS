@@ -50,4 +50,3 @@ All components use Arc<Mutex<>> or Arc<RwLock<>> for shared state.
 ## Error Handling
 
 Result<T, String> throughout for clear error propagation.
-

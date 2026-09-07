@@ -496,7 +496,7 @@ pub mod utils {
 
     /// Generate random bytes
     pub fn randombytes(buf: &mut [u8]) {
-        
+
         for _byte in buf.iter_mut() {
             // *byte = random::random_byte(); // not available
         }
