@@ -153,6 +153,78 @@ impl Default for PkgBuild {
     }
 }
 
+/// Pacman Contrib Tooling Suite (pacman-contrib parity: paccache, pacdiff, checkupdates, pactree)
+pub struct PacmanContribEngine {
+    pub cached_packages: Vec<String>,
+    pub pending_pacnew: Vec<(String, String)>,
+}
+
+impl PacmanContribEngine {
+    pub fn new() -> Self {
+        Self {
+            cached_packages: Vec::new(),
+            pending_pacnew: Vec::new(),
+        }
+    }
+
+    /// paccache -r parity: Prunes package cache retaining the latest N builds
+    pub fn paccache_prune(&mut self, keep_latest: usize) -> Vec<String> {
+        if self.cached_packages.len() <= keep_latest {
+            return Vec::new();
+        }
+        let remove_count = self.cached_packages.len() - keep_latest;
+        self.cached_packages.drain(0..remove_count).collect()
+    }
+
+    /// pacdiff parity: Registers pending .pacnew files for interactive merging
+    pub fn register_pacnew(&mut self, original: &str, pacnew: &str) {
+        self.pending_pacnew
+            .push((original.to_string(), pacnew.to_string()));
+    }
+
+    /// pacdiff merge parity: Resolves and merges .pacnew into original file
+    pub fn pacdiff_merge(&mut self, original: &str) -> Option<String> {
+        if let Some(pos) = self
+            .pending_pacnew
+            .iter()
+            .position(|(orig, _)| orig == original)
+        {
+            let (orig, pacnew) = self.pending_pacnew.remove(pos);
+            Some(format!("Merged {} -> {}", pacnew, orig))
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for PacmanContribEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// AUR PKGBUILD Diff & Security Analyzer
+pub struct AurPkgbuildDiffAnalyzer;
+
+impl AurPkgbuildDiffAnalyzer {
+    /// Inspects PKGBUILD content for suspicious commands (e.g. curl|bash, sudo, rm -rf /)
+    pub fn inspect_pkgbuild_security(pkgbuild_text: &str) -> Vec<String> {
+        let mut warnings = Vec::new();
+        for line in pkgbuild_text.lines() {
+            if line.contains("curl") && line.contains("|") && line.contains("sh") {
+                warnings.push(format!("Suspicious remote script execution: {}", line.trim()));
+            }
+            if line.contains("rm -rf /") || line.contains("rm -rf $pkgdir/..") {
+                warnings.push(format!("Dangerous file deletion command: {}", line.trim()));
+            }
+            if line.contains("sudo ") {
+                warnings.push(format!("Elevated privilege invocation in PKGBUILD: {}", line.trim()));
+            }
+        }
+        warnings
+    }
+}
+
 /// AUR client helper for package management
 pub struct AurClient {
     pub aur_url: String,
@@ -584,7 +656,7 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -1,5 +1,6 @@
 pub mod omarchy;
 pub use omarchy::{
+pub mod parrot_security;
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
     OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
