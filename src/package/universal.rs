@@ -227,11 +227,17 @@ pub enum PackagePriority {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     Deb,        // apt/dpkg
+    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
+    Ipk,        // OpenWrt IPK package (.ipk)
+    Opkg,       // Opkg package (.opkg)
+    SolarisIps, // Solaris IPS package (.p5p / .ips)
+    GuixNar,    // Guix NAR archive (.nar)
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
     Snap,       // snap/squashfs
     Flatpak,    // flatpak sandbox
     AppImage,   // AppImage single-file container
+    #[default]
     SigmaPkg,   // native SigmaOS format
     Air,        // Adobe AIR (.air)
     Bottle,     // Homebrew Bottle (.bottle)
@@ -1210,6 +1216,7 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
+            _ => Box::new(TarGzInstallStrategy),
         }
     }
 
@@ -1264,6 +1271,7 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
+            _ => Box::new(TarGzMetadataAdapter),
         }
     }
 }
@@ -1749,6 +1757,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
