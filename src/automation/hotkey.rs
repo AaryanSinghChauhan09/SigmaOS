@@ -192,6 +192,7 @@ impl SovereignWindowManagerHotkeyEngine {
     pub fn load_preset_profile(&mut self, profile: WindowManagerProfileType) {
         self.active_profile = profile.clone();
         self.loaded_bindings.clear();
+        self.manager = SimpleHotkeyManager::new();
 
         match profile {
             WindowManagerProfileType::I3Sway => {
