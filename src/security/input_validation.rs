@@ -293,6 +293,8 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
 }
 
 /// Validate a textual IPv6 address (hexadecimal blocks separated by colons, ≤ 39 bytes).
+/// Rejects over-length compressed IPv6 addresses (e.g. `1:2:3:4:5:6:7::8`) with 8 or
+/// more explicit blocks to prevent parser differential security vulnerabilities.
 pub fn validate_ipv6(addr: &[u8]) -> Result<(), ValidationError> {
     if addr.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -304,6 +306,7 @@ pub fn validate_ipv6(addr: &[u8]) -> Result<(), ValidationError> {
     let mut colons = 0;
     let mut double_colon = false;
     let mut block_len = 0;
+    let mut blocks = 0;
     let mut i = 0;
 
     while i < addr.len() {
@@ -328,6 +331,9 @@ pub fn validate_ipv6(addr: &[u8]) -> Result<(), ValidationError> {
             colons += 1;
             block_len = 0;
         } else if b.is_ascii_hexdigit() {
+            if block_len == 0 {
+                blocks += 1;
+            }
             block_len += 1;
             if block_len > 4 {
                 return Err(ValidationError::OutOfRange);
@@ -338,10 +344,13 @@ pub fn validate_ipv6(addr: &[u8]) -> Result<(), ValidationError> {
         i += 1;
     }
 
-    if colons > 7 {
+    if colons > 7 || blocks > 8 {
         return Err(ValidationError::OutOfRange);
     }
-    if !double_colon && colons != 7 {
+    if double_colon && blocks >= 8 {
+        return Err(ValidationError::OutOfRange);
+    }
+    if !double_colon && (colons != 7 || blocks != 8) {
         return Err(ValidationError::OutOfRange);
     }
 
@@ -359,7 +368,7 @@ pub fn validate_port(port: u32) -> Result<(), ValidationError> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -486,6 +495,10 @@ mod tests {
         // Incorrect block counts
         assert!(validate_ipv6(b"2001:db8:85a3").is_err());
         assert!(validate_ipv6(b"2001:db8:85a3:0:0:8a2e:370:7334:1234").is_err());
+
+        // Over-length compressed IPv6 addresses (8 or more explicit blocks with double colon)
+        assert_eq!(validate_ipv6(b"1:2:3:4:5:6:7::8"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv6(b"1::2:3:4:5:6:7:8"), Err(ValidationError::OutOfRange));
     }
 
     #[test]
