@@ -5,16 +5,15 @@
 //! and syscall integration.
 
 use sigmaos::security::user_namespace::{
-    CapabilitySet, SubgidEntry, SubuidEntry, UidGidMapping, UserContext, UserNamespace,
-    UserNamespaceId, UserNamespaceManager, parse_subuid_file, parse_subgid_file,
-    SubuidAllocationTracker,
+    parse_subgid_file, parse_subuid_file, CapabilitySet, SubgidEntry, SubuidAllocationTracker,
+    SubuidEntry, UidGidMapping, UserContext, UserNamespace, UserNamespaceId, UserNamespaceManager,
 };
 use sigmaos::syscall::user_syscalls::{
-    UserCloneFlags, UserUnshareFlags, new_user_namespace_manager, sys_clone_user,
-    sys_unshare_user, sys_map_uid64, sys_map_gid64, sys_setuid64, sys_setgid64,
-    parse_subuid_allocations, parse_subgid_allocations, sys_grant_capability,
-    sys_revoke_capability, sys_check_capability, sys_setns_user, UidGidMapConfig,
-    SetidCapabilitySpec, UserNamespaceSyscallError,
+    new_user_namespace_manager, parse_subgid_allocations, parse_subuid_allocations,
+    sys_check_capability, sys_clone_user, sys_grant_capability, sys_map_gid64, sys_map_uid64,
+    sys_revoke_capability, sys_setgid64, sys_setns_user, sys_setuid64, sys_unshare_user,
+    SetidCapabilitySpec, UidGidMapConfig, UserCloneFlags, UserNamespaceSyscallError,
+    UserUnshareFlags,
 };
 
 // ============================================================================
@@ -25,7 +24,7 @@ use sigmaos::syscall::user_syscalls::{
 fn test_9_3_1_user_namespace_id_creation() {
     let ns_id = UserNamespaceId(1);
     assert_eq!(ns_id.0, 1);
-    
+
     let ns_id2 = UserNamespaceId(42);
     assert_eq!(ns_id2.0, 42);
 }
@@ -55,7 +54,9 @@ fn test_9_3_1_user_context_add_group() {
 #[test]
 fn test_9_3_1_user_namespace_creation() {
     let manager = UserNamespaceManager::new();
-    let ns_id = manager.create_namespace(1000, None).expect("Failed to create namespace");
+    let ns_id = manager
+        .create_namespace(1000, None)
+        .expect("Failed to create namespace");
     assert!(ns_id.0 > 0);
 }
 
@@ -63,7 +64,9 @@ fn test_9_3_1_user_namespace_creation() {
 fn test_9_3_1_get_namespace() {
     let manager = UserNamespaceManager::new();
     let ns_id = manager.create_namespace(1000, None).unwrap();
-    let ns = manager.get_namespace(ns_id).expect("Failed to get namespace");
+    let ns = manager
+        .get_namespace(ns_id)
+        .expect("Failed to get namespace");
     let ns_lock = ns.lock().unwrap();
     assert_eq!(ns_lock.id, ns_id);
     assert_eq!(ns_lock.owner_uid, 1000);
@@ -593,23 +596,23 @@ fn test_9_3_4_error_code_mapping() {
 #[test]
 fn test_integration_full_user_namespace_workflow() {
     let manager = UserNamespaceManager::new();
-    
+
     // Create namespace
     let ns_id = manager.create_namespace(1000, None).unwrap();
     let ns = manager.get_namespace(ns_id).unwrap();
-    
+
     // Set UID mapping
     let uid_mapping = UidGidMapping::new(0, 100000, 65536);
     let gid_mapping = UidGidMapping::new(0, 100000, 65536);
-    
+
     let mut ns_lock = ns.lock().unwrap();
     assert!(ns_lock.set_uid_map(vec![uid_mapping]).is_ok());
     assert!(ns_lock.set_gid_map(vec![gid_mapping]).is_ok());
-    
+
     // Grant capabilities
     assert!(ns_lock.grant_capability(CapabilitySet::CapChown).is_ok());
     assert!(ns_lock.has_capability(CapabilitySet::CapChown));
-    
+
     // Verify mapping works
     assert_eq!(ns_lock.map_uid_ns_to_host(0).unwrap(), 100000);
     assert_eq!(ns_lock.map_gid_ns_to_host(0).unwrap(), 100000);
@@ -618,27 +621,30 @@ fn test_integration_full_user_namespace_workflow() {
 #[test]
 fn test_integration_multiple_namespaces() {
     let manager = UserNamespaceManager::new();
-    
+
     let ns1 = manager.create_namespace(1000, None).unwrap();
     let ns2 = manager.create_namespace(2000, None).unwrap();
     let ns3 = manager.create_namespace(3000, None).unwrap();
-    
+
     let list = manager.list_namespaces().unwrap();
     assert_eq!(list.len(), 3);
-    
+
     // Configure each namespace differently
     let ns1_obj = manager.get_namespace(ns1).unwrap();
     let ns2_obj = manager.get_namespace(ns2).unwrap();
     let ns3_obj = manager.get_namespace(ns3).unwrap();
-    
+
     let mut n1 = ns1_obj.lock().unwrap();
     let mut n2 = ns2_obj.lock().unwrap();
     let mut n3 = ns3_obj.lock().unwrap();
-    
-    n1.set_uid_map(vec![UidGidMapping::new(0, 100000, 1000)]).ok();
-    n2.set_uid_map(vec![UidGidMapping::new(0, 200000, 1000)]).ok();
-    n3.set_uid_map(vec![UidGidMapping::new(0, 300000, 1000)]).ok();
-    
+
+    n1.set_uid_map(vec![UidGidMapping::new(0, 100000, 1000)])
+        .ok();
+    n2.set_uid_map(vec![UidGidMapping::new(0, 200000, 1000)])
+        .ok();
+    n3.set_uid_map(vec![UidGidMapping::new(0, 300000, 1000)])
+        .ok();
+
     assert_eq!(n1.map_uid_ns_to_host(0).ok(), Some(100000));
     assert_eq!(n2.map_uid_ns_to_host(0).ok(), Some(200000));
     assert_eq!(n3.map_uid_ns_to_host(0).ok(), Some(300000));
@@ -647,7 +653,7 @@ fn test_integration_multiple_namespaces() {
 #[test]
 fn test_integration_syscall_and_namespace_manager() {
     let manager = new_user_namespace_manager();
-    
+
     let ns_id = sys_clone_user(UserCloneFlags::CLONE_NEWUSER, &manager).unwrap();
     assert!(sys_map_uid64(ns_id, 0, 100000, 65536, &manager).is_ok());
     assert!(sys_map_gid64(ns_id, 0, 100000, 65536, &manager).is_ok());
@@ -660,12 +666,12 @@ fn test_integration_subuid_with_namespace() {
     let content = "user1:100000:65536\nuser2:200000:32768\n";
     let entries = parse_subuid_file(content).unwrap();
     assert_eq!(entries.len(), 2);
-    
+
     // Use the parsed entries to configure namespace
     let manager = UserNamespaceManager::new();
     let ns_id = manager.create_namespace(1000, None).unwrap();
     let ns = manager.get_namespace(ns_id).unwrap();
-    
+
     let mapping = UidGidMapping::new(entries[0].start_uid, 0, entries[0].count);
     let mut ns_lock = ns.lock().unwrap();
     assert!(ns_lock.set_uid_map(vec![mapping]).is_ok());
@@ -676,15 +682,17 @@ fn test_integration_complex_mapping_scenario() {
     let manager = UserNamespaceManager::new();
     let ns_id = manager.create_namespace(1000, None).unwrap();
     let ns = manager.get_namespace(ns_id).unwrap();
-    
+
     // Set up multiple non-overlapping mappings
     let mapping1 = UidGidMapping::new(0, 100000, 1000);
     let mapping2 = UidGidMapping::new(1000, 200000, 1000);
     let mapping3 = UidGidMapping::new(2000, 300000, 1000);
-    
+
     let mut ns_lock = ns.lock().unwrap();
-    assert!(ns_lock.set_uid_map(vec![mapping1, mapping2, mapping3]).is_ok());
-    
+    assert!(ns_lock
+        .set_uid_map(vec![mapping1, mapping2, mapping3])
+        .is_ok());
+
     // Verify all mappings work correctly
     assert_eq!(ns_lock.map_uid_ns_to_host(0).ok(), Some(100000));
     assert_eq!(ns_lock.map_uid_ns_to_host(1000).ok(), Some(200000));
