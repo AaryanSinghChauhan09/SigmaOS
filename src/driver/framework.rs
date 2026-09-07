@@ -147,6 +147,16 @@ impl Driver for SimpleDriver {
             _ => DriverState::Unloaded,
         }
     }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.state
+            .store(DriverState::Active as usize, Ordering::SeqCst);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.state
+            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        Ok(())
+    }
 }
 
 
@@ -531,7 +541,7 @@ impl DriverFramework for SimpleDriverFramework {
 // Unit Tests
 // ==========================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

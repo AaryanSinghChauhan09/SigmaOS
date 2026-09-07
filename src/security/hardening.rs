@@ -277,14 +277,6 @@ pub fn secure_zeroize(buffer: &mut [u8]) {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum IntrusionSeverity {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
-
 #[derive(Debug, Clone)]
 pub struct AuditLogEntry {
     pub timestamp_ms: u64,
@@ -308,21 +300,6 @@ impl HardenedAuditTrail {
             event: event.into(),
             severity,
         });
-    }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct IntrusionMonitor {
-    pub audit_trail: HardenedAuditTrail,
-}
-
-impl IntrusionMonitor {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn log_intrusion_attempt(&mut self, source: &str, severity: IntrusionSeverity) {
-        self.audit_trail.record_event(source, severity);
     }
 }
 
