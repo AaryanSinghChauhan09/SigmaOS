@@ -23,6 +23,13 @@ Welcome, AI Agent! This file provides essential context, coding standards, instr
 
 ---
 
+## 🏎️ Subsystem Management Protocols for AI Agents
+
+- **Driver Management**: Refer to `docs/AI_AGENT_DRIVER_MANAGEMENT.md` for driver lifecycle directives.
+- **Cache Operation Management**: Refer to `docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md` for explicit CPU cache line flushing (`clflush`, `clflushopt`, `clwb`), TLB invalidation/shootdown, Page Cache Radix-Tree operations, SLUB object cache recycling, `#[repr(align(64))]` CPU cache alignment, and JIT instruction cache synchronization rules.
+
+---
+
 ## 🚗 Driver Management Protocols for AI Agents
 
 When working on or interacting with the **Driver Subsystem** (`src/driver/`):
