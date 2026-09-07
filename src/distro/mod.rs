@@ -63,6 +63,14 @@ pub use garuda_nomad_innovations::{
 };
 pub mod linux_ideas;
 pub mod manjaro;
+pub use manjaro::{
+    DesktopLayoutPreset, HardwareQuirkRule, ManjaroBranch, ManjaroBranchManager,
+    ManjaroHelloSetupEngine, ManjaroTimeshiftAutoSnap, MhwdHardwareQuirkDatabase,
+    MhwdKernelDriverAutobuilder, PackageSearchResult, PamacTransactionEntry,
+    PamacTransactionJournalEngine, PamacUnifiedSearchEngine, PrimeOffloadMode,
+    SearchResultBackend, SetupWizardTask, SnapshotMode as ManjaroSnapshotMode, TimeshiftSnapshot,
+    TransactionType as PamacTransactionType, VendorHardwareType,
+};
 pub mod missing_distro_innovations;
 pub mod nextgen;
 pub mod nixos_inspirations;

@@ -146,6 +146,199 @@ impl Default for ManjaroHardwareDetection {
 }
 
 // ============================================================================
+// 5. Pamac Transaction Journal & Undo Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TransactionType {
+    Install,
+    Remove,
+    Upgrade,
+}
+
+#[derive(Debug, Clone)]
+pub struct PamacTransactionEntry {
+    pub transaction_id: usize,
+    pub package_name: String,
+    pub old_version: Option<String>,
+    pub new_version: String,
+    pub transaction_type: TransactionType,
+    pub timestamp_sec: u64,
+}
+
+pub struct PamacTransactionJournalEngine {
+    pub journal: Vec<PamacTransactionEntry>,
+}
+
+impl PamacTransactionJournalEngine {
+    pub fn new() -> Self {
+        Self { journal: Vec::new() }
+    }
+
+    pub fn record_transaction(
+        &mut self,
+        package_name: &str,
+        old_version: Option<&str>,
+        new_version: &str,
+        tx_type: TransactionType,
+        timestamp: u64,
+    ) -> usize {
+        let tx_id = self.journal.len() + 1;
+        self.journal.push(PamacTransactionEntry {
+            transaction_id: tx_id,
+            package_name: package_name.to_string(),
+            old_version: old_version.map(|s| s.to_string()),
+            new_version: new_version.to_string(),
+            transaction_type: tx_type,
+            timestamp_sec: timestamp,
+        });
+        tx_id
+    }
+
+    pub fn undo_last_transaction(&mut self) -> Option<PamacTransactionEntry> {
+        self.journal.pop()
+    }
+}
+
+impl Default for PamacTransactionJournalEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 6. MHWD Vendor Hardware Quirk Database
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VendorHardwareType {
+    AsusRogLaptop,
+    LenovoThinkPad,
+    AppleT2Mac,
+    DellXps,
+}
+
+#[derive(Debug, Clone)]
+pub struct HardwareQuirkRule {
+    pub vendor_type: VendorHardwareType,
+    pub quirk_flag: String,
+    pub patch_description: String,
+}
+
+pub struct MhwdHardwareQuirkDatabase {
+    pub rules: Vec<HardwareQuirkRule>,
+}
+
+impl MhwdHardwareQuirkDatabase {
+    pub fn new() -> Self {
+        let mut db = Self { rules: Vec::new() };
+        db.populate_quirks();
+        db
+    }
+
+    fn populate_quirks(&mut self) {
+        self.rules.push(HardwareQuirkRule {
+            vendor_type: VendorHardwareType::AsusRogLaptop,
+            quirk_flag: "asus_rog_kbd_backlight".to_string(),
+            patch_description: "Enable ASUS WMI keyboard RGB LED controller".to_string(),
+        });
+        self.rules.push(HardwareQuirkRule {
+            vendor_type: VendorHardwareType::LenovoThinkPad,
+            quirk_flag: "thinkpad_battery_threshold".to_string(),
+            patch_description: "Enable tp_smapi battery charge thresholds".to_string(),
+        });
+        self.rules.push(HardwareQuirkRule {
+            vendor_type: VendorHardwareType::AppleT2Mac,
+            quirk_flag: "apple_bcm4377_wifi_override".to_string(),
+            patch_description: "Apple T2 BCM4377 Wi-Fi firmware blob loader".to_string(),
+        });
+    }
+
+    pub fn lookup_quirks_for_vendor(&self, vendor: VendorHardwareType) -> Vec<&HardwareQuirkRule> {
+        self.rules.iter().filter(|r| r.vendor_type == vendor).collect()
+    }
+}
+
+impl Default for MhwdHardwareQuirkDatabase {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. Manjaro Hello First-Run Setup & Layout Switcher
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopLayoutPreset {
+    GnomeDefault,
+    PlasmaBreeze,
+    XfceClassic,
+    SwayTiling,
+}
+
+#[derive(Debug, Clone)]
+pub struct SetupWizardTask {
+    pub name: String,
+    pub description: String,
+    pub is_completed: bool,
+}
+
+pub struct ManjaroHelloSetupEngine {
+    pub current_layout: DesktopLayoutPreset,
+    pub setup_tasks: Vec<SetupWizardTask>,
+}
+
+impl ManjaroHelloSetupEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            current_layout: DesktopLayoutPreset::GnomeDefault,
+            setup_tasks: Vec::new(),
+        };
+        engine.init_default_tasks();
+        engine
+    }
+
+    fn init_default_tasks(&mut self) {
+        self.setup_tasks.push(SetupWizardTask {
+            name: "Enable AUR".to_string(),
+            description: "Enable Arch User Repository access in Pamac".to_string(),
+            is_completed: false,
+        });
+        self.setup_tasks.push(SetupWizardTask {
+            name: "Enable Flatpaks".to_string(),
+            description: "Enable Flatpak repository integration".to_string(),
+            is_completed: false,
+        });
+        self.setup_tasks.push(SetupWizardTask {
+            name: "System Update".to_string(),
+            description: "Perform initial system upgrade".to_string(),
+            is_completed: false,
+        });
+    }
+
+    pub fn set_layout(&mut self, layout: DesktopLayoutPreset) {
+        self.current_layout = layout;
+    }
+
+    pub fn complete_task(&mut self, task_name: &str) -> bool {
+        for task in &mut self.setup_tasks {
+            if task.name == task_name {
+                task.is_completed = true;
+                return true;
+            }
+        }
+        false
+    }
+}
+
+impl Default for ManjaroHelloSetupEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // 1. Manjaro Branch Switcher & Staging Repository Manager
 // ============================================================================
 
@@ -416,6 +609,38 @@ mod manjaro_tests {
         let results = search_engine.search("code");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].backend, SearchResultBackend::Aur);
+    }
+
+    #[test]
+    fn test_pamac_transaction_journal() {
+        let mut journal = PamacTransactionJournalEngine::new();
+        let id = journal.record_transaction("firefox", Some("119.0"), "120.0", TransactionType::Upgrade, 1700000000);
+        assert_eq!(id, 1);
+        assert_eq!(journal.journal.len(), 1);
+
+        let undone = journal.undo_last_transaction().unwrap();
+        assert_eq!(undone.package_name, "firefox");
+        assert_eq!(journal.journal.len(), 0);
+    }
+
+    #[test]
+    fn test_mhwd_hardware_quirk_db() {
+        let db = MhwdHardwareQuirkDatabase::new();
+        let asus_quirks = db.lookup_quirks_for_vendor(VendorHardwareType::AsusRogLaptop);
+        assert_eq!(asus_quirks.len(), 1);
+        assert_eq!(asus_quirks[0].quirk_flag, "asus_rog_kbd_backlight");
+    }
+
+    #[test]
+    fn test_manjaro_hello_setup_engine() {
+        let mut hello = ManjaroHelloSetupEngine::new();
+        assert_eq!(hello.current_layout, DesktopLayoutPreset::GnomeDefault);
+
+        hello.set_layout(DesktopLayoutPreset::SwayTiling);
+        assert_eq!(hello.current_layout, DesktopLayoutPreset::SwayTiling);
+
+        assert!(hello.complete_task("Enable AUR"));
+        assert!(hello.setup_tasks[0].is_completed);
     }
 }
 
