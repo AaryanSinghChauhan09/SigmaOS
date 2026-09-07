@@ -205,6 +205,14 @@ impl Default for DistroRepoSyncEngine {
 
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageState {
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
+}
+
 pub enum PackagePriority {
     Essential,
     Required,
@@ -267,8 +275,6 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    Nix,        // Nix package (.nix)
-    Txz,        // FreeBSD / Slackware txz (.txz)
 }
 
 impl PackageFormat {
@@ -1258,9 +1264,6 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
-            PackageFormat::Nix => Box::new(NixInstallStrategy),
-            PackageFormat::Txz => Box::new(TxzInstallStrategy),
-            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1315,9 +1318,6 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
-            PackageFormat::Nix => Box::new(NixMetadataAdapter),
-            PackageFormat::Txz => Box::new(TxzMetadataAdapter),
-            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -1399,203 +1399,7 @@ impl NodeBinaryDistroEngine {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ForeignDistroManifest {
-    pub raw_format: PackageFormat,
-    pub original_name: String,
-    pub version: String,
-    pub architecture: String,
-    pub raw_dependencies: Vec<String>,
-    pub raw_provides: Vec<String>,
-    pub raw_conflicts: Vec<String>,
-    pub maintainer: String,
-}
 
-pub struct UniversalPackageTranslator;
-
-impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let name = format!("sigpkg-{}", manifest.original_name);
-        let mut pkg = UnifiedPackage::new(name, manifest.version.clone())
-            .with_format(PackageFormat::SigmaPkg);
-
-        for dep in &manifest.raw_dependencies {
-            if dep.contains("ssl") || dep.contains("crypto") {
-                pkg = pkg.with_dependency("sovereign-openssl".to_string());
-            } else if dep.contains("libc") || dep.contains("c6") {
-                pkg = pkg.with_dependency("sovereign-libc".to_string());
-            } else {
-                pkg = pkg.with_dependency(format!("sovereign-{}", dep));
-            }
-        }
-        pkg.provides.push(manifest.original_name.clone());
-        for p in &manifest.raw_provides {
-            pkg.provides.push(p.clone());
-        }
-        pkg
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DistroRepoRecord {
-    pub distro_name: String,
-    pub url: String,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct DistroRepoSyncEngine {
-    pub synced_repos: Vec<String>,
-    pub registered_repos: Vec<DistroRepoRecord>,
-    pub indexed_manifests: Vec<ForeignDistroManifest>,
-}
-
-impl DistroRepoSyncEngine {
-    pub fn new() -> Self {
-        Self {
-            synced_repos: Vec::new(),
-            registered_repos: vec![
-                DistroRepoRecord { distro_name: "Debian".to_string(), url: "https://deb.debian.org".to_string() },
-                DistroRepoRecord { distro_name: "ArchLinux".to_string(), url: "https://archlinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Fedora".to_string(), url: "https://fedoraproject.org".to_string() },
-                DistroRepoRecord { distro_name: "Alpine".to_string(), url: "https://alpinelinux.org".to_string() },
-                DistroRepoRecord { distro_name: "Void".to_string(), url: "https://voidlinux.org".to_string() },
-            ],
-            indexed_manifests: Vec::new(),
-        }
-    }
-
-    pub fn sync_all_repositories(&mut self) -> Result<usize, &'static str> {
-        self.synced_repos = self.registered_repos.iter().map(|r| r.distro_name.clone()).collect();
-        Ok(self.synced_repos.len())
-    }
-
-    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
-        self.indexed_manifests.push(manifest);
-    }
-
-    pub fn total_indexed_packages(&self) -> usize {
-        self.indexed_manifests.len()
-    }
-
-    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
-        self.indexed_manifests
-            .iter()
-            .find(|m| m.original_name == pkg_name)
-            .map(|m| UniversalPackageTranslator::translate_to_sigma_pkg(m))
-    }
-}
-
-// =========================================================================
-// Foreign Distro Package Manifest & Repository Synchronization
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ForeignDistroManifest {
-    pub raw_format: PackageFormat,
-    pub original_name: String,
-    pub version: String,
-    pub architecture: String,
-    pub raw_dependencies: Vec<String>,
-    pub raw_provides: Vec<String>,
-    pub raw_conflicts: Vec<String>,
-    pub maintainer: String,
-}
-
-pub struct UniversalPackageTranslator;
-
-impl UniversalPackageTranslator {
-    pub fn translate_to_sigma_pkg(manifest: &ForeignDistroManifest) -> UnifiedPackage {
-        let mut pkg = UnifiedPackage::new(
-            format!("sigpkg-{}", manifest.original_name),
-            manifest.version.clone(),
-        )
-        .with_format(PackageFormat::SigmaPkg)
-        .with_provides(manifest.original_name.clone());
-
-        for dep in &manifest.raw_dependencies {
-            let mapped_dep = if dep.contains("ssl") {
-                "sovereign-openssl".to_string()
-            } else if dep.contains("c6") || dep.contains("libc") {
-                "sovereign-libc".to_string()
-            } else {
-                dep.clone()
-            };
-            pkg = pkg.with_dependency(mapped_dep);
-        }
-
-        for prov in &manifest.raw_provides {
-            pkg = pkg.with_provides(prov.clone());
-        }
-
-        for conf in &manifest.raw_conflicts {
-            pkg = pkg.with_conflict(conf.clone());
-        }
-
-        pkg
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RegisteredRepoInfo {
-    pub distro_name: String,
-    pub mirror_url: String,
-}
-
-pub struct DistroRepoSyncEngine {
-    pub registered_repos: Vec<RegisteredRepoInfo>,
-    pub foreign_index: HashMap<String, ForeignDistroManifest>,
-}
-
-impl DistroRepoSyncEngine {
-    pub fn new() -> Self {
-        Self {
-            registered_repos: vec![
-                RegisteredRepoInfo {
-                    distro_name: "Debian".to_string(),
-                    mirror_url: "https://deb.debian.org/debian".to_string(),
-                },
-                RegisteredRepoInfo {
-                    distro_name: "ArchLinux".to_string(),
-                    mirror_url: "https://archlinux.org/packages".to_string(),
-                },
-                RegisteredRepoInfo {
-                    distro_name: "Fedora".to_string(),
-                    mirror_url: "https://mirrors.fedoraproject.org".to_string(),
-                },
-                RegisteredRepoInfo {
-                    distro_name: "Alpine".to_string(),
-                    mirror_url: "https://dl-cdn.alpinelinux.org/alpine".to_string(),
-                },
-                RegisteredRepoInfo {
-                    distro_name: "VoidLinux".to_string(),
-                    mirror_url: "https://repo-default.voidlinux.org/current".to_string(),
-                },
-            ],
-            foreign_index: HashMap::new(),
-        }
-    }
-
-    pub fn index_foreign_manifest(&mut self, manifest: ForeignDistroManifest) {
-        self.foreign_index
-            .insert(manifest.original_name.clone(), manifest);
-    }
-
-    pub fn total_indexed_packages(&self) -> usize {
-        self.foreign_index.len()
-    }
-
-    pub fn find_and_translate(&self, pkg_name: &str) -> Option<UnifiedPackage> {
-        self.foreign_index
-            .get(pkg_name)
-            .map(|manifest| UniversalPackageTranslator::translate_to_sigma_pkg(manifest))
-    }
-}
-
-impl Default for DistroRepoSyncEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 // =========================================================================
 // Multi-Distro Package Adapter Execution Pipeline
@@ -1703,6 +1507,43 @@ pub struct PackageAdapter {
 }
 
 impl PackageAdapter {
+    pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
+        let mut pledges = Vec::new();
+        for arg in &manifest.finish_args {
+            if arg.contains("network") {
+                pledges.push("network".to_string());
+            } else if arg.contains("ipc") {
+                pledges.push("ipc".to_string());
+            } else if arg.contains("filesystem") {
+                pledges.push("unveil_all".to_string());
+            }
+        }
+        pledges
+    }
+
+    pub fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> String {
+        if manifest.confinement == "strict" {
+            "strict_pledge_sandbox".to_string()
+        } else {
+            "unconfined_host".to_string()
+        }
+    }
+
+    pub fn mount_appimage_squashfs(&self, runtime: &AppImageRuntime) -> Result<String, &'static str> {
+        if runtime.squashfs_offset == 0 {
+            Err("Invalid squashfs offset")
+        } else {
+            Ok(format!("/tmp/.mount_{}_squashfs", runtime.app_name))
+        }
+    }
+
+    pub fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
+        !config.sourcelist_url.is_empty()
+    }
+
+    pub fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
+        config.enabled
+    }
     pub fn new(format: PackageFormat, adapter_name: String) -> Self {
         Self {
             format,
@@ -1976,7 +1817,6 @@ impl UniversalPackageManager {
             triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
-            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
@@ -2063,13 +1903,13 @@ impl UniversalPackageManager {
             (PackageFormat::Snap, "snap"),
             (PackageFormat::Flatpak, "flatpak"),
             (PackageFormat::SigmaPkg, "sigpkg"),
-            (PackageFormat::Portage, "portage_ebuild"),
-            (PackageFormat::FreeBsdPkg, "freebsd_pkg"),
-            (PackageFormat::ArchPkgBuild, "arch_pkgbuild"),
-            (PackageFormat::NixStore, "nix_store"),
+            (PackageFormat::Ebuild, "portage_ebuild"),
+            (PackageFormat::Pkg, "freebsd_pkg"),
+            (PackageFormat::Nixpkg, "nix_store"),
             (PackageFormat::AppImage, "appimage"),
-            (PackageFormat::Homebrew, "homebrew_formula"),
+            (PackageFormat::Bottle, "homebrew_formula"),
             (PackageFormat::Apk, "apk"),
+            (PackageFormat::Xbps, "xbps"),
         ];
 
         for (fmt, name) in formats {
