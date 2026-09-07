@@ -59,6 +59,12 @@ Components receiving open file descriptors enter capability mode (`enter_capabil
 * **PipeWire WirePlumber Policy**: Audio session wireplumber Lua policy & device node routing governor (`FedoraPipewireWireplumberPolicyGovernor`).
 * **RPM Seccomp Syscall Filter**: Post-install Seccomp BPF syscall filter validator (`FedoraRPMSeccompFilterEngine`).
 
+### 3.5 Kali Linux Security & Forensics Components (`src/security/kali_stack.rs`)
+* **NetHunter Mobile Penetration Testing**: Android / ARM USB OTG BadUSB emulation & Rubber Ducky HID payload injection (`KaliNethunterMobileAuditEngine`).
+* **Undercover Desktop Mode**: Stealth desktop theme switching for Windows 10/11 disguise (`KaliUndercoverThemeSwitcherEngine`).
+* **Kismet Wireless Sniffer & WIDS**: 802.11 / Bluetooth / Zigbee passive packet capture & WIDS intrusion detection (`KaliKismetWirelessSnifferEngine`).
+* **Autopsy Forensic Timeline Engine**: Filesystem MFT/inode timestamp & action timeline analysis (`KaliAutopsyForensicTimelineEngine`).
+
 ### 3.4 Arch Linux Parity & Keyring Components (`src/compatibility/arch_linux.rs`)
 * **GnuPG Keyring & Trust Database**: Web of Trust keyring initialization, key import, and revocation (`ArchKeyringTrustDatabaseEngine`).
 * **Reflector Mirrorlist Ranking**: Dynamic mirror ranking by download speed, country code, and completion rate (`ArchReflectorMirrorlistEngine`).

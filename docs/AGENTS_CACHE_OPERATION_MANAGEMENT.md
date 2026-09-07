@@ -1,100 +1,65 @@
-# AI Agent Guidelines: Cache Operation Management in SigmaOS
+# Sovereign AI Agent Cache Operation Management Specification
 
-## 📌 1. Overview & Core Directives
-
-In **SigmaOS**, cache operation management governs explicit, hardware-level CPU cache line flushes, write-backs, invalidations, and instruction-data cache synchronization ($I\$ / D\$$ coherence).
-
-As an AI agent developing microkernel components, device drivers, virtual memory systems, or JIT translators, you must strictly manage hardware cache operations to guarantee **data durability, DMA coherency, and execution safety** across x86_64, AArch64, and RISC-V 64 architectures.
+This document specifies mandatory protocols for explicit CPU cache line flushing (`clflush`, `clflushopt`, `clwb`), Translation Lookaside Buffer (TLB) invalidation and inter-processor interrupt (IPI) shootdowns, Page Cache Radix-Tree lookups, SLUB object cache recycling, CPU cache line alignment (`#[repr(align(64))]`), and JIT instruction cache synchronization for autonomous AI engineering agents (Jules, Sentinel, Palette, Bolt) operating within the SigmaOS kernel and userland subsystems.
 
 ---
 
-## ⚙️ 2. Hardware Cache Operations & ISA Mapping
+## 1. Explicit CPU Cache Line Flushing & Persistent Memory Writeback
 
-### 2.1 x86_64 Cache Control Instructions
-| Operation | Architecture Instruction | Intrinsic / Assembly | Operational Semantics |
-| :--- | :--- | :--- | :--- |
-| **Flush Line** | `clflush` / `clflushopt` | `_mm_clflush(ptr)` | Flushes cache line containing `ptr` from all cache levels ($L1/L2/L3$) to DRAM. |
-| **Write-Back Line** | `clwb` | `_mm_clwb(ptr)` | Writes back dirty cache line to memory without evicting line from cache ($L1/L2/L3$). |
-| **Full Invalidation** | `wbinvd` | `asm!("wbinvd")` | Writes back and invalidates ALL CPU caches (Privileged Ring 0 only; HIGH LATENCY). |
-| **Store Fence** | `sfence` | `_mm_sfence()` | Guarantees all preceding stores and cache flushes retire before subsequent stores. |
-| **Full Fence** | `mfence` | `_mm_mfence()` | Serializes all load and store operations across the memory pipeline. |
-
-### 2.2 AArch64 Cache Control Operations
-* **Data Cache Clean (Write-Back) to PoC (Point of Coherency):** `dc cvac, xt`
-* **Data Cache Clean & Invalidate:** `dc civac, xt`
-* **Instruction Cache Invalidation to PoU (Point of Unification):** `ic ivau, xt`
-* **Barrier Synchronization:** `dsb ish` (Data Synchronization Barrier), `isb` (Instruction Synchronization Barrier)
-
-### 2.3 RISC-V 64 Cache Operations (Zicbom / Zicboz Extension)
-* **Clean Block:** `cbo.clean`
-* **Flush Block:** `cbo.flush`
-* **Invalidate Block:** `cbo.inval`
-* **Instruction Cache Fence:** `fence.i`
+1. **Low-Level Cache Line Flushing Primitives**:
+   - **`clflush`**: Flushes the specified cache line from all cache levels across all cores.
+   - **`clflushopt`**: Optimized unordered cache line flush instruction allowing concurrent execution across non-overlapping addresses. Must be followed by `sfence` when memory order serialization is required.
+   - **`clwb`**: Cache Line Write Back write-optimized primitive. Writes back modified cache line data to main memory without evicting the line from the L1/L2/L3 cache hierarchies.
+2. **Persistent Memory Transaction Serialization**:
+   - Updates to non-volatile RAM (NVRAM), NVDIMM persistent memory log structures, or transactional journals (`src/filesystem/ext4.rs`, `src/filesystem/cow_snapshot.rs`) must issue `clwb` / `clflushopt` instructions followed by `sfence` memory barriers before committing transaction headers.
 
 ---
 
-## 🛡️ 3. Key Subsystem Cache Operation Patterns
+## 2. Translation Lookaside Buffer (TLB) Invalidation & SMP Shootdowns
 
-### 3.1 DMA Buffer Coherency
-When preparing a buffer for non-cache-coherent PCIe or AHCI DMA devices:
-1. **Pre-DMA Transmit (CPU Write $\rightarrow$ Device Read):**
-   * Perform $D\$$ clean/write-back for all 64-byte cache lines covering the buffer range.
-   * Issue `sfence` / `dsb ish` before signaling device doorbell register.
-2. **Post-DMA Receive (Device Write $\rightarrow$ CPU Read):**
-   * Invalidate CPU $D\$$ lines covering target buffer to force subsequent CPU reads to fetch fresh data from DRAM.
-
-### 3.2 Self-Modifying Code & eBPF JIT Cache Sync
-When generating dynamic machine code in memory before execution:
-1. Write generated instructions to target memory buffer.
-2. Flush/Clean Data Cache line ($D\$$ write-back): `clwb` / `dc cvau`.
-3. Issue Store Fence: `sfence` / `dsb ish`.
-4. Invalidate Instruction Cache ($I\$$ invalidate): `ic ivau` / `fence.i`.
-5. Issue Pipeline Instruction Barrier: `isb`.
-6. Execute function pointer.
-
-### 3.3 Persistent Memory & NVDIMM Durability
-For persistent memory writes (`src/filesystem/ext4.rs`, `src/filesystem/btrfs_inspired.rs`):
-```rust
-pub unsafe fn flush_persistent_range(ptr: *const u8, len: usize) {
-    let mut addr = ptr as usize & !63; // Align to 64-byte boundary
-    let end = (ptr as usize + len + 63) & !63;
-
-    while addr < end {
-        #[cfg(target_arch = "x86_64")]
-        core::arch::x86_64::_mm_clwb(addr as *const _);
-
-        #[cfg(target_arch = "aarch64")]
-        core::arch::aarch64::__dc_cvac(addr as *const _);
-
-        addr += 64;
-    }
-
-    #[cfg(target_arch = "x86_64")]
-    core::arch::x86_64::_mm_sfence();
-}
-```
+1. **Page-Table Invalidation Primitives (`src/memory/tlb_associative.rs`)**:
+   - Virtual page unmapping or protection bit updates (`PTE_PRESENT`, `PTE_USER`, `PTE_RW`) must immediately execute CPU-specific page invalidation instructions:
+     - **x86_64**: `invlpg [addr]`
+     - **ARM64**: `tlbi vaae1is, [addr]`
+     - **RISC-V**: `sfence.vma [addr]`
+2. **SMP Inter-Processor Interrupt (IPI) Shootdown Protocol**:
+   - In multi-core symmetric multiprocessing (SMP) environments, unmapping physical frames assigned to active process page tables requires broadcasting an IPI TLB shootdown request to all CPUs executing threads in the target page directory.
+   - The originating CPU must wait for all target cores to acknowledge TLB invalidation before returning the physical page frame to the buddy frame allocator (`src/memory/pmm_vmm.rs`, `src/memory/buddy_allocator.rs`).
 
 ---
 
-## 🚫 4. AI Agent Safety Rules for Cache Operations
+## 3. Page Cache & SLUB Object Cache Operations
 
-1. **Avoid `wbinvd` in Hot Paths:**
-   * Never execute `wbinvd` inside kernel interrupt handlers or system call dispatchers. It stalls all execution pipelines for up to several milliseconds.
-2. **Align Range Flushes to 64 Bytes:**
-   * Always round start address down (`addr & !63`) and end address up (`(addr + len + 63) & !63`) when flushing cache ranges to prevent partial line misses.
-3. **Always Pair Non-Temporal Stores with Fences:**
-   * Every non-temporal streaming store (`_mm_stream_si128`) or `clwb` flush sequence MUST conclude with an `sfence` / `dsb ish` before returning or notifying external hardware.
+1. **Page Cache Radix-Tree Lookups (`src/klib/adt.rs`, `docs/filesystem.md`)**:
+   - VFS file page cache lookups use lock-free $O(\log N)$ Radix-Tree structures with Read-Copy-Update (RCU) protection.
+   - Hot page cache allocations must maintain cache-line locality and avoid invalidating adjacent tree node cache lines.
+2. **SLUB Object Cache Recycling (`src/klib/slab.rs`, `src/klib/custom_allocator.rs`)**:
+   - Kernel slab allocators recycle fixed-size kernel objects (dentries, inodes, socket descriptors) using per-CPU lock-free object pools.
+   - Unused slab pages must be reclaimed and returned to the physical memory allocator when slab utilization drops below 25%.
 
 ---
 
-## 🧪 5. Verification & Standalone Testing Procedures
+## 4. CPU Cache Line Alignment & False Sharing Prevention
 
-AI agents can verify cache operation helper routines via standalone unit compilation:
+1. **64-Byte CPU Cache Line Alignment (`#[repr(align(64))]`)**:
+   - All high-frequency concurrent structures (spinlocks, atomic counters, lock-free ring buffer read/write indices in `src/klib/ringbuf.rs`) must enforce 64-byte alignment to prevent false sharing cache ping-ponging across CPU cores.
+2. **Per-CPU Scratchpads**:
+   - Frequently modified kernel metrics and scheduler task queues must utilize per-CPU variables to isolate cache lines to individual CPU cores.
 
-```bash
-# Test memory manager & performance allocator stack (includes cache flushing helpers)
-rustc --test --edition=2021 src/kernel/perf_mm.rs -o build/perf_mm_tests && ./build/perf_mm_tests && rm build/perf_mm_tests
+---
 
-# Test eBPF JIT translator & code cache synchronization
-rustc --test --edition=2021 src/kernel/linux_bsd_innovations.rs -o build/ebpf_tests && ./build/ebpf_tests && rm build/ebpf_tests
-```
+## 5. DMA Buffer Coherency & JIT Instruction Cache Synchronization
+
+1. **DMA Buffer Cache Coherency**:
+   - For non-cache-coherent bus hardware (ISA, legacy PCI, embedded SPI/I2C), CPU data cache ranges covering DMA buffer regions must be invalidated before DMA receive reads and flushed after DMA write writes (`src/driver/ahci_sata_controller.rs`).
+2. **JIT Dynamic Binary Translation Cache Invalidation**:
+   - Dynamic binary translation engines (Rosetta translation layer, eBPF JIT compiler in `src/unimplemented_features.rs`) generating machine code into memory must flush data caches and invalidate the instruction cache (`isb` on ARM64, `fence.i` on RISC-V) prior to branch jumps.
+
+---
+
+## 6. AI Agent Cache Operation Directives Summary
+
+1. **Always Flush Before DMA**: Explicitly flush/invalidate CPU data cache lines over DMA buffers before initiating controller DMA bus operations.
+2. **Synchronize Multi-Core TLBs**: Execute IPI shootdowns across all active cores prior to freeing unmapped physical page frames.
+3. **Enforce 64-Byte Alignment**: Annotate concurrent atomic pointers and queue indices with `#[repr(align(64))]`.
+4. **Invalidate Instruction Caches on Code JIT**: Always issue CPU instruction cache invalidation barriers after generating or patching executable memory.
