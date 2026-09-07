@@ -11,7 +11,11 @@ use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
+
+#[cfg(test)]
+use std::collections::HashMap;
 
 /// x86-64 Microarchitecture Level (CachyOS / Arch Linux parity)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -158,7 +162,89 @@ impl CachyPackageRepo {
     }
 }
 
-#[cfg(test_disabled)]
+/// CPU Energy Performance Preference (EPP) for CachyOS / auto-cpufreq
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EnergyPerformancePreference {
+    Performance,
+    BalancePerformance,
+    BalancePower,
+    Power,
+}
+
+/// CachyOS Auto-CpuFreq Power Governor Engine
+/// Dynamically adjusts CPU scaling governors and EPP parameters based on battery vs AC power states.
+pub struct CachyOsAutoFreqEngine {
+    pub is_on_ac_power: bool,
+    pub current_governor: String,
+    pub current_epp: EnergyPerformancePreference,
+    pub turbo_boost_enabled: bool,
+}
+
+impl CachyOsAutoFreqEngine {
+    pub fn new() -> Self {
+        Self {
+            is_on_ac_power: true,
+            current_governor: String::from("performance"),
+            current_epp: EnergyPerformancePreference::Performance,
+            turbo_boost_enabled: true,
+        }
+    }
+
+    pub fn set_power_state(&mut self, on_ac: bool) {
+        self.is_on_ac_power = on_ac;
+        if on_ac {
+            self.current_governor = String::from("performance");
+            self.current_epp = EnergyPerformancePreference::Performance;
+            self.turbo_boost_enabled = true;
+        } else {
+            self.current_governor = String::from("powersave");
+            self.current_epp = EnergyPerformancePreference::BalancePower;
+            self.turbo_boost_enabled = false;
+        }
+    }
+}
+
+impl Default for CachyOsAutoFreqEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// CachyOS Hardware Detection & Microarch Driver Installer (chwd parity)
+pub struct CachyOsChWDHardwareEngine {
+    pub microarch_level: MicroArchLevel,
+    pub installed_gpu_driver: String,
+    pub optimized_mesa_v3: bool,
+}
+
+impl CachyOsChWDHardwareEngine {
+    pub fn new(caps: CpuCapabilities) -> Self {
+        let level = caps.detect_microarch_level();
+        let mesa_v3 = level >= MicroArchLevel::V3;
+        Self {
+            microarch_level: level,
+            installed_gpu_driver: String::from("chwd-video-linux"),
+            optimized_mesa_v3: mesa_v3,
+        }
+    }
+
+    pub fn auto_configure_chwd_drivers(&mut self, is_nvidia: bool) -> String {
+        if is_nvidia {
+            if self.microarch_level >= MicroArchLevel::V3 {
+                self.installed_gpu_driver = String::from("chwd-nvidia-v3-dkms");
+            } else {
+                self.installed_gpu_driver = String::from("chwd-nvidia-dkms");
+            }
+        } else if self.microarch_level >= MicroArchLevel::V3 {
+            self.installed_gpu_driver = String::from("chwd-mesa-v3-amdgpu-intel");
+        } else {
+            self.installed_gpu_driver = String::from("chwd-mesa-generic");
+        }
+        self.installed_gpu_driver.clone()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -197,5 +283,24 @@ mod tests {
 
         repo.switch_kernel_variant(CachyKernelVariant::CachyLto);
         assert_eq!(repo.active_kernel, CachyKernelVariant::CachyLto);
+    }
+
+    #[test]
+    fn test_cachy_autofreq_and_chwd() {
+        let mut auto_freq = CachyOsAutoFreqEngine::new();
+        assert!(auto_freq.is_on_ac_power);
+        assert_eq!(auto_freq.current_governor, "performance");
+
+        auto_freq.set_power_state(false); // Battery mode
+        assert!(!auto_freq.is_on_ac_power);
+        assert_eq!(auto_freq.current_governor, "powersave");
+        assert_eq!(auto_freq.current_epp, EnergyPerformancePreference::BalancePower);
+
+        let caps_v3 = CpuCapabilities::new_x86_64_v3_capable();
+        let mut chwd = CachyOsChWDHardwareEngine::new(caps_v3);
+        assert!(chwd.optimized_mesa_v3);
+
+        let driver = chwd.auto_configure_chwd_drivers(true);
+        assert_eq!(driver, "chwd-nvidia-v3-dkms");
     }
 }
