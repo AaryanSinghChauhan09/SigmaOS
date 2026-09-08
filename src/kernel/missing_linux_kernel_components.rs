@@ -7,8 +7,6 @@
 // 5. Futex2 / futex_waitv Engine (Multi-futex waiting, 64-bit alignment, priority inheritance PI futexes)
 // 6. Device Mapper Engine (dm-verity Merkle tree root hash verification and dm-crypt virtual block translation)
 
-#![cfg_attr(not(test), no_std)]
-
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
