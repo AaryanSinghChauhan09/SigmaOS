@@ -124,16 +124,14 @@ impl CinnamonPanel {
     /// Move applet to new position
     pub fn move_applet(&mut self, applet_id: &str, new_position: u32) {
         if let Some(idx) = self.applets.iter().position(|a| a.id == applet_id) {
-            if let Some(applet) = self.applets.remove(idx) {
-                let mut applet = applet;
-                applet.position = new_position;
-                // Insert at correct position
-                let insert_idx = self
-                    .applets
-                    .binary_search_by_key(&new_position, |a| a.position)
-                    .unwrap_or_else(|e| e);
-                self.applets.insert(insert_idx, applet);
-            }
+            let mut applet = self.applets.remove(idx);
+            applet.position = new_position;
+            // Insert at correct position
+            let insert_idx = self
+                .applets
+                .binary_search_by_key(&new_position, |a| a.position)
+                .unwrap_or_else(|e| e);
+            self.applets.insert(insert_idx, applet);
         }
     }
 }
