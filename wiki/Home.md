@@ -19,7 +19,7 @@ SigmaOS is the world’s first **sovereign operating system**, engineered from t
 - **Unix Philosophy for Web Apps**: PWAs gain raw access to pipes, spawn, mmap, and `/dev`.
 - **Zero-Bloat Package Management**: Alpine packages installed directly via browser APIs.
 - **Strict Capabilities System**: Websites must explicitly request hardware/file access.
-- **Safe-Rust 12-Shard Microkernel**: Twelve shard taxonomy replacing 500+ legacy apps with native abstractions.
+- **Safe-Rust 12-Shard Microkernel**: Twelve shard taxonomy replacing 500+ legacy apps with native abstractions ([SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V22.md](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V22.md)).
 
 ---
 
