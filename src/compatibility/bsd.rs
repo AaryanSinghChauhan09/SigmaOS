@@ -394,27 +394,4 @@ mod tests {
         guard.pledge("stdio rpath").unwrap();
         assert!(!guard.check_permission("inet", None));
     }
-
-    #[test]
-    fn test_freebsd_geom_manager() {
-        let mut geom = FreeBsdGeomManager::new();
-        geom.register_provider("ada0p1", GeomClassType::Partition, 1073741824, 512);
-
-        let provider = geom.lookup_provider("ada0p1").unwrap();
-        assert_eq!(provider.class_type, GeomClassType::Partition);
-        assert_eq!(provider.media_size_bytes, 1073741824);
-    }
-
-    #[test]
-    fn test_openbsd_sandbox_guard() {
-        let mut guard = OpenBsdSandboxGuard::new();
-        assert!(guard.check_permission("inet", None));
-
-        guard.unveil("/etc", "r").unwrap();
-        assert!(guard.check_permission("rpath", Some("/etc")));
-        assert!(!guard.check_permission("rpath", Some("/var")));
-
-        guard.pledge("stdio rpath").unwrap();
-        assert!(!guard.check_permission("inet", None));
-    }
 }

@@ -1519,7 +1519,13 @@ mod tests {
                 None,
             ],
         };
+        let node_b = PackageNode {
+            pkg_id: 1,
+            version: PkgVersion { major: 2, minor: 1 },
+            dependencies: [None, None, None, None],
+        };
         assert!(sat.add_package_node(node_a));
+        assert!(sat.add_package_node(node_b));
         assert!(sat.solve(0));
     }
 }
@@ -1582,6 +1588,90 @@ impl GamifiedProductivityLayer {
             "resolve_security_scan" => self.badges[2].unlocked = true,
             _ => {}
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZenithProfileMode {
+    Developer,
+    Minimalist,
+    Gamer,
+}
+
+#[derive(Debug, Clone)]
+pub struct ZenithProfileConfig {
+    pub mode: ZenithProfileMode,
+    pub target_clock_mhz: u32,
+    pub idle_ram_budget_mb: u32,
+    pub compositor_fps: u32,
+}
+
+pub struct ZenithDesktopProfileManager {
+    pub active_config: ZenithProfileConfig,
+}
+
+impl ZenithDesktopProfileManager {
+    pub fn new() -> Self {
+        Self {
+            active_config: ZenithProfileConfig {
+                mode: ZenithProfileMode::Developer,
+                target_clock_mhz: 2400,
+                idle_ram_budget_mb: 128,
+                compositor_fps: 60,
+            },
+        }
+    }
+
+    pub fn switch_profile(&mut self, mode: ZenithProfileMode) {
+        self.active_config = match mode {
+            ZenithProfileMode::Developer => ZenithProfileConfig {
+                mode,
+                target_clock_mhz: 2400,
+                idle_ram_budget_mb: 128,
+                compositor_fps: 60,
+            },
+            ZenithProfileMode::Minimalist => ZenithProfileConfig {
+                mode,
+                target_clock_mhz: 800,
+                idle_ram_budget_mb: 24,
+                compositor_fps: 30,
+            },
+            ZenithProfileMode::Gamer => ZenithProfileConfig {
+                mode,
+                target_clock_mhz: 4500,
+                idle_ram_budget_mb: 256,
+                compositor_fps: 144,
+            },
+        };
+    }
+}
+
+pub struct CrossDeviceContinuityEngine {
+    pub active_app: Option<String>,
+    pub app_offset: u64,
+    pub shared_clipboard_data: String,
+}
+
+impl CrossDeviceContinuityEngine {
+    pub fn new() -> Self {
+        Self {
+            active_app: None,
+            app_offset: 0,
+            shared_clipboard_data: String::new(),
+        }
+    }
+
+    pub fn snapshot_application_context(&mut self, app_name: &str, offset: u64, _bounds: (i32, i32, u32, u32), _timestamp: u64) {
+        self.active_app = Some(app_name.to_string());
+        self.app_offset = offset;
+    }
+
+    pub fn sync_clipboard_content(&mut self, text: &str) {
+        self.shared_clipboard_data = text.to_string();
+    }
+
+    pub fn resume_context_on_target_device(&self) -> Option<(String, u64)> {
+        self.active_app.as_ref().map(|app| (app.clone(), self.app_offset))
     }
 }
 
@@ -1782,6 +1872,8 @@ impl GentooUseFlagEngine {
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
 pub const CAP_SEEK: u64 = 1 << 2;
+
+use alloc::collections::BTreeMap as HashMap;
 
 pub struct FreeBsdCapsicumEngine {
     pub is_capability_mode: bool,
@@ -2188,14 +2280,14 @@ impl DragonFlyHammer2FsSnapshotV2 {
             pfs_snapshots: Vec::new(),
             active_pfs_id: 1,
         };
-
-        assert!(sat.add_package_node(node_a));
-        assert!(sat.add_package_node(node_b));
-
-        assert!(sat.solve(0));
-        assert_eq!(sat.selected_version[0].unwrap().major, 1);
-        assert_eq!(sat.selected_version[1].unwrap().major, 2);
+        snap.pfs_snapshots.push((1, root_pfs_name.to_string(), 1000));
+        snap
     }
+}
+
+#[cfg(test)]
+pub mod extra_unimplemented_tests {
+    use super::*;
 
     #[test]
     fn test_section_6_4_jbd2_ledger() {
