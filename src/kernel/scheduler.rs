@@ -1,3 +1,23 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct TaskId(pub u64);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
+}
+
+impl Task {
+    pub fn new(id: u64, vruntime: u64) -> Self {
+        Self {
+            id: TaskId(id),
+            vruntime,
+            priority: 1,
+        }
+    }
+}
+
 use core::time::Duration;
 use std::string::String;
 use std::vec::Vec;
@@ -110,7 +130,7 @@ impl Process {
     }
 
     /// Update virtual deadline considering ULE interactivity and EEVDF lag
-    pub fn update_virtual_deadline_ule(&mut self, _system_vtime: u64) {
+    pub fn update_virtual_deadline_ule(&mut self, system_vtime: u64) {
         let weight = self.get_weight();
         let q = 10u64;
         let base_slice = (q / weight).max(1);
@@ -120,6 +140,7 @@ impl Process {
         let slice = base_slice.saturating_sub(boost).max(1);
         self.virtual_deadline = self.virtual_runtime + slice;
     }
+
 }
 
 #[derive(Debug, Clone)]
@@ -299,7 +320,7 @@ impl Scheduler {
 }
 
 /// Task identifier for CFS scheduler
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TaskId(pub u64);
 
 /// Task representation for CFS scheduler
@@ -308,16 +329,6 @@ pub struct Task {
     pub id: TaskId,
     pub vruntime: u64,
     pub priority: u32,
-}
-
-impl Task {
-    pub fn new(id: u64, vruntime: u64) -> Self {
-        Self {
-            id: TaskId(id),
-            vruntime,
-            priority: 1,
-        }
-    }
 }
 
 /// CFS Scheduler implementation
@@ -330,7 +341,7 @@ pub struct CfsScheduler {
 impl CfsScheduler {
     pub const fn new() -> Self {
         CfsScheduler {
-            tasks: [None; 64],
+            tasks: [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
             task_count: 0,
             current_time: 0,
         }
@@ -338,12 +349,19 @@ impl CfsScheduler {
 
     pub fn add_task(&mut self, task: Task) {
         if self.task_count < 64 {
-            self.tasks[self.task_count] = Some(task);
+            self.tasks[self.task_count] = Some(task.clone());
             self.task_count += 1;
             self.sort_tasks();
         }
     }
 
+    pub fn tick(&mut self) {
+        self.current_time += 1;
+    }
+
+    pub fn schedule(&mut self) -> Option<Task> {
+        self.pick_next_task()
+    }
     pub fn pick_next_task(&mut self) -> Option<Task> {
         if self.task_count > 0 {
             let task = self.tasks[0].take();

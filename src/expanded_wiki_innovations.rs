@@ -21,9 +21,9 @@
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
+extern crate alloc;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 
 /// Arch Linux pacman-contrib Utilities Engine
@@ -55,7 +55,7 @@ impl ArchPacmanContribEngine {
         &self,
         remote_versions: &[(String, String)],
     ) -> Vec<(String, String, String)> {
-        let mut pending = Vec::new();
+        let mut pending: Vec<(String, String, String)> = Vec::new();
         for (pkg, remote_ver) in remote_versions {
             if let Some((_, local_ver)) = self.cached_pkg_versions.iter().find(|(p, _)| p == pkg) {
                 if local_ver != remote_ver {
@@ -95,7 +95,7 @@ impl ArchPacmanContribEngine {
         target_dep: &str,
         pkg_deps_map: &[(String, Vec<String>)],
     ) -> Vec<String> {
-        let mut dependents = Vec::new();
+        let mut dependents: Vec<String> = Vec::new();
         for (pkg, deps) in pkg_deps_map {
             if deps.iter().any(|d: &String| d == target_dep) {
                 dependents.push(pkg.clone());
@@ -170,7 +170,7 @@ impl FreeBsdPkgAuditEngine {
         &self,
         installed_pkgs: &[String],
     ) -> Vec<(String, String, String)> {
-        let mut found = Vec::new();
+        let mut found: Vec<(String, String, String)> = Vec::new();
         for (pkg, cve, sev) in &self.vulnerability_cve_db {
             if installed_pkgs.iter().any(|p: &String| p.starts_with(pkg.as_str())) {
                 found.push((pkg.clone(), cve.clone(), sev.clone()));
@@ -326,7 +326,7 @@ impl MiseUniversalVersionManager {
         self.runtimes
             .iter()
             .find(|(r, _)| r == runtime)
-            .map(|(_, v)| v.clone())
+            .map(|(_, v): &(String, String)| v.clone())
     }
 }
 
@@ -481,7 +481,7 @@ pub struct SigmaosGrowthArchitectureEngine {
 
 impl SigmaosGrowthArchitectureEngine {
     pub fn new() -> Self {
-        let items = vec![
+        let items = alloc::vec![
             GrowthDomainItem {
                 domain: "Package Management".to_string(),
                 inspiration: "Arch pacman, Nix reproducibility, BSD Ports".to_string(),
@@ -600,7 +600,7 @@ impl GentooPortageUseFlagResolver {
     }
 
     pub fn resolve_dependencies(&self, pkg_name: &str) -> Vec<String> {
-        let mut deps = vec!["sys-libs/glibc".to_string()];
+        let mut deps = alloc::vec!["sys-libs/glibc".to_string()];
         if self.is_feature_enabled("ssl") {
             deps.push("dev-libs/openssl".to_string());
         }
@@ -737,7 +737,7 @@ pub struct StrategicImportPlanEngine {
 
 impl StrategicImportPlanEngine {
     pub fn new() -> Self {
-        let items = vec![
+        let items = alloc::vec![
             StrategicImportItem {
                 pillar: "Kernel Enhancements".to_string(),
                 linux_source: "Arch RT, Fedora (Btrfs)".to_string(),
@@ -856,7 +856,7 @@ mod expanded_wiki_tests {
         let mut audit = FreeBsdPkgAuditEngine::new();
         audit.add_vulnerability("openssl", "CVE-2024-0001", "High");
 
-        let installed = vec!["openssl-3.0.13".to_string(), "curl-8.2.1".to_string()];
+        let installed = alloc::vec!["openssl-3.0.13".to_string(), "curl-8.2.1".to_string()];
         let found = audit.audit_vulnerabilities(&installed);
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].1, "CVE-2024-0001");

@@ -63,6 +63,61 @@ pub enum OfficialArchiveSource {
     Backports,
 }
 
+/// Ubuntu PPA (Personal Package Archive) representation
+#[derive(Debug, Clone)]
+pub struct PpaRepository {
+    pub owner: String,
+    pub name: String,
+    pub gpg_fingerprint: String,
+    pub enabled: bool,
+}
+
+impl PpaRepository {
+    pub fn new(owner: &str, name: &str, fingerprint: &str) -> Self {
+        Self {
+            owner: owner.to_string(),
+            name: name.to_string(),
+            gpg_fingerprint: fingerprint.to_string(),
+            enabled: true,
+        }
+    }
+
+    pub fn to_sources_list_entry(&self) -> String {
+        format!(
+            "deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main",
+            self.owner, self.name
+        )
+    }
+}
+
+/// GPG Key Verification for Repositories
+#[derive(Debug, Clone)]
+pub struct RepositoryGpgKey {
+    pub key_id: String,
+    pub owner_email: String,
+    pub is_valid: bool,
+}
+
+impl RepositoryGpgKey {
+    pub fn new(key_id: &str, owner_email: &str) -> Self {
+        Self {
+            key_id: key_id.to_string(),
+            owner_email: owner_email.to_string(),
+            is_valid: true,
+        }
+    }
+}
+
+/// Debian / Ubuntu Official Archives & Foreign Backports
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OfficialArchiveSource {
+    Main,
+    Universe,
+    Restricted,
+    Multiverse,
+    Backports,
+}
+
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]
 pub struct Repository {
@@ -216,6 +271,17 @@ mod tests {
             ppa.to_sources_list_entry(),
             "deb https://ppa.launchpadcontent.net/graphics-drivers/ppa/ubuntu main"
         );
+    }
+
+    #[test]
+    fn test_mirror_benchmark_engine() {
+        let mirrors = vec![
+            "https://mirror1.org".to_string(),
+            "https://mirror2.org".to_string(),
+        ];
+        let bench = MirrorBenchmarkEngine::benchmark_mirrors(&mirrors);
+        assert_eq!(bench.len(), 2);
+        assert!(bench[0].latency_ms < bench[1].latency_ms);
     }
 
     #[test]
