@@ -285,7 +285,6 @@ pub enum PackageFormat {
     GuixNar,    // Guix NAR archive (.nar)
 }
 
-
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
         let name = filename.to_lowercase();
