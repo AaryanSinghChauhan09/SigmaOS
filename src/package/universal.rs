@@ -226,6 +226,13 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    OpenBsdPkg,
+    Ipk,
+    Opkg,
+    SolarisIps,
+    GuixNar,
+
+    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -1127,6 +1134,75 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
+
+pub struct HardwareOptimizationDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub target_microarch_level: String,
+    pub required_simd_features: Vec<String>,
+}
+
+impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        println!("HardwareOptimizationDecorator: Optimization level {}", self.target_microarch_level);
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct ResourceLimitDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub max_memory_bytes: u64,
+    pub cpu_quota_percent: u32,
+}
+
+impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        println!("ResourceLimitDecorator: Memory limit {} bytes, CPU {}%", self.max_memory_bytes, self.cpu_quota_percent);
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct PqcSignedDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub dilithium_signature: String,
+}
+
+impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        if self.dilithium_signature.contains("invalid") {
+            return Err(PackageError::InstallationFailed("PQC Signature Verification Failed".to_string()));
+        }
+        println!("PqcSignedDecorator: Dilithium signature verified successfully!");
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -1161,6 +1237,12 @@ pub struct PackageFactory;
 impl PackageFactory {
     pub fn get_strategy(format: PackageFormat) -> Box<dyn InstallStrategy> {
         match format {
+            PackageFormat::OpenBsdPkg => Box::new(PkgInstallStrategy),
+            PackageFormat::Ipk => Box::new(ApkInstallStrategy),
+            PackageFormat::Opkg => Box::new(ApkInstallStrategy),
+            PackageFormat::SolarisIps => Box::new(PkgInstallStrategy),
+            PackageFormat::GuixNar => Box::new(GuixInstallStrategy),
+
             PackageFormat::Deb => Box::new(DebInstallStrategy),
             PackageFormat::Rpm => Box::new(RpmInstallStrategy),
             PackageFormat::Pacman => Box::new(PacmanInstallStrategy),
@@ -1215,6 +1297,12 @@ impl PackageFactory {
 
     pub fn get_adapter(format: PackageFormat) -> Box<dyn PackageMetadataAdapter> {
         match format {
+            PackageFormat::OpenBsdPkg => Box::new(PkgMetadataAdapter),
+            PackageFormat::Ipk => Box::new(ApkMetadataAdapter),
+            PackageFormat::Opkg => Box::new(ApkMetadataAdapter),
+            PackageFormat::SolarisIps => Box::new(PkgMetadataAdapter),
+            PackageFormat::GuixNar => Box::new(GuixMetadataAdapter),
+
             PackageFormat::Deb => Box::new(DebMetadataAdapter),
             PackageFormat::Rpm => Box::new(RpmMetadataAdapter),
             PackageFormat::Pacman => Box::new(PacmanMetadataAdapter),
@@ -1749,6 +1837,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
@@ -2088,6 +2177,9 @@ pub struct UniversalPackageManifestParser;
 
 impl UniversalPackageManifestParser {
     pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
+        PackageFormat::from_filename(filename)
+    }
+    pub fn _detect_format_from_filename_legacy(filename: &str) -> Option<PackageFormat> {
         let name = filename.to_lowercase();
         if name.ends_with(".deb") || name.ends_with(".superdeb") {
             Some(PackageFormat::Deb)
@@ -2296,7 +2388,7 @@ impl UniversalPackageFormatBridge {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

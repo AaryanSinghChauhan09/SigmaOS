@@ -1020,6 +1020,7 @@ pub struct NixFlakeInput {
     pub locked_nar_hash: String,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct NixOsFlakesEngine {
     pub flake_inputs: BTreeMap<String, NixFlakeInput>,
     pub lock_version: u32,
