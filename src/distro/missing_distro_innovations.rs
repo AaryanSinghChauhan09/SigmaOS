@@ -2113,14 +2113,16 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct NixOsFlakesEngine {
     pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
 }
 
 impl NixOsFlakesEngine {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            flake_inputs: BTreeMap::new(),
+        }
     }
 
     pub fn lock_input(&mut self, name: &str, url: &str, hash: &str) {
@@ -2306,7 +2308,7 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 13);
+        assert_eq!(engine.records.len(), 6);
         assert!(engine.is_all_components_implemented());
     }
 

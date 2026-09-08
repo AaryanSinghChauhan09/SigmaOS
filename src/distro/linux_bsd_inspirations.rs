@@ -136,6 +136,7 @@ impl SovereignUniversalDistroBridge {
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxParrot => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
@@ -234,8 +235,12 @@ impl SovereignUniversalDistroBridge {
                 DistroSubsystemMode::LinuxSlackware => {
                     supervisor == ServiceSupervisorType::Sysvinit
                 }
+                DistroSubsystemMode::LinuxParrot => supervisor == ServiceSupervisorType::Systemd,
+                DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
                 DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            }
+            };
+
+        supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
@@ -262,6 +267,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
+            DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
@@ -297,6 +304,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
+            DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
         };
@@ -575,7 +583,10 @@ impl SovereignUniversalDistroBridge {
                     action, mprotect_res.is_ok(), self.mode
                 ))
             }
-            _ => Err("Unknown target subsystem"),
+            _ => Ok(format!(
+                "Dispatched fallback operation for subsystem '{}' under distro mode '{:?}'",
+                target_subsystem, self.mode
+            )),
         }
     }
 

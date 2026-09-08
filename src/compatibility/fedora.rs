@@ -3143,19 +3143,21 @@ pub struct IgnitionSystemdUnit {
     pub contents: String,
 }
 
-/// Fedora Ignition First-Boot Declarative Provisioning Engine
-/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
-/// (files, users, systemd units) before userspace init handoff.
-pub struct FedoraIgnitionEngine {
-    pub files: Vec<IgnitionFile>,
-    pub users: Vec<IgnitionUser>,
-    pub systemd_units: Vec<IgnitionSystemdUnit>,
-    pub provisioned: bool,
+/// Fedora Offline Update Staging & Reboot Execution Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraOfflineUpdateEngine {
+    pub staged_packages: Vec<String>,
+    pub is_offline_update_pending: bool,
+    pub trigger_reboot_flag: bool,
 }
 
-impl FedoraIgnitionEngine {
+impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            staged_packages: Vec::new(),
+            is_offline_update_pending: false,
+            trigger_reboot_flag: false,
+        }
     }
 
     pub fn stage_offline_packages(&mut self, packages: &[&str]) {
@@ -3178,9 +3180,22 @@ impl FedoraIgnitionEngine {
     }
 }
 
+impl Default for FedoraOfflineUpdateEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-
-
+/// Fedora Ignition First-Boot Declarative Provisioning Engine
+/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
+/// (files, users, systemd units) before userspace init handoff.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraIgnitionEngine {
+    pub files: Vec<IgnitionFile>,
+    pub users: Vec<IgnitionUser>,
+    pub systemd_units: Vec<IgnitionSystemdUnit>,
+    pub provisioned: bool,
+}
 
 impl FedoraIgnitionEngine {
     pub fn new() -> Self {
@@ -4021,6 +4036,7 @@ impl FedoraElectionsEngine {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -5228,21 +5244,6 @@ mod tests {
         let mut sssd = FedoraSssdKerberosRealmClientEngine::new("FEDORA.ORGANIZATION.ORG");
         assert!(sssd.obtain_ticket_granting_ticket("jules_admin", "SecretPgpPass").is_ok());
         assert!(sssd.is_tgt_valid());
-    }
-
-        // New version release check -> event generated & fedmsg published
-        let event = hotness
-            .process_upstream_release_check(
-                1234,
-                "8.3.0",
-                "https://curl.se/release-8.3.0",
-                1700000100,
-            )
-            .unwrap()
-            .unwrap();
-
-        assert!(wireplumber.set_default_node("sink", 101));
-        assert_eq!(wireplumber.default_sink_node, Some(101));
     }
 
     #[test]
