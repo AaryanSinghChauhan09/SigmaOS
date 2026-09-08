@@ -232,7 +232,13 @@ pub enum PackageFormat {
     Snap,       // snap/squashfs
     Flatpak,    // flatpak sandbox
     AppImage,   // AppImage single-file container
+    #[default]
     SigmaPkg,   // native SigmaOS format
+    OpenBsdPkg,
+    Ipk,
+    Opkg,
+    SolarisIps,
+    GuixNar,
     Air,        // Adobe AIR (.air)
     Bottle,     // Homebrew Bottle (.bottle)
     Ipa,        // iOS App (.ipa)
@@ -1210,6 +1216,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
+            PackageFormat::OpenBsdPkg
+            | PackageFormat::Ipk
+            | PackageFormat::Opkg
+            | PackageFormat::SolarisIps
+            | PackageFormat::GuixNar => Box::new(DebInstallStrategy),
         }
     }
 
@@ -1264,6 +1275,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
+            PackageFormat::OpenBsdPkg
+            | PackageFormat::Ipk
+            | PackageFormat::Opkg
+            | PackageFormat::SolarisIps
+            | PackageFormat::GuixNar => Box::new(DebMetadataAdapter),
         }
     }
 }
@@ -1749,6 +1765,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();

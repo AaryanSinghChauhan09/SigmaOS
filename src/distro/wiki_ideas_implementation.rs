@@ -1,4 +1,6 @@
 // SigmaOS Wiki & Distro Innovations Subsystem
+extern crate alloc;
+
 // Incorporates declarative system configurations (NixOS pattern),
 // Arch-style plaintext recipe sandbox compilation (Arch pattern),
 // openSUSE Snapper-inspired pre/post CoW transaction recovery (openSUSE pattern),
