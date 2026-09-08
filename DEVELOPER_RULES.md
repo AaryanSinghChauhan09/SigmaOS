@@ -21,7 +21,12 @@
 
 ---
 
-## Core Principles
+## Core Principles & Contributor Rules
+
+SigmaOS maintains strict `#![no_std]` zero-dependency architecture across all subsystems. Comprehensive contributor and AI agent rules are specified in:
+- `docs/AGENTS_CONTRIBUTOR_DEVELOPMENT_RULES.md`
+- `AGENTS.md`
+- `CONTRIBUTING.md`
 
 ### 1. **Sovereignty & Zero Dependencies**
 - **No External Unverified Dependencies**: Core kernel and userspace modules must use Rust's `#![no_std]` with explicit capability bounds.

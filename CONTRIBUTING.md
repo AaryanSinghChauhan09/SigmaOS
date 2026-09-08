@@ -4,6 +4,20 @@ Thank you for contributing to **SigmaOS**! This document provides task guideline
 
 ---
 
+## Contributor & AI Agent Development Rules
+
+SigmaOS enforces a strict `#![no_std]` zero-dependency architecture. Comprehensive directives are detailed in:
+- `docs/AGENTS_CONTRIBUTOR_DEVELOPMENT_RULES.md`
+- `AGENTS.md`
+- `DEVELOPER_RULES.md`
+
+### Core Principles
+1. **Zero Third-Party Dependencies:** Do NOT add external crates under `Cargo.toml`.
+2. **Modular Design Patterns:** Organize components using Factory, Adapter, Observer, and Singleton patterns.
+3. **Automated Verification:** Always execute `./run_sigma_tests.sh` and module unit test suites before creating pull requests.
+
+---
+
 ## Task Guidelines & Contribution Rules
 
 ### 1. **Branch Naming & Workflow**

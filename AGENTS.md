@@ -77,6 +77,10 @@ This document defines operational guidelines, security policies, and verificatio
 - Follow technical directives in `AGENTS_ACCESS_MANAGEMENT.md` and `docs/AGENTS_ACCESS_MANAGEMENT.md`.
 - Manage the complete access lifecycle across LDAP directory services (`LdapAccessClient`), anonymous/authenticated client tiers, direct/relative path canonicalization, memory access protection (`W^X`), read/write permission enforcers (`FileAttributeAccessControl`), RAT remote files, and wireless access points.
 
+### N. Fedora Subsystem Parity & Components Directives
+- Follow technical directives in `docs/AGENTS_FEDORA_COMPONENTS_MANAGEMENT.md`.
+- Maintain native Rust implementations for CoreOS Ignition (`FedoraIgnitionEngine`), Bodhi updates (`BodhiUpdateTriage`), Koji build client, PipeWire WirePlumber policy governor (`FedoraPipewireWireplumberPolicyGovernor`), RPM Seccomp filters, The New Hotness upstream monitoring, fedmsg messaging bus, and MirrorManager2 routing in `src/compatibility/fedora.rs`.
+
 ---
 
 ## 3. Pre-Commit Verification Checklist for AI Agents
