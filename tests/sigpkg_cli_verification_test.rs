@@ -17,13 +17,106 @@ pub mod security {
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
 
 pub mod sigpkg {
-    pub use super::universal_adapter;
-    pub use super::universal_adapter::universal_oop_system;
-    pub use super::universal_engine;
+    use alloc::string::String;
+    use alloc::vec::Vec;
+
+    pub use crate::security;
+    pub use crate::universal_adapter;
+    pub use crate::universal_engine;
+    pub use crate::universal_oop_system;
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub struct Version {
+        pub major: u64,
+        pub minor: u64,
+        pub patch: u64,
+    }
+
+    impl core::fmt::Display for Version {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+        }
+    }
+
+    impl Version {
+        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+            Self {
+                major,
+                minor,
+                patch,
+            }
+        }
+
+        pub fn parse(version_str: &str) -> Result<Self, &'static str> {
+            let clean = version_str.split('-').next().unwrap_or(version_str);
+            let mut parts = clean.split('.');
+
+            let major_str = parts.next().unwrap_or("0");
+            let minor_str = parts.next().unwrap_or("0");
+            let patch_str = parts.next().unwrap_or("0");
+
+            let major_clean: String = major_str.chars().filter(|c| c.is_ascii_digit()).collect();
+            let minor_clean: String = minor_str.chars().filter(|c| c.is_ascii_digit()).collect();
+            let patch_clean: String = patch_str.chars().filter(|c| c.is_ascii_digit()).collect();
+
+            let major = major_clean.parse::<u64>().unwrap_or(0);
+            let minor = minor_clean.parse::<u64>().unwrap_or(0);
+            let patch = patch_clean.parse::<u64>().unwrap_or(0);
+
+            Ok(Self {
+                major,
+                minor,
+                patch,
+            })
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub enum VersionConstraint {
+        Any,
+        Exact(Version),
+        Min(Version),
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Dependency {
+        pub name: String,
+        pub version_constraint: VersionConstraint,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Package {
+        pub name: String,
+        pub version: Version,
+        pub description: String,
+        pub dependencies: Vec<Dependency>,
+        pub checksum: String,
+    }
+
+    impl Package {
+        pub fn new(
+            name: String,
+            version: Version,
+            description: String,
+            dependencies: Vec<Dependency>,
+            checksum: String,
+        ) -> Self {
+            Self {
+                name,
+                version,
+                description,
+                dependencies,
+                checksum,
+            }
+        }
+    }
 }
 
 use universal_adapter::{

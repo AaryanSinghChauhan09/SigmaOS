@@ -3182,7 +3182,7 @@ impl FedoraIgnitionEngine {
 
 
 
-impl FedoraOfflineUpdateEngine {
+impl FedoraIgnitionEngine {
     pub fn new() -> Self {
         Self {
             files: Vec::new(),
@@ -3191,7 +3191,6 @@ impl FedoraOfflineUpdateEngine {
             provisioned: false,
         }
     }
-}
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
         self.files.push(IgnitionFile {

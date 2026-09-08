@@ -8,11 +8,22 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::package::universal::AptDebManifest;
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub architecture: String,
+    pub maintainer: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: Option<PackagePriority>,
+}
+
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::universal_engine::PackageFormat;
@@ -50,10 +61,80 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
+/// Description of Arch Linux .PKGINFO manifest
+#[derive(Debug, Clone)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub arch: String,
+    pub architecture: String,
+    pub depend: Vec<String>,
+    pub depends: Vec<String>,
+}
+
+/// Description of Gentoo ebuild metadata
+#[derive(Debug, Clone)]
+pub struct GentooEbuildMetadata {
+    pub pkgname: String,
+    pub package_name: String,
+    pub version: String,
+    pub category: String,
+    pub description: String,
+    pub keywords: Vec<String>,
+    pub depend: Vec<String>,
+    pub rdepend: Vec<String>,
+    pub use_flags: Vec<String>,
+}
+
+/// Description of Alpine APKINDEX manifest
+#[derive(Debug, Clone)]
+pub struct ApkIndexManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depend: Vec<String>,
+    pub depends: Vec<String>,
+    pub provides: Vec<String>,
+}
+
+/// Description of Void Linux XBPS manifest
+#[derive(Debug, Clone)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+}
+
+/// Description of Snapcraft snap.yaml manifest
+#[derive(Debug, Clone)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub confinement: String,
+    pub apps: Vec<String>,
+    pub plugs: Vec<String>,
+}
+
+/// Description of Haiku .hpkg package manifest
+#[derive(Debug, Clone)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub architecture: String,
+    pub requires: Vec<String>,
+}
+
 use crate::sigpkg::universal_engine::PackageFormat;
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::sigpkg::universal_oop_system;
+
+#[cfg(any(feature = "standalone_test", test))]
+pub use crate::universal_oop_system;
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -192,9 +273,11 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: String::new(),
             depends,
             description,
-            priority,
+            priority: Some(priority),
         })
     }
 
@@ -277,8 +360,10 @@ impl UniversalPackageAdapter {
             pkgname,
             pkgver,
             pkgdesc,
-            depends,
+            arch: architecture.clone(),
             architecture,
+            depend: depends.clone(),
+            depends,
         })
     }
 
@@ -357,6 +442,7 @@ impl UniversalPackageAdapter {
         }
 
         Ok(GentooEbuildMetadata {
+            pkgname: package_name.clone(),
             category,
             package_name,
             version,
@@ -364,6 +450,7 @@ impl UniversalPackageAdapter {
             depend,
             description,
             use_flags,
+            keywords: Vec::new(),
         })
     }
 
@@ -400,7 +487,9 @@ impl UniversalPackageAdapter {
             pkgname,
             pkgver,
             pkgdesc,
+            depend: depends.clone(),
             depends,
+            provides: Vec::new(),
         })
     }
 
@@ -496,6 +585,7 @@ impl UniversalPackageAdapter {
             version,
             summary,
             confinement,
+            apps: Vec::new(),
             plugs,
         })
     }
@@ -890,6 +980,8 @@ impl UniversalPackageAdapter {
         } else if f.ends_with(".pkg.tar.zst")
             || f.ends_with(".pkg.tar.xz")
             || f.ends_with(".pkg.tar.gz")
+            || f.contains("pacman")
+            || f == "pacman"
         {
             Some(PackageFormat::Pacman)
         } else if f.ends_with(".apk") {
@@ -1702,7 +1794,13 @@ impl UniversalDependencyMapper {
             raw.as_str()
         };
 
-        match clean {
+        let uncat = if let Some(pos) = clean.find('/') {
+            &clean[pos + 1..]
+        } else {
+            clean
+        };
+
+        match uncat {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
             "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
@@ -1720,6 +1818,10 @@ impl UniversalDependencyMapper {
             "wayland" | "wayland-devel" | "wayland-dev" | "dev-libs/wayland" => "wayland".to_string(),
             "pipewire" | "media-video/pipewire" | "pipewire-devel" => "pipewire".to_string(),
             "dbus" | "dbus-devel" | "sys-apps/dbus" => "dbus".to_string(),
+            "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
+            "glib" | "glib2" | "glib2-devel" | "glib2-dev" | "libglib2.0-dev" | "dev-libs/glib" => "glib".to_string(),
+            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => "pcre".to_string(),
+            "libuv" | "libuv-devel" | "libuv1-dev" | "dev-libs/libuv" => "libuv".to_string(),
             "pkgconf" | "pkg-config" | "pkgconfig" | "dev-util/pkgconf" => "pkgconf".to_string(),
             "ncurses" | "ncurses-devel" | "ncursesw" | "sys-libs/ncurses" => "ncurses".to_string(),
             "readline" | "readline-devel" | "sys-libs/readline" => "readline".to_string(),
@@ -1730,7 +1832,7 @@ impl UniversalDependencyMapper {
             "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "qt5".to_string(),
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
-            _ => clean.to_string(),
+            _ => uncat.to_string(),
         }
     }
 }
@@ -1986,7 +2088,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "dnf" | "yum" | "zypper" => {
+            "dnf" | "dnf5" | "microdnf" | "tdnf" | "yum" | "zypper" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
