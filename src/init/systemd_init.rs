@@ -3,13 +3,13 @@ use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// Systemd-Grade Init and Target State Engine for SigmaOS
 /// Provides robust target dependency graphs, wants/requires properties,
 /// and target states to defeat Fedora's Systemd initialization.
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
 

@@ -1,4 +1,3 @@
-
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::{String, ToString};
@@ -2775,7 +2774,6 @@ impl CapabilityDerivationTree {
     }
 }
 
-
 // ================= Linux XDP & FreeBSD Netmap High-Performance Fast Packet Engine =================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -3340,8 +3338,6 @@ impl VoidRunitInit {
             }
         }
         false
-
-
     }
 }
 

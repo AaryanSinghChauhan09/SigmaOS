@@ -174,8 +174,11 @@ use unimplemented_features::{
     AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot,
     NixOsDeclarativeConfigEngine,
 };
+use unimplemented_features::{
+    AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot,
+    NixOsDeclarativeConfigEngine,
+};
 use unveil::{UnveilManager, UnveilPermission};
-use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {

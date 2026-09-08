@@ -962,26 +962,6 @@ mod tests {
         let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
         assert_eq!(pkg_file.as_str(), "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
-    }
-}
-
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
         Self {
             migrated_packages: alloc::collections::BTreeMap::new(),
         }

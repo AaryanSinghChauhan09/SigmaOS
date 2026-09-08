@@ -1155,7 +1155,9 @@ pub struct EndeavourReflectorMirrorRanker {
 
 impl EndeavourReflectorMirrorRanker {
     pub fn new() -> Self {
-        Self { mirrors: Vec::new() }
+        Self {
+            mirrors: Vec::new(),
+        }
     }
 
     pub fn add_mirror(&mut self, url: &str, latency_ms: u32, bw_bps: u64) {
