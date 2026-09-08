@@ -307,6 +307,7 @@ pub use kernel::{
     InteractiveHybridScheduler, HybridTask,
     CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
+    LinuxRcuSynchronizationEngine, LinuxKernelWorkqueueEngine, LinuxKernelTimerWheel, LinuxCmaAllocatorEngine,
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use network::{

@@ -32,6 +32,10 @@ pub mod kqueue;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
+pub use linux_parity::{
+    CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
+    LinuxKernelWorkqueueEngine, LinuxRcuSynchronizationEngine, RcuCallback, WorkItem,
+};
 pub mod memory;
 pub mod meta;
 pub mod module_loader;
