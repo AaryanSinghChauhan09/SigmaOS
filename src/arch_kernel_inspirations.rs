@@ -83,7 +83,7 @@ impl KUnitEngine {
     pub fn run_suite(
         &mut self,
         suite_name: &str,
-        cases: Vec<(String, alloc::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)>,
+        cases: Vec<(String, std::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)>,
     ) -> KUnitSuiteResult {
         let mut passed = 0;
         let mut failed = 0;
@@ -561,6 +561,24 @@ impl SignstarService {
     }
 
     pub fn add_signer(&mut self, id: &str, policy: SignerPolicy) {
+        let key = SigningKey {
+            key_id: id.to_string(),
+            fingerprint: "00000000".to_string(),
+            algorithm: SignatureAlgorithm::Ed25519,
+            backing: KeyBacking::SoftwareKey,
+            expires_at: 0,
+            is_revoked: false,
+        };
+        self.signers.push(Signer {
+            id: id.to_string(),
+            key,
+            policy,
+            signed: false,
+            signature_timestamp: 0,
+        });
+    }
+
+    pub fn add_signer_with_key(&mut self, id: &str, policy: SignerPolicy, key: SigningKey) {
         self.signers.push(Signer {
             id: id.to_string(),
             key,
@@ -1193,9 +1211,9 @@ mod tests {
         };
 
         let mut signstar = SignstarService::new("core/glibc").with_quorum_threshold(2);
-        signstar.add_signer("releng", SignerPolicy::Mandatory, key_master);
-        signstar.add_signer("rogue", SignerPolicy::Optional, key_revoked);
-        signstar.add_signer("security-team", SignerPolicy::Optional, key_auditor);
+        signstar.add_signer_with_key("releng", SignerPolicy::Mandatory, key_master);
+        signstar.add_signer_with_key("rogue", SignerPolicy::Optional, key_revoked);
+        signstar.add_signer_with_key("security-team", SignerPolicy::Optional, key_auditor);
 
         // Revoked key signature should be rejected
         assert!(signstar.record_signature_at("rogue", 1700000000).is_err());

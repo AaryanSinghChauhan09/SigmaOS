@@ -6,11 +6,30 @@
 // eBPF-inspired lightweight syscall policy verifiers,
 // and FreeBSD Capsicum descriptor capability delegation.
 
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// 1. NixOS-Style Declarative System Configuration & Generation Manager
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -107,7 +126,8 @@ impl NixDeclarativeSystemState {
     pub fn switch_generation(&mut self, target_id: u32) -> Result<Generation, String> {
         if let Some(gen) = self.generations.iter().find(|g| g.id == target_id) {
             self.active_generation_id = target_id;
-            Ok(gen.clone())
+            let result: Generation = gen.clone();
+            Ok(result)
         } else {
             Err(format!("Generation ID {} not found", target_id))
         }
@@ -550,7 +570,7 @@ impl SovereignSystemdParityEngine {
     pub fn query_journal(&self, name: &str) -> Vec<String> {
         self.journal_logs
             .iter()
-            .filter(|log| log.contains(name))
+            .filter(|log: &&String| log.contains(name))
             .cloned()
             .collect()
     }
