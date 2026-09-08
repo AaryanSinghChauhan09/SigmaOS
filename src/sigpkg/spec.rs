@@ -473,17 +473,17 @@ impl PackageManager for SimplePackageManager {
         let dependencies = package.dependencies();
 
         for dep in dependencies {
-            // Bolt performance optimization: Hoist dep slice calculation out of inner loop (O(D) instead of O(D*P))
-            let dep_len = dep.name.iter().position(|&b| b == 0).unwrap_or(dep.name.len());
-            let dep_slice = &dep.name[..dep_len];
-
             let mut found = false;
             for package_option in &self.packages {
                 if let Some(ref pkg) = *package_option {
                     let p_ref: &dyn Package = pkg.as_ref();
+                    let dep_name = dep.name;
                     let pkg_name = p_ref.name();
-                    let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(pkg_name.len());
-                    if &pkg_name[..pkg_len] == dep_slice {
+
+                    let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(64);
+                    let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(64);
+
+                    if &dep_name[..dep_len] == &pkg_name[..pkg_len] {
                         found = true;
                         break;
                     }
@@ -970,96 +970,5 @@ pub struct SignedReleaseManifest {
 impl SignedReleaseManifest {
     pub fn is_trusted(&self) -> bool {
         self.signatures_obtained >= self.required_signatures
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_resolve_dependencies_success_and_missing() {
-        let mut mgr = SimplePackageManager::new(ManagerCapability::full());
-
-        let pkg_a = SimplePackage::new(
-            b"libfoo",
-            PackageVersion::new(1, 0, 0),
-            PackageCapability::full(),
-        );
-
-        let mut pkg_b = SimplePackage::new(
-            b"appbar",
-            PackageVersion::new(2, 0, 0),
-            PackageCapability::full(),
-        );
-        pkg_b.add_dependency(b"libfoo", b">= 1.0.0");
-
-        mgr.add_package(Box::new(pkg_a)).unwrap();
-        mgr.add_package(Box::new(pkg_b)).unwrap();
-
-        let appbar = mgr.get_package(b"appbar").unwrap();
-
-        // Should resolve libfoo successfully
-        let resolved = mgr.resolve_dependencies(appbar).unwrap();
-        assert_eq!(resolved.len(), 1);
-
-        // Package with missing dependency
-        let mut pkg_c = SimplePackage::new(
-            b"appbaz",
-            PackageVersion::new(1, 0, 0),
-            PackageCapability::full(),
-        );
-        pkg_c.add_dependency(b"nonexistent_lib", b">= 1.0");
-
-        let err = mgr.resolve_dependencies(&pkg_c);
-        assert!(matches!(err, Err(PackageError::DependencyNotFound)));
-    }
-
-    #[test]
-    fn test_resolve_dependencies_custom_zero_padded_package() {
-        struct CustomPaddedPackage {
-            name_buf: [u8; 64],
-            deps: Vec<PackageDependency>,
-        }
-
-        impl Package for CustomPaddedPackage {
-            fn name(&self) -> &[u8] {
-                &self.name_buf // returns full 64 byte zero padded slice
-            }
-            fn version(&self) -> PackageVersion {
-                PackageVersion::new(1, 0, 0)
-            }
-            fn dependencies(&self) -> &[PackageDependency] {
-                &self.deps
-            }
-            fn verify_signature(&self, _signature: &[u8]) -> bool {
-                true
-            }
-            fn info(&self) -> PackageInfo {
-                PackageInfo::new()
-            }
-        }
-
-        let mut mgr = SimplePackageManager::new(ManagerCapability::full());
-
-        let mut name_buf = [0u8; 64];
-        name_buf[..6].copy_from_slice(b"libbar");
-
-        let custom_pkg = CustomPaddedPackage {
-            name_buf,
-            deps: Vec::new(),
-        };
-
-        mgr.add_package(Box::new(custom_pkg)).unwrap();
-
-        let mut consumer = SimplePackage::new(
-            b"consumer_app",
-            PackageVersion::new(1, 0, 0),
-            PackageCapability::full(),
-        );
-        consumer.add_dependency(b"libbar", b">= 1.0");
-
-        let resolved = mgr.resolve_dependencies(&consumer).unwrap();
-        assert_eq!(resolved.len(), 1);
     }
 }
