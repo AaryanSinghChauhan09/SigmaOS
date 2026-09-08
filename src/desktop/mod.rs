@@ -6,6 +6,7 @@ pub mod mate_betsy;
 pub mod mint_desktop;
 pub mod mint_tools;
 pub mod moksha;
+pub mod omarchy_theme;
 pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
@@ -34,6 +35,9 @@ pub use mate_betsy::{
 pub use mint_desktop::{
     CinnamonDesklet, CinnamonDesktopManager, CinnamonExtension, CinnamonPanel, CinnamonPanelPosition,
     CinnamonTheme, PanelApplet, PanelAppletType, XAppPreferences,
+};
+pub use omarchy_theme::{
+    Color, OmarchyThemeManager, SemanticColor, Theme, ThemeComponent,
 };
 pub use mint_tools::{
     AppMetadata, MintSoftwareManager, MintTimeshiftEngine, MintUpdateManager, SnapshotType,
