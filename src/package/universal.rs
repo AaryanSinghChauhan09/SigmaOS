@@ -1394,10 +1394,54 @@ impl UniversalDistroAdapterPipeline {
 pub struct AptDebManifest {
     pub package: String,
     pub version: String,
-    pub architecture: String,
-    pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: crate::sigpkg::universal_adapter::PackagePriority,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub architecture: String,
+    pub requires: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+    pub architecture: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub package_name: String,
+    pub version: String,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+    pub use_flags: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkIndexManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)

@@ -117,6 +117,7 @@ pub use store::{
      GLOBAL_SOFTWARE_STORE,
 };
 pub use universal::{
-    AptDebManifest, ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    ApkIndexManifest, AptDebManifest, ArchPkgInfoManifest, ConflictResolution, DependencyResolver,
+    GentooEbuildMetadata, HaikuHpkgManifest, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, SnapcraftManifest, UnifiedPackage, UniversalPackageManager, XbpsManifest,
 };

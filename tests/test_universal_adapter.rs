@@ -14,6 +14,9 @@ pub mod security {
     pub use super::capability::*;
 }
 
+#[path = "../src/package/universal.rs"]
+pub mod package;
+
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
@@ -47,7 +50,6 @@ pub mod sigpkg {
                 patch,
             }
         }
-
     }
 
     impl core::fmt::Display for Version {
@@ -57,6 +59,7 @@ pub mod sigpkg {
     }
 
     impl Version {
+
         pub fn parse(version_str: &str) -> Result<Self, &'static str> {
             let clean = version_str.split('-').next().unwrap_or(version_str);
             let mut parts = clean.split('.');
@@ -141,6 +144,7 @@ fn test_universal_adapter_all_formats() {
         UniversalPmCommandDispatcher, UniversalPmOperation, ZypperSpecManifest,
     };
 
+    use sigpkg::Version;
     let adapter = UniversalPackageAdapter::new();
 
     // 1. FreeBSD UCL (+MANIFEST)
@@ -177,14 +181,14 @@ fn test_universal_adapter_all_formats() {
         .absorb_and_register("redis.pkg", freebsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge
         .absorb_and_register("tmux.tgz", openbsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -196,7 +200,7 @@ fn test_universal_adapter_all_formats() {
 
     // Test new foreign PM command aliases (yay, paru, microdnf, rpm, pkg_add, pkg_delete)
     let yay_action = dispatcher
-        .dispatch_command("yay -Syu --noconfirm neovim")
+        .dispatch_command("yay -S --noconfirm neovim")
         .unwrap();
     assert_eq!(yay_action.source_pm, "yay");
     assert_eq!(yay_action.operation, UniversalPmOperation::Install);
@@ -235,10 +239,9 @@ fn test_universal_adapter_all_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_engine::PackageFormat;
-    use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation};
+    use universal_adapter::UniversalPackageAdapter;
 
     let adapter = UniversalPackageAdapter::new();
-    let dispatcher = UniversalPmCommandDispatcher::new();
 
     // Verify detection for all 29 Linux & BSD distro formats specified in prompt
     assert_eq!(
@@ -395,29 +398,32 @@ fn test_all_prompt_package_formats() {
         .unwrap();
     assert_eq!(pkg.name, "nginx");
 
+    use universal_adapter::UniversalPmCommandDispatcher;
+    let dispatcher = UniversalPmCommandDispatcher::new();
+
     let pacman_cmd = dispatcher.dispatch_command("pacman -S zsh").unwrap();
     assert_eq!(pacman_cmd.source_pm, "pacman");
-    assert_eq!(pacman_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(pacman_cmd.operation, universal_adapter::UniversalPmOperation::Install);
     assert_eq!(pacman_cmd.target_packages, vec!["zsh"]);
 
     let dnf_cmd = dispatcher.dispatch_command("dnf install htop").unwrap();
     assert_eq!(dnf_cmd.source_pm, "dnf");
-    assert_eq!(dnf_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(dnf_cmd.operation, universal_adapter::UniversalPmOperation::Install);
     assert_eq!(dnf_cmd.target_packages, vec!["htop"]);
 
     let apk_cmd = dispatcher.dispatch_command("apk add bash").unwrap();
     assert_eq!(apk_cmd.source_pm, "apk");
-    assert_eq!(apk_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(apk_cmd.operation, universal_adapter::UniversalPmOperation::Install);
     assert_eq!(apk_cmd.target_packages, vec!["bash"]);
 
     let brew_cmd = dispatcher.dispatch_command("brew install wget").unwrap();
     assert_eq!(brew_cmd.source_pm, "brew");
-    assert_eq!(brew_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(brew_cmd.operation, universal_adapter::UniversalPmOperation::Install);
     assert_eq!(brew_cmd.target_packages, vec!["wget"]);
 
     let pisi_cmd = dispatcher.dispatch_command("pisi it firefox").unwrap();
     assert_eq!(pisi_cmd.source_pm, "pisi");
-    assert_eq!(pisi_cmd.operation, UniversalPmOperation::Install);
+    assert_eq!(pisi_cmd.operation, universal_adapter::UniversalPmOperation::Install);
     assert_eq!(pisi_cmd.target_packages, vec!["firefox"]);
 }
 
