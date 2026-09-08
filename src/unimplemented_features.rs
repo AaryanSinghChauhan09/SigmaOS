@@ -2,15 +2,14 @@ use alloc::format;
 use alloc::vec;
 extern crate alloc;
 
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+
 #[cfg(test)]
 use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(test))]
 use crate::klib::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -1685,6 +1684,12 @@ pub struct GestureVoiceControlEngine {
     pub registered_voice_commands: [Option<(&'static str, DesktopShellAction)>; 4],
 }
 
+impl GestureVoiceControlEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_voice_commands: [None; 4],
+        }
+    }
 
     pub fn parse_touchpad_gesture(
         &self,
@@ -1697,6 +1702,13 @@ pub struct GestureVoiceControlEngine {
             _ => None,
         }
     }
+}
+
+impl Default for GestureVoiceControlEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 
 #[cfg(test)]
