@@ -153,7 +153,8 @@ impl SovereignUniversalDistroBridge {
             (
                 DistroSubsystemMode::LinuxDebian
                 | DistroSubsystemMode::LinuxPopOs
-                | DistroSubsystemMode::LinuxTails,
+                | DistroSubsystemMode::LinuxTails
+                | DistroSubsystemMode::LinuxParrot,
                 "/var/lib/pkg",
             ) => "/var/lib/dpkg".to_string(),
             (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
