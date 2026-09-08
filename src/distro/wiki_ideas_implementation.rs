@@ -6,11 +6,11 @@
 // eBPF-inspired lightweight syscall policy verifiers,
 // and FreeBSD Capsicum descriptor capability delegation.
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// 1. NixOS-Style Declarative System Configuration & Generation Manager
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -106,8 +106,9 @@ impl NixDeclarativeSystemState {
 
     pub fn switch_generation(&mut self, target_id: u32) -> Result<Generation, String> {
         if let Some(gen) = self.generations.iter().find(|g| g.id == target_id) {
+            let gen_clone: Generation = gen.clone();
             self.active_generation_id = target_id;
-            Ok(gen.clone())
+            Ok(gen_clone)
         } else {
             Err(format!("Generation ID {} not found", target_id))
         }
@@ -550,7 +551,7 @@ impl SovereignSystemdParityEngine {
     pub fn query_journal(&self, name: &str) -> Vec<String> {
         self.journal_logs
             .iter()
-            .filter(|log| log.contains(name))
+            .filter(|log: &&String| log.contains(name))
             .cloned()
             .collect()
     }
