@@ -79,12 +79,30 @@ This document defines operational guidelines, security policies, and verificatio
 
 ---
 
-## 3. Pre-Commit Verification Checklist for AI Agents
+## 3. Autonomous AI Agent Development Rules
+
+1. **Persona Protocols & Missions:**
+   - **Sentinel (Security):** Focus on security vulnerability remediation (XSS, path traversal, injection, memory safety).
+   - **Palette (UX):** Focus on micro-UX enhancements, accessibility (ARIA, focus visible), and terminal/GUI polish.
+   - **Bolt (Performance):** Focus on O(1) algorithms, lock-free structures, caching, and allocation reduction.
+
+2. **Planning & Review Cycles:**
+   - AI agents must request plan reviews using `request_plan_review` before setting or modifying the plan with `set_plan`.
+   - Agents must call `request_code_review` and address review feedback before finalizing PR submission.
+
+3. **Critical Learning Journaling:**
+   - Maintain critical learnings in `.jules/<persona>.md` (e.g. `.jules/sentinel.md`, `.jules/bolt.md`, `.jules/palette.md`).
+   - Log only non-routine, codebase-specific security findings, edge cases, and unexpected performance/UX insights.
+
+---
+
+## 4. Pre-Commit Verification Checklist for AI Agents
 
 Before submitting changes, AI agents must execute:
-1. `./run_sigma_tests.sh` to run 220+ atomic Rust unit tests and Python integration tests.
-2. `cargo fmt` to verify code formatting.
-3. Validate standalone builds for modified modules (`rustc --edition=2021 --test <modified_file.rs>`).
+1. `./run_sigma_tests.sh` to run all atomic Rust unit tests and system tests.
+2. Verify standalone builds for modified modules (`rustc --edition=2021 --test <modified_file.rs>`).
+3. Call `pre_commit_instructions` tool and complete all required checks.
+4. Record key codebase patterns via `initiate_memory_recording`.
 
 - **Driver Management**: Refer to `docs/AI_AGENT_DRIVER_MANAGEMENT.md` for driver lifecycle directives.
 - **Cache Operation Management**: Refer to `docs/AGENTS_CACHE_OPERATION_MANAGEMENT.md` for explicit CPU cache line flushing (`clflush`, `clflushopt`, `clwb`), TLB invalidation/shootdown, Page Cache Radix-Tree operations, SLUB object cache recycling, `#[repr(align(64))]` CPU cache alignment, and JIT instruction cache synchronization rules.
@@ -110,7 +128,7 @@ When modifying, releasing, or updating versions in SigmaOS:
 
 ---
 
-## 3. Thread Synchronization & Lock-Free Atomic Rules for AI Agents
+## 5. Thread Synchronization & Lock-Free Atomic Rules for AI Agents
 
 When implementing or modifying concurrent thread synchronization:
 
@@ -123,7 +141,7 @@ When implementing or modifying concurrent thread synchronization:
 
 ---
 
-## 4. HTML Dependency Reduction & Text-Based Interface Rules for AI Agents
+## 6. HTML Dependency Reduction & Text-Based Interface Rules for AI Agents
 
 When creating or modifying documentation, dashboards, or user interfaces:
 
@@ -134,7 +152,7 @@ When creating or modifying documentation, dashboards, or user interfaces:
 
 ---
 
-## 5. Compile-Time Defenses & Build Hardening Rules for AI Agents
+## 7. Compile-Time Defenses & Build Hardening Rules for AI Agents
 
 When modifying build settings, profile options, or feature flags:
 
@@ -145,7 +163,7 @@ When modifying build settings, profile options, or feature flags:
 
 ---
 
-## 6. Clock Algorithm & Timer Management Rules for AI Agents
+## 8. Clock Algorithm & Timer Management Rules for AI Agents
 
 When modifying clock page replacement or timekeeping subsystems:
 
@@ -154,7 +172,7 @@ When modifying clock page replacement or timekeeping subsystems:
 
 ---
 
-## 7. Circular Buffer & Lock-Free Ring Buffer Rules for AI Agents
+## 9. Circular Buffer & Lock-Free Ring Buffer Rules for AI Agents
 
 When implementing or modifying ring buffers in `src/klib/ring_buffer.rs`, `src/klib/ringbuf.rs`, or `src/media/sovereign_video_player.rs`:
 
@@ -163,7 +181,7 @@ When implementing or modifying ring buffers in `src/klib/ring_buffer.rs`, `src/k
 
 ---
 
-## 8. Cache Memory Architecture, LRU Eviction & Package Cache Rules for AI Agents
+## 10. Cache Memory Architecture, LRU Eviction & Package Cache Rules for AI Agents
 
 When modifying cache memory engines, key-value stores, or package cache trimmers:
 
@@ -172,7 +190,7 @@ When modifying cache memory engines, key-value stores, or package cache trimmers
 
 ---
 
-## 9. Process Lifecycle, Signal ABI Translation & Supervision Rules for AI Agents
+## 11. Process Lifecycle, Signal ABI Translation & Supervision Rules for AI Agents
 
 When modifying process management, signal handlers, or pseudo-terminals:
 
@@ -181,7 +199,7 @@ When modifying process management, signal handlers, or pseudo-terminals:
 
 ---
 
-## 10. Hardware Fitting, Driver Auto-Binding & Device Adaptation Rules for AI Agents
+## 12. Hardware Fitting, Driver Auto-Binding & Device Adaptation Rules for AI Agents
 
 When writing, probing, or modifying hardware device drivers (`src/drivers/`):
 
@@ -190,7 +208,7 @@ When writing, probing, or modifying hardware device drivers (`src/drivers/`):
 
 ---
 
-## 11. Network Stack, eBPF/XDP & PQC Security Rules for AI Agents
+## 13. Network Stack, eBPF/XDP & PQC Security Rules for AI Agents
 
 When modifying networking drivers, eBPF filters, or VPN subsystems:
 
@@ -199,7 +217,7 @@ When modifying networking drivers, eBPF filters, or VPN subsystems:
 
 ---
 
-## 12. Processor Topology, CPU Scheduling & Multi-Core Rules for AI Agents
+## 14. Processor Topology, CPU Scheduling & Multi-Core Rules for AI Agents
 
 When modifying CPU scheduling, task management, or ISA optimization:
 
@@ -208,7 +226,7 @@ When modifying CPU scheduling, task management, or ISA optimization:
 
 ---
 
-## 13. Kernel, Bootloader & Driver Loading Rules for AI Agents
+## 15. Kernel, Bootloader & Driver Loading Rules for AI Agents
 
 When modifying boot sequences, driver registration, or scheduler loading:
 
@@ -217,7 +235,7 @@ When modifying boot sequences, driver registration, or scheduler loading:
 
 ---
 
-## 14. Backend Subsystem & Server Engine Rules for AI Agents
+## 16. Backend Subsystem & Server Engine Rules for AI Agents
 
 When modifying backend services in `src/open_source_obsoletion.rs`, `src/open_source_os_gap_closure.rs`, or `src/automation/system_level.rs`:
 
@@ -226,9 +244,9 @@ When modifying backend services in `src/open_source_obsoletion.rs`, `src/open_so
 
 ---
 
-## 15. Explicit Rules for Human Contributors & AI Agents
+## 17. Explicit Rules for Human Contributors & AI Agents
 
-### 15.1 Universal Rules for Human Contributors
+### 17.1 Universal Rules for Human Contributors
 1. **Zero External Dependencies Policy (`no_std`):**
    * Core microkernel shards and kernel subsystems MUST be `#![no_std]` and MUST NOT add external dependencies under `[dependencies]` in `Cargo.toml`.
    * Use native `klib` abstractions (`klib::Vec`, `klib::HashMap`, `klib::BTreeMap`, `klib::String`).
@@ -241,7 +259,7 @@ When modifying backend services in `src/open_source_obsoletion.rs`, `src/open_so
 5. **Testing Invariants & Quality Verification:**
    * Every new feature or bugfix MUST include unit tests. Run `cargo check --lib` and `./run_sigma_tests.sh` before submitting pull requests.
 
-### 15.2 Explicit Rules for AI Agents (Autonomous Development)
+### 17.2 Explicit Rules for AI Agents (Autonomous Development)
 1. **Planning & Review Protocol:**
    * AI agents MUST call `request_plan_review` with a structured plan before using `set_plan` for the first time.
    * Plans MUST include a dedicated step for verifying test execution and a pre-commit step using the exact phrasing:
@@ -257,7 +275,7 @@ When modifying backend services in `src/open_source_obsoletion.rs`, `src/open_so
 
 ---
 
-## 16. Checklist for AI Agents & Contributors
+## 18. Checklist for AI Agents & Contributors
 
 1. **Update Manifests & Documentation** when bumping versions, adding drivers, or modifying synchronization logic.
 2. **Run Standalone Subsystem Tests:**
@@ -270,7 +288,7 @@ When modifying backend services in `src/open_source_obsoletion.rs`, `src/open_so
 
 ---
 
-## 17. Detailed Documentation References
+## 19. Detailed Documentation References
 
 For technical specifications, see:
 * [`docs/AGENTS_VERSION_HANDLING.md`](docs/AGENTS_VERSION_HANDLING.md)
@@ -291,7 +309,7 @@ For technical specifications, see:
 
 ---
 
-## 18. Linux & BSD Distro Parity Directives
+## 20. Linux & BSD Distro Parity Directives
 
 When integrating or refining Linux & BSD distro capability engines in `src/distro/`:
 1. **Zero-Dependency Subsystem Parity:** Implement clean-room, `#![no_std]` Rust modules that absorb and emulate key distro innovations (e.g. Void Linux runit service supervision in `VoidRunitServiceSupervisorEngine`, Alpine Linux tmpfs apk volatile overlays in `AlpineApkVolatileOverlayEngine`, openSUSE YaST2/Snapper, NetBSD rump kernels, Ubuntu netplan/cloud-init, GNU Guix Shepherd/store derivations).
