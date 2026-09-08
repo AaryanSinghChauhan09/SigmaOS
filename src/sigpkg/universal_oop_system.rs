@@ -25,25 +25,30 @@ use std::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(all(test, not(feature = "standalone_test")))]
-pub use crate::sigpkg::Version;
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
 
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
 
 use std::sync::Arc;
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl core::fmt::Display for Version {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {

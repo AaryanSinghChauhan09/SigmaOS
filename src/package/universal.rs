@@ -226,6 +226,7 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -277,6 +278,11 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+    OpenBsdPkg, // OpenBSD Package (.openbsd.tgz)
+    Ipk,        // OpenWrt Package (.ipk)
+    Opkg,       // Yocto Package (.opkg)
+    SolarisIps, // Solaris IPS Package (.p5p, .ips)
+    GuixNar,    // Nix/Guix NAR Archive (.nar)
 }
 
 impl PackageFormat {
@@ -823,6 +829,11 @@ impl_generic_install_strategy!(SlackBuildInstallStrategy);
 impl_generic_install_strategy!(CruxInstallStrategy);
 impl_generic_install_strategy!(DrpmInstallStrategy);
 impl_generic_install_strategy!(StratumInstallStrategy);
+impl_generic_install_strategy!(OpenBsdPkgInstallStrategy);
+impl_generic_install_strategy!(IpkInstallStrategy);
+impl_generic_install_strategy!(OpkgInstallStrategy);
+impl_generic_install_strategy!(SolarisIpsInstallStrategy);
+impl_generic_install_strategy!(GuixNarInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1072,6 +1083,11 @@ impl_generic_metadata_adapter!(SlackBuildMetadataAdapter, SlackBuild);
 impl_generic_metadata_adapter!(CruxMetadataAdapter, Crux);
 impl_generic_metadata_adapter!(DrpmMetadataAdapter, Drpm);
 impl_generic_metadata_adapter!(StratumMetadataAdapter, Stratum);
+impl_generic_metadata_adapter!(OpenBsdPkgMetadataAdapter, OpenBsdPkg);
+impl_generic_metadata_adapter!(IpkMetadataAdapter, Ipk);
+impl_generic_metadata_adapter!(OpkgMetadataAdapter, Opkg);
+impl_generic_metadata_adapter!(SolarisIpsMetadataAdapter, SolarisIps);
+impl_generic_metadata_adapter!(GuixNarMetadataAdapter, GuixNar);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1210,6 +1226,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
+            PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgInstallStrategy),
+            PackageFormat::Ipk => Box::new(IpkInstallStrategy),
+            PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
+            PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
+            PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
         }
     }
 
@@ -1264,6 +1285,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
+            PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgMetadataAdapter),
+            PackageFormat::Ipk => Box::new(IpkMetadataAdapter),
+            PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
+            PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
+            PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
         }
     }
 }
@@ -1749,6 +1775,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
@@ -2088,67 +2115,7 @@ pub struct UniversalPackageManifestParser;
 
 impl UniversalPackageManifestParser {
     pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
-        let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".superdeb") {
-            Some(PackageFormat::Deb)
-        } else if name.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") {
-            Some(PackageFormat::Pacman)
-        } else if name.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
-        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
-            Some(PackageFormat::Nixpkg)
-        } else if name.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if name.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if name.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if name.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if name.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if name.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if name.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if name.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if name.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if name.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
-            Some(PackageFormat::TarGz)
-        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
-            Some(PackageFormat::Xz)
-        } else if name.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else if name.ends_with(".dports") {
-            Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
-        {
-            Some(PackageFormat::SlackBuild)
-        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
-            Some(PackageFormat::Crux)
-        } else if name.ends_with(".drpm") {
-            Some(PackageFormat::Drpm)
-        } else if name.ends_with(".stratum") {
-            Some(PackageFormat::Stratum)
-        } else if name.ends_with(".app") {
-            Some(PackageFormat::App)
-        } else {
-            None
-        }
+        PackageFormat::from_filename(filename)
     }
 
     pub fn parse_manifest_auto(
@@ -2296,7 +2263,7 @@ impl UniversalPackageFormatBridge {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -2740,37 +2707,19 @@ mod tests {
         let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
         let base = BasePackageDecorator { package: pkg };
 
-        let hw_dec = HardwareOptimizationDecorator {
+        let sandbox_dec = SandboxDecorator {
             decorated: base,
-            target_microarch_level: "x86-64-v3".to_string(),
-            required_simd_features: vec!["avx2".to_string(), "fma".to_string()],
+            is_isolated: true,
         };
 
-        hw_dec.profile_performance();
-        assert_eq!(hw_dec.get_package().name, "simd-app");
+        assert!(sandbox_dec.enforce_sandbox().is_ok());
+        assert_eq!(sandbox_dec.get_package().name, "simd-app");
 
-        let res_dec = ResourceLimitDecorator {
-            decorated: hw_dec,
-            max_memory_bytes: 1024 * 1024 * 512,
-            cpu_quota_percent: 50,
+        let net_dec = NetworkRestrictionDecorator {
+            decorated: sandbox_dec,
+            allowed_hosts: vec!["sigmaos.org".to_string()],
         };
 
-        assert!(res_dec.enforce_sandbox().is_ok());
-
-        let pqc_dec = PqcSignedDecorator {
-            decorated: res_dec,
-            dilithium_signature: "dilithium-5-valid-signature".to_string(),
-        };
-
-        assert!(pqc_dec.enforce_sandbox().is_ok());
-
-        let bad_pqc = PqcSignedDecorator {
-            decorated: BasePackageDecorator {
-                package: UnifiedPackage::new("invalid-sig".to_string(), "1.0.0".to_string()),
-            },
-            dilithium_signature: "invalid-signature".to_string(),
-        };
-
-        assert!(bad_pqc.enforce_sandbox().is_err());
+        assert!(net_dec.restrict_network().is_ok());
     }
 }

@@ -17,9 +17,7 @@ pub use crate::sigpkg::Version;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::universal_engine::PackageFormat;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
     NetworkTcp,
@@ -32,10 +30,9 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
-    ProcessExec,
 }
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::security::Permission;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -119,6 +116,66 @@ pub struct NetBsdPkgsrcManifest {
     pub version: String,
     pub comment: String,
     pub depends: Vec<String>,
+}
+
+/// Description of Arch Linux binary .PKGINFO manifest (pacman parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+    pub architecture: String,
+}
+
+/// Description of Gentoo .ebuild metadata
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub package_name: String,
+    pub version: String,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+    pub use_flags: Vec<String>,
+}
+
+/// Description of Alpine APKINDEX manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkIndexManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+}
+
+/// Description of Void Linux XBPS control manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+}
+
+/// Description of Snapcraft YAML manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub confinement: String,
+    pub plugs: Vec<String>,
+}
+
+/// Description of Haiku .hpkg package manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub architecture: String,
+    pub requires: Vec<String>,
 }
 
 /// Description of openSUSE Zypper RPM spec/manifest
@@ -3564,7 +3621,7 @@ requires {
         // 4. OpenBSD +CONTENTS
         let openbsd_contents = "@name htop-3.2.2\n@depend sysutils/lsof\n@comment interactive process viewer\n";
         let obsd_manifest = adapter.parse_openbsd_contents(openbsd_contents).unwrap();
-        assert_eq!(obsd_manifest.name, "htop");
+        assert_eq!(obsd_manifest.pkgname, "htop");
         assert_eq!(obsd_manifest.version, "3.2.2");
     }
 }
