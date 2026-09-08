@@ -8,12 +8,17 @@ This document provides a complete, actionable technical analysis, guidelines, an
 ## 1. Code Quality & Testing Guidelines
 
 ### 1.1 Trait Implementation & Syntax Correctness
+* Ensure delimiter balance and struct scope integrity are maintained across large compatibility files (e.g., `src/compatibility/fedora.rs`).
 * Ensure trait implementations (such as `Default`, `Eq`, `PartialEq`, `Clone`, and `Debug`) are declared only once per struct type across all modules.
 * Always implement all required methods when fulfilling a trait contract (e.g. `load(&mut self)` and `unload(&mut self)` for `Driver` implementors).
 * Ensure pattern matches on enums are strictly exhaustive or include appropriate fallback handling.
 
 ### 1.2 Test Execution Procedures
-* To run standalone module tests, execute:
+* To execute the primary native test runner for SigmaOS security and launch readiness suites, run:
+  ```bash
+  ./run_sigma_tests.sh
+  ```
+* To run standalone module tests via Rust compiler flags, execute:
   ```bash
   rustc --test src/package/universal.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_universal && /tmp/test_universal
   rustc --test src/distro/omarchy.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_omarchy && /tmp/test_omarchy
@@ -60,7 +65,7 @@ This document provides a complete, actionable technical analysis, guidelines, an
 ## 6. Execution Roadmap & Priority Next Steps
 
 1. **Immediate (High Priority)**:
-   - Finalize trait duplicate removal across large compatibility modules.
+   - Finalize syntax verification and trait duplicate removal across large compatibility modules.
    - Expand PQC signature verification to stage-2 bootloaders.
 2. **Short-Term (Medium Priority)**:
    - Implement lock-free SPSC ring buffers for zero-copy IPC messaging.
