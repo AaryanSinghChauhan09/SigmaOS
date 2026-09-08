@@ -1,7 +1,7 @@
-
 /// Zorin OS Compatibility Subsystem for SigmaOS
 /// Implements familiarity-first layout switching, Chameleon dynamic auto-theming,
 /// Zorin Connect smartphone integration, and Windows App support.
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
@@ -395,7 +395,7 @@ impl ZorinWindowsAppSupport {
 
 /// Zorin OS Grid Window Tiling & Snap Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ZorinSnapPosition {
+pub enum ZorinGridSnapPosition {
     LeftHalf,
     RightHalf,
     TopLeftQuarter,
@@ -421,18 +421,18 @@ impl ZorinGridWindowTilingEngine {
         }
     }
 
-    pub fn calculate_snap_rect(&self, position: ZorinSnapPosition) -> (u32, u32, u32, u32) {
+    pub fn calculate_snap_rect(&self, position: ZorinGridSnapPosition) -> (u32, u32, u32, u32) {
         let half_w = self.screen_width / 2;
         let half_h = self.screen_height / 2;
 
         match position {
-            ZorinSnapPosition::LeftHalf => (0, 0, half_w, self.screen_height),
-            ZorinSnapPosition::RightHalf => (half_w, 0, half_w, self.screen_height),
-            ZorinSnapPosition::TopLeftQuarter => (0, 0, half_w, half_h),
-            ZorinSnapPosition::TopRightQuarter => (half_w, 0, half_w, half_h),
-            ZorinSnapPosition::BottomLeftQuarter => (0, half_h, half_w, half_h),
-            ZorinSnapPosition::BottomRightQuarter => (half_w, half_h, half_w, half_h),
-            ZorinSnapPosition::Maximized => (0, 0, self.screen_width, self.screen_height),
+            ZorinGridSnapPosition::LeftHalf => (0, 0, half_w, self.screen_height),
+            ZorinGridSnapPosition::RightHalf => (half_w, 0, half_w, self.screen_height),
+            ZorinGridSnapPosition::TopLeftQuarter => (0, 0, half_w, half_h),
+            ZorinGridSnapPosition::TopRightQuarter => (half_w, 0, half_w, half_h),
+            ZorinGridSnapPosition::BottomLeftQuarter => (0, half_h, half_w, half_h),
+            ZorinGridSnapPosition::BottomRightQuarter => (half_w, half_h, half_w, half_h),
+            ZorinGridSnapPosition::Maximized => (0, 0, self.screen_width, self.screen_height),
         }
     }
 }
@@ -631,10 +631,10 @@ mod tests {
     #[test]
     fn test_zorin_grid_tiling_sound_and_taskbar() {
         let grid = ZorinGridWindowTilingEngine::new(1920, 1080);
-        let left_rect = grid.calculate_snap_rect(ZorinSnapPosition::LeftHalf);
+        let left_rect = grid.calculate_snap_rect(ZorinGridSnapPosition::LeftHalf);
         assert_eq!(left_rect, (0, 0, 960, 1080));
 
-        let top_right_rect = grid.calculate_snap_rect(ZorinSnapPosition::TopRightQuarter);
+        let top_right_rect = grid.calculate_snap_rect(ZorinGridSnapPosition::TopRightQuarter);
         assert_eq!(top_right_rect, (960, 0, 960, 540));
 
         let sound_mgr = ZorinSoundManager::new();
