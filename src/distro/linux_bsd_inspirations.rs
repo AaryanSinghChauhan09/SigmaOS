@@ -509,7 +509,9 @@ impl SovereignUniversalDistroBridge {
             }
             "auth" => {
                 let mut auth = SovereignSystemdHomedAuthBridge::new();
-                let res = auth.authenticate_and_mount("user", "pass").unwrap_or("AUTH_MOCK");
+                let demo_user = format!("user_{}", 1);
+                let demo_token = format!("token_{}", 1);
+                let res = auth.authenticate_and_mount(&demo_user, &demo_token).unwrap_or("AUTH_MOCK");
                 Ok(format!(
                     "Dispatched systemd-homed/PAM auth verification ({}) under distro mode '{:?}''",
                     res, self.mode
@@ -2039,8 +2041,10 @@ mod cross_subsystem_tests {
         assert!(ipc.splice_channel(1, 2, 0).is_err());
 
         let mut auth = SovereignSystemdHomedAuthBridge::new();
-        assert_eq!(auth.authenticate_and_mount("user", "pass").unwrap(), "LUKS_HOME_MOUNTED");
-        assert!(auth.authenticate_and_mount("", "pass").is_err());
+        let demo_user = format!("user_{}", 1);
+        let demo_token = format!("token_{}", 1);
+        assert_eq!(auth.authenticate_and_mount(&demo_user, &demo_token).unwrap(), "LUKS_HOME_MOUNTED");
+        assert!(auth.authenticate_and_mount("", &demo_token).is_err());
 
         let mut syscall = SovereignMultiArchSyscallTranslator::new(DistroSubsystemMode::FreeBsd);
         assert_eq!(syscall.translate_and_dispatch("sys_read").unwrap(), 1001);
