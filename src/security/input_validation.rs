@@ -163,7 +163,14 @@ pub fn validate_hostname(name: &[u8]) -> Result<(), ValidationError> {
 
 // ── Environment variables ──────────────────────────────────────────────────
 
-/// Validate an environment variable key (no `=`, no NUL).
+/// Validate an environment variable key per POSIX IEEE Std 1003.1.
+///
+/// Rules:
+/// - Non-empty
+/// - ≤ `MAX_ENV_KEY_LEN` bytes
+/// - First byte MUST be an ASCII letter or underscore (`[a-zA-Z_]`).
+///   This prevents leading digits, dashes, spaces, and multi-line CRLF injection.
+/// - Subsequent bytes MUST be ASCII alphanumeric or underscore (`[a-zA-Z0-9_]`).
 pub fn validate_env_key(key: &[u8]) -> Result<(), ValidationError> {
     if key.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -171,8 +178,12 @@ pub fn validate_env_key(key: &[u8]) -> Result<(), ValidationError> {
     if key.len() > MAX_ENV_KEY_LEN {
         return Err(ValidationError::TooLong);
     }
-    for &b in key {
-        if b == 0 || b == b'=' {
+    let first = key[0];
+    if !first.is_ascii_alphabetic() && first != b'_' {
+        return Err(ValidationError::InvalidChars);
+    }
+    for &b in &key[1..] {
+        if !b.is_ascii_alphanumeric() && b != b'_' {
             return Err(ValidationError::InvalidChars);
         }
     }
@@ -551,6 +562,43 @@ mod tests {
         assert!(validate_port(65535).is_ok());
         assert!(validate_port(0).is_err());
         assert!(validate_port(65536).is_err());
+    }
+
+    #[test]
+    fn test_env_key_validation() {
+        assert_eq!(validate_env_key(b"PATH"), Ok(()));
+        assert_eq!(validate_env_key(b"_CONFIG_DIR"), Ok(()));
+        assert_eq!(validate_env_key(b"VAR123"), Ok(()));
+
+        // Reject invalid initial character (digit, dash, space, equal)
+        assert_eq!(validate_env_key(b"123KEY"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"-KEY"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b" KEY"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"=KEY"), Err(ValidationError::InvalidChars));
+
+        // Reject invalid subsequent character (hyphen, space, equal, CRLF injection)
+        assert_eq!(validate_env_key(b"VAR-NAME"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"VAR NAME"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"KEY=VAL"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"KEY\nINJECT"), Err(ValidationError::InvalidChars));
+
+        // Reject empty and over-length input
+        assert_eq!(validate_env_key(b""), Err(ValidationError::EmptyInput));
+        let long_key = [b'A'; MAX_ENV_KEY_LEN + 1];
+        assert_eq!(validate_env_key(&long_key), Err(ValidationError::TooLong));
+    }
+
+    #[test]
+    fn test_env_value_validation() {
+        assert_eq!(validate_env_value(b"/usr/local/bin"), Ok(()));
+        assert_eq!(validate_env_value(b""), Ok(()));
+
+        // Reject embedded NUL byte
+        assert_eq!(validate_env_value(b"value\x00injection"), Err(ValidationError::NullByte));
+
+        // Reject over-length input
+        let long_val = [b'v'; MAX_ENV_VAR_LEN + 1];
+        assert_eq!(validate_env_value(&long_val), Err(ValidationError::TooLong));
     }
 
     #[test]
