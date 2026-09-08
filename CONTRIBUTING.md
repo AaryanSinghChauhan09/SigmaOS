@@ -4,15 +4,22 @@ Thank you for contributing to **SigmaOS**! This document provides task guideline
 
 ---
 
-## Task Guidelines & Contribution Rules
+## Task Guidelines & Contribution Rules for Human Contributors and AI Agents
 
-### 1. **Branch Naming & Workflow**
+### 1. **Branch Naming & Commit Workflow**
 - All git branches MUST start with `jules-` (e.g. `jules-feature-scheduler`, `jules-fix-pam`).
+- Commit messages must follow standard conventions: short subject line (50 chars max), blank line, and descriptive body detailing changes.
 - Keep commits granular, logical, and focused on single task objectives.
 
-### 2. **Distro Parity & Zero Dependencies**
+### 2. **Zero Dependencies & Distro Parity Standards**
 - All kernel and userspace components must maintain strict `#![no_std]` zero external dependency design.
 - Contributions taking inspiration from Linux & BSD distributions (Arch Linux ALPM, Debian sbuild, Fedora DNF, FreeBSD Ports, OpenBSD Pledge/Unveil, NixOS Flakes) must include unit tests.
+- Do not add unverified crates under `[dependencies]` in `Cargo.toml`.
+
+### 3. **AI Agent Development & Verification Directives**
+- AI agents working on SigmaOS must follow the planning, execution, and verification workflow defined in `AGENTS.md` and `DEVELOPER_RULES.md`.
+- AI agents MUST request plan reviews before initiating multi-file modifications and verify all code changes using read-only tools or test execution scripts (`./run_sigma_tests.sh`).
+- AI agents must record critical learnings using `initiate_memory_recording` upon task completion.
 
 ## 🔹 2. Getting Started
 

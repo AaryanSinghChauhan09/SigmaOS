@@ -1,16 +1,35 @@
-# 📋 SigmaOS Developer Task Rules & Execution Directives
+# 📋 SigmaOS Contributor & AI Agent Rules (`docs/RULES.md`)
 
-**Scope:** Developer Execution Guidelines, Quality Engineering, and Subsystem Integrity
+This document defines core rules for human contributors and AI agents working on the SigmaOS codebase.
 
 ---
 
-## 1. Distribution Engineering Execution Rules
+## 1. Contributor Rules
 
-Inspired by Linux and BSD distribution maintenance protocols:
+1. **Branch Naming Standard:**
+   - All git branches MUST start with the prefix `jules-` (e.g. `jules-feat-memory`, `jules-fix-pam`).
 
-1. **Cleanroom Chroots**: All package builds and core subsystem modifications must be verifiable in an isolated chroot / sandbox container.
-2. **Zero Unverified Dependencies**: All code additions must adhere strictly to `#![no_std]` zero external dependency requirements.
-3. **Reproducible Compilation**: Builds must yield byte-identical output given the same `SOURCE_DATE_EPOCH` and toolchain version.
-4. **Mandatory Branch Naming**: Every git branch MUST start with the `jules-` prefix (e.g. `jules-subsystem-improvements`).
-5. **Security Gating**: All new binaries and utilities must declare OpenBSD `pledge`/`unveil` privilege restrictions and FreeBSD `Capsicum` capability rights.
-6. **Pre-Commit Verification**: Before submitting changes, developers must call `pre_commit_instructions` and execute `./run_sigma_tests.sh`.
+2. **Zero External Dependencies:**
+   - SigmaOS is a `#![no_std]` sovereign operating system. Never add unverified external crates to `Cargo.toml`.
+
+3. **Safe Rust First:**
+   - Prefer Safe Rust. Avoid `unsafe` blocks unless interfacing with low-level hardware or OS primitives, and document all safety invariants.
+
+4. **Testing & Quality Assurance:**
+   - Execute `./run_sigma_tests.sh` before submitting pull requests and verify all tests pass 100%.
+
+---
+
+## 2. AI Agent Operational Directives
+
+1. **Planning & Review:**
+   - Request plan reviews using `request_plan_review` prior to setting multi-step plans or making broad changes.
+
+2. **Always Verify Edits:**
+   - Immediately verify every code change using read-only tools or standalone test compilation.
+
+3. **Diagnose Before Modifying Environment:**
+   - On build/test failure, diagnose error logs before altering environment configurations or dependencies.
+
+4. **Record Learnings:**
+   - Document critical codebase patterns and learnings using `initiate_memory_recording` upon completing tasks.

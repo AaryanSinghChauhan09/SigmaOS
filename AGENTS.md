@@ -79,7 +79,23 @@ This document defines operational guidelines, security policies, and verificatio
 
 ---
 
-## 3. Pre-Commit Verification Checklist for AI Agents
+## 3. Contributor & AI Agent Rules for SigmaOS Development
+
+### A. General Contributor Rules
+1. **Branch Naming**: Every branch created by human contributors or AI agents MUST use the `jules-` prefix (e.g. `jules-fix-cgroups`).
+2. **Zero Dependency Policy**: Do NOT add external third-party crates under `Cargo.toml` `[dependencies]`.
+3. **Safe Rust First**: Prefer Safe Rust over `unsafe`. Any `unsafe` block must document safety invariants explicitly.
+4. **Mandatory Testing**: Always run `./run_sigma_tests.sh` and verify modified files build cleanly before opening PRs.
+
+### B. AI Agent Operational Directives
+1. **Plan Review & Approval**: Call `request_plan_review` before calling `set_plan` for multi-step tasks.
+2. **Always Verify Edits**: Use read-only tools (`read_file`, `list_files`) or test execution immediately after modifying any source file.
+3. **Diagnose Failures First**: On build/test failure, read logs carefully before altering dependencies or package settings.
+4. **Memory Recording**: Record critical architectural, security, and performance learnings using `initiate_memory_recording`.
+
+---
+
+## 4. Pre-Commit Verification Checklist for AI Agents
 
 Before submitting changes, AI agents must execute:
 1. `./run_sigma_tests.sh` to run 220+ atomic Rust unit tests and Python integration tests.

@@ -89,5 +89,30 @@ Inspired by Linux & BSD distribution development standards (Arch Linux, Debian, 
 
 ---
 
+## AI Agent Guidelines & Directives
+
+### 1. **Autonomous Operation & Verification**
+- AI agents operating on SigmaOS must autonomously diagnose build and test failures before changing package configurations or dependencies.
+- Every state-modifying action (file edits, creations, or deletions) MUST be verified immediately using read-only inspection tools or standalone test compilation.
+
+### 2. **Planning & Review Protocols**
+- AI agents must formulate clear numbered plans and call `request_plan_review` prior to setting plans or making broad architectural modifications.
+- AI agents must execute pre-commit checklists, including `pre_commit_instructions`, before submitting pull requests.
+
+### 3. **Memory & Knowledge Recording**
+- AI agents must document critical, codebase-specific performance, security, or architectural insights using `initiate_memory_recording`.
+- AI agents must consult the internal knowledgebase (`knowledgebase_lookup`) when facing ambiguous system behavior or setup issues.
+
+---
+
+## Rules for Contributors
+
+1. **Branch Naming**: All branches created by contributors or agents MUST start with `jules-` (e.g. `jules-feature-xxx`).
+2. **Zero Dependency Integrity**: Never add unverified external crates to `Cargo.toml`.
+3. **Safe Rust First**: Do not introduce `unsafe` blocks without documented safety invariants and explicit review.
+4. **Verification**: Always execute `./run_sigma_tests.sh` and confirm all tests pass prior to submitting PRs.
+
+---
+
 **Last Updated:** September 2026
 **Maintained By:** SigmaOS Core Architecture Team
