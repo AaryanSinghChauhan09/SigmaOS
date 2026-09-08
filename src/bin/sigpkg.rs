@@ -53,9 +53,12 @@ fn main() {
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
         "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "apk" | "pkg" | "pkg_add"
-        | "pkg_delete" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
-        | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env" | "guix"
-        | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" => {
+        | "pkg_delete" | "pkg_info" | "pkgin" | "zypper" | "xbps" | "xbps-install"
+        | "xbps-remove" | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env"
+        | "guix" | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" | "yay"
+        | "paru" | "pikaur" | "trizen" | "aura" | "microdnf" | "rpm" | "pip" | "spack"
+        | "conan" | "cargo" | "gem" | "brew" | "flatpak" | "snap" | "swupd" | "pkgman"
+        | "pisi" | "urpmi" | "slapt-get" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),

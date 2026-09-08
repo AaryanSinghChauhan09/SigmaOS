@@ -17,10 +17,11 @@ pub mod security {
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
-
-pub use universal_adapter::universal_oop_system;
 
 pub mod sigpkg {
     use alloc::string::String;
@@ -47,6 +48,15 @@ pub mod sigpkg {
             }
         }
 
+    }
+
+    impl core::fmt::Display for Version {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+        }
+    }
+
+    impl Version {
         pub fn parse(version_str: &str) -> Result<Self, &'static str> {
             let clean = version_str.split('-').next().unwrap_or(version_str);
             let mut parts = clean.split('.');
@@ -131,7 +141,6 @@ fn test_universal_adapter_all_formats() {
         UniversalPmCommandDispatcher, UniversalPmOperation, ZypperSpecManifest,
     };
 
-    use universal_adapter::Version;
     let adapter = UniversalPackageAdapter::new();
 
     // 1. FreeBSD UCL (+MANIFEST)
@@ -168,14 +177,14 @@ fn test_universal_adapter_all_formats() {
         .absorb_and_register("redis.pkg", freebsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge
         .absorb_and_register("tmux.tgz", openbsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -225,10 +234,11 @@ fn test_universal_adapter_all_formats() {
 
 #[test]
 fn test_all_prompt_package_formats() {
-    use universal_adapter::universal_oop_system::PackageFormat;
-    use universal_adapter::UniversalPackageAdapter;
+    use universal_engine::PackageFormat;
+    use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation};
 
     let adapter = UniversalPackageAdapter::new();
+    let dispatcher = UniversalPmCommandDispatcher::new();
 
     // Verify detection for all 29 Linux & BSD distro formats specified in prompt
     assert_eq!(
@@ -414,7 +424,7 @@ fn test_all_prompt_package_formats() {
 #[test]
 fn test_all_prompt_package_formats_extended() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
