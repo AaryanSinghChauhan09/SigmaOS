@@ -82,6 +82,7 @@ pub mod lubuntu;
 pub mod macos_darwin;
 pub mod mate_betsy;
 pub mod mesh_hub;
+pub mod mint;
 pub mod mint_ecosystem;
 pub mod mint_linux;
 
@@ -89,6 +90,11 @@ pub use mint_ecosystem::{
     CaptainMintManager, CinnamonSpiceDesklet, CinnamonSpiceTheme, CinnamonSpicesEngine,
     LinuxMintEcosystemHub, MintRepoMirror, MintUpgradeSourcesEngine, RecentDocument,
     SlickGreeterXappPortal, WarpinatorLanShare, WarpinatorPeer, XappAppsSuite,
+};
+pub use mint::{
+    LinuxMintIntegrationEngine, MintInstallManager, MintUpdateManager, SoftwarePackage,
+    UpdateLevel, UpdatePackage, CinnamonDesktopManager, CinnamonPanel, CinnamonPanelPosition,
+    XAppPreferences, MintSystemConfig,
 };
 pub mod mobile_desktop_parity;
 pub mod nixos;
