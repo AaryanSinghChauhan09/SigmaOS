@@ -12,20 +12,33 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::boxed::Box;
 
-use crate::klib::{BTreeMap, Vec, VecDeque};
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::boxed::Box;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::{BTreeMap, VecDeque};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::boxed::Box;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::{BTreeMap, VecDeque};
+#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
+
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
-
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
-use alloc::collections::{BTreeMap, VecDeque};
-use alloc::string::String;
-use alloc::vec::Vec;
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks

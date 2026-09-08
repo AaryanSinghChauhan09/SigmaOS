@@ -1,12 +1,25 @@
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap as HashMap;
+
+#[cfg(any(feature = "standalone_test", test))]
 use std::format;
+#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
+
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 // Enhanced with Fedora's standard SELinux Context & Policy Transition security engines,
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
-
-use std::collections::HashMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
