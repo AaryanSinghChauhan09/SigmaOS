@@ -94,6 +94,205 @@ impl Default for FreeBsdJailManager {
     }
 }
 
+// =========================================================================
+// FreeBSD kqueue / kevent Event Notification Loop Engine
+// =========================================================================
+
+pub const EVFILT_READ: i16 = -1;
+pub const EVFILT_WRITE: i16 = -2;
+pub const EVFILT_SIGNAL: i16 = -6;
+pub const EVFILT_TIMER: i16 = -7;
+
+pub const EV_ADD: u16 = 0x0001;
+pub const EV_DELETE: u16 = 0x0002;
+pub const EV_ENABLE: u16 = 0x0004;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KEvent {
+    pub ident: usize,
+    pub filter: i16,
+    pub flags: u16,
+    pub fflags: u32,
+    pub data: i64,
+    pub udata: usize,
+}
+
+pub struct FreeBsdKqueueEngine {
+    pub kq_fd: i32,
+    pub registered_events: BTreeMap<(usize, i16), KEvent>,
+    pub pending_events: Vec<KEvent>,
+}
+
+impl FreeBsdKqueueEngine {
+    pub fn new(kq_fd: i32) -> Self {
+        Self {
+            kq_fd,
+            registered_events: BTreeMap::new(),
+            pending_events: Vec::new(),
+        }
+    }
+
+    pub fn kevent_register(&mut self, ev: KEvent) -> Result<(), &'static str> {
+        let key = (ev.ident, ev.filter);
+        if (ev.flags & EV_DELETE) != 0 {
+            self.registered_events.remove(&key);
+        } else {
+            self.registered_events.insert(key, ev);
+        }
+        Ok(())
+    }
+
+    pub fn kevent_trigger(&mut self, ident: usize, filter: i16, data: i64) {
+        if let Some(ev) = self.registered_events.get(&(ident, filter)) {
+            let mut triggered = ev.clone();
+            triggered.data = data;
+            self.pending_events.push(triggered);
+        }
+    }
+
+    pub fn kevent_poll(&mut self) -> Vec<KEvent> {
+        let events = self.pending_events.clone();
+        self.pending_events.clear();
+        events
+    }
+}
+
+// =========================================================================
+// OpenBSD Syspatch & Securelevel State Governor
+// =========================================================================
+
+pub struct OpenBsdSyspatchSecurityState {
+    pub securelevel: i32,
+    pub syspatch_version: String,
+    pub applied_patches: Vec<String>,
+    pub wx_enforced: bool,
+}
+
+impl OpenBsdSyspatchSecurityState {
+    pub fn new(securelevel: i32, version: &str) -> Self {
+        Self {
+            securelevel,
+            syspatch_version: version.to_string(),
+            applied_patches: Vec::new(),
+            wx_enforced: true,
+        }
+    }
+
+    pub fn apply_syspatch(&mut self, patch_id: &str) -> Result<(), &'static str> {
+        if self.securelevel > 1 {
+            return Err("EPERM: Cannot apply syspatch when securelevel > 1");
+        }
+        self.applied_patches.push(patch_id.to_string());
+        Ok(())
+    }
+
+    pub fn raise_securelevel(&mut self, level: i32) -> Result<(), &'static str> {
+        if level <= self.securelevel {
+            return Err("EPERM: Securelevel can only be raised, not lowered");
+        }
+        self.securelevel = level;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// NetBSD Rump Kernel Virtual Hypercall Driver Layer
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RumpDriverType {
+    VfsStorage,
+    NetStack,
+    PciDev,
+}
+
+pub struct NetBsdRumpHypercallLayer {
+    pub driver_type: RumpDriverType,
+    pub initialized: bool,
+    pub active_hypercalls: u64,
+}
+
+impl NetBsdRumpHypercallLayer {
+    pub fn new(driver_type: RumpDriverType) -> Self {
+        Self {
+            driver_type,
+            initialized: false,
+            active_hypercalls: 0,
+        }
+    }
+
+    pub fn init_rump_kernel(&mut self) -> Result<(), &'static str> {
+        self.initialized = true;
+        Ok(())
+    }
+
+    pub fn invoke_hypercall(&mut self, hypercall_id: u32) -> Result<u64, &'static str> {
+        if !self.initialized {
+            return Err("ENXIO: Rump kernel server not initialized");
+        }
+        self.active_hypercalls += 1;
+        Ok(u64::from(hypercall_id) * 0x1000 + 0x42)
+    }
+}
+
+// =========================================================================
+// FreeBSD UMA (Universal Memory Allocator) Zone Allocator
+// =========================================================================
+
+pub struct UmaZone {
+    pub name: String,
+    pub item_size: usize,
+    pub allocated_items: usize,
+    pub free_items: usize,
+}
+
+pub struct FreeBsdUmaZoneAllocator {
+    pub zones: BTreeMap<String, UmaZone>,
+}
+
+impl FreeBsdUmaZoneAllocator {
+    pub fn new() -> Self {
+        Self {
+            zones: BTreeMap::new(),
+        }
+    }
+
+    pub fn uma_zcreate(&mut self, name: &str, item_size: usize) -> Result<(), &'static str> {
+        if self.zones.contains_key(name) {
+            return Err("EEXIST: UMA zone already exists");
+        }
+        self.zones.insert(
+            name.to_string(),
+            UmaZone {
+                name: name.to_string(),
+                item_size,
+                allocated_items: 0,
+                free_items: 16, // Pre-allocated zone cushion
+            },
+        );
+        Ok(())
+    }
+
+    pub fn uma_zalloc(&mut self, name: &str) -> Result<usize, &'static str> {
+        let zone = self.zones.get_mut(name).ok_or("ENOENT: UMA zone not found")?;
+        if zone.free_items > 0 {
+            zone.free_items -= 1;
+        }
+        zone.allocated_items += 1;
+        Ok(zone.allocated_items)
+    }
+
+    pub fn uma_zfree(&mut self, name: &str) -> Result<(), &'static str> {
+        let zone = self.zones.get_mut(name).ok_or("ENOENT: UMA zone not found")?;
+        if zone.allocated_items == 0 {
+            return Err("EFAULT: Double free or invalid UMA zone release");
+        }
+        zone.allocated_items -= 1;
+        zone.free_items += 1;
+        Ok(())
+    }
+}
+
 /// OpenBsdSysctlKernelMib emulates OpenBSD's sysctl Management Information Base tree.
 /// Specifically focuses on securelevel lockdown states (e.g. kern.securelevel).
 pub struct OpenBsdSysctlKernelMib {
@@ -369,7 +568,7 @@ impl Default for OpenBsdPfFirewallEngine {
 // UNIT TESTS MODULE
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -479,5 +678,47 @@ mod tests {
 
         guard.pledge("stdio rpath").unwrap();
         assert!(!guard.check_permission("inet", None));
+    }
+
+    #[test]
+    fn test_freebsd_kqueue_engine() {
+        let mut kq = FreeBsdKqueueEngine::new(3);
+        let ev = KEvent {
+            ident: 10,
+            filter: EVFILT_READ,
+            flags: EV_ADD | EV_ENABLE,
+            fflags: 0,
+            data: 0,
+            udata: 1001,
+        };
+        assert!(kq.kevent_register(ev).is_ok());
+        kq.kevent_trigger(10, EVFILT_READ, 128);
+        let events = kq.kevent_poll();
+        assert_eq!(events.len(), 1);
+        assert_eq!(events[0].data, 128);
+    }
+
+    #[test]
+    fn test_openbsd_syspatch_and_securelevel() {
+        let mut state = OpenBsdSyspatchSecurityState::new(1, "7.4");
+        assert!(state.apply_syspatch("001_sysctl").is_ok());
+        assert!(state.raise_securelevel(2).is_ok());
+        assert!(state.apply_syspatch("002_pledge").is_err()); // securelevel > 1
+    }
+
+    #[test]
+    fn test_netbsd_rump_hypercall_layer() {
+        let mut rump = NetBsdRumpHypercallLayer::new(RumpDriverType::VfsStorage);
+        assert!(rump.invoke_hypercall(1).is_err()); // Uninitialized
+        rump.init_rump_kernel().unwrap();
+        assert_eq!(rump.invoke_hypercall(1).unwrap(), 0x1042);
+    }
+
+    #[test]
+    fn test_freebsd_uma_zone_allocator() {
+        let mut uma = FreeBsdUmaZoneAllocator::new();
+        assert!(uma.uma_zcreate("socket_zone", 256).is_ok());
+        assert_eq!(uma.uma_zalloc("socket_zone").unwrap(), 1);
+        assert!(uma.uma_zfree("socket_zone").is_ok());
     }
 }
