@@ -33,6 +33,7 @@ pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub mod memory;
+pub mod missing_linux_kernel_components;
 pub mod meta;
 pub mod module_loader;
 pub mod namespaces;
@@ -97,6 +98,7 @@ pub use linux_bsd_innovations::{
     PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
 };
 pub use linux_parity::*;
+pub use missing_linux_kernel_components::*;
 pub use memory::{
     BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
     MemoryBlock, PcieResourceAllocator, ResourceLimits, SigmaResourceAllocatorHub,
