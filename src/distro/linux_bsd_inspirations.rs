@@ -569,11 +569,25 @@ impl SovereignUniversalDistroBridge {
                     action, timeslice, self.mode
                 ))
             }
-            "virt" => {
-                Ok(format!(
-                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
+            "virt" | "virtualization" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd => Ok(format!(
+                        "Dispatched bhyve hypervisor virtual machine instance for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD vmm/vmd hypervisor instance for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(format!(
+                        "Dispatched Illumos Zones hardware virtualization for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched KVM/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
             }
             "audit" => {
                 let mut pax_engine = HardenedBsdPaxGuardEngine::new();
@@ -582,6 +596,224 @@ impl SovereignUniversalDistroBridge {
                     "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
                     action, mprotect_res.is_ok(), self.mode
                 ))
+            }
+            "auth" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched PAM/login.conf and doas security context auth for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched systemd-homed LUKS-encrypted session auth for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "boot" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd => Ok(format!(
+                        "Dispatched FreeBSD loader.conf and ZFS bootenv manager for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD efiboot bootloader staging for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched systemd-boot / Dracut initramfs boot chain staging for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "input" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD wscons console input driver for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched libinput multi-touch gesture input processing for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "thermal" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd => Ok(format!(
+                        "Dispatched FreeBSD coretemp thermal CPU frequency scaling for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD hw.sensors thermal monitoring for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched thermald ACPI thermal zone governor for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "syscall" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd => Ok(format!(
+                        "Dispatched FreeBSD Capsicum capability syscall filter for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD pledge/unveil syscall dispatch auditor for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched Linux seccomp-BPF syscall filter gate for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "device" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd => Ok(format!(
+                        "Dispatched FreeBSD devd hotplug device event dispatcher for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD hotplugd peripheral manager for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched udev rule evaluation and device event dispatcher for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "crypto" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD LibreSSL / arc4random CSPRNG for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched Dilithium-5 / Kyber-1024 post-quantum crypto & Linux AF_ALG kTLS for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched Omarchy Herdr AI Agent & CachyOS ML auto-tuning queue for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::SolarisIllumos => Ok(format!(
+                        "Dispatched DTrace kernel dynamic tracing & aggregation for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD vmstat/top system performance monitoring for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched eBPF BPFtrace & Linux PSI pressure stall monitoring for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "logging" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched BSD syslogd structured log collector for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched systemd-journald eBPF ring-buffer log sink for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "accessibility" => {
+                Ok(format!(
+                    "Dispatched Zenith screen reader & AT-SPI2 accessibility bridge for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "bluetooth" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd => Ok(format!(
+                        "Dispatched FreeBSD Netgraph Bluetooth HCI stack for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched Linux BlueZ Bluetooth 5.4 socket controller for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "wireless" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD ieee80211 wireless rate control for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched Linux iwd/wpa_supplicant Wi-Fi 7 interface manager for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "media" => {
+                Ok(format!(
+                    "Dispatched PipeWire zero-copy audio/video media graph node for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cloud" | "orchestration" | "cluster" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD CARP cluster failover state sync for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched Cloud-init / Cilium eBPF CNI cloud cluster orchestrator for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "embedded" => {
+                Ok(format!(
+                    "Dispatched Yocto/Buildroot minimal embedded diskless image generator for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "gamepad" => {
+                Ok(format!(
+                    "Dispatched SteamOS gamescope input composite gamepad mapping for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "smartcard" | "tpm" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD bio hardware security token manager for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched TPM 2.0 cryptographic attestation & tpm2-tss stack for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
+            }
+            "location" | "sensor" | "camera" | "microphone" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd => Ok(format!(
+                        "Dispatched OpenBSD hw.sensors telemetry for hardware subsystem '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                    _ => Ok(format!(
+                        "Dispatched geoclue/PipeWire sensor and media device router for '{}' under distro mode '{:?}'",
+                        action, self.mode
+                    )),
+                }
             }
             _ => Ok(format!(
                 "Dispatched subsystem '{}' action '{}' under distro mode '{:?}'",
@@ -594,8 +826,13 @@ impl SovereignUniversalDistroBridge {
         let subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
             "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
+            "boot", "container", "containers", "virtualization", "virt", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "logging", "accessibility", "bluetooth", "wireless", "media", "cloud",
+            "orchestration", "cluster", "embedded", "gamepad", "smartcard", "tpm",
+            "location", "sensor", "camera", "microphone", "ui", "process", "time",
+            "parrot_anonsurf", "parrot_apparmor", "parrot_forensics", "omarchy_quickshell",
+            "omarchy_theme", "omarchy_lua_reload", "omarchy_herdr_agent",
         ];
 
         for sub in subsystems {
@@ -1952,8 +2189,13 @@ mod cross_subsystem_tests {
         let target_subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
             "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
+            "boot", "container", "containers", "virtualization", "virt", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "logging", "accessibility", "bluetooth", "wireless", "media", "cloud",
+            "orchestration", "cluster", "embedded", "gamepad", "smartcard", "tpm",
+            "location", "sensor", "camera", "microphone", "ui", "process", "time",
+            "parrot_anonsurf", "parrot_apparmor", "parrot_forensics", "omarchy_quickshell",
+            "omarchy_theme", "omarchy_lua_reload", "omarchy_herdr_agent",
         ];
 
         for m in modes {

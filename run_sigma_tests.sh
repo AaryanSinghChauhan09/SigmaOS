@@ -24,3 +24,10 @@ if [ -f "src/launch_ready/mod.rs" ]; then
     rustc --test src/launch_ready/mod.rs --edition=2021 -o build/launch_ready_test
     ./build/launch_ready_test
 fi
+
+if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
+    echo "Running Linux & BSD distro cross-subsystem inspirations test suite..."
+    mkdir -p build
+    rustc --test src/distro/linux_bsd_inspirations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/linux_bsd_inspirations_test
+    ./build/linux_bsd_inspirations_test
+fi
