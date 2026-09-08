@@ -1,17 +1,16 @@
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
+// Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
+use alloc::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap as HashMap;
 
+// Test environment compatibility: Use std for testing only
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
+use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
