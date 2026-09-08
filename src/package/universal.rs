@@ -215,8 +215,6 @@ pub enum PackageState {
     BrokenDependency,
 }
 
-=======
->>>>>>> origin/feat/linux-bsd-distro-inspirations-4462545698197364281
 pub enum PackagePriority {
     Essential,
     Required,
