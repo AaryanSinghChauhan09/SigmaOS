@@ -144,21 +144,6 @@ impl Driver for SimpleDriver {
     }
 }
 
-pub struct SimpleStorageDriver {
-    id: DriverID,
-    driver_type: DriverType,
-    state: DriverState,
-}
-
-impl SimpleStorageDriver {
-    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
-        Self {
-            id,
-            driver_type,
-            state: DriverState::Unloaded,
-        }
-    }
-}
 
 
 // =========================================================================

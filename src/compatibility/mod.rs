@@ -127,13 +127,13 @@ pub use wsl::*;
 pub use zorin::*;
 
 pub use gap_closure::{
-    AiTaskOrchestrator, AlpineLinuxDisklessLbuPersistence, BuildLedgerSystem,
-    DriverRepositoryManager, FirmwareBridgeManager, FreeBsdGeomStorageStack, HidGraphicsDriver,
-    KernelModuleManager, NetworkStackGateway, NixOsHermeticClosureEngine,
-    OpenBsdSelfReportingSecurityGovernor, OpenSourceCompetitorOrchestrator,
+    AiTaskOrchestrator, BuildLedgerSystem,
+    DriverRepositoryManager, FirmwareBridgeManager, HidGraphicsDriver,
+    KernelModuleManager, NetworkStackGateway,
+    OpenSourceCompetitorOrchestrator,
     PeripheralEmulationLibrary, SecurityPolicyManager, SovereignDistroAbsorptionEngine,
     SyscallCompatibilityRegistry, TargetDistroFamily, VirtualMemoryManager,
-    VoidLinuxRunitServiceSupervisor, ZorinAppearanceSwitcher,
+    ZorinAppearanceSwitcher,
 };
 pub use superiority::{
     LockFreeQueue, NumaCfsScheduler, ShardIgnitor, SovereignCloudFS, SovereignForensics,

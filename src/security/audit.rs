@@ -1,5 +1,3 @@
-use std::boxed::Box;
-use std::vec::Vec;
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
 /// Implements security event logging and audit trails
