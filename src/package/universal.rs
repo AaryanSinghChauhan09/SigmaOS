@@ -224,7 +224,7 @@ pub enum PackagePriority {
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     #[default]
     Deb,        // apt/dpkg
@@ -283,13 +283,6 @@ pub enum PackageFormat {
     Opkg,       // OpenWrt OPKG (.opkg)
     SolarisIps, // Solaris IPS package (.p5p / .ips)
     GuixNar,    // GNU Guix Normalized Archive (.nar)
-}
-
-impl Default for PackageFormat {
-    fn default() -> Self {
-        Self::Deb
-    }
->>>>>>> bolt-hotkey-temp
 }
 
 impl PackageFormat {

@@ -2341,7 +2341,7 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 6);
+        assert_eq!(engine.records.len(), 13);
         assert!(engine.is_all_components_implemented());
     }
 
