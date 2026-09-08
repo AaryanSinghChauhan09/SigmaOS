@@ -121,8 +121,6 @@ pub use structures::*;
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 pub use linux_bsd_innovations::{
-    ArchUserRepoManager, BsdPfStateTable, PfFiveTuple, PfStateEntry,
-    LinuxFutexEngine, FutexOp, FutexWaiter, FreeBsdVfsNullfs, NullfsLayerNode,
     AlpineHardenedEnv, OpenBsdPledge, BoundedBufferProducerConsumer,
     BottomHalfKernelThread, SoftIrqType, AndroidBroadcastReceiverRegistry, BroadcastReceiver,
     MultikernelMessagePassing, MultikernelMessage, NinePProtocolTranslator, NinePResource,
@@ -133,7 +131,6 @@ pub use linux_bsd_innovations::{
     SovereignNamespaceContainer, NamespaceType, SovereignEventReactor, ReactorRegistration, ReactorEvent,
     HybridKernelManager, NtExecutiveService, MicrokernelCore, ExokernelHardwareMultiplexer, ResourceBinding,
     NetBsdRumpKernel, RumpComponent, DynamicLkmLoader, KernelModule, CapabilityDerivationTree, KernelCapability,
-    FreeBsdJail, NixOsDeclarativeManager, GentooUseFlags, VoidRunitInit,
     SovereignCgroupGovernor, SovereignCgroupEntry, CgroupResourceLimits,
     KernelFastPacketEngine, FastPacketFrame, XdpAction,
     KernelAccessController, LandlockPathRule, LandlockAccessRight, PLEDGE_STDIO, PLEDGE_RPATH, PLEDGE_WPATH, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_INET, PLEDGE_UNIX, PLEDGE_EXEC,

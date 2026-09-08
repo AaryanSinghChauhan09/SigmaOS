@@ -330,17 +330,6 @@ impl Scheduler {
     }
 }
 
-/// Task identifier for CFS scheduler
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TaskId(pub u64);
-
-/// Task representation for CFS scheduler
-#[derive(Debug, Clone, Copy)]
-pub struct Task {
-    pub id: TaskId,
-    pub vruntime: u64,
-    pub priority: u32,
-}
 
 /// CFS Scheduler implementation
 pub struct CfsScheduler {

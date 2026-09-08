@@ -432,7 +432,4 @@ pub use tools::{
     UserIdentity as LibUserIdentity,
 };
 
-pub mod open_source_obsoletion;
-pub use open_source_obsoletion::*;
-
 pub use unimplemented_features::*;
