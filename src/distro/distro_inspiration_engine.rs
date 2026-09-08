@@ -520,7 +520,7 @@ impl OpenWrtUciSqmRouterEngine {
         };
         if bw < 10000 {
             15 // 15ms target delay for low-bandwidth links
-        } else if bw < 100000 {
+        } else if bw <= 100000 {
             5  // 5ms standard CAKE target delay
         } else {
             2  // 2ms ultra-low latency target delay for gigabit

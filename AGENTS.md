@@ -200,7 +200,38 @@ When modifying backend services in `src/open_source_obsoletion.rs`, `src/open_so
 
 ---
 
-## 15. Checklist for AI Agents
+## 15. Explicit Rules for Human Contributors & AI Agents
+
+### 15.1 Universal Rules for Human Contributors
+1. **Zero External Dependencies Policy (`no_std`):**
+   * Core microkernel shards and kernel subsystems MUST be `#![no_std]` and MUST NOT add external dependencies under `[dependencies]` in `Cargo.toml`.
+   * Use native `klib` abstractions (`klib::Vec`, `klib::HashMap`, `klib::BTreeMap`, `klib::String`).
+2. **Memory Safety & Unsafe Code Guidelines:**
+   * Prefer Safe-Rust. Every `unsafe` block MUST be preceded by a `// SAFETY:` comment documenting safety invariants, pointer alignment, and memory bounds.
+3. **Post-Quantum Cryptographic (PQC) Security Standard:**
+   * All driver signatures, package manifests, and kernel module attestations MUST use Dilithium-5 signatures or Kyber-1024 KEM.
+4. **Sandboxing & Least Privilege:**
+   * Userland binaries MUST declare OpenBSD `pledge`/`unveil` rights or FreeBSD Capsicum capabilities before handling untrusted data.
+5. **Testing Invariants & Quality Verification:**
+   * Every new feature or bugfix MUST include unit tests. Run `cargo check --lib` and `./run_sigma_tests.sh` before submitting pull requests.
+
+### 15.2 Explicit Rules for AI Agents (Autonomous Development)
+1. **Planning & Review Protocol:**
+   * AI agents MUST call `request_plan_review` with a structured plan before using `set_plan` for the first time.
+   * Plans MUST include a dedicated step for verifying test execution and a pre-commit step using the exact phrasing:
+     `Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done.`
+2. **Always Verify Modifications:**
+   * After modifying any file, the AI agent MUST confirm the change using a read-only tool (`read_file` or `list_files`).
+3. **Code Review & Feedback Implementation:**
+   * Before finalizing any PR or submission, the AI agent MUST invoke `request_code_review` and address all blocking feedback.
+4. **Memory Recording Directive:**
+   * Upon completing code review and verification, the AI agent MUST call `initiate_memory_recording` to document key architectural patterns and learnings.
+5. **Secret Scanner False Positive Mitigation:**
+   * Test functions or mock credentials MUST use variable names prefixed with `mock_` or `test_` (e.g. `mock_client_secret`) to prevent automated scanner triggers.
+
+---
+
+## 16. Checklist for AI Agents & Contributors
 
 1. **Update Manifests & Documentation** when bumping versions, adding drivers, or modifying synchronization logic.
 2. **Run Standalone Subsystem Tests:**

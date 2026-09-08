@@ -622,9 +622,24 @@ Keep GitHub Wiki updated with:
 
 ---
 
-## AI Agent Guidelines
+## AI Agent & Contributor Development Rules
 
-### 1. **Scope & Limitations**
+### 1. **Universal Rules for Human Contributors**
+- **Zero External Dependencies**: Core microkernel shards and kernel subsystems operate under `#![no_std]` and must maintain 0 external crates in `Cargo.toml`.
+- **Memory Safety & Unsafe Invariants**: Safe Rust is mandatory. Every `unsafe` block must include a `// SAFETY:` rationale.
+- **Post-Quantum Cryptography (PQC)**: Driver signatures, package recipes, and kernel module attestations must use Dilithium-5 or Kyber-1024.
+- **Capability Sandboxing**: Applications must enforce OpenBSD `pledge`/`unveil` rights or FreeBSD Capsicum capabilities.
+- **Automated Verification**: Run `cargo check --lib` and `./run_sigma_tests.sh` before submitting pull requests.
+
+### 2. **Operational Rules for AI Agents**
+- **Planning Review Protocol**: AI agents must propose a plan via `request_plan_review` before calling `set_plan` for the first time.
+- **Pre-Commit Step Requirement**: Plans must include a pre-commit step using the exact phrasing:
+  `Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done.`
+- **Post-Edit Verification**: After every file creation or modification, the AI agent must verify the change with a read-only tool (`read_file` or `list_files`).
+- **Code Review & Memory Recording**: AI agents must call `request_code_review` prior to submitting changes, and call `initiate_memory_recording` after review.
+- **Secret Scanner Safeguards**: All mock keys or test tokens in code or tests must use names prefixed with `mock_` or `test_` to prevent false positive secret leaks.
+
+### 3. **Scope & Limitations for AI Agents**
 
 **AI agents may:**
 - ✅ Generate code following established patterns
@@ -642,7 +657,7 @@ Keep GitHub Wiki updated with:
 - ❌ Make architectural decisions
 - ❌ Override established patterns without justification
 
-### 2. **Code Generation Rules**
+### 4. **Code Generation Rules**
 
 For All Generated Code:
 - Follow Rust style guidelines exactly

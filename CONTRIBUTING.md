@@ -41,13 +41,21 @@ All contributions to SigmaOS must uphold the core principles defined in the **Si
 
 ---
 
-## 🔹 4. Coding Standards
+## 🔹 4. Coding Standards & Mandatory Rules
 
+### 4.1 Rules for Human Contributors
+- **Zero External Dependencies Policy**: The core microkernel and 12 shards operate under `#![no_std]`. Never add third-party crates to `[dependencies]` in `Cargo.toml`.
+- **Safe Rust & `unsafe` Documentation**: Memory safety is non-negotiable. Every `unsafe` block must include a `// SAFETY:` explanation.
+- **PQC Security**: Cryptographic signing and verification must use Dilithium-5 or Kyber-1024.
 - **Formatting & Linting**: Format code with `rustfmt` (`cargo fmt`) and check with Clippy (`cargo clippy`).
-- **Modular Architecture**: Keep components small, composable, and loosely coupled under `#![no_std]` / `alloc` capability bounds.
 - **API Documentation**: Document all public modules, structs, traits, and functions using Rustdoc comments (`///`).
-- **Security & Safety First**: Prefer safe Rust. Avoid `unsafe` blocks unless explicitly required for low-level driver/hardware interface interop, and document all safety invariants.
-- **PQC Cryptographic Verification**: Ensure driver modules and package recipes adhere to post-quantum signature verification models.
+
+### 4.2 Rules for AI Agents
+- **Planning & Review**: AI agents must propose plans via `request_plan_review` before calling `set_plan`.
+- **Mandatory Pre-Commit Step**: Plans must include a step with the exact text: `Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done.`
+- **Post-Modification Verification**: Every file modification must be confirmed using a read-only tool (`read_file` / `list_files`).
+- **Code Review**: AI agents must call `request_code_review` prior to submitting changes.
+- **Secret Scanning Safeguards**: Mock keys and test tokens must be prefixed with `mock_` or `test_`.
 
 ---
 
