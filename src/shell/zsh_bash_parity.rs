@@ -468,10 +468,58 @@ impl Default for ZshSyntaxHighlighter {
 // 4. BASH PARAMETER EXPANSION & WILDCARD GLOBBING
 // =========================================================================
 
+pub struct BraceExpansionEngine;
+
+impl BraceExpansionEngine {
+    /// Expands Bash/Zsh brace syntax like `{1..5}` or `{a,b,c}` into a space-separated sequence
+    pub fn expand_braces(input: &str) -> String {
+        let mut result = String::new();
+        let mut idx = 0;
+        let bytes = input.as_bytes();
+
+        while idx < bytes.len() {
+            if bytes[idx] == b'{' {
+                if let Some(end_rel) = input[idx..].find('}') {
+                    let end = idx + end_rel;
+                    let inner = &input[idx + 1..end];
+                    if let Some(dotdot) = inner.find("..") {
+                        let start_str = &inner[..dotdot];
+                        let end_str = &inner[dotdot + 2..];
+                        if let (Ok(s), Ok(e)) = (start_str.parse::<i64>(), end_str.parse::<i64>()) {
+                            let step = if s <= e { 1 } else { -1 };
+                            let mut curr = s;
+                            let mut seq = Vec::new();
+                            loop {
+                                seq.push(curr.to_string());
+                                if curr == e {
+                                    break;
+                                }
+                                curr += step;
+                            }
+                            result.push_str(&seq.join(" "));
+                            idx = end + 1;
+                            continue;
+                        }
+                    } else if inner.contains(',') {
+                        let parts: Vec<&str> = inner.split(',').map(|s| s.trim()).collect();
+                        result.push_str(&parts.join(" "));
+                        idx = end + 1;
+                        continue;
+                    }
+                }
+            }
+            result.push(bytes[idx] as char);
+            idx += 1;
+        }
+
+        result
+    }
+}
+
 pub struct BashParameterExpansion;
 
 impl BashParameterExpansion {
-    /// Expands bash parameter syntax: ${VAR:-default}, ${VAR#prefix}, ${VAR%suffix}, ${#VAR}, ${VAR//pattern/replacement}, ${VAR:offset:length}
+    /// Expands bash parameter syntax: ${!VAR}, ${VAR^^}, ${VAR,,}, ${VAR^}, ${VAR,}, ${VAR:-default}, ${VAR#prefix}, ${VAR%suffix}, ${#VAR}, ${VAR//pattern/replacement}, ${VAR:offset:length}
     pub fn expand(expr: &str, env: &BTreeMap<String, String>) -> String {
         if !expr.starts_with("${") || !expr.ends_with('}') {
             return expr.to_string();
@@ -479,14 +527,53 @@ impl BashParameterExpansion {
 
         let inner = &expr[2..expr.len() - 1];
 
-        // 1. ${#VAR} - string length
+        // 1. Indirect variable expansion: ${!VAR}
+        if inner.starts_with('!') {
+            let target_var_name = &inner[1..];
+            if let Some(actual_var_name) = env.get(target_var_name) {
+                return env.get(actual_var_name).cloned().unwrap_or_default();
+            }
+            return String::new();
+        }
+
+        // 2. Uppercase / Lowercase case conversion: ${VAR^^}, ${VAR,,}, ${VAR^}, ${VAR,}
+        if inner.ends_with("^^") {
+            let var_name = &inner[..inner.len() - 2];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            return val.to_uppercase();
+        }
+        if inner.ends_with(",,") {
+            let var_name = &inner[..inner.len() - 2];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            return val.to_lowercase();
+        }
+        if inner.ends_with('^') {
+            let var_name = &inner[..inner.len() - 1];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            let mut c = val.chars();
+            return match c.next() {
+                None => String::new(),
+                Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+            };
+        }
+        if inner.ends_with(',') {
+            let var_name = &inner[..inner.len() - 1];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            let mut c = val.chars();
+            return match c.next() {
+                None => String::new(),
+                Some(f) => f.to_lowercase().collect::<String>() + c.as_str(),
+            };
+        }
+
+        // 3. ${#VAR} - string length
         if inner.starts_with('#') {
             let var_name = &inner[1..];
             let val = env.get(var_name).cloned().unwrap_or_default();
             return val.len().to_string();
         }
 
-        // 2. ${VAR//search/replace} - global replace
+        // 4. ${VAR//search/replace} - global replace
         if let Some(pos) = inner.find("//") {
             let var_name = &inner[..pos];
             let rest = &inner[pos + 2..];
@@ -500,7 +587,7 @@ impl BashParameterExpansion {
             }
         }
 
-        // 3. ${VAR:offset:length} - substring slicing
+        // 5. ${VAR:offset:length} - substring slicing
         if let Some(pos) = inner.find(':') {
             if !inner.contains(":-") {
                 let var_name = &inner[..pos];
@@ -523,7 +610,7 @@ impl BashParameterExpansion {
             }
         }
 
-        // 4. ${VAR:-default} - default value
+        // 6. ${VAR:-default} - default value
         if let Some(pos) = inner.find(":-") {
             let var_name = &inner[..pos];
             let default_val = &inner[pos + 2..];
@@ -535,7 +622,7 @@ impl BashParameterExpansion {
             return default_val.to_string();
         }
 
-        // 5. ${VAR#prefix} - strip prefix
+        // 7. ${VAR#prefix} - strip prefix
         if let Some(pos) = inner.find('#') {
             let var_name = &inner[..pos];
             let prefix = &inner[pos + 1..];
@@ -546,7 +633,7 @@ impl BashParameterExpansion {
             return val;
         }
 
-        // 6. ${VAR%suffix} - strip suffix
+        // 8. ${VAR%suffix} - strip suffix
         if let Some(pos) = inner.find('%') {
             let var_name = &inner[..pos];
             let suffix = &inner[pos + 1..];
@@ -1259,6 +1346,18 @@ impl UniversalShellCompatibilityEngine {
         }
         Ok(pipelines)
     }
+
+    /// End-to-end processing of multi-dialect scripts with POSIX compliance verification
+    pub fn execute_multi_dialect_script(
+        &mut self,
+        script: &str,
+    ) -> Result<(Vec<ShellPipeline>, Vec<(u32, &'static str)>), &'static str> {
+        let dialect = Self::detect_shebang_dialect(script);
+        let posix_script = UniversalScriptTranspiler::transpile_to_posix_sh(script, dialect);
+        let warnings = DashPosixShValidator::validate_posix_compliance(&posix_script);
+        let pipelines = self.execute_script_as_sh(script)?;
+        Ok((pipelines, warnings))
+    }
 }
 
 pub struct UniversalScriptTranspiler;
@@ -1280,13 +1379,17 @@ impl UniversalScriptTranspiler {
             let converted_line = match dialect {
                 ShellDialect::Fish => Self::transpile_fish_line(trimmed, &mut in_function),
                 ShellDialect::Tcsh => Self::transpile_tcsh_line(trimmed),
-                ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh => {
+                ShellDialect::Ksh => Self::transpile_ksh_line(trimmed),
+                ShellDialect::Bash | ShellDialect::Zsh => {
                     Self::transpile_bash_zsh_line(trimmed)
                 }
                 ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
             };
 
-            transpiled.push_str(&converted_line);
+            // Expand brace patterns like {1..5} or {a,b}
+            let brace_expanded = BraceExpansionEngine::expand_braces(&converted_line);
+
+            transpiled.push_str(&brace_expanded);
             transpiled.push('\n');
         }
 
@@ -1346,21 +1449,47 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 4. Fish 'and' / 'or' -> '&&' / '||'
+        // 4. Fish loop 'for i in (seq 1 5)' -> 'for i in 1 2 3 4 5; do'
+        if l.starts_with("for ") && l.contains(" in (seq ") {
+            if let (Some(in_idx), Some(seq_idx), Some(close_idx)) = (l.find(" in (seq "), l.find("seq "), l.find(')')) {
+                let var_part = &l[4..in_idx];
+                let seq_args = &l[seq_idx + 4..close_idx].trim();
+                let parts: Vec<&str> = seq_args.split_whitespace().collect();
+                if parts.len() == 2 {
+                    if let (Ok(s), Ok(e)) = (parts[0].parse::<i64>(), parts[1].parse::<i64>()) {
+                        let nums: Vec<String> = (s..=e).map(|n| n.to_string()).collect();
+                        return format!("for {} in {}; do", var_part.trim(), nums.join(" "));
+                    }
+                }
+            }
+        }
+
+        // 5. Fish switch 'switch $var' / 'case val' / 'end' -> 'case "$var" in' / 'val)' / 'esac'
+        if l.starts_with("switch ") {
+            let target = l.trim_start_matches("switch ").trim();
+            return format!("case {} in", target);
+        } else if l.starts_with("case ") && !l.contains(')') {
+            let pattern = l.trim_start_matches("case ").trim();
+            return format!("{})", pattern);
+        } else if l == "end" && !*in_function {
+            return "esac".to_string();
+        }
+
+        // 6. Fish 'and' / 'or' -> '&&' / '||'
         if l.starts_with("and ") {
             l = format!("&& {}", &l[4..]);
         } else if l.starts_with("or ") {
             l = format!("|| {}", &l[3..]);
         }
 
-        // 5. Fish 'function foo' -> 'foo() {'
+        // 7. Fish 'function foo' -> 'foo() {'
         if l.starts_with("function ") {
             let func_name = l.trim_start_matches("function ").trim();
             *in_function = true;
             return format!("{}() {{", func_name);
         }
 
-        // 6. Fish 'end' -> '}' if in function
+        // 8. Fish 'end' -> '}' if in function
         if l == "end" && *in_function {
             *in_function = false;
             return "}".to_string();
@@ -1389,12 +1518,21 @@ impl UniversalScriptTranspiler {
             return format!("unset {}", var);
         }
 
-        // 3. Tcsh 'rehash' -> hash -r
+        // 3. Tcsh 'foreach var ( a b c )' -> 'for var in a b c; do'
+        if l.starts_with("foreach ") && l.contains('(') && l.contains(')') {
+            if let (Some(open_idx), Some(close_idx)) = (l.find('('), l.find(')')) {
+                let var_part = &l[8..open_idx].trim();
+                let items = &l[open_idx + 1..close_idx].trim();
+                return format!("for {} in {}; do", var_part, items);
+            }
+        }
+
+        // 4. Tcsh 'rehash' -> hash -r
         if l == "rehash" {
             return "hash -r".to_string();
         }
 
-        // 4. Tcsh 'alias foo bar' -> 'alias foo="bar"'
+        // 5. Tcsh 'alias foo bar' -> 'alias foo="bar"'
         if l.starts_with("alias ") {
             let rest = l.trim_start_matches("alias ");
             if let Some(space_idx) = rest.find(' ') {
@@ -1402,6 +1540,27 @@ impl UniversalScriptTranspiler {
                 let cmd = &rest[space_idx + 1..];
                 return format!("alias {}={}", name, cmd);
             }
+        }
+
+        l
+    }
+
+    fn transpile_ksh_line(line: &str) -> String {
+        let l = line.to_string();
+
+        // 1. Ksh 'typeset -i var=10' or 'typeset var=10' -> 'var=10'
+        if l.starts_with("typeset ") {
+            let rest = l.trim_start_matches("typeset ").trim();
+            if rest.starts_with("-i ") || rest.starts_with("-r ") || rest.starts_with("-x ") {
+                let cleaned = rest[3..].trim();
+                return cleaned.to_string();
+            }
+            return rest.to_string();
+        }
+
+        // 2. Ksh 'print -r text' -> 'echo text'
+        if l.starts_with("print -r ") {
+            return format!("echo {}", &l[9..]);
         }
 
         l
@@ -1468,9 +1627,24 @@ impl Default for UniversalShellCompatibilityEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_brace_and_case_expansions() {
+        let mut env = BTreeMap::new();
+        env.insert("VAR".to_string(), "hello world".to_string());
+        env.insert("PTR".to_string(), "VAR".to_string());
+
+        assert_eq!(BraceExpansionEngine::expand_braces("{1..3}"), "1 2 3");
+        assert_eq!(BraceExpansionEngine::expand_braces("{a,b,c}"), "a b c");
+
+        assert_eq!(BashParameterExpansion::expand("${VAR^^}", &env), "HELLO WORLD");
+        assert_eq!(BashParameterExpansion::expand("${VAR,,}", &env), "hello world");
+        assert_eq!(BashParameterExpansion::expand("${VAR^}", &env), "Hello world");
+        assert_eq!(BashParameterExpansion::expand("${!PTR}", &env), "hello world");
+    }
 
     #[test]
     fn test_powerline_prompt_expansions() {

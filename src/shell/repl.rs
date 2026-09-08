@@ -22,7 +22,8 @@ use crate::dashboard::SystemMonitor;
 use crate::package::{UnifiedPackage, UniversalPackageManager};
 use crate::resilience::SelfHealingModule;
 use crate::shell::zsh_bash_parity::{
-    BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
+    BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellArithmeticEvaluator,
+    ShellDialect, ShellJobControl, UniversalScriptTranspiler, UniversalShellCompatibilityEngine,
     ZshSyntaxHighlighter,
 };
 use crate::virtualization::{
@@ -215,6 +216,18 @@ pub enum ShellCommand {
         permissions: String,
     },
 
+    // Multi-dialect universal shell compatibility commands
+    ShScript {
+        script: String,
+    },
+    SourceScript {
+        script: String,
+    },
+    ScriptDialect {
+        dialect: String,
+        content: String,
+    },
+
     Unknown(String),
 }
 
@@ -289,6 +302,7 @@ pub struct ShellRepl {
     pub dir_stack: BsdDirectoryStack,
     pub job_control: ShellJobControl,
     pub job_manager: JobControlManager,
+    pub compatibility_engine: UniversalShellCompatibilityEngine,
 }
 
 impl ShellRepl {
@@ -331,6 +345,7 @@ impl ShellRepl {
             dir_stack,
             job_control: ShellJobControl::new(),
             job_manager: JobControlManager::new(),
+            compatibility_engine: UniversalShellCompatibilityEngine::new(),
         }
     }
 
@@ -385,13 +400,18 @@ impl ShellRepl {
     }
 
     fn execute_line(&mut self, line: &str) {
-        // 1. History Expansion (!1, !!, !$)
-        let expanded_history = HistoryExpansionEngine::expand_history(line, &self.command_history);
+        // 1. Universal Multi-Dialect Transpilation (Fish, Tcsh, Ksh, Zsh, Bash)
+        let dialect = UniversalShellCompatibilityEngine::detect_shebang_dialect(line);
+        let transpiled_line = UniversalScriptTranspiler::transpile_to_posix_sh(line, dialect);
+        let clean_line = transpiled_line.trim();
+
+        // 2. History Expansion (!1, !!, !$)
+        let expanded_history = HistoryExpansionEngine::expand_history(clean_line, &self.command_history);
 
         // Save command history (Fish style)
         self.command_history.push(expanded_history.clone());
 
-        // 2. Perform Bash-style Alias Substitution
+        // 3. Perform Bash-style Alias Substitution
         let mut alias_expanded = expanded_history.clone();
         let parts: Vec<&str> = expanded_history.split_whitespace().collect();
         if !parts.is_empty() {
@@ -405,7 +425,7 @@ impl ShellRepl {
             }
         }
 
-        // 3. Parameter Expansion & Arithmetic Evaluation (${VAR:-default}, $(( expr )))
+        // 4. Parameter Expansion & Arithmetic Evaluation (${VAR:-default}, $(( expr )))
         let mut env_map = std::collections::BTreeMap::new();
         for (k, v) in &self.variables {
             env_map.insert(k.clone(), v.clone());
@@ -415,7 +435,7 @@ impl ShellRepl {
 
         let mut fully_expanded = BashParameterExpansion::expand(&alias_expanded, &env_map);
         if fully_expanded.contains("$(( ") || fully_expanded.contains("$(((") {
-            if let Ok(val) = crate::shell::zsh_bash_parity::ShellArithmeticEvaluator::evaluate(&fully_expanded) {
+            if let Ok(val) = ShellArithmeticEvaluator::evaluate(&fully_expanded) {
                 fully_expanded = val.to_string();
             }
         }
@@ -840,6 +860,34 @@ impl ShellRepl {
                     ShellCommand::Unveil {
                         path: parts[1].to_string(),
                         permissions: parts[2].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "sh" => {
+                if parts.len() >= 2 {
+                    ShellCommand::ShScript {
+                        script: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "source" | "." => {
+                if parts.len() >= 2 {
+                    ShellCommand::SourceScript {
+                        script: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "script" => {
+                if parts.len() >= 3 {
+                    ShellCommand::ScriptDialect {
+                        dialect: parts[1].to_string(),
+                        content: parts[2..].join(" "),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -1436,6 +1484,56 @@ impl ShellRepl {
                 Ok(format!("Unveiled path '{}' with permissions '{}'", path, permissions))
             }
 
+            ShellCommand::ShScript { script } => {
+                match self.compatibility_engine.execute_multi_dialect_script(&script) {
+                    Ok((pipelines, warnings)) => {
+                        let warn_msg: String = if warnings.is_empty() {
+                            String::from("POSIX Compliant")
+                        } else {
+                            format!("{} POSIX Warnings", warnings.len())
+                        };
+                        Ok(format!(
+                            "Executed script universally via /bin/sh: {} pipeline stage(s) generated [Status: {}].",
+                            pipelines.len(),
+                            warn_msg
+                        ))
+                    }
+                    Err(e) => Err(format!("sh execution failed: {}", e)),
+                }
+            }
+            ShellCommand::SourceScript { script } => {
+                let dialect = UniversalShellCompatibilityEngine::detect_shebang_dialect(&script);
+                let posix_script = UniversalScriptTranspiler::transpile_to_posix_sh(&script, dialect);
+                let mut count = 0;
+                for line in posix_script.lines() {
+                    let l = line.trim();
+                    if !l.is_empty() && !l.starts_with('#') {
+                        if l.contains('=') && !l.starts_with("echo") {
+                            if let Some((k, v)) = l.trim_start_matches("export ").split_once('=') {
+                                self.variables.insert(k.trim().to_string(), v.trim().to_string());
+                            }
+                        }
+                        count += 1;
+                    }
+                }
+                Ok(format!("Sourced script into active REPL environment ({} line(s) processed).", count))
+            }
+            ShellCommand::ScriptDialect { dialect, content } => {
+                let shell_dialect = match dialect.to_lowercase().as_str() {
+                    "fish" => ShellDialect::Fish,
+                    "tcsh" | "csh" => ShellDialect::Tcsh,
+                    "ksh" => ShellDialect::Ksh,
+                    "zsh" => ShellDialect::Zsh,
+                    "dash" => ShellDialect::Dash,
+                    _ => ShellDialect::Bash,
+                };
+                let posix = UniversalScriptTranspiler::transpile_to_posix_sh(&content, shell_dialect);
+                Ok(format!(
+                    "Transpiled {} script to POSIX /bin/sh:\n{}",
+                    dialect, posix
+                ))
+            }
+
             ShellCommand::Echo { message } => Ok(message.clone()),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -1459,8 +1557,35 @@ impl Default for ShellRepl {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
+    #[test]
+    fn test_universal_script_commands_in_repl() {
+        let mut repl = ShellRepl::new();
+
+        // 1. Test ShScript execution
+        let sh_cmd = repl.parse_command("sh echo hello_world");
+        assert!(matches!(sh_cmd, ShellCommand::ShScript { .. }));
+        let sh_res = repl.execute_command(sh_cmd).unwrap();
+        assert!(sh_res.contains("Executed script universally via /bin/sh"));
+
+        // 2. Test SourceScript execution
+        let source_cmd = repl.parse_command("source export REPL_VAR=active_state");
+        assert!(matches!(source_cmd, ShellCommand::SourceScript { .. }));
+        let source_res = repl.execute_command(source_cmd).unwrap();
+        assert!(source_res.contains("Sourced script into active REPL environment"));
+        assert_eq!(repl.variables.get("REPL_VAR").unwrap(), "active_state");
+
+        // 3. Test ScriptDialect transpilation command
+        let script_cmd = repl.parse_command("script fish set -gx PORT 8080");
+        assert!(matches!(script_cmd, ShellCommand::ScriptDialect { .. }));
+        let script_res = repl.execute_command(script_cmd).unwrap();
+        assert!(script_res.contains("export PORT=8080"));
+
+        // 4. Test auto-transpilation in execute_line
+        repl.execute_line("set -gx AUTO_PORT 9090");
+        assert_eq!(repl.command_history.last().unwrap(), "export AUTO_PORT=9090");
+    }
     use super::*;
 
     #[test]
