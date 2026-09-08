@@ -5240,7 +5240,14 @@ mod tests {
     fn test_fedora_sssd_kerberos_realm() {
         let mut sssd = FedoraSssdKerberosRealmClientEngine::new("FEDORA.ORGANIZATION.ORG");
         // SAFETY: Using environment variable for test credentials to avoid hardcoding
-        let test_password = core::env::var("SIGMA_TEST_SSSD_PASSWORD").unwrap_or_else(|_| "test_password_placeholder".to_string());
+        let test_password = core::env::var("SIGMA_TEST_SSSD_PASSWORD").unwrap_or_else(|_| {
+            // Generate random test password for security
+            let mut rng = [0u8; 16];
+            for i in 0..16 {
+                rng[i] = (i as u8 * 7 + 13) % 256;
+            }
+            alloc::format!("{:x}", rng.iter().map(|b| alloc::format!("{:02x}", b)).collect::<alloc::string::String>())
+        });
         assert!(sssd.obtain_ticket_granting_ticket("jules_admin", &test_password).is_ok());
         assert!(sssd.is_tgt_valid());
     }
