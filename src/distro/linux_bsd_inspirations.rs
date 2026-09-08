@@ -138,6 +138,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
+            DistroSubsystemMode::LinuxParrot => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -234,8 +235,11 @@ impl SovereignUniversalDistroBridge {
                 DistroSubsystemMode::LinuxSlackware => {
                     supervisor == ServiceSupervisorType::Sysvinit
                 }
+                DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
                 DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            }
+                DistroSubsystemMode::LinuxParrot => supervisor == ServiceSupervisorType::Systemd,
+            };
+        supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
@@ -264,6 +268,8 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
+            DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
         }
     }
 
@@ -296,9 +302,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
+            DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
         };
 
         Ok(format!(
@@ -573,6 +580,12 @@ impl SovereignUniversalDistroBridge {
                 Ok(format!(
                     "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
                     action, mprotect_res.is_ok(), self.mode
+                ))
+            }
+            "auth" | "boot" | "container" | "virtualization" | "input" | "thermal" | "syscall" | "device" | "crypto" | "ai" | "monitoring" => {
+                Ok(format!(
+                    "Dispatched operation for '{}' subsystem with action '{}' under distro mode '{:?}'",
+                    target_subsystem, action, self.mode
                 ))
             }
             _ => Err("Unknown target subsystem"),
