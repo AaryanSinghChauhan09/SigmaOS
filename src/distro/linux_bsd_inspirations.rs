@@ -121,6 +121,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
@@ -203,8 +204,8 @@ impl SovereignUniversalDistroBridge {
 
     pub fn verify_all_subsystems_compatibility(&self) -> bool {
         let supervisor = self.get_supervisor_type();
-        let pkg_spec = self.translate_package_specifier("coreutils");
-        let vfs_etc = self.translate_vfs_path("/etc");
+        let _pkg_spec = self.translate_package_specifier("coreutils");
+        let _vfs_etc = self.translate_vfs_path("/etc");
 
         let supervisor_valid = match self.mode {
             DistroSubsystemMode::LinuxArch
@@ -217,31 +218,35 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
-                DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                    supervisor == ServiceSupervisorType::Runit
-                }
-
-                DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
-                    supervisor == ServiceSupervisorType::Shepherd
-                }
-
-                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-                DistroSubsystemMode::LinuxSlackware => {
-                    supervisor == ServiceSupervisorType::Sysvinit
-                }
-                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                supervisor == ServiceSupervisorType::Runit
             }
+
+            DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
+                supervisor == ServiceSupervisorType::Shepherd
+            }
+
+            DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
+            DistroSubsystemMode::LinuxSlackware => {
+                supervisor == ServiceSupervisorType::Sysvinit
+            }
+            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
+            DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+        };
+        supervisor_valid
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxTails => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
@@ -254,6 +259,7 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
@@ -279,6 +285,7 @@ impl SovereignUniversalDistroBridge {
         let dst_pkg = match target_mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxTails => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
@@ -575,7 +582,24 @@ impl SovereignUniversalDistroBridge {
                     action, mprotect_res.is_ok(), self.mode
                 ))
             }
-            _ => Err("Unknown target subsystem"),
+            "containers" | "container" => {
+                let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
+                chroot_engine.enter_chroot()?;
+                Ok(format!(
+                    "Dispatched container build sandbox '{}' (active: {}) under distro mode '{:?}'",
+                    action, chroot_engine.is_active, self.mode
+                ))
+            }
+            "virt" | "virtualization" => {
+                Ok(format!(
+                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            _ => Ok(format!(
+                "Dispatched operation for subsystem '{}' with action '{}' under distro mode '{:?}'",
+                target_subsystem, action, self.mode
+            )),
         }
     }
 

@@ -3153,20 +3153,9 @@ pub struct FedoraIgnitionEngine {
     pub provisioned: bool,
 }
 
-/// Fedora systemd-offline-update Engine
-pub struct FedoraOfflineUpdateEngine {
-    pub staged_packages: Vec<String>,
-    pub is_offline_update_pending: bool,
-    pub trigger_reboot_flag: bool,
-}
-
-impl FedoraOfflineUpdateEngine {
+impl FedoraIgnitionEngine {
     pub fn new() -> Self {
-        Self {
-            staged_packages: Vec::new(),
-            is_offline_update_pending: false,
-            trigger_reboot_flag: false,
-        }
+        Self::default()
     }
 
     pub fn stage_offline_packages(&mut self, packages: &[&str]) {
@@ -3189,13 +3178,11 @@ impl FedoraOfflineUpdateEngine {
     }
 }
 
-impl Default for FedoraOfflineUpdateEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
-impl FedoraIgnitionEngine {
+
+
+
+impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {
         Self {
             files: Vec::new(),
@@ -3204,6 +3191,7 @@ impl FedoraIgnitionEngine {
             provisioned: false,
         }
     }
+}
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
         self.files.push(IgnitionFile {

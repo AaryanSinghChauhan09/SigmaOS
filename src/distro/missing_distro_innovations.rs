@@ -910,6 +910,41 @@ impl MissingDistroComponentsEngine {
             "Fedora Silverblue",
             ComponentParityStatus::Implemented,
         );
+        engine.register_component(
+            "AppArmor Security Profiles",
+            "Ubuntu",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "eBPF BTF Type Format",
+            "Linux Kernel",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "EROFS Read-Only Overlay",
+            "Android/Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "FreeBSD VNET Stack",
+            "FreeBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Illumos DTrace Probes",
+            "Solaris/Illumos",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "NetBSD Rump Kernels",
+            "NetBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "NixOS Flakes Engine",
+            "NixOS",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
     }
@@ -2113,7 +2148,7 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct NixOsFlakesEngine {
     pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
 }
