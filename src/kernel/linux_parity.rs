@@ -867,6 +867,195 @@ impl KernelNotifierChain {
     }
 }
 
+// ============================================================================
+// 13. Linux Kernel Workqueue Engine (LinuxKernelWorkqueueEngine)
+// ============================================================================
+
+pub struct WorkItem {
+    pub id: u64,
+    pub name: String,
+    pub delay_ms: u64,
+    pub completed: bool,
+}
+
+pub struct LinuxKernelWorkqueueEngine {
+    pub name: String,
+    pub pending_work: Vec<WorkItem>,
+    pub completed_work: Vec<WorkItem>,
+    pub max_active_workers: usize,
+}
+
+impl LinuxKernelWorkqueueEngine {
+    pub fn new(name: &str, max_active_workers: usize) -> Self {
+        Self {
+            name: name.to_string(),
+            pending_work: Vec::new(),
+            completed_work: Vec::new(),
+            max_active_workers,
+        }
+    }
+
+    pub fn queue_work(&mut self, id: u64, name: &str) {
+        self.pending_work.push(WorkItem {
+            id,
+            name: name.to_string(),
+            delay_ms: 0,
+            completed: false,
+        });
+    }
+
+    pub fn queue_delayed_work(&mut self, id: u64, name: &str, delay_ms: u64) {
+        self.pending_work.push(WorkItem {
+            id,
+            name: name.to_string(),
+            delay_ms,
+            completed: false,
+        });
+    }
+
+    pub fn flush_workqueue(&mut self) -> usize {
+        let count = self.pending_work.len();
+        while let Some(mut item) = self.pending_work.pop() {
+            item.completed = true;
+            self.completed_work.push(item);
+        }
+        count
+    }
+}
+
+// ============================================================================
+// 14. Linux Kernel RCU Read Lock & Grace Period Engine (LinuxRcuReadLockGuard)
+// ============================================================================
+
+pub struct LinuxRcuReadLockGuard {
+    pub active_readers: u32,
+    pub grace_period_epoch: u64,
+}
+
+impl LinuxRcuReadLockGuard {
+    pub fn new() -> Self {
+        Self {
+            active_readers: 0,
+            grace_period_epoch: 1,
+        }
+    }
+
+    pub fn rcu_read_lock(&mut self) {
+        self.active_readers += 1;
+    }
+
+    pub fn rcu_read_unlock(&mut self) {
+        if self.active_readers > 0 {
+            self.active_readers -= 1;
+        }
+    }
+
+    pub fn synchronize_rcu(&mut self) -> Result<u64, &'static str> {
+        if self.active_readers > 0 {
+            return Err("RCU: Cannot advance grace period while readers are active");
+        }
+        self.grace_period_epoch += 1;
+        Ok(self.grace_period_epoch)
+    }
+}
+
+// ============================================================================
+// 15. Linux Kernel Futex Engine (LinuxFutexEngine)
+// ============================================================================
+
+pub const FUTEX_WAIT: u32 = 0;
+pub const FUTEX_WAKE: u32 = 1;
+pub const FUTEX_REQUEUE: u32 = 3;
+
+#[derive(Debug, Clone)]
+pub struct FutexWaiter {
+    pub thread_id: u32,
+    pub address: usize,
+    pub expected_val: u32,
+}
+
+pub struct LinuxFutexEngine {
+    pub waiters: Vec<FutexWaiter>,
+}
+
+impl LinuxFutexEngine {
+    pub fn new() -> Self {
+        Self {
+            waiters: Vec::new(),
+        }
+    }
+
+    pub fn futex_wait(&mut self, thread_id: u32, address: usize, current_val: u32, val: u32) -> Result<(), &'static str> {
+        if current_val != val {
+            return Err("EEAGAIN: Futex value changed before wait");
+        }
+        self.waiters.push(FutexWaiter {
+            thread_id,
+            address,
+            expected_val: val,
+        });
+        Ok(())
+    }
+
+    pub fn futex_wake(&mut self, address: usize, num_wake: usize) -> usize {
+        let mut woken = 0;
+        self.waiters.retain(|w| {
+            if w.address == address && woken < num_wake {
+                woken += 1;
+                false
+            } else {
+                true
+            }
+        });
+        woken
+    }
+}
+
+// ============================================================================
+// 16. Linux Kernel Memory Control Group v2 Engine (LinuxMemCgroupV2Engine)
+// ============================================================================
+
+pub struct LinuxMemCgroupV2Engine {
+    pub cgroup_name: String,
+    pub memory_high_bytes: u64,
+    pub memory_max_bytes: u64,
+    pub current_usage_bytes: u64,
+    pub oom_kill_events: u64,
+}
+
+impl LinuxMemCgroupV2Engine {
+    pub fn new(cgroup_name: &str, high_bytes: u64, max_bytes: u64) -> Self {
+        Self {
+            cgroup_name: cgroup_name.to_string(),
+            memory_high_bytes: high_bytes,
+            memory_max_bytes: max_bytes,
+            current_usage_bytes: 0,
+            oom_kill_events: 0,
+        }
+    }
+
+    pub fn charge_memory(&mut self, bytes: u64) -> Result<(), &'static str> {
+        if self.current_usage_bytes + bytes > self.memory_max_bytes {
+            self.oom_kill_events += 1;
+            return Err("ENOMEM: Memory Control Group max limit exceeded (OOM triggered)");
+        }
+        self.current_usage_bytes += bytes;
+        Ok(())
+    }
+
+    pub fn uncharge_memory(&mut self, bytes: u64) {
+        if bytes >= self.current_usage_bytes {
+            self.current_usage_bytes = 0;
+        } else {
+            self.current_usage_bytes -= bytes;
+        }
+    }
+
+    pub fn is_memory_throttled(&self) -> bool {
+        self.current_usage_bytes >= self.memory_high_bytes
+    }
+}
+
 impl Default for KernelNotifierChain {
     fn default() -> Self {
         Self::new()
@@ -994,5 +1183,36 @@ mod tests {
         let mut notifier = KernelNotifierChain::new();
         notifier.notifier_chain_register("netdev_notifier", 10);
         assert_eq!(notifier.notifier_call_chain(1), NOTIFY_OK);
+
+        // 9. LinuxKernelWorkqueueEngine tests
+        let mut wq = LinuxKernelWorkqueueEngine::new("kworker/0:1", 4);
+        wq.queue_work(1, "flush_journal");
+        wq.queue_delayed_work(2, "trim_extents", 500);
+        assert_eq!(wq.pending_work.len(), 2);
+        assert_eq!(wq.flush_workqueue(), 2);
+        assert_eq!(wq.completed_work.len(), 2);
+
+        // 10. LinuxRcuReadLockGuard tests
+        let mut rcu = LinuxRcuReadLockGuard::new();
+        rcu.rcu_read_lock();
+        assert!(rcu.synchronize_rcu().is_err());
+        rcu.rcu_read_unlock();
+        assert_eq!(rcu.synchronize_rcu().unwrap(), 2);
+
+        // 11. LinuxFutexEngine tests
+        let mut futex = LinuxFutexEngine::new();
+        assert!(futex.futex_wait(101, 0x1000, 0, 0).is_ok());
+        assert!(futex.futex_wait(102, 0x1000, 1, 0).is_err()); // Value changed
+        assert_eq!(futex.futex_wake(0x1000, 1), 1);
+
+        // 12. LinuxMemCgroupV2Engine tests
+        let mut memcg = LinuxMemCgroupV2Engine::new("user.slice", 1024, 2048);
+        assert!(memcg.charge_memory(512).is_ok());
+        assert!(!memcg.is_memory_throttled());
+        assert!(memcg.charge_memory(600).is_ok());
+        assert!(memcg.is_memory_throttled());
+        assert!(memcg.charge_memory(2000).is_err()); // OOM triggered
+        memcg.uncharge_memory(500);
+        assert_eq!(memcg.current_usage_bytes, 612);
     }
 }
