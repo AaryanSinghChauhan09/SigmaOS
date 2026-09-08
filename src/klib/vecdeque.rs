@@ -14,8 +14,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
-
 use super::Vec;
 
 pub struct VecDeque<T> {
@@ -23,10 +21,7 @@ pub struct VecDeque<T> {
     back: Vec<T>,
 }
 
-impl<T> VecDeque<T>
-where
-    T: Clone,
-{
+impl<T> VecDeque<T> {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         VecDeque {
@@ -38,8 +33,8 @@ where
     pub fn with_capacity(capacity: usize) -> Self {
         let half = capacity / 2;
         VecDeque {
-            front: Vec::new(),
-            back: Vec::new(),
+            front: Vec::with_capacity(half),
+            back: Vec::with_capacity(capacity - half),
         }
     }
 
@@ -51,30 +46,34 @@ where
         self.back.push(item);
     }
 
+    /// Optimized by Bolt ⚡: moves owned items directly from `back` to `front`
+    /// after a single capacity reservation. Eliminates redundant `.clone()` loops,
+    /// $O(\log N)$ intermediate reallocations, and vector buffer drops.
     pub fn pop_front(&mut self) -> Option<T> {
         if !self.front.is_empty() {
             self.front.pop()
         } else if !self.back.is_empty() {
-            let len = self.back.len();
-            for i in 0..len {
-                self.front.push(self.back[len - 1 - i].clone());
+            self.front.reserve(self.back.len());
+            while let Some(item) = self.back.pop() {
+                self.front.push(item);
             }
-            self.back = Vec::new();
             self.front.pop()
         } else {
             None
         }
     }
 
+    /// Optimized by Bolt ⚡: moves owned items directly from `front` to `back`
+    /// after a single capacity reservation. Eliminates redundant `.clone()` loops,
+    /// $O(\log N)$ intermediate reallocations, and vector buffer drops.
     pub fn pop_back(&mut self) -> Option<T> {
         if !self.back.is_empty() {
             self.back.pop()
         } else if !self.front.is_empty() {
-            let len = self.front.len();
-            for i in 0..len {
-                self.back.push(self.front[len - 1 - i].clone());
+            self.back.reserve(self.front.len());
+            while let Some(item) = self.front.pop() {
+                self.back.push(item);
             }
-            self.front = Vec::new();
             self.back.pop()
         } else {
             None
@@ -106,7 +105,7 @@ where
     }
 
     pub fn iter(&self) -> VecDequeIter<'_, T> {
-        VecDequeIter {
+        VecDequeIter::<T> {
             deque: self,
             front_idx: 0,
             back_idx: 0,
@@ -115,10 +114,7 @@ where
     }
 }
 
-impl<T> Default for VecDeque<T>
-where
-    T: Clone,
-{
+impl<T> Default for VecDeque<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -137,10 +133,7 @@ pub struct VecDequeIter<'a, T> {
     phase: IterPhase,
 }
 
-impl<'a, T> Iterator for VecDequeIter<'a, T>
-where
-    T: Clone,
-{
+impl<'a, T> Iterator for VecDequeIter<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {

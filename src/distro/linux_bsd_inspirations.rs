@@ -4,6 +4,8 @@
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
@@ -11,6 +13,8 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 // Test environment compatibility: Use std for testing only
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
@@ -6965,7 +6969,7 @@ impl AptRepository {
     pub fn generate_sources_entry(&self) -> String {
         let components_str = self.components.join(" ");
         let trusted_str = if self.trusted { "[trusted=yes]" } else { "" };
-        alloc::format!("deb {} {} {} {}", 
+        format!("deb {} {} {} {}",
             trusted_str,
             self.url,
             self.distribution,
@@ -7013,8 +7017,8 @@ impl AdvancedDistroSecurityEngine {
         
         config.push_str("# AppArmor Profiles\n");
         for profile in &self.apparmor_profiles {
-            config.push_str(&alloc::format!("profile {} {{\n", profile.name));
-            config.push_str(&alloc::format!("  mode: {:?}\n", profile.mode));
+            config.push_str(&format!("profile {} {{\n", profile.name));
+            config.push_str(&format!("  mode: {:?}\n", profile.mode));
             config.push_str("}\n");
         }
         

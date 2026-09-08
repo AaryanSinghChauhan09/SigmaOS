@@ -24,4 +24,6 @@ jobs:
 
       - name: Test Wiki Page Documentation Generators
         run: |
-          cargo test --lib -- expanded_wiki_innovations::tests
+          mkdir -p build
+          rustc --edition=2021 --test --cfg 'feature="standalone_test"' src/expanded_wiki_innovations.rs -o build/test_wiki_innovations
+          ./build/test_wiki_innovations
