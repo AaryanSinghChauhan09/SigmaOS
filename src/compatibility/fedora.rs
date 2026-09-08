@@ -5250,7 +5250,7 @@ mod tests {
         assert_eq!(event.new_version, "8.3.0");
 
         let mut wireplumber = FedoraPipewireWireplumberPolicyGovernor::new();
-        wireplumber.register_audio_node(101, "AlsaSinkDefault");
+        wireplumber.register_audio_node(101, "AlsaSinkDefault", "sink");
         assert!(wireplumber.set_default_node("sink", 101));
         assert_eq!(wireplumber.default_sink_node, Some(101));
     }
