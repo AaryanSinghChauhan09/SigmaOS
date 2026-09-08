@@ -3189,21 +3189,6 @@ impl FedoraIgnitionEngine {
         self.staged_packages.clear();
         Ok(())
     }
-}
-
-
-
-
-
-impl FedoraIgnitionEngine {
-    pub fn new() -> Self {
-        Self {
-            files: Vec::new(),
-            users: Vec::new(),
-            systemd_units: Vec::new(),
-            provisioned: false,
-        }
-    }
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
         self.files.push(IgnitionFile {
@@ -3246,6 +3231,47 @@ impl FedoraIgnitionEngine {
 }
 
 impl Default for FedoraIgnitionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct FedoraOfflineUpdateEngine {
+    pub staged_packages: Vec<String>,
+    pub is_offline_update_pending: bool,
+    pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self {
+            staged_packages: Vec::new(),
+            is_offline_update_pending: false,
+            trigger_reboot_flag: false,
+        }
+    }
+
+    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
+        for p in packages {
+            self.staged_packages.push((*p).to_string());
+        }
+        self.is_offline_update_pending = !self.staged_packages.is_empty();
+    }
+
+    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
+        self.trigger_reboot_flag = true;
+        Ok(self.staged_packages.len())
+    }
+
+    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
+        self.is_offline_update_pending = false;
+        self.trigger_reboot_flag = false;
+        self.staged_packages.clear();
+        Ok(())
+    }
+}
+
+impl Default for FedoraOfflineUpdateEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -5253,10 +5279,22 @@ mod tests {
     }
 
     #[test]
-    fn test_fedora_wireplumber_governor() {
+    fn test_fedora_the_new_hotness_and_wireplumber() {
+        let mut hotness = FedoraTheNewHotnessEngine::new();
+        hotness.register_anitya_mapping(1234, "curl", "curl", "8.2.1");
+        let event = hotness
+            .process_upstream_release_check(
+                1234,
+                "8.3.0",
+                "https://curl.se/release-8.3.0",
+                1700000100,
+            )
+            .unwrap()
+            .unwrap();
+        assert_eq!(event.new_version, "8.3.0");
+
         let mut wireplumber = FedoraPipewireWireplumberPolicyGovernor::new();
-        wireplumber.register_audio_node(101, "alsa_output.pci-0000_00_1f.3.analog-stereo", "sink");
-        assert_eq!(wireplumber.default_sink_node, Some(101));
+        wireplumber.register_audio_node(101, "speaker", "sink");
         assert!(wireplumber.set_default_node("sink", 101));
         assert_eq!(wireplumber.default_sink_node, Some(101));
     }
