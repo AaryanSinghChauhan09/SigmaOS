@@ -226,6 +226,7 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -243,6 +244,7 @@ pub enum PackageFormat {
     Eopkg,      // Solus eopkg (.eopkg)
     Nixpkg,     // Nix store package (.nixpkg)
     Ebuild,     // Gentoo ebuild (.ebuild / .portage)
+    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
     TarGz,      // Compressed Tar (.tar.gz, .tgz)
     Xz,         // Compressed XZ archive (.xz, .tar.xz)
     App,        // macOS App bundle (.app)
@@ -277,6 +279,10 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+    Ipk,        // Embedded Linux IPK (.ipk)
+    Opkg,       // OpenWrt OPKG (.opkg)
+    SolarisIps, // Solaris IPS (.p5p / .ips)
+    GuixNar,    // GNU Guix NAR archive (.nar)
 }
 
 impl PackageFormat {
@@ -1210,6 +1216,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
+            PackageFormat::OpenBsdPkg
+            | PackageFormat::Ipk
+            | PackageFormat::Opkg
+            | PackageFormat::SolarisIps
+            | PackageFormat::GuixNar => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1264,6 +1275,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
+            PackageFormat::OpenBsdPkg
+            | PackageFormat::Ipk
+            | PackageFormat::Opkg
+            | PackageFormat::SolarisIps
+            | PackageFormat::GuixNar => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -1749,6 +1765,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
