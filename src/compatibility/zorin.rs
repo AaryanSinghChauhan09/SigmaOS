@@ -394,17 +394,6 @@ impl ZorinWindowsAppSupport {
 }
 
 /// Zorin OS Grid Window Tiling & Snap Engine
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ZorinSnapPosition {
-    LeftHalf,
-    RightHalf,
-    TopLeftQuarter,
-    TopRightQuarter,
-    BottomLeftQuarter,
-    BottomRightQuarter,
-    Maximized,
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ZorinGridWindowTilingEngine {
     pub screen_width: u32,
@@ -428,11 +417,11 @@ impl ZorinGridWindowTilingEngine {
         match position {
             ZorinSnapPosition::LeftHalf => (0, 0, half_w, self.screen_height),
             ZorinSnapPosition::RightHalf => (half_w, 0, half_w, self.screen_height),
-            ZorinSnapPosition::TopLeftQuarter => (0, 0, half_w, half_h),
-            ZorinSnapPosition::TopRightQuarter => (half_w, 0, half_w, half_h),
-            ZorinSnapPosition::BottomLeftQuarter => (0, half_h, half_w, half_h),
-            ZorinSnapPosition::BottomRightQuarter => (half_w, half_h, half_w, half_h),
-            ZorinSnapPosition::Maximized => (0, 0, self.screen_width, self.screen_height),
+            ZorinSnapPosition::TopLeft => (0, 0, half_w, half_h),
+            ZorinSnapPosition::TopRight => (half_w, 0, half_w, half_h),
+            ZorinSnapPosition::BottomLeft => (0, half_h, half_w, half_h),
+            ZorinSnapPosition::BottomRight => (half_w, half_h, half_w, half_h),
+            ZorinSnapPosition::Maximize => (0, 0, self.screen_width, self.screen_height),
         }
     }
 }
@@ -634,7 +623,7 @@ mod tests {
         let left_rect = grid.calculate_snap_rect(ZorinSnapPosition::LeftHalf);
         assert_eq!(left_rect, (0, 0, 960, 1080));
 
-        let top_right_rect = grid.calculate_snap_rect(ZorinSnapPosition::TopRightQuarter);
+        let top_right_rect = grid.calculate_snap_rect(ZorinSnapPosition::TopRight);
         assert_eq!(top_right_rect, (960, 0, 960, 540));
 
         let sound_mgr = ZorinSoundManager::new();
