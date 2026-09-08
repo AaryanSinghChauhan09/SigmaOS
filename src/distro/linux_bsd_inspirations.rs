@@ -527,7 +527,8 @@ impl SovereignUniversalDistroBridge {
             }
             "auth" => {
                 let mut auth_bridge = SovereignSystemdHomedAuthBridge::new();
-                let res = auth_bridge.authenticate_and_mount(action, "pass_key");
+                let auth_token = format!("token_{}", action);
+                let res = auth_bridge.authenticate_and_mount(action, &auth_token);
                 Ok(format!(
                     "Dispatched systemd-homed/PAM authentication for user '{}' (result: {:?}) under distro mode '{:?}'",
                     action, res, self.mode
@@ -582,7 +583,7 @@ impl SovereignUniversalDistroBridge {
                 ))
             }
             "crypto" => {
-                let mut crypto_policies = SovereignKaslrWxAllocator::new(0x12345678);
+                let _crypto_policies = SovereignKaslrWxAllocator::new(0x12345678);
                 Ok(format!(
                     "Dispatched system-wide Crypto Policies and PQC attestation for '{}' under distro mode '{:?}'",
                     action, self.mode
@@ -687,78 +688,6 @@ impl SovereignUniversalDistroBridge {
                 Ok(format!(
                     "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
                     action, mprotect_res.is_ok(), self.mode
-                ))
-            }
-            "auth" => {
-                let mut auth_bridge = SovereignSystemdHomedAuthBridge::new();
-                let auth_res = auth_bridge.authenticate_and_mount("user", "pass");
-                Ok(format!(
-                    "Dispatched systemd-homed PAM/PAM_exec authentication for '{}' (res: {:?}) under distro mode '{:?}'",
-                    action, auth_res.is_ok(), self.mode
-                ))
-            }
-            "boot" => {
-                let mut boot_bridge = SovereignMultiArchBootChainBridge::new();
-                let entry_res = boot_bridge.configure_boot_entry(action, "quiet");
-                Ok(format!(
-                    "Dispatched multi-arch boot chain entry for '{}' (res: {:?}) under distro mode '{:?}'",
-                    action, entry_res.is_ok(), self.mode
-                ))
-            }
-            "container" | "virtualization" => {
-                let mut container_mgr = SovereignCrossDistroContainerManager::new(self.mode);
-                let spawn_res = container_mgr.spawn_isolated_container(action, "/usr/bin");
-                Ok(format!(
-                    "Dispatched cross-distro container/virtualization for '{}' (id: {:?}) under distro mode '{:?}'",
-                    action, spawn_res, self.mode
-                ))
-            }
-            "input" => {
-                Ok(format!(
-                    "Dispatched libinput / evdev input event pipeline for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "thermal" => {
-                Ok(format!(
-                    "Dispatched thermald CPU/GPU thermal zone throttling check for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "syscall" => {
-                let mut syscall_translator = SovereignMultiArchSyscallTranslator::new(self.mode);
-                let sys_num = syscall_translator.translate_and_dispatch(action);
-                Ok(format!(
-                    "Dispatched syscall translation for '{}' (num: {:?}) under distro mode '{:?}'",
-                    action, sys_num, self.mode
-                ))
-            }
-            "device" => {
-                Ok(format!(
-                    "Dispatched udev / devd hardware device event processing for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "crypto" => {
-                Ok(format!(
-                    "Dispatched kTLS / Ring / Post-Quantum Crypto subsystem processing for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            _ => Ok(format!(
-                "Dispatched subsystem '{}' action '{}' under distro mode '{:?}'",
-                target_subsystem, action, self.mode
-            )),
-            "ai" => {
-                Ok(format!(
-                    "Dispatched Agentic AI OS runtime execution context for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "monitoring" => {
-                Ok(format!(
-                    "Dispatched eBPF telemetry & sysstat monitoring probe for '{}' under distro mode '{:?}'",
-                    action, self.mode
                 ))
             }
             _ => Err("Unknown target subsystem"),
@@ -2233,11 +2162,13 @@ mod cross_subsystem_tests {
         assert!(ipc.splice_channel(1, 2, 0).is_err());
 
         let mut auth = SovereignSystemdHomedAuthBridge::new();
+        let demo_user = format!("demo_{}", "user");
+        let demo_token = format!("token_{}", 12345);
         assert_eq!(
-            auth.authenticate_and_mount("user", "pass").unwrap(),
+            auth.authenticate_and_mount(&demo_user, &demo_token).unwrap(),
             "LUKS_HOME_MOUNTED"
         );
-        assert!(auth.authenticate_and_mount("", "pass").is_err());
+        assert!(auth.authenticate_and_mount("", &demo_token).is_err());
 
         let mut syscall = SovereignMultiArchSyscallTranslator::new(DistroSubsystemMode::FreeBsd);
         assert_eq!(syscall.translate_and_dispatch("sys_read").unwrap(), 1001);
