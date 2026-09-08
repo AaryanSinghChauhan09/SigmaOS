@@ -226,6 +226,7 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -277,6 +278,11 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
+    Ipk,        // OpenWrt IPK (.ipk)
+    Opkg,       // Opkg package (.opkg)
+    SolarisIps, // Solaris Image Packaging System (.ips, .p5p)
+    GuixNar,    // GNU Guix Normalized Archive (.nar)
 }
 
 impl PackageFormat {
@@ -1210,6 +1216,7 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
+            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1264,6 +1271,7 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
+            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -1749,6 +1757,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
