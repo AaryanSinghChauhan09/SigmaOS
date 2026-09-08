@@ -3,6 +3,7 @@ pub use mobile_variant::*;
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
+pub mod mint_desktop;
 pub mod mint_tools;
 pub mod moksha;
 pub mod omarchy_omakase;
@@ -30,6 +31,10 @@ pub use mate_betsy::{
     MateBetsyDesktopEnvironment, PlumaTextEditor,
 };
 
+pub use mint_desktop::{
+    CinnamonDesklet, CinnamonDesktopManager, CinnamonExtension, CinnamonPanel, CinnamonPanelPosition,
+    CinnamonTheme, PanelApplet, PanelAppletType, XAppPreferences,
+};
 pub use mint_tools::{
     AppMetadata, MintSoftwareManager, MintTimeshiftEngine, MintUpdateManager, SnapshotType,
     TimeshiftSnapshot, UpdateLevel, UpdatePackage,

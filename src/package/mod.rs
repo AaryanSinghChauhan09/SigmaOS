@@ -32,6 +32,7 @@ pub mod gentoo_portage;
 pub mod hardening;
 pub mod linux_translation;
 pub mod manager;
+pub mod mint_package;
 pub mod nix_guix;
 pub mod paccache;
 pub mod pactree;
@@ -102,6 +103,10 @@ pub use nix_guix::{
 };
 pub use paccache::{PaccacheConfig, PaccacheEngine, PackageCacheEntry};
 pub use pactree::{DependencyNode, PactreeEngine};
+pub use mint_package::{
+    MintInstallManager, MintMirrorManager, MintPackageMetadata, MintPackageSource, MintRepositoryMirror,
+    MintSnapshotConfig, MintUpdateLevel, MintUpdateManager,
+};
 pub use repository::{
     MirrorEntry, MirrorSyncEngine, PackagePinEngine, PackagePinRule, PackageRepository,
     PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,
