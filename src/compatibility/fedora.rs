@@ -5226,7 +5226,9 @@ mod tests {
     #[test]
     fn test_fedora_sssd_kerberos_realm() {
         let mut sssd = FedoraSssdKerberosRealmClientEngine::new("FEDORA.ORGANIZATION.ORG");
-        assert!(sssd.obtain_ticket_granting_ticket("jules_admin", "SecretPgpPass").is_ok());
+        // SAFETY: Using environment variable for test credentials to avoid hardcoding
+        let test_password = core::env::var("SIGMA_TEST_SSSD_PASSWORD").unwrap_or_else(|_| "test_password_placeholder".to_string());
+        assert!(sssd.obtain_ticket_granting_ticket("jules_admin", &test_password).is_ok());
         assert!(sssd.is_tgt_valid());
     }
 
@@ -5304,9 +5306,13 @@ impl FedoraSssdKerberosRealmClientEngine {
     }
 
     pub fn obtain_ticket_granting_ticket(&mut self, username: &str, password: &str) -> Result<(), &'static str> {
+        // SAFETY: Password validation to prevent empty strings, but real implementations
+        // should use secure credential storage and avoid storing passwords in memory
         if password.is_empty() {
             return Err("SSSD/Kerberos: Password cannot be empty");
         }
+        // In production, this should use proper Kerberos library integration
+        // For now, this is a placeholder implementation
         self.active_user = Some(username.to_string());
         self.has_valid_tgt = true;
         Ok(())
