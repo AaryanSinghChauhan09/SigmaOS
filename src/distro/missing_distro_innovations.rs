@@ -910,6 +910,41 @@ impl MissingDistroComponentsEngine {
             "Fedora Silverblue",
             ComponentParityStatus::Implemented,
         );
+        engine.register_component(
+            "Clear Linux Stateless Configuration",
+            "Clear Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "NixOS Flakes Declarative Store",
+            "NixOS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Tails Amnesic Memory Scrubbing",
+            "Tails OS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Chimera Dinit Service Supervisor",
+            "Chimera Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Solus eopkg Delta Packaging",
+            "Solus",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "SteamOS Atomic A/B Image Update",
+            "SteamOS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "YaST Configuration Registry",
+            "openSUSE",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
     }
@@ -2113,7 +2148,7 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct NixOsFlakesEngine {
     pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
 }
