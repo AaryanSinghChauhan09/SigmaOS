@@ -224,7 +224,7 @@ pub enum PackagePriority {
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
     #[default]
     Deb,        // apt/dpkg
@@ -279,10 +279,17 @@ pub enum PackageFormat {
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
     OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
-    Ipk,        // IPK package (.ipk)
-    Opkg,       // OPKG package (.opkg)
-    SolarisIps, // Solaris IPS package (.p5p, .ips)
-    GuixNar,    // Guix NAR archive (.nar)
+    Ipk,        // OpenWrt IPK (.ipk)
+    Opkg,       // OpenWrt OPKG (.opkg)
+    SolarisIps, // Solaris IPS package (.p5p / .ips)
+    GuixNar,    // GNU Guix Normalized Archive (.nar)
+}
+
+impl Default for PackageFormat {
+    fn default() -> Self {
+        Self::Deb
+    }
+>>>>>>> bolt-hotkey-temp
 }
 
 impl PackageFormat {
