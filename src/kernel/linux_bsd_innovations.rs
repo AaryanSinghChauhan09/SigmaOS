@@ -4570,21 +4570,3 @@ mod linux_bsd_extra_tests {
         assert_eq!(snapper.active_snapshot_id, 2);
     }
 }
-
-        }
-    }
-
-    pub fn start_service(&mut self, service: &str) {
-        self.services.push(service.to_string());
-    }
-
-    pub fn is_running(&self, service: &str) -> bool {
-        for s in &self.services {
-            let s: &String = s;
-            if s.as_str() == service {
-                return true;
-            }
-        }
-        false
-    }
-}
