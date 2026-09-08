@@ -3155,35 +3155,6 @@ pub struct FedoraIgnitionEngine {
 
 impl FedoraIgnitionEngine {
     pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
-    }
-}
-
-
-
-
-
-impl FedoraOfflineUpdateEngine {
-    pub fn new() -> Self {
         Self {
             files: Vec::new(),
             users: Vec::new(),
@@ -3191,7 +3162,6 @@ impl FedoraOfflineUpdateEngine {
             provisioned: false,
         }
     }
-}
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
         self.files.push(IgnitionFile {
@@ -3230,6 +3200,47 @@ impl FedoraOfflineUpdateEngine {
             self.users.len(),
             self.systemd_units.len()
         ))
+    }
+}
+
+pub struct FedoraOfflineUpdateEngine {
+    pub is_offline_update_pending: bool,
+    pub trigger_reboot_flag: bool,
+    pub staged_packages: Vec<String>,
+}
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self {
+            is_offline_update_pending: false,
+            trigger_reboot_flag: false,
+            staged_packages: Vec::new(),
+        }
+    }
+
+    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
+        for p in packages {
+            self.staged_packages.push((*p).to_string());
+        }
+        self.is_offline_update_pending = !self.staged_packages.is_empty();
+    }
+
+    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
+        self.trigger_reboot_flag = true;
+        Ok(self.staged_packages.len())
+    }
+
+    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
+        self.is_offline_update_pending = false;
+        self.trigger_reboot_flag = false;
+        self.staged_packages.clear();
+        Ok(())
+    }
+}
+
+impl Default for FedoraOfflineUpdateEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -5231,6 +5242,13 @@ mod tests {
         assert!(sssd.is_tgt_valid());
     }
 
+    #[test]
+    fn test_fedora_the_new_hotness_and_wireplumber() {
+        let mut hotness = FedoraTheNewHotnessEngine::new();
+        hotness.register_anitya_mapping(1234, "curl", "curl", "8.2.0");
+        let mut wireplumber = FedoraPipewireWireplumberPolicyGovernor::new();
+        wireplumber.register_audio_node(101, "alsa_output.pci-0000_00_1f.3.analog-stereo", "sink");
+
         // New version release check -> event generated & fedmsg published
         let event = hotness
             .process_upstream_release_check(
@@ -5242,6 +5260,7 @@ mod tests {
             .unwrap()
             .unwrap();
 
+        assert_eq!(event.new_version, "8.3.0");
         assert!(wireplumber.set_default_node("sink", 101));
         assert_eq!(wireplumber.default_sink_node, Some(101));
     }
