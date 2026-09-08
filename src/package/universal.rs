@@ -224,7 +224,7 @@ pub enum PackagePriority {
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     #[default]
     Deb,        // apt/dpkg
@@ -285,12 +285,6 @@ pub enum PackageFormat {
     GuixNar,    // GNU Guix Normalized Archive (.nar)
 }
 
-impl Default for PackageFormat {
-    fn default() -> Self {
-        Self::Deb
-    }
->>>>>>> bolt-hotkey-temp
-}
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
