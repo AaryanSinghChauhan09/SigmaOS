@@ -2,15 +2,15 @@
 // Zero-dependency, safe, robust package adapter and transaction orchestrator
 // Integrates User-Defined Functions (UDF) and instant O(1) transaction rollbacks
 
+use core::default::Default;
+use core::option::Option::{self, None, Some};
+use core::result::Result::{self, Err, Ok};
 use std::boxed::Box;
 use std::collections::BTreeMap as HashMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use core::default::Default;
-use core::option::Option::{self, None, Some};
-use core::result::Result::{self, Err, Ok};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
@@ -119,7 +119,10 @@ impl PackageFormat {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::TarXz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -149,7 +152,10 @@ impl PackageFormat {
             Some(PackageFormat::Cports)
         } else if normalized.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if normalized.ends_with(".slackbuild") || normalized.ends_with(".tlz") || normalized.ends_with(".tbz") {
+        } else if normalized.ends_with(".slackbuild")
+            || normalized.ends_with(".tlz")
+            || normalized.ends_with(".tbz")
+        {
             Some(PackageFormat::SlackBuild)
         } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -2071,7 +2077,11 @@ impl IPackageAdapter for IpkPackageAdapter {
             hash: [0x32; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("IPK Adapter: Extracted IPK package to: {}", store_path);
         Ok(())
     }
@@ -2095,7 +2105,11 @@ impl IPackageAdapter for OpkgPackageAdapter {
             hash: [0x34; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("OPKG Adapter: Extracted OPKG package to: {}", store_path);
         Ok(())
     }
@@ -2119,8 +2133,15 @@ impl IPackageAdapter for SolarisIpsPackageAdapter {
             hash: [0x35; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Solaris IPS Adapter: Extracted IPS package to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Solaris IPS Adapter: Extracted IPS package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -2143,7 +2164,11 @@ impl IPackageAdapter for GuixNarPackageAdapter {
             hash: [0x36; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Guix NAR Adapter: Extracted NAR package to: {}", store_path);
         Ok(())
     }
@@ -2167,8 +2192,15 @@ impl IPackageAdapter for OpenBsdPkgPackageAdapter {
             hash: [0x37; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("OpenBSD PKG Adapter: Extracted PKG package to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "OpenBSD PKG Adapter: Extracted PKG package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
