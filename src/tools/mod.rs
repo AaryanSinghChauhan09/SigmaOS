@@ -12,6 +12,7 @@ pub mod mint_domain_blocker;
 pub mod mint_locale_manager;
 pub mod mint_welcome;
 pub mod mint_system_report;
+pub mod omarchy_command_palette;
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
