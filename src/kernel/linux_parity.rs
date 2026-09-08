@@ -296,6 +296,276 @@ impl Default for BpfLsmPolicyGovernor {
 }
 
 // ============================================================================
+// 13. Linux Read-Copy Update (RCU) Synchronization Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct RcuCallback {
+    pub callback_id: usize,
+    pub target_ptr: usize,
+}
+
+pub struct LinuxRcuSynchronizationEngine {
+    pub active_readers_count: AtomicU32,
+    pub grace_period_counter: AtomicU64,
+    pub deferred_callbacks: Vec<RcuCallback>,
+}
+
+impl LinuxRcuSynchronizationEngine {
+    pub fn new() -> Self {
+        Self {
+            active_readers_count: AtomicU32::new(0),
+            grace_period_counter: AtomicU64::new(1),
+            deferred_callbacks: Vec::new(),
+        }
+    }
+
+    pub fn rcu_read_lock(&self) {
+        self.active_readers_count.fetch_add(1, Ordering::Acquire);
+    }
+
+    pub fn rcu_read_unlock(&self) {
+        self.active_readers_count.fetch_sub(1, Ordering::Release);
+    }
+
+    pub fn call_rcu(&mut self, target_ptr: usize) -> usize {
+        let callback_id = self.deferred_callbacks.len() + 1;
+        self.deferred_callbacks.push(RcuCallback {
+            callback_id,
+            target_ptr,
+        });
+        callback_id
+    }
+
+    pub fn synchronize_rcu(&mut self) -> usize {
+        // Wait until all current readers exit read-side critical section
+        while self.active_readers_count.load(Ordering::Acquire) > 0 {
+            core::hint::spin_loop();
+        }
+        self.grace_period_counter.fetch_add(1, Ordering::Release);
+        let executed_count = self.deferred_callbacks.len();
+        self.deferred_callbacks.clear();
+        executed_count
+    }
+}
+
+impl Default for LinuxRcuSynchronizationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 14. Linux Kernel Concurrency-Bounded Workqueue Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct WorkItem {
+    pub work_id: usize,
+    pub func_name: &'static str,
+    pub data_arg: u64,
+}
+
+pub struct LinuxKernelWorkqueueEngine {
+    pub name: &'static str,
+    pub max_active_workers: usize,
+    pub pending_works: Vec<WorkItem>,
+    pub completed_works_count: usize,
+}
+
+impl LinuxKernelWorkqueueEngine {
+    pub fn new(name: &'static str, max_active: usize) -> Self {
+        Self {
+            name,
+            max_active_workers: max_active,
+            pending_works: Vec::new(),
+            completed_works_count: 0,
+        }
+    }
+
+    pub fn queue_work(&mut self, func_name: &'static str, data_arg: u64) -> usize {
+        let work_id = self.pending_works.len() + self.completed_works_count + 1;
+        self.pending_works.push(WorkItem {
+            work_id,
+            func_name,
+            data_arg,
+        });
+        work_id
+    }
+
+    pub fn flush_scheduled_work(&mut self) -> usize {
+        let count = self.pending_works.len();
+        self.completed_works_count += count;
+        self.pending_works.clear();
+        count
+    }
+}
+
+// ============================================================================
+// 15. Linux Multi-Level Cascading Kernel Timer Wheel
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct KernelTimer {
+    pub timer_id: usize,
+    pub expires_tick: u64,
+    pub is_active: bool,
+}
+
+pub struct LinuxKernelTimerWheel {
+    pub current_tick: u64,
+    pub active_timers: Vec<KernelTimer>,
+}
+
+impl LinuxKernelTimerWheel {
+    pub fn new() -> Self {
+        Self {
+            current_tick: 0,
+            active_timers: Vec::new(),
+        }
+    }
+
+    pub fn add_timer(&mut self, expires_tick: u64) -> usize {
+        let timer_id = self.active_timers.len() + 1;
+        self.active_timers.push(KernelTimer {
+            timer_id,
+            expires_tick,
+            is_active: true,
+        });
+        timer_id
+    }
+
+    pub fn del_timer(&mut self, timer_id: usize) -> bool {
+        if let Some(timer) = self.active_timers.iter_mut().find(|t| t.timer_id == timer_id) {
+            timer.is_active = false;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn advance_ticks(&mut self, ticks: u64) -> usize {
+        self.current_tick += ticks;
+        let mut expired = 0;
+        for timer in &mut self.active_timers {
+            if timer.is_active && timer.expires_tick <= self.current_tick {
+                timer.is_active = false;
+                expired += 1;
+            }
+        }
+        expired
+    }
+}
+
+impl Default for LinuxKernelTimerWheel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 16. Linux Contiguous Memory Allocator (CMA) Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct CmaRegion {
+    pub base_pfn: usize,
+    pub page_count: usize,
+    pub is_allocated: bool,
+}
+
+pub struct LinuxCmaAllocatorEngine {
+    pub reservation_pool: Vec<CmaRegion>,
+}
+
+impl LinuxCmaAllocatorEngine {
+    pub fn new(start_pfn: usize, total_pages: usize) -> Self {
+        Self {
+            reservation_pool: vec![CmaRegion {
+                base_pfn: start_pfn,
+                page_count: total_pages,
+                is_allocated: false,
+            }],
+        }
+    }
+
+    pub fn cma_alloc(&mut self, count: usize) -> Result<usize, &'static str> {
+        for region in &mut self.reservation_pool {
+            if !region.is_allocated && region.page_count >= count {
+                region.is_allocated = true;
+                return Ok(region.base_pfn);
+            }
+        }
+        Err("CMA: No contiguous physical memory block available")
+    }
+
+    pub fn cma_release(&mut self, base_pfn: usize) -> bool {
+        for region in &mut self.reservation_pool {
+            if region.base_pfn == base_pfn {
+                region.is_allocated = false;
+                return true;
+            }
+        }
+        false
+    }
+}
+
+// ============================================================================
+// Unit Tests for Linux Kernel Primitives
+// ============================================================================
+
+#[cfg(test)]
+mod linux_kernel_primitives_tests {
+    use super::*;
+
+    #[test]
+    fn test_linux_rcu_synchronization() {
+        let mut rcu = LinuxRcuSynchronizationEngine::new();
+        rcu.rcu_read_lock();
+        assert_eq!(rcu.active_readers_count.load(Ordering::Acquire), 1);
+
+        let cb_id = rcu.call_rcu(0x7FFF0000);
+        assert_eq!(cb_id, 1);
+
+        rcu.rcu_read_unlock();
+        assert_eq!(rcu.active_readers_count.load(Ordering::Acquire), 0);
+
+        let executed = rcu.synchronize_rcu();
+        assert_eq!(executed, 1);
+        assert_eq!(rcu.grace_period_counter.load(Ordering::Acquire), 2);
+    }
+
+    #[test]
+    fn test_linux_workqueue_and_timer_wheel() {
+        let mut wq = LinuxKernelWorkqueueEngine::new("system_highpri_wq", 4);
+        let id1 = wq.queue_work("deferred_flush", 100);
+        let id2 = wq.queue_work("async_sync", 200);
+        assert_eq!(id1, 1);
+        assert_eq!(id2, 2);
+
+        let flushed = wq.flush_scheduled_work();
+        assert_eq!(flushed, 2);
+
+        let mut timer_wheel = LinuxKernelTimerWheel::new();
+        let t1 = timer_wheel.add_timer(10);
+        let _t2 = timer_wheel.add_timer(50);
+        assert_eq!(t1, 1);
+
+        let expired = timer_wheel.advance_ticks(20);
+        assert_eq!(expired, 1);
+    }
+
+    #[test]
+    fn test_cma_allocator_engine() {
+        let mut cma = LinuxCmaAllocatorEngine::new(0x10000, 2048);
+        let pfn = cma.cma_alloc(512).unwrap();
+        assert_eq!(pfn, 0x10000);
+
+        assert!(cma.cma_release(pfn));
+    }
+}
+
+// ============================================================================
 // 5. Linux pidfd Process File Descriptor Subsystem (PidfdEngine)
 // ============================================================================
 

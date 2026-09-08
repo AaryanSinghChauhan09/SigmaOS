@@ -54,8 +54,20 @@ pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
+pub mod wiki_unimplemented_ideas;
+pub use wiki_unimplemented_ideas::*;
 
 pub use distro::{
+    distro_inspiration_engine::{
+        AlpineLbuApkOverlayEngine, ApkovlCommit, ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine,
+        DragonFlyHammer2ClusterEngine, FreeBsdZfsArcGeomEngine, GenerationRecord, Hammer2DedupEntry,
+        IsaLevel, MuslLightweightInitEngine, MuslStaticService,
+        NixOsDeclarativeStateReconciliationEngine, NixOsPureStoreDerivationEngine,
+        OpenBsdStatefulPacketFilterEngine, OpenWrtUciSqmRouterEngine, PaxSecurityLevel, PfProtocol,
+        PfStateEntry, PortageUseFlag, PortageUseFlagGovernor, QubeDomainType,
+        QubesHardenedBsdSecurityGuard, RunitStage, ServiceRunState, SqmAlgorithm, StoreDerivationPath,
+        UciSection, UseFlagState, VoidRunitStageController,
+    },
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
@@ -69,7 +81,26 @@ pub use distro::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
     SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
     SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
-    ZramCompressionAlgorithm,
+    ZramCompressionAlgorithm, DebianMultiarchAptEngine, EndeavourReflectorMirrorRanker,
+    FreeBsdZfsBootEnvManager, GarudaDracutBtrfsSnapper, GarudaPerformanceTweakEngine,
+    HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, NixOsFlakeProfileManager,
+    OpenBsdDoasPrivilegeManager, SolusEopkgBudgieEngine, BodhiUpdateRecord, BodhiUpdateStatus,
+    AlpmHook, AlpmHookWhen, ArchGpgKey, ArchKeyringEngine, ArchPacmanHookManager,
+    ArchCommunitySigRepoManager, ArchPacmanContribEngine, ArchSignstarSignerEngine,
+    PacDiffCandidate, PacLogEntry, SigRepositoryBranch, SignstarAttestation,
+    ArchReflectorEngine, ArchinstallEngine, ArchFilesystemType, ArchInstallerProfile,
+    KeyTrustLevel, ReflectorMirror, ReflectorSortKey,
+    DesktopLayoutPreset, HardwareQuirkRule, ManjaroBranch, ManjaroBranchManager,
+    ManjaroHelloSetupEngine, ManjaroTimeshiftAutoSnap, MhwdHardwareQuirkDatabase,
+    MhwdKernelDriverAutobuilder, PackageSearchResult, PamacTransactionEntry,
+    PamacTransactionJournalEngine, PamacUnifiedSearchEngine, PrimeOffloadMode,
+    SearchResultBackend, SetupWizardTask, ManjaroSnapshotMode, TimeshiftSnapshot,
+    PamacTransactionType, VendorHardwareType,
+    FedoraBodhiUpdateEngine, FedoraIgnitionProvisionEngine, FedoraKojiDistGitBuilder,
+    FedoraRpmOstreeEngine, IgnitionFile, IgnitionUnit, KojiBuildTask, OstreeDeploymentPin,
+    FedoraTargetArchitecture,
+    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
+    OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
 };
 pub use driver::{
     DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
@@ -299,6 +330,7 @@ pub use kernel::{
     InteractiveHybridScheduler, HybridTask,
     CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
+    LinuxRcuSynchronizationEngine, LinuxKernelWorkqueueEngine, LinuxKernelTimerWheel, LinuxCmaAllocatorEngine,
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use network::{

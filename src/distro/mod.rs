@@ -38,6 +38,11 @@ pub mod ecosystem_dimensions;
 pub mod endeavour_os;
 pub mod enterprise;
 pub mod fedora_parity;
+pub use fedora_parity::{
+    BodhiUpdateRecord, BodhiUpdateStatus, FedoraBodhiUpdateEngine, FedoraIgnitionProvisionEngine,
+    FedoraKojiDistGitBuilder, FedoraRpmOstreeEngine, IgnitionFile, IgnitionUnit, KojiBuildTask,
+    OstreeDeploymentPin, TargetArchitecture as FedoraTargetArchitecture,
+};
 pub mod garuda_nomad_innovations;
 pub mod gentoo;
 pub mod gentoo_inspirations;
@@ -64,6 +69,14 @@ pub use garuda_nomad_innovations::{
 };
 pub mod linux_ideas;
 pub mod manjaro;
+pub use manjaro::{
+    DesktopLayoutPreset, HardwareQuirkRule, ManjaroBranch, ManjaroBranchManager,
+    ManjaroHelloSetupEngine, ManjaroTimeshiftAutoSnap, MhwdHardwareQuirkDatabase,
+    MhwdKernelDriverAutobuilder, PackageSearchResult, PamacTransactionEntry,
+    PamacTransactionJournalEngine, PamacUnifiedSearchEngine, PrimeOffloadMode,
+    SearchResultBackend, SetupWizardTask, SnapshotMode as ManjaroSnapshotMode, TimeshiftSnapshot,
+    TransactionType as PamacTransactionType, VendorHardwareType,
+};
 pub mod missing_distro_innovations;
 pub mod nextgen;
 pub mod nixos_inspirations;
@@ -104,8 +117,9 @@ pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
     AlpmDatabase, ArchArchinstallEngine, ArchArchwebEngine, ArchCdevtoolsEngine, ArchPkgctlEngine,
-    ArchWikiOfflineEngine, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
-    SvntogitPackageRepo,
+    ArchWikiOfflineEngine, ArchCommunitySigRepoManager, ArchPacmanContribEngine, ArchSignstarSignerEngine,
+    AurClient, PacDiffCandidate, PacLogEntry, PkgBuild, SandboxedCompiler, SigRepositoryBranch,
+    SignstarAttestation, SovereignSvntogitEngine, SvntogitPackageRepo,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
