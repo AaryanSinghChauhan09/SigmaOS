@@ -289,7 +289,6 @@ impl Default for PackageFormat {
     fn default() -> Self {
         Self::Deb
     }
->>>>>>> bolt-hotkey-temp
 }
 
 impl PackageFormat {

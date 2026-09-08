@@ -9,8 +9,8 @@ pub mod zsh_bash_parity;
 
 pub use sigma_sh::{
     AutoSuggestTabPopup, ContextualCompleter, HistoryExpansionEngine, JobControlManager,
-    ParameterExpansionEngine, PipelineExecutor, PipelinePlan, ReplLineEditor, ShellPledgeUnveilGuard, SimpleShell,
-    SovereignSigmaShRepl, ZshPromptFormatter,
+    ParameterExpansionEngine, PipelineExecutor, PipelinePlan, ReplLineEditor, ShellPledgeUnveilGuard,
+    ShellSyntaxHighlighter, SimpleShell, SovereignSigmaShRepl, ZshPromptFormatter,
 };
 
 pub use repl::ShellRepl;
@@ -30,14 +30,4 @@ pub use terminal_emulator::{
     TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor,
     BsdConsoleColorPalette, BsdConsoleTheme,
     TermiosInputEvent, TermiosInputMode, TermiosLineDiscipline,
-};
-pub use alias_system::{AliasManager, SigmaAlias, AliasType};
-pub use zsh_bash_parity::{
-    PowerlinePromptBuilder, PromptTheme, FuzzyCompletionEngine, CompletionCandidate, CandidateCategory,
-    ZshSyntaxHighlighter, SyntaxTokenKind, HighlightedToken, BashParameterExpansion, WildcardGlobMatcher,
-    ShellPipelineParser, ShellPipeline, PipelineCommand, BsdDirectoryStack, ShellJobControl, ShellJob, JobState,
-};
-pub use sigma_sh::{
-    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
-    PipelineExecutor, ShellPledgeUnveilGuard, ShellSyntaxHighlighter, ZshPromptFormatter,
 };
