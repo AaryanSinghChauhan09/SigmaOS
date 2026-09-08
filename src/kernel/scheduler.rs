@@ -1,6 +1,3 @@
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TaskId(pub u64);
 
@@ -23,11 +20,13 @@ impl Task {
 
 use core::time::Duration;
 
+// Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::String;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
+// Test environment compatibility: Use std for testing only
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]

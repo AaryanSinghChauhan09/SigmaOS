@@ -2,9 +2,7 @@
 // Inspired by Linux polkit (/usr/share/polkit-1/actions/), sysctl.d (/etc/sysctl.d/), and OpenBSD doas.conf
 // Provides PolicyKit authorization evaluation, kernel sysctl parameter enforcement, and doas privilege escalation rules.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
+// Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap as HashMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -12,6 +10,7 @@ use alloc::string::String;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
+// Test environment compatibility: Use std for testing only
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 #[cfg(any(feature = "standalone_test", test))]
