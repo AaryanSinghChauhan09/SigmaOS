@@ -19,9 +19,7 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::runtime::node_distribution::{
-    NodeBinaryDistroEngine, NodeBinaryPackage,
-};
+use crate::runtime::node_distribution::{NodeBinaryDistroEngine, NodeBinaryPackage};
 
 #[cfg(any(feature = "standalone_test", test))]
 pub mod node_distribution_dummy {
@@ -227,7 +225,7 @@ pub enum PackagePriority {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     #[default]
-    Deb,        // apt/dpkg
+    Deb, // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
     Snap,       // snap/squashfs
@@ -285,12 +283,6 @@ pub enum PackageFormat {
     GuixNar,    // GNU Guix Normalized Archive (.nar)
 }
 
-impl Default for PackageFormat {
-    fn default() -> Self {
-        Self::Deb
-    }
-}
-
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
         let name = filename.to_lowercase();
@@ -344,7 +336,10 @@ impl PackageFormat {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::Xz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -792,12 +787,28 @@ macro_rules! impl_generic_install_strategy {
         pub struct $struct_name;
         impl InstallStrategy for $struct_name {
             fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-                println!(concat!("Strategy: Installing ", stringify!($struct_name), " package '{}'"), package.name);
+                println!(
+                    concat!(
+                        "Strategy: Installing ",
+                        stringify!($struct_name),
+                        " package '{}'"
+                    ),
+                    package.name
+                );
                 Ok(())
             }
-            fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+            fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> {
+                Ok(true)
+            }
             fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-                println!(concat!("Strategy: Removing ", stringify!($struct_name), " package '{}'"), package.name);
+                println!(
+                    concat!(
+                        "Strategy: Removing ",
+                        stringify!($struct_name),
+                        " package '{}'"
+                    ),
+                    package.name
+                );
                 Ok(())
             }
         }
@@ -1052,7 +1063,11 @@ macro_rules! impl_generic_metadata_adapter {
         pub struct $struct_name;
         impl PackageMetadataAdapter for $struct_name {
             fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
-                Ok(UnifiedPackage::new(concat!(stringify!($format_variant), "-pkg").to_lowercase(), "1.0.0".to_string()).with_format(PackageFormat::$format_variant))
+                Ok(UnifiedPackage::new(
+                    concat!(stringify!($format_variant), "-pkg").to_lowercase(),
+                    "1.0.0".to_string(),
+                )
+                .with_format(PackageFormat::$format_variant))
             }
         }
     };
@@ -1360,10 +1375,6 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-
-
-
-
 // =========================================================================
 // Multi-Distro Package Adapter Execution Pipeline
 // =========================================================================
@@ -1492,7 +1503,10 @@ impl PackageAdapter {
         }
     }
 
-    pub fn mount_appimage_squashfs(&self, runtime: &AppImageRuntime) -> Result<String, &'static str> {
+    pub fn mount_appimage_squashfs(
+        &self,
+        runtime: &AppImageRuntime,
+    ) -> Result<String, &'static str> {
         if runtime.squashfs_offset == 0 {
             Err("Invalid squashfs offset")
         } else {
@@ -1515,7 +1529,6 @@ impl PackageAdapter {
         }
     }
 
-
     pub fn _can_handle(&self, package: &UnifiedPackage) -> bool {
         package.formats.contains(&self.format)
     }
@@ -1529,10 +1542,7 @@ impl PackageAdapter {
     }
 
     pub fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Purging package {}",
-            self.adapter_name, package.name
-        );
+        println!("[{}] Purging package {}", self.adapter_name, package.name);
         Ok(())
     }
 
@@ -1878,7 +1888,8 @@ impl UniversalPackageManager {
         ];
 
         for (fmt, name) in formats {
-            self.adapters.insert(fmt, PackageAdapter::new(fmt, name.to_string()));
+            self.adapters
+                .insert(fmt, PackageAdapter::new(fmt, name.to_string()));
         }
     }
 
@@ -2236,7 +2247,12 @@ impl SovereignPackageRollbackEngine {
     }
 
     pub fn create_snapshot(&mut self, label: &str, installed_packages: Vec<String>) -> usize {
-        self.create_distro_snapshot(DistroRollbackType::OpenSuseSnapper, label, &installed_packages, 0)
+        self.create_distro_snapshot(
+            DistroRollbackType::OpenSuseSnapper,
+            label,
+            &installed_packages,
+            0,
+        )
     }
 
     pub fn create_distro_snapshot(
@@ -2278,7 +2294,10 @@ impl SovereignPackageRollbackEngine {
 pub struct UniversalPackageFormatBridge;
 
 impl UniversalPackageFormatBridge {
-    pub fn detect_and_transpile(filename: &str, raw_data: &[u8]) -> Result<UnifiedPackage, &'static str> {
+    pub fn detect_and_transpile(
+        filename: &str,
+        raw_data: &[u8],
+    ) -> Result<UnifiedPackage, &'static str> {
         let fmt = UniversalPackageManifestParser::detect_format_from_filename(filename)
             .ok_or("UniversalPackageFormatBridge: Unsupported package format extension")?;
 
@@ -2322,7 +2341,8 @@ impl UniversalPackageFormatBridge {
         }
 
         if !raw_data.is_empty() {
-            pkg.properties.insert("checksum".to_string(), format!("{:x}", raw_data.len() * 31));
+            pkg.properties
+                .insert("checksum".to_string(), format!("{:x}", raw_data.len() * 31));
         }
 
         Ok(pkg)
@@ -2686,44 +2706,158 @@ mod tests {
 
     #[test]
     fn test_package_format_from_filename_extensions() {
-        assert_eq!(PackageFormat::from_filename("app.air"), Some(PackageFormat::Air));
-        assert_eq!(PackageFormat::from_filename("brew.bottle"), Some(PackageFormat::Bottle));
-        assert_eq!(PackageFormat::from_filename("app.ipa"), Some(PackageFormat::Ipa));
-        assert_eq!(PackageFormat::from_filename("bsd.ports"), Some(PackageFormat::Ports));
-        assert_eq!(PackageFormat::from_filename("install.pkg"), Some(PackageFormat::Pkg));
-        assert_eq!(PackageFormat::from_filename("app.aab"), Some(PackageFormat::Aab));
-        assert_eq!(PackageFormat::from_filename("tool.apk"), Some(PackageFormat::Apk));
-        assert_eq!(PackageFormat::from_filename("software.AppImage"), Some(PackageFormat::AppImage));
-        assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
-        assert_eq!(PackageFormat::from_filename("nixos.nixpkg"), Some(PackageFormat::Nixpkg));
-        assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
-        assert_eq!(PackageFormat::from_filename("gentoo.portage"), Some(PackageFormat::Ebuild));
-        assert_eq!(PackageFormat::from_filename("debian.deb"), Some(PackageFormat::Deb));
-        assert_eq!(PackageFormat::from_filename("archive.tar.gz"), Some(PackageFormat::TarGz));
-        assert_eq!(PackageFormat::from_filename("archive.tar .gz"), Some(PackageFormat::TarGz));
-        assert_eq!(PackageFormat::from_filename("archive.tgz"), Some(PackageFormat::TarGz));
-        assert_eq!(PackageFormat::from_filename("compressed.xz"), Some(PackageFormat::Xz));
-        assert_eq!(PackageFormat::from_filename("fedora.rpm"), Some(PackageFormat::Rpm));
-        assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
-        assert_eq!(PackageFormat::from_filename("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
-        assert_eq!(PackageFormat::from_filename("arch.pkg.tar.zst"), Some(PackageFormat::Pacman));
-        assert_eq!(PackageFormat::from_filename("app.flatpak"), Some(PackageFormat::Flatpak));
-        assert_eq!(PackageFormat::from_filename("macos.app"), Some(PackageFormat::App));
-        assert_eq!(PackageFormat::from_filename("harmony.hap"), Some(PackageFormat::Hap));
-        assert_eq!(PackageFormat::from_filename("pardus.PiSi"), Some(PackageFormat::Pisi));
-        assert_eq!(PackageFormat::from_filename("pardus.pisi"), Some(PackageFormat::Pisi));
-        assert_eq!(PackageFormat::from_filename("deepin.superdeb"), Some(PackageFormat::Superdeb));
-        assert_eq!(PackageFormat::from_filename("slax.lzm"), Some(PackageFormat::Lzm));
-        assert_eq!(PackageFormat::from_filename("puppy.pup"), Some(PackageFormat::Pup));
-        assert_eq!(PackageFormat::from_filename("canonical.snap"), Some(PackageFormat::Snap));
-        assert_eq!(PackageFormat::from_filename("arch_pkg.pkg"), Some(PackageFormat::Pkg));
-        assert_eq!(PackageFormat::from_filename("plain.tar"), Some(PackageFormat::Tar));
-        assert_eq!(PackageFormat::from_filename("puppy.pet"), Some(PackageFormat::Pet));
-        assert_eq!(PackageFormat::from_filename("router.ipk"), Some(PackageFormat::Ipk));
-        assert_eq!(PackageFormat::from_filename("embedded.opkg"), Some(PackageFormat::Opkg));
-        assert_eq!(PackageFormat::from_filename("solaris.p5p"), Some(PackageFormat::SolarisIps));
-        assert_eq!(PackageFormat::from_filename("store.nar"), Some(PackageFormat::GuixNar));
-        assert_eq!(PackageFormat::from_filename("base.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
+        assert_eq!(
+            PackageFormat::from_filename("app.air"),
+            Some(PackageFormat::Air)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("brew.bottle"),
+            Some(PackageFormat::Bottle)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("app.ipa"),
+            Some(PackageFormat::Ipa)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("bsd.ports"),
+            Some(PackageFormat::Ports)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("install.pkg"),
+            Some(PackageFormat::Pkg)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("app.aab"),
+            Some(PackageFormat::Aab)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("tool.apk"),
+            Some(PackageFormat::Apk)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("software.AppImage"),
+            Some(PackageFormat::AppImage)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("solus.eopkg"),
+            Some(PackageFormat::Eopkg)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("nixos.nixpkg"),
+            Some(PackageFormat::Nixpkg)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("nixos.nix"),
+            Some(PackageFormat::Nixpkg)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("gentoo.portage"),
+            Some(PackageFormat::Ebuild)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("debian.deb"),
+            Some(PackageFormat::Deb)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("archive.tar.gz"),
+            Some(PackageFormat::TarGz)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("archive.tar .gz"),
+            Some(PackageFormat::TarGz)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("archive.tgz"),
+            Some(PackageFormat::TarGz)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("compressed.xz"),
+            Some(PackageFormat::Xz)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("fedora.rpm"),
+            Some(PackageFormat::Rpm)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("gentoo.ebuild"),
+            Some(PackageFormat::Ebuild)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("arch.pkg.tar.xz"),
+            Some(PackageFormat::Pacman)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("arch.pkg.tar.zst"),
+            Some(PackageFormat::Pacman)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("app.flatpak"),
+            Some(PackageFormat::Flatpak)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("macos.app"),
+            Some(PackageFormat::App)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("harmony.hap"),
+            Some(PackageFormat::Hap)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("pardus.PiSi"),
+            Some(PackageFormat::Pisi)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("pardus.pisi"),
+            Some(PackageFormat::Pisi)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("deepin.superdeb"),
+            Some(PackageFormat::Superdeb)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("slax.lzm"),
+            Some(PackageFormat::Lzm)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("puppy.pup"),
+            Some(PackageFormat::Pup)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("canonical.snap"),
+            Some(PackageFormat::Snap)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("arch_pkg.pkg"),
+            Some(PackageFormat::Pkg)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("plain.tar"),
+            Some(PackageFormat::Tar)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("puppy.pet"),
+            Some(PackageFormat::Pet)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("router.ipk"),
+            Some(PackageFormat::Ipk)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("embedded.opkg"),
+            Some(PackageFormat::Opkg)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("solaris.p5p"),
+            Some(PackageFormat::SolarisIps)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("store.nar"),
+            Some(PackageFormat::GuixNar)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("base.openbsd.tgz"),
+            Some(PackageFormat::OpenBsdPkg)
+        );
     }
 
     #[test]
@@ -2739,32 +2873,73 @@ mod tests {
     #[test]
     fn test_all_package_format_strategies_and_adapters() {
         let formats = vec![
-            PackageFormat::Deb, PackageFormat::Rpm, PackageFormat::Pacman, PackageFormat::Ebuild,
-            PackageFormat::Apk, PackageFormat::Nix, PackageFormat::Flatpak, PackageFormat::Snap,
-            PackageFormat::AppImage, PackageFormat::Xbps, PackageFormat::Txz, PackageFormat::Eopkg,
-            PackageFormat::Zypper, PackageFormat::Guix, PackageFormat::CachyOS, PackageFormat::Swupd,
-            PackageFormat::Starling, PackageFormat::SigmaPkg, PackageFormat::Air, PackageFormat::Bottle,
-            PackageFormat::Ipa, PackageFormat::Ports, PackageFormat::Pkg, PackageFormat::Aab,
-            PackageFormat::TarGz, PackageFormat::Xz, PackageFormat::App, PackageFormat::Hap,
-            PackageFormat::Pisi, PackageFormat::Superdeb, PackageFormat::Lzm, PackageFormat::Pup,
-            PackageFormat::Pet, PackageFormat::Tar, PackageFormat::Moss, PackageFormat::Hpkg,
-            PackageFormat::Tcz, PackageFormat::Gobo, PackageFormat::Ostree, PackageFormat::Pkgsrc,
-            PackageFormat::Sfs, PackageFormat::Puk, PackageFormat::Dmg, PackageFormat::Cports,
-            PackageFormat::Dports, PackageFormat::SlackBuild, PackageFormat::Crux, PackageFormat::Drpm,
-            PackageFormat::Stratum
+            PackageFormat::Deb,
+            PackageFormat::Rpm,
+            PackageFormat::Pacman,
+            PackageFormat::Ebuild,
+            PackageFormat::Apk,
+            PackageFormat::Nix,
+            PackageFormat::Flatpak,
+            PackageFormat::Snap,
+            PackageFormat::AppImage,
+            PackageFormat::Xbps,
+            PackageFormat::Txz,
+            PackageFormat::Eopkg,
+            PackageFormat::Zypper,
+            PackageFormat::Guix,
+            PackageFormat::CachyOS,
+            PackageFormat::Swupd,
+            PackageFormat::Starling,
+            PackageFormat::SigmaPkg,
+            PackageFormat::Air,
+            PackageFormat::Bottle,
+            PackageFormat::Ipa,
+            PackageFormat::Ports,
+            PackageFormat::Pkg,
+            PackageFormat::Aab,
+            PackageFormat::TarGz,
+            PackageFormat::Xz,
+            PackageFormat::App,
+            PackageFormat::Hap,
+            PackageFormat::Pisi,
+            PackageFormat::Superdeb,
+            PackageFormat::Lzm,
+            PackageFormat::Pup,
+            PackageFormat::Pet,
+            PackageFormat::Tar,
+            PackageFormat::Moss,
+            PackageFormat::Hpkg,
+            PackageFormat::Tcz,
+            PackageFormat::Gobo,
+            PackageFormat::Ostree,
+            PackageFormat::Pkgsrc,
+            PackageFormat::Sfs,
+            PackageFormat::Puk,
+            PackageFormat::Dmg,
+            PackageFormat::Cports,
+            PackageFormat::Dports,
+            PackageFormat::SlackBuild,
+            PackageFormat::Crux,
+            PackageFormat::Drpm,
+            PackageFormat::Stratum,
         ];
 
         for fmt in formats {
             let strategy = PackageFactory::get_strategy(fmt);
             let adapter = PackageFactory::get_adapter(fmt);
-            let pkg = UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string()).with_format(fmt);
+            let pkg =
+                UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string()).with_format(fmt);
 
             assert!(strategy.install(&pkg).is_ok());
             assert!(strategy.verify(&pkg).unwrap());
             assert!(strategy.remove(&pkg).is_ok());
 
             let adapted = adapter.adapt("").unwrap();
-            assert!(adapted.formats.contains(&fmt) || (fmt == PackageFormat::Nix && adapted.formats.contains(&PackageFormat::Nixpkg)));
+            assert!(
+                adapted.formats.contains(&fmt)
+                    || (fmt == PackageFormat::Nix
+                        && adapted.formats.contains(&PackageFormat::Nixpkg))
+            );
         }
     }
 

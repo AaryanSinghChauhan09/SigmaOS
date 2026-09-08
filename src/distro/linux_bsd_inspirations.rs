@@ -13,8 +13,6 @@ use alloc::format;
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
 
 // Test environment compatibility: Use std for testing only
 #[cfg(any(feature = "standalone_test", test))]
@@ -25,8 +23,6 @@ use std::format;
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use super::sovereign_distro_dominance::SovereignDistroDominanceSuite;
@@ -239,9 +235,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => {
-                supervisor == ServiceSupervisorType::Sysvinit
-            }
+            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
         };
@@ -300,8 +294,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", action),
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", action),
-            DistroSubsystemMode::LinuxFedora
-            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", action),
+            DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxOpenSuse => {
+                format!("{}.rpm", action)
+            }
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", action),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
@@ -772,15 +767,45 @@ impl SovereignUniversalDistroBridge {
 
     pub fn verify_all_subsystems_compatibility_matrix(&mut self) -> bool {
         let subsystems = [
-            "init", "package", "vfs", "security", "storage", "kernel",
-            "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
-            "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
+            "init",
+            "package",
+            "vfs",
+            "security",
+            "storage",
+            "kernel",
+            "network",
+            "graphics",
+            "power",
+            "ipc",
+            "auth",
+            "audit",
+            "boot",
+            "container",
+            "virtualization",
+            "audio",
+            "input",
+            "thermal",
+            "memory",
+            "syscall",
+            "device",
+            "crypto",
+            "ai",
+            "monitoring",
+            "desktop",
+            "compiler",
+            "i18n",
+            "bluetooth",
+            "firewall",
+            "diagnostics",
+            "recovery",
+            "time",
         ];
 
         for sub in subsystems {
-            if self.dispatch_cross_subsystem_operation(sub, "test_action").is_err() {
+            if self
+                .dispatch_cross_subsystem_operation(sub, "test_action")
+                .is_err()
+            {
                 return false;
             }
         }
@@ -844,7 +869,6 @@ impl SovereignUniversalDistroBridge {
     pub fn create_qubes_isolation_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
         self.super_matrix.create_qubes_domain(domain_name)
     }
-
 }
 
 // ==========================================
@@ -1893,7 +1917,11 @@ impl LandlockV5NetworkGuard {
         }
     }
 
-    pub fn add_net_port_rule(&mut self, port: u16, access: LandlockNetAccess) -> Result<(), &'static str> {
+    pub fn add_net_port_rule(
+        &mut self,
+        port: u16,
+        access: LandlockNetAccess,
+    ) -> Result<(), &'static str> {
         if self.is_enforced {
             return Err("Landlock v5 Network Ruleset is already enforced");
         }
@@ -1909,7 +1937,9 @@ impl LandlockV5NetworkGuard {
         if !self.is_enforced {
             return true;
         }
-        self.net_rules.iter().any(|r| r.port == port && r.access == access)
+        self.net_rules
+            .iter()
+            .any(|r| r.port == port && r.access == access)
     }
 }
 
@@ -1936,8 +1966,16 @@ impl EbpfXdpZeroCopyRedirector {
         self.interface_map.push((ifindex, ifname.to_string()));
     }
 
-    pub fn redirect_packet_zero_copy(&mut self, from_ifindex: u32, to_ifindex: u32, packet_bytes: &[u8]) -> Result<usize, &'static str> {
-        let src_valid = self.interface_map.iter().any(|(idx, _)| *idx == from_ifindex);
+    pub fn redirect_packet_zero_copy(
+        &mut self,
+        from_ifindex: u32,
+        to_ifindex: u32,
+        packet_bytes: &[u8],
+    ) -> Result<usize, &'static str> {
+        let src_valid = self
+            .interface_map
+            .iter()
+            .any(|(idx, _)| *idx == from_ifindex);
         let dst_valid = self.interface_map.iter().any(|(idx, _)| *idx == to_ifindex);
 
         if !src_valid || !dst_valid {
@@ -2046,7 +2084,9 @@ mod cross_subsystem_tests {
     #[test]
     fn test_omarchy_quickshell_dispatch() {
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
-        let res = bridge.dispatch_cross_subsystem_operation("omarchy_quickshell", "quattro_bar").unwrap();
+        let res = bridge
+            .dispatch_cross_subsystem_operation("omarchy_quickshell", "quattro_bar")
+            .unwrap();
         assert!(res.contains("Omarchy Quickshell UI layout engine"));
         assert!(res.contains("quattro_bar"));
     }
@@ -2054,7 +2094,9 @@ mod cross_subsystem_tests {
     #[test]
     fn test_omarchy_herdr_agent_dispatch() {
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
-        let res = bridge.dispatch_cross_subsystem_operation("omarchy_herdr_agent", "Refactor scheduler").unwrap();
+        let res = bridge
+            .dispatch_cross_subsystem_operation("omarchy_herdr_agent", "Refactor scheduler")
+            .unwrap();
         assert!(res.contains("Omarchy Herdr AI Agent task spawning"));
         assert!(res.contains("Refactor scheduler"));
     }
@@ -2062,13 +2104,19 @@ mod cross_subsystem_tests {
     #[test]
     fn test_parrot_distro_bridge_dispatch() {
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxParrot);
-        let res1 = bridge.dispatch_cross_subsystem_operation("parrot_anonsurf", "start").unwrap();
+        let res1 = bridge
+            .dispatch_cross_subsystem_operation("parrot_anonsurf", "start")
+            .unwrap();
         assert!(res1.contains("Anonsurf transparent Tor proxy routing"));
 
-        let res2 = bridge.dispatch_cross_subsystem_operation("parrot_apparmor", "browser_sandbox").unwrap();
+        let res2 = bridge
+            .dispatch_cross_subsystem_operation("parrot_apparmor", "browser_sandbox")
+            .unwrap();
         assert!(res2.contains("Parrot AppArmor Seccomp sandbox profile generation"));
 
-        let res3 = bridge.dispatch_cross_subsystem_operation("parrot_forensics", "/dev/sdb1").unwrap();
+        let res3 = bridge
+            .dispatch_cross_subsystem_operation("parrot_forensics", "/dev/sdb1")
+            .unwrap();
         assert!(res3.contains("Parrot Digital Forensics read-only evidence acquisition"));
     }
 
@@ -2131,11 +2179,38 @@ mod cross_subsystem_tests {
         ];
 
         let target_subsystems = [
-            "init", "package", "vfs", "security", "storage", "kernel",
-            "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
-            "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
+            "init",
+            "package",
+            "vfs",
+            "security",
+            "storage",
+            "kernel",
+            "network",
+            "graphics",
+            "power",
+            "ipc",
+            "auth",
+            "audit",
+            "boot",
+            "container",
+            "virtualization",
+            "audio",
+            "input",
+            "thermal",
+            "memory",
+            "syscall",
+            "device",
+            "crypto",
+            "ai",
+            "monitoring",
+            "desktop",
+            "compiler",
+            "i18n",
+            "bluetooth",
+            "firewall",
+            "diagnostics",
+            "recovery",
+            "time",
         ];
 
         for m in modes {
@@ -2158,7 +2233,10 @@ mod cross_subsystem_tests {
         assert!(ipc.splice_channel(1, 2, 0).is_err());
 
         let mut auth = SovereignSystemdHomedAuthBridge::new();
-        assert_eq!(auth.authenticate_and_mount("user", "pass").unwrap(), "LUKS_HOME_MOUNTED");
+        assert_eq!(
+            auth.authenticate_and_mount("user", "pass").unwrap(),
+            "LUKS_HOME_MOUNTED"
+        );
         assert!(auth.authenticate_and_mount("", "pass").is_err());
 
         let mut syscall = SovereignMultiArchSyscallTranslator::new(DistroSubsystemMode::FreeBsd);
@@ -2170,8 +2248,11 @@ mod cross_subsystem_tests {
         assert!(entry.contains("SigmaKernel"));
         assert!(boot.configure_boot_entry("", "quiet").is_err());
 
-        let mut container = SovereignCrossDistroContainerManager::new(DistroSubsystemMode::LinuxArch);
-        let id = container.spawn_isolated_container("app", "/usr/bin").unwrap();
+        let mut container =
+            SovereignCrossDistroContainerManager::new(DistroSubsystemMode::LinuxArch);
+        let id = container
+            .spawn_isolated_container("app", "/usr/bin")
+            .unwrap();
         assert_eq!(id, 1);
         assert!(container.spawn_isolated_container("", "/path").is_err());
     }
@@ -5299,22 +5380,54 @@ mod tests {
             assert!(bridge.verify_all_subsystems_compatibility());
 
             // Check cross-subsystem operations
-            assert!(bridge.dispatch_cross_subsystem_operation("init", "restart").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("package", "install").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("vfs", "/etc").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("security", "/app").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("power", "performance").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("audio", "default-sink").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("ipc", "ring-pipe").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("containers", "/var/chroot/app").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("time", "pool.ntp.org").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("memory", "page_alloc").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("ui", "KdePlasma").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("process", "worker_task").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("virt", "microvm0").is_ok());
-            assert!(bridge.dispatch_cross_subsystem_operation("audit", "pax_check").is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("init", "restart")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("package", "install")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("vfs", "/etc")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("security", "/app")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("network", "eth0")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("graphics", "set_mode")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("power", "performance")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("audio", "default-sink")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("ipc", "ring-pipe")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("containers", "/var/chroot/app")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("time", "pool.ntp.org")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("memory", "page_alloc")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("ui", "KdePlasma")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("process", "worker_task")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("virt", "microvm0")
+                .is_ok());
+            assert!(bridge
+                .dispatch_cross_subsystem_operation("audit", "pax_check")
+                .is_ok());
         }
     }
 
@@ -5785,14 +5898,20 @@ mod tests {
     #[test]
     fn test_landlock_v5_network_guard_and_xdp_redirect() {
         let mut net_guard = LandlockV5NetworkGuard::new();
-        assert!(net_guard.add_net_port_rule(8080, LandlockNetAccess::TcpBind).is_ok());
-        assert!(net_guard.add_net_port_rule(443, LandlockNetAccess::TcpConnect).is_ok());
+        assert!(net_guard
+            .add_net_port_rule(8080, LandlockNetAccess::TcpBind)
+            .is_ok());
+        assert!(net_guard
+            .add_net_port_rule(443, LandlockNetAccess::TcpConnect)
+            .is_ok());
 
         // Prior to enforcement, everything is allowed
         assert!(net_guard.check_net_access(80, LandlockNetAccess::TcpConnect));
 
         net_guard.restrict_network();
-        assert!(net_guard.add_net_port_rule(22, LandlockNetAccess::TcpConnect).is_err());
+        assert!(net_guard
+            .add_net_port_rule(22, LandlockNetAccess::TcpConnect)
+            .is_err());
 
         assert!(net_guard.check_net_access(8080, LandlockNetAccess::TcpBind));
         assert!(net_guard.check_net_access(443, LandlockNetAccess::TcpConnect));
@@ -6526,7 +6645,10 @@ mod tests {
         // 5th crash triggers SegvGuard brute force mitigation
         assert!(pax.record_segfault(200, 0x0));
         assert_eq!(pax.violations.len(), 2);
-        assert_eq!(pax.violations[1].violation, PaxViolationType::SegvGuardThresholdExceeded);
+        assert_eq!(
+            pax.violations[1].violation,
+            PaxViolationType::SegvGuardThresholdExceeded
+        );
     }
 }
 
@@ -6646,7 +6768,12 @@ impl SovereignZeroCopyIpcBridge {
         }
     }
 
-    pub fn splice_channel(&mut self, _src_fd: i32, _dst_fd: i32, len: usize) -> Result<usize, &'static str> {
+    pub fn splice_channel(
+        &mut self,
+        _src_fd: i32,
+        _dst_fd: i32,
+        len: usize,
+    ) -> Result<usize, &'static str> {
         if len == 0 {
             return Err("Splice length must be greater than zero");
         }
@@ -6671,7 +6798,11 @@ impl SovereignSystemdHomedAuthBridge {
         }
     }
 
-    pub fn authenticate_and_mount(&mut self, username: &str, password: &str) -> Result<&'static str, &'static str> {
+    pub fn authenticate_and_mount(
+        &mut self,
+        username: &str,
+        password: &str,
+    ) -> Result<&'static str, &'static str> {
         if username.is_empty() || password.is_empty() {
             return Err("Invalid credentials");
         }
@@ -6700,7 +6831,10 @@ impl SovereignMultiArchSyscallTranslator {
             return Err("Syscall name cannot be empty");
         }
         match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
+            DistroSubsystemMode::FreeBsd
+            | DistroSubsystemMode::OpenBsd
+            | DistroSubsystemMode::NetBsd
+            | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
             DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(2002),
             _ => Ok(0),
         }
@@ -6718,7 +6852,11 @@ impl SovereignMultiArchBootChainBridge {
         }
     }
 
-    pub fn configure_boot_entry(&mut self, label: &str, params: &str) -> Result<String, &'static str> {
+    pub fn configure_boot_entry(
+        &mut self,
+        label: &str,
+        params: &str,
+    ) -> Result<String, &'static str> {
         if label.is_empty() {
             return Err("Boot label cannot be empty");
         }
@@ -6749,7 +6887,11 @@ impl SovereignCrossDistroContainerManager {
         }
     }
 
-    pub fn spawn_isolated_container(&mut self, name: &str, path: &str) -> Result<u64, &'static str> {
+    pub fn spawn_isolated_container(
+        &mut self,
+        name: &str,
+        path: &str,
+    ) -> Result<u64, &'static str> {
         if name.is_empty() || path.is_empty() {
             return Err("Container name and path cannot be empty");
         }
@@ -6926,7 +7068,10 @@ impl UseFlagEngine {
     }
 
     pub fn add_package_flag(&mut self, package: &str, name: &str, enabled: bool) {
-        let entry = self.package_flags.entry(package.to_string()).or_insert_with(Vec::new);
+        let entry = self
+            .package_flags
+            .entry(package.to_string())
+            .or_insert_with(Vec::new);
         entry.push(UseFlag {
             name: name.to_string(),
             enabled,
@@ -6975,11 +7120,9 @@ impl AptRepository {
     pub fn generate_sources_entry(&self) -> String {
         let components_str = self.components.join(" ");
         let trusted_str = if self.trusted { "[trusted=yes]" } else { "" };
-        format!("deb {} {} {} {}",
-            trusted_str,
-            self.url,
-            self.distribution,
-            components_str
+        format!(
+            "deb {} {} {} {}",
+            trusted_str, self.url, self.distribution, components_str
         )
     }
 }
@@ -7020,20 +7163,20 @@ impl AdvancedDistroSecurityEngine {
 
     pub fn generate_composite_security_config(&self) -> String {
         let mut config = String::from("# Advanced Linux/BSD Security Configuration\n");
-        
+
         config.push_str("# AppArmor Profiles\n");
         for profile in &self.apparmor_profiles {
             config.push_str(&format!("profile {} {{\n", profile.name));
             config.push_str(&format!("  mode: {:?}\n", profile.mode));
             config.push_str("}\n");
         }
-        
+
         config.push_str("\n# APT Repositories\n");
         for repo in &self.apt_repositories {
             config.push_str(&repo.generate_sources_entry());
             config.push('\n');
         }
-        
+
         config
     }
 }
