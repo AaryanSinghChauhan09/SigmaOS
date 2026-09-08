@@ -119,7 +119,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -215,7 +214,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -224,31 +222,27 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                supervisor == ServiceSupervisorType::Runit
-            }
+                DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
+                    supervisor == ServiceSupervisorType::Runit
+                }
 
-            DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
-                supervisor == ServiceSupervisorType::Shepherd
-            }
+                DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
+                    supervisor == ServiceSupervisorType::Shepherd
+                }
 
-            DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => {
-                supervisor == ServiceSupervisorType::Sysvinit
+                DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
+                DistroSubsystemMode::LinuxSlackware => {
+                    supervisor == ServiceSupervisorType::Sysvinit
+                }
+                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
             }
-            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
-            DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-        };
-
-        supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
-            | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
+            | DistroSubsystemMode::LinuxTails => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -260,7 +254,6 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
@@ -286,8 +279,7 @@ impl SovereignUniversalDistroBridge {
         let dst_pkg = match target_mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
-            | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
+            | DistroSubsystemMode::LinuxTails => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
@@ -583,74 +575,6 @@ impl SovereignUniversalDistroBridge {
                     action, mprotect_res.is_ok(), self.mode
                 ))
             }
-            "auth" => {
-                let mut auth_bridge = SovereignSystemdHomedAuthBridge::new();
-                let auth_res = auth_bridge.authenticate_and_mount("user", "pass");
-                Ok(format!(
-                    "Dispatched systemd-homed PAM/PAM_exec authentication for '{}' (res: {:?}) under distro mode '{:?}'",
-                    action, auth_res.is_ok(), self.mode
-                ))
-            }
-            "boot" => {
-                let mut boot_bridge = SovereignMultiArchBootChainBridge::new();
-                let entry_res = boot_bridge.configure_boot_entry(action, "quiet");
-                Ok(format!(
-                    "Dispatched multi-arch boot chain entry for '{}' (res: {:?}) under distro mode '{:?}'",
-                    action, entry_res.is_ok(), self.mode
-                ))
-            }
-            "container" | "virtualization" => {
-                let mut container_mgr = SovereignCrossDistroContainerManager::new(self.mode);
-                let spawn_res = container_mgr.spawn_isolated_container(action, "/usr/bin");
-                Ok(format!(
-                    "Dispatched cross-distro container/virtualization for '{}' (id: {:?}) under distro mode '{:?}'",
-                    action, spawn_res, self.mode
-                ))
-            }
-            "input" => {
-                Ok(format!(
-                    "Dispatched libinput / evdev input event pipeline for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "thermal" => {
-                Ok(format!(
-                    "Dispatched thermald CPU/GPU thermal zone throttling check for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "syscall" => {
-                let mut syscall_translator = SovereignMultiArchSyscallTranslator::new(self.mode);
-                let sys_num = syscall_translator.translate_and_dispatch(action);
-                Ok(format!(
-                    "Dispatched syscall translation for '{}' (num: {:?}) under distro mode '{:?}'",
-                    action, sys_num, self.mode
-                ))
-            }
-            "device" => {
-                Ok(format!(
-                    "Dispatched udev / devd hardware device event processing for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "crypto" => {
-                Ok(format!(
-                    "Dispatched kTLS / Ring / Post-Quantum Crypto subsystem processing for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "ai" => {
-                Ok(format!(
-                    "Dispatched Agentic AI OS runtime execution context for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "monitoring" => {
-                Ok(format!(
-                    "Dispatched eBPF telemetry & sysstat monitoring probe for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
             _ => Err("Unknown target subsystem"),
         }
     }
@@ -664,8 +588,7 @@ impl SovereignUniversalDistroBridge {
         ];
 
         for sub in subsystems {
-            if let Err(e) = self.dispatch_cross_subsystem_operation(sub, "test_action") {
-                eprintln!("FAILED SUBSYSTEM: {} for mode {:?}: {}", sub, self.mode, e);
+            if self.dispatch_cross_subsystem_operation(sub, "test_action").is_err() {
                 return false;
             }
         }
