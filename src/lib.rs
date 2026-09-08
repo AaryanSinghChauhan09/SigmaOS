@@ -85,6 +85,8 @@ pub use distro::{
     HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, NixOsFlakeProfileManager,
     OpenBsdDoasPrivilegeManager, SolusEopkgBudgieEngine, BodhiUpdateRecord, BodhiUpdateStatus,
     AlpmHook, AlpmHookWhen, ArchGpgKey, ArchKeyringEngine, ArchPacmanHookManager,
+    ArchCommunitySigRepoManager, ArchPacmanContribEngine, ArchSignstarSignerEngine,
+    PacDiffCandidate, PacLogEntry, SigRepositoryBranch, SignstarAttestation,
     ArchReflectorEngine, ArchinstallEngine, ArchFilesystemType, ArchInstallerProfile,
     KeyTrustLevel, ReflectorMirror, ReflectorSortKey,
     DesktopLayoutPreset, HardwareQuirkRule, ManjaroBranch, ManjaroBranchManager,

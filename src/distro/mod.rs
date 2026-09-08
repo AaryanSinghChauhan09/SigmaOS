@@ -114,8 +114,9 @@ pub use void_runit::{
 pub mod sovereign_distro_dominance;
 
 pub use arch_parity::{
-    AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
-    SvntogitPackageRepo,
+    AlpmDatabase, ArchCommunitySigRepoManager, ArchPacmanContribEngine, ArchSignstarSignerEngine,
+    AurClient, PacDiffCandidate, PacLogEntry, PkgBuild, SandboxedCompiler, SigRepositoryBranch,
+    SignstarAttestation, SovereignSvntogitEngine, SvntogitPackageRepo,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
