@@ -355,7 +355,272 @@ impl Default for SolusMossStatelessTransactionEngine {
     }
 }
 
-#[cfg(test_disabled)]
+// =========================================================================
+// 8. Void Linux xbps-src Template Sandbox & Cross-Build Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsTemplate {
+    pub pkgname: String,
+    pub version: String,
+    pub revision: u32,
+    pub short_desc: String,
+    pub depends: Vec<String>,
+    pub makedepends: Vec<String>,
+    pub build_style: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SandboxEnvironment {
+    pub chroot_dir: String,
+    pub isolation_active: bool,
+    pub target_arch: String,
+}
+
+pub struct XbpsSrcTemplateSandboxEngine {
+    pub templates: BTreeMap<String, XbpsTemplate>,
+    pub sandbox: SandboxEnvironment,
+}
+
+impl XbpsSrcTemplateSandboxEngine {
+    pub fn new(chroot_dir: &str, target_arch: &str) -> Self {
+        Self {
+            templates: BTreeMap::new(),
+            sandbox: SandboxEnvironment {
+                chroot_dir: chroot_dir.to_string(),
+                isolation_active: true,
+                target_arch: target_arch.to_string(),
+            },
+        }
+    }
+
+    pub fn register_template(&mut self, template: XbpsTemplate) {
+        self.templates.insert(template.pkgname.clone(), template);
+    }
+
+    pub fn build_src_package(&self, pkgname: &str) -> Result<String, String> {
+        let tmpl = self.templates.get(pkgname).ok_or("Template not found")?;
+        Ok(format!(
+            "{}-{}_{}.{}.xbps",
+            tmpl.pkgname, tmpl.version, tmpl.revision, self.sandbox.target_arch
+        ))
+    }
+}
+
+// =========================================================================
+// 9. Alpine Linux APK Tagged Repo (@edge/@testing) Overlay Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkRepoTag {
+    pub tag_name: String,
+    pub repo_url: String,
+    pub priority: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TaggedPackageSpec {
+    pub package_name: String,
+    pub version: String,
+    pub repo_tag: String,
+}
+
+pub struct AlpineApkEdgeOverlayEngine {
+    pub repo_tags: BTreeMap<String, ApkRepoTag>,
+    pub package_pins: BTreeMap<String, String>,
+    pub available_packages: Vec<TaggedPackageSpec>,
+}
+
+impl AlpineApkEdgeOverlayEngine {
+    pub fn new() -> Self {
+        Self {
+            repo_tags: BTreeMap::new(),
+            package_pins: BTreeMap::new(),
+            available_packages: Vec::new(),
+        }
+    }
+
+    pub fn register_repo_tag(&mut self, name: &str, url: &str, priority: u32) {
+        self.repo_tags.insert(
+            name.to_string(),
+            ApkRepoTag {
+                tag_name: name.to_string(),
+                repo_url: url.to_string(),
+                priority,
+            },
+        );
+    }
+
+    pub fn pin_package(&mut self, package_name: &str, tag_name: &str) {
+        self.package_pins.insert(package_name.to_string(), tag_name.to_string());
+    }
+
+    pub fn register_available_package(&mut self, spec: TaggedPackageSpec) {
+        self.available_packages.push(spec);
+    }
+
+    pub fn resolve_package(&self, package_name: &str) -> Option<TaggedPackageSpec> {
+        if let Some(pinned_tag) = self.package_pins.get(package_name) {
+            self.available_packages
+                .iter()
+                .find(|p| p.package_name == package_name && p.repo_tag == *pinned_tag)
+                .cloned()
+        } else {
+            self.available_packages
+                .iter()
+                .find(|p| p.package_name == package_name && p.repo_tag == "main")
+                .cloned()
+        }
+    }
+}
+
+impl Default for AlpineApkEdgeOverlayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 10. Debian apt-listchanges News & Security Auditor Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChangelogEntry {
+    pub package_name: String,
+    pub version: String,
+    pub date: String,
+    pub urgency: String,
+    pub summary: String,
+    pub is_security_fix: bool,
+    pub has_breaking_news: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AuditAlert {
+    pub package_name: String,
+    pub alert_type: String,
+    pub message: String,
+}
+
+pub struct AptListChangesNewsAuditorEngine {
+    pub changelogs: Vec<ChangelogEntry>,
+}
+
+impl AptListChangesNewsAuditorEngine {
+    pub fn new() -> Self {
+        Self {
+            changelogs: Vec::new(),
+        }
+    }
+
+    pub fn record_changelog(&mut self, entry: ChangelogEntry) {
+        self.changelogs.push(entry);
+    }
+
+    pub fn audit_pending_upgrades(&self, pkg_names: &[&str]) -> Vec<AuditAlert> {
+        let mut alerts = Vec::new();
+        for entry in &self.changelogs {
+            if pkg_names.contains(&entry.package_name.as_str()) {
+                if entry.has_breaking_news {
+                    alerts.push(AuditAlert {
+                        package_name: entry.package_name.clone(),
+                        alert_type: "BREAKING_CHANGE".to_string(),
+                        message: entry.summary.clone(),
+                    });
+                } else if entry.is_security_fix {
+                    alerts.push(AuditAlert {
+                        package_name: entry.package_name.clone(),
+                        alert_type: "SECURITY_FIX".to_string(),
+                        message: entry.summary.clone(),
+                    });
+                }
+            }
+        }
+        alerts
+    }
+}
+
+impl Default for AptListChangesNewsAuditorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 11. Silverblue / rpm-ostree Layered Image Deployment Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LayeredPackageDeployment {
+    pub deployment_id: u32,
+    pub base_commit: String,
+    pub layered_packages: Vec<String>,
+    pub is_active: bool,
+    pub is_pending: bool,
+}
+
+pub struct RpmOstreeTransactionalEngine {
+    pub deployments: Vec<LayeredPackageDeployment>,
+    pub next_id: u32,
+}
+
+impl RpmOstreeTransactionalEngine {
+    pub fn new(base_commit: &str) -> Self {
+        let initial = LayeredPackageDeployment {
+            deployment_id: 1,
+            base_commit: base_commit.to_string(),
+            layered_packages: Vec::new(),
+            is_active: true,
+            is_pending: false,
+        };
+        Self {
+            deployments: vec![initial],
+            next_id: 2,
+        }
+    }
+
+    pub fn stage_layered_package(&mut self, pkg_name: &str) -> u32 {
+        let active = self.deployments.iter().find(|d| d.is_active).unwrap();
+        let mut new_pkgs = active.layered_packages.clone();
+        if !new_pkgs.contains(&pkg_name.to_string()) {
+            new_pkgs.push(pkg_name.to_string());
+        }
+
+        let pending = LayeredPackageDeployment {
+            deployment_id: self.next_id,
+            base_commit: active.base_commit.clone(),
+            layered_packages: new_pkgs,
+            is_active: false,
+            is_pending: true,
+        };
+        let id = self.next_id;
+        self.next_id += 1;
+        self.deployments.push(pending);
+        id
+    }
+
+    pub fn commit_pending(&mut self) -> Result<(), String> {
+        let pending_idx = self
+            .deployments
+            .iter()
+            .position(|d| d.is_pending)
+            .ok_or("No pending deployment")?;
+
+        for d in &mut self.deployments {
+            d.is_active = false;
+        }
+
+        self.deployments[pending_idx].is_active = true;
+        self.deployments[pending_idx].is_pending = false;
+        Ok(())
+    }
+
+    pub fn get_active_deployment(&self) -> Option<&LayeredPackageDeployment> {
+        self.deployments.iter().find(|d| d.is_active)
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -481,5 +746,75 @@ mod tests {
 
         let config = moss.query_stateless_default_config("nano", "/etc/nanorc");
         assert_eq!(config, Some("set syntaxon".to_string()));
+    }
+
+    #[test]
+    fn test_xbps_src_template_sandbox() {
+        let mut xbps_src = XbpsSrcTemplateSandboxEngine::new("/host/chroot", "x86_64");
+        xbps_src.register_template(XbpsTemplate {
+            pkgname: "xtools".to_string(),
+            version: "0.59".to_string(),
+            revision: 1,
+            short_desc: "Void Linux utility scripts".to_string(),
+            depends: vec![],
+            makedepends: vec![],
+            build_style: "gnu-makefile".to_string(),
+        });
+
+        let binary_pkg = xbps_src.build_src_package("xtools").unwrap();
+        assert_eq!(binary_pkg, "xtools-0.59_1.x86_64.xbps");
+    }
+
+    #[test]
+    fn test_alpine_apk_edge_overlay() {
+        let mut apk = AlpineApkEdgeOverlayEngine::new();
+        apk.register_repo_tag("edge", "https://dl-cdn.alpinelinux.org/alpine/edge/testing", 100);
+        apk.register_available_package(TaggedPackageSpec {
+            package_name: "neovim".to_string(),
+            version: "0.9.0".to_string(),
+            repo_tag: "main".to_string(),
+        });
+        apk.register_available_package(TaggedPackageSpec {
+            package_name: "neovim".to_string(),
+            version: "0.10.0".to_string(),
+            repo_tag: "edge".to_string(),
+        });
+
+        assert_eq!(apk.resolve_package("neovim").unwrap().version, "0.9.0");
+
+        apk.pin_package("neovim", "edge");
+        assert_eq!(apk.resolve_package("neovim").unwrap().version, "0.10.0");
+    }
+
+    #[test]
+    fn test_apt_listchanges_news_auditor() {
+        let mut auditor = AptListChangesNewsAuditorEngine::new();
+        auditor.record_changelog(ChangelogEntry {
+            package_name: "openssh".to_string(),
+            version: "9.3p1".to_string(),
+            date: "2024-01-01".to_string(),
+            urgency: "high".to_string(),
+            summary: "Deprecate DSA keys by default".to_string(),
+            is_security_fix: true,
+            has_breaking_news: true,
+        });
+
+        let alerts = auditor.audit_pending_upgrades(&["openssh"]);
+        assert_eq!(alerts.len(), 1);
+        assert_eq!(alerts[0].alert_type, "BREAKING_CHANGE");
+    }
+
+    #[test]
+    fn test_rpm_ostree_transactional_engine() {
+        let mut ostree = RpmOstreeTransactionalEngine::new("commit_base_sha_123");
+        assert_eq!(ostree.get_active_deployment().unwrap().deployment_id, 1);
+
+        let pending_id = ostree.stage_layered_package("htop");
+        assert_eq!(pending_id, 2);
+
+        assert!(ostree.commit_pending().is_ok());
+        let active = ostree.get_active_deployment().unwrap();
+        assert_eq!(active.deployment_id, 2);
+        assert!(active.layered_packages.contains(&"htop".to_string()));
     }
 }

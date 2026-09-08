@@ -53,6 +53,10 @@ pub mod svntogit_repro;
 pub use sovereign_package_innovations::{
     AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
     GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
+    XbpsSrcTemplateSandboxEngine, XbpsTemplate, SandboxEnvironment,
+    AlpineApkEdgeOverlayEngine, ApkRepoTag, TaggedPackageSpec,
+    AptListChangesNewsAuditorEngine, ChangelogEntry, AuditAlert,
+    RpmOstreeTransactionalEngine, LayeredPackageDeployment,
 };
 pub mod spec;
 pub mod store;
@@ -149,6 +153,10 @@ pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use sovereign_package_innovations::{
     ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
     NixFlakeHermeticCacheStore,
+    XbpsSrcTemplateSandboxEngine, XbpsTemplate, SandboxEnvironment,
+    AlpineApkEdgeOverlayEngine, ApkRepoTag, TaggedPackageSpec,
+    AptListChangesNewsAuditorEngine, ChangelogEntry, AuditAlert,
+    RpmOstreeTransactionalEngine, LayeredPackageDeployment,
 };
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,

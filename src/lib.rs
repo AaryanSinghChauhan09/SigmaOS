@@ -101,6 +101,10 @@ pub use package::bsd_linux_package_innovations::{
     SlotOperator, SovereignPackageBuildProvenanceEngine, UbuntuPpaAptPinningEngine, XbpsCachedPkg,
     XbpsDowngradeRepoEngine, XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine,
     ZypperPackageOffer, ZypperRepository,
+    FreeBsdPoudriereMatrixEngine, PoudriereJailSpec, PoudrierePortTask, PoudriereBuildReport,
+    NixGuixStoreDeduplicatorEngine, StoreFileInode, DeduplicationSummary,
+    FedoraModularityModulemdEngine, ModuleStreamSpec,
+    ArchPacmanParallelDownloadEngine, MirrorBenchmark,
 };
 
 pub use security::{

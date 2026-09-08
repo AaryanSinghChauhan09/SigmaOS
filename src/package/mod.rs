@@ -72,6 +72,10 @@ pub use bsd_linux_package_innovations::{
     SlotOperator, SovereignPackageBuildProvenanceEngine, UbuntuPpaAptPinningEngine, XbpsCachedPkg,
     XbpsDowngradeRepoEngine, XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine,
     ZypperPackageOffer, ZypperRepository,
+    FreeBsdPoudriereMatrixEngine, PoudriereJailSpec, PoudrierePortTask, PoudriereBuildReport,
+    NixGuixStoreDeduplicatorEngine, StoreFileInode, DeduplicationSummary,
+    FedoraModularityModulemdEngine, ModuleStreamSpec,
+    ArchPacmanParallelDownloadEngine, MirrorBenchmark,
 };
 pub use checkupdates::{CheckupdatesEngine, PackageUpdate};
 pub use debian::{
