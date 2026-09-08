@@ -77,6 +77,10 @@ This document defines operational guidelines, security policies, and verificatio
 - Follow technical directives in `AGENTS_ACCESS_MANAGEMENT.md` and `docs/AGENTS_ACCESS_MANAGEMENT.md`.
 - Manage the complete access lifecycle across LDAP directory services (`LdapAccessClient`), anonymous/authenticated client tiers, direct/relative path canonicalization, memory access protection (`W^X`), read/write permission enforcers (`FileAttributeAccessControl`), RAT remote files, and wireless access points.
 
+### N. Zero-Dependency & Pre-Defined Library Reduction Management
+- Follow technical directives in `docs/AGENTS_ZERO_DEPENDENCY_PREDEFINED_REDUCTION.md`.
+- Enforce strict `#![no_std]` bare-metal architecture, replace pre-defined standard and third-party functions/libraries with custom user-defined functions (UDFs) and algorithms, apply bare-metal OOP design patterns (Factory, Adapter, Observer, Singleton), and run `./scripts/no_std_check.sh` to verify zero-dependency purity.
+
 ---
 
 ## 3. Pre-Commit Verification Checklist for AI Agents

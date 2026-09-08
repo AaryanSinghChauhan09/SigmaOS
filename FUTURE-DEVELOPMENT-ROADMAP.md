@@ -4810,3 +4810,32 @@ All technical roadmap updates, architecture specifications, and compliance matri
 ```
 
 This updates all target wiki directories (`WIKI/`, `wiki/`, `wiki_repo/`), ensuring complete alignment between the repository codebase, documentation root, and GitHub Wiki targets.
+
+## 101. SOVEREIGN ZERO-DEPENDENCY, PRE-DEFINED FUNCTION & LIBRARY ELIMINATION ARCHITECTURE SPECIFICATION
+
+### 101.1 Core Mission & Elimination Philosophy
+SigmaOS is engineered as an autonomous, self-hosting, bare-metal operating system built from first principles. To ensure complete architectural sovereignty, transparency, and freedom from supply-chain risks or third-party bloat:
+1. **Pre-Defined Function & Standard Library Elimination (`#![no_std]`):** All operating system components, kernel modules, device drivers, virtual filesystems, network stacks, and desktop compositors must run directly on bare hardware without importing or depending on pre-defined language runtime standard libraries (e.g. Rust `std::`, C `libc`/`glibc`/`musl`, C++ `std::`, Zig `std`, or Nim system runtimes).
+2. **User-Defined Functions (UDFs) & Primitives:** Every data structure (`SigmaHashMap`, `SigmaBTreeMap`, `SigmaVec`, `SigmaString`), math primitive, memory allocator, string formatter, hash function, and lock-free synchronization construct must be built using custom user-defined primitives in `src/klib/`.
+3. **Third-Party Package & Library Independence:** External third-party libraries, SDKs, or pre-compiled binaries are strictly prohibited in the core OS. All functionality—from PQC cryptography (Kyber-1024, Dilithium-5) to TCP/IP networking, Ext4/JBD2 filesystem journaling, and the Zenith graphics compositor—is implemented natively inside the SigmaOS codebase.
+
+### 101.2 Bare-Metal Object-Oriented Principles (OOP) & Design Patterns
+Subsystems across SigmaOS strictly implement structured object-oriented design paradigms tailored for low-level memory-mapped I/O and bare-metal hardware execution:
+- **Encapsulation:** Hardware control registers, PCI config spaces, and MMIO memory regions are encapsulated inside strict, type-safe guard objects (`SovereignVMM`, `NvmeQueueGuard`, `XhciControllerGuard`).
+- **Factory Pattern:** Dynamic driver allocation (`DriverFactory`), package format strategies (`PackageFactory::get_strategy()`), and metadata adapters instantiated based on hardware IDs or format signatures.
+- **Adapter Pattern:** Universal compatibility shims (`UniversalPackageTranslator`, `ForeignDistroAdapter`, `SyscallAdapter`) converting legacy Linux/BSD interfaces into native SigmaOS primitives without relying on foreign runtime wrappers.
+- **Observer Pattern:** Asynchronous event handling and thread-safe notifications (`PackageTriggerRegistry`, `KernelEventObserver`) for hardware interrupts, hotplug events, and packet arrivals.
+- **Singleton Pattern:** Central system management controllers (`SovereignVMM`, `SovereignSched`, `DriverCoordinator`) providing thread-safe global access to hardware resources.
+
+### 101.3 Verification & Wiki Synchronization
+Zero-dependency purity is validated autonomously using:
+```bash
+# 1. Verify #![no_std] purity and symbol isolation
+./scripts/no_std_check.sh
+
+# 2. Run full SigmaOS test suite
+./run_sigma_tests.sh
+
+# 3. Synchronize documentation with Wiki targets
+./scripts/sync_wiki.sh
+```
