@@ -25,6 +25,8 @@ use std::format;
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 
 #[cfg(not(feature = "standalone_test"))]
 use super::sovereign_distro_dominance::SovereignDistroDominanceSuite;
