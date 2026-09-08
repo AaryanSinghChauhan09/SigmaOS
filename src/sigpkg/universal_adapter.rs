@@ -54,15 +54,7 @@ pub struct PacmanPkgbuild {
 use crate::sigpkg::universal_engine::PackageFormat;
 use crate::sigpkg::universal_oop_system::{self, UniversalPackageManager};
 
-/// Debian-style package priority levels (DFSG and APT standard)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PackagePriority {
-    Optional = 0,
-    Standard = 1,
-    Important = 2,
-    Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
-}
+pub use crate::package::PackagePriority;
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;

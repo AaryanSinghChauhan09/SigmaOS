@@ -215,12 +215,13 @@ pub enum PackageState {
     BrokenDependency,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PackagePriority {
-    Essential,
-    Required,
-    Important,
-    Standard,
-    Optional,
+    Optional = 0,
+    Standard = 1,
+    Important = 2,
+    Required = 3,
+    Essential = 4,
 }
 
 /// Supported package formats across Linux and BSD ecosystems
@@ -1396,7 +1397,7 @@ pub struct AptDebManifest {
     pub version: String,
     pub depends: Vec<String>,
     pub description: String,
-    pub priority: crate::sigpkg::universal_adapter::PackagePriority,
+    pub priority: PackagePriority,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
