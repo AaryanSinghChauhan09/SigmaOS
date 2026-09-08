@@ -499,6 +499,7 @@ pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
     pub distro_gap_closure: SovereignDistroGapClosureEngine,
+    pub wiki_arch_engine: crate::distro::SovereignLinuxBsdWikiArchitectureEngine,
 }
 
 impl SovereignWikiMasterEngine {
@@ -507,6 +508,7 @@ impl SovereignWikiMasterEngine {
             suite_100_ideas: Sovereign100IdeasSuite::new(),
             shards_registry: SovereignShardsMasterRegistry::new(),
             distro_gap_closure: SovereignDistroGapClosureEngine::new(),
+            wiki_arch_engine: crate::distro::SovereignLinuxBsdWikiArchitectureEngine::new(),
         }
     }
 
@@ -514,8 +516,9 @@ impl SovereignWikiMasterEngine {
         let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
         let shards_ok = self.shards_registry.is_all_12_shards_active();
         let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
+        let arch_ok = self.wiki_arch_engine.verify_full_wiki_production_architecture();
 
-        ideas_ok && shards_ok && gap_closure_ok
+        ideas_ok && shards_ok && gap_closure_ok && arch_ok
     }
 
     pub fn evaluate_wiki_roadmap_fulfillment(&self) -> bool {

@@ -173,8 +173,9 @@ pub use wiki_ideas_implementation::{
     FreeBsdCapsicumDescriptorDelegate, Generation, JournalLogEntry, NixDeclarativeSystemState,
     NumaNodeAffinity, PolicyAction, RtlaneRealtimeTask, SigmaZeroCopySpliceEngine, SigpkgRecipe,
     SnapperSnapshot as WikiSnapperSnapshot, SnapperTransactionGuard,
-    SovereignHybridSchedulerInnovations, SovereignSystemdParityEngine, SovereignSystemdUnit,
-    SystemdUnitState, SystemdUnitType, CAP_FSTAT, CAP_READ, CAP_SEEK, CAP_WRITE,
+    SovereignHybridSchedulerInnovations, SovereignLinuxBsdWikiArchitectureEngine,
+    SovereignSystemdParityEngine, SovereignSystemdUnit, SystemdUnitState, SystemdUnitType,
+    CAP_FSTAT, CAP_READ, CAP_SEEK, CAP_WRITE,
 };
 
 pub use missing_distro_innovations::{
