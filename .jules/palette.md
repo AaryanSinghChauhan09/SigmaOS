@@ -9,3 +9,7 @@
 ## 2026-10-15 - System High-Contrast & Forced-Colors Media Query Support
 **Learning:** Hardcoded `!important` hex colors in CSS high-contrast rules override user-configured system accessibility palettes in Windows High Contrast / Forced Colors mode; using standard CSS system colors (`Canvas`, `CanvasText`, `Highlight`, `HighlightText`) alongside media query feature detection (`prefers-contrast: high` and `forced-colors: active`) ensures compliance with WCAG 2.1 Level AA without breaking custom themes.
 **Action:** Use CSS system keywords (`Canvas`, `CanvasText`, `Highlight`) inside `(forced-colors: active)` media queries and auto-initialize high-contrast detection listeners on DOM ready.
+
+## 2026-11-20 - Desktop Right-Click Context Menu Accessibility & Keyboard Focus States
+**Learning:** Web OS desktop context menus constructed with non-semantic `<div>` elements prevent screen readers from identifying menu items (`role="menu"` / `role="menuitem"`) and block keyboard navigation because `<div>` elements do not receive default focus or `:focus-visible` styling without explicit button resets and outline indicators.
+**Action:** Structure context menus with `<div role="menu">` containers, `<button type="button" class="context-item" role="menuitem">` options, `<div role="separator">` dividers, explicit `aria-label` attributes, and CSS reset rules with `:focus-visible` outline indicators.
