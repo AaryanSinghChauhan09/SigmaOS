@@ -879,7 +879,7 @@ impl SovereignCacheEngine {
     pub fn set(&mut self, key: &str, value: &[u8], ttl_secs: u64) {
         self.current_tick += 1;
 
-        // Bolt optimization: Mutate existing key in-place to avoid retain vector shift & heap re-allocations
+        // Bolt Optimization: In-place update prevents O(N) element shifts and redundant allocations on existing key update
         if let Some(entry) = self.entries.iter_mut().find(|e| e.key == key) {
             entry.value.clear();
             entry.value.extend_from_slice(value);

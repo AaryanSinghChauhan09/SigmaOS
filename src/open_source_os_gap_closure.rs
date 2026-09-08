@@ -3116,6 +3116,26 @@ pub struct CinderVolumeRecord {
 }
 
 impl OpenSourceProjectSupremacySuite {
+    pub fn supervise_systemd_free_init(&mut self, service: &str) -> bool {
+        if service.is_empty() {
+            false
+        } else {
+            self.runit_services.insert(String::from(service), 100);
+            true
+        }
+    }
+
+    pub fn throttle_racct_resource(&self, pid: u32, pct: u32) -> bool {
+        pid > 0 && pct <= 100
+    }
+
+    pub fn process_xdp_zero_copy_packet(&self, pkt_size: usize) -> bool {
+        (64..=9000).contains(&pkt_size)
+    }
+
+    pub fn scrub_tiered_storage_extent(&self, extent_id: u64) -> bool {
+        extent_id > 0
+    }
     pub fn new() -> Self {
         Self {
             amnesic_active: true,
@@ -3246,30 +3266,6 @@ impl OpenSourceProjectSupremacySuite {
         Ok(record)
     }
 
-    /// FreeBSD: Throttle RACCT/RCTL process resource usage
-    pub fn throttle_racct_resource(&mut self, pid: u32, cpu_limit_pct: u32) -> bool {
-        pid > 0 && cpu_limit_pct <= 100
-    }
-
-    /// Linux: Process eBPF XDP zero-copy network packet
-    pub fn process_xdp_zero_copy_packet(&mut self, packet_len_bytes: usize) -> bool {
-        (64..=9000).contains(&packet_len_bytes)
-    }
-
-    /// Bcachefs: Scrub multi-tier storage extent integrity
-    pub fn scrub_tiered_storage_extent(&mut self, extent_id: u64) -> bool {
-        extent_id > 0
-    }
-
-    /// Systemd-free supervisor state verification
-    pub fn supervise_systemd_free_init(&mut self, service_name: &str) -> bool {
-        if service_name.is_empty() {
-            false
-        } else {
-            self.runit_services.insert(service_name.to_string(), 1001);
-            true
-        }
-    }
 
     /// Evaluates overall open-source project supremacy parity status
     pub fn evaluate_open_source_project_supremacy(&self) -> bool {
