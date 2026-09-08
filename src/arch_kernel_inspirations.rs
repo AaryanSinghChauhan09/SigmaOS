@@ -83,7 +83,7 @@ impl KUnitEngine {
     pub fn run_suite(
         &mut self,
         suite_name: &str,
-        cases: Vec<(String, alloc::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)>,
+        cases: Vec<(String, Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)>,
     ) -> KUnitSuiteResult {
         let mut passed = 0;
         let mut failed = 0;
@@ -563,7 +563,14 @@ impl SignstarService {
     pub fn add_signer(&mut self, id: &str, policy: SignerPolicy) {
         self.signers.push(Signer {
             id: id.to_string(),
-            key,
+            key: SigningKey {
+                key_id: id.to_string(),
+                fingerprint: String::new(),
+                algorithm: SignatureAlgorithm::Ed25519,
+                backing: KeyBacking::SoftwareKey,
+                expires_at: 0,
+                is_revoked: false,
+            },
             policy,
             signed: false,
             signature_timestamp: 0,

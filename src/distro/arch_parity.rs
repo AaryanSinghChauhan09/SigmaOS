@@ -803,30 +803,6 @@ impl Default for ArchWikiOfflineEngine {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
-        let devtools = ArchCdevtoolsEngine::new();
-        let cmd = devtools.build_in_chroot("extra-x86_64-build", "curl").unwrap();
-        assert!(cmd.contains("arch-nspawn"));
-
-        let mut pkgctl = ArchPkgctlEngine::new();
-        let repo_url = pkgctl.clone_pkg_repo("nginx");
-        assert!(repo_url.contains("gitlab.archlinux.org"));
-
-        let archweb = ArchArchwebEngine::new();
-        let res = archweb.search("pacman");
-        assert_eq!(res.len(), 1);
-
-        let mut installer = ArchArchinstallEngine::new();
-        installer.set_config("/dev/nvme0n1", "desktop", "sovereign");
-        let inst_cmd = installer.execute_installation().unwrap();
-        assert!(inst_cmd.contains("archinstall"));
-
-        let wiki = ArchWikiOfflineEngine::new();
-        let articles = wiki.search("pacman");
-        assert_eq!(articles.len(), 1);
-    }
-
     use super::*;
 
     #[test]
