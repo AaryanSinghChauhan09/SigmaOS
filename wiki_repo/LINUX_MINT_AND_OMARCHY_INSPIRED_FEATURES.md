@@ -101,6 +101,19 @@ This document describes the features implemented in SigmaOS inspired by Linux Mi
 - Theme search by name/description
 - Default dark and light themes with Catppuccin-inspired colors
 
+### Command Palette System
+
+#### OmarchyCommandPalette
+- Filterable, nested command palette defined in JSONC for system control
+- Command action types (Shell, Open, Toggle, Navigate, Custom)
+- CommandPaletteItem with label, description, category, shortcut, icon
+- Search functionality with label/description/category matching
+- Category-based command filtering (System, Applications, Settings)
+- Keyboard navigation (next/previous selection)
+- Command execution with enabled/disabled states
+- Default commands for system operations, applications, and settings
+- Extensible architecture for custom commands
+
 ## Implementation Details
 
 All implementations follow SigmaOS's zero-dependency `#![no_std]` architecture using `alloc::` primitives for kernel-compatible code. The code maintains Linux/BSD cross-distro interoperability and applies security best practices including least-privilege sandboxing, PQC cryptography, and safe Rust patterns.
@@ -112,6 +125,7 @@ All implementations include comprehensive unit tests:
 - Mint desktop management: 5 tests passed
 - Mint system tools: 37 tests passed (driver: 5, usb: 6, blocker: 8, locale: 7, welcome: 5, report: 6)
 - Omarchy theme system: 6 tests passed
+- Omarchy command palette: 6 tests passed
 
 ## Files Added
 
@@ -131,6 +145,7 @@ All implementations include comprehensive unit tests:
 - `src/tools/mint_locale_manager.rs` - Locale manager
 - `src/tools/mint_welcome.rs` - Welcome screen
 - `src/tools/mint_system_report.rs` - System reporting
+- `src/tools/omarchy_command_palette.rs` - Command palette system
 - `src/tools/mod.rs` - Module exports
 
 ### Compatibility
@@ -140,7 +155,6 @@ All implementations include comprehensive unit tests:
 ## Future Enhancements
 
 Potential future additions based on Linux Mint and Omarchy Linux:
-- Command palette system (Omarchy-style shell-powered command palette)
 - Snapshot management (Btrfs-inspired system snapshots)
 - AI usage tracking widget (Omarchy-style model usage statistics)
 - LAN file sharing (Warpinator-inspired local network sharing)
