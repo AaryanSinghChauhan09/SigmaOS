@@ -3394,4 +3394,54 @@ MAINTAINER="SigmaOS"
         let (blocked_ok, _) = sec_engine.is_installation_blocked("safe-pkg");
         assert!(!blocked_ok);
     }
+
+    #[test]
+    fn test_all_prompt_package_formats_detection_and_adaptation() {
+        use crate::sigpkg::universal_engine::PackageFormat;
+
+        let test_cases = [
+            ("app.air", PackageFormat::Air),
+            ("pkg.bottle", PackageFormat::Bottle),
+            ("app.ipa", PackageFormat::Ipa),
+            ("bsd.ports", PackageFormat::Ports),
+            ("mac.pkg", PackageFormat::Pkg),
+            ("app.aab", PackageFormat::Aab),
+            ("app.apk", PackageFormat::Apk),
+            ("app.AppImage", PackageFormat::AppImage),
+            ("solus.eopkg", PackageFormat::Eopkg),
+            ("nix.nixpkg", PackageFormat::Nix),
+            ("gentoo.portage", PackageFormat::Portage),
+            ("debian.deb", PackageFormat::Apt),
+            ("archive.tar.gz", PackageFormat::TarGz),
+            ("archive.tar .gz", PackageFormat::TarGz),
+            ("compressed.xz", PackageFormat::TarXz),
+            ("fedora.rpm", PackageFormat::Yum),
+            ("gentoo.ebuild", PackageFormat::Portage),
+            ("arch.pkg.tar.xz", PackageFormat::Pacman),
+            ("app.flatpak", PackageFormat::Flatpak),
+            ("macos.app", PackageFormat::AppBundle),
+            ("harmony.hap", PackageFormat::Hap),
+            ("pardus.PiSi", PackageFormat::Pisi),
+            ("archive.tgz", PackageFormat::TarGz),
+            ("deepin.superdeb", PackageFormat::Superdeb),
+            ("slax.lzm", PackageFormat::Lzm),
+            ("puppy.pup", PackageFormat::Pup),
+            ("pup", PackageFormat::Pup),
+            ("canonical.snap", PackageFormat::Snap),
+            ("pacman.pkg.tar.zst", PackageFormat::Pacman),
+            ("pacman", PackageFormat::Pacman),
+            ("plain.tar", PackageFormat::Tar),
+            ("puppy.pet", PackageFormat::Pet),
+            ("pet", PackageFormat::Pet),
+        ];
+
+        for (filename, expected) in test_cases {
+            assert_eq!(
+                PackageFormat::from_filename(filename),
+                Some(expected),
+                "Failed format detection for filename: {}",
+                filename
+            );
+        }
+    }
 }
