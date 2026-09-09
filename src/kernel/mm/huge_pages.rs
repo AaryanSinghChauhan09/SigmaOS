@@ -15,7 +15,7 @@
 
 /// SigmaOS Huge Pages and hugetlbfs memory support
 /// Standard huge pages: 2MB or 1GB configurations to reduce TLB misses
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum HugePageSize {

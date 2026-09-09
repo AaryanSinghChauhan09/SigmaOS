@@ -21,7 +21,7 @@ use std::vec::Vec;
 // SigmaOS Email Client
 // OOP-based email client with IMAP/SMTP support and organization
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Email address
 #[derive(Debug, Clone)]

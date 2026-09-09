@@ -21,7 +21,7 @@ use std::vec::Vec;
 use std::format;
 
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 // =========================================================================
 // 1. HolyC JIT Compiler Shell

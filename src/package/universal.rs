@@ -282,12 +282,15 @@ pub enum PackageFormat {
     Opkg,       // OpenWrt OPKG (.opkg)
     SolarisIps, // Solaris IPS package (.p5p / .ips)
     GuixNar,    // GNU Guix Normalized Archive (.nar)
-}
-
-impl Default for PackageFormat {
-    fn default() -> Self {
-        Self::Deb
-    }
+    Spack,      // Spack HPC package manager (.spack)
+    Conan,      // Conan C/C++ package (.conan)
+    Wheel,      // Python Wheel (.whl)
+    Crate,      // Rust Cargo crate (.crate)
+    Gem,        // RubyGems (.gem)
+    Nupkg,      // .NET NuGet (.nupkg)
+    Vcpkg,      // Microsoft Vcpkg (.vcpkg)
+    NarInfo,    // Nix/Guix NarInfo substituter manifest (.narinfo)
+    Sysupdate,  // systemd sysupdate definition (.sysupdate)
 }
 
 impl PackageFormat {
@@ -404,6 +407,24 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
+        } else if normalized.ends_with(".sysupdate") {
+            Some(PackageFormat::Sysupdate)
         } else {
             None
         }
@@ -839,6 +860,15 @@ impl_generic_install_strategy!(IpkInstallStrategy);
 impl_generic_install_strategy!(OpkgInstallStrategy);
 impl_generic_install_strategy!(SolarisIpsInstallStrategy);
 impl_generic_install_strategy!(GuixNarInstallStrategy);
+impl_generic_install_strategy!(SpackInstallStrategy);
+impl_generic_install_strategy!(ConanInstallStrategy);
+impl_generic_install_strategy!(WheelInstallStrategy);
+impl_generic_install_strategy!(CrateInstallStrategy);
+impl_generic_install_strategy!(GemInstallStrategy);
+impl_generic_install_strategy!(NupkgInstallStrategy);
+impl_generic_install_strategy!(VcpkgInstallStrategy);
+impl_generic_install_strategy!(NarInfoInstallStrategy);
+impl_generic_install_strategy!(SysupdateInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1093,6 +1123,15 @@ impl_generic_metadata_adapter!(IpkMetadataAdapter, Ipk);
 impl_generic_metadata_adapter!(OpkgMetadataAdapter, Opkg);
 impl_generic_metadata_adapter!(SolarisIpsMetadataAdapter, SolarisIps);
 impl_generic_metadata_adapter!(GuixNarMetadataAdapter, GuixNar);
+impl_generic_metadata_adapter!(SpackMetadataAdapter, Spack);
+impl_generic_metadata_adapter!(ConanMetadataAdapter, Conan);
+impl_generic_metadata_adapter!(WheelMetadataAdapter, Wheel);
+impl_generic_metadata_adapter!(CrateMetadataAdapter, Crate);
+impl_generic_metadata_adapter!(GemMetadataAdapter, Gem);
+impl_generic_metadata_adapter!(NupkgMetadataAdapter, Nupkg);
+impl_generic_metadata_adapter!(VcpkgMetadataAdapter, Vcpkg);
+impl_generic_metadata_adapter!(NarInfoMetadataAdapter, NarInfo);
+impl_generic_metadata_adapter!(SysupdateMetadataAdapter, Sysupdate);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1137,6 +1176,81 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
                 "SandboxDecorator: Sandboxing enforced for package '{}'!",
                 self.get_package().name
             );
+        }
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct HardwareOptimizationDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub target_microarch_level: String,
+    pub required_simd_features: Vec<String>,
+}
+
+impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        println!(
+            "HardwareOptimizationDecorator: Microarch Level={}, SIMD={:?}",
+            self.target_microarch_level, self.required_simd_features
+        );
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct ResourceLimitDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub max_memory_bytes: u64,
+    pub cpu_quota_percent: u32,
+}
+
+impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        println!(
+            "ResourceLimitDecorator: Memory Limit={} bytes, CPU Quota={}%",
+            self.max_memory_bytes, self.cpu_quota_percent
+        );
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct PqcSignedDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub dilithium_signature: String,
+}
+
+impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        if !self.dilithium_signature.starts_with("dilithium-5-valid") {
+            return Err(PackageError::InstallationFailed(
+                "Dilithium signature verification failed".to_string(),
+            ));
         }
         self.decorated.enforce_sandbox()
     }
@@ -1236,6 +1350,15 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
+            PackageFormat::Spack => Box::new(SpackInstallStrategy),
+            PackageFormat::Conan => Box::new(ConanInstallStrategy),
+            PackageFormat::Wheel => Box::new(WheelInstallStrategy),
+            PackageFormat::Crate => Box::new(CrateInstallStrategy),
+            PackageFormat::Gem => Box::new(GemInstallStrategy),
+            PackageFormat::Nupkg => Box::new(NupkgInstallStrategy),
+            PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
+            PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
+            PackageFormat::Sysupdate => Box::new(SysupdateInstallStrategy),
         }
     }
 
@@ -1295,6 +1418,15 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
+            PackageFormat::Spack => Box::new(SpackMetadataAdapter),
+            PackageFormat::Conan => Box::new(ConanMetadataAdapter),
+            PackageFormat::Wheel => Box::new(WheelMetadataAdapter),
+            PackageFormat::Crate => Box::new(CrateMetadataAdapter),
+            PackageFormat::Gem => Box::new(GemMetadataAdapter),
+            PackageFormat::Nupkg => Box::new(NupkgMetadataAdapter),
+            PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
+            PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
+            PackageFormat::Sysupdate => Box::new(SysupdateMetadataAdapter),
         }
     }
 }
@@ -2120,67 +2252,7 @@ pub struct UniversalPackageManifestParser;
 
 impl UniversalPackageManifestParser {
     pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
-        let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".superdeb") {
-            Some(PackageFormat::Deb)
-        } else if name.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") {
-            Some(PackageFormat::Pacman)
-        } else if name.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
-        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
-            Some(PackageFormat::Nixpkg)
-        } else if name.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if name.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if name.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if name.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if name.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if name.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if name.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if name.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if name.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if name.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
-            Some(PackageFormat::TarGz)
-        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
-            Some(PackageFormat::Xz)
-        } else if name.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else if name.ends_with(".dports") {
-            Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
-        {
-            Some(PackageFormat::SlackBuild)
-        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
-            Some(PackageFormat::Crux)
-        } else if name.ends_with(".drpm") {
-            Some(PackageFormat::Drpm)
-        } else if name.ends_with(".stratum") {
-            Some(PackageFormat::Stratum)
-        } else if name.ends_with(".app") {
-            Some(PackageFormat::App)
-        } else {
-            None
-        }
+        PackageFormat::from_filename(filename)
     }
 
     pub fn parse_manifest_auto(
@@ -2328,7 +2400,7 @@ impl UniversalPackageFormatBridge {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -2750,7 +2822,10 @@ mod tests {
             PackageFormat::Tcz, PackageFormat::Gobo, PackageFormat::Ostree, PackageFormat::Pkgsrc,
             PackageFormat::Sfs, PackageFormat::Puk, PackageFormat::Dmg, PackageFormat::Cports,
             PackageFormat::Dports, PackageFormat::SlackBuild, PackageFormat::Crux, PackageFormat::Drpm,
-            PackageFormat::Stratum
+            PackageFormat::Stratum, PackageFormat::OpenBsdPkg, PackageFormat::Ipk, PackageFormat::Opkg,
+            PackageFormat::SolarisIps, PackageFormat::GuixNar, PackageFormat::Spack, PackageFormat::Conan,
+            PackageFormat::Wheel, PackageFormat::Crate, PackageFormat::Gem, PackageFormat::Nupkg,
+            PackageFormat::Vcpkg, PackageFormat::NarInfo, PackageFormat::Sysupdate
         ];
 
         for fmt in formats {

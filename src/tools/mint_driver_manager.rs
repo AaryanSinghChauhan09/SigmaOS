@@ -3,7 +3,6 @@
 //! This module implements a driver manager inspired by Linux Mint's mintdrivers,
 //! which handles installation and management of proprietary and open-source drivers.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;

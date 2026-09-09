@@ -19,7 +19,7 @@ use std::vec::Vec;
 // SigmaOS Constellation & Museum Architecture for Legacy Compatibility (SigmaConstellation)
 // Implements Kernel Constellations, Syscall Chronicles, Driver Museums, Firmware Pavilions, Build Archives, Security Pavilions, and Peripheral Museums.
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 // ==========================================
 // 1. Kernel Personality Constellation (KernelConstellation)

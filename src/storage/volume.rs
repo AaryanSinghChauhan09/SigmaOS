@@ -1,10 +1,13 @@
-// SPDX-License-Identifier: MIT
 /// OOP-based Volume Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
-use std::boxed::Box;
-use std::vec::Vec;
+
+extern crate alloc;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 pub type VolumeID = usize;
 
@@ -58,6 +61,26 @@ impl SimpleVolume {
             size: AtomicUsize::new(size as usize),
             mounted: AtomicUsize::new(0),
         }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -199,6 +222,43 @@ impl SimpleSnapshotManager {
     pub fn new() -> Self {
         SimpleSnapshotManager {
             snapshots: Vec::new(),
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

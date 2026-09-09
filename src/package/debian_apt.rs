@@ -1,10 +1,9 @@
-use std::collections::{BTreeSet, BTreeMap};
+#![allow(unused_imports)]
 // SigmaOS APT (Advanced Package Tool) Implementation
 // Implements Debian-style package management for SigmaOS
 // Inspired by Debian's APT for advanced package operations
 
 use crate::klib::collections::HashSet;
-use alloc::collections::BTreeMap;
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::string::String;
 use alloc::vec::Vec;

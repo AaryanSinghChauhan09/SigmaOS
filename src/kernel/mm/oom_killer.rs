@@ -17,7 +17,7 @@ use std::vec;
 use crate::kernel::scheduler::Process;
 /// SigmaOS OOM (Out Of Memory) Killer implementation
 /// Calculates badness score of processes and kills the worst culprit
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 pub struct OomKiller {
     oom_scores_adj: BTreeMap<u64, i32>,

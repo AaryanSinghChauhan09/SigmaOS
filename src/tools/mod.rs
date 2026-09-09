@@ -13,6 +13,12 @@ pub mod mint_locale_manager;
 pub mod mint_welcome;
 pub mod mint_system_report;
 pub mod omarchy_command_palette;
+pub mod timeshift_snapshot_manager;
+pub mod warpinator_lan_sharing;
+pub mod mint_backup_manager;
+pub mod mint_system;
+pub mod mint_desktop;
+pub mod mint_menu;
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
@@ -53,5 +59,28 @@ pub use mint_welcome::{
 pub use mint_system_report::{
     MintSystemReport, SystemInfoCategory, SystemInfoItem,
 };
+pub use timeshift_snapshot_manager::{
+    SnapshotConfig, SnapshotLevel, SnapshotMetadata, SnapshotMode, SnapshotResult,
+    SnapshotStatistics, RestoreResult, TimeshiftSnapshotManager,
+};
+pub use warpinator_lan_sharing::{
+    DeviceInfo, GroupCode, TransferItem, TransferResult, TransferStatistics, TransferStatus,
+    WarpinatorLanSharing,
+};
+pub use mint_backup_manager::{
+    BackupConfig, BackupMetadata, BackupResult, BackupStatistics, BackupStatus, BackupType,
+    MintBackupManager, PackageList,
+};
+pub use mint_system::{
+    AptCommand, AptResult, MintSystem,
+};
+pub use mint_desktop::{
+    DesktopLayout, DesktopSettings, MintDesktop, ThemeSettings, WindowManager,
+};
+pub use mint_menu::{
+    MenuCategory, MenuItem, MenuItemType, MenuSearchResult, MintMenu,
+};
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
+pub mod native_userland_replacements;
+pub use native_userland_replacements::MasterNativeUserlandReplacements;

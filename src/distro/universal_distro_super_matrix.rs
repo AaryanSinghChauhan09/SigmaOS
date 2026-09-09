@@ -241,6 +241,22 @@ impl UniversalDistroSuperMatrix {
         self.ebuild_matrix_slots
             .insert(package.to_string(), flag_list);
     }
+
+    pub fn is_nix_hermetic_store_active(&self) -> bool {
+        self.nix_hermetic_store_active
+    }
+
+    pub fn set_nix_hermetic_store_active(&mut self, active: bool) {
+        self.nix_hermetic_store_active = active;
+    }
+
+    pub fn is_gamescope_microcompositor_active(&self) -> bool {
+        self.gamescope_microcompositor_active
+    }
+
+    pub fn set_gamescope_microcompositor_active(&mut self, active: bool) {
+        self.gamescope_microcompositor_active = active;
+    }
 }
 
 impl Default for UniversalDistroSuperMatrix {

@@ -18,7 +18,7 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// Caches file data in memory pages, tracks dirty pages, writeback pressure
 
 #[cfg(not(test))]
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 #[cfg(test_disabled)]
 use std::collections::BTreeMap;

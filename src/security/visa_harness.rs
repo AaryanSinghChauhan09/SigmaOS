@@ -21,7 +21,7 @@ use std::format;
 // Formally implements compilable, production-ready Rust structures for the absorbed VVAH SAST pipeline:
 // 1. VisaVulnerabilityAgenticHarness (Phase 1-4, Stage S1-S11 pipeline, SARIF reporting, and adversarial validation)
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PipelineStage {

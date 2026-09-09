@@ -2,9 +2,12 @@ name: FreeBSD Poudriere Ports & Jails CI
 
 on:
   push:
-    branches: [ "main", "master", "jules-*" ]
+    branches: [ "main" ]
+
+permissions:
+  contents: read
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
 
 jobs:
   freebsd-poudriere-ports:

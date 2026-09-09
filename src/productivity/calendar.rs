@@ -20,8 +20,7 @@ use std::vec::Vec;
 // SigmaOS Calendar App
 // OOP-based calendar with events, reminders, and scheduling
 
-#[cfg(not(test))]
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 #[cfg(test_disabled)]
 use std::collections::BTreeMap;
 // SystemTime not in no_std

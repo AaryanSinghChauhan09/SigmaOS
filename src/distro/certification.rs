@@ -17,7 +17,7 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TestResult {

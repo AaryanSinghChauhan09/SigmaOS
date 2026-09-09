@@ -24,7 +24,7 @@ use std::vec::Vec;
 use crate::klib::HashMap;
 
 #[cfg(all(not(test), target_os = "none"))]
-use crate::klib::BTreeMap as HashMap;
+use crate::klib::btreemap::BTreeMap as HashMap;
 
 #[cfg(test)]
 use std::collections::HashMap;
@@ -1021,88 +1021,95 @@ impl Default for ManjaroSettingsManager {
     }
 }
 
-/// Manjaro rolling update branch types
+/// Manjaro Release Branch Tier (Stable, Testing, Unstable)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ManjaroBranchType {
+pub enum ManjaroBranchTier {
     Stable,
     Testing,
     Unstable,
 }
 
-/// Manjaro pacman-mirrors Branch Switcher & Fasttrack Mirror Engine
+/// Manjaro Branch Switcher Engine (pacman-mirrors -api -set-branch parity)
 #[derive(Debug, Clone)]
-pub struct ManjaroBranchSwitcherEngine {
-    pub current_branch: ManjaroBranchType,
-    pub fasttrack_mirrors_count: usize,
-    pub sync_database_url: String,
+pub struct ManjaroBranchSwitcher {
+    pub current_branch: ManjaroBranchTier,
+    pub branch_sync_timestamps: HashMap<String, u64>,
 }
 
-impl ManjaroBranchSwitcherEngine {
+impl ManjaroBranchSwitcher {
     pub fn new() -> Self {
+        let mut syncs = HashMap::new();
+        syncs.insert("Stable".to_string(), 1700000000);
+        syncs.insert("Testing".to_string(), 1700050000);
+        syncs.insert("Unstable".to_string(), 1700100000);
+
         Self {
-            current_branch: ManjaroBranchType::Stable,
-            fasttrack_mirrors_count: 10,
-            sync_database_url: String::from("https://repo.manjaro.org/repo/stable/$repo/$arch"),
+            current_branch: ManjaroBranchTier::Stable,
+            branch_sync_timestamps: syncs,
         }
     }
 
-    pub fn switch_branch(&mut self, target_branch: ManjaroBranchType) -> String {
-        self.current_branch = target_branch;
-        match target_branch {
-            ManjaroBranchType::Stable => {
-                self.sync_database_url = String::from("https://repo.manjaro.org/repo/stable/$repo/$arch");
-            }
-            ManjaroBranchType::Testing => {
-                self.sync_database_url = String::from("https://repo.manjaro.org/repo/testing/$repo/$arch");
-            }
-            ManjaroBranchType::Unstable => {
-                self.sync_database_url = String::from("https://repo.manjaro.org/repo/unstable/$repo/$arch");
-            }
-        }
-        self.sync_database_url.clone()
+    pub fn set_branch(&mut self, branch: ManjaroBranchTier) -> Result<String, &'static str> {
+        self.current_branch = branch;
+        let branch_name = format!("{:?}", branch);
+        Ok(format!("Switched pacman-mirrors branch to '{}'", branch_name))
     }
 }
 
-impl Default for ManjaroBranchSwitcherEngine {
+impl Default for ManjaroBranchSwitcher {
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// Manjaro Architect CLI Net-Installer Profile & Subvolume Generator
+/// Manjaro Architect CLI Netinstaller Engine
 #[derive(Debug, Clone)]
-pub struct ManjaroArchitectProfileGenerator {
-    pub desktop_edition: String, // "KDE", "XFCE", "GNOME", "Minimal"
-    pub filesystem_type: String, // "btrfs", "zfs", "ext4", "f2fs"
-    pub selected_packages: Vec<String>,
+pub struct ArchitectInstallerProfile {
+    pub profile_name: String,
+    pub desktop_environment: String,
+    pub selected_kernel: ManjaroKernelRelease,
+    pub btrfs_subvolumes_enabled: bool,
+    pub zfs_root_enabled: bool,
+    pub custom_packages: Vec<String>,
 }
 
-impl ManjaroArchitectProfileGenerator {
-    pub fn new(edition: &str, fs: &str) -> Self {
+pub struct ArchitectInstallerEngine {
+    pub profiles: Vec<ArchitectInstallerProfile>,
+}
+
+impl ArchitectInstallerEngine {
+    pub fn new() -> Self {
         Self {
-            desktop_edition: edition.to_string(),
-            filesystem_type: fs.to_string(),
-            selected_packages: Vec::new(),
+            profiles: Vec::new(),
         }
     }
 
-    pub fn add_package(&mut self, pkg: &str) {
-        if !self.selected_packages.contains(&pkg.to_string()) {
-            self.selected_packages.push(pkg.to_string());
-        }
+    pub fn register_profile(&mut self, profile: ArchitectInstallerProfile) {
+        self.profiles.push(profile);
     }
 
-    pub fn generate_installer_script(&self) -> String {
-        let mut script = format!(
-            "#!/bin/bash\n# Manjaro Architect Net-Installer Script\n# Edition: {}\n# Filesystem: {}\n\n",
-            self.desktop_edition, self.filesystem_type
-        );
-        script.push_str("basestrap /mnt base linux612 manjaro-system\n");
-        script.push_str("fstabgen -U /mnt >> /mnt/etc/fstab\n");
-        if !self.selected_packages.is_empty() {
-            script.push_str(&format!("manjaro-chroot /mnt pacman -S --noconfirm {}\n", self.selected_packages.join(" ")));
-        }
-        script
+    pub fn generate_installation_manifest(&self, profile_name: &str) -> Result<String, &'static str> {
+        let profile = self
+            .profiles
+            .iter()
+            .find(|p| p.profile_name == profile_name)
+            .ok_or("Architect installation profile not found")?;
+
+        Ok(format!(
+            "Manjaro Architect Manifest [{}]\nDesktop: {}\nKernel: {:?}\nBtrfs Subvols: {}\nZFS Root: {}\nPackages: {:?}",
+            profile.profile_name,
+            profile.desktop_environment,
+            profile.selected_kernel,
+            profile.btrfs_subvolumes_enabled,
+            profile.zfs_root_enabled,
+            profile.custom_packages
+        ))
+    }
+}
+
+impl Default for ArchitectInstallerEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -1189,28 +1196,31 @@ mod tests {
     }
 
     #[test]
-    fn test_manjaro_branch_switcher_engine() {
-        let mut switcher = ManjaroBranchSwitcherEngine::new();
-        assert_eq!(switcher.current_branch, ManjaroBranchType::Stable);
+    fn test_manjaro_branch_switcher() {
+        let mut switcher = ManjaroBranchSwitcher::new();
+        assert_eq!(switcher.current_branch, ManjaroBranchTier::Stable);
 
-        let testing_url = switcher.switch_branch(ManjaroBranchType::Testing);
-        assert_eq!(switcher.current_branch, ManjaroBranchType::Testing);
-        assert!(testing_url.contains("testing"));
-
-        let unstable_url = switcher.switch_branch(ManjaroBranchType::Unstable);
-        assert_eq!(switcher.current_branch, ManjaroBranchType::Unstable);
-        assert!(unstable_url.contains("unstable"));
+        let res = switcher.set_branch(ManjaroBranchTier::Testing).unwrap();
+        assert!(res.contains("Switched pacman-mirrors branch to 'Testing'"));
+        assert_eq!(switcher.current_branch, ManjaroBranchTier::Testing);
     }
 
     #[test]
-    fn test_manjaro_architect_profile_generator() {
-        let mut arch = ManjaroArchitectProfileGenerator::new("KDE", "btrfs");
-        arch.add_package("pamac-gtk");
-        arch.add_package("zsh");
+    fn test_architect_installer_engine() {
+        let mut architect = ArchitectInstallerEngine::new();
+        let profile = ArchitectInstallerProfile {
+            profile_name: "custom_kde_btrfs".to_string(),
+            desktop_environment: "KDE Plasma".to_string(),
+            selected_kernel: ManjaroKernelRelease::LinuxLts,
+            btrfs_subvolumes_enabled: true,
+            zfs_root_enabled: false,
+            custom_packages: vec!["neovim".to_string(), "zsh".to_string()],
+        };
 
-        let script = arch.generate_installer_script();
-        assert!(script.contains("Edition: KDE"));
-        assert!(script.contains("Filesystem: btrfs"));
-        assert!(script.contains("pamac-gtk zsh"));
+        architect.register_profile(profile);
+        let manifest = architect.generate_installation_manifest("custom_kde_btrfs").unwrap();
+        assert!(manifest.contains("custom_kde_btrfs"));
+        assert!(manifest.contains("KDE Plasma"));
+        assert!(manifest.contains("LinuxLts"));
     }
 }

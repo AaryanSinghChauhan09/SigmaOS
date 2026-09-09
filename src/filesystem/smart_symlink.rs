@@ -24,7 +24,10 @@ impl SymlinkResolverRule for LinuxPersonaRule {
         "linux-persona-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        persona.name().contains("Linux") || persona.name().contains("linux")
+        match persona {
+            KernelPersona::Linux_6_x | KernelPersona::Linux_2_6 => true,
+            _ => false,
+        }
     }
 }
 

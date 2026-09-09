@@ -14,6 +14,7 @@ pub mod sovereign_navigation_engine;
 pub mod zenith_compositor;
 pub mod ultimate_distro_desktop;
 pub mod wayland_protocol;
+pub mod weather_panel;
 
 pub use wayland_protocol::*;
 
@@ -25,6 +26,7 @@ pub use ultimate_distro_desktop::{
     Xfce418Engine,
 };
 
+pub mod web_wasm_bridge;
 pub use web_wasm_bridge::*;
 
 pub use mate_betsy::{
@@ -69,4 +71,8 @@ pub use sovereign_navigation_engine::{
     AppCategory, GnomePopLauncherNav, HudActionResult, KrunnerRofiCommandHud, LauncherAppItem,
     NavDirection, RangerDolphinSpatialFileNav, SovereignUniversalNavigationEngine,
     SystemControlNode, TilingWindowManagerNav, WindowNode, YastBsdConfigControlTreeNav,
+};
+
+pub use weather_panel::{
+    WeatherCondition, WeatherData, WeatherForecast, WeatherPanel,
 };

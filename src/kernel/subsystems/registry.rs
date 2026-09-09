@@ -20,7 +20,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Kernel Subsystem Registry
 /// Inspired by Linux initcall mechanism — provides ordered, dependency-aware subsystem boot
 /// OOP-based: every kernel module implements the KernelSubsystem trait
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

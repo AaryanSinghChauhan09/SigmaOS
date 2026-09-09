@@ -21,7 +21,7 @@ use std::vec::Vec;
 // SigmaOS File Manager
 // OOP-based file management with advanced features
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 // str/String not in no_std
 
 /// File item

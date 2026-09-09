@@ -10,7 +10,7 @@ use std::vec::Vec;
 // OpenRC runlevel dependency supervision, and Catalyst stage compilation.
 
 use crate::klib::hashset::HashSet;
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,

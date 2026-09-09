@@ -15,7 +15,7 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Configuration hook representing enterprise configuration scripts (e.g. Ansible playbook, Puppet manifest).
 #[derive(Debug, Clone)]

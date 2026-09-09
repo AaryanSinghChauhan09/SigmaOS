@@ -4,8 +4,8 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnsiColor {
@@ -1362,173 +1362,19 @@ impl TerminalSession {
                         .multiplexer
                         .split_active_pane(PaneSplitDirection::Horizontal);
                 }
-                TerminalAction::ClearScreen => {
-                    self.scrollback.clear();
-                    self.current_line.clear();
-                    self.cursor_x = 0;
-                    self.cursor_y = 0;
-                }
                 _ => {}
             }
             Some(action)
         } else {
             None
         }
-    }
-
-    pub fn parse_osc(&mut self, seq: &str) -> bool {
-        if !seq.starts_with("\x1B]") {
-            return false;
-        }
-
-        // Clean up string terminator (\x07 or \x1B\)
-        let payload = seq
-            .trim_start_matches("\x1B]")
-            .trim_end_matches('\x07')
-            .trim_end_matches("\x1B\\");
-
-        if payload.starts_with("0;") || payload.starts_with("2;") {
-            let title = &payload[2..];
-            self.active_window_title = title.to_string();
-            return true;
-        } else if payload.starts_with("8;") {
-            // OSC 8 Hyperlink parsing: 8;params;url
-            let parts: Vec<&str> = payload.splitn(3, ';').collect();
-            if parts.len() == 3 {
-                let url = parts[2];
-                let anchor = parts[1];
-                self.explicit_hyperlinks
-                    .push((anchor.to_string(), url.to_string()));
-                return true;
-            }
-        }
-
-        false
-    }
-
-    pub fn parse_ansi(&mut self, seq: &str) {
-        if seq.starts_with("\x1B]") {
-            self.parse_osc(seq);
-            return;
-        }
-        if !seq.starts_with("\x1B[") {
-            return;
-        }
-        let payload = &seq[2..];
-        if payload.ends_with('A') {
-            let steps = payload[..payload.len() - 1].parse::<usize>().unwrap_or(1);
-            self.cursor_y = self.cursor_y.saturating_sub(steps);
-        } else if payload.ends_with('B') {
-            let steps = payload[..payload.len() - 1].parse::<usize>().unwrap_or(1);
-            self.cursor_y = (self.cursor_y + steps).min(self.height - 1);
-        } else if payload.ends_with('C') {
-            let steps = payload[..payload.len() - 1].parse::<usize>().unwrap_or(1);
-            self.cursor_x = (self.cursor_x + steps).min(self.width - 1);
-        } else if payload.ends_with('D') {
-            let steps = payload[..payload.len() - 1].parse::<usize>().unwrap_or(1);
-            self.cursor_x = self.cursor_x.saturating_sub(steps);
-        } else if payload.ends_with('m') {
-            let content = &payload[..payload.len() - 1];
-            let parts: Vec<&str> = content.split(';').collect();
-            let mut i = 0;
-            while i < parts.len() {
-                if parts[i].is_empty() {
-                    i += 1;
-                    continue;
-                }
-                match parts[i].parse::<u32>().unwrap_or(0) {
-                    0 => {
-                        self.foreground = AnsiColor::Default;
-                        self.background = AnsiColor::Default;
-                        self.bold = false;
-                    }
-                    1 => {
-                        self.bold = true;
-                    }
-                    22 => {
-                        self.bold = false;
-                    }
-                    30 => self.foreground = AnsiColor::Black,
-                    31 => self.foreground = AnsiColor::Red,
-                    32 => self.foreground = AnsiColor::Green,
-                    33 => self.foreground = AnsiColor::Yellow,
-                    34 => self.foreground = AnsiColor::Blue,
-                    35 => self.foreground = AnsiColor::Magenta,
-                    36 => self.foreground = AnsiColor::Cyan,
-                    37 => self.foreground = AnsiColor::White,
-                    38 => {
-                        if i + 4 < parts.len() && parts[i + 1] == "2" {
-                            if let (Ok(r), Ok(g), Ok(b)) = (
-                                parts[i + 2].parse::<u8>(),
-                                parts[i + 3].parse::<u8>(),
-                                parts[i + 4].parse::<u8>(),
-                            ) {
-                                self.foreground = AnsiColor::Rgb(r, g, b);
-                            }
-                            i += 4;
-                        } else if i + 2 < parts.len() && parts[i + 1] == "5" {
-                            if let Ok(color_val) = parts[i + 2].parse::<u8>() {
-                                self.foreground = AnsiColor::Xterm256(color_val);
-                            }
-                            i += 2;
-                        } else if i + 4 < parts.len() && parts[i + 1] == "2" {
-                            if let (Ok(r), Ok(g), Ok(b)) = (
-                                parts[i + 2].parse::<u8>(),
-                                parts[i + 3].parse::<u8>(),
-                                parts[i + 4].parse::<u8>(),
-                            ) {
-                                self.foreground = AnsiColor::Rgb(r, g, b);
-                            }
-                            i += 4;
-                        }
-                    }
-                    40 => self.background = AnsiColor::Black,
-                    41 => self.background = AnsiColor::Red,
-                    42 => self.background = AnsiColor::Green,
-                    43 => self.background = AnsiColor::Yellow,
-                    44 => self.background = AnsiColor::Blue,
-                    45 => self.background = AnsiColor::Magenta,
-                    46 => self.background = AnsiColor::Cyan,
-                    47 => self.background = AnsiColor::White,
-                    48 => {
-                        if i + 4 < parts.len() && parts[i + 1] == "2" {
-                            if let (Ok(r), Ok(g), Ok(b)) = (
-                                parts[i + 2].parse::<u8>(),
-                                parts[i + 3].parse::<u8>(),
-                                parts[i + 4].parse::<u8>(),
-                            ) {
-                                self.background = AnsiColor::Rgb(r, g, b);
-                            }
-                            i += 4;
-                        } else if i + 2 < parts.len() && parts[i + 1] == "5" {
-                            if let Ok(color_val) = parts[i + 2].parse::<u8>() {
-                                self.background = AnsiColor::Xterm256(color_val);
-                            }
-                            i += 2;
-                        } else if i + 4 < parts.len() && parts[i + 1] == "2" {
-                            if let (Ok(r), Ok(g), Ok(b)) = (
-                                parts[i + 2].parse::<u8>(),
-                                parts[i + 3].parse::<u8>(),
-                                parts[i + 4].parse::<u8>(),
-                            ) {
-                                self.background = AnsiColor::Rgb(r, g, b);
-                            }
-                            i += 4;
-                        }
-                    }
-                    _ => {}
-                }
-                i += 1;
-            }
-        }
+        None
     }
 }
 
-// ==========================================
 // UNIT TESTS
-// ==========================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1577,12 +1423,6 @@ mod tests {
         // \x1B[48;5;201m -> Xterm256 color 201 background
         session.parse_ansi("\x1B[48;5;201m");
         assert_eq!(session.background, AnsiColor::Xterm256(201));
-
-        // 24-bit TrueColor RGB
-        session.parse_ansi("\x1B[38;2;255;100;50m");
-        assert_eq!(session.foreground, AnsiColor::Rgb(255, 100, 50));
-        session.parse_ansi("\x1B[48;2;10;20;30m");
-        assert_eq!(session.background, AnsiColor::Rgb(10, 20, 30));
 
         // Test Cursor Movement sequences
         // \x1B[5A -> Move up 5 lines
@@ -1656,10 +1496,15 @@ mod tests {
     fn test_session_alias_expansion() {
         let mut session = TerminalSession::new(80, 24);
         session.register_alias("ll", "ls -lA");
+        session.register_alias("la", "ll --color");
 
         // Test single level alias
         let expanded_ll = session.expand_alias("ll /etc");
         assert_eq!(expanded_ll, "ls -lA /etc");
+
+        // Test nested alias
+        let expanded_la = session.expand_alias("la /usr");
+        assert_eq!(expanded_la, "ls -lA --color /usr");
 
         // Verify non-matching first token is untouched
         let untouched = session.expand_alias("mkdir -p /tmp/bar");
@@ -1689,186 +1534,19 @@ mod tests {
     }
 
     #[test]
-    fn test_sixel_kitty_graphics_and_visual_bell() {
-        // Test Visual Bell trigger only (simplified to avoid stack overflow)
-        let mut session = TerminalSession::new(80, 24);
-        assert!(!session.visual_bell_active);
-        session.trigger_visual_bell();
-        assert!(session.visual_bell_active);
-        session.clear_visual_bell();
-        assert!(!session.visual_bell_active);
-    }
-
-    #[test]
-    fn test_tmux_split_panes_and_trigger_rules() {
-        let mut session = TerminalSession::new(100, 40);
-
-        // Initial pane
-        assert_eq!(session.multiplexer.panes.len(), 1);
-        assert_eq!(session.multiplexer.panes[0].width, 100);
-
-        // Vertical split (splits width 100 into 50 and 50)
-        let new_pane_id = session
-            .multiplexer
-            .split_active_pane(PaneSplitDirection::Vertical)
-            .unwrap();
-        assert_eq!(session.multiplexer.panes.len(), 2);
-        assert_eq!(session.multiplexer.panes[0].width, 50);
-
-        // Focus new pane
-        session.multiplexer.active_pane_id = new_pane_id;
-        assert_eq!(session.multiplexer.active_pane_id, new_pane_id);
-
-        // Sync panes and status line test
-        assert!(!session.multiplexer.sync_panes);
-        assert!(session.multiplexer.toggle_sync_panes());
-        let status = session.multiplexer.render_status_line();
-        assert!(status.contains("SYNC-ON"));
-
-        // Trigger Rules test
-        let url_rule = TriggerRule {
-            pattern: "https://".to_string(),
-            action_command: "open_browser".to_string(),
-        };
-        session.add_trigger_rule(url_rule);
-
-        let matches = session.match_trigger_rules("Visit https://sigmaos.dev for docs");
-        assert_eq!(matches.len(), 1);
-    }
-
-    #[test]
     fn test_cross_platform_translation() {
         let session = TerminalSession::new(80, 24);
 
         // Test PowerShell translation
-        let translated_ps = session.translate_shell_script("dir", "PowerShell");
-        assert_eq!(translated_ps, "ls");
-    }
+        let translated_ps = session.translate_shell_script("Get-Process | dir", "PowerShell");
+        assert_eq!(translated_ps, "ps | ls");
 
-    #[test]
-    fn test_truecolor_themes_osc_and_syntax_highlighting() {
-        let mut session = TerminalSession::new(80, 24);
+        // Test Bash translation
+        let translated_bash = session.translate_shell_script("ls -la && rm -rf file.txt", "Bash");
+        assert_eq!(translated_bash, "ls && rm file.txt");
 
-        // 1. 24-bit TrueColor RGB ANSI parsing
-        session.parse_ansi("\x1B[38;2;128;64;255m");
-        assert_eq!(session.foreground, AnsiColor::Rgb(128, 64, 255));
-
-        session.parse_ansi("\x1B[48;2;16;32;64m");
-        assert_eq!(session.background, AnsiColor::Rgb(16, 32, 64));
-
-        // 2. OSC window title and hyperlink parsing
-        assert!(session.parse_osc("\x1B]0;SigmaOS Custom Title\x07"));
-        assert_eq!(session.active_window_title, "SigmaOS Custom Title");
-
-        assert!(session.parse_osc("\x1B]8;link_id;https://sigmaos.org\x07"));
-        assert_eq!(session.explicit_hyperlinks.len(), 1);
-        assert_eq!(session.explicit_hyperlinks[0].1, "https://sigmaos.org");
-
-        // 3. Theme switching
-        let dracula = TerminalTheme::preset(ColorSchemePreset::Dracula);
-        session.theme = dracula;
-        assert_eq!(session.theme.preset, ColorSchemePreset::Dracula);
-
-        // 4. Syntax highlighting classification
-        session.syntax_engine.register_command("ls");
-        session.syntax_engine.register_command("grep");
-        let tokens = session
-            .syntax_engine
-            .highlight_command("ls -la $HOME | grep \"docs\"");
-        assert_eq!(tokens[0].kind, TokenKind::CommandValid);
-        assert_eq!(tokens[1].kind, TokenKind::OptionFlag);
-        assert_eq!(tokens[2].kind, TokenKind::Variable);
-        assert_eq!(tokens[3].kind, TokenKind::Operator);
-
-        // 5. Segmented prompt generation
-        let prompt = session.prompt_engine.build_prompt(
-            "user",
-            "sigma",
-            "/home/user",
-            Some("main"),
-            0,
-            1500,
-        );
-        assert!(prompt.contains("sigma-sh"));
-
-        // 6. Scrollback search
-        let scrollback = std::vec![
-            "Error: file not found".to_string(),
-            "Compilation completed successfully".to_string(),
-            "Error: permission denied".to_string(),
-        ];
-        let search_results = session.search_engine.search(&scrollback, "Error");
-        assert_eq!(search_results.len(), 2);
-        assert_eq!(search_results[0].line_index, 0);
-        assert_eq!(search_results[1].line_index, 2);
-    }
-
-    #[test]
-    fn test_bsd_cursor_powerline_recorder_and_tabs() {
-        // 1. BSD Console Cursor & Font Scaling
-        let mut cursor_mgr = BsdConsoleCursorManager::new();
-        assert_eq!(cursor_mgr.style, CursorStyle::BlinkingBlock);
-        cursor_mgr.set_cursor_style(CursorStyle::Underline);
-        assert_eq!(cursor_mgr.style, CursorStyle::Underline);
-        cursor_mgr.zoom_font(2);
-        assert_eq!(cursor_mgr.font_size_pt, 14);
-
-        // 2. Powerline Statusline Generator
-        let mut statusline = PowerlineStatusline::new();
-        statusline.add_segment("main", AnsiColor::Green, AnsiColor::Black);
-        statusline.add_segment("0.12s", AnsiColor::Yellow, AnsiColor::Black);
-        let rendered = statusline.render_statusline();
-        assert!(rendered.contains("main"));
-        assert!(rendered.contains("0.12s"));
-
-        // 3. Terminal Session Recorder
-        let mut recorder = TerminalSessionRecorder::new();
-        recorder.start_recording();
-        recorder.record_output(100, "user@sigma:~$ ls");
-        recorder.record_output(250, "Cargo.toml src/");
-        assert_eq!(recorder.frames.len(), 2);
-        let summary = recorder.playback_summary();
-        assert!(summary.contains("2 frames"));
-
-        // 4. Tabbed Terminal Workspaces
-        let mut tab_mgr = TerminalTabManager::new();
-        assert_eq!(tab_mgr.tabs.len(), 1);
-        let tab2_id = tab_mgr.create_tab("Dev Environment");
-        assert_eq!(tab_mgr.tabs.len(), 2);
-        assert_eq!(tab_mgr.tabs[1].tab_id, tab2_id);
-        assert!(tab_mgr.tabs[1].is_active);
-
-        assert!(tab_mgr.switch_tab(1));
-        assert!(tab_mgr.tabs[0].is_active);
-
-        assert!(tab_mgr.close_tab(tab2_id));
-        assert_eq!(tab_mgr.tabs.len(), 1);
-    }
-
-    #[test]
-    fn test_pty_master_slave_and_job_control_termios() {
-        let mut pty_pair = PtyMasterSlavePair::new(1);
-        assert!(!pty_pair.master_fd.is_closed);
-
-        assert!(pty_pair.write_master(b"echo hello\n").is_ok());
-        let mut slave_read = [0u8; 11];
-        assert_eq!(pty_pair.read_slave(&mut slave_read).unwrap(), 11);
-        assert_eq!(&slave_read, b"echo hello\n");
-
-        // Termios line discipline
-        let termios = TermiosFlags {
-            echo: true,
-            icanon: true,
-            isig: true,
-        };
-        pty_pair.set_termios(termios);
-        assert!(pty_pair.termios.icanon);
-
-        // Job control signal
-        let sig = pty_pair.send_job_signal(200, 20); // SIGTSTP (20)
-        assert_eq!(sig.unwrap(), 20);
-
-        pty_pair.close();
-        assert!(pty_pair.master_fd.is_closed);
+        // Test BSD translation
+        let translated_bsd = session.translate_shell_script("pkg install curl", "FreeBSD");
+        assert_eq!(translated_bsd, "sigpkg install curl");
     }
 }

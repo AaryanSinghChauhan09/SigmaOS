@@ -1,22 +1,33 @@
+---
 name: Bug Report
-about: Report a bug or issue in SigmaOS
+about: Create a report to help us improve SigmaOS
 title: '[BUG] '
-labels: bug
+labels: 'bug'
 assignees: ''
-
 ---
 
-### Problem Description
-<!-- Clear description of the bug -->
+## Bug Description
+A clear and concise description of what the bug is.
 
-### Steps to Reproduce
-1. Go to '...'
-2. Execute '...'
+## System / Architecture Context
+- **Module Affected**: (e.g., `kernel/memory`, `drivers/pci`, `security/capability`)
+- **Target Architecture**: (x86_64 / AArch64 / RISC-V 64)
+- **Environment**: (QEMU / Bare-Metal)
+
+## Steps to Reproduce
+Steps to reproduce the behavior:
+1. Compile via `...`
+2. Boot with QEMU / Run standalone test `...`
 3. See error
 
-### Expected Behavior
-<!-- What should happen -->
+## Expected Behavior
+A clear description of what you expected to happen.
 
-### System Environment
-- Architecture: x86_64 / aarch64 / riscv64
-- Release Channel: Stable / Beta / Nightly
+## Stack Trace / Serial Log Output
+```text
+[Paste kernel logs, panic stack trace, or QEMU output here]
+```
+
+## Architectural Compliance Checklist
+- [ ] Issue does not violate `no_std` kernel core boundary.
+- [ ] Issue includes steps to reproduce via standalone `rustc --test` or QEMU smoke runner.

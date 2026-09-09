@@ -2,9 +2,7 @@
 // Combines Kyber-1024 KEM with a firmware measurement hash chain
 // for secure-boot / measured-boot narrative
 
-#[cfg(not(test))]
 use crate::klib::merkle::{MerkleAccumulator, MerkleHash};
-#[cfg(not(test))]
 use crate::security::pqc_enclave::KyberKem;
 
 #[cfg(test_disabled)]

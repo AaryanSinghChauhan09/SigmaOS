@@ -2,9 +2,12 @@ name: SLSA Level 3 Provenance & Cosign Deployment CI
 
 on:
   push:
-    branches: [ "main", "master", "jules-*" ]
+    branches: [ "main" ]
+
+permissions:
+  contents: read
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
 
 jobs:
   slsa-cosign-deployment:

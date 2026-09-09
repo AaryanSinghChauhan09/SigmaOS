@@ -2690,6 +2690,691 @@ impl Default for FedoraDnf5AdvisorySecurityEngine {
     }
 }
 
+// =========================================================================
+// 37. FreeBSD pkg-message Post-Install Notification & Version Threshold Governor
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PkgMessageNotice {
+    pub package_name: String,
+    pub trigger_event: String, // "install", "upgrade", "remove"
+    pub min_version: Option<String>,
+    pub max_version: Option<String>,
+    pub message_text: String,
+}
+
+pub struct FreeBsdPkgMessageNotifierEngine {
+    pub notices: Vec<PkgMessageNotice>,
+}
+
+impl FreeBsdPkgMessageNotifierEngine {
+    pub fn new() -> Self {
+        Self { notices: Vec::new() }
+    }
+
+    pub fn register_notice(&mut self, notice: PkgMessageNotice) {
+        self.notices.push(notice);
+    }
+
+    pub fn collect_notices_for_action(&self, pkg_name: &str, event: &str, current_ver: &str) -> Vec<String> {
+        let mut result = Vec::new();
+        for notice in &self.notices {
+            if notice.package_name == pkg_name && notice.trigger_event.eq_ignore_ascii_case(event) {
+                let min_ok = notice
+                    .min_version
+                    .as_ref()
+                    .map_or(true, |min_v| current_ver >= min_v.as_str());
+                let max_ok = notice
+                    .max_version
+                    .as_ref()
+                    .map_or(true, |max_v| current_ver <= max_v.as_str());
+
+                if min_ok && max_ok {
+                    result.push(notice.message_text.clone());
+                }
+            }
+        }
+        result
+    }
+}
+
+impl Default for FreeBsdPkgMessageNotifierEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 38. OpenBSD Pledge & Unveil Scriptlet Sandbox Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UnveilPathRule {
+    pub path: String,
+    pub permissions: String, // "r", "rw", "rwx", "rx", "wc"
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ScriptletSandboxPolicy {
+    pub package_name: String,
+    pub scriptlet_type: String, // "pre-install", "post-install", "pre-remove"
+    pub unveil_rules: Vec<UnveilPathRule>,
+    pub pledge_promises: Vec<String>, // "stdio", "rpath", "wpath", "cpath", "exec"
+}
+
+pub struct OpenBsdPledgeUnveilSandboxScriptletEngine {
+    pub policies: BTreeMap<String, ScriptletSandboxPolicy>,
+}
+
+impl OpenBsdPledgeUnveilSandboxScriptletEngine {
+    pub fn new() -> Self {
+        Self {
+            policies: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_policy(&mut self, policy: ScriptletSandboxPolicy) {
+        let key = format!("{}/{}", policy.package_name, policy.scriptlet_type);
+        self.policies.insert(key, policy);
+    }
+
+    pub fn validate_scriptlet_access(&self, pkg_name: &str, scriptlet_type: &str, target_path: &str, req_perm: &str) -> bool {
+        let key = format!("{}/{}", pkg_name, scriptlet_type);
+        if let Some(policy) = self.policies.get(&key) {
+            for rule in &policy.unveil_rules {
+                if target_path.starts_with(&rule.path) {
+                    if rule.permissions.contains(req_perm) {
+                        return true;
+                    }
+                }
+            }
+            false
+        } else {
+            true // Default permissive if no policy configured
+        }
+    }
+}
+
+impl Default for OpenBsdPledgeUnveilSandboxScriptletEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 39. Alpine APK LAN P2P Cache Discovery & Artifact Sync Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkPeerNode {
+    pub node_id: String,
+    pub ip_address: String,
+    pub available_sha256_hashes: Vec<String>,
+}
+
+pub struct AlpineApkCachePeerSyncEngine {
+    pub peers: Vec<ApkPeerNode>,
+}
+
+impl AlpineApkCachePeerSyncEngine {
+    pub fn new() -> Self {
+        Self { peers: Vec::new() }
+    }
+
+    pub fn register_peer(&mut self, peer: ApkPeerNode) {
+        self.peers.push(peer);
+    }
+
+    pub fn find_local_peer_with_artifact(&self, artifact_sha256: &str) -> Option<ApkPeerNode> {
+        self.peers
+            .iter()
+            .find(|p| p.available_sha256_hashes.contains(&artifact_sha256.to_string()))
+            .cloned()
+    }
+}
+
+impl Default for AlpineApkCachePeerSyncEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 40. Debian apt-listchanges Changelog & NEWS Auditor Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptNewsEntry {
+    pub package_name: String,
+    pub version: String,
+    pub urgency: String,
+    pub summary: String,
+    pub is_breaking_change: bool,
+}
+
+pub struct AptListChangesNewsAuditorEngine {
+    pub news_db: Vec<AptNewsEntry>,
+}
+
+impl AptListChangesNewsAuditorEngine {
+    pub fn new() -> Self {
+        Self { news_db: Vec::new() }
+    }
+
+    pub fn register_news(&mut self, entry: AptNewsEntry) {
+        self.news_db.push(entry);
+    }
+
+    pub fn filter_breaking_news_for_upgrade(&self, packages: &[&str]) -> Vec<AptNewsEntry> {
+        self.news_db
+            .iter()
+            .filter(|n| n.is_breaking_change && packages.contains(&n.package_name.as_str()))
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for AptListChangesNewsAuditorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 41. Arch Linux pacdiff Configuration File Merge Governor
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PacdiffMergeDecision {
+    KeepActive,
+    OverwriteWithPacnew,
+    DeletePacnew,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PacdiffCandidate {
+    pub config_path: String,
+    pub pacnew_path: String,
+    pub pending_decision: Option<PacdiffMergeDecision>,
+}
+
+pub struct PacdiffConfigMergeGovernorEngine {
+    pub candidates: Vec<PacdiffCandidate>,
+}
+
+impl PacdiffConfigMergeGovernorEngine {
+    pub fn new() -> Self {
+        Self { candidates: Vec::new() }
+    }
+
+    pub fn register_candidate(&mut self, config_path: &str, pacnew_path: &str) {
+        self.candidates.push(PacdiffCandidate {
+            config_path: config_path.to_string(),
+            pacnew_path: pacnew_path.to_string(),
+            pending_decision: None,
+        });
+    }
+
+    pub fn apply_decision(&mut self, config_path: &str, decision: PacdiffMergeDecision) -> bool {
+        if let Some(cand) = self.candidates.iter_mut().find(|c| c.config_path == config_path) {
+            cand.pending_decision = Some(decision);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for PacdiffConfigMergeGovernorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 42. Gentoo etc-update & dispatch-conf Git Overlay Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EtcUpdateOverlayCommit {
+    pub config_path: String,
+    pub commit_hash: String,
+    pub timestamp_sec: u64,
+    pub change_summary: String,
+}
+
+pub struct PortageEtcUpdateGitOverlayEngine {
+    pub commits: Vec<EtcUpdateOverlayCommit>,
+}
+
+impl PortageEtcUpdateGitOverlayEngine {
+    pub fn new() -> Self {
+        Self { commits: Vec::new() }
+    }
+
+    pub fn record_config_change(&mut self, path: &str, hash: &str, now_sec: u64, summary: &str) {
+        self.commits.push(EtcUpdateOverlayCommit {
+            config_path: path.to_string(),
+            commit_hash: hash.to_string(),
+            timestamp_sec: now_sec,
+            change_summary: summary.to_string(),
+        });
+    }
+
+    pub fn query_history_for_file(&self, path: &str) -> Vec<EtcUpdateOverlayCommit> {
+        self.commits
+            .iter()
+            .filter(|c| c.config_path == path)
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for PortageEtcUpdateGitOverlayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 43. Fedora / rpm-ostree Transactional Layered Image Governor
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OstreeLayeredDeployment {
+    pub deployment_id: String,
+    pub checksum: String,
+    pub layered_packages: Vec<String>,
+    pub is_active: bool,
+    pub is_pinned: bool,
+}
+
+pub struct RpmOstreeLayeredImageGovernorEngine {
+    pub deployments: Vec<OstreeLayeredDeployment>,
+}
+
+impl RpmOstreeLayeredImageGovernorEngine {
+    pub fn new() -> Self {
+        Self { deployments: Vec::new() }
+    }
+
+    pub fn register_deployment(&mut self, dep: OstreeLayeredDeployment) {
+        self.deployments.push(dep);
+    }
+
+    pub fn stage_package_layer(&mut self, new_pkg: &str) -> String {
+        let new_id = format!("dep-{}", self.deployments.len() + 1);
+        let mut layers = Vec::new();
+        if let Some(active) = self.deployments.iter().find(|d| d.is_active) {
+            layers = active.layered_packages.clone();
+        }
+        layers.push(new_pkg.to_string());
+
+        let new_dep = OstreeLayeredDeployment {
+            deployment_id: new_id.clone(),
+            checksum: format!("sha256-{}", new_id),
+            layered_packages: layers,
+            is_active: false,
+            is_pinned: false,
+        };
+        self.deployments.push(new_dep);
+        new_id
+    }
+
+    pub fn activate_deployment(&mut self, dep_id: &str) -> bool {
+        if self.deployments.iter().any(|d| d.deployment_id == dep_id) {
+            for d in &mut self.deployments {
+                d.is_active = d.deployment_id == dep_id;
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for RpmOstreeLayeredImageGovernorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 44. FreeBSD Poudriere Clean-Jail Parallel Build Matrix Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PoudriereJailSpec {
+    pub jail_name: String,
+    pub freebsd_version: String,
+    pub arch: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PoudriereBuildTask {
+    pub pkg_name: String,
+    pub target_jail: String,
+    pub status: String, // "pending", "building", "success", "failed"
+}
+
+pub struct FreeBsdPoudriereMatrixEngine {
+    pub jails: Vec<PoudriereJailSpec>,
+    pub tasks: Vec<PoudriereBuildTask>,
+}
+
+impl FreeBsdPoudriereMatrixEngine {
+    pub fn new() -> Self {
+        Self {
+            jails: Vec::new(),
+            tasks: Vec::new(),
+        }
+    }
+
+    pub fn add_jail(&mut self, jail: PoudriereJailSpec) {
+        self.jails.push(jail);
+    }
+
+    pub fn schedule_task(&mut self, pkg_name: &str, jail_name: &str) -> bool {
+        if self.jails.iter().any(|j| j.jail_name == jail_name) {
+            self.tasks.push(PoudriereBuildTask {
+                pkg_name: pkg_name.to_string(),
+                target_jail: jail_name.to_string(),
+                status: "pending".to_string(),
+            });
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FreeBsdPoudriereMatrixEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 45. Nix/Guix CAS Store Hardlink Content Deduplicator Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StoreFileMetadata {
+    pub store_path: String,
+    pub relative_file_path: String,
+    pub sha256_hash: String,
+    pub size_bytes: u64,
+}
+
+pub struct NixGuixStoreDeduplicatorEngine {
+    pub registered_files: Vec<StoreFileMetadata>,
+}
+
+impl NixGuixStoreDeduplicatorEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_files: Vec::new(),
+        }
+    }
+
+    pub fn register_file(&mut self, file: StoreFileMetadata) {
+        self.registered_files.push(file);
+    }
+
+    pub fn find_deduplication_candidates(&self) -> Vec<(String, String, u64)> {
+        let mut candidates = Vec::new();
+        for i in 0..self.registered_files.len() {
+            for j in (i + 1)..self.registered_files.len() {
+                let f1 = &self.registered_files[i];
+                let f2 = &self.registered_files[j];
+                if f1.sha256_hash == f2.sha256_hash && f1.size_bytes > 0 {
+                    let p1 = format!("{}/{}", f1.store_path, f1.relative_file_path);
+                    let p2 = format!("{}/{}", f2.store_path, f2.relative_file_path);
+                    candidates.push((p1, p2, f1.size_bytes));
+                }
+            }
+        }
+        candidates
+    }
+}
+
+impl Default for NixGuixStoreDeduplicatorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 46. Fedora Modularity Modulemd Stream Governor
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModulemdStreamSpec {
+    pub module_name: String,
+    pub stream_name: String,
+    pub profiles: Vec<String>,
+    pub is_enabled: bool,
+}
+
+pub struct FedoraModularityModulemdEngine {
+    pub modules: Vec<ModulemdStreamSpec>,
+}
+
+impl FedoraModularityModulemdEngine {
+    pub fn new() -> Self {
+        Self { modules: Vec::new() }
+    }
+
+    pub fn register_module_stream(&mut self, spec: ModulemdStreamSpec) {
+        self.modules.push(spec);
+    }
+
+    pub fn enable_stream(&mut self, module_name: &str, stream_name: &str) -> bool {
+        let mut found = false;
+        for m in &mut self.modules {
+            if m.module_name == module_name {
+                m.is_enabled = m.stream_name == stream_name;
+                if m.is_enabled {
+                    found = true;
+                }
+            }
+        }
+        found
+    }
+}
+
+impl Default for FedoraModularityModulemdEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 47. Arch Linux pacman Parallel Downloader Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParallelDownloadTask {
+    pub package_name: String,
+    pub url: String,
+    pub size_bytes: u64,
+    pub downloaded_bytes: u64,
+    pub is_complete: bool,
+}
+
+pub struct ArchPacmanParallelDownloadEngine {
+    pub max_parallel_streams: usize,
+    pub pending_downloads: Vec<ParallelDownloadTask>,
+}
+
+impl ArchPacmanParallelDownloadEngine {
+    pub fn new(max_streams: usize) -> Self {
+        Self {
+            max_parallel_streams: max_streams,
+            pending_downloads: Vec::new(),
+        }
+    }
+
+    pub fn enqueue_download(&mut self, pkg_name: &str, url: &str, size_bytes: u64) {
+        self.pending_downloads.push(ParallelDownloadTask {
+            package_name: pkg_name.to_string(),
+            url: url.to_string(),
+            size_bytes,
+            downloaded_bytes: 0,
+            is_complete: false,
+        });
+    }
+
+    pub fn active_download_count(&self) -> usize {
+        self.pending_downloads
+            .iter()
+            .filter(|t| !t.is_complete && t.downloaded_bytes > 0)
+            .count()
+    }
+}
+
+impl Default for ArchPacmanParallelDownloadEngine {
+    fn default() -> Self {
+        Self::new(5)
+    }
+}
+
+// =========================================================================
+// 48. Void Linux xbps-src Template Builder Sandbox Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsSrcTemplate {
+    pub pkg_name: String,
+    pub version: String,
+    pub revision: u32,
+    pub build_depends: Vec<String>,
+    pub short_desc: String,
+}
+
+pub struct XbpsSrcTemplateSandboxEngine {
+    pub templates: BTreeMap<String, XbpsSrcTemplate>,
+}
+
+impl XbpsSrcTemplateSandboxEngine {
+    pub fn new() -> Self {
+        Self {
+            templates: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_template(&mut self, template: XbpsSrcTemplate) {
+        self.templates.insert(template.pkg_name.clone(), template);
+    }
+
+    pub fn generate_binary_xbps_name(&self, pkg_name: &str) -> Option<String> {
+        self.templates
+            .get(pkg_name)
+            .map(|t| format!("{}-{}_{}.xbps", t.pkg_name, t.version, t.revision))
+    }
+}
+
+impl Default for XbpsSrcTemplateSandboxEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 49. Alpine APK Edge & Testing Overlay Repository Governor
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkRepositoryOverlay {
+    pub name: String,
+    pub url: String,
+    pub is_testing: bool,
+    pub is_enabled: bool,
+}
+
+pub struct AlpineApkEdgeOverlayEngine {
+    pub overlays: Vec<ApkRepositoryOverlay>,
+}
+
+impl AlpineApkEdgeOverlayEngine {
+    pub fn new() -> Self {
+        Self { overlays: Vec::new() }
+    }
+
+    pub fn add_overlay(&mut self, name: &str, url: &str, testing: bool) {
+        self.overlays.push(ApkRepositoryOverlay {
+            name: name.to_string(),
+            url: url.to_string(),
+            is_testing: testing,
+            is_enabled: true,
+        });
+    }
+
+    pub fn enabled_testing_overlays(&self) -> Vec<String> {
+        self.overlays
+            .iter()
+            .filter(|o| o.is_enabled && o.is_testing)
+            .map(|o| o.name.clone())
+            .collect()
+    }
+}
+
+impl Default for AlpineApkEdgeOverlayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 50. Void / Debian Alternatives Provider Governor
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlternativeProvider {
+    pub alternative_name: String,
+    pub provider_pkg: String,
+    pub target_binary_path: String,
+    pub priority: u32,
+}
+
+pub struct XbpsDebianAlternativesGovernorEngine {
+    pub alternatives: BTreeMap<String, Vec<AlternativeProvider>>,
+    pub active_selections: BTreeMap<String, String>, // alt_name -> provider_pkg
+}
+
+impl XbpsDebianAlternativesGovernorEngine {
+    pub fn new() -> Self {
+        Self {
+            alternatives: BTreeMap::new(),
+            active_selections: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_provider(&mut self, provider: AlternativeProvider) {
+        self.alternatives
+            .entry(provider.alternative_name.clone())
+            .or_insert_with(Vec::new)
+            .push(provider);
+    }
+
+    pub fn select_best_provider(&mut self, alt_name: &str) -> Option<String> {
+        if let Some(providers) = self.alternatives.get(alt_name) {
+            let best = providers.iter().max_by_key(|p| p.priority)?;
+            self.active_selections
+                .insert(alt_name.to_string(), best.provider_pkg.clone());
+            Some(best.target_binary_path.clone())
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for XbpsDebianAlternativesGovernorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 #[path = "../sigpkg/universal_engine.rs"]
 #[allow(dead_code)]
@@ -3400,6 +4085,218 @@ MAINTAINER="SigmaOS"
         assert!(!blocked_ok);
     }
 
+    #[test]
+    fn test_freebsd_pkg_message_notifier() {
+        let mut engine = FreeBsdPkgMessageNotifierEngine::new();
+        engine.register_notice(PkgMessageNotice {
+            package_name: "postgresql15-server".to_string(),
+            trigger_event: "install".to_string(),
+            min_version: None,
+            max_version: None,
+            message_text: "Run 'service postgresql initdb' before starting.".to_string(),
+        });
+
+        let msgs = engine.collect_notices_for_action("postgresql15-server", "install", "15.4");
+        assert_eq!(msgs.len(), 1);
+        assert!(msgs[0].contains("initdb"));
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil_scriptlet() {
+        let mut sandbox = OpenBsdPledgeUnveilSandboxScriptletEngine::new();
+        sandbox.register_policy(ScriptletSandboxPolicy {
+            package_name: "nginx".to_string(),
+            scriptlet_type: "post-install".to_string(),
+            unveil_rules: vec![UnveilPathRule {
+                path: "/etc/nginx".to_string(),
+                permissions: "rw".to_string(),
+            }],
+            pledge_promises: vec!["stdio".to_string(), "rpath".to_string(), "wpath".to_string()],
+        });
+
+        assert!(sandbox.validate_scriptlet_access("nginx", "post-install", "/etc/nginx/nginx.conf", "r"));
+        assert!(!sandbox.validate_scriptlet_access("nginx", "post-install", "/usr/local/bin/malicious", "x"));
+    }
+
+    #[test]
+    fn test_alpine_apk_cache_peer_sync() {
+        let mut sync_engine = AlpineApkCachePeerSyncEngine::new();
+        sync_engine.register_peer(ApkPeerNode {
+            node_id: "node-lan-1".to_string(),
+            ip_address: "192.168.1.100".to_string(),
+            available_sha256_hashes: vec!["hash123".to_string()],
+        });
+
+        let peer = sync_engine.find_local_peer_with_artifact("hash123").unwrap();
+        assert_eq!(peer.node_id, "node-lan-1");
+    }
+
+    #[test]
+    fn test_apt_listchanges_news_auditor() {
+        let mut news_engine = AptListChangesNewsAuditorEngine::new();
+        news_engine.register_news(AptNewsEntry {
+            package_name: "systemd".to_string(),
+            version: "255".to_string(),
+            urgency: "high".to_string(),
+            summary: "CGroup v1 deprecated".to_string(),
+            is_breaking_change: true,
+        });
+
+        let breaking = news_engine.filter_breaking_news_for_upgrade(&["systemd", "curl"]);
+        assert_eq!(breaking.len(), 1);
+        assert_eq!(breaking[0].package_name, "systemd");
+    }
+
+    #[test]
+    fn test_pacdiff_config_merge() {
+        let mut governor = PacdiffConfigMergeGovernorEngine::new();
+        governor.register_candidate("/etc/pacman.conf", "/etc/pacman.conf.pacnew");
+
+        assert!(governor.apply_decision("/etc/pacman.conf", PacdiffMergeDecision::OverwriteWithPacnew));
+        assert_eq!(
+            governor.candidates[0].pending_decision,
+            Some(PacdiffMergeDecision::OverwriteWithPacnew)
+        );
+    }
+
+    #[test]
+    fn test_portage_etc_update_git_overlay() {
+        let mut overlay = PortageEtcUpdateGitOverlayEngine::new();
+        overlay.record_config_change("/etc/portage/make.conf", "abc123commit", 1700000000, "Updated CFLAGS");
+
+        let history = overlay.query_history_for_file("/etc/portage/make.conf");
+        assert_eq!(history.len(), 1);
+        assert_eq!(history[0].commit_hash, "abc123commit");
+    }
+
+    #[test]
+    fn test_rpm_ostree_layered_image_governor() {
+        let mut ostree = RpmOstreeLayeredImageGovernorEngine::new();
+        ostree.register_deployment(OstreeLayeredDeployment {
+            deployment_id: "dep-base".to_string(),
+            checksum: "sha256-base".to_string(),
+            layered_packages: vec!["vim".to_string()],
+            is_active: true,
+            is_pinned: true,
+        });
+
+        let staged_id = ostree.stage_package_layer("htop");
+        assert_eq!(staged_id, "dep-2");
+        assert!(ostree.activate_deployment("dep-2"));
+        assert!(ostree.deployments.iter().find(|d| d.deployment_id == "dep-2").unwrap().is_active);
+    }
+
+    #[test]
+    fn test_freebsd_poudriere_matrix() {
+        let mut matrix = FreeBsdPoudriereMatrixEngine::new();
+        matrix.add_jail(PoudriereJailSpec {
+            jail_name: "14_0_RELEASE_amd64".to_string(),
+            freebsd_version: "14.0-RELEASE".to_string(),
+            arch: "amd64".to_string(),
+        });
+
+        assert!(matrix.schedule_task("zsh", "14_0_RELEASE_amd64"));
+        assert_eq!(matrix.tasks.len(), 1);
+    }
+
+    #[test]
+    fn test_nix_guix_store_deduplicator() {
+        let mut dedup = NixGuixStoreDeduplicatorEngine::new();
+        dedup.register_file(StoreFileMetadata {
+            store_path: "/nix/store/pkg1".to_string(),
+            relative_file_path: "bin/tool".to_string(),
+            sha256_hash: "same_hash".to_string(),
+            size_bytes: 4096,
+        });
+        dedup.register_file(StoreFileMetadata {
+            store_path: "/nix/store/pkg2".to_string(),
+            relative_file_path: "bin/tool".to_string(),
+            sha256_hash: "same_hash".to_string(),
+            size_bytes: 4096,
+        });
+
+        let candidates = dedup.find_deduplication_candidates();
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0].2, 4096);
+    }
+
+    #[test]
+    fn test_fedora_modularity_modulemd() {
+        let mut mod_engine = FedoraModularityModulemdEngine::new();
+        mod_engine.register_module_stream(ModulemdStreamSpec {
+            module_name: "nodejs".to_string(),
+            stream_name: "18".to_string(),
+            profiles: vec!["default".to_string(), "development".to_string()],
+            is_enabled: true,
+        });
+        mod_engine.register_module_stream(ModulemdStreamSpec {
+            module_name: "nodejs".to_string(),
+            stream_name: "20".to_string(),
+            profiles: vec!["default".to_string()],
+            is_enabled: false,
+        });
+
+        assert!(mod_engine.enable_stream("nodejs", "20"));
+        assert!(mod_engine.modules.iter().find(|m| m.stream_name == "20").unwrap().is_enabled);
+        assert!(!mod_engine.modules.iter().find(|m| m.stream_name == "18").unwrap().is_enabled);
+    }
+
+    #[test]
+    fn test_arch_pacman_parallel_download() {
+        let mut dl_engine = ArchPacmanParallelDownloadEngine::new(5);
+        dl_engine.enqueue_download("linux", "https://mirror.archlinux.org/linux.pkg.tar.zst", 120_000_000);
+
+        assert_eq!(dl_engine.pending_downloads.len(), 1);
+        assert_eq!(dl_engine.max_parallel_streams, 5);
+    }
+
+    #[test]
+    fn test_xbps_src_template_sandbox() {
+        let mut sandbox = XbpsSrcTemplateSandboxEngine::new();
+        sandbox.register_template(XbpsSrcTemplate {
+            pkg_name: "void-repo-multilib".to_string(),
+            version: "1.0".to_string(),
+            revision: 3,
+            build_depends: vec![],
+            short_desc: "Void Linux multilib repository".to_string(),
+        });
+
+        let bin_name = sandbox.generate_binary_xbps_name("void-repo-multilib").unwrap();
+        assert_eq!(bin_name, "void-repo-multilib-1.0_3.xbps");
+    }
+
+    #[test]
+    fn test_alpine_apk_edge_overlay() {
+        let mut overlay_engine = AlpineApkEdgeOverlayEngine::new();
+        overlay_engine.add_overlay("testing", "https://dl-cdn.alpinelinux.org/alpine/edge/testing", true);
+
+        let active_testing = overlay_engine.enabled_testing_overlays();
+        assert_eq!(active_testing.len(), 1);
+        assert_eq!(active_testing[0], "testing");
+    }
+
+    #[test]
+    fn test_xbps_debian_alternatives_governor() {
+        let mut alt_gov = XbpsDebianAlternativesGovernorEngine::new();
+        alt_gov.register_provider(AlternativeProvider {
+            alternative_name: "editor".to_string(),
+            provider_pkg: "nano".to_string(),
+            target_binary_path: "/usr/bin/nano".to_string(),
+            priority: 40,
+        });
+        alt_gov.register_provider(AlternativeProvider {
+            alternative_name: "editor".to_string(),
+            provider_pkg: "neovim".to_string(),
+            target_binary_path: "/usr/bin/nvim".to_string(),
+            priority: 80,
+        });
+
+        let target = alt_gov.select_best_provider("editor").unwrap();
+        assert_eq!(target, "/usr/bin/nvim");
+        assert_eq!(alt_gov.active_selections.get("editor"), Some(&"neovim".to_string()));
+    }
+
+    #[cfg(not(feature = "standalone_test"))]
     #[test]
     fn test_all_prompt_package_formats_detection_and_adaptation() {
         use super::sigpkg_universal_engine::PackageFormat;

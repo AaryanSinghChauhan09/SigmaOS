@@ -1,23 +1,3 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct TaskId(pub u64);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Task {
-    pub id: TaskId,
-    pub vruntime: u64,
-    pub priority: u32,
-}
-
-impl Task {
-    pub fn new(id: u64, vruntime: u64) -> Self {
-        Self {
-            id: TaskId(id),
-            vruntime,
-            priority: 1,
-        }
-    }
-}
-
 use core::time::Duration;
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
@@ -31,6 +11,10 @@ use alloc::vec::Vec;
 use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+
+// Re-export for other modules
+// pub use crate::kernel::structures::Task;
+// pub use crate::kernel::structures::TaskId;
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -140,17 +124,20 @@ impl Process {
     }
 
     /// Update virtual deadline considering ULE interactivity and EEVDF lag
-    pub fn update_virtual_deadline_ule(&mut self, system_vtime: u64) {
+    pub fn update_virtual_deadline_ule(&mut self, _system_vtime: u64) {
         let weight = self.get_weight();
         let q = 10u64;
         let base_slice = (q / weight).max(1);
         let inter = self.interactivity_score();
         // Boost interactive tasks (> 70) by shortening their deadline window
-        let boost = if inter > 70 { (inter as u64 - 70) / 10 } else { 0 };
+        let boost = if inter > 70 {
+            (inter as u64 - 70) / 10
+        } else {
+            0
+        };
         let slice = base_slice.saturating_sub(boost).max(1);
         self.virtual_deadline = self.virtual_runtime + slice;
     }
-
 }
 
 #[derive(Debug, Clone)]
@@ -329,7 +316,6 @@ impl Scheduler {
     }
 }
 
-
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
     tasks: [Option<Task>; 64],
@@ -340,7 +326,13 @@ pub struct CfsScheduler {
 impl CfsScheduler {
     pub const fn new() -> Self {
         CfsScheduler {
-            tasks: [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+            tasks: [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None,
+            ],
             task_count: 0,
             current_time: 0,
         }
@@ -354,13 +346,6 @@ impl CfsScheduler {
         }
     }
 
-    pub fn tick(&mut self) {
-        self.current_time += 1;
-    }
-
-    pub fn schedule(&mut self) -> Option<Task> {
-        self.pick_next_task()
-    }
     pub fn pick_next_task(&mut self) -> Option<Task> {
         if self.task_count > 0 {
             let task = self.tasks[0].take();

@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -25,25 +26,34 @@ use std::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(all(test, not(feature = "standalone_test")))]
-pub use crate::sigpkg::Version;
+#[cfg(not(feature = "standalone_test"))]
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::klib::HashMap;
+#[cfg(all(not(feature = "standalone_test"), target_os = "none"))]
+use crate::klib::{HashMap, Arc};
 
+#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
+use std::collections::HashMap;
+#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
 use std::sync::Arc;
 
 #[cfg(feature = "standalone_test")]
-impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
+
+#[cfg(feature = "standalone_test")]
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(all(feature = "standalone_test", not(test)))]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {

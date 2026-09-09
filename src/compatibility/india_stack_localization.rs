@@ -15,7 +15,7 @@
 use std::format;
 use std::vec::Vec;
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 /// OOP-based Localization Manager for SigmaOS India Stack
 /// Implements 22 scheduled languages of India and regional formatting
 /// Based on Roadmap Item: India-first architecture

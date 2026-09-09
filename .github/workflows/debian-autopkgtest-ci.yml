@@ -2,9 +2,12 @@ name: Debian Autopkgtest & Sbuild CI
 
 on:
   push:
-    branches: [ "main", "master", "jules-*" ]
+    branches: [ "main" ]
+
+permissions:
+  contents: read
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
 
 jobs:
   debian-autopkgtest:

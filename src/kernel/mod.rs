@@ -1,32 +1,7 @@
 #![allow(ambiguous_glob_reexports)]
 // SigmaOS Kernel Module
 pub mod architecture;
-pub mod atomic_extended;
-pub mod cgroup_v2;
-pub mod kqueue_event;
-pub mod cgroup_controllers;
-pub mod block_dev;
-pub mod bore;
-pub mod breakthrough;
 pub mod breakthroughs;
-pub mod breakthroughs_v2;
-pub mod bus;
-pub mod classic_os;
-pub mod component;
-pub mod console;
-pub mod cpu_features;
-pub mod cpufreq;
-pub mod device;
-pub mod driver;
-pub mod dtrace_compat;
-pub mod ebpf;
-pub mod ebpf_vm;
-pub mod ebpf_verification;
-pub mod exports;
-pub mod gap_closing;
-pub mod gap_filling;
-pub mod generation_manager;
-pub mod io_uring;
 pub mod ipc;
 pub mod kqueue;
 pub mod linux_absorb;
@@ -54,6 +29,8 @@ pub mod sched;
 pub mod scheduler;
 pub mod structures;
 pub mod traits;
+pub mod virtual_cpu;
+pub mod vmm_paging;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;
@@ -97,3 +74,21 @@ pub mod sigma_timer;
 pub mod sigma_workqueue;
 pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
+
+pub mod cgroups_v2_sovereign;
+pub use cgroups_v2_sovereign::{SovereignCgroupsV2Manager, CgroupController, CgroupNode, CpuAccounting, MemoryAccounting, PidAccounting};
+pub mod bsd_jails_sovereign;
+pub use bsd_jails_sovereign::{SovereignBsdJailManager, SovereignJail, JailState, JailPermissions, JailNetworkConfig, JailProcess};
+
+pub mod ftrace_sovereign;
+pub use ftrace_sovereign::{SovereignFtracer, TraceEvent, TraceEventKind, TraceRingBuffer, TracerFilter, LatencyHistogram};
+
+pub mod eevdf_sovereign;
+pub use eevdf_sovereign::{SovereignEevdfScheduler, EevdfSchedEntity};
+pub mod io_uring_sqpoll_sovereign;
+pub use io_uring_sqpoll_sovereign::{SovereignIoUringSqpoll, SovereignSqe, SovereignCqe, IoUringOp};
+
+pub mod psi_sovereign;
+pub use psi_sovereign::{SovereignPsiManager, PsiResource, PsiRecord, PsiMetric, PsiTrigger};
+pub mod ksm_sovereign;
+pub use ksm_sovereign::{SovereignKsmEngine, KsmPage};

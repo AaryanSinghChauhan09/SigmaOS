@@ -16,7 +16,7 @@ use std::format;
 
 /// SigmaOS proc filesystem (/proc) implementation
 /// Provides dynamic system statistics and process information in-memory
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

@@ -18,7 +18,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 #[cfg(feature = "standalone_test")]
 use std::collections::BTreeMap;

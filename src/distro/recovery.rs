@@ -4,7 +4,7 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(target_os = "none")]
-use crate::klib::BTreeMap as HashMap;
+use crate::klib::btreemap::BTreeMap as HashMap;
 
 /// Disaster rescue environment setup (inspired by SystemRescue and Rescuezilla).
 #[derive(Debug, Clone)]

@@ -1,9 +1,7 @@
-use std::boxed::Box;
+extern crate alloc;
 
-#[cfg(not(target_os = "none"))]
-#[cfg(not(target_os = "none"))]
-use std::vec::Vec;
-
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 use core::mem;
 /// OOP-based Debugger for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 171

@@ -2,9 +2,9 @@ name: Universal Package Manager Multi-Format CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -24,5 +24,6 @@ jobs:
 
       - name: Test Universal Package Manager Submodule
         run: |
+          mkdir -p build
           mkdir -p build && rustc --test src/package/universal.rs --edition=2021 -o build/package_test
           ./build/package_test

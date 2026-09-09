@@ -17,3 +17,12 @@ This document defines mandatory security constraints and verification requiremen
 3. **Verification & Regression Testing:**
    - Run `./run_sigma_tests.sh` to execute the full Rust test suite and Python pytest integration suite.
    - Verify that all standalone test targets build and pass cleanly.
+
+4. **Zero Code-Scanning Alerts & Secure Coding Invariants:**
+   - No hardcoded cryptographic keys, credentials, or test passwords (use dynamic deterministic test patterns).
+   - No invalid pointer dereferences, out-of-bounds array access, or unsafe blocks without explicit `# SAFETY:` contract annotations.
+   - Prevent prototype-polluting functions and unescaped HTML/DOM injection across management dashboards and tooling.
+   - Strict exception handling: Do not use empty `except:` or handle `BaseException` generically.
+   - Eliminate unused imports, variables, functions, and loop mutation bugs.
+   - Prioritize memory safety, constant-time cryptography, and robust input validation across all kernel and userland layers.
+

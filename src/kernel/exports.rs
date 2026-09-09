@@ -10,7 +10,6 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;

@@ -3,7 +3,7 @@ use std::format;
 // Asynchronous I/O Ring Subsystem for SigmaOS
 // Inspired by Linux io_uring, Linux POSIX AIO, FreeBSD kqueue EVFILT_AIO, and Windows IOCP.
 
-use crate::klib::VecDeque;
+use crate::klib::collections::VecDeque;
 
 /// Asynchronous I/O Operation Opcodes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -79,8 +79,8 @@ pub struct AsyncIoRingEngine {
 impl AsyncIoRingEngine {
     pub fn new(capacity: usize) -> Self {
         Self {
-            sq_ring: VecDeque::with_capacity(capacity),
-            cq_ring: VecDeque::with_capacity(capacity),
+            sq_ring: VecDeque::new(),
+            cq_ring: VecDeque::new(),
             ring_capacity: capacity,
             total_submitted: 0,
             total_completed: 0,

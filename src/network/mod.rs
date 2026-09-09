@@ -41,3 +41,12 @@ pub use socket::{
     AddressFamily, Socket, SocketAddr, SocketError, SocketOptions, SocketState, SocketTable,
     SocketType,
 };
+
+pub mod zero_copy_networking;
+pub use zero_copy_networking::{SovereignZeroCopySocket, UmemPool, XdpRing, XdpAction, IoCompletionQueue, IoCompletionEntry};
+
+pub mod tc_qdisc_sovereign;
+pub use tc_qdisc_sovereign::{TbfQdisc, PrioQdisc, HtbQdisc, HtbClass, FqCodelQdisc, Packet as QdiscPacket};
+
+pub mod wireguard_sovereign;
+pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};

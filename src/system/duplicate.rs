@@ -19,7 +19,7 @@ use std::vec::Vec;
 // SigmaOS Duplicate File Finder
 // OOP-based duplicate file detection with hash comparison
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 pub type Path = str;
 pub type PathBuf = String;
 

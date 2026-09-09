@@ -68,23 +68,26 @@ pub mod zero_alloc_resolver;
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
-    ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
-    CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
-    DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
-    DebianDebconfStatoverrideEngine, DebianDpkgTriggersAptListbugsGuardEngine, DnfActionKind,
-    DnfActionRecord, DnfTransactionItem, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
-    DragonFlyDportsHammer2SnapshotEngine, EbuildSlotRecord, FedoraDnf5AdvisoryAndDeltaRpmEngine,
-    FedoraDnfHistoryRollbackJournalEngine, FlakeInputLock, FreeBsdPortsFlavoursAndVuxmlEngine,
-    GentooPortageEapiSlotOperatorEngine, GentooPortageSubslotAndUseExpandEngine,
-    HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot, MicroarchRepoRoute, MicroarchitectureLevel,
-    NetBsdPkginBinaryDatabaseEngine, NetBsdPkgsrcOptionsFrameworkEngine,
-    NixFlakesDevshellResolverEngine, NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine,
-    OpenSuseZypperVendorStickinessEngine, PkgSummaryRecord, PkgsrcOptionSpec, PortageEapiLevel,
-    PpaRepository, RestrictedPackageSpec, SlackBuildInfo, SlackPackageRecord,
-    SlackwarePkgtoolSlackBuildEngine, SlotOperator, UbuntuPpaAptPinningEngine,
-    XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
-    ZypperRepository,
+    AlpineApkCachePeerSyncEngine, AlpineApkEdgeOverlayEngine, AlpineApkWorldAndVirtualPkgEngine,
+    AlternativeProvider, AptBugReport, AptListChangesNewsAuditorEngine, AptMarkRecord, AptMarkState,
+    AptNewsEntry, AptPinRule, ArchCachyosMicroarchOptimizationEngine, ArchPacmanParallelDownloadEngine,
+    ArchSplitPackageHookRunnerEngine, CachedPackageFile, CommunityPackageBuildSource, CommunityRepoBackend,
+    CoprAurBuildRepositoryGatewayEngine, DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
+    DebianDebconfStatoverrideEngine, DebianDpkgTriggersAptListbugsGuardEngine, DnfActionKind, DnfActionRecord,
+    DnfTransactionItem, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind, DragonFlyDportsHammer2SnapshotEngine,
+    EbuildSlotRecord, EtcUpdateOverlayCommit, FedoraDnf5AdvisoryAndDeltaRpmEngine, FedoraDnfHistoryRollbackJournalEngine,
+    FedoraModularityModulemdEngine, FlakeInputLock, FreeBsdPkgMessageNotifierEngine, FreeBsdPortsFlavoursAndVuxmlEngine,
+    FreeBsdPoudriereMatrixEngine, GentooPortageEapiSlotOperatorEngine, GentooPortageSubslotAndUseExpandEngine,
+    HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot, MicroarchRepoRoute, MicroarchitectureLevel, ModulemdStreamSpec,
+    NetBsdPkginBinaryDatabaseEngine, NetBsdPkgsrcOptionsFrameworkEngine, NixFlakesDevshellResolverEngine,
+    NixGuixCasGcProfileEngine, NixGuixStoreDeduplicatorEngine, OpenBsdPkgAddSignifyEngine,
+    OpenBsdPledgeUnveilSandboxScriptletEngine, OpenSuseZypperVendorStickinessEngine, OstreeLayeredDeployment,
+    PacdiffCandidate, PacdiffConfigMergeGovernorEngine, PacdiffMergeDecision, PkgMessageNotice, PkgSummaryRecord,
+    PkgsrcOptionSpec, PortageEapiLevel, PortageEtcUpdateGitOverlayEngine, PoudriereBuildTask, PoudriereJailSpec,
+    PpaRepository, RestrictedPackageSpec, RpmOstreeLayeredImageGovernorEngine, ScriptletSandboxPolicy,
+    SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine, SlotOperator, StoreFileMetadata,
+    UbuntuPpaAptPinningEngine, UnveilPathRule, XbpsDebianAlternativesGovernorEngine, XbpsRestrictedNonFreeLicenseEngine,
+    XbpsSonameAndOrphanEngine, XbpsSrcTemplate, XbpsSrcTemplateSandboxEngine, ZypperPackageOffer, ZypperRepository,
 };
 pub use sovereign_sigpkg::*;
 pub use universal_adapter::{
@@ -97,7 +100,7 @@ pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
-    AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
+    AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager, SvnPackageMetadata, SvntogitMigrationEngine,
 };
 pub use arch_pacman_engine::{
@@ -272,7 +275,7 @@ impl Package {
 }
 
 /// Package dependency
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,

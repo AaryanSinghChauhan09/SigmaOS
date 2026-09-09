@@ -19,7 +19,7 @@ use std::format;
 /// SigmaOS IRQ Domain mapper
 /// Maps physical hardware interrupts (hwirq) to virtual interrupt numbers (virq)
 /// Inspired by the Linux irq_domain architecture
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 pub struct IrqDomain {
     pub name: String,

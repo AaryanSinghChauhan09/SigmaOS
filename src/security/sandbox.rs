@@ -5,7 +5,7 @@ use std::format;
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Enhanced with Sandboxie-style file system overlays and Firejail-style execution profiles.
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use crate::klib::HashMap;
 use crate::klib::HashSet;
 

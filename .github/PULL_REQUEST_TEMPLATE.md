@@ -1,60 +1,26 @@
-## Summary
-
-<!-- Provide a brief description of the changes in this PR. -->
-
-## Type of Change
-
-- [ ] Bug fix (non-breaking change that fixes an issue)
-- [ ] New feature (non-breaking change that adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Security fix (addresses a vulnerability)
-- [ ] Documentation update
-- [ ] Refactoring (no functional changes)
-- [ ] CI/CD improvement
-- [ ] Performance improvement
+## Description
+A clear and concise description of the changes introduced in this Pull Request.
 
 ## Related Issues
+Closes #
 
-<!-- Reference related issues: "Fixes #123", "Closes #456", "Related to #789" -->
+## Subsystem Impact
+- [ ] Kernel Core / Microkernel Shards
+- [ ] Drivers (`DriverObject` / `DeviceObject` / `DeviceExtension`)
+- [ ] Capability Security (`CapabilityToken` / `verify_token`)
+- [ ] Memory Management (Paged / NonPaged Pools)
+- [ ] Userland & Runtimes (WASM / POSIX / Win32)
+- [ ] Zenith Desktop Compositor / GUI
 
-## Changes Made
+## Architectural Rule Verification Checklist
+- [ ] **`no_std` Compliance**: Verified no `std` imports introduced in bare-metal crates (passed `./scripts/no_std_check.sh`).
+- [ ] **Capability Security**: Added `CapabilityToken` checks (`verify_token`) for all new syscall entrypoints.
+- [ ] **Driver Lifecycle**: Driver changes include `DriverObject` / `DeviceObject` allocation and `DeviceExtension` pool separation unit tests.
+- [ ] **Memory Safety**: Array and pointer copy operations use bounds-clamped bounds checks.
+- [ ] **Explicit Typing**: Public APIs use explicit type annotations.
+- [ ] **Standalone Testing**: Verified changes using standalone `rustc --test` runner (`./scripts/changed_files_rustc_tests.sh`).
 
-<!-- List the key changes in this PR: -->
--
--
--
-
-## Testing
-
-<!-- Describe the tests you ran and how to reproduce them. -->
-
-- [ ] Unit tests pass (`cargo test --all`)
-- [ ] Integration tests pass (`bash run_sigma_tests.sh`)
-- [ ] No new Clippy warnings (`cargo clippy --all`)
-- [ ] Code is formatted (`cargo fmt --check`)
-- [ ] Security audit passes (`cargo audit`)
-- [ ] New tests added for new functionality
-- [ ] Tested manually in QEMU
-
-## Security Considerations
-
-<!-- If this PR has security implications, describe them here. -->
-
-- [ ] No hardcoded credentials
-- [ ] No unsafe code added (or safety proof provided in comments)
-- [ ] Input validation added for all external inputs
-- [ ] No sensitive data logged
-
-## Documentation
-
-- [ ] Relevant documentation updated
-- [ ] New public APIs documented with doc comments
-- [ ] CHANGELOG.md updated
-
-## Checklist
-
-- [ ] My code follows the project's coding style
-- [ ] I have performed a self-review of my code
-- [ ] I have commented hard-to-understand code
-- [ ] My changes generate no new warnings
-- [ ] Dependent changes have been merged and published
+## Screenshots / Verification Output
+```text
+[Paste test outputs or benchmark logs here]
+```

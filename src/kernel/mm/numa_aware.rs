@@ -15,7 +15,7 @@
 
 /// SigmaOS NUMA (Non-Uniform Memory Access) Topology manager
 /// Tracks NUMA nodes and handles node-local memory allocation preferences
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use std::vec;
 use std::vec::Vec;
 

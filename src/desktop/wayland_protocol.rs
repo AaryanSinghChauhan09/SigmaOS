@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 // SigmaOS Wayland Protocol Engine (Zero-Dependency Bare-Metal Display Protocol Engine)
 // Implements core Wayland wire encoding/decoding, xdg_shell surface lifecycle,
 // wl_seat input event dispatching, and wl_data_device clipboard negotiations.

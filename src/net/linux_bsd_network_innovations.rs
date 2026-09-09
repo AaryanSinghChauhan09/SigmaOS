@@ -158,6 +158,9 @@ impl FreeBsdNetgraphGraphRouter {
     }
 
     pub fn inject_packet(&mut self, entry_node: &str, packet_data: &[u8]) -> Result<u32, &'static str> {
+        if packet_data.is_empty() {
+            return Err("Empty packet payload");
+        }
         let mut current_node = entry_node.to_string();
         let mut hops = 0u32;
 
@@ -240,6 +243,9 @@ impl OpenBsdPfCarpPfsyncStateEngine {
     }
 
     pub fn sync_pfsync_state_table(&self, peer_ip: &str) -> usize {
+        if peer_ip.is_empty() {
+            return 0;
+        }
         if self.carp_state == CarpState::Master {
             self.state_table.len()
         } else {

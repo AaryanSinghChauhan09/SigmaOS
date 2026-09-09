@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 //! Arch Linux Parity and Compatibility Subsystem for SigmaOS
 //! Arch Linux Parity and Compatibility Subsystem for SigmaOS
 //! Implements a rich suite of Arch Linux abstractions and parities:

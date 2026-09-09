@@ -19,7 +19,7 @@ use std::vec::Vec;
 // SigmaOS Process Manager
 // OOP-based process management with monitoring and control
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use core::time::Duration;
 // Instant not in no_std
 

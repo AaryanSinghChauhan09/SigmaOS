@@ -15,8 +15,6 @@ use std::vec;
 // - Intel SMBus / I2C Host Controller (Linux i2c-i801 / FreeBSD ichsmb(4))
 // - Controller Area Network SocketCAN (Linux SocketCAN / FreeBSD can(4))
 
-
-
 #[cfg(not(all(test, not(feature = "sigmaos_lib"))))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
@@ -244,7 +242,9 @@ impl PeripheralDevice for RealtekRtl8169Driver {
         self.power_state = PowerState::On;
         self.rx_ring = Vec::new();
         // Pre-populate simulated RX buffer frame
-        self.rx_ring.push(std::vec![0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x52, 0x54, 0x00, 0x81, 0x69, 0x01, 0x08, 0x00]);
+        self.rx_ring.push(std::vec![
+            0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x52, 0x54, 0x00, 0x81, 0x69, 0x01, 0x08, 0x00
+        ]);
         Ok(())
     }
 
@@ -985,7 +985,8 @@ impl PeripheralDevice for CanBusSocketDriver {
         self.power_state = PowerState::On;
         self.rx_queue = Vec::new();
         // Enqueue sample CAN frame
-        self.rx_queue.push((0x123, std::vec![0xDE, 0xAD, 0xBE, 0xEF]));
+        self.rx_queue
+            .push((0x123, std::vec![0xDE, 0xAD, 0xBE, 0xEF]));
         Ok(())
     }
 
@@ -1806,6 +1807,489 @@ impl PeripheralDevice for Ch340ExternalSerialDriver {
 }
 
 // =========================================================================
+// 23. Display / Monitor: EDID DDC/CI Display & Backlight Control Driver
+// =========================================================================
+pub struct EdidMonitorDdcDisplayDriver {
+    pub is_initialized: bool,
+    pub power_state: PowerState,
+    pub preferred_width: u32,
+    pub preferred_height: u32,
+    pub refresh_rate_hz: u32,
+    pub brightness_percent: u8,
+    pub dpms_state: String, // "On", "Standby", "Suspend", "Off"
+    pub hdr_enabled: bool,
+}
+
+impl EdidMonitorDdcDisplayDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            preferred_width: 3840,
+            preferred_height: 2160,
+            refresh_rate_hz: 144,
+            brightness_percent: 80,
+            dpms_state: String::from("On"),
+            hdr_enabled: true,
+        }
+    }
+
+    pub fn set_ddc_brightness(&mut self, level: u8) {
+        self.brightness_percent = level.min(100);
+    }
+
+    pub fn set_dpms_mode(&mut self, mode: &str) {
+        self.dpms_state = mode.to_string();
+    }
+}
+
+impl PeripheralDevice for EdidMonitorDdcDisplayDriver {
+    fn name(&self) -> &'static str {
+        "EDID Monitor DDC/CI Display & Backlight Controller (Linux drm_edid / FreeBSD edid)"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Gen5
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::Active;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("Monitor driver not initialized");
+        }
+        let info = format!("3840x2160@144Hz_HDR_DDC80");
+        let bytes = info.as_bytes();
+        let copy_len = bytes.len().min(buffer.len());
+        buffer[..copy_len].copy_from_slice(&bytes[..copy_len]);
+        Ok(copy_len)
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("Monitor driver not initialized");
+        }
+        if let Ok(s) = core::str::from_utf8(data) {
+            if s.starts_with("brightness=") {
+                if let Ok(val) = s.trim_start_matches("brightness=").parse::<u8>() {
+                    self.set_ddc_brightness(val);
+                }
+            }
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 24. Audio / Speaker: PC Speaker & Internal Beeper PCM Driver
+// =========================================================================
+pub struct PcSpeakerInternalAudioDriver {
+    pub is_initialized: bool,
+    pub power_state: PowerState,
+    pub current_frequency_hz: u32,
+    pub tone_duration_ms: u32,
+    pub is_beeping: bool,
+}
+
+impl PcSpeakerInternalAudioDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            current_frequency_hz: 440, // A4 tone
+            tone_duration_ms: 200,
+            is_beeping: false,
+        }
+    }
+
+    pub fn play_tone(&mut self, freq_hz: u32, duration_ms: u32) {
+        self.current_frequency_hz = freq_hz;
+        self.tone_duration_ms = duration_ms;
+        self.is_beeping = true;
+    }
+
+    pub fn silence(&mut self) {
+        self.is_beeping = false;
+    }
+}
+
+impl PeripheralDevice for PcSpeakerInternalAudioDriver {
+    fn name(&self) -> &'static str {
+        "PC Speaker & Internal Beeper Driver (Linux pcspkr / FreeBSD syscons_beeper)"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Legacy
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::Active;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("PC Speaker driver not initialized");
+        }
+        if buffer.len() >= 4 {
+            buffer[0..4].copy_from_slice(&self.current_frequency_hz.to_le_bytes());
+            Ok(4)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("PC Speaker driver not initialized");
+        }
+        if data.len() >= 4 {
+            let freq = u32::from_le_bytes([data[0], data[1], data[2], data[3]]);
+            self.play_tone(freq, 200);
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.is_beeping = false;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 25. Video / Camera: USB Video Class (UVC) Webcam Camera Driver
+// =========================================================================
+pub struct UvcWebcamVideoCameraDriver {
+    pub is_initialized: bool,
+    pub power_state: PowerState,
+    pub resolution_width: u32,
+    pub resolution_height: u32,
+    pub fps: u32,
+    pub auto_exposure: bool,
+    pub is_streaming: bool,
+}
+
+impl UvcWebcamVideoCameraDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            resolution_width: 1920,
+            resolution_height: 1080,
+            fps: 60,
+            auto_exposure: true,
+            is_streaming: false,
+        }
+    }
+
+    pub fn start_capture(&mut self) {
+        self.is_streaming = true;
+    }
+
+    pub fn stop_capture(&mut self) {
+        self.is_streaming = false;
+    }
+}
+
+impl PeripheralDevice for UvcWebcamVideoCameraDriver {
+    fn name(&self) -> &'static str {
+        "USB Video Class (UVC) HD Webcam Driver (Linux uvcvideo / FreeBSD webcamd)"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Gen4
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::Active;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("UVC Webcam driver not initialized");
+        }
+        // Simulated YUY2 1080p frame header
+        let frame_hdr = b"UVC_FRAME_1080P_YUY2";
+        let copy_len = frame_hdr.len().min(buffer.len());
+        buffer[..copy_len].copy_from_slice(&frame_hdr[..copy_len]);
+        Ok(copy_len)
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("UVC Webcam driver not initialized");
+        }
+        if data == b"start" {
+            self.start_capture();
+        } else if data == b"stop" {
+            self.stop_capture();
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.is_streaming = false;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 26. Bluetooth: Intel/Realtek Bluetooth 5.3 USB Controller Driver
+// =========================================================================
+pub struct IntelBtUsbBluetoothDriver {
+    pub is_initialized: bool,
+    pub power_state: PowerState,
+    pub is_scanning: bool,
+    pub active_connections: usize,
+    pub mac_address: [u8; 6],
+}
+
+impl IntelBtUsbBluetoothDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            is_scanning: false,
+            active_connections: 0,
+            mac_address: [0x00, 0x1A, 0x7D, 0xDA, 0x71, 0x13],
+        }
+    }
+
+    pub fn start_hci_scan(&mut self) {
+        self.is_scanning = true;
+    }
+
+    pub fn stop_hci_scan(&mut self) {
+        self.is_scanning = false;
+    }
+}
+
+impl PeripheralDevice for IntelBtUsbBluetoothDriver {
+    fn name(&self) -> &'static str {
+        "Intel/Realtek Bluetooth 5.3 HCI USB Driver (Linux btusb / FreeBSD ng_ubt)"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Gen5
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::Active;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("Bluetooth driver not initialized");
+        }
+        if buffer.len() >= 6 {
+            buffer[..6].copy_from_slice(&self.mac_address);
+            Ok(6)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("Bluetooth driver not initialized");
+        }
+        if data == b"scan_start" {
+            self.start_hci_scan();
+        } else if data == b"scan_stop" {
+            self.stop_hci_scan();
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.is_scanning = false;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 27. Input / Mouse: HID Precision Multi-Touch Touchpad & Gaming Mouse
+// =========================================================================
+pub struct HidPrecisionTouchpadDriver {
+    pub is_initialized: bool,
+    pub power_state: PowerState,
+    pub dpi_setting: u32,
+    pub polling_rate_hz: u32,
+    pub touch_contacts: u8,
+}
+
+impl HidPrecisionTouchpadDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            dpi_setting: 1600,
+            polling_rate_hz: 1000,
+            touch_contacts: 0,
+        }
+    }
+
+    pub fn set_dpi(&mut self, dpi: u32) {
+        self.dpi_setting = dpi;
+    }
+}
+
+impl PeripheralDevice for HidPrecisionTouchpadDriver {
+    fn name(&self) -> &'static str {
+        "HID Precision Touchpad & Multi-Button Gaming Mouse Driver (Linux hid-multitouch / FreeBSD hcons)"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Gen4
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::Active;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("Touchpad driver not initialized");
+        }
+        let report = [0x01, 0x10, 0x20, 0x02]; // Simulated HID multi-touch report
+        let copy_len = report.len().min(buffer.len());
+        buffer[..copy_len].copy_from_slice(&report[..copy_len]);
+        Ok(copy_len)
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("Touchpad driver not initialized");
+        }
+        if data.len() >= 4 {
+            let dpi = u32::from_le_bytes([data[0], data[1], data[2], data[3]]);
+            self.set_dpi(dpi);
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 28. Storage / PCIe: NVMe v1.4 High-Speed PCIe Host Controller Driver
+// =========================================================================
+pub struct NvmePCIeHostControllerDriver {
+    pub is_initialized: bool,
+    pub power_state: PowerState,
+    pub namespace_count: u32,
+    pub total_blocks: u64,
+    pub block_size_bytes: usize,
+}
+
+impl NvmePCIeHostControllerDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            namespace_count: 1,
+            total_blocks: 1_953_525_168, // 1 TB in 512B sectors
+            block_size_bytes: 512,
+        }
+    }
+}
+
+impl PeripheralDevice for NvmePCIeHostControllerDriver {
+    fn name(&self) -> &'static str {
+        "NVMe v1.4 High-Speed PCIe Controller Driver (Linux nvme / FreeBSD nvme)"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Gen5
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::Active;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("NVMe driver not initialized");
+        }
+        let read_len = self.block_size_bytes.min(buffer.len());
+        buffer[..read_len].fill(0xE5); // Simulated NVMe block read
+        Ok(read_len)
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized {
+            return Err("NVMe driver not initialized");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
 // Unit Tests
 // =========================================================================
 
@@ -1908,7 +2392,10 @@ mod tests {
     #[test]
     fn test_wacom_graphics_tablet_driver() {
         let mut wacom = WacomGraphicsTabletDriver::new();
-        assert_eq!(wacom.name(), "Wacom Intuos/Cintiq Professional Digitizer Tablet");
+        assert_eq!(
+            wacom.name(),
+            "Wacom Intuos/Cintiq Professional Digitizer Tablet"
+        );
         assert_eq!(wacom.generation(), DeviceGeneration::Modern);
         assert_eq!(wacom.pressure_levels(), 8192);
 
@@ -1979,7 +2466,10 @@ mod tests {
     #[test]
     fn test_raspberry_pi_gpio_driver() {
         let mut rpi = RaspberryPiGpioMailboxDriver::new();
-        assert_eq!(rpi.name(), "Broadcom BCM2835/2711/2712 GPIO & Mailbox SoC Driver");
+        assert_eq!(
+            rpi.name(),
+            "Broadcom BCM2835/2711/2712 GPIO & Mailbox SoC Driver"
+        );
         assert_eq!(rpi.generation(), DeviceGeneration::Modern);
         assert_eq!(rpi.gpio_count(), 54);
 
@@ -2016,14 +2506,20 @@ mod tests {
     #[test]
     fn test_can_bus_socket_driver() {
         let mut can = CanBusSocketDriver::new();
-        assert_eq!(can.name(), "SocketCAN Automotive & Industrial Bus Controller");
+        assert_eq!(
+            can.name(),
+            "SocketCAN Automotive & Industrial Bus Controller"
+        );
         assert_eq!(can.generation(), DeviceGeneration::Modern);
         assert_eq!(can.bitrate_kbps(), 500);
 
         assert!(can.initialize().is_ok());
         let mut frame_buf = [0u8; 8];
         assert_eq!(can.read(&mut frame_buf).unwrap(), 8);
-        assert_eq!(u32::from_le_bytes([frame_buf[0], frame_buf[1], frame_buf[2], frame_buf[3]]), 0x123);
+        assert_eq!(
+            u32::from_le_bytes([frame_buf[0], frame_buf[1], frame_buf[2], frame_buf[3]]),
+            0x123
+        );
 
         let tx_frame = [0x45, 0x01, 0x00, 0x00, 0xAA, 0xBB];
         assert_eq!(can.write(&tx_frame).unwrap(), 6);
@@ -2034,14 +2530,20 @@ mod tests {
     #[test]
     fn test_usb_mass_storage_bot_driver() {
         let mut bot = UsbMassStorageBotDriver::new();
-        assert_eq!(bot.name(), "USB Mass Storage Bulk-Only Transport (BOT) External Drive");
+        assert_eq!(
+            bot.name(),
+            "USB Mass Storage Bulk-Only Transport (BOT) External Drive"
+        );
         assert_eq!(bot.generation(), DeviceGeneration::Modern);
         assert_eq!(bot.total_capacity_bytes(), 64_000_000_000);
 
         assert!(bot.initialize().is_ok());
         let mut geom_buf = [0u8; 12];
         assert_eq!(bot.read(&mut geom_buf).unwrap(), 12);
-        assert_eq!(u32::from_le_bytes([geom_buf[0], geom_buf[1], geom_buf[2], geom_buf[3]]), 512);
+        assert_eq!(
+            u32::from_le_bytes([geom_buf[0], geom_buf[1], geom_buf[2], geom_buf[3]]),
+            512
+        );
 
         assert_eq!(bot.write(b"WRITE-BLOCK").unwrap(), 11);
         assert!(bot.shutdown().is_ok());
@@ -2065,7 +2567,10 @@ mod tests {
     #[test]
     fn test_bluetooth_external_gatt_hid_driver() {
         let mut bt_hid = BluetoothExternalGattHidDriver::new();
-        assert_eq!(bt_hid.name(), "Bluetooth LE External GATT Human Interface Device");
+        assert_eq!(
+            bt_hid.name(),
+            "Bluetooth LE External GATT Human Interface Device"
+        );
         assert_eq!(bt_hid.generation(), DeviceGeneration::Modern);
         assert_eq!(bt_hid.battery_percent(), 85);
 
@@ -2081,7 +2586,10 @@ mod tests {
     #[test]
     fn test_thunderbolt_external_display_driver() {
         let mut tb_dp = ThunderboltExternalDisplayDriver::new();
-        assert_eq!(tb_dp.name(), "USB Type-C / Thunderbolt External DisplayPort Alt-Mode");
+        assert_eq!(
+            tb_dp.name(),
+            "USB Type-C / Thunderbolt External DisplayPort Alt-Mode"
+        );
         assert_eq!(tb_dp.generation(), DeviceGeneration::Modern);
         assert_eq!(tb_dp.resolution(), (3840, 2160));
 
@@ -2097,7 +2605,10 @@ mod tests {
     #[test]
     fn test_ch340_external_serial_driver() {
         let mut serial = Ch340ExternalSerialDriver::new();
-        assert_eq!(serial.name(), "CH340 / FTDI USB-to-Serial External Controller Bridge");
+        assert_eq!(
+            serial.name(),
+            "CH340 / FTDI USB-to-Serial External Controller Bridge"
+        );
         assert_eq!(serial.generation(), DeviceGeneration::Modern);
         assert_eq!(serial.baud_rate(), 115200);
 
@@ -2171,7 +2682,10 @@ mod tests {
     #[test]
     fn test_cxl3_memory_expander_driver() {
         let mut cxl = Cxl3MemoryExpanderDriver::new();
-        assert_eq!(cxl.name(), "Compute Express Link (CXL 3.0) Type-3 Memory Expander");
+        assert_eq!(
+            cxl.name(),
+            "Compute Express Link (CXL 3.0) Type-3 Memory Expander"
+        );
         assert_eq!(cxl.generation(), DeviceGeneration::Modern);
         assert_eq!(cxl.ram_gb(), 256);
 
@@ -2188,30 +2702,92 @@ mod tests {
         let mut manager = PeripheralManager::new();
         assert_eq!(manager.device_count(), 0);
 
-        assert!(manager.register_device(Box::new(Mpt3SasControllerDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(VirtioScsiControllerDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(RealtekRtl8169Driver::new())).is_ok());
-        assert!(manager.register_device(Box::new(IntelIgbNicDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(IntelIwfWifiDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(WacomGraphicsTabletDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(SynapticsTouchpadDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(RealtekAlcAudioDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(RadeonKmsGpuDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(RaspberryPiGpioMailboxDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(IntelI2cSmbusControllerDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(CanBusSocketDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(UsbMassStorageBotDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(UsbGamepadControllerDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(BluetoothExternalGattHidDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(ThunderboltExternalDisplayDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Ch340ExternalSerialDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(SoundBlaster16IsaDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(ThreeCom3c59xEthernetDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(FloppyDiskControllerDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(IntelXeArcGpuDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(Cxl3MemoryExpanderDriver::new())).is_ok());
+        assert!(manager
+            .register_device(Box::new(Mpt3SasControllerDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(VirtioScsiControllerDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(RealtekRtl8169Driver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(IntelIgbNicDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(IntelIwfWifiDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(WacomGraphicsTabletDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(SynapticsTouchpadDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(RealtekAlcAudioDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(RadeonKmsGpuDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(RaspberryPiGpioMailboxDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(IntelI2cSmbusControllerDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(CanBusSocketDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(UsbMassStorageBotDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(UsbGamepadControllerDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(BluetoothExternalGattHidDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(ThunderboltExternalDisplayDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Ch340ExternalSerialDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(SoundBlaster16IsaDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(ThreeCom3c59xEthernetDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(FloppyDiskControllerDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(IntelXeArcGpuDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(Cxl3MemoryExpanderDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(EdidMonitorDdcDisplayDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(PcSpeakerInternalAudioDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(UvcWebcamVideoCameraDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(IntelBtUsbBluetoothDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(HidPrecisionTouchpadDriver::new()))
+            .is_ok());
+        assert!(manager
+            .register_device(Box::new(NvmePCIeHostControllerDriver::new()))
+            .is_ok());
 
-        assert_eq!(manager.device_count(), 22);
+        assert_eq!(manager.device_count(), 28);
         manager.broadcast_power_state(PowerState::Sleep);
     }
 }

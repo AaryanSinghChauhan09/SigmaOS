@@ -21,7 +21,7 @@ use std::vec::Vec;
 // SigmaOS Code Editor
 // OOP-based code editor with syntax highlighting and LSP integration
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 // String not in no_std
 
 /// Document

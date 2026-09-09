@@ -12,7 +12,7 @@
 mod network_ns_integration_tests {
     use sigmaos::net::{
         FirewallAction, FirewallRule, NetworkInterface, NetworkNamespace, NetworkNamespaceId,
-        NetworkNamespaceManager, Route, VirtualBridge,
+        NetworkNamespaceManager, NamespaceRoute as Route, VirtualBridge,
     };
     use std::net::{IpAddr, Ipv4Addr};
     use std::time::Instant;

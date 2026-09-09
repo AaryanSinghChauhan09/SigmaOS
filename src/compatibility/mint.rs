@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 // SigmaOS Linux Mint Compatibility Subsystem
 // Zero-dependency implementations of Linux Mint's core tooling
 // Inspired by mintupdate, mintinstall, Cinnamon, and xapps

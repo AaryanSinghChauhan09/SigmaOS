@@ -2,9 +2,9 @@ name: Security - Pledge & Unveil Capability Sandbox Audit
 
 on:
   push:
-    branches: [ main, master, "jules-*" ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -24,7 +24,6 @@ jobs:
 
       - name: Run Pledge/Unveil & Shell Security Tests
         run: |
-          mkdir -p build
           mkdir -p build && rustc --edition=2021 --test src/shell/sigma_sh.rs -o build/sh_test
           ./build/sh_test
           rm -f build/sh_test

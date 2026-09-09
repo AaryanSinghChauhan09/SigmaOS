@@ -65,6 +65,15 @@ pub enum PackageFormat {
     SolarisIps,
     GuixNar,
     OpenBsdPkg,
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -177,6 +186,24 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
+        } else if normalized.ends_with(".sysupdate") {
+            Some(PackageFormat::Sysupdate)
         } else {
             None
         }
@@ -606,6 +633,15 @@ impl PackageAdapterFactory {
             PackageFormat::SolarisIps => Box::new(SolarisIpsPackageAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarPackageAdapter),
             PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgPackageAdapter),
+            PackageFormat::Spack => Box::new(SpackPackageAdapter),
+            PackageFormat::Conan => Box::new(ConanPackageAdapter),
+            PackageFormat::Wheel => Box::new(WheelPackageAdapter),
+            PackageFormat::Crate => Box::new(CratePackageAdapter),
+            PackageFormat::Gem => Box::new(GemPackageAdapter),
+            PackageFormat::Nupkg => Box::new(NupkgPackageAdapter),
+            PackageFormat::Vcpkg => Box::new(VcpkgPackageAdapter),
+            PackageFormat::NarInfo => Box::new(NarInfoPackageAdapter),
+            PackageFormat::Sysupdate => Box::new(SysupdatePackageAdapter),
         }
     }
 }
@@ -637,6 +673,222 @@ impl IPackageAdapter for DportsPackageAdapter {
             "DragonFly DPorts Adapter: Building ports snapshot overlay in: {}",
             store_path
         );
+        Ok(())
+    }
+}
+
+pub struct SpackPackageAdapter;
+impl IPackageAdapter for SpackPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Spack
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Spack package payload");
+        }
+        Ok(PackageContext {
+            name: "spack-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Spack,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x38; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Spack Adapter: Extracted Spack package to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct ConanPackageAdapter;
+impl IPackageAdapter for ConanPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Conan
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Conan package payload");
+        }
+        Ok(PackageContext {
+            name: "conan-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Conan,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x39; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Conan Adapter: Extracted Conan package to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct WheelPackageAdapter;
+impl IPackageAdapter for WheelPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Wheel
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Python Wheel payload");
+        }
+        Ok(PackageContext {
+            name: "wheel-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Wheel,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x3a; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Wheel Adapter: Extracted Wheel package to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct CratePackageAdapter;
+impl IPackageAdapter for CratePackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Crate
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Cargo crate payload");
+        }
+        Ok(PackageContext {
+            name: "crate-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Crate,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x3b; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Crate Adapter: Extracted Cargo crate to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct GemPackageAdapter;
+impl IPackageAdapter for GemPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Gem
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty RubyGem payload");
+        }
+        Ok(PackageContext {
+            name: "gem-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Gem,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x3c; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Gem Adapter: Extracted RubyGem to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct NupkgPackageAdapter;
+impl IPackageAdapter for NupkgPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Nupkg
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty NuGet package payload");
+        }
+        Ok(PackageContext {
+            name: "nupkg-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Nupkg,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x3d; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Nupkg Adapter: Extracted NuGet package to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct VcpkgPackageAdapter;
+impl IPackageAdapter for VcpkgPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Vcpkg
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Vcpkg payload");
+        }
+        Ok(PackageContext {
+            name: "vcpkg-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Vcpkg,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x3e; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Vcpkg Adapter: Extracted Vcpkg package to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct NarInfoPackageAdapter;
+impl IPackageAdapter for NarInfoPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::NarInfo
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty NarInfo payload");
+        }
+        Ok(PackageContext {
+            name: "narinfo-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::NarInfo,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x3f; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("NarInfo Adapter: Extracted NarInfo manifest to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct SysupdatePackageAdapter;
+impl IPackageAdapter for SysupdatePackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Sysupdate
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Sysupdate payload");
+        }
+        Ok(PackageContext {
+            name: "sysupdate-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Sysupdate,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x40; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Sysupdate Adapter: Extracted Sysupdate definition to: {}", store_path);
         Ok(())
     }
 }

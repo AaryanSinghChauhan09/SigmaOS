@@ -13,7 +13,7 @@
 mod tests {
     use sigmaos::net::{
         FirewallAction, FirewallRule, NetworkInterface, NetworkNamespaceId,
-        NetworkNamespaceManager, NetworkSyscalls, Route, SockAddr, SocketFd, SocketState, AF_INET,
+        NetworkNamespaceManager, NetworkSyscalls, NamespaceRoute as Route, SockAddr, SocketFd, SocketState, AF_INET,
         IPPROTO_TCP, IPPROTO_UDP, SOCK_DGRAM, SOCK_STREAM,
     };
     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};

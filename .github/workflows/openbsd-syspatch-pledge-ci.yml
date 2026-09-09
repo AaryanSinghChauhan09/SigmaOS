@@ -2,9 +2,12 @@ name: OpenBSD Syspatch & Pledge/Unveil CI
 
 on:
   push:
-    branches: [ "main", "master", "jules-*" ]
+    branches: [ "main" ]
+
+permissions:
+  contents: read
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
 
 jobs:
   openbsd-syspatch-pledge:

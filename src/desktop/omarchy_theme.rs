@@ -4,7 +4,6 @@
 //! a visual theme switcher with live previews, semantic color systems, and
 //! coordinated theming across desktop, terminal, editor, and applications.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;

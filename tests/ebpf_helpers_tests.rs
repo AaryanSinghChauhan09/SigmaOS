@@ -209,7 +209,7 @@ mod ebpf_integration_tests {
         let mut verifier = BpfProgramVerifier::new(program);
         let result = verifier.verify();
         assert!(
-            result.is_err() || !verifier.report.is_valid,
+            result.as_ref().map_or(true, |r| !r.is_valid),
             "Invalid register should fail verification"
         );
     }
@@ -227,7 +227,7 @@ mod ebpf_integration_tests {
         let mut verifier = BpfProgramVerifier::new(program);
         let result = verifier.verify();
         assert!(
-            result.is_err() || !verifier.report.is_valid,
+            result.as_ref().map_or(true, |r| !r.is_valid),
             "Out of bounds jump should fail verification"
         );
     }
@@ -245,7 +245,7 @@ mod ebpf_integration_tests {
         let mut verifier = BpfProgramVerifier::new(program);
         let result = verifier.verify();
         assert!(
-            result.is_err() || !verifier.report.is_valid,
+            result.as_ref().map_or(true, |r| !r.is_valid),
             "Infinite loop should fail verification"
         );
     }
@@ -263,7 +263,7 @@ mod ebpf_integration_tests {
         let mut verifier = BpfProgramVerifier::new(program);
         let result = verifier.verify();
         assert!(
-            result.is_err() || !verifier.report.is_valid,
+            result.as_ref().map_or(true, |r| !r.is_valid),
             "Unreachable code should fail verification"
         );
     }

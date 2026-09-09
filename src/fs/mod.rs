@@ -36,3 +36,15 @@ pub use xfs::{
     AllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal,
     XfsState,
 };
+
+pub mod bcachefs_sovereign;
+pub use bcachefs_sovereign::{SovereignBcachefsVolume, BcachefsInode, BcachefsExtent, BcachefsSnapshot, ChecksumAlgorithm, CompressionType, sovereign_crc32c};
+
+pub mod overlayfs_sovereign;
+pub use overlayfs_sovereign::{SovereignOverlayFs, OverlayLayer, OverlayEntry, OverlayEntryKind};
+
+pub mod zfs_arc_sovereign;
+pub use zfs_arc_sovereign::{SovereignZfsArc, ArcBufferHeader};
+
+pub mod fanotify_sovereign;
+pub use fanotify_sovereign::{SovereignFanotifyGroup, FanotifyEvent, FanotifyEventKind, FanotifyResponse, FanotifyMark};

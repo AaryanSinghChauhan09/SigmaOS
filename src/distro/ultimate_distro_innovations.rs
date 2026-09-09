@@ -8,7 +8,7 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Solus Linux Inspired: Stateless Vendor Override & LMO Package Stream Engine
 #[derive(Debug, Clone)]

@@ -11,13 +11,69 @@ use std::vec::Vec;
 use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
+/// Description of Arch Linux binary .PKGINFO Manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+    pub architecture: String,
+}
+
+/// Description of Gentoo .ebuild specification metadata
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub package_name: String,
+    pub version: String,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+    pub use_flags: Vec<String>,
+}
+
+/// Description of Alpine Linux APKINDEX Manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkIndexManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+}
+
+/// Description of Void Linux XBPS Manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+}
+
+/// Description of Ubuntu Snapcraft Manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub confinement: String,
+    pub plugs: Vec<String>,
+}
+
+/// Description of Haiku .hpkg Manifest
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub architecture: String,
+    pub requires: Vec<String>,
+}
+
 #[cfg(test)]
 pub use crate::sigpkg::Version;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -32,7 +88,6 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
-    ProcessExec,
 }
 
 #[cfg(not(feature = "standalone_test"))]
@@ -50,7 +105,6 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -936,6 +990,22 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::GuixNar) // Nix / Guix NAR archive magic
         } else if data.starts_with(b"OBSD") {
             Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
+        } else if data.starts_with(b"SPAK") {
+            Some(PackageFormat::Spack) // HPC Spack magic
+        } else if data.starts_with(b"CONA") {
+            Some(PackageFormat::Conan) // Conan package magic
+        } else if data.starts_with(b"WHEL") {
+            Some(PackageFormat::Wheel) // Python Wheel magic
+        } else if data.starts_with(b"CRAT") {
+            Some(PackageFormat::Crate) // Cargo crate magic
+        } else if data.starts_with(b"GEMS") {
+            Some(PackageFormat::Gem) // RubyGems magic
+        } else if data.starts_with(b"NUPK") {
+            Some(PackageFormat::Nupkg) // NuGet magic
+        } else if data.starts_with(b"VCPK") {
+            Some(PackageFormat::Vcpkg) // Vcpkg magic
+        } else if data.starts_with(b"NARI") {
+            Some(PackageFormat::NarInfo) // NarInfo magic
         } else {
             None
         }
@@ -2882,6 +2952,71 @@ mod tests {
         assert_eq!(
             adapter.detect_format_by_header(b"SPKG0001header"),
             Some(PackageFormat::Sovereign)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("hpc.spack"),
+            Some(PackageFormat::Spack)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("lib.conan"),
+            Some(PackageFormat::Conan)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("pkg.whl"),
+            Some(PackageFormat::Wheel)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("crate.crate"),
+            Some(PackageFormat::Crate)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("ruby.gem"),
+            Some(PackageFormat::Gem)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("dotnet.nupkg"),
+            Some(PackageFormat::Nupkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("cpp.vcpkg"),
+            Some(PackageFormat::Vcpkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_extension("store.narinfo"),
+            Some(PackageFormat::NarInfo)
+        );
+
+        assert_eq!(
+            adapter.detect_format_by_header(b"SPAK1234"),
+            Some(PackageFormat::Spack)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"CONA1234"),
+            Some(PackageFormat::Conan)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"WHEL1234"),
+            Some(PackageFormat::Wheel)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"CRAT1234"),
+            Some(PackageFormat::Crate)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"GEMS1234"),
+            Some(PackageFormat::Gem)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NUPK1234"),
+            Some(PackageFormat::Nupkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"VCPK1234"),
+            Some(PackageFormat::Vcpkg)
+        );
+        assert_eq!(
+            adapter.detect_format_by_header(b"NARI1234"),
+            Some(PackageFormat::NarInfo)
         );
     }
 

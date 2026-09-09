@@ -105,17 +105,9 @@ impl Default for SigmaString {
     }
 }
 
-impl From<&str> for SigmaString {
-    fn from(s: &str) -> Self {
-        Self::from_str(s)
-    }
-}
-
-impl From<String> for SigmaString {
-    fn from(s: String) -> Self {
-        Self { data: s }
-    }
-}
+// ------------------------------------------------------------------
+// Deref to &str
+// ------------------------------------------------------------------
 
 impl core::ops::Deref for SigmaString {
     type Target = str;
