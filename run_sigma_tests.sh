@@ -200,7 +200,15 @@ rustc --edition=2021 --test src/kernel/ksm_sovereign.rs \
 ./build/test_ksm --test-threads=1
 echo "ksm_sovereign: PASSED"
 
+# ─── Linux & BSD Distro Inspirations Subsystem Integration ────────────────────
+echo ""
+echo "=== [23] SigmaOS Distro Subsystem Compatibility Tests ==="
+rustc --edition=2021 --test --cfg 'feature="standalone_test"' src/distro/linux_bsd_inspirations.rs \
+  -o build/test_linux_bsd_inspirations 2>&1 | grep -v "^$" || true
+./build/test_linux_bsd_inspirations --test-threads=1
+echo "distro_subsystem_compatibility: PASSED"
+
 echo ""
 echo "========================================================"
-echo "=== ALL 22 SIGMAOS TEST SUITES PASSED SUCCESSFULLY ==="
+echo "=== ALL 23 SIGMAOS TEST SUITES PASSED SUCCESSFULLY ==="
 echo "========================================================"
