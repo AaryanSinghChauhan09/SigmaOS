@@ -1,7 +1,7 @@
 # Next Steps Guidelines & Comprehensive Repository Improvements
 
 ## Overview & Executive Summary
-This document provides a complete, actionable technical analysis, guidelines, and improvements roadmap for the **SigmaOS** operating system repository (`https://github.com/AaryanSinghChauhan09/SigmaOS/`). It encompasses deep audits across code quality, performance optimization, security compliance, developer workflow, repository governance, community engagement, tools & utilities, object-oriented design (OOP) principles, micro-UX accessibility, and strategic next steps directly applied to the `main` branch.
+This document provides a complete, actionable technical analysis, guidelines, and improvements roadmap for the **SigmaOS** operating system repository (`https://github.com/AaryanSinghChauhan09/SigmaOS/`). It encompasses deep audits across code quality, performance optimization, security compliance, developer workflow, repository governance, community engagement, tools & utilities, object-oriented design (OOP) principles, micro-UX accessibility, and strategic next steps directly applied to the `main` branch without creating pull requests.
 
 ---
 
@@ -13,6 +13,10 @@ This document provides a complete, actionable technical analysis, guidelines, an
 * Ensure pattern matches on enums are strictly exhaustive or include appropriate fallback handling.
 
 ### 1.2 Test Execution Procedures
+* To execute the native test runner suite, run:
+  ```bash
+  ./run_sigma_tests.sh
+  ```
 * To run standalone module tests, execute:
   ```bash
   rustc --test src/package/universal.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_universal && /tmp/test_universal
