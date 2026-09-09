@@ -224,7 +224,7 @@ pub enum PackagePriority {
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
@@ -282,15 +282,6 @@ pub enum PackageFormat {
     Opkg,       // OpenWrt OPKG (.opkg)
     SolarisIps, // Solaris IPS package (.p5p / .ips)
     GuixNar,    // GNU Guix Normalized Archive (.nar)
-    Spack,      // Spack HPC package manager (.spack)
-    Conan,      // Conan C/C++ package (.conan)
-    Wheel,      // Python Wheel (.whl)
-    Crate,      // Rust Cargo crate (.crate)
-    Gem,        // RubyGems (.gem)
-    Nupkg,      // .NET NuGet (.nupkg)
-    Vcpkg,      // Microsoft Vcpkg (.vcpkg)
-    NarInfo,    // Nix/Guix NarInfo substituter manifest (.narinfo)
-    Sysupdate,  // systemd sysupdate definition (.sysupdate)
 }
 
 impl PackageFormat {

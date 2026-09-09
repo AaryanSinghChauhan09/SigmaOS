@@ -76,10 +76,14 @@ Tasks must not block synchronously on I/O. All wait states must suspend executio
 
 ## 4. Task Isolation, Sandboxing & Resource Quotas
 
-### 4.1 Fine-Grained Capability Sandboxing
-All agent tasks operate under OpenBSD-inspired `pledge(2)` and `unveil(2)` sandboxing (`src/security/sigma_unveil.rs`):
+### 4.1 Fine-Grained Capability Sandboxing & Distro-Inspired Cleanrooms
+All agent tasks operate under OpenBSD-inspired `pledge(2)` and `unveil(2)` sandboxing (`src/security/sigma_unveil.rs`) combined with Linux & BSD distro cleanroom execution principles:
 * **Pledge Promises**: Tasks explicitly drop unneeded system call promises (e.g., `pledge("stdio rpath wpath")`). Attempting an unpromised syscall generates a `SIGABRT` and task eviction.
 * **Unveil Path Scoping**: Tasks restrict filesystem visibility to declared target paths (`unveil("/src", "r")`, `unveil("/build", "rwc")`). Path traversal outside unveiled locations returns `ENOENT` or `EACCES`.
+* **Arch Linux Build & Sign Verification**: Package tasks must verify PGP keyring signatures (`ArchKeyringTrustEngine`) and run `pacman-contrib` checks (`updpkgsums`, `checkupdates`, `finddeps`) before code execution.
+* **Debian Autopkgtest & Sbuild Cleanroom**: Build tasks must execute within isolated ephemeral chroot sandboxes (`SbuildChrootSandboxEngine`), enforcing network suppression and reproducibly pristine build environments.
+* **FreeBSD VNET/Jails Multi-Tenant Isolation**: High-privilege task execution is partitioned using FreeBSD VNET network stack virtualization and Jail capability masks (`FreeBsdJailSandboxEngine`).
+* **Gentoo EAPI Subslot Dependency Graphing**: Task dependency resolution enforces Gentoo Portage EAPI 8 subslot rebuild triggers (`GentooPortageSubslotAndUseExpandEngine`) to prevent ABI mismatch crashes.
 
 ### 4.2 Linux Cgroups v2 Resource Enforcement
 Tasks are governed by strict cgroups v2 resource envelopes:
