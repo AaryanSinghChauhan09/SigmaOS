@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# scripts/pre-commit
+# Pre-commit hook for SigmaOS enforcing formatting, clippy, no_std rules, and standalone unit tests.
+
+set -e
+
+echo "=== Running SigmaOS Pre-Commit Checks ==="
+
+echo "[1/4] Checking Rust code formatting (rustfmt)..."
+cargo fmt -- --check || {
+    echo "ERROR: Code formatting check failed. Please run 'cargo fmt'."
+    exit 1
+}
+
+echo "[2/4] Running Clippy lints..."
+cargo clippy -- -D warnings || {
+    echo "ERROR: Clippy warnings detected."
+    exit 1
+}
+
+echo "[3/4] Running no_std compliance audit..."
+if [ -f "./scripts/no_std_check.sh" ]; then
+    chmod +x ./scripts/no_std_check.sh
+    ./scripts/no_std_check.sh
+fi
+
+echo "[4/4] Executing standalone file tests for modified files..."
+if [ -f "./scripts/changed_files_rustc_tests.sh" ]; then
+    chmod +x ./scripts/changed_files_rustc_tests.sh
+    ./scripts/changed_files_rustc_tests.sh
+fi
+
+echo "=== All Pre-Commit Checks Passed Successfully! ==="
+exit 0
