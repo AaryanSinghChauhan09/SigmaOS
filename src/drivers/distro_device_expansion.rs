@@ -1331,6 +1331,379 @@ impl PeripheralDevice for AlsaSocAudioCodecDriver {
 }
 
 // =========================================================================
+// 17. External Serial: CH340 / FTDI USB Serial Controller Driver
+// =========================================================================
+
+/// CH340 / FTDI External Serial USB Bridge Controller Driver (Linux ch341 / FreeBSD uchcom(4))
+pub struct Ch340ExternalSerialDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    baud_rate: u32,
+    rx_buffer: Vec<u8>,
+}
+
+impl Ch340ExternalSerialDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            baud_rate: 115200,
+            rx_buffer: Vec::new(),
+        }
+    }
+
+    pub fn baud_rate(&self) -> u32 {
+        self.baud_rate
+    }
+}
+
+impl PeripheralDevice for Ch340ExternalSerialDriver {
+    fn name(&self) -> &'static str {
+        "CH340 / FTDI USB-to-Serial External Controller Bridge"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        self.rx_buffer = alloc::vec![b'O', b'K', b'\r', b'\n'];
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("CH340 Serial offline");
+        }
+        let len = buffer.len().min(self.rx_buffer.len());
+        if len > 0 {
+            let chunk: Vec<u8> = self.rx_buffer.drain(..len).collect();
+            buffer[..len].copy_from_slice(&chunk);
+            Ok(len)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("CH340 Serial offline");
+        }
+        self.rx_buffer.extend_from_slice(data);
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        self.rx_buffer.clear();
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 23. Legacy Graphics: S3 Trio64 / Virge PCI/VESA Driver
+// =========================================================================
+
+/// S3 Trio64 / Virge PCI/VESA SVGA Legacy Graphics Driver (Linux s3fb / FreeBSD s3(4))
+pub struct S3Trio64VgaDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    vram_kb: u32,
+    base_io_port: u16,
+}
+
+impl S3Trio64VgaDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            vram_kb: 4096, // 4MB SVGA VRAM
+            base_io_port: 0x3C0,
+        }
+    }
+
+    pub fn vram_kb(&self) -> u32 {
+        self.vram_kb
+    }
+}
+
+impl PeripheralDevice for S3Trio64VgaDriver {
+    fn name(&self) -> &'static str {
+        "S3 Trio64 / Virge SVGA Graphics Adapter"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Legacy
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("S3 Trio64 SVGA offline");
+        }
+        if buffer.len() >= 6 {
+            buffer[0..4].copy_from_slice(&self.vram_kb.to_le_bytes());
+            buffer[4..6].copy_from_slice(&self.base_io_port.to_le_bytes());
+            Ok(6)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("S3 Trio64 SVGA offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 24. Ancient Network: Novell NE2000 ISA Ethernet Driver
+// =========================================================================
+
+/// Novell NE2000 ISA 10Mbps Ethernet Network Adapter Driver (Linux ne / FreeBSD ed(4))
+pub struct Ne2000IsaEthernetDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    mac_address: [u8; 6],
+    io_port: u16,
+}
+
+impl Ne2000IsaEthernetDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            mac_address: [0x00, 0x00, 0xC0, 0x12, 0x34, 0x56],
+            io_port: 0x300,
+        }
+    }
+
+    pub fn mac_address(&self) -> [u8; 6] {
+        self.mac_address
+    }
+}
+
+impl PeripheralDevice for Ne2000IsaEthernetDriver {
+    fn name(&self) -> &'static str {
+        "Novell NE2000 ISA 10Mbps Ethernet Adapter"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Ancient
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("NE2000 NIC offline");
+        }
+        if buffer.len() >= 6 {
+            buffer[..6].copy_from_slice(&self.mac_address);
+            Ok(6)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("NE2000 NIC offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 25. Modern ARM SoC Storage: Apple Silicon M1/M2/M3 ANS2 NVMe Driver
+// =========================================================================
+
+/// Apple Silicon M1/M2/M3 ANS2 NVMe Storage Controller Driver (Linux nvme-apple / NetBSD apple_ans)
+pub struct AppleSiliconAnss2StorageDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    max_queue_depth: u16,
+    storage_size_gb: u32,
+}
+
+impl AppleSiliconAnss2StorageDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            max_queue_depth: 256,
+            storage_size_gb: 1024, // 1TB Ultra-Fast NAND
+        }
+    }
+
+    pub fn capacity_gb(&self) -> u32 {
+        self.storage_size_gb
+    }
+}
+
+impl PeripheralDevice for AppleSiliconAnss2StorageDriver {
+    fn name(&self) -> &'static str {
+        "Apple Silicon M1/M2/M3 ANS2 NVMe Storage Controller"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Apple ANS2 NVMe offline");
+        }
+        if buffer.len() >= 6 {
+            buffer[0..2].copy_from_slice(&self.max_queue_depth.to_le_bytes());
+            buffer[2..6].copy_from_slice(&self.storage_size_gb.to_le_bytes());
+            Ok(6)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Apple ANS2 NVMe offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 26. Modern ARM SoC Graphics: Qualcomm Snapdragon X Elite Adreno GPU
+// =========================================================================
+
+/// Qualcomm Snapdragon X Elite Adreno 740 / X1-85 GPU Driver (Linux msm / FreeBSD drm(4))
+pub struct QualcommSnapdragonXEliteGpuDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    shader_cores: u32,
+    max_clock_mhz: u32,
+}
+
+impl QualcommSnapdragonXEliteGpuDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            shader_cores: 1536,
+            max_clock_mhz: 1300,
+        }
+    }
+
+    pub fn shader_cores(&self) -> u32 {
+        self.shader_cores
+    }
+}
+
+impl PeripheralDevice for QualcommSnapdragonXEliteGpuDriver {
+    fn name(&self) -> &'static str {
+        "Qualcomm Snapdragon X Elite Adreno GPU Driver"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Qualcomm Adreno GPU offline");
+        }
+        if buffer.len() >= 8 {
+            buffer[0..4].copy_from_slice(&self.shader_cores.to_le_bytes());
+            buffer[4..8].copy_from_slice(&self.max_clock_mhz.to_le_bytes());
+            Ok(8)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Qualcomm Adreno GPU offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
 // Unit Tests
 // =========================================================================
 
@@ -1585,7 +1958,186 @@ mod tests {
     }
 
     #[test]
-    fn test_peripheral_manager_registration_with_all_16_distro_expansion_drivers() {
+    fn test_bluetooth_external_gatt_hid_driver() {
+        let mut bt_hid = BluetoothExternalGattHidDriver::new();
+        assert_eq!(bt_hid.name(), "Bluetooth LE External GATT Human Interface Device");
+        assert_eq!(bt_hid.generation(), DeviceGeneration::Modern);
+        assert_eq!(bt_hid.battery_percent(), 85);
+
+        assert!(bt_hid.initialize().is_ok());
+        let mut report_buf = [0u8; 7];
+        assert_eq!(bt_hid.read(&mut report_buf).unwrap(), 7);
+        assert_eq!(report_buf[6], 85);
+
+        assert_eq!(bt_hid.write(b"LED-CMD").unwrap(), 7);
+        assert!(bt_hid.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_thunderbolt_external_display_driver() {
+        let mut tb_dp = ThunderboltExternalDisplayDriver::new();
+        assert_eq!(tb_dp.name(), "USB Type-C / Thunderbolt External DisplayPort Alt-Mode");
+        assert_eq!(tb_dp.generation(), DeviceGeneration::Modern);
+        assert_eq!(tb_dp.resolution(), (3840, 2160));
+
+        assert!(tb_dp.initialize().is_ok());
+        let mut dp_buf = [0u8; 5];
+        assert_eq!(tb_dp.read(&mut dp_buf).unwrap(), 5);
+        assert_eq!(dp_buf[0], 4); // 4 DP lanes
+
+        assert_eq!(tb_dp.write(b"MODE-SET").unwrap(), 8);
+        assert!(tb_dp.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_ch340_external_serial_driver() {
+        let mut serial = Ch340ExternalSerialDriver::new();
+        assert_eq!(serial.name(), "CH340 / FTDI USB-to-Serial External Controller Bridge");
+        assert_eq!(serial.generation(), DeviceGeneration::Modern);
+        assert_eq!(serial.baud_rate(), 115200);
+
+        assert!(serial.initialize().is_ok());
+        let mut rx_buf = [0u8; 4];
+        assert_eq!(serial.read(&mut rx_buf).unwrap(), 4);
+        assert_eq!(&rx_buf, b"OK\r\n");
+
+        assert_eq!(serial.write(b"AT\r\n").unwrap(), 4);
+        assert!(serial.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_sound_blaster_16_isa_driver() {
+        let mut sb16 = SoundBlaster16IsaDriver::new();
+        assert_eq!(sb16.name(), "Creative Sound Blaster 16 ISA Audio Card");
+        assert_eq!(sb16.generation(), DeviceGeneration::Ancient);
+        assert_eq!(sb16.io_port(), 0x220);
+
+        assert!(sb16.initialize().is_ok());
+        let mut cfg_buf = [0u8; 4];
+        assert_eq!(sb16.read(&mut cfg_buf).unwrap(), 4);
+        assert_eq!(cfg_buf[2], 5); // IRQ 5
+
+        assert!(sb16.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_three_com_3c59x_driver() {
+        let mut xl = ThreeCom3c59xEthernetDriver::new();
+        assert_eq!(xl.name(), "3Com 3c59x Fast EtherLink PCI/EISA NIC");
+        assert_eq!(xl.generation(), DeviceGeneration::Legacy);
+
+        assert!(xl.initialize().is_ok());
+        let mut mac_buf = [0u8; 6];
+        assert_eq!(xl.read(&mut mac_buf).unwrap(), 6);
+        assert_eq!(mac_buf[0], 0x00);
+
+        assert!(xl.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_floppy_disk_controller_driver() {
+        let mut fdc = FloppyDiskControllerDriver::new();
+        assert_eq!(fdc.name(), "Standard 3.5\" 1.44MB Floppy Disk Controller");
+        assert_eq!(fdc.generation(), DeviceGeneration::Ancient);
+        assert_eq!(fdc.drives(), 2);
+
+        assert!(fdc.initialize().is_ok());
+        let mut status_buf = [0u8; 2];
+        assert_eq!(fdc.read(&mut status_buf).unwrap(), 2);
+        assert_eq!(status_buf[1], 1); // Motor ON
+
+        assert!(fdc.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_intel_xe_arc_gpu_driver() {
+        let mut xe = IntelXeArcGpuDriver::new();
+        assert_eq!(xe.name(), "Intel Xe / Arc Graphics DRM/KMS GPU");
+        assert_eq!(xe.generation(), DeviceGeneration::Modern);
+        assert_eq!(xe.eu_count(), 512);
+
+        assert!(xe.initialize().is_ok());
+        let mut gpu_buf = [0u8; 8];
+        assert_eq!(xe.read(&mut gpu_buf).unwrap(), 8);
+
+        assert!(xe.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_cxl3_memory_expander_driver() {
+        let mut cxl = Cxl3MemoryExpanderDriver::new();
+        assert_eq!(cxl.name(), "Compute Express Link (CXL 3.0) Type-3 Memory Expander");
+        assert_eq!(cxl.generation(), DeviceGeneration::Modern);
+        assert_eq!(cxl.ram_gb(), 256);
+
+        assert!(cxl.initialize().is_ok());
+        let mut cxl_buf = [0u8; 9];
+        assert_eq!(cxl.read(&mut cxl_buf).unwrap(), 9);
+        assert_eq!(cxl_buf[8], 64); // 64 GT/s
+
+        assert!(cxl.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_s3_trio64_vga_driver() {
+        let mut s3 = S3Trio64VgaDriver::new();
+        assert_eq!(s3.name(), "S3 Trio64 / Virge SVGA Graphics Adapter");
+        assert_eq!(s3.generation(), DeviceGeneration::Legacy);
+        assert_eq!(s3.vram_kb(), 4096);
+
+        assert!(s3.initialize().is_ok());
+        let mut buf = [0u8; 6];
+        assert_eq!(s3.read(&mut buf).unwrap(), 6);
+        assert_eq!(u32::from_le_bytes([buf[0], buf[1], buf[2], buf[3]]), 4096);
+
+        assert!(s3.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_ne2000_isa_ethernet_driver() {
+        let mut ne = Ne2000IsaEthernetDriver::new();
+        assert_eq!(ne.name(), "Novell NE2000 ISA 10Mbps Ethernet Adapter");
+        assert_eq!(ne.generation(), DeviceGeneration::Ancient);
+        assert_eq!(ne.mac_address(), [0x00, 0x00, 0xC0, 0x12, 0x34, 0x56]);
+
+        assert!(ne.initialize().is_ok());
+        let mut mac_buf = [0u8; 6];
+        assert_eq!(ne.read(&mut mac_buf).unwrap(), 6);
+        assert_eq!(mac_buf[2], 0xC0);
+
+        assert!(ne.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_apple_silicon_ans2_storage_driver() {
+        let mut apple_nvme = AppleSiliconAnss2StorageDriver::new();
+        assert_eq!(apple_nvme.name(), "Apple Silicon M1/M2/M3 ANS2 NVMe Storage Controller");
+        assert_eq!(apple_nvme.generation(), DeviceGeneration::Modern);
+        assert_eq!(apple_nvme.capacity_gb(), 1024);
+
+        assert!(apple_nvme.initialize().is_ok());
+        let mut buf = [0u8; 6];
+        assert_eq!(apple_nvme.read(&mut buf).unwrap(), 6);
+
+        assert!(apple_nvme.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_qualcomm_snapdragon_x_elite_gpu_driver() {
+        let mut snap = QualcommSnapdragonXEliteGpuDriver::new();
+        assert_eq!(snap.name(), "Qualcomm Snapdragon X Elite Adreno GPU Driver");
+        assert_eq!(snap.generation(), DeviceGeneration::Modern);
+        assert_eq!(snap.shader_cores(), 1536);
+
+        assert!(snap.initialize().is_ok());
+        let mut buf = [0u8; 8];
+        assert_eq!(snap.read(&mut buf).unwrap(), 8);
+
+        assert!(snap.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_peripheral_manager_registration_with_all_26_distro_expansion_drivers() {
         let mut manager = PeripheralManager::new();
         assert_eq!(manager.device_count(), 0);
 
@@ -1601,12 +2153,22 @@ mod tests {
         assert!(manager.register_device(Box::new(RaspberryPiGpioMailboxDriver::new())).is_ok());
         assert!(manager.register_device(Box::new(IntelI2cSmbusControllerDriver::new())).is_ok());
         assert!(manager.register_device(Box::new(CanBusSocketDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(QualcommAth11kWifiDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(OpenBsdAthnWifiDriver::new())).is_ok());
-        assert!(manager.register_device(Box::new(NetBsdVirtio9pDriver::new("host_share"))).is_ok());
-        assert!(manager.register_device(Box::new(AlsaSocAudioCodecDriver::new("WM8960"))).is_ok());
+        assert!(manager.register_device(Box::new(UsbMassStorageBotDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(UsbGamepadControllerDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(BluetoothExternalGattHidDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(ThunderboltExternalDisplayDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(Ch340ExternalSerialDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(SoundBlaster16IsaDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(ThreeCom3c59xEthernetDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(FloppyDiskControllerDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(IntelXeArcGpuDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(Cxl3MemoryExpanderDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(S3Trio64VgaDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(Ne2000IsaEthernetDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(AppleSiliconAnss2StorageDriver::new())).is_ok());
+        assert!(manager.register_device(Box::new(QualcommSnapdragonXEliteGpuDriver::new())).is_ok());
 
-        assert_eq!(manager.device_count(), 16);
+        assert_eq!(manager.device_count(), 26);
         manager.broadcast_power_state(PowerState::Sleep);
     }
 }

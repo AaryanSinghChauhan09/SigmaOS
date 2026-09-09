@@ -55,9 +55,11 @@ pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 pub use distro_device_expansion::{
-    CanBusSocketDriver, Cxl3MemoryExpanderDriver, FloppyDiskControllerDriver,
-    IntelI2cSmbusControllerDriver, IntelIgbNicDriver, IntelIwfWifiDriver, IntelXeArcGpuDriver,
-    Mpt3SasControllerDriver, RadeonKmsGpuDriver, RaspberryPiGpioMailboxDriver,
-    RealtekAlcAudioDriver, RealtekRtl8169Driver, SoundBlaster16IsaDriver, SynapticsTouchpadDriver,
-    ThreeCom3c59xEthernetDriver, VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
+    AppleSiliconAnss2StorageDriver, CanBusSocketDriver, Cxl3MemoryExpanderDriver,
+    FloppyDiskControllerDriver, IntelI2cSmbusControllerDriver, IntelIgbNicDriver,
+    IntelIwfWifiDriver, IntelXeArcGpuDriver, Mpt3SasControllerDriver, Ne2000IsaEthernetDriver,
+    QualcommSnapdragonXEliteGpuDriver, RadeonKmsGpuDriver, RaspberryPiGpioMailboxDriver,
+    RealtekAlcAudioDriver, RealtekRtl8169Driver, S3Trio64VgaDriver, SoundBlaster16IsaDriver,
+    SynapticsTouchpadDriver, ThreeCom3c59xEthernetDriver, VirtioScsiControllerDriver,
+    WacomGraphicsTabletDriver,
 };
