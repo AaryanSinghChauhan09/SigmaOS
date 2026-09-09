@@ -8,6 +8,20 @@ pub mod klib;
 
 #[path = "../src/compatibility/abi_extended.rs"]
 mod abi_extended;
+#[path = "../src/compatibility/distro_bridge.rs"]
+mod distro_bridge;
+#[path = "../src/network/protocols.rs"]
+mod protocols;
+#[path = "../src/security/hardening.rs"]
+mod hardening;
+#[path = "../src/distro/ready_to_use.rs"]
+mod ready_to_use;
+#[path = "../src/compatibility/garuda_zen.rs"]
+mod garuda_zen;
+#[path = "../src/virtualization/vm_manager.rs"]
+mod vm_manager;
+#[path = "../src/compatibility/zorin.rs"]
+mod zorin;
 #[path = "../src/process/advanced_process_control.rs"]
 mod advanced_process_control;
 #[path = "../src/kernel/bore.rs"]
@@ -52,28 +66,20 @@ mod sovereign_distro_dominance;
 mod sovereign_process_engine;
 #[path = "../src/shell/sovereign_shell_parity.rs"]
 mod sovereign_shell_parity;
-#[path = "../src/kernel/sysctl.rs"]
-mod sysctl;
-#[path = "../src/init/systemd_init.rs"]
-mod systemd_init;
-#[path = "../src/memory/tlb_associative.rs"]
-mod tlb_associative;
-#[path = "../src/logging/unified.rs"]
-mod unified;
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-#[path = "../src/distro/universal_distro_super_matrix.rs"]
-mod universal_distro_super_matrix;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
-#[path = "../src/virtualization/vm_manager.rs"]
-mod vm_manager;
-#[path = "../src/desktop/zenith_advanced_features.rs"]
-mod zenith_advanced;
-#[path = "../src/compatibility/zorin.rs"]
-mod zorin;
-#[path = "../src/compatibility/bsd.rs"]
-mod bsd;
+#[path = "../src/package/repository.rs"]
+mod package_repository;
+#[path = "../src/kernel/module_loader.rs"]
+mod module_loader;
+#[path = "../src/input/keyboard.rs"]
+mod keyboard_driver;
+#[path = "../src/distro/missing_distro_innovations.rs"]
+mod missing_distro_innovations;
+#[path = "../src/distro/linux_bsd_inspirations.rs"]
+mod linux_bsd_inspirations;
+#[path = "../src/compatibility/community_foundation.rs"]
+mod community_foundation;
+#[path = "../src/distro/sovereign_distro_dominance.rs"]
+mod sovereign_distro_dominance;
 
 use bsd::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
