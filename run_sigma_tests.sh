@@ -24,3 +24,10 @@ if [ -f "src/launch_ready/mod.rs" ]; then
     rustc --test src/launch_ready/mod.rs --edition=2021 -o build/launch_ready_test
     ./build/launch_ready_test
 fi
+
+if [ -f "tests/test_vecdeque_standalone.rs" ]; then
+    echo "Running VecDeque performance & correctness test suite..."
+    mkdir -p build
+    rustc --test tests/test_vecdeque_standalone.rs --edition=2021 -o build/vecdeque_test
+    ./build/vecdeque_test
+fi
