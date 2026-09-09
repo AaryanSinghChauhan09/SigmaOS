@@ -1,11 +1,8 @@
-
 /// OOP-based SigPkg Package Specification for SigmaOS
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
 use std::boxed::Box;
-
-
 
 /// Package version
 #[repr(C)]
@@ -476,7 +473,10 @@ impl PackageManager for SimplePackageManager {
             // Bolt performance optimization: hoist dependency name slicing outside the inner
             // package candidate loop. Reduces zero-byte linear scans from O(D * P) to O(D).
             let dep_name = dep.name;
-            let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(dep_name.len());
+            let dep_len = dep_name
+                .iter()
+                .position(|&b| b == 0)
+                .unwrap_or(dep_name.len());
             let dep_slice = &dep_name[..dep_len];
 
             let mut found = false;
@@ -484,7 +484,10 @@ impl PackageManager for SimplePackageManager {
                 if let Some(ref pkg) = *package_option {
                     let p_ref: &dyn Package = pkg.as_ref();
                     let pkg_name = p_ref.name();
-                    let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(pkg_name.len());
+                    let pkg_len = pkg_name
+                        .iter()
+                        .position(|&b| b == 0)
+                        .unwrap_or(pkg_name.len());
 
                     if dep_slice == &pkg_name[..pkg_len] {
                         found = true;
@@ -619,7 +622,10 @@ impl UniversalPackageType {
             Some(UniversalPackageType::Ebuild)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(UniversalPackageType::TarArchive)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(UniversalPackageType::Txz)
         } else if normalized.ends_with(".xbps") {
             Some(UniversalPackageType::Xbps)
@@ -1001,7 +1007,10 @@ mod tests {
         let resolved = mgr.resolve_dependencies(&app_pkg).unwrap();
         assert_eq!(resolved.len(), 1);
         let dep_name = resolved[0].name;
-        let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(dep_name.len());
+        let dep_len = dep_name
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(dep_name.len());
         assert_eq!(&dep_name[..dep_len], b"libssl");
     }
 
