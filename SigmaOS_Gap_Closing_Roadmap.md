@@ -570,6 +570,8 @@ This document serves as the master engineering roadmap to systematically resolve
 
 ## 🔬 5. VALIDATION & AUDITING PLAN
 
+For feature-by-feature milestone tracking, see the [SigmaOS Feature-by-Feature Parity Checklist](docs/LINUX_DISTRO_PARITY_CHECKLIST.md).
+
 To ensure all gap-closing features maintain pristine stability and correctness:
 1. **Paging Integrity**: Physical frames mapped via `VirtualMemoryPagingManager` are strictly capability-gated, panicking on any overlapping privilege access.
 2. **Interrupt Latency**: Interrupt routes distributed dynamically by `AcpiInterruptManager` run under bounded O(1) complexity, ensuring real-time interrupt handling.
