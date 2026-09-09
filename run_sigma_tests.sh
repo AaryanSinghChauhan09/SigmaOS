@@ -31,3 +31,10 @@ if [ -f "tests/test_vecdeque_standalone.rs" ]; then
     rustc --test tests/test_vecdeque_standalone.rs --edition=2021 -o build/vecdeque_test
     ./build/vecdeque_test
 fi
+
+if [ -f "src/tools/native_userland_replacements.rs" ]; then
+    echo "Running native userland replacements test suite..."
+    mkdir -p build
+    rustc --test src/tools/native_userland_replacements.rs --edition=2021 -o build/userland_rep_test
+    ./build/userland_rep_test
+fi
