@@ -42,3 +42,6 @@ pub use bcachefs_sovereign::{SovereignBcachefsVolume, BcachefsInode, BcachefsExt
 
 pub mod overlayfs_sovereign;
 pub use overlayfs_sovereign::{SovereignOverlayFs, OverlayLayer, OverlayEntry, OverlayEntryKind};
+
+pub mod zfs_arc_sovereign;
+pub use zfs_arc_sovereign::{SovereignZfsArc, ArcBufferHeader};

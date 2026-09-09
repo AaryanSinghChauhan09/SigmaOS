@@ -57,3 +57,6 @@ pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
 pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
 pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
+
+pub mod bpf_lsm_sovereign;
+pub use bpf_lsm_sovereign::{SovereignBpfLsmEngine, BpfLsmProgram, LsmHookPoint, BpfLsmDecision};

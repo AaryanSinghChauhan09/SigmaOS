@@ -82,3 +82,8 @@ pub use bsd_jails_sovereign::{SovereignBsdJailManager, SovereignJail, JailState,
 
 pub mod ftrace_sovereign;
 pub use ftrace_sovereign::{SovereignFtracer, TraceEvent, TraceEventKind, TraceRingBuffer, TracerFilter, LatencyHistogram};
+
+pub mod eevdf_sovereign;
+pub use eevdf_sovereign::{SovereignEevdfScheduler, EevdfSchedEntity};
+pub mod io_uring_sqpoll_sovereign;
+pub use io_uring_sqpoll_sovereign::{SovereignIoUringSqpoll, SovereignSqe, SovereignCqe, IoUringOp};

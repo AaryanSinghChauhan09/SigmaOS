@@ -136,7 +136,39 @@ rustc --edition=2021 --test src/fs/overlayfs_sovereign.rs \
 ./build/test_overlayfs --test-threads=1
 echo "overlayfs_sovereign: PASSED"
 
+# ─── Linux 6.6+ EEVDF Scheduler ────────────────────────────────────────────────
+echo ""
+echo "=== [15] SigmaOS EEVDF Sovereign Scheduler Tests ==="
+rustc --edition=2021 --test src/kernel/eevdf_sovereign.rs \
+  -o build/test_eevdf 2>&1 | grep -v "^$" || true
+./build/test_eevdf --test-threads=1
+echo "eevdf_sovereign: PASSED"
+
+# ─── Linux 5.7+ BPF-LSM Security Engine ───────────────────────────────────────
+echo ""
+echo "=== [16] SigmaOS BPF-LSM Sovereign Security Tests ==="
+rustc --edition=2021 --test src/security/bpf_lsm_sovereign.rs \
+  -o build/test_bpf_lsm 2>&1 | grep -v "^$" || true
+./build/test_bpf_lsm --test-threads=1
+echo "bpf_lsm_sovereign: PASSED"
+
+# ─── Linux io_uring SQPOLL Zero-Syscall Engine ────────────────────────────────
+echo ""
+echo "=== [17] SigmaOS io_uring SQPOLL Sovereign Tests ==="
+rustc --edition=2021 --test src/kernel/io_uring_sqpoll_sovereign.rs \
+  -o build/test_sqpoll 2>&1 | grep -v "^$" || true
+./build/test_sqpoll --test-threads=1
+echo "io_uring_sqpoll_sovereign: PASSED"
+
+# ─── OpenZFS / FreeBSD ZFS Adaptive Replacement Cache (ARC) ──────────────────
+echo ""
+echo "=== [18] SigmaOS ZFS ARC Sovereign Cache Tests ==="
+rustc --edition=2021 --test src/fs/zfs_arc_sovereign.rs \
+  -o build/test_zfs_arc 2>&1 | grep -v "^$" || true
+./build/test_zfs_arc --test-threads=1
+echo "zfs_arc_sovereign: PASSED"
+
 echo ""
 echo "========================================================"
-echo "=== ALL 14 SIGMAOS TEST SUITES PASSED SUCCESSFULLY ==="
+echo "=== ALL 18 SIGMAOS TEST SUITES PASSED SUCCESSFULLY ==="
 echo "========================================================"
