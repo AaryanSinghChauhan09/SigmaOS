@@ -533,22 +533,24 @@ impl VirtualFileSystem {
                 if (flags & O_CREAT) != 0 && (flags & O_EXCL) != 0 {
                     return Err(FsError::AlreadyExists);
                 }
-                1 => { // SEEK_CUR
-                    if offset < 0 && (offset.abs() as u64) > handle.position {
-                        return Err(VfsError::InvalidArgument);
-                    }
-                    handle.position = ((handle.position as i64) + offset) as u64;
-                }
-                2 => { // SEEK_END
-                    // Would need file size from actual filesystem
-                    return Err(VfsError::InvalidArgument);
-                }
-                _ => return Err(VfsError::InvalidArgument),
+                id
             }
-            Ok(handle.position)
-        } else {
-            Err(VfsError::BadFileDescriptor)
+            None => {
+                if (flags & O_CREAT) == 0 {
+                    return Err(FsError::NotFound);
+                }
+                self.create_file(FileType::Regular, owner)?
+            }
+        };
+
+        if (flags & O_TRUNC) != 0 {
+            if let Some(inode) = self.inodes.get_mut(&inode_id) {
+                inode.data.clear();
+                inode.size = 0;
+            }
         }
+
+        Ok(inode_id)
     }
 
     /// Get file statistics

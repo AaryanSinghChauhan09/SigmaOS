@@ -1683,7 +1683,7 @@ pub struct GestureVoiceControlEngine {
     pub registered_voice_commands: [Option<(&'static str, DesktopShellAction)>; 4],
 }
 
-
+impl GestureVoiceControlEngine {
     pub fn parse_touchpad_gesture(
         &self,
         fingers_count: u8,
@@ -1695,6 +1695,7 @@ pub struct GestureVoiceControlEngine {
             _ => None,
         }
     }
+}
 
 
 #[cfg(test)]

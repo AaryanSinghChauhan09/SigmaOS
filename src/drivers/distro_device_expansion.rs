@@ -1847,13 +1847,17 @@ impl PeripheralDevice for EdidMonitorDdcDisplayDriver {
         "EDID Monitor DDC/CI Display & Backlight Controller (Linux drm_edid / FreeBSD edid)"
     }
 
+    fn device_category(&self) -> &'static str {
+        "Monitor/Display"
+    }
+
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Modern
+        DeviceGeneration::Gen5
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::On;
+        self.power_state = PowerState::Active;
         Ok(())
     }
 
@@ -1928,13 +1932,17 @@ impl PeripheralDevice for PcSpeakerInternalAudioDriver {
         "PC Speaker & Internal Beeper Driver (Linux pcspkr / FreeBSD syscons_beeper)"
     }
 
+    fn device_category(&self) -> &'static str {
+        "Audio/Speaker"
+    }
+
     fn generation(&self) -> DeviceGeneration {
         DeviceGeneration::Legacy
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::On;
+        self.power_state = PowerState::Active;
         Ok(())
     }
 
@@ -2010,13 +2018,17 @@ impl PeripheralDevice for UvcWebcamVideoCameraDriver {
         "USB Video Class (UVC) HD Webcam Driver (Linux uvcvideo / FreeBSD webcamd)"
     }
 
+    fn device_category(&self) -> &'static str {
+        "Video/Webcam"
+    }
+
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Modern
+        DeviceGeneration::Gen4
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::On;
+        self.power_state = PowerState::Active;
         Ok(())
     }
 
@@ -2085,13 +2097,17 @@ impl PeripheralDevice for IntelBtUsbBluetoothDriver {
         "Intel/Realtek Bluetooth 5.3 HCI USB Driver (Linux btusb / FreeBSD ng_ubt)"
     }
 
+    fn device_category(&self) -> &'static str {
+        "Wireless/Bluetooth"
+    }
+
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Modern
+        DeviceGeneration::Gen5
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::On;
+        self.power_state = PowerState::Active;
         Ok(())
     }
 
@@ -2157,13 +2173,17 @@ impl PeripheralDevice for HidPrecisionTouchpadDriver {
         "HID Precision Touchpad & Multi-Button Gaming Mouse Driver (Linux hid-multitouch / FreeBSD hcons)"
     }
 
+    fn device_category(&self) -> &'static str {
+        "Input/Mouse"
+    }
+
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Modern
+        DeviceGeneration::Gen4
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::On;
+        self.power_state = PowerState::Active;
         Ok(())
     }
 
@@ -2224,13 +2244,17 @@ impl PeripheralDevice for NvmePCIeHostControllerDriver {
         "NVMe v1.4 High-Speed PCIe Controller Driver (Linux nvme / FreeBSD nvme)"
     }
 
+    fn device_category(&self) -> &'static str {
+        "Storage/NVMe"
+    }
+
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Modern
+        DeviceGeneration::Gen5
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::On;
+        self.power_state = PowerState::Active;
         Ok(())
     }
 

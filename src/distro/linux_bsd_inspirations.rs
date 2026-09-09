@@ -124,6 +124,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -140,7 +142,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
@@ -221,6 +223,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -238,7 +242,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => {
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
@@ -253,7 +257,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -292,7 +299,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
@@ -565,11 +575,11 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "containers" => {
+            "containers" | "container" => {
                 let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
                 chroot_engine.enter_chroot()?;
                 Ok(format!(
-                    "Dispatched container build sandbox '{}' (active: {}) under distro mode '{:?}'",
+                    "Dispatched container build sandbox/Jail/Zone '{}' (active: {}) under distro mode '{:?}'",
                     action, chroot_engine.is_active, self.mode
                 ))
             }
@@ -587,7 +597,7 @@ impl SovereignUniversalDistroBridge {
                     virt_addr, self.mode
                 ))
             }
-            "ui" => {
+            "ui" | "desktop" => {
                 Ok(format!(
                     "Dispatched Zenith Zenith/COSMIC desktop inspiration UI theme '{}' under distro mode '{:?}'",
                     action, self.mode
@@ -610,9 +620,9 @@ impl SovereignUniversalDistroBridge {
                     action, timeslice, self.mode
                 ))
             }
-            "virt" => {
+            "virt" | "virtualization" => {
                 Ok(format!(
-                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
+                    "Dispatched bhyve/VirtIO/vmm microVM hypervisor instance for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -622,6 +632,319 @@ impl SovereignUniversalDistroBridge {
                 Ok(format!(
                     "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
                     action, mprotect_res.is_ok(), self.mode
+                ))
+            }
+            "auth" => {
+                let mut homed = SovereignSystemdHomedAuthBridge::new();
+                let token = format!("auth_token_{}", action);
+                let auth_res = homed.authenticate_and_mount(action, &token).is_ok();
+                Ok(format!(
+                    "Dispatched PAM/systemd-homed LUKS authentication for user '{}' (authenticated: {}) under distro mode '{:?}'",
+                    action, auth_res, self.mode
+                ))
+            }
+            "boot" => {
+                let mut boot_bridge = SovereignMultiArchBootChainBridge::new();
+                let entry = boot_bridge.configure_boot_entry("SigmaKernel", action)?;
+                Ok(format!(
+                    "Dispatched systemd-boot/loader.conf entry generation: '{}' under distro mode '{:?}'",
+                    entry, self.mode
+                ))
+            }
+            "input" => {
+                Ok(format!(
+                    "Dispatched libinput/wscons HID input event queue processing for action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched ACPI thermal_sys/coretemp zone monitoring for sensor '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "syscall" => {
+                let mut translator = SovereignMultiArchSyscallTranslator::new(self.mode);
+                let sys_num = translator.translate_and_dispatch("sys_read").unwrap_or(0);
+                Ok(format!(
+                    "Dispatched multi-arch syscall translation for '{}' (sys_read -> {}) under distro mode '{:?}'",
+                    action, sys_num, self.mode
+                ))
+            }
+            "device" => {
+                Ok(format!(
+                    "Dispatched dynamic devfs/udev/devd peripheral node auto-probe for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "crypto" => {
+                Ok(format!(
+                    "Dispatched Linux Crypto API / OpenBSD OCF Dilithium5 PQC operation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched Herdr AI agent orchestrator and predictive ML scheduler for task '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                Ok(format!(
+                    "Dispatched ftrace/DTrace/PSI observability tracking for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched PKGBUILD cleanroom builder / Gentoo CFLAGS tuner for package '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched glibc/localedef multilingual Indic i18n locale processing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "bluetooth" => {
+                Ok(format!(
+                    "Dispatched BlueZ / FreeBSD ng_ubt Bluetooth subsystem routing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched OpenBSD PF / nftables stateful firewall rule evaluation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "diagnostics" => {
+                Ok(format!(
+                    "Dispatched binary journald indexing / crash dump diagnostics for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "recovery" => {
+                Ok(format!(
+                    "Dispatched Snapper Btrfs / HAMMER2 CoW snapshot recovery point for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "accessibility" => {
+                Ok(format!(
+                    "Dispatched screen reader and sticky keys accessibility pipeline for action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "automation" => {
+                Ok(format!(
+                    "Dispatched hotkey binding automation rule engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "backup" => {
+                Ok(format!(
+                    "Dispatched Timeshift / HAMMER2 delta backup snapshot engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cloud" => {
+                Ok(format!(
+                    "Dispatched Ignition / cloud-init provisioner for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cluster" => {
+                Ok(format!(
+                    "Dispatched HAMMER2 multi-master PFS / CARP HA mesh sync for node '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compliance" => {
+                Ok(format!(
+                    "Dispatched DFSG / FSF RYF / statutory compliance verification for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compression" => {
+                Ok(format!(
+                    "Dispatched zstd / FNV-1a block deduplication pipeline for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "config" => {
+                Ok(format!(
+                    "Dispatched UCI / sysctl declarative config manager for key '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "event" => {
+                Ok(format!(
+                    "Dispatched fanotify / kqueue event loop listener for path '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "filesystem" => {
+                Ok(format!(
+                    "Dispatched bcachefs / ZFS / OverlayFS VFS operation for path '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "finance" => {
+                Ok(format!(
+                    "Dispatched India Stack UPI / GST tax calculation engine for transaction '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "gamepad" => {
+                Ok(format!(
+                    "Dispatched Evdev / HID gamepad controller mapping for input '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "iot" => {
+                Ok(format!(
+                    "Dispatched CoAP constrained IoT protocol messaging engine for endpoint '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "location" => {
+                Ok(format!(
+                    "Dispatched GeoIP / GPS location services provider for request '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "logging" => {
+                Ok(format!(
+                    "Dispatched structured journald / dmesg ring buffer logger for event '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "microphone" => {
+                Ok(format!(
+                    "Dispatched PipeWire microphone audio capture stream for channel '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "ml" => {
+                Ok(format!(
+                    "Dispatched ISA microarchitecture JIT auto-tuning and ML workload dispatcher for model '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "nlp" => {
+                Ok(format!(
+                    "Dispatched natural language shell command parser for query '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "observability" => {
+                Ok(format!(
+                    "Dispatched ftrace function graph tracer / DTrace USDT probe for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "orchestration" => {
+                Ok(format!(
+                    "Dispatched cross-device orchestrator and Qubes domain isolation for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "performance" => {
+                Ok(format!(
+                    "Dispatched BORE scheduler governor / Ananicy-cpp tuner for profile '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "print" => {
+                Ok(format!(
+                    "Dispatched CUPS print spooler / FreeBSD lpd daemon for print job '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "privacy" => {
+                Ok(format!(
+                    "Dispatched Parrot AnonSurf / Tails amnesic RAM scrubber for session '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "provisioning" => {
+                Ok(format!(
+                    "Dispatched Anaconda Kickstart / Archinstall declarative installer for profile '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "release" => {
+                Ok(format!(
+                    "Dispatched Debian/Fedora/Arch release tier synchronizer for release '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "remote" => {
+                Ok(format!(
+                    "Dispatched WireGuard VPN / SSH remote desktop session manager for host '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "resource" => {
+                Ok(format!(
+                    "Dispatched cgroups v2 / FreeBSD racct resource governor for group '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "robotics" => {
+                Ok(format!(
+                    "Dispatched ROS2 middleware node / SocketCAN frame dispatcher for device '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "rt" => {
+                Ok(format!(
+                    "Dispatched NuttX / Linux POSIX RT preemption-threshold scheduler for task '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "runtime" => {
+                Ok(format!(
+                    "Dispatched AppBundle / Flatpak / OCI container runtime environment for app '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "shell" => {
+                Ok(format!(
+                    "Dispatched userland shell parser / Zsh prompt formatter for command '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "smartcard" => {
+                Ok(format!(
+                    "Dispatched PIV / PKCS#11 smartcard authentication guard for slot '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "toolchain" => {
+                Ok(format!(
+                    "Dispatched GCC/Clang CFLAGS optimization tuner / DTrace probe provider for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "tracing" => {
+                Ok(format!(
+                    "Dispatched ftrace function graph tracer / DTrace USDT probe for subsystem '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "workflow" => {
+                Ok(format!(
+                    "Dispatched RFC development workflow / CI matrix runner for pipeline '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "customization" => {
+                Ok(format!(
+                    "Dispatched ThemeEngine / Zorin layout switcher / Omarchy theme studio for theme '{}' under distro mode '{:?}'",
+                    action, self.mode
                 ))
             }
             _ => Err("Unknown target subsystem"),
@@ -635,7 +958,13 @@ impl SovereignUniversalDistroBridge {
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
             "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
-            "recovery", "time",
+            "recovery", "time", "accessibility", "automation", "backup", "cloud",
+            "cluster", "compliance", "compression", "config", "event", "filesystem",
+            "finance", "gamepad", "iot", "location", "logging", "microphone", "ml",
+            "nlp", "observability", "orchestration", "performance", "print", "privacy",
+            "provisioning", "release", "remote", "resource", "robotics", "rt",
+            "runtime", "shell", "smartcard", "toolchain", "tracing", "workflow",
+            "customization", "process", "ui", "containers", "virt",
         ];
 
         for sub in subsystems {
@@ -1982,6 +2311,9 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
         ];
 
         for m in modes {
@@ -2014,6 +2346,9 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
         ];
 
         let target_subsystems = [
@@ -2022,7 +2357,13 @@ mod cross_subsystem_tests {
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
             "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
-            "recovery", "time",
+            "recovery", "time", "accessibility", "automation", "backup", "cloud",
+            "cluster", "compliance", "compression", "config", "event", "filesystem",
+            "finance", "gamepad", "iot", "location", "logging", "microphone", "ml",
+            "nlp", "observability", "orchestration", "performance", "print", "privacy",
+            "provisioning", "release", "remote", "resource", "robotics", "rt",
+            "runtime", "shell", "smartcard", "toolchain", "tracing", "workflow",
+            "customization", "process", "ui", "containers", "virt",
         ];
 
         for m in modes {

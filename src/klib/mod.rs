@@ -2,17 +2,6 @@
 
 // Core Library Collection Modules for SigmaOS
 // Sovereign implementations - no external crate dependencies
-pub mod buddy_allocator;
-pub mod paging;
-#[cfg(target_os = "none")]
-pub mod hashmap;
-#[cfg(target_os = "none")]
-pub mod hashset;
-pub mod vec;
-pub mod error;
-pub mod uuid;
-pub mod hash;
-pub mod string;
 pub mod arc;
 pub mod async_runtime;
 pub mod base64;

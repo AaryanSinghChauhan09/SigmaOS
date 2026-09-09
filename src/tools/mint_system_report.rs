@@ -4,7 +4,6 @@
 //! system information reporting capabilities, which collects and displays
 //! detailed system information for troubleshooting and diagnostics.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;

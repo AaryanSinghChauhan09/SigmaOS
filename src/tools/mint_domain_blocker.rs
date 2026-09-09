@@ -3,7 +3,6 @@
 //! This module implements a domain blocker inspired by Linux Mint's mintnanny,
 //! which blocks outgoing traffic towards chosen domain names using /etc/hosts.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;
