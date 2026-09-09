@@ -5,44 +5,25 @@ use std::vec;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-/// Trait for DSP Audio Effects
 pub trait AudioEffect {
     fn apply(&self, samples: &mut [f32]);
 }
 
-/// Single Audio Track in a multi-track session
-#[derive(Debug, Clone)]
-pub struct AudioTrack {
-    pub id: u64,
-    pub name: String,
-    pub samples: Vec<f32>,
-    pub volume: f32,
-    pub pan: f32, // -1.0 (Left) to +1.0 (Right)
-    pub is_muted: bool,
-    pub is_solo: bool,
+pub struct AmplifyEffect {
+    pub gain: f32,
 }
 
-impl AudioTrack {
-    pub fn new(id: u64, name: &str) -> Self {
-        AudioTrack {
-            id,
-            name: String::from(name),
-            samples: Vec::new(),
-            volume: 1.0,
-            pan: 0.0,
-            is_muted: false,
-            is_solo: false,
+impl AmplifyEffect {
+    pub fn new(gain: f32) -> Self {
+        AmplifyEffect { gain }
+    }
+}
+
+impl AudioEffect for AmplifyEffect {
+    fn apply(&self, samples: &mut [f32]) {
+        for sample in samples.iter_mut() {
+            *sample *= self.gain;
         }
-    }
-
-    pub fn with_samples(mut self, samples: &[f32]) -> Self {
-        self.samples = samples.to_vec();
-        self
-    }
-
-    pub fn with_volume(mut self, volume: f32) -> Self {
-        self.volume = volume;
-        self
     }
 }
 
@@ -64,6 +45,38 @@ impl AudioEffect for SpectralNoiseSuppressionEffect {
                 *sample = 0.0;
             }
         }
+    }
+}
+
+pub struct AudioTrack {
+    pub id: u64,
+    pub name: String,
+    pub samples: Vec<f32>,
+    pub volume: f32,
+    pub is_muted: bool,
+    pub is_solo: bool,
+}
+
+impl AudioTrack {
+    pub fn new(id: u64, name: &str) -> Self {
+        AudioTrack {
+            id,
+            name: String::from(name),
+            samples: Vec::new(),
+            volume: 1.0,
+            is_muted: false,
+            is_solo: false,
+        }
+    }
+
+    pub fn with_samples(mut self, samples: &[f32]) -> Self {
+        self.samples = samples.to_vec();
+        self
+    }
+
+    pub fn with_volume(mut self, volume: f32) -> Self {
+        self.volume = volume;
+        self
     }
 }
 
@@ -289,11 +302,11 @@ mod tests {
     fn test_multi_track_session_mixing() {
         let mut session = MultiTrackSession::new(44100);
 
-        let track1 = AudioTrack::new(1u32, "Vocals")
+        let track1 = AudioTrack::new(1, "Vocals")
             .with_samples(&[0.5, 0.5, 0.5])
             .with_volume(1.2); // linear amplification
 
-        let track2 = AudioTrack::new(2u32, "Backing").with_samples(&[0.2, -0.2, 0.2]);
+        let track2 = AudioTrack::new(2, "Backing").with_samples(&[0.2, -0.2, 0.2]);
 
         session.add_track(track1);
         session.add_track(track2);
@@ -308,10 +321,10 @@ mod tests {
     fn test_solo_and_mute_priority() {
         let mut session = MultiTrackSession::new(44100);
 
-        let mut t1 = AudioTrack::new(1u32, "Lead").with_samples(&[0.5, 0.5]);
+        let mut t1 = AudioTrack::new(1, "Lead").with_samples(&[0.5, 0.5]);
         t1.is_solo = true; // Solo active!
 
-        let mut t2 = AudioTrack::new(2u32, "Harmony").with_samples(&[0.3, 0.3]);
+        let mut t2 = AudioTrack::new(2, "Harmony").with_samples(&[0.3, 0.3]);
         t2.is_muted = false; // Harmony should be ignored because Lead is soloed
 
         session.add_track(t1);
@@ -334,7 +347,7 @@ mod tests {
 
     #[test]
     fn test_normalize_and_fades() {
-        let mut track = AudioTrack::new(100u32, "Sweep").with_samples(&[0.1, 0.5, 0.2]);
+        let mut track = AudioTrack::new(100, "Sweep").with_samples(&[0.1, 0.5, 0.2]);
 
         // Normalize peak 0.5 to exactly 1.0
         AudioEditor::normalize(&mut track);
@@ -348,7 +361,7 @@ mod tests {
 
     #[test]
     fn test_audacity_cut_and_paste() {
-        let mut track = AudioTrack::new(1u32, "Beat").with_samples(&[1.0, 2.0, 3.0, 4.0]);
+        let mut track = AudioTrack::new(1, "Beat").with_samples(&[1.0, 2.0, 3.0, 4.0]);
 
         // Cut index 1..3 ([2.0, 3.0])
         let clipboard = AudioEditor::cut(&mut track, 1, 3);
