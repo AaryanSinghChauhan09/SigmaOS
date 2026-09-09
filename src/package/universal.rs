@@ -282,6 +282,15 @@ pub enum PackageFormat {
     Opkg,       // OpenWrt OPKG (.opkg)
     SolarisIps, // Solaris IPS package (.p5p / .ips)
     GuixNar,    // GNU Guix Normalized Archive (.nar)
+    Spack,      // Spack HPC package manager (.spack)
+    Conan,      // Conan C/C++ package (.conan)
+    Wheel,      // Python Wheel (.whl)
+    Crate,      // Rust Cargo crate (.crate)
+    Gem,        // RubyGems (.gem)
+    Nupkg,      // .NET NuGet (.nupkg)
+    Vcpkg,      // Microsoft Vcpkg (.vcpkg)
+    NarInfo,    // Nix/Guix NarInfo substituter manifest (.narinfo)
+    Sysupdate,  // systemd sysupdate definition (.sysupdate)
 }
 
 impl PackageFormat {
@@ -398,6 +407,24 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
+        } else if normalized.ends_with(".sysupdate") {
+            Some(PackageFormat::Sysupdate)
         } else {
             None
         }
@@ -833,6 +860,15 @@ impl_generic_install_strategy!(IpkInstallStrategy);
 impl_generic_install_strategy!(OpkgInstallStrategy);
 impl_generic_install_strategy!(SolarisIpsInstallStrategy);
 impl_generic_install_strategy!(GuixNarInstallStrategy);
+impl_generic_install_strategy!(SpackInstallStrategy);
+impl_generic_install_strategy!(ConanInstallStrategy);
+impl_generic_install_strategy!(WheelInstallStrategy);
+impl_generic_install_strategy!(CrateInstallStrategy);
+impl_generic_install_strategy!(GemInstallStrategy);
+impl_generic_install_strategy!(NupkgInstallStrategy);
+impl_generic_install_strategy!(VcpkgInstallStrategy);
+impl_generic_install_strategy!(NarInfoInstallStrategy);
+impl_generic_install_strategy!(SysupdateInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1087,6 +1123,15 @@ impl_generic_metadata_adapter!(IpkMetadataAdapter, Ipk);
 impl_generic_metadata_adapter!(OpkgMetadataAdapter, Opkg);
 impl_generic_metadata_adapter!(SolarisIpsMetadataAdapter, SolarisIps);
 impl_generic_metadata_adapter!(GuixNarMetadataAdapter, GuixNar);
+impl_generic_metadata_adapter!(SpackMetadataAdapter, Spack);
+impl_generic_metadata_adapter!(ConanMetadataAdapter, Conan);
+impl_generic_metadata_adapter!(WheelMetadataAdapter, Wheel);
+impl_generic_metadata_adapter!(CrateMetadataAdapter, Crate);
+impl_generic_metadata_adapter!(GemMetadataAdapter, Gem);
+impl_generic_metadata_adapter!(NupkgMetadataAdapter, Nupkg);
+impl_generic_metadata_adapter!(VcpkgMetadataAdapter, Vcpkg);
+impl_generic_metadata_adapter!(NarInfoMetadataAdapter, NarInfo);
+impl_generic_metadata_adapter!(SysupdateMetadataAdapter, Sysupdate);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1230,6 +1275,15 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
+            PackageFormat::Spack => Box::new(SpackInstallStrategy),
+            PackageFormat::Conan => Box::new(ConanInstallStrategy),
+            PackageFormat::Wheel => Box::new(WheelInstallStrategy),
+            PackageFormat::Crate => Box::new(CrateInstallStrategy),
+            PackageFormat::Gem => Box::new(GemInstallStrategy),
+            PackageFormat::Nupkg => Box::new(NupkgInstallStrategy),
+            PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
+            PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
+            PackageFormat::Sysupdate => Box::new(SysupdateInstallStrategy),
         }
     }
 
@@ -1289,6 +1343,15 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
+            PackageFormat::Spack => Box::new(SpackMetadataAdapter),
+            PackageFormat::Conan => Box::new(ConanMetadataAdapter),
+            PackageFormat::Wheel => Box::new(WheelMetadataAdapter),
+            PackageFormat::Crate => Box::new(CrateMetadataAdapter),
+            PackageFormat::Gem => Box::new(GemMetadataAdapter),
+            PackageFormat::Nupkg => Box::new(NupkgMetadataAdapter),
+            PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
+            PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
+            PackageFormat::Sysupdate => Box::new(SysupdateMetadataAdapter),
         }
     }
 }
@@ -2744,7 +2807,10 @@ mod tests {
             PackageFormat::Tcz, PackageFormat::Gobo, PackageFormat::Ostree, PackageFormat::Pkgsrc,
             PackageFormat::Sfs, PackageFormat::Puk, PackageFormat::Dmg, PackageFormat::Cports,
             PackageFormat::Dports, PackageFormat::SlackBuild, PackageFormat::Crux, PackageFormat::Drpm,
-            PackageFormat::Stratum
+            PackageFormat::Stratum, PackageFormat::OpenBsdPkg, PackageFormat::Ipk, PackageFormat::Opkg,
+            PackageFormat::SolarisIps, PackageFormat::GuixNar, PackageFormat::Spack, PackageFormat::Conan,
+            PackageFormat::Wheel, PackageFormat::Crate, PackageFormat::Gem, PackageFormat::Nupkg,
+            PackageFormat::Vcpkg, PackageFormat::NarInfo, PackageFormat::Sysupdate
         ];
 
         for fmt in formats {
