@@ -26,31 +26,40 @@ impl<T: PartialEq> Vec<T> {
 }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
 
     pub fn with_capacity(capacity: usize) -> Self {
-        let data = if capacity == 0 {
-            core::ptr::null_mut()
-        } else {
-            unsafe { alloc(capacity * mem::size_of::<T>()) as *mut T }
-        };
+        if capacity == 0 {
+            return Self::new();
+        }
+        let size = mem::size_of::<T>() * capacity;
+        let new_data = unsafe { alloc(size) } as *mut T;
         Vec {
-            data,
+            data: new_data,
             len: 0,
             capacity,
         }
     }
 
-    pub fn pop(&mut self) -> Option<T> {
-        if self.len == 0 {
-            None
-        } else {
-            self.len -= 1;
-            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
+    pub fn reserve(&mut self, additional: usize) {
+        if self.len + additional > self.capacity {
+            // SAFETY: delegated to `grow_to`, which validates allocation before use.
+            unsafe {
+                self.grow_to(self.len + additional);
+            }
         }
     }
 
-    pub fn push(&mut self, item: T) {
+    pub fn truncate(&mut self, new_len: usize) {
+        // SAFETY: `self.len - 1` is always in range because the while loop
+        // condition guards against underflow, and `self.data` is valid for
+        // indices `0..self.len`.
         unsafe {
             while self.len > new_len {
                 self.len -= 1;
