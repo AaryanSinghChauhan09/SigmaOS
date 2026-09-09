@@ -146,11 +146,14 @@ impl Process {
         let base_slice = (q / weight).max(1);
         let inter = self.interactivity_score();
         // Boost interactive tasks (> 70) by shortening their deadline window
-        let boost = if inter > 70 { (inter as u64 - 70) / 10 } else { 0 };
+        let boost = if inter > 70 {
+            (inter as u64 - 70) / 10
+        } else {
+            0
+        };
         let slice = base_slice.saturating_sub(boost).max(1);
         self.virtual_deadline = self.virtual_runtime + slice;
     }
-
 }
 
 #[derive(Debug, Clone)]
@@ -339,7 +342,13 @@ pub struct CfsScheduler {
 impl CfsScheduler {
     pub const fn new() -> Self {
         CfsScheduler {
-            tasks: [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
+            tasks: [
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None,
+            ],
             task_count: 0,
             current_time: 0,
         }
