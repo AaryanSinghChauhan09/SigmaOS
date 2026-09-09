@@ -3,7 +3,6 @@
 //! This module implements a USB image writer inspired by Linux Mint's mintstick,
 //! which formats USB sticks and creates bootable USB sticks.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;

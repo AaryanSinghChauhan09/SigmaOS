@@ -13,7 +13,7 @@ pub trait AudioEffect {
 /// Single Audio Track in a multi-track session
 #[derive(Debug, Clone)]
 pub struct AudioTrack {
-    pub id: u32,
+    pub id: u64,
     pub name: String,
     pub samples: Vec<f32>,
     pub volume: f32,
@@ -23,16 +23,26 @@ pub struct AudioTrack {
 }
 
 impl AudioTrack {
-    pub fn new(id: u32, name: &str) -> Self {
-        Self {
+    pub fn new(id: u64, name: &str) -> Self {
+        AudioTrack {
             id,
-            name: name.to_string(),
+            name: String::from(name),
             samples: Vec::new(),
             volume: 1.0,
             pan: 0.0,
             is_muted: false,
             is_solo: false,
         }
+    }
+
+    pub fn with_samples(mut self, samples: &[f32]) -> Self {
+        self.samples = samples.to_vec();
+        self
+    }
+
+    pub fn with_volume(mut self, volume: f32) -> Self {
+        self.volume = volume;
+        self
     }
 }
 
@@ -54,38 +64,6 @@ impl AudioEffect for SpectralNoiseSuppressionEffect {
                 *sample = 0.0;
             }
         }
-    }
-}
-
-pub struct AudioTrack {
-    pub id: u64,
-    pub name: String,
-    pub samples: Vec<f32>,
-    pub volume: f32,
-    pub is_muted: bool,
-    pub is_solo: bool,
-}
-
-impl AudioTrack {
-    pub fn new(id: u64, name: &str) -> Self {
-        AudioTrack {
-            id,
-            name: String::from(name),
-            samples: Vec::new(),
-            volume: 1.0,
-            is_muted: false,
-            is_solo: false,
-        }
-    }
-
-    pub fn with_samples(mut self, samples: &[f32]) -> Self {
-        self.samples = samples.to_vec();
-        self
-    }
-
-    pub fn with_volume(mut self, volume: f32) -> Self {
-        self.volume = volume;
-        self
     }
 }
 

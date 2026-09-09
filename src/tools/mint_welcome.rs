@@ -3,7 +3,6 @@
 //! This module implements a welcome screen inspired by Linux Mint's mintwelcome,
 //! which shows important information about the release and guides new users.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;

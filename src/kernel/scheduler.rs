@@ -329,16 +329,6 @@ impl Scheduler {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TaskId(pub u64);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Task {
-    pub id: TaskId,
-    pub vruntime: u64,
-    pub priority: u32,
-}
-
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
     tasks: [Option<Task>; 64],
@@ -363,13 +353,6 @@ impl CfsScheduler {
         }
     }
 
-    pub fn tick(&mut self) {
-        self.current_time += 1;
-    }
-
-    pub fn schedule(&mut self) -> Option<Task> {
-        self.pick_next_task()
-    }
     pub fn pick_next_task(&mut self) -> Option<Task> {
         if self.task_count > 0 {
             let task = self.tasks[0].take();

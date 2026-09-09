@@ -1362,8 +1362,11 @@ impl TerminalSession {
                         .multiplexer
                         .split_active_pane(PaneSplitDirection::Horizontal);
                 }
-                i += 1;
+                _ => {}
             }
+            Some(action)
+        } else {
+            None
         }
     }
 }

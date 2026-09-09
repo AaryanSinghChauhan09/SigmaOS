@@ -4,7 +4,6 @@
 //! mintupdate and mintinstall, including update levels, multi-source support,
 //! repository mirrors, and snapshot integration.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;
