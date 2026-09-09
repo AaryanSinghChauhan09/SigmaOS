@@ -364,7 +364,7 @@ impl PosixSyscallDispatchApi {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

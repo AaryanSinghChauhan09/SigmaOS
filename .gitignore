@@ -20,10 +20,11 @@ build/*
 *.exe
 *.elf
 test_runner
-wiki_push
-wiki/
-WIKI/
+.cache/
 __pycache__/
-
-/tmp/
-*.tmp
+*.pyc
+/test_dma
+/test_runner
+/test_universal
+/tests/sigma_test_runner
+*.png

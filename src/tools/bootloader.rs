@@ -4,8 +4,9 @@
 
 
 use crate::klib::{Vec, String, ToString};
-use std::string::String;
-use std::format;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::format;
 
 /// Target Operating System Type for Dual-Boot Chainloading
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -256,36 +257,6 @@ impl Bootloader {
 
         cfg
     }
-
-    /// Generates Arch/Fedora systemd-boot loader entry configurations (/loader/entries/*.conf)
-    pub fn generate_systemd_boot_entries(&self) -> Vec<(String, String)> {
-        let mut entries = Vec::new();
-        for entry in &self.configuration.entries {
-            if entry.chainloader_target.is_none() {
-                let mut content = String::new();
-                content.push_str(&format!("title {}\n", entry.name));
-                content.push_str(&format!("linux {}\n", entry.kernel));
-                content.push_str(&format!("initrd {}\n", entry.initrd));
-                if !entry.options.is_empty() {
-                    content.push_str(&format!("options {}\n", entry.options.join(" ")));
-                }
-                let filename = format!("{}.conf", entry.id);
-                entries.push((filename, content));
-            }
-        }
-        entries
-    }
-
-    /// Generates FreeBSD /boot/loader.conf configuration format
-    pub fn generate_freebsd_loader_conf(&self) -> String {
-        let mut conf = String::new();
-        conf.push_str("# FreeBSD / SigmaOS /boot/loader.conf\n");
-        conf.push_str(&format!("autoboot_delay=\"{}\"\n", self.configuration.global_settings.timeout));
-        conf.push_str("boot_multicons=\"YES\"\n");
-        conf.push_str("kern.geom.label.disk_ident.enable=\"0\"\n");
-        conf.push_str("zfs_load=\"YES\"\n");
-        conf
-    }
 }
 
 impl Default for Bootloader {
@@ -302,7 +273,7 @@ pub enum BootloaderError {
     SecureBootError,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

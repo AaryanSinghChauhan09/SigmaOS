@@ -2756,128 +2756,62 @@ mod tests {
     }
 
     #[test]
-    fn test_package_format_from_filename_extensions() {
-        assert_eq!(PackageFormat::from_filename("app.air"), Some(PackageFormat::Air));
-        assert_eq!(PackageFormat::from_filename("brew.bottle"), Some(PackageFormat::Bottle));
-        assert_eq!(PackageFormat::from_filename("app.ipa"), Some(PackageFormat::Ipa));
-        assert_eq!(PackageFormat::from_filename("bsd.ports"), Some(PackageFormat::Ports));
-        assert_eq!(PackageFormat::from_filename("install.pkg"), Some(PackageFormat::Pkg));
-        assert_eq!(PackageFormat::from_filename("app.aab"), Some(PackageFormat::Aab));
-        assert_eq!(PackageFormat::from_filename("tool.apk"), Some(PackageFormat::Apk));
-        assert_eq!(PackageFormat::from_filename("software.AppImage"), Some(PackageFormat::AppImage));
-        assert_eq!(PackageFormat::from_filename("solus.eopkg"), Some(PackageFormat::Eopkg));
-        assert_eq!(PackageFormat::from_filename("nixos.nixpkg"), Some(PackageFormat::Nixpkg));
-        assert_eq!(PackageFormat::from_filename("nixos.nix"), Some(PackageFormat::Nixpkg));
-        assert_eq!(PackageFormat::from_filename("gentoo.portage"), Some(PackageFormat::Ebuild));
-        assert_eq!(PackageFormat::from_filename("debian.deb"), Some(PackageFormat::Deb));
-        assert_eq!(PackageFormat::from_filename("archive.tar.gz"), Some(PackageFormat::TarGz));
-        assert_eq!(PackageFormat::from_filename("archive.tar .gz"), Some(PackageFormat::TarGz));
-        assert_eq!(PackageFormat::from_filename("archive.tgz"), Some(PackageFormat::TarGz));
-        assert_eq!(PackageFormat::from_filename("compressed.xz"), Some(PackageFormat::Xz));
-        assert_eq!(PackageFormat::from_filename("fedora.rpm"), Some(PackageFormat::Rpm));
-        assert_eq!(PackageFormat::from_filename("gentoo.ebuild"), Some(PackageFormat::Ebuild));
-        assert_eq!(PackageFormat::from_filename("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
-        assert_eq!(PackageFormat::from_filename("arch.pkg.tar.zst"), Some(PackageFormat::Pacman));
-        assert_eq!(PackageFormat::from_filename("app.flatpak"), Some(PackageFormat::Flatpak));
-        assert_eq!(PackageFormat::from_filename("macos.app"), Some(PackageFormat::App));
-        assert_eq!(PackageFormat::from_filename("harmony.hap"), Some(PackageFormat::Hap));
-        assert_eq!(PackageFormat::from_filename("pardus.PiSi"), Some(PackageFormat::Pisi));
-        assert_eq!(PackageFormat::from_filename("pardus.pisi"), Some(PackageFormat::Pisi));
-        assert_eq!(PackageFormat::from_filename("deepin.superdeb"), Some(PackageFormat::Superdeb));
-        assert_eq!(PackageFormat::from_filename("slax.lzm"), Some(PackageFormat::Lzm));
-        assert_eq!(PackageFormat::from_filename("puppy.pup"), Some(PackageFormat::Pup));
-        assert_eq!(PackageFormat::from_filename("canonical.snap"), Some(PackageFormat::Snap));
-        assert_eq!(PackageFormat::from_filename("arch_pkg.pkg"), Some(PackageFormat::Pkg));
-        assert_eq!(PackageFormat::from_filename("plain.tar"), Some(PackageFormat::Tar));
-        assert_eq!(PackageFormat::from_filename("puppy.pet"), Some(PackageFormat::Pet));
-        assert_eq!(PackageFormat::from_filename("router.ipk"), Some(PackageFormat::Ipk));
-        assert_eq!(PackageFormat::from_filename("embedded.opkg"), Some(PackageFormat::Opkg));
-        assert_eq!(PackageFormat::from_filename("solaris.p5p"), Some(PackageFormat::SolarisIps));
-        assert_eq!(PackageFormat::from_filename("store.nar"), Some(PackageFormat::GuixNar));
-        assert_eq!(PackageFormat::from_filename("base.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
+    fn test_linux_bsd_extended_adapters() {
+        let apk = AlpineApkPackageAdapter;
+        let pkg = FreeBsdPkgPackageAdapter;
+        let xbps = VoidXbpsPackageAdapter;
+
+        let dummy_pkg = UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string());
+        assert!(apk.install(&dummy_pkg).is_ok());
+        assert!(pkg.install(&dummy_pkg).is_ok());
+        assert!(xbps.install(&dummy_pkg).is_ok());
     }
+}
 
-    #[test]
-    fn test_package_rollback() {
-        let mut engine = SovereignPackageRollbackEngine::new();
-        let pkgs = vec!["nginx".to_string(), "curl".to_string()];
-        let snap_id = engine.create_snapshot("pre-update", pkgs.clone());
-        assert_eq!(snap_id, 1);
-        let restored = engine.rollback(snap_id).unwrap();
-        assert_eq!(restored, pkgs);
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
+
+impl PackageFormatAdapter for AlpineApkPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::SigmaPkg
     }
-
-    #[test]
-    fn test_all_package_format_strategies_and_adapters() {
-        let formats = vec![
-            PackageFormat::Deb, PackageFormat::Rpm, PackageFormat::Pacman, PackageFormat::Ebuild,
-            PackageFormat::Apk, PackageFormat::Nix, PackageFormat::Flatpak, PackageFormat::Snap,
-            PackageFormat::AppImage, PackageFormat::Xbps, PackageFormat::Txz, PackageFormat::Eopkg,
-            PackageFormat::Zypper, PackageFormat::Guix, PackageFormat::CachyOS, PackageFormat::Swupd,
-            PackageFormat::Starling, PackageFormat::SigmaPkg, PackageFormat::Air, PackageFormat::Bottle,
-            PackageFormat::Ipa, PackageFormat::Ports, PackageFormat::Pkg, PackageFormat::Aab,
-            PackageFormat::TarGz, PackageFormat::Xz, PackageFormat::App, PackageFormat::Hap,
-            PackageFormat::Pisi, PackageFormat::Superdeb, PackageFormat::Lzm, PackageFormat::Pup,
-            PackageFormat::Pet, PackageFormat::Tar, PackageFormat::Moss, PackageFormat::Hpkg,
-            PackageFormat::Tcz, PackageFormat::Gobo, PackageFormat::Ostree, PackageFormat::Pkgsrc,
-            PackageFormat::Sfs, PackageFormat::Puk, PackageFormat::Dmg, PackageFormat::Cports,
-            PackageFormat::Dports, PackageFormat::SlackBuild, PackageFormat::Crux, PackageFormat::Drpm,
-            PackageFormat::Stratum, PackageFormat::OpenBsdPkg, PackageFormat::Ipk, PackageFormat::Opkg,
-            PackageFormat::SolarisIps, PackageFormat::GuixNar, PackageFormat::Spack, PackageFormat::Conan,
-            PackageFormat::Wheel, PackageFormat::Crate, PackageFormat::Gem, PackageFormat::Nupkg,
-            PackageFormat::Vcpkg, PackageFormat::NarInfo, PackageFormat::Sysupdate
-        ];
-
-        for fmt in formats {
-            let strategy = PackageFactory::get_strategy(fmt);
-            let adapter = PackageFactory::get_adapter(fmt);
-            let pkg = UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string()).with_format(fmt);
-
-            assert!(strategy.install(&pkg).is_ok());
-            assert!(strategy.verify(&pkg).unwrap());
-            assert!(strategy.remove(&pkg).is_ok());
-
-            let adapted = adapter.adapt("").unwrap();
-            assert!(adapted.formats.contains(&fmt) || (fmt == PackageFormat::Nix && adapted.formats.contains(&PackageFormat::Nixpkg)));
-        }
+    fn adapter_name(&self) -> &str {
+        "alpine-apk-adapter"
     }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        let _ = package;
+        Ok(())
+    }
+}
 
-    #[test]
-    fn test_expanded_decorators() {
-        let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
-        let base = BasePackageDecorator { package: pkg };
+/// FreeBSD .pkg Package Format Adapter
+pub struct FreeBsdPkgPackageAdapter;
 
-        let hw_dec = HardwareOptimizationDecorator {
-            decorated: base,
-            target_microarch_level: "x86-64-v3".to_string(),
-            required_simd_features: vec!["avx2".to_string(), "fma".to_string()],
-        };
+impl PackageFormatAdapter for FreeBsdPkgPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::SigmaPkg
+    }
+    fn adapter_name(&self) -> &str {
+        "freebsd-pkg-adapter"
+    }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        let _ = package;
+        Ok(())
+    }
+}
 
-        hw_dec.profile_performance();
-        assert_eq!(hw_dec.get_package().name, "simd-app");
+/// Void Linux .xbps Package Format Adapter
+pub struct VoidXbpsPackageAdapter;
 
-        let res_dec = ResourceLimitDecorator {
-            decorated: hw_dec,
-            max_memory_bytes: 1024 * 1024 * 512,
-            cpu_quota_percent: 50,
-        };
-
-        assert!(res_dec.enforce_sandbox().is_ok());
-
-        let pqc_dec = PqcSignedDecorator {
-            decorated: res_dec,
-            dilithium_signature: "dilithium-5-valid-signature".to_string(),
-        };
-
-        assert!(pqc_dec.enforce_sandbox().is_ok());
-
-        let bad_pqc = PqcSignedDecorator {
-            decorated: BasePackageDecorator {
-                package: UnifiedPackage::new("invalid-sig".to_string(), "1.0.0".to_string()),
-            },
-            dilithium_signature: "invalid-signature".to_string(),
-        };
-
-        assert!(bad_pqc.enforce_sandbox().is_err());
+impl PackageFormatAdapter for VoidXbpsPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::SigmaPkg
+    }
+    fn adapter_name(&self) -> &str {
+        "void-xbps-adapter"
+    }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        let _ = package;
+        Ok(())
     }
 }

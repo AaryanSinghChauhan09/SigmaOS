@@ -18,15 +18,8 @@ pub mod pci_enumeration;
 pub mod pods;
 pub mod rootkit;
 pub mod shims;
-pub mod ubuntu_common_drivers;
-pub mod universal_support;
-pub mod vault;
-pub mod wifi_broadcom_bcm4318;
-pub mod windows_compat;
-pub mod usb_xhci_host;
-pub mod ahci_sata_controller;
-pub mod hid_input_device;
-pub mod audio_codec_hda;
+pub mod gpu_framework;
+pub mod network_framework;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
@@ -69,18 +62,13 @@ pub use ubuntu_common_drivers::{
     UbuntuLivepatchDriverHook,
 };
 pub use vault::{DriverArchiveVault, VaultEntry};
-pub use usb_xhci_host::{
-    UsbXhciHostDriver, UsbXhciPciDriver, UsbDevice, UsbEndpoint, UsbSpeed, UsbDeviceClass,
-    TransferRing,
+pub use shims::{IntelE1000Driver, HdaSampleRate, IntelHdaDriver, VirtioBlockOp, VirtioBlockRequest, VirtioBlockDriver};
+pub use gpu_framework::{
+    AmdgpuDriver, GpuBuffer, GpuDriver, GpuError, GpuInfo, GpuManager, GpuType, IntelDriver,
+    NvidiaDriver, VirtioGpuDriver,
 };
-pub use ahci_sata_controller::{
-    AhciSataController, AhciPciDriver, SataDevice, SataDeviceType, CommandListEntry,
-};
-pub use hid_input_device::{
-    HidInputDeviceDriver, HidPciDriver, HidDevice, HidDeviceType, HidKeyboardReport,
-    HidMouseReport, HidReportBuffer,
-};
-pub use audio_codec_hda::{
-    HdaController, HdaPciDriver, HdaCodec, AudioStream, AudioFormat, SampleRate, BitDepth,
-    Channels,
+pub use network_framework::{
+    AtherosAthDriver, BroadcomBrcmDriver, EthernetDriver, IntelIwlWifiDriver, NetworkDriver,
+    NetworkError, NetworkInfo, NetworkManager, NetworkType, RealtekRtwDriver, WifiChipsetVendor,
+    WirelessNetwork,
 };

@@ -1,10 +1,13 @@
 //! Security, Privacy & Governance Framework (Items 61-80)
 //! Comprehensive Security, Privacy, and Open-Source Governance Suite for SigmaOS
 
+#![no_std]
 
+extern crate alloc;
 
 use crate::klib::{String, Vec, ToString};
-use std::string::String;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 // ============================================================================
 // 61. Default Secure Posture
@@ -310,8 +313,8 @@ pub struct ContainerSecurityPolicyEngine {
 impl ContainerSecurityPolicyEngine {
     pub fn new() -> Self {
         let mut caps = Vec::new();
-        caps.push("CAP_SYS_ADMIN_BIT".to_string());
-        caps.push("CapNetRaw".to_string());
+        caps.push("CAP_SYS_ADMIN".to_string());
+        caps.push("CAP_NET_RAW".to_string());
 
         Self {
             enforce_read_only_rootfs: true,
@@ -453,7 +456,6 @@ pub struct GovernanceCharterManager {
     pub project_lead: String,
     pub steering_committee_members: Vec<String>,
     pub code_of_conduct_version: String,
-    pub bylaw_clauses: Vec<String>,
 }
 
 impl GovernanceCharterManager {
@@ -463,27 +465,11 @@ impl GovernanceCharterManager {
         members.push("Kernel Maintainer".to_string());
         members.push("Community Representative".to_string());
 
-        let mut clauses = Vec::new();
-        clauses.push("Debian Free Software Guidelines (DFSG) Compliance".to_string());
-        clauses.push("Arch Linux Developer Bylaws & Consensus Voting".to_string());
-        clauses.push("FreeBSD Core Team Charter & Judicial Appeal".to_string());
-
         Self {
             project_lead: "SigmaOS Benevolent Governance Board".to_string(),
             steering_committee_members: members,
             code_of_conduct_version: "Contributor Covenant 2.1".to_string(),
-            bylaw_clauses: clauses,
         }
-    }
-
-    pub fn add_bylaw_clause(&mut self, clause: &str) {
-        if !self.bylaw_clauses.contains(&clause.to_string()) {
-            self.bylaw_clauses.push(clause.to_string());
-        }
-    }
-
-    pub fn enforce_distro_bylaws(&self) -> bool {
-        !self.steering_committee_members.is_empty() && !self.bylaw_clauses.is_empty()
     }
 }
 
@@ -561,7 +547,7 @@ impl Default for SecurityPrivacyGovernanceMasterSuite {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -579,13 +565,5 @@ mod tests {
     fn test_playbook_containment() {
         let playbook = IncidentResponsePlaybook::breach_containment();
         assert_eq!(playbook.containment_steps.len(), 4);
-    }
-
-    #[test]
-    fn test_governance_charter_distro_bylaws() {
-        let mut mgr = GovernanceCharterManager::new();
-        mgr.add_bylaw_clause("OpenBSD Unveil & Pledge Mandatory Audit");
-        assert!(mgr.enforce_distro_bylaws());
-        assert!(mgr.bylaw_clauses.iter().any(|c| c.contains("OpenBSD")));
     }
 }

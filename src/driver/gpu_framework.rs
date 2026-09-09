@@ -1,9 +1,14 @@
 //! GPU Driver Framework (Linux DRM & BSD drm-kmod Inspiration)
 //! Native bare-metal hardware drivers for AMD, Intel, NVIDIA, and VirtIO-GPU
 
-use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
+#![no_std]
+
+extern crate alloc;
+
+use crate::klib::{String, Vec, ToString};
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// GPU device types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -142,30 +147,10 @@ impl GpuDriver for AmdgpuDriver {
     fn initialize(&mut self) -> Result<(), GpuError> {
         // Discover IP Blocks (Linux amdgpu_device_init inspiration)
         self.ip_blocks.clear();
-        self.ip_blocks.push(AmdIpBlock {
-            block_type: AmdIpBlockType::Gfx,
-            version_major: 11,
-            version_minor: 0,
-            initialized: true,
-        });
-        self.ip_blocks.push(AmdIpBlock {
-            block_type: AmdIpBlockType::Sdma,
-            version_major: 6,
-            version_minor: 0,
-            initialized: true,
-        });
-        self.ip_blocks.push(AmdIpBlock {
-            block_type: AmdIpBlockType::Vcn,
-            version_major: 4,
-            version_minor: 0,
-            initialized: true,
-        });
-        self.ip_blocks.push(AmdIpBlock {
-            block_type: AmdIpBlockType::Dcn,
-            version_major: 3,
-            version_minor: 2,
-            initialized: true,
-        });
+        self.ip_blocks.push(AmdIpBlock { block_type: AmdIpBlockType::Gfx, version_major: 11, version_minor: 0, initialized: true });
+        self.ip_blocks.push(AmdIpBlock { block_type: AmdIpBlockType::Sdma, version_major: 6, version_minor: 0, initialized: true });
+        self.ip_blocks.push(AmdIpBlock { block_type: AmdIpBlockType::Vcn, version_major: 4, version_minor: 0, initialized: true });
+        self.ip_blocks.push(AmdIpBlock { block_type: AmdIpBlockType::Dcn, version_major: 3, version_minor: 2, initialized: true });
 
         self.initialized = true;
         Ok(())

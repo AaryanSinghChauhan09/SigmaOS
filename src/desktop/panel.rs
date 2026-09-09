@@ -268,3 +268,84 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
         self.deref_mut().iter_mut()
     }
 }
+
+// ============================================================================
+// XFCE & KDE Plasma Inspired Desktop Environment Extensions
+// ============================================================================
+
+/// XFCE Panel Applet Plugin System (Whisker Menu, Tasklist, SysTray, Clock)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XfceAppletType {
+    WhiskerMenu,
+    WindowButtonsTasklist,
+    SystemTrayNotifier,
+    ClockCalendar,
+    WorkspacePager,
+}
+
+pub struct XfcePanelAppletEngine {
+    pub applet_id: usize,
+    pub applet_type: XfceAppletType,
+    pub width_px: u32,
+}
+
+impl XfcePanelAppletEngine {
+    pub fn new(applet_id: usize, applet_type: XfceAppletType) -> Self {
+        Self {
+            applet_id,
+            applet_type,
+            width_px: 120,
+        }
+    }
+}
+
+/// KDE Plasma / KWin Desktop Effects & Plasmoid Widgets Engine
+pub struct KdePlasmaKwinCompositorEffects {
+    pub blur_behind_active: bool,
+    pub wobbly_windows_enabled: bool,
+    pub desktop_grid_active: bool,
+    pub plasmoids_loaded: usize,
+}
+
+impl KdePlasmaKwinCompositorEffects {
+    pub fn new() -> Self {
+        Self {
+            blur_behind_active: true,
+            wobbly_windows_enabled: true,
+            desktop_grid_active: false,
+            plasmoids_loaded: 8,
+        }
+    }
+
+    pub fn toggle_desktop_grid(&mut self) -> bool {
+        self.desktop_grid_active = !self.desktop_grid_active;
+        self.desktop_grid_active
+    }
+}
+
+impl Default for KdePlasmaKwinCompositorEffects {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_xfce_panel_applet_engine() {
+        let applet = XfcePanelAppletEngine::new(1, XfceAppletType::WhiskerMenu);
+        assert_eq!(applet.applet_id, 1);
+        assert_eq!(applet.applet_type, XfceAppletType::WhiskerMenu);
+    }
+
+    #[test]
+    fn test_kde_plasma_kwin_effects() {
+        let mut kwin = KdePlasmaKwinCompositorEffects::new();
+        assert!(kwin.blur_behind_active);
+        assert!(kwin.wobbly_windows_enabled);
+        assert!(kwin.toggle_desktop_grid());
+        assert!(!kwin.toggle_desktop_grid());
+    }
+}

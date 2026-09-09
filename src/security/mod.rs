@@ -1,7 +1,21 @@
 // SigmaOS Security Subsystem
 pub mod capability;
-pub mod defensive_audit;
-pub mod parrot;
+pub mod pqc_enclave;
+pub mod governance;
+
+pub use pqc_enclave::{
+    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
+};
+pub mod capability_enforcer;
+pub mod capability_token;
+pub mod cleaner;
+pub mod clipboard;
+pub mod forensics;
+pub mod integrity;
+pub mod intrusion;
+pub mod mac;
+pub mod password;
+pub mod pki;
 pub mod pledge;
 pub mod unveil;
 pub mod selinux;
@@ -45,8 +59,17 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use defensive_audit::{
-    DefensiveAuditLog, SecurityAuditRecord,
+pub use governance::{
+    ComplianceFramework, ComplianceProfileEngine, ContainerSecurityPolicyEngine,
+    DefaultSecurePosture, DeveloperKeyRotator, EncryptedHomeOptIn, GovernanceCharterManager,
+    ImmutableAuditTrail, IncidentResponsePlaybook, LicensingAuditor, MacPolicyEngine,
+    MacPolicyMode, NetworkZeroTrustEngine, PrivacyDashboardControls, PrivacyPreservingTelemetry,
+    RuntimeAppSandbox, SbomManager, SecureUpdateChannel, SecurityPrivacyGovernanceMasterSuite,
+    SystemSecretsKeyring, TpmHardwareAttestation, VulnerabilityDisclosureManager,
+};
+pub use intrusion::{
+    AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
+    IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
 pub use forensics::*;
 pub use hardening::{
