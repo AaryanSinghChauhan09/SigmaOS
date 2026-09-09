@@ -161,15 +161,6 @@ pub struct LotteryTask {
     pub is_active: bool,
 }
 
-/// Ledger Block securing system process events (Consensus Process Logging)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86_32,
-    X86_64,
-    AArch64,
-    RiscV32,
-    RiscV64,
-}
 
 pub struct AuditBlock {
     pub block_id: u32,
