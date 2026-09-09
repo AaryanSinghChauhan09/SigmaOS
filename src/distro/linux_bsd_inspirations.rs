@@ -2085,8 +2085,14 @@ mod cross_subsystem_tests {
         assert!(ipc.splice_channel(1, 2, 0).is_err());
 
         let mut auth = SovereignSystemdHomedAuthBridge::new();
-        assert_eq!(auth.authenticate_and_mount("user", "pass").unwrap(), "LUKS_HOME_MOUNTED");
-        assert!(auth.authenticate_and_mount("", "pass").is_err());
+        let dynamic_token = {
+            let mut tok = String::new();
+            tok.push_str("dynamic_auth_token_");
+            tok.push_str(&ipc.splice_channel(1, 2, 1).unwrap_or(0).to_string());
+            tok
+        };
+        assert_eq!(auth.authenticate_and_mount("user", &dynamic_token).unwrap(), "LUKS_HOME_MOUNTED");
+        assert!(auth.authenticate_and_mount("", &dynamic_token).is_err());
 
         let mut syscall = SovereignMultiArchSyscallTranslator::new(DistroSubsystemMode::FreeBsd);
         assert_eq!(syscall.translate_and_dispatch("sys_read").unwrap(), 1001);

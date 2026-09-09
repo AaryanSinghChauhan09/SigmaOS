@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 // SigmaOS Security Hardening Module
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations

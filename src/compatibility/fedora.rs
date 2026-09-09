@@ -4024,6 +4024,9 @@ impl FedoraIrcotEngine {
     }
 
     pub fn broadcast_message(&self, message: &str) -> usize {
+        if message.is_empty() {
+            return 0;
+        }
         self.channels.len()
     }
 }

@@ -443,6 +443,9 @@ impl MkinitcpioInitramfsBuilder {
     }
 
     pub fn build_initramfs_img(&self, output_path: &str) -> Result<usize, &'static str> {
+        if output_path.is_empty() {
+            return Err("mkinitcpio: Output path is empty");
+        }
         if self.hooks.is_empty() {
             return Err("mkinitcpio: Hook array is empty");
         }
