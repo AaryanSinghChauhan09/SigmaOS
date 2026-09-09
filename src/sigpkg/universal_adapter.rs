@@ -1789,6 +1789,14 @@ impl UniversalDependencyMapper {
             "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "qt5".to_string(),
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
+            "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
+            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => "glib".to_string(),
+            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => "pcre".to_string(),
+            "libuv" | "libuv-dev" | "libuv-devel" | "dev-libs/libuv" => "libuv".to_string(),
+            "openssh" | "openssh-server" | "net-misc/openssh" => "openssh".to_string(),
+            "mesa" | "mesa-dev" | "mesa-libgl-devel" | "media-libs/mesa" => "mesa".to_string(),
+            "git" | "git-base" | "dev-vcs/git" => "git".to_string(),
+            "cmake" | "dev-build/cmake" => "cmake".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2056,7 +2064,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "dnf" | "yum" | "zypper" => {
+            "dnf" | "yum" | "zypper" | "microdnf" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2188,7 +2196,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" => {
+            "pkgin" | "pkg_delete" | "pkg_add" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }

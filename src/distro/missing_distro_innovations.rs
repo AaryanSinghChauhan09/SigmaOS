@@ -934,10 +934,105 @@ impl SmartOsZoneEngine {
         Ok(())
     }
 
-    pub fn vmadm_start(&mut self, uuid: &str) -> Result<(), &'static str> {
-        if let Some(vm) = self.vms.get_mut(uuid) {
-            vm.state = SmartOsVmState::Running;
-            Ok(())
+    pub fn report_boot_failure_and_rollback(&mut self) -> PartitionSlot {
+        let active = match self.active_slot {
+            PartitionSlot::SlotA => &mut self.slot_a,
+            PartitionSlot::SlotB => &mut self.slot_b,
+        };
+        active.status = ImageSlotStatus::Corrupted;
+
+        let fallback_slot = self.inactive_slot();
+        self.active_slot = fallback_slot;
+        fallback_slot
+    }
+}
+
+impl Default for SteamOsAtomicAbImageUpdateEngine {
+    fn default() -> Self {
+        Self::new("1.0.0", "cbf29ce484222325")
+    }
+}
+
+// =========================================================================
+// APPARMOR-INSPIRED PATH-BASED MAC RULE EVALUATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppArmorRuleMode {
+    Enforce,
+    Complain,
+    Disabled,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorPathRule {
+    pub path_pattern: String,
+    pub allow_read: bool,
+    pub allow_write: bool,
+    pub allow_exec: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorRuleProfile {
+    pub profile_name: String,
+    pub mode: AppArmorRuleMode,
+    pub rules: Vec<AppArmorPathRule>,
+}
+
+pub type AppArmorProfile = AppArmorRuleProfile;
+pub type AppArmorPathProfile = AppArmorRuleProfile;
+
+pub struct AppArmorPathRuleEngine {
+    pub profiles: BTreeMap<String, AppArmorPathProfile>,
+    pub audit_log: Vec<String>,
+}
+
+impl AppArmorPathRuleEngine {
+    pub fn new() -> Self {
+        Self {
+            profiles: BTreeMap::new(),
+            audit_log: Vec::new(),
+        }
+    }
+
+    pub fn add_profile(&mut self, profile: AppArmorPathProfile) {
+        self.profiles.insert(profile.profile_name.clone(), profile);
+    }
+
+    pub fn evaluate_access(
+        &mut self,
+        profile_name: &str,
+        path: &str,
+        need_read: bool,
+        need_write: bool,
+        need_exec: bool,
+    ) -> bool {
+        let profile = match self.profiles.get(profile_name) {
+            Some(p) => p,
+            None => return true, // Unprofiled application
+        };
+
+        if profile.mode == AppArmorRuleMode::Disabled {
+            return true;
+        }
+
+        let mut matched_rule: Option<&AppArmorPathRule> = None;
+        for rule in &profile.rules {
+            if path == rule.path_pattern
+                || (rule.path_pattern.ends_with("/*")
+                    && path.starts_with(rule.path_pattern.trim_end_matches("/*")))
+                || (rule.path_pattern.ends_with('*')
+                    && path.starts_with(rule.path_pattern.trim_end_matches('*')))
+            {
+                matched_rule = Some(rule);
+                break;
+            }
+        }
+
+        let allowed = if let Some(rule) = matched_rule {
+            (!need_read || rule.allow_read)
+                && (!need_write || rule.allow_write)
+                && (!need_exec || rule.allow_exec)
         } else {
             Ok(true) // Unconfined
         }

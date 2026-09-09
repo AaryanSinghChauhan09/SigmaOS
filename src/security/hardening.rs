@@ -111,7 +111,10 @@ fn canary_base() -> u64 {
 
     // Compile-time constant: djb2 hash over default seed string
     const FILE_PATH_HASH: u64 = {
-        let bytes = b"SIGMAOS_SECURITY_HARDENING_CANARY_SEED";
+        let bytes = match option_env!("CARGO_MANIFEST_DIR") {
+            Some(dir) => dir.as_bytes(),
+            None => b"sigmaos",
+        };
         let mut h: u64 = 5381;
         let mut i = 0;
         while i < bytes.len() {
