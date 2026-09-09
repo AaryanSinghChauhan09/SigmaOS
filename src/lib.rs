@@ -81,7 +81,10 @@ pub use distro::{
     SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignFastInitramfsGenerator,
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
     SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
-    SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
+    SovereignStatefulNatEngine, SovereignAheadOfDistrosSuite, SovereignPredictiveSchedExtEngine,
+    SovereignOmniCasStoreEngine, SovereignCrossPlatformCapabilityEngine,
+    SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine,
+    StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
     ZramCompressionAlgorithm, DebianMultiarchAptEngine, EndeavourReflectorMirrorRanker,
     FreeBsdZfsBootEnvManager, GarudaDracutBtrfsSnapper, GarudaPerformanceTweakEngine,
     HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, NixOsFlakeProfileManager,
@@ -283,6 +286,10 @@ pub use driver::pci_bus::{
     SimulatedPciHardwareAccess,
 };
 pub use drivers::*;
+pub use drivers::distro_device_expansion::{
+    AppleNvmeAnsDriver, AtherosAr9271WifiDriver, Esp32HciBtBridgeDriver, LogitechUnifyingHidDriver,
+    NvidiaNouveauOpenGspDriver, UsbAudioClass2Driver,
+};
 pub use filesystem::{
     FileMode, FileType, FsError, Inode, VirtualFilesystem,
 };
