@@ -2,24 +2,6 @@
 
 SigmaOS is the world’s first **sovereign operating system**, engineered from the ground up in Safe-Rust to deliver mathematical memory safety, sub-millisecond execution latency, and true computing independence beyond legacy Linux and BSD distributions.
 
-> ✅ **Build Status:** 0 compilation errors as of September 2026. All open PRs merged and verified.
-
----
-
-## 🏛️ Master Arch-Style Wiki Portal
-
-Explore the **[SigmaOS Arch Wiki Portal](SIGMAOS_ARCH_WIKI_PORTAL)** for comprehensive, Arch Linux Wiki-standard technical guides covering system administration, package management, security hardening, performance tuning, and Wayland desktop compositor setup.
-
----
-
-## 🎯 The SigmaOS Philosophy (Arch & Sovereign Principles)
-
-1. **Simplicity:** Zero-dependency, pure Rust microkernel shards and userland.
-2. **Modernity:** Wayland wire protocol, eBPF XDP zero-copy networking, and CachyOS BORE scheduler.
-3. **Pragmatism:** Universal package compatibility (`.deb`, `.rpm`, `PKGBUILD` / `.pkg.tar.zst`, `.apk`, `.xbps`, `.txz`).
-4. **User-Centricity:** Transparent privilege delegation, sandboxing, and hardware Governor control.
-5. **Versatility:** Rolling release agility with sub-millisecond atomic transactional state rollbacks (Snapper CoW, NixOS generations, FreeBSD ZFS boot environments).
-
 ---
 
 ## 📜 Key Project Resources & Manifesto
@@ -27,6 +9,7 @@ Explore the **[SigmaOS Arch Wiki Portal](SIGMAOS_ARCH_WIKI_PORTAL)** for compreh
 - 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
 - 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
 - ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
+- 📋 **Linux Distro Feature Parity Checklist**: [docs/LINUX_DISTRO_PARITY_CHECKLIST.md](docs/LINUX_DISTRO_PARITY_CHECKLIST.md)
 - 🗺️ **Master Development Roadmap**: [FUTURE-DEVELOPMENT-ROADMAP.md](FUTURE-DEVELOPMENT-ROADMAP.md)
 
 ---
@@ -96,49 +79,8 @@ SigmaOS is licensed under the [MIT License](LICENSE).
 
 ---
 
-<<<<<<< HEAD
 ## 📜 Key Project Resources & Public Launch Documents
 - 🚀 **Public Launch Announcement**: [docs/LAUNCH_ANNOUNCEMENT.md](docs/LAUNCH_ANNOUNCEMENT.md)
 - 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
 - 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
 - ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
-=======
-## 🗺️ Roadmap & Status
-
-| Page | Description |
-|------|-------------|
-| [ROADMAP](ROADMAP) | Development roadmap |
-| [FUTURE-DEVELOPMENT-ROADMAP](FUTURE-DEVELOPMENT-ROADMAP) | Long-term vision |
-| [CHANGELOG](CHANGELOG) | Version changelog |
-| [RELEASE_NOTES_v0.9](RELEASE_NOTES_v0.9) | v0.9 release notes |
-| [WHAT_IS_WORKING_AND_NOT_WORKING](WHAT_IS_WORKING_AND_NOT_WORKING) | Current feature status |
-| [NEXT_STEPS_GUIDELINES](NEXT_STEPS_GUIDELINES) | Contributor guidelines for next steps |
-| [TIER1_FEATURES](TIER1_FEATURES) | Tier-1 feature tracking |
-
----
-
-## 🌐 Linux & BSD Distro Parity
-
-| Page | Description |
-|------|-------------|
-| [SigmaOS-vs-Linux-Distros-Comparative-Dashboard](SigmaOS-vs-Linux-Distros-Comparative-Dashboard) | Feature parity dashboard vs major distros |
-| [SigmaOS_Gap_Closing_Roadmap](SigmaOS_Gap_Closing_Roadmap) | Gap-closing roadmap vs Linux |
-| [LINUX_BSD_INNOVATIONS_IMPLEMENTED](LINUX_BSD_INNOVATIONS_IMPLEMENTED) | Implemented Linux/BSD innovations |
-| [Operations-and-Continuous-Improvement-Guide](Operations-and-Continuous-Improvement-Guide) | Ops and CI guide |
-| [SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V22](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V22) | Sovereign OS Encyclopedia V22 |
-
----
-
-## 💡 Strategic Planning & Improvement Ideas
-
-| Page | Description |
-|------|-------------|
-| [100-Improvement-Ideas](100-Improvement-Ideas) | 100 improvement ideas |
-| [ImprovementPlan](ImprovementPlan) | Improvement plan |
-| [DETAILED_IMPROVEMENT_PLAN](DETAILED_IMPROVEMENT_PLAN) | Detailed improvement plan |
-| [SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_AND_IMPLEMENTATION_PLAN](SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_AND_IMPLEMENTATION_PLAN) | 500-repo absorption plan |
-
----
-
-*Last updated: September 2026 — Documentation aligned with Arch Linux Wiki principles.*
->>>>>>> 6e22963ba6 (docs(wiki): enhance GitHub Wiki with Arch Linux Wiki portal structure and principles)
