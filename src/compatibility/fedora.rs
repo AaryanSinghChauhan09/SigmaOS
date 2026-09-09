@@ -285,6 +285,10 @@ impl BodhiUpdateTriage {
         }
     }
 
+    pub fn get_update_status(&self, update_id: &str) -> Option<BodhiUpdateStatus> {
+        self.update_statuses.get(update_id).copied()
+    }
+
     /// Backwards-compatible simple update submission
     pub fn submit_update(&mut self, update_id: &str) {
         self.create_update(
@@ -2755,6 +2759,24 @@ pub struct TahrirBadgeAssertion {
     pub assertion_digest: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaPackageMapping {
+    pub anitya_project_id: u64,
+    pub upstream_name: String,
+    pub fedora_package_name: String,
+    pub current_stable_version: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UpstreamReleaseEvent {
+    pub project_id: u64,
+    pub fedora_package_name: String,
+    pub old_version: String,
+    pub new_version: String,
+    pub release_url: String,
+    pub timestamp_secs: u64,
+}
+
 /// Fedora "The New Hotness" & Anitya Upstream Release Monitoring Engine
 /// Tracks upstream project releases, compares version semantics, maps Anitya project IDs
 /// to Fedora RPM packages, and dispatches `org.fedoraproject.prod.hotness.update` fedmsg events.
@@ -2863,10 +2885,24 @@ pub struct FedoraPlanetPost {
     pub published_epoch: u64,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PlanetUserFeed {
+    pub fas_account: String,
+    pub feed_url: String,
+    pub active: bool,
+}
+
+pub struct FedoraPlanetAggregationEngine {
+    pub registered_feeds: Vec<PlanetUserFeed>,
+    pub posts: Vec<FedoraPlanetPost>,
+}
 
 impl FedoraPlanetAggregationEngine {
     pub fn new() -> Self {
-        FedoraPlanetAggregationEngine { posts: Vec::new() }
+        FedoraPlanetAggregationEngine {
+            registered_feeds: Vec::new(),
+            posts: Vec::new(),
+        }
     }
 
     pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
@@ -2896,6 +2932,16 @@ pub struct AnityaUpstreamRelease {
     pub project_name: String,
     pub latest_version: String,
     pub homepage: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TahrirMessagePost {
+    pub post_id: u64,
+    pub author_fas_username: String,
+    pub content: String,
+    pub hashtags: Vec<String>,
+    pub timestamp_secs: u64,
+    pub fedmsg_dispatched: bool,
 }
 
 /// Fedora Tahrir Microblogging & Developer Social Network System
@@ -3167,26 +3213,12 @@ pub struct FedoraIgnitionEngine {
 
 impl FedoraIgnitionEngine {
     pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
+        Self {
+            files: Vec::new(),
+            users: Vec::new(),
+            systemd_units: Vec::new(),
+            provisioned: false,
         }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
     }
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
@@ -3799,9 +3831,10 @@ impl FedoraBadgesEngine {
             user_badges.push(badge_id.to_string());
         }
 
+        let badges_ref = &self.badges;
         let total_points = user_badges
             .iter()
-            .filter_map(|id| self.badges.get(id))
+            .filter_map(|id| badges_ref.get(id))
             .map(|b| b.points)
             .sum();
 
@@ -3872,6 +3905,529 @@ impl Default for FedoraSystemRolesEngine {
     }
 }
 
+// =========================================================================
+// Fedora Tahrir Identity & Avatar Resolution Engine
+// =========================================================================
+
+pub struct FedoraTahrirIdentityApiEngine {
+    pub user_avatars: HashMap<String, TahrirUserAvatar>,
+}
+
+impl FedoraTahrirIdentityApiEngine {
+    pub fn new() -> Self {
+        Self {
+            user_avatars: HashMap::new(),
+        }
+    }
+
+    pub fn register_user_avatar(
+        &mut self,
+        user_id: &str,
+        email: &str,
+        avatar_bytes: &[u8],
+        mime_type: &str,
+    ) -> String {
+        let hash = format!("hash_{}", email);
+        let avatar = TahrirUserAvatar {
+            user_id: user_id.to_string(),
+            email_sha256: hash.clone(),
+            avatar_data: avatar_bytes.to_vec(),
+            mime_type: mime_type.to_string(),
+        };
+        self.user_avatars.insert(hash.clone(), avatar);
+        hash
+    }
+
+    pub fn resolve_avatar_by_hash(&self, email_hash: &str) -> Option<&TahrirUserAvatar> {
+        self.user_avatars.get(email_hash)
+    }
+
+    pub fn issue_badge_assertion(
+        &self,
+        badge_id: &str,
+        recipient_email: &str,
+        issuer: &str,
+        timestamp_epoch: u64,
+    ) -> TahrirBadgeAssertion {
+        let email_hash = format!("hash_{}", recipient_email);
+        TahrirBadgeAssertion {
+            badge_id: badge_id.to_string(),
+            recipient_email_hash: email_hash,
+            issuer_id: issuer.to_string(),
+            issued_on_epoch: timestamp_epoch,
+            evidence_url: format!("https://badges.fedoraproject.org/badge/{}", badge_id),
+            assertion_digest: format!("sha256_assert_{}_{}", badge_id, timestamp_epoch),
+        }
+    }
+
+    pub fn verify_badge_assertion(&self, assertion: &TahrirBadgeAssertion) -> bool {
+        !assertion.badge_id.is_empty()
+            && assertion.assertion_digest.starts_with("sha256_assert_")
+            && !assertion.recipient_email_hash.is_empty()
+    }
+}
+
+impl Default for FedoraTahrirIdentityApiEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora FMN (Fedora Messaging Notifications) Dispatch Engine
+// =========================================================================
+
+pub struct FedoraFmnMessagingEngine {
+    pub filter_rules: Vec<FmnFilterRule>,
+    pub dispatched_notifications_log: Vec<(String, FmnNotificationTransport)>,
+}
+
+impl FedoraFmnMessagingEngine {
+    pub fn new() -> Self {
+        Self {
+            filter_rules: Vec::new(),
+            dispatched_notifications_log: Vec::new(),
+        }
+    }
+
+    pub fn register_filter_rule(&mut self, rule: FmnFilterRule) {
+        self.filter_rules.push(rule);
+    }
+
+    pub fn publish_event(&mut self, event: FmnMessageEvent) -> usize {
+        let mut count = 0;
+        for rule in &self.filter_rules {
+            if event.severity >= rule.min_severity {
+                let match_pkg = rule.package_pattern == "*" || rule.package_pattern == event.package_name;
+                let match_topic = rule.topic_pattern == "*" || event.topic.contains(&rule.topic_pattern);
+                if match_pkg && match_topic {
+                    self.dispatched_notifications_log.push((rule.user_id.clone(), rule.preferred_transport));
+                    count += 1;
+                }
+            }
+        }
+        count
+    }
+}
+
+impl Default for FedoraFmnMessagingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora NVIDIA PRIME GPU Power & Render Offload Engine
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FedoraGpuPowerMode {
+    Integrated,
+    DiscreteNvidia,
+    HybridPrimeOffload,
+}
+
+pub struct FedoraNvidiaPrimeSwitcherEngine {
+    pub current_mode: FedoraGpuPowerMode,
+    pub prime_offload_active: bool,
+    pub active_env_vars: HashMap<String, String>,
+}
+
+impl FedoraNvidiaPrimeSwitcherEngine {
+    pub fn new() -> Self {
+        let mut envs = HashMap::new();
+        envs.insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
+        envs.insert("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string());
+        Self {
+            current_mode: FedoraGpuPowerMode::HybridPrimeOffload,
+            prime_offload_active: true,
+            active_env_vars: envs,
+        }
+    }
+
+    pub fn set_gpu_mode(&mut self, mode: FedoraGpuPowerMode) {
+        self.current_mode = mode;
+        match mode {
+            FedoraGpuPowerMode::Integrated => {
+                self.prime_offload_active = false;
+                self.active_env_vars.clear();
+            }
+            FedoraGpuPowerMode::DiscreteNvidia => {
+                self.prime_offload_active = true;
+                self.active_env_vars.clear();
+                self.active_env_vars.insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
+                self.active_env_vars.insert("__VK_LAYER_NV_optimus".to_string(), "NVIDIA_only".to_string());
+            }
+            FedoraGpuPowerMode::HybridPrimeOffload => {
+                self.prime_offload_active = true;
+                self.active_env_vars.clear();
+                self.active_env_vars.insert("__NV_PRIME_RENDER_OFFLOAD".to_string(), "1".to_string());
+                self.active_env_vars.insert("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string());
+            }
+        }
+    }
+}
+
+impl Default for FedoraNvidiaPrimeSwitcherEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora CoreOS Bootc (Container Native OS) Switcher & Deployer Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BootcTargetState {
+    pub container_image_url: String,
+    pub digest: String,
+    pub pinned: bool,
+}
+
+pub struct FedoraBootcEngine {
+    pub active_image: BootcTargetState,
+    pub staged_image: Option<BootcTargetState>,
+    pub registry_authenticated: bool,
+}
+
+impl FedoraBootcEngine {
+    pub fn new(current_image: &str, current_digest: &str) -> Self {
+        Self {
+            active_image: BootcTargetState {
+                container_image_url: current_image.to_string(),
+                digest: current_digest.to_string(),
+                pinned: true,
+            },
+            staged_image: None,
+            registry_authenticated: true,
+        }
+    }
+
+    pub fn bootc_switch(&mut self, new_image_url: &str, digest: &str) -> Result<String, &'static str> {
+        if !self.registry_authenticated {
+            return Err("Bootc: OCI Registry authentication failed");
+        }
+        self.staged_image = Some(BootcTargetState {
+            container_image_url: new_image_url.to_string(),
+            digest: digest.to_string(),
+            pinned: false,
+        });
+        Ok(format!("Bootc: Successfully staged bootable container image {}", new_image_url))
+    }
+
+    pub fn bootc_upgrade(&mut self, new_digest: &str) -> Result<String, &'static str> {
+        let mut next = self.active_image.clone();
+        next.digest = new_digest.to_string();
+        self.staged_image = Some(next);
+        Ok(format!("Bootc: Staged update to digest {}", new_digest))
+    }
+
+    pub fn apply_staged_bootc_update(&mut self) -> Result<String, &'static str> {
+        if let Some(staged) = self.staged_image.take() {
+            let prev = self.active_image.container_image_url.clone();
+            self.active_image = staged;
+            Ok(format!("Bootc: Switched active system image to {}. Previous: {}", self.active_image.container_image_url, prev))
+        } else {
+            Err("Bootc: No staged update available")
+        }
+    }
+}
+
+// =========================================================================
+// Fedora CoreOS Zincati Auto-Update Client Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ZincatiStrategy {
+    Periodic,
+    Immediate,
+    Disabled,
+}
+
+pub struct FedoraZincatiEngine {
+    pub strategy: ZincatiStrategy,
+    pub cincinnati_url: String,
+    pub canary_group: String,
+    pub auto_updates_enabled: bool,
+}
+
+impl FedoraZincatiEngine {
+    pub fn new(canary: &str) -> Self {
+        Self {
+            strategy: ZincatiStrategy::Periodic,
+            cincinnati_url: "https://updates.coreos.fedoraproject.org/api/upgrades_v1".to_string(),
+            canary_group: canary.to_string(),
+            auto_updates_enabled: true,
+        }
+    }
+
+    pub fn query_cincinnati_graph(&self, current_ver: &str) -> Result<String, &'static str> {
+        if !self.auto_updates_enabled {
+            return Err("Zincati: Auto updates disabled");
+        }
+        Ok(format!("Zincati: Target release for {} in group {}: 39.20240101.3.0", current_ver, self.canary_group))
+    }
+}
+
+// =========================================================================
+// Fedora Keylime TPM 2.0 Remote Attestation Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KeylimePcrQuote {
+    pub pcr_index: u32,
+    pub expected_hash: String,
+    pub actual_hash: String,
+    pub pcr_matched: bool,
+}
+
+pub struct FedoraKeylimeAttestationEngine {
+    pub verifier_id: String,
+    pub verified_quotes: Vec<KeylimePcrQuote>,
+    pub ima_log_valid: bool,
+}
+
+impl FedoraKeylimeAttestationEngine {
+    pub fn new(verifier_id: &str) -> Self {
+        Self {
+            verifier_id: verifier_id.to_string(),
+            verified_quotes: Vec::new(),
+            ima_log_valid: true,
+        }
+    }
+
+    pub fn verify_pcr_quote(&mut self, pcr: u32, expected: &str, actual: &str) -> bool {
+        let matched = expected == actual;
+        self.verified_quotes.push(KeylimePcrQuote {
+            pcr_index: pcr,
+            expected_hash: expected.to_string(),
+            actual_hash: actual.to_string(),
+            pcr_matched: matched,
+        });
+        matched
+    }
+
+    pub fn evaluate_attestation_trust(&self) -> bool {
+        self.ima_log_valid && self.verified_quotes.iter().all(|q| q.pcr_matched)
+    }
+}
+
+// =========================================================================
+// Fedora Power Profiles Daemon Engine (power-profiles-daemon)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerProfileMode {
+    Performance,
+    Balanced,
+    PowerSaver,
+}
+
+pub struct FedoraPowerProfilesDaemonEngine {
+    pub active_mode: PowerProfileMode,
+    pub cpu_governor: String,
+    pub platform_driver: String,
+}
+
+impl FedoraPowerProfilesDaemonEngine {
+    pub fn new() -> Self {
+        Self {
+            active_mode: PowerProfileMode::Balanced,
+            cpu_governor: "powersave".to_string(),
+            platform_driver: "amd_pstate".to_string(),
+        }
+    }
+
+    pub fn set_power_profile(&mut self, mode: PowerProfileMode) -> &'static str {
+        self.active_mode = mode;
+        match mode {
+            PowerProfileMode::Performance => {
+                self.cpu_governor = "performance".to_string();
+                "performance"
+            }
+            PowerProfileMode::Balanced => {
+                self.cpu_governor = "powersave".to_string();
+                "balanced"
+            }
+            PowerProfileMode::PowerSaver => {
+                self.cpu_governor = "schedutil".to_string();
+                "power-saver"
+            }
+        }
+    }
+}
+
+impl Default for FedoraPowerProfilesDaemonEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora RPM Inspector & Rpmlint Audit Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RpmSecurityFlags {
+    pub relro: bool,
+    pub stack_protector: bool,
+    pub fortify_source: bool,
+    pub pie: bool,
+    pub bind_now: bool,
+}
+
+pub struct FedoraRpmLintInspectorEngine {
+    pub spec_warnings: Vec<String>,
+    pub elf_security_audit: RpmSecurityFlags,
+}
+
+impl FedoraRpmLintInspectorEngine {
+    pub fn new() -> Self {
+        Self {
+            spec_warnings: Vec::new(),
+            elf_security_audit: RpmSecurityFlags {
+                relro: true,
+                stack_protector: true,
+                fortify_source: true,
+                pie: true,
+                bind_now: true,
+            },
+        }
+    }
+
+    pub fn inspect_rpm_spec(&mut self, spec_contents: &str) -> usize {
+        self.spec_warnings.clear();
+        if !spec_contents.contains("License:") {
+            self.spec_warnings.push("W: no-license-tag".to_string());
+        }
+        if !spec_contents.contains("URL:") {
+            self.spec_warnings.push("W: no-url-tag".to_string());
+        }
+        self.spec_warnings.len()
+    }
+
+    pub fn verify_hardened_binary(&self) -> bool {
+        self.elf_security_audit.relro
+            && self.elf_security_audit.stack_protector
+            && self.elf_security_audit.fortify_source
+            && self.elf_security_audit.pie
+            && self.elf_security_audit.bind_now
+    }
+}
+
+impl Default for FedoraRpmLintInspectorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora Account System (FAS) Identity Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FasUserProfile {
+    pub username: String,
+    pub email: String,
+    pub ssh_keys: Vec<String>,
+    pub fpca_signed: bool,
+    pub matrix_handle: String,
+}
+
+pub struct FedoraAccountSystemEngine {
+    pub users: HashMap<String, FasUserProfile>,
+}
+
+impl FedoraAccountSystemEngine {
+    pub fn new() -> Self {
+        Self {
+            users: HashMap::new(),
+        }
+    }
+
+    pub fn register_fas_user(&mut self, username: &str, email: &str) -> &FasUserProfile {
+        let profile = FasUserProfile {
+            username: username.to_string(),
+            email: email.to_string(),
+            ssh_keys: Vec::new(),
+            fpca_signed: false,
+            matrix_handle: format!("@{}:fedora.im", username),
+        };
+        self.users.insert(username.to_string(), profile);
+        self.users.get(username).unwrap()
+    }
+
+    pub fn sign_fpca_agreement(&mut self, username: &str) -> bool {
+        if let Some(user) = self.users.get_mut(username) {
+            user.fpca_signed = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraAccountSystemEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora Dist-Git Maintainer Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DistGitBranch {
+    pub branch_name: String, // rawhide, f39, f40
+    pub commit_hash: String,
+    pub sources_checksum: String,
+}
+
+pub struct FedoraDistGitMaintainerEngine {
+    pub package_name: String,
+    pub branches: HashMap<String, DistGitBranch>,
+    pub pending_patch_queue: Vec<String>,
+}
+
+impl FedoraDistGitMaintainerEngine {
+    pub fn new(pkg_name: &str) -> Self {
+        let mut branches = HashMap::new();
+        branches.insert(
+            "rawhide".to_string(),
+            DistGitBranch {
+                branch_name: "rawhide".to_string(),
+                commit_hash: "git-commit-rawhide-01".to_string(),
+                sources_checksum: "sha512_lookaside_hash".to_string(),
+            },
+        );
+        Self {
+            package_name: pkg_name.to_string(),
+            branches,
+            pending_patch_queue: Vec::new(),
+        }
+    }
+
+    pub fn queue_patch(&mut self, patch_name: &str) {
+        if !self.pending_patch_queue.contains(&patch_name.to_string()) {
+            self.pending_patch_queue.push(patch_name.to_string());
+        }
+    }
+
+    pub fn create_branch(&mut self, branch: &str) {
+        self.branches.insert(
+            branch.to_string(),
+            DistGitBranch {
+                branch_name: branch.to_string(),
+                commit_hash: format!("git-commit-{}", branch),
+                sources_checksum: "sha512_lookaside_hash".to_string(),
+            },
+        );
+    }
+}
+
+#[cfg(test)]
 mod tests_extra {
     use super::*;
 
@@ -4870,15 +5426,16 @@ mod tests_extra {
     }
 
     #[test]
-    fn test_fedora_toolbx_container() {
-        let mut toolbx = FedoraToolbxContainerEngine::new();
-        let container = toolbx.create_toolbx(
-            "fedora-toolbox-39",
-            "registry.fedoraproject.org/fedora-toolbox:39",
-        );
+    fn test_fedora_shared_system_manager() {
+        let mut mgr = FedoraSharedSystemManager::new(1000);
+        mgr.register_shared_library("libc.so.6", "/usr/lib64/libc.so.6", "2.38", &["malloc", "free"]);
         assert!(mgr.resolve_shared_library_symbol("libc.so.6", "malloc"));
         assert!(!mgr.resolve_shared_library_symbol("libc.so.6", "nonexistent_symbol"));
+    }
 
+    #[test]
+    fn test_fedora_toolbx_container() {
+        let mut engine = FedoraToolbxContainerEngine::new();
         let container = engine.create_toolbx(
             "fedora-toolbox-39",
             "registry.fedoraproject.org/fedora-toolbox:39",
@@ -4932,5 +5489,85 @@ mod tests_extra {
         roles.apply_firewall_role(&[80, 443, 8080]);
         assert_eq!(roles.applied_roles.len(), 2);
         assert_eq!(roles.configured_firewall_ports.len(), 3);
+    }
+
+    #[test]
+    fn test_fedora_planet_aggregation_engine() {
+        let mut planet = FedoraPlanetAggregationEngine::new();
+        planet.register_feed("jules", "https://jules.fedorapeople.org/feed.xml");
+        assert_eq!(planet.registered_feeds.len(), 1);
+        assert_eq!(planet.registered_feeds[0].fas_account, "jules");
+        assert!(planet.registered_feeds[0].active);
+    }
+
+    #[test]
+    fn test_fedora_bootc_engine() {
+        let mut bootc = FedoraBootcEngine::new(
+            "quay.io/fedora/fedora-bootc:40",
+            "sha256:1234567890abcdef",
+        );
+        assert!(bootc.active_image.pinned);
+        assert_eq!(bootc.active_image.container_image_url, "quay.io/fedora/fedora-bootc:40");
+
+        assert!(bootc.bootc_switch("quay.io/fedora/fedora-bootc:41", "sha256:fedora41").is_ok());
+        let res = bootc.apply_staged_bootc_update().unwrap();
+        assert!(res.contains("quay.io/fedora/fedora-bootc:41"));
+        assert_eq!(bootc.active_image.container_image_url, "quay.io/fedora/fedora-bootc:41");
+    }
+
+    #[test]
+    fn test_fedora_zincati_engine() {
+        let zincati = FedoraZincatiEngine::new("stable");
+        assert_eq!(zincati.canary_group, "stable");
+
+        let graph = zincati.query_cincinnati_graph("39.20231101.3.0").unwrap();
+        assert!(graph.contains("Target release"));
+    }
+
+    #[test]
+    fn test_fedora_keylime_attestation_engine() {
+        let mut keylime = FedoraKeylimeAttestationEngine::new("verifier-node-1");
+        assert!(keylime.verify_pcr_quote(0, "sha256:expected", "sha256:expected"));
+        assert!(!keylime.verify_pcr_quote(1, "sha256:expected", "sha256:tampered"));
+
+        assert!(!keylime.evaluate_attestation_trust()); // pcr 1 tampered
+    }
+
+    #[test]
+    fn test_fedora_power_profiles_daemon_engine() {
+        let mut daemon = FedoraPowerProfilesDaemonEngine::new();
+        assert_eq!(daemon.active_mode, PowerProfileMode::Balanced);
+
+        assert_eq!(daemon.set_power_profile(PowerProfileMode::Performance), "performance");
+        assert_eq!(daemon.cpu_governor, "performance");
+    }
+
+    #[test]
+    fn test_fedora_rpm_lint_inspector_engine() {
+        let mut inspector = FedoraRpmLintInspectorEngine::new();
+        let warnings = inspector.inspect_rpm_spec("Name: testpkg\nVersion: 1.0\n");
+        assert_eq!(warnings, 2); // missing License and URL
+
+        assert!(inspector.verify_hardened_binary());
+    }
+
+    #[test]
+    fn test_fedora_account_system_engine() {
+        let mut fas = FedoraAccountSystemEngine::new();
+        fas.register_fas_user("jules", "jules@fedoraproject.org");
+        assert!(fas.sign_fpca_agreement("jules"));
+        assert!(fas.users.get("jules").unwrap().fpca_signed);
+    }
+
+    #[test]
+    fn test_fedora_dist_git_maintainer_engine() {
+        let mut distgit = FedoraDistGitMaintainerEngine::new("kernel");
+        assert!(distgit.branches.contains_key("rawhide"));
+
+        distgit.queue_patch("0001-fix-pqc-crypto.patch");
+        assert_eq!(distgit.pending_patch_queue.len(), 1);
+
+        distgit.create_branch("f40");
+        assert!(distgit.branches.contains_key("f40"));
     }
 }
