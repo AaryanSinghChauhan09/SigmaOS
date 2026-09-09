@@ -2,13 +2,15 @@ use alloc::format;
 use alloc::vec;
 extern crate alloc;
 
+#[cfg(not(test))]
+use crate::klib::collections::HashMap;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(test)]
 use std::collections::HashMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -1684,6 +1686,12 @@ pub struct GestureVoiceControlEngine {
 }
 
 impl GestureVoiceControlEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_voice_commands: [None; 4],
+        }
+    }
+
     pub fn parse_touchpad_gesture(
         &self,
         fingers_count: u8,
@@ -1696,6 +1704,14 @@ impl GestureVoiceControlEngine {
         }
     }
 }
+
+impl Default for GestureVoiceControlEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3702,4 +3718,8 @@ mod new_unimplemented_tests {
         phoronix.execute_benchmark("Shadow of Tomb Raider", 80.0);
         assert_eq!(phoronix.calculate_composite_score(), 100.0);
     }
+
+
 }
+
+// ===========================================================}
