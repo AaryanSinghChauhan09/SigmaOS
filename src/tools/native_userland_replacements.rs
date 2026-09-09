@@ -1,9 +1,15 @@
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
+#![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
 // SigmaOS Native Rust Sovereign Userland Replacements
 // Completely replaces userland C++ utilities, Python maintenance scripts, Shell installers, and HTML/CSS UI.
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};

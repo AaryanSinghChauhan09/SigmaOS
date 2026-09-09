@@ -1,14 +1,20 @@
-//! SigmaOS Sovereign BSD Jails Process Isolation
-//! Implements FreeBSD Jails-style lightweight OS virtualization in 100% safe Rust.
-//!
-//! FreeBSD Jails (since FreeBSD 4.0, 2000) provide lightweight OS-level
-//! virtualization. Each jail has its own hostname, IP address, filesystem root,
-//! and process namespace. This module implements the same concepts in pure Rust.
-//!
-//! Also incorporates OpenBSD securelevel, Linux network namespaces concept.
-
 #![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+// SigmaOS Sovereign BSD Jails Process Isolation
+// Implements FreeBSD Jails-style lightweight OS virtualization in 100% safe Rust.
+//
+// FreeBSD Jails (since FreeBSD 4.0, 2000) provide lightweight OS-level
+// virtualization. Each jail has its own hostname, IP address, filesystem root,
+// and process namespace. This module implements the same concepts in pure Rust.
+//
+// Also incorporates OpenBSD securelevel, Linux network namespaces concept.
+
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

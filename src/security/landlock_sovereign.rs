@@ -1,12 +1,18 @@
-//! SigmaOS Sovereign Landlock Filesystem Sandboxing
-//! Implements Linux Landlock v5 + OpenBSD unveil + FreeBSD Capsicum hybrid
-//! in 100% safe Rust with no external dependencies.
-//!
-//! Landlock was mainlined in Linux 5.13 (June 2021). This is a pure-Rust
-//! in-kernel reference implementation of the access-control matrix.
-
 #![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+// SigmaOS Sovereign Landlock Filesystem Sandboxing
+// Implements Linux Landlock v5 + OpenBSD unveil + FreeBSD Capsicum hybrid
+// in 100% safe Rust with no external dependencies.
+//
+// Landlock was mainlined in Linux 5.13 (June 2021). This is a pure-Rust
+// in-kernel reference implementation of the access-control matrix.
+
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

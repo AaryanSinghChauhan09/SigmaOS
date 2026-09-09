@@ -1,11 +1,17 @@
-//! SigmaOS Sovereign cgroups v2 Resource Accounting
-//! Implements Linux cgroups v2 unified hierarchy resource controller
-//! in 100% safe Rust with no external dependencies.
-//!
-//! Inspired by Linux kernel cgroups v2 (Linux 4.5+) unified hierarchy.
-
 #![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+// SigmaOS Sovereign cgroups v2 Resource Accounting
+// Implements Linux cgroups v2 unified hierarchy resource controller
+// in 100% safe Rust with no external dependencies.
+//
+// Inspired by Linux kernel cgroups v2 (Linux 4.5+) unified hierarchy.
+
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

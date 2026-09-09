@@ -1,16 +1,21 @@
-//! SigmaOS Sovereign Traffic Control (tc) Qdiscs
-//! Implements Linux Traffic Control queuing disciplines in 100% safe Rust.
-//!
-//! Inspired by Linux tc(8) qdiscs:
-//!   - HTB (Hierarchical Token Bucket) — bandwidth sharing/limiting
-//!   - FQ-CoDel (Fair Queuing CoDel) — latency control
-//!   - HFSC (Hierarchical Fair-Service Curve) — latency + bandwidth
-//!   - TBF (Token Bucket Filter) — simple rate limiting
-//!   - PRIO (Priority scheduler) — strict priority queues
-
 #![allow(dead_code)]
 #![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+// SigmaOS Sovereign Traffic Control (tc) Qdiscs
+// Implements Linux Traffic Control queuing disciplines in 100% safe Rust.
+//
+// Inspired by Linux tc(8) qdiscs:
+//   - HTB (Hierarchical Token Bucket) — bandwidth sharing/limiting
+//   - FQ-CoDel (Fair Queuing CoDel) — latency control
+//   - HFSC (Hierarchical Fair-Service Curve) — latency + bandwidth
+//   - TBF (Token Bucket Filter) — simple rate limiting
+//   - PRIO (Priority scheduler) — strict priority queues
+
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

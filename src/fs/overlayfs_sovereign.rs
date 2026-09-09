@@ -1,16 +1,22 @@
-//! SigmaOS Sovereign OverlayFS
-//! Implements Linux overlayfs (overlay2) union filesystem in 100% safe Rust.
-//!
-//! Linux overlayfs was merged in Linux 3.18 (2014) and is the default
-//! Docker/Podman container storage driver (overlay2).
-//! It provides a union of:
-//!   - lower: read-only base layer(s)
-//!   - upper: read-write writable layer
-//!   - work:  internal scratch directory (opaque whiteouts)
-//!   - merged: unified view
-
 #![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+// SigmaOS Sovereign OverlayFS
+// Implements Linux overlayfs (overlay2) union filesystem in 100% safe Rust.
+//
+// Linux overlayfs was merged in Linux 3.18 (2014) and is the default
+// Docker/Podman container storage driver (overlay2).
+// It provides a union of:
+//   - lower: read-only base layer(s)
+//   - upper: read-write writable layer
+//   - work:  internal scratch directory (opaque whiteouts)
+//   - merged: unified view
+
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

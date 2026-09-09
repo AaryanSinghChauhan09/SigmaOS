@@ -1,15 +1,21 @@
-//! SigmaOS Sovereign Zero-Copy Networking
-//! Implements Linux XDP (eXpress Data Path) + io_uring-style zero-copy networking
-//! in 100% safe Rust with no external dependencies.
-//!
-//! Inspired by:
-//!   - Linux XDP (AF_XDP sockets, Linux 4.18+)
-//!   - Linux io_uring (Linux 5.1+)
-//!   - FreeBSD sendfile(2) zero-copy send
-//!   - FreeBSD UMEM / netmap zero-copy receive
-
 #![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+// SigmaOS Sovereign Zero-Copy Networking
+// Implements Linux XDP (eXpress Data Path) + io_uring-style zero-copy networking
+// in 100% safe Rust with no external dependencies.
+//
+// Inspired by:
+//   - Linux XDP (AF_XDP sockets, Linux 4.18+)
+//   - Linux io_uring (Linux 5.1+)
+//   - FreeBSD sendfile(2) zero-copy send
+//   - FreeBSD UMEM / netmap zero-copy receive
+
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

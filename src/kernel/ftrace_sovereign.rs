@@ -1,16 +1,22 @@
-//! SigmaOS Sovereign Function Tracer (ftrace)
-//! Implements Linux ftrace-style kernel function tracing in 100% safe Rust.
-//!
-//! Linux ftrace (merged in Linux 2.6.27, 2008) provides:
-//!   - Function call tracing with timestamps
-//!   - Function graph tracing (call + return)
-//!   - Event tracing (tracepoints)
-//!   - Latency histograms (hist triggers)
-//!   - Per-CPU ring buffers
-//!   - Filtering by function, pid, cpu
-
 #![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+// SigmaOS Sovereign Function Tracer (ftrace)
+// Implements Linux ftrace-style kernel function tracing in 100% safe Rust.
+//
+// Linux ftrace (merged in Linux 2.6.27, 2008) provides:
+//   - Function call tracing with timestamps
+//   - Function graph tracing (call + return)
+//   - Event tracing (tracepoints)
+//   - Latency histograms (hist triggers)
+//   - Per-CPU ring buffers
+//   - Filtering by function, pid, cpu
+
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

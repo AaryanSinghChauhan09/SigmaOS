@@ -1,18 +1,24 @@
-//! SigmaOS Sovereign bcachefs Copy-on-Write Filesystem Layer
-//! Implements bcachefs-inspired CoW filesystem concepts in 100% safe Rust.
-//!
-//! bcachefs was developed by Kent Overstreet and merged into Linux 6.7 (2024).
-//! It combines bcache (block-layer caching) with a full filesystem providing:
-//! - Copy-on-write semantics
-//! - Checksumming (CRC32/CRC64/xxHash/SHA-256)
-//! - Inline compression (lz4/gzip/zstd)
-//! - Encryption (ChaCha20/Poly1305)
-//! - Snapshots and subvolumes
-//! - RAID (levels 0, 1, 10, 5, 6)
-//! - Reflinks (like Btrfs/XFS)
-
 #![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+// SigmaOS Sovereign bcachefs Copy-on-Write Filesystem Layer
+// Implements bcachefs-inspired CoW filesystem concepts in 100% safe Rust.
+//
+// bcachefs was developed by Kent Overstreet and merged into Linux 6.7 (2024).
+// It combines bcache (block-layer caching) with a full filesystem providing:
+// - Copy-on-write semantics
+// - Checksumming (CRC32/CRC64/xxHash/SHA-256)
+// - Inline compression (lz4/gzip/zstd)
+// - Encryption (ChaCha20/Poly1305)
+// - Snapshots and subvolumes
+// - RAID (levels 0, 1, 10, 5, 6)
+// - Reflinks (like Btrfs/XFS)
+
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

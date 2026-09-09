@@ -1,12 +1,18 @@
-//! SigmaOS Sovereign D-Bus IPC Protocol Implementation
-//! Implements D-Bus message format and dispatch in 100% safe Rust.
-//!
-//! D-Bus is the standard IPC mechanism on Linux desktops (freedesktop.org).
-//! Used by systemd, NetworkManager, BlueZ, PulseAudio, GNOME, KDE, etc.
-//! This is a pure-Rust, zero-dependency implementation of the D-Bus wire protocol.
-
 #![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unexpected_cfgs)]
 #![allow(clippy::new_without_default)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+// SigmaOS Sovereign D-Bus IPC Protocol Implementation
+// Implements D-Bus message format and dispatch in 100% safe Rust.
+//
+// D-Bus is the standard IPC mechanism on Linux desktops (freedesktop.org).
+// Used by systemd, NetworkManager, BlueZ, PulseAudio, GNOME, KDE, etc.
+// This is a pure-Rust, zero-dependency implementation of the D-Bus wire protocol.
+
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
