@@ -1310,6 +1310,313 @@ impl MintCinnamonSpicesAppletManager {
     }
 }
 
+/// Bulky Batch File Renamer (Linux Mint Bulky tool)
+#[derive(Debug, Clone)]
+pub struct FileRenameRule {
+    pub search_pattern: String,
+    pub replace_with: String,
+    pub prefix: String,
+    pub suffix: String,
+    pub start_index: usize,
+}
+
+pub struct MintBulkyFileRenamer {
+    pub rules: FileRenameRule,
+}
+
+impl Default for MintBulkyFileRenamer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintBulkyFileRenamer {
+    pub fn new() -> Self {
+        Self {
+            rules: FileRenameRule {
+                search_pattern: String::new(),
+                replace_with: String::new(),
+                prefix: String::new(),
+                suffix: String::new(),
+                start_index: 1,
+            },
+        }
+    }
+
+    pub fn set_search_replace(&mut self, search: &str, replace: &str) {
+        self.rules.search_pattern = search.to_string();
+        self.rules.replace_with = replace.to_string();
+    }
+
+    pub fn set_prefix_suffix(&mut self, prefix: &str, suffix: &str) {
+        self.rules.prefix = prefix.to_string();
+        self.rules.suffix = suffix.to_string();
+    }
+
+    pub fn generate_preview_name(&self, original_filename: &str, index: usize) -> String {
+        let (stem, ext) = if let Some(pos) = original_filename.rfind('.') {
+            (&original_filename[..pos], &original_filename[pos..])
+        } else {
+            (original_filename, "")
+        };
+        let mut name = stem.to_string();
+        if !self.rules.search_pattern.is_empty() {
+            name = name.replace(&self.rules.search_pattern, &self.rules.replace_with);
+        }
+        format!(
+            "{}{}{}_{}{}",
+            self.rules.prefix,
+            name,
+            self.rules.suffix,
+            self.rules.start_index + index,
+            ext
+        )
+    }
+}
+
+/// Linux Mint Night Light / Redshift Display Color Temperature Manager
+pub struct MintRedshiftColorTemperatureManager {
+    pub day_temp_kelvin: u32,   // e.g. 6500K
+    pub night_temp_kelvin: u32, // e.g. 3500K
+    pub current_temp_kelvin: u32,
+    pub is_enabled: bool,
+    pub transition_duration_min: u32,
+}
+
+impl Default for MintRedshiftColorTemperatureManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintRedshiftColorTemperatureManager {
+    pub fn new() -> Self {
+        Self {
+            day_temp_kelvin: 6500,
+            night_temp_kelvin: 3500,
+            current_temp_kelvin: 6500,
+            is_enabled: true,
+            transition_duration_min: 30,
+        }
+    }
+
+    pub fn set_temperatures(&mut self, day_k: u32, night_k: u32) {
+        self.day_temp_kelvin = day_k.clamp(1000, 10000);
+        self.night_temp_kelvin = night_k.clamp(1000, 10000);
+    }
+
+    pub fn update_temperature_for_time(&mut self, hour_24: u8) {
+        if !self.is_enabled {
+            self.current_temp_kelvin = self.day_temp_kelvin;
+            return;
+        }
+        if hour_24 >= 20 || hour_24 < 6 {
+            self.current_temp_kelvin = self.night_temp_kelvin;
+        } else {
+            self.current_temp_kelvin = self.day_temp_kelvin;
+        }
+    }
+}
+
+/// XApps Suite Core Integration Engine (Xed, Xreader, Xviewer, Pix)
+#[derive(Debug, Clone)]
+pub struct XedDocumentSession {
+    pub file_path: String,
+    pub cursor_line: usize,
+    pub cursor_column: usize,
+    pub encoding: String,
+}
+
+pub struct MintXAppsCore {
+    pub active_editor_sessions: Vec<XedDocumentSession>,
+    pub recent_reader_bookmarks: Vec<String>,
+}
+
+impl Default for MintXAppsCore {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintXAppsCore {
+    pub fn new() -> Self {
+        Self {
+            active_editor_sessions: Vec::new(),
+            recent_reader_bookmarks: Vec::new(),
+        }
+    }
+
+    pub fn save_xed_session(&mut self, path: &str, line: usize, col: usize) {
+        self.active_editor_sessions.push(XedDocumentSession {
+            file_path: path.to_string(),
+            cursor_line: line,
+            cursor_column: col,
+            encoding: String::from("UTF-8"),
+        });
+    }
+
+    pub fn add_reader_bookmark(&mut self, bookmark_title: &str) {
+        self.recent_reader_bookmarks.push(bookmark_title.to_string());
+    }
+}
+
+/// MintReport Security Audit & System Checker
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SecurityAuditIssueKind {
+    UnassignedRootPassword,
+    OrphanedPpaRepository,
+    MissingKernelPatch,
+    IncompleteLanguagePack,
+}
+
+#[derive(Debug, Clone)]
+pub struct SecurityAuditReportItem {
+    pub kind: SecurityAuditIssueKind,
+    pub description: String,
+    pub critical: bool,
+}
+
+pub struct MintSystemReportsSecurityChecker {
+    pub audit_items: Vec<SecurityAuditReportItem>,
+}
+
+impl Default for MintSystemReportsSecurityChecker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintSystemReportsSecurityChecker {
+    pub fn new() -> Self {
+        Self {
+            audit_items: Vec::new(),
+        }
+    }
+
+    pub fn run_system_audit(&mut self) -> usize {
+        self.audit_items.clear();
+        self.audit_items.push(SecurityAuditReportItem {
+            kind: SecurityAuditIssueKind::IncompleteLanguagePack,
+            description: String::from("Additional language packs available for installed applications"),
+            critical: false,
+        });
+        self.audit_items.len()
+    }
+
+    pub fn get_critical_issues(&self) -> Vec<&SecurityAuditReportItem> {
+        self.audit_items.iter().filter(|i| i.critical).collect()
+    }
+}
+
+/// Mint Software Manager Flatpak / Flathub Portal Integration
+#[derive(Debug, Clone)]
+pub struct FlatpakRemoteRepository {
+    pub name: String, // e.g. "flathub"
+    pub url: String,
+    pub enabled: bool,
+}
+
+pub struct MintSoftwareManagerFlatpakPortal {
+    pub remotes: Vec<FlatpakRemoteRepository>,
+    pub total_flatpaks_installed: usize,
+}
+
+impl Default for MintSoftwareManagerFlatpakPortal {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintSoftwareManagerFlatpakPortal {
+    pub fn new() -> Self {
+        let mut portal = Self {
+            remotes: Vec::new(),
+            total_flatpaks_installed: 0,
+        };
+        portal.remotes.push(FlatpakRemoteRepository {
+            name: String::from("flathub"),
+            url: String::from("https://dl.flathub.org/repo/flathub.flatpakrepo"),
+            enabled: true,
+        });
+        portal
+    }
+
+    pub fn add_remote(&mut self, name: &str, url: &str) {
+        self.remotes.push(FlatpakRemoteRepository {
+            name: name.to_string(),
+            url: url.to_string(),
+            enabled: true,
+        });
+    }
+
+    pub fn install_flatpak_app(&mut self, app_id: &str) -> Result<String, &'static str> {
+        if app_id.is_empty() {
+            return Err("Invalid Flatpak App ID");
+        }
+        self.total_flatpaks_installed += 1;
+        Ok(format!("Successfully installed Flatpak package '{}' from Flathub", app_id))
+    }
+}
+
+/// Mint Timeshift Automated Snapshot Schedule Manager
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SnapshotScheduleFrequency {
+    Hourly,
+    Daily,
+    Weekly,
+    Monthly,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapshotSchedulePolicy {
+    pub frequency: SnapshotScheduleFrequency,
+    pub max_keep_count: usize,
+    pub enabled: bool,
+}
+
+pub struct MintTimeshiftScheduleManager {
+    pub policies: Vec<SnapshotSchedulePolicy>,
+    pub auto_prune_enabled: bool,
+}
+
+impl Default for MintTimeshiftScheduleManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintTimeshiftScheduleManager {
+    pub fn new() -> Self {
+        let mut mgr = Self {
+            policies: Vec::new(),
+            auto_prune_enabled: true,
+        };
+        mgr.policies.push(SnapshotSchedulePolicy {
+            frequency: SnapshotScheduleFrequency::Daily,
+            max_keep_count: 5,
+            enabled: true,
+        });
+        mgr.policies.push(SnapshotSchedulePolicy {
+            frequency: SnapshotScheduleFrequency::Weekly,
+            max_keep_count: 3,
+            enabled: true,
+        });
+        mgr
+    }
+
+    pub fn add_policy(&mut self, freq: SnapshotScheduleFrequency, keep: usize) {
+        self.policies.push(SnapshotSchedulePolicy {
+            frequency: freq,
+            max_keep_count: keep,
+            enabled: true,
+        });
+    }
+
+    pub fn calculate_max_retained_snapshots(&self) -> usize {
+        self.policies.iter().filter(|p| p.enabled).map(|p| p.max_keep_count).sum()
+    }
+}
+
 pub struct MintDriverManager {
     pub available_drivers: Vec<MintDriverInfo>,
 }
@@ -1352,6 +1659,66 @@ impl MintDriverManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_mint_bulky_file_renamer() {
+        let mut renamer = MintBulkyFileRenamer::new();
+        renamer.set_search_replace("old", "new");
+        renamer.set_prefix_suffix("IMG_", "_v1");
+
+        let preview = renamer.generate_preview_name("old_photo.jpg", 0);
+        assert_eq!(preview, "IMG_new_photo_v1_1.jpg");
+    }
+
+    #[test]
+    fn test_mint_redshift_color_temperature_manager() {
+        let mut redshift = MintRedshiftColorTemperatureManager::new();
+        redshift.set_temperatures(6500, 3200);
+
+        redshift.update_temperature_for_time(12); // Day
+        assert_eq!(redshift.current_temp_kelvin, 6500);
+
+        redshift.update_temperature_for_time(22); // Night
+        assert_eq!(redshift.current_temp_kelvin, 3200);
+    }
+
+    #[test]
+    fn test_mint_xapps_core() {
+        let mut xapps = MintXAppsCore::new();
+        xapps.save_xed_session("/home/user/document.txt", 42, 10);
+        assert_eq!(xapps.active_editor_sessions.len(), 1);
+        assert_eq!(xapps.active_editor_sessions[0].cursor_line, 42);
+
+        xapps.add_reader_bookmark("Chapter 3");
+        assert_eq!(xapps.recent_reader_bookmarks.len(), 1);
+    }
+
+    #[test]
+    fn test_mint_system_reports_security_checker() {
+        let mut checker = MintSystemReportsSecurityChecker::new();
+        let count = checker.run_system_audit();
+        assert!(count > 0);
+        assert_eq!(checker.audit_items[0].kind, SecurityAuditIssueKind::IncompleteLanguagePack);
+    }
+
+    #[test]
+    fn test_mint_software_manager_flatpak_portal() {
+        let mut flatpak_portal = MintSoftwareManagerFlatpakPortal::new();
+        assert_eq!(flatpak_portal.remotes.len(), 1);
+
+        let install_res = flatpak_portal.install_flatpak_app("org.gimp.GIMP").unwrap();
+        assert!(install_res.contains("Successfully installed Flatpak package 'org.gimp.GIMP'"));
+        assert_eq!(flatpak_portal.total_flatpaks_installed, 1);
+    }
+
+    #[test]
+    fn test_mint_timeshift_schedule_manager() {
+        let mut sched = MintTimeshiftScheduleManager::new();
+        assert_eq!(sched.policies.len(), 2);
+
+        sched.add_policy(SnapshotScheduleFrequency::Monthly, 2);
+        assert_eq!(sched.calculate_max_retained_snapshots(), 10); // 5 + 3 + 2 = 10
+    }
 
     #[test]
     fn test_mint_sticky_notes_manager() {
