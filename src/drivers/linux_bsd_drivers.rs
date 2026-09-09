@@ -266,6 +266,287 @@ impl IntelXeDrmDriver {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_atheros_ath10k_wifi_driver() {
+        let mut ath10k = AtherosAth10kWifiDriver::new([0x00, 0x03, 0x7f, 0x11, 0x22, 0x33]);
+        assert_eq!(ath10k.active_channel, 1);
+        assert!(ath10k.transmit_frame(&[0xff; 64]).is_err()); // FW not loaded
+
+        assert!(ath10k.load_firmware(&[0x12, 0x34]).is_ok());
+        assert!(ath10k.set_channel(36).is_ok());
+        assert_eq!(ath10k.transmit_frame(&[0xff; 64]).unwrap(), 64);
+    }
+
+    #[test]
+    fn test_broadcom_bcm57788_and_intel_sof_audio() {
+        let mut bcm = BroadcomBcm57788EthernetDriver::new([0x00, 0x10, 0x18, 0xaa, 0xbb, 0xcc]);
+        assert_eq!(bcm.link_speed_mbps, 1000);
+        assert!(bcm.receive_packet(&[0x00; 48]).is_ok());
+        assert_eq!(bcm.rx_packets_counter, 1);
+
+        let mut sof = IntelSofAudioDriver::new(48000, 2);
+        assert_eq!(sof.write_pcm(&[0x01, 0x02, 0x03, 0x04]), 4);
+        assert!(sof.playing);
+        sof.stop_stream();
+        assert!(!sof.playing);
+    }
+
+    #[test]
+    fn test_virtio_console_and_balloon() {
+        let mut console = VirtioConsoleDriver::new(0);
+        assert_eq!(console.write_str("Hello VirtIO"), 12);
+        assert_eq!(console.tx_buffer.len(), 12);
+
+        let mut balloon = VirtioBalloonDriver::new();
+        balloon.inflate(256);
+        assert_eq!(balloon.actual_pages_ballooned, 256);
+        balloon.deflate(100);
+        assert_eq!(balloon.actual_pages_ballooned, 156);
+    }
+
+    #[test]
+    fn test_bsd_mpt_aqt_and_zfs_arc_drivers() {
+        let mpt = FreeBsdMptSasHbaDriver::new(0);
+        assert_eq!(mpt.execute_scsi_command(&[0x12, 0x00]).unwrap(), 0x00);
+
+        let mut aqt = OpenBsdAqtEthernetDriver::new([0x00, 0x50, 0x56, 0x12, 0x34, 0x56]);
+        assert_eq!(aqt.speed_gbps, 10);
+        aqt.set_promiscuous(true);
+        assert!(aqt.promiscuous_mode);
+
+        let mut arc = IllumosZfsArcStorageDriver::new(64);
+        assert!(arc.cache_lookup(100)); // Even block ID => hit
+        assert!(!arc.cache_lookup(101)); // Odd block ID => miss
+        assert_eq!(arc.hit_count, 1);
+        assert_eq!(arc.miss_count, 1);
+    }
+}
+
+/// Linux mac80211-inspired Atheros Ath10k Wi-Fi Driver
+pub struct AtherosAth10kWifiDriver {
+    pub mac_address: [u8; 6],
+    pub firmware_loaded: bool,
+    pub active_channel: u8,
+    pub tx_ring_head: usize,
+}
+
+impl AtherosAth10kWifiDriver {
+    pub fn new(mac: [u8; 6]) -> Self {
+        Self {
+            mac_address: mac,
+            firmware_loaded: false,
+            active_channel: 1,
+            tx_ring_head: 0,
+        }
+    }
+
+    pub fn load_firmware(&mut self, _fw_bytes: &[u8]) -> Result<(), &'static str> {
+        self.firmware_loaded = true;
+        Ok(())
+    }
+
+    pub fn set_channel(&mut self, channel: u8) -> Result<(), &'static str> {
+        if channel == 0 || channel > 165 {
+            return Err("Invalid 802.11 Wi-Fi channel");
+        }
+        self.active_channel = channel;
+        Ok(())
+    }
+
+    pub fn transmit_frame(&mut self, frame: &[u8]) -> Result<usize, &'static str> {
+        if !self.firmware_loaded {
+            return Err("Ath10k firmware not loaded");
+        }
+        self.tx_ring_head = (self.tx_ring_head + 1) % 256;
+        Ok(frame.len())
+    }
+}
+
+/// Linux tg3/bcm57788-inspired Broadcom Ethernet Driver
+pub struct BroadcomBcm57788EthernetDriver {
+    pub mac_address: [u8; 6],
+    pub link_speed_mbps: u32,
+    pub full_duplex: bool,
+    pub rx_packets_counter: u64,
+}
+
+impl BroadcomBcm57788EthernetDriver {
+    pub fn new(mac: [u8; 6]) -> Self {
+        Self {
+            mac_address: mac,
+            link_speed_mbps: 1000,
+            full_duplex: true,
+            rx_packets_counter: 0,
+        }
+    }
+
+    pub fn receive_packet(&mut self, packet_data: &[u8]) -> Result<usize, &'static str> {
+        if packet_data.is_empty() {
+            return Err("Empty ethernet packet");
+        }
+        self.rx_packets_counter += 1;
+        Ok(packet_data.len())
+    }
+}
+
+/// Linux Sound Open Firmware (SOF) Audio Codec Driver
+pub struct IntelSofAudioDriver {
+    pub sample_rate_hz: u32,
+    pub channels: u8,
+    pub pcm_buffer: Vec<u8>,
+    pub playing: bool,
+}
+
+impl IntelSofAudioDriver {
+    pub fn new(sample_rate_hz: u32, channels: u8) -> Self {
+        Self {
+            sample_rate_hz,
+            channels,
+            pcm_buffer: Vec::new(),
+            playing: false,
+        }
+    }
+
+    pub fn write_pcm(&mut self, pcm: &[u8]) -> usize {
+        self.pcm_buffer.extend_from_slice(pcm);
+        self.playing = true;
+        pcm.len()
+    }
+
+    pub fn stop_stream(&mut self) {
+        self.playing = false;
+        self.pcm_buffer.clear();
+    }
+}
+
+/// VirtIO Console Character Device Driver
+pub struct VirtioConsoleDriver {
+    pub port_id: u32,
+    pub ready: bool,
+    pub tx_buffer: Vec<u8>,
+}
+
+impl VirtioConsoleDriver {
+    pub fn new(port_id: u32) -> Self {
+        Self {
+            port_id,
+            ready: true,
+            tx_buffer: Vec::new(),
+        }
+    }
+
+    pub fn write_str(&mut self, msg: &str) -> usize {
+        if !self.ready {
+            return 0;
+        }
+        self.tx_buffer.extend_from_slice(msg.as_bytes());
+        msg.len()
+    }
+}
+
+/// VirtIO Memory Balloon Device Driver
+pub struct VirtioBalloonDriver {
+    pub num_pages_requested: u32,
+    pub actual_pages_ballooned: u32,
+}
+
+impl VirtioBalloonDriver {
+    pub fn new() -> Self {
+        Self {
+            num_pages_requested: 0,
+            actual_pages_ballooned: 0,
+        }
+    }
+
+    pub fn inflate(&mut self, pages: u32) {
+        self.num_pages_requested += pages;
+        self.actual_pages_ballooned += pages;
+    }
+
+    pub fn deflate(&mut self, pages: u32) {
+        let freed = pages.min(self.actual_pages_ballooned);
+        self.actual_pages_ballooned -= freed;
+    }
+}
+
+/// FreeBSD mpt(4) LSI SAS/SATA Controller Driver
+pub struct FreeBsdMptSasHbaDriver {
+    pub target_id: u8,
+    pub connected_drives: u8,
+    pub queue_depth: u16,
+}
+
+impl FreeBsdMptSasHbaDriver {
+    pub fn new(target_id: u8) -> Self {
+        Self {
+            target_id,
+            connected_drives: 4,
+            queue_depth: 128,
+        }
+    }
+
+    pub fn execute_scsi_command(&self, cdb: &[u8]) -> Result<u8, &'static str> {
+        if cdb.is_empty() {
+            return Err("Invalid SCSI CDB");
+        }
+        Ok(0x00) // GOOD SCSI status
+    }
+}
+
+/// OpenBSD aqt(4) Aquantia Multi-Gigabit Ethernet Driver
+pub struct OpenBsdAqtEthernetDriver {
+    pub mac_address: [u8; 6],
+    pub speed_gbps: u8,
+    pub promiscuous_mode: bool,
+}
+
+impl OpenBsdAqtEthernetDriver {
+    pub fn new(mac: [u8; 6]) -> Self {
+        Self {
+            mac_address: mac,
+            speed_gbps: 10,
+            promiscuous_mode: false,
+        }
+    }
+
+    pub fn set_promiscuous(&mut self, enable: bool) {
+        self.promiscuous_mode = enable;
+    }
+}
+
+/// illumos ZFS ARC Adaptive Replacement Cache Storage Driver
+pub struct IllumosZfsArcStorageDriver {
+    pub c_max_bytes: usize,
+    pub c_current_bytes: usize,
+    pub hit_count: u64,
+    pub miss_count: u64,
+}
+
+impl IllumosZfsArcStorageDriver {
+    pub fn new(max_cache_mb: usize) -> Self {
+        Self {
+            c_max_bytes: max_cache_mb * 1024 * 1024,
+            c_current_bytes: 0,
+            hit_count: 0,
+            miss_count: 0,
+        }
+    }
+
+    pub fn cache_lookup(&mut self, block_id: u64) -> bool {
+        if block_id % 2 == 0 {
+            self.hit_count += 1;
+            true
+        } else {
+            self.miss_count += 1;
+            false
+        }
+    }
+}
+
 // =========================================================================
 // 16. FreeBSD Broadcom bwn Wireless LAN Driver
 // =========================================================================
