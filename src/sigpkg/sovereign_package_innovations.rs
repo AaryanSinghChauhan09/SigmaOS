@@ -355,7 +355,7 @@ impl Default for SolusMossStatelessTransactionEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
