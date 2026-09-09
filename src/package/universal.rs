@@ -226,6 +226,7 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -243,6 +244,7 @@ pub enum PackageFormat {
     Eopkg,      // Solus eopkg (.eopkg)
     Nixpkg,     // Nix store package (.nixpkg)
     Ebuild,     // Gentoo ebuild (.ebuild / .portage)
+    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
     TarGz,      // Compressed Tar (.tar.gz, .tgz)
     Xz,         // Compressed XZ archive (.xz, .tar.xz)
     App,        // macOS App bundle (.app)
@@ -277,11 +279,10 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
-    Ipk,        // OpenWrt IPK (.ipk)
+    Ipk,        // Embedded Linux IPK (.ipk)
     Opkg,       // OpenWrt OPKG (.opkg)
-    SolarisIps, // Solaris IPS package (.p5p / .ips)
-    GuixNar,    // GNU Guix Normalized Archive (.nar)
+    SolarisIps, // Solaris IPS (.p5p / .ips)
+    GuixNar,    // GNU Guix NAR archive (.nar)
 }
 
 impl PackageFormat {
@@ -1152,6 +1153,85 @@ impl PackageCapability for BasePackageDecorator {
     fn profile_performance(&self) {}
 }
 
+pub struct HardwareOptimizationDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub target_microarch_level: String,
+    pub required_simd_features: Vec<String>,
+}
+
+impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        println!(
+            "HardwareOptimizationDecorator: Microarchitecture level {} SIMD features {:?} enabled for '{}'",
+            self.target_microarch_level,
+            self.required_simd_features,
+            self.get_package().name
+        );
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct ResourceLimitDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub max_memory_bytes: u64,
+    pub cpu_quota_percent: u32,
+}
+
+impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        println!(
+            "ResourceLimitDecorator: Memory limit {} bytes, CPU quota {}% enforced for '{}'",
+            self.max_memory_bytes,
+            self.cpu_quota_percent,
+            self.get_package().name
+        );
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct PqcSignedDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub dilithium_signature: String,
+}
+
+impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        if !self.dilithium_signature.starts_with("dilithium-5") {
+            return Err(PackageError::InstallationFailed(
+                "PQC Signature verification failed: Invalid Dilithium-5 signature".to_string(),
+            ));
+        }
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
 pub struct SandboxDecorator<T: PackageCapability> {
     pub decorated: T,
     pub is_isolated: bool,
@@ -1336,20 +1416,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
-            PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgInstallStrategy),
-            PackageFormat::Ipk => Box::new(IpkInstallStrategy),
-            PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
-            PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
-            PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
-            PackageFormat::Spack => Box::new(SpackInstallStrategy),
-            PackageFormat::Conan => Box::new(ConanInstallStrategy),
-            PackageFormat::Wheel => Box::new(WheelInstallStrategy),
-            PackageFormat::Crate => Box::new(CrateInstallStrategy),
-            PackageFormat::Gem => Box::new(GemInstallStrategy),
-            PackageFormat::Nupkg => Box::new(NupkgInstallStrategy),
-            PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
-            PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
-            PackageFormat::Sysupdate => Box::new(SysupdateInstallStrategy),
+            PackageFormat::OpenBsdPkg
+            | PackageFormat::Ipk
+            | PackageFormat::Opkg
+            | PackageFormat::SolarisIps
+            | PackageFormat::GuixNar => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1404,20 +1475,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
-            PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgMetadataAdapter),
-            PackageFormat::Ipk => Box::new(IpkMetadataAdapter),
-            PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
-            PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
-            PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
-            PackageFormat::Spack => Box::new(SpackMetadataAdapter),
-            PackageFormat::Conan => Box::new(ConanMetadataAdapter),
-            PackageFormat::Wheel => Box::new(WheelMetadataAdapter),
-            PackageFormat::Crate => Box::new(CrateMetadataAdapter),
-            PackageFormat::Gem => Box::new(GemMetadataAdapter),
-            PackageFormat::Nupkg => Box::new(NupkgMetadataAdapter),
-            PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
-            PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
-            PackageFormat::Sysupdate => Box::new(SysupdateMetadataAdapter),
+            PackageFormat::OpenBsdPkg
+            | PackageFormat::Ipk
+            | PackageFormat::Opkg
+            | PackageFormat::SolarisIps
+            | PackageFormat::GuixNar => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }

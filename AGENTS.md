@@ -7,7 +7,7 @@ This document defines operational guidelines, security policies, and verificatio
 ## 1. Core Principles for AI Agents
 
 1. **Zero External Third-Party Dependencies:**
-   - SigmaOS strictly follows a zero-dependency `#![no_std]` design philosophy.
+   - SigmaOS strictly follows a zero-dependency `#![no_std]` design philosophy (see `docs/CONTRIBUTOR_AND_AI_AGENT_RULES.md`).
    - Do NOT add external crates under `[dependencies]` in `Cargo.toml`.
    - Use `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`) and native `#![no_std]` structures.
 
