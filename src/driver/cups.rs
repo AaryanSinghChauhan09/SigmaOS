@@ -1,8 +1,8 @@
 // CUPS Printer Driver Paradigm Implementation for SigmaOS
 // Provides zero-dependency USB/Network printer device abstraction and IPP protocol handling.
 
-use crate::klib::string::String;
-use crate::klib::vec::Vec;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrinterState {

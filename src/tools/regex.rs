@@ -1,8 +1,8 @@
 // High-Performance Regular Expression Engine for SigmaOS
 // Provides zero-dependency pattern matching, character classes, and sub-string extraction for native coreutils.
 
-use crate::klib::string::String;
-use crate::klib::vec::Vec;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RegexMatch {
