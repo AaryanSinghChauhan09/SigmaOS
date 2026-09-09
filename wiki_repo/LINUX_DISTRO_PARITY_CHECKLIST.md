@@ -3,6 +3,8 @@
 ## Overview
 This document serves as the master engineering checklist and developer to-do board for achieving 100% operational, subsystem, driver, POSIX, and userland parity between **SigmaOS** and traditional Linux distributions (Ubuntu, Fedora, Arch Linux, Debian, Gentoo, Void, NixOS).
 
+For the overarching strategic plan on surpassing legacy OS architectures, see [Strategy to Surpass & Defeat Linux & BSD](STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md).
+
 ---
 
 ## 📋 SigmaOS Parity Checklist
