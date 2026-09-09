@@ -20,11 +20,16 @@
 // Database engines, storage systems, and data management
 
 pub mod block;
+pub mod geom;
 pub mod nosql_engine;
 pub mod search;
 pub mod sql_engine;
 pub mod volume;
 
+pub use geom::{
+    BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
+    PartitionEntry,
+};
 pub use sql_engine::{
     Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
 };

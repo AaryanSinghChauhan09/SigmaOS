@@ -3,6 +3,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -24,6 +25,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod storage;
 pub mod virtualization;
 
 pub use accessibility::{
@@ -55,6 +57,10 @@ pub use compatibility::{
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};
+pub use distro::{
+    AkmKernelManager, CalamaresConfig, CalamaresInstaller, EosLogTool, EosWelcomeApp,
+    ReflectorMirrorManager, YayParuHelper,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
@@ -117,15 +123,21 @@ pub use resilience::{
     SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
 };
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CrowdStrikeFalconAi,
+    DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter, IntrusionDetectionSystem,
+    LinuxCapability, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, PamError, PamGroup,
+    PamUser, Permission, PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, Securelevel,
+    SIGNATURE_LEN, SnortRule, SnortSignatureFirewall, SovereignPamManager,
+    SovereignSecurelevelManager, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
+};
+pub use storage::{
+    BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
+    PartitionEntry,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

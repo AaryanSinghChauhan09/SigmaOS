@@ -1,5 +1,6 @@
 // SigmaOS Kernel Module
 pub mod architecture;
+pub mod breakthroughs;
 pub mod ipc;
 pub mod memory;
 pub mod policy_mechanism;

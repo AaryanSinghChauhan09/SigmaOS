@@ -194,6 +194,26 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "echo" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Echo {
+                        message: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Echo {
+                        message: String::new(),
+                    }
+                }
+            }
             "mkdir" => {
                 if parts.len() >= 2 {
                     ShellCommand::Mkdir {
