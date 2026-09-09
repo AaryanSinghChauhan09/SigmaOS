@@ -803,31 +803,30 @@ impl Default for ArchWikiOfflineEngine {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
-        let devtools = ArchCdevtoolsEngine::new();
-        let cmd = devtools.build_in_chroot("extra-x86_64-build", "curl").unwrap();
-        assert!(cmd.contains("arch-nspawn"));
+        let devtools = ArchCdevtoolsEngine::default();
+        let artifact = devtools.build_in_clean_chroot("curl").unwrap();
+        assert!(artifact.contains("pkg.tar.zst"));
 
-        let mut pkgctl = ArchPkgctlEngine::new();
-        let repo_url = pkgctl.clone_pkg_repo("nginx");
+        let pkgctl = ArchPkgctlEngine::default();
+        let repo_url = pkgctl.split_package_repo("nginx");
         assert!(repo_url.contains("gitlab.archlinux.org"));
 
         let archweb = ArchArchwebEngine::new();
-        let res = archweb.search("pacman");
-        assert_eq!(res.len(), 1);
+        let res = archweb.query_package("pacman");
+        assert!(res.is_some());
 
-        let mut installer = ArchArchinstallEngine::new();
-        installer.set_config("/dev/nvme0n1", "desktop", "sovereign");
-        let inst_cmd = installer.execute_installation().unwrap();
-        assert!(inst_cmd.contains("archinstall"));
+        let installer = ArchArchinstallEngine::new("/dev/nvme0n1", "btrfs");
+        let inst_res = installer.execute_installation_profile("{\"fs\": \"btrfs\"}");
+        assert!(inst_res);
 
         let wiki = ArchWikiOfflineEngine::new();
-        let articles = wiki.search("pacman");
-        assert_eq!(articles.len(), 1);
+        let article = wiki.search_offline_wiki("pacman");
+        assert!(article.contains("ArchWiki Offline Entry"));
     }
-
-    use super::*;
 
     #[test]
     fn test_arch_cdevtools_engine() {
