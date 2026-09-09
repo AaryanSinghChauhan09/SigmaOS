@@ -415,6 +415,134 @@ impl Default for PcmanfmQtAdapter {
 }
 
 // =========================================================================
+// LUBUNTU PPA REPOSITORY MANAGER (`LubuntuPpaRepositoryManager`)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LubuntuPpaRepository {
+    pub ppa_name: String,
+    pub ppa_uri: String,
+    pub signing_key_fingerprint: String,
+    pub is_enabled: bool,
+}
+
+pub struct LubuntuPpaRepositoryManager {
+    pub repositories: Vec<LubuntuPpaRepository>,
+}
+
+impl LubuntuPpaRepositoryManager {
+    pub fn new() -> Self {
+        let mut mgr = Self {
+            repositories: Vec::new(),
+        };
+        mgr.add_ppa("ppa:lubuntu-dev/stable", "https://ppa.launchpadcontent.net/lubuntu-dev/stable/ubuntu");
+        mgr.add_ppa("ppa:lubuntu-desktop/ppa", "https://ppa.launchpadcontent.net/lubuntu-desktop/ppa/ubuntu");
+        mgr
+    }
+
+    pub fn add_ppa(&mut self, ppa_name: &str, ppa_uri: &str) -> &LubuntuPpaRepository {
+        let key_hash = format!("4096R/{:x}", ppa_name.len() * 0x1337);
+        let repo = LubuntuPpaRepository {
+            ppa_name: ppa_name.to_string(),
+            ppa_uri: ppa_uri.to_string(),
+            signing_key_fingerprint: key_hash,
+            is_enabled: true,
+        };
+        self.repositories.retain(|r| r.ppa_name != ppa_name);
+        self.repositories.push(repo);
+        self.repositories.last().unwrap()
+    }
+
+    pub fn disable_ppa(&mut self, ppa_name: &str) -> bool {
+        if let Some(repo) = self.repositories.iter_mut().find(|r| r.ppa_name == ppa_name) {
+            repo.is_enabled = false;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_enabled_ppas(&self) -> Vec<&LubuntuPpaRepository> {
+        self.repositories.iter().filter(|r| r.is_enabled).collect()
+    }
+}
+
+impl Default for LubuntuPpaRepositoryManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// LXQT PACKAGE UPDATE NOTIFIER ENGINE (`LxqtPackageUpdateNotifierEngine`)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LubuntuPackageUpdateNotice {
+    pub package_name: String,
+    pub current_version: String,
+    pub new_version: String,
+    pub is_security_update: bool,
+    pub download_size_kb: usize,
+}
+
+pub struct LxqtPackageUpdateNotifierEngine {
+    pub pending_updates: Vec<LubuntuPackageUpdateNotice>,
+    pub auto_check_interval_secs: u32,
+    pub notifications_enabled: bool,
+}
+
+impl LxqtPackageUpdateNotifierEngine {
+    pub fn new() -> Self {
+        Self {
+            pending_updates: Vec::new(),
+            auto_check_interval_secs: 86400, // 24 hours
+            notifications_enabled: true,
+        }
+    }
+
+    pub fn register_update(
+        &mut self,
+        pkg: &str,
+        cur_ver: &str,
+        new_ver: &str,
+        is_security: bool,
+        size_kb: usize,
+    ) {
+        self.pending_updates.push(LubuntuPackageUpdateNotice {
+            package_name: pkg.to_string(),
+            current_version: cur_ver.to_string(),
+            new_version: new_ver.to_string(),
+            is_security_update: is_security,
+            download_size_kb: size_kb,
+        });
+    }
+
+    pub fn get_security_updates(&self) -> Vec<&LubuntuPackageUpdateNotice> {
+        self.pending_updates.iter().filter(|u| u.is_security_update).collect()
+    }
+
+    pub fn calculate_total_download_size_kb(&self) -> usize {
+        self.pending_updates.iter().map(|u| u.download_size_kb).sum()
+    }
+
+    pub fn apply_update(&mut self, pkg: &str) -> bool {
+        if let Some(pos) = self.pending_updates.iter().position(|u| u.package_name == pkg) {
+            self.pending_updates.remove(pos);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for LxqtPackageUpdateNotifierEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // 3. DISCOVER PACKAGE ADAPTER (`DiscoverPackageAdapter`)
 // =========================================================================
 
@@ -651,7 +779,7 @@ impl Default for CalamaresInstallerShim {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -812,6 +940,33 @@ mod tests {
 
         notif.do_not_disturb = true;
         assert!(notif.notify("Alert", "Ignored").is_none());
+    }
+
+    #[test]
+    fn test_lubuntu_ppa_repository_manager() {
+        let mut ppa_mgr = LubuntuPpaRepositoryManager::new();
+        assert_eq!(ppa_mgr.get_enabled_ppas().len(), 2);
+
+        ppa_mgr.add_ppa("ppa:lubuntu-dev/backports", "https://ppa.launchpadcontent.net/lubuntu-dev/backports/ubuntu");
+        assert_eq!(ppa_mgr.get_enabled_ppas().len(), 3);
+
+        assert!(ppa_mgr.disable_ppa("ppa:lubuntu-dev/backports"));
+        assert_eq!(ppa_mgr.get_enabled_ppas().len(), 2);
+    }
+
+    #[test]
+    fn test_lxqt_package_update_notifier() {
+        let mut notifier = LxqtPackageUpdateNotifierEngine::new();
+        assert_eq!(notifier.pending_updates.len(), 0);
+
+        notifier.register_update("qterminal", "1.3.0", "1.4.0", false, 1024);
+        notifier.register_update("openssl", "3.0.2", "3.0.3", true, 2048);
+
+        assert_eq!(notifier.get_security_updates().len(), 1);
+        assert_eq!(notifier.calculate_total_download_size_kb(), 3072);
+
+        assert!(notifier.apply_update("qterminal"));
+        assert_eq!(notifier.pending_updates.len(), 1);
     }
 
     #[test]
