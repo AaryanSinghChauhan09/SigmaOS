@@ -8,12 +8,11 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::{
-    ApkIndexManifest, ArchPkgInfoManifest, AptDebManifest, GentooEbuildMetadata,
-    HaikuHpkgManifest, SnapcraftManifest, XbpsManifest,
-};
+use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
+#[cfg(test)]
+pub use crate::sigpkg::Version;
 
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::universal_engine::PackageFormat;
@@ -52,9 +51,19 @@ pub struct PacmanPkgbuild {
 }
 
 use crate::sigpkg::universal_engine::PackageFormat;
-use crate::sigpkg::universal_oop_system::{self, UniversalPackageManager};
+/// Use universal_oop_system::UniversalPackageManager instead
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub use crate::package::PackagePriority;
+/// Debian-style package priority levels (DFSG and APT standard)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PackagePriority {
+    Optional = 0,
+    Standard = 1,
+    Important = 2,
+    Required = 3,
+    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
+}
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -488,7 +497,6 @@ impl UniversalPackageAdapter {
             summary,
             confinement,
             plugs,
-            slots: Vec::new(),
         })
     }
 
@@ -1321,14 +1329,14 @@ impl Default for UniversalServerImageAdapter {
 /// into native Sigma-pkg models, mapping dependencies, sandboxing capabilities, and registering with Universal PM.
 pub struct SigPkgUniversalBridgeEngine {
     adapter: UniversalPackageAdapter,
-    pm: UniversalPackageManager,
+    pm: universal_oop_system::UniversalPackageManager,
 }
 
 impl SigPkgUniversalBridgeEngine {
     pub fn new() -> Self {
         Self {
             adapter: UniversalPackageAdapter::new(),
-            pm: UniversalPackageManager::new(),
+            pm: universal_oop_system::UniversalPackageManager::new(),
         }
     }
 
@@ -1586,19 +1594,13 @@ impl UniversalDependencyMapper {
             raw.as_str()
         };
 
-        let uncat = if let Some(pos) = clean.find('/') {
-            &clean[pos + 1..]
-        } else {
-            clean
-        };
-
-        match uncat {
+        match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
-            | "dev-libs/openssl" | "openssl" => "openssl".to_string(),
+            | "dev-libs/openssl" => "openssl".to_string(),
             "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
-            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" | "zlib" => {
+            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
             "python" | "python3" | "python3-dev" | "python3-devel" | "dev-lang/python" | "lang/python" => {
@@ -1620,26 +1622,7 @@ impl UniversalDependencyMapper {
             "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "qt5".to_string(),
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
-            "libffi" | "libffi-dev" | "libffi-devel" => "libffi".to_string(),
-            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" => "glib".to_string(),
-            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" => "pcre".to_string(),
-            "libuv" | "libuv-dev" | "libuv-devel" | "libuv1-dev" => "libuv".to_string(),
-            "openssh" | "openssh-server" | "openssh-clients" => "openssh".to_string(),
-            "mesa" | "mesa-libgl" | "mesa-dri-drivers" => "mesa".to_string(),
-            "git" => "git".to_string(),
-            "cmake" => "cmake".to_string(),
-            "libxml2" | "libxml2-dev" | "libxml2-devel" => "libxml2".to_string(),
-            "libyaml" | "libyaml-dev" | "libyaml-devel" => "libyaml".to_string(),
-            "systemd" | "systemd-libs" | "systemd-devel" => "systemd".to_string(),
-            other => {
-                if let Some(stripped) = other.strip_suffix("-devel") {
-                    stripped.to_string()
-                } else if let Some(stripped) = other.strip_suffix("-dev") {
-                    stripped.to_string()
-                } else {
-                    other.to_string()
-                }
-            }
+            _ => clean.to_string(),
         }
     }
 }
@@ -1878,23 +1861,6 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "yay" | "paru" | "pikaur" | "trizen" | "aura" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "-S" | "-Sy" => operation = UniversalPmOperation::Install,
-                        "-R" | "-Rns" => operation = UniversalPmOperation::Remove,
-                        "-Syu" | "-Syyu" => operation = UniversalPmOperation::Upgrade,
-                        "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
-                        "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
-                        "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
-                        "--print" | "--dryrun" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
             "pacman" => {
                 let mut i = 0;
                 while i < args.len() {
@@ -1912,7 +1878,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "microdnf" | "rpm" | "dnf" | "yum" | "zypper" => {
+            "dnf" | "yum" | "zypper" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
