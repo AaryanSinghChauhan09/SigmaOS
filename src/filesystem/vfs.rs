@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
+// SigmaOS: Virtual File System (VFS) Layer
+// Provides unified filesystem abstraction supporting multiple filesystem types
+// Integrates with syscall dispatcher for read, write, open, close operations
+
 use core::fmt;
-/// SigmaOS: Virtual File System (VFS) Layer
-/// Provides unified filesystem abstraction supporting multiple filesystem types
-/// Integrates with syscall dispatcher for read, write, open, close operations
 use std::string::String;
 use std::vec::Vec;
 
