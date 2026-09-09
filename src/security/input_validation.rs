@@ -163,7 +163,16 @@ pub fn validate_hostname(name: &[u8]) -> Result<(), ValidationError> {
 
 // ── Environment variables ──────────────────────────────────────────────────
 
-/// Validate an environment variable key (no `=`, no NUL).
+/// Validate an environment variable key per POSIX IEEE Std 1003.1.
+///
+/// Rules:
+/// - Non-empty
+/// - ≤ 256 bytes (`MAX_ENV_KEY_LEN`)
+/// - First byte MUST be an ASCII letter or underscore (`[a-zA-Z_]`).
+///   This prevents command-line option injection (e.g., keys starting with `-`
+///   such as `-LD_PRELOAD` or `--config` passed into `env` or subshells)
+///   and enforces POSIX variable naming standards (no leading digits).
+/// - Subsequent bytes MUST be ASCII alphanumeric or underscore (`[a-zA-Z0-9_]`).
 pub fn validate_env_key(key: &[u8]) -> Result<(), ValidationError> {
     if key.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -171,8 +180,12 @@ pub fn validate_env_key(key: &[u8]) -> Result<(), ValidationError> {
     if key.len() > MAX_ENV_KEY_LEN {
         return Err(ValidationError::TooLong);
     }
-    for &b in key {
-        if b == 0 || b == b'=' {
+    let first = key[0];
+    if !first.is_ascii_alphabetic() && first != b'_' {
+        return Err(ValidationError::InvalidChars);
+    }
+    for &b in &key[1..] {
+        if !b.is_ascii_alphanumeric() && b != b'_' {
             return Err(ValidationError::InvalidChars);
         }
     }
@@ -467,6 +480,31 @@ mod tests {
         // Total hostname length > 253
         let long_hostname = [b'a'; MAX_HOSTNAME_LEN + 1];
         assert_eq!(validate_hostname(&long_hostname), Err(ValidationError::TooLong));
+    }
+
+    #[test]
+    fn test_env_key_validation() {
+        assert_eq!(validate_env_key(b"PATH"), Ok(()));
+        assert_eq!(validate_env_key(b"_CONFIG_VAR"), Ok(()));
+        assert_eq!(validate_env_key(b"HTTP_PROXY_123"), Ok(()));
+
+        // Command-line option injection prevention (leading dash/hyphen)
+        assert_eq!(validate_env_key(b"-LD_PRELOAD"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"--config"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"-i"), Err(ValidationError::InvalidChars));
+
+        // POSIX compliance (leading digit disallowed)
+        assert_eq!(validate_env_key(b"123VAR"), Err(ValidationError::InvalidChars));
+
+        // Disallowed special characters
+        assert_eq!(validate_env_key(b"KEY=VAL"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"KEY;id"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"KEY WITH SPACE"), Err(ValidationError::InvalidChars));
+
+        // Empty and length checks
+        assert_eq!(validate_env_key(b""), Err(ValidationError::EmptyInput));
+        let long_key = [b'A'; MAX_ENV_KEY_LEN + 1];
+        assert_eq!(validate_env_key(&long_key), Err(ValidationError::TooLong));
     }
 
     #[test]
