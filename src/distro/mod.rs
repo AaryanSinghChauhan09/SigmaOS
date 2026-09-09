@@ -247,3 +247,13 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
+
+pub mod sovereign_ahead_distro_supremacy;
+pub use sovereign_ahead_distro_supremacy::{
+    AccessRight as CapabilityAccessRight, CarpNodeStatus, CoWBlockExtent,
+    DeclarativeCapabilityRule, MicroarchIsaTarget, OmniCasBlob, OmniGenRecord, PfsyncConnEntry,
+    SchedPolicyKind, SchedTaskDescriptor, SchedTaskState, SimdJitPatch,
+    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
+    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
+    SovereignXdpCarpMeshEngine,
+};
