@@ -1,90 +1,94 @@
-# SigmaOS Linux & BSD Distro Development Roadmap & Issue Matrix
+# SigmaOS Strategic Roadmap: Defeating & Leapfrogging Linux & BSD Distros
 
-This roadmap details prioritized development initiatives inspired by leading Linux & BSD distribution paradigms (Arch, Fedora, FreeBSD, OpenBSD, NixOS, Void Linux, Clear Linux, Haiku).
-
----
-
-## 🛡️ 1. Security & Sandboxing
-
-### 1.1 Per-Tab Capability Model (Pledge / Unveil / Capsicum)
-- **Status:** Implemented in `src/distro/wiki_ideas_implementation.rs` & `src/security/input_validation.rs`.
-- **Target:** Enforce least privilege process boundaries at launch time across Linux (seccomp/bpf), macOS (app sandbox), and BSDs (Capsicum/pledge/unveil).
-- **Metric:** 100% of renderer helper processes launched in sandboxed capability mode.
-
-### 1.2 SBOM Generation, Sigstore Cosign Signing & CVE Scanning
-- **Status:** Implemented in `.github/workflows/sbom-cosign-cve-scan-ci.yml` & `src/sigpkg/verifier.rs`.
-- **Target:** Automated SPDX/CycloneDX SBOM generation, Post-Quantum Dilithium-5 / Cosign signing, and vulnerability tracking via `SecurityAdvisoryTracker`.
-- **Metric:** Zero unmitigated critical CVEs in production release artifacts.
+This roadmap details prioritized development initiatives and strategic pillars designed to surpass mature Linux & BSD distributions (Arch, Fedora, FreeBSD, OpenBSD, NixOS, Void Linux, Clear Linux, Haiku).
 
 ---
 
-## 🚀 2. Release Engineering & Atomic Updates
+## 🏛️ The 6 Strategic Pillars to Defeat Traditional Operating Systems
 
-### 2.1 Atomic Updates & One-Click Rollback (OSTree / Snapper Parity)
-- **Status:** Implemented in `src/compatibility/fedora.rs` (`FedoraOfflineUpdateEngine`) & `src/distro/wiki_ideas_implementation.rs` (Btrfs/Snapper recovery).
-- **Target:** Transactional offline system updates with instant subvolume rollback.
-- **Metric:** 100% update success rate with 0 bricked system states.
+### 1. 🧠 AI-Native Kernel & Process Scheduling
+* **Limitation of Linux/BSD:** Traditional Linux (CFS/EEVDF) and BSD (SCHED_ULE) schedulers are built solely for human-centric interactive workloads and traditional CPU threads. They lack native awareness of AI agentic processes, INT4/INT8 SIMD tensor workloads, and zero-copy agent IPC pipelines.
+* **SigmaOS Breakthrough:**
+  * **BORE+EEVDF Agent Scheduler:** Real-time priority classes specifically designed for autonomous AI agent processes and background thread throttling.
+  * **Zero-Copy Agent IPC:** Zero-copy shared memory queues and kernel capability tokens (`Pledge`/`Unveil` sandboxing) enabling microsecond-level agent-to-agent communication.
+  * **Quantized Tensor Operations:** Direct kernel-level INT4/INT8 SIMD/VNNI packed weight dispatching for edge inference.
 
-### 2.2 Reproducible Build Verification Pipeline
-- **Status:** Implemented in `src/sigpkg/sovereign_sigpkg.rs` (`ReproducibleBuildContext`) & `src/arch_kernel_inspirations.rs`.
-- **Target:** Diffoscope-style bit-for-bit build verification normalized via `SOURCE_DATE_EPOCH`.
-- **Metric:** > 99% bit-for-bit binary reproducibility across release targets.
+### 2. 🛡️ Zero-C / 100% Safe Rust Security Hardening
+* **Limitation of Linux/BSD:** Linux and BSD kernels and userlands suffer from legacy C/C++ memory corruption vulnerabilities (use-after-free, buffer overflows) and complex MAC policies (SELinux/AppArmor) that are difficult to configure.
+* **SigmaOS Breakthrough:**
+  * **Memory Safety by Default:** 100% Rust `#![no_std]` kernel and userland, eliminating memory-safety vulnerability classes.
+  * **OpenBSD Privilege Granularity:** Built-in `pledge()` system call restriction and `unveil()` path-based isolation per process.
+  * **PaX W^X & KASLR:** Strict Write-XOR-Execute memory layout and dynamic entropy KASLR stack canary protections.
+
+### 3. 🌀 Universal Package & Multi-Dialect Script Absorption
+* **Limitation of Linux/BSD:** The Linux ecosystem is heavily fragmented across incompatible package managers (`apt`, `dnf`, `pacman`, `apk`, `zypper`, `nix`) and shell dialects (`bash`, `zsh`, `fish`, `tcsh`, `ksh`).
+* **SigmaOS Breakthrough:**
+  * **`sigpkg` Universal Adapter:** Translates and installs foreign package formats (`.deb`, `.rpm`, PKGBUILD, `.apk`, `.xbps`, `.ebuild`, `.hpkg`, Flatpak, Snap, AppImage) natively without container overhead.
+  * **Universal Shell Transpiler:** Parses Bash, Zsh, Fish, Tcsh, Ksh, and Dash scripts on the fly, transpiling them into POSIX `/bin/sh` pipelines with microsecond execution parity in `ShellRepl`.
+
+### 4. ⚡ Immutable, Stateless & Self-Healing Architecture
+* **Limitation of Linux/BSD:** Mutable `/etc` and `/var` directories lead to configuration drift, update failures, and unrecoverable system states in conventional Linux distros.
+* **SigmaOS Breakthrough:**
+  * **Intel Clear Linux Stateless Design:** Strict separation of vendor defaults (`/usr/share/factory`) and user overrides (`/etc`), guaranteeing zero configuration drift.
+  * **Transactional CoW Rollbacks:** Instant point-in-time state rollbacks powered by Copy-on-Write (CoW) Btrfs/Snapper and HAMMER2 Merkle-tree snapshot integrity checks.
+  * **Atomic A/B Updates:** Post-quantum Dilithium signed UKI image boot sequence with zero-downtime background updates.
+
+### 5. 🌐 Privacy-First Sovereign Networking & Anonymity Stack
+* **Limitation of Linux/BSD:** Networking in standard distros leaks DNS, WebRTC IP addresses, and metadata unless manually configured with complex iptables/nftables scripts.
+* **SigmaOS Breakthrough:**
+  * **OpenBSD PF & FreeBSD VNET Stack:** Native kernel stateful packet filter (`PfStateTable`), SYN flood synproxy, and isolated virtual network stacks.
+  * **Mullvad Privacy & Oblivious DoH:** Direct kernel-level Oblivious DoH (ODoH), WebRTC IP leak suppression, and ephemeral per-tab SOCKS5 proxy isolation in `SigmaWeb`.
+  * **Transparent Tor Anonsurf Routing:** Single-command system-wide transparent Tor proxying (`ParrotAnonsurfTorRouterEngine`).
+
+### 6. 🎨 Next-Gen Zenith Desktop Experience (Zero-JS Lag)
+* **Limitation of Linux/BSD:** Desktop environments (GNOME/KDE) rely heavily on heavy JavaScript/C++ IPC bindings or Electron bloat, causing latency, frame drops, and accessibility gaps.
+* **SigmaOS Breakthrough:**
+  * **Native WASM / Rust Compositor:** Direct Wayland layer-shell rendering via `KWinWaylandCompositor` and `Quickshell` widgets without JavaScript runtime overhead.
+  * **WCAG & ARIA High-Contrast Parity:** Dynamic high-contrast CSS mode with standard system colors (`Canvas`, `CanvasText`, `Highlight`) and 100% keyboard focus navigation.
+  * **Arc Spaces & Workstation Presets:** Curated `OmakasePresetConfig` workspace tiling, vertical tab trees (`ZenWorkspaceTreeEngine`), and custom domain CSS/JS boosts.
 
 ---
 
-## ⚡ 3. Process Control & System Supervision
+## 🛡️ Detailed Subsystem Roadmap & Issue Matrix
 
-### 3.1 Void Linux Runit Supervisor & Automated Health Checks
-- **Status:** Implemented in `src/distro/void_runit.rs`.
-- **Target:** 3-stage process supervision with automated failure threshold detection and recovery.
-- **Metric:** < 100ms service restart latency on failure.
+### 1. Security & Sandboxing
+* **Per-Tab Capability Model (Pledge / Unveil / Capsicum):** Enforce least privilege process boundaries at launch time across Linux (`seccomp`/`bpf`) and BSDs (`pledge`/`unveil`).
+* **SBOM Generation & CVE Scanning:** Automated SPDX/CycloneDX SBOM generation, Post-Quantum Dilithium-5 signing, and vulnerability tracking via `SecurityAdvisoryTracker`.
 
-### 3.2 Linux Cgroups v2 & FreeBSD rctl Quota Enforcement
-- **Status:** Implemented in `src/memory/resource_allocator.rs` & `src/unimplemented_tools.rs`.
-- **Target:** Strict per-process memory, CPU, and IO bandwidth limits.
-- **Metric:** Zero system-wide out-of-memory (OOM) lockups under high render load.
+### 2. Release Engineering & Atomic Updates
+* **Atomic Updates & One-Click Rollback:** Transactional offline system updates with instant subvolume rollback.
+* **Reproducible Build Pipeline:** Diffoscope-style bit-for-bit build verification normalized via `SOURCE_DATE_EPOCH`.
 
----
+### 3. Process Control & System Supervision
+* **Void Linux Runit Supervisor:** 3-stage process supervision with automated failure threshold detection and recovery.
+* **Linux Cgroups v2 & Quotas:** Strict per-process memory, CPU, and IO bandwidth limits.
 
-## 🖥️ 4. Native Desktop & JS Reduction
-
-### 4.1 Native WASM Desktop UI & Accessibility Engine
-- **Status:** Implemented in `zenith_desktop/src/lib.rs` & `src/desktop/web_wasm_bridge.rs`.
-- **Target:** Direct Rust/WASM event routing for keyboard focus, ARIA attributes, and DOM manipulation without JavaScript runtime overhead.
-- **Metric:** 0ms JavaScript event loop blockage during desktop navigation.
+### 4. Native Desktop & JS Reduction
+* **Native WASM Desktop UI & Accessibility Engine:** Direct Rust/WASM event routing for keyboard focus, ARIA attributes, and DOM manipulation without JavaScript runtime overhead.
 
 ---
 
-## 📑 5. Formal Strategic Roadmap (Next 2 Years)
+## 📑 Formal Strategic Roadmap (2-Year Targets)
 
 ### 🔹 Q4 2026 – Q2 2027
-- **Compatibility layers** → Seamless support for Linux/Windows apps.
-- **Immutable userland layers** → Atomic updates, eliminating dependency conflicts.
-- **Contributor charter** → Publish governance and contribution guidelines.
-- **Zenith desktop refinement** → Improve usability and polish.
+* **Compatibility Layers:** Seamless execution for Linux/Windows ELF/PE binaries.
+* **Immutable Userland Layers:** Atomic app layering, eliminating dependency conflicts.
+* **Contributor Charter:** Formalized governance and contribution guidelines (`CONTRIBUTOR_CHARTER_AND_GOVERNANCE.md`).
+* **Zenith Desktop Refinement:** Polish wayland compositing, applets, and tiling gestures.
 
 ### 🔹 Q3 2027 – Q1 2028
-- **Shard implementation** → Roll out core shards (media, networking, storage).
-- **Firmware‑free drivers** → Replace opaque blobs with transparent Rust drivers.
-- **Composable boot sequences** → Scriptable boot flows for multi‑boot and encrypted startup.
-- **Clustered peripherals** → Enable device pooling across SigmaOS nodes.
+* **Shard Implementation:** Roll out core system shards (media, networking, storage).
+* **Firmware-Free Drivers:** Replace opaque vendor blobs with transparent, open-source Rust drivers.
+* **Composable Boot Sequences:** Scriptable boot flows for multi-boot and post-quantum encrypted startup.
+* **Clustered Peripherals:** Enable hardware device pooling across SigmaOS mesh nodes.
 
 ### 🔹 Q2 2028 – Q4 2028
-- **Programmable scheduler** → User‑defined scheduling policies.
-- **Network‑native OS state** → Pause a session on one device, resume seamlessly on another.
-- **Shards marketplace** → Curated ecosystem for modular SigmaOS apps.
-- **Temporal filesystem** → Native time‑travel for system state.
+* **Programmable Scheduler:** User-defined scheduling policies for AI and real-time tasks.
+* **Network-Native OS State:** Pause a session on one device and resume seamlessly on another node.
+* **Shards Marketplace:** Curated marketplace for modular, sandboxed SigmaOS applications.
+* **Temporal Filesystem:** Native time-travel state rollbacks across any past point in time.
 
 ---
 
-## ⚔️ 6. Strategy to Defeat Linux Distros
-- **Sovereignty over hardware** → Linux still depends on vendor blobs; SigmaOS must enforce firmware‑free drivers.
-- **Declarative simplicity** → Replace Linux’s fragmented package ecosystem with declarative manifests and immutable layers.
-- **Cluster‑native design** → Linux dominates servers, but SigmaOS can leap ahead by treating devices as pooled resources across nodes.
-- **Security by design** → Rust safety + OpenBSD‑style hardening = stronger guarantees than Linux.
-- **Unified vision** → Linux is fragmented across distros; SigmaOS must remain coherent, with shards as the single modular path.
-
----
-
-## 🌍 7. Outcome
-By 2028, SigmaOS will position itself as the **first sovereign OS**: modular, cluster‑native, firmware‑free, and declarative — offering clarity and resilience where Linux distros remain fragmented.
+## 🌍 Outcome
+By 2028, SigmaOS will position itself as the **first sovereign OS**: modular, cluster-native, firmware-free, AI-native, and declarative — offering complete clarity and resilience where Linux and BSD distributions remain fragmented.
