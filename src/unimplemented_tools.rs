@@ -2,6 +2,7 @@
 // Highly-polished, robust OOP implementation covering multimedia, system, productivity, AI, and developer tools.
 // Re-exported in src/lib.rs for full SigmaOS distribution parity.
 
+use std::collections::BTreeMap;
 use std::format;
 use std::string::String;
 use std::string::ToString;
@@ -5341,9 +5342,94 @@ impl NetworkPcapForensicSniffer {
     }
 }
 
+// =========================================================================
+// BSD CAPSICUM RIGHTS SANDBOXING ENGINE & LINUX XDP EXPRESS DATA PATH SHAPER
+// =========================================================================
+
+pub struct BsdCapsicumRightsSandboxingEngine {
+    pub capability_mode: bool,
+    pub allowed_rights: BTreeMap<i32, Vec<String>>,
+}
+
+impl BsdCapsicumRightsSandboxingEngine {
+    pub fn new() -> Self {
+        Self {
+            capability_mode: false,
+            allowed_rights: BTreeMap::new(),
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.capability_mode = true;
+    }
+
+    pub fn limit_fd_rights(&mut self, fd: i32, rights: Vec<&str>) {
+        let rights_vec: Vec<String> = rights.into_iter().map(|s| s.to_string()).collect();
+        self.allowed_rights.insert(fd, rights_vec);
+    }
+
+    pub fn check_right(&self, fd: i32, right: &str) -> bool {
+        if !self.capability_mode {
+            return true;
+        }
+        if let Some(rights) = self.allowed_rights.get(&fd) {
+            rights.iter().any(|r| r.eq_ignore_ascii_case(right))
+        } else {
+            false
+        }
+    }
+}
+
+pub struct LinuxXdpExpressDataPathShaper {
+    pub interface_name: String,
+    pub packets_processed: u64,
+    pub packets_dropped: u64,
+}
+
+impl LinuxXdpExpressDataPathShaper {
+    pub fn new(interface_name: &str) -> Self {
+        Self {
+            interface_name: interface_name.to_string(),
+            packets_processed: 0,
+            packets_dropped: 0,
+        }
+    }
+
+    pub fn process_packet_xdp(&mut self, packet_size: usize, drop_limit: usize) -> &'static str {
+        self.packets_processed += 1;
+        if packet_size > drop_limit {
+            self.packets_dropped += 1;
+            "XDP_DROP"
+        } else {
+            "XDP_PASS"
+        }
+    }
+}
+
 #[cfg(test)]
 mod new_unimplemented_tools_tests {
     use super::*;
+
+    #[test]
+    fn test_bsd_capsicum_rights_sandboxing_engine() {
+        let mut capsicum = BsdCapsicumRightsSandboxingEngine::new();
+        capsicum.limit_fd_rights(3, vec!["CAP_READ", "CAP_SEEK"]);
+
+        assert!(capsicum.check_right(3, "CAP_READ")); // Not in capability mode yet
+        capsicum.enter_capability_mode();
+        assert!(capsicum.check_right(3, "CAP_READ"));
+        assert!(!capsicum.check_right(3, "CAP_WRITE"));
+        assert!(!capsicum.check_right(4, "CAP_READ"));
+    }
+
+    #[test]
+    fn test_linux_xdp_express_data_path_shaper() {
+        let mut xdp = LinuxXdpExpressDataPathShaper::new("eth0");
+        assert_eq!(xdp.process_packet_xdp(512, 1500), "XDP_PASS");
+        assert_eq!(xdp.process_packet_xdp(2000, 1500), "XDP_DROP");
+        assert_eq!(xdp.packets_processed, 2);
+        assert_eq!(xdp.packets_dropped, 1);
+    }
 
     #[test]
     fn test_distrowatch_trend_analyzer_tool() {

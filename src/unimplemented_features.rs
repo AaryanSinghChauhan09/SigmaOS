@@ -3617,12 +3617,77 @@ mod extra_unimplemented_tests {
 }
 
 // =========================================================================
+// TECH MEDIA & BENCHMARK INTELLIGENCE AGGREGATOR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TechMediaFeedItem {
+    pub source_name: String,
+    pub title: String,
+    pub category: String,
+    pub severity_score: u8,
+}
+
+pub struct TechMediaIntelligenceAggregatorEngine {
+    pub feed_items: Vec<TechMediaFeedItem>,
+}
+
+impl TechMediaIntelligenceAggregatorEngine {
+    pub fn new() -> Self {
+        Self {
+            feed_items: Vec::new(),
+        }
+    }
+
+    pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
+        self.feed_items.push(TechMediaFeedItem {
+            source_name: source.to_string(),
+            title: title.to_string(),
+            category: category.to_string(),
+            severity_score: severity,
+        });
+    }
+
+    pub fn filter_by_source(&self, source: &str) -> Vec<TechMediaFeedItem> {
+        self.feed_items
+            .iter()
+            .filter(|item| item.source_name.eq_ignore_ascii_case(source))
+            .cloned()
+            .collect()
+    }
+
+    pub fn get_critical_advisories(&self, min_severity: u8) -> Vec<TechMediaFeedItem> {
+        self.feed_items
+            .iter()
+            .filter(|item| item.severity_score >= min_severity)
+            .cloned()
+            .collect()
+    }
+}
+
+// =========================================================================
 // DISTRO-INSPIRED ECOSYSTEM ENCOUNTER ENFORCE ENGINES
 // =========================================================================
 
 #[cfg(test)]
 mod new_unimplemented_tests {
     use super::*;
+
+    #[test]
+    fn test_tech_media_intelligence_aggregator_engine() {
+        let mut aggregator = TechMediaIntelligenceAggregatorEngine::new();
+        aggregator.ingest_feed_item("9to5Linux", "Linux Kernel 6.11 Released", "Kernel", 3);
+        aggregator.ingest_feed_item("Phoronix", "AMD EPYC Zen 5 Benchmarks", "Hardware", 2);
+        aggregator.ingest_feed_item("XDA", "Critical Zero-Day Vulnerability Discovered", "Security", 9);
+
+        let p_feeds = aggregator.filter_by_source("Phoronix");
+        assert_eq!(p_feeds.len(), 1);
+        assert_eq!(p_feeds[0].title, "AMD EPYC Zen 5 Benchmarks");
+
+        let critical = aggregator.get_critical_advisories(8);
+        assert_eq!(critical.len(), 1);
+        assert_eq!(critical[0].severity_score, 9);
+    }
 
     #[test]
     fn test_rocky_alma_enterprise_lifecycle_governor() {
