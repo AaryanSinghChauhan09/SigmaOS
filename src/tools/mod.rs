@@ -85,5 +85,7 @@ pub use mint_menu::{
 };
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
+pub mod regex;
 pub mod native_userland_replacements;
+pub use regex::{RegexMatch, SovereignRegexEngine};
 pub use native_userland_replacements::MasterNativeUserlandReplacements;

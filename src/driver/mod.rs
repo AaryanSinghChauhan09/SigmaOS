@@ -18,8 +18,11 @@ pub mod pci_enumeration;
 pub mod pods;
 pub mod rootkit;
 pub mod shims;
-pub mod gpu_framework;
-pub mod network_framework;
+pub mod bluez;
+pub mod cups;
+pub mod gpu;
+pub mod v4l2;
+pub mod wifi;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
