@@ -7,7 +7,6 @@ pub mod async_runtime;
 pub mod base64;
 pub mod bitmap;
 pub mod btreemap;
-pub mod buddy_allocator;
 pub mod collections;
 pub mod config_parser;
 #[macro_use]
@@ -16,10 +15,8 @@ pub mod conversion;
 pub mod custom_allocator;
 pub mod custom_string;
 pub mod env;
-pub mod error;
 pub mod ffi;
 pub mod fs;
-pub mod hash;
 pub mod hashmap;
 pub mod hashset;
 pub mod io;
@@ -30,7 +27,6 @@ pub mod math;
 pub mod math_ops;
 pub mod merkle;
 pub mod net;
-pub mod paging;
 pub mod path;
 pub mod process;
 pub mod rand;
@@ -43,16 +39,13 @@ pub mod sigmalib;
 pub mod slab;
 pub mod static_hashmap;
 pub mod store;
-pub mod string;
 pub mod string_ops;
 pub mod string_parser;
 pub mod time;
 pub mod time_impl;
 pub mod toml;
 pub mod utf8_utils;
-pub mod uuid;
 pub mod uvm;
-pub mod vec;
 
 // Re-exports
 pub use string::{String, ToString};
@@ -67,7 +60,6 @@ pub use std::vec::Vec;
 
 #[cfg(target_os = "none")]
 pub use vec::Vec;
-pub use uuid::Uuid;
 
 #[cfg(not(target_os = "none"))]
 pub use std::collections::HashMap;
@@ -78,3 +70,4 @@ pub use std::collections::HashSet;
 pub use hashmap::HashMap;
 #[cfg(target_os = "none")]
 pub use hashset::HashSet;
+pub use uuid::Uuid;

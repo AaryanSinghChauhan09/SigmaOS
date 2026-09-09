@@ -1361,8 +1361,11 @@ impl TerminalSession {
                     let _ = self
                         .multiplexer
                         .split_active_pane(PaneSplitDirection::Horizontal);
+                    i += 1;
                 }
-                _ => {}
+                _ => {
+                    i += 1;
+                }
             }
             Some(action)
         } else {

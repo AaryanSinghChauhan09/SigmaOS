@@ -67,10 +67,11 @@ impl<T> CircularDoublyLinkedList<T> {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchitectureClass {
-    X86,
-    X64,
-    Arm,
-    Cisc,
+    X86_32,
+    X86_64,
+    AArch64,
+    RiscV32,
+    RiscV64,
 }
 
 pub struct SystemThread {

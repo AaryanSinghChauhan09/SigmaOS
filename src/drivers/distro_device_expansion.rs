@@ -2244,17 +2244,13 @@ impl PeripheralDevice for NvmePCIeHostControllerDriver {
         "NVMe v1.4 High-Speed PCIe Controller Driver (Linux nvme / FreeBSD nvme)"
     }
 
-    fn device_category(&self) -> &'static str {
-        "Storage/NVMe"
-    }
-
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Gen5
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::Active;
+        self.power_state = PowerState::On;
         Ok(())
     }
 

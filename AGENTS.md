@@ -11,9 +11,15 @@ This document defines operational guidelines, security policies, and verificatio
    - Do NOT add external crates under `[dependencies]` in `Cargo.toml`.
    - Use `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`) and native `#![no_std]` structures.
 
-2. **Cross-OS Subsystem Interoperability:**
+2. **Cross-OS Subsystem Interoperability (Linux/BSD Distros):**
    - Every security or kernel component must maintain compatibility across Linux and BSD distribution modes (`LinuxArch`, `LinuxDebian`, `LinuxFedora`, `LinuxNix`, `FreeBsd`, `OpenBsd`, `NetBsd`, `DragonFlyBsd`, `SolarisIllumos`, etc.).
    - Sandboxing rules must bridge Linux Landlock v5 with FreeBSD Capsicum rights (`FreeBsdCapsicumDescriptorDelegate`) and OpenBSD pledge/unveil (`OpenBsdUnveilAuditor`).
+   - **Arch Linux Inspiration**: Follow rolling release model principles, PKGBUILD recipe patterns, and AUR-style user repositories.
+   - **Debian Inspiration**: Implement stable/unstable/testing release channels, deb package compatibility, and dpkg management patterns.
+   - **FreeBSD Inspiration**: Adopt CAM (Common Access Method) for device drivers, Jails for containerization, and PF firewall state management.
+   - **OpenBSD Inspiration**: Prioritize security-first development, pledge/unveil sandboxing, and KARL (Kernel Address Randomized Link).
+   - **Gentoo Inspiration**: Implement USE flags for conditional compilation, Portage-style dependency resolution, and ebuild recipe management.
+   - **NixOS Inspiration**: Adopt declarative system configuration, content-addressed storage, and atomic rollbacks.
 
 3. **Autonomous Verification:**
    - Always run `./run_sigma_tests.sh` and `pytest` after making modifications.
@@ -315,3 +321,37 @@ When integrating or refining Linux & BSD distro capability engines in `src/distr
 1. **Zero-Dependency Subsystem Parity:** Implement clean-room, `#![no_std]` Rust modules that absorb and emulate key distro innovations (e.g. Void Linux runit service supervision in `VoidRunitServiceSupervisorEngine`, Alpine Linux tmpfs apk volatile overlays in `AlpineApkVolatileOverlayEngine`, openSUSE YaST2/Snapper, NetBSD rump kernels, Ubuntu netplan/cloud-init, GNU Guix Shepherd/store derivations).
 2. **Re-export Invariants:** Always re-export newly implemented distro engines in `src/distro/mod.rs` and `src/lib.rs`.
 3. **Verification:** Validate all distro parity engines using standalone unit tests (`rustc --test --edition 2021`) and `./run_sigma_tests.sh`.
+
+## 21. Linux & BSD Distro Development Patterns
+
+### Governance Models (Inspired by Linux/BSD Distros)
+- **Arch Linux**: Simple, volunteer-based governance with minimal bureaucracy. Decisions made by contributors involved in specific projects.
+- **Debian**: Formal constitution with democratic voting, technical committee for conflicts, and clearly defined decision-making bodies.
+- **Ubuntu**: Code of Conduct foundation, council-based governance with defined escalation paths.
+- **FreeBSD**: Core team with committer hierarchy, emphasis on technical excellence and code quality.
+- **OpenBSD**: Dictator-for-life (Theo de Raadt) with focus on code correctness and security.
+
+### Release Management (Linux/BSD Patterns)
+- **Arch Linux**: Rolling release model with continuous updates
+- **Debian**: Stable/Testing/Unstable branches with strict freeze periods
+- **Fedora**: Rapid release cycle with feature-based releases
+- **FreeBSD**: Stable branches with quarterly releases and security branches
+- **OpenBSD**: 6-month release cycle with emphasis on stability
+
+### Package Management (Linux/BSD Patterns)
+- **Arch Linux**: PKGBUILD recipes, pacman database, AUR user repositories
+- **Debian**: deb packages, apt dependency resolution, dpkg database
+- **Fedora**: RPM packages, dnf package manager, Koji build system
+- **Gentoo**: ebuild recipes, Portage dependency resolution, USE flags
+- **FreeBSD**: ports collection, pkg binary packages, Poudriere build system
+- **OpenBSD**: ports collection, pkg_add package manager
+
+### Security Development (Linux/BSD Patterns)
+- **OpenBSD**: Default-deny security, pledge/unveil sandboxing, proactive security auditing
+- **FreeBSD**: Capsicum capability mode, Jails for isolation, TrustedBSD MAC framework
+- **Linux**: SELinux/AppArmor mandatory access control, seccomp syscall filtering, Landlock filesystem sandboxing
+
+### Code Quality Standards (Linux/BSD Patterns)
+- **FreeBSD**: KNF (Kernel Normal Form) coding style, strict code review process
+- **Linux**: Kernel coding style, mandatory Signed-off-by process, extensive review
+- **OpenBSD**: Emphasis on code clarity, security audits, minimal attack surface

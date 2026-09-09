@@ -376,8 +376,5 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub mod init {
-    pub mod systemd_init;
-}
 pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 pub use tools::native_userland_replacements::MasterNativeUserlandReplacements;

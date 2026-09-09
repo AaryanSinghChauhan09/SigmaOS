@@ -1,12 +1,28 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialOrd, Ord, Hash)]
 pub struct TaskId(pub u64);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+impl PartialEq for TaskId {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+impl Eq for TaskId {}
+
+#[derive(Debug, Clone, Copy)]
 pub struct Task {
     pub id: TaskId,
     pub vruntime: u64,
     pub priority: u32,
 }
+
+impl PartialEq for Task {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for Task {}
 
 impl Task {
     pub fn new(id: u64, vruntime: u64) -> Self {
