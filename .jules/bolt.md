@@ -29,3 +29,7 @@
 ## 2026-08-10 - Target-Conditional Collection Re-Exports for Zero-Allocation & Host Compilation
 **Learning:** Re-exporting custom `klib` collection structures (`klib::HashMap`, `klib::HashSet`) unconditionally under host targets (`target_os != "none"`) caused severe type inference errors and disabled standard compiler vectorization.
 **Action:** Conditionally re-export standard `std::collections` on hosted targets and custom `klib` collections on bare-metal (`target_os = "none"`), ensuring optimal compilation speed and full host test compatibility.
+
+## 2026-09-10 - Single-Pass Path Validation in Input Security
+**Learning:** Performing multiple sequential loops over byte slices (e.g. scanning first for NUL bytes then scanning again for `..` path traversal sequences in `validate_path`) doubles memory bandwidth requirements and cache references for every path checked by the security subsystem. Merging NUL byte checking and boundary-aware delimiter scanning into a single pass reduces slice iteration count by 50% without altering validation behavior.
+**Action:** When validating raw byte slices against multiple criteria, combine character and boundary checks into a single pass through the slice.
