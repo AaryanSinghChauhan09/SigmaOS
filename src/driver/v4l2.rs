@@ -1,6 +1,8 @@
 // V4L2 Webcam Driver Paradigm Implementation for SigmaOS
 // Provides zero-dependency Video4Linux2 capture buffer management and format negotiation.
 
+extern crate alloc;
+
 use alloc::string::String;
 use alloc::vec::Vec;
 

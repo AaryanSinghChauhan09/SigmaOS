@@ -1,6 +1,8 @@
 // BlueZ Bluetooth Driver & HCI Subsystem Implementation for SigmaOS
 // Provides zero-dependency HCI command packet routing, Bluetooth adapter management, and L2CAP channel parsing.
 
+extern crate alloc;
+
 use alloc::string::String;
 use alloc::vec::Vec;
 
