@@ -45,6 +45,7 @@ pub mod object;
 pub mod os_innovations;
 pub mod paging;
 pub mod performance;
+pub mod pipes;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
@@ -60,6 +61,7 @@ pub mod vmm_paging;
 pub use architecture::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
+pub use pipes::*;
 pub use policy_mechanism::*;
 #[allow(ambiguous_glob_reexports)]
 pub use structures::*;

@@ -2,12 +2,9 @@ name: SLSA Level 3 Provenance & Cosign Deployment CI
 
 on:
   push:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: [ "main", "master", "jules-*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   slsa-cosign-deployment:
@@ -29,6 +26,7 @@ jobs:
 
       - name: Verify SLSA Level 3 provenance & Cosign signing simulation
         run: |
+          mkdir -p build
           echo "Simulating SLSA Level 3 build provenance & Cosign binary signature verification..."
           rustc --edition=2021 --test src/arch_kernel_inspirations.rs -o build/test_slsa_cosign && ./build/test_slsa_cosign
           python -m pytest tests/test_integration_system.py -k test_cosign || true

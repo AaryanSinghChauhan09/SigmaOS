@@ -24,5 +24,6 @@ jobs:
 
       - name: Verify Debian Package Parity & Reproducibility Context
         run: |
-          cargo test --lib -- sigpkg::sovereign_sigpkg
-          cargo test --lib -- package::universal
+          mkdir -p build
+          ./run_sigma_tests.sh
+          ./run_sigma_tests.sh

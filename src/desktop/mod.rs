@@ -11,6 +11,7 @@ pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
+pub mod web_wasm_bridge;
 pub mod zenith_compositor;
 pub mod ultimate_distro_desktop;
 pub mod wayland_protocol;
@@ -20,13 +21,14 @@ pub use wayland_protocol::*;
 
 pub use sovereign_navigation_engine::*;
 
+pub use sovereign_navigation_engine::*;
+
 pub use ultimate_distro_desktop::{
     ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
     LuminaBsdDesktopEngine, SwayRegolithWmEngine, SwayWorkspaceContainerNode, ThunarCustomAction,
     Xfce418Engine,
 };
 
-pub mod web_wasm_bridge;
 pub use web_wasm_bridge::*;
 
 pub use mate_betsy::{

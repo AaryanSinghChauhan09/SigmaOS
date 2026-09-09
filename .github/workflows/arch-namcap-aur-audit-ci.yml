@@ -2,12 +2,9 @@ name: Arch Linux Namcap & AUR Security Audit CI
 
 on:
   push:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: [ "main", "master", "jules-*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   arch-namcap-aur-audit:
@@ -24,6 +21,7 @@ jobs:
 
       - name: Run Arch Linux PKGBUILD, AUR and pacman parity tests
         run: |
+          mkdir -p build
           echo "Running Arch Linux namcap & AUR audit tests..."
           rustc --edition=2021 --test src/distro/arch_parity.rs -o build/test_arch_namcap && ./build/test_arch_namcap
           rustc --edition=2021 --test src/package/aur_integration.rs -o build/test_aur_namcap && ./build/test_aur_namcap

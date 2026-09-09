@@ -1,7 +1,8 @@
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::format;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS
 /// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
 /// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.
@@ -412,7 +413,85 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+
+
+/// Kali Undercover Desktop Disguise Mode Switcher
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum UndercoverDisguiseTheme {
+    #[default]
+    DefaultKali,
+    Windows10Disguise,
+    Windows11Disguise,
+    MacOsDisguise,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct KaliUndercoverThemeMode {
+    pub active_theme: UndercoverDisguiseTheme,
+}
+
+impl KaliUndercoverThemeMode {
+    pub fn new() -> Self {
+        Self { active_theme: UndercoverDisguiseTheme::DefaultKali }
+    }
+
+    pub fn toggle_undercover(&mut self, target_theme: UndercoverDisguiseTheme) -> UndercoverDisguiseTheme {
+        if self.active_theme == target_theme {
+            self.active_theme = UndercoverDisguiseTheme::DefaultKali;
+        } else {
+            self.active_theme = target_theme;
+        }
+        self.active_theme
+    }
+}
+
+
+
+/// Kali Sqlmap SQL Injection Vulnerability Auditor
+#[derive(Debug, Clone, Default)]
+pub struct KaliSqlmapInjectionAuditor {
+    pub detected_vulnerabilities: Vec<String>,
+}
+
+impl KaliSqlmapInjectionAuditor {
+    pub fn new() -> Self {
+        Self { detected_vulnerabilities: Vec::new() }
+    }
+
+    pub fn audit_url(&mut self, url: &str, parameter_value: &str) -> bool {
+        let is_vulnerable = parameter_value.contains("UNION SELECT")
+            || parameter_value.contains("' OR '1'='1")
+            || parameter_value.contains("SLEEP(");
+        if is_vulnerable {
+            self.detected_vulnerabilities.push(format!("SQLi at {}: {}", url, parameter_value));
+        }
+        is_vulnerable
+    }
+}
+
+
+
+/// Kali John The Ripper Hash Cracker & Password Audit Engine
+#[derive(Debug, Clone, Default)]
+pub struct KaliJohnTheRipperCracker {
+    pub wordlist: Vec<String>,
+}
+
+impl KaliJohnTheRipperCracker {
+    pub fn new() -> Self {
+        let mut cracker = Self { wordlist: Vec::new() };
+        cracker.wordlist.push("123456".to_string());
+        cracker.wordlist.push("password".to_string());
+        cracker.wordlist.push("sovereign".to_string());
+        cracker
+    }
+
+    pub fn crack_simple_hash(&self, target_word: &str) -> Option<String> {
+        self.wordlist.iter().find(|w| *w == target_word).cloned()
+    }
+}
+
+
 mod tests {
 
     #[test]

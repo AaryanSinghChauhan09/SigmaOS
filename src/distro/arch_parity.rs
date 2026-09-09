@@ -416,152 +416,175 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
+
+
 // ============================================================================
-// Arch Linux Cleanroom Build Tools, Pkgctl Repo Manager, Archinstall & Wiki HUD
+// Arch Linux Parity Engines: devtools, pkgctl, archweb, archinstall, arch-wiki
 // ============================================================================
 
-/// Arch Linux `devtools` cleanroom chroot container builder (`arch-nspawn`, `extra-x86_64-build`)
+/// Arch Linux devtools Cleanroom Chroot Build Engine
 #[derive(Debug, Clone)]
+pub struct ArchChrootProfile {
+    pub target: String,
+    pub chroot_dir: String,
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct ArchCdevtoolsEngine {
-    pub chroot_path: String,
-    pub is_cleanroom_active: bool,
+    pub profiles: Vec<ArchChrootProfile>,
 }
 
 impl ArchCdevtoolsEngine {
-    pub fn new(chroot_path: &str) -> Self {
-        Self {
-            chroot_path: String::from(chroot_path),
-            is_cleanroom_active: true,
-        }
+    pub fn new() -> Self {
+        let mut engine = Self { profiles: Vec::new() };
+        engine.profiles.push(ArchChrootProfile { target: "extra-x86_64-build".to_string(), chroot_dir: "/var/lib/archbuild/extra-x86_64".to_string() });
+        engine.profiles.push(ArchChrootProfile { target: "multilib-build".to_string(), chroot_dir: "/var/lib/archbuild/multilib".to_string() });
+        engine
     }
 
-    pub fn build_in_clean_chroot(&self, pkg_name: &str) -> Result<String, &'static str> {
-        if !self.is_cleanroom_active {
-            return Err("Cleanroom chroot environment inactive");
+    pub fn build_in_chroot(&self, target: &str, pkg_name: &str) -> Result<String, &'static str> {
+        if let Some(prof) = self.profiles.iter().find(|p| p.target == target) {
+            Ok(format!("arch-nspawn {}/root pacman -Syu && build {}", prof.chroot_dir, pkg_name))
+        } else {
+            Err("ArchCdevtoolsEngine: Unknown build target profile")
         }
-        let mut artifact = String::from(pkg_name);
-        artifact.push_str("-1-x86_64.pkg.tar.zst");
-        Ok(artifact)
     }
 }
 
-impl Default for ArchCdevtoolsEngine {
-    fn default() -> Self {
-        Self::new("/var/lib/archbuild/extra-x86_64")
-    }
-}
-
-/// Arch Linux `pkgctl` package repository CLI manager
+/// Arch Linux pkgctl Packaging & Git Repo Engine
+#[derive(Debug, Clone)]
 pub struct ArchPkgctlEngine {
-    pub current_repo: String,
+    pub active_repos: Vec<String>,
 }
 
 impl ArchPkgctlEngine {
-    pub fn new(repo: &str) -> Self {
-        Self {
-            current_repo: String::from(repo),
-        }
+    pub fn new() -> Self {
+        Self { active_repos: Vec::new() }
     }
 
-    pub fn split_package_repo(&self, base_pkg: &str) -> String {
-        let mut git_repo = String::from("https://gitlab.archlinux.org/archlinux/packaging/packages/");
-        git_repo.push_str(base_pkg);
-        git_repo.push_str(".git");
-        git_repo
+    pub fn clone_pkg_repo(&mut self, pkg_name: &str) -> String {
+        let repo = format!("https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git", pkg_name);
+        self.active_repos.push(pkg_name.to_string());
+        repo
     }
-}
 
-impl Default for ArchPkgctlEngine {
-    fn default() -> Self {
-        Self::new("core")
+    pub fn release_package(&self, pkg_name: &str, tag: &str) -> String {
+        format!("pkgctl release --pkg {} --tag {}", pkg_name, tag)
     }
 }
 
-/// ArchWeb package query indexer and maintainer portal
+/// Arch Linux archweb Package Search Portal
+#[derive(Debug, Clone)]
+pub struct ArchwebEntry {
+    pub pkgname: String,
+    pub repo: String,
+    pub maintainer: String,
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct ArchArchwebEngine {
-    pub total_packages_indexed: AtomicUsize,
+    pub entries: Vec<ArchwebEntry>,
 }
 
 impl ArchArchwebEngine {
     pub fn new() -> Self {
-        Self {
-            total_packages_indexed: AtomicUsize::new(14500),
-        }
+        let mut engine = Self { entries: Vec::new() };
+        engine.entries.push(ArchwebEntry { pkgname: "linux".to_string(), repo: "core".to_string(), maintainer: "arch-kernel".to_string() });
+        engine.entries.push(ArchwebEntry { pkgname: "pacman".to_string(), repo: "core".to_string(), maintainer: "arch-pacman".to_string() });
+        engine
     }
 
-    pub fn query_package(&self, pkg_name: &str) -> Option<String> {
-        if pkg_name == "linux" || pkg_name == "pacman" || pkg_name == "glibc" {
-            let mut info = String::from("ArchWeb Package Entry: ");
-            info.push_str(pkg_name);
-            info.push_str(" [Core Repository / Active]");
-            return Some(info);
-        }
-        None
+    pub fn search(&self, pkg_name: &str) -> Vec<&ArchwebEntry> {
+        self.entries.iter().filter(|e| e.pkgname.contains(pkg_name)).collect()
     }
 }
 
-impl Default for ArchArchwebEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+/// Arch Linux archinstall Automated Declarative Installer Engine
+#[derive(Debug, Clone)]
+pub struct ArchinstallConfig {
+    pub disk_path: String,
+    pub profile: String,
+    pub username: String,
 }
 
-/// `archinstall`-style declarative scriptable installer
+#[derive(Debug, Clone, Default)]
 pub struct ArchArchinstallEngine {
-    pub disk_target: String,
-    pub filesystem_type: String,
+    pub config: Option<ArchinstallConfig>,
 }
 
 impl ArchArchinstallEngine {
-    pub fn new(disk: &str, fs: &str) -> Self {
-        Self {
-            disk_target: String::from(disk),
-            filesystem_type: String::from(fs),
-        }
+    pub fn new() -> Self {
+        Self { config: None }
     }
 
-    pub fn execute_installation_profile(&self, profile_json: &str) -> bool {
-        if profile_json.contains("btrfs") || profile_json.contains("ext4") || profile_json.contains("xfs") {
-            return true;
+    pub fn set_config(&mut self, disk: &str, profile: &str, user: &str) {
+        self.config = Some(ArchinstallConfig {
+            disk_path: disk.to_string(),
+            profile: profile.to_string(),
+            username: user.to_string(),
+        });
+    }
+
+    pub fn execute_installation(&self) -> Result<String, &'static str> {
+        if let Some(cfg) = &self.config {
+            Ok(format!("archinstall --disk {} --profile {} --user {}", cfg.disk_path, cfg.profile, cfg.username))
+        } else {
+            Err("Archinstall: Missing configuration")
         }
-        false
     }
 }
 
-impl Default for ArchArchinstallEngine {
-    fn default() -> Self {
-        Self::new("/dev/sda", "btrfs")
-    }
+/// Arch Linux arch-wiki-docs Offline Search Engine
+#[derive(Debug, Clone)]
+pub struct WikiArticle {
+    pub title: String,
+    pub content: String,
 }
 
-/// `arch-wiki-docs` offline documentation reader and search HUD
+#[derive(Debug, Clone, Default)]
 pub struct ArchWikiOfflineEngine {
-    pub cached_pages_count: usize,
+    pub articles: Vec<WikiArticle>,
 }
 
 impl ArchWikiOfflineEngine {
     pub fn new() -> Self {
-        Self {
-            cached_pages_count: 5200,
-        }
+        let mut wiki = Self { articles: Vec::new() };
+        wiki.articles.push(WikiArticle { title: "Arch_Linux".to_string(), content: "Arch Linux is an x86-64 general-purpose Linux distribution.".to_string() });
+        wiki.articles.push(WikiArticle { title: "Pacman".to_string(), content: "Pacman is the package manager for Arch Linux.".to_string() });
+        wiki
     }
 
-    pub fn search_offline_wiki(&self, topic: &str) -> String {
-        let mut result = String::from("ArchWiki Offline Entry for ");
-        result.push_str(topic);
-        result.push_str(": Complete configuration guidelines and troubleshooting steps.");
-        result
-    }
-}
-
-impl Default for ArchWikiOfflineEngine {
-    fn default() -> Self {
-        Self::new()
+    pub fn search(&self, query: &str) -> Vec<&WikiArticle> {
+        let q = query.to_lowercase();
+        self.articles.iter().filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)).collect()
     }
 }
 
-#[cfg(test)]
 mod tests {
+    #[test]
+    fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
+        let devtools = ArchCdevtoolsEngine::new();
+        let cmd = devtools.build_in_chroot("extra-x86_64-build", "curl").unwrap();
+        assert!(cmd.contains("arch-nspawn"));
+
+        let mut pkgctl = ArchPkgctlEngine::new();
+        let repo_url = pkgctl.clone_pkg_repo("nginx");
+        assert!(repo_url.contains("gitlab.archlinux.org"));
+
+        let archweb = ArchArchwebEngine::new();
+        let res = archweb.search("pacman");
+        assert_eq!(res.len(), 1);
+
+        let mut installer = ArchArchinstallEngine::new();
+        installer.set_config("/dev/nvme0n1", "desktop", "sovereign");
+        let inst_cmd = installer.execute_installation().unwrap();
+        assert!(inst_cmd.contains("archinstall"));
+
+        let wiki = ArchWikiOfflineEngine::new();
+        let articles = wiki.search("pacman");
+        assert_eq!(articles.len(), 1);
+    }
+
     use super::*;
 
     #[test]
@@ -801,4 +824,7 @@ sha256sums=('SKIP')
         let top = reflector.rank_top_mirrors();
         assert_eq!(top[0].1, 12);
     }
+
+
+
 }

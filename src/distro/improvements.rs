@@ -858,8 +858,148 @@ impl SigmaDistroEngine {
 
 // Bring alloc into scope for format! and vec!
 
-#[cfg(test_disabled)]
+
+
+/// Gentoo emerge CLI & Portage World File Manager Engine
+#[derive(Debug, Clone, Default)]
+pub struct GentooEmergeCliEngine {
+    pub world_packages: Vec<String>,
+    pub pending_etc_updates: Vec<String>,
+}
+
+impl GentooEmergeCliEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            world_packages: Vec::new(),
+            pending_etc_updates: Vec::new(),
+        };
+        engine.world_packages.push("sys-apps/portage".to_string());
+        engine.world_packages.push("app-shells/bash".to_string());
+        engine
+    }
+
+    pub fn add_to_world(&mut self, atom: &str) {
+        if !self.world_packages.contains(&atom.to_string()) {
+            self.world_packages.push(atom.to_string());
+        }
+    }
+
+    pub fn emerge_world_rebuild(&self) -> String {
+        format!("emerge --ask --update --deep --changed-use @world ({} atoms)", self.world_packages.len())
+    }
+
+    pub fn run_etc_update(&mut self) -> usize {
+        let count = self.pending_etc_updates.len();
+        self.pending_etc_updates.clear();
+        count
+    }
+}
+
+
+
+/// Gentoo Layman Overlay Repository Manager
+#[derive(Debug, Clone)]
+pub struct LaymanOverlay {
+    pub name: String,
+    pub git_url: String,
+    pub priority: i32,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct GentooLaymanOverlayEngine {
+    pub registered_overlays: Vec<LaymanOverlay>,
+}
+
+impl GentooLaymanOverlayEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { registered_overlays: Vec::new() };
+        engine.add_overlay("guru", "https://github.com/gentoo/guru.git", 50);
+        engine
+    }
+
+    pub fn add_overlay(&mut self, name: &str, url: &str, priority: i32) {
+        self.registered_overlays.push(LaymanOverlay {
+            name: name.to_string(),
+            git_url: url.to_string(),
+            priority,
+        });
+    }
+
+    pub fn sync_all_overlays(&self) -> usize {
+        self.registered_overlays.len()
+    }
+}
+
+
+
+/// Gentoo CFLAGS Optimization & make.conf Tuner
+#[derive(Debug, Clone)]
+pub struct GentooGccCflagsTunerEngine {
+    pub march: String,
+    pub opt_level: String,
+    pub lto_enabled: bool,
+    pub extra_flags: Vec<String>,
+}
+
+impl GentooGccCflagsTunerEngine {
+    pub fn new() -> Self {
+        Self {
+            march: "native".to_string(),
+            opt_level: "-O3".to_string(),
+            lto_enabled: true,
+            extra_flags: vec!["-pipe".to_string(), "-fomit-frame-pointer".to_string()],
+        }
+    }
+
+    pub fn generate_cflags(&self) -> String {
+        let mut flags = format!("-march={} {}", self.march, self.opt_level);
+        if self.lto_enabled {
+            flags.push_str(" -flto");
+        }
+        for extra in &self.extra_flags {
+            flags.push(' ');
+            flags.push_str(extra);
+        }
+        flags
+    }
+}
+
+impl Default for GentooGccCflagsTunerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
 mod tests {
+
+    #[test]
+    fn test_gentoo_gcc_cflags_tuner_engine() {
+        let tuner = GentooGccCflagsTunerEngine::new();
+        let flags = tuner.generate_cflags();
+        assert!(flags.contains("-march=native"));
+        assert!(flags.contains("-flto"));
+    }
+
+
+    #[test]
+    fn test_gentoo_layman_overlay_engine() {
+        let mut layman = GentooLaymanOverlayEngine::new();
+        assert_eq!(layman.registered_overlays.len(), 1);
+        layman.add_overlay("science", "https://github.com/gentoo/science.git", 10);
+        assert_eq!(layman.sync_all_overlays(), 2);
+    }
+
+
+    #[test]
+    fn test_gentoo_emerge_cli_engine() {
+        let mut emerge = GentooEmergeCliEngine::new();
+        assert_eq!(emerge.world_packages.len(), 2);
+        emerge.add_to_world("net-misc/curl");
+        assert_eq!(emerge.world_packages.len(), 3);
+        assert!(emerge.emerge_world_rebuild().contains("3 atoms"));
+    }
+
     use super::*;
 
     #[test]

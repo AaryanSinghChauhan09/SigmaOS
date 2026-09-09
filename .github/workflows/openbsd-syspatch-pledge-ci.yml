@@ -2,12 +2,9 @@ name: OpenBSD Syspatch & Pledge/Unveil CI
 
 on:
   push:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: [ "main", "master", "jules-*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   openbsd-syspatch-pledge:
@@ -24,5 +21,6 @@ jobs:
 
       - name: Test OpenBSD syspatch security & pledge/unveil compliance
         run: |
+          mkdir -p build
           echo "Executing OpenBSD syspatch & pledge/unveil sandbox checks..."
           rustc --edition=2021 --test src/distro/missing_distro_innovations.rs --cfg 'feature="standalone_test"' -o build/test_openbsd_pledge && ./build/test_openbsd_pledge

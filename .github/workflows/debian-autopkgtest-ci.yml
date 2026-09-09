@@ -2,12 +2,9 @@ name: Debian Autopkgtest & Sbuild CI
 
 on:
   push:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: [ "main", "master", "jules-*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   debian-autopkgtest:
@@ -29,6 +26,7 @@ jobs:
 
       - name: Simulate Debian autopkgtest and sbuild package build
         run: |
+          mkdir -p build
           echo "Simulating Debian autopkgtest and sbuild cleanroom environment..."
           python -m pytest tests/test_unit_core.py -k test_debian_sbuild_package_build || true
           rustc --edition=2021 --test --cfg 'feature="standalone_test"' src/package/universal.rs -o build/test_deb_autopkgtest && ./build/test_deb_autopkgtest

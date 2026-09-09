@@ -25,5 +25,5 @@ jobs:
       - name: Test OpenBSD Pledge & Unveil Submodule
         run: |
           mkdir -p build
-          mkdir -p build && rustc --test src/security/unveil.rs --edition=2021 -o build/unveil_test
+          rustc --test src/security/unveil.rs --edition=2021 -o build/unveil_test
           ./build/unveil_test

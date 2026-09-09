@@ -2,12 +2,9 @@ name: Alpine Abuild & APK Security CI
 
 on:
   push:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: [ "main", "master", "jules-*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   alpine-abuild-apk:
@@ -24,5 +21,6 @@ jobs:
 
       - name: Test Alpine abuild fast initramfs & APK world engine
         run: |
+          mkdir -p build
           echo "Testing Alpine Linux abuild initramfs and APK security..."
           rustc --edition=2021 --test src/distro/missing_distro_innovations.rs --cfg 'feature="standalone_test"' -o build/test_alpine_abuild && ./build/test_alpine_abuild

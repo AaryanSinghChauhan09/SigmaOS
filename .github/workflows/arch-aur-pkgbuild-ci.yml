@@ -23,4 +23,5 @@ jobs:
 
       - name: Verify Arch Pacman & Contrib Engine
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh

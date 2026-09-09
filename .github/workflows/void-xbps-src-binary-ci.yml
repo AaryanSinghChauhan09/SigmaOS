@@ -25,4 +25,4 @@ jobs:
       - name: Test Universal Package Importer
         run: |
           mkdir -p build
-          mkdir -p build && rustc --test src/package/sigma_pkg.rs --edition=2021 -o build/sigma_pkg_test && ./build/sigma_pkg_test
+          rustc --test src/package/sigma_pkg.rs --edition=2021 -o build/sigma_pkg_test && ./build/sigma_pkg_test

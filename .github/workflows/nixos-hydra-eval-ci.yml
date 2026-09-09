@@ -2,12 +2,9 @@ name: NixOS Hydra Evaluation & Flake CI
 
 on:
   push:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: [ "main", "master", "jules-*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   nixos-hydra-eval:
@@ -24,6 +21,7 @@ jobs:
 
       - name: Evaluate NixOS Hydra declarative state and CAS store
         run: |
+          mkdir -p build
           echo "Evaluating NixOS Hydra declarative state and hermetic CAS store..."
           rustc --edition=2021 --test src/distro/sovereign_nextgen_distro_leap.rs -o build/test_nix_hydra && ./build/test_nix_hydra
           rustc --edition=2021 --test src/distro/wiki_ideas_implementation.rs -o build/test_nix_wiki && ./build/test_nix_wiki

@@ -2,12 +2,9 @@ name: FreeBSD Poudriere Ports & Jails CI
 
 on:
   push:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches: [ "main", "master", "jules-*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   freebsd-poudriere-ports:
@@ -24,5 +21,6 @@ jobs:
 
       - name: Test FreeBSD Poudriere & Capsicum security integration
         run: |
+          mkdir -p build
           echo "Executing FreeBSD poudriere & Capsicum security test matrix..."
           rustc --edition=2021 --test --cfg 'feature="standalone_test"' src/distro/linux_bsd_inspirations.rs -o build/test_freebsd_poudriere && ./build/test_freebsd_poudriere
