@@ -37,6 +37,7 @@ SigmaOS is the world’s first **sovereign operating system**, engineered from t
 - [Security Architecture](docs/security.md)
 - [Package Management](docs/package-manager.md)
 - [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
+- [Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia (V23)](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V23.md)
 
 ---
 
