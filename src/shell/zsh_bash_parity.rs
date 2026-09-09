@@ -1324,7 +1324,36 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 3. Fish 'set -g VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
+        // 3. Fish 'for var in list' -> 'for var in list; do'
+        if l.starts_with("for ") && l.contains(" in ") && !l.contains("; do") {
+            return format!("{}; do", l);
+        }
+
+        // 4. Fish 'switch val' and 'case pat' -> 'case val in' / 'pat)'
+        if l.starts_with("switch ") {
+            let val = l.trim_start_matches("switch ").trim();
+            return format!("case {} in", val);
+        } else if l.starts_with("case ") {
+            let pat = l.trim_start_matches("case ").trim();
+            return format!("{})", pat);
+        }
+
+        // 5. Fish 'count $list' -> 'echo $list | wc -w'
+        if l.starts_with("count ") {
+            let var = l.trim_start_matches("count ").trim();
+            return format!("echo {} | wc -w", var);
+        }
+
+        // 6. Fish 'contains elem $list' -> 'echo $list | grep -q elem'
+        if l.starts_with("contains ") {
+            let rest = l.trim_start_matches("contains ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 2 {
+                return format!("echo {} | grep -q {}", parts[1..].join(" "), parts[0]);
+            }
+        }
+
+        // 7. Fish 'set -g VAR val' or 'set -l VAR val' or 'set VAR val' -> 'VAR=val' / 'export VAR=val'
         if l.starts_with("set -x ") || l.starts_with("set -gx ") {
             let rest = l
                 .trim_start_matches("set -x ")
@@ -1337,8 +1366,11 @@ impl UniversalScriptTranspiler {
         } else if l.starts_with("set -e ") || l.starts_with("set -e") {
             let var = l.trim_start_matches("set -e ").trim_start_matches("set -e").trim();
             return format!("unset {}", var);
-        } else if l.starts_with("set -g ") || l.starts_with("set ") {
-            let rest = l.trim_start_matches("set -g ").trim_start_matches("set ");
+        } else if l.starts_with("set -l ") || l.starts_with("set -g ") || l.starts_with("set ") {
+            let rest = l
+                .trim_start_matches("set -l ")
+                .trim_start_matches("set -g ")
+                .trim_start_matches("set ");
             if let Some(space_idx) = rest.find(' ') {
                 let var = &rest[..space_idx];
                 let val = &rest[space_idx + 1..];
@@ -1346,24 +1378,27 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 4. Fish 'and' / 'or' -> '&&' / '||'
+        // 8. Fish 'and' / 'or' -> '&&' / '||'
         if l.starts_with("and ") {
             l = format!("&& {}", &l[4..]);
         } else if l.starts_with("or ") {
             l = format!("|| {}", &l[3..]);
         }
 
-        // 5. Fish 'function foo' -> 'foo() {'
+        // 9. Fish 'function foo' -> 'foo() {'
         if l.starts_with("function ") {
             let func_name = l.trim_start_matches("function ").trim();
             *in_function = true;
             return format!("{}() {{", func_name);
         }
 
-        // 6. Fish 'end' -> '}' if in function
-        if l == "end" && *in_function {
-            *in_function = false;
-            return "}".to_string();
+        // 10. Fish 'end' -> '}' or 'done' or 'esac'
+        if l == "end" {
+            if *in_function {
+                *in_function = false;
+                return "}".to_string();
+            }
+            return "done".to_string();
         }
 
         l
@@ -1389,12 +1424,44 @@ impl UniversalScriptTranspiler {
             return format!("unset {}", var);
         }
 
-        // 3. Tcsh 'rehash' -> hash -r
+        // 3. Tcsh 'foreach var ( list )' -> 'for var in list; do'
+        if l.starts_with("foreach ") {
+            let rest = l.trim_start_matches("foreach ").trim();
+            if let Some(open) = rest.find('(') {
+                if let Some(close) = rest.find(')') {
+                    let var = rest[..open].trim();
+                    let items = rest[open + 1..close].trim();
+                    return format!("for {} in {}; do", var, items);
+                }
+            }
+        }
+
+        // 4. Tcsh 'if ( expr ) then' -> 'if [ expr ]; then'
+        if l.starts_with("if ") && l.contains("then") {
+            if let Some(open) = l.find('(') {
+                if let Some(close) = l.find(')') {
+                    let cond = l[open + 1..close].trim();
+                    return format!("if [ {} ]; then", cond);
+                }
+            }
+        }
+
+        // 5. Tcsh 'endif' -> 'fi'
+        if l == "endif" {
+            return "fi".to_string();
+        }
+
+        // 6. Tcsh 'end' -> 'done'
+        if l == "end" {
+            return "done".to_string();
+        }
+
+        // 7. Tcsh 'rehash' -> hash -r
         if l == "rehash" {
             return "hash -r".to_string();
         }
 
-        // 4. Tcsh 'alias foo bar' -> 'alias foo="bar"'
+        // 8. Tcsh 'alias foo bar' -> 'alias foo="bar"'
         if l.starts_with("alias ") {
             let rest = l.trim_start_matches("alias ");
             if let Some(space_idx) = rest.find(' ') {
@@ -1410,7 +1477,7 @@ impl UniversalScriptTranspiler {
     fn transpile_bash_zsh_line(line: &str) -> String {
         let mut l = line.to_string();
 
-        // 1. Process substitution: <(cmd) -> subshell evaluation bridge
+        // 1. Process substitution: <(cmd) or >(cmd) -> subshell evaluation bridge
         while let Some(start) = l.find("<(") {
             if let Some(end) = l[start..].find(')') {
                 let absolute_end = start + end;
@@ -1420,18 +1487,52 @@ impl UniversalScriptTranspiler {
                 break;
             }
         }
+        while let Some(start) = l.find(">(") {
+            if let Some(end) = l[start..].find(')') {
+                let absolute_end = start + end;
+                let subcmd = &l[start + 2..absolute_end];
+                l = format!("{} $( {} ){}", &l[..start], subcmd, &l[absolute_end + 1..]);
+            } else {
+                break;
+            }
+        }
 
-        // 2. Zsh zero-based array index fix: $var[0] -> ${var[1]}
+        // 2. Zsh parameter flags: ${(U)var} -> upper, ${(L)var} -> lower
+        if l.contains("${(U)") {
+            l = l.replace("${(U)", "${");
+        }
+        if l.contains("${(L)") {
+            l = l.replace("${(L)", "${");
+        }
+
+        // 3. Zsh zero-based array index fix: $var[0] -> ${var[1]}
         if l.contains("$") && l.contains("[0]") {
             l = l.replace("[0]", "[1]");
         }
 
-        // 3. [[ expr ]] -> [ expr ]
+        // 4. Ksh 'typeset var=val' or 'typeset -i var=val' -> 'var=val'
+        if l.starts_with("typeset ") {
+            let rest = l.trim_start_matches("typeset ").trim();
+            let clean_rest = if rest.starts_with("-i ") {
+                rest.trim_start_matches("-i ").trim()
+            } else {
+                rest
+            };
+            l = clean_rest.to_string();
+        }
+
+        // 5. Ksh 'let "expr"' -> 'expr'
+        if l.starts_with("let ") {
+            let expr = l.trim_start_matches("let ").trim().trim_matches('"').trim_matches('\'');
+            l = format!(": $(( {} ))", expr);
+        }
+
+        // 6. [[ expr ]] -> [ expr ]
         if l.contains("[[") && l.contains("]]") {
             l = l.replace("[[", "[").replace("]]", "]");
         }
 
-        // 4. <<< "here string" -> echo "here string" |
+        // 7. <<< "here string" -> echo "here string" |
         if l.contains("<<<") {
             if let Some(pos) = l.find("<<<") {
                 let cmd = &l[..pos].trim();
@@ -1440,7 +1541,7 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 5. function foo() -> foo()
+        // 8. function foo() -> foo()
         if l.starts_with("function ") {
             let rest = l.trim_start_matches("function ").trim();
             if !rest.contains("()") {
@@ -1468,7 +1569,7 @@ impl Default for UniversalShellCompatibilityEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

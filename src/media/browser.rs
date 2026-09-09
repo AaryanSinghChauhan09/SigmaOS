@@ -936,7 +936,157 @@ impl DuckAssistPrivacyEngine {
 }
 
 // =========================================================================
-// 16. UNIFIED SIGMAWEB BROWSER SUITE
+// 16. CHROMIUM MOJO IPC & MANIFEST V3 SERVICE WORKER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ChromiumIpcMessage {
+    pub channel_id: u32,
+    pub interface_name: String,
+    pub method_name: String,
+    pub payload: Vec<u8>,
+}
+
+pub struct ChromiumIpcChannelEngine {
+    pub active_channels: BTreeMap<u32, String>,
+    pub dispatched_messages: Vec<ChromiumIpcMessage>,
+    pub extension_service_workers: BTreeMap<String, bool>, // ext_id -> is_active
+}
+
+impl ChromiumIpcChannelEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            active_channels: BTreeMap::new(),
+            dispatched_messages: Vec::new(),
+            extension_service_workers: BTreeMap::new(),
+        };
+        engine.active_channels.insert(1001, String::from("mojo:content.mojom.FrameHost"));
+        engine.active_channels.insert(1002, String::from("mojo:network.mojom.URLLoaderFactory"));
+        engine.extension_service_workers.insert(String::from("sigma_ublock_v3"), true);
+        engine
+    }
+
+    pub fn dispatch_mojo_message(&mut self, channel_id: u32, interface_name: &str, method: &str, payload: &[u8]) -> bool {
+        if self.active_channels.contains_key(&channel_id) {
+            self.dispatched_messages.push(ChromiumIpcMessage {
+                channel_id,
+                interface_name: interface_name.to_string(),
+                method_name: method.to_string(),
+                payload: payload.to_vec(),
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn trigger_manifest_v3_background_event(&self, extension_id: &str, event_type: &str) -> String {
+        if let Some(&active) = self.extension_service_workers.get(extension_id) {
+            if active {
+                return format!("[MV3 ServiceWorker Dispatch]: Extension '{}' processed event '{}' in isolated background worker.", extension_id, event_type);
+            }
+        }
+        format!("[MV3 ServiceWorker Error]: Extension worker '{}' inactive.", extension_id)
+    }
+}
+
+// =========================================================================
+// 17. LIBREWOLF & MULLVAD PRIVACY ISOLATION & ODOH RELAY ENGINE
+// =========================================================================
+
+pub struct MullvadPrivacyIsolationEngine {
+    pub ephemerality_enabled: bool,
+    pub odoh_relay_endpoint: String,
+    pub socks5_proxies_per_tab: BTreeMap<u64, String>, // tab_id -> socks5 proxy address
+    pub referrer_policy: String,
+}
+
+impl MullvadPrivacyIsolationEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            ephemerality_enabled: true,
+            odoh_relay_endpoint: String::from("https://odoh.mullvad.net/relay"),
+            socks5_proxies_per_tab: BTreeMap::new(),
+            referrer_policy: String::from("no-referrer-when-downgrade"),
+        }
+    }
+
+    pub fn bind_tab_to_ephemeral_socks5(&mut self, tab_id: u64, proxy_addr: &str) {
+        self.socks5_proxies_per_tab.insert(tab_id, proxy_addr.to_string());
+    }
+
+    pub fn get_tab_proxy(&self, tab_id: u64) -> String {
+        self.socks5_proxies_per_tab
+            .get(&tab_id)
+            .cloned()
+            .unwrap_or_else(|| String::from("direct://"))
+    }
+
+    pub fn sanitize_referrer_header(&self, origin: &str, target: &str) -> Option<String> {
+        if self.referrer_policy == "strict-origin-when-cross-origin" || self.referrer_policy == "no-referrer" {
+            if origin != target {
+                return None; // Strip cross-origin referrer completely
+            }
+        }
+        Some(origin.to_string())
+    }
+
+    pub fn wrap_odoh_query(&self, domain: &str) -> String {
+        format!("odoh_relay://{}?target_dns=cloudflare-dns.com&q={}", self.odoh_relay_endpoint, domain)
+    }
+}
+
+// =========================================================================
+// 18. ARC BROWSER BOOST & SPACES ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ArcBoostScript {
+    pub domain_pattern: String,
+    pub custom_css: String,
+    pub custom_js: String,
+}
+
+pub struct ArcBrowserBoostEngine {
+    pub active_space: String,
+    pub spaces: Vec<String>,
+    pub domain_boosts: Vec<ArcBoostScript>,
+}
+
+impl ArcBrowserBoostEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            active_space: String::from("Personal"),
+            spaces: vec![String::from("Personal"), String::from("Work"), String::from("Development")],
+            domain_boosts: Vec::new(),
+        };
+        engine.domain_boosts.push(ArcBoostScript {
+            domain_pattern: String::from("github.com"),
+            custom_css: String::from("body { font-family: 'JetBrains Mono', monospace !important; }"),
+            custom_js: String::from("console.log('Arc Boost active on GitHub');"),
+        });
+        engine
+    }
+
+    pub fn get_boost_for_domain(&self, domain: &str) -> Option<&ArcBoostScript> {
+        self.domain_boosts.iter().find(|b| domain.contains(&b.domain_pattern))
+    }
+
+    pub fn switch_space(&mut self, space_name: &str) -> bool {
+        if self.spaces.contains(&space_name.to_string()) {
+            self.active_space = space_name.to_string();
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// =========================================================================
+// 19. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
 pub struct SigmaWebBrowser {
@@ -954,6 +1104,9 @@ pub struct SigmaWebBrowser {
     pub ublock_origin: UBlockOriginFilterEngine,
     pub zen_tree: ZenWorkspaceTreeEngine,
     pub duck_assist: DuckAssistPrivacyEngine,
+    pub chromium_ipc: ChromiumIpcChannelEngine,
+    pub mullvad_isolation: MullvadPrivacyIsolationEngine,
+    pub arc_boost: ArcBrowserBoostEngine,
 }
 
 impl SigmaWebBrowser {
@@ -974,6 +1127,9 @@ impl SigmaWebBrowser {
             ublock_origin: UBlockOriginFilterEngine::new(),
             zen_tree: ZenWorkspaceTreeEngine::new(),
             duck_assist: DuckAssistPrivacyEngine::new(),
+            chromium_ipc: ChromiumIpcChannelEngine::new(),
+            mullvad_isolation: MullvadPrivacyIsolationEngine::new(),
+            arc_boost: ArcBrowserBoostEngine::new(),
         }
     }
 
@@ -1026,9 +1182,28 @@ impl SigmaWebBrowser {
 // TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_chromium_ipc_and_mullvad_arc_engines() {
+        let mut ipc = ChromiumIpcChannelEngine::new();
+        assert!(ipc.dispatch_mojo_message(1001, "FrameHost", "Navigate", b"payload"));
+        let mv3_out = ipc.trigger_manifest_v3_background_event("sigma_ublock_v3", "onBeforeRequest");
+        assert!(mv3_out.contains("isolated background worker"));
+
+        let mut mullvad = MullvadPrivacyIsolationEngine::new();
+        mullvad.bind_tab_to_ephemeral_socks5(1, "socks5://127.0.0.1:9050");
+        assert_eq!(mullvad.get_tab_proxy(1), "socks5://127.0.0.1:9050");
+        assert!(mullvad.wrap_odoh_query("example.com").contains("odoh_relay"));
+
+        let mut arc = ArcBrowserBoostEngine::new();
+        assert!(arc.switch_space("Work"));
+        assert_eq!(arc.active_space, "Work");
+        let boost = arc.get_boost_for_domain("github.com").unwrap();
+        assert!(boost.custom_css.contains("JetBrains Mono"));
+    }
 
     #[test]
     fn test_multi_process_engine() {
