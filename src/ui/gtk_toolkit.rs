@@ -84,10 +84,30 @@ pub struct GtkCssProvider {
 
 impl GtkCssProvider {
     pub fn new() -> Self {
-        Self {
+        let mut provider = Self {
             rules: Vec::new(),
             active_color_scheme: AdwColorScheme::Default,
-        }
+        };
+        // Programmatic default styling rules eliminating CSS file dependencies
+        let mut default_window = BTreeMap::new();
+        default_window.insert("background-color".to_string(), "#1e1e2e".to_string());
+        default_window.insert("color".to_string(), "#cdd6f4".to_string());
+        default_window.insert("border-radius".to_string(), "12px".to_string());
+
+        let mut default_row = BTreeMap::new();
+        default_row.insert("padding".to_string(), "12px".to_string());
+        default_row.insert("background-color".to_string(), "#313244".to_string());
+
+        provider.rules.push(GtkCssRule {
+            selector: "window.main".to_string(),
+            properties: default_window,
+        });
+        provider.rules.push(GtkCssRule {
+            selector: ".adw-action-row".to_string(),
+            properties: default_row,
+        });
+
+        provider
     }
 
     pub fn set_color_scheme(&mut self, scheme: AdwColorScheme) {

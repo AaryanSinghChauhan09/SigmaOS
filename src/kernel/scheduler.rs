@@ -316,15 +316,6 @@ impl Scheduler {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TaskId(pub u64);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Task {
-    pub id: TaskId,
-    pub vruntime: u64,
-    pub priority: u32,
-}
 
 /// CFS Scheduler implementation
 pub struct CfsScheduler {
@@ -385,10 +376,7 @@ impl CfsScheduler {
     fn sort_tasks(&mut self) {
         for i in 1..self.task_count {
             let mut j = i;
-            while j > 0
-                && self.tasks[j - 1].as_ref().map_or(u64::MAX, |t| t.vruntime)
-                    > self.tasks[j].as_ref().map_or(u64::MAX, |t| t.vruntime)
-            {
+            while j > 0 && self.tasks[j - 1].as_ref().unwrap().vruntime > self.tasks[j].as_ref().unwrap().vruntime {
                 self.tasks.swap(j - 1, j);
                 j -= 1;
             }
