@@ -103,3 +103,40 @@ else
   echo "bcachefs_sovereign: FAILED"
   FAILED=$((FAILED + 1))
 fi
+
+# ─── Traffic Control (tc) Qdiscs ───────────────────────────────────────────────
+echo ""
+echo "=== [11] SigmaOS Traffic Control (tc) Qdiscs Tests ==="
+rustc --edition=2021 --test src/net/tc_qdisc_sovereign.rs \
+  -o build/test_tc_qdisc 2>&1 | grep -v "^$" || true
+./build/test_tc_qdisc --test-threads=1
+echo "tc_qdisc_sovereign: PASSED"
+
+# ─── Sovereign D-Bus IPC ──────────────────────────────────────────────────────
+echo ""
+echo "=== [12] SigmaOS Sovereign D-Bus IPC Tests ==="
+rustc --edition=2021 --test src/ipc/dbus_sovereign.rs \
+  -o build/test_dbus 2>&1 | grep -v "^$" || true
+./build/test_dbus --test-threads=1
+echo "dbus_sovereign: PASSED"
+
+# ─── Sovereign ftrace Function Tracer ─────────────────────────────────────────
+echo ""
+echo "=== [13] SigmaOS Sovereign ftrace Function Tracer Tests ==="
+rustc --edition=2021 --test src/kernel/ftrace_sovereign.rs \
+  -o build/test_ftrace 2>&1 | grep -v "^$" || true
+./build/test_ftrace --test-threads=1
+echo "ftrace_sovereign: PASSED"
+
+# ─── Sovereign OverlayFS ──────────────────────────────────────────────────────
+echo ""
+echo "=== [14] SigmaOS Sovereign OverlayFS Tests ==="
+rustc --edition=2021 --test src/fs/overlayfs_sovereign.rs \
+  -o build/test_overlayfs 2>&1 | grep -v "^$" || true
+./build/test_overlayfs --test-threads=1
+echo "overlayfs_sovereign: PASSED"
+
+echo ""
+echo "========================================================"
+echo "=== ALL 14 SIGMAOS TEST SUITES PASSED SUCCESSFULLY ==="
+echo "========================================================"

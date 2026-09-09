@@ -39,3 +39,6 @@ pub use network_syscalls::{
     CLONE_NEWNET, AF_INET, AF_INET6, AF_UNIX, SOCK_STREAM, SOCK_DGRAM, SOCK_RAW,
     IPPROTO_TCP, IPPROTO_UDP, IPPROTO_IP,
 };
+
+pub mod tc_qdisc_sovereign;
+pub use tc_qdisc_sovereign::{TbfQdisc, PrioQdisc, HtbQdisc, HtbClass, FqCodelQdisc, Packet as QdiscPacket};

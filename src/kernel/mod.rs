@@ -102,3 +102,6 @@ pub mod cgroups_v2_sovereign;
 pub use cgroups_v2_sovereign::{SovereignCgroupsV2Manager, CgroupController, CgroupNode, CpuAccounting, MemoryAccounting, PidAccounting};
 pub mod bsd_jails_sovereign;
 pub use bsd_jails_sovereign::{SovereignBsdJailManager, SovereignJail, JailState, JailPermissions, JailNetworkConfig, JailProcess};
+
+pub mod ftrace_sovereign;
+pub use ftrace_sovereign::{SovereignFtracer, TraceEvent, TraceEventKind, TraceRingBuffer, TracerFilter, LatencyHistogram};

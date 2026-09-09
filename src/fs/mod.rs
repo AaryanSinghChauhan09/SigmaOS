@@ -39,3 +39,6 @@ pub use xfs::{
 
 pub mod bcachefs_sovereign;
 pub use bcachefs_sovereign::{SovereignBcachefsVolume, BcachefsInode, BcachefsExtent, BcachefsSnapshot, ChecksumAlgorithm, CompressionType, sovereign_crc32c};
+
+pub mod overlayfs_sovereign;
+pub use overlayfs_sovereign::{SovereignOverlayFs, OverlayLayer, OverlayEntry, OverlayEntryKind};

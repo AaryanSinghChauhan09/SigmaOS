@@ -50,3 +50,6 @@ pub use ipc_namespace::{
     SharedMemoryObject, IpcNamespaceStats, MessageQueueId, SemaphoreId, SharedMemoryId,
     IpcObjectId,
 };
+
+pub mod dbus_sovereign;
+pub use dbus_sovereign::{SovereignDbusBus, DbusMessage, DbusMessageType, DbusValue, DbusMatchRule, DbusService, DbusName};
