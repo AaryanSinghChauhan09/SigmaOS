@@ -18,6 +18,7 @@ pub mod warpinator_lan_sharing;
 pub mod mint_backup_manager;
 pub mod mint_system;
 pub mod mint_desktop;
+pub mod mint_menu;
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
@@ -75,6 +76,9 @@ pub use mint_system::{
 };
 pub use mint_desktop::{
     DesktopLayout, DesktopSettings, MintDesktop, ThemeSettings, WindowManager,
+};
+pub use mint_menu::{
+    MenuCategory, MenuItem, MenuItemType, MenuSearchResult, MintMenu,
 };
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
