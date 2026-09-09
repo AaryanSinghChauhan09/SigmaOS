@@ -1,20 +1,25 @@
 ---
-name: Open-Source OS Competitor Feature Adoption
-about: Propose adapting an idea from Redox, seL4, Tock, Fuchsia, Linux, BSD, or WASI
-title: '[OSS-ADOPTION] '
-labels: 'competitor-scan, architecture'
+name: OSS Idea Adoption / Competitor Feature Proposal
+about: Adapt or prototype an idea from another open-source OS project (Redox, seL4, Tock, Fuchsia, Linux, BSD)
+title: '[OSS-IDEA] '
+labels: 'research, prototype'
 assignees: ''
 ---
 
-## 🔍 Source Project & Feature
-- **Source OS**: [e.g. Redox, seL4, Tock OS, Fuchsia Zircon, OpenBSD, NixOS, WASI]
-- **Feature Name**:
-- **Source Code / Spec Link**:
+## Source Open-Source OS Project
+- **Project Name**: (Redox / seL4 / Tock OS / Fuchsia / Linux / FreeBSD / OpenBSD)
+- **Reference URL / Source Commit**:
 
-## 💡 Why Adapt This to SigmaOS?
-What advantages does this feature bring to SigmaOS's sovereign microkernel architecture?
+## Feature Description
+Describe the feature or architectural pattern to borrow and adapt for SigmaOS.
 
-## 📐 Implementation & Parity Strategy
-1. **Prototype Timebox**: [e.g. 1-2 sprints]
-2. **SigmaOS Adapters**: How will it integrate with `CapabilityToken`, `no_std`, and WDM driver standards?
-3. **Acceptance Criteria & Benchmarks**:
+## Adaptation & Prototype Plan
+- **Proposed Prototype Timebox**: (1–2 weeks)
+- **Target SigmaOS Subsystem**:
+- **Expected Benefits**: (Security / Latency / Footprint / Compatibility)
+
+## SigmaOS Architecture Compliance Checklist
+- [ ] Maintains `no_std` compliance in core microkernel crates.
+- [ ] Respects `CapabilityToken` permission checks.
+- [ ] Uses strict Paged vs NonPaged pool memory allocations.
+- [ ] Prototype will include standalone `rustc --test` verification.
