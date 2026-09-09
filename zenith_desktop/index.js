@@ -98,15 +98,56 @@ export function initHighContrastSupport() {
   }
 }
 
+/**
+ * Initialize WAI-ARIA tablist arrow key navigation (WCAG 2.1 Level AA).
+ * Allows users to navigate tabs with ArrowRight/ArrowDown, ArrowLeft/ArrowUp, Home, and End keys.
+ */
+export function initTablistNavigation() {
+  const tablists = document.querySelectorAll('[role="tablist"]');
+
+  tablists.forEach((tablist) => {
+    tablist.addEventListener("keydown", (event) => {
+      const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+      if (tabs.length === 0) return;
+
+      const activeIndex = tabs.indexOf(document.activeElement);
+      if (activeIndex === -1) return;
+
+      let nextIndex = activeIndex;
+
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        event.preventDefault();
+        nextIndex = (activeIndex + 1) % tabs.length;
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        event.preventDefault();
+        nextIndex = (activeIndex - 1 + tabs.length) % tabs.length;
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        event.preventDefault();
+        nextIndex = tabs.length - 1;
+      }
+
+      if (nextIndex !== activeIndex) {
+        tabs[nextIndex].focus();
+        tabs[nextIndex].click();
+      }
+    });
+  });
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       initKeyboardNavigation();
+      initTablistNavigation();
       initHighContrastSupport();
     });
   } else {
     initKeyboardNavigation();
+    initTablistNavigation();
     initHighContrastSupport();
   }
 }

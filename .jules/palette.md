@@ -13,3 +13,7 @@
 ## 2026-11-20 - Desktop Right-Click Context Menu Accessibility & Keyboard Focus States
 **Learning:** Web OS desktop context menus constructed with non-semantic `<div>` elements prevent screen readers from identifying menu items (`role="menu"` / `role="menuitem"`) and block keyboard navigation because `<div>` elements do not receive default focus or `:focus-visible` styling without explicit button resets and outline indicators.
 **Action:** Structure context menus with `<div role="menu">` containers, `<button type="button" class="context-item" role="menuitem">` options, `<div role="separator">` dividers, explicit `aria-label` attributes, and CSS reset rules with `:focus-visible` outline indicators.
+
+## 2027-02-14 - WAI-ARIA Tablist Keyboard Arrow Navigation
+**Learning:** Standard `<div role="tablist">` components require standard arrow key listeners (`ArrowRight`, `ArrowLeft`, `ArrowUp`, `ArrowDown`, `Home`, `End`) to enable seamless keyboard navigation across tab controls according to WCAG 2.1 Level AA patterns.
+**Action:** Attach keydown listeners on `[role="tablist"]` containers to calculate next active tab index on directional or boundary key presses, focusing and triggering selection on the new tab.
