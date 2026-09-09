@@ -355,3 +355,53 @@ When integrating or refining Linux & BSD distro capability engines in `src/distr
 - **FreeBSD**: KNF (Kernel Normal Form) coding style, strict code review process
 - **Linux**: Kernel coding style, mandatory Signed-off-by process, extensive review
 - **OpenBSD**: Emphasis on code clarity, security audits, minimal attack surface
+
+---
+
+## 22. Universal Linux & BSD Ecosystem Subsystem Directives
+
+Autonomous agents must uphold and extend the following distro innovations:
+1. **SteamOS / ChimeraOS (Gaming & Display Optimization):**
+   - Implements gamescope microcompositor sandboxing, MangoHud telemetry hooks, and atomic A/B Btrfs rootfs updates.
+2. **GhostBSD / MidnightBSD (Desktop & Workspace Integration):**
+   - Integrates Fish-shell-like autocompletion, mports package management, and unified desktop workspace isolation.
+3. **openSUSE MicroOS / Fedora Silverblue (Transactional Immutability):**
+   - Read-only root filesystem with transactional snapshots (`transactional-update`) and atomic reboot rollbacks.
+4. **Alpine Linux (Minimalism & Musl Hardening):**
+   - Zero-overhead static binaries, stack smashing protection (`-fstack-protector-strong`), and musl libc memory invariants.
+5. **Artix Linux / Void Linux (Init Diversity & Lightweight Daemons):**
+   - Independent service supervisors (runit, dinit, s6, OpenRC) decoupled from monolithic PID 1 designs.
+6. **HardenedBSD / Subgraph OS (Advanced Exploit Mitigations):**
+   - Strict PaX MPROTECT/PAGEEXEC emulation, ASLR high-entropy randomization, and SegvGuard brute-force mitigations.
+7. **Redox OS (Microkernel Architecture & Capability Isolation):**
+   - Separation of kernel space into scheme handlers (file, net, time, bus), lock-free channel IPC, and memory-safe userland drivers.
+8. **NixOS / Guix (Declarative Configuration & Hermetic Stores):**
+   - Declarative system configurations, hash-indexed store paths (`/nix/store`, `/gnu/store`), and bit-for-bit reproducible closures.
+
+---
+
+## 23. Operating System Architecture & Software Engineering Principles
+
+AI agents working on SigmaOS must strictly apply and verify the following principles:
+
+1. **OOPS (Object-Oriented Programming System):**
+   - Encapsulation: Strict private state encapsulation with accessor/mutator methods.
+   - Abstraction: Abstract hardware and subsystem interfaces via Rust traits (`PeripheralDevice`, `PackageAdapter`, `ServiceSupervisor`).
+   - Polymorphism: Dynamic and static dispatch across multi-architecture and multi-distro bridges.
+   - Composition over Inheritance: Prefer struct composition and trait implementations over deep hierarchies.
+
+2. **SOLID Principles:**
+   - Single Responsibility: Each module addresses a single concern (e.g. `KsmDeduplicationEngine` handles only samepage deduplication).
+   - Open/Closed: Open for extension via traits and adapters, closed for modification of verified cores.
+   - Liskov Substitution: Trait implementors must satisfy all invariants of the interface without panic.
+   - Interface Segregation: Fine-grained, purpose-built interfaces rather than monolithic traits.
+   - Dependency Inversion: Subsystems depend upon abstractions and trait interfaces rather than concrete platform bindings.
+
+3. **Clean Code & Robust Engineering:**
+   - DRY (Don't Repeat Yourself): Deduplicate identical logic into shared helpers in `src/klib/`.
+   - KISS (Keep It Simple, Stupid): Prefer straightforward, readable, deterministic logic over convoluted macros.
+   - YAGNI (You Aren't Gonna Need It): Implement only required capabilities with zero speculative bloat.
+   - Design by Contract: Enforce pre-conditions, post-conditions, and loop invariants on memory boundaries.
+   - Concurrency & Deadlocks: Enforce strict lock acquisition hierarchies, lock-free atomics, and bounded queue timeouts.
+   - Conflict Resolution: In any conflict between feature velocity and system integrity, **prioritize stability, memory safety, zero-day defense, and test performance.**
+

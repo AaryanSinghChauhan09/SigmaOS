@@ -2,12 +2,12 @@ name: openSUSE OBS & Kiwi Deployment CI
 
 on:
   push:
-    branches: [ "main", "master", "jules-*" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
 
 jobs:
   opensuse-obs-kiwi:

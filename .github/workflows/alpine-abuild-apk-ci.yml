@@ -2,12 +2,12 @@ name: Alpine Abuild & APK Security CI
 
 on:
   push:
-    branches: [ "main", "master", "jules-*" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
 
 jobs:
   alpine-abuild-apk:

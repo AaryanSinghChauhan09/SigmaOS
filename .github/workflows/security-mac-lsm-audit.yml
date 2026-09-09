@@ -2,9 +2,9 @@ name: Security - Mandatory Access Control (MAC) LSM Audit
 
 on:
   push:
-    branches: [ main, master, "jules-*" ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 permissions:
   contents: read

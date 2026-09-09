@@ -10,7 +10,6 @@ on:
   push:
     branches:
       - main
-      - master
     paths:
       - '.github/**'
       - 'Cargo.toml'
@@ -132,7 +131,7 @@ jobs:
   release-draft:
     name: Auto-Draft Release Notes
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || false)
     steps:
       - name: Draft Release
         uses: release-drafter/release-drafter@v6

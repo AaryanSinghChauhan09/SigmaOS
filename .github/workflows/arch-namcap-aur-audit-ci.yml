@@ -2,12 +2,12 @@ name: Arch Linux Namcap & AUR Security Audit CI
 
 on:
   push:
-    branches: [ "main", "master", "jules-*" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
 
 jobs:
   arch-namcap-aur-audit:

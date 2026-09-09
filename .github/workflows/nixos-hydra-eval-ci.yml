@@ -2,12 +2,12 @@ name: NixOS Hydra Evaluation & Flake CI
 
 on:
   push:
-    branches: [ "main", "master", "jules-*" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
 
 jobs:
   nixos-hydra-eval:
