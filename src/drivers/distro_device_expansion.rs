@@ -1409,182 +1409,31 @@ impl PeripheralDevice for Ch340ExternalSerialDriver {
 }
 
 // =========================================================================
-// 23. Legacy Graphics: S3 Trio64 / Virge PCI/VESA Driver
+// 23. Storage / NVMe: Apple Silicon ANS/ANS2 NVMe Storage Controller Driver
 // =========================================================================
 
-/// S3 Trio64 / Virge PCI/VESA SVGA Legacy Graphics Driver (Linux s3fb / FreeBSD s3(4))
-pub struct S3Trio64VgaDriver {
+/// Apple Silicon ANS / ANS2 Co-Processor NVMe Storage Controller Driver (Linux apple-nvme)
+pub struct AppleNvmeAnsDriver {
     is_initialized: bool,
     power_state: PowerState,
-    vram_kb: u32,
-    base_io_port: u16,
+    sector_size: u32,
+    total_blocks: u64,
 }
 
-impl S3Trio64VgaDriver {
+impl AppleNvmeAnsDriver {
     pub fn new() -> Self {
         Self {
             is_initialized: false,
             power_state: PowerState::Off,
-            vram_kb: 4096, // 4MB SVGA VRAM
-            base_io_port: 0x3C0,
+            sector_size: 4096,
+            total_blocks: 125_000_000, // 512GB NVMe Storage
         }
-    }
-
-    pub fn vram_kb(&self) -> u32 {
-        self.vram_kb
     }
 }
 
-impl PeripheralDevice for S3Trio64VgaDriver {
+impl PeripheralDevice for AppleNvmeAnsDriver {
     fn name(&self) -> &'static str {
-        "S3 Trio64 / Virge SVGA Graphics Adapter"
-    }
-
-    fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Legacy
-    }
-
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        self.is_initialized = true;
-        self.power_state = PowerState::On;
-        Ok(())
-    }
-
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        if !self.is_initialized || self.power_state != PowerState::On {
-            return Err("S3 Trio64 SVGA offline");
-        }
-        if buffer.len() >= 6 {
-            buffer[0..4].copy_from_slice(&self.vram_kb.to_le_bytes());
-            buffer[4..6].copy_from_slice(&self.base_io_port.to_le_bytes());
-            Ok(6)
-        } else {
-            Ok(0)
-        }
-    }
-
-    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
-        if !self.is_initialized || self.power_state != PowerState::On {
-            return Err("S3 Trio64 SVGA offline");
-        }
-        Ok(data.len())
-    }
-
-    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
-        self.power_state = state;
-        Ok(())
-    }
-
-    fn shutdown(&mut self) -> Result<(), &'static str> {
-        self.is_initialized = false;
-        self.power_state = PowerState::Off;
-        Ok(())
-    }
-}
-
-// =========================================================================
-// 24. Ancient Network: Novell NE2000 ISA Ethernet Driver
-// =========================================================================
-
-/// Novell NE2000 ISA 10Mbps Ethernet Network Adapter Driver (Linux ne / FreeBSD ed(4))
-pub struct Ne2000IsaEthernetDriver {
-    is_initialized: bool,
-    power_state: PowerState,
-    mac_address: [u8; 6],
-    io_port: u16,
-}
-
-impl Ne2000IsaEthernetDriver {
-    pub fn new() -> Self {
-        Self {
-            is_initialized: false,
-            power_state: PowerState::Off,
-            mac_address: [0x00, 0x00, 0xC0, 0x12, 0x34, 0x56],
-            io_port: 0x300,
-        }
-    }
-
-    pub fn mac_address(&self) -> [u8; 6] {
-        self.mac_address
-    }
-}
-
-impl PeripheralDevice for Ne2000IsaEthernetDriver {
-    fn name(&self) -> &'static str {
-        "Novell NE2000 ISA 10Mbps Ethernet Adapter"
-    }
-
-    fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Ancient
-    }
-
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        self.is_initialized = true;
-        self.power_state = PowerState::On;
-        Ok(())
-    }
-
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        if !self.is_initialized || self.power_state != PowerState::On {
-            return Err("NE2000 NIC offline");
-        }
-        if buffer.len() >= 6 {
-            buffer[..6].copy_from_slice(&self.mac_address);
-            Ok(6)
-        } else {
-            Ok(0)
-        }
-    }
-
-    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
-        if !self.is_initialized || self.power_state != PowerState::On {
-            return Err("NE2000 NIC offline");
-        }
-        Ok(data.len())
-    }
-
-    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
-        self.power_state = state;
-        Ok(())
-    }
-
-    fn shutdown(&mut self) -> Result<(), &'static str> {
-        self.is_initialized = false;
-        self.power_state = PowerState::Off;
-        Ok(())
-    }
-}
-
-// =========================================================================
-// 25. Modern ARM SoC Storage: Apple Silicon M1/M2/M3 ANS2 NVMe Driver
-// =========================================================================
-
-/// Apple Silicon M1/M2/M3 ANS2 NVMe Storage Controller Driver (Linux nvme-apple / NetBSD apple_ans)
-pub struct AppleSiliconAnss2StorageDriver {
-    is_initialized: bool,
-    power_state: PowerState,
-    max_queue_depth: u16,
-    storage_size_gb: u32,
-}
-
-impl AppleSiliconAnss2StorageDriver {
-    pub fn new() -> Self {
-        Self {
-            is_initialized: false,
-            power_state: PowerState::Off,
-            max_queue_depth: 256,
-            storage_size_gb: 1024, // 1TB Ultra-Fast NAND
-        }
-    }
-
-    pub fn capacity_gb(&self) -> u32 {
-        self.storage_size_gb
-    }
-}
-
-impl PeripheralDevice for AppleSiliconAnss2StorageDriver {
-    fn name(&self) -> &'static str {
-        "Apple Silicon M1/M2/M3 ANS2 NVMe Storage Controller"
+        "Apple Silicon ANS2 Co-Processor NVMe Controller"
     }
 
     fn generation(&self) -> DeviceGeneration {
@@ -1599,12 +1448,12 @@ impl PeripheralDevice for AppleSiliconAnss2StorageDriver {
 
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized || self.power_state != PowerState::On {
-            return Err("Apple ANS2 NVMe offline");
+            return Err("Apple NVMe offline");
         }
-        if buffer.len() >= 6 {
-            buffer[0..2].copy_from_slice(&self.max_queue_depth.to_le_bytes());
-            buffer[2..6].copy_from_slice(&self.storage_size_gb.to_le_bytes());
-            Ok(6)
+        if buffer.len() >= 12 {
+            buffer[0..4].copy_from_slice(&self.sector_size.to_le_bytes());
+            buffer[4..12].copy_from_slice(&self.total_blocks.to_le_bytes());
+            Ok(12)
         } else {
             Ok(0)
         }
@@ -1612,7 +1461,7 @@ impl PeripheralDevice for AppleSiliconAnss2StorageDriver {
 
     fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
         if !self.is_initialized || self.power_state != PowerState::On {
-            return Err("Apple ANS2 NVMe offline");
+            return Err("Apple NVMe offline");
         }
         Ok(data.len())
     }
@@ -1630,35 +1479,31 @@ impl PeripheralDevice for AppleSiliconAnss2StorageDriver {
 }
 
 // =========================================================================
-// 26. Modern ARM SoC Graphics: Qualcomm Snapdragon X Elite Adreno GPU
+// 24. Graphics / GPU: NVIDIA Nouveau Open-Kernel GSP Driver
 // =========================================================================
 
-/// Qualcomm Snapdragon X Elite Adreno 740 / X1-85 GPU Driver (Linux msm / FreeBSD drm(4))
-pub struct QualcommSnapdragonXEliteGpuDriver {
+/// NVIDIA GeForce / RTX Open-Kernel GSP Firmware GPU Driver (Linux nouveau / OpenBSD nouveau)
+pub struct NvidiaNouveauOpenGspDriver {
     is_initialized: bool,
     power_state: PowerState,
-    shader_cores: u32,
-    max_clock_mhz: u32,
+    vram_mb: u32,
+    cuda_cores: u32,
 }
 
-impl QualcommSnapdragonXEliteGpuDriver {
+impl NvidiaNouveauOpenGspDriver {
     pub fn new() -> Self {
         Self {
             is_initialized: false,
             power_state: PowerState::Off,
-            shader_cores: 1536,
-            max_clock_mhz: 1300,
+            vram_mb: 24576, // 24GB GDDR6X VRAM
+            cuda_cores: 16384,
         }
-    }
-
-    pub fn shader_cores(&self) -> u32 {
-        self.shader_cores
     }
 }
 
-impl PeripheralDevice for QualcommSnapdragonXEliteGpuDriver {
+impl PeripheralDevice for NvidiaNouveauOpenGspDriver {
     fn name(&self) -> &'static str {
-        "Qualcomm Snapdragon X Elite Adreno GPU Driver"
+        "NVIDIA GeForce/RTX Nouveau Open-GSP GPU"
     }
 
     fn generation(&self) -> DeviceGeneration {
@@ -1673,11 +1518,11 @@ impl PeripheralDevice for QualcommSnapdragonXEliteGpuDriver {
 
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized || self.power_state != PowerState::On {
-            return Err("Qualcomm Adreno GPU offline");
+            return Err("Nouveau GPU offline");
         }
         if buffer.len() >= 8 {
-            buffer[0..4].copy_from_slice(&self.shader_cores.to_le_bytes());
-            buffer[4..8].copy_from_slice(&self.max_clock_mhz.to_le_bytes());
+            buffer[0..4].copy_from_slice(&self.vram_mb.to_le_bytes());
+            buffer[4..8].copy_from_slice(&self.cuda_cores.to_le_bytes());
             Ok(8)
         } else {
             Ok(0)
@@ -1686,7 +1531,281 @@ impl PeripheralDevice for QualcommSnapdragonXEliteGpuDriver {
 
     fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
         if !self.is_initialized || self.power_state != PowerState::On {
-            return Err("Qualcomm Adreno GPU offline");
+            return Err("Nouveau GPU offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 25. Wireless / Network: Atheros AR9271 USB Wi-Fi Adapter Driver
+// =========================================================================
+
+/// Atheros AR9271 / ath9k_htc 802.11n USB Wireless Adapter Driver (Linux ath9k_htc / FreeBSD athn(4))
+pub struct AtherosAr9271WifiDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    mac_addr: [u8; 6],
+    freq_mhz: u32,
+}
+
+impl AtherosAr9271WifiDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            mac_addr: [0x00, 0x03, 0x7F, 0x92, 0x71, 0x01],
+            freq_mhz: 2437, // Channel 6 (2.4GHz)
+        }
+    }
+}
+
+impl PeripheralDevice for AtherosAr9271WifiDriver {
+    fn name(&self) -> &'static str {
+        "Atheros AR9271 802.11n USB Wi-Fi Adapter"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Atheros Wi-Fi offline");
+        }
+        if buffer.len() >= 10 {
+            buffer[0..6].copy_from_slice(&self.mac_addr);
+            buffer[6..10].copy_from_slice(&self.freq_mhz.to_le_bytes());
+            Ok(10)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Atheros Wi-Fi offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 26. Audio / Media: USB Audio Class 2.0 (UAC2) Driver
+// =========================================================================
+
+/// USB Audio Class 2.0 (UAC2) Hi-Res Asynchronous Audio Driver (Linux snd-usb-audio / FreeBSD uaudio(4))
+pub struct UsbAudioClass2Driver {
+    is_initialized: bool,
+    power_state: PowerState,
+    sample_rate_hz: u32,
+    channels: u8,
+}
+
+impl UsbAudioClass2Driver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            sample_rate_hz: 192000, // 192kHz Hi-Res Audio
+            channels: 2,
+        }
+    }
+}
+
+impl PeripheralDevice for UsbAudioClass2Driver {
+    fn name(&self) -> &'static str {
+        "USB Audio Class 2.0 (UAC2) Asynchronous Hi-Res Interface"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("UAC2 Audio offline");
+        }
+        if buffer.len() >= 5 {
+            buffer[0..4].copy_from_slice(&self.sample_rate_hz.to_le_bytes());
+            buffer[4] = self.channels;
+            Ok(5)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("UAC2 Audio offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 27. Input / HID: Logitech Unifying / Bolt HID++ Receiver Driver
+// =========================================================================
+
+/// Logitech Unifying & Bolt HID++ Wireless Receiver Driver (Linux hid-logitech-hidpp)
+pub struct LogitechUnifyingHidDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    connected_peripherals: u8,
+}
+
+impl LogitechUnifyingHidDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            connected_peripherals: 6, // Up to 6 devices
+        }
+    }
+}
+
+impl PeripheralDevice for LogitechUnifyingHidDriver {
+    fn name(&self) -> &'static str {
+        "Logitech Unifying / Bolt Wireless HID++ Receiver"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Logitech Receiver offline");
+        }
+        if !buffer.is_empty() {
+            buffer[0] = self.connected_peripherals;
+            Ok(1)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("Logitech Receiver offline");
+        }
+        Ok(data.len())
+    }
+
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
+        self.power_state = state;
+        Ok(())
+    }
+
+    fn shutdown(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = false;
+        self.power_state = PowerState::Off;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 28. IoT / Connectivity: ESP32 Wi-Fi / Bluetooth HCI Bridge Driver
+// =========================================================================
+
+/// ESP32 Wi-Fi & Bluetooth HCI UART/SPI Bridge Driver (Linux hci_uart / FreeBSD umodem)
+pub struct Esp32HciBtBridgeDriver {
+    is_initialized: bool,
+    power_state: PowerState,
+    baud_rate: u32,
+}
+
+impl Esp32HciBtBridgeDriver {
+    pub fn new() -> Self {
+        Self {
+            is_initialized: false,
+            power_state: PowerState::Off,
+            baud_rate: 921600,
+        }
+    }
+}
+
+impl PeripheralDevice for Esp32HciBtBridgeDriver {
+    fn name(&self) -> &'static str {
+        "ESP32 Wi-Fi & Bluetooth HCI Bridge Controller"
+    }
+
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Modern
+    }
+
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        self.power_state = PowerState::On;
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("ESP32 Bridge offline");
+        }
+        if buffer.len() >= 4 {
+            buffer[0..4].copy_from_slice(&self.baud_rate.to_le_bytes());
+            Ok(4)
+        } else {
+            Ok(0)
+        }
+    }
+
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
+        if !self.is_initialized || self.power_state != PowerState::On {
+            return Err("ESP32 Bridge offline");
         }
         Ok(data.len())
     }
@@ -1707,7 +1826,7 @@ impl PeripheralDevice for QualcommSnapdragonXEliteGpuDriver {
 // Unit Tests
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     #[cfg(not(test))]
@@ -2170,5 +2289,65 @@ mod tests {
 
         assert_eq!(manager.device_count(), 26);
         manager.broadcast_power_state(PowerState::Sleep);
+    }
+
+    #[test]
+    fn test_apple_nvme_ans_driver() {
+        let mut drv = AppleNvmeAnsDriver::new();
+        assert_eq!(drv.name(), "Apple Silicon ANS2 Co-Processor NVMe Controller");
+        assert!(drv.initialize().is_ok());
+        let mut buf = [0u8; 12];
+        assert_eq!(drv.read(&mut buf).unwrap(), 12);
+        assert!(drv.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_nvidia_nouveau_open_gsp_driver() {
+        let mut drv = NvidiaNouveauOpenGspDriver::new();
+        assert_eq!(drv.name(), "NVIDIA GeForce/RTX Nouveau Open-GSP GPU");
+        assert!(drv.initialize().is_ok());
+        let mut buf = [0u8; 8];
+        assert_eq!(drv.read(&mut buf).unwrap(), 8);
+        assert!(drv.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_atheros_ar9271_wifi_driver() {
+        let mut drv = AtherosAr9271WifiDriver::new();
+        assert_eq!(drv.name(), "Atheros AR9271 802.11n USB Wi-Fi Adapter");
+        assert!(drv.initialize().is_ok());
+        let mut buf = [0u8; 10];
+        assert_eq!(drv.read(&mut buf).unwrap(), 10);
+        assert!(drv.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_usb_audio_class2_driver() {
+        let mut drv = UsbAudioClass2Driver::new();
+        assert_eq!(drv.name(), "USB Audio Class 2.0 (UAC2) Asynchronous Hi-Res Interface");
+        assert!(drv.initialize().is_ok());
+        let mut buf = [0u8; 5];
+        assert_eq!(drv.read(&mut buf).unwrap(), 5);
+        assert!(drv.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_logitech_unifying_hid_driver() {
+        let mut drv = LogitechUnifyingHidDriver::new();
+        assert_eq!(drv.name(), "Logitech Unifying / Bolt Wireless HID++ Receiver");
+        assert!(drv.initialize().is_ok());
+        let mut buf = [0u8; 1];
+        assert_eq!(drv.read(&mut buf).unwrap(), 1);
+        assert!(drv.shutdown().is_ok());
+    }
+
+    #[test]
+    fn test_esp32_hci_bt_bridge_driver() {
+        let mut drv = Esp32HciBtBridgeDriver::new();
+        assert_eq!(drv.name(), "ESP32 Wi-Fi & Bluetooth HCI Bridge Controller");
+        assert!(drv.initialize().is_ok());
+        let mut buf = [0u8; 4];
+        assert_eq!(drv.read(&mut buf).unwrap(), 4);
+        assert!(drv.shutdown().is_ok());
     }
 }
