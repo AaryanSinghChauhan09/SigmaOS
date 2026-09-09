@@ -33,3 +33,7 @@
 ## 2026-09-10 - Single-Pass Path Validation in Input Security
 **Learning:** Performing multiple sequential loops over byte slices (e.g. scanning first for NUL bytes then scanning again for `..` path traversal sequences in `validate_path`) doubles memory bandwidth requirements and cache references for every path checked by the security subsystem. Merging NUL byte checking and boundary-aware delimiter scanning into a single pass reduces slice iteration count by 50% without altering validation behavior.
 **Action:** When validating raw byte slices against multiple criteria, combine character and boundary checks into a single pass through the slice.
+
+## 2026-09-11 - Fast Bitwise Bitmasking for Power-of-Two Hash Table Indexing
+**Learning:** Computing hash bucket indices using hardware modulo division (`hash % capacity`) triggers CPU `div` instructions taking ~10-40 clock cycles. Since custom hash table structures guarantee bucket capacity as power-of-two values, replacing modulo division with bitwise AND mask (`hash & (capacity - 1)`) evaluates bucket indexing in a single CPU cycle.
+**Action:** When designing custom hash tables, ring buffers, or fixed-capacity pools, maintain capacity as a power of two and use bitwise AND bitmasking (`& (capacity - 1)`) instead of integer division (`% capacity`).
