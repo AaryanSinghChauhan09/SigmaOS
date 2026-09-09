@@ -55,7 +55,7 @@ pub use hardening::{
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
 pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
-pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
+pub use securelevels::{Securelevel, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
 
 pub mod bpf_lsm_sovereign;
