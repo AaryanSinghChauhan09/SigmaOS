@@ -922,6 +922,7 @@ pub struct StatusFpoIncident {
 /// logs incidents, calculates uptime SLA percentages, and generates status reports.
 pub struct FedoraStatusFpoEngine {
     pub service_states: HashMap<String, StatusFpoServiceHealth>,
+    pub service_statuses: HashMap<String, FedoraServiceStatusState>,
     pub incidents: Vec<StatusFpoIncident>,
     pub total_checks: u64,
     pub successful_checks: u64,
@@ -936,12 +937,27 @@ impl FedoraStatusFpoEngine {
         states.insert("MirrorManager".to_string(), StatusFpoServiceHealth::Good);
         states.insert("Pagure".to_string(), StatusFpoServiceHealth::Good);
 
+        let mut statuses = HashMap::new();
+        statuses.insert("koji".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("bodhi".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("copr".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("pagure".to_string(), FedoraServiceStatusState::Good);
+
         Self {
             service_states: states,
+            service_statuses: statuses,
             incidents: Vec::new(),
             total_checks: 100,
             successful_checks: 100,
         }
+    }
+
+    pub fn set_service_status(&mut self, service: &str, state: FedoraServiceStatusState) {
+        self.service_statuses.insert(service.to_string(), state);
+    }
+
+    pub fn query_service_health(&self, service: &str) -> FedoraServiceStatusState {
+        *self.service_statuses.get(service).unwrap_or(&FedoraServiceStatusState::Good)
     }
 
     pub fn set_service_health(&mut self, service_name: &str, health: StatusFpoServiceHealth) {
@@ -2780,38 +2796,6 @@ pub struct FedoraPlanetPost {
     pub published_epoch: u64,
 }
 
-/// Fedora Planet Blog & Community News Aggregation Engine
-pub struct FedoraPlanetAggregationEngine {
-    pub posts: Vec<FedoraPlanetPost>,
-}
-
-impl FedoraPlanetAggregationEngine {
-    pub fn new() -> Self {
-        FedoraPlanetAggregationEngine { posts: Vec::new() }
-    }
-
-    pub fn fetch_and_parse_feed(&mut self, author: &str, title: &str, url: &str, timestamp: u64) {
-        let post_id = format!("planet-{}", self.posts.len() + 1);
-        self.posts.push(FedoraPlanetPost {
-            post_id,
-            author_name: author.to_string(),
-            title: title.to_string(),
-            url: url.to_string(),
-            published_epoch: timestamp,
-        });
-    }
-
-    pub fn get_latest_posts(&self, limit: usize) -> Vec<&FedoraPlanetPost> {
-        self.posts.iter().take(limit).collect()
-    }
-}
-
-impl Default for FedoraPlanetAggregationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Fedora "The New Hotness" Upstream Release Event
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AnityaUpstreamRelease {
@@ -2819,44 +2803,6 @@ pub struct AnityaUpstreamRelease {
     pub latest_version: String,
     pub homepage: String,
     pub is_triggering_scratch_build: bool,
-}
-
-/// Fedora "The New Hotness" (Anitya) Upstream Release Monitor & Scratch Build Trigger Engine
-pub struct FedoraTheNewHotnessEngine {
-    pub monitored_projects: Vec<AnityaUpstreamRelease>,
-}
-
-impl FedoraTheNewHotnessEngine {
-    pub fn new() -> Self {
-        FedoraTheNewHotnessEngine {
-            monitored_projects: Vec::new(),
-        }
-    }
-
-    pub fn register_upstream_project(&mut self, name: &str, homepage: &str) {
-        self.monitored_projects.push(AnityaUpstreamRelease {
-            project_name: name.to_string(),
-            latest_version: "1.0.0".to_string(),
-            homepage: homepage.to_string(),
-            is_triggering_scratch_build: false,
-        });
-    }
-
-    pub fn process_upstream_release_event(&mut self, name: &str, new_version: &str) -> Result<String, &'static str> {
-        if let Some(project) = self.monitored_projects.iter_mut().find(|p| p.project_name == name) {
-            project.latest_version = new_version.to_string();
-            project.is_triggering_scratch_build = true;
-            Ok(format!("TheNewHotness: Triggered Koji scratch build for {} version {}", name, new_version))
-        } else {
-            Err("Project not found in Anitya release monitor")
-        }
-    }
-}
-
-impl Default for FedoraTheNewHotnessEngine {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// Fedora rpmautospec RPM Spec Changelog & Version Generator
@@ -2898,35 +2844,6 @@ pub enum FedoraServiceStatusState {
     MajorOutage,
 }
 
-/// Fedora Status (status.fedoraproject.org) Health Monitoring Engine
-pub struct FedoraStatusFpoEngine {
-    pub service_statuses: HashMap<String, FedoraServiceStatusState>,
-}
-
-impl FedoraStatusFpoEngine {
-    pub fn new() -> Self {
-        let mut statuses = HashMap::new();
-        statuses.insert("koji".to_string(), FedoraServiceStatusState::Good);
-        statuses.insert("bodhi".to_string(), FedoraServiceStatusState::Good);
-        statuses.insert("copr".to_string(), FedoraServiceStatusState::Good);
-        statuses.insert("pagure".to_string(), FedoraServiceStatusState::Good);
-        FedoraStatusFpoEngine { service_statuses: statuses }
-    }
-
-    pub fn set_service_status(&mut self, service: &str, state: FedoraServiceStatusState) {
-        self.service_statuses.insert(service.to_string(), state);
-    }
-
-    pub fn query_service_health(&self, service: &str) -> FedoraServiceStatusState {
-        *self.service_statuses.get(service).unwrap_or(&FedoraServiceStatusState::Good)
-    }
-}
-
-impl Default for FedoraStatusFpoEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// Fedora FASJSON (Fedora Account System REST API) User Record
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -3175,6 +3092,7 @@ pub struct UpstreamReleaseEvent {
 /// Tracks upstream project releases, compares version semantics, maps Anitya project IDs
 /// to Fedora RPM packages, and dispatches `org.fedoraproject.prod.hotness.update` fedmsg events.
 pub struct FedoraTheNewHotnessEngine {
+    pub monitored_projects: Vec<AnityaUpstreamRelease>,
     pub mappings: Vec<AnityaPackageMapping>,
     pub release_events: Vec<UpstreamReleaseEvent>,
     pub messaging_engine: FedoraMessagingEngine,
@@ -3183,9 +3101,29 @@ pub struct FedoraTheNewHotnessEngine {
 impl FedoraTheNewHotnessEngine {
     pub fn new() -> Self {
         Self {
+            monitored_projects: Vec::new(),
             mappings: Vec::new(),
             release_events: Vec::new(),
             messaging_engine: FedoraMessagingEngine::new(),
+        }
+    }
+
+    pub fn register_upstream_project(&mut self, name: &str, homepage: &str) {
+        self.monitored_projects.push(AnityaUpstreamRelease {
+            project_name: name.to_string(),
+            latest_version: "1.0.0".to_string(),
+            homepage: homepage.to_string(),
+            is_triggering_scratch_build: false,
+        });
+    }
+
+    pub fn process_upstream_release_event(&mut self, name: &str, new_version: &str) -> Result<String, &'static str> {
+        if let Some(project) = self.monitored_projects.iter_mut().find(|p| p.project_name == name) {
+            project.latest_version = new_version.to_string();
+            project.is_triggering_scratch_build = true;
+            Ok(format!("TheNewHotness: Triggered Koji scratch build for {} version {}", name, new_version))
+        } else {
+            Err("Project not found in Anitya release monitor")
         }
     }
 
@@ -3284,6 +3222,7 @@ pub struct PlanetUserFeed {
 /// Aggregates community developer blog posts, filters by FAS account or categories,
 /// sanitizes HTML content summaries, and emits fedmsg notifications for new articles.
 pub struct FedoraPlanetAggregationEngine {
+    pub posts: Vec<FedoraPlanetPost>,
     pub registered_feeds: Vec<PlanetUserFeed>,
     pub aggregated_entries: Vec<PlanetBlogFeedEntry>,
     pub messaging_engine: FedoraMessagingEngine,
@@ -3293,11 +3232,27 @@ pub struct FedoraPlanetAggregationEngine {
 impl FedoraPlanetAggregationEngine {
     pub fn new() -> Self {
         Self {
+            posts: Vec::new(),
             registered_feeds: Vec::new(),
             aggregated_entries: Vec::new(),
             messaging_engine: FedoraMessagingEngine::new(),
             entry_counter: 0,
         }
+    }
+
+    pub fn fetch_and_parse_feed(&mut self, author: &str, title: &str, url: &str, timestamp: u64) {
+        let post_id = format!("planet-{}", self.posts.len() + 1);
+        self.posts.push(FedoraPlanetPost {
+            post_id,
+            author_name: author.to_string(),
+            title: title.to_string(),
+            url: url.to_string(),
+            published_epoch: timestamp,
+        });
+    }
+
+    pub fn get_latest_posts(&self, limit: usize) -> Vec<&FedoraPlanetPost> {
+        self.posts.iter().take(limit).collect()
     }
 
     pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
@@ -3979,13 +3934,6 @@ impl FedoraOfflineUpdateEngine {
 }
 
 
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IgnitionSystemdUnit {
-    pub name: String,
-    pub enabled: bool,
-    pub contents: String,
-}
 
 impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {

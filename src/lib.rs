@@ -11,6 +11,7 @@
 // Core library for SigmaOS operating system
 
 // Core working modules
+pub mod open_source_os_gap_closure;
 pub mod accessibility;
 pub mod ai;
 pub mod app;
@@ -51,6 +52,19 @@ pub use process::{
     ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess,
     SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
     WNOHANG, WUNTRACED,
+};
+pub mod linuxmint_inspirations;
+pub use linuxmint_inspirations::{
+    AppTheme, BulkyRenamer, CaptainInstaller, CaptainSource, ConfigBackend, DebPackage,
+    DesktopIconFlags, DiagnosticField, FsFormat, HypnotixIptvPlayer, IsolationMode, IptvProvider,
+    LanPeer, LanWarpEngine, MintConfigHub, MintDesktopEngine, MintLocaleEngine, MintMenuEngine,
+    MintMenuItem, MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintStickIsoVerifier,
+    MintUpgradeEngine, MintUpgradePhase, MintWelcomeFlow, NannyDecision, PartitionScheme,
+    ProviderType, RenameConflict, RenameRule, RenamedFile, RequestIncoming, SessionControlAction,
+    StickyNote, StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome,
+    TransferRequest, TvChannel, UsbDevice, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
+    WebEngineKind, Webapp, WebappManager, WelcomeStep, XAppImageViewer, XAppStatusIconBadgeManager,
+    XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
 };
 pub mod tools;
 pub use open_source_os_gap_closure::*;
@@ -228,7 +242,7 @@ pub use driver::pci_bus::{
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,
     SimulatedPciHardwareAccess,
 };
-pub use drivers::{
+pub use driver::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
     EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,

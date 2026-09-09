@@ -1197,11 +1197,419 @@ impl Default for XAppThemeEngine {
 }
 
 // =========================================================================
-// Unit tests (verified via the integration harness; the `#[cfg(test_disabled)]` module
+// 14. STICKY NOTES -> StickyNotesManager
+//     Linux Mint `sticky` parity note taking application manager with
+//     color styling, category grouping, and note locking/pinning.
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StickyNote {
+    pub id: usize,
+    pub title: String,
+    pub content: String,
+    pub color_hex: String,
+    pub category: String,
+    pub is_locked: bool,
+    pub is_pinned: bool,
+    pub timestamp_sec: u64,
+}
+
+pub struct StickyNotesManager {
+    pub notes: Vec<StickyNote>,
+    pub next_id: usize,
+}
+
+impl StickyNotesManager {
+    pub fn new() -> Self {
+        Self {
+            notes: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_note(&mut self, title: &str, content: &str, color_hex: &str) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.notes.push(StickyNote {
+            id,
+            title: title.to_string(),
+            content: content.to_string(),
+            color_hex: color_hex.to_string(),
+            category: "General".to_string(),
+            is_locked: false,
+            is_pinned: false,
+            timestamp_sec: 1700000000,
+        });
+        id
+    }
+
+    pub fn update_content(&mut self, id: usize, new_content: &str) -> Result<(), &'static str> {
+        if let Some(note) = self.notes.iter_mut().find(|n| n.id == id) {
+            if note.is_locked {
+                return Err("Cannot edit locked sticky note");
+            }
+            note.content = new_content.to_string();
+            Ok(())
+        } else {
+            Err("Sticky note not found")
+        }
+    }
+
+    pub fn toggle_lock(&mut self, id: usize) -> bool {
+        if let Some(note) = self.notes.iter_mut().find(|n| n.id == id) {
+            note.is_locked = !note.is_locked;
+            note.is_locked
+        } else {
+            false
+        }
+    }
+
+    pub fn toggle_pin(&mut self, id: usize) -> bool {
+        if let Some(note) = self.notes.iter_mut().find(|n| n.id == id) {
+            note.is_pinned = !note.is_pinned;
+            note.is_pinned
+        } else {
+            false
+        }
+    }
+
+    pub fn get_pinned(&self) -> Vec<&StickyNote> {
+        self.notes.iter().filter(|n| n.is_pinned).collect()
+    }
+
+    pub fn get_by_category(&self, category: &str) -> Vec<&StickyNote> {
+        self.notes.iter().filter(|n| n.category == category).collect()
+    }
+}
+
+impl Default for StickyNotesManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 15. MINTMENU -> MintMenuEngine
+//     Cinnamon MintMenu parity application launcher engine with search
+//     indexing, category filtering, favorite app pinning, and session controls.
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SessionControlAction {
+    LockScreen,
+    LogOut,
+    Suspend,
+    Restart,
+    ShutDown,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MintMenuItem {
+    pub app_id: String,
+    pub name: String,
+    pub generic_name: String,
+    pub icon_name: String,
+    pub category: String,
+    pub exec: String,
+    pub is_favorite: bool,
+}
+
+pub struct MintMenuEngine {
+    pub items: Vec<MintMenuItem>,
+    pub active_category: String,
+}
+
+impl MintMenuEngine {
+    pub fn new() -> Self {
+        Self {
+            items: Vec::new(),
+            active_category: "All".to_string(),
+        }
+    }
+
+    pub fn register_item(&mut self, app_id: &str, name: &str, category: &str, exec: &str) {
+        self.items.push(MintMenuItem {
+            app_id: app_id.to_string(),
+            name: name.to_string(),
+            generic_name: name.to_string(),
+            icon_name: app_id.to_string(),
+            category: category.to_string(),
+            exec: exec.to_string(),
+            is_favorite: false,
+        });
+    }
+
+    pub fn search(&self, query: &str) -> Vec<&MintMenuItem> {
+        let q = query.to_lowercase();
+        self.items
+            .iter()
+            .filter(|item| {
+                item.name.to_lowercase().contains(&q)
+                    || item.generic_name.to_lowercase().contains(&q)
+                    || item.app_id.to_lowercase().contains(&q)
+                    || item.category.to_lowercase().contains(&q)
+            })
+            .collect()
+    }
+
+    pub fn toggle_favorite(&mut self, app_id: &str) -> bool {
+        if let Some(item) = self.items.iter_mut().find(|i| i.app_id == app_id) {
+            item.is_favorite = !item.is_favorite;
+            item.is_favorite
+        } else {
+            false
+        }
+    }
+
+    pub fn get_favorites(&self) -> Vec<&MintMenuItem> {
+        self.items.iter().filter(|i| i.is_favorite).collect()
+    }
+
+    pub fn execute_session_action(&self, action: SessionControlAction) -> &'static str {
+        match action {
+            SessionControlAction::LockScreen => "Screen locked",
+            SessionControlAction::LogOut => "Logging out session",
+            SessionControlAction::Suspend => "System entering S3 suspend",
+            SessionControlAction::Restart => "Initiating system reboot",
+            SessionControlAction::ShutDown => "Initiating system shutdown",
+        }
+    }
+}
+
+impl Default for MintMenuEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. MINTLOCALE -> MintLocaleEngine
+//     Linux Mint `mintlocale` system locale switcher, dictionary manager,
+//     and regional format configurator.
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MintLocaleEngine {
+    pub system_language: String,
+    pub regional_format: String,
+    pub installed_dictionaries: Vec<String>,
+    pub keyboard_layout: String,
+    pub numlock_on_boot: bool,
+}
+
+impl MintLocaleEngine {
+    pub fn new() -> Self {
+        Self {
+            system_language: "en_US.UTF-8".to_string(),
+            regional_format: "en_US.UTF-8".to_string(),
+            installed_dictionaries: vec!["en_US".to_string()],
+            keyboard_layout: "us".to_string(),
+            numlock_on_boot: true,
+        }
+    }
+
+    pub fn set_language(&mut self, lang: &str) {
+        self.system_language = lang.to_string();
+    }
+
+    pub fn add_dictionary(&mut self, dict: &str) {
+        if !self.installed_dictionaries.contains(&dict.to_string()) {
+            self.installed_dictionaries.push(dict.to_string());
+        }
+    }
+
+    pub fn set_keyboard_layout(&mut self, layout: &str) {
+        self.keyboard_layout = layout.to_string();
+    }
+}
+
+impl Default for MintLocaleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 17. MINTDESKTOP -> MintDesktopEngine
+//     Desktop icon toggling, window manager compositor settings,
+//     and taskbar/panel layout customization.
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DesktopIconFlags {
+    pub show_computer: bool,
+    pub show_home: bool,
+    pub show_network: bool,
+    pub show_trash: bool,
+    pub show_mounted_volumes: bool,
+}
+
+impl DesktopIconFlags {
+    pub fn default_mint() -> Self {
+        Self {
+            show_computer: true,
+            show_home: true,
+            show_network: false,
+            show_trash: true,
+            show_mounted_volumes: true,
+        }
+    }
+}
+
+pub struct MintDesktopEngine {
+    pub icon_flags: DesktopIconFlags,
+    pub compositor_effects_enabled: bool,
+    pub panel_layout_style: String,
+}
+
+impl MintDesktopEngine {
+    pub fn new() -> Self {
+        Self {
+            icon_flags: DesktopIconFlags::default_mint(),
+            compositor_effects_enabled: true,
+            panel_layout_style: "Traditional".to_string(), // Traditional or Modern
+        }
+    }
+
+    pub fn toggle_home_icon(&mut self) -> bool {
+        self.icon_flags.show_home = !self.icon_flags.show_home;
+        self.icon_flags.show_home
+    }
+
+    pub fn toggle_trash_icon(&mut self) -> bool {
+        self.icon_flags.show_trash = !self.icon_flags.show_trash;
+        self.icon_flags.show_trash
+    }
+}
+
+impl Default for MintDesktopEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 18. MINTSTICK ENHANCEMENTS -> MintStickIsoVerifier
+//     ISO checksum validation and partition scheme configuration.
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartitionScheme {
+    Mbr,
+    Gpt,
+}
+
+pub struct MintStickIsoVerifier;
+
+impl MintStickIsoVerifier {
+    pub fn verify_checksum(calculated_hash: &str, expected_hash: &str) -> bool {
+        calculated_hash.eq_ignore_ascii_case(expected_hash)
+    }
+
+    pub fn format_partition_table(target_path: &str, scheme: PartitionScheme) -> String {
+        format!("Formatted {} with {:?} partition table", target_path, scheme)
+    }
+}
+
+// =========================================================================
+// 19. XAPPS EXTENSIONS -> Status Icons, Image Viewing & Text Editing
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct XAppTrayBadge {
+    pub app_id: String,
+    pub badge_count: u32,
+    pub tooltip: String,
+    pub context_actions: Vec<String>,
+}
+
+pub struct XAppStatusIconBadgeManager {
+    pub badges: Vec<XAppTrayBadge>,
+}
+
+impl XAppStatusIconBadgeManager {
+    pub fn new() -> Self {
+        Self { badges: Vec::new() }
+    }
+
+    pub fn update_badge(&mut self, app_id: &str, count: u32, tooltip: &str) {
+        if let Some(badge) = self.badges.iter_mut().find(|b| b.app_id == app_id) {
+            badge.badge_count = count;
+            badge.tooltip = tooltip.to_string();
+        } else {
+            self.badges.push(XAppTrayBadge {
+                app_id: app_id.to_string(),
+                badge_count: count,
+                tooltip: tooltip.to_string(),
+                context_actions: Vec::new(),
+            });
+        }
+    }
+
+    pub fn add_context_action(&mut self, app_id: &str, action: &str) {
+        if let Some(badge) = self.badges.iter_mut().find(|b| b.app_id == app_id) {
+            badge.context_actions.push(action.to_string());
+        }
+    }
+}
+
+impl Default for XAppStatusIconBadgeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct XAppImageViewer {
+    pub current_file: String,
+    pub rotation_degrees: u32,
+    pub exif_camera_model: String,
+}
+
+impl XAppImageViewer {
+    pub fn new(path: &str) -> Self {
+        Self {
+            current_file: path.to_string(),
+            rotation_degrees: 0,
+            exif_camera_model: "Generic Sensor".to_string(),
+        }
+    }
+
+    pub fn rotate_clockwise(&mut self) -> u32 {
+        self.rotation_degrees = (self.rotation_degrees + 90) % 360;
+        self.rotation_degrees
+    }
+}
+
+pub struct XAppTextEditor {
+    pub file_path: String,
+    pub content: String,
+    pub line_numbers_visible: bool,
+    pub syntax_highlighting_mode: String,
+}
+
+impl XAppTextEditor {
+    pub fn new(path: &str, content: &str) -> Self {
+        Self {
+            file_path: path.to_string(),
+            content: content.to_string(),
+            line_numbers_visible: true,
+            syntax_highlighting_mode: "Plain Text".to_string(),
+        }
+    }
+
+    pub fn replace_all(&mut self, target: &str, replacement: &str) -> usize {
+        let occurrences = self.content.matches(target).count();
+        self.content = self.content.replace(target, replacement);
+        occurrences
+    }
+}
+
+// =========================================================================
+// Unit tests (verified via the integration harness; the `#[cfg(test)]` module
 // is kept in parity with sibling files).
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1215,6 +1623,72 @@ mod tests {
         assert!(w.discover_peer("desk", "192.168.1.5", "myprivatekey"));
         assert!(!w.discover_peer("intruder", "192.168.1.9", "wrong-code"));
         assert_eq!(w.peer_count(), 1);
+    }
+
+    #[test]
+    fn test_sticky_notes_management() {
+        let mut mgr = StickyNotesManager::new();
+        let id = mgr.create_note("Meeting Notes", "Discuss Linux Mint parity", "#f1c40f");
+        assert_eq!(id, 1);
+        assert!(mgr.toggle_pin(id));
+        assert_eq!(mgr.get_pinned().len(), 1);
+
+        assert!(mgr.update_content(id, "Updated meeting notes").is_ok());
+        assert!(mgr.toggle_lock(id));
+        assert!(mgr.update_content(id, "Locked edit should fail").is_err());
+    }
+
+    #[test]
+    fn test_mint_menu_search_and_favorites() {
+        let mut menu = MintMenuEngine::new();
+        menu.register_item("nemo", "Nemo File Manager", "System", "nemo %U");
+        menu.register_item("xed", "Xed Text Editor", "Accessories", "xed %U");
+
+        let results = menu.search("text");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].app_id, "xed");
+
+        assert!(menu.toggle_favorite("nemo"));
+        assert_eq!(menu.get_favorites().len(), 1);
+
+        let action_msg = menu.execute_session_action(SessionControlAction::LockScreen);
+        assert_eq!(action_msg, "Screen locked");
+    }
+
+    #[test]
+    fn test_mint_locale_and_desktop_config() {
+        let mut locale = MintLocaleEngine::new();
+        locale.set_language("de_DE.UTF-8");
+        locale.add_dictionary("de_DE");
+        locale.set_keyboard_layout("de");
+        assert_eq!(locale.system_language, "de_DE.UTF-8");
+        assert_eq!(locale.installed_dictionaries.len(), 2);
+
+        let mut desktop = MintDesktopEngine::new();
+        assert!(desktop.icon_flags.show_home);
+        assert!(!desktop.toggle_home_icon());
+        assert!(!desktop.icon_flags.show_home);
+    }
+
+    #[test]
+    fn test_mint_stick_verifier_and_xapps() {
+        assert!(MintStickIsoVerifier::verify_checksum("abc123hash", "ABC123HASH"));
+        let fmt = MintStickIsoVerifier::format_partition_table("/dev/sdb", PartitionScheme::Gpt);
+        assert!(fmt.contains("Gpt"));
+
+        let mut tray = XAppStatusIconBadgeManager::new();
+        tray.update_badge("sticky", 3, "3 unread sticky notes");
+        tray.add_context_action("sticky", "New Note");
+        assert_eq!(tray.badges.len(), 1);
+        assert_eq!(tray.badges[0].badge_count, 3);
+
+        let mut img = XAppImageViewer::new("/home/user/photo.jpg");
+        assert_eq!(img.rotate_clockwise(), 90);
+
+        let mut editor = XAppTextEditor::new("/tmp/test.txt", "Hello Mint OS");
+        let count = editor.replace_all("Mint", "Sigma");
+        assert_eq!(count, 1);
+        assert_eq!(editor.content, "Hello Sigma OS");
     }
 
     #[test]

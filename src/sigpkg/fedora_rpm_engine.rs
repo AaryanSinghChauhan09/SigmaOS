@@ -855,26 +855,6 @@ impl FedoraAnityaReleaseMonitoringEngine {
             }
             record.latest_upstream_version = latest_version.to_string();
             record.updated_available = is_new;
-            if is_new {
-                let mut pkgs = Vec::new();
-                pkgs.push(AnityaPackageMapping {
-                    distro: "Fedora".to_string(),
-                    package_name: proj_name.clone(),
-                });
-                pkgs.push(AnityaPackageMapping {
-                    distro: "CentOS".to_string(),
-                    package_name: proj_name.clone(),
-                });
-                self.messaging_bus.publish_version_update(
-                    proj_id,
-                    &proj_name,
-                    "fedora",
-                    &old_ver,
-                    latest_version,
-                    pkgs,
-                    1700000000,
-                );
-            }
             Some(is_new)
         } else {
             None

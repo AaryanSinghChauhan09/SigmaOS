@@ -555,11 +555,177 @@ impl DemandPagingSwapEngine {
             page_faults_handled: 0,
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceNodeType {
+    CharacterDevice,
+    BlockDevice,
+    Fifo,
+    Socket,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeviceNodeEntry {
+    pub name: String,
+    pub node_type: DeviceNodeType,
+    pub major: u32,
+    pub minor: u32,
+    pub symlink_paths: Vec<String>,
+}
+
+pub struct SovereignDynamicDevfsEngine {
+    pub nodes: Vec<DeviceNodeEntry>,
+}
+
+impl SovereignDynamicDevfsEngine {
+    pub fn new() -> Self {
+        Self { nodes: Vec::new() }
+    }
+
+    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
+        self.nodes.push(DeviceNodeEntry {
+            name: name.to_string(),
+            node_type,
+            major,
+            minor,
+            symlink_paths: Vec::new(),
+        });
+    }
 
     pub fn lookup_node(&self, path: &str) -> Option<&DeviceNodeEntry> {
         self.nodes
             .iter()
             .find(|n| n.name == path || n.symlink_paths.iter().any(|s| *s == path))
+    }
+}
+
+impl Default for SovereignDynamicDevfsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConntrackTableEntry {
+    pub original_src: [u8; 4],
+    pub original_dst: [u8; 4],
+    pub src_port: u16,
+    pub dst_port: u16,
+    pub translated_ip: [u8; 4],
+    pub translated_port: u16,
+    pub nat_type: NatType,
+    pub packets_counter: u64,
+}
+
+pub struct SovereignStatefulNatEngine {
+    pub public_ip: [u8; 4],
+    pub conntrack_table: Vec<ConntrackTableEntry>,
+}
+
+impl SovereignStatefulNatEngine {
+    pub fn new(public_ip: [u8; 4]) -> Self {
+        Self {
+            public_ip,
+            conntrack_table: Vec::new(),
+        }
+    }
+
+    pub fn create_snat_mapping(
+        &mut self,
+        internal_src: [u8; 4],
+        dst_ip: [u8; 4],
+        src_port: u16,
+        dst_port: u16,
+        protocol: u8,
+    ) -> ([u8; 4], u16) {
+        let _ = protocol;
+        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
+            c.original_src == internal_src
+                && c.src_port == src_port
+                && c.original_dst == dst_ip
+                && c.dst_port == dst_port
+        }) {
+            conn.packets_counter += 1;
+        } else {
+            self.conntrack_table.push(ConntrackTableEntry {
+                original_src: internal_src,
+                original_dst: dst_ip,
+                src_port,
+                dst_port,
+                translated_ip: self.public_ip,
+                translated_port: src_port,
+                nat_type: NatType::Snat,
+                packets_counter: 1,
+            });
+        }
+        (self.public_ip, src_port)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JournaldLogRecord {
+    pub timestamp_epoch_ms: u64,
+    pub identifier: String,
+    pub message: String,
+    pub priority: u8,
+}
+
+pub struct SovereignJournaldBinaryStorageEngine {
+    pub log_records: Vec<JournaldLogRecord>,
+}
+
+impl SovereignJournaldBinaryStorageEngine {
+    pub fn new() -> Self {
+        Self { log_records: Vec::new() }
+    }
+
+    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
+        self.log_records.push(JournaldLogRecord {
+            timestamp_epoch_ms: 1000,
+            identifier: identifier.to_string(),
+            message: message.to_string(),
+            priority,
+        });
+    }
+}
+
+impl Default for SovereignJournaldBinaryStorageEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DnsRecordEntry {
+    pub domain: String,
+    pub ip_address: [u8; 4],
+}
+
+pub struct SovereignDnsTlsResolverEngine {
+    pub primary_dns_ip: [u8; 4],
+    pub records: Vec<DnsRecordEntry>,
+}
+
+impl SovereignDnsTlsResolverEngine {
+    pub fn new(primary_dns_ip: [u8; 4]) -> Self {
+        let mut records = Vec::new();
+        records.push(DnsRecordEntry {
+            domain: "localhost".to_string(),
+            ip_address: [127, 0, 0, 1],
+        });
+        Self { primary_dns_ip, records }
+    }
+
+    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
+        self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
     }
 }
 
@@ -654,37 +820,6 @@ impl MulticoreSmpInterruptEngine {
         }
     }
 
-    pub fn create_snat_mapping(
-        &mut self,
-        internal_src: [u8; 4],
-        dst_ip: [u8; 4],
-        src_port: u16,
-        dst_port: u16,
-        protocol: u8,
-    ) -> ([u8; 4], u16) {
-        let _ = protocol;
-        // Search conntrack
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
-                && c.src_port == src_port
-                && c.original_dst == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConntrackTableEntry {
-                original_src: internal_src,
-                original_dst: dst_ip,
-                src_port,
-                dst_port,
-                translated_ip: self.public_ip,
-                translated_port: src_port,
-                nat_type: NatType::Snat,
-                packets_counter: 1,
-            });
-        }
-        Ok(())
-    }
 
     pub fn balance_irq_load(&mut self) {
         for (i, entry) in self.irq_table.iter_mut().enumerate() {

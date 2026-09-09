@@ -66,15 +66,6 @@ pub struct SnapcraftManifest {
     pub apps: Vec<String>,
     pub plugs: Vec<String>,
 }
-/// Description of Flatpak Manifest (flatpak parity)
-pub struct FlatpakManifest {
-    pub id: String,
-    pub runtime: String,
-    pub runtime_version: String,
-    pub sdk: String,
-    pub command: String,
-    pub finish_args: Vec<String>,
-}
 #[derive(Debug, Clone)]
 pub enum AdapterError {
     ParseError(String),
@@ -118,8 +109,11 @@ pub trait PackageFormatAdapter {
 pub struct FlatpakManifest {
     pub id: String,
     pub app_id: String,
+    pub runtime: String,
+    pub runtime_version: String,
+    pub sdk: String,
     pub command: String,
-    pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"
+    pub finish_args: Vec<String>,
 }
 
 /// Description of FreeBSD UCL (+MANIFEST) pkg manifest
@@ -157,6 +151,7 @@ pub struct ZypperSpecManifest {
     pub name: String,
     pub version: String,
     pub summary: String,
+    pub architecture: String,
     pub requires: Vec<String>,
 }
 
@@ -167,6 +162,53 @@ pub struct SlackwarePkgManifest {
     pub version: String,
     pub description: String,
     pub slack_required: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub package_name: String,
+    pub version: String,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+    pub use_flags: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ApkIndexManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub requires: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub arch: String,
+    pub architecture: String,
+    pub depends: Vec<String>,
+    pub depend: Vec<String>,
+    pub makedepend: Vec<String>,
 }
 
 pub struct UniversalPackageAdapter;
@@ -222,9 +264,11 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: "SigmaOS".to_string(),
             depends,
             description,
-            priority,
+            priority: format!("{:?}", priority),
         })
     }
 
@@ -307,8 +351,11 @@ impl UniversalPackageAdapter {
             pkgname,
             pkgver,
             pkgdesc,
-            depends,
+            arch: architecture.clone(),
             architecture,
+            depends: depends.clone(),
+            depend: depends,
+            makedepend: Vec::new(),
         })
     }
 
@@ -524,9 +571,12 @@ impl UniversalPackageAdapter {
         Ok(SnapcraftManifest {
             name,
             version,
-            summary,
+            summary: summary.clone(),
             confinement,
             plugs,
+            apps: Vec::new(),
+            description: summary,
+            grade: "stable".to_string(),
         })
     }
 
@@ -630,6 +680,9 @@ impl UniversalPackageAdapter {
         Ok(FlatpakManifest {
             id: app_id.clone(),
             app_id,
+            runtime: String::new(),
+            runtime_version: String::new(),
+            sdk: String::new(),
             command,
             finish_args,
         })
@@ -830,6 +883,7 @@ impl UniversalPackageAdapter {
             version,
             summary,
             requires,
+            architecture: "x86_64".to_string(),
         })
     }
 
@@ -1508,14 +1562,14 @@ impl Default for UniversalServerImageAdapter {
 /// into native Sigma-pkg models, mapping dependencies, sandboxing capabilities, and registering with Universal PM.
 pub struct SigPkgUniversalBridgeEngine {
     adapter: UniversalPackageAdapter,
-    pm: universal_oop_system::UniversalPackageManager,
+    pm: crate::sigpkg::universal_oop_system::UniversalPackageManager,
 }
 
 impl SigPkgUniversalBridgeEngine {
     pub fn new() -> Self {
         Self {
             adapter: UniversalPackageAdapter::new(),
-            pm: universal_oop_system::UniversalPackageManager::new(),
+            pm: crate::sigpkg::universal_oop_system::UniversalPackageManager::new(),
         }
     }
 
@@ -1672,8 +1726,8 @@ impl SigPkgUniversalBridgeEngine {
         raw_data: &[u8],
     ) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let standard_pkg = universal_oop_system::StandardPackage {
-            metadata: universal_oop_system::PackageMetadata {
+        let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
+            metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
                 version: native_pkg.version,
                 description: native_pkg.description.clone(),
@@ -1689,7 +1743,7 @@ impl SigPkgUniversalBridgeEngine {
                 supported_architectures: Vec::new(),
             },
             dependencies: Vec::new(),
-            format: universal_oop_system::PackageFormat::Sigma,
+            format: crate::sigpkg::universal_oop_system::PackageFormat::Sigma,
         };
         let _ = self.pm.install_package(Box::new(standard_pkg));
         Ok(native_pkg)

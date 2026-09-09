@@ -78,15 +78,15 @@ pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
 pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager, AdapterError,
+    PackageFormatAdapter, AdapterError,
 };
 pub use universal_oop_system::{
-    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter,
+    DebAdapter, RpmAdapter, PacmanAdapter, ApkAdapter, NixAdapter, EbuildAdapter, UniversalPackageManager,
 };
 pub use sovereign_sigpkg::*;
 pub use universal_adapter::{
-    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuildV2, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
+    AppImageContainer, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
+    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
     UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
     UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
 };
@@ -146,7 +146,7 @@ pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
 pub use transaction::Transaction;
 pub use universal_adapter::{
-    AptDebManifest, UniversalPackageAdapter,
+    UniversalPackageAdapter,
 };
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,

@@ -11,6 +11,8 @@
 // Implements Void Linux's runit supervision system
 // Inspired by Void Linux's 3-stage process supervision
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -154,11 +156,12 @@ impl RunitSupervisor {
         // Start all services respecting dependencies
         let mut started = Vec::new();
 
-        for (name, _service) in self.services.clone() {
+        let names: Vec<String> = self.services.keys().cloned().collect();
+        for name in names {
             if self.can_start_service(&name, &started) {
                 if let Some(s) = self.services.get_mut(&name) {
                     s.start();
-                    started.push(name);
+                    started.push(name.clone());
                 }
             }
         }
@@ -173,11 +176,12 @@ impl RunitSupervisor {
         // Stop all services in reverse dependency order
         let mut stopped = Vec::new();
 
-        for (name, _service) in self.services.clone() {
+        let names: Vec<String> = self.services.keys().cloned().collect();
+        for name in names {
             if self.can_stop_service(&name, &stopped) {
                 if let Some(s) = self.services.get_mut(&name) {
                     s.stop();
-                    stopped.push(name);
+                    stopped.push(name.clone());
                 }
             }
         }
@@ -232,7 +236,8 @@ impl RunitSupervisor {
     /// Monitor and update health for a specific supervised service
     pub fn monitor_service_health(&mut self, name: &str, is_healthy: bool) -> Option<ServiceState> {
         if let Some(service) = self.services.get_mut(name) {
-            Some(service.check_health(is_healthy))
+            let state = service.check_health(is_healthy);
+            Some(state)
         } else {
             None
         }
