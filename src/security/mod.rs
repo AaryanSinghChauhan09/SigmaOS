@@ -162,3 +162,6 @@ pub use vulnerability::{
 };
 pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
 pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};
+
+pub mod landlock_sovereign;
+pub use landlock_sovereign::{SovereignLandlockV5Guard, LandlockPathRule, LandlockFsRights, UnveilEntry, UnveilPermission, CapsicumFdDescriptor, CapsicumRights, SandboxState};

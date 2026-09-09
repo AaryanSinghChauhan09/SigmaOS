@@ -36,3 +36,6 @@ pub use xfs::{
     AllocationStrategy, XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal,
     XfsState,
 };
+
+pub mod bcachefs_sovereign;
+pub use bcachefs_sovereign::{SovereignBcachefsVolume, BcachefsInode, BcachefsExtent, BcachefsSnapshot, ChecksumAlgorithm, CompressionType, sovereign_crc32c};

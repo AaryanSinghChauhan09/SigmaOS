@@ -41,3 +41,6 @@ pub use socket::{
     AddressFamily, Socket, SocketAddr, SocketError, SocketOptions, SocketState, SocketTable,
     SocketType,
 };
+
+pub mod zero_copy_networking;
+pub use zero_copy_networking::{SovereignZeroCopySocket, UmemPool, XdpRing, XdpAction, IoCompletionQueue, IoCompletionEntry};

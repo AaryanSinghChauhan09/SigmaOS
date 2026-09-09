@@ -97,3 +97,8 @@ pub mod sigma_timer;
 pub mod sigma_workqueue;
 pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
+
+pub mod cgroups_v2_sovereign;
+pub use cgroups_v2_sovereign::{SovereignCgroupsV2Manager, CgroupController, CgroupNode, CpuAccounting, MemoryAccounting, PidAccounting};
+pub mod bsd_jails_sovereign;
+pub use bsd_jails_sovereign::{SovereignBsdJailManager, SovereignJail, JailState, JailPermissions, JailNetworkConfig, JailProcess};
