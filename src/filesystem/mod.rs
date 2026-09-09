@@ -13,10 +13,14 @@ pub mod mount_namespace;
 pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
-pub mod ext4;
-pub use bsd_linux_innovations::{
-    BsdSoftUpdatesEngine, GoboLinuxPathResolver, LinuxOverlayFsManager, LinuxProcSysfsEmulator,
-    MetadataDependency, MetadataOp, OpenBsdMountEnforcer, SovereignFhsHierarchyEngine,
+pub mod sigma_fs;
+
+pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use sigma_fs::{
+    SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
+    JournalState, RaidLevel, SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid,
+    SigmaFsCrypt, SigmaFsVirtio,
 };
 
 pub use archive::{

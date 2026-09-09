@@ -3,7 +3,12 @@ use std::vec::Vec;
 /// OOP-based Screen Magnifier for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 826
 /// Implements screen magnification and zoom
+
+extern crate alloc;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use alloc::boxed::Box;
+use crate::klib::Vec;
 
 pub type MagnifierID = usize;
 

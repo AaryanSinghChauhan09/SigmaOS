@@ -1,33 +1,7 @@
 #![allow(ambiguous_glob_reexports)]
 // SigmaOS Kernel Module
 pub mod architecture;
-pub mod atomic_extended;
-pub mod cgroup_v2;
-pub mod kqueue_event;
-pub mod cgroup_controllers;
-pub mod block_dev;
-pub mod bore;
-pub mod breakthrough;
 pub mod breakthroughs;
-pub mod breakthroughs_v2;
-pub mod bus;
-pub mod classic_os;
-pub mod component;
-pub mod console;
-pub mod cpu_features;
-pub mod cpufreq;
-pub mod device;
-pub mod driver;
-pub mod dtrace_compat;
-pub mod ebpf;
-pub mod bsd_kernel_parity;
-pub mod ebpf_vm;
-pub mod ebpf_verification;
-pub mod exports;
-pub mod gap_closing;
-pub mod gap_filling;
-pub mod generation_manager;
-pub mod io_uring;
 pub mod ipc;
 pub mod kqueue;
 pub mod linux_absorb;

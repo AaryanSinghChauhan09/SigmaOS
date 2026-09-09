@@ -30,7 +30,15 @@ use std::vec::Vec;
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(not(feature = "standalone_test"))]
-pub use crate::sigpkg::Version;
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(all(not(feature = "standalone_test"), target_os = "none"))]
+use crate::klib::{HashMap, Arc};
+
+#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
+use std::collections::HashMap;
+#[cfg(all(not(feature = "standalone_test"), not(target_os = "none")))]
+use std::sync::Arc;
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -40,14 +48,9 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::klib::HashMap;
-
-use std::sync::Arc;
-
-#[cfg(all(feature = "standalone_test", not(test)))]
-impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+#[cfg(feature = "standalone_test")]
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }

@@ -50,79 +50,26 @@ pub mod garuda_nomad_innovations;
 pub mod gentoo;
 pub mod gentoo_inspirations;
 pub mod i18n;
-pub mod improvements;
-pub mod linux_bsd_distro_gaps;
-pub mod linux_bsd_inspirations;
-pub mod linux_bsd_parity;
-pub mod linux_bsd_parity_extended;
-
-pub use linux_bsd_distro_gaps::{
-    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeType,
-    DnsRecord, DynamicDeviceNode, JournalBinaryRecord, JournalLogLevel, NatRule, NatRuleKind,
-    NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SovereignDnsTlsResolverEngine,
-    SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine,
-    SystemdInitManager, SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver,
-    UsbHidModifierKeys, WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
-};
-
-pub use garuda_nomad_innovations::{
-    CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
-    NomadBsdLivePersistenceEngine, NomadBsdZfsDataset, ShepherdService, ZfsPoolState,
-    ZramCompressionAlgorithm,
-};
-pub mod linux_ideas;
 pub mod manjaro;
-pub use manjaro::{
-    DesktopLayoutPreset, HardwareQuirkRule, ManjaroBranch, ManjaroBranchManager,
-    ManjaroHelloSetupEngine, ManjaroTimeshiftAutoSnap, MhwdHardwareQuirkDatabase,
-    MhwdKernelDriverAutobuilder, PackageSearchResult, PamacTransactionEntry,
-    PamacTransactionJournalEngine, PamacUnifiedSearchEngine, PrimeOffloadMode,
-    SearchResultBackend, SetupWizardTask, SnapshotMode as ManjaroSnapshotMode, TimeshiftSnapshot,
-    TransactionType as PamacTransactionType, VendorHardwareType,
-};
-pub mod missing_distro_innovations;
 pub mod nextgen;
-pub mod nixos_inspirations;
-pub mod parity;
-pub mod power_network_tools;
-pub mod preseed;
-pub mod ready_to_use;
 pub mod recovery;
-pub mod sovereign_system_innovations;
 pub mod specialized;
-pub mod stable_components;
 pub mod tiny_core;
-pub mod visual_dashboard;
-pub mod void_runit;
-pub mod wiki_ideas_implementation;
+pub mod transformation_engine;
+pub mod preseed;
+pub mod endeavour_os;
 
-pub use clear_linux::{
-    ClearLinuxStatelessEngine, ConfigLocation, ConfigState, SwupdBundle, SwupdUpdateManager,
+pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
+pub use endeavour_os::{
+    AkmKernelManager, AurPackageSpec, CalamaresConfig, CalamaresInstaller, DesktopEnvironment,
+    EosKernelFlavor, EosLogTool, EosWelcomeApp, InstallMode, PacmanMirror, PartitionType,
+    ReflectorMirrorManager, WelcomeButtonTask, YayParuHelper,
 };
-pub use compliance::{
-    ComplianceAuditEvent, ComplianceAuditLogger, ComplianceFramework, TpmAttestationManager,
-    TpmPcrMeasurement,
-};
-pub use sovereign_system_innovations::{
-    AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,
-    GamifiedSystemMonitor, HookAction, PolicyAdaptiveEventScheduler,
-    UnifiedFirewallVpnOrchestrator, VisualPolicyRule, VisualSandboxPolicyManager, WmLayoutMode,
-    WorkloadType,
-};
-pub use visual_dashboard::{
-    FirewallAction, FirewallPolicy, HardwareTelemetry, ProcessCapability, VisualDashboardManager,
-    VpnStatus, VpnTunnel, VpnType,
-};
-pub use void_runit::{
-    RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
-};
-pub mod sovereign_distro_dominance;
-
-pub use arch_parity::{
-    AlpmDatabase, ArchArchinstallEngine, ArchArchwebEngine, ArchCdevtoolsEngine, ArchPkgctlEngine,
-    ArchWikiOfflineEngine, ArchCommunitySigRepoManager, ArchPacmanContribEngine, ArchSignstarSignerEngine,
-    AurClient, PacDiffCandidate, PacLogEntry, PkgBuild, SandboxedCompiler, SigRepositoryBranch,
-    SignstarAttestation, SovereignSvntogitEngine, SvntogitPackageRepo,
+pub use preseed::{SovereignPreseedParser, PreseedVariable};
+pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
+pub use manjaro::{
+    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
+    ManjaroKernelRelease, AurPackage, FlatpakPackage, SnapPackage, MhwdDkmsRebuilder,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,

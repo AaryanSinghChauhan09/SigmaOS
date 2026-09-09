@@ -3,10 +3,12 @@
 // EOS Welcome app tasks, EOS Log Tool pastebin diagnostics, Reflector mirror ranking,
 // Yay/Paru AUR helper, and AKM Kernel Manager.
 
-use std::format;
-use std::string::{String, ToString};
-use std::vec;
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// Supported Desktop Environments for Calamares
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +34,15 @@ pub enum InstallMode {
 pub enum PartitionType {
     EraseDiskBtrfs,
     EraseDiskExt4,
+    DualBootSideBySide,
     ManualPartitioning,
+}
+
+#[derive(Debug, Clone)]
+pub struct DetectedOsEntry {
+    pub os_name: String,
+    pub partition_path: String,
+    pub boot_type: String, // "UEFI" or "BIOS"
 }
 
 /// Calamares Configuration Settings
@@ -42,6 +52,8 @@ pub struct CalamaresConfig {
     pub desktop: DesktopEnvironment,
     pub partition_type: PartitionType,
     pub enable_swap: bool,
+    pub target_drive: String,
+    pub detected_operating_systems: Vec<DetectedOsEntry>,
     pub username: String,
     pub hostname: String,
 }
@@ -53,9 +65,20 @@ impl CalamaresConfig {
             desktop: DesktopEnvironment::KdePlasma,
             partition_type: PartitionType::EraseDiskBtrfs,
             enable_swap: true,
+            target_drive: "/dev/nvme0n1".to_string(),
+            detected_operating_systems: Vec::new(),
             username: username.to_string(),
             hostname: hostname.to_string(),
         }
+    }
+
+    pub fn with_dual_boot(&mut self, existing_os_name: &str, partition_path: &str) {
+        self.partition_type = PartitionType::DualBootSideBySide;
+        self.detected_operating_systems.push(DetectedOsEntry {
+            os_name: existing_os_name.to_string(),
+            partition_path: partition_path.to_string(),
+            boot_type: "UEFI".to_string(),
+        });
     }
 }
 
@@ -179,15 +202,19 @@ impl Default for EosLogTool {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_calamares_installer() {
-        let config = CalamaresConfig::new("endeavour_user", "eos-laptop");
+        let mut config = CalamaresConfig::new("endeavour_user", "eos-laptop");
+        config.with_dual_boot("Windows 11 Pro", "/dev/nvme0n1p3");
+
         let mut installer = CalamaresInstaller::new(config);
         assert!(!installer.is_completed);
+        assert_eq!(installer.config.partition_type, PartitionType::DualBootSideBySide);
+        assert_eq!(installer.config.detected_operating_systems.len(), 1);
 
         let res = installer.run_installation();
         assert!(res.is_ok());
@@ -200,20 +227,13 @@ mod tests {
     #[test]
     fn test_eos_welcome_app_and_log_tool() {
         let mut welcome = EosWelcomeApp::new();
-        assert!(welcome
-            .execute_task(WelcomeButtonTask::UpdateMirrors)
-            .is_ok());
-        assert!(welcome
-            .execute_task(WelcomeButtonTask::UpdateSystem)
-            .is_ok());
-        assert!(welcome
-            .execute_task(WelcomeButtonTask::CleanPackages)
-            .is_ok());
+        assert!(welcome.execute_task(WelcomeButtonTask::UpdateMirrors).is_ok());
+        assert!(welcome.execute_task(WelcomeButtonTask::UpdateSystem).is_ok());
+        assert!(welcome.execute_task(WelcomeButtonTask::CleanPackages).is_ok());
         assert!(welcome.execute_task(WelcomeButtonTask::FixKeys).is_ok());
 
         let log_tool = EosLogTool::new();
-        let upload_res =
-            log_tool.upload_system_logs("Hardware: AMD Ryzen 7 7840HS, GPU: Radeon 780M");
+        let upload_res = log_tool.upload_system_logs("Hardware: AMD Ryzen 7 7840HS, GPU: Radeon 780M");
         assert!(upload_res.is_ok());
         assert!(upload_res.unwrap().contains("https://0x0.st/"));
     }
@@ -413,10 +433,7 @@ impl AkmKernelManager {
     }
 
     /// Switches the default boot kernel in GRUB/systemd-boot
-    pub fn switch_active_kernel(
-        &mut self,
-        flavor: EosKernelFlavor,
-    ) -> Result<String, &'static str> {
+    pub fn switch_active_kernel(&mut self, flavor: EosKernelFlavor) -> Result<String, &'static str> {
         if !self.installed_kernels.contains(&flavor) {
             return Err("Kernel flavor not installed.");
         }

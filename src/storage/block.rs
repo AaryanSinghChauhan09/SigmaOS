@@ -1,12 +1,13 @@
-// SPDX-License-Identifier: MIT
-// SigmaOS Block Device Subsystem & High-Performance Block Management Architecture
-// Implements block-oriented devices, block operations, multi-type block classification,
-// record blocking (fixed, variable, permanent, spanned), and system block diagram topologies.
+/// OOP-based Block Storage for SigmaOS
+/// Based on 100-Improvement-Ideas.md storage management concepts
+/// Implements comprehensive block device abstraction, partition management,
+/// and caching for high-performance storage operations
 
-use std::boxed::Box;
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
+
+use core::mem;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BlockDeviceID = usize;
