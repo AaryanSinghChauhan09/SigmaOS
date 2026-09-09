@@ -11,7 +11,11 @@
 // SigmaOS Debian/Ubuntu APT Compatibility Engine
 // Implements APT package management, DEB package parsing, and dpkg compatibility
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::collections::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
+
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -254,7 +258,7 @@ impl DpkgDatabase {
 
     /// Get package status
     pub fn get_package_status(&self, package_name: &str) -> Option<&str> {
-        self.status_database.get(package_name).map(|s| s.as_str())
+        self.status_database.get(package_name).map(|s: &String| s.as_str())
     }
 
     /// Get installed package
@@ -268,7 +272,7 @@ impl DpkgDatabase {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -296,7 +300,7 @@ Priority: optional"#;
 
     #[test]
     fn test_dependency_parsing() {
-        let mut parser = DebControlParser::new();
+        let parser = DebControlParser::new();
         let deps = parser.parse_dependencies("libc6 (>= 2.28), libssl1.1 (>= 1.1.1), zlib1g");
 
         assert_eq!(deps.len(), 3);
