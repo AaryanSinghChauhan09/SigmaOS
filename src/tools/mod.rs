@@ -16,6 +16,8 @@ pub mod omarchy_command_palette;
 pub mod timeshift_snapshot_manager;
 pub mod warpinator_lan_sharing;
 pub mod mint_backup_manager;
+pub mod mint_system;
+pub mod mint_desktop;
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
@@ -67,6 +69,12 @@ pub use warpinator_lan_sharing::{
 pub use mint_backup_manager::{
     BackupConfig, BackupMetadata, BackupResult, BackupStatistics, BackupStatus, BackupType,
     MintBackupManager, PackageList,
+};
+pub use mint_system::{
+    AptCommand, AptResult, MintSystem,
+};
+pub use mint_desktop::{
+    DesktopLayout, DesktopSettings, MintDesktop, ThemeSettings, WindowManager,
 };
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
