@@ -73,3 +73,18 @@ documentation:
           - 'docs/**/*'
           - 'wiki/**/*'
           - '*.md'
+"area: kernel":
+  - src/kernel/**/*
+"area: distro":
+  - src/distro/**/*
+"area: security":
+  - src/security/**/*
+"area: networking":
+  - src/net/**/*
+  - src/network/**/*
+"area: package":
+  - src/sigpkg/**/*
+  - src/package/**/*
+"area: documentation":
+  - docs/**/*
+  - wiki/**/*
