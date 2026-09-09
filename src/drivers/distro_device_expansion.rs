@@ -1843,7 +1843,7 @@ impl EdidMonitorDdcDisplayDriver {
 }
 
 impl PeripheralDevice for EdidMonitorDdcDisplayDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "EDID Monitor DDC/CI Display & Backlight Controller (Linux drm_edid / FreeBSD edid)"
     }
 
@@ -1861,7 +1861,7 @@ impl PeripheralDevice for EdidMonitorDdcDisplayDriver {
         Ok(())
     }
 
-    fn read(&self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized { return Err("Monitor driver not initialized"); }
         let info = format!("3840x2160@144Hz_HDR_DDC80");
         let bytes = info.as_bytes();
@@ -1928,7 +1928,7 @@ impl PcSpeakerInternalAudioDriver {
 }
 
 impl PeripheralDevice for PcSpeakerInternalAudioDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "PC Speaker & Internal Beeper Driver (Linux pcspkr / FreeBSD syscons_beeper)"
     }
 
@@ -1946,7 +1946,7 @@ impl PeripheralDevice for PcSpeakerInternalAudioDriver {
         Ok(())
     }
 
-    fn read(&self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized { return Err("PC Speaker driver not initialized"); }
         if buffer.len() >= 4 {
             buffer[0..4].copy_from_slice(&self.current_frequency_hz.to_le_bytes());
@@ -2014,7 +2014,7 @@ impl UvcWebcamVideoCameraDriver {
 }
 
 impl PeripheralDevice for UvcWebcamVideoCameraDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "USB Video Class (UVC) HD Webcam Driver (Linux uvcvideo / FreeBSD webcamd)"
     }
 
@@ -2032,7 +2032,7 @@ impl PeripheralDevice for UvcWebcamVideoCameraDriver {
         Ok(())
     }
 
-    fn read(&self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized { return Err("UVC Webcam driver not initialized"); }
         // Simulated YUY2 1080p frame header
         let frame_hdr = b"UVC_FRAME_1080P_YUY2";
@@ -2093,7 +2093,7 @@ impl IntelBtUsbBluetoothDriver {
 }
 
 impl PeripheralDevice for IntelBtUsbBluetoothDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "Intel/Realtek Bluetooth 5.3 HCI USB Driver (Linux btusb / FreeBSD ng_ubt)"
     }
 
@@ -2111,7 +2111,7 @@ impl PeripheralDevice for IntelBtUsbBluetoothDriver {
         Ok(())
     }
 
-    fn read(&self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized { return Err("Bluetooth driver not initialized"); }
         if buffer.len() >= 6 {
             buffer[..6].copy_from_slice(&self.mac_address);
@@ -2169,7 +2169,7 @@ impl HidPrecisionTouchpadDriver {
 }
 
 impl PeripheralDevice for HidPrecisionTouchpadDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "HID Precision Touchpad & Multi-Button Gaming Mouse Driver (Linux hid-multitouch / FreeBSD hcons)"
     }
 
@@ -2187,7 +2187,7 @@ impl PeripheralDevice for HidPrecisionTouchpadDriver {
         Ok(())
     }
 
-    fn read(&self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized { return Err("Touchpad driver not initialized"); }
         let report = [0x01, 0x10, 0x20, 0x02]; // Simulated HID multi-touch report
         let copy_len = report.len().min(buffer.len());
@@ -2240,7 +2240,7 @@ impl NvmePCIeHostControllerDriver {
 }
 
 impl PeripheralDevice for NvmePCIeHostControllerDriver {
-    fn device_name(&self) -> &'static str {
+    fn name(&self) -> &'static str {
         "NVMe v1.4 High-Speed PCIe Controller Driver (Linux nvme / FreeBSD nvme)"
     }
 
@@ -2258,7 +2258,7 @@ impl PeripheralDevice for NvmePCIeHostControllerDriver {
         Ok(())
     }
 
-    fn read(&self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         if !self.is_initialized { return Err("NVMe driver not initialized"); }
         let read_len = self.block_size_bytes.min(buffer.len());
         buffer[..read_len].fill(0xE5); // Simulated NVMe block read

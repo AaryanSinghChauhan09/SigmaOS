@@ -3,7 +3,6 @@
 //! This module implements desktop environment features inspired by Linux Mint's
 //! Cinnamon desktop, including panels, desklets, themes, extensions, and XApp integration.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;

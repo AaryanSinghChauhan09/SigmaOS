@@ -1,0 +1,28 @@
+# GitHub Actions PR Labeler Configuration for SigmaOS
+
+kernel:
+  - 'src/kernel/**/*'
+  - 'kernel/**/*'
+
+drivers:
+  - 'src/drivers/**/*'
+  - 'src/driver/**/*'
+  - 'drivers/**/*'
+
+security:
+  - 'src/security/**/*'
+  - 'security/**/*'
+
+documentation:
+  - '**/*.md'
+  - 'docs/**/*'
+  - 'WIKI/**/*'
+  - 'wiki/**/*'
+
+tools:
+  - 'src/tools/**/*'
+  - 'tools/**/*'
+
+ci:
+  - '.github/**/*'
+  - 'scripts/**/*'

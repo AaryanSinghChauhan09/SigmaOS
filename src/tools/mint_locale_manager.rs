@@ -3,7 +3,6 @@
 //! This module implements a locale manager inspired by Linux Mint's mintlocale,
 //! which configures system locale settings and language packs.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;
