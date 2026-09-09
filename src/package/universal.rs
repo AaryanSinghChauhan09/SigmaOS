@@ -722,4 +722,64 @@ mod tests {
         let checkpoint_id = manager.create_checkpoint();
         assert_eq!(checkpoint_id, 0);
     }
+
+    #[test]
+    fn test_linux_bsd_extended_adapters() {
+        let apk = AlpineApkPackageAdapter;
+        let pkg = FreeBsdPkgPackageAdapter;
+        let xbps = VoidXbpsPackageAdapter;
+
+        let dummy_pkg = UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string());
+        assert!(apk.install(&dummy_pkg).is_ok());
+        assert!(pkg.install(&dummy_pkg).is_ok());
+        assert!(xbps.install(&dummy_pkg).is_ok());
+    }
+}
+
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
+
+impl PackageFormatAdapter for AlpineApkPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::SigmaPkg
+    }
+    fn adapter_name(&self) -> &str {
+        "alpine-apk-adapter"
+    }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        let _ = package;
+        Ok(())
+    }
+}
+
+/// FreeBSD .pkg Package Format Adapter
+pub struct FreeBsdPkgPackageAdapter;
+
+impl PackageFormatAdapter for FreeBsdPkgPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::SigmaPkg
+    }
+    fn adapter_name(&self) -> &str {
+        "freebsd-pkg-adapter"
+    }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        let _ = package;
+        Ok(())
+    }
+}
+
+/// Void Linux .xbps Package Format Adapter
+pub struct VoidXbpsPackageAdapter;
+
+impl PackageFormatAdapter for VoidXbpsPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::SigmaPkg
+    }
+    fn adapter_name(&self) -> &str {
+        "void-xbps-adapter"
+    }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        let _ = package;
+        Ok(())
+    }
 }

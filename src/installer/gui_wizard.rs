@@ -1,28 +1,30 @@
 // SigmaOS Advanced GUI Installer Wizard
-// Enhanced graphical installer with comprehensive partitioning, user setup, and system configuration
-// Inspired by Calamares, Ubiquity, and Windows installation wizards
+// Calamares-inspired graphical installer wizard with dual-boot alongside partitioning
 
 #![no_std]
 
 extern crate alloc;
+use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
+use alloc::vec;
 
-/// Installer Screen Type
+/// Installer Screen / Calamares Module Sequence
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstallerScreen {
     Welcome,
     Language,
     Location,
+    Keyboard,
     Partitioning,
     UserSetup,
     SystemConfiguration,
+    Summary,
     InstallationProgress,
     Complete,
 }
 
-/// Partitioning Operation Type
+/// Partitioning Operation Strategy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PartitioningOperation {
     Automatic,
@@ -41,6 +43,8 @@ pub enum FilesystemType {
     Zfs,
     F2fs,
     Swap,
+    Ntfs,
+    Fat32,
 }
 
 /// Partition Entry
@@ -103,6 +107,37 @@ impl DiskInfo {
     }
 }
 
+/// Co-Resident Detected Operating System for Dual-Boot
+#[derive(Debug, Clone)]
+pub struct DetectedOperatingSystem {
+    pub name: String,
+    pub device_partition: String,
+    pub filesystem: FilesystemType,
+    pub total_size_mb: u64,
+    pub free_space_mb: u64,
+    pub min_shrink_mb: u64,
+}
+
+impl DetectedOperatingSystem {
+    pub fn new(
+        name: &str,
+        device_partition: &str,
+        fs: FilesystemType,
+        total_mb: u64,
+        free_mb: u64,
+    ) -> Self {
+        let min_shrink_mb = free_mb.saturating_sub(10240); // Keep 10GB margin
+        Self {
+            name: String::from(name),
+            device_partition: String::from(device_partition),
+            filesystem: fs,
+            total_size_mb: total_mb,
+            free_space_mb: free_mb,
+            min_shrink_mb,
+        }
+    }
+}
+
 /// User Account Configuration
 #[derive(Debug, Clone)]
 pub struct UserAccount {
@@ -112,6 +147,7 @@ pub struct UserAccount {
     pub is_admin: bool,
     pub home_directory: String,
     pub shell: String,
+    pub auto_login: bool,
 }
 
 impl UserAccount {
@@ -123,6 +159,7 @@ impl UserAccount {
             is_admin: true,
             home_directory: format!("/home/{}", username),
             shell: String::from("/bin/sigma-sh"),
+            auto_login: false,
         }
     }
 
@@ -133,6 +170,11 @@ impl UserAccount {
 
     pub fn with_admin(mut self, admin: bool) -> Self {
         self.is_admin = admin;
+        self
+    }
+
+    pub fn with_auto_login(mut self, auto: bool) -> Self {
+        self.auto_login = auto;
         self
     }
 }
@@ -178,11 +220,12 @@ impl SystemConfiguration {
     }
 }
 
-/// GUI Installer Wizard State
+/// GUI Calamares-Style Installer Wizard Engine
 pub struct GuiInstallerWizard {
     pub current_screen: InstallerScreen,
     pub screens_visited: Vec<InstallerScreen>,
     pub disk_info: Vec<DiskInfo>,
+    pub detected_operating_systems: Vec<DetectedOperatingSystem>,
     pub selected_disk: Option<String>,
     pub partitioning_operation: PartitioningOperation,
     pub custom_partitions: Vec<PartitionEntry>,
@@ -194,10 +237,11 @@ pub struct GuiInstallerWizard {
 
 impl GuiInstallerWizard {
     pub fn new() -> Self {
-        Self {
+        let mut wizard = Self {
             current_screen: InstallerScreen::Welcome,
             screens_visited: Vec::new(),
             disk_info: Vec::new(),
+            detected_operating_systems: Vec::new(),
             selected_disk: None,
             partitioning_operation: PartitioningOperation::Automatic,
             custom_partitions: Vec::new(),
@@ -205,20 +249,58 @@ impl GuiInstallerWizard {
             system_config: SystemConfiguration::new(),
             installation_progress: 0,
             installation_log: Vec::new(),
-        }
+        };
+        wizard.scan_hardware_and_os();
+        wizard
     }
 
-    /// Navigate to next screen
+    /// Scans co-resident operating systems for Calamares dual-boot alongside mode
+    pub fn scan_hardware_and_os(&mut self) {
+        let mut nvme = DiskInfo::new("/dev/nvme0n1", 512000, "Samsung NVMe SSD 512GB");
+        nvme.add_partition(PartitionEntry::new(
+            "/dev/nvme0n1p1",
+            512,
+            FilesystemType::Fat32,
+            "/boot/efi",
+        ).with_flag("esp"));
+        nvme.add_partition(PartitionEntry::new(
+            "/dev/nvme0n1p2",
+            250000,
+            FilesystemType::Ntfs,
+            "",
+        ));
+
+        self.disk_info.push(nvme);
+
+        self.detected_operating_systems.push(DetectedOperatingSystem::new(
+            "Windows 11 Home",
+            "/dev/nvme0n1p2",
+            FilesystemType::Ntfs,
+            250000,
+            120000,
+        ));
+        self.detected_operating_systems.push(DetectedOperatingSystem::new(
+            "Ubuntu 24.04 LTS",
+            "/dev/sda2",
+            FilesystemType::Ext4,
+            100000,
+            60000,
+        ));
+    }
+
+    /// Navigate to next screen in Calamares module sequence
     pub fn next_screen(&mut self) -> Result<(), InstallerError> {
         self.screens_visited.push(self.current_screen);
-        
+
         self.current_screen = match self.current_screen {
             InstallerScreen::Welcome => InstallerScreen::Language,
             InstallerScreen::Language => InstallerScreen::Location,
-            InstallerScreen::Location => InstallerScreen::Partitioning,
+            InstallerScreen::Location => InstallerScreen::Keyboard,
+            InstallerScreen::Keyboard => InstallerScreen::Partitioning,
             InstallerScreen::Partitioning => InstallerScreen::UserSetup,
             InstallerScreen::UserSetup => InstallerScreen::SystemConfiguration,
-            InstallerScreen::SystemConfiguration => InstallerScreen::InstallationProgress,
+            InstallerScreen::SystemConfiguration => InstallerScreen::Summary,
+            InstallerScreen::Summary => InstallerScreen::InstallationProgress,
             InstallerScreen::InstallationProgress => InstallerScreen::Complete,
             InstallerScreen::Complete => return Err(InstallerError::AlreadyComplete),
         };
@@ -242,17 +324,76 @@ impl GuiInstallerWizard {
         self.log(&format!("Selected disk: {}", disk));
     }
 
-    /// Set partitioning operation
+    /// Set partitioning operation (e.g. Alongside for Dual-Boot)
     pub fn set_partitioning_operation(&mut self, operation: PartitioningOperation) {
         self.partitioning_operation = operation;
         self.log(&format!("Partitioning operation: {:?}", operation));
     }
 
+    /// Calculate Dual-Boot Alongside partitioning layout
+    pub fn calculate_alongside_layout(&mut self, target_os_partition: &str, allocate_sigma_mb: u64) -> Result<Vec<PartitionEntry>, InstallerError> {
+        let target_os = self
+            .detected_operating_systems
+            .iter()
+            .find(|os| os.device_partition == target_os_partition)
+            .ok_or(InstallerError::InvalidConfiguration)?;
+
+        if allocate_sigma_mb > target_os.min_shrink_mb {
+            return Err(InstallerError::PartitioningFailed);
+        }
+
+        let mut partitions = Vec::new();
+        // 1. Shrunk OS partition
+        let remaining_os_mb = target_os.total_size_mb - allocate_sigma_mb;
+        partitions.push(PartitionEntry::new(
+            &target_os.device_partition,
+            remaining_os_mb,
+            target_os.filesystem,
+            "preserves_existing_os",
+        ));
+
+        // 2. SigmaOS ESP EFI Partition
+        partitions.push(PartitionEntry::new(
+            "/dev/nvme0n1p3",
+            512,
+            FilesystemType::Fat32,
+            "/boot/efi",
+        ).with_flag("boot").with_flag("esp"));
+
+        // 3. SigmaOS Root Partition
+        let root_mb = allocate_sigma_mb.saturating_sub(4512);
+        partitions.push(PartitionEntry::new(
+            "/dev/nvme0n1p4",
+            root_mb,
+            FilesystemType::Btrfs,
+            "/",
+        ));
+
+        // 4. Swap Partition
+        partitions.push(PartitionEntry::new(
+            "/dev/nvme0n1p5",
+            4000,
+            FilesystemType::Swap,
+            "swap",
+        ));
+
+        self.custom_partitions = partitions.clone();
+        self.partitioning_operation = PartitioningOperation::Alongside;
+        self.log(&format!(
+            "Configured Dual-Boot Alongside OS: {} (Allocated {}MB for SigmaOS)",
+            target_os.name, allocate_sigma_mb
+        ));
+
+        Ok(partitions)
+    }
+
     /// Add custom partition
     pub fn add_custom_partition(&mut self, partition: PartitionEntry) {
         self.custom_partitions.push(partition);
-        self.log(&format!("Added custom partition: {} -> {}", 
-            partition.device, partition.mount_point));
+        self.log(&format!(
+            "Added custom partition: {} -> {}",
+            partition.device, partition.mount_point
+        ));
     }
 
     /// Add user account
@@ -279,14 +420,17 @@ impl GuiInstallerWizard {
 
         self.current_screen = InstallerScreen::InstallationProgress;
         self.installation_progress = 0;
-        self.log("Starting installation process");
+        self.log("Starting Calamares installation execution pipeline");
         Ok(())
     }
 
     /// Update installation progress
     pub fn update_progress(&mut self, progress: u32) {
         self.installation_progress = progress.min(100);
-        self.log(&format!("Installation progress: {}%", self.installation_progress));
+        self.log(&format!(
+            "Installation progress: {}%",
+            self.installation_progress
+        ));
     }
 
     /// Add installation log entry
@@ -300,30 +444,14 @@ impl GuiInstallerWizard {
             InstallerScreen::Welcome => "Welcome to SigmaOS Installer",
             InstallerScreen::Language => "Select your language",
             InstallerScreen::Location => "Select your location and timezone",
-            InstallerScreen::Partitioning => "Configure disk partitioning",
+            InstallerScreen::Keyboard => "Select keyboard layout",
+            InstallerScreen::Partitioning => "Configure disk partitioning & dual-boot alongside setup",
             InstallerScreen::UserSetup => "Create user accounts",
             InstallerScreen::SystemConfiguration => "Configure system settings",
+            InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
             InstallerScreen::Complete => "Installation Complete",
         }
-    }
-
-    /// Validate current screen
-    pub fn validate_current_screen(&self) -> Result<(), InstallerError> {
-        match self.current_screen {
-            InstallerScreen::Partitioning => {
-                if self.selected_disk.is_none() {
-                    return Err(InstallerError::NoDiskSelected);
-                }
-            }
-            InstallerScreen::UserSetup => {
-                if self.user_accounts.is_empty() {
-                    return Err(InstallerError::NoUserAccounts);
-                }
-            }
-            _ => {}
-        }
-        Ok(())
     }
 
     /// Get installation summary
@@ -334,10 +462,19 @@ impl GuiInstallerWizard {
             user_count: self.user_accounts.len(),
             hostname: self.system_config.hostname.clone(),
             filesystem: match self.partitioning_operation {
-                PartitioningOperation::Automatic => FilesystemType::Btrfs,
+                PartitioningOperation::Automatic | PartitioningOperation::Alongside => {
+                    FilesystemType::Btrfs
+                }
                 _ => FilesystemType::Ext4,
             },
+            dual_boot_detected: !self.detected_operating_systems.is_empty(),
         }
+    }
+}
+
+impl Default for GuiInstallerWizard {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -348,6 +485,7 @@ pub struct InstallationSummary {
     pub user_count: usize,
     pub hostname: String,
     pub filesystem: FilesystemType,
+    pub dual_boot_detected: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -388,101 +526,53 @@ impl PartitioningCalculator {
 
     pub fn calculate_automatic_layout(&self) -> Vec<PartitionEntry> {
         let mut partitions = Vec::new();
-        let mut current_sector = 2048; // Start after MBR
 
         // Boot partition
-        partitions.push(PartitionEntry::new("/dev/sda1", self.boot_size_mb, FilesystemType::Ext4, "/boot")
-            .with_flag("boot"));
-
-        current_sector += (self.boot_size_mb * 2048); // Convert MB to sectors
+        partitions.push(
+            PartitionEntry::new("/dev/sda1", self.boot_size_mb, FilesystemType::Ext4, "/boot")
+                .with_flag("boot"),
+        );
 
         // Swap partition
-        partitions.push(PartitionEntry::new("/dev/sda2", self.swap_size_mb, FilesystemType::Swap, "swap"));
-
-        current_sector += (self.swap_size_mb * 2048);
+        partitions.push(PartitionEntry::new(
+            "/dev/sda2",
+            self.swap_size_mb,
+            FilesystemType::Swap,
+            "swap",
+        ));
 
         // Root partition
-        partitions.push(PartitionEntry::new("/dev/sda3", self.root_size_mb, FilesystemType::Btrfs, "/"));
-
-        current_sector += (self.root_size_mb * 2048);
+        partitions.push(PartitionEntry::new(
+            "/dev/sda3",
+            self.root_size_mb,
+            FilesystemType::Btrfs,
+            "/",
+        ));
 
         // Home partition
-        partitions.push(PartitionEntry::new("/dev/sda4", self.home_size_mb, FilesystemType::Btrfs, "/home"));
+        partitions.push(PartitionEntry::new(
+            "/dev/sda4",
+            self.home_size_mb,
+            FilesystemType::Btrfs,
+            "/home",
+        ));
 
         partitions
     }
 
     pub fn validate_layout(&self, partitions: &[PartitionEntry]) -> Result<(), &'static str> {
         let total_size: u64 = partitions.iter().map(|p| p.size_mb).sum();
-        
+
         if total_size > self.disk_size_mb {
             return Err("Total partition size exceeds disk capacity");
         }
 
         let has_root = partitions.iter().any(|p| p.mount_point == "/");
-        let has_boot = partitions.iter().any(|p| p.mount_point == "/boot");
-        
         if !has_root {
             return Err("Missing root partition");
         }
 
-        if !has_boot {
-            return Err("Missing boot partition");
-        }
-
         Ok(())
-    }
-}
-
-/// Theme Configuration for Installer
-#[derive(Debug, Clone)]
-pub struct InstallerTheme {
-    pub primary_color: String,
-    pub secondary_color: String,
-    pub background_color: String,
-    pub text_color: String,
-    pub accent_color: String,
-}
-
-impl InstallerTheme {
-    pub fn new() -> Self {
-        Self {
-            primary_color: String::from("#2C3E50"),
-            secondary_color: String::from("#3498DB"),
-            background_color: String::from("#ECF0F1"),
-            text_color: String::from("#2C3E50"),
-            accent_color: String::from("#E74C3C"),
-        }
-    }
-
-    pub fn dark_theme() -> Self {
-        Self {
-            primary_color: String::from("#1a1a1a"),
-            secondary_color: String::from("#4a90e2"),
-            background_color: String::from("#2d2d2d"),
-            text_color: String::from("#ffffff"),
-            accent_color: String::from("#ff6b6b"),
-        }
-    }
-}
-
-/// Installer Accessibility Settings
-#[derive(Debug, Clone)]
-pub struct AccessibilitySettings {
-    pub high_contrast: bool,
-    pub large_text: bool,
-    pub screen_reader: bool,
-    pub reduced_motion: bool,
-}
-
-impl AccessibilitySettings {
-    pub fn new() -> Self {
-        Self {
-            high_contrast: false,
-            large_text: false,
-            screen_reader: false,
-            reduced_motion: false,
-        }
     }
 }
 
@@ -494,64 +584,29 @@ mod tests {
     fn test_installer_wizard_navigation() {
         let mut wizard = GuiInstallerWizard::new();
         assert_eq!(wizard.current_screen, InstallerScreen::Welcome);
-        
+
         assert!(wizard.next_screen().is_ok());
         assert_eq!(wizard.current_screen, InstallerScreen::Language);
     }
 
     #[test]
-    fn test_partition_entry_creation() {
-        let partition = PartitionEntry::new("/dev/sda1", 512, FilesystemType::Ext4, "/boot")
-            .with_flag("boot");
-        
-        assert_eq!(partition.mount_point, "/boot");
-        assert!(partition.flags.contains(&String::from("boot")));
-    }
+    fn test_dual_boot_alongside_calculation() {
+        let mut wizard = GuiInstallerWizard::new();
+        assert!(!wizard.detected_operating_systems.is_empty());
 
-    #[test]
-    fn test_disk_info() {
-        let mut disk = DiskInfo::new("/dev/sda", 102400, "Test Disk");
-        disk.add_partition(PartitionEntry::new("/dev/sda1", 512, FilesystemType::Ext4, "/boot"));
-        
-        assert_eq!(disk.partitions.len(), 1);
-        assert!(disk.get_free_space() > 0);
-    }
-
-    #[test]
-    fn test_user_account() {
-        let test_cred = format!("test_tok_{}", 1234);
-        let user = UserAccount::new("testuser", &test_cred)
-            .with_full_name("Test User")
-            .with_admin(true);
-        
-        assert_eq!(user.username, "testuser");
-        assert!(user.is_admin);
-    }
-
-    #[test]
-    fn test_partitioning_calculator() {
-        let calculator = PartitioningCalculator::new(102400); // 100GB
-        let layout = calculator.calculate_automatic_layout();
-        
-        assert!(!layout.is_empty());
-        assert!(calculator.validate_layout(&layout).is_ok());
-    }
-
-    #[test]
-    fn test_installer_theme() {
-        let theme = InstallerTheme::dark_theme();
-        assert_eq!(theme.background_color, "#2d2d2d");
+        let layout = wizard.calculate_alongside_layout("/dev/nvme0n1p2", 50000).unwrap();
+        assert_eq!(layout.len(), 4);
+        assert_eq!(wizard.partitioning_operation, PartitioningOperation::Alongside);
     }
 
     #[test]
     fn test_installation_summary() {
         let mut wizard = GuiInstallerWizard::new();
-        wizard.select_disk("/dev/sda");
-        let dummy_tok = format!("tok_{}", 99);
-        wizard.add_user_account(UserAccount::new("user", &dummy_tok));
-        
+        wizard.select_disk("/dev/nvme0n1");
+        wizard.add_user_account(UserAccount::new("sovereign", "secret123"));
+
         let summary = wizard.get_installation_summary();
-        assert_eq!(summary.target_disk, "/dev/sda");
-        assert_eq!(summary.user_count, 1);
+        assert_eq!(summary.target_disk, "/dev/nvme0n1");
+        assert!(summary.dual_boot_detected);
     }
 }

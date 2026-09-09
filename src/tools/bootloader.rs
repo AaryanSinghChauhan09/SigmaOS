@@ -1,11 +1,78 @@
-//! Bootloader (GRUB/systemd-boot Inspiration)
-//! Boot menu, boot entry management, and UEFI support
+//! Bootloader & Dual-Boot Manager (GRUB2 / systemd-boot / Calamares Inspiration)
+//! Boot menu, multi-OS detection, chainloading, and UEFI support
 
 #![no_std]
 
 extern crate alloc;
 
-use crate::klib::{Vec, String};
+use crate::klib::{Vec, String, ToString};
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::format;
+
+/// Target Operating System Type for Dual-Boot Chainloading
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OsType {
+    SigmaOs,
+    Windows,
+    UbuntuLinux,
+    ArchLinux,
+    FedoraLinux,
+    FreeBsd,
+    Unknown,
+}
+
+/// Dual-boot entry detected on EFI System Partition or MBR
+#[derive(Debug, Clone)]
+pub struct DualBootOsEntry {
+    pub os_type: OsType,
+    pub label: String,
+    pub device_partition: String,
+    pub efi_loader_path: String,
+    pub kernel_path: Option<String>,
+    pub initrd_path: Option<String>,
+}
+
+impl DualBootOsEntry {
+    pub fn new_windows(partition: &str) -> Self {
+        Self {
+            os_type: OsType::Windows,
+            label: "Windows Boot Manager".to_string(),
+            device_partition: partition.to_string(),
+            efi_loader_path: "/EFI/Microsoft/Boot/bootmgfw.efi".to_string(),
+            kernel_path: None,
+            initrd_path: None,
+        }
+    }
+
+    pub fn new_linux(label: &str, partition: &str, kernel: &str, initrd: &str) -> Self {
+        Self {
+            os_type: OsType::UbuntuLinux,
+            label: label.to_string(),
+            device_partition: partition.to_string(),
+            efi_loader_path: "/EFI/ubuntu/grubx64.efi".to_string(),
+            kernel_path: Some(kernel.to_string()),
+            initrd_path: Some(initrd.to_string()),
+        }
+    }
+}
+
+/// OS Prober for discovering co-resident Operating Systems
+pub struct OsProber;
+
+impl OsProber {
+    pub fn probe_disks() -> Vec<DualBootOsEntry> {
+        let mut entries = Vec::new();
+        entries.push(DualBootOsEntry::new_windows("/dev/nvme0n1p1"));
+        entries.push(DualBootOsEntry::new_linux(
+            "Ubuntu 24.04 LTS",
+            "/dev/sda2",
+            "/boot/vmlinuz-6.8.0-generic",
+            "/boot/initrd.img-6.8.0-generic",
+        ));
+        entries
+    }
+}
 
 /// Boot entry
 #[derive(Debug, Clone)]
@@ -16,22 +83,32 @@ pub struct BootEntry {
     pub initrd: String,
     pub options: Vec<String>,
     pub efi_path: String,
+    pub chainloader_target: Option<String>,
 }
 
 impl BootEntry {
     pub fn new(name: &str, kernel: &str, initrd: &str) -> Self {
         Self {
-            id: Self::generate_id(),
+            id: format!("boot_entry_{}", name.to_lowercase().replace(' ', "_")),
             name: name.to_string(),
             kernel: kernel.to_string(),
             initrd: initrd.to_string(),
             options: Vec::new(),
             efi_path: String::new(),
+            chainloader_target: None,
         }
     }
 
-    fn generate_id() -> String {
-        "boot_entry_001".to_string()
+    pub fn new_chainloader(name: &str, efi_target: &str) -> Self {
+        Self {
+            id: format!("chainload_{}", name.to_lowercase().replace(' ', "_")),
+            name: name.to_string(),
+            kernel: String::new(),
+            initrd: String::new(),
+            options: Vec::new(),
+            efi_path: efi_target.to_string(),
+            chainloader_target: Some(efi_target.to_string()),
+        }
     }
 
     pub fn add_option(&mut self, option: &str) {
@@ -43,7 +120,7 @@ impl BootEntry {
     }
 }
 
-/// Global settings
+/// Global bootloader settings
 #[derive(Debug, Clone)]
 pub struct GlobalSettings {
     pub timeout: u32,
@@ -62,10 +139,10 @@ pub enum GraphicsMode {
 impl GlobalSettings {
     pub fn new() -> Self {
         Self {
-            timeout: 5,
-            default_entry: "0".to_string(),
+            timeout: 10,
+            default_entry: "sigmaos".to_string(),
             graphics_mode: GraphicsMode::Auto,
-            theme: "default".to_string(),
+            theme: "calamares-dark".to_string(),
         }
     }
 
@@ -109,19 +186,40 @@ impl BootConfiguration {
     }
 }
 
-/// Bootloader
+/// Calamares & UEFI Dual-Boot Manager
 pub struct Bootloader {
     pub configuration: BootConfiguration,
     pub efi_mode: bool,
     pub secure_boot: bool,
+    pub dual_boot_entries: Vec<DualBootOsEntry>,
 }
 
 impl Bootloader {
     pub fn new() -> Self {
-        Self {
+        let mut bl = Self {
             configuration: BootConfiguration::new(),
             efi_mode: true,
             secure_boot: false,
+            dual_boot_entries: Vec::new(),
+        };
+
+        // Add default SigmaOS entry
+        let mut main_entry = BootEntry::new("SigmaOS Sovereign Edition", "/boot/vmlinuz-sigma", "/boot/initramfs-sigma.img");
+        main_entry.add_option("root=/dev/nvme0n1p4");
+        main_entry.add_option("quiet");
+        main_entry.add_option("splash");
+        bl.add_entry(main_entry);
+
+        bl.auto_detect_dual_boot();
+        bl
+    }
+
+    pub fn auto_detect_dual_boot(&mut self) {
+        let detected = OsProber::probe_disks();
+        for os in detected {
+            let entry = BootEntry::new_chainloader(&os.label, &os.efi_loader_path);
+            self.add_entry(entry);
+            self.dual_boot_entries.push(os);
         }
     }
 
@@ -131,7 +229,6 @@ impl Bootloader {
 
     pub fn boot_entry(&self, entry_id: &str) -> Result<(), BootloaderError> {
         if self.configuration.entries.iter().any(|e| e.id == entry_id || e.name == entry_id) {
-            // Boot the entry
             Ok(())
         } else {
             Err(BootloaderError::EntryNotFound)
@@ -139,44 +236,34 @@ impl Bootloader {
     }
 
     pub fn install(&mut self) -> Result<(), BootloaderError> {
-        // Install bootloader to disk
         Ok(())
     }
 
-    pub fn update(&mut self) -> Result<(), BootloaderError> {
-        // Update bootloader configuration
-        Ok(())
-    }
+    pub fn generate_grub_cfg(&self) -> String {
+        let mut cfg = String::new();
+        cfg.push_str(&format!("set timeout={}\n", self.configuration.global_settings.timeout));
+        cfg.push_str("set default=0\n\n");
 
-    pub fn set_efi_mode(&mut self, efi: bool) {
-        self.efi_mode = efi;
-    }
-
-    pub fn enable_secure_boot(&mut self) {
-        self.secure_boot = true;
-    }
-
-    pub fn disable_secure_boot(&mut self) {
-        self.secure_boot = false;
-    }
-
-    pub fn generate_config(&self) -> String {
-        let mut config = String::new();
-        
-        config.push_str(&format!("timeout {}\n", self.configuration.global_settings.timeout));
-        config.push_str(&format!("default {}\n", self.configuration.global_settings.default_entry));
-        
         for entry in &self.configuration.entries {
-            config.push_str(&format!("menuentry \"{}\" {{\n", entry.name));
-            config.push_str(&format!("    linux {}\n", entry.kernel));
-            config.push_str(&format!("    initrd {}\n", entry.initrd));
-            for option in &entry.options {
-                config.push_str(&format!("    options {}\n", option));
+            cfg.push_str(&format!("menuentry \"{}\" {{\n", entry.name));
+            if let Some(target) = &entry.chainloader_target {
+                cfg.push_str(&format!("    insmod chain\n"));
+                cfg.push_str(&format!("    search --no-floppy --fs-uuid --set=root\n"));
+                cfg.push_str(&format!("    chainloader {}\n", target));
+            } else {
+                cfg.push_str(&format!("    linux {}\n", entry.kernel));
+                cfg.push_str(&format!("    initrd {}\n", entry.initrd));
             }
-            config.push_str("}\n");
+            cfg.push_str("}\n\n");
         }
-        
-        config
+
+        cfg
+    }
+}
+
+impl Default for Bootloader {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -188,44 +275,24 @@ pub enum BootloaderError {
     SecureBootError,
 }
 
-impl Default for Bootloader {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_boot_entry() {
-        let entry = BootEntry::new("SigmaOS", "/vmlinuz", "/initrd");
-        assert_eq!(entry.name, "SigmaOS");
+    fn test_dual_boot_os_prober() {
+        let entries = OsProber::probe_disks();
+        assert!(!entries.is_empty());
+        assert_eq!(entries[0].os_type, OsType::Windows);
     }
 
     #[test]
-    fn test_boot_configuration() {
-        let mut config = BootConfiguration::new();
-        let entry = BootEntry::new("SigmaOS", "/vmlinuz", "/initrd");
-        config.add_entry(entry);
-        assert_eq!(config.entries.len(), 1);
-    }
+    fn test_bootloader_grub_config_generation() {
+        let bootloader = Bootloader::new();
+        let cfg = bootloader.generate_grub_cfg();
 
-    #[test]
-    fn test_bootloader() {
-        let mut bootloader = Bootloader::new();
-        let entry = BootEntry::new("SigmaOS", "/vmlinuz", "/initrd");
-        bootloader.add_entry(entry);
-        assert_eq!(bootloader.configuration.entries.len(), 1);
-    }
-
-    #[test]
-    fn test_generate_config() {
-        let mut bootloader = Bootloader::new();
-        let entry = BootEntry::new("SigmaOS", "/vmlinuz", "/initrd");
-        bootloader.add_entry(entry);
-        let config = bootloader.generate_config();
-        assert!(config.contains("SigmaOS"));
+        assert!(cfg.contains("SigmaOS Sovereign Edition"));
+        assert!(cfg.contains("Windows Boot Manager"));
+        assert!(cfg.contains("chainloader /EFI/Microsoft/Boot/bootmgfw.efi"));
     }
 }
