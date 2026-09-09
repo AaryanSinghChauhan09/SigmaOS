@@ -3,14 +3,7 @@
 > **"Sovereignty is the ultimate efficiency."**
 > The world's first industrial-grade microkernel designed for total digital autonomy, post-quantum resilience, and Indian industrial compliance.
 
-The wiki contains comprehensive documentation about:
-- AI Agent development rules and guidelines
-- Linux/BSD distro compatibility and implementation
-- Security documentation and hardening guides
-- Performance optimization guides
-- Architecture documentation
-- Developer guidelines and rules
-- Roadmap and strategic planning documents
+---
 
 ## 🎯 Overview
 

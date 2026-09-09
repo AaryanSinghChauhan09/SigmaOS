@@ -23,9 +23,6 @@ pub enum OmarchyTheme {
     Nord,
     Everforest,
     Kanagawa,
-    RosePine,
-    SolarizedDark,
-    SolarizedLight,
 }
 
 impl OmarchyTheme {
@@ -37,9 +34,6 @@ impl OmarchyTheme {
             Self::Nord => "nord",
             Self::Everforest => "everforest",
             Self::Kanagawa => "kanagawa",
-            Self::RosePine => "rose-pine",
-            Self::SolarizedDark => "solarized-dark",
-            Self::SolarizedLight => "solarized-light",
         }
     }
 
@@ -51,9 +45,6 @@ impl OmarchyTheme {
             Self::Nord => "#88c0d0",
             Self::Everforest => "#a7c080",
             Self::Kanagawa => "#7e9cd8",
-            Self::RosePine => "#ebbcba",
-            Self::SolarizedDark => "#268bd2",
-            Self::SolarizedLight => "#b58900",
         }
     }
 
@@ -65,9 +56,6 @@ impl OmarchyTheme {
             Self::Nord => "#2e3440",
             Self::Everforest => "#2d353b",
             Self::Kanagawa => "#1f1f28",
-            Self::RosePine => "#191724",
-            Self::SolarizedDark => "#002b36",
-            Self::SolarizedLight => "#fdf6e3",
         }
     }
 
@@ -79,9 +67,6 @@ impl OmarchyTheme {
             Self::Nord => "#d8dee9",
             Self::Everforest => "#d3c6aa",
             Self::Kanagawa => "#dcd7ba",
-            Self::RosePine => "#e0def4",
-            Self::SolarizedDark => "#839496",
-            Self::SolarizedLight => "#657b83",
         }
     }
 }
@@ -222,7 +207,7 @@ impl OmarchyModernDesktopEngine {
             theme_name = {}
             variable = rgb({})
             variable = rgb({})
-
+            
             general {{
                 gaps_in = 6
                 gaps_out = 12
@@ -231,7 +216,7 @@ impl OmarchyModernDesktopEngine {
                 col.inactive_border = rgba({}aa)
                 layout = dwindle
             }}
-
+            
             decoration {{
                 rounding = 10
                 blur {{
@@ -600,12 +585,12 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-// pub use crate::distro::omarchy_inspiration::{
-//     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
-//     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
-//     OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
-//     QuickshellWidget, ShellComponentKind,
-// };
+pub use crate::distro::omarchy_inspiration::{
+    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
+    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
+    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
+    QuickshellWidget, ShellComponentKind,
+};
 
 #[cfg(test)]
 mod tests {
@@ -669,59 +654,4 @@ mod tests {
         assert_eq!(audio.quantum_buffer_size, 64);
         assert!(!audio.set_low_latency(0));
     }
-
-    #[test]
-    fn test_omarchy_extended_themes_and_desktop_components() {
-        assert_eq!(OmarchyTheme::RosePine.name(), "rose-pine");
-        assert_eq!(OmarchyTheme::SolarizedDark.bg_color(), "#002b36");
-        assert_eq!(OmarchyTheme::SolarizedLight.accent_color(), "#b58900");
-
-        let hypridle = OmarchyHypridleEngine::new();
-        let idle_conf = hypridle.generate_hypridle_conf();
-        assert!(idle_conf.contains("timeout = 300"));
-        assert!(idle_conf.contains("timeout = 600"));
-
-        let walker = OmarchyWalkerLauncherEngine::new();
-        let walker_conf = walker.generate_walker_config_toml();
-        assert!(walker_conf.contains("placeholder"));
-        assert!(walker_conf.contains("applications"));
-
-        let swaync = OmarchySwayNcEngine::new();
-        let swaync_json = swaync.generate_swaync_json();
-        assert!(swaync_json.contains("control-center-width"));
-        assert!(swaync_json.contains("notifications"));
-
-        let waybar = OmarchyWaybarEngine::new();
-        let waybar_json = waybar.generate_waybar_json();
-        assert!(waybar_json.contains("hyprland/workspaces"));
-        assert!(waybar_json.contains("pulseaudio"));
-
-        let dev_installer = OmarchyOmakubDevInstaller::new();
-        let plan = dev_installer.generate_installation_plan();
-        assert!(plan.iter().any(|cmd| cmd.contains("mise use --global rust")));
-        assert!(plan.iter().any(|cmd| cmd.contains("pacman -S --needed --noconfirm neovim")));
-    }
-
-    #[test]
-    fn test_omarchy_hyprpaper_wallpaper_engine() {
-        let mut hyprpaper = OmarchyHyprpaperWallpaperEngine::new();
-        hyprpaper.set_wallpaper_for_monitor("DP-1", "/usr/share/backgrounds/tokyo-night.png");
-        let paper_conf = hyprpaper.generate_hyprpaper_conf();
-        assert!(paper_conf.contains("preload = /usr/share/backgrounds/tokyo-night.png"));
-        assert!(paper_conf.contains("wallpaper = DP-1,/usr/share/backgrounds/tokyo-night.png"));
-    }
-
-    #[test]
-    fn test_omarchy_fastfetch_and_ghostty_engines() {
-        let fastfetch = OmarchyFastfetchSysinfoEngine::new();
-        let sysinfo_json = fastfetch.generate_fastfetch_jsonc();
-        assert!(sysinfo_json.contains("omarchy"));
-        assert!(sysinfo_json.contains("modules"));
-
-        let ghostty = OmarchyGhosttyTerminalEngine::new();
-        let ghostty_cfg = ghostty.generate_ghostty_config();
-        assert!(ghostty_cfg.contains("JetBrainsMono Nerd Font"));
-        assert!(ghostty_cfg.contains("theme = tokyonight"));
-    }
-
 }

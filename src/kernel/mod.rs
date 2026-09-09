@@ -1,16 +1,37 @@
 #![allow(ambiguous_glob_reexports)]
 // SigmaOS Kernel Module
 pub mod architecture;
+pub mod atomic_extended;
+pub mod cgroup_v2;
+pub mod kqueue_event;
+pub mod cgroup_controllers;
+pub mod block_dev;
+pub mod bore;
+pub mod breakthrough;
 pub mod breakthroughs;
+pub mod breakthroughs_v2;
+pub mod bus;
+pub mod classic_os;
+pub mod component;
+pub mod console;
+pub mod cpu_features;
+pub mod cpufreq;
+pub mod device;
+pub mod driver;
+pub mod dtrace_compat;
+pub mod ebpf;
+pub mod bsd_kernel_parity;
+pub mod ebpf_vm;
+pub mod ebpf_verification;
+pub mod exports;
+pub mod gap_closing;
+pub mod gap_filling;
+pub mod generation_manager;
+pub mod io_uring;
 pub mod ipc;
-pub mod kqueue;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
-pub use linux_parity::{
-    CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
-    LinuxKernelWorkqueueEngine, LinuxRcuSynchronizationEngine, RcuCallback, WorkItem,
-};
 pub mod memory;
 pub mod meta;
 pub mod module_loader;
@@ -28,7 +49,9 @@ pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
 pub mod structures;
-pub mod traits;
+pub mod subsystem;
+pub mod syscall;
+pub mod task_name_cache;
 pub mod virtual_cpu;
 pub mod vmm_paging;
 
@@ -50,6 +73,32 @@ pub use gap_closing::{
 pub use generation_manager::{Generation, GenerationManager};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
+pub use linux_bsd_innovations::{
+    AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
+    BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
+    BsdPfStateTable, CapabilityDerivationTree, CarpSecurityRouter, CgroupResourceLimits, CowBlock,
+    CowStorageEngine, CpuIsaMicroarch, DevlinkHealthReporter, DynamicLkmLoader, EbpfInstruction,
+    EbpfRuntime, ExokernelHardwareMultiplexer, FastPacketFrame, FreeBsdCapsicumEngine,
+    FreeBsdGeomTopology, FreeBsdJail, FreeBsdVfsNullfs, FreeBsdVnetManager, FutexOp, FutexWaiter,
+    GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
+    Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
+    HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
+    KernelAccessController, KernelCapability, KernelFastPacketEngine, KernelModule, KmdfDriver,
+    KmdfIoRequest, KmdfPnpState, KmdfPowerState, LandlockAccessRight, LandlockPathRule,
+    LinuxDevlinkHealthMonitor, LinuxFutexEngine, LinuxLandlockLsmRuleEngine,
+    MemoryCompactionSuperpagesAllocator, MicrokernelCore, MicrokernelTranslatorRegistry,
+    MultikernelMessage, MultikernelMessagePassing, NamespaceType, NanokernelHardwareBroker,
+    NanokernelIrq, NetBsdRumpKernel, NinePProtocolTranslator, NinePResource,
+    NixOsDeclarativeManager, NtExecutiveService, NullfsLayerNode, OpenBsdPledge,
+    OpenBsdUnveilEngine, OpenSuseSnapperEngine, PfFiveTuple, PfStateEntry, PhysicalFrameBlock,
+    ReactorEvent, ReactorRegistration, ResourceBinding, RumpComponent, SnapperSnapshot,
+    SoftIrqType, SovereignCgroupGovernor, SovereignEventReactor, SovereignNamespaceContainer,
+    SovereignSwapEngine, SovereignZone, SovereignZonesManager, SwapDeviceConfig, SwapPage,
+    UnveilPathRule, VnetNetworkStack, VoidLinuxRunitSupervisor, VoidRunitInit, VoidRunitService,
+    VoidRunitStage, XdpAction, ZramCompressedPage, CAP_MMAP_FLAG, CAP_READ_FLAG, CAP_SEEK_FLAG,
+    CAP_WRITE_FLAG, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_EXEC, PLEDGE_INET, PLEDGE_RPATH,
+    PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
+};
 pub use linux_parity::*;
 pub use memory::{
     BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
@@ -66,29 +115,14 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use namespaces::{
+    KernelNamespace, NamespaceId, KernelNamespaceType, NamespaceConfig, NamespaceError,
+    NamespaceIdGenerator, next_namespace_id, MAX_NAMESPACES, MAX_PIDS_PER_NAMESPACE,
+};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-
-pub mod sigma_kthread;
-pub mod sigma_timer;
-pub mod sigma_workqueue;
-pub mod sigma_cgroup_v2;
-pub mod sigma_signal;
-
-pub mod cgroups_v2_sovereign;
-pub use cgroups_v2_sovereign::{SovereignCgroupsV2Manager, CgroupController, CgroupNode, CpuAccounting, MemoryAccounting, PidAccounting};
-pub mod bsd_jails_sovereign;
-pub use bsd_jails_sovereign::{SovereignBsdJailManager, SovereignJail, JailState, JailPermissions, JailNetworkConfig, JailProcess};
-
-pub mod ftrace_sovereign;
-pub use ftrace_sovereign::{SovereignFtracer, TraceEvent, TraceEventKind, TraceRingBuffer, TracerFilter, LatencyHistogram};
-
-pub mod eevdf_sovereign;
-pub use eevdf_sovereign::{SovereignEevdfScheduler, EevdfSchedEntity};
-pub mod io_uring_sqpoll_sovereign;
-pub use io_uring_sqpoll_sovereign::{SovereignIoUringSqpoll, SovereignSqe, SovereignCqe, IoUringOp};
-
-pub mod psi_sovereign;
-pub use psi_sovereign::{SovereignPsiManager, PsiResource, PsiRecord, PsiMetric, PsiTrigger};
-pub mod ksm_sovereign;
-pub use ksm_sovereign::{SovereignKsmEngine, KsmPage};
+pub use cgroup_v2::{
+    Cgroup, CgroupHierarchy, CgroupId, CgroupState, ControllerType, CpuController,
+    MemoryController, PidsController, Controller,
+};
+pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};

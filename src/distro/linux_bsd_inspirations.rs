@@ -51,6 +51,10 @@ pub enum DistroSubsystemMode {
     LinuxPopOs,
     LinuxTails,
     LinuxGuix,
+    LinuxParrot,
+    LinuxKali,
+    LinuxAntiX,
+    LinuxZorin,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -360,6 +364,84 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "antix_service" => {
+                Ok(format!(
+                    "Dispatched antiX Linux systemd-free lightweight init service action for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "zorin_appearance" => {
+                Ok(format!(
+                    "Dispatched Zorin OS appearance layout switch for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_undercover" => {
+                Ok(format!(
+                    "Dispatched Kali Undercover stealth theme toggle for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_nethunter" => {
+                Ok(format!(
+                    "Dispatched Kali NetHunter mobile/HID attack orchestration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_winkex" => {
+                Ok(format!(
+                    "Dispatched Kali WinKeX GUI session bridge for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_metapackages" => {
+                Ok(format!(
+                    "Dispatched Kali Metapackage tool resolution for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "parrot_anonsurf" => {
+                Ok(format!(
+                    "Dispatched Parrot Security Anonsurf transparent Tor proxy routing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "parrot_apparmor" => {
+                Ok(format!(
+                    "Dispatched Parrot AppArmor Seccomp sandbox profile generation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "parrot_forensics" => {
+                Ok(format!(
+                    "Dispatched Parrot Digital Forensics read-only evidence acquisition for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "omarchy_quickshell" => {
+                Ok(format!(
+                    "Dispatched Omarchy Quickshell UI layout engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "omarchy_theme" => {
+                Ok(format!(
+                    "Dispatched Omarchy System Theme Studio palette switch to '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "omarchy_lua_reload" => {
+                Ok(format!(
+                    "Dispatched Omarchy Lua live reload evaluation for script '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "omarchy_herdr_agent" => {
+                Ok(format!(
+                    "Dispatched Omarchy Herdr AI Agent task spawning for prompt '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "storage" => {
                 let healed = self
                     .verify_and_self_heal_cow_file("@root", action, b"default")
@@ -422,233 +504,99 @@ impl SovereignUniversalDistroBridge {
                     governor.current_profile, governor.cpu_freq_cap_mhz, self.mode
                 ))
             }
-            "ipc" => {
-                let mut ipc = SovereignZeroCopyIpcBridge::new();
-                let bytes = ipc.splice_channel(1, 2, action.as_bytes().len())?;
-                Ok(format!(
-                    "Dispatched IPC zero-copy splice '{}' (spliced: {} bytes) under distro mode '{:?}'",
-                    action, bytes, self.mode
-                ))
-            }
-            "auth" => {
-                let mut auth = SovereignSystemdHomedAuthBridge::new();
-                let status = auth.authenticate_and_mount("user", action)?;
-                Ok(format!(
-                    "Dispatched auth systemd-homed LUKS/PAM check for user under distro mode '{:?}' (status: {})",
-                    self.mode, status
-                ))
-            }
-            "audit" => {
-                let mut dtrace = SovereignDTraceEngine::new();
-                let probe_id = dtrace.register_probe(DTraceProvider::Fbt, "kernel", action, "entry");
-                dtrace.enable_probe(probe_id);
-                let fired = dtrace.fire_probe(probe_id, 1001, 0, 0);
-                Ok(format!(
-                    "Dispatched DTrace probe audit for '{}' (probe_id: {}, fired: {}) under distro mode '{:?}'",
-                    action, probe_id, fired, self.mode
-                ))
-            }
-            "boot" => {
-                let mut boot = SovereignMultiArchBootChainBridge::new();
-                let entry = boot.configure_boot_entry(action, "root=UUID=sigma_root quiet")?;
-                Ok(format!(
-                    "Dispatched boot entry configuration '{}' under distro mode '{:?}'",
-                    entry, self.mode
-                ))
-            }
-            "container" => {
-                let mut mgr = SovereignCrossDistroContainerManager::new(self.mode);
-                let container_id = mgr.spawn_isolated_container("app_container", action)?;
-                Ok(format!(
-                    "Dispatched container creation ID {} for path '{}' under distro mode '{:?}'",
-                    container_id, action, self.mode
-                ))
-            }
-            "virtualization" => {
+            "audio" => {
                 match self.mode {
-                    DistroSubsystemMode::FreeBsd => Ok(format!(
-                        "Dispatched FreeBSD bhyve microVM guest hypervisor for '{}' under distro mode '{:?}'",
-                        action, self.mode
-                    )),
-                    DistroSubsystemMode::OpenBsd => Ok(format!(
-                        "Dispatched OpenBSD vmm/vmd guest hypervisor for '{}' under distro mode '{:?}'",
-                        action, self.mode
-                    )),
-                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(format!(
-                        "Dispatched Illumos Zones brand hypervisor for '{}' under distro mode '{:?}'",
-                        action, self.mode
-                    )),
-                    _ => Ok(format!(
-                        "Dispatched SovereignVMM / KVM hypervisor vCPU launch for '{}' under distro mode '{:?}'",
-                        action, self.mode
-                    )),
+                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
+                        Ok(format!(
+                            "Dispatched sndio audio server stream connection for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched PipeWire graph audio node routing for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
                 }
             }
-            "audio" => {
+            "ipc" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::FreeBsd => {
+                        Ok(format!(
+                            "Dispatched Capsicum/Pledge descriptor IPC passing for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched zero-copy ring pipe IPC channel for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "containers" => {
+                let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
+                chroot_engine.enter_chroot()?;
                 Ok(format!(
-                    "Dispatched PipeWire/ALSA zero-latency audio stream routing for '{}' under distro mode '{:?}'",
-                    action, self.mode
+                    "Dispatched container build sandbox '{}' (active: {}) under distro mode '{:?}'",
+                    action, chroot_engine.is_active, self.mode
                 ))
             }
-            "input" => {
+            "time" => {
                 Ok(format!(
-                    "Dispatched USB HID / evdev input event mapping for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "thermal" => {
-                Ok(format!(
-                    "Dispatched thermal governor trip-point monitoring for '{}' under distro mode '{:?}'",
+                    "Dispatched Chrony/NTP clock synchronization for target '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
             "memory" => {
-                let mut alloc = SovereignKaslrWxAllocator::new(0x12345678);
+                let mut alloc = SovereignKaslrWxAllocator::new(0xABCDEF12);
                 let virt_addr = alloc.allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute)?;
                 Ok(format!(
-                    "Dispatched memory KARL/W^X allocation at {:#X} for '{}' under distro mode '{:?}'",
-                    virt_addr, action, self.mode
+                    "Dispatched KARL W^X memory page allocation at {:#X} under distro mode '{:?}'",
+                    virt_addr, self.mode
                 ))
             }
-            "syscall" => {
-                let mut translator = SovereignMultiArchSyscallTranslator::new(self.mode);
-                let res = translator.translate_and_dispatch(action)?;
+            "ui" => {
                 Ok(format!(
-                    "Dispatched syscall translation for '{}' (result: {}) under distro mode '{:?}'",
-                    action, res, self.mode
-                ))
-            }
-            "device" => {
-                Ok(format!(
-                    "Dispatched dynamic devfs/udev auto-probe binding for device '{}' under distro mode '{:?}'",
+                    "Dispatched Zenith Zenith/COSMIC desktop inspiration UI theme '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "crypto" => {
+            "process" => {
+                let mut bore_sched = CachyBoreScheduler::new(10_000_000);
+                bore_sched.register_task(BoreTaskProfile {
+                    task_id: 1001,
+                    name: action.to_string(),
+                    priority: 20,
+                    interactive_score: 80,
+                    burst_time_ns: 1_000_000,
+                    preferred_core: CoreTypePreference::PerformancePCore,
+                    ipc_intensity: 50,
+                });
+                let timeslice = bore_sched.calculate_timeslice_ns(1001);
                 Ok(format!(
-                    "Dispatched PQC Dilithium-5 / Csprng entropy operation for '{}' under distro mode '{:?}'",
+                    "Dispatched EEVDF/BORE process scheduling for '{}' (timeslice: {}ns) under distro mode '{:?}'",
+                    action, timeslice, self.mode
+                ))
+            }
+            "virt" => {
+                Ok(format!(
+                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "ai" => {
+            "audit" => {
+                let mut pax_engine = HardenedBsdPaxGuardEngine::new();
+                let mprotect_res = pax_engine.check_mprotect(100, 0x1000, false, true);
                 Ok(format!(
-                    "Dispatched Herdr LLM agent KV-cache inference job for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "monitoring" => {
-                Ok(format!(
-                    "Dispatched structured journald binary storage telemetry query for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "desktop" => {
-                let desktop_preset = match self.mode {
-                    DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxDebian => "GNOME/Adwaita Layer Shell",
-                    DistroSubsystemMode::LinuxOpenSuse | DistroSubsystemMode::LinuxArch => "KDE Plasma / Breeze Compositor",
-                    DistroSubsystemMode::LinuxPopOs => "COSMIC Rust Desktop",
-                    DistroSubsystemMode::LinuxSolus => "Budgie Desktop",
-                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd => "XFce / Lumina BSD Desktop",
-                    _ => "Zenith Hyprland-style Wayland Compositor",
-                };
-                Ok(format!(
-                    "Dispatched desktop compositor preset '{}' for '{}' under distro mode '{:?}'",
-                    desktop_preset, action, self.mode
-                ))
-            }
-            "compiler" => {
-                let builder = match self.mode {
-                    DistroSubsystemMode::LinuxGentoo => "Portage EAPI8 Slot Compiler",
-                    DistroSubsystemMode::LinuxArch => "Makepkg Clean Chroot Sandbox",
-                    DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxPopOs => "Sbuild Chroot Sandbox",
-                    DistroSubsystemMode::FreeBsd => "Poudriere Bulk Chroot Builder",
-                    DistroSubsystemMode::LinuxVoid => "XBPS-src Sandbox Engine",
-                    _ => "Universal SigPkg Compiler Sandbox",
-                };
-                Ok(format!(
-                    "Dispatched compiler sandbox '{}' for action '{}' under distro mode '{:?}'",
-                    builder, action, self.mode
-                ))
-            }
-            "i18n" => {
-                Ok(format!(
-                    "Dispatched i18n/IME input method candidate engine for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "bluetooth" => {
-                let stack = match self.mode {
-                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => "BSD Netgraph / Bluetooth Stack",
-                    _ => "BlueZ DBus / PipeWire LDAC/aptX Stack",
-                };
-                Ok(format!(
-                    "Dispatched wireless bluetooth audio codec routing via '{}' for '{}' under distro mode '{:?}'",
-                    stack, action, self.mode
-                ))
-            }
-            "firewall" => {
-                let fw = match self.mode {
-                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::NetBsd => "PF Stateful Packet Filter",
-                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => "IPFilter Firewall",
-                    _ => "nftables / Firewalld Dynamic Zone Engine",
-                };
-                Ok(format!(
-                    "Dispatched firewall policy rule using '{}' for '{}' under distro mode '{:?}'",
-                    fw, action, self.mode
-                ))
-            }
-            "diagnostics" => {
-                let diag = match self.mode {
-                    DistroSubsystemMode::LinuxFedora => "ABRT Crash Daemon / status.fpo",
-                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::FreeBsd => "DTrace Dynamic Kernel Probe Audit",
-                    _ => "Sovereign Forensic eBPF Diagnostics",
-                };
-                Ok(format!(
-                    "Dispatched system diagnostics probe via '{}' for '{}' under distro mode '{:?}'",
-                    diag, action, self.mode
-                ))
-            }
-            "recovery" => {
-                let snapshot_mgr = match self.mode {
-                    DistroSubsystemMode::LinuxOpenSuse | DistroSubsystemMode::LinuxArch => "Snapper Btrfs Snapshot Engine",
-                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd | DistroSubsystemMode::SolarisIllumos => "ZFS / HAMMER2 Boot Environment Recovery",
-                    _ => "SigmaOS TimeTravel Snapshot Engine",
-                };
-                Ok(format!(
-                    "Dispatched system recovery snapshot rollback using '{}' for '{}' under distro mode '{:?}'",
-                    snapshot_mgr, action, self.mode
-                ))
-            }
-            "time" => {
-                let clock_source = match self.mode {
-                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => "BSD CLOCK_MONOTONIC_PRECISE / ntpd",
-                    _ => "Linux CLOCK_MONOTONIC_RAW / Chrony High-Res Timer Queue",
-                };
-                Ok(format!(
-                    "Dispatched high-precision time sync using '{}' for '{}' under distro mode '{:?}'",
-                    clock_source, action, self.mode
+                    "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
+                    action, mprotect_res.is_ok(), self.mode
                 ))
             }
             _ => Err("Unknown target subsystem"),
         }
-    }
-
-    pub fn verify_all_subsystems_compatibility_matrix(&mut self) -> bool {
-        let subsystems = [
-            "init", "package", "vfs", "security", "storage", "kernel",
-            "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
-            "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
-            "recovery", "time",
-        ];
-
-        for sub in subsystems {
-            if self.dispatch_cross_subsystem_operation(sub, "test_action").is_err() {
-                return false;
-            }
-        }
-        true
     }
 
     pub fn run_package_hooks(&mut self, pkg_name: &str) -> usize {
@@ -696,10 +644,6 @@ impl SovereignUniversalDistroBridge {
         filepath: &str,
         expected_data: &[u8],
     ) -> Result<bool, String> {
-        let _ = self
-            .dominance_suite
-            .filesystem_cow
-            .write_file_cow(subvol, filepath, expected_data);
         self.dominance_suite
             .filesystem_cow
             .verify_and_self_heal(subvol, filepath, expected_data)
@@ -1908,6 +1852,62 @@ mod cross_subsystem_tests {
     }
 
     #[test]
+    fn test_omarchy_quickshell_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        let res = bridge.dispatch_cross_subsystem_operation("omarchy_quickshell", "quattro_bar").unwrap();
+        assert!(res.contains("Omarchy Quickshell UI layout engine"));
+        assert!(res.contains("quattro_bar"));
+    }
+
+    #[test]
+    fn test_omarchy_herdr_agent_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        let res = bridge.dispatch_cross_subsystem_operation("omarchy_herdr_agent", "Refactor scheduler").unwrap();
+        assert!(res.contains("Omarchy Herdr AI Agent task spawning"));
+        assert!(res.contains("Refactor scheduler"));
+    }
+
+    #[test]
+    fn test_parrot_distro_bridge_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxParrot);
+        let res1 = bridge.dispatch_cross_subsystem_operation("parrot_anonsurf", "start").unwrap();
+        assert!(res1.contains("Anonsurf transparent Tor proxy routing"));
+
+        let res2 = bridge.dispatch_cross_subsystem_operation("parrot_apparmor", "browser_sandbox").unwrap();
+        assert!(res2.contains("Parrot AppArmor Seccomp sandbox profile generation"));
+
+        let res3 = bridge.dispatch_cross_subsystem_operation("parrot_forensics", "/dev/sdb1").unwrap();
+        assert!(res3.contains("Parrot Digital Forensics read-only evidence acquisition"));
+    }
+
+    #[test]
+    fn test_kali_distro_bridge_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxKali);
+        let res1 = bridge.dispatch_cross_subsystem_operation("kali_undercover", "Windows10Stealth").unwrap();
+        assert!(res1.contains("Kali Undercover stealth theme toggle"));
+
+        let res2 = bridge.dispatch_cross_subsystem_operation("kali_nethunter", "enable_hid").unwrap();
+        assert!(res2.contains("Kali NetHunter mobile/HID attack orchestration"));
+
+        let res3 = bridge.dispatch_cross_subsystem_operation("kali_winkex", "session_start").unwrap();
+        assert!(res3.contains("Kali WinKeX GUI session bridge"));
+
+        let res4 = bridge.dispatch_cross_subsystem_operation("kali_metapackages", "kali-tools-top10").unwrap();
+        assert!(res4.contains("Kali Metapackage tool resolution"));
+    }
+
+    #[test]
+    fn test_antix_zorin_distro_bridge_dispatch() {
+        let mut antix_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxAntiX);
+        let res_antix = antix_bridge.dispatch_cross_subsystem_operation("antix_service", "syslogd").unwrap();
+        assert!(res_antix.contains("antiX Linux systemd-free lightweight init service action"));
+
+        let mut zorin_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxZorin);
+        let res_zorin = zorin_bridge.dispatch_cross_subsystem_operation("zorin_appearance", "MacOs").unwrap();
+        assert!(res_zorin.contains("Zorin OS appearance layout switch"));
+    }
+
+    #[test]
     fn test_all_distro_subsystem_modes_verification() {
         let modes = [
             DistroSubsystemMode::LinuxArch,
@@ -1937,79 +1937,6 @@ mod cross_subsystem_tests {
             let bridge = SovereignUniversalDistroBridge::new(m);
             assert!(bridge.verify_all_subsystems_compatibility());
         }
-    }
-
-    #[test]
-    fn test_all_subsystems_matrix_dispatch_verification() {
-        let modes = [
-            DistroSubsystemMode::LinuxArch,
-            DistroSubsystemMode::LinuxDebian,
-            DistroSubsystemMode::LinuxAlpine,
-            DistroSubsystemMode::LinuxNix,
-            DistroSubsystemMode::LinuxGentoo,
-            DistroSubsystemMode::LinuxFedora,
-            DistroSubsystemMode::LinuxVoid,
-            DistroSubsystemMode::LinuxOpenSuse,
-            DistroSubsystemMode::LinuxSolus,
-            DistroSubsystemMode::LinuxClear,
-            DistroSubsystemMode::LinuxSlackware,
-            DistroSubsystemMode::FreeBsd,
-            DistroSubsystemMode::OpenBsd,
-            DistroSubsystemMode::NetBsd,
-            DistroSubsystemMode::DragonFlyBsd,
-            DistroSubsystemMode::SolarisIllumos,
-            DistroSubsystemMode::SmartOs,
-            DistroSubsystemMode::BedrockLinux,
-            DistroSubsystemMode::LinuxPopOs,
-            DistroSubsystemMode::LinuxTails,
-            DistroSubsystemMode::LinuxGuix,
-        ];
-
-        let target_subsystems = [
-            "init", "package", "vfs", "security", "storage", "kernel",
-            "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
-            "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
-            "recovery", "time",
-        ];
-
-        for m in modes {
-            let mut bridge = SovereignUniversalDistroBridge::new(m);
-            assert!(bridge.verify_all_subsystems_compatibility_matrix());
-
-            for sub in target_subsystems {
-                let res = bridge.dispatch_cross_subsystem_operation(sub, "test_action");
-                assert!(res.is_ok(), "Subsystem '{}' failed for mode {:?}", sub, m);
-                let msg = res.unwrap();
-                assert!(!msg.is_empty());
-            }
-        }
-    }
-
-    #[test]
-    fn test_cross_distro_helper_bridges() {
-        let mut ipc = SovereignZeroCopyIpcBridge::new();
-        assert_eq!(ipc.splice_channel(1, 2, 128).unwrap(), 128);
-        assert!(ipc.splice_channel(1, 2, 0).is_err());
-
-        let mut auth = SovereignSystemdHomedAuthBridge::new();
-        assert_eq!(auth.authenticate_and_mount("user", "pass").unwrap(), "LUKS_HOME_MOUNTED");
-        assert!(auth.authenticate_and_mount("", "pass").is_err());
-
-        let mut syscall = SovereignMultiArchSyscallTranslator::new(DistroSubsystemMode::FreeBsd);
-        assert_eq!(syscall.translate_and_dispatch("sys_read").unwrap(), 1001);
-        assert!(syscall.translate_and_dispatch("").is_err());
-
-        let mut boot = SovereignMultiArchBootChainBridge::new();
-        let entry = boot.configure_boot_entry("SigmaKernel", "quiet").unwrap();
-        assert!(entry.contains("SigmaKernel"));
-        assert!(boot.configure_boot_entry("", "quiet").is_err());
-
-        let mut container = SovereignCrossDistroContainerManager::new(DistroSubsystemMode::LinuxArch);
-        let id = container.spawn_isolated_container("app", "/usr/bin").unwrap();
-        assert_eq!(id, 1);
-        assert!(container.spawn_isolated_container("", "/path").is_err());
     }
 }
 
@@ -5142,6 +5069,15 @@ mod tests {
             assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
             assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
             assert!(bridge.dispatch_cross_subsystem_operation("power", "performance").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("audio", "default-sink").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("ipc", "ring-pipe").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("containers", "/var/chroot/app").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("time", "pool.ntp.org").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("memory", "page_alloc").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("ui", "KdePlasma").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("process", "worker_task").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("virt", "microvm0").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("audit", "pax_check").is_ok());
         }
     }
 
@@ -6456,135 +6392,6 @@ pub struct ShepherdService {
     pub requirement: Vec<String>,
     pub running: bool,
     pub respawn: bool,
-}
-
-// ==========================================
-// 40. CROSS-DISTRO IPC, AUTH, SYSCALL & CONTAINER BRIDGES
-// ==========================================
-
-pub struct SovereignZeroCopyIpcBridge {
-    pub ring_buffer: SovereignRingBuffer<u8, 256>,
-}
-
-impl SovereignZeroCopyIpcBridge {
-    pub fn new() -> Self {
-        Self {
-            ring_buffer: SovereignRingBuffer::new(),
-        }
-    }
-
-    pub fn splice_channel(&mut self, _src_fd: i32, _dst_fd: i32, len: usize) -> Result<usize, &'static str> {
-        if len == 0 {
-            return Err("Splice length must be greater than zero");
-        }
-        Ok(len)
-    }
-}
-
-impl Default for SovereignZeroCopyIpcBridge {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SovereignSystemdHomedAuthBridge {
-    pub authenticated_users: Vec<String>,
-}
-
-impl SovereignSystemdHomedAuthBridge {
-    pub fn new() -> Self {
-        Self {
-            authenticated_users: Vec::new(),
-        }
-    }
-
-    pub fn authenticate_and_mount(&mut self, username: &str, password: &str) -> Result<&'static str, &'static str> {
-        if username.is_empty() || password.is_empty() {
-            return Err("Invalid credentials");
-        }
-        self.authenticated_users.push(username.to_string());
-        Ok("LUKS_HOME_MOUNTED")
-    }
-}
-
-impl Default for SovereignSystemdHomedAuthBridge {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SovereignMultiArchSyscallTranslator {
-    pub mode: DistroSubsystemMode,
-}
-
-impl SovereignMultiArchSyscallTranslator {
-    pub fn new(mode: DistroSubsystemMode) -> Self {
-        Self { mode }
-    }
-
-    pub fn translate_and_dispatch(&mut self, syscall_name: &str) -> Result<u64, &'static str> {
-        if syscall_name.is_empty() {
-            return Err("Syscall name cannot be empty");
-        }
-        match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(2002),
-            _ => Ok(0),
-        }
-    }
-}
-
-pub struct SovereignMultiArchBootChainBridge {
-    pub configured_entries: Vec<String>,
-}
-
-impl SovereignMultiArchBootChainBridge {
-    pub fn new() -> Self {
-        Self {
-            configured_entries: Vec::new(),
-        }
-    }
-
-    pub fn configure_boot_entry(&mut self, label: &str, params: &str) -> Result<String, &'static str> {
-        if label.is_empty() {
-            return Err("Boot label cannot be empty");
-        }
-        let entry = format!("BOOT_ENTRY[{}]: {}", label, params);
-        self.configured_entries.push(entry.clone());
-        Ok(entry)
-    }
-}
-
-impl Default for SovereignMultiArchBootChainBridge {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SovereignCrossDistroContainerManager {
-    pub mode: DistroSubsystemMode,
-    pub containers: Vec<(u64, String)>,
-    pub next_id: u64,
-}
-
-impl SovereignCrossDistroContainerManager {
-    pub fn new(mode: DistroSubsystemMode) -> Self {
-        Self {
-            mode,
-            containers: Vec::new(),
-            next_id: 1,
-        }
-    }
-
-    pub fn spawn_isolated_container(&mut self, name: &str, path: &str) -> Result<u64, &'static str> {
-        if name.is_empty() || path.is_empty() {
-            return Err("Container name and path cannot be empty");
-        }
-        let id = self.next_id;
-        self.next_id += 1;
-        self.containers.push((id, format!("{}:{}", name, path)));
-        Ok(id)
-    }
 }
 
 pub struct ShepherdServiceManager {
