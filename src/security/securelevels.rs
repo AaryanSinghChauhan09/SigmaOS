@@ -2,7 +2,7 @@
 // Integrates core security paradigms from BSD securelevels and Linux capabilities into a unified microkernel privilege manager.
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::error::{SecurityError, SigmaError};
+use crate::klib::custom_string::SigmaString::{SecurityError, SigmaError};
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, PartialEq, Eq)]

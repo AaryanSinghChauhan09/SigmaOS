@@ -20,7 +20,7 @@ use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use super::{BuddyAllocator as KernelBuddyAllocator, MemoryBlock, PAGE_SIZE};
-use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
+use crate::klib::buddy_allocator::BuddyAllocator::{BuddyAllocator, SimpleBuddyAllocator};
 
 
 /// SigmaOS Buddy Allocator Wrapper

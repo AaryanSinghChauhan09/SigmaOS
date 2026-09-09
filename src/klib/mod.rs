@@ -46,6 +46,9 @@ pub mod time_impl;
 pub mod toml;
 pub mod utf8_utils;
 pub mod uvm;
+pub mod uuid;
+pub mod buddy_allocator;
+pub mod hash;
 
 // Re-exports
 pub use arc::Arc;
@@ -53,6 +56,7 @@ pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
 pub use custom_string::SigmaString;
+pub use uuid::Uuid;
 
 #[cfg(not(target_os = "none"))]
 pub use std::vec::Vec;
@@ -69,4 +73,3 @@ pub use std::collections::HashSet;
 pub use hashmap::HashMap;
 #[cfg(target_os = "none")]
 pub use hashset::HashSet;
-pub use uuid::Uuid;

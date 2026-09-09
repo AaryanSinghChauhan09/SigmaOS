@@ -10,8 +10,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 #[cfg(test)]
 use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::klib::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // ========================================================================
