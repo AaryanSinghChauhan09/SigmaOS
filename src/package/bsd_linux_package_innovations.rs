@@ -3376,6 +3376,11 @@ impl Default for XbpsDebianAlternativesGovernorEngine {
 }
 
 #[cfg(test)]
+#[path = "../sigpkg/universal_engine.rs"]
+#[allow(dead_code)]
+mod sigpkg_universal_engine;
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -4294,7 +4299,7 @@ MAINTAINER="SigmaOS"
     #[cfg(not(feature = "standalone_test"))]
     #[test]
     fn test_all_prompt_package_formats_detection_and_adaptation() {
-        use crate::sigpkg::universal_engine::PackageFormat;
+        use super::sigpkg_universal_engine::PackageFormat;
 
         let test_cases = [
             ("app.air", PackageFormat::Air),
