@@ -24,4 +24,5 @@ jobs:
 
       - name: Test Gentoo Package Format Transpilation
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh
