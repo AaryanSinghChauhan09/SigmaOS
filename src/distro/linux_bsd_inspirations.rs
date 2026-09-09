@@ -51,6 +51,10 @@ pub enum DistroSubsystemMode {
     LinuxPopOs,
     LinuxTails,
     LinuxGuix,
+    LinuxParrot,
+    LinuxKali,
+    LinuxAntiX,
+    LinuxZorin,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -360,6 +364,84 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "antix_service" => {
+                Ok(format!(
+                    "Dispatched antiX Linux systemd-free lightweight init service action for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "zorin_appearance" => {
+                Ok(format!(
+                    "Dispatched Zorin OS appearance layout switch for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_undercover" => {
+                Ok(format!(
+                    "Dispatched Kali Undercover stealth theme toggle for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_nethunter" => {
+                Ok(format!(
+                    "Dispatched Kali NetHunter mobile/HID attack orchestration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_winkex" => {
+                Ok(format!(
+                    "Dispatched Kali WinKeX GUI session bridge for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_metapackages" => {
+                Ok(format!(
+                    "Dispatched Kali Metapackage tool resolution for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "parrot_anonsurf" => {
+                Ok(format!(
+                    "Dispatched Parrot Security Anonsurf transparent Tor proxy routing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "parrot_apparmor" => {
+                Ok(format!(
+                    "Dispatched Parrot AppArmor Seccomp sandbox profile generation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "parrot_forensics" => {
+                Ok(format!(
+                    "Dispatched Parrot Digital Forensics read-only evidence acquisition for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "omarchy_quickshell" => {
+                Ok(format!(
+                    "Dispatched Omarchy Quickshell UI layout engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "omarchy_theme" => {
+                Ok(format!(
+                    "Dispatched Omarchy System Theme Studio palette switch to '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "omarchy_lua_reload" => {
+                Ok(format!(
+                    "Dispatched Omarchy Lua live reload evaluation for script '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "omarchy_herdr_agent" => {
+                Ok(format!(
+                    "Dispatched Omarchy Herdr AI Agent task spawning for prompt '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "storage" => {
                 let healed = self
                     .verify_and_self_heal_cow_file("@root", action, b"default")
@@ -420,6 +502,97 @@ impl SovereignUniversalDistroBridge {
                 Ok(format!(
                     "Dispatched power governor profile '{:?}' (cap: {}MHz) under distro mode '{:?}'",
                     governor.current_profile, governor.cpu_freq_cap_mhz, self.mode
+                ))
+            }
+            "audio" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
+                        Ok(format!(
+                            "Dispatched sndio audio server stream connection for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched PipeWire graph audio node routing for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "ipc" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::FreeBsd => {
+                        Ok(format!(
+                            "Dispatched Capsicum/Pledge descriptor IPC passing for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched zero-copy ring pipe IPC channel for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "containers" => {
+                let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
+                chroot_engine.enter_chroot()?;
+                Ok(format!(
+                    "Dispatched container build sandbox '{}' (active: {}) under distro mode '{:?}'",
+                    action, chroot_engine.is_active, self.mode
+                ))
+            }
+            "time" => {
+                Ok(format!(
+                    "Dispatched Chrony/NTP clock synchronization for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "memory" => {
+                let mut alloc = SovereignKaslrWxAllocator::new(0xABCDEF12);
+                let virt_addr = alloc.allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute)?;
+                Ok(format!(
+                    "Dispatched KARL W^X memory page allocation at {:#X} under distro mode '{:?}'",
+                    virt_addr, self.mode
+                ))
+            }
+            "ui" => {
+                Ok(format!(
+                    "Dispatched Zenith Zenith/COSMIC desktop inspiration UI theme '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "process" => {
+                let mut bore_sched = CachyBoreScheduler::new(10_000_000);
+                bore_sched.register_task(BoreTaskProfile {
+                    task_id: 1001,
+                    name: action.to_string(),
+                    priority: 20,
+                    interactive_score: 80,
+                    burst_time_ns: 1_000_000,
+                    preferred_core: CoreTypePreference::PerformancePCore,
+                    ipc_intensity: 50,
+                });
+                let timeslice = bore_sched.calculate_timeslice_ns(1001);
+                Ok(format!(
+                    "Dispatched EEVDF/BORE process scheduling for '{}' (timeslice: {}ns) under distro mode '{:?}'",
+                    action, timeslice, self.mode
+                ))
+            }
+            "virt" => {
+                Ok(format!(
+                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "audit" => {
+                let mut pax_engine = HardenedBsdPaxGuardEngine::new();
+                let mprotect_res = pax_engine.check_mprotect(100, 0x1000, false, true);
+                Ok(format!(
+                    "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
+                    action, mprotect_res.is_ok(), self.mode
                 ))
             }
             _ => Err("Unknown target subsystem"),
@@ -1676,6 +1849,62 @@ mod cross_subsystem_tests {
 
         let res_err = bridge.dispatch_cross_subsystem_action("", DistroSubsystemMode::OpenBsd);
         assert!(res_err.is_err());
+    }
+
+    #[test]
+    fn test_omarchy_quickshell_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        let res = bridge.dispatch_cross_subsystem_operation("omarchy_quickshell", "quattro_bar").unwrap();
+        assert!(res.contains("Omarchy Quickshell UI layout engine"));
+        assert!(res.contains("quattro_bar"));
+    }
+
+    #[test]
+    fn test_omarchy_herdr_agent_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        let res = bridge.dispatch_cross_subsystem_operation("omarchy_herdr_agent", "Refactor scheduler").unwrap();
+        assert!(res.contains("Omarchy Herdr AI Agent task spawning"));
+        assert!(res.contains("Refactor scheduler"));
+    }
+
+    #[test]
+    fn test_parrot_distro_bridge_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxParrot);
+        let res1 = bridge.dispatch_cross_subsystem_operation("parrot_anonsurf", "start").unwrap();
+        assert!(res1.contains("Anonsurf transparent Tor proxy routing"));
+
+        let res2 = bridge.dispatch_cross_subsystem_operation("parrot_apparmor", "browser_sandbox").unwrap();
+        assert!(res2.contains("Parrot AppArmor Seccomp sandbox profile generation"));
+
+        let res3 = bridge.dispatch_cross_subsystem_operation("parrot_forensics", "/dev/sdb1").unwrap();
+        assert!(res3.contains("Parrot Digital Forensics read-only evidence acquisition"));
+    }
+
+    #[test]
+    fn test_kali_distro_bridge_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxKali);
+        let res1 = bridge.dispatch_cross_subsystem_operation("kali_undercover", "Windows10Stealth").unwrap();
+        assert!(res1.contains("Kali Undercover stealth theme toggle"));
+
+        let res2 = bridge.dispatch_cross_subsystem_operation("kali_nethunter", "enable_hid").unwrap();
+        assert!(res2.contains("Kali NetHunter mobile/HID attack orchestration"));
+
+        let res3 = bridge.dispatch_cross_subsystem_operation("kali_winkex", "session_start").unwrap();
+        assert!(res3.contains("Kali WinKeX GUI session bridge"));
+
+        let res4 = bridge.dispatch_cross_subsystem_operation("kali_metapackages", "kali-tools-top10").unwrap();
+        assert!(res4.contains("Kali Metapackage tool resolution"));
+    }
+
+    #[test]
+    fn test_antix_zorin_distro_bridge_dispatch() {
+        let mut antix_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxAntiX);
+        let res_antix = antix_bridge.dispatch_cross_subsystem_operation("antix_service", "syslogd").unwrap();
+        assert!(res_antix.contains("antiX Linux systemd-free lightweight init service action"));
+
+        let mut zorin_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxZorin);
+        let res_zorin = zorin_bridge.dispatch_cross_subsystem_operation("zorin_appearance", "MacOs").unwrap();
+        assert!(res_zorin.contains("Zorin OS appearance layout switch"));
     }
 
     #[test]
@@ -4840,6 +5069,15 @@ mod tests {
             assert!(bridge.dispatch_cross_subsystem_operation("network", "eth0").is_ok());
             assert!(bridge.dispatch_cross_subsystem_operation("graphics", "set_mode").is_ok());
             assert!(bridge.dispatch_cross_subsystem_operation("power", "performance").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("audio", "default-sink").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("ipc", "ring-pipe").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("containers", "/var/chroot/app").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("time", "pool.ntp.org").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("memory", "page_alloc").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("ui", "KdePlasma").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("process", "worker_task").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("virt", "microvm0").is_ok());
+            assert!(bridge.dispatch_cross_subsystem_operation("audit", "pax_check").is_ok());
         }
     }
 
