@@ -1,5 +1,8 @@
 pub mod omarchy;
 pub mod parrot_security;
+pub mod kali_security;
+pub mod antix_zorin_innovations;
+
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,

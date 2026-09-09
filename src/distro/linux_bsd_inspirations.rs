@@ -69,6 +69,9 @@ pub enum DistroSubsystemMode {
     LinuxTails,
     LinuxGuix,
     LinuxParrot,
+    LinuxKali,
+    LinuxAntiX,
+    LinuxZorin,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -390,6 +393,42 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "antix_service" => {
+                Ok(format!(
+                    "Dispatched antiX Linux systemd-free lightweight init service action for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "zorin_appearance" => {
+                Ok(format!(
+                    "Dispatched Zorin OS appearance layout switch for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_undercover" => {
+                Ok(format!(
+                    "Dispatched Kali Undercover stealth theme toggle for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_nethunter" => {
+                Ok(format!(
+                    "Dispatched Kali NetHunter mobile/HID attack orchestration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_winkex" => {
+                Ok(format!(
+                    "Dispatched Kali WinKeX GUI session bridge for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_metapackages" => {
+                Ok(format!(
+                    "Dispatched Kali Metapackage tool resolution for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "parrot_anonsurf" => {
                 Ok(format!(
                     "Dispatched Parrot Security Anonsurf transparent Tor proxy routing for '{}' under distro mode '{:?}'",
@@ -526,23 +565,7 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "auth" => {
-                let mut auth_bridge = SovereignSystemdHomedAuthBridge::new();
-                let res = auth_bridge.authenticate_and_mount(action, "pass_key");
-                Ok(format!(
-                    "Dispatched systemd-homed/PAM authentication for user '{}' (result: {:?}) under distro mode '{:?}'",
-                    action, res, self.mode
-                ))
-            }
-            "boot" => {
-                let mut boot_bridge = SovereignMultiArchBootChainBridge::new();
-                let entry = boot_bridge.configure_boot_entry(action, "quiet splash")?;
-                Ok(format!(
-                    "Dispatched bootloader configuration for entry '{}' under distro mode '{:?}'",
-                    entry, self.mode
-                ))
-            }
-            "container" | "containers" => {
+            "containers" => {
                 let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
                 chroot_engine.enter_chroot()?;
                 Ok(format!(
@@ -550,150 +573,55 @@ impl SovereignUniversalDistroBridge {
                     action, chroot_engine.is_active, self.mode
                 ))
             }
-            "virtualization" | "virt" => {
+            "time" => {
+                Ok(format!(
+                    "Dispatched Chrony/NTP clock synchronization for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "memory" => {
+                let mut alloc = SovereignKaslrWxAllocator::new(0xABCDEF12);
+                let virt_addr = alloc.allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute)?;
+                Ok(format!(
+                    "Dispatched KARL W^X memory page allocation at {:#X} under distro mode '{:?}'",
+                    virt_addr, self.mode
+                ))
+            }
+            "ui" => {
+                Ok(format!(
+                    "Dispatched Zenith Zenith/COSMIC desktop inspiration UI theme '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "process" => {
+                let mut bore_sched = CachyBoreScheduler::new(10_000_000);
+                bore_sched.register_task(BoreTaskProfile {
+                    task_id: 1001,
+                    name: action.to_string(),
+                    priority: 20,
+                    interactive_score: 80,
+                    burst_time_ns: 1_000_000,
+                    preferred_core: CoreTypePreference::PerformancePCore,
+                    ipc_intensity: 50,
+                });
+                let timeslice = bore_sched.calculate_timeslice_ns(1001);
+                Ok(format!(
+                    "Dispatched EEVDF/BORE process scheduling for '{}' (timeslice: {}ns) under distro mode '{:?}'",
+                    action, timeslice, self.mode
+                ))
+            }
+            "virt" => {
                 Ok(format!(
                     "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "input" => {
+            "audit" => {
+                let mut pax_engine = HardenedBsdPaxGuardEngine::new();
+                let mprotect_res = pax_engine.check_mprotect(100, 0x1000, false, true);
                 Ok(format!(
-                    "Dispatched libinput/evdev wscons input event mapping for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "thermal" => {
-                Ok(format!(
-                    "Dispatched ACPI/sysfs thermal zone governor throttling for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "syscall" => {
-                let mut translator = SovereignMultiArchSyscallTranslator::new(self.mode);
-                let sys_num = translator.translate_and_dispatch(action)?;
-                Ok(format!(
-                    "Dispatched multi-arch syscall translation for '{}' (nr: {}) under distro mode '{:?}'",
-                    action, sys_num, self.mode
-                ))
-            }
-            "device" => {
-                Ok(format!(
-                    "Dispatched udev/devd device node rule manager for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "crypto" => {
-                let _crypto_policies = SovereignKaslrWxAllocator::new(0x12345678);
-                Ok(format!(
-                    "Dispatched system-wide Crypto Policies and PQC attestation for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "ai" => {
-                Ok(format!(
-                    "Dispatched agentic OS AI task scheduler for prompt '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "monitoring" => {
-                let mut dtrace = SovereignDTraceEngine::new();
-                let probe_id = dtrace.register_probe(DTraceProvider::Sysinfo, "kernel", "cpu", action);
-                Ok(format!(
-                    "Dispatched eBPF/DTrace system observability probe #{} for '{}' under distro mode '{:?}'",
-                    probe_id, action, self.mode
-                ))
-            }
-            "desktop" => {
-                Ok(format!(
-                    "Dispatched Zenith desktop environment session manager for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "desktop" => {
-                let desktop_preset = match self.mode {
-                    DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxDebian => "GNOME/Adwaita Layer Shell",
-                    DistroSubsystemMode::LinuxOpenSuse | DistroSubsystemMode::LinuxArch => "KDE Plasma / Breeze Compositor",
-                    DistroSubsystemMode::LinuxPopOs => "COSMIC Rust Desktop",
-                    DistroSubsystemMode::LinuxSolus => "Budgie Desktop",
-                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd => "XFce / Lumina BSD Desktop",
-                    _ => "Zenith Hyprland-style Wayland Compositor",
-                };
-                Ok(format!(
-                    "Dispatched desktop compositor preset '{}' for '{}' under distro mode '{:?}'",
-                    desktop_preset, action, self.mode
-                ))
-            }
-            "compiler" => {
-                let builder = match self.mode {
-                    DistroSubsystemMode::LinuxGentoo => "Portage EAPI8 Slot Compiler",
-                    DistroSubsystemMode::LinuxArch => "Makepkg Clean Chroot Sandbox",
-                    DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxPopOs => "Sbuild Chroot Sandbox",
-                    DistroSubsystemMode::FreeBsd => "Poudriere Bulk Chroot Builder",
-                    DistroSubsystemMode::LinuxVoid => "XBPS-src Sandbox Engine",
-                    _ => "Universal SigPkg Compiler Sandbox",
-                };
-                Ok(format!(
-                    "Dispatched compiler sandbox '{}' for action '{}' under distro mode '{:?}'",
-                    builder, action, self.mode
-                ))
-            }
-            "i18n" => {
-                Ok(format!(
-                    "Dispatched i18n/IME input method candidate engine for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "bluetooth" => {
-                let stack = match self.mode {
-                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => "BSD Netgraph / Bluetooth Stack",
-                    _ => "BlueZ DBus / PipeWire LDAC/aptX Stack",
-                };
-                Ok(format!(
-                    "Dispatched wireless bluetooth audio codec routing via '{}' for '{}' under distro mode '{:?}'",
-                    stack, action, self.mode
-                ))
-            }
-            "firewall" => {
-                let fw = match self.mode {
-                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::NetBsd => "PF Stateful Packet Filter",
-                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => "IPFilter Firewall",
-                    _ => "nftables / Firewalld Dynamic Zone Engine",
-                };
-                Ok(format!(
-                    "Dispatched firewall policy rule using '{}' for '{}' under distro mode '{:?}'",
-                    fw, action, self.mode
-                ))
-            }
-            "diagnostics" => {
-                let diag = match self.mode {
-                    DistroSubsystemMode::LinuxFedora => "ABRT Crash Daemon / status.fpo",
-                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::FreeBsd => "DTrace Dynamic Kernel Probe Audit",
-                    _ => "Sovereign Forensic eBPF Diagnostics",
-                };
-                Ok(format!(
-                    "Dispatched system diagnostics probe via '{}' for '{}' under distro mode '{:?}'",
-                    diag, action, self.mode
-                ))
-            }
-            "recovery" => {
-                let snapshot_mgr = match self.mode {
-                    DistroSubsystemMode::LinuxOpenSuse | DistroSubsystemMode::LinuxArch => "Snapper Btrfs Snapshot Engine",
-                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd | DistroSubsystemMode::SolarisIllumos => "ZFS / HAMMER2 Boot Environment Recovery",
-                    _ => "SigmaOS TimeTravel Snapshot Engine",
-                };
-                Ok(format!(
-                    "Dispatched system recovery snapshot rollback using '{}' for '{}' under distro mode '{:?}'",
-                    snapshot_mgr, action, self.mode
-                ))
-            }
-            "time" => {
-                let clock_source = match self.mode {
-                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => "BSD CLOCK_MONOTONIC_PRECISE / ntpd",
-                    _ => "Linux CLOCK_MONOTONIC_RAW / Chrony High-Res Timer Queue",
-                };
-                Ok(format!(
-                    "Dispatched high-precision time sync using '{}' for '{}' under distro mode '{:?}'",
-                    clock_source, action, self.mode
+                    "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
+                    action, mprotect_res.is_ok(), self.mode
                 ))
             }
             _ => Err("Unknown target subsystem"),
@@ -2001,6 +1929,33 @@ mod cross_subsystem_tests {
 
         let res3 = bridge.dispatch_cross_subsystem_operation("parrot_forensics", "/dev/sdb1").unwrap();
         assert!(res3.contains("Parrot Digital Forensics read-only evidence acquisition"));
+    }
+
+    #[test]
+    fn test_kali_distro_bridge_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxKali);
+        let res1 = bridge.dispatch_cross_subsystem_operation("kali_undercover", "Windows10Stealth").unwrap();
+        assert!(res1.contains("Kali Undercover stealth theme toggle"));
+
+        let res2 = bridge.dispatch_cross_subsystem_operation("kali_nethunter", "enable_hid").unwrap();
+        assert!(res2.contains("Kali NetHunter mobile/HID attack orchestration"));
+
+        let res3 = bridge.dispatch_cross_subsystem_operation("kali_winkex", "session_start").unwrap();
+        assert!(res3.contains("Kali WinKeX GUI session bridge"));
+
+        let res4 = bridge.dispatch_cross_subsystem_operation("kali_metapackages", "kali-tools-top10").unwrap();
+        assert!(res4.contains("Kali Metapackage tool resolution"));
+    }
+
+    #[test]
+    fn test_antix_zorin_distro_bridge_dispatch() {
+        let mut antix_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxAntiX);
+        let res_antix = antix_bridge.dispatch_cross_subsystem_operation("antix_service", "syslogd").unwrap();
+        assert!(res_antix.contains("antiX Linux systemd-free lightweight init service action"));
+
+        let mut zorin_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxZorin);
+        let res_zorin = zorin_bridge.dispatch_cross_subsystem_operation("zorin_appearance", "MacOs").unwrap();
+        assert!(res_zorin.contains("Zorin OS appearance layout switch"));
     }
 
     #[test]

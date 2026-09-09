@@ -20,6 +20,7 @@ pub mod device;
 pub mod driver;
 pub mod dtrace_compat;
 pub mod ebpf;
+pub mod bsd_kernel_parity;
 pub mod ebpf_vm;
 pub mod ebpf_verification;
 pub mod exports;

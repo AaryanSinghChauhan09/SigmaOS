@@ -208,7 +208,7 @@ The following innovations are planned but not yet fully implemented:
 | EROFS read-only overlay FS | Linux | `src/filesystem/` | 🟡 Medium |
 | zRAM compressed swap | Linux | `src/memory/` | 🟡 Medium |
 | systemd-homed | systemd | `src/auth/` | 🟢 Low |
-| Wayland display protocol | Linux | `src/desktop/wayland_protocol.rs` | ✅ Done | Zero-dependency Wayland wire & xdg_shell protocol |
+| Wayland display protocol | Linux | `src/desktop/` | 🟡 Medium |
 | RISC-V port | Linux | `src/arch/` | 🟡 Medium |
 | LoongArch port | Linux | `src/arch/` | 🟢 Low |
 

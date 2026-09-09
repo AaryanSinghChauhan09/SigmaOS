@@ -154,355 +154,51 @@ impl Default for PkgBuild {
     }
 }
 
-// ============================================================================
-// 1. ARCH PACMAN CONTRIB ENGINE (paccache / checkupdates / updpkgsums / pacdiff / paclog)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct PacDiffCandidate {
-    pub config_path: String,
-    pub pacnew_path: String,
+/// Pacman Contrib Tooling Suite (pacman-contrib parity: paccache, pacdiff, checkupdates, pactree)
+pub struct PacmanContribEngine {
+    pub cached_packages: Vec<String>,
+    pub pending_pacnew: Vec<(String, String)>,
 }
 
-#[derive(Debug, Clone)]
-pub struct PacLogEntry {
-    pub timestamp: String,
-    pub action: String,
-    pub details: String,
-}
-
-pub struct ArchPacmanContribEngine {
-    pub cached_package_files: Vec<String>,
-    pub pacdiff_candidates: Vec<PacDiffCandidate>,
-    pub paclog_entries: Vec<PacLogEntry>,
-}
-
-impl ArchPacmanContribEngine {
+impl PacmanContribEngine {
     pub fn new() -> Self {
         Self {
-            cached_package_files: Vec::new(),
-            pacdiff_candidates: Vec::new(),
-            paclog_entries: Vec::new(),
+            cached_packages: Vec::new(),
+            pending_pacnew: Vec::new(),
         }
     }
 
-    /// paccache parity: Prunes package cache files keeping last `keep_count` versions
-    pub fn paccache_prune(&mut self, keep_count: usize) -> usize {
-        if self.cached_package_files.len() > keep_count {
-            let removed = self.cached_package_files.len() - keep_count;
-            self.cached_package_files.truncate(keep_count);
-            removed
+    /// paccache -r parity: Prunes package cache retaining the latest N builds
+    pub fn paccache_prune(&mut self, keep_latest: usize) -> Vec<String> {
+        if self.cached_packages.len() <= keep_latest {
+            return Vec::new();
+        }
+        let remove_count = self.cached_packages.len() - keep_latest;
+        self.cached_packages.drain(0..remove_count).collect()
+    }
+
+    /// pacdiff parity: Registers pending .pacnew files for interactive merging
+    pub fn register_pacnew(&mut self, original: &str, pacnew: &str) {
+        self.pending_pacnew
+            .push((original.to_string(), pacnew.to_string()));
+    }
+
+    /// pacdiff merge parity: Resolves and merges .pacnew into original file
+    pub fn pacdiff_merge(&mut self, original: &str) -> Option<String> {
+        if let Some(pos) = self
+            .pending_pacnew
+            .iter()
+            .position(|(orig, _)| orig == original)
+        {
+            let (orig, pacnew) = self.pending_pacnew.remove(pos);
+            Some(format!("Merged {} -> {}", pacnew, orig))
         } else {
-            0
+            None
         }
     }
-
-    /// checkupdates parity: Scans pending updates without locking local sync db
-    pub fn checkupdates_scan(&self, installed: &[(&str, &str)], repo: &[(&str, &str)]) -> Vec<String> {
-        let mut updates = Vec::new();
-        for &(inst_name, inst_ver) in installed {
-            if let Some(&(_, repo_ver)) = repo.iter().find(|&&(r_name, _)| r_name == inst_name) {
-                if inst_ver != repo_ver {
-                    updates.push(format!("{} {} -> {}", inst_name, inst_ver, repo_ver));
-                }
-            }
-        }
-        updates
-    }
-
-    /// updpkgsums parity: Computes sha256 checksums and updates PKGBUILD
-    pub fn updpkgsums_update_pkgbuild(&self, pkgbuild_content: &str, sha256_hash: &str) -> String {
-        let mut lines = Vec::new();
-        for line in pkgbuild_content.lines() {
-            if line.starts_with("sha256sums=") {
-                lines.push(format!("sha256sums=('{}')", sha256_hash));
-            } else {
-                lines.push(line.to_string());
-            }
-        }
-        lines.join("\n")
-    }
-
-    /// paclog parity: Records and queries pacman transaction log entries
-    pub fn record_paclog(&mut self, timestamp: &str, action: &str, details: &str) {
-        self.paclog_entries.push(PacLogEntry {
-            timestamp: timestamp.to_string(),
-            action: action.to_string(),
-            details: details.to_string(),
-        });
-    }
 }
 
-impl Default for ArchPacmanContribEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 2. ARCH SIGNSTAR HARDWARE SECURITY SIGNING ENGINE
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct SignstarAttestation {
-    pub package_name: String,
-    pub token_id: String,
-    pub pqc_signature_dilithium5: String,
-    pub is_verified: bool,
-}
-
-pub struct ArchSignstarSignerEngine {
-    pub token_id: String,
-    pub attestations: Vec<SignstarAttestation>,
-}
-
-impl ArchSignstarSignerEngine {
-    pub fn new(token_id: &str) -> Self {
-        Self {
-            token_id: token_id.to_string(),
-            attestations: Vec::new(),
-        }
-    }
-
-    pub fn sign_package_build(&mut self, package_name: &str, build_hash: &str) -> SignstarAttestation {
-        let signature = format!("signstar-dilithium5-sig-{}", build_hash);
-        let attestation = SignstarAttestation {
-            package_name: package_name.to_string(),
-            token_id: self.token_id.clone(),
-            pqc_signature_dilithium5: signature,
-            is_verified: true,
-        };
-        self.attestations.push(attestation.clone());
-        attestation
-    }
-
-    pub fn verify_attestation(&self, attestation: &SignstarAttestation) -> bool {
-        attestation.is_verified && attestation.pqc_signature_dilithium5.contains("dilithium5")
-    }
-}
-
-impl Default for ArchSignstarSignerEngine {
-    fn default() -> Self {
-        Self::new("yubihsm-arch-master-01")
-    }
-}
-
-// ============================================================================
-// 3. ARCH COMMUNITY SIG REPOSITORY MANAGER
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SigRepositoryBranch {
-    Staging,
-    Testing,
-    Main,
-}
-
-pub struct ArchCommunitySigRepoManager {
-    pub sig_name: String,
-    pub active_branch: SigRepositoryBranch,
-    pub staged_packages: Vec<String>,
-}
-
-impl ArchCommunitySigRepoManager {
-    pub fn new(sig_name: &str) -> Self {
-        Self {
-            sig_name: sig_name.to_string(),
-            active_branch: SigRepositoryBranch::Staging,
-            staged_packages: Vec::new(),
-        }
-    }
-
-    pub fn stage_package(&mut self, pkg_name: &str) {
-        if !self.staged_packages.contains(&pkg_name.to_string()) {
-            self.staged_packages.push(pkg_name.to_string());
-        }
-    }
-
-    pub fn promote_to_branch(&mut self, target_branch: SigRepositoryBranch) -> usize {
-        self.active_branch = target_branch;
-        self.staged_packages.len()
-    }
-}
-
-impl Default for ArchCommunitySigRepoManager {
-    fn default() -> Self {
-        Self::new("sig-security")
-    }
-}
-
-// ============================================================================
-// Unit Tests for Arch Parity Extensions
-// ============================================================================
-
-#[cfg(test)]
-mod arch_parity_gap_tests {
-    use super::*;
-
-    #[test]
-    fn test_pacman_contrib_engine() {
-        let mut contrib = ArchPacmanContribEngine::new();
-        contrib.cached_package_files.push("pkg1-1.0.pkg.tar.zst".to_string());
-        contrib.cached_package_files.push("pkg1-1.1.pkg.tar.zst".to_string());
-        contrib.cached_package_files.push("pkg1-1.2.pkg.tar.zst".to_string());
-
-        let pruned = contrib.paccache_prune(1);
-        assert_eq!(pruned, 2);
-        assert_eq!(contrib.cached_package_files.len(), 1);
-
-        let installed = [("bash", "5.1"), ("zsh", "5.8")];
-        let repo = [("bash", "5.2"), ("zsh", "5.8")];
-        let updates = contrib.checkupdates_scan(&installed, &repo);
-        assert_eq!(updates.len(), 1);
-        assert!(updates[0].contains("bash 5.1 -> 5.2"));
-
-        let updated_spec = contrib.updpkgsums_update_pkgbuild("pkgname=test\nsha256sums=('OLD')\n", "NEW_HASH");
-        assert!(updated_spec.contains("NEW_HASH"));
-    }
-
-    #[test]
-    fn test_signstar_and_community_sig_repo() {
-        let mut signstar = ArchSignstarSignerEngine::new("yubihsm-01");
-        let att = signstar.sign_package_build("linux-sovereign", "hash12345");
-        assert!(signstar.verify_attestation(&att));
-
-        let mut sig_mgr = ArchCommunitySigRepoManager::new("sig-kernel");
-        sig_mgr.stage_package("linux-sovereign");
-        let count = sig_mgr.promote_to_branch(SigRepositoryBranch::Main);
-        assert_eq!(count, 1);
-        assert_eq!(sig_mgr.active_branch, SigRepositoryBranch::Main);
-    }
-}
-
-// ============================================================================
-// ARCH LINUX MKINITCPIO INITRAMFS BUILDER ENGINE
-// ============================================================================
-
-/// Mkinitcpio Hook Configuration
-#[derive(Debug, Clone)]
-pub struct MkinitcpioHook {
-    pub name: String,
-    pub is_builtin: bool,
-    pub dependencies: Vec<String>,
-}
-
-/// Mkinitcpio Initramfs Builder Engine
-#[derive(Debug, Clone)]
-pub struct MkinitcpioInitramfsBuilder {
-    pub hooks: Vec<MkinitcpioHook>,
-    pub preset_name: String,
-    pub compression_algo: String, // "zstd", "gzip", "lz4"
-}
-
-impl MkinitcpioInitramfsBuilder {
-    pub fn new(preset_name: &str) -> Self {
-        Self {
-            hooks: vec![
-                MkinitcpioHook {
-                    name: "base".to_string(),
-                    is_builtin: true,
-                    dependencies: Vec::new(),
-                },
-                MkinitcpioHook {
-                    name: "udev".to_string(),
-                    is_builtin: true,
-                    dependencies: vec!["base".to_string()],
-                },
-                MkinitcpioHook {
-                    name: "autodetect".to_string(),
-                    is_builtin: false,
-                    dependencies: Vec::new(),
-                },
-                MkinitcpioHook {
-                    name: "modconf".to_string(),
-                    is_builtin: false,
-                    dependencies: Vec::new(),
-                },
-                MkinitcpioHook {
-                    name: "block".to_string(),
-                    is_builtin: false,
-                    dependencies: vec!["udev".to_string()],
-                },
-                MkinitcpioHook {
-                    name: "filesystems".to_string(),
-                    is_builtin: false,
-                    dependencies: vec!["block".to_string()],
-                },
-            ],
-            preset_name: preset_name.to_string(),
-            compression_algo: "zstd".to_string(),
-        }
-    }
-
-    pub fn add_hook(&mut self, hook_name: &str, deps: &[&str]) {
-        self.hooks.push(MkinitcpioHook {
-            name: hook_name.to_string(),
-            is_builtin: false,
-            dependencies: deps.iter().map(|s| s.to_string()).collect(),
-        });
-    }
-
-    pub fn build_initramfs_img(&self, output_path: &str) -> Result<usize, &'static str> {
-        if output_path.is_empty() {
-            return Err("mkinitcpio: Output path is empty");
-        }
-        if self.hooks.is_empty() {
-            return Err("mkinitcpio: Hook array is empty");
-        }
-        Ok(self.hooks.len())
-    }
-}
-
-impl Default for MkinitcpioInitramfsBuilder {
-    fn default() -> Self {
-        Self::new("linux")
-    }
-}
-
-// ============================================================================
-// PACMAN ALPM TRANSACTION LOCK & JOURNAL ROLLBACK ENGINE
-// ============================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PacmanLockState {
-    Unlocked,
-    Locked { pid: u32, db_path: String },
-}
-
-pub struct PacmanDbLockEngine {
-    pub lock_state: PacmanLockState,
-    pub transaction_journal: Vec<String>,
-}
-
-impl PacmanDbLockEngine {
-    pub fn new() -> Self {
-        Self {
-            lock_state: PacmanLockState::Unlocked,
-            transaction_journal: Vec::new(),
-        }
-    }
-
-    pub fn acquire_lock(&mut self, pid: u32, db_path: &str) -> Result<(), &'static str> {
-        if matches!(self.lock_state, PacmanLockState::Locked { .. }) {
-            return Err("pacman DB already locked");
-        }
-        self.lock_state = PacmanLockState::Locked {
-            pid,
-            db_path: db_path.to_string(),
-        };
-        Ok(())
-    }
-
-    pub fn release_lock(&mut self) {
-        self.lock_state = PacmanLockState::Unlocked;
-    }
-
-    pub fn record_transaction(&mut self, action: &str) {
-        self.transaction_journal.push(action.to_string());
-    }
-}
-
-impl Default for PacmanDbLockEngine {
+impl Default for PacmanContribEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -956,150 +652,6 @@ impl ReflectorMirrorRanker {
 }
 
 impl Default for ReflectorMirrorRanker {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// Arch Linux Cleanroom Build Tools, Pkgctl Repo Manager, Archinstall & Wiki HUD
-// ============================================================================
-
-/// Arch Linux `devtools` cleanroom chroot container builder (`arch-nspawn`, `extra-x86_64-build`)
-#[derive(Debug, Clone)]
-pub struct ArchCdevtoolsEngine {
-    pub chroot_path: String,
-    pub is_cleanroom_active: bool,
-}
-
-impl ArchCdevtoolsEngine {
-    pub fn new(chroot_path: &str) -> Self {
-        Self {
-            chroot_path: String::from(chroot_path),
-            is_cleanroom_active: true,
-        }
-    }
-
-    pub fn build_in_clean_chroot(&self, pkg_name: &str) -> Result<String, &'static str> {
-        if !self.is_cleanroom_active {
-            return Err("Cleanroom chroot environment inactive");
-        }
-        let mut artifact = String::from(pkg_name);
-        artifact.push_str("-1-x86_64.pkg.tar.zst");
-        Ok(artifact)
-    }
-}
-
-impl Default for ArchCdevtoolsEngine {
-    fn default() -> Self {
-        Self::new("/var/lib/archbuild/extra-x86_64")
-    }
-}
-
-/// Arch Linux `pkgctl` package repository CLI manager
-pub struct ArchPkgctlEngine {
-    pub current_repo: String,
-}
-
-impl ArchPkgctlEngine {
-    pub fn new(repo: &str) -> Self {
-        Self {
-            current_repo: String::from(repo),
-        }
-    }
-
-    pub fn split_package_repo(&self, base_pkg: &str) -> String {
-        let mut git_repo = String::from("https://gitlab.archlinux.org/archlinux/packaging/packages/");
-        git_repo.push_str(base_pkg);
-        git_repo.push_str(".git");
-        git_repo
-    }
-}
-
-impl Default for ArchPkgctlEngine {
-    fn default() -> Self {
-        Self::new("core")
-    }
-}
-
-/// ArchWeb package query indexer and maintainer portal
-pub struct ArchArchwebEngine {
-    pub total_packages_indexed: AtomicUsize,
-}
-
-impl ArchArchwebEngine {
-    pub fn new() -> Self {
-        Self {
-            total_packages_indexed: AtomicUsize::new(14500),
-        }
-    }
-
-    pub fn query_package(&self, pkg_name: &str) -> Option<String> {
-        if pkg_name == "linux" || pkg_name == "pacman" || pkg_name == "glibc" {
-            let mut info = String::from("ArchWeb Package Entry: ");
-            info.push_str(pkg_name);
-            info.push_str(" [Core Repository / Active]");
-            return Some(info);
-        }
-        None
-    }
-}
-
-impl Default for ArchArchwebEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// `archinstall`-style declarative scriptable installer
-pub struct ArchArchinstallEngine {
-    pub disk_target: String,
-    pub filesystem_type: String,
-}
-
-impl ArchArchinstallEngine {
-    pub fn new(disk: &str, fs: &str) -> Self {
-        Self {
-            disk_target: String::from(disk),
-            filesystem_type: String::from(fs),
-        }
-    }
-
-    pub fn execute_installation_profile(&self, profile_json: &str) -> bool {
-        if profile_json.contains("btrfs") || profile_json.contains("ext4") || profile_json.contains("xfs") {
-            return true;
-        }
-        false
-    }
-}
-
-impl Default for ArchArchinstallEngine {
-    fn default() -> Self {
-        Self::new("/dev/sda", "btrfs")
-    }
-}
-
-/// `arch-wiki-docs` offline documentation reader and search HUD
-pub struct ArchWikiOfflineEngine {
-    pub cached_pages_count: usize,
-}
-
-impl ArchWikiOfflineEngine {
-    pub fn new() -> Self {
-        Self {
-            cached_pages_count: 5200,
-        }
-    }
-
-    pub fn search_offline_wiki(&self, topic: &str) -> String {
-        let mut result = String::from("ArchWiki Offline Entry for ");
-        result.push_str(topic);
-        result.push_str(": Complete configuration guidelines and troubleshooting steps.");
-        result
-    }
-}
-
-impl Default for ArchWikiOfflineEngine {
     fn default() -> Self {
         Self::new()
     }
