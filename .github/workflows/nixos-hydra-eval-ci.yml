@@ -3,6 +3,9 @@ name: NixOS Hydra Evaluation & Flake CI
 on:
   push:
     branches: [ "main", "master", "jules-*" ]
+
+permissions:
+  contents: read
   pull_request:
     branches: [ "main", "master" ]
 

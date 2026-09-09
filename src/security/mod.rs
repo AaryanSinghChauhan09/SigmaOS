@@ -62,7 +62,7 @@ pub use kali_components::{
 };
 
 pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+    DomainID, DomainType, IsolatedDomain, IsolationError,
 };
 
 pub use qubes_isolation::*;
@@ -88,8 +88,7 @@ pub use clipboard::{
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
+    DefensiveAuditLog, SecurityAuditRecord,
 };
 pub use forensics::*;
 pub use hardening::{

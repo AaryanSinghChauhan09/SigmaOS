@@ -13,11 +13,13 @@ pub mod customization;
 pub mod dashboard;
 pub mod desktop;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
+pub mod governance;
 pub mod kernel;
 pub mod klib;
 pub use klib::ZeroDependencyPrimitiveHub;
@@ -139,10 +141,8 @@ pub use security::{
     Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, GksuAuthBackend,
     GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult, GksuSecurityGuard,
     HardenedSyscallDispatcher, HardenedSyscallError, HybridPqcMeasurementEngine,
-    HashMode, KaliAirgeddonWifiAudit, KaliBurpSuiteWebProxy, KaliHashcatGpuCracker,
-    KaliHydraPasswordBruteforce, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter,
-    KaliNiktoWebScanner, KaliNmapPortScanner, KaliSqlmapInjectionAuditor, KaliUndercoverThemeMode,
-    KaliWiresharkPacketAnalyzer, ScanTechnique,
+    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter,
+    KaliWiresharkPacketAnalyzer,
     LibGksuGraphicalSudoEngine, MemoryAccessError, PagePermissions, PcapPacketHeader,
     PiaDedicatedIpBinding, PiaMaceAdBlocker, PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine,
     PiaServerRegion, PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager,
@@ -151,13 +151,13 @@ pub use security::{
     TPM2_PCR_COUNT,
 };
 pub use unimplemented_features::{
-    AlpineApkPackageIndex, Android15PrivateSpaceGovernor, AndroidApexContainerModuleEngine,
+    AlpineApkPackageIndex, AndroidApexContainerModuleEngine,
     AndroidApexModule, AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager,
     BareMetalUnifiedPeripheral, DeepinDdeControlCenterEngine, DistroWatchParityMetricsHub,
-    DragonFlyHammer2DeduplicationEngine, DragonFlyHammer2FsSnapshot, FrappeFrameworkDocTypeEngine,
+    DragonFlyHammer2DeduplicationEngine, DragonFlyHammer2FsSnapshot,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine,
-    Hammer2Block, HwbustersPowerSupplyMonitor, Jbd2TransactionLedger, LegacyController,
-    MacOsSequoiaWindowManager, MageiaMirror, MageiaSynthesisPackage, MageiaUrpmiMccResolver,
+    Hammer2Block, Jbd2TransactionLedger, LegacyController,
+    MageiaMirror, MageiaSynthesisPackage, MageiaUrpmiMccResolver,
     ManjaroHardwareDetectionEngine, ModernController, NetBsdRumpComponentEngine,
     NixOsDeclarativeConfigEngine, PciBusScanner, PhoronixAutomatedBenchmarkEngine,
     PhoronixTestSuiteRunner, PowerState, PuppyLinuxOverlayRamdiskEngine, RavenWidgetState,
@@ -165,7 +165,7 @@ pub use unimplemented_features::{
     RumpComponentType, SatSolverEngine, SerenityIpcEvent, SerenityOsAsyncIpcLoop, SlackwarePackage,
     SlackwarePkgtoolEngine, SolusEopkgDeltaPackage, SolusEopkgRavenGovernor, SovereignIpcBus,
     SteamOsGamescopeCompositorEngine, TargetArch, TinyCoreModularTczLoader, UdfVm,
-    VoidXbpsContainerEngine, WindowsCopilotRecallAuditor, ZorinAppMapping, ZorinWinAppDbRegistry,
+    VoidXbpsContainerEngine, ZorinAppMapping, ZorinWinAppDbRegistry,
 };
 pub mod expanded_wiki_innovations;
 pub use expanded_wiki_innovations::{
@@ -342,12 +342,11 @@ pub use resilience::{
 pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
+    CapabilityToken, ForensicStorageFilter, Permission, OriginalPledgeManager as PledgeManager, OriginalPledgePromise as PledgePromise, RoutingMode,
     SandboxPolicy,
 };
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
-    StreamTarget,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,

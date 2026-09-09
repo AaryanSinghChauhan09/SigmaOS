@@ -2,15 +2,13 @@ use alloc::format;
 use alloc::vec;
 extern crate alloc;
 
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-#[cfg(test)]
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)

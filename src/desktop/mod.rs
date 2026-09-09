@@ -25,6 +25,7 @@ pub use ultimate_distro_desktop::{
     Xfce418Engine,
 };
 
+pub mod web_wasm_bridge;
 pub use web_wasm_bridge::*;
 
 pub use mate_betsy::{
