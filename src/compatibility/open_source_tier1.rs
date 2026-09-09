@@ -5,10 +5,7 @@ use std::vec::Vec;
 // SigmaOS Open Source Tier 1 Projects Integration Layer
 // Implements clean-room, high-fidelity integration wrappers for Wasmer, smoltcp, libsodium, and SQLite
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test_disabled)]
-use std::collections::HashMap;
 
 /// Wasmer WebAssembly runtime integration adapter
 pub struct WasmerIntegration {

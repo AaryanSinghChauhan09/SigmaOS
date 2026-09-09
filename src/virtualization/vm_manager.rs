@@ -7,8 +7,6 @@ use std::collections::BTreeMap as HashMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap as HashMap;
-use std::format;
 
 /// VM configuration
 #[derive(Debug, Clone)]

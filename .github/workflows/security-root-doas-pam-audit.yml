@@ -24,7 +24,6 @@ jobs:
 
       - name: Run Doas & PAM Root Improvement Unit Tests
         run: |
-          mkdir -p build
-          rustc --edition=2021 --test src/security/root_improvement.rs -o build/root_test
+          mkdir -p build && rustc --edition=2021 --test src/security/root_improvement.rs -o build/root_test
           ./build/root_test
           rm -f build/root_test

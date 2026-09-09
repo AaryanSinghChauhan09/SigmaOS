@@ -2,9 +2,6 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
-#[cfg(test_disabled)]
 use crate::klib::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
@@ -3407,9 +3404,9 @@ impl MemoryCompactionSuperpagesAllocator {
     }
 }
 
-#[cfg(test_disabled)]
 
-mod tests {
+#[cfg(test)]
+mod tests_extra_1 {
     use super::*;
 
     #[test]
@@ -3574,9 +3571,9 @@ mod tests {
     #[test]
     fn test_void_runit_init() {
         let mut runit = VoidRunitInit::new();
-        runit.start_service("nginx");
-        assert!(runit.is_running("nginx"));
-        assert!(!runit.is_running("postgresql"));
+        runit.register_service("nginx", 101);
+        assert!(runit.is_service_active("nginx"));
+        assert!(!runit.is_service_active("postgresql"));
     }
 
     #[test]
@@ -4680,7 +4677,6 @@ impl OpenSuseSnapperEngine {
     }
 }
 
-#[cfg(test_disabled)]
 mod linux_bsd_extra_tests {
     use super::*;
 
@@ -4870,7 +4866,7 @@ impl GentooUseFlags {
 }
 
 #[cfg(test)]
-mod tests {
+mod tests_extra_2 {
     use super::*;
 
     #[test]
