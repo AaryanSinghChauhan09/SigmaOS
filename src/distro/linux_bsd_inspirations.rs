@@ -609,91 +609,94 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
-            "compiler" => {
+            "desktop" => {
+                let desktop_preset = match self.mode {
+                    DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxDebian => "GNOME/Adwaita Layer Shell",
+                    DistroSubsystemMode::LinuxOpenSuse | DistroSubsystemMode::LinuxArch => "KDE Plasma / Breeze Compositor",
+                    DistroSubsystemMode::LinuxPopOs => "COSMIC Rust Desktop",
+                    DistroSubsystemMode::LinuxSolus => "Budgie Desktop",
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd => "XFce / Lumina BSD Desktop",
+                    _ => "Zenith Hyprland-style Wayland Compositor",
+                };
                 Ok(format!(
-                    "Dispatched Gentoo/Arch sandboxed makepkg compiler toolchain for '{}' under distro mode '{:?}'",
-                    action, self.mode
+                    "Dispatched desktop compositor preset '{}' for '{}' under distro mode '{:?}'",
+                    desktop_preset, action, self.mode
+                ))
+            }
+            "compiler" => {
+                let builder = match self.mode {
+                    DistroSubsystemMode::LinuxGentoo => "Portage EAPI8 Slot Compiler",
+                    DistroSubsystemMode::LinuxArch => "Makepkg Clean Chroot Sandbox",
+                    DistroSubsystemMode::LinuxDebian | DistroSubsystemMode::LinuxPopOs => "Sbuild Chroot Sandbox",
+                    DistroSubsystemMode::FreeBsd => "Poudriere Bulk Chroot Builder",
+                    DistroSubsystemMode::LinuxVoid => "XBPS-src Sandbox Engine",
+                    _ => "Universal SigPkg Compiler Sandbox",
+                };
+                Ok(format!(
+                    "Dispatched compiler sandbox '{}' for action '{}' under distro mode '{:?}'",
+                    builder, action, self.mode
                 ))
             }
             "i18n" => {
                 Ok(format!(
-                    "Dispatched gettext/locale-gen internationalization catalog for '{}' under distro mode '{:?}'",
+                    "Dispatched i18n/IME input method candidate engine for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
             "bluetooth" => {
+                let stack = match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => "BSD Netgraph / Bluetooth Stack",
+                    _ => "BlueZ DBus / PipeWire LDAC/aptX Stack",
+                };
                 Ok(format!(
-                    "Dispatched BlueZ/netbt Bluetooth stack subsystem for '{}' under distro mode '{:?}'",
-                    action, self.mode
+                    "Dispatched wireless bluetooth audio codec routing via '{}' for '{}' under distro mode '{:?}'",
+                    stack, action, self.mode
                 ))
             }
             "firewall" => {
+                let fw = match self.mode {
+                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::FreeBsd | DistroSubsystemMode::NetBsd => "PF Stateful Packet Filter",
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => "IPFilter Firewall",
+                    _ => "nftables / Firewalld Dynamic Zone Engine",
+                };
                 Ok(format!(
-                    "Dispatched OpenBSD PF/nftables stateful firewall filter for '{}' under distro mode '{:?}'",
-                    action, self.mode
+                    "Dispatched firewall policy rule using '{}' for '{}' under distro mode '{:?}'",
+                    fw, action, self.mode
                 ))
             }
             "diagnostics" => {
+                let diag = match self.mode {
+                    DistroSubsystemMode::LinuxFedora => "ABRT Crash Daemon / status.fpo",
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::FreeBsd => "DTrace Dynamic Kernel Probe Audit",
+                    _ => "Sovereign Forensic eBPF Diagnostics",
+                };
                 Ok(format!(
-                    "Dispatched ABRT/crashdump diagnostic telemetry analyzer for '{}' under distro mode '{:?}'",
-                    action, self.mode
+                    "Dispatched system diagnostics probe via '{}' for '{}' under distro mode '{:?}'",
+                    diag, action, self.mode
                 ))
             }
             "recovery" => {
+                let snapshot_mgr = match self.mode {
+                    DistroSubsystemMode::LinuxOpenSuse | DistroSubsystemMode::LinuxArch => "Snapper Btrfs Snapshot Engine",
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd | DistroSubsystemMode::SolarisIllumos => "ZFS / HAMMER2 Boot Environment Recovery",
+                    _ => "SigmaOS TimeTravel Snapshot Engine",
+                };
                 Ok(format!(
-                    "Dispatched openSUSE Snapper/ZFS boot environment recovery for '{}' under distro mode '{:?}'",
-                    action, self.mode
+                    "Dispatched system recovery snapshot rollback using '{}' for '{}' under distro mode '{:?}'",
+                    snapshot_mgr, action, self.mode
                 ))
             }
             "time" => {
+                let clock_source = match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => "BSD CLOCK_MONOTONIC_PRECISE / ntpd",
+                    _ => "Linux CLOCK_MONOTONIC_RAW / Chrony High-Res Timer Queue",
+                };
                 Ok(format!(
-                    "Dispatched Chrony/NTP clock synchronization for target '{}' under distro mode '{:?}'",
-                    action, self.mode
+                    "Dispatched high-precision time sync using '{}' for '{}' under distro mode '{:?}'",
+                    clock_source, action, self.mode
                 ))
             }
-            "memory" => {
-                let mut alloc = SovereignKaslrWxAllocator::new(0xABCDEF12);
-                let virt_addr = alloc.allocate_page(0x1000, 4096, MemoryPagePerms::ReadExecute)?;
-                Ok(format!(
-                    "Dispatched KARL W^X memory page allocation at {:#X} under distro mode '{:?}'",
-                    virt_addr, self.mode
-                ))
-            }
-            "ui" => {
-                Ok(format!(
-                    "Dispatched Zenith Zenith/COSMIC desktop inspiration UI theme '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "process" => {
-                let mut bore_sched = CachyBoreScheduler::new(10_000_000);
-                bore_sched.register_task(BoreTaskProfile {
-                    task_id: 1001,
-                    name: action.to_string(),
-                    priority: 20,
-                    interactive_score: 80,
-                    burst_time_ns: 1_000_000,
-                    preferred_core: CoreTypePreference::PerformancePCore,
-                    ipc_intensity: 50,
-                });
-                let timeslice = bore_sched.calculate_timeslice_ns(1001);
-                Ok(format!(
-                    "Dispatched EEVDF/BORE process scheduling for '{}' (timeslice: {}ns) under distro mode '{:?}'",
-                    action, timeslice, self.mode
-                ))
-            }
-            "audit" => {
-                let mut pax_engine = HardenedBsdPaxGuardEngine::new();
-                let mprotect_res = pax_engine.check_mprotect(100, 0x1000, false, true);
-                Ok(format!(
-                    "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
-                    action, mprotect_res.is_ok(), self.mode
-                ))
-            }
-            _ => Ok(format!(
-                "Dispatched subsystem '{}' action '{}' under distro mode '{:?}'",
-                target_subsystem, action, self.mode
-            )),
+            _ => Err("Unknown target subsystem"),
         }
     }
 
@@ -703,7 +706,8 @@ impl SovereignUniversalDistroBridge {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
+            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
+            "recovery", "time",
         ];
 
         for sub in subsystems {
@@ -2062,7 +2066,8 @@ mod cross_subsystem_tests {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
+            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics",
+            "recovery", "time",
         ];
 
         for m in modes {

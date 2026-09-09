@@ -3,12 +3,10 @@ use std::vec;
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::format;
-use std::collections::HashMap;
-use std::path::PathBuf;
+use std::collections::BTreeMap as HashMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// VM configuration
 #[derive(Debug, Clone)]

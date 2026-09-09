@@ -5,7 +5,7 @@
 //! - `/etc/fstab` filesystem mount table entry parsing (`LinuxFstabEngine`)
 //! - Dynamic shared library symbol loader resolution simulation (`LinuxLdSoLoader`)
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
@@ -614,7 +614,6 @@ impl Default for LinuxCoreDumpFilterEngine {
 // 12. Integration Tests
 // ==========================================
 
-#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

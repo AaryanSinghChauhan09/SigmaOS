@@ -1870,8 +1870,8 @@ pub struct AppArmorRuleProfile {
     pub rules: Vec<AppArmorPathRule>,
 }
 
-pub type AppArmorPathProfile = AppArmorRuleProfile;
 pub type AppArmorProfile = AppArmorRuleProfile;
+pub type AppArmorPathProfile = AppArmorRuleProfile;
 
 pub struct AppArmorPathRuleEngine {
     pub profiles: BTreeMap<String, AppArmorPathProfile>,

@@ -4,9 +4,6 @@ use alloc::string::String;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
-#[cfg(test_disabled)]
 use crate::klib::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
@@ -3198,154 +3195,9 @@ impl MemoryCompactionSuperpagesAllocator {
     }
 }
 
-/// FreeBSD inspired Jails (capability-based isolation)
-pub struct FreeBsdJail {
-    pub id: u32,
-    pub parent_id: Option<u32>,
-    pub isolated: bool,
-}
 
-impl FreeBsdJail {
-    pub fn create(id: u32) -> Self {
-        Self {
-            id,
-            parent_id: None,
-            isolated: true,
-        }
-    }
-
-    pub fn create_nested(id: u32, parent_id: u32) -> Self {
-        Self {
-            id,
-            parent_id: Some(parent_id),
-            isolated: true,
-        }
-    }
-
-    pub fn is_isolated(&self) -> bool {
-        self.isolated
-    }
-
-    /// Recursively check if this jail is a descendant of the target parent jail ID
-    pub fn is_descendant_of(&self, target_parent_id: u32) -> bool {
-        if let Some(pid) = self.parent_id {
-            if pid == target_parent_id {
-                return true;
-            }
-        }
-        false
-    }
-}
-
-/// NixOS inspired Declarative package management
-pub struct NixOsDeclarativeManager {
-    pub configuration: Vec<String>,
-    pub previous_generations: Vec<Vec<String>>,
-}
-
-impl NixOsDeclarativeManager {
-    pub fn new() -> Self {
-        Self {
-            configuration: Vec::new(),
-            previous_generations: Vec::new(),
-        }
-    }
-
-    pub fn apply_configuration(&mut self, config: &[&str]) -> Result<(), &'static str> {
-        // Save previous generation before applying new one
-        if !self.configuration.is_empty() {
-            self.previous_generations.push(self.configuration.clone());
-        }
-        self.configuration.clear();
-        for c in config {
-            self.configuration.push(c.to_string());
-        }
-        Ok(())
-    }
-
-    /// Rollbacks to the previous configuration generation atomically
-    pub fn rollback(&mut self) -> Result<(), &'static str> {
-        if let Some(prev) = self.previous_generations.pop() {
-            self.configuration = prev;
-            Ok(())
-        } else {
-            Err("No previous generations available for rollback")
-        }
-    }
-}
-
-/// Gentoo inspired USE flags / compile-time feature selection
-pub struct GentooUseFlags {
-    pub flags: HashMap<String, bool>,
-    pub dependencies: HashMap<String, String>, // (flag -> required companion flag)
-}
-
-impl GentooUseFlags {
-    pub fn new() -> Self {
-        Self {
-            flags: HashMap::new(),
-            dependencies: HashMap::new(),
-        }
-    }
-
-    pub fn set_flag(&mut self, flag: &str, enabled: bool) {
-        self.flags.insert(flag.to_string(), enabled);
-    }
-
-    pub fn add_dependency(&mut self, flag: &str, required_companion: &str) {
-        self.dependencies
-            .insert(flag.to_string(), required_companion.to_string());
-    }
-
-    pub fn has_feature(&self, flag: &str) -> bool {
-        if let Some(&val) = self.flags.get(flag) {
-            val
-        } else {
-            false
-        }
-    }
-
-    /// Check if all active USE-flags have their required companion dependencies enabled
-    pub fn check_dependencies(&self) -> bool {
-        for (flag, required) in &self.dependencies {
-            if self.has_feature(flag) && !self.has_feature(required) {
-                return false;
-            }
-        }
-        true
-    }
-}
-
-/// Void Linux inspired runit init system inspiration
-pub struct VoidRunitInit {
-    services: Vec<String>,
-}
-
-impl VoidRunitInit {
-    pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-        }
-    }
-
-    pub fn start_service(&mut self, service: &str) {
-        self.services.push(service.to_string());
-    }
-
-    pub fn is_running(&self, service: &str) -> bool {
-        for s in &self.services {
-            let s: &String = s;
-            if s.as_str() == service {
-                return true;
-            }
-        }
-        false
-
-
-    }
-}
-
-mod tests {
+#[cfg(test)]
+mod tests_extra_1 {
     use super::*;
 
     #[test]
@@ -3510,9 +3362,9 @@ mod tests {
     #[test]
     fn test_void_runit_init() {
         let mut runit = VoidRunitInit::new();
-        runit.start_service("nginx");
-        assert!(runit.is_running("nginx"));
-        assert!(!runit.is_running("postgresql"));
+        runit.register_service("nginx", 101);
+        assert!(runit.is_service_active("nginx"));
+        assert!(!runit.is_service_active("postgresql"));
     }
 
     #[test]
@@ -4500,7 +4352,6 @@ impl OpenSuseSnapperEngine {
     }
 }
 
-#[cfg(test)]
 mod linux_bsd_extra_tests {
     use super::*;
 
@@ -4568,5 +4419,233 @@ mod linux_bsd_extra_tests {
         let hash = snapper.rollback_to_snapshot(2).unwrap();
         assert_eq!(hash, 0xAABBCCDD);
         assert_eq!(snapper.active_snapshot_id, 2);
+    }
+}
+
+/// FreeBSD inspired Jails (capability-based isolation)
+pub struct FreeBsdJail {
+    pub id: u32,
+    pub parent_id: Option<u32>,
+    pub isolated: bool,
+}
+
+impl FreeBsdJail {
+    pub fn create(id: u32) -> Self {
+        Self {
+            id,
+            parent_id: None,
+            isolated: true,
+        }
+    }
+
+    pub fn create_nested(id: u32, parent_id: u32) -> Self {
+        Self {
+            id,
+            parent_id: Some(parent_id),
+            isolated: true,
+        }
+    }
+
+    pub fn is_isolated(&self) -> bool {
+        self.isolated
+    }
+
+    /// Recursively check if this jail is a descendant of the target parent jail ID
+    pub fn is_descendant_of(&self, target_parent_id: u32) -> bool {
+        if let Some(pid) = self.parent_id {
+            if pid == target_parent_id {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+/// NixOS inspired Declarative package management
+pub struct NixOsDeclarativeManager {
+    pub configuration: Vec<String>,
+    pub previous_generations: Vec<Vec<String>>,
+}
+
+impl NixOsDeclarativeManager {
+    pub fn new() -> Self {
+        Self {
+            configuration: Vec::new(),
+            previous_generations: Vec::new(),
+        }
+    }
+
+    pub fn apply_configuration(&mut self, config: &[&str]) -> Result<(), &'static str> {
+        // Save previous generation before applying new one
+        if !self.configuration.is_empty() {
+            self.previous_generations.push(self.configuration.clone());
+        }
+        self.configuration.clear();
+        for c in config {
+            self.configuration.push(c.to_string());
+        }
+        Ok(())
+    }
+
+    /// Rollbacks to the previous configuration generation atomically
+    pub fn rollback(&mut self) -> Result<(), &'static str> {
+        if let Some(prev) = self.previous_generations.pop() {
+            self.configuration = prev;
+            Ok(())
+        } else {
+            Err("No previous generations available for rollback")
+        }
+    }
+}
+
+/// Gentoo inspired USE flags / compile-time feature selection
+pub struct GentooUseFlags {
+    pub flags: HashMap<String, bool>,
+    pub dependencies: HashMap<String, String>, // (flag -> required companion flag)
+}
+
+impl GentooUseFlags {
+    pub fn new() -> Self {
+        Self {
+            flags: HashMap::new(),
+            dependencies: HashMap::new(),
+        }
+    }
+
+    pub fn set_flag(&mut self, flag: &str, enabled: bool) {
+        self.flags.insert(flag.to_string(), enabled);
+    }
+
+    pub fn add_dependency(&mut self, flag: &str, required_companion: &str) {
+        self.dependencies
+            .insert(flag.to_string(), required_companion.to_string());
+    }
+
+    pub fn has_feature(&self, flag: &str) -> bool {
+        if let Some(&val) = self.flags.get(flag) {
+            val
+        } else {
+            false
+        }
+    }
+
+    /// Check if all active USE-flags have their required companion dependencies enabled
+    pub fn check_dependencies(&self) -> bool {
+        for (flag, required) in &self.dependencies {
+            if self.has_feature(flag) && !self.has_feature(required) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+#[cfg(test)]
+mod tests_extra_2 {
+    use super::*;
+
+    #[test]
+    fn test_bsd_pf_state_table() {
+        let mut pf = BsdPfStateTable::new(60);
+        let tuple = PfFiveTuple {
+            src_ip: "192.168.1.100".to_string(),
+            dst_ip: "1.1.1.1".to_string(),
+            src_port: 5000,
+            dst_port: 443,
+            protocol: "TCP".to_string(),
+        };
+
+        pf.create_state(tuple.clone(), Some("203.0.113.5"), Some(40000), 1000);
+
+        let nat_res = pf.process_packet(&tuple, 1010).unwrap();
+        assert!(nat_res.is_some());
+        let (nat_ip, nat_port) = nat_res.unwrap();
+        assert_eq!(nat_ip, "203.0.113.5");
+        assert_eq!(nat_port, 40000);
+
+        // Expire state
+        assert_eq!(pf.expire_states(1100), 1);
+        assert!(pf.process_packet(&tuple, 1105).is_err());
+    }
+
+    #[test]
+    fn test_linux_futex_engine() {
+        let mut futex = LinuxFutexEngine::new();
+        let uaddr = 0x7fff0000;
+
+        // Memory value changed (EAGAIN)
+        assert!(futex.futex_wait(uaddr, 1, 0, 101, None).is_err());
+
+        // Successful wait enqueue
+        assert!(futex.futex_wait(uaddr, 0, 0, 101, None).is_ok());
+        assert!(futex.futex_wait(uaddr, 0, 0, 102, None).is_ok());
+
+        // Wake 1 thread
+        let woken = futex.futex_wake(uaddr, 1);
+        assert_eq!(woken, 1);
+        assert_eq!(futex.buckets.get(&uaddr).unwrap().len(), 1);
+
+        // Wake remaining
+        let woken_all = futex.futex_wake(uaddr, 5);
+        assert_eq!(woken_all, 1);
+        assert!(futex.buckets.get(&uaddr).is_none());
+    }
+
+    #[test]
+    fn test_freebsd_vfs_nullfs() {
+        let mut nullfs = FreeBsdVfsNullfs::new();
+        nullfs
+            .mount_nullfs("/usr/src/sys", "/sys", true, Some(0o755))
+            .unwrap();
+
+        let (resolved, perm) = nullfs
+            .resolve_overlay_path("/sys/kern/vfs_subr.c", false)
+            .unwrap();
+        assert_eq!(resolved, "/usr/src/sys/kern/vfs_subr.c");
+        assert_eq!(perm, Some(0o755));
+
+        // Write to read-only nullfs layer should fail
+        assert!(nullfs
+            .resolve_overlay_path("/sys/kern/vfs_subr.c", true)
+            .is_err());
+    }
+
+    #[test]
+    fn test_openbsd_pledge() {
+        let mut pledge = OpenBsdPledge::new();
+        assert!(pledge.check_permission("exec"));
+
+        pledge.pledge("stdio rpath wpath").unwrap();
+        assert!(pledge.check_permission("stdio"));
+        assert!(pledge.check_permission("rpath"));
+        assert!(!pledge.check_permission("exec"));
+
+        pledge.pledge("stdio").unwrap();
+        assert!(pledge.check_permission("stdio"));
+        assert!(!pledge.check_permission("rpath"));
+
+        assert!(pledge.pledge("stdio rpath").is_err());
+    }
+
+    #[test]
+    fn test_intel_clear_linux_stateless() {
+        let mut stateless = IntelClearLinuxStatelessEngine::new();
+        stateless.register_default_config("/etc/hostname", "sigma-default");
+        assert_eq!(
+            stateless.resolve_config("/etc/hostname").unwrap(),
+            "sigma-default"
+        );
+
+        stateless.set_user_override("/etc/hostname", "sigma-custom");
+        assert_eq!(
+            stateless.resolve_config("/etc/hostname").unwrap(),
+            "sigma-custom"
+        );
+
+        stateless.reset_etc_to_stateless();
+        assert_eq!(
+            stateless.resolve_config("/etc/hostname").unwrap(),
+            "sigma-default"
+        );
     }
 }

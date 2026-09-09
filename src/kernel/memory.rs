@@ -6,7 +6,6 @@ use std::vec::Vec;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(test_disabled)]
 use std::collections::HashMap;

@@ -20,11 +20,10 @@ jobs:
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@v1
         with:
-          toolchain: stable
+          toolchain: stable # stable
 
       - name: Run Network Discovery Security Tests
         run: |
-          mkdir -p build
           mkdir -p build && rustc --edition=2021 --test src/network/discovery.rs -o build/disc_test
           ./build/disc_test
           rm -f build/disc_test

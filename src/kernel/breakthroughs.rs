@@ -3,7 +3,6 @@
 // Universal ABI Translator, SigmaFS++, Self-Healing Kernel, AI-Native Runtime,
 // Energy-Aware Scheduler, User-Defined Kernel Functions, and Privacy-First Sandboxes.
 
-#[cfg(not(test))]
 use crate::security::CapabilityToken;
 
 #[cfg(test_disabled)]

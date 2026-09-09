@@ -40,10 +40,6 @@ mod module_loader;
 mod package_repository;
 #[path = "../src/network/protocols.rs"]
 mod protocols;
-#[path = "../src/network/protocols.rs"]
-mod protocols;
-#[path = "../src/distro/ready_to_use.rs"]
-mod ready_to_use;
 #[path = "../src/distro/ready_to_use.rs"]
 mod ready_to_use;
 #[path = "../src/security/root_improvement.rs"]
@@ -76,69 +72,8 @@ mod vm_manager;
 mod zenith_advanced;
 #[path = "../src/compatibility/zorin.rs"]
 mod zorin;
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
-
-#[path = "../src/kernel/linux_bsd_innovations.rs"]
-mod linux_bsd_innovations;
-
-#[path = "../src/boot/firmware.rs"]
-mod firmware;
-
-#[path = "../src/unimplemented_features.rs"]
-mod unimplemented_features;
+#[path = "../src/compatibility/bsd.rs"]
+mod bsd;
 
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;

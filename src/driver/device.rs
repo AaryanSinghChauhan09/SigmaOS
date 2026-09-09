@@ -1587,16 +1587,16 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test_disabled)]
-extern "C" {
-    fn malloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+#[cfg(test)]
+pub unsafe fn alloc(size: usize) -> *mut u8 {
+    std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
 }
 
-#[cfg(test_disabled)]
-#[no_mangle]
-pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
-    malloc(size)
+#[cfg(test)]
+pub unsafe fn free(ptr: *mut u8) {
+    if !ptr.is_null() {
+        std::alloc::dealloc(ptr, std::alloc::Layout::from_size_align_unchecked(1, 8));
+    }
 }
 
 // ==========================================

@@ -24,7 +24,6 @@ jobs:
 
       - name: Run MAC LSM Security Unit Tests
         run: |
-          mkdir -p build
           mkdir -p build && rustc --edition=2021 --test src/security/mandatory_access_control.rs -o build/mac_test
           ./build/mac_test
           rm -f build/mac_test

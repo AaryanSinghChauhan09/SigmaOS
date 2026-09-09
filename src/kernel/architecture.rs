@@ -561,6 +561,15 @@ impl SystemServiceDescriptorTable {
     }
 }
 
+#[cfg(not(feature = "standalone_test"))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchitectureClass {
+    X86_32,
+    X86_64,
+    AArch64,
+    RiscV32,
+    RiscV64,
+}
 
 // 6. Unified Architecture Engine
 
