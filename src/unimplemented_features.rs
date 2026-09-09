@@ -1685,6 +1685,12 @@ pub struct GestureVoiceControlEngine {
     pub registered_voice_commands: [Option<(&'static str, DesktopShellAction)>; 4],
 }
 
+impl GestureVoiceControlEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_voice_commands: [None; 4],
+        }
+    }
 
     pub fn parse_touchpad_gesture(
         &self,
@@ -1697,6 +1703,13 @@ pub struct GestureVoiceControlEngine {
             _ => None,
         }
     }
+}
+
+impl Default for GestureVoiceControlEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 
 #[cfg(test)]
