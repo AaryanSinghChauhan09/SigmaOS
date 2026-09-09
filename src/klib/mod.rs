@@ -48,12 +48,11 @@ pub mod utf8_utils;
 pub mod uvm;
 
 // Re-exports
-pub use string::{String, ToString};
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
-pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
+pub use custom_string::SigmaString;
 
 #[cfg(not(target_os = "none"))]
 pub use std::vec::Vec;

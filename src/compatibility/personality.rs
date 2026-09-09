@@ -20,7 +20,7 @@ use std::vec::Vec;
 // SigmaOS Sharded Personality & Legacy Compatibility Subsystem (SigmaPersonality)
 // Implements sharded kernels, syscall capsules, driver emulators, firmware personas, build capsules, security grids, and peripheral pods.
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 // ==========================================
 // 1. Kernel Personality Sharding (KernelShard)

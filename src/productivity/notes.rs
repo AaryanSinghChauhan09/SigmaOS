@@ -20,7 +20,7 @@ use std::format;
 // SigmaOS Note-taking App
 // OOP-based note management with rich text and organization
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 // PathBuf not in no_std
 
 /// Note

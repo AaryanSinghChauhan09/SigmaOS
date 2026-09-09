@@ -19,7 +19,7 @@ use core::net::IpAddr;
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Network security alert classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

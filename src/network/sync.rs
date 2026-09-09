@@ -21,7 +21,7 @@ use std::format;
 // SigmaOS Cloud Sync
 // OOP-based cloud synchronization for files and settings
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Sync item
 #[derive(Debug, Clone)]

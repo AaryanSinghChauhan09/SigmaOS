@@ -1696,8 +1696,6 @@ impl GestureVoiceControlEngine {
         }
     }
 }
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3704,8 +3702,4 @@ mod new_unimplemented_tests {
         phoronix.execute_benchmark("Shadow of Tomb Raider", 80.0);
         assert_eq!(phoronix.calculate_composite_score(), 100.0);
     }
-
-
 }
-
-// ===========================================================}

@@ -16,7 +16,7 @@
 /// SigmaOS SLAB/SLUB memory allocator
 /// Inspired by Bonwick's 1994 paper and the Linux kernel SLUB allocator.
 /// Exposes caches for fixed-size allocations to prevent fragmentation.
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use std::vec;
 use std::vec::Vec;
 

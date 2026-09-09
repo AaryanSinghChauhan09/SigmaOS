@@ -105,7 +105,6 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};

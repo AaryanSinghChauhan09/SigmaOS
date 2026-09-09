@@ -16,7 +16,7 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Represents a Language Pack for translating system messages.
 #[derive(Debug, Clone)]

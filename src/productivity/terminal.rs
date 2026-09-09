@@ -20,7 +20,7 @@ use std::format;
 // SigmaOS Integrated Terminal
 // OOP-based terminal emulator with shell integration
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Terminal session
 #[derive(Debug, Clone)]

@@ -21,7 +21,7 @@ use std::vec::Vec;
 // SigmaOS Password Manager
 // OOP-based password management with biometric unlock and encryption
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Password entry
 #[derive(Debug, Clone)]

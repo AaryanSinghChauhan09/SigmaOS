@@ -19,7 +19,7 @@
 use std::format;
 use std::string::{String, ToString};
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Historical early Linux release metadata
 #[derive(Debug, Clone)]

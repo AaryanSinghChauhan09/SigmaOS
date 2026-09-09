@@ -18,7 +18,7 @@ use std::vec::Vec;
 // SigmaOS Accessibility Framework
 // Advanced vision, hearing, mobility, and cognitive support
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Accessibility category
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

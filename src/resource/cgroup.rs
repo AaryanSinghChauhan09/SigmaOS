@@ -4,7 +4,7 @@
 
 use std::string::String;
 use std::vec::Vec;
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -8,7 +8,7 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// KDE Plasma 6 Inspired: KWin Wayland Split-Tiling & KRunner Search Dispatcher
 #[derive(Debug, Clone)]

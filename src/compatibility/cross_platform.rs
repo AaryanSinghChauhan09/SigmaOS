@@ -2,7 +2,7 @@
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
-use crate::klib::{BTreeMap, HashMap};
+use crate::klib::{btreemap::BTreeMap, HashMap};
 use std::string::{String, ToString};
 use std::vec::Vec;
 

@@ -22,7 +22,7 @@ use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 // =========================================================================
 // 1. Kernel Personality Proxy

@@ -1,5 +1,5 @@
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

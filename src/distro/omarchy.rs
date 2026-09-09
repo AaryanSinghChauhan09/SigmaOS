@@ -600,12 +600,12 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-pub use crate::distro::omarchy_inspiration::{
-    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
-    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
-    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
-    QuickshellWidget, ShellComponentKind,
-};
+// pub use crate::distro::omarchy_inspiration::{
+//     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
+//     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
+//     OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
+//     QuickshellWidget, ShellComponentKind,
+// };
 
 #[cfg(test)]
 mod tests {

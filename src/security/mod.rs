@@ -34,7 +34,7 @@ pub use bsd_hardening::{
     UnveilPermission as BsdUnveilPermission, WxEnforcer,
 };
 pub use capability::{
-    CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission,
+    CapabilityGate, CapabilityToken,LinuxCapabilitySet, Permission,
 };
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use capability_token::{

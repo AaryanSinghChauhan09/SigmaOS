@@ -21,7 +21,7 @@ use std::format;
 // SigmaOS Task Manager
 // OOP-based task management with Kanban boards and reminders
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use core::time::Duration;
 // Instant not in no_std
 

@@ -24,7 +24,7 @@ use std::vec::Vec;
 use crate::klib::HashMap;
 
 #[cfg(all(not(test), target_os = "none"))]
-use crate::klib::BTreeMap as HashMap;
+use crate::klib::btreemap::BTreeMap as HashMap;
 
 #[cfg(test)]
 use std::collections::HashMap;

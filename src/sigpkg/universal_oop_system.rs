@@ -28,6 +28,8 @@ use std::vec::Vec;
 
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
+#[cfg(not(feature = "standalone_test"))]
+
 #[cfg(all(not(feature = "standalone_test"), target_os = "none"))]
 use crate::klib::{HashMap, Arc};
 

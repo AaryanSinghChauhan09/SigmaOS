@@ -20,7 +20,7 @@ use std::vec::Vec;
 // SigmaOS AI-Powered System-Level Automation
 // Extended Samsung Modes & Routines for system-level workflows
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use core::time::Duration;
 // SystemTime not in no_std
 

@@ -15,7 +15,7 @@
 
 /// SigmaOS POSIX signals implementation
 /// Based on early and modern Linux signals design
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
 use std::vec::Vec;
 

@@ -16,7 +16,7 @@ use std::vec::Vec;
 
 /// SigmaOS cgroups v2 resource controller implementation
 /// Controls CPU limits, Memory limits, and PID limits
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

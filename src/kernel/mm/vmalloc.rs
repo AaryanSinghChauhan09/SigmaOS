@@ -15,7 +15,7 @@
 
 /// SigmaOS vmalloc interface for virtual contiguous memory allocation
 /// Maps non-contiguous physical pages into contiguous virtual space
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use std::vec::Vec;
 
 pub struct VmallocRegion {

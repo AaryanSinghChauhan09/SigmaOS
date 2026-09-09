@@ -20,7 +20,7 @@ use std::vec::Vec;
 // SigmaOS Clipboard Manager
 // OOP-based clipboard management with history and type support
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 use core::time::Duration;
 // Instant not in no_std
 

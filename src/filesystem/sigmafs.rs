@@ -5,7 +5,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 use std::string::{String, ToString};
 use std::vec::Vec;
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 use crate::security::vault::EncryptionAlgorithm;
 

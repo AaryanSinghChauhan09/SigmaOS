@@ -21,7 +21,7 @@ use std::format;
 // SigmaOS Built-in Torrent Client
 // OOP-based BitTorrent client with peer management
 
-use crate::klib::BTreeMap;
+use crate::klib::btreemap::BTreeMap;
 
 /// Torrent info
 #[derive(Debug, Clone)]
