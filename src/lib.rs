@@ -377,4 +377,80 @@ pub use virtualization::{
 };
 
 pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
+
+pub use ai::next_gen::{
+    AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType, EnergyGovernorMode, ModelType,
+    MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
+};
+pub use ai::wandr::{
+    ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
+};
+pub use distro::{
+    AkmKernelManager, CalamaresConfig, CalamaresInstaller, EosLogTool, EosWelcomeApp,
+    ReflectorMirrorManager, YayParuHelper,
+};
+pub use drivers::{
+    Bdle, Ch340Driver, DeviceGeneration, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver,
+    GpuError, GpuPipeline, GpuShader, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, IntelHdaDriver, NetworkCommand, NetworkDriver, NetworkError,
+    NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
+    RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
+    TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+};
+pub use filesystem::{
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
+    SmartSymlink, SymlinkResolverRule,
+};
+pub use graphics::paint::ColorRgba;
+pub use kernel::{
+    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    AuditBlock, CircularDoublyLinkedList, CpuArchitectureClass,
+    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
+    InstructionCyclePhase, InterruptClass, IoWaitProfile, Irql,
+    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask,
+    MemoryDescriptorList, Pcb, PolicyMechanismCoordinator, PoolType,
+    ProcessorInitState,
+    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
+    Tcb, ThreadState, WorkItem,
+};
+pub use network::{
+    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
+    SocketStatsCommand, SocketStatsEntry,
+    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
+};
+pub use package::{
+    ConflictResolution, PackageFormatAdapter, PackageError,
+    PackageSource, UnifiedPackage,
+};
+pub use performance::{
+    AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, CallGraph,
+    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoSchedClass, IoTaskPriority,
+    PerformanceProfileRule, PhysicalPageFrame, Profile, ProfileType, Profiler, ProfilerError,
+    RamDefragmenter, SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
+    SmartResourceOptimizer, UltraKernelSamepageMerger, X86v3v4OptimizationDetector,
+    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+};
+pub use productivity::{
+    Achievement, AchievementType, Goal,
+    ProductivityScore, EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
+    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
+    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
+    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
+};
+pub use resilience::{
+    FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
+    SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
+};
+pub use security::{
+    AnonSurfShunt, AppSandboxEngine, CapabilityToken, CrowdStrikeFalconAi,
+    DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter, IntrusionDetectionSystem,
+    LinuxCapability, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, PamError, PamGroup,
+    PamUser, Permission, RoutingMode, SandboxPolicy, Securelevel,
+    SIGNATURE_LEN, SnortRule, SnortSignatureFirewall, SovereignPamManager,
+    SovereignSecurelevelManager, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+};
+pub use storage::{
+    BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
+    PartitionEntry,
+};
 pub use tools::native_userland_replacements::MasterNativeUserlandReplacements;
