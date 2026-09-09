@@ -1,37 +1,3 @@
-# GitHub Actions PR Labeler Configuration for SigmaOS (v5 syntax)
-
-kernel:
-  - any:
-      - 'src/kernel/**/*'
-      - 'kernel/**/*'
-
-drivers:
-  - any:
-      - 'src/drivers/**/*'
-      - 'src/driver/**/*'
-      - 'drivers/**/*'
-
-security:
-  - any:
-      - 'src/security/**/*'
-      - 'security/**/*'
-
-documentation:
-  - any:
-      - '**/*.md'
-      - 'docs/**/*'
-      - 'WIKI/**/*'
-      - 'wiki/**/*'
-
-tools:
-  - any:
-      - 'src/tools/**/*'
-      - 'tools/**/*'
-
-ci:
-  - any:
-      - '.github/**/*'
-      - 'scripts/**/*'
 # GitHub Labeler Configuration for SigmaOS
 rust:
   - changed-files:
@@ -44,6 +10,7 @@ documentation:
 workflows:
   - changed-files:
       - any-glob-to-any-file: '.github/workflows/*'
+
 # GitHub Labeler Configuration for SigmaOS
 
 core-kernel:
@@ -73,6 +40,7 @@ documentation:
           - 'docs/**/*'
           - 'wiki/**/*'
           - '*.md'
+
 "area: kernel":
   - src/kernel/**/*
 "area: distro":
