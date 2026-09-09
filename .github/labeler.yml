@@ -11,8 +11,6 @@ workflows:
   - changed-files:
       - any-glob-to-any-file: '.github/workflows/*'
 
-# GitHub Labeler Configuration for SigmaOS
-
 core-kernel:
   - changed-files:
       - any-glob-to-any-file: 'src/kernel/**/*'
@@ -33,13 +31,6 @@ drivers-hal:
 security:
   - changed-files:
       - any-glob-to-any-file: 'src/security/**/*'
-
-documentation:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'docs/**/*'
-          - 'wiki/**/*'
-          - '*.md'
 
 "area: kernel":
   - src/kernel/**/*

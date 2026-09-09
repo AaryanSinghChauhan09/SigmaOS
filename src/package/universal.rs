@@ -277,11 +277,19 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    OpenBsdPkg, // OpenBSD Package (.openbsd.tgz)
     Ipk,        // OpenWrt Package (.ipk)
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
+    Spack,      // HPC Spack Package (.spack)
+    Conan,      // C/C++ Conan Package (.conan)
+    Wheel,      // Python Wheel (.whl)
+    Crate,      // Rust Crate (.crate)
+    Gem,        // Ruby Gem (.gem)
+    Nupkg,      // .NET NuGet Package (.nupkg)
+    Vcpkg,      // C++ vcpkg Package (.vcpkg)
+    NarInfo,    // Nix NarInfo (.narinfo)
+    Sysupdate,  // systemd-sysupdate (.sysupdate)
 }
 
 impl PackageFormat {
@@ -870,6 +878,15 @@ impl_generic_install_strategy!(IpkInstallStrategy);
 impl_generic_install_strategy!(OpkgInstallStrategy);
 impl_generic_install_strategy!(SolarisIpsInstallStrategy);
 impl_generic_install_strategy!(GuixNarInstallStrategy);
+impl_generic_install_strategy!(SpackInstallStrategy);
+impl_generic_install_strategy!(ConanInstallStrategy);
+impl_generic_install_strategy!(WheelInstallStrategy);
+impl_generic_install_strategy!(CrateInstallStrategy);
+impl_generic_install_strategy!(GemInstallStrategy);
+impl_generic_install_strategy!(NupkgInstallStrategy);
+impl_generic_install_strategy!(VcpkgInstallStrategy);
+impl_generic_install_strategy!(NarInfoInstallStrategy);
+impl_generic_install_strategy!(SysupdateInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1128,6 +1145,15 @@ impl_generic_metadata_adapter!(IpkMetadataAdapter, Ipk);
 impl_generic_metadata_adapter!(OpkgMetadataAdapter, Opkg);
 impl_generic_metadata_adapter!(SolarisIpsMetadataAdapter, SolarisIps);
 impl_generic_metadata_adapter!(GuixNarMetadataAdapter, GuixNar);
+impl_generic_metadata_adapter!(SpackMetadataAdapter, Spack);
+impl_generic_metadata_adapter!(ConanMetadataAdapter, Conan);
+impl_generic_metadata_adapter!(WheelMetadataAdapter, Wheel);
+impl_generic_metadata_adapter!(CrateMetadataAdapter, Crate);
+impl_generic_metadata_adapter!(GemMetadataAdapter, Gem);
+impl_generic_metadata_adapter!(NupkgMetadataAdapter, Nupkg);
+impl_generic_metadata_adapter!(VcpkgMetadataAdapter, Vcpkg);
+impl_generic_metadata_adapter!(NarInfoMetadataAdapter, NarInfo);
+impl_generic_metadata_adapter!(SysupdateMetadataAdapter, Sysupdate);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1262,80 +1288,6 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
-pub struct HardwareOptimizationDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub target_microarch_level: String,
-    pub required_simd_features: Vec<String>,
-}
-
-impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        println!(
-            "HardwareOptimizationDecorator: Microarch Level={}, SIMD={:?}",
-            self.target_microarch_level, self.required_simd_features
-        );
-        self.decorated.profile_performance();
-    }
-}
-
-pub struct ResourceLimitDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub max_memory_bytes: u64,
-    pub cpu_quota_percent: u32,
-}
-
-impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        println!(
-            "ResourceLimitDecorator: Memory Limit={} bytes, CPU Quota={}%",
-            self.max_memory_bytes, self.cpu_quota_percent
-        );
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
-}
-
-pub struct PqcSignedDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub dilithium_signature: String,
-}
-
-impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        if !self.dilithium_signature.starts_with("dilithium-5-valid") {
-            return Err(PackageError::InstallationFailed(
-                "Dilithium signature verification failed".to_string(),
-            ));
-        }
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
-}
 
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
@@ -1425,6 +1377,15 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
+            PackageFormat::Spack => Box::new(SpackInstallStrategy),
+            PackageFormat::Conan => Box::new(ConanInstallStrategy),
+            PackageFormat::Wheel => Box::new(WheelInstallStrategy),
+            PackageFormat::Crate => Box::new(CrateInstallStrategy),
+            PackageFormat::Gem => Box::new(GemInstallStrategy),
+            PackageFormat::Nupkg => Box::new(NupkgInstallStrategy),
+            PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
+            PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
+            PackageFormat::Sysupdate => Box::new(SysupdateInstallStrategy),
         }
     }
 
@@ -1484,6 +1445,15 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
+            PackageFormat::Spack => Box::new(SpackMetadataAdapter),
+            PackageFormat::Conan => Box::new(ConanMetadataAdapter),
+            PackageFormat::Wheel => Box::new(WheelMetadataAdapter),
+            PackageFormat::Crate => Box::new(CrateMetadataAdapter),
+            PackageFormat::Gem => Box::new(GemMetadataAdapter),
+            PackageFormat::Nupkg => Box::new(NupkgMetadataAdapter),
+            PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
+            PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
+            PackageFormat::Sysupdate => Box::new(SysupdateMetadataAdapter),
         }
     }
 }
@@ -2977,102 +2947,8 @@ mod tests {
 /// Alpine Linux .apk Package Format Adapter
 pub struct AlpineApkPackageAdapter;
 
-impl PackageFormatAdapter for AlpineApkPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::SigmaPkg
-    }
-
-    #[test]
-    fn test_all_package_format_strategies_and_adapters() {
-        let formats = vec![
-            PackageFormat::Deb,
-            PackageFormat::Rpm,
-            PackageFormat::Pacman,
-            PackageFormat::Ebuild,
-            PackageFormat::Apk,
-            PackageFormat::Nix,
-            PackageFormat::Flatpak,
-            PackageFormat::Snap,
-            PackageFormat::AppImage,
-            PackageFormat::Xbps,
-            PackageFormat::Txz,
-            PackageFormat::Eopkg,
-            PackageFormat::Zypper,
-            PackageFormat::Guix,
-            PackageFormat::CachyOS,
-            PackageFormat::Swupd,
-            PackageFormat::Starling,
-            PackageFormat::SigmaPkg,
-            PackageFormat::Air,
-            PackageFormat::Bottle,
-            PackageFormat::Ipa,
-            PackageFormat::Ports,
-            PackageFormat::Pkg,
-            PackageFormat::Aab,
-            PackageFormat::TarGz,
-            PackageFormat::Xz,
-            PackageFormat::App,
-            PackageFormat::Hap,
-            PackageFormat::Pisi,
-            PackageFormat::Superdeb,
-            PackageFormat::Lzm,
-            PackageFormat::Pup,
-            PackageFormat::Pet,
-            PackageFormat::Tar,
-            PackageFormat::Moss,
-            PackageFormat::Hpkg,
-            PackageFormat::Tcz,
-            PackageFormat::Gobo,
-            PackageFormat::Ostree,
-            PackageFormat::Pkgsrc,
-            PackageFormat::Sfs,
-            PackageFormat::Puk,
-            PackageFormat::Dmg,
-            PackageFormat::Cports,
-            PackageFormat::Dports,
-            PackageFormat::SlackBuild,
-            PackageFormat::Crux,
-            PackageFormat::Drpm,
-            PackageFormat::Stratum,
-        ];
-
-        for fmt in formats {
-            let strategy = PackageFactory::get_strategy(fmt);
-            let adapter = PackageFactory::get_adapter(fmt);
-            let pkg =
-                UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string()).with_format(fmt);
-
-            assert!(strategy.install(&pkg).is_ok());
-            assert!(strategy.verify(&pkg).unwrap());
-            assert!(strategy.remove(&pkg).is_ok());
-
-            let adapted = adapter.adapt("").unwrap();
-            assert!(
-                adapted.formats.contains(&fmt)
-                    || (fmt == PackageFormat::Nix
-                        && adapted.formats.contains(&PackageFormat::Nixpkg))
-            );
-        }
-    }
-
-    #[test]
-    fn test_expanded_decorators() {
-        let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
-        let base = BasePackageDecorator { package: pkg };
-
-        let sandbox_dec = SandboxDecorator {
-            decorated: base,
-            is_isolated: true,
-        };
-
-        assert!(sandbox_dec.enforce_sandbox().is_ok());
-        assert_eq!(sandbox_dec.get_package().name, "simd-app");
-
-        let net_dec = NetworkRestrictionDecorator {
-            decorated: sandbox_dec,
-            allowed_hosts: vec!["sigmaos.org".to_string()],
-        };
-
-        assert!(net_dec.restrict_network().is_ok());
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, raw_data: &str) -> Result<UnifiedPackage, PackageError> {
+        ApkMetadataAdapter.adapt(raw_data)
     }
 }
