@@ -87,3 +87,8 @@ pub mod eevdf_sovereign;
 pub use eevdf_sovereign::{SovereignEevdfScheduler, EevdfSchedEntity};
 pub mod io_uring_sqpoll_sovereign;
 pub use io_uring_sqpoll_sovereign::{SovereignIoUringSqpoll, SovereignSqe, SovereignCqe, IoUringOp};
+
+pub mod psi_sovereign;
+pub use psi_sovereign::{SovereignPsiManager, PsiResource, PsiRecord, PsiMetric, PsiTrigger};
+pub mod ksm_sovereign;
+pub use ksm_sovereign::{SovereignKsmEngine, KsmPage};

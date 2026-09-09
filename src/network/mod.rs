@@ -47,3 +47,6 @@ pub use zero_copy_networking::{SovereignZeroCopySocket, UmemPool, XdpRing, XdpAc
 
 pub mod tc_qdisc_sovereign;
 pub use tc_qdisc_sovereign::{TbfQdisc, PrioQdisc, HtbQdisc, HtbClass, FqCodelQdisc, Packet as QdiscPacket};
+
+pub mod wireguard_sovereign;
+pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};

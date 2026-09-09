@@ -168,7 +168,39 @@ rustc --edition=2021 --test src/fs/zfs_arc_sovereign.rs \
 ./build/test_zfs_arc --test-threads=1
 echo "zfs_arc_sovereign: PASSED"
 
+# ─── Linux 4.20+ Pressure Stall Information (PSI) ──────────────────────────────
+echo ""
+echo "=== [19] SigmaOS Pressure Stall Information (PSI) Tests ==="
+rustc --edition=2021 --test src/kernel/psi_sovereign.rs \
+  -o build/test_psi 2>&1 | grep -v "^$" || true
+./build/test_psi --test-threads=1
+echo "psi_sovereign: PASSED"
+
+# ─── Pure-Rust WireGuard Sovereign Tunnel ─────────────────────────────────────
+echo ""
+echo "=== [20] SigmaOS WireGuard Sovereign Tunnel Tests ==="
+rustc --edition=2021 --test src/net/wireguard_sovereign.rs \
+  -o build/test_wireguard 2>&1 | grep -v "^$" || true
+./build/test_wireguard --test-threads=1
+echo "wireguard_sovereign: PASSED"
+
+# ─── Linux fanotify Filesystem Access Notification ────────────────────────────
+echo ""
+echo "=== [21] SigmaOS fanotify Sovereign Filesystem Access Tests ==="
+rustc --edition=2021 --test src/fs/fanotify_sovereign.rs \
+  -o build/test_fanotify 2>&1 | grep -v "^$" || true
+./build/test_fanotify --test-threads=1
+echo "fanotify_sovereign: PASSED"
+
+# ─── Linux Kernel Samepage Merging (KSM) Deduplication ────────────────────────
+echo ""
+echo "=== [22] SigmaOS KSM Memory Deduplication Tests ==="
+rustc --edition=2021 --test src/kernel/ksm_sovereign.rs \
+  -o build/test_ksm 2>&1 | grep -v "^$" || true
+./build/test_ksm --test-threads=1
+echo "ksm_sovereign: PASSED"
+
 echo ""
 echo "========================================================"
-echo "=== ALL 18 SIGMAOS TEST SUITES PASSED SUCCESSFULLY ==="
+echo "=== ALL 22 SIGMAOS TEST SUITES PASSED SUCCESSFULLY ==="
 echo "========================================================"

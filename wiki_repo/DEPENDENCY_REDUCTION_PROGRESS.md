@@ -95,6 +95,14 @@ All functionality is implemented from scratch:
 | `src/ipc/dbus_sovereign.rs` | Linux D-Bus wire protocol | 6 ✅ |
 | `src/kernel/ftrace_sovereign.rs` | Linux ftrace function tracer | 6 ✅ |
 | `src/fs/overlayfs_sovereign.rs` | Linux overlayfs (overlay2) | 6 ✅ |
+| `src/kernel/eevdf_sovereign.rs` | Linux EEVDF CPU scheduler (6.6) | 6 ✅ |
+| `src/security/bpf_lsm_sovereign.rs` | Linux BPF-LSM dynamic MAC hooks (5.7) | 6 ✅ |
+| `src/kernel/io_uring_sqpoll_sovereign.rs` | Linux io_uring SQPOLL zero-syscall (5.1) | 6 ✅ |
+| `src/fs/zfs_arc_sovereign.rs` | OpenZFS / FreeBSD ARC cache | 6 ✅ |
+| `src/kernel/psi_sovereign.rs` | Linux Pressure Stall Information (4.20) | 6 ✅ |
+| `src/net/wireguard_sovereign.rs` | Linux WireGuard Cryptokey Routing (5.6) | 6 ✅ |
+| `src/fs/fanotify_sovereign.rs` | Linux fanotify access control (2.6.37) | 6 ✅ |
+| `src/kernel/ksm_sovereign.rs` | Linux Kernel Samepage Merging (2.6.32) | 6 ✅ |
 | `src/package/bsd_linux_package_innovations.rs` | Apt/Pacman/Ports/Nix/XBPS/APK | — |
 | `src/arch/sovereign_multiarch_hal.rs` | x86/ARM/RISC-V/MIPS/PPC/SPARC | — |
 | `src/tools/dependency_reduction.rs` | Master dependency eliminator | — |
@@ -102,10 +110,18 @@ All functionality is implemented from scratch:
 | `src/launch_ready/mod.rs` | IDT/PMM/Scheduler/Syscall table | 5 ✅ |
 | `src/klib/zero_dependency_elimination.rs` | ZeroDependencyMasterHub | — |
 
-**Total sovereign tests: 84 passing across 14 test suites, 0 failing**
+**Total sovereign tests: 132 passing across 22 test suites, 0 failing**
 
 ## Related Wiki Pages
 
+- [PSI_PRESSURE_STALL_SOVEREIGN](PSI_PRESSURE_STALL_SOVEREIGN) — Linux PSI CPU/Memory/IO pressure stall accounting
+- [WIREGUARD_SOVEREIGN](WIREGUARD_SOVEREIGN) — Linux WireGuard Cryptokey routing & handshake
+- [FANOTIFY_SOVEREIGN](FANOTIFY_SOVEREIGN) — Linux fanotify file access control & notification
+- [KSM_DEDUPLICATION_SOVEREIGN](KSM_DEDUPLICATION_SOVEREIGN) — Linux Kernel Samepage Merging memory deduplication
+- [EEVDF_SCHEDULER_SOVEREIGN](EEVDF_SCHEDULER_SOVEREIGN) — Linux EEVDF lag/deadline scheduler
+- [BPF_LSM_SOVEREIGN](BPF_LSM_SOVEREIGN) — Linux BPF-LSM security hooks
+- [IO_URING_SQPOLL_SOVEREIGN](IO_URING_SQPOLL_SOVEREIGN) — Linux io_uring SQPOLL kernel thread
+- [ZFS_ARC_SOVEREIGN](ZFS_ARC_SOVEREIGN) — OpenZFS Adaptive Replacement Cache
 - [CGROUPS_V2_SOVEREIGN](CGROUPS_V2_SOVEREIGN) — Linux cgroups v2 resource accounting
 - [BSD_JAILS_SOVEREIGN](BSD_JAILS_SOVEREIGN) — FreeBSD Jails OS virtualization
 - [LANDLOCK_CAPSICUM_SOVEREIGN](LANDLOCK_CAPSICUM_SOVEREIGN) — Landlock + Capsicum + Unveil

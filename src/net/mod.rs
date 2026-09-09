@@ -42,3 +42,6 @@ pub use network_syscalls::{
 
 pub mod tc_qdisc_sovereign;
 pub use tc_qdisc_sovereign::{TbfQdisc, PrioQdisc, HtbQdisc, HtbClass, FqCodelQdisc, Packet as QdiscPacket};
+
+pub mod wireguard_sovereign;
+pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};

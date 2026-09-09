@@ -45,3 +45,6 @@ pub use overlayfs_sovereign::{SovereignOverlayFs, OverlayLayer, OverlayEntry, Ov
 
 pub mod zfs_arc_sovereign;
 pub use zfs_arc_sovereign::{SovereignZfsArc, ArcBufferHeader};
+
+pub mod fanotify_sovereign;
+pub use fanotify_sovereign::{SovereignFanotifyGroup, FanotifyEvent, FanotifyEventKind, FanotifyResponse, FanotifyMark};

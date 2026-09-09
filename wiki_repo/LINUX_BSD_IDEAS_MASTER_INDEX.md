@@ -21,6 +21,10 @@ as sovereign Safe Rust modules with zero external dependencies.
 | EEVDF CPU scheduler | 6.6 (2023) | `src/kernel/eevdf_sovereign.rs` | 6 ✅ |
 | BPF-LSM dynamic security hooks | 5.7 (2020) | `src/security/bpf_lsm_sovereign.rs` | 6 ✅ |
 | io_uring SQPOLL zero-syscall polling | 5.1 (2019) | `src/kernel/io_uring_sqpoll_sovereign.rs` | 6 ✅ |
+| Pressure Stall Information (PSI) | 4.20 (2018) | `src/kernel/psi_sovereign.rs` | 6 ✅ |
+| WireGuard sovereign tunnel protocol | 5.6 (2020) | `src/net/wireguard_sovereign.rs` | 6 ✅ |
+| fanotify filesystem access control | 2.6.37 (2011) | `src/fs/fanotify_sovereign.rs` | 6 ✅ |
+| Kernel Samepage Merging (KSM) | 2.6.32 (2009) | `src/kernel/ksm_sovereign.rs` | 6 ✅ |
 | eBPF virtual machine | 3.15 (2014) | `src/kernel/ebpf_vm.rs` | — |
 | BORE scheduler | 5.19+ patch | `src/kernel/bore.rs` | — |
 | Linux namespaces | 3.8 (2013) | `src/security/namespaces.rs` | — |
@@ -69,12 +73,20 @@ kernel/eevdf_sovereign                      [15]       6/6      ✅ PASS
 security/bpf_lsm_sovereign                  [16]       6/6      ✅ PASS
 kernel/io_uring_sqpoll_sovereign            [17]       6/6      ✅ PASS
 fs/zfs_arc_sovereign                        [18]       6/6      ✅ PASS
+kernel/psi_sovereign                        [19]       6/6      ✅ PASS
+net/wireguard_sovereign                     [20]       6/6      ✅ PASS
+fs/fanotify_sovereign                       [21]       6/6      ✅ PASS
+kernel/ksm_sovereign                        [22]       6/6      ✅ PASS
 ──────────────────────────────────────────  ─────────  ───────  ──────
-TOTAL                                       18 Suites  108/108  ✅ ALL PASS
+TOTAL                                       22 Suites  132/132  ✅ ALL PASS
 ```
 
 ## Related Pages
 
+- [PSI_PRESSURE_STALL_SOVEREIGN](PSI_PRESSURE_STALL_SOVEREIGN)
+- [WIREGUARD_SOVEREIGN](WIREGUARD_SOVEREIGN)
+- [FANOTIFY_SOVEREIGN](FANOTIFY_SOVEREIGN)
+- [KSM_DEDUPLICATION_SOVEREIGN](KSM_DEDUPLICATION_SOVEREIGN)
 - [EEVDF_SCHEDULER_SOVEREIGN](EEVDF_SCHEDULER_SOVEREIGN)
 - [BPF_LSM_SOVEREIGN](BPF_LSM_SOVEREIGN)
 - [IO_URING_SQPOLL_SOVEREIGN](IO_URING_SQPOLL_SOVEREIGN)
