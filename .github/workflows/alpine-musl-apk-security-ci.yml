@@ -24,4 +24,5 @@ jobs:
 
       - name: Run Input Validation Security Tests
         run: |
-          rustc --test src/security/input_validation.rs --edition=2021 -o build/input_val_test && ./build/input_val_test
+          mkdir -p build
+          mkdir -p build && rustc --test src/security/input_validation.rs --edition=2021 -o build/input_val_test && ./build/input_val_test

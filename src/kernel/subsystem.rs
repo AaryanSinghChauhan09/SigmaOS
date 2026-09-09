@@ -7,7 +7,6 @@ use std::string::String;
 use std::vec::Vec;
 use core::any::Any;
 
-#[cfg(not(test))]
 use crate::security::CapabilityToken;
 
 #[cfg(test_disabled)]

@@ -79,8 +79,8 @@ pub struct AsyncIoRingEngine {
 impl AsyncIoRingEngine {
     pub fn new(capacity: usize) -> Self {
         Self {
-            sq_ring: VecDeque::with_capacity(capacity),
-            cq_ring: VecDeque::with_capacity(capacity),
+            sq_ring: VecDeque::new(),
+            cq_ring: VecDeque::new(),
             ring_capacity: capacity,
             total_submitted: 0,
             total_completed: 0,

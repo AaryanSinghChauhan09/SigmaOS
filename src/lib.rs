@@ -4,6 +4,9 @@
 // Core working modules
 pub mod accessibility;
 pub mod ai;
+pub mod audio;
+pub mod ipc;
+pub mod init;
 pub mod app;
 pub mod auth;
 pub mod automation;
@@ -182,7 +185,9 @@ pub mod performance;
 
 pub mod distro;
 pub mod distro_innovations;
+pub mod arch_kernel_inspirations;
 pub mod distro_inspirations;
+pub mod linuxmint_inspirations;
 pub mod innovation;
 pub use innovation::{
     BootStageKind, BootStageRecipe, ComposableBootSequencesEngine, DriverShard,

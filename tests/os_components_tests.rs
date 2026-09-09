@@ -6,10 +6,8 @@ extern crate alloc;
 mod pipes;
 #[path = "../src/security/unveil.rs"]
 mod unveil;
-
 #[path = "../src/storage/geom.rs"]
 mod geom;
-
 #[path = "../src/audio/editor.rs"]
 mod audio_editor;
 #[path = "../src/compatibility/bsd.rs"]
@@ -20,23 +18,9 @@ mod chimera_linux;
 mod debian_compat;
 #[path = "../src/distro/mod.rs"]
 pub mod distro;
-#[path = "../src/storage/geom.rs"]
-mod geom;
-#[path = "../src/storage/geom.rs"]
-mod geom;
-#[path = "../src/ipc/pipes.rs"]
-mod pipes;
-#[path = "../src/ipc/pipes.rs"]
-mod pipes;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
 #[path = "../src/graphics/video_editor.rs"]
 mod video_editor;
 use distro::linux_bsd_inspirations as distro_inspirations;
-#[path = "../src/access/control.rs"]
-mod access_control;
 #[path = "../src/access/control.rs"]
 mod access_control;
 #[path = "../src/ipc/alpc.rs"]

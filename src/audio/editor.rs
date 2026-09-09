@@ -25,16 +25,6 @@ impl AudioEffect for AmplifyEffect {
             *sample *= self.gain;
         }
     }
-
-    pub fn with_samples(mut self, samples: &[f32]) -> Self {
-        self.samples = samples.to_vec();
-        self
-    }
-
-    pub fn with_volume(mut self, vol: f32) -> Self {
-        self.volume = vol;
-        self
-    }
 }
 
 /// Spectral Noise Suppression Effect
@@ -46,53 +36,15 @@ impl SpectralNoiseSuppressionEffect {
     pub fn new(noise_floor: f32) -> Self {
         Self { noise_floor }
     }
+}
 
-    pub fn apply(&self, samples: &mut [f32]) {
+impl AudioEffect for SpectralNoiseSuppressionEffect {
+    fn apply(&self, samples: &mut [f32]) {
         for sample in samples.iter_mut() {
             if sample.abs() < self.noise_floor {
                 *sample = 0.0;
             }
         }
-    }
-}
-
-/// Multi-Track Audio Mixing Session
-pub struct MultiTrackSession {
-    pub sample_rate: u32,
-    pub tracks: Vec<AudioTrack>,
-}
-
-impl MultiTrackSession {
-    pub fn new(sample_rate: u32) -> Self {
-        Self {
-            sample_rate,
-            tracks: Vec::new(),
-        }
-    }
-
-    pub fn add_track(&mut self, track: AudioTrack) {
-        self.tracks.push(track);
-    }
-
-    pub fn mix_session(&self) -> Vec<f32> {
-        let has_solo = self.tracks.iter().any(|t| t.is_solo);
-        let max_len = self.tracks.iter().map(|t| t.samples.len()).max().unwrap_or(0);
-        let mut mixed = alloc::vec![0.0f32; max_len];
-
-        for track in &self.tracks {
-            if track.is_muted {
-                continue;
-            }
-            if has_solo && !track.is_solo {
-                continue;
-            }
-
-            for (i, &sample) in track.samples.iter().enumerate() {
-                mixed[i] += sample * track.volume;
-            }
-        }
-
-        mixed
     }
 }
 
@@ -128,6 +80,7 @@ impl AudioTrack {
     }
 }
 
+/// Multi-Track Audio Mixing Session
 pub struct MultiTrackSession {
     pub sample_rate: u32,
     pub tracks: Vec<AudioTrack>,
@@ -135,7 +88,7 @@ pub struct MultiTrackSession {
 
 impl MultiTrackSession {
     pub fn new(sample_rate: u32) -> Self {
-        MultiTrackSession {
+        Self {
             sample_rate,
             tracks: Vec::new(),
         }
@@ -147,12 +100,7 @@ impl MultiTrackSession {
 
     pub fn mix_session(&self) -> Vec<f32> {
         let has_solo = self.tracks.iter().any(|t| t.is_solo);
-        let max_len = self
-            .tracks
-            .iter()
-            .map(|t| t.samples.len())
-            .max()
-            .unwrap_or(0);
+        let max_len = self.tracks.iter().map(|t| t.samples.len()).max().unwrap_or(0);
         let mut mixed = std::vec![0.0f32; max_len];
 
         for track in &self.tracks {
@@ -169,26 +117,6 @@ impl MultiTrackSession {
         }
 
         mixed
-    }
-}
-
-pub struct SpectralNoiseSuppressionEffect {
-    pub noise_floor: f32,
-}
-
-impl SpectralNoiseSuppressionEffect {
-    pub fn new(noise_floor: f32) -> Self {
-        SpectralNoiseSuppressionEffect { noise_floor }
-    }
-}
-
-impl AudioEffect for SpectralNoiseSuppressionEffect {
-    fn apply(&self, samples: &mut [f32]) {
-        for sample in samples.iter_mut() {
-            if sample.abs() < self.noise_floor {
-                *sample = 0.0;
-            }
-        }
     }
 }
 
@@ -366,7 +294,7 @@ impl AudioEditor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

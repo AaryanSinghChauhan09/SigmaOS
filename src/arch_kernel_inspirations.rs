@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS ArchLinux & Linux Kernel Inspiration Subsystem
 // (`src/arch_kernel_inspirations.rs`)
+
+extern crate alloc;
 //
 // Sovereign `#![no_std]` reimplementations of distinctive ideas drawn from the
 // Arch Linux organization (https://github.com/archlinux) and the Linux kernel
@@ -563,7 +565,14 @@ impl SignstarService {
     pub fn add_signer(&mut self, id: &str, policy: SignerPolicy) {
         self.signers.push(Signer {
             id: id.to_string(),
-            key,
+            key: SigningKey {
+                key_id: id.to_string(),
+                fingerprint: format!("fp_{}", id),
+                algorithm: SignatureAlgorithm::Ed25519,
+                backing: KeyBacking::SoftwareKey,
+                expires_at: 0,
+                is_revoked: false,
+            },
             policy,
             signed: false,
             signature_timestamp: 0,
