@@ -11,6 +11,22 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+/// Helper function to escape HTML special characters to prevent DOM injection / XSS
+fn escape_html(input: &str) -> String {
+    let mut escaped = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
+}
+
 /// Welcome screen section
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WelcomeSection {
@@ -128,39 +144,39 @@ impl MintWelcomeScreen {
         html.push_str("<html>\n");
         html.push_str("<head>\n");
         html.push_str("<title>Welcome to ");
-        html.push_str(&self.system_info.os_name);
+        html.push_str(&escape_html(&self.system_info.os_name));
         html.push_str("</title>\n");
         html.push_str("</head>\n");
         html.push_str("<body>\n");
         
         // Header
         html.push_str("<h1>Welcome to ");
-        html.push_str(&self.system_info.os_name);
+        html.push_str(&escape_html(&self.system_info.os_name));
         html.push_str(" ");
-        html.push_str(&self.system_info.os_version);
+        html.push_str(&escape_html(&self.system_info.os_version));
         html.push_str("</h1>\n");
         
         // System info
         html.push_str("<h2>System Information</h2>\n");
         html.push_str("<ul>\n");
-        html.push_str(&format!("<li>Edition: {}</li>\n", self.system_info.edition));
-        html.push_str(&format!("<li>Desktop: {}</li>\n", self.system_info.desktop_environment));
-        html.push_str(&format!("<li>Kernel: {}</li>\n", self.system_info.kernel_version));
-        html.push_str(&format!("<li>Architecture: {}</li>\n", self.system_info.architecture));
+        html.push_str(&format!("<li>Edition: {}</li>\n", escape_html(&self.system_info.edition)));
+        html.push_str(&format!("<li>Desktop: {}</li>\n", escape_html(&self.system_info.desktop_environment)));
+        html.push_str(&format!("<li>Kernel: {}</li>\n", escape_html(&self.system_info.kernel_version)));
+        html.push_str(&format!("<li>Architecture: {}</li>\n", escape_html(&self.system_info.architecture)));
         html.push_str("</ul>\n");
         
         // Content sections
         for section in &self.content {
             html.push_str("<h2>");
-            html.push_str(&section.title);
+            html.push_str(&escape_html(&section.title));
             html.push_str("</h2>\n");
             html.push_str("<p>");
-            html.push_str(&section.content);
+            html.push_str(&escape_html(&section.content));
             html.push_str("</p>\n");
             
             if let Some(url) = &section.url {
                 html.push_str("<p><a href=\"");
-                html.push_str(url);
+                html.push_str(&escape_html(url));
                 html.push_str("\">Learn more</a></p>\n");
             }
         }
