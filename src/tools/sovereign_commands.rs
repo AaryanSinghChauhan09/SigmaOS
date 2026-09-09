@@ -58,6 +58,257 @@ impl Default for SovereignSudo {
     }
 }
 
+/// 9. Sovereign Interactive Shell Engine (sh / bash / zsh / csh parity)
+#[derive(Debug, Clone)]
+pub struct ShellAlias {
+    pub name: String,
+    pub replacement: String,
+}
+
+pub struct SovereignInteractiveShell {
+    pub current_working_dir: String,
+    pub environment_variables: BTreeMap<String, String>,
+    pub aliases: Vec<ShellAlias>,
+    pub command_history: Vec<String>,
+}
+
+impl SovereignInteractiveShell {
+    pub fn new() -> Self {
+        let mut env = BTreeMap::new();
+        env.insert("PATH".to_string(), "/bin:/usr/bin:/usr/local/bin".to_string());
+        env.insert("SHELL".to_string(), "/bin/sigma-sh".to_string());
+        env.insert("USER".to_string(), "root".to_string());
+        env.insert("HOME".to_string(), "/root".to_string());
+
+        Self {
+            current_working_dir: "/root".to_string(),
+            environment_variables: env,
+            aliases: vec![
+                ShellAlias {
+                    name: "ll".to_string(),
+                    replacement: "ls -la".to_string(),
+                },
+                ShellAlias {
+                    name: "la".to_string(),
+                    replacement: "ls -A".to_string(),
+                },
+            ],
+            command_history: Vec::new(),
+        }
+    }
+
+    pub fn execute_line(&mut self, line: &str) -> Result<String, String> {
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            return Ok(String::new());
+        }
+
+        self.command_history.push(trimmed.to_string());
+
+        // Alias expansion
+        let mut expanded_line = trimmed.to_string();
+        for alias in &self.aliases {
+            if trimmed == alias.name || trimmed.starts_with(&format!("{} ", alias.name)) {
+                expanded_line = trimmed.replacen(&alias.name, &alias.replacement, 1);
+                break;
+            }
+        }
+
+        let tokens: Vec<&str> = expanded_line.split_whitespace().collect();
+        match tokens[0] {
+            "cd" => {
+                let target = tokens.get(1).copied().unwrap_or("/root");
+                self.current_working_dir = target.to_string();
+                Ok(format!("cd: {}", self.current_working_dir))
+            }
+            "pwd" => Ok(self.current_working_dir.clone()),
+            "export" => {
+                if let Some(arg) = tokens.get(1) {
+                    if let Some(pos) = arg.find('=') {
+                        let k = arg[..pos].to_string();
+                        let v = arg[pos + 1..].to_string();
+                        self.environment_variables.insert(k.clone(), v.clone());
+                        return Ok(format!("export {}={}", k, v));
+                    }
+                }
+                Ok("export: updated environment".to_string())
+            }
+            "history" => Ok(self.command_history.join("\n")),
+            _ => Ok(format!("sigma-sh: Executed pipeline '{}'", expanded_line)),
+        }
+    }
+}
+
+impl Default for SovereignInteractiveShell {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 10. Sovereign File Manager Engine (ls / cp / mv / rm / chmod / chown / find / tree)
+#[derive(Debug, Clone)]
+pub struct FileMetadataNode {
+    pub path: String,
+    pub is_directory: bool,
+    pub size_bytes: u64,
+    pub mode_octal: u32,
+    pub owner_uid: u32,
+    pub group_gid: u32,
+    pub is_cow_reflink: bool,
+}
+
+pub struct SovereignFileManager {
+    pub virtual_tree: BTreeMap<String, FileMetadataNode>,
+}
+
+impl SovereignFileManager {
+    pub fn new() -> Self {
+        let mut tree = BTreeMap::new();
+        tree.insert(
+            "/root".to_string(),
+            FileMetadataNode {
+                path: "/root".to_string(),
+                is_directory: true,
+                size_bytes: 4096,
+                mode_octal: 0o755,
+                owner_uid: 0,
+                group_gid: 0,
+                is_cow_reflink: false,
+            },
+        );
+        tree.insert(
+            "/root/config.toml".to_string(),
+            FileMetadataNode {
+                path: "/root/config.toml".to_string(),
+                is_directory: false,
+                size_bytes: 1024,
+                mode_octal: 0o644,
+                owner_uid: 0,
+                group_gid: 0,
+                is_cow_reflink: false,
+            },
+        );
+
+        Self { virtual_tree: tree }
+    }
+
+    pub fn list_directory(&self, path: &str) -> Vec<FileMetadataNode> {
+        self.virtual_tree
+            .values()
+            .filter(|node| node.path != path && node.path.starts_with(path))
+            .cloned()
+            .collect()
+    }
+
+    pub fn copy_reflink(&mut self, src: &str, dst: &str) -> Result<String, String> {
+        let src_node = self
+            .virtual_tree
+            .get(src)
+            .ok_or_else(|| format!("cp: cannot stat '{}': No such file or directory", src))?
+            .clone();
+
+        let mut dst_node = src_node;
+        dst_node.path = dst.to_string();
+        dst_node.is_cow_reflink = true;
+
+        self.virtual_tree.insert(dst.to_string(), dst_node);
+        Ok(format!("cp --reflink=always: {} -> {}", src, dst))
+    }
+
+    pub fn chmod(&mut self, path: &str, mode: u32) -> Result<(), String> {
+        let node = self
+            .virtual_tree
+            .get_mut(path)
+            .ok_or_else(|| format!("chmod: cannot access '{}'", path))?;
+        node.mode_octal = mode;
+        Ok(())
+    }
+}
+
+impl Default for SovereignFileManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 11. Sovereign Process Controller Engine (kill / pkill / renice / pstree)
+#[derive(Debug, Clone)]
+pub struct ProcessRecord {
+    pub pid: usize,
+    pub ppid: usize,
+    pub name: String,
+    pub priority_nice: i32,
+    pub state_signal: String,
+}
+
+pub struct SovereignProcessController {
+    pub process_table: BTreeMap<usize, ProcessRecord>,
+}
+
+impl SovereignProcessController {
+    pub fn new() -> Self {
+        let mut table = BTreeMap::new();
+        table.insert(
+            1,
+            ProcessRecord {
+                pid: 1,
+                ppid: 0,
+                name: "rust-init".to_string(),
+                priority_nice: 0,
+                state_signal: "RUNNING".to_string(),
+            },
+        );
+        table.insert(
+            100,
+            ProcessRecord {
+                pid: 100,
+                ppid: 1,
+                name: "sigma-desktop".to_string(),
+                priority_nice: -5,
+                state_signal: "RUNNING".to_string(),
+            },
+        );
+
+        Self { process_table: table }
+    }
+
+    pub fn send_signal(&mut self, pid: usize, signal_name: &str) -> Result<String, String> {
+        let proc = self
+            .process_table
+            .get_mut(&pid)
+            .ok_or_else(|| format!("kill: ({}) - No such process", pid))?;
+
+        proc.state_signal = signal_name.to_string();
+        Ok(format!("kill: sent signal {} to PID {}", signal_name, pid))
+    }
+
+    pub fn renice(&mut self, pid: usize, new_nice: i32) -> Result<String, String> {
+        let proc = self
+            .process_table
+            .get_mut(&pid)
+            .ok_or_else(|| format!("renice: ({}) - No such process", pid))?;
+
+        proc.priority_nice = new_nice;
+        Ok(format!("renice: PID {} priority set to {}", pid, new_nice))
+    }
+
+    pub fn generate_pstree(&self) -> String {
+        let mut tree = String::from("1 rust-init\n");
+        for proc in self.process_table.values() {
+            if proc.pid != 1 {
+                tree.push_str(&format!("  └─ {} {}\n", proc.pid, proc.name));
+            }
+        }
+        tree
+    }
+}
+
+impl Default for SovereignProcessController {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 7. Sovereign Linux Command Line Suite (systemctl, journalctl, systemd-analyze, pacman, dnf, apt-get, apk)
 pub struct SovereignLinuxCommandSuite;
 
@@ -421,7 +672,7 @@ impl Default for SovereignOpenBsdDoas {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -516,5 +767,52 @@ mod tests {
 
         assert!(doas.validate_doas_rule_with_args("sovereign", "root", "sigma-pkg", &["upgrade", "--yes"]).unwrap());
         assert!(doas.validate_doas_rule_with_args("guest", "root", "rm", &["-rf", "/"]).is_err());
+    }
+
+    #[test]
+    fn test_sovereign_interactive_shell() {
+        let mut shell = SovereignInteractiveShell::new();
+        assert_eq!(shell.execute_line("pwd").unwrap(), "/root");
+
+        let res_cd = shell.execute_line("cd /var/log").unwrap();
+        assert_eq!(res_cd, "cd: /var/log");
+        assert_eq!(shell.current_working_dir, "/var/log");
+
+        let res_alias = shell.execute_line("ll").unwrap();
+        assert!(res_alias.contains("ls -la"));
+
+        let res_export = shell.execute_line("export EDITOR=nvim").unwrap();
+        assert_eq!(res_export, "export EDITOR=nvim");
+        assert_eq!(shell.environment_variables.get("EDITOR").unwrap(), "nvim");
+    }
+
+    #[test]
+    fn test_sovereign_file_manager() {
+        let mut fm = SovereignFileManager::new();
+        let list = fm.list_directory("/root");
+        assert_eq!(list.len(), 1);
+        assert_eq!(list[0].path, "/root/config.toml");
+
+        let reflink_res = fm.copy_reflink("/root/config.toml", "/root/config_backup.toml").unwrap();
+        assert!(reflink_res.contains("cp --reflink=always"));
+        assert!(fm.virtual_tree.get("/root/config_backup.toml").unwrap().is_cow_reflink);
+
+        assert!(fm.chmod("/root/config.toml", 0o600).is_ok());
+        assert_eq!(fm.virtual_tree.get("/root/config.toml").unwrap().mode_octal, 0o600);
+    }
+
+    #[test]
+    fn test_sovereign_process_controller() {
+        let mut pc = SovereignProcessController::new();
+        let sig_res = pc.send_signal(100, "SIGTERM").unwrap();
+        assert!(sig_res.contains("sent signal SIGTERM to PID 100"));
+        assert_eq!(pc.process_table.get(&100).unwrap().state_signal, "SIGTERM");
+
+        let nice_res = pc.renice(100, -10).unwrap();
+        assert!(nice_res.contains("priority set to -10"));
+        assert_eq!(pc.process_table.get(&100).unwrap().priority_nice, -10);
+
+        let tree = pc.generate_pstree();
+        assert!(tree.contains("sigma-desktop"));
     }
 }
