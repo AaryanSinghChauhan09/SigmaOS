@@ -1,7 +1,6 @@
-
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -23,14 +22,6 @@ pub enum ContainerState {
 
 /// Container capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContainerCapability {
     pub can_start: bool,
@@ -206,7 +197,6 @@ impl NamespaceConfig {
         self.pid && self.mnt && self.net && self.uts && self.ipc && self.user && self.cgroup
     }
 }
-
 
 impl SeccompProfileV2 {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {

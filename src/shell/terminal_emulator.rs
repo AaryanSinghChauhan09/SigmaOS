@@ -4,8 +4,8 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnsiColor {
@@ -1362,8 +1362,11 @@ impl TerminalSession {
                         .multiplexer
                         .split_active_pane(PaneSplitDirection::Horizontal);
                 }
-                i += 1;
+                _ => {}
             }
+            Some(action)
+        } else {
+            None
         }
     }
 }
@@ -1447,7 +1450,7 @@ mod tests {
             "echo 'Arg 1 is: $1'",
             "sigpkg install $2",
             "echo 'All args: $@'",
-            "echo 'Total count: $#'"
+            "echo 'Total count: $#'",
         ];
         let func = UserDefinedFunction::new("deploy", &lines);
 

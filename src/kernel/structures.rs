@@ -65,14 +65,6 @@ impl<T> CircularDoublyLinkedList<T> {
 
 // 2. Scheduler SystemThread, WorkItems, APCs
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86,
-    X64,
-    Arm,
-    Cisc,
-}
-
 pub struct SystemThread {
     pub thread_id: usize,
     pub priority: u8,

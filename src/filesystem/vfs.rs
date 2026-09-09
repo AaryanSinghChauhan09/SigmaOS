@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-/// SigmaOS: Virtual File System (VFS) Layer
-/// Provides unified filesystem abstraction supporting multiple filesystem types
-/// Integrates with syscall dispatcher for read, write, open, close operations
+// SigmaOS: Virtual File System (VFS) Layer
+// Provides unified filesystem abstraction supporting multiple filesystem types
+// Integrates with syscall dispatcher for read, write, open, close operations
 
+use core::fmt;
 use std::string::String;
 use std::vec::Vec;
-use core::fmt;
 
 /// File types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -50,15 +50,33 @@ impl FileMode {
 
     pub fn to_u32(&self) -> u32 {
         let mut mode = 0u32;
-        if self.owner_read { mode |= 0o400; }
-        if self.owner_write { mode |= 0o200; }
-        if self.owner_execute { mode |= 0o100; }
-        if self.group_read { mode |= 0o040; }
-        if self.group_write { mode |= 0o020; }
-        if self.group_execute { mode |= 0o010; }
-        if self.other_read { mode |= 0o004; }
-        if self.other_write { mode |= 0o002; }
-        if self.other_execute { mode |= 0o001; }
+        if self.owner_read {
+            mode |= 0o400;
+        }
+        if self.owner_write {
+            mode |= 0o200;
+        }
+        if self.owner_execute {
+            mode |= 0o100;
+        }
+        if self.group_read {
+            mode |= 0o040;
+        }
+        if self.group_write {
+            mode |= 0o020;
+        }
+        if self.group_execute {
+            mode |= 0o010;
+        }
+        if self.other_read {
+            mode |= 0o004;
+        }
+        if self.other_write {
+            mode |= 0o002;
+        }
+        if self.other_execute {
+            mode |= 0o001;
+        }
         mode
     }
 }
@@ -172,10 +190,20 @@ pub trait FileSystem: Send + Sync {
     fn write_inode(&mut self, inode: &Inode) -> Result<(), VfsError>;
 
     /// Read data from inode at offset
-    fn read_data(&self, inode_number: u64, offset: u64, buffer: &mut [u8]) -> Result<usize, VfsError>;
+    fn read_data(
+        &self,
+        inode_number: u64,
+        offset: u64,
+        buffer: &mut [u8],
+    ) -> Result<usize, VfsError>;
 
     /// Write data to inode at offset
-    fn write_data(&mut self, inode_number: u64, offset: u64, data: &[u8]) -> Result<usize, VfsError>;
+    fn write_data(
+        &mut self,
+        inode_number: u64,
+        offset: u64,
+        data: &[u8],
+    ) -> Result<usize, VfsError>;
 
     /// List directory entries
     fn list_dir(&self, inode_number: u64) -> Result<Vec<DirEntry>, VfsError>;
@@ -384,7 +412,12 @@ impl VirtualFileSystem {
     }
 
     /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn read_file_gated(&mut self, fd: u64, buffer: &mut [u8], token: &CapabilityToken) -> Result<usize, FsError> {
+    pub fn read_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &mut [u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
         if !token.has_permission(Permission::FileRead) {
             return Err(FsError::PermissionDenied);
         }
@@ -392,7 +425,12 @@ impl VirtualFileSystem {
     }
 
     /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn write_file_gated(&mut self, fd: u64, buffer: &[u8], token: &CapabilityToken) -> Result<usize, FsError> {
+    pub fn write_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &[u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
         if !token.has_permission(Permission::FileWrite) {
             return Err(FsError::PermissionDenied);
         }
@@ -533,15 +571,65 @@ impl VirtualFileSystem {
                 if (flags & O_CREAT) != 0 && (flags & O_EXCL) != 0 {
                     return Err(FsError::AlreadyExists);
                 }
-                1 => { // SEEK_CUR
+                id
+            }
+            None => {
+                if (flags & O_CREAT) == 0 {
+                    return Err(FsError::NotFound);
+                }
+                self.create_node(filename, FileType::Regular, 0o644, owner, parent_inode_id)?
+            }
+        };
+
+        if (flags & O_TRUNC) != 0 {
+            if let Some(node) = self.inodes.get_mut(&inode_id) {
+                node.size = 0;
+            }
+        }
+
+        let fd = self.next_fd;
+        self.next_fd += 1;
+        self.open_files.insert(
+            fd,
+            FileDescriptor {
+                inode_id,
+                position: 0,
+                flags,
+            },
+        );
+
+        Ok(fd)
+    }
+
+    /// Reposition read/write file offset
+    pub fn lseek(&mut self, fd: u64, offset: i64, whence: u32) -> Result<u64, VfsError> {
+        if let Some(handle) = self.open_files.get_mut(&fd) {
+            match whence {
+                0 => {
+                    // SEEK_SET
+                    if offset < 0 {
+                        return Err(VfsError::InvalidArgument);
+                    }
+                    handle.position = offset as u64;
+                }
+                1 => {
+                    // SEEK_CUR
                     if offset < 0 && (offset.abs() as u64) > handle.position {
                         return Err(VfsError::InvalidArgument);
                     }
                     handle.position = ((handle.position as i64) + offset) as u64;
                 }
-                2 => { // SEEK_END
-                    // Would need file size from actual filesystem
-                    return Err(VfsError::InvalidArgument);
+                2 => {
+                    // SEEK_END
+                    if let Some(inode) = self.inodes.get(&handle.inode_id) {
+                        let new_pos = inode.size as i64 + offset;
+                        if new_pos < 0 {
+                            return Err(VfsError::InvalidArgument);
+                        }
+                        handle.position = new_pos as u64;
+                    } else {
+                        return Err(VfsError::InvalidArgument);
+                    }
                 }
                 _ => return Err(VfsError::InvalidArgument),
             }
@@ -648,16 +736,28 @@ mod tests {
         assert_eq!(pos, 150);
 
         // Write should fail with bad_token and read_token, but succeed with write_token or all_token
-        assert_eq!(vfs.write_file_gated(fd, b"gated", &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
+        assert_eq!(
+            vfs.write_file_gated(fd, b"gated", &bad_token),
+            Err(FsError::PermissionDenied)
+        );
+        assert_eq!(
+            vfs.write_file_gated(fd, b"gated", &read_token),
+            Err(FsError::PermissionDenied)
+        );
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
         // Re-open file to reset offset to 0 for reading
         let read_fd = vfs.open_file(inode_id, 0).unwrap();
 
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+        assert_eq!(
+            vfs.read_file_gated(read_fd, &mut buf, &bad_token),
+            Err(FsError::PermissionDenied)
+        );
+        assert_eq!(
+            vfs.read_file_gated(read_fd, &mut buf, &write_token),
+            Err(FsError::PermissionDenied)
+        );
         assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
     }
 
@@ -667,13 +767,27 @@ mod tests {
 
         // 1. Create a regular file with extended attribute (user.mime_type = "text/plain")
         let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
-        vfs.set_xattr(inode_id, "user.mime_type", b"text/plain").unwrap();
-        assert_eq!(vfs.get_xattr(inode_id, "user.mime_type").unwrap(), b"text/plain");
+        vfs.set_xattr(inode_id, "user.mime_type", b"text/plain")
+            .unwrap();
+        assert_eq!(
+            vfs.get_xattr(inode_id, "user.mime_type").unwrap(),
+            b"text/plain"
+        );
 
         // 2. Create a symlink pointing to our file
         let symlink_id = vfs.create_symlink("/home/tc/file.txt", 1000).unwrap();
-        assert_eq!(vfs.get_inode(symlink_id).unwrap().file_type, FileType::Symlink);
-        assert_eq!(vfs.get_inode(symlink_id).unwrap().symlink_target.as_ref().unwrap(), "/home/tc/file.txt");
+        assert_eq!(
+            vfs.get_inode(symlink_id).unwrap().file_type,
+            FileType::Symlink
+        );
+        assert_eq!(
+            vfs.get_inode(symlink_id)
+                .unwrap()
+                .symlink_target
+                .as_ref()
+                .unwrap(),
+            "/home/tc/file.txt"
+        );
 
         // 3. Create a hard link -> increments link_count
         assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
@@ -693,9 +807,18 @@ mod tests {
     #[test]
     fn test_canonicalize_path() {
         let vfs = VirtualFilesystem::new();
-        assert_eq!(vfs.canonicalize_path("/var/log", "syslog"), "/var/log/syslog");
-        assert_eq!(vfs.canonicalize_path("/var/log", "../mail/../log/./syslog"), "/var/log/syslog");
-        assert_eq!(vfs.canonicalize_path("/home/user", "/usr/bin/../../etc/passwd"), "/etc/passwd");
+        assert_eq!(
+            vfs.canonicalize_path("/var/log", "syslog"),
+            "/var/log/syslog"
+        );
+        assert_eq!(
+            vfs.canonicalize_path("/var/log", "../mail/../log/./syslog"),
+            "/var/log/syslog"
+        );
+        assert_eq!(
+            vfs.canonicalize_path("/home/user", "/usr/bin/../../etc/passwd"),
+            "/etc/passwd"
+        );
         assert_eq!(vfs.canonicalize_path("/home/user", ".."), "/home");
     }
 }
