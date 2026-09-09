@@ -533,6 +533,46 @@ impl VirtualFileSystem {
                 if (flags & O_CREAT) != 0 && (flags & O_EXCL) != 0 {
                     return Err(FsError::AlreadyExists);
                 }
+                id
+            }
+            None => {
+                if (flags & O_CREAT) == 0 {
+                    return Err(FsError::NotFound);
+                }
+                self.create_node(filename, FileType::Regular, 0o644, owner, parent_inode_id)?
+            }
+        };
+
+        if (flags & O_TRUNC) != 0 {
+            if let Some(node) = self.inodes.get_mut(&inode_id) {
+                node.size = 0;
+            }
+        }
+
+        let fd = self.next_fd;
+        self.next_fd += 1;
+        self.open_files.insert(
+            fd,
+            FileDescriptor {
+                inode_id,
+                position: 0,
+                flags,
+            },
+        );
+
+        Ok(fd)
+    }
+
+    /// Reposition read/write file offset
+    pub fn lseek(&mut self, fd: u64, offset: i64, whence: u32) -> Result<u64, VfsError> {
+        if let Some(handle) = self.open_files.get_mut(&fd) {
+            match whence {
+                0 => { // SEEK_SET
+                    if offset < 0 {
+                        return Err(VfsError::InvalidArgument);
+                    }
+                    handle.position = offset as u64;
+                }
                 1 => { // SEEK_CUR
                     if offset < 0 && (offset.abs() as u64) > handle.position {
                         return Err(VfsError::InvalidArgument);
@@ -540,8 +580,15 @@ impl VirtualFileSystem {
                     handle.position = ((handle.position as i64) + offset) as u64;
                 }
                 2 => { // SEEK_END
-                    // Would need file size from actual filesystem
-                    return Err(VfsError::InvalidArgument);
+                    if let Some(inode) = self.inodes.get(&handle.inode_id) {
+                        let new_pos = inode.size as i64 + offset;
+                        if new_pos < 0 {
+                            return Err(VfsError::InvalidArgument);
+                        }
+                        handle.position = new_pos as u64;
+                    } else {
+                        return Err(VfsError::InvalidArgument);
+                    }
                 }
                 _ => return Err(VfsError::InvalidArgument),
             }

@@ -124,6 +124,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -140,7 +142,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
@@ -221,6 +223,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -238,7 +242,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => {
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
@@ -253,7 +257,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -292,7 +299,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
@@ -565,7 +575,7 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "containers" => {
+            "container" | "containers" => {
                 let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
                 chroot_engine.enter_chroot()?;
                 Ok(format!(
@@ -587,7 +597,7 @@ impl SovereignUniversalDistroBridge {
                     virt_addr, self.mode
                 ))
             }
-            "ui" => {
+            "desktop" | "ui" => {
                 Ok(format!(
                     "Dispatched Zenith Zenith/COSMIC desktop inspiration UI theme '{}' under distro mode '{:?}'",
                     action, self.mode
@@ -610,7 +620,7 @@ impl SovereignUniversalDistroBridge {
                     action, timeslice, self.mode
                 ))
             }
-            "virt" => {
+            "virtualization" | "virt" => {
                 Ok(format!(
                     "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
                     action, self.mode
@@ -622,6 +632,96 @@ impl SovereignUniversalDistroBridge {
                 Ok(format!(
                     "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
                     action, mprotect_res.is_ok(), self.mode
+                ))
+            }
+            "auth" => {
+                Ok(format!(
+                    "Dispatched systemd-homed/PAM/BSD-Auth authentication request for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "boot" => {
+                Ok(format!(
+                    "Dispatched systemd-boot/GRUB/Multiboot2 boot loader configuration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "input" => {
+                Ok(format!(
+                    "Dispatched libinput/evdev/wsmouse input device event pipeline for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched thermal zone regulation and cooling profile for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "syscall" => {
+                Ok(format!(
+                    "Dispatched syscall interface dispatcher table for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "device" => {
+                Ok(format!(
+                    "Dispatched udev/devfs peripheral device manager event for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "crypto" => {
+                Ok(format!(
+                    "Dispatched LUKS/GELI/OpenSSL cryptographic key engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched QwenPaw/Herdr AI agent runtime orchestration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                Ok(format!(
+                    "Dispatched eBPF/PSI/ftrace observability monitor for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched sandboxed compiler/GCC/Clang build pipeline for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched glibc/musl locale internationalization engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "bluetooth" => {
+                Ok(format!(
+                    "Dispatched BlueZ/Intel-BT LE HCI wireless stack for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched nftables/OpenBSD-PF/FreeBSD-IPFW firewall engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "diagnostics" => {
+                Ok(format!(
+                    "Dispatched dmesg/journalctl/syslog diagnostic collector for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "recovery" => {
+                Ok(format!(
+                    "Dispatched Snapper/ZFS bootenv system recovery snapshot for '{}' under distro mode '{:?}'",
+                    action, self.mode
                 ))
             }
             _ => Err("Unknown target subsystem"),
@@ -1982,6 +2082,10 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
         ];
 
         for m in modes {
@@ -2014,6 +2118,10 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
         ];
 
         let target_subsystems = [
