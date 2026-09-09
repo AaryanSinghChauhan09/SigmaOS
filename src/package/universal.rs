@@ -285,12 +285,6 @@ pub enum PackageFormat {
     GuixNar,    // GNU Guix Normalized Archive (.nar)
 }
 
-impl Default for PackageFormat {
-    fn default() -> Self {
-        Self::Deb
-    }
-}
-
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
         let name = filename.to_lowercase();
