@@ -6,7 +6,7 @@
 
 ## 1. Distribution Engineering Execution Rules
 
-Inspired by Linux and BSD distribution maintenance protocols:
+Inspired by Linux and BSD distribution maintenance protocols (see full rules in `docs/CONTRIBUTOR_AND_AI_AGENT_RULES.md`):
 
 1. **Cleanroom Chroots**: All package builds and core subsystem modifications must be verifiable in an isolated chroot / sandbox container.
 2. **Zero Unverified Dependencies**: All code additions must adhere strictly to `#![no_std]` zero external dependency requirements.

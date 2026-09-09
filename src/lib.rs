@@ -59,16 +59,20 @@ pub use distro::{
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
-    ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode,
+    ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode, DeclarativeCapabilityRule,
     DragonFlyHammer2EmergencyCowEngine, FedoraSelinuxMlsMcsGovernor, FreeBsdGeomVdevTopology,
     GarudaZenPerformanceEngine, GentooPortageSlotOperatorEngine, GeomVdevNode,
     GuixShepherdServiceEngine, HaStateEntry, HermeticClosureRecord, HermeticStoreClosureEngine,
-    LandlockAccessType, LandlockV5Rule, NomadBsdLivePersistenceEngine, NomadBsdZfsDataset,
-    OpenBsdFdPledgeGate, SchedExtTask, ScxSchedulerKind, ScxTaskState, SovereignDistroLeapSuite,
-    SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignFastInitramfsGenerator,
-    SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
-    SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
-    SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
+    LandlockAccessType, LandlockV5Rule, MicroDeltaPatch, MicroarchTier, NomadBsdLivePersistenceEngine,
+    NomadBsdZfsDataset, OpenBsdFdPledgeGate, PredictiveSchedPolicy, PredictiveTaskDescriptor,
+    ResilientBlockEntry, SchedExtTask, ScxSchedulerKind, ScxTaskState, SecurityMultiOsMask,
+    SimdJitFunctionTarget, SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine,
+    SovereignDistroLeapSuite, SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine,
+    SovereignFastInitramfsGenerator, SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
+    SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignOmniCasStoreEngine,
+    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine, SovereignSchedExtEngine,
+    SovereignStatefulNatEngine, SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine,
+    StoreClosurePackage, SystemGenerationRecord, XdpCarpMeshConnection, ZfsPoolState,
     ZramCompressionAlgorithm,
 };
 pub use driver::{
@@ -299,6 +303,9 @@ pub use kernel::{
     InteractiveHybridScheduler, HybridTask,
     CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
+    LinuxPressureStallInfoEngine, LinuxKernelSamepageMergingEngine, LinuxDamonAccessMonitorEngine,
+    LinuxFanotifyEngine, LinuxFutex2WaitvEngine, LinuxDeviceMapperEngine,
+    SovereignMissingLinuxKernelComponentsSuite,
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use network::{

@@ -233,3 +233,13 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
+
+pub mod sovereign_ahead_distro_supremacy;
+pub use sovereign_ahead_distro_supremacy::{
+    DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchTier, PredictiveSchedPolicy,
+    PredictiveTaskDescriptor, ResilientBlockEntry, SecurityMultiOsMask, SimdJitFunctionTarget,
+    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine,
+    SovereignOmniCasStoreEngine, SovereignPredictiveSchedExtEngine,
+    SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
+    SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
+};
