@@ -156,7 +156,7 @@ impl Process {
     }
 
     /// Update virtual deadline considering ULE interactivity and EEVDF lag
-    pub fn update_virtual_deadline_ule(&mut self, system_vtime: u64) {
+    pub fn update_virtual_deadline_ule(&mut self, _system_vtime: u64) {
         let weight = self.get_weight();
         let q = 10u64;
         let base_slice = (q / weight).max(1);

@@ -159,8 +159,6 @@ impl GpuDriver {
                 pipeline_reconstructed_count: 0,
                 is_hardware_ready: true,
             },
-            crtc: None,
-            connector: None,
         }
     }
 
