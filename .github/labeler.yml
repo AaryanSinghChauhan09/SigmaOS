@@ -1,0 +1,29 @@
+# GitHub Labeler Configuration for SigmaOS
+
+core-kernel:
+  - changed-files:
+      - any-glob-to-any-file: 'src/kernel/**/*'
+
+package-system:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/package/**/*'
+          - 'src/sigpkg/**/*'
+          - 'src/bin/sigpkg.rs'
+
+drivers-hal:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/drivers/**/*'
+          - 'src/arch/**/*'
+
+security:
+  - changed-files:
+      - any-glob-to-any-file: 'src/security/**/*'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**/*'
+          - 'wiki/**/*'
+          - '*.md'
