@@ -13,14 +13,40 @@ pub mod pam;
 pub mod intrusion;
 pub mod crypto_utils;
 
-pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use intrusion::{
-    CrowdStrikeFalconAi, DetectionResult, EventType, IntrusionDetectionSystem, RuleAction,
-    SecurityEvent, Severity, SnortRule, SnortSignatureFirewall,
+pub use kali_components::{
+    HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,
+    KaliPcapDissector, KaliRamMemoryForensics, KaliWebVulnScanner, PacketHeader, ProcessArtifact,
+    ScanResult, ScanType, VulnType, WebVulnReport,
+};
+
+pub use qubes_isolation::{
+    DomainID, DomainType, IsolatedDomain, IsolationError,
+};
+
+pub use qubes_isolation::*;
+pub use root_improvement::*;
+
+pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
+pub use bsd_hardening::{
+    AslrEngine, BsdHardeningSuite, CapsicumCapability, CapsicumManager, MemoryPermission,
+    PaxMprotect, PledgeManager as BsdPledgeManager, PledgePromise as BsdPledgePromise,
+    UnveilEntry as BsdUnveilEntry, UnveilManager as BsdUnveilManager,
+    UnveilPermission as BsdUnveilPermission, WxEnforcer,
+};
+pub use capability::{
+    CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission,
+};
+pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
+pub use capability_token::{
+    CapabilityToken as AndroidStyleCapabilityToken,
+    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+};
+pub use clipboard::{
+    ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
+    SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
 pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
+    DefensiveAuditLog, SecurityAuditRecord,
 };
 pub use forensics::*;
 pub use hardening::{

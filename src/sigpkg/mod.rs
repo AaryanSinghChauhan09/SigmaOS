@@ -100,7 +100,7 @@ pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
-    AlpmHook, AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
+    AlpmHookManager, AurRecipeCompiler, MakepkgBuilder, MkinitcpioBuilder,
     PacmanDbAdapter, RollingSyncManager, SvnPackageMetadata, SvntogitMigrationEngine,
 };
 pub use arch_pacman_engine::{

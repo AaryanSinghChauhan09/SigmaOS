@@ -3,9 +3,6 @@ use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-#[cfg(test)]
-
-#[cfg(test)]
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 
 use core::sync::atomic::{AtomicBool, Ordering};

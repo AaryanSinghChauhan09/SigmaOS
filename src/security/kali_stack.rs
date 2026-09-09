@@ -1,4 +1,5 @@
 
+extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS
