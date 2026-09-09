@@ -19,6 +19,9 @@ pub mod mint_backup_manager;
 pub mod mint_system;
 pub mod mint_desktop;
 pub mod mint_menu;
+pub mod profession_tools;
+
+pub use profession_tools::*;
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
