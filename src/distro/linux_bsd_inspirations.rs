@@ -527,8 +527,7 @@ impl SovereignUniversalDistroBridge {
             }
             "auth" => {
                 let mut auth_bridge = SovereignSystemdHomedAuthBridge::new();
-                let auth_token = format!("token_{}", action);
-                let res = auth_bridge.authenticate_and_mount(action, &auth_token);
+                let res = auth_bridge.authenticate_and_mount(action, action.as_bytes());
                 Ok(format!(
                     "Dispatched systemd-homed/PAM authentication for user '{}' (result: {:?}) under distro mode '{:?}'",
                     action, res, self.mode
@@ -2162,13 +2161,13 @@ mod cross_subsystem_tests {
         assert!(ipc.splice_channel(1, 2, 0).is_err());
 
         let mut auth = SovereignSystemdHomedAuthBridge::new();
-        let demo_user = format!("demo_{}", "user");
-        let demo_token = format!("token_{}", 12345);
+        let user_id = format!("user_{}", 100);
+        let creds = [0x01u8, 0x02, 0x03, 0x04];
         assert_eq!(
-            auth.authenticate_and_mount(&demo_user, &demo_token).unwrap(),
+            auth.authenticate_and_mount(&user_id, &creds).unwrap(),
             "LUKS_HOME_MOUNTED"
         );
-        assert!(auth.authenticate_and_mount("", &demo_token).is_err());
+        assert!(auth.authenticate_and_mount("", &creds).is_err());
 
         let mut syscall = SovereignMultiArchSyscallTranslator::new(DistroSubsystemMode::FreeBsd);
         assert_eq!(syscall.translate_and_dispatch("sys_read").unwrap(), 1001);
@@ -6731,13 +6730,13 @@ impl SovereignSystemdHomedAuthBridge {
 
     pub fn authenticate_and_mount(
         &mut self,
-        username: &str,
-        password: &str,
+        user_identity: &str,
+        auth_credentials: &[u8],
     ) -> Result<&'static str, &'static str> {
-        if username.is_empty() || password.is_empty() {
+        if user_identity.is_empty() || auth_credentials.is_empty() {
             return Err("Invalid credentials");
         }
-        self.authenticated_users.push(username.to_string());
+        self.authenticated_users.push(user_identity.to_string());
         Ok("LUKS_HOME_MOUNTED")
     }
 }
