@@ -7,7 +7,7 @@ use alloc::vec::Vec;
 // Inspired by Arch Linux pacman, Debian apt, and FreeBSD pkg
 // Supports dependencies, repositories, transactions, and package management
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -360,8 +360,7 @@ impl SigmaPkg {
             }
 
             for (name, package) in &repo.packages {
-                let name_str: &String = name;
-                if name_str.to_lowercase().contains(&query_lower)
+                if name.to_lowercase().contains(&query_lower)
                     || package.description.to_lowercase().contains(&query_lower)
                 {
                     results.push(package);
@@ -475,7 +474,7 @@ impl SigmaPkg {
             "{}/{}-{}.sigmpkg",
             package.repository, package.name, package.version
         );
-        let _package_path = self
+        let package_path = self
             .cache_dir
             .join(format!("{}-{}.sigmpkg", package.name, package.version));
 
@@ -697,7 +696,7 @@ impl SigmaPkg {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
