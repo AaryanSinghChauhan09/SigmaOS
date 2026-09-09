@@ -97,6 +97,7 @@ pub use universal_adapter::{
     SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
     UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
     UniversalPmCommandDispatcher, UniversalPmOperation, DispatchedPmAction,
+    SigPkgUniversalBridgeEngine,
 };
 pub use sovereign_sigpkg::*;
 

@@ -888,6 +888,208 @@ impl Default for SystemdPresetConfigurator {
 }
 
 // =========================================================================
+// Fedora Account System (FAS) & OIDC Authentication Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FasUserProfile {
+    pub fas_username: String,
+    pub email: String,
+    pub human_name: String,
+    pub fpca_signed: bool,
+    pub groups: Vec<String>, // e.g. "packager", "provenpackager", "qa", "sysadmin-main"
+    pub gpg_key_fingerprint: String,
+    pub ssh_public_keys: Vec<String>,
+}
+
+pub struct FedoraFasAuthEngine {
+    pub user_profiles: HashMap<String, FasUserProfile>,
+    pub active_tokens: HashMap<String, String>, // token -> fas_username
+    pub token_counter: u64,
+}
+
+impl FedoraFasAuthEngine {
+    pub fn new() -> Self {
+        Self {
+            user_profiles: HashMap::new(),
+            active_tokens: HashMap::new(),
+            token_counter: 0,
+        }
+    }
+
+    pub fn register_user(
+        &mut self,
+        username: &str,
+        email: &str,
+        human_name: &str,
+        fpca_signed: bool,
+        groups: &[&str],
+        gpg_fp: &str,
+    ) {
+        let grp_vec = groups.iter().map(|g| g.to_string()).collect();
+        self.user_profiles.insert(
+            username.to_string(),
+            FasUserProfile {
+                fas_username: username.to_string(),
+                email: email.to_string(),
+                human_name: human_name.to_string(),
+                fpca_signed,
+                groups: grp_vec,
+                gpg_key_fingerprint: gpg_fp.to_string(),
+                ssh_public_keys: Vec::new(),
+            },
+        );
+    }
+
+    pub fn sign_fpca_agreement(&mut self, username: &str) -> bool {
+        if let Some(user) = self.user_profiles.get_mut(username) {
+            user.fpca_signed = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn authenticate_oidc(&mut self, username: &str) -> Result<String, &'static str> {
+        if let Some(user) = self.user_profiles.get(username) {
+            if !user.fpca_signed {
+                return Err("FAS Auth Failed: Fedora Project Contributor Agreement (FPCA) signature required");
+            }
+            self.token_counter += 1;
+            let token = format!("fas_oidc_tok_{:08x}_{}", self.token_counter, username);
+            self.active_tokens.insert(token.clone(), username.to_string());
+            Ok(token)
+        } else {
+            Err("FAS Auth Failed: User not found in Fedora Account System")
+        }
+    }
+
+    pub fn is_member_of_group(&self, username: &str, group: &str) -> bool {
+        if let Some(user) = self.user_profiles.get(username) {
+            user.groups.contains(&group.to_string())
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraFasAuthEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Fedora Greenwave CI Policy Gating Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GreenwaveDecisionRule {
+    pub product_version: String, // e.g. "fedora-39"
+    pub required_ci_tests: Vec<String>, // e.g. ["dist.rpmdeplint", "upgrades.rpmdeplint", "openQA.boot"]
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GreenwaveWaiver {
+    pub waiver_id: u32,
+    pub subject_identifier: String, // NVR or update_id
+    pub test_type: String,
+    pub waiver_author: String,
+    pub reason: String,
+}
+
+pub struct FedoraGreenwaveCiEngine {
+    pub decision_rules: HashMap<String, GreenwaveDecisionRule>,
+    pub waivers: Vec<GreenwaveWaiver>,
+    pub waiver_counter: u32,
+}
+
+impl FedoraGreenwaveCiEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            decision_rules: HashMap::new(),
+            waivers: Vec::new(),
+            waiver_counter: 0,
+        };
+        engine.register_default_rules();
+        engine
+    }
+
+    fn register_default_rules(&mut self) {
+        self.decision_rules.insert(
+            "fedora-39".to_string(),
+            GreenwaveDecisionRule {
+                product_version: "fedora-39".to_string(),
+                required_ci_tests: vec![
+                    "dist.rpmdeplint".to_string(),
+                    "upgrades.rpmdeplint".to_string(),
+                    "openQA.boot".to_string(),
+                ],
+            },
+        );
+    }
+
+    pub fn submit_waiver(
+        &mut self,
+        subject: &str,
+        test_type: &str,
+        author: &str,
+        reason: &str,
+    ) -> u32 {
+        self.waiver_counter += 1;
+        let wid = self.waiver_counter;
+        self.waivers.push(GreenwaveWaiver {
+            waiver_id: wid,
+            subject_identifier: subject.to_string(),
+            test_type: test_type.to_string(),
+            waiver_author: author.to_string(),
+            reason: reason.to_string(),
+        });
+        wid
+    }
+
+    pub fn evaluate_gating_decision(
+        &self,
+        product_version: &str,
+        subject: &str,
+        passed_tests: &[&str],
+    ) -> Result<bool, Vec<String>> {
+        let rule = match self.decision_rules.get(product_version) {
+            Some(r) => r,
+            None => return Ok(true), // No rule defined, allow by default
+        };
+
+        let passed_vec: Vec<String> = passed_tests.iter().map(|s| s.to_string()).collect();
+        let mut missing_tests = Vec::new();
+
+        for req in &rule.required_ci_tests {
+            if !passed_vec.contains(req) {
+                // Check if waived
+                let is_waived = self
+                    .waivers
+                    .iter()
+                    .any(|w| w.subject_identifier == subject && w.test_type == *req);
+                if !is_waived {
+                    missing_tests.push(req.clone());
+                }
+            }
+        }
+
+        if missing_tests.is_empty() {
+            Ok(true)
+        } else {
+            Err(missing_tests)
+        }
+    }
+}
+
+impl Default for FedoraGreenwaveCiEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // Fedora status.fpo Infrastructure Status & Health Monitoring System
 // =========================================================================
 
@@ -4103,9 +4305,52 @@ impl Default for FedoraSystemRolesEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_fedora_fas_auth_engine() {
+        let mut fas = FedoraFasAuthEngine::new();
+        fas.register_user(
+            "jules",
+            "jules@fedoraproject.org",
+            "Jules Engineer",
+            false,
+            &["packager", "qa"],
+            "1234567890ABCDEF",
+        );
+
+        assert!(fas.is_member_of_group("jules", "packager"));
+        assert!(!fas.is_member_of_group("jules", "sysadmin-main"));
+
+        // Authentication fails when FPCA is unsigned
+        assert!(fas.authenticate_oidc("jules").is_err());
+
+        // Sign FPCA and re-authenticate
+        assert!(fas.sign_fpca_agreement("jules"));
+        let token = fas.authenticate_oidc("jules").unwrap();
+        assert!(token.contains("jules"));
+    }
+
+    #[test]
+    fn test_fedora_greenwave_ci_engine() {
+        let mut gw = FedoraGreenwaveCiEngine::new();
+        let passed = vec!["dist.rpmdeplint", "upgrades.rpmdeplint"];
+
+        // Fails because openQA.boot is missing and not waived
+        let decision = gw.evaluate_gating_decision("fedora-39", "nginx-1.24.0-1.fc39", &passed);
+        assert!(decision.is_err());
+        let missing = decision.unwrap_err();
+        assert_eq!(missing, vec!["openQA.boot"]);
+
+        // Submit waiver for openQA.boot
+        gw.submit_waiver("nginx-1.24.0-1.fc39", "openQA.boot", "qa_lead", "Hardware test lab offline waiver");
+
+        // Now gating decision passes
+        let decision_after_waiver = gw.evaluate_gating_decision("fedora-39", "nginx-1.24.0-1.fc39", &passed);
+        assert!(decision_after_waiver.is_ok());
+    }
 
     #[test]
     fn test_fedora_dnf_resolver() {

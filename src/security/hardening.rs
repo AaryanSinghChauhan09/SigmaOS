@@ -96,7 +96,10 @@ fn canary_base() -> u64 {
 
     // Compile-time constant: djb2 hash over the build-manifest directory bytes.
     const FILE_PATH_HASH: u64 = {
-        let bytes = env!("CARGO_MANIFEST_DIR").as_bytes();
+        let bytes = match option_env!("CARGO_MANIFEST_DIR") {
+            Some(dir) => dir.as_bytes(),
+            None => b"sigmaos",
+        };
         let mut h: u64 = 5381;
         let mut i = 0;
         while i < bytes.len() {

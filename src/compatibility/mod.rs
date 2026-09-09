@@ -25,6 +25,7 @@ pub mod constellation_mesh;
 pub mod cross_platform;
 pub mod cross_platform_kernel;
 pub mod debian;
+pub use debian::*;
 pub mod distro_bridge;
 pub mod dragonfly_bsd;
 pub mod elf_execution;

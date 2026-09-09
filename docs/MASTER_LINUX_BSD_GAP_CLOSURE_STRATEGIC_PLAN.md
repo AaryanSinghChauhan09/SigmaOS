@@ -114,18 +114,22 @@ This master strategic plan details the technical architecture, development roadm
 
 1. **Unify Where Linux Fragments**:
    - Instead of splitting into hundreds of incompatible distributions, SigmaOS maintains a single unified shard ecosystem (`S-SHARDS`) with customizable desktop presets (`KdePlasma`, `GnomeShell`, `CosmicRust`, `XfceModular`).
+   - Execute universal package ingestion across all 29+ Linux & BSD package formats (`.air`, `.bottle`, `.ipa`, `.ports`, `.pkg`, `.aab`, `.apk`, AppImage, `.eopkg`, `.nixpkg`, `.portage`, `.deb`, `.rpm`, `.ebuild`, `.pkg.tar.xz`, Flatpak, `.snap`, etc.) with zero-copy CAS deduplication and micro-VM container sandboxing.
 
 2. **Hardware Sovereignty & Blob Elimination**:
    - Replace opaque binary blobs and proprietary C driver structures with transparent, memory-safe Rust driver implementations sandboxed in user-space capability zones.
+   - Employ zero-allocation `klib` driver wrappers with automatic ISA vector routing (AVX-512, NEON, RVV).
 
-3. **Declarative Simplicity**:
+3. **Declarative Simplicity & Instant Rollbacks**:
    - Eliminate Linux dependency chaos through immutable, content-addressed application layers and single-file declarative manifests.
+   - Enforce Btrfs CoW and ZFS subvolume transactional snapshots before and after package state transitions, ensuring instant A/B state rollbacks.
 
 4. **Cluster-Native Distributed Execution**:
-   - Leapfrog traditional Linux server models by treating multiple physical devices (desktop, laptop, server, edge node) as a pooled, unified OS resource.
+   - Leapfrog traditional Linux server models by treating multiple physical devices (desktop, laptop, server, edge node) as a pooled, unified OS resource with zero-copy IPC ring pipes.
 
-5. **Security by Design**:
+5. **Security by Design & AI Self-Healing**:
    - Combine Rust memory safety, OpenBSD capability sandboxing (`pledge`/`unveil`), FreeBSD descriptor rights (`Capsicum`), and Post-Quantum Cryptography to deliver unbreakable security guarantees out of the box.
+   - Integrate AI autonomous self-healing supervisors to detect kernel lockups, repair corrupted package caches, and recalculate optimal CPU EEVDF/BORE scheduler slice allocations in real time.
 
 ---
 

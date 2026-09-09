@@ -12,60 +12,7 @@ use core::default::Default;
 use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PackageFormat {
-    Apt,
-    Yum,
-    Pacman,
-    Portage,
-    Sovereign,
-    Nix,
-    Apk,
-    Xbps,
-    Air,
-    Bottle,
-    Ipa,
-    Ports,
-    Pkg,
-    Aab,
-    TarGz,
-    TarXz,
-    Tar,
-    AppBundle,
-    Hap,
-    Pisi,
-    Superdeb,
-    Lzm,
-    Pup,
-    Pet,
-    Flatpak,
-    Snap,
-    Txz,
-    Guix,
-    Eopkg,
-    Zypper,
-    AppImage,
-    Moss,
-    Hpkg,
-    Tcz,
-    Gobo,
-    Ostree,
-    Pkgsrc,
-    Sfs,
-    Puk,
-    Dmg,
-    Cports,
-    Dports,
-    SlackBuild,
-    Crux,
-    Drpm,
-    Stratum,
-    Ipk,
-    Opkg,
-    SolarisIps,
-    GuixNar,
-    OpenBsdPkg,
-}
+pub use crate::sigpkg::universal_oop_system::PackageFormat;
 
 #[derive(Debug, Clone)]
 pub struct PackageContext {
@@ -439,11 +386,11 @@ pub struct PackageAdapterFactory;
 impl PackageAdapterFactory {
     pub fn get_adapter(format: PackageFormat) -> Box<dyn IPackageAdapter> {
         match format {
-            PackageFormat::Apt => Box::new(AptPackageAdapter),
-            PackageFormat::Yum => Box::new(YumPackageAdapter),
+            PackageFormat::Apt | PackageFormat::Deb => Box::new(AptPackageAdapter),
+            PackageFormat::Yum | PackageFormat::Rpm => Box::new(YumPackageAdapter),
             PackageFormat::Pacman => Box::new(PacmanPackageAdapter),
-            PackageFormat::Portage => Box::new(EbuildPackageAdapter::new(Vec::new())),
-            PackageFormat::Sovereign => Box::new(SovereignPackageAdapter),
+            PackageFormat::Portage | PackageFormat::Ebuild => Box::new(EbuildPackageAdapter::new(Vec::new())),
+            PackageFormat::Sovereign | PackageFormat::Sigma => Box::new(SovereignPackageAdapter),
             PackageFormat::Nix => Box::new(NixPackageAdapter),
             PackageFormat::Apk => Box::new(ApkPackageAdapter),
             PackageFormat::Xbps => Box::new(XbpsPackageAdapter::new(None)),
