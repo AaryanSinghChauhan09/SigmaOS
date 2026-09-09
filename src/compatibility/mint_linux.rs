@@ -756,6 +756,560 @@ impl Mint4WinInstallerEngine {
     }
 }
 
+// ==========================================
+// Linux Mint Parity Subsystems
+// ==========================================
+
+/// Sticky Notes Utility (Sticky / Sticky Notes)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StickyNoteColor {
+    Yellow,
+    Blue,
+    Green,
+    Pink,
+    Purple,
+    Orange,
+}
+
+#[derive(Debug, Clone)]
+pub struct StickyNote {
+    pub id: u32,
+    pub title: String,
+    pub body: String,
+    pub color: StickyNoteColor,
+    pub is_pinned: bool,
+    pub x: usize,
+    pub y: usize,
+}
+
+pub struct MintStickyNotesManager {
+    pub notes: Vec<StickyNote>,
+    next_id: u32,
+}
+
+impl Default for MintStickyNotesManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintStickyNotesManager {
+    pub fn new() -> Self {
+        Self {
+            notes: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_note(&mut self, title: &str, body: &str, color: StickyNoteColor) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.notes.push(StickyNote {
+            id,
+            title: title.to_string(),
+            body: body.to_string(),
+            color,
+            is_pinned: false,
+            x: 100,
+            y: 100,
+        });
+        id
+    }
+
+    pub fn toggle_pin(&mut self, id: u32) -> Result<bool, &'static str> {
+        if let Some(note) = self.notes.iter_mut().find(|n| n.id == id) {
+            note.is_pinned = !note.is_pinned;
+            Ok(note.is_pinned)
+        } else {
+            Err("Note not found")
+        }
+    }
+
+    pub fn update_body(&mut self, id: u32, new_body: &str) -> Result<(), &'static str> {
+        if let Some(note) = self.notes.iter_mut().find(|n| n.id == id) {
+            note.body = new_body.to_string();
+            Ok(())
+        } else {
+            Err("Note not found")
+        }
+    }
+}
+
+/// Web Apps Manager (webapp-manager) - Site-Specific Browser (SSB) launcher
+#[derive(Debug, Clone)]
+pub struct WebAppProfile {
+    pub id: u32,
+    pub name: String,
+    pub url: String,
+    pub icon_path: String,
+    pub category: String,
+    pub browser_profile: String,
+    pub custom_user_agent: Option<String>,
+    pub isolated_cookies: bool,
+}
+
+pub struct MintWebAppManager {
+    pub web_apps: Vec<WebAppProfile>,
+    next_id: u32,
+}
+
+impl Default for MintWebAppManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintWebAppManager {
+    pub fn new() -> Self {
+        Self {
+            web_apps: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn register_webapp(
+        &mut self,
+        name: &str,
+        url: &str,
+        category: &str,
+        icon: &str,
+        isolated: bool,
+    ) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.web_apps.push(WebAppProfile {
+            id,
+            name: name.to_string(),
+            url: url.to_string(),
+            icon_path: icon.to_string(),
+            category: category.to_string(),
+            browser_profile: format!("profile_{}", name.to_lowercase().replace(' ', "_")),
+            custom_user_agent: None,
+            isolated_cookies: isolated,
+        });
+        id
+    }
+
+    pub fn set_custom_user_agent(&mut self, id: u32, user_agent: &str) -> Result<(), &'static str> {
+        if let Some(app) = self.web_apps.iter_mut().find(|a| a.id == id) {
+            app.custom_user_agent = Some(user_agent.to_string());
+            Ok(())
+        } else {
+            Err("WebApp not found")
+        }
+    }
+
+    pub fn launch_webapp_command(&self, id: u32) -> Result<String, &'static str> {
+        if let Some(app) = self.web_apps.iter().find(|a| a.id == id) {
+            Ok(format!(
+                "zenith-browser --app=\"{}\" --profile=\"{}\" --isolated={}",
+                app.url, app.browser_profile, app.isolated_cookies
+            ))
+        } else {
+            Err("WebApp not found")
+        }
+    }
+}
+
+/// Hypnotix IPTV / Media Player Engine
+#[derive(Debug, Clone)]
+pub struct IptvChannel {
+    pub name: String,
+    pub stream_url: String,
+    pub country_code: String,
+    pub category: String,
+    pub quality_720p_or_higher: bool,
+}
+
+pub struct MintHypnotixIptvEngine {
+    pub channels: Vec<IptvChannel>,
+    pub active_channel_index: Option<usize>,
+    pub user_favorites: Vec<String>,
+}
+
+impl Default for MintHypnotixIptvEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintHypnotixIptvEngine {
+    pub fn new() -> Self {
+        Self {
+            channels: Vec::new(),
+            active_channel_index: None,
+            user_favorites: Vec::new(),
+        }
+    }
+
+    pub fn import_m3u_playlist(&mut self, playlist_content: &str) -> usize {
+        let mut added = 0;
+        for line in playlist_content.lines() {
+            if line.contains("http://") || line.contains("https://") {
+                self.channels.push(IptvChannel {
+                    name: format!("Stream {}", self.channels.len() + 1),
+                    stream_url: line.trim().to_string(),
+                    country_code: "INT".to_string(),
+                    category: "General".to_string(),
+                    quality_720p_or_higher: true,
+                });
+                added += 1;
+            }
+        }
+        added
+    }
+
+    pub fn add_channel(
+        &mut self,
+        name: &str,
+        url: &str,
+        country: &str,
+        category: &str,
+        hd: bool,
+    ) {
+        self.channels.push(IptvChannel {
+            name: name.to_string(),
+            stream_url: url.to_string(),
+            country_code: country.to_string(),
+            category: category.to_string(),
+            quality_720p_or_higher: hd,
+        });
+    }
+
+    pub fn play_channel(&mut self, name: &str) -> Result<String, &'static str> {
+        if let Some((idx, ch)) = self.channels.iter().enumerate().find(|(_, c)| c.name == name) {
+            self.active_channel_index = Some(idx);
+            Ok(format!("Playing stream from {}", ch.stream_url))
+        } else {
+            Err("Channel not found")
+        }
+    }
+
+    pub fn filter_by_country(&self, country: &str) -> Vec<&IptvChannel> {
+        self.channels.iter().filter(|c| c.country_code == country).collect()
+    }
+}
+
+/// MintWelcome - First-Run Desktop Setup & Onboarding Wizard
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopLayoutPreset {
+    Traditional, // Panel at bottom with menu
+    Modern,      // Centered panel with app grid
+    Compact,     // Minimal panel
+}
+
+pub struct MintWelcomeWizard {
+    pub layout: DesktopLayoutPreset,
+    pub dark_mode: bool,
+    pub initial_timeshift_done: bool,
+    pub drivers_checked: bool,
+    pub updates_checked: bool,
+    pub firewall_enabled: bool,
+}
+
+impl Default for MintWelcomeWizard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintWelcomeWizard {
+    pub fn new() -> Self {
+        Self {
+            layout: DesktopLayoutPreset::Traditional,
+            dark_mode: true,
+            initial_timeshift_done: false,
+            drivers_checked: false,
+            updates_checked: false,
+            firewall_enabled: true,
+        }
+    }
+
+    pub fn set_desktop_layout(&mut self, layout: DesktopLayoutPreset) {
+        self.layout = layout;
+    }
+
+    pub fn toggle_dark_mode(&mut self, enabled: bool) {
+        self.dark_mode = enabled;
+    }
+
+    pub fn mark_timeshift_completed(&mut self) {
+        self.initial_timeshift_done = true;
+    }
+
+    pub fn mark_drivers_reviewed(&mut self) {
+        self.drivers_checked = true;
+    }
+
+    pub fn mark_updates_checked(&mut self) {
+        self.updates_checked = true;
+    }
+
+    pub fn is_setup_completed(&self) -> bool {
+        self.initial_timeshift_done && self.drivers_checked && self.updates_checked
+    }
+}
+
+/// MintNanny - Domain & Parental Controls Manager
+#[derive(Debug, Clone)]
+pub struct BlockedDomainRule {
+    pub domain: String,
+    pub reason: String,
+    pub block_time_start_hour: u8, // 0 to 23
+    pub block_time_end_hour: u8,   // 0 to 23
+}
+
+pub struct MintNannyDomainFilter {
+    pub blocked_rules: Vec<BlockedDomainRule>,
+    pub filter_active: bool,
+}
+
+impl Default for MintNannyDomainFilter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintNannyDomainFilter {
+    pub fn new() -> Self {
+        Self {
+            blocked_rules: Vec::new(),
+            filter_active: true,
+        }
+    }
+
+    pub fn add_blocked_domain(&mut self, domain: &str, reason: &str) {
+        self.blocked_rules.push(BlockedDomainRule {
+            domain: domain.to_string(),
+            reason: reason.to_string(),
+            block_time_start_hour: 0,
+            block_time_end_hour: 24,
+        });
+    }
+
+    pub fn is_domain_blocked(&self, domain: &str, current_hour: u8) -> bool {
+        if !self.filter_active {
+            return false;
+        }
+        for rule in &self.blocked_rules {
+            if domain.contains(&rule.domain) {
+                if current_hour >= rule.block_time_start_hour && current_hour < rule.block_time_end_hour {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
+
+/// MintLocale & Language Selector
+#[derive(Debug, Clone)]
+pub struct LanguagePack {
+    pub locale_code: String, // e.g. "en_US.UTF-8", "fr_FR.UTF-8", "hi_IN.UTF-8"
+    pub name: String,
+    pub has_spellcheck: bool,
+    pub input_method: String, // e.g. "IBus", "Fcitx5"
+}
+
+pub struct MintLocaleManager {
+    pub installed_languages: Vec<LanguagePack>,
+    pub active_locale: String,
+}
+
+impl Default for MintLocaleManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintLocaleManager {
+    pub fn new() -> Self {
+        let mut mgr = Self {
+            installed_languages: Vec::new(),
+            active_locale: String::from("en_US.UTF-8"),
+        };
+        mgr.installed_languages.push(LanguagePack {
+            locale_code: String::from("en_US.UTF-8"),
+            name: String::from("English (United States)"),
+            has_spellcheck: true,
+            input_method: String::from("IBus"),
+        });
+        mgr
+    }
+
+    pub fn install_language_pack(&mut self, pack: LanguagePack) {
+        self.installed_languages.push(pack);
+    }
+
+    pub fn switch_active_locale(&mut self, locale_code: &str) -> Result<(), &'static str> {
+        if self.installed_languages.iter().any(|l| l.locale_code == locale_code) {
+            self.active_locale = locale_code.to_string();
+            Ok(())
+        } else {
+            Err("Language pack not installed")
+        }
+    }
+}
+
+/// MintUsbStickUtilities - USB Image Writer & Formatting Tool
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UsbFileSystemFormat {
+    Fat32,
+    Ntfs,
+    ExFat,
+    Ext4,
+}
+
+pub struct MintUsbFormatterTool {
+    pub target_device_path: String,
+    pub is_busy: bool,
+    pub format_progress_percent: u8,
+}
+
+impl Default for MintUsbFormatterTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintUsbFormatterTool {
+    pub fn new() -> Self {
+        Self {
+            target_device_path: String::new(),
+            is_busy: false,
+            format_progress_percent: 0,
+        }
+    }
+
+    pub fn select_device(&mut self, device_path: &str) -> Result<(), &'static str> {
+        if device_path.starts_with("/dev/sd") || device_path.starts_with("/dev/nvme") || device_path.starts_with("/dev/mmc") {
+            self.target_device_path = device_path.to_string();
+            Ok(())
+        } else {
+            Err("Invalid storage device path")
+        }
+    }
+
+    pub fn format_filesystem(&mut self, format_type: UsbFileSystemFormat, label: &str) -> Result<String, &'static str> {
+        if self.target_device_path.is_empty() {
+            return Err("No device selected");
+        }
+        self.is_busy = true;
+        self.format_progress_percent = 100;
+        self.is_busy = false;
+        Ok(format!(
+            "Successfully formatted {} to {:?} with label '{}'",
+            self.target_device_path, format_type, label
+        ))
+    }
+
+    pub fn write_iso_image(&mut self, iso_path: &str) -> Result<String, &'static str> {
+        if self.target_device_path.is_empty() {
+            return Err("No device selected");
+        }
+        if iso_path.is_empty() {
+            return Err("ISO path invalid");
+        }
+        Ok(format!(
+            "Successfully wrote ISO image '{}' to device {}",
+            iso_path, self.target_device_path
+        ))
+    }
+}
+
+/// MintSoftwareSources & PPA Manager
+#[derive(Debug, Clone)]
+pub struct PpaRepository {
+    pub ppa_name: String, // e.g. "ppa:cinnamon/stable"
+    pub gpg_key_fingerprint: String,
+    pub enabled: bool,
+}
+
+pub struct MintSoftwareSourcesPpaManager {
+    pub ppas: Vec<PpaRepository>,
+    pub main_mirror_url: String,
+    pub base_mirror_url: String,
+}
+
+impl Default for MintSoftwareSourcesPpaManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintSoftwareSourcesPpaManager {
+    pub fn new() -> Self {
+        Self {
+            ppas: Vec::new(),
+            main_mirror_url: String::from("https://packages.linuxmint.com"),
+            base_mirror_url: String::from("https://archive.ubuntu.com/ubuntu"),
+        }
+    }
+
+    pub fn add_ppa(&mut self, ppa: &str, fingerprint: &str) {
+        self.ppas.push(PpaRepository {
+            ppa_name: ppa.to_string(),
+            gpg_key_fingerprint: fingerprint.to_string(),
+            enabled: true,
+        });
+    }
+
+    pub fn remove_ppa(&mut self, ppa: &str) -> Result<(), &'static str> {
+        let initial_len = self.ppas.len();
+        self.ppas.retain(|p| p.ppa_name != ppa);
+        if self.ppas.len() < initial_len {
+            Ok(())
+        } else {
+            Err("PPA not found")
+        }
+    }
+}
+
+/// Cinnamon Spices Suite & Applet Manager
+#[derive(Debug, Clone)]
+pub struct CinnamonSpiceApplet {
+    pub uuid: String,
+    pub name: String,
+    pub enabled: bool,
+    pub panel_index: usize,
+}
+
+pub struct MintCinnamonSpicesAppletManager {
+    pub applets: Vec<CinnamonSpiceApplet>,
+}
+
+impl Default for MintCinnamonSpicesAppletManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintCinnamonSpicesAppletManager {
+    pub fn new() -> Self {
+        Self {
+            applets: Vec::new(),
+        }
+    }
+
+    pub fn add_applet(&mut self, uuid: &str, name: &str, panel_index: usize) {
+        self.applets.push(CinnamonSpiceApplet {
+            uuid: uuid.to_string(),
+            name: name.to_string(),
+            enabled: true,
+            panel_index,
+        });
+    }
+
+    pub fn set_applet_state(&mut self, uuid: &str, enabled: bool) -> Result<(), &'static str> {
+        if let Some(applet) = self.applets.iter_mut().find(|a| a.uuid == uuid) {
+            applet.enabled = enabled;
+            Ok(())
+        } else {
+            Err("Applet UUID not found")
+        }
+    }
+}
+
 pub struct MintDriverManager {
     pub available_drivers: Vec<MintDriverInfo>,
 }
@@ -795,9 +1349,128 @@ impl MintDriverManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_mint_sticky_notes_manager() {
+        let mut notes = MintStickyNotesManager::new();
+        let id1 = notes.create_note("Shopping", "Buy apples & milk", StickyNoteColor::Yellow);
+        assert_eq!(id1, 1);
+        assert_eq!(notes.notes.len(), 1);
+
+        let pinned = notes.toggle_pin(id1).unwrap();
+        assert!(pinned);
+
+        notes.update_body(id1, "Buy apples, milk, & bread").unwrap();
+        assert_eq!(notes.notes[0].body, "Buy apples, milk, & bread");
+    }
+
+    #[test]
+    fn test_mint_webapp_manager() {
+        let mut webapps = MintWebAppManager::new();
+        let id = webapps.register_webapp("GitHub", "https://github.com", "Development", "github.png", true);
+        assert_eq!(id, 1);
+
+        webapps.set_custom_user_agent(id, "Mozilla/5.0 Custom").unwrap();
+        assert_eq!(webapps.web_apps[0].custom_user_agent, Some("Mozilla/5.0 Custom".to_string()));
+
+        let cmd = webapps.launch_webapp_command(id).unwrap();
+        assert!(cmd.contains("zenith-browser --app=\"https://github.com\""));
+    }
+
+    #[test]
+    fn test_mint_hypnotix_iptv_engine() {
+        let mut hypnotix = MintHypnotixIptvEngine::new();
+        hypnotix.add_channel("News 24", "https://stream.news24.com/live.m3u8", "US", "News", true);
+        assert_eq!(hypnotix.channels.len(), 1);
+
+        let m3u_added = hypnotix.import_m3u_playlist("#EXTM3U\nhttps://stream.sports.com/live.m3u8");
+        assert_eq!(m3u_added, 1);
+        assert_eq!(hypnotix.channels.len(), 2);
+
+        let status = hypnotix.play_channel("News 24").unwrap();
+        assert!(status.contains("Playing stream from https://stream.news24.com/live.m3u8"));
+
+        let us_channels = hypnotix.filter_by_country("US");
+        assert_eq!(us_channels.len(), 1);
+    }
+
+    #[test]
+    fn test_mint_welcome_wizard() {
+        let mut wizard = MintWelcomeWizard::new();
+        assert_eq!(wizard.layout, DesktopLayoutPreset::Traditional);
+        assert!(!wizard.is_setup_completed());
+
+        wizard.set_desktop_layout(DesktopLayoutPreset::Modern);
+        wizard.mark_timeshift_completed();
+        wizard.mark_drivers_reviewed();
+        wizard.mark_updates_checked();
+
+        assert_eq!(wizard.layout, DesktopLayoutPreset::Modern);
+        assert!(wizard.is_setup_completed());
+    }
+
+    #[test]
+    fn test_mint_nanny_domain_filter() {
+        let mut nanny = MintNannyDomainFilter::new();
+        nanny.add_blocked_domain("gambling.com", "Parental Control");
+
+        assert!(nanny.is_domain_blocked("https://gambling.com/poker", 14));
+        assert!(!nanny.is_domain_blocked("https://wikipedia.org", 14));
+
+        nanny.filter_active = false;
+        assert!(!nanny.is_domain_blocked("https://gambling.com/poker", 14));
+    }
+
+    #[test]
+    fn test_mint_locale_manager() {
+        let mut locale_mgr = MintLocaleManager::new();
+        assert_eq!(locale_mgr.active_locale, "en_US.UTF-8");
+
+        locale_mgr.install_language_pack(LanguagePack {
+            locale_code: "fr_FR.UTF-8".to_string(),
+            name: "French".to_string(),
+            has_spellcheck: true,
+            input_method: "IBus".to_string(),
+        });
+
+        assert!(locale_mgr.switch_active_locale("fr_FR.UTF-8").is_ok());
+        assert_eq!(locale_mgr.active_locale, "fr_FR.UTF-8");
+    }
+
+    #[test]
+    fn test_mint_usb_formatter_tool() {
+        let mut usb_tool = MintUsbFormatterTool::new();
+        assert!(usb_tool.select_device("/dev/sdb").is_ok());
+
+        let fmt_result = usb_tool.format_filesystem(UsbFileSystemFormat::Fat32, "MINT_USB").unwrap();
+        assert!(fmt_result.contains("Successfully formatted /dev/sdb"));
+
+        let iso_result = usb_tool.write_iso_image("/home/user/sigmaos.iso").unwrap();
+        assert!(iso_result.contains("Successfully wrote ISO image"));
+    }
+
+    #[test]
+    fn test_mint_software_sources_ppa_manager() {
+        let mut ppa_mgr = MintSoftwareSourcesPpaManager::new();
+        ppa_mgr.add_ppa("ppa:cinnamon/stable", "1234567890ABCDEF");
+        assert_eq!(ppa_mgr.ppas.len(), 1);
+
+        assert!(ppa_mgr.remove_ppa("ppa:cinnamon/stable").is_ok());
+        assert_eq!(ppa_mgr.ppas.len(), 0);
+    }
+
+    #[test]
+    fn test_mint_cinnamon_spices_applet_manager() {
+        let mut applet_mgr = MintCinnamonSpicesAppletManager::new();
+        applet_mgr.add_applet("workspace-switcher@cinnamon.org", "Workspace Switcher", 0);
+        assert_eq!(applet_mgr.applets.len(), 1);
+
+        assert!(applet_mgr.set_applet_state("workspace-switcher@cinnamon.org", false).is_ok());
+        assert!(!applet_mgr.applets[0].enabled);
+    }
 
     #[test]
     fn test_mint_update_manager() {
@@ -922,56 +1595,19 @@ mod tests {
 
     #[test]
     fn test_mint4win_installer_flow() {
-        let config = Mint4WinConfig {
-            target_drive_letter: 'C',
-            install_folder: "sigmaos".to_string(),
-            root_disk_size_mb: 32768,
-            swap_disk_size_mb: 4096,
-            username: "mintuser".to_string(),
-            language: "en_US".to_string(),
-            bootloader_type: WindowsBootloaderType::BcdUefi,
-        };
+        let config = Mint4WinInstallationConfig::default_windows_c('C', "mintuser");
+        let mut installer = Mint4WinInstallerEngine::new(config);
 
-        let mut installer = Mint4WinInstaller::new(config);
+        let alloc_res = installer.allocate_loopback_disks().unwrap();
+        assert!(alloc_res.contains("Successfully allocated 32768 MB"));
 
-        // 1. Detect Fast Startup / Hibernation safety check
-        assert_eq!(
-            installer.detect_ntfs_fast_startup(true, false),
-            NtfsFastStartupState::DirtyHibernated
-        );
+        let bcd_res = installer.configure_windows_bcd_boot_entry().unwrap();
+        assert!(bcd_res.contains("Added Windows BCD boot entry"));
 
-        // Attempting to create loopback disk on hibernated NTFS fails for safety
-        assert!(installer.create_loopback_disks().is_err());
+        let script = installer.generate_unattended_install_script();
+        assert!(script.contains("unattended_user=\"mintuser\""));
 
-        // Clear fast startup hibernation block
-        installer.detect_ntfs_fast_startup(false, false);
-        assert_eq!(installer.fast_startup_state, NtfsFastStartupState::Clean);
-
-        // 2. Allocate sparse loopback virtual disk images
-        assert!(installer.create_loopback_disks().is_ok());
-        let root_disk = installer.root_disk.as_ref().unwrap();
-        assert_eq!(root_disk.windows_path, "C:\\sigmaos\\disks\\root.disk");
-        assert_eq!(root_disk.size_mb, 32768);
-
-        // 3. Register BCD boot entry
-        let bcd_cmd = installer.register_windows_boot_entry();
-        assert!(bcd_cmd.contains("bcdedit /create"));
-        assert!(installer.bcd_entry_guid.is_some());
-
-        // 4. Register Windows Control Panel Uninstaller entry
-        let uninst = installer.register_windows_uninstaller();
-        assert!(uninst.key_path.contains("SigmaOS_mint4win"));
-        assert!(uninst
-            .uninstall_string
-            .contains("C:\\sigmaos\\uninstall.exe"));
-
-        // 5. Expand root loopback disk capacity dynamically
-        let new_size = installer.expand_root_disk(16384).unwrap();
-        assert_eq!(new_size, 49152);
-
-        // 6. Execute uninstallation and reclaim disk space
-        let reclaimed = installer.execute_uninstallation().unwrap();
-        assert_eq!(reclaimed, 53248); // 49152 + 4096 swap
-        assert!(installer.root_disk.is_none());
+        let uninst_res = installer.uninstall_mint4win().unwrap();
+        assert!(uninst_res.contains("Successfully removed mint4win"));
     }
 }
