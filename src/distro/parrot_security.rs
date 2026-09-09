@@ -16,10 +16,10 @@ use alloc::vec::Vec;
 /// Parrot OS Edition Profiles
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ParrotSecEditionMode {
-    Security, // Full penetration testing and reverse engineering toolkit
-    Home,     // Lightweight privacy-focused daily driver
+    Security,   // Full penetration testing and reverse engineering toolkit
+    Home,       // Lightweight privacy-focused daily driver
     HackTheBox, // Offsec & competitive CTF edition
-    Cloud,    // Docker/Podman containerized security suite
+    Cloud,      // Docker/Podman containerized security suite
 }
 
 /// Anonsurf Routing Status
@@ -118,12 +118,25 @@ impl ParrotAppArmorProfileManager {
         };
 
         // Default strict sandbox profiles
-        mgr.register_profile("browser_sandbox", vec!["/home/user/Downloads".to_string()], vec!["ptrace".to_string(), "process_vm_writev".to_string()]);
-        mgr.register_profile("metasploit_sandbox", vec!["/var/log/metasploit".to_string()], vec!["reboot".to_string()]);
+        mgr.register_profile(
+            "browser_sandbox",
+            vec!["/home/user/Downloads".to_string()],
+            vec!["ptrace".to_string(), "process_vm_writev".to_string()],
+        );
+        mgr.register_profile(
+            "metasploit_sandbox",
+            vec!["/var/log/metasploit".to_string()],
+            vec!["reboot".to_string()],
+        );
         mgr
     }
 
-    pub fn register_profile(&mut self, name: &str, allowed_paths: Vec<String>, blocked_syscalls: Vec<String>) {
+    pub fn register_profile(
+        &mut self,
+        name: &str,
+        allowed_paths: Vec<String>,
+        blocked_syscalls: Vec<String>,
+    ) {
         self.profiles.insert(
             name.to_string(),
             ParrotAppArmorProfile {
@@ -167,12 +180,18 @@ impl ParrotForensicsSandbox {
         }
     }
 
-    pub fn acquire_evidence_read_only(&mut self, target_device: &str) -> Result<String, &'static str> {
+    pub fn acquire_evidence_read_only(
+        &mut self,
+        target_device: &str,
+    ) -> Result<String, &'static str> {
         if !self.write_blocker_active {
             return Err("Refusing acquisition: Hardware write-blocker is disabled!");
         }
 
-        let entry = format!("Evidence[{}] acquired read-only under {}", target_device, self.ramdisk_mount_path);
+        let entry = format!(
+            "Evidence[{}] acquired read-only under {}",
+            target_device, self.ramdisk_mount_path
+        );
         self.evidence_chain.push(entry.clone());
         Ok(entry)
     }

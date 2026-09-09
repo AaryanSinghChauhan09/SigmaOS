@@ -1,9 +1,9 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Systemd-Grade Init and Target State Engine for SigmaOS
 /// Provides robust target dependency graphs, wants/requires properties,

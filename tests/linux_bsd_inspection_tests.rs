@@ -12,6 +12,8 @@ mod abi_extended;
 mod advanced_process_control;
 #[path = "../src/kernel/bore.rs"]
 mod bore;
+#[path = "../src/compatibility/bsd.rs"]
+mod bsd;
 #[path = "../src/compatibility/distro_bridge.rs"]
 mod distro_bridge;
 #[path = "../src/boot/firmware.rs"]
@@ -72,8 +74,6 @@ mod vm_manager;
 mod zenith_advanced;
 #[path = "../src/compatibility/zorin.rs"]
 mod zorin;
-#[path = "../src/compatibility/bsd.rs"]
-mod bsd;
 
 #[path = "../src/kernel/linux_bsd_innovations.rs"]
 mod linux_bsd_innovations;
@@ -109,8 +109,11 @@ use unimplemented_features::{
     AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot,
     NixOsDeclarativeConfigEngine,
 };
+use unimplemented_features::{
+    AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot,
+    NixOsDeclarativeConfigEngine,
+};
 use unveil::{UnveilManager, UnveilPermission};
-use unimplemented_features::{AlpineApkPackageIndex, ApkPackageEntry, DragonFlyHammer2FsSnapshot, NixOsDeclarativeConfigEngine};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {

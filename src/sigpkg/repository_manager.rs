@@ -1,6 +1,5 @@
 /// Repository Management System (Debian APT + Arch Pacman Inspiration)
 /// Manages package repositories, mirrors, and metadata
-
 use crate::klib::BTreeMap;
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility

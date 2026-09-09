@@ -2,25 +2,25 @@
 
 // Core Library Collection Modules for SigmaOS
 // Sovereign implementations - no external crate dependencies
-pub mod buddy_allocator;
-pub mod paging;
-#[cfg(target_os = "none")]
-pub mod hashmap;
-#[cfg(target_os = "none")]
-pub mod hashset;
-pub mod vec;
-pub mod error;
-pub mod uuid;
-pub mod hash;
-pub mod string;
 pub mod arc;
 pub mod async_runtime;
 pub mod base64;
 pub mod bitmap;
 pub mod btreemap;
 pub mod buddy_allocator;
+pub mod buddy_allocator;
 pub mod collections;
 pub mod config_parser;
+pub mod error;
+pub mod hash;
+#[cfg(target_os = "none")]
+pub mod hashmap;
+#[cfg(target_os = "none")]
+pub mod hashset;
+pub mod paging;
+pub mod string;
+pub mod uuid;
+pub mod vec;
 #[macro_use]
 pub mod console;
 pub mod conversion;
@@ -66,19 +66,19 @@ pub mod uvm;
 pub mod vec;
 
 // Re-exports
-pub use string::{String, ToString};
 pub use arc::Arc;
-pub use ring_buffer::{RingBuffer, HeapRingBuffer};
+pub use custom_string::{CStringView, SigmaString, SigmaStringBuilder};
 pub use linked_list::{LinkedList, SList};
+pub use ring_buffer::{HeapRingBuffer, RingBuffer};
 pub use slab::{SlabCache, TypedSlabCache};
-pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
+pub use string::{String, ToString};
 
 #[cfg(not(target_os = "none"))]
 pub use std::vec::Vec;
 
+pub use uuid::Uuid;
 #[cfg(target_os = "none")]
 pub use vec::Vec;
-pub use uuid::Uuid;
 
 #[cfg(not(target_os = "none"))]
 pub use std::collections::HashMap;

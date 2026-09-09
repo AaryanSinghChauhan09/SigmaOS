@@ -1,0 +1,15 @@
+kernel:
+  - 'src/kernel/**/*'
+distro:
+  - 'src/distro/**/*'
+drivers:
+  - 'src/drivers/**/*'
+package:
+  - 'src/package/**/*'
+  - 'src/sigpkg/**/*'
+security:
+  - 'src/security/**/*'
+documentation:
+  - 'docs/**/*'
+  - 'WIKI/**/*'
+  - '*.md'

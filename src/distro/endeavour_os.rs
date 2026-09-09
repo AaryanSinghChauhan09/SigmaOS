@@ -213,7 +213,10 @@ mod tests {
 
         let mut installer = CalamaresInstaller::new(config);
         assert!(!installer.is_completed);
-        assert_eq!(installer.config.partition_type, PartitionType::DualBootSideBySide);
+        assert_eq!(
+            installer.config.partition_type,
+            PartitionType::DualBootSideBySide
+        );
         assert_eq!(installer.config.detected_operating_systems.len(), 1);
 
         let res = installer.run_installation();
@@ -227,13 +230,20 @@ mod tests {
     #[test]
     fn test_eos_welcome_app_and_log_tool() {
         let mut welcome = EosWelcomeApp::new();
-        assert!(welcome.execute_task(WelcomeButtonTask::UpdateMirrors).is_ok());
-        assert!(welcome.execute_task(WelcomeButtonTask::UpdateSystem).is_ok());
-        assert!(welcome.execute_task(WelcomeButtonTask::CleanPackages).is_ok());
+        assert!(welcome
+            .execute_task(WelcomeButtonTask::UpdateMirrors)
+            .is_ok());
+        assert!(welcome
+            .execute_task(WelcomeButtonTask::UpdateSystem)
+            .is_ok());
+        assert!(welcome
+            .execute_task(WelcomeButtonTask::CleanPackages)
+            .is_ok());
         assert!(welcome.execute_task(WelcomeButtonTask::FixKeys).is_ok());
 
         let log_tool = EosLogTool::new();
-        let upload_res = log_tool.upload_system_logs("Hardware: AMD Ryzen 7 7840HS, GPU: Radeon 780M");
+        let upload_res =
+            log_tool.upload_system_logs("Hardware: AMD Ryzen 7 7840HS, GPU: Radeon 780M");
         assert!(upload_res.is_ok());
         assert!(upload_res.unwrap().contains("https://0x0.st/"));
     }
@@ -433,7 +443,10 @@ impl AkmKernelManager {
     }
 
     /// Switches the default boot kernel in GRUB/systemd-boot
-    pub fn switch_active_kernel(&mut self, flavor: EosKernelFlavor) -> Result<String, &'static str> {
+    pub fn switch_active_kernel(
+        &mut self,
+        flavor: EosKernelFlavor,
+    ) -> Result<String, &'static str> {
         if !self.installed_kernels.contains(&flavor) {
             return Err("Kernel flavor not installed.");
         }

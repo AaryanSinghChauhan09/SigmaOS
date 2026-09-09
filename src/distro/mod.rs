@@ -1,13 +1,13 @@
+pub mod antix_zorin_innovations;
+pub mod kali_security;
 pub mod omarchy;
 pub mod parrot_security;
-pub mod kali_security;
-pub mod antix_zorin_innovations;
 
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
-    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
-    OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
-    WebAppSpec,
+    OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNeovimPresetEngine,
+    OmarchyNerdFont, OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard,
+    SovereignAgentKind, WebAppSpec,
 };
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
@@ -46,35 +46,28 @@ pub use fedora_parity::{
     FedoraKojiDistGitBuilder, FedoraRpmOstreeEngine, IgnitionFile, IgnitionUnit, KojiBuildTask,
     OstreeDeploymentPin, TargetArchitecture as FedoraTargetArchitecture,
 };
+pub mod endeavour_os;
 pub mod garuda_nomad_innovations;
 pub mod gentoo;
 pub mod gentoo_inspirations;
 pub mod i18n;
 pub mod manjaro;
 pub mod nextgen;
+pub mod preseed;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
-pub mod preseed;
-pub mod endeavour_os;
 
-pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
-pub use endeavour_os::{
-    AkmKernelManager, AurPackageSpec, CalamaresConfig, CalamaresInstaller, DesktopEnvironment,
-    EosKernelFlavor, EosLogTool, EosWelcomeApp, InstallMode, PacmanMirror, PartitionType,
-    ReflectorMirrorManager, WelcomeButtonTask, YayParuHelper,
-};
-pub use preseed::{SovereignPreseedParser, PreseedVariable};
-pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
-pub use manjaro::{
-    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease, AurPackage, FlatpakPackage, SnapPackage, MhwdDkmsRebuilder,
-};
+pub use arch_parity::{AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler};
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
     ReleaseStage, SoftwareCertificationProgram,
+};
+pub use chakra_parity::{
+    AkabeiBundle, AkabeiPackageEngine, DesktopTheme, InstallerStep, KapudanAssistant,
+    TribeInstaller,
 };
 pub use community::{
     BountyStatus, BugBountyProgram, BugBountyReport, CommunityConference, ConferenceTalk,
@@ -88,6 +81,11 @@ pub use developer::{
     ArchMakepkgDevEngine, BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit,
     PackageBuildService, PortageCompilerTuner, PoudriereBulkBuildEngine, SbuildChrootSandboxEngine,
     SovereignDevToolsSuite, TargetArch,
+};
+pub use endeavour_os::{
+    AkmKernelManager, AurPackageSpec, CalamaresConfig, CalamaresInstaller, DesktopEnvironment,
+    EosKernelFlavor, EosLogTool, EosWelcomeApp, InstallMode, PacmanMirror, PartitionType,
+    ReflectorMirrorManager, WelcomeButtonTask, YayParuHelper,
 };
 pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
@@ -106,6 +104,10 @@ pub use linux_bsd_parity_extended::{
     SlackPackage, SlackwarePkgTools, SnapperBtrfsEngine, SnapperSnapshot, SnapperType,
     SolarisCrossbowVnicEngine, Yast2ControlCenter, YastSetting,
 };
+pub use manjaro::{
+    AurPackage, FlatpakPackage, GpuType, ManjaroHardwareDetection, ManjaroKernelRelease,
+    MhwdDkmsRebuilder, MhwdDriverConfig, SnapPackage,
+};
 pub use nextgen::{
     AdminAction, AiSysAdmin, AtomicTrampolineGenerator, IntegrityState,
     KernelPatchVerificationEngine, LivepatchArchitecture, LivepatchManager, LivepatchPatch,
@@ -118,6 +120,7 @@ pub use parity::{
     SigmaAppBundle, SovereignBundleRuntime, SovereignChannelManager, SovereignHal,
     SovereignInstaller, SystemStateStatus, UpdateChannel, UpdateError,
 };
+pub use preseed::{PreseedVariable, SovereignPreseedParser};
 pub use ready_to_use::{
     DeviceCategory, DeviceNode, DistroServiceManager, HardwareEvent, InteractiveUserEnvironment,
     MountEntry, MountType, PlugAndPlayHardwareManager, ServiceUnit, SessionEnvironment,
@@ -203,7 +206,7 @@ pub use sovereign_ahead_distro_supremacy::{
     AccessRight as CapabilityAccessRight, CarpNodeStatus, CoWBlockExtent,
     DeclarativeCapabilityRule, MicroarchIsaTarget, OmniCasBlob, OmniGenRecord, PfsyncConnEntry,
     SchedPolicyKind, SchedTaskDescriptor, SchedTaskState, SimdJitPatch,
-    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
-    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
-    SovereignXdpCarpMeshEngine,
+    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine,
+    SovereignOmniCasStoreEngine, SovereignPredictiveSchedExtEngine,
+    SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine,
 };

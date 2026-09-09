@@ -188,7 +188,10 @@ impl FreeBsdPkgAuditEngine {
     ) -> Vec<(String, String, String)> {
         let mut found = Vec::new();
         for (pkg, cve, sev) in &self.vulnerability_cve_db {
-            if installed_pkgs.iter().any(|p: &String| p.starts_with(pkg.as_str())) {
+            if installed_pkgs
+                .iter()
+                .any(|p: &String| p.starts_with(pkg.as_str()))
+            {
                 found.push((pkg.clone(), cve.clone(), sev.clone()));
             }
         }

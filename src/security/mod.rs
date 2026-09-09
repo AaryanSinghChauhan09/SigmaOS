@@ -1,17 +1,17 @@
 // SigmaOS Security Subsystem
 pub mod capability;
+pub mod crypto_utils;
 pub mod defensive_audit;
+pub mod deobfuscation;
+pub mod hardening;
+pub mod intrusion;
+pub mod pam;
 pub mod parrot;
 pub mod pledge;
-pub mod unveil;
-pub mod selinux;
-pub mod vulnerability;
-pub mod hardening;
-pub mod deobfuscation;
 pub mod securelevels;
-pub mod pam;
-pub mod intrusion;
-pub mod crypto_utils;
+pub mod selinux;
+pub mod unveil;
+pub mod vulnerability;
 
 pub use kali_components::{
     HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,
@@ -19,9 +19,7 @@ pub use kali_components::{
     ScanResult, ScanType, VulnType, WebVulnReport,
 };
 
-pub use qubes_isolation::{
-    DomainID, DomainType, IsolatedDomain, IsolationError,
-};
+pub use qubes_isolation::{DomainID, DomainType, IsolatedDomain, IsolationError};
 
 pub use qubes_isolation::*;
 pub use root_improvement::*;
@@ -45,18 +43,17 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use defensive_audit::{
-    DefensiveAuditLog, SecurityAuditRecord,
-};
+pub use defensive_audit::{DefensiveAuditLog, SecurityAuditRecord};
 pub use forensics::*;
-pub use hardening::{
-    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
-};
+pub use hardening::{MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary};
+pub use pam::{PamError, PamGroup, PamUser, SovereignPamManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
+pub use selinux::{
+    AppArmorManager, AppArmorProfile, SecurityLabel, SecurityPolicy, SecurityRule,
+    SelinuxPermission,
+};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
-pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
-pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
-pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
 
 pub mod bpf_lsm_sovereign;
-pub use bpf_lsm_sovereign::{SovereignBpfLsmEngine, BpfLsmProgram, LsmHookPoint, BpfLsmDecision};
+pub use bpf_lsm_sovereign::{BpfLsmDecision, BpfLsmProgram, LsmHookPoint, SovereignBpfLsmEngine};

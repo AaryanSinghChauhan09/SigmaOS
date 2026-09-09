@@ -24,7 +24,14 @@ impl DefensiveAuditLog {
         }
     }
 
-    pub fn log_event(&mut self, timestamp: u64, event: &str, actor: &str, target: &str, allowed: bool) {
+    pub fn log_event(
+        &mut self,
+        timestamp: u64,
+        event: &str,
+        actor: &str,
+        target: &str,
+        allowed: bool,
+    ) {
         self.records.push(SecurityAuditRecord {
             timestamp_ms: timestamp,
             event_type: event.to_string(),

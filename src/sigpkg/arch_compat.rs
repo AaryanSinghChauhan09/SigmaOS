@@ -9,9 +9,9 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec as AllocVec;
 
+use crate::klib;
 use crate::klib::collections::HashMap;
 use crate::klib::string::SigmaString;
-use crate::klib;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -322,11 +322,7 @@ impl AlpmHookManager {
         Ok(())
     }
 
-    pub fn trigger_hooks(
-        &self,
-        when: HookWhen,
-        changed_file: &str,
-    ) -> std::vec::Vec<SigmaString> {
+    pub fn trigger_hooks(&self, when: HookWhen, changed_file: &str) -> std::vec::Vec<SigmaString> {
         let mut triggered_cmds = std::vec::Vec::new();
         for hook in &self.hooks {
             if hook.when == when {
@@ -795,10 +791,7 @@ mod tests {
         let source_pkg = DebianSbuildPackage {
             name: SigmaString::from("coreutils"),
             version: Version::new(9, 1, 0),
-            build_depends: std::vec![
-                SigmaString::from("gcc"),
-                SigmaString::from("make")
-            ],
+            build_depends: std::vec![SigmaString::from("gcc"), SigmaString::from("make")],
         };
 
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));

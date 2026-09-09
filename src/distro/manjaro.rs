@@ -175,7 +175,9 @@ pub struct PamacTransactionJournalEngine {
 
 impl PamacTransactionJournalEngine {
     pub fn new() -> Self {
-        Self { journal: Vec::new() }
+        Self {
+            journal: Vec::new(),
+        }
     }
 
     pub fn record_transaction(
@@ -258,7 +260,10 @@ impl MhwdHardwareQuirkDatabase {
     }
 
     pub fn lookup_quirks_for_vendor(&self, vendor: VendorHardwareType) -> Vec<&HardwareQuirkRule> {
-        self.rules.iter().filter(|r| r.vendor_type == vendor).collect()
+        self.rules
+            .iter()
+            .filter(|r| r.vendor_type == vendor)
+            .collect()
     }
 }
 
@@ -489,7 +494,11 @@ impl MhwdKernelDriverAutobuilder {
         if !self.auto_patch_kernel_switches {
             return 0;
         }
-        println!("MHWD Autobuilder: Patching {} DKMS drivers for kernel {}", self.dkms_modules.len(), kernel_ver);
+        println!(
+            "MHWD Autobuilder: Patching {} DKMS drivers for kernel {}",
+            self.dkms_modules.len(),
+            kernel_ver
+        );
         self.dkms_modules.len()
     }
 }
@@ -527,7 +536,9 @@ pub struct PamacUnifiedSearchEngine {
 
 impl PamacUnifiedSearchEngine {
     pub fn new() -> Self {
-        let mut engine = Self { search_index: Vec::new() };
+        let mut engine = Self {
+            search_index: Vec::new(),
+        };
         engine.populate_default_index();
         engine
     }
@@ -617,7 +628,13 @@ mod manjaro_tests {
     #[test]
     fn test_pamac_transaction_journal() {
         let mut journal = PamacTransactionJournalEngine::new();
-        let id = journal.record_transaction("firefox", Some("119.0"), "120.0", TransactionType::Upgrade, 1700000000);
+        let id = journal.record_transaction(
+            "firefox",
+            Some("119.0"),
+            "120.0",
+            TransactionType::Upgrade,
+            1700000000,
+        );
         assert_eq!(id, 1);
         assert_eq!(journal.journal.len(), 1);
 
@@ -1052,7 +1069,10 @@ impl ManjaroBranchSwitcher {
     pub fn set_branch(&mut self, branch: ManjaroBranchTier) -> Result<String, &'static str> {
         self.current_branch = branch;
         let branch_name = format!("{:?}", branch);
-        Ok(format!("Switched pacman-mirrors branch to '{}'", branch_name))
+        Ok(format!(
+            "Switched pacman-mirrors branch to '{}'",
+            branch_name
+        ))
     }
 }
 
@@ -1088,7 +1108,10 @@ impl ArchitectInstallerEngine {
         self.profiles.push(profile);
     }
 
-    pub fn generate_installation_manifest(&self, profile_name: &str) -> Result<String, &'static str> {
+    pub fn generate_installation_manifest(
+        &self,
+        profile_name: &str,
+    ) -> Result<String, &'static str> {
         let profile = self
             .profiles
             .iter()
@@ -1218,7 +1241,9 @@ mod tests {
         };
 
         architect.register_profile(profile);
-        let manifest = architect.generate_installation_manifest("custom_kde_btrfs").unwrap();
+        let manifest = architect
+            .generate_installation_manifest("custom_kde_btrfs")
+            .unwrap();
         assert!(manifest.contains("custom_kde_btrfs"));
         assert!(manifest.contains("KDE Plasma"));
         assert!(manifest.contains("LinuxLts"));

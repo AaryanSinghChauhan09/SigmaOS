@@ -140,15 +140,17 @@ impl Process {
     }
 
     /// Update virtual deadline considering ULE interactivity and EEVDF lag
-    pub fn update_virtual_deadline_ule(&mut self, _system_vtime: u64) {
+    pub fn update_virtual_deadline_ule(&mut self, system_vtime: u64) {
         let weight = self.get_weight();
         let q = 10u64;
         let base_slice = (q / weight).max(1);
         let inter = self.interactivity_score();
+        let lag = self.calculate_lag(system_vtime);
         // Boost interactive tasks (> 70) by shortening their deadline window
         let boost = if inter > 70 { (inter as u64 - 70) / 10 } else { 0 };
         let slice = base_slice.saturating_sub(boost).max(1);
-        self.virtual_deadline = self.virtual_runtime + slice;
+        let lag_adjustment = if lag > 0 { lag as u64 / 2 } else { 0 };
+        self.virtual_deadline = self.virtual_runtime + slice.saturating_sub(lag_adjustment);
     }
 
 }

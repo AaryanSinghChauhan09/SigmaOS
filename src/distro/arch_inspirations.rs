@@ -9,7 +9,6 @@
 // dependency on std::collections::HashMap (uses the crate's own SigmaHashMap
 // from klib where maps are required).
 
-
 extern crate alloc;
 
 use alloc::format;

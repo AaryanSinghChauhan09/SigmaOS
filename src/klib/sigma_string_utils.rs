@@ -10,7 +10,6 @@
 //   present in the `alloc` crate (which SigmaOS already uses)
 // • Panic-free — every operation returns a Result or Option
 
-
 use std::vec::Vec;
 
 // ── Type aliases ──────────────────────────────────────────────────────────────

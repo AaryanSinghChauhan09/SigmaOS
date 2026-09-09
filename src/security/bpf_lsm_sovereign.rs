@@ -50,7 +50,13 @@ pub struct BpfLsmProgram {
 }
 
 impl BpfLsmProgram {
-    pub fn new(id: u32, name: &str, hook: LsmHookPoint, pattern: &str, action: BpfLsmDecision) -> Self {
+    pub fn new(
+        id: u32,
+        name: &str,
+        hook: LsmHookPoint,
+        pattern: &str,
+        action: BpfLsmDecision,
+    ) -> Self {
         BpfLsmProgram {
             id,
             name: name.to_string(),
@@ -82,10 +88,17 @@ impl SovereignBpfLsmEngine {
         }
     }
 
-    pub fn attach_program(&mut self, name: &str, hook: LsmHookPoint, pattern: &str, action: BpfLsmDecision) -> u32 {
+    pub fn attach_program(
+        &mut self,
+        name: &str,
+        hook: LsmHookPoint,
+        pattern: &str,
+        action: BpfLsmDecision,
+    ) -> u32 {
         let id = self.next_program_id;
         self.next_program_id = self.next_program_id.saturating_add(1);
-        self.programs.push(BpfLsmProgram::new(id, name, hook, pattern, action));
+        self.programs
+            .push(BpfLsmProgram::new(id, name, hook, pattern, action));
         id
     }
 
@@ -153,7 +166,12 @@ mod tests {
     #[test]
     fn test_bpf_lsm_attach_detach() {
         let mut lsm = SovereignBpfLsmEngine::new();
-        let id = lsm.attach_program("block_etc_shadow", LsmHookPoint::FileOpen, "/etc/shadow", BpfLsmDecision::Deny(-13));
+        let id = lsm.attach_program(
+            "block_etc_shadow",
+            LsmHookPoint::FileOpen,
+            "/etc/shadow",
+            BpfLsmDecision::Deny(-13),
+        );
         assert_eq!(id, 1);
         assert_eq!(lsm.programs.len(), 1);
         assert!(lsm.detach_program(id));
@@ -163,7 +181,12 @@ mod tests {
     #[test]
     fn test_bpf_lsm_file_open_denial() {
         let mut lsm = SovereignBpfLsmEngine::new();
-        lsm.attach_program("protect_secrets", LsmHookPoint::FileOpen, "/secret", BpfLsmDecision::Deny(-13));
+        lsm.attach_program(
+            "protect_secrets",
+            LsmHookPoint::FileOpen,
+            "/secret",
+            BpfLsmDecision::Deny(-13),
+        );
 
         assert!(lsm.check_file_open("/usr/bin/ls").is_ok());
         assert_eq!(lsm.check_file_open("/secret/keys.txt"), Err(-13));
@@ -173,7 +196,12 @@ mod tests {
     #[test]
     fn test_bpf_lsm_bprm_exec_protection() {
         let mut lsm = SovereignBpfLsmEngine::new();
-        lsm.attach_program("no_suid_bash", LsmHookPoint::BprmCheckSecurity, "/tmp/evil_sh", BpfLsmDecision::Deny(-1));
+        lsm.attach_program(
+            "no_suid_bash",
+            LsmHookPoint::BprmCheckSecurity,
+            "/tmp/evil_sh",
+            BpfLsmDecision::Deny(-1),
+        );
 
         assert!(lsm.check_bprm("/bin/sh").is_ok());
         assert_eq!(lsm.check_bprm("/tmp/evil_sh"), Err(-1));
@@ -182,7 +210,12 @@ mod tests {
     #[test]
     fn test_bpf_lsm_socket_filter() {
         let mut lsm = SovereignBpfLsmEngine::new();
-        lsm.attach_program("block_c2_ip", LsmHookPoint::SocketConnect, "198.51.100.", BpfLsmDecision::Deny(-111)); // -ECONNREFUSED
+        lsm.attach_program(
+            "block_c2_ip",
+            LsmHookPoint::SocketConnect,
+            "198.51.100.",
+            BpfLsmDecision::Deny(-111),
+        ); // -ECONNREFUSED
 
         assert!(lsm.check_socket_connect("1.1.1.1:53").is_ok());
         assert_eq!(lsm.check_socket_connect("198.51.100.4:4444"), Err(-111));
@@ -192,7 +225,12 @@ mod tests {
     fn test_bpf_lsm_ptrace_defense() {
         let mut lsm = SovereignBpfLsmEngine::new();
         // Protect PID 1 (init) from ptrace attachment
-        lsm.attach_program("protect_init", LsmHookPoint::PtraceAccessCheck, "1", BpfLsmDecision::Deny(-1));
+        lsm.attach_program(
+            "protect_init",
+            LsmHookPoint::PtraceAccessCheck,
+            "1",
+            BpfLsmDecision::Deny(-1),
+        );
 
         assert!(lsm.check_ptrace(100).is_ok());
         assert_eq!(lsm.check_ptrace(1), Err(-1));
@@ -201,7 +239,12 @@ mod tests {
     #[test]
     fn test_bpf_lsm_audit_decision() {
         let mut lsm = SovereignBpfLsmEngine::new();
-        lsm.attach_program("audit_root", LsmHookPoint::FileOpen, "/root", BpfLsmDecision::AuditOnly);
+        lsm.attach_program(
+            "audit_root",
+            LsmHookPoint::FileOpen,
+            "/root",
+            BpfLsmDecision::AuditOnly,
+        );
 
         assert!(lsm.check_file_open("/root/.bashrc").is_ok());
         assert_eq!(lsm.programs[0].invocation_count, 1);

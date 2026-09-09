@@ -890,5 +890,4 @@ depends=('glibc')
         let deps = contrib.finddeps(&local_db, "glibc");
         assert_eq!(deps, vec!["linux-zen".to_string()]);
     }
-
 }

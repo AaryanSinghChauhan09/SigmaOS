@@ -3,7 +3,6 @@
 // Native Rust implementation of pacman-contrib utilities:
 // Maccache, pacdiff, checkupdates, paclist, updpkgsums, paclog
 
-
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;

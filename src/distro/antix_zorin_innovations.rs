@@ -39,7 +39,11 @@ impl AntiXSysVInitEngine {
         self.services.insert(name.to_string(), state);
     }
 
-    pub fn set_service_state(&mut self, name: &str, state: AntiXServiceState) -> Result<String, &'static str> {
+    pub fn set_service_state(
+        &mut self,
+        name: &str,
+        state: AntiXServiceState,
+    ) -> Result<String, &'static str> {
         if let Some(svc) = self.services.get_mut(name) {
             *svc = state;
             Ok(format!("antiX init: Service '{}' set to {:?}", name, state))
@@ -103,11 +107,19 @@ mod tests {
     #[test]
     fn test_antix_init_engine() {
         let mut init = AntiXSysVInitEngine::new();
-        assert_eq!(init.services.get("syslogd"), Some(&AntiXServiceState::Running));
+        assert_eq!(
+            init.services.get("syslogd"),
+            Some(&AntiXServiceState::Running)
+        );
 
-        let res = init.set_service_state("syslogd", AntiXServiceState::Stopped).unwrap();
+        let res = init
+            .set_service_state("syslogd", AntiXServiceState::Stopped)
+            .unwrap();
         assert!(res.contains("Service 'syslogd' set to Stopped"));
-        assert_eq!(init.services.get("syslogd"), Some(&AntiXServiceState::Stopped));
+        assert_eq!(
+            init.services.get("syslogd"),
+            Some(&AntiXServiceState::Stopped)
+        );
     }
 
     #[test]

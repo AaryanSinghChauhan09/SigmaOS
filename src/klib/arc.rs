@@ -5,10 +5,10 @@
 
 extern crate alloc;
 use alloc::boxed::Box;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::convert::AsRef;
 use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
-use core::convert::AsRef;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// ArcInner - Internal structure for Arc
 #[repr(C)]

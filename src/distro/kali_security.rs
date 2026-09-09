@@ -119,15 +119,32 @@ impl KaliMetapackageEngine {
             metapackages: BTreeMap::new(),
         };
 
-        mgr.register_metapackage("kali-tools-top10", vec![
-            "nmap".to_string(), "burpsuite".to_string(), "wireshark".to_string(),
-            "john".to_string(), "aircrack-ng".to_string(), "sqlmap".to_string(),
-            "metasploit-framework".to_string(), "hydra".to_string(), "autopsy".to_string(), "hashcat".to_string(),
-        ]);
+        mgr.register_metapackage(
+            "kali-tools-top10",
+            vec![
+                "nmap".to_string(),
+                "burpsuite".to_string(),
+                "wireshark".to_string(),
+                "john".to_string(),
+                "aircrack-ng".to_string(),
+                "sqlmap".to_string(),
+                "metasploit-framework".to_string(),
+                "hydra".to_string(),
+                "autopsy".to_string(),
+                "hashcat".to_string(),
+            ],
+        );
 
-        mgr.register_metapackage("kali-tools-web", vec![
-            "burpsuite".to_string(), "sqlmap".to_string(), "nikto".to_string(), "gobuster".to_string(), "wpscan".to_string(),
-        ]);
+        mgr.register_metapackage(
+            "kali-tools-web",
+            vec![
+                "burpsuite".to_string(),
+                "sqlmap".to_string(),
+                "nikto".to_string(),
+                "gobuster".to_string(),
+                "wpscan".to_string(),
+            ],
+        );
 
         mgr
     }
@@ -161,7 +178,10 @@ impl KaliLiveEncryptedPersistenceEngine {
         }
     }
 
-    pub fn execute_emergency_nuke(&mut self, nuke_passphrase_entered: bool) -> Result<String, &'static str> {
+    pub fn execute_emergency_nuke(
+        &mut self,
+        nuke_passphrase_entered: bool,
+    ) -> Result<String, &'static str> {
         if !self.luks_nuke_armed {
             return Err("LUKS nuke key is not armed");
         }
@@ -191,7 +211,10 @@ mod tests {
 
         let res = undercover.toggle_undercover(UndercoverThemeMode::Windows10Stealth);
         assert!(res.contains("Stealth Active: true"));
-        assert_eq!(undercover.current_mode, UndercoverThemeMode::Windows10Stealth);
+        assert_eq!(
+            undercover.current_mode,
+            UndercoverThemeMode::Windows10Stealth
+        );
     }
 
     #[test]

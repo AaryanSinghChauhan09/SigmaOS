@@ -1,4 +1,3 @@
-
 /// Zorin OS Compatibility Subsystem for SigmaOS
 /// Implements familiarity-first layout switching, Chameleon dynamic auto-theming,
 /// Zorin Connect smartphone integration, and Windows App support.
@@ -99,14 +98,28 @@ impl ZorinGridDesktopManager {
         }
     }
 
-    pub fn calculate_window_bounds(&self, snap: ZorinSnapPosition, screen_width: u32, screen_height: u32) -> (u32, u32, u32, u32) {
+    pub fn calculate_window_bounds(
+        &self,
+        snap: ZorinSnapPosition,
+        screen_width: u32,
+        screen_height: u32,
+    ) -> (u32, u32, u32, u32) {
         match snap {
             ZorinSnapPosition::LeftHalf => (0, 0, screen_width / 2, screen_height),
             ZorinSnapPosition::RightHalf => (screen_width / 2, 0, screen_width / 2, screen_height),
             ZorinSnapPosition::TopLeft => (0, 0, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::TopRight => (screen_width / 2, 0, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::BottomLeft => (0, screen_height / 2, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::BottomRight => (screen_width / 2, screen_height / 2, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::TopRight => {
+                (screen_width / 2, 0, screen_width / 2, screen_height / 2)
+            }
+            ZorinSnapPosition::BottomLeft => {
+                (0, screen_height / 2, screen_width / 2, screen_height / 2)
+            }
+            ZorinSnapPosition::BottomRight => (
+                screen_width / 2,
+                screen_height / 2,
+                screen_width / 2,
+                screen_height / 2,
+            ),
             ZorinSnapPosition::Maximize => (0, 0, screen_width, screen_height),
         }
     }
@@ -186,7 +199,9 @@ impl ZorinEducationFocusMode {
             return true;
         }
         let lower = app_name.to_lowercase();
-        self.allowed_educational_apps.iter().any(|allowed| lower.contains(allowed))
+        self.allowed_educational_apps
+            .iter()
+            .any(|allowed| lower.contains(allowed))
     }
 
     pub fn tick_minute(&self) -> bool {
@@ -210,8 +225,13 @@ impl ZorinSoundThemeManager {
     }
 
     pub fn set_volume(&self, volume: usize) {
-        let max_vol = if self.amplification_boost_enabled { 150 } else { 100 };
-        self.master_volume_percent.store(volume.min(max_vol), Ordering::SeqCst);
+        let max_vol = if self.amplification_boost_enabled {
+            150
+        } else {
+            100
+        };
+        self.master_volume_percent
+            .store(volume.min(max_vol), Ordering::SeqCst);
     }
 
     pub fn enable_amplification_boost(&mut self, enable: bool) {
@@ -450,7 +470,10 @@ impl ZorinSoundManager {
     }
 
     pub fn get_sound_file_path(&self, event_name: &str) -> String {
-        format!("/usr/share/sounds/{}/stereo/{}.ogg", self.sound_theme, event_name)
+        format!(
+            "/usr/share/sounds/{}/stereo/{}.ogg",
+            self.sound_theme, event_name
+        )
     }
 }
 
@@ -628,7 +651,10 @@ mod tests {
 
         let sound_mgr = ZorinSoundManager::new();
         let login_sound = sound_mgr.get_sound_file_path("desktop-login");
-        assert_eq!(login_sound, "/usr/share/sounds/zorin/stereo/desktop-login.ogg");
+        assert_eq!(
+            login_sound,
+            "/usr/share/sounds/zorin/stereo/desktop-login.ogg"
+        );
 
         let taskbar = ZorinTaskbarCustomizer::new();
         let css = taskbar.generate_panel_css();

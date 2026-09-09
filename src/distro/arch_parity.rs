@@ -2,13 +2,12 @@
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
 
-
+use core::cell::Cell;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::cell::Cell;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// PKGBUILD representation following Arch Linux standards
 #[derive(Debug, Clone)]
@@ -213,13 +212,19 @@ impl AurPkgbuildDiffAnalyzer {
         let mut warnings = Vec::new();
         for line in pkgbuild_text.lines() {
             if line.contains("curl") && line.contains("|") && line.contains("sh") {
-                warnings.push(format!("Suspicious remote script execution: {}", line.trim()));
+                warnings.push(format!(
+                    "Suspicious remote script execution: {}",
+                    line.trim()
+                ));
             }
             if line.contains("rm -rf /") || line.contains("rm -rf $pkgdir/..") {
                 warnings.push(format!("Dangerous file deletion command: {}", line.trim()));
             }
             if line.contains("sudo ") {
-                warnings.push(format!("Elevated privilege invocation in PKGBUILD: {}", line.trim()));
+                warnings.push(format!(
+                    "Elevated privilege invocation in PKGBUILD: {}",
+                    line.trim()
+                ));
             }
         }
         warnings
@@ -662,7 +667,9 @@ mod tests {
     #[test]
     fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
         let devtools = ArchCdevtoolsEngine::new();
-        let cmd = devtools.build_in_chroot("extra-x86_64-build", "curl").unwrap();
+        let cmd = devtools
+            .build_in_chroot("extra-x86_64-build", "curl")
+            .unwrap();
         assert!(cmd.contains("arch-nspawn"));
 
         let mut pkgctl = ArchPkgctlEngine::new();
@@ -1058,7 +1065,4 @@ impl Default for SovereignSvntogitEngine {
     fn default() -> Self {
         Self::new()
     }
-
-
-
 }

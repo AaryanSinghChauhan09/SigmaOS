@@ -2,14 +2,14 @@ use alloc::format;
 use alloc::vec;
 extern crate alloc;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::collections::HashMap;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // ========================================================================
@@ -1683,19 +1683,17 @@ pub struct GestureVoiceControlEngine {
     pub registered_voice_commands: [Option<(&'static str, DesktopShellAction)>; 4],
 }
 
-
-    pub fn parse_touchpad_gesture(
-        &self,
-        fingers_count: u8,
-        swipe_up: bool,
-    ) -> Option<DesktopShellAction> {
-        match (fingers_count, swipe_up) {
-            (3, true) => Some(DesktopShellAction::ToggleOverview),
-            (4, false) => Some(DesktopShellAction::SwitchWorkspace),
-            _ => None,
-        }
+pub fn parse_touchpad_gesture(
+    &self,
+    fingers_count: u8,
+    swipe_up: bool,
+) -> Option<DesktopShellAction> {
+    match (fingers_count, swipe_up) {
+        (3, true) => Some(DesktopShellAction::ToggleOverview),
+        (4, false) => Some(DesktopShellAction::SwitchWorkspace),
+        _ => None,
     }
-
+}
 
 #[cfg(test)]
 mod tests {
@@ -1728,17 +1726,42 @@ mod tests {
         let mut vm = UdfVm::new(0, 16);
 
         let program = [
-            UdfInstruction { opcode: OP_WRITE, reg_dest: 0, reg_src: 0, address_or_imm: 4 }, // write R0 (0) to addr 4
-            UdfInstruction { opcode: OP_READ, reg_dest: 1, reg_src: 0, address_or_imm: 4 },  // read addr 4 to R1
-            UdfInstruction { opcode: OP_ADD, reg_dest: 1, reg_src: 1, address_or_imm: 0 },   // R1 = R1 + R1
-            UdfInstruction { opcode: OP_HALT, reg_dest: 1, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction {
+                opcode: OP_WRITE,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 4,
+            }, // write R0 (0) to addr 4
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 1,
+                reg_src: 0,
+                address_or_imm: 4,
+            }, // read addr 4 to R1
+            UdfInstruction {
+                opcode: OP_ADD,
+                reg_dest: 1,
+                reg_src: 1,
+                address_or_imm: 0,
+            }, // R1 = R1 + R1
+            UdfInstruction {
+                opcode: OP_HALT,
+                reg_dest: 1,
+                reg_src: 0,
+                address_or_imm: 0,
+            },
         ];
 
         let res = vm.execute_program(&program, &mut dev).unwrap();
         assert_eq!(res, 0);
 
         let invalid_program = [
-            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 }, // out of bounds
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 100,
+            }, // out of bounds
         ];
         assert!(vm.execute_program(&invalid_program, &mut dev).is_err());
     }
@@ -1756,7 +1779,9 @@ mod tests {
                     min_version: PkgVersion { major: 2, minor: 0 },
                     max_version: PkgVersion { major: 2, minor: 5 },
                 }),
-                None, None, None,
+                None,
+                None,
+                None,
             ],
         };
 
@@ -3703,8 +3728,6 @@ mod new_unimplemented_tests {
         phoronix.execute_benchmark("Shadow of Tomb Raider", 80.0);
         assert_eq!(phoronix.calculate_composite_score(), 100.0);
     }
-
-
 }
 
 // ===========================================================}

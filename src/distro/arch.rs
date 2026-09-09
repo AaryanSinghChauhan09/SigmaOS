@@ -1,10 +1,8 @@
 // SigmaOS Arch Linux Compatibility & Tooling Suite (Arch Parity)
 // Implements Arch Build System (ABS), Pacman database synchronizations, AUR package compilation helper, and Mirror ranker.
 
-
 #[cfg(test_disabled)]
 extern crate std;
-
 
 use std::format;
 use std::string::String;
@@ -221,7 +219,11 @@ impl ArchinstallEngine {
 
 impl Default for ArchinstallEngine {
     fn default() -> Self {
-        Self::new("/dev/sda", FilesystemType::Btrfs, InstallerProfile::DesktopGnome)
+        Self::new(
+            "/dev/sda",
+            FilesystemType::Btrfs,
+            InstallerProfile::DesktopGnome,
+        )
     }
 }
 
@@ -250,7 +252,9 @@ pub struct ArchReflectorEngine {
 
 impl ArchReflectorEngine {
     pub fn new() -> Self {
-        Self { mirrors: Vec::new() }
+        Self {
+            mirrors: Vec::new(),
+        }
     }
 
     pub fn add_mirror(&mut self, url: &str, country: &str, rate: u32, latency: u32) {
@@ -265,7 +269,8 @@ impl ArchReflectorEngine {
     pub fn sort_mirrors(&mut self, sort_key: ReflectorSortKey) {
         match sort_key {
             ReflectorSortKey::Rate => {
-                self.mirrors.sort_by(|a, b| b.download_rate_kbps.cmp(&a.download_rate_kbps));
+                self.mirrors
+                    .sort_by(|a, b| b.download_rate_kbps.cmp(&a.download_rate_kbps));
             }
             ReflectorSortKey::Latency => {
                 self.mirrors.sort_by(|a, b| a.latency_ms.cmp(&b.latency_ms));
@@ -314,7 +319,9 @@ pub struct ArchKeyringEngine {
 
 impl ArchKeyringEngine {
     pub fn new() -> Self {
-        let mut keyring = Self { master_keys: Vec::new() };
+        let mut keyring = Self {
+            master_keys: Vec::new(),
+        };
         keyring.populate_arch_master_keys();
         keyring
     }
@@ -336,7 +343,9 @@ impl ArchKeyringEngine {
     }
 
     pub fn verify_package_signature(&self, key_id: &str) -> bool {
-        self.master_keys.iter().any(|k| k.key_id == key_id && k.trust_level != KeyTrustLevel::Unknown)
+        self.master_keys
+            .iter()
+            .any(|k| k.key_id == key_id && k.trust_level != KeyTrustLevel::Unknown)
     }
 }
 
@@ -368,7 +377,11 @@ mod arch_suite_tests {
 
     #[test]
     fn test_archinstall_engine() {
-        let mut installer = ArchinstallEngine::new("/dev/nvme0n1", FilesystemType::Btrfs, InstallerProfile::DesktopGnome);
+        let mut installer = ArchinstallEngine::new(
+            "/dev/nvme0n1",
+            FilesystemType::Btrfs,
+            InstallerProfile::DesktopGnome,
+        );
         let json_spec = installer.generate_archinstall_json();
         assert!(json_spec.contains("/dev/nvme0n1"));
         assert!(json_spec.contains("Btrfs"));

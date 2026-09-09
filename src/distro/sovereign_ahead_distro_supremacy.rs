@@ -582,11 +582,7 @@ impl SovereignAheadOfDistrosSuite {
             capability_engine: SovereignCrossPlatformCapabilityEngine::new(),
             storage_engine: SovereignResilientHammer2Engine::new(),
             microarch_engine: SovereignUniversalMicroarchEngine::new(MicroarchIsaTarget::X86_64V4),
-            xdp_mesh_engine: SovereignXdpCarpMeshEngine::new(
-                1,
-                CarpNodeStatus::Master,
-                0x01234567,
-            ),
+            xdp_mesh_engine: SovereignXdpCarpMeshEngine::new(1, CarpNodeStatus::Master, 0x01234567),
         }
     }
 

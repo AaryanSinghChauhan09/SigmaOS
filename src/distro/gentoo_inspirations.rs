@@ -6,7 +6,6 @@
 //   • ebuilds metadata model
 //   • World set and dependency graph
 
-
 extern crate alloc;
 
 use alloc::format;

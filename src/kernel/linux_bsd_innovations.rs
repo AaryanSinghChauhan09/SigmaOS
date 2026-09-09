@@ -1,4 +1,3 @@
-
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::{String, ToString};
@@ -2772,7 +2771,6 @@ impl CapabilityDerivationTree {
     }
 }
 
-
 // ================= Linux XDP & FreeBSD Netmap High-Performance Fast Packet Engine =================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -3194,7 +3192,6 @@ impl MemoryCompactionSuperpagesAllocator {
         Err("Superpages Allocator: No 2MB contiguous free frame block available")
     }
 }
-
 
 #[cfg(test)]
 mod tests_extra_1 {

@@ -1,18 +1,18 @@
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap as HashMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap as HashMap;
 
 // Test environment compatibility: Use std for testing only
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
@@ -995,7 +995,6 @@ impl FedoraStatusFpoEngine {
     }
 }
 
-
 // ==========================================================
 // Fedora Anaconda Installer & Kickstart Configurator
 // ==========================================================
@@ -1714,13 +1713,20 @@ impl FedoraSilverblueRpmOstreeEngine {
         }
     }
 
-    pub fn rebase_stream(&mut self, new_stream: &str, target_commit: &str) -> Result<String, &'static str> {
+    pub fn rebase_stream(
+        &mut self,
+        new_stream: &str,
+        target_commit: &str,
+    ) -> Result<String, &'static str> {
         if new_stream.is_empty() || target_commit.is_empty() {
             return Err("Stream and target commit cannot be empty");
         }
         self.current_stream = new_stream.to_string();
         self.stage_upgrade(target_commit);
-        Ok(format!("Rebased to stream '{}' at commit '{}'", new_stream, target_commit))
+        Ok(format!(
+            "Rebased to stream '{}' at commit '{}'",
+            new_stream, target_commit
+        ))
     }
 
     pub fn overlay_layer_package(&mut self, pkg: &str) {
@@ -1857,14 +1863,16 @@ impl FedoraKeyringPamModule {
         // Security: Never use hardcoded credentials in production.
         // Authentication must be verified against a secure credential store (PAM, SSSD, etc.)
         // This implementation uses a constant-time comparison against the configured credential.
-        let expected = std::env::var("SIGMA_PAM_TEST_SECRET")
-            .unwrap_or_else(|_| String::new());
+        let expected = std::env::var("SIGMA_PAM_TEST_SECRET").unwrap_or_else(|_| String::new());
         // Constant-time comparison to prevent timing attacks
         let pass_bytes = pass.as_bytes();
         let expected_bytes = expected.as_bytes();
         let matches = if pass_bytes.len() == expected_bytes.len() && !expected.is_empty() {
-            pass_bytes.iter().zip(expected_bytes.iter())
-                .fold(0u8, |acc, (a, b)| acc | (a ^ b)) == 0
+            pass_bytes
+                .iter()
+                .zip(expected_bytes.iter())
+                .fold(0u8, |acc, (a, b)| acc | (a ^ b))
+                == 0
         } else {
             false
         };
@@ -2606,7 +2614,10 @@ impl FedoraGettextL10nEngine {
     }
 
     pub fn gettext(&self, msgid: &str) -> String {
-        if let Some(catalog) = self.translation_catalogs.get(&self.current_locale.to_string()) {
+        if let Some(catalog) = self
+            .translation_catalogs
+            .get(&self.current_locale.to_string())
+        {
             if let Some(msgstr) = catalog.get(&msgid.to_string()) {
                 return msgstr.clone();
             }
@@ -2864,7 +2875,6 @@ pub struct FedoraPlanetPost {
     pub url: String,
     pub published_epoch: u64,
 }
-
 
 impl FedoraPlanetAggregationEngine {
     pub fn new() -> Self {
@@ -3831,8 +3841,6 @@ pub enum SystemRoleKind {
     Storage,
 }
 
-
-
 #[derive(Debug, Clone)]
 pub struct FedoraSystemRolesEngine {
     pub applied_roles: Vec<SystemRoleKind>,
@@ -3907,7 +3915,11 @@ mod tests_extra {
         // Increase karma
         let k1 = bodhi.submit_feedback("FEDORA-2023-A8F8", 1).unwrap();
         assert_eq!(k1, 1);
-        assert!(!bodhi.stable_gated.get("FEDORA-2023-A8F8").copied().unwrap_or(false));
+        assert!(!bodhi
+            .stable_gated
+            .get("FEDORA-2023-A8F8")
+            .copied()
+            .unwrap_or(false));
 
         // Direct promotion
         bodhi.advance_testing_days("FEDORA-2023-A8F8", 3);
@@ -4539,7 +4551,6 @@ mod tests_extra {
         assert_eq!(setup.current_step, "Complete");
     }
 
-
     #[test]
     fn test_fedora_tahrir_identity_api_engine() {
         let mut tahrir = FedoraTahrirIdentityApiEngine::new();
@@ -4630,7 +4641,10 @@ mod tests_extra {
         });
         assert_eq!(count2, 1);
         assert_eq!(fmn.dispatched_notifications_log[0].0, "alice@fedora");
-        assert_eq!(fmn.dispatched_notifications_log[0].1, FmnNotificationTransport::Matrix);
+        assert_eq!(
+            fmn.dispatched_notifications_log[0].1,
+            FmnNotificationTransport::Matrix
+        );
 
         // Event 3: Critical security update for openssl -> Bob matches!
         let count3 = fmn.publish_event(FmnMessageEvent {
@@ -4643,7 +4657,10 @@ mod tests_extra {
         });
         assert_eq!(count3, 1);
         assert_eq!(fmn.dispatched_notifications_log[1].0, "bob@fedora");
-        assert_eq!(fmn.dispatched_notifications_log[1].1, FmnNotificationTransport::Email);
+        assert_eq!(
+            fmn.dispatched_notifications_log[1].1,
+            FmnNotificationTransport::Email
+        );
     }
 
     #[test]
