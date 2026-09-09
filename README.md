@@ -9,6 +9,7 @@ SigmaOS is the world’s first **sovereign operating system**, engineered from t
 - 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
 - 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
 - ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
+- 📋 **Linux Distro Feature Parity Checklist**: [docs/LINUX_DISTRO_PARITY_CHECKLIST.md](docs/LINUX_DISTRO_PARITY_CHECKLIST.md)
 - 🗺️ **Master Development Roadmap**: [FUTURE-DEVELOPMENT-ROADMAP.md](FUTURE-DEVELOPMENT-ROADMAP.md)
 
 ---
