@@ -165,8 +165,9 @@ pub use cross_platform::{
 pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
 pub use lubuntu::{
     CpuGovernor, LidCloseAction, LubuntuGlobalHotkeyManager, LubuntuHealthReport,
-    LubuntuNetworkTrayAdapter, LubuntuNotificationDaemon, LubuntuPowerManager, LubuntuSystemManager,
-    SystemPressure, WifiAccessPointNode,
+    LubuntuNetworkTrayAdapter, LubuntuNotificationDaemon, LubuntuPackageUpdateNotice,
+    LubuntuPowerManager, LubuntuPpaRepository, LubuntuPpaRepositoryManager, LubuntuSystemManager,
+    LxqtPackageUpdateNotifierEngine, SystemPressure, WifiAccessPointNode,
 };
 
 pub use cross_platform_kernel::{

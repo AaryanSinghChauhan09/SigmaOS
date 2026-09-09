@@ -120,9 +120,9 @@ impl NixDeclarativeSystemState {
 
     pub fn switch_generation(&mut self, target_id: u32) -> Result<Generation, String> {
         if let Some(gen) = self.generations.iter().find(|g| g.id == target_id) {
-            let selected_gen = gen.clone();
+            let res = gen.clone();
             self.active_generation_id = target_id;
-            Ok(selected_gen)
+            Ok(res)
         } else {
             Err(format!("Generation ID {} not found", target_id))
         }
