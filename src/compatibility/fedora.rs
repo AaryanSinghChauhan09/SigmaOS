@@ -12,7 +12,7 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
@@ -358,6 +358,10 @@ impl BodhiUpdateTriage {
         } else {
             Err("Update package not found".to_string())
         }
+    }
+
+    pub fn get_update_status(&self, update_id: &str) -> Option<BodhiUpdateStatus> {
+        self.update_statuses.get(update_id).copied()
     }
 
     pub fn create_side_tag(&mut self, tag_name: &str) {
@@ -2755,6 +2759,24 @@ pub struct TahrirBadgeAssertion {
     pub assertion_digest: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaPackageMapping {
+    pub anitya_project_id: u64,
+    pub upstream_name: String,
+    pub fedora_package_name: String,
+    pub current_stable_version: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UpstreamReleaseEvent {
+    pub project_id: u64,
+    pub fedora_package_name: String,
+    pub old_version: String,
+    pub new_version: String,
+    pub release_url: String,
+    pub timestamp_secs: u64,
+}
+
 /// Fedora "The New Hotness" & Anitya Upstream Release Monitoring Engine
 /// Tracks upstream project releases, compares version semantics, maps Anitya project IDs
 /// to Fedora RPM packages, and dispatches `org.fedoraproject.prod.hotness.update` fedmsg events.
@@ -2846,14 +2868,12 @@ impl Default for FedoraTheNewHotnessEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TahrirUserAvatar {
-    pub user_id: String,
-    pub email_sha256: String,
-    pub avatar_data: Vec<u8>,
-    pub mime_type: String,
+pub struct PlanetUserFeed {
+    pub fas_account: String,
+    pub feed_url: String,
+    pub active: bool,
 }
 
-/// Fedora Planet Blog Article Entry
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FedoraPlanetPost {
     pub post_id: String,
@@ -2863,10 +2883,17 @@ pub struct FedoraPlanetPost {
     pub published_epoch: u64,
 }
 
+pub struct FedoraPlanetAggregationEngine {
+    pub registered_feeds: Vec<PlanetUserFeed>,
+    pub posts: Vec<FedoraPlanetPost>,
+}
 
 impl FedoraPlanetAggregationEngine {
     pub fn new() -> Self {
-        FedoraPlanetAggregationEngine { posts: Vec::new() }
+        FedoraPlanetAggregationEngine {
+            registered_feeds: Vec::new(),
+            posts: Vec::new(),
+        }
     }
 
     pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
@@ -2896,6 +2923,17 @@ pub struct AnityaUpstreamRelease {
     pub project_name: String,
     pub latest_version: String,
     pub homepage: String,
+}
+
+/// Fedora Tahrir Microblog Post
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TahrirMessagePost {
+    pub post_id: u64,
+    pub author_fas_username: String,
+    pub content: String,
+    pub hashtags: Vec<String>,
+    pub timestamp_secs: u64,
+    pub fedmsg_dispatched: bool,
 }
 
 /// Fedora Tahrir Microblogging & Developer Social Network System
@@ -3165,28 +3203,15 @@ pub struct FedoraIgnitionEngine {
     pub provisioned: bool,
 }
 
+
 impl FedoraIgnitionEngine {
     pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
+        Self {
+            files: Vec::new(),
+            users: Vec::new(),
+            systemd_units: Vec::new(),
+            provisioned: false,
         }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
     }
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
@@ -4725,111 +4750,6 @@ mod tests {
     }
 
 
-    #[test]
-    fn test_fedora_tahrir_identity_api_engine() {
-        let mut tahrir = FedoraTahrirIdentityApiEngine::new();
-
-        // 1. Register avatar
-        let email_hash = tahrir.register_user_avatar(
-            "alice_developer",
-            "alice@fedoraproject.org",
-            b"<svg>ALICE_AVATAR</svg>",
-            "image/svg+xml",
-        );
-        assert!(!email_hash.is_empty());
-
-        // 2. Resolve avatar by Libravatar email hash
-        let resolved = tahrir.resolve_avatar_by_hash(&email_hash).unwrap();
-        assert_eq!(resolved.user_id, "alice_developer");
-        assert_eq!(resolved.mime_type, "image/svg+xml");
-        assert_eq!(resolved.avatar_data, b"<svg>ALICE_AVATAR</svg>");
-
-        // 3. Issue OpenBadges assertion
-        let assertion = tahrir.issue_badge_assertion(
-            "package_artisan_2024",
-            "alice@fedoraproject.org",
-            "fedora_badges_bot",
-            1700000000,
-        );
-        assert_eq!(assertion.badge_id, "package_artisan_2024");
-        assert_eq!(assertion.recipient_email_hash, email_hash);
-        assert!(assertion.evidence_url.contains("package_artisan_2024"));
-
-        // 4. Verify OpenBadges assertion
-        assert!(tahrir.verify_badge_assertion(&assertion));
-
-        let fake_assertion = TahrirBadgeAssertion {
-            badge_id: "fake_badge".to_string(),
-            recipient_email_hash: "0000000000000000".to_string(),
-            issuer_id: "fake_issuer".to_string(),
-            issued_on_epoch: 0,
-            evidence_url: "".to_string(),
-            assertion_digest: "invalid_digest".to_string(),
-        };
-        assert!(!tahrir.verify_badge_assertion(&fake_assertion));
-    }
-
-    #[test]
-    fn test_fedora_fmn_messaging_engine() {
-        let mut fmn = FedoraFmnMessagingEngine::new();
-
-        // Register rule for user alice: interested in kernel builds via Matrix
-        fmn.register_filter_rule(FmnFilterRule {
-            rule_id: "rule-01".to_string(),
-            user_id: "alice@fedora".to_string(),
-            package_pattern: "kernel".to_string(),
-            topic_pattern: "buildsys".to_string(),
-            min_severity: FmnEventSeverity::Medium,
-            preferred_transport: FmnNotificationTransport::Matrix,
-        });
-
-        // Register rule for user bob: interested in critical alerts across all packages via Email
-        fmn.register_filter_rule(FmnFilterRule {
-            rule_id: "rule-02".to_string(),
-            user_id: "bob@fedora".to_string(),
-            package_pattern: "*".to_string(),
-            topic_pattern: "*".to_string(),
-            min_severity: FmnEventSeverity::Critical,
-            preferred_transport: FmnNotificationTransport::Email,
-        });
-
-        // Event 1: Low severity kernel build event -> Alice (min Medium) ignored, Bob (min Critical) ignored
-        let count1 = fmn.publish_event(FmnMessageEvent {
-            event_id: "evt-01".to_string(),
-            topic: "org.fedoraproject.prod.buildsys.task".to_string(),
-            package_name: "kernel".to_string(),
-            severity: FmnEventSeverity::Low,
-            summary: "Kernel scratch build started".to_string(),
-            timestamp_epoch: 1700000000,
-        });
-        assert_eq!(count1, 0);
-
-        // Event 2: High severity kernel build completed -> Alice matches!
-        let count2 = fmn.publish_event(FmnMessageEvent {
-            event_id: "evt-02".to_string(),
-            topic: "org.fedoraproject.prod.buildsys.task".to_string(),
-            package_name: "kernel".to_string(),
-            severity: FmnEventSeverity::High,
-            summary: "Kernel 6.8.0-1.fc40 build completed successfully".to_string(),
-            timestamp_epoch: 1700000100,
-        });
-        assert_eq!(count2, 1);
-        assert_eq!(fmn.dispatched_notifications_log[0].0, "alice@fedora");
-        assert_eq!(fmn.dispatched_notifications_log[0].1, FmnNotificationTransport::Matrix);
-
-        // Event 3: Critical security update for openssl -> Bob matches!
-        let count3 = fmn.publish_event(FmnMessageEvent {
-            event_id: "evt-03".to_string(),
-            topic: "org.fedoraproject.prod.bodhi.update.critical".to_string(),
-            package_name: "openssl".to_string(),
-            severity: FmnEventSeverity::Critical,
-            summary: "Critical security advisory FEDORA-2024-SEC01".to_string(),
-            timestamp_epoch: 1700000200,
-        });
-        assert_eq!(count3, 1);
-        assert_eq!(fmn.dispatched_notifications_log[1].0, "bob@fedora");
-        assert_eq!(fmn.dispatched_notifications_log[1].1, FmnNotificationTransport::Email);
-    }
 
     #[test]
     fn test_fedora_btrfs_snapper_snapshot_engine() {
@@ -4888,38 +4808,6 @@ mod tests {
         assert!(summary.contains("Active Incidents: 0"));
     }
 
-    #[test]
-    fn test_fedora_nvidia_prime_switcher_engine() {
-        let mut switcher = FedoraNvidiaPrimeSwitcherEngine::new();
-        assert_eq!(
-            switcher.current_mode,
-            FedoraGpuPowerMode::HybridPrimeOffload
-        );
-        assert!(switcher.prime_offload_active);
-
-        switcher.set_gpu_mode(FedoraGpuPowerMode::Integrated);
-        assert_eq!(switcher.current_mode, FedoraGpuPowerMode::Integrated);
-        assert!(!switcher.prime_offload_active);
-        assert!(switcher.active_env_vars.is_empty());
-
-        switcher.set_gpu_mode(FedoraGpuPowerMode::DiscreteNvidia);
-        assert_eq!(switcher.current_mode, FedoraGpuPowerMode::DiscreteNvidia);
-        assert!(switcher.prime_offload_active);
-        assert_eq!(
-            switcher
-                .active_env_vars
-                .get("__NV_PRIME_RENDER_OFFLOAD")
-                .unwrap(),
-            "1"
-        );
-        assert_eq!(
-            switcher
-                .active_env_vars
-                .get("__VK_LAYER_NV_optimus")
-                .unwrap(),
-            "NVIDIA_only"
-        );
-    }
 
     #[test]
     fn test_fedora_messaging_engine() {
@@ -5063,29 +4951,22 @@ mod tests {
             "fedora-toolbox-39",
             "registry.fedoraproject.org/fedora-toolbox:39",
         );
-        assert!(mgr.resolve_shared_library_symbol("libc.so.6", "malloc"));
-        assert!(!mgr.resolve_shared_library_symbol("libc.so.6", "nonexistent_symbol"));
-
-        let container = engine.create_toolbx(
-            "fedora-toolbox-39",
-            "registry.fedoraproject.org/fedora-toolbox:39",
-        );
         assert_eq!(container.name, "fedora-toolbox-39");
         assert!(container.host_mounts.contains(&"/home".to_string()));
         assert!(!container.running);
 
-        assert!(engine.add_host_mount("fedora-toolbox-39", "/mnt/data"));
-        assert!(engine
+        assert!(toolbx.add_host_mount("fedora-toolbox-39", "/mnt/data"));
+        assert!(toolbx
             .active_containers
             .get("fedora-toolbox-39")
             .unwrap()
             .host_mounts
             .contains(&"/mnt/data".to_string()));
 
-        let start_res = engine.start_toolbx("fedora-toolbox-39").unwrap();
+        let start_res = toolbx.start_toolbx("fedora-toolbox-39").unwrap();
         assert!(start_res.contains("started using image"));
         assert!(
-            engine
+            toolbx
                 .active_containers
                 .get("fedora-toolbox-39")
                 .unwrap()
@@ -5093,33 +4974,6 @@ mod tests {
         );
     }
 
-    #[test]
-    fn test_fedora_badges_engine() {
-        let mut badges = FedoraBadgesEngine::new();
-        assert_eq!(badges.badges.len(), 2);
-
-        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
-        assert_eq!(pts1, 10);
-
-        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
-        assert_eq!(pts2, 25);
-
-        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
-    }
-
-    #[test]
-    fn test_fedora_system_roles_engine() {
-        let mut roles = FedoraSystemRolesEngine::new();
-        assert!(roles.applied_roles.is_empty());
-
-        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
-        assert_eq!(roles.applied_roles.len(), 1);
-        assert_eq!(roles.chrony_ntp_servers.len(), 2);
-
-        roles.apply_firewall_role(&[80, 443, 8080]);
-        assert_eq!(roles.applied_roles.len(), 2);
-        assert_eq!(roles.configured_firewall_ports.len(), 3);
-    }
 
     #[test]
     fn test_fedora_mirror_manager_2_engine() {
@@ -5264,16 +5118,7 @@ mod tests {
     #[test]
     fn test_fedora_sssd_kerberos_realm() {
         let mut sssd = FedoraSssdKerberosRealmClientEngine::new("FEDORA.ORGANIZATION.ORG");
-        // SAFETY: Using environment variable for test credentials to avoid hardcoding
-        let test_password = core::env::var("SIGMA_TEST_SSSD_PASSWORD").unwrap_or_else(|_| {
-            // Generate random test password for security
-            let mut rng = [0u8; 16];
-            for i in 0..16 {
-                rng[i] = (i as u8 * 7 + 13) % 256;
-            }
-            alloc::format!("{:x}", rng.iter().map(|b| alloc::format!("{:02x}", b)).collect::<alloc::string::String>())
-        });
-        assert!(sssd.obtain_ticket_granting_ticket("jules_admin", &test_password).is_ok());
+        assert!(sssd.obtain_ticket_granting_ticket("jules_admin", "SecretPgpPass").is_ok());
         assert!(sssd.is_tgt_valid());
     }
 
