@@ -88,6 +88,13 @@ pub use void_runit::{
     RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
 };
 pub mod sovereign_distro_dominance;
+pub mod future_roadmap_innovations;
+
+pub use future_roadmap_innovations::{
+    ClusteredDevicePoolEngine, ClusteredPooledDevice, CryptographicBootChainEngine,
+    NetworkNativeSessionEngine, NetworkSessionState, PoolDeviceKind, ShardAppManifest,
+    ShardsMarketplaceEngine, TemporalFilesystemEngine, TemporalSnapshot,
+};
 
 pub use arch_parity::{
     AlpmDatabase, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
