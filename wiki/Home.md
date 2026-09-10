@@ -34,12 +34,12 @@
 - **AI Agent Data Operation Management Guide:** [[AI_AGENT_DATA_OPERATION_MANAGEMENT]] - Content-Addressed Storage DAG nodes, PQC data signing, transactional journaling, and Soft Updates for AI agents.
 - **AI Agent Zones Operation Management Guide:** [[AI_AGENT_ZONES_OPERATION_MANAGEMENT]] - Solaris container zones, VNIC networking, FreeBSD VM zones, and thermal power zones for AI agents.
 - **AI Agent C Language Elimination Guide:** [[AI_AGENT_C_LANGUAGE_ELIMINATION]] - C dependency reduction, malloc/free replacement, RAII memory safety, and pure Rust driver frameworks for AI agents.
+- **Arch Linux Wiki-Inspired Master Portal:** [[ARCH_WIKI_INSPIRED_SIGMAOS_MASTER_WIKI]] - Master technical navigation portal, hardware drivers, and architectural reference.
 - **Master Linux & BSD Distro Strategic Roadmap:** [[MASTER_LINUX_BSD_GAP_CLOSURE_STRATEGIC_PLAN]] - Master strategic plan, gap closure roadmap, 2026-2029+ timeline, and strategy to surpass Linux distros.
-- **Linux & BSD Distro Components & Engineering Guidelines:** [[LINUX_BSD_DISTRO_COMPONENTS_AND_GUIDELINES]] - Cross-subsystem Linux and BSD inspirations, component maps, and engineering guidelines.
-- **AI Agent Omarchy Navigation Management Guide:** [[AI_AGENT_OMARCHY_NAVIGATION_MANAGEMENT]] - Omarchy/Hyprland tiling layouts, window grouping, scratchpad overlays, and hotkeys for AI agents.
 - **AI Agent Universal Package Management Guide:** [[AI_AGENT_UNIVERSAL_PACKAGE_MANAGEMENT]] - Foreign package adapters (.deb, .rpm, PKGBUILD, ebuild, apk, hpkg), dependency canonicalization, and Universal PM for AI agents.
 - **AI Agent GitHub Workflows Management Guide:** [[AI_AGENT_GITHUB_WORKFLOWS_MANAGEMENT]] - CI/CD, multi-distro matrix, reproducible SBOMs, Cosign signing, and Pages auto-deploy workflows for AI agents.
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
+- **Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia (V23):** [[SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V23]] - Complete application, library, model, framework, codec, format, and dependency elimination guide.
 
 ---
 
@@ -113,7 +113,6 @@ Get started with SigmaOS through our comprehensive wiki:
 7. ⏳ Phase 7: v0.6 release preparation
 
 For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and [wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
->>>>>>> dc4e8ec4c6a64666adb44812235d1d650af69a5f
 
 ---
 
