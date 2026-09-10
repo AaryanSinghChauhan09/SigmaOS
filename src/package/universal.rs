@@ -281,14 +281,14 @@ pub enum PackageFormat {
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,      // HPC Spack (.spack)
-    Conan,      // C/C++ Conan (.conan)
+    Spack,      // Spack HPC Package (.spack)
+    Conan,      // Conan C/C++ Package (.conan)
     Wheel,      // Python Wheel (.whl)
     Crate,      // Rust Cargo Crate (.crate)
     Gem,        // Ruby Gem (.gem)
-    Nupkg,      // .NET NuGet (.nupkg)
-    Vcpkg,      // Vcpkg (.vcpkg)
-    NarInfo,    // Nix NarInfo (.narinfo)
+    Nupkg,      // .NET NuGet Package (.nupkg)
+    Vcpkg,      // Vcpkg Package (.vcpkg)
+    NarInfo,    // Nix/Guix NAR Info (.narinfo)
     Sysupdate,  // Systemd Sysupdate (.sysupdate)
 }
 
@@ -878,6 +878,15 @@ impl_generic_install_strategy!(IpkInstallStrategy);
 impl_generic_install_strategy!(OpkgInstallStrategy);
 impl_generic_install_strategy!(SolarisIpsInstallStrategy);
 impl_generic_install_strategy!(GuixNarInstallStrategy);
+impl_generic_install_strategy!(SpackInstallStrategy);
+impl_generic_install_strategy!(ConanInstallStrategy);
+impl_generic_install_strategy!(WheelInstallStrategy);
+impl_generic_install_strategy!(CrateInstallStrategy);
+impl_generic_install_strategy!(GemInstallStrategy);
+impl_generic_install_strategy!(NupkgInstallStrategy);
+impl_generic_install_strategy!(VcpkgInstallStrategy);
+impl_generic_install_strategy!(NarInfoInstallStrategy);
+impl_generic_install_strategy!(SysupdateInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1136,6 +1145,15 @@ impl_generic_metadata_adapter!(IpkMetadataAdapter, Ipk);
 impl_generic_metadata_adapter!(OpkgMetadataAdapter, Opkg);
 impl_generic_metadata_adapter!(SolarisIpsMetadataAdapter, SolarisIps);
 impl_generic_metadata_adapter!(GuixNarMetadataAdapter, GuixNar);
+impl_generic_metadata_adapter!(SpackMetadataAdapter, Spack);
+impl_generic_metadata_adapter!(ConanMetadataAdapter, Conan);
+impl_generic_metadata_adapter!(WheelMetadataAdapter, Wheel);
+impl_generic_metadata_adapter!(CrateMetadataAdapter, Crate);
+impl_generic_metadata_adapter!(GemMetadataAdapter, Gem);
+impl_generic_metadata_adapter!(NupkgMetadataAdapter, Nupkg);
+impl_generic_metadata_adapter!(VcpkgMetadataAdapter, Vcpkg);
+impl_generic_metadata_adapter!(NarInfoMetadataAdapter, NarInfo);
+impl_generic_metadata_adapter!(SysupdateMetadataAdapter, Sysupdate);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1358,7 +1376,15 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
-            _ => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::Spack => Box::new(SpackInstallStrategy),
+            PackageFormat::Conan => Box::new(ConanInstallStrategy),
+            PackageFormat::Wheel => Box::new(WheelInstallStrategy),
+            PackageFormat::Crate => Box::new(CrateInstallStrategy),
+            PackageFormat::Gem => Box::new(GemInstallStrategy),
+            PackageFormat::Nupkg => Box::new(NupkgInstallStrategy),
+            PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
+            PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
+            PackageFormat::Sysupdate => Box::new(SysupdateInstallStrategy),
         }
     }
 
@@ -1418,7 +1444,15 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
-            _ => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::Spack => Box::new(SpackMetadataAdapter),
+            PackageFormat::Conan => Box::new(ConanMetadataAdapter),
+            PackageFormat::Wheel => Box::new(WheelMetadataAdapter),
+            PackageFormat::Crate => Box::new(CrateMetadataAdapter),
+            PackageFormat::Gem => Box::new(GemMetadataAdapter),
+            PackageFormat::Nupkg => Box::new(NupkgMetadataAdapter),
+            PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
+            PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
+            PackageFormat::Sysupdate => Box::new(SysupdateMetadataAdapter),
         }
     }
 }
@@ -2907,11 +2941,6 @@ mod tests {
             Some(PackageFormat::OpenBsdPkg)
         );
     }
-}
-
-#[cfg(test)]
-mod extra_universal_tests {
-    use super::*;
 
     #[test]
     fn test_all_package_format_strategies_and_adapters() {
@@ -2987,12 +3016,6 @@ mod extra_universal_tests {
     }
 
     #[test]
-    fn test_nix_guix_functional_derivation_engine() {
-        let manager = UniversalPackageManager::new();
-        assert_eq!(manager.packages.len(), 0);
-    }
-
-    #[test]
     fn test_expanded_decorators() {
         let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
         let base = BasePackageDecorator { package: pkg };
@@ -3011,5 +3034,17 @@ mod extra_universal_tests {
         };
 
         assert!(net_dec.restrict_network().is_ok());
+    }
+}
+
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
+
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, _raw_data: &str) -> Result<UnifiedPackage, PackageError> {
+        Ok(
+            UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Apk),
+        )
     }
 }

@@ -172,14 +172,43 @@ impl NativeRustIsoBuilder {
     }
 }
 
+/// Native Safe Rust replacement for external shell execution (`/bin/sh` & `/bin/bash` dependency)
+pub struct NativeRustShellCommandExec {
+    pub command_name: String,
+    pub native_handling_active: bool,
+}
+
+impl NativeRustShellCommandExec {
+    pub fn new(cmd: &str) -> Self {
+        Self {
+            command_name: cmd.to_string(),
+            native_handling_active: true,
+        }
+    }
+
+    pub fn execute_native(&self, args: &[&str]) -> String {
+        format!("NativeRustShellExec[{}]: executed args {:?}", self.command_name, args)
+    }
+}
+
 /// Shell dependency reducer hub
 pub struct ShellDependencyReducer {
     pub iso_builder: NativeRustIsoBuilder,
+    pub exec_engine: NativeRustShellCommandExec,
 }
 
 impl ShellDependencyReducer {
     pub fn new() -> Self {
-        Self { iso_builder: NativeRustIsoBuilder::new() }
+        Self {
+            iso_builder: NativeRustIsoBuilder::new(),
+            exec_engine: NativeRustShellCommandExec::new("sigma_sh_native"),
+        }
+    }
+}
+
+impl Default for ShellDependencyReducer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

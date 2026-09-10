@@ -1,3 +1,9 @@
+//! SigmaOS Voice Recognition and Synthesis Module
+//!
+//! This module provides voice recognition (speech-to-text) and synthesis (text-to-speech)
+//! capabilities for the SigmaOS AI ecosystem, including local inference and AI integration.
+extern crate alloc;
+
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -12,13 +18,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-
-//! SigmaOS Voice Recognition and Synthesis Module
-//!
-//! This module provides voice recognition (speech-to-text) and synthesis (text-to-speech)
-//! capabilities for the SigmaOS AI ecosystem, including local inference and AI integration.
-extern crate alloc;
-
 use std::format;
 use std::vec;
 
@@ -439,6 +438,6 @@ impl WhisperGgufDecoder {
         if audio_data.is_empty() {
             return Err("Empty audio buffer");
         }
-        Ok(std::format!("System Voice Command: Transcribed {} bytes using Whisper GGUF 4-bit model", audio_data.len()))
+        Ok(alloc::format!("System Voice Command: Transcribed {} bytes using Whisper GGUF 4-bit model", audio_data.len()))
     }
 }

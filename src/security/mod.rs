@@ -23,15 +23,14 @@ pub mod vulnerability;
 pub mod hardening;
 pub mod deobfuscation;
 pub mod securelevels;
+pub mod audit;
+pub mod bsd_hardening;
+pub mod kali_components;
+pub mod kali_stack;
 pub mod pam;
+pub mod qubes_isolation;
+pub mod root_improvement;
 pub mod crypto_utils;
-pub mod publication_permissions;
-
-pub use publication_permissions::{
-    AppPermissionRecord, FineGrainedAccessControlMatrix, HardwarePeripheralBounds,
-    MatrixPolicyAction, PermissionGrantState, PortalPermissionScope,
-    SovereignPublicationInspiredPermissionEngine,
-};
 
 pub use kali_components::{
     HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,
