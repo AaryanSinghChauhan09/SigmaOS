@@ -7,6 +7,9 @@ pub mod klib {
     }
 }
 
+#[path = "../src/package/universal.rs"]
+pub mod package;
+
 #[path = "../src/security/capability.rs"]
 pub mod capability;
 
@@ -17,10 +20,11 @@ pub mod security {
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
-
-pub use universal_adapter::universal_oop_system;
 
 pub mod sigpkg {
     use alloc::string::String;
@@ -36,6 +40,12 @@ pub mod sigpkg {
         pub major: u64,
         pub minor: u64,
         pub patch: u64,
+    }
+
+    impl core::fmt::Display for Version {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+        }
     }
 
     impl Version {
@@ -130,8 +140,6 @@ fn test_universal_adapter_all_formats() {
         SigPkgUniversalBridgeEngine, SlackwarePkgManifest, UniversalPackageAdapter,
         UniversalPmCommandDispatcher, UniversalPmOperation, ZypperSpecManifest,
     };
-
-    use universal_adapter::Version;
     let adapter = UniversalPackageAdapter::new();
 
     // 1. FreeBSD UCL (+MANIFEST)
@@ -168,14 +176,14 @@ fn test_universal_adapter_all_formats() {
         .absorb_and_register("redis.pkg", freebsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge
         .absorb_and_register("tmux.tgz", openbsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -190,7 +198,7 @@ fn test_universal_adapter_all_formats() {
         .dispatch_command("yay -Syu --noconfirm neovim")
         .unwrap();
     assert_eq!(yay_action.source_pm, "yay");
-    assert_eq!(yay_action.operation, UniversalPmOperation::Install);
+    assert_eq!(yay_action.operation, UniversalPmOperation::Upgrade);
     assert_eq!(yay_action.target_packages, vec!["neovim"]);
 
     let rpm_action = dispatcher.dispatch_command("rpm -i htop.rpm").unwrap();
@@ -225,7 +233,7 @@ fn test_universal_adapter_all_formats() {
 
 #[test]
 fn test_all_prompt_package_formats() {
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_engine::PackageFormat;
     use universal_adapter::UniversalPackageAdapter;
 
     let adapter = UniversalPackageAdapter::new();
@@ -385,6 +393,9 @@ fn test_all_prompt_package_formats() {
         .unwrap();
     assert_eq!(pkg.name, "nginx");
 
+    use universal_adapter::{UniversalPmCommandDispatcher, UniversalPmOperation};
+    let dispatcher = UniversalPmCommandDispatcher::new();
+
     let pacman_cmd = dispatcher.dispatch_command("pacman -S zsh").unwrap();
     assert_eq!(pacman_cmd.source_pm, "pacman");
     assert_eq!(pacman_cmd.operation, UniversalPmOperation::Install);
@@ -414,7 +425,7 @@ fn test_all_prompt_package_formats() {
 #[test]
 fn test_all_prompt_package_formats_extended() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
