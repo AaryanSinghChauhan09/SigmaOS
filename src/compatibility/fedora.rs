@@ -958,7 +958,8 @@ impl FedoraFasAuthEngine {
             }
             self.token_counter += 1;
             let token = format!("fas_oidc_tok_{:08x}_{}", self.token_counter, username);
-            self.active_tokens.insert(token.clone(), username.to_string());
+            self.active_tokens
+                .insert(token.clone(), username.to_string());
             Ok(token)
         } else {
             Err("FAS Auth Failed: User not found in Fedora Account System")
@@ -986,7 +987,7 @@ impl Default for FedoraFasAuthEngine {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GreenwaveDecisionRule {
-    pub product_version: String, // e.g. "fedora-39"
+    pub product_version: String,        // e.g. "fedora-39"
     pub required_ci_tests: Vec<String>, // e.g. ["dist.rpmdeplint", "upgrades.rpmdeplint", "openQA.boot"]
 }
 
@@ -2805,7 +2806,10 @@ impl FedoraGettextL10nEngine {
     }
 
     pub fn gettext(&self, msgid: &str) -> String {
-        if let Some(catalog) = self.translation_catalogs.get(&self.current_locale.to_string()) {
+        if let Some(catalog) = self
+            .translation_catalogs
+            .get(&self.current_locale.to_string())
+        {
             if let Some(msgstr) = catalog.get(&msgid.to_string()) {
                 return msgstr.clone();
             }
@@ -3355,16 +3359,6 @@ pub struct TahrirMessagePost {
     pub fedmsg_dispatched: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TahrirMessagePost {
-    pub post_id: u64,
-    pub author_fas_username: String,
-    pub content: String,
-    pub hashtags: Vec<String>,
-    pub timestamp_secs: u64,
-    pub fedmsg_dispatched: bool,
-}
-
 /// Fedora Tahrir Microblogging & Developer Social Network System
 /// Provides developer status microblogging, hashtag indexing, FAS authentication integration,
 /// and automated status broadcast over Fedora Messaging.
@@ -3688,48 +3682,6 @@ impl Default for FedoraIgnitionEngine {
     }
 }
 
-/// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
-pub struct FedoraOfflineUpdateEngine {
-    pub is_offline_update_pending: bool,
-    pub trigger_reboot_flag: bool,
-    pub staged_packages: Vec<String>,
-}
-
-impl FedoraOfflineUpdateEngine {
-    pub fn new() -> Self {
-        Self {
-            is_offline_update_pending: false,
-            trigger_reboot_flag: false,
-            staged_packages: Vec::new(),
-        }
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
-    }
-}
-
-impl Default for FedoraOfflineUpdateEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // =========================================================================
 // Fedora Dracut Initramfs Builder Engine
 // =========================================================================
@@ -3962,7 +3914,10 @@ impl FedoraToolbxContainerEngine {
             if !c.running {
                 c.running = true;
             }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
+            Ok(format!(
+                "Toolbx '{}' executed command: '{}'",
+                c.name, command
+            ))
         } else {
             Err("Toolbx container not found")
         }
@@ -4384,10 +4339,16 @@ mod tests {
         assert_eq!(missing, vec!["openQA.boot"]);
 
         // Submit waiver for openQA.boot
-        gw.submit_waiver("nginx-1.24.0-1.fc39", "openQA.boot", "qa_lead", "Hardware test lab offline waiver");
+        gw.submit_waiver(
+            "nginx-1.24.0-1.fc39",
+            "openQA.boot",
+            "qa_lead",
+            "Hardware test lab offline waiver",
+        );
 
         // Now gating decision passes
-        let decision_after_waiver = gw.evaluate_gating_decision("fedora-39", "nginx-1.24.0-1.fc39", &passed);
+        let decision_after_waiver =
+            gw.evaluate_gating_decision("fedora-39", "nginx-1.24.0-1.fc39", &passed);
         assert!(decision_after_waiver.is_ok());
     }
 
@@ -5351,7 +5312,11 @@ mod tests {
     fn test_fedora_ignition_engine() {
         let mut ignition = FedoraIgnitionEngine::new();
         ignition.add_file("/etc/motd", "Welcome to Sovereign SigmaOS\n", 0o644);
-        ignition.add_user("sovereign", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."], &["wheel", "sudo"]);
+        ignition.add_user(
+            "sovereign",
+            &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."],
+            &["wheel", "sudo"],
+        );
 
         assert_eq!(ignition.files.len(), 1);
         assert_eq!(ignition.users.len(), 1);
@@ -5376,7 +5341,10 @@ mod tests {
             "gnome-shell",
             11,
             "SIGSEGV in st_widget_get_theme_node()",
-            &["#0 0x00007f1234 in st_widget_get_theme_node ()", "#1 0x00007f5678 in main ()"],
+            &[
+                "#0 0x00007f1234 in st_widget_get_theme_node ()",
+                "#1 0x00007f5678 in main ()",
+            ],
         );
 
         assert_eq!(report_id, 1);
@@ -5737,7 +5705,10 @@ impl Default for FedoraRPMSeccompFilterEngine {
         // 2. Pagu
         let mut pagu = FedoraPaguEngine::new();
         pagu.provision_account("jules_dev", "jules@fedora.org", &["packagers", "sysadmin"]);
-        assert_eq!(pagu.generate_oauth2_token("jules_dev"), Some("pagu-oauth2-token-jules_dev".to_string()));
+        assert_eq!(
+            pagu.generate_oauth2_token("jules_dev"),
+            Some("pagu-oauth2-token-jules_dev".to_string())
+        );
 
         // 3. Fedocal
         let mut cal = FedoraFedocalEngine::new();

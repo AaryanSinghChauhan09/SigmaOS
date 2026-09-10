@@ -2,6 +2,8 @@
 // Implements BSD-style security hardening features for SigmaOS
 // Inspired by OpenBSD, FreeBSD, DragonFly BSD, and HardenedBSD
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
