@@ -2,6 +2,12 @@ pub mod omarchy;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
+pub mod arch_missing_components;
+
+pub use arch_missing_components::{
+    AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAurWebRpcClient, ArchMakepkgEngine,
+    ArchNamcapLinterEngine, AurRpcResult, NamcapIssue, NamcapSeverity, PkgBuildSpec,
+};
 
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
@@ -245,14 +251,4 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
     SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
     SovereignXdpCarpMeshEngine,
-};
-
-pub mod sovereign_ahead_distro_supremacy;
-pub use sovereign_ahead_distro_supremacy::{
-    DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchTier, PredictiveSchedPolicy,
-    PredictiveTaskDescriptor, ResilientBlockEntry, SecurityMultiOsMask, SimdJitFunctionTarget,
-    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine,
-    SovereignOmniCasStoreEngine, SovereignPredictiveSchedExtEngine,
-    SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
-    SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
 };
