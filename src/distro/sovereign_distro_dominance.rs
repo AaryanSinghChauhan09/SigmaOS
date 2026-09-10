@@ -836,6 +836,263 @@ impl FreeBsdBhyveMicrovmJailBridge {
     }
 }
 
+// ============================================================================
+// 11. Clear Linux Inspired Stateless Architecture & ISA Level Optimizer
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum X86MicroarchIsaLevel {
+    V1Basics,
+    V2Sse42,
+    V3Avx2,
+    V4Avx512Avx10,
+}
+
+pub struct SovereignStatelessIsaOptimizer {
+    pub detected_isa: X86MicroarchIsaLevel,
+    pub vendor_defaults_dir: String,
+    pub etc_override_dir: String,
+    pub stateless_configs: BTreeMap<String, String>,
+}
+
+impl SovereignStatelessIsaOptimizer {
+    pub fn new(detected_isa: X86MicroarchIsaLevel) -> Self {
+        let mut optimizer = Self {
+            detected_isa,
+            vendor_defaults_dir: String::from("/usr/share/defaults"),
+            etc_override_dir: String::from("/etc"),
+            stateless_configs: BTreeMap::new(),
+        };
+
+        optimizer.stateless_configs.insert(
+            String::from("/etc/system.conf"),
+            String::from("DEFAULT_PREEMPT=full\nDEFAULT_SIMD=avx512\n"),
+        );
+        optimizer.stateless_configs.insert(
+            String::from("/usr/share/defaults/system.conf"),
+            String::from("DEFAULT_PREEMPT=full\nDEFAULT_SIMD=v1\n"),
+        );
+
+        optimizer
+    }
+
+    /// Resolves configuration path using Clear Linux stateless fallback logic: /etc override -> /usr/share/defaults fallback
+    pub fn resolve_stateless_config(&self, config_path: &str) -> Option<&str> {
+        if let Some(cfg) = self.stateless_configs.get(config_path) {
+            Some(cfg.as_str())
+        } else if !config_path.starts_with("/usr/share/defaults") {
+            let fallback_path = format!("/usr/share/defaults{}", config_path.trim_start_matches("/etc"));
+            self.stateless_configs.get(&fallback_path).map(|s| s.as_str())
+        } else {
+            None
+        }
+    }
+
+    /// Selects optimal SIMD vector dispatch function pointer based on CPU ISA level
+    pub fn select_simd_vector_kernel(&self) -> &'static str {
+        match self.detected_isa {
+            X86MicroarchIsaLevel::V4Avx512Avx10 => "kernel_avx512_avx10_optimized",
+            X86MicroarchIsaLevel::V3Avx2 => "kernel_avx2_fma_optimized",
+            X86MicroarchIsaLevel::V2Sse42 => "kernel_sse42_popcnt_optimized",
+            X86MicroarchIsaLevel::V1Basics => "kernel_x86_64_generic_baseline",
+        }
+    }
+}
+
+// ============================================================================
+// 12. OpenBSD & FreeBSD Hybrid Sandboxing & Descriptor Capability Rights Guard
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct HybridSandboxRule {
+    pub pledge_promise: String,
+    pub unveil_path: String,
+    pub unveil_perms: String,
+    pub capsicum_mask: u32,
+}
+
+pub struct SovereignHybridSandboxingGuard {
+    pub process_rules: BTreeMap<usize, HybridSandboxRule>,
+    pub audited_violations_count: u64,
+}
+
+impl SovereignHybridSandboxingGuard {
+    pub fn new() -> Self {
+        Self {
+            process_rules: BTreeMap::new(),
+            audited_violations_count: 0,
+        }
+    }
+
+    pub fn attach_hybrid_sandbox(
+        &mut self,
+        pid: usize,
+        pledge: &str,
+        unveil_path: &str,
+        unveil_perms: &str,
+        capsicum_mask: u32,
+    ) {
+        let rule = HybridSandboxRule {
+            pledge_promise: pledge.to_string(),
+            unveil_path: unveil_path.to_string(),
+            unveil_perms: unveil_perms.to_string(),
+            capsicum_mask,
+        };
+        self.process_rules.insert(pid, rule);
+    }
+
+    pub fn attest_syscall_execution(
+        &mut self,
+        pid: usize,
+        promise_req: &str,
+        path_req: &str,
+        requested_right: u32,
+    ) -> bool {
+        if let Some(rule) = self.process_rules.get(&pid) {
+            let pledge_ok = rule.pledge_promise.contains(promise_req);
+            let unveil_ok = path_req.starts_with(&rule.unveil_path);
+            let capsicum_ok = (rule.capsicum_mask & requested_right) == requested_right;
+
+            if pledge_ok && unveil_ok && capsicum_ok {
+                true
+            } else {
+                self.audited_violations_count += 1;
+                false
+            }
+        } else {
+            true // Unrestricted process by default
+        }
+    }
+}
+
+impl Default for SovereignHybridSandboxingGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 13. NixOS & GNU Guix Generational Store Reconciler
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct StoreGenerationRecord {
+    pub generation_id: usize,
+    pub active_packages: Vec<String>,
+    pub profile_symlink: String,
+}
+
+pub struct SovereignGenerationalStoreReconciler {
+    pub current_generation: usize,
+    pub generations: Vec<StoreGenerationRecord>,
+}
+
+impl SovereignGenerationalStoreReconciler {
+    pub fn new() -> Self {
+        let mut reconciler = Self {
+            current_generation: 1,
+            generations: Vec::new(),
+        };
+        reconciler.generations.push(StoreGenerationRecord {
+            generation_id: 1,
+            active_packages: vec![String::from("sigma-core-1.0"), String::from("glibc-2.38")],
+            profile_symlink: String::from("/nix/var/nix/profiles/system-1-link"),
+        });
+        reconciler
+    }
+
+    pub fn commit_new_generation(&mut self, new_packages: &[&str]) -> usize {
+        self.current_generation += 1;
+        let gen_id = self.current_generation;
+        let rec = StoreGenerationRecord {
+            generation_id: gen_id,
+            active_packages: new_packages.iter().map(|s| s.to_string()).collect(),
+            profile_symlink: format!("/nix/var/nix/profiles/system-{}-link", gen_id),
+        };
+        self.generations.push(rec);
+        gen_id
+    }
+
+    pub fn rollback_to_generation(&mut self, target_gen_id: usize) -> Result<usize, &'static str> {
+        if self.generations.iter().any(|g| g.generation_id == target_gen_id) {
+            self.current_generation = target_gen_id;
+            Ok(self.current_generation)
+        } else {
+            Err("Target generation not found in store history")
+        }
+    }
+}
+
+impl Default for SovereignGenerationalStoreReconciler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 14. FreeBSD ZFS & DragonFly BSD HAMMER2 Hybrid Boot Environment CoW Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct HybridBootEnv {
+    pub env_name: String,
+    pub zfs_dataset: String,
+    pub hammer2_pfs_root: String,
+    pub is_active: bool,
+}
+
+pub struct SovereignHybridCowBootEnvEngine {
+    pub boot_environments: Vec<HybridBootEnv>,
+    pub active_env_name: String,
+}
+
+impl SovereignHybridCowBootEnvEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            boot_environments: Vec::new(),
+            active_env_name: String::from("default"),
+        };
+        engine.boot_environments.push(HybridBootEnv {
+            env_name: String::from("default"),
+            zfs_dataset: String::from("rpool/ROOT/default"),
+            hammer2_pfs_root: String::from("@root.default"),
+            is_active: true,
+        });
+        engine
+    }
+
+    pub fn create_boot_environment(&mut self, name: &str) -> Result<(), &'static str> {
+        if self.boot_environments.iter().any(|b| b.env_name == name) {
+            return Err("Boot environment already exists");
+        }
+        self.boot_environments.push(HybridBootEnv {
+            env_name: name.to_string(),
+            zfs_dataset: format!("rpool/ROOT/{}", name),
+            hammer2_pfs_root: format!("@root.{}", name),
+            is_active: false,
+        });
+        Ok(())
+    }
+
+    pub fn activate_boot_environment(&mut self, name: &str) -> Result<(), &'static str> {
+        let exists = self.boot_environments.iter().any(|b| b.env_name == name);
+        if !exists {
+            return Err("Boot environment not found");
+        }
+        for be in self.boot_environments.iter_mut() {
+            be.is_active = be.env_name == name;
+        }
+        self.active_env_name = name.to_string();
+        Ok(())
+    }
+}
+
+impl Default for SovereignHybridCowBootEnvEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Default for FreeBsdBhyveMicrovmJailBridge {
     fn default() -> Self {
         Self::new()
@@ -1134,6 +1391,63 @@ mod tests {
         doas.add_rule("user", false, true);
         assert!(doas.evaluate_privilege("root"));
         assert!(!doas.evaluate_privilege("user"));
+    }
+
+    #[test]
+    fn test_sovereign_stateless_isa_optimizer() {
+        let opt_v4 = SovereignStatelessIsaOptimizer::new(X86MicroarchIsaLevel::V4Avx512Avx10);
+        assert_eq!(opt_v4.select_simd_vector_kernel(), "kernel_avx512_avx10_optimized");
+
+        let opt_v1 = SovereignStatelessIsaOptimizer::new(X86MicroarchIsaLevel::V1Basics);
+        assert_eq!(opt_v1.select_simd_vector_kernel(), "kernel_x86_64_generic_baseline");
+
+        assert_eq!(
+            opt_v4.resolve_stateless_config("/etc/system.conf"),
+            Some("DEFAULT_PREEMPT=full\nDEFAULT_SIMD=avx512\n")
+        );
+        assert_eq!(
+            opt_v4.resolve_stateless_config("/etc/nonexistent.conf"),
+            None
+        );
+    }
+
+    #[test]
+    fn test_sovereign_hybrid_sandboxing_guard() {
+        let mut guard = SovereignHybridSandboxingGuard::new();
+        guard.attach_hybrid_sandbox(2001, "stdio rpath", "/var/app", "r", 0x01);
+
+        assert!(guard.attest_syscall_execution(2001, "stdio", "/var/app/data.txt", 0x01));
+        assert!(!guard.attest_syscall_execution(2001, "exec", "/var/app/data.txt", 0x01));
+        assert!(!guard.attest_syscall_execution(2001, "stdio", "/etc/shadow", 0x01));
+        assert!(!guard.attest_syscall_execution(2001, "stdio", "/var/app/data.txt", 0x02));
+        assert_eq!(guard.audited_violations_count, 3);
+    }
+
+    #[test]
+    fn test_sovereign_generational_store_reconciler() {
+        let mut reconciler = SovereignGenerationalStoreReconciler::new();
+        assert_eq!(reconciler.current_generation, 1);
+
+        let gen2 = reconciler.commit_new_generation(&["sigma-core-1.1", "glibc-2.39", "zsh-5.9"]);
+        assert_eq!(gen2, 2);
+        assert_eq!(reconciler.current_generation, 2);
+
+        assert!(reconciler.rollback_to_generation(1).is_ok());
+        assert_eq!(reconciler.current_generation, 1);
+        assert!(reconciler.rollback_to_generation(99).is_err());
+    }
+
+    #[test]
+    fn test_sovereign_hybrid_cow_boot_env_engine() {
+        let mut boot_env = SovereignHybridCowBootEnvEngine::new();
+        assert_eq!(boot_env.active_env_name, "default");
+
+        assert!(boot_env.create_boot_environment("be-upgrade-6.6").is_ok());
+        assert!(boot_env.create_boot_environment("be-upgrade-6.6").is_err()); // duplicate name
+
+        assert!(boot_env.activate_boot_environment("be-upgrade-6.6").is_ok());
+        assert_eq!(boot_env.active_env_name, "be-upgrade-6.6");
+        assert!(boot_env.activate_boot_environment("nonexistent").is_err());
     }
 }
 
