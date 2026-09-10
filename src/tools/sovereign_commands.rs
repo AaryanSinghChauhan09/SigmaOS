@@ -672,8 +672,56 @@ impl SovereignOpenBsdDoas {
         }
     }
 
+    /// Safely parses and evaluates a doas rule against user identity and command.
+    /// Prevents substring authorization bypasses and enforces command path restrictions.
+    fn rule_permits(&self, rule: &str, user: &str, command: &str) -> bool {
+        let tokens: Vec<&str> = rule.split_whitespace().collect();
+        if tokens.first() != Some(&"permit") {
+            return false;
+        }
+
+        // Skip rule option keywords
+        let mut idx = 1;
+        while idx < tokens.len() && (tokens[idx] == "nopass" || tokens[idx] == "keepenv") {
+            idx += 1;
+        }
+        if idx >= tokens.len() {
+            return false;
+        }
+
+        // Validate identity (user or :group)
+        let identity = tokens[idx];
+        let identity_matched = if let Some(group) = identity.strip_prefix(':') {
+            user == group
+        } else {
+            user == identity
+        };
+
+        if !identity_matched {
+            return false;
+        }
+
+        // Validate optional `cmd <command>` constraint
+        if let Some(cmd_pos) = tokens.iter().position(|&t| t == "cmd") {
+            if let Some(&allowed_cmd) = tokens.get(cmd_pos + 1) {
+                let cmd_name = allowed_cmd.rsplit('/').next().unwrap_or(allowed_cmd);
+                let req_cmd = command.split_whitespace().next().unwrap_or(command);
+                let req_name = req_cmd.rsplit('/').next().unwrap_or(req_cmd);
+                if req_cmd != allowed_cmd && req_name != cmd_name {
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
+
     pub fn execute_doas(&self, user: &str, command: &str) -> Result<String, String> {
-        let is_allowed = user == "sovereign" || user == "root" || self.permitted_rules.iter().any(|r| r.contains(user));
+        let is_allowed = user == "root"
+            || self
+                .permitted_rules
+                .iter()
+                .any(|r| self.rule_permits(r, user, command));
         if is_allowed {
             Ok(format!("[doas] Executing '{}' as root for user '{}'", command, user))
         } else {
@@ -806,6 +854,14 @@ mod tests {
 
         let denied = doas.execute_doas("guest", "rm -rf /");
         assert!(denied.is_err());
+
+        // Security unit tests: ensure substring matches cannot bypass doas authorization
+        assert!(doas.execute_doas("eve", "rm -rf /").is_err());
+        assert!(doas.execute_doas("permit", "rm -rf /").is_err());
+        assert!(doas.execute_doas("keepenv", "rm -rf /").is_err());
+
+        // Security unit tests: ensure command constraints (cmd /bin/sigma-pkg) block unauthorized commands
+        assert!(doas.execute_doas("sovereign", "rm -rf /").is_err());
 
         assert!(doas.validate_doas_rule_with_args("sovereign", "root", "sigma-pkg", &["upgrade", "--yes"]).unwrap());
         assert!(doas.validate_doas_rule_with_args("guest", "root", "rm", &["-rf", "/"]).is_err());
