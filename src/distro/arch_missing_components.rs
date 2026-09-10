@@ -207,12 +207,15 @@ impl ArchNamcapLinterEngine {
                     message: format!("File {} violates Arch Linux FHS policy by installing into /usr/local", path),
                 });
             } else if path.starts_with("etc/") || path.starts_with("/etc/") {
-                if !path.ends_with(".conf") && !path.contains('/') {
-                    issues.push(NamcapIssue {
-                        rule: String::from("etc-unorganized"),
-                        severity: NamcapSeverity::Warning,
-                        message: format!("Config file {} should be organized under a subfolder in /etc", path),
-                    });
+                let rel_path = path.trim_start_matches('/');
+                if let Some(sub_path) = rel_path.strip_prefix("etc/") {
+                    if !sub_path.contains('/') {
+                        issues.push(NamcapIssue {
+                            rule: String::from("etc-unorganized"),
+                            severity: NamcapSeverity::Warning,
+                            message: format!("Config file {} should be organized under a subfolder in /etc", path),
+                        });
+                    }
                 }
             }
         }

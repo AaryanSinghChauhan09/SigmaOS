@@ -2,7 +2,10 @@
 // SigmaOS BSD & Linux Innovations Subsystem
 // Inspired by OpenBSD/FreeBSD PF, DragonFly BSD HAMMER2, Void Linux runit, and Parrot OS AnonSurf
 
+#[cfg(not(test))]
 use alloc::vec::Vec;
+#[cfg(test)]
+use std::vec::Vec;
 
 // ============================================================================
 // 1. OpenBSD / FreeBSD PF (Packet Filter) Stateful Firewall
@@ -167,6 +170,46 @@ impl DragonFlyHammerFs {
 impl Default for DragonFlyHammerFs {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ============================================================================
+// 7. Alpine Linux Volatile Tmpfs Rootfs RAM Overlay Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct AlpineApkVolatileTmpfsOverlayEngine {
+    pub tmpfs_size_bytes: usize,
+    pub is_overlay_active: bool,
+    pub committed_packages: Vec<&'static str>,
+}
+
+impl AlpineApkVolatileTmpfsOverlayEngine {
+    pub fn new(tmpfs_size_bytes: usize) -> Self {
+        Self {
+            tmpfs_size_bytes,
+            is_overlay_active: true,
+            committed_packages: Vec::new(),
+        }
+    }
+
+    pub fn commit_package_overlay(&mut self, pkg_name: &'static str) -> bool {
+        if !self.committed_packages.contains(&pkg_name) {
+            self.committed_packages.push(pkg_name);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_committed_package_count(&self) -> usize {
+        self.committed_packages.len()
+    }
+}
+
+impl Default for AlpineApkVolatileTmpfsOverlayEngine {
+    fn default() -> Self {
+        Self::new(512 * 1024 * 1024)
     }
 }
 
@@ -927,6 +970,14 @@ mod tests {
         let region_id = bridge.map_dax_region(1, 0x100000000, 256);
         assert_eq!(region_id, 1);
         assert_eq!(bridge.get_mapped_region_count(), 1);
+    }
+
+    #[test]
+    fn test_alpine_apk_volatile_tmpfs_overlay() {
+        let mut overlay = AlpineApkVolatileTmpfsOverlayEngine::new(1024 * 1024 * 1024);
+        assert!(overlay.is_overlay_active);
+        assert!(overlay.commit_package_overlay("htop"));
+        assert_eq!(overlay.get_committed_package_count(), 1);
     }
 
     #[test]
