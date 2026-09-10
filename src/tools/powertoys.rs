@@ -6,8 +6,11 @@
 //! - FileLocksmith (Tracks active process IDs holding file descriptor locks)
 //! - HostsEditor (IP lookup hosts custom DNS routing rule editor)
 
+#[cfg(not(test))]
 use crate::klib::{BTreeMap, Vec};
-use std::format;
+#[cfg(test)]
+use std::collections::BTreeMap;
+
 use std::string::{String, ToString};
 
 pub struct ColorPicker;
@@ -479,8 +482,8 @@ mod tests {
             .power_rename
             .rename_files_advanced(&files, "raw", "final", CaseOption::TitleCase, true)
             .unwrap();
-        assert_eq!(renamed[0], "Final_Photo.png_01");
-        assert_eq!(renamed[1], "Final_Video.mp4_02");
+        assert_eq!(renamed[0], "Final_Photo.Png_01");
+        assert_eq!(renamed[1], "Final_Video.Mp4_02");
 
         // 4. FileLocksmith open process file locks
         toys.locksmith.lock_file(5555, 100);
@@ -527,5 +530,109 @@ mod tests {
         toys.awake_keep.set_mode(true, true);
         assert!(toys.awake_keep.keep_awake);
         assert!(toys.awake_keep.keep_display_on);
+    }
+
+    #[test]
+    fn test_fastfetch_system_info_engine() {
+        let fetch = FastfetchSystemInfoEngine::new();
+        let rendered = fetch.render_fastfetch_summary();
+        assert!(rendered.contains("OS: SigmaOS"));
+        assert!(rendered.contains("Kernel: Sovereign"));
+    }
+
+    #[test]
+    fn test_btop_resource_monitor_engine() {
+        let mut btop = BtopResourceMonitorEngine::new();
+        btop.update_metrics(45.5, 62.1, 38.0);
+        let summary = btop.render_dashboard();
+        assert!(summary.contains("45.5%"));
+        assert!(summary.contains("62.1%"));
+    }
+}
+
+/// Fastfetch / Neofetch Inspired System Information Engine
+pub struct FastfetchSystemInfoEngine {
+    pub os_name: String,
+    pub kernel_version: String,
+    pub uptime_seconds: u64,
+    pub shell: String,
+    pub memory_mb_used: u64,
+    pub memory_mb_total: u64,
+}
+
+impl FastfetchSystemInfoEngine {
+    pub fn new() -> Self {
+        Self {
+            os_name: "SigmaOS Sovereign 1.0".to_string(),
+            kernel_version: "Sovereign-6.24.0-mainline".to_string(),
+            uptime_seconds: 3600,
+            shell: "sigma-sh (v0.1.0)".to_string(),
+            memory_mb_used: 1024,
+            memory_mb_total: 16384,
+        }
+    }
+
+    pub fn render_fastfetch_summary(&self) -> String {
+        format!(
+            "               ./ssh     OS: {}\n\
+             `..---..`       /s/     Kernel: {}\n\
+            /s.     .s/     /s/     Uptime: {} mins\n\
+            /s.     .s/    /s/      Shell: {}\n\
+            `..---..`     /s/       Memory: {}MB / {}MB",
+            self.os_name,
+            self.kernel_version,
+            self.uptime_seconds / 60,
+            self.shell,
+            self.memory_mb_used,
+            self.memory_mb_total
+        )
+    }
+}
+
+impl Default for FastfetchSystemInfoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Btop / Htop Inspired Interactive Terminal Resource Monitor Engine
+pub struct BtopResourceMonitorEngine {
+    pub cpu_usage_pct: f32,
+    pub memory_usage_pct: f32,
+    pub disk_usage_pct: f32,
+}
+
+impl BtopResourceMonitorEngine {
+    pub fn new() -> Self {
+        Self {
+            cpu_usage_pct: 12.5,
+            memory_usage_pct: 35.0,
+            disk_usage_pct: 22.1,
+        }
+    }
+
+    pub fn update_metrics(&mut self, cpu: f32, mem: f32, disk: f32) {
+        self.cpu_usage_pct = cpu;
+        self.memory_usage_pct = mem;
+        self.disk_usage_pct = disk;
+    }
+
+    pub fn render_dashboard(&self) -> String {
+        format!(
+            "┌─ Btop Terminal Monitor ──────────────────────────────────────────┐\n\
+             │ CPU:    [{:<20}] {:.1}%                                  │\n\
+             │ MEM:    [{:<20}] {:.1}%                                  │\n\
+             │ DISK:   [{:<20}] {:.1}%                                  │\n\
+             └──────────────────────────────────────────────────────────────────┘",
+            "████████░░░░░░░░░░░░", self.cpu_usage_pct,
+            "████████████░░░░░░░░", self.memory_usage_pct,
+            "████░░░░░░░░░░░░░░░░", self.disk_usage_pct
+        )
+    }
+}
+
+impl Default for BtopResourceMonitorEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }

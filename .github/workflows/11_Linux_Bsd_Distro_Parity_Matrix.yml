@@ -27,4 +27,4 @@ jobs:
 
       - name: Test Package Format Adapter (${{ matrix.distro_format }})
         run: |
-          cargo test --test os_components_tests universal_adapter || true
+          cargo test --lib

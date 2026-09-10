@@ -1431,4 +1431,85 @@ mod replicated_tests {
         );
         assert_eq!(pipeline.deployed_systems_count, 4);
     }
+
+    #[test]
+    fn test_ripgrep_fast_search_engine() {
+        let mut rg = RipgrepFastSearchEngine::new();
+        rg.index_file("src/main.rs", "fn main() { println!(\"Hello\"); }");
+        let matches = rg.search("main");
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].0, "src/main.rs");
+    }
+
+    #[test]
+    fn test_bat_syntax_highlighter_engine() {
+        let bat = BatSyntaxHighlighterEngine::new();
+        let highlighted = bat.render_file("main.rs", "fn main() {}");
+        assert!(highlighted.contains("fn main() {}"));
+        assert!(highlighted.contains("File: main.rs"));
+    }
+}
+
+/// Ripgrep / Fd Inspired Fast File Content Search Engine
+pub struct RipgrepMatch {
+    pub file_path: String,
+    pub line_number: usize,
+    pub line_content: String,
+}
+
+pub struct RipgrepFastSearchEngine {
+    pub indexed_files: HashMap<String, String>,
+}
+
+impl RipgrepFastSearchEngine {
+    pub fn new() -> Self {
+        Self {
+            indexed_files: HashMap::new(),
+        }
+    }
+
+    pub fn index_file(&mut self, file_path: &str, content: &str) {
+        self.indexed_files.insert(file_path.to_string(), content.to_string());
+    }
+
+    pub fn search(&self, pattern: &str) -> Vec<(String, usize, String)> {
+        let mut results = Vec::new();
+        for (path, content) in &self.indexed_files {
+            for (line_idx, line) in content.lines().enumerate() {
+                if line.contains(pattern) {
+                    results.push((path.clone(), line_idx + 1, line.to_string()));
+                }
+            }
+        }
+        results
+    }
+}
+
+impl Default for RipgrepFastSearchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Bat / Cat Inspired Syntax Highlighting and Line Gutter Renderer
+pub struct BatSyntaxHighlighterEngine;
+
+impl BatSyntaxHighlighterEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn render_file(&self, filename: &str, content: &str) -> String {
+        let mut output = format!("─────── File: {} ───────\n", filename);
+        for (idx, line) in content.lines().enumerate() {
+            output.push_str(&format!("│ {:>2} │ {}\n", idx + 1, line));
+        }
+        output
+    }
+}
+
+impl Default for BatSyntaxHighlighterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }

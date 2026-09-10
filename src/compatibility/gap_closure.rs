@@ -12,6 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use std::collections::HashMap;
 use std::vec;
 
 // SigmaOS Absolute Parity & Gap-Closure Subsystem (SigmaGapClosure)
@@ -1223,5 +1224,88 @@ mod tests {
         let leapfrogs = engine.query_leapfrog_innovations();
         assert_eq!(leapfrogs.len(), 6);
         assert!(leapfrogs.contains(&"Predictive VM"));
+    }
+
+    #[test]
+    fn test_freebsd_capsicum_guard() {
+        let mut caps = FreeBsdCapsicumGuard::new();
+        caps.enter_capability_mode();
+        assert!(caps.is_capability_mode);
+        caps.grant_right(3, "CAP_READ");
+        assert!(caps.check_right(3, "CAP_READ"));
+        assert!(!caps.check_right(3, "CAP_WRITE"));
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_emergency_cow() {
+        let mut hammer2 = DragonFlyHammer2EmergencyCowEngine::new();
+        let snap_id = hammer2.create_pfs_snapshot("ROOT_SNAPSHOT_01");
+        assert!(snap_id.contains("ROOT_SNAPSHOT_01"));
+        assert_eq!(hammer2.active_pfs_snapshots.len(), 1);
+    }
+}
+
+/// FreeBSD Capsicum Capability Mode Sandboxing Guard
+pub struct FreeBsdCapsicumGuard {
+    pub is_capability_mode: bool,
+    pub descriptor_rights: HashMap<i32, Vec<String>>,
+}
+
+impl FreeBsdCapsicumGuard {
+    pub fn new() -> Self {
+        Self {
+            is_capability_mode: false,
+            descriptor_rights: HashMap::new(),
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.is_capability_mode = true;
+    }
+
+    pub fn grant_right(&mut self, fd: i32, right: &str) {
+        self.descriptor_rights
+            .entry(fd)
+            .or_default()
+            .push(right.to_string());
+    }
+
+    pub fn check_right(&self, fd: i32, right: &str) -> bool {
+        if let Some(rights) = self.descriptor_rights.get(&fd) {
+            rights.iter().any(|r: &String| r == right)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FreeBsdCapsicumGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// DragonFly BSD HAMMER2 Emergency Copy-on-Write Snapshot Engine
+pub struct DragonFlyHammer2EmergencyCowEngine {
+    pub active_pfs_snapshots: Vec<String>,
+}
+
+impl DragonFlyHammer2EmergencyCowEngine {
+    pub fn new() -> Self {
+        Self {
+            active_pfs_snapshots: Vec::new(),
+        }
+    }
+
+    pub fn create_pfs_snapshot(&mut self, label: &str) -> String {
+        let snap_id = format!("HAMMER2_PFS_{}", label);
+        self.active_pfs_snapshots.push(snap_id.clone());
+        snap_id
+    }
+}
+
+impl Default for DragonFlyHammer2EmergencyCowEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }

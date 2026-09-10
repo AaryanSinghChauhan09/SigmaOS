@@ -23,4 +23,4 @@ jobs:
 
       - name: Test Deepin DDE Dock
         run: |
-          cargo test --test os_components_tests deepin || true
+          cargo test --lib

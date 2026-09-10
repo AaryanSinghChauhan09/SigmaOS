@@ -1,4 +1,3 @@
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -1669,8 +1668,16 @@ impl ShellRepl {
             // Accessibility
             ShellCommand::A11ySet { setting, enabled } => {
                 #[cfg(not(test))]
+                let feature = match setting.to_lowercase().as_str() {
+                    "high_contrast" | "highcontrast" => AccessibilityFeature::HighContrast,
+                    "screen_reader" | "screenreader" => AccessibilityFeature::ScreenReader,
+                    "magnifier" => AccessibilityFeature::Magnifier,
+                    "sticky_keys" | "stickykeys" => AccessibilityFeature::StickyKeys,
+                    _ => AccessibilityFeature::ScreenReader,
+                };
+                #[cfg(not(test))]
                 let s = AccessibilitySetting {
-                    feature: AccessibilityFeature::ScreenReader,
+                    feature,
                     enabled,
                     intensity: 1.0,
                     custom_params: std::collections::BTreeMap::new(),
@@ -1764,7 +1771,16 @@ impl ShellRepl {
             ShellCommand::VmCreate { name, tech } => {
                 let id = format!("vm-{}", name.to_lowercase());
                 #[cfg(not(test))]
-                let mut vm = VirtualMachine::new(id.clone(), name.clone(), VirtualizationTech::QemuKvm).with_resources(4, 4096, 40);
+                let v_tech = match tech.to_lowercase().as_str() {
+                    "docker" => VirtualizationTech::Docker,
+                    "podman" => VirtualizationTech::Podman,
+                    "lxc" => VirtualizationTech::Lxc,
+                    "xen" => VirtualizationTech::Xen,
+                    "bhyve" => VirtualizationTech::Bhyve,
+                    _ => VirtualizationTech::QemuKvm,
+                };
+                #[cfg(not(test))]
+                let mut vm = VirtualMachine::new(id.clone(), name.clone(), v_tech).with_resources(4, 4096, 40);
                 #[cfg(test)]
                 let mut vm = VirtualMachine::new(id.clone(), name.clone(), tech).with_resources(4, 4096, 40);
                 vm.start().unwrap();
@@ -1797,7 +1813,21 @@ impl ShellRepl {
             // Cross-Platform Compatibility Layer (Wine / Rosetta equivalent)
             ShellCommand::PlatformRun { name, platform, format } => {
                 #[cfg(not(test))]
-                let mut bin = ApplicationBinary::new(name.clone(), BinaryFormat::Elf64, TargetPlatform::Linux);
+                let b_format = match format.to_lowercase().as_str() {
+                    "exe" | "pe" | "pe32" | "pe32plus" => BinaryFormat::Pe32Plus,
+                    "macho" | "dmg" => BinaryFormat::MachO64,
+                    "wasm" => BinaryFormat::Wasm32,
+                    _ => BinaryFormat::Elf64,
+                };
+                #[cfg(not(test))]
+                let t_platform = match platform.to_lowercase().as_str() {
+                    "windows" | "win32" | "win64" => TargetPlatform::Windows,
+                    "macos" | "darwin" => TargetPlatform::MacOs,
+                    "android" => TargetPlatform::Android,
+                    _ => TargetPlatform::Linux,
+                };
+                #[cfg(not(test))]
+                let mut bin = ApplicationBinary::new(name.clone(), b_format, t_platform);
                 #[cfg(test)]
                 let mut bin = ApplicationBinary::new(name.clone(), format, platform);
                 self.compatibility.auto_configure_binary(&mut bin);

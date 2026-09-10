@@ -26,8 +26,13 @@ jobs:
       - name: Scan for Quantum-Vulnerable Cryptographic Keys
         run: |
           echo "Scanning codebase for hardcoded cryptographic keys and weak RSA/ECC signatures..."
-          grep -rn -E "(BEGIN RSA PRIVATE KEY|BEGIN EC PRIVATE KEY|BEGIN PRIVATE KEY)" . || echo "Zero hardcoded private keys detected."
+          if grep -rn -E "(BEGIN RSA PRIVATE KEY|BEGIN EC PRIVATE KEY|BEGIN PRIVATE KEY)" . ; then
+            echo "ERROR: Hardcoded private keys detected in codebase!"
+            exit 1
+          else
+            echo "Zero hardcoded private keys detected."
+          fi
 
       - name: Verify Post-Quantum Dilithium-5 Signature Compliance
         run: |
-          cargo test --test os_components_tests pqc_dilithium || true
+          cargo test --lib

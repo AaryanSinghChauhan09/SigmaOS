@@ -23,4 +23,4 @@ jobs:
 
       - name: Test System76 Power Governor
         run: |
-          cargo test --test os_components_tests system76 || true
+          cargo test --lib

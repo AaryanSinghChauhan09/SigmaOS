@@ -2,7 +2,6 @@
 extern crate alloc as std_alloc;
 use std::boxed::Box;
 
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec as StdVec;
 

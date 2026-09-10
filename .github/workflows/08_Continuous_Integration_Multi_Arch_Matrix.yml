@@ -32,4 +32,4 @@ jobs:
 
       - name: Run Cross-Compilation Check
         run: |
-          cargo check --target ${{ matrix.target }} --no-default-features || true
+          cargo check --target ${{ matrix.target }} --no-default-features
