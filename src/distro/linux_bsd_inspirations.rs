@@ -140,7 +140,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
-            DistroSubsystemMode::LinuxParrot => ServiceSupervisorType::Systemd,
+            DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -238,7 +240,9 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
+            DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => supervisor == ServiceSupervisorType::Systemd,
         };
 
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
@@ -249,7 +253,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -267,7 +274,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
@@ -286,7 +292,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
@@ -6660,106 +6669,6 @@ mod tests {
     }
 }
 
-// ==========================================
-// 28. GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
-// ==========================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GuixDerivation {
-    pub name: String,
-    pub builder: String,
-    pub inputs: Vec<String>,
-    pub outputs: Vec<String>,
-    pub build_hash: String,
-}
-
-pub struct GuixDerivationEngine {
-    pub store_prefix: String,
-    pub derivations: Vec<GuixDerivation>,
-    pub built_outputs: Vec<String>,
-}
-
-impl GuixDerivationEngine {
-    pub fn new(store_prefix: &str) -> Self {
-        Self {
-            store_prefix: store_prefix.to_string(),
-            derivations: Vec::new(),
-            built_outputs: Vec::new(),
-        }
-    }
-
-    pub fn compute_derivation_hash(name: &str, builder: &str, inputs: &[&str]) -> String {
-        let mut hash: u64 = 0xcbf29ce484222325;
-        for &b in name.as_bytes() {
-            hash ^= b as u64;
-            hash = hash.wrapping_mul(0x100000001b3);
-        }
-        for &b in builder.as_bytes() {
-            hash ^= b as u64;
-            hash = hash.wrapping_mul(0x100000001b3);
-        }
-        for input in inputs {
-            for &b in input.as_bytes() {
-                hash ^= b as u64;
-                hash = hash.wrapping_mul(0x100000001b3);
-            }
-        }
-        format!("{:016x}", hash)
-    }
-
-    pub fn register_derivation(&mut self, name: &str, builder: &str, inputs: &[&str]) -> String {
-        let build_hash = Self::compute_derivation_hash(name, builder, inputs);
-        let output_path = format!("{}/{}-{}", self.store_prefix, build_hash, name);
-
-        let drv = GuixDerivation {
-            name: name.to_string(),
-            builder: builder.to_string(),
-            inputs: inputs.iter().map(|s| s.to_string()).collect(),
-            outputs: vec![output_path.clone()],
-            build_hash,
-        };
-
-        self.derivations.push(drv);
-        output_path
-    }
-
-    pub fn build_derivation(&mut self, name: &str) -> Result<String, &'static str> {
-        let drv = self
-            .derivations
-            .iter()
-            .find(|d| d.name == name)
-            .ok_or("Derivation not found")?
-            .clone();
-
-        for input in &drv.inputs {
-            if !self.built_outputs.contains(input) {
-                return Err("Missing required input derivation build dependency");
-            }
-        }
-
-        let output_path = &drv.outputs[0];
-        if !self.built_outputs.contains(output_path) {
-            self.built_outputs.push(output_path.clone());
-        }
-
-        Ok(output_path.clone())
-    }
-}
-
-impl Default for GuixDerivationEngine {
-    fn default() -> Self {
-        Self::new("/gnu/store")
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ShepherdService {
-    pub name: String,
-    pub provision: Vec<String>,
-    pub requirement: Vec<String>,
-    pub running: bool,
-    pub respawn: bool,
-}
 
 // ==========================================
 // 40. CROSS-DISTRO IPC, AUTH, SYSCALL & CONTAINER BRIDGES
@@ -6890,84 +6799,6 @@ impl SovereignCrossDistroContainerManager {
     }
 }
 
-pub struct ShepherdServiceManager {
-    pub services: Vec<ShepherdService>,
-}
-
-impl ShepherdServiceManager {
-    pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-        }
-    }
-
-    pub fn register_service(
-        &mut self,
-        name: &str,
-        provision: &[&str],
-        requirement: &[&str],
-        respawn: bool,
-    ) {
-        self.services.push(ShepherdService {
-            name: name.to_string(),
-            provision: provision.iter().map(|s| s.to_string()).collect(),
-            requirement: requirement.iter().map(|s| s.to_string()).collect(),
-            running: false,
-            respawn,
-        });
-    }
-
-    pub fn is_provisioned(&self, symbol: &str) -> bool {
-        self.services
-            .iter()
-            .any(|s| s.running && s.provision.iter().any(|p| p == symbol))
-    }
-
-    pub fn start_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let svc_idx = self
-            .services
-            .iter()
-            .position(|s| s.name == name)
-            .ok_or("Service not found in Shepherd graph")?;
-
-        let reqs = self.services[svc_idx].requirement.clone();
-
-        for req in reqs {
-            if !self.is_provisioned(&req) {
-                let provider_name = self
-                    .services
-                    .iter()
-                    .find(|s| s.provision.contains(&req))
-                    .map(|s| s.name.clone());
-
-                if let Some(pname) = provider_name {
-                    self.start_service(&pname)?;
-                } else {
-                    return Err("Unsatisfied Shepherd requirement dependency");
-                }
-            }
-        }
-
-        self.services[svc_idx].running = true;
-        Ok(())
-    }
-
-    pub fn stop_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let svc = self
-            .services
-            .iter_mut()
-            .find(|s| s.name == name)
-            .ok_or("Service not found")?;
-        svc.running = false;
-        Ok(())
-    }
-}
-
-impl Default for ShepherdServiceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// ============================================================================
 /// 9. Advanced Linux/BSD Distro Innovations Integration
