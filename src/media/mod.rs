@@ -18,12 +18,15 @@ pub use sovereign_screen_recorder::{
 };
 
 pub use browser::{
-    AdBlockFilter, BraveShieldsEngine, BrowserContainerType, BrowserProcess, BrowserProcessType,
-    BrowserTabInstance, DeclarativeNetRequestEngine, DnrActionType, DuckAssistPrivacyEngine,
-    GlobalPrivacyControl, OnionCircuitNode, QuantumWebRenderEngine, ResistFingerprintingEngine,
-    SearchEngineType, SearchSwitcher, SecureStorageContainer, SigmaWebBrowser,
-    SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper, TorCircuitManager,
-    TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine, ZenWorkspaceTreeEngine,
+    ArcBoostScript, ArcBrowserBoostEngine, BraveShieldsEngine, BrowserContainerType,
+    BrowserProcess, BrowserProcessType, BrowserTabInstance, ChromiumIpcChannelEngine,
+    ChromiumIpcMessage, DeclarativeNetRequestEngine, DnrActionType, DohEchEncryptionEngine,
+    DuckAssistPrivacyEngine, FirefoxContainerJarManager, GlobalPrivacyControl,
+    MullvadPrivacyIsolationEngine, OnionCircuitNode, QuantumWebRenderEngine,
+    ResistFingerprintingEngine, SearchEngineType, SearchSwitcher, SecureStorageContainer,
+    SigmaWebBrowser, SovereignBrowserEngine, TabMemoryOptimizer, TelemetryAndTrackerStripper,
+    TorCircuitManager, TorSecurityLevel, TrackerTrustGrade, UBlockOriginFilterEngine,
+    ZenWorkspaceTreeEngine,
 };
 
 pub use sovereign_video_player::{

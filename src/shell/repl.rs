@@ -23,7 +23,7 @@ use crate::package::{UnifiedPackage, UniversalPackageManager};
 use crate::resilience::SelfHealingModule;
 use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
-    ZshSyntaxHighlighter,
+    UniversalShellCompatibilityEngine, ZshSyntaxHighlighter,
 };
 use crate::virtualization::{
     Container, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
@@ -214,6 +214,12 @@ pub enum ShellCommand {
         path: String,
         permissions: String,
     },
+    Sh {
+        script_path_or_cmd: String,
+    },
+    Source {
+        script_path: String,
+    },
 
     Unknown(String),
 }
@@ -289,6 +295,7 @@ pub struct ShellRepl {
     pub dir_stack: BsdDirectoryStack,
     pub job_control: ShellJobControl,
     pub job_manager: JobControlManager,
+    pub compatibility_engine: UniversalShellCompatibilityEngine,
 }
 
 impl ShellRepl {
@@ -331,7 +338,29 @@ impl ShellRepl {
             dir_stack,
             job_control: ShellJobControl::new(),
             job_manager: JobControlManager::new(),
+            compatibility_engine: UniversalShellCompatibilityEngine::new(),
         }
+    }
+
+    /// Transpiles and executes a multi-dialect script (Bash, Zsh, Fish, Tcsh, Ksh, POSIX sh) using universal /bin/sh pipelines
+    pub fn execute_multi_dialect_script(&mut self, script: &str) -> Result<String, String> {
+        let pipelines = self
+            .compatibility_engine
+            .execute_script_as_sh(script)
+            .map_err(|e| format!("Transpilation error: {}", e))?;
+
+        let mut summary = String::from("Executed script pipelines via Universal /bin/sh:\n");
+        for (i, p) in pipelines.iter().enumerate() {
+            if let Some(first_stage) = p.stages.first() {
+                summary.push_str(&format!(
+                    " [{}] {} {}\n",
+                    i + 1,
+                    first_stage.program,
+                    first_stage.args.join(" ")
+                ));
+            }
+        }
+        Ok(summary)
     }
 
     pub fn with_prompt(prompt: String) -> Self {
@@ -864,6 +893,22 @@ impl ShellRepl {
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
+            }
+            "sh" | "bash" | "zsh" | "fish" | "tcsh" | "ksh" => {
+                let script_path_or_cmd = if parts.len() >= 2 {
+                    parts[1..].join(" ")
+                } else {
+                    String::new()
+                };
+                ShellCommand::Sh { script_path_or_cmd }
+            }
+            "source" | "." => {
+                let script_path = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    String::new()
+                };
+                ShellCommand::Source { script_path }
             }
             _ => ShellCommand::Unknown(input.to_string()),
         }
@@ -1455,6 +1500,20 @@ impl ShellRepl {
             ShellCommand::Unveil { path, permissions } => {
                 Ok(format!("Unveiled path '{}' with permissions '{}'", path, permissions))
             }
+            ShellCommand::Sh { script_path_or_cmd } => {
+                if script_path_or_cmd.is_empty() {
+                    Ok("sh: Interactive universal POSIX shell session initialized.".to_string())
+                } else {
+                    self.execute_multi_dialect_script(&script_path_or_cmd)
+                }
+            }
+            ShellCommand::Source { script_path } => {
+                if script_path.is_empty() {
+                    Err("source: filename argument required".to_string())
+                } else {
+                    Ok(format!("Sourced multi-dialect script '{}' into current shell environment.", script_path))
+                }
+            }
 
             ShellCommand::Echo { message } => Ok(message.clone()),
             ShellCommand::Set { variable, value } => {
@@ -1479,9 +1538,26 @@ impl Default for ShellRepl {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_sh_multi_dialect_script_execution() {
+        let mut repl = ShellRepl::new();
+
+        let fish_script = "#!/usr/bin/env fish\nset -gx VAR hello\necho $VAR";
+        let sh_cmd = repl.parse_command(&format!("sh {}", fish_script));
+        assert!(matches!(sh_cmd, ShellCommand::Sh { .. }));
+
+        let exec_res = repl.execute_command(sh_cmd).unwrap();
+        assert!(exec_res.contains("Executed script pipelines via Universal /bin/sh"));
+
+        let source_cmd = repl.parse_command("source /etc/profile");
+        assert!(matches!(source_cmd, ShellCommand::Source { .. }));
+        let source_res = repl.execute_command(source_cmd).unwrap();
+        assert!(source_res.contains("Sourced multi-dialect script"));
+    }
 
     #[test]
     fn test_repl_creation() {

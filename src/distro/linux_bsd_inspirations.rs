@@ -121,6 +121,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -218,14 +220,15 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd
-            | DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::OpenRC || supervisor == ServiceSupervisorType::Smf,
+            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
                 supervisor == ServiceSupervisorType::Runit
@@ -269,7 +272,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }

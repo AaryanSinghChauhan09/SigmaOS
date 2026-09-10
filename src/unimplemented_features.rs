@@ -1880,24 +1880,30 @@ pub trait BareMetalUnifiedPeripheral {
 
 pub struct LegacyPioController {
     pub port_base: u16,
+    pub power_state: PowerState,
 }
 
 impl BareMetalUnifiedPeripheral for LegacyPioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+    fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
 pub struct ModernMmioController {
     pub mmio_base: u64,
+    pub power_state: PowerState,
 }
 
 impl BareMetalUnifiedPeripheral for ModernMmioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+    fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
 pub struct BareMetalUnifiedPeripheralManager {
@@ -1926,13 +1932,6 @@ impl Default for BareMetalUnifiedPeripheralManager {
 }
 
 // 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
-#[derive(Debug, Clone, Copy)]
-pub struct UdfInstruction {
-    pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
-    pub reg: u8,  // R0 - R7
-    pub addr: u64,
-}
-
 pub struct UdfVm {
     pub registers: [u64; 8], // R0 - R7
     pub pc: usize,
@@ -1950,12 +1949,12 @@ impl UdfVm {
         self.pc = 0;
         while self.pc < bytecode.len() {
             let inst = bytecode[self.pc];
-            if inst.reg >= 8 { return Err("Register out of bounds"); }
-            match inst.op {
-                0x10 => self.registers[inst.reg as usize] = inst.addr, // OP_READ
+            if inst.reg_dest >= 8 { return Err("Register out of bounds"); }
+            match inst.opcode {
+                0x10 => self.registers[inst.reg_dest as usize] = inst.address_or_imm, // OP_READ
                 0x20 => { /* OP_WRITE */ }
-                0x30 => self.registers[inst.reg as usize] = self.registers[inst.reg as usize].wrapping_add(inst.addr), // OP_ADD
-                0xF0 => return Ok(self.registers[inst.reg as usize]), // OP_HALT
+                0x30 => self.registers[inst.reg_dest as usize] = self.registers[inst.reg_dest as usize].wrapping_add(inst.address_or_imm), // OP_ADD
+                0xF0 => return Ok(self.registers[inst.reg_dest as usize]), // OP_HALT
                 _ => return Err("Invalid ISA opcode"),
             }
             self.pc += 1;
@@ -1969,14 +1968,6 @@ impl Default for UdfVm {
 }
 
 // 6.3 Declarative Package Resolution SAT Solver
-#[derive(Debug, Clone, Copy)]
-pub struct PackageNode {
-    pub id: u32,
-    pub version: u32,
-    pub req_min: u32,
-    pub req_max: u32,
-}
-
 pub struct ConstraintSatSolver;
 
 impl ConstraintSatSolver {
@@ -1997,12 +1988,6 @@ impl Default for ConstraintSatSolver {
 }
 
 // 6.4 JBD2-Style Crash-Resilient Transactional Ledger
-#[derive(Debug, Clone, Copy)]
-pub struct TransactionBlock {
-    pub tx_id: u64,
-    pub target_addr: u64,
-    pub crc32c_hash: u32,
-}
 
 pub struct Jbd2TransactionLedger {
     pub ring_blocks: [TransactionBlock; 16],
