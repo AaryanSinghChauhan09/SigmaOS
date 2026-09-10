@@ -215,6 +215,14 @@ pub enum ShellCommand {
         permissions: String,
     },
 
+    // Universal Shell Dialect execution
+    Script {
+        code: String,
+    },
+    Dialect {
+        code: String,
+    },
+
     Unknown(String),
 }
 
@@ -849,6 +857,24 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "script" | "sh" | "source" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Script {
+                        code: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "dialect" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Dialect {
+                        code: parts[1..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -1439,6 +1465,21 @@ impl ShellRepl {
             }
             ShellCommand::Unveil { path, permissions } => {
                 Ok(format!("Unveiled path '{}' with permissions '{}'", path, permissions))
+            }
+
+            ShellCommand::Script { code } => {
+                let mut compat = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::new();
+                match compat.execute_script_as_sh(&code) {
+                    Ok(pipelines) => Ok(format!(
+                        "Successfully transpiled and parsed script ({} pipelines executed).",
+                        pipelines.len()
+                    )),
+                    Err(e) => Err(format!("Script execution error: {}", e)),
+                }
+            }
+            ShellCommand::Dialect { code } => {
+                let dialect = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::detect_shebang_dialect(&code);
+                Ok(format!("Detected shell script dialect: {:?}", dialect))
             }
 
             ShellCommand::Echo { message } => Ok(message.clone()),
