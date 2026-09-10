@@ -85,7 +85,7 @@ jobs:
           cosign sign-blob --yes target/release/libsigmaos.rlib --output-signature target/release/libsigmaos.rlib.sig
 
       - name: Upload SBOM & Signature Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac212293921041ab61e07598c8092 # v4.4.3
         with:
           name: sigmaos-sbom-signatures
           path: |

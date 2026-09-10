@@ -2,6 +2,8 @@
 // Implements Fedora-style mandatory access control adapted for capability-based security
 // Inspired by Fedora's SELinux for enhanced security architecture
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
