@@ -3159,5 +3159,30 @@ pub struct AlpineApkPackageAdapter;
 impl PackageMetadataAdapter for AlpineApkPackageAdapter {
     fn adapt(&self, _raw_metadata: &str) -> Result<UnifiedPackage, PackageError> {
         Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
+
+        let bad_pqc = PqcSignedDecorator {
+            decorated: BasePackageDecorator {
+                package: UnifiedPackage::new("invalid-sig".to_string(), "1.0.0".to_string()),
+            },
+            dilithium_signature: "invalid-signature".to_string(),
+        };
+
+        assert!(bad_pqc.enforce_sandbox().is_err());
+    }
+
+    #[test]
+    fn test_universal_package_format_bridge() {
+        let deb_pkg = UniversalPackageFormatBridge::detect_and_transpile("nginx.deb", b"deb_payload").unwrap();
+        assert_eq!(deb_pkg.formats[0], PackageFormat::Deb);
+        assert_eq!(deb_pkg.name, "nginx");
+        assert!(deb_pkg.dependencies.contains(&"libc6".to_string()));
+
+        let rpm_pkg = UniversalPackageFormatBridge::detect_and_transpile("curl.rpm", b"rpm_payload").unwrap();
+        assert_eq!(rpm_pkg.formats[0], PackageFormat::Rpm);
+        assert!(rpm_pkg.provides.contains(&"fedora_compat".to_string()));
+
+        let apk_pkg = UniversalPackageFormatBridge::detect_and_transpile("busybox.apk", b"apk_payload").unwrap();
+        assert_eq!(apk_pkg.formats[0], PackageFormat::Apk);
+        assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
     }
 }

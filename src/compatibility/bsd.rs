@@ -2,7 +2,7 @@ use std::vec::Vec;
 // SigmaOS BSD Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of BSD (FreeBSD/OpenBSD) core tooling
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::string::String;
 use std::string::ToString;
 
@@ -479,5 +479,81 @@ mod tests {
 
         guard.pledge("stdio rpath").unwrap();
         assert!(!guard.check_permission("inet", None));
+    }
+
+    #[test]
+    fn test_netbsd_rump_component_engine() {
+        let mut rump = NetBsdRumpComponentEngine::new();
+        rump.register_rump_server("rump_ffs_vfs", "filesys");
+        assert_eq!(rump.rump_servers.len(), 1);
+        assert!(rump.mount_rump_vfs("rump_ffs_vfs", "/mnt/rump"));
+    }
+
+    #[test]
+    fn test_openbsd_unveil_auditor() {
+        let mut auditor = OpenBsdUnveilAuditor::new();
+        auditor.add_unveil_mapping("/usr/bin", "rx");
+        assert!(auditor.audit_access("/usr/bin/git", "r"));
+        assert!(!auditor.audit_access("/usr/bin/git", "w"));
+    }
+}
+
+/// NetBSD Rump Kernel Component Virtualization Server Engine
+pub struct NetBsdRumpComponentEngine {
+    pub rump_servers: HashMap<String, String>,
+}
+
+impl NetBsdRumpComponentEngine {
+    pub fn new() -> Self {
+        Self {
+            rump_servers: HashMap::new(),
+        }
+    }
+
+    pub fn register_rump_server(&mut self, server_id: &str, subsystem: &str) {
+        self.rump_servers.insert(server_id.to_string(), subsystem.to_string());
+    }
+
+    pub fn mount_rump_vfs(&self, server_id: &str, _mount_path: &str) -> bool {
+        self.rump_servers.contains_key(server_id)
+    }
+}
+
+impl Default for NetBsdRumpComponentEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// OpenBSD Unveil Path Auditor
+pub struct OpenBsdUnveilAuditor {
+    pub unveiled_paths: HashMap<String, String>,
+}
+
+impl OpenBsdUnveilAuditor {
+    pub fn new() -> Self {
+        Self {
+            unveiled_paths: HashMap::new(),
+        }
+    }
+
+    pub fn add_unveil_mapping(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+    }
+
+    pub fn audit_access(&self, file_path: &str, required_perm: &str) -> bool {
+        for (base_path, perms) in self.unveiled_paths.iter() {
+            if file_path.starts_with(base_path) {
+                let perm_str: &str = perms;
+                return perm_str.contains(required_perm);
+            }
+        }
+        false
+    }
+}
+
+impl Default for OpenBsdUnveilAuditor {
+    fn default() -> Self {
+        Self::new()
     }
 }

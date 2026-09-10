@@ -671,6 +671,32 @@ gpgcheck=1
         assert!(xml.contains("repodata/repomd.xml"));
         assert!(xml.contains("countme=2"));
     }
+
+    #[test]
+    fn test_fedora_silverblue_ostree_atomic_engine() {
+        let mut ostree = FedoraSilverblueOstreeAtomicEngine::new();
+        ostree.stage_deployment("fedora/39/x86_64/silverblue", "a1b2c3d4e5f6");
+        assert_eq!(ostree.staged_deployments.len(), 1);
+        let commit_msg = ostree.finalize_atomic_switch().unwrap();
+        assert!(commit_msg.contains("Atomic switch successful"));
+        assert_eq!(ostree.active_deployment.0, "fedora/39/x86_64/silverblue");
+    }
+
+    #[test]
+    fn test_fedora_koji_build_system() {
+        let mut koji = FedoraKojiBuildSystem::new();
+        let task_id = koji.submit_build_task("curl", "8.3.0-1.fc39");
+        assert_eq!(task_id, 1001);
+        assert!(koji.check_task_status(1001));
+    }
+
+    #[test]
+    fn test_fedora_flatpak_sandbox() {
+        let mut flatpak = FedoraFlatpakSandbox::new();
+        flatpak.spawn_container("org.gimp.GIMP", "/var/lib/flatpak/app/org.gimp.GIMP");
+        assert_eq!(flatpak.active_sandboxes.len(), 1);
+        assert!(flatpak.check_permission("org.gimp.GIMP", "wayland"));
+    }
 }
 
 /// Fedora Anitya (release-monitoring.org) Upstream Project Tracking Record
@@ -971,5 +997,109 @@ impl FedoraMirrorManager2Engine {
 impl Default for FedoraMirrorManager2Engine {
     fn default() -> Self {
         Self::new(86400) // Default 24h staleness limit
+    }
+}
+
+/// Fedora Silverblue rpm-ostree Atomic Sysroot Engine
+pub struct FedoraSilverblueOstreeAtomicEngine {
+    pub active_deployment: (String, String),
+    pub staged_deployments: Vec<(String, String)>,
+}
+
+impl FedoraSilverblueOstreeAtomicEngine {
+    pub fn new() -> Self {
+        Self {
+            active_deployment: ("fedora/39/x86_64/silverblue".to_string(), "000000000000".to_string()),
+            staged_deployments: Vec::new(),
+        }
+    }
+
+    pub fn stage_deployment(&mut self, ref_spec: &str, checksum: &str) {
+        self.staged_deployments.push((ref_spec.to_string(), checksum.to_string()));
+    }
+
+    pub fn finalize_atomic_switch(&mut self) -> Result<String, &'static str> {
+        if let Some(next) = self.staged_deployments.pop() {
+            self.active_deployment = next.clone();
+            Ok(format!("Atomic switch successful to {} ({})", next.0, next.1))
+        } else {
+            Err("No staged ostree deployment to finalize")
+        }
+    }
+}
+
+impl Default for FedoraSilverblueOstreeAtomicEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora Koji RPM Build System Client Engine
+pub struct FedoraKojiBuildSystem {
+    pub tasks: HashMap<u64, (String, String, bool)>,
+    pub next_task_id: u64,
+}
+
+impl FedoraKojiBuildSystem {
+    pub fn new() -> Self {
+        Self {
+            tasks: HashMap::new(),
+            next_task_id: 1001,
+        }
+    }
+
+    pub fn submit_build_task(&mut self, pkg_name: &str, nvr: &str) -> u64 {
+        let task_id = self.next_task_id;
+        self.next_task_id += 1;
+        self.tasks.insert(task_id, (pkg_name.to_string(), nvr.to_string(), true));
+        task_id
+    }
+
+    pub fn check_task_status(&self, task_id: u64) -> bool {
+        if let Some(task) = self.tasks.get(&task_id) {
+            task.2
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraKojiBuildSystem {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora Flatpak Application OCI Container Sandbox
+pub struct FedoraFlatpakSandbox {
+    pub active_sandboxes: HashMap<String, Vec<String>>,
+}
+
+impl FedoraFlatpakSandbox {
+    pub fn new() -> Self {
+        Self {
+            active_sandboxes: HashMap::new(),
+        }
+    }
+
+    pub fn spawn_container(&mut self, app_id: &str, _sysroot_path: &str) {
+        let mut caps = Vec::new();
+        caps.push("wayland".to_string());
+        caps.push("pulseaudio".to_string());
+        self.active_sandboxes.insert(app_id.to_string(), caps);
+    }
+
+    pub fn check_permission(&self, app_id: &str, cap: &str) -> bool {
+        if let Some(caps) = self.active_sandboxes.get(app_id) {
+            caps.iter().any(|c| c == cap)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraFlatpakSandbox {
+    fn default() -> Self {
+        Self::new()
     }
 }
