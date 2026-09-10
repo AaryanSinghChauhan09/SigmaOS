@@ -129,6 +129,7 @@ pub enum BodhiUpdateStatus {
     Testing,
     Stable,
     Obsolete,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BodhiStatus {
@@ -441,8 +442,13 @@ pub struct MockChrootConfig {
     pub installed_build_deps: Vec<String>,
 }
 
+#[derive(Debug, Clone)]
 pub struct FedoraMockChrootBuilder {
     pub chroots: BTreeMap<String, MockChrootConfig>,
+    pub chroot_name: String,
+    pub target_arch: String,
+    pub is_initialized: bool,
+    pub installed_deps: Vec<String>,
 }
 
 impl FedoraMockChrootBuilder {
@@ -457,7 +463,43 @@ impl FedoraMockChrootBuilder {
                 installed_build_deps: vec!["gcc".to_string(), "rpm-build".to_string(), "make".to_string()],
             },
         );
-        Self { chroots }
+        Self {
+            chroots,
+            chroot_name: "fedora-40-x86_64".to_string(),
+            target_arch: "x86_64".to_string(),
+            is_initialized: true,
+            installed_deps: Vec::new(),
+        }
+    }
+
+    pub fn with_arch(chroot_name: &str, target_arch: &str) -> Self {
+        let mut builder = Self::new();
+        builder.chroot_name = chroot_name.to_string();
+        builder.target_arch = target_arch.to_string();
+        builder.is_initialized = false;
+        builder
+    }
+
+    pub fn init_chroot(&mut self) -> Result<(), &'static str> {
+        self.is_initialized = true;
+        Ok(())
+    }
+
+    pub fn install_build_deps(&mut self, deps: &[&str]) -> Result<usize, &'static str> {
+        for d in deps {
+            self.installed_deps.push(d.to_string());
+        }
+        Ok(deps.len())
+    }
+
+    pub fn build_srpm(&self, srpm_name: &str) -> Result<String, &'static str> {
+        if !self.is_initialized {
+            return Err("Mock chroot is not initialized");
+        }
+        Ok(format!(
+            "Built RPM binary package from '{}' inside Mock chroot '{}'",
+            srpm_name, self.chroot_name
+        ))
     }
 
     pub fn build_srpm_in_chroot(
@@ -486,6 +528,23 @@ impl Default for FedoraMockChrootBuilder {
 // 7. FEDORA DNF5 NEXT-GEN PACKAGE MANAGER ENGINE
 // =========================================================================
 
+/// DNF5 Advisory Severity Type (Security/Bugfix/Enhancement)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DnfAdvisoryKind {
+    Security,
+    Bugfix,
+    Enhancement,
+}
+
+/// DNF5 Advisory Record
+#[derive(Debug, Clone)]
+pub struct DnfAdvisory {
+    pub id: String,
+    pub kind: DnfAdvisoryKind,
+    pub affected_packages: Vec<String>,
+    pub cve_refs: Vec<String>,
+}
+
 #[derive(Debug, Clone)]
 pub struct Dnf5PackageRecord {
     pub name: String,
@@ -495,10 +554,13 @@ pub struct Dnf5PackageRecord {
     pub advisory_id: Option<String>,
 }
 
+#[derive(Debug, Clone)]
 pub struct FedoraDnf5PackageEngine {
     pub installed_packages: BTreeMap<String, Dnf5PackageRecord>,
     pub available_packages: BTreeMap<String, Dnf5PackageRecord>,
     pub package_groups: BTreeMap<String, Vec<String>>,
+    pub advisories: BTreeMap<String, DnfAdvisory>,
+    pub installed_pkg_names: Vec<String>,
 }
 
 impl FedoraDnf5PackageEngine {
@@ -509,10 +571,33 @@ impl FedoraDnf5PackageEngine {
             vec!["gnome-shell".to_string(), "firefox".to_string(), "nautilus".to_string()],
         );
 
+        let mut advisories = BTreeMap::new();
+        advisories.insert(
+            "FEDORA-2024-001".to_string(),
+            DnfAdvisory {
+                id: "FEDORA-2024-001".to_string(),
+                kind: DnfAdvisoryKind::Security,
+                affected_packages: vec!["glibc".to_string(), "openssl".to_string()],
+                cve_refs: vec!["CVE-2024-0001".to_string()],
+            },
+        );
+
+        advisories.insert(
+            "FEDORA-2024-002".to_string(),
+            DnfAdvisory {
+                id: "FEDORA-2024-002".to_string(),
+                kind: DnfAdvisoryKind::Bugfix,
+                affected_packages: vec!["systemd".to_string()],
+                cve_refs: Vec::new(),
+            },
+        );
+
         Self {
             installed_packages: BTreeMap::new(),
             available_packages: BTreeMap::new(),
             package_groups: groups,
+            advisories,
+            installed_pkg_names: vec!["bash".to_string(), "coreutils".to_string()],
         }
     }
 
@@ -548,80 +633,14 @@ impl FedoraDnf5PackageEngine {
         Ok(count)
     }
 
-    /// Builds RPM package from Source RPM (`mock --rebuild package.src.rpm`)
-    pub fn build_srpm(&self, srpm_name: &str) -> Result<String, &'static str> {
-        if !self.is_initialized {
-            return Err("Mock chroot is not initialized");
-        }
-        Ok(format!(
-            "Built RPM binary package from '{}' inside Mock chroot '{}'",
-            srpm_name, self.chroot_name
-        ))
-    }
-}
-
-/// DNF5 Advisory Severity Type (Security/Bugfix/Enhancement)
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DnfAdvisoryKind {
-    Security,
-    Bugfix,
-    Enhancement,
-}
-
-/// DNF5 Advisory Record
-#[derive(Debug, Clone)]
-pub struct DnfAdvisory {
-    pub id: String,
-    pub kind: DnfAdvisoryKind,
-    pub affected_packages: Vec<String>,
-    pub cve_refs: Vec<String>,
-}
-
-/// Fedora DNF5 Package Management Engine (`dnf5` CLI parity)
-#[derive(Debug, Clone)]
-pub struct FedoraDnf5PackageEngine {
-    pub advisories: BTreeMap<String, DnfAdvisory>,
-    pub installed_packages: Vec<String>,
-}
-
-impl FedoraDnf5PackageEngine {
-    pub fn new() -> Self {
-        let mut advisories = BTreeMap::new();
-
-        advisories.insert(
-            "FEDORA-2024-001".to_string(),
-            DnfAdvisory {
-                id: "FEDORA-2024-001".to_string(),
-                kind: DnfAdvisoryKind::Security,
-                affected_packages: vec!["glibc".to_string(), "openssl".to_string()],
-                cve_refs: vec!["CVE-2024-0001".to_string()],
-            },
-        );
-
-        advisories.insert(
-            "FEDORA-2024-002".to_string(),
-            DnfAdvisory {
-                id: "FEDORA-2024-002".to_string(),
-                kind: DnfAdvisoryKind::Bugfix,
-                affected_packages: vec!["systemd".to_string()],
-                cve_refs: Vec::new(),
-            },
-        );
-
-        Self {
-            advisories,
-            installed_packages: vec!["bash".to_string(), "coreutils".to_string()],
-        }
-    }
-
     /// Resolves and installs security advisories (`dnf5 update --security`)
     pub fn update_security_advisories(&mut self) -> Vec<String> {
         let mut updated = Vec::new();
         for advisory in self.advisories.values() {
             if advisory.kind == DnfAdvisoryKind::Security {
                 for pkg in &advisory.affected_packages {
-                    if !self.installed_packages.contains(pkg) {
-                        self.installed_packages.push(pkg.clone());
+                    if !self.installed_pkg_names.contains(pkg) {
+                        self.installed_pkg_names.push(pkg.clone());
                         updated.push(pkg.clone());
                     }
                 }
@@ -721,12 +740,25 @@ pub struct SssdDomain {
 pub struct FedoraSssdFreeIpaEngine {
     pub domains: BTreeMap<String, SssdDomain>,
     pub cached_kerberos_tickets: Vec<String>,
+    pub active_krb_tickets: BTreeMap<String, u64>,
 }
 
 impl FedoraSssdFreeIpaEngine {
     pub fn new() -> Self {
+        let mut domains = BTreeMap::new();
+        domains.insert(
+            "ipa.example.com".to_string(),
+            SssdDomain {
+                name: "ipa.example.com".to_string(),
+                provider: "ipa".to_string(),
+                realm: "IPA.EXAMPLE.COM".to_string(),
+                is_active: true,
+            },
+        );
+
         Self {
-            domains: BTreeMap::new(),
+            domains,
+            cached_kerberos_tickets: Vec::new(),
             active_krb_tickets: BTreeMap::new(),
         }
     }
@@ -734,14 +766,14 @@ impl FedoraSssdFreeIpaEngine {
     pub fn join_freeipa_domain(
         &mut self,
         domain_name: &str,
-        ldap_uri: &str,
+        _ldap_uri: &str,
         realm: &str,
     ) -> Result<String, &'static str> {
-        let config = SssdDomainConfig {
-            domain_name: domain_name.to_string(),
-            ldap_uri: ldap_uri.to_string(),
-            krb5_realm: realm.to_string(),
-            is_joined: true,
+        let config = SssdDomain {
+            name: domain_name.to_string(),
+            provider: "ipa".to_string(),
+            realm: realm.to_string(),
+            is_active: true,
         };
 
         self.domains.insert(domain_name.to_string(), config);
@@ -750,6 +782,22 @@ impl FedoraSssdFreeIpaEngine {
 
     pub fn kinit_authenticate(&mut self, user: &str, expiry_time: u64) {
         self.active_krb_tickets.insert(user.to_string(), expiry_time);
+    }
+
+    /// Authenticates a domain user and caches Kerberos TGT
+    pub fn authenticate_user(&mut self, domain: &str, user: &str) -> Result<String, &'static str> {
+        let dom = self.domains.get(domain).ok_or("Domain not found")?;
+        if !dom.is_active {
+            return Err("Domain is inactive");
+        }
+
+        let ticket = format!("krbtgt/{}@{}", dom.realm, user);
+        self.cached_kerberos_tickets.push(ticket.clone());
+
+        Ok(format!(
+            "Successfully authenticated user '{}' against FreeIPA realm '{}'",
+            user, dom.realm
+        ))
     }
 }
 
@@ -805,41 +853,6 @@ impl Default for SovereignFedoraEcosystemSuite {
 // =========================================================================
 // UNIT TESTS
 // =========================================================================
-
-
-        let mut domains = BTreeMap::new();
-        domains.insert(
-            "ipa.example.com".to_string(),
-            SssdDomain {
-                name: "ipa.example.com".to_string(),
-                provider: "ipa".to_string(),
-                realm: "IPA.EXAMPLE.COM".to_string(),
-                is_active: true,
-            },
-        );
-
-        Self {
-            domains,
-            cached_kerberos_tickets: Vec::new(),
-        }
-    }
-
-    /// Authenticates a domain user and caches Kerberos TGT
-    pub fn authenticate_user(&mut self, domain: &str, user: &str) -> Result<String, &'static str> {
-        let dom = self.domains.get(domain).ok_or("Domain not found")?;
-        if !dom.is_active {
-            return Err("Domain is inactive");
-        }
-
-        let ticket = format!("krbtgt/{}@{}", dom.realm, user);
-        self.cached_kerberos_tickets.push(ticket.clone());
-
-        Ok(format!(
-            "Successfully authenticated user '{}' against FreeIPA realm '{}'",
-            user, dom.realm
-        ))
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -953,7 +966,9 @@ mod tests {
 
         sssd.kinit_authenticate("developer@FEDORAPROJECT.ORG", 1700000000);
         assert!(sssd.active_krb_tickets.contains_key("developer@FEDORAPROJECT.ORG"));
+    }
 
+    #[test]
     fn test_koji_build_system_engine() {
         let mut koji = FedoraKojiBuildSystemEngine::new();
         let id = koji.submit_build_task("bash", "5.2", "fc40", "x86_64");
@@ -1002,9 +1017,11 @@ mod tests {
         let result = suite.run_release_pipeline("systemd", "255");
         assert!(result.is_ok());
         assert!(result.unwrap().contains("systemd-255.x86_64.rpm"));
+    }
 
+    #[test]
     fn test_fedora_mock_chroot() {
-        let mut mock = FedoraMockChrootBuilder::new("fedora-39-x86_64", "x86_64");
+        let mut mock = FedoraMockChrootBuilder::with_arch("fedora-39-x86_64", "x86_64");
         assert!(mock.init_chroot().is_ok());
         assert_eq!(mock.install_build_deps(&["openssl-devel"]).unwrap(), 1);
         let build_res = mock.build_srpm("nginx-1.24.0.src.rpm").unwrap();

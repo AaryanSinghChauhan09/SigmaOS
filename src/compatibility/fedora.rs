@@ -969,7 +969,10 @@ impl FedoraFasAuthEngine {
     pub fn is_member_of_group(&self, username: &str, group: &str) -> bool {
         if let Some(user) = self.user_profiles.get(username) {
             user.groups.contains(&group.to_string())
-
+        } else {
+            false
+        }
+    }
 }
 
 impl Default for FedoraFedoraKojiBuildSystemEngine {
@@ -6060,6 +6063,11 @@ impl Default for FedoraRPMSeccompFilterEngine {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
     #[test]
     fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {

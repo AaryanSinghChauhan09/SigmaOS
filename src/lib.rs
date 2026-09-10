@@ -1,6 +1,8 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
 // Core working modules
 pub mod open_source_os_gap_closure;
 pub mod accessibility;
@@ -410,10 +412,6 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub mod init {
-    pub mod systemd_init;
-}
-pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
 pub use ai::next_gen::{
     AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType, EnergyGovernorMode, ModelType,
@@ -444,13 +442,3 @@ pub use tools::{
     SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
     UserIdentity as LibUserIdentity,
 };
-
-pub mod open_source_obsoletion;
-pub mod ipc;
-pub mod audio;
-pub mod system;
-pub mod event;
-pub mod loader;
-pub mod app;
-pub mod auth;
-pub use open_source_obsoletion::*;

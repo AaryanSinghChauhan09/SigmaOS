@@ -1583,7 +1583,10 @@ impl Default for BareMetalUnifiedPeripheralManager {
 pub struct UdfInstruction {
     pub op: u8,  // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
     pub reg: u8, // R0 - R7
+    pub addr: u64,
+}
 
+#[derive(Debug, Clone, Copy)]
 pub struct SpecUdfInstruction {
     pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
     pub reg: u8,  // R0 - R7

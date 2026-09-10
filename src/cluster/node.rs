@@ -11,7 +11,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 #[cfg(test_disabled)]
-extern crate alloc as std::std::alloc;
+extern crate alloc;
 
 pub type NodeID = usize;
 pub type PodID = usize;
@@ -454,9 +454,9 @@ impl<T> Default for Vec<T> {
 // Allocator shims: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::std::{alloc, Layout};
+    use std::alloc::{alloc, Layout};
     let layout = Layout::from_size_align(size, 8).expect("Failed to create memory layout");
-    std::std::alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]

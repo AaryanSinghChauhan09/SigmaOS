@@ -714,7 +714,7 @@ unsafe fn alloc(size: usize) -> *mut u8 {
     extern crate std;
     use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std::std::alloc(layout)
+    std::alloc::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]

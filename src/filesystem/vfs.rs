@@ -233,10 +233,17 @@ impl FilePermissions {
 
             bsd_flags: BsdFileFlags::new(),
         }
-        if self.owner_write {
+    }
+
+    pub fn to_posix_mode(&self) -> u32 {
+        let mut mode = 0u32;
+        if self.user_read {
+            mode |= 0o400;
+        }
+        if self.user_write {
             mode |= 0o200;
         }
-        if self.owner_execute {
+        if self.user_execute {
             mode |= 0o100;
         }
         if self.group_read {
