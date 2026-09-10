@@ -46,6 +46,13 @@ pub mod hopper_lab;
 pub mod india_professional_tools;
 pub mod india_stack;
 pub mod india_stack_localization;
+pub mod itsfoss_inspiration_suite;
+
+pub use itsfoss_inspiration_suite::{
+    ItsFossLocalSendTransferEngine, ItsFossStacerOptimizerEngine, ItsFossTimeshiftBackupEngine,
+    ItsFossVentoyMultiBootUsbEngine, LocalSendPeer, SnapshotMode, StacerCleanCategory,
+    TimeshiftRestorePoint, VentoyIsoEntry,
+};
 pub mod innovations;
 pub mod installer;
 pub mod interim;
