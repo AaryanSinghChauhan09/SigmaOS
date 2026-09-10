@@ -24,7 +24,6 @@ pub mod hardening;
 pub mod deobfuscation;
 pub mod securelevels;
 pub mod pam;
-pub mod intrusion;
 pub mod crypto_utils;
 
 pub use kali_components::{
