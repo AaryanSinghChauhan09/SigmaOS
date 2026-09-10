@@ -1,19 +1,18 @@
-#![allow(unused_imports)]
 // SigmaOS Wayland Protocol Engine (Zero-Dependency Bare-Metal Display Protocol Engine)
 // Implements core Wayland wire encoding/decoding, xdg_shell surface lifecycle,
 // wl_seat input event dispatching, and wl_data_device clipboard negotiations.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
 
-
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::format;
+use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::vec;
+use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
