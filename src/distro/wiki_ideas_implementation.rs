@@ -10,6 +10,8 @@
 
 use std::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use std::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
