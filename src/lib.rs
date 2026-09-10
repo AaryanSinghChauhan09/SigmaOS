@@ -43,6 +43,7 @@ pub mod thread;
 pub mod compositor;
 pub mod theming;
 pub mod onboarding;
+pub mod launcher;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
 };
