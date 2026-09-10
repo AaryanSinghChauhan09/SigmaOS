@@ -208,6 +208,7 @@ pub enum PackageFormat {
     Pisi,
     // Deepin Superdeb (.superdeb)
     Superdeb,
+    Sysupdate,
     // Slax Linux Module (.lzm)
     Lzm,
     // Puppy Linux Package (.pup)
@@ -3017,6 +3018,20 @@ impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
         let mut out = source.to_vec();
         out.extend_from_slice(patch);
         Ok(out)
+
+    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        let mut delta = vec![0x44, 0x52, 0x50, 0x4d];
+        delta.extend_from_slice(new_data);
+        delta
+    }
+    fn apply_delta(&self, old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str> {
+        if delta.len() >= 4 && &delta[..4] == b"DRPM" {
+            let mut res = old_data.to_vec();
+            res.extend_from_slice(&delta[4..]);
+            Ok(res)
+        } else {
+            Err("Invalid DRPM payload header")
+        }
     }
 }
 
@@ -3025,6 +3040,18 @@ impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
     fn name(&self) -> &str { "moss-stone-delta" }
     fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         Ok(patch.to_vec())
+
+    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        let mut delta = vec![0x4d, 0x4f, 0x53, 0x53];
+        delta.extend_from_slice(new_data);
+        delta
+    }
+    fn apply_delta(&self, _old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str> {
+        if delta.len() >= 4 && &delta[..4] == b"MOSS" {
+            Ok(delta[4..].to_vec())
+        } else {
+            Err("Invalid MOSS delta payload header")
+        }
     }
 }
 
@@ -3033,6 +3060,18 @@ impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
     fn name(&self) -> &str { "zstd-chunked" }
     fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         Ok(patch.to_vec())
+
+    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        let mut delta = vec![0x5a, 0x53, 0x54, 0x44];
+        delta.extend_from_slice(new_data);
+        delta
+    }
+    fn apply_delta(&self, _old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str> {
+        if delta.len() >= 4 && &delta[..4] == b"ZSTD" {
+            Ok(delta[4..].to_vec())
+        } else {
+            Err("Invalid ZSTD delta payload header")
+        }
     }
 }
 
