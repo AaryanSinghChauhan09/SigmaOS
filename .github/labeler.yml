@@ -3,6 +3,18 @@ rust:
   - changed-files:
       - any-glob-to-any-file: 'src/**/*.rs'
 
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**/*'
+          - 'wiki/**/*'
+          - 'wiki_repo/**/*'
+          - '**/*.md'
+
+workflows:
+  - changed-files:
+      - any-glob-to-any-file: '.github/workflows/*'
+
 core-kernel:
   - changed-files:
       - any-glob-to-any-file: 'src/kernel/**/*'
@@ -23,17 +35,6 @@ drivers-hal:
 security:
   - changed-files:
       - any-glob-to-any-file: 'src/security/**/*'
-
-documentation:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'docs/**/*'
-          - 'wiki/**/*'
-          - '*.md'
-
-workflows:
-  - changed-files:
-      - any-glob-to-any-file: '.github/workflows/*'
 
 "area: kernel":
   - changed-files:
@@ -58,9 +59,3 @@ workflows:
       - any-glob-to-any-file:
           - 'src/sigpkg/**/*'
           - 'src/package/**/*'
-
-"area: documentation":
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'docs/**/*'
-          - 'wiki/**/*'

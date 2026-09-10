@@ -8,34 +8,14 @@
 // - Distro Emulation Core: Linux Syscall ABI & BSD Kqueue Event Layer
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::String;
-<<<<<<< HEAD
-=======
-extern crate alloc;
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
->>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-=======
-extern crate alloc;
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-=======
->>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
->>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
 use alloc::format;
 
 #[cfg(any(feature = "standalone_test", test))]

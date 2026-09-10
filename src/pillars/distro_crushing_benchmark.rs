@@ -379,7 +379,7 @@ impl Default for LinuxDistroDefeaterEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -462,7 +462,57 @@ impl Default for SovereignDistroVictoryEngine {
     }
 }
 
-#[cfg(test_disabled)]
+// =========================================================================
+// 2.7 PHORONIX TEST SUITE AUTOMATED BENCHMARK ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct PtsBenchmarkResult {
+    pub test_name: String,
+    pub score: f64,
+    pub unit: String,
+    pub higher_is_better: bool,
+}
+
+pub struct PhoronixAutomatedPerformanceSuite {
+    pub benchmark_results: Vec<PtsBenchmarkResult>,
+}
+
+impl PhoronixAutomatedPerformanceSuite {
+    pub fn new() -> Self {
+        Self {
+            benchmark_results: Vec::new(),
+        }
+    }
+
+    pub fn record_result(&mut self, name: &str, score: f64, unit: &str, higher_is_better: bool) {
+        self.benchmark_results.push(PtsBenchmarkResult {
+            test_name: name.to_string(),
+            score,
+            unit: unit.to_string(),
+            higher_is_better,
+        });
+    }
+
+    pub fn generate_pts_report(&self) -> String {
+        let mut report = String::from("# Phoronix Test Suite Automated Benchmark Report\n\n");
+        for res in &self.benchmark_results {
+            report.push_str(&format!(
+                "- **{}**: {:.2} {} (Higher is better: {})\n",
+                res.test_name, res.score, res.unit, res.higher_is_better
+            ));
+        }
+        report
+    }
+}
+
+impl Default for PhoronixAutomatedPerformanceSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod victory_tests {
     use super::*;
 
@@ -470,5 +520,13 @@ mod victory_tests {
     fn test_sovereign_distro_victory_engine() {
         let engine = SovereignDistroVictoryEngine::new();
         assert!(engine.evaluate_superiority_verdict());
+    }
+
+    #[test]
+    fn test_phoronix_automated_performance_suite() {
+        let mut pts = PhoronixAutomatedPerformanceSuite::new();
+        pts.record_result("7-Zip Compression", 150000.0, "MIPS", true);
+        let report = pts.generate_pts_report();
+        assert!(report.contains("7-Zip Compression"));
     }
 }
