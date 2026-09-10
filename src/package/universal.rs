@@ -277,11 +277,26 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    OpenBsdPkg, // OpenBSD Package (.openbsd.tgz)
     Ipk,        // OpenWrt Package (.ipk)
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
+    Sysext,     // systemd system extension (.sysext / .raw)
+    Confext,    // systemd configuration extension (.confext)
+    Zck,        // Delta zchunk package (.zck)
+    Npm,        // Node.js NPM package (.tgz / npm)
+    Appx,       // Windows AppX (.appx)
+    Msix,       // Windows MSIX (.msix)
+    Mpkg,       // macOS MetaPackage (.mpkg)
 }
 
 impl PackageFormat {
@@ -335,6 +350,8 @@ impl PackageFormat {
             Some(PackageFormat::Ebuild)
         } else if normalized.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
+        } else if normalized.ends_with(".npm.tgz") || normalized.ends_with(".npm") {
+            Some(PackageFormat::Npm)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
         } else if normalized.ends_with(".txz")
@@ -419,6 +436,18 @@ impl PackageFormat {
             Some(PackageFormat::NarInfo)
         } else if normalized.ends_with(".sysupdate") {
             Some(PackageFormat::Sysupdate)
+        } else if normalized.ends_with(".sysext") || (normalized.ends_with(".raw") && normalized.contains("sysext")) {
+            Some(PackageFormat::Sysext)
+        } else if normalized.ends_with(".confext") {
+            Some(PackageFormat::Confext)
+        } else if normalized.ends_with(".zck") {
+            Some(PackageFormat::Zck)
+        } else if normalized.ends_with(".appx") {
+            Some(PackageFormat::Appx)
+        } else if normalized.ends_with(".msix") {
+            Some(PackageFormat::Msix)
+        } else if normalized.ends_with(".mpkg") {
+            Some(PackageFormat::Mpkg)
         } else {
             None
         }
@@ -1262,81 +1291,6 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
-pub struct HardwareOptimizationDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub target_microarch_level: String,
-    pub required_simd_features: Vec<String>,
-}
-
-impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        println!(
-            "HardwareOptimizationDecorator: Microarch Level={}, SIMD={:?}",
-            self.target_microarch_level, self.required_simd_features
-        );
-        self.decorated.profile_performance();
-    }
-}
-
-pub struct ResourceLimitDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub max_memory_bytes: u64,
-    pub cpu_quota_percent: u32,
-}
-
-impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        println!(
-            "ResourceLimitDecorator: Memory Limit={} bytes, CPU Quota={}%",
-            self.max_memory_bytes, self.cpu_quota_percent
-        );
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
-}
-
-pub struct PqcSignedDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub dilithium_signature: String,
-}
-
-impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        if !self.dilithium_signature.starts_with("dilithium-5-valid") {
-            return Err(PackageError::InstallationFailed(
-                "Dilithium signature verification failed".to_string(),
-            ));
-        }
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
-}
-
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -1425,6 +1379,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
+            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1484,6 +1439,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
+            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -2977,10 +2933,15 @@ mod tests {
 /// Alpine Linux .apk Package Format Adapter
 pub struct AlpineApkPackageAdapter;
 
-impl PackageFormatAdapter for AlpineApkPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::SigmaPkg
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, _raw_data: &str) -> Result<UnifiedPackage, PackageError> {
+        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
     }
+}
+
+#[cfg(test)]
+mod extra_tests {
+    use super::*;
 
     #[test]
     fn test_all_package_format_strategies_and_adapters() {
@@ -3074,5 +3035,16 @@ impl PackageFormatAdapter for AlpineApkPackageAdapter {
         };
 
         assert!(net_dec.restrict_network().is_ok());
+    }
+
+    #[test]
+    fn test_universal_package_format_extended_auto_detection() {
+        assert_eq!(PackageFormat::from_filename("system.sysext"), Some(PackageFormat::Sysext));
+        assert_eq!(PackageFormat::from_filename("config.confext"), Some(PackageFormat::Confext));
+        assert_eq!(PackageFormat::from_filename("delta.zck"), Some(PackageFormat::Zck));
+        assert_eq!(PackageFormat::from_filename("express.npm.tgz"), Some(PackageFormat::Npm));
+        assert_eq!(PackageFormat::from_filename("calculator.appx"), Some(PackageFormat::Appx));
+        assert_eq!(PackageFormat::from_filename("office.msix"), Some(PackageFormat::Msix));
+        assert_eq!(PackageFormat::from_filename("developer.mpkg"), Some(PackageFormat::Mpkg));
     }
 }
