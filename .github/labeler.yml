@@ -7,9 +7,9 @@ documentation:
   - changed-files:
       - any-glob-to-any-file:
           - '**/*.md'
-          - 'docs/**/*'
-          - 'wiki/**/*'
-          - 'wiki_repo/**/*'
+          - 'docs/**'
+          - 'wiki/**'
+          - 'wiki_repo/**'
 
 workflows:
   - changed-files:

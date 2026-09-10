@@ -1,12 +1,11 @@
 // SigmaOS Advanced GUI Installer Wizard
 // Calamares-inspired graphical installer wizard with dual-boot alongside partitioning
 
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
-
-pub type InstallerStep = InstallerScreen;
-pub type UserAccountConfig = UserAccount;
+extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
 
 /// Installer Screen / Calamares Module Sequence
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -21,7 +20,6 @@ pub enum InstallerScreen {
     Summary,
     InstallationProgress,
     CompleteOnboarding,
-    Complete,
 }
 
 /// Partitioning Operation Strategy
@@ -30,14 +28,6 @@ pub enum PartitionStrategy {
     EraseDisk,
     InstallAlongsideExisting,
     ManualCustomPartitions,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PartitioningOperation {
-    Automatic,
-    Alongside,
-    Manual,
-    EraseDisk,
 }
 
 /// Filesystem Type
@@ -185,24 +175,10 @@ impl UserAccount {
     }
 }
 
-/// Network Config
-#[derive(Debug, Clone)]
-pub struct NetworkConfig {
-    pub use_dhcp: bool,
-    pub static_ip: Option<String>,
-    pub gateway: Option<String>,
-    pub dns_servers: Vec<String>,
-}
-
 /// System Configuration
 #[derive(Debug, Clone)]
 pub struct SystemConfiguration {
     pub hostname: String,
-    pub timezone: String,
-    pub locale: String,
-    pub keyboard_layout: String,
-    pub network_config: NetworkConfig,
-    pub services: Vec<String>,
     pub is_admin: bool,
     pub auto_login: bool,
 }
@@ -232,8 +208,6 @@ impl SystemConfiguration {
                 String::from("sshd"),
                 String::from("cron"),
             ],
-            is_admin: true,
-            auto_login: false,
         }
     }
 }
@@ -319,10 +293,8 @@ impl GuiInstallerWizard {
             InstallerScreen::UserSetup => InstallerScreen::SystemConfiguration,
             InstallerScreen::SystemConfiguration => InstallerScreen::Summary,
             InstallerScreen::Summary => InstallerScreen::InstallationProgress,
-            InstallerScreen::InstallationProgress => InstallerScreen::CompleteOnboarding,
-            InstallerScreen::CompleteOnboarding | InstallerScreen::Complete => {
-                return Err(InstallerError::AlreadyComplete);
-            }
+            InstallerScreen::InstallationProgress => InstallerScreen::Complete,
+            InstallerScreen::Complete => return Err(InstallerError::AlreadyComplete),
         };
 
         Ok(())
@@ -409,17 +381,17 @@ impl GuiInstallerWizard {
 
     /// Add custom partition
     pub fn add_custom_partition(&mut self, partition: PartitionEntry) {
+        self.custom_partitions.push(partition);
         self.log(&format!(
             "Added custom partition: {} -> {}",
             partition.device, partition.mount_point
         ));
-        self.custom_partitions.push(partition);
     }
 
     /// Add user account
     pub fn add_user_account(&mut self, user: UserAccount) {
-        self.log(&format!("Added user account: {}", user.username));
         self.user_accounts.push(user);
+        self.log(&format!("Added user account: {}", user.username));
     }
 
     /// Update system configuration
@@ -470,7 +442,7 @@ impl GuiInstallerWizard {
             InstallerScreen::SystemConfiguration => "Configure system settings",
             InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
-            InstallerScreen::CompleteOnboarding | InstallerScreen::Complete => "Installation Complete",
+            InstallerScreen::Complete => "Installation Complete",
         }
     }
 

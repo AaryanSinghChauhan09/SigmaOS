@@ -5,11 +5,11 @@
 
 #![allow(dead_code)]
 
+extern crate alloc;
 
-
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Helper function to escape HTML special characters to prevent DOM injection / XSS
 fn escape_html(input: &str) -> String {
@@ -162,10 +162,22 @@ impl MintWelcomeScreen {
         // System info
         html.push_str("<h2>System Information</h2>\n");
         html.push_str("<ul>\n");
-        html.push_str(&format!("<li>Edition: {}</li>\n", escape_html(&self.system_info.edition)));
-        html.push_str(&format!("<li>Desktop: {}</li>\n", escape_html(&self.system_info.desktop_environment)));
-        html.push_str(&format!("<li>Kernel: {}</li>\n", escape_html(&self.system_info.kernel_version)));
-        html.push_str(&format!("<li>Architecture: {}</li>\n", escape_html(&self.system_info.architecture)));
+        html.push_str(&format!(
+            "<li>Edition: {}</li>\n",
+            escape_html(&self.system_info.edition)
+        ));
+        html.push_str(&format!(
+            "<li>Desktop: {}</li>\n",
+            escape_html(&self.system_info.desktop_environment)
+        ));
+        html.push_str(&format!(
+            "<li>Kernel: {}</li>\n",
+            escape_html(&self.system_info.kernel_version)
+        ));
+        html.push_str(&format!(
+            "<li>Architecture: {}</li>\n",
+            escape_html(&self.system_info.architecture)
+        ));
         html.push_str("</ul>\n");
 
         // Content sections

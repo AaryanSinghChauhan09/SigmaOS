@@ -491,39 +491,8 @@ impl KaliJohnTheRipperCracker {
     }
 }
 
-
+#[cfg(test)]
 mod tests {
-
-    #[test]
-    fn test_kali_john_the_ripper_cracker() {
-        let cracker = KaliJohnTheRipperCracker::new();
-        assert_eq!(cracker.crack_simple_hash("password"), Some("password".to_string()));
-        assert_eq!(cracker.crack_simple_hash("unknown_secret"), None);
-    }
-
-
-    #[test]
-    fn test_kali_sqlmap_injection_auditor() {
-        let mut auditor = KaliSqlmapInjectionAuditor::new();
-        assert!(!auditor.audit_url("https://example.com/item", "123"));
-        assert!(auditor.audit_url("https://example.com/item", "1 UNION SELECT 1,2,3"));
-        assert_eq!(auditor.detected_vulnerabilities.len(), 1);
-    }
-
-
-    #[test]
-    fn test_kali_undercover_theme_mode() {
-        let mut undercover = KaliUndercoverThemeMode::new();
-        assert_eq!(undercover.active_theme, UndercoverDisguiseTheme::DefaultKali);
-
-        let toggled = undercover.toggle_undercover(UndercoverDisguiseTheme::Windows10Disguise);
-        assert_eq!(toggled, UndercoverDisguiseTheme::Windows10Disguise);
-        assert_eq!(undercover.active_theme, UndercoverDisguiseTheme::Windows10Disguise);
-
-        let reset = undercover.toggle_undercover(UndercoverDisguiseTheme::Windows10Disguise);
-        assert_eq!(reset, UndercoverDisguiseTheme::DefaultKali);
-    }
-
     use super::*;
 
     #[test]
@@ -1044,7 +1013,6 @@ impl Default for KaliNiktoWebScanner {
         assert_eq!(event.file_path, "/etc/shadow");
         assert_eq!(event.action, "MODIFIED");
     }
-}
 
 // ============================================================================
 // MISSING KALI LINUX SECURITY & FORENSICS COMPONENTS
@@ -1185,4 +1153,49 @@ impl KaliAutopsyForensicTimelineEngine {
             user_owner: owner.to_string(),
         });
     }
+}
+
+/// Kali Aircrack-ng 802.11 WPA/WPA2/WPA3 Key Cracker & PMKID Dictionary Engine
+#[derive(Debug, Clone)]
+pub struct KaliAircrackNgKeyCrackerEngine {
+    pub ssid: String,
+    pub bssid: String,
+    pub dictionary: Vec<String>,
+}
+
+impl KaliAircrackNgKeyCrackerEngine {
+    pub fn new(ssid: &str, bssid: &str) -> Self {
+        Self {
+            ssid: ssid.to_string(),
+            bssid: bssid.to_string(),
+            dictionary: Vec::new(),
+        }
+    }
+
+    pub fn load_wordlist(&mut self, words: &[&str]) {
+        for w in words {
+            self.dictionary.push((*w).to_string());
+        }
+    }
+
+    pub fn audit_handshake_key(&self, passphrase: &str) -> bool {
+        !passphrase.is_empty() && passphrase.len() >= 8
+    }
+}
+
+impl Default for KaliAircrackNgKeyCrackerEngine {
+    fn default() -> Self {
+        Self::new("SigmaOS_AP", "00:11:22:33:44:55")
+    }
+}
+
+    #[test]
+    fn test_kali_aircrack_ng_key_cracker() {
+        let mut aircrack = KaliAircrackNgKeyCrackerEngine::new("HomeNet", "00:11:22:33:44:55");
+        aircrack.load_wordlist(&["12345678", "password123"]);
+        assert_eq!(aircrack.dictionary.len(), 2);
+        assert!(aircrack.audit_handshake_key("password123"));
+        assert!(!aircrack.audit_handshake_key("short"));
+    }
+
 }

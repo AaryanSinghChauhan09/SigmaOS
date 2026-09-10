@@ -3,9 +3,12 @@
 
 #![no_std]
 
-use alloc::string::{String, ToString};
-use crate::klib::Vec;
+extern crate alloc;
+
 use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
 /// Network device types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkType {
