@@ -6,12 +6,11 @@
 extern crate std;
 
 
+use std::collections::HashMap;
 use std::format;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-
-use crate::klib::HashMap;
 
 /// Pacman sync database repository types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

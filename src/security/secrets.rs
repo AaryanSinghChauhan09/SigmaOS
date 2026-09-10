@@ -35,7 +35,7 @@ pub trait Secret {
 
 /// Secret error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecretError {
     Success = 0,
     NotFound = 1,
@@ -161,6 +161,10 @@ impl Secret for SimpleSecret {
     }
 
     fn encrypt(&mut self, key: &[u8]) -> Result<(), SecretError> {
+        if key.is_empty() {
+            return Err(SecretError::InvalidKey);
+        }
+
         if !self.capability.can_write {
             return Err(SecretError::PermissionDenied);
         }
@@ -169,9 +173,8 @@ impl Secret for SimpleSecret {
             return Err(SecretError::EncryptionFailed);
         }
 
-        // Simple XOR encryption for demonstration
-        for i in 0..self.data_len {
-            self.data[i] ^= key[i % key.len()];
+        for (b, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
+            *b ^= k;
         }
 
         self.is_encrypted.store(true, Ordering::SeqCst);
@@ -179,6 +182,10 @@ impl Secret for SimpleSecret {
     }
 
     fn decrypt(&mut self, key: &[u8]) -> Result<(), SecretError> {
+        if key.is_empty() {
+            return Err(SecretError::InvalidKey);
+        }
+
         if !self.capability.can_read {
             return Err(SecretError::PermissionDenied);
         }
@@ -187,9 +194,8 @@ impl Secret for SimpleSecret {
             return Err(SecretError::DecryptionFailed);
         }
 
-        // Simple XOR decryption (same as encryption)
-        for i in 0..self.data_len {
-            self.data[i] ^= key[i % key.len()];
+        for (b, &k) in self.data[..self.data_len].iter_mut().zip(key.iter().cycle()) {
+            *b ^= k;
         }
 
         self.is_encrypted.store(false, Ordering::SeqCst);
@@ -383,7 +389,7 @@ impl Keyring for SimpleKeyring {
 pub struct SecretManager;
 pub struct SecretStorage;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -398,5 +404,29 @@ mod tests {
 
         let retrieved = keyring.get_secret(1).unwrap();
         assert_eq!(retrieved.name(), b"TestSecret");
+    }
+
+    #[test]
+    fn test_secret_encryption_and_decryption() {
+        let secret_cap = SecretCapability::full();
+        let mut secret = SimpleSecret::new(1, b"my_api_key", SecretType::APIKey, secret_cap);
+        secret.set_data(b"secret_payload_12345");
+
+        let key = b"super_secret_key";
+        assert!(secret.encrypt(key).is_ok());
+        assert_ne!(secret.get_data(), b"secret_payload_12345");
+
+        assert!(secret.decrypt(key).is_ok());
+        assert_eq!(secret.get_data(), b"secret_payload_12345");
+    }
+
+    #[test]
+    fn test_empty_key_rejected() {
+        let secret_cap = SecretCapability::full();
+        let mut secret = SimpleSecret::new(1, b"my_token", SecretType::Token, secret_cap);
+        secret.set_data(b"data");
+
+        assert_eq!(secret.encrypt(b""), Err(SecretError::InvalidKey));
+        assert_eq!(secret.decrypt(b""), Err(SecretError::InvalidKey));
     }
 }
