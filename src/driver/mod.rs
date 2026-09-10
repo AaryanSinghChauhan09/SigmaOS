@@ -18,6 +18,9 @@ pub mod pci_enumeration;
 pub mod pods;
 pub mod rootkit;
 pub mod shims;
+pub mod ubuntu_common_drivers;
+pub mod vault;
+pub mod wifi_broadcom_bcm4318;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
