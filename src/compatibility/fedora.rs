@@ -3355,6 +3355,16 @@ pub struct TahrirMessagePost {
     pub fedmsg_dispatched: bool,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TahrirMessagePost {
+    pub post_id: u64,
+    pub author_fas_username: String,
+    pub content: String,
+    pub hashtags: Vec<String>,
+    pub timestamp_secs: u64,
+    pub fedmsg_dispatched: bool,
+}
+
 /// Fedora Tahrir Microblogging & Developer Social Network System
 /// Provides developer status microblogging, hashtag indexing, FAS authentication integration,
 /// and automated status broadcast over Fedora Messaging.
