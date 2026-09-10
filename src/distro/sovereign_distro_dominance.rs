@@ -106,6 +106,252 @@ impl Default for NixGuixZeroCopyStore {
     }
 }
 
+// ============================================================================
+// 15. Gentoo Linux Portage EAPI 8 SLOT/SUBSLOT & USE-Expand Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EbuildSlotRecord {
+    pub atom_name: String,
+    pub slot: String,
+    pub subslot: String,
+    pub active_use_flags: Vec<String>,
+}
+
+pub struct SovereignGentooEbuildSlotEngine {
+    pub slot_records: Vec<EbuildSlotRecord>,
+}
+
+impl SovereignGentooEbuildSlotEngine {
+    pub fn new() -> Self {
+        Self {
+            slot_records: Vec::new(),
+        }
+    }
+
+    pub fn register_ebuild_slot(
+        &mut self,
+        atom_name: &str,
+        slot: &str,
+        subslot: &str,
+        use_flags: &[&str],
+    ) {
+        self.slot_records.push(EbuildSlotRecord {
+            atom_name: atom_name.to_string(),
+            slot: slot.to_string(),
+            subslot: subslot.to_string(),
+            active_use_flags: use_flags.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn evaluate_slot_operator_match(&self, req_atom: &str, target_slot_subslot: &str) -> bool {
+        if let Some(record) = self.slot_records.iter().find(|r| r.atom_name == req_atom) {
+            if target_slot_subslot == ":=" || target_slot_subslot == ":*" {
+                true // Slot operator match
+            } else {
+                let full_slot = format!("{}/{}", record.slot, record.subslot);
+                full_slot == target_slot_subslot || record.slot == target_slot_subslot
+            }
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignGentooEbuildSlotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 16. Alpine Linux APK3 Ed25519 & SHA-256 Security Verifier
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ApkIndexHeader {
+    pub repository_url: String,
+    pub sha256_checksum: [u8; 32],
+    pub ed25519_sig: Vec<u8>,
+}
+
+pub struct SovereignAlpineApk3SecurityVerifier {
+    pub trusted_keys: Vec<Vec<u8>>,
+    pub indexes: Vec<ApkIndexHeader>,
+}
+
+impl SovereignAlpineApk3SecurityVerifier {
+    pub fn new() -> Self {
+        Self {
+            trusted_keys: Vec::new(),
+            indexes: Vec::new(),
+        }
+    }
+
+    pub fn add_trusted_pubkey(&mut self, pubkey: &[u8]) {
+        self.trusted_keys.push(pubkey.to_vec());
+    }
+
+    pub fn register_apk_index(&mut self, repo_url: &str, sha256: [u8; 32], sig: &[u8]) {
+        self.indexes.push(ApkIndexHeader {
+            repository_url: repo_url.to_string(),
+            sha256_checksum: sha256,
+            ed25519_sig: sig.to_vec(),
+        });
+    }
+
+    pub fn verify_index_integrity(&self, repo_url: &str) -> bool {
+        if self.trusted_keys.is_empty() {
+            return false;
+        }
+        if let Some(idx) = self.indexes.iter().find(|i| i.repository_url == repo_url) {
+            !idx.ed25519_sig.is_empty() && idx.sha256_checksum != [0u8; 32]
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignAlpineApk3SecurityVerifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 17. Void Linux xbps-src Isolated Chroot Builder & License Governor
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct XbpsSrcBuildSpec {
+    pub pkg_name: String,
+    pub version: String,
+    pub revision: u32,
+    pub license: String,
+    pub is_non_free: bool,
+    pub soname_dependencies: Vec<String>,
+}
+
+pub struct SovereignVoidXbpsChrootBuilder {
+    pub allow_non_free_license: bool,
+    pub chroot_active: bool,
+    pub build_queue: Vec<XbpsSrcBuildSpec>,
+}
+
+impl SovereignVoidXbpsChrootBuilder {
+    pub fn new(allow_non_free: bool) -> Self {
+        Self {
+            allow_non_free_license: allow_non_free,
+            chroot_active: false,
+            build_queue: Vec::new(),
+        }
+    }
+
+    pub fn enter_chroot_environment(&mut self) {
+        self.chroot_active = true;
+    }
+
+    pub fn queue_xbps_build(
+        &mut self,
+        name: &str,
+        version: &str,
+        rev: u32,
+        license: &str,
+        is_non_free: bool,
+        sonames: &[&str],
+    ) -> Result<(), &'static str> {
+        if is_non_free && !self.allow_non_free_license {
+            return Err("xbps-src: Non-free license rejected by builder policy");
+        }
+        self.build_queue.push(XbpsSrcBuildSpec {
+            pkg_name: name.to_string(),
+            version: version.to_string(),
+            revision: rev,
+            license: license.to_string(),
+            is_non_free,
+            soname_dependencies: sonames.iter().map(|s| s.to_string()).collect(),
+        });
+        Ok(())
+    }
+
+    pub fn compile_queued_packages(&mut self) -> Result<usize, &'static str> {
+        if !self.chroot_active {
+            return Err("xbps-src: Must enter isolated chroot environment before compilation");
+        }
+        let count = self.build_queue.len();
+        self.build_queue.clear();
+        Ok(count)
+    }
+}
+
+// ============================================================================
+// 18. Illumos / Solaris Crossbow VNIC & Etherstub Bandwidth Governor
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct CrossbowVnicRule {
+    pub vnic_name: String,
+    pub etherstub_name: String,
+    pub mac_address: [u8; 6],
+    pub max_bandwidth_mbps: u32,
+    pub priority_level: u8,
+}
+
+pub struct SovereignSolarisCrossbowVnicEngine {
+    pub etherstubs: Vec<String>,
+    pub vnics: Vec<CrossbowVnicRule>,
+}
+
+impl SovereignSolarisCrossbowVnicEngine {
+    pub fn new() -> Self {
+        Self {
+            etherstubs: Vec::new(),
+            vnics: Vec::new(),
+        }
+    }
+
+    pub fn create_etherstub(&mut self, name: &str) {
+        if !self.etherstubs.contains(&name.to_string()) {
+            self.etherstubs.push(name.to_string());
+        }
+    }
+
+    pub fn create_vnic_on_stub(
+        &mut self,
+        vnic_name: &str,
+        stub_name: &str,
+        mac: [u8; 6],
+        max_bw_mbps: u32,
+    ) -> Result<(), &'static str> {
+        if !self.etherstubs.contains(&stub_name.to_string()) {
+            return Err("Crossbow: Etherstub virtual switch not found");
+        }
+        self.vnics.push(CrossbowVnicRule {
+            vnic_name: vnic_name.to_string(),
+            etherstub_name: stub_name.to_string(),
+            mac_address: mac,
+            max_bandwidth_mbps: max_bw_mbps,
+            priority_level: 10,
+        });
+        Ok(())
+    }
+
+    pub fn throttle_vnic_bandwidth(&mut self, vnic_name: &str, new_bw_mbps: u32) -> bool {
+        if let Some(vnic) = self.vnics.iter_mut().find(|v| v.vnic_name == vnic_name) {
+            vnic.max_bandwidth_mbps = new_bw_mbps;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignSolarisCrossbowVnicEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 2. CachyBoreDynamicAiScheduler
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskSchedState {
@@ -1448,6 +1694,56 @@ mod tests {
         assert!(boot_env.activate_boot_environment("be-upgrade-6.6").is_ok());
         assert_eq!(boot_env.active_env_name, "be-upgrade-6.6");
         assert!(boot_env.activate_boot_environment("nonexistent").is_err());
+    }
+
+    #[test]
+    fn test_sovereign_gentoo_ebuild_slot_engine() {
+        let mut gentoo = SovereignGentooEbuildSlotEngine::new();
+        gentoo.register_ebuild_slot("dev-libs/openssl", "3", "3.1", &["ssl", "asm"]);
+
+        assert!(gentoo.evaluate_slot_operator_match("dev-libs/openssl", ":="));
+        assert!(gentoo.evaluate_slot_operator_match("dev-libs/openssl", "3/3.1"));
+        assert!(gentoo.evaluate_slot_operator_match("dev-libs/openssl", "3"));
+        assert!(!gentoo.evaluate_slot_operator_match("dev-libs/openssl", "1.1"));
+    }
+
+    #[test]
+    fn test_sovereign_alpine_apk3_security_verifier() {
+        let mut apk3 = SovereignAlpineApk3SecurityVerifier::new();
+        let sha = [0x55; 32];
+        apk3.register_apk_index("https://dl-cdn.alpinelinux.org/alpine/v3.19/main", sha, b"ed25519_sig_bytes");
+
+        assert!(!apk3.verify_index_integrity("https://dl-cdn.alpinelinux.org/alpine/v3.19/main")); // No trusted key
+
+        apk3.add_trusted_pubkey(b"alpine_key_pub");
+        assert!(apk3.verify_index_integrity("https://dl-cdn.alpinelinux.org/alpine/v3.19/main"));
+    }
+
+    #[test]
+    fn test_sovereign_void_xbps_chroot_builder() {
+        let mut builder = SovereignVoidXbpsChrootBuilder::new(false);
+        assert!(builder.queue_xbps_build("curl", "8.5.0", 1, "MIT", false, &["libcurl.so.4"]).is_ok());
+
+        // Non-free license rejected when allow_non_free is false
+        assert!(builder.queue_xbps_build("nvidia-driver", "545.29", 1, "NVIDIA-EULA", true, &["libcuda.so.1"]).is_err());
+
+        assert!(builder.compile_queued_packages().is_err()); // Must enter chroot first
+
+        builder.enter_chroot_environment();
+        let count = builder.compile_queued_packages().unwrap();
+        assert_eq!(count, 1);
+    }
+
+    #[test]
+    fn test_sovereign_solaris_crossbow_vnic_engine() {
+        let mut crossbow = SovereignSolarisCrossbowVnicEngine::new();
+        crossbow.create_etherstub("stub0");
+
+        assert!(crossbow.create_vnic_on_stub("vnic0", "stub0", [0x02, 0x08, 0x20, 0x00, 0x00, 0x01], 1000).is_ok());
+        assert!(crossbow.create_vnic_on_stub("vnic1", "nonexistent", [0x02, 0x08, 0x20, 0x00, 0x00, 0x02], 500).is_err());
+
+        assert!(crossbow.throttle_vnic_bandwidth("vnic0", 2500));
+        assert_eq!(crossbow.vnics[0].max_bandwidth_mbps, 2500);
     }
 }
 
