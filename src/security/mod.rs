@@ -25,6 +25,13 @@ pub mod deobfuscation;
 pub mod securelevels;
 pub mod pam;
 pub mod crypto_utils;
+pub mod publication_permissions;
+
+pub use publication_permissions::{
+    AppPermissionRecord, FineGrainedAccessControlMatrix, HardwarePeripheralBounds,
+    MatrixPolicyAction, PermissionGrantState, PortalPermissionScope,
+    SovereignPublicationInspiredPermissionEngine,
+};
 
 pub use kali_components::{
     HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,

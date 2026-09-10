@@ -380,9 +380,10 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    AnonSurfShunt, AppPermissionRecord, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
+    CapabilityToken, FineGrainedAccessControlMatrix, ForensicStorageFilter, HardwarePeripheralBounds,
+    MatrixPolicyAction, Permission, PermissionGrantState, PledgeManager, PledgePromise, PortalPermissionScope,
+    RoutingMode, SandboxPolicy, SovereignPublicationInspiredPermissionEngine,
 };
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
