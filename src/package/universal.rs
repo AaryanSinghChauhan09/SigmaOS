@@ -1270,7 +1270,6 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
-
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -2915,12 +2914,12 @@ pub struct AlpineApkPackageAdapter;
 
 impl PackageMetadataAdapter for AlpineApkPackageAdapter {
     fn adapt(&self, _raw_data: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("alpine-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
+        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
     }
 }
 
 #[cfg(test)]
-mod tests_factory_and_decorators {
+mod extra_tests {
     use super::*;
 
     #[test]

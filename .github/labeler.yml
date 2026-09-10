@@ -1,34 +1,53 @@
-# GitHub Actions PR Labeler Configuration for SigmaOS (v5 syntax)
-
-kernel:
-  - any:
-      - 'src/kernel/**/*'
-      - 'kernel/**/*'
-
-drivers:
-  - any:
-      - 'src/drivers/**/*'
-      - 'src/driver/**/*'
-      - 'drivers/**/*'
-
-security:
-  - any:
-      - 'src/security/**/*'
-      - 'security/**/*'
+# GitHub Labeler Configuration for SigmaOS
+rust:
+  - changed-files:
+      - any-glob-to-any-file: 'src/**/*.rs'
 
 documentation:
-  - any:
-      - '**/*.md'
-      - 'docs/**/*'
-      - 'WIKI/**/*'
-      - 'wiki/**/*'
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.md'
+          - 'docs/**/*'
+          - 'wiki/**/*'
+          - 'wiki_repo/**/*'
 
-tools:
-  - any:
-      - 'src/tools/**/*'
-      - 'tools/**/*'
+workflows:
+  - changed-files:
+      - any-glob-to-any-file: '.github/workflows/*'
 
-ci:
-  - any:
-      - '.github/**/*'
-      - 'scripts/**/*'
+core-kernel:
+  - changed-files:
+      - any-glob-to-any-file: 'src/kernel/**/*'
+
+package-system:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/package/**/*'
+          - 'src/sigpkg/**/*'
+          - 'src/bin/sigpkg.rs'
+
+drivers-hal:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/drivers/**/*'
+          - 'src/arch/**/*'
+
+security:
+  - changed-files:
+      - any-glob-to-any-file: 'src/security/**/*'
+
+"area: kernel":
+  - src/kernel/**/*
+"area: distro":
+  - src/distro/**/*
+"area: security":
+  - src/security/**/*
+"area: networking":
+  - src/net/**/*
+  - src/network/**/*
+"area: package":
+  - src/sigpkg/**/*
+  - src/package/**/*
+"area: documentation":
+  - docs/**/*
+  - wiki/**/*
