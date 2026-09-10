@@ -20,6 +20,13 @@ pub mod mint_system;
 pub mod mint_desktop;
 pub mod mint_menu;
 pub mod profession_tools;
+pub mod open_source_tools_engine;
+
+pub use open_source_tools_engine::{
+    BatSyntaxHighlighterEngine, FzfFuzzyFinderEngine, FuzzyMatch, HtopProcessMonitorEngine,
+    ProcessMetrics, ProcessSortOrder, RsyncChunkSignature, RsyncDeltaOp, RsyncDeltaSyncEngine,
+    SyntaxTheme,
+};
 
 pub use profession_tools::*;
 

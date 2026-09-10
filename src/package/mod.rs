@@ -44,7 +44,13 @@ pub mod signing;
 pub mod spac;
 pub mod store;
 pub mod universal;
+pub mod universal_package_innovations_suite;
 pub mod updater;
+
+pub use universal_package_innovations_suite::{
+    AptMirrorServer, ArchPacmanDeltaSyncEngine, BasePackageRecord, DebianAptFastMirrorRanker,
+    DnfGroupPackageSpec, FedoraDnfGroupInstallSolver, FreeBsdPkgBaseRootfsEngine, PacmanDeltaPatch,
+};
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};
