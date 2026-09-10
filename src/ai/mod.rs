@@ -26,12 +26,9 @@ pub mod quantization;
 pub mod wandr;
 
 pub use agentic_os_runtime::{
-    ContextVirtualMmu, EphemeralAgentSandbox, HybridContainerRuntime, LocalLlmSystemDaemon,
-    OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
-    AgentAuditRecord, ContainerConfig, ContainerFirstRuntimeHost, ContainerState, ContextTokenType,
-    DeterministicAgentSandbox, EbpfTraceEvent, EbpfTraceEventType, EbpfTracingMonitor, LocalLlmModel,
-    PosixNativeBridgeLayer, TamperProofAgentAuditLogger,
-    TpmTokenKeyVault, VectorContextBlock, VectorContextMmu,
+    AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,
+    EbpfNetworkFilter, EphemeralAgentSandbox, GpuBackend, HybridContainerRuntime, LocalLlmDaemon,
+    LocalLlmSystemDaemon, OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
 };
 
 pub use openclaw::{

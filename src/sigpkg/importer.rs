@@ -69,11 +69,6 @@ impl PackageImporter for DebPackageImporter {
             )
             .with_build_command("make".to_string());
 
-        // We can add translated dependencies to build commands for verification
-        for dep in depends {
-            let cmd = format!("# depends: {}", dep);
-            recipe = recipe.with_prepare_command(cmd);
-        }
 
         Ok(recipe)
     }
@@ -134,10 +129,6 @@ impl PackageImporter for RpmPackageImporter {
             )
             .with_build_command("cmake . && make".to_string());
 
-        for req in requires {
-            let cmd = format!("# requires: {}", req);
-            recipe = recipe.with_prepare_command(cmd);
-        }
 
         Ok(recipe)
     }
@@ -200,7 +191,7 @@ impl PackageImporter for PacmanPackageImporter {
                 "pacman-sha256-placeholder".to_string(),
             )
             .with_build_command("cargo build --release".to_string())
-            .with_pkgrel(pkgrel);
+            .with_pkgrel(pkgrel.to_string());
 
         Ok(recipe)
     }

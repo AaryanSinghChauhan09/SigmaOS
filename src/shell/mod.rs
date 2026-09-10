@@ -16,7 +16,7 @@ pub use command::{
 };
 pub use terminal_emulator::{
     AnsiColor, AutoSuggestionEngine, TerminalSession, UserDefinedFunction,
-    BsdConsoleColorPalette, BsdConsoleTheme, BracketedPasteBuffer,
+    BsdConsoleColorPalette, BsdConsoleTheme,
     TermiosInputEvent, TermiosInputMode, TermiosLineDiscipline,
 };
 pub use zsh_bash_parity::{

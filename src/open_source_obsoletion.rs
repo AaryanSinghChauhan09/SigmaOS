@@ -184,58 +184,6 @@ impl SovereignVcsEngine {
 
         Ok(merged)
     }
-
-    pub fn three_way_merge(
-        base_blobs: &[VcsBlob],
-        ours_blobs: &[VcsBlob],
-        theirs_blobs: &[VcsBlob],
-    ) -> Result<Vec<VcsBlob>, &'static str> {
-        let mut merged = Vec::new();
-        let mut all_paths = Vec::new();
-
-        for b in base_blobs.iter().chain(ours_blobs).chain(theirs_blobs) {
-            if !all_paths.contains(&b.path) {
-                all_paths.push(b.path.clone());
-            }
-        }
-
-        for path in all_paths {
-            let base = base_blobs.iter().find(|b| b.path == path);
-            let ours = ours_blobs.iter().find(|b| b.path == path);
-            let theirs = theirs_blobs.iter().find(|b| b.path == path);
-
-            match (base, ours, theirs) {
-                (_, Some(o), Some(t)) if o.payload == t.payload => {
-                    merged.push(o.clone());
-                }
-                (Some(b), Some(o), Some(t)) if o.payload == b.payload && t.payload != b.payload => {
-                    merged.push(t.clone());
-                }
-                (Some(b), Some(o), Some(t)) if t.payload == b.payload && o.payload != b.payload => {
-                    merged.push(o.clone());
-                }
-                (None, Some(o), None) => {
-                    merged.push(o.clone());
-                }
-                (None, None, Some(t)) => {
-                    merged.push(t.clone());
-                }
-                (Some(_), None, Some(t)) if theirs_blobs.iter().any(|b| b.path == path) => {
-                    // Deleted in ours, kept or modified in theirs -> conflict if modified
-                    merged.push(t.clone());
-                }
-                (Some(_), Some(o), None) => {
-                    merged.push(o.clone());
-                }
-                (Some(_), Some(o), Some(t)) if o.payload != t.payload => {
-                    return Err("Vcs: Merge conflict detected between branches");
-                }
-                _ => {}
-            }
-        }
-
-        Ok(merged)
-    }
 }
 
 impl Default for SovereignVcsEngine {

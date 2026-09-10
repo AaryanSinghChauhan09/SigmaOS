@@ -466,6 +466,46 @@ pub struct TerminalPane {
     pub session: TerminalSession,
 }
 
+pub type TerminalMultiplexer = TerminalMultiplexerV1;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ColorSchemePreset {
+    Default,
+    Nord,
+    Dracula,
+    SolarizedDark,
+    Monokai,
+}
+
+#[derive(Debug, Clone)]
+pub struct TerminalTheme {
+    pub name: String,
+    pub fg_color_rgb: (u8, u8, u8),
+    pub bg_color_rgb: (u8, u8, u8),
+}
+
+impl TerminalTheme {
+    pub fn preset(preset: ColorSchemePreset) -> Self {
+        match preset {
+            ColorSchemePreset::Nord => Self {
+                name: String::from("Nord"),
+                fg_color_rgb: (216, 222, 233),
+                bg_color_rgb: (46, 52, 64),
+            },
+            ColorSchemePreset::Dracula => Self {
+                name: String::from("Dracula"),
+                fg_color_rgb: (248, 248, 242),
+                bg_color_rgb: (40, 42, 54),
+            },
+            _ => Self {
+                name: String::from("Default"),
+                fg_color_rgb: (255, 255, 255),
+                bg_color_rgb: (0, 0, 0),
+            },
+        }
+    }
+}
+
 /// Tmux / BSD-style Terminal Multiplexer
 #[derive(Debug, Clone)]
 pub struct TerminalMultiplexerV1 {
@@ -475,6 +515,10 @@ pub struct TerminalMultiplexerV1 {
 }
 
 impl TerminalMultiplexerV1 {
+    pub fn split_pane(&mut self, direction: PaneSplitDirection) -> u32 {
+        self.split_active_pane(direction).unwrap_or(0)
+    }
+
     pub fn new(root_width: usize, root_height: usize) -> Self {
         let root_pane = TerminalPane {
             pane_id: 1,
@@ -789,24 +833,7 @@ impl TriggerRuleV2 {
 
 impl TerminalSession {
     pub fn new(width: usize, height: usize) -> Self {
-        let session = Self {
-            cursor_x: 0,
-            cursor_y: 0,
-            width,
-            height,
-            foreground: AnsiColor::Default,
-            background: AnsiColor::Default,
-            bold: false,
-            scrollback: Vec::new(),
-            current_line: String::new(),
-            aliases: BTreeMap::new(),
-            user_functions: BTreeMap::new(),
-            suggestion_engine: AutoSuggestionEngine::new(),
-            multiplexer: TerminalMultiplexer::new(width, height),
-            graphics_frames: Vec::new(),
-            trigger_rules: Vec::new(),
-            visual_bell_active: false,
-        };
+        let mut suggestion_engine = AutoSuggestionEngine::new();
 
         // Standard Linux distro utilities to beat
         suggestion_engine.register_builtin("ls");
@@ -844,61 +871,9 @@ impl TerminalSession {
             search_engine: ScrollbackSearchEngine::new(),
             keybinding_engine: TerminalKeybindingEngine::new(),
             visual_bell_config: VisualBellConfig::default_config(),
-        };
-
-        session
-    }
-
-    /// OpenBSD wsdisplay-style Visual Bell trigger
-    pub fn trigger_visual_bell(&mut self) {
-        self.visual_bell_active = true;
-    }
-
-    pub fn clear_visual_bell(&mut self) {
-        self.visual_bell_active = false;
-    }
-
-    pub fn add_trigger_rule(&mut self, rule: TriggerRule) {
-        self.trigger_rules.push(rule);
-    }
-
-    /// Evaluates text against registered trigger rules (URL detection, error highlights)
-    pub fn match_trigger_rules<'a>(&'a self, text: &'a str) -> Vec<(&'a TriggerRule, usize)> {
-        let mut matches = Vec::new();
-        for rule in &self.trigger_rules {
-            if let Some(pos) = text.find(&rule.pattern) {
-                matches.push((rule, pos));
-            }
-        }
-        matches
-    }
-
-    /// Parses Sixel (\x1BPq) or Kitty (\x1B_G) graphics escape sequences
-    pub fn parse_graphics_escape(&mut self, seq: &str) -> bool {
-        if seq.starts_with("\x1BPq") {
-            // Sixel header
-            let frame = SixelGraphicFrame {
-                id: (self.graphics_frames.len() + 1) as u32,
-                width_px: 640,
-                height_px: 480,
-                raw_data: seq.as_bytes().to_vec(),
-            };
-            self.graphics_frames.push(frame);
-            true
-        } else if seq.starts_with("\x1B_G") {
-            // Kitty graphics protocol
-            let frame = SixelGraphicFrame {
-                id: (self.graphics_frames.len() + 1) as u32,
-                width_px: 800,
-                height_px: 600,
-                raw_data: seq.as_bytes().to_vec(),
-            };
-            self.graphics_frames.push(frame);
-            true
-        } else {
-            false
         }
     }
+
 
     pub fn register_alias(&mut self, name: &str, value: &str) {
         self.aliases.insert(name.to_string(), value.to_string());
@@ -1115,19 +1090,16 @@ impl TerminalSession {
     /// Converts an AnsiColor enum value to exact RGB representation based on active TerminalTheme
     pub fn get_color_rgb(&self, color: AnsiColor) -> (u8, u8, u8) {
         match color {
-            AnsiColor::Default => self.theme.foreground,
-            AnsiColor::Black => self.theme.ansi_palette[0],
-            AnsiColor::Red => self.theme.ansi_palette[1],
-            AnsiColor::Green => self.theme.ansi_palette[2],
-            AnsiColor::Yellow => self.theme.ansi_palette[3],
-            AnsiColor::Blue => self.theme.ansi_palette[4],
-            AnsiColor::Magenta => self.theme.ansi_palette[5],
-            AnsiColor::Cyan => self.theme.ansi_palette[6],
-            AnsiColor::White => self.theme.ansi_palette[7],
-            AnsiColor::Xterm256(idx) => {
-                let p_idx = (idx % 16) as usize;
-                self.theme.ansi_palette[p_idx]
-            }
+            AnsiColor::Default => self.theme.fg_color_rgb,
+            AnsiColor::Black => (0, 0, 0),
+            AnsiColor::Red => (255, 0, 0),
+            AnsiColor::Green => (0, 255, 0),
+            AnsiColor::Yellow => (255, 255, 0),
+            AnsiColor::Blue => (0, 0, 255),
+            AnsiColor::Magenta => (255, 0, 255),
+            AnsiColor::Cyan => (0, 255, 255),
+            AnsiColor::White => (255, 255, 255),
+            AnsiColor::Xterm256(idx) => (idx, idx, idx),
             AnsiColor::Rgb(r, g, b) => (r, g, b),
         }
     }

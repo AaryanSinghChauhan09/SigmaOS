@@ -231,7 +231,7 @@ impl DpkgDatabase {
     /// Install a package
     pub fn install_package(&mut self, package: DebPackage) -> Result<(), String> {
         self.installed_packages
-            .insert(package.package.clone(), package);
+            .insert(package.package.clone(), package.clone());
         self.status_database
             .insert(package.package.clone(), "install ok installed".to_string());
         Ok(())
@@ -246,7 +246,7 @@ impl DpkgDatabase {
 
     /// Get package status
     pub fn get_package_status(&self, package_name: &str) -> Option<&str> {
-        self.status_database.get(package_name)
+        self.status_database.get(package_name).map(|s| s.as_str())
     }
 
     /// Get installed package

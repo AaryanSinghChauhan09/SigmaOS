@@ -163,13 +163,13 @@ impl CronDaemon {
 
     /// Remove a cron job
     pub fn remove_job(&mut self, id: &str) -> Result<(), CronError> {
-        self.jobs.remove(id).ok_or(CronError::JobNotFound)?;
+        self.jobs.remove(&id.to_string()).ok_or(CronError::JobNotFound)?;
         Ok(())
     }
 
     /// Get a cron job
     pub fn get_job(&self, id: &str) -> Option<&CronJob> {
-        self.jobs.get(id)
+        self.jobs.get_str(id)
     }
 
     /// List all cron jobs
@@ -218,14 +218,14 @@ impl CronDaemon {
 
     /// Enable a job
     pub fn enable_job(&mut self, id: &str) -> Result<(), CronError> {
-        let job = self.jobs.get_mut(id).ok_or(CronError::JobNotFound)?;
+        let job = self.jobs.get_mut_str(id).ok_or(CronError::JobNotFound)?;
         job.enabled = true;
         Ok(())
     }
 
     /// Disable a job
     pub fn disable_job(&mut self, id: &str) -> Result<(), CronError> {
-        let job = self.jobs.get_mut(id).ok_or(CronError::JobNotFound)?;
+        let job = self.jobs.get_mut_str(id).ok_or(CronError::JobNotFound)?;
         job.enabled = false;
         Ok(())
     }
@@ -377,8 +377,20 @@ impl SovereignCronDaemon {
         }
 
         let mut ran = 0;
-        for job in self.base_daemon.jobs.values_mut() {
-            if job.enabled && self.is_user_permitted(&job.user) {
+        let allowed = self.allowed_users.clone();
+        let denied = self.denied_users.clone();
+        let is_permitted = |user: &str| {
+            if denied.contains(&user.to_string()) {
+                return false;
+            }
+            if !allowed.is_empty() {
+                return allowed.contains(&user.to_string());
+            }
+            true
+        };
+
+        for (_id, job) in self.base_daemon.jobs.iter_mut() {
+            if job.enabled && is_permitted(&job.user) {
                 if job.last_run.is_none() || (current_time > job.next_run) {
                     job.last_run = Some(current_time);
                     job.next_run = current_time + 86400; // 24h

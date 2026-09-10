@@ -188,6 +188,6 @@ pub use sovereign_suite::{
 };
 
 pub use open_source_dominance::{
-    InspirationFeatureMatrix, InspirationFeatureNode, InspirationPackageIntegrator,
+    InspirationFeature, InspirationFeatureMatrix, InspirationPackageIntegrator,
     InspirationSecurityGuard, OpenSourceDominanceEngine, OpenSourceInspirationTier,
 };

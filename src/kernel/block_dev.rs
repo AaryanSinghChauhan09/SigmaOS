@@ -63,7 +63,7 @@ impl Bio {
             count,
             op: BioOp::Read,
             priority: ReqPriority::Normal,
-            data: vec![0u8; count as usize * SECTOR_SIZE],
+            data: Vec::from_iter(alloc::vec![0u8; count as usize * SECTOR_SIZE]),
         }
     }
     pub fn write(id: u64, sector: u64, data: Vec<u8>) -> Self {

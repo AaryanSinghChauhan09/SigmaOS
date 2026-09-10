@@ -281,10 +281,9 @@ pub use ai::next_gen::{
     MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
 };
 pub use ai::agentic_os_runtime::{
-    AgentAuditRecord, ContainerConfig, ContainerFirstRuntimeHost, ContainerState, ContextTokenType,
-    DeterministicAgentSandbox, EbpfTraceEvent, EbpfTraceEventType, EbpfTracingMonitor, LocalLlmModel,
-    LocalLlmSystemDaemon, OmniAutomatorStudioApi, PosixNativeBridgeLayer, TamperProofAgentAuditLogger,
-    TpmTokenKeyVault, VectorContextBlock, VectorContextMmu,
+    BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu, EbpfNetworkFilter,
+    EphemeralAgentSandbox, GpuBackend, HybridContainerRuntime, LocalLlmDaemon, LocalLlmSystemDaemon,
+    OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
 };
 pub use ai::wandr::{
     ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
@@ -317,7 +316,3 @@ pub mod app;
 pub mod auth;
 pub use open_source_obsoletion::*;
 
-pub use unimplemented_features::{
-    KaliAnonsurfTrafficShunt, GhostBsdSysadmBridge, PopOsSystem76PowerManager, System76GpuMode,
-    ClearLinuxStatelessOverlayManager, KeylimeTpmAttestationEngine,
-};

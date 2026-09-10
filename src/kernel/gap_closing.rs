@@ -480,7 +480,7 @@ impl X86RootkitAuditor {
 
     pub fn audit_driver_dispatch_table(
         &self,
-        driver: &DriverObject,
+        driver: &DriverObjectX86,
         lower_bound: usize,
         upper_bound: usize,
     ) -> Result<(), &'static str> {

@@ -2,7 +2,7 @@
 //!
 //! Lightweight OS-level virtualization with process isolation
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::str::FromStr;
@@ -74,46 +74,41 @@ impl SigmaJailManager {
 
     /// Start a jail
     pub fn start_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get_mut(name) {
+        let (ip_address, config, exec_start) = if let Some(jail) = self.jails.get_str(name) {
             if jail.state != JailState::Stopped {
                 return Err(format!("Jail '{}' is not stopped", name).into());
             }
-
-            jail.state = JailState::Starting;
-
-            // Assign JID
-            let jid = self.next_jid;
-            self.next_jid += 1;
-            jail.jid = Some(jid);
-
-            // Create network namespace if IP specified
-            if let Some(ip) = &jail.config.ip_address {
-                self.setup_jail_network(jid, ip)?;
-            }
-
-            // Mount jail filesystem
-            self.mount_jail_fs(&jail.config)?;
-
-            // Apply security restrictions
-            self.apply_jail_restrictions(jid, &jail.config)?;
-
-            // Execute startup script
-            if let Some(exec_start) = &jail.config.exec_start {
-                self.execute_in_jail(jid, exec_start)?;
-            }
-
-            jail.state = JailState::Running;
-            println!("Jail '{}' started with JID {}", name, jid);
-
-            Ok(())
+            (jail.config.ip_address.clone(), jail.config.clone(), jail.config.exec_start.clone())
         } else {
-            Err(format!("Jail '{}' not found", name).into())
+            return Err(format!("Jail '{}' not found", name).into());
+        };
+
+        let jid = self.next_jid;
+        self.next_jid += 1;
+
+        if let Some(ip) = &ip_address {
+            self.setup_jail_network(jid, ip)?;
         }
+
+        self.mount_jail_fs(&config)?;
+        self.apply_jail_restrictions(jid, &config)?;
+
+        if let Some(start_cmd) = &exec_start {
+            self.execute_in_jail(jid, start_cmd)?;
+        }
+
+        if let Some(jail) = self.jails.get_mut_str(name) {
+            jail.state = JailState::Running;
+            jail.jid = Some(jid);
+        }
+
+        println!("Jail '{}' started with JID {}", name, jid);
+        Ok(())
     }
 
     /// Stop a jail
     pub fn stop_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let (exec_stop, jid, config, processes) = if let Some(jail) = self.jails.get(name) {
+        let (exec_stop, jid, config, processes) = if let Some(jail) = self.jails.get_str(name) {
             if jail.state != JailState::Running {
                 return Err(format!("Jail '{}' is not running", name).into());
             }
@@ -127,7 +122,7 @@ impl SigmaJailManager {
             return Err(format!("Jail '{}' not found", name).into());
         };
 
-        if let Some(jail) = self.jails.get_mut(name) {
+        if let Some(jail) = self.jails.get_mut_str(name) {
             jail.state = JailState::Stopping;
         }
 
@@ -149,7 +144,7 @@ impl SigmaJailManager {
             self.cleanup_jail_network(jid)?;
         }
 
-        if let Some(jail) = self.jails.get_mut(name) {
+        if let Some(jail) = self.jails.get_mut_str(name) {
             jail.state = JailState::Stopped;
             jail.jid = None;
             jail.processes.clear();
@@ -165,7 +160,7 @@ impl SigmaJailManager {
         name: &str,
         command: &str,
     ) -> Result<String, Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get(name) {
+        if let Some(jail) = self.jails.get_str(name) {
             if jail.state != JailState::Running {
                 return Err(format!("Jail '{}' is not running", name).into());
             }
@@ -434,7 +429,7 @@ impl SigmaJailManager {
         // Wait and force kill if necessary
         std::thread::sleep(std::time::Duration::from_secs(5));
 
-        for pid in &jail.processes {
+        for pid in processes {
             let _ = Command::new("kill")
                 .arg("-KILL")
                 .arg(pid.to_string())

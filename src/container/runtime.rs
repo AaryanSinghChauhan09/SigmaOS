@@ -109,7 +109,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: ContainerCapability::full(),
+            capability: RuntimeCapability::full(),
         }
     }
 }
@@ -282,6 +282,25 @@ pub struct SimpleContainer {
     pub capability: RuntimeCapability,
     pub environment: [u8; 512],
     pub seccomp: SeccompPolicy,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SeccompAction {
+    Allow,
+    Errno,
+    Kill,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeccompPolicy {
+    pub default_action: SeccompAction,
+    pub blocked_syscalls: Vec<u32>,
+}
+
+impl SeccompPolicy {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        self.blocked_syscalls.contains(&syscall_id)
+    }
 }
 
 impl SimpleContainer {

@@ -31,7 +31,7 @@ pub mod vpn;
 pub mod vulnerability;
 
 pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+    DomainID, DomainType, IsolatedDomain, IsolationError,
 };
 
 pub use qubes_isolation::*;
@@ -80,4 +80,4 @@ pub use vpn::{
 pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
 };
-pub use vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner};
+pub use vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};

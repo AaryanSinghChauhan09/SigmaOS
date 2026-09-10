@@ -159,11 +159,11 @@ impl TCPConnection for SimpleSocket {
             return Err(NetworkError::ConnectionFailed);
         }
 
-        self.remote_port.store(remote_port as u32, Ordering::SeqCst);
+        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
 
         // Transition: Closed -> SynSent -> Established
-        self.state.store(TCPState::SynSent as u32, Ordering::SeqCst);
-        self.state.store(TCPState::Established as u32, Ordering::SeqCst);
+        self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state.store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
     fn listen(&mut self) -> Result<(), NetworkError> {
@@ -634,27 +634,23 @@ pub struct SimpleNetworkStack {
     pub interfaces: Vec<NetworkInterface>,
 }
 
-impl Default for SimpleNetworkStack {
-    fn default() -> Self {
-        Self::new()
+impl SimpleNetworkStack {
+    pub fn new() -> Self {
+        Self {
+            sockets: Vec::new(),
+            next_id: AtomicUsize::new(1),
+            firewall: SimpleFirewall::new(),
+            congestion: RenoCongestionControl::new(),
+            netfilter: NetfilterFirewall::new(),
+            routing_table: RoutingTable::new(),
+            interfaces: Vec::new(),
+        }
     }
 }
 
-impl NetworkStack for SimpleNetworkStack {
-    fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst) as usize;
-        let socket = SimpleSocket::new(id, protocol, port);
-        self.sockets.push(Box::new(socket));
-        Ok(id)
-    }
-
-    fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        if let Some(pos) = self.sockets.iter().position(|s: &Box<dyn Socket>| s.id() == id) {
-            self.sockets.remove(pos);
-            Ok(())
-        } else {
-            Err(NetworkError::InvalidSocket)
-        }
+impl Default for SimpleNetworkStack {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -665,19 +661,22 @@ impl NetworkStack for SimpleNetworkStack {
         self.sockets.push(Some(Box::new(socket)));
         Ok(id)
     }
+
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        for socket_option in &mut self.sockets {
-            if let Some(ref socket) = *socket_option {
-                if socket.id() == id {
+        for socket_opt in &mut self.sockets {
+            if let Some(s) = socket_opt {
+                if s.id() == id {
+                    *socket_opt = None;
                     return Ok(());
                 }
             }
         }
         Err(NetworkError::InvalidSocket)
     }
+
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        for socket in &self.sockets {
-            if let Some(s) = socket {
+        for socket_opt in &self.sockets {
+            if let Some(s) = socket_opt {
                 if s.id() == id {
                     return Some(s.as_ref());
                 }

@@ -273,6 +273,16 @@ impl SimpleVMM {
         self.vmas.push(vma);
     }
 
+    pub fn map_page_with_flags(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        _writable: bool,
+        _executable: bool,
+    ) -> Result<(), MemoryError> {
+        self.map_page(virt, phys)
+    }
+
     /// Maps a standard 4KB page
     pub fn map_page(
         &mut self,
@@ -420,30 +430,12 @@ impl SimpleVMM {
             .and_then(|opt| opt.as_mut())
             .unwrap();
 
-        // 1GB Huge Page Check at PML4 level (points to PDPT huge entry)
-        if let Some(huge_pte) = pml4.get_huge_entry(pdpt_idx) {
-            self.validate_access(huge_pte, write_intent, execute_intent)?;
-            let offset = virt.0 & 0x3FFF_FFFF; // 1GB offset
-            return Ok(PhysicalAddress(
-                (huge_pte.physical_address.0 & !0x3FFF_FFFF) + offset,
-            ));
-        }
-
         let has_pdpt = pml4.get_directory(pdpt_idx).is_some();
         if !has_pdpt {
             return self.attempt_demand_paging(virt, write_intent, execute_intent);
         }
 
         let pdpt = pml4.get_directory_mut(pdpt_idx).unwrap();
-
-        // 2MB Huge Page Check at PDPT level (points to PD huge entry)
-        if let Some(huge_pte) = pdpt.get_huge_entry(pd_idx) {
-            self.validate_access(huge_pte, write_intent, execute_intent)?;
-            let offset = virt.0 & 0x1F_FFFF; // 2MB offset
-            return Ok(PhysicalAddress(
-                (huge_pte.physical_address.0 & !0x1F_FFFF) + offset,
-            ));
-        }
 
         let has_pd = pdpt.get_table(pd_idx).is_some();
         if !has_pd {
@@ -477,7 +469,7 @@ impl SimpleVMM {
             return Ok(PhysicalAddress(unique_phys.0 + offset));
         }
 
-        self.validate_access(pte, write_intent, execute_intent)?;
+        Self::validate_access(pte, write_intent, execute_intent)?;
 
         // Compute 4KB physical offset
         let offset = virt.0 & 0xFFF;
@@ -520,7 +512,6 @@ impl SimpleVMM {
     }
 
     fn validate_access(
-        &self,
         pte: &PageTableEntry,
         write_intent: bool,
         execute_intent: bool,
