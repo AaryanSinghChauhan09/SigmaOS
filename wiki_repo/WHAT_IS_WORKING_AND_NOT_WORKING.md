@@ -126,6 +126,128 @@ While SigmaOS is highly innovative in its Rust-based microkernel, zero-dependenc
 
 ---
 
+## 2.3 Missing Linux Kernel Parity Components & Safe Rust Implementation Blueprints
+
+When comparing SigmaOS kernel infrastructure (`src/kernel/`, `src/compatibility/linux_compat.rs`) with the monolithic Linux kernel (v6.x+), several advanced subsystem components are missing or only partially simulated. AI agents expanding kernel capabilities can use the safe Rust blueprints below to implement them cleanly:
+
+### 🔑 Missing Linux Kernel Components Comparison
+
+| Linux Kernel Subsystem | Linux Reference Implementation | SigmaOS Status | Missing Component & Algorithmic Blueprint |
+| :--- | :--- | :--- | :--- |
+| **cgroups v2 Memory Controller (`memcg`)** | `mm/memcontrol.c` (`memory.max`, `memory.high`, reclaim, OOM) | **PARTIAL** | Missing dynamic memory pressure reclamation & OOM score governor (`LinuxMemcgV2MemoryController`) |
+| **Kernel Samepage Merging (`KSM`)** | `mm/ksm.c` (`ksmd` thread, stable/unstable tree) | **MISSING** | Missing background page hash deduplication scanner (`LinuxKsmKernelSamepageMerging`) |
+| **OverlayFS Union Mount** | `fs/overlayfs/` (`lowerdir`, `upperdir`, `workdir`, whiteouts) | **PARTIAL** | Missing copy-up on write and whiteout character device (`0,0`) generator (`LinuxOverlayFsEngine`) |
+| **eBPF In-Kernel JIT Compiler** | `kernel/bpf/core.c` (x86_64 JIT machine code emitter) | **PARTIAL** | Missing native eBPF bytecode to x86_64/AArch64 machine code JIT emitter (`BpfJitCompiler`) |
+| **io_uring SQPOLL Thread** | `io_uring/sqpoll.c` (Kernel SQ polling thread) | **WORKING (Shim)** | Need kernel thread wake-up polling loop with lockless ring synchronization |
+
+---
+
+### 🛠️ Safe Rust Algorithmic Blueprints for AI Agents
+
+#### Blueprint 10: cgroups v2 Memory Controller (`LinuxMemcgV2MemoryController`)
+```rust
+pub struct LinuxMemcgV2MemoryController {
+    pub cgroup_name: String,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub current_usage_bytes: u64,
+    pub oom_kill_count: u32,
+}
+
+impl LinuxMemcgV2MemoryController {
+    pub fn new(cgroup_name: &str, max_mb: u64, high_mb: u64) -> Self {
+        Self {
+            cgroup_name: cgroup_name.to_string(),
+            memory_max_bytes: max_mb * 1024 * 1024,
+            memory_high_bytes: high_mb * 1024 * 1024,
+            current_usage_bytes: 0,
+            oom_kill_count: 0,
+        }
+    }
+
+    pub fn try_charge(&mut self, bytes: u64) -> Result<(), &'static str> {
+        if self.current_usage_bytes + bytes > self.memory_max_bytes {
+            self.oom_kill_count += 1;
+            return Err("memcg: Out of Memory (OOM) killed process");
+        }
+        self.current_usage_bytes += bytes;
+        Ok(())
+    }
+
+    pub fn uncharge(&mut self, bytes: u64) {
+        self.current_usage_bytes = self.current_usage_bytes.saturating_sub(bytes);
+    }
+}
+```
+
+#### Blueprint 11: Kernel Samepage Merging Deduplication (`LinuxKsmKernelSamepageMerging`)
+```rust
+use alloc::collections::BTreeMap;
+
+pub struct LinuxKsmKernelSamepageMerging {
+    pub page_hashes: BTreeMap<u64, u64>, // Hash -> Frame Physical Address
+    pub merged_pages_count: usize,
+    pub pages_scanned_count: usize,
+}
+
+impl LinuxKsmKernelSamepageMerging {
+    pub fn new() -> Self {
+        Self {
+            page_hashes: BTreeMap::new(),
+            merged_pages_count: 0,
+            pages_scanned_count: 0,
+        }
+    }
+
+    pub fn scan_and_merge_page(&mut self, phys_addr: u64, page_data: &[u8]) -> Option<u64> {
+        self.pages_scanned_count += 1;
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in page_data {
+            hash ^= u64::from(b);
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+
+        if let Some(&existing_paddr) = self.page_hashes.get(&hash) {
+            self.merged_pages_count += 1;
+            Some(existing_paddr) // Return existing shared page frame for CoW mapping
+        } else {
+            self.page_hashes.insert(hash, phys_addr);
+            None
+        }
+    }
+}
+```
+
+#### Blueprint 12: OverlayFS Copy-Up Engine (`LinuxOverlayFsEngine`)
+```rust
+pub struct LinuxOverlayFsEngine {
+    pub lower_dir: String,
+    pub upper_dir: String,
+    pub work_dir: String,
+    pub merged_dir: String,
+    pub copy_up_count: usize,
+}
+
+impl LinuxOverlayFsEngine {
+    pub fn new(lower: &str, upper: &str, work: &str, merged: &str) -> Self {
+        Self {
+            lower_dir: lower.to_string(),
+            upper_dir: upper.to_string(),
+            work_dir: work.to_string(),
+            merged_dir: merged.to_string(),
+            copy_up_count: 0,
+        }
+    }
+
+    pub fn copy_up_file_on_write(&mut self, relative_path: &str) -> String {
+        self.copy_up_count += 1;
+        format!("{}/{}", self.upper_dir, relative_path)
+    }
+}
+```
+
+---
+
 ## 3. Compiler & Runtime Diagnostics Catalog (What's Not Working & Why)
 
 When modifying, building, or expanding algorithms in full workspace build modes (`cargo check --lib` / `cargo test`), AI agents may encounter Rust compiler errors caused by duplicate implementations or trait collisions from legacy feature additions. The catalog below lists each error code, its root cause, and why it happens in this codebase.
