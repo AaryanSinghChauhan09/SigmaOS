@@ -247,7 +247,119 @@ impl Default for EbpfXdpFilterEngine {
     }
 }
 
-#[cfg(test_disabled)]
+// =========================================================================
+// Linux BPF_MAP_TYPE_RINGBUF Lock-Free Kernel-to-Userland Event Ring Buffer
+// =========================================================================
+
+pub const BPF_RINGBUF_BUSY_BIT: u32 = 1 << 31;
+pub const BPF_RINGBUF_DISCARD_BIT: u32 = 1 << 30;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BpfRingBufferHeader {
+    pub len: u32,
+    pub pgoff: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BpfRingBufferSample {
+    pub producer_offset: u32,
+    pub payload: Vec<u8>,
+    pub is_discarded: bool,
+}
+
+/// Linux eBPF Ring Buffer (BPF_MAP_TYPE_RINGBUF) parity engine
+pub struct BpfRingBufferEngine {
+    pub capacity: usize,
+    pub producer_pos: usize,
+    pub consumer_pos: usize,
+    pub samples: Vec<BpfRingBufferSample>,
+    pub dropped_samples_count: u64,
+}
+
+impl BpfRingBufferEngine {
+    pub fn new(capacity_bytes: usize) -> Self {
+        let cap = if capacity_bytes.is_power_of_two() && capacity_bytes >= 4096 {
+            capacity_bytes
+        } else {
+            capacity_bytes.next_power_of_two().max(4096)
+        };
+
+        Self {
+            capacity: cap,
+            producer_pos: 0,
+            consumer_pos: 0,
+            samples: Vec::new(),
+            dropped_samples_count: 0,
+        }
+    }
+
+    pub fn reserve_sample(&mut self, payload_len: usize) -> Result<usize, &'static str> {
+        let total_size = payload_len + 8; // 8 bytes header
+        if self.producer_pos + total_size - self.consumer_pos > self.capacity {
+            self.dropped_samples_count += 1;
+            return Err("BPF_MAP_TYPE_RINGBUF: Buffer overflow");
+        }
+
+        let sample_id = self.samples.len();
+        self.samples.push(BpfRingBufferSample {
+            producer_offset: (self.producer_pos % self.capacity) as u32,
+            payload: vec![0u8; payload_len],
+            is_discarded: false,
+        });
+
+        self.producer_pos += total_size;
+        Ok(sample_id)
+    }
+
+    pub fn submit_sample(&mut self, sample_id: usize, data: &[u8]) -> Result<(), &'static str> {
+        let sample = self
+            .samples
+            .get_mut(sample_id)
+            .ok_or("BPF_MAP_TYPE_RINGBUF: Invalid sample handle")?;
+
+        if sample.payload.len() != data.len() {
+            return Err("BPF_MAP_TYPE_RINGBUF: Payload size mismatch");
+        }
+
+        sample.payload.copy_from_slice(data);
+        sample.is_discarded = false;
+        Ok(())
+    }
+
+    pub fn discard_sample(&mut self, sample_id: usize) -> Result<(), &'static str> {
+        let sample = self
+            .samples
+            .get_mut(sample_id)
+            .ok_or("BPF_MAP_TYPE_RINGBUF: Invalid sample handle")?;
+
+        sample.is_discarded = true;
+        sample.payload.clear();
+        Ok(())
+    }
+
+    pub fn consume_next_sample(&mut self) -> Option<BpfRingBufferSample> {
+        if self.samples.is_empty() {
+            None
+        } else {
+            let sample = self.samples.remove(0);
+            let total_size = sample.payload.len() + 8;
+            self.consumer_pos += total_size;
+            if sample.is_discarded {
+                self.consume_next_sample()
+            } else {
+                Some(sample)
+            }
+        }
+    }
+}
+
+impl Default for BpfRingBufferEngine {
+    fn default() -> Self {
+        Self::new(4096)
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -315,5 +427,31 @@ mod tests {
             xdp_engine.process_xdp_packet_hook(&mut ctx).unwrap(),
             XdpAction::Drop
         );
+    }
+
+    #[test]
+    fn test_bpf_ringbuf_reserve_submit_and_consume() {
+        let mut ringbuf = BpfRingBufferEngine::new(4096);
+        let sample_id = ringbuf.reserve_sample(16).unwrap();
+
+        let event_data = b"EVENT_DATA_12345";
+        assert!(ringbuf.submit_sample(sample_id, event_data).is_ok());
+
+        let consumed = ringbuf.consume_next_sample().unwrap();
+        assert_eq!(consumed.payload, event_data);
+    }
+
+    #[test]
+    fn test_bpf_ringbuf_discard_sample() {
+        let mut ringbuf = BpfRingBufferEngine::new(4096);
+        let id1 = ringbuf.reserve_sample(8).unwrap();
+        let id2 = ringbuf.reserve_sample(8).unwrap();
+
+        assert!(ringbuf.discard_sample(id1).is_ok());
+        assert!(ringbuf.submit_sample(id2, b"12345678").is_ok());
+
+        // Consuming should skip discarded sample id1 and yield sample id2
+        let consumed = ringbuf.consume_next_sample().unwrap();
+        assert_eq!(consumed.payload, b"12345678");
     }
 }

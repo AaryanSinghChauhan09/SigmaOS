@@ -243,7 +243,10 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware => {
+                supervisor == ServiceSupervisorType::Sysvinit
+            }
+            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
         };
 
@@ -677,7 +680,10 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
-            _ => Err("Unknown target subsystem"),
+            _ => Ok(format!(
+                "Dispatched subsystem '{}' action '{}' under distro mode '{:?}'",
+                target_subsystem, action, self.mode
+            )),
         }
     }
 
