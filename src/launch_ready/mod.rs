@@ -9,6 +9,7 @@
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
@@ -23,10 +24,19 @@ use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
+=======
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+>>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
 use alloc::format;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::String;
+use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]

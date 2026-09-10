@@ -125,7 +125,10 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::LinuxMint
+<<<<<<< HEAD
 >>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
+=======
+>>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -232,7 +235,10 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::LinuxMint
+<<<<<<< HEAD
 >>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
+=======
+>>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -274,7 +280,15 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
+<<<<<<< HEAD
             | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
+=======
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint => format!("{}.deb", input_pkg),
+>>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -315,7 +329,15 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
+<<<<<<< HEAD
             | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
+=======
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint => format!("{}.deb", action),
+>>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
@@ -1115,6 +1137,7 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+<<<<<<< HEAD
             "storage" => {
                 let healed = self
                     .verify_and_self_heal_cow_file("@root", action, b"default")
@@ -1270,6 +1293,10 @@ impl SovereignUniversalDistroBridge {
             }
             _ => Ok(format!(
                 "Dispatched subsystem '{}' action '{}' under distro mode '{:?}'",
+=======
+            _ => Ok(format!(
+                "Dispatched operation for subsystem '{}' with action '{}' under distro mode '{:?}'",
+>>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
                 target_subsystem, action, self.mode
             )),
         }
@@ -2600,6 +2627,14 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+<<<<<<< HEAD
+=======
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxMint,
+>>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
         ];
 
         for m in modes {
