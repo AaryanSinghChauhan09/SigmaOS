@@ -80,6 +80,36 @@ export function initKeyboardNavigation() {
 }
 
 /**
+ * Initializes WAI-ARIA tablist keyboard navigation (Arrow keys, Home, End).
+ */
+export function initTablistNavigation() {
+  const tablists = SovereignDomSelector.selectAll('[role="tablist"]');
+  tablists.forEach((tablist) => {
+    const tabs = SovereignDomSelector.selectAll('[role="tab"]', tablist);
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("keydown", (event) => {
+        let targetIndex = null;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          targetIndex = (index + 1) % tabs.length;
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          targetIndex = (index - 1 + tabs.length) % tabs.length;
+        } else if (event.key === "Home") {
+          targetIndex = 0;
+        } else if (event.key === "End") {
+          targetIndex = tabs.length - 1;
+        }
+
+        if (targetIndex !== null) {
+          event.preventDefault();
+          tabs[targetIndex].focus();
+          tabs[targetIndex].click();
+        }
+      });
+    });
+  });
+}
+
+/**
  * Set ARIA label for screen readers
  */
 export function setAriaLabel(element, label) {
@@ -142,10 +172,12 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", () => {
       initKeyboardNavigation();
       initHighContrastSupport();
+      initTablistNavigation();
     });
   } else {
     initKeyboardNavigation();
     initHighContrastSupport();
+    initTablistNavigation();
   }
 }
 
