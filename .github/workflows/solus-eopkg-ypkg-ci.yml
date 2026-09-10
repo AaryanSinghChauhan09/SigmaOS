@@ -1,0 +1,25 @@
+name: Solus ypkg & eopkg Package Subsystem CI
+
+on:
+  push:
+    branches: [ "main", "master", "jules-*" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  solus-eopkg:
+    name: Solus ypkg Build Recipes & eopkg Package Subsystem Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test Solus eopkg Manifest & CLI Dispatcher
+        run: |
+          echo "Testing Solus ypkg recipes and eopkg package manager dispatcher..."
+          rustc --test --edition=2021 tests/test_universal_adapter.rs -o build/test_universal_adapter && ./build/test_universal_adapter

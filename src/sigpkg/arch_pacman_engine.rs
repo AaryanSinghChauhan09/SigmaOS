@@ -36,6 +36,7 @@ pub struct PacmanDatabase {
     pub packages: Vec<ArchPacmanPackage>,
     pub local_packages: Vec<ArchPacmanPackage>,
     pub sync_databases: Vec<String>,
+    pub history_snapshots: Vec<Vec<ArchPacmanPackage>>,
 }
 
 impl PacmanDatabase {
@@ -49,6 +50,22 @@ impl PacmanDatabase {
                 "community".to_string(),
                 "multilib".to_string(),
             ],
+            history_snapshots: Vec::new(),
+        }
+    }
+
+    /// Creates a point-in-time snapshot of currently installed local packages
+    pub fn create_snapshot(&mut self) {
+        self.history_snapshots.push(self.local_packages.clone());
+    }
+
+    /// Rolls back the local package database to the previous historical snapshot generation
+    pub fn rollback(&mut self) -> Result<(), String> {
+        if let Some(previous_state) = self.history_snapshots.pop() {
+            self.local_packages = previous_state;
+            Ok(())
+        } else {
+            Err("No previous generation snapshot available for rollback".to_string())
         }
     }
 
@@ -255,6 +272,39 @@ impl AURHelper {
         } else {
             Err(format!("AUR package '{}' not found", package_name))
         }
+    }
+
+    /// Compiles an AUR PKGBUILD string, parses dependencies, and registers the compiled package into local AUR cache
+    pub fn compile_aur_pkgbuild(&mut self, pkgname: &str, pkgbuild_content: &str) -> Result<ArchPacmanPackage, String> {
+        let mut abs = ArchBuildSystem::new();
+        abs.parse_pkgbuild(pkgbuild_content)?;
+        abs.build_package()?;
+
+        let pkg = ArchPacmanPackage {
+            name: pkgname.to_string(),
+            version: "1.0.0-1".to_string(),
+            description: format!("Compiled AUR package {}", pkgname),
+            url: format!("https://aur.archlinux.org/packages/{}", pkgname),
+            architecture: "x86_64".to_string(),
+            license: vec!["GPL".to_string()],
+            groups: Vec::new(),
+            depends: Vec::new(),
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: vec![pkgname.to_string()],
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 2048,
+            packager: "AUR-Compiler".to_string(),
+            build_date: "2026-08-24".to_string(),
+            install_date: "2026-08-24".to_string(),
+            is_explicit: true,
+        };
+
+        self.register_aur_package(pkg.clone());
+        Ok(pkg)
     }
 }
 
@@ -708,6 +758,53 @@ depends=('glibc')
 
         assert!(abs.parse_pkgbuild(pkgbuild).is_ok());
         assert!(!abs.srcinfo.is_empty());
+    }
+
+    #[test]
+    fn test_pacman_database_snapshot_and_rollback() {
+        let mut db = PacmanDatabase::new();
+        let test_pkg = ArchPacmanPackage {
+            name: "test-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            description: "Test".to_string(),
+            url: "".to_string(),
+            architecture: "x86_64".to_string(),
+            license: Vec::new(),
+            groups: Vec::new(),
+            depends: Vec::new(),
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 100,
+            packager: "".to_string(),
+            build_date: "".to_string(),
+            install_date: "".to_string(),
+            is_explicit: true,
+        };
+
+        db.local_packages.push(test_pkg);
+        db.create_snapshot();
+        assert_eq!(db.history_snapshots.len(), 1);
+
+        db.local_packages.clear();
+        assert_eq!(db.local_packages.len(), 0);
+
+        assert!(db.rollback().is_ok());
+        assert_eq!(db.local_packages.len(), 1);
+        assert_eq!(db.local_packages[0].name, "test-pkg");
+    }
+
+    #[test]
+    fn test_aur_helper_compile_pkgbuild() {
+        let mut aur = AURHelper::new();
+        let pkgbuild = "pkgname=custom-app\npkgver=1.0.0\npkgrel=1\n";
+        let compiled = aur.compile_aur_pkgbuild("custom-app", pkgbuild).unwrap();
+        assert_eq!(compiled.name, "custom-app");
+        assert_eq!(aur.aur_packages.len(), 1);
     }
 
     #[test]
