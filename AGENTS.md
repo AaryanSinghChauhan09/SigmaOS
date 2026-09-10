@@ -79,9 +79,27 @@ This document defines operational guidelines, security policies, and verificatio
 
 ---
 
-## 3. Pre-Commit Verification Checklist for AI Agents
+## 3. Autonomous AI Agent Development Rules
+
+1. **Persona Protocols & Missions:**
+   - **Sentinel (Security):** Focus on security vulnerability remediation (XSS, path traversal, injection, memory safety).
+   - **Palette (UX):** Focus on micro-UX enhancements, accessibility (ARIA, focus visible), and terminal/GUI polish.
+   - **Bolt (Performance):** Focus on O(1) algorithms, lock-free structures, caching, and allocation reduction.
+
+2. **Planning & Review Cycles:**
+   - AI agents must request plan reviews using `request_plan_review` before setting or modifying the plan with `set_plan`.
+   - Agents must call `request_code_review` and address review feedback before finalizing PR submission.
+
+3. **Critical Learning Journaling:**
+   - Maintain critical learnings in `.jules/<persona>.md` (e.g. `.jules/sentinel.md`, `.jules/bolt.md`, `.jules/palette.md`).
+   - Log only non-routine, codebase-specific security findings, edge cases, and unexpected performance/UX insights.
+
+---
+
+## 4. Pre-Commit Verification Checklist for AI Agents
 
 Before submitting changes, AI agents must execute:
-1. `./run_sigma_tests.sh` to run 220+ atomic Rust unit tests and Python integration tests.
-2. `cargo fmt` to verify code formatting.
-3. Validate standalone builds for modified modules (`rustc --edition=2021 --test <modified_file.rs>`).
+1. `./run_sigma_tests.sh` to run all atomic Rust unit tests and system tests.
+2. Verify standalone builds for modified modules (`rustc --edition=2021 --test <modified_file.rs>`).
+3. Call `pre_commit_instructions` tool and complete all required checks.
+4. Record key codebase patterns via `initiate_memory_recording`.
