@@ -184,6 +184,93 @@ impl ArchAbsTreeManager {
     }
 }
 
+/// 7. Arch Linux Archive (ALA) Historical Time-Travel Package Engine
+#[derive(Debug, Clone)]
+pub struct ArchLinuxArchiveEngine {
+    pub archive_base_url: String,
+    pub historical_snapshots: BTreeMap<String, String>, // "YYYY/MM/DD" -> repo url
+}
+
+impl ArchLinuxArchiveEngine {
+    pub fn new() -> Self {
+        let mut snapshots = BTreeMap::new();
+        snapshots.insert(
+            "2024/01/01".to_string(),
+            "https://archive.archlinux.org/repos/2024/01/01/$repo/os/$arch".to_string(),
+        );
+        snapshots.insert(
+            "2024/06/01".to_string(),
+            "https://archive.archlinux.org/repos/2024/06/01/$repo/os/$arch".to_string(),
+        );
+        Self {
+            archive_base_url: "https://archive.archlinux.org".to_string(),
+            historical_snapshots: snapshots,
+        }
+    }
+
+    pub fn generate_time_travel_mirrorlist(&self, date_path: &str) -> Result<String, &'static str> {
+        if let Some(url) = self.historical_snapshots.get(date_path) {
+            Ok(format!("Server = {}", url))
+        } else {
+            Err("ALA Engine: Historical snapshot date not found")
+        }
+    }
+}
+
+impl Default for ArchLinuxArchiveEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Arch Security Advisory (ASA) Vulnerability Report
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchSecurityAdvisory {
+    pub asa_id: String, // e.g. "ASA-202401-1"
+    pub package_name: String,
+    pub affected_versions: String,
+    pub fixed_version: String,
+    pub cve_ids: Vec<String>,
+}
+
+/// 8. Arch Audit Vulnerability Advisory Scanner (`arch-audit`)
+#[derive(Debug, Clone)]
+pub struct ArchAuditScannerEngine {
+    pub advisories: Vec<ArchSecurityAdvisory>,
+}
+
+impl ArchAuditScannerEngine {
+    pub fn new() -> Self {
+        let mut advisories = Vec::new();
+        advisories.push(ArchSecurityAdvisory {
+            asa_id: "ASA-202405-1".to_string(),
+            package_name: "openssl".to_string(),
+            affected_versions: "<3.2.1-1".to_string(),
+            fixed_version: "3.2.1-1".to_string(),
+            cve_ids: vec!["CVE-2024-0001".to_string()],
+        });
+        Self { advisories }
+    }
+
+    pub fn scan_installed_packages(&self, installed: &BTreeMap<String, String>) -> Vec<ArchSecurityAdvisory> {
+        let mut vulnerable = Vec::new();
+        for adv in &self.advisories {
+            if let Some(ver) = installed.get(&adv.package_name) {
+                if ver < &adv.fixed_version {
+                    vulnerable.push(adv.clone());
+                }
+            }
+        }
+        vulnerable
+    }
+}
+
+impl Default for ArchAuditScannerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -219,5 +306,20 @@ mod tests {
         let results = aur.search("yay");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].name, "yay");
+    }
+
+    #[test]
+    fn test_arch_archive_and_audit_scanner() {
+        let ala = ArchLinuxArchiveEngine::new();
+        let mirrorlist = ala.generate_time_travel_mirrorlist("2024/01/01").unwrap();
+        assert!(mirrorlist.contains("https://archive.archlinux.org"));
+
+        let audit = ArchAuditScannerEngine::new();
+        let mut installed = BTreeMap::new();
+        installed.insert("openssl".to_string(), "3.1.0-1".to_string());
+
+        let vulns = audit.scan_installed_packages(&installed);
+        assert_eq!(vulns.len(), 1);
+        assert_eq!(vulns[0].asa_id, "ASA-202405-1");
     }
 }
