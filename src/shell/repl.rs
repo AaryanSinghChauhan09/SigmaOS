@@ -21,8 +21,6 @@ use crate::customization::{CustomizationEngine, Theme};
 #[cfg(not(test))]
 use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
 #[cfg(not(test))]
-use crate::klib::hashset::HashSet;
-#[cfg(not(test))]
 use crate::klib::HashMap;
 #[cfg(not(test))]
 use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
@@ -36,17 +34,6 @@ use crate::shell::zsh_bash_parity::{
 #[cfg(not(test))]
 use crate::shell::{
     BashParameterExpansion, HistoryExpansionEngine, JobControlManager,
-};
-use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform,
-};
-use crate::customization::CustomizationEngine;
-use crate::dashboard::SystemMonitor;
-use crate::package::{UnifiedPackage, UniversalPackageManager};
-use crate::resilience::SelfHealingModule;
-use crate::shell::zsh_bash_parity::{
-    BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
-    UniversalShellCompatibilityEngine, ZshSyntaxHighlighter,
 };
 use crate::virtualization::{
     Container, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
