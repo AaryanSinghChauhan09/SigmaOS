@@ -259,17 +259,16 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
-            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
-            | DistroSubsystemMode::LinuxVoid
-            | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Runit,
+            | DistroSubsystemMode::LinuxVoid => ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 ServiceSupervisorType::Shepherd
@@ -358,25 +357,24 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
-            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
-            | DistroSubsystemMode::LinuxVoid
-            | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Runit,
+            | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 supervisor == ServiceSupervisorType::Shepherd
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
         };
@@ -409,6 +407,8 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
+            DistroSubsystemMode::LinuxMint => format!("{}.deb", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
@@ -449,6 +449,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
+            DistroSubsystemMode::LinuxMint => format!("{}.deb", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
         };
@@ -507,6 +508,18 @@ impl SovereignUniversalDistroBridge {
             "access" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'access' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'i18n' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'firewall' with action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -1327,7 +1340,7 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
-            "toolchain" => {
+            "toolchain" | "compiler" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'toolchain' with action '{}' under distro mode '{:?}'",
                     action, self.mode
