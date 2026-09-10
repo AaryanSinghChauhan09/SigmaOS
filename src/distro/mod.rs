@@ -240,16 +240,6 @@ pub use ultimate_distro_innovations::{
 
 pub mod sovereign_ahead_distro_supremacy;
 pub use sovereign_ahead_distro_supremacy::{
-    AccessRight as CapabilityAccessRight, CarpNodeStatus, CoWBlockExtent,
-    DeclarativeCapabilityRule, MicroarchIsaTarget, OmniCasBlob, OmniGenRecord, PfsyncConnEntry,
-    SchedPolicyKind, SchedTaskDescriptor, SchedTaskState, SimdJitPatch,
-    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
-    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
-    SovereignXdpCarpMeshEngine,
-};
-
-pub mod sovereign_ahead_distro_supremacy;
-pub use sovereign_ahead_distro_supremacy::{
     DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchTier, PredictiveSchedPolicy,
     PredictiveTaskDescriptor, ResilientBlockEntry, SecurityMultiOsMask, SimdJitFunctionTarget,
     SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine,
