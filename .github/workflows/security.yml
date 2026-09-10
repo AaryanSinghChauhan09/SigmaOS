@@ -50,6 +50,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       - name: Count unsafe blocks
         run: |
+          mkdir -p build
           echo "## Unsafe Code Audit" > unsafe-report.txt
           echo "" >> unsafe-report.txt
           count=$(grep -r "unsafe " src/ --include="*.rs" | grep -v "// SAFETY" | wc -l)
@@ -74,6 +75,7 @@ jobs:
 
       - name: Scan for hardcoded secrets
         run: |
+          mkdir -p build
           echo "Scanning for potential hardcoded secrets..."
           # Look for patterns that suggest hardcoded credentials
           found=0
@@ -109,6 +111,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       - name: Check for new dependencies
         run: |
+          mkdir -p build
           echo "Checking Cargo.toml for unpinned dependency versions..."
           # Flag any dependencies using wildcard or caret ranges without minimum version
           grep -n '^\s*[a-z_-]\+ = "\*"' Cargo.toml || echo "No wildcard deps found"
@@ -126,6 +129,7 @@ jobs:
           components: rust-src
       - name: Run security-specific tests
         run: |
+          mkdir -p build
           cargo +nightly test --all -- security 2>&1 | tee security-test-results.txt
           # Specifically test IPv4 octal SSRF prevention
           cargo +nightly test --all -- validate_ipv4 2>&1 | tee -a security-test-results.txt
@@ -146,6 +150,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       - name: Check that all actions are pinned to SHAs
         run: |
+          mkdir -p build
           echo "Checking GitHub Actions workflow files for unpinned actions..."
           unpinned=0
           
