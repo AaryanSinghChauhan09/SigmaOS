@@ -93,8 +93,36 @@ pub use mint_menu::{
     MenuCategory, MenuItem, MenuItemType, MenuSearchResult, MintMenu,
 };
 pub mod dependency_reduction;
-pub use dependency_reduction::*;
+pub use dependency_reduction::{
+    CppDependencyReducer, HtmlCssDependencyReducer, MasterDependencyReductionSuite,
+    NativeCssToken, NativeRustAnsiUiRenderer, NativeRustCompetitorScanner, NativeRustInitProcess,
+    NativeRustIsoBuilder, NativeRustMarkdownMerger, NativeRustNoStdValidator,
+    NativeRustZenithCompositor, NativeWidgetStyle, PythonDependencyReducer, ShellDependencyReducer,
+    SovereignCssEliminationEngine,
+};
 pub mod regex;
 pub mod native_userland_replacements;
+pub mod itsfoss_innovations;
+pub mod publication_stdout;
+pub mod market_competitor_tools;
+
+pub use market_competitor_tools::{
+    AndroidPrivateSpaceEngine, AndroidScrcpyMirrorEngine, AwakeMode, FancyZoneLayoutMode,
+    LocksmithProcess, MacOsAirDropEngine, MacOsSpotlightEngine, PowerToysAwakeEngine,
+    PowerToysFancyZonesEngine, PowerToysFileLocksmith, PowerToysTextExtractorOcr,
+    SovereignK8sClusterTool, SovereignTerraformIacTool, SpotlightIndexEntry, ZoneArea,
+};
+
+pub use publication_stdout::{
+    KdProgressTracker, PhoronixComparisonTable, SovereignPublicationStdoutEngine,
+    StatusBadgeLevel, StdoutColor, TextFormatStyle, TreeNode,
+};
 pub use regex::{RegexMatch, SovereignRegexEngine};
 pub use native_userland_replacements::MasterNativeUserlandReplacements;
+pub use itsfoss_innovations::{
+    AppPortalPermission, BduDiskUsageAnalyzer, CleanTargetCategory, CleanableCacheItem,
+    ItsFossFlatpakSnapLayer, ItsFossGamingBoosterEngine, ItsFossGuiSoftwareCenterEngine,
+    ItsFossSystemCleanerEngine, MangoHudMetrics, MicroTextEditorEngine, NeowritableNotetakerEngine,
+    SandboxAppFormat, SandboxContainerApp, SoftwareCatalogEntry, StarshipPromptThemeEngine,
+    TerminalNote,
+};

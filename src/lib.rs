@@ -209,11 +209,11 @@ pub mod toolchain {
 pub mod scheduler;
 pub mod logging;
 pub mod system;
-pub mod update {
-    pub mod distro_update_parity;
-}
-pub use update::distro_update_parity::{
-    SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
+pub mod update;
+pub use update::{
+    PreflightCheckResult, SovereignSystemUpdateAndTestingEngine, SovereignSystemUpdateManager,
+    SystemDiagnosticReport, SystemUpdatePayload, SystemUpdatePolicy, SystemUpdateStrategy,
+    UpdateHealthVerifier, UpdateLedgerEntry, UpdateSeverity, UpdateTransactionLedger,
 };
 pub mod installer;
 pub mod iot;
@@ -377,9 +377,10 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    AnonSurfShunt, AppPermissionRecord, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
+    CapabilityToken, FineGrainedAccessControlMatrix, ForensicStorageFilter, HardwarePeripheralBounds,
+    MatrixPolicyAction, Permission, PermissionGrantState, PledgeManager, PledgePromise, PortalPermissionScope,
+    RoutingMode, SandboxPolicy, SovereignPublicationInspiredPermissionEngine,
 };
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
@@ -433,11 +434,16 @@ pub use community::toolkit::{
 };
 
 pub use tools::{
-    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
-    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
-    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
-    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
-    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
-    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
-    UserIdentity as LibUserIdentity,
+    AccessibilityFeature as LibAccessibilityFeature, AndroidPrivateSpaceEngine,
+    AndroidScrcpyMirrorEngine, AwakeMode, ClusterNode as LibClusterNode, FancyZoneLayoutMode,
+    KdProgressTracker, LocksmithProcess, MacOsAirDropEngine, MacOsSpotlightEngine,
+    NodeState as LibNodeState, PhoronixComparisonTable, PowerToysAwakeEngine,
+    PowerToysFancyZonesEngine, PowerToysFileLocksmith, PowerToysTextExtractorOcr,
+    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
+    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, SovereignAptDuo,
+    SovereignDpkgEtcher, SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
+    SovereignK8sClusterTool, SovereignKeyboardTester, SovereignPublicationStdoutEngine,
+    SovereignTableConverter, SovereignTerraformIacTool, SovereignTextFixer, SovereignWordCounter,
+    SpotlightIndexEntry, StatusBadgeLevel, StdoutColor, TextFormatStyle, TreeNode,
+    UserIdentity as LibUserIdentity, ZoneArea,
 };
