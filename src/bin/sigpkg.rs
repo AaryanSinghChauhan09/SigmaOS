@@ -7,12 +7,24 @@ use std::fs;
 use std::path::Path;
 use std::process::exit;
 
+#[cfg(not(feature = "standalone_test"))]
 use sigmaos::sigpkg::repository_manager::{Repository, RepositoryManager};
+#[cfg(not(feature = "standalone_test"))]
 use sigmaos::sigpkg::{
-    ContentAddressedStore, CryptoVerifier, DispatchedPmAction, Package, SigpkgDaemon,
-    SovereignPackageSnapshotRollbackEngine, UniversalDependencyMapper, UniversalDryRunSimulator,
-    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation, Version,
-    VersionConstraint,
+    ContentAddressedStore, CryptoVerifier, DispatchedPmAction, Package, PackageFormat, SigpkgDaemon,
+    SovereignPackageSnapshotRollbackEngine, SyncStatus, UniversalDependencyMapper, UniversalDryRunSimulator,
+    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation, UniversalScriptletConverter,
+    Version, VersionConstraint,
+};
+
+#[cfg(feature = "standalone_test")]
+use crate::sigpkg::repository_manager::{Repository, RepositoryManager};
+#[cfg(feature = "standalone_test")]
+use crate::sigpkg::{
+    ContentAddressedStore, CryptoVerifier, DispatchedPmAction, Package, PackageFormat, SigpkgDaemon,
+    SovereignPackageSnapshotRollbackEngine, SyncStatus, UniversalDependencyMapper, UniversalDryRunSimulator,
+    UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation, UniversalScriptletConverter,
+    Version, VersionConstraint,
 };
 
 fn usage() -> ! {
@@ -161,143 +173,55 @@ fn cmd_install(args: &[String]) {
     let dep_mapper = UniversalDependencyMapper::new();
     let mut store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
 
-    let mut forced_format: Option<sigmaos::sigpkg::universal_engine::PackageFormat> = None;
+    let mut forced_format: Option<PackageFormat> = None;
     let mut targets = Vec::new();
 
     for arg in args {
         match arg.as_str() {
-            "--apt" | "--deb" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Apt)
-            }
-            "--dnf" | "--rpm" | "--yum" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Yum)
-            }
-            "--pacman" | "--arch" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pacman)
-            }
-            "--apk" | "--alpine" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Apk)
-            }
-            "--pkg" | "--bsd" | "--freebsd" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pkg)
-            }
-            "--xbps" | "--void" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Xbps)
-            }
-            "--zypper" | "--suse" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Zypper)
-            }
-            "--ebuild" | "--portage" | "--gentoo" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Portage)
-            }
-            "--flatpak" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Flatpak)
-            }
-            "--snap" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Snap)
-            }
-            "--appimage" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::AppImage)
-            }
-            "--eopkg" | "--pisi" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pisi)
-            }
-            "--nix" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nix)
-            }
-            "--guix" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Guix)
-            }
-            "--haiku" | "--hpkg" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Hpkg)
-            }
-            "--slackware" | "--slackbuild" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::SlackBuild)
-            }
-            "--pkgsrc" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pkgsrc)
-            }
-            "--moss" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Moss)
-            }
-            "--tcz" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tcz)
-            }
-            "--gobo" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Gobo)
-            }
-            "--ostree" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ostree)
-            }
-            "--air" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Air)
-            }
-            "--bottle" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Bottle)
-            }
-            "--ipa" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipa)
-            }
-            "--ports" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ports)
-            }
-            "--aab" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Aab)
-            }
-            "--hap" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Hap)
-            }
-            "--superdeb" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Superdeb)
-            }
-            "--lzm" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Lzm)
-            }
-            "--pup" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pup)
-            }
-            "--pet" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pet)
-            }
-            "--tar" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Tar)
-            }
-            "--tgz" | "--targz" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::TarGz)
-            }
-            "--xz" | "--tarxz" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::TarXz)
-            }
-            "--app" | "--appbundle" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::AppBundle)
-            }
-            "--puk" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Puk)
-            }
-            "--dmg" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dmg)
-            }
-            "--cports" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Cports)
-            }
-            "--dports" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Dports)
-            }
-            "--ipk" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Ipk)
-            }
-            "--opkg" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Opkg)
-            }
-            "--ips" | "--p5p" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::SolarisIps)
-            }
-            "--nar" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::GuixNar)
-            }
-            "--openbsd" => {
-                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::OpenBsdPkg)
-            }
+            "--apt" | "--deb" => forced_format = Some(PackageFormat::Apt),
+            "--dnf" | "--rpm" | "--yum" => forced_format = Some(PackageFormat::Yum),
+            "--pacman" | "--arch" => forced_format = Some(PackageFormat::Pacman),
+            "--apk" | "--alpine" => forced_format = Some(PackageFormat::Apk),
+            "--pkg" | "--bsd" | "--freebsd" => forced_format = Some(PackageFormat::Pkg),
+            "--xbps" | "--void" => forced_format = Some(PackageFormat::Xbps),
+            "--zypper" | "--suse" => forced_format = Some(PackageFormat::Zypper),
+            "--ebuild" | "--portage" | "--gentoo" => forced_format = Some(PackageFormat::Portage),
+            "--flatpak" => forced_format = Some(PackageFormat::Flatpak),
+            "--snap" => forced_format = Some(PackageFormat::Snap),
+            "--appimage" => forced_format = Some(PackageFormat::AppImage),
+            "--eopkg" | "--pisi" => forced_format = Some(PackageFormat::Pisi),
+            "--nix" => forced_format = Some(PackageFormat::Nix),
+            "--guix" => forced_format = Some(PackageFormat::Guix),
+            "--haiku" | "--hpkg" => forced_format = Some(PackageFormat::Hpkg),
+            "--slackware" | "--slackbuild" => forced_format = Some(PackageFormat::SlackBuild),
+            "--pkgsrc" => forced_format = Some(PackageFormat::Pkgsrc),
+            "--moss" => forced_format = Some(PackageFormat::Moss),
+            "--tcz" => forced_format = Some(PackageFormat::Tcz),
+            "--gobo" => forced_format = Some(PackageFormat::Gobo),
+            "--ostree" => forced_format = Some(PackageFormat::Ostree),
+            "--air" => forced_format = Some(PackageFormat::Air),
+            "--bottle" => forced_format = Some(PackageFormat::Bottle),
+            "--ipa" => forced_format = Some(PackageFormat::Ipa),
+            "--ports" => forced_format = Some(PackageFormat::Ports),
+            "--aab" => forced_format = Some(PackageFormat::Aab),
+            "--hap" => forced_format = Some(PackageFormat::Hap),
+            "--superdeb" => forced_format = Some(PackageFormat::Superdeb),
+            "--lzm" => forced_format = Some(PackageFormat::Lzm),
+            "--pup" => forced_format = Some(PackageFormat::Pup),
+            "--pet" => forced_format = Some(PackageFormat::Pet),
+            "--tar" => forced_format = Some(PackageFormat::Tar),
+            "--tgz" | "--targz" => forced_format = Some(PackageFormat::TarGz),
+            "--xz" | "--tarxz" => forced_format = Some(PackageFormat::TarXz),
+            "--app" | "--appbundle" => forced_format = Some(PackageFormat::AppBundle),
+            "--puk" => forced_format = Some(PackageFormat::Puk),
+            "--dmg" => forced_format = Some(PackageFormat::Dmg),
+            "--cports" => forced_format = Some(PackageFormat::Cports),
+            "--dports" => forced_format = Some(PackageFormat::Dports),
+            "--ipk" => forced_format = Some(PackageFormat::Ipk),
+            "--opkg" => forced_format = Some(PackageFormat::Opkg),
+            "--ips" | "--p5p" => forced_format = Some(PackageFormat::SolarisIps),
+            "--nar" => forced_format = Some(PackageFormat::GuixNar),
+            "--openbsd" => forced_format = Some(PackageFormat::OpenBsdPkg),
             a if a.starts_with('-') => {
                 // Ignore operational flags like -y or --yes
             }
@@ -386,7 +310,7 @@ fn cmd_convert(args: &[String]) {
     let path = Path::new(target);
     let adapter = UniversalPackageAdapter::new();
     let simulator = UniversalDryRunSimulator::new();
-    let scriptlet_conv = sigmaos::sigpkg::UniversalScriptletConverter::new();
+    let scriptlet_conv = UniversalScriptletConverter::new();
 
     let (content, fmt) = if path.exists() {
         let data = match fs::read(path) {
@@ -399,12 +323,12 @@ fn cmd_convert(args: &[String]) {
         let detected = adapter
             .detect_format_by_header(&data)
             .or_else(|| adapter.detect_format_by_extension(target))
-            .unwrap_or(sigmaos::sigpkg::universal_engine::PackageFormat::Apt);
+            .unwrap_or(PackageFormat::Apt);
         (data, detected)
     } else {
         let detected = adapter
             .detect_format_by_extension(target)
-            .unwrap_or(sigmaos::sigpkg::universal_engine::PackageFormat::Apt);
+            .unwrap_or(PackageFormat::Apt);
         let synthetic_manifest = format!("Package: {}\nVersion: 1.0.0\n", target);
         (synthetic_manifest.into_bytes(), detected)
     };
@@ -527,7 +451,7 @@ fn cmd_verify(args: &[String]) {
     }
     let name = &args[0];
     let store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
-    let pkg: Package = match store.get(name) {
+    let pkg = match store.get(name) {
         Some(p) => p.clone(),
         None => {
             eprintln!("sigpkg: package '{}' not found", name);
@@ -652,12 +576,12 @@ fn cmd_update(args: &[String]) {
     let payload = b"root-metadata";
     let sig = daemon.verifier().sign("root-key", payload);
     match daemon.sync_repository(payload, &sig) {
-        sigmaos::sigpkg::SyncStatus::Synced { .. } => {
+        SyncStatus::Synced { .. } => {
             println!("Repository metadata verified and synced.");
             println!("No update checks performed against a live mirror (offline demo).");
             exit(0);
         }
-        sigmaos::sigpkg::SyncStatus::Failed { reason } => {
+        SyncStatus::Failed { reason } => {
             eprintln!("sigpkg: update failed: {}", reason);
             exit(1);
         }

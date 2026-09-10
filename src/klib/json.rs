@@ -2,9 +2,6 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 // Use std::collections::BTreeMap during standalone test compilation or custom BTreeMap otherwise
-#[cfg(not(test))]
-use crate::klib::hashmap::BTreeMap;
-#[cfg(test_disabled)]
 use std::collections::BTreeMap;
 
 /// Zero-dependency Sovereign JSON Data Model
@@ -70,12 +67,12 @@ impl SovereignJsonValue {
     /// Bolt optimization: eliminates temporary heap allocations for array elements and object keys.
     fn append_json_string(&self, out: &mut String) {
         match self {
-            SovereignJsonValue::Null => "null".to_string(),
+            SovereignJsonValue::Null => out.push_str("null"),
             SovereignJsonValue::Bool(b) => {
                 if *b {
-                    "true".to_string()
+                    out.push_str("true");
                 } else {
-                    "false".to_string()
+                    out.push_str("false");
                 }
             }
             SovereignJsonValue::Number(n) => {
