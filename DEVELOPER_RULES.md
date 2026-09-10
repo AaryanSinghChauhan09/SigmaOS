@@ -817,3 +817,10 @@ Consequences for guideline violations:
 ### 5. Release Engineering Policy
 - **Tag & Release Signing**: All release artifacts, ISO images, and Git tags must be signed using GPG or Post-Quantum Dilithium-5 keys.
 - **Reproducible Build Verification**: Build outputs must be validated bit-for-bit against published SHA-256 build provenance hashes and SBOM manifests.
+
+### 6. Linux & BSD Distribution Parity Rules
+- **Debian Parity**: Debconf preseed answer databases, statoverride file permissions, APT pin priorities (`/etc/apt/preferences`), and `Build-Depends` resolution must be evaluated without external C helper dependencies.
+- **Fedora Parity**: Account authorization must verify FAS user profiles and FPCA signatures; Bodhi package promotions must gate on Greenwave CI testing policies and OpenQA waivers.
+- **Arch Parity**: ALPM pacman hooks must parse `[Trigger]` and `[Action]` sections cleanly; WKD PGP keyring signatures (`.sig`) must be verified prior to ALPM database commitments.
+- **Gentoo Parity**: Portage USE-flag solvers must handle conditional expressions (`USE="wayland -X"`); package masking and slot isolation must prevent path collisions.
+- **BSD Parity**: Network services must implement OpenBSD PF stateful packet inspection; processes must enforce OpenBSD `pledge`/`unveil` path limits and FreeBSD Capsicum descriptor rights.
