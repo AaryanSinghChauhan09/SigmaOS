@@ -4,8 +4,8 @@ pub mod control_center;
 pub mod gtk_toolkit;
 pub mod math_plotter;
 pub mod toolkit;
-pub mod control_center;
 pub mod folder_color;
+pub mod widget_api;
 
 pub use control_center::{
     ControlCenterCategory, DisplaySettingsPlug, NetworkSettingsPlug, SwitchboardPlug,
@@ -23,4 +23,10 @@ pub use control_center::{
 };
 pub use folder_color::{
     FolderColor, FolderColorSwitcherEngine, FolderCustomization, FolderEmblem,
+};
+pub use widget_api::{
+    Widget as NativeWidget, WidgetApi, WidgetBuilder, WidgetKind, WidgetId,
+    Layout, Dimension, Spacing, FlexDirection, Justify, Align,
+    Style, WidgetState, Event, EventType, EventHandler, Modifiers,
+    widgets,
 };
