@@ -136,6 +136,9 @@ pub mod sigpkg {
 #[cfg(feature = "standalone_test")]
 use crate::sigpkg::*;
 
+#[cfg(feature = "standalone_test")]
+use crate::sigpkg::*;
+
 #[test]
 fn test_universal_adapter_all_formats() {
     use universal_adapter::{

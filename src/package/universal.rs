@@ -3152,3 +3152,12 @@ impl PackageMetadataAdapter for AlpineApkPackageAdapter {
         Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
     }
 }
+
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
+
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, _raw_metadata: &str) -> Result<UnifiedPackage, PackageError> {
+        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
+    }
+}

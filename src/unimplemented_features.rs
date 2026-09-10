@@ -1552,6 +1552,10 @@ impl Default for BareMetalUnifiedPeripheralManager {
 pub struct UdfInstruction {
     pub op: u8,  // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
     pub reg: u8, // R0 - R7
+
+pub struct SpecUdfInstruction {
+    pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
+    pub reg: u8,  // R0 - R7
     pub addr: u64,
 }
 
@@ -1568,7 +1572,7 @@ impl UdfVm {
         }
     }
 
-    pub fn execute(&mut self, bytecode: &[UdfInstruction]) -> Result<u64, &'static str> {
+    pub fn execute(&mut self, bytecode: &[SpecUdfInstruction]) -> Result<u64, &'static str> {
         self.pc = 0;
         while self.pc < bytecode.len() {
             let inst = bytecode[self.pc];
@@ -1599,7 +1603,7 @@ impl Default for UdfVm {
 
 // 6.3 Declarative Package Resolution SAT Solver
 #[derive(Debug, Clone, Copy)]
-pub struct PackageNode {
+pub struct SpecPackageNode {
     pub id: u32,
     pub version: u32,
     pub req_min: u32,
@@ -1613,7 +1617,7 @@ impl ConstraintSatSolver {
         Self
     }
 
-    pub fn resolve_satisfiability(&self, packages: &[PackageNode]) -> Result<bool, &'static str> {
+    pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
         for pkg in packages {
             if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
                 return Err("Constraint conflict detected");
@@ -1631,14 +1635,14 @@ impl Default for ConstraintSatSolver {
 
 // 6.4 JBD2-Style Crash-Resilient Transactional Ledger
 #[derive(Debug, Clone, Copy)]
-pub struct TransactionBlock {
+pub struct SpecTransactionBlock {
     pub tx_id: u64,
     pub target_addr: u64,
     pub crc32c_hash: u32,
 }
 
 pub struct Jbd2TransactionLedger {
-    pub ring_blocks: [TransactionBlock; 16],
+    pub ring_blocks: [SpecTransactionBlock; 16],
     pub head: usize,
     pub current_merkle_root: u32,
 }
@@ -1670,7 +1674,7 @@ impl Jbd2TransactionLedger {
             crc = crc.wrapping_add(b as u32);
         }
 
-        self.ring_blocks[self.head] = TransactionBlock {
+        self.ring_blocks[self.head] = SpecTransactionBlock {
             tx_id,
             target_addr,
             crc32c_hash: crc,
