@@ -1,4 +1,4 @@
-name: Solus ypkg & eopkg Package Subsystem CI
+name: Intel Clear Linux Stateless Config & Clr-boot-manager CI
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  solus-eopkg:
-    name: Solus ypkg Build Recipes & eopkg Package Subsystem Matrix
+  clear-linux-stateless:
+    name: Intel Clear Linux Stateless /etc & /usr Resolution & Boot Manager Audit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,7 +19,7 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Test Solus eopkg Manifest & CLI Dispatcher
+      - name: Test Clear Linux Stateless Engine & Bundle Manager
         run: |
-          echo "Testing Solus ypkg recipes and eopkg package manager dispatcher..."
+          echo "Testing Clear Linux stateless configuration resolution and swupd bundle manager..."
           rustc --test --edition=2021 tests/test_universal_adapter.rs -o build/test_universal_adapter && ./build/test_universal_adapter

@@ -1,4 +1,4 @@
-name: Solus ypkg & eopkg Package Subsystem CI
+name: Void Linux XBPS-src & Runit Service CI
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  solus-eopkg:
-    name: Solus ypkg Build Recipes & eopkg Package Subsystem Matrix
+  void-xbps-runit:
+    name: Void Linux XBPS-src Package & Runit Service Supervision Matrix
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,7 +19,7 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Test Solus eopkg Manifest & CLI Dispatcher
+      - name: Test Void Linux XBPS Package & Runit Integration
         run: |
-          echo "Testing Solus ypkg recipes and eopkg package manager dispatcher..."
+          echo "Testing Void Linux XBPS package parsing and runit supervision..."
           rustc --test --edition=2021 tests/test_universal_adapter.rs -o build/test_universal_adapter && ./build/test_universal_adapter

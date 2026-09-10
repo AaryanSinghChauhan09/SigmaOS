@@ -1,4 +1,4 @@
-name: Solus ypkg & eopkg Package Subsystem CI
+name: DragonFly BSD HAMMER2 PFS & Emergency CoW CI
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  solus-eopkg:
-    name: Solus ypkg Build Recipes & eopkg Package Subsystem Matrix
+  dragonfly-hammer2:
+    name: DragonFly BSD HAMMER2 Pseudo-Filesystem & Emergency CoW Snapshot Audit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,7 +19,7 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Test Solus eopkg Manifest & CLI Dispatcher
+      - name: Test DragonFly BSD HAMMER2 & Package Subsystem
         run: |
-          echo "Testing Solus ypkg recipes and eopkg package manager dispatcher..."
+          echo "Testing DragonFly BSD HAMMER2 PFS CoW snapshots and pkgin package manager..."
           rustc --test --edition=2021 tests/test_universal_adapter.rs -o build/test_universal_adapter && ./build/test_universal_adapter

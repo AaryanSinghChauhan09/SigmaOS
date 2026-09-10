@@ -1,4 +1,4 @@
-name: Solus ypkg & eopkg Package Subsystem CI
+name: Fedora COPR Mock Chroot & SELinux Policy CI
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  solus-eopkg:
-    name: Solus ypkg Build Recipes & eopkg Package Subsystem Matrix
+  fedora-copr-mock:
+    name: Fedora Mock Cleanroom RPM Build & SELinux Policy Audit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,7 +19,7 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Test Solus eopkg Manifest & CLI Dispatcher
+      - name: Test Fedora Mock RPM & DNF Dispatcher
         run: |
-          echo "Testing Solus ypkg recipes and eopkg package manager dispatcher..."
+          echo "Testing Fedora COPR Mock RPM specs and microdnf/dnf command dispatcher..."
           rustc --test --edition=2021 tests/test_universal_adapter.rs -o build/test_universal_adapter && ./build/test_universal_adapter

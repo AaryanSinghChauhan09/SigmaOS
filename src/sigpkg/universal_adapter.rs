@@ -110,15 +110,7 @@ pub struct PacmanPkgbuild {
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-/// Debian-style package priority levels (DFSG and APT standard)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PackagePriority {
-    Optional = 0,
-    Standard = 1,
-    Important = 2,
-    Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
-}
+pub use crate::package::PackagePriority;
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -247,6 +239,8 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: String::new(),
             depends,
             description,
             priority,
@@ -552,6 +546,7 @@ impl UniversalPackageAdapter {
             summary,
             confinement,
             plugs,
+            slots: Vec::new(),
         })
     }
 
@@ -1681,16 +1676,16 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let raw = foreign_name.trim().to_lowercase();
-        let clean = if let Some(stripped) = raw.strip_prefix("so:") {
+        let clean_prefix = if let Some(stripped) = raw.strip_prefix("so:") {
             if stripped.starts_with("libc.") {
-                "libc"
+                "libc".to_string()
             } else {
-                stripped.split('.').next().unwrap_or(stripped)
+                stripped.split('.').next().unwrap_or(stripped).to_string()
             }
         } else if let Some(stripped) = raw.strip_prefix("cmd:") {
-            stripped
+            stripped.to_string()
         } else {
-            raw.as_str()
+            raw.clone()
         };
 
         match clean {
@@ -1992,7 +1987,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2002,7 +1997,7 @@ impl UniversalPmCommandDispatcher {
                         "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
                         "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
                         "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
-                        "--print" | "--dryrun" => dry_run = true,
+                        "--print" | "--dryrun" | "--noconfirm" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
@@ -2217,9 +2212,11 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_add" | "pkg_info" => {
+            "pkg_add" | "pkg_delete" | "pkg_info" => {
                 if pm == "pkg_add" {
                     operation = UniversalPmOperation::Install;
+                } else if pm == "pkg_delete" {
+                    operation = UniversalPmOperation::Remove;
                 } else {
                     operation = UniversalPmOperation::QueryInfo;
                 }
