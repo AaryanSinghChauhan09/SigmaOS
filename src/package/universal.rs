@@ -277,11 +277,19 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    OpenBsdPkg, // OpenBSD Package (.openbsd.tgz)
     Ipk,        // OpenWrt Package (.ipk)
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -1262,81 +1270,6 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
-pub struct HardwareOptimizationDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub target_microarch_level: String,
-    pub required_simd_features: Vec<String>,
-}
-
-impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        println!(
-            "HardwareOptimizationDecorator: Microarch Level={}, SIMD={:?}",
-            self.target_microarch_level, self.required_simd_features
-        );
-        self.decorated.profile_performance();
-    }
-}
-
-pub struct ResourceLimitDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub max_memory_bytes: u64,
-    pub cpu_quota_percent: u32,
-}
-
-impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        println!(
-            "ResourceLimitDecorator: Memory Limit={} bytes, CPU Quota={}%",
-            self.max_memory_bytes, self.cpu_quota_percent
-        );
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
-}
-
-pub struct PqcSignedDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub dilithium_signature: String,
-}
-
-impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        if !self.dilithium_signature.starts_with("dilithium-5-valid") {
-            return Err(PackageError::InstallationFailed(
-                "Dilithium signature verification failed".to_string(),
-            ));
-        }
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
-}
-
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -1425,6 +1358,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
+            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1484,6 +1418,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
+            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -2977,10 +2912,15 @@ mod tests {
 /// Alpine Linux .apk Package Format Adapter
 pub struct AlpineApkPackageAdapter;
 
-impl PackageFormatAdapter for AlpineApkPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::SigmaPkg
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, _raw_data: &str) -> Result<UnifiedPackage, PackageError> {
+        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
     }
+}
+
+#[cfg(test)]
+mod extra_tests {
+    use super::*;
 
     #[test]
     fn test_all_package_format_strategies_and_adapters() {
