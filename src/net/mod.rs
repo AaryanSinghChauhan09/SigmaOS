@@ -45,3 +45,8 @@ pub use tc_qdisc_sovereign::{TbfQdisc, PrioQdisc, HtbQdisc, HtbClass, FqCodelQdi
 
 pub mod wireguard_sovereign;
 pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};
+
+pub mod tech_news_redirection;
+pub use tech_news_redirection::{
+    NewsArticleItem, SovereignTechNewsRedirectionEngine, TechPublicationCategory, TechPublicationEntry,
+};
