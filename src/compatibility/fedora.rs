@@ -20,8 +20,6 @@ use std::collections::HashMap;
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
 
-use crate::klib::HashMap;
-
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
 pub struct DnfPackageResolver {
