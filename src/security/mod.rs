@@ -1,45 +1,74 @@
-// SigmaOS Security Subsystem
-pub mod capability;
-pub mod pqc_enclave;
-pub mod governance;
+pub mod system_policy_rules;
+pub use system_policy_rules::*;
 
-pub use pqc_enclave::{
-    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
-};
+// SigmaOS Security Subsystem
+pub mod audit;
+pub mod capability;
+pub mod seccomp;
+pub mod seccomp_ebpf;
+pub mod syscall_filter;
+pub mod defensive_audit;
+pub mod hardening;
+pub mod kernel_hardening;
+pub mod user_namespace;
+
+pub mod bridge;
+pub mod bsd_hardening;
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
+pub mod deobfuscation;
 pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
+pub mod libgksu;
 pub mod mac;
+pub mod openbsd_karl;
 pub mod password;
-pub mod pki;
 pub mod pledge;
-pub mod unveil;
-pub mod selinux;
-pub mod vulnerability;
-pub mod hardening;
-pub mod deobfuscation;
-pub mod securelevels;
-pub mod audit;
-pub mod bsd_hardening;
-pub mod kali_components;
+pub mod pqc_enclave;
+pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
+pub mod kali_stack;
+pub mod parrot;
+pub mod parrot_kali;
+pub mod parrot_linux;
+pub mod parrot_parity;
+pub mod pqc_measurement;
+pub use pqc_measurement::{
+    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
+    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
+};
+pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
-pub mod pam;
-pub mod crypto_utils;
-pub mod publication_permissions;
+pub mod rules;
+pub mod scanner;
+pub mod secrets;
+pub mod selinux;
+pub mod selinux_advanced;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
+pub mod unveil;
+pub mod vault;
+pub mod vpn;
+pub mod vulnerability;
+pub mod kali_components;
+pub mod landlock;
+pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 
-pub use publication_permissions::{
-    AppPermissionRecord, FineGrainedAccessControlMatrix, HardwarePeripheralBounds,
-    MatrixPolicyAction, PermissionGrantState, PortalPermissionScope,
-    SovereignPublicationInspiredPermissionEngine,
+pub use kali_components::{
+    HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,
+    KaliPcapDissector, KaliRamMemoryForensics, KaliWebVulnScanner, PacketHeader, ProcessArtifact,
+    ScanResult, ScanType, VulnType, WebVulnReport,
 };
 
+pub use qubes_isolation::{
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+};
 
-
+pub use qubes_isolation::*;
+pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
@@ -49,7 +78,7 @@ pub use bsd_hardening::{
     UnveilPermission as BsdUnveilPermission, WxEnforcer,
 };
 pub use capability::{
-    CapabilityGate, CapabilityToken,LinuxCapabilitySet, Permission,
+    CapabilityGate, CapabilityToken, LinuxCapability, LinuxCapabilitySet, Permission,
 };
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use capability_token::{
@@ -60,39 +89,79 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use governance::{
-    ComplianceFramework, ComplianceProfileEngine, ContainerSecurityPolicyEngine,
-    DefaultSecurePosture, DeveloperKeyRotator, EncryptedHomeOptIn, GovernanceCharterManager,
-    ImmutableAuditTrail, IncidentResponsePlaybook, LicensingAuditor, MacPolicyEngine,
-    MacPolicyMode, NetworkZeroTrustEngine, PrivacyDashboardControls, PrivacyPreservingTelemetry,
-    RuntimeAppSandbox, SbomManager, SecureUpdateChannel, SecurityPrivacyGovernanceMasterSuite,
-    SystemSecretsKeyring, TpmHardwareAttestation, VulnerabilityDisclosureManager,
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
+};
+pub use forensics::*;
+pub use hardening::{
+    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
 };
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
-pub use hardening::{
-    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
+pub use kali_stack::{
+    HashMode, KaliAirgeddonWifiAudit, KaliBurpSuiteWebProxy, KaliHashcatGpuCracker,
+    KaliHydraPasswordBruteforce, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter,
+    KaliNiktoWebScanner, KaliNmapPortScanner, KaliSqlmapInjectionAuditor, KaliUndercoverThemeMode,
+    KaliWiresharkPacketAnalyzer, PcapPacketHeader, ScanTechnique, UndercoverDisguiseTheme,
+    WifiFrameType,
 };
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
-    SecurityRule, SelinuxPermission,
+pub use kernel_hardening::{
+    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError, PagePermissions,
+    PledgePromise as KernelPledgePromise, RetpolineKptiMitigationEngine, SmepSmapEnforcer,
+    SovereignKaslrEngine, SyscallCategory,
 };
+pub use libgksu::{
+    GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
+    GksuSecurityGuard, LibGksuGraphicalSudoEngine,
+};
+pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
+pub use parrot::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
+    GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+};
+pub use password::{
+    BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
+    PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
+};
+pub use pledge::{
+    promises, PledgeError, PledgeManager as OriginalPledgeManager,
+    PledgePromise as OriginalPledgePromise,
+};
+pub use qubes_isolation::*;
+pub use root_improvement::*;
+pub use rules::{
+    AuditAccessType, AuditSyscallRule, AuditWatchRule, PfAction, PfFilterRule, PledgeRule,
+    SecurelevelState, SovereignAuditRuleEngine, SovereignNetworkFilterRulesEngine,
+    SovereignSandboxingRulesEngine, SovereignSecurelevelRuleEngine, SovereignSysctlHardeningRules,
+    SysctlParameterRule, UnveilRule,
+};
+pub use selinux::{PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux};
+pub use selinux_advanced::{AdvancedSELinuxManager, MlsLevel, SELinuxBoolean, SELinuxModule};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
-pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
+pub use sigma_unveil::{
+    UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions,
+    UnveilState,
+};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
     EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
     VaultResult,
 };
 pub use vpn::{
-    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
+    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, PiaDedicatedIpBinding,
+    PiaMaceAdBlocker, PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine, PiaServerRegion,
+    PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager, SecureVpnClient, SplitTunnelRule,
+    VpnConfig, VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
 pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+    ExploitPayload, PenetrationAssistant, SecurityScanner, SimpleVulnerabilityScanner,
+    VulnerabilityClass, VulnerabilityReport,
 };
-pub use vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};
+pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
+pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};
+pub mod defensive_audit;
+pub mod parrot;

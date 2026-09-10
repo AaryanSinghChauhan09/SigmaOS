@@ -3,7 +3,21 @@
 // and execution over standard in-kernel maps.
 
 
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap as HashMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap as HashMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -274,7 +288,7 @@ pub struct BpfRingBufferEngine {
     pub producer_pos: usize,
     pub consumer_pos: usize,
     pub next_handle: usize,
-    pub samples: std::collections::BTreeMap<usize, BpfRingBufferSample>,
+    pub samples: BTreeMap<usize, BpfRingBufferSample>,
     pub sample_order: Vec<usize>,
     pub dropped_samples_count: u64,
 }
@@ -292,7 +306,7 @@ impl BpfRingBufferEngine {
             producer_pos: 0,
             consumer_pos: 0,
             next_handle: 1,
-            samples: std::collections::BTreeMap::new(),
+            samples: BTreeMap::new(),
             sample_order: Vec::new(),
             dropped_samples_count: 0,
         }
