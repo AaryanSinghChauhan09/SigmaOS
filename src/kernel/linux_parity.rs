@@ -2,7 +2,7 @@
 /// Clean-room implementation of Linux io_uring, memfd_secret, BPF LSM, and Page Folios
 /// Designed for bare-metal zero-dependency performance and zero-trust security
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicU64, AtomicUsize, Ordering};
 
 // ============================================================================
 // 1. Linux io_uring Asynchronous Ring Buffer Engine (KernelIoUringEngine)

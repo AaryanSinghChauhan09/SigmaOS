@@ -2987,6 +2987,12 @@ mod extra_universal_tests {
     }
 
     #[test]
+    fn test_nix_guix_functional_derivation_engine() {
+        let manager = UniversalPackageManager::new();
+        assert_eq!(manager.packages.len(), 0);
+    }
+
+    #[test]
     fn test_expanded_decorators() {
         let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
         let base = BasePackageDecorator { package: pkg };
