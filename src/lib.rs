@@ -438,10 +438,11 @@ pub use community::toolkit::{
 
 pub use tools::{
     AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
-    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
-    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
+    KdProgressTracker, NodeState as LibNodeState, PhoronixComparisonTable, SigmaAccess as LibSigmaAccess,
+    SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
     SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
     SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
-    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
-    UserIdentity as LibUserIdentity,
+    SovereignKeyboardTester, SovereignPublicationStdoutEngine, SovereignTableConverter,
+    SovereignTextFixer, SovereignWordCounter, StatusBadgeLevel, StdoutColor, TextFormatStyle,
+    TreeNode, UserIdentity as LibUserIdentity,
 };

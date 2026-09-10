@@ -3,6 +3,7 @@ pub mod system_monitor;
 
 pub mod data_tools;
 pub mod display_manager;
+pub mod open_source_tools_parity;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
@@ -20,8 +21,16 @@ pub mod mint_system;
 pub mod mint_desktop;
 pub mod mint_menu;
 pub mod profession_tools;
+pub mod indian_profession_tools;
 
 pub use profession_tools::*;
+pub use indian_profession_tools::*;
+
+pub use open_source_tools_parity::{
+    BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, FastfetchInfoEngine,
+    FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry, RipgrepRegexSearchEngine,
+    RofiCommandHudEngine, SearchMatch,
+};
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
@@ -84,8 +93,28 @@ pub use mint_menu::{
     MenuCategory, MenuItem, MenuItemType, MenuSearchResult, MintMenu,
 };
 pub mod dependency_reduction;
-pub use dependency_reduction::*;
+pub use dependency_reduction::{
+    CppDependencyReducer, HtmlCssDependencyReducer, MasterDependencyReductionSuite,
+    NativeCssToken, NativeRustAnsiUiRenderer, NativeRustCompetitorScanner, NativeRustInitProcess,
+    NativeRustIsoBuilder, NativeRustMarkdownMerger, NativeRustNoStdValidator,
+    NativeRustZenithCompositor, NativeWidgetStyle, PythonDependencyReducer, ShellDependencyReducer,
+    SovereignCssEliminationEngine,
+};
+pub mod regex;
 pub mod native_userland_replacements;
+pub mod itsfoss_innovations;
+pub mod publication_stdout;
+
+pub use publication_stdout::{
+    KdProgressTracker, PhoronixComparisonTable, SovereignPublicationStdoutEngine,
+    StatusBadgeLevel, StdoutColor, TextFormatStyle, TreeNode,
+};
+pub use regex::{RegexMatch, SovereignRegexEngine};
 pub use native_userland_replacements::MasterNativeUserlandReplacements;
-pub mod thenewstack_tools;
-pub use thenewstack_tools::*;
+pub use itsfoss_innovations::{
+    AppPortalPermission, BduDiskUsageAnalyzer, CleanTargetCategory, CleanableCacheItem,
+    ItsFossFlatpakSnapLayer, ItsFossGamingBoosterEngine, ItsFossGuiSoftwareCenterEngine,
+    ItsFossSystemCleanerEngine, MangoHudMetrics, MicroTextEditorEngine, NeowritableNotetakerEngine,
+    SandboxAppFormat, SandboxContainerApp, SoftwareCatalogEntry, StarshipPromptThemeEngine,
+    TerminalNote,
+};

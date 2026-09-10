@@ -200,11 +200,15 @@ pub use linux_bsd_inspirations::{
 
 pub use sovereign_distro_dominance::{
     AlpineApkCASPackageCache, CachyBoreDynamicAiScheduler, CasPackageBlob, ClusterNodeConfig,
-    FreeBsdBhyveMicrovmJailBridge, HybridIsolationInstance, IsolationType, ManagedProcessAffinity,
-    MicrovmState, NixGuixZeroCopyStore, OpenBsdHardenedCapsicumPledge, PopOsSystem76AutoScheduler,
-    ProcessPowerProfile, SovereignDistroDominanceSuite, SovereignMicrovmHypervisorGateway,
-    SovereignPqcWireguardVpnEngine, TalosHeadlessMtlsClusterEngine, VirtioConfig, WireguardPeer,
-    ZfsBtrfsHybridSelfHealingCoW,
+    EbuildSlotRecord, FreeBsdBhyveMicrovmJailBridge, HybridIsolationInstance, IsolationType,
+    ManagedProcessAffinity, MicrovmState, NixGuixZeroCopyStore, OpenBsdHardenedCapsicumPledge,
+    PopOsSystem76AutoScheduler, ProcessPowerProfile, SovereignAlpineApk3SecurityVerifier,
+    SovereignDistroDominanceSuite, SovereignGenerationalStoreReconciler,
+    SovereignGentooEbuildSlotEngine, SovereignHybridCowBootEnvEngine, SovereignHybridSandboxingGuard,
+    SovereignMicrovmHypervisorGateway, SovereignPqcWireguardVpnEngine,
+    SovereignSolarisCrossbowVnicEngine, SovereignStatelessIsaOptimizer,
+    SovereignVoidXbpsChrootBuilder, TalosHeadlessMtlsClusterEngine, VirtioConfig, WireguardPeer,
+    X86MicroarchIsaLevel, XbpsSrcBuildSpec, ZfsBtrfsHybridSelfHealingCoW,
 };
 
 pub mod nextgen_innovations;
