@@ -452,6 +452,274 @@ impl SovereignXcpTool {
 }
 
 // =========================================================================
+// 11. TLDR-PAGES / CHEAT.SH QUICK MAN PAGE HUD
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct TldrCommandPage {
+    pub command_name: String,
+    pub description: String,
+    pub examples: Vec<(String, String)>, // (description, example_cmd)
+}
+
+pub struct TldrQuickPagesEngine {
+    pub pages: Vec<TldrCommandPage>,
+}
+
+impl TldrQuickPagesEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { pages: Vec::new() };
+        engine.pages.push(TldrCommandPage {
+            command_name: "tar".to_string(),
+            description: "Archiving utility for .tar and .tar.gz archives".to_string(),
+            examples: vec![
+                ("Extract archive".to_string(), "tar -xvf archive.tar.gz".to_string()),
+                ("Create gzip archive".to_string(), "tar -czvf archive.tar.gz /path/to/dir".to_string()),
+            ],
+        });
+        engine
+    }
+
+    pub fn query_page(&self, command: &str) -> Option<&TldrCommandPage> {
+        self.pages.iter().find(|p| p.command_name == command)
+    }
+}
+
+impl Default for TldrQuickPagesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 12. NCDU / GDU FAST INTERACTIVE DISK USAGE ANALYZER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct NcduNode {
+    pub path: String,
+    pub size_bytes: u64,
+    pub is_dir: bool,
+}
+
+pub struct NcduDiskUsageAnalyzerEngine {
+    pub nodes: Vec<NcduNode>,
+}
+
+impl NcduDiskUsageAnalyzerEngine {
+    pub fn new() -> Self {
+        Self { nodes: Vec::new() }
+    }
+
+    pub fn scan_dir_entry(&mut self, path: &str, size_bytes: u64, is_dir: bool) {
+        self.nodes.push(NcduNode {
+            path: path.to_string(),
+            size_bytes,
+            is_dir,
+        });
+    }
+
+    pub fn sort_by_size_descending(&mut self) {
+        self.nodes.sort_by(|a, b| b.size_bytes.cmp(&a.size_bytes));
+    }
+}
+
+impl Default for NcduDiskUsageAnalyzerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 13. DUF MODERN COLORFUL DISK FREE VIEWER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DufMountPoint {
+    pub filesystem: String,
+    pub mount_point: String,
+    pub total_bytes: u64,
+    pub used_bytes: u64,
+    pub free_bytes: u64,
+}
+
+pub struct DufDiskFreeInfoEngine {
+    pub mounts: Vec<DufMountPoint>,
+}
+
+impl DufDiskFreeInfoEngine {
+    pub fn new() -> Self {
+        let mounts = vec![
+            DufMountPoint {
+                filesystem: "/dev/nvme0n1p2".to_string(),
+                mount_point: "/".to_string(),
+                total_bytes: 512_000_000_000,
+                used_bytes: 128_000_000_000,
+                free_bytes: 384_000_000_000,
+            },
+            DufMountPoint {
+                filesystem: "tmpfs".to_string(),
+                mount_point: "/tmp".to_string(),
+                total_bytes: 16_000_000_000,
+                used_bytes: 512_000_000,
+                free_bytes: 15_488_000_000,
+            },
+        ];
+        Self { mounts }
+    }
+
+    pub fn get_mount(&self, path: &str) -> Option<&DufMountPoint> {
+        self.mounts.iter().find(|m| m.mount_point == path)
+    }
+}
+
+impl Default for DufDiskFreeInfoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 14. PROCS MODERN PS PROCESS VIEWER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ProcsProcessEntry {
+    pub pid: u32,
+    pub user: String,
+    pub cpu_percent: f32,
+    pub memory_rss_mb: u32,
+    pub command: String,
+}
+
+pub struct ProcsModernPsEngine {
+    pub processes: Vec<ProcsProcessEntry>,
+}
+
+impl ProcsModernPsEngine {
+    pub fn new() -> Self {
+        let sample = vec![
+            ProcsProcessEntry {
+                pid: 1,
+                user: "root".to_string(),
+                cpu_percent: 0.1,
+                memory_rss_mb: 2,
+                command: "/sbin/sigma-initd".to_string(),
+            },
+            ProcsProcessEntry {
+                pid: 420,
+                user: "jules".to_string(),
+                cpu_percent: 1.2,
+                memory_rss_mb: 48,
+                command: "zenith-compositor".to_string(),
+            },
+        ];
+        Self { processes: sample }
+    }
+
+    pub fn search_by_command(&self, pattern: &str) -> Vec<ProcsProcessEntry> {
+        let pat = pattern.to_lowercase();
+        self.processes
+            .iter()
+            .filter(|p| p.command.to_lowercase().contains(&pat))
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for ProcsModernPsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 15. EZA / EXA MODERN LS REPLACEMENT
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct EzaFileItem {
+    pub name: String,
+    pub is_dir: bool,
+    pub permissions_str: String,
+    pub size_bytes: u64,
+    pub git_status: String,
+}
+
+pub struct EzaModernLsEngine {
+    pub items: Vec<EzaFileItem>,
+}
+
+impl EzaModernLsEngine {
+    pub fn new() -> Self {
+        Self { items: Vec::new() }
+    }
+
+    pub fn add_item(&mut self, name: &str, is_dir: bool, size: u64, git_status: &str) {
+        let perm = if is_dir { "drwxr-xr-x" } else { "-rw-r--r--" };
+        self.items.push(EzaFileItem {
+            name: name.to_string(),
+            is_dir,
+            permissions_str: perm.to_string(),
+            size_bytes: size,
+            git_status: git_status.to_string(),
+        });
+    }
+}
+
+impl Default for EzaModernLsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 16. DUST INTUITIVE GRAPHICAL DU REPLACEMENT
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DustFolderUsage {
+    pub folder_name: String,
+    pub size_bytes: u64,
+    pub bar_graph: String,
+}
+
+pub struct DustFastDuEngine {
+    pub folders: Vec<DustFolderUsage>,
+}
+
+impl DustFastDuEngine {
+    pub fn new() -> Self {
+        Self { folders: Vec::new() }
+    }
+
+    pub fn add_folder(&mut self, name: &str, size_bytes: u64, max_size: u64) {
+        let percentage = if max_size > 0 { (size_bytes as f32 / max_size as f32) * 10.0 } else { 0.0 };
+        let blocks = percentage as usize;
+        let mut bar = String::from("[");
+        for _ in 0..blocks.min(10) {
+            bar.push('█');
+        }
+        for _ in blocks..10 {
+            bar.push('░');
+        }
+        bar.push(']');
+
+        self.folders.push(DustFolderUsage {
+            folder_name: name.to_string(),
+            size_bytes,
+            bar_graph: bar,
+        });
+    }
+}
+
+impl Default for DustFastDuEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -527,5 +795,34 @@ mod tests {
         let progress = xcp.copy_file_parallel("/src/kernel.bin", "/dest/kernel.bin", 1024);
         assert_eq!(progress.bytes_copied, 1024);
         assert_eq!(progress.percentage, 100.0);
+    }
+
+    #[test]
+    fn test_itsfoss_featured_tools() {
+        let tldr = TldrQuickPagesEngine::new();
+        let tar_page = tldr.query_page("tar").unwrap();
+        assert_eq!(tar_page.command_name, "tar");
+
+        let mut ncdu = NcduDiskUsageAnalyzerEngine::new();
+        ncdu.scan_dir_entry("/usr/bin", 500_000, true);
+        ncdu.scan_dir_entry("/var/log", 1_500_000, true);
+        ncdu.sort_by_size_descending();
+        assert_eq!(ncdu.nodes[0].path, "/var/log");
+
+        let duf = DufDiskFreeInfoEngine::new();
+        let root_mount = duf.get_mount("/").unwrap();
+        assert_eq!(root_mount.mount_point, "/");
+
+        let procs = ProcsModernPsEngine::new();
+        let matches = procs.search_by_command("initd");
+        assert_eq!(matches.len(), 1);
+
+        let mut eza = EzaModernLsEngine::new();
+        eza.add_item("src", true, 4096, "modified");
+        assert_eq!(eza.items[0].permissions_str, "drwxr-xr-x");
+
+        let mut dust = DustFastDuEngine::new();
+        dust.add_folder("/home", 50, 100);
+        assert!(dust.folders[0].bar_graph.contains("█"));
     }
 }
