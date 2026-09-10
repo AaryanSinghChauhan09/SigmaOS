@@ -52,10 +52,12 @@ fn main() {
         "install" => cmd_install(&args[1..]),
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
-        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "apk" | "pkg" | "pkg_add"
-        | "pkg_delete" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
-        | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env" | "guix"
-        | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" => {
+        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "yay" | "paru" | "microdnf"
+        | "rpm" | "apk" | "pkg" | "pkg_add" | "pkg_delete" | "pkgin" | "zypper" | "xbps"
+        | "xbps-install" | "xbps-remove" | "emerge" | "ebuild" | "eopkg" | "moss" | "nix"
+        | "nix-env" | "guix" | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt"
+        | "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" | "brew"
+        | "flatpak" | "snap" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),
