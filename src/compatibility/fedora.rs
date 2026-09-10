@@ -3355,8 +3355,6 @@ pub struct TahrirMessagePost {
     pub fedmsg_dispatched: bool,
 }
 
-
-
 /// Fedora Tahrir Microblogging & Developer Social Network System
 /// Provides developer status microblogging, hashtag indexing, FAS authentication integration,
 /// and automated status broadcast over Fedora Messaging.

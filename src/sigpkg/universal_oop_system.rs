@@ -208,7 +208,6 @@ pub enum PackageFormat {
     Pisi,
     // Deepin Superdeb (.superdeb)
     Superdeb,
-    Sysupdate,
     // Slax Linux Module (.lzm)
     Lzm,
     // Puppy Linux Package (.pup)
@@ -255,6 +254,15 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -301,8 +309,12 @@ impl PackageFormat {
             Some(PackageFormat::Eopkg)
         } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
             Some(PackageFormat::Nix)
+        } else if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if normalized.ends_with(".rpm") {
+            Some(PackageFormat::Yum)
         } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
+            Some(PackageFormat::Portage)
         } else if normalized.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
@@ -2989,63 +3001,38 @@ pub struct PackageDeltaPatch {
 
 pub trait IPackageDeltaStrategy: Send + Sync {
     fn name(&self) -> &str;
-    fn calculate_delta(&self, old_data: &[u8], new_data: &[u8]) -> Vec<u8>;
-    fn compute_delta(&self, old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
-        self.calculate_delta(old_data, new_data)
+    fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str>;
+    fn compute_delta(&self, _source: &[u8], target: &[u8]) -> Vec<u8> {
+        target.to_vec()
     }
-    fn apply_delta(&self, old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str>;
+    fn apply_delta(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        self.apply(source, patch)
+    }
 }
 
 pub struct DnfDeltaRpmStrategy;
 impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
     fn name(&self) -> &str { "drpm" }
-    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
-        let mut delta = vec![0x44, 0x52, 0x50, 0x4d];
-        delta.extend_from_slice(new_data);
-        delta
-    }
-    fn apply_delta(&self, old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str> {
-        if delta.len() >= 4 && &delta[..4] == b"DRPM" {
-            let mut res = old_data.to_vec();
-            res.extend_from_slice(&delta[4..]);
-            Ok(res)
-        } else {
-            Err("Invalid DRPM payload header")
-        }
+    fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        let mut out = source.to_vec();
+        out.extend_from_slice(patch);
+        Ok(out)
     }
 }
 
 pub struct SovereignBinaryDeltaStrategy;
 impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
     fn name(&self) -> &str { "moss-stone-delta" }
-    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
-        let mut delta = vec![0x4d, 0x4f, 0x53, 0x53];
-        delta.extend_from_slice(new_data);
-        delta
-    }
-    fn apply_delta(&self, _old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str> {
-        if delta.len() >= 4 && &delta[..4] == b"MOSS" {
-            Ok(delta[4..].to_vec())
-        } else {
-            Err("Invalid MOSS delta payload header")
-        }
+    fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(patch.to_vec())
     }
 }
 
 pub struct ZstdChunkedDeltaStrategy;
 impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
     fn name(&self) -> &str { "zstd-chunked" }
-    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
-        let mut delta = vec![0x5a, 0x53, 0x54, 0x44];
-        delta.extend_from_slice(new_data);
-        delta
-    }
-    fn apply_delta(&self, _old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str> {
-        if delta.len() >= 4 && &delta[..4] == b"ZSTD" {
-            Ok(delta[4..].to_vec())
-        } else {
-            Err("Invalid ZSTD delta payload header")
-        }
+    fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(patch.to_vec())
     }
 }
 
@@ -5649,13 +5636,13 @@ Description: Hook test";
             ("test.AppImage", PackageFormat::AppImage),
             ("test.eopkg", PackageFormat::Eopkg),
             ("test.nixpkg", PackageFormat::Nix),
-            ("test.portage", PackageFormat::Ebuild),
+            ("test.portage", PackageFormat::Portage),
             ("test.deb", PackageFormat::Deb),
             ("test.tar.gz", PackageFormat::TarGz),
             ("test.tar .gz", PackageFormat::TarGz),
             ("test.xz", PackageFormat::TarXz),
-            ("test.rpm", PackageFormat::Rpm),
-            ("test.ebuild", PackageFormat::Ebuild),
+            ("test.rpm", PackageFormat::Yum),
+            ("test.ebuild", PackageFormat::Portage),
             ("test.pkg.tar.xz", PackageFormat::Pacman),
             ("test.flatpak", PackageFormat::Flatpak),
             ("test.app", PackageFormat::AppBundle),

@@ -193,7 +193,6 @@ pub struct PrivacySettings {
     pub location_services: bool,
 }
 
-
 impl SystemConfiguration {
     pub fn new() -> Self {
         Self {

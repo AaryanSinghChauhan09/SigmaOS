@@ -30,8 +30,6 @@ pub struct ContainerCapability {
     pub can_modify: bool,
 }
 
-
-
 impl ContainerCapability {
     pub const fn new() -> Self {
         ContainerCapability {

@@ -213,12 +213,13 @@ pub enum PackageState {
     BrokenDependency,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PackagePriority {
-    Essential,
-    Required,
-    Important,
-    Standard,
-    Optional,
+    Optional = 0,
+    Standard = 1,
+    Important = 2,
+    Required = 3,
+    Essential = 4,
 }
 
 /// Supported package formats across Linux and BSD ecosystems
@@ -226,7 +227,9 @@ pub enum PackagePriority {
 pub enum PackageFormat {
     #[default]
     Deb, // apt/dpkg
+    Apt, // alias for Deb
     Rpm,        // yum/dnf/zypper
+    Yum,        // alias for Rpm
     Pacman,     // pacman/pkgbuild
     Snap,       // snap/squashfs
     Flatpak,    // flatpak sandbox
@@ -242,10 +245,13 @@ pub enum PackageFormat {
     Eopkg,      // Solus eopkg (.eopkg)
     Nixpkg,     // Nix store package (.nixpkg)
     Ebuild,     // Gentoo ebuild (.ebuild / .portage)
+    Portage,    // alias for Ebuild
     OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
     TarGz,      // Compressed Tar (.tar.gz, .tgz)
     Xz,         // Compressed XZ archive (.xz, .tar.xz)
+    TarXz,      // alias for Xz
     App,        // macOS App bundle (.app)
+    AppBundle,  // alias for App
     Hap,        // HarmonyOS Ability Package (.hap)
     Pisi,       // Pardus / Solus PiSi (.PiSi)
     Superdeb,   // Deepin Superdeb (.superdeb)
@@ -281,15 +287,15 @@ pub enum PackageFormat {
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,
-    Conan,
-    Wheel,
-    Crate,
-    Gem,
-    Nupkg,
-    Vcpkg,
-    NarInfo,
-    Sysupdate,
+    Spack,      // HPC Spack package (.spack)
+    Conan,      // C/C++ Conan package (.conan)
+    Wheel,      // Python Wheel (.whl)
+    Crate,      // Cargo Rust crate (.crate)
+    Gem,        // Ruby Gem (.gem)
+    Nupkg,      // .NET NuGet package (.nupkg)
+    Vcpkg,      // C++ vcpkg package (.vcpkg)
+    NarInfo,    // Nix/Guix NarInfo (.narinfo)
+    Sysupdate,  // systemd-sysupdate A/B update bundle (.sysupdate)
 }
 
 impl PackageFormat {
@@ -339,8 +345,12 @@ impl PackageFormat {
             Some(PackageFormat::Eopkg)
         } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
             Some(PackageFormat::Nixpkg)
+        } else if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if normalized.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
         } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
+            Some(PackageFormat::Portage)
         } else if normalized.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
@@ -878,6 +888,15 @@ impl_generic_install_strategy!(IpkInstallStrategy);
 impl_generic_install_strategy!(OpkgInstallStrategy);
 impl_generic_install_strategy!(SolarisIpsInstallStrategy);
 impl_generic_install_strategy!(GuixNarInstallStrategy);
+impl_generic_install_strategy!(SpackInstallStrategy);
+impl_generic_install_strategy!(ConanInstallStrategy);
+impl_generic_install_strategy!(WheelInstallStrategy);
+impl_generic_install_strategy!(CrateInstallStrategy);
+impl_generic_install_strategy!(GemInstallStrategy);
+impl_generic_install_strategy!(NupkgInstallStrategy);
+impl_generic_install_strategy!(VcpkgInstallStrategy);
+impl_generic_install_strategy!(NarInfoInstallStrategy);
+impl_generic_install_strategy!(SysupdateInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1136,6 +1155,15 @@ impl_generic_metadata_adapter!(IpkMetadataAdapter, Ipk);
 impl_generic_metadata_adapter!(OpkgMetadataAdapter, Opkg);
 impl_generic_metadata_adapter!(SolarisIpsMetadataAdapter, SolarisIps);
 impl_generic_metadata_adapter!(GuixNarMetadataAdapter, GuixNar);
+impl_generic_metadata_adapter!(SpackMetadataAdapter, Spack);
+impl_generic_metadata_adapter!(ConanMetadataAdapter, Conan);
+impl_generic_metadata_adapter!(WheelMetadataAdapter, Wheel);
+impl_generic_metadata_adapter!(CrateMetadataAdapter, Crate);
+impl_generic_metadata_adapter!(GemMetadataAdapter, Gem);
+impl_generic_metadata_adapter!(NupkgMetadataAdapter, Nupkg);
+impl_generic_metadata_adapter!(VcpkgMetadataAdapter, Vcpkg);
+impl_generic_metadata_adapter!(NarInfoMetadataAdapter, NarInfo);
+impl_generic_metadata_adapter!(SysupdateMetadataAdapter, Sysupdate);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1304,10 +1332,10 @@ pub struct PackageFactory;
 impl PackageFactory {
     pub fn get_strategy(format: PackageFormat) -> Box<dyn InstallStrategy> {
         match format {
-            PackageFormat::Deb => Box::new(DebInstallStrategy),
-            PackageFormat::Rpm => Box::new(RpmInstallStrategy),
+            PackageFormat::Deb | PackageFormat::Apt => Box::new(DebInstallStrategy),
+            PackageFormat::Rpm | PackageFormat::Yum => Box::new(RpmInstallStrategy),
             PackageFormat::Pacman => Box::new(PacmanInstallStrategy),
-            PackageFormat::Ebuild => Box::new(EbuildInstallStrategy),
+            PackageFormat::Ebuild | PackageFormat::Portage => Box::new(EbuildInstallStrategy),
             PackageFormat::Apk => Box::new(ApkInstallStrategy),
             PackageFormat::Nix | PackageFormat::Nixpkg => Box::new(NixInstallStrategy),
             PackageFormat::Flatpak => Box::new(FlatpakInstallStrategy),
@@ -1329,8 +1357,8 @@ impl PackageFactory {
             PackageFormat::Pkg => Box::new(PkgInstallStrategy),
             PackageFormat::Aab => Box::new(AabInstallStrategy),
             PackageFormat::TarGz => Box::new(TarGzInstallStrategy),
-            PackageFormat::Xz => Box::new(XzInstallStrategy),
-            PackageFormat::App => Box::new(AppInstallStrategy),
+            PackageFormat::Xz | PackageFormat::TarXz => Box::new(XzInstallStrategy),
+            PackageFormat::App | PackageFormat::AppBundle => Box::new(AppInstallStrategy),
             PackageFormat::Hap => Box::new(HapInstallStrategy),
             PackageFormat::Pisi => Box::new(PisiInstallStrategy),
             PackageFormat::Superdeb => Box::new(SuperdebInstallStrategy),
@@ -1358,16 +1386,24 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
-            _ => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::Spack => Box::new(SpackInstallStrategy),
+            PackageFormat::Conan => Box::new(ConanInstallStrategy),
+            PackageFormat::Wheel => Box::new(WheelInstallStrategy),
+            PackageFormat::Crate => Box::new(CrateInstallStrategy),
+            PackageFormat::Gem => Box::new(GemInstallStrategy),
+            PackageFormat::Nupkg => Box::new(NupkgInstallStrategy),
+            PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
+            PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
+            PackageFormat::Sysupdate => Box::new(SysupdateInstallStrategy),
         }
     }
 
     pub fn get_adapter(format: PackageFormat) -> Box<dyn PackageMetadataAdapter> {
         match format {
-            PackageFormat::Deb => Box::new(DebMetadataAdapter),
-            PackageFormat::Rpm => Box::new(RpmMetadataAdapter),
+            PackageFormat::Deb | PackageFormat::Apt => Box::new(DebMetadataAdapter),
+            PackageFormat::Rpm | PackageFormat::Yum => Box::new(RpmMetadataAdapter),
             PackageFormat::Pacman => Box::new(PacmanMetadataAdapter),
-            PackageFormat::Ebuild => Box::new(EbuildMetadataAdapter),
+            PackageFormat::Ebuild | PackageFormat::Portage => Box::new(EbuildMetadataAdapter),
             PackageFormat::Apk => Box::new(ApkMetadataAdapter),
             PackageFormat::Nix | PackageFormat::Nixpkg => Box::new(NixMetadataAdapter),
             PackageFormat::Flatpak => Box::new(FlatpakMetadataAdapter),
@@ -1389,8 +1425,8 @@ impl PackageFactory {
             PackageFormat::Pkg => Box::new(PkgMetadataAdapter),
             PackageFormat::Aab => Box::new(AabMetadataAdapter),
             PackageFormat::TarGz => Box::new(TarGzMetadataAdapter),
-            PackageFormat::Xz => Box::new(XzMetadataAdapter),
-            PackageFormat::App => Box::new(AppMetadataAdapter),
+            PackageFormat::Xz | PackageFormat::TarXz => Box::new(XzMetadataAdapter),
+            PackageFormat::App | PackageFormat::AppBundle => Box::new(AppMetadataAdapter),
             PackageFormat::Hap => Box::new(HapMetadataAdapter),
             PackageFormat::Pisi => Box::new(PisiMetadataAdapter),
             PackageFormat::Superdeb => Box::new(SuperdebMetadataAdapter),
@@ -1418,7 +1454,15 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
-            _ => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::Spack => Box::new(SpackMetadataAdapter),
+            PackageFormat::Conan => Box::new(ConanMetadataAdapter),
+            PackageFormat::Wheel => Box::new(WheelMetadataAdapter),
+            PackageFormat::Crate => Box::new(CrateMetadataAdapter),
+            PackageFormat::Gem => Box::new(GemMetadataAdapter),
+            PackageFormat::Nupkg => Box::new(NupkgMetadataAdapter),
+            PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
+            PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
+            PackageFormat::Sysupdate => Box::new(SysupdateMetadataAdapter),
         }
     }
 }
@@ -1518,6 +1562,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: PackagePriority,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -2599,6 +2644,7 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
+            priority: PackagePriority::Standard,
         };
 
         let _pkgbuild = PacmanPkgbuild {
@@ -2707,13 +2753,13 @@ mod tests {
             ("app.AppImage", PackageFormat::AppImage),
             ("app.eopkg", PackageFormat::Eopkg),
             ("app.nixpkg", PackageFormat::Nixpkg),
-            ("app.portage", PackageFormat::Ebuild),
+            ("app.portage", PackageFormat::Portage),
             ("app.deb", PackageFormat::Deb),
             ("app.tar.gz", PackageFormat::TarGz),
             ("app.tar .gz", PackageFormat::TarGz),
             ("app.xz", PackageFormat::Xz),
             ("app.rpm", PackageFormat::Rpm),
-            ("app.ebuild", PackageFormat::Ebuild),
+            ("app.ebuild", PackageFormat::Portage),
             ("app.pkg.tar.xz", PackageFormat::Pacman),
             ("app.flatpak", PackageFormat::Flatpak),
             ("app.app", PackageFormat::App),
@@ -2800,7 +2846,7 @@ mod tests {
         );
         assert_eq!(
             PackageFormat::from_filename("gentoo.portage"),
-            Some(PackageFormat::Ebuild)
+            Some(PackageFormat::Portage)
         );
         assert_eq!(
             PackageFormat::from_filename("debian.deb"),
@@ -2828,7 +2874,11 @@ mod tests {
         );
         assert_eq!(
             PackageFormat::from_filename("gentoo.ebuild"),
-            Some(PackageFormat::Ebuild)
+            Some(PackageFormat::Portage)
+        );
+        assert_eq!(
+            PackageFormat::from_filename("gentoo.portage"),
+            Some(PackageFormat::Portage)
         );
         assert_eq!(
             PackageFormat::from_filename("arch.pkg.tar.xz"),
@@ -2907,11 +2957,6 @@ mod tests {
             Some(PackageFormat::OpenBsdPkg)
         );
     }
-}
-
-#[cfg(test)]
-mod extra_tests {
-    use super::*;
 
     #[test]
     fn test_all_package_format_strategies_and_adapters() {
@@ -3005,5 +3050,14 @@ mod extra_tests {
         };
 
         assert!(net_dec.restrict_network().is_ok());
+    }
+}
+
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
+
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, _raw_metadata: &str) -> Result<UnifiedPackage, PackageError> {
+        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
     }
 }
