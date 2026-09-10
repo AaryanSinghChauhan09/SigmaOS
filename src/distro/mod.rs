@@ -5,8 +5,9 @@ pub mod antix_zorin_innovations;
 pub mod arch_missing_components;
 
 pub use arch_missing_components::{
-    AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAurWebRpcClient, ArchMakepkgEngine,
-    ArchNamcapLinterEngine, AurRpcResult, NamcapIssue, NamcapSeverity, PkgBuildSpec,
+    AlaSnapshotRecord, AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAuditScannerEngine,
+    ArchAurWebRpcClient, ArchLinuxArchiveEngine, ArchMakepkgEngine, ArchNamcapLinterEngine,
+    ArchVulnerabilityReport, AurRpcResult, NamcapIssue, NamcapSeverity, PkgBuildSpec,
 };
 
 pub use omarchy::{
