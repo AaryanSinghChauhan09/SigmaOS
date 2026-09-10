@@ -9,8 +9,6 @@ SigmaOS is the world’s first **sovereign operating system**, engineered from t
 - 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
 - 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
 - ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
-- 📋 **Linux Distro Feature Parity Checklist**: [docs/LINUX_DISTRO_PARITY_CHECKLIST.md](docs/LINUX_DISTRO_PARITY_CHECKLIST.md)
-- ⚡ **Strategy to Surpass & Defeat Linux & BSD**: [docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md](docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md)
 - 🗺️ **Master Development Roadmap**: [FUTURE-DEVELOPMENT-ROADMAP.md](FUTURE-DEVELOPMENT-ROADMAP.md)
 
 ---
@@ -73,42 +71,6 @@ cargo check --lib
 For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and [wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
 
 ---
-
-## 🎯 Design Principles
-
-SigmaOS follows strict software engineering principles:
-
-- **OOPS**: Objects, Classes, Instances, Encapsulation, Abstraction, Inheritance, Polymorphism
-- **SOLID**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
-- **DRY**: Don't Repeat Yourself
-- **KISS**: Keep It Simple, Stupid
-- **YAGNI**: You Aren't Gonna Need It
-- **Separation of Concerns**
-- **Composition Over Inheritance**
-- **Design by Contract**
-
----
-
-## 🔗 Quick Links
-
-- **[Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)** - Source code and issues
-- **[Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Full documentation
-- **[AGENTS.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/AGENTS.md)** - AI Agent operational guidelines
-- **[LICENSE](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LICENSE)** - MIT License
-
----
-
-*Built with sovereign zero-dependency philosophy to defeat Linux and BSD distros through superior architecture.*
-
-SigmaOS is licensed under the [MIT License](LICENSE).
-
----
-
-## 📜 Key Project Resources & Public Launch Documents
-- 🚀 **Public Launch Announcement**: [docs/LAUNCH_ANNOUNCEMENT.md](docs/LAUNCH_ANNOUNCEMENT.md)
-- 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
-- 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
-- ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## 📄 License
 

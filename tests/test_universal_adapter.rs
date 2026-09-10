@@ -1,4 +1,4 @@
-// Integration tests for SigmaOS Universal Package Format Adapter
+// Standalone Test Runner for SigmaOS Universal Package Format Adapter
 extern crate alloc;
 
 pub mod klib {
@@ -133,12 +133,6 @@ pub mod sigpkg {
     }
 }
 
-#[cfg(feature = "standalone_test")]
-use crate::sigpkg::*;
-
-#[cfg(feature = "standalone_test")]
-use crate::sigpkg::*;
-
 #[test]
 fn test_universal_adapter_all_formats() {
     use universal_adapter::{
@@ -182,14 +176,14 @@ fn test_universal_adapter_all_formats() {
         .absorb_and_register("redis.pkg", freebsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge
         .absorb_and_register("tmux.tgz", openbsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -225,6 +219,7 @@ fn test_universal_adapter_all_formats() {
     assert_eq!(microdnf_action.target_packages, vec!["httpd"]);
 
     // 8. Dependency Mapper Canonicalization
+    use universal_adapter::UniversalDependencyMapper;
     let dep_mapper = UniversalDependencyMapper::new();
     assert_eq!(dep_mapper.to_canonical_name("libffi-dev"), "libffi");
     assert_eq!(dep_mapper.to_canonical_name("glib2-devel"), "glib");
@@ -446,11 +441,11 @@ fn test_all_prompt_package_formats_extended() {
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
     assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
-    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Deb));
+    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("compressed.xz"), Some(PackageFormat::TarXz));
-    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Rpm));
+    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Yum));
     assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
     assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
     assert_eq!(adapter.detect_format_by_extension("app.flatpak"), Some(PackageFormat::Flatpak));
