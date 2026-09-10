@@ -254,3 +254,11 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
+
+pub mod distro_inspiration_synthesis;
+pub use distro_inspiration_synthesis::{
+    AlpineLbuRamRootEngine, FreeBsdVnetJailEngine, LbuOverlayCommit, NetBsdRumpUserlandDriverEngine,
+    NixOsFlakeGcEngine, OpenBsdPledgeUnveilSentinel, RumpComponentKind, RumpUserlandDriver,
+    SovereignDistroInspirationSynthesisSuite, StoreGeneration, SyscallPromise, UnveilPermission,
+    VnetInterface, VnetJail,
+};

@@ -57,3 +57,6 @@ pub mod dependency_reduction;
 pub use dependency_reduction::*;
 pub mod open_source_tools_engine;
 pub use open_source_tools_engine::*;
+
+pub mod open_source_tools_synthesis;
+pub use open_source_tools_synthesis::*;
