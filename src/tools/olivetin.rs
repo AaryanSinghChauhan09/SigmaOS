@@ -8,6 +8,22 @@ use std::format;
 use std::string::ToString;
 use crate::klib::{Vec, BTreeMap};
 
+/// Helper function to escape HTML special characters to prevent DOM injection / XSS
+fn escape_html(input: &str) -> String {
+    let mut escaped = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
+}
+
 #[derive(Debug, Clone)]
 pub struct OliveTinAction {
     pub id: usize,
@@ -119,11 +135,11 @@ impl SovereignOliveTinEngine {
             let act = &self.actions[i];
             html.push_str("<div class=\"card\">");
             html.push_str("<h3>");
-            html.push_str(&act.title);
+            html.push_str(&escape_html(&act.title));
             html.push_str("</h3><p>");
-            html.push_str(&act.description);
+            html.push_str(&escape_html(&act.description));
             html.push_str("</p><p><code>");
-            html.push_str(&act.command_template);
+            html.push_str(&escape_html(&act.command_template));
             html.push_str("</code></p>");
             html.push_str("<button>Run Action</button>");
             html.push_str("</div>");
