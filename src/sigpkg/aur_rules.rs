@@ -3,10 +3,19 @@
 // Native Rust implementation of Arch Linux AUR security linting (namcap parity) & makepkg pipeline
 
 
+<<<<<<< HEAD
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+=======
+extern crate alloc;
+
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+>>>>>>> origin/jules-11419381740832472292-50948cbf
 
 // ============================================================================
 // 1. AurRuleEngine (namcap & AUR security rules parity)

@@ -6,10 +6,17 @@ rust:
 documentation:
   - changed-files:
       - any-glob-to-any-file:
+<<<<<<< HEAD
           - 'docs/**/*'
           - 'wiki/**/*'
           - 'wiki_repo/**/*'
           - '**/*.md'
+=======
+          - '**/*.md'
+          - 'docs/**'
+          - 'wiki/**'
+          - 'wiki_repo/**'
+>>>>>>> origin/jules-11419381740832472292-50948cbf
 
 workflows:
   - changed-files:
@@ -37,6 +44,7 @@ security:
       - any-glob-to-any-file: 'src/security/**/*'
 
 "area: kernel":
+<<<<<<< HEAD
   - changed-files:
       - any-glob-to-any-file: 'src/kernel/**/*'
 
@@ -54,6 +62,16 @@ security:
           - 'src/net/**/*'
           - 'src/network/**/*'
 
+=======
+  - src/kernel/**/*
+"area: distro":
+  - src/distro/**/*
+"area: security":
+  - src/security/**/*
+"area: networking":
+  - src/net/**/*
+  - src/network/**/*
+>>>>>>> origin/jules-11419381740832472292-50948cbf
 "area: package":
   - changed-files:
       - any-glob-to-any-file:

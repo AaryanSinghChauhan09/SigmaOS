@@ -1,123 +1,31 @@
-# Contributing to SigmaOS
+# 🤝 Contributing to SigmaOS
 
-Thank you for your interest in contributing to SigmaOS! This document provides guidelines and instructions for contributing to the core operating system, hardware drivers, application compatibility layers, and declarative app shards.
+Thank you for contributing to **SigmaOS**! This document provides development guidelines, code quality standards, and contribution workflows inspired by Linux kernel maintainers and BSD distribution standards.
 
-## Code of Conduct
+---
 
-- Be respectful and inclusive
-- Focus on what is best for the community and open sovereign computing
-- Show empathy towards other community members
+## 📜 Rules for Contributors
 
-## Special Interest Groups (SIGs)
+### 1. **Zero External Dependencies Policy**
+- SigmaOS strictly adheres to a **zero-dependency `#![no_std]`** design philosophy across kernel, hardware abstractions, and system services.
+- **Do NOT add third-party crates** to `Cargo.toml`.
+- All abstractions must use core Rust or `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`).
 
-To foster specialized collaboration, SigmaOS organizes community work into Special Interest Groups (SIGs):
+### 2. **Code Quality, Safety & Testing**
+- **Safe Rust First:** Avoid `unsafe` blocks unless interfacing directly with MMIO registers, CPU instructions, or FFI. Always document `// SAFETY:` invariants for any `unsafe` usage.
+- **No Panics:** Avoid `unwrap()`, `expect()`, or panicking logic in production paths. Gracefully return `Option` or `Result`.
+- **Mandatory Unit Testing:** Every new feature, bug fix, or security enhancement must include comprehensive unit tests (`#[cfg(test)] mod tests`).
+- **Full Verification:** All changes must pass `./run_sigma_tests.sh` and standalone test compilation (`rustc --edition=2021 --test <file_path>`).
 
-- **SIG-Kernel**: Low-level kernel scheduling, virtual memory (VMM), IPC, eBPF, and syscall gates.
-- **SIG-Drivers**: Hardware abstraction layers (HAL), PCIe, NVMe, e1000e NICs, xHCI USB, Intel HDA, and net80211/iwlwifi.
-- **SIG-Apps & Shards**: Declarative app manifests (`.sigma-app`), immutable SquashFS/OverlayFS layers, and Shards Marketplace ecosystem.
-- **SIG-Security**: OpenBSD-style `pledge`/`unveil`, SELinux MAC policies, PQC cryptographic enclaves, and binary hardening.
+### 3. **Security & Sandboxing Standards**
+- Implement security controls following defense-in-depth principles: OpenBSD `pledge`/`unveil`, Linux Landlock v5, FreeBSD Capsicum descriptors, and SELinux MAC.
+- All network packets, input parameters, and package manifests must undergo strict validation against path traversal, octal differential, and CLI option injection attacks.
 
-## Getting Started
+### 4. **Branch Naming & Commit Workflow**
+- Branch names should follow descriptive prefixes (`feat/`, `fix/`, `docs/`, `security/`, `perf/`, `jules-`).
+- Keep commits atomic, well-tested, and accompanied by clear commit messages adhering to standard git conventions (50-char subject, blank line, body).
 
-### Prerequisites
-
-- Rust (latest stable version)
-- Cargo (comes with Rust)
-- Git
-- QEMU / KVM (for OS testing)
-- Make & GCC/Clang
-
-### Setting Up Development Environment
-
-```bash
-# Clone the repository
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
-
-# Build the project
-cargo build
-
-# Run core library unit tests
-cargo test --lib
-
-# Run the interactive REPL shell
-cargo run --bin sigma_userspace
-```
-
-## Declarative App Manifests & Shards Packaging
-
-Developers are encouraged to package applications as declarative SigmaOS Shards using single-file `.sigma-app` specs:
-
-```toml
-# Example Declarative App Manifest
-name = "my-sovereign-app"
-version = "1.0.0"
-entrypoint = "/bin/myapp"
-description = "High-performance modular app"
-allow_gpu = "true"
-allow_audio = "true"
-allow_network = "false"
-depends = "sigma-libc"
-env.APP_MODE = "production"
-```
-
-App shards run in immutable, read-only layers with atomic zero-downtime slot updates and capability permission enforcement.
-
-## Development Workflow
-
-### Branching Strategy
-
-- `main` - The main development branch
-- All changes should be made through pull requests
-- Feature branches should be named `feature/description`
-- Bugfix branches should be named `fix/description`
-- Shard / package updates should be named `shard/app-name`
-
-### Commit Guidelines
-
-- Use clear, descriptive commit messages
-- Follow conventional commit format: `type(scope): description`
-- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `shard`
-
-### Code Style
-
-- Follow Rust standard formatting: `cargo fmt`
-- Use clippy for linting: `cargo clippy`
-- Write unit tests for new functionality
-- Document public APIs with rustdoc
-
-## Testing & Verification
-
-```bash
-# Run all unit tests
-cargo test --lib
-
-# Run binary executable target checks
-cargo check --bins
-
-# Run specific driver test
-cargo test --lib drivers::modern_nvme
-```
-
-## Hackathons, Community Sprints & Roadmap
-
-- **Developer Roadmap**: Check `ROADMAP.md` and `3-YEAR-STRATEGIC-VISION.md` to align your contributions with current milestones.
-- **Community Hackathons & Sprints**: We host quarterly virtual hackathons and monthly bug-hunting sprints. Announcements and sign-ups are posted in GitHub Discussions.
-
-## Pull Request Process
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes and add unit tests
-4. Update documentation or manifest specs as needed
-5. Submit a pull request
-6. Address review feedback from SIG maintainers
-7. Obtain approval and merge
-
-## Questions & Discussions
-
-- Join discussions in **GitHub Discussions**
-- File bug reports and feature proposals via **GitHub Issues**
-- Reach out to SIG leads in relevant subproject channels
-
-Thank you for building the future of sovereign, AI-native operating systems with SigmaOS!
+### 3. **Testing & Code Review**
+- Run standalone tests on modified files (`rustc --edition=2021 --test <file>`).
+- Execute `./run_sigma_tests.sh` to ensure all 13 native test stages pass cleanly.
+- Pull requests require double maintainer code review before merging.

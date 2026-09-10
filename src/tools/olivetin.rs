@@ -2,11 +2,27 @@
 //! Provides a safe, incredibly clean, lightweight web control panel
 //! allowing administrators to expose pre-defined shell commands with parameter variables
 //! in a sandboxed, ease-of-use environment under #![no_std].
-use std::string::String;
 use std::format;
+use std::string::String;
 
+use crate::klib::{BTreeMap, Vec};
 use std::string::ToString;
-use crate::klib::{Vec, BTreeMap};
+
+/// Helper function to escape HTML special characters to prevent DOM injection / XSS
+fn escape_html(input: &str) -> String {
+    let mut escaped = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
+}
 
 /// Helper function to escape HTML special characters to prevent DOM injection / XSS
 fn escape_html(input: &str) -> String {
@@ -74,7 +90,11 @@ impl SovereignOliveTinEngine {
     }
 
     /// Evaluates action parameter interpolation and executes the pre-defined command
-    pub fn execute_action(&mut self, action_id: usize, args: &[&str]) -> Result<String, &'static str> {
+    pub fn execute_action(
+        &mut self,
+        action_id: usize,
+        args: &[&str],
+    ) -> Result<String, &'static str> {
         let mut action_opt = None;
         for i in 0..self.actions.len() {
             if self.actions[i].id == action_id {
@@ -124,7 +144,9 @@ impl SovereignOliveTinEngine {
         let mut html = String::new();
         html.push_str("<!DOCTYPE html><html><head>");
         html.push_str("<title>SigmaOS OliveTin Control Panel</title>");
-        html.push_str("<style>body{font-family:sans-serif;background:#0d1117;color:#c9d1d9;padding:2rem;}");
+        html.push_str(
+            "<style>body{font-family:sans-serif;background:#0d1117;color:#c9d1d9;padding:2rem;}",
+        );
         html.push_str(".container{max-width:800px;margin:0 auto;}");
         html.push_str(".card{background:#161b22;border:1px solid #30363d;padding:1.5rem;margin-bottom:1rem;border-radius:6px;}");
         html.push_str("button{background:#238636;color:white;border:none;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;}");

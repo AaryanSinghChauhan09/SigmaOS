@@ -1,5 +1,5 @@
 //! Linux Mint mintwelcome-inspired Welcome Screen
-//! 
+//!
 //! This module implements a welcome screen inspired by Linux Mint's mintwelcome,
 //! which shows important information about the release and guides new users.
 
@@ -10,6 +10,22 @@
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+
+/// Helper function to escape HTML special characters to prevent DOM injection / XSS
+fn escape_html(input: &str) -> String {
+    let mut escaped = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
+}
 
 /// Helper function to escape HTML special characters to prevent DOM injection / XSS
 fn escape_html(input: &str) -> String {
@@ -113,7 +129,10 @@ impl MintWelcomeScreen {
 
     /// Get content by section
     pub fn get_content_by_section(&self, section: WelcomeSection) -> Vec<&WelcomeContent> {
-        self.content.iter().filter(|c| c.section == section).collect()
+        self.content
+            .iter()
+            .filter(|c| c.section == section)
+            .collect()
     }
 
     /// Mark welcome as shown
@@ -139,7 +158,7 @@ impl MintWelcomeScreen {
     /// Generate welcome HTML
     pub fn generate_html(&self) -> String {
         let mut html = String::new();
-        
+
         html.push_str("<!DOCTYPE html>\n");
         html.push_str("<html>\n");
         html.push_str("<head>\n");
@@ -148,23 +167,42 @@ impl MintWelcomeScreen {
         html.push_str("</title>\n");
         html.push_str("</head>\n");
         html.push_str("<body>\n");
-        
+
         // Header
         html.push_str("<h1>Welcome to ");
         html.push_str(&escape_html(&self.system_info.os_name));
         html.push_str(" ");
         html.push_str(&escape_html(&self.system_info.os_version));
         html.push_str("</h1>\n");
-        
+
         // System info
         html.push_str("<h2>System Information</h2>\n");
         html.push_str("<ul>\n");
+<<<<<<< HEAD
         html.push_str(&format!("<li>Edition: {}</li>\n", escape_html(&self.system_info.edition)));
         html.push_str(&format!("<li>Desktop: {}</li>\n", escape_html(&self.system_info.desktop_environment)));
         html.push_str(&format!("<li>Kernel: {}</li>\n", escape_html(&self.system_info.kernel_version)));
         html.push_str(&format!("<li>Architecture: {}</li>\n", escape_html(&self.system_info.architecture)));
+=======
+        html.push_str(&format!(
+            "<li>Edition: {}</li>\n",
+            escape_html(&self.system_info.edition)
+        ));
+        html.push_str(&format!(
+            "<li>Desktop: {}</li>\n",
+            escape_html(&self.system_info.desktop_environment)
+        ));
+        html.push_str(&format!(
+            "<li>Kernel: {}</li>\n",
+            escape_html(&self.system_info.kernel_version)
+        ));
+        html.push_str(&format!(
+            "<li>Architecture: {}</li>\n",
+            escape_html(&self.system_info.architecture)
+        ));
+>>>>>>> origin/jules-11419381740832472292-50948cbf
         html.push_str("</ul>\n");
-        
+
         // Content sections
         for section in &self.content {
             html.push_str("<h2>");
@@ -173,38 +211,47 @@ impl MintWelcomeScreen {
             html.push_str("<p>");
             html.push_str(&escape_html(&section.content));
             html.push_str("</p>\n");
-            
+
             if let Some(url) = &section.url {
                 html.push_str("<p><a href=\"");
                 html.push_str(&escape_html(url));
                 html.push_str("\">Learn more</a></p>\n");
             }
         }
-        
+
         html.push_str("</body>\n");
         html.push_str("</html>\n");
-        
+
         html
     }
 
     /// Generate welcome markdown
     pub fn generate_markdown(&self) -> String {
         let mut md = String::new();
-        
+
         md.push_str("# Welcome to ");
         md.push_str(&self.system_info.os_name);
         md.push_str(" ");
         md.push_str(&self.system_info.os_version);
         md.push_str("\n\n");
-        
+
         // System info
         md.push_str("## System Information\n\n");
         md.push_str(&format!("- **Edition:** {}\n", self.system_info.edition));
-        md.push_str(&format!("- **Desktop:** {}\n", self.system_info.desktop_environment));
-        md.push_str(&format!("- **Kernel:** {}\n", self.system_info.kernel_version));
-        md.push_str(&format!("- **Architecture:** {}\n", self.system_info.architecture));
+        md.push_str(&format!(
+            "- **Desktop:** {}\n",
+            self.system_info.desktop_environment
+        ));
+        md.push_str(&format!(
+            "- **Kernel:** {}\n",
+            self.system_info.kernel_version
+        ));
+        md.push_str(&format!(
+            "- **Architecture:** {}\n",
+            self.system_info.architecture
+        ));
         md.push_str("\n");
-        
+
         // Content sections
         for section in &self.content {
             md.push_str("## ");
@@ -212,14 +259,14 @@ impl MintWelcomeScreen {
             md.push_str("\n\n");
             md.push_str(&section.content);
             md.push_str("\n\n");
-            
+
             if let Some(url) = &section.url {
                 md.push_str("[Learn more](");
                 md.push_str(url);
                 md.push_str(")\n\n");
             }
         }
-        
+
         md
     }
 }
@@ -253,7 +300,7 @@ mod tests {
             architecture: "x86_64".to_string(),
             installation_date: "2024-01-01".to_string(),
         };
-        
+
         let welcome = MintWelcomeScreen::new(system_info);
         assert_eq!(welcome.content.len(), 0);
         assert!(welcome.show_on_first_boot);
@@ -262,7 +309,7 @@ mod tests {
     #[test]
     fn test_add_content() {
         let mut welcome = MintWelcomeScreen::default();
-        
+
         let content = WelcomeContent {
             section: WelcomeSection::Introduction,
             title: "Welcome".to_string(),
@@ -270,7 +317,7 @@ mod tests {
             url: None,
             icon: None,
         };
-        
+
         welcome.add_content(content);
         assert_eq!(welcome.content.len(), 1);
     }
@@ -279,7 +326,7 @@ mod tests {
     fn test_should_show() {
         let welcome = MintWelcomeScreen::default();
         assert!(welcome.should_show());
-        
+
         let mut welcome = MintWelcomeScreen::default();
         welcome.mark_as_shown();
         assert!(!welcome.should_show());
@@ -288,7 +335,7 @@ mod tests {
     #[test]
     fn test_generate_markdown() {
         let mut welcome = MintWelcomeScreen::default();
-        
+
         let content = WelcomeContent {
             section: WelcomeSection::Introduction,
             title: "Welcome".to_string(),
@@ -296,7 +343,7 @@ mod tests {
             url: None,
             icon: None,
         };
-        
+
         welcome.add_content(content);
         let md = welcome.generate_markdown();
         assert!(md.contains("Welcome to SigmaOS"));
@@ -306,7 +353,7 @@ mod tests {
     #[test]
     fn test_generate_html() {
         let mut welcome = MintWelcomeScreen::default();
-        
+
         let content = WelcomeContent {
             section: WelcomeSection::Introduction,
             title: "Welcome".to_string(),
@@ -314,7 +361,7 @@ mod tests {
             url: None,
             icon: None,
         };
-        
+
         welcome.add_content(content);
         let html = welcome.generate_html();
         assert!(html.contains("<!DOCTYPE html>"));

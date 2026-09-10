@@ -1,12 +1,9 @@
 // SigmaOS Advanced GUI Installer Wizard
 // Calamares-inspired graphical installer wizard with dual-boot alongside partitioning
 
-use std::string::{String, ToString};
-use std::vec::Vec;
-
 extern crate alloc;
 use alloc::format;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;
 
