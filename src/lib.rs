@@ -42,6 +42,7 @@ pub mod storage;
 pub mod thread;
 pub mod compositor;
 pub mod theming;
+pub mod onboarding;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
 };
