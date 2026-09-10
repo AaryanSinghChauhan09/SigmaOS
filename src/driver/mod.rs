@@ -18,9 +18,6 @@ pub mod pci_enumeration;
 pub mod pods;
 pub mod rootkit;
 pub mod shims;
-pub mod ubuntu_common_drivers;
-pub mod vault;
-pub mod wifi_broadcom_bcm4318;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
@@ -40,9 +37,6 @@ pub use nic_intel_e1000::{
 pub use nvme_storage::{
     NvmeController, NvmePciDriver, NvmeNamespace, QueuePair, NvmeCompletionEntry,
 };
-pub use wifi_broadcom_bcm4318::{
-    BroadcomWifiDriver, BroadcomWifiPciDriver, WifiStandard, Band, AssociationState,
-};
 pub use pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,
@@ -57,12 +51,6 @@ pub use rootkit::{
     FileDirectoryEntry, MappedView, SectionBackingType, SectionObject, StealthFilterDriver,
     SyscallStubDisassembler,
 };
-pub use ubuntu_common_drivers::{
-    DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
-    UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
-    UbuntuLivepatchDriverHook,
-};
-pub use vault::{DriverArchiveVault, VaultEntry};
 pub use shims::{IntelE1000Driver, HdaSampleRate, IntelHdaDriver, VirtioBlockOp, VirtioBlockRequest, VirtioBlockDriver};
 pub use gpu_framework::{
     AmdgpuDriver, GpuBuffer, GpuDriver, GpuError, GpuInfo, GpuManager, GpuType, IntelDriver,
