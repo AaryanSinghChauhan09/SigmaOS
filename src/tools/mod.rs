@@ -96,5 +96,13 @@ pub mod dependency_reduction;
 pub use dependency_reduction::*;
 pub mod regex;
 pub mod native_userland_replacements;
+pub mod itsfoss_innovations;
 pub use regex::{RegexMatch, SovereignRegexEngine};
 pub use native_userland_replacements::MasterNativeUserlandReplacements;
+pub use itsfoss_innovations::{
+    AppPortalPermission, BduDiskUsageAnalyzer, CleanTargetCategory, CleanableCacheItem,
+    ItsFossFlatpakSnapLayer, ItsFossGamingBoosterEngine, ItsFossGuiSoftwareCenterEngine,
+    ItsFossSystemCleanerEngine, MangoHudMetrics, MicroTextEditorEngine, NeowritableNotetakerEngine,
+    SandboxAppFormat, SandboxContainerApp, SoftwareCatalogEntry, StarshipPromptThemeEngine,
+    TerminalNote,
+};
