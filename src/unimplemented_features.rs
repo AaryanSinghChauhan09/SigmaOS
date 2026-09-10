@@ -118,8 +118,10 @@ impl GentooPortageMaskResolver {
 }
 
 
-// ==================================================================// 1. S-BOOT FIRMWARE (BIOS & UEFI SPECIFICATION)
-// ===========================================================pub const PCI_MAX_BUS: usize = 256;
+// ==================================================================
+// 1. S-BOOT FIRMWARE (BIOS & UEFI SPECIFICATION)
+// ==================================================================
+pub const PCI_MAX_BUS: usize = 256;
 pub const PCI_MAX_DEVICE: u8 = 32;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
