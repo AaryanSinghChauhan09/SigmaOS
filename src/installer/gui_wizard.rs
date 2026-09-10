@@ -3,11 +3,7 @@
 
 use std::string::{String, ToString};
 use std::vec::Vec;
-
-
 use std::format;
-use std::string::String;
-use std::vec::Vec;
 use std::vec;
 
 /// Installer Screen / Calamares Module Sequence

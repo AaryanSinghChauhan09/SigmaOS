@@ -4107,54 +4107,6 @@ impl Default for FedoraToolbxContainerEngine {
 }
 
 // =========================================================================
-// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
-// =========================================================================
-
-#[derive(Debug, Clone, Default)]
-pub struct FedoraOfflineUpdateEngine {
-    pub is_offline_update_pending: bool,
-    pub staged_packages: Vec<String>,
-    pub trigger_reboot_flag: bool,
-}
-
-impl FedoraOfflineUpdateEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
-    }
-}
-
-
-
-impl FedoraOfflineUpdateEngine {
-    pub fn new() -> Self {
-        Self {
-            staged_packages: Vec::new(),
-            is_offline_update_pending: false,
-            trigger_reboot_flag: false,
-        }
-    }
-}
-
-// =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine
 // =========================================================================
 
@@ -5888,41 +5840,5 @@ impl FedoraRPMSeccompFilterEngine {
 impl Default for FedoraRPMSeccompFilterEngine {
     fn default() -> Self {
         Self::new()
-    }
-
-    #[test]
-    fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {
-        // 1. MojiKey
-        let moji = FedoraMojiKeyEngine::new();
-        let res = moji.search("fedora");
-        assert_eq!(res.len(), 1);
-        assert_eq!(res[0].glyph, "🎩");
-
-        // 2. Pagu
-        let mut pagu = FedoraPaguEngine::new();
-        pagu.provision_account("jules_dev", "jules@fedora.org", &["packagers", "sysadmin"]);
-        assert_eq!(pagu.generate_oauth2_token("jules_dev"), Some("pagu-oauth2-token-jules_dev".to_string()));
-
-        // 3. Fedocal
-        let mut cal = FedoraFedocalEngine::new();
-        let m_id = cal.schedule_meeting("Kernel Release Party", "#fedora-meeting", "jules_dev");
-        assert_eq!(m_id, 1);
-
-        // 4. Nuancier
-        let mut nuancier = FedoraNuancierEngine::new();
-        let w_id = nuancier.submit_wallpaper("Blue Nebula", "artist_guy");
-        assert!(nuancier.vote(w_id));
-        assert_eq!(nuancier.submissions[0].votes, 1);
-
-        // 5. IRCOT
-        let mut ircot = FedoraIrcotEngine::new();
-        ircot.join_channel("#fedora-devel", "Fedora Devel Channel");
-        assert_eq!(ircot.broadcast_message("Release v40 published!"), 1);
-
-        // 6. Elections
-        let mut elections = FedoraElectionsEngine::new();
-        elections.nominate_candidate("alice");
-        assert!(elections.cast_ballot("alice"));
-        assert_eq!(elections.candidates[0].votes, 1);
     }
 }

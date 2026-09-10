@@ -42,14 +42,6 @@ pub struct SeccompProfileV2 {
     pub allowed_syscalls: Vec<u32>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
 impl ContainerCapability {
     pub const fn new() -> Self {
         ContainerCapability {
@@ -714,7 +706,7 @@ impl SimpleContainerRuntime {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::std::Layout;
+    use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
     unsafe { std::std::alloc(layout) }
 }

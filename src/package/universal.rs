@@ -210,16 +210,6 @@ impl Default for DistroRepoSyncEngine {
     }
 }
 
-/// Package format type covering 18 major distribution formats
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PackageState {
-    Uninstalled,
-    Downloading,
-    Installing,
-    Installed,
-    BrokenDependency,
-}
-
 pub enum PackagePriority {
     Essential,
     Required,

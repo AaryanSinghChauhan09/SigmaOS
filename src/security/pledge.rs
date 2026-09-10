@@ -5,8 +5,6 @@ use std::vec::Vec;
 use crate::security::capability::Permission;
 use crate::security::capability::{CapabilityGate, CapabilityToken};
 
-use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
-
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Per-thread sub-pledge context enabling fine-grained worker thread isolation

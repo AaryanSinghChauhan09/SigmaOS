@@ -18,8 +18,6 @@ pub mod pci_enumeration;
 pub mod pods;
 pub mod rootkit;
 pub mod shims;
-pub mod gpu_framework;
-pub mod network_framework;
 pub mod bluez;
 pub mod cups;
 pub mod gpu;

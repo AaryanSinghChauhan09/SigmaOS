@@ -3,13 +3,10 @@
 
 #![no_std]
 
-
-
-use crate::klib::{String, Vec, ToString};
-use std::boxed::Box;
-use std::string::String;
-use std::vec::Vec;
-
+extern crate alloc;
+use alloc::string::{String, ToString};
+use crate::klib::Vec;
+use alloc::boxed::Box;
 /// GPU device types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuType {

@@ -276,6 +276,7 @@ pub use drivers::*;
 pub use drivers::distro_device_expansion::{
     AppleNvmeAnsDriver, AtherosAr9271WifiDriver, Esp32HciBtBridgeDriver, LogitechUnifyingHidDriver,
     NvidiaNouveauOpenGspDriver, UsbAudioClass2Driver,
+};
 pub use driver::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,

@@ -3,12 +3,8 @@
 
 #![no_std]
 
-
-
+extern crate alloc;
 use crate::klib::{String, Vec, ToString};
-use std::string::String;
-use std::vec::Vec;
-
 // ============================================================================
 // 61. Default Secure Posture
 // ============================================================================

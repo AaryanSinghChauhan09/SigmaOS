@@ -267,7 +267,7 @@ pub use chakra::{
 };
 pub use legacy_adapters::{
     APITimelineManager, DiscontinuedFS, DriverBridge, GraphicsBridge,
-    KernelPersona, KernelPersonaVM, LegacyBus, LegacyPluginManager, LibcVersion, NetworkBridge,
-    StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM,
+    LegacyBus, LegacyPluginManager, NetworkBridge,
+    StorageBridge, WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM,
     GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };

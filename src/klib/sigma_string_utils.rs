@@ -3,11 +3,11 @@
 #![allow(unexpected_cfgs)]
 #![allow(dead_code)]
 #![allow(unused_imports)]
-extern crate alloc;
 #![allow(unused_variables)]
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+extern crate alloc;
 // SigmaOS — sigma_string_utils.rs
 // Custom string manipulation utilities that avoid std::string wherever possible.
 // All functions operate on raw byte slices (&[u8] / &mut [u8]) or the crate's

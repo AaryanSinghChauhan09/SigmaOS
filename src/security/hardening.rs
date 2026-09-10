@@ -8,19 +8,6 @@ use std::vec::Vec;
 use alloc::vec::Vec;
 use core::sync::atomic::AtomicU64;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MemoryPermission {
-    None,
-    Read,
-    Write,
-    Execute,
-    ReadWrite,
-    ReadExecute,
-    ReadWriteExecute,
-}
-use crate::security::Permission;
-use core::sync::atomic::{AtomicUsize, Ordering};
-
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data
 /// Uses volatile writes to guarantee that the compiler does not optimize away the memory wipe (preventing CVE leaks)
@@ -35,6 +22,7 @@ pub fn secure_zeroize<T: Copy + Default>(slice: &mut [T]) {
 /// Memory protection flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemoryPermission {
+    None,
     Read,
     Write,
     Execute,
@@ -228,12 +216,6 @@ impl SecurityHardeningConfig {
 impl Default for SecurityHardeningConfig {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-pub fn secure_zeroize(buffer: &mut [u8]) {
-    for byte in buffer.iter_mut() {
-        unsafe { core::ptr::write_volatile(byte, 0) };
     }
 }
 
