@@ -43,4 +43,5 @@ jobs:
 
       - name: Verify Package Subsystem Compatibility
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh

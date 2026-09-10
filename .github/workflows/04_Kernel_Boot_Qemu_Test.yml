@@ -30,6 +30,7 @@ jobs:
 
       - name: Install System Build Dependencies
         run: |
+          mkdir -p build
           sudo apt-get update
           sudo apt-get install -y build-essential cmake ninja-build qemu-system-x86 qemu-system-arm qemu-system-riscv64
 
@@ -41,9 +42,11 @@ jobs:
 
       - name: Run Systemd Init & BORE Scheduler Tests
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh
 
       - name: Run Standalone Rust Inspection Suite
         run: |
+          mkdir -p build
           chmod +x ./scripts/changed_files_rustc_tests.sh
           ./scripts/changed_files_rustc_tests.sh

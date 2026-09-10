@@ -34,16 +34,19 @@ jobs:
 
       - name: no_std Compliance Verification
         run: |
+          mkdir -p build
           chmod +x ./scripts/no_std_check.sh
           ./scripts/no_std_check.sh
 
       - name: Run Standalone File Tests for Modified Files
         run: |
+          mkdir -p build
           chmod +x ./scripts/changed_files_rustc_tests.sh
           ./scripts/changed_files_rustc_tests.sh
 
       - name: Quick Boot Smoke Test Trigger Check
         run: |
+          mkdir -p build
           CHANGED_BOOT_FILES=$(git diff --name-only origin/main...HEAD | grep -E '^(src/boot|kernel/|src/kernel/boot)' || true)
           if [ -n "$CHANGED_BOOT_FILES" ]; then
             echo "Boot or kernel initialization files changed. Triggering quick boot smoke test..."
