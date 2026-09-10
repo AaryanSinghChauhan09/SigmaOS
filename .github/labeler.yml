@@ -1,61 +1,34 @@
-# GitHub Labeler Configuration for SigmaOS
-rust:
-  - changed-files:
-      - any-glob-to-any-file: 'src/**/*.rs'
+# GitHub Actions PR Labeler Configuration for SigmaOS (v5 syntax)
 
-documentation:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'docs/**/*'
-          - 'wiki/**/*'
-          - 'wiki_repo/**/*'
-          - '**/*.md'
+kernel:
+  - any:
+      - 'src/kernel/**/*'
+      - 'kernel/**/*'
 
-workflows:
-  - changed-files:
-      - any-glob-to-any-file: '.github/workflows/*'
-
-core-kernel:
-  - changed-files:
-      - any-glob-to-any-file: 'src/kernel/**/*'
-
-package-system:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'src/package/**/*'
-          - 'src/sigpkg/**/*'
-          - 'src/bin/sigpkg.rs'
-
-drivers-hal:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'src/drivers/**/*'
-          - 'src/arch/**/*'
+drivers:
+  - any:
+      - 'src/drivers/**/*'
+      - 'src/driver/**/*'
+      - 'drivers/**/*'
 
 security:
-  - changed-files:
-      - any-glob-to-any-file: 'src/security/**/*'
+  - any:
+      - 'src/security/**/*'
+      - 'security/**/*'
 
-"area: kernel":
-  - changed-files:
-      - any-glob-to-any-file: 'src/kernel/**/*'
+documentation:
+  - any:
+      - '**/*.md'
+      - 'docs/**/*'
+      - 'WIKI/**/*'
+      - 'wiki/**/*'
 
-"area: distro":
-  - changed-files:
-      - any-glob-to-any-file: 'src/distro/**/*'
+tools:
+  - any:
+      - 'src/tools/**/*'
+      - 'tools/**/*'
 
-"area: security":
-  - changed-files:
-      - any-glob-to-any-file: 'src/security/**/*'
-
-"area: networking":
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'src/net/**/*'
-          - 'src/network/**/*'
-
-"area: package":
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'src/sigpkg/**/*'
-          - 'src/package/**/*'
+ci:
+  - any:
+      - '.github/**/*'
+      - 'scripts/**/*'

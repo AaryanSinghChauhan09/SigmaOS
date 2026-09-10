@@ -1,10 +1,10 @@
+extern crate alloc;
 
-
-use std::collections::BTreeMap;
-use std::format;
-use std::string::{String, ToString};
-use std::vec;
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// Timeshift-inspired snapshot management GUI
 /// Provides text-based interface for system snapshot management

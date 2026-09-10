@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-// SigmaOS: Virtual File System (VFS) Layer
-// Provides unified filesystem abstraction supporting multiple filesystem types
-// Integrates with syscall dispatcher for read, write, open, close operations
+/// SigmaOS: Virtual File System (VFS) Layer
+/// Provides unified filesystem abstraction supporting multiple filesystem types
+/// Integrates with syscall dispatcher for read, write, open, close operations
 
-use core::fmt;
 use std::string::String;
 use std::vec::Vec;
+use core::fmt;
 
 /// File types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,221 +49,16 @@ impl FileMode {
     }
 
     pub fn to_u32(&self) -> u32 {
-        let mut flags = 0u32;
-        if self.nodump { flags |= 0x0001; }
-        if self.immutable { flags |= 0x0002; }
-        if self.append_only { flags |= 0x0004; }
-        if self.opaque { flags |= 0x0008; }
-        if self.nounlink { flags |= 0x0010; }
-        if self.archived { flags |= 0x0001_0000; }
-        flags
-    }
-}
-
-/// POSIX Mode Bits constants (Linux & BSD standard permissions)
-pub mod mode_bits {
-    pub const S_ISUID: u16 = 0o4000; // Set-user-ID on execution
-    pub const S_ISGID: u16 = 0o2000; // Set-group-ID on execution
-    pub const S_ISVTX: u16 = 0o1000; // Sticky bit (restricted deletion)
-
-    pub const S_IRUSR: u16 = 0o0400; // User read
-    pub const S_IWUSR: u16 = 0o0200; // User write
-    pub const S_IXUSR: u16 = 0o0100; // User execute
-
-    pub const S_IRGRP: u16 = 0o0040; // Group read
-    pub const S_IWGRP: u16 = 0o0020; // Group write
-    pub const S_IXGRP: u16 = 0o0010; // Group execute
-
-    pub const S_IROTH: u16 = 0o0004; // Other read
-    pub const S_IWOTH: u16 = 0o0002; // Other write
-    pub const S_IXOTH: u16 = 0o0001; // Other execute
-
-    pub const S_IRWXU: u16 = 0o0700; // User read, write, execute
-    pub const S_IRWXG: u16 = 0o0070; // Group read, write, execute
-    pub const S_IRWXO: u16 = 0o0007; // Other read, write, execute
-}
-
-/// Comprehensive File Permissions combining Linux POSIX Mode Bits and BSD File Flags
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct FilePermissions {
-    pub read: bool,      // Legacy backward compatibility flag (reflects owner read)
-    pub write: bool,     // Legacy backward compatibility flag (reflects owner write)
-    pub execute: bool,   // Legacy backward compatibility flag (reflects owner execute)
-
-    pub user_read: bool,
-    pub user_write: bool,
-    pub user_execute: bool,
-
-    pub group_read: bool,
-    pub group_write: bool,
-    pub group_execute: bool,
-
-    pub other_read: bool,
-    pub other_write: bool,
-    pub other_execute: bool,
-
-    pub suid: bool,      // SUID bit (set-user-ID)
-    pub sgid: bool,      // SGID bit (set-group-ID)
-    pub sticky: bool,    // Sticky bit
-
-    pub owner_mask: u8,
-    pub group_mask: u8,
-    pub other_mask: u8,
-
-    pub bsd_flags: BsdFileFlags,
-}
-
-impl FilePermissions {
-    pub fn new(read: bool, write: bool, execute: bool) -> Self {
-        let mask = ((read as u8) << 2) | ((write as u8) << 1) | (execute as u8);
-        Self {
-            read,
-            write,
-            execute,
-            user_read: read,
-            user_write: write,
-            user_execute: execute,
-            group_read: read,
-            group_write: false,
-            group_execute: execute,
-            other_read: read,
-            other_write: false,
-            other_execute: execute,
-            suid: false,
-            sgid: false,
-            sticky: false,
-            owner_mask: mask,
-            group_mask: (read as u8) << 2 | (execute as u8),
-            other_mask: (read as u8) << 2 | (execute as u8),
-            bsd_flags: BsdFileFlags::new(),
-        }
-    }
-
-    pub fn from_mode_bits(mode: u32) -> Self {
-        let suid = (mode & 0o4000) != 0;
-        let sgid = (mode & 0o2000) != 0;
-        let sticky = (mode & 0o1000) != 0;
-        let owner_mask = ((mode >> 6) & 0o7) as u8;
-        let group_mask = ((mode >> 3) & 0o7) as u8;
-        let other_mask = (mode & 0o7) as u8;
-
-        Self {
-            read: (owner_mask & 0o4) != 0,
-            write: (owner_mask & 0o2) != 0,
-            execute: (owner_mask & 0o1) != 0,
-            user_read: (owner_mask & 0o4) != 0,
-            user_write: (owner_mask & 0o2) != 0,
-            user_execute: (owner_mask & 0o1) != 0,
-            group_read: (group_mask & 0o4) != 0,
-            group_write: (group_mask & 0o2) != 0,
-            group_execute: (group_mask & 0o1) != 0,
-            other_read: (other_mask & 0o4) != 0,
-            other_write: (other_mask & 0o2) != 0,
-            other_execute: (other_mask & 0o1) != 0,
-            suid,
-            sgid,
-            sticky,
-            owner_mask,
-            group_mask,
-            other_mask,
-            bsd_flags: BsdFileFlags::new(),
-        }
-    }
-
-    pub fn to_mode_bits(&self) -> u32 {
         let mut mode = 0u32;
-        if self.suid { mode |= 0o4000; }
-        if self.sgid { mode |= 0o2000; }
-        if self.sticky { mode |= 0o1000; }
-        mode |= ((self.owner_mask as u32) & 0o7) << 6;
-        mode |= ((self.group_mask as u32) & 0o7) << 3;
-        mode |= (self.other_mask as u32) & 0o7;
-        mode
-    }
-
-    pub fn allows_owner(&self, req_mask: u8) -> bool {
-        (self.owner_mask & req_mask) == req_mask
-    }
-
-    pub fn allows_group(&self, req_mask: u8) -> bool {
-        (self.group_mask & req_mask) == req_mask
-    }
-
-    pub fn allows_other(&self, req_mask: u8) -> bool {
-        (self.other_mask & req_mask) == req_mask
-    }
-
-    pub fn all() -> Self {
-        Self::from_mode(0o777)
-    }
-
-    pub fn read_only() -> Self {
-        Self::from_mode(0o444)
-    }
-
-    pub fn from_mode(mode: u16) -> Self {
-        let user_r = (mode & mode_bits::S_IRUSR) != 0;
-        let user_w = (mode & mode_bits::S_IWUSR) != 0;
-        let user_x = (mode & mode_bits::S_IXUSR) != 0;
-
-        Self {
-            read: user_r,
-            write: user_w,
-            execute: user_x,
-
-            user_read: user_r,
-            user_write: user_w,
-            user_execute: user_x,
-
-            group_read: (mode & mode_bits::S_IRGRP) != 0,
-            group_write: (mode & mode_bits::S_IWGRP) != 0,
-            group_execute: (mode & mode_bits::S_IXGRP) != 0,
-
-            other_read: (mode & mode_bits::S_IROTH) != 0,
-            other_write: (mode & mode_bits::S_IWOTH) != 0,
-            other_execute: (mode & mode_bits::S_IXOTH) != 0,
-
-            suid: (mode & mode_bits::S_ISUID) != 0,
-            sgid: (mode & mode_bits::S_ISGID) != 0,
-            sticky: (mode & mode_bits::S_ISVTX) != 0,
-
-            owner_mask: ((mode >> 6) & 0o7) as u8,
-            group_mask: ((mode >> 3) & 0o7) as u8,
-            other_mask: (mode & 0o7) as u8,
-
-            bsd_flags: BsdFileFlags::new(),
-        }
-    }
-
-    pub fn to_posix_mode(&self) -> u32 {
-        let mut mode = 0u32;
-        if self.user_read {
-            mode |= 0o400;
-        }
-        if self.user_write {
-            mode |= 0o200;
-        }
-        if self.user_execute {
-            mode |= 0o100;
-        }
-        if self.group_read {
-            mode |= 0o040;
-        }
-        if self.group_write {
-            mode |= 0o020;
-        }
-        if self.group_execute {
-            mode |= 0o010;
-        }
-        if self.other_read {
-            mode |= 0o004;
-        }
-        if self.other_write {
-            mode |= 0o002;
-        }
-        if self.other_execute {
-            mode |= 0o001;
-        }
+        if self.owner_read { mode |= 0o400; }
+        if self.owner_write { mode |= 0o200; }
+        if self.owner_execute { mode |= 0o100; }
+        if self.group_read { mode |= 0o040; }
+        if self.group_write { mode |= 0o020; }
+        if self.group_execute { mode |= 0o010; }
+        if self.other_read { mode |= 0o004; }
+        if self.other_write { mode |= 0o002; }
+        if self.other_execute { mode |= 0o001; }
         mode
     }
 }
@@ -377,20 +172,10 @@ pub trait FileSystem: Send + Sync {
     fn write_inode(&mut self, inode: &Inode) -> Result<(), VfsError>;
 
     /// Read data from inode at offset
-    fn read_data(
-        &self,
-        inode_number: u64,
-        offset: u64,
-        buffer: &mut [u8],
-    ) -> Result<usize, VfsError>;
+    fn read_data(&self, inode_number: u64, offset: u64, buffer: &mut [u8]) -> Result<usize, VfsError>;
 
     /// Write data to inode at offset
-    fn write_data(
-        &mut self,
-        inode_number: u64,
-        offset: u64,
-        data: &[u8],
-    ) -> Result<usize, VfsError>;
+    fn write_data(&mut self, inode_number: u64, offset: u64, data: &[u8]) -> Result<usize, VfsError>;
 
     /// List directory entries
     fn list_dir(&self, inode_number: u64) -> Result<Vec<DirEntry>, VfsError>;
@@ -599,12 +384,7 @@ impl VirtualFileSystem {
     }
 
     /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn read_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &mut [u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
+    pub fn read_file_gated(&mut self, fd: u64, buffer: &mut [u8], token: &CapabilityToken) -> Result<usize, FsError> {
         if !token.has_permission(Permission::FileRead) {
             return Err(FsError::PermissionDenied);
         }
@@ -612,12 +392,7 @@ impl VirtualFileSystem {
     }
 
     /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn write_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &[u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
+    pub fn write_file_gated(&mut self, fd: u64, buffer: &[u8], token: &CapabilityToken) -> Result<usize, FsError> {
         if !token.has_permission(Permission::FileWrite) {
             return Err(FsError::PermissionDenied);
         }
@@ -764,66 +539,18 @@ impl VirtualFileSystem {
                 if (flags & O_CREAT) == 0 {
                     return Err(FsError::NotFound);
                 }
-                self.create_node(filename, FileType::Regular, 0o644, owner, parent_inode_id)?
+                self.create_file(FileType::Regular, owner)?
             }
         };
 
         if (flags & O_TRUNC) != 0 {
-            if let Some(node) = self.inodes.get_mut(&inode_id) {
-                node.size = 0;
+            if let Some(inode) = self.inodes.get_mut(&inode_id) {
+                inode.data.clear();
+                inode.size = 0;
             }
         }
 
-        let fd = self.next_fd;
-        self.next_fd += 1;
-        self.open_files.insert(
-            fd,
-            FileDescriptor {
-                inode_id,
-                position: 0,
-                flags,
-            },
-        );
-
-        Ok(fd)
-    }
-
-    /// Reposition read/write file offset
-    pub fn lseek(&mut self, fd: u64, offset: i64, whence: u32) -> Result<u64, VfsError> {
-        if let Some(handle) = self.open_files.get_mut(&fd) {
-            match whence {
-                0 => {
-                    // SEEK_SET
-                    if offset < 0 {
-                        return Err(VfsError::InvalidArgument);
-                    }
-                    handle.position = offset as u64;
-                }
-                1 => {
-                    // SEEK_CUR
-                    if offset < 0 && (offset.abs() as u64) > handle.position {
-                        return Err(VfsError::InvalidArgument);
-                    }
-                    handle.position = ((handle.position as i64) + offset) as u64;
-                }
-                2 => {
-                    // SEEK_END
-                    if let Some(inode) = self.inodes.get(&handle.inode_id) {
-                        let new_pos = inode.size as i64 + offset;
-                        if new_pos < 0 {
-                            return Err(VfsError::InvalidArgument);
-                        }
-                        handle.position = new_pos as u64;
-                    } else {
-                        return Err(VfsError::InvalidArgument);
-                    }
-                }
-                _ => return Err(VfsError::InvalidArgument),
-            }
-            Ok(handle.position)
-        } else {
-            Err(VfsError::BadFileDescriptor)
-        }
+        Ok(inode_id)
     }
 
     /// Get file statistics
@@ -923,28 +650,16 @@ mod tests {
         assert_eq!(pos, 150);
 
         // Write should fail with bad_token and read_token, but succeed with write_token or all_token
-        assert_eq!(
-            vfs.write_file_gated(fd, b"gated", &bad_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(
-            vfs.write_file_gated(fd, b"gated", &read_token),
-            Err(FsError::PermissionDenied)
-        );
+        assert_eq!(vfs.write_file_gated(fd, b"gated", &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
         // Re-open file to reset offset to 0 for reading
         let read_fd = vfs.open_file(inode_id, 0).unwrap();
 
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(
-            vfs.read_file_gated(read_fd, &mut buf, &bad_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(
-            vfs.read_file_gated(read_fd, &mut buf, &write_token),
-            Err(FsError::PermissionDenied)
-        );
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
         assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
     }
 
@@ -954,27 +669,13 @@ mod tests {
 
         // 1. Create a regular file with extended attribute (user.mime_type = "text/plain")
         let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
-        vfs.set_xattr(inode_id, "user.mime_type", b"text/plain")
-            .unwrap();
-        assert_eq!(
-            vfs.get_xattr(inode_id, "user.mime_type").unwrap(),
-            b"text/plain"
-        );
+        vfs.set_xattr(inode_id, "user.mime_type", b"text/plain").unwrap();
+        assert_eq!(vfs.get_xattr(inode_id, "user.mime_type").unwrap(), b"text/plain");
 
         // 2. Create a symlink pointing to our file
         let symlink_id = vfs.create_symlink("/home/tc/file.txt", 1000).unwrap();
-        assert_eq!(
-            vfs.get_inode(symlink_id).unwrap().file_type,
-            FileType::Symlink
-        );
-        assert_eq!(
-            vfs.get_inode(symlink_id)
-                .unwrap()
-                .symlink_target
-                .as_ref()
-                .unwrap(),
-            "/home/tc/file.txt"
-        );
+        assert_eq!(vfs.get_inode(symlink_id).unwrap().file_type, FileType::Symlink);
+        assert_eq!(vfs.get_inode(symlink_id).unwrap().symlink_target.as_ref().unwrap(), "/home/tc/file.txt");
 
         // 3. Create a hard link -> increments link_count
         assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
@@ -994,18 +695,9 @@ mod tests {
     #[test]
     fn test_canonicalize_path() {
         let vfs = VirtualFilesystem::new();
-        assert_eq!(
-            vfs.canonicalize_path("/var/log", "syslog"),
-            "/var/log/syslog"
-        );
-        assert_eq!(
-            vfs.canonicalize_path("/var/log", "../mail/../log/./syslog"),
-            "/var/log/syslog"
-        );
-        assert_eq!(
-            vfs.canonicalize_path("/home/user", "/usr/bin/../../etc/passwd"),
-            "/etc/passwd"
-        );
+        assert_eq!(vfs.canonicalize_path("/var/log", "syslog"), "/var/log/syslog");
+        assert_eq!(vfs.canonicalize_path("/var/log", "../mail/../log/./syslog"), "/var/log/syslog");
+        assert_eq!(vfs.canonicalize_path("/home/user", "/usr/bin/../../etc/passwd"), "/etc/passwd");
         assert_eq!(vfs.canonicalize_path("/home/user", ".."), "/home");
     }
 }

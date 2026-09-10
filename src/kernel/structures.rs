@@ -4,10 +4,10 @@
 use core::cell::{Cell, RefCell};
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
-
-use std::boxed::Box;
-use std::string::String;
-use std::vec::Vec;
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 // 1. Singly, Sequenced, and Circular Doubly Linked Lists
 
@@ -64,6 +64,14 @@ impl<T> CircularDoublyLinkedList<T> {
 }
 
 // 2. Scheduler SystemThread, WorkItems, APCs
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchitectureClass {
+    X86,
+    X64,
+    Arm,
+    Cisc,
+}
 
 pub struct SystemThread {
     pub thread_id: usize,
@@ -161,7 +169,7 @@ pub struct LotteryTask {
     pub is_active: bool,
 }
 
-
+/// Ledger Block securing system process events (Consensus Process Logging)
 pub struct AuditBlock {
     pub block_id: u32,
     pub timestamp: u64,
