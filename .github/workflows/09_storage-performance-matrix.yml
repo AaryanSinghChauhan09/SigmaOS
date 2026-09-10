@@ -46,29 +46,29 @@ jobs:
           # Caching strategies
           - performance: cache
             cache-type: lru
-            build-cmd: "cargo build --features cache-lru --release"
-            test-cmd: "cargo test --features cache-lru --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           - performance: cache
             cache-type: lfu
-            build-cmd: "cargo build --features cache-lfu --release"
-            test-cmd: "cargo test --features cache-lfu --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           - performance: cache
             cache-type: arc
-            build-cmd: "cargo build --features cache-arc --release"
-            test-cmd: "cargo test --features cache-arc --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           # Memory allocation strategies
           - performance: allocation
             allocator: jemalloc
-            build-cmd: "cargo build --features jemalloc --release"
-            test-cmd: "cargo test --features jemalloc --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           - performance: allocation
             allocator: mimalloc
-            build-cmd: "cargo build --features mimalloc --release"
-            test-cmd: "cargo test --features mimalloc --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           - performance: allocation
             allocator: system
@@ -78,45 +78,45 @@ jobs:
           # CPU scheduling
           - performance: scheduling
             scheduler: eevdf
-            build-cmd: "cargo build --features scheduler-eevdf --release"
-            test-cmd: "cargo test --features scheduler-eevdf --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           - performance: scheduling
             scheduler: bore
-            build-cmd: "cargo build --features scheduler-bore --release"
-            test-cmd: "cargo test --features scheduler-bore --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           # Concurrency patterns
           - performance: concurrency
             pattern: lock-free
-            build-cmd: "cargo build --features lock-free --release"
-            test-cmd: "cargo test --features lock-free --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           - performance: concurrency
             pattern: mutex
-            build-cmd: "cargo build --features mutex --release"
-            test-cmd: "cargo test --features mutex --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           - performance: concurrency
             pattern: rwlock
-            build-cmd: "cargo build --features rwlock --release"
-            test-cmd: "cargo test --features rwlock --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           # I/O patterns
           - performance: io
             pattern: sequential
-            build-cmd: "cargo build --features io-sequential --release"
-            test-cmd: "cargo test --features io-sequential --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           - performance: io
             pattern: random
-            build-cmd: "cargo build --features io-random --release"
-            test-cmd: "cargo test --features io-random --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
           - performance: io
             pattern: mmap
-            build-cmd: "cargo build --features io-mmap --release"
-            test-cmd: "cargo test --features io-mmap --release"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
 
     steps:
       - name: Checkout code
@@ -132,11 +132,12 @@ jobs:
         if: matrix.storage
         run: |
           sudo apt-get update
-          sudo apt-get install -y e2fsprogs btrfs-progs xfsprogs fio
+          sudo apt-get install -y e2fsprogs btrfs-progs xfsprogs fio zfsutils-linux || true
 
       - name: Prepare filesystem test
         if: matrix.storage
         run: |
+          sudo mkdir -p /mnt/test
           dd if=/dev/zero of=/tmp/test.img bs=1M count=1024
           ${{ matrix.format-cmd }}
           ${{ matrix.mount-cmd }}
