@@ -175,66 +175,6 @@ pub struct NetBsdPkgsrcManifest {
     pub depends: Vec<String>,
 }
 
-/// Description of Arch Linux binary .PKGINFO manifest (pacman parity)
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ArchPkgInfoManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub depends: Vec<String>,
-    pub architecture: String,
-}
-
-/// Description of Gentoo .ebuild metadata
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GentooEbuildMetadata {
-    pub category: String,
-    pub package_name: String,
-    pub version: String,
-    pub rdepend: Vec<String>,
-    pub depend: Vec<String>,
-    pub description: String,
-    pub use_flags: Vec<String>,
-}
-
-/// Description of Alpine APKINDEX manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ApkIndexManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub depends: Vec<String>,
-}
-
-/// Description of Void Linux XBPS control manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct XbpsManifest {
-    pub pkgname: String,
-    pub version: String,
-    pub short_desc: String,
-    pub run_depends: Vec<String>,
-}
-
-/// Description of Snapcraft YAML manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub confinement: String,
-    pub plugs: Vec<String>,
-}
-
-/// Description of Haiku .hpkg package manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct HaikuHpkgManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub architecture: String,
-    pub requires: Vec<String>,
-}
-
 /// Description of openSUSE Zypper RPM spec/manifest
 #[derive(Debug, Clone)]
 pub struct ZypperSpecManifest {
@@ -1790,8 +1730,12 @@ impl UniversalDependencyMapper {
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
             "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
-            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => "glib".to_string(),
-            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => "pcre".to_string(),
+            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => {
+                "glib".to_string()
+            }
+            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => {
+                "pcre".to_string()
+            }
             "libuv" | "libuv-dev" | "libuv-devel" | "dev-libs/libuv" => "libuv".to_string(),
             "openssh" | "openssh-server" | "net-misc/openssh" => "openssh".to_string(),
             "mesa" | "mesa-dev" | "mesa-libgl-devel" | "media-libs/mesa" => "mesa".to_string(),
@@ -3485,7 +3429,6 @@ mod tests {
         assert_eq!(slack_action.source_pm, "slackpkg");
         assert_eq!(slack_action.operation, UniversalPmOperation::Install);
     }
-
 
     #[test]
     fn test_haiku_hpkg_manifest_parsing_and_bridge() {
