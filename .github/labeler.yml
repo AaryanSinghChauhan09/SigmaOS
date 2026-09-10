@@ -31,6 +31,7 @@ drivers-hal:
   - changed-files:
       - any-glob-to-any-file:
           - 'src/drivers/**/*'
+          - 'src/driver/**/*'
           - 'src/arch/**/*'
 
 security:
