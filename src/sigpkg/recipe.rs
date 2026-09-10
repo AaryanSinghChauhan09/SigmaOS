@@ -54,6 +54,7 @@ pub struct PackageRecipe {
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
+    pub pkgrel: String,
     pub arch: String,
     pub license_spdx: String,
     pub package_commands: Vec<String>,
@@ -72,6 +73,7 @@ impl PackageRecipe {
             build_commands: Vec::new(),
             install_commands: Vec::new(),
             environment: HashMap::new(),
+            pkgrel: "1".to_string(),
             arch: "x86_64".to_string(),
             license_spdx: "GPL".to_string(),
             package_commands: Vec::new(),
@@ -126,11 +128,6 @@ impl PackageRecipe {
 
     pub fn with_env(mut self, key: String, value: String) -> Self {
         self.environment.insert(key, value);
-        self
-    }
-
-    pub fn with_arch(mut self, arch: String) -> Self {
-        self.arch = arch;
         self
     }
 
