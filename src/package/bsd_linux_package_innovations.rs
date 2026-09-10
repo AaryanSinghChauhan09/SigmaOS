@@ -3375,7 +3375,405 @@ impl Default for XbpsDebianAlternativesGovernorEngine {
     }
 }
 
-#[cfg(test)]
+// =========================================================================
+// 51. Arch Linux makechrootpkg & Void Linux xbps-src Clean Chroot Build Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CleanChrootMount {
+    pub source_path: String,
+    pub target_mount_point: String,
+    pub is_read_only: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CleanChrootBuildEnvironment {
+    pub chroot_id: String,
+    pub rootfs_base_path: String,
+    pub active_mounts: Vec<CleanChrootMount>,
+    pub installed_build_deps: Vec<String>,
+    pub is_dirty: bool,
+}
+
+pub struct ArchVoidCleanChrootBuildEngine {
+    pub chroots: BTreeMap<String, CleanChrootBuildEnvironment>,
+}
+
+impl ArchVoidCleanChrootBuildEngine {
+    pub fn new() -> Self {
+        Self {
+            chroots: BTreeMap::new(),
+        }
+    }
+
+    pub fn prepare_chroot(&mut self, chroot_id: &str, base_path: &str) -> String {
+        let env = CleanChrootBuildEnvironment {
+            chroot_id: chroot_id.to_string(),
+            rootfs_base_path: base_path.to_string(),
+            active_mounts: vec![
+                CleanChrootMount {
+                    source_path: "/proc".to_string(),
+                    target_mount_point: format!("{}/proc", base_path),
+                    is_read_only: false,
+                },
+                CleanChrootMount {
+                    source_path: "/sys".to_string(),
+                    target_mount_point: format!("{}/sys", base_path),
+                    is_read_only: true,
+                },
+                CleanChrootMount {
+                    source_path: "/dev".to_string(),
+                    target_mount_point: format!("{}/dev", base_path),
+                    is_read_only: false,
+                },
+            ],
+            installed_build_deps: Vec::new(),
+            is_dirty: false,
+        };
+        self.chroots.insert(chroot_id.to_string(), env);
+        format!("{}/root", base_path)
+    }
+
+    pub fn install_chroot_build_deps(&mut self, chroot_id: &str, deps: &[&str]) -> Result<usize, &'static str> {
+        let env = self.chroots.get_mut(chroot_id).ok_or("Chroot environment not found")?;
+        let mut added = 0;
+        for &dep in deps {
+            if !env.installed_build_deps.contains(&dep.to_string()) {
+                env.installed_build_deps.push(dep.to_string());
+                added += 1;
+            }
+        }
+        env.is_dirty = true;
+        Ok(added)
+    }
+
+    pub fn reset_chroot(&mut self, chroot_id: &str) -> Result<bool, &'static str> {
+        let env = self.chroots.get_mut(chroot_id).ok_or("Chroot environment not found")?;
+        env.installed_build_deps.clear();
+        env.is_dirty = false;
+        Ok(true)
+    }
+
+    pub fn build_in_chroot(&self, chroot_id: &str, package_name: &str) -> Result<String, &'static str> {
+        let env = self.chroots.get(chroot_id).ok_or("Chroot environment not found")?;
+        Ok(format!("{}/build/{}.pkg", env.rootfs_base_path, package_name))
+    }
+}
+
+impl Default for ArchVoidCleanChrootBuildEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 52. FreeBSD pkg check & OpenBSD Shared Library ELF SONAME ABI Auditor
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LibrarySonameSpec {
+    pub library_name: String,
+    pub soname: String,
+    pub exported_symbols: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BsdAbiAuditReport {
+    pub package_name: String,
+    pub missing_sonames: Vec<String>,
+    pub missing_symbols: Vec<String>,
+    pub is_abi_broken: bool,
+}
+
+pub struct BsdLibraryAbiCompatMatrixEngine {
+    pub registered_libraries: BTreeMap<String, LibrarySonameSpec>,
+}
+
+impl BsdLibraryAbiCompatMatrixEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_libraries: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_library(&mut self, spec: LibrarySonameSpec) {
+        self.registered_libraries.insert(spec.soname.clone(), spec);
+    }
+
+    pub fn audit_package_abi(&self, pkg_name: &str, required_sonames: &[&str], required_symbols: &[&str]) -> BsdAbiAuditReport {
+        let mut missing_sonames = Vec::new();
+        let mut missing_symbols = Vec::new();
+
+        for &req_so in required_sonames {
+            if !self.registered_libraries.contains_key(req_so) {
+                missing_sonames.push(req_so.to_string());
+            }
+        }
+
+        for &req_sym in required_symbols {
+            let found = self.registered_libraries.values().any(|lib| lib.exported_symbols.contains(&req_sym.to_string()));
+            if !found {
+                missing_symbols.push(req_sym.to_string());
+            }
+        }
+
+        let is_broken = !missing_sonames.is_empty() || !missing_symbols.is_empty();
+
+        BsdAbiAuditReport {
+            package_name: pkg_name.to_string(),
+            missing_sonames,
+            missing_symbols,
+            is_abi_broken: is_broken,
+        }
+    }
+}
+
+impl Default for BsdLibraryAbiCompatMatrixEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 53. Fedora / systemd-sysusers & systemd-tmpfiles Declarative Provisioner
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SysUserEntry {
+    pub username: String,
+    pub uid_gid: String,
+    pub gecos: String,
+    pub home_dir: String,
+    pub shell: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TmpFileEntry {
+    pub entry_type: char, // 'd', 'f', 'e', 'z'
+    pub path: String,
+    pub mode: String,
+    pub user: String,
+    pub group: String,
+    pub age: String,
+}
+
+pub struct FedoraDeclarativeSysusersTmpfilesEngine {
+    pub sysusers: Vec<SysUserEntry>,
+    pub tmpfiles: Vec<TmpFileEntry>,
+}
+
+impl FedoraDeclarativeSysusersTmpfilesEngine {
+    pub fn new() -> Self {
+        Self {
+            sysusers: Vec::new(),
+            tmpfiles: Vec::new(),
+        }
+    }
+
+    pub fn parse_sysusers_d(&mut self, content: &str) -> usize {
+        let mut count = 0;
+        for line in content.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() >= 2 && parts[0] == "u" {
+                let username = parts[1].to_string();
+                let uid_gid = parts.get(2).unwrap_or(&"-").to_string();
+                let gecos = parts.get(3).map(|s| s.trim_matches('"')).unwrap_or("System User").to_string();
+                let home_dir = parts.get(4).unwrap_or(&"/var/empty").to_string();
+                let shell = parts.get(5).unwrap_or(&"/sbin/nologin").to_string();
+
+                self.sysusers.push(SysUserEntry {
+                    username,
+                    uid_gid,
+                    gecos,
+                    home_dir,
+                    shell,
+                });
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn parse_tmpfiles_d(&mut self, content: &str) -> usize {
+        let mut count = 0;
+        for line in content.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let entry_type = parts[0].chars().next().unwrap_or('d');
+                let path = parts[1].to_string();
+                let mode = parts.get(2).unwrap_or(&"0755").to_string();
+                let user = parts.get(3).unwrap_or(&"root").to_string();
+                let group = parts.get(4).unwrap_or(&"root").to_string();
+                let age = parts.get(5).unwrap_or(&"-").to_string();
+
+                self.tmpfiles.push(TmpFileEntry {
+                    entry_type,
+                    path,
+                    mode,
+                    user,
+                    group,
+                    age,
+                });
+                count += 1;
+            }
+        }
+        count
+    }
+
+    pub fn provisioned_user_exists(&self, username: &str) -> bool {
+        self.sysusers.iter().any(|u| u.username == username)
+    }
+
+    pub fn provisioned_tmp_path_exists(&self, path: &str) -> bool {
+        self.tmpfiles.iter().any(|t| t.path == path)
+    }
+}
+
+impl Default for FedoraDeclarativeSysusersTmpfilesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 54. NixOS / GNU Guix Store Garbage Collection Policy Scheduler
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StoreGcPolicy {
+    pub max_age_days: u32,
+    pub keep_generations: u32,
+    pub max_store_bytes: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StorePathGcMetadata {
+    pub store_path: String,
+    pub generation_id: u32,
+    pub age_days: u32,
+    pub size_bytes: u64,
+    pub is_active_profile: bool,
+}
+
+pub struct NixGuixGcPolicySchedulerEngine {
+    pub policy: StoreGcPolicy,
+}
+
+impl NixGuixGcPolicySchedulerEngine {
+    pub fn new(policy: StoreGcPolicy) -> Self {
+        Self { policy }
+    }
+
+    pub fn evaluate_gc_candidates(&self, paths: &[StorePathGcMetadata]) -> Vec<String> {
+        let mut candidates = Vec::new();
+        for p in paths {
+            if p.is_active_profile {
+                continue;
+            }
+
+            let exceed_age = p.age_days > self.policy.max_age_days;
+            let exceed_gen = p.generation_id < self.policy.keep_generations;
+
+            if exceed_age || exceed_gen {
+                candidates.push(p.store_path.clone());
+            }
+        }
+        candidates
+    }
+}
+
+impl Default for NixGuixGcPolicySchedulerEngine {
+    fn default() -> Self {
+        Self::new(StoreGcPolicy {
+            max_age_days: 30,
+            keep_generations: 5,
+            max_store_bytes: 100_000_000_000,
+        })
+    }
+}
+
+// =========================================================================
+// 55. Gentoo Portage package.license & ACCEPT_LICENSE Governor
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PackageLicenseRule {
+    pub package_pattern: String,
+    pub allowed_licenses: Vec<String>,
+}
+
+pub struct PortagePackageLicenseGovernorEngine {
+    pub global_accept_licenses: Vec<String>,
+    pub package_rules: Vec<PackageLicenseRule>,
+}
+
+impl PortagePackageLicenseGovernorEngine {
+    pub fn new() -> Self {
+        Self {
+            global_accept_licenses: vec![
+                "@FREE-SOFTWARE".to_string(),
+                "@OSI-APPROVED".to_string(),
+                "MIT".to_string(),
+                "Apache-2.0".to_string(),
+                "GPL-2.0-or-later".to_string(),
+                "GPL-3.0-or-later".to_string(),
+                "BSD-3-Clause".to_string(),
+            ],
+            package_rules: Vec::new(),
+        }
+    }
+
+    pub fn allow_package_license(&mut self, pkg_pattern: &str, license_name: &str) {
+        if let Some(rule) = self.package_rules.iter_mut().find(|r| r.package_pattern == pkg_pattern) {
+            if !rule.allowed_licenses.contains(&license_name.to_string()) {
+                rule.allowed_licenses.push(license_name.to_string());
+            }
+        } else {
+            self.package_rules.push(PackageLicenseRule {
+                package_pattern: pkg_pattern.to_string(),
+                allowed_licenses: vec![license_name.to_string()],
+            });
+        }
+    }
+
+    pub fn is_license_accepted(&self, package_name: &str, license_name: &str) -> bool {
+        if self.global_accept_licenses.contains(&license_name.to_string()) || self.global_accept_licenses.contains(&"*".to_string()) {
+            return true;
+        }
+
+        for rule in &self.package_rules {
+            let pkg_matches = if rule.package_pattern == "*" {
+                true
+            } else if rule.package_pattern.ends_with('*') {
+                package_name.starts_with(rule.package_pattern.trim_end_matches('*'))
+            } else {
+                rule.package_pattern == package_name
+            };
+
+            if pkg_matches && rule.allowed_licenses.contains(&license_name.to_string()) {
+                return true;
+            }
+        }
+
+        false
+    }
+}
+
+impl Default for PortagePackageLicenseGovernorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(all(test, not(feature = "standalone_test")))]
 #[path = "../sigpkg/universal_engine.rs"]
 #[allow(dead_code)]
 mod sigpkg_universal_engine;
@@ -4345,5 +4743,91 @@ MAINTAINER="SigmaOS"
                 filename
             );
         }
+    }
+
+    #[test]
+    fn test_arch_void_clean_chroot_build() {
+        let mut engine = ArchVoidCleanChrootBuildEngine::new();
+        let root = engine.prepare_chroot("chroot-x86_64", "/var/lib/chroot/x86_64");
+        assert_eq!(root, "/var/lib/chroot/x86_64/root");
+
+        let added = engine.install_chroot_build_deps("chroot-x86_64", &["gcc", "make", "pkg-config"]).unwrap();
+        assert_eq!(added, 3);
+
+        let pkg_path = engine.build_in_chroot("chroot-x86_64", "htop").unwrap();
+        assert_eq!(pkg_path, "/var/lib/chroot/x86_64/build/htop.pkg");
+
+        assert!(engine.reset_chroot("chroot-x86_64").unwrap());
+        assert_eq!(engine.chroots.get("chroot-x86_64").unwrap().installed_build_deps.len(), 0);
+    }
+
+    #[test]
+    fn test_bsd_library_abi_compat_matrix() {
+        let mut engine = BsdLibraryAbiCompatMatrixEngine::new();
+        engine.register_library(LibrarySonameSpec {
+            library_name: "openssl".to_string(),
+            soname: "libssl.so.3".to_string(),
+            exported_symbols: vec!["SSL_read".to_string(), "SSL_write".to_string()],
+        });
+
+        let report = engine.audit_package_abi("curl", &["libssl.so.3"], &["SSL_read"]);
+        assert!(!report.is_abi_broken);
+
+        let broken_report = engine.audit_package_abi("legacy-app", &["libssl.so.1.1"], &["SSL_read"]);
+        assert!(broken_report.is_abi_broken);
+        assert_eq!(broken_report.missing_sonames, vec!["libssl.so.1.1".to_string()]);
+    }
+
+    #[test]
+    fn test_fedora_declarative_sysusers_tmpfiles() {
+        let mut engine = FedoraDeclarativeSysusersTmpfilesEngine::new();
+        let sysusers_doc = "u nginx - \"Nginx web server\" /var/lib/nginx /sbin/nologin\n";
+        let tmpfiles_doc = "d /var/log/nginx 0755 nginx nginx -\n";
+
+        assert_eq!(engine.parse_sysusers_d(sysusers_doc), 1);
+        assert_eq!(engine.parse_tmpfiles_d(tmpfiles_doc), 1);
+
+        assert!(engine.provisioned_user_exists("nginx"));
+        assert!(engine.provisioned_tmp_path_exists("/var/log/nginx"));
+    }
+
+    #[test]
+    fn test_nix_guix_gc_policy_scheduler() {
+        let engine = NixGuixGcPolicySchedulerEngine::new(StoreGcPolicy {
+            max_age_days: 14,
+            keep_generations: 3,
+            max_store_bytes: 10_000_000_000,
+        });
+
+        let paths = vec![
+            StorePathGcMetadata {
+                store_path: "/nix/store/pkg1".to_string(),
+                generation_id: 1,
+                age_days: 20,
+                size_bytes: 100_000,
+                is_active_profile: false,
+            },
+            StorePathGcMetadata {
+                store_path: "/nix/store/pkg2".to_string(),
+                generation_id: 5,
+                age_days: 2,
+                size_bytes: 200_000,
+                is_active_profile: true,
+            },
+        ];
+
+        let candidates = engine.evaluate_gc_candidates(&paths);
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(candidates[0], "/nix/store/pkg1");
+    }
+
+    #[test]
+    fn test_portage_package_license_governor() {
+        let mut engine = PortagePackageLicenseGovernorEngine::new();
+        assert!(engine.is_license_accepted("curl", "MIT"));
+        assert!(!engine.is_license_accepted("nvidia-driver", "NVIDIA-EULA"));
+
+        engine.allow_package_license("x11-drivers/nvidia-drivers", "NVIDIA-EULA");
+        assert!(engine.is_license_accepted("x11-drivers/nvidia-drivers", "NVIDIA-EULA"));
     }
 }
