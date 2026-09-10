@@ -1,9 +1,8 @@
+extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
-#![allow(ambiguous_glob_reexports)]
 
-// Core working modules
-pub mod open_source_os_gap_closure;
+pub mod klib;
 pub mod accessibility;
 pub mod ai;
 pub mod audio;
@@ -18,13 +17,15 @@ pub mod customization;
 pub mod dashboard;
 pub mod desktop;
 pub mod device;
+pub mod distro;
 pub mod driver;
+pub mod drivers;
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
+pub mod governance;
 pub mod kernel;
-pub mod klib;
-// pub use klib::ZeroDependencyPrimitiveHub;
+pub use klib::ZeroDependencyPrimitiveHub;
 pub mod memory;
 pub mod network;
 pub mod observability;
@@ -40,9 +41,6 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
-pub use desktop::{
-    Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
-};
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
@@ -51,19 +49,9 @@ pub use process::{
     SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
     WNOHANG, WUNTRACED,
 };
-pub mod linuxmint_inspirations;
-pub use linuxmint_inspirations::{
-    AppTheme, BulkyRenamer, CaptainInstaller, CaptainSource, ConfigBackend, DebPackage,
-    DesktopIconFlags, DiagnosticField, FsFormat, HypnotixIptvPlayer, IsolationMode, IptvProvider,
-    LanPeer, LanWarpEngine, MintConfigHub, MintDesktopEngine, MintLocaleEngine, MintMenuEngine,
-    MintMenuItem, MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintStickIsoVerifier,
-    MintUpgradeEngine, MintUpgradePhase, MintWelcomeFlow, NannyDecision, PartitionScheme,
-    ProviderType, RenameConflict, RenameRule, RenamedFile, RequestIncoming, SessionControlAction,
-    StickyNote, StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome,
-    TransferRequest, TvChannel, UsbDevice, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
-    WebEngineKind, Webapp, WebappManager, WelcomeStep, XAppImageViewer, XAppStatusIconBadgeManager,
-    XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
-};
+pub mod access;
+pub mod community;
+pub mod open_source_os_gap_closure;
 pub mod tools;
 pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;
@@ -72,12 +60,24 @@ pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
+pub mod wiki_unimplemented_ideas;
+pub use wiki_unimplemented_ideas::*;
 
 pub use distro::{
+    distro_inspiration_engine::{
+        AlpineLbuApkOverlayEngine, ApkovlCommit, ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine,
+        DragonFlyHammer2ClusterEngine, FreeBsdZfsArcGeomEngine, GenerationRecord, Hammer2DedupEntry,
+        IsaLevel, MuslLightweightInitEngine, MuslStaticService,
+        NixOsDeclarativeStateReconciliationEngine, NixOsPureStoreDerivationEngine,
+        OpenBsdStatefulPacketFilterEngine, OpenWrtUciSqmRouterEngine, PaxSecurityLevel, PfProtocol,
+        PfStateEntry, PortageUseFlag, PortageUseFlagGovernor, QubeDomainType,
+        QubesHardenedBsdSecurityGuard, RunitStage, ServiceRunState, SqmAlgorithm, StoreDerivationPath,
+        UciSection, UseFlagState, VoidRunitStageController,
+    },
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
-    ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode, DeclarativeCapabilityRule,
+    ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode,
     DragonFlyHammer2EmergencyCowEngine, FedoraSelinuxMlsMcsGovernor, FreeBsdGeomVdevTopology,
     GarudaZenPerformanceEngine, GentooPortageSlotOperatorEngine, GeomVdevNode,
     GuixShepherdServiceEngine, HaStateEntry, HermeticClosureRecord, HermeticStoreClosureEngine,
@@ -86,11 +86,7 @@ pub use distro::{
     SovereignDnsTlsResolverEngine, SovereignDynamicDevfsEngine, SovereignFastInitramfsGenerator,
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
     SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
-    SovereignStatefulNatEngine, SovereignAheadOfDistrosSuite, SovereignDistroInspirationLeapEngine,
-    SovereignPredictiveSchedExtEngine,
-    SovereignOmniCasStoreEngine, SovereignCrossPlatformCapabilityEngine,
-    SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine,
-    StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
+    SovereignStatefulNatEngine, StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
     ZramCompressionAlgorithm, DebianMultiarchAptEngine, EndeavourReflectorMirrorRanker,
     FreeBsdZfsBootEnvManager, GarudaDracutBtrfsSnapper, GarudaPerformanceTweakEngine,
     HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, NixOsFlakeProfileManager,
@@ -117,39 +113,39 @@ pub use driver::{
     UbuntuAdditionalDriversRegistry, UbuntuCommonDriverEngine, UbuntuDriverPackage,
     UbuntuLivepatchDriverHook,
 };
-
 pub use package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ApkIndexMetadata, ApkSignatureKey, ApkV3SignatureEngine,
     AptBugReport, AptMarkRecord, AptMarkState, AptPinRule, ArchCachyosMicroarchOptimizationEngine,
-    ArchCachyOsMicroarchBuildProfileEngine, ArchSplitPackageHookRunnerEngine, ArchVoidCleanChrootBuildEngine,
-    BsdAbiAuditReport, BsdLibraryAbiCompatMatrixEngine, CasStorePath, CachedPackageFile, CleanChrootBuildEnvironment,
-    CleanChrootMount, CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
-    DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor, DebianDebconfStatoverrideEngine,
-    DebianDpkgTriggersAptListbugsGuardEngine, DeltaRpmSpec, DnfActionKind, DnfActionRecord, DnfTransactionItem,
-    DpkgDivertEngine, DpkgDivertRule, DpkgStatoverrideRule, DpkgTrigger, DpkgTriggerKind,
-    DragonFlyDportsHammer2SnapshotEngine, EbuildSlotRecord, FedoraDnf5AdvisoryAndDeltaRpmEngine,
-    FedoraDnf5AdvisorySecurityEngine, FedoraDnfHistoryRollbackJournalEngine, FedoraDeclarativeSysusersTmpfilesEngine,
-    FlakeInputLock, FreeBsdPkgAuditEngine, FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageEapiSlotOperatorEngine,
-    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot, LibrarySonameSpec,
+    ArchCachyOsMicroarchBuildProfileEngine, ArchSplitPackageHookRunnerEngine, CasStorePath,
+    CachedPackageFile, CommunityPackageBuildSource, CommunityRepoBackend,
+    CoprAurBuildRepositoryGatewayEngine, DebconfPreseedEntry, DebconfQuestionType,
+    DebianAptMarkPackageStateGovernor, DebianDebconfStatoverrideEngine,
+    DebianDpkgTriggersAptListbugsGuardEngine, DeltaRpmSpec, DnfActionKind, DnfActionRecord,
+    DnfTransactionItem, DpkgDivertEngine, DpkgDivertRule, DpkgStatoverrideRule, DpkgTrigger,
+    DpkgTriggerKind, DragonFlyDportsHammer2SnapshotEngine, EbuildSlotRecord,
+    FedoraDnf5AdvisoryAndDeltaRpmEngine, FedoraDnf5AdvisorySecurityEngine,
+    FedoraDnfHistoryRollbackJournalEngine, FlakeInputLock, FreeBsdPkgAuditEngine,
+    FreeBsdPortsFlavoursAndVuxmlEngine, GentooPortageEapiSlotOperatorEngine,
+    GentooPortageSubslotAndUseExpandEngine, HaikuHpkgPackageFsEngine, Hammer2PfsSnapshot,
     MicroarchCompilerFlags, MicroarchRepoRoute, MicroarchitectureLevel, NetBsdPkginBinaryDatabaseEngine,
     NetBsdPkgsrcOptionsFrameworkEngine, NixCasStoreGcGovernor, NixFlakesDevshellResolverEngine,
-    NixGuixCasGcProfileEngine, NixGuixGcPolicySchedulerEngine, OpenBsdPkgAddSignifyEngine,
-    OpenBsdSignifyBinaryIntegrityEngine, OpenSuseZypperVendorStickinessEngine, PacmanGpgKey, PacmanKeyTrust,
-    PacmanKeyringEngine, PackageBuildAttestation, PackageBuildEnvironment, PackageLicenseRule,
-    PkgAuditAdvisory, PkgSummaryRecord, PkgsrcOptionSpec, PortageEnvProfile, PortageEapiLevel,
-    PortagePackageEnvEngine, PortagePackageLicenseGovernorEngine, PpaRepository, RestrictedPackageSpec,
-    RpmDeltaReconstitutionEngine, SecurityAdvisoryDetail, SignifyPqcSignatureHeader, SlackBuildInfo,
-    SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine, SlotOperator, SovereignPackageBuildProvenanceEngine,
-    StoreGcPolicy, StorePathGcMetadata, SysUserEntry, TmpFileEntry, UbuntuPpaAptPinningEngine, XbpsCachedPkg,
-    XbpsDowngradeRepoEngine, XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
-    ZypperRepository,
+    NixGuixCasGcProfileEngine, OpenBsdPkgAddSignifyEngine, OpenBsdSignifyBinaryIntegrityEngine,
+    OpenSuseZypperVendorStickinessEngine, PacmanGpgKey, PacmanKeyTrust, PacmanKeyringEngine,
+    PackageBuildAttestation, PackageBuildEnvironment, PkgAuditAdvisory, PkgSummaryRecord,
+    PkgsrcOptionSpec, PortageEnvProfile, PortageEapiLevel, PortagePackageEnvEngine, PpaRepository,
+    RestrictedPackageSpec, RpmDeltaReconstitutionEngine, SecurityAdvisoryDetail,
+    SignifyPqcSignatureHeader, SlackBuildInfo, SlackPackageRecord, SlackwarePkgtoolSlackBuildEngine,
+    SlotOperator, SovereignPackageBuildProvenanceEngine, UbuntuPpaAptPinningEngine, XbpsCachedPkg,
+    XbpsDowngradeRepoEngine, XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine,
+    ZypperPackageOffer, ZypperRepository,
 };
 
 pub use security::{
     Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, GksuAuthBackend,
     GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult, GksuSecurityGuard,
     HardenedSyscallDispatcher, HardenedSyscallError, HybridPqcMeasurementEngine,
-    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter, KaliWiresharkPacketAnalyzer,
+    KaliAirgeddonWifiAudit, KaliMetasploitPayloadFilter,
+    KaliWiresharkPacketAnalyzer,
     LibGksuGraphicalSudoEngine, MemoryAccessError, PagePermissions, PcapPacketHeader,
     PiaDedicatedIpBinding, PiaMaceAdBlocker, PiaMultiHopShadowsocksBridge, PiaPortForwardingEngine,
     PiaServerRegion, PiaSplitTunnelGovernor, PiaStrictKillSwitch, PiaVpnManager,
@@ -169,17 +165,10 @@ pub use unimplemented_features::{
     NixOsDeclarativeConfigEngine, PciBusScanner, PhoronixAutomatedBenchmarkEngine,
     PhoronixTestSuiteRunner, PowerState, PuppyLinuxOverlayRamdiskEngine, RavenWidgetState,
     RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator, RumpComponent,
-    RumpComponentType, SatSolverEngine, SerenityIpcEvent,
-    SerenityOsAsyncIpcLoop, SlackwarePackage, SlackwarePkgtoolEngine, SolusEopkgDeltaPackage,
-    SolusEopkgRavenGovernor, SovereignIpcBus, SteamOsGamescopeCompositorEngine, TargetArch,
-    TinyCoreModularTczLoader, UdfVm, VoidXbpsContainerEngine,
-    ZorinAppMapping, ZorinWinAppDbRegistry,
-};
-pub use unimplemented_tools::{
-    ChainedAuditTrailLedger, DiskImageSignatureCarver, DistroWatchTrendAnalyzerTool,
-    MetadataExifAntiForensicScrubber, NetworkPcapForensicSniffer, NixGuixStoreGarbageCollectorTool,
-    OpenBsdUnveilAuditTool, PhoronixSuiteAutomatedBenchmarkRunnerTool,
-    VolatileMemoryDumpForensicEngine,
+    RumpComponentType, SatSolverEngine, SerenityIpcEvent, SerenityOsAsyncIpcLoop, SlackwarePackage,
+    SlackwarePkgtoolEngine, SolusEopkgDeltaPackage, SolusEopkgRavenGovernor, SovereignIpcBus,
+    SteamOsGamescopeCompositorEngine, TargetArch, TinyCoreModularTczLoader, UdfVm,
+    VoidXbpsContainerEngine, ZorinAppMapping, ZorinWinAppDbRegistry,
 };
 pub mod expanded_wiki_innovations;
 pub use expanded_wiki_innovations::{
@@ -209,11 +198,12 @@ pub mod toolchain {
 pub mod scheduler;
 pub mod logging;
 pub mod system;
-pub mod update;
-pub use update::{
-    PreflightCheckResult, SovereignSystemUpdateAndTestingEngine, SovereignSystemUpdateManager,
-    SystemDiagnosticReport, SystemUpdatePayload, SystemUpdatePolicy, SystemUpdateStrategy,
-    UpdateHealthVerifier, UpdateLedgerEntry, UpdateSeverity, UpdateTransactionLedger,
+pub use system::{AutomationTaskKind, SovereignAutomationEngine, TaskStatus};
+pub mod update {
+    pub mod distro_update_parity;
+}
+pub use update::distro_update_parity::{
+    SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
 };
 pub mod installer;
 pub mod iot;
@@ -293,24 +283,6 @@ pub use driver::pci_bus::{
     SimulatedPciHardwareAccess,
 };
 pub use drivers::*;
-pub use drivers::distro_device_expansion::{
-    AppleNvmeAnsDriver, AtherosAr9271WifiDriver, Esp32HciBtBridgeDriver, LogitechUnifyingHidDriver,
-    NvidiaNouveauOpenGspDriver, UsbAudioClass2Driver,
-};
-pub use driver::{
-    AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
-    DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
-    EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
-    I2cSpiGpioBusController, InputDriver, InputEvent, InputType, IsochannelMode,
-    IsolationRingLevel, LeAudioCodec, LinuxBsdWifi6e7Driver, LinuxUrb, LinuxUrbQueue,
-    MultiTouchSlot, NetBsdRumpDriverHost, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    Nvme2ZnsFabricsDriver, NvmeFabricsTransport, NvmeZoneDescriptor, NvmeZoneState,
-    OpenBsdDriverPledge, PacketSlot, StorageCommand, StorageDriver, StorageError, StorageType,
-    Uac3IntelHdaAudioDspDriver, UrbTransferType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
-    Virgl3dCmd, Virgl3dResource, VirtioGpuVirgl3dDriver, WifiBand, WifiMloLink, WifiProtocolMode,
-    ZeroCopyPacketDriverEngine,
-};
 pub use filesystem::{
     FileMode, FileType, FsError, Inode, VirtualFilesystem,
 };
@@ -322,9 +294,6 @@ pub use governance::{
 //     StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
 //     STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO,
 // };
-pub mod arch;
-pub use arch::{ArchitectureClass, CpuPageTableMode, IsaVectorCapabilities, SovereignMultiArchHalEngine};
-
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, Message, MemoryBlock, PAGE_SIZE,
     Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
@@ -337,9 +306,7 @@ pub use kernel::{
     InteractiveHybridScheduler, HybridTask,
     CowStorageEngine, CowBlock,
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
-    LinuxPressureStallInfoEngine, LinuxKernelSamepageMergingEngine, LinuxDamonAccessMonitorEngine,
-    LinuxFanotifyEngine, LinuxFutex2WaitvEngine, LinuxDeviceMapperEngine,
-    SovereignMissingLinuxKernelComponentsSuite,
+    LinuxRcuSynchronizationEngine, LinuxKernelWorkqueueEngine, LinuxKernelTimerWheel, LinuxCmaAllocatorEngine,
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use network::{
@@ -367,8 +334,8 @@ pub use remote::{
     SimpleShellManager,
 };
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
-    PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore, SplitDirection as TmuxSplitDirection,
     TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
 pub use resilience::{
@@ -378,12 +345,11 @@ pub use resilience::{
 pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
+    CapabilityToken, ForensicStorageFilter, Permission, OriginalPledgeManager as PledgeManager, OriginalPledgePromise as PledgePromise, RoutingMode,
     SandboxPolicy,
 };
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
-    StreamTarget,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
@@ -411,33 +377,101 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
+pub mod init {
+    pub mod systemd_init;
+}
+pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
 pub use ai::next_gen::{
     AIModel, AdaptiveKernelPersona, AiTask, DeviceTargetType, EnergyGovernorMode, ModelType,
     MultiModelOrchestrator, PredictiveSyscallTranslator, WorkloadType,
 };
-pub use ai::agentic_os_runtime::{
-    BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu, EbpfNetworkFilter,
-    EphemeralAgentSandbox, GpuBackend, HybridContainerRuntime, LocalLlmDaemon, LocalLlmSystemDaemon,
-    OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
-};
 pub use ai::wandr::{
     ResearchResult, SigmaWandrAgent, WandrDocument, WandrEvaluator, WandrResearchAgent, WandrTask,
 };
-
-pub use community::toolkit::{
-    ArticleCategory, CommunityHandbookCatalog, HandbookArticle, HybridFirewallTemplateStore,
-    PackageRecipe as CommunityPackageRecipe, RecipeSourceFormat, ReproduciblePackageRecipeManager,
-    SecurityModelType, SecurityProfileTemplateStore, SecurityTemplate,
-    VirtualizationBlueprintStore,
+pub use distro::{
+    AkmKernelManager, CalamaresConfig, CalamaresInstaller, EosLogTool, EosWelcomeApp,
+    ReflectorMirrorManager, YayParuHelper,
 };
-
-pub use tools::{
-    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
-    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
-    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
-    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
-    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
-    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
-    UserIdentity as LibUserIdentity,
+pub use dashboard::{
+    DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
+pub use drivers::{
+    Bdle, Ch340Driver, DeviceGeneration, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver,
+    GpuError, GpuPipeline, GpuShader, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, IntelHdaDriver, NetworkCommand, NetworkDriver, NetworkError,
+    NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
+    RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
+    TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+};
+pub use filesystem::{
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
+    SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
+};
+pub use graphics::paint::ColorRgba;
+pub use kernel::{
+    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
+    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
+    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
+    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
+    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
+    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
+    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
+    Tcb, ThreadState, WorkItem, PAGE_SIZE,
+};
+pub use network::{
+    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
+    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
+};
+pub use orchestration::{
+    AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
+    ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
+    DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
+};
+pub use package::{
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use performance::{
+    AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, CallGraph,
+    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoSchedClass, IoTaskPriority,
+    PerformanceProfileRule, PhysicalPageFrame, Profile, ProfileType, Profiler, ProfilerError,
+    RamDefragmenter, SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
+    SmartResourceOptimizer, UltraKernelSamepageMerger, X86v3v4OptimizationDetector,
+    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+};
+pub use productivity::{
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore, EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
+    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
+    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
+    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
+};
+pub use resilience::{
+    FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
+    SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
+};
+pub use security::{
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CrowdStrikeFalconAi,
+    DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter, IntrusionDetectionSystem,
+    LinuxCapability, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, PamError, PamGroup,
+    PamUser, Permission, PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, Securelevel,
+    SIGNATURE_LEN, SnortRule, SnortSignatureFirewall, SovereignPamManager,
+    SovereignSecurelevelManager, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+};
+pub use shell::{ShellCommand, ShellRepl};
+pub use sigpkg::{
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    SatSolver, Transaction,
+};
+pub use storage::{
+    BioCmd, BioRequest, GeomClassType, GeomConsumer, GeomEliConfig, GeomProvider, GeomTopology,
+    PartitionEntry,
+};
+pub use virtualization::{
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use tools::native_userland_replacements::MasterNativeUserlandReplacements;

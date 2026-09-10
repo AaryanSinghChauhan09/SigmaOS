@@ -4978,3 +4978,171 @@ The Jules AI Development Agent executes a continuous daily operational workflow:
 2. **Feature Extraction**: Extracts key algorithms, performance gains, and security patches, transpiling them into zero-dependency `#![no_std]` Rust modules.
 3. **Automated Audits**: Runs daily CVE vulnerability scans, dependency health checks, and license audits across all codebase files.
 4. **Wiki Target Synchronization**: Automatically synchronizes all documentation changes across `WIKI/`, `wiki/`, and `wiki_repo/` targets using `./scripts/sync_wiki.sh`.
+
+---
+
+## 103. SOVEREIGN LINUX MINT STRUCTURAL & USER-CENTRIC ARCHITECTURE SPECIFICATION
+
+### 103.1 Overview & Strategic Value
+SigmaOS absorbs the structure, user-friendliness, and desktop stability of **Linux Mint** to deliver an operating system that eliminates user friction, desktop complexity, and maintenance headaches. By synthesizing Mint's signature **MintTools** ecosystem, **Cinnamon Desktop Environment**, **Timeshift** system restore, **Warpinator** local network sharing, and **Mint4Win** Windows loopback installation into a zero-dependency, `#![no_std]`, bare-metal Rust architecture, SigmaOS sets the benchmark for user-centric operating system design.
+
+---
+
+### 103.2 MintTools Ecosystem Integration Architecture
+
+SigmaOS natively implements the complete Linux Mint `MintTools` suite within `src/compatibility/mint_linux.rs`, `src/desktop/mint_tools.rs`, `src/desktop/mint_desktop.rs`, `src/package/mint_package.rs`, and dedicated utilities under `src/tools/`:
+
+```
++-----------------------------------------------------------------------------------+
+|                        SIGMAOS MINTTOOLS SUITE ARCHITECTURE                      |
++-----------------------------------------------------------------------------------+
+|  [MintUpdate]       [MintInstall]      [MintBackup]       [MintReport]           |
+|  5-Tier Safety      Software Manager    User State         Diagnostic Remedies    |
+|  Kernel Hot-Swap    App Ratings/Reviews Incremental Backups Crash & Memory Alerts |
++-----------------------------------------------------------------------------------+
+|  [MintDrivers]      [MintNanny]        [MintStick]        [MintWelcome]          |
+|  Hardware Detection Domain Blocker     USB Formatter/Write Initial Setup Flow     |
++-----------------------------------------------------------------------------------+
+|  [MintLocale]       [MintMenu]         [Warpinator]       [Mint4Win Engine]      |
+|  Language/i18n      Categorized Search LAN P2P Sharing    Windows Loopback VHD   |
++-----------------------------------------------------------------------------------+
+```
+
+#### 1. MintUpdate (`MintUpdateManager`)
+- **5-Tier Safety Classification**: Categorizes system updates into 5 distinct safety rings:
+  - `Level1Safe`: Certified safe userland packages.
+  - `Level2Tested`: Tested system package upgrades.
+  - `Level3Normal`: Standard upstream updates.
+  - `Level4Sensitive`: Sensitive system updates.
+  - `Level5Critical`: Core microkernel / SovereignVMM updates.
+- **Fastest Mirror Selection**: Automatically pings network mirrors and selects low-latency endpoints.
+- **Kernel Hot-Swapping**: Allows seamless kernel version swapping without requiring a full cold reboot.
+
+#### 2. MintInstall (`MintSoftwareManager` & `MintAppMetadata`)
+- **Software Catalog & User Reviews**: Features a user-friendly application directory with user ratings (1 to 5 stars), category filters, and Flatpak/SigPkg app reviews.
+- **Featured App Ranking**: Automatically calculates average user satisfaction scores to present top-rated software.
+
+#### 3. MintBackup (`MintBackupTool`)
+- **Incremental User Data Archiving**: Performs non-blocking background incremental backups of home directories and user configurations.
+
+#### 4. MintReport (`MintReportSystem` & `MintReportAlert`)
+- **Automated Crash & Memory Diagnostics**: Captures process crashes, system memory pressure, and hardware anomalies, presenting clear, actionable remedies.
+
+#### 5. MintDrivers (`MintDriverManager` & `MintDriverInfo`)
+- **Proprietary & Open-Source Driver Management**: Automatically detects hardware components (Wi-Fi, GPU, Bluetooth, Chipsets) and provides one-click driver toggling and DKMS auto-rebuilding.
+
+#### 6. MintNanny & MintDomainBlocker (`MintNannyFilter`)
+- **Web Content & Domain Filtering**: System-level domain and IP filtering for parental control and malware blocking.
+
+#### 7. MintStick (`MintUsbWriter`)
+- **USB ISO Image Writer & Formatter**: Low-level raw disk block writing (`dd`-style) and flash drive formatting (FAT32, Ext4, ExFAT) with progress monitoring.
+
+#### 8. MintWelcome & MintLocale (`MintWelcomeFlow` & `MintLocaleManager`)
+- **First-Boot Onboarding & i18n**: Guides users through initial setup, layout customization, snapshot creation, driver setup, and regional language pack configuration.
+
+#### 9. MintMenu (`MintMenuLayout`)
+- **Categorized Application Search**: Lightning-fast indexed search with favorite apps, recent files, system actions, and customizable layout themes.
+
+---
+
+### 103.3 Cinnamon Desktop Environment & Spices Engine
+
+SigmaOS implements a pure `#![no_std]` Rust Cinnamon-inspired desktop compositor (`CinnamonThemeEngine` in `src/compatibility/mint_linux.rs` & `src/desktop/mint_desktop.rs`):
+
+- **Theme Presets**: Out-of-the-box support for `MintYDark`, `MintYLight`, `MintYAqua`, `MintYPurple`, `MintYTeal`, and `MintXDefault` styling.
+- **Cinnamon Spices Framework**:
+  - **Applets**: Panel widgets for volume, networking, hardware monitoring, and power management.
+  - **Desklets**: Desktop widgets for clocks, weather, system status, and notes.
+  - **Extensions**: Modular workspace effects and window animation drivers.
+  - **Themes**: Full GTK/Icon theme customization with custom transparency and blur effects.
+- **Window Management & Tiling**: Supports both stacking cascaded window coordination and smart dynamic tiling modes.
+
+---
+
+### 103.4 Timeshift System Restore Engine
+
+SigmaOS integrates a `Timeshift`-style snapshot manager (`MintTimeshiftEngine` in `src/compatibility/mint_linux.rs` and `src/tools/timeshift_snapshot_manager.rs`):
+
+- **Snapshot Modes**:
+  - **RSYNC Snapshots**: File-level incremental snapshots with hardlink deduplication.
+  - **BTRFS / CoW Snapshots**: Instantaneous $O(1)$ zero-copy block-level storage snapshots.
+- **Automated Triggers**: Schedules automated snapshots before system updates, kernel upgrades, or configuration changes.
+- **Atomic Rollbacks**: Allows one-click system restoration to previous state Merkle root hashes (`system_state_hash`), guaranteeing self-healing recovery from unbootable states.
+
+---
+
+### 103.5 Warpinator LAN Peer-to-Peer File Sharing Engine
+
+SigmaOS implements a zero-dependency local network file transfer utility (`WarpinatorLanSharing` in `src/tools/warpinator_lan_sharing.rs`):
+
+- **Automatic P2P Discovery**: Discovers local network SigmaOS and Linux Mint peers using mDNS/UDP broadcast announcements.
+- **Encrypted Transfers**: Secures file transmission across local subnets using TLS 1.3 / ChaCha20-Poly1305 encryption.
+- **Port & Firewall Coordination**: Dynamically opens ephemeral ports (`port 42000`) and handles automatic payload integrity verification.
+
+---
+
+### 103.6 Mint4Win Windows Loopback Installer Engine
+
+SigmaOS includes a `mint4win` / `Wubi` inspired Windows loopback installer (`Mint4WinInstallerEngine` in `src/compatibility/mint_linux.rs`):
+
+- **Zero-Partition Dual-Boot**: Installs SigmaOS directly inside a single Windows NTFS folder (e.g., `C:\sigmaos`) as virtual disk images (`root.disk` and `swap.disk`).
+- **Windows BCD Bootloader Registration**: Automatically registers a custom dual-boot entry in the Windows Boot Configuration Data (`bcdedit`) store without modifying MBR/GPT partition tables.
+- **NTFS Fast Startup Protection**: Inspects NTFS volumes for dirty/hibernated fast startup flags, preventing data corruption during loopback mounting.
+- **Clean Windows Control Panel Uninstallation**: Includes a native Windows uninstaller that cleanly removes the BCD boot entry and reclaims virtual disk space upon request.
+
+---
+
+## 104. SOVEREIGN TECH-MEDIA & OPEN-SOURCE INNOVATION SYNTHESIS ARCHITECTURE
+
+### 104.1 Overview & Media Intelligence Matrix
+SigmaOS continuously analyzes and absorbs cutting-edge breakthroughs, benchmarks, and architectural paradigms reported across leading technology publications and Linux ecosystem journals (such as *Phoronix*, *The New Stack*, *ItsFOSS*, *9to5Linux*, *XDA-Developers*, *TechCrunch*, *ZDNet*, *HowToGeek*, *Hwbusters*, *InfoWorld*, *MakeUseOf*, and *DistroWatch*).
+
+```
++-----------------------------------------------------------------------------------+
+|               SIGMAOS TECH-MEDIA & ECOSYSTEM SYNTHESIS MATRIX                     |
++-----------------------------------------------------------------------------------+
+|  [Phoronix Benchmarks]     [The New Stack eBPF]     [XDA / Android 15]           |
+|  Automated Regression      Kernel Observability     Private Space & Apex Runtime  |
+|  Kernel & I/O Metrics      Zero-Overhead Probes     Isolated Memory Containment   |
++-----------------------------------------------------------------------------------+
+|  [Hwbusters Power]         [ItsFOSS & 9to5Linux]    [Windows / macOS Trends]      |
+|  Hardware Rail Telemetry   Distro Parity & News     Recall Auditor & Sequoia WM   |
+|  Power Supply Monitoring   User-Friendly Tooling    Seamless Window Management    |
++-----------------------------------------------------------------------------------+
+|  [TechCrunch / InfoWorld]  [DistroWatch Metrics]    [Linux Foundation Specs]       |
+|  Enterprise Cloud/AI       Popularity & Trends      Open-Source Standards &       |
+|  Native PQC & LLM Runtimes Package Ecosystem Gaps   Compliance Frameworks         |
++-----------------------------------------------------------------------------------+
+```
+
+---
+
+### 104.2 Media-Inspired Subsystem Innovations
+
+SigmaOS integrates zero-dependency, `#![no_std]` Rust engines inspired by global technology media coverage:
+
+#### 1. Tech Media Feed Intelligence (`TechMediaIntelligenceAggregatorEngine`)
+- Natively parses news feeds, release notes, and benchmark reports from *9to5Linux*, *Phoronix*, *XDA*, *TechPowerUp*, and *TechCrunch*.
+- Automatically identifies emerging Linux kernel patches, GPU driver updates, and security advisories to propose self-healing updates for SigmaOS modules.
+
+#### 2. Hardware Power Supply & Thermal Monitoring (`HwbustersPowerSupplyMonitor`)
+- Inspired by *Hwbusters* deep hardware analysis: monitors PSU voltage rails (+12V, +5V, +3.3V), ripple noise, efficiency percentages, and power consumption across CPU/GPU/Storage domains.
+- Provides real-time power capping and dynamic thermal throttling adjustments.
+
+#### 3. Android 15 Private Space & APEX Isolation (`Android15PrivateSpaceGovernor`)
+- Inspired by *XDA-Developers* coverage of Android 15: creates capability-isolated userland compartments (`PrivateSpace`) with dedicated encryption keys, biometric verification gates, and hidden launcher visibility.
+
+#### 4. macOS Sequoia Window Tiling & snapping (`MacOsSequoiaWindowManager`)
+- Inspired by *HowToGeek* and *MacRumors* analysis of macOS Sequoia window management: provides zero-latency keyboard/gesture snap zones, adaptive multi-monitor layout presets, and fluid desktop animations within Zenith Compositor.
+
+#### 5. Windows Copilot Recall Security Auditor (`WindowsCopilotRecallAuditor`)
+- Inspired by *WindowsLatest* and *TechSpot* privacy reviews: monitors local screen capture databases, enforces zero-knowledge local encryption, and redacts sensitive credentials/PII before local OCR indexing.
+
+#### 6. Coreutils Zero-Copy Buffer (`UutilsCoreutilsZeroCopyBuffer`)
+- Inspired by *ItsFOSS* and *Phoronix* benchmarking of Rust `uutils/coreutils`: implements kernel-level `splice`/`vmsplice` zero-copy I/O channels for file operations (`cat`, `cp`, `ls`), beating POSIX read/write pipeline throughput.
+
+#### 7. DistroWatch Trend Analyzer (`DistroWatchTrendAnalyzerTool`)
+- Inspired by *DistroWatch* ranking algorithms: tracks package popularity, distribution feature velocity, and user interest metrics to prioritize driver and package absorption targets.
+
+#### 8. Phoronix Automated Benchmark Runner (`PhoronixSuiteAutomatedBenchmarkRunnerTool`)
+- Inspired by *Phoronix Test Suite*: runs automated regression suites measuring context switch latencies, memory bandwidth, VFS IOPS, and network throughput under heavy workloads.
