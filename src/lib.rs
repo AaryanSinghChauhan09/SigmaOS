@@ -25,7 +25,6 @@ pub mod filesystem;
 pub mod futuristic_modules;
 pub mod governance;
 pub mod kernel;
-pub mod klib;
 pub use klib::ZeroDependencyPrimitiveHub;
 pub mod memory;
 pub mod network;
@@ -335,8 +334,8 @@ pub use remote::{
     SimpleShellManager,
 };
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
-    PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore, SplitDirection as TmuxSplitDirection,
     TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
 pub use resilience::{

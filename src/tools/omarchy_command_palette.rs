@@ -4,7 +4,6 @@
 //! which provides a filterable, nested command palette defined in JSONC for
 //! system control and configuration.
 
-#![no_std]
 #![allow(dead_code)]
 
 extern crate alloc;

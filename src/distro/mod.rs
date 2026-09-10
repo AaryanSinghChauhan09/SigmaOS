@@ -57,7 +57,6 @@ pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
 pub mod preseed;
-pub mod endeavour_os;
 
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use endeavour_os::{
