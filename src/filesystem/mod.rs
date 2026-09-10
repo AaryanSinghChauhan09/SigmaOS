@@ -13,7 +13,9 @@ pub mod mount_namespace;
 pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
+pub mod erofs;
 pub mod ext4;
+pub use erofs::{ErofsEngine, ErofsInode, ErofsInodeFormat, ErofsSuperblock};
 pub use bsd_linux_innovations::{
     BsdSoftUpdatesEngine, GoboLinuxPathResolver, LinuxOverlayFsManager, LinuxProcSysfsEmulator,
     MetadataDependency, MetadataOp, OpenBsdMountEnforcer, SovereignFhsHierarchyEngine,

@@ -6,6 +6,12 @@ pub mod display_manager;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
+pub mod open_source_tools_engine;
+
+pub use open_source_tools_engine::{
+    BatSyntaxHighlighterEngine, FzfFuzzyFinderEngine, FzfSearchResult, HtopProcessEntry,
+    HtopProcessMonitorEngine, HtopSortField, RsyncBlockChecksum, RsyncDeltaOp, RsyncDeltaSyncEngine,
+};
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
