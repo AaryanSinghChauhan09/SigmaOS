@@ -725,6 +725,14 @@ pub enum DevuanInitBackend {
     OpenRc,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DevuanInitBackend {
+    OpenRc,
+    SysVInit,
+    Runit,
+    S6,
+}
+
 #[derive(Debug, Clone)]
 pub struct DevuanInitService {
     pub name: String,
@@ -866,7 +874,6 @@ impl Default for KaOSPackageStateGovernor {
     }
 }
 
-/// 12. Missing Linux & BSD Distro Component Parity Inspector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
     Implemented,
@@ -876,6 +883,8 @@ pub enum ComponentParityStatus {
 
 #[derive(Debug, Clone)]
 pub struct DistroComponentParityRecord {
+
+pub struct MissingDistroComponentRecord {
     pub component_name: String,
     pub source_distro: String,
     pub status: ComponentParityStatus,

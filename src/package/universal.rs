@@ -2941,6 +2941,25 @@ mod tests {
             Some(PackageFormat::OpenBsdPkg)
         );
     }
+}
+
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
+
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, raw_data: &str) -> Result<UnifiedPackage, PackageError> {
+        let mut pkg = UnifiedPackage::new("alpine-apk-pkg".to_string(), "3.18.0".to_string())
+            .with_format(PackageFormat::Apk);
+        if !raw_data.is_empty() {
+            pkg.name = raw_data.to_string();
+        }
+        Ok(pkg)
+    }
+}
+
+#[cfg(test)]
+mod alpine_apk_tests {
+    use super::*;
 
     #[test]
     fn test_all_package_format_strategies_and_adapters() {
