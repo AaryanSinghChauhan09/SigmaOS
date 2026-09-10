@@ -41,3 +41,7 @@
 ## 2026-09-12 - Single-Pass Move Insertion for Hash Map Entry API
 **Learning:** In map `Entry` API implementations (`or_insert` / `or_insert_with`), calling `map.insert(entry.key.clone(), val)` followed by `map.get_mut(&entry.key).unwrap()` forces key cloning, duplicate hash calculations, double bucket search passes, and unwrap checks. Implementing a single-pass `insert_entry(&mut self, key: K, value: V) -> &mut V` method moves the key directly into the map without cloning (`K: Clone` bound dropped), computes the hash once, and returns a mutable reference to the inserted/updated value directly.
 **Action:** For map `Entry` APIs or upsert operations, provide a single-pass `insert_entry` method that consumes owned keys and returns mutable value references directly.
+
+## 2026-09-13 - Fast Raw Byte-Scanning Path for JSON String Parsing
+**Learning:** In JSON recursive descent parsers, iterating over string characters using `.chars().next()` decodes UTF-8 multi-byte sequences for every byte in the input string. Scanning raw byte slices (`&[u8]`) directly until hitting delimiter bytes (`"` or `\`) bypasses character decoding entirely for escape-free strings (the majority of JSON strings), resulting in a significant parsing throughput increase while falling back safely to UTF-8 decoding when backslash escapes are encountered.
+**Action:** When parsing text formats or string literals, use raw byte-level scanning for delimiter detection and fast slicing before falling back to multi-byte UTF-8 character decoding.
