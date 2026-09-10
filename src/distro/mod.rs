@@ -207,13 +207,13 @@ pub use linux_bsd_inspirations::{
     HardenedBsdPaxGuardEngine, HermeticStoreClosureEngine, NetBsdRumpRouter, NixStyleStore,
     OpenBSDPledge, OpenBSDUnveil, OpenBsdFdPledgeGate, OpenBsdPledgeUnveilSentinel,
     OpenBsdRetguardEngine, OpenRCService, PaxViolationLog, PaxViolationType, PfsNodeVote,
-    PowerProfileMode, SerpentMossEngine, ServiceSupervisorType, SovereignBcachefsTieringEngine,
-    SovereignBpfCoReEngine, SovereignDTraceEngine, SovereignDeclarativeSystemEngine,
-    SovereignDragonflyNpotEngine, SovereignEbpfEngine, SovereignIllumosZonesEngine,
-    SovereignIoUring, SovereignKaslrWxAllocator, SovereignLandlockLsm, SovereignOstreeEngine,
-    SovereignPrivSepSandbox, SovereignRaidSelfHealer, SovereignRingBuffer,
-    SovereignRunitSupervisor, SovereignUniversalDistroBridge, SovereignZfsPoolEngine, StorageTier,
-    StoreClosurePackage, System76PowerGovernor, ZoneBrand, ZoneState,
+    PowerProfileMode, ScxSchedulerPolicy, SerpentMossEngine, ServiceSupervisorType,
+    SovereignBcachefsTieringEngine, SovereignBpfCoReEngine, SovereignDTraceEngine,
+    SovereignDeclarativeSystemEngine, SovereignDistroInspirationLeapEngine, SovereignDragonflyNpotEngine,
+    SovereignEbpfEngine, SovereignIllumosZonesEngine, SovereignIoUring, SovereignKaslrWxAllocator,
+    SovereignLandlockLsm, SovereignOstreeEngine, SovereignPrivSepSandbox, SovereignRaidSelfHealer,
+    SovereignRingBuffer, SovereignRunitSupervisor, SovereignUniversalDistroBridge, SovereignZfsPoolEngine,
+    StorageTier, StoreClosurePackage, System76PowerGovernor, ZoneBrand, ZoneState,
 };
 
 pub use sovereign_distro_dominance::{
