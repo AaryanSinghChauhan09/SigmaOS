@@ -5,8 +5,7 @@
 
 extern crate alloc;
 
-use crate::klib::{String, Vec, ToString};
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 // ============================================================================

@@ -1,12 +1,9 @@
 // SigmaOS Advanced GUI Installer Wizard
 // Calamares-inspired graphical installer wizard with dual-boot alongside partitioning
 
-use std::string::{String, ToString};
-use std::vec::Vec;
-
 extern crate alloc;
 use alloc::format;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::vec;
 
@@ -191,12 +188,6 @@ pub struct PrivacySettings {
     pub enable_telemetry: bool,
     pub send_crash_reports: bool,
     pub location_services: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct DetectedOperatingSystem {
-    pub name: String,
-    pub partition_path: String,
 }
 
 impl SystemConfiguration {
