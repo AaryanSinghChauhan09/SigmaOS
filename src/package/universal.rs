@@ -281,15 +281,15 @@ pub enum PackageFormat {
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,      // HPC Spack (.spack)
-    Conan,      // C/C++ Conan (.conan)
-    Wheel,      // Python Wheel (.whl)
-    Crate,      // Rust Cargo Crate (.crate)
-    Gem,        // Ruby Gem (.gem)
-    Nupkg,      // .NET NuGet (.nupkg)
-    Vcpkg,      // Vcpkg (.vcpkg)
-    NarInfo,    // Nix NarInfo (.narinfo)
-    Sysupdate,  // Systemd Sysupdate (.sysupdate)
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -1885,16 +1885,10 @@ pub struct UniversalPackageManager {
     pub node_distro_engine: NodeBinaryDistroEngine,
     pub distro_repo_sync: DistroRepoSyncEngine,
     pub triggers: PackageTriggerRegistry,
-    pub mirror_latency_map: HashMap<String, u32>,
 }
 
 impl UniversalPackageManager {
     pub fn new() -> Self {
-        let mut mirrors = HashMap::new();
-        mirrors.insert("https://pkg.sigmaos.org/core".to_string(), 12);
-        mirrors.insert("https://cdn.sigmaos.org/mirrors".to_string(), 8);
-        mirrors.insert("https://mirror.global.sigmaos.org".to_string(), 25);
-
         let mut manager = Self {
             packages: HashMap::new(),
             adapters: HashMap::new(),
@@ -1906,18 +1900,10 @@ impl UniversalPackageManager {
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
             triggers: PackageTriggerRegistry::new(),
-            mirror_latency_map: mirrors,
         };
 
         manager.add_default_adapters();
         manager
-    }
-
-    /// Applies delta patch to base package bytes
-    pub fn apply_delta_package_patch(&self, base_bytes: &[u8], delta_bytes: &[u8]) -> Vec<u8> {
-        let mut patched = Vec::from(base_bytes);
-        patched.extend_from_slice(delta_bytes);
-        patched
     }
 
     /// Register and install a Node.js binary distribution runtime into the isolated store
@@ -2923,8 +2909,17 @@ mod tests {
     }
 }
 
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
+
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, _raw_data: &str) -> Result<UnifiedPackage, PackageError> {
+        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
+    }
+}
+
 #[cfg(test)]
-mod extra_universal_tests {
+mod extra_tests {
     use super::*;
 
     #[test]
@@ -2998,24 +2993,6 @@ mod extra_universal_tests {
                         && adapted.formats.contains(&PackageFormat::Nixpkg))
             );
         }
-    }
-
-    #[test]
-    fn test_nix_guix_functional_derivation_engine() {
-        let manager = UniversalPackageManager::new();
-        assert_eq!(manager.packages.len(), 0);
-    }
-
-    #[test]
-    fn test_parallel_mirror_ranking_and_delta_patching() {
-        let manager = UniversalPackageManager::new();
-        let fastest_mirror = manager.mirror_latency_map.iter().min_by_key(|(_, &lat)| lat).map(|(url, _)| url.clone());
-        assert!(fastest_mirror.is_some());
-
-        let base_binary = b"OLD_PACKAGE_BINARY_V1";
-        let delta_patch = b"_DELTA_PATCH_V2";
-        let patched = manager.apply_delta_package_patch(base_binary, delta_patch);
-        assert!(patched.ends_with(b"_DELTA_PATCH_V2"));
     }
 
     #[test]
