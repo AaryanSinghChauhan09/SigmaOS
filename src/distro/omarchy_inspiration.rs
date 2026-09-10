@@ -368,9 +368,140 @@ impl Default for OmarchyReleaseChannelSnapshotEngine {
     }
 }
 
+
+/// Omarchy Dotfiles Versioning & Stow Profile Manager Engine
+#[derive(Debug, Clone)]
+pub struct StowProfile {
+    pub package_name: String,
+    pub target_dir: String,
+    pub is_stowed: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct OmarchyDotfilesManagerEngine {
+    pub profiles: Vec<StowProfile>,
+}
+
+impl OmarchyDotfilesManagerEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { profiles: Vec::new() };
+        engine.profiles.push(StowProfile {
+            package_name: "hypr".to_string(),
+            target_dir: "/home/sovereign/.config/hypr".to_string(),
+            is_stowed: true,
+        });
+        engine.profiles.push(StowProfile {
+            package_name: "waybar".to_string(),
+            target_dir: "/home/sovereign/.config/waybar".to_string(),
+            is_stowed: true,
+        });
+        engine
+    }
+
+    pub fn stow_profile(&mut self, pkg: &str, target: &str) -> String {
+        self.profiles.push(StowProfile {
+            package_name: pkg.to_string(),
+            target_dir: target.to_string(),
+            is_stowed: true,
+        });
+        format!("Stowed {} -> {}", pkg, target)
+    }
+}
+
+
+
+/// Omarchy Keybindings Studio Engine
+#[derive(Debug, Clone)]
+pub struct CustomShortcut {
+    pub keys: String,
+    pub command: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct OmarchyKeybindingsStudioEngine {
+    pub bindings: Vec<CustomShortcut>,
+}
+
+impl OmarchyKeybindingsStudioEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { bindings: Vec::new() };
+        engine.bind_keys("SUPER+RETURN", "kitty");
+        engine.bind_keys("SUPER+D", "rofi -show drun");
+        engine
+    }
+
+    pub fn bind_keys(&mut self, keys: &str, cmd: &str) {
+        self.bindings.push(CustomShortcut {
+            keys: keys.to_string(),
+            command: cmd.to_string(),
+        });
+    }
+
+    pub fn generate_hyprland_binds(&self) -> Vec<String> {
+        self.bindings.iter().map(|b| format!("bind = {}, exec, {}", b.keys, b.command)).collect()
+    }
+}
+
+
+
+/// Omarchy Hyprland Custom Animation Curve Tuner Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyHyprlandAnimEngine {
+    pub bezier_curve: String,
+    pub animation_speed_ms: u32,
+}
+
+impl OmarchyHyprlandAnimEngine {
+    pub fn new() -> Self {
+        Self {
+            bezier_curve: "0.05, 0.9, 0.1, 1.05".to_string(),
+            animation_speed_ms: 200,
+        }
+    }
+
+    pub fn generate_hyprland_anim_cfg(&self) -> String {
+        format!("bezier = myBezier, {}
+animation = windows, 1, 7, myBezier", self.bezier_curve)
+    }
+}
+
+impl Default for OmarchyHyprlandAnimEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
 #[cfg(test)]
 mod omarchy_tests {
     use super::*;
+
+    #[test]
+    fn test_omarchy_dotfiles_manager() {
+        let mut mgr = OmarchyDotfilesManagerEngine::new();
+        assert_eq!(mgr.profiles.len(), 2);
+        let res = mgr.stow_profile("alacritty", "/home/sovereign/.config/alacritty");
+        assert!(res.contains("Stowed alacritty"));
+        assert_eq!(mgr.profiles.len(), 3);
+    }
+
+    #[test]
+    fn test_omarchy_keybindings_studio() {
+        let mut studio = OmarchyKeybindingsStudioEngine::new();
+        assert_eq!(studio.bindings.len(), 2);
+        studio.bind_keys("SUPER+SHIFT+Q", "hyprctl dispatch exit");
+        let binds = studio.generate_hyprland_binds();
+        assert_eq!(binds.len(), 3);
+        assert!(binds[2].contains("SUPER+SHIFT+Q"));
+    }
+
+    #[test]
+    fn test_omarchy_hyprland_anim_engine() {
+        let anim = OmarchyHyprlandAnimEngine::new();
+        let cfg = anim.generate_hyprland_anim_cfg();
+        assert!(cfg.contains("bezier = myBezier"));
+    }
+
 
     #[test]
     fn test_quickshell_engine() {

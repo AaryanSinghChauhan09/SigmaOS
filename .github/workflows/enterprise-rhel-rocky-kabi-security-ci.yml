@@ -24,4 +24,5 @@ jobs:
 
       - name: Test Kernel System Call Table & Anti-Rootkit Guard
         run: |
+          mkdir -p build
           cargo test --lib -- kernel::syscall::table::tests
