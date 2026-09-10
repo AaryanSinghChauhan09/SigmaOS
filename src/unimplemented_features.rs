@@ -11,14 +11,45 @@ use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-
-// Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
-// Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::collections::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(test)]
 use std::collections::HashMap;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use std::collections::HashMap;
+
+// ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
+// ========================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerState {
+    D0Active,
+    D1LowPower,
+    D2LowPower,
+    D3Off,
+}
+
+pub trait BareMetalUnifiedPeripheral {
+    fn initialize(&mut self) -> Result<(), &'static str>;
+    fn read_register(&self, offset: u16) -> u64;
+    fn write_register(&mut self, offset: u16, value: u64);
+    fn handle_irq(&mut self) -> bool;
+    fn set_power_state(&mut self, state: PowerState);
+    fn get_power_state(&self) -> PowerState;
+}
+
+pub struct LegacyController {
+    pub base_port: u16,
+    pub power_state: PowerState,
+    pub ports_buffer: [u8; 16],
+}
+
+impl LegacyController {
+    pub fn new(base_port: u16) -> Self {
+        Self {
+            base_port,
+            power_state: PowerState::D3Off,
+            ports_buffer: [0u8; 16],
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct PortageEbuildProfile {

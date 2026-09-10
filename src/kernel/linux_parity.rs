@@ -2,7 +2,8 @@
 /// Clean-room implementation of Linux io_uring, memfd_secret, BPF LSM, and Page Folios
 /// Designed for bare-metal zero-dependency performance and zero-trust security
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use std::collections::HashMap;
+use std::sync::atomic::{AtomicU32, AtomicU64, AtomicUsize, Ordering};
 
 // ============================================================================
 // 1. Linux io_uring Asynchronous Ring Buffer Engine (KernelIoUringEngine)
@@ -1264,5 +1265,564 @@ mod tests {
         let mut notifier = KernelNotifierChain::new();
         notifier.notifier_chain_register("netdev_notifier", 10);
         assert_eq!(notifier.notifier_call_chain(1), NOTIFY_OK);
+    }
+}
+
+// ============================================================================
+// 16. Linux Ftrace Function Tracer Engine (LinuxFtraceRingBufferEngine)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FtraceEventRecord {
+    pub timestamp_ns: u64,
+    pub pid: u32,
+    pub cpu_id: u32,
+    pub func_ip: u64,
+    pub parent_ip: u64,
+    pub function_name: &'static str,
+}
+
+pub struct LinuxFtraceRingBufferEngine {
+    ring_buffer: Vec<FtraceEventRecord>,
+    capacity: usize,
+    enabled: bool,
+    filter_functions: Vec<&'static str>,
+    dropped_events: usize,
+}
+
+impl LinuxFtraceRingBufferEngine {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            ring_buffer: Vec::with_capacity(capacity),
+            capacity,
+            enabled: false,
+            filter_functions: Vec::new(),
+            dropped_events: 0,
+        }
+    }
+
+    pub fn enable_tracing(&mut self) {
+        self.enabled = true;
+    }
+
+    pub fn disable_tracing(&mut self) {
+        self.enabled = false;
+    }
+
+    pub fn is_enabled(&self) -> bool {
+        self.enabled
+    }
+
+    pub fn set_filter_function(&mut self, func_name: &'static str) {
+        if !self.filter_functions.contains(&func_name) {
+            self.filter_functions.push(func_name);
+        }
+    }
+
+    pub fn clear_filters(&mut self) {
+        self.filter_functions.clear();
+    }
+
+    pub fn trace_function_entry(
+        &mut self,
+        timestamp_ns: u64,
+        pid: u32,
+        cpu_id: u32,
+        func_ip: u64,
+        parent_ip: u64,
+        function_name: &'static str,
+    ) -> bool {
+        if !self.enabled {
+            return false;
+        }
+
+        if !self.filter_functions.is_empty() && !self.filter_functions.contains(&function_name) {
+            return false;
+        }
+
+        if self.ring_buffer.len() >= self.capacity {
+            self.ring_buffer.remove(0);
+            self.dropped_events += 1;
+        }
+
+        self.ring_buffer.push(FtraceEventRecord {
+            timestamp_ns,
+            pid,
+            cpu_id,
+            func_ip,
+            parent_ip,
+            function_name,
+        });
+
+        true
+    }
+
+    pub fn read_trace_events(&self) -> &[FtraceEventRecord] {
+        &self.ring_buffer
+    }
+
+    pub fn clear_ring_buffer(&mut self) {
+        self.ring_buffer.clear();
+        self.dropped_events = 0;
+    }
+
+    pub fn dropped_events_count(&self) -> usize {
+        self.dropped_events
+    }
+}
+
+#[cfg(test)]
+mod ftrace_tests {
+    use super::*;
+
+    #[test]
+    fn test_linux_ftrace_engine() {
+        let mut ftrace = LinuxFtraceRingBufferEngine::new(2);
+        assert!(!ftrace.is_enabled());
+
+        assert!(!ftrace.trace_function_entry(1000, 101, 0, 0xdeadbeef, 0x4000, "vfs_read"));
+
+        ftrace.enable_tracing();
+        assert!(ftrace.is_enabled());
+
+        ftrace.set_filter_function("vfs_read");
+
+        assert!(!ftrace.trace_function_entry(1005, 101, 0, 0xcafe, 0x4000, "vfs_write"));
+        assert!(ftrace.trace_function_entry(1010, 101, 0, 0xdeadbeef, 0x4000, "vfs_read"));
+
+        ftrace.clear_filters();
+        assert!(ftrace.trace_function_entry(1020, 101, 0, 0xcafe, 0x4000, "vfs_write"));
+        assert!(ftrace.trace_function_entry(1030, 102, 1, 0x1234, 0x4000, "do_sys_open"));
+
+        let records = ftrace.read_trace_events();
+        assert_eq!(records.len(), 2);
+        assert_eq!(records[0].function_name, "vfs_write");
+        assert_eq!(records[1].function_name, "do_sys_open");
+        assert_eq!(ftrace.dropped_events_count(), 1);
+    }
+}
+
+// ============================================================================
+// 17. Linux Zswap Compressed Swap Cache Engine (LinuxZswapCompressorEngine)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ZswapEntry {
+    pub swp_entry: u64,
+    pub compressed_data: Vec<u8>,
+    pub uncompressed_size: usize,
+    pub checksum: u32,
+}
+
+pub struct LinuxZswapCompressorEngine {
+    zpool: HashMap<u64, ZswapEntry>,
+    max_pool_pages: usize,
+    current_pages: usize,
+    compressed_bytes: usize,
+    uncompressed_bytes: usize,
+    backstore_writes: usize,
+}
+
+impl LinuxZswapCompressorEngine {
+    pub fn new(max_pool_pages: usize) -> Self {
+        Self {
+            zpool: HashMap::new(),
+            max_pool_pages,
+            current_pages: 0,
+            compressed_bytes: 0,
+            uncompressed_bytes: 0,
+            backstore_writes: 0,
+        }
+    }
+
+    pub fn store_page(&mut self, swp_entry: u64, raw_page: &[u8]) -> Result<(), &'static str> {
+        if self.current_pages >= self.max_pool_pages {
+            self.backstore_writes += 1;
+            return Err("zpool limit reached: written to swap disk backstore");
+        }
+
+        let compressed_data = self.compress_rle(raw_page);
+        let checksum = raw_page.iter().fold(0u32, |acc, &x| acc.wrapping_add(x as u32));
+
+        let entry = ZswapEntry {
+            swp_entry,
+            uncompressed_size: raw_page.len(),
+            compressed_data: compressed_data.clone(),
+            checksum,
+        };
+
+        self.compressed_bytes += compressed_data.len();
+        self.uncompressed_bytes += raw_page.len();
+        self.zpool.insert(swp_entry, entry);
+        self.current_pages += 1;
+
+        Ok(())
+    }
+
+    pub fn load_page(&mut self, swp_entry: u64) -> Option<Vec<u8>> {
+        if let Some(entry) = self.zpool.remove(&swp_entry) {
+            self.current_pages -= 1;
+            self.compressed_bytes -= entry.compressed_data.len();
+            self.uncompressed_bytes -= entry.uncompressed_size;
+
+            let decompressed = self.decompress_rle(&entry.compressed_data, entry.uncompressed_size);
+            let check = decompressed.iter().fold(0u32, |acc, &x| acc.wrapping_add(x as u32));
+            if check == entry.checksum {
+                Some(decompressed)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn compression_ratio(&self) -> f64 {
+        if self.compressed_bytes == 0 {
+            0.0
+        } else {
+            self.uncompressed_bytes as f64 / self.compressed_bytes as f64
+        }
+    }
+
+    pub fn backstore_writes_count(&self) -> usize {
+        self.backstore_writes
+    }
+
+    fn compress_rle(&self, data: &[u8]) -> Vec<u8> {
+        let mut out = Vec::new();
+        if data.is_empty() {
+            return out;
+        }
+
+        let mut i = 0;
+        while i < data.len() {
+            let mut run_len = 1;
+            while i + run_len < data.len() && data[i + run_len] == data[i] && run_len < 255 {
+                run_len += 1;
+            }
+            out.push(run_len as u8);
+            out.push(data[i]);
+            i += run_len;
+        }
+        out
+    }
+
+    fn decompress_rle(&self, data: &[u8], expected_size: usize) -> Vec<u8> {
+        let mut out = Vec::with_capacity(expected_size);
+        let mut i = 0;
+        while i < data.len() {
+            let count = data[i] as usize;
+            let val = data[i + 1];
+            out.extend(core::iter::repeat(val).take(count));
+            i += 2;
+        }
+        out
+    }
+}
+
+#[cfg(test)]
+mod zswap_tests {
+    use super::*;
+
+    #[test]
+    fn test_linux_zswap_engine() {
+        let mut zswap = LinuxZswapCompressorEngine::new(1);
+        let raw_page = vec![0xAB; 1024];
+
+        assert!(zswap.store_page(0x1000, &raw_page).is_ok());
+        assert!(zswap.compression_ratio() > 1.0);
+
+        // Limit reached -> should fail and increment backstore_writes
+        assert!(zswap.store_page(0x2000, &raw_page).is_err());
+        assert_eq!(zswap.backstore_writes_count(), 1);
+
+        let restored = zswap.load_page(0x1000).expect("failed to load zswap page");
+        assert_eq!(restored, raw_page);
+        assert!(zswap.load_page(0x1000).is_none());
+    }
+}
+
+// ============================================================================
+// 18. Linux BFQ (Budget Fair Queueing) Block I/O Scheduler (LinuxBfqBlockScheduler)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BfqIoRequest {
+    pub req_id: u64,
+    pub process_id: u32,
+    pub sector: u64,
+    pub sector_count: u32,
+    pub is_write: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct BfqProcessQueue {
+    pub process_id: u32,
+    pub weight: u32,
+    pub allocated_budget_sectors: u32,
+    pub consumed_budget_sectors: u32,
+    pub pending_requests: Vec<BfqIoRequest>,
+}
+
+pub struct LinuxBfqBlockScheduler {
+    queues: HashMap<u32, BfqProcessQueue>,
+    active_pid: Option<u32>,
+    default_budget: u32,
+}
+
+impl LinuxBfqBlockScheduler {
+    pub fn new(default_budget: u32) -> Self {
+        Self {
+            queues: HashMap::new(),
+            active_pid: None,
+            default_budget,
+        }
+    }
+
+    pub fn register_process_queue(&mut self, process_id: u32, weight: u32) {
+        let queue = BfqProcessQueue {
+            process_id,
+            weight: weight.max(1),
+            allocated_budget_sectors: self.default_budget * weight.max(1),
+            consumed_budget_sectors: 0,
+            pending_requests: Vec::new(),
+        };
+        self.queues.insert(process_id, queue);
+    }
+
+    pub fn enqueue_request(&mut self, request: BfqIoRequest) {
+        let pid = request.process_id;
+        if let Some(queue) = self.queues.get_mut(&pid) {
+            queue.pending_requests.push(request);
+        } else {
+            let mut queue = BfqProcessQueue {
+                process_id: pid,
+                weight: 1,
+                allocated_budget_sectors: self.default_budget,
+                consumed_budget_sectors: 0,
+                pending_requests: Vec::new(),
+            };
+            queue.pending_requests.push(request);
+            self.queues.insert(pid, queue);
+        }
+    }
+
+    pub fn dispatch_next_request(&mut self) -> Option<BfqIoRequest> {
+        if self.queues.is_empty() {
+            return None;
+        }
+
+        if let Some(active_pid) = self.active_pid {
+            if let Some(queue) = self.queues.get_mut(&active_pid) {
+                if !queue.pending_requests.is_empty()
+                    && queue.consumed_budget_sectors < queue.allocated_budget_sectors
+                {
+                    let req = queue.pending_requests.remove(0);
+                    queue.consumed_budget_sectors += req.sector_count;
+                    return Some(req);
+                } else {
+                    queue.consumed_budget_sectors = 0;
+                    self.active_pid = None;
+                }
+            } else {
+                self.active_pid = None;
+            }
+        }
+
+        let mut candidate_pid = None;
+        for (pid, queue) in &self.queues {
+            if !queue.pending_requests.is_empty() {
+                candidate_pid = Some(*pid);
+                break;
+            }
+        }
+
+        if let Some(pid) = candidate_pid {
+            self.active_pid = Some(pid);
+            let queue = self.queues.get_mut(&pid).unwrap();
+            let req = queue.pending_requests.remove(0);
+            queue.consumed_budget_sectors += req.sector_count;
+            Some(req)
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(test)]
+mod bfq_tests {
+    use super::*;
+
+    #[test]
+    fn test_linux_bfq_scheduler() {
+        let mut bfq = LinuxBfqBlockScheduler::new(100);
+
+        bfq.register_process_queue(1001, 2);
+        bfq.register_process_queue(1002, 1);
+
+        bfq.enqueue_request(BfqIoRequest {
+            req_id: 1,
+            process_id: 1001,
+            sector: 0x100,
+            sector_count: 50,
+            is_write: false,
+        });
+
+        bfq.enqueue_request(BfqIoRequest {
+            req_id: 2,
+            process_id: 1001,
+            sector: 0x200,
+            sector_count: 60,
+            is_write: true,
+        });
+
+        let req1 = bfq.dispatch_next_request().unwrap();
+        assert_eq!(req1.req_id, 1);
+
+        let req2 = bfq.dispatch_next_request().unwrap();
+        assert_eq!(req2.req_id, 2);
+
+        assert!(bfq.dispatch_next_request().is_none());
+    }
+}
+
+// ============================================================================
+// 19. Linux Binder Inter-Process Communication Subsystem (LinuxBinderIpcEngine)
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BinderTransaction {
+    pub sender_pid: u32,
+    pub target_handle: u32,
+    pub code: u32,
+    pub flags: u32,
+    pub payload: Vec<u8>,
+}
+
+#[derive(Debug, Clone)]
+pub struct BinderNode {
+    pub handle: u32,
+    pub owner_pid: u32,
+    pub ref_count: usize,
+}
+
+pub struct LinuxBinderIpcEngine {
+    nodes: HashMap<u32, BinderNode>,
+    next_handle: u32,
+    pending_transactions: HashMap<u32, Vec<BinderTransaction>>,
+}
+
+impl LinuxBinderIpcEngine {
+    pub fn new() -> Self {
+        Self {
+            nodes: HashMap::new(),
+            next_handle: 1,
+            pending_transactions: HashMap::new(),
+        }
+    }
+
+    pub fn register_context_manager(&mut self, owner_pid: u32) -> u32 {
+        let handle = 0; // Context manager always has handle 0 in Android/Linux Binder
+        let node = BinderNode {
+            handle,
+            owner_pid,
+            ref_count: 1,
+        };
+        self.nodes.insert(handle, node);
+        handle
+    }
+
+    pub fn create_binder_node(&mut self, owner_pid: u32) -> u32 {
+        let handle = self.next_handle;
+        self.next_handle += 1;
+
+        let node = BinderNode {
+            handle,
+            owner_pid,
+            ref_count: 1,
+        };
+        self.nodes.insert(handle, node);
+        handle
+    }
+
+    pub fn inc_ref(&mut self, handle: u32) -> Result<(), &'static str> {
+        if let Some(node) = self.nodes.get_mut(&handle) {
+            node.ref_count += 1;
+            Ok(())
+        } else {
+            Err("binder node handle not found")
+        }
+    }
+
+    pub fn dec_ref(&mut self, handle: u32) -> Result<(), &'static str> {
+        if let Some(node) = self.nodes.get_mut(&handle) {
+            if node.ref_count > 1 {
+                node.ref_count -= 1;
+            } else {
+                self.nodes.remove(&handle);
+            }
+            Ok(())
+        } else {
+            Err("binder node handle not found")
+        }
+    }
+
+    pub fn send_transaction(&mut self, transaction: BinderTransaction) -> Result<(), &'static str> {
+        if let Some(node) = self.nodes.get(&transaction.target_handle) {
+            let target_pid = node.owner_pid;
+            self.pending_transactions
+                .entry(target_pid)
+                .or_insert_with(Vec::new)
+                .push(transaction);
+            Ok(())
+        } else {
+            Err("target binder handle does not exist")
+        }
+    }
+
+    pub fn receive_transaction(&mut self, receiver_pid: u32) -> Option<BinderTransaction> {
+        if let Some(list) = self.pending_transactions.get_mut(&receiver_pid) {
+            if !list.is_empty() {
+                return Some(list.remove(0));
+            }
+        }
+        None
+    }
+}
+
+#[cfg(test)]
+mod binder_tests {
+    use super::*;
+
+    #[test]
+    fn test_linux_binder_ipc_engine() {
+        let mut binder = LinuxBinderIpcEngine::new();
+
+        let ctx_handle = binder.register_context_manager(100);
+        assert_eq!(ctx_handle, 0);
+
+        let service_handle = binder.create_binder_node(200);
+        assert_eq!(service_handle, 1);
+
+        assert!(binder.inc_ref(service_handle).is_ok());
+
+        let tx = BinderTransaction {
+            sender_pid: 300,
+            target_handle: service_handle,
+            code: 0x1,
+            flags: 0,
+            payload: vec![1, 2, 3, 4],
+        };
+
+        assert!(binder.send_transaction(tx.clone()).is_ok());
+
+        let rx = binder.receive_transaction(200).expect("failed to receive binder tx");
+        assert_eq!(rx, tx);
+        assert!(binder.receive_transaction(200).is_none());
+
+        assert!(binder.dec_ref(service_handle).is_ok());
+        assert!(binder.dec_ref(service_handle).is_ok());
+        assert!(binder.dec_ref(service_handle).is_err());
     }
 }

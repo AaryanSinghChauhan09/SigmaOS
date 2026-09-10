@@ -4571,7 +4571,8 @@ impl FedoraBadgesEngine {
             user_badges.push(badge_id.to_string());
         }
 
-        let total_points = user_badges
+        let badge_ids = user_badges.clone();
+        let total_points = badge_ids
             .iter()
             .filter_map(|id| self.badges.get(id))
             .map(|b| b.points)
