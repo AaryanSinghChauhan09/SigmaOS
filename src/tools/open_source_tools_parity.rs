@@ -64,6 +64,54 @@ impl Default for FastfetchInfoEngine {
     }
 }
 
+// ============================================================================
+// 10. It's FOSS Fastfetch / Neofetch System Information Banner Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ItsFossFastfetchSysinfoEngine {
+    pub os_name: String,
+    pub host: String,
+    pub kernel: String,
+    pub uptime_secs: u64,
+    pub shell: String,
+    pub memory_used_mb: u64,
+    pub memory_total_mb: u64,
+}
+
+impl ItsFossFastfetchSysinfoEngine {
+    pub fn new() -> Self {
+        Self {
+            os_name: "SigmaOS Sovereign Linux/BSD".to_string(),
+            host: "Bare-Metal x86_64".to_string(),
+            kernel: "6.8.0-sigma".to_string(),
+            uptime_secs: 3600,
+            shell: "sigma-sh".to_string(),
+            memory_used_mb: 28,
+            memory_total_mb: 16384,
+        }
+    }
+
+    pub fn render_ascii_logo_and_sysinfo(&self) -> String {
+        format!(
+            "  /\\_/\\     {} @ {}\n \
+             ( o.o )    -----------------\n \
+              > ^ <     OS: {}\n \
+                       Kernel: {}\n \
+                       Uptime: {} mins\n \
+                       Shell: {}\n \
+                       Memory: {}MB / {}MB\n",
+            "root", self.host, self.os_name, self.kernel, self.uptime_secs / 60, self.shell, self.memory_used_mb, self.memory_total_mb
+        )
+    }
+}
+
+impl Default for ItsFossFastfetchSysinfoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // =========================================================================
 // 2. BTOP++ / HTOP PROCESS & HARDWARE MONITOR ENGINE
 // =========================================================================
@@ -426,6 +474,14 @@ mod tests {
         let code = "fn foo() {}\nfn bar() {}\nlet x = 10;";
         let matches = RipgrepRegexSearchEngine::search_file_content(code, "fn ");
         assert_eq!(matches.len(), 2);
+    }
+
+    #[test]
+    fn test_itsfoss_fastfetch_sysinfo() {
+        let engine = ItsFossFastfetchSysinfoEngine::new();
+        let sysinfo = engine.render_ascii_logo_and_sysinfo();
+        assert!(sysinfo.contains("SigmaOS Sovereign Linux/BSD"));
+        assert!(sysinfo.contains("Kernel: 6.8.0-sigma"));
     }
 
     #[test]

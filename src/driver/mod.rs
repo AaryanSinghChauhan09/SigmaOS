@@ -18,12 +18,9 @@ pub mod pci_enumeration;
 pub mod pods;
 pub mod rootkit;
 pub mod shims;
-<<<<<<< HEAD
-=======
 pub mod ubuntu_common_drivers;
 pub mod vault;
 pub mod wifi_broadcom_bcm4318;
->>>>>>> origin/jules-11419381740832472292-50948cbf
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
