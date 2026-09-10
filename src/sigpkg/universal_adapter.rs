@@ -1735,6 +1735,8 @@ impl UniversalDependencyMapper {
             "mesa" | "mesa-dev" | "mesa-libgl-devel" | "media-libs/mesa" => "mesa".to_string(),
             "git" | "git-base" | "dev-vcs/git" => "git".to_string(),
             "cmake" | "dev-build/cmake" => "cmake".to_string(),
+            "archlinux-keyring" | "archlinux-keyring-wkd" => "arch-keyring".to_string(),
+            "pacman-contrib" | "pacman-utils" => "pacman-contrib".to_string(),
             _ => clean.to_string(),
         }
     }
