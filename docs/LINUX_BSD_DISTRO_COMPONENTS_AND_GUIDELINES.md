@@ -26,6 +26,16 @@ This document serves as the master engineering reference and operational guideli
 | **Solaris / Illumos**| Zones container isolation, VNICs, DTrace dynamic tracing | `SovereignZonesManager`, `SovereignZone`, `configure_vnic`, `IllumosDTraceEngine` |
 | **Haiku OS** | `.hpkg` packagefs, BFS attributes, desktop responsiveness | `HaikuHpkgManifest`, `parse_haiku_hpkg` (`src/sigpkg/universal_adapter.rs`) |
 
+| **SmartOS** | SmartOS zones, rcd service supervision, bhyve virtualization | `SmartOs` distro mode, `rcd` supervisor mapping |
+| **Bedrock Linux** | Stratum filesystem virtualization, cross-subsystem package spec translation | `BedrockLinux` distro mode, `.stratum` specifier mapping |
+| **Pop!_OS** | System76 power governor profiles, COSMIC desktop window management | `System76PowerGovernor`, `PowerProfileMode` |
+| **Tails** | Encrypted live persistence, amnesic RAM scrubbing | `SovereignAnonScrubber`, RAM wiping on shutdown |
+| **GNU Guix** | Guix SCM derivations, Shepherd service supervision | `GNUGuixShepherdSupervisor`, `GuixDerivation` |
+| **Parrot OS** | Anonsurf Tor/I2P proxying, AppArmor seccomp profiles, digital forensics | `AnonsurfEngine`, `ParrotAppArmorProfileManager`, `ParrotForensicsSandbox` |
+| **Kali Linux** | Kali Undercover, NetHunter mobile/HID attack orchestrator, WinKeX WSL2, LUKS persistence | `KaliUndercoverEngine`, `KaliNetHunterEngine`, `KaliWinKexEngine`, `KaliMetapackageEngine` |
+| **antiX Linux** | Systemd-free SysVInit lightweight service management | `AntiXSysVInitEngine`, `Sysvinit` supervisor mapping |
+| **Zorin OS** | Zorin Appearance adaptive layout switcher (Windows/macOS/GNOME presets) | `ZorinAppearanceSwitcher` |
+
 ---
 
 ## 🛠️ 2. Subsystem Component Architecture & Interoperability
@@ -75,17 +85,81 @@ This document serves as the master engineering reference and operational guideli
 
 ## 📏 3. Development Guidelines & Directives for AI Agents
 
+## 🔌 3. Hardware Peripheral Driver Integration
+
+SigmaOS includes 28 distro-inspired hardware drivers implementing the unified `PeripheralDevice` trait in `src/drivers/distro_device_expansion.rs`:
+
+1. **`Mpt3SasControllerDriver`**: Broadcom LSI MPT3SAS 12Gbps HBA SAS/SATA Controller.
+2. **`VirtioScsiControllerDriver`**: QEMU/KVM VirtIO-SCSI Storage Host Controller.
+3. **`RealtekRtl8169Driver`**: Realtek RTL8169/8111 Gigabit Ethernet NIC.
+4. **`IntelIgbNicDriver`**: Intel I210/I350 PCIe Gigabit Network Controller.
+5. **`IntelIwfWifiDriver`**: Intel Wi-Fi 6/6E/7 AX210 Wireless Network Adapter.
+6. **`WacomGraphicsTabletDriver`**: Wacom Intuos/Cintiq Professional Digitizer Tablet.
+7. **`SynapticsTouchpadDriver`**: Synaptics PS/2 & SMBus Multi-Touch Precision Touchpad.
+8. **`RealtekAlcAudioDriver`**: Realtek ALC892/ALC1220 High Definition Audio Codec.
+9. **`RadeonKmsGpuDriver`**: AMD Radeon DRM/KMS Graphics Controller.
+10. **`RaspberryPiGpioMailboxDriver`**: Raspberry Pi Broadcom BCM2711 GPIO & VideoCore Mailbox.
+11. **`IntelI2cSmbusControllerDriver`**: Intel PCH I2C SMBus System Controller.
+12. **`CanBusSocketDriver`**: Controller Area Network (CAN) Socket Controller.
+13. **`UsbMassStorageBotDriver`**: USB Mass Storage Bulk-Only Transport (BOT) Flash Drive Controller.
+14. **`UsbGamepadControllerDriver`**: USB HID Gamepad & Joystick Input Controller.
+15. **`BluetoothExternalGattHidDriver`**: Bluetooth 5.0 LE GATT HID Wireless Keyboard & Mouse Controller.
+16. **`ThunderboltExternalDisplayDriver`**: Intel Thunderbolt 3/4 PCIe & DisplayPort Hot-Plug Controller.
+17. **`SoundBlaster16IsaDriver`**: Sound Blaster 16 ISA Legacy Audio DSP Codec.
+18. **`ThreeCom3c59xEthernetDriver`**: 3Com 3c59x Fast EtherLink XL ISA/PCI Ethernet NIC.
+19. **`FloppyDiskControllerDriver`**: Intel 82077AA Floppy Disk Controller (FDC).
+20. **`IntelXeArcGpuDriver`**: Intel Xe Arc Alchemist/Battlemage DRM/KMS Discrete GPU.
+21. **`Cxl3MemoryExpanderDriver`**: Compute Express Link (CXL 3.0) PCIe Type-3 Memory Expander.
+22. **`Ch340ExternalSerialDriver`**: WCH CH340/CH341 USB-to-Serial TTL Adapter.
+23. **`EdidMonitorDdcDisplayDriver`**: EDID Monitor DDC/CI Display & Backlight Controller.
+24. **`PcSpeakerInternalAudioDriver`**: PC Speaker & Internal Beeper Driver.
+25. **`UvcWebcamVideoCameraDriver`**: USB Video Class (UVC) HD Webcam Driver.
+26. **`IntelBtUsbBluetoothDriver`**: Intel/Realtek Bluetooth 5.3 HCI USB Driver.
+27. **`HidPrecisionTouchpadDriver`**: HID Precision Touchpad & Multi-Button Gaming Mouse Driver.
+28. **`NvmePCIeHostControllerDriver`**: NVMe v1.4 High-Speed PCIe Storage Controller.
+
+---
+
+## 🚀 5. SigmaOS Strategic Supremacy Over Linux & BSD Distributions
+
+SigmaOS achieves strategic and technical supremacy over conventional Linux and BSD distributions through 10 architectural pillars:
+
+1. **Zero-Dependency Safe Rust Core (`klib`)**: Eliminates C memory safety bugs (`malloc`/`free`, double free, use-after-free, buffer overflows) by implementing safe Rust `klib` primitives without external crate dependencies.
+2. **Omnipresent Cross-Distro Subsystem Interoperability**: Seamlessly executes applications and workflows designed for 25 distro modes across 32 core subsystems via `SovereignUniversalDistroBridge`.
+3. **Advanced Scheduling (EEVDF + CachyOS BORE)**: Combines EEVDF (Earliest Eligible Virtual Deadline First) latency guarantees with BORE (Burst-Oriented Response Enhancer) interactive task prioritization for ultra-responsive desktop and server performance.
+4. **Zero-Copy Programmable XDP Networking**: Bypasses traditional kernel network stack bottlenecks using eBPF/XDP sockmaps and UMEM ring buffers for line-rate packet throughput.
+5. **Modern CoW Filesystem Parity (`bcachefs` + ZFS ARC)**: Combines `bcachefs` CoW extent encryption, reflink, and CRC32c checksums with FreeBSD ZFS Adaptive Replacement Cache (ARC) ghost adaptation.
+6. **Hardware Driver Breadth**: Integrates 28 distro-expansion drivers implementing a unified `PeripheralDevice` interface across modern PCIe, NVMe, Thunderbolt, Bluetooth 5.3, and legacy ISA/floppy hardware.
+7. **Universal Package Management (`sigpkg`)**: Automatically parses, translates, and executes triggers for 10+ package formats (`.deb`, `.rpm`, `PKGBUILD`, `.ebuild`, `.apk`, `.xbps`, `.hpkg`, `nix`, `flatpak`, `snap`).
+8. **Defense-in-Depth Capability Sandboxing**: Integrates OpenBSD `pledge`/`unveil`, FreeBSD Capsicum rights, Linux Landlock LSM, and BPF-LSM for fine-grained capability mode enforcement.
+9. **Formal Memory Hardening (KARL + PaX W^X)**: Relinks kernel sections at boot (Kernel Address Randomized Link) and enforces strict W^X (Write XOR Execute) page perms to defeat zero-day exploitation.
+10. **Autonomous AI OS Management (`QwenPaw` + `Herdr`)**: Built-in AI agentic runtime orchestrating system tasks, performance tuning, and diagnostic recovery natively inside the OS.
+
+---
+
+## 📐 7. Detailed Engineering Directives & Operational Guidelines
+
 1. **Zero-Dependency Core (`#![no_std]`) Rule**:
    - Kernel subsystems and `klib` utilities MUST NOT depend on external third-party C/C++ libraries or non-`alloc` crates. Use native safe Rust primitives in `src/klib/`.
 
 2. **Cross-Distro Mode Interoperability**:
    - When introducing new kernel features or syscalls, add corresponding dispatch branches in `SovereignUniversalDistroBridge::dispatch_cross_subsystem_operation` to support all Linux and BSD distro modes.
 
-3. **Capability & Sandboxing First**:
-   - Restrict process permissions using OpenBSD `pledge`/`unveil` or FreeBSD Capsicum descriptor rights before executing untrusted foreign code.
+2. **Cross-Distro Subsystem Parity Mandate**:
+   - Every newly implemented distro feature MUST register a corresponding dispatch branch inside `SovereignUniversalDistroBridge::dispatch_cross_subsystem_operation` across all 32 core subsystem categories.
+
+3. **Memory Safety & Execution Protection**:
+   - Memory allocators MUST enforce strict W^X (Write XOR Execute) page permission boundaries (`SovereignKaslrWxAllocator`). Executable pages cannot be writable simultaneously.
+   - Userland stack validation MUST verify stack pointers against registered `MAP_STACK` regions (`OpenBsdRetguardEngine`).
 
 4. **Testing & Verification**:
    - Every distro-inspired component MUST include unit tests executable via `./run_sigma_tests.sh`.
+
+4. **Storage Reliability & Self-Healing Protocol**:
+   - All multi-device array writes MUST compute 64-bit Fletcher-4 or CRC32c checksums. Scrub routines MUST automatically heal corrupted blocks from healthy mirrors or parity chunks (`SovereignRaidSelfHealer`).
+
+5. **Hermetic & Pure Package Store Directives**:
+   - Package managers MUST verify dependency closure completeness (`HermeticStoreClosureEngine`). A package cannot be committed to the store unless 100% of its transitive dependencies are pinned.
 
 ---
 
