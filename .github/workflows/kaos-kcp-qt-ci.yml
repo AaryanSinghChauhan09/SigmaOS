@@ -1,4 +1,7 @@
 name: KaOS KCP & Plasma Desktop Integration CI
+permissions:
+  contents: read
+
 
 on:
   push:
@@ -9,6 +12,7 @@ on:
 jobs:
   kaos-kcp:
     name: KaOS Community Packages (KCP) & Plasma Desktop Engine Audit
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

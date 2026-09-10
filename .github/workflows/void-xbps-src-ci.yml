@@ -1,4 +1,7 @@
 name: Void Linux XBPS-src & Runit Service CI
+permissions:
+  contents: read
+
 
 on:
   push:
@@ -9,6 +12,7 @@ on:
 jobs:
   void-xbps-runit:
     name: Void Linux XBPS-src Package & Runit Service Supervision Matrix
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
