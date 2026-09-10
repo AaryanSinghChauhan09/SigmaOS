@@ -176,7 +176,6 @@ pub struct NetBsdPkgsrcManifest {
 }
 
 
-
 /// Description of openSUSE Zypper RPM spec/manifest
 #[derive(Debug, Clone)]
 pub struct ZypperSpecManifest {
