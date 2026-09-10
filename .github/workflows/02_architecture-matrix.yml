@@ -1,0 +1,132 @@
+name: Architecture Matrix Build
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - '.github/workflows/02_architecture-matrix.yml'
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 3 * * 0'  # Weekly
+
+jobs:
+  architecture-build:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # x86-64 Variants
+          - arch: x86_64
+            target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+            rustflags: "-C target-feature=+cmpxchg16b"
+            llvm-config: "llvm-config"
+
+          - arch: x86_64-v2
+            target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+            rustflags: "-C target-cpu=x86-64-v2"
+            llvm-config: "llvm-config"
+
+          - arch: x86_64-v3
+            target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+            rustflags: "-C target-cpu=x86-64-v3"
+            llvm-config: "llvm-config"
+
+          - arch: x86_64-v4
+            target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+            rustflags: "-C target-cpu=x86-64-v4"
+            llvm-config: "llvm-config"
+
+          # ARM64
+          - arch: aarch64
+            target: aarch64-unknown-linux-gnu
+            runner: ubuntu-latest
+            rustflags: "-C target-feature=+neon"
+            llvm-config: "llvm-config"
+
+          # ARM32
+          - arch: armv7
+            target: armv7-unknown-linux-gnueabihf
+            runner: ubuntu-latest
+            rustflags: "-C target-feature=+v7,+neon"
+            llvm-config: "llvm-config"
+
+          # RISC-V 64
+          - arch: riscv64
+            target: riscv64gc-unknown-linux-gnu
+            runner: ubuntu-latest
+            rustflags: "-C target-feature=+a,+c,+d,+f,+m"
+            llvm-config: "llvm-config"
+
+          # PowerPC 64
+          - arch: powerpc64
+            target: powerpc64-unknown-linux-gnu
+            runner: ubuntu-latest
+            rustflags: "-C target-cpu=pwr8"
+            llvm-config: "llvm-config"
+
+          # s390x (IBM mainframe)
+          - arch: s390x
+            target: s390x-unknown-linux-gnu
+            runner: ubuntu-latest
+            rustflags: "-C target-feature=+arch11"
+            llvm-config: "llvm-config"
+
+          # LoongArch64
+          - arch: loongarch64
+            target: loongarch64-unknown-linux-gnu
+            runner: ubuntu-latest
+            rustflags: "-C target-cpu=la464"
+            llvm-config: "llvm-config"
+
+          # MIPS64
+          - arch: mips64
+            target: mips64-unknown-linux-gnuabi64
+            runner: ubuntu-latest
+            rustflags: "-C target-feature=+mips64r2"
+            llvm-config: "llvm-config"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Install cross-compilation tools
+        run: |
+          cargo install cross
+
+      - name: Build for ${{ matrix.arch }}
+        env:
+          RUSTFLAGS: ${{ matrix.rustflags }}
+        run: |
+          cross build --target ${{ matrix.target }} --release
+
+      - name: Test for ${{ matrix.arch }} (native only)
+        if: matrix.arch == 'x86_64'
+        run: |
+          cargo test --target ${{ matrix.target }} --release
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ matrix.arch }}
+          path: target/${{ matrix.target }}/release/
+
+      - name: Report status
+        if: always()
+        run: |
+          echo "Build for ${{ matrix.arch }}: ${{ job.status }}"

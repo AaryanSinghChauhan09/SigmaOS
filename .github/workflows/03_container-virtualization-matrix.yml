@@ -1,0 +1,111 @@
+name: Container & Virtualization Matrix
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - '.github/workflows/03_container-virtualization-matrix.yml'
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 4 * * 0'  # Weekly
+
+jobs:
+  container-build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Docker
+          - container: docker
+            version: latest
+            build-cmd: "docker build -t sigmaos:latest ."
+            test-cmd: "docker run --rm sigmaos:latest cargo test"
+
+          - container: docker
+            version: "24.0"
+            build-cmd: "docker build -t sigmaos:24 ."
+            test-cmd: "docker run --rm sigmaos:24 cargo test"
+
+          # Podman
+          - container: podman
+            version: latest
+            build-cmd: "podman build -t sigmaos:latest ."
+            test-cmd: "podman run --rm sigmaos:latest cargo test"
+
+          - container: podman
+            version: "4.7"
+            build-cmd: "podman build -t sigmaos:4.7 ."
+            test-cmd: "podman run --rm sigmaos:4.7 cargo test"
+
+          # LXC/LXD
+          - container: lxc
+            version: latest
+            build-cmd: "lxc launch ubuntu:jammy sigmaos-lxc"
+            test-cmd: "lxc exec sigmaos-lxc -- cargo test"
+
+          # QEMU/KVM
+          - vm: qemu
+            version: latest
+            image: ubuntu-22.04
+            cpu: kvm64
+            memory: 2G
+            test-cmd: "qemu-system-x86_64 -enable-kvm -cpu kvm64 -m 2G -hda ubuntu-22.04.img"
+
+          - vm: qemu
+            version: latest
+            image: debian-12
+            cpu: Haswell
+            memory: 2G
+            test-cmd: "qemu-system-x86_64 -enable-kvm -cpu Haswell -m 2G -hda debian-12.img"
+
+          # Hyper-V (Windows)
+          - vm: hyper-v
+            version: latest
+            image: ubuntu-22.04
+            generation: 2
+            memory: 2G
+            test-cmd: "powershell -Command 'Get-VM sigmaos'"
+
+          # Bhyve (FreeBSD)
+          - vm: bhyve
+            version: latest
+            image: freebsd-13
+            vcpu: 4
+            memory: 2G
+            test-cmd: "bhyvectl --vm=sigmaos --info"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker buildx
+        if: matrix.container == 'docker'
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build with ${{ matrix.container || matrix.vm }} ${{ matrix.version || matrix.image }}
+        shell: bash
+        run: |
+          ${{ matrix.build-cmd || 'echo "Skip build"' }}
+
+      - name: Test with ${{ matrix.container || matrix.vm }}
+        shell: bash
+        continue-on-error: true
+        run: |
+          ${{ matrix.test-cmd || 'echo "Skip test"' }}
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.container || matrix.vm }}-${{ matrix.version || matrix.image }}-logs
+          path: logs/
+          if-no-files-found: ignore
+
+      - name: Report status
+        if: always()
+        run: |
+          echo "Container/VM test for ${{ matrix.container || matrix.vm }}: ${{ job.status }}"

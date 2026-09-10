@@ -1,0 +1,159 @@
+name: Build Optimization Matrix
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - '.github/workflows/06_build-optimization-matrix.yml'
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 7 * * 0'  # Weekly
+
+jobs:
+  build-optimization:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Basic release build
+          - optimization: release
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: ""
+
+          # LTO (Link-Time Optimization)
+          - optimization: lto
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C lto=fat -C embed-bitcode=yes"
+
+          # Thin LTO
+          - optimization: thin-lto
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C lto=thin"
+
+          # PGO (Profile-Guided Optimization)
+          - optimization: pgo-instrument
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C llvm-args=-pgo-warn-missing-function"
+
+          - optimization: pgo-optimize
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C llvm-args=-use-sample-profile=samples.prof"
+
+          # BOLT (Post-link optimization)
+          - optimization: bolt
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C relocation-model=pic"
+
+          # Codegen units optimization
+          - optimization: codegen-units-1
+            profile: release
+            build-cmd: "cargo build --release -j 1"
+            rustflags: "-C codegen-units=1"
+
+          - optimization: codegen-units-16
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C codegen-units=16"
+
+          # Optimization levels
+          - optimization: opt-level-0
+            profile: custom
+            build-cmd: "cargo build --release"
+            rustflags: "-C opt-level=0"
+
+          - optimization: opt-level-2
+            profile: custom
+            build-cmd: "cargo build --release"
+            rustflags: "-C opt-level=2"
+
+          - optimization: opt-level-3
+            profile: custom
+            build-cmd: "cargo build --release"
+            rustflags: "-C opt-level=3"
+
+          - optimization: opt-level-z
+            profile: custom
+            build-cmd: "cargo build --release"
+            rustflags: "-C opt-level=z"
+
+          - optimization: opt-level-s
+            profile: custom
+            build-cmd: "cargo build --release"
+            rustflags: "-C opt-level=s"
+
+          # Vectorization
+          - optimization: vectorization-avx2
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C target-feature=+avx2"
+
+          - optimization: vectorization-avx512
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C target-feature=+avx512f,+avx512cd,+avx512bw,+avx512dq,+avx512vl"
+
+          # Debug info optimization
+          - optimization: debuginfo-minimal
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C debuginfo=1"
+
+          - optimization: debuginfo-full
+            profile: release
+            build-cmd: "cargo build --release"
+            rustflags: "-C debuginfo=2"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install LLVM tools
+        run: |
+          rustup component add llvm-tools-preview
+
+      - name: Build with ${{ matrix.optimization }}
+        env:
+          RUSTFLAGS: ${{ matrix.rustflags }}
+        run: |
+          ${{ matrix.build-cmd }}
+
+      - name: Analyze binary
+        run: |
+          echo "Binary size:" && du -sh target/release/sigmaos || true
+          echo "Binary sections:" && objdump -h target/release/sigmaos || true
+
+      - name: Run benchmark
+        continue-on-error: true
+        run: |
+          cargo bench --release || true
+
+      - name: Upload optimization report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: optimization-${{ matrix.optimization }}
+          path: |
+            target/release/
+            bench_results.json
+          if-no-files-found: ignore
+
+      - name: Report status
+        if: always()
+        run: |
+          echo "Optimization ${{ matrix.optimization }}: ${{ job.status }}"

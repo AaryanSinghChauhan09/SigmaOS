@@ -1,0 +1,135 @@
+name: Distro CI Matrix Build
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - '.github/workflows/01_distro-ci-matrix.yml'
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * 0'  # Weekly
+
+jobs:
+  distro-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Alpine Linux
+          - distro: alpine
+            version: latest
+            container: alpine:latest
+            package-manager: apk
+            install-deps: "apk add --no-cache build-base rust cargo git"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
+
+          # Arch Linux
+          - distro: arch
+            version: latest
+            container: archlinux:latest
+            package-manager: pacman
+            install-deps: "pacman -Sy --noconfirm base-devel rust git"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
+
+          # Debian Stable
+          - distro: debian
+            version: bookworm
+            container: debian:bookworm
+            package-manager: apt
+            install-deps: "apt-get update && apt-get install -y build-essential rustc cargo git"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
+
+          # Fedora
+          - distro: fedora
+            version: latest
+            container: fedora:latest
+            package-manager: dnf
+            install-deps: "dnf install -y gcc rust cargo git"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
+
+          # Ubuntu LTS
+          - distro: ubuntu
+            version: jammy
+            container: ubuntu:jammy
+            package-manager: apt
+            install-deps: "apt-get update && apt-get install -y build-essential rustc cargo git"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
+
+          # openSUSE
+          - distro: opensuse
+            version: latest
+            container: opensuse/leap:latest
+            package-manager: zypper
+            install-deps: "zypper install -y gcc rust cargo git"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
+
+          # Gentoo
+          - distro: gentoo
+            version: latest
+            container: gentoo/stage3:latest
+            package-manager: emerge
+            install-deps: "emerge --sync && emerge sys-devel/gcc dev-lang/rust dev-vcs/git"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
+
+          # Void Linux
+          - distro: void
+            version: latest
+            container: voidlinux/voidlinux:latest
+            package-manager: xbps
+            install-deps: "xbps-install -Sy base-devel rust cargo git"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
+
+          # NixOS
+          - distro: nixos
+            version: latest
+            container: nixos/nix:latest
+            package-manager: nix
+            install-deps: "nix-shell -p rustup cargo git gcc"
+            build-cmd: "cargo build --release"
+            test-cmd: "cargo test --release"
+
+    container:
+      image: ${{ matrix.container }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (${{ matrix.distro }})
+        shell: bash
+        run: |
+          ${{ matrix.install-deps }}
+
+      - name: Build (${{ matrix.distro }})
+        shell: bash
+        run: |
+          ${{ matrix.build-cmd }}
+
+      - name: Test (${{ matrix.distro }})
+        shell: bash
+        run: |
+          ${{ matrix.test-cmd }}
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ matrix.distro }}-${{ matrix.version }}
+          path: target/release/
+
+      - name: Report status
+        if: always()
+        run: |
+          echo "Build for ${{ matrix.distro }} ${{ matrix.version }}: ${{ job.status }}"

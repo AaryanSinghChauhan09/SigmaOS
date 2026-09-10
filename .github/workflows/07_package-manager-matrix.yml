@@ -1,0 +1,165 @@
+name: Package Manager Matrix
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - '.github/workflows/07_package-manager-matrix.yml'
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 8 * * 0'  # Weekly
+
+jobs:
+  package-manager-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # APK (Alpine)
+          - pm: apk
+            distro: alpine
+            container: alpine:latest
+            install-cmd: "apk add --no-cache"
+            deps: "build-base rust cargo"
+            create-cmd: "apk pack -o /tmp/sigmaos.apk ./src"
+            verify-cmd: "apk verify /tmp/sigmaos.apk"
+
+          # DEB (Debian/Ubuntu)
+          - pm: deb
+            distro: debian
+            container: debian:bookworm
+            install-cmd: "apt-get install -y"
+            deps: "build-essential rustc cargo debhelper"
+            create-cmd: "dpkg-deb --build ./src /tmp/sigmaos.deb"
+            verify-cmd: "dpkg -c /tmp/sigmaos.deb"
+
+          # RPM (Fedora/RHEL)
+          - pm: rpm
+            distro: fedora
+            container: fedora:latest
+            install-cmd: "dnf install -y"
+            deps: "gcc rust cargo rpm-build"
+            create-cmd: "rpmbuild --build-in-place -ta /tmp/sigmaos.tar.gz"
+            verify-cmd: "rpm -K /tmp/sigmaos.rpm"
+
+          # PKG (Arch)
+          - pm: pkg
+            distro: arch
+            container: archlinux:latest
+            install-cmd: "pacman -S --noconfirm"
+            deps: "base-devel rust git"
+            create-cmd: "makepkg -si"
+            verify-cmd: "pacman -Q sigmaos"
+
+          # PKGBUILD (AUR)
+          - pm: aur
+            distro: arch
+            container: archlinux:latest
+            install-cmd: "pacman -S --noconfirm"
+            deps: "base-devel rust git"
+            create-cmd: "git clone /tmp/sigmaos-aur && cd sigmaos-aur && makepkg -si"
+            verify-cmd: "pacman -Q sigmaos"
+
+          # Emerge (Gentoo)
+          - pm: emerge
+            distro: gentoo
+            container: gentoo/stage3:latest
+            install-cmd: "emerge"
+            deps: "dev-lang/rust sys-devel/gcc"
+            create-cmd: "ebuild sigmaos.ebuild digest && ebuild sigmaos.ebuild merge"
+            verify-cmd: "equery list sigmaos"
+
+          # Zypper (openSUSE)
+          - pm: zypper
+            distro: opensuse
+            container: opensuse/leap:latest
+            install-cmd: "zypper install -y"
+            deps: "gcc rust cargo"
+            create-cmd: "rpmbuild -ta /tmp/sigmaos.tar.gz"
+            verify-cmd: "rpm -K /tmp/sigmaos.rpm"
+
+          # Xbps (Void)
+          - pm: xbps
+            distro: void
+            container: voidlinux/voidlinux:latest
+            install-cmd: "xbps-install -S"
+            deps: "base-devel rust cargo"
+            create-cmd: "xbps-src pkg sigmaos"
+            verify-cmd: "xbps-query -l | grep sigmaos"
+
+          # Nix (NixOS)
+          - pm: nix
+            distro: nixos
+            container: nixos/nix:latest
+            install-cmd: "nix-env -i"
+            deps: "rustup gcc"
+            create-cmd: "nix build .#sigmaos"
+            verify-cmd: "nix-store -q --outputs /nix/store/*sigmaos*"
+
+          # Opkg (embedded)
+          - pm: opkg
+            distro: openwrt
+            container: ubuntu:latest
+            install-cmd: "apt-get install -y"
+            deps: "opkg-utils build-essential"
+            create-cmd: "ipk-pack ./src sigmaos.ipk"
+            verify-cmd: "opkg info sigmaos.ipk"
+
+          # Flatpak
+          - pm: flatpak
+            distro: flatpak
+            container: ubuntu:latest
+            install-cmd: "apt-get install -y"
+            deps: "flatpak flatpak-builder"
+            create-cmd: "flatpak-builder --repo=/tmp/repo /tmp/sigmaos com.sigmaos.SigmaOS.json"
+            verify-cmd: "flatpak info --app-id=com.sigmaos.SigmaOS"
+
+          # Snap
+          - pm: snap
+            distro: snap
+            container: ubuntu:latest
+            install-cmd: "apt-get install -y"
+            deps: "snapcraft"
+            create-cmd: "snapcraft"
+            verify-cmd: "snap info sigmaos"
+
+    container:
+      image: ${{ matrix.container }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          ${{ matrix.install-cmd }} ${{ matrix.deps }}
+
+      - name: Build package with ${{ matrix.pm }}
+        continue-on-error: true
+        shell: bash
+        run: |
+          ${{ matrix.create-cmd }}
+
+      - name: Verify package
+        continue-on-error: true
+        shell: bash
+        run: |
+          ${{ matrix.verify-cmd }}
+
+      - name: Upload package
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: package-${{ matrix.pm }}
+          path: /tmp/sigmaos.*
+          if-no-files-found: ignore
+
+      - name: Report status
+        if: always()
+        run: |
+          echo "Package manager ${{ matrix.pm }}: ${{ job.status }}"

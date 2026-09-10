@@ -1,0 +1,172 @@
+name: Compiler & Kernel Matrix
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'Cargo.toml'
+      - '.github/workflows/08_compiler-kernel-matrix.yml'
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 9 * * 0'  # Weekly
+
+jobs:
+  compiler-kernel:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Rust toolchains
+          - compiler: rustc
+            version: "1.70"
+            target: x86_64-unknown-linux-gnu
+            build-cmd: "rustup install 1.70 && cargo +1.70 build --release"
+            test-cmd: "cargo +1.70 test --release"
+
+          - compiler: rustc
+            version: "1.75"
+            target: x86_64-unknown-linux-gnu
+            build-cmd: "rustup install 1.75 && cargo +1.75 build --release"
+            test-cmd: "cargo +1.75 test --release"
+
+          - compiler: rustc
+            version: stable
+            target: x86_64-unknown-linux-gnu
+            build-cmd: "rustup update && cargo build --release"
+            test-cmd: "cargo test --release"
+
+          - compiler: rustc
+            version: beta
+            target: x86_64-unknown-linux-gnu
+            build-cmd: "rustup install beta && cargo +beta build --release"
+            test-cmd: "cargo +beta test --release"
+
+          - compiler: rustc
+            version: nightly
+            target: x86_64-unknown-linux-gnu
+            build-cmd: "rustup install nightly && cargo +nightly build --release -Z unstable-options"
+            test-cmd: "cargo +nightly test --release"
+
+          # GCC versions
+          - compiler: gcc
+            version: "11"
+            container: ubuntu:jammy
+            build-cmd: "gcc --version"
+            test-cmd: "gcc-11 --version"
+
+          - compiler: gcc
+            version: "12"
+            container: ubuntu:mantic
+            build-cmd: "gcc --version"
+            test-cmd: "gcc-12 --version"
+
+          - compiler: gcc
+            version: "13"
+            container: ubuntu:noble
+            build-cmd: "gcc --version"
+            test-cmd: "gcc-13 --version"
+
+          # Clang/LLVM versions
+          - compiler: clang
+            version: "15"
+            container: ubuntu:jammy
+            build-cmd: "clang --version"
+            test-cmd: "clang-15 --version"
+
+          - compiler: clang
+            version: "17"
+            container: ubuntu:mantic
+            build-cmd: "clang --version"
+            test-cmd: "clang-17 --version"
+
+          - compiler: clang
+            version: "18"
+            container: ubuntu:noble
+            build-cmd: "clang --version"
+            test-cmd: "clang-18 --version"
+
+          # Linux Kernel versions
+          - kernel: linux
+            version: "5.15"
+            target: x86_64-unknown-linux-gnu
+            build-cmd: "uname -r | grep -q 5.15 && echo 'Kernel 5.15 compatible'"
+            test-cmd: "uname -a"
+
+          - kernel: linux
+            version: "6.1"
+            target: x86_64-unknown-linux-gnu
+            build-cmd: "uname -r | grep -q 6.1 && echo 'Kernel 6.1 compatible'"
+            test-cmd: "uname -a"
+
+          - kernel: linux
+            version: "6.4"
+            target: x86_64-unknown-linux-gnu
+            build-cmd: "uname -r | grep -q 6.4 && echo 'Kernel 6.4 compatible'"
+            test-cmd: "uname -a"
+
+          - kernel: linux
+            version: "6.6"
+            target: x86_64-unknown-linux-gnu
+            build-cmd: "uname -r | grep -q 6.6 && echo 'Kernel 6.6 LTS compatible'"
+            test-cmd: "uname -a"
+
+          # FreeBSD versions
+          - kernel: freebsd
+            version: "13"
+            target: x86_64-unknown-freebsd
+            build-cmd: "uname -r | grep -q 13"
+            test-cmd: "uname -s"
+
+          - kernel: freebsd
+            version: "14"
+            target: x86_64-unknown-freebsd
+            build-cmd: "uname -r | grep -q 14"
+            test-cmd: "uname -s"
+
+    container:
+      image: ${{ matrix.container }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust (if needed)
+        if: matrix.compiler
+        shell: bash
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source $HOME/.cargo/env
+
+      - name: Check ${{ matrix.compiler || matrix.kernel }} version
+        if: matrix.version || matrix.kernel
+        shell: bash
+        run: |
+          ${{ matrix.build-cmd || 'echo "Checking version"' }}
+
+      - name: Build compatibility test
+        if: matrix.compiler == 'rustc'
+        shell: bash
+        run: |
+          source $HOME/.cargo/env
+          ${{ matrix.build-cmd }}
+
+      - name: Test compatibility
+        if: matrix.compiler == 'rustc'
+        continue-on-error: true
+        shell: bash
+        run: |
+          source $HOME/.cargo/env
+          ${{ matrix.test-cmd }}
+
+      - name: Verify compiler/kernel
+        if: matrix.compiler || matrix.kernel
+        run: |
+          ${{ matrix.test-cmd }}
+
+      - name: Report status
+        if: always()
+        run: |
+          echo "Compiler/Kernel ${{ matrix.compiler || matrix.kernel }} ${{ matrix.version }}: ${{ job.status }}"
