@@ -9,18 +9,20 @@ SigmaOS is the world’s first **sovereign operating system**, engineered from t
 - 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
 - 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
 - ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
+- 📋 **Linux Distro Feature Parity Checklist**: [docs/LINUX_DISTRO_PARITY_CHECKLIST.md](docs/LINUX_DISTRO_PARITY_CHECKLIST.md)
+- ⚡ **Strategy to Surpass & Defeat Linux & BSD**: [docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md](docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md)
 - 🗺️ **Master Development Roadmap**: [FUTURE-DEVELOPMENT-ROADMAP.md](FUTURE-DEVELOPMENT-ROADMAP.md)
-- 🏆 **Master Strategic Plan (Defeating Linux & BSD)**: [docs/SIGMAOS_FUTURE_ROADMAP_DEFEATING_LINUX_AND_BSD.md](docs/SIGMAOS_FUTURE_ROADMAP_DEFEATING_LINUX_AND_BSD.md)
+- 👑 **Strategy to Surpass & Defeat Linux/BSD**: [docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md](docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md)
 
 ---
 
 ## 🧩 Core Architecture & Features
-- **Pure Safe-Rust `#![no_std]` Microkernel**: 100% memory-safe microkernel architecture engineered for zero buffer overflows or data races.
-- **Twelve System Shards (`S-SHARDS`)**: Modular architecture providing native `klib` utilities to eliminate external application dependencies.
-- **Universal Foreign Package Absorption**: Native transpilation of foreign package formats (.deb, .rpm, PKGBUILD, .apk, .xbps, .ebuild, .hpkg) without virtual machines.
-- **Sub-5µs Real-Time RTLane Scheduler**: Guaranteed preemption latency for real-time, interactive, and AI workloads.
-- **Native Post-Quantum Cryptography (PQC)**: Built-in Kyber-1024 key exchange and Dilithium-5 cryptographic attestation.
-- **Zenith Single-Pass Desktop Compositor**: Unified Hyprland-style window tiling, Quickshell widgets, Zorin layout switching, and Omarchy theme studio.
+- **Boot to Web**: Minimal Linux (Buildroot) base, boots directly into Chromium in ~3s.
+- **Browser as Shell**: Workspaces, window management, and hardware interfaces powered by web apps.
+- **Unix Philosophy for Web Apps**: PWAs gain raw access to pipes, spawn, mmap, and `/dev`.
+- **Zero-Bloat Package Management**: Alpine packages installed directly via browser APIs.
+- **Strict Capabilities System**: Websites must explicitly request hardware/file access.
+- **Safe-Rust 12-Shard Microkernel**: Twelve shard taxonomy replacing 500+ legacy apps with native abstractions.
 
 ---
 
