@@ -175,6 +175,7 @@ pub struct NetBsdPkgsrcManifest {
     pub depends: Vec<String>,
 }
 
+
 /// Description of openSUSE Zypper RPM spec/manifest
 #[derive(Debug, Clone)]
 pub struct ZypperSpecManifest {
