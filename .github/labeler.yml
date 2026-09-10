@@ -7,10 +7,10 @@ rust:
 documentation:
   - changed-files:
       - any-glob-to-any-file:
+          - '**/*.md'
           - 'docs/**/*'
           - 'wiki/**/*'
           - 'wiki_repo/**/*'
-          - '*.md'
 
 workflows:
   - changed-files:

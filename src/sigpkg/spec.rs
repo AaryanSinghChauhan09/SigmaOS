@@ -1,11 +1,8 @@
-
 /// OOP-based SigPkg Package Specification for SigmaOS
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
 use std::boxed::Box;
-
-
 
 /// Package version
 #[repr(C)]
@@ -473,17 +470,26 @@ impl PackageManager for SimplePackageManager {
         let dependencies = package.dependencies();
 
         for dep in dependencies {
+            // Bolt performance optimization: hoist dependency name slicing outside the inner
+            // package candidate loop. Reduces zero-byte linear scans from O(D * P) to O(D).
+            let dep_name = dep.name;
+            let dep_len = dep_name
+                .iter()
+                .position(|&b| b == 0)
+                .unwrap_or(dep_name.len());
+            let dep_slice = &dep_name[..dep_len];
+
             let mut found = false;
             for package_option in &self.packages {
                 if let Some(ref pkg) = *package_option {
                     let p_ref: &dyn Package = pkg.as_ref();
-                    let dep_name = dep.name;
                     let pkg_name = p_ref.name();
+                    let pkg_len = pkg_name
+                        .iter()
+                        .position(|&b| b == 0)
+                        .unwrap_or(pkg_name.len());
 
-                    let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(64);
-                    let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(64);
-
-                    if &dep_name[..dep_len] == &pkg_name[..pkg_len] {
+                    if dep_slice == &pkg_name[..pkg_len] {
                         found = true;
                         break;
                     }
@@ -616,7 +622,10 @@ impl UniversalPackageType {
             Some(UniversalPackageType::Ebuild)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(UniversalPackageType::TarArchive)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(UniversalPackageType::Txz)
         } else if normalized.ends_with(".xbps") {
             Some(UniversalPackageType::Xbps)
@@ -970,5 +979,53 @@ pub struct SignedReleaseManifest {
 impl SignedReleaseManifest {
     pub fn is_trusted(&self) -> bool {
         self.signatures_obtained >= self.required_signatures
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_resolve_dependencies_success() {
+        let mut mgr = SimplePackageManager::new(ManagerCapability::full());
+
+        let dep_pkg = Box::new(SimplePackage::new(
+            b"libssl",
+            PackageVersion::new(1, 1, 1),
+            PackageCapability::full(),
+        ));
+        mgr.add_package(dep_pkg).unwrap();
+
+        let mut app_pkg = SimplePackage::new(
+            b"nginx",
+            PackageVersion::new(1, 24, 0),
+            PackageCapability::full(),
+        );
+        app_pkg.add_dependency(b"libssl", b">=1.0.0");
+
+        let resolved = mgr.resolve_dependencies(&app_pkg).unwrap();
+        assert_eq!(resolved.len(), 1);
+        let dep_name = resolved[0].name;
+        let dep_len = dep_name
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(dep_name.len());
+        assert_eq!(&dep_name[..dep_len], b"libssl");
+    }
+
+    #[test]
+    fn test_resolve_dependencies_missing() {
+        let mgr = SimplePackageManager::new(ManagerCapability::full());
+
+        let mut app_pkg = SimplePackage::new(
+            b"nginx",
+            PackageVersion::new(1, 24, 0),
+            PackageCapability::full(),
+        );
+        app_pkg.add_dependency(b"missing_dep", b">=1.0.0");
+
+        let result = mgr.resolve_dependencies(&app_pkg);
+        assert!(matches!(result, Err(PackageError::DependencyNotFound)));
     }
 }
