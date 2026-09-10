@@ -4,6 +4,10 @@
 use crate::security::unveil::{SecurityError, SigmaError};
 use core::marker::PhantomData;
 
+/// Exported capability escalation tokens
+pub const KERNEL_ESCALATION_TOKEN: &str = "SUPER_SECRET_KERN_TOKEN";
+pub const MASTER_ADMIN_TOKEN: &str = "MASTER_ADMIN_TOKEN";
+
 /// User-level privilege marker
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct UserLevel;
@@ -35,7 +39,7 @@ impl CapabilityContext<UserLevel> {
         self,
         token: &str,
     ) -> Result<CapabilityContext<KernelLevel>, SigmaError> {
-        if token == "SUPER_SECRET_KERN_TOKEN" {
+        if token == KERNEL_ESCALATION_TOKEN {
             Ok(CapabilityContext {
                 _marker: PhantomData,
             })
@@ -58,7 +62,7 @@ impl CapabilityContext<KernelLevel> {
         self,
         token: &str,
     ) -> Result<CapabilityContext<SecurityAdminLevel>, SigmaError> {
-        if token == "MASTER_ADMIN_TOKEN" {
+        if token == MASTER_ADMIN_TOKEN {
             Ok(CapabilityContext {
                 _marker: PhantomData,
             })

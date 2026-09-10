@@ -5,13 +5,15 @@ rust:
 
 documentation:
   - changed-files:
-      - any-glob-to-any-file: ['**/*.md', 'docs/**', 'wiki/**', 'wiki_repo/**']
+      - any-glob-to-any-file:
+          - '**/*.md'
+          - 'docs/**'
+          - 'wiki/**'
+          - 'wiki_repo/**'
 
 workflows:
   - changed-files:
       - any-glob-to-any-file: '.github/workflows/*'
-
-# GitHub Labeler Configuration for SigmaOS
 
 core-kernel:
   - changed-files:
@@ -33,13 +35,6 @@ drivers-hal:
 security:
   - changed-files:
       - any-glob-to-any-file: 'src/security/**/*'
-
-documentation:
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'docs/**/*'
-          - 'wiki/**/*'
-          - '*.md'
 
 "area: kernel":
   - src/kernel/**/*
