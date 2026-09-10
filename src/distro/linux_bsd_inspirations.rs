@@ -6665,7 +6665,7 @@ mod tests {
     }
 }
 
-// ==========================================
+
 // ==========================================
 // 40. CROSS-DISTRO IPC, AUTH, SYSCALL & CONTAINER BRIDGES
 // ==========================================
@@ -6794,6 +6794,7 @@ impl SovereignCrossDistroContainerManager {
         Ok(id)
     }
 }
+
 
 /// ============================================================================
 /// 9. Advanced Linux/BSD Distro Innovations Integration

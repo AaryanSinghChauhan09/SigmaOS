@@ -281,15 +281,15 @@ pub enum PackageFormat {
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,      // HPC Spack package (.spack)
-    Conan,      // C/C++ Conan package (.conan)
-    Wheel,      // Python Wheel (.whl)
-    Crate,      // Rust Cargo Crate (.crate)
-    Gem,        // Ruby Gem (.gem)
-    Nupkg,      // .NET NuGet (.nupkg)
-    Vcpkg,      // C++ vcpkg (.vcpkg)
-    NarInfo,    // Nix Store NarInfo (.narinfo)
-    Sysupdate,  // systemd-sysupdate (.sysupdate)
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -1419,7 +1419,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
-            _ => Box::new(DebMetadataAdapter),
+            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
