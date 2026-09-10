@@ -68,9 +68,6 @@ pub mod tools;
 pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
-
-pub mod wiki_distro_ideas_deployment;
-pub use wiki_distro_ideas_deployment::*;
 pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
@@ -161,22 +158,22 @@ pub use security::{
     TPM2_PCR_COUNT,
 };
 pub use unimplemented_features::{
-    AlpineApkPackageIndex, AndroidApexContainerModuleEngine,
+    AlpineApkPackageIndex, Android15PrivateSpaceGovernor, AndroidApexContainerModuleEngine,
     AndroidApexModule, AntiXLowRamSysVInitGovernor, BareMetalPeripheralManager,
     BareMetalUnifiedPeripheral, DeepinDdeControlCenterEngine, DistroWatchParityMetricsHub,
-    DragonFlyHammer2DeduplicationEngine, DragonFlyHammer2FsSnapshot,
+    DragonFlyHammer2DeduplicationEngine, DragonFlyHammer2FsSnapshot, FrappeFrameworkDocTypeEngine,
     GenerationManager, GentooPortageMaskResolver, HaikuMediaTranslator, HaikuTranslatorEngine,
-    Hammer2Block, Jbd2TransactionLedger, LegacyController,
-    MageiaMirror, MageiaSynthesisPackage, MageiaUrpmiMccResolver,
+    Hammer2Block, HwbustersPowerSupplyMonitor, Jbd2TransactionLedger, LegacyController,
+    MacOsSequoiaWindowManager, MageiaMirror, MageiaSynthesisPackage, MageiaUrpmiMccResolver,
     ManjaroHardwareDetectionEngine, ModernController, NetBsdRumpComponentEngine,
     NixOsDeclarativeConfigEngine, PciBusScanner, PhoronixAutomatedBenchmarkEngine,
     PhoronixTestSuiteRunner, PowerState, PuppyLinuxOverlayRamdiskEngine, RavenWidgetState,
     RockyAlmaLinuxEnterpriseLifecycleGovernor, RosettaDynamicBinaryTranslator, RumpComponent,
-    RumpComponentType, SatSolverEngine, SerenityIpcEvent,
+    RumpComponentType, S6ServiceInitSupervisor, SatSolverEngine, SerenityIpcEvent,
     SerenityOsAsyncIpcLoop, SlackwarePackage, SlackwarePkgtoolEngine, SolusEopkgDeltaPackage,
     SolusEopkgRavenGovernor, SovereignIpcBus, SteamOsGamescopeCompositorEngine, TargetArch,
-    TinyCoreModularTczLoader, UdfVm, VoidXbpsContainerEngine,
-    ZorinAppMapping, ZorinWinAppDbRegistry,
+    TinyCoreModularTczLoader, UdfVm, UutilsCoreutilsZeroCopyBuffer, VoidXbpsContainerEngine,
+    WindowsCopilotRecallAuditor, ZorinAppMapping, ZorinWinAppDbRegistry,
 };
 pub use unimplemented_tools::{
     ChainedAuditTrailLedger, DiskImageSignatureCarver, DistroWatchTrendAnalyzerTool,
@@ -437,12 +434,16 @@ pub use community::toolkit::{
 };
 
 pub use tools::{
-    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
-    KdProgressTracker, NodeState as LibNodeState, PhoronixComparisonTable, SigmaAccess as LibSigmaAccess,
-    SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
-    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
-    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
-    SovereignKeyboardTester, SovereignPublicationStdoutEngine, SovereignTableConverter,
-    SovereignTextFixer, SovereignWordCounter, StatusBadgeLevel, StdoutColor, TextFormatStyle,
-    TreeNode, UserIdentity as LibUserIdentity,
+    AccessibilityFeature as LibAccessibilityFeature, AndroidPrivateSpaceEngine,
+    AndroidScrcpyMirrorEngine, AwakeMode, ClusterNode as LibClusterNode, FancyZoneLayoutMode,
+    KdProgressTracker, LocksmithProcess, MacOsAirDropEngine, MacOsSpotlightEngine,
+    NodeState as LibNodeState, PhoronixComparisonTable, PowerToysAwakeEngine,
+    PowerToysFancyZonesEngine, PowerToysFileLocksmith, PowerToysTextExtractorOcr,
+    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
+    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, SovereignAptDuo,
+    SovereignDpkgEtcher, SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
+    SovereignK8sClusterTool, SovereignKeyboardTester, SovereignPublicationStdoutEngine,
+    SovereignTableConverter, SovereignTerraformIacTool, SovereignTextFixer, SovereignWordCounter,
+    SpotlightIndexEntry, StatusBadgeLevel, StdoutColor, TextFormatStyle, TreeNode,
+    UserIdentity as LibUserIdentity, ZoneArea,
 };
