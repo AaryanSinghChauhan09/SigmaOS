@@ -388,14 +388,20 @@ impl WaylandProtocolEngine {
         seat.pointer_x = x;
         seat.pointer_y = y;
 
-        // Find matching surface under pointer
-        let focused_id = self.surfaces.iter().find_map(|s| {
-            if (x as u32) < s.width && (y as u32) < s.height {
-                Some(s.surface_id)
-            } else {
-                None
-            }
-        });
+        // Find matching surface under pointer (enforce non-negative coordinates)
+        let focused_id = if x >= 0.0 && y >= 0.0 {
+            let ux = x as u32;
+            let uy = y as u32;
+            self.surfaces.iter().find_map(|s| {
+                if ux < s.width && uy < s.height {
+                    Some(s.surface_id)
+                } else {
+                    None
+                }
+            })
+        } else {
+            None
+        };
 
         seat.focused_surface_id = focused_id;
         Ok(())
