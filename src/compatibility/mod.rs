@@ -92,7 +92,7 @@ pub use mint_ecosystem::{
     SlickGreeterXappPortal, WarpinatorLanShare, WarpinatorPeer, XappAppsSuite,
 };
 pub use mint::{
-    LinuxMintIntegrationEngine, MintInstallManager, MintUpdatePackage, SoftwarePackage,
+    LinuxMintIntegrationEngine, MintInstallManager, SoftwarePackage,
     UpdateLevel, UpdatePackage, CinnamonDesktopManager, CinnamonPanel, CinnamonPanelPosition,
     XAppPreferences, MintSystemConfig,
 };
@@ -185,7 +185,7 @@ pub use mate_betsy::{
 pub use mint_linux::{
     Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
     MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert, MintReportSystem,
-    MintSoftwareManager, MintTimeshiftEngine, MintUpdatePackage, MintUpdatePackage,
+    MintSoftwareManager, MintTimeshiftEngine, MintUpdatePackage,
     TimeshiftSnapshot,
 };
 
