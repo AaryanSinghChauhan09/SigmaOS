@@ -5,9 +5,6 @@ use std::string::{String, ToString};
 
 #[cfg(not(test))]
 use crate::security::capability::CapabilityToken;
-extern crate alloc;
-
-use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {

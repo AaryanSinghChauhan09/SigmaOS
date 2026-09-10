@@ -3,15 +3,13 @@
 
 use crate::klib::btreemap::BTreeMap;
 
-// Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
+// Zero-dependency architecture: Use std:: primitives for no_std compatibility
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
-use alloc::format;
+use std::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // Test environment compatibility: Use std for testing only
 #[cfg(any(feature = "standalone_test", test))]
@@ -80,8 +78,6 @@ pub enum OfficialArchiveSource {
     Backports,
 }
 
-/// Repository configuration (Debian sources.list inspiration)
-#[derive(Debug, Clone)]
 pub struct Repository {
     pub name: String,
     pub url: String,
@@ -150,12 +146,13 @@ impl RepositoryManager {
 
     /// Select best mirror (Arch rankmirrors inspiration)
     pub fn select_best_mirror(&mut self, repo_name: &str) -> Result<String, String> {
-        if let Some(mirrors) = self.mirrors.get(repo_name) {
+        if let Some(mirrors) = self.mirrors.get_str(repo_name) {
             // Simple selection - in production would test latency
             if let Some(first) = mirrors.first() {
+                let first_clone = first.clone();
                 self.current_mirror
-                    .insert(repo_name.to_string(), first.clone());
-                return Ok(first.clone());
+                    .insert(repo_name.to_string(), first_clone.clone());
+                return Ok(first_clone);
             }
         }
         Err(format!(
@@ -166,7 +163,7 @@ impl RepositoryManager {
 
     /// Get repository URL with mirror substitution
     pub fn get_repository_url(&self, repo_name: &str) -> Result<String, String> {
-        if let Some(mirror) = self.current_mirror.get(repo_name) {
+        if let Some(mirror) = self.current_mirror.get_str(repo_name) {
             if let Some(repo) = self.repositories.iter().find(|r| r.name == repo_name) {
                 return Ok(format!("{}/{}", mirror, repo.name));
             }

@@ -4,12 +4,10 @@
 // Maccache, pacdiff, checkupdates, paclist, updpkgsums, paclog
 
 
-extern crate alloc;
-
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. PacCacheTrimmer (paccache parity)
@@ -145,7 +143,7 @@ impl PacDiffConfigResolver {
         for i in 0..max_lines {
             match (current_lines.get(i), new_lines.get(i)) {
                 (Some(&cur), Some(&nw)) if cur == nw => merged.push(cur.to_string()),
-                (Some(&cur), Some(&nw)) => {
+                (Some(cur), Some(nw)) => {
                     // Line conflict: keep non-commented or new line preference
                     if cur.trim().starts_with('#') && !nw.trim().starts_with('#') {
                         merged.push(nw.to_string());
@@ -153,8 +151,8 @@ impl PacDiffConfigResolver {
                         merged.push(cur.to_string());
                     }
                 }
-                (Some(&cur), None) => merged.push(cur.to_string()),
-                (None, Some(&nw)) => merged.push(nw.to_string()),
+                (Some(cur), None) => merged.push(cur.to_string()),
+                (None, Some(nw)) => merged.push(nw.to_string()),
                 (None, None) => {}
             }
         }
