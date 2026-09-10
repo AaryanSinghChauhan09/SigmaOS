@@ -55,6 +55,7 @@ pub enum DistroSubsystemMode {
     LinuxKali,
     LinuxAntiX,
     LinuxZorin,
+    LinuxMint,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -361,6 +362,24 @@ impl SovereignUniversalDistroBridge {
                 self.enforce_security_isolation(1001, action)?;
                 Ok(format!(
                     "Dispatched security isolation for path '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "mint_cinnamon" => {
+                Ok(format!(
+                    "Dispatched Linux Mint Cinnamon desktop theme configuration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "mint_timeshift" => {
+                Ok(format!(
+                    "Dispatched Linux Mint Timeshift snapshot operation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "mint_update" => {
+                Ok(format!(
+                    "Dispatched Linux MintUpdate safety policy evaluation for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -1905,6 +1924,19 @@ mod cross_subsystem_tests {
         let mut zorin_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxZorin);
         let res_zorin = zorin_bridge.dispatch_cross_subsystem_operation("zorin_appearance", "MacOs").unwrap();
         assert!(res_zorin.contains("Zorin OS appearance layout switch"));
+    }
+
+    #[test]
+    fn test_mint_distro_bridge_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxMint);
+        let res1 = bridge.dispatch_cross_subsystem_operation("mint_cinnamon", "Mint-Y").unwrap();
+        assert!(res1.contains("Linux Mint Cinnamon desktop theme configuration"));
+
+        let res2 = bridge.dispatch_cross_subsystem_operation("mint_timeshift", "create").unwrap();
+        assert!(res2.contains("Linux Mint Timeshift snapshot operation"));
+
+        let res3 = bridge.dispatch_cross_subsystem_operation("mint_update", "level1").unwrap();
+        assert!(res3.contains("Linux MintUpdate safety policy evaluation"));
     }
 
     #[test]
