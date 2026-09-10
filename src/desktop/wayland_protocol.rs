@@ -4,16 +4,16 @@
 // wl_seat input event dispatching, and wl_data_device clipboard negotiations.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
+
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+use std::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
+use std::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;

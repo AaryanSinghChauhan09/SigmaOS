@@ -177,9 +177,9 @@ mod tests {
     #[test]
     fn test_attention_mechanism() {
         let sched = TransformerScheduler::new(4, 64, 128);
-        let q = alloc::vec![1.0, 0.0, 0.0];
-        let k = alloc::vec![0.0, 1.0, 0.0];
-        let v = alloc::vec![0.0, 0.0, 1.0];
+        let q = std::vec![1.0, 0.0, 0.0];
+        let k = std::vec![0.0, 1.0, 0.0];
+        let v = std::vec![0.0, 0.0, 1.0];
         let output = sched.attention(&q, &k, &v);
         assert_eq!(output.len(), 3);
     }

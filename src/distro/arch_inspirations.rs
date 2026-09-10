@@ -10,11 +10,11 @@
 // from klib where maps are required).
 
 
-extern crate alloc;
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ── Rolling release model ─────────────────────────────────────────────────────
 

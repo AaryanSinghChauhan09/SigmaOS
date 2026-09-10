@@ -11,10 +11,10 @@
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 // ============================================================

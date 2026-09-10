@@ -1029,7 +1029,7 @@ mod tests {
             ShellCommand::Redirect(_, RedirectSpec::ProcessSubInput { command, .. }) => {
                 match *command {
                     ShellCommand::Simple(args) => {
-                        assert_eq!(args, alloc::vec!["echo", "internal_sub"]);
+                        assert_eq!(args, std::vec!["echo", "internal_sub"]);
                     }
                     _ => panic!("Expected simple subcommand"),
                 }
@@ -1054,6 +1054,6 @@ mod tests {
         let expanded = env.expand("Result is $(( 5 + 5 ))");
         assert_eq!(expanded, "Result is 10");
         let files = Environment::expand_braces("img_{1,2}.png");
-        assert_eq!(files, alloc::vec!["img_1.png", "img_2.png"]);
+        assert_eq!(files, std::vec!["img_1.png", "img_2.png"]);
     }
 }

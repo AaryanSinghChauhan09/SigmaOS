@@ -5,10 +5,10 @@
 
 #![allow(dead_code)]
 
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// USB device information
 #[derive(Debug, Clone)]

@@ -2,7 +2,7 @@
 // SigmaOS ArchLinux & Linux Kernel Inspiration Subsystem
 // (`src/arch_kernel_inspirations.rs`)
 
-extern crate alloc;
+
 //
 // Sovereign `#![no_std]` reimplementations of distinctive ideas drawn from the
 // Arch Linux organization (https://github.com/archlinux) and the Linux kernel
@@ -85,7 +85,7 @@ impl KUnitEngine {
     pub fn run_suite(
         &mut self,
         suite_name: &str,
-        cases: Vec<(String, alloc::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)>,
+        cases: Vec<(String, std::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)>,
     ) -> KUnitSuiteResult {
         let mut passed = 0;
         let mut failed = 0;
@@ -1050,10 +1050,10 @@ mod tests {
     #[test]
     fn kunit_suite_reports_failures() {
         let mut eng = KUnitEngine::new();
-        let cases: Vec<(String, alloc::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)> = vec![
+        let cases: Vec<(String, std::boxed::Box<dyn FnOnce(&mut Vec<Expectation>) + Send>)> = vec![
             (
                 "test_ok".to_string(),
-                alloc::boxed::Box::new(|e: &mut Vec<Expectation>| {
+                std::boxed::Box::new(|e: &mut Vec<Expectation>| {
                     e.push(Expectation {
                         kind: ExpectationKind::Eq,
                         left: "1".into(),
@@ -1066,7 +1066,7 @@ mod tests {
             ),
             (
                 "test_bad".to_string(),
-                alloc::boxed::Box::new(|e: &mut Vec<Expectation>| {
+                std::boxed::Box::new(|e: &mut Vec<Expectation>| {
                     e.push(Expectation {
                         kind: ExpectationKind::True,
                         left: "false".into(),

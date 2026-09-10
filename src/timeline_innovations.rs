@@ -29,15 +29,15 @@ impl SigmaOsSdk {
     /// Generates boilerplate bindings suitable for compiling native target binaries
     pub fn compile_bindings(app: &SdkAppDescriptor) -> Result<String, &'static str> {
         match app.language {
-            SdkLanguage::Rust => Ok(alloc::format!(
+            SdkLanguage::Rust => Ok(std::format!(
                 "// SigmaOS Rust SDK bindings for {}\nextern \"C\" {{\n    fn sigma_syscall(sys_id: u32, args: *const u8) -> u32;\n}}",
                 app.name
             )),
-            SdkLanguage::Nim => Ok(alloc::format!(
+            SdkLanguage::Nim => Ok(std::format!(
                 "# SigmaOS Nim SDK bindings for {}\nproc sigma_syscall*(sys_id: uint32, args: pointer): uint32 {{.importc, cdecl.}}",
                 app.name
             )),
-            SdkLanguage::Zig => Ok(alloc::format!(
+            SdkLanguage::Zig => Ok(std::format!(
                 "// SigmaOS Zig SDK bindings for {}\nextern fn sigma_syscall(sys_id: u32, args: [*]const u8) ccall u32;",
                 app.name
             )),
@@ -522,7 +522,7 @@ impl AptPackageResolver {
         if let Some(&prio) = self.pinned_priorities.get(&pkg.name) {
             pkg.pin_priority = prio;
         }
-        let version_pin = alloc::format!("{}={}", pkg.name, pkg.version);
+        let version_pin = std::format!("{}={}", pkg.name, pkg.version);
         if let Some(&prio) = self.pinned_priorities.get(&version_pin) {
             pkg.pin_priority = prio;
         }

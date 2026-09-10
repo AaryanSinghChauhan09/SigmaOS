@@ -724,7 +724,7 @@ impl Default for SovereignXcr0State {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    extern crate alloc;
+    
     use std::vec;
 
     #[test]

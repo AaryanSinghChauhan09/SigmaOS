@@ -211,7 +211,7 @@ impl ProcessLifecycleManager {
             .ok_or("Parent process not found")?;
 
         let child_pid = self.next_pid.fetch_add(1, Ordering::SeqCst) as u64;
-        let child_name = alloc::format!("{}_forked", parent.name);
+        let child_name = std::format!("{}_forked", parent.name);
 
         let mut child = Process::new(child_pid, child_name, parent.priority);
         child.state = ProcessState::Ready;

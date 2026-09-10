@@ -13,10 +13,10 @@
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ============================================================
 // Boot Platform
@@ -456,9 +456,9 @@ impl SigmaBootManager {
         s.push_str("─────────────────\n");
         for (i, entry) in self.entries.iter().enumerate() {
             let marker = if i == self.default_entry { "* " } else { "  " };
-            s.push_str(&alloc::format!("{}{}\n", marker, entry.title));
+            s.push_str(&std::format!("{}{}\n", marker, entry.title));
         }
-        s.push_str(&alloc::format!("\nTimeout: {}s\n", self.timeout_secs));
+        s.push_str(&std::format!("\nTimeout: {}s\n", self.timeout_secs));
         s
     }
 }

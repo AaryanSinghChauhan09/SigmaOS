@@ -10,9 +10,9 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 

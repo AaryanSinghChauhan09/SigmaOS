@@ -15,7 +15,7 @@
 //! 10. **Clear Linux**: Stateless OS Root Verification & Bundle Telemetry Analyzer
 use std::format;
 
-extern crate alloc;
+
 
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
@@ -96,7 +96,7 @@ impl NixDerivation {
                 hasher_seed = hasher_seed.wrapping_mul(0x100000001b3);
             }
         }
-        alloc::format!("/nix/store/{:016x}-{}", hasher_seed, self.name)
+        std::format!("/nix/store/{:016x}-{}", hasher_seed, self.name)
     }
 }
 

@@ -2,12 +2,12 @@
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
 
-extern crate alloc;
+
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::boxed::Box;
 
 pub type VolumeID = usize;
 

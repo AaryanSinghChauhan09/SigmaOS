@@ -1,11 +1,11 @@
 extern crate core;
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
-use alloc::string::ToString;
+
+use std::format;
+use std::string::String;
+use std::vec;
+use std::vec::Vec;
+use std::string::ToString;
 
 #[derive(Debug, Clone)]
 pub struct FirmwareMemoryMapEntry {

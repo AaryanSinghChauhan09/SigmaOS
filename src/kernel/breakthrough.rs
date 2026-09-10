@@ -370,9 +370,9 @@ impl<T> Vec<T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::Layout;
+    use std::std::Layout;
     if let Ok(layout) = Layout::from_size_align(size, 8) {
-        std::alloc::alloc(layout)
+        std::std::alloc(layout)
     } else {
         core::ptr::null_mut()
     }

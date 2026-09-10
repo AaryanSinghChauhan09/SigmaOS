@@ -3,14 +3,14 @@
 // with 100% self-sufficient `#![no_std]` Safe Rust primitives per AGENTS.md
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
+
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+use std::format;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

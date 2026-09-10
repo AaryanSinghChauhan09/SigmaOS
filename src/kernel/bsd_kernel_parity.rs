@@ -7,12 +7,12 @@
 //! - `BsdPfPacketFilter`: OpenBSD PF packet filter with stateful firewall rules, NAT translation, and tables
 //! - `BsdSoftUpdatesEngine`: FreeBSD FFS Soft Updates metadata dependency ordering for file system journaling
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Kqueue Filter Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

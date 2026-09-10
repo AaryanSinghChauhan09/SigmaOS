@@ -389,11 +389,11 @@ pub mod zenithnet {
 // ============================================================================
 
 pub mod roadmap_innovations {
-    extern crate alloc;
-use alloc::vec::Vec;
-    use alloc::string::String;
-    use alloc::string::ToString;
-    use alloc::collections::BTreeSet;
+    
+use std::vec::Vec;
+    use std::string::String;
+    use std::string::ToString;
+    use std::collections::BTreeSet;
 
     // 8.1 Kernel Profiles
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]

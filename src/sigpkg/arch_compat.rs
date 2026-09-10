@@ -3,11 +3,11 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec as AllocVec;
+
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec as AllocVec;
 
 use crate::klib::collections::HashMap;
 use crate::klib::string::SigmaString;
@@ -746,13 +746,13 @@ pub struct SvnPackageMetadata {
 
 #[derive(Debug, Default)]
 pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
+    pub migrated_packages: std::collections::BTreeMap<String, SvnPackageMetadata>,
 }
 
 impl SvntogitMigrationEngine {
     pub fn new() -> Self {
         Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
+            migrated_packages: std::collections::BTreeMap::new(),
         }
     }
 

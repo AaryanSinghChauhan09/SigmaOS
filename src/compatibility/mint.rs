@@ -4,13 +4,13 @@
 // Inspired by mintupdate, mintinstall, Cinnamon, and xapps
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+use std::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -97,7 +97,7 @@ impl MintUpdateManager {
         let recommended_count = self.get_recommended_updates().len();
         let total_size = self.calculate_total_update_size();
         
-        alloc::format!(
+        std::format!(
             "MintUpdate Summary:\n\
              Security updates: {}\n\
              Recommended updates: {}\n\
@@ -304,7 +304,7 @@ impl XAppPreferences {
     }
 
     pub fn apply_to_environment(&self) -> String {
-        alloc::format!(
+        std::format!(
             "XApp Preferences:\n\
              Dark Mode: {}\n\
              Accent Color: {}\n\
@@ -357,7 +357,7 @@ impl MintSystemConfig {
     }
 
     pub fn generate_system_config(&self) -> String {
-        alloc::format!(
+        std::format!(
             "MintSystem Configuration:\n\
              Update Level: {:?}\n\
              Kernel Auto-Updates: {}\n\
@@ -414,7 +414,7 @@ impl LinuxMintIntegrationEngine {
     }
 
     pub fn generate_integration_report(&self) -> String {
-        alloc::format!(
+        std::format!(
             "Linux Mint Integration Report:\n\
              {}\n\
              Installed Packages: {}\n\

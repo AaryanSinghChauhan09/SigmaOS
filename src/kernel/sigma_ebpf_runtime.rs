@@ -13,10 +13,10 @@
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ============================================================
 // eBPF Instruction Set
@@ -388,7 +388,7 @@ impl BpfVm {
                     return_value: self.regs.get(0),
                     insns_executed,
                     exited_normally: false,
-                    error: Some(alloc::format!("PC out of bounds: {}", pc)),
+                    error: Some(std::format!("PC out of bounds: {}", pc)),
                 };
             }
             if insns_executed >= self.insn_limit {

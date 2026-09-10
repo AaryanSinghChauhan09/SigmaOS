@@ -3,12 +3,12 @@
 
 #![no_std]
 
-extern crate alloc;
+
 
 use crate::klib::{String, Vec, ToString};
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 /// Network device types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

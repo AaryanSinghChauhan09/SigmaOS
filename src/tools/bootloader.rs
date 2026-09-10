@@ -4,9 +4,9 @@
 
 
 use crate::klib::{Vec, String, ToString};
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::String;
+use std::vec::Vec;
+use std::format;
 
 /// Target Operating System Type for Dual-Boot Chainloading
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

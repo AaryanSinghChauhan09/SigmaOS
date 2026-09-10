@@ -5,12 +5,12 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 #![allow(unexpected_cfgs)]
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::boxed::Box;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
@@ -2446,9 +2446,9 @@ impl SovereignStatelessArchitectureEngine {
         user_overrides_exist: bool,
     ) -> String {
         if user_overrides_exist {
-            alloc::format!("{}/{}", self.user_override_path, config_key)
+            std::format!("{}/{}", self.user_override_path, config_key)
         } else {
-            alloc::format!("{}/{}", self.factory_default_path, config_key)
+            std::format!("{}/{}", self.factory_default_path, config_key)
         }
     }
 }

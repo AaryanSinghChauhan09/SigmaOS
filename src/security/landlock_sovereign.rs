@@ -4,7 +4,7 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
+
 
 // SigmaOS Sovereign Landlock Filesystem Sandboxing
 // Implements Linux Landlock v5 + OpenBSD unveil + FreeBSD Capsicum hybrid
@@ -19,9 +19,9 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ─── Landlock Access Rights Bitmask (mirrors LANDLOCK_ACCESS_FS_*) ────────────
 

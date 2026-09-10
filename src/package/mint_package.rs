@@ -6,12 +6,12 @@
 
 #![allow(dead_code)]
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// Update level classification (from Linux Mint's Update Manager)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

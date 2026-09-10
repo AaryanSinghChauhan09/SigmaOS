@@ -11,5 +11,5 @@ pub use numa_aware::{NumaNode, NumaTopologyManager};
 pub use oom_killer::OomKiller;
 pub use page_cache::{CachedPage, PageCache, PageStatus};
 pub use slab_allocator::{Slab, SlabAllocator, SlabCache};
-pub use vmalloc::{VmallocManager, VmallocRegion};
+pub use vmstd::{VmallocManager, VmallocRegion};
 pub use descriptor_list::{MemoryDescriptorList, MdlEntry, MemoryProtection, AncientDeviceType, AncientDeviceDmaBuffer};

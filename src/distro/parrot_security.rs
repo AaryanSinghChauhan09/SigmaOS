@@ -6,12 +6,12 @@
 //! - `ParrotForensicsSandbox`: Read-only forensic RAM-disk mounting and write-blocking evidence acquisition
 //! - `ParrotSecEditionMode`: Modular system profile manager (Security, Home, HTB, Cloud)
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Parrot OS Edition Profiles
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

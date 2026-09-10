@@ -4,12 +4,12 @@
 
 #![no_std]
 
-extern crate alloc;
+
 
 use crate::klib::{BTreeMap, String, ToString, Vec};
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::format;
+use std::string::String;
+use std::vec::Vec;
+use std::format;
 use core::cell::Cell;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

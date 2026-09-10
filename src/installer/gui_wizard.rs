@@ -4,11 +4,11 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::vec;
+
+use std::format;
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
 
 /// Installer Screen / Calamares Module Sequence
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

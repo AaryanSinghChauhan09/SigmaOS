@@ -14,10 +14,10 @@
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ============================================================
 // Key Types
@@ -39,7 +39,7 @@ impl PublicKey {
     pub fn zero() -> Self { Self([0u8; 32]) }
     pub fn as_bytes(&self) -> &[u8; 32] { &self.0 }
     pub fn to_hex(&self) -> String {
-        self.0.iter().map(|b| alloc::format!("{:02x}", b)).collect()
+        self.0.iter().map(|b| std::format!("{:02x}", b)).collect()
     }
 }
 
@@ -249,7 +249,7 @@ impl WgEndpoint {
     }
 
     pub fn to_string(&self) -> String {
-        alloc::format!("{}.{}.{}.{}:{}", self.ip[0], self.ip[1], self.ip[2], self.ip[3], self.port)
+        std::format!("{}.{}.{}.{}:{}", self.ip[0], self.ip[1], self.ip[2], self.ip[3], self.port)
     }
 }
 

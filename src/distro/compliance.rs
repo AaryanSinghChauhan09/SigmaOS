@@ -2,12 +2,12 @@
 // Implements regulatory compliance frameworks (HIPAA, SOC2, ISO 27001, PCI-DSS)
 // Inspired by enterprise Linux distributions and security-focused BSD systems
 
-extern crate alloc;
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
+
+use std::string::String;
+use std::vec::Vec;
+use std::vec;
+use std::format;
 
 /// Compliance framework types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

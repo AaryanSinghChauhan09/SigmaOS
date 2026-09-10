@@ -19,10 +19,10 @@
 
 #![allow(dead_code)]
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 // ============================================================

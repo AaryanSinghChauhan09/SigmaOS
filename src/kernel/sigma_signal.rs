@@ -19,10 +19,10 @@
 
 #![allow(dead_code)]
 
-extern crate alloc;
-use alloc::collections::{BTreeMap, VecDeque};
-use alloc::string::String;
-use alloc::vec::Vec;
+
+use std::collections::{BTreeMap, VecDeque};
+use std::string::String;
+use std::vec::Vec;
 
 // ============================================================
 // Signal Numbers (POSIX + Linux-compatible)

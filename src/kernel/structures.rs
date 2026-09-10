@@ -4,10 +4,10 @@
 use core::cell::{Cell, RefCell};
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 // 1. Singly, Sequenced, and Circular Doubly Linked Lists
 

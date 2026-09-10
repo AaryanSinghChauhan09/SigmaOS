@@ -40,12 +40,12 @@
 
 #![allow(dead_code)]
 
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::sync::Arc;
-use alloc::vec::Vec;
+
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::sync::Arc;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -409,9 +409,9 @@ impl VfsPath {
     /// Join this path with another component.
     pub fn join(&self, component: &str) -> VfsPath {
         if self.raw.ends_with('/') {
-            VfsPath::new(&alloc::format!("{}{}", self.raw, component))
+            VfsPath::new(&std::format!("{}{}", self.raw, component))
         } else {
-            VfsPath::new(&alloc::format!("{}/{}", self.raw, component))
+            VfsPath::new(&std::format!("{}/{}", self.raw, component))
         }
     }
 
@@ -582,7 +582,7 @@ impl VfsNode for TmpfsNode {
         Ok(self.stat.clone())
     }
     fn readdir(&self) -> Result<Vec<DirEntry>, VfsError> {
-        Ok(alloc::vec![
+        Ok(std::vec![
             DirEntry { name: ".".to_string(),  ino: 1, inode_type: InodeType::Directory },
             DirEntry { name: "..".to_string(), ino: 1, inode_type: InodeType::Directory },
         ])

@@ -17,7 +17,7 @@ use std::vec;
 
 
 
-extern crate alloc;
+
 #[cfg(test)]
 #[path = "peripheral.rs"]
 pub mod peripheral;
@@ -26,9 +26,9 @@ pub mod peripheral;
 use super::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 #[cfg(test)]
 use peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. Storage / SAS Controller: Broadcom LSI MPT3SAS Controller
@@ -1369,7 +1369,7 @@ impl PeripheralDevice for Ch340ExternalSerialDriver {
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
         self.power_state = PowerState::On;
-        self.rx_buffer = alloc::vec![b'O', b'K', b'\r', b'\n'];
+        self.rx_buffer = std::vec![b'O', b'K', b'\r', b'\n'];
         Ok(())
     }
 

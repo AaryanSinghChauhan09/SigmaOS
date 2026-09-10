@@ -4,9 +4,9 @@
 // Inspired by Debian's APT for advanced package operations
 
 use crate::klib::collections::HashSet;
-use alloc::collections::{BTreeMap, BTreeSet};
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::{BTreeMap, BTreeSet};
+use std::string::String;
+use std::vec::Vec;
 
 /// APT error types
 #[derive(Debug, Clone)]

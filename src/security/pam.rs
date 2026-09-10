@@ -1,7 +1,7 @@
 // Pluggable Authentication Modules (PAM) and Multi-User Access Control Subsystem
 // Inspired by Linux PAM and BSD pw/group databases.
 
-extern crate alloc;
+
 
 #[cfg(not(target_os = "none"))]
 use std::collections::HashMap;
@@ -9,8 +9,8 @@ use std::collections::HashMap;
 use crate::klib::HashMap;
 
 use crate::security::crypto_utils::{constant_time_eq, hash_password_placeholder, SecureRandom};
-use alloc::string::{String as AllocString, ToString};
-use alloc::vec::Vec;
+use std::string::{String as AllocString, ToString};
+use std::vec::Vec;
 
 /// Errors returned by the PAM subsystem
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -103,7 +103,7 @@ impl PamModule for AccountTallyModule {
 pub struct SovereignPamManager {
     pub users: HashMap<AllocString, PamUser>,
     pub groups: HashMap<AllocString, PamGroup>,
-    pub modules: Vec<alloc::boxed::Box<dyn PamModule>>,
+    pub modules: Vec<std::boxed::Box<dyn PamModule>>,
     pub next_uid: u32,
     pub next_gid: u32,
 }
@@ -121,7 +121,7 @@ impl SovereignPamManager {
     }
 
     /// Add a pluggable authentication module to the stack
-    pub fn register_module(&mut self, module: alloc::boxed::Box<dyn PamModule>) {
+    pub fn register_module(&mut self, module: std::boxed::Box<dyn PamModule>) {
         self.modules.push(module);
     }
 
@@ -282,7 +282,7 @@ mod tests {
     #[test]
     fn test_pam_pwquality_complexity() {
         let mut manager = SovereignPamManager::new();
-        manager.register_module(alloc::boxed::Box::new(PasswordQualityModule { min_length: 8 }));
+        manager.register_module(std::boxed::Box::new(PasswordQualityModule { min_length: 8 }));
 
         // Attempt weak password registration -> fails
         assert_eq!(manager.register_user("bob", "weak", "users"), Err(PamError::PasswordTooWeak));
@@ -294,7 +294,7 @@ mod tests {
     #[test]
     fn test_pam_account_tally_lockout() {
         let mut manager = SovereignPamManager::new();
-        manager.register_module(alloc::boxed::Box::new(AccountTallyModule { max_failed_attempts: 3 }));
+        manager.register_module(std::boxed::Box::new(AccountTallyModule { max_failed_attempts: 3 }));
 
         manager.register_user("alice", "validpass123", "users").unwrap();
 

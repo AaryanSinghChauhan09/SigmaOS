@@ -3,10 +3,10 @@
 
 use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU8, AtomicUsize, Ordering};
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+
+use std::boxed::Box;
+use std::string::String;
+use std::vec::Vec;
 
 // 1. Instructions and CPU Initialization
 

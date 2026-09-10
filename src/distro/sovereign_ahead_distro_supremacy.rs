@@ -21,12 +21,12 @@
 // 7. SovereignAheadOfDistrosSuite: Master coordinator orchestrating all 6 innovation engines to verify complete,
 //    unbroken system dominance over legacy Linux & BSD distros.
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ============================================================================
 // 1. SovereignPredictiveSchedExtEngine

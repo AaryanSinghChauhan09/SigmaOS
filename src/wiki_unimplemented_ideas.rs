@@ -569,7 +569,11 @@ impl HardwareBackedPasswordManager {
     }
 
     pub fn check_haveibeenpwned_breach(&self, password: &str) -> bool {
-        password == "password123" || password == "123456"
+        // NOTE: In production, query the HIBP k-anonymity API with SHA-1 prefix.
+        // These are commonly-breached passwords used for offline simulation only.
+        // Production code must use: https://api.pwnedpasswords.com/range/{prefix}
+        const COMMON_BREACHED: &[&str] = &["password123", "123456", "qwerty", "password"];
+        COMMON_BREACHED.contains(&password)
     }
 }
 

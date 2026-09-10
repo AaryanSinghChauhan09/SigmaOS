@@ -3,11 +3,11 @@
 /// Implements comprehensive block device abstraction, partition management,
 /// and caching for high-performance storage operations
 
-extern crate alloc;
+
 
 use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+use std::vec::Vec;
+use std::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BlockDeviceID = usize;

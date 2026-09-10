@@ -5,13 +5,13 @@ pub mod custom_allocator {
     pub struct CustomAllocator;
     pub static GLOBAL_CUSTOM_ALLOCATOR: CustomAllocator = CustomAllocator;
     impl CustomAllocator {
-        pub fn alloc(&self, _layout: std::alloc::Layout) -> *mut u8 {
+        pub fn alloc(&self, _layout: std::std::Layout) -> *mut u8 {
             core::ptr::null_mut()
         }
-        pub fn dealloc(&self, _ptr: *mut u8, _layout: std::alloc::Layout) {}
+        pub fn dealloc(&self, _ptr: *mut u8, _layout: std::std::Layout) {}
     }
     pub unsafe fn alloc(size: usize) -> *mut u8 {
-        use std::alloc::Layout;
+        use std::std::Layout;
         let _layout = Layout::from_size_align(size, 8).unwrap();
         core::ptr::null_mut()
     }
@@ -36,9 +36,9 @@ pub mod uuid {
     }
 }
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Clone)]
 pub struct SigmaString {

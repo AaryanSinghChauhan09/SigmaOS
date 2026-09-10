@@ -4,7 +4,7 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
+
 
 // SigmaOS Sovereign Traffic Control (tc) Qdiscs
 // Implements Linux Traffic Control queuing disciplines in 100% safe Rust.
@@ -22,9 +22,9 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ─── Packet descriptor ────────────────────────────────────────────────────────
 

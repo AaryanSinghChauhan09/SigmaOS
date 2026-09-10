@@ -4,7 +4,7 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
+
 
 // SigmaOS Sovereign D-Bus IPC Protocol Implementation
 // Implements D-Bus message format and dispatch in 100% safe Rust.
@@ -19,9 +19,9 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ─── D-Bus Type Signatures ────────────────────────────────────────────────────
 

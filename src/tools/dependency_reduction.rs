@@ -3,14 +3,14 @@
 // legacy C++, Python, Shell, HTML, and CSS runtime dependencies.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
+
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+use std::format;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
@@ -283,7 +283,7 @@ mod tests {
         let res = builder.build_iso_image();
         assert!(res.contains("SigmaOS-v1.0"));
 
-        let is_valid = NativeRustNoStdValidator::validate_no_std_invariant("#![no_std]\nuse alloc::vec::Vec;");
+        let is_valid = NativeRustNoStdValidator::validate_no_std_invariant("#![no_std]\nuse std::vec::Vec;");
         assert!(is_valid);
     }
 

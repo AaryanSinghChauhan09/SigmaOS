@@ -20,13 +20,13 @@
 
 // (no_std only applicable at crate root - removed)
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // =========================================================================
 // 1. PLAN 9 FROM BELL LABS / 9FRONT (9P2000 RPC & rfork Namespace Isolation)

@@ -10,9 +10,9 @@
 //! - `KaliRamMemoryForensics`: Volatility-style RAM memory artifact & process list analyzer.
 //! - `KaliHashcatCracker`: Multi-algorithm hash identifier & accelerated cracker.
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
+
+use std::string::String;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Port Scan Type (Nmap inspired)

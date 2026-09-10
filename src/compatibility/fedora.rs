@@ -3688,48 +3688,6 @@ impl Default for FedoraIgnitionEngine {
     }
 }
 
-/// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
-pub struct FedoraOfflineUpdateEngine {
-    pub is_offline_update_pending: bool,
-    pub trigger_reboot_flag: bool,
-    pub staged_packages: Vec<String>,
-}
-
-impl FedoraOfflineUpdateEngine {
-    pub fn new() -> Self {
-        Self {
-            is_offline_update_pending: false,
-            trigger_reboot_flag: false,
-            staged_packages: Vec::new(),
-        }
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
-    }
-}
-
-impl Default for FedoraOfflineUpdateEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // =========================================================================
 // Fedora Dracut Initramfs Builder Engine
 // =========================================================================

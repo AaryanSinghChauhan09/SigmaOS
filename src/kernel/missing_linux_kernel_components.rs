@@ -7,12 +7,12 @@
 // 5. Futex2 / futex_waitv Engine (Multi-futex waiting, 64-bit alignment, priority inheritance PI futexes)
 // 6. Device Mapper Engine (dm-verity Merkle tree root hash verification and dm-crypt virtual block translation)
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // =========================================================================
 // 1. PRESSURE STALL INFORMATION (PSI) ENGINE

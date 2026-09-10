@@ -14,7 +14,7 @@ use merkle::{MerkleAccumulator, MerkleHash};
 #[cfg(test_disabled)]
 #[path = "pqc_enclave.rs"]
 mod pqc_enclave;
-use alloc::vec::Vec;
+use std::vec::Vec;
 #[cfg(test)]
 use pqc_enclave::KyberKem;
 

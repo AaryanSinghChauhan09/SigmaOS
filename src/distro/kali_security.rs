@@ -7,12 +7,12 @@
 //! - `KaliMetapackageEngine`: Security tool categories manager (`kali-tools-top10`, `kali-tools-web`, `kali-tools-forensics`, `kali-tools-wireless`)
 //! - `KaliLiveEncryptedPersistenceEngine`: Encrypted live USB persistence & LUKS emergency nuke key
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Undercover Theme Mode (Kali Undercover)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

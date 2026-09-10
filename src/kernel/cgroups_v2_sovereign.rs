@@ -4,7 +4,7 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
+
 
 // SigmaOS Sovereign cgroups v2 Resource Accounting
 // Implements Linux cgroups v2 unified hierarchy resource controller
@@ -18,9 +18,9 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // ─── Resource controller types (mirrors Linux cgroup v2 controllers) ──────────
 

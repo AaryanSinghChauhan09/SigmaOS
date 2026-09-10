@@ -561,7 +561,7 @@ impl SigmaHash for &str {
         fnv1a_64(self.as_bytes())
     }
 }
-impl SigmaHash for alloc::string::String {
+impl SigmaHash for std::string::String {
     fn sigma_hash(&self) -> u64 {
         fnv1a_64(self.as_bytes())
     }

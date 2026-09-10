@@ -2,9 +2,9 @@
 /// Manages pod configurations, limits, shared namespaces, and container orchestration
 /// to easily match and exceed Fedora's native Podman/Kubernetes setups.
 
-extern crate alloc;
 
-use alloc::vec::Vec;
+
+use std::vec::Vec;
 use core::sync::atomic::AtomicUsize;
 
 pub type PodID = usize;
@@ -279,9 +279,9 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::Layout;
+    use std::std::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    std::alloc::alloc(layout)
+    std::std::alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]

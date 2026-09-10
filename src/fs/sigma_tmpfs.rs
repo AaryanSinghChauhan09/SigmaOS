@@ -23,11 +23,11 @@
 
 #![allow(dead_code)]
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
+
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::boxed::Box;
 
 // ============================================================
 // Inode Types

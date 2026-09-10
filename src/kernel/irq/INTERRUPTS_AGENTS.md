@@ -17,7 +17,7 @@ This directory implements hardware interrupt handling (IRQ/MSI-X), programmable 
 
 4. **Interrupt Safety & Locking Rules**
    - Never acquire non-irq-safe locks inside hard-IRQ context. Use `IrqSafeSpinlock` which disables local CPU interrupts before acquiring locks.
-   - Do not perform dynamic heap allocations (`alloc::vec::Vec::new()` or `Box::new()`) within hard-IRQ context.
+   - Do not perform dynamic heap allocations (`std::vec::Vec::new()` or `Box::new()`) within hard-IRQ context.
 
 5. **Verification**
    - Validate IRQ handling changes using `cargo check --lib`.

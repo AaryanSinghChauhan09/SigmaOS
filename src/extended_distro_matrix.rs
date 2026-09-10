@@ -128,7 +128,7 @@ pub struct AmnesicRamWiper {
 impl AmnesicRamWiper {
     pub fn new(size: usize) -> Self {
         Self {
-            memory_blocks: alloc::vec![0xFF; size],
+            memory_blocks: std::vec![0xFF; size],
         }
     }
 

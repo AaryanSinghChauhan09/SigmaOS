@@ -31,10 +31,10 @@
 
 #![allow(dead_code)]
 
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Error type
@@ -186,7 +186,7 @@ impl PipeBuffer {
 ///
 /// Both the read and write halves hold a reference to this via index in the
 /// kernel's pipe table in a real OS. Here, for a sovereign library model, we
-/// use a simple heap-allocated `PipeInner` wrapped in an `alloc::rc::Rc<core::cell::RefCell<…>>`.
+/// use a simple heap-allocated `PipeInner` wrapped in an `std::rc::Rc<core::cell::RefCell<…>>`.
 struct PipeInner {
     buffer: PipeBuffer,
     write_closed: bool,
@@ -211,7 +211,7 @@ impl PipeInner {
 ///
 /// Dropping this type is equivalent to calling [`close_write`](PipeWriter::close_write).
 pub struct PipeWriter {
-    inner: alloc::rc::Rc<core::cell::RefCell<PipeInner>>,
+    inner: std::rc::Rc<core::cell::RefCell<PipeInner>>,
 }
 
 impl PipeWriter {
@@ -263,7 +263,7 @@ impl Drop for PipeWriter {
 ///
 /// Dropping this type is equivalent to calling [`close_read`](PipeReader::close_read).
 pub struct PipeReader {
-    inner: alloc::rc::Rc<core::cell::RefCell<PipeInner>>,
+    inner: std::rc::Rc<core::cell::RefCell<PipeInner>>,
 }
 
 impl PipeReader {
@@ -339,9 +339,9 @@ impl SigmaPipe {
     ///
     /// Panics if `capacity` is zero.
     pub fn new(capacity: usize) -> (PipeWriter, PipeReader) {
-        let inner = alloc::rc::Rc::new(core::cell::RefCell::new(PipeInner::new(capacity)));
+        let inner = std::rc::Rc::new(core::cell::RefCell::new(PipeInner::new(capacity)));
         (
-            PipeWriter { inner: alloc::rc::Rc::clone(&inner) },
+            PipeWriter { inner: std::rc::Rc::clone(&inner) },
             PipeReader { inner },
         )
     }

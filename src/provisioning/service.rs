@@ -2,10 +2,10 @@
 /// Implements zero-touch enrollment and automated device lifecycle management
 /// inspired by Linux Preseed/Kickstart and BSD Auto-Install configurations.
 
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Device ID

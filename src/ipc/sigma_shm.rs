@@ -9,10 +9,10 @@
 #![allow(dead_code)]
 #![allow(clippy::new_without_default)]
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// POSIX open flags for shm_open.
 pub struct OFlags(pub u32);

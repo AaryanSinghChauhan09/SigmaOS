@@ -3,12 +3,12 @@
 // Partitioning (g_part), Mirroring (g_mirror), Striping (g_stripe),
 // GELI Encryption (g_eli), and Linear Concatenation (g_concat).
 
-extern crate alloc;
 
-use alloc::borrow::ToOwned;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec::Vec;
+
+use std::borrow::ToOwned;
+use std::format;
+use std::string::String;
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BioCmd {
@@ -386,14 +386,14 @@ mod tests {
         assert_eq!(provider.mediasize, 4096);
         assert_eq!(provider.sectorsize, 512);
 
-        let mut write_bio = BioRequest::new_write(0, alloc::vec![1, 2, 3, 4, 5]);
+        let mut write_bio = BioRequest::new_write(0, std::vec![1, 2, 3, 4, 5]);
         provider.handle_bio(&mut write_bio);
         assert!(write_bio.completed);
 
         let mut read_bio = BioRequest::new_read(0, 5);
         provider.handle_bio(&mut read_bio);
         assert!(read_bio.completed);
-        assert_eq!(read_bio.data, alloc::vec![1, 2, 3, 4, 5]);
+        assert_eq!(read_bio.data, std::vec![1, 2, 3, 4, 5]);
     }
 
     #[test]

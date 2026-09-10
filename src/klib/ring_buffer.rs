@@ -7,7 +7,7 @@ use core::cell::UnsafeCell;
 use core::mem::MaybeUninit;
 #[allow(dead_code)]
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::alloc::Layout;
+use std::std::Layout;
 
 /// A fixed-capacity lock-free single-producer, single-consumer ring buffer.
 /// Inspired by Linux kfifo and FreeBSD SPSC ring buffers.
@@ -143,7 +143,7 @@ impl<T> HeapRingBuffer<T> {
         let cap = capacity.next_power_of_two();
         let layout = Layout::array::<core::mem::MaybeUninit<T>>(cap).unwrap();
         // SAFETY: we use the global allocator
-        let data = unsafe { std::alloc::alloc(layout) as *mut core::mem::MaybeUninit<T> };
+        let data = unsafe { std::std::alloc(layout) as *mut core::mem::MaybeUninit<T> };
         if data.is_null() {
             panic!("HeapRingBuffer: allocation failed");
         }
@@ -200,7 +200,7 @@ impl<T> Drop for HeapRingBuffer<T> {
         while self.pop().is_some() {}
         let layout = Layout::array::<core::mem::MaybeUninit<T>>(self.cap).unwrap();
         unsafe {
-            std::alloc::dealloc(self.data as *mut u8, layout);
+            std::std::dealloc(self.data as *mut u8, layout);
         }
     }
 }

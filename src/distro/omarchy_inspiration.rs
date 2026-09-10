@@ -8,12 +8,12 @@
 //! - `OmarchyHerdrAiAgentManager`: Multi-agent orchestrator managing parallel AI coding agents (Claude, Codex, Grok, Gemini, Local)
 //! - `OmarchyReleaseChannelSnapshotEngine`: Multi-channel system release tracking (Stable, Edge, RC, Dev) with automated update pre-flight snapshots
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Release channels available in Omarchy-style system management
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

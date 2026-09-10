@@ -3,11 +3,11 @@
 // BSD-style SYSINIT boots, Kernel Linker Daemon (KLD) modules,
 // and Enterprise Kernel ABI (KABI) stability guarantees & automated testing suites.
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::format;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::format;
+use std::vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::klib::HashMap;

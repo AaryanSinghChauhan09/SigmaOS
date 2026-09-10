@@ -1,6 +1,6 @@
 use std::boxed::Box;
 #[cfg(not(target_os = "none"))]
-extern crate alloc as std::alloc::alloc;
+extern crate alloc as std::std::alloc;
 #[cfg(not(target_os = "none"))]
 use std_std::boxed::Box;
 

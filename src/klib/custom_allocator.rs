@@ -18,7 +18,7 @@
 // Designed to minimize dependency on predefined library allocators.
 
 #[allow(dead_code)]
-use std::alloc::{GlobalAlloc, Layout};
+use std::std::{GlobalAlloc, Layout};
 use core::cell::UnsafeCell;
 use core::ptr;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -394,7 +394,7 @@ fn sigma_oom(layout: Layout) -> ! {
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
-    use std::alloc::Layout;
+    use std::std::Layout;
 
     #[test]
     fn test_basic_alloc_dealloc() {

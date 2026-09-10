@@ -4,7 +4,7 @@
 // Inspired by OpenBSD and Linux security mitigations
 
 #[cfg(feature = "standalone_test")]
-use alloc::vec::Vec;
+use std::vec::Vec;
 use crate::security::Permission;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

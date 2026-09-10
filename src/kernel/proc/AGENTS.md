@@ -21,4 +21,4 @@ This directory implements core process lifecycle state transitions, POSIX signal
    - Ensure root capability checks (`CAP_SYS_ADMIN`) are evaluated within the target user namespace.
 
 5. **`no_std` Pure Rust Guidelines**
-   - Maintain strict `no_std` compatibility using `core::` and `alloc::` modules.
+   - Maintain strict `no_std` compatibility using `core::` and `std::` modules.

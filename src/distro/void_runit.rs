@@ -6,14 +6,14 @@
  */
 
 #[cfg(not(test))]
-extern crate alloc;
+
 
 #[cfg(not(test))]
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 #[cfg(not(test))]
-use alloc::string::String;
+use std::string::String;
 #[cfg(not(test))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[cfg(test)]
 use std::collections::BTreeMap;

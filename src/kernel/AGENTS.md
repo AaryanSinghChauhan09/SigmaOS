@@ -6,7 +6,7 @@ This directory contains the primary kernel architecture, memory management, sche
 
 1. **`no_std` Pure Rust Compatibility**
    - All kernel modules must adhere strictly to `no_std` environments unless explicitly conditioned under `#[cfg(test)]`.
-   - Use `core::` imports (such as `core::sync::atomic::*`, `core::fmt`, `core::cell::*`) and `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::boxed::Box`, `alloc::sync::Arc`) instead of `std`.
+   - Use `core::` imports (such as `core::sync::atomic::*`, `core::fmt`, `core::cell::*`) and `std::` primitives (`std::vec::Vec`, `std::string::String`, `std::boxed::Box`, `std::sync::Arc`) instead of `std`.
 
 2. **Concurrency & Locking Discipline**
    - Memory allocation and process scheduling must maintain strict lock hierarchy rules to prevent kernel deadlocks.

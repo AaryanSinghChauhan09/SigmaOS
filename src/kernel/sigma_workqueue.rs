@@ -18,10 +18,10 @@
 
 #![allow(dead_code)]
 
-extern crate alloc;
-use alloc::collections::VecDeque;
-use alloc::string::String;
-use alloc::vec::Vec;
+
+use std::collections::VecDeque;
+use std::string::String;
+use std::vec::Vec;
 
 // ============================================================
 // Work Item Priority

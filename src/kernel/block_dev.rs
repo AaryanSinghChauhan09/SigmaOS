@@ -14,16 +14,16 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
+
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::boxed::Box;
+use std::boxed::Box;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::{BTreeMap, VecDeque};
+use std::collections::{BTreeMap, VecDeque};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::boxed::Box;

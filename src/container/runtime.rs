@@ -703,9 +703,9 @@ impl SimpleContainerRuntime {
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::Layout;
+    use std::std::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    unsafe { std::alloc::alloc(layout) }
+    unsafe { std::std::alloc(layout) }
 }
 
 /// Flatpak & Snap Sandboxed App Compatibility Layer
@@ -794,10 +794,10 @@ impl Default for FlatpakSnapCompatLayer {
 // This module requires alloc which is conditionally available
 #[cfg(not(target_os = "none"))]
 pub mod oci {
-    extern crate alloc;
+    
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
-    use alloc::vec::Vec;
+    use std::vec::Vec;
 
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
@@ -959,7 +959,7 @@ pub mod oci {
 
 #[cfg(test_disabled)]
 mod tests {
-    extern crate alloc;
+    
     use super::*;
     use std::string::ToString;
     use std::vec;

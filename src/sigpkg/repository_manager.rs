@@ -3,13 +3,13 @@
 
 use crate::klib::btreemap::BTreeMap;
 
-// Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
+// Zero-dependency architecture: Use std:: primitives for no_std compatibility
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+use std::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 // Test environment compatibility: Use std for testing only
 #[cfg(any(feature = "standalone_test", test))]

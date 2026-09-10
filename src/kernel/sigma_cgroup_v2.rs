@@ -24,10 +24,10 @@
 
 #![allow(dead_code)]
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ============================================================
 // Controller Types
@@ -387,9 +387,9 @@ impl SigmaCgroupV2 {
         self.next_id += 1;
 
         let path = if parent_path == "/sys/fs/cgroup" {
-            alloc::format!("/sys/fs/cgroup/{}", name)
+            std::format!("/sys/fs/cgroup/{}", name)
         } else {
-            alloc::format!("{}/{}", parent_path, name)
+            std::format!("{}/{}", parent_path, name)
         };
 
         let node = CgroupNode::new(new_id, name, &path, Some(parent_id));
