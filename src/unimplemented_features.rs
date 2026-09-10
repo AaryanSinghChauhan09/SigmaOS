@@ -2248,8 +2248,154 @@ impl GamifiedProductivityLayer {
     }
 }
 
-// ==================================================================// 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
-// ========================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZenithProfileMode {
+    Developer,
+    Minimalist,
+    Gamer,
+}
+
+#[derive(Debug, Clone)]
+pub struct ZenithProfileConfig {
+    pub mode: ZenithProfileMode,
+    pub target_clock_mhz: u32,
+    pub idle_ram_budget_mb: u32,
+    pub compositor_fps: u32,
+}
+
+pub struct ZenithDesktopProfileManager {
+    pub active_config: ZenithProfileConfig,
+}
+
+impl ZenithDesktopProfileManager {
+    pub fn new() -> Self {
+        Self {
+            active_config: ZenithProfileConfig {
+                mode: ZenithProfileMode::Developer,
+                target_clock_mhz: 2400,
+                idle_ram_budget_mb: 128,
+                compositor_fps: 60,
+            },
+        }
+    }
+
+    pub fn switch_profile(&mut self, mode: ZenithProfileMode) {
+        self.active_config = match mode {
+            ZenithProfileMode::Developer => ZenithProfileConfig {
+                mode,
+                target_clock_mhz: 2400,
+                idle_ram_budget_mb: 128,
+                compositor_fps: 60,
+            },
+            ZenithProfileMode::Minimalist => ZenithProfileConfig {
+                mode,
+                target_clock_mhz: 800,
+                idle_ram_budget_mb: 24,
+                compositor_fps: 30,
+            },
+            ZenithProfileMode::Gamer => ZenithProfileConfig {
+                mode,
+                target_clock_mhz: 4500,
+                idle_ram_budget_mb: 256,
+                compositor_fps: 144,
+            },
+        };
+    }
+}
+
+pub struct CrossDeviceContinuityEngine {
+    pub active_app: Option<String>,
+    pub app_offset: u64,
+    pub shared_clipboard_data: String,
+}
+
+impl CrossDeviceContinuityEngine {
+    pub fn new() -> Self {
+        Self {
+            active_app: None,
+            app_offset: 0,
+            shared_clipboard_data: String::new(),
+        }
+    }
+
+    pub fn snapshot_application_context(&mut self, app_name: &str, offset: u64, _bounds: (i32, i32, u32, u32), _timestamp: u64) {
+        self.active_app = Some(app_name.to_string());
+        self.app_offset = offset;
+    }
+
+    pub fn sync_clipboard_content(&mut self, text: &str) {
+        self.shared_clipboard_data = text.to_string();
+    }
+
+    pub fn resume_context_on_target_device(&self) -> Option<(String, u64)> {
+        self.active_app.as_ref().map(|app| (app.clone(), self.app_offset))
+    }
+}
+
+#[cfg(test)]
+mod zenith_desktop_core_tests {
+    use super::*;
+
+    #[test]
+    fn test_zenith_desktop_profile_switching() {
+        let mut manager = ZenithDesktopProfileManager::new();
+        assert_eq!(manager.active_config.mode, ZenithProfileMode::Developer);
+
+        // Switch to Minimalist profile (<30MB idle RAM target)
+        manager.switch_profile(ZenithProfileMode::Minimalist);
+        assert_eq!(manager.active_config.mode, ZenithProfileMode::Minimalist);
+        assert_eq!(manager.active_config.target_clock_mhz, 800);
+        assert!(manager.active_config.idle_ram_budget_mb < 30);
+
+        // Switch to Gamer profile
+        manager.switch_profile(ZenithProfileMode::Gamer);
+        assert_eq!(manager.active_config.mode, ZenithProfileMode::Gamer);
+        assert_eq!(manager.active_config.compositor_fps, 144);
+    }
+
+    #[test]
+    fn test_cross_device_continuity() {
+        let mut continuity = CrossDeviceContinuityEngine::new();
+        continuity.snapshot_application_context("SigmaDev IDE", 42, (0, 0, 1024, 768), 1000);
+        continuity.sync_clipboard_content("SOVEREIGN_PASTE_BUFFER");
+
+        assert_eq!(continuity.shared_clipboard_data, "SOVEREIGN_PASTE_BUFFER");
+        let (app, offset) = continuity.resume_context_on_target_device().unwrap();
+        assert_eq!(app, "SigmaDev IDE");
+        assert_eq!(offset, 42);
+    }
+
+    #[test]
+    fn test_gesture_and_voice_control() {
+        let engine = GestureVoiceControlEngine::new();
+
+        // Touchpad gesture matching
+        assert_eq!(engine.parse_touchpad_gesture(3, true), Some(DesktopShellAction::ToggleOverview));
+        assert_eq!(engine.parse_touchpad_gesture(2, false), None);
+
+        // Voice phrase matching
+        assert_eq!(engine.match_voice_phrase("open terminal"), Some(DesktopShellAction::OpenTerminal));
+        assert_eq!(engine.match_voice_phrase("unknown phrase"), None);
+    }
+
+    #[test]
+    fn test_gamified_productivity_layer() {
+        let mut gamification = GamifiedProductivityLayer::new();
+        assert_eq!(gamification.level, 1);
+        assert!(!gamification.badges[0].unlocked);
+
+        // Award XP for compiling package
+        gamification.award_experience("compile_package", 1200, 10000);
+        assert_eq!(gamification.total_xp, 1200);
+        assert_eq!(gamification.level, 2);
+        assert!(gamification.badges[0].unlocked); // "Package Artisan" unlocked
+    }
+}
+
+// =========================================================================
+// 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
+// =========================================================================
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxLtsVersion {
     Lts5_15, // Long-Term Support 5.15
@@ -2387,6 +2533,8 @@ impl GentooUseFlagEngine {
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
 pub const CAP_SEEK: u64 = 1 << 2;
+
+use alloc::collections::BTreeMap as HashMap;
 
 pub struct FreeBsdCapsicumEngine {
     pub is_capability_mode: bool,

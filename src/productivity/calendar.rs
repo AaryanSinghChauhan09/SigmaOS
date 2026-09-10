@@ -178,13 +178,13 @@ impl CalendarStorage for InMemoryCalendarStorage {
 
     fn remove_event(&mut self, event_id: &str) -> Result<(), CalendarError> {
         self.events
-            .remove(event_id)
+            .remove(&event_id.to_string())
             .ok_or_else(|| CalendarError::EventNotFound(event_id.to_string()))?;
         Ok(())
     }
 
     fn update_event(&mut self, event: CalendarEvent) -> Result<(), CalendarError> {
-        if !self.events.contains_key(&event.id) {
+        if self.events.get_str(&event.id).is_none() {
             return Err(CalendarError::EventNotFound(event.id.clone()));
         }
         self.events.insert(event.id.clone(), event);
@@ -192,7 +192,7 @@ impl CalendarStorage for InMemoryCalendarStorage {
     }
 
     fn get_event(&self, event_id: &str) -> Option<CalendarEvent> {
-        self.events.get(event_id).cloned()
+        self.events.get_str(event_id).cloned()
     }
 
     fn get_all_events(&self) -> Vec<CalendarEvent> {

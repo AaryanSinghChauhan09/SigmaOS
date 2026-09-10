@@ -1672,6 +1672,89 @@ impl SovereignZonesManager {
     }
 }
 
+// ================= Sovereign Linux Cgroup v2 Governor =================
+
+#[derive(Debug, Clone, Copy)]
+pub struct CgroupResourceLimitsV1 {
+    pub cpu_quota_us: u64,
+    pub cpu_period_us: u64,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u32,
+}
+
+pub struct SovereignCgroupGovernorV1 {
+    pub groups: HashMap<String, CgroupGroup>,
+}
+
+impl Default for SovereignCgroupGovernorV1 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignCgroupGovernorV1 {
+    pub fn new() -> Self {
+        Self {
+            groups: HashMap::new(),
+        }
+    }
+
+    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
+        if self.groups.contains_key(path) {
+            return Err("Group already exists");
+        }
+        self.groups.insert(
+            path.to_string(),
+            CgroupGroup {
+                path: path.to_string(),
+                limits: Some(CgroupResourceLimits::default()),
+                pids: Vec::new(),
+                cpu_used_us: 0,
+                memory_allocated_bytes: 0,
+            },
+        );
+        Ok(())
+    }
+
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+        let group = self.groups.get_mut(path).ok_or("Group not found")?;
+        group.limits = Some(limits);
+        Ok(())
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u32) -> Result<(), &'static str> {
+        let group = self.groups.get_mut(path).ok_or("Group not found")?;
+        group.pids.push(pid);
+        Ok(())
+    }
+
+    pub fn check_cpu_budget(&mut self, path: &str, usage_us: u64) -> Result<bool, &'static str> {
+        let group = self.groups.get_mut(path).ok_or("Group not found")?;
+        let quota = group.limits.as_ref().map(|l| l.cpu_quota_us).unwrap_or(u64::MAX);
+        if group.cpu_used_us + usage_us <= quota {
+            group.cpu_used_us += usage_us;
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+
+    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
+        let group = self.groups.get_mut(path).ok_or("Group not found")?;
+        let max_mem = group.limits.as_ref().map(|l| l.memory_max_bytes).unwrap_or(u64::MAX);
+        if group.memory_allocated_bytes + bytes <= max_mem {
+            group.memory_allocated_bytes += bytes;
+            Ok(())
+        } else {
+            Err("Memory quota exceeded")
+        }
+    }
+}
+
+// ================= Windows KMDF Driver Framework Parity =================
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KmdfPnpState {
     PnpActive,
@@ -2771,6 +2854,112 @@ impl CapabilityDerivationTree {
     }
 }
 
+/// Linux cgroups v2 resource governor
+pub struct SovereignCgroupGovernorV3 {
+    pub groups: HashMap<String, CgroupResourceLimits>,
+    pub pids: HashMap<String, Vec<u64>>,
+    pub cpu_usage: HashMap<String, u64>,
+    pub mem_usage: HashMap<String, u64>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct CgroupResourceLimitsV3 {
+    pub cpu_quota_us: u64,
+    pub cpu_period_us: u64,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub memory_swap_max_bytes: u64,
+    pub io_weight: u32,
+}
+
+impl Default for CgroupResourceLimitsV1 {
+    fn default() -> Self {
+        Self {
+            cpu_quota_us: 100_000,
+            cpu_period_us: 100_000,
+            memory_max_bytes: u64::MAX,
+            memory_high_bytes: u64::MAX,
+            memory_swap_max_bytes: 0,
+            io_weight: 100,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CgroupGroupV2 {
+    pub path: String,
+    pub limits: CgroupResourceLimitsV3,
+    pub pids: Vec<u64>,
+    pub current_cpu_usage_us: u64,
+    pub current_memory_bytes: u64,
+}
+
+pub struct SovereignCgroupGovernorV2 {
+    pub groups: HashMap<String, CgroupGroupV2>,
+}
+
+impl SovereignCgroupGovernorV2 {
+    pub fn new() -> Self {
+        Self {
+            groups: HashMap::new(),
+        }
+    }
+
+    pub fn create_group(&mut self, path: &str) -> Result<(), &'static str> {
+        if self.groups.contains_key(path) {
+            return Err("cgroup path already exists");
+        }
+        self.groups.insert(path.to_string(), CgroupGroupV2 {
+            path: path.to_string(),
+            limits: CgroupResourceLimitsV3 {
+                cpu_quota_us: 100_000,
+                cpu_period_us: 100_000,
+                memory_max_bytes: 1024 * 1024 * 1024,
+                memory_high_bytes: 512 * 1024 * 1024,
+                memory_swap_max_bytes: 0,
+                io_weight: 100,
+            },
+            pids: Vec::new(),
+            current_cpu_usage_us: 0,
+            current_memory_bytes: 0,
+        });
+        Ok(())
+    }
+
+    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimitsV3) -> Result<(), &'static str> {
+        let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
+        entry.limits = limits;
+        Ok(())
+    }
+
+    pub fn attach_pid(&mut self, path: &str, pid: u64) -> Result<(), &'static str> {
+        let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
+        if !entry.pids.contains(&pid) {
+            entry.pids.push(pid);
+        }
+        Ok(())
+    }
+
+    pub fn check_cpu_budget(&mut self, path: &str, time_requested_us: u64) -> Result<bool, &'static str> {
+        let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
+        if entry.current_cpu_usage_us + time_requested_us > entry.limits.cpu_quota_us {
+            Ok(false) // Quota exceeded
+        } else {
+            entry.current_cpu_usage_us += time_requested_us;
+            Ok(true)
+        }
+    }
+
+    pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
+        let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
+        if entry.current_memory_bytes + bytes > entry.limits.memory_max_bytes {
+            Err("cgroup OOM: memory_max_bytes limit exceeded")
+        } else {
+            entry.current_memory_bytes += bytes;
+            Ok(())
+        }
+    }
+}
 
 // ================= Linux XDP & FreeBSD Netmap High-Performance Fast Packet Engine =================
 
@@ -3907,6 +4096,13 @@ mod tests_extra_1 {
             manager.zones.get("db_zone").unwrap().vnic_ips[0],
             "10.0.0.5"
         );
+    }
+
+    #[test]
+    fn test_sovereign_cgroup_governor() {
+        let mut controller = SovereignCgroupGovernor::new();
+        controller.create_group("db").unwrap();
+        assert_eq!(controller.groups.len(), 1);
     }
 
     #[test]

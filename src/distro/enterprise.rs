@@ -67,14 +67,14 @@ impl DirectoryService {
     }
 
     pub fn authenticate(&self, username: &str, hash: &str) -> bool {
-        if let Some(user) = self.users.get(username) {
+        if let Some(user) = self.users.get_str(username) {
             return user.password_hash == hash;
         }
         false
     }
 
     pub fn is_member_of(&self, username: &str, group: &str) -> bool {
-        if let Some(user) = self.users.get(username) {
+        if let Some(user) = self.users.get_str(username) {
             return user.groups.iter().any(|g| g == group);
         }
         false

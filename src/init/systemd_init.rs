@@ -1558,8 +1558,9 @@ impl SystemdEngine {
                 blame_list.push((unit.id, unit.duration_ms));
             }
         }
-        for i in 0..blame_list.len() {
-            for j in 0..blame_list.len() - 1 - i {
+        let len = blame_list.len();
+        for i in 0..len {
+            for j in 0..len.saturating_sub(1).saturating_sub(i) {
                 if blame_list[j].1 < blame_list[j + 1].1 {
                     let temp = blame_list[j].clone();
                     blame_list[j] = blame_list[j + 1].clone();

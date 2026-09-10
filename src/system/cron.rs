@@ -631,17 +631,21 @@ impl SovereignCronDaemon {
         }
 
         let mut ran = 0;
-        for (id, job) in self.base_daemon.jobs.iter_mut() {
-            let is_permitted = if self.denied_users.contains(&job.user) {
-                false
-            } else if !self.allowed_users.is_empty() {
-                self.allowed_users.contains(&job.user)
-            } else {
-                true
-            };
+        let allowed = self.allowed_users.clone();
+        let denied = self.denied_users.clone();
+        let is_permitted = |user: &str| {
+            if denied.contains(&user.to_string()) {
+                return false;
+            }
+            if !allowed.is_empty() {
+                return allowed.contains(&user.to_string());
+            }
+            true
+        };
 
-            if job.enabled && is_permitted {
-                if job.last_run.is_none() || (current_time >= job.next_run) {
+        for (_id, job) in self.base_daemon.jobs.iter_mut() {
+            if job.enabled && is_permitted(&job.user) {
+                if job.last_run.is_none() || (current_time > job.next_run) {
                     job.last_run = Some(current_time);
                     let jitter = if self.random_delay_max > 0 {
                         ((current_time as u32 % self.random_delay_max) + 1) * 60

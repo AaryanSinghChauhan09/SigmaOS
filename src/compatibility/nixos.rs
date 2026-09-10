@@ -78,7 +78,7 @@ impl NixStore {
     pub fn install(&mut self, package: &str, profile: &str) -> Result<(), NixError> {
         if !self.packages.contains_key(package) {
             return Err(NixError::EvaluationError);
-        }
+        };
 
         let path_opt = self
             .packages
@@ -211,7 +211,7 @@ impl NixosConfig {
     }
 
     pub fn get_option(&self, key: &str) -> Option<&ConfigOption> {
-        self.options.get(key)
+        self.options.get_str(key)
     }
 
     pub fn enable_service(&mut self, service: &str) {
@@ -221,7 +221,7 @@ impl NixosConfig {
     }
 
     pub fn disable_service(&mut self, service: &str) {
-        if let Some(config) = self.services.get_mut(service) {
+        if let Some(config) = self.services.get_mut_str(service) {
             config.insert(String::from("enable"), ConfigOption::Boolean(false));
         }
     }
@@ -372,7 +372,7 @@ impl NixChannels {
     }
 
     pub fn set_channel(&mut self, name: &str) -> Result<(), &'static str> {
-        if self.channels.contains_key(name) {
+        if self.channels.contains_key_str(name) {
             self.current_channel = name.to_string();
             Ok(())
         } else {

@@ -39,7 +39,9 @@ pub enum DriverError {
 
 pub trait Driver {
     fn id(&self) -> DriverID;
-    fn name(&self) -> &str;
+    fn name(&self) -> &str {
+        "generic_driver"
+    }
     fn driver_type(&self) -> DriverType;
     fn state(&self) -> DriverState;
     fn set_state(&self, _state: DriverState) {}
@@ -132,7 +134,11 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        match self.state.load(Ordering::SeqCst) {
+            0 => DriverState::Unloaded,
+            1 => DriverState::Active,
+            _ => DriverState::Failed,
+        }
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state.store(DriverState::Active as usize, Ordering::SeqCst);

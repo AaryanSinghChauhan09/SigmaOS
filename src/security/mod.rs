@@ -64,10 +64,23 @@ pub use hardening::{
     MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
-pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
-pub use securelevels::{Securelevel, SovereignSecurelevelManager};
-pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
-
-pub mod bpf_lsm_sovereign;
-pub use bpf_lsm_sovereign::{SovereignBpfLsmEngine, BpfLsmProgram, LsmHookPoint, BpfLsmDecision};
+pub use selinux::{
+    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
+    SecurityRule, SelinuxPermission,
+};
+pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
+pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
+pub use vault::{
+    Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
+    EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
+    VaultResult,
+};
+pub use vpn::{
+    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
+    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
+    WireGuardHandler,
+};
+pub use vulnerability::{
+    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+};
+pub use vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};

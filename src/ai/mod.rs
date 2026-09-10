@@ -26,8 +26,10 @@ pub mod tensor_memory;
 pub mod voice;
 pub mod wandr;
 
-pub use local_llm::{
-    LocalLlmWrapper, QuantizationType as LocalQuantizationType, WhisperSpeechToText,
+pub use agentic_os_runtime::{
+    AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,
+    EbpfNetworkFilter, EphemeralAgentSandbox, GpuBackend, HybridContainerRuntime, LocalLlmDaemon,
+    LocalLlmSystemDaemon, OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
 };
 
 pub use agentic_os_runtime::{

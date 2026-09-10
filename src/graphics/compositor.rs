@@ -724,8 +724,14 @@ impl Compositor for SimpleCompositor {
     }
 
     fn stats(&self) -> CompositorStats {
-        let mut stats = self.stats;
-        stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
+        let mut stats = self.stats.clone();
+        let mut visible = 0;
+        for win in &self.windows {
+            if win.info().visible {
+                visible += 1;
+            }
+        }
+        stats.visible_windows = visible;
         stats
     }
 }

@@ -282,6 +282,17 @@ impl SimpleVMM {
         &mut self,
         virt: VirtualAddress,
         phys: PhysicalAddress,
+        _writable: bool,
+        _executable: bool,
+    ) -> Result<(), MemoryError> {
+        self.map_page(virt, phys)
+    }
+
+    /// Maps a standard 4KB page
+    pub fn map_page(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
         writable: bool,
         execute_disable: bool,
     ) -> Result<(), MemoryError> {

@@ -1452,10 +1452,14 @@ impl ShellRepl {
 
             ShellCommand::Jobs => {
                 let jobs_list = self.job_control.list_jobs();
-                Ok(jobs_list)
+                if jobs_list.is_empty() {
+                    Ok("No active background or stopped jobs.".to_string())
+                } else {
+                    Ok(jobs_list.join("\n"))
+                }
             }
             ShellCommand::JobFg { job_id } => {
-                match self.job_control.bring_to_foreground(job_id as usize) {
+                match self.job_control.bring_to_foreground(job_id) {
                     Ok(msg) => Ok(msg),
                     Err(_) => Err(format!("fg: Job %{} not found.", job_id)),
                 }

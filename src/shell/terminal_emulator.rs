@@ -798,6 +798,46 @@ pub struct TerminalPane {
     pub height: usize,
 }
 
+pub type TerminalMultiplexer = TerminalMultiplexerV1;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ColorSchemePreset {
+    Default,
+    Nord,
+    Dracula,
+    SolarizedDark,
+    Monokai,
+}
+
+#[derive(Debug, Clone)]
+pub struct TerminalTheme {
+    pub name: String,
+    pub fg_color_rgb: (u8, u8, u8),
+    pub bg_color_rgb: (u8, u8, u8),
+}
+
+impl TerminalTheme {
+    pub fn preset(preset: ColorSchemePreset) -> Self {
+        match preset {
+            ColorSchemePreset::Nord => Self {
+                name: String::from("Nord"),
+                fg_color_rgb: (216, 222, 233),
+                bg_color_rgb: (46, 52, 64),
+            },
+            ColorSchemePreset::Dracula => Self {
+                name: String::from("Dracula"),
+                fg_color_rgb: (248, 248, 242),
+                bg_color_rgb: (40, 42, 54),
+            },
+            _ => Self {
+                name: String::from("Default"),
+                fg_color_rgb: (255, 255, 255),
+                bg_color_rgb: (0, 0, 0),
+            },
+        }
+    }
+}
+
 /// Tmux / BSD-style Terminal Multiplexer
 pub type TerminalMultiplexer = TerminalMultiplexerV1;
 
@@ -811,6 +851,10 @@ pub struct TerminalMultiplexerV1 {
 }
 
 impl TerminalMultiplexerV1 {
+    pub fn split_pane(&mut self, direction: PaneSplitDirection) -> u32 {
+        self.split_active_pane(direction).unwrap_or(0)
+    }
+
     pub fn new(root_width: usize, root_height: usize) -> Self {
         let root_pane = TerminalPane {
             pane_id: 1,
@@ -1123,6 +1167,7 @@ impl TerminalSession {
         }
     }
 
+
     pub fn register_alias(&mut self, name: &str, value: &str) {
         self.aliases.insert(name.to_string(), value.to_string());
     }
@@ -1307,19 +1352,16 @@ impl TerminalSession {
     /// Converts an AnsiColor enum value to exact RGB representation based on active TerminalTheme
     pub fn get_color_rgb(&self, color: AnsiColor) -> (u8, u8, u8) {
         match color {
-            AnsiColor::Default => self.theme.foreground,
-            AnsiColor::Black => self.theme.ansi_palette[0],
-            AnsiColor::Red => self.theme.ansi_palette[1],
-            AnsiColor::Green => self.theme.ansi_palette[2],
-            AnsiColor::Yellow => self.theme.ansi_palette[3],
-            AnsiColor::Blue => self.theme.ansi_palette[4],
-            AnsiColor::Magenta => self.theme.ansi_palette[5],
-            AnsiColor::Cyan => self.theme.ansi_palette[6],
-            AnsiColor::White => self.theme.ansi_palette[7],
-            AnsiColor::Xterm256(idx) => {
-                let p_idx = (idx % 16) as usize;
-                self.theme.ansi_palette[p_idx]
-            }
+            AnsiColor::Default => self.theme.fg_color_rgb,
+            AnsiColor::Black => (0, 0, 0),
+            AnsiColor::Red => (255, 0, 0),
+            AnsiColor::Green => (0, 255, 0),
+            AnsiColor::Yellow => (255, 255, 0),
+            AnsiColor::Blue => (0, 0, 255),
+            AnsiColor::Magenta => (255, 0, 255),
+            AnsiColor::Cyan => (0, 255, 255),
+            AnsiColor::White => (255, 255, 255),
+            AnsiColor::Xterm256(idx) => (idx, idx, idx),
             AnsiColor::Rgb(r, g, b) => (r, g, b),
         }
     }

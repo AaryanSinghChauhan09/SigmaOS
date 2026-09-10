@@ -81,7 +81,17 @@ mod community_foundation;
 #[path = "../src/distro/sovereign_distro_dominance.rs"]
 mod sovereign_distro_dominance;
 
+#[path = "../src/kernel/linux_bsd_innovations.rs"]
+mod linux_bsd_innovations;
+
+#[path = "../src/boot/firmware.rs"]
+mod firmware;
+
+#[path = "../src/unimplemented_features.rs"]
+mod unimplemented_features;
+
 use bsd::*;
+use unimplemented_features::*;
 use gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
 use kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
 use unimplemented_features::{

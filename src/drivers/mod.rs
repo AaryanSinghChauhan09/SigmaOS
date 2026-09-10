@@ -32,9 +32,15 @@ pub use legacy_audio_ac97::LegacyAudioAc97;
 pub use legacy_keyboard::LegacyKeyboard;
 pub use legacy_parallel_printer::LegacyParallelPrinter;
 pub use linux_bsd_drivers::{
-    DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent, EvdevInputDevice, EvdevEventType,
-    FreeBsdDrmConnector, MultiTouchSlot, OpenBsdDriverPledge, DriverCapability,
-    NetBsdRumpDriverHost, UrbTransferType, LinuxUrb, LinuxUrbQueue,
+    AmdgpuDrmDriver, AmdgpuIpBlockType, AppleSiliconDartIommu, DriverCapability,
+    DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent, EvdevEventType,
+    EvdevInputDevice, FreeBsdDrmConnector, IntelIgcEthernetDriver, IntelXeDrmDriver,
+    LinuxIioImuSensorDriver, LinuxUrb, LinuxUrbQueue, LsiMegaRaidHbaDriver, MultiTouchSlot,
+    NetBsdRumpDriverHost, OpenBsdDriverPledge, RaidLevel, RealtekR8169EthernetDriver,
+    RpiBcmSocDriver, SensorReadings, SovereignDeviceManager, SovereignWirelessCardDriver,
+    ThunderboltSecurityLevel, ThunderboltUsb4Driver, Uac2AudioDriver, UrbTransferType,
+    UvcCameraDriver, VideoPixelFormat, VirtioGpu3dDriver, VirtioSoundDriver,
+    WacomPrecisionTouchpadDriver, WifiMode,
 };
 pub use modern_audio_intel_hda::ModernAudioIntelHda;
 pub use modern_usb::ModernUsbController;

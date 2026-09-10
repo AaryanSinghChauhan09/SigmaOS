@@ -8,6 +8,7 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::str::FromStr;
@@ -121,7 +122,7 @@ impl SigmaJailManager {
 
     /// Stop a jail
     pub fn stop_jail(&mut self, name: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let (exec_stop, jid, config, processes) = if let Some(jail) = self.jails.get(name) {
+        let (exec_stop, jid, config, processes) = if let Some(jail) = self.jails.get_str(name) {
             if jail.state != JailState::Running {
                 return Err(format!("Jail '{}' is not running", name).into());
             }
@@ -135,7 +136,7 @@ impl SigmaJailManager {
             return Err(format!("Jail '{}' not found", name).into());
         };
 
-        if let Some(jail) = self.jails.get_mut(name) {
+        if let Some(jail) = self.jails.get_mut_str(name) {
             jail.state = JailState::Stopping;
         }
 
@@ -157,7 +158,7 @@ impl SigmaJailManager {
             self.cleanup_jail_network(jid)?;
         }
 
-        if let Some(jail) = self.jails.get_mut(name) {
+        if let Some(jail) = self.jails.get_mut_str(name) {
             jail.state = JailState::Stopped;
             jail.jid = None;
             jail.processes.clear();
@@ -173,7 +174,7 @@ impl SigmaJailManager {
         name: &str,
         command: &str,
     ) -> Result<String, Box<dyn std::error::Error>> {
-        if let Some(jail) = self.jails.get(name) {
+        if let Some(jail) = self.jails.get_str(name) {
             if jail.state != JailState::Running {
                 return Err(format!("Jail '{}' is not running", name).into());
             }

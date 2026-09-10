@@ -789,23 +789,26 @@ impl ShellJobControl {
         id
     }
 
-    pub fn list_jobs(&self) -> String {
-        if self.jobs.is_empty() {
-            return "No active jobs.".to_string();
-        }
-        let mut out = String::new();
+    pub fn list_jobs(&self) -> Vec<String> {
+        let mut list = Vec::new();
         for job in &self.jobs {
             let state_str = match job.state {
                 JobState::Running => "Running",
                 JobState::Stopped => "Stopped",
                 JobState::Terminated => "Terminated",
             };
-            out.push_str(&format!(
-                "[{}] PID {}  {}  {}\n",
-                job.id, job.pid, state_str, job.command
-            ));
+            list.push(format!("[{}] PID {}  {}  {}", job.id, job.pid, state_str, job.command));
         }
-        out
+        list
+    }
+
+    pub fn bring_to_foreground(&mut self, id: u32) -> Result<String, &'static str> {
+        if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id as usize) {
+            job.state = JobState::Running;
+            Ok(format!("Job [{}] '{}' brought to foreground.", job.id, job.command))
+        } else {
+            Err("Job not found")
+        }
     }
 
     pub fn bring_to_foreground(&mut self, id: usize) -> Result<String, String> {

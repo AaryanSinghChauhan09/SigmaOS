@@ -183,7 +183,14 @@ pub trait TCPConnection {
 
 impl TCPConnection for SimpleSocket {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
+        let current = self.get_state();
+        if current != TCPState::Closed && current != TCPState::Listen {
+            return Err(NetworkError::ConnectionFailed);
+        }
+
         self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+
+        // Transition: Closed -> SynSent -> Established
         self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
         self.state.store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
@@ -708,8 +715,8 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        for socket in &self.sockets {
-            if let Some(s) = socket {
+        for socket_opt in &self.sockets {
+            if let Some(s) = socket_opt {
                 if s.id() == id {
                     return Some(s.as_ref());
                 }

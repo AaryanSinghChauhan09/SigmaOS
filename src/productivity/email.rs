@@ -171,7 +171,7 @@ impl EmailBackend for ImapSmtpBackend {
     }
 
     fn mark_as_read(&mut self, email_id: &str) -> Result<(), EmailError> {
-        if let Some(email) = self.emails.get_mut(email_id) {
+        if let Some(email) = self.emails.get_mut_str(email_id) {
             email.read = true;
             Ok(())
         } else {
@@ -180,7 +180,7 @@ impl EmailBackend for ImapSmtpBackend {
     }
 
     fn delete_email(&mut self, email_id: &str) -> Result<(), EmailError> {
-        if let Some(email) = self.emails.get_mut(email_id) {
+        if let Some(email) = self.emails.get_mut_str(email_id) {
             email.folder = EmailFolder::Trash;
             Ok(())
         } else {
@@ -189,7 +189,7 @@ impl EmailBackend for ImapSmtpBackend {
     }
 
     fn move_to_folder(&mut self, email_id: &str, folder: EmailFolder) -> Result<(), EmailError> {
-        if let Some(email) = self.emails.get_mut(email_id) {
+        if let Some(email) = self.emails.get_mut_str(email_id) {
             email.folder = folder;
             Ok(())
         } else {
