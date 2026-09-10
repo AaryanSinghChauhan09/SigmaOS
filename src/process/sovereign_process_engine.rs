@@ -3,8 +3,7 @@
 // background process management, timeout waiting, process cancellation/termination,
 // and zero-copy IPC channels inspired by Linux and BSD distributions.
 
-use std::collections::BTreeMap;
-use std::format;
+use std::collections::{BTreeMap, HashMap};
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -250,7 +249,7 @@ impl Default for SovereignProcessManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -297,5 +296,177 @@ mod tests {
             SovereignProcessState::Cancelled
         );
         assert!(mgr.sovereign_run_background(pid).is_err());
+    }
+
+    #[test]
+    fn test_sovereign_pid_allocator() {
+        let mut alloc = SovereignPidAllocator::new(100, 200);
+        let pid1 = alloc.allocate_pid(1).unwrap();
+        let pid2 = alloc.allocate_pid(1).unwrap();
+        assert_ne!(pid1, pid2);
+        assert!(pid1 >= 100 && pid1 < 200);
+
+        alloc.free_pid(pid1);
+        assert!(alloc.recycled_pid_queue.contains(&pid1));
+    }
+
+    #[test]
+    fn test_process_id_table() {
+        let mut table = ProcessIdTable::new();
+        table.insert_process(101, 1, 101, 101, "init_proc");
+        table.insert_process(102, 101, 101, 101, "child_proc");
+
+        assert_eq!(table.get_ppid(102), Some(101));
+        assert_eq!(table.get_pgid(102), Some(101));
+        let children = table.get_children(101);
+        assert_eq!(children.len(), 1);
+        assert_eq!(children[0], 102);
+    }
+}
+
+/// Secure Randomized Process ID (PID) Allocator & Recycling Guard
+/// Implements OpenBSD/Linux security research inspired randomized PID assignment
+/// and delayed PID recycling to prevent PID reuse vulnerabilities and race conditions.
+pub struct SovereignPidAllocator {
+    pub min_pid: usize,
+    pub max_pid: usize,
+    pub active_pids: Vec<usize>,
+    pub recycled_pid_queue: Vec<usize>,
+    pub pid_namespace_id: usize,
+    pub next_pseudo_random_seed: usize,
+}
+
+impl SovereignPidAllocator {
+    pub fn new(min_pid: usize, max_pid: usize) -> Self {
+        Self {
+            min_pid,
+            max_pid,
+            active_pids: Vec::new(),
+            recycled_pid_queue: Vec::new(),
+            pid_namespace_id: 1,
+            next_pseudo_random_seed: 0x5167_4321,
+        }
+    }
+
+    pub fn allocate_pid(&mut self, _ns_id: usize) -> Result<usize, &'static str> {
+        let range = self.max_pid.saturating_sub(self.min_pid);
+        if range == 0 || self.active_pids.len() >= range {
+            return Err("PID Allocator: PID space exhausted in namespace");
+        }
+
+        for _ in 0..range {
+            self.next_pseudo_random_seed = self
+                .next_pseudo_random_seed
+                .wrapping_mul(1103515245)
+                .wrapping_add(12345);
+            let offset = (self.next_pseudo_random_seed >> 16) % range;
+            let candidate_pid = self.min_pid + offset;
+
+            if !self.active_pids.contains(&candidate_pid)
+                && !self.recycled_pid_queue.contains(&candidate_pid)
+            {
+                self.active_pids.push(candidate_pid);
+                return Ok(candidate_pid);
+            }
+        }
+
+        // Fallback to sequential linear scan if pseudo-random probe collides
+        for candidate_pid in self.min_pid..self.max_pid {
+            if !self.active_pids.contains(&candidate_pid)
+                && !self.recycled_pid_queue.contains(&candidate_pid)
+            {
+                self.active_pids.push(candidate_pid);
+                return Ok(candidate_pid);
+            }
+        }
+
+        Err("PID Allocator: No free PID available")
+    }
+
+    pub fn free_pid(&mut self, pid: usize) {
+        if let Some(pos) = self.active_pids.iter().position(|&p| p == pid) {
+            self.active_pids.remove(pos);
+            self.recycled_pid_queue.push(pid);
+            // Maintain a bounded recycling queue (delay PID reuse to prevent race attacks)
+            if self.recycled_pid_queue.len() > 64 {
+                self.recycled_pid_queue.remove(0);
+            }
+        }
+    }
+}
+
+impl Default for SovereignPidAllocator {
+    fn default() -> Self {
+        Self::new(1000, 65536)
+    }
+}
+
+/// Process ID Hierarchy Table & Session Group Manager (`pid_t` / `pgid_t` / `sid_t`)
+#[derive(Debug, Clone)]
+pub struct ProcessGroupEntry {
+    pub pid: usize,
+    pub ppid: usize,
+    pub pgid: usize,
+    pub sid: usize,
+    pub process_name: String,
+}
+
+pub struct ProcessIdTable {
+    pub pid_map: HashMap<usize, ProcessGroupEntry>,
+}
+
+impl ProcessIdTable {
+    pub fn new() -> Self {
+        Self {
+            pid_map: HashMap::new(),
+        }
+    }
+
+    pub fn insert_process(
+        &mut self,
+        pid: usize,
+        ppid: usize,
+        pgid: usize,
+        sid: usize,
+        name: &str,
+    ) {
+        self.pid_map.insert(
+            pid,
+            ProcessGroupEntry {
+                pid,
+                ppid,
+                pgid,
+                sid,
+                process_name: name.to_string(),
+            },
+        );
+    }
+
+    pub fn get_ppid(&self, pid: usize) -> Option<usize> {
+        self.pid_map.get(&pid).map(|entry| entry.ppid)
+    }
+
+    pub fn get_pgid(&self, pid: usize) -> Option<usize> {
+        self.pid_map.get(&pid).map(|entry| entry.pgid)
+    }
+
+    pub fn get_children(&self, parent_pid: usize) -> Vec<usize> {
+        let mut children = Vec::new();
+        for (pid, entry) in &self.pid_map {
+            if entry.ppid == parent_pid {
+                children.push(*pid);
+            }
+        }
+        children
+    }
+
+    pub fn remove_process(&mut self, pid: usize) -> Option<ProcessGroupEntry> {
+        self.pid_map.remove(&pid)
+    }
+}
+
+impl Default for ProcessIdTable {
+    fn default() -> Self {
+        Self::new()
     }
 }
