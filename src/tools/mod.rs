@@ -32,6 +32,16 @@ pub use open_source_tools_parity::{
     RofiCommandHudEngine, SearchMatch,
 };
 
+pub use open_source_tools_parity::{
+    BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, DufDiskFreeInfoEngine,
+    DufMountPoint, DustFastDuEngine, DustFolderUsage, EzaFileItem, EzaModernLsEngine,
+    FastfetchInfoEngine, FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry,
+    NcduDiskUsageAnalyzerEngine, NcduNode, ProcsModernPsEngine, ProcsProcessEntry,
+    RipgrepRegexSearchEngine, RofiCommandHudEngine, SearchMatch, SovereignAbridgeTool,
+    SovereignXcpTool, StarshipPromptEngine, TldrCommandPage, TldrQuickPagesEngine,
+    XcpCopyProgress, ZoxideFastCdEngine, ZoxidePathEntry,
+};
+
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
     DataPipelineEtlEngine, DataQueryEngine, DataValue, ParquetArrowDataEngine,

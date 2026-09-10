@@ -388,6 +388,25 @@ impl LinuxDistroDefeaterEngine {
         })
     }
 
+    /// Evaluates total distro domination score across all baselines
+    pub fn eval_distro_domination_score(&self) -> u64 {
+        self.baselines
+            .iter()
+            .map(|b| {
+                let boot_multiplier = b.boot_latency_ms / self.sigma_boot_latency_ms.max(1);
+                let ram_multiplier = b.rss_memory_mb / self.sigma_rss_memory_mb.max(1);
+                let syscall_multiplier = b.syscall_overhead_ns / self.sigma_syscall_overhead_ns.max(1);
+                let ipc_multiplier = self.zero_copy_ipc_msg_sec / b.ipc_throughput_msg_sec.max(1);
+                (boot_multiplier + ram_multiplier + syscall_multiplier + ipc_multiplier) / 4
+            })
+            .sum::<u64>() / self.baselines.len().max(1) as u64
+    }
+
+    /// Calculates overall distro domination ratio vs average Linux & BSD baselines
+    pub fn distro_domination_ratio(&self) -> u64 {
+        self.eval_distro_domination_score()
+    }
+
     pub fn benchmark_comparison_matrix(&self) -> Vec<(String, u64, u64, u64, u64)> {
         self.baselines
             .iter()

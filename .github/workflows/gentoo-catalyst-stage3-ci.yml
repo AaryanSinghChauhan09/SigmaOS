@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-permissions:
-  contents: read
-
 jobs:
   gentoo-catalyst-stage3:
     name: Gentoo Linux Catalyst Stage3 & Portage EAPI 8 Rebuild Test
