@@ -87,3 +87,5 @@ pub mod dependency_reduction;
 pub use dependency_reduction::*;
 pub mod native_userland_replacements;
 pub use native_userland_replacements::MasterNativeUserlandReplacements;
+pub mod thenewstack_tools;
+pub use thenewstack_tools::*;
