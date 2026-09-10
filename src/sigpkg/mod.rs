@@ -90,9 +90,10 @@ pub use bsd_linux_package_innovations::{
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
+pub use universal_engine::PackageFormat;
 pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
-    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
+    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest,
     FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
     ZypperSpecManifest, SlackwarePkgManifest,
     RpmSpecManifest, AppImageContainer, MappedScriptletHook,

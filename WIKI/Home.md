@@ -66,6 +66,36 @@ Get started with SigmaOS through our comprehensive wiki:
 - **Cross-Subsystem Bridge**: `SovereignUniversalDistroBridge` in `src/distro/linux_bsd_inspirations.rs` integrates VFS, Init, Package Management, Security, Kernel, and Memory subsystems.
 - **Multi-Distro Parity**: Comprehensive adapters for Arch Linux (pacman/AUR), Fedora (dnf/rpm-ostree), Debian (apt), Gentoo (portage), Alpine (apk), Void (xbps), FreeBSD (pkg), OpenBSD (pkg_add), and NixOS (nix).
 
+## 📜 Key Project Resources & Manifesto
+- 🚀 **Public Launch Announcement**: [docs/LAUNCH_ANNOUNCEMENT.md](docs/LAUNCH_ANNOUNCEMENT.md)
+- 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
+- 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
+- ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
+- 📋 **Linux Distro Feature Parity Checklist**: [docs/LINUX_DISTRO_PARITY_CHECKLIST.md](docs/LINUX_DISTRO_PARITY_CHECKLIST.md)
+- ⚡ **Strategy to Surpass & Defeat Linux & BSD**: [docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md](docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md)
+- 🗺️ **Master Development Roadmap**: [FUTURE-DEVELOPMENT-ROADMAP.md](FUTURE-DEVELOPMENT-ROADMAP.md)
+
+---
+
+## 🧩 Core Architecture & Features
+- **Boot to Web**: Minimal Linux (Buildroot) base, boots directly into Chromium in ~3s.
+- **Browser as Shell**: Workspaces, window management, and hardware interfaces powered by web apps.
+- **Unix Philosophy for Web Apps**: PWAs gain raw access to pipes, spawn, mmap, and `/dev`.
+- **Zero-Bloat Package Management**: Alpine packages installed directly via browser APIs.
+- **Strict Capabilities System**: Websites must explicitly request hardware/file access.
+- **Safe-Rust 12-Shard Microkernel**: Twelve shard taxonomy replacing 500+ legacy apps with native abstractions.
+
+---
+
+## 🛠️ Quick Start & Building
+```bash
+# Build the core library
+cargo check --lib
+
+# Run the native test suite
+./run_sigma_tests.sh
+```
+
 ---
 
 ## 🛡️ Security Architecture

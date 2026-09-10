@@ -36,14 +36,6 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Version {
-    pub major: u64,
-    pub minor: u64,
-    pub patch: u64,
-}
-
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
 
@@ -262,6 +254,15 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -308,8 +309,12 @@ impl PackageFormat {
             Some(PackageFormat::Eopkg)
         } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
             Some(PackageFormat::Nix)
+        } else if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if normalized.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
         } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
+            Some(PackageFormat::Portage)
         } else if normalized.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
@@ -2994,7 +2999,46 @@ pub struct PackageDeltaPatch {
     pub delta_payload: Vec<u8>,
 }
 
-pub struct PackageDeltaEngine;
+pub trait IPackageDeltaStrategy: Send + Sync {
+    fn name(&self) -> &str;
+    fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str>;
+    fn compute_delta(&self, _source: &[u8], target: &[u8]) -> Vec<u8> {
+        target.to_vec()
+    }
+    fn apply_delta(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        self.apply(source, patch)
+    }
+}
+
+pub struct DnfDeltaRpmStrategy;
+impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
+    fn name(&self) -> &str { "drpm" }
+    fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        let mut out = source.to_vec();
+        out.extend_from_slice(patch);
+        Ok(out)
+    }
+}
+
+pub struct SovereignBinaryDeltaStrategy;
+impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
+    fn name(&self) -> &str { "moss-stone-delta" }
+    fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(patch.to_vec())
+    }
+}
+
+pub struct ZstdChunkedDeltaStrategy;
+impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
+    fn name(&self) -> &str { "zstd-chunked" }
+    fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(patch.to_vec())
+    }
+}
+
+pub struct PackageDeltaEngine {
+    pub strategies: HashMap<String, Arc<dyn IPackageDeltaStrategy>>,
+}
 
 impl PackageDeltaEngine {
     pub fn new() -> Self {
@@ -5592,13 +5636,13 @@ Description: Hook test";
             ("test.AppImage", PackageFormat::AppImage),
             ("test.eopkg", PackageFormat::Eopkg),
             ("test.nixpkg", PackageFormat::Nix),
-            ("test.portage", PackageFormat::Ebuild),
+            ("test.portage", PackageFormat::Portage),
             ("test.deb", PackageFormat::Deb),
             ("test.tar.gz", PackageFormat::TarGz),
             ("test.tar .gz", PackageFormat::TarGz),
             ("test.xz", PackageFormat::TarXz),
             ("test.rpm", PackageFormat::Rpm),
-            ("test.ebuild", PackageFormat::Ebuild),
+            ("test.ebuild", PackageFormat::Portage),
             ("test.pkg.tar.xz", PackageFormat::Pacman),
             ("test.flatpak", PackageFormat::Flatpak),
             ("test.app", PackageFormat::AppBundle),

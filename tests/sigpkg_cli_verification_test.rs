@@ -1,7 +1,11 @@
 // SigmaOS Universal Package Manager CLI & Adapter Integration Tests
 extern crate alloc;
 
+#[cfg(not(feature = "standalone_test"))]
 use sigmaos::sigpkg::*;
+
+#[cfg(feature = "standalone_test")]
+use crate::sigpkg::*;
 
 #[test]
 fn test_bsd_and_linux_manifest_parsers() {

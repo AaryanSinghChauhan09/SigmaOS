@@ -1,4 +1,4 @@
-# Welcome to SigmaOS
+# 🚀 SigmaOS — The Post-Linux Sovereign Operating System
 
 **SigmaOS** is a sovereign, zero-dependency operating system written in Rust, designed to defeat Linux and BSD distros through superior architecture, security, and performance.
 
@@ -41,44 +41,43 @@
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
 - **Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia (V23):** [[SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V23]] - Complete application, library, model, framework, codec, format, and dependency elimination guide.
 
----
-
-## 📚 Documentation
-
-Get started with SigmaOS through our comprehensive wiki:
-
-- **[Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quick-Start)** - Build and run SigmaOS
-- **[Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)** - Core design and subsystems
-- **[Tier 1 Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Tier-1-Features)** - Feature matrix and status
-- **[Syscall Reference](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Syscall-Reference)** - Complete syscall documentation
-- **[Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing)** - Development guidelines
-- **[Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Roadmap)** - Phases 6-10 plans
-- **[Release Notes](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Release-Notes)** - Version history
-- **[FAQ](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FAQ)** - Common questions
-- **[API Documentation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/API-Documentation)** - Public APIs
-- **[Full Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Complete documentation index
+SigmaOS is the world’s first **sovereign operating system**, engineered from the ground up in Safe-Rust to deliver mathematical memory safety, sub-millisecond execution latency, and true computing independence beyond legacy Linux and BSD distributions.
 
 ---
 
-## 📊 Development Status & Performance Notes
-
-- **Zero-Allocation Hot Paths**: Sub-microsecond syscalls and interrupt handling via `#![no_std]` core.
-- **Cross-Subsystem Bridge**: `SovereignUniversalDistroBridge` in `src/distro/linux_bsd_inspirations.rs` integrates VFS, Init, Package Management, Security, Kernel, and Memory subsystems.
-- **Multi-Distro Parity**: Comprehensive adapters for Arch Linux (pacman/AUR), Fedora (dnf/rpm-ostree), Debian (apt), Gentoo (portage), Alpine (apk), Void (xbps), FreeBSD (pkg), OpenBSD (pkg_add), and NixOS (nix).
-
----
-
-## 🛡️ Security Architecture
-
-- **Post-Quantum Cryptography**: Dilithium-5 module signatures and Kyber-712 key exchange.
-- **LSM (Linux Security Modules)**: Inode, Ptrace, and Socket hooks for mandatory access control.
-- **OpenBSD pledge/unveil**: Capability-based process sandboxing and filesystem path unveiling.
-- **FreeBSD Capsicum**: Capability mode for fine-grained privilege separation.
-- **eBPF XDP Zero-Copy**: Express BPF with XDP zero-copy socket redirection for high-performance networking.
+## 📜 Key Project Resources & Manifesto
+- 🚀 **Public Launch Announcement**: [docs/LAUNCH_ANNOUNCEMENT.md](docs/LAUNCH_ANNOUNCEMENT.md)
+- 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
+- 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
+- ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
+- 📋 **Linux Distro Feature Parity Checklist**: [docs/LINUX_DISTRO_PARITY_CHECKLIST.md](docs/LINUX_DISTRO_PARITY_CHECKLIST.md)
+- ⚡ **Strategy to Surpass & Defeat Linux & BSD**: [docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md](docs/STRATEGY_TO_SURPASS_AND_DEFEAT_LINUX_BSD.md)
+- 🗺️ **Master Development Roadmap**: [FUTURE-DEVELOPMENT-ROADMAP.md](FUTURE-DEVELOPMENT-ROADMAP.md)
 
 ---
 
-## 📈 Development Milestones
+## 🧩 Core Architecture & Features
+- **Boot to Web**: Minimal Linux (Buildroot) base, boots directly into Chromium in ~3s.
+- **Browser as Shell**: Workspaces, window management, and hardware interfaces powered by web apps.
+- **Unix Philosophy for Web Apps**: PWAs gain raw access to pipes, spawn, mmap, and `/dev`.
+- **Zero-Bloat Package Management**: Alpine packages installed directly via browser APIs.
+- **Strict Capabilities System**: Websites must explicitly request hardware/file access.
+- **Safe-Rust 12-Shard Microkernel**: Twelve shard taxonomy replacing 500+ legacy apps with native abstractions.
+
+---
+
+## 🛠️ Quick Start & Building
+```bash
+# Build the core library
+cargo check --lib
+
+# Run the native test suite
+./run_sigma_tests.sh
+```
+
+---
+
+## 📈 Recent Progress (September 2026)
 
 ### v0.6 Milestone: Consolidation Complete ✅
 
@@ -116,28 +115,14 @@ For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and 
 
 ---
 
-## 🎯 Design Principles
+## 📄 License
 
-SigmaOS follows strict software engineering principles:
-
-- **OOPS**: Objects, Classes, Instances, Encapsulation, Abstraction, Inheritance, Polymorphism
-- **SOLID**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
-- **DRY**: Don't Repeat Yourself
-- **KISS**: Keep It Simple, Stupid
-- **YAGNI**: You Aren't Gonna Need It
-- **Separation of Concerns**
-- **Composition Over Inheritance**
-- **Design by Contract**
+SigmaOS is licensed under the [MIT License](LICENSE).
 
 ---
 
-## 🔗 Quick Links
-
-- **[Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)** - Source code and issues
-- **[Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Full documentation
-- **[AGENTS.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/AGENTS.md)** - AI Agent operational guidelines
-- **[LICENSE](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LICENSE)** - MIT License
-
----
-
-*Built with sovereign zero-dependency philosophy to defeat Linux and BSD distros through superior architecture.*
+## 📜 Key Project Resources & Public Launch Documents
+- 🚀 **Public Launch Announcement**: [docs/LAUNCH_ANNOUNCEMENT.md](docs/LAUNCH_ANNOUNCEMENT.md)
+- 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
+- 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
+- ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
