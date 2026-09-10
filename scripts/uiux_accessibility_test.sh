@@ -21,7 +21,7 @@ echo "=============================================="
 echo "[1/6] Compositor frame time benchmark..."
 FRAME_LIMIT_MS=16
 FRAME_TIME_MS=12  # Simulated — in production read from perf counters
-if [[ $FRAME_TIME_MS -lt $FRAME_LIMIT_MS ]]; then
+if [ "$FRAME_TIME_MS" -lt "$FRAME_LIMIT_MS" ]; then
     log_pass "Compositor frame time: ${FRAME_TIME_MS}ms < ${FRAME_LIMIT_MS}ms target."
 else
     log_fail "Compositor frame time EXCEEDED: ${FRAME_TIME_MS}ms >= ${FRAME_LIMIT_MS}ms."
@@ -31,7 +31,7 @@ fi
 echo "[2/6] App cold-start time benchmark..."
 LAUNCH_LIMIT_MS=500
 LAUNCH_TIME_MS=320  # Simulated
-if [[ $LAUNCH_TIME_MS -lt $LAUNCH_LIMIT_MS ]]; then
+if [ "$LAUNCH_TIME_MS" -lt "$LAUNCH_LIMIT_MS" ]; then
     log_pass "App launch time: ${LAUNCH_TIME_MS}ms < ${LAUNCH_LIMIT_MS}ms target."
 else
     log_fail "App launch time EXCEEDED: ${LAUNCH_TIME_MS}ms >= ${LAUNCH_LIMIT_MS}ms."
@@ -41,7 +41,7 @@ fi
 echo "[3/6] Syscall frequency audit..."
 SYSCALL_LIMIT=50
 SYSCALLS_PER_FRAME=33  # Simulated
-if [[ $SYSCALLS_PER_FRAME -lt $SYSCALL_LIMIT ]]; then
+if [ "$SYSCALLS_PER_FRAME" -lt "$SYSCALL_LIMIT" ]; then
     log_pass "Syscalls/frame: $SYSCALLS_PER_FRAME < $SYSCALL_LIMIT limit."
 else
     log_fail "Syscall frequency EXCEEDED: $SYSCALLS_PER_FRAME >= $SYSCALL_LIMIT/frame."
@@ -76,5 +76,7 @@ echo ""
 echo "=============================================="
 echo "  Results: $PASS passed | $FAIL failed"
 echo "=============================================="
-[[ $FAIL -gt 0 ]] && exit 1
+if [ "$FAIL" -gt 0 ]; then
+    exit 1
+fi
 exit 0

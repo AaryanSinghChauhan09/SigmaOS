@@ -802,15 +802,6 @@ impl ShellJobControl {
         list
     }
 
-    pub fn bring_to_foreground(&mut self, id: u32) -> Result<String, &'static str> {
-        if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id as usize) {
-            job.state = JobState::Running;
-            Ok(format!("Job [{}] '{}' brought to foreground.", job.id, job.command))
-        } else {
-            Err("Job not found")
-        }
-    }
-
     pub fn bring_to_foreground(&mut self, id: usize) -> Result<String, String> {
         if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {
             job.state = JobState::Running;
@@ -1864,8 +1855,8 @@ mod tests {
         assert_eq!(jc.jobs[0].state, JobState::Stopped);
 
         let listing = jc.list_jobs();
-        assert!(listing.contains("sleep 100"));
-        assert!(listing.contains("Stopped"));
+        assert!(listing.iter().any(|s| s.contains("sleep 100")));
+        assert!(listing.iter().any(|s| s.contains("Stopped")));
 
         assert!(jc.remove_job(id2));
         assert_eq!(jc.jobs.len(), 1);

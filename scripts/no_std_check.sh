@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # scripts/no_std_check.sh
 # Scans kernel, drivers, and core subsystems for illegal 'use std::' statements outside tests.
 
@@ -6,10 +6,10 @@ set -e
 
 echo "Running no_std enforcement audit across core modules..."
 
-SEARCH_DIRS=("kernel" "drivers" "klib")
+SEARCH_DIRS="kernel drivers klib"
 VIOLATIONS=0
 
-for dir in "${SEARCH_DIRS[@]}"; do
+for dir in $SEARCH_DIRS; do
     if [ -d "$dir" ]; then
         # Search for 'use std::' ignoring test blocks or test configs where possible
         FOUND=$(grep -rn "use std::" "$dir" | grep -v "#\[cfg(test)\]" | grep -v "//" || true)
