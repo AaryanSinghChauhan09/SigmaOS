@@ -83,4 +83,7 @@ pub use mint_menu::{
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
 pub mod native_userland_replacements;
-pub use native_userland_replacements::MasterNativeUserlandReplacements;
+pub use native_userland_replacements::{
+    BatSyntaxPagerEngine, BtopSystemMonitorEngine, FastfetchInfoEngine, FdFastFindEngine,
+    MasterNativeUserlandReplacements, RipgrepRegexSearchEngine, RofiCommandHudEngine,
+};

@@ -415,4 +415,7 @@ pub use tools::{
     SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
     UserIdentity as LibUserIdentity,
 };
-pub use tools::native_userland_replacements::MasterNativeUserlandReplacements;
+pub use tools::native_userland_replacements::{
+    BatSyntaxPagerEngine, BtopSystemMonitorEngine, FastfetchInfoEngine, FdFastFindEngine,
+    MasterNativeUserlandReplacements, RipgrepRegexSearchEngine, RofiCommandHudEngine,
+};
