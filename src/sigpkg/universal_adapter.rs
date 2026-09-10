@@ -8,10 +8,11 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-
-#[cfg(test)]
+pub use crate::package::{
+    ApkIndexManifest, AptDebManifest, ArchPkgInfoManifest, GentooEbuildMetadata, HaikuHpkgManifest,
+    SnapcraftManifest, XbpsManifest,
+};
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
 pub use crate::sigpkg::Version;
 
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
@@ -51,19 +52,10 @@ pub struct PacmanPkgbuild {
 }
 
 use crate::sigpkg::universal_engine::PackageFormat;
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
+pub use crate::sigpkg::universal_oop_system;
+pub use universal_oop_system::UniversalPackageManager;
 
-/// Debian-style package priority levels (DFSG and APT standard)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PackagePriority {
-    Optional = 0,
-    Standard = 1,
-    Important = 2,
-    Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
-}
+pub use crate::package::PackagePriority;
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -192,6 +184,8 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: String::new(),
             depends,
             description,
             priority,
@@ -497,6 +491,7 @@ impl UniversalPackageAdapter {
             summary,
             confinement,
             plugs,
+            slots: Vec::new(),
         })
     }
 
@@ -1582,47 +1577,67 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let raw = foreign_name.trim().to_lowercase();
-        let clean = if let Some(stripped) = raw.strip_prefix("so:") {
+        let clean_prefix = if let Some(stripped) = raw.strip_prefix("so:") {
             if stripped.starts_with("libc.") {
-                "libc"
+                "libc".to_string()
             } else {
-                stripped.split('.').next().unwrap_or(stripped)
+                stripped.split('.').next().unwrap_or(stripped).to_string()
             }
         } else if let Some(stripped) = raw.strip_prefix("cmd:") {
-            stripped
+            stripped.to_string()
         } else {
-            raw.as_str()
+            raw.clone()
         };
 
-        match clean {
-            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
-            | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
-                "libc".to_string()
-            }
-            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
-                "zlib".to_string()
-            }
-            "python" | "python3" | "python3-dev" | "python3-devel" | "dev-lang/python" | "lang/python" => {
-                "python".to_string()
-            }
-            "curl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl" | "net-misc/curl" => "curl".to_string(),
-            "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
-            "libx11" | "libx11-dev" | "libx11-devel" | "x11-libs/libx11" | "x11-proto/xorgproto" | "xorg-x11-server" => "libx11".to_string(),
-            "wayland" | "wayland-devel" | "wayland-dev" | "dev-libs/wayland" => "wayland".to_string(),
-            "pipewire" | "media-video/pipewire" | "pipewire-devel" => "pipewire".to_string(),
-            "dbus" | "dbus-devel" | "sys-apps/dbus" => "dbus".to_string(),
-            "pkgconf" | "pkg-config" | "pkgconfig" | "dev-util/pkgconf" => "pkgconf".to_string(),
-            "ncurses" | "ncurses-devel" | "ncursesw" | "sys-libs/ncurses" => "ncurses".to_string(),
-            "readline" | "readline-devel" | "sys-libs/readline" => "readline".to_string(),
-            "xz" | "xz-utils" | "liblzma-dev" | "app-arch/xz-utils" => "xz".to_string(),
-            "zstd" | "libzstd-dev" | "libzstd-devel" | "app-arch/zstd" => "zstd".to_string(),
-            "sqlite" | "sqlite3" | "libsqlite3-dev" | "sqlite-devel" | "dev-db/sqlite" => "sqlite".to_string(),
-            "gtk3" | "libgtk-3-dev" | "gtk3-devel" | "x11-toolkits/gtk30" => "gtk3".to_string(),
-            "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "qt5".to_string(),
-            "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
-            "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
-            _ => clean.to_string(),
+        // Strip category prefix if present (e.g. "dev-libs/openssl" -> "openssl")
+        let sans_category = if let Some((_cat, pkg)) = clean_prefix.split_once('/') {
+            pkg.to_string()
+        } else {
+            clean_prefix
+        };
+
+        // Strip common dev suffixes (e.g., "-dev", "-devel")
+        let base_name = if let Some(s) = sans_category.strip_suffix("-devel") {
+            s.to_string()
+        } else if let Some(s) = sans_category.strip_suffix("-dev") {
+            s.to_string()
+        } else {
+            sans_category
+        };
+
+        match base_name.as_str() {
+            "libssl" | "libssl3" | "openssl" => "openssl".to_string(),
+            "libc6" | "glibc" | "musl" | "libc" => "libc".to_string(),
+            "zlib1g" | "zlib" => "zlib".to_string(),
+            "python3" | "python" => "python".to_string(),
+            "libcurl4" | "libcurl" | "curl" => "curl".to_string(),
+            "bash" => "bash".to_string(),
+            "libx11" | "xorgproto" | "xorg-x11-server" => "libx11".to_string(),
+            "wayland" => "wayland".to_string(),
+            "pipewire" => "pipewire".to_string(),
+            "dbus" => "dbus".to_string(),
+            "pkg-config" | "pkgconfig" | "pkgconf" => "pkgconf".to_string(),
+            "ncursesw" | "ncurses" => "ncurses".to_string(),
+            "readline" => "readline".to_string(),
+            "xz-utils" | "liblzma" | "xz" => "xz".to_string(),
+            "libzstd" | "zstd" => "zstd".to_string(),
+            "sqlite3" | "libsqlite3" | "sqlite" => "sqlite".to_string(),
+            "libgtk-3" | "gtk30" | "gtk3" => "gtk3".to_string(),
+            "qt5-base" | "libqt5core5a" | "qt5" => "qt5".to_string(),
+            "llvm" => "llvm".to_string(),
+            "gcc-c++" | "gcc" => "gcc".to_string(),
+            "libffi" => "libffi".to_string(),
+            "glib2" | "glib" => "glib".to_string(),
+            "pcre2" | "libpcre2" | "libpcre" | "pcre" => "pcre".to_string(),
+            "libuv" => "libuv".to_string(),
+            "openssh" => "openssh".to_string(),
+            "mesa" => "mesa".to_string(),
+            "git" => "git".to_string(),
+            "cmake" => "cmake".to_string(),
+            "libxml2" => "libxml2".to_string(),
+            "libyaml" => "libyaml".to_string(),
+            "systemd" => "systemd".to_string(),
+            _ => base_name,
         }
     }
 }
@@ -1861,7 +1876,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -1871,14 +1886,14 @@ impl UniversalPmCommandDispatcher {
                         "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
                         "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
                         "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
-                        "--print" | "--dryrun" => dry_run = true,
+                        "--print" | "--dryrun" | "--noconfirm" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
                     i += 1;
                 }
             }
-            "dnf" | "yum" | "zypper" => {
+            "dnf" | "yum" | "zypper" | "microdnf" | "rpm" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2006,10 +2021,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" => {
-                if pm == "pkg_delete" {
-                    operation = UniversalPmOperation::Remove;
-                }
+            "pkgin" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2074,9 +2086,11 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_add" | "pkg_info" => {
+            "pkg_add" | "pkg_delete" | "pkg_info" => {
                 if pm == "pkg_add" {
                     operation = UniversalPmOperation::Install;
+                } else if pm == "pkg_delete" {
+                    operation = UniversalPmOperation::Remove;
                 } else {
                     operation = UniversalPmOperation::QueryInfo;
                 }
