@@ -91,6 +91,7 @@ pub use bsd_linux_package_innovations::{
 pub use zero_alloc_resolver::{
     PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
+pub use universal_engine::PackageFormat;
 pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
     AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest,

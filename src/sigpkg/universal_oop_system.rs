@@ -312,7 +312,7 @@ impl PackageFormat {
         } else if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
             Some(PackageFormat::Deb)
         } else if normalized.ends_with(".rpm") {
-            Some(PackageFormat::Yum)
+            Some(PackageFormat::Rpm)
         } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
             Some(PackageFormat::Portage)
         } else if normalized.ends_with(".openbsd.tgz") {
@@ -5641,7 +5641,7 @@ Description: Hook test";
             ("test.tar.gz", PackageFormat::TarGz),
             ("test.tar .gz", PackageFormat::TarGz),
             ("test.xz", PackageFormat::TarXz),
-            ("test.rpm", PackageFormat::Yum),
+            ("test.rpm", PackageFormat::Rpm),
             ("test.ebuild", PackageFormat::Portage),
             ("test.pkg.tar.xz", PackageFormat::Pacman),
             ("test.flatpak", PackageFormat::Flatpak),
