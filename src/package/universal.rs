@@ -348,7 +348,7 @@ impl PackageFormat {
         } else if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
             Some(PackageFormat::Deb)
         } else if normalized.ends_with(".rpm") {
-            Some(PackageFormat::Yum)
+            Some(PackageFormat::Rpm)
         } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
             Some(PackageFormat::Portage)
         } else if normalized.ends_with(".openbsd.tgz") {
@@ -2758,7 +2758,7 @@ mod tests {
             ("app.tar.gz", PackageFormat::TarGz),
             ("app.tar .gz", PackageFormat::TarGz),
             ("app.xz", PackageFormat::Xz),
-            ("app.rpm", PackageFormat::Yum),
+            ("app.rpm", PackageFormat::Rpm),
             ("app.ebuild", PackageFormat::Portage),
             ("app.pkg.tar.xz", PackageFormat::Pacman),
             ("app.flatpak", PackageFormat::Flatpak),
@@ -2870,7 +2870,7 @@ mod tests {
         );
         assert_eq!(
             PackageFormat::from_filename("fedora.rpm"),
-            Some(PackageFormat::Yum)
+            Some(PackageFormat::Rpm)
         );
         assert_eq!(
             PackageFormat::from_filename("gentoo.ebuild"),

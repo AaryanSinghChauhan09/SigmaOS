@@ -119,7 +119,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("compressed.xz"), Some(PackageFormat::TarXz));
-    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Yum));
+    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Rpm));
     assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
     assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
     assert_eq!(adapter.detect_format_by_extension("app.flatpak"), Some(PackageFormat::Flatpak));

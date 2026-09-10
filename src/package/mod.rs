@@ -121,5 +121,5 @@ pub use store::{
 };
 pub use universal::{
     AptDebManifest, ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    PackagePriority, PackageSource, UnifiedPackage, UniversalPackageManager,
 };
