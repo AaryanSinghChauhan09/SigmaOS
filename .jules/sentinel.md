@@ -1,8 +1,3 @@
-## 2026-03-03 - Doas Rule Substring Match Authorization Bypass
-**Vulnerability:** In `SovereignOpenBsdDoas::execute_doas`, checking rules via substring searching (`rule.contains(user)`) permitted any username matching configuration keywords or substrings (e.g. `eve` inside `keepenv`, or `permit`) to gain root execution access while bypassing command path constraints.
-**Learning:** Matching usernames against full rule configuration strings via `contains()` introduces severe authorization bypass vulnerabilities because common names and keywords overlap as substrings.
-**Prevention:** Always parse rule configuration strings into discrete token lists, enforcing exact identity matching on user/group tokens and validating command path boundaries (`cmd`).
-
 ## 2026-09-06 - IPv6 Compressed Over-Length Address Parser Vulnerability
 **Vulnerability:** Textual IPv6 input validation permitted compressed addresses with a double colon (`::`) containing 8 or more explicit hex blocks (e.g. `1:2:3:4:5:6:7::8`), causing parser differential vulnerabilities when expanding compressed IP address structures.
 **Learning:** Checking only colon count (`colons <= 7`) is insufficient for compressed IPv6 validation because `::` consumes 1 colon while expanding to fill missing blocks. If 8 explicit hex blocks are present alongside `::`, address expansion results in 9 or more blocks, violating IPv6 128-bit structure boundaries.

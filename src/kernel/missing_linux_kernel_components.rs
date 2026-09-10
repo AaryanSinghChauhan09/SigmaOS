@@ -626,6 +626,239 @@ impl Default for LinuxDeviceMapperEngine {
 }
 
 // =========================================================================
+// 7. EBPF RING BUFFER EVENT STREAMING ENGINE (BPF_MAP_TYPE_RINGBUF)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct BpfRingBufferSampleRecord {
+    pub sample_id: u64,
+    pub pid: usize,
+    pub event_type: u32,
+    pub payload: Vec<u8>,
+}
+
+pub struct BpfRingBufferStreamEngine {
+    pub buffer_capacity: usize,
+    pub ring_samples: Vec<BpfRingBufferSampleRecord>,
+    pub next_sample_id: u64,
+    pub dropped_samples_count: u64,
+}
+
+impl BpfRingBufferStreamEngine {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            buffer_capacity: capacity,
+            ring_samples: Vec::new(),
+            next_sample_id: 1,
+            dropped_samples_count: 0,
+        }
+    }
+
+    pub fn reserve_and_submit(&mut self, pid: usize, event_type: u32, payload: &[u8]) -> Result<u64, &'static str> {
+        if self.ring_samples.len() >= self.buffer_capacity {
+            self.dropped_samples_count += 1;
+            return Err("BPF_RINGBUF: Buffer full, sample dropped");
+        }
+
+        let id = self.next_sample_id;
+        self.next_sample_id += 1;
+
+        self.ring_samples.push(BpfRingBufferSampleRecord {
+            sample_id: id,
+            pid,
+            event_type,
+            payload: payload.to_vec(),
+        });
+
+        Ok(id)
+    }
+
+    pub fn consume_next_sample(&mut self) -> Option<BpfRingBufferSampleRecord> {
+        if self.ring_samples.is_empty() {
+            None
+        } else {
+            Some(self.ring_samples.remove(0))
+        }
+    }
+}
+
+// =========================================================================
+// 8. VIRTIO BALLOON MEMORY DRIVER ENGINE
+// =========================================================================
+
+pub struct VirtioBalloonDriverEngine {
+    pub current_balloon_pages: u64,
+    pub target_balloon_pages: u64,
+    pub inflated_pfns: Vec<u64>,
+}
+
+impl VirtioBalloonDriverEngine {
+    pub fn new() -> Self {
+        Self {
+            current_balloon_pages: 0,
+            target_balloon_pages: 0,
+            inflated_pfns: Vec::new(),
+        }
+    }
+
+    pub fn inflate_balloon(&mut self, pages_count: u64, start_pfn: u64) -> u64 {
+        for i in 0..pages_count {
+            self.inflated_pfns.push(start_pfn + i);
+        }
+        self.current_balloon_pages += pages_count;
+        self.current_balloon_pages
+    }
+
+    pub fn deflate_balloon(&mut self, pages_count: u64) -> u64 {
+        let deflate_num = (pages_count as usize).min(self.inflated_pfns.len());
+        self.inflated_pfns.drain(..deflate_num);
+        self.current_balloon_pages -= deflate_num as u64;
+        self.current_balloon_pages
+    }
+}
+
+impl Default for VirtioBalloonDriverEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 9. USERFAULTFD PAGE FAULT TRAPPING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct UserfaultfdPageFault {
+    pub fault_addr: u64,
+    pub pid: usize,
+    pub is_write_fault: bool,
+    pub is_resolved: bool,
+}
+
+pub struct UserfaultfdSubsystemEngine {
+    pub registered_ranges: Vec<(u64, u64)>, // (start, len)
+    pub pending_faults: Vec<UserfaultfdPageFault>,
+}
+
+impl UserfaultfdSubsystemEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_ranges: Vec::new(),
+            pending_faults: Vec::new(),
+        }
+    }
+
+    pub fn register_range(&mut self, start_addr: u64, len: u64) {
+        self.registered_ranges.push((start_addr, len));
+    }
+
+    pub fn trigger_page_fault(&mut self, fault_addr: u64, pid: usize, is_write: bool) -> bool {
+        let is_registered = self
+            .registered_ranges
+            .iter()
+            .any(|&(start, len)| fault_addr >= start && fault_addr < start + len);
+
+        if is_registered {
+            self.pending_faults.push(UserfaultfdPageFault {
+                fault_addr,
+                pid,
+                is_write_fault: is_write,
+                is_resolved: false,
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn copy_missing_page(&mut self, fault_addr: u64) -> Result<(), &'static str> {
+        if let Some(fault) = self.pending_faults.iter_mut().find(|f| f.fault_addr == fault_addr) {
+            fault.is_resolved = true;
+            Ok(())
+        } else {
+            Err("userfaultfd: No pending fault found for address")
+        }
+    }
+}
+
+impl Default for UserfaultfdSubsystemEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 10. LINUX KERNEL AUDIT & SELINUX AVC LOGGING SUBSYSTEM
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct AuditRecord {
+    pub audit_id: u64,
+    pub syscall_id: usize,
+    pub pid: usize,
+    pub uid: u32,
+    pub avc_denial: Option<String>,
+}
+
+pub struct LinuxKernelAuditSubsystemEngine {
+    pub audit_enabled: bool,
+    pub audit_logs: Vec<AuditRecord>,
+    pub next_audit_id: u64,
+}
+
+impl LinuxKernelAuditSubsystemEngine {
+    pub fn new() -> Self {
+        Self {
+            audit_enabled: true,
+            audit_logs: Vec::new(),
+            next_audit_id: 1,
+        }
+    }
+
+    pub fn log_syscall_audit(&mut self, syscall_id: usize, pid: usize, uid: u32) -> u64 {
+        if !self.audit_enabled {
+            return 0;
+        }
+
+        let id = self.next_audit_id;
+        self.next_audit_id += 1;
+
+        self.audit_logs.push(AuditRecord {
+            audit_id: id,
+            syscall_id,
+            pid,
+            uid,
+            avc_denial: None,
+        });
+
+        id
+    }
+
+    pub fn log_avc_denial(&mut self, pid: usize, scontext: &str, tcontext: &str, tclass: &str) -> u64 {
+        let id = self.next_audit_id;
+        self.next_audit_id += 1;
+
+        let avc_msg = format!("avc: denied {{ read }} for pid={} scontext={} tcontext={} tclass={}", pid, scontext, tcontext, tclass);
+
+        self.audit_logs.push(AuditRecord {
+            audit_id: id,
+            syscall_id: 0,
+            pid,
+            uid: 0,
+            avc_denial: Some(avc_msg),
+        });
+
+        id
+    }
+}
+
+impl Default for LinuxKernelAuditSubsystemEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // MASTER SUITE
 // =========================================================================
 
@@ -636,6 +869,10 @@ pub struct SovereignMissingLinuxKernelComponentsSuite {
     pub fanotify: LinuxFanotifyEngine,
     pub futex2: LinuxFutex2WaitvEngine,
     pub dm: LinuxDeviceMapperEngine,
+    pub bpf_ringbuf: BpfRingBufferStreamEngine,
+    pub balloon: VirtioBalloonDriverEngine,
+    pub userfaultfd: UserfaultfdSubsystemEngine,
+    pub audit: LinuxKernelAuditSubsystemEngine,
 }
 
 impl SovereignMissingLinuxKernelComponentsSuite {
@@ -647,6 +884,10 @@ impl SovereignMissingLinuxKernelComponentsSuite {
             fanotify: LinuxFanotifyEngine::new(),
             futex2: LinuxFutex2WaitvEngine::new(),
             dm: LinuxDeviceMapperEngine::new(),
+            bpf_ringbuf: BpfRingBufferStreamEngine::new(1024),
+            balloon: VirtioBalloonDriverEngine::new(),
+            userfaultfd: UserfaultfdSubsystemEngine::new(),
+            audit: LinuxKernelAuditSubsystemEngine::new(),
         }
     }
 }
@@ -724,5 +965,60 @@ mod tests {
         let computed_hash = dm.compute_block_hash(b"SECURE_BLOCK_DATA");
         dm.create_dm_verity_target("rootfs", computed_hash);
         assert!(dm.verify_block_integrity("rootfs", b"SECURE_BLOCK_DATA"));
+    }
+
+    #[test]
+    fn test_bpf_ring_buffer_engine() {
+        let mut ring = BpfRingBufferStreamEngine::new(2);
+        let id1 = ring.reserve_and_submit(100, 1, b"sample_event_data_1").unwrap();
+        let id2 = ring.reserve_and_submit(101, 1, b"sample_event_data_2").unwrap();
+        assert_eq!(id1, 1);
+        assert_eq!(id2, 2);
+
+        // Third submit fails due to capacity 2
+        assert!(ring.reserve_and_submit(102, 1, b"overflow_event").is_err());
+        assert_eq!(ring.dropped_samples_count, 1);
+
+        let sample = ring.consume_next_sample().unwrap();
+        assert_eq!(sample.sample_id, 1);
+        assert_eq!(sample.payload, b"sample_event_data_1");
+    }
+
+    #[test]
+    fn test_virtio_balloon_driver() {
+        let mut balloon = VirtioBalloonDriverEngine::new();
+        let current = balloon.inflate_balloon(10, 0x1000);
+        assert_eq!(current, 10);
+        assert_eq!(balloon.inflated_pfns.len(), 10);
+
+        let deflated = balloon.deflate_balloon(4);
+        assert_eq!(deflated, 6);
+        assert_eq!(balloon.inflated_pfns.len(), 6);
+    }
+
+    #[test]
+    fn test_userfaultfd_subsystem() {
+        let mut uffd = UserfaultfdSubsystemEngine::new();
+        uffd.register_range(0x7f0000, 0x10000);
+
+        assert!(uffd.trigger_page_fault(0x7f1000, 500, true));
+        assert!(!uffd.trigger_page_fault(0x800000, 500, false));
+
+        assert_eq!(uffd.pending_faults.len(), 1);
+        assert!(uffd.copy_missing_page(0x7f1000).is_ok());
+        assert!(uffd.pending_faults[0].is_resolved);
+    }
+
+    #[test]
+    fn test_linux_kernel_audit_subsystem() {
+        let mut audit = LinuxKernelAuditSubsystemEngine::new();
+        let audit_id = audit.log_syscall_audit(59, 1234, 1000);
+        assert_eq!(audit_id, 1);
+
+        let avc_id = audit.log_avc_denial(1234, "unconfined_u:unconfined_r:unconfined_t", "etc_t", "file");
+        assert_eq!(avc_id, 2);
+
+        let avc_record = &audit.audit_logs[1];
+        assert!(avc_record.avc_denial.as_ref().unwrap().contains("avc: denied { read }"));
     }
 }
