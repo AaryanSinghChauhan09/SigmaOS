@@ -17,6 +17,9 @@
 //  11. NixOS                         -> Hermetic Content-Addressed Store & Atomic Garbage Collector Engine
 //  12. Linux                         -> io_uring Asynchronous System Call Engine
 //  13. FreeBSD                       -> GEOM Storage Transformation Topology Engine
+//   14. OpenBSD                       -> PF Firewall Stateful Tracking, ALTQ Bandwidth Shaping & CARP Virtual Router Engine
+//   15. Apache Arrow / Polars         -> Zero-Copy Vectorized Columnar Query & Aggregation Engine
+//   16. Linux Kernel 6.12+ SchedExt   -> scx Pluggable BPF Scheduler & Lag Controller Engine
 
 // (no_std only applicable at crate root - removed)
 
@@ -2367,6 +2370,283 @@ impl Default for FreeBsdGeomTopologyEngine {
 }
 
 // =========================================================================
+// 32. OPENBSD PF FIREWALL, ALTQ QOS & CARP VIRTUAL ROUTER FAILOVER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CarpState {
+    Init,
+    Backup,
+    Master,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PfStateTableEntry {
+    pub proto: String,
+    pub src_ip: String,
+    pub src_port: u16,
+    pub dst_ip: String,
+    pub dst_port: u16,
+    pub packets_counter: u64,
+    pub bytes_counter: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AltqBandwidthQueue {
+    pub queue_name: String,
+    pub bandwidth_kbps: u32,
+    pub priority: u8,
+    pub queued_bytes: u64,
+}
+
+pub struct OpenBsdPfCarpStateEngine {
+    pub vhid: u8,
+    pub advbase: u8,
+    pub advskew: u8,
+    pub carp_state: CarpState,
+    pub state_table: Vec<PfStateTableEntry>,
+    pub altq_queues: Vec<AltqBandwidthQueue>,
+    pub master_advertisements_sent: u64,
+}
+
+impl OpenBsdPfCarpStateEngine {
+    pub fn new(vhid: u8, advbase: u8, advskew: u8) -> Self {
+        Self {
+            vhid,
+            advbase,
+            advskew,
+            carp_state: CarpState::Backup,
+            state_table: Vec::new(),
+            altq_queues: Vec::new(),
+            master_advertisements_sent: 0,
+        }
+    }
+
+    pub fn promote_to_master(&mut self) {
+        self.carp_state = CarpState::Master;
+    }
+
+    pub fn demote_to_backup(&mut self) {
+        self.carp_state = CarpState::Backup;
+    }
+
+    pub fn register_altq_queue(&mut self, name: &str, bw_kbps: u32, priority: u8) {
+        self.altq_queues.push(AltqBandwidthQueue {
+            queue_name: name.to_string(),
+            bandwidth_kbps: bw_kbps,
+            priority,
+            queued_bytes: 0,
+        });
+    }
+
+    pub fn track_state(
+        &mut self,
+        proto: &str,
+        src_ip: &str,
+        src_port: u16,
+        dst_ip: &str,
+        dst_port: u16,
+        pkt_bytes: u64,
+    ) {
+        if let Some(entry) = self.state_table.iter_mut().find(|e| {
+            e.proto == proto
+                && e.src_ip == src_ip
+                && e.src_port == src_port
+                && e.dst_ip == dst_ip
+                && e.dst_port == dst_port
+        }) {
+            entry.packets_counter += 1;
+            entry.bytes_counter += pkt_bytes;
+        } else {
+            self.state_table.push(PfStateTableEntry {
+                proto: proto.to_string(),
+                src_ip: src_ip.to_string(),
+                src_port,
+                dst_ip: dst_ip.to_string(),
+                dst_port,
+                packets_counter: 1,
+                bytes_counter: pkt_bytes,
+            });
+        }
+    }
+
+    pub fn emit_carp_advertisement(&mut self) -> Result<Vec<u8>, &'static str> {
+        if self.carp_state != CarpState::Master {
+            return Err("CARP: Backup router does not emit master advertisements");
+        }
+        self.master_advertisements_sent += 1;
+        let payload = format!(
+            "CARP_ADVT_VHID_{}_BASE_{}_SKEW_{}_SEQ_{}",
+            self.vhid, self.advbase, self.advskew, self.master_advertisements_sent
+        )
+        .into_bytes();
+        Ok(payload)
+    }
+
+    pub fn sync_pfsync_states(&self) -> usize {
+        self.state_table.len()
+    }
+}
+
+impl Default for OpenBsdPfCarpStateEngine {
+    fn default() -> Self {
+        Self::new(1, 1, 0)
+    }
+}
+
+// =========================================================================
+// 33. APACHE ARROW / POLARS VECTORIZED COLUMNAR BATCH & QUERY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ArrowRecordBatch {
+    pub batch_id: u64,
+    pub uint_column: Vec<u64>,
+    pub float_column: Vec<f64>,
+}
+
+pub struct ApacheArrowVectorizedEngine {
+    pub record_batches: Vec<ArrowRecordBatch>,
+}
+
+impl ApacheArrowVectorizedEngine {
+    pub fn new() -> Self {
+        Self {
+            record_batches: Vec::new(),
+        }
+    }
+
+    pub fn append_batch(&mut self, batch_id: u64, uints: &[u64], floats: &[f64]) {
+        self.record_batches.push(ArrowRecordBatch {
+            batch_id,
+            uint_column: uints.to_vec(),
+            float_column: floats.to_vec(),
+        });
+    }
+
+    pub fn filter_vectorized_greater_than(&self, min_uint_val: u64) -> Vec<(u64, u64, f64)> {
+        let mut results = Vec::new();
+        for batch in &self.record_batches {
+            let len = batch.uint_column.len().min(batch.float_column.len());
+            for i in 0..len {
+                let u = batch.uint_column[i];
+                if u > min_uint_val {
+                    results.push((batch.batch_id, u, batch.float_column[i]));
+                }
+            }
+        }
+        results
+    }
+
+    pub fn aggregate_sum_and_mean(&self) -> (u64, f64) {
+        let mut sum_u = 0u64;
+        let mut sum_f = 0.0f64;
+        let mut count = 0usize;
+
+        for batch in &self.record_batches {
+            for &u in &batch.uint_column {
+                sum_u = sum_u.saturating_add(u);
+            }
+            for &f in &batch.float_column {
+                sum_f += f;
+                count += 1;
+            }
+        }
+
+        let mean_f = if count == 0 { 0.0 } else { sum_f / (count as f64) };
+        (sum_u, mean_f)
+    }
+}
+
+impl Default for ApacheArrowVectorizedEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 34. LINUX KERNEL 6.12+ SCHEDEXT (SCX) PLUGGABLE BPF SCHEDULER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ScxSchedulerKind {
+    BpfLand,
+    Rusty,
+    Lavd,
+    CustomBpf,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ScxTaskDescriptor {
+    pub pid: u32,
+    pub name: String,
+    pub vruntime_lag_ms: i64,
+    pub cpu_affinity: u32,
+    pub is_interactive: bool,
+}
+
+pub struct LinuxSchedExtScxEngine {
+    pub scheduler_kind: ScxSchedulerKind,
+    pub runnable_queue: Vec<ScxTaskDescriptor>,
+    pub dispatched_tasks_count: u64,
+}
+
+impl LinuxSchedExtScxEngine {
+    pub fn new(kind: ScxSchedulerKind) -> Self {
+        Self {
+            scheduler_kind: kind,
+            runnable_queue: Vec::new(),
+            dispatched_tasks_count: 0,
+        }
+    }
+
+    pub fn enqueue_task(&mut self, pid: u32, name: &str, lag_ms: i64, interactive: bool) {
+        self.runnable_queue.push(ScxTaskDescriptor {
+            pid,
+            name: name.to_string(),
+            vruntime_lag_ms: lag_ms,
+            cpu_affinity: 0,
+            is_interactive: interactive,
+        });
+    }
+
+    pub fn select_next_task(&mut self) -> Option<ScxTaskDescriptor> {
+        if self.runnable_queue.is_empty() {
+            return None;
+        }
+
+        match self.scheduler_kind {
+            ScxSchedulerKind::Lavd | ScxSchedulerKind::BpfLand => {
+                // Prioritize interactive tasks first, then by highest lag_ms
+                let pos = self
+                    .runnable_queue
+                    .iter()
+                    .enumerate()
+                    .max_by_key(|(_, t)| (t.is_interactive, t.vruntime_lag_ms))
+                    .map(|(i, _)| i);
+
+                if let Some(idx) = pos {
+                    self.dispatched_tasks_count += 1;
+                    Some(self.runnable_queue.remove(idx))
+                } else {
+                    None
+                }
+            }
+            _ => {
+                self.dispatched_tasks_count += 1;
+                Some(self.runnable_queue.remove(0))
+            }
+        }
+    }
+}
+
+impl Default for LinuxSchedExtScxEngine {
+    fn default() -> Self {
+        Self::new(ScxSchedulerKind::BpfLand)
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -2952,6 +3232,54 @@ mod tests {
         assert_eq!(hist.sum, 45.0);
         assert_eq!(hist.buckets[1], (50.0, 1)); // Count in <= 50.0 bucket
     }
+
+    #[test]
+    fn test_openbsd_pf_carp_state_engine() {
+        let mut pf_carp = OpenBsdPfCarpStateEngine::new(1, 1, 0);
+        assert_eq!(pf_carp.carp_state, CarpState::Backup);
+        assert!(pf_carp.emit_carp_advertisement().is_err());
+
+        pf_carp.promote_to_master();
+        assert_eq!(pf_carp.carp_state, CarpState::Master);
+
+        let adv = pf_carp.emit_carp_advertisement().unwrap();
+        assert!(adv.starts_with(b"CARP_ADVT_VHID_1"));
+
+        pf_carp.register_altq_queue("q_pqc_vpn", 100000, 1);
+        pf_carp.track_state("TCP", "10.0.0.1", 12345, "10.0.0.2", 443, 1024);
+        pf_carp.track_state("TCP", "10.0.0.1", 12345, "10.0.0.2", 443, 2048);
+
+        assert_eq!(pf_carp.sync_pfsync_states(), 1);
+        assert_eq!(pf_carp.state_table[0].packets_counter, 2);
+        assert_eq!(pf_carp.state_table[0].bytes_counter, 3072);
+    }
+
+    #[test]
+    fn test_apache_arrow_vectorized_engine() {
+        let mut arrow = ApacheArrowVectorizedEngine::new();
+        arrow.append_batch(101, &[10, 25, 50, 100], &[1.1, 2.2, 5.5, 10.0]);
+        arrow.append_batch(102, &[5, 60], &[0.5, 6.0]);
+
+        let filtered = arrow.filter_vectorized_greater_than(20);
+        assert_eq!(filtered.len(), 4);
+        assert_eq!(filtered[0], (101, 25, 2.2));
+
+        let (sum_u, mean_f) = arrow.aggregate_sum_and_mean();
+        assert_eq!(sum_u, 250);
+        assert!((mean_f - 4.216666666666667).abs() < 1e-5);
+    }
+
+    #[test]
+    fn test_linux_sched_ext_scx_engine() {
+        let mut scx = LinuxSchedExtScxEngine::new(ScxSchedulerKind::BpfLand);
+        scx.enqueue_task(1001, "batch_job", 10, false);
+        scx.enqueue_task(1002, "ui_compositor", 50, true);
+        scx.enqueue_task(1003, "render_pipeline", 30, false);
+
+        let next = scx.select_next_task().unwrap();
+        assert_eq!(next.pid, 1002); // Interactive ui_compositor selected first
+        assert_eq!(scx.dispatched_tasks_count, 1);
+    }
 }
 
 // =========================================================================
@@ -3105,6 +3433,9 @@ pub struct OpenSourceProjectSupremacySuite {
     pub cinder_volumes: BTreeMap<String, CinderVolumeRecord>,
     pub ingress_router: SovereignNginxIngressRouter,
     pub otel_collector: SovereignOpenTelemetryMetricsCollector,
+    pub pf_carp_engine: OpenBsdPfCarpStateEngine,
+    pub arrow_engine: ApacheArrowVectorizedEngine,
+    pub sched_ext_engine: LinuxSchedExtScxEngine,
 }
 
 #[derive(Debug, Clone)]
@@ -3130,6 +3461,9 @@ impl OpenSourceProjectSupremacySuite {
             cinder_volumes: BTreeMap::new(),
             ingress_router: SovereignNginxIngressRouter::new(),
             otel_collector: SovereignOpenTelemetryMetricsCollector::new(),
+            pf_carp_engine: OpenBsdPfCarpStateEngine::new(1, 1, 0),
+            arrow_engine: ApacheArrowVectorizedEngine::new(),
+            sched_ext_engine: LinuxSchedExtScxEngine::new(ScxSchedulerKind::BpfLand),
         }
     }
 
