@@ -36,7 +36,7 @@ SigmaOS natively supports 25 distinct distribution subsystem modes via `DistroSu
 | **Tails** | Encrypted live persistence, amnesic RAM scrubbing | `SovereignAnonScrubber`, RAM wiping on shutdown |
 | **GNU Guix** | Guix SCM derivations, Shepherd service supervision | `GNUGuixShepherdSupervisor`, `GuixDerivation` |
 | **Parrot OS** | Anonsurf Tor/I2P proxying, AppArmor seccomp profiles, digital forensics | `AnonsurfEngine`, `ParrotAppArmorProfileManager`, `ParrotForensicsSandbox` |
-| **Kali Linux** | Kali Undercover, NetHunter mobile/HID orchestrator, WinKeX WSL2, LUKS persistence | `KaliUndercoverEngine`, `KaliNetHunterEngine`, `KaliWinKexEngine`, `KaliMetapackageEngine` |
+| **Kali Linux** | Kali Undercover, NetHunter mobile/HID attack orchestrator, WinKeX WSL2, LUKS persistence | `KaliUndercoverEngine`, `KaliNetHunterEngine`, `KaliWinKexEngine`, `KaliMetapackageEngine` |
 | **antiX Linux** | Systemd-free SysVInit lightweight service management | `AntiXSysVInitEngine`, `Sysvinit` supervisor mapping |
 | **Zorin OS** | Zorin Appearance adaptive layout switcher (Windows/macOS/GNOME presets) | `ZorinAppearanceSwitcher` |
 
@@ -160,19 +160,23 @@ SigmaOS achieves strategic and technical supremacy over conventional Linux and B
 
 ---
 
-## 📏 6. Development Guidelines & Directives for AI Agents
+## 📐 7. Detailed Engineering Directives & Operational Guidelines
 
 1. **Zero-Dependency Core (`#![no_std]`) Rule**:
    - Kernel subsystems and `klib` utilities MUST NOT depend on external third-party C/C++ libraries or non-`alloc` crates. Use native safe Rust primitives in `src/klib/`.
 
-2. **Cross-Distro Mode Interoperability**:
-   - When introducing new kernel features or syscalls, add corresponding dispatch branches in `SovereignUniversalDistroBridge::dispatch_cross_subsystem_operation` to support all 25 Linux and BSD distro modes across all 32 target subsystems.
+2. **Cross-Distro Subsystem Parity Mandate**:
+   - Every newly implemented distro feature MUST register a corresponding dispatch branch inside `SovereignUniversalDistroBridge::dispatch_cross_subsystem_operation` across all 32 core subsystem categories.
 
-3. **Capability & Sandboxing First**:
-   - Restrict process permissions using OpenBSD `pledge`/`unveil` or FreeBSD Capsicum descriptor rights before executing untrusted foreign code.
+3. **Memory Safety & Execution Protection**:
+   - Memory allocators MUST enforce strict W^X (Write XOR Execute) page permission boundaries (`SovereignKaslrWxAllocator`). Executable pages cannot be writable simultaneously.
+   - Userland stack validation MUST verify stack pointers against registered `MAP_STACK` regions (`OpenBsdRetguardEngine`).
 
-4. **Testing & Verification Protocol**:
-   - Every distro-inspired component MUST include unit tests executable via `./run_sigma_tests.sh` and standalone test runners.
+4. **Storage Reliability & Self-Healing Protocol**:
+   - All multi-device array writes MUST compute 64-bit Fletcher-4 or CRC32c checksums. Scrub routines MUST automatically heal corrupted blocks from healthy mirrors or parity chunks (`SovereignRaidSelfHealer`).
+
+5. **Hermetic & Pure Package Store Directives**:
+   - Package managers MUST verify dependency closure completeness (`HermeticStoreClosureEngine`). A package cannot be committed to the store unless 100% of its transitive dependencies are pinned.
 
 ---
 
