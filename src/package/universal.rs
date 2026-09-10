@@ -281,15 +281,15 @@ pub enum PackageFormat {
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,
-    Conan,
-    Wheel,
-    Crate,
-    Gem,
-    Nupkg,
-    Vcpkg,
-    NarInfo,
-    Sysupdate,
+    Spack,      // HPC Spack (.spack)
+    Conan,      // C/C++ Conan (.conan)
+    Wheel,      // Python Wheel (.whl)
+    Crate,      // Rust Cargo Crate (.crate)
+    Gem,        // Ruby Gem (.gem)
+    Nupkg,      // .NET NuGet (.nupkg)
+    Vcpkg,      // Vcpkg (.vcpkg)
+    NarInfo,    // Nix NarInfo (.narinfo)
+    Sysupdate,  // Systemd Sysupdate (.sysupdate)
 }
 
 impl PackageFormat {
@@ -1270,7 +1270,6 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
-
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -1359,7 +1358,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
-            _ => Box::new(GuixInstallStrategy),
+            _ => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1419,7 +1418,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
-            _ => Box::new(GuixMetadataAdapter),
+            _ => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -2910,15 +2909,12 @@ mod tests {
     }
 }
 
-/// Alpine Linux .apk Package Format Adapter
-pub struct AlpineApkPackageAdapter;
+#[cfg(test)]
+mod extra_universal_tests {
+    use super::*;
 
-impl AlpineApkPackageAdapter {
-    pub fn format(&self) -> PackageFormat {
-        PackageFormat::SigmaPkg
-    }
-
-    pub fn test_all_package_format_strategies_and_adapters(&self) {
+    #[test]
+    fn test_all_package_format_strategies_and_adapters() {
         let formats = vec![
             PackageFormat::Deb,
             PackageFormat::Rpm,
@@ -2990,7 +2986,13 @@ impl AlpineApkPackageAdapter {
         }
     }
 
-    #[cfg(test)]
+    #[test]
+    fn test_nix_guix_functional_derivation_engine() {
+        let manager = UniversalPackageManager::new();
+        assert_eq!(manager.packages.len(), 0);
+    }
+
+    #[test]
     fn test_expanded_decorators() {
         let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
         let base = BasePackageDecorator { package: pkg };

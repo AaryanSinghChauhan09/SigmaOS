@@ -1252,6 +1252,58 @@ impl Default for LinuxKsmEngine {
 }
 
 // ============================================================================
+// 15. Linux Energy-Aware Scheduling & Kernel Power Profile Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KernelPowerProfile {
+    Performance,
+    Balanced,
+    PowerSaver,
+}
+
+pub struct EnergyAwareSchedulerEngine {
+    pub active_profile: KernelPowerProfile,
+    pub active_energy_cap_watts: u32,
+    pub high_efficiency_cores: usize,
+    pub high_performance_cores: usize,
+}
+
+impl EnergyAwareSchedulerEngine {
+    pub fn new(eff_cores: usize, perf_cores: usize) -> Self {
+        Self {
+            active_profile: KernelPowerProfile::Balanced,
+            active_energy_cap_watts: 45,
+            high_efficiency_cores: eff_cores,
+            high_performance_cores: perf_cores,
+        }
+    }
+
+    pub fn set_power_profile(&mut self, profile: KernelPowerProfile) {
+        self.active_profile = profile;
+        match profile {
+            KernelPowerProfile::Performance => self.active_energy_cap_watts = 95,
+            KernelPowerProfile::Balanced => self.active_energy_cap_watts = 45,
+            KernelPowerProfile::PowerSaver => self.active_energy_cap_watts = 15,
+        }
+    }
+
+    pub fn select_cpu_core_for_task(&self, task_utilization_pct: u32) -> usize {
+        if self.active_profile == KernelPowerProfile::PowerSaver || task_utilization_pct < 30 {
+            0 // Assign to efficiency core cluster
+        } else {
+            self.high_efficiency_cores // Assign to performance core cluster
+        }
+    }
+}
+
+impl Default for EnergyAwareSchedulerEngine {
+    fn default() -> Self {
+        Self::new(4, 4)
+    }
+}
+
+// ============================================================================
 // 14. Linux eventfd Notification Engine (fs/eventfd.c Parity)
 // ============================================================================
 
@@ -1428,5 +1480,12 @@ mod tests {
         let mut efd = LinuxEventfdEngine::new(0, false);
         assert!(efd.write_signal(10).is_ok());
         assert_eq!(efd.read_signal().unwrap(), 10);
+
+        // 12. Energy-Aware Scheduler tests
+        let mut eas = EnergyAwareSchedulerEngine::new(4, 4);
+        assert_eq!(eas.select_cpu_core_for_task(20), 0); // E-core
+        assert_eq!(eas.select_cpu_core_for_task(80), 4); // P-core
+        eas.set_power_profile(KernelPowerProfile::PowerSaver);
+        assert_eq!(eas.select_cpu_core_for_task(80), 0); // Forced E-core
     }
 }
