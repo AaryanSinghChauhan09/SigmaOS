@@ -1,8 +1,8 @@
-# Welcome to SigmaOS
+# 🚀 SigmaOS — The Post-Linux Sovereign Operating System
 
-**SigmaOS** is a sovereign, zero-dependency operating system written in Rust, designed to defeat Linux and BSD distros through superior architecture, security, and performance.
+SigmaOS is the world’s first **sovereign operating system**, engineered from the ground up in Safe-Rust to deliver mathematical memory safety, sub-millisecond execution latency, and true computing independence beyond legacy Linux and BSD distributions.
 
-## 🚀 Core Features
+---
 
 ## 📜 Key Project Resources & Manifesto
 - 🚀 **Public Launch Announcement**: [docs/LAUNCH_ANNOUNCEMENT.md](docs/LAUNCH_ANNOUNCEMENT.md)
@@ -36,17 +36,7 @@ cargo check --lib
 
 ---
 
-## 🛡️ Security Architecture
-
-- **Post-Quantum Cryptography**: Dilithium-5 module signatures and Kyber-712 key exchange.
-- **LSM (Linux Security Modules)**: Inode, Ptrace, and Socket hooks for mandatory access control.
-- **OpenBSD pledge/unveil**: Capability-based process sandboxing and filesystem path unveiling.
-- **FreeBSD Capsicum**: Capability mode for fine-grained privilege separation.
-- **eBPF XDP Zero-Copy**: Express BPF with XDP zero-copy socket redirection for high-performance networking.
-
----
-
-## 📈 Development Milestones
+## 📈 Recent Progress (September 2026)
 
 ### v0.6 Milestone: Consolidation Complete ✅
 
@@ -84,28 +74,14 @@ For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and 
 
 ---
 
-## 🎯 Design Principles
+## 📄 License
 
-SigmaOS follows strict software engineering principles:
-
-- **OOPS**: Objects, Classes, Instances, Encapsulation, Abstraction, Inheritance, Polymorphism
-- **SOLID**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
-- **DRY**: Don't Repeat Yourself
-- **KISS**: Keep It Simple, Stupid
-- **YAGNI**: You Aren't Gonna Need It
-- **Separation of Concerns**
-- **Composition Over Inheritance**
-- **Design by Contract**
+SigmaOS is licensed under the [MIT License](LICENSE).
 
 ---
 
-## 🔗 Quick Links
-
-- **[Main Repository](https://github.com/AaryanSinghChauhan09/SigmaOS)** - Source code and issues
-- **[Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** - Full documentation
-- **[AGENTS.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/AGENTS.md)** - AI Agent operational guidelines
-- **[LICENSE](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LICENSE)** - MIT License
-
----
-
-*Built with sovereign zero-dependency philosophy to defeat Linux and BSD distros through superior architecture.*
+## 📜 Key Project Resources & Public Launch Documents
+- 🚀 **Public Launch Announcement**: [docs/LAUNCH_ANNOUNCEMENT.md](docs/LAUNCH_ANNOUNCEMENT.md)
+- 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
+- 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
+- ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)

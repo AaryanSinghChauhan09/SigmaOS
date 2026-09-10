@@ -958,8 +958,7 @@ impl FedoraFasAuthEngine {
             }
             self.token_counter += 1;
             let token = format!("fas_oidc_tok_{:08x}_{}", self.token_counter, username);
-            self.active_tokens
-                .insert(token.clone(), username.to_string());
+            self.active_tokens.insert(token.clone(), username.to_string());
             Ok(token)
         } else {
             Err("FAS Auth Failed: User not found in Fedora Account System")
@@ -969,51 +968,6 @@ impl FedoraFasAuthEngine {
     pub fn is_member_of_group(&self, username: &str, group: &str) -> bool {
         if let Some(user) = self.user_profiles.get(username) {
             user.groups.contains(&group.to_string())
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for FedoraFedoraKojiBuildSystemEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct FedoraBodhiUpdateRecord {
-    pub update_id: String,
-    pub karma_score: i32,
-    pub status: String,
-}
-
-pub struct FedoraFedoraBodhiUpdateEngine {
-    pub updates: Vec<FedoraBodhiUpdateRecord>,
-}
-
-impl FedoraFedoraBodhiUpdateEngine {
-    pub fn new() -> Self {
-        Self {
-            updates: Vec::new(),
-        }
-    }
-
-    pub fn create_update(&mut self, id: &str) {
-        self.updates.push(FedoraBodhiUpdateRecord {
-            update_id: id.to_string(),
-            karma_score: 0,
-            status: "testing".to_string(),
-        });
-    }
-
-    pub fn add_karma(&mut self, id: &str, karma: i32) -> bool {
-        if let Some(upd) = self.updates.iter_mut().find(|u| u.update_id == id) {
-            upd.karma_score += karma;
-            if upd.karma_score >= 3 {
-                upd.status = "stable".to_string();
-            }
-            true
         } else {
             false
         }
@@ -1032,7 +986,7 @@ impl Default for FedoraFasAuthEngine {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GreenwaveDecisionRule {
-    pub product_version: String,        // e.g. "fedora-39"
+    pub product_version: String, // e.g. "fedora-39"
     pub required_ci_tests: Vec<String>, // e.g. ["dist.rpmdeplint", "upgrades.rpmdeplint", "openQA.boot"]
 }
 
@@ -1136,106 +1090,6 @@ impl Default for FedoraGreenwaveCiEngine {
     }
 }
 
-pub struct FedoraFedoraCoprBuildGatewayEngine {
-    pub copr_repos: Vec<String>,
-}
-
-impl FedoraFedoraCoprBuildGatewayEngine {
-    pub fn new() -> Self {
-        Self {
-            copr_repos: Vec::new(),
-        }
-    }
-
-    pub fn add_copr_repo(&mut self, name: &str) {
-        self.copr_repos.push(name.to_string());
-    }
-}
-
-impl Default for FedoraFedoraCoprBuildGatewayEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct FedoraFedoraContainerStackEngine {
-    pub container_count: usize,
-}
-
-impl FedoraFedoraContainerStackEngine {
-    pub fn new() -> Self {
-        Self { container_count: 0 }
-    }
-
-    pub fn spawn_podman_container(&mut self, _image: &str) -> usize {
-        self.container_count += 1;
-        self.container_count
-    }
-}
-
-impl Default for FedoraFedoraContainerStackEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct FedoraSovereignEcosystemSuite {
-    pub koji: FedoraFedoraKojiBuildSystemEngine,
-    pub bodhi: FedoraFedoraBodhiUpdateEngine,
-    pub pagure: FedoraFedoraPagureForgeEngine,
-    pub copr: FedoraFedoraCoprBuildGatewayEngine,
-    pub podman: FedoraFedoraContainerStackEngine,
-}
-
-impl FedoraSovereignEcosystemSuite {
-    pub fn new() -> Self {
-        Self {
-            koji: FedoraFedoraKojiBuildSystemEngine::new(),
-            bodhi: FedoraFedoraBodhiUpdateEngine::new(),
-            pagure: FedoraFedoraPagureForgeEngine::new(),
-            copr: FedoraFedoraCoprBuildGatewayEngine::new(),
-            podman: FedoraFedoraContainerStackEngine::new(),
-        }
-    }
-
-    pub fn verify_suite(&mut self) -> bool {
-        let task_id = self.koji.submit_build_task("kernel", "f39-build");
-        self.koji.complete_task(task_id)
-    }
-}
-
-impl Default for FedoraSovereignEcosystemSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod fedora_missing_tests {
-    use super::*;
-
-    #[test]
-    fn test_fedora_koji_build_system() {
-        let mut koji = FedoraFedoraKojiBuildSystemEngine::new();
-        let id = koji.submit_build_task("glibc", "rawhide");
-        assert!(koji.complete_task(id));
-    }
-
-    #[test]
-    fn test_fedora_bodhi_update_engine() {
-        let mut bodhi = FedoraFedoraBodhiUpdateEngine::new();
-        bodhi.create_update("FEDORA-2026-0001");
-        bodhi.add_karma("FEDORA-2026-0001", 3);
-        assert_eq!(bodhi.updates[0].status, "stable");
-    }
-
-    #[test]
-    fn test_fedora_ecosystem_suite() {
-        let mut suite = FedoraSovereignEcosystemSuite::new();
-        assert!(suite.verify_suite());
-    }
-}
-
 // =========================================================================
 // Fedora status.fpo Infrastructure Status & Health Monitoring System
 // =========================================================================
@@ -1260,7 +1114,6 @@ pub struct StatusFpoIncident {
 /// logs incidents, calculates uptime SLA percentages, and generates status reports.
 pub struct FedoraStatusFpoEngine {
     pub service_states: HashMap<String, StatusFpoServiceHealth>,
-    pub service_statuses: HashMap<String, FedoraServiceStatusState>,
     pub incidents: Vec<StatusFpoIncident>,
     pub total_checks: u64,
     pub successful_checks: u64,
@@ -1275,27 +1128,12 @@ impl FedoraStatusFpoEngine {
         states.insert("MirrorManager".to_string(), StatusFpoServiceHealth::Good);
         states.insert("Pagure".to_string(), StatusFpoServiceHealth::Good);
 
-        let mut statuses = HashMap::new();
-        statuses.insert("koji".to_string(), FedoraServiceStatusState::Good);
-        statuses.insert("bodhi".to_string(), FedoraServiceStatusState::Good);
-        statuses.insert("copr".to_string(), FedoraServiceStatusState::Good);
-        statuses.insert("pagure".to_string(), FedoraServiceStatusState::Good);
-
         Self {
             service_states: states,
-            service_statuses: statuses,
             incidents: Vec::new(),
             total_checks: 100,
             successful_checks: 100,
         }
-    }
-
-    pub fn set_service_status(&mut self, service: &str, state: FedoraServiceStatusState) {
-        self.service_statuses.insert(service.to_string(), state);
-    }
-
-    pub fn query_service_health(&self, service: &str) -> FedoraServiceStatusState {
-        *self.service_statuses.get(service).unwrap_or(&FedoraServiceStatusState::Good)
     }
 
     pub fn set_service_health(&mut self, service_name: &str, health: StatusFpoServiceHealth) {
@@ -2967,10 +2805,7 @@ impl FedoraGettextL10nEngine {
     }
 
     pub fn gettext(&self, msgid: &str) -> String {
-        if let Some(catalog) = self
-            .translation_catalogs
-            .get(&self.current_locale.to_string())
-        {
+        if let Some(catalog) = self.translation_catalogs.get(&self.current_locale.to_string()) {
             if let Some(msgstr) = catalog.get(&msgid.to_string()) {
                 return msgstr.clone();
             }
@@ -3121,126 +2956,6 @@ pub struct TahrirBadgeAssertion {
     pub assertion_digest: String,
 }
 
-/// Fedora Tahrir User Avatar Record (Libravatar/Gravatar Compatible)
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TahrirUserAvatar {
-    pub user_id: String,
-    pub email_sha256: String,
-    pub avatar_data: Vec<u8>,
-    pub mime_type: String,
-}
-
-/// Fedora Planet Blog Article Entry
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraPlanetPost {
-    pub post_id: String,
-    pub author_name: String,
-    pub title: String,
-    pub url: String,
-    pub published_epoch: u64,
-}
-
-/// Fedora "The New Hotness" Upstream Release Event
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AnityaUpstreamRelease {
-    pub project_name: String,
-    pub latest_version: String,
-    pub homepage: String,
-    pub is_triggering_scratch_build: bool,
-}
-
-/// Fedora rpmautospec RPM Spec Changelog & Version Generator
-pub struct FedoraRpmAutoSpecEngine {
-    pub git_commit_count: u32,
-    pub git_commit_messages: Vec<String>,
-}
-
-impl FedoraRpmAutoSpecEngine {
-    pub fn new(commit_count: u32) -> Self {
-        FedoraRpmAutoSpecEngine {
-            git_commit_count: commit_count,
-            git_commit_messages: Vec::new(),
-        }
-    }
-
-    pub fn add_commit_log(&mut self, msg: &str) {
-        self.git_commit_messages.push(msg.to_string());
-    }
-
-    pub fn generate_autorelease(&self, base_release: u32) -> String {
-        format!("{}.{}", base_release, self.git_commit_count)
-    }
-
-    pub fn generate_autochangelog(&self) -> String {
-        let mut changelog = String::from("%autochangelog\n");
-        for msg in &self.git_commit_messages {
-            changelog.push_str(&format!("- {}\n", msg));
-        }
-        changelog
-    }
-}
-
-/// Fedora Service Status Indicator
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FedoraServiceStatusState {
-    Good,
-    MinorOutage,
-    MajorOutage,
-}
-
-
-/// Fedora FASJSON (Fedora Account System REST API) User Record
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FasjsonUserRecord {
-    pub username: String,
-    pub human_name: String,
-    pub email: String,
-    pub group_memberships: Vec<String>,
-}
-
-/// Fedora FASJSON Client Engine
-pub struct FedoraFasjsonClientEngine {
-    pub user_db: HashMap<String, FasjsonUserRecord>,
-}
-
-impl FedoraFasjsonClientEngine {
-    pub fn new() -> Self {
-        FedoraFasjsonClientEngine { user_db: HashMap::new() }
-    }
-
-    pub fn register_user(&mut self, username: &str, human_name: &str, email: &str, groups: &[&str]) {
-        self.user_db.insert(
-            username.to_string(),
-            FasjsonUserRecord {
-                username: username.to_string(),
-                human_name: human_name.to_string(),
-                email: email.to_string(),
-                group_memberships: groups.iter().map(|g| g.to_string()).collect(),
-            },
-        );
-    }
-
-    pub fn get_user_info(&self, username: &str) -> Option<&FasjsonUserRecord> {
-        self.user_db.get(username)
-    }
-
-    pub fn is_user_in_group(&self, username: &str, group: &str) -> bool {
-        if let Some(user) = self.get_user_info(username) {
-            user.group_memberships.iter().any(|g| g == group)
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for FedoraFasjsonClientEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Fedora Tahrir User Identity, Avatar & OpenBadges API Engine
-/// Serves Libravatar-compatible avatar resolution and Fedora Badges OpenBadges v2/v3 assertions.
 pub struct FedoraTahrirIdentityApiEngine {
     pub avatars: HashMap<String, TahrirUserAvatar>,
 }
@@ -3438,7 +3153,6 @@ pub struct UpstreamReleaseEvent {
 /// Tracks upstream project releases, compares version semantics, maps Anitya project IDs
 /// to Fedora RPM packages, and dispatches `org.fedoraproject.prod.hotness.update` fedmsg events.
 pub struct FedoraTheNewHotnessEngine {
-    pub monitored_projects: Vec<AnityaUpstreamRelease>,
     pub mappings: Vec<AnityaPackageMapping>,
     pub release_events: Vec<UpstreamReleaseEvent>,
     pub messaging_engine: FedoraMessagingEngine,
@@ -3447,29 +3161,9 @@ pub struct FedoraTheNewHotnessEngine {
 impl FedoraTheNewHotnessEngine {
     pub fn new() -> Self {
         Self {
-            monitored_projects: Vec::new(),
             mappings: Vec::new(),
             release_events: Vec::new(),
             messaging_engine: FedoraMessagingEngine::new(),
-        }
-    }
-
-    pub fn register_upstream_project(&mut self, name: &str, homepage: &str) {
-        self.monitored_projects.push(AnityaUpstreamRelease {
-            project_name: name.to_string(),
-            latest_version: "1.0.0".to_string(),
-            homepage: homepage.to_string(),
-            is_triggering_scratch_build: false,
-        });
-    }
-
-    pub fn process_upstream_release_event(&mut self, name: &str, new_version: &str) -> Result<String, &'static str> {
-        if let Some(project) = self.monitored_projects.iter_mut().find(|p| p.project_name == name) {
-            project.latest_version = new_version.to_string();
-            project.is_triggering_scratch_build = true;
-            Ok(format!("TheNewHotness: Triggered Koji scratch build for {} version {}", name, new_version))
-        } else {
-            Err("Project not found in Anitya release monitor")
         }
     }
 
@@ -3576,21 +3270,6 @@ impl FedoraPlanetAggregationEngine {
             posts: Vec::new(),
             registered_feeds: Vec::new(),
         }
-    }
-
-    pub fn fetch_and_parse_feed(&mut self, author: &str, title: &str, url: &str, timestamp: u64) {
-        let post_id = format!("planet-{}", self.posts.len() + 1);
-        self.posts.push(FedoraPlanetPost {
-            post_id,
-            author_name: author.to_string(),
-            title: title.to_string(),
-            url: url.to_string(),
-            published_epoch: timestamp,
-        });
-    }
-
-    pub fn get_latest_posts(&self, limit: usize) -> Vec<&FedoraPlanetPost> {
-        self.posts.iter().take(limit).collect()
     }
 
     pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
@@ -3941,30 +3620,6 @@ pub struct FedoraIgnitionEngine {
     pub users: Vec<IgnitionUser>,
     pub systemd_units: Vec<IgnitionSystemdUnit>,
     pub provisioned: bool,
-    pub staged_packages: Vec<String>,
-    pub is_offline_update_pending: bool,
-    pub trigger_reboot_flag: bool,
-}
-
-impl FedoraOfflineUpdateEngine {
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
-    }
 }
 
 impl FedoraIgnitionEngine {
@@ -3974,15 +3629,6 @@ impl FedoraIgnitionEngine {
             users: Vec::new(),
             systemd_units: Vec::new(),
             provisioned: false,
-            staged_packages: Vec::new(),
-            is_offline_update_pending: false,
-            trigger_reboot_flag: false,
-        }
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
         }
     }
 
@@ -4027,6 +3673,12 @@ impl FedoraIgnitionEngine {
 }
 
 impl Default for FedoraIgnitionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Default for FedoraOfflineUpdateEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -4264,10 +3916,7 @@ impl FedoraToolbxContainerEngine {
             if !c.running {
                 c.running = true;
             }
-            Ok(format!(
-                "Toolbx '{}' executed command: '{}'",
-                c.name, command
-            ))
+            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
         } else {
             Err("Toolbx container not found")
         }
@@ -4290,6 +3939,10 @@ impl Default for FedoraToolbxContainerEngine {
         Self::new()
     }
 }
+
+// =========================================================================
+// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
+// =========================================================================
 
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine
@@ -4574,8 +4227,7 @@ impl FedoraBadgesEngine {
             user_badges.push(badge_id.to_string());
         }
 
-        let badge_ids = user_badges.clone();
-        let total_points = badge_ids
+        let total_points = user_badges
             .iter()
             .filter_map(|id| self.badges.get(id))
             .map(|b| b.points)
@@ -4686,16 +4338,10 @@ mod tests {
         assert_eq!(missing, vec!["openQA.boot"]);
 
         // Submit waiver for openQA.boot
-        gw.submit_waiver(
-            "nginx-1.24.0-1.fc39",
-            "openQA.boot",
-            "qa_lead",
-            "Hardware test lab offline waiver",
-        );
+        gw.submit_waiver("nginx-1.24.0-1.fc39", "openQA.boot", "qa_lead", "Hardware test lab offline waiver");
 
         // Now gating decision passes
-        let decision_after_waiver =
-            gw.evaluate_gating_decision("fedora-39", "nginx-1.24.0-1.fc39", &passed);
+        let decision_after_waiver = gw.evaluate_gating_decision("fedora-39", "nginx-1.24.0-1.fc39", &passed);
         assert!(decision_after_waiver.is_ok());
     }
 
@@ -5659,11 +5305,7 @@ mod tests {
     fn test_fedora_ignition_engine() {
         let mut ignition = FedoraIgnitionEngine::new();
         ignition.add_file("/etc/motd", "Welcome to Sovereign SigmaOS\n", 0o644);
-        ignition.add_user(
-            "sovereign",
-            &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."],
-            &["wheel", "sudo"],
-        );
+        ignition.add_user("sovereign", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."], &["wheel", "sudo"]);
 
         assert_eq!(ignition.files.len(), 1);
         assert_eq!(ignition.users.len(), 1);
@@ -5688,10 +5330,7 @@ mod tests {
             "gnome-shell",
             11,
             "SIGSEGV in st_widget_get_theme_node()",
-            &[
-                "#0 0x00007f1234 in st_widget_get_theme_node ()",
-                "#1 0x00007f5678 in main ()",
-            ],
+            &["#0 0x00007f1234 in st_widget_get_theme_node ()", "#1 0x00007f5678 in main ()"],
         );
 
         assert_eq!(report_id, 1);
@@ -5700,11 +5339,6 @@ mod tests {
 
     #[test]
     fn test_fedora_toolbx_container() {
-        let mut toolbx = FedoraToolbxContainerEngine::new();
-        let container = toolbx.create_toolbx(
-            "fedora-toolbox-39",
-            "registry.fedoraproject.org/fedora-toolbox:39",
-        );
         let mut engine = FedoraToolbxContainerEngine::new();
         let container = engine.create_toolbx(
             "fedora-toolbox-39",
@@ -5864,34 +5498,6 @@ mod tests {
     }
 
     #[test]
-    fn test_fedora_badges_engine() {
-        let mut badges = FedoraBadgesEngine::new();
-        assert_eq!(badges.badges.len(), 2);
-
-        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
-        assert_eq!(pts1, 10);
-
-        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
-        assert_eq!(pts2, 25);
-
-        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
-    }
-
-    #[test]
-    fn test_fedora_system_roles_engine() {
-        let mut roles = FedoraSystemRolesEngine::new();
-        assert!(roles.applied_roles.is_empty());
-
-        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
-        assert_eq!(roles.applied_roles.len(), 1);
-        assert_eq!(roles.chrony_ntp_servers.len(), 2);
-
-        roles.apply_firewall_role(&[80, 443, 8080]);
-        assert_eq!(roles.applied_roles.len(), 2);
-        assert_eq!(roles.configured_firewall_ports.len(), 3);
-    }
-
-    #[test]
     fn test_fedora_ostree_sysroot_staging() {
         let mut sysroot = FedoraOstreeSysrootStagingEngine::new("/ostree/deploy/fedora");
         sysroot.stage_pending_commit("sha256:abc123commit456");
@@ -5911,6 +5517,16 @@ mod tests {
             .obtain_ticket_granting_ticket("jules_admin", "SecretPgpPass")
             .is_ok());
         assert!(sssd.is_tgt_valid());
+    }
+
+    #[test]
+    fn test_fedora_rpm_seccomp_filter() {
+        let mut seccomp = FedoraRPMSeccompFilterEngine::new();
+        seccomp.allow_syscall(1); // sys_write
+        seccomp.allow_syscall(0); // sys_read
+
+        assert!(seccomp.validate_syscall_access(1));
+        assert!(!seccomp.validate_syscall_access(322)); // unallowed syscall
     }
 }
 
@@ -6063,11 +5679,6 @@ impl Default for FedoraRPMSeccompFilterEngine {
     fn default() -> Self {
         Self::new()
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
 
     #[test]
     fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {
@@ -6080,10 +5691,7 @@ mod tests {
         // 2. Pagu
         let mut pagu = FedoraPaguEngine::new();
         pagu.provision_account("jules_dev", "jules@fedora.org", &["packagers", "sysadmin"]);
-        assert_eq!(
-            pagu.generate_oauth2_token("jules_dev"),
-            Some("pagu-oauth2-token-jules_dev".to_string())
-        );
+        assert_eq!(pagu.generate_oauth2_token("jules_dev"), Some("pagu-oauth2-token-jules_dev".to_string()));
 
         // 3. Fedocal
         let mut cal = FedoraFedocalEngine::new();
