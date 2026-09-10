@@ -283,11 +283,113 @@ impl Default for FedoraContainerStackEngine {
 // 6. SOVEREIGN FEDORA ECOSYSTEM SUITE MASTER COORDINATOR
 // =========================================================================
 
+// =========================================================================
+// 7. FEDORA GREENWAVE DECISION ENGINE & WAIVERDB API ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum GreenwaveDecisionStatus {
+    Satisfied,
+    Unsatisfied,
+    Waived,
+}
+
+#[derive(Debug, Clone)]
+pub struct GreenwavePolicyRequirement {
+    pub policy_id: String,
+    pub required_test_type: String,
+    pub passed: bool,
+}
+
+pub struct FedoraGreenwaveDecisionEngine {
+    pub requirements: Vec<GreenwavePolicyRequirement>,
+}
+
+impl FedoraGreenwaveDecisionEngine {
+    pub fn new() -> Self {
+        Self {
+            requirements: Vec::new(),
+        }
+    }
+
+    pub fn add_requirement(&mut self, policy: &str, test_type: &str, passed: bool) {
+        self.requirements.push(GreenwavePolicyRequirement {
+            policy_id: policy.to_string(),
+            required_test_type: test_type.to_string(),
+            passed,
+        });
+    }
+
+    pub fn evaluate_decision(&self) -> GreenwaveDecisionStatus {
+        if self.requirements.iter().all(|r| r.passed) {
+            GreenwaveDecisionStatus::Satisfied
+        } else {
+            GreenwaveDecisionStatus::Unsatisfied
+        }
+    }
+}
+
+impl Default for FedoraGreenwaveDecisionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WaiverRecord {
+    pub waiver_id: u64,
+    pub subject_identifier: String,
+    pub test_type: String,
+    pub waived_by: String,
+    pub comment: String,
+}
+
+pub struct FedoraWaiverDbEngine {
+    pub waivers: Vec<WaiverRecord>,
+    pub waiver_counter: u64,
+}
+
+impl FedoraWaiverDbEngine {
+    pub fn new() -> Self {
+        Self {
+            waivers: Vec::new(),
+            waiver_counter: 0,
+        }
+    }
+
+    pub fn issue_waiver(&mut self, subject: &str, test_type: &str, author: &str, comment: &str) -> u64 {
+        self.waiver_counter += 1;
+        let id = self.waiver_counter;
+
+        self.waivers.push(WaiverRecord {
+            waiver_id: id,
+            subject_identifier: subject.to_string(),
+            test_type: test_type.to_string(),
+            waived_by: author.to_string(),
+            comment: comment.to_string(),
+        });
+
+        id
+    }
+
+    pub fn is_waived(&self, subject: &str, test_type: &str) -> bool {
+        self.waivers.iter().any(|w| w.subject_identifier == subject && w.test_type == test_type)
+    }
+}
+
+impl Default for FedoraWaiverDbEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SovereignFedoraEcosystemSuite {
     pub koji: FedoraKojiBuildSystemEngine,
     pub bodhi: FedoraBodhiUpdateEngine,
     pub copr: FedoraCoprBuildGatewayEngine,
     pub containers: FedoraContainerStackEngine,
+    pub greenwave: FedoraGreenwaveDecisionEngine,
+    pub waiverdb: FedoraWaiverDbEngine,
 }
 
 impl SovereignFedoraEcosystemSuite {
@@ -297,6 +399,8 @@ impl SovereignFedoraEcosystemSuite {
             bodhi: FedoraBodhiUpdateEngine::new(),
             copr: FedoraCoprBuildGatewayEngine::new(),
             containers: FedoraContainerStackEngine::new(),
+            greenwave: FedoraGreenwaveDecisionEngine::new(),
+            waiverdb: FedoraWaiverDbEngine::new(),
         }
     }
 
@@ -352,6 +456,18 @@ mod tests {
         let mut copr = FedoraCoprBuildGatewayEngine::new();
         copr.create_copr_repo("jules", "sigma-tools", &["fedora-40-x86_64"]);
         assert!(copr.find_repo("jules", "sigma-tools").is_some());
+    }
+
+    #[test]
+    fn test_greenwave_and_waiverdb_engines() {
+        let mut gw = FedoraGreenwaveDecisionEngine::new();
+        gw.add_requirement("bodhi_update_gate", "openqa_install_test", true);
+        assert_eq!(gw.evaluate_decision(), GreenwaveDecisionStatus::Satisfied);
+
+        let mut wdb = FedoraWaiverDbEngine::new();
+        let id = wdb.issue_waiver("kernel-6.8.0", "abi_check", "jules", "Non-breaking driver ABI change");
+        assert_eq!(id, 1);
+        assert!(wdb.is_waived("kernel-6.8.0", "abi_check"));
     }
 
     #[test]
