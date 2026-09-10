@@ -3,6 +3,7 @@ pub mod system_monitor;
 
 pub mod data_tools;
 pub mod display_manager;
+pub mod open_source_tools_parity;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
@@ -29,6 +30,13 @@ pub use open_source_tools_engine::{
 };
 
 pub use profession_tools::*;
+
+pub use open_source_tools_parity::{
+    BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, FastfetchInfoEngine,
+    FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry, RipgrepRegexSearchEngine,
+    RofiCommandHudEngine, SearchMatch, StarshipPromptEngine, ZoxideFastCdEngine,
+    ZoxidePathEntry,
+};
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
