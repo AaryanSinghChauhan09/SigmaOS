@@ -58,18 +58,21 @@ pub struct VacantEntry<'a, K, V> {
 
 impl<'a, K, V> Entry<'a, K, V>
 where
-    K: Eq + Hash + Clone,
+    K: Eq + Hash,
 {
+    /// Optimized by Bolt ⚡: uses `insert_entry` to move `entry.key` directly into the map
+    /// in a single pass. Eliminates key cloning, duplicate hash recalculations, duplicate
+    /// bucket lookup loops, and `.unwrap()` calls.
     pub fn or_insert(self, default: V) -> &'a mut V {
         match self {
             Entry::Occupied(entry) => entry.value,
-            Entry::Vacant(entry) => {
-                entry.map.insert(entry.key.clone(), default);
-                entry.map.get_mut(&entry.key).unwrap()
-            }
+            Entry::Vacant(entry) => entry.map.insert_entry(entry.key, default),
         }
     }
 
+    /// Optimized by Bolt ⚡: uses `insert_entry` to move `entry.key` directly into the map
+    /// in a single pass. Eliminates key cloning, duplicate hash recalculations, duplicate
+    /// bucket lookup loops, and `.unwrap()` calls.
     pub fn or_insert_with<F>(self, default: F) -> &'a mut V
     where
         F: FnOnce() -> V,
@@ -78,8 +81,7 @@ where
             Entry::Occupied(entry) => entry.value,
             Entry::Vacant(entry) => {
                 let val = default();
-                entry.map.insert(entry.key.clone(), val);
-                entry.map.get_mut(&entry.key).unwrap()
+                entry.map.insert_entry(entry.key, val)
             }
         }
     }
@@ -131,7 +133,10 @@ where
         (hasher.finish() as usize) & (self.capacity - 1)
     }
 
-    pub fn insert(&mut self, key: K, value: V) {
+    /// Optimized by Bolt ⚡: Single-pass key insertion moving `key` into the bucket and returning
+    /// a mutable reference to the inserted/updated value. Pre-allocates new bucket vectors with
+    /// initial capacity of 4 to avoid immediate reallocations on first push.
+    pub fn insert_entry(&mut self, key: K, value: V) -> &mut V {
         if self.capacity == 0 || self.buckets.is_empty() {
             if self.capacity == 0 {
                 self.capacity = 16;
@@ -143,24 +148,39 @@ where
         }
 
         let hash = self.hash_key(&key);
-        if let Some(ref mut bucket) = self.buckets[hash] {
-            for item in bucket.iter_mut() {
-                if item.0 == key {
-                    // Key already exists — update value WITHOUT incrementing len.
-                    item.1 = value;
-                    return;
-                }
-            }
-            // New key in an existing bucket.
-            bucket.push((key, value));
-        } else {
-            // No bucket yet — create one.
-            let mut bucket = Vec::new();
+        if self.buckets[hash].is_none() {
+            // No bucket yet — pre-allocate with capacity for 4 entries to avoid reallocations
+            let mut bucket = Vec::with_capacity(4);
             bucket.push((key, value));
             self.buckets[hash] = Some(bucket);
+            self.len += 1;
+            let bucket_ref = self.buckets[hash].as_mut().unwrap();
+            let last_idx = bucket_ref.len() - 1;
+            return &mut bucket_ref[last_idx].1;
         }
-        // Only reached for genuinely new keys.
+
+        let bucket = self.buckets[hash].as_mut().unwrap();
+        let mut found_idx = None;
+        for (i, item) in bucket.iter().enumerate() {
+            if item.0 == key {
+                found_idx = Some(i);
+                break;
+            }
+        }
+
+        if let Some(idx) = found_idx {
+            bucket[idx].1 = value;
+            return &mut bucket[idx].1;
+        }
+
+        bucket.push((key, value));
         self.len += 1;
+        let last_idx = bucket.len() - 1;
+        &mut bucket[last_idx].1
+    }
+
+    pub fn insert(&mut self, key: K, value: V) {
+        self.insert_entry(key, value);
     }
 
     pub fn get<Q>(&self, key: &Q) -> Option<&V>

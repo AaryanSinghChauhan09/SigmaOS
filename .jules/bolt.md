@@ -37,3 +37,7 @@
 ## 2026-09-11 - Fast Bitwise Bitmasking for Power-of-Two Hash Table Indexing
 **Learning:** Computing hash bucket indices using hardware modulo division (`hash % capacity`) triggers CPU `div` instructions taking ~10-40 clock cycles. Since custom hash table structures guarantee bucket capacity as power-of-two values, replacing modulo division with bitwise AND mask (`hash & (capacity - 1)`) evaluates bucket indexing in a single CPU cycle.
 **Action:** When designing custom hash tables, ring buffers, or fixed-capacity pools, maintain capacity as a power of two and use bitwise AND bitmasking (`& (capacity - 1)`) instead of integer division (`% capacity`).
+
+## 2026-09-12 - Single-Pass Move Insertion for Hash Map Entry API
+**Learning:** In map `Entry` API implementations (`or_insert` / `or_insert_with`), calling `map.insert(entry.key.clone(), val)` followed by `map.get_mut(&entry.key).unwrap()` forces key cloning, duplicate hash calculations, double bucket search passes, and unwrap checks. Implementing a single-pass `insert_entry(&mut self, key: K, value: V) -> &mut V` method moves the key directly into the map without cloning (`K: Clone` bound dropped), computes the hash once, and returns a mutable reference to the inserted/updated value directly.
+**Action:** For map `Entry` APIs or upsert operations, provide a single-pass `insert_entry` method that consumes owned keys and returns mutable value references directly.
