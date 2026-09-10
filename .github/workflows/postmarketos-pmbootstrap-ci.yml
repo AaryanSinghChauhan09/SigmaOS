@@ -1,0 +1,25 @@
+name: postmarketOS pmbootstrap & Mobile Kernel CI
+
+on:
+  push:
+    branches: [ "main", "master", "jules-*" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  postmarketos-pmbootstrap:
+    name: postmarketOS pmbootstrap Tooling & Alpine Mobile Architecture Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Test postmarketOS & apk-tools Package Integration
+        run: |
+          echo "Testing postmarketOS pmbootstrap and apk-tools package adapter..."
+          rustc --test --edition=2021 tests/test_universal_adapter.rs -o build/test_universal_adapter && ./build/test_universal_adapter
