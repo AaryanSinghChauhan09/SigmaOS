@@ -2,7 +2,12 @@ pub mod omarchy;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
-pub mod mint_innovations;
+pub mod arch_missing_components;
+
+pub use arch_missing_components::{
+    AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAurWebRpcClient, ArchMakepkgEngine,
+    ArchNamcapLinterEngine, AurRpcResult, NamcapIssue, NamcapSeverity, PkgBuildSpec,
+};
 
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
@@ -183,13 +188,13 @@ pub use linux_bsd_inspirations::{
     HardenedBsdPaxGuardEngine, HermeticStoreClosureEngine, NetBsdRumpRouter, NixStyleStore,
     OpenBSDPledge, OpenBSDUnveil, OpenBsdFdPledgeGate, OpenBsdPledgeUnveilSentinel,
     OpenBsdRetguardEngine, OpenRCService, PaxViolationLog, PaxViolationType, PfsNodeVote,
-    PowerProfileMode, ScxSchedulerPolicy, SerpentMossEngine, ServiceSupervisorType,
-    SovereignBcachefsTieringEngine, SovereignBpfCoReEngine, SovereignDTraceEngine,
-    SovereignDeclarativeSystemEngine, SovereignDistroInspirationLeapEngine, SovereignDragonflyNpotEngine,
-    SovereignEbpfEngine, SovereignIllumosZonesEngine, SovereignIoUring, SovereignKaslrWxAllocator,
-    SovereignLandlockLsm, SovereignOstreeEngine, SovereignPrivSepSandbox, SovereignRaidSelfHealer,
-    SovereignRingBuffer, SovereignRunitSupervisor, SovereignUniversalDistroBridge, SovereignZfsPoolEngine,
-    StorageTier, StoreClosurePackage, System76PowerGovernor, ZoneBrand, ZoneState,
+    PowerProfileMode, SerpentMossEngine, ServiceSupervisorType, SovereignBcachefsTieringEngine,
+    SovereignBpfCoReEngine, SovereignDTraceEngine, SovereignDeclarativeSystemEngine,
+    SovereignDragonflyNpotEngine, SovereignEbpfEngine, SovereignIllumosZonesEngine,
+    SovereignIoUring, SovereignKaslrWxAllocator, SovereignLandlockLsm, SovereignOstreeEngine,
+    SovereignPrivSepSandbox, SovereignRaidSelfHealer, SovereignRingBuffer,
+    SovereignRunitSupervisor, SovereignUniversalDistroBridge, SovereignZfsPoolEngine, StorageTier,
+    StoreClosurePackage, System76PowerGovernor, ZoneBrand, ZoneState,
 };
 
 pub use sovereign_distro_dominance::{
@@ -201,11 +206,6 @@ pub use sovereign_distro_dominance::{
     ZfsBtrfsHybridSelfHealingCoW,
 };
 
-pub mod opensuse;
-pub use opensuse::{
-    MicroOsSnapshot, MicroOsSnapshotState, OpenSuseMicroOsEngine, OpenSuseYastPatternEngine,
-    YastPattern,
-};
 pub mod nextgen_innovations;
 pub mod universal_distro_super_matrix;
 pub mod void_xbps_src;
@@ -246,11 +246,9 @@ pub use ultimate_distro_innovations::{
 pub mod sovereign_ahead_distro_supremacy;
 pub use sovereign_ahead_distro_supremacy::{
     AccessRight as CapabilityAccessRight, CarpNodeStatus, CoWBlockExtent,
-    DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchIsaTarget, MicroarchTier,
-    OmniCasBlob, OmniGenRecord, PfsyncConnEntry, PredictiveSchedPolicy, PredictiveTaskDescriptor,
-    ResilientBlockEntry, SchedPolicyKind, SchedTaskDescriptor, SchedTaskState, SecurityMultiOsMask,
-    SimdJitFunctionTarget, SimdJitPatch, SovereignAheadOfDistrosSuite,
-    SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
-    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine,
-    SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
+    DeclarativeCapabilityRule, MicroarchIsaTarget, OmniCasBlob, OmniGenRecord, PfsyncConnEntry,
+    SchedPolicyKind, SchedTaskDescriptor, SchedTaskState, SimdJitPatch,
+    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
+    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
+    SovereignXdpCarpMeshEngine,
 };
