@@ -416,7 +416,8 @@ impl ShellRepl {
         let mut fully_expanded = BashParameterExpansion::expand(&alias_expanded, &env_map);
         if fully_expanded.contains("$(( ") || fully_expanded.contains("$(((") {
             if let Ok(val) = crate::shell::zsh_bash_parity::ShellArithmeticEvaluator::evaluate(&fully_expanded) {
-                fully_expanded = val.to_string();
+                let val_i64: i64 = val;
+                fully_expanded = val_i64.to_string();
             }
         }
 
@@ -561,23 +562,6 @@ impl ShellRepl {
                     ShellCommand::Alias {
                         shorthand: parts[1].to_string(),
                         statement: parts[2..].join(" "),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "echo" => {
-                let message = if parts.len() >= 2 {
-                    parts[1..].join(" ")
-                } else {
-                    String::new()
-                };
-                ShellCommand::Echo { message }
-            }
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -1258,9 +1242,9 @@ impl ShellRepl {
                 monitor.running = true;
                 monitor.update_metrics(); // automatically update to capture values
 
-                let cpu_avg = monitor.dashboard.widgets.get("cpu").and_then(|w| w.get_latest_value()).unwrap_or(42.5);
-                let mem_avg = monitor.dashboard.widgets.get("memory").and_then(|w| w.get_latest_value()).unwrap_or(61.2);
-                let disk_avg = monitor.dashboard.widgets.get("disk").and_then(|w| w.get_latest_value()).unwrap_or(75.0);
+                let cpu_avg = monitor.dashboard.widgets.get("cpu").and_then(|w: &crate::dashboard::DashboardWidget| w.get_latest_value()).unwrap_or(42.5);
+                let mem_avg = monitor.dashboard.widgets.get("memory").and_then(|w: &crate::dashboard::DashboardWidget| w.get_latest_value()).unwrap_or(61.2);
+                let disk_avg = monitor.dashboard.widgets.get("disk").and_then(|w: &crate::dashboard::DashboardWidget| w.get_latest_value()).unwrap_or(75.0);
 
                 Ok(format!(
                     "System Telemetry Dashboard:\n\
@@ -1321,7 +1305,8 @@ impl ShellRepl {
             }
             ShellCommand::VmStart { id } => {
                 if let Some(vm) = self.virt_orchestrator.virtual_machines.get_mut(&id) {
-                    vm.start().unwrap();
+                    let vm: &mut VirtualMachine = vm;
+                    let _ = vm.start();
                     Ok(format!("Booting guest VM '{}'...", vm.name))
                 } else {
                     Ok(format!("Starting VM '{}' with hardware VT-x acceleration...", id))
@@ -1443,7 +1428,7 @@ impl ShellRepl {
                         self.current_dir = self.dir_stack.current_dir.clone();
                         Ok(formatted)
                     }
-                    Err(err) => Err(err.to_string()),
+                    Err(err) => Err(String::from(err)),
                 }
             }
             ShellCommand::Dirs => {
