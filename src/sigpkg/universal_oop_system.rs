@@ -262,6 +262,8 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
+    // Systemd Sysupdate (.sysupdate)
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -2988,13 +2990,83 @@ impl Default for SovereignUniversalAlternativesManager {
 // Delta Package Reconstruction Subsystem
 // ============================================================================
 
+pub trait IPackageDeltaStrategy: Send + Sync {
+    fn name(&self) -> &str;
+    fn compute_delta(&self, old_bytes: &[u8], new_bytes: &[u8]) -> Vec<u8>;
+    fn apply_delta(&self, old_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str>;
+    fn apply_patch(&self, source_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
+        self.apply_delta(source_bytes, delta_bytes)
+    }
+}
+
+pub struct DnfDeltaRpmStrategy;
+
+impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
+    fn name(&self) -> &str {
+        "drpm"
+    }
+
+    fn compute_delta(&self, _old_bytes: &[u8], new_bytes: &[u8]) -> Vec<u8> {
+        let mut delta = Vec::new();
+        delta.extend_from_slice(b"DRPM_DELTA:");
+        delta.extend_from_slice(new_bytes);
+        delta
+    }
+
+    fn apply_delta(&self, old_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
+        if delta_bytes.starts_with(b"DRPM_DELTA:") {
+            let mut reconstructed = old_bytes.to_vec();
+            reconstructed.extend_from_slice(&delta_bytes[11..]);
+            Ok(reconstructed)
+        } else {
+            let mut reconstructed = old_bytes.to_vec();
+            reconstructed.extend_from_slice(delta_bytes);
+            Ok(reconstructed)
+        }
+    }
+}
+
+pub struct SovereignBinaryDeltaStrategy;
+
+impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
+    fn name(&self) -> &str {
+        "moss-stone-delta"
+    }
+
+    fn compute_delta(&self, _old_bytes: &[u8], new_bytes: &[u8]) -> Vec<u8> {
+        new_bytes.to_vec()
+    }
+
+    fn apply_delta(&self, _old_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(delta_bytes.to_vec())
+    }
+}
+
+pub struct ZstdChunkedDeltaStrategy;
+
+impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
+    fn name(&self) -> &str {
+        "zstd-chunked"
+    }
+
+    fn compute_delta(&self, _old_bytes: &[u8], new_bytes: &[u8]) -> Vec<u8> {
+        new_bytes.to_vec()
+    }
+
+    fn apply_delta(&self, _old_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(delta_bytes.to_vec())
+    }
+}
+
 pub struct PackageDeltaPatch {
     pub source_checksum: String,
     pub target_checksum: String,
     pub delta_payload: Vec<u8>,
 }
 
-pub struct PackageDeltaEngine;
+pub struct PackageDeltaEngine {
+    pub strategies: HashMap<String, Arc<dyn IPackageDeltaStrategy>>,
+}
 
 impl PackageDeltaEngine {
     pub fn new() -> Self {
