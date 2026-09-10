@@ -19,8 +19,6 @@ use alloc::vec::Vec;
 
 // Test environment compatibility: Use std for testing only
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

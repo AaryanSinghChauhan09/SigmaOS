@@ -3034,6 +3034,16 @@ mod tests {
         };
 
         assert!(net_dec.restrict_network().is_ok());
+
+}
+
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
+
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, raw_data: &str) -> Result<UnifiedPackage, PackageError> {
+        let name = raw_data.lines().next().unwrap_or("apk-package");
+        Ok(UnifiedPackage::new(name.to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
     }
 }
 

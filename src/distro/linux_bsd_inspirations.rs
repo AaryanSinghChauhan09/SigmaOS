@@ -121,6 +121,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -140,7 +143,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
-            DistroSubsystemMode::LinuxParrot => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -218,14 +220,16 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd
-            | DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::OpenRC || supervisor == ServiceSupervisorType::Smf,
+            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC || supervisor == ServiceSupervisorType::Smf,
 
             DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
                 supervisor == ServiceSupervisorType::Runit
@@ -249,7 +253,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -267,7 +274,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
-            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
@@ -286,7 +292,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
