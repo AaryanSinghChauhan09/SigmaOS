@@ -2,7 +2,6 @@
 /// Based on Roadmap Item: ARM64 + RISC-V Portability
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -66,7 +65,7 @@ impl SimpleARM64Support {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -255,7 +254,7 @@ impl SovereignContextSwitchEngine {
     /// Optimized X64 context switch with PCID TLB preservation and TLS MSR restoration
     pub fn context_switch_x64(&mut self, next_x64: X64Context) -> (X64Context, bool) {
         let old_context = self.current_context;
-        let mut old_x64 = match old_context {
+        let old_x64 = match old_context {
             CpuContextState::X64(c) => c,
             _ => X64Context::default(),
         };
