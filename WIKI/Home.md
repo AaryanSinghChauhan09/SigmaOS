@@ -41,6 +41,20 @@
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
 - **Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia (V23):** [[SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V23]] - Complete application, library, model, framework, codec, format, and dependency elimination guide.
 
+- **Autonomous AI Agent Resource Management:** Intelligent microkernel and userland agent governors for compute, memory (DAMON/PSI), storage (ZFS ARC/CoW), network QoS (eBPF/VNET), and thermal power tuning via ACP/MCP protocols.
+
+---
+
+## 📚 Documentation Index
+
+- [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
+- [API Reference](docs/api-reference.md)
+- [Kernel Architecture](docs/kernel.md)
+- [Memory Management](docs/memory-management.md)
+- [Security Architecture](docs/security.md)
+- [Package Management](docs/package-manager.md)
+- [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
+
 ---
 
 ## 📚 Documentation

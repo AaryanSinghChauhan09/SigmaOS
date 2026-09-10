@@ -129,6 +129,12 @@ pub enum BodhiUpdateStatus {
     Testing,
     Stable,
     Obsolete,
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BodhiStatus {
+    Testing,
+    Stable,
+    Unpushed,
 }
 
 #[derive(Debug, Clone)]
@@ -306,6 +312,20 @@ impl FedoraCoprBuildGatewayEngine {
         } else {
             Err("COPR: Project not found")
         }
+
+        Self { repos: Vec::new() }
+    }
+
+    pub fn create_copr_repo(&mut self, owner: &str, name: &str, chroots: &[&str]) {
+        self.repos.push(CoprRepository {
+            owner: owner.to_string(),
+            project_name: name.to_string(),
+            chroots: chroots.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn find_repo(&self, owner: &str, name: &str) -> Option<&CoprRepository> {
+        self.repos.iter().find(|r| r.owner == owner && r.project_name == name)
     }
 }
 
@@ -316,62 +336,89 @@ impl Default for FedoraCoprBuildGatewayEngine {
 }
 
 // =========================================================================
-// 5. ROOTLESS OCI CONTAINER ENGINE (PODMAN/BUILDAH PARITY)
+// 5. FEDORA CONTAINER STACK ENGINE (Podman / Buildah / Skopeo)
 // =========================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OciContainerState {
-    Created,
-    Running,
-    Exited,
+#[derive(Debug, Clone)]
+pub struct OciContainerImage {
+    pub repository: String,
+    pub tag: String,
+    pub digest: String,
+}
+
+pub struct FedoraContainerStackEngine {
+    pub images: Vec<OciContainerImage>,
+}
+
+impl FedoraContainerStackEngine {
+    pub fn new() -> Self {
+        Self { images: Vec::new() }
+    }
+
+    pub fn pull_image(&mut self, repo: &str, tag: &str) -> OciContainerImage {
+        let digest = format!("sha256:{:x}", repo.len() * 0xcafe);
+        let img = OciContainerImage {
+            repository: repo.to_string(),
+            tag: tag.to_string(),
+            digest,
+        };
+        self.images.push(img.clone());
+        img
+    }
+}
+
+impl Default for FedoraContainerStackEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 6. SOVEREIGN FEDORA ECOSYSTEM SUITE MASTER COORDINATOR
+// =========================================================================
+
+// =========================================================================
+// 7. FEDORA GREENWAVE DECISION ENGINE & WAIVERDB API ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum GreenwaveDecisionStatus {
+    Satisfied,
+    Unsatisfied,
+    Waived,
 }
 
 #[derive(Debug, Clone)]
-pub struct OciContainerInstance {
-    pub container_id: String,
-    pub image: String,
-    pub user_uid: usize,
-    pub state: OciContainerState,
+pub struct GreenwavePolicyRequirement {
+    pub policy_id: String,
+    pub required_test_type: String,
+    pub passed: bool,
 }
 
-pub struct FedoraRootlessOciContainerEngine {
-    pub containers: BTreeMap<String, OciContainerInstance>,
+pub struct FedoraGreenwaveDecisionEngine {
+    pub requirements: Vec<GreenwavePolicyRequirement>,
 }
 
-impl FedoraRootlessOciContainerEngine {
+impl FedoraGreenwaveDecisionEngine {
     pub fn new() -> Self {
         Self {
-            containers: BTreeMap::new(),
+            requirements: Vec::new(),
         }
     }
 
-    pub fn podman_run_rootless(
-        &mut self,
-        container_id: &str,
-        image: &str,
-        user_uid: usize,
-    ) -> Result<(), &'static str> {
-        if self.containers.contains_key(container_id) {
-            return Err("Podman: Container ID already exists");
-        }
-
-        let instance = OciContainerInstance {
-            container_id: container_id.to_string(),
-            image: image.to_string(),
-            user_uid,
-            state: OciContainerState::Running,
-        };
-
-        self.containers.insert(container_id.to_string(), instance);
-        Ok(())
+    pub fn add_requirement(&mut self, policy: &str, test_type: &str, passed: bool) {
+        self.requirements.push(GreenwavePolicyRequirement {
+            policy_id: policy.to_string(),
+            required_test_type: test_type.to_string(),
+            passed,
+        });
     }
 
-    pub fn podman_stop(&mut self, container_id: &str) -> Result<(), &'static str> {
-        if let Some(c) = self.containers.get_mut(container_id) {
-            c.state = OciContainerState::Exited;
-            Ok(())
+    pub fn evaluate_decision(&self) -> GreenwaveDecisionStatus {
+        if self.requirements.iter().all(|r| r.passed) {
+            GreenwaveDecisionStatus::Satisfied
         } else {
-            Err("Podman: Container not found")
+            GreenwaveDecisionStatus::Unsatisfied
         }
     }
 }
@@ -643,14 +690,19 @@ impl SovereignFedoraEcosystemSuite {
         Self {
             koji: FedoraKojiBuildSystemEngine::new(),
             bodhi: FedoraBodhiUpdateEngine::new(),
-            pagure: FedoraPagureForgeEngine::new("sigmaos-core"),
             copr: FedoraCoprBuildGatewayEngine::new(),
-            podman: FedoraRootlessOciContainerEngine::new(),
-            mock: FedoraMockChrootBuilder::new(),
-            dnf5: FedoraDnf5PackageEngine::new(),
-            anaconda: FedoraAnacondaKickstartEngine::new(),
-            sssd: FedoraSssdFreeIpaEngine::new(),
+            containers: FedoraContainerStackEngine::new(),
+            greenwave: FedoraGreenwaveDecisionEngine::new(),
+            waiverdb: FedoraWaiverDbEngine::new(),
         }
+    }
+
+    pub fn run_release_pipeline(&mut self, pkg: &str, ver: &str) -> Result<String, &'static str> {
+        let task_id = self.koji.submit_build_task(pkg, ver, "fc40-build", "x86_64");
+        let rpm = self.koji.build_target(task_id)?;
+        self.bodhi.submit_update(&format!("{}-update", pkg), pkg, ver, BodhiUpdateType::Enhancement);
+        self.bodhi.add_karma(&format!("{}-update", pkg), 3)?;
+        Ok(format!("Successfully released {} via Koji task #{}", rpm, task_id))
     }
 }
 
@@ -659,6 +711,10 @@ impl Default for SovereignFedoraEcosystemSuite {
         Self::new()
     }
 }
+
+// =========================================================================
+// UNIT TESTS
+// =========================================================================
 
 #[cfg(test)]
 mod tests {
@@ -772,5 +828,54 @@ mod tests {
 
         sssd.kinit_authenticate("developer@FEDORAPROJECT.ORG", 1700000000);
         assert!(sssd.active_krb_tickets.contains_key("developer@FEDORAPROJECT.ORG"));
+
+    fn test_koji_build_system_engine() {
+        let mut koji = FedoraKojiBuildSystemEngine::new();
+        let id = koji.submit_build_task("bash", "5.2", "fc40", "x86_64");
+        let result = koji.build_target(id);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "bash-5.2.x86_64.rpm");
+    }
+
+    #[test]
+    fn test_bodhi_update_engine() {
+        let mut bodhi = FedoraBodhiUpdateEngine::new();
+        bodhi.submit_update("UPD-001", "kernel", "6.8.0", BodhiUpdateType::Security);
+        let status = bodhi.add_karma("UPD-001", 3).unwrap();
+        assert_eq!(status, BodhiStatus::Stable);
+    }
+
+    #[test]
+    fn test_pagure_forge_engine() {
+        let mut pagure = FedoraPagureForgeEngine::new("rpms/kernel");
+        let pr_id = pagure.create_pull_request("Fix memory leak in page allocator", "jules");
+        assert!(pagure.merge_pull_request(pr_id));
+    }
+
+    #[test]
+    fn test_copr_build_gateway_engine() {
+        let mut copr = FedoraCoprBuildGatewayEngine::new();
+        copr.create_copr_repo("jules", "sigma-tools", &["fedora-40-x86_64"]);
+        assert!(copr.find_repo("jules", "sigma-tools").is_some());
+    }
+
+    #[test]
+    fn test_greenwave_and_waiverdb_engines() {
+        let mut gw = FedoraGreenwaveDecisionEngine::new();
+        gw.add_requirement("bodhi_update_gate", "openqa_install_test", true);
+        assert_eq!(gw.evaluate_decision(), GreenwaveDecisionStatus::Satisfied);
+
+        let mut wdb = FedoraWaiverDbEngine::new();
+        let id = wdb.issue_waiver("kernel-6.8.0", "abi_check", "jules", "Non-breaking driver ABI change");
+        assert_eq!(id, 1);
+        assert!(wdb.is_waived("kernel-6.8.0", "abi_check"));
+    }
+
+    #[test]
+    fn test_sovereign_fedora_ecosystem_suite() {
+        let mut suite = SovereignFedoraEcosystemSuite::new();
+        let result = suite.run_release_pipeline("systemd", "255");
+        assert!(result.is_ok());
+        assert!(result.unwrap().contains("systemd-255.x86_64.rpm"));
     }
 }
