@@ -48,26 +48,17 @@ pub mod object;
 pub mod os_innovations;
 pub mod paging;
 pub mod performance;
-pub mod pipes;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod missing_linux_kernel_components;
 pub mod structures;
-
-pub use missing_linux_kernel_components::{
-    BpfRingBufferStreamEngine, KernelAuditRecord, KernelAuditRecordType,
-    LinuxKernelAuditSubsystemEngine, UffdFaultEvent, UffdMode, UffdRegisteredRange,
-    UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
-};
 pub mod traits;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
-pub use pipes::*;
 pub use policy_mechanism::*;
 #[allow(ambiguous_glob_reexports)]
 pub use structures::*;
@@ -108,11 +99,3 @@ pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
 pub mod missing_linux_kernel_components;
 pub use missing_linux_kernel_components::*;
-
-pub mod linux_kernel_parity_synthesis;
-pub use linux_kernel_parity_synthesis::{
-    DamonRegionNode, DmTargetDevice, DmTargetType, FutexSize, FutexWaitvEntry,
-    LinuxDamonAccessMonitorEngine, LinuxDeviceMapperEngine, LinuxKernelFutex2WaitvEngine,
-    LinuxPressureStallInfoEngine, PsiResourceKind, PsiStallMetrics,
-    SovereignLinuxKernelParitySynthesisSuite,
-};

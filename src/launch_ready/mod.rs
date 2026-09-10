@@ -9,18 +9,21 @@
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+extern crate alloc;
+
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use alloc::string::String;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
+use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
 
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 

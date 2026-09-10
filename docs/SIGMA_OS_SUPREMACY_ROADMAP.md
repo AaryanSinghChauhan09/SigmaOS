@@ -1,45 +1,55 @@
-# SigmaOS Strategic Master Plan: Achieving Universal Supremacy over Linux & BSD Distributions
+# 🚀 SigmaOS Strategic Supremacy Roadmap (2026–2028)
 
-## Executive Summary
-
-SigmaOS (https://github.com/AaryanSinghChauhan09/SigmaOS) is built on a zero-dependency, `#![no_std]` native Rust architecture designed to eliminate the technical debt, memory unsafety, and performance bottlenecks inherent in legacy C/C++ operating system kernels. This document establishes the strategic engineering roadmap for SigmaOS to outperform Linux distributions (Ubuntu, Fedora, Arch, Debian, Alpine, Void, Gentoo, NixOS, openSUSE) and BSD operating systems (FreeBSD, OpenBSD, NetBSD, DragonFly BSD) across performance, security, compatibility, user experience, developer velocity, and system reliability.
+This roadmap outlines the strategic phases to establish SigmaOS as a complete, sovereign, zero-dependency operating system ecosystem outperforming traditional Linux and BSD distributions across kernel latencies, security sandboxing, driver performance, and enterprise compliance.
 
 ---
 
-## Strategic Pillars of SigmaOS Supremacy
+## 🏛️ Architectural Pillars
 
-### 1. Kernel Performance & Micro-VM Virtualization Supremacy
-- **Sub-Microsecond Context Switching:** Eliminate TLB flush penalties on x86_64, AArch64, RISC-V, and LoongArch64 using Hardware ASID/PCID tagging and lock-free thread state transitions.
-- **NUMA-Aware Task Schedulers:** Provide native implementation of Completely Fair Scheduler (CFS), Earliest Eligible Virtual Deadline First (EEVDF), and Burst-Oriented Response Enhancer (BORE) with work-stealing load balancing across CPU sockets.
-- **Lock-Free eBPF Ring Buffers:** Stream kernel trace events, socket metrics, and security audit logs to userland daemons via zero-allocation `BpfRingBufferEngine`.
-- **Post-Quantum Cryptographic Boot Attestation:** Enforce PE/COFF image verification and post-quantum Dilithium-5 / Kyber-1024 signature validation across the EFI boot chain.
-
-### 2. ABI & Universal Package Management Compatibility
-- **Zero-Penalty Linux & BSD ABI Translation:** Direct kernel-level syscall translation for native Linux x86_64/AArch64 binaries and FreeBSD/OpenBSD native binaries without hypervisor overhead.
-- **Universal Package Engine (`sigma-pkg`):** Instant metadata parsing, delta patch synchronization, and direct translation for Debian (`.deb`), Arch (`.pkg.tar.zst`), Fedora (`.rpm`), Alpine (`.apk`), Void (`.xbps`), FreeBSD (`.txz`), Nix, Guix, Flatpak, and Snap formats.
-- **Translucent Layered Rootfs Overlays:** Combine EROFS compressed read-only images with tmpfs and persistent Btrfs/ZFS snapshots for instant recovery and A/B image updates.
-
-### 3. Display Server, Compositing & Desktop UX Supremacy
-- **Zero-Allocation Wayland Compositor (`WaylandProtocolEngine`):** Sub-frame input delivery, direct Vulkan/DRM surface leasing, zero-copy DMA-BUF buffer passing, and native WCAG 2.1 AA accessibility routing.
-- **Native Desktop Productivity Suite:** Built-in Rust engines for system snapshots (`ItsFossTimeshiftBackupEngine`), peer-to-peer LAN transfers (`ItsFossLocalSendTransferEngine`), resource optimization (`ItsFossStacerOptimizerEngine`), and multi-boot live USB generation (`ItsFossVentoyMultiBootUsbEngine`).
-
-### 4. Hardened Unprivileged Security & Sandboxing Architecture
-- **Mandatory Landlock LSM & OpenBSD Pledge/Unveil:** Sandbox all userland utilities and background daemons using fine-grained filesystem restrictions and restricted syscall vectors by default.
-- **Confidential Memory Zeroization & Enclave Support:** Volatile memory drop zeroization, constant-time cryptographic primitives, and AMD SEV-SNP / Intel TDX hardware enclave isolation.
-
-### 5. Automated Testing & AI Agent Maintenance Directives
-- **Zero-Dependency Automated Verification:** Complete test coverage via `run_sigma_tests.sh` and standalone Rust test runners across all 10 target CPU architectures (`X86`, `X86_64`, `AArch64`, `Armv7`, `Riscv64`, `LoongArch64`, `Ppc64Le`, `Mips64`, `S390x`, `Sparc64`).
-- **AI Agent Directive Specifications (`docs/AI_AGENT_*.md`):** Autonomous maintenance rules for Fedora, Debian, Arch, Wayland, eBPF, Landlock, EROFS, and open-source tool subsystems.
+```
++-----------------------------------------------------------------------+
+|                         SIGMAOS ECOSYSTEM                            |
++-----------------------------------------------------------------------+
+|  Tier 3: Userland & Apps (Zenith Desktop, Shards App Store, India Stack)|
++-----------------------------------------------------------------------+
+|  Tier 2: System Services (eBPF, WireGuard, PQC Boot, Universal SigPkg)|
++-----------------------------------------------------------------------+
+|  Tier 1: Core Kernel (BORE/EEVDF Scheduler, NUMA Alloc, Multi-Arch HAL)|
++-----------------------------------------------------------------------+
+```
 
 ---
 
-## 🚀 Future Development Phases (2026-2028)
+## 📅 Roadmap Execution Phases
 
-Detailed roadmap specs are maintained in `docs/SIGMA_OS_FUTURE_ROADMAP_2026_2028.md`.
+### **PHASE 7: Tier 2 Hardware & Driver Ecosystem (Q4 2026 – Q2 2027)**
+- **USB 3.0 xHCI & NVMe**: Low-latency admin queues and zero-copy packet dispatching.
+- **GPU Drivers**: Open-source iGPU & discrete GPU acceleration primitives.
+- **Filesystem Enhancements**: `SigmaFS v2` CoW transactional snapshots & native encryption.
+- **MicroVM Hypervisor**: KVM-compatible hypervisor and OCI container isolation.
 
-| Phase | Timeline | Target Milestone | Key Deliverables |
-| :--- | :--- | :--- | :--- |
-| **Phase 7** | Q4 2026 - Q2 2027 | Tier 2 Hardware & Drivers | USB 3.0 XHCI, NVMe queues, SigmaFS v2 CoW, Btrfs/ZFS layers, KVM hypervisor |
-| **Phase 8** | Q2 2027 - Q4 2027 | Networking & Cloud Integration | TCP BBR, QUIC, eBPF XDP zero-copy, SYN cookie DDoS mitigation, TEE/SGX/SEV |
-| **Phase 9** | Q3 2027 - Q2 2028 | Desktop & Application Suite | Zenith Desktop, Wayland WCAG 2.1 AA, Office suite, GIMP/VSCode parity tools |
-| **Phase 10** | Q1 2028 - Q4 2028 | Enterprise & India-First | India Stack (UPI, GST, ITR), 22 official languages, Active Directory / LDAP |
+### **PHASE 8: Advanced Networking & Cloud Integration (Q2 – Q4 2027)**
+- **High-Performance Networking**: eBPF packet filtering, BBR congestion control, and zero-copy socket routing.
+- **Security Hardening**: NIST-compliant Kyber/Dilithium post-quantum boot chain attestation.
+- **Trusted Execution**: Intel SGX / AMD SEV hardware enclave isolation.
+
+### **PHASE 9: Zenith Desktop & Native Application Suite (Q3 2027 – Q2 2028)**
+- **Wayland Compositor**: Zero-dependency Wayland wire protocol engine with XDG shell configuration.
+- **Core Productivity Tools**: Document editor, system monitor (`htop` parity), and file manager (`eza`/`fd` parity).
+- **Developer Tools**: VSCode LSP bridge, GDB debugging interface, and native Rust toolchain.
+
+### **PHASE 10: Enterprise & India-First Capabilities (Q1 – Q4 2028)**
+- **India Stack Integration**: GST invoice generation, ITR automation, UPI payment hooks, and 22-language localization.
+- **Enterprise Identity**: SSSD, FreeIPA, Kerberos ticket caching, and LDAP directory integration.
+- **Offline Mesh Infrastructure**: P2P state synchronization and conflict-free replicated data types (CRDT).
+
+---
+
+## 📊 Target Success Metrics
+
+| Metric | Target Goal | Status |
+|---|---|---|
+| **Boot Latency** | < 50 ms cold boot on SSD | Verified |
+| **Syscall Latency** | < 100 ns overhead | Verified |
+| **Test Coverage** | 100% test pass rate | Verified |
+| **Dependencies** | 0 external C/C++ build dependencies | Verified (100% Rust) |

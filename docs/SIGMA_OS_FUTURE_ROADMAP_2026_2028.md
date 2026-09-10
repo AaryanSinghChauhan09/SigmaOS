@@ -1,115 +1,100 @@
-# 🚀 SigmaOS Future Development Roadmap (2026-2028)
+# 🚀 SigmaOS Future Development Roadmap (2026–2028)
 
-## Executive Overview
-This document establishes the strategic 2026–2028 long-term engineering roadmap for **SigmaOS** (https://github.com/AaryanSinghChauhan09/SigmaOS) to achieve universal operating system dominance over Linux distributions and BSD systems.
-
----
-
-## 🛠️ PHASE 7: Tier 2 Hardware & Driver Ecosystem (Q4 2026 - Q2 2027)
-
-### Inspired By:
-- **linux-0.11-rs**: Idiomatic Rust bare-metal design patterns
-- **TILCK** (Tiny Linux-Compatible Kernel): Clean hardware driver abstractions
-- **x86-bare-metal-examples**: Direct hardware management
-
-### Key Deliverables:
-1. **Extended Driver Infrastructure:**
-   - USB 3.0 XHCI controller optimizations
-   - Hot-swappable SATA & NVMe queues
-   - Intel & AMD iGPU / discrete GPU DRM drivers
-   - 802.11ax Wi-Fi and Bluetooth 5.2+ subsystem drivers
-   - High-Definition Audio (HD Audio) & USB Audio codecs
-2. **SigmaFS v2 & Filesystem Compatibility Layers:**
-   - SigmaFS v2: Distributed CoW snapshots with inline compression
-   - Btrfs and ZFS-inspired data integrity & scrubbing features
-   - Native filesystem-level transparent AES-256 / ChaCha20 encryption
-3. **Hypervisor & Container Runtime:**
-   - KVM-compatible micro-hypervisor module
-   - OCI-compliant container runtime with eBPF isolation
-   - Lightweight VM manager (kvmtool inspired)
+This document outlines the strategic future development roadmap for **SigmaOS**, drawing inspiration from world-class open-source GitHub repositories (`redox-os/redox`, `torvalds/linux`, `freebsd/freebsd`, `openbsd/src`, `nixos/nix`, `hyprwm/Hyprland`, `BurntSushi/ripgrep`, `systemd/systemd`).
 
 ---
 
-## 🌐 PHASE 8: Networking & Cloud Integration (Q2 - Q4 2027)
-
-### Inspired By:
-- **SocketCAN & Linux Kernel Network Stack**
-- **Bare-metal Kubernetes deployments**
-- **MiniDexed**: Real-time bare-metal I/O processing
-
-### Key Deliverables:
-1. **Advanced High-Performance Networking Stack:**
-   - TCP/UDP stack with BBR congestion control
-   - Native QUIC protocol engine
-   - eBPF XDP networking hooks & DPDK-inspired zero-copy packet processing
-   - Native DDoS mitigation (SYN cookie validation & dynamic rate limiting)
-2. **Cloud-Native Infrastructure:**
-   - Bare-metal container orchestration engine
-   - Observability & distributed tracing primitives
-   - S3-compatible cloud object storage integration
-3. **Hardware-Backed Security:**
-   - Secure Boot (S-Boot firmware)
-   - Intel SGX and AMD SEV-SNP Trusted Execution Environment (TEE) support
-   - Zero-trust mesh network architecture
+## 🎯 Strategic Mission & Principles
+- **100% Safe Rust `#![no_std]` Core**: Zero external C/C++ build dependencies.
+- **Sovereignty & Security First**: Post-Quantum Cryptography (Kyber/Dilithium) + OpenBSD `pledge`/`unveil` sandboxing + Linux `Landlock` LSM.
+- **Universal Distro Parity**: Seamless execution and translation layers for Linux (.deb, .rpm, .pkg.tar.zst, .apk), BSD (ports/pkg), and Android/macOS payloads.
+- **Ultra-Low Latency & High Throughput**: Lock-free O(1) BORE/EEVDF preemptive scheduling, eBPF zero-copy networking (`BPF_MAP_TYPE_RINGBUF`), and EROFS/Btrfs CoW filesystems.
 
 ---
 
-## 💻 PHASE 9: Desktop & Application Ecosystem (Q3 2027 - Q2 2028)
+## 🗺️ Multi-Phase Strategic Execution Roadmap
 
-### Inspired By:
-- **Zenith Desktop Compositor**
-- **Arc Browser & Modern UX Standards**
-- **GNOME & KDE Plasma**
-
-### Key Deliverables:
-1. **Zenith Desktop & Wayland Compositor:**
-   - Full Wayland protocol compliance with sub-frame rendering latency
-   - Touch gesture recognition and multi-monitor surface leasing
-   - Accessibility compliance (WCAG 2.1 AA & native screen reader routing)
-   - Dynamic Theme Engine v2 (dark/light auto-switching, accent colors)
-2. **Core Productivity Applications Suite:**
-   - Office suite (documents, spreadsheets, presentations)
-   - PDF viewer with annotation support
-   - GIMP-compatible image editor & timeline video editor
-   - Unified system settings & app store (Software Center)
-3. **Developer Tools & IDE Integration:**
-   - Language Server Protocol (LSP) server with VSCode parity
-   - GDB-compatible interactive debugger frontend
-   - Perf-compatible system profiler
+```
++-----------------------------------------------------------------------------------+
+|                           SIGMAOS FUTURE ROADMAP                                 |
++-----------------------------------------------------------------------------------+
+|  PHASE 10 (2028 Q1-Q4): Enterprise, India Stack & Offline P2P Mesh                |
++-----------------------------------------------------------------------------------+
+|  PHASE 9  (2027 Q3-2028 Q2): Zenith Desktop, Wayland Compositor & Core Suite     |
++-----------------------------------------------------------------------------------+
+|  PHASE 8  (2027 Q2-Q4): Advanced Networking, Cloud-Native, eBPF & TEE/SEV Isolation|
++-----------------------------------------------------------------------------------+
+|  PHASE 7  (2026 Q4-2027 Q2): Hardware Drivers, Multi-Arch HAL & SigmaFS v2        |
++-----------------------------------------------------------------------------------+
+```
 
 ---
 
-## 🇮🇳 PHASE 10: Enterprise & India-First Capabilities (Q1 - Q4 2028)
+## 🔬 Detailed Phase Breakdown
 
-### Inspired By:
-- **India Stack**: Unified Payments Interface (UPI), GST, IT Return automation
-- **Government Digital Infrastructure Initiatives**
-- **Enterprise Compliance Standards**
-
-### Key Deliverables:
-1. **India-First Native Stack Integrations:**
-   - Native GST calculation and e-invoice generation
-   - Automated Income Tax Return (ITR) computation
-   - Direct UPI payment gateway integration
-   - Aadhaar identity authentication SDK
-   - Full localization support for 22 official Indian languages
-2. **Enterprise & Active Directory Capabilities:**
-   - LDAP and Active Directory domain joining
-   - Kerberos ticket caching & single sign-on (SSO)
-   - Mobile Device Management (MDM) enrollment
-   - Enterprise VPN & certificate lifecycle management
-   - Compliance auditing (SOC2, ISO27001, HIPAA)
-3. **Offline-First Mesh Synchronization:**
-   - Peer-to-peer mesh sync via Conflict-Free Replicated Data Types (CRDT)
-   - Edge node distributed database synchronization
+### **PHASE 7: Hardware Drivers, Multi-Arch HAL & Filesystem Innovations (Q4 2026 – Q2 2027)**
+*Inspired by `torvalds/linux`, `freebsd/freebsd`, and `x86-bare-metal-examples`*
+- **Expanded Hardware Drivers**:
+  - USB 3.x xHCI low-latency event ring queues.
+  - NVMe Admin & IO submission/completion queue optimizations.
+  - Discrete & iGPU acceleration driver abstractions (Intel i915 / AMDGPU / Nouveau parity).
+  - 802.11ax Wi-Fi stack & Bluetooth 5.2+ audio/RFKILL governors.
+- **Multi-Architecture HAL Expansion**:
+  - Full hardware context switching and interrupt controller bindings for `x86_64`, `x86`, `aarch64`, `armv7`, `riscv64`, `loongarch64`, `powerpc64le`, `mips64el`, `s390x`, and `sparc64`.
+  - GNU target triplet auto-formatting (`to_gnu_triplet()`) and dynamic ELF `e_machine` binary header inspection.
+- **SigmaFS v2 Filesystem**:
+  - Copy-on-Write (CoW) point-in-time snapshotting (openSUSE Snapper parity).
+  - Native post-quantum file encryption at rest.
+  - EROFS read-only compressed overlay support.
 
 ---
 
-## 📊 Summary of Success Metrics
+### **PHASE 8: Advanced Networking, Cloud-Native & Security Isolation (Q2 – Q4 2027)**
+*Inspired by `openbsd/src`, `cilium/ebpf`, `google/gvisor`, and `nixos/nix`*
+- **Cloud-Native Networking**:
+  - Zero-copy socket pipelines with BBR congestion control and native QUIC protocol support.
+  - Lock-free eBPF ring buffer event streaming (`BPF_MAP_TYPE_RINGBUF`).
+  - High-throughput DPDK-style packet processing and SYN cookie DDoS mitigation.
+- **Hardened Security Architecture**:
+  - OpenBSD `pledge`/`unveil` monotonic sandbox gates.
+  - Linux `Landlock` LSM unprivileged path sandboxing.
+  - Hardware TEE isolation (Intel SGX / AMD SEV-SNP enclave integration).
+  - Post-Quantum Cryptography (NIST Kyber-1024 & Dilithium-5) PE/COFF boot attestation.
 
-| Metric | Target Goal |
-| :--- | :--- |
-| **Syscall Latency** | < 100ns (with Spectre/Meltdown mitigations) |
-| **Boot Time** | < 50ms on NVMe SSD |
-| **POSIX Compliance** | 95%+ POSIX 2018 compliance |
-| **Unit Test Coverage** | 85%+ across all core crates |
+---
+
+### **PHASE 9: Zenith Desktop, Wayland Compositor & Core Applications (Q3 2027 – Q2 2028)**
+*Inspired by `hyprwm/Hyprland`, `BurntSushi/ripgrep`, `sharkdp/fd`, and `systemd/systemd`*
+- **Zenith Wayland Compositor**:
+  - Zero-dependency Wayland wire protocol encoder/decoder (`wl_surface`, `xdg_shell`, `wl_seat`, `wl_data_device`).
+  - Multi-layout persona switching (macOS, Windows 11, GNOME, Ubuntu, Zorin OS).
+  - WCAG 2.1 AA accessibility standards (ARIA navigation, screen reader contrast, touch gesture engine).
+- **Core Open-Source Tool Suite**:
+  - Native Rust CLI tools: `fd` parallel file walker, `ripgrep` regex line matcher, `zoxide` frecency cd tracker, `eza` tree lister, `htop` process tree monitor, `bat` syntax highlighter, `fzf` fuzzy matcher, and `rsync` Adler-32 delta synchronization.
+
+---
+
+### **PHASE 10: Enterprise, India-First Stack & Offline Mesh Infrastructure (Q1 – Q4 2028)**
+*Inspired by `India Stack`, `FreeIPA/sssd`, and `bedrocklinux/bedrock`*
+- **India-First Compliance & Services**:
+  - Native GST invoice computation & ITR tax automation engines.
+  - UPI payment integration hooks & Aadhaar cryptographic authentication support.
+  - Full 22-language Indian regional localization & IME candidates.
+- **Enterprise Infrastructure**:
+  - SSSD, FreeIPA, Kerberos ticket caching, and Active Directory domain authentication.
+  - SOC2 / ISO27001 compliance audit logger and SELinux AVC denial reporting.
+- **Offline Mesh & P2P Synchronization**:
+  - P2P state synchronization via Conflict-free Replicated Data Types (CRDT).
+  - Bandwidth-optimized edge storage sync and offline package caching.
+
+---
+
+## 📊 Target Key Performance Indicators (KPIs)
+
+| Metric | Target Metric | Target Benchmark |
+|---|---|---|
+| **Boot Latency** | Cold boot to desktop REPL | < 50 ms on SSD |
+| **Syscall Overhead** | Direct register trap dispatch | < 100 ns latency |
+| **RAM Footprint** | System base RSS memory | < 30 MB idle RAM |
+| **Build Purity** | External C/C++ dependencies | 0% (100% Native Safe Rust) |
+| **Test Coverage** | Automated unit & integration tests | 100% pass rate across all suites |
