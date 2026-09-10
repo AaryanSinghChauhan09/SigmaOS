@@ -248,3 +248,19 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine,
     SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
 };
+
+pub mod distro_inspiration_synthesis;
+pub use distro_inspiration_synthesis::{
+    AlpineLbuRamRootEngine, FreeBsdVnetJailEngine, LbuOverlayCommit, NetBsdRumpUserlandDriverEngine,
+    NixOsFlakeGcEngine, OpenBsdPledgeUnveilSentinel, RumpComponentKind, RumpUserlandDriver,
+    SovereignDistroInspirationSynthesisSuite, StoreGeneration, SyscallPromise, UnveilPermission,
+    VnetInterface, VnetJail,
+};
+
+pub mod itsfoss_innovations;
+pub use itsfoss_innovations::{
+    CuratedAppEntry, DesktopLayoutPreset, ItsFossAntiXLowRamEngine, ItsFossPantheonAppCenterEngine,
+    ItsFossTailsPrivacyEngine, ItsFossTilingWindowManagerEngine, ItsFossTimeshiftBackupEngine,
+    ItsFossZorinAppAppearanceEngine, SnapshotMode, SovereignItsFossInnovationsSuite,
+    TiledWindowNode, WindowTileOrientation,
+};
