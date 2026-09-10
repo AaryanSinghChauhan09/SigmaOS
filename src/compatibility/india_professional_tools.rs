@@ -6,7 +6,11 @@ use std::vec::Vec;
 // Localized, high-performance, OOP-compliant tools for Indian Professionals.
 // Refers to India-Apps-Overview.md and India-first architecture.
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 
 /// 1. Legal & Judicial Professionals (`sigma-judicial`)
 /// Manages Bharatiya Nyaya Sanhita (BNS), Bharatiya Nagarik Suraksha Sanhita (BNSS),
@@ -522,7 +526,7 @@ impl IrctcPnrTracker {
     }
 
     pub fn get_pnr_status(&self, pnr: &str) -> Option<&str> {
-        self.pnr_statuses.get(pnr).map(|s| s.as_str())
+        self.pnr_statuses.get(pnr).map(|s: &String| s.as_str())
     }
 }
 
@@ -695,7 +699,7 @@ impl Default for MedicalCouncilDoctorPrescriptionGenerator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -816,7 +820,7 @@ mod tests {
         let boq = CharteredEngineersBoqEstimator::new();
         let (conc, steel, total) = boq.estimate_rcc_beam_boq(10.0, 0.3, 0.6, 2.0).unwrap();
 
-        assert_eq!(conc.quantity, 1.8); // 10 * 0.3 * 0.6
+        assert!((conc.quantity - 1.8).abs() < 1e-6); // 10 * 0.3 * 0.6
         assert!(steel.quantity > 0.2); // ~0.2826 MT steel
         assert!(total > 20000.0);
     }
