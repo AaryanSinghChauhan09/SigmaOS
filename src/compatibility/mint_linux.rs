@@ -1310,6 +1310,197 @@ impl MintCinnamonSpicesAppletManager {
     }
 }
 
+// ==========================================
+// Warpinator Local Network File Transfer Engine
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct WarpinatorPeer {
+    pub uuid: String,
+    pub hostname: String,
+    pub ip_address: String,
+    pub port: u16,
+    pub pin_code: String,
+    pub trusted: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct WarpinatorTransferItem {
+    pub file_name: String,
+    pub file_size_bytes: u64,
+    pub sender_uuid: String,
+    pub status: String,
+}
+
+pub struct MintWarpinatorFileTransferEngine {
+    pub discovered_peers: Vec<WarpinatorPeer>,
+    pub transfer_queue: Vec<WarpinatorTransferItem>,
+    pub group_code: String,
+}
+
+impl Default for MintWarpinatorFileTransferEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintWarpinatorFileTransferEngine {
+    pub fn new() -> Self {
+        Self {
+            discovered_peers: Vec::new(),
+            transfer_queue: Vec::new(),
+            group_code: String::from("WarpinatorSigmaOS"),
+        }
+    }
+
+    pub fn discover_peer(&mut self, hostname: &str, ip: &str, port: u16, pin: &str) -> String {
+        let uuid = format!("peer_{}", self.discovered_peers.len() + 1);
+        self.discovered_peers.push(WarpinatorPeer {
+            uuid: uuid.clone(),
+            hostname: hostname.to_string(),
+            ip_address: ip.to_string(),
+            port,
+            pin_code: pin.to_string(),
+            trusted: false,
+        });
+        uuid
+    }
+
+    pub fn pair_peer(&mut self, uuid: &str, pin: &str) -> Result<(), &'static str> {
+        if let Some(peer) = self.discovered_peers.iter_mut().find(|p| p.uuid == uuid) {
+            if peer.pin_code == pin {
+                peer.trusted = true;
+                Ok(())
+            } else {
+                Err("Warpinator: PIN code mismatch")
+            }
+        } else {
+            Err("Warpinator: Peer not found")
+        }
+    }
+
+    pub fn queue_file_transfer(&mut self, sender_uuid: &str, file_name: &str, size: u64) -> Result<(), &'static str> {
+        if !self.discovered_peers.iter().any(|p| p.uuid == sender_uuid && p.trusted) {
+            return Err("Warpinator: Peer is not trusted or paired");
+        }
+        self.transfer_queue.push(WarpinatorTransferItem {
+            file_name: file_name.to_string(),
+            file_size_bytes: size,
+            sender_uuid: sender_uuid.to_string(),
+            status: String::from("Pending"),
+        });
+        Ok(())
+    }
+}
+
+// ==========================================
+// Bulky Batch File Renamer Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BulkyCaseMode {
+    Lowercase,
+    Uppercase,
+    Titlecase,
+    Unchanged,
+}
+
+pub struct MintBulkyBatchRenamerEngine;
+
+impl MintBulkyBatchRenamerEngine {
+    pub fn rename_find_replace(files: &[&str], search: &str, replace: &str) -> Vec<String> {
+        files.iter().map(|f| f.replace(search, replace)).collect()
+    }
+
+    pub fn rename_add_prefix_suffix(files: &[&str], prefix: &str, suffix: &str) -> Vec<String> {
+        files
+            .iter()
+            .map(|f| {
+                if let Some(pos) = f.rfind('.') {
+                    let stem = &f[..pos];
+                    let ext = &f[pos..];
+                    format!("{}{}{}{}", prefix, stem, suffix, ext)
+                } else {
+                    format!("{}{}{}", prefix, f, suffix)
+                }
+            })
+            .collect()
+    }
+
+    pub fn rename_change_case(files: &[&str], mode: BulkyCaseMode) -> Vec<String> {
+        files
+            .iter()
+            .map(|f| match mode {
+                BulkyCaseMode::Lowercase => f.to_lowercase(),
+                BulkyCaseMode::Uppercase => f.to_uppercase(),
+                BulkyCaseMode::Titlecase => {
+                    let mut chars = f.chars();
+                    match chars.next() {
+                        None => String::new(),
+                        Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+                    }
+                }
+                BulkyCaseMode::Unchanged => f.to_string(),
+            })
+            .collect()
+    }
+}
+
+// ==========================================
+// XApps Status Icon & Tray System
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct XAppStatusIcon {
+    pub id: u32,
+    pub icon_name: String,
+    pub tooltip: String,
+    pub badge_count: u32,
+    pub visible: bool,
+}
+
+pub struct MintXAppStatusIconTray {
+    pub icons: Vec<XAppStatusIcon>,
+    next_id: u32,
+}
+
+impl Default for MintXAppStatusIconTray {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MintXAppStatusIconTray {
+    pub fn new() -> Self {
+        Self {
+            icons: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn add_status_icon(&mut self, icon_name: &str, tooltip: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.icons.push(XAppStatusIcon {
+            id,
+            icon_name: icon_name.to_string(),
+            tooltip: tooltip.to_string(),
+            badge_count: 0,
+            visible: true,
+        });
+        id
+    }
+
+    pub fn set_badge_count(&mut self, id: u32, count: u32) -> Result<(), &'static str> {
+        if let Some(icon) = self.icons.iter_mut().find(|i| i.id == id) {
+            icon.badge_count = count;
+            Ok(())
+        } else {
+            Err("XAppStatusIcon not found")
+        }
+    }
+}
+
 pub struct MintDriverManager {
     pub available_drivers: Vec<MintDriverInfo>,
 }
@@ -1591,6 +1782,46 @@ mod tests {
             .toggle_driver(b"Broadcom BCM4360 WiFi", true)
             .unwrap();
         assert!(drivers.available_drivers[0].active);
+    }
+
+    #[test]
+    fn test_mint_warpinator_file_transfer() {
+        let mut warpinator = MintWarpinatorFileTransferEngine::new();
+        let peer_uuid = warpinator.discover_peer("mint-laptop", "192.168.1.100", 42000, "123456");
+
+        // Unpaired queue attempt should fail
+        assert!(warpinator.queue_file_transfer(&peer_uuid, "document.pdf", 1024).is_err());
+
+        // Pair with matching PIN
+        assert!(warpinator.pair_peer(&peer_uuid, "123456").is_ok());
+
+        // Paired queue attempt should succeed
+        assert!(warpinator.queue_file_transfer(&peer_uuid, "document.pdf", 1024).is_ok());
+        assert_eq!(warpinator.transfer_queue.len(), 1);
+    }
+
+    #[test]
+    fn test_mint_bulky_batch_renamer() {
+        let files = vec!["photo_1.png", "photo_2.png"];
+
+        let replaced = MintBulkyBatchRenamerEngine::rename_find_replace(&files, "photo_", "vacation_");
+        assert_eq!(replaced, vec!["vacation_1.png", "vacation_2.png"]);
+
+        let prefixed = MintBulkyBatchRenamerEngine::rename_add_prefix_suffix(&files, "2026_", "_backup");
+        assert_eq!(prefixed, vec!["2026_photo_1_backup.png", "2026_photo_2_backup.png"]);
+
+        let cased = MintBulkyBatchRenamerEngine::rename_change_case(&files, BulkyCaseMode::Uppercase);
+        assert_eq!(cased, vec!["PHOTO_1.PNG", "PHOTO_2.PNG"]);
+    }
+
+    #[test]
+    fn test_mint_xapp_status_icon_tray() {
+        let mut tray = MintXAppStatusIconTray::new();
+        let id = tray.add_status_icon("update-notifier", "Updates Available");
+        assert_eq!(id, 1);
+
+        assert!(tray.set_badge_count(id, 5).is_ok());
+        assert_eq!(tray.icons[0].badge_count, 5);
     }
 
     #[test]
