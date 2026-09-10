@@ -288,6 +288,96 @@ impl RipgrepRegexSearchEngine {
 }
 
 // =========================================================================
+// 7. STARSHIP CROSS-SHELL PROMPT ENGINE
+// =========================================================================
+
+pub struct StarshipPromptEngine {
+    pub username: String,
+    pub hostname: String,
+    pub current_dir: String,
+    pub git_branch: Option<String>,
+    pub git_status_dirty: bool,
+    pub execution_time_ms: u64,
+}
+
+impl StarshipPromptEngine {
+    pub fn new(username: &str, hostname: &str, cwd: &str) -> Self {
+        Self {
+            username: username.to_string(),
+            hostname: hostname.to_string(),
+            current_dir: cwd.to_string(),
+            git_branch: Some("main".to_string()),
+            git_status_dirty: false,
+            execution_time_ms: 12,
+        }
+    }
+
+    pub fn render_prompt(&self) -> String {
+        let branch_info = match &self.git_branch {
+            Some(branch) => {
+                let status_symbol = if self.git_status_dirty { "*" } else { "" };
+                format!(" on git:({}{})", branch, status_symbol)
+            }
+            None => String::new(),
+        };
+
+        format!(
+            "{}@{} in {}{} [{}ms]\n❯ ",
+            self.username, self.hostname, self.current_dir, branch_info, self.execution_time_ms
+        )
+    }
+}
+
+// =========================================================================
+// 8. ZOXIDE FAST FRECENT DIRECTORY NAVIGATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ZoxidePathEntry {
+    pub path: String,
+    pub frecency_score: f32,
+    pub access_count: u32,
+}
+
+pub struct ZoxideFastCdEngine {
+    pub db: Vec<ZoxidePathEntry>,
+}
+
+impl ZoxideFastCdEngine {
+    pub fn new() -> Self {
+        Self { db: Vec::new() }
+    }
+
+    pub fn add_or_increment_path(&mut self, path: &str) {
+        if let Some(entry) = self.db.iter_mut().find(|e| e.path == path) {
+            entry.access_count += 1;
+            entry.frecency_score += 10.0;
+        } else {
+            self.db.push(ZoxidePathEntry {
+                path: path.to_string(),
+                frecency_score: 10.0,
+                access_count: 1,
+            });
+        }
+    }
+
+    pub fn query_best_match(&self, keyword: &str) -> Option<String> {
+        let kw = keyword.to_lowercase();
+        self.db
+            .iter()
+            .filter(|e| e.path.to_lowercase().contains(&kw))
+            .max_by(|a, b| a.frecency_score.partial_cmp(&b.frecency_score).unwrap_or(core::cmp::Ordering::Equal))
+            .map(|e| e.path.clone())
+    }
+}
+
+impl Default for ZoxideFastCdEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -336,5 +426,19 @@ mod tests {
         let code = "fn foo() {}\nfn bar() {}\nlet x = 10;";
         let matches = RipgrepRegexSearchEngine::search_file_content(code, "fn ");
         assert_eq!(matches.len(), 2);
+    }
+
+    #[test]
+    fn test_starship_and_zoxide_engines() {
+        let prompt = StarshipPromptEngine::new("jules", "sigma-host", "/home/jules/projects");
+        let rendered = prompt.render_prompt();
+        assert!(rendered.contains("jules@sigma-host"));
+        assert!(rendered.contains("git:(main)"));
+
+        let mut zoxide = ZoxideFastCdEngine::new();
+        zoxide.add_or_increment_path("/var/log/sigma");
+        zoxide.add_or_increment_path("/home/jules/src/sigmaos");
+        let best = zoxide.query_best_match("sigmaos");
+        assert_eq!(best, Some("/home/jules/src/sigmaos".to_string()));
     }
 }

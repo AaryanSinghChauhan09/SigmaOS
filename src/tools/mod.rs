@@ -11,7 +11,8 @@ pub mod sovereign_commands;
 pub use open_source_tools_parity::{
     BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, FastfetchInfoEngine,
     FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry, RipgrepRegexSearchEngine,
-    RofiCommandHudEngine, SearchMatch,
+    RofiCommandHudEngine, SearchMatch, StarshipPromptEngine, ZoxideFastCdEngine,
+    ZoxidePathEntry,
 };
 
 pub use data_tools::{
