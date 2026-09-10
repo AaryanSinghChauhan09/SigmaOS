@@ -58,7 +58,7 @@ fn test_universal_adapter_all_formats() {
     assert_eq!(action.operation, UniversalPmOperation::Install);
     assert_eq!(action.target_packages, vec!["curl"]);
 
-    // Test new foreign PM command aliases (yay, paru, microdnf, rpm, pkg_add, pkg_delete)
+    // Foreign PM command aliases (yay, paru, microdnf, rpm, pkg_add, pkg_delete)
     let yay_action = dispatcher
         .dispatch_command("yay -Syu --noconfirm neovim")
         .unwrap();
@@ -99,7 +99,7 @@ fn test_universal_adapter_all_formats() {
 fn test_all_prompt_package_formats() {
     let adapter = UniversalPackageAdapter::new();
 
-    // Verify detection for all 29 Linux & BSD distro formats specified in prompt
+    // Verify detection for all Linux & BSD distro formats specified in prompt
     assert_eq!(adapter.detect_format_by_extension("app.air"), Some(PackageFormat::Air));
     assert_eq!(adapter.detect_format_by_extension("pkg.bottle"), Some(PackageFormat::Bottle));
     assert_eq!(adapter.detect_format_by_extension("app.ipa"), Some(PackageFormat::Ipa));
@@ -110,13 +110,13 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
-    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ebuild));
+    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Deb));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("compressed.xz"), Some(PackageFormat::TarXz));
-    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Yum));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Rpm));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Ebuild));
     assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
     assert_eq!(adapter.detect_format_by_extension("app.flatpak"), Some(PackageFormat::Flatpak));
     assert_eq!(adapter.detect_format_by_extension("macos.app"), Some(PackageFormat::AppBundle));

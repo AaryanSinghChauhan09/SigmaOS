@@ -24,8 +24,13 @@ pub mod hardening;
 pub mod deobfuscation;
 pub mod securelevels;
 pub mod pam;
-pub mod intrusion;
 pub mod crypto_utils;
+pub mod kali_components;
+pub mod qubes_isolation;
+pub mod root_improvement;
+pub mod audit;
+pub mod bsd_hardening;
+pub mod vault;
 
 pub use kali_components::{
     HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,
