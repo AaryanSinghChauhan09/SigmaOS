@@ -190,6 +190,62 @@ impl PhoronixAutomatedBenchmarkEngine {
     }
 }
 
+/// 9. ChromeOS Flex Cloud-Native Hardware Readiness Governor (Inspired by 9to5Google / Android Authority)
+#[derive(Debug, Clone)]
+pub struct ChromeOsFlexCloudReadinessGovernor {
+    pub min_ram_mb: u64,
+    pub verified_boot_active: bool,
+    pub cloud_policy_enforced: bool,
+}
+
+impl ChromeOsFlexCloudReadinessGovernor {
+    pub fn new() -> Self {
+        Self {
+            min_ram_mb: 4096,
+            verified_boot_active: true,
+            cloud_policy_enforced: true,
+        }
+    }
+
+    pub fn evaluate_hardware_readiness(&self, total_ram_mb: u64) -> bool {
+        total_ram_mb >= self.min_ram_mb && self.verified_boot_active
+    }
+}
+
+/// 10. Fedora Silverblue OSTree Atomic Staging Coordinator (Inspired by 9to5Linux / Phoronix)
+#[derive(Debug, Clone)]
+pub struct FedoraSilverblueOstreeStagingCoordinator {
+    pub current_commit: String,
+    pub staged_commit: Option<String>,
+    pub pending_reboot: bool,
+}
+
+impl FedoraSilverblueOstreeStagingCoordinator {
+    pub fn new(initial_commit: &str) -> Self {
+        Self {
+            current_commit: initial_commit.to_string(),
+            staged_commit: None,
+            pending_reboot: false,
+        }
+    }
+
+    pub fn stage_upgrade(&mut self, target_commit: &str) -> Result<String, &'static str> {
+        self.staged_commit = Some(target_commit.to_string());
+        self.pending_reboot = true;
+        Ok(format!("Staged OSTree commit '{}' for next boot", target_commit))
+    }
+
+    pub fn finalize_reboot(&mut self) -> bool {
+        if let Some(commit) = self.staged_commit.take() {
+            self.current_commit = commit;
+            self.pending_reboot = false;
+            true
+        } else {
+            false
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -228,5 +284,15 @@ mod tests {
         let mut pts = PhoronixAutomatedBenchmarkEngine::new();
         pts.record_benchmark("7zip-compress", 48200.0);
         assert_eq!(*pts.benchmark_results.get("7zip-compress").unwrap(), 48200.0);
+
+        let chromeos = ChromeOsFlexCloudReadinessGovernor::new();
+        assert!(chromeos.evaluate_hardware_readiness(8192));
+        assert!(!chromeos.evaluate_hardware_readiness(2048));
+
+        let mut ostree = FedoraSilverblueOstreeStagingCoordinator::new("commit-v1");
+        assert!(ostree.stage_upgrade("commit-v2").is_ok());
+        assert!(ostree.pending_reboot);
+        assert!(ostree.finalize_reboot());
+        assert_eq!(ostree.current_commit, "commit-v2");
     }
 }
