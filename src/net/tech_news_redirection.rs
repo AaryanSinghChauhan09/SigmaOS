@@ -3,13 +3,12 @@
 // across 28 top Linux & Tech publications for SigmaOS browser and desktop news widgets.
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
-#![cfg_attr(not(test), no_std)]
-
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
