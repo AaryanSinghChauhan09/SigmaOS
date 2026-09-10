@@ -1753,7 +1753,7 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             k8s_orchestrator: SovereignK8sOrchestratorEngine::new(),
             ansible: SovereignAnsibleAutomationEngine::new(),
             supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
-            total_obsoleted_projects_count: 43,
+            total_obsoleted_projects_count: 46,
         }
     }
 
@@ -4447,6 +4447,6 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("43 legacy open-source projects obsoleted"));
+        assert!(status.contains("46 legacy open-source projects obsoleted"));
     }
 }
