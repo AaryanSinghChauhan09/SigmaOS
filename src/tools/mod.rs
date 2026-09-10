@@ -98,3 +98,6 @@ pub mod regex;
 pub mod native_userland_replacements;
 pub use regex::{RegexMatch, SovereignRegexEngine};
 pub use native_userland_replacements::MasterNativeUserlandReplacements;
+
+pub mod itsfoss_innovations;
+pub use itsfoss_innovations::*;

@@ -45,3 +45,17 @@ if [ -f "tests/test_hashmap_standalone.rs" ]; then
     rustc --test tests/test_hashmap_standalone.rs --edition=2021 -o build/hashmap_test
     ./build/hashmap_test
 fi
+
+if [ -f "src/distro/arch.rs" ]; then
+    echo "Running Arch Linux parity & tooling test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/arch_test
+    ./build/arch_test
+fi
+
+if [ -f "src/distro/arch_missing_components.rs" ]; then
+    echo "Running Arch Linux missing components suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_missing_components.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/arch_missing_test
+    ./build/arch_missing_test
+fi

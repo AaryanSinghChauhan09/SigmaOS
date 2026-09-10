@@ -674,7 +674,9 @@ mod arch_suite_tests {
         assert_eq!(total, 2);
         assert_eq!(warnings.len(), 1);
         assert!(warnings[0].contains("empty-pkg"));
+    }
 
+    #[test]
     fn test_arch_genfstab_generator() {
         let mut generator = ArchGenfstabGenerator::new(ArchGenfstabFormatMode::Uuid);
         generator.add_mount(ArchGenfstabMountEntry {
@@ -812,8 +814,8 @@ impl Default for AurHelper {
     }
 }
 
-#[cfg(test_disabled)]
-mod tests {
+#[cfg(test)]
+mod tests2 {
     use super::*;
 
     #[test]
