@@ -3,6 +3,7 @@ pub mod system_monitor;
 
 pub mod data_tools;
 pub mod display_manager;
+pub mod open_source_tools_parity;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
@@ -13,6 +14,13 @@ pub mod mint_locale_manager;
 pub mod mint_welcome;
 pub mod mint_system_report;
 pub mod omarchy_command_palette;
+
+pub use open_source_tools_parity::{
+    BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, FastfetchInfoEngine,
+    FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry, RipgrepRegexSearchEngine,
+    RofiCommandHudEngine, SearchMatch, SovereignAbridgeTool, SovereignXcpTool,
+    StarshipPromptEngine, XcpCopyProgress, ZoxideFastCdEngine, ZoxidePathEntry,
+};
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,

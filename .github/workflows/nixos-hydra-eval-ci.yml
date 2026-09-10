@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-permissions:
-  contents: read
-
 jobs:
   nixos-hydra-eval:
     name: NixOS Hydra Flake & Hermetic CAS Evaluation

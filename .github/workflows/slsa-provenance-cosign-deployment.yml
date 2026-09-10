@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-permissions:
-  contents: read
-
 jobs:
   slsa-cosign-deployment:
     name: SLSA Level 3 Build Provenance, Cosign Verification & Pages Deployment

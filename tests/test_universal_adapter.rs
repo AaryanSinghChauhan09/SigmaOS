@@ -7,9 +7,6 @@ pub mod klib {
     }
 }
 
-#[path = "../src/package/universal.rs"]
-pub mod package;
-
 #[path = "../src/security/capability.rs"]
 pub mod capability;
 
@@ -20,11 +17,10 @@ pub mod security {
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
-#[path = "../src/sigpkg/universal_oop_system.rs"]
-pub mod universal_oop_system;
-
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
+
+pub use universal_adapter::universal_oop_system;
 
 pub mod sigpkg {
     use alloc::string::String;
@@ -40,12 +36,6 @@ pub mod sigpkg {
         pub major: u64,
         pub minor: u64,
         pub patch: u64,
-    }
-
-    impl core::fmt::Display for Version {
-        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-            write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-        }
     }
 
     impl Version {
@@ -125,10 +115,7 @@ fn test_universal_adapter_all_formats() {
         FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
         ZypperSpecManifest, SlackwarePkgManifest,
     };
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
     let adapter = UniversalPackageAdapter::new();
 
     // 1. FreeBSD UCL (+MANIFEST)
@@ -162,12 +149,12 @@ fn test_universal_adapter_all_formats() {
     let mut bridge = SigPkgUniversalBridgeEngine::new();
     let pkg_bsd = bridge.absorb_and_register("redis.pkg", freebsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -176,57 +163,11 @@ fn test_universal_adapter_all_formats() {
     assert_eq!(action.source_pm, "apt");
     assert_eq!(action.operation, UniversalPmOperation::Install);
     assert_eq!(action.target_packages, vec!["curl"]);
-<<<<<<< HEAD
 }
 
 #[test]
 fn test_universal_adapter_extended_linux_bsd_formats() {
     use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation, PackageFormat};
-=======
-
-    // Test new foreign PM command aliases (yay, paru, microdnf, rpm, pkg_add, pkg_delete)
-    let yay_action = dispatcher
-        .dispatch_command("yay -Syu --noconfirm neovim")
-        .unwrap();
-    assert_eq!(yay_action.source_pm, "yay");
-    assert_eq!(yay_action.operation, UniversalPmOperation::Upgrade);
-    assert_eq!(yay_action.target_packages, vec!["neovim"]);
-
-    let rpm_action = dispatcher.dispatch_command("rpm -i htop.rpm").unwrap();
-    assert_eq!(rpm_action.source_pm, "rpm");
-    assert_eq!(rpm_action.operation, UniversalPmOperation::Install);
-    assert_eq!(rpm_action.target_packages, vec!["htop.rpm"]);
-
-    let openbsd_action = dispatcher.dispatch_command("pkg_add -n rsync").unwrap();
-    assert_eq!(openbsd_action.source_pm, "pkg_add");
-    assert_eq!(openbsd_action.operation, UniversalPmOperation::Install);
-    assert!(openbsd_action.dry_run);
-
-    let microdnf_action = dispatcher
-        .dispatch_command("microdnf remove httpd")
-        .unwrap();
-    assert_eq!(microdnf_action.source_pm, "microdnf");
-    assert_eq!(microdnf_action.operation, UniversalPmOperation::Remove);
-    assert_eq!(microdnf_action.target_packages, vec!["httpd"]);
-
-    // 8. Dependency Mapper Canonicalization
-    use universal_adapter::UniversalDependencyMapper;
-    let dep_mapper = UniversalDependencyMapper::new();
-    assert_eq!(dep_mapper.to_canonical_name("libffi-dev"), "libffi");
-    assert_eq!(dep_mapper.to_canonical_name("glib2-devel"), "glib");
-    assert_eq!(dep_mapper.to_canonical_name("libpcre2-dev"), "pcre");
-    assert_eq!(dep_mapper.to_canonical_name("libuv-devel"), "libuv");
-    assert_eq!(dep_mapper.to_canonical_name("net-misc/openssh"), "openssh");
-    assert_eq!(dep_mapper.to_canonical_name("media-libs/mesa"), "mesa");
-    assert_eq!(dep_mapper.to_canonical_name("dev-vcs/git"), "git");
-    assert_eq!(dep_mapper.to_canonical_name("dev-build/cmake"), "cmake");
-}
-
-#[test]
-fn test_all_prompt_package_formats() {
-    use universal_engine::PackageFormat;
-    use universal_adapter::UniversalPackageAdapter;
->>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -249,9 +190,6 @@ fn test_all_prompt_package_formats() {
     // Test Command Dispatcher across multiple package managers
     let dispatcher = UniversalPmCommandDispatcher::new();
 
-    use universal_adapter::{UniversalPmCommandDispatcher, UniversalPmOperation};
-    let dispatcher = UniversalPmCommandDispatcher::new();
-
     let pacman_cmd = dispatcher.dispatch_command("pacman -S zsh").unwrap();
     assert_eq!(pacman_cmd.source_pm, "pacman");
     assert_eq!(pacman_cmd.operation, UniversalPmOperation::Install);
@@ -271,7 +209,7 @@ fn test_all_prompt_package_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_engine::PackageFormat;
+    use universal_adapter::universal_oop_system::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 

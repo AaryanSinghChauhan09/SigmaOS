@@ -12,13 +12,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Modifier bitmasks inspired by Linux & BSD window managers (i3, Sway, Hyprland, xmonad, dwm)
 pub const MOD_NONE: u8 = 0b0000_0000;
@@ -52,21 +51,20 @@ pub struct SimpleHotkey {
     pub modifiers: AtomicUsize,
     pub key: AtomicUsize,
     pub action: [u8; 64],
-    pub action_len: u8,
 }
 
 impl SimpleHotkey {
     pub fn new(id: HotkeyID, modifiers: u8, key: u8, action: &[u8]) -> Self {
         let mut action_array = [0u8; 64];
         let action_len = action.len().min(63);
-        // Bolt optimization: use copy_from_slice for vectorized bulk memory transfer
-        action_array[..action_len].copy_from_slice(&action[..action_len]);
+        for i in 0..action_len {
+            action_array[i] = action[i];
+        }
         SimpleHotkey {
             id,
             modifiers: AtomicUsize::new(modifiers as usize),
             key: AtomicUsize::new(key as usize),
             action: action_array,
-            action_len: action_len as u8,
         }
     }
 }
@@ -82,8 +80,8 @@ impl Hotkey for SimpleHotkey {
         self.key.load(Ordering::SeqCst) as u8
     }
     fn action(&self) -> &[u8] {
-        // Bolt optimization: O(1) slice lookup using explicit byte length field instead of O(N) null-byte search scan
-        &self.action[..self.action_len as usize]
+        let len = self.action.iter().position(|&b| b == 0).unwrap_or(64);
+        &self.action[..len]
     }
 }
 

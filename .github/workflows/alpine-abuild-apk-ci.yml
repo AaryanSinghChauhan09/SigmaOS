@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-permissions:
-  contents: read
-
 jobs:
   alpine-abuild-apk:
     name: Alpine Linux Abuild APK Package Security Build
