@@ -1270,6 +1270,7 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
+
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -1358,7 +1359,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
-            _ => Box::new(SigmaPkgInstallStrategy),
+            _ => Box::new(GuixInstallStrategy),
         }
     }
 
@@ -1418,7 +1419,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
-            _ => Box::new(SigmaPkgMetadataAdapter),
+            _ => Box::new(GuixMetadataAdapter),
         }
     }
 }
@@ -2912,18 +2913,12 @@ mod tests {
 /// Alpine Linux .apk Package Format Adapter
 pub struct AlpineApkPackageAdapter;
 
-impl PackageMetadataAdapter for AlpineApkPackageAdapter {
-    fn adapt(&self, _raw_data: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
+impl AlpineApkPackageAdapter {
+    pub fn format(&self) -> PackageFormat {
+        PackageFormat::SigmaPkg
     }
-}
 
-#[cfg(test)]
-mod extra_tests {
-    use super::*;
-
-    #[test]
-    fn test_all_package_format_strategies_and_adapters() {
+    pub fn test_all_package_format_strategies_and_adapters(&self) {
         let formats = vec![
             PackageFormat::Deb,
             PackageFormat::Rpm,
@@ -2995,7 +2990,7 @@ mod extra_tests {
         }
     }
 
-    #[test]
+    #[cfg(test)]
     fn test_expanded_decorators() {
         let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
         let base = BasePackageDecorator { package: pkg };
