@@ -106,6 +106,94 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
+/// Use universal_oop_system::UniversalPackageManager instead
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+/// Debian-style package priority levels (DFSG and APT standard)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PackagePriority {
+    Optional = 0,
+    Standard = 1,
+    Important = 2,
+    Required = 3,
+    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
+}
+
+pub trait PackageFormatAdapter {
+    fn format_name(&self) -> &str;
+    fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
+    fn parse_package(&self, raw: &[u8]) -> Result<Package, String> {
+        self.parse_manifest(raw)
+    }
+    fn validate_permissions(&self, raw: &[u8]) -> Result<Vec<Permission>, String>;
+    fn validate(&self, _raw: &[u8]) -> Result<bool, String> {
+        Ok(true)
+    }
+    fn process_hook(&self, _hook: &str) -> Result<(), String> {
+        Ok(())
+    }
+    fn serialize_package(&self, _pkg: &Package) -> Result<Vec<u8>, String> {
+        Ok(Vec::new())
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FlatpakManifest {
+    pub id: String,
+    pub app_id: String,
+    pub command: String,
+    pub finish_args: Vec<String>, // Sandboxed permissions like "--share=network", "--share=ipc"
+}
+
+/// Description of FreeBSD UCL (+MANIFEST) pkg manifest
+#[derive(Debug, Clone)]
+pub struct FreeBsdUclManifest {
+    pub name: String,
+    pub version: String,
+    pub comment: String,
+    pub deps: Vec<String>,
+}
+
+/// Description of OpenBSD +CONTENTS pkg manifest
+#[derive(Debug, Clone)]
+pub struct OpenBsdContentsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub comment: String,
+    pub depends: Vec<String>,
+    pub exec_commands: Vec<String>,
+    pub unexec_commands: Vec<String>,
+}
+
+/// Description of NetBSD pkgsrc manifest
+#[derive(Debug, Clone)]
+pub struct NetBsdPkgsrcManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub comment: String,
+    pub depends: Vec<String>,
+}
+
+/// Description of Arch Linux binary .PKGINFO manifest (pacman parity)
+/// Description of openSUSE Zypper RPM spec/manifest
+#[derive(Debug, Clone)]
+pub struct ZypperSpecManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub requires: Vec<String>,
+}
+
+/// Description of Slackware package manifest
+#[derive(Debug, Clone)]
+pub struct SlackwarePkgManifest {
+    pub name: String,
+    pub version: String,
+    pub description: String,
+    pub slack_required: Vec<String>,
+}
+
 pub struct UniversalPackageAdapter;
 
 impl UniversalPackageAdapter {
@@ -159,11 +247,9 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
-            architecture: "amd64".to_string(),
-            maintainer: "SigmaOS".to_string(),
             depends,
             description,
-            priority: format!("{:?}", priority),
+            priority,
         })
     }
 
@@ -246,11 +332,8 @@ impl UniversalPackageAdapter {
             pkgname,
             pkgver,
             pkgdesc,
-            arch: architecture.clone(),
+            depends,
             architecture,
-            depends: depends.clone(),
-            depend: depends,
-            makedepend: Vec::new(),
         })
     }
 
@@ -466,12 +549,9 @@ impl UniversalPackageAdapter {
         Ok(SnapcraftManifest {
             name,
             version,
-            summary: summary.clone(),
+            summary,
             confinement,
             plugs,
-            apps: Vec::new(),
-            description: summary,
-            grade: "stable".to_string(),
         })
     }
 
@@ -591,9 +671,6 @@ impl UniversalPackageAdapter {
         Ok(FlatpakManifest {
             id: app_id.clone(),
             app_id,
-            runtime: String::new(),
-            runtime_version: String::new(),
-            sdk: String::new(),
             command,
             finish_args,
         })
@@ -801,7 +878,6 @@ impl UniversalPackageAdapter {
             version,
             summary,
             requires,
-            architecture: "x86_64".to_string(),
         })
     }
 
@@ -1352,14 +1428,14 @@ impl Default for UniversalServerImageAdapter {
 /// into native Sigma-pkg models, mapping dependencies, sandboxing capabilities, and registering with Universal PM.
 pub struct SigPkgUniversalBridgeEngine {
     adapter: UniversalPackageAdapter,
-    pm: crate::sigpkg::universal_oop_system::UniversalPackageManager,
+    pm: universal_oop_system::UniversalPackageManager,
 }
 
 impl SigPkgUniversalBridgeEngine {
     pub fn new() -> Self {
         Self {
             adapter: UniversalPackageAdapter::new(),
-            pm: crate::sigpkg::universal_oop_system::UniversalPackageManager::new(),
+            pm: universal_oop_system::UniversalPackageManager::new(),
         }
     }
 
@@ -1507,8 +1583,8 @@ impl SigPkgUniversalBridgeEngine {
         raw_data: &[u8],
     ) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
-            metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
+        let standard_pkg = universal_oop_system::StandardPackage {
+            metadata: universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
                 version: native_pkg.version,
                 description: native_pkg.description.clone(),
@@ -1524,7 +1600,7 @@ impl SigPkgUniversalBridgeEngine {
                 supported_architectures: Vec::new(),
             },
             dependencies: Vec::new(),
-            format: crate::sigpkg::universal_oop_system::PackageFormat::Sigma,
+            format: universal_oop_system::PackageFormat::Sigma,
         };
         let _ = self.pm.install_package(Box::new(standard_pkg));
         Ok(native_pkg)

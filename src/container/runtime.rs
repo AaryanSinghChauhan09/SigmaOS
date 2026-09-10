@@ -30,18 +30,6 @@ pub struct ContainerCapability {
     pub can_modify: bool,
 }
 
-#[derive(Debug, Clone)]
-pub struct SeccompProfile {
-    pub default_action: u32,
-    pub allowed_syscalls: Vec<u32>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SeccompProfileV2 {
-    pub default_action: u32,
-    pub allowed_syscalls: Vec<u32>,
-}
-
 impl ContainerCapability {
     pub const fn new() -> Self {
         ContainerCapability {
@@ -708,7 +696,7 @@ impl SimpleContainerRuntime {
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::Layout;
     let layout = Layout::from_size_align(size, 8).unwrap();
-    unsafe { std::std::alloc(layout) }
+    unsafe { std::alloc::alloc(layout) }
 }
 
 /// Flatpak & Snap Sandboxed App Compatibility Layer
@@ -797,10 +785,10 @@ impl Default for FlatpakSnapCompatLayer {
 // This module requires alloc which is conditionally available
 #[cfg(not(target_os = "none"))]
 pub mod oci {
-    
+    extern crate alloc;
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
-    use std::vec::Vec;
+    use alloc::vec::Vec;
 
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
@@ -962,7 +950,7 @@ pub mod oci {
 
 #[cfg(test_disabled)]
 mod tests {
-    
+    extern crate alloc;
     use super::*;
     use std::string::ToString;
     use std::vec;

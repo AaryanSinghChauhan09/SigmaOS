@@ -1,16 +1,9 @@
+extern crate alloc;
 
-
-use std::boxed::Box;
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use alloc::boxed::Box;
-// use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
-pub use crate::package::manager::PackageState;
 
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
@@ -210,6 +203,16 @@ impl Default for DistroRepoSyncEngine {
     }
 }
 
+/// Package format type covering 18 major distribution formats
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageState {
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
+}
+
 pub enum PackagePriority {
     Essential,
     Required,
@@ -278,15 +281,15 @@ pub enum PackageFormat {
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,      // HPC Spack package (.spack)
-    Conan,      // C/C++ Conan package (.conan)
+    Spack,      // Spack HPC Package (.spack)
+    Conan,      // Conan C/C++ Package (.conan)
     Wheel,      // Python Wheel (.whl)
-    Crate,      // Rust Cargo Crate (.crate)
+    Crate,      // Rust Crate (.crate)
     Gem,        // Ruby Gem (.gem)
-    Nupkg,      // .NET NuGet (.nupkg)
-    Vcpkg,      // C++ vcpkg (.vcpkg)
-    NarInfo,    // Nix Store NarInfo (.narinfo)
-    Sysupdate,  // systemd-sysupdate (.sysupdate)
+    Nupkg,      // .NET NuGet Package (.nupkg)
+    Vcpkg,      // C/C++ vcpkg Package (.vcpkg)
+    NarInfo,    // Nix NAR Info (.narinfo)
+    Sysupdate,  // Systemd sysupdate (.sysupdate)
 }
 
 impl PackageFormat {
@@ -1285,7 +1288,6 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
-
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -1515,14 +1517,6 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
-
-#[derive(Debug, Clone)]
-pub struct DistroRepoRecord {
-    pub distro_name: String,
-    pub url: String,
-}
-
-
 // =========================================================================
 // Multi-Distro Package Adapter Execution Pipeline
 // =========================================================================
@@ -1558,7 +1552,6 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
-    pub priority: String,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -2948,11 +2941,6 @@ mod tests {
             Some(PackageFormat::OpenBsdPkg)
         );
     }
-}
-
-#[cfg(test)]
-mod extra_tests {
-    use super::*;
 
     #[test]
     fn test_all_package_format_strategies_and_adapters() {
@@ -3046,5 +3034,17 @@ mod extra_tests {
         };
 
         assert!(net_dec.restrict_network().is_ok());
+    }
+}
+
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
+
+impl PackageMetadataAdapter for AlpineApkPackageAdapter {
+    fn adapt(&self, _raw: &str) -> Result<UnifiedPackage, PackageError> {
+        Ok(
+            UnifiedPackage::new("alpine-apk-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Apk),
+        )
     }
 }

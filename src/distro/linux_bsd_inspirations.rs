@@ -2,15 +2,15 @@
 // This module implements key concepts from Linux and BSD distributions
 // that provide competitive advantages for SigmaOS
 
-// Zero-dependency architecture: Use std:: primitives for no_std compatibility
+// Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::collections::BTreeMap;
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::format;
+use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 // Test environment compatibility: Use std for testing only
 #[cfg(any(feature = "standalone_test", test))]
@@ -121,8 +121,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
-            | DistroSubsystemMode::LinuxKali
-            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -139,10 +137,10 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
-            DistroSubsystemMode::LinuxKali | DistroSubsystemMode::LinuxZorin => ServiceSupervisorType::Systemd,
+            DistroSubsystemMode::LinuxParrot => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -220,15 +218,14 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
-            | DistroSubsystemMode::LinuxKali
-            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
+            | DistroSubsystemMode::DragonFlyBsd
+            | DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::OpenRC || supervisor == ServiceSupervisorType::Smf,
 
             DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
                 supervisor == ServiceSupervisorType::Runit
@@ -239,9 +236,9 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            DistroSubsystemMode::LinuxKali | DistroSubsystemMode::LinuxZorin => supervisor == ServiceSupervisorType::Systemd,
+            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
         };
 
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
@@ -252,10 +249,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot
-            | DistroSubsystemMode::LinuxKali
-            | DistroSubsystemMode::LinuxAntiX
-            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", input_pkg),
+            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -266,12 +260,14 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
             DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
         }
@@ -290,10 +286,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot
-            | DistroSubsystemMode::LinuxKali
-            | DistroSubsystemMode::LinuxAntiX
-            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", action),
+            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
@@ -6664,340 +6657,5 @@ mod tests {
             pax.violations[1].violation,
             PaxViolationType::SegvGuardThresholdExceeded
         );
-    }
-}
-
-// ==========================================
-// ==========================================
-// 40. CROSS-DISTRO IPC, AUTH, SYSCALL & CONTAINER BRIDGES
-// ==========================================
-
-pub struct SovereignZeroCopyIpcBridge {
-    pub ring_buffer: SovereignRingBuffer<u8, 256>,
-}
-
-impl SovereignZeroCopyIpcBridge {
-    pub fn new() -> Self {
-        Self {
-            ring_buffer: SovereignRingBuffer::new(),
-        }
-    }
-
-    pub fn splice_channel(&mut self, _src_fd: i32, _dst_fd: i32, len: usize) -> Result<usize, &'static str> {
-        if len == 0 {
-            return Err("Splice length must be greater than zero");
-        }
-        Ok(len)
-    }
-}
-
-impl Default for SovereignZeroCopyIpcBridge {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SovereignSystemdHomedAuthBridge {
-    pub authenticated_users: Vec<String>,
-}
-
-impl SovereignSystemdHomedAuthBridge {
-    pub fn new() -> Self {
-        Self {
-            authenticated_users: Vec::new(),
-        }
-    }
-
-    pub fn authenticate_and_mount(&mut self, username: &str, password: &str) -> Result<&'static str, &'static str> {
-        if username.is_empty() || password.is_empty() {
-            return Err("Invalid credentials");
-        }
-        self.authenticated_users.push(username.to_string());
-        Ok("LUKS_HOME_MOUNTED")
-    }
-}
-
-impl Default for SovereignSystemdHomedAuthBridge {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SovereignMultiArchSyscallTranslator {
-    pub mode: DistroSubsystemMode,
-}
-
-impl SovereignMultiArchSyscallTranslator {
-    pub fn new(mode: DistroSubsystemMode) -> Self {
-        Self { mode }
-    }
-
-    pub fn translate_and_dispatch(&mut self, syscall_name: &str) -> Result<u64, &'static str> {
-        if syscall_name.is_empty() {
-            return Err("Syscall name cannot be empty");
-        }
-        match self.mode {
-            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
-            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(2002),
-            _ => Ok(0),
-        }
-    }
-}
-
-pub struct SovereignMultiArchBootChainBridge {
-    pub configured_entries: Vec<String>,
-}
-
-impl SovereignMultiArchBootChainBridge {
-    pub fn new() -> Self {
-        Self {
-            configured_entries: Vec::new(),
-        }
-    }
-
-    pub fn configure_boot_entry(&mut self, label: &str, params: &str) -> Result<String, &'static str> {
-        if label.is_empty() {
-            return Err("Boot label cannot be empty");
-        }
-        let entry = format!("BOOT_ENTRY[{}]: {}", label, params);
-        self.configured_entries.push(entry.clone());
-        Ok(entry)
-    }
-}
-
-impl Default for SovereignMultiArchBootChainBridge {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SovereignCrossDistroContainerManager {
-    pub mode: DistroSubsystemMode,
-    pub containers: Vec<(u64, String)>,
-    pub next_id: u64,
-}
-
-impl SovereignCrossDistroContainerManager {
-    pub fn new(mode: DistroSubsystemMode) -> Self {
-        Self {
-            mode,
-            containers: Vec::new(),
-            next_id: 1,
-        }
-    }
-
-    pub fn spawn_isolated_container(&mut self, name: &str, path: &str) -> Result<u64, &'static str> {
-        if name.is_empty() || path.is_empty() {
-            return Err("Container name and path cannot be empty");
-        }
-        let id = self.next_id;
-        self.next_id += 1;
-        self.containers.push((id, format!("{}:{}", name, path)));
-        Ok(id)
-    }
-}
-
-/// ============================================================================
-/// 9. Advanced Linux/BSD Distro Innovations Integration
-/// ============================================================================
-
-/// Ubuntu-style AppArmor Security Profiles
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum AppArmorMode {
-    Unconfined,
-    Complain,
-    Enforce,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppArmorSecurityProfile {
-    pub name: String,
-    pub mode: AppArmorMode,
-    pub allowed_paths: Vec<String>,
-    pub denied_paths: Vec<String>,
-    pub capabilities: Vec<String>,
-}
-
-impl AppArmorSecurityProfile {
-    pub fn new(name: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            mode: AppArmorMode::Unconfined,
-            allowed_paths: Vec::new(),
-            denied_paths: Vec::new(),
-            capabilities: Vec::new(),
-        }
-    }
-
-    pub fn set_enforce_mode(&mut self) {
-        self.mode = AppArmorMode::Enforce;
-    }
-
-    pub fn allow_path(&mut self, path: &str) {
-        self.allowed_paths.push(path.to_string());
-    }
-
-    pub fn deny_path(&mut self, path: &str) {
-        self.denied_paths.push(path.to_string());
-    }
-
-    pub fn add_capability(&mut self, cap: &str) {
-        self.capabilities.push(cap.to_string());
-    }
-
-    pub fn validate_path_access(&self, path: &str) -> bool {
-        if self.denied_paths.iter().any(|p| path.starts_with(p)) {
-            return false;
-        }
-        self.allowed_paths.iter().any(|p| path.starts_with(p))
-    }
-}
-
-/// Gentoo-style USE Flags Conditional Compilation
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct UseFlag {
-    pub name: String,
-    pub enabled: bool,
-    pub description: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct UseFlagEngine {
-    pub global_flags: Vec<UseFlag>,
-    pub package_flags: BTreeMap<String, Vec<UseFlag>>,
-}
-
-impl UseFlagEngine {
-    pub fn new() -> Self {
-        Self {
-            global_flags: Vec::new(),
-            package_flags: BTreeMap::new(),
-        }
-    }
-
-    pub fn add_global_flag(&mut self, name: &str, enabled: bool, description: &str) {
-        self.global_flags.push(UseFlag {
-            name: name.to_string(),
-            enabled,
-            description: description.to_string(),
-        });
-    }
-
-    pub fn add_package_flag(&mut self, package: &str, name: &str, enabled: bool) {
-        let entry = self.package_flags.entry(package.to_string()).or_insert_with(Vec::new);
-        entry.push(UseFlag {
-            name: name.to_string(),
-            enabled,
-            description: String::new(),
-        });
-    }
-
-    pub fn resolve_flags(&self, package: &str) -> Vec<UseFlag> {
-        let mut resolved = self.global_flags.clone();
-        if let Some(pkg_flags) = self.package_flags.get(package) {
-            resolved.extend(pkg_flags.clone());
-        }
-        resolved
-    }
-}
-
-/// Debian-style APT Repository Management
-#[derive(Debug, Clone)]
-pub struct AptRepository {
-    pub name: String,
-    pub url: String,
-    pub distribution: String,
-    pub components: Vec<String>,
-    pub trusted: bool,
-}
-
-impl AptRepository {
-    pub fn new(name: &str, url: &str, dist: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            url: url.to_string(),
-            distribution: dist.to_string(),
-            components: Vec::new(),
-            trusted: false,
-        }
-    }
-
-    pub fn add_component(&mut self, component: &str) {
-        self.components.push(component.to_string());
-    }
-
-    pub fn set_trusted(&mut self, trusted: bool) {
-        self.trusted = trusted;
-    }
-
-    pub fn generate_sources_entry(&self) -> String {
-        let components_str = self.components.join(" ");
-        let trusted_str = if self.trusted { "[trusted=yes]" } else { "" };
-        format!("deb {} {} {} {}",
-            trusted_str,
-            self.url,
-            self.distribution,
-            components_str
-        )
-    }
-}
-
-/// Advanced Multi-Distro Security Integration Engine
-#[derive(Debug, Clone)]
-pub struct AdvancedDistroSecurityEngine {
-    pub apparmor_profiles: Vec<AppArmorSecurityProfile>,
-    pub use_flag_engine: UseFlagEngine,
-    pub apt_repositories: Vec<AptRepository>,
-}
-
-impl AdvancedDistroSecurityEngine {
-    pub fn new() -> Self {
-        Self {
-            apparmor_profiles: Vec::new(),
-            use_flag_engine: UseFlagEngine::new(),
-            apt_repositories: Vec::new(),
-        }
-    }
-
-    pub fn add_apparmor_profile(&mut self, profile: AppArmorSecurityProfile) {
-        self.apparmor_profiles.push(profile);
-    }
-
-    pub fn add_apt_repository(&mut self, repo: AptRepository) {
-        self.apt_repositories.push(repo);
-    }
-
-    pub fn validate_security_policy(&self, application: &str, path: &str) -> bool {
-        for profile in &self.apparmor_profiles {
-            if profile.name == application {
-                return profile.validate_path_access(path);
-            }
-        }
-        true // Default allow if no specific profile
-    }
-
-    pub fn generate_composite_security_config(&self) -> String {
-        let mut config = String::from("# Advanced Linux/BSD Security Configuration\n");
-        
-        config.push_str("# AppArmor Profiles\n");
-        for profile in &self.apparmor_profiles {
-            config.push_str(&format!("profile {} {{\n", profile.name));
-            config.push_str(&format!("  mode: {:?}\n", profile.mode));
-            config.push_str("}\n");
-        }
-        
-        config.push_str("\n# APT Repositories\n");
-        for repo in &self.apt_repositories {
-            config.push_str(&repo.generate_sources_entry());
-            config.push('\n');
-        }
-        
-        config
-    }
-}
-
-impl Default for AdvancedDistroSecurityEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }

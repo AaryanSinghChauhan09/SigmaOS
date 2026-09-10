@@ -31,3 +31,10 @@ if [ -f "tests/test_vecdeque_standalone.rs" ]; then
     rustc --test tests/test_vecdeque_standalone.rs --edition=2021 -o build/vecdeque_test
     ./build/vecdeque_test
 fi
+
+if [ -f "tests/test_hashmap_standalone.rs" ]; then
+    echo "Running HashMap performance & correctness test suite..."
+    mkdir -p build
+    rustc --test tests/test_hashmap_standalone.rs --edition=2021 -o build/hashmap_test
+    ./build/hashmap_test
+fi

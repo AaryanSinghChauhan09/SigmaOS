@@ -5,12 +5,12 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 #![allow(unexpected_cfgs)]
+extern crate alloc;
 
-
-use std::boxed::Box;
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
@@ -1866,6 +1866,11 @@ mod tests {
     }
 }
 
+// ============================================================================
+// Section 6: Bare-Metal Subsystem Design Specifications
+// ============================================================================
+
+
 pub struct AchievementBadge {
     pub badge_id: &'static str,
     pub name: &'static str,
@@ -2264,9 +2269,9 @@ impl SovereignStatelessArchitectureEngine {
         user_overrides_exist: bool,
     ) -> String {
         if user_overrides_exist {
-            std::format!("{}/{}", self.user_override_path, config_key)
+            alloc::format!("{}/{}", self.user_override_path, config_key)
         } else {
-            std::format!("{}/{}", self.factory_default_path, config_key)
+            alloc::format!("{}/{}", self.factory_default_path, config_key)
         }
     }
 }
@@ -3090,10 +3095,10 @@ pub struct PuppyLinuxOverlayRamdiskEngine {
 }
 
 impl PuppyLinuxOverlayRamdiskEngine {
-    pub fn new(ram_size_mb: usize) -> Self {
+    pub fn new(ram_size_mb: usize, ram_capacity_mb: u32) -> Self {
         Self {
             ram_size_mb,
-            ram_capacity_mb: (ram_size_mb as u32) * 2,
+            ram_capacity_mb,
             loaded_sfs_modules: Vec::new(),
             persistence_save_file: None,
         }
@@ -3712,43 +3717,31 @@ mod extra_unimplemented_tests {
 // TECH MEDIA & BENCHMARK INTELLIGENCE AGGREGATOR ENGINE
 // =========================================================================
 
-
-// =========================================================================
-// TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct DocField {
-    pub fieldname: String,
-    pub fieldtype: String,
-    pub label: String,
-    pub reqd: bool,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TechMediaFeedItem {
+    pub source_name: String,
+    pub title: String,
+    pub category: String,
+    pub severity_score: u8,
 }
 
-#[derive(Debug, Clone)]
-pub struct FrappeFrameworkDocTypeEngine {
-    pub doctype_name: String,
-    pub fields: Vec<DocField>,
-    pub workflow_state: String,
-    pub is_submittable: bool,
+pub struct TechMediaIntelligenceAggregatorEngine {
+    pub feed_items: Vec<TechMediaFeedItem>,
 }
 
-impl FrappeFrameworkDocTypeEngine {
-    pub fn new(doctype_name: &str) -> Self {
+impl TechMediaIntelligenceAggregatorEngine {
+    pub fn new() -> Self {
         Self {
-            doctype_name: doctype_name.to_string(),
-            fields: Vec::new(),
-            workflow_state: "Draft".to_string(),
-            is_submittable: true,
+            feed_items: Vec::new(),
         }
     }
 
-    pub fn add_field(&mut self, fieldname: &str, fieldtype: &str, label: &str, reqd: bool) {
-        self.fields.push(DocField {
-            fieldname: fieldname.to_string(),
-            fieldtype: fieldtype.to_string(),
-            label: label.to_string(),
-            reqd,
+    pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
+        self.feed_items.push(TechMediaFeedItem {
+            source_name: source.to_string(),
+            title: title.to_string(),
+            category: category.to_string(),
+            severity_score: severity,
         });
     }
 

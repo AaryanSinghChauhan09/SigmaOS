@@ -1,10 +1,10 @@
 //! Custom BTreeMap implementation for SigmaOS
 //! Reduces dependency on std::collections::BTreeMap
 
-use crate::klib::hash::SimpleHasher;
+use super::hash::SimpleHasher;
 use std::vec::Vec;
 use core::borrow::Borrow;
-use core::hash::{Hash, Hasher};
+use core::hash::Hash;
 
 pub type HashMap<K, V> = BTreeMap<K, V>;
 
@@ -125,7 +125,10 @@ where
         }
         let mut hasher = SimpleHasher::new();
         key.hash(&mut hasher);
-        (hasher.finish() as usize) % self.capacity
+        // Bolt ⚡: Replace CPU integer modulo division (`% self.capacity`) with fast bitwise AND bitmasking
+        // (`& (self.capacity - 1)`). Since BTreeMap capacity is guaranteed to be a power of two, bitmasking
+        // computes bucket indices in 1 CPU cycle instead of ~10-40 cycles for hardware division instructions.
+        (hasher.finish() as usize) & (self.capacity - 1)
     }
 
     pub fn insert(&mut self, key: K, value: V) {
