@@ -209,11 +209,11 @@ pub mod toolchain {
 pub mod scheduler;
 pub mod logging;
 pub mod system;
-pub mod update {
-    pub mod distro_update_parity;
-}
-pub use update::distro_update_parity::{
-    SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
+pub mod update;
+pub use update::{
+    PreflightCheckResult, SovereignSystemUpdateAndTestingEngine, SovereignSystemUpdateManager,
+    SystemDiagnosticReport, SystemUpdatePayload, SystemUpdatePolicy, SystemUpdateStrategy,
+    UpdateHealthVerifier, UpdateLedgerEntry, UpdateSeverity, UpdateTransactionLedger,
 };
 pub mod installer;
 pub mod iot;
