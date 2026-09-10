@@ -46,6 +46,8 @@ pub mod store;
 pub mod universal;
 pub mod universal_package_innovations_suite;
 pub mod updater;
+pub mod universal_package_innovations_suite;
+pub use universal_package_innovations_suite::*;
 
 pub use universal_package_innovations_suite::{
     AptMirrorServer, ArchPacmanDeltaSyncEngine, BasePackageRecord, DebianAptFastMirrorRanker,

@@ -125,65 +125,6 @@ impl ArchAurWebRpcClient {
     }
 }
 
-/// 5. Arch Linux Systemd Initramfs / Early Microcode Generator (`mkinitcpio`)
-#[derive(Debug, Clone)]
-pub struct ArchMkinitcpioHooks {
-    pub hooks: Vec<String>,
-    pub compression: String,
-}
-
-impl ArchMkinitcpioHooks {
-    pub fn new() -> Self {
-        Self {
-            hooks: vec![
-                "base".to_string(),
-                "udev".to_string(),
-                "autodetect".to_string(),
-                "modconf".to_string(),
-                "block".to_string(),
-                "filesystems".to_string(),
-                "fsck".to_string(),
-            ],
-            compression: "zstd".to_string(),
-        }
-    }
-
-    pub fn generate_preset_config(&self) -> String {
-        let hooks_str = self.hooks.join(" ");
-        format!("HOOKS=({})\nCOMPRESSION=\"{}\"\n", hooks_str, self.compression)
-    }
-}
-
-/// 6. Arch Linux Arch Build System (ABS) & `asp` / `pkgctl` Tree Manager
-#[derive(Debug, Clone)]
-pub struct ArchAbsTreeManager {
-    pub core_repos: Vec<String>,
-}
-
-impl ArchAbsTreeManager {
-    pub fn new() -> Self {
-        Self {
-            core_repos: vec![
-                "core".to_string(),
-                "extra".to_string(),
-                "multilib".to_string(),
-            ],
-        }
-    }
-
-    pub fn fetch_official_pkgbuild(&self, pkg_name: &str) -> Result<ArchPkgbuild, String> {
-        Ok(ArchPkgbuild {
-            pkgname: pkg_name.to_string(),
-            pkgver: "1.0.0".to_string(),
-            pkgrel: "1".to_string(),
-            pkgdesc: format!("Official Arch package {}", pkg_name),
-            arch: vec!["x86_64".to_string()],
-            depends: vec!["glibc".to_string()],
-            makedepends: vec![],
-        })
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

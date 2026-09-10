@@ -3,7 +3,6 @@ pub mod system_monitor;
 
 pub mod data_tools;
 pub mod display_manager;
-pub mod open_source_tools_parity;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
@@ -14,25 +13,6 @@ pub mod mint_locale_manager;
 pub mod mint_welcome;
 pub mod mint_system_report;
 pub mod omarchy_command_palette;
-pub mod timeshift_snapshot_manager;
-pub mod warpinator_lan_sharing;
-pub mod mint_backup_manager;
-pub mod mint_system;
-pub mod mint_desktop;
-pub mod mint_menu;
-pub mod profession_tools;
-
-pub use profession_tools::*;
-
-pub use open_source_tools_parity::{
-    BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, DufDiskFreeInfoEngine,
-    DufMountPoint, DustFastDuEngine, DustFolderUsage, EzaFileItem, EzaModernLsEngine,
-    FastfetchInfoEngine, FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry,
-    NcduDiskUsageAnalyzerEngine, NcduNode, ProcsModernPsEngine, ProcsProcessEntry,
-    RipgrepRegexSearchEngine, RofiCommandHudEngine, SearchMatch, SovereignAbridgeTool,
-    SovereignXcpTool, StarshipPromptEngine, TldrCommandPage, TldrQuickPagesEngine,
-    XcpCopyProgress, ZoxideFastCdEngine, ZoxidePathEntry,
-};
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
@@ -73,30 +53,9 @@ pub use mint_welcome::{
 pub use mint_system_report::{
     MintSystemReport, SystemInfoCategory, SystemInfoItem,
 };
-pub use timeshift_snapshot_manager::{
-    SnapshotConfig, SnapshotLevel, SnapshotMetadata, SnapshotMode, SnapshotResult,
-    SnapshotStatistics, RestoreResult, TimeshiftSnapshotManager,
-};
-pub use warpinator_lan_sharing::{
-    DeviceInfo, GroupCode, TransferItem, TransferResult, TransferStatistics, TransferStatus,
-    WarpinatorLanSharing,
-};
-pub use mint_backup_manager::{
-    BackupConfig, BackupMetadata, BackupResult, BackupStatistics, BackupStatus, BackupType,
-    MintBackupManager, PackageList,
-};
-pub use mint_system::{
-    AptCommand, AptResult, MintSystem,
-};
-pub use mint_desktop::{
-    DesktopLayout, DesktopSettings, MintDesktop, ThemeSettings, WindowManager,
-};
-pub use mint_menu::{
-    MenuCategory, MenuItem, MenuItemType, MenuSearchResult, MintMenu,
-};
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
-pub mod native_userland_replacements;
-pub use native_userland_replacements::MasterNativeUserlandReplacements;
-pub mod thenewstack_tools;
-pub use thenewstack_tools::*;
+pub mod open_source_tools_engine;
+pub use open_source_tools_engine::*;
+pub mod open_source_cli_tools_suite;
+pub use open_source_cli_tools_suite::*;

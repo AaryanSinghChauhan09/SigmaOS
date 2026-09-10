@@ -11,7 +11,7 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use alloc::string::String;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
