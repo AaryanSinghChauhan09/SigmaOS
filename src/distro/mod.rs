@@ -201,6 +201,11 @@ pub use sovereign_distro_dominance::{
     ZfsBtrfsHybridSelfHealingCoW,
 };
 
+pub mod opensuse;
+pub use opensuse::{
+    MicroOsSnapshot, MicroOsSnapshotState, OpenSuseMicroOsEngine, OpenSuseYastPatternEngine,
+    YastPattern,
+};
 pub mod nextgen_innovations;
 pub mod universal_distro_super_matrix;
 pub mod void_xbps_src;
