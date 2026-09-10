@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-SigmaOS is built on a zero-dependency, `#![no_std]` native Rust architecture designed to eliminate the technical debt, memory unsafety, and performance bottlenecks inherent in legacy C/C++ operating system kernels. This document establishes the strategic engineering roadmap for SigmaOS to outperform Linux distributions (Ubuntu, Fedora, Arch, Debian, Alpine, Void, Gentoo, NixOS, openSUSE) and BSD operating systems (FreeBSD, OpenBSD, NetBSD, DragonFly BSD) across performance, security, compatibility, user experience, developer velocity, and system reliability.
+SigmaOS (https://github.com/AaryanSinghChauhan09/SigmaOS) is built on a zero-dependency, `#![no_std]` native Rust architecture designed to eliminate the technical debt, memory unsafety, and performance bottlenecks inherent in legacy C/C++ operating system kernels. This document establishes the strategic engineering roadmap for SigmaOS to outperform Linux distributions (Ubuntu, Fedora, Arch, Debian, Alpine, Void, Gentoo, NixOS, openSUSE) and BSD operating systems (FreeBSD, OpenBSD, NetBSD, DragonFly BSD) across performance, security, compatibility, user experience, developer velocity, and system reliability.
 
 ---
 
@@ -20,7 +20,7 @@ SigmaOS is built on a zero-dependency, `#![no_std]` native Rust architecture des
 - **Translucent Layered Rootfs Overlays:** Combine EROFS compressed read-only images with tmpfs and persistent Btrfs/ZFS snapshots for instant recovery and A/B image updates.
 
 ### 3. Display Server, Compositing & Desktop UX Supremacy
-- **Zero-Allocation Wayland Compositor (`WaylandProtocolEngine`):** Sub-frame input delivery, direct Vulkan/DRM surface leasing, zero-copy DMA-BUF buffer passing, and native ARIA accessibility routing.
+- **Zero-Allocation Wayland Compositor (`WaylandProtocolEngine`):** Sub-frame input delivery, direct Vulkan/DRM surface leasing, zero-copy DMA-BUF buffer passing, and native WCAG 2.1 AA accessibility routing.
 - **Native Desktop Productivity Suite:** Built-in Rust engines for system snapshots (`ItsFossTimeshiftBackupEngine`), peer-to-peer LAN transfers (`ItsFossLocalSendTransferEngine`), resource optimization (`ItsFossStacerOptimizerEngine`), and multi-boot live USB generation (`ItsFossVentoyMultiBootUsbEngine`).
 
 ### 4. Hardened Unprivileged Security & Sandboxing Architecture
@@ -33,12 +33,13 @@ SigmaOS is built on a zero-dependency, `#![no_std]` native Rust architecture des
 
 ---
 
-## Implementation Roadmap & Milestones
+## 🚀 Future Development Phases (2026-2028)
 
-| Milestone | Target Objective | Key Subsystems Involved |
-| :--- | :--- | :--- |
-| **Phase I** | Micro-Kernel Hardening & Lock-Free Ring Buffers | `src/kernel/ebpf.rs`, `src/kernel/scheduler.rs`, `src/hal/multi_arch.rs` |
-| **Phase II** | Universal ABI Translation & Package Adapter | `src/sigpkg/universal_adapter.rs`, `src/package/universal.rs` |
-| **Phase III** | Sub-frame Wayland Compositor & Desktop Suite | `src/desktop/wayland_protocol.rs`, `src/compatibility/itsfoss_inspiration_suite.rs` |
-| **Phase IV** | Unprivileged Sandboxing & PQC Boot Security | `src/security/landlock.rs`, `src/distro/future_roadmap_innovations.rs` |
-| **Phase V** | Multi-Arch Testing & Autonomous AI Agent Oversight | `./run_sigma_tests.sh`, `docs/AI_AGENT_*.md` |
+Detailed roadmap specs are maintained in `docs/SIGMA_OS_FUTURE_ROADMAP_2026_2028.md`.
+
+| Phase | Timeline | Target Milestone | Key Deliverables |
+| :--- | :--- | :--- | :--- |
+| **Phase 7** | Q4 2026 - Q2 2027 | Tier 2 Hardware & Drivers | USB 3.0 XHCI, NVMe queues, SigmaFS v2 CoW, Btrfs/ZFS layers, KVM hypervisor |
+| **Phase 8** | Q2 2027 - Q4 2027 | Networking & Cloud Integration | TCP BBR, QUIC, eBPF XDP zero-copy, SYN cookie DDoS mitigation, TEE/SGX/SEV |
+| **Phase 9** | Q3 2027 - Q2 2028 | Desktop & Application Suite | Zenith Desktop, Wayland WCAG 2.1 AA, Office suite, GIMP/VSCode parity tools |
+| **Phase 10** | Q1 2028 - Q4 2028 | Enterprise & India-First | India Stack (UPI, GST, ITR), 22 official languages, Active Directory / LDAP |

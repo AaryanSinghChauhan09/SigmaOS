@@ -9,14 +9,11 @@ pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
-pub mod web_wasm_bridge;
 pub mod zenith_compositor;
 pub mod ultimate_distro_desktop;
 pub mod wayland_protocol;
 
 pub use wayland_protocol::*;
-
-pub use sovereign_navigation_engine::*;
 
 pub use sovereign_navigation_engine::*;
 
@@ -59,7 +56,8 @@ pub use zenith_compositor::{
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
 };
 
-pub use omarchy_omakase::{
-    AgenticWorkstationLayout, AgenticWorkstationOrchestrator, OmakasePresetConfig,
-    OmarchySystemEngine, WorkstationPane, WorkstationPaneRole,
+pub use sovereign_navigation_engine::{
+    AppCategory, GnomePopLauncherNav, HudActionResult, KrunnerRofiCommandHud, LauncherAppItem,
+    NavDirection, RangerDolphinSpatialFileNav, SovereignUniversalNavigationEngine,
+    SystemControlNode, TilingWindowManagerNav, WindowNode, YastBsdConfigControlTreeNav,
 };
