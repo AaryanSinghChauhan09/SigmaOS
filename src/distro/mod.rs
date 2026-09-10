@@ -202,9 +202,11 @@ pub use sovereign_distro_dominance::{
     AlpineApkCASPackageCache, CachyBoreDynamicAiScheduler, CasPackageBlob, ClusterNodeConfig,
     FreeBsdBhyveMicrovmJailBridge, HybridIsolationInstance, IsolationType, ManagedProcessAffinity,
     MicrovmState, NixGuixZeroCopyStore, OpenBsdHardenedCapsicumPledge, PopOsSystem76AutoScheduler,
-    ProcessPowerProfile, SovereignDistroDominanceSuite, SovereignMicrovmHypervisorGateway,
-    SovereignPqcWireguardVpnEngine, TalosHeadlessMtlsClusterEngine, VirtioConfig, WireguardPeer,
-    ZfsBtrfsHybridSelfHealingCoW,
+    ProcessPowerProfile, SovereignDistroDominanceSuite, SovereignGenerationalStoreReconciler,
+    SovereignHybridCowBootEnvEngine, SovereignHybridSandboxingGuard,
+    SovereignMicrovmHypervisorGateway, SovereignPqcWireguardVpnEngine,
+    SovereignStatelessIsaOptimizer, TalosHeadlessMtlsClusterEngine, VirtioConfig, WireguardPeer,
+    X86MicroarchIsaLevel, ZfsBtrfsHybridSelfHealingCoW,
 };
 
 pub mod nextgen_innovations;
