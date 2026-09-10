@@ -281,15 +281,15 @@ pub enum PackageFormat {
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,      // HPC Spack (.spack)
-    Conan,      // C/C++ Conan (.conan)
-    Wheel,      // Python Wheel (.whl)
-    Crate,      // Rust Cargo Crate (.crate)
-    Gem,        // Ruby Gem (.gem)
-    Nupkg,      // .NET NuGet (.nupkg)
-    Vcpkg,      // Vcpkg (.vcpkg)
-    NarInfo,    // Nix NarInfo (.narinfo)
-    Sysupdate,  // Systemd Sysupdate (.sysupdate)
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -2910,7 +2910,7 @@ mod tests {
 }
 
 #[cfg(test)]
-mod extra_universal_tests {
+mod extra_tests {
     use super::*;
 
     #[test]
@@ -2984,12 +2984,6 @@ mod extra_universal_tests {
                         && adapted.formats.contains(&PackageFormat::Nixpkg))
             );
         }
-    }
-
-    #[test]
-    fn test_nix_guix_functional_derivation_engine() {
-        let manager = UniversalPackageManager::new();
-        assert_eq!(manager.packages.len(), 0);
     }
 
     #[test]

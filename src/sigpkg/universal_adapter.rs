@@ -175,8 +175,8 @@ pub struct NetBsdPkgsrcManifest {
     pub depends: Vec<String>,
 }
 
-/// Description of openSUSE Zypper RPM spec/manifest
-#[derive(Debug, Clone)]
+/// Description of Arch Linux binary .PKGINFO manifest (pacman parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ZypperSpecManifest {
     pub name: String,
     pub version: String,

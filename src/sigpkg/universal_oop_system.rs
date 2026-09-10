@@ -36,14 +36,6 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Version {
-    pub major: u64,
-    pub minor: u64,
-    pub patch: u64,
-}
-
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::klib::HashMap;
 
@@ -216,6 +208,7 @@ pub enum PackageFormat {
     Pisi,
     // Deepin Superdeb (.superdeb)
     Superdeb,
+    Sysupdate,
     // Slax Linux Module (.lzm)
     Lzm,
     // Puppy Linux Package (.pup)
@@ -262,8 +255,6 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
-    // Systemd Sysupdate (.sysupdate)
-    Sysupdate,
 }
 
 impl PackageFormat {
@@ -2990,78 +2981,72 @@ impl Default for SovereignUniversalAlternativesManager {
 // Delta Package Reconstruction Subsystem
 // ============================================================================
 
+pub struct PackageDeltaPatch {
+    pub source_checksum: String,
+    pub target_checksum: String,
+    pub delta_payload: Vec<u8>,
+}
+
 pub trait IPackageDeltaStrategy: Send + Sync {
     fn name(&self) -> &str;
-    fn compute_delta(&self, old_bytes: &[u8], new_bytes: &[u8]) -> Vec<u8>;
-    fn apply_delta(&self, old_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str>;
-    fn apply_patch(&self, source_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
-        self.apply_delta(source_bytes, delta_bytes)
+    fn calculate_delta(&self, old_data: &[u8], new_data: &[u8]) -> Vec<u8>;
+    fn compute_delta(&self, old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        self.calculate_delta(old_data, new_data)
     }
+    fn apply_delta(&self, old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str>;
 }
 
 pub struct DnfDeltaRpmStrategy;
-
 impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
-    fn name(&self) -> &str {
-        "drpm"
-    }
-
-    fn compute_delta(&self, _old_bytes: &[u8], new_bytes: &[u8]) -> Vec<u8> {
-        let mut delta = Vec::new();
-        delta.extend_from_slice(b"DRPM_DELTA:");
-        delta.extend_from_slice(new_bytes);
+    fn name(&self) -> &str { "drpm" }
+    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        let mut delta = vec![0x44, 0x52, 0x50, 0x4d];
+        delta.extend_from_slice(new_data);
         delta
     }
-
-    fn apply_delta(&self, old_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
-        if delta_bytes.starts_with(b"DRPM_DELTA:") {
-            let mut reconstructed = old_bytes.to_vec();
-            reconstructed.extend_from_slice(&delta_bytes[11..]);
-            Ok(reconstructed)
+    fn apply_delta(&self, old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str> {
+        if delta.len() >= 4 && &delta[..4] == b"DRPM" {
+            let mut res = old_data.to_vec();
+            res.extend_from_slice(&delta[4..]);
+            Ok(res)
         } else {
-            let mut reconstructed = old_bytes.to_vec();
-            reconstructed.extend_from_slice(delta_bytes);
-            Ok(reconstructed)
+            Err("Invalid DRPM payload header")
         }
     }
 }
 
 pub struct SovereignBinaryDeltaStrategy;
-
 impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
-    fn name(&self) -> &str {
-        "moss-stone-delta"
+    fn name(&self) -> &str { "moss-stone-delta" }
+    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        let mut delta = vec![0x4d, 0x4f, 0x53, 0x53];
+        delta.extend_from_slice(new_data);
+        delta
     }
-
-    fn compute_delta(&self, _old_bytes: &[u8], new_bytes: &[u8]) -> Vec<u8> {
-        new_bytes.to_vec()
-    }
-
-    fn apply_delta(&self, _old_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
-        Ok(delta_bytes.to_vec())
+    fn apply_delta(&self, _old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str> {
+        if delta.len() >= 4 && &delta[..4] == b"MOSS" {
+            Ok(delta[4..].to_vec())
+        } else {
+            Err("Invalid MOSS delta payload header")
+        }
     }
 }
 
 pub struct ZstdChunkedDeltaStrategy;
-
 impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
-    fn name(&self) -> &str {
-        "zstd-chunked"
+    fn name(&self) -> &str { "zstd-chunked" }
+    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        let mut delta = vec![0x5a, 0x53, 0x54, 0x44];
+        delta.extend_from_slice(new_data);
+        delta
     }
-
-    fn compute_delta(&self, _old_bytes: &[u8], new_bytes: &[u8]) -> Vec<u8> {
-        new_bytes.to_vec()
+    fn apply_delta(&self, _old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &str> {
+        if delta.len() >= 4 && &delta[..4] == b"ZSTD" {
+            Ok(delta[4..].to_vec())
+        } else {
+            Err("Invalid ZSTD delta payload header")
+        }
     }
-
-    fn apply_delta(&self, _old_bytes: &[u8], delta_bytes: &[u8]) -> Result<Vec<u8>, &'static str> {
-        Ok(delta_bytes.to_vec())
-    }
-}
-
-pub struct PackageDeltaPatch {
-    pub source_checksum: String,
-    pub target_checksum: String,
-    pub delta_payload: Vec<u8>,
 }
 
 pub struct PackageDeltaEngine {

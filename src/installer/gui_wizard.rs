@@ -3,8 +3,12 @@
 
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
-use std::vec;
+
+extern crate alloc;
+use alloc::format;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::vec;
 
 /// Installer Screen / Calamares Module Sequence
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -188,6 +192,7 @@ pub struct PrivacySettings {
     pub send_crash_reports: bool,
     pub location_services: bool,
 }
+
 
 impl SystemConfiguration {
     pub fn new() -> Self {

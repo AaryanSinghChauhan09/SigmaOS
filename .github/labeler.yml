@@ -3,10 +3,6 @@ rust:
   - changed-files:
       - any-glob-to-any-file: 'src/**/*.rs'
 
-workflows:
-  - changed-files:
-      - any-glob-to-any-file: '.github/workflows/*'
-
 core-kernel:
   - changed-files:
       - any-glob-to-any-file: 'src/kernel/**/*'
@@ -33,8 +29,11 @@ documentation:
       - any-glob-to-any-file:
           - 'docs/**/*'
           - 'wiki/**/*'
-          - 'wiki_repo/**/*'
           - '*.md'
+
+workflows:
+  - changed-files:
+      - any-glob-to-any-file: '.github/workflows/*'
 
 "area: kernel":
   - changed-files:

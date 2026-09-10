@@ -30,6 +30,8 @@ pub struct ContainerCapability {
     pub can_modify: bool,
 }
 
+
+
 impl ContainerCapability {
     pub const fn new() -> Self {
         ContainerCapability {
@@ -93,7 +95,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: RuntimeCapability::full(),
+            capability: ContainerCapability::full(),
         }
     }
 }
@@ -260,25 +262,6 @@ pub struct SimpleContainer {
     pub capability: ContainerCapability,
     pub environment: [u8; 512],
     pub seccomp: SeccompProfile,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SeccompAction {
-    Allow,
-    Errno,
-    Kill,
-}
-
-#[derive(Debug, Clone)]
-pub struct SeccompPolicy {
-    pub default_action: SeccompAction,
-    pub blocked_syscalls: Vec<u32>,
-}
-
-impl SeccompPolicy {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        self.blocked_syscalls.contains(&syscall_id)
-    }
 }
 
 impl SimpleContainer {
