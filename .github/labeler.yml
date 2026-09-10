@@ -5,15 +5,13 @@ rust:
 
 documentation:
   - changed-files:
-      - any-glob-to-any-file:
-          - 'docs/**/*'
-          - 'wiki/**/*'
-          - 'wiki_repo/**/*'
-          - '**/*.md'
+      - any-glob-to-any-file: ['**/*.md', 'docs/**', 'wiki/**', 'wiki_repo/**']
 
 workflows:
   - changed-files:
       - any-glob-to-any-file: '.github/workflows/*'
+
+# GitHub Labeler Configuration for SigmaOS
 
 core-kernel:
   - changed-files:
@@ -36,26 +34,25 @@ security:
   - changed-files:
       - any-glob-to-any-file: 'src/security/**/*'
 
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**/*'
+          - 'wiki/**/*'
+          - '*.md'
+
 "area: kernel":
-  - changed-files:
-      - any-glob-to-any-file: 'src/kernel/**/*'
-
+  - src/kernel/**/*
 "area: distro":
-  - changed-files:
-      - any-glob-to-any-file: 'src/distro/**/*'
-
+  - src/distro/**/*
 "area: security":
-  - changed-files:
-      - any-glob-to-any-file: 'src/security/**/*'
-
+  - src/security/**/*
 "area: networking":
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'src/net/**/*'
-          - 'src/network/**/*'
-
+  - src/net/**/*
+  - src/network/**/*
 "area: package":
-  - changed-files:
-      - any-glob-to-any-file:
-          - 'src/sigpkg/**/*'
-          - 'src/package/**/*'
+  - src/sigpkg/**/*
+  - src/package/**/*
+"area: documentation":
+  - docs/**/*
+  - wiki/**/*
