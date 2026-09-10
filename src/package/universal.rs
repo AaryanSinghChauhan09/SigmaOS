@@ -281,15 +281,15 @@ pub enum PackageFormat {
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,
-    Conan,
-    Wheel,
-    Crate,
-    Gem,
-    Nupkg,
-    Vcpkg,
-    NarInfo,
-    Sysupdate,
+    Spack,      // Spack package (.spack)
+    Conan,      // Conan C/C++ package (.conan)
+    Wheel,      // Python Wheel package (.whl)
+    Crate,      // Rust Crate package (.crate)
+    Gem,        // Ruby Gem package (.gem)
+    Nupkg,      // NuGet package (.nupkg)
+    Vcpkg,      // vcpkg C++ package (.vcpkg)
+    NarInfo,    // Nix/Guix NarInfo (.narinfo)
+    Sysupdate,  // systemd-sysupdate A/B image (.sysupdate)
 }
 
 impl PackageFormat {
@@ -1269,6 +1269,7 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
         self.decorated.profile_performance();
     }
 }
+
 
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
@@ -2907,20 +2908,6 @@ mod tests {
             Some(PackageFormat::OpenBsdPkg)
         );
     }
-}
-
-/// Alpine Linux .apk Package Format Adapter
-pub struct AlpineApkPackageAdapter;
-
-impl PackageMetadataAdapter for AlpineApkPackageAdapter {
-    fn adapt(&self, _raw_data: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
-    }
-}
-
-#[cfg(test)]
-mod extra_tests {
-    use super::*;
 
     #[test]
     fn test_all_package_format_strategies_and_adapters() {

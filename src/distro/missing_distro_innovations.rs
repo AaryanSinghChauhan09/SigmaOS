@@ -713,6 +713,220 @@ impl Default for OpenBsdUnveilAuditor {
 }
 
 
+// =========================================================================
+// APPARMOR-INSPIRED PATH-BASED MAC RULE EVALUATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppArmorRuleMode {
+    Enforce,
+    Complain,
+    Disabled,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorPathRule {
+    pub path_pattern: String,
+    pub allow_read: bool,
+    pub allow_write: bool,
+    pub allow_exec: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorRuleProfile {
+    pub profile_name: String,
+    pub mode: AppArmorRuleMode,
+    pub rules: Vec<AppArmorPathRule>,
+}
+
+pub type AppArmorProfile = AppArmorRuleProfile;
+pub type AppArmorPathProfile = AppArmorRuleProfile;
+
+pub struct AppArmorPathRuleEngine {
+    pub profiles: BTreeMap<String, AppArmorPathProfile>,
+    pub audit_log: Vec<String>,
+}
+
+impl AppArmorPathRuleEngine {
+    pub fn new() -> Self {
+        Self {
+            profiles: BTreeMap::new(),
+            audit_log: Vec::new(),
+        }
+    }
+
+    pub fn add_profile(&mut self, profile: AppArmorPathProfile) {
+        self.profiles.insert(profile.profile_name.clone(), profile);
+    }
+
+    pub fn evaluate_access(
+        &mut self,
+        profile_name: &str,
+        path: &str,
+        need_read: bool,
+        need_write: bool,
+        need_exec: bool,
+    ) -> bool {
+        let profile = match self.profiles.get(profile_name) {
+            Some(p) => p,
+            None => return true, // Unprofiled application
+        };
+
+        if profile.mode == AppArmorRuleMode::Disabled {
+            return true;
+        }
+
+        let mut matched_rule: Option<&AppArmorPathRule> = None;
+        for rule in &profile.rules {
+            if path == rule.path_pattern
+                || (rule.path_pattern.ends_with("/*")
+                    && path.starts_with(rule.path_pattern.trim_end_matches("/*")))
+                || (rule.path_pattern.ends_with('*')
+                    && path.starts_with(rule.path_pattern.trim_end_matches('*')))
+            {
+                matched_rule = Some(rule);
+                break;
+            }
+        }
+
+        let allowed = if let Some(rule) = matched_rule {
+            (!need_read || rule.allow_read)
+                && (!need_write || rule.allow_write)
+                && (!need_exec || rule.allow_exec)
+        } else {
+            true // Unconfined
+        };
+
+        if !allowed {
+            self.audit_log.push(format!(
+                "AppArmor DENIED [{}] path={}",
+                profile_name, path
+            ));
+        }
+
+        allowed
+    }
+}
+
+impl Default for AppArmorPathRuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// NIXOS FLAKES DECLARATIVE INPUT LOCK & CAS DERIVATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct NixFlakeInput {
+    pub input_id: String,
+    pub url: String,
+    pub locked_nar_hash: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct NixOsFlakesEngine {
+    pub flake_inputs: BTreeMap<String, NixFlakeInput>,
+    pub lock_version: u32,
+}
+
+impl NixOsFlakesEngine {
+    pub fn new() -> Self {
+        Self {
+            flake_inputs: BTreeMap::new(),
+            lock_version: 2,
+        }
+    }
+
+    pub fn lock_input(&mut self, id: &str, url: &str, nar_hash: &str) {
+        let input = NixFlakeInput {
+            input_id: id.to_string(),
+            url: url.to_string(),
+            locked_nar_hash: nar_hash.to_string(),
+        };
+        self.flake_inputs.insert(id.to_string(), input);
+    }
+
+    pub fn compute_system_derivation_hash(&self) -> String {
+        let mut combined = String::new();
+        for inp in self.flake_inputs.values() {
+            combined.push_str(&inp.locked_nar_hash);
+        }
+        format!("nix-store-drv-{:08x}", combined.len() * 31)
+    }
+}
+
+// =========================================================================
+// DRAGONFLY BSD HAMMER2 PSEUDO FILE SYSTEM (PFS) CLUSTERING & SNAPSHOT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Hammer2PfsType {
+    Master,
+    Slave,
+    Snapshot,
+    Cache,
+}
+
+#[derive(Debug, Clone)]
+pub struct Hammer2PfsNode {
+    pub pfs_id: u32,
+    pub name: String,
+    pub pfs_type: Hammer2PfsType,
+    pub cluster_quorum_votes: u32,
+}
+
+pub struct DragonFlyHammer2PfsEngine {
+    pub pfs_nodes: BTreeMap<u32, Hammer2PfsNode>,
+    pub active_snapshots: Vec<String>,
+}
+
+impl DragonFlyHammer2PfsEngine {
+    pub fn new() -> Self {
+        Self {
+            pfs_nodes: BTreeMap::new(),
+            active_snapshots: Vec::new(),
+        }
+    }
+
+    pub fn create_pfs(
+        &mut self,
+        pfs_id: u32,
+        name: &str,
+        pfs_type: Hammer2PfsType,
+    ) -> Hammer2PfsNode {
+        let node = Hammer2PfsNode {
+            pfs_id,
+            name: name.to_string(),
+            pfs_type,
+            cluster_quorum_votes: if pfs_type == Hammer2PfsType::Master {
+                1
+            } else {
+                0
+            },
+        };
+        self.pfs_nodes.insert(pfs_id, node.clone());
+        node
+    }
+
+    pub fn create_pfs_snapshot(
+        &mut self,
+        source_pfs_id: u32,
+        snap_name: &str,
+    ) -> Result<u32, &'static str> {
+        if let Some(src) = self.pfs_nodes.get(&source_pfs_id) {
+            let snap_id = (self.pfs_nodes.len() + 1) as u32;
+            let name = format!("{}@{}", src.name, snap_name);
+            self.create_pfs(snap_id, &name, Hammer2PfsType::Snapshot);
+            self.active_snapshots.push(name);
+            Ok(snap_id)
+        } else {
+            Err("PFS node not found")
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1834,6 +2048,7 @@ mod tests {
         assert_eq!(auditor.violations.len(), 1);
         assert_eq!(auditor.violations[0].attempted_path, "/etc/shadow");
     }
+
 
     #[test]
     fn test_steamos_atomic_ab_image_update_engine() {
