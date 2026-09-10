@@ -7,6 +7,7 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+<<<<<<< HEAD
 pub use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
@@ -19,6 +20,14 @@ pub struct ArchPkgInfoManifest {
     pub depends: Vec<String>,
     pub architecture: String,
 }
+=======
+pub use crate::package::{
+    ApkIndexManifest, AptDebManifest, ArchPkgInfoManifest, GentooEbuildMetadata, HaikuHpkgManifest,
+    SnapcraftManifest, XbpsManifest,
+};
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
+pub use crate::sigpkg::Version;
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 
 /// Description of Gentoo .ebuild specification metadata
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -103,10 +112,16 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
+<<<<<<< HEAD
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system;
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
+=======
+use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::universal_oop_system;
+pub use universal_oop_system::UniversalPackageManager;
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 
 pub use crate::package::PackagePriority;
 
@@ -237,7 +252,11 @@ impl UniversalPackageAdapter {
             package,
             version,
             architecture: "amd64".to_string(),
+<<<<<<< HEAD
             maintainer: "Debian Maintainer".to_string(),
+=======
+            maintainer: String::new(),
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
             depends,
             description,
             priority,
@@ -543,6 +562,7 @@ impl UniversalPackageAdapter {
             summary,
             confinement,
             plugs,
+            slots: Vec::new(),
         })
     }
 
@@ -868,6 +888,47 @@ impl UniversalPackageAdapter {
             name,
             version,
             summary,
+            requires,
+        })
+    }
+
+    /// Parses HaikuPorter .recipe files into native HaikuHpkgManifest attribute models
+    pub fn parse_haiku_recipe(&self, text: &str) -> Result<HaikuHpkgManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut summary = String::new();
+        let mut requires = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.starts_with("SUMMARY=") {
+                summary = line.trim_start_matches("SUMMARY=").trim_matches('"').to_string();
+            } else if line.starts_with("NAME=") || line.starts_with("pkgname=") {
+                name = line.split('=').nth(1).unwrap_or("").trim_matches('"').to_string();
+            } else if line.starts_with("VERSION=") || line.starts_with("pkgver=") {
+                version = line.split('=').nth(1).unwrap_or("").trim_matches('"').to_string();
+            } else if line.starts_with("REQUIRES=") {
+                let reqs = line.split('=').nth(1).unwrap_or("").trim_matches('"');
+                for r in reqs.split_whitespace() {
+                    if !r.is_empty() {
+                        requires.push(r.to_string());
+                    }
+                }
+            }
+        }
+
+        if name.is_empty() {
+            name = "haiku_recipe_app".to_string();
+        }
+        if version.is_empty() {
+            version = "1.0.0".to_string();
+        }
+
+        Ok(HaikuHpkgManifest {
+            name,
+            version,
+            summary,
+            architecture: String::from("x86_64"),
             requires,
         })
     }
@@ -1672,18 +1733,19 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let raw = foreign_name.trim().to_lowercase();
-        let clean = if let Some(stripped) = raw.strip_prefix("so:") {
+        let clean_prefix = if let Some(stripped) = raw.strip_prefix("so:") {
             if stripped.starts_with("libc.") {
-                "libc"
+                "libc".to_string()
             } else {
-                stripped.split('.').next().unwrap_or(stripped)
+                stripped.split('.').next().unwrap_or(stripped).to_string()
             }
         } else if let Some(stripped) = raw.strip_prefix("cmd:") {
-            stripped
+            stripped.to_string()
         } else {
-            raw.as_str()
+            raw.clone()
         };
 
+<<<<<<< HEAD
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
@@ -1730,6 +1792,64 @@ impl UniversalDependencyMapper {
             "git" | "git-base" | "dev-vcs/git" => "git".to_string(),
             "cmake" | "dev-build/cmake" => "cmake".to_string(),
             _ => clean.to_string(),
+=======
+        // Strip category prefix if present (e.g. "dev-libs/openssl" -> "openssl")
+        let sans_category = if let Some((_cat, pkg)) = clean_prefix.split_once('/') {
+            pkg.to_string()
+        } else {
+            clean_prefix
+        };
+
+        // Strip common dev suffixes (e.g., "-dev", "-devel")
+        let base_name = if let Some(s) = sans_category.strip_suffix("-devel") {
+            s.to_string()
+        } else if let Some(s) = sans_category.strip_suffix("-dev") {
+            s.to_string()
+        } else {
+            sans_category
+        };
+
+        match base_name.as_str() {
+            "libssl" | "libssl3" | "openssl" => "openssl".to_string(),
+            "libc6" | "glibc" | "musl" | "libc" => "libc".to_string(),
+            "zlib1g" | "zlib" => "zlib".to_string(),
+            "python3" | "python" => "python".to_string(),
+            "libcurl4" | "libcurl" | "curl" => "curl".to_string(),
+            "bash" => "bash".to_string(),
+            "libx11" | "xorgproto" | "xorg-x11-server" => "libx11".to_string(),
+            "wayland" => "wayland".to_string(),
+            "pipewire" => "pipewire".to_string(),
+            "dbus" => "dbus".to_string(),
+            "pkg-config" | "pkgconfig" | "pkgconf" => "pkgconf".to_string(),
+            "ncursesw" | "ncurses" => "ncurses".to_string(),
+            "readline" => "readline".to_string(),
+            "xz-utils" | "liblzma" | "xz" => "xz".to_string(),
+            "libzstd" | "zstd" => "zstd".to_string(),
+            "sqlite3" | "libsqlite3" | "sqlite" => "sqlite".to_string(),
+            "libgtk-3" | "gtk30" | "gtk3" => "gtk3".to_string(),
+            "qt5-base" | "libqt5core5a" | "qt5" => "qt5".to_string(),
+            "llvm" => "llvm".to_string(),
+            "gcc-c++" | "gcc" => "gcc".to_string(),
+            "libffi" => "libffi".to_string(),
+            "glib2" | "glib" => "glib".to_string(),
+            "pcre2" | "libpcre2" | "libpcre" | "pcre" => "pcre".to_string(),
+            "libuv" => "libuv".to_string(),
+            "openssh" => "openssh".to_string(),
+            "mesa" => "mesa".to_string(),
+            "git" => "git".to_string(),
+            "cmake" => "cmake".to_string(),
+            "libxml2" => "libxml2".to_string(),
+            "libyaml" => "libyaml".to_string(),
+            "systemd" => "systemd".to_string(),
+            "fastfetch" | "neofetch" => "fastfetch".to_string(),
+            "btop" | "htop" | "gotop" => "btop".to_string(),
+            "ripgrep" | "rg" => "ripgrep".to_string(),
+            "bat" | "bat-cat" => "bat".to_string(),
+            "fd" | "fd-find" => "fd".to_string(),
+            "zoxide" | "z" => "zoxide".to_string(),
+            "eza" | "exa" => "eza".to_string(),
+            _ => base_name,
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
         }
     }
 }
@@ -1979,7 +2099,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -1989,14 +2109,18 @@ impl UniversalPmCommandDispatcher {
                         "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
                         "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
                         "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
-                        "--print" | "--dryrun" => dry_run = true,
+                        "--print" | "--dryrun" | "--noconfirm" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
                     i += 1;
                 }
             }
+<<<<<<< HEAD
             "dnf" | "yum" | "zypper" | "microdnf" => {
+=======
+            "dnf" | "yum" | "zypper" | "microdnf" | "rpm" => {
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2128,10 +2252,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" => {
-                if pm == "pkg_delete" {
-                    operation = UniversalPmOperation::Remove;
-                }
+            "pkgin" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2204,9 +2325,11 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_add" | "pkg_info" => {
+            "pkg_add" | "pkg_delete" | "pkg_info" => {
                 if pm == "pkg_add" {
                     operation = UniversalPmOperation::Install;
+                } else if pm == "pkg_delete" {
+                    operation = UniversalPmOperation::Remove;
                 } else {
                     operation = UniversalPmOperation::QueryInfo;
                 }
@@ -3444,6 +3567,13 @@ requires {
             .unwrap();
         assert_eq!(pkg.name, "haiku_dep");
         assert!(engine.is_package_registered("haiku_dep"));
+
+        let recipe_text = "NAME=\"demo_app\"\nVERSION=\"2.0.0\"\nSUMMARY=\"Demo Recipe\"\nREQUIRES=\"haiku_lib\"\n";
+        let recipe_manifest = adapter.parse_haiku_recipe(recipe_text).unwrap();
+        assert_eq!(recipe_manifest.name, "demo_app");
+        assert_eq!(recipe_manifest.version, "2.0.0");
+        assert_eq!(recipe_manifest.summary, "Demo Recipe");
+        assert_eq!(recipe_manifest.requires, vec!["haiku_lib"]);
     }
 
     #[test]

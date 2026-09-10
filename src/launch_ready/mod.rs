@@ -15,6 +15,7 @@ extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::String;
+<<<<<<< HEAD
 =======
 extern crate alloc;
 
@@ -29,6 +30,8 @@ extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+=======
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -36,7 +39,7 @@ use alloc::vec::Vec;
 use alloc::format;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
+use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]

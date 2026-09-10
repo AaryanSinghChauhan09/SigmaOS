@@ -23,6 +23,7 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 
 ---
 
+<<<<<<< HEAD
 ## 📚 Documentation Index
 
 - [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
@@ -32,6 +33,15 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 - [Security Architecture](docs/security.md)
 - [Package Management](docs/package-manager.md)
 - [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
+=======
+## 🧩 Core Architecture & Features
+- **Boot to Web**: Minimal Linux (Buildroot) base, boots directly into Chromium in ~3s.
+- **Browser as Shell**: Workspaces, window management, and hardware interfaces powered by web apps.
+- **Unix Philosophy for Web Apps**: PWAs gain raw access to pipes, spawn, mmap, and `/dev`.
+- **Zero-Bloat Package Management**: Alpine packages installed directly via browser APIs.
+- **Strict Capabilities System**: Websites must explicitly request hardware/file access.
+- **Safe-Rust 12-Shard Microkernel**: Twelve shard taxonomy replacing 500+ legacy apps with native abstractions.
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 
 ---
 
@@ -132,3 +142,14 @@ For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and 
 ## 📄 License
 
 SigmaOS is licensed under the [MIT License](LICENSE).
+<<<<<<< HEAD
+=======
+
+---
+
+## 📜 Key Project Resources & Public Launch Documents
+- 🚀 **Public Launch Announcement**: [docs/LAUNCH_ANNOUNCEMENT.md](docs/LAUNCH_ANNOUNCEMENT.md)
+- 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
+- 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
+- ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453

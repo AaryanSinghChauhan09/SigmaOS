@@ -10,8 +10,11 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
+<<<<<<< HEAD
 use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
+=======
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -19,8 +22,11 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
+<<<<<<< HEAD
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
+=======
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
@@ -1240,6 +1246,104 @@ impl SovereignUniversalDistroBridge {
                     action, chroot_engine.is_active, self.mode
                 ))
             }
+<<<<<<< HEAD
+=======
+            "virtualization" | "virt" => {
+                Ok(format!(
+                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "input" => {
+                Ok(format!(
+                    "Dispatched libinput/evdev wscons input event mapping for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched ACPI/sysfs thermal zone governor throttling for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "syscall" => {
+                let mut translator = SovereignMultiArchSyscallTranslator::new(self.mode);
+                let sys_num = translator.translate_and_dispatch(action)?;
+                Ok(format!(
+                    "Dispatched multi-arch syscall translation for '{}' (nr: {}) under distro mode '{:?}'",
+                    action, sys_num, self.mode
+                ))
+            }
+            "device" => {
+                Ok(format!(
+                    "Dispatched udev/devd device node rule manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "crypto" => {
+                let _crypto_policies = SovereignKaslrWxAllocator::new(0x12345678);
+                Ok(format!(
+                    "Dispatched system-wide Crypto Policies and PQC attestation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched agentic OS AI task scheduler for prompt '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                let mut dtrace = SovereignDTraceEngine::new();
+                let probe_id = dtrace.register_probe(DTraceProvider::Sysinfo, "kernel", "cpu", action);
+                Ok(format!(
+                    "Dispatched eBPF/DTrace system observability probe #{} for '{}' under distro mode '{:?}'",
+                    probe_id, action, self.mode
+                ))
+            }
+            "desktop" => {
+                Ok(format!(
+                    "Dispatched Zenith desktop environment session manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched Gentoo/Arch sandboxed makepkg compiler toolchain for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched gettext/locale-gen internationalization catalog for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "bluetooth" => {
+                Ok(format!(
+                    "Dispatched BlueZ/netbt Bluetooth stack subsystem for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched OpenBSD PF/nftables stateful firewall filter for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "diagnostics" => {
+                Ok(format!(
+                    "Dispatched ABRT/crashdump diagnostic telemetry analyzer for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "recovery" => {
+                Ok(format!(
+                    "Dispatched openSUSE Snapper/ZFS boot environment recovery for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+>>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
             "time" => {
                 Ok(format!(
                     "Dispatched Chrony/NTP clock synchronization for target '{}' under distro mode '{:?}'",
