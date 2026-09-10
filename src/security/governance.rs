@@ -1,13 +1,10 @@
 //! Security, Privacy & Governance Framework (Items 61-80)
 //! Comprehensive Security, Privacy, and Open-Source Governance Suite for SigmaOS
 
-<<<<<<< HEAD
-=======
 #![no_std]
 
 extern crate alloc;
 
->>>>>>> origin/jules-11419381740832472292-50948cbf
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
