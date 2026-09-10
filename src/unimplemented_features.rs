@@ -1880,24 +1880,30 @@ pub trait BareMetalUnifiedPeripheral {
 
 pub struct LegacyPioController {
     pub port_base: u16,
+    pub power_state: PowerState,
 }
 
 impl BareMetalUnifiedPeripheral for LegacyPioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+    fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
 pub struct ModernMmioController {
     pub mmio_base: u64,
+    pub power_state: PowerState,
 }
 
 impl BareMetalUnifiedPeripheral for ModernMmioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+    fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
 pub struct BareMetalUnifiedPeripheralManager {
@@ -1927,7 +1933,7 @@ impl Default for BareMetalUnifiedPeripheralManager {
 
 // 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
 #[derive(Debug, Clone, Copy)]
-pub struct UdfInstruction {
+pub struct SpecUdfInstruction {
     pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
     pub reg: u8,  // R0 - R7
     pub addr: u64,
@@ -1946,7 +1952,7 @@ impl UdfVm {
         }
     }
 
-    pub fn execute(&mut self, bytecode: &[UdfInstruction]) -> Result<u64, &'static str> {
+    pub fn execute(&mut self, bytecode: &[SpecUdfInstruction]) -> Result<u64, &'static str> {
         self.pc = 0;
         while self.pc < bytecode.len() {
             let inst = bytecode[self.pc];
@@ -1970,7 +1976,7 @@ impl Default for UdfVm {
 
 // 6.3 Declarative Package Resolution SAT Solver
 #[derive(Debug, Clone, Copy)]
-pub struct PackageNode {
+pub struct SpecPackageNode {
     pub id: u32,
     pub version: u32,
     pub req_min: u32,
@@ -1982,7 +1988,7 @@ pub struct ConstraintSatSolver;
 impl ConstraintSatSolver {
     pub fn new() -> Self { Self }
 
-    pub fn resolve_satisfiability(&self, packages: &[PackageNode]) -> Result<bool, &'static str> {
+    pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
         for pkg in packages {
             if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
                 return Err("Constraint conflict detected");
@@ -1998,14 +2004,14 @@ impl Default for ConstraintSatSolver {
 
 // 6.4 JBD2-Style Crash-Resilient Transactional Ledger
 #[derive(Debug, Clone, Copy)]
-pub struct TransactionBlock {
+pub struct SpecTransactionBlock {
     pub tx_id: u64,
     pub target_addr: u64,
     pub crc32c_hash: u32,
 }
 
 pub struct Jbd2TransactionLedger {
-    pub ring_blocks: [TransactionBlock; 16],
+    pub ring_blocks: [SpecTransactionBlock; 16],
     pub head: usize,
     pub current_merkle_root: u32,
 }
@@ -2013,7 +2019,7 @@ pub struct Jbd2TransactionLedger {
 impl Jbd2TransactionLedger {
     pub fn new() -> Self {
         Self {
-            ring_blocks: [TransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
+            ring_blocks: [SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
             head: 0,
             current_merkle_root: 0x1234_5678,
         }
@@ -2025,7 +2031,7 @@ impl Jbd2TransactionLedger {
         let mut crc = 0u32;
         for &b in data { crc = crc.wrapping_add(b as u32); }
 
-        self.ring_blocks[self.head] = TransactionBlock {
+        self.ring_blocks[self.head] = SpecTransactionBlock {
             tx_id,
             target_addr,
             crc32c_hash: crc,
@@ -2039,7 +2045,7 @@ impl Jbd2TransactionLedger {
         if self.head > 0 {
             self.head -= 1;
             self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
-            self.ring_blocks[self.head] = TransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 };
+            self.ring_blocks[self.head] = SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 };
         }
     }
 }

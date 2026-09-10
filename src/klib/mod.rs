@@ -50,6 +50,14 @@ pub mod uuid;
 pub mod buddy_allocator;
 pub mod hash;
 
+pub mod string {
+    pub use crate::klib::custom_string::SigmaString;
+}
+
+pub mod vec {
+    pub use std::vec::Vec;
+}
+
 // Re-exports
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};

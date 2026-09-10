@@ -528,7 +528,7 @@ fn cmd_verify(args: &[String]) {
     let name = &args[0];
     let store = ContentAddressedStore::new("/var/lib/sigpkg/store".to_string());
     let pkg: Package = match store.get(name) {
-        Some(p) => p.clone(),
+        Some(p) => (*p).clone(),
         None => {
             eprintln!("sigpkg: package '{}' not found", name);
             exit(1);
