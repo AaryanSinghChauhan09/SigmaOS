@@ -32,6 +32,8 @@ pub mod endeavour;
 pub mod federation;
 pub mod fedora;
 pub use fedora::*;
+pub mod fedora_missing_components;
+pub use fedora_missing_components::*;
 pub mod fedora_domination;
 pub use fedora_domination::*;
 // pub mod freebsd_jails;
