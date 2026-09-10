@@ -321,6 +321,9 @@ pub use governance::{
 //     StandardStreamController, StandardStreamHandle, StreamBufferMode, StreamTeeSpliceRouter,
 //     STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO,
 // };
+pub mod arch;
+pub use arch::{ArchitectureClass, CpuPageTableMode, IsaVectorCapabilities, SovereignMultiArchHalEngine};
+
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, Message, MemoryBlock, PAGE_SIZE,
     Priority, Process, ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler,

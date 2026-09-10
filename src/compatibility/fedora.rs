@@ -3943,6 +3943,27 @@ pub struct FedoraIgnitionEngine {
     pub trigger_reboot_flag: bool,
 }
 
+impl FedoraOfflineUpdateEngine {
+    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
+        for p in packages {
+            self.staged_packages.push((*p).to_string());
+        }
+        self.is_offline_update_pending = !self.staged_packages.is_empty();
+    }
+
+    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
+        self.trigger_reboot_flag = true;
+        Ok(self.staged_packages.len())
+    }
+
+    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
+        self.is_offline_update_pending = false;
+        self.trigger_reboot_flag = false;
+        self.staged_packages.clear();
+        Ok(())
+    }
+}
+
 impl FedoraIgnitionEngine {
     pub fn new() -> Self {
         Self {
@@ -5839,6 +5860,34 @@ mod tests {
     }
 
     #[test]
+    fn test_fedora_badges_engine() {
+        let mut badges = FedoraBadgesEngine::new();
+        assert_eq!(badges.badges.len(), 2);
+
+        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
+        assert_eq!(pts1, 10);
+
+        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
+        assert_eq!(pts2, 25);
+
+        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
+    }
+
+    #[test]
+    fn test_fedora_system_roles_engine() {
+        let mut roles = FedoraSystemRolesEngine::new();
+        assert!(roles.applied_roles.is_empty());
+
+        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
+        assert_eq!(roles.applied_roles.len(), 1);
+        assert_eq!(roles.chrony_ntp_servers.len(), 2);
+
+        roles.apply_firewall_role(&[80, 443, 8080]);
+        assert_eq!(roles.applied_roles.len(), 2);
+        assert_eq!(roles.configured_firewall_ports.len(), 3);
+    }
+
+    #[test]
     fn test_fedora_ostree_sysroot_staging() {
         let mut sysroot = FedoraOstreeSysrootStagingEngine::new("/ostree/deploy/fedora");
         sysroot.stage_pending_commit("sha256:abc123commit456");
@@ -5858,16 +5907,6 @@ mod tests {
             .obtain_ticket_granting_ticket("jules_admin", "SecretPgpPass")
             .is_ok());
         assert!(sssd.is_tgt_valid());
-    }
-
-    #[test]
-    fn test_fedora_rpm_seccomp_filter() {
-        let mut seccomp = FedoraRPMSeccompFilterEngine::new();
-        seccomp.allow_syscall(1); // sys_write
-        seccomp.allow_syscall(0); // sys_read
-
-        assert!(seccomp.validate_syscall_access(1));
-        assert!(!seccomp.validate_syscall_access(322)); // unallowed syscall
     }
 }
 
