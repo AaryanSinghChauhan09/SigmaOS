@@ -728,6 +728,113 @@ impl FedoraMediaWriterEngine {
 }
 
 // =========================================================================
+// 11. ASK FEDORA KNOWLEDGE BASE & DISCOURSE DISPATCH ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AskFedoraTopic {
+    pub topic_id: usize,
+    pub title: String,
+    pub category: String, // "Common Issues", "Desktop", "Server", "Kinoite/Silverblue"
+    pub author: String,
+    pub solution_body: Option<String>,
+}
+
+pub struct AskFedoraKnowledgeEngine {
+    pub topics: BTreeMap<usize, AskFedoraTopic>,
+    pub next_topic_id: usize,
+}
+
+impl AskFedoraKnowledgeEngine {
+    pub fn new() -> Self {
+        Self {
+            topics: BTreeMap::new(),
+            next_topic_id: 1,
+        }
+    }
+
+    pub fn create_topic(&mut self, title: &str, category: &str, author: &str) -> usize {
+        let id = self.next_topic_id;
+        self.next_topic_id += 1;
+
+        self.topics.insert(
+            id,
+            AskFedoraTopic {
+                topic_id: id,
+                title: title.to_string(),
+                category: category.to_string(),
+                author: author.to_string(),
+                solution_body: None,
+            },
+        );
+
+        id
+    }
+
+    pub fn set_solution(&mut self, topic_id: usize, solution: &str) -> bool {
+        if let Some(topic) = self.topics.get_mut(&topic_id) {
+            topic.solution_body = Some(solution.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn search_knowledge_base(&self, query: &str) -> Vec<AskFedoraTopic> {
+        let q = query.to_lowercase();
+        self.topics
+            .values()
+            .filter(|t| t.title.to_lowercase().contains(&q) || t.category.to_lowercase().contains(&q))
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for AskFedoraKnowledgeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 12. FEDORA HYPERREADINESS STANDARDIZATION & VERIFICATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraHyperreadinessReport {
+    pub is_rpm_ostree_immutable: bool,
+    pub is_selinux_enforcing: bool,
+    pub is_wayland_active: bool,
+    pub is_pipewire_default: bool,
+    pub readiness_score_percent: u8,
+}
+
+pub struct FedoraHyperreadinessEngine;
+
+impl FedoraHyperreadinessEngine {
+    pub fn evaluate_system_hyperreadiness(
+        ostree_active: bool,
+        selinux_active: bool,
+        wayland_active: bool,
+        pipewire_active: bool,
+    ) -> FedoraHyperreadinessReport {
+        let mut score = 0u8;
+        if ostree_active { score += 25; }
+        if selinux_active { score += 25; }
+        if wayland_active { score += 25; }
+        if pipewire_active { score += 25; }
+
+        FedoraHyperreadinessReport {
+            is_rpm_ostree_immutable: ostree_active,
+            is_selinux_enforcing: selinux_active,
+            is_wayland_active: wayland_active,
+            is_pipewire_default: pipewire_active,
+            readiness_score_percent: score,
+        }
+    }
+}
+
+// =========================================================================
 // MASTER SUITE
 // =========================================================================
 
@@ -866,5 +973,25 @@ mod tests {
         let image = b"FEDORA_LIVE_ISO_IMAGE_BYTES";
         assert!(FedoraMediaWriterEngine::verify_image_checksum(image, "00000000"));
         assert!(FedoraMediaWriterEngine::write_image_to_usb_device("/dev/sdb", image.len()).is_ok());
+    }
+
+    #[test]
+    fn test_ask_fedora_knowledge_base() {
+        let mut kb = AskFedoraKnowledgeEngine::new();
+        let topic_id = kb.create_topic("How to upgrade to Fedora 40?", "Desktop", "alice");
+        assert_eq!(topic_id, 1);
+        assert!(kb.set_solution(topic_id, "Run dnf system-upgrade download --releasever=40"));
+
+        let results = kb.search_knowledge_base("Fedora 40");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].solution_body, Some("Run dnf system-upgrade download --releasever=40".to_string()));
+    }
+
+    #[test]
+    fn test_fedora_hyperreadiness_engine() {
+        let report = FedoraHyperreadinessEngine::evaluate_system_hyperreadiness(true, true, true, true);
+        assert_eq!(report.readiness_score_percent, 100);
+        assert!(report.is_rpm_ostree_immutable);
+        assert!(report.is_selinux_enforcing);
     }
 }
