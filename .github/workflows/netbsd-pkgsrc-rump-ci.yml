@@ -1,4 +1,7 @@
 name: NetBSD pkgsrc & Rump Kernel Subsystem CI
+permissions:
+  contents: read
+
 
 on:
   push:
@@ -9,6 +12,7 @@ on:
 jobs:
   netbsd-pkgsrc-rump:
     name: NetBSD pkgsrc Package Manager & Rump Kernel Virtual Server Audit
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

@@ -1,4 +1,7 @@
 name: Fedora COPR Mock Chroot & SELinux Policy CI
+permissions:
+  contents: read
+
 
 on:
   push:
@@ -9,6 +12,7 @@ on:
 jobs:
   fedora-copr-mock:
     name: Fedora Mock Cleanroom RPM Build & SELinux Policy Audit
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
