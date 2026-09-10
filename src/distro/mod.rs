@@ -8,6 +8,8 @@ pub mod parrot_security;
 };
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
+pub mod arch_missing_components;
+pub use arch_missing_components::*;
 pub use arch::{
     AlpmHook, AlpmHookWhen, ArchGpgKey, ArchKeyringEngine, ArchPacmanHookManager,
     ArchReflectorEngine, ArchinstallEngine, FilesystemType as ArchFilesystemType,
@@ -225,6 +227,11 @@ pub use sovereign_distro_dominance::{
     ZfsBtrfsHybridSelfHealingCoW,
 };
 
+pub mod opensuse;
+pub use opensuse::{
+    MicroOsSnapshot, MicroOsSnapshotState, OpenSuseMicroOsEngine, OpenSuseYastPatternEngine,
+    YastPattern,
+};
 pub mod nextgen_innovations;
 pub mod universal_distro_super_matrix;
 pub mod void_xbps_src;
