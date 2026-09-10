@@ -6,7 +6,6 @@
 //! - `MintUpdateSafetyManager`: Tiered package update safety policy levels (1..5) with kernel protection
 //! - `MintstickUsbFormatterEngine`: Low-level USB image writer, ISO burner, and FAT32/exFAT formatter
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::format;

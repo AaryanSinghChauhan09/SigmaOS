@@ -7,9 +7,10 @@ This document defines operational guidelines, security policies, and verificatio
 ## 1. Core Principles for AI Agents
 
 1. **Zero External Third-Party Dependencies:**
-   - SigmaOS strictly follows a zero-dependency `#![no_std]` design philosophy (see `docs/CONTRIBUTOR_AND_AI_AGENT_RULES.md`).
-   - Do NOT add external crates under `[dependencies]` in `Cargo.toml`.
-   - Use `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`) and native `#![no_std]` structures.
+   - SigmaOS strictly follows a **zero external crate** philosophy: `[dependencies]` in Cargo.toml must remain EMPTY.
+   - See ARCHITECTURE.md for the decision to use std-based architecture (approved Sept 4, 2026).
+   - Use **std library** primitives (std::vec::Vec, std::string::String, std::collections::HashMap).
+   - Implement custom functionality in safe Rust without relying on external crates.
 
 2. **Cross-OS Subsystem Interoperability (Linux/BSD Distros):**
    - Every security or kernel component must maintain compatibility across Linux and BSD distribution modes (`LinuxArch`, `LinuxDebian`, `LinuxFedora`, `LinuxNix`, `FreeBsd`, `OpenBsd`, `NetBsd`, `DragonFlyBsd`, `SolarisIllumos`, etc.).
@@ -35,10 +36,17 @@ This document establishes the mandatory engineering standards, architectural rul
 
 ## Core Engineering Rules & Mandates
 
-### 1. Zero External Dependency Mandate (`klib`)
-- All kernel, system, and userland code must be written in **pure safe Rust** (`#![no_std]`).
+### 1. Standard Library Based Architecture (DECISION: Sept 4, 2026)
+- SigmaOS uses **Rust standard library (std)** as its primary foundation (see ARCHITECTURE.md).
+- All kernel, system, and userland code must be written in **pure safe Rust** using std facilities.
+- External third-party crates (`[dependencies]` in Cargo.toml) remain **strictly prohibited**.
 - External C libraries (`libc`, `malloc`, `free`), Python runtimes, Node.js V8, or unverified crates are strictly prohibited.
-- Use native `klib` primitives in `src/klib/` for string parsing, hashing, cryptography, data structures, and memory allocation.
+- Use std primitives (Vec, String, HashMap, BTreeMap) and implement custom subsystems via native klib when needed.
+
+### 1.1 Zero External Third-Party Crates Mandate
+- Cargo.toml `[dependencies]` section must remain **EMPTY**.
+- All functionality must be implemented using Rust std library and custom safe-Rust code.
+- No external crates allowed under any circumstances.
 
 ### 2. Kernel ABI (KABI) Binary Layout Stability
 - Kernel exports and syscall structures (`src/kernel/exports.rs`) must maintain backward binary layout compatibility.

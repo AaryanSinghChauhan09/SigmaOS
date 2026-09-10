@@ -5,7 +5,6 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 #![allow(unexpected_cfgs)]
-extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;

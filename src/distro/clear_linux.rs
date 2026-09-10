@@ -6,7 +6,6 @@
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;

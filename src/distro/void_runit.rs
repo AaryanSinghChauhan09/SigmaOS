@@ -5,7 +5,6 @@
  * health checking, and automatic restart policy governance.
  */
 
-extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::String;

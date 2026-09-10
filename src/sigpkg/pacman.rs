@@ -1,6 +1,5 @@
 
 #[cfg(test_disabled)]
-extern crate std;
 
 use std::vec::Vec;
 /// Arch Linux-inspired rolling release build engine (makepkg) and package manager (pacman) for SigmaOS.

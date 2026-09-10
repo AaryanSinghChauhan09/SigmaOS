@@ -6,7 +6,6 @@
 // eBPF-inspired lightweight syscall policy verifiers,
 // and FreeBSD Capsicum descriptor capability delegation.
 
-extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;

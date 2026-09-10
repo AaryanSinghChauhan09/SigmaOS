@@ -28,8 +28,7 @@ pub mod wandr;
 
 pub use agentic_os_runtime::{
     AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,
-    EbpfNetworkFilter, EphemeralAgentSandbox, GpuBackend, HybridContainerRuntime, LocalLlmDaemon,
-    LocalLlmSystemDaemon, OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
+    EbpfNetworkFilter, GpuBackend, LocalLlmDaemon,
 };
 
 pub use agentic_os_runtime::{

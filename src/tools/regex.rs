@@ -1,7 +1,6 @@
 // High-Performance Regular Expression Engine for SigmaOS
 // Provides zero-dependency pattern matching, character classes, wildcards, and substring extraction under #![no_std].
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

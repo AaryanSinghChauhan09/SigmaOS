@@ -1,7 +1,6 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
-
-extern crate alloc;
+#![allow(ambiguous_glob_reexports)]
 
 // Core working modules
 pub mod open_source_os_gap_closure;

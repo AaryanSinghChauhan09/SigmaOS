@@ -1,7 +1,6 @@
 // Sovereign Wi-Fi MAC/PHY Protocol Stack & Driver Engine for SigmaOS
 // Provides zero-dependency 802.11a/b/g/n/ac/ax/be frame management, WPA3 authentication, and channel scanning.
 
-extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;

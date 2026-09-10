@@ -1,7 +1,6 @@
 // Open-Source CLI Tools Parity Subsystem for SigmaOS
 // Zero-dependency, safe Rust, #![no_std] compliant architecture
 
-extern crate alloc;
 
 use alloc::format;
 use alloc::string::{String, ToString};

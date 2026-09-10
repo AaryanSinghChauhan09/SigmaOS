@@ -3,7 +3,6 @@ use std::vec;
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
-extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 #[cfg(not(test))]

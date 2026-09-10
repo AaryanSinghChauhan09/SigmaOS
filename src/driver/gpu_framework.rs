@@ -3,7 +3,6 @@
 
 #![no_std]
 
-extern crate alloc;
 use alloc::string::{String, ToString};
 use crate::klib::Vec;
 use alloc::boxed::Box;
