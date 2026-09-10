@@ -8,11 +8,10 @@
 // - Distro Emulation Core: Linux Syscall ABI & BSD Kqueue Event Layer
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::String;
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]

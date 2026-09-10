@@ -376,6 +376,129 @@ impl Default for ArchAurWebRpcClient {
 }
 
 // ============================================================================
+// 5. Arch Linux Archive (ALA) Historical Snapshot Time Travel Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AlaSnapshotRecord {
+    pub timestamp: String, // e.g. "2024/01/15"
+    pub package_name: String,
+    pub package_version: String,
+    pub download_url: String,
+    pub sha256_checksum: String,
+}
+
+pub struct ArchLinuxArchiveEngine {
+    pub base_archive_url: String,
+    pub registered_snapshots: HashMap<String, Vec<AlaSnapshotRecord>>,
+}
+
+impl ArchLinuxArchiveEngine {
+    pub fn new() -> Self {
+        Self {
+            base_archive_url: "https://archive.archlinux.org/repos".to_string(),
+            registered_snapshots: HashMap::new(),
+        }
+    }
+
+    pub fn register_snapshot_record(&mut self, record: AlaSnapshotRecord) {
+        self.registered_snapshots
+            .entry(record.timestamp.clone())
+            .or_insert_with(Vec::new)
+            .push(record);
+    }
+
+    pub fn lookup_time_travel_package(
+        &self,
+        timestamp: &str,
+        package_name: &str,
+    ) -> Result<AlaSnapshotRecord, &'static str> {
+        let records = self
+            .registered_snapshots
+            .get(timestamp)
+            .ok_or("ALA: No historical snapshot found for target timestamp")?;
+
+        records
+            .iter()
+            .find(|r| r.package_name == package_name)
+            .cloned()
+            .ok_or("ALA: Package record not found in specified snapshot timestamp")
+    }
+
+    pub fn generate_mirrorlist_override(&self, timestamp: &str) -> String {
+        format!(
+            "Server = {}/{}\n",
+            self.base_archive_url.trim_end_matches('/'),
+            timestamp
+        )
+    }
+}
+
+impl Default for ArchLinuxArchiveEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 6. Arch Audit CVE Vulnerability Scanner Engine
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchVulnerabilityReport {
+    pub pkgname: String,
+    pub installed_version: String,
+    pub fixed_version: Option<String>,
+    pub cve_ids: Vec<String>,
+    pub severity: String, // "High", "Critical", "Medium", "Low"
+    pub issue_type: String,
+}
+
+pub struct ArchAuditScannerEngine {
+    pub known_advisories: HashMap<String, Vec<ArchVulnerabilityReport>>,
+}
+
+impl ArchAuditScannerEngine {
+    pub fn new() -> Self {
+        Self {
+            known_advisories: HashMap::new(),
+        }
+    }
+
+    pub fn register_advisory(&mut self, report: ArchVulnerabilityReport) {
+        self.known_advisories
+            .entry(report.pkgname.clone())
+            .or_insert_with(Vec::new)
+            .push(report);
+    }
+
+    pub fn audit_installed_packages(
+        &self,
+        installed_packages: &[(&str, &str)],
+    ) -> Vec<ArchVulnerabilityReport> {
+        let mut vulnerabilities = Vec::new();
+
+        for &(pkg, ver) in installed_packages {
+            if let Some(reports) = self.known_advisories.get(pkg) {
+                for r in reports {
+                    if r.installed_version == ver {
+                        vulnerabilities.push(r.clone());
+                    }
+                }
+            }
+        }
+
+        vulnerabilities
+    }
+}
+
+impl Default for ArchAuditScannerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -444,5 +567,42 @@ mod tests {
         let res = client.parse_rpc_response(json).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].name, "yay-bin");
+    }
+
+    #[test]
+    fn test_arch_linux_archive_engine() {
+        let mut ala = ArchLinuxArchiveEngine::new();
+        ala.register_snapshot_record(AlaSnapshotRecord {
+            timestamp: "2024/01/15".to_string(),
+            package_name: "linux".to_string(),
+            package_version: "6.7.0".to_string(),
+            download_url: "https://archive.archlinux.org/packages/l/linux/linux-6.7.0-1-x86_64.pkg.tar.zst".to_string(),
+            sha256_checksum: "abc123def456".to_string(),
+        });
+
+        let pkg = ala.lookup_time_travel_package("2024/01/15", "linux").unwrap();
+        assert_eq!(pkg.package_version, "6.7.0");
+
+        let mirror = ala.generate_mirrorlist_override("2024/01/15");
+        assert!(mirror.contains("https://archive.archlinux.org/repos/2024/01/15"));
+    }
+
+    #[test]
+    fn test_arch_audit_scanner_engine() {
+        let mut audit = ArchAuditScannerEngine::new();
+        audit.register_advisory(ArchVulnerabilityReport {
+            pkgname: "openssl".to_string(),
+            installed_version: "3.0.1".to_string(),
+            fixed_version: Some("3.0.2".to_string()),
+            cve_ids: vec!["CVE-2024-0001".to_string()],
+            severity: "High".to_string(),
+            issue_type: "buffer overflow".to_string(),
+        });
+
+        let installed = [("openssl", "3.0.1"), ("bash", "5.2")];
+        let vulns = audit.audit_installed_packages(&installed);
+        assert_eq!(vulns.len(), 1);
+        assert_eq!(vulns[0].pkgname, "openssl");
+        assert_eq!(vulns[0].cve_ids[0], "CVE-2024-0001");
     }
 }
