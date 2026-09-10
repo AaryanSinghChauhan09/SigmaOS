@@ -2,6 +2,7 @@
 // Core library for SigmaOS operating system
 
 // Core working modules
+pub mod open_source_os_gap_closure;
 pub mod accessibility;
 pub mod ai;
 pub mod audio;
@@ -49,9 +50,19 @@ pub use process::{
     SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
     WNOHANG, WUNTRACED,
 };
-pub mod access;
-pub mod community;
-pub mod open_source_os_gap_closure;
+pub mod linuxmint_inspirations;
+pub use linuxmint_inspirations::{
+    AppTheme, BulkyRenamer, CaptainInstaller, CaptainSource, ConfigBackend, DebPackage,
+    DesktopIconFlags, DiagnosticField, FsFormat, HypnotixIptvPlayer, IsolationMode, IptvProvider,
+    LanPeer, LanWarpEngine, MintConfigHub, MintDesktopEngine, MintLocaleEngine, MintMenuEngine,
+    MintMenuItem, MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintStickIsoVerifier,
+    MintUpgradeEngine, MintUpgradePhase, MintWelcomeFlow, NannyDecision, PartitionScheme,
+    ProviderType, RenameConflict, RenameRule, RenamedFile, RequestIncoming, SessionControlAction,
+    StickyNote, StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome,
+    TransferRequest, TvChannel, UsbDevice, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
+    WebEngineKind, Webapp, WebappManager, WelcomeStep, XAppImageViewer, XAppStatusIconBadgeManager,
+    XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
+};
 pub mod tools;
 pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;
@@ -265,6 +276,19 @@ pub use drivers::*;
 pub use drivers::distro_device_expansion::{
     AppleNvmeAnsDriver, AtherosAr9271WifiDriver, Esp32HciBtBridgeDriver, LogitechUnifyingHidDriver,
     NvidiaNouveauOpenGspDriver, UsbAudioClass2Driver,
+pub use driver::{
+    AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
+    DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
+    EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
+    I2cSpiGpioBusController, InputDriver, InputEvent, InputType, IsochannelMode,
+    IsolationRingLevel, LeAudioCodec, LinuxBsdWifi6e7Driver, LinuxUrb, LinuxUrbQueue,
+    MultiTouchSlot, NetBsdRumpDriverHost, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    Nvme2ZnsFabricsDriver, NvmeFabricsTransport, NvmeZoneDescriptor, NvmeZoneState,
+    OpenBsdDriverPledge, PacketSlot, StorageCommand, StorageDriver, StorageError, StorageType,
+    Uac3IntelHdaAudioDspDriver, UrbTransferType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+    Virgl3dCmd, Virgl3dResource, VirtioGpuVirgl3dDriver, WifiBand, WifiMloLink, WifiProtocolMode,
+    ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
     FileMode, FileType, FsError, Inode, VirtualFilesystem,

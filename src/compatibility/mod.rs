@@ -187,10 +187,15 @@ pub use mate_betsy::{
     MateBetsyCategory, MateBetsyPackage, MatePackagesBetsyEngine,
 };
 pub use mint_linux::{
-    Mint4WinInstallationConfig, Mint4WinInstallerEngine, MintAppMetadata, MintBackupTool,
-    MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert, MintReportSystem,
-    MintSoftwareManager, MintTimeshiftEngine,
-    TimeshiftSnapshot,
+    CinnamonPreset, CinnamonThemeEngine, Mint4WinInstallationConfig, Mint4WinInstallerEngine,
+    MintAppMetadata, MintBackupTool, MintCinnamonStyling, MintDriverInfo, MintDriverManager,
+    MintReportAlert, MintReportAlertSeverity, MintReportSystem, MintSoftwareManager,
+    MintTimeshiftEngine, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+    TimeshiftSystemRestorer,
+};
+pub use legacy_adapters::{
+    KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
 };
 
 pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};

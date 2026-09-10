@@ -2,6 +2,8 @@
 use crate::klib::btreemap::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use crate::security::capability::Permission;
+use crate::security::capability::{CapabilityGate, CapabilityToken};
 
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 

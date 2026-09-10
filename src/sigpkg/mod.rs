@@ -102,8 +102,8 @@ pub use universal_adapter::{
 };
 pub use sovereign_sigpkg::*;
 pub use universal_adapter::{
-    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuildV2, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
+    AppImageContainer, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
+    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
     UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
     UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
 };
@@ -160,6 +160,11 @@ pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
+pub use store::{BsdPkgRepositoryMirror, ContentAddressedStore, GentooPortageUseFlagMask, NixOsHermeticCasStore};
+pub use transaction::Transaction;
+pub use universal_adapter::{
+    UniversalPackageAdapter,
+};
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,

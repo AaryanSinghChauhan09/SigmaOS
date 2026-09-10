@@ -79,7 +79,20 @@ pub enum OfficialArchiveSource {
 }
 
 /// Repository configuration (Debian sources.list inspiration)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OfficialArchiveSource {
+    Main,
+    Universe,
+    Multiverse,
+    Restricted,
+}
+
 #[derive(Debug, Clone)]
+pub struct RepositoryGpgKey {
+    pub key_id: String,
+    pub fingerprint: String,
+}
+
 pub struct Repository {
     pub name: String,
     pub url: String,

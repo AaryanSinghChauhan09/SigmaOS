@@ -1114,6 +1114,7 @@ pub struct StatusFpoIncident {
 /// logs incidents, calculates uptime SLA percentages, and generates status reports.
 pub struct FedoraStatusFpoEngine {
     pub service_states: HashMap<String, StatusFpoServiceHealth>,
+    pub service_statuses: HashMap<String, FedoraServiceStatusState>,
     pub incidents: Vec<StatusFpoIncident>,
     pub total_checks: u64,
     pub successful_checks: u64,
@@ -1128,12 +1129,27 @@ impl FedoraStatusFpoEngine {
         states.insert("MirrorManager".to_string(), StatusFpoServiceHealth::Good);
         states.insert("Pagure".to_string(), StatusFpoServiceHealth::Good);
 
+        let mut statuses = HashMap::new();
+        statuses.insert("koji".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("bodhi".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("copr".to_string(), FedoraServiceStatusState::Good);
+        statuses.insert("pagure".to_string(), FedoraServiceStatusState::Good);
+
         Self {
             service_states: states,
+            service_statuses: statuses,
             incidents: Vec::new(),
             total_checks: 100,
             successful_checks: 100,
         }
+    }
+
+    pub fn set_service_status(&mut self, service: &str, state: FedoraServiceStatusState) {
+        self.service_statuses.insert(service.to_string(), state);
+    }
+
+    pub fn query_service_health(&self, service: &str) -> FedoraServiceStatusState {
+        *self.service_statuses.get(service).unwrap_or(&FedoraServiceStatusState::Good)
     }
 
     pub fn set_service_health(&mut self, service_name: &str, health: StatusFpoServiceHealth) {
@@ -2956,6 +2972,126 @@ pub struct TahrirBadgeAssertion {
     pub assertion_digest: String,
 }
 
+/// Fedora Tahrir User Avatar Record (Libravatar/Gravatar Compatible)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TahrirUserAvatar {
+    pub user_id: String,
+    pub email_sha256: String,
+    pub avatar_data: Vec<u8>,
+    pub mime_type: String,
+}
+
+/// Fedora Planet Blog Article Entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraPlanetPost {
+    pub post_id: String,
+    pub author_name: String,
+    pub title: String,
+    pub url: String,
+    pub published_epoch: u64,
+}
+
+/// Fedora "The New Hotness" Upstream Release Event
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaUpstreamRelease {
+    pub project_name: String,
+    pub latest_version: String,
+    pub homepage: String,
+    pub is_triggering_scratch_build: bool,
+}
+
+/// Fedora rpmautospec RPM Spec Changelog & Version Generator
+pub struct FedoraRpmAutoSpecEngine {
+    pub git_commit_count: u32,
+    pub git_commit_messages: Vec<String>,
+}
+
+impl FedoraRpmAutoSpecEngine {
+    pub fn new(commit_count: u32) -> Self {
+        FedoraRpmAutoSpecEngine {
+            git_commit_count: commit_count,
+            git_commit_messages: Vec::new(),
+        }
+    }
+
+    pub fn add_commit_log(&mut self, msg: &str) {
+        self.git_commit_messages.push(msg.to_string());
+    }
+
+    pub fn generate_autorelease(&self, base_release: u32) -> String {
+        format!("{}.{}", base_release, self.git_commit_count)
+    }
+
+    pub fn generate_autochangelog(&self) -> String {
+        let mut changelog = String::from("%autochangelog\n");
+        for msg in &self.git_commit_messages {
+            changelog.push_str(&format!("- {}\n", msg));
+        }
+        changelog
+    }
+}
+
+/// Fedora Service Status Indicator
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FedoraServiceStatusState {
+    Good,
+    MinorOutage,
+    MajorOutage,
+}
+
+
+/// Fedora FASJSON (Fedora Account System REST API) User Record
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FasjsonUserRecord {
+    pub username: String,
+    pub human_name: String,
+    pub email: String,
+    pub group_memberships: Vec<String>,
+}
+
+/// Fedora FASJSON Client Engine
+pub struct FedoraFasjsonClientEngine {
+    pub user_db: HashMap<String, FasjsonUserRecord>,
+}
+
+impl FedoraFasjsonClientEngine {
+    pub fn new() -> Self {
+        FedoraFasjsonClientEngine { user_db: HashMap::new() }
+    }
+
+    pub fn register_user(&mut self, username: &str, human_name: &str, email: &str, groups: &[&str]) {
+        self.user_db.insert(
+            username.to_string(),
+            FasjsonUserRecord {
+                username: username.to_string(),
+                human_name: human_name.to_string(),
+                email: email.to_string(),
+                group_memberships: groups.iter().map(|g| g.to_string()).collect(),
+            },
+        );
+    }
+
+    pub fn get_user_info(&self, username: &str) -> Option<&FasjsonUserRecord> {
+        self.user_db.get(username)
+    }
+
+    pub fn is_user_in_group(&self, username: &str, group: &str) -> bool {
+        if let Some(user) = self.get_user_info(username) {
+            user.group_memberships.iter().any(|g| g == group)
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraFasjsonClientEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora Tahrir User Identity, Avatar & OpenBadges API Engine
+/// Serves Libravatar-compatible avatar resolution and Fedora Badges OpenBadges v2/v3 assertions.
 pub struct FedoraTahrirIdentityApiEngine {
     pub avatars: HashMap<String, TahrirUserAvatar>,
 }
@@ -3153,6 +3289,7 @@ pub struct UpstreamReleaseEvent {
 /// Tracks upstream project releases, compares version semantics, maps Anitya project IDs
 /// to Fedora RPM packages, and dispatches `org.fedoraproject.prod.hotness.update` fedmsg events.
 pub struct FedoraTheNewHotnessEngine {
+    pub monitored_projects: Vec<AnityaUpstreamRelease>,
     pub mappings: Vec<AnityaPackageMapping>,
     pub release_events: Vec<UpstreamReleaseEvent>,
     pub messaging_engine: FedoraMessagingEngine,
@@ -3161,9 +3298,29 @@ pub struct FedoraTheNewHotnessEngine {
 impl FedoraTheNewHotnessEngine {
     pub fn new() -> Self {
         Self {
+            monitored_projects: Vec::new(),
             mappings: Vec::new(),
             release_events: Vec::new(),
             messaging_engine: FedoraMessagingEngine::new(),
+        }
+    }
+
+    pub fn register_upstream_project(&mut self, name: &str, homepage: &str) {
+        self.monitored_projects.push(AnityaUpstreamRelease {
+            project_name: name.to_string(),
+            latest_version: "1.0.0".to_string(),
+            homepage: homepage.to_string(),
+            is_triggering_scratch_build: false,
+        });
+    }
+
+    pub fn process_upstream_release_event(&mut self, name: &str, new_version: &str) -> Result<String, &'static str> {
+        if let Some(project) = self.monitored_projects.iter_mut().find(|p| p.project_name == name) {
+            project.latest_version = new_version.to_string();
+            project.is_triggering_scratch_build = true;
+            Ok(format!("TheNewHotness: Triggered Koji scratch build for {} version {}", name, new_version))
+        } else {
+            Err("Project not found in Anitya release monitor")
         }
     }
 
@@ -3270,6 +3427,21 @@ impl FedoraPlanetAggregationEngine {
             posts: Vec::new(),
             registered_feeds: Vec::new(),
         }
+    }
+
+    pub fn fetch_and_parse_feed(&mut self, author: &str, title: &str, url: &str, timestamp: u64) {
+        let post_id = format!("planet-{}", self.posts.len() + 1);
+        self.posts.push(FedoraPlanetPost {
+            post_id,
+            author_name: author.to_string(),
+            title: title.to_string(),
+            url: url.to_string(),
+            published_epoch: timestamp,
+        });
+    }
+
+    pub fn get_latest_posts(&self, limit: usize) -> Vec<&FedoraPlanetPost> {
+        self.posts.iter().take(limit).collect()
     }
 
     pub fn register_feed(&mut self, fas_account: &str, feed_url: &str) {
@@ -3937,6 +4109,50 @@ impl Default for FedoraToolbxContainerEngine {
 // =========================================================================
 // Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
 // =========================================================================
+
+#[derive(Debug, Clone, Default)]
+pub struct FedoraOfflineUpdateEngine {
+    pub is_offline_update_pending: bool,
+    pub staged_packages: Vec<String>,
+    pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
+        for p in packages {
+            self.staged_packages.push((*p).to_string());
+        }
+        self.is_offline_update_pending = !self.staged_packages.is_empty();
+    }
+
+    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
+        self.trigger_reboot_flag = true;
+        Ok(self.staged_packages.len())
+    }
+
+    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
+        self.is_offline_update_pending = false;
+        self.trigger_reboot_flag = false;
+        self.staged_packages.clear();
+        Ok(())
+    }
+}
+
+
+
+impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self {
+            staged_packages: Vec::new(),
+            is_offline_update_pending: false,
+            trigger_reboot_flag: false,
+        }
+    }
+}
 
 // =========================================================================
 // Fedora MirrorManager 2 (mirrormanager2) System Engine

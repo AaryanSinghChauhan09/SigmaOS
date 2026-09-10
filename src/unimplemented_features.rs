@@ -3257,10 +3257,10 @@ pub struct PuppyLinuxOverlayRamdiskEngine {
 }
 
 impl PuppyLinuxOverlayRamdiskEngine {
-    pub fn new(ram_size_mb: usize, ram_capacity_mb: u32) -> Self {
+    pub fn new(ram_size_mb: usize) -> Self {
         Self {
             ram_size_mb,
-            ram_capacity_mb,
+            ram_capacity_mb: (ram_size_mb as u32) * 2,
             loaded_sfs_modules: Vec::new(),
             persistence_save_file: None,
         }
@@ -3879,31 +3879,43 @@ mod extra_unimplemented_tests {
 // TECH MEDIA & BENCHMARK INTELLIGENCE AGGREGATOR ENGINE
 // =========================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TechMediaFeedItem {
-    pub source_name: String,
-    pub title: String,
-    pub category: String,
-    pub severity_score: u8,
+
+// =========================================================================
+// TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DocField {
+    pub fieldname: String,
+    pub fieldtype: String,
+    pub label: String,
+    pub reqd: bool,
 }
 
-pub struct TechMediaIntelligenceAggregatorEngine {
-    pub feed_items: Vec<TechMediaFeedItem>,
+#[derive(Debug, Clone)]
+pub struct FrappeFrameworkDocTypeEngine {
+    pub doctype_name: String,
+    pub fields: Vec<DocField>,
+    pub workflow_state: String,
+    pub is_submittable: bool,
 }
 
-impl TechMediaIntelligenceAggregatorEngine {
-    pub fn new() -> Self {
+impl FrappeFrameworkDocTypeEngine {
+    pub fn new(doctype_name: &str) -> Self {
         Self {
-            feed_items: Vec::new(),
+            doctype_name: doctype_name.to_string(),
+            fields: Vec::new(),
+            workflow_state: "Draft".to_string(),
+            is_submittable: true,
         }
     }
 
-    pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
-        self.feed_items.push(TechMediaFeedItem {
-            source_name: source.to_string(),
-            title: title.to_string(),
-            category: category.to_string(),
-            severity_score: severity,
+    pub fn add_field(&mut self, fieldname: &str, fieldtype: &str, label: &str, reqd: bool) {
+        self.fields.push(DocField {
+            fieldname: fieldname.to_string(),
+            fieldtype: fieldtype.to_string(),
+            label: label.to_string(),
+            reqd,
         });
     }
 

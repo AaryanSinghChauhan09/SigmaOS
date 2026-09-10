@@ -23,24 +23,17 @@
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
 #[cfg(not(any(feature = "standalone_test", test)))]
 
-
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
-
 #[cfg(any(feature = "standalone_test", test))]
-use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
+extern crate alloc;
+use alloc::format;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// Arch Linux pacman-contrib Utilities Engine
 pub struct ArchPacmanContribEngine {

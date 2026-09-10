@@ -4,6 +4,13 @@ use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use alloc::boxed::Box;
+// use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+pub use crate::package::manager::PackageState;
 
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
@@ -1518,6 +1525,14 @@ impl Default for PackageTriggerRegistry {
     }
 }
 
+
+#[derive(Debug, Clone)]
+pub struct DistroRepoRecord {
+    pub distro_name: String,
+    pub url: String,
+}
+
+
 // =========================================================================
 // Multi-Distro Package Adapter Execution Pipeline
 // =========================================================================
@@ -1553,6 +1568,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: String,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)

@@ -5,7 +5,11 @@
  * health checking, and automatic restart policy governance.
  */
 
-#[cfg(not(test))]
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 
 #[cfg(not(test))]
@@ -106,9 +110,69 @@ impl RunitSupervisor {
         self.services.insert(service.name.clone(), service);
     }
 
-    pub fn start_service(&mut self, name: &str) -> bool {
-        if let Some(service) = self.services.get_mut(name) {
-            service.start()
+    /// Start stage 1 (one-time initialization)
+    pub fn run_stage1(&mut self) {
+        self.stage = RunitStage::Stage1;
+        self.current_stage_num = 1;
+        println!("Running Stage 1: One-time system initialization");
+
+        // Run one-time initialization tasks
+        println!("Mounting virtual filesystems");
+        println!("Setting hostname");
+        println!("Initializing devices");
+    }
+
+    /// Start stage 2 (concurrent supervision)
+    pub fn run_stage2(&mut self) {
+        self.stage = RunitStage::Stage2;
+        self.current_stage_num = 2;
+        println!("Running Stage 2: Concurrent process supervision");
+
+        // Start all services respecting dependencies
+        let mut started = Vec::new();
+
+        let names: Vec<String> = self.services.keys().cloned().collect();
+        for name in names {
+            if self.can_start_service(&name, &started) {
+                if let Some(s) = self.services.get_mut(&name) {
+                    s.start();
+                    started.push(name.clone());
+                }
+            }
+        }
+    }
+
+    /// Start stage 3 (clean shutdown)
+    pub fn run_stage3(&mut self) {
+        self.stage = RunitStage::Stage3;
+        self.current_stage_num = 3;
+        println!("Running Stage 3: Clean system shutdown");
+
+        // Stop all services in reverse dependency order
+        let mut stopped = Vec::new();
+
+        let names: Vec<String> = self.services.keys().cloned().collect();
+        for name in names {
+            if self.can_stop_service(&name, &stopped) {
+                if let Some(s) = self.services.get_mut(&name) {
+                    s.stop();
+                    stopped.push(name.clone());
+                }
+            }
+        }
+
+        println!("Unmounting filesystems");
+    }
+
+    /// Check if service can start (dependencies satisfied)
+    fn can_start_service(&self, name: &str, started: &[String]) -> bool {
+        if let Some(service) = self.services.get(name) {
+            for dep in &service.dependencies {
+                if !started.contains(dep) {
+                    return false;
+                }
+            }
+            true
         } else {
             false
         }
@@ -149,7 +213,8 @@ impl RunitSupervisor {
 
     pub fn monitor_service_health(&mut self, name: &str, is_healthy: bool) -> Option<RunitServiceStatus> {
         if let Some(service) = self.services.get_mut(name) {
-            Some(service.check_health(is_healthy))
+            let state = service.check_health(is_healthy);
+            Some(state)
         } else {
             None
         }
