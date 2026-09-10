@@ -1,0 +1,39 @@
+name: 10 Automation Issue & PR Triage Bot
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  triage-welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Welcome New Contributor on Issue
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Thank you for opening an issue on **SigmaOS**! Our core maintainer team will review your report shortly.'
+            })
+
+      - name: Welcome New Contributor on Pull Request
+        if: github.event_name == 'pull_request_target'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Thank you for submitting a pull request to **SigmaOS**! Automated quality gates and security checks are now running.'
+            })

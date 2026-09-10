@@ -18,6 +18,8 @@ pub use comprehensive::{
     TaskState as LinuxTaskState, TaskStruct as LinuxTaskStruct, RcuSynchronizer as LinuxRcuSynchronizer,
     KqueueFilter as BsdKqueueFilter, Kevent as BsdKevent, KqueueMultiplexer as BsdKqueueMultiplexer,
     SysctlNode as BsdSysctlNode, SysctlRegistry as BsdSysctlRegistry,
+    SovereignIsaArchitecture, X86Registers, X64Registers, AArch64Registers, Riscv64Registers,
+    LoongArch64Registers, SovereignRegisterContext,
 };
 
 pub use arm_bx_formats::{

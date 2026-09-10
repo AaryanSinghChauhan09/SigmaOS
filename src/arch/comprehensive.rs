@@ -14,7 +14,130 @@ use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
-// 1. PROCESSOR ARCHITECTURE MODELS (x86_64 & ARMv8)
+// 1. MULTI-ARCHITECTURE ISA MODELS (x86, x86_64, AArch64, RISC-V 64, LoongArch64, PPC64LE, s390x)
+// =========================================================================
+
+/// Primary Instruction Set Architecture (ISA) classification
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SovereignIsaArchitecture {
+    X86,
+    X86_64,
+    AArch64,
+    Riscv64,
+    LoongArch64,
+    PowerPC64LE,
+    S390x,
+}
+
+impl SovereignIsaArchitecture {
+    pub const fn pointer_width_bits(&self) -> u32 {
+        match self {
+            Self::X86 => 32,
+            Self::X86_64
+            | Self::AArch64
+            | Self::Riscv64
+            | Self::LoongArch64
+            | Self::PowerPC64LE
+            | Self::S390x => 64,
+        }
+    }
+
+    pub const fn is_little_endian(&self) -> bool {
+        match self {
+            Self::S390x => false,
+            _ => true,
+        }
+    }
+}
+
+/// 32-bit x86 CPU register context
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct X86Registers {
+    pub eax: u32,
+    pub ebx: u32,
+    pub ecx: u32,
+    pub edx: u32,
+    pub esi: u32,
+    pub edi: u32,
+    pub ebp: u32,
+    pub esp: u32,
+    pub eip: u32,
+    pub eflags: u32,
+    pub cs: u16,
+    pub ds: u16,
+    pub ss: u16,
+    pub es: u16,
+    pub fs: u16,
+    pub gs: u16,
+}
+
+/// 64-bit x86_64 (x64) CPU register context
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct X64Registers {
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rsi: u64,
+    pub rdi: u64,
+    pub rbp: u64,
+    pub rsp: u64,
+    pub r8: u64,
+    pub r9: u64,
+    pub r10: u64,
+    pub r11: u64,
+    pub r12: u64,
+    pub r13: u64,
+    pub r14: u64,
+    pub r15: u64,
+    pub rip: u64,
+    pub rflags: u64,
+    pub cs: u16,
+    pub ss: u16,
+}
+
+/// 64-bit ARMv8/v9 AArch64 CPU register context
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct AArch64Registers {
+    pub x: [u64; 31],
+    pub sp: u64,
+    pub pc: u64,
+    pub pstate: u64,
+}
+
+/// 64-bit RISC-V (RV64GC) CPU register context
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct Riscv64Registers {
+    pub x: [u64; 32],
+    pub pc: u64,
+    pub sstatus: u64,
+}
+
+/// 64-bit LoongArch64 CPU register context
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct LoongArch64Registers {
+    pub r: [u64; 32],
+    pub pc: u64,
+    pub pstat: u64,
+}
+
+/// Unified multi-architecture CPU register state wrapper
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SovereignRegisterContext {
+    X86(X86Registers),
+    X64(X64Registers),
+    AArch64(AArch64Registers),
+    Riscv64(Riscv64Registers),
+    LoongArch64(LoongArch64Registers),
+}
+
+// =========================================================================
+// 1b. PROCESSOR ARCHITECTURE MODELS (x86_64 & ARMv8)
 // =========================================================================
 
 /// Models x86_64 4-level paging structures for virtual-to-physical translations

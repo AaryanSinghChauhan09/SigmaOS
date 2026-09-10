@@ -3,13 +3,11 @@
 //! This module provides automatic documentation generation from source code,
 //! including API documentation, architecture diagrams, and user guides.
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use std::string::ToString;
 
 /// Safely escapes HTML special characters to prevent DOM text reinterpretation / XSS
 pub fn escape_html(input: &str) -> String {
@@ -34,6 +32,7 @@ pub enum DocFormat {
     Html,
     Pdf,
     AsciiDoc,
+    PlainText,
 }
 
 /// Documentation section type
@@ -98,7 +97,32 @@ impl DocGenerator {
             DocFormat::Html => self.generate_html(),
             DocFormat::Pdf => self.generate_pdf(),
             DocFormat::AsciiDoc => self.generate_asciidoc(),
+            DocFormat::PlainText => self.generate_plain_text(),
         }
+    }
+
+    /// Generate Plain Text documentation
+    fn generate_plain_text(&self) -> Result<String, String> {
+        let mut output = String::new();
+
+        if !self.metadata.is_empty() {
+            output.push_str("=== METADATA ===\n");
+            for (key, value) in &self.metadata {
+                output.push_str(&format!("{}: {}\n", key, value));
+            }
+            output.push_str("\n");
+        }
+
+        let mut sorted_entries = self.entries.clone();
+        sorted_entries.sort_by_key(|e| e.order);
+
+        for entry in &sorted_entries {
+            output.push_str(&format!("[ SECTION: {} ]\n", entry.title.to_uppercase()));
+            output.push_str(&entry.content);
+            output.push_str("\n\n");
+        }
+
+        Ok(output)
     }
 
     /// Generate PDF documentation (Simulated PDF document layout structure)
@@ -121,7 +145,11 @@ impl DocGenerator {
         content_stream.push_str("ET");
 
         output.push_str("3 0 obj\n<< /Type /Page /Parent 2 0 R /Contents 4 0 R >>\nendobj\n");
-        output.push_str(&format!("4 0 obj\n<< /Length {} >>\nstream\n{}\nendstream\nendobj\n", content_stream.len(), content_stream));
+        output.push_str(&format!(
+            "4 0 obj\n<< /Length {} >>\nstream\n{}\nendstream\nendobj\n",
+            content_stream.len(),
+            content_stream
+        ));
         output.push_str("xref\n0 5\n0000000000 65535 f\n");
         output.push_str("trailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n%%EOF");
 
@@ -163,7 +191,9 @@ impl DocGenerator {
         output.push_str("<html>\n<head>\n");
         output.push_str("<title>SigmaOS Documentation</title>\n");
         output.push_str("<style>\n");
-        output.push_str("body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }\n");
+        output.push_str(
+            "body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }\n",
+        );
         output.push_str("h1 { color: #333; }\n");
         output.push_str("h2 { color: #666; border-bottom: 1px solid #eee; }\n");
         output.push_str("code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }\n");
@@ -284,7 +314,6 @@ impl Default for ApiDocBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::string::ToString;
 
     #[test]
     fn test_doc_entry_creation() {
@@ -337,6 +366,27 @@ mod tests {
         let markdown = result.unwrap();
         assert!(markdown.contains("Test Section"));
         assert!(markdown.contains("Test content"));
+    }
+
+    #[test]
+    fn test_plain_text_generation() {
+        let mut generator = DocGenerator::new();
+        generator.add_metadata("title".to_string(), "Test Doc".to_string());
+
+        let entry = DocEntry::new(
+            "Architecture".to_string(),
+            "Sovereign Kernel Subsystem".to_string(),
+            SectionType::Architecture,
+            1,
+        );
+        generator.add_entry(entry);
+
+        let result = generator.generate(DocFormat::PlainText);
+        assert!(result.is_ok());
+        let text = result.unwrap();
+        assert!(text.contains("=== METADATA ==="));
+        assert!(text.contains("[ SECTION: ARCHITECTURE ]"));
+        assert!(text.contains("Sovereign Kernel Subsystem"));
     }
 
     #[test]
