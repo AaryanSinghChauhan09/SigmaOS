@@ -20,8 +20,10 @@ pub mod mint_system;
 pub mod mint_desktop;
 pub mod mint_menu;
 pub mod profession_tools;
+pub mod indian_profession_tools;
 
 pub use profession_tools::*;
+pub use indian_profession_tools::*;
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
