@@ -278,27 +278,11 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-<<<<<<< HEAD
     OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
     Ipk,        // IPK package (.ipk)
     Opkg,       // OPKG package (.opkg)
     SolarisIps, // Solaris IPS package (.p5p, .ips)
     GuixNar,    // Guix NAR archive (.nar)
-=======
-    Ipk,        // OpenWrt Package (.ipk)
-    Opkg,       // Yocto Package (.opkg)
-    SolarisIps, // Solaris IPS Package (.p5p, .ips)
-    GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,      // Spack HPC Package (.spack)
-    Conan,      // Conan C/C++ Package (.conan)
-    Wheel,      // Python Wheel (.whl)
-    Crate,      // Rust Cargo Crate (.crate)
-    Gem,        // Ruby Gem (.gem)
-    Nupkg,      // .NET NuGet Package (.nupkg)
-    Vcpkg,      // Vcpkg Package (.vcpkg)
-    NarInfo,    // Nix/Guix NAR Info (.narinfo)
-    Sysupdate,  // Systemd Sysupdate (.sysupdate)
->>>>>>> origin/jules-11419381740832472292-50948cbf
 }
 
 impl PackageFormat {
@@ -2822,7 +2806,6 @@ mod tests {
         assert_eq!(PackageFormat::from_filename("store.nar"), Some(PackageFormat::GuixNar));
         assert_eq!(PackageFormat::from_filename("base.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
     }
-<<<<<<< HEAD
 
     #[test]
     fn test_package_rollback() {
@@ -2833,8 +2816,6 @@ mod tests {
         let restored = engine.rollback(snap_id).unwrap();
         assert_eq!(restored, pkgs);
     }
-=======
->>>>>>> origin/jules-11419381740832472292-50948cbf
 
     #[test]
     fn test_all_package_format_strategies_and_adapters() {
@@ -2906,20 +2887,4 @@ mod tests {
 
         assert!(bad_pqc.enforce_sandbox().is_err());
     }
-<<<<<<< HEAD
 }
-=======
-}
-
-/// Alpine Linux .apk Package Format Adapter
-pub struct AlpineApkPackageAdapter;
-
-impl PackageMetadataAdapter for AlpineApkPackageAdapter {
-    fn adapt(&self, _raw_data: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(
-            UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string())
-                .with_format(PackageFormat::Apk),
-        )
-    }
-}
->>>>>>> origin/jules-11419381740832472292-50948cbf

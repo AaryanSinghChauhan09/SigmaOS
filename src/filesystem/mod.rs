@@ -13,24 +13,12 @@ pub mod mount_namespace;
 pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
-<<<<<<< HEAD
 pub mod erofs;
 pub mod ext4;
 pub use erofs::{ErofsEngine, ErofsInode, ErofsInodeFormat, ErofsSuperblock};
 pub use bsd_linux_innovations::{
     BsdSoftUpdatesEngine, GoboLinuxPathResolver, LinuxOverlayFsManager, LinuxProcSysfsEmulator,
     MetadataDependency, MetadataOp, OpenBsdMountEnforcer, SovereignFhsHierarchyEngine,
-=======
-pub mod sigma_fs;
-
-pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
-pub use vfs::{FileType, FsError, Inode, VirtualFileSystem, DirEntry, FileHandle, FileMode, VfsError, MountPoint};
-pub use sigma_fs::{
-    SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
-    JournalState, SovereignFsJournal, SovereignFhsHierarchy, DistributedSovereignFS,
-    PqcFileEncryptor, FileBlock, PseudoFilesystemNamespace, Blake3BlockDeduplicationEngine,
-    SigmaFsCrypt, SigmaFsVirtio,
->>>>>>> origin/jules-11419381740832472292-50948cbf
 };
 
 pub use archive::{

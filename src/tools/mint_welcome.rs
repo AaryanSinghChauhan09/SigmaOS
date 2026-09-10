@@ -178,29 +178,10 @@ impl MintWelcomeScreen {
         // System info
         html.push_str("<h2>System Information</h2>\n");
         html.push_str("<ul>\n");
-<<<<<<< HEAD
         html.push_str(&format!("<li>Edition: {}</li>\n", escape_html(&self.system_info.edition)));
         html.push_str(&format!("<li>Desktop: {}</li>\n", escape_html(&self.system_info.desktop_environment)));
         html.push_str(&format!("<li>Kernel: {}</li>\n", escape_html(&self.system_info.kernel_version)));
         html.push_str(&format!("<li>Architecture: {}</li>\n", escape_html(&self.system_info.architecture)));
-=======
-        html.push_str(&format!(
-            "<li>Edition: {}</li>\n",
-            escape_html(&self.system_info.edition)
-        ));
-        html.push_str(&format!(
-            "<li>Desktop: {}</li>\n",
-            escape_html(&self.system_info.desktop_environment)
-        ));
-        html.push_str(&format!(
-            "<li>Kernel: {}</li>\n",
-            escape_html(&self.system_info.kernel_version)
-        ));
-        html.push_str(&format!(
-            "<li>Architecture: {}</li>\n",
-            escape_html(&self.system_info.architecture)
-        ));
->>>>>>> origin/jules-11419381740832472292-50948cbf
         html.push_str("</ul>\n");
 
         // Content sections

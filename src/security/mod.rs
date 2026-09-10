@@ -53,23 +53,9 @@ pub mod unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-<<<<<<< HEAD
 pub mod kali_components;
 pub mod landlock;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
-=======
-pub mod hardening;
-pub mod deobfuscation;
-pub mod securelevels;
-pub mod audit;
-pub mod bsd_hardening;
-pub mod kali_components;
-pub mod kali_stack;
-pub mod pam;
-pub mod qubes_isolation;
-pub mod root_improvement;
-pub mod crypto_utils;
->>>>>>> origin/jules-11419381740832472292-50948cbf
 
 pub use kali_components::{
     HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,

@@ -5,13 +5,7 @@ use crate::klib::btreemap::BTreeMap;
 
 // Zero-dependency architecture: Use std:: primitives for no_std compatibility
 #[cfg(not(any(feature = "standalone_test", test)))]
-<<<<<<< HEAD
 use std::format;
-=======
-extern crate alloc;
-
-use alloc::format;
->>>>>>> origin/jules-11419381740832472292-50948cbf
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]

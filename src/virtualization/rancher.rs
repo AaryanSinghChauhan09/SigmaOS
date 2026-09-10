@@ -5,12 +5,6 @@ use std::string::{String, ToString};
 
 #[cfg(not(test))]
 use crate::security::capability::CapabilityToken;
-<<<<<<< HEAD
-=======
-extern crate alloc;
-
-use alloc::collections::BTreeMap;
->>>>>>> origin/jules-11419381740832472292-50948cbf
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
