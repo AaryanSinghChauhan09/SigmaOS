@@ -23,25 +23,14 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 
 ---
 
-<<<<<<< HEAD
-## 📚 Documentation Index
-
-- [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
-- [API Reference](docs/api-reference.md)
-- [Kernel Architecture](docs/kernel.md)
-- [Memory Management](docs/memory-management.md)
-- [Security Architecture](docs/security.md)
-- [Package Management](docs/package-manager.md)
-- [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
-=======
 ## 🧩 Core Architecture & Features
+
 - **Boot to Web**: Minimal Linux (Buildroot) base, boots directly into Chromium in ~3s.
 - **Browser as Shell**: Workspaces, window management, and hardware interfaces powered by web apps.
 - **Unix Philosophy for Web Apps**: PWAs gain raw access to pipes, spawn, mmap, and `/dev`.
 - **Zero-Bloat Package Management**: Alpine packages installed directly via browser APIs.
 - **Strict Capabilities System**: Websites must explicitly request hardware/file access.
 - **Safe-Rust 12-Shard Microkernel**: Twelve shard taxonomy replacing 500+ legacy apps with native abstractions.
->>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 
 ---
 
@@ -51,6 +40,7 @@ Get started with SigmaOS through our comprehensive wiki:
 
 - **[Quick Start](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Quick-Start)** - Build and run SigmaOS
 - **[Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture)** - Core design and subsystems
+- **[Future Development Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Future-Development-Roadmap)** - 7-phase strategic plan (2026-2029+)
 - **[Tier 1 Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Tier-1-Features)** - Feature matrix and status
 - **[Syscall Reference](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Syscall-Reference)** - Complete syscall documentation
 - **[Contributing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Contributing)** - Development guidelines
@@ -142,8 +132,6 @@ For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and 
 ## 📄 License
 
 SigmaOS is licensed under the [MIT License](LICENSE).
-<<<<<<< HEAD
-=======
 
 ---
 
@@ -152,4 +140,4 @@ SigmaOS is licensed under the [MIT License](LICENSE).
 - 📜 **Technical Whitepaper**: [docs/WHITEPAPER.md](docs/WHITEPAPER.md)
 - 📰 **Public Press Kit & Media Guide**: [docs/PRESS_KIT.md](docs/PRESS_KIT.md)
 - ⚖️ **Contributor Charter & Governance**: [docs/GOVERNANCE_CHARTER.md](docs/GOVERNANCE_CHARTER.md) / [CONTRIBUTING.md](CONTRIBUTING.md)
->>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
+
