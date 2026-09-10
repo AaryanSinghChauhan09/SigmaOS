@@ -180,6 +180,30 @@ impl PartialEq<SigmaString> for &str {
     }
 }
 
+impl fmt::Display for SigmaString {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl From<&str> for SigmaString {
+    fn from(s: &str) -> Self {
+        Self::from_str(s)
+    }
+}
+
+impl From<String> for SigmaString {
+    fn from(s: String) -> Self {
+        Self { data: s }
+    }
+}
+
+impl From<&String> for SigmaString {
+    fn from(s: &String) -> Self {
+        Self { data: s.clone() }
+    }
+}
+
 impl PartialEq<SigmaString> for String {
     fn eq(&self, other: &SigmaString) -> bool {
         *self == other.data
