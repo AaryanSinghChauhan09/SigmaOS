@@ -16,6 +16,13 @@ if [ -f "src/security/input_validation.rs" ]; then
     ./build/input_val_test
 fi
 
+if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
+    echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
+    mkdir -p build
+    rustc --test src/distro/linux_bsd_inspirations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/distro_inspirations_test
+    ./build/distro_inspirations_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
