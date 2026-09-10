@@ -9,6 +9,9 @@
 </head>
 <body>
 
+    <!-- Accessibility Skip Link -->
+    <a href="#terminal-win" class="skip-link">Skip to main desktop content</a>
+
     <!-- Ambient Mouse Glow -->
     <div id="mouse-glow"></div>
 
@@ -141,10 +144,10 @@
                             <div class="settings-group">
                                 <h4>Dynamic Theme Engine</h4>
                                 <div class="theme-selector-grid" role="group" aria-label="Color Theme Selection">
-                                    <button type="button" class="theme-button theme-cyan" onclick="setTheme('cyan')" aria-label="Switch to Cyan theme" title="Switch to Cyan theme">Cyan</button>
-                                    <button type="button" class="theme-button theme-gold" onclick="setTheme('gold')" aria-label="Switch to Gold theme" title="Switch to Gold theme">Gold</button>
-                                    <button type="button" class="theme-button theme-solar" onclick="setTheme('solar')" aria-label="Switch to Solar theme" title="Switch to Solar theme">Solar</button>
-                                    <button type="button" class="theme-button theme-crimson" onclick="setTheme('crimson')" aria-label="Switch to Crimson theme" title="Switch to Crimson theme">Crimson</button>
+                                    <button type="button" class="theme-button theme-cyan" onclick="setTheme('cyan')" aria-label="Switch to Cyan theme" title="Switch to Cyan theme" aria-pressed="false">Cyan</button>
+                                    <button type="button" class="theme-button theme-gold" onclick="setTheme('gold')" aria-label="Switch to Gold theme" title="Switch to Gold theme" aria-pressed="true">Gold</button>
+                                    <button type="button" class="theme-button theme-solar" onclick="setTheme('solar')" aria-label="Switch to Solar theme" title="Switch to Solar theme" aria-pressed="false">Solar</button>
+                                    <button type="button" class="theme-button theme-crimson" onclick="setTheme('crimson')" aria-label="Switch to Crimson theme" title="Switch to Crimson theme" aria-pressed="false">Crimson</button>
                                 </div>
                             </div>
                         </div>
@@ -572,6 +575,15 @@
     <script>
 // Fixed to resolve XSS and unused variables
 console.log("Loaded");
+
+function setTheme(themeName) {
+    document.body.className = (themeName === 'gold' || !themeName) ? '' : 'theme-' + themeName;
+    const buttons = document.querySelectorAll('.theme-button');
+    buttons.forEach(btn => {
+        const isCurrent = btn.classList.contains('theme-' + themeName);
+        btn.setAttribute('aria-pressed', isCurrent ? 'true' : 'false');
+    });
+}
 
 function switchMarketTab(tabId) {
     document.getElementById('market-core-shards').style.display = (tabId === 'core-shards') ? 'block' : 'none';
