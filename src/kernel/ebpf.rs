@@ -263,6 +263,7 @@ pub struct BpfRingBufferHeader {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BpfRingBufferSample {
     pub producer_offset: u32,
+    pub reserved_len: usize,
     pub payload: Vec<u8>,
     pub is_discarded: bool,
 }
@@ -303,6 +304,7 @@ impl BpfRingBufferEngine {
         let sample_id = self.samples.len();
         self.samples.push(BpfRingBufferSample {
             producer_offset: (self.producer_pos % self.capacity) as u32,
+            reserved_len: payload_len,
             payload: vec![0u8; payload_len],
             is_discarded: false,
         });
@@ -342,7 +344,7 @@ impl BpfRingBufferEngine {
             None
         } else {
             let sample = self.samples.remove(0);
-            let total_size = sample.payload.len() + 8;
+            let total_size = sample.reserved_len + 8;
             self.consumer_pos += total_size;
             if sample.is_discarded {
                 self.consume_next_sample()
