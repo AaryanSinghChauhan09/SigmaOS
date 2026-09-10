@@ -3,7 +3,6 @@ pub mod system_monitor;
 
 pub mod data_tools;
 pub mod display_manager;
-pub mod open_source_tools_parity;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
@@ -21,16 +20,15 @@ pub mod mint_system;
 pub mod mint_desktop;
 pub mod mint_menu;
 pub mod profession_tools;
-pub mod indian_profession_tools;
+pub mod open_source_tools_engine;
+
+pub use open_source_tools_engine::{
+    BatSyntaxHighlighterEngine, FzfFuzzyFinderEngine, FuzzyMatch, HtopProcessMonitorEngine,
+    ProcessMetrics, ProcessSortOrder, RsyncChunkSignature, RsyncDeltaOp, RsyncDeltaSyncEngine,
+    SyntaxTheme,
+};
 
 pub use profession_tools::*;
-pub use indian_profession_tools::*;
-
-pub use open_source_tools_parity::{
-    BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, FastfetchInfoEngine,
-    FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry, RipgrepRegexSearchEngine,
-    RofiCommandHudEngine, SearchMatch,
-};
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
@@ -94,7 +92,5 @@ pub use mint_menu::{
 };
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
-pub mod regex;
 pub mod native_userland_replacements;
-pub use regex::{RegexMatch, SovereignRegexEngine};
 pub use native_userland_replacements::MasterNativeUserlandReplacements;
