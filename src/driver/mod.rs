@@ -18,8 +18,6 @@ pub mod pci_enumeration;
 pub mod pods;
 pub mod rootkit;
 pub mod shims;
-pub mod gpu_framework;
-pub mod network_framework;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
