@@ -259,3 +259,11 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
     SovereignXdpCarpMeshEngine,
 };
+
+pub mod distro_inspiration_synthesis;
+pub use distro_inspiration_synthesis::{
+    AlpineLbuRamRootEngine, FreeBsdVnetJailEngine, LbuOverlayCommit, NetBsdRumpUserlandDriverEngine,
+    NixOsFlakeGcEngine, OpenBsdPledgeUnveilSentinel, RumpComponentKind, RumpUserlandDriver,
+    SovereignDistroInspirationSynthesisSuite, StoreGeneration, SyscallPromise, UnveilPermission,
+    VnetInterface, VnetJail,
+};
