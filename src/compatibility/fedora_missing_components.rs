@@ -728,109 +728,114 @@ impl FedoraMediaWriterEngine {
 }
 
 // =========================================================================
-// 11. ASK FEDORA KNOWLEDGE BASE & DISCOURSE DISPATCH ENGINE
+// MASTER SUITE
 // =========================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AskFedoraTopic {
-    pub topic_id: usize,
-    pub title: String,
-    pub category: String, // "Common Issues", "Desktop", "Server", "Kinoite/Silverblue"
-    pub author: String,
-    pub solution_body: Option<String>,
+// =========================================================================
+// 12. FEDORA CLEANROOM CHROOT BUILD ISOLATION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ChrootBuildEnvironment {
+    pub name: String,
+    pub target_arch: String,
+    pub is_initialized: bool,
+    pub installed_build_deps: Vec<String>,
 }
 
-pub struct AskFedoraKnowledgeEngine {
-    pub topics: BTreeMap<usize, AskFedoraTopic>,
-    pub next_topic_id: usize,
+pub struct FedoraCleanroomBuildEngine {
+    pub environments: BTreeMap<String, ChrootBuildEnvironment>,
 }
 
-impl AskFedoraKnowledgeEngine {
+impl FedoraCleanroomBuildEngine {
     pub fn new() -> Self {
         Self {
-            topics: BTreeMap::new(),
-            next_topic_id: 1,
+            environments: BTreeMap::new(),
         }
     }
 
-    pub fn create_topic(&mut self, title: &str, category: &str, author: &str) -> usize {
-        let id = self.next_topic_id;
-        self.next_topic_id += 1;
+    pub fn init_chroot(&mut self, env_name: &str, target_arch: &str) -> Result<(), &'static str> {
+        if self.environments.contains_key(env_name) {
+            return Err("Chroot: Environment already exists");
+        }
 
-        self.topics.insert(
-            id,
-            AskFedoraTopic {
-                topic_id: id,
-                title: title.to_string(),
-                category: category.to_string(),
-                author: author.to_string(),
-                solution_body: None,
-            },
-        );
+        let env = ChrootBuildEnvironment {
+            name: env_name.to_string(),
+            target_arch: target_arch.to_string(),
+            is_initialized: true,
+            installed_build_deps: vec!["bash".to_string(), "gcc".to_string(), "rpm-build".to_string()],
+        };
 
-        id
+        self.environments.insert(env_name.to_string(), env);
+        Ok(())
     }
 
-    pub fn set_solution(&mut self, topic_id: usize, solution: &str) -> bool {
-        if let Some(topic) = self.topics.get_mut(&topic_id) {
-            topic.solution_body = Some(solution.to_string());
-            true
+    pub fn build_srpm_in_chroot(&mut self, env_name: &str, srpm_name: &str) -> Result<String, &'static str> {
+        if let Some(env) = self.environments.get_mut(env_name) {
+            if !env.is_initialized {
+                return Err("Chroot: Environment not initialized");
+            }
+            Ok(format!("/var/lib/chroot/{}/result/{}.rpm", env_name, srpm_name))
         } else {
-            false
+            Err("Chroot: Environment not found")
         }
-    }
-
-    pub fn search_knowledge_base(&self, query: &str) -> Vec<AskFedoraTopic> {
-        let q = query.to_lowercase();
-        self.topics
-            .values()
-            .filter(|t| t.title.to_lowercase().contains(&q) || t.category.to_lowercase().contains(&q))
-            .cloned()
-            .collect()
     }
 }
 
-impl Default for AskFedoraKnowledgeEngine {
+impl Default for FedoraCleanroomBuildEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // =========================================================================
-// 12. FEDORA HYPERREADINESS STANDARDIZATION & VERIFICATION ENGINE
+// 11. FEDORA ATOMIC BOOT HEALTH CHECK & FALLBACK ENGINE
 // =========================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraHyperreadinessReport {
-    pub is_rpm_ostree_immutable: bool,
-    pub is_selinux_enforcing: bool,
-    pub is_wayland_active: bool,
-    pub is_pipewire_default: bool,
-    pub readiness_score_percent: u8,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BootHealthState {
+    Healthy,
+    Degraded,
+    Failed,
 }
 
-pub struct FedoraHyperreadinessEngine;
+pub struct FedoraAtomicBootHealthEngine {
+    pub current_boot_counter: u32,
+    pub max_boot_attempts: u32,
+    pub state: BootHealthState,
+    pub is_rollback_triggered: bool,
+}
 
-impl FedoraHyperreadinessEngine {
-    pub fn evaluate_system_hyperreadiness(
-        ostree_active: bool,
-        selinux_active: bool,
-        wayland_active: bool,
-        pipewire_active: bool,
-    ) -> FedoraHyperreadinessReport {
-        let mut score = 0u8;
-        if ostree_active { score += 25; }
-        if selinux_active { score += 25; }
-        if wayland_active { score += 25; }
-        if pipewire_active { score += 25; }
-
-        FedoraHyperreadinessReport {
-            is_rpm_ostree_immutable: ostree_active,
-            is_selinux_enforcing: selinux_active,
-            is_wayland_active: wayland_active,
-            is_pipewire_default: pipewire_active,
-            readiness_score_percent: score,
+impl FedoraAtomicBootHealthEngine {
+    pub fn new(max_attempts: u32) -> Self {
+        Self {
+            current_boot_counter: 0,
+            max_boot_attempts: max_attempts,
+            state: BootHealthState::Healthy,
+            is_rollback_triggered: false,
         }
+    }
+
+    pub fn record_boot_attempt(&mut self, is_successful: bool) -> BootHealthState {
+        if is_successful {
+            self.current_boot_counter = 0;
+            self.state = BootHealthState::Healthy;
+        } else {
+            self.current_boot_counter += 1;
+            if self.current_boot_counter >= self.max_boot_attempts {
+                self.state = BootHealthState::Failed;
+                self.is_rollback_triggered = true;
+            } else {
+                self.state = BootHealthState::Degraded;
+            }
+        }
+        self.state
+    }
+}
+
+impl Default for FedoraAtomicBootHealthEngine {
+    fn default() -> Self {
+        Self::new(3)
     }
 }
 
@@ -848,6 +853,7 @@ pub struct SovereignFedoraEcosystemSuite {
     pub toolbx: FedoraToolbxEngine,
     pub anaconda: FedoraAnacondaPartitionEngine,
     pub ignition: FedoraCoreOsIgnitionV3Engine,
+    pub boot_health: FedoraAtomicBootHealthEngine,
 }
 
 impl SovereignFedoraEcosystemSuite {
@@ -862,6 +868,7 @@ impl SovereignFedoraEcosystemSuite {
             toolbx: FedoraToolbxEngine::new(),
             anaconda: FedoraAnacondaPartitionEngine::new(),
             ignition: FedoraCoreOsIgnitionV3Engine::new(),
+            boot_health: FedoraAtomicBootHealthEngine::new(3),
         }
     }
 }
@@ -976,22 +983,24 @@ mod tests {
     }
 
     #[test]
-    fn test_ask_fedora_knowledge_base() {
-        let mut kb = AskFedoraKnowledgeEngine::new();
-        let topic_id = kb.create_topic("How to upgrade to Fedora 40?", "Desktop", "alice");
-        assert_eq!(topic_id, 1);
-        assert!(kb.set_solution(topic_id, "Run dnf system-upgrade download --releasever=40"));
+    fn test_atomic_boot_health_check() {
+        let mut health = FedoraAtomicBootHealthEngine::new(3);
+        assert_eq!(health.record_boot_attempt(false), BootHealthState::Degraded);
+        assert_eq!(health.record_boot_attempt(false), BootHealthState::Degraded);
+        assert_eq!(health.record_boot_attempt(false), BootHealthState::Failed);
+        assert!(health.is_rollback_triggered);
 
-        let results = kb.search_knowledge_base("Fedora 40");
-        assert_eq!(results.len(), 1);
-        assert_eq!(results[0].solution_body, Some("Run dnf system-upgrade download --releasever=40".to_string()));
+        assert_eq!(health.record_boot_attempt(true), BootHealthState::Healthy);
     }
 
     #[test]
-    fn test_fedora_hyperreadiness_engine() {
-        let report = FedoraHyperreadinessEngine::evaluate_system_hyperreadiness(true, true, true, true);
-        assert_eq!(report.readiness_score_percent, 100);
-        assert!(report.is_rpm_ostree_immutable);
-        assert!(report.is_selinux_enforcing);
+    fn test_cleanroom_chroot_build_isolation() {
+        let mut build_engine = FedoraCleanroomBuildEngine::new();
+        assert!(build_engine.init_chroot("fedora-rawhide-x86_64", "x86_64").is_ok());
+
+        let rpm_path = build_engine
+            .build_srpm_in_chroot("fedora-rawhide-x86_64", "bash-5.2")
+            .unwrap();
+        assert!(rpm_path.contains("result/bash-5.2.rpm"));
     }
 }

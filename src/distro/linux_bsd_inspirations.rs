@@ -121,8 +121,11 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
@@ -140,9 +143,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
-            DistroSubsystemMode::LinuxKali
-            | DistroSubsystemMode::LinuxAntiX
-            | DistroSubsystemMode::LinuxZorin => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -220,9 +220,12 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
+            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
@@ -240,9 +243,6 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            DistroSubsystemMode::LinuxKali
-            | DistroSubsystemMode::LinuxAntiX
-            | DistroSubsystemMode::LinuxZorin => supervisor == ServiceSupervisorType::Systemd,
         };
 
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
@@ -6798,7 +6798,6 @@ impl SovereignCrossDistroContainerManager {
         Ok(id)
     }
 }
-
 
 /// ============================================================================
 /// 9. Advanced Linux/BSD Distro Innovations Integration

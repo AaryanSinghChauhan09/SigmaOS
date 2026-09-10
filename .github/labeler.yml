@@ -3,14 +3,6 @@ rust:
   - changed-files:
       - any-glob-to-any-file: 'src/**/*.rs'
 
-documentation:
-  - changed-files:
-      - any-glob-to-any-file:
-          - '**/*.md'
-          - 'docs/**/*'
-          - 'wiki/**/*'
-          - 'wiki_repo/**/*'
-
 workflows:
   - changed-files:
       - any-glob-to-any-file: '.github/workflows/*'
@@ -36,18 +28,40 @@ security:
   - changed-files:
       - any-glob-to-any-file: 'src/security/**/*'
 
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**/*'
+          - 'wiki/**/*'
+          - 'wiki_repo/**/*'
+          - '*.md'
+
 "area: kernel":
-  - src/kernel/**/*
+  - changed-files:
+      - any-glob-to-any-file: 'src/kernel/**/*'
+
 "area: distro":
-  - src/distro/**/*
+  - changed-files:
+      - any-glob-to-any-file: 'src/distro/**/*'
+
 "area: security":
-  - src/security/**/*
+  - changed-files:
+      - any-glob-to-any-file: 'src/security/**/*'
+
 "area: networking":
-  - src/net/**/*
-  - src/network/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/net/**/*'
+          - 'src/network/**/*'
+
 "area: package":
-  - src/sigpkg/**/*
-  - src/package/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/sigpkg/**/*'
+          - 'src/package/**/*'
+
 "area: documentation":
-  - docs/**/*
-  - wiki/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**/*'
+          - 'wiki/**/*'

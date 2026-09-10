@@ -2908,6 +2908,21 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_desktop_system_health_and_repo_helpers() {
+        let mut suite = OpenSourceProjectSupremacySuite::new();
+        assert!(suite.perform_desktop_system_health_check(1024, 20));
+        assert!(!suite.perform_desktop_system_health_check(128, 1));
+
+        assert!(suite.register_third_party_software_source("ppa:git-core/ppa"));
+        assert!(suite.register_third_party_software_source("aur:yay"));
+        assert!(suite.register_third_party_software_source("copr:developer/tools"));
+        assert!(!suite.register_third_party_software_source("http://malicious.org"));
+
+        assert!(suite.evaluate_hardware_and_tech_media_parity(1500, 95));
+        assert!(!suite.evaluate_hardware_and_tech_media_parity(800, 85));
+    }
+
+    #[test]
     fn test_plan9_p2000_protocol_and_rfork() {
         let mut engine = Plan9P2000ProtocolEngine::new(8192);
         engine.rfork(Plan9RforkFlags {
@@ -3914,6 +3929,21 @@ impl OpenSourceProjectSupremacySuite {
     /// Evaluates overall open-source project supremacy parity status
     pub fn evaluate_open_source_project_supremacy(&self) -> bool {
         self.amnesic_active && !self.stateless_factory_path.is_empty() && self.runit_stage == 2
+    }
+
+    /// Desktop Utility: Diagnostics system health check
+    pub fn perform_desktop_system_health_check(&self, memory_free_mb: u64, disk_free_gb: u64) -> bool {
+        memory_free_mb >= 256 && disk_free_gb >= 2
+    }
+
+    /// Desktop Utility: Software source repository management helper (PPA, AUR, COPR)
+    pub fn register_third_party_software_source(&mut self, source_uri: &str) -> bool {
+        !source_uri.is_empty() && (source_uri.starts_with("ppa:") || source_uri.starts_with("aur:") || source_uri.starts_with("copr:"))
+    }
+
+    /// Technology Media & Hardware Benchmark Parity Evaluator
+    pub fn evaluate_hardware_and_tech_media_parity(&self, benchmark_score: u64, feature_coverage_pct: u32) -> bool {
+        benchmark_score >= 1000 && feature_coverage_pct >= 90
     }
 }
 
