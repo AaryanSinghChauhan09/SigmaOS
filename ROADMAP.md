@@ -224,6 +224,14 @@ By 2028, SigmaOS will position itself as the **first sovereign OS**: modular, cl
 
 ---
 
+---
+
+## 🔮 Future Development Roadmap Proposal (GitHub Repo Inspirations)
+
+For a detailed analysis of inspirations from top OS GitHub repositories (Redox OS, NixOS, SerenityOS, Google Fuchsia, seL4, Theseus OS, OpenBSD) and a 4-phase strategic roadmap, see [docs/FUTURE_ROADMAP_PROPOSAL.md](docs/FUTURE_ROADMAP_PROPOSAL.md).
+
+---
+
 ## Contributing to the Roadmap
 
 To propose new roadmap items, open a GitHub issue with the label `roadmap` and describe:
