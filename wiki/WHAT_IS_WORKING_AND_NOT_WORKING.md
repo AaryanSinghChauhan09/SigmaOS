@@ -164,6 +164,39 @@ When modifying, building, or expanding algorithms in full workspace build modes 
 
 ---
 
+
+---
+
+## 3.1 Recent CI Failure Case Studies & Automated Fix Patterns
+
+Recent GitHub Actions CI checks revealed key failure modes across workflow configurations, standalone test runners, and multi-module struct definitions. Any AI agent encountering similar failures must apply the following resolution patterns:
+
+### Case 1: `actions/labeler@v5` Configuration Failure
+- **Symptom**: `Error: found unexpected type for label 'area: kernel' (should be array of config options)`
+- **Root Cause**: `.github/labeler.yml` used legacy labeler v4 syntax (`"area: kernel": - src/kernel/**/*`) instead of labeler v5 nested mapping structure.
+- **Fix Pattern**: Format all label definitions using `changed-files` and `any-glob-to-any-file` options:
+  ```yaml
+  "area: kernel":
+    - changed-files:
+        - any-glob-to-any-file: 'src/kernel/**/*'
+  ```
+
+### Case 2: Duplicate Struct & Enum Definitions across Distro Modules (`E0428`)
+- **Symptom**: `error[E0428]: the name 'BedrockStratum' is defined multiple times` or `error[E0119]: conflicting implementations of trait 'Clone'`
+- **Root Cause**: Concatenation of sub-system files or redundant block re-declarations in `src/distro/missing_distro_innovations.rs`, `src/container/runtime.rs`, `src/sigpkg/universal_adapter.rs`, and `src/compatibility/fedora.rs`.
+- **Fix Pattern**: Retain a single canonical `pub struct` / `pub enum` definition in its primary module and delete redundant blocks. For re-exports across modules, use `pub use path::to::Struct;`.
+
+### Case 3: Trait Implementation Signature Mismatch (`E0053`, `E0046`)
+- **Symptom**: `error[E0053]: method 'read_register' has an incompatible type for trait` or `error[E0046]: missing 'set_power_state' in implementation`
+- **Root Cause**: `BareMetalUnifiedPeripheral` in `src/unimplemented_features.rs` declared `read_register(&self, offset: u16) -> u64`, but `LegacyPioController` implemented `offset: u32`.
+- **Fix Pattern**: Align method parameter types, return types, and add required getter/setter methods matching trait bounds exactly.
+
+### Case 4: Standalone `rustc --test` Runner Scope Discrepancies (`E0433`)
+- **Symptom**: `error[E0433]: cannot find type 'DevuanInitDiversityEngine' in this scope` during `rustc --test src/distro/missing_distro_innovations.rs --cfg 'feature="standalone_test"'`
+- **Root Cause**: Structs needed by standalone test runners were deleted or gated behind `#[cfg(not(feature = "standalone_test"))]`.
+- **Fix Pattern**: Ensure all structs and enums referenced in `mod tests` are unconditionally defined or properly gated with `#[cfg(any(feature = "standalone_test", test))]`.
+
+
 ## 4. Production-Grade Safe Rust Code Blueprints (How To Fix It)
 
 Below are production-grade Rust code blueprints designed for AI agents to fix algorithms and compiler errors cleanly.
