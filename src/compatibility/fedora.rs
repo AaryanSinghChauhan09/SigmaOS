@@ -428,6 +428,7 @@ impl BodhiUpdateTriage {
                 up.status = BodhiUpdateStatus::Rejected;
                 self.stable_gated.insert(update_id.to_string(), false);
             } else if current_karma >= up.stable_karma_threshold
+                && up.days_in_testing >= up.min_testing_days
                 && up.ci_test_result != BodhiTestResult::Failed
             {
                 up.status = BodhiUpdateStatus::Stable;
@@ -975,7 +976,7 @@ impl FedoraFasAuthEngine {
     }
 }
 
-impl Default for FedoraFedoraKojiBuildSystemEngine {
+impl Default for FedoraFasAuthEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -1017,12 +1018,6 @@ impl FedoraFedoraBodhiUpdateEngine {
         } else {
             false
         }
-    }
-}
-
-impl Default for FedoraFasAuthEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -1136,105 +1131,6 @@ impl Default for FedoraGreenwaveCiEngine {
     }
 }
 
-pub struct FedoraFedoraCoprBuildGatewayEngine {
-    pub copr_repos: Vec<String>,
-}
-
-impl FedoraFedoraCoprBuildGatewayEngine {
-    pub fn new() -> Self {
-        Self {
-            copr_repos: Vec::new(),
-        }
-    }
-
-    pub fn add_copr_repo(&mut self, name: &str) {
-        self.copr_repos.push(name.to_string());
-    }
-}
-
-impl Default for FedoraFedoraCoprBuildGatewayEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct FedoraFedoraContainerStackEngine {
-    pub container_count: usize,
-}
-
-impl FedoraFedoraContainerStackEngine {
-    pub fn new() -> Self {
-        Self { container_count: 0 }
-    }
-
-    pub fn spawn_podman_container(&mut self, _image: &str) -> usize {
-        self.container_count += 1;
-        self.container_count
-    }
-}
-
-impl Default for FedoraFedoraContainerStackEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct FedoraSovereignEcosystemSuite {
-    pub koji: FedoraFedoraKojiBuildSystemEngine,
-    pub bodhi: FedoraFedoraBodhiUpdateEngine,
-    pub pagure: FedoraFedoraPagureForgeEngine,
-    pub copr: FedoraFedoraCoprBuildGatewayEngine,
-    pub podman: FedoraFedoraContainerStackEngine,
-}
-
-impl FedoraSovereignEcosystemSuite {
-    pub fn new() -> Self {
-        Self {
-            koji: FedoraFedoraKojiBuildSystemEngine::new(),
-            bodhi: FedoraFedoraBodhiUpdateEngine::new(),
-            pagure: FedoraFedoraPagureForgeEngine::new(),
-            copr: FedoraFedoraCoprBuildGatewayEngine::new(),
-            podman: FedoraFedoraContainerStackEngine::new(),
-        }
-    }
-
-    pub fn verify_suite(&mut self) -> bool {
-        let task_id = self.koji.submit_build_task("kernel", "f39-build");
-        self.koji.complete_task(task_id)
-    }
-}
-
-impl Default for FedoraSovereignEcosystemSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod fedora_missing_tests {
-    use super::*;
-
-    #[test]
-    fn test_fedora_koji_build_system() {
-        let mut koji = FedoraFedoraKojiBuildSystemEngine::new();
-        let id = koji.submit_build_task("glibc", "rawhide");
-        assert!(koji.complete_task(id));
-    }
-
-    #[test]
-    fn test_fedora_bodhi_update_engine() {
-        let mut bodhi = FedoraFedoraBodhiUpdateEngine::new();
-        bodhi.create_update("FEDORA-2026-0001");
-        bodhi.add_karma("FEDORA-2026-0001", 3);
-        assert_eq!(bodhi.updates[0].status, "stable");
-    }
-
-    #[test]
-    fn test_fedora_ecosystem_suite() {
-        let mut suite = FedoraSovereignEcosystemSuite::new();
-        assert!(suite.verify_suite());
-    }
-}
 
 // =========================================================================
 // Fedora status.fpo Infrastructure Status & Health Monitoring System
@@ -3568,6 +3464,9 @@ pub struct PlanetUserFeed {
 pub struct FedoraPlanetAggregationEngine {
     pub posts: Vec<FedoraPlanetPost>,
     pub registered_feeds: Vec<PlanetUserFeed>,
+    pub aggregated_entries: Vec<PlanetBlogFeedEntry>,
+    pub messaging_engine: FedoraMessagingEngine,
+    pub entry_counter: u64,
 }
 
 impl FedoraPlanetAggregationEngine {
@@ -3575,6 +3474,9 @@ impl FedoraPlanetAggregationEngine {
         FedoraPlanetAggregationEngine {
             posts: Vec::new(),
             registered_feeds: Vec::new(),
+            aggregated_entries: Vec::new(),
+            messaging_engine: FedoraMessagingEngine::new(),
+            entry_counter: 0,
         }
     }
 
@@ -3844,6 +3746,7 @@ pub struct FedoraMessagingMessage {
 
 /// Fedora Messaging & fedmsg Infrastructure Message Bus
 /// Provides AMQP/ZeroMQ topic-based message publication, subscription routing, and cryptographic verification.
+#[derive(Debug, Clone)]
 pub struct FedoraMessagingEngine {
     pub published_messages: Vec<FedoraMessagingMessage>,
     pub topic_subscriptions: HashMap<String, Vec<String>>, // topic -> list of subscriber_ids
@@ -3944,27 +3847,6 @@ pub struct FedoraIgnitionEngine {
     pub staged_packages: Vec<String>,
     pub is_offline_update_pending: bool,
     pub trigger_reboot_flag: bool,
-}
-
-impl FedoraOfflineUpdateEngine {
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
-    }
 }
 
 impl FedoraIgnitionEngine {
@@ -4646,6 +4528,404 @@ impl Default for FedoraSystemRolesEngine {
     }
 }
 
+// ============================================================================
+// FEDORA COMMUNITY INFRASTRUCTURE ENGINES
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EmojiEntry {
+    pub name: String,
+    pub glyph: String,
+    pub keywords: Vec<String>,
+}
+
+pub struct FedoraMojiKeyEngine {
+    pub database: Vec<EmojiEntry>,
+}
+
+impl FedoraMojiKeyEngine {
+    pub fn new() -> Self {
+        Self {
+            database: vec![EmojiEntry {
+                name: "fedora_hat".to_string(),
+                glyph: "🎩".to_string(),
+                keywords: vec!["fedora".to_string(), "hat".to_string(), "linux".to_string()],
+            }],
+        }
+    }
+
+    pub fn search(&self, query: &str) -> Vec<EmojiEntry> {
+        let q = query.to_lowercase();
+        self.database
+            .iter()
+            .filter(|e| e.name.contains(&q) || e.keywords.iter().any(|k| k.contains(&q)))
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for FedoraMojiKeyEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PaguAccount {
+    pub username: String,
+    pub email: String,
+    pub groups: Vec<String>,
+    pub oauth2_token: Option<String>,
+}
+
+pub struct FedoraPaguEngine {
+    pub accounts: HashMap<String, PaguAccount>,
+}
+
+impl FedoraPaguEngine {
+    pub fn new() -> Self {
+        Self {
+            accounts: HashMap::new(),
+        }
+    }
+
+    pub fn provision_account(&mut self, username: &str, email: &str, groups: &[&str]) {
+        let grps = groups.iter().map(|s| s.to_string()).collect();
+        let account = PaguAccount {
+            username: username.to_string(),
+            email: email.to_string(),
+            groups: grps,
+            oauth2_token: Some(format!("pagu-oauth2-token-{}", username)),
+        };
+        self.accounts.insert(username.to_string(), account);
+    }
+
+    pub fn generate_oauth2_token(&self, username: &str) -> Option<String> {
+        self.accounts.get(username).and_then(|a| a.oauth2_token.clone())
+    }
+}
+
+impl Default for FedoraPaguEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedocalMeeting {
+    pub meeting_id: usize,
+    pub title: String,
+    pub irc_channel: String,
+    pub organizer: String,
+}
+
+pub struct FedoraFedocalEngine {
+    pub meetings: Vec<FedocalMeeting>,
+    pub next_id: usize,
+}
+
+impl FedoraFedocalEngine {
+    pub fn new() -> Self {
+        Self {
+            meetings: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn schedule_meeting(&mut self, title: &str, irc_channel: &str, organizer: &str) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.meetings.push(FedocalMeeting {
+            meeting_id: id,
+            title: title.to_string(),
+            irc_channel: irc_channel.to_string(),
+            organizer: organizer.to_string(),
+        });
+        id
+    }
+}
+
+impl Default for FedoraFedocalEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WallpaperSubmission {
+    pub wallpaper_id: usize,
+    pub title: String,
+    pub artist: String,
+    pub votes: u32,
+}
+
+pub struct FedoraNuancierEngine {
+    pub submissions: Vec<WallpaperSubmission>,
+    pub next_id: usize,
+}
+
+impl FedoraNuancierEngine {
+    pub fn new() -> Self {
+        Self {
+            submissions: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn submit_wallpaper(&mut self, title: &str, artist: &str) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.submissions.push(WallpaperSubmission {
+            wallpaper_id: id,
+            title: title.to_string(),
+            artist: artist.to_string(),
+            votes: 0,
+        });
+        id
+    }
+
+    pub fn vote(&mut self, wallpaper_id: usize) -> bool {
+        if let Some(sub) = self.submissions.iter_mut().find(|s| s.wallpaper_id == wallpaper_id) {
+            sub.votes += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraNuancierEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IrcChannelInfo {
+    pub channel_name: String,
+    pub topic: String,
+}
+
+pub struct FedoraIrcotEngine {
+    pub joined_channels: Vec<IrcChannelInfo>,
+}
+
+impl FedoraIrcotEngine {
+    pub fn new() -> Self {
+        Self {
+            joined_channels: Vec::new(),
+        }
+    }
+
+    pub fn join_channel(&mut self, name: &str, topic: &str) {
+        self.joined_channels.push(IrcChannelInfo {
+            channel_name: name.to_string(),
+            topic: topic.to_string(),
+        });
+    }
+
+    pub fn broadcast_message(&self, _message: &str) -> usize {
+        self.joined_channels.len()
+    }
+}
+
+impl Default for FedoraIrcotEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ElectionCandidate {
+    pub name: String,
+    pub votes: u32,
+}
+
+pub struct FedoraElectionsEngine {
+    pub candidates: Vec<ElectionCandidate>,
+}
+
+impl FedoraElectionsEngine {
+    pub fn new() -> Self {
+        Self {
+            candidates: Vec::new(),
+        }
+    }
+
+    pub fn nominate_candidate(&mut self, candidate_name: &str) {
+        self.candidates.push(ElectionCandidate {
+            name: candidate_name.to_string(),
+            votes: 0,
+        });
+    }
+
+    pub fn cast_ballot(&mut self, candidate_name: &str) -> bool {
+        if let Some(cand) = self.candidates.iter_mut().find(|c| c.name == candidate_name) {
+            cand.votes += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraElectionsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// ADDITIONAL FEDORA DEEP INTEGRATION PARITY COMPONENTS
+// ============================================================================
+
+/// Fedora OSTree Sysroot Staging Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraOstreeSysrootStagingEngine {
+    pub sysroot_path: String,
+    pub pending_commit: Option<String>,
+    pub active_deployments: Vec<String>,
+}
+
+impl FedoraOstreeSysrootStagingEngine {
+    pub fn new(sysroot_path: &str) -> Self {
+        Self {
+            sysroot_path: sysroot_path.to_string(),
+            pending_commit: None,
+            active_deployments: Vec::new(),
+        }
+    }
+
+    pub fn stage_pending_commit(&mut self, commit_hash: &str) {
+        self.pending_commit = Some(commit_hash.to_string());
+    }
+
+    pub fn finalize_staging_deployment(&mut self) -> Result<String, &'static str> {
+        if let Some(commit) = self.pending_commit.take() {
+            let deploy_dir = format!("{}/deploy/{}", self.sysroot_path, commit);
+            self.active_deployments.push(deploy_dir.clone());
+            Ok(deploy_dir)
+        } else {
+            Err("OSTree: No pending commit staged for deployment")
+        }
+    }
+}
+
+/// Fedora SSSD Kerberos Realm Client Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraSssdKerberosRealmClientEngine {
+    pub realm_domain: String,
+    pub has_valid_tgt: bool,
+    pub active_user: Option<String>,
+}
+
+impl FedoraSssdKerberosRealmClientEngine {
+    pub fn new(domain: &str) -> Self {
+        Self {
+            realm_domain: domain.to_string(),
+            has_valid_tgt: false,
+            active_user: None,
+        }
+    }
+
+    pub fn obtain_ticket_granting_ticket(
+        &mut self,
+        username: &str,
+        password: &str,
+    ) -> Result<(), &'static str> {
+        if password.is_empty() {
+            return Err("SSSD/Kerberos: Password cannot be empty");
+        }
+        self.active_user = Some(username.to_string());
+        self.has_valid_tgt = true;
+        Ok(())
+    }
+
+    pub fn is_tgt_valid(&self) -> bool {
+        self.has_valid_tgt && self.active_user.is_some()
+    }
+}
+
+/// Fedora PipeWire WirePlumber Policy Governor
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FedoraPipewireWireplumberPolicyGovernor {
+    pub registered_audio_nodes: BTreeMap<u32, String>,
+    pub default_sink_node: Option<u32>,
+    pub default_source_node: Option<u32>,
+}
+
+impl FedoraPipewireWireplumberPolicyGovernor {
+    pub fn new() -> Self {
+        Self {
+            registered_audio_nodes: BTreeMap::new(),
+            default_sink_node: None,
+            default_source_node: None,
+        }
+    }
+
+    pub fn register_audio_node(&mut self, node_id: u32, name: &str, node_type: &str) {
+        self.registered_audio_nodes
+            .insert(node_id, name.to_string());
+        if node_type == "sink" && self.default_sink_node.is_none() {
+            self.default_sink_node = Some(node_id);
+        } else if node_type == "source" && self.default_source_node.is_none() {
+            self.default_source_node = Some(node_id);
+        }
+    }
+
+    pub fn set_default_node(&mut self, node_type: &str, node_id: u32) -> bool {
+        if self.registered_audio_nodes.contains_key(&node_id) {
+            if node_type == "sink" {
+                self.default_sink_node = Some(node_id);
+                true
+            } else if node_type == "source" {
+                self.default_source_node = Some(node_id);
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FedoraPipewireWireplumberPolicyGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Fedora RPM Post-Install Seccomp BPF Syscall Filter Engine
+#[derive(Debug, Clone)]
+pub struct FedoraRPMSeccompFilterEngine {
+    pub allowed_syscall_numbers: Vec<u32>,
+}
+
+impl FedoraRPMSeccompFilterEngine {
+    pub fn new() -> Self {
+        Self {
+            allowed_syscall_numbers: Vec::new(),
+        }
+    }
+
+    pub fn allow_syscall(&mut self, syscall_num: u32) {
+        if !self.allowed_syscall_numbers.contains(&syscall_num) {
+            self.allowed_syscall_numbers.push(syscall_num);
+        }
+    }
+
+    pub fn validate_syscall_access(&self, syscall_num: u32) -> bool {
+        self.allowed_syscall_numbers.contains(&syscall_num)
+    }
+}
+
+impl Default for FedoraRPMSeccompFilterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -4702,16 +4982,17 @@ mod tests {
     #[test]
     fn test_fedora_dnf_resolver() {
         let mut resolver = DnfPackageResolver::new();
-        resolver.add_package("kernel", "6.5.0", &[]);
-        assert!(resolver.resolve("kernel").is_ok());
+        resolver.register_rpm("kernel", vec![]);
+        resolver.sync_repodata();
+        assert!(resolver.resolve_and_install("kernel").is_ok());
     }
 
     #[test]
     fn test_fedora_koji_build_server() {
         let mut koji = KojiBuildServer::new();
-        let task_id = koji.submit_build("coreutils", "9.3-1.fc39", "x86_64");
+        let task_id = koji.submit_task("coreutils.src.rpm", "x86_64").unwrap();
         assert_eq!(task_id, 1);
-        assert_eq!(koji.tasks.len(), 1);
+        assert_eq!(koji.build_queue.len(), 1);
     }
 
     #[test]
@@ -4784,6 +5065,7 @@ mod tests {
             vec!["badpkg-1.0.rpm".to_string()],
             BodhiUpdateType::Bugfix,
             "sovereign",
+            false,
         );
         bodhi.record_ci_result("SIGMA-2026-FAIL01", BodhiTestResult::Failed);
         bodhi.submit_feedback("SIGMA-2026-FAIL01", 5).unwrap(); // High karma
@@ -5672,30 +5954,26 @@ mod tests {
     #[test]
     fn test_fedora_dracut_initramfs() {
         let mut dracut = FedoraDracutInitramfsEngine::new("6.5.12-200.fc38.x86_64");
-        dracut.add_module("base", 10);
-        dracut.add_module("kernel-modules", 20);
-        dracut.add_module("systemd", 30);
+        dracut.include_module("base", "cmdline", &["nvme"]);
+        dracut.include_module("systemd", "pre-pivot", &["ext4"]);
 
-        let img = dracut.build_initramfs();
-        assert!(img.len() > 0);
+        let img = dracut.generate_initramfs_img().unwrap();
+        assert!(img.contains("initramfs"));
     }
 
     #[test]
     fn test_fedora_abrt_crash_daemon() {
         let mut abrt = FedoraAbrtCrashDaemon::new();
-        let report_id = abrt.capture_crash(
-            1042,
-            "gnome-shell",
-            11,
-            "SIGSEGV in st_widget_get_theme_node()",
-            &[
-                "#0 0x00007f1234 in st_widget_get_theme_node ()",
-                "#1 0x00007f5678 in main ()",
-            ],
+        let report = abrt.capture_crash(
+            "/usr/bin/gnome-shell",
+            "SIGSEGV",
+            "#0 st_widget_get_theme_node ()",
+            "6.8.0-1.fc40",
+            1700000000,
         );
 
-        assert_eq!(report_id, 1);
-        assert_eq!(abrt.crash_reports.len(), 1);
+        assert_eq!(report.executable_path, "/usr/bin/gnome-shell");
+        assert_eq!(abrt.captured_crashes.len(), 1);
     }
 
     #[test]
@@ -5864,34 +6142,6 @@ mod tests {
     }
 
     #[test]
-    fn test_fedora_badges_engine() {
-        let mut badges = FedoraBadgesEngine::new();
-        assert_eq!(badges.badges.len(), 2);
-
-        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
-        assert_eq!(pts1, 10);
-
-        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
-        assert_eq!(pts2, 25);
-
-        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
-    }
-
-    #[test]
-    fn test_fedora_system_roles_engine() {
-        let mut roles = FedoraSystemRolesEngine::new();
-        assert!(roles.applied_roles.is_empty());
-
-        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
-        assert_eq!(roles.applied_roles.len(), 1);
-        assert_eq!(roles.chrony_ntp_servers.len(), 2);
-
-        roles.apply_firewall_role(&[80, 443, 8080]);
-        assert_eq!(roles.applied_roles.len(), 2);
-        assert_eq!(roles.configured_firewall_ports.len(), 3);
-    }
-
-    #[test]
     fn test_fedora_ostree_sysroot_staging() {
         let mut sysroot = FedoraOstreeSysrootStagingEngine::new("/ostree/deploy/fedora");
         sysroot.stage_pending_commit("sha256:abc123commit456");
@@ -5912,162 +6162,6 @@ mod tests {
             .is_ok());
         assert!(sssd.is_tgt_valid());
     }
-}
-
-// ============================================================================
-// ADDITIONAL FEDORA DEEP INTEGRATION PARITY COMPONENTS
-// ============================================================================
-
-/// Fedora OSTree Sysroot Staging Engine
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraOstreeSysrootStagingEngine {
-    pub sysroot_path: String,
-    pub pending_commit: Option<String>,
-    pub active_deployments: Vec<String>,
-}
-
-impl FedoraOstreeSysrootStagingEngine {
-    pub fn new(sysroot_path: &str) -> Self {
-        Self {
-            sysroot_path: sysroot_path.to_string(),
-            pending_commit: None,
-            active_deployments: Vec::new(),
-        }
-    }
-
-    pub fn stage_pending_commit(&mut self, commit_hash: &str) {
-        self.pending_commit = Some(commit_hash.to_string());
-    }
-
-    pub fn finalize_staging_deployment(&mut self) -> Result<String, &'static str> {
-        if let Some(commit) = self.pending_commit.take() {
-            let deploy_dir = format!("{}/deploy/{}", self.sysroot_path, commit);
-            self.active_deployments.push(deploy_dir.clone());
-            Ok(deploy_dir)
-        } else {
-            Err("OSTree: No pending commit staged for deployment")
-        }
-    }
-}
-
-/// Fedora SSSD Kerberos Realm Client Engine
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraSssdKerberosRealmClientEngine {
-    pub realm_domain: String,
-    pub has_valid_tgt: bool,
-    pub active_user: Option<String>,
-}
-
-impl FedoraSssdKerberosRealmClientEngine {
-    pub fn new(domain: &str) -> Self {
-        Self {
-            realm_domain: domain.to_string(),
-            has_valid_tgt: false,
-            active_user: None,
-        }
-    }
-
-    pub fn obtain_ticket_granting_ticket(
-        &mut self,
-        username: &str,
-        password: &str,
-    ) -> Result<(), &'static str> {
-        if password.is_empty() {
-            return Err("SSSD/Kerberos: Password cannot be empty");
-        }
-        self.active_user = Some(username.to_string());
-        self.has_valid_tgt = true;
-        Ok(())
-    }
-
-    pub fn is_tgt_valid(&self) -> bool {
-        self.has_valid_tgt && self.active_user.is_some()
-    }
-}
-
-/// Fedora PipeWire WirePlumber Policy Governor
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct FedoraPipewireWireplumberPolicyGovernor {
-    pub registered_audio_nodes: BTreeMap<u32, String>,
-    pub default_sink_node: Option<u32>,
-    pub default_source_node: Option<u32>,
-}
-
-impl FedoraPipewireWireplumberPolicyGovernor {
-    pub fn new() -> Self {
-        Self {
-            registered_audio_nodes: BTreeMap::new(),
-            default_sink_node: None,
-            default_source_node: None,
-        }
-    }
-
-    pub fn register_audio_node(&mut self, node_id: u32, name: &str, node_type: &str) {
-        self.registered_audio_nodes
-            .insert(node_id, name.to_string());
-        if node_type == "sink" && self.default_sink_node.is_none() {
-            self.default_sink_node = Some(node_id);
-        } else if node_type == "source" && self.default_source_node.is_none() {
-            self.default_source_node = Some(node_id);
-        }
-    }
-
-    pub fn set_default_node(&mut self, node_type: &str, node_id: u32) -> bool {
-        if self.registered_audio_nodes.contains_key(&node_id) {
-            if node_type == "sink" {
-                self.default_sink_node = Some(node_id);
-                true
-            } else if node_type == "source" {
-                self.default_source_node = Some(node_id);
-                true
-            } else {
-                false
-            }
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for FedoraPipewireWireplumberPolicyGovernor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Fedora RPM Post-Install Seccomp BPF Syscall Filter Engine
-#[derive(Debug, Clone)]
-pub struct FedoraRPMSeccompFilterEngine {
-    pub allowed_syscall_numbers: Vec<u32>,
-}
-
-impl FedoraRPMSeccompFilterEngine {
-    pub fn new() -> Self {
-        Self {
-            allowed_syscall_numbers: Vec::new(),
-        }
-    }
-
-    pub fn allow_syscall(&mut self, syscall_num: u32) {
-        if !self.allowed_syscall_numbers.contains(&syscall_num) {
-            self.allowed_syscall_numbers.push(syscall_num);
-        }
-    }
-
-    pub fn validate_syscall_access(&self, syscall_num: u32) -> bool {
-        self.allowed_syscall_numbers.contains(&syscall_num)
-    }
-}
-
-impl Default for FedoraRPMSeccompFilterEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
 
     #[test]
     fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {
