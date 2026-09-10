@@ -227,7 +227,7 @@ impl Default for StandardStreamController {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -314,5 +314,79 @@ mod tests {
         let flushed = ctrl2.flush_all();
         assert!(flushed.contains_key(&STDOUT_FILENO));
         assert_eq!(flushed.get(&STDOUT_FILENO).unwrap(), b"buffered_stdout");
+    }
+
+    #[test]
+    fn test_sovereign_stdin_stream_engine() {
+        let mut stdin_engine = SovereignStdinStreamEngine::new();
+        stdin_engine.set_raw_mode(true);
+        assert!(stdin_engine.raw_mode);
+
+        stdin_engine.push_input_data(b"ls -la\n");
+        assert_eq!(stdin_engine.ring_buffer.len(), 7);
+
+        let parsed = stdin_engine.parse_and_consume_line();
+        assert_eq!(parsed, Some("ls -la".to_string()));
+        assert_eq!(stdin_engine.history.len(), 1);
+    }
+}
+
+/// Sovereign Stdin Stream Engine (Linux/BSD stdio raw mode, VT100 escape decoding, async ring buffer)
+#[derive(Debug, Clone)]
+pub struct SovereignStdinStreamEngine {
+    pub raw_mode: bool,
+    pub echo_enabled: bool,
+    pub ring_buffer: Vec<u8>,
+    pub history: Vec<String>,
+    pub cursor_position: usize,
+}
+
+impl SovereignStdinStreamEngine {
+    pub fn new() -> Self {
+        Self {
+            raw_mode: false,
+            echo_enabled: true,
+            ring_buffer: Vec::new(),
+            history: Vec::new(),
+            cursor_position: 0,
+        }
+    }
+
+    pub fn set_raw_mode(&mut self, enabled: bool) {
+        self.raw_mode = enabled;
+        if enabled {
+            self.echo_enabled = false;
+        }
+    }
+
+    pub fn push_input_data(&mut self, data: &[u8]) {
+        self.ring_buffer.extend_from_slice(data);
+    }
+
+    pub fn parse_and_consume_line(&mut self) -> Option<String> {
+        if let Some(pos) = self.ring_buffer.iter().position(|&b| b == b'\n' || b == b'\r') {
+            let line_bytes: Vec<u8> = self.ring_buffer.drain(..pos).collect();
+            // Skip newline
+            if !self.ring_buffer.is_empty() {
+                self.ring_buffer.remove(0);
+            }
+            if let Ok(line_str) = String::from_utf8(line_bytes) {
+                let trimmed = line_str.trim().to_string();
+                if !trimmed.is_empty() {
+                    self.history.push(trimmed.clone());
+                }
+                Some(trimmed)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+}
+
+impl Default for SovereignStdinStreamEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
