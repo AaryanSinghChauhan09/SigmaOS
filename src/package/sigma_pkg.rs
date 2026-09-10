@@ -68,6 +68,11 @@ pub enum UniversalPackageFormat {
     FlatpakBundle,  // .flatpak
     SnapPackage,    // .snap
     AppImageBinary, // .AppImage
+    PisiEopkg,      // .eopkg / .pisi (eopkg)
+    SolusMoss,      // .moss (Solus Serpent OS moss)
+    TinyCoreTcz,    // .tcz (Tiny Core Linux extension)
+    GoboLinux,      // .gobo / recipe (GoboLinux package)
+    OstreeLayer,    // .ostree / commit layer (OSTree)
 }
 
 /// Importer/Converter engine mapping foreign Linux/BSD packages into SigmaPkg native representation
@@ -77,7 +82,11 @@ impl UniversalPackageImporter {
     pub fn autodetect_format(filename: &str) -> Option<UniversalPackageFormat> {
         if filename.ends_with(".deb") {
             Some(UniversalPackageFormat::DebianDeb)
-        } else if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") {
+        } else if filename.ends_with(".pkg.tar.zst")
+            || filename.ends_with(".pkg.tar.xz")
+            || filename.ends_with(".pkg.tar.bz2")
+            || filename.ends_with(".pkg.tar.gz")
+        {
             Some(UniversalPackageFormat::ArchPacman)
         } else if filename.ends_with(".rpm") {
             Some(UniversalPackageFormat::FedoraRpm)
@@ -107,6 +116,16 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::SnapPackage)
         } else if filename.ends_with(".AppImage") || filename.ends_with(".appimage") {
             Some(UniversalPackageFormat::AppImageBinary)
+        } else if filename.ends_with(".eopkg") || filename.ends_with(".pisi") {
+            Some(UniversalPackageFormat::PisiEopkg)
+        } else if filename.ends_with(".moss") {
+            Some(UniversalPackageFormat::SolusMoss)
+        } else if filename.ends_with(".tcz") {
+            Some(UniversalPackageFormat::TinyCoreTcz)
+        } else if filename.ends_with(".gobo") {
+            Some(UniversalPackageFormat::GoboLinux)
+        } else if filename.ends_with(".ostree") {
+            Some(UniversalPackageFormat::OstreeLayer)
         } else {
             None
         }
@@ -129,6 +148,10 @@ impl UniversalPackageImporter {
                 ("GPLv2+", vec!["glibc".to_string(), "bash".to_string()])
             }
             UniversalPackageFormat::AlpineApk => ("MIT/GPL-2.0", vec!["musl".to_string()]),
+            UniversalPackageFormat::GentooEbuild => {
+                ("GPL-2.0-only", vec!["sys-libs/glibc".to_string()])
+            }
+            UniversalPackageFormat::VoidXbps => ("BSD-2-Clause", vec!["glibc".to_string()]),
             UniversalPackageFormat::FreeBsdPkg => {
                 ("BSD-2-Clause", vec!["freebsd-runtime".to_string()])
             }
@@ -142,6 +165,13 @@ impl UniversalPackageImporter {
             }
             UniversalPackageFormat::GuixPackage => ("GPL-3.0+", vec!["guix-daemon".to_string()]),
             UniversalPackageFormat::HaikuHpkg => ("MIT", vec!["haiku-libroot".to_string()]),
+            UniversalPackageFormat::PisiEopkg => ("GPLv3", vec!["comar".to_string()]),
+            UniversalPackageFormat::SolusMoss => ("GPL-2.0-or-later", vec!["moss-core".to_string()]),
+            UniversalPackageFormat::TinyCoreTcz => ("GPL", vec!["busybox".to_string()]),
+            UniversalPackageFormat::GoboLinux => ("GPL", vec!["gobolinux-base".to_string()]),
+            UniversalPackageFormat::OstreeLayer => {
+                ("LGPL-2.1-or-later", vec!["ostree-core".to_string()])
+            }
             _ => ("GPL/MIT/BSD", vec![]),
         };
 
@@ -699,7 +729,7 @@ impl SigmaPkg {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
 
@@ -756,6 +786,21 @@ mod tests {
         let fmt_haiku = UniversalPackageImporter::autodetect_format("bash.hpkg");
         assert_eq!(fmt_haiku, Some(UniversalPackageFormat::HaikuHpkg));
 
+        let fmt_eopkg = UniversalPackageImporter::autodetect_format("vlc.eopkg");
+        assert_eq!(fmt_eopkg, Some(UniversalPackageFormat::PisiEopkg));
+
+        let fmt_moss = UniversalPackageImporter::autodetect_format("nano.moss");
+        assert_eq!(fmt_moss, Some(UniversalPackageFormat::SolusMoss));
+
+        let fmt_tcz = UniversalPackageImporter::autodetect_format("htop.tcz");
+        assert_eq!(fmt_tcz, Some(UniversalPackageFormat::TinyCoreTcz));
+
+        let fmt_gobo = UniversalPackageImporter::autodetect_format("python.gobo");
+        assert_eq!(fmt_gobo, Some(UniversalPackageFormat::GoboLinux));
+
+        let fmt_ostree = UniversalPackageImporter::autodetect_format("fedora-silverblue.ostree");
+        assert_eq!(fmt_ostree, Some(UniversalPackageFormat::OstreeLayer));
+
         let pkg = UniversalPackageImporter::parse_foreign_package(
             "curl_8.0.deb",
             UniversalPackageFormat::DebianDeb,
@@ -773,5 +818,13 @@ mod tests {
         .unwrap();
         assert_eq!(apk_pkg.license, "MIT/GPL-2.0");
         assert!(apk_pkg.dependencies.contains(&"musl".to_string()));
+
+        let moss_pkg = UniversalPackageImporter::parse_foreign_package(
+            "nano.moss",
+            UniversalPackageFormat::SolusMoss,
+        )
+        .unwrap();
+        assert_eq!(moss_pkg.license, "GPL-2.0-or-later");
+        assert!(moss_pkg.dependencies.contains(&"moss-core".to_string()));
     }
 }
