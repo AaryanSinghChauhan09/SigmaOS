@@ -3182,7 +3182,7 @@ impl FedoraIgnitionEngine {
 
 
 
-impl FedoraIgnitionEngine {
+impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {
         Self {
             files: Vec::new(),
@@ -3191,6 +3191,7 @@ impl FedoraIgnitionEngine {
             provisioned: false,
         }
     }
+}
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
         self.files.push(IgnitionFile {
@@ -5230,11 +5231,17 @@ mod tests {
         assert!(sssd.is_tgt_valid());
     }
 
-    #[test]
-    fn test_fedora_wireplumber_governor() {
-        let mut wireplumber = FedoraPipewireWireplumberPolicyGovernor::new();
-        wireplumber.register_audio_node(101, "alsa_output.pci-0000_00_1f.3.analog-stereo", "sink");
-        assert_eq!(wireplumber.default_sink_node, Some(101));
+        // New version release check -> event generated & fedmsg published
+        let event = hotness
+            .process_upstream_release_check(
+                1234,
+                "8.3.0",
+                "https://curl.se/release-8.3.0",
+                1700000100,
+            )
+            .unwrap()
+            .unwrap();
+
         assert!(wireplumber.set_default_node("sink", 101));
         assert_eq!(wireplumber.default_sink_node, Some(101));
     }
