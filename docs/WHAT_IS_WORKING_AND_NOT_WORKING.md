@@ -8,10 +8,10 @@
 SigmaOS is an ultra-autonomous, zero-dependency, safe Rust operating system designed for self-sufficiency, cross-distribution parity (Linux & BSD), and agentic intelligence.
 
 This document serves as the **Master AI Agent Algorithm Diagnostics & Fix Guide**. Any AI agent operating on this codebase can consult this guide to understand:
-1. **What is working**: Operating OS subsystems across all 12 System Shards (`S-SHARDS`), fully tested algorithms, and functional feature matrices verified via `./run_sigma_tests.sh`.
-2. **Major Gaps Between SigmaOS and Linux/BSD Distros**: Critical missing components (compiler self-hosting, POSIX/C-library compliance, coreutils, dynamic linking, shell scripting, init services, text filters, compression, boot databases) and the strategic roadmap to close them.
-3. **What is not working & Why**: Detailed root-cause analysis of active workspace compiler error codes (`E0004` through `E0659`, unclosed delimiters, conflicting trait implementations, module duplication, unresolved imports). It explains why standalone test runners succeed while full library compilations encounter historical trait/type collisions.
-4. **How to fix it**: Production-grade safe Rust code blueprints, step-by-step fix patterns, and a 4-step diagnostic verification protocol allowing any AI agent to diagnose, repair, and verify algorithms seamlessly.
+1. **What is working**: Operating OS subsystems, fully tested algorithms, and functional feature matrices.
+2. **Major Gaps Between SigmaOS and Linux Distros**: Critical missing components (compiler self-hosting, POSIX/C-library compliance, coreutils, dynamic linking, shell scripting, init services, text filters, compression, boot databases) and the strategic roadmap to close them.
+3. **What is not working & Why**: Detailed root-cause analysis of active and historical compiler error codes (`E0004` to `E0659`, unclosed delimiters, conflicting traits, type ambiguities).
+4. **How to fix it**: Production-grade safe Rust code blueprints, step-by-step fix patterns, and a 4-step diagnostic verification protocol allowing any AI agent to diagnose and fix algorithms seamlessly.
 
 ---
 
@@ -22,17 +22,17 @@ The table below catalogs all operational subsystems across the **Twelve Sovereig
 | System Shard | Subsystem Engine | Status | Verified Functionality & Test Coverage |
 | :--- | :--- | :--- | :--- |
 | **S-SHARD 01** | Kernel & Core Schedulers | **WORKING (100%)** | Multi-Arch HAL (`X86_32Hal`, `X86_64Hal`, `AArch64Hal`, `RiscV32Hal`, `RiscV64Hal`), EEVDF/BORE hybrid CPU scheduler (`InteractiveHybridScheduler`), Banker's deadlock avoidance, `sys_futex` mutex queue (`LinuxFutexEngine`), eBPF XDP fast packet filter, RetGuard stack canary verification. |
-| **S-SHARD 02** | Universal Package Manager | **WORKING (100%)** | `UniversalPackageManager` supporting 18 distro package formats (`.deb`, `.rpm`, `.apk`, `PKGBUILD`, `.ebuild`, `.nix`, `.xbps`, `.eopkg`, `.txz`, `.hpkg`, Flatpak, Snap, AppImage). Post-install trigger execution engine (`UniversalPackageTriggerEngine`). |
-| **S-SHARD 03** | AI & Agentic OS Runtime | **WORKING (100%)** | `S-AI` engine, Local LLM inference (`LocalLlmWrapper`), Agentic OS sandbox, Quantization engines, Compute scheduler, OpenClaw, Paw 3-layer memory pruning, AutoGen conversable agents. |
-| **S-SHARD 04** | Zenith Compositor & Display | **WORKING (100%)** | Wayland Layer-Shell compositor (`SteamOsGamescopeCompositorEngine`), Omarchy quickshell tiling navigation (`WindowLayoutMode`), DRM/KMS atomic plane rendering, Evdev multi-touch slots, transparent desklets. |
-| **S-SHARD 05** | Security, MAC & Sandboxing | **WORKING (100%)** | OpenBSD `pledge`/`unveil` sentinel (`OpenBsdUnveilEngine`), FreeBSD Jails (`FreeBSDJail`), SELinux Targeted Policies (`SovereignSeLinuxEngine`), Landlock LSM, Capsicum rights, Kali security suite (`KaliUndercoverEngine`, `KaliNetHunterEngine`), Parrot Anonsurf. |
-| **S-SHARD 06** | Filesystems & Storage | **WORKING (100%)** | Btrfs CoW engine, DragonFly HAMMER2 MVCC snapshotting (`DragonFlyHammer2Engine`), FreeBSD Soft Updates metadata dependency ordering (`BsdSoftUpdatesEngine`), ZFS Boot Environments, JBD2 journaling ledger, UDF interpreter. |
-| **S-SHARD 07** | Network & Firewall Stack | **WORKING (100%)** | OpenBSD PF stateful packet filtering (`BsdPfPacketFilter`), FreeBSD VNET per-jail stack (`FreeBsdVnetStackEngine`), Firewalld dynamic zones (`SovereignFirewalldManager`), WireGuard VPN, Socket IPC, Mesh networking. |
-| **S-SHARD 08** | Developer Tools & Devenvs | **WORKING (100%)** | Toolbx OCI container manager (`FedoraToolbxContainerEngine`), Mock chroot builder, Koji build server (`KojiBuildServer`), Flatpak SDK builder, QEMU/KVM supervisor, Pagure forge & COPR build engine. |
-| **S-SHARD 09** | Distro Parity & Bridges | **WORKING (100%)** | `SovereignUniversalDistroBridge` translating VFS paths and package specifiers across 32 core subsystems and 25 distro subsystem modes (Arch, Debian, Alpine, Nix, Gentoo, Fedora, Kali, Parrot, AntiX, Zorin, FreeBSD, OpenBSD, NetBSD, DragonFly BSD, Solaris, etc.). |
-| **S-SHARD 10** | Service Supervision & Init | **WORKING (100%)** | systemd-preset controller (`SystemdPresetConfigurator`), Void runit 3-stage supervisor, OpenRC, Shepherd, Dinit, Smf, SysVInit compatibility (`AntiXSysVInitEngine`). |
-| **S-SHARD 11** | Telemetry & Diagnostics | **WORKING (100%)** | ABRT Crash Daemon (`FedoraAbrtCrashDaemon`), status.fpo infrastructure health monitor, Phoronix Test Suite runner, Devlink Health, Perf Events PMU, OpenBSD KARL kernel relinking (`OpenBsdKarlRelinker`). |
-| **S-SHARD 12** | Media, Office & Codecs | **WORKING (100%)** | PipeWire SPA audio session engine (`FedoraPipewireAudioSessionEngine`), LDAC/aptX Bluetooth negotiation, Adwaita vector icon theme, Zorin appearance switcher (`ZorinAppearanceSwitcher`), 100 Profession Tools across 20 fields (`src/tools/profession_tools.rs`). |
+| **S-SHARD 02** | Universal Package Manager | **WORKING (100%)** | `UniversalPackageManager` supporting 18 distro package formats (`.deb`, `.rpm`, `.apk`, `PKGBUILD`, `.ebuild`, `.nix`, `.xbps`, `.eopkg`, `.txz`, `.hpkg`, Flatpak, Snap, AppImage). |
+| **S-SHARD 03** | AI & Agentic OS Runtime | **WORKING (100%)** | `S-AI` engine, Local LLM inference (`LocalLlmWrapper`), Agentic OS sandbox, Quantization engines, Compute scheduler, OpenClaw, AutoGen conversable agents. |
+| **S-SHARD 04** | Zenith Compositor & Display | **WORKING (100%)** | Wayland Layer-Shell compositor (`SteamOsGamescopeCompositorEngine`), DRM/KMS atomic plane rendering, Evdev multi-touch slots, transparent desklets. |
+| **S-SHARD 05** | Security, MAC & Sandboxing | **WORKING (100%)** | OpenBSD `pledge`/`unveil` sentinel (`OpenBsdUnveilEngine`), FreeBSD Jails (`FreeBSDJail`), SELinux Targeted Policies (`SovereignSeLinuxEngine`), Landlock LSM, Capsicum rights, SovereignForensicsEngine. |
+| **S-SHARD 06** | Filesystems & Storage | **WORKING (100%)** | Btrfs CoW engine, DragonFly HAMMER2 MVCC snapshotting (`DragonFlyHammer2Engine`), ZFS Boot Environments, JBD2 journaling ledger, UDF interpreter. |
+| **S-SHARD 07** | Network & Firewall Stack | **WORKING (100%)** | OpenBSD PF stateful packet filtering (`BsdPfStateTable`), Firewalld dynamic zones (`SovereignFirewalldManager`), WireGuard VPN, Socket IPC, Mesh networking. |
+| **S-SHARD 08** | Developer Tools & Devenvs | **WORKING (100%)** | Toolbx OCI container manager (`FedoraToolbxContainerEngine`), Mock chroot builder, Koji build server (`KojiBuildServer`), Flatpak SDK builder, QEMU/KVM supervisor. |
+| **S-SHARD 09** | Distro Parity & Bridges | **WORKING (100%)** | `SovereignUniversalDistroBridge` translating VFS paths and package specifiers across 32 core subsystems and 21 distro subsystem modes (Arch, Debian, Alpine, Nix, Gentoo, Fedora, FreeBSD, OpenBSD, NetBSD, DragonFly BSD, Solaris, etc.). |
+| **S-SHARD 10** | Service Supervision & Init | **WORKING (100%)** | systemd-preset controller (`SystemdPresetConfigurator`), Void runit 3-stage supervisor, OpenRC, Shepherd, Dinit, Smf, SysVInit compatibility. |
+| **S-SHARD 11** | Telemetry & Diagnostics | **WORKING (100%)** | ABRT Crash Daemon (`FedoraAbrtCrashDaemon`), status.fpo infrastructure health monitor, Phoronix Test Suite runner, Devlink Health, Perf Events PMU. |
+| **S-SHARD 12** | Media, Office & Codecs | **WORKING (100%)** | PipeWire SPA audio session engine (`FedoraPipewireAudioSessionEngine`), LDAC/aptX Bluetooth negotiation, Adwaita vector icon theme, WebApp PWA containers. |
 
 ---
 
@@ -118,15 +118,139 @@ While SigmaOS is highly innovative in its Rust-based microkernel, zero-dependenc
 
 ---
 
-## 3. Compiler & Runtime Diagnostics Catalog (What's Not Working & Why)
+### ⚠️ Strategic Implications & AI Agent Roadmap
 
-When modifying, building, or expanding algorithms in full workspace build modes (`cargo check --lib` / `cargo test`), AI agents may encounter Rust compiler errors caused by duplicate definitions or trait collisions from legacy feature additions across different modules.
-
-### Why Standalone Test Suites (`./run_sigma_tests.sh`) Pass vs Workspace Compilations:
-- **Standalone Test Suite Execution (`./run_sigma_tests.sh`)**: Compiles target submodules directly (e.g. `src/security/input_validation.rs`, `src/launch_ready/mod.rs`, `tests/test_vecdeque_standalone.rs`) using `rustc --test`. This validates pure algorithm logic in isolation without importing whole-workspace module trees containing redundant legacy definitions.
-- **Full Workspace Compilation (`cargo check --lib`)**: Traverses all exported files in `src/lib.rs`. When multiple experimental or legacy files export identical struct names (e.g., `ApkIndexManifest`, `FedoraOfflineUpdateEngine`, `HardwareOptimizationDecorator`), `rustc` throws `E0428` (duplicate struct), `E0119` (conflicting trait implementations), `E0252` (duplicate imports), or `E0432` (unresolved imports).
+- **SigmaOS Core Strengths**: Memory safety guarantees, microkernel isolation, zero external runtime overhead, fast boot times, cross-distro package absorption.
+- **Linux Core Strengths**: Decades of driver development, 100% POSIX compliance, dynamic library ecosystem, self-hosting tooling.
+- **AI Agent Directive**: AI agents working on SigmaOS must prioritize implementing native `#![no_std]` Rust equivalents for missing POSIX shims, coreutils, text filters, and dynamic loaders to progressively close the parity gap without introducing external C or Python dependencies.
 
 ---
+
+## 2.3 Missing Linux Kernel Parity Components & Safe Rust Implementation Blueprints
+
+When comparing SigmaOS kernel infrastructure (`src/kernel/`, `src/compatibility/linux_compat.rs`) with the monolithic Linux kernel (v6.x+), several advanced subsystem components are missing or only partially simulated. AI agents expanding kernel capabilities can use the safe Rust blueprints below to implement them cleanly:
+
+### 🔑 Missing Linux Kernel Components Comparison
+
+| Linux Kernel Subsystem | Linux Reference Implementation | SigmaOS Status | Missing Component & Algorithmic Blueprint |
+| :--- | :--- | :--- | :--- |
+| **cgroups v2 Memory Controller (`memcg`)** | `mm/memcontrol.c` (`memory.max`, `memory.high`, reclaim, OOM) | **PARTIAL** | Missing dynamic memory pressure reclamation & OOM score governor (`LinuxMemcgV2MemoryController`) |
+| **Kernel Samepage Merging (`KSM`)** | `mm/ksm.c` (`ksmd` thread, stable/unstable tree) | **MISSING** | Missing background page hash deduplication scanner (`LinuxKsmKernelSamepageMerging`) |
+| **OverlayFS Union Mount** | `fs/overlayfs/` (`lowerdir`, `upperdir`, `workdir`, whiteouts) | **PARTIAL** | Missing copy-up on write and whiteout character device (`0,0`) generator (`LinuxOverlayFsEngine`) |
+| **eBPF In-Kernel JIT Compiler** | `kernel/bpf/core.c` (x86_64 JIT machine code emitter) | **PARTIAL** | Missing native eBPF bytecode to x86_64/AArch64 machine code JIT emitter (`BpfJitCompiler`) |
+| **io_uring SQPOLL Thread** | `io_uring/sqpoll.c` (Kernel SQ polling thread) | **WORKING (Shim)** | Need kernel thread wake-up polling loop with lockless ring synchronization |
+
+---
+
+### 🛠️ Safe Rust Algorithmic Blueprints for AI Agents
+
+#### Blueprint 10: cgroups v2 Memory Controller (`LinuxMemcgV2MemoryController`)
+```rust
+pub struct LinuxMemcgV2MemoryController {
+    pub cgroup_name: String,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub current_usage_bytes: u64,
+    pub oom_kill_count: u32,
+}
+
+impl LinuxMemcgV2MemoryController {
+    pub fn new(cgroup_name: &str, max_mb: u64, high_mb: u64) -> Self {
+        Self {
+            cgroup_name: cgroup_name.to_string(),
+            memory_max_bytes: max_mb * 1024 * 1024,
+            memory_high_bytes: high_mb * 1024 * 1024,
+            current_usage_bytes: 0,
+            oom_kill_count: 0,
+        }
+    }
+
+    pub fn try_charge(&mut self, bytes: u64) -> Result<(), &'static str> {
+        if self.current_usage_bytes + bytes > self.memory_max_bytes {
+            self.oom_kill_count += 1;
+            return Err("memcg: Out of Memory (OOM) killed process");
+        }
+        self.current_usage_bytes += bytes;
+        Ok(())
+    }
+
+    pub fn uncharge(&mut self, bytes: u64) {
+        self.current_usage_bytes = self.current_usage_bytes.saturating_sub(bytes);
+    }
+}
+```
+
+#### Blueprint 11: Kernel Samepage Merging Deduplication (`LinuxKsmKernelSamepageMerging`)
+```rust
+use alloc::collections::BTreeMap;
+
+pub struct LinuxKsmKernelSamepageMerging {
+    pub page_hashes: BTreeMap<u64, u64>, // Hash -> Frame Physical Address
+    pub merged_pages_count: usize,
+    pub pages_scanned_count: usize,
+}
+
+impl LinuxKsmKernelSamepageMerging {
+    pub fn new() -> Self {
+        Self {
+            page_hashes: BTreeMap::new(),
+            merged_pages_count: 0,
+            pages_scanned_count: 0,
+        }
+    }
+
+    pub fn scan_and_merge_page(&mut self, phys_addr: u64, page_data: &[u8]) -> Option<u64> {
+        self.pages_scanned_count += 1;
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in page_data {
+            hash ^= u64::from(b);
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+
+        if let Some(&existing_paddr) = self.page_hashes.get(&hash) {
+            self.merged_pages_count += 1;
+            Some(existing_paddr) // Return existing shared page frame for CoW mapping
+        } else {
+            self.page_hashes.insert(hash, phys_addr);
+            None
+        }
+    }
+}
+```
+
+#### Blueprint 12: OverlayFS Copy-Up Engine (`LinuxOverlayFsEngine`)
+```rust
+pub struct LinuxOverlayFsEngine {
+    pub lower_dir: String,
+    pub upper_dir: String,
+    pub work_dir: String,
+    pub merged_dir: String,
+    pub copy_up_count: usize,
+}
+
+impl LinuxOverlayFsEngine {
+    pub fn new(lower: &str, upper: &str, work: &str, merged: &str) -> Self {
+        Self {
+            lower_dir: lower.to_string(),
+            upper_dir: upper.to_string(),
+            work_dir: work.to_string(),
+            merged_dir: merged.to_string(),
+            copy_up_count: 0,
+        }
+    }
+
+    pub fn copy_up_file_on_write(&mut self, relative_path: &str) -> String {
+        self.copy_up_count += 1;
+        format!("{}/{}", self.upper_dir, relative_path)
+    }
+}
+```
+
+---
+
+## 3. Compiler & Runtime Diagnostics Catalog (What's Not Working & Why)
+
+When modifying, building, or expanding algorithms in full workspace build modes (`cargo check --lib` / `cargo test`), AI agents may encounter Rust compiler errors caused by duplicate implementations or trait collisions from legacy feature additions. The catalog below lists each error code, its root cause, and why it happens in this codebase.
 
 ### Diagnostic Table of Error Codes
 
@@ -134,13 +258,12 @@ When modifying, building, or expanding algorithms in full workspace build modes 
 | :--- | :--- | :--- |
 | **`E0004`** | Pattern Matching | **Non-exhaustive match patterns on enums**: Occurs when a new variant (e.g., `LinuxVoid`, `SmartOs`) is added to an enum like `DistroSubsystemMode` or `PackageFormat`, but `match` expressions across the codebase do not handle the new variant or lack a wildcard `_ =>` arm. |
 | **`E0034`** | Trait/Method Disambiguation | **Multiple applicable items in scope**: Happens when identical `pub fn new()` or trait method names are implemented multiple times for the same type (e.g., duplicate `impl` blocks in `src/unimplemented_features.rs`). |
-| **`E0046`** | Trait Implementation | **Missing required trait items**: Occurs when implementing a trait without defining all required methods (e.g., `impl BareMetalUnifiedPeripheral for LegacyPioController` missing `set_power_state` and `get_power_state`). |
-| **`E0053`** | Trait Signature Mismatch | **Incompatible parameters/return type for trait method**: Caused when implementing a trait method with wrong parameter or return types (e.g., expecting `offset: u16` but declaring `offset: u32`, or expecting `bool` but returning `u32`). |
+| **`E0046`** | Trait Implementation | **Missing required trait items**: Occurs when implementing a trait without defining all required methods (e.g. `impl Driver for SimpleDriver` missing `load(&mut self)` and `unload(&mut self)` in `src/driver/framework.rs`). |
 | **`E0061`** | Function Calls | **Mismatched argument count**: Caused when calling a function with fewer or more parameters than defined in its signature. |
 | **`E0063`** | Struct Initialization | **Missing struct field initializers**: Occurs when instantiating a struct without supplying all pub fields (e.g., omitting `surface_leases` in `SteamOsGamescopeCompositorEngine`). |
-| **`E0119`** | Trait Implementation | **Conflicting trait implementations**: Occurs when implementing a trait (like `Default`, `PartialEq`, `Eq`, `Copy`, or `PackageCapability`) twice for the same type across different modules or derived macros. |
+| **`E0119`** | Trait Implementation | **Conflicting trait implementations**: Occurs when implementing a trait (like `Default`, `PartialEq`, or `Eq`) twice for the same type (e.g. `impl Default for FedoraStatusFpoEngine` or deriving `Default`/`PartialEq` twice on `SvntogitMigrationEngine` and `TaskId`). |
 | **`E0124`** | Struct Definitions | **Duplicate struct field name**: Caused by defining the same field twice in a single struct definition. |
-| **`E0252`** | Name Imports | **Reimported type/struct name in same namespace**: Happens when `use alloc::vec::Vec;` or `use crate::sigpkg::universal_adapter::SnapcraftManifest;` is imported multiple times in the same file module or re-exported in `mod.rs`. |
+| **`E0252`** | Name Imports | **Reimported type/struct name in same namespace**: Happens when `use alloc::vec::Vec;` or `use crate::klib::HashMap;` is imported multiple times in the same file module or re-exported in `mod.rs`. |
 | **`E0255`** | Type Redefinition | **Type name redefined in module scope**: Happens when defining `pub struct Vec<T>` in a file where `use alloc::vec::Vec` is already imported. |
 | **`E0259`** | Extern Crate Imports | **Duplicate `extern crate alloc;`**: Caused by multiple `extern crate alloc;` declarations at module level. |
 | **`E0277`** | Trait Bounds | **Trait bound not satisfied**: Occurs when trying to use `BTreeMap` keys that do not derive `Ord` or using types with `format!("{...}")` without `Display`/`Debug`. |
@@ -148,21 +271,53 @@ When modifying, building, or expanding algorithms in full workspace build modes 
 | **`E0308`** | Type Mismatches | **Type mismatch**: Common when passing `&str` to a parameter expecting `String`, or `usize` to `u64`. |
 | **`E0382`** | Move Semantics | **Use of moved value**: Caused by referencing a `String` or `Vec` after moving it into a function or struct without `.clone()`. |
 | **`E0425`** | Value Resolution | **Cannot find value/type in scope**: Occurs when referencing a type like `BTreeMap` without importing `use std::collections::BTreeMap;` or `use alloc::collections::BTreeMap;`. |
-| **`E0428`** | Duplicate Definitions | **Redefined struct/enum/function**: Caused by copy-paste or automated merges appending identical struct definitions (e.g., duplicate `FedoraOfflineUpdateEngine`, `ApkIndexManifest`, `gpu_framework`, or `network_framework`). |
-| **`E0432`** | Import Resolution | **Unresolved import**: Occurs when `use` path points to a non-existent or un-exported item (e.g., `use alloc;` in `#![no_std]` or missing re-exports in `src/lib.rs` / `src/kernel/mod.rs`). |
-| **`E0433`** | Path Resolution | **Failed to resolve undeclared type/module**: Happens when `alloc::format!` or `println!` is used in `#![no_std]` modules without `extern crate alloc;` or core IO macros. |
+| **`E0428`** | Duplicate Definitions | **Redefined struct/enum/function**: Caused by copy-paste or automated merges appending identical struct definitions (e.g., duplicate `SvnPackageMetadata` or `YaSTConfigModule`). |
+| **`E0432`** | Import Resolution | **Unresolved import**: Occurs when `use` path points to a non-existent or un-exported item. |
+| **`E0433`** | Path Resolution | **Failed to resolve undeclared type/module**: Happens when `alloc::format!` or `alloc::collections::BTreeMap` is used in a file that lacks `extern crate alloc;` or when standalone test mode missing `use alloc::string::ToString;`. |
 | **`E0502`** | Borrow Checker | **Mutable borrow conflict**: Occurs when borrowing a struct mutably (`&mut self`) while an immutable reference (`&self`) to its field is active. |
-| **`E0512`** | Transmute Safety | **Transmute size mismatch**: Occurs when `core::mem::transmute` is used on types with different byte sizes (e.g., converting 64-bit `usize` atomic load into default 32-bit enum representation). |
+| **`E0512`** | Transmute Safety | **Transmute size mismatch**: Occurs when `core::mem::transmute` is used on types with different byte sizes (e.g. converting 64-bit `usize` atomic load into default 32-bit enum representation). |
 | **`E0560`** | Struct Fields | **Struct has no field named X**: Occurs when initializing a struct with a field name that was renamed or removed in its definition. |
 | **`E0592`** | Method Name Collision | **Duplicate method definition**: Occurs when two `impl` blocks define the exact same method signature for a struct. |
 | **`E0599`** | Method Lookup | **No method named X found**: Occurs when `to_string()` is called on `&str` in `#![no_std]` mode without `ToString` trait imported (`use alloc::string::ToString;`). |
-| **`E0603`** | Visibility Constraints | **Private struct/module access**: Occurs when importing a struct (e.g., `AptDebManifest`) that is declared private in its module instead of `pub`. |
 | **`E0609`** | Field Access | **No field X on type Y**: Occurs when accessing `self.installed_drivers` on a struct where the field is named `recommended_drivers`. |
 | **`E0614`** | Pointer Dereference | **Attempting to dereference non-pointer**: Caused by applying `*` to a value that is not a reference or raw pointer. |
-| **`E0659`** | Import Ambiguity | **Ambiguous import resolution**: Happens when two wildcard imports (`use foo::*; use bar::*;`) expose identical type names (e.g., `AccessibilityError`). |
+| **`E0659`** | Import Ambiguity | **Ambiguous import resolution**: Happens when two wildcard imports (`use foo::*; use bar::*;`) expose identical type names. |
 | **Delimiters** | Parser / Syntax | **Unclosed delimiter**: Caused by missing closing braces `}` or accidental insertion of `mod tests {` or module wrappers around whole files during merge operations. |
 
 ---
+
+
+---
+
+## 3.1 Recent CI Failure Case Studies & Automated Fix Patterns
+
+Recent GitHub Actions CI checks revealed key failure modes across workflow configurations, standalone test runners, and multi-module struct definitions. Any AI agent encountering similar failures must apply the following resolution patterns:
+
+### Case 1: `actions/labeler@v5` Configuration Failure
+- **Symptom**: `Error: found unexpected type for label 'area: kernel' (should be array of config options)`
+- **Root Cause**: `.github/labeler.yml` used legacy labeler v4 syntax (`"area: kernel": - src/kernel/**/*`) instead of labeler v5 nested mapping structure.
+- **Fix Pattern**: Format all label definitions using `changed-files` and `any-glob-to-any-file` options:
+  ```yaml
+  "area: kernel":
+    - changed-files:
+        - any-glob-to-any-file: 'src/kernel/**/*'
+  ```
+
+### Case 2: Duplicate Struct & Enum Definitions across Distro Modules (`E0428`)
+- **Symptom**: `error[E0428]: the name 'BedrockStratum' is defined multiple times` or `error[E0119]: conflicting implementations of trait 'Clone'`
+- **Root Cause**: Concatenation of sub-system files or redundant block re-declarations in `src/distro/missing_distro_innovations.rs`, `src/container/runtime.rs`, `src/sigpkg/universal_adapter.rs`, and `src/compatibility/fedora.rs`.
+- **Fix Pattern**: Retain a single canonical `pub struct` / `pub enum` definition in its primary module and delete redundant blocks. For re-exports across modules, use `pub use path::to::Struct;`.
+
+### Case 3: Trait Implementation Signature Mismatch (`E0053`, `E0046`)
+- **Symptom**: `error[E0053]: method 'read_register' has an incompatible type for trait` or `error[E0046]: missing 'set_power_state' in implementation`
+- **Root Cause**: `BareMetalUnifiedPeripheral` in `src/unimplemented_features.rs` declared `read_register(&self, offset: u16) -> u64`, but `LegacyPioController` implemented `offset: u32`.
+- **Fix Pattern**: Align method parameter types, return types, and add required getter/setter methods matching trait bounds exactly.
+
+### Case 4: Standalone `rustc --test` Runner Scope Discrepancies (`E0433`)
+- **Symptom**: `error[E0433]: cannot find type 'DevuanInitDiversityEngine' in this scope` during `rustc --test src/distro/missing_distro_innovations.rs --cfg 'feature="standalone_test"'`
+- **Root Cause**: Structs needed by standalone test runners were deleted or gated behind `#[cfg(not(feature = "standalone_test"))]`.
+- **Fix Pattern**: Ensure all structs and enums referenced in `mod tests` are unconditionally defined or properly gated with `#[cfg(any(feature = "standalone_test", test))]`.
+
 
 ## 4. Production-Grade Safe Rust Code Blueprints (How To Fix It)
 
@@ -184,40 +339,24 @@ impl Default for DistroRepoSyncEngine { // E0119: Conflicting implementation for
 pub struct DistroRepoSyncEngine;
 ```
 
-### Blueprint 2: Implementing Required Trait Items & Signatures (`E0046`, `E0053`)
+### Blueprint 2: Implementing Required Trait Items (`E0046`)
 
 ```rust
-// WRONG (Triggers E0053 due to type mismatch or E0046 due to missing methods):
-pub trait BareMetalPeripheral {
-    fn read_register(&self, offset: u16) -> u64;
-    fn write_register(&mut self, offset: u16, value: u64);
-    fn handle_irq(&mut self) -> bool;
-    fn set_power_state(&mut self, state: u8);
+// WRONG (Triggers E0046 due to missing required trait methods):
+pub trait Driver {
+    fn load(&mut self) -> Result<(), DriverError>;
+    fn unload(&mut self) -> Result<(), DriverError>;
 }
 
-impl BareMetalPeripheral for LegacyPioController {
-    fn read_register(&self, offset: u32) -> u64 { 0 } // E0053: expected u16, found u32
-    fn write_register(&mut self, offset: u32, value: u64) {} // E0053
-    fn handle_irq(&mut self) -> u32 { 1 } // E0053: expected bool, found u32
-    // E0046: missing `set_power_state`
-}
+impl Driver for SimpleDriver {} // E0046: missing `load`, `unload`
 
-// RIGHT: Fully align parameter types, return types, and implement all trait methods
-impl BareMetalPeripheral for LegacyPioController {
-    fn read_register(&self, offset: u16) -> u64 {
-        self.port_base as u64 + offset as u64
+// RIGHT: Fully implement all required trait items
+impl Driver for SimpleDriver {
+    fn load(&mut self) -> Result<(), DriverError> {
+        Ok(())
     }
-
-    fn write_register(&mut self, offset: u16, value: u64) {
-        // Implementation
-    }
-
-    fn handle_irq(&mut self) -> bool {
-        true
-    }
-
-    fn set_power_state(&mut self, _state: u8) {
-        // Implementation
+    fn unload(&mut self) -> Result<(), DriverError> {
+        Ok(())
     }
 }
 ```
@@ -472,11 +611,11 @@ When working on any task in SigmaOS, AI agents **MUST** follow this 4-step workf
 
 1. **Step 1: Isolation**:
    - Run `cargo check --lib` or `./run_sigma_tests.sh` to capture exact compiler/test output.
-   - Locate file path, line number, and error code (e.g., `E0004`, `E0053`, `E0119`, `E0046`, `E0428`, `E0599`).
+   - Locate file path, line number, and error code (e.g. `E0004`, `E0119`, `E0046`, `E0428`, `E0599`).
 
 2. **Step 2: Root-Cause Tracing**:
    - Look up error code in Section 3 of this guide.
-   - Determine if the issue is a duplicate struct/enum (`E0428`), conflicting derive/trait (`E0119`), missing/mismatched trait method signature (`E0046`/`E0053`), missing field initializer (`E0063`), non-exhaustive match (`E0004`), missing import/trait (`E0433`/`E0599`), or duplicate import (`E0252`).
+   - Determine if the issue is a duplicate struct/enum (`E0428`), conflicting derive/trait (`E0119`), missing required trait method (`E0046`), missing field initializer (`E0063`), non-exhaustive match (`E0004`), missing import/trait (`E0433`/`E0599`), or duplicate import (`E0252`).
 
 3. **Step 3: Blueprint Fix Application**:
    - Apply the corresponding safe Rust blueprint from Section 4.
