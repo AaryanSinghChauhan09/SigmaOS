@@ -1,8 +1,24 @@
-# SigmaOS Wiki
+# 🏛️ SigmaOS Master Wiki
 
-**SigmaOS** is a sovereign, secure, next-generation operating system written in Rust — designed for zero-dependency bare-metal execution with full Linux/BSD distro compatibility.
+**SigmaOS** is a sovereign, secure, next-generation bare-metal operating system written in safe Rust (`#![no_std]`) — combining the performance, flexibility, and philosophy of **Arch Linux** with multi-distro Linux and BSD compatibility.
 
-> ✅ **Build Status:** 0 compilation errors as of September 2026. All 14 open PRs merged.
+> ✅ **Build Status:** 0 compilation errors as of September 2026. All open PRs merged and verified.
+
+---
+
+## 🏛️ Master Arch-Style Wiki Portal
+
+Explore the **[SigmaOS Arch Wiki Portal](SIGMAOS_ARCH_WIKI_PORTAL)** for comprehensive, Arch Linux Wiki-standard technical guides covering system administration, package management, security hardening, performance tuning, and Wayland desktop compositor setup.
+
+---
+
+## 🎯 The SigmaOS Philosophy (Arch Principles)
+
+1. **Simplicity:** Zero-dependency, pure Rust microkernel shards and userland.
+2. **Modernity:** Wayland wire protocol, eBPF XDP zero-copy networking, and CachyOS BORE scheduler.
+3. **Pragmatism:** Universal package compatibility (`.deb`, `.rpm`, `PKGBUILD` / `.pkg.tar.zst`, `.apk`, `.xbps`, `.txz`).
+4. **User-Centricity:** Transparent privilege delegation, sandboxing, and hardware Governor control.
+5. **Versatility:** Rolling release agility with sub-millisecond atomic transactional state rollbacks (Snapper CoW, NixOS generations, FreeBSD ZFS boot environments).
 
 ---
 
@@ -10,6 +26,7 @@
 
 | Page | Description |
 |------|-------------|
+| [SIGMAOS_ARCH_WIKI_PORTAL](SIGMAOS_ARCH_WIKI_PORTAL) | **Master Wiki Portal (Arch Linux Standard)** |
 | [INSTALL](INSTALL) | Installation and build instructions |
 | [BUILD](BUILD) | Build system, toolchain, and compilation |
 | [CONTRIBUTING](CONTRIBUTING) | How to contribute to SigmaOS |
@@ -17,7 +34,7 @@
 
 ---
 
-## 🏗️ Architecture & Design
+## 🏗️ Architecture & Core Kernel Shards
 
 | Page | Description |
 |------|-------------|
@@ -33,10 +50,11 @@
 
 ---
 
-## 📦 Package Management
+## 📦 Package Management & AUR Build Pipeline
 
 | Page | Description |
 |------|-------------|
+| [ARCH_LINUX_PARITY_FEATURES](ARCH_LINUX_PARITY_FEATURES) | Arch Linux pacman, PKGBUILD, AUR, & Reflector parity |
 | [PACKAGE_MANAGEMENT](PACKAGE_MANAGEMENT) | Complete sigpkg reference |
 | [package-manager](package-manager) | Package manager architecture |
 | [LINUX_BSD_DISTRO_COMPATIBILITY_GUIDE](LINUX_BSD_DISTRO_COMPATIBILITY_GUIDE) | Linux/BSD distro compatibility |
@@ -44,7 +62,7 @@
 
 ---
 
-## 🔐 Security
+## 🔐 Security & Hardening
 
 | Page | Description |
 |------|-------------|
@@ -78,7 +96,7 @@
 
 ---
 
-## 🌐 Linux Distro Innovations
+## 🌐 Linux & BSD Distro Parity
 
 | Page | Description |
 |------|-------------|
@@ -90,7 +108,7 @@
 
 ---
 
-## 💡 Ideas & Planning
+## 💡 Strategic Planning & Improvement Ideas
 
 | Page | Description |
 |------|-------------|
@@ -101,4 +119,4 @@
 
 ---
 
-*Last updated: September 2026 — All PRs merged, 0 compilation errors.*
+*Last updated: September 2026 — Documentation aligned with Arch Linux Wiki principles.*

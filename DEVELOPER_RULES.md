@@ -1,8 +1,9 @@
 # 📋 SigmaOS Developer Rules & Task Guidelines
 
-**Version:** 2.0.0
+**Version:** 3.0.0
 **Last Updated:** September 2026  
 **Scope:** All developers, maintainers, contributors, and AI agents
+**Master Directives Reference:** [`RULES.md`](RULES.md)
 
 ---
 
