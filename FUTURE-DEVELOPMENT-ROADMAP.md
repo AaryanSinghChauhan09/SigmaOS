@@ -5307,3 +5307,51 @@ SigmaOS development is driven by a composite 10-specialist AI agent operational 
 - **Daily Repository Auditing**: Automated discovery of bugs, race conditions, dead code, memory leaks, and security risks.
 - **GitHub Feature Extraction**: Scans open-source ecosystems to extract state-of-the-art algorithms, schedulers, and networking techniques for native SigmaOS re-implementation.
 - **Wiki & Documentation Synchronization**: Automatically maintains synchronized state across repo root docs, `WIKI/`, `wiki/`, and `wiki_repo/` targets via `./scripts/sync_wiki.sh`.
+
+---
+
+## 107. SOVEREIGN OMARCHY LINUX PARITY & DEVELOPER WORKSTATION ERGONOMICS ARCHITECTURE SPECIFICATION
+
+### 107.1 Overview & Omarchy Absorption Philosophy
+SigmaOS absorbs the developer-centric ergonomics, instant out-of-the-box productivity, and keyboard-driven tiling aesthetics of **Omarchy Linux** (an Arch-based distribution tailored for AI pair-programming and modern workstation workflows). While Omarchy relies on standard Arch packages and X11/Wayland daemons (Hyprland, Waybar, Quickshell, Neovim, LazyVim, Kitty, Ghostty), SigmaOS implements native `#![no_std]` Rust engines inside its Zenith Compositor and userland.
+
+```
++-----------------------------------------------------------------------------------+
+|               SIGMAOS OMARCHY LINUX PARITY & ERGONOMICS ARCHITECTURE              |
++-----------------------------------------------------------------------------------+
+|  [Hyprland Window Tiling]    [Quickshell & Waybar HUD]   [Herdr AI Orchestrator]  |
+|  Dwindle vs. Scroll Layouts  Real-Time Tray & Applets     Multi-Agent Pair-Prog.  |
++-----------------------------------------------------------------------------------+
+|  [Omakase Neovim LSP]        [Terminal & Typography]     [Curated Theme Studio]   |
+|  Mason/LSP Native Studio     Ghostty/Kitty/NerdFonts     TokyoNight / Catppuccin  |
++-----------------------------------------------------------------------------------+
+```
+
+---
+
+### 107.2 Omarchy Subsystem Parity Components
+
+SigmaOS natively implements Omarchy Linux workstation parity across `src/distro/omarchy.rs`, `src/desktop/omarchy_omakase.rs`, `src/tools/omarchy_command_palette.rs`, and `src/distro/omarchy_inspiration.rs`:
+
+#### 1. Hyprland Window Tiling Engine (`Omarchy4HyprlandDynamicTilingManager` & `OmarchyModernDesktopEngine`)
+- **Dwindle & Master Layouts**: Generates binary-tree dwindle and master-stack window tiling layouts directly inside Zenith Compositor.
+- **Keyboard Navigation Maps**: Native support for Omarchy keybindings (`Super+Return` Terminal, `Super+Space` Launcher, `Super+Q` Kill, `Super+F` Fullscreen, `Super+G` Window Group, `Super+O` Pop/Float, `Super+Grave` Scratchpad).
+
+#### 2. Quickshell & Status Bar HUD (`OmarchyQuickShellWindowBarEngine` & `OmarchyWaybarStatusAppletStudio`)
+- **Quickshell Integration**: Renders real-time hardware telemetry, active window titles, system tray notifications, and workspace indicators without external Wayland shell daemons.
+- **Waybar Applets**: Configurable status bar applets for network link, CPU/GPU load, memory usage, and volume controls.
+
+#### 3. Omakase Neovim & Terminal Studio (`OmarchyNeovimPresetEngine` & `OmarchyTerminalFontStudioEngine`)
+- **Preconfigured Neovim Studio**: Built-in LazyVim / Kickstart IDE presets with Mason package manager shims, Treesitter syntax highlighting, and LSP auto-completion.
+- **Terminal & Font Integration**: Native rendering presets for Ghostty, Kitty, Nerd Fonts (`OmarchyNerdFont`), and Starship powerline prompt themes.
+
+#### 4. Herdr AI Pair-Programming Agent (`OmarchyHerdrAiWorkflowAgent`)
+- **Multi-Agent Orchestration**: OS-level multi-agent workflow engine managing parallel AI coding agents (Claude, Codex, Grok, Gemini, local LLMs) with capability-gated file and process permissions.
+
+#### 5. Live ISO Installer & Web2App Launcher (`OmarchyIsoInstallerEngine` & `OmarchyAppLauncherEngine`)
+- **Archiso Bootstrap Manifests**: Generates custom bootable ISO images for Omarchy-style workstation setups.
+- **Web2App PWA Launcher**: Converts Web applications into isolated desktop applications with dedicated sandboxed windows.
+
+#### 6. Curated Theme Studio (`OmarchyTheme` & `OmarchySystemThemeStudio`)
+- Enforces system-wide color palette synchronization across compositor, status bar, terminal, and applications.
+- Built-in palettes: `TokyoNight`, `Catppuccin`, `Gruvbox`, `Nord`, `Everforest`, `Kanagawa`, `RosePine`, `Dracula`, `Solarized`, `Oxide`, and `Cyberpunk`.
