@@ -1,18 +1,17 @@
 pub mod omarchy;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
-    OmarchyAudioPipewireConfig, OmarchyFastfetchSysinfoEngine, OmarchyGhosttyTerminalEngine,
-    OmarchyHyprlandCompositorConfigEngine, OmarchyHypridleEngine, OmarchyHyprpaperWallpaperEngine,
-    OmarchyLazyGitConfigurationEngine, OmarchyMiseVersionManagerEngine, OmarchyModernDesktopEngine,
-    OmarchyNerdFont, OmarchyNeovimPresetEngine, OmarchyOmakubDevInstaller, OmarchySwayNcEngine,
-    OmarchyTerminalFontConfig, OmarchyTheme, OmarchyWalkerLauncherEngine, OmarchyWaybarEngine,
-    PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
+    OmarchyAudioPipewireConfig, OmarchyAyuThemeEngine, OmarchyFastfetchSysinfoEngine,
+    OmarchyGhosttyTerminalEngine, OmarchyHyprlandCompositorConfigEngine, OmarchyHypridleEngine,
+    OmarchyHyprpaperWallpaperEngine, OmarchyLazyGitConfigurationEngine,
+    OmarchyMiseVersionManagerEngine, OmarchyModernDesktopEngine, OmarchyNerdFont,
+    OmarchyNeovimPresetEngine, OmarchyOmakubDevInstaller, OmarchyStarshipPromptConfigEngine,
+    OmarchySwayNcEngine, OmarchyTerminalFontConfig, OmarchyTheme, OmarchyWalkerLauncherEngine,
+    OmarchyWaybarEngine, PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
 };
 pub mod parrot_security;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
-pub mod arch_missing_components;
-pub use arch_missing_components::*;
 pub use arch::{
     AlpmHook, AlpmHookWhen, ArchGpgKey, ArchKeyringEngine, ArchPacmanHookManager,
     ArchReflectorEngine, ArchinstallEngine, FilesystemType as ArchFilesystemType,
@@ -229,11 +228,6 @@ pub use sovereign_distro_dominance::{
     ZfsBtrfsHybridSelfHealingCoW,
 };
 
-pub mod opensuse;
-pub use opensuse::{
-    MicroOsSnapshot, MicroOsSnapshotState, OpenSuseMicroOsEngine, OpenSuseYastPatternEngine,
-    YastPattern,
-};
 pub mod nextgen_innovations;
 pub mod universal_distro_super_matrix;
 pub mod void_xbps_src;
@@ -249,8 +243,6 @@ pub use universal_distro_super_matrix::{
     DistroCapabilityProfile, DistroCategory, UniversalDistroSuperMatrix,
 };
 
-pub mod future_roadmap_innovations;
-pub use future_roadmap_innovations::*;
 pub mod sovereign_nextgen_distro_leap;
 pub use sovereign_nextgen_distro_leap::{
     ClusterNodeRole, HaStateEntry, HermeticClosureRecord, LandlockAccessType, LandlockV5Rule,
@@ -258,36 +250,3 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
-
-pub mod arch_gap_closure;
-pub use arch_gap_closure::{
-    AlpmHookRule as ArchAlpmHookRule, ArchArchisoIsoBuilderEngine, ArchGpgKeyNode,
-    ArchPacmanCachePruningEngine, ArchPacmanHooksManagerEngine, ArchPacmanKeyringTrustEngine,
-    ArchSysusersTmpfilesGeneratorEngine, ArchisoProfileSpec, CachedPackageTarball,
-    HookWhen as ArchHookWhen, KeyTrustLevel as ArchKeyTrustLevel, SovereignArchGapClosureSuite,
-    SysuserRule, TmpfileRule,
-};
-
-pub mod fedora_gap_closure;
-pub use fedora_gap_closure::{
-    CoprPackageProject, FedoraAnacondaInstallerEngine, FedoraCoprBuildRepositoryEngine,
-    FedoraMockChrootBuildEngine, FedoraSelinuxMlsPolicyGovernorEngine, KickstartConfig,
-    MockChrootSpec, SelinuxMlsContext, SovereignFedoraGapClosureSuite,
-};
-
-pub mod tech_media_distro_innovations;
-pub use tech_media_distro_innovations::{
-    DistroWatchRankTrackerEngine, LinuxTeckSysadminAutomationEngine,
-    MakeUseOfDistroRecommendationEngine, NineToFiveLinuxReleaseMatrixEngine,
-    SovereignTechMediaDistroInnovationsSuite,
-};
-pub mod arch_ultimate_gap_closure;
-pub use arch_ultimate_gap_closure::*;
-pub mod omarchy_ultimate_gap_closure;
-pub use omarchy_ultimate_gap_closure::*;
-pub mod tech_media_extended_innovations;
-pub use tech_media_extended_innovations::*;
-pub mod omarchy_complete_gap_closure;
-pub use omarchy_complete_gap_closure::*;
-pub mod omarchy_final_gap_closure;
-pub use omarchy_final_gap_closure::*;
