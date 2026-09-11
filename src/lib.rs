@@ -56,6 +56,8 @@ pub use sovereign_wiki_master_engine::*;
 pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
+pub mod wiki_unimplemented_ideas;
+pub use wiki_unimplemented_ideas::*;
 pub mod userland;
 
 pub use distro::{
