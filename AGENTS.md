@@ -315,3 +315,21 @@ When integrating or refining Linux & BSD distro capability engines in `src/distr
 1. **Zero-Dependency Subsystem Parity:** Implement clean-room, `#![no_std]` Rust modules that absorb and emulate key distro innovations (e.g. Void Linux runit service supervision in `VoidRunitServiceSupervisorEngine`, Alpine Linux tmpfs apk volatile overlays in `AlpineApkVolatileOverlayEngine`, openSUSE YaST2/Snapper, NetBSD rump kernels, Ubuntu netplan/cloud-init, GNU Guix Shepherd/store derivations).
 2. **Re-export Invariants:** Always re-export newly implemented distro engines in `src/distro/mod.rs` and `src/lib.rs`.
 3. **Verification:** Validate all distro parity engines using standalone unit tests (`rustc --test --edition 2021`) and `./run_sigma_tests.sh`.
+
+---
+
+## 3. Operational Directives for Contributors & Autonomous AI Agents
+
+1. **Zero External Dependencies Policy:**
+   - SigmaOS strictly follows a zero-dependency `#![no_std]` design philosophy.
+   - Do NOT add external crates under `[dependencies]` in `Cargo.toml`.
+   - Use `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`) and native `#![no_std]` structures.
+
+2. **Mandatory Verification Protocol:**
+   - Always run `./run_sigma_tests.sh` after making modifications.
+   - Individual standalone tests MUST be compiled and verified using `rustc --edition=2021 --test <file_path> -o build/test_bin && ./build/test_bin`.
+
+3. **Persona & Planning Workflows:**
+   - AI agents MUST operate under designated personas (Sentinel 🛡️, Palette 🎨, Bolt ⚡).
+   - Planning MUST go through formal review (`request_plan_review`) before execution.
+   - Before submission, AI agents MUST invoke `pre_commit_instructions`, request code review, and log critical insights via `initiate_memory_recording`.

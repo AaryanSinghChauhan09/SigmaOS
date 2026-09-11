@@ -103,3 +103,24 @@ All contributions to SigmaOS must uphold the core principles defined in the **Si
 - **Clarity**: Architecture, code structure, and documentation must be explicit and self-documenting.
 - **Resilience**: Every modification must preserve $O(1)$ state rollback safety and fault tolerance.
 - **Security**: Non-negotiable Safe-Rust memory safety, Post-Quantum Cryptography (Dilithium-5/Kyber), and capability sandboxing (`pledge`/`unveil`).
+
+## 📜 Additional Development Rules for Contributors & AI Agents
+
+### 1. **Zero External Third-Party Dependencies Policy**
+- SigmaOS strictly adheres to a **zero-dependency `#![no_std]`** design philosophy across kernel, hardware abstractions, and system services.
+- **Do NOT add third-party crates** to `Cargo.toml` under `[dependencies]`.
+- All abstractions must use core Rust or `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`).
+
+### 2. **Code Quality, Safety & Safe Rust Enforcement**
+- **Safe Rust First:** Avoid `unsafe` blocks unless interfacing directly with MMIO registers, CPU instructions, or FFI. Always document `// SAFETY:` invariants for any `unsafe` usage.
+- **No Panics:** Avoid `unwrap()`, `expect()`, or panicking logic in production paths. Gracefully return `Option` or `Result`.
+- **Mandatory Unit Testing:** Every new feature, bug fix, or security enhancement must include comprehensive unit tests (`#[cfg(test)] mod tests`).
+- **Full Test Verification:** All changes must pass `./run_sigma_tests.sh` and standalone test compilation (`rustc --edition=2021 --test <file_path>`).
+
+### 3. **AI Agent Persona & Workflow Protocols**
+- **Persona Workflows:** AI agents must adopt specific personas for targeted tasks:
+  - **Sentinel 🛡️:** Focused on security hardening, input validation, and vulnerability prevention.
+  - **Palette 🎨:** Focused on UX polish, ARIA accessibility, and desktop usability.
+  - **Bolt ⚡:** Focused on low-latency kernel scheduling, performance optimization, and memory efficiency.
+- **Plan Review & Approval Cycle:** AI agents MUST call `request_plan_review` and obtain approval before calling `set_plan` or modifying code state.
+- **Pre-Commit Steps:** Prior to final submission (`submit`), AI agents MUST execute all pre-commit instructions, verify test outputs, and record architectural learnings via `initiate_memory_recording`.
