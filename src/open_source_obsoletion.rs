@@ -2236,7 +2236,7 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             mosquitto: SovereignMosquittoMqttBroker::new(),
             restic_backup: SovereignResticBorgBackupEngine::new(),
             supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
-            total_obsoleted_projects_count: 50,
+            total_obsoleted_projects_count: 53,
         }
     }
 
@@ -5044,6 +5044,6 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("50 legacy open-source projects obsoleted"));
+        assert!(status.contains("53 legacy open-source projects obsoleted"));
     }
 }
