@@ -151,23 +151,23 @@ impl DuplicateFinder {
         // Second pass: hash files with same size
         let mut files_by_hash: BTreeMap<String, Vec<FileMetadata>> = BTreeMap::new();
 
-        for (_size, files) in files_by_size.iter() {
+        for (_size, files) in &files_by_size {
             if files.len() > 1 {
                 for file in files {
-                    let mut file_clone = file.clone();
-                    if let Ok(hash) = self.algorithm.compute_hash(&file_clone.path) {
-                        file_clone.hash = Some(hash.clone());
+                    let mut file_cloned = file.clone();
+                    if let Ok(hash) = self.algorithm.compute_hash(&file_cloned.path) {
+                        file_cloned.hash = Some(hash.clone());
                         files_by_hash
                             .entry(hash)
                             .or_insert_with(Vec::new)
-                            .push(file_clone);
+                            .push(file_cloned);
                     }
                 }
             }
         }
 
         // Third pass: identify duplicates
-        for (hash, files) in files_by_hash.iter() {
+        for (hash, files) in &files_by_hash {
             if files.len() > 1 {
                 let mut group = DuplicateGroup::new(hash.clone());
                 let mut total_size = 0u64;

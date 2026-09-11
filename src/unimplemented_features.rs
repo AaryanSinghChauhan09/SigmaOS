@@ -1718,6 +1718,7 @@ impl Default for GestureVoiceControlEngine {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1749,42 +1750,17 @@ mod tests {
         let mut vm = UdfVm::new(0, 16);
 
         let program = [
-            UdfInstruction {
-                opcode: OP_WRITE,
-                reg_dest: 0,
-                reg_src: 0,
-                address_or_imm: 4,
-            }, // write R0 (0) to addr 4
-            UdfInstruction {
-                opcode: OP_READ,
-                reg_dest: 1,
-                reg_src: 0,
-                address_or_imm: 4,
-            }, // read addr 4 to R1
-            UdfInstruction {
-                opcode: OP_ADD,
-                reg_dest: 1,
-                reg_src: 1,
-                address_or_imm: 0,
-            }, // R1 = R1 + R1
-            UdfInstruction {
-                opcode: OP_HALT,
-                reg_dest: 1,
-                reg_src: 0,
-                address_or_imm: 0,
-            },
+            UdfInstruction { opcode: OP_WRITE, reg_dest: 0, reg_src: 0, address_or_imm: 4 }, // write R0 (0) to addr 4
+            UdfInstruction { opcode: OP_READ, reg_dest: 1, reg_src: 0, address_or_imm: 4 },  // read addr 4 to R1
+            UdfInstruction { opcode: OP_ADD, reg_dest: 1, reg_src: 1, address_or_imm: 0 },   // R1 = R1 + R1
+            UdfInstruction { opcode: OP_HALT, reg_dest: 1, reg_src: 0, address_or_imm: 0 },
         ];
 
         let res = vm.execute_program(&program, &mut dev).unwrap();
         assert_eq!(res, 0);
 
         let invalid_program = [
-            UdfInstruction {
-                opcode: OP_READ,
-                reg_dest: 0,
-                reg_src: 0,
-                address_or_imm: 100,
-            }, // out of bounds
+            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 }, // out of bounds
         ];
         assert!(vm.execute_program(&invalid_program, &mut dev).is_err());
     }
@@ -1802,9 +1778,7 @@ mod tests {
                     min_version: PkgVersion { major: 2, minor: 0 },
                     max_version: PkgVersion { major: 2, minor: 5 },
                 }),
-                None,
-                None,
-                None,
+                None, None, None,
             ],
         };
 
@@ -1825,9 +1799,7 @@ mod tests {
     #[test]
     fn test_polymorphic_baremetal_peripheral_blueprint() {
         let pio = LegacyPioController { port_base: 0x3F8 };
-        let mmio = ModernMmioController {
-            mmio_base: 0xFE00_0000,
-        };
+        let mmio = ModernMmioController { mmio_base: 0xFE00_0000 };
 
         assert_eq!(pio.read_register(0), 0x3F8);
         assert_eq!(mmio.read_register(0), 0xFE00_0000);
@@ -1842,21 +1814,9 @@ mod tests {
     fn test_zero_allocation_udf_bytecode_vm() {
         let mut vm = SpecUdfVm::new();
         let code = [
-            SpecUdfInstruction {
-                op: 0x10,
-                reg: 0,
-                addr: 0x3F8,
-            }, // READ R0 from 0x3F8 -> 0x3F8
-            SpecUdfInstruction {
-                op: 0x30,
-                reg: 0,
-                addr: 10,
-            }, // ADD R0, 10
-            SpecUdfInstruction {
-                op: 0xF0,
-                reg: 0,
-                addr: 0,
-            }, // HALT
+            SpecUdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
+            SpecUdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
+            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
         ];
         let res = vm.execute(&code).unwrap();
         assert_eq!(res, 0x3F8 + 10);
@@ -1864,20 +1824,10 @@ mod tests {
 
     #[test]
     fn test_constraint_sat_solver() {
-        let solver = ConstraintSatSolver::new();
+        let solver = SpecConstraintSatSolver::new();
         let nodes = [
-            SpecPackageNode {
-                id: 1,
-                version: 10,
-                req_min: 1,
-                req_max: 20,
-            },
-            SpecPackageNode {
-                id: 2,
-                version: 5,
-                req_min: 1,
-                req_max: 10,
-            },
+            SpecPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
+            SpecPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
         ];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
@@ -1898,21 +1848,9 @@ mod tests {
         // Inspect & verify zero-allocation VM bytecode execution
         let mut vm = SpecUdfVm::new();
         let code = [
-            SpecUdfInstruction {
-                op: 0x10,
-                reg: 0,
-                addr: 100,
-            },
-            SpecUdfInstruction {
-                op: 0x30,
-                reg: 0,
-                addr: 50,
-            },
-            SpecUdfInstruction {
-                op: 0xF0,
-                reg: 0,
-                addr: 0,
-            },
+            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 },
+            SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },
+            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
         ];
         assert_eq!(vm.execute(&code).unwrap(), 150);
 
@@ -1922,13 +1860,8 @@ mod tests {
         assert_eq!(ledger.head, 1);
 
         // Inspect & verify SAT Solver
-        let solver = ConstraintSatSolver::new();
-        let nodes = [SpecPackageNode {
-            id: 1,
-            version: 1,
-            req_min: 1,
-            req_max: 5,
-        }];
+        let solver = SpecConstraintSatSolver::new();
+        let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 }
@@ -1937,68 +1870,41 @@ mod tests {
 // Section 6: Bare-Metal Subsystem Design Specifications
 // ============================================================================
 
-// 6.1 Polymorphic Universal Peripheral Blueprint
-pub trait SpecBareMetalUnifiedPeripheral {
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn read_register(&self, offset: u32) -> u64;
-    fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
-    fn handle_irq(&mut self) -> u32;
-}
-
-pub struct LegacyPioController {
+// 6.1 Polymorphic Universal Peripheral Blueprint Specifications
+pub struct LegacyPioSpecController {
     pub port_base: u16,
     pub power_state: PowerState,
 }
 
-impl BareMetalUnifiedPeripheral for LegacyPioController {
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        Ok(())
-    }
-    fn read_register(&self, offset: u16) -> u64 {
-        self.port_base as u64 + offset as u64
-    }
-    fn write_register(&mut self, _offset: u16, _value: u64) {}
-    fn handle_irq(&mut self) -> bool {
-        true
-    }
-    fn set_power_state(&mut self, state: PowerState) {
-        self.power_state = state;
-    }
-    fn get_power_state(&self) -> PowerState {
-        self.power_state
-    }
+impl LegacyPioSpecController {
+    pub fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    pub fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
+    pub fn write_register(&mut self, _offset: u16, _value: u64) {}
+    pub fn handle_irq(&mut self) -> bool { true }
+    pub fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    pub fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
-pub struct ModernMmioController {
+pub struct ModernMmioSpecController {
     pub mmio_base: u64,
     pub power_state: PowerState,
 }
 
-impl BareMetalUnifiedPeripheral for ModernMmioController {
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        Ok(())
-    }
-    fn read_register(&self, offset: u16) -> u64 {
-        self.mmio_base + offset as u64
-    }
-    fn write_register(&mut self, _offset: u16, _value: u64) {}
-    fn handle_irq(&mut self) -> bool {
-        true
-    }
-    fn set_power_state(&mut self, state: PowerState) {
-        self.power_state = state;
-    }
-    fn get_power_state(&self) -> PowerState {
-        self.power_state
-    }
+impl ModernMmioSpecController {
+    pub fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    pub fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
+    pub fn write_register(&mut self, _offset: u16, _value: u64) {}
+    pub fn handle_irq(&mut self) -> bool { true }
+    pub fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    pub fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
-pub struct BareMetalUnifiedPeripheralManager {
+pub struct BareMetalSpecPeripheralManager {
     pub registered_devices: [(u16, u64, bool); 16],
     pub device_count: usize,
 }
 
-impl BareMetalUnifiedPeripheralManager {
+impl BareMetalSpecPeripheralManager {
     pub fn new() -> Self {
         Self {
             registered_devices: [(0, 0, false); 16],
@@ -2006,32 +1912,23 @@ impl BareMetalUnifiedPeripheralManager {
         }
     }
 
-    pub fn register_device(
-        &mut self,
-        vendor_id: u16,
-        base_addr: u64,
-        is_mmio: bool,
-    ) -> Result<(), &'static str> {
-        if self.device_count >= 16 {
-            return Err("Registry full");
-        }
+    pub fn register_device(&mut self, vendor_id: u16, base_addr: u64, is_mmio: bool) -> Result<(), &'static str> {
+        if self.device_count >= 16 { return Err("Registry full"); }
         self.registered_devices[self.device_count] = (vendor_id, base_addr, is_mmio);
         self.device_count += 1;
         Ok(())
     }
 }
 
-impl Default for BareMetalUnifiedPeripheralManager {
-    fn default() -> Self {
-        Self::new()
-    }
+impl Default for BareMetalSpecPeripheralManager {
+    fn default() -> Self { Self::new() }
 }
 
 // 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
 #[derive(Debug, Clone, Copy)]
 pub struct SpecUdfInstruction {
-    pub op: u8,  // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
-    pub reg: u8, // R0 - R7
+    pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
+    pub reg: u8,  // R0 - R7
     pub addr: u64,
 }
 
@@ -2052,16 +1949,11 @@ impl SpecUdfVm {
         self.pc = 0;
         while self.pc < bytecode.len() {
             let inst = bytecode[self.pc];
-            if inst.reg >= 8 {
-                return Err("Register out of bounds");
-            }
+            if inst.reg >= 8 { return Err("Register out of bounds"); }
             match inst.op {
                 0x10 => self.registers[inst.reg as usize] = inst.addr, // OP_READ
                 0x20 => { /* OP_WRITE */ }
-                0x30 => {
-                    self.registers[inst.reg as usize] =
-                        self.registers[inst.reg as usize].wrapping_add(inst.addr)
-                } // OP_ADD
+                0x30 => self.registers[inst.reg as usize] = self.registers[inst.reg as usize].wrapping_add(inst.addr), // OP_ADD
                 0xF0 => return Ok(self.registers[inst.reg as usize]), // OP_HALT
                 _ => return Err("Invalid ISA opcode"),
             }
@@ -2072,9 +1964,7 @@ impl SpecUdfVm {
 }
 
 impl Default for SpecUdfVm {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 // 6.3 Declarative Package Resolution SAT Solver
@@ -2086,17 +1976,12 @@ pub struct SpecPackageNode {
     pub req_max: u32,
 }
 
-pub struct ConstraintSatSolver;
+pub struct SpecConstraintSatSolver;
 
-impl ConstraintSatSolver {
-    pub fn new() -> Self {
-        Self
-    }
+impl SpecConstraintSatSolver {
+    pub fn new() -> Self { Self }
 
-    pub fn resolve_satisfiability(
-        &self,
-        packages: &[SpecPackageNode],
-    ) -> Result<bool, &'static str> {
+    pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
         for pkg in packages {
             if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
                 return Err("Constraint conflict detected");
@@ -2106,10 +1991,8 @@ impl ConstraintSatSolver {
     }
 }
 
-impl Default for ConstraintSatSolver {
-    fn default() -> Self {
-        Self::new()
-    }
+impl Default for SpecConstraintSatSolver {
+    fn default() -> Self { Self::new() }
 }
 
 // 6.4 JBD2-Style Crash-Resilient Transactional Ledger
@@ -2129,29 +2012,17 @@ pub struct SpecJbd2TransactionLedger {
 impl SpecJbd2TransactionLedger {
     pub fn new() -> Self {
         Self {
-            ring_blocks: [SpecTransactionBlock {
-                tx_id: 0,
-                target_addr: 0,
-                crc32c_hash: 0,
-            }; 16],
+            ring_blocks: [SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
             head: 0,
             current_merkle_root: 0x1234_5678,
         }
     }
 
-    pub fn write_transaction(
-        &mut self,
-        target_addr: u64,
-        data: &[u8],
-    ) -> Result<u64, &'static str> {
-        if self.head >= 16 {
-            return Err("Ledger ring full");
-        }
+    pub fn write_transaction(&mut self, target_addr: u64, data: &[u8]) -> Result<u64, &'static str> {
+        if self.head >= 16 { return Err("Ledger ring full"); }
         let tx_id = self.head as u64 + 1;
         let mut crc = 0u32;
-        for &b in data {
-            crc = crc.wrapping_add(b as u32);
-        }
+        for &b in data { crc = crc.wrapping_add(b as u32); }
 
         self.ring_blocks[self.head] = SpecTransactionBlock {
             tx_id,
@@ -2167,19 +2038,13 @@ impl SpecJbd2TransactionLedger {
         if self.head > 0 {
             self.head -= 1;
             self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
-            self.ring_blocks[self.head] = SpecTransactionBlock {
-                tx_id: 0,
-                target_addr: 0,
-                crc32c_hash: 0,
-            };
+            self.ring_blocks[self.head] = SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 };
         }
     }
 }
 
 impl Default for SpecJbd2TransactionLedger {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub struct AchievementBadge {
@@ -4086,12 +3951,7 @@ mod new_unimplemented_tests {
         let mut aggregator = TechMediaIntelligenceAggregatorEngine::new();
         aggregator.ingest_feed_item("9to5Linux", "Linux Kernel 6.11 Released", "Kernel", 3);
         aggregator.ingest_feed_item("Phoronix", "AMD EPYC Zen 5 Benchmarks", "Hardware", 2);
-        aggregator.ingest_feed_item(
-            "XDA",
-            "Critical Zero-Day Vulnerability Discovered",
-            "Security",
-            9,
-        );
+        aggregator.ingest_feed_item("XDA", "Critical Zero-Day Vulnerability Discovered", "Security", 9);
 
         let p_feeds = aggregator.filter_by_source("Phoronix");
         assert_eq!(p_feeds.len(), 1);
