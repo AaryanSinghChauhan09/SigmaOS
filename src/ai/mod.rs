@@ -33,6 +33,12 @@ pub use agentic_os_runtime::{
     LocalLlmSystemDaemon, OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
 };
 
+pub use agent_runtime::{
+    AgentCapability, AgentError, AgentId, AgentKernelBridge, AgentPriority, AgentProcess,
+    AgentReport, AgentSandbox, AgentState, ConfigDiff, CrashDump, Plugin, PluginLanguage,
+    PluginSpec, PluginTarget, SovereignAgentRuntime, UserIntent,
+};
+
 pub use openclaw::{AlertPlatform, ClawBackgroundDaemon, ClawChatIntegrator, ClawVoiceTranscriber};
 
 pub use agent::{AIAgent, SimpleAIAgent};
