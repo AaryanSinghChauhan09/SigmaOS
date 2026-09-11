@@ -892,7 +892,8 @@ impl TerminalMultiplexerV1 {
 #[derive(Debug, Clone)]
 pub struct TriggerRule {
     pub pattern: String,
-    pub action_command: String,
+    pub highlight_color: AnsiColor,
+    pub action_command: Option<String>,
 }
 
 /// Dynamic, user-defined shell function.
@@ -1291,10 +1292,7 @@ impl TerminalSession {
     }
 
     pub fn register_trigger_rule(&mut self, pattern: &str, action: &str) {
-        self.trigger_rules.push(TriggerRule {
-            pattern: pattern.to_string(),
-            action_command: action.to_string(),
-        });
+        self.trigger_rules.push(TriggerRule::new(pattern, AnsiColor::Default, Some(action)));
     }
 
     /// Parses basic ANSI Escape Sequences (CSIs)
@@ -1312,7 +1310,7 @@ impl TerminalSession {
     /// Converts an AnsiColor enum value to exact RGB representation based on active TerminalTheme
     pub fn get_color_rgb(&self, color: AnsiColor) -> (u8, u8, u8) {
         match color {
-            AnsiColor::Default => self.theme.fg_color_rgb,
+            AnsiColor::Default => self.theme.foreground,
             AnsiColor::Black => (0, 0, 0),
             AnsiColor::Red => (255, 0, 0),
             AnsiColor::Green => (0, 255, 0),
@@ -1366,11 +1364,10 @@ impl TerminalSession {
                 }
                 _ => {}
             }
-            Some(action)
+            return Some(action);
         } else {
-            None
+            return None;
         }
-        None
     }
 }
 
