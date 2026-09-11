@@ -53,6 +53,20 @@ pub use omarchy_inspiration::{
     OmarchyReleaseChannel, OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio,
     OmarchyThemePalette, PreflightSnapshot, QuickshellWidget, ShellComponentKind,
 };
+
+pub use omarchy_ultimate_gap_closure::{
+    HerdrAiAgentTask, OmarchyFactoryResetGuardianEngine, OmarchyHardwareQuattroAdapterEngine,
+    OmarchyHerdrAiOrchestratorEngine, OmarchyQuickshellBarEngine, QuickShellWidgetKind,
+    QuickShellWidgetSpec, SovereignOmarchyUltimateGapClosureSuite,
+};
+
+pub use omarchy_inspiration::{
+    AiAgentProvider, HerdrAgentTask, OmarchyDotfilesManagerEngine, OmarchyHerdrAiAgentManager,
+    OmarchyHyprlandAnimEngine, OmarchyKeybindingsStudioEngine, OmarchyLuaConfigEngine,
+    OmarchyPluginEntry, OmarchyPluginMarketplace, OmarchyQuickshellEngine,
+    OmarchyReleaseChannel, OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio,
+    OmarchyThemePalette, PreflightSnapshot, QuickshellWidget, ShellComponentKind,
+};
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_inspirations;
 pub mod arch_parity;
