@@ -5372,7 +5372,7 @@ impl BsdCapsicumRightsSandboxingEngine {
             return true;
         }
         if let Some(rights) = self.allowed_rights.get(&fd) {
-            rights.iter().any(|r| r.eq_ignore_ascii_case(right))
+            rights.iter().any(|r: &String| r.eq_ignore_ascii_case(right))
         } else {
             false
         }

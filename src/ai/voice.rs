@@ -2,7 +2,6 @@
 //!
 //! This module provides voice recognition (speech-to-text) and synthesis (text-to-speech)
 //! capabilities for the SigmaOS AI ecosystem, including local inference and AI integration.
-extern crate alloc;
 
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
@@ -18,6 +17,9 @@ extern crate alloc;
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+
+extern crate alloc;
+
 use std::format;
 use std::vec;
 

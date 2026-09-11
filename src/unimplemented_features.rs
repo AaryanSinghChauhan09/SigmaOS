@@ -1798,8 +1798,8 @@ mod tests {
 
     #[test]
     fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8 };
-        let mmio = ModernMmioController { mmio_base: 0xFE00_0000 };
+        let pio = LegacyPioController { port_base: 0x3F8, power_state: PowerState::D0Active };
+        let mmio = ModernMmioController { mmio_base: 0xFE00_0000, power_state: PowerState::D0Active };
 
         assert_eq!(pio.read_register(0), 0x3F8);
         assert_eq!(mmio.read_register(0), 0xFE00_0000);
@@ -1812,11 +1812,11 @@ mod tests {
 
     #[test]
     fn test_zero_allocation_udf_bytecode_vm() {
-        let mut vm = UdfVm::new();
+        let mut vm = SpecUdfVm::new();
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
-            UdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
+            SpecUdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
+            SpecUdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
+            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
         ];
         let res = vm.execute(&code).unwrap();
         assert_eq!(res, 0x3F8 + 10);
@@ -1824,17 +1824,17 @@ mod tests {
 
     #[test]
     fn test_constraint_sat_solver() {
-        let mut solver = ConstraintSatSolver::new();
+        let solver = ConstraintSatSolver::new();
         let nodes = [
-            PackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
-            PackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
+            SpecPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
+            SpecPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
         ];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 
     #[test]
     fn test_jbd2_transactional_ledger() {
-        let mut ledger = Jbd2TransactionLedger::new();
+        let mut ledger = SpecJbd2TransactionLedger::new();
         let tx_id = ledger.write_transaction(0x1000, &[1, 2, 3, 4]).unwrap();
         assert_eq!(tx_id, 1);
         assert_eq!(ledger.head, 1);
@@ -1846,22 +1846,22 @@ mod tests {
     #[test]
     fn test_sigmaos_component_inspection_suite() {
         // Inspect & verify zero-allocation VM bytecode execution
-        let mut vm = UdfVm::new();
+        let mut vm = SpecUdfVm::new();
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            UdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },
+            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 },
+            SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },
+            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
         ];
         assert_eq!(vm.execute(&code).unwrap(), 150);
 
         // Inspect & verify JBD2 crash transaction ledger
-        let mut ledger = Jbd2TransactionLedger::new();
+        let mut ledger = SpecJbd2TransactionLedger::new();
         assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);
         assert_eq!(ledger.head, 1);
 
         // Inspect & verify SAT Solver
         let solver = ConstraintSatSolver::new();
-        let nodes = [PackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
+        let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 }
@@ -1871,13 +1871,6 @@ mod tests {
 // ============================================================================
 
 // 6.1 Polymorphic Universal Peripheral Blueprint
-pub trait BareMetalUnifiedPeripheral {
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn read_register(&self, offset: u32) -> u64;
-    fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
-    fn handle_irq(&mut self) -> u32;
-}
-
 pub struct LegacyPioController {
     pub port_base: u16,
     pub power_state: PowerState,
@@ -1939,12 +1932,12 @@ pub struct SpecUdfInstruction {
     pub addr: u64,
 }
 
-pub struct UdfVm {
+pub struct SpecUdfVm {
     pub registers: [u64; 8], // R0 - R7
     pub pc: usize,
 }
 
-impl UdfVm {
+impl SpecUdfVm {
     pub fn new() -> Self {
         Self {
             registers: [0; 8],
@@ -1970,7 +1963,7 @@ impl UdfVm {
     }
 }
 
-impl Default for UdfVm {
+impl Default for SpecUdfVm {
     fn default() -> Self { Self::new() }
 }
 
@@ -2010,13 +2003,13 @@ pub struct SpecTransactionBlock {
     pub crc32c_hash: u32,
 }
 
-pub struct Jbd2TransactionLedger {
+pub struct SpecJbd2TransactionLedger {
     pub ring_blocks: [SpecTransactionBlock; 16],
     pub head: usize,
     pub current_merkle_root: u32,
 }
 
-impl Jbd2TransactionLedger {
+impl SpecJbd2TransactionLedger {
     pub fn new() -> Self {
         Self {
             ring_blocks: [SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
@@ -2050,7 +2043,7 @@ impl Jbd2TransactionLedger {
     }
 }
 
-impl Default for Jbd2TransactionLedger {
+impl Default for SpecJbd2TransactionLedger {
     fn default() -> Self { Self::new() }
 }
 
