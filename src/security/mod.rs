@@ -2,6 +2,12 @@
 pub mod capability;
 pub mod pqc_enclave;
 pub mod governance;
+pub mod audit;
+pub mod bsd_hardening;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
+pub mod vault;
+pub mod vpn;
 
 pub use pqc_enclave::{
     KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
@@ -25,9 +31,6 @@ pub mod deobfuscation;
 pub mod securelevels;
 pub mod pam;
 pub mod crypto_utils;
-
-
-
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{

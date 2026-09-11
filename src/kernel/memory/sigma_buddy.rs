@@ -19,7 +19,7 @@
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use super::{MemoryBlock, PAGE_SIZE};
-use crate::klib::buddy_allocator::BuddyAllocator::{BuddyAllocator, SimpleBuddyAllocator};
+use crate::klib::buddy_allocator::{BuddyAllocator, SimpleBuddyAllocator};
 
 /// Linux-inspired Page Migration Types for Anti-Fragmentation Buddy Allocator
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

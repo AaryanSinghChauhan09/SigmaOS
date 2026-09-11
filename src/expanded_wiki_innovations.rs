@@ -29,11 +29,6 @@ use std::vec;
 use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 extern crate alloc;
-use alloc::format;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec;
-use alloc::vec::Vec;
 
 /// Arch Linux pacman-contrib Utilities Engine
 pub struct ArchPacmanContribEngine {

@@ -3,10 +3,6 @@
 
 extern crate alloc;
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
 
 // =========================================================================
 // 1. FASTFETCH / NEOFETCH SYSTEM INFORMATION HUD ENGINE

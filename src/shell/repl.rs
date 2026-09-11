@@ -1,11 +1,10 @@
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
 use std::collections::{HashMap, HashSet};
-
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 #[cfg(not(test))]
 use crate::accessibility::{
@@ -21,35 +20,24 @@ use crate::customization::{CustomizationEngine, Theme};
 #[cfg(not(test))]
 use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
 #[cfg(not(test))]
-use crate::klib::hashset::HashSet;
-#[cfg(not(test))]
-use crate::klib::HashMap;
-#[cfg(not(test))]
 use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
 #[cfg(not(test))]
 use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
 #[cfg(not(test))]
 use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
-    ZshSyntaxHighlighter,
+    ZshSyntaxHighlighter, UniversalShellCompatibilityEngine,
 };
 #[cfg(not(test))]
 use crate::shell::{
     BashParameterExpansion, HistoryExpansionEngine, JobControlManager,
 };
+
+// Non-test imports (stable)
+#[cfg(not(test))]
 use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform,
-};
-use crate::customization::CustomizationEngine;
-use crate::dashboard::SystemMonitor;
-use crate::package::{UnifiedPackage, UniversalPackageManager};
-use crate::resilience::SelfHealingModule;
-use crate::shell::zsh_bash_parity::{
-    BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
-    UniversalShellCompatibilityEngine, ZshSyntaxHighlighter,
-};
-use crate::virtualization::{
-    Container, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
+    ApplicationBinary as CompatAppBinary, BinaryFormat as CompatBinaryFmt,
+    CompatibilityManager as CompatMgr, TargetPlatform as CompatTargetPlatform,
 };
 
 #[cfg(test)]

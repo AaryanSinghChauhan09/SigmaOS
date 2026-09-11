@@ -8,9 +8,6 @@
 extern crate alloc;
 
 use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 #[cfg(test)]
 use std::collections::HashMap;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]

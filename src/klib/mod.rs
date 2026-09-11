@@ -14,6 +14,7 @@ pub mod console;
 pub mod conversion;
 pub mod custom_allocator;
 pub mod custom_string;
+pub mod string;
 pub mod env;
 pub mod ffi;
 pub mod fs;
@@ -50,14 +51,6 @@ pub mod uuid;
 pub mod buddy_allocator;
 pub mod hash;
 
-pub mod string {
-    pub use crate::klib::custom_string::SigmaString;
-}
-
-pub mod vec {
-    pub use std::vec::Vec;
-}
-
 // Re-exports
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
@@ -78,6 +71,6 @@ pub use std::collections::HashMap;
 pub use std::collections::HashSet;
 
 #[cfg(target_os = "none")]
-pub use hashmap::HashMap;
+pub use collections::HashMap;
 #[cfg(target_os = "none")]
-pub use hashset::HashSet;
+pub use collections::HashSet;

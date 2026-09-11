@@ -4,13 +4,10 @@ use std::vec;
 // OOP-based VM management with hypervisor integration
 
 extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
-use alloc::format;
 
 #[cfg(test)]
 use std::time::{SystemTime, UNIX_EPOCH};
