@@ -20,8 +20,10 @@ pub use media_inspired_desktop::{
     WindowSnapZone,
 };
 pub mod wayland_protocol;
+pub mod sovereign_ux_innovation_hub;
 
 pub use wayland_protocol::*;
+pub use sovereign_ux_innovation_hub::*;
 
 pub use sovereign_navigation_engine::*;
 
