@@ -35,7 +35,7 @@ jobs:
           cargo doc --no-deps 2>&1 || true
 
       - name: Upload Documentation Artifact
-        uses: actions/upload-artifact@b4b15b8c7c6ac212293921041ab61e07598c8092 # v4.4.3
+        uses: actions/upload-artifact@v4
         with:
           name: sigmaos-docs-html
           path: target/doc
