@@ -42,7 +42,7 @@ jobs:
 
           # Filesystem tests - ZFS (if available)
           - storage: zfs
-            format-cmd: "sudo zpool create testpool /tmp/test.img"
+            format-cmd: "sudo apt-get install -y zfsutils-linux || true; sudo zpool create testpool /tmp/test.img || true"
             mount-cmd: "sudo mkdir -p /mnt/test"
             benchmark: "fio --name=sequential_read --ioengine=libaio --rw=read --bs=4k --size=1G"
 
