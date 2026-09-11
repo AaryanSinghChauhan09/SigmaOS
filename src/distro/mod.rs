@@ -14,7 +14,13 @@ pub use arch::{
     InstallerProfile as ArchInstallerProfile, KeyTrustLevel, ReflectorMirror, ReflectorSortKey,
 };
 pub mod arch_inspirations;
+pub mod arch_missing_components;
 pub mod arch_parity;
+
+pub use arch_missing_components::{
+    AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAurWebRpcClient, ArchMakepkgEngine,
+    ArchNamcapLinterEngine, AurPackageResult, NamcapLintWarning, PkgbuildSpec,
+};
 pub mod certification;
 pub mod chakra_parity;
 pub mod clear_linux;
@@ -101,6 +107,13 @@ pub use void_runit::{
     RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
 };
 pub mod sovereign_distro_dominance;
+pub mod future_roadmap_innovations;
+
+pub use future_roadmap_innovations::{
+    ClusteredDevicePoolEngine, ClusteredPooledDevice, CryptographicBootChainEngine,
+    NetworkNativeSessionEngine, NetworkSessionState, PoolDeviceKind, ShardAppManifest,
+    ShardsMarketplaceEngine, TemporalFilesystemEngine, TemporalSnapshot,
+};
 
 pub use arch_parity::{
     AlpmDatabase, ArchArchinstallEngine, ArchArchwebEngine, ArchCdevtoolsEngine, ArchPkgctlEngine,
