@@ -23,8 +23,6 @@
 
 // (no_std only applicable at crate root - removed)
 
-
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -306,7 +304,8 @@ impl SovereignPhoronixBenchmarkSuite {
         if current_geomean == 0.0 {
             return false;
         }
-        let diff_pct = ((self.baseline_score_index - current_geomean) / self.baseline_score_index) * 100.0;
+        let diff_pct =
+            ((self.baseline_score_index - current_geomean) / self.baseline_score_index) * 100.0;
         diff_pct > threshold_pct
     }
 }
@@ -330,7 +329,8 @@ impl SovereignKdNuggetsDataPipeline {
             return Vec::new();
         }
         let mean: f64 = values.iter().sum::<f64>() / (values.len() as f64);
-        let variance: f64 = values.iter().map(|x| (x - mean) * (x - mean)).sum::<f64>() / (values.len() as f64);
+        let variance: f64 =
+            values.iter().map(|x| (x - mean) * (x - mean)).sum::<f64>() / (values.len() as f64);
         let std_dev = variance.sqrt().max(1e-9);
 
         values.iter().map(|x| (x - mean) / std_dev).collect()
@@ -535,7 +535,11 @@ impl EbpfSockmapRedirectEngine {
     }
 
     /// Redirect packet zero-copy bypassing full TCP/IP stack
-    pub fn redirect_socket_msg(&mut self, src_fd: u64, payload: &[u8]) -> Result<(u32, Vec<u8>), &'static str> {
+    pub fn redirect_socket_msg(
+        &mut self,
+        src_fd: u64,
+        payload: &[u8],
+    ) -> Result<(u32, Vec<u8>), &'static str> {
         if let Some(&target_fd) = self.sock_map.get(&src_fd) {
             self.active_redirects += 1;
             Ok((target_fd, payload.to_vec()))
@@ -561,7 +565,7 @@ impl Default for EbpfSockmapRedirectEngine {
 
 /// Arch Linux Pacman ALPM hook triggers & dynamic PKGBUILD source patcher
 pub struct PacmanAurHookPatchEngine {
-    hooks: Vec<(String, String)>, // (event_type, command)
+    hooks: Vec<(String, String)>,          // (event_type, command)
     applied_patches: Vec<(String, usize)>, // (patch_name, bytes_patched)
 }
 
@@ -588,12 +592,17 @@ impl PacmanAurHookPatchEngine {
     }
 
     /// Apply dynamic PKGBUILD patch diff to source file
-    pub fn apply_pkgbuild_patch(&mut self, patch_name: &str, patch_diff: &str) -> Result<usize, &'static str> {
+    pub fn apply_pkgbuild_patch(
+        &mut self,
+        patch_name: &str,
+        patch_diff: &str,
+    ) -> Result<usize, &'static str> {
         if patch_name.is_empty() || patch_diff.is_empty() {
             return Err("Pacman/AUR: Invalid patch name or content");
         }
         let bytes_patched = patch_diff.len();
-        self.applied_patches.push((patch_name.to_string(), bytes_patched));
+        self.applied_patches
+            .push((patch_name.to_string(), bytes_patched));
         Ok(bytes_patched)
     }
 
@@ -627,7 +636,12 @@ impl VhostUserGpuEngine {
     }
 
     /// Allocate virtio-gpu 2D/3D resource buffer
-    pub fn create_gpu_resource(&mut self, res_id: u32, width: u32, height: u32) -> Result<usize, &'static str> {
+    pub fn create_gpu_resource(
+        &mut self,
+        res_id: u32,
+        width: u32,
+        height: u32,
+    ) -> Result<usize, &'static str> {
         if width == 0 || height == 0 {
             return Err("Vhost-User-GPU: Invalid dimensions");
         }
@@ -637,7 +651,11 @@ impl VhostUserGpuEngine {
     }
 
     /// Submit zero-copy 3D render command payload for virtio GPU dispatch
-    pub fn submit_3d_render_cmd(&mut self, res_id: u32, cmd_bytes: &[u8]) -> Result<usize, &'static str> {
+    pub fn submit_3d_render_cmd(
+        &mut self,
+        res_id: u32,
+        cmd_bytes: &[u8],
+    ) -> Result<usize, &'static str> {
         if !self.resources.contains_key(&res_id) {
             return Err("Vhost-User-GPU: Resource ID not allocated");
         }
@@ -2806,7 +2824,11 @@ impl ApacheArrowVectorizedEngine {
             }
         }
 
-        let mean_f = if count == 0 { 0.0 } else { sum_f / (count as f64) };
+        let mean_f = if count == 0 {
+            0.0
+        } else {
+            sum_f / (count as f64)
+        };
         (sum_u, mean_f)
     }
 }
@@ -3479,7 +3501,12 @@ mod tests {
     #[test]
     fn test_sovereign_nginx_ingress_router() {
         let mut router = SovereignNginxIngressRouter::new();
-        router.add_ingress_rule("api.sigmaos.local", "/v1", "127.0.0.1:8080", Some("cert-prod"));
+        router.add_ingress_rule(
+            "api.sigmaos.local",
+            "/v1",
+            "127.0.0.1:8080",
+            Some("cert-prod"),
+        );
 
         let routed = router.route_request("api.sigmaos.local", "/v1/health");
         assert_eq!(routed, Some("127.0.0.1:8080".to_string()));
@@ -3495,7 +3522,10 @@ mod tests {
         assert_eq!(collector.get_counter("http_requests_total"), 15);
 
         collector.record_histogram_value("http_request_duration_ms", 45.0, &[10.0, 50.0, 100.0]);
-        let hist = collector.histograms.get("http_request_duration_ms").unwrap();
+        let hist = collector
+            .histograms
+            .get("http_request_duration_ms")
+            .unwrap();
         assert_eq!(hist.count, 1);
         assert_eq!(hist.sum, 45.0);
         assert_eq!(hist.buckets[1], (50.0, 1)); // Count in <= 50.0 bucket
@@ -3648,7 +3678,9 @@ impl SovereignNginxIngressRouter {
     pub fn route_request(&mut self, sni: &str, path: &str) -> Option<String> {
         self.total_requests_routed += 1;
         for route in &self.routes {
-            if (route.host_sni == "*" || route.host_sni == sni) && path.starts_with(&route.path_prefix) {
+            if (route.host_sni == "*" || route.host_sni == sni)
+                && path.starts_with(&route.path_prefix)
+            {
                 return Some(route.upstream_address.clone());
             }
         }
@@ -3932,17 +3964,28 @@ impl OpenSourceProjectSupremacySuite {
     }
 
     /// Desktop Utility: Diagnostics system health check
-    pub fn perform_desktop_system_health_check(&self, memory_free_mb: u64, disk_free_gb: u64) -> bool {
+    pub fn perform_desktop_system_health_check(
+        &self,
+        memory_free_mb: u64,
+        disk_free_gb: u64,
+    ) -> bool {
         memory_free_mb >= 256 && disk_free_gb >= 2
     }
 
     /// Desktop Utility: Software source repository management helper (PPA, AUR, COPR)
     pub fn register_third_party_software_source(&mut self, source_uri: &str) -> bool {
-        !source_uri.is_empty() && (source_uri.starts_with("ppa:") || source_uri.starts_with("aur:") || source_uri.starts_with("copr:"))
+        !source_uri.is_empty()
+            && (source_uri.starts_with("ppa:")
+                || source_uri.starts_with("aur:")
+                || source_uri.starts_with("copr:"))
     }
 
     /// Technology Media & Hardware Benchmark Parity Evaluator
-    pub fn evaluate_hardware_and_tech_media_parity(&self, benchmark_score: u64, feature_coverage_pct: u32) -> bool {
+    pub fn evaluate_hardware_and_tech_media_parity(
+        &self,
+        benchmark_score: u64,
+        feature_coverage_pct: u32,
+    ) -> bool {
         benchmark_score >= 1000 && feature_coverage_pct >= 90
     }
 }

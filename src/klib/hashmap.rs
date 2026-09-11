@@ -2,9 +2,9 @@
 //! Reduces dependency on std::collections::BTreeMap
 
 use super::hash::SimpleHasher;
-use std::vec::Vec;
 use core::borrow::Borrow;
 use core::hash::Hash;
+use std::vec::Vec;
 
 pub type HashMap<K, V> = BTreeMap<K, V>;
 

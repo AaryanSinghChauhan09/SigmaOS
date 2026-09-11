@@ -281,8 +281,16 @@ impl SovereignFdiskDiskPartitioner {
         }
     }
 
-    pub fn add_partition(&mut self, sectors_count: u64, type_guid: &str) -> Result<usize, &'static str> {
-        let last_end = self.partitions.last().map(|p| p.end_sector + 1).unwrap_or(2048); // 1MB initial alignment
+    pub fn add_partition(
+        &mut self,
+        sectors_count: u64,
+        type_guid: &str,
+    ) -> Result<usize, &'static str> {
+        let last_end = self
+            .partitions
+            .last()
+            .map(|p| p.end_sector + 1)
+            .unwrap_or(2048); // 1MB initial alignment
         let end_sector = last_end + sectors_count - 1;
 
         if end_sector >= self.total_disk_sectors {
@@ -445,7 +453,11 @@ impl SovereignHtopProcessMonitorEngine {
 
     pub fn get_top_cpu_processes(&self, limit: usize) -> Vec<ProcessTaskSnapshot> {
         let mut sorted = self.process_snapshots.clone();
-        sorted.sort_by(|a, b| b.cpu_pct.partial_cmp(&a.cpu_pct).unwrap_or(core::cmp::Ordering::Equal));
+        sorted.sort_by(|a, b| {
+            b.cpu_pct
+                .partial_cmp(&a.cpu_pct)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
         sorted.truncate(limit);
         sorted
     }
@@ -495,7 +507,10 @@ impl SovereignAnsibleAutomationEngine {
         self.playbooks.push(playbook);
     }
 
-    pub fn execute_playbook(&mut self, playbook_name: &str) -> Result<(usize, usize), &'static str> {
+    pub fn execute_playbook(
+        &mut self,
+        playbook_name: &str,
+    ) -> Result<(usize, usize), &'static str> {
         let playbook = self
             .playbooks
             .iter()
@@ -507,7 +522,10 @@ impl SovereignAnsibleAutomationEngine {
 
         for task in &playbook.tasks {
             task_count += 1;
-            if task.target_state == "present" || task.target_state == "started" || task.target_state == "absent" {
+            if task.target_state == "present"
+                || task.target_state == "started"
+                || task.target_state == "absent"
+            {
                 changed_count += 1;
             }
         }
@@ -1866,7 +1884,9 @@ pub struct SovereignApacheSparkDataEngine {
 
 impl SovereignApacheSparkDataEngine {
     pub fn new() -> Self {
-        Self { dataset: Vec::new() }
+        Self {
+            dataset: Vec::new(),
+        }
     }
 
     pub fn load_dataset(&mut self, records: Vec<SparkDataRecord>) {
@@ -1874,7 +1894,11 @@ impl SovereignApacheSparkDataEngine {
     }
 
     pub fn filter_by_min_value(&self, min_val: u64) -> Vec<SparkDataRecord> {
-        self.dataset.iter().filter(|r| r.value >= min_val).cloned().collect()
+        self.dataset
+            .iter()
+            .filter(|r| r.value >= min_val)
+            .cloned()
+            .collect()
     }
 
     pub fn map_transform<F>(&self, transform: F) -> Vec<SparkDataRecord>
@@ -4048,9 +4072,21 @@ mod tests {
     fn test_sovereign_apache_spark_data_engine() {
         let mut spark = SovereignApacheSparkDataEngine::new();
         let records = vec![
-            SparkDataRecord { id: 1, key: "CPU".to_string(), value: 40 },
-            SparkDataRecord { id: 2, key: "RAM".to_string(), value: 80 },
-            SparkDataRecord { id: 3, key: "CPU".to_string(), value: 60 },
+            SparkDataRecord {
+                id: 1,
+                key: "CPU".to_string(),
+                value: 40,
+            },
+            SparkDataRecord {
+                id: 2,
+                key: "RAM".to_string(),
+                value: 80,
+            },
+            SparkDataRecord {
+                id: 3,
+                key: "CPU".to_string(),
+                value: 60,
+            },
         ];
         spark.load_dataset(records);
 
@@ -4634,7 +4670,9 @@ mod tests {
     #[test]
     fn test_sovereign_fdisk_partitioner() {
         let mut fdisk = SovereignFdiskDiskPartitioner::new(PartitionTableType::Gpt, 100_000_000);
-        let p1 = fdisk.add_partition(204800, "C12A7328-F81F-11D2-BA4B-00A0C93EC93B").unwrap();
+        let p1 = fdisk
+            .add_partition(204800, "C12A7328-F81F-11D2-BA4B-00A0C93EC93B")
+            .unwrap();
         assert_eq!(p1, 1);
         assert!(fdisk.is_lba_aligned());
     }
@@ -4642,7 +4680,9 @@ mod tests {
     #[test]
     fn test_sovereign_curl_http_client() {
         let curl = SovereignCurlHttpClientEngine::new();
-        let resp = curl.execute_http_get("https://api.sigmaos.org/v1/health").unwrap();
+        let resp = curl
+            .execute_http_get("https://api.sigmaos.org/v1/health")
+            .unwrap();
         assert_eq!(resp.status_code, 200);
         assert!(resp.headers.contains_key("server"));
     }

@@ -1,10 +1,9 @@
-
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 use crate::klib::HashMap;
 
@@ -1721,7 +1720,11 @@ impl SovereignCgroupGovernorV1 {
         Ok(())
     }
 
-    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimits) -> Result<(), &'static str> {
+    pub fn configure_limits(
+        &mut self,
+        path: &str,
+        limits: CgroupResourceLimits,
+    ) -> Result<(), &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
         group.limits = Some(limits);
         Ok(())
@@ -1735,7 +1738,11 @@ impl SovereignCgroupGovernorV1 {
 
     pub fn check_cpu_budget(&mut self, path: &str, usage_us: u64) -> Result<bool, &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        let quota = group.limits.as_ref().map(|l| l.cpu_quota_us).unwrap_or(u64::MAX);
+        let quota = group
+            .limits
+            .as_ref()
+            .map(|l| l.cpu_quota_us)
+            .unwrap_or(u64::MAX);
         if group.cpu_used_us + usage_us <= quota {
             group.cpu_used_us += usage_us;
             Ok(true)
@@ -1746,7 +1753,11 @@ impl SovereignCgroupGovernorV1 {
 
     pub fn allocate_memory(&mut self, path: &str, bytes: u64) -> Result<(), &'static str> {
         let group = self.groups.get_mut(path).ok_or("Group not found")?;
-        let max_mem = group.limits.as_ref().map(|l| l.memory_max_bytes).unwrap_or(u64::MAX);
+        let max_mem = group
+            .limits
+            .as_ref()
+            .map(|l| l.memory_max_bytes)
+            .unwrap_or(u64::MAX);
         if group.memory_allocated_bytes + bytes <= max_mem {
             group.memory_allocated_bytes += bytes;
             Ok(())
@@ -2912,24 +2923,31 @@ impl SovereignCgroupGovernorV2 {
         if self.groups.contains_key(path) {
             return Err("cgroup path already exists");
         }
-        self.groups.insert(path.to_string(), CgroupGroupV2 {
-            path: path.to_string(),
-            limits: CgroupResourceLimitsV3 {
-                cpu_quota_us: 100_000,
-                cpu_period_us: 100_000,
-                memory_max_bytes: 1024 * 1024 * 1024,
-                memory_high_bytes: 512 * 1024 * 1024,
-                memory_swap_max_bytes: 0,
-                io_weight: 100,
+        self.groups.insert(
+            path.to_string(),
+            CgroupGroupV2 {
+                path: path.to_string(),
+                limits: CgroupResourceLimitsV3 {
+                    cpu_quota_us: 100_000,
+                    cpu_period_us: 100_000,
+                    memory_max_bytes: 1024 * 1024 * 1024,
+                    memory_high_bytes: 512 * 1024 * 1024,
+                    memory_swap_max_bytes: 0,
+                    io_weight: 100,
+                },
+                pids: Vec::new(),
+                current_cpu_usage_us: 0,
+                current_memory_bytes: 0,
             },
-            pids: Vec::new(),
-            current_cpu_usage_us: 0,
-            current_memory_bytes: 0,
-        });
+        );
         Ok(())
     }
 
-    pub fn configure_limits(&mut self, path: &str, limits: CgroupResourceLimitsV3) -> Result<(), &'static str> {
+    pub fn configure_limits(
+        &mut self,
+        path: &str,
+        limits: CgroupResourceLimitsV3,
+    ) -> Result<(), &'static str> {
         let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
         entry.limits = limits;
         Ok(())
@@ -2943,7 +2961,11 @@ impl SovereignCgroupGovernorV2 {
         Ok(())
     }
 
-    pub fn check_cpu_budget(&mut self, path: &str, time_requested_us: u64) -> Result<bool, &'static str> {
+    pub fn check_cpu_budget(
+        &mut self,
+        path: &str,
+        time_requested_us: u64,
+    ) -> Result<bool, &'static str> {
         let entry = self.groups.get_mut(path).ok_or("cgroup path not found")?;
         if entry.current_cpu_usage_us + time_requested_us > entry.limits.cpu_quota_us {
             Ok(false) // Quota exceeded
@@ -3385,7 +3407,6 @@ impl MemoryCompactionSuperpagesAllocator {
         Err("Superpages Allocator: No 2MB contiguous free frame block available")
     }
 }
-
 
 #[cfg(test)]
 mod tests_extra_1 {

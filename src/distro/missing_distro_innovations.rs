@@ -712,7 +712,6 @@ impl Default for OpenBsdUnveilAuditor {
     }
 }
 
-
 // =========================================================================
 // UBUNTU APPARMOR MANDATORY ACCESS CONTROL (MAC) SECURITY PROFILE ENGINE
 // =========================================================================
@@ -922,11 +921,7 @@ impl VanillaOsApxSubsystemEngine {
         Ok(())
     }
 
-    pub fn install_apx_app(
-        &mut self,
-        container_name: &str,
-        app: &str,
-    ) -> Result<(), &'static str> {
+    pub fn install_apx_app(&mut self, container_name: &str, app: &str) -> Result<(), &'static str> {
         if let Some(c) = self
             .containers
             .iter_mut()
@@ -1630,7 +1625,6 @@ impl UbuntuAppArmorEngine {
         }
     }
 }
-
 
 mod tests {
     use super::*;
