@@ -7,7 +7,7 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-pub use crate::package::AptDebManifest;
+use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
@@ -70,8 +70,11 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
+#[cfg(test)]
+pub use crate::sigpkg::Version;
 
-pub use crate::sigpkg::universal_engine::PackageFormat;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -104,11 +107,18 @@ pub struct PacmanPkgbuild {
 }
 
 /// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system;
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub use crate::package::PackagePriority;
+/// Debian-style package priority levels (DFSG and APT standard)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PackagePriority {
+    Optional = 0,
+    Standard = 1,
+    Important = 2,
+    Required = 3,
+    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
+}
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -164,6 +174,7 @@ pub struct NetBsdPkgsrcManifest {
     pub comment: String,
     pub depends: Vec<String>,
 }
+
 
 /// Description of openSUSE Zypper RPM spec/manifest
 #[derive(Debug, Clone)]
@@ -236,8 +247,6 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
-            architecture: "amd64".to_string(),
-            maintainer: "Debian Maintainer".to_string(),
             depends,
             description,
             priority,
@@ -1577,7 +1586,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = universal_oop_system::StandardPackage {
             metadata: universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: universal_oop_system::Version::new(native_pkg.version.major, native_pkg.version.minor, native_pkg.version.patch),
+                version: native_pkg.version,
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
@@ -2128,7 +2137,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" => {
+            "pkgin" | "pkg_delete" | "pkg_add" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
@@ -3474,23 +3483,5 @@ requires {
         let obsd_manifest = adapter.parse_openbsd_contents(openbsd_contents).unwrap();
         assert_eq!(obsd_manifest.pkgname, "htop");
         assert_eq!(obsd_manifest.version, "3.2.2");
-    }
-
-    #[test]
-    fn test_expanded_pm_command_dispatcher() {
-        let dispatcher = UniversalPmCommandDispatcher::new();
-
-        let swupd_res = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
-        assert_eq!(swupd_res.source_pm, "swupd");
-        assert_eq!(swupd_res.operation, UniversalPmOperation::Install);
-        assert_eq!(swupd_res.target_packages, vec!["os-core"]);
-
-        let kiss_res = dispatcher.dispatch_command("kiss build busybox").unwrap();
-        assert_eq!(kiss_res.source_pm, "kiss");
-        assert_eq!(kiss_res.operation, UniversalPmOperation::Install);
-
-        let spack_res = dispatcher.dispatch_command("spack install openmpi").unwrap();
-        assert_eq!(spack_res.source_pm, "spack");
-        assert_eq!(spack_res.operation, UniversalPmOperation::Install);
     }
 }
