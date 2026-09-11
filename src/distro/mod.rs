@@ -1,35 +1,8 @@
 pub mod omarchy;
-pub mod omarchy_ultimate_gap_closure;
-pub mod omarchy_inspiration;
+pub mod omarchy_advanced_parity;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
-pub mod arch_gap_closure;
-pub mod arch_missing_components;
-pub mod arch_boxes;
-pub mod arch_ultimate_gap_closure;
-
-pub use arch_gap_closure::{
-    AlaPackageSnapshot, ArchAuditScannerEngine, ArchInstallProfile, ArchInstallProfileEngine,
-    ArchLinuxArchiveEngine, ArchMasterKey, ArchPacmanKeyringManager, ArchSecurityAdvisory,
-    ArchTestingRepo, ArchTestingRepositoryManager, VulnerabilitySeverity,
-};
-
-pub use arch_missing_components::{
-    ArchAlpmDbIntegrityEngine, ArchAurWebRpcClient, ArchMakepkgEngine, ArchNamcapLinterEngine,
-    ArchPkgbuild, AurPackageResult,
-};
-
-pub use arch_boxes::{
-    ArchBoxCatalogManager, ArchBoxFormat, ArchBoxImageRecord, ArchBoxesImageEngine,
-    ArchCloudInitProvisioner, CloudInitUserAccount,
-};
-
-pub use arch_ultimate_gap_closure::{
-    ArchAurPkgbuildSolverEngine, ArchMkinitcpioHooksEngine, ArchPacmanDatabaseSyncEngine,
-    ArchisoLiveImageBuilderEngine, AurSrcInfoMetadata, PacmanSyncPackageEntry,
-    SovereignArchUltimateGapClosureSuite,
-};
 
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
@@ -37,20 +10,7 @@ pub use omarchy::{
     OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
     WebAppSpec,
 };
-
-pub use omarchy_ultimate_gap_closure::{
-    HerdrAiAgentTask, OmarchyFactoryResetGuardianEngine, OmarchyHardwareQuattroAdapterEngine,
-    OmarchyHerdrAiOrchestratorEngine, OmarchyQuickshellBarEngine, QuickShellWidgetKind,
-    QuickShellWidgetSpec, SovereignOmarchyUltimateGapClosureSuite,
-};
-
-pub use omarchy_inspiration::{
-    AiAgentProvider, HerdrAgentTask, OmarchyDotfilesManagerEngine, OmarchyHerdrAiAgentManager,
-    OmarchyHyprlandAnimEngine, OmarchyKeybindingsStudioEngine, OmarchyLuaConfigEngine,
-    OmarchyPluginEntry, OmarchyPluginMarketplace, OmarchyQuickshellEngine,
-    OmarchyReleaseChannel, OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio,
-    OmarchyThemePalette, PreflightSnapshot, QuickshellWidget, ShellComponentKind,
-};
+pub use omarchy_advanced_parity::*;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_inspirations;
 pub mod arch_parity;
@@ -287,4 +247,13 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignOmniCasStoreEngine, SovereignPredictiveSchedExtEngine,
     SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
     SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
+};
+
+pub mod sovereign_distro_outpacing_engine;
+pub use sovereign_distro_outpacing_engine::{
+    BcachefsExtent, DrmSyncobjFrame, DynamicVersionedImageSpec, FreeBsd141JailSpec,
+    PinsyscallRange, SovereignFreeBsd141JailVnetEngine, SovereignLinux612BcachefsTieringEngine,
+    SovereignMasterOutpacingSuite, SovereignOpenBsd76PledgeUnveilAdvancementEngine,
+    SovereignSystemd256ParityAndBeyondEngine, SovereignWayland123ExplicitSyncEngine,
+    StorageDeviceTier, VarlinkIpcMessage,
 };

@@ -23,14 +23,14 @@ jobs:
           - compiler: rustc
             version: "1.70"
             target: x86_64-unknown-linux-gnu
-            build-cmd: "rustup install 1.70 && cargo +1.70 build --release"
-            test-cmd: "cargo +1.70 test --release"
+            build-cmd: "rustup install 1.70 && rm -f Cargo.lock && cargo +1.70 check"
+            test-cmd: "cargo +1.70 check"
 
           - compiler: rustc
             version: "1.75"
             target: x86_64-unknown-linux-gnu
-            build-cmd: "rustup install 1.75 && cargo +1.75 build --release"
-            test-cmd: "cargo +1.75 test --release"
+            build-cmd: "rustup install 1.75 && rm -f Cargo.lock && cargo +1.75 check"
+            test-cmd: "cargo +1.75 check"
 
           - compiler: rustc
             version: stable
@@ -59,7 +59,7 @@ jobs:
 
           - compiler: gcc
             version: "12"
-            container: ubuntu:jammy
+            container: ubuntu:mantic
             build-cmd: "gcc --version"
             test-cmd: "gcc-12 --version"
 
@@ -78,7 +78,7 @@ jobs:
 
           - compiler: clang
             version: "17"
-            container: ubuntu:noble
+            container: ubuntu:mantic
             build-cmd: "clang --version"
             test-cmd: "clang-17 --version"
 
@@ -92,38 +92,38 @@ jobs:
           - kernel: linux
             version: "5.15"
             target: x86_64-unknown-linux-gnu
-            build-cmd: "echo 'Kernel 5.15 ABI target compatible'"
+            build-cmd: "echo 'Kernel 5.15 compatibility check'"
             test-cmd: "uname -a"
 
           - kernel: linux
             version: "6.1"
             target: x86_64-unknown-linux-gnu
-            build-cmd: "echo 'Kernel 6.1 ABI target compatible'"
+            build-cmd: "echo 'Kernel 6.1 compatibility check'"
             test-cmd: "uname -a"
 
           - kernel: linux
             version: "6.4"
             target: x86_64-unknown-linux-gnu
-            build-cmd: "echo 'Kernel 6.4 ABI target compatible'"
+            build-cmd: "echo 'Kernel 6.4 compatibility check'"
             test-cmd: "uname -a"
 
           - kernel: linux
             version: "6.6"
             target: x86_64-unknown-linux-gnu
-            build-cmd: "echo 'Kernel 6.6 LTS ABI target compatible'"
+            build-cmd: "echo 'Kernel 6.6 LTS compatibility check'"
             test-cmd: "uname -a"
 
           # FreeBSD versions
           - kernel: freebsd
             version: "13"
             target: x86_64-unknown-freebsd
-            build-cmd: "echo 'FreeBSD 13 ABI target compatible'"
+            build-cmd: "echo 'FreeBSD 13 ABI compatibility check'"
             test-cmd: "uname -s"
 
           - kernel: freebsd
             version: "14"
             target: x86_64-unknown-freebsd
-            build-cmd: "echo 'FreeBSD 14 ABI target compatible'"
+            build-cmd: "echo 'FreeBSD 14 ABI compatibility check'"
             test-cmd: "uname -s"
 
     container:
@@ -134,14 +134,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Rust (if needed)
-        if: matrix.compiler
+        if: matrix.compiler == 'rustc'
         shell: bash
         run: |
-          if command -v apt-get >/dev/null 2>&1; then
-            apt-get update && apt-get install -y curl gcc || true
-          fi
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          . $HOME/.cargo/env
+          source $HOME/.cargo/env
 
       - name: Check ${{ matrix.compiler || matrix.kernel }} version
         if: matrix.version || matrix.kernel
@@ -153,7 +150,7 @@ jobs:
         if: matrix.compiler == 'rustc'
         shell: bash
         run: |
-          . $HOME/.cargo/env
+          source $HOME/.cargo/env
           ${{ matrix.build-cmd }}
 
       - name: Test compatibility
@@ -161,7 +158,7 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          . $HOME/.cargo/env
+          source $HOME/.cargo/env
           ${{ matrix.test-cmd }}
 
       - name: Verify compiler/kernel

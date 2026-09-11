@@ -15,8 +15,10 @@ pub mod sovereign_navigation_engine;
 pub mod zenith_compositor;
 pub mod ultimate_distro_desktop;
 pub mod wayland_protocol;
+pub mod sovereign_ux_innovation_hub;
 
 pub use wayland_protocol::*;
+pub use sovereign_ux_innovation_hub::*;
 
 pub use sovereign_navigation_engine::*;
 

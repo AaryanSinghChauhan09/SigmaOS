@@ -14,11 +14,6 @@ use core::result::Result::{self, Err, Ok};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
-    Deb,
-    Rpm,
-    Ebuild,
-    Sigma,
-    Sysupdate,
     Apt,
     Yum,
     Pacman,
@@ -80,157 +75,21 @@ pub enum PackageFormat {
     Conan,
     Deb,
     Rpm,
-    Sigma,
     Ebuild,
+    Sigma,
     Sysupdate,
-    Cachy,
-    CachyOS,
-    Swupd,
-    Starling,
-    App,
-    Xz,
-    Nixpkg,
 }
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        let name = filename.to_lowercase();
-        let name = name.trim();
-        let normalized = name.replace(" ", "");
-
-        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
-            Some(PackageFormat::Deb)
-        } else if normalized.ends_with(".superdeb") {
-            Some(PackageFormat::Superdeb)
-        } else if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
-            Some(PackageFormat::Rpm)
-        } else if normalized.ends_with(".pkg.tar.zst")
-            || normalized.ends_with(".pkg.tar.xz")
-            || normalized.ends_with(".pkg.tar.gz")
-            || normalized.contains("pacman")
-            || normalized.ends_with(".pacman")
-        {
-            Some(PackageFormat::Pacman)
-        } else if normalized.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if normalized.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if normalized.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
-            Some(PackageFormat::Sovereign)
-        } else if normalized.ends_with(".air") {
-            Some(PackageFormat::Air)
-        } else if normalized.ends_with(".bottle") {
-            Some(PackageFormat::Bottle)
-        } else if normalized.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if normalized.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if normalized.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if normalized.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if normalized.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if normalized.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
-            Some(PackageFormat::Nixpkg)
-        } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
-            Some(PackageFormat::Portage)
-        } else if normalized.ends_with(".openbsd.tgz") {
-            Some(PackageFormat::OpenBsdPkg)
-        } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
-            Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz")
-            || normalized.ends_with(".tar.xz")
-            || normalized.ends_with(".xz")
-        {
-            Some(PackageFormat::Xz)
-        } else if normalized.ends_with(".xbps") {
-            Some(PackageFormat::Xbps)
-        } else if normalized.ends_with(".zypper") {
-            Some(PackageFormat::Zypper)
-        } else if normalized.ends_with(".guix") || normalized.ends_with(".scm") {
-            Some(PackageFormat::Guix)
-        } else if normalized.ends_with(".moss") {
-            Some(PackageFormat::Moss)
-        } else if normalized.ends_with(".hpkg") {
-            Some(PackageFormat::Hpkg)
-        } else if normalized.ends_with(".tcz") {
-            Some(PackageFormat::Tcz)
-        } else if normalized.ends_with(".gobo") {
-            Some(PackageFormat::Gobo)
-        } else if normalized.ends_with(".commit") || normalized.ends_with(".ostree") {
-            Some(PackageFormat::Ostree)
-        } else if normalized.ends_with(".pkgsrc") {
-            Some(PackageFormat::Pkgsrc)
-        } else if normalized.ends_with(".sfs") {
-            Some(PackageFormat::Sfs)
-        } else if normalized.ends_with(".puk") {
-            Some(PackageFormat::Puk)
-        } else if normalized.ends_with(".dmg") {
-            Some(PackageFormat::Dmg)
-        } else if normalized.ends_with(".cports") {
-            Some(PackageFormat::Cports)
-        } else if normalized.ends_with(".cachy") || normalized.ends_with(".cachyos") {
-            Some(PackageFormat::Cachy)
-        } else if normalized.ends_with(".swupd") {
-            Some(PackageFormat::Swupd)
-        } else if normalized.ends_with(".starling") {
-            Some(PackageFormat::Starling)
-        } else if normalized.ends_with(".dports") {
-            Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
-            Some(PackageFormat::SlackBuild)
-        } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
-            Some(PackageFormat::Crux)
-        } else if normalized.ends_with(".stratum") {
-            Some(PackageFormat::Stratum)
-        } else if normalized.ends_with(".app") {
-            Some(PackageFormat::App)
-        } else if normalized.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if normalized.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if normalized.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if normalized.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if normalized.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if normalized.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else if normalized.ends_with(".ipk") {
-            Some(PackageFormat::Ipk)
-        } else if normalized.ends_with(".opkg") {
-            Some(PackageFormat::Opkg)
-        } else if normalized.ends_with(".p5p") || normalized.ends_with(".ips") {
-            Some(PackageFormat::SolarisIps)
-        } else if normalized.ends_with(".nar") {
-            Some(PackageFormat::GuixNar)
-        } else if normalized.ends_with(".spack") {
-            Some(PackageFormat::Spack)
-        } else if normalized.ends_with(".conan") {
-            Some(PackageFormat::Conan)
-        } else if normalized.ends_with(".whl") {
-            Some(PackageFormat::Wheel)
-        } else if normalized.ends_with(".crate") {
-            Some(PackageFormat::Crate)
-        } else if normalized.ends_with(".gem") {
-            Some(PackageFormat::Gem)
-        } else if normalized.ends_with(".nupkg") {
-            Some(PackageFormat::Nupkg)
-        } else if normalized.ends_with(".vcpkg") {
-            Some(PackageFormat::Vcpkg)
-        } else if normalized.ends_with(".narinfo") {
-            Some(PackageFormat::NarInfo)
-        } else if normalized.ends_with(".sysupdate") {
-            Some(PackageFormat::Sysupdate)
-        } else {
-            None
-        }
+        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
+        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
+        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
+        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
+        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
+        else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
+        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
+        else { None }
     }
 }
 
@@ -245,35 +104,6 @@ pub struct PackageContext {
 }
 
 /// Dynamic Polymorphic Interface for Package Formats (OOP Adapter pattern)
-impl PackageFormat {
-    pub fn from_filename(filename: &str) -> Option<Self> {
-        let name_lower = filename.to_lowercase();
-        if name_lower.ends_with(".deb") {
-            Some(PackageFormat::Deb)
-        } else if name_lower.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name_lower.ends_with(".ebuild") {
-            Some(PackageFormat::Ebuild)
-        } else if name_lower.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name_lower.ends_with(".xbps") {
-            Some(PackageFormat::Xbps)
-        } else if name_lower.ends_with(".pkg.tar.zst") || name_lower.ends_with(".pkg.tar.xz") {
-            Some(PackageFormat::Pacman)
-        } else if name_lower.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name_lower.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name_lower.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name_lower.ends_with(".sigma") {
-            Some(PackageFormat::Sigma)
-        } else {
-            None
-        }
-    }
-}
-
 pub trait IPackageAdapter {
     fn format(&self) -> PackageFormat;
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str>;
@@ -695,85 +525,7 @@ impl PackageAdapterFactory {
             PackageFormat::Vcpkg => Box::new(VcpkgPackageAdapter),
             PackageFormat::NarInfo => Box::new(NarInfoPackageAdapter),
             PackageFormat::Sysupdate => Box::new(SysupdatePackageAdapter),
-            PackageFormat::Cachy | PackageFormat::CachyOS => Box::new(CachyOSPackageAdapter),
-            PackageFormat::Swupd => Box::new(SwupdPackageAdapter),
-            PackageFormat::Starling => Box::new(StarlingPackageAdapter),
-            PackageFormat::App => Box::new(AppBundlePackageAdapter),
-            PackageFormat::Xz => Box::new(TarXzPackageAdapter),
-            PackageFormat::Nixpkg => Box::new(NixPackageAdapter),
         }
-    }
-}
-
-pub struct CachyOSPackageAdapter;
-impl IPackageAdapter for CachyOSPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::CachyOS
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty CachyOS package payload");
-        }
-        Ok(PackageContext {
-            name: "cachyos-pkg".to_string(),
-            version: "1.0.0".to_string(),
-            format: PackageFormat::CachyOS,
-            dependencies: vec![],
-            files: vec![],
-            hash: [0x41; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("CachyOS Adapter: Extracted optimized package to: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct SwupdPackageAdapter;
-impl IPackageAdapter for SwupdPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Swupd
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty Swupd package payload");
-        }
-        Ok(PackageContext {
-            name: "swupd-pkg".to_string(),
-            version: "1.0.0".to_string(),
-            format: PackageFormat::Swupd,
-            dependencies: vec![],
-            files: vec![],
-            hash: [0x42; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Swupd Adapter: Applied Clear Linux bundle stream to: {}", store_path);
-        Ok(())
-    }
-}
-
-pub struct StarlingPackageAdapter;
-impl IPackageAdapter for StarlingPackageAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Starling
-    }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() {
-            return Err("Empty Starling package payload");
-        }
-        Ok(PackageContext {
-            name: "starling-pkg".to_string(),
-            version: "1.0.0".to_string(),
-            format: PackageFormat::Starling,
-            dependencies: vec![],
-            files: vec![],
-            hash: [0x43; 32],
-        })
-    }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Starling Adapter: Extracted Starling package to: {}", store_path);
-        Ok(())
     }
 }
 
@@ -2875,16 +2627,5 @@ mod tests {
             order,
             vec!["glibc-sigma", "sigma-compositor", "sigma-desktop"]
         );
-    }
-
-    #[test]
-    fn test_universal_format_from_filename() {
-        assert_eq!(PackageFormat::from_filename("app.swupd"), Some(PackageFormat::Swupd));
-        assert_eq!(PackageFormat::from_filename("app.cachy"), Some(PackageFormat::Cachy));
-        assert_eq!(PackageFormat::from_filename("app.cachyos"), Some(PackageFormat::Cachy));
-        assert_eq!(PackageFormat::from_filename("app.starling"), Some(PackageFormat::Starling));
-        assert_eq!(PackageFormat::from_filename("app.sysupdate"), Some(PackageFormat::Sysupdate));
-        assert_eq!(PackageFormat::from_filename("app.deb"), Some(PackageFormat::Deb));
-        assert_eq!(PackageFormat::from_filename("app.rpm"), Some(PackageFormat::Rpm));
     }
 }

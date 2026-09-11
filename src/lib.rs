@@ -46,6 +46,8 @@ pub mod onboarding;
 pub mod launcher;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
+    CachyosGamescopeHandheldOverlay, ItsFossQuickShareAndBackupHud, PhoronixPerformanceBenchmarkWidget,
+    PopOsKdeTilingWorkspaceGridEngine, SovereignUxMasterEngine, WindowsCopilotAiAssistantSidebar,
 };
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
@@ -91,7 +93,7 @@ pub use distro::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
     SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
     SovereignStatefulNatEngine, SovereignAheadOfDistrosSuite, SovereignDistroInspirationLeapEngine,
-    SovereignPredictiveSchedExtEngine,
+    SovereignPredictiveSchedExtEngine, SovereignMasterOutpacingSuite,
     SovereignOmniCasStoreEngine, SovereignCrossPlatformCapabilityEngine,
     SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine,
     StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
@@ -257,6 +259,8 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use distro::{
+    Omarchy4HyprlandDynamicTilingManager, OmarchyWaybarStatusAppletStudio, OmarchyGhosttyKittyFontStudio,
+    OmarchyOmakaseNeovimLspEngine, OmarchyLiveIsoInstallerBootstrap, OmarchyMasterParitySuite,
     AdminAction, AiSysAdmin, AppBundleRuntime, AppManifest, AppsAuditTool, AptCacheSimulator,
     ArchBuildSystem, ArchMirror, ArchPacmanHooksManager, ArchRepoType, AuditResult, AuditRule,
     AurHelper, AurPackage, BackupSnapshot, BackupSystem, BoreSchedulerGovernor, BountyStatus,
