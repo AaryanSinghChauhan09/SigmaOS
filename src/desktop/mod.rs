@@ -10,7 +10,15 @@ pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod zenith_compositor;
+pub mod media_inspired_desktop;
 pub mod ultimate_distro_desktop;
+
+pub use media_inspired_desktop::{
+    AiDesktopAssistantCommand, AiDesktopAssistantPanelEngine, FpsHudPosition,
+    HyprlandAestheticConfig, HyprlandAestheticEngine, MobileMirroringBridgeEngine,
+    PhoronixPerformanceHudConfig, PhoronixPerformanceHudEngine, SnapLayoutType, SnapLayoutsEngine,
+    WindowSnapZone,
+};
 pub mod wayland_protocol;
 
 pub use wayland_protocol::*;

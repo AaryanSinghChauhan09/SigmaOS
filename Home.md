@@ -14,7 +14,6 @@
 - **Linux io_uring Parity**: Asynchronous I/O engine for high-performance networking and storage.
 - **Zero-Trust Access Control & MAC:** Discretionary (DAC), Mandatory Access Control (MAC LSM Inode/Ptrace/Socket hooks), and Role-Based (RBAC) security enforcers.
 - **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
-- **Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia (V24):** [[SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V24]] - Complete master architectural blueprint for total native self-sufficiency, zero application downloads, and complete shard coverage.
 - **AI Agents Master Guide:** [[AI_AGENTS_GUIDE]] - Authoritative reference for autonomous coding agents and subagents.
 - **AI Agents UX Management Guide:** [[AI_AGENTS_UX_MANAGEMENT_GUIDE]] - Interface, visual layout, and UX guidelines for autonomous AI agents.
 - **AI Agents Time Management Guide:** [[AI_AGENTS_TIME_MANAGEMENT_GUIDE]] - Timekeeping primitives, clock sync, and temporal architecture for autonomous AI agents.
@@ -38,6 +37,7 @@
 - **Arch Linux Wiki-Inspired Master Portal:** [[ARCH_WIKI_INSPIRED_SIGMAOS_MASTER_WIKI]] - Master technical navigation portal, hardware drivers, and architectural reference.
 - **Master Linux & BSD Distro Strategic Roadmap:** [[MASTER_LINUX_BSD_GAP_CLOSURE_STRATEGIC_PLAN]] - Master strategic plan, gap closure roadmap, 2026-2029+ timeline, and strategy to surpass Linux distros.
 - **Arch Linux Parity Gap Closure Blueprint:** [[ARCH_LINUX_PARITY_GAP_CLOSURE_BLUEPRINT]] - Comprehensive Arch Linux (Pacman, AUR, makepkg, ALA, archinstall, arch-audit) parity blueprint.
+- **Sovereign OS Self-Sufficiency Ultra Encyclopedia V25:** [[SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V25]] - Master self-sufficiency ultra-encyclopedia V25 eliminating all third-party software, frameworks, models, codecs, and formats.
 - **AI Agent Universal Package Management Guide:** [[AI_AGENT_UNIVERSAL_PACKAGE_MANAGEMENT]] - Foreign package adapters (.deb, .rpm, PKGBUILD, ebuild, apk, hpkg), dependency canonicalization, and Universal PM for AI agents.
 - **AI Agent GitHub Workflows Management Guide:** [[AI_AGENT_GITHUB_WORKFLOWS_MANAGEMENT]] - CI/CD, multi-distro matrix, reproducible SBOMs, Cosign signing, and Pages auto-deploy workflows for AI agents.
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
