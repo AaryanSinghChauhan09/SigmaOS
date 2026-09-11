@@ -56,7 +56,6 @@ pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
-pub use custom_string::SigmaString;
 pub use uuid::Uuid;
 
 #[cfg(not(target_os = "none"))]
@@ -71,6 +70,14 @@ pub use std::collections::HashMap;
 pub use std::collections::HashSet;
 
 #[cfg(target_os = "none")]
-pub use collections::HashMap;
+pub use hashmap::HashMap;
 #[cfg(target_os = "none")]
 pub use collections::HashSet;
+
+pub mod string {
+    pub use crate::klib::custom_string::SigmaString;
+}
+
+pub mod vec {
+    pub use super::Vec;
+}
