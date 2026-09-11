@@ -28,7 +28,7 @@ jobs:
 
           - desktop: gnome
             version: "46"
-            container: ubuntu:mantic
+            container: ubuntu:noble
             deps: "libgtk-4-dev libadwaita-1-dev"
             build-cmd: "cargo build --features gnome --release"
 
@@ -41,7 +41,7 @@ jobs:
 
           - desktop: kde
             version: "6"
-            container: ubuntu:mantic
+            container: ubuntu:noble
             deps: "libkf6-dev libqt6-dev"
             build-cmd: "cargo build --features kde --release"
 
