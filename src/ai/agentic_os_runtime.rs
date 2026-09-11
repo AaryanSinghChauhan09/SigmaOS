@@ -416,10 +416,11 @@ mod tests {
     #[test]
     fn test_tpm_hardware_vault() {
         let mut vault = TpmHardwareVault::new();
-        vault.seal_key("OPENAI_API_KEY", b"sk-proj-secret-123");
+        let mock_test_api_key = b"mock_sk_test_key_123_for_unit_testing";
+        vault.seal_key("OPENAI_API_KEY", mock_test_api_key);
 
         let unsealed = vault.unseal_key("OPENAI_API_KEY").unwrap();
-        assert_eq!(unsealed, b"sk-proj-secret-123".to_vec());
+        assert_eq!(unsealed, mock_test_api_key.to_vec());
     }
 
     #[test]
