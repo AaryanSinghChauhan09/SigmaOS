@@ -73,7 +73,7 @@ pub struct HaikuHpkgManifest {
 #[cfg(test)]
 pub use crate::sigpkg::Version;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -2794,7 +2794,7 @@ impl Default for UniversalDryRunSimulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -3622,5 +3622,61 @@ requires {
         let spack_res = dispatcher.dispatch_command("spack install openmpi").unwrap();
         assert_eq!(spack_res.source_pm, "spack");
         assert_eq!(spack_res.operation, UniversalPmOperation::Install);
+    }
+
+    #[test]
+    fn test_all_requested_package_formats_conversion_and_detection() {
+        let adapter = UniversalPackageAdapter::new();
+        let converter = UniversalFormatConverter::new();
+
+        let formats_to_test = [
+            ("app.air", PackageFormat::Air, "id=air.app\nversion=1.2.3\nname=AirApp\n"),
+            ("brew.bottle", PackageFormat::Bottle, "{\"name\": \"bottle-app\", \"version\": \"2.0.0\", \"desc\": \"Bottle app\"}\n"),
+            ("app.ipa", PackageFormat::Ipa, "<key>CFBundleIdentifier</key><string>com.ios.app</string>\n<key>CFBundleShortVersionString</key><string>1.0</string>\n"),
+            ("bsd.ports", PackageFormat::Ports, "@name freebsd-port-1.0\n"),
+            ("app.pkg", PackageFormat::Pkg, "name: bsd-pkg\nversion: 1.0\ncomment: BSD PKG\n"),
+            ("app.aab", PackageFormat::Aab, "package=\"com.android.app\"\nandroid:versionName=\"1.0.0\"\n"),
+            ("tool.apk", PackageFormat::Apk, "P:tool\nV:1.0.0\nT:Tool package\n"),
+            ("app.AppImage", PackageFormat::AppImage, "[Desktop Entry]\nName=AppImageTool\nVersion=1.0.0\nExec=AppRun\n"),
+            ("solus.eopkg", PackageFormat::Eopkg, "<PISI><Source><Name>eopkg-app</Name></Source></PISI>\n"),
+            ("nixos.nixpkg", PackageFormat::Nixpkg, "pname = \"nix-app\";\nversion = \"1.0.0\";\n"),
+            ("gentoo.portage", PackageFormat::Portage, "package_name=gentoo-app\nversion=1.0.0\n"),
+            ("debian.deb", PackageFormat::Apt, "Package: deb-app\nVersion: 1.0.0\nDescription: Deb App\n"),
+            ("archive.tar.gz", PackageFormat::TarGz, "Package: targz-app\nVersion: 1.0.0\n"),
+            ("archive.tar .gz", PackageFormat::TarGz, "Package: targz-app\nVersion: 1.0.0\n"),
+            ("compressed.xz", PackageFormat::Xz, "Package: xz-app\nVersion: 1.0.0\n"),
+            ("fedora.rpm", PackageFormat::Yum, "Name: rpm-app\nVersion: 1.0.0\nSummary: RPM App\n"),
+            ("gentoo.ebuild", PackageFormat::Portage, "package_name=ebuild-app\nversion=1.0.0\n"),
+            ("arch.pkg.tar.xz", PackageFormat::Pacman, "pkgname=pacman-app\npkgver=1.0.0\n"),
+            ("app.flatpak", PackageFormat::Flatpak, "{\"app-id\": \"org.flatpak.App\"}\n"),
+            ("macos.app", PackageFormat::App, "CFBundleIdentifier=\"com.macos.app\"\nCFBundleVersion=\"1.0.0\"\n"),
+            ("harmony.hap", PackageFormat::Hap, "{\"bundleName\": \"com.harmony.hap\", \"versionName\": \"1.0.0\"}\n"),
+            ("pardus.PiSi", PackageFormat::Pisi, "Name: pisi-app\nVersion: 1.0.0\nSummary: PiSi App\n"),
+            ("archive.tgz", PackageFormat::TarGz, "Package: tgz-app\nVersion: 1.0.0\n"),
+            ("deepin.superdeb", PackageFormat::Superdeb, "Package: superdeb-app\nVersion: 1.0.0\nDescription: Superdeb\n"),
+            ("slax.lzm", PackageFormat::Lzm, "NAME=\"lzm-app\"\nVERSION=\"1.0.0\"\n"),
+            ("puppy.pup", PackageFormat::Pup, "pup|puppy-app|1.0.0|extra|Puppy App|cat|deps\n"),
+            ("canonical.snap", PackageFormat::Snap, "name: snap-app\nversion: 1.0.0\nsummary: Snap App\n"),
+            ("arch.pacman", PackageFormat::Pacman, "pkgname=pacman-direct\npkgver=1.0.0\n"),
+            ("plain.tar", PackageFormat::Tar, "Package: tar-app\nVersion: 1.0.0\n"),
+            ("puppy.pet", PackageFormat::Pet, "pet|pet-app|1.0.0|extra|PET App|cat|deps\n"),
+        ];
+
+        for (filename, expected_fmt, manifest_sample) in formats_to_test {
+            let detected = adapter.detect_format_by_extension(filename);
+            assert!(
+                detected.is_some(),
+                "Failed to detect format for extension: {}",
+                filename
+            );
+
+            let converted = converter.convert_to_sigma_pkg(expected_fmt, manifest_sample.as_bytes());
+            assert!(
+                converted.is_ok(),
+                "Failed conversion for format {:?} with filename {}",
+                expected_fmt,
+                filename
+            );
+        }
     }
 }

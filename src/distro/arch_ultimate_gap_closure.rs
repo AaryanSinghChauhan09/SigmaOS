@@ -1,8 +1,8 @@
 // SigmaOS Arch Linux Ultimate Gap Closure Engine
 // Zero-dependency Rust implementation covering ALPM sync databases, AUR .SRCINFO parsing, mkinitcpio hooks, and archiso profile bootstrap.
 
-use crate::klib::string::String;
-use crate::klib::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 
 /// ALPM Repository Sync Database Entry (.db.tar.gz spec)
 #[derive(Debug, Clone)]
