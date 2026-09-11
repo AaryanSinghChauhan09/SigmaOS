@@ -74,6 +74,9 @@ pub mod tools;
 pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
+
+pub mod wiki_distro_ideas_deployment;
+pub use wiki_distro_ideas_deployment::*;
 pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
@@ -453,3 +456,11 @@ pub use tools::{
     SpotlightIndexEntry, StatusBadgeLevel, StdoutColor, TextFormatStyle, TreeNode,
     UserIdentity as LibUserIdentity, ZoneArea,
 };
+pub mod tech_media_reexports;
+pub use tech_media_reexports::*;
+pub use distro::arch_ultimate_gap_closure::*;
+pub use distro::omarchy_ultimate_gap_closure::*;
+pub use performance::cachyos_ultimate_gap_closure::*;
+pub use distro::tech_media_extended_innovations::*;
+pub use kernel::linux_kernel_gap_closure_ultimate::*;
+pub use distro::omarchy_complete_gap_closure::*;
