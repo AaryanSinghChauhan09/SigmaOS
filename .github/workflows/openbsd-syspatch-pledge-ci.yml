@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-permissions:
-  contents: read
-
 jobs:
   openbsd-syspatch-pledge:
     name: OpenBSD Syspatch Security Updates & Pledge/Unveil Scan

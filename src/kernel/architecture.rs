@@ -1,21 +1,6 @@
-// SigmaOS Kernel Architecture Module - Multi-arch support (x86, x64, ARM, RISC-V, CISC/RISC)
-// Inspired by Linux/BSD multi-architecture kernel design patterns
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::String;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::String;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-use core::mem;
-use crate::kernel::structures::CpuArchitectureClass;
 // 1. Instructions and CPU Initialization
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -39,6 +24,17 @@ pub enum ThreadState {
     Terminated,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchitectureClass {
+    X86_32,
+    X86_64,
+    AArch64,
+    RiscV32,
+    RiscV64,
+    LoongArch64,
+    PowerPC64,
+    S390x,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptClass {

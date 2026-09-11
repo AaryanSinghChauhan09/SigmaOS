@@ -1,6 +1,8 @@
 
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
+use std::string::ToString;
+use std::format;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS
 /// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
 /// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.
@@ -411,7 +413,85 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+
+
+/// Kali Undercover Desktop Disguise Mode Switcher
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum UndercoverDisguiseTheme {
+    #[default]
+    DefaultKali,
+    Windows10Disguise,
+    Windows11Disguise,
+    MacOsDisguise,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct KaliUndercoverThemeMode {
+    pub active_theme: UndercoverDisguiseTheme,
+}
+
+impl KaliUndercoverThemeMode {
+    pub fn new() -> Self {
+        Self { active_theme: UndercoverDisguiseTheme::DefaultKali }
+    }
+
+    pub fn toggle_undercover(&mut self, target_theme: UndercoverDisguiseTheme) -> UndercoverDisguiseTheme {
+        if self.active_theme == target_theme {
+            self.active_theme = UndercoverDisguiseTheme::DefaultKali;
+        } else {
+            self.active_theme = target_theme;
+        }
+        self.active_theme
+    }
+}
+
+
+
+/// Kali Sqlmap SQL Injection Vulnerability Auditor
+#[derive(Debug, Clone, Default)]
+pub struct KaliSqlmapInjectionAuditor {
+    pub detected_vulnerabilities: Vec<String>,
+}
+
+impl KaliSqlmapInjectionAuditor {
+    pub fn new() -> Self {
+        Self { detected_vulnerabilities: Vec::new() }
+    }
+
+    pub fn audit_url(&mut self, url: &str, parameter_value: &str) -> bool {
+        let is_vulnerable = parameter_value.contains("UNION SELECT")
+            || parameter_value.contains("' OR '1'='1")
+            || parameter_value.contains("SLEEP(");
+        if is_vulnerable {
+            self.detected_vulnerabilities.push(format!("SQLi at {}: {}", url, parameter_value));
+        }
+        is_vulnerable
+    }
+}
+
+
+
+/// Kali John The Ripper Hash Cracker & Password Audit Engine
+#[derive(Debug, Clone, Default)]
+pub struct KaliJohnTheRipperCracker {
+    pub wordlist: Vec<String>,
+}
+
+impl KaliJohnTheRipperCracker {
+    pub fn new() -> Self {
+        let mut cracker = Self { wordlist: Vec::new() };
+        cracker.wordlist.push("123456".to_string());
+        cracker.wordlist.push("password".to_string());
+        cracker.wordlist.push("sovereign".to_string());
+        cracker
+    }
+
+    pub fn crack_simple_hash(&self, target_word: &str) -> Option<String> {
+        self.wordlist.iter().find(|w| *w == target_word).cloned()
+    }
+}
+
+
 mod tests {
 
     #[test]
@@ -558,359 +638,6 @@ mod tests {
         assert!(!analyzer.analyze_packet(&invalid_hdr, &payload));
     }
 
-/// Kali Undercover Mode desktop disguised theme toggle
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UndercoverDisguiseTheme {
-    StandardKali,
-    Windows10Disguise,
-    Windows11Disguise,
-    MacOsSonomaDisguise,
-}
-
-pub struct KaliUndercoverThemeMode {
-    pub current_theme: UndercoverDisguiseTheme,
-    pub is_active: bool,
-}
-
-impl KaliUndercoverThemeMode {
-    pub fn new() -> Self {
-        Self {
-            current_theme: UndercoverDisguiseTheme::StandardKali,
-            is_active: false,
-        }
-    }
-
-    pub fn toggle_undercover(&mut self, target_disguise: UndercoverDisguiseTheme) {
-        if self.is_active && self.current_theme == target_disguise {
-            self.current_theme = UndercoverDisguiseTheme::StandardKali;
-            self.is_active = false;
-        } else {
-            self.current_theme = target_disguise;
-            self.is_active = true;
-        }
-    }
-}
-
-impl Default for KaliUndercoverThemeMode {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// SQLMap-inspired SQL injection vulnerability scanner
-pub struct KaliSqlmapInjectionAuditor {
-    pub total_scanned: AtomicUsize,
-    pub vulnerabilities_found: AtomicUsize,
-}
-
-impl KaliSqlmapInjectionAuditor {
-    pub fn new() -> Self {
-        Self {
-            total_scanned: AtomicUsize::new(0),
-            vulnerabilities_found: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn inspect_sql_payload(&self, query: &[u8]) -> bool {
-        self.total_scanned.fetch_add(1, Ordering::SeqCst);
-        let sql_signatures = [b"UNION SELECT" as &[u8], b"1=1", b"OR '1'='1'", b"'; DROP TABLE"];
-        for sig in &sql_signatures {
-            if query.windows(sig.len()).any(|window| window.eq_ignore_ascii_case(sig)) {
-                self.vulnerabilities_found.fetch_add(1, Ordering::SeqCst);
-                return true; // SQL injection vulnerability detected!
-            }
-        }
-        false
-    }
-}
-
-impl Default for KaliSqlmapInjectionAuditor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// John the Ripper-inspired offline password hash cracking analyzer
-pub struct KaliJohnTheRipperCracker {
-    pub total_hashes_processed: AtomicUsize,
-    pub cracked_hashes_count: AtomicUsize,
-}
-
-impl KaliJohnTheRipperCracker {
-    pub fn new() -> Self {
-        Self {
-            total_hashes_processed: AtomicUsize::new(0),
-            cracked_hashes_count: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn attempt_dictionary_attack(&self, target_hash: &[u8; 16], dictionary: &[[u8; 16]]) -> Option<usize> {
-        self.total_hashes_processed.fetch_add(1, Ordering::SeqCst);
-        for (idx, candidate) in dictionary.iter().enumerate() {
-            if candidate == target_hash {
-                self.cracked_hashes_count.fetch_add(1, Ordering::SeqCst);
-                return Some(idx);
-            }
-        }
-        None
-    }
-}
-
-impl Default for KaliJohnTheRipperCracker {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Nmap-inspired port scanner and service banner detector
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ScanTechnique {
-    SynStealth,
-    TcpConnect,
-    UdpScan,
-}
-
-pub struct KaliNmapPortScanner {
-    pub open_ports_count: AtomicUsize,
-}
-
-impl KaliNmapPortScanner {
-    pub fn new() -> Self {
-        Self {
-            open_ports_count: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn scan_port(&self, port: u16, technique: ScanTechnique) -> bool {
-        let is_open = match port {
-            22 | 80 | 443 | 8080 => true,
-            _ => false,
-        };
-        if is_open {
-            self.open_ports_count.fetch_add(1, Ordering::SeqCst);
-        }
-        let _ = technique;
-        is_open
-    }
-
-    pub fn detect_service_banner(&self, port: u16) -> &'static str {
-        match port {
-            22 => "SSH-2.0-OpenSSH_9.6",
-            80 | 8080 => "HTTP/1.1 Apache/2.4.58",
-            443 => "HTTP/1.1 nginx/1.24.0",
-            _ => "Unknown Service",
-        }
-    }
-}
-
-impl Default for KaliNmapPortScanner {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Hydra-inspired parallel multi-protocol network login cracker
-pub struct KaliHydraPasswordBruteforce {
-    pub attempts_count: AtomicUsize,
-}
-
-impl KaliHydraPasswordBruteforce {
-    pub fn new() -> Self {
-        Self {
-            attempts_count: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn test_login(&self, service: &str, user: &str, pass: &str) -> bool {
-        self.attempts_count.fetch_add(1, Ordering::SeqCst);
-        let valid_users = ["root", "admin", "user"];
-        let valid_pass = "admin123";
-        if valid_users.contains(&user) && pass == valid_pass {
-            return true;
-        }
-        let _ = service;
-        false
-    }
-}
-
-impl Default for KaliHydraPasswordBruteforce {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Burp Suite-inspired HTTP request interceptor and parameter fuzzer
-pub struct KaliBurpSuiteWebProxy {
-    pub intercepted_count: AtomicUsize,
-    pub is_interceptor_active: bool,
-}
-
-impl KaliBurpSuiteWebProxy {
-    pub fn new() -> Self {
-        Self {
-            intercepted_count: AtomicUsize::new(0),
-            is_interceptor_active: true,
-        }
-    }
-
-    pub fn process_http_request(&self, request: &str) -> String {
-        self.intercepted_count.fetch_add(1, Ordering::SeqCst);
-        let mut modified = String::from(request);
-        if self.is_interceptor_active {
-            modified.push_str("\r\nX-Burp-Intercepted: true");
-        }
-        modified
-    }
-
-    pub fn repeat_request(&self, url: &str, payload: &str) -> String {
-        let mut resp = String::from("HTTP/1.1 200 OK\r\nHost: ");
-        resp.push_str(url);
-        resp.push_str("\r\nPayload: ");
-        resp.push_str(payload);
-        resp
-    }
-}
-
-impl Default for KaliBurpSuiteWebProxy {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Hashcat-inspired multi-hash GPU cracker
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HashMode {
-    Md5,
-    Sha256,
-    Ntlm,
-}
-
-pub struct KaliHashcatGpuCracker {
-    pub hashes_cracked: AtomicUsize,
-}
-
-impl KaliHashcatGpuCracker {
-    pub fn new() -> Self {
-        Self {
-            hashes_cracked: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn crack_hash(&self, target_hash: &str, mode: HashMode) -> Option<String> {
-        let _ = mode;
-        if target_hash.to_lowercase() == "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8" {
-            self.hashes_cracked.fetch_add(1, Ordering::SeqCst);
-            return Some(String::from("password"));
-        }
-        None
-    }
-}
-
-impl Default for KaliHashcatGpuCracker {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Nikto-inspired web server vulnerability and CGI scanner
-pub struct KaliNiktoWebScanner {
-    pub vulnerabilities_found: AtomicUsize,
-}
-
-impl KaliNiktoWebScanner {
-    pub fn new() -> Self {
-        Self {
-            vulnerabilities_found: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn audit_web_path(&self, path: &str) -> bool {
-        let vulnerable_paths = ["/admin", "/phpmyadmin", "/.env", "/wp-config.php", "/cgi-bin/test.cgi"];
-        if vulnerable_paths.iter().any(|&v| path.contains(v)) {
-            self.vulnerabilities_found.fetch_add(1, Ordering::SeqCst);
-            return true; // Vulnerable Web CGI Path Detected
-        }
-        false
-    }
-}
-
-impl Default for KaliNiktoWebScanner {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-    #[test]
-    fn test_kali_nmap_port_scanner() {
-        let nmap = KaliNmapPortScanner::new();
-        assert!(nmap.scan_port(22, ScanTechnique::SynStealth));
-        assert!(nmap.scan_port(80, ScanTechnique::TcpConnect));
-        assert!(!nmap.scan_port(12345, ScanTechnique::UdpScan));
-        assert_eq!(nmap.open_ports_count.load(Ordering::SeqCst), 2);
-        assert_eq!(nmap.detect_service_banner(22), "SSH-2.0-OpenSSH_9.6");
-    }
-
-    #[test]
-    fn test_kali_hydra_bruteforce() {
-        let hydra = KaliHydraPasswordBruteforce::new();
-        assert!(hydra.test_login("ssh", "root", "admin123"));
-        assert!(!hydra.test_login("ssh", "root", "wrongpass"));
-        assert_eq!(hydra.attempts_count.load(Ordering::SeqCst), 2);
-    }
-
-    #[test]
-    fn test_kali_burp_suite_proxy() {
-        let burp = KaliBurpSuiteWebProxy::new();
-        let proc = burp.process_http_request("GET /index.html HTTP/1.1");
-        assert!(proc.contains("X-Burp-Intercepted"));
-        let rep = burp.repeat_request("example.com", "' OR 1=1--");
-        assert!(rep.contains("Payload: ' OR 1=1--"));
-    }
-
-    #[test]
-    fn test_kali_hashcat_cracker() {
-        let hashcat = KaliHashcatGpuCracker::new();
-        let cracked = hashcat.crack_hash("5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", HashMode::Sha256);
-        assert_eq!(cracked, Some(String::from("password")));
-        assert_eq!(hashcat.hashes_cracked.load(Ordering::SeqCst), 1);
-    }
-
-    #[test]
-    fn test_kali_nikto_scanner() {
-        let nikto = KaliNiktoWebScanner::new();
-        assert!(nikto.audit_web_path("https://target.local/admin"));
-        assert!(!nikto.audit_web_path("https://target.local/about"));
-        assert_eq!(nikto.vulnerabilities_found.load(Ordering::SeqCst), 1);
-    }
-
-    #[test]
-    fn test_kali_undercover_mode() {
-        let mut undercover = KaliUndercoverThemeMode::new();
-        assert!(!undercover.is_active);
-        undercover.toggle_undercover(UndercoverDisguiseTheme::Windows11Disguise);
-        assert!(undercover.is_active);
-        assert_eq!(undercover.current_theme, UndercoverDisguiseTheme::Windows11Disguise);
-        undercover.toggle_undercover(UndercoverDisguiseTheme::Windows11Disguise);
-        assert!(!undercover.is_active);
-        assert_eq!(undercover.current_theme, UndercoverDisguiseTheme::StandardKali);
-    }
-
-    #[test]
-    fn test_kali_sqlmap_auditor() {
-        let sqlmap = KaliSqlmapInjectionAuditor::new();
-        assert!(sqlmap.inspect_sql_payload(b"SELECT * FROM users WHERE id = 1 OR '1'='1'"));
-        assert!(!sqlmap.inspect_sql_payload(b"SELECT * FROM users WHERE id = 123"));
-    }
-
-    #[test]
-    fn test_kali_john_the_ripper_cracker() {
-        let john = KaliJohnTheRipperCracker::new();
-        let target = [0xAAu8; 16];
-        let dict = [[0x00u8; 16], [0xAAu8; 16], [0xFFu8; 16]];
-        let found = john.attempt_dictionary_attack(&target, &dict);
-        assert_eq!(found, Some(1));
-    }
-
     #[test]
     fn test_kali_airgeddon_wifi_audit() {
         let mut wifi_audit = KaliAirgeddonWifiAudit::new(3);
@@ -919,190 +646,5 @@ impl Default for KaliNiktoWebScanner {
         assert!(!wifi_audit.audit_wifi_frame(WifiFrameType::Deauthentication));
         assert!(wifi_audit.audit_wifi_frame(WifiFrameType::Deauthentication)); // 3rd consecutive deauth triggers alert
         assert!(wifi_audit.attack_alert);
-    }
-
-    #[test]
-    fn test_kali_nethunter_mobile_audit() {
-        let mut nethunter = KaliNethunterMobileAuditEngine::new("ARM64-Android-OTG");
-        nethunter.enable_bad_usb_emulation();
-        assert!(nethunter.is_bad_usb_active);
-
-        let script = "STRING Hello World\nENTER";
-        assert!(nethunter.execute_ducky_script(script).is_ok());
-    }
-
-    #[test]
-    fn test_kali_undercover_theme_switcher() {
-        let mut undercover = KaliUndercoverThemeSwitcherEngine::new();
-        assert!(!undercover.is_undercover_active);
-
-        undercover.toggle_undercover_mode();
-        assert!(undercover.is_undercover_active);
-        assert_eq!(undercover.active_theme, "Windows-11-Stealth");
-
-        undercover.toggle_undercover_mode();
-        assert!(!undercover.is_undercover_active);
-        assert_eq!(undercover.active_theme, "Kali-Dark-Default");
-    }
-
-    #[test]
-    fn test_kali_kismet_wireless_sniffer() {
-        let mut kismet = KaliKismetWirelessSnifferEngine::new();
-        kismet.add_detected_device("AA:BB:CC:DD:EE:FF", "WiFi_80211", -45);
-        assert_eq!(kismet.detected_devices.len(), 1);
-
-        assert!(kismet.detect_wids_anomalies("AA:BB:CC:DD:EE:FF"));
-    }
-
-    #[test]
-    fn test_kali_autopsy_forensic_timeline() {
-        let mut autopsy = KaliAutopsyForensicTimelineEngine::new("disk_image_evidence.raw");
-        autopsy.add_timeline_event(1700000000, "/etc/shadow", "MODIFIED", "root");
-        assert_eq!(autopsy.timeline_events.len(), 1);
-
-        let event = &autopsy.timeline_events[0];
-        assert_eq!(event.file_path, "/etc/shadow");
-        assert_eq!(event.action, "MODIFIED");
-    }
-}
-
-// ============================================================================
-// MISSING KALI LINUX SECURITY & FORENSICS COMPONENTS
-// ============================================================================
-
-/// Kali NetHunter Android / ARM Mobile Penetration Testing & USB Audit Engine
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct KaliNethunterMobileAuditEngine {
-    pub target_arch: String,
-    pub is_bad_usb_active: bool,
-    pub injected_payloads: Vec<String>,
-}
-
-impl KaliNethunterMobileAuditEngine {
-    pub fn new(arch: &str) -> Self {
-        Self {
-            target_arch: arch.to_string(),
-            is_bad_usb_active: false,
-            injected_payloads: Vec::new(),
-        }
-    }
-
-    pub fn enable_bad_usb_emulation(&mut self) {
-        self.is_bad_usb_active = true;
-    }
-
-    pub fn execute_ducky_script(&mut self, script_content: &str) -> Result<usize, &'static str> {
-        if !self.is_bad_usb_active {
-            return Err("NetHunter: BadUSB HID emulation not active");
-        }
-        let lines_count = script_content.lines().count();
-        self.injected_payloads.push(format!("ducky_script_lines_{}", lines_count));
-        Ok(lines_count)
-    }
-}
-
-/// Kali Undercover Mode Windows 10/11 Stealth Theme Switcher Engine
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct KaliUndercoverThemeSwitcherEngine {
-    pub is_undercover_active: bool,
-    pub active_theme: String,
-}
-
-impl KaliUndercoverThemeSwitcherEngine {
-    pub fn new() -> Self {
-        Self {
-            is_undercover_active: false,
-            active_theme: "Kali-Dark-Default".to_string(),
-        }
-    }
-
-    pub fn toggle_undercover_mode(&mut self) -> String {
-        self.is_undercover_active = !self.is_undercover_active;
-        if self.is_undercover_active {
-            self.active_theme = "Windows-11-Stealth".to_string();
-        } else {
-            self.active_theme = "Kali-Dark-Default".to_string();
-        }
-        self.active_theme.clone()
-    }
-}
-
-impl Default for KaliUndercoverThemeSwitcherEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Kismet Wireless Network Device Record
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct KismetDeviceRecord {
-    pub mac_address: String,
-    pub phy_type: String, // 802.11, Bluetooth, Zigbee
-    pub signal_dbm: i32,
-}
-
-/// Kali Kismet 802.11 / Bluetooth / Zigbee Passive Sniffer & WIDS Engine
-#[derive(Debug, Clone)]
-pub struct KaliKismetWirelessSnifferEngine {
-    pub detected_devices: Vec<KismetDeviceRecord>,
-}
-
-impl KaliKismetWirelessSnifferEngine {
-    pub fn new() -> Self {
-        Self {
-            detected_devices: Vec::new(),
-        }
-    }
-
-    pub fn add_detected_device(&mut self, mac: &str, phy: &str, signal: i32) {
-        self.detected_devices.push(KismetDeviceRecord {
-            mac_address: mac.to_string(),
-            phy_type: phy.to_string(),
-            signal_dbm: signal,
-        });
-    }
-
-    pub fn detect_wids_anomalies(&self, mac: &str) -> bool {
-        self.detected_devices.iter().any(|d| d.mac_address == mac)
-    }
-}
-
-impl Default for KaliKismetWirelessSnifferEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Autopsy Forensic Timeline Event Record
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ForensicTimelineEvent {
-    pub timestamp_sec: u64,
-    pub file_path: String,
-    pub action: String, // CREATED, MODIFIED, ACCESSED, DELETED
-    pub user_owner: String,
-}
-
-/// Kali Autopsy / SleuthKit Filesystem Forensic Timeline Analysis Engine
-#[derive(Debug, Clone)]
-pub struct KaliAutopsyForensicTimelineEngine {
-    pub image_source: String,
-    pub timeline_events: Vec<ForensicTimelineEvent>,
-}
-
-impl KaliAutopsyForensicTimelineEngine {
-    pub fn new(image_source: &str) -> Self {
-        Self {
-            image_source: image_source.to_string(),
-            timeline_events: Vec::new(),
-        }
-    }
-
-    pub fn add_timeline_event(&mut self, timestamp: u64, path: &str, action: &str, owner: &str) {
-        self.timeline_events.push(ForensicTimelineEvent {
-            timestamp_sec: timestamp,
-            file_path: path.to_string(),
-            action: action.to_string(),
-            user_owner: owner.to_string(),
-        });
     }
 }

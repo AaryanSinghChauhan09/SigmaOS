@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-permissions:
-  contents: read
-
 jobs:
   arch-namcap-aur-audit:
     name: Arch Linux Namcap PKGBUILD Audit & Repository Check
