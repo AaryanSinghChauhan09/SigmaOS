@@ -396,8 +396,11 @@ pub use shell::{
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
-    RecipeManager, SatSolver, Transaction,
+    AlpineApkCachePeerSyncEngine, AptDebManifest, BuildSystem, ContentAddressedStore,
+    CryptoVerifier, DebianAptPinningEngine, FreeBsdPkgMessageNotifierEngine,
+    OpenBsdPledgeUnveilSandboxScriptletEngine, PackageRecipe, RecipeError, RecipeManager,
+    RpmOstreeLayeredImageGovernorEngine, SatSolver, Transaction,
+    XbpsDebianAlternativesGovernorEngine,
 };
 pub use unimplemented_tools::{
     AdaptiveUxAgent, AiAnomalyFirewall, AiCodeAssistant, AiDependencyResolver,

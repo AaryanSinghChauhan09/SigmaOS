@@ -53,8 +53,13 @@ pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
-    AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
-    GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
+    AlpmHook, AlpineApkCachePeerSyncEngine, AlternativeGroup, AlternativeProvider,
+    ApkPackageChunk, AptPackageCandidate, AptPinRule, ArchAlpmHookTransactionEngine,
+    BsdPkgDbStorageEngine, BsdPkgRecord, CachePeerNode, DebianAptPinningEngine,
+    FreeBsdPkgMessageNotifierEngine, GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
+    OpenBsdPledgeUnveilSandboxScriptletEngine, OstreeDeploymentPin, OstreeLayer, PkgMessage,
+    PkgMessageTrigger, PledgePromises, RpmOstreeLayeredImageGovernorEngine, UnveilPath,
+    XbpsDebianAlternativesGovernorEngine,
 };
 pub mod spec;
 pub mod store;
