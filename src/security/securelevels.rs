@@ -1,10 +1,6 @@
 // Sovereign BSD Securelevels and Granular Linux Capabilities Subsystem
 // Integrates core security paradigms from BSD securelevels and Linux capabilities into a unified microkernel privilege manager.
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::custom_string::SigmaString::{SecurityError, SigmaError};
-
-#[cfg(feature = "standalone_test")]
 #[derive(Debug, PartialEq, Eq)]
 pub enum SecurityError {
     AccessDenied,

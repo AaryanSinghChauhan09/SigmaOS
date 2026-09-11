@@ -2,23 +2,18 @@
 // Zero-dependency, safe, robust package adapter and transaction orchestrator
 // Integrates User-Defined Functions (UDF) and instant O(1) transaction rollbacks
 
-use core::default::Default;
-use core::option::Option::{self, None, Some};
-use core::result::Result::{self, Err, Ok};
 use std::boxed::Box;
 use std::collections::BTreeMap as HashMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+use core::default::Default;
+use core::option::Option::{self, None, Some};
+use core::result::Result::{self, Err, Ok};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
-    Deb,
-    Rpm,
-    Ebuild,
-    Sigma,
-    Sysupdate,
     Apt,
     Deb,
     Yum,
@@ -28,7 +23,6 @@ pub enum PackageFormat {
     Ebuild,
     Sovereign,
     Sigma,
-    Sysupdate,
     Nix,
     Apk,
     Xbps,
@@ -83,107 +77,123 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
-    Deb,
-    Rpm,
-    Ebuild,
-    Sigma,
     Sysupdate,
 }
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
-        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
-        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
-        else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
-        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
-        else { None }
-    }
-}
-
-impl PackageFormat {
-    pub fn from_filename(filename: &str) -> Option<Self> {
         let name = filename.to_lowercase();
-        if name.ends_with(".deb") {
-            Some(PackageFormat::Apt)
-        } else if name.ends_with(".rpm") {
-            Some(PackageFormat::Yum)
-        } else if name.ends_with(".pkg.tar.zst") || name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.gz") {
+        let name = name.trim();
+        let normalized = name.replace(" ", "");
+
+        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if normalized.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+            Some(PackageFormat::Rpm)
+        } else if normalized.ends_with(".pkg.tar.zst")
+            || normalized.ends_with(".pkg.tar.xz")
+            || normalized.ends_with(".pkg.tar.gz")
+            || normalized.contains("pacman")
+        {
             Some(PackageFormat::Pacman)
-        } else if name.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name.ends_with(".xbps") {
-            Some(PackageFormat::Xbps)
-        } else if name.ends_with(".ebuild") {
-            Some(PackageFormat::Portage)
-        } else if name.ends_with(".snap") {
+        } else if normalized.ends_with(".snap") {
             Some(PackageFormat::Snap)
-        } else if name.ends_with(".flatpak") {
+        } else if normalized.ends_with(".flatpak") {
             Some(PackageFormat::Flatpak)
-        } else if name.ends_with(".appimage") {
+        } else if normalized.ends_with(".appimage") {
             Some(PackageFormat::AppImage)
-        } else if name.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if name.ends_with(".moss") {
-            Some(PackageFormat::Moss)
-        } else if name.ends_with(".hpkg") {
-            Some(PackageFormat::Hpkg)
-        } else if name.ends_with(".tcz") {
-            Some(PackageFormat::Tcz)
-        } else if name.ends_with(".gobo") {
-            Some(PackageFormat::Gobo)
-        } else if name.ends_with(".ostree") {
-            Some(PackageFormat::Ostree)
-        } else if name.ends_with(".pkgsrc") {
-            Some(PackageFormat::Pkgsrc)
-        } else if name.ends_with(".sfs") {
-            Some(PackageFormat::Sfs)
-        } else if name.ends_with(".puk") {
-            Some(PackageFormat::Puk)
-        } else if name.ends_with(".dmg") {
-            Some(PackageFormat::Dmg)
-        } else if name.ends_with(".cports") {
-            Some(PackageFormat::Cports)
-        } else if name.ends_with(".sigpkg") {
-            Some(PackageFormat::Sovereign)
-        } else if name.ends_with(".air") {
+        } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
+            Some(PackageFormat::Sigma)
+        } else if normalized.ends_with(".air") {
             Some(PackageFormat::Air)
-        } else if name.ends_with(".bottle") {
+        } else if normalized.ends_with(".bottle") {
             Some(PackageFormat::Bottle)
-        } else if name.ends_with(".ipa") {
+        } else if normalized.ends_with(".ipa") {
             Some(PackageFormat::Ipa)
-        } else if name.ends_with(".ports") {
+        } else if normalized.ends_with(".ports") {
             Some(PackageFormat::Ports)
-        } else if name.ends_with(".pkg") {
+        } else if normalized.ends_with(".pkg") {
             Some(PackageFormat::Pkg)
-        } else if name.ends_with(".aab") {
+        } else if normalized.ends_with(".aab") {
             Some(PackageFormat::Aab)
-        } else if name.ends_with(".hap") {
+        } else if normalized.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if normalized.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
+            Some(PackageFormat::Nix)
+        } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
+            Some(PackageFormat::Portage)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
+        } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
+            Some(PackageFormat::TarXz)
+        } else if normalized.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if normalized.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if normalized.ends_with(".guix") || normalized.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if normalized.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if normalized.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if normalized.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if normalized.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if normalized.ends_with(".commit") || normalized.ends_with(".ostree") {
+            Some(PackageFormat::Ostree)
+        } else if normalized.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if normalized.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if normalized.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if normalized.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if normalized.ends_with(".cports") {
+            Some(PackageFormat::Cports)
+        } else if normalized.ends_with(".dports") {
+            Some(PackageFormat::Dports)
+        } else if normalized.ends_with(".slackbuild")
+            || normalized.ends_with(".tlz")
+            || normalized.ends_with(".tbz")
+        {
+            Some(PackageFormat::SlackBuild)
+        } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
+            Some(PackageFormat::Crux)
+        } else if normalized.ends_with(".stratum") {
+            Some(PackageFormat::Stratum)
+        } else if normalized.ends_with(".app") {
+            Some(PackageFormat::AppBundle)
+        } else if normalized.ends_with(".hap") {
             Some(PackageFormat::Hap)
-        } else if name.ends_with(".lzm") {
+        } else if normalized.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if normalized.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if name.ends_with(".pup") {
+        } else if normalized.ends_with(".pup") {
             Some(PackageFormat::Pup)
-        } else if name.ends_with(".pet") {
+        } else if normalized.ends_with(".pet") {
             Some(PackageFormat::Pet)
-        } else if name.ends_with(".spack") {
-            Some(PackageFormat::Spack)
-        } else if name.ends_with(".conan") {
-            Some(PackageFormat::Conan)
-        } else if name.ends_with(".whl") {
-            Some(PackageFormat::Wheel)
-        } else if name.ends_with(".crate") {
-            Some(PackageFormat::Crate)
-        } else if name.ends_with(".gem") {
-            Some(PackageFormat::Gem)
-        } else if name.ends_with(".nupkg") {
-            Some(PackageFormat::Nupkg)
-        } else if name.ends_with(".vcpkg") {
-            Some(PackageFormat::Vcpkg)
-        } else if name.ends_with(".narinfo") {
-            Some(PackageFormat::NarInfo)
+        } else if normalized.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else if normalized.ends_with(".ipk") {
+            Some(PackageFormat::Ipk)
+        } else if normalized.ends_with(".opkg") {
+            Some(PackageFormat::Opkg)
+        } else if normalized.ends_with(".p5p") || normalized.ends_with(".ips") {
+            Some(PackageFormat::SolarisIps)
+        } else if normalized.ends_with(".nar") {
+            Some(PackageFormat::GuixNar)
         } else {
             None
         }
@@ -201,35 +211,6 @@ pub struct PackageContext {
 }
 
 /// Dynamic Polymorphic Interface for Package Formats (OOP Adapter pattern)
-impl PackageFormat {
-    pub fn from_filename(filename: &str) -> Option<Self> {
-        let name_lower = filename.to_lowercase();
-        if name_lower.ends_with(".deb") {
-            Some(PackageFormat::Deb)
-        } else if name_lower.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name_lower.ends_with(".ebuild") {
-            Some(PackageFormat::Ebuild)
-        } else if name_lower.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name_lower.ends_with(".xbps") {
-            Some(PackageFormat::Xbps)
-        } else if name_lower.ends_with(".pkg.tar.zst") || name_lower.ends_with(".pkg.tar.xz") {
-            Some(PackageFormat::Pacman)
-        } else if name_lower.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name_lower.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name_lower.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name_lower.ends_with(".sigma") {
-            Some(PackageFormat::Sigma)
-        } else {
-            None
-        }
-    }
-}
-
 pub trait IPackageAdapter {
     fn format(&self) -> PackageFormat;
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str>;
@@ -594,9 +575,7 @@ impl PackageAdapterFactory {
             PackageFormat::Apt | PackageFormat::Deb => Box::new(AptPackageAdapter),
             PackageFormat::Yum | PackageFormat::Rpm => Box::new(YumPackageAdapter),
             PackageFormat::Pacman => Box::new(PacmanPackageAdapter),
-            PackageFormat::Portage | PackageFormat::Ebuild => {
-                Box::new(EbuildPackageAdapter::new(Vec::new()))
-            }
+            PackageFormat::Portage | PackageFormat::Ebuild => Box::new(EbuildPackageAdapter::new(Vec::new())),
             PackageFormat::Sovereign | PackageFormat::Sigma => Box::new(SovereignPackageAdapter),
             PackageFormat::Nix => Box::new(NixPackageAdapter),
             PackageFormat::Apk => Box::new(ApkPackageAdapter),
@@ -706,11 +685,7 @@ impl IPackageAdapter for SpackPackageAdapter {
             hash: [0x38; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("Spack Adapter: Extracted Spack package to: {}", store_path);
         Ok(())
     }
@@ -734,11 +709,7 @@ impl IPackageAdapter for ConanPackageAdapter {
             hash: [0x39; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("Conan Adapter: Extracted Conan package to: {}", store_path);
         Ok(())
     }
@@ -762,11 +733,7 @@ impl IPackageAdapter for WheelPackageAdapter {
             hash: [0x3a; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("Wheel Adapter: Extracted Wheel package to: {}", store_path);
         Ok(())
     }
@@ -790,11 +757,7 @@ impl IPackageAdapter for CratePackageAdapter {
             hash: [0x3b; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("Crate Adapter: Extracted Cargo crate to: {}", store_path);
         Ok(())
     }
@@ -818,11 +781,7 @@ impl IPackageAdapter for GemPackageAdapter {
             hash: [0x3c; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("Gem Adapter: Extracted RubyGem to: {}", store_path);
         Ok(())
     }
@@ -846,11 +805,7 @@ impl IPackageAdapter for NupkgPackageAdapter {
             hash: [0x3d; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("Nupkg Adapter: Extracted NuGet package to: {}", store_path);
         Ok(())
     }
@@ -874,11 +829,7 @@ impl IPackageAdapter for VcpkgPackageAdapter {
             hash: [0x3e; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("Vcpkg Adapter: Extracted Vcpkg package to: {}", store_path);
         Ok(())
     }
@@ -902,15 +853,8 @@ impl IPackageAdapter for NarInfoPackageAdapter {
             hash: [0x3f; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!(
-            "NarInfo Adapter: Extracted NarInfo manifest to: {}",
-            store_path
-        );
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("NarInfo Adapter: Extracted NarInfo manifest to: {}", store_path);
         Ok(())
     }
 }
@@ -933,15 +877,8 @@ impl IPackageAdapter for SysupdatePackageAdapter {
             hash: [0x40; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!(
-            "Sysupdate Adapter: Extracted Sysupdate definition to: {}",
-            store_path
-        );
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Sysupdate Adapter: Extracted Sysupdate definition to: {}", store_path);
         Ok(())
     }
 }
@@ -2376,11 +2313,7 @@ impl IPackageAdapter for IpkPackageAdapter {
             hash: [0x32; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("IPK Adapter: Extracted IPK package to: {}", store_path);
         Ok(())
     }
@@ -2404,11 +2337,7 @@ impl IPackageAdapter for OpkgPackageAdapter {
             hash: [0x34; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("OPKG Adapter: Extracted OPKG package to: {}", store_path);
         Ok(())
     }
@@ -2432,15 +2361,8 @@ impl IPackageAdapter for SolarisIpsPackageAdapter {
             hash: [0x35; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!(
-            "Solaris IPS Adapter: Extracted IPS package to: {}",
-            store_path
-        );
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Solaris IPS Adapter: Extracted IPS package to: {}", store_path);
         Ok(())
     }
 }
@@ -2463,11 +2385,7 @@ impl IPackageAdapter for GuixNarPackageAdapter {
             hash: [0x36; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
         println!("Guix NAR Adapter: Extracted NAR package to: {}", store_path);
         Ok(())
     }
@@ -2491,15 +2409,8 @@ impl IPackageAdapter for OpenBsdPkgPackageAdapter {
             hash: [0x37; 32],
         })
     }
-    fn extract_to_store(
-        &self,
-        _ctx: &PackageContext,
-        store_path: &str,
-    ) -> Result<(), &'static str> {
-        println!(
-            "OpenBSD PKG Adapter: Extracted PKG package to: {}",
-            store_path
-        );
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("OpenBSD PKG Adapter: Extracted PKG package to: {}", store_path);
         Ok(())
     }
 }

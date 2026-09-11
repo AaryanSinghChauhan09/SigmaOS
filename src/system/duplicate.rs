@@ -154,13 +154,13 @@ impl DuplicateFinder {
         for (_size, files) in &files_by_size {
             if files.len() > 1 {
                 for file in files {
-                    let mut file_cloned = file.clone();
-                    if let Ok(hash) = self.algorithm.compute_hash(&file_cloned.path) {
-                        file_cloned.hash = Some(hash.clone());
+                    let mut file_clone = file.clone();
+                    if let Ok(hash) = self.algorithm.compute_hash(&file_clone.path) {
+                        file_clone.hash = Some(hash.clone());
                         files_by_hash
                             .entry(hash)
                             .or_insert_with(Vec::new)
-                            .push(file_cloned);
+                            .push(file_clone);
                     }
                 }
             }
