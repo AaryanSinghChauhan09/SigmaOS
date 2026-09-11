@@ -26,6 +26,11 @@ pub use file_manager::{
     ThunarBulkRenamerRegexEngine, YaziLuaPluginEngine,
 };
 
+pub use file_manager::{
+    DolphinDualPaneSplitGovernor, NnnFastTraversalGovernor, RangerSixelImagePreviewEngine,
+    ThunarBulkRenamerRegexEngine, YaziLuaPluginEngine,
+};
+
 pub use open_source_tools_parity::{
     DufDeviceUsage, DufDiskUsageEngine, DustDirectoryTreeEngine, DustNode, FastfetchSysinfo,
     ItsFossFastfetchSysinfoEngine, SimpleJqJsonQueryEngine,
