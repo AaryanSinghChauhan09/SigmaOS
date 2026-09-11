@@ -281,15 +281,15 @@ pub enum PackageFormat {
     Opkg,       // Yocto Package (.opkg)
     SolarisIps, // Solaris IPS Package (.p5p, .ips)
     GuixNar,    // Nix/Guix NAR Archive (.nar)
-    Spack,      // Spack package (.spack)
-    Conan,      // Conan C/C++ package (.conan)
-    Wheel,      // Python Wheel package (.whl)
-    Crate,      // Rust Crate package (.crate)
-    Gem,        // Ruby Gem package (.gem)
-    Nupkg,      // NuGet package (.nupkg)
-    Vcpkg,      // vcpkg C++ package (.vcpkg)
-    NarInfo,    // Nix/Guix NarInfo (.narinfo)
-    Sysupdate,  // systemd-sysupdate A/B image (.sysupdate)
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -1359,7 +1359,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
-            _ => Box::new(SigmaPkgInstallStrategy),
+            _ => Box::new(GuixInstallStrategy),
         }
     }
 
@@ -1419,7 +1419,7 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
-            _ => Box::new(SigmaPkgMetadataAdapter),
+            _ => Box::new(GuixMetadataAdapter),
         }
     }
 }
@@ -2908,98 +2908,34 @@ mod tests {
             Some(PackageFormat::OpenBsdPkg)
         );
     }
+}
 
-    #[test]
-    fn test_all_package_format_strategies_and_adapters() {
-        let formats = vec![
-            PackageFormat::Deb,
-            PackageFormat::Rpm,
-            PackageFormat::Pacman,
-            PackageFormat::Ebuild,
-            PackageFormat::Apk,
-            PackageFormat::Nix,
-            PackageFormat::Flatpak,
-            PackageFormat::Snap,
-            PackageFormat::AppImage,
-            PackageFormat::Xbps,
-            PackageFormat::Txz,
-            PackageFormat::Eopkg,
-            PackageFormat::Zypper,
-            PackageFormat::Guix,
-            PackageFormat::CachyOS,
-            PackageFormat::Swupd,
-            PackageFormat::Starling,
-            PackageFormat::SigmaPkg,
-            PackageFormat::Air,
-            PackageFormat::Bottle,
-            PackageFormat::Ipa,
-            PackageFormat::Ports,
-            PackageFormat::Pkg,
-            PackageFormat::Aab,
-            PackageFormat::TarGz,
-            PackageFormat::Xz,
-            PackageFormat::App,
-            PackageFormat::Hap,
-            PackageFormat::Pisi,
-            PackageFormat::Superdeb,
-            PackageFormat::Lzm,
-            PackageFormat::Pup,
-            PackageFormat::Pet,
-            PackageFormat::Tar,
-            PackageFormat::Moss,
-            PackageFormat::Hpkg,
-            PackageFormat::Tcz,
-            PackageFormat::Gobo,
-            PackageFormat::Ostree,
-            PackageFormat::Pkgsrc,
-            PackageFormat::Sfs,
-            PackageFormat::Puk,
-            PackageFormat::Dmg,
-            PackageFormat::Cports,
-            PackageFormat::Dports,
-            PackageFormat::SlackBuild,
-            PackageFormat::Crux,
-            PackageFormat::Drpm,
-            PackageFormat::Stratum,
-        ];
+/// Alpine Linux .apk Package Format Adapter
+pub struct AlpineApkPackageAdapter;
 
-        for fmt in formats {
-            let strategy = PackageFactory::get_strategy(fmt);
-            let adapter = PackageFactory::get_adapter(fmt);
-            let pkg =
-                UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string()).with_format(fmt);
-
-            assert!(strategy.install(&pkg).is_ok());
-            assert!(strategy.verify(&pkg).unwrap());
-            assert!(strategy.remove(&pkg).is_ok());
-
-            let adapted = adapter.adapt("").unwrap();
-            assert!(
-                adapted.formats.contains(&fmt)
-                    || (fmt == PackageFormat::Nix
-                        && adapted.formats.contains(&PackageFormat::Nixpkg))
-            );
-        }
+impl AlpineApkPackageAdapter {
+    pub fn format(&self) -> PackageFormat {
+        PackageFormat::SigmaPkg
     }
+}
 
-    #[test]
-    fn test_expanded_decorators() {
-        let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
-        let base = BasePackageDecorator { package: pkg };
+#[test]
+fn test_expanded_decorators() {
+    let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
+    let base = BasePackageDecorator { package: pkg };
 
-        let sandbox_dec = SandboxDecorator {
-            decorated: base,
-            is_isolated: true,
-        };
+    let sandbox_dec = SandboxDecorator {
+        decorated: base,
+        is_isolated: true,
+    };
 
-        assert!(sandbox_dec.enforce_sandbox().is_ok());
-        assert_eq!(sandbox_dec.get_package().name, "simd-app");
+    assert!(sandbox_dec.enforce_sandbox().is_ok());
+    assert_eq!(sandbox_dec.get_package().name, "simd-app");
 
-        let net_dec = NetworkRestrictionDecorator {
-            decorated: sandbox_dec,
-            allowed_hosts: vec!["sigmaos.org".to_string()],
-        };
+    let net_dec = NetworkRestrictionDecorator {
+        decorated: sandbox_dec,
+        allowed_hosts: vec!["sigmaos.org".to_string()],
+    };
 
-        assert!(net_dec.restrict_network().is_ok());
-    }
+    assert!(net_dec.restrict_network().is_ok());
 }

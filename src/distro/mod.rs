@@ -270,8 +270,11 @@ pub use sovereign_nextgen_distro_leap::{
 
 pub mod open_source_distro_innovations;
 pub use open_source_distro_innovations::{
-    NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, MicroVmGuest, VmState,
-    IllumosDTraceProbeProvider, DTraceProbe, GentooPortageEapi8SlotResolver, EbuildPackageRecord,
+    DTraceProbe, EbuildPackageRecord, FreeBsdJailVnetConfig, FreeBsdJailVnetEngine,
+    GentooPackageSlotSpec, GentooPortageEapi8SlotResolver, GentooUseFlagSlotEngine,
+    IllumosDTraceProbeProvider, IllumosZoneConfig, IllumosZoneVirtualizationEngine, MicroVmGuest,
+    NixFlakeLockEntry, NixOsFlakeAtomicGenerationEngine, NuttxRealtimeTaskGovernor, NuttxTask,
+    OpenBsdPledgeUnveilSecurityEngine, OpenBsdVmmBhyveHypervisorBridge, VmState,
 };
 
 pub mod ultimate_distro_innovations;
