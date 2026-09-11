@@ -1,17 +1,7 @@
 // SigmaOS Arch Linux Ultimate Gap Closure Engine
 // Zero-dependency Rust implementation covering ALPM sync databases, AUR .SRCINFO parsing, mkinitcpio hooks, and archiso profile bootstrap.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::String;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::String;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 /// ALPM Repository Sync Database Entry (.db.tar.gz spec)
@@ -115,7 +105,7 @@ impl ArchAurPkgbuildSolverEngine {
     }
 
     pub fn solve_dependencies(&self) -> Vec<String> {
-        let mut deps: Vec<String> = Vec::new();
+        let mut deps = Vec::new();
         if let Some(ref info) = self.srcinfo {
             for dep in &info.makedepends {
                 deps.push(dep.clone());
