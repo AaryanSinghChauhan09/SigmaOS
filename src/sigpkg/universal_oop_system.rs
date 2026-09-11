@@ -120,6 +120,299 @@ impl Package {
 }
 
 // ============================================================================
+// Bridge Pattern: Decoupling Package Abstraction from Concrete Distro Backends
+// ============================================================================
+
+pub trait IPackageBackend: Send + Sync {
+    fn backend_name(&self) -> &str;
+    fn install_payload(&self, pkg: &dyn IPackage) -> Result<usize, String>;
+    fn remove_payload(&self, pkg_name: &str) -> Result<bool, String>;
+    fn verify_integrity(&self, pkg: &dyn IPackage) -> Result<bool, String>;
+}
+
+pub struct GenericDistroBackend {
+    pub name: String,
+}
+
+impl GenericDistroBackend {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+        }
+    }
+}
+
+impl IPackageBackend for GenericDistroBackend {
+    fn backend_name(&self) -> &str {
+        &self.name
+    }
+
+    fn install_payload(&self, pkg: &dyn IPackage) -> Result<usize, String> {
+        let size = pkg.metadata().size;
+        Ok(if size == 0 { 1024 } else { size as usize })
+    }
+
+    fn remove_payload(&self, _pkg_name: &str) -> Result<bool, String> {
+        Ok(true)
+    }
+
+    fn verify_integrity(&self, _pkg: &dyn IPackage) -> Result<bool, String> {
+        Ok(true)
+    }
+}
+
+pub struct UniversalDistroBridge {
+    backend: Box<dyn IPackageBackend>,
+}
+
+impl UniversalDistroBridge {
+    pub fn new(backend: Box<dyn IPackageBackend>) -> Self {
+        Self { backend }
+    }
+
+    pub fn backend_name(&self) -> &str {
+        self.backend.backend_name()
+    }
+
+    pub fn deploy(&self, pkg: &dyn IPackage) -> Result<usize, String> {
+        self.backend.install_payload(pkg)
+    }
+
+    pub fn uninstall(&self, pkg_name: &str) -> Result<bool, String> {
+        self.backend.remove_payload(pkg_name)
+    }
+
+    pub fn audit(&self, pkg: &dyn IPackage) -> Result<bool, String> {
+        self.backend.verify_integrity(pkg)
+    }
+}
+
+// ============================================================================
+// Composite Pattern: Uniform Treatment of Packages & Meta-Package Bundles
+// ============================================================================
+
+pub trait IPackageComponent: Send + Sync {
+    fn component_name(&self) -> &str;
+    fn component_size(&self) -> u64;
+    fn install_component(&self, bridge: &UniversalDistroBridge) -> Result<usize, String>;
+}
+
+impl IPackageComponent for StandardPackage {
+    fn component_name(&self) -> &str {
+        self.name()
+    }
+
+    fn component_size(&self) -> u64 {
+        self.metadata.size
+    }
+
+    fn install_component(&self, bridge: &UniversalDistroBridge) -> Result<usize, String> {
+        bridge.deploy(self)
+    }
+}
+
+pub struct CompositePackageBundle {
+    pub bundle_name: String,
+    pub components: Vec<Box<dyn IPackageComponent>>,
+}
+
+impl CompositePackageBundle {
+    pub fn new(bundle_name: &str) -> Self {
+        Self {
+            bundle_name: bundle_name.to_string(),
+            components: Vec::new(),
+        }
+    }
+
+    pub fn add_component(&mut self, component: Box<dyn IPackageComponent>) {
+        self.components.push(component);
+    }
+}
+
+impl IPackageComponent for CompositePackageBundle {
+    fn component_name(&self) -> &str {
+        &self.bundle_name
+    }
+
+    fn component_size(&self) -> u64 {
+        self.components.iter().map(|c| c.component_size()).sum()
+    }
+
+    fn install_component(&self, bridge: &UniversalDistroBridge) -> Result<usize, String> {
+        let mut total_bytes = 0;
+        for component in &self.components {
+            total_bytes += component.install_component(bridge)?;
+        }
+        Ok(total_bytes)
+    }
+}
+
+// ============================================================================
+// State Pattern: Type-Safe Package Lifecycle State Machine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageLifecycleState {
+    Uninstalled,
+    Downloading,
+    VerifyingPqcSignature,
+    UnpackingPayload,
+    ExecutingTriggers,
+    Installed,
+    RollbackInitiated,
+    Corrupted,
+}
+
+pub struct PackageLifecycleStateMachine {
+    current_state: PackageLifecycleState,
+}
+
+impl PackageLifecycleStateMachine {
+    pub fn new() -> Self {
+        Self {
+            current_state: PackageLifecycleState::Uninstalled,
+        }
+    }
+
+    pub fn current_state(&self) -> PackageLifecycleState {
+        self.current_state
+    }
+
+    pub fn can_transition(&self, next: PackageLifecycleState) -> bool {
+        match (self.current_state, next) {
+            (PackageLifecycleState::Uninstalled, PackageLifecycleState::Downloading) => true,
+            (PackageLifecycleState::Downloading, PackageLifecycleState::VerifyingPqcSignature) => {
+                true
+            }
+            (
+                PackageLifecycleState::VerifyingPqcSignature,
+                PackageLifecycleState::UnpackingPayload,
+            ) => true,
+            (PackageLifecycleState::UnpackingPayload, PackageLifecycleState::ExecutingTriggers) => {
+                true
+            }
+            (PackageLifecycleState::ExecutingTriggers, PackageLifecycleState::Installed) => true,
+            (PackageLifecycleState::Installed, PackageLifecycleState::Uninstalled) => true,
+            (_, PackageLifecycleState::RollbackInitiated) => true,
+            (PackageLifecycleState::RollbackInitiated, PackageLifecycleState::Uninstalled) => true,
+            (_, PackageLifecycleState::Corrupted) => true,
+            _ => false,
+        }
+    }
+
+    pub fn transition_to(
+        &mut self,
+        next: PackageLifecycleState,
+    ) -> Result<PackageLifecycleState, &'static str> {
+        if self.can_transition(next) {
+            self.current_state = next;
+            Ok(self.current_state)
+        } else {
+            Err("Invalid state machine transition")
+        }
+    }
+}
+
+impl Default for PackageLifecycleStateMachine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Builder Pattern: Declarative Fluent Builder for Universal Packages
+// ============================================================================
+
+pub struct UniversalPackageBuilder {
+    name: String,
+    version: Version,
+    description: String,
+    license: String,
+    maintainer: String,
+    homepage: String,
+    architecture: String,
+    format: PackageFormat,
+    dependencies: Vec<Dependency>,
+}
+
+impl UniversalPackageBuilder {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            license: "GPL-3.0".to_string(),
+            maintainer: "SigmaOS Developer".to_string(),
+            homepage: String::new(),
+            architecture: "x86_64".to_string(),
+            format: PackageFormat::Sigma,
+            dependencies: Vec::new(),
+        }
+    }
+
+    pub fn with_version(mut self, major: u64, minor: u64, patch: u64) -> Self {
+        self.version = Version::new(major, minor, patch);
+        self
+    }
+
+    pub fn with_description(mut self, desc: &str) -> Self {
+        self.description = desc.to_string();
+        self
+    }
+
+    pub fn with_license(mut self, license: &str) -> Self {
+        self.license = license.to_string();
+        self
+    }
+
+    pub fn with_maintainer(mut self, maintainer: &str) -> Self {
+        self.maintainer = maintainer.to_string();
+        self
+    }
+
+    pub fn with_format(mut self, format: PackageFormat) -> Self {
+        self.format = format;
+        self
+    }
+
+    pub fn add_dependency(mut self, dep_name: &str) -> Self {
+        self.dependencies.push(Dependency {
+            name: dep_name.to_string(),
+            version_constraint: VersionConstraint::Any,
+        });
+        self
+    }
+
+    pub fn build(self) -> Result<Box<dyn IPackage>, String> {
+        if self.name.is_empty() {
+            return Err("Package name cannot be empty".to_string());
+        }
+
+        let meta = PackageMetadata {
+            name: self.name,
+            version: self.version,
+            description: self.description,
+            license: self.license,
+            maintainer: self.maintainer,
+            homepage: self.homepage,
+            architecture: self.architecture,
+            checksum: "builder-generated-sha256".to_string(),
+            size: 4096,
+            install_date: None,
+            pqc_signature: Some("dilithium-5".to_string()),
+            gpg_key_id: Some("0x9E5A86A21B607B76".to_string()),
+            supported_architectures: vec!["x86_64".to_string()],
+        };
+
+        Ok(Box::new(StandardPackage {
+            metadata: meta,
+            dependencies: self.dependencies,
+            format: self.format,
+        }))
+    }
+}
+
+// ============================================================================
 // Core Abstractions (OOP Interface Layer)
 // ============================================================================
 
@@ -399,8 +692,6 @@ impl PackageFormat {
             Some(PackageFormat::Vcpkg)
         } else if normalized.ends_with(".narinfo") {
             Some(PackageFormat::NarInfo)
-        } else if normalized.ends_with(".sysupdate") {
-            Some(PackageFormat::Sysupdate)
         } else {
             None
         }
@@ -949,19 +1240,6 @@ impl_generic_package_adapter!(
     "stratum-package: ",
     "stratum-version: "
 );
-impl_generic_package_adapter!(IpkAdapter, Ipk, "ipk-package:", "ipk-package: ", "ipk-version: ");
-impl_generic_package_adapter!(OpkgAdapter, Opkg, "opkg-package:", "opkg-package: ", "opkg-version: ");
-impl_generic_package_adapter!(OpenBsdPkgAdapter, OpenBsdPkg, "openbsd-pkg:", "openbsd-pkg: ", "openbsd-version: ");
-impl_generic_package_adapter!(SolarisIpsAdapter, SolarisIps, "solaris-ips:", "solaris-ips: ", "solaris-version: ");
-impl_generic_package_adapter!(GuixNarAdapter, GuixNar, "guix-nar:", "guix-nar: ", "guix-nar-version: ");
-impl_generic_package_adapter!(SpackAdapter, Spack, "spack-package:", "spack-package: ", "spack-version: ");
-impl_generic_package_adapter!(ConanAdapter, Conan, "conan-package:", "conan-package: ", "conan-version: ");
-impl_generic_package_adapter!(WheelAdapter, Wheel, "wheel-package:", "wheel-package: ", "wheel-version: ");
-impl_generic_package_adapter!(CrateAdapter, Crate, "crate-package:", "crate-package: ", "crate-version: ");
-impl_generic_package_adapter!(GemAdapter, Gem, "gem-package:", "gem-package: ", "gem-version: ");
-impl_generic_package_adapter!(NupkgAdapter, Nupkg, "nupkg-package:", "nupkg-package: ", "nupkg-version: ");
-impl_generic_package_adapter!(VcpkgAdapter, Vcpkg, "vcpkg-package:", "vcpkg-package: ", "vcpkg-version: ");
-impl_generic_package_adapter!(NarInfoAdapter, NarInfo, "narinfo-package:", "narinfo-package: ", "narinfo-version: ");
 
 /// Fedora/RHEL .rpm adapter
 pub struct RpmAdapter {
@@ -2938,20 +3216,6 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(CruxAdapter::new()));
         factory.register_parser(Box::new(DrpmAdapter::new()));
         factory.register_parser(Box::new(StratumAdapter::new()));
-        factory.register_parser(Box::new(IpkAdapter::new()));
-        factory.register_parser(Box::new(OpkgAdapter::new()));
-        factory.register_parser(Box::new(OpenBsdPkgAdapter::new()));
-        factory.register_parser(Box::new(SolarisIpsAdapter::new()));
-        factory.register_parser(Box::new(GuixNarAdapter::new()));
-        factory.register_parser(Box::new(SpackAdapter::new()));
-        factory.register_parser(Box::new(ConanAdapter::new()));
-        factory.register_parser(Box::new(WheelAdapter::new()));
-        factory.register_parser(Box::new(CrateAdapter::new()));
-        factory.register_parser(Box::new(GemAdapter::new()));
-        factory.register_parser(Box::new(NupkgAdapter::new()));
-        factory.register_parser(Box::new(VcpkgAdapter::new()));
-        factory.register_parser(Box::new(NarInfoAdapter::new()));
-        factory.register_parser(Box::new(SystemdSysupdateAdapter::new()));
 
         factory
     }
@@ -3057,7 +3321,9 @@ pub trait IPackageDeltaStrategy: Send + Sync {
 
 pub struct DnfDeltaRpmStrategy;
 impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
-    fn name(&self) -> &str { "drpm" }
+    fn name(&self) -> &str {
+        "drpm"
+    }
     fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         let mut out = source.to_vec();
         out.extend_from_slice(patch);
@@ -3067,7 +3333,9 @@ impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
 
 pub struct SovereignBinaryDeltaStrategy;
 impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
-    fn name(&self) -> &str { "moss-stone-delta" }
+    fn name(&self) -> &str {
+        "moss-stone-delta"
+    }
     fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         Ok(patch.to_vec())
     }
@@ -3075,7 +3343,9 @@ impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
 
 pub struct ZstdChunkedDeltaStrategy;
 impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
-    fn name(&self) -> &str { "zstd-chunked" }
+    fn name(&self) -> &str {
+        "zstd-chunked"
+    }
     fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         Ok(patch.to_vec())
     }
@@ -3712,8 +3982,7 @@ impl DebianTriggerManager {
         let mut executed_count = 0;
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
-                let paths_ref: Vec<&str> =
-                    matched_paths.iter().map(|s| s.as_str()).collect();
+                let paths_ref: Vec<&str> = matched_paths.iter().map(|s| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -5838,5 +6107,64 @@ Description: Hook test";
             mgr.eselect_modules.get("kernel").unwrap(),
             "linux-6.12-sigma"
         );
+    }
+
+    #[test]
+    fn test_bridge_and_composite_and_state_and_builder_oop_patterns() {
+        // 1. Test Builder Pattern
+        let pkg = UniversalPackageBuilder::new("sovereign-tool")
+            .with_version(2, 5, 0)
+            .with_description("Sovereign developer tool")
+            .with_license("Apache-2.0")
+            .with_format(PackageFormat::Sigma)
+            .add_dependency("sovereign-libc")
+            .build()
+            .unwrap();
+
+        assert_eq!(pkg.name(), "sovereign-tool");
+        assert_eq!(pkg.version(), &Version::new(2, 5, 0));
+        assert_eq!(pkg.dependencies().len(), 1);
+
+        // 2. Test Bridge Pattern
+        let backend = Box::new(GenericDistroBackend::new("deb-dpkg-backend"));
+        let bridge = UniversalDistroBridge::new(backend);
+        assert_eq!(bridge.backend_name(), "deb-dpkg-backend");
+        assert!(bridge.deploy(pkg.as_ref()).is_ok());
+
+        // 3. Test Composite Pattern
+        let pkg1 = UniversalPackageBuilder::new("core-lib").build().unwrap();
+        let pkg2 = UniversalPackageBuilder::new("gui-lib").build().unwrap();
+
+        let mut bundle = CompositePackageBundle::new("desktop-meta-bundle");
+        bundle.add_component(Box::new(StandardPackage {
+            metadata: pkg1.metadata().clone(),
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        }));
+        bundle.add_component(Box::new(StandardPackage {
+            metadata: pkg2.metadata().clone(),
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        }));
+
+        assert_eq!(bundle.component_name(), "desktop-meta-bundle");
+        assert_eq!(bundle.component_size(), 8192);
+        assert_eq!(bundle.install_component(&bridge).unwrap(), 8192);
+
+        // 4. Test State Machine Pattern
+        let mut sm = PackageLifecycleStateMachine::new();
+        assert_eq!(sm.current_state(), PackageLifecycleState::Uninstalled);
+        assert!(sm.transition_to(PackageLifecycleState::Downloading).is_ok());
+        assert!(sm
+            .transition_to(PackageLifecycleState::VerifyingPqcSignature)
+            .is_ok());
+        assert!(sm
+            .transition_to(PackageLifecycleState::UnpackingPayload)
+            .is_ok());
+        assert!(sm
+            .transition_to(PackageLifecycleState::ExecutingTriggers)
+            .is_ok());
+        assert!(sm.transition_to(PackageLifecycleState::Installed).is_ok());
+        assert_eq!(sm.current_state(), PackageLifecycleState::Installed);
     }
 }
