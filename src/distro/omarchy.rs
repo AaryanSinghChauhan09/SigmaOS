@@ -618,6 +618,17 @@ pub use crate::distro::omarchy_inspiration::{
     QuickshellWidget, ShellComponentKind,
 };
 
+#[cfg(feature = "standalone_test")]
+#[path = "omarchy_inspiration.rs"]
+pub mod omarchy_inspiration;
+#[cfg(feature = "standalone_test")]
+pub use omarchy_inspiration::{
+    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
+    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
+    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
+    QuickshellWidget, ShellComponentKind,
+};
+
 /// Omarchy Liveboot ISO & Automated Installer Engine
 #[derive(Debug, Clone)]
 pub struct OmarchyIsoInstallerEngine {
