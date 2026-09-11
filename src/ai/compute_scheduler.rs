@@ -63,7 +63,7 @@ impl Default for AiComputeQuota {
         Self {
             max_gpu_percent: 100,
             max_npu_percent: 100,
-            max_memory_bytes: 16 * 1024 * 1024 * 1024, // 16GB default
+            max_memory_bytes: 16u64 * 1024 * 1024 * 1024, // 16GB default
             current_gpu_usage_percent: 0,
             current_memory_bytes: 0,
         }

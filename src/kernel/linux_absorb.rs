@@ -701,7 +701,7 @@ impl AbsorbedExt4Driver {
                 version: String::from("1.0.0"),
                 fs_type: FilesystemType::LinuxDerived,
                 linux_heritage: None,
-                max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
+                max_file_size: 16u64 * 1024 * 1024 * 1024, // 16TB
                 max_filename_length: 255,
                 features: {
                     let mut v = Vec::new();
@@ -893,8 +893,8 @@ impl AbsorbedBuddyAllocator {
                         v
                     },
                 }),
-                total_memory: 4 * 1024 * 1024 * 1024, // 4GB
-                available_memory: 4 * 1024 * 1024 * 1024,
+                total_memory: 4u64 * 1024 * 1024 * 1024, // 4GB
+                available_memory: 4u64 * 1024 * 1024 * 1024,
                 page_size: 4096,
             },
             allocated_blocks: Vec::new(),
