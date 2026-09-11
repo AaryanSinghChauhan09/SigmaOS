@@ -271,3 +271,12 @@ pub use itsfoss_innovations::{
     ItsFossZorinAppAppearanceEngine, SnapshotMode, SovereignItsFossInnovationsSuite,
     TiledWindowNode, WindowTileOrientation,
 };
+
+pub mod arch_gap_closure;
+pub use arch_gap_closure::{
+    AlpmHookRule as ArchAlpmHookRule, ArchArchisoIsoBuilderEngine, ArchGpgKeyNode,
+    ArchPacmanCachePruningEngine, ArchPacmanHooksManagerEngine, ArchPacmanKeyringTrustEngine,
+    ArchSysusersTmpfilesGeneratorEngine, ArchisoProfileSpec, CachedPackageTarball,
+    HookWhen as ArchHookWhen, KeyTrustLevel as ArchKeyTrustLevel, SovereignArchGapClosureSuite,
+    SysuserRule, TmpfileRule,
+};
