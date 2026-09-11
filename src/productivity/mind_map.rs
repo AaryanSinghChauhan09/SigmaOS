@@ -89,6 +89,60 @@ pub struct MindMapCreator {
     pub default_layout: MindMapLayout,
 }
 
+/// Indented Text MindMap Parser Engine (inspired by NiceMind, XMind, Markmap)
+/// Converts tab/space-indented text outlines into interactive MindMapCreator objects.
+pub struct IndentedTextMindMapParserEngine;
+
+impl IndentedTextMindMapParserEngine {
+    /// Parses tab or 2/4-space indented text into a structured MindMapCreator
+    pub fn parse_indented_text(title: &str, indented_input: &str) -> Result<MindMapCreator, &'static str> {
+        let lines: Vec<&str> = indented_input
+            .lines()
+            .map(|l| l.trim_end())
+            .filter(|l| !l.trim().is_empty())
+            .collect();
+
+        if lines.is_empty() {
+            return Err("Indented text input cannot be empty");
+        }
+
+        let root_topic = lines[0].trim().trim_start_matches("- ").trim_start_matches("* ");
+        let mut map = MindMapCreator::new(title, root_topic);
+
+        let mut stack: Vec<(usize, String)> = vec![(0, map.root_node_id.clone())];
+
+        for (idx, line) in lines.iter().enumerate().skip(1) {
+            let indent_level = Self::calc_indent_level(line);
+            let topic = line.trim().trim_start_matches("- ").trim_start_matches("* ");
+            let node_id = format!("node_{}", idx);
+
+            while stack.len() > 1 && stack.last().unwrap().0 >= indent_level {
+                stack.pop();
+            }
+
+            let parent_id = stack.last().unwrap().1.clone();
+            map.add_node(&node_id, &parent_id, topic)?;
+            stack.push((indent_level, node_id));
+        }
+
+        Ok(map)
+    }
+
+    fn calc_indent_level(line: &str) -> usize {
+        let mut count = 0;
+        for c in line.chars() {
+            if c == '\t' {
+                count += 4;
+            } else if c == ' ' {
+                count += 1;
+            } else {
+                break;
+            }
+        }
+        count
+    }
+}
+
 impl MindMapCreator {
     pub fn new(title: &str, root_topic: &str) -> Self {
         let root_id = "root_node".to_string();
@@ -347,5 +401,25 @@ mod tests {
         let tree_str = map.export_to_text_tree();
         assert!(tree_str.contains("=== MIND MAP: Alpha ==="));
         assert!(tree_str.contains("- Branch 1 (Priority: 1) [Progress: 50%]"));
+    }
+}
+
+
+#[cfg(test)]
+mod mindmap_parser_tests {
+    use super::*;
+
+    #[test]
+    fn test_indented_text_mindmap_parser() {
+        let input = "Sovereign OS Architecture\n\t- Kernel Core\n\t\t- Scheduler\n\t\t- Memory Manager\n\t- Desktop Zenith\n\t\t- Tiling WM";
+        let map = IndentedTextMindMapParserEngine::parse_indented_text("SigmaOS Mindmap", input).unwrap();
+
+        assert_eq!(map.map_title, "SigmaOS Mindmap");
+        assert_eq!(map.nodes.len(), 6);
+
+        let tree_out = map.export_to_text_tree();
+        assert!(tree_out.contains("Sovereign OS Architecture"));
+        assert!(tree_out.contains("Kernel Core"));
+        assert!(tree_out.contains("Scheduler"));
     }
 }

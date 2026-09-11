@@ -35,7 +35,7 @@ pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
     OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
-    WebAppSpec,
+    WebAppSpec, OmarchyIsoInstallerEngine, OmarchyAppLauncherEngine,
 };
 
 pub use omarchy_ultimate_gap_closure::{
