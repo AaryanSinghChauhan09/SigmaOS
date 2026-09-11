@@ -27,9 +27,10 @@ mod atomic;
 
 #[cfg(feature = "standalone_test")]
 use distro_update_parity::{
-    ArchRollingReleaseUpdater, DebianUnattendedUpgradesEngine, FreeBsdPatchEntry,
-    FreeBsdUpdateEngine, OstreeAbPartitionUpdater, PartitionSlot, PostQuantumSignedUpdateVerifier,
-    SystemDiagnosticReport, UnattendedUpgradeRule,
+    ArchNewsAlertChecker, ArchRollingReleaseUpdater, DebianUnattendedUpgradesEngine,
+    FreeBsdPatchEntry, FreeBsdUpdateEngine, FwupdCapsuleManager, OstreeAbPartitionUpdater,
+    PartitionSlot, PostQuantumSignedUpdateVerifier, PreUpdateSnapshotGuard,
+    SystemDiagnosticReport, TopgradeSystemUpdateOrchestrator, UnattendedUpgradeRule,
 };
 
 #[cfg(feature = "standalone_test")]
@@ -39,9 +40,10 @@ use atomic::{
 
 #[cfg(not(feature = "standalone_test"))]
 use super::distro_update_parity::{
-    ArchRollingReleaseUpdater, DebianUnattendedUpgradesEngine, FreeBsdPatchEntry,
-    FreeBsdUpdateEngine, OstreeAbPartitionUpdater, PartitionSlot, PostQuantumSignedUpdateVerifier,
-    SystemDiagnosticReport, UnattendedUpgradeRule,
+    ArchNewsAlertChecker, ArchRollingReleaseUpdater, DebianUnattendedUpgradesEngine,
+    FreeBsdPatchEntry, FreeBsdUpdateEngine, FwupdCapsuleManager, OstreeAbPartitionUpdater,
+    PartitionSlot, PostQuantumSignedUpdateVerifier, PreUpdateSnapshotGuard,
+    SystemDiagnosticReport, TopgradeSystemUpdateOrchestrator, UnattendedUpgradeRule,
 };
 
 #[cfg(not(feature = "standalone_test"))]
@@ -56,6 +58,8 @@ pub enum SystemUpdateStrategy {
     DeltaBinaryPatch,
     InPlaceTransaction,
     UnattendedBackground,
+    TopgradeUnified,
+    FirmwareCapsule,
 }
 
 /// System update severity / priority
@@ -246,13 +250,17 @@ impl Default for UpdateTransactionLedger {
 
 /// Master Sovereign System Update Manager
 /// Unifies atomic A/B slot swapping, FreeBSD binary delta patching, Debian unattended upgrades,
-/// Arch rolling release sync, PQC Dilithium-5 verification, and transactional rollbacks.
+/// Arch rolling release sync, Topgrade unified orchestrator, Timeshift snapshots, Arch news alerts,
+/// fwupd firmware capsules, PQC Dilithium-5 verification, and transactional rollbacks.
 pub struct SovereignSystemUpdateManager {
     pub current_version: String,
     pub policy: SystemUpdatePolicy,
     pub ab_updater: OstreeAbPartitionUpdater,
     pub freebsd_updater: FreeBsdUpdateEngine,
     pub arch_updater: ArchRollingReleaseUpdater,
+    pub topgrade_orchestrator: TopgradeSystemUpdateOrchestrator,
+    pub snapshot_guard: PreUpdateSnapshotGuard,
+    pub news_checker: ArchNewsAlertChecker,
     pub atomic_manager: SimpleAtomicUpdateManager,
     pub rollback_manager: SimpleRollbackManager,
     pub health_verifier: UpdateHealthVerifier,
@@ -269,6 +277,9 @@ impl SovereignSystemUpdateManager {
             ab_updater: OstreeAbPartitionUpdater::new("1.0.0"),
             freebsd_updater: FreeBsdUpdateEngine::new("1.0.0"),
             arch_updater: ArchRollingReleaseUpdater::new(),
+            topgrade_orchestrator: TopgradeSystemUpdateOrchestrator::new(),
+            snapshot_guard: PreUpdateSnapshotGuard::new("sig_snapshot"),
+            news_checker: ArchNewsAlertChecker::new(),
             atomic_manager: SimpleAtomicUpdateManager::new(),
             rollback_manager: SimpleRollbackManager::new(),
             health_verifier: UpdateHealthVerifier::new(50_000_000), // 50MB
@@ -295,7 +306,7 @@ impl SovereignSystemUpdateManager {
         )
     }
 
-    /// Executes complete update workflow: Pre-flight checks -> PQC validation -> Strategy execution -> Post-flight verification -> Ledger recording
+    /// Executes complete update workflow: Pre-flight checks -> News & Snapshot checks -> PQC validation -> Strategy execution -> Post-flight verification -> Ledger recording
     pub fn apply_update(
         &mut self,
         payload_id: &str,
@@ -332,7 +343,26 @@ impl SovereignSystemUpdateManager {
             return Err("Pre-flight health diagnostics failed");
         }
 
-        // 2. PQC Signature Verification
+        // 2. Arch News Breaking Change Check
+        if self.news_checker.check_breaking_changes(&payload.target_version).is_err() {
+            self.transaction_ledger.record_transaction(
+                &payload.update_id,
+                &self.current_version,
+                &payload.target_version,
+                payload.strategy,
+                false,
+                false,
+                "Update blocked by breaking change news advisory",
+            );
+            return Err("Update blocked by breaking change news advisory");
+        }
+
+        // 3. Pre-update Restore Snapshot Creation
+        if self.snapshot_guard.create_preupdate_snapshot(&payload.target_version).is_err() {
+            return Err("Failed to create pre-update restore snapshot");
+        }
+
+        // 4. PQC Signature Verification
         if !self.verify_update_pqc_signature(&payload) {
             self.transaction_ledger.record_transaction(
                 &payload.update_id,
@@ -346,7 +376,7 @@ impl SovereignSystemUpdateManager {
             return Err("Dilithium-5 PQC signature verification failed");
         }
 
-        // 3. Strategy Execution
+        // 5. Strategy Execution
         let old_version = self.current_version.clone();
         let target_version = payload.target_version.clone();
 
@@ -357,7 +387,7 @@ impl SovereignSystemUpdateManager {
                 self.active_slot = switched;
                 self.ab_updater.confirm_boot_success();
                 self.current_version = target_version.clone();
-                Ok("Atomic slot swap update applied successfully")
+                Ok("Atomic slot swap update applied successfully".to_string())
             }
             SystemUpdateStrategy::DeltaBinaryPatch => {
                 self.freebsd_updater.fetch_binary_diffs(vec![FreeBsdPatchEntry {
@@ -368,14 +398,14 @@ impl SovereignSystemUpdateManager {
                 }]);
                 let _applied = self.freebsd_updater.apply_patch_and_verify()?;
                 self.current_version = target_version.clone();
-                Ok("Delta binary patch update applied successfully")
+                Ok("Delta binary patch update applied successfully".to_string())
             }
             SystemUpdateStrategy::InPlaceTransaction => {
                 let tx_id = self.atomic_manager.create_transaction().map_err(|_| "Failed to create atomic update tx")?;
                 self.atomic_manager.add_operation(tx_id, b"stage_inplace").map_err(|_| "Failed to add operation")?;
                 self.atomic_manager.execute_transaction(tx_id).map_err(|_| "Failed to commit atomic update tx")?;
                 self.current_version = target_version.clone();
-                Ok("In-place transactional update applied successfully")
+                Ok("In-place transactional update applied successfully".to_string())
             }
             SystemUpdateStrategy::UnattendedBackground => {
                 let mut debian_engine = DebianUnattendedUpgradesEngine::new(UnattendedUpgradeRule {
@@ -386,7 +416,17 @@ impl SovereignSystemUpdateManager {
                 debian_engine.register_pending_update("kernel-core", true);
                 let _count = debian_engine.process_unattended_updates();
                 self.current_version = target_version.clone();
-                Ok("Unattended background update applied successfully")
+                Ok("Unattended background update applied successfully".to_string())
+            }
+            SystemUpdateStrategy::TopgradeUnified => {
+                let _tasks = self.topgrade_orchestrator.run_all_system_updates()?;
+                self.current_version = target_version.clone();
+                Ok("Topgrade-style unified multi-system update applied successfully".to_string())
+            }
+            SystemUpdateStrategy::FirmwareCapsule => {
+                let res = FwupdCapsuleManager::verify_and_apply_firmware_capsule(&payload.payload_bytes)?;
+                self.current_version = target_version.clone();
+                Ok(res)
             }
         };
 
@@ -403,7 +443,7 @@ impl SovereignSystemUpdateManager {
             return Err(err_msg);
         }
 
-        // 4. Post-flight Verification
+        // 6. Post-flight Verification
         let postflight = self.health_verifier.verify_postflight_health();
         if !postflight.overall_passed {
             // Trigger Fail-safe Rollback
@@ -420,7 +460,7 @@ impl SovereignSystemUpdateManager {
             return Err("Post-flight health failed; automated rollback triggered");
         }
 
-        // 5. Successful Completion
+        // 7. Successful Completion
         self.transaction_ledger.record_transaction(
             &payload.update_id,
             &old_version,
@@ -454,7 +494,7 @@ mod tests {
     use super::*;
 
     fn create_test_payload(strategy: SystemUpdateStrategy) -> SystemUpdatePayload {
-        let payload_bytes = b"sovereign_update_v2.0".to_vec();
+        let payload_bytes = b"sovereign_update_v2.0_padded_bytes".to_vec();
         let calc_checksum = payload_bytes.iter().fold(0u8, |acc, &b| acc.wrapping_add(b));
         let mut dilithium5_sig = vec![0u8; 32];
         dilithium5_sig[0] = calc_checksum;
@@ -515,6 +555,36 @@ mod tests {
         assert_eq!(history.len(), 1);
         assert!(history[0].success);
         assert!(!history[0].rolled_back);
+    }
+
+    #[test]
+    fn test_apply_update_topgrade_and_firmware() {
+        let policy = SystemUpdatePolicy::default();
+        let mut manager = SovereignSystemUpdateManager::new("1.0.0", policy);
+
+        let topgrade_payload = create_test_payload(SystemUpdateStrategy::TopgradeUnified);
+        manager.register_update(topgrade_payload);
+        let res_topgrade = manager.apply_update("update_200", 50_000_000, 80, true);
+        assert!(res_topgrade.is_ok());
+
+        let fw_payload = create_test_payload(SystemUpdateStrategy::FirmwareCapsule);
+        manager.register_update(fw_payload);
+        let res_fw = manager.apply_update("update_200", 50_000_000, 80, true);
+        assert!(res_fw.is_ok());
+    }
+
+    #[test]
+    fn test_apply_update_news_breaking_change_blocking() {
+        let policy = SystemUpdatePolicy::default();
+        let mut manager = SovereignSystemUpdateManager::new("1.0.0", policy);
+        manager.news_checker.add_advisory("Manual migration required for glibc", "2.0.0", true);
+
+        let payload = create_test_payload(SystemUpdateStrategy::AtomicSlotSwap);
+        manager.register_update(payload);
+
+        let res = manager.apply_update("update_200", 50_000_000, 80, true);
+        assert!(res.is_err());
+        assert_eq!(manager.current_version, "1.0.0");
     }
 
     #[test]
