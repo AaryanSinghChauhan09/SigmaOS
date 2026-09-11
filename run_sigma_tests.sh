@@ -60,6 +60,27 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     ./build/arch_missing_test
 fi
 
+if [ -f "src/distro/arch_boxes.rs" ]; then
+    echo "Running Arch Linux Boxes & cloud-init test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_boxes.rs --edition=2021 -o build/arch_boxes_test
+    ./build/arch_boxes_test
+fi
+
+if [ -f "src/distro/arch_gap_closure.rs" ]; then
+    echo "Running Arch Linux gap closure test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_gap_closure.rs --edition=2021 -o build/arch_gap_closure_test
+    ./build/arch_gap_closure_test
+fi
+
+if [ -f "src/distro/arch_ultimate_gap_closure.rs" ]; then
+    echo "Running Arch Linux ultimate gap closure test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_ultimate_gap_closure.rs --edition=2021 -o build/arch_ultimate_gap_closure_test
+    ./build/arch_ultimate_gap_closure_test
+fi
+
 if [ -f "src/package/universal.rs" ]; then
     echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
@@ -72,4 +93,25 @@ if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
     mkdir -p build
     rustc --test --edition=2021 src/sigpkg/arch_pacman_engine.rs -o build/test_arch_engine
     ./build/test_arch_engine
+fi
+
+if [ -f "src/driver/driver_test_framework.rs" ]; then
+    echo "Running Essential Hardware Drivers test suite..."
+    mkdir -p build
+    rustc --test src/driver/driver_test_framework.rs --edition=2021 -o build/driver_test_framework
+    ./build/driver_test_framework
+fi
+
+if [ -f "src/distro/omarchy.rs" ]; then
+    echo "Running Omarchy Linux desktop & theme test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/omarchy_test
+    ./build/omarchy_test
+fi
+
+if [ -f "src/distro/omarchy_ultimate_gap_closure.rs" ]; then
+    echo "Running Omarchy Linux ultimate gap closure test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_ultimate_gap_closure.rs --edition=2021 -o build/omarchy_ultimate_test
+    ./build/omarchy_ultimate_test
 fi
