@@ -12,15 +12,18 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::string::String;
 use core::sync::atomic::{AtomicU64, Ordering};
+
+use crate::klib::*;
+pub mod types {}
+use crate::security::sandbox::{LandlockV5Guard, CapsicumRights};
+use crate::kernel::process::{ProcessId, ProcessState};
 
 /// Unique identifier for AI agents in the kernel
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct AgentId(pub u64);
+pub struct AgentId(u64);
 
 impl AgentId {
     pub fn new() -> Self {
@@ -29,38 +32,8 @@ impl AgentId {
     }
 }
 
-impl Default for AgentId {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Process identifier placeholder for stand-alone runtime execution
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct ProcessId(pub u64);
-
-/// Landlock v5 guard stub
-#[derive(Debug, Clone, Default)]
-pub struct LandlockV5Guard;
-
-impl LandlockV5Guard {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
-/// Capsicum rights stub
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub struct CapsicumRights;
-
-impl CapsicumRights {
-    pub fn empty() -> Self {
-        Self
-    }
-}
-
 /// Agent capability domains (sandboxed execution contexts)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentCapability {
     /// Analyze kernel crashes, panics, and core dumps
     SystemAnalysis,
@@ -224,7 +197,7 @@ pub struct AgentReport {
 }
 
 /// Plugin specification for code generation
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct PluginSpec {
     pub name: String,
     pub description: String,
@@ -572,7 +545,7 @@ proc new{}*(): {} =
     fn analyze_intent(
         &self,
         _agent_id: AgentId,
-        _intent: &UserIntent,
+        intent: &UserIntent,
     ) -> Result<ConfigDiff, AgentError> {
         // TODO: Integrate LLM intent analysis
         
