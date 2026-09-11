@@ -858,8 +858,353 @@ impl SigmaDistroEngine {
 
 // Bring alloc into scope for format! and vec!
 
-#[cfg(test_disabled)]
+
+
+/// Gentoo emerge CLI & Portage World File Manager Engine
+#[derive(Debug, Clone, Default)]
+pub struct GentooEmergeCliEngine {
+    pub world_packages: Vec<String>,
+    pub pending_etc_updates: Vec<String>,
+}
+
+impl GentooEmergeCliEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            world_packages: Vec::new(),
+            pending_etc_updates: Vec::new(),
+        };
+        engine.world_packages.push("sys-apps/portage".to_string());
+        engine.world_packages.push("app-shells/bash".to_string());
+        engine
+    }
+
+    pub fn add_to_world(&mut self, atom: &str) {
+        if !self.world_packages.contains(&atom.to_string()) {
+            self.world_packages.push(atom.to_string());
+        }
+    }
+
+    pub fn emerge_world_rebuild(&self) -> String {
+        format!("emerge --ask --update --deep --changed-use @world ({} atoms)", self.world_packages.len())
+    }
+
+    pub fn run_etc_update(&mut self) -> usize {
+        let count = self.pending_etc_updates.len();
+        self.pending_etc_updates.clear();
+        count
+    }
+}
+
+
+
+/// Gentoo Layman Overlay Repository Manager
+#[derive(Debug, Clone)]
+pub struct LaymanOverlay {
+    pub name: String,
+    pub git_url: String,
+    pub priority: i32,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct GentooLaymanOverlayEngine {
+    pub registered_overlays: Vec<LaymanOverlay>,
+}
+
+impl GentooLaymanOverlayEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { registered_overlays: Vec::new() };
+        engine.add_overlay("guru", "https://github.com/gentoo/guru.git", 50);
+        engine
+    }
+
+    pub fn add_overlay(&mut self, name: &str, url: &str, priority: i32) {
+        self.registered_overlays.push(LaymanOverlay {
+            name: name.to_string(),
+            git_url: url.to_string(),
+            priority,
+        });
+    }
+
+    pub fn sync_all_overlays(&self) -> usize {
+        self.registered_overlays.len()
+    }
+}
+
+
+
+/// Gentoo CFLAGS Optimization & make.conf Tuner
+#[derive(Debug, Clone)]
+pub struct GentooGccCflagsTunerEngine {
+    pub march: String,
+    pub opt_level: String,
+    pub lto_enabled: bool,
+    pub extra_flags: Vec<String>,
+}
+
+impl GentooGccCflagsTunerEngine {
+    pub fn new() -> Self {
+        Self {
+            march: "native".to_string(),
+            opt_level: "-O3".to_string(),
+            lto_enabled: true,
+            extra_flags: vec!["-pipe".to_string(), "-fomit-frame-pointer".to_string()],
+        }
+    }
+
+    pub fn generate_cflags(&self) -> String {
+        let mut flags = format!("-march={} {}", self.march, self.opt_level);
+        if self.lto_enabled {
+            flags.push_str(" -flto");
+        }
+        for extra in &self.extra_flags {
+            flags.push(' ');
+            flags.push_str(extra);
+        }
+        flags
+    }
+}
+
+impl Default for GentooGccCflagsTunerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// VOID LINUX — XBPS Binary Package Indexer & Delta Solver
+// ============================================================================
+
+/// XBPS package entry for Void Linux parity.
+#[derive(Debug, Clone)]
+pub struct VoidXbpsPackage {
+    pub name: String,
+    pub version: String,
+    pub architecture: String,
+    pub dependencies: Vec<String>,
+    pub installed: bool,
+}
+
+/// Void Linux XBPS binary repository indexer and package manager simulator.
+#[derive(Debug, Clone, Default)]
+pub struct VoidXbpsBinaryPackageEngine {
+    pub registered_packages: Vec<VoidXbpsPackage>,
+    pub repository_url: String,
+}
+
+impl VoidXbpsBinaryPackageEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            registered_packages: Vec::new(),
+            repository_url: "https://alpha.de.repo.voidlinux.org/current".to_string(),
+        };
+        engine.register_package("xbps", "0.59.1", "x86_64", vec![]);
+        engine.register_package("glibc", "2.38", "x86_64", vec![]);
+        engine
+    }
+
+    pub fn register_package(&mut self, name: &str, ver: &str, arch: &str, deps: Vec<&str>) {
+        self.registered_packages.push(VoidXbpsPackage {
+            name: name.to_string(),
+            version: ver.to_string(),
+            architecture: arch.to_string(),
+            dependencies: deps.into_iter().map(|s| s.to_string()).collect(),
+            installed: false,
+        });
+    }
+
+    pub fn install_package(&mut self, name: &str) -> bool {
+        if let Some(pkg) = self.registered_packages.iter_mut().find(|p| p.name == name) {
+            pkg.installed = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn installed_count(&self) -> usize {
+        self.registered_packages.iter().filter(|p| p.installed).count()
+    }
+}
+
+// ============================================================================
+// ALPINE LINUX — Diskless RAM Overlay & apk-world Keeper
+// ============================================================================
+
+/// Alpine Linux diskless RAM-boot volatile tmpfs overlay.
+#[derive(Debug, Clone, Default)]
+pub struct AlpineApkVolatileOverlayEngine {
+    pub world_packages: Vec<String>,
+    pub overlay_size_mb: usize,
+    pub is_diskless: bool,
+}
+
+impl AlpineApkVolatileOverlayEngine {
+    pub fn new() -> Self {
+        Self {
+            world_packages: vec!["alpine-base".to_string(), "busybox".to_string()],
+            overlay_size_mb: 256,
+            is_diskless: true,
+        }
+    }
+
+    pub fn add_to_world(&mut self, pkg: &str) {
+        if !self.world_packages.contains(&pkg.to_string()) {
+            self.world_packages.push(pkg.to_string());
+        }
+    }
+
+    pub fn commit_lbu(&self) -> String {
+        format!("lbu commit: backed up {} world packages to volatile media", self.world_packages.len())
+    }
+}
+
+// ============================================================================
+// FREEBSD — Poudriere Cleanroom Jail Port Builder
+// ============================================================================
+
+/// FreeBSD Poudriere cleanroom jail port build job.
+#[derive(Debug, Clone)]
+pub struct PoudrierePortJob {
+    pub port_origin: String,
+    pub jail_name: String,
+    pub is_successful: bool,
+}
+
+/// FreeBSD Poudriere cleanroom port builder engine.
+#[derive(Debug, Clone, Default)]
+pub struct FreeBsdPoudrierePortBuilder {
+    pub build_jobs: Vec<PoudrierePortJob>,
+    pub target_arch: String,
+}
+
+impl FreeBsdPoudrierePortBuilder {
+    pub fn new() -> Self {
+        Self {
+            build_jobs: Vec::new(),
+            target_arch: "amd64".to_string(),
+        }
+    }
+
+    pub fn submit_job(&mut self, origin: &str, jail: &str) {
+        self.build_jobs.push(PoudrierePortJob {
+            port_origin: origin.to_string(),
+            jail_name: jail.to_string(),
+            is_successful: false,
+        });
+    }
+
+    pub fn execute_bulk_build(&mut self) -> usize {
+        let mut count = 0;
+        for job in &mut self.build_jobs {
+            job.is_successful = true;
+            count += 1;
+        }
+        count
+    }
+}
+
+// ============================================================================
+// OPENBSD — Pledge & Unveil Security Governor
+// ============================================================================
+
+/// OpenBSD Pledge promises bitmask/governor.
+#[derive(Debug, Clone, Default)]
+pub struct OpenBsdPledgeUnveilSecurityGovernor {
+    pub promises: Vec<String>,
+    pub unveiled_paths: Vec<(String, String)>, // (path, permissions "r", "rw", "rwx")
+}
+
+impl OpenBsdPledgeUnveilSecurityGovernor {
+    pub fn new() -> Self {
+        Self {
+            promises: vec!["stdio".to_string(), "rpath".to_string()],
+            unveiled_paths: Vec::new(),
+        }
+    }
+
+    pub fn pledge(&mut self, promises: &str) {
+        for prom in promises.split_whitespace() {
+            if !self.promises.contains(&prom.to_string()) {
+                self.promises.push(prom.to_string());
+            }
+        }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
+    }
+
+    pub fn is_path_accessible(&self, path: &str) -> bool {
+        self.unveiled_paths.iter().any(|(p, _)| path.starts_with(p))
+    }
+}
+
+
 mod tests {
+
+    #[test]
+    fn test_void_xbps_binary_package_engine() {
+        let mut engine = VoidXbpsBinaryPackageEngine::new();
+        assert_eq!(engine.registered_packages.len(), 2);
+        assert!(engine.install_package("xbps"));
+        assert_eq!(engine.installed_count(), 1);
+    }
+
+    #[test]
+    fn test_alpine_apk_volatile_overlay_engine() {
+        let mut alpine = AlpineApkVolatileOverlayEngine::new();
+        alpine.add_to_world("neovim");
+        assert_eq!(alpine.world_packages.len(), 3);
+        assert!(alpine.commit_lbu().contains("3 world packages"));
+    }
+
+    #[test]
+    fn test_freebsd_poudriere_port_builder() {
+        let mut poudriere = FreeBsdPoudrierePortBuilder::new();
+        poudriere.submit_job("sysutils/tmux", "140amd64-default");
+        assert_eq!(poudriere.build_jobs.len(), 1);
+        assert_eq!(poudriere.execute_bulk_build(), 1);
+        assert!(poudriere.build_jobs[0].is_successful);
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil_security_governor() {
+        let mut governor = OpenBsdPledgeUnveilSecurityGovernor::new();
+        governor.pledge("wpath cpath");
+        assert!(governor.promises.contains(&"wpath".to_string()));
+
+        governor.unveil("/var/log", "rw");
+        assert!(governor.is_path_accessible("/var/log/syslog"));
+        assert!(!governor.is_path_accessible("/etc/shadow"));
+    }
+
+    #[test]
+    fn test_gentoo_gcc_cflags_tuner_engine() {
+        let tuner = GentooGccCflagsTunerEngine::new();
+        let flags = tuner.generate_cflags();
+        assert!(flags.contains("-march=native"));
+        assert!(flags.contains("-flto"));
+    }
+
+
+    #[test]
+    fn test_gentoo_layman_overlay_engine() {
+        let mut layman = GentooLaymanOverlayEngine::new();
+        assert_eq!(layman.registered_overlays.len(), 1);
+        layman.add_overlay("science", "https://github.com/gentoo/science.git", 10);
+        assert_eq!(layman.sync_all_overlays(), 2);
+    }
+
+
+    #[test]
+    fn test_gentoo_emerge_cli_engine() {
+        let mut emerge = GentooEmergeCliEngine::new();
+        assert_eq!(emerge.world_packages.len(), 2);
+        emerge.add_to_world("net-misc/curl");
+        assert_eq!(emerge.world_packages.len(), 3);
+        assert!(emerge.emerge_world_rebuild().contains("3 atoms"));
+    }
+
     use super::*;
 
     #[test]
