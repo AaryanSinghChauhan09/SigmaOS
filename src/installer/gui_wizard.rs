@@ -3,8 +3,12 @@
 
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
-use std::vec;
+
+extern crate alloc;
+use alloc::format;
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::vec;
 
 /// Installer Screen / Calamares Module Sequence
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,16 +22,7 @@ pub enum InstallerScreen {
     SystemConfiguration,
     Summary,
     InstallationProgress,
-    Complete,
-}
-
-/// Partitioning Operation Mode
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PartitioningOperation {
-    Automatic,
-    Alongside,
-    Manual,
-    EraseDisk,
+    CompleteOnboarding,
 }
 
 /// Partitioning Operation Strategy
@@ -183,24 +178,10 @@ impl UserAccount {
     }
 }
 
-/// Network Configuration
-#[derive(Debug, Clone)]
-pub struct NetworkConfig {
-    pub use_dhcp: bool,
-    pub static_ip: Option<String>,
-    pub gateway: Option<String>,
-    pub dns_servers: Vec<String>,
-}
-
 /// System Configuration
 #[derive(Debug, Clone)]
 pub struct SystemConfiguration {
     pub hostname: String,
-    pub timezone: String,
-    pub locale: String,
-    pub keyboard_layout: String,
-    pub network_config: NetworkConfig,
-    pub services: Vec<String>,
     pub is_admin: bool,
     pub auto_login: bool,
 }
@@ -211,7 +192,6 @@ pub struct PrivacySettings {
     pub send_crash_reports: bool,
     pub location_services: bool,
 }
-
 
 impl SystemConfiguration {
     pub fn new() -> Self {
@@ -231,8 +211,6 @@ impl SystemConfiguration {
                 String::from("sshd"),
                 String::from("cron"),
             ],
-            is_admin: true,
-            auto_login: false,
         }
     }
 }
@@ -406,17 +384,17 @@ impl GuiInstallerWizard {
 
     /// Add custom partition
     pub fn add_custom_partition(&mut self, partition: PartitionEntry) {
+        self.custom_partitions.push(partition);
         self.log(&format!(
             "Added custom partition: {} -> {}",
             partition.device, partition.mount_point
         ));
-        self.custom_partitions.push(partition);
     }
 
     /// Add user account
     pub fn add_user_account(&mut self, user: UserAccount) {
-        self.log(&format!("Added user account: {}", user.username));
         self.user_accounts.push(user);
+        self.log(&format!("Added user account: {}", user.username));
     }
 
     /// Update system configuration

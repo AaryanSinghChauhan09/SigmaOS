@@ -6,7 +6,7 @@
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 // ==========================================
 // 1. BORE (Burst-Oriented Response Enhancer)
@@ -594,7 +594,128 @@ impl Default for CachyosSysctlTuningEngine {
 }
 
 
+
+// ==========================================
+// 10. CachyOS Hardware Detection & Driver Manager (chwd parity)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GpuVendor {
+    Nvidia,
+    Amd,
+    Intel,
+    Generic,
+}
+
+#[derive(Debug, Clone)]
+pub struct CachyOsChwdGpuHardwareEngine {
+    pub detected_vendor: GpuVendor,
+    pub microarch_v_level: u8, // 1 to 4
+    pub installed_driver: String,
+    pub mesa_v3_optimized: bool,
+}
+
+impl CachyOsChwdGpuHardwareEngine {
+    pub fn new(vendor: GpuVendor, microarch_level: u8) -> Self {
+        Self {
+            detected_vendor: vendor,
+            microarch_v_level: microarch_level.clamp(1, 4),
+            installed_driver: String::from("chwd-unknown"),
+            mesa_v3_optimized: microarch_level >= 3,
+        }
+    }
+
+    pub fn auto_configure_gpu_driver(&mut self) -> String {
+        match self.detected_vendor {
+            GpuVendor::Nvidia => {
+                if self.microarch_v_level >= 3 {
+                    self.installed_driver = String::from("chwd-nvidia-v3-dkms");
+                } else {
+                    self.installed_driver = String::from("chwd-nvidia-dkms");
+                }
+            }
+            GpuVendor::Amd => {
+                if self.microarch_v_level >= 3 {
+                    self.installed_driver = String::from("chwd-mesa-v3-amdgpu");
+                } else {
+                    self.installed_driver = String::from("chwd-mesa-amdgpu");
+                }
+            }
+            GpuVendor::Intel => {
+                if self.microarch_v_level >= 3 {
+                    self.installed_driver = String::from("chwd-mesa-v3-intel");
+                } else {
+                    self.installed_driver = String::from("chwd-mesa-intel");
+                }
+            }
+            GpuVendor::Generic => {
+                self.installed_driver = String::from("chwd-generic-modesetting");
+            }
+        }
+        self.installed_driver.clone()
+    }
+}
+
+// ==========================================
+// 11. CachyOS eBPF sched_ext Scheduler Framework
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedExtPolicy {
+    ScxBpfland,
+    ScxRusty,
+    ScxLavd,
+    ScxCentral,
+}
+
+pub struct CachyOsSchedExtFramework {
+    pub active_policy: SchedExtPolicy,
+    pub bpf_scheduler_loaded: bool,
+}
+
+impl CachyOsSchedExtFramework {
+    pub fn new(policy: SchedExtPolicy) -> Self {
+        Self {
+            active_policy: policy,
+            bpf_scheduler_loaded: true,
+        }
+    }
+
+    pub fn switch_policy(&mut self, new_policy: SchedExtPolicy) -> String {
+        self.active_policy = new_policy;
+        format!("sched_ext: Switched active BPF scheduler to {:?}", new_policy)
+    }
+
+    pub fn is_bpf_scheduler_active(&self) -> bool {
+        self.bpf_scheduler_loaded
+    }
+}
+
 mod tests {
+    #[test]
+    fn test_cachyos_chwd_gpu_engine() {
+        let mut nvidia_v3 = CachyOsChwdGpuHardwareEngine::new(GpuVendor::Nvidia, 3);
+        assert_eq!(nvidia_v3.auto_configure_gpu_driver(), "chwd-nvidia-v3-dkms");
+        assert!(nvidia_v3.mesa_v3_optimized);
+
+        let mut amd_v1 = CachyOsChwdGpuHardwareEngine::new(GpuVendor::Amd, 1);
+        assert_eq!(amd_v1.auto_configure_gpu_driver(), "chwd-mesa-amdgpu");
+        assert!(!amd_v1.mesa_v3_optimized);
+
+        let mut intel_v4 = CachyOsChwdGpuHardwareEngine::new(GpuVendor::Intel, 4);
+        assert_eq!(intel_v4.auto_configure_gpu_driver(), "chwd-mesa-v3-intel");
+    }
+
+    #[test]
+    fn test_cachyos_sched_ext_framework() {
+        let mut sched_ext = CachyOsSchedExtFramework::new(SchedExtPolicy::ScxBpfland);
+        assert!(sched_ext.is_bpf_scheduler_active());
+        assert_eq!(sched_ext.active_policy, SchedExtPolicy::ScxBpfland);
+
+        let msg = sched_ext.switch_policy(SchedExtPolicy::ScxLavd);
+        assert!(msg.contains("ScxLavd"));
+        assert_eq!(sched_ext.active_policy, SchedExtPolicy::ScxLavd);
+    }
 
     #[test]
     fn test_cachyos_sysctl_tuning() {

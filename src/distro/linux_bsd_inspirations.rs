@@ -122,7 +122,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxKali
-            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
@@ -140,7 +139,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
@@ -221,7 +220,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxKali
-            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
@@ -229,7 +227,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC || supervisor == ServiceSupervisorType::Smf,
+            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
                 supervisor == ServiceSupervisorType::Runit
@@ -240,7 +238,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
         };
@@ -657,6 +655,54 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "desktop" => {
+                Ok(format!(
+                    "Dispatched desktop compositor adaptation engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched chroot compiler build sandbox for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched internationalization / input method mapping for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "bluetooth" => {
+                Ok(format!(
+                    "Dispatched bluetooth LE stream manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched stateful packet filter rule manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "diagnostics" => {
+                Ok(format!(
+                    "Dispatched automated crash diagnostics & eBPF probe audit for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "recovery" => {
+                Ok(format!(
+                    "Dispatched atomic system recovery snapshot rollback for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "time" => {
+                Ok(format!(
+                    "Dispatched high-precision time synchronization daemon for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             _ => Err("Unknown target subsystem"),
         }
     }
@@ -667,6 +713,7 @@ impl SovereignUniversalDistroBridge {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
         ];
 
         for sub in subsystems {
@@ -2036,6 +2083,10 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
         ];
 
         for m in modes {
@@ -2068,6 +2119,10 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
         ];
 
         let target_subsystems = [
@@ -2075,6 +2130,7 @@ mod cross_subsystem_tests {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
         ];
 
         for m in modes {
@@ -6669,9 +6725,6 @@ mod tests {
     }
 }
 
-// ==========================================
-// 28. GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
-// ==========================================
 
 // ==========================================
 // 40. CROSS-DISTRO IPC, AUTH, SYSCALL & CONTAINER BRIDGES
