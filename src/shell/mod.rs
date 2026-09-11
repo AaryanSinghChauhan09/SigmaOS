@@ -6,6 +6,7 @@ pub mod sigma_sh;
 pub mod sovereign_shell_parity;
 pub mod terminal_emulator;
 pub mod zsh_bash_parity;
+pub mod tech_media_shell_innovations;
 
 pub use sigma_sh::{
     AutoSuggestTabPopup, ContextualCompleter, HistoryExpansionEngine, JobControlManager,
@@ -30,4 +31,10 @@ pub use terminal_emulator::{
     TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor,
     BsdConsoleColorPalette, BsdConsoleTheme,
     TermiosInputEvent, TermiosInputMode, TermiosLineDiscipline,
+};
+pub use tech_media_shell_innovations::{
+    AdbDeviceDescriptor, BenchmarkResultNode, HwbustersPsuSensorMonitorEngine,
+    KdnuggetsAiDataShellEngine, KubectlPodNode, PhoronixAutomatedBenchmarkShellHook,
+    SovereignTechMediaShellInnovationsSuite, TensorDataColumn, TheNewStackCloudKubectlEngine,
+    XdaAndroidAdbFastbootShellBridge,
 };
