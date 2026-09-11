@@ -14,6 +14,7 @@ pub mod bus;
 pub mod classic_os;
 pub mod component;
 pub mod console;
+pub mod missing_linux_kernel_components;
 pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;
@@ -32,6 +33,10 @@ pub mod kqueue;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
+pub use linux_parity::{
+    CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
+    LinuxKernelWorkqueueEngine, LinuxRcuSynchronizationEngine, RcuCallback, WorkItem,
+};
 pub mod memory;
 pub mod meta;
 pub mod module_loader;
@@ -44,6 +49,7 @@ pub mod object;
 pub mod os_innovations;
 pub mod paging;
 pub mod performance;
+pub mod pipes;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
@@ -55,6 +61,7 @@ pub mod traits;
 pub use architecture::*;
 pub use bus::*;
 pub use linux_bsd_innovations::*;
+pub use pipes::*;
 pub use policy_mechanism::*;
 #[allow(ambiguous_glob_reexports)]
 pub use structures::*;
@@ -69,33 +76,6 @@ pub use gap_closing::{
 pub use generation_manager::{Generation, GenerationManager};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use linux_bsd_innovations::*;
-pub use linux_bsd_innovations::{
-    AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
-    BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
-    BsdPfStateTable, CapabilityDerivationTree, CarpSecurityRouter, CgroupResourceLimits, CowBlock,
-    CowStorageEngine, CpuIsaMicroarch, DevlinkHealthReporter, DynamicLkmLoader, EbpfInstruction,
-    EbpfRuntime, ExokernelHardwareMultiplexer, FastPacketFrame, FreeBsdCapsicumEngine,
-    FreeBsdGeomTopology, FreeBsdJail, FreeBsdVfsNullfs, FreeBsdVnetManager, FutexOp, FutexWaiter,
-    GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
-    Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
-    HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
-    KernelAccessController, KernelCapability, KernelFastPacketEngine, KernelModule, KmdfDriver,
-    KmdfIoRequest, KmdfPnpState, KmdfPowerState, LandlockAccessRight, LandlockPathRule,
-    LinuxDevlinkHealthMonitor, LinuxFutexEngine, LinuxLandlockLsmRuleEngine,
-    MemoryCompactionSuperpagesAllocator, MicrokernelCore, MicrokernelTranslatorRegistry,
-    MultikernelMessage, MultikernelMessagePassing, NamespaceType, NanokernelHardwareBroker,
-    NanokernelIrq, NetBsdRumpKernel, NinePProtocolTranslator, NinePResource,
-    NixOsDeclarativeManager, NtExecutiveService, NullfsLayerNode, OpenBsdPledge,
-    OpenBsdUnveilEngine, OpenSuseSnapperEngine, PfFiveTuple, PfStateEntry, PhysicalFrameBlock,
-    ReactorEvent, ReactorRegistration, ResourceBinding, RumpComponent, SnapperSnapshot,
-    SoftIrqType, SovereignCgroupGovernor, SovereignEventReactor, SovereignNamespaceContainer,
-    SovereignSwapEngine, SovereignZone, SovereignZonesManager, SwapDeviceConfig, SwapPage,
-    UnveilPathRule, VnetNetworkStack, VoidLinuxRunitSupervisor, VoidRunitInit, VoidRunitService,
-    VoidRunitStage, XdpAction, ZramCompressedPage, CAP_MMAP_FLAG, CAP_READ_FLAG, CAP_SEEK_FLAG,
-    CAP_WRITE_FLAG, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_EXEC, PLEDGE_INET, PLEDGE_RPATH,
-    PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
-};
 pub use linux_parity::*;
 pub use memory::{
     BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
@@ -112,9 +92,12 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-#[allow(ambiguous_glob_reexports)]
-pub use structures::*;
-pub mod virtual_cpu;
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
-pub mod vmm_paging;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
+
+pub mod sigma_kthread;
+pub mod sigma_timer;
+pub mod sigma_workqueue;
+pub mod sigma_cgroup_v2;
+pub mod sigma_signal;
+pub use missing_linux_kernel_components::*;

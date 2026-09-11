@@ -200,10 +200,6 @@ pub use mint_linux::{
     MintTimeshiftEngine, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
     TimeshiftSystemRestorer,
 };
-pub use legacy_adapters::{
-    KernelPersona, SyscallAbi, KernelPersonaVM, BinaryCompatMatrix, LibcVersion,
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyProtocolAdapter,
-};
 
 pub use chimera_linux::{ApkPackageMetadata, ApkPackageStore};
 pub use community_foundation::{
@@ -271,10 +267,4 @@ pub use canonical::{
 pub use chakra::{
     AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
     TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
-};
-pub use legacy_adapters::{
-    APITimelineManager, DiscontinuedFS, DriverBridge, GraphicsBridge,
-    LegacyBus, LegacyPluginManager, NetworkBridge,
-    StorageBridge, WorkloadOptimizer, WorkloadProfile, GLOBAL_PERSONA_VM,
-    GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };

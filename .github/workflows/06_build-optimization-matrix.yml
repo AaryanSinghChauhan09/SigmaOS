@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 7 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   build-optimization:
     runs-on: ubuntu-latest

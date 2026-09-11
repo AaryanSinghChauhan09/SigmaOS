@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 8 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   package-manager-test:
     runs-on: ubuntu-latest

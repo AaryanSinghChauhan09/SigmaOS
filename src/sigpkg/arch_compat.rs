@@ -3,15 +3,14 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec as AllocVec;
+
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec as AllocVec;
 
 use crate::klib::collections::HashMap;
 use crate::klib::string::SigmaString;
-use crate::klib;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {
@@ -276,13 +275,13 @@ pub struct AlpmHook {
 
 #[derive(Debug, Clone)]
 pub struct AlpmHookManager {
-    pub hooks: AllocVec<AlpmHook>,
+    pub hooks: Vec<AlpmHook>,
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
         Self {
-            hooks: AllocVec::new(),
+            hooks: Vec::new(),
         }
     }
 
@@ -359,7 +358,7 @@ pub enum AlpmTransactionState {
 #[derive(Debug, Clone)]
 pub struct AlpmTransactionEngine {
     pub state: AlpmTransactionState,
-    pub targets: AllocVec<SigmaString>,
+    pub targets: Vec<SigmaString>,
     pub installed: HashMap<SigmaString, Version>,
     pub hook_manager: AlpmHookManager,
 }
@@ -368,7 +367,7 @@ impl AlpmTransactionEngine {
     pub fn new() -> Self {
         Self {
             state: AlpmTransactionState::Init,
-            targets: AllocVec::new(),
+            targets: Vec::new(),
             installed: HashMap::new(),
             hook_manager: AlpmHookManager::new(),
         }
@@ -383,16 +382,16 @@ impl AlpmTransactionEngine {
     }
 
     /// Prepares transaction by checking dependencies, conflicts, and pre-transaction hooks
-    pub fn prepare(&mut self) -> Result<AllocVec<SigmaString>, &'static str> {
+    pub fn prepare(&mut self) -> Result<Vec<SigmaString>, &'static str> {
         if self.state != AlpmTransactionState::Init {
             return Err("ALPM: Transaction already prepared");
         }
 
-        let mut pre_cmds = AllocVec::new();
+        let mut pre_cmds = Vec::new();
         for target in &self.targets {
             let cmds = self
                 .hook_manager
-                .trigger_hooks(HookWhen::PreTransaction, target.as_str());
+                .trigger_hooks(HookWhen::PreTransaction, target);
             pre_cmds.extend(cmds);
         }
 
@@ -401,17 +400,17 @@ impl AlpmTransactionEngine {
     }
 
     /// Commits transaction by updating installed package DB and triggering post-transaction hooks
-    pub fn commit(&mut self) -> Result<AllocVec<SigmaString>, &'static str> {
+    pub fn commit(&mut self) -> Result<Vec<SigmaString>, &'static str> {
         if self.state != AlpmTransactionState::Prepared {
             return Err("ALPM: Transaction must be prepared before committing");
         }
 
-        let mut post_cmds = AllocVec::new();
+        let mut post_cmds = Vec::new();
         for target in &self.targets {
             self.installed.insert(target.clone(), Version::new(1, 0, 0));
             let cmds = self
                 .hook_manager
-                .trigger_hooks(HookWhen::PostTransaction, target.as_str());
+                .trigger_hooks(HookWhen::PostTransaction, target);
             post_cmds.extend(cmds);
         }
 
@@ -577,7 +576,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        image_header
+        image_header.to_vec()
     }
 }
 
@@ -668,7 +667,7 @@ impl SAbsSimdCompiler {
         }
     }
 
-    pub fn compile_vectorized_binary(&self, source_code: &str) -> AllocVec<u8> {
+    pub fn compile_vectorized_binary(&self, source_code: &str) -> Vec<u8> {
         let flags = self.generate_compiler_flags();
         let mut binary_header = format!(
             "S-ABS_SIMD_BINARY | ISA: {:?} | Flags: {} | SourceLength: {}\n",
@@ -679,54 +678,6 @@ impl SAbsSimdCompiler {
         .into_bytes();
         binary_header.extend_from_slice(b"\x7FELF_SIMD_VECTORIZED_PAYLOAD");
         binary_header
-    }
-}
-
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: std::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: std::collections::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
     }
 }
 
@@ -778,14 +729,58 @@ impl MakepkgBuilder {
         .into_bytes();
 
         archive_content.extend_from_slice(source_data);
-        Ok((archive_name, archive_content))
+        Ok((archive_name, archive_content.to_vec()))
     }
 }
+
 // --- Arch Linux svntogit Repository Migration Engine ---
+
 #[derive(Debug, Clone)]
-pub struct SvntoGitEngine {
-    pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
+pub struct SvnPackageMetadata {
+    pub pkgname: String,
+    pub repo: String, // e.g. "core", "extra", "community"
+    pub svn_revision: u64,
+    pub has_pkgbuild: bool,
 }
+
+#[derive(Debug, Default)]
+pub struct SvntogitMigrationEngine {
+    pub migrated_packages: std::collections::BTreeMap<String, SvnPackageMetadata>,
+}
+
+impl SvntogitMigrationEngine {
+    pub fn new() -> Self {
+        Self {
+            migrated_packages: std::collections::BTreeMap::new(),
+        }
+    }
+
+    pub fn migrate_svn_repo_layout(
+        &mut self,
+        pkgname: &str,
+        repo: &str,
+        svn_revision: u64,
+        pkgbuild_content: &str,
+    ) -> Result<String, &'static str> {
+        if pkgbuild_content.is_empty() {
+            return Err("svntogit: Cannot migrate empty PKGBUILD");
+        }
+
+        let metadata = SvnPackageMetadata {
+            pkgname: pkgname.to_string(),
+            repo: repo.to_string(),
+            svn_revision,
+            has_pkgbuild: true,
+        };
+
+        self.migrated_packages.insert(pkgname.to_string(), metadata);
+        Ok(format!(
+            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
+            pkgname, svn_revision, pkgname
+        ))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -959,47 +954,10 @@ mod tests {
         let builder = MakepkgBuilder::new("ripgrep", "13.0.0", "x86_64", "SKIP");
         let source_bytes = b"cargo build --release";
 
-        let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
+        let (pkg_file, pkg_data): (SigmaString, AllocVec<u8>) = builder.build_package_archive(source_bytes).unwrap();
         assert_eq!(pkg_file.as_str(), "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
     }
-}
-
-impl SvntogitMigrationEngine {
-    pub fn new() -> Self {
-        Self {
-            migrated_packages: crate::klib::BTreeMap::new(),
-        }
-    }
-
-    pub fn migrate_svn_repo_layout(
-        &mut self,
-        pkgname: &str,
-        repo: &str,
-        svn_revision: u64,
-        pkgbuild_content: &str,
-    ) -> Result<String, &'static str> {
-        if pkgbuild_content.is_empty() {
-            return Err("svntogit: Cannot migrate empty PKGBUILD");
-        }
-
-        let metadata = SvnPackageMetadata {
-            pkgname: pkgname.to_string(),
-            repo: repo.to_string(),
-            svn_revision,
-            has_pkgbuild: true,
-        };
-
-        self.migrated_packages.insert(pkgname.to_string(), metadata);
-        Ok(format!(
-            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
-            pkgname, svn_revision, pkgname
-        ))
-    }
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
 
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {
