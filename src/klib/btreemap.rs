@@ -6,7 +6,7 @@ use super::Vec;
 use core::borrow::Borrow;
 use core::cmp::PartialEq;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -29,52 +29,7 @@ impl<K, V> Eq for BTreeMap<K, V>
 where
     K: Eq + Clone + Ord,
     V: Eq + Clone,
-{}
-
-pub struct IntoIter<K: PartialEq + Clone + Ord, V: Clone> {
-    entries: core::iter::IntoIter<(K, V)>,
-}
-
-impl<K: PartialEq + Clone + Ord, V: Clone> Iterator for IntoIter<K, V> {
-    type Item = (K, V);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.entries.next()
-    }
-}
-
-impl<K: PartialEq + Clone + Ord, V: Clone> IntoIterator for BTreeMap<K, V> {
-    type Item = (K, V);
-    type IntoIter = IntoIter<K, V>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        IntoIter {
-            entries: self.entries.into_iter(),
-        }
-    }
-}
-
-pub struct Iter<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
-    entries: core::slice::Iter<'a, (K, V)>,
-}
-
-impl<'a, K: PartialEq + Clone + Ord, V: Clone> Iterator for Iter<'a, K, V> {
-    type Item = (&'a K, &'a V);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.entries.next().map(|(k, v)| (k, v))
-    }
-}
-
-impl<'a, K: PartialEq + Clone + Ord, V: Clone> IntoIterator for &'a BTreeMap<K, V> {
-    type Item = (&'a K, &'a V);
-    type IntoIter = Iter<'a, K, V>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        Iter {
-            entries: self.entries.iter(),
-        }
-    }
+{
 }
 
 impl<K, V> Clone for BTreeMap<K, V>
@@ -443,37 +398,6 @@ where
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
-    }
-}
-
-pub struct IntoIter<K, V> {
-    entries: Vec<(K, V)>,
-}
-
-impl<K, V> Iterator for IntoIter<K, V> {
-    type Item = (K, V);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.entries.is_empty() {
-            None
-        } else {
-            Some(self.entries.remove(0))
-        }
-    }
-}
-
-impl<K, V> IntoIterator for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: Clone,
-{
-    type Item = (K, V);
-    type IntoIter = IntoIter<K, V>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        IntoIter {
-            entries: self.entries,
-        }
     }
 }
 

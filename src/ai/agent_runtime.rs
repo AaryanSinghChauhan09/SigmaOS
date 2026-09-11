@@ -16,8 +16,7 @@ use alloc::vec::Vec;
 use alloc::string::String;
 use core::sync::atomic::{AtomicU64, Ordering};
 
-use crate::klib::*;
-pub mod types {}
+use crate::klib::types::*;
 use crate::security::sandbox::{LandlockV5Guard, CapsicumRights};
 use crate::kernel::process::{ProcessId, ProcessState};
 
@@ -574,6 +573,11 @@ pub enum AgentError {
     AnalysisFailed,
 }
 
+// Re-export for other modules
+pub use self::{
+    AgentCapability, AgentError, AgentId, AgentKernelBridge, AgentPriority, AgentProcess,
+    AgentReport, AgentSandbox, AgentState, CrashDump, Plugin, PluginSpec,
+};
 
 #[cfg(test)]
 mod tests {

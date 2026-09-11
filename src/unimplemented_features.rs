@@ -1798,8 +1798,8 @@ mod tests {
 
     #[test]
     fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8, power_state: PowerState::D3Off };
-        let mmio = ModernMmioController { mmio_base: 0xFE00_0000, power_state: PowerState::D3Off };
+        let pio = LegacyPioController { port_base: 0x3F8, power_state: PowerState::D0Active };
+        let mmio = ModernMmioController { mmio_base: 0xFE00_0000, power_state: PowerState::D0Active };
 
         assert_eq!(pio.read_register(0), 0x3F8);
         assert_eq!(mmio.read_register(0), 0xFE00_0000);
@@ -1871,13 +1871,6 @@ mod tests {
 // ============================================================================
 
 // 6.1 Polymorphic Universal Peripheral Blueprint
-pub trait SpecBareMetalUnifiedPeripheral {
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn read_register(&self, offset: u32) -> u64;
-    fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
-    fn handle_irq(&mut self) -> u32;
-}
-
 pub struct LegacyPioController {
     pub port_base: u16,
     pub power_state: PowerState,

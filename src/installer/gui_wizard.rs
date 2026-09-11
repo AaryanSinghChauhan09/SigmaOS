@@ -312,8 +312,8 @@ impl GuiInstallerWizard {
             InstallerScreen::UserSetup => InstallerScreen::SystemConfiguration,
             InstallerScreen::SystemConfiguration => InstallerScreen::Summary,
             InstallerScreen::Summary => InstallerScreen::InstallationProgress,
-            InstallerScreen::InstallationProgress => InstallerScreen::Complete,
-            InstallerScreen::Complete => return Err(InstallerError::AlreadyComplete),
+            InstallerScreen::InstallationProgress => InstallerScreen::CompleteOnboarding,
+            InstallerScreen::CompleteOnboarding => return Err(InstallerError::AlreadyComplete),
         };
 
         Ok(())
@@ -461,7 +461,7 @@ impl GuiInstallerWizard {
             InstallerScreen::SystemConfiguration => "Configure system settings",
             InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
-            InstallerScreen::Complete => "Installation Complete",
+            InstallerScreen::CompleteOnboarding => "Installation Complete",
         }
     }
 
