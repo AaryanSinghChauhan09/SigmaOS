@@ -449,3 +449,4 @@ pub use tech_media_reexports::*;
 pub use distro::arch_ultimate_gap_closure::*;
 pub use distro::omarchy_ultimate_gap_closure::*;
 pub use performance::cachyos_ultimate_gap_closure::*;
+pub use distro::tech_media_extended_innovations::*;
