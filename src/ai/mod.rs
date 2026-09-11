@@ -67,3 +67,8 @@ pub use marktechpost_kdnuggets_data_science::{
     InfoWorldEnterpriseAiDeploymentEngine, KdnuggetsAutoMlPipelineEngine,
     MarkTechPostVectorIndexEngine, SovereignAiDataSciencePipelineSuite,
 };
+
+pub use marktechpost_kdnuggets_data_science::{
+    InfoWorldEnterpriseAiDeploymentEngine, KdnuggetsAutoMlPipelineEngine,
+    MarkTechPostVectorIndexEngine, SovereignAiDataSciencePipelineSuite,
+};

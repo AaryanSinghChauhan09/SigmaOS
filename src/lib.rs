@@ -17,9 +17,7 @@ pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
-pub mod community;
 pub mod device;
-pub mod distro;
 pub mod driver;
 pub mod crypto;
 pub mod filesystem;
@@ -42,12 +40,6 @@ pub mod shell;
 pub mod sigpkg;
 pub mod storage;
 pub mod thread;
-pub mod compositor;
-pub mod theming;
-pub mod onboarding;
-pub mod launcher;
-pub mod notification;
-pub mod monitor;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
 };
@@ -98,7 +90,7 @@ pub use distro::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
     SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
     SovereignStatefulNatEngine, SovereignAheadOfDistrosSuite, SovereignDistroInspirationLeapEngine,
-    SovereignPredictiveSchedExtEngine, SovereignMasterOutpacingSuite,
+    SovereignPredictiveSchedExtEngine,
     SovereignOmniCasStoreEngine, SovereignCrossPlatformCapabilityEngine,
     SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine,
     StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
@@ -303,9 +295,27 @@ pub use driver::pci_bus::{
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,
     SimulatedPciHardwareAccess,
 };
-pub use driver::*;
+pub use drivers::*;
+pub use drivers::distro_device_expansion::{
+    AppleNvmeAnsDriver, AtherosAr9271WifiDriver, Esp32HciBtBridgeDriver, LogitechUnifyingHidDriver,
+    NvidiaNouveauOpenGspDriver, UsbAudioClass2Driver,
+};
+pub use driver::{
+    AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
+    DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
+    EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
+    I2cSpiGpioBusController, InputDriver, InputEvent, InputType, IsochannelMode,
+    IsolationRingLevel, LeAudioCodec, LinuxBsdWifi6e7Driver, LinuxUrb, LinuxUrbQueue,
+    MultiTouchSlot, NetBsdRumpDriverHost, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    Nvme2ZnsFabricsDriver, NvmeFabricsTransport, NvmeZoneDescriptor, NvmeZoneState,
+    OpenBsdDriverPledge, PacketSlot, StorageCommand, StorageDriver, StorageError, StorageType,
+    Uac3IntelHdaAudioDspDriver, UrbTransferType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
+    Virgl3dCmd, Virgl3dResource, VirtioGpuVirgl3dDriver, WifiBand, WifiMloLink, WifiProtocolMode,
+    ZeroCopyPacketDriverEngine,
+};
 pub use filesystem::{
-    FileMode, FileType, FsError, Inode, VirtualFileSystem,
+    FileMode, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
@@ -370,13 +380,13 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppPermissionRecord, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, FineGrainedAccessControlMatrix, ForensicStorageFilter, HardwarePeripheralBounds,
-    MatrixPolicyAction, Permission, PermissionGrantState, PledgeManager, PledgePromise, PortalPermissionScope,
-    RoutingMode, SandboxPolicy, SovereignPublicationInspiredPermissionEngine,
+    AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
+    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
+    SandboxPolicy,
 };
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
+    StreamTarget,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
@@ -384,11 +394,8 @@ pub use shell::{
     SimpleShellSession as ShellRepl, ZshPromptFormatter,
 };
 pub use sigpkg::{
-    AlpineApkCachePeerSyncEngine, AptDebManifest, BuildSystem, ContentAddressedStore,
-    CryptoVerifier, DebianAptPinningEngine, FreeBsdPkgMessageNotifierEngine,
-    OpenBsdPledgeUnveilSandboxScriptletEngine, PackageRecipe, RecipeError, RecipeManager,
-    RpmOstreeLayeredImageGovernorEngine, SatSolver, Transaction,
-    XbpsDebianAlternativesGovernorEngine,
+    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError,
+    RecipeManager, SatSolver, Transaction,
 };
 pub use unimplemented_tools::{
     AdaptiveUxAgent, AiAnomalyFirewall, AiCodeAssistant, AiDependencyResolver,
@@ -429,19 +436,15 @@ pub use community::toolkit::{
 };
 
 pub use tools::{
-    AccessibilityFeature as LibAccessibilityFeature, AndroidPrivateSpaceEngine,
-    AndroidScrcpyMirrorEngine, AwakeMode, ClusterNode as LibClusterNode, FancyZoneLayoutMode,
-    KdProgressTracker, LocksmithProcess, MacOsAirDropEngine, MacOsSpotlightEngine,
-    NodeState as LibNodeState, PhoronixComparisonTable, PowerToysAwakeEngine,
-    PowerToysFancyZonesEngine, PowerToysFileLocksmith, PowerToysTextExtractorOcr,
-    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
-    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, SovereignAptDuo,
-    SovereignDpkgEtcher, SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
-    SovereignK8sClusterTool, SovereignKeyboardTester, SovereignPublicationStdoutEngine,
-    SovereignTableConverter, SovereignTerraformIacTool, SovereignTextFixer, SovereignWordCounter,
-    SpotlightIndexEntry, StatusBadgeLevel, StdoutColor, TextFormatStyle, TreeNode,
-    UserIdentity as LibUserIdentity, ZoneArea,
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode,
+    NodeState as LibNodeState, SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster,
+    SigmaDeploy as LibSigmaDeploy, SigmaIdentity as LibSigmaIdentity,
+    SigmaToolError as LibSigmaToolError, SovereignAptDuo, SovereignDpkgEtcher,
+    SovereignImageToDataUri, SovereignImeConvertCase, SovereignIsWebsiteDown,
+    SovereignKeyboardTester, SovereignTableConverter, SovereignTextFixer, SovereignWordCounter,
+    UserIdentity as LibUserIdentity,
 };
 pub mod tech_media_reexports;
 pub use tech_media_reexports::*;
 pub use distro::arch_ultimate_gap_closure::*;
+pub use distro::omarchy_ultimate_gap_closure::*;
