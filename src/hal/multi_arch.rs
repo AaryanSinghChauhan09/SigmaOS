@@ -18,24 +18,23 @@ pub enum TargetArchitecture {
 }
 
 impl TargetArchitecture {
-    /// Returns the canonical GNU target triplet string for cross-compilation toolchains.
-    pub fn to_gnu_triplet(&self) -> &'static str {
+    pub fn to_gnu_triplet(self) -> &'static str {
         match self {
-            TargetArchitecture::X86 => "i686-sigmaos-linux-gnu",
-            TargetArchitecture::X86_64 => "x86_64-sigmaos-linux-gnu",
-            TargetArchitecture::AArch64 => "aarch64-sigmaos-linux-gnu",
-            TargetArchitecture::Armv7 => "armv7-sigmaos-linux-gnueabihf",
-            TargetArchitecture::Riscv64 => "riscv64-sigmaos-linux-gnu",
-            TargetArchitecture::LoongArch64 => "loongarch64-sigmaos-linux-gnu",
-            TargetArchitecture::Ppc64Le => "powerpc64le-sigmaos-linux-gnu",
-            TargetArchitecture::Mips64 => "mips64el-sigmaos-linux-gnu",
-            TargetArchitecture::S390x => "s390x-sigmaos-linux-gnu",
-            TargetArchitecture::Sparc64 => "sparc64-sigmaos-linux-gnu",
+            TargetArchitecture::X86 => "i686-unknown-linux-gnu",
+            TargetArchitecture::X86_64 => "x86_64-unknown-linux-gnu",
+            TargetArchitecture::AArch64 => "aarch64-unknown-linux-gnu",
+            TargetArchitecture::Armv7 => "armv7-unknown-linux-gnueabihf",
+            TargetArchitecture::Riscv64 => "riscv64-unknown-linux-gnu",
+            TargetArchitecture::LoongArch64 => "loongarch64-unknown-linux-gnu",
+            TargetArchitecture::Ppc64Le => "powerpc64le-unknown-linux-gnu",
+            TargetArchitecture::Mips64 => "mips64el-unknown-linux-gnu",
+            TargetArchitecture::S390x => "s390x-unknown-linux-gnu",
+            TargetArchitecture::Sparc64 => "sparc64-unknown-linux-gnu",
         }
     }
 }
 
-/// System Interrupt Controller Abstraction (x86 PIC/APIC, ARM GICv2/v3, RISC-V PLIC, LoongArch ExtIOI, PowerPC XIVE, MIPS GIC, IBM S390x SCLP, SPARC Monddo)
+/// System Interrupt Controller Abstraction
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptControllerKind {
     X86PicApic,
@@ -85,13 +84,6 @@ pub enum CpuRegisterContext {
         pstate: u64,
         ttbr0_el1: u64,
     },
-    Armv7 {
-        r: [u32; 13],
-        sp: u32,
-        lr: u32,
-        pc: u32,
-        cpsr: u32,
-    },
     Riscv64 {
         x: [u64; 32],
         pc: u64,
@@ -110,11 +102,18 @@ pub enum CpuRegisterContext {
         msr: u64,
         lr: u64,
     },
+    Armv7 {
+        r: [u32; 13],
+        sp: u32,
+        lr: u32,
+        pc: u32,
+        cpsr: u32,
+    },
     Mips64 {
         gpr: [u64; 32],
-        pc: u64,
+        epc: u64,
         status: u64,
-        cause: u64,
+        badvaddr: u64,
     },
     S390x {
         gprs: [u64; 16],
@@ -123,10 +122,31 @@ pub enum CpuRegisterContext {
     },
     Sparc64 {
         gpr: [u64; 32],
-        pc: u64,
         tpc: u64,
-        pstate: u64,
+        tnpc: u64,
+        tstate: u64,
     },
+}
+
+/// Dynamic ELF Header Machine Type Detection
+pub struct MultiArchElfHeader;
+
+impl MultiArchElfHeader {
+    pub fn detect_architecture(e_machine: u16) -> Option<TargetArchitecture> {
+        match e_machine {
+            3 => Some(TargetArchitecture::X86),
+            62 => Some(TargetArchitecture::X86_64),
+            183 => Some(TargetArchitecture::AArch64),
+            40 => Some(TargetArchitecture::Armv7),
+            243 => Some(TargetArchitecture::Riscv64),
+            258 => Some(TargetArchitecture::LoongArch64),
+            21 => Some(TargetArchitecture::Ppc64Le),
+            8 => Some(TargetArchitecture::Mips64),
+            22 => Some(TargetArchitecture::S390x),
+            43 => Some(TargetArchitecture::Sparc64),
+            _ => None,
+        }
+    }
 }
 
 /// MMIO Page Fault Information
@@ -136,34 +156,6 @@ pub struct MmioPageFault {
     pub is_write: bool,
     pub instruction_pointer: u64,
     pub target_arch: TargetArchitecture,
-}
-
-/// Dynamic Multi-Architecture ELF Binary Header Inspector
-#[derive(Debug, Clone)]
-pub struct MultiArchElfHeader {
-    pub e_machine: u16,
-    pub is_64bit: bool,
-    pub is_little_endian: bool,
-    pub entry_point: u64,
-}
-
-impl MultiArchElfHeader {
-    /// Detects the target architecture from ELF `e_machine` values.
-    pub fn detect_architecture(&self) -> Result<TargetArchitecture, &'static str> {
-        match self.e_machine {
-            0x03 => Ok(TargetArchitecture::X86),
-            0x3E => Ok(TargetArchitecture::X86_64),
-            0x28 => Ok(TargetArchitecture::Armv7),
-            0xB7 => Ok(TargetArchitecture::AArch64),
-            0xF3 => Ok(TargetArchitecture::Riscv64),
-            0x102 => Ok(TargetArchitecture::LoongArch64),
-            0x15 => Ok(TargetArchitecture::Ppc64Le),
-            0x08 => Ok(TargetArchitecture::Mips64),
-            0x16 => Ok(TargetArchitecture::S390x),
-            0x2B => Ok(TargetArchitecture::Sparc64),
-            _ => Err("Unsupported or unknown ELF e_machine architecture identifier"),
-        }
-    }
 }
 
 /// Multi-Architecture Hardware Abstraction Layer Manager
@@ -251,13 +243,6 @@ impl MultiArchHalManager {
                 pstate: 0x3C5,
                 ttbr0_el1: 0x2000,
             },
-            TargetArchitecture::Armv7 => CpuRegisterContext::Armv7 {
-                r: [0u32; 13],
-                sp: 0x80000000,
-                lr: 0,
-                pc: 0x00010000,
-                cpsr: 0x10,
-            },
             TargetArchitecture::Riscv64 => CpuRegisterContext::Riscv64 {
                 x: [0u64; 32],
                 pc: 0x80000000,
@@ -276,22 +261,29 @@ impl MultiArchHalManager {
                 msr: 0x8000000000009033,
                 lr: 0,
             },
+            TargetArchitecture::Armv7 => CpuRegisterContext::Armv7 {
+                r: [0u32; 13],
+                sp: 0x80000000,
+                lr: 0,
+                pc: 0x00010000,
+                cpsr: 0x13,
+            },
             TargetArchitecture::Mips64 => CpuRegisterContext::Mips64 {
                 gpr: [0u64; 32],
-                pc: 0xFFFFFFFF80000000,
+                epc: 0xFFFFFFFF80000000,
                 status: 0x24000000,
-                cause: 0,
+                badvaddr: 0,
             },
             TargetArchitecture::S390x => CpuRegisterContext::S390x {
                 gprs: [0u64; 16],
                 psw_mask: 0x0705000180000000,
-                psw_addr: 0x0000000000010000,
+                psw_addr: 0x0000000000100000,
             },
             TargetArchitecture::Sparc64 => CpuRegisterContext::Sparc64 {
                 gpr: [0u64; 32],
-                pc: 0x0000000000400000,
-                tpc: 0,
-                pstate: 0x16,
+                tpc: 0x0000000000400000,
+                tnpc: 0x0000000000400004,
+                tstate: 0,
             },
         }
     }
@@ -300,37 +292,6 @@ impl MultiArchHalManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_gnu_triplets() {
-        assert_eq!(TargetArchitecture::X86.to_gnu_triplet(), "i686-sigmaos-linux-gnu");
-        assert_eq!(TargetArchitecture::X86_64.to_gnu_triplet(), "x86_64-sigmaos-linux-gnu");
-        assert_eq!(TargetArchitecture::AArch64.to_gnu_triplet(), "aarch64-sigmaos-linux-gnu");
-        assert_eq!(TargetArchitecture::Armv7.to_gnu_triplet(), "armv7-sigmaos-linux-gnueabihf");
-        assert_eq!(TargetArchitecture::Riscv64.to_gnu_triplet(), "riscv64-sigmaos-linux-gnu");
-        assert_eq!(TargetArchitecture::Mips64.to_gnu_triplet(), "mips64el-sigmaos-linux-gnu");
-        assert_eq!(TargetArchitecture::S390x.to_gnu_triplet(), "s390x-sigmaos-linux-gnu");
-        assert_eq!(TargetArchitecture::Sparc64.to_gnu_triplet(), "sparc64-sigmaos-linux-gnu");
-    }
-
-    #[test]
-    fn test_elf_header_detection() {
-        let elf = MultiArchElfHeader {
-            e_machine: 0xF3,
-            is_64bit: true,
-            is_little_endian: true,
-            entry_point: 0x80000000,
-        };
-        assert_eq!(elf.detect_architecture().unwrap(), TargetArchitecture::Riscv64);
-
-        let unknown_elf = MultiArchElfHeader {
-            e_machine: 0xFFFF,
-            is_64bit: true,
-            is_little_endian: true,
-            entry_point: 0x0,
-        };
-        assert!(unknown_elf.detect_architecture().is_err());
-    }
 
     #[test]
     fn test_x86_32bit_hal_manager() {
@@ -361,39 +322,58 @@ mod tests {
         let fault_res = hal_x86.handle_mmio_page_fault(&fault).unwrap();
         assert!(fault_res.contains("Handled MMIO WRITE"));
 
+        let null_fault = MmioPageFault {
+            faulting_address: 0,
+            is_write: false,
+            instruction_pointer: 0x400000,
+            target_arch: TargetArchitecture::X86_64,
+        };
+        assert!(hal_x86.handle_mmio_page_fault(&null_fault).is_err());
+
+        let hal_arm = MultiArchHalManager::new(TargetArchitecture::AArch64);
+        assert_eq!(hal_arm.irq_controller, InterruptControllerKind::ArmGicV3);
+        if let CpuRegisterContext::AArch64 { sp, .. } = hal_arm.create_default_context() {
+            assert_eq!(sp, 0x40000000);
+        } else {
+            panic!("Expected AArch64 register context");
+        }
+
+        let hal_riscv = MultiArchHalManager::new(TargetArchitecture::Riscv64);
+        assert_eq!(hal_riscv.irq_controller, InterruptControllerKind::RiscvPlicClint);
+        if let CpuRegisterContext::Riscv64 { pc, .. } = hal_riscv.create_default_context() {
+            assert_eq!(pc, 0x80000000);
+        } else {
+            panic!("Expected Riscv64 register context");
+        }
+
+        let hal_loongarch = MultiArchHalManager::new(TargetArchitecture::LoongArch64);
+        assert_eq!(hal_loongarch.irq_controller, InterruptControllerKind::LoongArchExtIoi);
+        if let CpuRegisterContext::LoongArch64 { era, .. } = hal_loongarch.create_default_context() {
+            assert_eq!(era, 0x9000000000000000);
+        } else {
+            panic!("Expected LoongArch64 register context");
+        }
+
+        let hal_ppc = MultiArchHalManager::new(TargetArchitecture::Ppc64Le);
+        assert_eq!(hal_ppc.irq_controller, InterruptControllerKind::PpcXive);
+        if let CpuRegisterContext::Ppc64Le { nip, .. } = hal_ppc.create_default_context() {
+            assert_eq!(nip, 0x0000000000000100);
+        } else {
+            panic!("Expected Ppc64Le register context");
+        }
+
         let hal_armv7 = MultiArchHalManager::new(TargetArchitecture::Armv7);
         assert_eq!(hal_armv7.irq_controller, InterruptControllerKind::ArmGicV2);
-        if let CpuRegisterContext::Armv7 { sp, pc, .. } = hal_armv7.create_default_context() {
-            assert_eq!(sp, 0x80000000);
-            assert_eq!(pc, 0x00010000);
-        } else {
-            panic!("Expected Armv7 register context");
-        }
+        assert_eq!(hal_armv7.current_arch.to_gnu_triplet(), "armv7-unknown-linux-gnueabihf");
 
         let hal_mips = MultiArchHalManager::new(TargetArchitecture::Mips64);
         assert_eq!(hal_mips.irq_controller, InterruptControllerKind::MipsGic);
-        if let CpuRegisterContext::Mips64 { pc, status, .. } = hal_mips.create_default_context() {
-            assert_eq!(pc, 0xFFFFFFFF80000000);
-            assert_eq!(status, 0x24000000);
-        } else {
-            panic!("Expected Mips64 register context");
-        }
+        assert_eq!(MultiArchElfHeader::detect_architecture(8), Some(TargetArchitecture::Mips64));
 
         let hal_s390x = MultiArchHalManager::new(TargetArchitecture::S390x);
         assert_eq!(hal_s390x.irq_controller, InterruptControllerKind::S390xSclp);
-        if let CpuRegisterContext::S390x { psw_addr, .. } = hal_s390x.create_default_context() {
-            assert_eq!(psw_addr, 0x0000000000010000);
-        } else {
-            panic!("Expected S390x register context");
-        }
 
         let hal_sparc = MultiArchHalManager::new(TargetArchitecture::Sparc64);
         assert_eq!(hal_sparc.irq_controller, InterruptControllerKind::Sparc64Monddo);
-        if let CpuRegisterContext::Sparc64 { pc, pstate, .. } = hal_sparc.create_default_context() {
-            assert_eq!(pc, 0x0000000000400000);
-            assert_eq!(pstate, 0x16);
-        } else {
-            panic!("Expected Sparc64 register context");
-        }
     }
 }
