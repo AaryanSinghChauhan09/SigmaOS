@@ -23,9 +23,14 @@ pub enum InstallerScreen {
     CompleteOnboarding,
 }
 
-/// Partitioning Operation Strategy
+/// Partitioning Operation Strategy / Mode
+pub type PartitionStrategy = PartitioningOperation;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PartitionStrategy {
+pub enum PartitioningOperation {
+    Automatic,
+    Alongside,
+    Manual,
     EraseDisk,
     InstallAlongsideExisting,
     ManualCustomPartitions,
@@ -174,6 +179,14 @@ impl UserAccount {
         self.auto_login = auto;
         self
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct NetworkConfig {
+    pub use_dhcp: bool,
+    pub static_ip: Option<String>,
+    pub gateway: Option<String>,
+    pub dns_servers: Vec<String>,
 }
 
 /// System Configuration
