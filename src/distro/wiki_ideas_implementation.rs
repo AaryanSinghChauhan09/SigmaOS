@@ -9,10 +9,20 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+
+// Test environment compatibility: Use std for testing only
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// 1. NixOS-Style Declarative System Configuration & Generation Manager
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -108,9 +118,9 @@ impl NixDeclarativeSystemState {
 
     pub fn switch_generation(&mut self, target_id: u32) -> Result<Generation, String> {
         if let Some(gen) = self.generations.iter().find(|g| g.id == target_id) {
+            let res = gen.clone();
             self.active_generation_id = target_id;
-            let target_gen: &Generation = gen;
-            Ok(target_gen.clone())
+            Ok(res)
         } else {
             Err(format!("Generation ID {} not found", target_id))
         }
@@ -686,7 +696,7 @@ impl Default for SovereignHybridSchedulerInnovations {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
