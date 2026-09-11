@@ -23,6 +23,11 @@ pub enum OmarchyTheme {
     Nord,
     Everforest,
     Kanagawa,
+    RosePine,
+    Dracula,
+    Solarized,
+    Oxide,
+    Cyberpunk,
 }
 
 impl OmarchyTheme {
@@ -34,6 +39,11 @@ impl OmarchyTheme {
             Self::Nord => "nord",
             Self::Everforest => "everforest",
             Self::Kanagawa => "kanagawa",
+            Self::RosePine => "rose-pine",
+            Self::Dracula => "dracula",
+            Self::Solarized => "solarized",
+            Self::Oxide => "oxide",
+            Self::Cyberpunk => "cyberpunk",
         }
     }
 
@@ -45,6 +55,11 @@ impl OmarchyTheme {
             Self::Nord => "#88c0d0",
             Self::Everforest => "#a7c080",
             Self::Kanagawa => "#7e9cd8",
+            Self::RosePine => "#ebbcba",
+            Self::Dracula => "#bd93f9",
+            Self::Solarized => "#268bd2",
+            Self::Oxide => "#00adb5",
+            Self::Cyberpunk => "#ff007f",
         }
     }
 
@@ -56,6 +71,11 @@ impl OmarchyTheme {
             Self::Nord => "#2e3440",
             Self::Everforest => "#2d353b",
             Self::Kanagawa => "#1f1f28",
+            Self::RosePine => "#191724",
+            Self::Dracula => "#282a36",
+            Self::Solarized => "#002b36",
+            Self::Oxide => "#222831",
+            Self::Cyberpunk => "#0d0221",
         }
     }
 
@@ -67,6 +87,11 @@ impl OmarchyTheme {
             Self::Nord => "#d8dee9",
             Self::Everforest => "#d3c6aa",
             Self::Kanagawa => "#dcd7ba",
+            Self::RosePine => "#e0def4",
+            Self::Dracula => "#f8f8f2",
+            Self::Solarized => "#839496",
+            Self::Oxide => "#eeeeee",
+            Self::Cyberpunk => "#00f5d4",
         }
     }
 }
@@ -592,6 +617,78 @@ pub use crate::distro::omarchy_inspiration::{
     QuickshellWidget, ShellComponentKind,
 };
 
+/// Omarchy Liveboot ISO & Automated Installer Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyIsoInstallerEngine {
+    pub iso_label: String,
+    pub archiso_profile: String,
+    pub btrfs_subvolumes: Vec<String>,
+    pub auto_install_script: String,
+}
+
+impl OmarchyIsoInstallerEngine {
+    pub fn new(iso_label: &str) -> Self {
+        Self {
+            iso_label: iso_label.to_string(),
+            archiso_profile: "omarchy-hyprland-omakase".to_string(),
+            btrfs_subvolumes: vec![
+                "/@".to_string(),
+                "/@home".to_string(),
+                "/@snapshots".to_string(),
+                "/@factory-clean".to_string(),
+            ],
+            auto_install_script: "/usr/bin/omarchy-install".to_string(),
+        }
+    }
+
+    pub fn generate_archiso_bootstrap_manifest(&self) -> String {
+        format!(
+            "LABEL={}\nPROFILE={}\nSUBVOLUMES={:?}\nSCRIPT={}",
+            self.iso_label, self.archiso_profile, self.btrfs_subvolumes, self.auto_install_script
+        )
+    }
+}
+
+impl Default for OmarchyIsoInstallerEngine {
+    fn default() -> Self {
+        Self::new("OMARCHY_2026_LIVE")
+    }
+}
+
+/// Omarchy Web2App PWA Sandbox & Desktop Launcher Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyAppLauncherEngine {
+    pub registered_apps: Vec<String>,
+}
+
+impl OmarchyAppLauncherEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_apps: vec![
+                "WhatsApp".to_string(),
+                "ChatGPT".to_string(),
+                "GitHub".to_string(),
+                "YouTube".to_string(),
+            ],
+        }
+    }
+
+    pub fn register_pwa_app(&mut self, app_name: &str) -> bool {
+        if self.registered_apps.contains(&app_name.to_string()) {
+            false
+        } else {
+            self.registered_apps.push(app_name.to_string());
+            true
+        }
+    }
+}
+
+impl Default for OmarchyAppLauncherEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -653,5 +750,21 @@ mod tests {
         assert!(audio.set_low_latency(64));
         assert_eq!(audio.quantum_buffer_size, 64);
         assert!(!audio.set_low_latency(0));
+    }
+    #[test]
+    fn test_omarchy_expanded_themes_and_iso_installer() {
+        let mut engine = OmarchyModernDesktopEngine::new();
+        engine.current_theme = OmarchyTheme::RosePine;
+        assert_eq!(engine.current_theme.name(), "rose-pine");
+        assert_eq!(engine.current_theme.accent_color(), "#ebbcba");
+
+        let iso = OmarchyIsoInstallerEngine::default();
+        let manifest = iso.generate_archiso_bootstrap_manifest();
+        assert!(manifest.contains("OMARCHY_2026_LIVE"));
+        assert!(manifest.contains("/@factory-clean"));
+
+        let mut pwa = OmarchyAppLauncherEngine::default();
+        assert!(pwa.register_pwa_app("Linear"));
+        assert!(!pwa.register_pwa_app("Linear"));
     }
 }
