@@ -11,6 +11,7 @@ pub mod developer_platform;
 pub mod lift_engine;
 pub mod llm;
 pub mod local_llm;
+pub mod marktechpost_kdnuggets_data_science;
 pub mod next_gen;
 pub mod open_computer;
 pub mod openclaw;
@@ -25,7 +26,6 @@ pub mod system;
 pub mod tensor_memory;
 pub mod voice;
 pub mod wandr;
-pub mod agent_runtime; // Kernel-level agent runtime (SigmaOS > Omarchy)
 
 pub use agentic_os_runtime::{
     AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,
@@ -62,8 +62,8 @@ pub use developer_platform::{
     AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
     MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
 };
-pub use agent_runtime::{
-    SovereignAgentRuntime, AgentId, AgentCapability, AgentPriority, AgentState,
-    AgentProcess, AgentSandbox, AgentKernelBridge, CrashDump, AgentReport,
-    PluginSpec, Plugin, UserIntent, ConfigDiff, AgentError,
+
+pub use marktechpost_kdnuggets_data_science::{
+    InfoWorldEnterpriseAiDeploymentEngine, KdnuggetsAutoMlPipelineEngine,
+    MarkTechPostVectorIndexEngine, SovereignAiDataSciencePipelineSuite,
 };

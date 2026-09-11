@@ -101,3 +101,11 @@ pub mod sigma_workqueue;
 pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
 pub use missing_linux_kernel_components::*;
+
+pub mod linux_kernel_parity_synthesis;
+pub use linux_kernel_parity_synthesis::{
+    DamonRegionNode, DmTargetDevice, DmTargetType, FutexSize, FutexWaitvEntry,
+    LinuxDamonAccessMonitorEngine, LinuxDeviceMapperEngine, LinuxKernelFutex2WaitvEngine,
+    LinuxPressureStallInfoEngine, PsiResourceKind, PsiStallMetrics,
+    SovereignLinuxKernelParitySynthesisSuite,
+};

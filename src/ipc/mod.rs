@@ -54,9 +54,9 @@ pub use ipc_namespace::{
 pub mod dbus_sovereign;
 pub use dbus_sovereign::{SovereignDbusBus, DbusMessage, DbusMessageType, DbusValue, DbusMatchRule, DbusService, DbusName};
 
-pub mod stdout_enhancements;
-pub use stdout_enhancements::{
-    OutputFormat, SovereignStdoutMasterEngine, StdoutAnsiColorFormatter, StdoutBufferMode,
-    StdoutStreamBufferingGovernor, StdoutStructuredLogFormatter, StdoutZeroCopySplicePipeline,
-    TerminalColorMode,
+pub mod tech_media_std_streams_synthesis;
+pub use tech_media_std_streams_synthesis::{
+    AnsiStreamColorizerEngine, LogLevel, PqcEncryptedStreamMultiplexerEngine,
+    SovereignTechMediaStdStreamsSuite, StreamColorLevel, StructuredJsonLogStreamFormatter,
+    ZeroCopySpliceTeeStreamEngine,
 };
