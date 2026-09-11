@@ -22,6 +22,7 @@ pub mod sai;
 pub mod sigma_data;
 pub mod sigma_logic;
 pub mod system;
+pub mod usage_tracker;
 pub mod tensor_memory;
 pub mod voice;
 pub mod wandr;
@@ -61,6 +62,9 @@ pub use voice::{
 pub use developer_platform::{
     AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
     MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
+};
+pub use usage_tracker::{
+    AiUsageQuota, AiUsageRecord, AiUsageTrackerEngine, ModelInferenceType,
 };
 pub use agent_runtime::{
     SovereignAgentRuntime, AgentId, AgentCapability, AgentPriority, AgentState,

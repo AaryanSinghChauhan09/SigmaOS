@@ -47,6 +47,31 @@ pub mod launcher;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
 };
+pub use system::{
+    CreatedSnapshotRecord, RetentionPolicy, ScheduledSnapshotEngine, SnapshotFrequency, SnapshotJob,
+};
+pub use boot::{
+    BootSnapshotConfig, BootSnapshotEngine, BootSnapshotItem, BootSnapshotStatus,
+};
+pub use network::{
+    DeviceDiscoverySyncEngine, DeviceType as NetworkDeviceType, DiscoveredPeerDevice, DiscoveryProtocol,
+};
+pub use plugin::{
+    InstalledPluginRecord, MarketplaceCategory as PluginMarketplaceCategory, MarketplaceListing as PluginMarketplaceListing,
+    PluginManifest, PluginMarketplaceEngine, PluginSandboxedContext, SovereignPluginCapability, SovereignPluginFramework,
+};
+pub use desktop::{
+    AdvancedClipboardEngine, AdvancedNotificationEngine, AppScalingOverride, ClipboardCategory,
+    ClipboardContentType, ClipboardHistoryItem, DndConfig, NetworkConnectionStatus, NetworkConnectionType,
+    NetworkInterfaceStatus, NetworkPanelGuiEngine, NotificationCategory, NotificationItem, NotificationUrgency,
+    ScalingProfile, UnifiedTextScalingEngine, VpnProfile,
+};
+pub use ai::{
+    AiUsageQuota, AiUsageRecord, AiUsageTrackerEngine, ModelInferenceType,
+};
+pub use productivity::{
+    EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
+};
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,

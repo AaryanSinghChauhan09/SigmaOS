@@ -59,3 +59,10 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     rustc --test src/distro/arch_missing_components.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/arch_missing_test
     ./build/arch_missing_test
 fi
+
+if [ -f "tests/test_implementation_plan_standalone.rs" ]; then
+    echo "Running Implementation Plan (11 modules) standalone test suite..."
+    mkdir -p build
+    rustc --test tests/test_implementation_plan_standalone.rs --edition=2021 -o build/impl_plan_test
+    ./build/impl_plan_test
+fi

@@ -1,6 +1,7 @@
 // SigmaOS Boot Module
 // Firmware, PCI scanning, and early system initialization
 
+pub mod boot_snapshot;
 pub mod bridge_grid;
 pub mod firmware;
 pub mod firmware_bridge;
@@ -26,6 +27,9 @@ pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
 pub use sigma_boot::{
     BootEntry, BootManager, BootStageDescriptor, BootTheme, HandoffProtocol,
     SovereignDistroBootStageHandoff, SovereignFastBootServicePipeline,
+};
+pub use boot_snapshot::{
+    BootSnapshotConfig, BootSnapshotEngine, BootSnapshotItem, BootSnapshotStatus,
 };
 pub use uefi::{
     AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,
