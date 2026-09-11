@@ -1,8 +1,13 @@
 pub mod omarchy;
+pub mod omarchy_ultimate_gap_closure;
+pub mod omarchy_inspiration;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
 pub mod arch_gap_closure;
+pub mod arch_missing_components;
+pub mod arch_boxes;
+pub mod arch_ultimate_gap_closure;
 
 pub use arch_gap_closure::{
     AlaPackageSnapshot, ArchAuditScannerEngine, ArchInstallProfile, ArchInstallProfileEngine,
@@ -10,11 +15,41 @@ pub use arch_gap_closure::{
     ArchTestingRepo, ArchTestingRepositoryManager, VulnerabilitySeverity,
 };
 
+pub use arch_missing_components::{
+    ArchAlpmDbIntegrityEngine, ArchAurWebRpcClient, ArchMakepkgEngine, ArchNamcapLinterEngine,
+    ArchPkgbuild, AurPackageResult,
+};
+
+pub use arch_boxes::{
+    ArchBoxCatalogManager, ArchBoxFormat, ArchBoxImageRecord, ArchBoxesImageEngine,
+    ArchCloudInitProvisioner, CloudInitUserAccount,
+};
+
+pub use arch_ultimate_gap_closure::{
+    ArchAurPkgbuildSolverEngine, ArchMkinitcpioHooksEngine, ArchPacmanDatabaseSyncEngine,
+    ArchisoLiveImageBuilderEngine, AurSrcInfoMetadata, PacmanSyncPackageEntry,
+    SovereignArchUltimateGapClosureSuite,
+};
+
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
     OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
     WebAppSpec,
+};
+
+pub use omarchy_ultimate_gap_closure::{
+    HerdrAiAgentTask, OmarchyFactoryResetGuardianEngine, OmarchyHardwareQuattroAdapterEngine,
+    OmarchyHerdrAiOrchestratorEngine, OmarchyQuickshellBarEngine, QuickShellWidgetKind,
+    QuickShellWidgetSpec, SovereignOmarchyUltimateGapClosureSuite,
+};
+
+pub use omarchy_inspiration::{
+    AiAgentProvider, HerdrAgentTask, OmarchyDotfilesManagerEngine, OmarchyHerdrAiAgentManager,
+    OmarchyHyprlandAnimEngine, OmarchyKeybindingsStudioEngine, OmarchyLuaConfigEngine,
+    OmarchyPluginEntry, OmarchyPluginMarketplace, OmarchyQuickshellEngine,
+    OmarchyReleaseChannel, OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio,
+    OmarchyThemePalette, PreflightSnapshot, QuickshellWidget, ShellComponentKind,
 };
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_inspirations;

@@ -50,3 +50,8 @@ pub use sovereign_commands::{
 };
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
+
+pub mod omarchy_command_palette;
+pub use omarchy_command_palette::{
+    CommandActionType, CommandPaletteItem, OmarchyCommandPalette,
+};
