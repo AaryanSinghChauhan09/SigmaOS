@@ -5,7 +5,10 @@ use std::vec::Vec;
 // Purpose-built, highly interactive hierarchical visualization tool inspired by XMind, MindMeister, and NiceMind.
 // Exposes rich styling, relationship boundaries, task progress tracking, and layouts.
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 
 /// Mind Map layouts (Radial, OrgChart, LogicChart)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -159,6 +162,78 @@ impl MindMapCreator {
         }
     }
 
+    /// Parses an indented outline text (NiceMind, XMind, Markdown list format) into a MindMapCreator structure.
+    pub fn import_from_indented_text(map_title: &str, text: &str) -> Result<Self, &'static str> {
+        let lines: Vec<&str> = text
+            .lines()
+            .filter(|l| !l.trim().is_empty())
+            .collect();
+
+        if lines.is_empty() {
+            return Err("Input text is empty");
+        }
+
+        // Helper to parse line level and clean topic string
+        let parse_line = |line: &str| -> (usize, String) {
+            let mut indent_count = 0;
+            let mut chars = line.chars().peekable();
+            while let Some(&c) = chars.peek() {
+                if c == ' ' {
+                    indent_count += 1;
+                    chars.next();
+                } else if c == '\t' {
+                    indent_count += 4; // Treat tab as 4 spaces
+                    chars.next();
+                } else {
+                    break;
+                }
+            }
+
+            let mut trimmed = line.trim();
+            // Strip bullet points or list markers: "-", "*", "+", "1.", "2.", "#"
+            if trimmed.starts_with("- ") || trimmed.starts_with("* ") || trimmed.starts_with("+ ") {
+                trimmed = trimmed[2..].trim();
+            } else if trimmed.starts_with('#') {
+                trimmed = trimmed.trim_start_matches('#').trim();
+            } else if let Some(idx) = trimmed.find(". ") {
+                if trimmed[..idx].chars().all(|c| c.is_ascii_digit()) {
+                    trimmed = trimmed[idx + 2..].trim();
+                }
+            }
+
+            (indent_count, trimmed.to_string())
+        };
+
+        let (_, root_topic) = parse_line(lines[0]);
+        let mut map = MindMapCreator::new(map_title, if root_topic.is_empty() { map_title } else { &root_topic });
+
+        let mut node_counter = 1usize;
+        // Stack storing (indent_level, node_id)
+        let mut level_stack: Vec<(usize, String)> = Vec::new();
+        level_stack.push((0, map.root_node_id.clone()));
+
+        for line in &lines[1..] {
+            let (indent, topic) = parse_line(line);
+            if topic.is_empty() {
+                continue;
+            }
+
+            // Find parent node from level stack
+            while level_stack.len() > 1 && indent <= level_stack.last().unwrap().0 {
+                level_stack.pop();
+            }
+
+            let parent_id = level_stack.last().unwrap().1.clone();
+            let node_id = format!("node_{}", node_counter);
+            node_counter += 1;
+
+            map.add_node(&node_id, &parent_id, &topic)?;
+            level_stack.push((indent, node_id));
+        }
+
+        Ok(map)
+    }
+
     /// Appends a new sub-idea to a parent node
     pub fn add_node(
         &mut self,
@@ -240,8 +315,8 @@ impl MindMapCreator {
 
     fn delete_recursive_inner(&mut self, node_id: &str) {
         if let Some(node) = self.nodes.remove(node_id) {
-            for child_id in node.children_ids {
-                self.delete_recursive_inner(&child_id);
+            for child_id in &node.children_ids {
+                self.delete_recursive_inner(child_id);
             }
         }
         // Remove active cross-relationships involving the deleted node
@@ -311,7 +386,7 @@ impl MindMapCreator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
 
@@ -333,6 +408,29 @@ mod tests {
         // Verify root node child indices
         let root = map.nodes.get("root_node").unwrap();
         assert_eq!(root.children_ids.len(), 2);
+    }
+
+    #[test]
+    fn test_import_from_indented_text() {
+        let text = r#"
+SigmaOS Architecture
+    - Kernel Subsystems
+        - Scheduler
+        - Memory Allocator
+    - Userland Tools
+        - Package Manager (sigpkg)
+        - Mind Map Tool (SigmaMind)
+"#;
+        let map = MindMapCreator::import_from_indented_text("SigmaOS Overview", text).unwrap();
+        assert_eq!(map.map_title, "SigmaOS Overview");
+        let root = map.nodes.get(&map.root_node_id).unwrap();
+        assert_eq!(root.topic, "SigmaOS Architecture");
+        assert_eq!(root.children_ids.len(), 2);
+
+        let tree = map.export_to_text_tree();
+        assert!(tree.contains("SigmaOS Architecture"));
+        assert!(tree.contains("Scheduler"));
+        assert!(tree.contains("Package Manager (sigpkg)"));
     }
 
     #[test]

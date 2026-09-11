@@ -5658,5 +5658,10 @@ impl Default for FedoraRPMSeccompFilterEngine {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[cfg(test)]
+mod tests_fedora_mojikey {
+    use super::*;
 
 }
