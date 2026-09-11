@@ -15,3 +15,11 @@ pub use systemd_init::{
     RestartPolicy, SystemdBetsyEngine, SystemdCgroupSliceGovernor, SystemdEngine,
     SystemdServiceWatchdog, SystemdUnit, SystemdUnitFileParser, UnitID, UnitState, UnitType,
 };
+
+pub mod tech_media_daemons_synthesis;
+pub use tech_media_daemons_synthesis::{
+    ConnectedCompanionDevice, InferenceJobRequest, ItsfossAutoCleanerHousekeepingDaemon,
+    LinuxFoundationSecurityPolicyDaemon, LivePatchModule, MarktechpostLocalAiInferenceDaemon,
+    PhoronixThermalDynamicGovernorDaemon, PowerGovernorProfile,
+    SovereignTechMediaDaemonsSuite, WindowsCentralDeviceCompanionDaemon,
+};
