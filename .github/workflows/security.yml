@@ -36,7 +36,7 @@ jobs:
         run: cargo audit --json > audit-results.json 2>&1 || true
 
       - name: Upload audit results
-        uses: actions/upload-artifact@b4b15b8c7c6ac212293921041ab61e07598c8092 # v4.4.3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cargo-audit-results
@@ -59,7 +59,7 @@ jobs:
           grep -rn "unsafe " src/ --include="*.rs" | grep -v "// SAFETY" | head -50 >> unsafe-report.txt || true
           cat unsafe-report.txt
       - name: Upload unsafe report
-        uses: actions/upload-artifact@v4  # v4.5.0
+        uses: actions/upload-artifact@v4
         with:
           name: unsafe-code-report
           path: unsafe-report.txt
@@ -136,7 +136,7 @@ jobs:
           # Test input validation
           cargo +nightly test --all -- input_validation 2>&1 | tee -a security-test-results.txt
       - name: Upload test results
-        uses: actions/upload-artifact@v4  # v4.5.0
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-test-results
