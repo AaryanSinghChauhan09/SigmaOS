@@ -195,7 +195,7 @@ impl OmarchySystemEngine {
     /// Unified CLI dispatch for `sigomarchy`
     pub fn dispatch_cli_command(&mut self, args: &[&str]) -> String {
         if args.is_empty() {
-            return "sigomarchy - Omarchy Omakase Workstation CLI\nCommands: bootstrap, tdl <ai>, herdr, hypr-cfg, status".to_string();
+            return "sigomarchy - Omarchy Omakase Workstation CLI\nCommands: bootstrap, tdl <ai>, herdr, bar, herdr-run <prompt>, hypr-cfg, status".to_string();
         }
 
         match args[0] {
@@ -209,6 +209,15 @@ impl OmarchySystemEngine {
                 )
             }
             "herdr" => self.orchestrator.launch_herdr_agent_manager(),
+            "bar" => {
+                let bar = OmarchyQuickShellWindowBarEngine::new(1, "SigmaOS IDE - main.rs");
+                bar.render_qml_bar_spec()
+            }
+            "herdr-run" => {
+                let prompt = if args.len() > 1 { args[1] } else { "Optimize kernel scheduler" };
+                let mut agent = OmarchyHerdrAiWorkflowAgent::new("Sovereign-Coder-v1");
+                agent.execute_ai_task(prompt)
+            }
             "hypr-cfg" => self.config.generate_hyprland_config(),
             "status" => {
                 format!(
@@ -219,6 +228,53 @@ impl OmarchySystemEngine {
             }
             _ => format!("Unknown sigomarchy command: '{}'", args[0]),
         }
+    }
+}
+
+/// Omarchy QuickShell Hyprland Window & Tray Bar Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyQuickShellWindowBarEngine {
+    pub active_workspace_id: u32,
+    pub active_window_title: String,
+    pub is_bar_visible: bool,
+}
+
+impl OmarchyQuickShellWindowBarEngine {
+    pub fn new(workspace_id: u32, window_title: &str) -> Self {
+        Self {
+            active_workspace_id: workspace_id,
+            active_window_title: window_title.to_string(),
+            is_bar_visible: true,
+        }
+    }
+
+    pub fn render_qml_bar_spec(&self) -> String {
+        format!(
+            "QuickShellBar(Workspace={}, Window='{}', Tray=Active)",
+            self.active_workspace_id, self.active_window_title
+        )
+    }
+}
+
+/// Omarchy Herdr AI Workflow & Pair-Programming Agent
+#[derive(Debug, Clone)]
+pub struct OmarchyHerdrAiWorkflowAgent {
+    pub agent_id: String,
+    pub executed_tasks: Vec<String>,
+}
+
+impl OmarchyHerdrAiWorkflowAgent {
+    pub fn new(agent_id: &str) -> Self {
+        Self {
+            agent_id: agent_id.to_string(),
+            executed_tasks: Vec::new(),
+        }
+    }
+
+    pub fn execute_ai_task(&mut self, prompt: &str) -> String {
+        let task_desc = format!("Agent '{}' executed AI prompt: {}", self.agent_id, prompt);
+        self.executed_tasks.push(task_desc.clone());
+        task_desc
     }
 }
 
@@ -271,5 +327,24 @@ mod tests {
         let status_after = engine.dispatch_cli_command(&["status"]);
         assert!(status_after.contains("Bootstrapped=true"));
         assert!(status_after.contains("Active Layouts=1"));
+
+        let bar_msg = engine.dispatch_cli_command(&["bar"]);
+        assert!(bar_msg.contains("QuickShellBar"));
+
+        let herdr_run_msg = engine.dispatch_cli_command(&["herdr-run", "Refactor scheduler"]);
+        assert!(herdr_run_msg.contains("Refactor scheduler"));
+    }
+
+    #[test]
+    fn test_omarchy_quickshell_bar_and_herdr_agent() {
+        let bar = OmarchyQuickShellWindowBarEngine::new(2, "Neovim");
+        assert!(bar.render_qml_bar_spec().contains("Workspace=2"));
+        assert!(bar.render_qml_bar_spec().contains("Neovim"));
+
+        let mut agent = OmarchyHerdrAiWorkflowAgent::new("Agent-007");
+        let task_res = agent.execute_ai_task("Fix memory leak");
+        assert!(task_res.contains("Agent-007"));
+        assert!(task_res.contains("Fix memory leak"));
+        assert_eq!(agent.executed_tasks.len(), 1);
     }
 }
