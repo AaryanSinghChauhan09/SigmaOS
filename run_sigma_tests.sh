@@ -129,3 +129,10 @@ if [ -f "src/drivers/sovereign_driver_lifecycle.rs" ]; then
     rustc --test src/drivers/sovereign_driver_lifecycle.rs --edition=2021 -o build/driver_lifecycle_test
     ./build/driver_lifecycle_test
 fi
+
+if [ -f "src/klib/ring_buffer.rs" ]; then
+    echo "Running Lock-Free Ring Buffer & Zero-Copy IPC Benchmark test suite..."
+    mkdir -p build
+    rustc --test src/klib/ring_buffer.rs --edition=2021 -o build/ring_buffer_test
+    ./build/ring_buffer_test
+fi
