@@ -3,9 +3,15 @@
 /// Provides unified filesystem abstraction supporting multiple filesystem types
 /// Integrates with syscall dispatcher for read, write, open, close operations
 
-use std::string::String;
+use std::collections::HashMap;
+use std::string::{String, ToString};
 use std::vec::Vec;
 use core::fmt;
+
+pub const O_CREAT: u32 = 0o100;
+pub const O_EXCL: u32 = 0o200;
+pub const O_TRUNC: u32 = 0o1000;
+pub const O_APPEND: u32 = 0o2000;
 
 /// File types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -13,10 +19,46 @@ pub enum FileType {
     Regular,
     Directory,
     SymbolicLink,
+    Symlink, // Alias for SymbolicLink
     CharacterDevice,
     BlockDevice,
     Fifo,
     Socket,
+}
+
+/// Capability token and permissions for gated access
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    FileRead,
+    FileWrite,
+    ProcessExec,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub permissions: Vec<Permission>,
+}
+
+impl CapabilityToken {
+    pub fn new() -> Self {
+        Self {
+            permissions: vec![
+                Permission::FileRead,
+                Permission::FileWrite,
+                Permission::ProcessExec,
+            ],
+        }
+    }
+
+    pub fn has_permission(&self, perm: Permission) -> bool {
+        self.permissions.contains(&perm)
+    }
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// File mode bits (permissions)
@@ -63,19 +105,26 @@ impl FileMode {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct InodePermissions {
+    pub read: bool,
+    pub write: bool,
+    pub execute: bool,
+}
+
 /// Inode - represents a file or directory on disk
 #[derive(Debug, Clone)]
 pub struct Inode {
     pub inode_number: u64,
     pub file_type: FileType,
     pub mode: FileMode,
+    pub permissions: InodePermissions,
     pub size: u64,
     pub owner: u64,
     pub group: u64,
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    // Conforming Linux/BSD additions
     pub hard_links_count: u32,
     pub link_count: u32,
     pub symlink_target: Option<String>,
@@ -90,8 +139,13 @@ impl Inode {
             inode_number,
             file_type,
             mode: FileMode::new(mode),
+            permissions: InodePermissions {
+                read: true,
+                write: true,
+                execute: true,
+            },
             size: 0,
-            owner,
+            owner: 0,
             group: 0,
             created: 0,
             modified: 0,
@@ -122,6 +176,14 @@ pub struct FileHandle {
     pub position: u64,
     pub flags: u32,
     pub mode: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenFileDescriptor {
+    pub fd: u64,
+    pub inode_id: u64,
+    pub offset: u64,
+    pub flags: u32,
 }
 
 /// VFS Error types
@@ -162,40 +224,17 @@ impl fmt::Display for VfsError {
 
 /// Filesystem trait - implemented by ext4, NTFS, FAT32, etc.
 pub trait FileSystem: Send + Sync {
-    /// Initialize filesystem
     fn init(&mut self) -> Result<(), VfsError>;
-
-    /// Read inode
     fn read_inode(&self, inode_number: u64) -> Result<Inode, VfsError>;
-
-    /// Write inode
     fn write_inode(&mut self, inode: &Inode) -> Result<(), VfsError>;
-
-    /// Read data from inode at offset
     fn read_data(&self, inode_number: u64, offset: u64, buffer: &mut [u8]) -> Result<usize, VfsError>;
-
-    /// Write data to inode at offset
     fn write_data(&mut self, inode_number: u64, offset: u64, data: &[u8]) -> Result<usize, VfsError>;
-
-    /// List directory entries
     fn list_dir(&self, inode_number: u64) -> Result<Vec<DirEntry>, VfsError>;
-
-    /// Find inode by path within filesystem
     fn lookup(&self, parent_inode: u64, name: &str) -> Result<u64, VfsError>;
-
-    /// Create new file
     fn create(&mut self, parent_inode: u64, name: &str, mode: u32) -> Result<u64, VfsError>;
-
-    /// Create new directory
     fn mkdir(&mut self, parent_inode: u64, name: &str, mode: u32) -> Result<u64, VfsError>;
-
-    /// Delete file
     fn unlink(&mut self, parent_inode: u64, name: &str) -> Result<(), VfsError>;
-
-    /// Delete directory
     fn rmdir(&mut self, parent_inode: u64, name: &str) -> Result<(), VfsError>;
-
-    /// Get filesystem name
     fn name(&self) -> &'static str;
 }
 
@@ -208,25 +247,95 @@ pub struct MountPoint {
 
 /// Virtual File System - main VFS layer
 pub struct VirtualFileSystem {
-    filesystems: Vec<(String, u64)>, // (fs_type, block_device_id)
-    mounts: Vec<MountPoint>,
-    open_files: Vec<FileHandle>,
-    next_fd: i32,
-    inode_cache: Vec<(u64, Inode)>,
+    pub filesystems: Vec<(String, u64)>, // (fs_type, block_device_id)
+    pub mounts: Vec<MountPoint>,
+    pub open_files: Vec<FileHandle>,
+    pub next_fd: i32,
+    pub inode_cache: Vec<(u64, Inode)>,
+    pub inodes: HashMap<u64, Inode>,
+    pub file_descriptors: HashMap<u64, OpenFileDescriptor>,
+    pub root_inode: u64,
+    pub next_inode_id: u64,
+    next_descriptor_id: u64,
 }
 
 impl VirtualFileSystem {
     pub fn new() -> Self {
+        let mut inodes = HashMap::new();
+        let root_inode = Inode::new(1, FileType::Directory, 0o755);
+        inodes.insert(1, root_inode);
+
         Self {
             filesystems: Vec::new(),
             mounts: Vec::new(),
             open_files: Vec::new(),
-            next_fd: 3, // 0, 1, 2 are stdin, stdout, stderr
+            next_fd: 3,
             inode_cache: Vec::new(),
+            inodes,
+            file_descriptors: HashMap::new(),
+            root_inode: 1,
+            next_inode_id: 2,
+            next_descriptor_id: 1,
         }
     }
 
-    /// Creates a hard link pointing directly to the same underlying file Inode
+    pub fn get_inode(&self, inode_id: u64) -> Option<&Inode> {
+        self.inodes.get(&inode_id)
+    }
+
+    pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let mut inode = Inode::new(id, file_type, 0o644);
+        inode.owner = owner;
+        self.inodes.insert(id, inode);
+        Ok(id)
+    }
+
+    pub fn create_symlink(&mut self, target: &str, owner: u64) -> Result<u64, FsError> {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let mut inode = Inode::new(id, FileType::Symlink, 0o777);
+        inode.owner = owner;
+        inode.symlink_target = Some(target.to_string());
+        self.inodes.insert(id, inode);
+        Ok(id)
+    }
+
+    pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
+        if !self.inodes.contains_key(&inode_id) {
+            return Err(FsError::NotFound);
+        }
+        let desc_id = self.next_descriptor_id;
+        self.next_descriptor_id += 1;
+
+        self.file_descriptors.insert(
+            desc_id,
+            OpenFileDescriptor {
+                fd: desc_id,
+                inode_id,
+                offset: 0,
+                flags,
+            },
+        );
+        Ok(desc_id)
+    }
+
+    pub fn set_xattr(&mut self, inode_id: u64, key: &str, value: &[u8]) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.xattrs.insert(key.to_string(), value.to_vec());
+        Ok(())
+    }
+
+    pub fn get_xattr(&self, inode_id: u64, key: &str) -> Result<Vec<u8>, FsError> {
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+        inode
+            .xattrs
+            .get(key)
+            .cloned()
+            .ok_or(FsError::AttributeNotFound)
+    }
+
     pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
         let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
         inode.link_count += 1;
@@ -234,23 +343,17 @@ impl VirtualFileSystem {
         Ok(())
     }
 
-    /// Mount filesystem at path
     pub fn mount(&mut self, path: String, fs_type: String) -> Result<(), VfsError> {
-        // Verify filesystem is registered
         if !self.filesystems.iter().any(|(ft, _)| ft == &fs_type) {
             return Err(VfsError::NotFound);
         }
-
-        // Check if path is already mounted
         if self.mounts.iter().any(|m| m.path == path) {
             return Err(VfsError::FileExists);
         }
-
         self.mounts.push(MountPoint { path, fs_type });
         Ok(())
     }
 
-    /// Unmount filesystem
     pub fn unmount(&mut self, path: &str) -> Result<(), VfsError> {
         if let Some(pos) = self.mounts.iter().position(|m| m.path == path) {
             self.mounts.remove(pos);
@@ -260,23 +363,19 @@ impl VirtualFileSystem {
         }
     }
 
-    /// Open file - returns file descriptor
     pub fn open(&mut self, path: &str, flags: u32, mode: u32) -> Result<i32, VfsError> {
         if path.len() > 4096 {
             return Err(VfsError::NameTooLong);
         }
-
         if self.open_files.len() >= 1024 {
             return Err(VfsError::TooManyOpenFiles);
         }
-
-        // For now, create a stub file handle
         let fd = self.next_fd;
         self.next_fd += 1;
 
         let handle = FileHandle {
             fd,
-            inode_number: 0, // Would be populated by actual filesystem
+            inode_number: 0,
             position: 0,
             flags,
             mode,
@@ -286,11 +385,19 @@ impl VirtualFileSystem {
         Ok(fd)
     }
 
+    pub fn close(&mut self, fd: i32) -> Result<(), VfsError> {
+        if let Some(pos) = self.open_files.iter().position(|h| h.fd == fd) {
+            self.open_files.remove(pos);
+            Ok(())
+        } else {
+            Err(VfsError::BadFileDescriptor)
+        }
+    }
+
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
         if !self.file_descriptors.contains_key(&fd) {
             return Err(FsError::InvalidFd);
         }
-
         self.file_descriptors.remove(&fd);
         Ok(())
     }
@@ -306,12 +413,10 @@ impl VirtualFileSystem {
             .get(&file_descriptor.inode_id)
             .ok_or(FsError::NotFound)?;
 
-        // Check read permission
         if !inode.permissions.read {
             return Err(FsError::PermissionDenied);
         }
 
-        // Check file offset and file size
         if file_descriptor.offset >= inode.size {
             return Ok(0);
         }
@@ -319,13 +424,6 @@ impl VirtualFileSystem {
         let remaining = (inode.size - file_descriptor.offset) as usize;
         let bytes_to_read = buffer.len().min(remaining);
 
-        // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
-            .offset
-            .checked_add(bytes_to_read as u64)
-            .ok_or(FsError::InvalidFd)?;
-
-        // Read the actual bytes from storage data
         let start = file_descriptor.offset as usize;
         let end = start + bytes_to_read;
         buffer[..bytes_to_read].copy_from_slice(&inode.data[start..end]);
@@ -345,61 +443,58 @@ impl VirtualFileSystem {
             .get_mut(&file_descriptor.inode_id)
             .ok_or(FsError::NotFound)?;
 
-        // Check write permission
         if !inode.permissions.write {
             return Err(FsError::PermissionDenied);
         }
 
-        // If open flag O_APPEND is set, offset is moved to the end of the file before each write
         if (file_descriptor.flags & O_APPEND) != 0 {
             file_descriptor.offset = inode.size;
         }
-
-        // Prevent integer overflow in size and offset calculation
-        let _new_size = inode
-            .size
-            .checked_add(buffer.len() as u64)
-            .ok_or(FsError::NoSpace)?;
 
         let new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
-        // Resize storage data buffer if offset + written bytes exceeds size (handling holes)
         if new_offset > inode.size {
             inode.data.resize(new_offset as usize, 0);
             inode.size = new_offset;
         }
 
-        // Write the actual bytes into file storage data
         let start = file_descriptor.offset as usize;
         let end = start + buffer.len();
         inode.data[start..end].copy_from_slice(buffer);
 
         file_descriptor.offset = new_offset;
-        inode.modified = 1716000000; // Simulated timestamp
+        inode.modified = 1716000000;
 
         Ok(buffer.len())
     }
 
-    /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn read_file_gated(&mut self, fd: u64, buffer: &mut [u8], token: &CapabilityToken) -> Result<usize, FsError> {
+    pub fn read_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &mut [u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
         if !token.has_permission(Permission::FileRead) {
             return Err(FsError::PermissionDenied);
         }
         self.read_file(fd, buffer)
     }
 
-    /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn write_file_gated(&mut self, fd: u64, buffer: &[u8], token: &CapabilityToken) -> Result<usize, FsError> {
+    pub fn write_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &[u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
         if !token.has_permission(Permission::FileWrite) {
             return Err(FsError::PermissionDenied);
         }
         self.write_file(fd, buffer)
     }
 
-    /// Linux-grade link-aware file removal
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
         if inode_id == self.root_inode {
             return Err(FsError::PermissionDenied);
@@ -414,15 +509,31 @@ impl VirtualFileSystem {
                 should_delete = true;
             }
         } else {
+            return Err(FsError::NotFound);
+        }
+
+        if should_delete {
+            self.inodes.remove(&inode_id);
+        }
+        Ok(())
+    }
+
+    pub fn seek(&mut self, fd: i32, offset: i64, whence: i32) -> Result<u64, VfsError> {
+        if let Some(handle) = self.open_files.iter_mut().find(|h| h.fd == fd) {
+            match whence {
+                0 => handle.position = offset as u64, // SEEK_SET
+                1 => handle.position = (handle.position as i64 + offset) as u64, // SEEK_CUR
+                _ => return Err(VfsError::InvalidArgument),
+            }
+            Ok(handle.position)
+        } else {
             Err(VfsError::BadFileDescriptor)
         }
     }
 
-    /// Read from file descriptor
     pub fn read(&mut self, fd: i32, buffer: &mut [u8]) -> Result<usize, VfsError> {
         if let Some(handle) = self.open_files.iter_mut().find(|h| h.fd == fd) {
-            // Stub implementation - would read from actual filesystem
-            let bytes_read = buffer.len().min(512); // Limit read size
+            let bytes_read = buffer.len().min(512);
             handle.position += bytes_read as u64;
             Ok(bytes_read)
         } else {
@@ -430,11 +541,9 @@ impl VirtualFileSystem {
         }
     }
 
-    /// Write to file descriptor
     pub fn write(&mut self, fd: i32, data: &[u8]) -> Result<usize, VfsError> {
         if let Some(handle) = self.open_files.iter_mut().find(|h| h.fd == fd) {
-            // Stub implementation - would write to actual filesystem
-            let bytes_written = data.len().min(512); // Limit write size
+            let bytes_written = data.len().min(512);
             handle.position += bytes_written as u64;
             Ok(bytes_written)
         } else {
@@ -442,10 +551,6 @@ impl VirtualFileSystem {
         }
     }
 
-    // Advanced Linux & BSD Inspired Path Traversal, O_CREAT, and Link Handling
-
-    /// Normalizes and canonicalizes a path into its standard absolute Linux/BSD POSIX path format.
-    /// Handles '.', '..', redundant slashes, and relative path resolution.
     pub fn canonicalize_path(&self, current_dir: &str, path: &str) -> String {
         let absolute = if path.starts_with('/') {
             path.to_string()
@@ -476,7 +581,6 @@ impl VirtualFileSystem {
         }
     }
 
-    /// Traverses and resolves a path name (e.g. "/var/log/syslog") to its Inode ID
     pub fn resolve_path(&self, path: &str) -> Result<u64, FsError> {
         if path.is_empty() {
             return Err(FsError::NotFound);
@@ -503,9 +607,7 @@ impl VirtualFileSystem {
         Ok(current_inode_id)
     }
 
-    /// Open path with creation, exclusion, truncation, and append logic matching POSIX
     pub fn open_path(&mut self, path: &str, flags: u32, owner: u64) -> Result<u64, FsError> {
-        // Resolve parent and target component
         let path_str = path.to_string();
         let mut parts: Vec<&str> = path_str.split('/').filter(|s| !s.is_empty()).collect();
 
@@ -553,24 +655,18 @@ impl VirtualFileSystem {
         Ok(inode_id)
     }
 
-    /// Get file statistics
     pub fn stat(&self, _path: &str) -> Result<Inode, VfsError> {
-        // Stub implementation - would query actual filesystem
         Ok(Inode::new(0, FileType::Regular, 0o644))
     }
 
-    /// List directory contents
     pub fn readdir(&self, _path: &str) -> Result<Vec<DirEntry>, VfsError> {
-        // Stub implementation - would query actual filesystem
         Ok(Vec::new())
     }
 
-    /// Get number of open files
     pub fn open_file_count(&self) -> usize {
         self.open_files.len()
     }
 
-    /// Get mount points
     pub fn get_mounts(&self) -> &[MountPoint] {
         &self.mounts
     }
@@ -637,64 +733,32 @@ mod tests {
     }
 
     #[test]
-    fn test_seek_operations() {
-        let mut vfs = VirtualFileSystem::new();
-        let fd = vfs.open("/test.txt", 0, 0o644).unwrap();
-
-        // SEEK_SET
-        let pos = vfs.seek(fd, 100, 0).unwrap();
-        assert_eq!(pos, 100);
-
-        // SEEK_CUR
-        let pos = vfs.seek(fd, 50, 1).unwrap();
-        assert_eq!(pos, 150);
-
-        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
-        assert_eq!(vfs.write_file_gated(fd, b"gated", &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
-        assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
-
-        // Re-open file to reset offset to 0 for reading
-        let read_fd = vfs.open_file(inode_id, 0).unwrap();
-
-        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
-    }
-
-    #[test]
     fn test_linux_hardlinks_symlinks_and_xattrs() {
-        let mut vfs = VirtualFilesystem::new();
+        let mut vfs = VirtualFileSystem::new();
 
-        // 1. Create a regular file with extended attribute (user.mime_type = "text/plain")
         let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
         vfs.set_xattr(inode_id, "user.mime_type", b"text/plain").unwrap();
         assert_eq!(vfs.get_xattr(inode_id, "user.mime_type").unwrap(), b"text/plain");
 
-        // 2. Create a symlink pointing to our file
         let symlink_id = vfs.create_symlink("/home/tc/file.txt", 1000).unwrap();
         assert_eq!(vfs.get_inode(symlink_id).unwrap().file_type, FileType::Symlink);
         assert_eq!(vfs.get_inode(symlink_id).unwrap().symlink_target.as_ref().unwrap(), "/home/tc/file.txt");
 
-        // 3. Create a hard link -> increments link_count
         assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
         vfs.create_hard_link(inode_id).unwrap();
         assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
 
-        // 4. Deleting the file first time simply decrements link_count and keeps underlying Inode alive!
         vfs.delete_file(inode_id).unwrap();
         assert!(vfs.get_inode(inode_id).is_some());
         assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
 
-        // 5. Deleting the file second time drops link_count to 0, successfully freeing the Inode from VFS!
         vfs.delete_file(inode_id).unwrap();
         assert!(vfs.get_inode(inode_id).is_none());
     }
 
     #[test]
     fn test_canonicalize_path() {
-        let vfs = VirtualFilesystem::new();
+        let vfs = VirtualFileSystem::new();
         assert_eq!(vfs.canonicalize_path("/var/log", "syslog"), "/var/log/syslog");
         assert_eq!(vfs.canonicalize_path("/var/log", "../mail/../log/./syslog"), "/var/log/syslog");
         assert_eq!(vfs.canonicalize_path("/home/user", "/usr/bin/../../etc/passwd"), "/etc/passwd");

@@ -470,10 +470,23 @@ impl CustomPackageHook {
     where
         F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
     {
+        #[cfg(any(feature = "standalone_test", test))]
+        let trait_obj: std::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync> = std::sync::Arc::new(handler);
+
+        #[cfg(not(any(feature = "standalone_test", test)))]
+        let trait_obj: crate::klib::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync> = {
+            let boxed: Box<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync> = Box::new(handler);
+            let ptr = Box::into_raw(boxed);
+            let inner_ptr = ptr as *mut crate::klib::arc::ArcInner<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>;
+            crate::klib::Arc {
+                ptr: core::ptr::NonNull::new(inner_ptr).expect("null"),
+            }
+        };
+
         Self {
             name: name.to_string(),
             timing,
-            handler: Arc::new(handler),
+            handler: trait_obj,
         }
     }
 }

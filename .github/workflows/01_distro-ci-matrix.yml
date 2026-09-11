@@ -24,8 +24,8 @@ jobs:
             version: latest
             container: alpine:latest
             package-manager: apk
-            install-deps: "apk add --no-cache build-base rust cargo git"
-            build-cmd: "cargo build --release"
+            install-deps: "apk add --no-cache build-base rust cargo git bash"
+            build-cmd: "rm -f Cargo.lock && cargo build --release"
             test-cmd: "cargo test --release"
 
           # Arch Linux
@@ -34,7 +34,7 @@ jobs:
             container: archlinux:latest
             package-manager: pacman
             install-deps: "pacman -Sy --noconfirm base-devel rust git"
-            build-cmd: "cargo build --release"
+            build-cmd: "rm -f Cargo.lock && cargo build --release"
             test-cmd: "cargo test --release"
 
           # Debian Stable
@@ -43,7 +43,7 @@ jobs:
             container: debian:bookworm
             package-manager: apt
             install-deps: "apt-get update && apt-get install -y build-essential rustc cargo git"
-            build-cmd: "cargo build --release"
+            build-cmd: "rm -f Cargo.lock && cargo build --release"
             test-cmd: "cargo test --release"
 
           # Fedora
@@ -52,7 +52,7 @@ jobs:
             container: fedora:latest
             package-manager: dnf
             install-deps: "dnf install -y gcc rust cargo git"
-            build-cmd: "cargo build --release"
+            build-cmd: "rm -f Cargo.lock && cargo build --release"
             test-cmd: "cargo test --release"
 
           # Ubuntu LTS
@@ -61,7 +61,7 @@ jobs:
             container: ubuntu:jammy
             package-manager: apt
             install-deps: "apt-get update && apt-get install -y build-essential rustc cargo git"
-            build-cmd: "cargo build --release"
+            build-cmd: "rm -f Cargo.lock && cargo build --release"
             test-cmd: "cargo test --release"
 
           # openSUSE
@@ -70,7 +70,7 @@ jobs:
             container: opensuse/leap:latest
             package-manager: zypper
             install-deps: "zypper install -y gcc rust cargo git"
-            build-cmd: "cargo build --release"
+            build-cmd: "rm -f Cargo.lock && cargo build --release"
             test-cmd: "cargo test --release"
 
           # Gentoo
@@ -79,7 +79,7 @@ jobs:
             container: gentoo/stage3:latest
             package-manager: emerge
             install-deps: "emerge --sync && emerge sys-devel/gcc dev-lang/rust dev-vcs/git"
-            build-cmd: "cargo build --release"
+            build-cmd: "rm -f Cargo.lock && cargo build --release"
             test-cmd: "cargo test --release"
 
           # Void Linux
@@ -87,8 +87,8 @@ jobs:
             version: latest
             container: voidlinux/voidlinux:latest
             package-manager: xbps
-            install-deps: "xbps-install -Sy base-devel rust cargo git"
-            build-cmd: "cargo build --release"
+            install-deps: "xbps-install -Sy base-devel rust cargo git libstdc++"
+            build-cmd: "rm -f Cargo.lock && cargo build --release"
             test-cmd: "cargo test --release"
 
           # NixOS
@@ -108,17 +108,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies (${{ matrix.distro }})
-        shell: bash
+        shell: sh
         run: |
           ${{ matrix.install-deps }}
 
       - name: Build (${{ matrix.distro }})
-        shell: bash
+        shell: sh
         run: |
           ${{ matrix.build-cmd }}
 
       - name: Test (${{ matrix.distro }})
-        shell: bash
+        shell: sh
         run: |
           ${{ matrix.test-cmd }}
 
