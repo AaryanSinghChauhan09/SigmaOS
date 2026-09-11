@@ -4103,7 +4103,193 @@ impl Default for FedoraSystemRolesEngine {
     }
 }
 
-#[cfg(test_disabled)]
+// ============================================================================
+// Fedora Parity Engines: MojiKey, Pagu, Fedocal, Nuancier, IRCOT, Elections
+// ============================================================================
+
+/// Fedora MojiKey Emoji & Character HUD Engine
+#[derive(Debug, Clone)]
+pub struct CharacterEntry {
+    pub glyph: String,
+    pub name: String,
+    pub category: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FedoraMojiKeyEngine {
+    pub characters: Vec<CharacterEntry>,
+}
+
+impl FedoraMojiKeyEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { characters: Vec::new() };
+        engine.characters.push(CharacterEntry { glyph: "🚀".to_string(), name: "rocket".to_string(), category: "symbols".to_string() });
+        engine.characters.push(CharacterEntry { glyph: "🐧".to_string(), name: "penguin".to_string(), category: "animals".to_string() });
+        engine.characters.push(CharacterEntry { glyph: "🎩".to_string(), name: "fedora hat".to_string(), category: "clothing".to_string() });
+        engine
+    }
+
+    pub fn search(&self, query: &str) -> Vec<&CharacterEntry> {
+        let q = query.to_lowercase();
+        self.characters.iter().filter(|c| c.name.to_lowercase().contains(&q) || c.category.to_lowercase().contains(&q)).collect()
+    }
+}
+
+/// Fedora Pagu Account Services & User Auth Engine
+#[derive(Debug, Clone)]
+pub struct PaguAccount {
+    pub username: String,
+    pub email: String,
+    pub fas_groups: Vec<String>,
+    pub is_active: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FedoraPaguEngine {
+    pub accounts: Vec<PaguAccount>,
+}
+
+impl FedoraPaguEngine {
+    pub fn new() -> Self {
+        Self { accounts: Vec::new() }
+    }
+
+    pub fn provision_account(&mut self, username: &str, email: &str, groups: &[&str]) {
+        self.accounts.push(PaguAccount {
+            username: username.to_string(),
+            email: email.to_string(),
+            fas_groups: groups.iter().map(|g| g.to_string()).collect(),
+            is_active: true,
+        });
+    }
+
+    pub fn generate_oauth2_token(&self, username: &str) -> Option<String> {
+        self.accounts.iter().find(|a| a.username == username && a.is_active).map(|a| format!("pagu-oauth2-token-{}", a.username))
+    }
+}
+
+/// Fedora Fedocal Meeting & Event Calendar Engine
+#[derive(Debug, Clone)]
+pub struct FedocalMeeting {
+    pub id: usize,
+    pub title: String,
+    pub room: String,
+    pub organizer: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FedoraFedocalEngine {
+    pub meetings: Vec<FedocalMeeting>,
+    pub next_id: usize,
+}
+
+impl FedoraFedocalEngine {
+    pub fn new() -> Self {
+        Self { meetings: Vec::new(), next_id: 1 }
+    }
+
+    pub fn schedule_meeting(&mut self, title: &str, room: &str, organizer: &str) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.meetings.push(FedocalMeeting { id, title: title.to_string(), room: room.to_string(), organizer: organizer.to_string() });
+        id
+    }
+}
+
+/// Fedora Nuancier Wallpaper Voting & Selection Engine
+#[derive(Debug, Clone)]
+pub struct WallpaperSubmission {
+    pub id: usize,
+    pub title: String,
+    pub author: String,
+    pub votes: usize,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FedoraNuancierEngine {
+    pub submissions: Vec<WallpaperSubmission>,
+    pub next_id: usize,
+}
+
+impl FedoraNuancierEngine {
+    pub fn new() -> Self {
+        Self { submissions: Vec::new(), next_id: 1 }
+    }
+
+    pub fn submit_wallpaper(&mut self, title: &str, author: &str) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.submissions.push(WallpaperSubmission { id, title: title.to_string(), author: author.to_string(), votes: 0 });
+        id
+    }
+
+    pub fn vote(&mut self, submission_id: usize) -> bool {
+        if let Some(sub) = self.submissions.iter_mut().find(|s| s.id == submission_id) {
+            sub.votes += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// Fedora IRCOT IRC Bot & Community Chat Notifications Engine
+#[derive(Debug, Clone)]
+pub struct IrcChannel {
+    pub channel_name: String,
+    pub topic: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FedoraIrcotEngine {
+    pub channels: Vec<IrcChannel>,
+}
+
+impl FedoraIrcotEngine {
+    pub fn new() -> Self {
+        Self { channels: Vec::new() }
+    }
+
+    pub fn join_channel(&mut self, name: &str, topic: &str) {
+        self.channels.push(IrcChannel { channel_name: name.to_string(), topic: topic.to_string() });
+    }
+
+    pub fn broadcast_message(&self, message: &str) -> usize {
+        self.channels.len()
+    }
+}
+
+/// Fedora Elections & Board Voting Audit Engine
+#[derive(Debug, Clone)]
+pub struct ElectionCandidate {
+    pub username: String,
+    pub votes: usize,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FedoraElectionsEngine {
+    pub candidates: Vec<ElectionCandidate>,
+}
+
+impl FedoraElectionsEngine {
+    pub fn new() -> Self {
+        Self { candidates: Vec::new() }
+    }
+
+    pub fn nominate_candidate(&mut self, username: &str) {
+        self.candidates.push(ElectionCandidate { username: username.to_string(), votes: 0 });
+    }
+
+    pub fn cast_ballot(&mut self, username: &str) -> bool {
+        if let Some(cand) = self.candidates.iter_mut().find(|c| c.username == username) {
+            cand.votes += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
 mod tests {
     use super::*;
 
@@ -4440,5 +4626,41 @@ mod tests {
         roles.apply_firewall_role(&[80, 443, 8080]);
         assert_eq!(roles.applied_roles.len(), 2);
         assert_eq!(roles.configured_firewall_ports.len(), 3);
+    }
+
+    #[test]
+    fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {
+        // 1. MojiKey
+        let moji = FedoraMojiKeyEngine::new();
+        let res = moji.search("fedora");
+        assert_eq!(res.len(), 1);
+        assert_eq!(res[0].glyph, "🎩");
+
+        // 2. Pagu
+        let mut pagu = FedoraPaguEngine::new();
+        pagu.provision_account("jules_dev", "jules@fedora.org", &["packagers", "sysadmin"]);
+        assert_eq!(pagu.generate_oauth2_token("jules_dev"), Some("pagu-oauth2-token-jules_dev".to_string()));
+
+        // 3. Fedocal
+        let mut cal = FedoraFedocalEngine::new();
+        let m_id = cal.schedule_meeting("Kernel Release Party", "#fedora-meeting", "jules_dev");
+        assert_eq!(m_id, 1);
+
+        // 4. Nuancier
+        let mut nuancier = FedoraNuancierEngine::new();
+        let w_id = nuancier.submit_wallpaper("Blue Nebula", "artist_guy");
+        assert!(nuancier.vote(w_id));
+        assert_eq!(nuancier.submissions[0].votes, 1);
+
+        // 5. IRCOT
+        let mut ircot = FedoraIrcotEngine::new();
+        ircot.join_channel("#fedora-devel", "Fedora Devel Channel");
+        assert_eq!(ircot.broadcast_message("Release v40 published!"), 1);
+
+        // 6. Elections
+        let mut elections = FedoraElectionsEngine::new();
+        elections.nominate_candidate("alice");
+        assert!(elections.cast_ballot("alice"));
+        assert_eq!(elections.candidates[0].votes, 1);
     }
 }
