@@ -438,6 +438,8 @@ pub use community::toolkit::{
 };
 
 pub use tools::{
+    DolphinDualPaneSplitGovernor, NnnFastTraversalGovernor, RangerSixelImagePreviewEngine,
+    ThunarBulkRenamerRegexEngine, YaziLuaPluginEngine,
     AccessibilityFeature as LibAccessibilityFeature, AndroidPrivateSpaceEngine,
     AndroidScrcpyMirrorEngine, AwakeMode, ClusterNode as LibClusterNode, FancyZoneLayoutMode,
     KdProgressTracker, LocksmithProcess, MacOsAirDropEngine, MacOsSpotlightEngine,

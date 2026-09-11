@@ -1,5 +1,6 @@
 // SigmaOS Tools Module - Real implementations of system utilities
 pub mod system_monitor;
+pub mod file_manager;
 
 pub mod data_tools;
 pub mod display_manager;
@@ -14,6 +15,11 @@ pub mod mint_locale_manager;
 pub mod mint_welcome;
 pub mod mint_system_report;
 pub mod omarchy_command_palette;
+
+pub use file_manager::{
+    DolphinDualPaneSplitGovernor, NnnFastTraversalGovernor, RangerSixelImagePreviewEngine,
+    ThunarBulkRenamerRegexEngine, YaziLuaPluginEngine,
+};
 
 pub use open_source_tools_parity::{
     BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, DufDiskFreeInfoEngine,

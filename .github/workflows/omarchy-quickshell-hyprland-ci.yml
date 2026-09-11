@@ -1,0 +1,38 @@
+name: Omarchy Hyprland Quickshell Desktop CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'src/distro/omarchy.rs'
+      - 'src/distro/omarchy_inspiration.rs'
+      - 'src/desktop/**'
+      - '.github/workflows/omarchy-quickshell-hyprland-ci.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'src/distro/omarchy.rs'
+      - 'src/distro/omarchy_inspiration.rs'
+      - 'src/desktop/**'
+
+permissions:
+  contents: read
+
+jobs:
+  omarchy-desktop-test:
+    name: Verify Omarchy Hyprland, Quickshell & Theme Engine
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test Omarchy Subsystem
+        run: |
+          mkdir -p build
+          rustc --test --edition=2021 src/distro/omarchy.rs -o build/test_omarchy
+          ./build/test_omarchy
+          rustc --test --edition=2021 src/distro/omarchy_inspiration.rs -o build/test_omarchy_inspiration
+          ./build/test_omarchy_inspiration

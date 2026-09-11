@@ -1,0 +1,51 @@
+name: GitHub Pages Documentation & Wiki Sync
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'docs/**'
+      - 'wiki/**'
+      - 'scripts/sync_wiki.sh'
+      - '.github/workflows/github-pages-wiki-deploy.yml'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  wiki-sync-and-deploy:
+    name: Sync Documentation Wiki and Deploy GitHub Pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Sync Markdown Documentation Wiki
+        run: |
+          chmod +x ./scripts/sync_wiki.sh
+          ./scripts/sync_wiki.sh
+
+      - name: Build Pages Artifact
+        run: |
+          mkdir -p _site
+          cp -r docs/* _site/ || true
+          cp -r wiki/* _site/ || true
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: wiki-sync-and-deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
