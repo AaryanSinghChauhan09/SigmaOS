@@ -10,11 +10,8 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-<<<<<<< HEAD
 use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-=======
->>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 use alloc::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
@@ -24,11 +21,8 @@ use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-<<<<<<< HEAD
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-=======
->>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
 use std::vec::Vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
@@ -78,6 +72,10 @@ pub enum DistroSubsystemMode {
     LinuxTails,
     LinuxGuix,
     LinuxParrot,
+    LinuxKali,
+    LinuxAntiX,
+    LinuxZorin,
+    LinuxMint,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -130,15 +128,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
-<<<<<<< HEAD
-=======
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::LinuxMint
-<<<<<<< HEAD
->>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
-=======
->>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -146,21 +138,18 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
 
-<<<<<<< HEAD
             DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
                 ServiceSupervisorType::Runit
             }
-=======
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxVoid => ServiceSupervisorType::Runit,
->>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 ServiceSupervisorType::Shepherd
             }
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
@@ -240,15 +229,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
-<<<<<<< HEAD
-=======
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::LinuxMint
-<<<<<<< HEAD
->>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
-=======
->>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -257,27 +240,21 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
-<<<<<<< HEAD
             DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
                 supervisor == ServiceSupervisorType::Runit
             }
-=======
             DistroSubsystemMode::LinuxAlpine
             | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
->>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 supervisor == ServiceSupervisorType::Shepherd
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-<<<<<<< HEAD
-            DistroSubsystemMode::LinuxSlackware => {
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
-=======
             DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Sysvinit,
->>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
         };
@@ -290,15 +267,12 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-<<<<<<< HEAD
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
-=======
+            | DistroSubsystemMode::LinuxParrot | DistroSubsystemMode::LinuxKali | DistroSubsystemMode::LinuxAntiX | DistroSubsystemMode::LinuxZorin | DistroSubsystemMode::LinuxMint => format!("{}.deb", input_pkg),
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::LinuxMint => format!("{}.deb", input_pkg),
->>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -339,15 +313,12 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-<<<<<<< HEAD
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
-=======
+            | DistroSubsystemMode::LinuxParrot | DistroSubsystemMode::LinuxKali | DistroSubsystemMode::LinuxAntiX | DistroSubsystemMode::LinuxZorin | DistroSubsystemMode::LinuxMint => format!("{}.deb", action),
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::LinuxMint => format!("{}.deb", action),
->>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
@@ -421,8 +392,6 @@ impl SovereignUniversalDistroBridge {
         action: &str,
     ) -> Result<String, &'static str> {
         match target_subsystem {
-<<<<<<< HEAD
-=======
             "access" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'access' with action '{}' under distro mode '{:?}'",
@@ -769,7 +738,6 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
->>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
             "init" => {
                 let supervisor = self.get_supervisor_type();
                 Ok(format!(
@@ -784,8 +752,6 @@ impl SovereignUniversalDistroBridge {
                     pkg_format, self.mode
                 ))
             }
-<<<<<<< HEAD
-=======
             "performance" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'performance' with action '{}' under distro mode '{:?}'",
@@ -1090,7 +1056,6 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
->>>>>>> origin/docs/ai-agent-algorithm-diagnostics-guide-5559564966027540966
             "vfs" => {
                 let translated_path = self.translate_vfs_path(action);
                 Ok(format!(
@@ -1147,7 +1112,6 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
-<<<<<<< HEAD
             "storage" => {
                 let healed = self
                     .verify_and_self_heal_cow_file("@root", action, b"default")
@@ -1250,8 +1214,6 @@ impl SovereignUniversalDistroBridge {
                     action, chroot_engine.is_active, self.mode
                 ))
             }
-<<<<<<< HEAD
-=======
             "virtualization" | "virt" => {
                 Ok(format!(
                     "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
@@ -1347,7 +1309,6 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
->>>>>>> origin/feat/universal-sigpkg-distro-improvements-12695762014901353453
             "time" => {
                 Ok(format!(
                     "Dispatched Chrony/NTP clock synchronization for target '{}' under distro mode '{:?}'",
@@ -1456,11 +1417,7 @@ impl SovereignUniversalDistroBridge {
                 ))
             }
             _ => Ok(format!(
-                "Dispatched subsystem '{}' action '{}' under distro mode '{:?}'",
-=======
-            _ => Ok(format!(
                 "Dispatched operation for subsystem '{}' with action '{}' under distro mode '{:?}'",
->>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
                 target_subsystem, action, self.mode
             )),
             "ai" => {
@@ -2804,14 +2761,11 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
-<<<<<<< HEAD
-=======
             DistroSubsystemMode::LinuxParrot,
             DistroSubsystemMode::LinuxKali,
             DistroSubsystemMode::LinuxAntiX,
             DistroSubsystemMode::LinuxZorin,
             DistroSubsystemMode::LinuxMint,
->>>>>>> origin/feat/open-source-project-gap-closure-11158141485598076103
         ];
 
         for m in modes {
@@ -3555,8 +3509,6 @@ impl Default for OpenBsdRetguardEngine {
 }
 
 // ==========================================
-<<<<<<< HEAD
-=======
 // GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
 // ==========================================
 
@@ -3708,7 +3660,6 @@ impl Default for ShepherdServiceManager {
 }
 
 // ==========================================
->>>>>>> origin/jules-11419381740832472292-50948cbf
 // 11. LINUX KFIFO-INSPIRED SPSC LOCK-FREE RING BUFFER (SovereignRingBuffer)
 // ==========================================
 
@@ -7538,84 +7489,6 @@ impl SovereignCrossDistroContainerManager {
     }
 }
 
-<<<<<<< HEAD
-pub struct ShepherdServiceManager {
-    pub services: Vec<ShepherdService>,
-}
-
-impl ShepherdServiceManager {
-    pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-        }
-    }
-
-    pub fn register_service(
-        &mut self,
-        name: &str,
-        provision: &[&str],
-        requirement: &[&str],
-        respawn: bool,
-    ) {
-        self.services.push(ShepherdService {
-            name: name.to_string(),
-            provision: provision.iter().map(|s| s.to_string()).collect(),
-            requirement: requirement.iter().map(|s| s.to_string()).collect(),
-            running: false,
-            respawn,
-        });
-    }
-
-    pub fn is_provisioned(&self, symbol: &str) -> bool {
-        self.services
-            .iter()
-            .any(|s| s.running && s.provision.iter().any(|p| p == symbol))
-    }
-
-    pub fn start_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let svc_idx = self
-            .services
-            .iter()
-            .position(|s| s.name == name)
-            .ok_or("Service not found in Shepherd graph")?;
-
-        let reqs = self.services[svc_idx].requirement.clone();
-
-        for req in reqs {
-            if !self.is_provisioned(&req) {
-                let provider_name = self
-                    .services
-                    .iter()
-                    .find(|s| s.provision.contains(&req))
-                    .map(|s| s.name.clone());
-
-                if let Some(pname) = provider_name {
-                    self.start_service(&pname)?;
-                } else {
-                    return Err("Unsatisfied Shepherd requirement dependency");
-                }
-            }
-        }
-
-        self.services[svc_idx].running = true;
-        Ok(())
-    }
-
-    pub fn stop_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let svc = self
-            .services
-            .iter_mut()
-            .find(|s| s.name == name)
-            .ok_or("Service not found")?;
-        svc.running = false;
-        Ok(())
-    }
-}
-
-impl Default for ShepherdServiceManager {
-=======
-
-/// ============================================================================
 /// 9. Advanced Linux/BSD Distro Innovations Integration
 /// ============================================================================
 
@@ -7815,7 +7688,6 @@ impl AdvancedDistroSecurityEngine {
 }
 
 impl Default for AdvancedDistroSecurityEngine {
->>>>>>> origin/jules-11419381740832472292-50948cbf
     fn default() -> Self {
         Self::new()
     }
