@@ -484,12 +484,11 @@ impl PackageManager for SimplePackageManager {
                 if let Some(ref pkg) = *package_option {
                     let p_ref: &dyn Package = pkg.as_ref();
                     let pkg_name = p_ref.name();
-                    let pkg_len = pkg_name
-                        .iter()
-                        .position(|&b| b == 0)
-                        .unwrap_or(pkg_name.len());
-
-                    if dep_slice == &pkg_name[..pkg_len] {
+                    // Bolt performance optimization: compare prefix and check for boundary or null terminator
+                    // instead of scanning the full candidate name buffer for zero bytes O(N).
+                    if pkg_name.starts_with(dep_slice)
+                        && (pkg_name.len() == dep_slice.len() || pkg_name[dep_slice.len()] == 0)
+                    {
                         found = true;
                         break;
                     }
