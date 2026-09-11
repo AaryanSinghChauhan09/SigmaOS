@@ -21,14 +21,24 @@ impl RsyncDeltaSyncEngine {
         Self { block_size }
     }
 
-    /// Computes Adler-32 style weak rolling checksum for a data block
+    /// Computes Adler-32 style weak rolling checksum for a data block.
+    /// Optimized by Bolt ⚡: defers `% 65521` modulo division to chunk boundaries (`NMAX = 3800` bytes).
+    /// Eliminates ~99.9% of CPU `div`/`rem` instructions during checksum calculation.
     pub fn compute_weak_rolling_checksum(&self, data: &[u8]) -> u32 {
+        const BASE: u32 = 65521;
+        const NMAX: usize = 3800;
         let mut a: u32 = 1;
         let mut b: u32 = 0;
-        for &byte in data {
-            a = (a + byte as u32) % 65521;
-            b = (b + a) % 65521;
+
+        for chunk in data.chunks(NMAX) {
+            for &byte in chunk {
+                a += byte as u32;
+                b += a;
+            }
+            a %= BASE;
+            b %= BASE;
         }
+
         (b << 16) | a
     }
 
@@ -145,21 +155,22 @@ pub struct FuzzyMatchResult {
 pub struct FzfFuzzyFinderEngine;
 
 impl FzfFuzzyFinderEngine {
-    /// Scores fuzzy match between query and candidate string
+    /// Scores fuzzy match between query and candidate string.
+    /// Optimized by Bolt ⚡: compares characters directly with `to_ascii_lowercase()`
+    /// on character iterators. Eliminates $O(N)$ temporary `String` heap allocations
+    /// during fuzzy filtering passes.
     pub fn score_match(candidate: &str, query: &str) -> Option<i32> {
         if query.is_empty() {
             return Some(0);
         }
 
-        let cand_lower = candidate.to_lowercase();
-        let query_lower = query.to_lowercase();
-
         let mut score = 0;
-        let mut query_chars = query_lower.chars().peekable();
+        let mut query_chars = query.chars().map(|c| c.to_ascii_lowercase()).peekable();
 
-        for (idx, ch) in cand_lower.chars().enumerate() {
+        for (idx, ch) in candidate.chars().enumerate() {
+            let cand_ch = ch.to_ascii_lowercase();
             if let Some(&q_ch) = query_chars.peek() {
-                if ch == q_ch {
+                if cand_ch == q_ch {
                     query_chars.next();
                     score += 10 - (idx as i32).min(5); // bonus for earlier matches
                 }
@@ -209,8 +220,36 @@ mod tests {
         assert!(highlighted.contains("1 │ fn main()"));
 
         let candidates = vec!["pacman.conf", "systemd-resolved.service", "sigpkg-builder"];
-        let matched = FzfFuzzyFinderEngine::fuzzy_filter(&candidates, "pacman");
+        let matched = FzfFuzzyFinderEngine::fuzzy_filter(&candidates, "PACMAN");
         assert_eq!(matched.len(), 1);
         assert_eq!(matched[0].candidate, "pacman.conf");
+    }
+
+    #[test]
+    fn test_adler32_rolling_checksum_multi_chunk() {
+        let rsync = RsyncDeltaSyncEngine::new(64);
+
+        // Single byte check
+        let c1 = rsync.compute_weak_rolling_checksum(b"a");
+        assert_ne!(c1, 0);
+
+        // Large payload crossing NMAX (3800 bytes) boundary multiple times (10,000 bytes)
+        let mut large_buf = vec![0u8; 10000];
+        for (i, byte) in large_buf.iter_mut().enumerate() {
+            *byte = (i % 256) as u8;
+        }
+
+        let c_large = rsync.compute_weak_rolling_checksum(&large_buf);
+
+        // Compute manual reference Adler-32 with per-byte modulo to ensure bitwise parity
+        let mut ref_a = 1u32;
+        let mut ref_b = 0u32;
+        for &byte in &large_buf {
+            ref_a = (ref_a + byte as u32) % 65521;
+            ref_b = (ref_b + ref_a) % 65521;
+        }
+        let ref_checksum = (ref_b << 16) | ref_a;
+
+        assert_eq!(c_large, ref_checksum, "Chunked Adler-32 must produce bit-exact same checksum as naive per-byte modulo");
     }
 }
