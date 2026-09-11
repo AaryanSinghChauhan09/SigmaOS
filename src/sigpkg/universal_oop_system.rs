@@ -281,9 +281,16 @@ impl PackageLifecycleStateMachine {
     pub fn can_transition(&self, next: PackageLifecycleState) -> bool {
         match (self.current_state, next) {
             (PackageLifecycleState::Uninstalled, PackageLifecycleState::Downloading) => true,
-            (PackageLifecycleState::Downloading, PackageLifecycleState::VerifyingPqcSignature) => true,
-            (PackageLifecycleState::VerifyingPqcSignature, PackageLifecycleState::UnpackingPayload) => true,
-            (PackageLifecycleState::UnpackingPayload, PackageLifecycleState::ExecutingTriggers) => true,
+            (PackageLifecycleState::Downloading, PackageLifecycleState::VerifyingPqcSignature) => {
+                true
+            }
+            (
+                PackageLifecycleState::VerifyingPqcSignature,
+                PackageLifecycleState::UnpackingPayload,
+            ) => true,
+            (PackageLifecycleState::UnpackingPayload, PackageLifecycleState::ExecutingTriggers) => {
+                true
+            }
             (PackageLifecycleState::ExecutingTriggers, PackageLifecycleState::Installed) => true,
             (PackageLifecycleState::Installed, PackageLifecycleState::Uninstalled) => true,
             (_, PackageLifecycleState::RollbackInitiated) => true,
@@ -293,7 +300,10 @@ impl PackageLifecycleStateMachine {
         }
     }
 
-    pub fn transition_to(&mut self, next: PackageLifecycleState) -> Result<PackageLifecycleState, &'static str> {
+    pub fn transition_to(
+        &mut self,
+        next: PackageLifecycleState,
+    ) -> Result<PackageLifecycleState, &'static str> {
         if self.can_transition(next) {
             self.current_state = next;
             Ok(self.current_state)
@@ -3311,7 +3321,9 @@ pub trait IPackageDeltaStrategy: Send + Sync {
 
 pub struct DnfDeltaRpmStrategy;
 impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
-    fn name(&self) -> &str { "drpm" }
+    fn name(&self) -> &str {
+        "drpm"
+    }
     fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         let mut out = source.to_vec();
         out.extend_from_slice(patch);
@@ -3321,7 +3333,9 @@ impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
 
 pub struct SovereignBinaryDeltaStrategy;
 impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
-    fn name(&self) -> &str { "moss-stone-delta" }
+    fn name(&self) -> &str {
+        "moss-stone-delta"
+    }
     fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         Ok(patch.to_vec())
     }
@@ -3329,7 +3343,9 @@ impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
 
 pub struct ZstdChunkedDeltaStrategy;
 impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
-    fn name(&self) -> &str { "zstd-chunked" }
+    fn name(&self) -> &str {
+        "zstd-chunked"
+    }
     fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         Ok(patch.to_vec())
     }
@@ -3966,8 +3982,7 @@ impl DebianTriggerManager {
         let mut executed_count = 0;
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
-                let paths_ref: Vec<&str> =
-                    matched_paths.iter().map(|s| s.as_str()).collect();
+                let paths_ref: Vec<&str> = matched_paths.iter().map(|s| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -6140,9 +6155,15 @@ Description: Hook test";
         let mut sm = PackageLifecycleStateMachine::new();
         assert_eq!(sm.current_state(), PackageLifecycleState::Uninstalled);
         assert!(sm.transition_to(PackageLifecycleState::Downloading).is_ok());
-        assert!(sm.transition_to(PackageLifecycleState::VerifyingPqcSignature).is_ok());
-        assert!(sm.transition_to(PackageLifecycleState::UnpackingPayload).is_ok());
-        assert!(sm.transition_to(PackageLifecycleState::ExecutingTriggers).is_ok());
+        assert!(sm
+            .transition_to(PackageLifecycleState::VerifyingPqcSignature)
+            .is_ok());
+        assert!(sm
+            .transition_to(PackageLifecycleState::UnpackingPayload)
+            .is_ok());
+        assert!(sm
+            .transition_to(PackageLifecycleState::ExecutingTriggers)
+            .is_ok());
         assert!(sm.transition_to(PackageLifecycleState::Installed).is_ok());
         assert_eq!(sm.current_state(), PackageLifecycleState::Installed);
     }

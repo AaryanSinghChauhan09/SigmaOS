@@ -2,7 +2,6 @@ use std::string::{String, ToString};
 // Console I/O module for SigmaOS
 // Replaces std::io functionality for terminal I/O
 
-
 pub struct SigmaConsole {
     stdout_fd: i32,
     stdin_fd: i32,

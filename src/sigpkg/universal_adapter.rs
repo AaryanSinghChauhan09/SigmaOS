@@ -7,25 +7,23 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::package::{AptDebManifest, PackagePriority};
-#[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::sigpkg::universal_engine::PackageFormat;
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::sigpkg::universal_oop_system;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[path = "universal_oop_system.rs"]
-mod universal_oop_system;
+pub mod universal_oop_system;
 
-#[cfg(feature = "standalone_test")]
-pub use universal_oop_system::{
-    Dependency, Package, PackageFormat, Version, VersionConstraint,
-};
+#[cfg(any(feature = "standalone_test", test))]
+pub use universal_oop_system::{Dependency, Package, PackageFormat, Version, VersionConstraint};
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum PackagePriority {
     #[default]
@@ -36,7 +34,7 @@ pub enum PackagePriority {
     Essential,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AptDebManifest {
     pub package: String,
@@ -108,7 +106,6 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
@@ -138,8 +135,6 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -1608,7 +1603,11 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = universal_oop_system::StandardPackage {
             metadata: universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: universal_oop_system::Version::new(native_pkg.version.major, native_pkg.version.minor, native_pkg.version.patch),
+                version: universal_oop_system::Version::new(
+                    native_pkg.version.major,
+                    native_pkg.version.minor,
+                    native_pkg.version.patch,
+                ),
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
@@ -1718,9 +1717,8 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "musl-dev" | "musl-devel" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
-                "libc".to_string()
-            }
+            "libc6" | "glibc" | "musl" | "musl-dev" | "musl-devel" | "devel/glibc"
+            | "sys-libs/glibc" | "libc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
@@ -1753,8 +1751,12 @@ impl UniversalDependencyMapper {
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
             "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
-            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => "glib".to_string(),
-            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => "pcre".to_string(),
+            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => {
+                "glib".to_string()
+            }
+            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => {
+                "pcre".to_string()
+            }
             "libuv" | "libuv-dev" | "libuv-devel" | "dev-libs/libuv" => "libuv".to_string(),
             "openssh" | "openssh-server" | "net-misc/openssh" => "openssh".to_string(),
             "mesa" | "mesa-dev" | "mesa-libgl-devel" | "media-libs/mesa" => "mesa".to_string(),
@@ -3448,7 +3450,6 @@ mod tests {
         assert_eq!(slack_action.source_pm, "slackpkg");
         assert_eq!(slack_action.operation, UniversalPmOperation::Install);
     }
-
 
     #[test]
     fn test_haiku_hpkg_manifest_parsing_and_bridge() {

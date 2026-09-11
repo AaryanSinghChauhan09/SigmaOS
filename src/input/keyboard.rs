@@ -12,28 +12,36 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::string::{String, ToString};
 use std::format;
+use std::string::{String, ToString};
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Keyboard Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements keyboard input handling and key mapping
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type KeyCode = u16;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum KeyState { Released = 0, Pressed = 1, Repeated = 2 }
+pub enum KeyState {
+    Released = 0,
+    Pressed = 1,
+    Repeated = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum Modifier { Shift = 1, Ctrl = 2, Alt = 4, Super = 8 }
+pub enum Modifier {
+    Shift = 1,
+    Ctrl = 2,
+    Alt = 4,
+    Super = 8,
+}
 
 pub trait KeyboardDevice {
     fn read_key(&mut self) -> Option<(KeyCode, KeyState)>;
@@ -62,13 +70,21 @@ impl KeyboardDevice for SimpleKeyboardDevice {
         None
     }
 
-    fn get_modifiers(&self) -> u8 { self.modifiers.load(Ordering::SeqCst) as u8 }
+    fn get_modifiers(&self) -> u8 {
+        self.modifiers.load(Ordering::SeqCst) as u8
+    }
 
     fn set_leds(&mut self, caps: bool, num: bool, scroll: bool) {
         let mut leds = 0;
-        if caps { leds |= 1; }
-        if num { leds |= 2; }
-        if scroll { leds |= 4; }
+        if caps {
+            leds |= 1;
+        }
+        if num {
+            leds |= 2;
+        }
+        if scroll {
+            leds |= 4;
+        }
         self.leds.store(leds, Ordering::SeqCst);
     }
 }
@@ -89,9 +105,7 @@ impl SimpleKeyMapper {
         let mut layout = [0u8; 32];
         let default_name = b"us-qwerty";
         layout[..default_name.len()].copy_from_slice(default_name);
-        SimpleKeyMapper {
-            layout,
-        }
+        SimpleKeyMapper { layout }
     }
 }
 
@@ -167,7 +181,9 @@ impl InputBuffer for SimpleInputBuffer {
         }
     }
 
-    fn is_empty(&self) -> bool { self.buffer.is_empty() }
+    fn is_empty(&self) -> bool {
+        self.buffer.is_empty()
+    }
 }
 
 pub trait KeyboardHandler {
@@ -201,29 +217,27 @@ impl KeyboardHandler for SimpleKeyboardHandler {
     }
 }
 
-
-
 // =========================================================================
 // Linux & BSD Inspired USB HID Keyboard Driver Engine
 // (Parity with Linux hid-input.c & FreeBSD ukbd.c)
 // =========================================================================
 
 /// USB HID Keyboard Modifier Bitmask flags (Standard USB HID spec)
-pub const HID_MODIFIER_LCTRL: u8   = 1 << 0;
-pub const HID_MODIFIER_LSHIFT: u8  = 1 << 1;
-pub const HID_MODIFIER_LALT: u8    = 1 << 2;
-pub const HID_MODIFIER_LMETA: u8   = 1 << 3;
-pub const HID_MODIFIER_RCTRL: u8   = 1 << 4;
-pub const HID_MODIFIER_RSHIFT: u8  = 1 << 5;
-pub const HID_MODIFIER_RALT: u8    = 1 << 6;
-pub const HID_MODIFIER_RMETA: u8   = 1 << 7;
+pub const HID_MODIFIER_LCTRL: u8 = 1 << 0;
+pub const HID_MODIFIER_LSHIFT: u8 = 1 << 1;
+pub const HID_MODIFIER_LALT: u8 = 1 << 2;
+pub const HID_MODIFIER_LMETA: u8 = 1 << 3;
+pub const HID_MODIFIER_RCTRL: u8 = 1 << 4;
+pub const HID_MODIFIER_RSHIFT: u8 = 1 << 5;
+pub const HID_MODIFIER_RALT: u8 = 1 << 6;
+pub const HID_MODIFIER_RMETA: u8 = 1 << 7;
 
 /// USB HID Keyboard LED Indicator Flags
-pub const HID_LED_NUM_LOCK: u8    = 1 << 0;
-pub const HID_LED_CAPS_LOCK: u8   = 1 << 1;
+pub const HID_LED_NUM_LOCK: u8 = 1 << 0;
+pub const HID_LED_CAPS_LOCK: u8 = 1 << 1;
 pub const HID_LED_SCROLL_LOCK: u8 = 1 << 2;
-pub const HID_LED_COMPOSE: u8     = 1 << 3;
-pub const HID_LED_KANA: u8        = 1 << 4;
+pub const HID_LED_COMPOSE: u8 = 1 << 3;
+pub const HID_LED_KANA: u8 = 1 << 4;
 
 /// Standard USB HID 8-byte Boot Protocol Keyboard Input Report
 #[repr(C, packed)]
@@ -284,9 +298,15 @@ impl UsbHidKeyboardDriver {
     /// Update LED indicators and generate LED Output Report byte
     pub fn update_led_state(&mut self, num_lock: bool, caps_lock: bool, scroll_lock: bool) -> u8 {
         let mut leds = 0u8;
-        if num_lock { leds |= HID_LED_NUM_LOCK; }
-        if caps_lock { leds |= HID_LED_CAPS_LOCK; }
-        if scroll_lock { leds |= HID_LED_SCROLL_LOCK; }
+        if num_lock {
+            leds |= HID_LED_NUM_LOCK;
+        }
+        if caps_lock {
+            leds |= HID_LED_CAPS_LOCK;
+        }
+        if scroll_lock {
+            leds |= HID_LED_SCROLL_LOCK;
+        }
         self.active_leds = leds;
         leds
     }
@@ -324,7 +344,8 @@ impl UsbHidKeyboardDriver {
 
     /// Decodes USB HID scancode to ASCII char considering Shift & CapsLock modifiers
     pub fn decode_hid_key_to_ascii(&self, hid_code: u8) -> char {
-        let is_shift = (self.current_report.modifiers & (HID_MODIFIER_LSHIFT | HID_MODIFIER_RSHIFT)) != 0;
+        let is_shift =
+            (self.current_report.modifiers & (HID_MODIFIER_LSHIFT | HID_MODIFIER_RSHIFT)) != 0;
         let is_caps = (self.active_leds & HID_LED_CAPS_LOCK) != 0;
         let uppercase = is_shift ^ is_caps;
 
@@ -342,12 +363,18 @@ impl UsbHidKeyboardDriver {
                     (b'1' + (hid_code - 0x1E)) as char
                 }
             }
-            0x27 => if is_shift { ')' } else { '0' },
-            0x28 => '\n', // Enter
+            0x27 => {
+                if is_shift {
+                    ')'
+                } else {
+                    '0'
+                }
+            }
+            0x28 => '\n',   // Enter
             0x29 => '\x1B', // Escape
             0x2A => '\x08', // Backspace
-            0x2B => '\t', // Tab
-            0x2C => ' ', // Space
+            0x2B => '\t',   // Tab
+            0x2C => ' ',    // Space
             _ => '\0',
         }
     }
@@ -370,7 +397,16 @@ mod tests {
         assert_eq!(driver.active_leds, HID_LED_NUM_LOCK);
 
         // Simulate pressing 'A' (HID 0x04) with Left Shift (modifier 0x02)
-        let report = [HID_MODIFIER_LSHIFT, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00];
+        let report = [
+            HID_MODIFIER_LSHIFT,
+            0x00,
+            0x04,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+        ];
         let pressed = driver.process_input_report(&report).unwrap();
         assert_eq!(pressed, 1);
         assert_eq!(driver.key_press_events[0], 0x04);
@@ -386,4 +422,3 @@ mod tests {
         assert!(driver.process_input_report(&phantom_report).is_err());
     }
 }
-

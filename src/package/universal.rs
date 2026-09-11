@@ -227,7 +227,7 @@ pub enum PackagePriority {
 pub enum PackageFormat {
     #[default]
     Deb, // apt/dpkg
-    Apt, // alias for Deb
+    Apt,        // alias for Deb
     Rpm,        // yum/dnf/zypper
     Yum,        // alias for Rpm
     Pacman,     // pacman/pkgbuild
@@ -2449,7 +2449,10 @@ impl UdfDynamicRepoMirrorSelector {
         Self
     }
 
-    pub fn select_best_mirror(&self, candidates: &[RepoMirrorCandidate]) -> Option<RepoMirrorCandidate> {
+    pub fn select_best_mirror(
+        &self,
+        candidates: &[RepoMirrorCandidate],
+    ) -> Option<RepoMirrorCandidate> {
         candidates
             .iter()
             .filter(|c| c.pqc_verified)
@@ -3137,9 +3140,8 @@ mod tests {
     #[test]
     fn test_udf_engine_enhancements() {
         // 1. UdfCustomConstraintSolver
-        let solver = UdfCustomConstraintSolver::new(|name, expr| {
-            name == "kernel-lts" && expr == ">= 6.1"
-        });
+        let solver =
+            UdfCustomConstraintSolver::new(|name, expr| name == "kernel-lts" && expr == ">= 6.1");
         assert!(solver.evaluate_constraint("kernel-lts", ">= 6.1"));
         assert!(!solver.evaluate_constraint("kernel-lts", "< 5.0"));
 
@@ -3187,6 +3189,9 @@ pub struct AlpineApkPackageAdapter;
 
 impl PackageMetadataAdapter for AlpineApkPackageAdapter {
     fn adapt(&self, _raw_metadata: &str) -> Result<UnifiedPackage, PackageError> {
-        Ok(UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string()).with_format(PackageFormat::Apk))
+        Ok(
+            UnifiedPackage::new("apk-pkg".to_string(), "1.0.0".to_string())
+                .with_format(PackageFormat::Apk),
+        )
     }
 }

@@ -422,14 +422,7 @@ impl ProcessIdTable {
         }
     }
 
-    pub fn insert_process(
-        &mut self,
-        pid: usize,
-        ppid: usize,
-        pgid: usize,
-        sid: usize,
-        name: &str,
-    ) {
+    pub fn insert_process(&mut self, pid: usize, ppid: usize, pgid: usize, sid: usize, name: &str) {
         self.pid_map.insert(
             pid,
             ProcessGroupEntry {

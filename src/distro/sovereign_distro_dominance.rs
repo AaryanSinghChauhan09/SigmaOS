@@ -1127,8 +1127,13 @@ impl SovereignStatelessIsaOptimizer {
         if let Some(cfg) = self.stateless_configs.get(config_path) {
             Some(cfg.as_str())
         } else if !config_path.starts_with("/usr/share/defaults") {
-            let fallback_path = format!("/usr/share/defaults{}", config_path.trim_start_matches("/etc"));
-            self.stateless_configs.get(&fallback_path).map(|s| s.as_str())
+            let fallback_path = format!(
+                "/usr/share/defaults{}",
+                config_path.trim_start_matches("/etc")
+            );
+            self.stateless_configs
+                .get(&fallback_path)
+                .map(|s| s.as_str())
         } else {
             None
         }
@@ -1260,7 +1265,11 @@ impl SovereignGenerationalStoreReconciler {
     }
 
     pub fn rollback_to_generation(&mut self, target_gen_id: usize) -> Result<usize, &'static str> {
-        if self.generations.iter().any(|g| g.generation_id == target_gen_id) {
+        if self
+            .generations
+            .iter()
+            .any(|g| g.generation_id == target_gen_id)
+        {
             self.current_generation = target_gen_id;
             Ok(self.current_generation)
         } else {
@@ -1642,10 +1651,16 @@ mod tests {
     #[test]
     fn test_sovereign_stateless_isa_optimizer() {
         let opt_v4 = SovereignStatelessIsaOptimizer::new(X86MicroarchIsaLevel::V4Avx512Avx10);
-        assert_eq!(opt_v4.select_simd_vector_kernel(), "kernel_avx512_avx10_optimized");
+        assert_eq!(
+            opt_v4.select_simd_vector_kernel(),
+            "kernel_avx512_avx10_optimized"
+        );
 
         let opt_v1 = SovereignStatelessIsaOptimizer::new(X86MicroarchIsaLevel::V1Basics);
-        assert_eq!(opt_v1.select_simd_vector_kernel(), "kernel_x86_64_generic_baseline");
+        assert_eq!(
+            opt_v1.select_simd_vector_kernel(),
+            "kernel_x86_64_generic_baseline"
+        );
 
         assert_eq!(
             opt_v4.resolve_stateless_config("/etc/system.conf"),
@@ -1711,7 +1726,11 @@ mod tests {
     fn test_sovereign_alpine_apk3_security_verifier() {
         let mut apk3 = SovereignAlpineApk3SecurityVerifier::new();
         let sha = [0x55; 32];
-        apk3.register_apk_index("https://dl-cdn.alpinelinux.org/alpine/v3.19/main", sha, b"ed25519_sig_bytes");
+        apk3.register_apk_index(
+            "https://dl-cdn.alpinelinux.org/alpine/v3.19/main",
+            sha,
+            b"ed25519_sig_bytes",
+        );
 
         assert!(!apk3.verify_index_integrity("https://dl-cdn.alpinelinux.org/alpine/v3.19/main")); // No trusted key
 
@@ -1722,10 +1741,21 @@ mod tests {
     #[test]
     fn test_sovereign_void_xbps_chroot_builder() {
         let mut builder = SovereignVoidXbpsChrootBuilder::new(false);
-        assert!(builder.queue_xbps_build("curl", "8.5.0", 1, "MIT", false, &["libcurl.so.4"]).is_ok());
+        assert!(builder
+            .queue_xbps_build("curl", "8.5.0", 1, "MIT", false, &["libcurl.so.4"])
+            .is_ok());
 
         // Non-free license rejected when allow_non_free is false
-        assert!(builder.queue_xbps_build("nvidia-driver", "545.29", 1, "NVIDIA-EULA", true, &["libcuda.so.1"]).is_err());
+        assert!(builder
+            .queue_xbps_build(
+                "nvidia-driver",
+                "545.29",
+                1,
+                "NVIDIA-EULA",
+                true,
+                &["libcuda.so.1"]
+            )
+            .is_err());
 
         assert!(builder.compile_queued_packages().is_err()); // Must enter chroot first
 
@@ -1739,8 +1769,17 @@ mod tests {
         let mut crossbow = SovereignSolarisCrossbowVnicEngine::new();
         crossbow.create_etherstub("stub0");
 
-        assert!(crossbow.create_vnic_on_stub("vnic0", "stub0", [0x02, 0x08, 0x20, 0x00, 0x00, 0x01], 1000).is_ok());
-        assert!(crossbow.create_vnic_on_stub("vnic1", "nonexistent", [0x02, 0x08, 0x20, 0x00, 0x00, 0x02], 500).is_err());
+        assert!(crossbow
+            .create_vnic_on_stub("vnic0", "stub0", [0x02, 0x08, 0x20, 0x00, 0x00, 0x01], 1000)
+            .is_ok());
+        assert!(crossbow
+            .create_vnic_on_stub(
+                "vnic1",
+                "nonexistent",
+                [0x02, 0x08, 0x20, 0x00, 0x00, 0x02],
+                500
+            )
+            .is_err());
 
         assert!(crossbow.throttle_vnic_bandwidth("vnic0", 2500));
         assert_eq!(crossbow.vnics[0].max_bandwidth_mbps, 2500);

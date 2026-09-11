@@ -11,12 +11,14 @@ pub mod collections;
 pub mod config_parser;
 #[macro_use]
 pub mod console;
+pub mod buddy_allocator;
 pub mod conversion;
 pub mod custom_allocator;
 pub mod custom_string;
 pub mod env;
 pub mod ffi;
 pub mod fs;
+pub mod hash;
 pub mod hashmap;
 pub mod hashset;
 pub mod io;
@@ -45,10 +47,8 @@ pub mod time;
 pub mod time_impl;
 pub mod toml;
 pub mod utf8_utils;
-pub mod uvm;
 pub mod uuid;
-pub mod buddy_allocator;
-pub mod hash;
+pub mod uvm;
 
 pub mod string {
     pub use crate::klib::custom_string::SigmaString;
@@ -60,10 +60,10 @@ pub mod vec {
 
 // Re-exports
 pub use arc::Arc;
-pub use ring_buffer::{RingBuffer, HeapRingBuffer};
-pub use linked_list::{LinkedList, SList};
-pub use slab::{SlabCache, TypedSlabCache};
 pub use custom_string::SigmaString;
+pub use linked_list::{LinkedList, SList};
+pub use ring_buffer::{HeapRingBuffer, RingBuffer};
+pub use slab::{SlabCache, TypedSlabCache};
 pub use uuid::Uuid;
 
 #[cfg(not(target_os = "none"))]
