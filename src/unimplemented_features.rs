@@ -1812,11 +1812,11 @@ mod tests {
 
     #[test]
     fn test_zero_allocation_udf_bytecode_vm() {
-        let mut vm = UdfVm::new();
+        let mut vm = ZeroAllocUdfVm::new();
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
-            UdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
+            BaremetalUdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
+            BaremetalUdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
+            BaremetalUdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
         ];
         let res = vm.execute(&code).unwrap();
         assert_eq!(res, 0x3F8 + 10);
@@ -1824,17 +1824,17 @@ mod tests {
 
     #[test]
     fn test_constraint_sat_solver() {
-        let mut solver = ConstraintSatSolver::new();
+        let solver = ConstraintSatSolver::new();
         let nodes = [
-            PackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
-            PackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
+            BaremetalPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
+            BaremetalPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
         ];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 
     #[test]
     fn test_jbd2_transactional_ledger() {
-        let mut ledger = Jbd2TransactionLedger::new();
+        let mut ledger = BaremetalJbd2TransactionLedger::new();
         let tx_id = ledger.write_transaction(0x1000, &[1, 2, 3, 4]).unwrap();
         assert_eq!(tx_id, 1);
         assert_eq!(ledger.head, 1);
@@ -1846,22 +1846,22 @@ mod tests {
     #[test]
     fn test_sigmaos_component_inspection_suite() {
         // Inspect & verify zero-allocation VM bytecode execution
-        let mut vm = UdfVm::new();
+        let mut vm = ZeroAllocUdfVm::new();
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            UdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },
+            BaremetalUdfInstruction { op: 0x10, reg: 0, addr: 100 },
+            BaremetalUdfInstruction { op: 0x30, reg: 0, addr: 50 },
+            BaremetalUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
         ];
         assert_eq!(vm.execute(&code).unwrap(), 150);
 
         // Inspect & verify JBD2 crash transaction ledger
-        let mut ledger = Jbd2TransactionLedger::new();
+        let mut ledger = BaremetalJbd2TransactionLedger::new();
         assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);
         assert_eq!(ledger.head, 1);
 
         // Inspect & verify SAT Solver
         let solver = ConstraintSatSolver::new();
-        let nodes = [PackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
+        let nodes = [BaremetalPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 }
@@ -1870,34 +1870,32 @@ mod tests {
 // Section 6: Bare-Metal Subsystem Design Specifications
 // ============================================================================
 
-// 6.1 Polymorphic Universal Peripheral Blueprint
-pub trait BareMetalUnifiedPeripheral {
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn read_register(&self, offset: u32) -> u64;
-    fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
-    fn handle_irq(&mut self) -> u32;
-}
-
 pub struct LegacyPioController {
     pub port_base: u16,
+    pub power_state: PowerState,
 }
 
 impl BareMetalUnifiedPeripheral for LegacyPioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+    fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
 pub struct ModernMmioController {
     pub mmio_base: u64,
+    pub power_state: PowerState,
 }
 
 impl BareMetalUnifiedPeripheral for ModernMmioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+    fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
 pub struct BareMetalUnifiedPeripheralManager {
@@ -1927,18 +1925,18 @@ impl Default for BareMetalUnifiedPeripheralManager {
 
 // 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
 #[derive(Debug, Clone, Copy)]
-pub struct UdfInstruction {
+pub struct BaremetalUdfInstruction {
     pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
     pub reg: u8,  // R0 - R7
     pub addr: u64,
 }
 
-pub struct UdfVm {
+pub struct ZeroAllocUdfVm {
     pub registers: [u64; 8], // R0 - R7
     pub pc: usize,
 }
 
-impl UdfVm {
+impl ZeroAllocUdfVm {
     pub fn new() -> Self {
         Self {
             registers: [0; 8],
@@ -1946,7 +1944,7 @@ impl UdfVm {
         }
     }
 
-    pub fn execute(&mut self, bytecode: &[UdfInstruction]) -> Result<u64, &'static str> {
+    pub fn execute(&mut self, bytecode: &[BaremetalUdfInstruction]) -> Result<u64, &'static str> {
         self.pc = 0;
         while self.pc < bytecode.len() {
             let inst = bytecode[self.pc];
@@ -1964,13 +1962,13 @@ impl UdfVm {
     }
 }
 
-impl Default for UdfVm {
+impl Default for ZeroAllocUdfVm {
     fn default() -> Self { Self::new() }
 }
 
 // 6.3 Declarative Package Resolution SAT Solver
 #[derive(Debug, Clone, Copy)]
-pub struct PackageNode {
+pub struct BaremetalPackageNode {
     pub id: u32,
     pub version: u32,
     pub req_min: u32,
@@ -1982,7 +1980,7 @@ pub struct ConstraintSatSolver;
 impl ConstraintSatSolver {
     pub fn new() -> Self { Self }
 
-    pub fn resolve_satisfiability(&self, packages: &[PackageNode]) -> Result<bool, &'static str> {
+    pub fn resolve_satisfiability(&self, packages: &[BaremetalPackageNode]) -> Result<bool, &'static str> {
         for pkg in packages {
             if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
                 return Err("Constraint conflict detected");
@@ -1998,22 +1996,22 @@ impl Default for ConstraintSatSolver {
 
 // 6.4 JBD2-Style Crash-Resilient Transactional Ledger
 #[derive(Debug, Clone, Copy)]
-pub struct TransactionBlock {
+pub struct BaremetalTransactionBlock {
     pub tx_id: u64,
     pub target_addr: u64,
     pub crc32c_hash: u32,
 }
 
-pub struct Jbd2TransactionLedger {
-    pub ring_blocks: [TransactionBlock; 16],
+pub struct BaremetalJbd2TransactionLedger {
+    pub ring_blocks: [BaremetalTransactionBlock; 16],
     pub head: usize,
     pub current_merkle_root: u32,
 }
 
-impl Jbd2TransactionLedger {
+impl BaremetalJbd2TransactionLedger {
     pub fn new() -> Self {
         Self {
-            ring_blocks: [TransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
+            ring_blocks: [BaremetalTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
             head: 0,
             current_merkle_root: 0x1234_5678,
         }
@@ -2025,7 +2023,7 @@ impl Jbd2TransactionLedger {
         let mut crc = 0u32;
         for &b in data { crc = crc.wrapping_add(b as u32); }
 
-        self.ring_blocks[self.head] = TransactionBlock {
+        self.ring_blocks[self.head] = BaremetalTransactionBlock {
             tx_id,
             target_addr,
             crc32c_hash: crc,
@@ -2039,14 +2037,22 @@ impl Jbd2TransactionLedger {
         if self.head > 0 {
             self.head -= 1;
             self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
-            self.ring_blocks[self.head] = TransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 };
+            self.ring_blocks[self.head] = BaremetalTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 };
         }
     }
 }
 
-impl Default for Jbd2TransactionLedger {
+impl Default for BaremetalJbd2TransactionLedger {
     fn default() -> Self { Self::new() }
 }
+
+pub struct Android15PrivateSpaceGovernor;
+pub struct FrappeFrameworkDocTypeEngine;
+pub struct HwbustersPowerSupplyMonitor;
+pub struct MacOsSequoiaWindowManager;
+pub struct S6ServiceInitSupervisor;
+pub struct UutilsCoreutilsZeroCopyBuffer;
+pub struct WindowsCopilotRecallAuditor;
 
 pub struct AchievementBadge {
     pub badge_id: &'static str,

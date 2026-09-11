@@ -124,3 +124,8 @@ For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and 
 ## 📄 License
 
 SigmaOS is licensed under the [MIT License](LICENSE).
+
+
+* [[AI Agent Dropped & Historical Distro Subsystems Maintenance Guidelines|AI_AGENT_DROPPED_HISTORICAL_DISTRO_SUBSYSTEMS_MAINTENANCE_GUIDELINES]]
+* [[AI Agent Compatibility Subsystem Development Guidance|AI_AGENT_COMPATIBILITY_SUBSYSTEM_DEVELOPMENT_GUIDANCE]]
+* [[AI Agent Distro Expansion Subsystem Maintenance Guidelines|AI_AGENT_DISTRO_EXPANSION_SUBSYSTEM_MAINTENANCE_GUIDELINES]]

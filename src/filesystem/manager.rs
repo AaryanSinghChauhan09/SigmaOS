@@ -21,7 +21,10 @@ use std::vec::Vec;
 // SigmaOS File Manager
 // OOP-based file management with advanced features
 
+#[cfg(not(test))]
 use crate::klib::btreemap::BTreeMap;
+#[cfg(test)]
+use std::collections::BTreeMap;
 // str/String not in no_std
 
 /// File item
@@ -502,5 +505,157 @@ mod tests {
             String::from("/home/user/Documents"),
         );
         assert_eq!(manager.bookmarks().len(), 1);
+    }
+}
+
+
+// =========================================================================
+// Open-Source File Manager Enhancements (Dolphin, Yazi, Ranger, Nautilus, Thunar)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ActivePane {
+    Left,
+    Right,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ViNavigationMode {
+    Normal,
+    Visual,
+    Command,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GitFileStatus {
+    Unmodified,
+    Modified,
+    Untracked,
+    Staged,
+    Ignored,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnhancedFileMetadata {
+    pub filepath: String,
+    pub git_status: GitFileStatus,
+    pub color_tag: Option<String>,
+    pub preview_content: Option<String>,
+}
+
+pub struct OpenSourceFileManagerEnhancementEngine {
+    pub left_pane_path: String,
+    pub right_pane_path: String,
+    pub active_pane: ActivePane,
+    pub vi_mode: ViNavigationMode,
+    pub metadata_store: BTreeMap<String, EnhancedFileMetadata>,
+    pub auto_refresh_enabled: bool,
+}
+
+impl OpenSourceFileManagerEnhancementEngine {
+    pub fn new(initial_path: &str) -> Self {
+        Self {
+            left_pane_path: initial_path.to_string(),
+            right_pane_path: initial_path.to_string(),
+            active_pane: ActivePane::Left,
+            vi_mode: ViNavigationMode::Normal,
+            metadata_store: BTreeMap::new(),
+            auto_refresh_enabled: true,
+        }
+    }
+
+    pub fn switch_active_pane(&mut self) -> ActivePane {
+        self.active_pane = match self.active_pane {
+            ActivePane::Left => ActivePane::Right,
+            ActivePane::Right => ActivePane::Left,
+        };
+        self.active_pane
+    }
+
+    pub fn set_vi_mode(&mut self, mode: ViNavigationMode) {
+        self.vi_mode = mode;
+    }
+
+    pub fn set_git_status(&mut self, filepath: &str, status: GitFileStatus) {
+        let entry = self
+            .metadata_store
+            .entry(filepath.to_string())
+            .or_insert_with(|| EnhancedFileMetadata {
+                filepath: filepath.to_string(),
+                git_status: GitFileStatus::Unmodified,
+                color_tag: None,
+                preview_content: None,
+            });
+        entry.git_status = status;
+    }
+
+    pub fn generate_async_preview(&mut self, filepath: &str, raw_bytes: &[u8]) -> String {
+        let preview = if raw_bytes.starts_with(b"\x7fELF") {
+            "[ELF Executable Binary]".to_string()
+        } else if raw_bytes.starts_with(b"PK\x03\x04") {
+            "[ZIP/JAR Compressed Archive]".to_string()
+        } else {
+            let str_val = String::from_utf8_lossy(raw_bytes);
+            let snippet: String = str_val.chars().take(100).collect();
+            format!("Preview: {}", snippet)
+        };
+
+        let entry = self
+            .metadata_store
+            .entry(filepath.to_string())
+            .or_insert_with(|| EnhancedFileMetadata {
+                filepath: filepath.to_string(),
+                git_status: GitFileStatus::Unmodified,
+                color_tag: None,
+                preview_content: None,
+            });
+        entry.preview_content = Some(preview.clone());
+        preview
+    }
+
+    pub fn batch_rename_pattern(&self, files: &[&str], pattern: &str, replacement: &str) -> Vec<(String, String)> {
+        let mut renames = Vec::new();
+        for file in files {
+            if file.contains(pattern) {
+                let new_name = file.replace(pattern, replacement);
+                renames.push((file.to_string(), new_name));
+            }
+        }
+        renames
+    }
+}
+
+impl Default for OpenSourceFileManagerEnhancementEngine {
+    fn default() -> Self {
+        Self::new("/home/user")
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_opensource_file_manager_enhancements() {
+        let mut fm = OpenSourceFileManagerEnhancementEngine::new("/home/user");
+        assert_eq!(fm.active_pane, ActivePane::Left);
+
+        assert_eq!(fm.switch_active_pane(), ActivePane::Right);
+        assert_eq!(fm.active_pane, ActivePane::Right);
+
+        fm.set_vi_mode(ViNavigationMode::Visual);
+        assert_eq!(fm.vi_mode, ViNavigationMode::Visual);
+
+        fm.set_git_status("/home/user/main.rs", GitFileStatus::Modified);
+        let meta = fm.metadata_store.get("/home/user/main.rs").unwrap();
+        assert_eq!(meta.git_status, GitFileStatus::Modified);
+
+        let preview = fm.generate_async_preview("/home/user/main.rs", b"fn main() { hello }");
+        assert!(preview.contains("Preview: fn main()"));
+
+        let renames = fm.batch_rename_pattern(&["file_v1.txt", "file_v2.txt"], "file_", "doc_");
+        assert_eq!(renames.len(), 2);
+        assert_eq!(renames[0].1, "doc_v1.txt");
     }
 }
