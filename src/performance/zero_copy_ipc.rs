@@ -9,7 +9,7 @@ pub use crate::kernel::performance::{
 
 pub const QUEUE_SIZE: usize = 16;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
