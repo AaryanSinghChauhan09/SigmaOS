@@ -54,6 +54,8 @@ pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
 pub mod kali_components;
+pub mod landlock;
+pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 
 pub use kali_components::{
     HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,

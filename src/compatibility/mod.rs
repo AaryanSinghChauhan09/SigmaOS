@@ -33,6 +33,12 @@ pub mod federation;
 pub mod fedora;
 pub use fedora::*;
 pub mod fedora_domination;
+pub mod fedora_missing_components;
+
+pub use fedora_missing_components::{
+    Dnf5Advisory, FedoraAnacondaKickstartEngine, FedoraDnf5PackageEngine,
+    FedoraMockChrootBuilder, FedoraSssdFreeIpaEngine, KickstartPartition, MockChrootConfig,
+};
 pub use fedora_domination::*;
 // pub mod freebsd_jails;
 pub mod freedos;
@@ -46,6 +52,13 @@ pub mod hopper_lab;
 pub mod india_professional_tools;
 pub mod india_stack;
 pub mod india_stack_localization;
+pub mod itsfoss_inspiration_suite;
+
+pub use itsfoss_inspiration_suite::{
+    ItsFossLocalSendTransferEngine, ItsFossStacerOptimizerEngine, ItsFossTimeshiftBackupEngine,
+    ItsFossVentoyMultiBootUsbEngine, LocalSendPeer, SnapshotMode, StacerCleanCategory,
+    TimeshiftRestorePoint, VentoyIsoEntry,
+};
 pub mod innovations;
 pub mod installer;
 pub mod interim;
