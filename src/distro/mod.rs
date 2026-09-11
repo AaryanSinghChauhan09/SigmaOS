@@ -2,6 +2,13 @@ pub mod omarchy;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
+pub mod arch_gap_closure;
+
+pub use arch_gap_closure::{
+    AlaPackageSnapshot, ArchAuditScannerEngine, ArchInstallProfile, ArchInstallProfileEngine,
+    ArchLinuxArchiveEngine, ArchMasterKey, ArchPacmanKeyringManager, ArchSecurityAdvisory,
+    ArchTestingRepo, ArchTestingRepositoryManager, VulnerabilitySeverity,
+};
 
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
