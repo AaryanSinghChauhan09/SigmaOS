@@ -3,18 +3,12 @@
 
 #![no_std]
 
-<<<<<<< HEAD
-use alloc::string::{String, ToString};
-use crate::klib::Vec;
-use alloc::boxed::Box;
-=======
 extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
->>>>>>> origin/jules-11419381740832472292-50948cbf
 /// GPU device types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuType {
