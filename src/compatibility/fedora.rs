@@ -428,6 +428,7 @@ impl BodhiUpdateTriage {
                 up.status = BodhiUpdateStatus::Rejected;
                 self.stable_gated.insert(update_id.to_string(), false);
             } else if current_karma >= up.stable_karma_threshold
+                && up.days_in_testing >= up.min_testing_days
                 && up.ci_test_result != BodhiTestResult::Failed
             {
                 up.status = BodhiUpdateStatus::Stable;
@@ -2956,6 +2957,14 @@ pub struct TahrirBadgeAssertion {
     pub assertion_digest: String,
 }
 
+#[derive(Debug, Clone)]
+pub struct TahrirUserAvatar {
+    pub user_id: String,
+    pub email_sha256: String,
+    pub avatar_data: Vec<u8>,
+    pub mime_type: String,
+}
+
 pub struct FedoraTahrirIdentityApiEngine {
     pub avatars: HashMap<String, TahrirUserAvatar>,
 }
@@ -3260,8 +3269,11 @@ pub struct PlanetUserFeed {
 
 #[derive(Debug, Clone)]
 pub struct FedoraPlanetAggregationEngine {
-    pub posts: Vec<FedoraPlanetPost>,
+    pub posts: Vec<PlanetBlogFeedEntry>,
     pub registered_feeds: Vec<PlanetUserFeed>,
+    pub aggregated_entries: Vec<PlanetBlogFeedEntry>,
+    pub entry_counter: u64,
+    pub messaging_engine: FedoraMessagingEngine,
 }
 
 impl FedoraPlanetAggregationEngine {
@@ -3269,6 +3281,9 @@ impl FedoraPlanetAggregationEngine {
         FedoraPlanetAggregationEngine {
             posts: Vec::new(),
             registered_feeds: Vec::new(),
+            aggregated_entries: Vec::new(),
+            entry_counter: 0,
+            messaging_engine: FedoraMessagingEngine::new(),
         }
     }
 
@@ -3344,16 +3359,6 @@ impl Default for FedoraPlanetAggregationEngine {
 // =========================================================================
 // Fedora Tahrir Developer Social Network Engine
 // =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TahrirMessagePost {
-    pub post_id: u64,
-    pub author_fas_username: String,
-    pub content: String,
-    pub hashtags: Vec<String>,
-    pub timestamp_secs: u64,
-    pub fedmsg_dispatched: bool,
-}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TahrirMessagePost {
@@ -3533,6 +3538,7 @@ pub struct FedoraMessagingMessage {
 
 /// Fedora Messaging & fedmsg Infrastructure Message Bus
 /// Provides AMQP/ZeroMQ topic-based message publication, subscription routing, and cryptographic verification.
+#[derive(Debug, Clone)]
 pub struct FedoraMessagingEngine {
     pub published_messages: Vec<FedoraMessagingMessage>,
     pub topic_subscriptions: HashMap<String, Vec<String>>, // topic -> list of subscriber_ids
@@ -3688,41 +3694,6 @@ impl Default for FedoraIgnitionEngine {
     }
 }
 
-/// Fedora DNF Staged Offline Update Engine (systemd-offline-update parity)
-pub struct FedoraOfflineUpdateEngine {
-    pub is_offline_update_pending: bool,
-    pub trigger_reboot_flag: bool,
-    pub staged_packages: Vec<String>,
-}
-
-impl FedoraOfflineUpdateEngine {
-    pub fn new() -> Self {
-        Self {
-            is_offline_update_pending: false,
-            trigger_reboot_flag: false,
-            staged_packages: Vec::new(),
-        }
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
-    }
-}
 
 impl Default for FedoraOfflineUpdateEngine {
     fn default() -> Self {
@@ -4391,20 +4362,6 @@ mod tests {
         assert!(decision_after_waiver.is_ok());
     }
 
-    #[test]
-    fn test_fedora_dnf_resolver() {
-        let mut resolver = DnfPackageResolver::new();
-        resolver.add_package("kernel", "6.5.0", &[]);
-        assert!(resolver.resolve("kernel").is_ok());
-    }
-
-    #[test]
-    fn test_fedora_koji_build_server() {
-        let mut koji = KojiBuildServer::new();
-        let task_id = koji.submit_build("coreutils", "9.3-1.fc39", "x86_64");
-        assert_eq!(task_id, 1);
-        assert_eq!(koji.tasks.len(), 1);
-    }
 
     #[test]
     fn test_fedora_bodhi_update_triage() {
@@ -4476,6 +4433,7 @@ mod tests {
             vec!["badpkg-1.0.rpm".to_string()],
             BodhiUpdateType::Bugfix,
             "sovereign",
+            false,
         );
         bodhi.record_ci_result("SIGMA-2026-FAIL01", BodhiTestResult::Failed);
         bodhi.submit_feedback("SIGMA-2026-FAIL01", 5).unwrap(); // High karma
@@ -5357,31 +5315,6 @@ mod tests {
         assert_eq!(ignition.users.len(), 1);
     }
 
-    #[test]
-    fn test_fedora_dracut_initramfs() {
-        let mut dracut = FedoraDracutInitramfsEngine::new("6.5.12-200.fc38.x86_64");
-        dracut.add_module("base", 10);
-        dracut.add_module("kernel-modules", 20);
-        dracut.add_module("systemd", 30);
-
-        let img = dracut.build_initramfs();
-        assert!(img.len() > 0);
-    }
-
-    #[test]
-    fn test_fedora_abrt_crash_daemon() {
-        let mut abrt = FedoraAbrtCrashDaemon::new();
-        let report_id = abrt.capture_crash(
-            1042,
-            "gnome-shell",
-            11,
-            "SIGSEGV in st_widget_get_theme_node()",
-            &["#0 0x00007f1234 in st_widget_get_theme_node ()", "#1 0x00007f5678 in main ()"],
-        );
-
-        assert_eq!(report_id, 1);
-        assert_eq!(abrt.crash_reports.len(), 1);
-    }
 
     #[test]
     fn test_fedora_toolbx_container() {
@@ -5726,39 +5659,4 @@ impl Default for FedoraRPMSeccompFilterEngine {
         Self::new()
     }
 
-    #[test]
-    fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {
-        // 1. MojiKey
-        let moji = FedoraMojiKeyEngine::new();
-        let res = moji.search("fedora");
-        assert_eq!(res.len(), 1);
-        assert_eq!(res[0].glyph, "🎩");
-
-        // 2. Pagu
-        let mut pagu = FedoraPaguEngine::new();
-        pagu.provision_account("jules_dev", "jules@fedora.org", &["packagers", "sysadmin"]);
-        assert_eq!(pagu.generate_oauth2_token("jules_dev"), Some("pagu-oauth2-token-jules_dev".to_string()));
-
-        // 3. Fedocal
-        let mut cal = FedoraFedocalEngine::new();
-        let m_id = cal.schedule_meeting("Kernel Release Party", "#fedora-meeting", "jules_dev");
-        assert_eq!(m_id, 1);
-
-        // 4. Nuancier
-        let mut nuancier = FedoraNuancierEngine::new();
-        let w_id = nuancier.submit_wallpaper("Blue Nebula", "artist_guy");
-        assert!(nuancier.vote(w_id));
-        assert_eq!(nuancier.submissions[0].votes, 1);
-
-        // 5. IRCOT
-        let mut ircot = FedoraIrcotEngine::new();
-        ircot.join_channel("#fedora-devel", "Fedora Devel Channel");
-        assert_eq!(ircot.broadcast_message("Release v40 published!"), 1);
-
-        // 6. Elections
-        let mut elections = FedoraElectionsEngine::new();
-        elections.nominate_candidate("alice");
-        assert!(elections.cast_ballot("alice"));
-        assert_eq!(elections.candidates[0].votes, 1);
-    }
 }

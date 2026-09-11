@@ -1,3 +1,5 @@
+pub mod omarchy_inspiration;
+pub use omarchy_inspiration::*;
 pub mod omarchy;
 pub mod parrot_security;
 pub mod kali_security;
@@ -32,6 +34,8 @@ pub mod improvements;
 pub mod linux_bsd_distro_gaps;
 pub mod linux_distro_innovations;
 pub mod linux_bsd_inspirations;
+
+pub use linux_distro_innovations::*;
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 
