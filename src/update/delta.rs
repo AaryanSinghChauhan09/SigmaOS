@@ -14,8 +14,8 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
 use std::string::{String, ToString};
-use std::vec::Vec as StdVec;
 use std::format;
+use std::vec::Vec;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only

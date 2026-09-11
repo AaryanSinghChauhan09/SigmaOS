@@ -16,7 +16,9 @@ use alloc::vec::Vec;
 use alloc::string::String;
 use core::sync::atomic::{AtomicU64, Ordering};
 
-use crate::kernel::scheduler::ProcessState;
+use crate::klib::types::*;
+use crate::security::landlock_sovereign::{SovereignLandlockV5Guard as LandlockV5Guard, CapsicumRights};
+use crate::kernel::process::{ProcessId, ProcessState};
 
 /// Unique identifier for AI agents in the kernel
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

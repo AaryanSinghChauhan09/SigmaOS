@@ -60,9 +60,16 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     ./build/arch_missing_test
 fi
 
-if [ -f "tests/test_implementation_plan_standalone.rs" ]; then
-    echo "Running Implementation Plan (11 modules) standalone test suite..."
+if [ -f "src/package/universal.rs" ]; then
+    echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
-    rustc --test tests/test_implementation_plan_standalone.rs --edition=2021 -o build/impl_plan_test
-    ./build/impl_plan_test
+    rustc --test src/package/universal.rs --edition=2021 -o build/universal_pkg_test
+    ./build/universal_pkg_test
+fi
+
+if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
+    echo "Running Arch Pacman Engine & AUR compilation test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/sigpkg/arch_pacman_engine.rs -o build/test_arch_engine
+    ./build/test_arch_engine
 fi
