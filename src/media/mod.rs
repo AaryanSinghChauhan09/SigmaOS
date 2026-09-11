@@ -2,6 +2,8 @@
 // Unified VLC-equivalent media player and system subsystems
 
 pub mod browser;
+pub mod browser_innovations_suite;
+pub use browser_innovations_suite::*;
 pub mod distro_media_engine;
 pub mod sovereign_screen_recorder;
 pub mod sovereign_video_editor;

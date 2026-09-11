@@ -45,6 +45,8 @@ pub mod spac;
 pub mod store;
 pub mod universal;
 pub mod updater;
+pub mod universal_package_innovations_suite;
+pub use universal_package_innovations_suite::*;
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};
