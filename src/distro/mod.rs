@@ -127,6 +127,13 @@ pub use gentoo::{
     KeywordStatus, ManifestEntry, ManifestEntryType, OpenRcRunlevel, OpenRcRunlevelSupervisor,
     PortageEapi8PhaseEngine, SigmaBuildGraph, UseFlag,
 };
+pub use improvements::{
+    AlpineApkVolatileOverlayEngine, DragonFlyHammer2PfsEngine, FreeBsdPoudrierePortBuilder,
+    GentooEmergeCliEngine, GentooGccCflagsTunerEngine, GentooLaymanOverlayEngine,
+    Hammer2PfsSnapshot, IllumosDTraceTracingGovernor, MageiaUrpmiMediaManager,
+    OpenBsdPledgeUnveilSecurityGovernor, PoudrierePortJob, SolusEopkgPackageEngine,
+    VoidXbpsBinaryPackageEngine, VoidXbpsPackage,
+};
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
 pub use linux_bsd_parity_extended::{
     CloudInitBootstrapEngine, CrossbowVnic, GNUGuixShepherdSupervisor, GuixDerivation,

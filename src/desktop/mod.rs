@@ -9,21 +9,9 @@ pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
+pub mod web_wasm_bridge;
 pub mod zenith_compositor;
-pub mod media_inspired_desktop;
 pub mod ultimate_distro_desktop;
-
-pub use media_inspired_desktop::{
-    AiDesktopAssistantCommand, AiDesktopAssistantPanelEngine, FpsHudPosition,
-    HyprlandAestheticConfig, HyprlandAestheticEngine, MobileMirroringBridgeEngine,
-    PhoronixPerformanceHudConfig, PhoronixPerformanceHudEngine, SnapLayoutType, SnapLayoutsEngine,
-    WindowSnapZone,
-};
-pub mod wayland_protocol;
-pub mod sovereign_ux_innovation_hub;
-
-pub use wayland_protocol::*;
-pub use sovereign_ux_innovation_hub::*;
 
 pub use sovereign_navigation_engine::*;
 
@@ -66,8 +54,7 @@ pub use zenith_compositor::{
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
 };
 
-pub use sovereign_navigation_engine::{
-    AppCategory, GnomePopLauncherNav, HudActionResult, KrunnerRofiCommandHud, LauncherAppItem,
-    NavDirection, RangerDolphinSpatialFileNav, SovereignUniversalNavigationEngine,
-    SystemControlNode, TilingWindowManagerNav, WindowNode, YastBsdConfigControlTreeNav,
+pub use omarchy_omakase::{
+    AgenticWorkstationLayout, AgenticWorkstationOrchestrator, OmakasePresetConfig,
+    OmarchySystemEngine, WorkstationPane, WorkstationPaneRole,
 };

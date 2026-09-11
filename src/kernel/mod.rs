@@ -14,6 +14,7 @@ pub mod bus;
 pub mod classic_os;
 pub mod component;
 pub mod console;
+pub mod missing_linux_kernel_components;
 pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;

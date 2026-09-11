@@ -1139,8 +1139,201 @@ impl OpenBsdPledgeUnveilSecurityGovernor {
     }
 }
 
+// ============================================================================
+// SOLUS — Eopkg Package Engine & Budgie Desktop Profile
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SolusEopkgPackage {
+    pub name: String,
+    pub version: String,
+    pub installed: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SolusEopkgPackageEngine {
+    pub packages: Vec<SolusEopkgPackage>,
+    pub active_desktop_profile: String,
+}
+
+impl SolusEopkgPackageEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            packages: Vec::new(),
+            active_desktop_profile: "Budgie".to_string(),
+        };
+        engine.register_package("eopkg", "3.1.0");
+        engine.register_package("budgie-desktop", "10.8.2");
+        engine
+    }
+
+    pub fn register_package(&mut self, name: &str, version: &str) {
+        self.packages.push(SolusEopkgPackage {
+            name: name.to_string(),
+            version: version.to_string(),
+            installed: false,
+        });
+    }
+
+    pub fn install_package(&mut self, name: &str) -> bool {
+        if let Some(pkg) = self.packages.iter_mut().find(|p| p.name == name) {
+            pkg.installed = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// ============================================================================
+// MAGEIA — Urpmi Media Manager & Synthesis Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct UrpmiMedia {
+    pub name: String,
+    pub url: String,
+    pub enabled: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct MageiaUrpmiMediaManager {
+    pub media_list: Vec<UrpmiMedia>,
+}
+
+impl MageiaUrpmiMediaManager {
+    pub fn new() -> Self {
+        let mut mgr = Self { media_list: Vec::new() };
+        mgr.add_media("core-release", "https://mirrors.kernel.org/mageia/distrib/9/x86_64/media/core/release");
+        mgr
+    }
+
+    pub fn add_media(&mut self, name: &str, url: &str) {
+        self.media_list.push(UrpmiMedia {
+            name: name.to_string(),
+            url: url.to_string(),
+            enabled: true,
+        });
+    }
+
+    pub fn active_media_count(&self) -> usize {
+        self.media_list.iter().filter(|m| m.enabled).count()
+    }
+}
+
+// ============================================================================
+// DRAGONFLY BSD — HAMMER2 Pseudo-FS Multi-Master Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct Hammer2PfsSnapshot {
+    pub name: String,
+    pub cluster_node_id: u32,
+    pub is_master: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DragonFlyHammer2PfsEngine {
+    pub snapshots: Vec<Hammer2PfsSnapshot>,
+}
+
+impl DragonFlyHammer2PfsEngine {
+    pub fn new() -> Self {
+        Self { snapshots: Vec::new() }
+    }
+
+    pub fn create_snapshot(&mut self, name: &str, node_id: u32, is_master: bool) {
+        self.snapshots.push(Hammer2PfsSnapshot {
+            name: name.to_string(),
+            cluster_node_id: node_id,
+            is_master,
+        });
+    }
+
+    pub fn master_snapshots_count(&self) -> usize {
+        self.snapshots.iter().filter(|s| s.is_master).count()
+    }
+}
+
+// ============================================================================
+// ILLUMOS / SOLARIS — DTrace Dynamic Tracing Governor
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct DTraceProbe {
+    pub provider: String,
+    pub module: String,
+    pub function: String,
+    pub name: String,
+    pub enabled: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct IllumosDTraceTracingGovernor {
+    pub probes: Vec<DTraceProbe>,
+}
+
+impl IllumosDTraceTracingGovernor {
+    pub fn new() -> Self {
+        let mut gov = Self { probes: Vec::new() };
+        gov.register_probe("sys", "kernel", "read", "entry");
+        gov.register_probe("sys", "kernel", "write", "entry");
+        gov
+    }
+
+    pub fn register_probe(&mut self, provider: &str, module: &str, function: &str, name: &str) {
+        self.probes.push(DTraceProbe {
+            provider: provider.to_string(),
+            module: module.to_string(),
+            function: function.to_string(),
+            name: name.to_string(),
+            enabled: false,
+        });
+    }
+
+    pub fn enable_all(&mut self) -> usize {
+        for probe in &mut self.probes {
+            probe.enabled = true;
+        }
+        self.probes.len()
+    }
+}
+
 
 mod tests {
+
+    #[test]
+    fn test_solus_eopkg_package_engine() {
+        let mut eopkg = SolusEopkgPackageEngine::new();
+        assert_eq!(eopkg.packages.len(), 2);
+        assert!(eopkg.install_package("budgie-desktop"));
+        assert_eq!(eopkg.active_desktop_profile, "Budgie");
+    }
+
+    #[test]
+    fn test_mageia_urpmi_media_manager() {
+        let mut urpmi = MageiaUrpmiMediaManager::new();
+        assert_eq!(urpmi.active_media_count(), 1);
+        urpmi.add_media("nonfree-release", "https://mirrors.kernel.org/mageia/distrib/9/x86_64/media/nonfree/release");
+        assert_eq!(urpmi.active_media_count(), 2);
+    }
+
+    #[test]
+    fn test_dragonfly_hammer2_pfs_engine() {
+        let mut hammer2 = DragonFlyHammer2PfsEngine::new();
+        hammer2.create_snapshot("pfs_root", 1, true);
+        hammer2.create_snapshot("pfs_backup", 2, false);
+        assert_eq!(hammer2.snapshots.len(), 2);
+        assert_eq!(hammer2.master_snapshots_count(), 1);
+    }
+
+    #[test]
+    fn test_illumos_dtrace_tracing_governor() {
+        let mut dtrace = IllumosDTraceTracingGovernor::new();
+        assert_eq!(dtrace.probes.len(), 2);
+        assert_eq!(dtrace.enable_all(), 2);
+        assert!(dtrace.probes[0].enabled);
+    }
 
     #[test]
     fn test_void_xbps_binary_package_engine() {
