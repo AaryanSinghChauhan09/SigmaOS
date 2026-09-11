@@ -82,9 +82,27 @@ pub use hardening::{
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
-pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
+pub use selinux::{SecurityContext, SELinuxPolicy, SigmaSELinux};
+pub mod libgksu;
+pub use libgksu::*;
+pub mod pqc_measurement;
+pub use pqc_measurement::*;
+pub mod landlock;
+pub use landlock::*;
+pub mod landlock_sovereign;
+pub use landlock_sovereign::*;
 pub use securelevels::{Securelevel, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
 
 pub mod bpf_lsm_sovereign;
 pub use bpf_lsm_sovereign::{SovereignBpfLsmEngine, BpfLsmProgram, LsmHookPoint, BpfLsmDecision};
+pub mod publication_permissions;
+pub use publication_permissions::*;
+pub mod kernel_hardening;
+pub use kernel_hardening::*;
+pub mod vpn;
+pub use vpn::*;
+pub mod parrot_kali;
+pub use parrot_kali::*;
+pub mod kali_stack;
+pub use kali_stack::*;

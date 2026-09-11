@@ -59,3 +59,10 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     rustc --test src/distro/arch_missing_components.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/arch_missing_test
     ./build/arch_missing_test
 fi
+
+if [ -f "tests/test_universal_adapter.rs" ]; then
+    echo "Running Universal Package Format Adapter test suite..."
+    mkdir -p build
+    rustc --test tests/test_universal_adapter.rs --edition=2021 -o build/universal_adapter_test
+    ./build/universal_adapter_test
+fi

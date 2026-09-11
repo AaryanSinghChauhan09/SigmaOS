@@ -575,14 +575,7 @@ impl SovereignDynamicDevfsEngine {
             symlink_paths: Vec::new(),
         });
     }
-
-    pub fn new(dot_server: [u8; 4]) -> Self {
-        let mut engine = Self {
-            upstream_dot_server: dot_server,
-            dot_port: 853,
-            local_cache: Vec::new(),
-            dnssec_enforced: true,
-        };
+}
 
 impl Default for SovereignDynamicDevfsEngine {
     fn default() -> Self {
@@ -807,12 +800,6 @@ impl Default for SovereignDynamicDevfsEngine {
 // ============================================================================
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-}
 
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
@@ -1107,7 +1094,7 @@ impl SovereignJournaldBinaryStorageEngine {
             timestamp_unix_epoch: timestamp,
             priority,
             unit_name: unit,
-            message: msg,
+            message: msg.to_string(),
         });
     }
 

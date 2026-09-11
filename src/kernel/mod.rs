@@ -15,6 +15,7 @@ pub mod classic_os;
 pub mod component;
 pub mod console;
 pub mod missing_linux_kernel_components;
+pub use missing_linux_kernel_components::*;
 pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;
@@ -92,6 +93,8 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub mod virtual_cpu;
+pub mod vmm_paging;
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 
@@ -100,5 +103,3 @@ pub mod sigma_timer;
 pub mod sigma_workqueue;
 pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
-pub mod missing_linux_kernel_components;
-pub use missing_linux_kernel_components::*;

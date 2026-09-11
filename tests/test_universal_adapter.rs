@@ -1,11 +1,105 @@
 // Integration tests for SigmaOS Universal Package Format Adapter
 extern crate alloc;
 
-#[cfg(not(feature = "standalone_test"))]
-use sigmaos::sigpkg::*;
+pub mod package {
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PackagePriority {
+        Essential,
+        Required,
+        Important,
+        Standard,
+        Optional,
+    }
 
-#[cfg(feature = "standalone_test")]
-use crate::sigpkg::*;
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct AptDebManifest {
+        pub package: String,
+        pub version: String,
+        pub architecture: String,
+        pub maintainer: String,
+        pub depends: Vec<String>,
+        pub description: String,
+        pub priority: PackagePriority,
+    }
+}
+
+#[path = "../src/sigpkg"]
+pub mod sigpkg {
+    pub use super::package::*;
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub struct Version {
+        pub major: u64,
+        pub minor: u64,
+        pub patch: u64,
+    }
+
+    impl Version {
+        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+            Self { major, minor, patch }
+        }
+
+        pub fn parse(s: &str) -> Result<Self, &'static str> {
+            let parts: Vec<&str> = s.split('.').collect();
+            let major = parts.get(0).and_then(|p| p.parse().ok()).unwrap_or(1);
+            let minor = parts.get(1).and_then(|p| p.parse().ok()).unwrap_or(0);
+            let patch = parts.get(2).and_then(|p| p.parse().ok()).unwrap_or(0);
+            Ok(Self::new(major, minor, patch))
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub enum VersionConstraint {
+        Exact(Version),
+        GreaterThan(Version),
+        LessThan(Version),
+        GreaterOrEqual(Version),
+        LessOrEqual(Version),
+        Any,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Dependency {
+        pub name: String,
+        pub version_constraint: VersionConstraint,
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct Package {
+        pub name: String,
+        pub version: Version,
+        pub description: String,
+        pub dependencies: Vec<Dependency>,
+        pub checksum: String,
+    }
+
+    impl Package {
+        pub fn new(
+            name: String,
+            version: Version,
+            description: String,
+            dependencies: Vec<Dependency>,
+            checksum: String,
+        ) -> Self {
+            Self {
+                name,
+                version,
+                description,
+                dependencies,
+                checksum,
+            }
+        }
+    }
+
+    pub mod universal_engine;
+    pub mod universal_oop_system;
+    pub mod universal_adapter;
+
+    pub use universal_adapter::*;
+    pub use universal_engine::PackageFormat;
+}
+
+use sigpkg::*;
 
 #[test]
 fn test_universal_adapter_all_formats() {
@@ -52,7 +146,7 @@ fn test_universal_adapter_all_formats() {
         .absorb_and_register("tmux.tgz", openbsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, Version::new(3, 0, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher

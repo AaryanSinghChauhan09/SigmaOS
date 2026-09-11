@@ -17,7 +17,9 @@ pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
+pub mod community;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod crypto;
 pub mod filesystem;
@@ -296,27 +298,9 @@ pub use driver::pci_bus::{
     PciHardwareAccess, PciHeaderType, PciInterruptMode, PcieAerLog, PcieAerSeverity, PcieAspmState,
     SimulatedPciHardwareAccess,
 };
-pub use drivers::*;
-pub use drivers::distro_device_expansion::{
-    AppleNvmeAnsDriver, AtherosAr9271WifiDriver, Esp32HciBtBridgeDriver, LogitechUnifyingHidDriver,
-    NvidiaNouveauOpenGspDriver, UsbAudioClass2Driver,
-};
-pub use driver::{
-    AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
-    DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
-    EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType,
-    I2cSpiGpioBusController, InputDriver, InputEvent, InputType, IsochannelMode,
-    IsolationRingLevel, LeAudioCodec, LinuxBsdWifi6e7Driver, LinuxUrb, LinuxUrbQueue,
-    MultiTouchSlot, NetBsdRumpDriverHost, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    Nvme2ZnsFabricsDriver, NvmeFabricsTransport, NvmeZoneDescriptor, NvmeZoneState,
-    OpenBsdDriverPledge, PacketSlot, StorageCommand, StorageDriver, StorageError, StorageType,
-    Uac3IntelHdaAudioDspDriver, UrbTransferType, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
-    Virgl3dCmd, Virgl3dResource, VirtioGpuVirgl3dDriver, WifiBand, WifiMloLink, WifiProtocolMode,
-    ZeroCopyPacketDriverEngine,
-};
+pub use driver::*;
 pub use filesystem::{
-    FileMode, FileType, FsError, Inode, VirtualFilesystem,
+    FileMode, FileType, FsError, Inode, VirtualFileSystem,
 };
 pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
@@ -388,7 +372,6 @@ pub use security::{
 };
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
-    StreamTarget,
 };
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,

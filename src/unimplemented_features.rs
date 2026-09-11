@@ -1871,39 +1871,35 @@ mod tests {
 // ============================================================================
 
 // 6.1 Polymorphic Universal Peripheral Blueprint
-pub trait BareMetalUnifiedPeripheral {
+pub trait SpecBareMetalUnifiedPeripheral {
     fn initialize(&mut self) -> Result<(), &'static str>;
     fn read_register(&self, offset: u32) -> u64;
     fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
     fn handle_irq(&mut self) -> u32;
 }
 
-pub struct LegacyPioController {
+pub struct SpecLegacyPioController {
     pub port_base: u16,
     pub power_state: PowerState,
 }
 
-impl BareMetalUnifiedPeripheral for LegacyPioController {
+impl SpecBareMetalUnifiedPeripheral for SpecLegacyPioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
-    fn write_register(&mut self, _offset: u16, _value: u64) {}
-    fn handle_irq(&mut self) -> bool { true }
-    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
-    fn get_power_state(&self) -> PowerState { self.power_state }
+    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
+    fn handle_irq(&mut self) -> u32 { 1 }
 }
 
-pub struct ModernMmioController {
+pub struct SpecModernMmioController {
     pub mmio_base: u64,
     pub power_state: PowerState,
 }
 
-impl BareMetalUnifiedPeripheral for ModernMmioController {
+impl SpecBareMetalUnifiedPeripheral for SpecModernMmioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
-    fn write_register(&mut self, _offset: u16, _value: u64) {}
-    fn handle_irq(&mut self) -> bool { true }
-    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
-    fn get_power_state(&self) -> PowerState { self.power_state }
+    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
+    fn handle_irq(&mut self) -> u32 { 1 }
 }
 
 pub struct BareMetalUnifiedPeripheralManager {
@@ -1939,12 +1935,12 @@ pub struct SpecUdfInstruction {
     pub addr: u64,
 }
 
-pub struct UdfVm {
+pub struct SpecUdfVm {
     pub registers: [u64; 8], // R0 - R7
     pub pc: usize,
 }
 
-impl UdfVm {
+impl SpecUdfVm {
     pub fn new() -> Self {
         Self {
             registers: [0; 8],
@@ -1970,7 +1966,7 @@ impl UdfVm {
     }
 }
 
-impl Default for UdfVm {
+impl Default for SpecUdfVm {
     fn default() -> Self { Self::new() }
 }
 
@@ -2010,13 +2006,13 @@ pub struct SpecTransactionBlock {
     pub crc32c_hash: u32,
 }
 
-pub struct Jbd2TransactionLedger {
+pub struct SpecJbd2TransactionLedger {
     pub ring_blocks: [SpecTransactionBlock; 16],
     pub head: usize,
     pub current_merkle_root: u32,
 }
 
-impl Jbd2TransactionLedger {
+impl SpecJbd2TransactionLedger {
     pub fn new() -> Self {
         Self {
             ring_blocks: [SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
@@ -2050,7 +2046,7 @@ impl Jbd2TransactionLedger {
     }
 }
 
-impl Default for Jbd2TransactionLedger {
+impl Default for SpecJbd2TransactionLedger {
     fn default() -> Self { Self::new() }
 }
 

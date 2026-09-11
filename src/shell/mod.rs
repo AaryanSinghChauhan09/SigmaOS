@@ -2,6 +2,11 @@
 // SigmaShell module - Desktop shell interface
 // Pure Nim implementation (no QML/JS dependencies)
 
+pub mod sigma_sh;
+pub use sigma_sh::*;
+pub mod command;
+pub use command::*;
+
 // FFI bindings to Nim SigmaShell
 extern "C" {
     fn sigma_shell_create() -> *mut SigmaShellHandle;

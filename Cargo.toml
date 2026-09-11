@@ -32,6 +32,26 @@ full-build = ["core-build"]  # Full build with all modules
 # Opt-in feature consumed by src/klib/custom_allocator.rs via cfg(feature = "...").
 custom_alloc_error_handler = []
 standalone_test = []
+# Storage & Performance Matrix features
+cache-lru = []
+cache-lfu = []
+cache-arc = []
+jemalloc = []
+mimalloc = []
+scheduler-eevdf = []
+scheduler-bore = []
+lock-free = []
+mutex = []
+rwlock = []
+io-sequential = []
+io-random = []
+io-mmap = []
+# Security Hardening Matrix features
+landlock-v4 = []
+pledge = []
+capsicum = []
+seccomp-strict = []
+smack = []
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(custom_alloc_error_handler)', 'cfg(standalone_test)'] }

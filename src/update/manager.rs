@@ -3,18 +3,8 @@
 // Centralized orchestration for system updates, atomic A/B slot switching, binary delta patching,
 // pre/post-flight health verification, cryptographic verification, and transactional rollback ledger.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 #[cfg(feature = "standalone_test")]

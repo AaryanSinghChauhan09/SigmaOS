@@ -12,7 +12,6 @@ use std::vec::Vec as AllocVec;
 use crate::klib::collections::HashMap;
 use crate::klib::string::SigmaString;
 use crate::klib;
-use crate::klib::SigmaString;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

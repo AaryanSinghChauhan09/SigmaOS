@@ -3,9 +3,7 @@
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations
 
-#[cfg(feature = "standalone_test")]
 use std::vec::Vec;
-use alloc::vec::Vec;
 use core::sync::atomic::AtomicU64;
 
 /// Secure Memory Zeroization utility
