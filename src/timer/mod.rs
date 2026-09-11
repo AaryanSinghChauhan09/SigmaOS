@@ -4,9 +4,10 @@
 // Zero-dependency implementation - no external libraries required
 
 
-use std::vec::Vec;
-use std::string::{String, ToString};
-use std::boxed::Box;
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
+use alloc::boxed::Box;
 use core::fmt;
 
 /// Error type for the Timer module
