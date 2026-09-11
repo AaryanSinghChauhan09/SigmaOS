@@ -203,10 +203,33 @@ impl<'a> SovereignJsonParser<'a> {
         }
     }
 
+    /// Optimized by Bolt ⚡: Fast byte-scanning path for JSON string parsing.
+    /// Eliminates per-character UTF-8 decoding overhead (`.chars().next()`) for escape-free strings
+    /// by scanning raw bytes directly for `"` and `\` delimiters.
     fn parse_string(&mut self) -> Result<String, &'static str> {
         if self.next_char() != Some('"') {
             return Err("JSON Parser: Expected opening quote for string");
         }
+        let start = self.pos;
+        let bytes = self.input.as_bytes();
+        let mut curr = start;
+
+        // Fast path: Scan raw bytes until we hit `"` or `\`
+        while curr < bytes.len() {
+            let b = bytes[curr];
+            if b == b'"' {
+                let slice = &self.input[start..curr];
+                self.pos = curr + 1; // consume closing quote
+                return Ok(String::from(slice));
+            }
+            if b == b'\\' {
+                break; // Escape sequence encountered, fall back to character processing
+            }
+            curr += 1;
+        }
+
+        // Slow path for strings containing backslash escape sequences
+        self.pos = start;
         let mut out = String::new();
         while let Some(c) = self.next_char() {
             match c {
@@ -342,45 +365,6 @@ impl<'a> SovereignJsonParser<'a> {
     }
 }
 
-/// ⚡ Perf: Zero-copy string borrowing for keys without escape sequences.
-/// Instead of allocating a new `String` for every object key, this method
-/// returns a `&'a str` slice directly into the input buffer when no escape
-/// characters are present.  Falls back to owned allocation only when needed.
-///
-/// Benchmark impact: ~40% reduction in allocations for dense JSON config files.
-impl<'a> SovereignJsonParser<'a> {
-    /// Attempt to borrow the string key from the input slice without allocation.
-    /// Returns `Ok(borrowed)` for escape-free strings, `Err(owned)` otherwise.
-    fn try_borrow_string(&mut self) -> Result<SovereignJsonValue, &'static str> {
-        if self.peek() != Some('"') {
-            return Err("JSON Parser: Expected opening quote");
-        }
-        self.pos += 1; // consume opening quote
-
-        let start = self.pos;
-        // Fast path: scan for closing quote without escapes.
-        let input_bytes = self.input.as_bytes();
-        while self.pos < input_bytes.len() {
-            let b = input_bytes[self.pos];
-            if b == b'"' {
-                // No escapes encountered — borrow the slice directly.
-                let slice = &self.input[start..self.pos];
-                self.pos += 1; // consume closing quote
-                return Ok(SovereignJsonValue::String(slice.to_string()));
-            }
-            if b == b'\\' {
-                // Escape found — fall back: rewind and use allocating parse_string.
-                self.pos = start - 1; // rewind to opening quote
-                return self.parse_string().map(SovereignJsonValue::String);
-            }
-            if b < 0x20 {
-                return Err("JSON Parser: Unescaped control character in string");
-            }
-            self.pos += 1;
-        }
-        Err("JSON Parser: Unterminated string")
-    }
-}
 
 /// Helper to append an escaped string to an existing String buffer without heap reallocations or cloning.
 fn append_escaped_json_string(s: &str, out: &mut String) {
@@ -439,7 +423,7 @@ fn parse_f64_simple(s: &str) -> Result<f64, &'static str> {
     Ok(result)
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
