@@ -1812,11 +1812,11 @@ mod tests {
 
     #[test]
     fn test_zero_allocation_udf_bytecode_vm() {
-        let mut vm = SpecUdfVm::new();
+        let mut vm = UdfVm::new();
         let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
+            UdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
+            UdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
+            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
         ];
         let res = vm.execute(&code).unwrap();
         assert_eq!(res, 0x3F8 + 10);
@@ -1824,17 +1824,17 @@ mod tests {
 
     #[test]
     fn test_constraint_sat_solver() {
-        let solver = SpecConstraintSatSolver::new();
+        let mut solver = ConstraintSatSolver::new();
         let nodes = [
-            SpecPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
-            SpecPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
+            PackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
+            PackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
         ];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 
     #[test]
     fn test_jbd2_transactional_ledger() {
-        let mut ledger = SpecJbd2TransactionLedger::new();
+        let mut ledger = Jbd2TransactionLedger::new();
         let tx_id = ledger.write_transaction(0x1000, &[1, 2, 3, 4]).unwrap();
         assert_eq!(tx_id, 1);
         assert_eq!(ledger.head, 1);
@@ -1846,22 +1846,22 @@ mod tests {
     #[test]
     fn test_sigmaos_component_inspection_suite() {
         // Inspect & verify zero-allocation VM bytecode execution
-        let mut vm = SpecUdfVm::new();
+        let mut vm = UdfVm::new();
         let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
+            UdfInstruction { op: 0x10, reg: 0, addr: 100 },
+            UdfInstruction { op: 0x30, reg: 0, addr: 50 },
+            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },
         ];
         assert_eq!(vm.execute(&code).unwrap(), 150);
 
         // Inspect & verify JBD2 crash transaction ledger
-        let mut ledger = SpecJbd2TransactionLedger::new();
+        let mut ledger = Jbd2TransactionLedger::new();
         assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);
         assert_eq!(ledger.head, 1);
 
         // Inspect & verify SAT Solver
-        let solver = SpecConstraintSatSolver::new();
-        let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
+        let solver = ConstraintSatSolver::new();
+        let nodes = [PackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 }
@@ -1870,41 +1870,44 @@ mod tests {
 // Section 6: Bare-Metal Subsystem Design Specifications
 // ============================================================================
 
-// 6.1 Polymorphic Universal Peripheral Blueprint Specifications
-pub struct LegacyPioSpecController {
+// 6.1 Polymorphic Universal Peripheral Blueprint
+pub trait SpecBareMetalUnifiedPeripheral {
+    fn initialize(&mut self) -> Result<(), &'static str>;
+    fn read_register(&self, offset: u32) -> u64;
+    fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
+    fn handle_irq(&mut self) -> u32;
+}
+
+pub struct LegacyPioController {
     pub port_base: u16,
     pub power_state: PowerState,
 }
 
-impl LegacyPioSpecController {
-    pub fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    pub fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
-    pub fn write_register(&mut self, _offset: u16, _value: u64) {}
-    pub fn handle_irq(&mut self) -> bool { true }
-    pub fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
-    pub fn get_power_state(&self) -> PowerState { self.power_state }
+impl SpecBareMetalUnifiedPeripheral for LegacyPioController {
+    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
+    fn handle_irq(&mut self) -> u32 { 1 }
 }
 
-pub struct ModernMmioSpecController {
+pub struct ModernMmioController {
     pub mmio_base: u64,
     pub power_state: PowerState,
 }
 
-impl ModernMmioSpecController {
-    pub fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    pub fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
-    pub fn write_register(&mut self, _offset: u16, _value: u64) {}
-    pub fn handle_irq(&mut self) -> bool { true }
-    pub fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
-    pub fn get_power_state(&self) -> PowerState { self.power_state }
+impl SpecBareMetalUnifiedPeripheral for ModernMmioController {
+    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
+    fn handle_irq(&mut self) -> u32 { 1 }
 }
 
-pub struct BareMetalSpecPeripheralManager {
+pub struct BareMetalUnifiedPeripheralManager {
     pub registered_devices: [(u16, u64, bool); 16],
     pub device_count: usize,
 }
 
-impl BareMetalSpecPeripheralManager {
+impl BareMetalUnifiedPeripheralManager {
     pub fn new() -> Self {
         Self {
             registered_devices: [(0, 0, false); 16],
@@ -1920,7 +1923,7 @@ impl BareMetalSpecPeripheralManager {
     }
 }
 
-impl Default for BareMetalSpecPeripheralManager {
+impl Default for BareMetalUnifiedPeripheralManager {
     fn default() -> Self { Self::new() }
 }
 
@@ -1976,9 +1979,9 @@ pub struct SpecPackageNode {
     pub req_max: u32,
 }
 
-pub struct SpecConstraintSatSolver;
+pub struct ConstraintSatSolver;
 
-impl SpecConstraintSatSolver {
+impl ConstraintSatSolver {
     pub fn new() -> Self { Self }
 
     pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
@@ -1991,7 +1994,7 @@ impl SpecConstraintSatSolver {
     }
 }
 
-impl Default for SpecConstraintSatSolver {
+impl Default for ConstraintSatSolver {
     fn default() -> Self { Self::new() }
 }
 
