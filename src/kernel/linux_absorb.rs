@@ -893,8 +893,8 @@ impl AbsorbedBuddyAllocator {
                         v
                     },
                 }),
-                total_memory: 4u64 * 1024 * 1024 * 1024, // 4GB
-                available_memory: 4u64 * 1024 * 1024 * 1024,
+                total_memory: 4 * 1024 * 1024 * 1024, // 4GB
+                available_memory: 4 * 1024 * 1024 * 1024,
                 page_size: 4096,
             },
             allocated_blocks: Vec::new(),

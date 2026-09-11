@@ -191,8 +191,8 @@ impl ProcFileSystem {
             namespaces: HashMap::new(),
             active_namespace_id: 0,
             system_uptime: 43200,          // 12 hours
-            total_memory: 16777216u64 * 1024, // 16GB
-            used_memory: 4194304u64 * 1024,   // 4GB
+            total_memory: 16777216 * 1024, // 16GB
+            used_memory: 4194304 * 1024,   // 4GB
             cpu_model: "Sigma Core AI-Native 9".to_string(),
             cpu_cores: 16,
         };
@@ -200,11 +200,11 @@ impl ProcFileSystem {
         // Create default root cgroups
         pfs.cgroups.insert(
             "system.slice".to_string(),
-            CGroup::new("system.slice", 8u64 * 1024 * 1024 * 1024, 1024),
+            CGroup::new("system.slice", 8 * 1024 * 1024 * 1024, 1024),
         );
         pfs.cgroups.insert(
             "user.slice".to_string(),
-            CGroup::new("user.slice", 8u64 * 1024 * 1024 * 1024, 1024),
+            CGroup::new("user.slice", 8 * 1024 * 1024 * 1024, 1024),
         );
 
         // Create root PID namespace

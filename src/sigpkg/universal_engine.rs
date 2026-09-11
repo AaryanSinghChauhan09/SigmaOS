@@ -73,6 +73,24 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
+    Deb,
+    Rpm,
+    Ebuild,
+    Sigma,
+    Sysupdate,
+}
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
+        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
+        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
+        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
+        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
+        else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
+        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
+        else { None }
+    }
 }
 
 #[derive(Debug, Clone)]
