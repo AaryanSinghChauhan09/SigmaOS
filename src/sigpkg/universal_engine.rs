@@ -14,6 +14,11 @@ use core::result::Result::{self, Err, Ok};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
+    Deb,
+    Rpm,
+    Ebuild,
+    Sigma,
+    Sysupdate,
     Apt,
     Yum,
     Pacman,
@@ -86,6 +91,35 @@ pub struct PackageContext {
 }
 
 /// Dynamic Polymorphic Interface for Package Formats (OOP Adapter pattern)
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let name_lower = filename.to_lowercase();
+        if name_lower.ends_with(".deb") {
+            Some(PackageFormat::Deb)
+        } else if name_lower.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
+        } else if name_lower.ends_with(".ebuild") {
+            Some(PackageFormat::Ebuild)
+        } else if name_lower.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if name_lower.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if name_lower.ends_with(".pkg.tar.zst") || name_lower.ends_with(".pkg.tar.xz") {
+            Some(PackageFormat::Pacman)
+        } else if name_lower.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if name_lower.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if name_lower.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if name_lower.ends_with(".sigma") {
+            Some(PackageFormat::Sigma)
+        } else {
+            None
+        }
+    }
+}
+
 pub trait IPackageAdapter {
     fn format(&self) -> PackageFormat;
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str>;
