@@ -287,3 +287,10 @@ pub use fedora_gap_closure::{
     FedoraMockChrootBuildEngine, FedoraSelinuxMlsPolicyGovernorEngine, KickstartConfig,
     MockChrootSpec, SelinuxMlsContext, SovereignFedoraGapClosureSuite,
 };
+
+pub mod tech_media_distro_innovations;
+pub use tech_media_distro_innovations::{
+    DistroWatchRankTrackerEngine, LinuxTeckSysadminAutomationEngine,
+    MakeUseOfDistroRecommendationEngine, NineToFiveLinuxReleaseMatrixEngine,
+    SovereignTechMediaDistroInnovationsSuite,
+};
