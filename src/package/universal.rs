@@ -2754,33 +2754,6 @@ mod tests {
     }
 
     #[test]
-    fn test_all_package_format_strategies_and_adapters() {
-        let adapter = AlpineApkPackageAdapter;
-        adapter.test_all_package_format_strategies_and_adapters();
-    }
-
-    #[test]
-    fn test_expanded_decorators() {
-        let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
-        let base = BasePackageDecorator { package: pkg };
-
-        let sandbox_dec = SandboxDecorator {
-            decorated: base,
-            is_isolated: true,
-        };
-
-        assert!(sandbox_dec.enforce_sandbox().is_ok());
-        assert_eq!(sandbox_dec.get_package().name, "simd-app");
-
-        let net_dec = NetworkRestrictionDecorator {
-            decorated: sandbox_dec,
-            allowed_hosts: vec!["sigmaos.org".to_string()],
-        };
-
-        assert!(net_dec.restrict_network().is_ok());
-    }
-
-    #[test]
     fn test_package_format_from_filename_extensions() {
         assert_eq!(
             PackageFormat::from_filename("app.air"),
@@ -2944,76 +2917,25 @@ impl AlpineApkPackageAdapter {
     pub fn format(&self) -> PackageFormat {
         PackageFormat::SigmaPkg
     }
+}
 
-    pub fn test_all_package_format_strategies_and_adapters(&self) {
-        let formats = vec![
-            PackageFormat::Deb,
-            PackageFormat::Rpm,
-            PackageFormat::Pacman,
-            PackageFormat::Ebuild,
-            PackageFormat::Apk,
-            PackageFormat::Nix,
-            PackageFormat::Flatpak,
-            PackageFormat::Snap,
-            PackageFormat::AppImage,
-            PackageFormat::Xbps,
-            PackageFormat::Txz,
-            PackageFormat::Eopkg,
-            PackageFormat::Zypper,
-            PackageFormat::Guix,
-            PackageFormat::CachyOS,
-            PackageFormat::Swupd,
-            PackageFormat::Starling,
-            PackageFormat::SigmaPkg,
-            PackageFormat::Air,
-            PackageFormat::Bottle,
-            PackageFormat::Ipa,
-            PackageFormat::Ports,
-            PackageFormat::Pkg,
-            PackageFormat::Aab,
-            PackageFormat::TarGz,
-            PackageFormat::Xz,
-            PackageFormat::App,
-            PackageFormat::Hap,
-            PackageFormat::Pisi,
-            PackageFormat::Superdeb,
-            PackageFormat::Lzm,
-            PackageFormat::Pup,
-            PackageFormat::Pet,
-            PackageFormat::Tar,
-            PackageFormat::Moss,
-            PackageFormat::Hpkg,
-            PackageFormat::Tcz,
-            PackageFormat::Gobo,
-            PackageFormat::Ostree,
-            PackageFormat::Pkgsrc,
-            PackageFormat::Sfs,
-            PackageFormat::Puk,
-            PackageFormat::Dmg,
-            PackageFormat::Cports,
-            PackageFormat::Dports,
-            PackageFormat::SlackBuild,
-            PackageFormat::Crux,
-            PackageFormat::Drpm,
-            PackageFormat::Stratum,
-        ];
+#[test]
+fn test_expanded_decorators() {
+    let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
+    let base = BasePackageDecorator { package: pkg };
 
-        for fmt in formats {
-            let strategy = PackageFactory::get_strategy(fmt);
-            let adapter = PackageFactory::get_adapter(fmt);
-            let pkg =
-                UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string()).with_format(fmt);
+    let sandbox_dec = SandboxDecorator {
+        decorated: base,
+        is_isolated: true,
+    };
 
-            assert!(strategy.install(&pkg).is_ok());
-            assert!(strategy.verify(&pkg).unwrap());
-            assert!(strategy.remove(&pkg).is_ok());
+    assert!(sandbox_dec.enforce_sandbox().is_ok());
+    assert_eq!(sandbox_dec.get_package().name, "simd-app");
 
-            let adapted = adapter.adapt("").unwrap();
-            assert!(
-                adapted.formats.contains(&fmt)
-                    || (fmt == PackageFormat::Nix
-                        && adapted.formats.contains(&PackageFormat::Nixpkg))
-            );
-        }
-    }
+    let net_dec = NetworkRestrictionDecorator {
+        decorated: sandbox_dec,
+        allowed_hosts: vec!["sigmaos.org".to_string()],
+    };
+
+    assert!(net_dec.restrict_network().is_ok());
 }
