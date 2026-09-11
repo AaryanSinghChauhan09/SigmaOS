@@ -18,6 +18,8 @@ pub use wayland_protocol::*;
 
 pub use sovereign_navigation_engine::*;
 
+pub use sovereign_navigation_engine::*;
+
 pub use ultimate_distro_desktop::{
     ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
     LuminaBsdDesktopEngine, SwayRegolithWmEngine, SwayWorkspaceContainerNode, ThunarCustomAction,
