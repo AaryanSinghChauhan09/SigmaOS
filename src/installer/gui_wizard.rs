@@ -193,12 +193,6 @@ pub struct PrivacySettings {
     pub location_services: bool,
 }
 
-#[derive(Debug, Clone)]
-pub struct DetectedOperatingSystem {
-    pub name: String,
-    pub partition_path: String,
-}
-
 impl SystemConfiguration {
     pub fn new() -> Self {
         Self {

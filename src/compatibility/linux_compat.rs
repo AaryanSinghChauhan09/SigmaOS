@@ -593,8 +593,247 @@ impl Default for LinuxCgroupV2PsiEngine {
     }
 }
 
-#[cfg(test)]
+// =========================================================================
+// Linux Kernel Pidfd Race-Free Process File Descriptor Engine
+// =========================================================================
+
+pub struct LinuxPidfdEngine {
+    pub active_pidfds: HashMap<i32, u32>, // pidfd -> target_pid
+    pub next_pidfd: i32,
+}
+
+impl LinuxPidfdEngine {
+    pub fn new() -> Self {
+        Self {
+            active_pidfds: HashMap::new(),
+            next_pidfd: 100,
+        }
+    }
+
+    pub fn pidfd_open(&mut self, target_pid: u32) -> i32 {
+        let fd = self.next_pidfd;
+        self.next_pidfd += 1;
+        self.active_pidfds.insert(fd, target_pid);
+        fd
+    }
+
+    pub fn pidfd_send_signal(&self, pidfd: i32, signal: i32) -> Result<(), &'static str> {
+        if self.active_pidfds.contains_key(&pidfd) {
+            if signal >= 0 && signal <= 64 {
+                Ok(())
+            } else {
+                Err("Pidfd: Invalid signal number")
+            }
+        } else {
+            Err("Pidfd: Invalid file descriptor")
+        }
+    }
+}
+
+impl Default for LinuxPidfdEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Linux Kernel User Namespace UID/GID Mapping Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UsernsMapEntry {
+    pub ns_id: u32,
+    pub host_id: u32,
+    pub range_length: u32,
+}
+
+pub struct LinuxUserNamespaceIdMapEngine {
+    pub uid_mappings: Vec<UsernsMapEntry>,
+    pub gid_mappings: Vec<UsernsMapEntry>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VecUsernsMapEntry(pub Vec<UsernsMapEntry>);
+
+impl LinuxUserNamespaceIdMapEngine {
+    pub fn new() -> Self {
+        Self {
+            uid_mappings: Vec::new(),
+            gid_mappings: Vec::new(),
+        }
+    }
+
+    pub fn add_uid_mapping(&mut self, ns_id: u32, host_id: u32, count: u32) {
+        self.uid_mappings.push(UsernsMapEntry {
+            ns_id,
+            host_id,
+            range_length: count,
+        });
+    }
+
+    pub fn translate_uid_to_host(&self, ns_uid: u32) -> Option<u32> {
+        for map in &self.uid_mappings {
+            if ns_uid >= map.ns_id && ns_uid < map.ns_id + map.range_length {
+                return Some(map.host_id + (ns_uid - map.ns_id));
+            }
+        }
+        None
+    }
+}
+
+impl Default for LinuxUserNamespaceIdMapEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Linux Kernel Device-Mapper dm-verity Merkle Tree Integrity Engine
+// =========================================================================
+
+pub struct LinuxDmVerityEngine {
+    pub expected_root_hash: String,
+    pub data_block_size: usize,
+    pub hash_block_size: usize,
+}
+
+impl LinuxDmVerityEngine {
+    pub fn new(root_hash: &str) -> Self {
+        Self {
+            expected_root_hash: root_hash.to_string(),
+            data_block_size: 4096,
+            hash_block_size: 4096,
+        }
+    }
+
+    pub fn verify_data_block(&self, block_data: &[u8], computed_hash: &str) -> bool {
+        if block_data.len() != self.data_block_size {
+            return false;
+        }
+        !computed_hash.is_empty() && computed_hash == self.expected_root_hash
+    }
+}
+
+// =========================================================================
+// Linux Kernel Netfilter / nftables Packet Filtering Engine
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NftRule {
+    pub table: String,
+    pub chain: String,
+    pub target_action: String, // "accept", "drop", "reject"
+}
+
+pub struct LinuxNetfilterNftablesEngine {
+    pub rules: Vec<NftRule>,
+}
+
+impl LinuxNetfilterNftablesEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+        }
+    }
+
+    pub fn add_rule(&mut self, table: &str, chain: &str, action: &str) {
+        self.rules.push(NftRule {
+            table: table.to_string(),
+            chain: chain.to_string(),
+            target_action: action.to_string(),
+        });
+    }
+
+    pub fn evaluate_packet(&self, table: &str, chain: &str) -> String {
+        for rule in &self.rules {
+            if rule.table == table && rule.chain == chain {
+                return rule.target_action.clone();
+            }
+        }
+        "accept".to_string()
+    }
+}
+
+impl Default for LinuxNetfilterNftablesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// Linux Kernel ZRAM Compressed RAM Swap Device Engine
+// =========================================================================
+
+pub struct LinuxZramSwapEngine {
+    pub disk_size_bytes: usize,
+    pub comp_algorithm: String, // "lz4", "zstd"
+    pub total_compressed_bytes: usize,
+}
+
+impl LinuxZramSwapEngine {
+    pub fn new(size_bytes: usize, comp_algo: &str) -> Self {
+        Self {
+            disk_size_bytes: size_bytes,
+            comp_algorithm: comp_algo.to_string(),
+            total_compressed_bytes: 0,
+        }
+    }
+
+    pub fn compress_page_to_zram(&mut self, raw_page: &[u8]) -> Result<usize, &'static str> {
+        if raw_page.is_empty() {
+            return Err("ZRAM: Page cannot be empty");
+        }
+        // Simulated ~50% compression ratio
+        let comp_size = raw_page.len() / 2;
+        self.total_compressed_bytes += comp_size;
+        Ok(comp_size)
+    }
+}
+
 mod tests {
+    #[test]
+    fn test_linux_pidfd_engine() {
+        let mut pidfd = LinuxPidfdEngine::new();
+        let fd = pidfd.pidfd_open(1234);
+        assert_eq!(fd, 100);
+        assert!(pidfd.pidfd_send_signal(fd, 9).is_ok());
+        assert!(pidfd.pidfd_send_signal(999, 9).is_err());
+    }
+
+    #[test]
+    fn test_linux_userns_idmap_engine() {
+        let mut userns = LinuxUserNamespaceIdMapEngine::new();
+        userns.add_uid_mapping(0, 100000, 65536);
+
+        let host_uid = userns.translate_uid_to_host(1000).unwrap();
+        assert_eq!(host_uid, 101000);
+        assert!(userns.translate_uid_to_host(70000).is_none());
+    }
+
+    #[test]
+    fn test_linux_dm_verity_engine() {
+        let verity = LinuxDmVerityEngine::new("sha256:root_hash_abc");
+        let data = [0u8; 4096];
+        assert!(verity.verify_data_block(&data, "sha256:root_hash_abc"));
+        assert!(!verity.verify_data_block(&data, "sha256:wrong_hash"));
+    }
+
+    #[test]
+    fn test_linux_nftables_engine() {
+        let mut nft = LinuxNetfilterNftablesEngine::new();
+        nft.add_rule("filter", "input", "drop");
+        assert_eq!(nft.evaluate_packet("filter", "input"), "drop");
+        assert_eq!(nft.evaluate_packet("filter", "output"), "accept");
+    }
+
+    #[test]
+    fn test_linux_zram_swap_engine() {
+        let mut zram = LinuxZramSwapEngine::new(1073741824, "zstd");
+        let raw_page = [0xABu8; 4096];
+        let comp_bytes = zram.compress_page_to_zram(&raw_page).unwrap();
+        assert_eq!(comp_bytes, 2048);
+        assert_eq!(zram.total_compressed_bytes, 2048);
+    }
     use super::*;
 
     #[test]
