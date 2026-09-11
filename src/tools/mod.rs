@@ -8,6 +8,7 @@ pub mod simple_scan;
 pub mod sovereign_commands;
 pub mod open_source_tools_engine;
 pub mod open_source_cli_tools_suite;
+pub mod open_source_tools_parity;
 
 pub use open_source_tools_engine::{
     BatSyntaxHighlighterEngine, FzfFuzzyFinderEngine, FzfSearchResult, HtopProcessEntry,
@@ -17,6 +18,11 @@ pub use open_source_tools_engine::{
 pub use open_source_cli_tools_suite::{
     EzaFormattedEntry, EzaLsEngine, FdFileEntry, FdFileSearchEngine, RipgrepMatchResult,
     RipgrepSearchEngine, ZoxideCdEngine, ZoxideEntry,
+};
+
+pub use open_source_tools_parity::{
+    DufDeviceUsage, DufDiskUsageEngine, DustDirectoryTreeEngine, DustNode, FastfetchSysinfo,
+    ItsFossFastfetchSysinfoEngine, SimpleJqJsonQueryEngine,
 };
 
 pub use data_tools::{
