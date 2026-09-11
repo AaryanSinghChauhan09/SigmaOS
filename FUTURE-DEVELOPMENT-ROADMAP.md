@@ -5146,3 +5146,53 @@ SigmaOS integrates zero-dependency, `#![no_std]` Rust engines inspired by global
 
 #### 8. Phoronix Automated Benchmark Runner (`PhoronixSuiteAutomatedBenchmarkRunnerTool`)
 - Inspired by *Phoronix Test Suite*: runs automated regression suites measuring context switch latencies, memory bandwidth, VFS IOPS, and network throughput under heavy workloads.
+
+---
+
+## 105. SOVEREIGN ARCH LINUX COMPLETE SUBSYSTEM PARITY ARCHITECTURE SPECIFICATION
+
+### 105.1 Overview & Rolling-Release Philosophy
+SigmaOS synthesizes the speed, simplicity, transparency, and bleeding-edge rolling-release paradigm of **Arch Linux** into its zero-dependency, `#![no_std]` Rust microkernel architecture. By implementing native equivalents of `pacman` (ALPM library), `makepkg` / `AUR` chroot builders, `mkinitcpio` early boot RAMFS hooks, `reflector` mirror rankers, `archinstall` automated setup scripts, and offline `ArchWiki` AI routing, SigmaOS offers complete Arch Linux parity while removing POSIX bloat.
+
+```
++-----------------------------------------------------------------------------------+
+|                     SIGMAOS ARCH LINUX PARITY ARCHITECTURE                        |
++-----------------------------------------------------------------------------------+
+|  [Arch Pacman / ALPM]    [AUR / Makepkg]      [Mkinitcpio Boot Hooks]            |
+|  Transactional Hooks    Chroot Container     Post-Quantum Crypto Boot RAMFS     |
+|  Delta Updates          GPG Keyring Trust    Early Microcode & Driver Loading   |
++-----------------------------------------------------------------------------------+
+|  [Reflector Mirror Engine] [Archinstall Engine] [ArchWiki Offline Knowledge]       |
+|  Mirror Speed Benchmarking Automated Profiles   Offline Vector Search & AI Router  |
++-----------------------------------------------------------------------------------+
+```
+
+---
+
+### 105.2 Arch Subsystem Parity Components
+
+SigmaOS natively implements Arch Linux subsystem parity across `src/compatibility/arch_linux.rs`, `src/distro/arch_parity.rs`, `src/sigpkg/arch_pacman_engine.rs`, `src/sigpkg/arch_compat.rs`, and `src/distro/arch.rs`:
+
+#### 1. ALPM & Pacman Transaction Engine (`ArchPacmanHooksEngine` & `AlpmDatabase`)
+- **Pre/Post-Transaction Hooks**: Executes system triggers (`PreTransaction`, `PostTransaction`) before and after package installation/removal.
+- **ALPM Database Operations**: Manages local package databases (`/var/lib/pacman/local`), sync databases, and lockfiles.
+- **GPG Keyring Trust Database (`ArchKeyringTrustDatabaseEngine`)**: Enforces Web-of-Trust signature verification for Arch Linux official repository packages using Dilithium-5 / Ed25519 cryptography.
+
+#### 2. Arch User Repository (AUR) & Makepkg (`ArchUserRepositoryRpcClientEngine` & `SandboxedCompiler`)
+- **RPC Search & Download**: Interfaces directly with `aur.archlinux.org` RPC APIs to search PKGBUILD recipes.
+- **Isolated Chroot Builds**: Compiles AUR packages inside capability-gated `#![no_std]` chroot sandboxes (`SbuildChrootSandboxEngine`), preventing unvetted scripts from accessing the host OS.
+
+#### 3. Mkinitcpio Early Boot Hooks (`ArchMkinitcpioPqcHooks`)
+- **Early RAMFS Generation**: Generates minimal early boot ramdisk images (`/boot/initramfs-sigma.img`) containing necessary block storage, NVMe, and filesystem drivers.
+- **PQC Boot Hooks**: Integrates early-stage Kyber-1024/Dilithium-5 encryption hooks to unlock root storage volumes before kernel handoff.
+
+#### 4. Reflector Mirror Ranker (`ArchReflectorMirrorlistEngine`)
+- **Mirror Speed Benchmarking**: Automatically queries and measures response latencies across global Arch Linux mirrors, updating `/etc/pacman.d/mirrorlist` with the top-performing endpoints.
+
+#### 5. Archinstall Automated Deployment Engine (`ArchisoBootstrapGeneratorEngine`)
+- **Declarative Profiles**: Automated system installation engine supporting profile presets (Minimal, Desktop, Server, Workstation).
+- **Disk Partitioning & Encryption**: Automatic LUKS / Btrfs / Ext4 disk layout creation and GRUB/systemd-boot setup.
+
+#### 6. ArchWiki Offline Knowledge Router (`ArchWikiOfflineKnowledgeRouter`)
+- **Local Documentation Indexing**: Vector-indexed offline storage of full ArchWiki articles.
+- **AI Query Router**: Interfaces with local LLM agents to provide instant troubleshooting and system administration guidance without internet access.
