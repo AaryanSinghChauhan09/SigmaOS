@@ -32,6 +32,7 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 - [Security Architecture](docs/security.md)
 - [Package Management](docs/package-manager.md)
 - [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
+- [Arch Linux Parity Gap Closure Blueprint](ARCH_LINUX_PARITY_GAP_CLOSURE_BLUEPRINT.md)
 
 ---
 
