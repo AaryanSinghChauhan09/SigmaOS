@@ -141,7 +141,7 @@ jobs:
             apt-get update && apt-get install -y curl gcc || true
           fi
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
 
       - name: Check ${{ matrix.compiler || matrix.kernel }} version
         if: matrix.version || matrix.kernel
@@ -153,7 +153,7 @@ jobs:
         if: matrix.compiler == 'rustc'
         shell: bash
         run: |
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
           ${{ matrix.build-cmd }}
 
       - name: Test compatibility
@@ -161,7 +161,7 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
           ${{ matrix.test-cmd }}
 
       - name: Verify compiler/kernel
