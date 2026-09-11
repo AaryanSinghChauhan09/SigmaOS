@@ -6,9 +6,9 @@
  */
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 
 #[cfg(not(test))]

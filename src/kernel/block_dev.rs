@@ -12,28 +12,11 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-
-
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::boxed::Box;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::collections::{BTreeMap, VecDeque};
-#[cfg(not(any(feature = "standalone_test", test)))]
+use std::format;
 use std::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
-use std::boxed::Box;
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::{BTreeMap, VecDeque};
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// SigmaOS Block Device Layer

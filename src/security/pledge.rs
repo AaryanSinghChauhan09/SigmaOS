@@ -1,9 +1,11 @@
 
-use crate::klib::btreemap::BTreeMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use crate::security::capability::Permission;
-use crate::security::capability::{CapabilityGate, CapabilityToken};
+
+#[cfg(test)]
+
+use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 
 use core::sync::atomic::{AtomicBool, Ordering};
 
@@ -286,7 +288,8 @@ impl Default for PledgeManager {
 
 /// Common pledge promises
 pub mod promises {
-    use super::{Permission, PledgePromise};
+    use crate::security::capability::Permission;
+    use super::PledgePromise;
 
     /// Stdio promise - basic I/O only
     pub fn stdio() -> PledgePromise {

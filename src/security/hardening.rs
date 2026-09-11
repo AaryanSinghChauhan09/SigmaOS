@@ -1,12 +1,11 @@
-#![allow(unused_imports)]
 // SigmaOS Security Hardening Module
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations
 
-use alloc::vec::Vec;
-use core::sync::atomic::AtomicU64;
 #[cfg(feature = "standalone_test")]
-use std::vec::Vec;
+use alloc::vec::Vec;
+use crate::security::Permission;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data
@@ -22,7 +21,6 @@ pub fn secure_zeroize<T: Copy + Default>(slice: &mut [T]) {
 /// Memory protection flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemoryPermission {
-    None,
     Read,
     Write,
     Execute,
@@ -112,10 +110,7 @@ fn canary_base() -> u64 {
 
     // Compile-time constant: djb2 hash over default seed string
     const FILE_PATH_HASH: u64 = {
-        let bytes = match option_env!("CARGO_MANIFEST_DIR") {
-            Some(dir) => dir.as_bytes(),
-            None => b"sigmaos",
-        };
+        let bytes = b"SIGMAOS_SECURITY_HARDENING_CANARY_SEED";
         let mut h: u64 = 5381;
         let mut i = 0;
         while i < bytes.len() {
@@ -127,8 +122,7 @@ fn canary_base() -> u64 {
     };
 
     // compare_exchange ensures only one writer wins in concurrent contexts.
-    match CANARY_BASE_SEED.compare_exchange(0, FILE_PATH_HASH, Ordering::SeqCst, Ordering::Relaxed)
-    {
+    match CANARY_BASE_SEED.compare_exchange(0, FILE_PATH_HASH, Ordering::SeqCst, Ordering::Relaxed) {
         Ok(_) => FILE_PATH_HASH,
         Err(winner) => winner,
     }
@@ -220,31 +214,6 @@ impl Default for SecurityHardeningConfig {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct AuditLogEntry {
-    pub timestamp_ms: u64,
-    pub event: std::string::String,
-    pub severity: IntrusionSeverity,
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct HardenedAuditTrail {
-    pub logs: std::vec::Vec<AuditLogEntry>,
-}
-
-impl HardenedAuditTrail {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn record_event(&mut self, event: &str, severity: IntrusionSeverity) {
-        self.logs.push(AuditLogEntry {
-            timestamp_ms: 1000,
-            event: event.into(),
-            severity,
-        });
-    }
-}
 
 #[cfg(test_disabled)]
 mod tests {

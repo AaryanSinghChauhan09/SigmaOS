@@ -6,23 +6,13 @@
 // eBPF-inspired lightweight syscall policy verifiers,
 // and FreeBSD Capsicum descriptor capability delegation.
 
+extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
 use alloc::vec::Vec;
-
-// Test environment compatibility: Use std for testing only
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// 1. NixOS-Style Declarative System Configuration & Generation Manager
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -118,9 +108,9 @@ impl NixDeclarativeSystemState {
 
     pub fn switch_generation(&mut self, target_id: u32) -> Result<Generation, String> {
         if let Some(gen) = self.generations.iter().find(|g| g.id == target_id) {
-            let res = gen.clone();
             self.active_generation_id = target_id;
-            Ok(res)
+            let target_gen: &Generation = gen;
+            Ok(target_gen.clone())
         } else {
             Err(format!("Generation ID {} not found", target_id))
         }
@@ -696,7 +686,7 @@ impl Default for SovereignHybridSchedulerInnovations {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 

@@ -1,6 +1,7 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
+
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -198,18 +199,28 @@ impl NamespaceConfig {
     }
 }
 
-impl SeccompProfileV2 {
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub blocked_syscalls: Vec<u32>,
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u64,
+}
+
+impl SeccompProfile {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened {
             return false;
         }
-        if syscall_id < 32 {
+        if syscall_id < 64 {
             (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
         } else {
-            false
+            self.blocked_syscalls.contains(&syscall_id)
         }
     }
 }
+
+pub type SeccompProfileV2 = SeccompProfile;
 
 /// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]

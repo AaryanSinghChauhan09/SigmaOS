@@ -3,8 +3,7 @@
 // Based on Ideas-999-Structured: AI & Machine Learning Item 936
 // Implements model training and optimization
 
-extern crate alloc;
-use alloc::vec::Vec;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type TrainingID = usize;
@@ -476,6 +475,13 @@ impl SovereignPpoOptimizer {
     }
 }
 
+
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 // ============================================================================
 // 🧪 Automated Unit Tests

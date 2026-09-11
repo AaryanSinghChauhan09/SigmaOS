@@ -1,9 +1,11 @@
+
 /// Zorin OS Compatibility Subsystem for SigmaOS
 /// Implements familiarity-first layout switching, Chameleon dynamic auto-theming,
 /// Zorin Connect smartphone integration, and Windows App support.
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Switchable desktop layout personas
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -83,6 +85,11 @@ pub enum ZorinSnapPosition {
     LeftHalf,
     RightHalf,
     Maximize,
+    TopLeftQuarter,
+    TopRightQuarter,
+    BottomLeftQuarter,
+    BottomRightQuarter,
+    Maximized,
 }
 
 pub struct ZorinGridDesktopManager {
@@ -98,29 +105,15 @@ impl ZorinGridDesktopManager {
         }
     }
 
-    pub fn calculate_window_bounds(
-        &self,
-        snap: ZorinSnapPosition,
-        screen_width: u32,
-        screen_height: u32,
-    ) -> (u32, u32, u32, u32) {
+    pub fn calculate_window_bounds(&self, snap: ZorinSnapPosition, screen_width: u32, screen_height: u32) -> (u32, u32, u32, u32) {
         match snap {
             ZorinSnapPosition::LeftHalf => (0, 0, screen_width / 2, screen_height),
             ZorinSnapPosition::RightHalf => (screen_width / 2, 0, screen_width / 2, screen_height),
-            ZorinSnapPosition::TopLeft => (0, 0, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::TopRight => {
-                (screen_width / 2, 0, screen_width / 2, screen_height / 2)
-            }
-            ZorinSnapPosition::BottomLeft => {
-                (0, screen_height / 2, screen_width / 2, screen_height / 2)
-            }
-            ZorinSnapPosition::BottomRight => (
-                screen_width / 2,
-                screen_height / 2,
-                screen_width / 2,
-                screen_height / 2,
-            ),
-            ZorinSnapPosition::Maximize => (0, 0, screen_width, screen_height),
+            ZorinSnapPosition::TopLeft | ZorinSnapPosition::TopLeftQuarter => (0, 0, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::TopRight | ZorinSnapPosition::TopRightQuarter => (screen_width / 2, 0, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::BottomLeft | ZorinSnapPosition::BottomLeftQuarter => (0, screen_height / 2, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::BottomRight | ZorinSnapPosition::BottomRightQuarter => (screen_width / 2, screen_height / 2, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::Maximize | ZorinSnapPosition::Maximized => (0, 0, screen_width, screen_height),
         }
     }
 }
@@ -199,9 +192,7 @@ impl ZorinEducationFocusMode {
             return true;
         }
         let lower = app_name.to_lowercase();
-        self.allowed_educational_apps
-            .iter()
-            .any(|allowed| lower.contains(allowed))
+        self.allowed_educational_apps.iter().any(|allowed| lower.contains(allowed))
     }
 
     pub fn tick_minute(&self) -> bool {
@@ -225,13 +216,8 @@ impl ZorinSoundThemeManager {
     }
 
     pub fn set_volume(&self, volume: usize) {
-        let max_vol = if self.amplification_boost_enabled {
-            150
-        } else {
-            100
-        };
-        self.master_volume_percent
-            .store(volume.min(max_vol), Ordering::SeqCst);
+        let max_vol = if self.amplification_boost_enabled { 150 } else { 100 };
+        self.master_volume_percent.store(volume.min(max_vol), Ordering::SeqCst);
     }
 
     pub fn enable_amplification_boost(&mut self, enable: bool) {
@@ -413,6 +399,107 @@ impl ZorinWindowsAppSupport {
     }
 }
 
+/// Zorin OS Grid Window Tiling & Snap Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZorinGridWindowTilingEngine {
+    pub screen_width: u32,
+    pub screen_height: u32,
+    pub enable_auto_tiling: bool,
+}
+
+impl ZorinGridWindowTilingEngine {
+    pub fn new(screen_width: u32, screen_height: u32) -> Self {
+        Self {
+            screen_width,
+            screen_height,
+            enable_auto_tiling: true,
+        }
+    }
+
+    pub fn calculate_snap_rect(&self, position: ZorinSnapPosition) -> (u32, u32, u32, u32) {
+        let half_w = self.screen_width / 2;
+        let half_h = self.screen_height / 2;
+
+        match position {
+            ZorinSnapPosition::LeftHalf => (0, 0, half_w, self.screen_height),
+            ZorinSnapPosition::RightHalf => (half_w, 0, half_w, self.screen_height),
+            ZorinSnapPosition::TopLeftQuarter | ZorinSnapPosition::TopLeft => (0, 0, half_w, half_h),
+            ZorinSnapPosition::TopRightQuarter | ZorinSnapPosition::TopRight => (half_w, 0, half_w, half_h),
+            ZorinSnapPosition::BottomLeftQuarter | ZorinSnapPosition::BottomLeft => (0, half_h, half_w, half_h),
+            ZorinSnapPosition::BottomRightQuarter | ZorinSnapPosition::BottomRight => (half_w, half_h, half_w, half_h),
+            ZorinSnapPosition::Maximized | ZorinSnapPosition::Maximize => (0, 0, self.screen_width, self.screen_height),
+        }
+    }
+}
+
+impl Default for ZorinGridWindowTilingEngine {
+    fn default() -> Self {
+        Self::new(1920, 1080)
+    }
+}
+
+/// Zorin OS Sound Theme & Event Audio Feedback Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZorinSoundManager {
+    pub sound_theme: String,
+    pub enable_event_sounds: bool,
+    pub volume_level_percent: u8,
+}
+
+impl ZorinSoundManager {
+    pub fn new() -> Self {
+        Self {
+            sound_theme: "zorin".to_string(),
+            enable_event_sounds: true,
+            volume_level_percent: 80,
+        }
+    }
+
+    pub fn get_sound_file_path(&self, event_name: &str) -> String {
+        format!("/usr/share/sounds/{}/stereo/{}.ogg", self.sound_theme, event_name)
+    }
+}
+
+impl Default for ZorinSoundManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Zorin OS Taskbar & Panel Customizer
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZorinTaskbarCustomizer {
+    pub transparency_percent: u8,
+    pub auto_hide: bool,
+    pub icon_size_px: u32,
+    pub show_window_previews: bool,
+}
+
+impl ZorinTaskbarCustomizer {
+    pub fn new() -> Self {
+        Self {
+            transparency_percent: 20,
+            auto_hide: false,
+            icon_size_px: 32,
+            show_window_previews: true,
+        }
+    }
+
+    pub fn generate_panel_css(&self) -> String {
+        format!(
+            ".zorin-panel {{ background: rgba(0, 0, 0, {:.2}); icon-size: {}px; }}",
+            1.0 - (self.transparency_percent as f32 / 100.0),
+            self.icon_size_px
+        )
+    }
+}
+
+impl Default for ZorinTaskbarCustomizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -542,15 +629,12 @@ mod tests {
         let left_rect = grid.calculate_snap_rect(ZorinSnapPosition::LeftHalf);
         assert_eq!(left_rect, (0, 0, 960, 1080));
 
-        let top_right_rect = grid.calculate_snap_rect(ZorinSnapPosition::TopRight);
+        let top_right_rect = grid.calculate_snap_rect(ZorinSnapPosition::TopRightQuarter);
         assert_eq!(top_right_rect, (960, 0, 960, 540));
 
         let sound_mgr = ZorinSoundManager::new();
         let login_sound = sound_mgr.get_sound_file_path("desktop-login");
-        assert_eq!(
-            login_sound,
-            "/usr/share/sounds/zorin/stereo/desktop-login.ogg"
-        );
+        assert_eq!(login_sound, "/usr/share/sounds/zorin/stereo/desktop-login.ogg");
 
         let taskbar = ZorinTaskbarCustomizer::new();
         let css = taskbar.generate_panel_css();

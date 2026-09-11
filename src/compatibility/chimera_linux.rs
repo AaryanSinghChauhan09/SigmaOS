@@ -1,10 +1,8 @@
 use std::vec::Vec;
-/// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
-/// Replicates Chimera's signature modern features:
-/// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Chimera Linux dinit service management compatibility
+#[derive(Debug, Clone)]
 pub struct DinitService {
     pub name: [u8; 32],
     pub dependencies: Vec<[u8; 32]>,
@@ -162,43 +160,40 @@ impl ApkPackageStore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use core::sync::atomic::Ordering;
 
     #[test]
     fn test_dinit_service_manager() {
-        let mut dinit = DinitServiceManager::new();
+        let mut manager = DinitServiceManager::new();
+        let mut svc = DinitService::new(b"networking");
+        svc.add_dependency(b"udev");
+        manager.register_service(svc);
 
-        let mut console = DinitService::new(b"dinit-console");
-        console.add_dependency(b"keyboard");
+        let udev = DinitService::new(b"udev");
+        manager.register_service(udev);
 
-        let keyboard = DinitService::new(b"keyboard");
-
-        dinit.register_service(console);
-        dinit.register_service(keyboard);
-
-        dinit.start_service(b"dinit-console").unwrap();
-
-        assert_eq!(dinit.running_count.load(Ordering::SeqCst), 2);
+        assert!(manager.start_service(b"networking").is_ok());
+        assert_eq!(manager.running_count.load(Ordering::SeqCst), 2);
     }
 
     #[test]
     fn test_bsd_userland_compat() {
         let compat = BsdUserlandCompat;
-        let (total_b, used_b) = compat.translate_bsd_df_output(1000, 400);
-        assert_eq!(total_b, 512000);
-        assert_eq!(used_b, 204800);
+        let (total, used) = compat.translate_bsd_df_output(1000, 500);
+        assert_eq!(total, 512000);
+        assert_eq!(used, 256000);
 
-        let pids = compat.pgrep_filter_by_name(&[(b"nginx", 101)], b"ng");
-        assert_eq!(pids, vec![101]);
+        let processes: &[(&[u8], u32)] = &[(b"dinit", 1), (b"apk", 42)];
+        let pids = compat.pgrep_filter_by_name(processes, b"dinit");
+        assert_eq!(pids, vec![1]);
     }
 
     #[test]
     fn test_apk_package_store() {
         let mut store = ApkPackageStore::new();
-        let pkg = ApkPackageMetadata::new(b"libkmod", b"31-r0", b"sha256sumhex");
+        let pkg = ApkPackageMetadata::new(b"curl", b"8.4.0", b"sha256_checksum");
         store.register_apk_installed(pkg);
 
-        assert!(store.verify_installed_checksum(b"libkmod", b"sha256sumhex"));
-        assert!(!store.verify_installed_checksum(b"libkmod", b"wrong"));
+        assert!(store.verify_installed_checksum(b"curl", b"sha256_checksum"));
+        assert!(!store.verify_installed_checksum(b"curl", b"bad_checksum"));
     }
 }

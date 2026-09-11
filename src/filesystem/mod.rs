@@ -12,16 +12,13 @@ pub mod manager;
 pub mod mount_namespace;
 pub mod smart_symlink;
 pub mod support;
+pub mod sovereign_file_descriptor;
 pub mod vfs;
-pub mod sigma_fs;
-
-pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
-pub use vfs::{FileType, FsError, Inode, VirtualFileSystem, DirEntry, FileHandle, FileMode, VfsError, MountPoint};
-pub use sigma_fs::{
-    SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
-    JournalState, SovereignFsJournal, SovereignFhsHierarchy, DistributedSovereignFS,
-    PqcFileEncryptor, FileBlock, PseudoFilesystemNamespace, Blake3BlockDeduplicationEngine,
-    SigmaFsCrypt, SigmaFsVirtio,
+pub use sovereign_file_descriptor::*;
+pub mod ext4;
+pub use bsd_linux_innovations::{
+    BsdSoftUpdatesEngine, GoboLinuxPathResolver, LinuxOverlayFsManager, LinuxProcSysfsEmulator,
+    MetadataDependency, MetadataOp, OpenBsdMountEnforcer, SovereignFhsHierarchyEngine,
 };
 
 pub use archive::{
@@ -39,9 +36,10 @@ pub use manager::{
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
 pub use mount_namespace::{MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource, MountFlags};
+pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
-pub use crate::filesystem::vfs::{FileSystem as VfsFileSystem};
-// pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};
+pub use crate::filesystem::vfs::{DirEntry, FileHandle, FileMode, VirtualFileSystem, VirtualFileSystem as VirtualFilesystem, VfsError, VfsError as FsError, FileSystem as VfsFileSystem, Inode, FileType, MountPoint};
+pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};
 pub use file_monitor::{
     EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
 };

@@ -3,11 +3,11 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, manages rolling release upgrades,
 // parses ALPM hooks, builds initramfs with mkinitcpio, packages with makepkg, and executes ALPM transactions.
 
-
-use std::format;
-use std::string::{String, ToString};
-use std::vec;
-use std::vec::Vec as AllocVec;
+extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec as AllocVec;
 
 use crate::klib::collections::HashMap;
 use crate::klib::string::SigmaString;
@@ -276,13 +276,13 @@ pub struct AlpmHook {
 
 #[derive(Debug, Clone)]
 pub struct AlpmHookManager {
-    pub hooks: Vec<AlpmHook>,
+    pub hooks: AllocVec<AlpmHook>,
 }
 
 impl AlpmHookManager {
     pub fn new() -> Self {
         Self {
-            hooks: Vec::new(),
+            hooks: AllocVec::new(),
         }
     }
 
@@ -359,7 +359,7 @@ pub enum AlpmTransactionState {
 #[derive(Debug, Clone)]
 pub struct AlpmTransactionEngine {
     pub state: AlpmTransactionState,
-    pub targets: Vec<SigmaString>,
+    pub targets: AllocVec<SigmaString>,
     pub installed: HashMap<SigmaString, Version>,
     pub hook_manager: AlpmHookManager,
 }
@@ -368,7 +368,7 @@ impl AlpmTransactionEngine {
     pub fn new() -> Self {
         Self {
             state: AlpmTransactionState::Init,
-            targets: Vec::new(),
+            targets: AllocVec::new(),
             installed: HashMap::new(),
             hook_manager: AlpmHookManager::new(),
         }
@@ -383,16 +383,16 @@ impl AlpmTransactionEngine {
     }
 
     /// Prepares transaction by checking dependencies, conflicts, and pre-transaction hooks
-    pub fn prepare(&mut self) -> Result<Vec<SigmaString>, &'static str> {
+    pub fn prepare(&mut self) -> Result<AllocVec<SigmaString>, &'static str> {
         if self.state != AlpmTransactionState::Init {
             return Err("ALPM: Transaction already prepared");
         }
 
-        let mut pre_cmds = Vec::new();
+        let mut pre_cmds = AllocVec::new();
         for target in &self.targets {
             let cmds = self
                 .hook_manager
-                .trigger_hooks(HookWhen::PreTransaction, target);
+                .trigger_hooks(HookWhen::PreTransaction, target.as_str());
             pre_cmds.extend(cmds);
         }
 
@@ -401,17 +401,17 @@ impl AlpmTransactionEngine {
     }
 
     /// Commits transaction by updating installed package DB and triggering post-transaction hooks
-    pub fn commit(&mut self) -> Result<Vec<SigmaString>, &'static str> {
+    pub fn commit(&mut self) -> Result<AllocVec<SigmaString>, &'static str> {
         if self.state != AlpmTransactionState::Prepared {
             return Err("ALPM: Transaction must be prepared before committing");
         }
 
-        let mut post_cmds = Vec::new();
+        let mut post_cmds = AllocVec::new();
         for target in &self.targets {
             self.installed.insert(target.clone(), Version::new(1, 0, 0));
             let cmds = self
                 .hook_manager
-                .trigger_hooks(HookWhen::PostTransaction, target);
+                .trigger_hooks(HookWhen::PostTransaction, target.as_str());
             post_cmds.extend(cmds);
         }
 
@@ -577,7 +577,7 @@ impl MkinitcpioBuilder {
         .into_bytes();
 
         image_header.extend_from_slice(b"\x1F\x8B\x08\x00_MOCK_INITRAMFS_PAYLOAD_BYTES");
-        image_header.to_vec()
+        image_header
     }
 }
 
@@ -668,7 +668,7 @@ impl SAbsSimdCompiler {
         }
     }
 
-    pub fn compile_vectorized_binary(&self, source_code: &str) -> Vec<u8> {
+    pub fn compile_vectorized_binary(&self, source_code: &str) -> AllocVec<u8> {
         let flags = self.generate_compiler_flags();
         let mut binary_header = format!(
             "S-ABS_SIMD_BINARY | ISA: {:?} | Flags: {} | SourceLength: {}\n",
@@ -679,58 +679,6 @@ impl SAbsSimdCompiler {
         .into_bytes();
         binary_header.extend_from_slice(b"\x7FELF_SIMD_VECTORIZED_PAYLOAD");
         binary_header
-    }
-}
-
-// --- makepkg Package Builder ---
-
-#[derive(Debug, Clone)]
-pub struct MakepkgBuilder {
-    pub pkgname: SigmaString,
-    pub pkgver: SigmaString,
-    pub arch: SigmaString,
-    pub expected_sha256: SigmaString,
-}
-
-impl MakepkgBuilder {
-    pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
-        Self {
-            pkgname: SigmaString::from(pkgname),
-            pkgver: SigmaString::from(pkgver),
-            arch: SigmaString::from(arch),
-            expected_sha256: SigmaString::from(expected_sha256),
-        }
-    }
-
-    pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
-        let mut checksum = 0u64;
-        for &b in source_data {
-            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
-        }
-        let computed = SigmaString::from(format!("{:016x}", checksum));
-        computed == self.expected_sha256 || self.expected_sha256 == SigmaString::from("SKIP")
-    }
-
-    pub fn build_package_archive(
-        &self,
-        source_data: &[u8],
-    ) -> Result<(SigmaString, Vec<u8>), &'static str> {
-        if !self.verify_source_integrity(source_data) {
-            return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
-        }
-
-        let archive_name = SigmaString::from(format!(
-            "{}-{}-{}.pkg.tar.zst",
-            self.pkgname, self.pkgver, self.arch
-        ));
-        let mut archive_content = SigmaString::from(format!(
-            "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
-            self.pkgname, self.pkgver, self.arch
-        ))
-        .into_bytes();
-
-        archive_content.extend_from_slice(source_data);
-        Ok((archive_name, archive_content.to_vec()))
     }
 }
 
@@ -782,6 +730,62 @@ impl SvntogitMigrationEngine {
     }
 }
 
+// --- makepkg Package Builder ---
+
+#[derive(Debug, Clone)]
+pub struct MakepkgBuilder {
+    pub pkgname: SigmaString,
+    pub pkgver: SigmaString,
+    pub arch: SigmaString,
+    pub expected_sha256: SigmaString,
+}
+
+impl MakepkgBuilder {
+    pub fn new(pkgname: &str, pkgver: &str, arch: &str, expected_sha256: &str) -> Self {
+        Self {
+            pkgname: SigmaString::from(pkgname),
+            pkgver: SigmaString::from(pkgver),
+            arch: SigmaString::from(arch),
+            expected_sha256: SigmaString::from(expected_sha256),
+        }
+    }
+
+    pub fn verify_source_integrity(&self, source_data: &[u8]) -> bool {
+        let mut checksum = 0u64;
+        for &b in source_data {
+            checksum = checksum.wrapping_mul(31).wrapping_add(b as u64);
+        }
+        let computed = SigmaString::from(format!("{:016x}", checksum));
+        computed == self.expected_sha256 || self.expected_sha256 == SigmaString::from("SKIP")
+    }
+
+    pub fn build_package_archive(
+        &self,
+        source_data: &[u8],
+    ) -> Result<(SigmaString, Vec<u8>), &'static str> {
+        if !self.verify_source_integrity(source_data) {
+            return Err("makepkg: Source integrity verification failed (SHA256 mismatch)");
+        }
+
+        let archive_name = SigmaString::from(format!(
+            "{}-{}-{}.pkg.tar.zst",
+            self.pkgname, self.pkgver, self.arch
+        ));
+        let mut archive_content = SigmaString::from(format!(
+            "ARCH_PKG_TAR_ZST_MAGIC | Name: {} | Ver: {} | Arch: {}\n",
+            self.pkgname, self.pkgver, self.arch
+        ))
+        .into_bytes();
+
+        archive_content.extend_from_slice(source_data);
+        Ok((archive_name, archive_content))
+    }
+}
+// --- Arch Linux svntogit Repository Migration Engine ---
+#[derive(Debug, Clone)]
+pub struct SvntoGitEngine {
+    pub migrated_packages: std::collections::HashMap<String, SvnPackageMetadata>,
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -955,10 +959,47 @@ mod tests {
         let builder = MakepkgBuilder::new("ripgrep", "13.0.0", "x86_64", "SKIP");
         let source_bytes = b"cargo build --release";
 
-        let (pkg_file, pkg_data): (SigmaString, AllocVec<u8>) = builder.build_package_archive(source_bytes).unwrap();
+        let (pkg_file, pkg_data) = builder.build_package_archive(source_bytes).unwrap();
         assert_eq!(pkg_file.as_str(), "ripgrep-13.0.0-x86_64.pkg.tar.zst");
         assert!(pkg_data.len() > source_bytes.len());
     }
+}
+
+impl SvntogitMigrationEngine {
+    pub fn new() -> Self {
+        Self {
+            migrated_packages: crate::klib::BTreeMap::new(),
+        }
+    }
+
+    pub fn migrate_svn_repo_layout(
+        &mut self,
+        pkgname: &str,
+        repo: &str,
+        svn_revision: u64,
+        pkgbuild_content: &str,
+    ) -> Result<String, &'static str> {
+        if pkgbuild_content.is_empty() {
+            return Err("svntogit: Cannot migrate empty PKGBUILD");
+        }
+
+        let metadata = SvnPackageMetadata {
+            pkgname: pkgname.to_string(),
+            repo: repo.to_string(),
+            svn_revision,
+            has_pkgbuild: true,
+        };
+
+        self.migrated_packages.insert(pkgname.to_string(), metadata);
+        Ok(format!(
+            "Migrated Arch SVN pkg '{}' (r{}) into Git branch 'packages/{}'",
+            pkgname, svn_revision, pkgname
+        ))
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
     #[test]
     fn test_saur_p2p_verifier_and_sabs_simd_compiler() {

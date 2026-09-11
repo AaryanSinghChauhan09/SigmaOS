@@ -1,4 +1,3 @@
-#![allow(unused_imports)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -14,12 +13,13 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+use std::boxed::Box;
+use std::vec::Vec;
+use std::string::{String, ToString};
+use std::collections::VecDeque;
 
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
 /// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel
-use std::collections::VecDeque;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// A network packet in the qdisc layer (simplified)

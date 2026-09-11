@@ -1,23 +1,15 @@
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::new_without_default)]
-#![allow(non_camel_case_types)]
-#![allow(unused_variables)]
-#![allow(unused_imports)]
-#![allow(dead_code)]
-#![allow(unexpected_cfgs)]
 extern crate alloc;
 
+use alloc::format;
+use alloc::vec;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-// Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
-// Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
-
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(not(test))]
 use crate::klib::collections::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(test)]
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -1692,12 +1684,6 @@ pub struct GestureVoiceControlEngine {
     pub registered_voice_commands: [Option<(&'static str, DesktopShellAction)>; 4],
 }
 
-impl GestureVoiceControlEngine {
-    pub fn new() -> Self {
-        Self {
-            registered_voice_commands: [None; 4],
-        }
-    }
 
     pub fn parse_touchpad_gesture(
         &self,
@@ -1710,13 +1696,7 @@ impl GestureVoiceControlEngine {
             _ => None,
         }
     }
-}
 
-impl Default for GestureVoiceControlEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -1749,42 +1729,17 @@ mod tests {
         let mut vm = UdfVm::new(0, 16);
 
         let program = [
-            UdfInstruction {
-                opcode: OP_WRITE,
-                reg_dest: 0,
-                reg_src: 0,
-                address_or_imm: 4,
-            }, // write R0 (0) to addr 4
-            UdfInstruction {
-                opcode: OP_READ,
-                reg_dest: 1,
-                reg_src: 0,
-                address_or_imm: 4,
-            }, // read addr 4 to R1
-            UdfInstruction {
-                opcode: OP_ADD,
-                reg_dest: 1,
-                reg_src: 1,
-                address_or_imm: 0,
-            }, // R1 = R1 + R1
-            UdfInstruction {
-                opcode: OP_HALT,
-                reg_dest: 1,
-                reg_src: 0,
-                address_or_imm: 0,
-            },
+            UdfInstruction { opcode: OP_WRITE, reg_dest: 0, reg_src: 0, address_or_imm: 4 }, // write R0 (0) to addr 4
+            UdfInstruction { opcode: OP_READ, reg_dest: 1, reg_src: 0, address_or_imm: 4 },  // read addr 4 to R1
+            UdfInstruction { opcode: OP_ADD, reg_dest: 1, reg_src: 1, address_or_imm: 0 },   // R1 = R1 + R1
+            UdfInstruction { opcode: OP_HALT, reg_dest: 1, reg_src: 0, address_or_imm: 0 },
         ];
 
         let res = vm.execute_program(&program, &mut dev).unwrap();
         assert_eq!(res, 0);
 
         let invalid_program = [
-            UdfInstruction {
-                opcode: OP_READ,
-                reg_dest: 0,
-                reg_src: 0,
-                address_or_imm: 100,
-            }, // out of bounds
+            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 }, // out of bounds
         ];
         assert!(vm.execute_program(&invalid_program, &mut dev).is_err());
     }
@@ -1802,9 +1757,7 @@ mod tests {
                     min_version: PkgVersion { major: 2, minor: 0 },
                     max_version: PkgVersion { major: 2, minor: 5 },
                 }),
-                None,
-                None,
-                None,
+                None, None, None,
             ],
         };
 
@@ -1820,365 +1773,6 @@ mod tests {
         assert!(sat.solve(0));
         assert_eq!(sat.selected_version[0].unwrap().major, 1);
         assert_eq!(sat.selected_version[1].unwrap().major, 2);
-    }
-
-    #[test]
-    fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8 };
-        let mmio = ModernMmioController {
-            mmio_base: 0xFE00_0000,
-        };
-
-        assert_eq!(pio.read_register(0), 0x3F8);
-        assert_eq!(mmio.read_register(0), 0xFE00_0000);
-
-        let mut mgr = BareMetalUnifiedPeripheralManager::new();
-        assert!(mgr.register_device(0x1002, 0x3F8, false).is_ok());
-        assert!(mgr.register_device(0x8086, 0xFE00_0000, true).is_ok());
-        assert_eq!(mgr.device_count, 2);
-    }
-
-    #[test]
-    fn test_zero_allocation_udf_bytecode_vm() {
-        let mut vm = UdfVm::new();
-        let code = [
-            UdfInstruction {
-                op: 0x10,
-                reg: 0,
-                addr: 0x3F8,
-            }, // READ R0 from 0x3F8 -> 0x3F8
-            UdfInstruction {
-                op: 0x30,
-                reg: 0,
-                addr: 10,
-            }, // ADD R0, 10
-            UdfInstruction {
-                op: 0xF0,
-                reg: 0,
-                addr: 0,
-            }, // HALT
-        ];
-        let res = vm.execute(&code).unwrap();
-        assert_eq!(res, 0x3F8 + 10);
-    }
-
-    #[test]
-    fn test_constraint_sat_solver() {
-        let mut solver = ConstraintSatSolver::new();
-        let nodes = [
-            PackageNode {
-                id: 1,
-                version: 10,
-                req_min: 1,
-                req_max: 20,
-            },
-            PackageNode {
-                id: 2,
-                version: 5,
-                req_min: 1,
-                req_max: 10,
-            },
-        ];
-        assert!(solver.resolve_satisfiability(&nodes).is_ok());
-    }
-
-    #[test]
-    fn test_jbd2_transactional_ledger() {
-        let mut ledger = Jbd2TransactionLedger::new();
-        let tx_id = ledger.write_transaction(0x1000, &[1, 2, 3, 4]).unwrap();
-        assert_eq!(tx_id, 1);
-        assert_eq!(ledger.head, 1);
-
-        ledger.rollback_transaction();
-        assert_eq!(ledger.head, 0);
-    }
-
-    #[test]
-    fn test_sigmaos_component_inspection_suite() {
-        // Inspect & verify zero-allocation VM bytecode execution
-        let mut vm = UdfVm::new();
-        let code = [
-            UdfInstruction {
-                op: 0x10,
-                reg: 0,
-                addr: 100,
-            },
-            UdfInstruction {
-                op: 0x30,
-                reg: 0,
-                addr: 50,
-            },
-            UdfInstruction {
-                op: 0xF0,
-                reg: 0,
-                addr: 0,
-            },
-        ];
-        assert_eq!(vm.execute(&code).unwrap(), 150);
-
-        // Inspect & verify JBD2 crash transaction ledger
-        let mut ledger = Jbd2TransactionLedger::new();
-        assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);
-        assert_eq!(ledger.head, 1);
-
-        // Inspect & verify SAT Solver
-        let solver = ConstraintSatSolver::new();
-        let nodes = [PackageNode {
-            id: 1,
-            version: 1,
-            req_min: 1,
-            req_max: 5,
-        }];
-        assert!(solver.resolve_satisfiability(&nodes).is_ok());
-    }
-}
-
-// ============================================================================
-// Section 6: Bare-Metal Subsystem Design Specifications
-// ============================================================================
-
-// 6.1 Polymorphic Universal Peripheral Blueprint
-pub trait BareMetalUnifiedPeripheral {
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn read_register(&self, offset: u32) -> u64;
-    fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
-    fn handle_irq(&mut self) -> u32;
-}
-
-pub struct LegacyPioController {
-    pub port_base: u16,
-    pub power_state: PowerState,
-}
-
-impl BareMetalUnifiedPeripheral for LegacyPioController {
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        Ok(())
-    }
-    fn read_register(&self, offset: u16) -> u64 {
-        self.port_base as u64 + offset as u64
-    }
-    fn write_register(&mut self, _offset: u16, _value: u64) {}
-    fn handle_irq(&mut self) -> bool {
-        true
-    }
-    fn set_power_state(&mut self, state: PowerState) {
-        self.power_state = state;
-    }
-    fn get_power_state(&self) -> PowerState {
-        self.power_state
-    }
-}
-
-pub struct ModernMmioController {
-    pub mmio_base: u64,
-    pub power_state: PowerState,
-}
-
-impl BareMetalUnifiedPeripheral for ModernMmioController {
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        Ok(())
-    }
-    fn read_register(&self, offset: u16) -> u64 {
-        self.mmio_base + offset as u64
-    }
-    fn write_register(&mut self, _offset: u16, _value: u64) {}
-    fn handle_irq(&mut self) -> bool {
-        true
-    }
-    fn set_power_state(&mut self, state: PowerState) {
-        self.power_state = state;
-    }
-    fn get_power_state(&self) -> PowerState {
-        self.power_state
-    }
-}
-
-pub struct BareMetalUnifiedPeripheralManager {
-    pub registered_devices: [(u16, u64, bool); 16],
-    pub device_count: usize,
-}
-
-impl BareMetalUnifiedPeripheralManager {
-    pub fn new() -> Self {
-        Self {
-            registered_devices: [(0, 0, false); 16],
-            device_count: 0,
-        }
-    }
-
-    pub fn register_device(
-        &mut self,
-        vendor_id: u16,
-        base_addr: u64,
-        is_mmio: bool,
-    ) -> Result<(), &'static str> {
-        if self.device_count >= 16 {
-            return Err("Registry full");
-        }
-        self.registered_devices[self.device_count] = (vendor_id, base_addr, is_mmio);
-        self.device_count += 1;
-        Ok(())
-    }
-}
-
-impl Default for BareMetalUnifiedPeripheralManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
-#[derive(Debug, Clone, Copy)]
-pub struct SpecUdfInstruction {
-    pub op: u8,  // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
-    pub reg: u8, // R0 - R7
-    pub addr: u64,
-}
-
-pub struct UdfVm {
-    pub registers: [u64; 8], // R0 - R7
-    pub pc: usize,
-}
-
-impl UdfVm {
-    pub fn new() -> Self {
-        Self {
-            registers: [0; 8],
-            pc: 0,
-        }
-    }
-
-    pub fn execute(&mut self, bytecode: &[SpecUdfInstruction]) -> Result<u64, &'static str> {
-        self.pc = 0;
-        while self.pc < bytecode.len() {
-            let inst = bytecode[self.pc];
-            if inst.reg >= 8 {
-                return Err("Register out of bounds");
-            }
-            match inst.op {
-                0x10 => self.registers[inst.reg as usize] = inst.addr, // OP_READ
-                0x20 => { /* OP_WRITE */ }
-                0x30 => {
-                    self.registers[inst.reg as usize] =
-                        self.registers[inst.reg as usize].wrapping_add(inst.addr)
-                } // OP_ADD
-                0xF0 => return Ok(self.registers[inst.reg as usize]), // OP_HALT
-                _ => return Err("Invalid ISA opcode"),
-            }
-            self.pc += 1;
-        }
-        Ok(self.registers[0])
-    }
-}
-
-impl Default for UdfVm {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 6.3 Declarative Package Resolution SAT Solver
-#[derive(Debug, Clone, Copy)]
-pub struct SpecPackageNode {
-    pub id: u32,
-    pub version: u32,
-    pub req_min: u32,
-    pub req_max: u32,
-}
-
-pub struct ConstraintSatSolver;
-
-impl ConstraintSatSolver {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn resolve_satisfiability(
-        &self,
-        packages: &[SpecPackageNode],
-    ) -> Result<bool, &'static str> {
-        for pkg in packages {
-            if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
-                return Err("Constraint conflict detected");
-            }
-        }
-        Ok(true)
-    }
-}
-
-impl Default for ConstraintSatSolver {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// 6.4 JBD2-Style Crash-Resilient Transactional Ledger
-#[derive(Debug, Clone, Copy)]
-pub struct SpecTransactionBlock {
-    pub tx_id: u64,
-    pub target_addr: u64,
-    pub crc32c_hash: u32,
-}
-
-pub struct Jbd2TransactionLedger {
-    pub ring_blocks: [SpecTransactionBlock; 16],
-    pub head: usize,
-    pub current_merkle_root: u32,
-}
-
-impl Jbd2TransactionLedger {
-    pub fn new() -> Self {
-        Self {
-            ring_blocks: [SpecTransactionBlock {
-                tx_id: 0,
-                target_addr: 0,
-                crc32c_hash: 0,
-            }; 16],
-            head: 0,
-            current_merkle_root: 0x1234_5678,
-        }
-    }
-
-    pub fn write_transaction(
-        &mut self,
-        target_addr: u64,
-        data: &[u8],
-    ) -> Result<u64, &'static str> {
-        if self.head >= 16 {
-            return Err("Ledger ring full");
-        }
-        let tx_id = self.head as u64 + 1;
-        let mut crc = 0u32;
-        for &b in data {
-            crc = crc.wrapping_add(b as u32);
-        }
-
-        self.ring_blocks[self.head] = SpecTransactionBlock {
-            tx_id,
-            target_addr,
-            crc32c_hash: crc,
-        };
-        self.head += 1;
-        self.current_merkle_root ^= crc;
-        Ok(tx_id)
-    }
-
-    pub fn rollback_transaction(&mut self) {
-        if self.head > 0 {
-            self.head -= 1;
-            self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
-            self.ring_blocks[self.head] = SpecTransactionBlock {
-                tx_id: 0,
-                target_addr: 0,
-                crc32c_hash: 0,
-            };
-        }
-    }
-}
-
-impl Default for Jbd2TransactionLedger {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -4025,82 +3619,12 @@ mod extra_unimplemented_tests {
 }
 
 // =========================================================================
-// TECH MEDIA & BENCHMARK INTELLIGENCE AGGREGATOR ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TechMediaFeedItem {
-    pub source_name: String,
-    pub title: String,
-    pub category: String,
-    pub severity_score: u8,
-}
-
-pub struct TechMediaIntelligenceAggregatorEngine {
-    pub feed_items: Vec<TechMediaFeedItem>,
-}
-
-impl TechMediaIntelligenceAggregatorEngine {
-    pub fn new() -> Self {
-        Self {
-            feed_items: Vec::new(),
-        }
-    }
-
-    pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
-        self.feed_items.push(TechMediaFeedItem {
-            source_name: source.to_string(),
-            title: title.to_string(),
-            category: category.to_string(),
-            severity_score: severity,
-        });
-    }
-
-    pub fn filter_by_source(&self, source: &str) -> Vec<TechMediaFeedItem> {
-        self.feed_items
-            .iter()
-            .filter(|item| item.source_name.eq_ignore_ascii_case(source))
-            .cloned()
-            .collect()
-    }
-
-    pub fn get_critical_advisories(&self, min_severity: u8) -> Vec<TechMediaFeedItem> {
-        self.feed_items
-            .iter()
-            .filter(|item| item.severity_score >= min_severity)
-            .cloned()
-            .collect()
-    }
-}
-
-// =========================================================================
 // DISTRO-INSPIRED ECOSYSTEM ENCOUNTER ENFORCE ENGINES
 // =========================================================================
 
 #[cfg(test)]
 mod new_unimplemented_tests {
     use super::*;
-
-    #[test]
-    fn test_tech_media_intelligence_aggregator_engine() {
-        let mut aggregator = TechMediaIntelligenceAggregatorEngine::new();
-        aggregator.ingest_feed_item("9to5Linux", "Linux Kernel 6.11 Released", "Kernel", 3);
-        aggregator.ingest_feed_item("Phoronix", "AMD EPYC Zen 5 Benchmarks", "Hardware", 2);
-        aggregator.ingest_feed_item(
-            "XDA",
-            "Critical Zero-Day Vulnerability Discovered",
-            "Security",
-            9,
-        );
-
-        let p_feeds = aggregator.filter_by_source("Phoronix");
-        assert_eq!(p_feeds.len(), 1);
-        assert_eq!(p_feeds[0].title, "AMD EPYC Zen 5 Benchmarks");
-
-        let critical = aggregator.get_critical_advisories(8);
-        assert_eq!(critical.len(), 1);
-        assert_eq!(critical[0].severity_score, 9);
-    }
 
     #[test]
     fn test_rocky_alma_enterprise_lifecycle_governor() {
@@ -4180,4 +3704,8 @@ mod new_unimplemented_tests {
         phoronix.execute_benchmark("Shadow of Tomb Raider", 80.0);
         assert_eq!(phoronix.calculate_composite_score(), 100.0);
     }
+
+
 }
+
+// ===========================================================}

@@ -1,13 +1,21 @@
-// SigmaOS Kernel Architecture, Processor Initialization, Pool Memory, MDLs, SSDT and IRQL Subsystem
-// Conforms to zero-dependency, #![no_std] compliant, priority-preemptive structures
-
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicU8, AtomicUsize, Ordering};
-
-
-use std::boxed::Box;
+// SigmaOS Kernel Architecture Module - Multi-arch support (x86, x64, ARM, RISC-V, CISC/RISC)
+// Inspired by Linux/BSD multi-architecture kernel design patterns
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::String;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
 use std::string::String;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-
+use core::mem;
+use crate::kernel::structures::CpuArchitectureClass;
 // 1. Instructions and CPU Initialization
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,18 +39,6 @@ pub enum ThreadState {
     Terminated,
 }
 
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86_32,
-    X86_64,
-    AArch64,
-    RiscV32,
-    RiscV64,
-    LoongArch64,
-    PowerPC64,
-    S390x,
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptClass {
@@ -69,7 +65,6 @@ pub enum ProcessorInitState {
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct CpuRegisters {
-    // Standard x86_64 64-bit General Purpose Registers (GPRs)
     pub rax: u64,
     pub rbx: u64,
     pub rcx: u64,
@@ -78,17 +73,8 @@ pub struct CpuRegisters {
     pub rdi: u64,
     pub rbp: u64,
     pub rsp: u64,
-    pub r8: u64,
-    pub r9: u64,
-    pub r10: u64,
-    pub r11: u64,
-    pub r12: u64,
-    pub r13: u64,
-    pub r14: u64,
-    pub r15: u64,
     pub rip: u64,
     pub rflags: u64,
-    // Control Registers
     pub cr0: u64,
     pub cr2: u64,
     pub cr3: u64, // PML4 Page directory base register
