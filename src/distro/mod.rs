@@ -5,11 +5,30 @@ pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
 pub mod arch_gap_closure;
+pub mod arch_missing_components;
+pub mod arch_boxes;
+pub mod arch_ultimate_gap_closure;
 
 pub use arch_gap_closure::{
     AlaPackageSnapshot, ArchAuditScannerEngine, ArchInstallProfile, ArchInstallProfileEngine,
     ArchLinuxArchiveEngine, ArchMasterKey, ArchPacmanKeyringManager, ArchSecurityAdvisory,
     ArchTestingRepo, ArchTestingRepositoryManager, VulnerabilitySeverity,
+};
+
+pub use arch_missing_components::{
+    ArchAlpmDbIntegrityEngine, ArchAurWebRpcClient, ArchMakepkgEngine, ArchNamcapLinterEngine,
+    ArchPkgbuild, AurPackageResult,
+};
+
+pub use arch_boxes::{
+    ArchBoxCatalogManager, ArchBoxFormat, ArchBoxImageRecord, ArchBoxesImageEngine,
+    ArchCloudInitProvisioner, CloudInitUserAccount,
+};
+
+pub use arch_ultimate_gap_closure::{
+    ArchAurPkgbuildSolverEngine, ArchMkinitcpioHooksEngine, ArchPacmanDatabaseSyncEngine,
+    ArchisoLiveImageBuilderEngine, AurSrcInfoMetadata, PacmanSyncPackageEntry,
+    SovereignArchUltimateGapClosureSuite,
 };
 
 pub use omarchy::{
