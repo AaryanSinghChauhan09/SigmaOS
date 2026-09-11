@@ -1866,6 +1866,139 @@ mod tests {
     }
 }
 
+// ============================================================================
+// Section 6: Bare-Metal Subsystem Design Specifications
+// ============================================================================
+
+// 6.1 Polymorphic Universal Peripheral Blueprint
+
+pub struct LegacyPioController {
+    pub port_base: u16,
+    pub power_state: PowerState,
+}
+
+impl BareMetalUnifiedPeripheral for LegacyPioController {
+    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
+}
+
+pub struct ModernMmioController {
+    pub mmio_base: u64,
+    pub power_state: PowerState,
+}
+
+impl BareMetalUnifiedPeripheral for ModernMmioController {
+    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
+}
+
+pub struct BareMetalUnifiedPeripheralManager {
+    pub registered_devices: [(u16, u64, bool); 16],
+    pub device_count: usize,
+}
+
+impl BareMetalUnifiedPeripheralManager {
+    pub fn new() -> Self {
+        Self {
+            registered_devices: [(0, 0, false); 16],
+            device_count: 0,
+        }
+    }
+
+    pub fn register_device(&mut self, vendor_id: u16, base_addr: u64, is_mmio: bool) -> Result<(), &'static str> {
+        if self.device_count >= 16 { return Err("Registry full"); }
+        self.registered_devices[self.device_count] = (vendor_id, base_addr, is_mmio);
+        self.device_count += 1;
+        Ok(())
+    }
+}
+
+impl Default for BareMetalUnifiedPeripheralManager {
+    fn default() -> Self { Self::new() }
+}
+
+
+pub struct AchievementBadge {
+    pub badge_id: &'static str,
+    pub name: &'static str,
+    pub unlocked: bool,
+}
+
+pub struct GamifiedProductivityLayer {
+    pub total_xp: u64,
+    pub level: u32,
+    pub daily_streak_days: u32,
+    pub last_activity_timestamp: u64,
+    pub badges: [AchievementBadge; 3],
+}
+
+impl GamifiedProductivityLayer {
+    pub fn new() -> Self {
+        Self {
+            total_xp: 0,
+            level: 1,
+            daily_streak_days: 1,
+            last_activity_timestamp: 0,
+            badges: [
+                AchievementBadge {
+                    badge_id: "pkg_builder",
+                    name: "Package Artisan",
+                    unlocked: false,
+                },
+                AchievementBadge {
+                    badge_id: "shard_debugger",
+                    name: "Shard Whisperer",
+                    unlocked: false,
+                },
+                AchievementBadge {
+                    badge_id: "security_sentinel",
+                    name: "Security Sentinel",
+                    unlocked: false,
+                },
+            ],
+        }
+    }
+
+    /// Award experience points (XP) for productivity tasks (compiling packages, debugging kernel shards, security scans)
+    pub fn award_experience(&mut self, action_type: &'static str, xp_gained: u64, timestamp: u64) {
+        self.total_xp += xp_gained;
+
+        // Level up algorithm (1000 XP per level)
+        while self.total_xp >= self.level as u64 * 1000 {
+            self.level += 1;
+        }
+
+        // Streak maintenance
+        if self.last_activity_timestamp != 0 {
+            let diff = timestamp.saturating_sub(self.last_activity_timestamp);
+            if diff <= 86400 {
+                // Activity within 24 hours
+                self.daily_streak_days += 1;
+            } else if diff > 86400 * 2 {
+                // Streak broken
+                self.daily_streak_days = 1;
+            }
+        }
+        self.last_activity_timestamp = timestamp;
+
+        // Check badge unlocks
+        match action_type {
+            "compile_package" => self.badges[0].unlocked = true,
+            "debug_shard" => self.badges[1].unlocked = true,
+            "resolve_security_scan" => self.badges[2].unlocked = true,
+            _ => {}
+        }
+    }
+}
+
 // ==================================================================// 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
 // ========================================================================
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
