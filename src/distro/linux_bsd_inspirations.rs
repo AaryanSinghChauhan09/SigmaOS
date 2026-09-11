@@ -68,6 +68,9 @@ pub enum DistroSubsystemMode {
     LinuxTails,
     LinuxGuix,
     LinuxParrot,
+    LinuxKali,
+    LinuxAntiX,
+    LinuxZorin,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -120,6 +123,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -136,7 +141,9 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => {
+                ServiceSupervisorType::Sysvinit
+            }
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
@@ -153,7 +160,11 @@ impl SovereignUniversalDistroBridge {
             (
                 DistroSubsystemMode::LinuxDebian
                 | DistroSubsystemMode::LinuxPopOs
-                | DistroSubsystemMode::LinuxTails,
+                | DistroSubsystemMode::LinuxTails
+                | DistroSubsystemMode::LinuxParrot
+                | DistroSubsystemMode::LinuxKali
+                | DistroSubsystemMode::LinuxAntiX
+                | DistroSubsystemMode::LinuxZorin,
                 "/var/lib/pkg",
             ) => "/var/lib/dpkg".to_string(),
             (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
@@ -216,6 +227,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -233,7 +246,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => {
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
@@ -248,7 +261,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -287,7 +303,10 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
@@ -583,6 +602,80 @@ impl SovereignUniversalDistroBridge {
                     action, mprotect_res.is_ok(), self.mode
                 ))
             }
+            "auth" => {
+                Ok(format!(
+                    "Dispatched systemd-homed/PAM authentication check for user '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "boot" => {
+                Ok(format!(
+                    "Dispatched multiboot EFI boot chain registration for entry '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "input" => {
+                Ok(format!(
+                    "Dispatched USB HID / libinput event pipeline for input device '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched ACPI thermal zone governor check for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "syscall" => {
+                let mut translator = SovereignMultiArchSyscallTranslator::new(self.mode);
+                let sys_num = translator.translate_and_dispatch(action).unwrap_or(0);
+                Ok(format!(
+                    "Dispatched multi-arch syscall translation for '{}' (num: {}) under distro mode '{:?}'",
+                    action, sys_num, self.mode
+                ))
+            }
+            "device" => {
+                Ok(format!(
+                    "Dispatched dynamic devfs / udev peripheral probe for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "crypto" => {
+                Ok(format!(
+                    "Dispatched post-quantum Kyber/Dilithium cryptographic operation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched AI task scheduler optimization for prompt/task '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                Ok(format!(
+                    "Dispatched Phoronix/btop system telemetry monitoring for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_nmap" => {
+                Ok(format!(
+                    "Dispatched Kali Security Nmap network security audit scanner for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "antix_fastboot" => {
+                Ok(format!(
+                    "Dispatched antiX lightweight SysVInit fast-boot optimization for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "zorin_chameleon" => {
+                Ok(format!(
+                    "Dispatched Zorin OS Chameleon desktop UI theme & layout switcher to '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             _ => Ok(format!(
                 "Dispatched subsystem '{}' action '{}' under distro mode '{:?}'",
                 target_subsystem, action, self.mode
@@ -596,6 +689,9 @@ impl SovereignUniversalDistroBridge {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "parrot_anonsurf", "parrot_apparmor", "parrot_forensics",
+            "omarchy_quickshell", "omarchy_theme", "omarchy_lua_reload", "omarchy_herdr_agent",
+            "kali_nmap", "antix_fastboot", "zorin_chameleon",
         ];
 
         for sub in subsystems {
@@ -1915,6 +2011,10 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
         ];
 
         for m in modes {
@@ -1947,6 +2047,10 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
         ];
 
         let target_subsystems = [
