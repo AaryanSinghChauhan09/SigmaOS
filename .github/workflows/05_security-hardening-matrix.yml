@@ -117,7 +117,7 @@ jobs:
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
 
       - name: Install security tools
         run: |
@@ -125,18 +125,18 @@ jobs:
 
       - name: Build with ${{ matrix.security }} hardening
         run: |
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
           ${{ matrix.build-cmd }}
 
       - name: Test security hardening
         continue-on-error: true
         run: |
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
           ${{ matrix.test-cmd }}
 
       - name: Security audit
         run: |
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
           cargo audit || true
 
       - name: Report status
