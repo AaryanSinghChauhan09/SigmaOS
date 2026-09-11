@@ -1,3 +1,5 @@
+pub mod omarchy_inspiration;
+pub use omarchy_inspiration::*;
 pub mod omarchy;
 pub mod parrot_security;
 pub mod kali_security;
