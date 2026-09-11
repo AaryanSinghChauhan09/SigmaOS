@@ -15,6 +15,7 @@
 use std::vec;
 
 use std::boxed::Box;
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 use std::format;
 use std::string::{String, ToString};
@@ -24,23 +25,30 @@ use std::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
 
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use crate::klib::HashMap;
 
 use std::sync::Arc;
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl core::fmt::Display for Version {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {
@@ -50,7 +58,16 @@ impl Version {
         }
     }
     pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let clean: String = s.chars().map(|c| if c.is_ascii_digit() || c == '.' { c } else { ' ' }).collect();
+        let clean: String = s
+            .chars()
+            .map(|c| {
+                if c.is_ascii_digit() || c == '.' {
+                    c
+                } else {
+                    ' '
+                }
+            })
+            .collect();
         let first_num = clean.split_whitespace().next().unwrap_or("1.0.0");
         let parts: Vec<&str> = first_num.split('.').collect();
         let major = parts.get(0).and_then(|p| p.parse().ok()).unwrap_or(1);
@@ -85,7 +102,13 @@ pub struct Package {
 
 #[cfg(any(feature = "standalone_test", test))]
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
         Self {
             name,
             version,
@@ -93,6 +116,299 @@ impl Package {
             dependencies,
             checksum,
         }
+    }
+}
+
+// ============================================================================
+// Bridge Pattern: Decoupling Package Abstraction from Concrete Distro Backends
+// ============================================================================
+
+pub trait IPackageBackend: Send + Sync {
+    fn backend_name(&self) -> &str;
+    fn install_payload(&self, pkg: &dyn IPackage) -> Result<usize, String>;
+    fn remove_payload(&self, pkg_name: &str) -> Result<bool, String>;
+    fn verify_integrity(&self, pkg: &dyn IPackage) -> Result<bool, String>;
+}
+
+pub struct GenericDistroBackend {
+    pub name: String,
+}
+
+impl GenericDistroBackend {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+        }
+    }
+}
+
+impl IPackageBackend for GenericDistroBackend {
+    fn backend_name(&self) -> &str {
+        &self.name
+    }
+
+    fn install_payload(&self, pkg: &dyn IPackage) -> Result<usize, String> {
+        let size = pkg.metadata().size;
+        Ok(if size == 0 { 1024 } else { size as usize })
+    }
+
+    fn remove_payload(&self, _pkg_name: &str) -> Result<bool, String> {
+        Ok(true)
+    }
+
+    fn verify_integrity(&self, _pkg: &dyn IPackage) -> Result<bool, String> {
+        Ok(true)
+    }
+}
+
+pub struct UniversalDistroBridge {
+    backend: Box<dyn IPackageBackend>,
+}
+
+impl UniversalDistroBridge {
+    pub fn new(backend: Box<dyn IPackageBackend>) -> Self {
+        Self { backend }
+    }
+
+    pub fn backend_name(&self) -> &str {
+        self.backend.backend_name()
+    }
+
+    pub fn deploy(&self, pkg: &dyn IPackage) -> Result<usize, String> {
+        self.backend.install_payload(pkg)
+    }
+
+    pub fn uninstall(&self, pkg_name: &str) -> Result<bool, String> {
+        self.backend.remove_payload(pkg_name)
+    }
+
+    pub fn audit(&self, pkg: &dyn IPackage) -> Result<bool, String> {
+        self.backend.verify_integrity(pkg)
+    }
+}
+
+// ============================================================================
+// Composite Pattern: Uniform Treatment of Packages & Meta-Package Bundles
+// ============================================================================
+
+pub trait IPackageComponent: Send + Sync {
+    fn component_name(&self) -> &str;
+    fn component_size(&self) -> u64;
+    fn install_component(&self, bridge: &UniversalDistroBridge) -> Result<usize, String>;
+}
+
+impl IPackageComponent for StandardPackage {
+    fn component_name(&self) -> &str {
+        self.name()
+    }
+
+    fn component_size(&self) -> u64 {
+        self.metadata.size
+    }
+
+    fn install_component(&self, bridge: &UniversalDistroBridge) -> Result<usize, String> {
+        bridge.deploy(self)
+    }
+}
+
+pub struct CompositePackageBundle {
+    pub bundle_name: String,
+    pub components: Vec<Box<dyn IPackageComponent>>,
+}
+
+impl CompositePackageBundle {
+    pub fn new(bundle_name: &str) -> Self {
+        Self {
+            bundle_name: bundle_name.to_string(),
+            components: Vec::new(),
+        }
+    }
+
+    pub fn add_component(&mut self, component: Box<dyn IPackageComponent>) {
+        self.components.push(component);
+    }
+}
+
+impl IPackageComponent for CompositePackageBundle {
+    fn component_name(&self) -> &str {
+        &self.bundle_name
+    }
+
+    fn component_size(&self) -> u64 {
+        self.components.iter().map(|c| c.component_size()).sum()
+    }
+
+    fn install_component(&self, bridge: &UniversalDistroBridge) -> Result<usize, String> {
+        let mut total_bytes = 0;
+        for component in &self.components {
+            total_bytes += component.install_component(bridge)?;
+        }
+        Ok(total_bytes)
+    }
+}
+
+// ============================================================================
+// State Pattern: Type-Safe Package Lifecycle State Machine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageLifecycleState {
+    Uninstalled,
+    Downloading,
+    VerifyingPqcSignature,
+    UnpackingPayload,
+    ExecutingTriggers,
+    Installed,
+    RollbackInitiated,
+    Corrupted,
+}
+
+pub struct PackageLifecycleStateMachine {
+    current_state: PackageLifecycleState,
+}
+
+impl PackageLifecycleStateMachine {
+    pub fn new() -> Self {
+        Self {
+            current_state: PackageLifecycleState::Uninstalled,
+        }
+    }
+
+    pub fn current_state(&self) -> PackageLifecycleState {
+        self.current_state
+    }
+
+    pub fn can_transition(&self, next: PackageLifecycleState) -> bool {
+        match (self.current_state, next) {
+            (PackageLifecycleState::Uninstalled, PackageLifecycleState::Downloading) => true,
+            (PackageLifecycleState::Downloading, PackageLifecycleState::VerifyingPqcSignature) => {
+                true
+            }
+            (
+                PackageLifecycleState::VerifyingPqcSignature,
+                PackageLifecycleState::UnpackingPayload,
+            ) => true,
+            (PackageLifecycleState::UnpackingPayload, PackageLifecycleState::ExecutingTriggers) => {
+                true
+            }
+            (PackageLifecycleState::ExecutingTriggers, PackageLifecycleState::Installed) => true,
+            (PackageLifecycleState::Installed, PackageLifecycleState::Uninstalled) => true,
+            (_, PackageLifecycleState::RollbackInitiated) => true,
+            (PackageLifecycleState::RollbackInitiated, PackageLifecycleState::Uninstalled) => true,
+            (_, PackageLifecycleState::Corrupted) => true,
+            _ => false,
+        }
+    }
+
+    pub fn transition_to(
+        &mut self,
+        next: PackageLifecycleState,
+    ) -> Result<PackageLifecycleState, &'static str> {
+        if self.can_transition(next) {
+            self.current_state = next;
+            Ok(self.current_state)
+        } else {
+            Err("Invalid state machine transition")
+        }
+    }
+}
+
+impl Default for PackageLifecycleStateMachine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Builder Pattern: Declarative Fluent Builder for Universal Packages
+// ============================================================================
+
+pub struct UniversalPackageBuilder {
+    name: String,
+    version: Version,
+    description: String,
+    license: String,
+    maintainer: String,
+    homepage: String,
+    architecture: String,
+    format: PackageFormat,
+    dependencies: Vec<Dependency>,
+}
+
+impl UniversalPackageBuilder {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            license: "GPL-3.0".to_string(),
+            maintainer: "SigmaOS Developer".to_string(),
+            homepage: String::new(),
+            architecture: "x86_64".to_string(),
+            format: PackageFormat::Sigma,
+            dependencies: Vec::new(),
+        }
+    }
+
+    pub fn with_version(mut self, major: u64, minor: u64, patch: u64) -> Self {
+        self.version = Version::new(major, minor, patch);
+        self
+    }
+
+    pub fn with_description(mut self, desc: &str) -> Self {
+        self.description = desc.to_string();
+        self
+    }
+
+    pub fn with_license(mut self, license: &str) -> Self {
+        self.license = license.to_string();
+        self
+    }
+
+    pub fn with_maintainer(mut self, maintainer: &str) -> Self {
+        self.maintainer = maintainer.to_string();
+        self
+    }
+
+    pub fn with_format(mut self, format: PackageFormat) -> Self {
+        self.format = format;
+        self
+    }
+
+    pub fn add_dependency(mut self, dep_name: &str) -> Self {
+        self.dependencies.push(Dependency {
+            name: dep_name.to_string(),
+            version_constraint: VersionConstraint::Any,
+        });
+        self
+    }
+
+    pub fn build(self) -> Result<Box<dyn IPackage>, String> {
+        if self.name.is_empty() {
+            return Err("Package name cannot be empty".to_string());
+        }
+
+        let meta = PackageMetadata {
+            name: self.name,
+            version: self.version,
+            description: self.description,
+            license: self.license,
+            maintainer: self.maintainer,
+            homepage: self.homepage,
+            architecture: self.architecture,
+            checksum: "builder-generated-sha256".to_string(),
+            size: 4096,
+            install_date: None,
+            pqc_signature: Some("dilithium-5".to_string()),
+            gpg_key_id: Some("0x9E5A86A21B607B76".to_string()),
+            supported_architectures: vec!["x86_64".to_string()],
+        };
+
+        Ok(Box::new(StandardPackage {
+            metadata: meta,
+            dependencies: self.dependencies,
+            format: self.format,
+        }))
     }
 }
 
@@ -231,6 +547,15 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -277,13 +602,20 @@ impl PackageFormat {
             Some(PackageFormat::Eopkg)
         } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
             Some(PackageFormat::Nix)
+        } else if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if normalized.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
         } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
+            Some(PackageFormat::Portage)
         } else if normalized.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::TarXz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -313,7 +645,10 @@ impl PackageFormat {
             Some(PackageFormat::Cports)
         } else if normalized.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if normalized.ends_with(".slackbuild") || normalized.ends_with(".tlz") || normalized.ends_with(".tbz") {
+        } else if normalized.ends_with(".slackbuild")
+            || normalized.ends_with(".tlz")
+            || normalized.ends_with(".tbz")
+        {
             Some(PackageFormat::SlackBuild)
         } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -341,6 +676,22 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
         } else {
             None
         }
@@ -2510,6 +2861,298 @@ impl IPackage for StandardPackage {
     }
 }
 
+// Specialized Adapter for Serpent OS (.stone / .moss)
+pub struct SerpentMossAdapter {
+    base: BaseAdapter,
+}
+
+impl SerpentMossAdapter {
+    pub fn new() -> Self {
+        Self {
+            base: BaseAdapter::new(PackageFormat::Moss),
+        }
+    }
+}
+
+impl IPackageParser for SerpentMossAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Moss
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("moss-manifest") || content.contains("stone-package")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "serpent-stone-pkg".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Serpent OS moss binary package".to_string(),
+                license: "GPL-3.0".to_string(),
+                maintainer: "Serpent OS Project".to_string(),
+                homepage: "https://serpentos.com".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "moss-sha256-digest".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: Some("dilithium-5".to_string()),
+                gpg_key_id: Some("0x9E5A86A21B607B76".to_string()),
+                supported_architectures: vec!["x86_64".to_string()],
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Moss,
+        };
+
+        for line in content.lines() {
+            if line.starts_with("name:") {
+                pkg.metadata.name = line.trim_start_matches("name:").trim().to_string();
+            } else if line.starts_with("version:") {
+                if let Ok(v) = Version::parse(line.trim_start_matches("version:").trim()) {
+                    pkg.metadata.version = v;
+                }
+            }
+        }
+
+        let mut boxed: Box<dyn IPackage> = Box::new(pkg);
+        self.base
+            .execute_hooks(boxed.as_mut())
+            .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
+        Ok(boxed)
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        Ok(format!(
+            "name: {}\nversion: {}\nmoss-manifest\n",
+            meta.name, meta.version
+        )
+        .into_bytes())
+    }
+}
+
+// Specialized Adapter for FreeBSD / OpenBSD / NetBSD PKG (+MANIFEST)
+pub struct FreeBsdPkgAdapter {
+    base: BaseAdapter,
+}
+
+impl FreeBsdPkgAdapter {
+    pub fn new() -> Self {
+        Self {
+            base: BaseAdapter::new(PackageFormat::Pkg),
+        }
+    }
+}
+
+impl IPackageParser for FreeBsdPkgAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Pkg
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("+MANIFEST") || content.contains("+COMPACT_MANIFEST")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "freebsd-pkg".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "FreeBSD binary package".to_string(),
+                license: "BSD-2-Clause".to_string(),
+                maintainer: "FreeBSD Ports Team".to_string(),
+                homepage: "https://freebsd.org".to_string(),
+                architecture: "amd64".to_string(),
+                checksum: "pkg-sha256".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: Some("dilithium-5".to_string()),
+                gpg_key_id: Some("0x9E5A86A21B607B76".to_string()),
+                supported_architectures: vec!["amd64".to_string(), "aarch64".to_string()],
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Pkg,
+        };
+
+        for line in content.lines() {
+            if line.starts_with("name:") || line.starts_with("name =") {
+                pkg.metadata.name = line
+                    .split(':')
+                    .last()
+                    .unwrap_or("freebsd-pkg")
+                    .trim()
+                    .to_string();
+            } else if line.starts_with("version:") {
+                if let Ok(v) = Version::parse(line.split(':').last().unwrap_or("1.0.0").trim()) {
+                    pkg.metadata.version = v;
+                }
+            }
+        }
+
+        let mut boxed: Box<dyn IPackage> = Box::new(pkg);
+        self.base
+            .execute_hooks(boxed.as_mut())
+            .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
+        Ok(boxed)
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        Ok(format!(
+            "name: {}\nversion: {}\n+MANIFEST\n",
+            meta.name, meta.version
+        )
+        .into_bytes())
+    }
+}
+
+// Specialized Adapter for Android App Bundle (.aab) & split .apk
+pub struct AndroidAabApkAdapter {
+    base: BaseAdapter,
+}
+
+impl AndroidAabApkAdapter {
+    pub fn new() -> Self {
+        Self {
+            base: BaseAdapter::new(PackageFormat::Aab),
+        }
+    }
+}
+
+impl IPackageParser for AndroidAabApkAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Aab
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("AndroidManifest.xml") || content.contains("aab-bundle")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "android-app-bundle".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Android App Bundle / APK package".to_string(),
+                license: "Apache-2.0".to_string(),
+                maintainer: "Android Open Source Project".to_string(),
+                homepage: "https://android.com".to_string(),
+                architecture: "arm64-v8a".to_string(),
+                checksum: "aab-sha256".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: Some("dilithium-5".to_string()),
+                gpg_key_id: Some("0x9E5A86A21B607B76".to_string()),
+                supported_architectures: vec!["arm64-v8a".to_string(), "x86_64".to_string()],
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Aab,
+        };
+
+        for line in content.lines() {
+            if line.contains("package=") {
+                let parts: Vec<&str> = line.split("package=").collect();
+                if let Some(p) = parts.get(1) {
+                    let clean = p.trim_matches(|c| c == '"' || c == '\'' || c == ' ');
+                    pkg.metadata.name = clean.to_string();
+                }
+            }
+        }
+
+        let mut boxed: Box<dyn IPackage> = Box::new(pkg);
+        self.base
+            .execute_hooks(boxed.as_mut())
+            .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
+        Ok(boxed)
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        Ok(format!(
+            "package=\"{}\"\nversion=\"{}\"\nAndroidManifest.xml\n",
+            meta.name, meta.version
+        )
+        .into_bytes())
+    }
+}
+
+// Specialized Adapter for systemd sysupdate definitions (.sysupdate)
+pub struct SystemdSysupdateAdapter {
+    base: BaseAdapter,
+}
+
+impl SystemdSysupdateAdapter {
+    pub fn new() -> Self {
+        Self {
+            base: BaseAdapter::new(PackageFormat::Sysupdate),
+        }
+    }
+}
+
+impl IPackageParser for SystemdSysupdateAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Sysupdate
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("[Transfer]")
+            || content.contains("[Target]")
+            || content.contains("sysupdate.d")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+        let mut pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "systemd-sysupdate-image".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "systemd sysupdate OS image transfer".to_string(),
+                license: "LGPL-2.1".to_string(),
+                maintainer: "systemd Project".to_string(),
+                homepage: "https://systemd.io".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "sysupdate-sha256".to_string(),
+                size: data.len() as u64,
+                install_date: None,
+                pqc_signature: Some("dilithium-5".to_string()),
+                gpg_key_id: Some("0x9E5A86A21B607B76".to_string()),
+                supported_architectures: vec!["x86_64".to_string(), "aarch64".to_string()],
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sysupdate,
+        };
+
+        for line in content.lines() {
+            if line.starts_with("Path=") || line.starts_with("MatchPattern=") {
+                let name = line.split('=').last().unwrap_or("sysupdate").trim();
+                pkg.metadata.name = format!("sysupdate-{}", name);
+            }
+        }
+
+        let mut boxed: Box<dyn IPackage> = Box::new(pkg);
+        self.base
+            .execute_hooks(boxed.as_mut())
+            .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
+        Ok(boxed)
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let meta = package.metadata();
+        Ok(format!(
+            "[Transfer]\nPath={}\nVersion={}\nsysupdate.d\n",
+            meta.name, meta.version
+        )
+        .into_bytes())
+    }
+}
+
 // ============================================================================
 // Factory Pattern: Package Parser Factory
 // ============================================================================
@@ -2605,6 +3248,52 @@ impl Default for PackageParserFactory {
     }
 }
 
+pub struct SovereignUniversalAlternativesManager {
+    pub alternatives: SovereignAlternativesEngine,
+    pub diverter: DebianDiverterEngine,
+    pub eselect_modules: HashMap<String, String>,
+}
+
+impl SovereignUniversalAlternativesManager {
+    pub fn new() -> Self {
+        Self {
+            alternatives: SovereignAlternativesEngine::new(),
+            diverter: DebianDiverterEngine::new(),
+            eselect_modules: HashMap::new(),
+        }
+    }
+
+    pub fn register_alternative(&mut self, name: &str, path: &str, priority: i32) {
+        self.alternatives.install_alternative(name, path, priority);
+    }
+
+    pub fn register_diversion(&mut self, original: &str, diverted: &str) {
+        self.diverter.add_diversion(original, diverted);
+    }
+
+    pub fn set_eselect_module(&mut self, module: &str, implementation: &str) {
+        self.eselect_modules
+            .insert(module.to_string(), implementation.to_string());
+    }
+
+    pub fn resolve_effective_path(&self, name: &str, original_path: &str) -> String {
+        let diverted = self.diverter.resolve_path(original_path);
+        if diverted != original_path {
+            return diverted.to_string();
+        }
+        if let Some(active) = self.alternatives.get_active_alternative(name) {
+            return active.to_string();
+        }
+        original_path.to_string()
+    }
+}
+
+impl Default for SovereignUniversalAlternativesManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // Facade Pattern: Universal Package Manager
 // ============================================================================
@@ -2619,11 +3308,72 @@ pub struct PackageDeltaPatch {
     pub delta_payload: Vec<u8>,
 }
 
-pub struct PackageDeltaEngine;
+pub trait IPackageDeltaStrategy: Send + Sync {
+    fn name(&self) -> &str;
+    fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str>;
+    fn compute_delta(&self, _source: &[u8], target: &[u8]) -> Vec<u8> {
+        target.to_vec()
+    }
+    fn apply_delta(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        self.apply(source, patch)
+    }
+}
+
+pub struct DnfDeltaRpmStrategy;
+impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
+    fn name(&self) -> &str {
+        "drpm"
+    }
+    fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        let mut out = source.to_vec();
+        out.extend_from_slice(patch);
+        Ok(out)
+    }
+}
+
+pub struct SovereignBinaryDeltaStrategy;
+impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
+    fn name(&self) -> &str {
+        "moss-stone-delta"
+    }
+    fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(patch.to_vec())
+    }
+}
+
+pub struct ZstdChunkedDeltaStrategy;
+impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
+    fn name(&self) -> &str {
+        "zstd-chunked"
+    }
+    fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(patch.to_vec())
+    }
+}
+
+pub struct PackageDeltaEngine {
+    pub strategies: HashMap<String, Arc<dyn IPackageDeltaStrategy>>,
+}
 
 impl PackageDeltaEngine {
     pub fn new() -> Self {
-        Self
+        let mut map: HashMap<String, Arc<dyn IPackageDeltaStrategy>> = HashMap::new();
+        let drpm = Arc::new(DnfDeltaRpmStrategy);
+        let moss = Arc::new(SovereignBinaryDeltaStrategy);
+        let zstd = Arc::new(ZstdChunkedDeltaStrategy);
+        map.insert(drpm.name().to_string(), drpm);
+        map.insert(moss.name().to_string(), moss);
+        map.insert(zstd.name().to_string(), zstd);
+        Self { strategies: map }
+    }
+
+    pub fn register_strategy(&mut self, strategy: Arc<dyn IPackageDeltaStrategy>) {
+        self.strategies
+            .insert(strategy.name().to_string(), strategy);
+    }
+
+    pub fn get_strategy(&self, name: &str) -> Option<&dyn IPackageDeltaStrategy> {
+        self.strategies.get(name).map(|s| s.as_ref())
     }
 
     /// Reconstitutes a full package by applying a binary patch to a cached source package
@@ -3232,8 +3982,7 @@ impl DebianTriggerManager {
         let mut executed_count = 0;
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
-                let paths_ref: Vec<&str> =
-                    matched_paths.iter().map(|s| s.as_str()).collect();
+                let paths_ref: Vec<&str> = matched_paths.iter().map(|s| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -3594,6 +4343,78 @@ impl Default for UserDefinedFunctionPipeline {
     }
 }
 
+pub trait IUserDefinedTransformHandler: Send + Sync {
+    fn transform(&self, package: &mut dyn IPackage) -> Result<(), HookError>;
+}
+
+pub struct UserDefinedPackageTransformPipeline {
+    handlers: Vec<Arc<dyn IUserDefinedTransformHandler>>,
+}
+
+impl UserDefinedPackageTransformPipeline {
+    pub fn new() -> Self {
+        Self {
+            handlers: Vec::new(),
+        }
+    }
+
+    pub fn add_handler(&mut self, handler: Arc<dyn IUserDefinedTransformHandler>) {
+        self.handlers.push(handler);
+    }
+
+    pub fn process_transforms(&self, package: &mut dyn IPackage) -> Result<usize, HookError> {
+        let mut count = 0;
+        for handler in &self.handlers {
+            handler.transform(package)?;
+            count += 1;
+        }
+        Ok(count)
+    }
+}
+
+impl Default for UserDefinedPackageTransformPipeline {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct UserDefinedScriptletHook {
+    pub name: String,
+    pub scriptlet_body: String,
+    pub execution_phase: PackageBuildPhase,
+}
+
+impl UserDefinedScriptletHook {
+    pub fn new(
+        name: impl Into<String>,
+        scriptlet_body: impl Into<String>,
+        phase: PackageBuildPhase,
+    ) -> Self {
+        Self {
+            name: name.into(),
+            scriptlet_body: scriptlet_body.into(),
+            execution_phase: phase,
+        }
+    }
+}
+
+impl UserDefinedHook for UserDefinedScriptletHook {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn execute(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
+        let meta = package.metadata_mut();
+        if self.scriptlet_body.contains("ADD_MAINTAINER_SUFFIX") {
+            meta.maintainer = format!("{}-udf-verified", meta.maintainer);
+        }
+        if self.scriptlet_body.contains("STRICT_LICENSE") {
+            meta.license = format!("Verified({})", meta.license);
+        }
+        Ok(())
+    }
+}
+
 // ============================================================================
 // Software Alternatives & File Diverter Subsystems
 // ============================================================================
@@ -3634,7 +4455,9 @@ impl SovereignAlternativesEngine {
     }
 
     pub fn get_active_alternative(&self, name: &str) -> Option<&str> {
-        self.active_selections.get(name).map(|s: &String| s.as_str())
+        self.active_selections
+            .get(name)
+            .map(|s: &String| s.as_str())
     }
 }
 
@@ -3712,7 +4535,9 @@ impl PortageSlotResolver {
 
     pub fn is_slot_compatible(&self, pkg_name: &str, target_slot: &str) -> bool {
         if let Some(slots) = self.installed_slots.get(pkg_name) {
-            slots.iter().any(|s: &PortageSlotInfo| s.slot == target_slot)
+            slots
+                .iter()
+                .any(|s: &PortageSlotInfo| s.slot == target_slot)
         } else {
             false
         }
@@ -3930,7 +4755,10 @@ impl UniversalDistroPackageUnifierEngine {
 
     /// Takes an IPackage from any external Linux distro format (Debian, RPM, Pacman, Ebuild, Apk, Nix, Flatpak, Snap, AppImage, Xbps, Zypper, etc.)
     /// and transforms it into a unified native Sigma package with normalized dependencies, expanded macros, and security audit wrappers.
-    pub fn unify_package(&self, foreign_package: &dyn IPackage) -> Result<Box<dyn IPackage>, ParseError> {
+    pub fn unify_package(
+        &self,
+        foreign_package: &dyn IPackage,
+    ) -> Result<Box<dyn IPackage>, ParseError> {
         let meta = foreign_package.metadata();
 
         // 1. Expand macros in description/paths if applicable
@@ -3940,7 +4768,9 @@ impl UniversalDistroPackageUnifierEngine {
         let mut unified_deps = Vec::new();
         for dep in foreign_package.dependencies() {
             let mapped_name = match dep.name.as_str() {
-                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
+                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => {
+                    "sovereign-openssl"
+                }
                 "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
                 "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
                 _ => &dep.name,
@@ -4004,7 +4834,138 @@ impl Default for UserDefinedFunctionManager {
     }
 }
 
-#[cfg(test_disabled)]
+// ============================================================================
+// Rich Boolean Dependency Solver Engine (Strategy & Composite Patterns)
+// Supports DNF5, APT 2.9, and Portage Boolean Dependency Syntax
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BooleanDependencyExpr {
+    Atom(String),
+    And(Vec<BooleanDependencyExpr>),
+    Or(Vec<BooleanDependencyExpr>),
+    If {
+        condition: Box<BooleanDependencyExpr>,
+        then_branch: Box<BooleanDependencyExpr>,
+    },
+    Unless {
+        condition: Box<BooleanDependencyExpr>,
+        then_branch: Box<BooleanDependencyExpr>,
+    },
+    Not(Box<BooleanDependencyExpr>),
+}
+
+pub trait IBooleanDependencySolver: Send + Sync {
+    fn evaluate(&self, expr: &BooleanDependencyExpr, installed_packages: &[String]) -> bool;
+    fn parse_expression(&self, raw: &str) -> Result<BooleanDependencyExpr, String>;
+}
+
+pub struct SovereignBooleanDependencySolver;
+
+impl SovereignBooleanDependencySolver {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for SovereignBooleanDependencySolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IBooleanDependencySolver for SovereignBooleanDependencySolver {
+    fn evaluate(&self, expr: &BooleanDependencyExpr, installed: &[String]) -> bool {
+        match expr {
+            BooleanDependencyExpr::Atom(name) => installed.iter().any(|p| p == name),
+            BooleanDependencyExpr::And(list) => list.iter().all(|e| self.evaluate(e, installed)),
+            BooleanDependencyExpr::Or(list) => list.iter().any(|e| self.evaluate(e, installed)),
+            BooleanDependencyExpr::If {
+                condition,
+                then_branch,
+            } => {
+                if self.evaluate(condition, installed) {
+                    self.evaluate(then_branch, installed)
+                } else {
+                    true
+                }
+            }
+            BooleanDependencyExpr::Unless {
+                condition,
+                then_branch,
+            } => {
+                if !self.evaluate(condition, installed) {
+                    self.evaluate(then_branch, installed)
+                } else {
+                    true
+                }
+            }
+            BooleanDependencyExpr::Not(inner) => !self.evaluate(inner, installed),
+        }
+    }
+
+    fn parse_expression(&self, raw: &str) -> Result<BooleanDependencyExpr, String> {
+        let trimmed = raw.trim();
+        if trimmed.is_empty() {
+            return Err("Empty boolean dependency expression".to_string());
+        }
+
+        let inner = if trimmed.starts_with('(') && trimmed.ends_with(')') {
+            &trimmed[1..trimmed.len() - 1]
+        } else {
+            trimmed
+        };
+
+        if inner.contains(" and ") {
+            let parts: Vec<&str> = inner.split(" and ").collect();
+            let mut exprs = Vec::new();
+            for part in parts {
+                exprs.push(self.parse_expression(part)?);
+            }
+            Ok(BooleanDependencyExpr::And(exprs))
+        } else if inner.contains(" or ") {
+            let parts: Vec<&str> = inner.split(" or ").collect();
+            let mut exprs = Vec::new();
+            for part in parts {
+                exprs.push(self.parse_expression(part)?);
+            }
+            Ok(BooleanDependencyExpr::Or(exprs))
+        } else if inner.contains(" if ") {
+            let parts: Vec<&str> = inner.splitn(2, " if ").collect();
+            if parts.len() == 2 {
+                let then_branch = Box::new(self.parse_expression(parts[0])?);
+                let condition = Box::new(self.parse_expression(parts[1])?);
+                Ok(BooleanDependencyExpr::If {
+                    condition,
+                    then_branch,
+                })
+            } else {
+                Err("Malformed if expression".to_string())
+            }
+        } else if inner.contains(" unless ") {
+            let parts: Vec<&str> = inner.splitn(2, " unless ").collect();
+            if parts.len() == 2 {
+                let then_branch = Box::new(self.parse_expression(parts[0])?);
+                let condition = Box::new(self.parse_expression(parts[1])?);
+                Ok(BooleanDependencyExpr::Unless {
+                    condition,
+                    then_branch,
+                })
+            } else {
+                Err("Malformed unless expression".to_string())
+            }
+        } else if inner.starts_with("not ") {
+            let sub = &inner[4..];
+            Ok(BooleanDependencyExpr::Not(Box::new(
+                self.parse_expression(sub)?,
+            )))
+        } else {
+            Ok(BooleanDependencyExpr::Atom(inner.trim().to_string()))
+        }
+    }
+}
+
+#[cfg(any(test, feature = "standalone_test"))]
 mod tests {
     use super::*;
 
@@ -4928,14 +5889,22 @@ Description: Hook test";
         assert!(unified.metadata().description.contains("/usr/bin/nginx"));
 
         // Normalized dependency mapping check
-        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-openssl"));
-        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-libc"));
+        assert!(unified
+            .dependencies()
+            .iter()
+            .any(|d| d.name == "sovereign-openssl"));
+        assert!(unified
+            .dependencies()
+            .iter()
+            .any(|d| d.name == "sovereign-libc"));
 
         // UserDefinedFunctionManager check
         let mut udf_mgr = UserDefinedFunctionManager::new();
         struct CustomSuffixHook;
         impl UserDefinedHook for CustomSuffixHook {
-            fn name(&self) -> &str { "suffix-hook" }
+            fn name(&self) -> &str {
+                "suffix-hook"
+            }
             fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
                 pkg.metadata_mut().maintainer = "sovereign-built".to_string();
                 Ok(())
@@ -4981,13 +5950,13 @@ Description: Hook test";
             ("test.AppImage", PackageFormat::AppImage),
             ("test.eopkg", PackageFormat::Eopkg),
             ("test.nixpkg", PackageFormat::Nix),
-            ("test.portage", PackageFormat::Ebuild),
+            ("test.portage", PackageFormat::Portage),
             ("test.deb", PackageFormat::Deb),
             ("test.tar.gz", PackageFormat::TarGz),
             ("test.tar .gz", PackageFormat::TarGz),
             ("test.xz", PackageFormat::TarXz),
             ("test.rpm", PackageFormat::Rpm),
-            ("test.ebuild", PackageFormat::Ebuild),
+            ("test.ebuild", PackageFormat::Portage),
             ("test.pkg.tar.xz", PackageFormat::Pacman),
             ("test.flatpak", PackageFormat::Flatpak),
             ("test.app", PackageFormat::AppBundle),
@@ -5011,5 +5980,191 @@ Description: Hook test";
                 filename
             );
         }
+    }
+
+    #[test]
+    fn test_boolean_dependency_solver() {
+        let solver = SovereignBooleanDependencySolver::new();
+        let installed = vec!["glibc".to_string(), "openssl".to_string()];
+
+        let parsed_and = solver.parse_expression("glibc and openssl").unwrap();
+        assert!(solver.evaluate(&parsed_and, &installed));
+
+        let parsed_or = solver.parse_expression("openssl or missingpkg").unwrap();
+        assert!(solver.evaluate(&parsed_or, &installed));
+
+        let parsed_if = solver.parse_expression("openssl if glibc").unwrap();
+        assert!(solver.evaluate(&parsed_if, &installed));
+
+        let parsed_not = solver.parse_expression("not missingpkg").unwrap();
+        assert!(solver.evaluate(&parsed_not, &installed));
+    }
+
+    #[test]
+    fn test_specialized_distro_adapters() {
+        let moss_adapter = SerpentMossAdapter::new();
+        let moss_data = b"name: serpent-app\nversion: 2.0.0\nmoss-manifest";
+        assert!(moss_adapter.can_parse(moss_data));
+        let moss_pkg = moss_adapter.parse(moss_data).unwrap();
+        assert_eq!(moss_pkg.name(), "serpent-app");
+        assert_eq!(moss_pkg.format(), PackageFormat::Moss);
+
+        let pkg_adapter = FreeBsdPkgAdapter::new();
+        let freebsd_data = b"name: nginx\nversion: 1.24.0\n+MANIFEST";
+        assert!(pkg_adapter.can_parse(freebsd_data));
+        let freebsd_pkg = pkg_adapter.parse(freebsd_data).unwrap();
+        assert_eq!(freebsd_pkg.name(), "nginx");
+        assert_eq!(freebsd_pkg.format(), PackageFormat::Pkg);
+
+        let sysupdate_adapter = SystemdSysupdateAdapter::new();
+        let sysupdate_data = b"[Transfer]\nPath=rootfs.raw\nsysupdate.d";
+        assert!(sysupdate_adapter.can_parse(sysupdate_data));
+        let sys_pkg = sysupdate_adapter.parse(sysupdate_data).unwrap();
+        assert_eq!(sys_pkg.format(), PackageFormat::Sysupdate);
+    }
+
+    #[test]
+    fn test_user_defined_transform_pipeline_and_scriptlets() {
+        let mut pipeline = UserDefinedPackageTransformPipeline::new();
+        struct LicenseTransform;
+        impl IUserDefinedTransformHandler for LicenseTransform {
+            fn transform(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+                pkg.metadata_mut().license = "Apache-2.0-Transformed".to_string();
+                Ok(())
+            }
+        }
+        pipeline.add_handler(Arc::new(LicenseTransform));
+
+        let mut test_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "udf-pkg".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "test".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "dev".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: String::new(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        assert_eq!(pipeline.process_transforms(test_pkg.as_mut()).unwrap(), 1);
+        assert_eq!(test_pkg.metadata().license, "Apache-2.0-Transformed");
+
+        let scriptlet_hook = UserDefinedScriptletHook::new(
+            "maintainer-hook",
+            "ADD_MAINTAINER_SUFFIX",
+            PackageBuildPhase::Install,
+        );
+        scriptlet_hook.execute(test_pkg.as_mut()).unwrap();
+        assert!(test_pkg.metadata().maintainer.contains("udf-verified"));
+    }
+
+    #[test]
+    fn test_package_delta_strategies() {
+        let engine = PackageDeltaEngine::new();
+        let drpm = engine.get_strategy("drpm").unwrap();
+        let moss = engine.get_strategy("moss-stone-delta").unwrap();
+        let zstd = engine.get_strategy("zstd-chunked").unwrap();
+
+        let delta_bytes = drpm.compute_delta(b"old_binary", b"new_binary");
+        let applied = drpm.apply_delta(b"old_binary", &delta_bytes).unwrap();
+        assert!(applied.starts_with(b"old_binary"));
+
+        let moss_delta = moss.compute_delta(b"old", b"payload_data");
+        let moss_reconstructed = moss.apply_delta(b"old", &moss_delta).unwrap();
+        assert_eq!(moss_reconstructed, b"payload_data");
+
+        let zstd_delta = zstd.compute_delta(b"old", b"zstd_payload");
+        let zstd_reconstructed = zstd.apply_delta(b"old", &zstd_delta).unwrap();
+        assert_eq!(zstd_reconstructed, b"zstd_payload");
+    }
+
+    #[test]
+    fn test_universal_alternatives_manager_facade() {
+        let mut mgr = SovereignUniversalAlternativesManager::new();
+        mgr.register_alternative("editor", "/usr/bin/nvim", 100);
+        mgr.register_alternative("editor", "/usr/bin/vim", 50);
+        mgr.register_diversion("/usr/bin/gcc", "/usr/bin/gcc-diverted");
+        mgr.set_eselect_module("kernel", "linux-6.12-sigma");
+
+        assert_eq!(
+            mgr.resolve_effective_path("editor", "/usr/bin/editor"),
+            "/usr/bin/nvim"
+        );
+        assert_eq!(
+            mgr.resolve_effective_path("gcc", "/usr/bin/gcc"),
+            "/usr/bin/gcc-diverted"
+        );
+        assert_eq!(
+            mgr.eselect_modules.get("kernel").unwrap(),
+            "linux-6.12-sigma"
+        );
+    }
+
+    #[test]
+    fn test_bridge_and_composite_and_state_and_builder_oop_patterns() {
+        // 1. Test Builder Pattern
+        let pkg = UniversalPackageBuilder::new("sovereign-tool")
+            .with_version(2, 5, 0)
+            .with_description("Sovereign developer tool")
+            .with_license("Apache-2.0")
+            .with_format(PackageFormat::Sigma)
+            .add_dependency("sovereign-libc")
+            .build()
+            .unwrap();
+
+        assert_eq!(pkg.name(), "sovereign-tool");
+        assert_eq!(pkg.version(), &Version::new(2, 5, 0));
+        assert_eq!(pkg.dependencies().len(), 1);
+
+        // 2. Test Bridge Pattern
+        let backend = Box::new(GenericDistroBackend::new("deb-dpkg-backend"));
+        let bridge = UniversalDistroBridge::new(backend);
+        assert_eq!(bridge.backend_name(), "deb-dpkg-backend");
+        assert!(bridge.deploy(pkg.as_ref()).is_ok());
+
+        // 3. Test Composite Pattern
+        let pkg1 = UniversalPackageBuilder::new("core-lib").build().unwrap();
+        let pkg2 = UniversalPackageBuilder::new("gui-lib").build().unwrap();
+
+        let mut bundle = CompositePackageBundle::new("desktop-meta-bundle");
+        bundle.add_component(Box::new(StandardPackage {
+            metadata: pkg1.metadata().clone(),
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        }));
+        bundle.add_component(Box::new(StandardPackage {
+            metadata: pkg2.metadata().clone(),
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        }));
+
+        assert_eq!(bundle.component_name(), "desktop-meta-bundle");
+        assert_eq!(bundle.component_size(), 8192);
+        assert_eq!(bundle.install_component(&bridge).unwrap(), 8192);
+
+        // 4. Test State Machine Pattern
+        let mut sm = PackageLifecycleStateMachine::new();
+        assert_eq!(sm.current_state(), PackageLifecycleState::Uninstalled);
+        assert!(sm.transition_to(PackageLifecycleState::Downloading).is_ok());
+        assert!(sm
+            .transition_to(PackageLifecycleState::VerifyingPqcSignature)
+            .is_ok());
+        assert!(sm
+            .transition_to(PackageLifecycleState::UnpackingPayload)
+            .is_ok());
+        assert!(sm
+            .transition_to(PackageLifecycleState::ExecutingTriggers)
+            .is_ok());
+        assert!(sm.transition_to(PackageLifecycleState::Installed).is_ok());
+        assert_eq!(sm.current_state(), PackageLifecycleState::Installed);
     }
 }

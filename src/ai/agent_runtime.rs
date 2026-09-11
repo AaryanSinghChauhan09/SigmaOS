@@ -16,7 +16,8 @@ use alloc::vec::Vec;
 use alloc::string::String;
 use core::sync::atomic::{AtomicU64, Ordering};
 
-use crate::security::landlock_sovereign::{SovereignLandlockV5Guard as LandlockV5Guard, CapsicumRights};
+use crate::klib::types::*;
+use crate::security::sandbox::{LandlockV5Guard, CapsicumRights};
 use crate::kernel::process::{ProcessId, ProcessState};
 
 /// Unique identifier for AI agents in the kernel
@@ -572,6 +573,14 @@ pub enum AgentError {
     AnalysisFailed,
 }
 
+// Re-export for other modules
+pub use self::{
+    AgentId, AgentCapability, AgentPriority, AgentState,
+    AgentProcess, AgentSandbox, AgentKernelBridge,
+    CrashDump, AgentReport, PluginSpec, Plugin,
+    UserIntent, ConfigDiff,
+    AgentError,
+};
 
 #[cfg(test)]
 mod tests {

@@ -1,4 +1,3 @@
-
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem
 // Incorporates:
 // - Clear Linux Stateless Architecture (/usr defaults vs /etc user overrides)
@@ -138,7 +137,12 @@ impl BedrockLinuxStrataEngine {
             if !stratum.is_enabled {
                 return Err(format!("Stratum '{}' is disabled", stratum_name));
             }
-            Ok(format!("Executed '{} {}' from stratum '{}'", cmd, args.join(" "), stratum_name))
+            Ok(format!(
+                "Executed '{} {}' from stratum '{}'",
+                cmd,
+                args.join(" "),
+                stratum_name
+            ))
         } else {
             Err(format!("Stratum '{}' not found", stratum_name))
         }
@@ -244,13 +248,19 @@ impl SmartOsZoneEngine {
     }
 
     pub fn vmadm_start(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self
+            .vms
+            .get_mut(uuid)
+            .ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Running;
         Ok(())
     }
 
     pub fn vmadm_stop(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self
+            .vms
+            .get_mut(uuid)
+            .ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Stopped;
         Ok(())
     }
@@ -703,531 +713,6 @@ impl Default for OpenBsdUnveilAuditor {
 }
 
 // =========================================================================
-// DEVUAN INIT DIVERSITY ENGINE (DEVUAN LINUX SYSTEMD-FREE INIT PARITY)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DevuanInitBackend {
-    SysVInit,
-    Runit,
-    S6,
-    OpenRc,
-}
-
-#[derive(Debug, Clone)]
-pub struct DevuanInitService {
-    pub name: String,
-    pub backend: DevuanInitBackend,
-    pub script_path: String,
-    pub is_enabled: bool,
-}
-
-pub struct DevuanInitDiversityEngine {
-    pub default_backend: DevuanInitBackend,
-    pub services: BTreeMap<String, DevuanInitService>,
-}
-
-impl DevuanInitDiversityEngine {
-    pub fn new(default_backend: DevuanInitBackend) -> Self {
-        Self {
-            default_backend,
-            services: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_service(&mut self, name: &str, backend: DevuanInitBackend, script_path: &str) {
-        let service = DevuanInitService {
-            name: name.to_string(),
-            backend,
-            script_path: script_path.to_string(),
-            is_enabled: true,
-        };
-        self.services.insert(name.to_string(), service);
-    }
-
-    pub fn is_systemd_free(&self) -> bool {
-        true
-    }
-}
-
-impl Default for DevuanInitDiversityEngine {
-    fn default() -> Self {
-        Self::new(DevuanInitBackend::SysVInit)
-    }
-}
-
-// =========================================================================
-// ARTIX LINUX INIT MATRIX (ARTIX LINUX SYSTEMD-FREE SCRIPTLET TRANSLATOR)
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct ArtixInitScriptlet {
-    pub service_name: String,
-    pub openrc_run_script: String,
-    pub runit_run_script: String,
-    pub dinit_service_file: String,
-}
-
-pub struct ArtixLinuxInitMatrix {
-    pub scriptlets: BTreeMap<String, ArtixInitScriptlet>,
-}
-
-impl ArtixLinuxInitMatrix {
-    pub fn new() -> Self {
-        Self {
-            scriptlets: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_scriptlet(&mut self, service_name: &str, exec_path: &str) {
-        let scriptlet = ArtixInitScriptlet {
-            service_name: service_name.to_string(),
-            openrc_run_script: format!("#!/sbin/openrc-run\ncommand=\"{}\"\n", exec_path),
-            runit_run_script: format!("#!/bin/sh\nexec {}\n", exec_path),
-            dinit_service_file: format!("type = process\ncommand = {}\n", exec_path),
-        };
-        self.scriptlets.insert(service_name.to_string(), scriptlet);
-    }
-
-    pub fn get_scriptlet(&self, service_name: &str) -> Option<&ArtixInitScriptlet> {
-        self.scriptlets.get(service_name)
-    }
-}
-
-impl Default for ArtixLinuxInitMatrix {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// KAOS PACKAGE STATE GOVERNOR (KAOS LINUX QT/KDE-FIRST REPOSITORY GOVERNOR)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KaOsRepoGroup {
-    Core,
-    Main,
-    Apps,
-}
-
-#[derive(Debug, Clone)]
-pub struct KaOsPackageRecord {
-    pub name: String,
-    pub version: String,
-    pub repo_group: KaOsRepoGroup,
-    pub is_qt_kde_toolkit: bool,
-}
-
-pub struct KaOSPackageStateGovernor {
-    pub packages: BTreeMap<String, KaOsPackageRecord>,
-}
-
-impl KaOSPackageStateGovernor {
-    pub fn new() -> Self {
-        Self {
-            packages: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_package(&mut self, name: &str, version: &str, group: KaOsRepoGroup, is_qt_kde: bool) {
-        let record = KaOsPackageRecord {
-            name: name.to_string(),
-            version: version.to_string(),
-            repo_group: group,
-            is_qt_kde_toolkit: is_qt_kde,
-        };
-        self.packages.insert(name.to_string(), record);
-    }
-
-    pub fn qt_kde_toolkit_ratio(&self) -> f32 {
-        if self.packages.is_empty() {
-            return 1.0;
-        }
-        let qt_count = self.packages.values().filter(|p| p.is_qt_kde_toolkit).count();
-        qt_count as f32 / self.packages.len() as f32
-    }
-}
-
-impl Default for KaOSPackageStateGovernor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 12. Missing Linux & BSD Distro Component Parity Inspector
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ComponentParityStatus {
-    Implemented,
-    InTesting,
-    Planned,
-}
-
-#[derive(Debug, Clone)]
-pub struct DistroComponentParityRecord {
-    pub component_name: String,
-    pub source_distro: String,
-    pub status: ComponentParityStatus,
-}
-
-pub struct MissingDistroComponentsEngine {
-    pub records: BTreeMap<String, DistroComponentParityRecord>,
-}
-
-impl MissingDistroComponentsEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            records: BTreeMap::new(),
-        };
-
-        engine.register_component(
-            "Portage USE Flags",
-            "Gentoo",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "APK Trigger Hooks",
-            "Alpine",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "AUR Recipe Helper",
-            "Arch Linux",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "Pledge & Unveil",
-            "OpenBSD",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "Jails & ZFS BootEnv",
-            "FreeBSD",
-            ComponentParityStatus::Implemented,
-        );
-        engine.register_component(
-            "RPM-OSTree Atomic Trees",
-            "Fedora Silverblue",
-            ComponentParityStatus::Implemented,
-        );
-
-        engine
-    }
-
-    pub fn register_component(&mut self, name: &str, distro: &str, status: ComponentParityStatus) {
-        let record = DistroComponentParityRecord {
-            component_name: name.to_string(),
-            source_distro: distro.to_string(),
-            status,
-        };
-        self.records.insert(name.to_string(), record);
-    }
-
-    pub fn is_all_components_implemented(&self) -> bool {
-        self.records
-            .values()
-            .all(|r| r.status == ComponentParityStatus::Implemented)
-    }
-}
-
-impl Default for MissingDistroComponentsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// UBUNTU APPARMOR MANDATORY ACCESS CONTROL (MAC) SECURITY PROFILE ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AppArmorMode {
-    Enforce,
-    Complain,
-    Disabled,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppArmorProfile {
-    pub profile_name: String,
-    pub mode: AppArmorMode,
-    pub allowed_read_paths: Vec<String>,
-    pub allowed_write_paths: Vec<String>,
-    pub allowed_exec_paths: Vec<String>,
-}
-
-pub struct UbuntuAppArmorEngine {
-    pub profiles: BTreeMap<String, AppArmorProfile>,
-}
-
-impl UbuntuAppArmorEngine {
-    pub fn new() -> Self {
-        Self {
-            profiles: BTreeMap::new(),
-        }
-    }
-
-    pub fn load_profile(&mut self, profile: AppArmorProfile) {
-        self.profiles.insert(profile.profile_name.clone(), profile);
-    }
-
-    pub fn authorize_path_access(
-        &self,
-        profile_name: &str,
-        path: &str,
-        access_type: &str, // "read", "write", "exec"
-    ) -> Result<bool, &'static str> {
-        if let Some(prof) = self.profiles.get(profile_name) {
-            if prof.mode == AppArmorMode::Disabled {
-                return Ok(true);
-            }
-
-            let allowed = match access_type {
-                "read" => prof.allowed_read_paths.iter().any(|p| path.starts_with(p)),
-                "write" => prof.allowed_write_paths.iter().any(|p| path.starts_with(p)),
-                "exec" => prof.allowed_exec_paths.iter().any(|p| path.starts_with(p)),
-                _ => false,
-            };
-
-            if !allowed {
-                if prof.mode == AppArmorMode::Enforce {
-                    return Err("AppArmor: Access denied by profile");
-                } else if prof.mode == AppArmorMode::Complain {
-                    return Ok(true); // Complain mode logs but allows
-                }
-            }
-            Ok(allowed)
-        } else {
-            Ok(true) // Unconfined
-        }
-    }
-}
-
-impl Default for UbuntuAppArmorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// NIXOS FLAKES DECLARATIVE INPUT LOCK & CAS DERIVATION ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct NixFlakeInput {
-    pub input_id: String,
-    pub url: String,
-    pub locked_nar_hash: String,
-}
-
-pub struct NixOsFlakesEngine {
-    pub flake_inputs: BTreeMap<String, NixFlakeInput>,
-    pub lock_version: u32,
-}
-
-impl NixOsFlakesEngine {
-    pub fn new() -> Self {
-        Self {
-            flake_inputs: BTreeMap::new(),
-            lock_version: 2,
-        }
-    }
-
-    pub fn lock_input(&mut self, id: &str, url: &str, nar_hash: &str) {
-        let input = NixFlakeInput {
-            input_id: id.to_string(),
-            url: url.to_string(),
-            locked_nar_hash: nar_hash.to_string(),
-        };
-        self.flake_inputs.insert(id.to_string(), input);
-    }
-
-    pub fn compute_system_derivation_hash(&self) -> String {
-        let mut combined = String::new();
-        for inp in self.flake_inputs.values() {
-            combined.push_str(&inp.locked_nar_hash);
-        }
-        format!("nix-store-drv-{:08x}", combined.len() * 31)
-    }
-}
-
-// =========================================================================
-// DRAGONFLY BSD HAMMER2 PSEUDO FILE SYSTEM (PFS) CLUSTERING & SNAPSHOT ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Hammer2PfsType {
-    Master,
-    Slave,
-    Snapshot,
-    Cache,
-}
-
-#[derive(Debug, Clone)]
-pub struct Hammer2PfsNode {
-    pub pfs_id: u32,
-    pub name: String,
-    pub pfs_type: Hammer2PfsType,
-    pub cluster_quorum_votes: u32,
-}
-
-pub struct DragonFlyHammer2PfsEngine {
-    pub pfs_nodes: BTreeMap<u32, Hammer2PfsNode>,
-    pub active_snapshots: Vec<String>,
-}
-
-impl DragonFlyHammer2PfsEngine {
-    pub fn new() -> Self {
-        Self {
-            pfs_nodes: BTreeMap::new(),
-            active_snapshots: Vec::new(),
-        }
-    }
-
-    pub fn create_pfs(&mut self, pfs_id: u32, name: &str, pfs_type: Hammer2PfsType) -> Hammer2PfsNode {
-        let node = Hammer2PfsNode {
-            pfs_id,
-            name: name.to_string(),
-            pfs_type,
-            cluster_quorum_votes: if pfs_type == Hammer2PfsType::Master { 1 } else { 0 },
-        };
-        self.pfs_nodes.insert(pfs_id, node.clone());
-        node
-    }
-
-    pub fn create_pfs_snapshot(&mut self, source_pfs_id: u32, snap_name: &str) -> Result<u32, &'static str> {
-        if let Some(src) = self.pfs_nodes.get(&source_pfs_id) {
-            let snap_id = (self.pfs_nodes.len() + 1) as u32;
-            let name = format!("{}@{}", src.name, snap_name);
-            self.create_pfs(snap_id, &name, Hammer2PfsType::Snapshot);
-            self.active_snapshots.push(name);
-            Ok(snap_id)
-        } else {
-            Err("HAMMER2: Source PFS node not found")
-        }
-    }
-}
-
-impl Default for DragonFlyHammer2PfsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// NETBSD PKGSRC PORTABLE PACKAGE BUILD & LICENSE COMPLIANCE ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct PkgsrcPackageSpec {
-    pub pkgname: String,
-    pub category: String,
-    pub license: String,
-    pub buildlink3_deps: Vec<String>,
-}
-
-pub struct NetBsdPkgsrcEngine {
-    pub acceptable_licenses: Vec<String>,
-    pub installed_packages: BTreeMap<String, PkgsrcPackageSpec>,
-}
-
-impl NetBsdPkgsrcEngine {
-    pub fn new() -> Self {
-        Self {
-            acceptable_licenses: vec![
-                "gnu-gpl-v2".to_string(),
-                "gnu-gpl-v3".to_string(),
-                "modified-bsd".to_string(),
-                "mit".to_string(),
-            ],
-            installed_packages: BTreeMap::new(),
-        }
-    }
-
-    pub fn accept_license(&mut self, license: &str) {
-        if !self.acceptable_licenses.contains(&license.to_string()) {
-            self.acceptable_licenses.push(license.to_string());
-        }
-    }
-
-    pub fn build_and_install(&mut self, spec: PkgsrcPackageSpec) -> Result<String, &'static str> {
-        if !self.acceptable_licenses.contains(&spec.license) {
-            return Err("pkgsrc: License not in ACCEPTABLE_LICENSES");
-        }
-        let name = spec.pkgname.clone();
-        self.installed_packages.insert(name.clone(), spec);
-        Ok(format!("pkgsrc: Successfully built and installed {}", name))
-    }
-}
-
-impl Default for NetBsdPkgsrcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_clear_linux_stateless() {
-        let mut clear = ClearLinuxStatelessEngine::new();
-        clear.set_vendor_default("/etc/nginx.conf", "worker_processes 1;");
-        assert_eq!(
-            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
-            "worker_processes 1;"
-        );
-
-        clear.set_user_override("/etc/nginx.conf", "worker_processes 4;");
-        assert_eq!(
-            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
-            "worker_processes 4;"
-        );
-    }
-
-    #[test]
-    fn test_tails_amnesic_scrubbing() {
-        let mut tails = TailsAmnesicEngine::new();
-        tails.allocate_session_page(&[0xFF, 0xAA, 0xBB]);
-        assert_eq!(tails.ram_pages.len(), 1);
-
-        let wiped_count = tails.wipe_all_memory_on_shutdown();
-        assert_eq!(wiped_count, 1);
-        assert_eq!(tails.ram_pages.len(), 0);
-    }
-
-    #[test]
-    fn test_chimera_dinit_supervisor() {
-        let mut dinit = ChimeraDinitSupervisor::new();
-        dinit.register_service("networking", "/sbin/ip link set up", Vec::new());
-        assert_eq!(
-            dinit.services.get("networking").unwrap().state,
-            DinitServiceState::Stopped
-        );
-    }
-
-    #[test]
-    fn test_solus_eopkg_manager() {
-        let mut eopkg = SolusEopkgManager::new();
-        eopkg
-            .installed_packages
-            .insert("firefox".to_string(), "115.0".to_string());
-        let res = eopkg
-            .apply_eopkg_delta("firefox", "115.0", "116.0")
-            .unwrap();
-        assert!(res.contains("firefox-116.0.eopkg.delta applied"));
-    }
-
-    #[test]
-    fn test_freebsd_vnet_stack() {
-        let mut vnet_engine = FreeBsdVnetStackEngine::new();
-        let stack = vnet_engine.create_vnet_stack(5, "10.0.0.5");
-        assert!(stack.loopback_up);
-        assert_eq!(stack.ip_address, "10.0.0.5");
-    }
-
-// =========================================================================
 // UBUNTU APPARMOR MANDATORY ACCESS CONTROL (MAC) SECURITY PROFILE ENGINE
 // =========================================================================
 
@@ -1377,7 +862,11 @@ impl DragonFlyBsdHammerSnapshotEngine {
     }
 
     pub fn mount_snapshot(&mut self, snapshot_id: u64) -> Result<String, &'static str> {
-        if let Some(snap) = self.snapshots.iter_mut().find(|s| s.snapshot_id == snapshot_id) {
+        if let Some(snap) = self
+            .snapshots
+            .iter_mut()
+            .find(|s| s.snapshot_id == snapshot_id)
+        {
             snap.is_mounted = true;
             Ok(format!("/media/hammer2/@snap_{}", snapshot_id))
         } else {
@@ -1410,10 +899,16 @@ pub struct VanillaOsApxSubsystemEngine {
 
 impl VanillaOsApxSubsystemEngine {
     pub fn new() -> Self {
-        Self { containers: Vec::new() }
+        Self {
+            containers: Vec::new(),
+        }
     }
 
-    pub fn create_apx_container(&mut self, name: &str, base_distro: &str) -> Result<(), &'static str> {
+    pub fn create_apx_container(
+        &mut self,
+        name: &str,
+        base_distro: &str,
+    ) -> Result<(), &'static str> {
         if self.containers.iter().any(|c| c.name == name) {
             return Err("APX: Container name already exists");
         }
@@ -1427,7 +922,11 @@ impl VanillaOsApxSubsystemEngine {
     }
 
     pub fn install_apx_app(&mut self, container_name: &str, app: &str) -> Result<(), &'static str> {
-        if let Some(c) = self.containers.iter_mut().find(|c| c.name == container_name) {
+        if let Some(c) = self
+            .containers
+            .iter_mut()
+            .find(|c| c.name == container_name)
+        {
             c.installed_apps.push(app.to_string());
             Ok(())
         } else {
@@ -1999,7 +1498,8 @@ impl BpfTypeFormatEngine {
     }
 
     pub fn register_type(&mut self, type_id: u32, name: &str, kind: &str) {
-        self.type_table.insert(type_id, (name.to_string(), kind.to_string()));
+        self.type_table
+            .insert(type_id, (name.to_string(), kind.to_string()));
     }
 
     pub fn lookup_type(&self, type_id: u32) -> Option<&(String, String)> {
@@ -2024,7 +1524,8 @@ impl ErofsReadOnlyOverlayEngine {
     }
 
     pub fn mount_erofs_super(&mut self, image_name: &str, compression: &str) {
-        self.mounted_images.insert(image_name.to_string(), compression.to_string());
+        self.mounted_images
+            .insert(image_name.to_string(), compression.to_string());
     }
 
     pub fn verify_block_checksum(&mut self, _block_id: u64) -> bool {
@@ -2101,9 +1602,21 @@ impl UbuntuAppArmorEngine {
         let need_write = access_type.contains('w');
         let need_exec = access_type.contains('x');
 
-        let allowed = (!need_read || profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)))
-            && (!need_write || profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)))
-            && (!need_exec || profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)));
+        let allowed = (!need_read
+            || profile
+                .allowed_read_paths
+                .iter()
+                .any(|p| target_path.starts_with(p)))
+            && (!need_write
+                || profile
+                    .allowed_write_paths
+                    .iter()
+                    .any(|p| target_path.starts_with(p)))
+            && (!need_exec
+                || profile
+                    .allowed_exec_paths
+                    .iter()
+                    .any(|p| target_path.starts_with(p)));
 
         if allowed || matches!(profile.mode, UbuntuAppArmorMode::Complain) {
             Ok(true)
@@ -2113,26 +1626,6 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct NixOsFlakesEngine {
-    pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
-}
-
-impl NixOsFlakesEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn lock_input(&mut self, name: &str, url: &str, hash: &str) {
-        self.flake_inputs.insert(name.to_string(), (url.to_string(), hash.to_string()));
-    }
-
-    pub fn compute_system_derivation_hash(&self) -> String {
-        format!("nix-store-drv-{:x}", self.flake_inputs.len())
-    }
-}
-
-#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -2204,7 +1697,6 @@ mod tests {
         assert_eq!(hammer.total_dedup_savings_bytes, 18);
     }
 
-
     #[test]
     fn test_gentoo_portage_slot_operator() {
         let mut portage = GentooPortageSlotOperatorEngine::new();
@@ -2223,190 +1715,172 @@ mod tests {
         assert!(!selinux.authorize_mls_mcs_access(100, 3, &[1])); // Higher sensitivity
         assert!(!selinux.authorize_mls_mcs_access(100, 1, &[4])); // Missing category
     }
-
 }
 
+#[test]
+fn test_suse_yast_configuration_registry() {
+    let mut yast = SuseYaSTConfigurationRegistry::new();
+    yast.register_module("network", "1.0");
+    yast.set_value("network", "dhcp_enabled", "true").unwrap();
 
-    #[test]
-    fn test_suse_yast_configuration_registry() {
-        let mut yast = SuseYaSTConfigurationRegistry::new();
-        yast.register_module("network", "1.0");
-        yast.set_value("network", "dhcp_enabled", "true").unwrap();
+    assert!(yast.apply_configuration("network").unwrap());
+    assert!(yast.modules[0].is_applied);
+}
 
-        assert!(yast.apply_configuration("network").unwrap());
-        assert!(yast.modules[0].is_applied);
+#[test]
+fn test_dragonfly_hammer_and_vanilla_apx() {
+    let mut hammer = DragonFlyBsdHammerSnapshotEngine::new();
+    let sid = hammer.create_pfs_snapshot("root_pfs");
+    let path = hammer.mount_snapshot(sid).unwrap();
+    assert!(path.contains("snap_100"));
+
+    let mut apx = VanillaOsApxSubsystemEngine::new();
+    assert!(apx.create_apx_container("arch-subsystem", "arch").is_ok());
+    assert!(apx.install_apx_app("arch-subsystem", "neofetch").is_ok());
+    assert_eq!(apx.containers[0].installed_apps.len(), 1);
+}
+
+#[test]
+fn test_illumos_dtrace_probe_engine() {
+    let mut dtrace = IllumosDTraceProbeEngine::new();
+    dtrace.register_probe("syscall", "sys", "read", "entry");
+
+    dtrace.fire_probe("syscall", "read", "fd=3, len=1024");
+    assert_eq!(dtrace.trace_buffer.len(), 1);
+    assert!(dtrace.trace_buffer[0].contains("syscall:sys:read:entry"));
+}
+
+#[test]
+fn test_netbsd_rump_kernel_server_engine() {
+    let mut rump = NetBsdRumpKernelServerEngine::new();
+    let sid = rump.start_rump_server("rumpvfs");
+
+    let s = rump.get_rump_server(sid).unwrap();
+    assert!(s.is_active);
+    assert_eq!(s.component_name, "rumpvfs");
+}
+
+#[test]
+fn test_openbsd_unveil_auditor() {
+    let mut auditor = OpenBsdUnveilAuditor::new();
+    auditor.log_violation(1234, "/etc/shadow", "r", 1000);
+    assert_eq!(auditor.violations.len(), 1);
+    assert_eq!(auditor.violations[0].attempted_path, "/etc/shadow");
+}
+
+#[test]
+fn test_steamos_atomic_ab_image_update_engine() {
+    let mut ab_engine = SteamOsAtomicAbImageUpdateEngine::new("3.4.0", "cbf29ce484222325");
+    assert_eq!(ab_engine.active_slot, PartitionSlot::SlotA);
+    assert_eq!(ab_engine.inactive_slot(), PartitionSlot::SlotB);
+
+    // Calculate expected hash for update payload
+    let payload = b"STEAM_OS_SYSTEM_UPDATE_IMAGE_PAYLOAD";
+    let mut hash: u64 = 0xcbf29ce484222325;
+    for &b in payload {
+        hash ^= u64::from(b);
+        hash = hash.wrapping_mul(0x100000001b3);
     }
+    let expected_hash = format!("{:016x}", hash);
 
-    #[test]
-    fn test_dragonfly_hammer_and_vanilla_apx() {
-        let mut hammer = DragonFlyBsdHammerSnapshotEngine::new();
-        let sid = hammer.create_pfs_snapshot("root_pfs");
-        let path = hammer.mount_snapshot(sid).unwrap();
-        assert!(path.contains("snap_100"));
+    // Apply update to Slot B
+    let updated_slot = ab_engine
+        .apply_update_to_inactive_slot("3.5.0", &expected_hash, payload)
+        .unwrap();
+    assert_eq!(updated_slot, PartitionSlot::SlotB);
+    assert_eq!(ab_engine.active_slot, PartitionSlot::SlotB);
 
-        let mut apx = VanillaOsApxSubsystemEngine::new();
-        assert!(apx.create_apx_container("arch-subsystem", "arch").is_ok());
-        assert!(apx.install_apx_app("arch-subsystem", "neofetch").is_ok());
-        assert_eq!(apx.containers[0].installed_apps.len(), 1);
-    }
+    // Confirm boot success on Slot B
+    assert!(ab_engine.mark_boot_successful().is_ok());
+    assert_eq!(ab_engine.slot_b.status, ImageSlotStatus::Healthy);
 
-    #[test]
-    fn test_illumos_dtrace_probe_engine() {
-        let mut dtrace = IllumosDTraceProbeEngine::new();
-        dtrace.register_probe("syscall", "sys", "read", "entry");
+    // Simulate boot failure and verify rollback to Slot A
+    let fallback = ab_engine.report_boot_failure_and_rollback();
+    assert_eq!(fallback, PartitionSlot::SlotA);
+    assert_eq!(ab_engine.active_slot, PartitionSlot::SlotA);
+    assert_eq!(ab_engine.slot_b.status, ImageSlotStatus::Corrupted);
+}
 
-        dtrace.fire_probe("syscall", "read", "fd=3, len=1024");
-        assert_eq!(dtrace.trace_buffer.len(), 1);
-        assert!(dtrace.trace_buffer[0].contains("syscall:sys:read:entry"));
-    }
+#[test]
+fn test_apparmor_path_rule_engine() {
+    let mut apparmor = AppArmorPathRuleEngine::new();
 
-    #[test]
-    fn test_netbsd_rump_kernel_server_engine() {
-        let mut rump = NetBsdRumpKernelServerEngine::new();
-        let sid = rump.start_rump_server("rumpvfs");
+    let profile = AppArmorPathProfile {
+        profile_name: "usr.bin.firefox".to_string(),
+        mode: AppArmorRuleMode::Enforce,
+        rules: vec![
+            AppArmorPathRule {
+                path_pattern: "/home/user/*".to_string(),
+                allow_read: true,
+                allow_write: true,
+                allow_exec: false,
+            },
+            AppArmorPathRule {
+                path_pattern: "/usr/lib/firefox/firefox".to_string(),
+                allow_read: true,
+                allow_write: false,
+                allow_exec: true,
+            },
+        ],
+    };
 
-        let s = rump.get_rump_server(sid).unwrap();
-        assert!(s.is_active);
-        assert_eq!(s.component_name, "rumpvfs");
-    }
+    apparmor.add_profile(profile);
 
-    #[test]
-    fn test_openbsd_unveil_auditor() {
-        let mut auditor = OpenBsdUnveilAuditor::new();
-        auditor.log_violation(1234, "/etc/shadow", "r", 1000);
-        assert_eq!(auditor.violations.len(), 1);
-        assert_eq!(auditor.violations[0].attempted_path, "/etc/shadow");
-    }
+    // Allowed accesses
+    assert!(apparmor.evaluate_access(
+        "usr.bin.firefox",
+        "/home/user/download.pdf",
+        true,
+        true,
+        false
+    ));
+    assert!(apparmor.evaluate_access(
+        "usr.bin.firefox",
+        "/usr/lib/firefox/firefox",
+        true,
+        false,
+        true
+    ));
 
-    #[test]
-    fn test_devuan_init_diversity() {
-        let mut devuan = DevuanInitDiversityEngine::new(DevuanInitBackend::OpenRc);
-        devuan.register_service("networking", DevuanInitBackend::OpenRc, "/etc/init.d/networking");
-        assert!(devuan.is_systemd_free());
-        assert_eq!(devuan.services.len(), 1);
-    }
+    // Denied accesses (e.g. write to executable or exec home file)
+    assert!(!apparmor.evaluate_access(
+        "usr.bin.firefox",
+        "/usr/lib/firefox/firefox",
+        true,
+        true,
+        true
+    ));
+    assert!(!apparmor.evaluate_access("usr.bin.firefox", "/etc/shadow", true, false, false));
 
-    #[test]
-    fn test_artix_init_matrix() {
-        let mut artix = ArtixLinuxInitMatrix::new();
-        artix.register_scriptlet("sshd", "/usr/bin/sshd");
-        let scriptlet = artix.get_scriptlet("sshd").unwrap();
-        assert!(scriptlet.openrc_run_script.contains("/usr/bin/sshd"));
-        assert!(scriptlet.runit_run_script.contains("exec /usr/bin/sshd"));
-    }
+    assert!(apparmor.audit_log.len() >= 2);
+}
 
-    #[test]
-    fn test_kaos_package_governor() {
-        let mut kaos = KaOSPackageStateGovernor::new();
-        kaos.register_package("plasma-desktop", "5.27", KaOsRepoGroup::Core, true);
-        kaos.register_package("kwrite", "23.08", KaOsRepoGroup::Apps, true);
-        assert_eq!(kaos.qt_kde_toolkit_ratio(), 1.0);
-    }
+#[test]
+fn test_bpf_type_format_engine() {
+    let mut btf = BpfTypeFormatEngine::new();
+    btf.register_type(1, "int", "BTF_KIND_INT");
+    btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
 
-    #[test]
-    fn test_missing_distro_components_engine() {
-        let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 6);
-        assert!(engine.is_all_components_implemented());
-    }
+    assert_eq!(btf.total_types(), 2);
+    let res = btf.lookup_type(2).unwrap();
+    assert_eq!(res.0, "sk_buff");
+    assert_eq!(res.1, "BTF_KIND_STRUCT");
+}
 
-    #[test]
-    fn test_steamos_atomic_ab_image_update_engine() {
-        let mut ab_engine = SteamOsAtomicAbImageUpdateEngine::new("3.4.0", "cbf29ce484222325");
-        assert_eq!(ab_engine.active_slot, PartitionSlot::SlotA);
-        assert_eq!(ab_engine.inactive_slot(), PartitionSlot::SlotB);
+#[test]
+fn test_erofs_read_only_overlay_engine() {
+    let mut erofs = ErofsReadOnlyOverlayEngine::new();
+    erofs.mount_erofs_super("rootfs.erofs", "LZ4");
+    assert_eq!(erofs.mounted_images.len(), 1);
+    assert!(erofs.verify_block_checksum(1024));
+    assert_eq!(erofs.total_blocks_checksummed, 1);
+}
 
-        // Calculate expected hash for update payload
-        let payload = b"STEAM_OS_SYSTEM_UPDATE_IMAGE_PAYLOAD";
-        let mut hash: u64 = 0xcbf29ce484222325;
-        for &b in payload {
-            hash ^= u64::from(b);
-            hash = hash.wrapping_mul(0x100000001b3);
-        }
-        let expected_hash = format!("{:016x}", hash);
-
-        // Apply update to Slot B
-        let updated_slot = ab_engine
-            .apply_update_to_inactive_slot("3.5.0", &expected_hash, payload)
-            .unwrap();
-        assert_eq!(updated_slot, PartitionSlot::SlotB);
-        assert_eq!(ab_engine.active_slot, PartitionSlot::SlotB);
-
-        // Confirm boot success on Slot B
-        assert!(ab_engine.mark_boot_successful().is_ok());
-        assert_eq!(ab_engine.slot_b.status, ImageSlotStatus::Healthy);
-
-        // Simulate boot failure and verify rollback to Slot A
-        let fallback = ab_engine.report_boot_failure_and_rollback();
-        assert_eq!(fallback, PartitionSlot::SlotA);
-        assert_eq!(ab_engine.active_slot, PartitionSlot::SlotA);
-        assert_eq!(ab_engine.slot_b.status, ImageSlotStatus::Corrupted);
-    }
-
-    #[test]
-    fn test_apparmor_path_rule_engine() {
-        let mut apparmor = AppArmorPathRuleEngine::new();
-
-        let profile = AppArmorPathProfile {
-            profile_name: "usr.bin.firefox".to_string(),
-            mode: AppArmorRuleMode::Enforce,
-            rules: vec![
-                AppArmorPathRule {
-                    path_pattern: "/home/user/*".to_string(),
-                    allow_read: true,
-                    allow_write: true,
-                    allow_exec: false,
-                },
-                AppArmorPathRule {
-                    path_pattern: "/usr/lib/firefox/firefox".to_string(),
-                    allow_read: true,
-                    allow_write: false,
-                    allow_exec: true,
-                },
-            ],
-        };
-
-        apparmor.add_profile(profile);
-
-        // Allowed accesses
-        assert!(apparmor.evaluate_access("usr.bin.firefox", "/home/user/download.pdf", true, true, false));
-        assert!(apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, false, true));
-
-        // Denied accesses (e.g. write to executable or exec home file)
-        assert!(!apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, true, true));
-        assert!(!apparmor.evaluate_access("usr.bin.firefox", "/etc/shadow", true, false, false));
-
-        assert!(apparmor.audit_log.len() >= 2);
-    }
-
-    #[test]
-    fn test_bpf_type_format_engine() {
-        let mut btf = BpfTypeFormatEngine::new();
-        btf.register_type(1, "int", "BTF_KIND_INT");
-        btf.register_type(2, "sk_buff", "BTF_KIND_STRUCT");
-
-        assert_eq!(btf.total_types(), 2);
-        let res = btf.lookup_type(2).unwrap();
-        assert_eq!(res.0, "sk_buff");
-        assert_eq!(res.1, "BTF_KIND_STRUCT");
-    }
-
-    #[test]
-    fn test_erofs_read_only_overlay_engine() {
-        let mut erofs = ErofsReadOnlyOverlayEngine::new();
-        erofs.mount_erofs_super("rootfs.erofs", "LZ4");
-        assert_eq!(erofs.mounted_images.len(), 1);
-        assert!(erofs.verify_block_checksum(1024));
-        assert_eq!(erofs.total_blocks_checksummed, 1);
-    }
-
-    #[test]
-    fn test_loongarch64_architecture_engine() {
-        let mut la64 = LoongArch64ArchitectureEngine::new();
-        la64.init_la64_core(4);
-        assert_eq!(la64.active_cores, 4);
-        assert!(la64.execute_instruction(0x02800000));
-        assert_eq!(la64.executed_instructions, 1);
-    }
-
+#[test]
+fn test_loongarch64_architecture_engine() {
+    let mut la64 = LoongArch64ArchitectureEngine::new();
+    la64.init_la64_core(4);
+    assert_eq!(la64.active_cores, 4);
+    assert!(la64.execute_instruction(0x02800000));
+    assert_eq!(la64.executed_instructions, 1);
 }

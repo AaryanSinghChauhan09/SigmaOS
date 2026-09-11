@@ -7,8 +7,44 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::package::{AptDebManifest, PackagePriority};
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::sigpkg::universal_engine::PackageFormat;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::sigpkg::universal_oop_system;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(any(feature = "standalone_test", test))]
+#[path = "universal_oop_system.rs"]
+pub mod universal_oop_system;
+
+#[cfg(any(feature = "standalone_test", test))]
+pub use universal_oop_system::{Dependency, Package, PackageFormat, Version, VersionConstraint};
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+pub enum PackagePriority {
+    #[default]
+    Optional,
+    Standard,
+    Important,
+    Required,
+    Essential,
+}
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub architecture: String,
+    pub maintainer: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,12 +106,6 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
-
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
@@ -104,20 +134,6 @@ pub struct PacmanPkgbuild {
     pub depends: Vec<String>,
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
-}
-
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
-
-/// Debian-style package priority levels (DFSG and APT standard)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PackagePriority {
-    Optional = 0,
-    Standard = 1,
-    Important = 2,
-    Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
 }
 
 pub trait PackageFormatAdapter {
@@ -174,8 +190,6 @@ pub struct NetBsdPkgsrcManifest {
     pub comment: String,
     pub depends: Vec<String>,
 }
-
-
 
 /// Description of openSUSE Zypper RPM spec/manifest
 #[derive(Debug, Clone)]
@@ -248,6 +262,8 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: "Debian Maintainer".to_string(),
             depends,
             description,
             priority,
@@ -1587,7 +1603,11 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = universal_oop_system::StandardPackage {
             metadata: universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: native_pkg.version,
+                version: universal_oop_system::Version::new(
+                    native_pkg.version.major,
+                    native_pkg.version.minor,
+                    native_pkg.version.patch,
+                ),
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
@@ -1697,9 +1717,8 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
-                "libc".to_string()
-            }
+            "libc6" | "glibc" | "musl" | "musl-dev" | "musl-devel" | "devel/glibc"
+            | "sys-libs/glibc" | "libc" => "libc".to_string(),
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
                 "zlib".to_string()
             }
@@ -1732,25 +1751,17 @@ impl UniversalDependencyMapper {
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
             "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
-            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => "glib".to_string(),
-            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => "pcre".to_string(),
+            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => {
+                "glib".to_string()
+            }
+            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => {
+                "pcre".to_string()
+            }
             "libuv" | "libuv-dev" | "libuv-devel" | "dev-libs/libuv" => "libuv".to_string(),
             "openssh" | "openssh-server" | "net-misc/openssh" => "openssh".to_string(),
             "mesa" | "mesa-dev" | "mesa-libgl-devel" | "media-libs/mesa" => "mesa".to_string(),
             "git" | "git-base" | "dev-vcs/git" => "git".to_string(),
             "cmake" | "dev-build/cmake" => "cmake".to_string(),
-            "ffmpeg" | "libffmpeg-dev" | "media-video/ffmpeg" => "ffmpeg".to_string(),
-            "rust" | "rustc" | "dev-lang/rust" => "rust".to_string(),
-            "golang" | "go" | "dev-lang/go" => "go".to_string(),
-            "ninja" | "ninja-build" | "dev-build/ninja" => "ninja".to_string(),
-            "systemd" | "systemd-sysv" | "sys-apps/systemd" => "systemd".to_string(),
-            "fastfetch" | "neofetch" => "fastfetch".to_string(),
-            "btop" | "htop" => "btop".to_string(),
-            "ripgrep" | "rg" => "ripgrep".to_string(),
-            "bat" | "cat" => "bat".to_string(),
-            "fd" | "fd-find" => "fd".to_string(),
-            "zoxide" => "zoxide".to_string(),
-            "eza" | "exa" => "eza".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2150,7 +2161,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" | "pkg_add" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
@@ -2439,115 +2450,6 @@ impl UniversalFormatConverter {
                     )
                     .map_err(|e: &'static str| e.to_string())
             }
-            PackageFormat::Pkg | PackageFormat::Ports => {
-                if text.contains("@name") {
-                    let obs = adapter
-                        .parse_openbsd_contents(&text)
-                        .map_err(|e: &'static str| e.to_string())?;
-                    let canonical_deps: Vec<String> = obs
-                        .depends
-                        .iter()
-                        .map(|d| self.dep_mapper.to_canonical_name(d))
-                        .collect();
-                    adapter
-                        .translate_to_native_package(
-                            &obs.pkgname,
-                            &obs.version,
-                            &obs.comment,
-                            &canonical_deps,
-                        )
-                        .map_err(|e: &'static str| e.to_string())
-                } else {
-                    let bsd = adapter
-                        .parse_freebsd_ucl_manifest(&text)
-                        .map_err(|e: &'static str| e.to_string())?;
-                    let canonical_deps: Vec<String> = bsd
-                        .deps
-                        .iter()
-                        .map(|d| self.dep_mapper.to_canonical_name(d))
-                        .collect();
-                    adapter
-                        .translate_to_native_package(
-                            &bsd.name,
-                            &bsd.version,
-                            &bsd.comment,
-                            &canonical_deps,
-                        )
-                        .map_err(|e: &'static str| e.to_string())
-                }
-            }
-            PackageFormat::Zypper => {
-                let zyp = adapter
-                    .parse_zypper_spec(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
-                let canonical_deps: Vec<String> = zyp
-                    .requires
-                    .iter()
-                    .map(|d| self.dep_mapper.to_canonical_name(d))
-                    .collect();
-                adapter
-                    .translate_to_native_package(
-                        &zyp.name,
-                        &zyp.version,
-                        &zyp.summary,
-                        &canonical_deps,
-                    )
-                    .map_err(|e: &'static str| e.to_string())
-            }
-            PackageFormat::Pkgsrc => {
-                let net = adapter
-                    .parse_netbsd_pkgsrc(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
-                let canonical_deps: Vec<String> = net
-                    .depends
-                    .iter()
-                    .map(|d| self.dep_mapper.to_canonical_name(d))
-                    .collect();
-                adapter
-                    .translate_to_native_package(
-                        &net.pkgname,
-                        &net.version,
-                        &net.comment,
-                        &canonical_deps,
-                    )
-                    .map_err(|e: &'static str| e.to_string())
-            }
-            PackageFormat::SlackBuild | PackageFormat::Txz => {
-                let slk = adapter
-                    .parse_slackware_pkg(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
-                let canonical_deps: Vec<String> = slk
-                    .slack_required
-                    .iter()
-                    .map(|d| self.dep_mapper.to_canonical_name(d))
-                    .collect();
-                adapter
-                    .translate_to_native_package(
-                        &slk.name,
-                        &slk.version,
-                        &slk.description,
-                        &canonical_deps,
-                    )
-                    .map_err(|e: &'static str| e.to_string())
-            }
-            PackageFormat::OpenBsdPkg => {
-                let obs = adapter
-                    .parse_openbsd_contents(&text)
-                    .map_err(|e: &'static str| e.to_string())?;
-                let canonical_deps: Vec<String> = obs
-                    .depends
-                    .iter()
-                    .map(|d| self.dep_mapper.to_canonical_name(d))
-                    .collect();
-                adapter
-                    .translate_to_native_package(
-                        &obs.pkgname,
-                        &obs.version,
-                        &obs.comment,
-                        &canonical_deps,
-                    )
-                    .map_err(|e: &'static str| e.to_string())
-            }
             PackageFormat::Pacman => {
                 let parsed = adapter
                     .parse_pacman_pkgbuild(&text)
@@ -2795,7 +2697,7 @@ impl Default for UniversalDryRunSimulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(any(test, feature = "standalone_test"))]
 mod tests {
     use super::*;
 
@@ -3038,7 +2940,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Pisi)
+            Some(PackageFormat::Eopkg)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
@@ -3046,7 +2948,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("ubuntu.deb"),
-            Some(PackageFormat::Apt)
+            Some(PackageFormat::Deb)
         );
         assert_eq!(
             adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -3054,7 +2956,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("fedora.rpm"),
-            Some(PackageFormat::Yum)
+            Some(PackageFormat::Rpm)
         );
         assert_eq!(
             adapter.detect_format_by_extension("harmony.hap"),
@@ -3548,7 +3450,6 @@ mod tests {
         assert_eq!(slack_action.source_pm, "slackpkg");
         assert_eq!(slack_action.operation, UniversalPmOperation::Install);
     }
-
 
     #[test]
     fn test_haiku_hpkg_manifest_parsing_and_bridge() {
