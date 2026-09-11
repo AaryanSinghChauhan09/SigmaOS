@@ -781,6 +781,7 @@ pub struct WebRenderDisplayItem {
 pub struct QuantumWebRenderEngine {
     pub display_items: Vec<WebRenderDisplayItem>,
     pub active_gpu_tiles: u32,
+    pub css_grid_tracks: Vec<(f32, f32)>, // (width, height)
 }
 
 impl QuantumWebRenderEngine {
@@ -789,6 +790,7 @@ impl QuantumWebRenderEngine {
         Self {
             display_items: Vec::new(),
             active_gpu_tiles: 16,
+            css_grid_tracks: Vec::new(),
         }
     }
 
@@ -802,6 +804,16 @@ impl QuantumWebRenderEngine {
             bg_color: color.to_string(),
             z_index: z,
         });
+    }
+
+    pub fn calculate_gecko_grid_layout(&mut self, columns: u32, container_w: f32, container_h: f32) {
+        self.css_grid_tracks.clear();
+        if columns > 0 {
+            let col_w = container_w / columns as f32;
+            for _ in 0..columns {
+                self.css_grid_tracks.push((col_w, container_h));
+            }
+        }
     }
 
     pub fn sort_display_list(&mut self) {
@@ -951,6 +963,8 @@ pub struct ChromiumIpcChannelEngine {
     pub active_channels: BTreeMap<u32, String>,
     pub dispatched_messages: Vec<ChromiumIpcMessage>,
     pub extension_service_workers: BTreeMap<String, bool>, // ext_id -> is_active
+    pub partition_alloc_enabled: bool,
+    pub allocated_partitions: BTreeMap<u32, usize>, // partition_id -> byte_size
 }
 
 impl ChromiumIpcChannelEngine {
@@ -960,11 +974,23 @@ impl ChromiumIpcChannelEngine {
             active_channels: BTreeMap::new(),
             dispatched_messages: Vec::new(),
             extension_service_workers: BTreeMap::new(),
+            partition_alloc_enabled: true,
+            allocated_partitions: BTreeMap::new(),
         };
         engine.active_channels.insert(1001, String::from("mojo:content.mojom.FrameHost"));
         engine.active_channels.insert(1002, String::from("mojo:network.mojom.URLLoaderFactory"));
         engine.extension_service_workers.insert(String::from("sigma_ublock_v3"), true);
         engine
+    }
+
+    pub fn allocate_partition(&mut self, partition_id: u32, bytes: usize) {
+        if self.partition_alloc_enabled {
+            self.allocated_partitions.insert(partition_id, bytes);
+        }
+    }
+
+    pub fn free_partition(&mut self, partition_id: u32) {
+        self.allocated_partitions.remove(&partition_id);
     }
 
     pub fn dispatch_mojo_message(&mut self, channel_id: u32, interface_name: &str, method: &str, payload: &[u8]) -> bool {
@@ -995,11 +1021,46 @@ impl ChromiumIpcChannelEngine {
 // 17. LIBREWOLF & MULLVAD PRIVACY ISOLATION & ODOH RELAY ENGINE
 // =========================================================================
 
+pub struct LibreWolfHardeningEngine {
+    pub total_cookie_protection_enabled: bool,
+    pub first_party_isolation: bool,
+    pub strict_referrer_policy: String,
+    pub partitioned_cookie_jars: BTreeMap<String, BTreeMap<String, String>>, // (top_level_site, cookie_key) -> cookie_val
+}
+
+impl LibreWolfHardeningEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            total_cookie_protection_enabled: true,
+            first_party_isolation: true,
+            strict_referrer_policy: String::from("no-referrer-when-downgrade"),
+            partitioned_cookie_jars: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_partitioned_cookie(&mut self, top_level_site: &str, key: &str, val: &str) {
+        if self.total_cookie_protection_enabled {
+            self.partitioned_cookie_jars
+                .entry(top_level_site.to_string())
+                .or_default()
+                .insert(key.to_string(), val.to_string());
+        }
+    }
+
+    pub fn get_partitioned_cookie(&self, top_level_site: &str, key: &str) -> Option<String> {
+        self.partitioned_cookie_jars
+            .get(top_level_site)
+            .and_then(|jar| jar.get(key).cloned())
+    }
+}
+
 pub struct MullvadPrivacyIsolationEngine {
     pub ephemerality_enabled: bool,
     pub odoh_relay_endpoint: String,
     pub socks5_proxies_per_tab: BTreeMap<u64, String>, // tab_id -> socks5 proxy address
     pub referrer_policy: String,
+    pub session_isolated_storage: BTreeMap<u64, BTreeMap<String, String>>, // tab_id -> storage
 }
 
 impl MullvadPrivacyIsolationEngine {
@@ -1010,11 +1071,25 @@ impl MullvadPrivacyIsolationEngine {
             odoh_relay_endpoint: String::from("https://odoh.mullvad.net/relay"),
             socks5_proxies_per_tab: BTreeMap::new(),
             referrer_policy: String::from("no-referrer-when-downgrade"),
+            session_isolated_storage: BTreeMap::new(),
         }
     }
 
     pub fn bind_tab_to_ephemeral_socks5(&mut self, tab_id: u64, proxy_addr: &str) {
         self.socks5_proxies_per_tab.insert(tab_id, proxy_addr.to_string());
+    }
+
+    pub fn store_ephemeral_item(&mut self, tab_id: u64, key: &str, val: &str) {
+        if self.ephemerality_enabled {
+            self.session_isolated_storage
+                .entry(tab_id)
+                .or_default()
+                .insert(key.to_string(), val.to_string());
+        }
+    }
+
+    pub fn purge_tab_ephemeral_storage(&mut self, tab_id: u64) {
+        self.session_isolated_storage.remove(&tab_id);
     }
 
     pub fn get_tab_proxy(&self, tab_id: u64) -> String {
@@ -1106,6 +1181,7 @@ pub struct SigmaWebBrowser {
     pub duck_assist: DuckAssistPrivacyEngine,
     pub chromium_ipc: ChromiumIpcChannelEngine,
     pub mullvad_isolation: MullvadPrivacyIsolationEngine,
+    pub librewolf_hardening: LibreWolfHardeningEngine,
     pub arc_boost: ArcBrowserBoostEngine,
 }
 
@@ -1129,6 +1205,7 @@ impl SigmaWebBrowser {
             duck_assist: DuckAssistPrivacyEngine::new(),
             chromium_ipc: ChromiumIpcChannelEngine::new(),
             mullvad_isolation: MullvadPrivacyIsolationEngine::new(),
+            librewolf_hardening: LibreWolfHardeningEngine::new(),
             arc_boost: ArcBrowserBoostEngine::new(),
         }
     }
@@ -1193,10 +1270,24 @@ mod tests {
         let mv3_out = ipc.trigger_manifest_v3_background_event("sigma_ublock_v3", "onBeforeRequest");
         assert!(mv3_out.contains("isolated background worker"));
 
+        ipc.allocate_partition(42, 1024);
+        assert_eq!(ipc.allocated_partitions.get(&42), Some(&1024));
+        ipc.free_partition(42);
+        assert_eq!(ipc.allocated_partitions.get(&42), None);
+
         let mut mullvad = MullvadPrivacyIsolationEngine::new();
         mullvad.bind_tab_to_ephemeral_socks5(1, "socks5://127.0.0.1:9050");
         assert_eq!(mullvad.get_tab_proxy(1), "socks5://127.0.0.1:9050");
         assert!(mullvad.wrap_odoh_query("example.com").contains("odoh_relay"));
+
+        mullvad.store_ephemeral_item(1, "token", "abc");
+        assert_eq!(mullvad.session_isolated_storage.get(&1).unwrap().get("token").unwrap(), "abc");
+        mullvad.purge_tab_ephemeral_storage(1);
+        assert!(mullvad.session_isolated_storage.get(&1).is_none());
+
+        let mut lw = LibreWolfHardeningEngine::new();
+        lw.set_partitioned_cookie("example.com", "sess", "123");
+        assert_eq!(lw.get_partitioned_cookie("example.com", "sess").unwrap(), "123");
 
         let mut arc = ArcBrowserBoostEngine::new();
         assert!(arc.switch_space("Work"));
@@ -1402,6 +1493,10 @@ mod tests {
         render.build_display_item(2, 0.0, 0.0, 100.0, 50.0, "#000", 1);
         render.sort_display_list();
         assert_eq!(render.display_items[0].item_id, 2);
+
+        render.calculate_gecko_grid_layout(2, 1000.0, 600.0);
+        assert_eq!(render.css_grid_tracks.len(), 2);
+        assert_eq!(render.css_grid_tracks[0], (500.0, 600.0));
     }
 
     #[test]
