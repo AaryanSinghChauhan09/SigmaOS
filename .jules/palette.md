@@ -25,3 +25,7 @@
 ## 2026-08-10 - EndeavourOS Calamares & EOS Welcome Application Parity
 **Learning:** Desktop installers and welcome applications without clear progress feedback cause user frustration. Implementing `CalamaresInstaller` and `EosWelcomeApp` with structured status messages and pastebin log diagnostics provides a seamless setup and maintenance experience.
 **Action:** Ensure all installation and maintenance wizards provide explicit status messages and clear diagnostic feedback.
+
+## 2026-09-10 - Web Desktop Theme Switcher State & Skip Link Navigation
+**Learning:** Web OS desktops with multi-theme selection buttons require `aria-pressed` synchronization and a skip-to-content anchor link (`skip-link`) at the top of the DOM to prevent screen readers from having to traverse fixed header status bars on every page load.
+**Action:** Provide `aria-pressed` attributes on theme toggle buttons updated dynamically via event handlers and include a visually-hidden `.skip-link` element at the start of `<body>` that becomes visible on keyboard focus.
