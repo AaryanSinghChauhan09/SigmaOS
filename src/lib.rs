@@ -62,6 +62,10 @@ pub use distro::{
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
+    AlpineApkVolatileOverlayEngine, DragonFlyHammer2PfsEngine, FreeBsdPoudrierePortBuilder,
+    GentooEmergeCliEngine, GentooGccCflagsTunerEngine, GentooLaymanOverlayEngine,
+    IllumosDTraceTracingGovernor, MageiaUrpmiMediaManager, OpenBsdPledgeUnveilSecurityGovernor,
+    SolusEopkgPackageEngine, VoidXbpsBinaryPackageEngine,
     ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode,
     DragonFlyHammer2EmergencyCowEngine, FedoraSelinuxMlsMcsGovernor, FreeBsdGeomVdevTopology,
     GarudaZenPerformanceEngine, GentooPortageSlotOperatorEngine, GeomVdevNode,
@@ -75,7 +79,9 @@ pub use distro::{
     ZramCompressionAlgorithm, DebianMultiarchAptEngine, GarudaPerformanceTweakEngine,
     HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, SolusEopkgBudgieEngine,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
-    OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
+    OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig, OmarchyHyprlandWorkspaceSnapLayoutEngine,
+    OmarchyLiveIsoBootstrapEngine, OmarchyLuaConfigEngine, OmarchyNeovimPresetStudioEngine,
+    OmarchyWaybarAppletStudioEngine,
 };
 
 pub use package::bsd_linux_package_innovations::{

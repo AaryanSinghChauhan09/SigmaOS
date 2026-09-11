@@ -24,4 +24,5 @@ jobs:
 
       - name: Test Haiku .hpkg Format Bridge & PackageFS
         run: |
+          mkdir -p build
           cargo test --lib -- sigpkg::universal_adapter::tests::test_haiku_hpkg_manifest_parsing_and_bridge
