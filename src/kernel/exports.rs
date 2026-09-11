@@ -3,6 +3,8 @@
 // BSD-style SYSINIT boots, Kernel Linker Daemon (KLD) modules,
 // and Enterprise Kernel ABI (KABI) stability guarantees & automated testing suites.
 
+extern crate alloc;
+
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::format;

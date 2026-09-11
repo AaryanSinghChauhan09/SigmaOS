@@ -2,6 +2,8 @@
 // Implements Arch Linux's checkupdates functionality
 // Scans repository index diffs without locking the primary package database
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;

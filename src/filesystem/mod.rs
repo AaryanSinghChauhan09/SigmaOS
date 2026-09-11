@@ -12,7 +12,9 @@ pub mod manager;
 pub mod mount_namespace;
 pub mod smart_symlink;
 pub mod support;
+pub mod sovereign_file_descriptor;
 pub mod vfs;
+pub use sovereign_file_descriptor::*;
 pub mod ext4;
 pub use bsd_linux_innovations::{
     BsdSoftUpdatesEngine, GoboLinuxPathResolver, LinuxOverlayFsManager, LinuxProcSysfsEmulator,

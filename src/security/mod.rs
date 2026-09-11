@@ -61,10 +61,6 @@ pub use kali_components::{
     ScanResult, ScanType, VulnType, WebVulnReport,
 };
 
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-};
-
 pub use qubes_isolation::*;
 pub use root_improvement::*;
 
@@ -87,10 +83,7 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
+pub use defensive_audit::{SecurityAuditRecord, DefensiveAuditLog};
 pub use forensics::*;
 pub use hardening::{
     MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
@@ -99,13 +92,7 @@ pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
-pub use kali_stack::{
-    HashMode, KaliAirgeddonWifiAudit, KaliBurpSuiteWebProxy, KaliHashcatGpuCracker,
-    KaliHydraPasswordBruteforce, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter,
-    KaliNiktoWebScanner, KaliNmapPortScanner, KaliSqlmapInjectionAuditor, KaliUndercoverThemeMode,
-    KaliWiresharkPacketAnalyzer, PcapPacketHeader, ScanTechnique, UndercoverDisguiseTheme,
-    WifiFrameType,
-};
+pub use kali_stack::*;
 pub use kernel_hardening::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError, PagePermissions,
     PledgePromise as KernelPledgePromise, RetpolineKptiMitigationEngine, SmepSmapEnforcer,
@@ -116,7 +103,7 @@ pub use libgksu::{
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,
 };
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
-pub use parrot::{
+pub use parrot_parity::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
@@ -161,5 +148,3 @@ pub use vulnerability::{
 };
 pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
 pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};
-pub mod defensive_audit;
-pub mod parrot;

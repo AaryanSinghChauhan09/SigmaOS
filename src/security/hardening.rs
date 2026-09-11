@@ -5,7 +5,7 @@
 #[cfg(feature = "standalone_test")]
 use alloc::vec::Vec;
 use crate::security::Permission;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data

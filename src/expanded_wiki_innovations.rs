@@ -21,10 +21,10 @@
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 /// Arch Linux pacman-contrib Utilities Engine
 pub struct ArchPacmanContribEngine {

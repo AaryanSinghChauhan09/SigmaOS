@@ -4,7 +4,6 @@ use alloc::boxed::Box;
 // use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 
 // SigmaOS Universal Package Manager
@@ -232,6 +231,7 @@ pub enum PackageFormat {
     Snap,       // snap/squashfs
     Flatpak,    // flatpak sandbox
     AppImage,   // AppImage single-file container
+    #[default]
     SigmaPkg,   // native SigmaOS format
     Air,        // Adobe AIR (.air)
     Bottle,     // Homebrew Bottle (.bottle)
@@ -277,6 +277,11 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
+    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
+    Ipk,        // OpenWrt / Entware (.ipk)
+    Opkg,       // Yocto / OpenWrt (.opkg)
+    SolarisIps, // Solaris / Illumos IPS (.p5p / .ips)
+    GuixNar,    // GNU Guix NAR archive (.nar)
 }
 
 impl PackageFormat {
@@ -823,6 +828,11 @@ impl_generic_install_strategy!(SlackBuildInstallStrategy);
 impl_generic_install_strategy!(CruxInstallStrategy);
 impl_generic_install_strategy!(DrpmInstallStrategy);
 impl_generic_install_strategy!(StratumInstallStrategy);
+impl_generic_install_strategy!(OpenBsdPkgInstallStrategy);
+impl_generic_install_strategy!(IpkInstallStrategy);
+impl_generic_install_strategy!(OpkgInstallStrategy);
+impl_generic_install_strategy!(SolarisIpsInstallStrategy);
+impl_generic_install_strategy!(GuixNarInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1072,6 +1082,11 @@ impl_generic_metadata_adapter!(SlackBuildMetadataAdapter, SlackBuild);
 impl_generic_metadata_adapter!(CruxMetadataAdapter, Crux);
 impl_generic_metadata_adapter!(DrpmMetadataAdapter, Drpm);
 impl_generic_metadata_adapter!(StratumMetadataAdapter, Stratum);
+impl_generic_metadata_adapter!(OpenBsdPkgMetadataAdapter, OpenBsdPkg);
+impl_generic_metadata_adapter!(IpkMetadataAdapter, Ipk);
+impl_generic_metadata_adapter!(OpkgMetadataAdapter, Opkg);
+impl_generic_metadata_adapter!(SolarisIpsMetadataAdapter, SolarisIps);
+impl_generic_metadata_adapter!(GuixNarMetadataAdapter, GuixNar);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1210,6 +1225,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
             PackageFormat::Stratum => Box::new(StratumInstallStrategy),
+            PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgInstallStrategy),
+            PackageFormat::Ipk => Box::new(IpkInstallStrategy),
+            PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
+            PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
+            PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
         }
     }
 
@@ -1264,6 +1284,11 @@ impl PackageFactory {
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
             PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
+            PackageFormat::OpenBsdPkg => Box::new(OpenBsdPkgMetadataAdapter),
+            PackageFormat::Ipk => Box::new(IpkMetadataAdapter),
+            PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
+            PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
+            PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
         }
     }
 }
@@ -1749,6 +1774,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();

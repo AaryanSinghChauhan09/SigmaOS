@@ -2,6 +2,8 @@
 // Implements Gentoo-style source-based package management for SigmaOS
 // Inspired by Gentoo's Portage for performance optimization and customization
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;

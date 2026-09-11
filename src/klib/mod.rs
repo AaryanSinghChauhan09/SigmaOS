@@ -53,6 +53,8 @@ pub mod uuid;
 pub mod uvm;
 pub mod vec;
 
+extern crate alloc;
+
 pub use alloc::collections::BTreeMap;
 pub use alloc::string::{String, ToString};
 pub use arc::Arc;

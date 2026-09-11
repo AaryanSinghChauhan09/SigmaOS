@@ -8,6 +8,8 @@
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
 use core::fmt;
+use core::ops::{Deref, DerefMut};
+use crate::klib::vec::SigmaVec;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

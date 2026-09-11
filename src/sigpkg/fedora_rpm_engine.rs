@@ -5,11 +5,9 @@
 #[cfg(not(any(test, feature = "standalone_test")))]
 use crate::klib::collections::HashMap;
 #[cfg(any(test, feature = "standalone_test"))]
-use alloc::collections::BTreeMap as HashMap;
+use std::collections::BTreeMap as HashMap;
 
 extern crate alloc;
-
-use alloc::collections::BTreeMap as HashMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;

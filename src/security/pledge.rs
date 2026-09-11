@@ -5,7 +5,6 @@ use std::vec::Vec;
 
 #[cfg(test)]
 
-#[cfg(test)]
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 
 use core::sync::atomic::{AtomicBool, Ordering};
@@ -289,7 +288,8 @@ impl Default for PledgeManager {
 
 /// Common pledge promises
 pub mod promises {
-    use super::{Permission, PledgePromise};
+    use crate::security::capability::Permission;
+    use super::PledgePromise;
 
     /// Stdio promise - basic I/O only
     pub fn stdio() -> PledgePromise {

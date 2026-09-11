@@ -14,29 +14,58 @@ use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(test)]
 pub use crate::sigpkg::Version;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
+pub use crate::package::universal::SnapcraftManifest;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Permission {
-    NetworkTcp,
-    NetworkUdp,
-    FileRead,
-    FileWrite,
-    ProcessExec,
-    AudioPlayback,
-    DisplayAccess,
-    Ipc,
-    ProcessControl,
-    Execute,
-    ProcessExec,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+    pub architecture: String,
 }
 
-#[cfg(not(feature = "standalone_test"))]
-pub use crate::security::Permission;
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub package_name: String,
+    pub version: String,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+    pub use_flags: Vec<String>,
+    pub slot: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkIndexManifest {
+    pub package_name: String,
+    pub version: String,
+    pub description: String,
+    pub depends: Vec<String>,
+    pub architecture: String,
+    pub install_size: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+    pub architecture: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub requires: Vec<String>,
+    pub architecture: String,
+}
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -50,7 +79,6 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-use crate::sigpkg::universal_engine::PackageFormat;
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};

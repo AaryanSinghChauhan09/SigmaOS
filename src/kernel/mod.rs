@@ -114,5 +114,7 @@ pub use roundrobin::{
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 #[allow(ambiguous_glob_reexports)]
 pub use structures::*;
+pub mod virtual_cpu;
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
+pub mod vmm_paging;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};

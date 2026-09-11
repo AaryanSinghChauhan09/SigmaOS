@@ -84,3 +84,9 @@ pub use audio_codec_hda::{
     HdaController, HdaPciDriver, HdaCodec, AudioStream, AudioFormat, SampleRate, BitDepth,
     Channels,
 };
+pub use device::*;
+pub use distro_drivers::*;
+pub use framework::*;
+pub use shims::*;
+pub use universal_support::*;
+pub use windows_compat::*;

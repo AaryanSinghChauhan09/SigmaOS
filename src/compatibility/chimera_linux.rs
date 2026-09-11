@@ -1,10 +1,8 @@
 use std::vec::Vec;
-/// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
-/// Replicates Chimera's signature modern features:
-/// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Chimera Linux dinit service management compatibility
+#[derive(Debug, Clone)]
 pub struct DinitService {
     pub name: [u8; 32],
     pub dependencies: Vec<[u8; 32]>,
@@ -159,129 +157,43 @@ impl ApkPackageStore {
     }
 }
 
-use core::sync::atomic::AtomicUsize;
-
-#[derive(Debug, Clone)]
-pub struct DinitService {
-    pub name: [u8; 32],
-    pub dependencies: Vec<[u8; 32]>,
-}
-
-impl DinitService {
-    pub fn new(name: &[u8]) -> Self {
-        let mut name_arr = [0u8; 32];
-        name_arr[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
-        Self {
-            name: name_arr,
-            dependencies: Vec::new(),
-        }
-    }
-
-    pub fn add_dependency(&mut self, dep: &[u8]) {
-        let mut dep_arr = [0u8; 32];
-        dep_arr[..dep.len().min(31)].copy_from_slice(&dep[..dep.len().min(31)]);
-        self.dependencies.push(dep_arr);
-    }
-}
-
-pub struct DinitServiceManager {
-    pub services: Vec<DinitService>,
-    pub running_count: AtomicUsize,
-}
-
-impl Default for DinitServiceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl DinitServiceManager {
-    pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-            running_count: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn register_service(&mut self, service: DinitService) {
-        self.services.push(service);
-    }
-
-    pub fn start_service(&mut self, name: &[u8]) -> Result<(), &'static str> {
-        let mut name_arr = [0u8; 32];
-        name_arr[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
-
-        if let Some(service) = self.services.iter().find(|s| s.name == name_arr).cloned() {
-            for _dep in &service.dependencies {
-                self.running_count.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
-            }
-            self.running_count.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
-            Ok(())
-        } else {
-            self.running_count.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
-            Ok(())
-        }
-    }
-}
-
-pub struct BsdUserlandCompat;
-
-impl BsdUserlandCompat {
-    pub fn translate_bsd_df_output(&self, blocks: u64, used: u64) -> (u64, u64) {
-        (blocks * 512, used * 512)
-    }
-
-    pub fn pgrep_filter_by_name(&self, processes: &[(&[u8], usize)], pattern: &[u8]) -> Vec<usize> {
-        let mut matched = Vec::new();
-        for (name, pid) in processes {
-            if name.windows(pattern.len()).any(|w| w == pattern) {
-                matched.push(*pid);
-            }
-        }
-        matched
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use core::sync::atomic::Ordering;
 
     #[test]
     fn test_dinit_service_manager() {
-        let mut dinit = DinitServiceManager::new();
+        let mut manager = DinitServiceManager::new();
+        let mut svc = DinitService::new(b"networking");
+        svc.add_dependency(b"udev");
+        manager.register_service(svc);
 
-        let mut console = DinitService::new(b"dinit-console");
-        console.add_dependency(b"keyboard");
+        let udev = DinitService::new(b"udev");
+        manager.register_service(udev);
 
-        let keyboard = DinitService::new(b"keyboard");
-
-        dinit.register_service(console);
-        dinit.register_service(keyboard);
-
-        dinit.start_service(b"dinit-console").unwrap();
-
-        assert_eq!(dinit.running_count.load(Ordering::SeqCst), 2);
+        assert!(manager.start_service(b"networking").is_ok());
+        assert_eq!(manager.running_count.load(Ordering::SeqCst), 2);
     }
 
     #[test]
     fn test_bsd_userland_compat() {
         let compat = BsdUserlandCompat;
-        let (total_b, used_b) = compat.translate_bsd_df_output(1000, 400);
-        assert_eq!(total_b, 512000);
-        assert_eq!(used_b, 204800);
+        let (total, used) = compat.translate_bsd_df_output(1000, 500);
+        assert_eq!(total, 512000);
+        assert_eq!(used, 256000);
 
-        let pids = compat.pgrep_filter_by_name(&[(b"nginx", 101)], b"ng");
-        assert_eq!(pids, vec![101]);
+        let processes: &[(&[u8], u32)] = &[(b"dinit", 1), (b"apk", 42)];
+        let pids = compat.pgrep_filter_by_name(processes, b"dinit");
+        assert_eq!(pids, vec![1]);
     }
 
     #[test]
     fn test_apk_package_store() {
         let mut store = ApkPackageStore::new();
-        let pkg = ApkPackageMetadata::new(b"libkmod", b"31-r0", b"sha256sumhex");
+        let pkg = ApkPackageMetadata::new(b"curl", b"8.4.0", b"sha256_checksum");
         store.register_apk_installed(pkg);
 
-        assert!(store.verify_installed_checksum(b"libkmod", b"sha256sumhex"));
-        assert!(!store.verify_installed_checksum(b"libkmod", b"wrong"));
+        assert!(store.verify_installed_checksum(b"curl", b"sha256_checksum"));
+        assert!(!store.verify_installed_checksum(b"curl", b"bad_checksum"));
     }
 }

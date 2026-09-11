@@ -2,6 +2,8 @@
 // Implements AUR-like package system for SigmaOS
 // Inspired by Arch Linux's AUR for community-driven packages
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;

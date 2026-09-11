@@ -5,6 +5,7 @@
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Switchable desktop layout personas
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -84,6 +85,11 @@ pub enum ZorinSnapPosition {
     LeftHalf,
     RightHalf,
     Maximize,
+    TopLeftQuarter,
+    TopRightQuarter,
+    BottomLeftQuarter,
+    BottomRightQuarter,
+    Maximized,
 }
 
 pub struct ZorinGridDesktopManager {
@@ -103,11 +109,11 @@ impl ZorinGridDesktopManager {
         match snap {
             ZorinSnapPosition::LeftHalf => (0, 0, screen_width / 2, screen_height),
             ZorinSnapPosition::RightHalf => (screen_width / 2, 0, screen_width / 2, screen_height),
-            ZorinSnapPosition::TopLeft => (0, 0, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::TopRight => (screen_width / 2, 0, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::BottomLeft => (0, screen_height / 2, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::BottomRight => (screen_width / 2, screen_height / 2, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::Maximize => (0, 0, screen_width, screen_height),
+            ZorinSnapPosition::TopLeft | ZorinSnapPosition::TopLeftQuarter => (0, 0, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::TopRight | ZorinSnapPosition::TopRightQuarter => (screen_width / 2, 0, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::BottomLeft | ZorinSnapPosition::BottomLeftQuarter => (0, screen_height / 2, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::BottomRight | ZorinSnapPosition::BottomRightQuarter => (screen_width / 2, screen_height / 2, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::Maximize | ZorinSnapPosition::Maximized => (0, 0, screen_width, screen_height),
         }
     }
 }
@@ -394,17 +400,6 @@ impl ZorinWindowsAppSupport {
 }
 
 /// Zorin OS Grid Window Tiling & Snap Engine
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ZorinSnapPosition {
-    LeftHalf,
-    RightHalf,
-    TopLeftQuarter,
-    TopRightQuarter,
-    BottomLeftQuarter,
-    BottomRightQuarter,
-    Maximized,
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ZorinGridWindowTilingEngine {
     pub screen_width: u32,
@@ -428,11 +423,11 @@ impl ZorinGridWindowTilingEngine {
         match position {
             ZorinSnapPosition::LeftHalf => (0, 0, half_w, self.screen_height),
             ZorinSnapPosition::RightHalf => (half_w, 0, half_w, self.screen_height),
-            ZorinSnapPosition::TopLeftQuarter => (0, 0, half_w, half_h),
-            ZorinSnapPosition::TopRightQuarter => (half_w, 0, half_w, half_h),
-            ZorinSnapPosition::BottomLeftQuarter => (0, half_h, half_w, half_h),
-            ZorinSnapPosition::BottomRightQuarter => (half_w, half_h, half_w, half_h),
-            ZorinSnapPosition::Maximized => (0, 0, self.screen_width, self.screen_height),
+            ZorinSnapPosition::TopLeftQuarter | ZorinSnapPosition::TopLeft => (0, 0, half_w, half_h),
+            ZorinSnapPosition::TopRightQuarter | ZorinSnapPosition::TopRight => (half_w, 0, half_w, half_h),
+            ZorinSnapPosition::BottomLeftQuarter | ZorinSnapPosition::BottomLeft => (0, half_h, half_w, half_h),
+            ZorinSnapPosition::BottomRightQuarter | ZorinSnapPosition::BottomRight => (half_w, half_h, half_w, half_h),
+            ZorinSnapPosition::Maximized | ZorinSnapPosition::Maximize => (0, 0, self.screen_width, self.screen_height),
         }
     }
 }

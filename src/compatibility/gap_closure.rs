@@ -1050,6 +1050,120 @@ impl Default for OpenSourceCompetitorOrchestrator {
     }
 }
 
+pub struct OpenBsdSelfReportingSecurityGovernor {
+    pub pledged_promises: Vec<String>,
+}
+
+impl OpenBsdSelfReportingSecurityGovernor {
+    pub fn new() -> Self {
+        Self { pledged_promises: Vec::new() }
+    }
+    pub fn pledge_process(&mut self, promises: &[&str]) {
+        for p in promises {
+            self.pledged_promises.push(p.to_string());
+        }
+    }
+    pub fn check_pledge(&self, promise: &str) -> bool {
+        self.pledged_promises.contains(&promise.to_string())
+    }
+}
+
+impl Default for OpenBsdSelfReportingSecurityGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct FreeBsdGeomStorageStack {
+    pub providers: Vec<(String, String, u64)>,
+}
+
+impl FreeBsdGeomStorageStack {
+    pub fn new() -> Self {
+        Self { providers: Vec::new() }
+    }
+    pub fn add_geom_provider(&mut self, name: &str, provider_type: &str, capacity: u64) {
+        self.providers.push((name.to_string(), provider_type.to_string(), capacity));
+    }
+}
+
+impl Default for FreeBsdGeomStorageStack {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct VoidLinuxRunitServiceSupervisor {
+    pub registered_services: Vec<String>,
+    pub running_services: Vec<String>,
+}
+
+impl VoidLinuxRunitServiceSupervisor {
+    pub fn new() -> Self {
+        Self { registered_services: Vec::new(), running_services: Vec::new() }
+    }
+    pub fn register_service(&mut self, name: &str) {
+        self.registered_services.push(name.to_string());
+    }
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if self.registered_services.contains(&name.to_string()) {
+            if !self.running_services.contains(&name.to_string()) {
+                self.running_services.push(name.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for VoidLinuxRunitServiceSupervisor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct AlpineLinuxDisklessLbuPersistence {
+    pub backup_tarball_path: Option<String>,
+}
+
+impl AlpineLinuxDisklessLbuPersistence {
+    pub fn new() -> Self {
+        Self { backup_tarball_path: None }
+    }
+    pub fn commit_overlay_backup(&mut self, path: &str) {
+        self.backup_tarball_path = Some(path.to_string());
+    }
+}
+
+impl Default for AlpineLinuxDisklessLbuPersistence {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct NixOsHermeticClosureEngine {
+    pub store_paths: Vec<String>,
+}
+
+impl NixOsHermeticClosureEngine {
+    pub fn new() -> Self {
+        Self { store_paths: Vec::new() }
+    }
+    pub fn add_store_path(&mut self, path: &str) {
+        self.store_paths.push(path.to_string());
+    }
+    pub fn verify_closure(&self, path: &str) -> bool {
+        self.store_paths.contains(&path.to_string())
+    }
+}
+
+impl Default for NixOsHermeticClosureEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test_disabled)]
 mod tests {
     use super::*;

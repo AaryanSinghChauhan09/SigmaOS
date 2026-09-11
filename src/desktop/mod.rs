@@ -11,6 +11,7 @@ pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod zenith_compositor;
 pub mod ultimate_distro_desktop;
+pub mod web_wasm_bridge;
 
 pub use sovereign_navigation_engine::*;
 

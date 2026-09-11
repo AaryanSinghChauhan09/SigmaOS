@@ -563,6 +563,14 @@ pub enum DeviceType {
 }
 
 
+#[derive(Debug, Clone)]
+pub struct DeviceObjectX86 {
+    pub device_type: u32,
+    pub reference_count: u32,
+}
+
+pub type DeviceObject = DeviceObjectX86;
+
 pub struct DriverObjectX86 {
     pub driver_name: &'static str,
     pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],

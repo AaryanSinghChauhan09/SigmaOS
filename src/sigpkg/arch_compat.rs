@@ -965,25 +965,10 @@ mod tests {
     }
 }
 
-// --- Arch Linux svntogit Repository Migration Engine ---
-
-#[derive(Debug, Clone)]
-pub struct SvnPackageMetadata {
-    pub pkgname: String,
-    pub repo: String, // e.g. "core", "extra", "community"
-    pub svn_revision: u64,
-    pub has_pkgbuild: bool,
-}
-
-#[derive(Debug, Default)]
-pub struct SvntogitMigrationEngine {
-    pub migrated_packages: alloc::collections::BTreeMap<String, SvnPackageMetadata>,
-}
-
 impl SvntogitMigrationEngine {
     pub fn new() -> Self {
         Self {
-            migrated_packages: alloc::collections::BTreeMap::new(),
+            migrated_packages: crate::klib::BTreeMap::new(),
         }
     }
 

@@ -14,6 +14,8 @@ use std::string::String;
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+use core::mem;
+use crate::kernel::structures::CpuArchitectureClass;
 // 1. Instructions and CPU Initialization
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

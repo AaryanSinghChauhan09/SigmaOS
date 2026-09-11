@@ -13,15 +13,13 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::VecDeque;
 use std::boxed::Box;
 use std::vec::Vec;
+use std::string::{String, ToString};
+use std::collections::VecDeque;
 
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
 /// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel
-use alloc::collections::VecDeque;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// A network packet in the qdisc layer (simplified)

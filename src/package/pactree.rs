@@ -2,9 +2,9 @@
 // Implements Arch Linux's pactree functionality
 // Renders ASCII dependency trees for installed packages and recipes
 
-use alloc::collections::BTreeMap;
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 /// Dependency tree node
 #[derive(Debug, Clone)]

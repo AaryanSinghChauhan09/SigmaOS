@@ -1,6 +1,6 @@
 
-use alloc::string::String;
-use alloc::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS
 /// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
 /// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.

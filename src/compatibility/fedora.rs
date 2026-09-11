@@ -6,7 +6,8 @@ use std::vec;
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
+use core::sync::atomic::{AtomicUsize, AtomicU64, Ordering};
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
@@ -2743,6 +2744,22 @@ pub struct TahrirBadgeAssertion {
     pub assertion_digest: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AnityaPackageMapping {
+    pub anitya_project_id: u64,
+    pub upstream_name: String,
+    pub fedora_pkg_name: String,
+    pub current_version: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UpstreamReleaseEvent {
+    pub anitya_project_id: u64,
+    pub version: String,
+    pub download_url: String,
+    pub timestamp_epoch: u64,
+}
+
 /// Fedora "The New Hotness" & Anitya Upstream Release Monitoring Engine
 /// Tracks upstream project releases, compares version semantics, maps Anitya project IDs
 /// to Fedora RPM packages, and dispatches `org.fedoraproject.prod.hotness.update` fedmsg events.
@@ -2849,6 +2866,27 @@ pub struct FedoraPlanetPost {
     pub title: String,
     pub url: String,
     pub published_epoch: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PlanetUserFeed {
+    pub fas_account: String,
+    pub feed_url: String,
+    pub active: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraPlanetAggregationEngine {
+    pub posts: Vec<FedoraPlanetPost>,
+    pub registered_feeds: Vec<PlanetUserFeed>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TahrirMessagePost {
+    pub post_id: u64,
+    pub author: String,
+    pub content: String,
+    pub timestamp_epoch: u64,
 }
 
 
@@ -3143,17 +3181,15 @@ pub struct IgnitionSystemdUnit {
     pub contents: String,
 }
 
-/// Fedora Ignition First-Boot Declarative Provisioning Engine
-/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
-/// (files, users, systemd units) before userspace init handoff.
-pub struct FedoraIgnitionEngine {
-    pub files: Vec<IgnitionFile>,
-    pub users: Vec<IgnitionUser>,
-    pub systemd_units: Vec<IgnitionSystemdUnit>,
-    pub provisioned: bool,
+/// Fedora Offline Systemd Update Engine
+#[derive(Debug, Clone, Default)]
+pub struct FedoraOfflineUpdateEngine {
+    pub staged_packages: Vec<String>,
+    pub is_offline_update_pending: bool,
+    pub trigger_reboot_flag: bool,
 }
 
-impl FedoraIgnitionEngine {
+impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {
         Self::default()
     }
@@ -3178,20 +3214,21 @@ impl FedoraIgnitionEngine {
     }
 }
 
-
-
-
-
-impl FedoraOfflineUpdateEngine {
-    pub fn new() -> Self {
-        Self {
-            files: Vec::new(),
-            users: Vec::new(),
-            systemd_units: Vec::new(),
-            provisioned: false,
-        }
-    }
+/// Fedora Ignition First-Boot Declarative Provisioning Engine
+/// Parses Ignition JSON/YAML v3 specifications and executes early boot system setup
+/// (files, users, systemd units) before userspace init handoff.
+#[derive(Debug, Clone)]
+pub struct FedoraIgnitionEngine {
+    pub files: Vec<IgnitionFile>,
+    pub users: Vec<IgnitionUser>,
+    pub systemd_units: Vec<IgnitionSystemdUnit>,
+    pub provisioned: bool,
 }
+
+impl FedoraIgnitionEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn add_file(&mut self, path: &str, content: &str, mode: u32) {
         self.files.push(IgnitionFile {
@@ -5229,21 +5266,6 @@ mod tests {
         let mut sssd = FedoraSssdKerberosRealmClientEngine::new("FEDORA.ORGANIZATION.ORG");
         assert!(sssd.obtain_ticket_granting_ticket("jules_admin", "SecretPgpPass").is_ok());
         assert!(sssd.is_tgt_valid());
-    }
-
-        // New version release check -> event generated & fedmsg published
-        let event = hotness
-            .process_upstream_release_check(
-                1234,
-                "8.3.0",
-                "https://curl.se/release-8.3.0",
-                1700000100,
-            )
-            .unwrap()
-            .unwrap();
-
-        assert!(wireplumber.set_default_node("sink", 101));
-        assert_eq!(wireplumber.default_sink_node, Some(101));
     }
 
     #[test]

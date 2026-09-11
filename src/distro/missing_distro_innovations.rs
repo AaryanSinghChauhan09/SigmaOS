@@ -18,29 +18,10 @@
 // - Gentoo Portage EAPI 8 Slot Operator Engine
 // - Fedora / RHEL SELinux MLS / MCS Governor Engine
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 /// 1. Clear Linux Stateless Architecture Engine
@@ -908,6 +889,41 @@ impl MissingDistroComponentsEngine {
         engine.register_component(
             "RPM-OSTree Atomic Trees",
             "Fedora Silverblue",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Clear Linux Stateless Architecture",
+            "Clear Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Tails Amnesic Scrubbing",
+            "Tails OS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Solus eopkg Delta",
+            "Solus OS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Chimera Dinit Supervisor",
+            "Chimera Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "FreeBSD VNET Network Stack",
+            "FreeBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "NetBSD Rump Kernel",
+            "NetBSD",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Illumos DTrace Probe",
+            "Illumos",
             ComponentParityStatus::Implemented,
         );
 
@@ -2113,7 +2129,7 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct NixOsFlakesEngine {
     pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
 }
