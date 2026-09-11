@@ -11,6 +11,9 @@ pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod zenith_compositor;
 pub mod ultimate_distro_desktop;
+pub mod wayland_protocol;
+
+pub use wayland_protocol::*;
 
 pub use sovereign_navigation_engine::*;
 

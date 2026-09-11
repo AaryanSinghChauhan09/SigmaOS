@@ -204,11 +204,11 @@ The following innovations are planned but not yet fully implemented:
 |-----------|-----------|--------------|----------|
 | io_uring async I/O | Linux 5.1 | `src/kernel/` | 🔴 High |
 | BPF Type Format (BTF) | Linux | `src/observability/` | 🟡 Medium |
-| Landlock LSM | Linux 5.13 | `src/security/` | 🔴 High |
-| EROFS read-only overlay FS | Linux | `src/filesystem/` | 🟡 Medium |
+| Landlock LSM | Linux 5.13 | `src/security/landlock.rs` | ✅ Done | Unprivileged application filesystem sandboxing rulesets |
+| EROFS read-only overlay FS | Linux | `src/filesystem/erofs.rs` | ✅ Done | Enhanced Read-Only File System superblock and inode parser |
 | zRAM compressed swap | Linux | `src/memory/` | 🟡 Medium |
 | systemd-homed | systemd | `src/auth/` | 🟢 Low |
-| Wayland display protocol | Linux | `src/desktop/` | 🟡 Medium |
+| Wayland display protocol | Linux | `src/desktop/wayland_protocol.rs` | ✅ Done | Zero-dependency Wayland wire & xdg_shell protocol |
 | RISC-V port | Linux | `src/arch/` | 🟡 Medium |
 | LoongArch port | Linux | `src/arch/` | 🟢 Low |
 
