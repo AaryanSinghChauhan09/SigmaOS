@@ -18,8 +18,6 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::format;
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
@@ -342,317 +340,6 @@ impl Default for LinuxKernelAuditSubsystemEngine {
     }
 }
 
-// ============================================================================
-// 5. Linux Landlock LSM Ruleset Engine (LinuxLandlockLsmRulesetEngine)
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LandlockFsAccess {
-    Execute = 1 << 0,
-    WriteFile = 1 << 1,
-    ReadFile = 1 << 2,
-    ReadDir = 1 << 3,
-    RemoveDir = 1 << 4,
-    RemoveFile = 1 << 5,
-    MakeChar = 1 << 6,
-    MakeDir = 1 << 7,
-    MakeReg = 1 << 8,
-    MakeSock = 1 << 9,
-    MakeFifo = 1 << 10,
-    MakeBlock = 1 << 11,
-    MakeSym = 1 << 12,
-}
-
-#[derive(Debug, Clone)]
-pub struct LandlockPathBeneathRule {
-    pub path_prefix: String,
-    pub allowed_access_mask: u32,
-}
-
-pub struct LinuxLandlockLsmRulesetEngine {
-    pub handled_access_fs: u32,
-    pub path_rules: Vec<LandlockPathBeneathRule>,
-    pub is_enforced: bool,
-}
-
-impl LinuxLandlockLsmRulesetEngine {
-    pub fn new(handled_access_fs: u32) -> Self {
-        Self {
-            handled_access_fs,
-            path_rules: Vec::new(),
-            is_enforced: false,
-        }
-    }
-
-    pub fn add_path_beneath_rule(&mut self, path: &str, allowed_mask: u32) -> Result<(), &'static str> {
-        if self.is_enforced {
-            return Err("Landlock: Cannot add rules to an already enforced ruleset");
-        }
-        self.path_rules.push(LandlockPathBeneathRule {
-            path_prefix: path.to_string(),
-            allowed_access_mask: allowed_mask & self.handled_access_fs,
-        });
-        Ok(())
-    }
-
-    pub fn restrict_self(&mut self) -> Result<(), &'static str> {
-        self.is_enforced = true;
-        Ok(())
-    }
-
-    pub fn check_path_access(&self, path: &str, requested_access: u32) -> Result<(), &'static str> {
-        if !self.is_enforced {
-            return Ok(()); // Not enforced yet
-        }
-
-        if (requested_access & self.handled_access_fs) == 0 {
-            return Ok(());
-        }
-
-        for rule in &self.path_rules {
-            if path.starts_with(&rule.path_prefix) {
-                if (rule.allowed_access_mask & requested_access) == requested_access {
-                    return Ok(());
-                } else {
-                    return Err("Landlock: Access right denied for path");
-                }
-            }
-        }
-
-        Err("Landlock: Path is outside allowed ruleset bounds")
-    }
-}
-
-impl Default for LinuxLandlockLsmRulesetEngine {
-    fn default() -> Self {
-        Self::new(0x1FFF)
-    }
-}
-
-// ============================================================================
-// 6. Linux zswap / zram Compressed Memory Cache Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct CompressedPageEntry {
-    pub page_id: u64,
-    pub compressed_data: Vec<u8>,
-    pub uncompressed_size: usize,
-    pub checksum: u32,
-}
-
-pub struct LinuxZswapCompressedCacheEngine {
-    pub pages: Vec<CompressedPageEntry>,
-    pub total_uncompressed_bytes: usize,
-    pub total_compressed_bytes: usize,
-    pub max_pool_capacity: usize,
-}
-
-impl LinuxZswapCompressedCacheEngine {
-    pub fn new(max_capacity: usize) -> Self {
-        Self {
-            pages: Vec::new(),
-            total_uncompressed_bytes: 0,
-            total_compressed_bytes: 0,
-            max_pool_capacity: max_capacity,
-        }
-    }
-
-    pub fn compress_and_store(&mut self, page_id: u64, raw_page: &[u8]) -> Result<usize, &'static str> {
-        if raw_page.is_empty() {
-            return Err("zswap: Empty page buffer");
-        }
-
-        let mut compressed = Vec::new();
-        let mut idx = 0;
-        while idx < raw_page.len() {
-            let byte = raw_page[idx];
-            let mut run_len = 1;
-            while idx + run_len < raw_page.len() && raw_page[idx + run_len] == byte && run_len < 255 {
-                run_len += 1;
-            }
-            compressed.push(run_len as u8);
-            compressed.push(byte);
-            idx += run_len;
-        }
-
-        if self.total_compressed_bytes + compressed.len() > self.max_pool_capacity {
-            return Err("zswap: Pool capacity exceeded");
-        }
-
-        let mut checksum = 0u32;
-        for &b in raw_page {
-            checksum = checksum.wrapping_add(b as u32);
-        }
-
-        let comp_len = compressed.len();
-        self.total_uncompressed_bytes += raw_page.len();
-        self.total_compressed_bytes += comp_len;
-
-        self.pages.push(CompressedPageEntry {
-            page_id,
-            compressed_data: compressed,
-            uncompressed_size: raw_page.len(),
-            checksum,
-        });
-
-        Ok(comp_len)
-    }
-
-    pub fn decompress_and_fetch(&mut self, page_id: u64) -> Result<Vec<u8>, &'static str> {
-        let pos = self
-            .pages
-            .iter()
-            .position(|p| p.page_id == page_id)
-            .ok_or("zswap: Page ID not found")?;
-
-        let entry = self.pages.remove(pos);
-        self.total_compressed_bytes -= entry.compressed_data.len();
-        self.total_uncompressed_bytes -= entry.uncompressed_size;
-
-        let mut decompressed = Vec::with_capacity(entry.uncompressed_size);
-        let mut idx = 0;
-        while idx < entry.compressed_data.len() {
-            let count = entry.compressed_data[idx] as usize;
-            let byte = entry.compressed_data[idx + 1];
-            for _ in 0..count {
-                decompressed.push(byte);
-            }
-            idx += 2;
-        }
-
-        Ok(decompressed)
-    }
-
-    pub fn compression_ratio(&self) -> f32 {
-        if self.total_compressed_bytes == 0 {
-            0.0
-        } else {
-            self.total_uncompressed_bytes as f32 / self.total_compressed_bytes as f32
-        }
-    }
-}
-
-impl Default for LinuxZswapCompressedCacheEngine {
-    fn default() -> Self {
-        Self::new(16 * 1024 * 1024)
-    }
-}
-
-// ============================================================================
-// 7. Linux Kernel Crypto API Subsystem (LinuxKernelCryptoApiEngine)
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CryptoAlgType {
-    SymmetricCipher,
-    MessageDigest,
-    AeadCipher,
-}
-
-pub struct CryptoAlgorithmDriver {
-    pub name: String,
-    pub alg_type: CryptoAlgType,
-    pub block_size: usize,
-    pub digest_size: usize,
-}
-
-pub struct LinuxKernelCryptoApiEngine {
-    pub drivers: Vec<CryptoAlgorithmDriver>,
-}
-
-impl LinuxKernelCryptoApiEngine {
-    pub fn new() -> Self {
-        let mut engine = Self { drivers: Vec::new() };
-        engine.register_driver("aes-256-cbc", CryptoAlgType::SymmetricCipher, 16, 0);
-        engine.register_driver("sha256", CryptoAlgType::MessageDigest, 64, 32);
-        engine.register_driver("aes-gcm", CryptoAlgType::AeadCipher, 16, 16);
-        engine
-    }
-
-    pub fn register_driver(&mut self, name: &str, alg_type: CryptoAlgType, block_size: usize, digest_size: usize) {
-        self.drivers.push(CryptoAlgorithmDriver {
-            name: name.to_string(),
-            alg_type,
-            block_size,
-            digest_size,
-        });
-    }
-
-    pub fn hash_digest(&self, alg_name: &str, input: &[u8]) -> Result<Vec<u8>, &'static str> {
-        let driver = self
-            .drivers
-            .iter()
-            .find(|d| d.name == alg_name && d.alg_type == CryptoAlgType::MessageDigest)
-            .ok_or("CryptoAPI: Digest algorithm driver not found")?;
-
-        let mut hash = vec![0u8; driver.digest_size];
-        for (i, &b) in input.iter().enumerate() {
-            hash[i % driver.digest_size] ^= b;
-        }
-        Ok(hash)
-    }
-}
-
-impl Default for LinuxKernelCryptoApiEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 8. Linux eBPF Bloom Filter Map Engine (LinuxEbpfBloomFilterMapEngine)
-// ============================================================================
-
-pub struct LinuxEbpfBloomFilterMapEngine {
-    pub bit_array: Vec<bool>,
-    pub num_hashes: usize,
-    pub entries_count: usize,
-}
-
-impl LinuxEbpfBloomFilterMapEngine {
-    pub fn new(bit_size: usize, num_hashes: usize) -> Self {
-        Self {
-            bit_array: vec![false; bit_size.max(64)],
-            num_hashes: num_hashes.max(1),
-            entries_count: 0,
-        }
-    }
-
-    fn hash_index(&self, key: &[u8], seed: usize) -> usize {
-        let mut hash = 0xcbf29ce484222325u64.wrapping_add(seed as u64);
-        for &b in key {
-            hash ^= b as u64;
-            hash = hash.wrapping_mul(0x100000001b3);
-        }
-        (hash as usize) % self.bit_array.len()
-    }
-
-    pub fn insert(&mut self, key: &[u8]) {
-        for seed in 0..self.num_hashes {
-            let idx = self.hash_index(key, seed);
-            self.bit_array[idx] = true;
-        }
-        self.entries_count += 1;
-    }
-
-    pub fn contains(&self, key: &[u8]) -> bool {
-        for seed in 0..self.num_hashes {
-            let idx = self.hash_index(key, seed);
-            if !self.bit_array[idx] {
-                return false;
-            }
-        }
-        true
-    }
-}
-
-impl Default for LinuxEbpfBloomFilterMapEngine {
-    fn default() -> Self {
-        Self::new(1024, 3)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -713,41 +400,262 @@ mod tests {
         assert_eq!(records.len(), 1);
         assert!(records[0].message.contains("openat"));
     }
+}
+
+// ============================================================================
+// 5. MEMCG V2 OOM KILLER ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct MemcgProcessEntry {
+    pub pid: u32,
+    pub oom_score_adj: i32, // -1000 to 1000
+    pub memory_bytes_used: u64,
+}
+
+pub struct LinuxMemoryCgroupV2OomKillerEngine {
+    pub cgroup_path: String,
+    pub memory_limit_bytes: u64,
+    pub processes: Vec<MemcgProcessEntry>,
+}
+
+impl LinuxMemoryCgroupV2OomKillerEngine {
+    pub fn new(path: &str, limit_bytes: u64) -> Self {
+        Self {
+            cgroup_path: path.to_string(),
+            memory_limit_bytes: limit_bytes,
+            processes: Vec::new(),
+        }
+    }
+
+    pub fn register_process(&mut self, entry: MemcgProcessEntry) {
+        self.processes.push(entry);
+    }
+
+    /// Selects the OOM kill candidate process using memcg v2 heuristics
+    pub fn select_oom_kill_candidate(&self) -> Option<u32> {
+        if self.processes.is_empty() {
+            return None;
+        }
+
+        let mut best_pid = None;
+        let mut max_score = i64::MIN;
+
+        for proc in &self.processes {
+            if proc.oom_score_adj <= -1000 {
+                continue; // Unkillable
+            }
+
+            let base_score = (proc.memory_bytes_used / 1024) as i64;
+            let final_score = base_score + (proc.oom_score_adj as i64 * 10);
+
+            if final_score > max_score {
+                max_score = final_score;
+                best_pid = Some(proc.pid);
+            }
+        }
+
+        best_pid
+    }
+}
+
+// ============================================================================
+// 6. LINUX EPOLL EVENT POLL ENGINE (epoll_create/ctl/wait)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EpollCtlOp {
+    Add,
+    Mod,
+    Del,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EpollEvent {
+    pub fd: i32,
+    pub events: u32, // EPOLLIN (1), EPOLLOUT (4)
+}
+
+pub struct LinuxEpollEventPollEngine {
+    pub registered_fds: Vec<EpollEvent>,
+}
+
+impl LinuxEpollEventPollEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_fds: Vec::new(),
+        }
+    }
+
+    pub fn epoll_ctl(&mut self, op: EpollCtlOp, event: EpollEvent) -> Result<(), &'static str> {
+        match op {
+            EpollCtlOp::Add => {
+                if self.registered_fds.iter().any(|e| e.fd == event.fd) {
+                    return Err("EPOLL_CTL_ADD: FD already registered");
+                }
+                self.registered_fds.push(event);
+            }
+            EpollCtlOp::Mod => {
+                let entry = self
+                    .registered_fds
+                    .iter_mut()
+                    .find(|e| e.fd == event.fd)
+                    .ok_or("EPOLL_CTL_MOD: FD not found")?;
+                entry.events = event.events;
+            }
+            EpollCtlOp::Del => {
+                let pos = self
+                    .registered_fds
+                    .iter()
+                    .position(|e| e.fd == event.fd)
+                    .ok_or("EPOLL_CTL_DEL: FD not found")?;
+                self.registered_fds.remove(pos);
+            }
+        }
+        Ok(())
+    }
+
+    pub fn epoll_wait(&self, ready_fd: i32) -> Vec<EpollEvent> {
+        self.registered_fds
+            .iter()
+            .filter(|e| e.fd == ready_fd)
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for LinuxEpollEventPollEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. LINUX KPROBES TRACEPOINT ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KprobeEntry {
+    pub symbol_name: String,
+    pub offset: usize,
+    pub is_retprobe: bool,
+}
+
+pub struct LinuxKprobesTracepointEngine {
+    pub active_probes: Vec<KprobeEntry>,
+}
+
+impl LinuxKprobesTracepointEngine {
+    pub fn new() -> Self {
+        Self {
+            active_probes: Vec::new(),
+        }
+    }
+
+    pub fn register_kprobe(&mut self, symbol: &str, offset: usize, is_retprobe: bool) -> Result<(), &'static str> {
+        if symbol.is_empty() {
+            return Err("Kprobes: Symbol name cannot be empty");
+        }
+        self.active_probes.push(KprobeEntry {
+            symbol_name: symbol.to_string(),
+            offset,
+            is_retprobe,
+        });
+        Ok(())
+    }
+}
+
+impl Default for LinuxKprobesTracepointEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. LINUX SECCOMP BPF SYSCALL FILTER ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SeccompAction {
+    Allow,
+    KillProcess,
+    Errno(u16),
+}
+
+pub struct LinuxSeccompBpfSyscallFilterEngine {
+    pub allowed_syscalls: Vec<u32>,
+    pub default_action: SeccompAction,
+}
+
+impl LinuxSeccompBpfSyscallFilterEngine {
+    pub fn new(default_act: SeccompAction) -> Self {
+        Self {
+            allowed_syscalls: Vec::new(),
+            default_action: default_act,
+        }
+    }
+
+    pub fn allow_syscall(&mut self, syscall_number: u32) {
+        if !self.allowed_syscalls.contains(&syscall_number) {
+            self.allowed_syscalls.push(syscall_number);
+        }
+    }
+
+    pub fn evaluate_syscall(&self, syscall_number: u32) -> SeccompAction {
+        if self.allowed_syscalls.contains(&syscall_number) {
+            SeccompAction::Allow
+        } else {
+            self.default_action
+        }
+    }
+}
+
+#[cfg(test)]
+mod extended_kernel_tests {
+    use super::*;
 
     #[test]
-    fn test_landlock_lsm_ruleset_engine() {
-        let mut landlock = LinuxLandlockLsmRulesetEngine::new(0x1FFF);
-        assert!(landlock.add_path_beneath_rule("/home/user", 0x07).is_ok());
-        assert!(landlock.restrict_self().is_ok());
+    fn test_memcg_v2_oom_killer() {
+        let mut oom = LinuxMemoryCgroupV2OomKillerEngine::new("/sys/fs/cgroup/user.slice", 1024 * 1024 * 1024);
+        oom.register_process(MemcgProcessEntry {
+            pid: 100,
+            oom_score_adj: -1000, // Unkillable
+            memory_bytes_used: 500 * 1024 * 1024,
+        });
+        oom.register_process(MemcgProcessEntry {
+            pid: 200,
+            oom_score_adj: 0,
+            memory_bytes_used: 200 * 1024 * 1024,
+        });
 
-        assert!(landlock.check_path_access("/home/user/docs/file.txt", 0x01).is_ok());
-        assert!(landlock.check_path_access("/etc/shadow", 0x01).is_err());
+        assert_eq!(oom.select_oom_kill_candidate(), Some(200));
     }
 
     #[test]
-    fn test_zswap_compressed_cache_engine() {
-        let mut zswap = LinuxZswapCompressedCacheEngine::default();
-        let raw_page = vec![0x41u8; 4096];
-        let comp_len = zswap.compress_and_store(101, &raw_page).unwrap();
-        assert!(comp_len < 4096);
-        assert!(zswap.compression_ratio() > 1.0);
+    fn test_linux_epoll_engine() {
+        let mut epoll = LinuxEpollEventPollEngine::new();
+        let ev = EpollEvent { fd: 5, events: 1 };
 
-        let fetched = zswap.decompress_and_fetch(101).unwrap();
-        assert_eq!(fetched, raw_page);
+        assert!(epoll.epoll_ctl(EpollCtlOp::Add, ev.clone()).is_ok());
+        assert_eq!(epoll.epoll_wait(5).len(), 1);
+
+        assert!(epoll.epoll_ctl(EpollCtlOp::Del, ev).is_ok());
+        assert_eq!(epoll.epoll_wait(5).len(), 0);
     }
 
     #[test]
-    fn test_kernel_crypto_api_engine() {
-        let crypto = LinuxKernelCryptoApiEngine::default();
-        let digest = crypto.hash_digest("sha256", b"SigmaOS Kernel").unwrap();
-        assert_eq!(digest.len(), 32);
+    fn test_linux_kprobes_engine() {
+        let mut kprobes = LinuxKprobesTracepointEngine::new();
+        assert!(kprobes.register_kprobe("sys_openat", 0, false).is_ok());
+        assert_eq!(kprobes.active_probes.len(), 1);
     }
 
     #[test]
-    fn test_ebpf_bloom_filter_map_engine() {
-        let mut bloom = LinuxEbpfBloomFilterMapEngine::default();
-        bloom.insert(b"192.168.1.100");
-        assert!(bloom.contains(b"192.168.1.100"));
-        assert!(!bloom.contains(b"10.0.0.1"));
+    fn test_seccomp_bpf_filter() {
+        let mut seccomp = LinuxSeccompBpfSyscallFilterEngine::new(SeccompAction::KillProcess);
+        seccomp.allow_syscall(1); // sys_write
+
+        assert_eq!(seccomp.evaluate_syscall(1), SeccompAction::Allow);
+        assert_eq!(seccomp.evaluate_syscall(2), SeccompAction::KillProcess);
     }
 }

@@ -242,7 +242,79 @@ impl Default for FileManager {
     }
 }
 
-#[cfg(test_disabled)]
+// =========================================================================
+// RANGER / YAZI / DOLPHIN DUAL-PANE & ADVANCED SORTING FILE MANAGER ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileSortField {
+    Name,
+    Size,
+    Type,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FileSortOrder {
+    Ascending,
+    Descending,
+}
+
+pub struct DualPaneFileManager {
+    pub left_pane: FileManager,
+    pub right_pane: FileManager,
+    pub is_active_left: bool,
+}
+
+impl DualPaneFileManager {
+    pub fn new() -> Self {
+        let mut left = FileManager::new();
+        let mut right = FileManager::new();
+        left.navigate("/home/user");
+        right.navigate("/tmp");
+
+        Self {
+            left_pane: left,
+            right_pane: right,
+            is_active_left: true,
+        }
+    }
+
+    pub fn active_pane_mut(&mut self) -> &mut FileManager {
+        if self.is_active_left {
+            &mut self.left_pane
+        } else {
+            &mut self.right_pane
+        }
+    }
+
+    pub fn switch_active_pane(&mut self) {
+        self.is_active_left = !self.is_active_left;
+    }
+
+    pub fn sort_pane_files(files: &mut [File], field: FileSortField, order: FileSortOrder) {
+        files.sort_by(|a, b| {
+            let cmp = match field {
+                FileSortField::Name => a.name.cmp(&b.name),
+                FileSortField::Size => a.size.cmp(&b.size),
+                FileSortField::Type => a.is_directory.cmp(&b.is_directory),
+            };
+
+            if order == FileSortOrder::Descending {
+                cmp.reverse()
+            } else {
+                cmp
+            }
+        });
+    }
+}
+
+impl Default for DualPaneFileManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -272,5 +344,22 @@ mod tests {
         let mut fm = FileManager::new();
         fm.navigate("/tmp");
         assert_eq!(fm.current_directory, "/tmp");
+    }
+
+    #[test]
+    fn test_dual_pane_file_manager() {
+        let mut dual = DualPaneFileManager::new();
+        assert_eq!(dual.active_pane_mut().current_directory, "/home/user");
+
+        dual.switch_active_pane();
+        assert_eq!(dual.active_pane_mut().current_directory, "/tmp");
+
+        let mut files = vec![
+            File::new("b.txt", "/b.txt", false),
+            File::new("a.txt", "/a.txt", false),
+        ];
+
+        DualPaneFileManager::sort_pane_files(&mut files, FileSortField::Name, FileSortOrder::Ascending);
+        assert_eq!(files[0].name, "a.txt");
     }
 }
