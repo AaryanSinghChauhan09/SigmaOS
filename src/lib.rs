@@ -47,6 +47,7 @@ pub mod theming;
 pub mod onboarding;
 pub mod launcher;
 pub mod notification;
+pub mod monitor;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
 };
