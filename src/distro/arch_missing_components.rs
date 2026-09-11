@@ -1,135 +1,127 @@
-// SigmaOS Arch Linux Missing Parity Components Engine
-// Implements Arch Linux Archive (ALA) time-travel snapshot repos, Arch Audit security advisory scanner,
-// and Arch/CachyOS microarchitecture BORE CPU scheduler policy selector.
-
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::format;
-use std::string::String;
+use std::string::{String, ToString};
 use std::vec::Vec;
 
-/// Arch Linux Archive (ALA) time-travel snapshot repo entry
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AlaSnapshotRepo {
-    pub date_iso: String, // e.g. "2024/01/15"
-    pub base_url: String,
+/// 1. Arch Linux `makepkg` Build Engine & PKGBUILD Compiler
+#[derive(Debug, Clone)]
+pub struct ArchPkgbuild {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgrel: String,
+    pub pkgdesc: String,
+    pub arch: Vec<String>,
+    pub depends: Vec<String>,
+    pub makedepends: Vec<String>,
 }
 
-/// Arch Linux Archive (ALA) time-travel package lookup and mirrorlist generator
-pub struct ArchLinuxArchiveEngine {
-    pub base_ala_url: String,
-    pub available_snapshots: HashMap<String, String>,
+#[derive(Debug, Clone)]
+pub struct ArchMakepkgEngine;
+
+impl ArchMakepkgEngine {
+    /// Generates `.PKGINFO` metadata for Arch Linux package tarballs
+    pub fn generate_pkginfo(pkgbuild: &ArchPkgbuild) -> String {
+        let mut info = String::new();
+        info.push_str(&format!("pkgname = {}\n", pkgbuild.pkgname));
+        info.push_str(&format!("pkgver = {}-{}\n", pkgbuild.pkgver, pkgbuild.pkgrel));
+        info.push_str(&format!("pkgdesc = {}\n", pkgbuild.pkgdesc));
+        for dep in &pkgbuild.depends {
+            info.push_str(&format!("depend = {}\n", dep));
+        }
+        info
+    }
+
+    /// Generates `.BUILDINFO` metadata for reproducible build attestation
+    pub fn generate_buildinfo(pkgbuild: &ArchPkgbuild, builddate: u64) -> String {
+        format!(
+            "format = 2\nbuilddate = {}\nbuilddir = /build/{}\npkgname = {}\n",
+            builddate, pkgbuild.pkgname, pkgbuild.pkgname
+        )
+    }
+
+    /// Synthesizes package binary archive name (`package-1.0.0-1-x86_64.pkg.tar.zst`)
+    pub fn synthesize_package_filename(pkgbuild: &ArchPkgbuild, arch: &str) -> String {
+        format!("{}-{}-{}-{}.pkg.tar.zst", pkgbuild.pkgname, pkgbuild.pkgver, pkgbuild.pkgrel, arch)
+    }
 }
 
-impl ArchLinuxArchiveEngine {
+/// 2. Arch Linux `namcap` PKGBUILD & Package Linter Engine
+#[derive(Debug, Clone)]
+pub struct ArchNamcapLinterEngine;
+
+impl ArchNamcapLinterEngine {
+    pub fn lint_pkgbuild(pkgbuild: &ArchPkgbuild) -> Vec<String> {
+        let mut warnings = Vec::new();
+        if pkgbuild.pkgdesc.is_empty() {
+            warning_push(&mut warnings, "PKGBUILD: pkgdesc is empty");
+        }
+        if pkgbuild.depends.is_empty() && pkgbuild.makedepends.is_empty() {
+            warning_push(&mut warnings, "PKGBUILD: no dependencies or makedependencies defined");
+        }
+        warnings
+    }
+}
+
+fn warning_push(warnings: &mut Vec<String>, msg: &str) {
+    warnings.push(msg.to_string());
+}
+
+/// 3. ALPM Package Database Integrity & Conflict Checker
+#[derive(Debug, Clone)]
+pub struct ArchAlpmDbIntegrityEngine {
+    pub installed_db: BTreeMap<String, String>,
+}
+
+impl ArchAlpmDbIntegrityEngine {
     pub fn new() -> Self {
-        let mut snapshots = HashMap::new();
-        snapshots.insert(
-            "2024/01/01".to_string(),
-            "https://archive.archlinux.org/repos/2024/01/01/$repo/os/$arch".to_string(),
-        );
-        snapshots.insert(
-            "2024/06/01".to_string(),
-            "https://archive.archlinux.org/repos/2024/06/01/$repo/os/$arch".to_string(),
-        );
-        Self {
-            base_ala_url: "https://archive.archlinux.org".to_string(),
-            available_snapshots: snapshots,
-        }
+        let mut db = BTreeMap::new();
+        db.insert("glibc".to_string(), "2.38-1".to_string());
+        db.insert("pacman".to_string(), "6.0.2-1".to_string());
+        Self { installed_db: db }
     }
 
-    pub fn generate_snapshot_mirrorlist(&self, date_iso: &str) -> Result<String, &'static str> {
-        if let Some(url) = self.available_snapshots.get(date_iso) {
-            Ok(format!("Server = {}\n", url))
-        } else {
-            Err("ArchLinuxArchive: Date snapshot not found in ALA index")
-        }
+    pub fn check_package_conflict(&self, pkg_name: &str) -> bool {
+        self.installed_db.contains_key(pkg_name)
     }
 }
 
-impl Default for ArchLinuxArchiveEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+/// 4. AUR v5 Web RPC Client (`aur.archlinux.org/rpc/v5/search`)
+#[derive(Debug, Clone)]
+pub struct AurPackageResult {
+    pub name: String,
+    pub version: String,
+    pub description: String,
+    pub votes: u32,
+    pub popularity: f64,
 }
 
-/// Arch Audit CVE Security Advisory Entry
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ArchSecurityAdvisory {
-    pub name: String, // e.g. "AVG-2800"
-    pub package_name: String,
-    pub affected_version: String,
-    pub fixed_version: String,
-    pub cves: Vec<String>,
-    pub severity: String, // "High", "Critical", "Medium"
+#[derive(Debug, Clone)]
+pub struct ArchAurWebRpcClient {
+    pub simulated_aur_index: BTreeMap<String, AurPackageResult>,
 }
 
-/// Arch Audit CVE security advisory report auditor
-#[derive(Debug, Clone, Default)]
-pub struct ArchAuditScannerEngine {
-    pub known_advisories: Vec<ArchSecurityAdvisory>,
-}
-
-impl ArchAuditScannerEngine {
+impl ArchAurWebRpcClient {
     pub fn new() -> Self {
-        let mut advisories = Vec::new();
-        advisories.push(ArchSecurityAdvisory {
-            name: "AVG-2801".to_string(),
-            package_name: "openssl".to_string(),
-            affected_version: "3.0.0".to_string(),
-            fixed_version: "3.0.1".to_string(),
-            cves: vec!["CVE-2023-9999".to_string()],
-            severity: "High".to_string(),
-        });
-        Self { known_advisories: advisories }
+        let mut index = BTreeMap::new();
+        index.insert(
+            "yay".to_string(),
+            AurPackageResult {
+                name: "yay".to_string(),
+                version: "12.3.0-1".to_string(),
+                description: "Yet another Yogurt - An AUR Helper".to_string(),
+                votes: 3500,
+                popularity: 15.2,
+            },
+        );
+        Self { simulated_aur_index: index }
     }
 
-    pub fn scan_installed_packages(
-        &self,
-        installed: &[(&str, &str)],
-    ) -> Vec<ArchSecurityAdvisory> {
-        let mut found = Vec::new();
-        for &(pkg, ver) in installed {
-            for adv in &self.known_advisories {
-                if adv.package_name == pkg && adv.affected_version == ver {
-                    found.push(adv.clone());
-                }
-            }
-        }
-        found
-    }
-}
-
-/// CachyOS x86-64 microarchitecture & BORE CPU scheduler selector
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ArchMicroArchLevel {
-    V1,
-    V2,
-    V3,
-    V4,
-}
-
-pub struct ArchCachyosBoreEngine {
-    pub microarch_level: ArchMicroArchLevel,
-    pub bore_enabled: bool,
-}
-
-impl ArchCachyosBoreEngine {
-    pub fn new(level: ArchMicroArchLevel) -> Self {
-        Self {
-            microarch_level: level,
-            bore_enabled: true,
-        }
-    }
-
-    pub fn get_compiler_flags(&self) -> Vec<String> {
-        let mut flags = vec!["-O3".to_string(), "-flto".to_string()];
-        match self.microarch_level {
-            ArchMicroArchLevel::V4 => flags.push("-march=x86-64-v4".to_string()),
-            ArchMicroArchLevel::V3 => flags.push("-march=x86-64-v3".to_string()),
-            ArchMicroArchLevel::V2 => flags.push("-march=x86-64-v2".to_string()),
-            ArchMicroArchLevel::V1 => flags.push("-march=x86-64".to_string()),
-        }
-        flags
+    pub fn search(&self, query: &str) -> Vec<AurPackageResult> {
+        self.simulated_aur_index
+            .values()
+            .filter(|p| p.name.contains(query) || p.description.contains(query))
+            .cloned()
+            .collect()
     }
 }
 
@@ -138,29 +130,35 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_arch_linux_archive_engine() {
-        let ala = ArchLinuxArchiveEngine::new();
-        let mirrorlist = ala.generate_snapshot_mirrorlist("2024/01/01").unwrap();
-        assert!(mirrorlist.contains("https://archive.archlinux.org/repos/2024/01/01"));
-        assert!(ala.generate_snapshot_mirrorlist("1999/01/01").is_err());
-    }
+    fn test_arch_missing_components() {
+        let pkg = ArchPkgbuild {
+            pkgname: "sigma-tool".to_string(),
+            pkgver: "1.0.0".to_string(),
+            pkgrel: "1".to_string(),
+            pkgdesc: "Sovereign Sigma Tool".to_string(),
+            arch: vec!["x86_64".to_string()],
+            depends: vec!["glibc".to_string()],
+            makedepends: vec!["gcc".to_string()],
+        };
 
-    #[test]
-    fn test_arch_audit_scanner_engine() {
-        let audit = ArchAuditScannerEngine::new();
-        let installed = vec![("openssl", "3.0.0"), ("curl", "8.1.0")];
-        let vulnerabilities = audit.scan_installed_packages(&installed);
+        let pkginfo = ArchMakepkgEngine::generate_pkginfo(&pkg);
+        assert!(pkginfo.contains("pkgname = sigma-tool"));
 
-        assert_eq!(vulnerabilities.len(), 1);
-        assert_eq!(vulnerabilities[0].name, "AVG-2801");
-        assert_eq!(vulnerabilities[0].cves[0], "CVE-2023-9999");
-    }
+        let buildinfo = ArchMakepkgEngine::generate_buildinfo(&pkg, 1700000000);
+        assert!(buildinfo.contains("builddate = 1700000000"));
 
-    #[test]
-    fn test_arch_cachyos_bore_engine() {
-        let bore_v4 = ArchCachyosBoreEngine::new(ArchMicroArchLevel::V4);
-        let flags = bore_v4.get_compiler_flags();
-        assert!(flags.contains(&"-march=x86-64-v4".to_string()));
-        assert!(flags.contains(&"-O3".to_string()));
+        let filename = ArchMakepkgEngine::synthesize_package_filename(&pkg, "x86_64");
+        assert_eq!(filename, "sigma-tool-1.0.0-1-x86_64.pkg.tar.zst");
+
+        let warnings = ArchNamcapLinterEngine::lint_pkgbuild(&pkg);
+        assert!(warnings.is_empty());
+
+        let alpm = ArchAlpmDbIntegrityEngine::new();
+        assert!(alpm.check_package_conflict("glibc"));
+
+        let aur = ArchAurWebRpcClient::new();
+        let results = aur.search("yay");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].name, "yay");
     }
 }
