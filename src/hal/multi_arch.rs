@@ -9,12 +9,16 @@ pub enum TargetArchitecture {
     X86_64,
     AArch64,
     Armv7,
+    Riscv32,
     Riscv64,
     LoongArch64,
     Ppc64Le,
     Mips64,
     S390x,
     Sparc64,
+    Sh4,
+    Alpha,
+    M68k,
 }
 
 impl TargetArchitecture {
@@ -24,12 +28,16 @@ impl TargetArchitecture {
             TargetArchitecture::X86_64 => "x86_64-unknown-linux-gnu",
             TargetArchitecture::AArch64 => "aarch64-unknown-linux-gnu",
             TargetArchitecture::Armv7 => "armv7-unknown-linux-gnueabihf",
+            TargetArchitecture::Riscv32 => "riscv32-unknown-linux-gnu",
             TargetArchitecture::Riscv64 => "riscv64-unknown-linux-gnu",
             TargetArchitecture::LoongArch64 => "loongarch64-unknown-linux-gnu",
             TargetArchitecture::Ppc64Le => "powerpc64le-unknown-linux-gnu",
             TargetArchitecture::Mips64 => "mips64el-unknown-linux-gnu",
             TargetArchitecture::S390x => "s390x-unknown-linux-gnu",
             TargetArchitecture::Sparc64 => "sparc64-unknown-linux-gnu",
+            TargetArchitecture::Sh4 => "sh4-unknown-linux-gnu",
+            TargetArchitecture::Alpha => "alpha-unknown-linux-gnu",
+            TargetArchitecture::M68k => "m68k-unknown-linux-gnu",
         }
     }
 }
@@ -47,6 +55,9 @@ pub enum InterruptControllerKind {
     MipsGic,
     S390xSclp,
     Sparc64Monddo,
+    SuperHIntc,
+    AlphaSrm,
+    M68kPic,
 }
 
 /// Architecture-specific register context snapshot
@@ -126,6 +137,29 @@ pub enum CpuRegisterContext {
         tnpc: u64,
         tstate: u64,
     },
+    Riscv32 {
+        x: [u32; 32],
+        pc: u32,
+        sstatus: u32,
+        satp: u32,
+    },
+    Sh4 {
+        r: [u32; 16],
+        pc: u32,
+        pr: u32,
+        sr: u32,
+    },
+    Alpha {
+        r: [u64; 32],
+        pc: u64,
+        ps: u64,
+    },
+    M68k {
+        d: [u32; 8],
+        a: [u32; 8],
+        pc: u32,
+        sr: u16,
+    },
 }
 
 /// Dynamic ELF Header Machine Type Detection
@@ -144,6 +178,9 @@ impl MultiArchElfHeader {
             8 => Some(TargetArchitecture::Mips64),
             22 => Some(TargetArchitecture::S390x),
             43 => Some(TargetArchitecture::Sparc64),
+            42 => Some(TargetArchitecture::Sh4),
+            0x9026 => Some(TargetArchitecture::Alpha),
+            4 => Some(TargetArchitecture::M68k),
             _ => None,
         }
     }
@@ -179,6 +216,10 @@ impl MultiArchHalManager {
             TargetArchitecture::Mips64 => InterruptControllerKind::MipsGic,
             TargetArchitecture::S390x => InterruptControllerKind::S390xSclp,
             TargetArchitecture::Sparc64 => InterruptControllerKind::Sparc64Monddo,
+            TargetArchitecture::Riscv32 => InterruptControllerKind::RiscvPlicClint,
+            TargetArchitecture::Sh4 => InterruptControllerKind::SuperHIntc,
+            TargetArchitecture::Alpha => InterruptControllerKind::AlphaSrm,
+            TargetArchitecture::M68k => InterruptControllerKind::M68kPic,
         };
 
         Self {
@@ -285,6 +326,29 @@ impl MultiArchHalManager {
                 tnpc: 0x0000000000400004,
                 tstate: 0,
             },
+            TargetArchitecture::Riscv32 => CpuRegisterContext::Riscv32 {
+                x: [0u32; 32],
+                pc: 0x80000000,
+                sstatus: 0x20,
+                satp: 0,
+            },
+            TargetArchitecture::Sh4 => CpuRegisterContext::Sh4 {
+                r: [0u32; 16],
+                pc: 0x80000000,
+                pr: 0,
+                sr: 0x40000000,
+            },
+            TargetArchitecture::Alpha => CpuRegisterContext::Alpha {
+                r: [0u64; 32],
+                pc: 0x20000000,
+                ps: 0,
+            },
+            TargetArchitecture::M68k => CpuRegisterContext::M68k {
+                d: [0u32; 8],
+                a: [0u32; 8],
+                pc: 0x00001000,
+                sr: 0x2700,
+            },
         }
     }
 }
@@ -375,5 +439,16 @@ mod tests {
 
         let hal_sparc = MultiArchHalManager::new(TargetArchitecture::Sparc64);
         assert_eq!(hal_sparc.irq_controller, InterruptControllerKind::Sparc64Monddo);
+
+        let hal_sh4 = MultiArchHalManager::new(TargetArchitecture::Sh4);
+        assert_eq!(hal_sh4.irq_controller, InterruptControllerKind::SuperHIntc);
+        assert_eq!(hal_sh4.current_arch.to_gnu_triplet(), "sh4-unknown-linux-gnu");
+
+        let hal_alpha = MultiArchHalManager::new(TargetArchitecture::Alpha);
+        assert_eq!(hal_alpha.irq_controller, InterruptControllerKind::AlphaSrm);
+
+        let hal_m68k = MultiArchHalManager::new(TargetArchitecture::M68k);
+        assert_eq!(hal_m68k.irq_controller, InterruptControllerKind::M68kPic);
+        assert_eq!(MultiArchElfHeader::detect_architecture(4), Some(TargetArchitecture::M68k));
     }
 }

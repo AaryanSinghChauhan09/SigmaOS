@@ -1,10 +1,8 @@
 // SigmaOS Tools Module - Real implementations of system utilities
 pub mod system_monitor;
-pub mod file_manager;
 
 pub mod data_tools;
 pub mod display_manager;
-pub mod open_source_tools_parity;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
@@ -22,29 +20,9 @@ pub use open_source_cli_tools_suite::{
     RipgrepSearchEngine, ZoxideCdEngine, ZoxideEntry,
 };
 
-pub use file_manager::{
-    DolphinDualPaneSplitGovernor, NnnFastTraversalGovernor, RangerSixelImagePreviewEngine,
-    ThunarBulkRenamerRegexEngine, YaziLuaPluginEngine,
-};
-
-pub use file_manager::{
-    DolphinDualPaneSplitGovernor, NnnFastTraversalGovernor, RangerSixelImagePreviewEngine,
-    ThunarBulkRenamerRegexEngine, YaziLuaPluginEngine,
-};
-
 pub use open_source_tools_parity::{
     DufDeviceUsage, DufDiskUsageEngine, DustDirectoryTreeEngine, DustNode, FastfetchSysinfo,
     ItsFossFastfetchSysinfoEngine, SimpleJqJsonQueryEngine,
-};
-
-pub use open_source_tools_parity::{
-    BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, DufDiskFreeInfoEngine,
-    DufMountPoint, DustFastDuEngine, DustFolderUsage, EzaFileItem, EzaModernLsEngine,
-    FastfetchInfoEngine, FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry,
-    NcduDiskUsageAnalyzerEngine, NcduNode, ProcsModernPsEngine, ProcsProcessEntry,
-    RipgrepRegexSearchEngine, RofiCommandHudEngine, SearchMatch, SovereignAbridgeTool,
-    SovereignXcpTool, StarshipPromptEngine, TldrCommandPage, TldrQuickPagesEngine,
-    XcpCopyProgress, ZoxideFastCdEngine, ZoxidePathEntry,
 };
 
 pub use data_tools::{
@@ -72,14 +50,3 @@ pub use sovereign_commands::{
 };
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
-
-pub mod omarchy_command_palette;
-pub use omarchy_command_palette::{
-    CommandActionType, CommandPaletteItem, OmarchyCommandPalette,
-};
-
-pub mod mint_driver_manager;
-pub use mint_driver_manager::{
-    DriverPackage, DriverStatus as MintDriverStatus, DriverType as MintDriverType,
-    HardwareDevice as MintHardwareDevice, MintDriverManager,
-};

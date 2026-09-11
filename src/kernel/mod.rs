@@ -54,7 +54,16 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
+pub mod missing_linux_kernel_components;
 pub mod structures;
+
+pub use missing_linux_kernel_components::{
+    BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
+    KprobeEntry, LinuxEpollEventPollEngine, LinuxKernelAuditSubsystemEngine,
+    LinuxKprobesTracepointEngine, LinuxMemoryCgroupV2OomKillerEngine,
+    LinuxSeccompBpfSyscallFilterEngine, MemcgProcessEntry, SeccompAction, UffdFaultEvent, UffdMode,
+    UffdRegisteredRange, UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
+};
 pub mod traits;
 
 #[allow(ambiguous_glob_reexports)]
