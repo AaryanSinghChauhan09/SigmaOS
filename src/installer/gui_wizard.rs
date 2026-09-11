@@ -3,7 +3,7 @@
 
 extern crate alloc;
 use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec::Vec;
 use alloc::vec;
 
@@ -19,22 +19,32 @@ pub enum InstallerScreen {
     SystemConfiguration,
     Summary,
     InstallationProgress,
-    Complete,
     CompleteOnboarding,
 }
 
 /// Partitioning Operation Strategy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PartitioningOperation {
-    Automatic,
+pub enum PartitionStrategy {
     EraseDisk,
-    Alongside,
-    Custom,
     InstallAlongsideExisting,
     ManualCustomPartitions,
 }
 
-pub type PartitionStrategy = PartitioningOperation;
+/// Partitioning Operation Mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartitioningOperation {
+    Automatic,
+    Alongside,
+    Custom,
+}
+
+#[derive(Debug, Clone)]
+pub struct NetworkConfig {
+    pub use_dhcp: bool,
+    pub static_ip: Option<String>,
+    pub gateway: Option<String>,
+    pub dns_servers: Vec<String>,
+}
 
 /// Filesystem Type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -181,14 +191,6 @@ impl UserAccount {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct NetworkConfig {
-    pub use_dhcp: bool,
-    pub static_ip: Option<String>,
-    pub gateway: Option<String>,
-    pub dns_servers: Vec<String>,
-}
-
 /// System Configuration
 #[derive(Debug, Clone)]
 pub struct SystemConfiguration {
@@ -230,12 +232,6 @@ impl SystemConfiguration {
             is_admin: true,
             auto_login: false,
         }
-    }
-}
-
-impl Default for SystemConfiguration {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -320,8 +316,8 @@ impl GuiInstallerWizard {
             InstallerScreen::UserSetup => InstallerScreen::SystemConfiguration,
             InstallerScreen::SystemConfiguration => InstallerScreen::Summary,
             InstallerScreen::Summary => InstallerScreen::InstallationProgress,
-            InstallerScreen::InstallationProgress => InstallerScreen::Complete,
-            InstallerScreen::Complete | InstallerScreen::CompleteOnboarding => return Err(InstallerError::AlreadyComplete),
+            InstallerScreen::InstallationProgress => InstallerScreen::CompleteOnboarding,
+            InstallerScreen::CompleteOnboarding => return Err(InstallerError::AlreadyComplete),
         };
 
         Ok(())
@@ -408,17 +404,17 @@ impl GuiInstallerWizard {
 
     /// Add custom partition
     pub fn add_custom_partition(&mut self, partition: PartitionEntry) {
-        self.custom_partitions.push(partition.clone());
         self.log(&format!(
             "Added custom partition: {} -> {}",
             partition.device, partition.mount_point
         ));
+        self.custom_partitions.push(partition);
     }
 
     /// Add user account
     pub fn add_user_account(&mut self, user: UserAccount) {
-        self.user_accounts.push(user.clone());
         self.log(&format!("Added user account: {}", user.username));
+        self.user_accounts.push(user);
     }
 
     /// Update system configuration
@@ -469,7 +465,7 @@ impl GuiInstallerWizard {
             InstallerScreen::SystemConfiguration => "Configure system settings",
             InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
-            InstallerScreen::Complete | InstallerScreen::CompleteOnboarding => "Installation Complete",
+            InstallerScreen::CompleteOnboarding => "Installation Complete",
         }
     }
 

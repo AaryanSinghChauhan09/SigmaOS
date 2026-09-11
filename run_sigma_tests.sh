@@ -60,9 +60,9 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     ./build/arch_missing_test
 fi
 
-if [ -f "tests/test_universal_adapter.rs" ]; then
-    echo "Running Universal Package Format Adapter test suite..."
+if [ -f "tests/test_implementation_plan_standalone.rs" ]; then
+    echo "Running Implementation Plan (11 modules) standalone test suite..."
     mkdir -p build
-    rustc --test tests/test_universal_adapter.rs --edition=2021 -o build/universal_adapter_test
-    ./build/universal_adapter_test
+    rustc --test tests/test_implementation_plan_standalone.rs --edition=2021 -o build/impl_plan_test
+    ./build/impl_plan_test
 fi
