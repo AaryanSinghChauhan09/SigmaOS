@@ -104,5 +104,4 @@ pub mod vpn;
 pub use vpn::*;
 pub mod parrot_kali;
 pub use parrot_kali::*;
-pub mod kali_stack;
 pub use kali_stack::*;

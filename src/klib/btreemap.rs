@@ -310,6 +310,22 @@ where
     }
 }
 
+impl<K, V> PartialEq for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: PartialEq + Clone,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.entries == other.entries
+    }
+}
+
+impl<K, V> Eq for BTreeMap<K, V>
+where
+    K: Eq + Clone + Ord,
+    V: Eq + Clone,
+{}
+
 
 
 impl<K, V> BTreeMap<K, V>
