@@ -11,3 +11,4 @@ pub use crate::hardware::tech_powerup_hardware_monitors::{
     HardwareBustersPsuRailMonitorEngine, PcWorldBatteryHealthControllerEngine,
     SovereignTechPowerUpHardwareMonitorsSuite, TechPowerUpGpuProfilerEngine,
 };
+pub use crate::distro::tech_media_extended_innovations::*;

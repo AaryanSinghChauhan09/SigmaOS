@@ -1,5 +1,3 @@
-pub mod omarchy_inspiration;
-pub use omarchy_inspiration::*;
 pub mod omarchy;
 pub mod parrot_security;
 pub mod kali_security;
@@ -249,14 +247,56 @@ pub use ultimate_distro_innovations::{
 pub mod sovereign_ahead_distro_supremacy;
 pub use sovereign_ahead_distro_supremacy::{
     AccessRight as CapabilityAccessRight, CarpNodeStatus, CoWBlockExtent,
-    DeclarativeCapabilityRule, MicroarchIsaTarget, OmniCasBlob, OmniGenRecord, PfsyncConnEntry,
-    SchedPolicyKind, SchedTaskDescriptor, SchedTaskState, SimdJitPatch,
-    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
-    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
-    SovereignXdpCarpMeshEngine,
+    DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchIsaTarget, MicroarchTier,
+    OmniCasBlob, OmniGenRecord, PfsyncConnEntry, PredictiveSchedPolicy, PredictiveTaskDescriptor,
+    ResilientBlockEntry, SchedPolicyKind, SchedTaskDescriptor, SchedTaskState, SecurityMultiOsMask,
+    SimdJitFunctionTarget, SimdJitPatch, SovereignAheadOfDistrosSuite,
+    SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
+    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine,
+    SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
 };
 
+pub mod distro_inspiration_synthesis;
+pub use distro_inspiration_synthesis::{
+    AlpineLbuRamRootEngine, FreeBsdVnetJailEngine, LbuOverlayCommit, NetBsdRumpUserlandDriverEngine,
+    NixOsFlakeGcEngine, OpenBsdPledgeUnveilSentinel, RumpComponentKind, RumpUserlandDriver,
+    SovereignDistroInspirationSynthesisSuite, StoreGeneration, SyscallPromise, UnveilPermission,
+    VnetInterface, VnetJail,
+};
 
+pub mod itsfoss_innovations;
+pub use itsfoss_innovations::{
+    CuratedAppEntry, DesktopLayoutPreset, ItsFossAntiXLowRamEngine, ItsFossPantheonAppCenterEngine,
+    ItsFossTailsPrivacyEngine, ItsFossTilingWindowManagerEngine, ItsFossTimeshiftBackupEngine,
+    ItsFossZorinAppAppearanceEngine, SnapshotMode, SovereignItsFossInnovationsSuite,
+    TiledWindowNode, WindowTileOrientation,
+};
 
-pub mod arch_missing_components;
-pub use arch_missing_components::*;
+pub mod arch_gap_closure;
+pub use arch_gap_closure::{
+    AlpmHookRule as ArchAlpmHookRule, ArchArchisoIsoBuilderEngine, ArchGpgKeyNode,
+    ArchPacmanCachePruningEngine, ArchPacmanHooksManagerEngine, ArchPacmanKeyringTrustEngine,
+    ArchSysusersTmpfilesGeneratorEngine, ArchisoProfileSpec, CachedPackageTarball,
+    HookWhen as ArchHookWhen, KeyTrustLevel as ArchKeyTrustLevel, SovereignArchGapClosureSuite,
+    SysuserRule, TmpfileRule,
+};
+
+pub mod fedora_gap_closure;
+pub use fedora_gap_closure::{
+    CoprPackageProject, FedoraAnacondaInstallerEngine, FedoraCoprBuildRepositoryEngine,
+    FedoraMockChrootBuildEngine, FedoraSelinuxMlsPolicyGovernorEngine, KickstartConfig,
+    MockChrootSpec, SelinuxMlsContext, SovereignFedoraGapClosureSuite,
+};
+
+pub mod tech_media_distro_innovations;
+pub use tech_media_distro_innovations::{
+    DistroWatchRankTrackerEngine, LinuxTeckSysadminAutomationEngine,
+    MakeUseOfDistroRecommendationEngine, NineToFiveLinuxReleaseMatrixEngine,
+    SovereignTechMediaDistroInnovationsSuite,
+};
+pub mod arch_ultimate_gap_closure;
+pub use arch_ultimate_gap_closure::*;
+pub mod omarchy_ultimate_gap_closure;
+pub use omarchy_ultimate_gap_closure::*;
+pub mod tech_media_extended_innovations;
+pub use tech_media_extended_innovations::*;

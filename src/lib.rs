@@ -43,31 +43,6 @@ pub mod thread;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
 };
-pub use system::{
-    CreatedSnapshotRecord, RetentionPolicy, ScheduledSnapshotEngine, SnapshotFrequency, SnapshotJob,
-};
-pub use boot::{
-    BootSnapshotConfig, BootSnapshotEngine, BootSnapshotItem, BootSnapshotStatus,
-};
-pub use network::{
-    DeviceDiscoverySyncEngine, DeviceType as NetworkDeviceType, DiscoveredPeerDevice, DiscoveryProtocol,
-};
-pub use plugin::{
-    InstalledPluginRecord, MarketplaceCategory as PluginMarketplaceCategory, MarketplaceListing as PluginMarketplaceListing,
-    PluginManifest, PluginMarketplaceEngine, PluginSandboxedContext, SovereignPluginCapability, SovereignPluginFramework,
-};
-pub use desktop::{
-    AdvancedClipboardEngine, AdvancedNotificationEngine, AppScalingOverride, ClipboardCategory,
-    ClipboardContentType, ClipboardHistoryItem, DndConfig, NetworkConnectionStatus, NetworkConnectionType,
-    NetworkInterfaceStatus, NetworkPanelGuiEngine, NotificationCategory, NotificationItem, NotificationUrgency,
-    ScalingProfile, UnifiedTextScalingEngine, VpnProfile,
-};
-pub use ai::{
-    AiUsageQuota, AiUsageRecord, AiUsageTrackerEngine, ModelInferenceType,
-};
-pub use productivity::{
-    EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
-};
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
@@ -325,7 +300,7 @@ pub use drivers::distro_device_expansion::{
     AppleNvmeAnsDriver, AtherosAr9271WifiDriver, Esp32HciBtBridgeDriver, LogitechUnifyingHidDriver,
     NvidiaNouveauOpenGspDriver, UsbAudioClass2Driver,
 };
-pub use drivers::{
+pub use driver::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
     EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
@@ -340,7 +315,7 @@ pub use drivers::{
     ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
-    FileMode, FileType, FsError, Inode, VirtualFileSystem as VirtualFilesystem,
+    FileMode, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
@@ -473,3 +448,5 @@ pub mod tech_media_reexports;
 pub use tech_media_reexports::*;
 pub use distro::arch_ultimate_gap_closure::*;
 pub use distro::omarchy_ultimate_gap_closure::*;
+pub use performance::cachyos_ultimate_gap_closure::*;
+pub use distro::tech_media_extended_innovations::*;
