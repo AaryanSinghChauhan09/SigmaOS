@@ -1,0 +1,29 @@
+name: CodeQL Security Scanning & SLSA Provenance Assurance
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '30 2 * * 0'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  codeql-analysis:
+    name: CodeQL Static Security Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'cpp, python'
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

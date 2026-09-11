@@ -318,6 +318,9 @@ pub use driver::{
 pub use filesystem::{
     FileMode, FileType, FsError, Inode, VirtualFilesystem,
 };
+pub use system::{
+    PackageDeclaration, ServiceDeclaration, StateGeneration, SystemState,
+};
 pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,
     DemocraticProposal, DemocraticVoting,
@@ -438,6 +441,8 @@ pub use community::toolkit::{
 };
 
 pub use tools::{
+    DolphinDualPaneSplitGovernor, NnnFastTraversalGovernor, RangerSixelImagePreviewEngine,
+    ThunarBulkRenamerRegexEngine, YaziLuaPluginEngine,
     AccessibilityFeature as LibAccessibilityFeature, AndroidPrivateSpaceEngine,
     AndroidScrcpyMirrorEngine, AwakeMode, ClusterNode as LibClusterNode, FancyZoneLayoutMode,
     KdProgressTracker, LocksmithProcess, MacOsAirDropEngine, MacOsSpotlightEngine,

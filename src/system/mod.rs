@@ -16,6 +16,7 @@
 // SigmaOS System Utilities Module
 // System-level utilities and tools
 
+pub mod declarative_state;
 pub mod cleanup;
 pub mod config;
 pub mod cron;

@@ -1,0 +1,34 @@
+name: OpenBSD Signify & Pledge/Unveil Audit CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'src/sigpkg/sovereign_package_innovations.rs'
+      - 'src/package/bsd_linux_package_innovations.rs'
+      - 'src/security/**'
+      - '.github/workflows/openbsd-signify-pledge-audit-ci.yml'
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  openbsd-security-audit:
+    name: Verify OpenBSD Signify Binary Signatures & Pledge/Unveil Sandboxing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run OpenBSD Security Verification
+        run: |
+          mkdir -p build
+          rustc --test --edition=2021 src/sigpkg/sovereign_package_innovations.rs -o build/test_sovereign_pkg_innovations
+          ./build/test_sovereign_pkg_innovations
+          rustc --test --edition=2021 src/package/bsd_linux_package_innovations.rs -o build/test_bsd_pkg_innovations
+          ./build/test_bsd_pkg_innovations
