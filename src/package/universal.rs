@@ -2990,7 +2990,7 @@ impl AlpineApkPackageAdapter {
         }
     }
 
-    #[cfg(test)]
+    #[test]
     fn test_expanded_decorators() {
         let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
         let base = BasePackageDecorator { package: pkg };

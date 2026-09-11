@@ -4731,6 +4731,7 @@ impl Default for FedoraZincatiAutoUpdateEngine {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {
