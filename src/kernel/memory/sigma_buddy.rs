@@ -173,6 +173,60 @@ impl BsdVmZoneAllocator {
 ///
 /// Wraps the klib buddy allocator and exposes a kernel-friendly interface.
 /// Integrates with the existing memory subsystem, migration types, CMA, and watermarks.
+/// Sovereign Atomic IPC Ring Buffer for lockless cross-shard message passing
+pub struct SovereignIpcBuffer {
+    buffer: alloc::vec::Vec<u8>,
+    head: AtomicUsize,
+    tail: AtomicUsize,
+    capacity: usize,
+}
+
+impl SovereignIpcBuffer {
+    pub fn new(capacity: usize) -> Self {
+        let actual_cap = capacity.next_power_of_two();
+        Self {
+            buffer: alloc::vec![0u8; actual_cap],
+            head: AtomicUsize::new(0),
+            tail: AtomicUsize::new(0),
+            capacity: actual_cap,
+        }
+    }
+
+    pub fn push(&mut self, byte: u8) -> Result<(), &'static str> {
+        let head = self.head.load(Ordering::Relaxed);
+        let tail = self.tail.load(Ordering::Acquire);
+        if head.wrapping_sub(tail) >= self.capacity {
+            return Err("SovereignIpcBuffer: Ring buffer full");
+        }
+        let index = head & (self.capacity - 1);
+        self.buffer[index] = byte;
+        self.head.store(head.wrapping_add(1), Ordering::Release);
+        Ok(())
+    }
+
+    pub fn pop(&mut self) -> Option<u8> {
+        let tail = self.tail.load(Ordering::Relaxed);
+        let head = self.head.load(Ordering::Acquire);
+        if tail == head {
+            return None;
+        }
+        let index = tail & (self.capacity - 1);
+        let val = self.buffer[index];
+        self.tail.store(tail.wrapping_add(1), Ordering::Release);
+        Some(val)
+    }
+
+    pub fn len(&self) -> usize {
+        let head = self.head.load(Ordering::Relaxed);
+        let tail = self.tail.load(Ordering::Relaxed);
+        head.wrapping_sub(tail)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+}
+
 pub struct SigmaBuddyAllocator {
     pub inner: SimpleBuddyAllocator,
     pub base_addr: usize,
@@ -180,6 +234,8 @@ pub struct SigmaBuddyAllocator {
     pub allocated: AtomicUsize,
     pub cma_glue: Option<CmaBuddyReservationGlue>,
     pub bsd_zone: Option<BsdVmZoneAllocator>,
+    pub has_guard_page: bool,
+    pub poison_on_free: bool,
 }
 
 impl SigmaBuddyAllocator {
@@ -195,6 +251,8 @@ impl SigmaBuddyAllocator {
                 total_pages / 4,
             )),
             bsd_zone: Some(BsdVmZoneAllocator::new(VmZone::Normal, total_pages)),
+            has_guard_page: true,
+            poison_on_free: true,
         }
     }
 
@@ -261,6 +319,13 @@ impl SigmaBuddyAllocator {
     pub fn free(&mut self, block: &MemoryBlock) {
         let addr = block.addr.as_ptr() as usize;
         let pages = block.size / PAGE_SIZE;
+
+        // Scrub and poison memory on free if poison_on_free is enabled
+        if self.poison_on_free && !block.addr.as_ptr().is_null() {
+            unsafe {
+                core::ptr::write_bytes(block.addr.as_ptr(), 0xDE, block.size);
+            }
+        }
 
         // Check if block was allocated in CMA region
         if let Some(ref cma) = self.cma_glue {
@@ -341,6 +406,8 @@ impl Default for SigmaBuddyAllocator {
             allocated: AtomicUsize::new(0),
             cma_glue: None,
             bsd_zone: None,
+            has_guard_page: true,
+            poison_on_free: true,
         }
     }
 }
@@ -407,5 +474,20 @@ mod tests {
         let status = allocator.evaluate_watermarks();
         assert_eq!(status.level, WatermarkLevel::WatermarkHigh);
         assert!(!status.requires_compaction);
+    }
+
+    #[test]
+    fn test_sovereign_ipc_buffer_operations() {
+        let mut ipc = SovereignIpcBuffer::new(4);
+        assert!(ipc.is_empty());
+
+        assert!(ipc.push(0xAA).is_ok());
+        assert!(ipc.push(0xBB).is_ok());
+        assert_eq!(ipc.len(), 2);
+
+        assert_eq!(ipc.pop(), Some(0xAA));
+        assert_eq!(ipc.pop(), Some(0xBB));
+        assert_eq!(ipc.pop(), None);
+        assert!(ipc.is_empty());
     }
 }
