@@ -1465,10 +1465,127 @@ impl Default for UniversalShellCompatibilityEngine {
 }
 
 // =========================================================================
+// 14. MODERN ZSH & BASH INNOVATIONS (zsh-autosuggestions, direnv, fzf-tab)
+// =========================================================================
+
+/// Fish-like inline ghost text autosuggestion engine for Zsh/Bash (as featured on ItsFOSS & How-To Geek)
+pub struct ZshAutosuggestionsEngine {
+    pub history: Vec<String>,
+}
+
+impl ZshAutosuggestionsEngine {
+    pub fn new() -> Self {
+        Self { history: Vec::new() }
+    }
+
+    pub fn add_history(&mut self, command: &str) {
+        if !command.trim().is_empty() && self.history.last().map(|s| s.as_str()) != Some(command) {
+            self.history.push(command.to_string());
+        }
+    }
+
+    /// Generates ghost text completion suggestion for user input line
+    pub fn suggest(&self, input: &str) -> Option<String> {
+        if input.trim().is_empty() {
+            return None;
+        }
+
+        for entry in self.history.iter().rev() {
+            if entry.starts_with(input) && entry.len() > input.len() {
+                return Some(entry[input.len()..].to_string());
+            }
+        }
+        None
+    }
+}
+
+impl Default for ZshAutosuggestionsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Direnv per-directory .envrc auto-loader/unloader engine (as featured on The New Stack & InfoWorld)
+pub struct DirenvEnvironmentManager {
+    pub loaded_envs: BTreeMap<String, BTreeMap<String, String>>, // dir -> (key, val)
+    pub current_env: BTreeMap<String, String>,
+}
+
+impl DirenvEnvironmentManager {
+    pub fn new() -> Self {
+        Self {
+            loaded_envs: BTreeMap::new(),
+            current_env: BTreeMap::new(),
+        }
+    }
+
+    /// Registers a directory .envrc configuration
+    pub fn register_envrc(&mut self, dir_path: &str, vars: &[(&str, &str)]) {
+        let mut map = BTreeMap::new();
+        for (k, v) in vars {
+            map.insert(k.to_string(), v.to_string());
+        }
+        self.loaded_envs.insert(dir_path.to_string(), map);
+    }
+
+    /// Hooks into shell directory changes (cd) to load or unload environment variables
+    pub fn on_directory_change(&mut self, new_dir: &str) -> Vec<(String, Option<String>)> {
+        let mut changes = Vec::new();
+        let target_vars = self.loaded_envs.get(new_dir).cloned().unwrap_or_default();
+
+        // Unload old keys not present in new dir
+        let keys_to_remove: Vec<String> = self.current_env.keys()
+            .filter(|k| !target_vars.contains_key(*k))
+            .cloned()
+            .collect();
+
+        for key in keys_to_remove {
+            self.current_env.remove(&key);
+            changes.push((key, None)); // Unset
+        }
+
+        // Load new/updated keys
+        for (key, val) in target_vars {
+            if self.current_env.get(&key) != Some(&val) {
+                self.current_env.insert(key.clone(), val.clone());
+                changes.push((key, Some(val)));
+            }
+        }
+
+        changes
+    }
+}
+
+impl Default for DirenvEnvironmentManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Zsh/Bash fzf-based interactive reverse history search engine (as featured on XDA Developers & Linux.com)
+pub struct ZshFzfHistorySearchEngine;
+
+impl ZshFzfHistorySearchEngine {
+    pub fn search(history: &[String], query: &str) -> Vec<String> {
+        let query_lower = query.to_lowercase();
+        let mut matches = Vec::new();
+
+        for entry in history.iter().rev() {
+            if entry.to_lowercase().contains(&query_lower) {
+                if !matches.contains(entry) {
+                    matches.push(entry.clone());
+                }
+            }
+        }
+        matches
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1796,5 +1913,46 @@ mod tests {
         let mut engine = UniversalShellCompatibilityEngine::new();
         let pipelines = engine.execute_script_as_sh(tcsh_script).unwrap();
         assert!(!pipelines.is_empty());
+    }
+
+    #[test]
+    fn test_zsh_autosuggestions_engine() {
+        let mut suggest_engine = ZshAutosuggestionsEngine::new();
+        suggest_engine.add_history("git status");
+        suggest_engine.add_history("git commit -m 'feat'");
+        suggest_engine.add_history("cargo test --lib");
+
+        assert_eq!(suggest_engine.suggest("car"), Some("go test --lib".to_string()));
+        assert_eq!(suggest_engine.suggest("git c"), Some("ommit -m 'feat'".to_string()));
+        assert_eq!(suggest_engine.suggest("unknown"), None);
+    }
+
+    #[test]
+    fn test_direnv_environment_manager() {
+        let mut direnv = DirenvEnvironmentManager::new();
+        direnv.register_envrc("/proj/a", &[("NODE_ENV", "development"), ("PORT", "3000")]);
+        direnv.register_envrc("/proj/b", &[("NODE_ENV", "production")]);
+
+        let changes_a = direnv.on_directory_change("/proj/a");
+        assert_eq!(changes_a.len(), 2);
+        assert_eq!(direnv.current_env.get("PORT"), Some(&"3000".to_string()));
+
+        let _changes_b = direnv.on_directory_change("/proj/b");
+        assert_eq!(direnv.current_env.get("PORT"), None);
+        assert_eq!(direnv.current_env.get("NODE_ENV"), Some(&"production".to_string()));
+    }
+
+    #[test]
+    fn test_zsh_fzf_history_search() {
+        let history = vec![
+            "cargo build".to_string(),
+            "git push origin main".to_string(),
+            "cargo test --lib".to_string(),
+        ];
+
+        let results = ZshFzfHistorySearchEngine::search(&history, "cargo");
+        assert_eq!(results.len(), 2);
+        assert_eq!(results[0], "cargo test --lib");
+        assert_eq!(results[1], "cargo build");
     }
 }
