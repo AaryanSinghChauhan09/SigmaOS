@@ -34,8 +34,10 @@ pub use disk_usage::{
     DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
 };
 pub use manager::{
-    ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
-    FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
+    ActivePane, BatchRegexRenamer, ClipboardOperation, FileItem, FileManager, FileManagerError,
+    FileOperation, FileTagAnnotation, FileTagColor, FileTagManager, FileType as ManagerFileType,
+    SortOrder, SplitPaneView, StandardFileOperation, TabEntry, TabbedBrowsingManager, ViewMode,
+    YaziSpatialPreviewEngine,
 };
 pub use mount_namespace::{MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource, MountFlags};
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
