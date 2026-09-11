@@ -112,6 +112,21 @@ io-sequential = []
 io-random = []
 io-mmap = []
 
+# Storage & Performance matrix features
+cache-lru = []
+cache-lfu = []
+cache-arc = []
+jemalloc = []
+mimalloc = []
+scheduler-eevdf = []
+scheduler-bore = []
+lock-free = []
+mutex = []
+rwlock = []
+io-sequential = []
+io-random = []
+io-mmap = []
+
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(custom_alloc_error_handler)',

@@ -1,4 +1,5 @@
 pub mod omarchy;
+pub mod omarchy_advanced_parity;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
@@ -9,6 +10,7 @@ pub use omarchy::{
     OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
     WebAppSpec,
 };
+pub use omarchy_advanced_parity::*;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_inspirations;
 pub mod arch_parity;
@@ -239,18 +241,19 @@ pub use ultimate_distro_innovations::{
 
 pub mod sovereign_ahead_distro_supremacy;
 pub use sovereign_ahead_distro_supremacy::{
-    AccessRight as CapabilityAccessRight, CarpNodeStatus, CoWBlockExtent,
-    DeclarativeCapabilityRule, MicroarchIsaTarget, OmniCasBlob, OmniGenRecord, PfsyncConnEntry,
-    SchedPolicyKind, SchedTaskDescriptor, SchedTaskState, SimdJitPatch,
-    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
-    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
-    SovereignXdpCarpMeshEngine,
+    DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchTier, PredictiveSchedPolicy,
+    PredictiveTaskDescriptor, ResilientBlockEntry, SecurityMultiOsMask, SimdJitFunctionTarget,
+    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine,
+    SovereignOmniCasStoreEngine, SovereignPredictiveSchedExtEngine,
+    SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
+    SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
 };
 
-
-
-pub mod arch_missing_components;
-pub use arch_missing_components::*;
-
-pub mod wiki_unimplemented_ideas;
-pub use wiki_unimplemented_ideas::*;
+pub mod sovereign_distro_outpacing_engine;
+pub use sovereign_distro_outpacing_engine::{
+    BcachefsExtent, DrmSyncobjFrame, DynamicVersionedImageSpec, FreeBsd141JailSpec,
+    PinsyscallRange, SovereignFreeBsd141JailVnetEngine, SovereignLinux612BcachefsTieringEngine,
+    SovereignMasterOutpacingSuite, SovereignOpenBsd76PledgeUnveilAdvancementEngine,
+    SovereignSystemd256ParityAndBeyondEngine, SovereignWayland123ExplicitSyncEngine,
+    StorageDeviceTier, VarlinkIpcMessage,
+};
