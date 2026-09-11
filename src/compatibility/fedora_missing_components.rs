@@ -266,6 +266,85 @@ impl FedoraSssdFreeIpaEngine {
     }
 }
 
+/// Fedora SSSD / FreeIPA Kerberos Realm Join & Active Directory Trust Engine
+#[derive(Debug, Clone)]
+pub struct FedoraIpaSssdActiveDirectoryEngine {
+    pub ad_domain: String,
+    pub realm: String,
+    pub is_joined: bool,
+}
+
+impl FedoraIpaSssdActiveDirectoryEngine {
+    pub fn new(ad_domain: &str, realm: &str) -> Self {
+        Self {
+            ad_domain: ad_domain.to_string(),
+            realm: realm.to_string(),
+            is_joined: false,
+        }
+    }
+
+    pub fn join_realm(&mut self, admin_user: &str) -> Result<String, &'static str> {
+        if self.is_joined {
+            return Err("Already joined to Kerberos realm");
+        }
+        self.is_joined = true;
+        Ok(format!(
+            "Successfully joined realm '{}' ({}) as admin '{}'",
+            self.realm, self.ad_domain, admin_user
+        ))
+    }
+}
+
+/// Fedora Bodhi Update Status Gating Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BodhiUpdateStatus {
+    Pending,
+    Testing,
+    Stable,
+    Obsolete,
+}
+
+#[derive(Debug, Clone)]
+pub struct BodhiUpdateRequest {
+    pub update_id: String,
+    pub karma_score: i32,
+    pub status: BodhiUpdateStatus,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraBodhiTriagePortalEngine {
+    pub updates: BTreeMap<String, BodhiUpdateRequest>,
+}
+
+impl FedoraBodhiTriagePortalEngine {
+    pub fn new() -> Self {
+        Self {
+            updates: BTreeMap::new(),
+        }
+    }
+
+    pub fn submit_update(&mut self, id: &str) -> String {
+        self.updates.insert(
+            id.to_string(),
+            BodhiUpdateRequest {
+                update_id: id.to_string(),
+                karma_score: 0,
+                status: BodhiUpdateStatus::Testing,
+            },
+        );
+        format!("Submitted update '{}' to Bodhi testing portal", id)
+    }
+
+    pub fn add_karma(&mut self, id: &str, delta: i32) -> Result<BodhiUpdateStatus, &'static str> {
+        let update = self.updates.get_mut(id).ok_or("Update not found")?;
+        update.karma_score += delta;
+        if update.karma_score >= 3 {
+            update.status = BodhiUpdateStatus::Stable;
+        }
+        Ok(update.status.clone())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -311,5 +390,16 @@ glibc
         let auth_res = sssd.authenticate_user("ipa.example.com", "admin").unwrap();
         assert!(auth_res.contains("Successfully authenticated"));
         assert_eq!(sssd.cached_kerberos_tickets.len(), 1);
+    }
+
+    #[test]
+    fn test_fedora_ad_and_bodhi_triage() {
+        let mut ad = FedoraIpaSssdActiveDirectoryEngine::new("ad.example.com", "AD.EXAMPLE.COM");
+        assert!(ad.join_realm("admin").is_ok());
+
+        let mut bodhi = FedoraBodhiTriagePortalEngine::new();
+        bodhi.submit_update("FEDORA-2024-100");
+        let status = bodhi.add_karma("FEDORA-2024-100", 3).unwrap();
+        assert_eq!(status, BodhiUpdateStatus::Stable);
     }
 }
