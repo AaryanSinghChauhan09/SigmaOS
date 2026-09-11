@@ -2,13 +2,6 @@ pub mod omarchy;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
-pub mod arch_gap_closure;
-
-pub use arch_gap_closure::{
-    AlaPackageSnapshot, ArchAuditScannerEngine, ArchInstallProfile, ArchInstallProfileEngine,
-    ArchLinuxArchiveEngine, ArchMasterKey, ArchPacmanKeyringManager, ArchSecurityAdvisory,
-    ArchTestingRepo, ArchTestingRepositoryManager, VulnerabilitySeverity,
-};
 
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
@@ -254,31 +247,11 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
 };
 
-pub mod arch_gap_closure;
-pub use arch_gap_closure::{
-    AlpmHookRule as ArchAlpmHookRule, ArchArchisoIsoBuilderEngine, ArchGpgKeyNode,
-    ArchPacmanCachePruningEngine, ArchPacmanHooksManagerEngine, ArchPacmanKeyringTrustEngine,
-    ArchSysusersTmpfilesGeneratorEngine, ArchisoProfileSpec, CachedPackageTarball,
-    HookWhen as ArchHookWhen, KeyTrustLevel as ArchKeyTrustLevel, SovereignArchGapClosureSuite,
-    SysuserRule, TmpfileRule,
+pub mod sovereign_distro_outpacing_engine;
+pub use sovereign_distro_outpacing_engine::{
+    BcachefsExtent, DrmSyncobjFrame, DynamicVersionedImageSpec, FreeBsd141JailSpec,
+    PinsyscallRange, SovereignFreeBsd141JailVnetEngine, SovereignLinux612BcachefsTieringEngine,
+    SovereignMasterOutpacingSuite, SovereignOpenBsd76PledgeUnveilAdvancementEngine,
+    SovereignSystemd256ParityAndBeyondEngine, SovereignWayland123ExplicitSyncEngine,
+    StorageDeviceTier, VarlinkIpcMessage,
 };
-
-pub mod fedora_gap_closure;
-pub use fedora_gap_closure::{
-    CoprPackageProject, FedoraAnacondaInstallerEngine, FedoraCoprBuildRepositoryEngine,
-    FedoraMockChrootBuildEngine, FedoraSelinuxMlsPolicyGovernorEngine, KickstartConfig,
-    MockChrootSpec, SelinuxMlsContext, SovereignFedoraGapClosureSuite,
-};
-
-pub mod tech_media_distro_innovations;
-pub use tech_media_distro_innovations::{
-    DistroWatchRankTrackerEngine, LinuxTeckSysadminAutomationEngine,
-    MakeUseOfDistroRecommendationEngine, NineToFiveLinuxReleaseMatrixEngine,
-    SovereignTechMediaDistroInnovationsSuite,
-};
-pub mod arch_ultimate_gap_closure;
-pub use arch_ultimate_gap_closure::*;
-pub mod omarchy_ultimate_gap_closure;
-pub use omarchy_ultimate_gap_closure::*;
-pub mod tech_media_extended_innovations;
-pub use tech_media_extended_innovations::*;

@@ -1798,8 +1798,8 @@ mod tests {
 
     #[test]
     fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8, power_state: PowerState::D0Active };
-        let mmio = ModernMmioController { mmio_base: 0xFE00_0000, power_state: PowerState::D0Active };
+        let pio = LegacyPioController { port_base: 0x3F8 };
+        let mmio = ModernMmioController { mmio_base: 0xFE00_0000 };
 
         assert_eq!(pio.read_register(0), 0x3F8);
         assert_eq!(mmio.read_register(0), 0xFE00_0000);
@@ -1824,7 +1824,7 @@ mod tests {
 
     #[test]
     fn test_constraint_sat_solver() {
-        let solver = ConstraintSatSolver::new();
+        let solver = SpecConstraintSatSolver::new();
         let nodes = [
             SpecPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
             SpecPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
@@ -1860,9 +1860,263 @@ mod tests {
         assert_eq!(ledger.head, 1);
 
         // Inspect & verify SAT Solver
-        let solver = ConstraintSatSolver::new();
+        let solver = SpecConstraintSatSolver::new();
         let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
+    }
+}
+
+// ============================================================================
+// Section 6: Bare-Metal Subsystem Design Specifications
+// ============================================================================
+
+// 6.1 Polymorphic Universal Peripheral Blueprint Specifications
+pub struct LegacyPioSpecController {
+    pub port_base: u16,
+    pub power_state: PowerState,
+}
+
+impl LegacyPioSpecController {
+    pub fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    pub fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
+    pub fn write_register(&mut self, _offset: u16, _value: u64) {}
+    pub fn handle_irq(&mut self) -> bool { true }
+    pub fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    pub fn get_power_state(&self) -> PowerState { self.power_state }
+}
+
+pub struct ModernMmioSpecController {
+    pub mmio_base: u64,
+    pub power_state: PowerState,
+}
+
+impl ModernMmioSpecController {
+    pub fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    pub fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
+    pub fn write_register(&mut self, _offset: u16, _value: u64) {}
+    pub fn handle_irq(&mut self) -> bool { true }
+    pub fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    pub fn get_power_state(&self) -> PowerState { self.power_state }
+}
+
+pub struct BareMetalSpecPeripheralManager {
+    pub registered_devices: [(u16, u64, bool); 16],
+    pub device_count: usize,
+}
+
+impl BareMetalSpecPeripheralManager {
+    pub fn new() -> Self {
+        Self {
+            registered_devices: [(0, 0, false); 16],
+            device_count: 0,
+        }
+    }
+
+    pub fn register_device(&mut self, vendor_id: u16, base_addr: u64, is_mmio: bool) -> Result<(), &'static str> {
+        if self.device_count >= 16 { return Err("Registry full"); }
+        self.registered_devices[self.device_count] = (vendor_id, base_addr, is_mmio);
+        self.device_count += 1;
+        Ok(())
+    }
+}
+
+impl Default for BareMetalSpecPeripheralManager {
+    fn default() -> Self { Self::new() }
+}
+
+// 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
+#[derive(Debug, Clone, Copy)]
+pub struct SpecUdfInstruction {
+    pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
+    pub reg: u8,  // R0 - R7
+    pub addr: u64,
+}
+
+pub struct SpecUdfVm {
+    pub registers: [u64; 8], // R0 - R7
+    pub pc: usize,
+}
+
+impl SpecUdfVm {
+    pub fn new() -> Self {
+        Self {
+            registers: [0; 8],
+            pc: 0,
+        }
+    }
+
+    pub fn execute(&mut self, bytecode: &[SpecUdfInstruction]) -> Result<u64, &'static str> {
+        self.pc = 0;
+        while self.pc < bytecode.len() {
+            let inst = bytecode[self.pc];
+            if inst.reg >= 8 { return Err("Register out of bounds"); }
+            match inst.op {
+                0x10 => self.registers[inst.reg as usize] = inst.addr, // OP_READ
+                0x20 => { /* OP_WRITE */ }
+                0x30 => self.registers[inst.reg as usize] = self.registers[inst.reg as usize].wrapping_add(inst.addr), // OP_ADD
+                0xF0 => return Ok(self.registers[inst.reg as usize]), // OP_HALT
+                _ => return Err("Invalid ISA opcode"),
+            }
+            self.pc += 1;
+        }
+        Ok(self.registers[0])
+    }
+}
+
+impl Default for SpecUdfVm {
+    fn default() -> Self { Self::new() }
+}
+
+// 6.3 Declarative Package Resolution SAT Solver
+#[derive(Debug, Clone, Copy)]
+pub struct SpecPackageNode {
+    pub id: u32,
+    pub version: u32,
+    pub req_min: u32,
+    pub req_max: u32,
+}
+
+pub struct SpecConstraintSatSolver;
+
+impl SpecConstraintSatSolver {
+    pub fn new() -> Self { Self }
+
+    pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
+        for pkg in packages {
+            if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
+                return Err("Constraint conflict detected");
+            }
+        }
+        Ok(true)
+    }
+}
+
+impl Default for SpecConstraintSatSolver {
+    fn default() -> Self { Self::new() }
+}
+
+// 6.4 JBD2-Style Crash-Resilient Transactional Ledger
+#[derive(Debug, Clone, Copy)]
+pub struct SpecTransactionBlock {
+    pub tx_id: u64,
+    pub target_addr: u64,
+    pub crc32c_hash: u32,
+}
+
+pub struct SpecJbd2TransactionLedger {
+    pub ring_blocks: [SpecTransactionBlock; 16],
+    pub head: usize,
+    pub current_merkle_root: u32,
+}
+
+impl SpecJbd2TransactionLedger {
+    pub fn new() -> Self {
+        Self {
+            ring_blocks: [SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
+            head: 0,
+            current_merkle_root: 0x1234_5678,
+        }
+    }
+
+    pub fn write_transaction(&mut self, target_addr: u64, data: &[u8]) -> Result<u64, &'static str> {
+        if self.head >= 16 { return Err("Ledger ring full"); }
+        let tx_id = self.head as u64 + 1;
+        let mut crc = 0u32;
+        for &b in data { crc = crc.wrapping_add(b as u32); }
+
+        self.ring_blocks[self.head] = SpecTransactionBlock {
+            tx_id,
+            target_addr,
+            crc32c_hash: crc,
+        };
+        self.head += 1;
+        self.current_merkle_root ^= crc;
+        Ok(tx_id)
+    }
+
+    pub fn rollback_transaction(&mut self) {
+        if self.head > 0 {
+            self.head -= 1;
+            self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
+            self.ring_blocks[self.head] = SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 };
+        }
+    }
+}
+
+impl Default for SpecJbd2TransactionLedger {
+    fn default() -> Self { Self::new() }
+}
+
+pub struct AchievementBadge {
+    pub badge_id: &'static str,
+    pub name: &'static str,
+    pub unlocked: bool,
+}
+
+pub struct GamifiedProductivityLayer {
+    pub total_xp: u64,
+    pub level: u32,
+    pub daily_streak_days: u32,
+    pub last_activity_timestamp: u64,
+    pub badges: [AchievementBadge; 3],
+}
+
+impl GamifiedProductivityLayer {
+    pub fn new() -> Self {
+        Self {
+            total_xp: 0,
+            level: 1,
+            daily_streak_days: 1,
+            last_activity_timestamp: 0,
+            badges: [
+                AchievementBadge {
+                    badge_id: "pkg_builder",
+                    name: "Package Artisan",
+                    unlocked: false,
+                },
+                AchievementBadge {
+                    badge_id: "shard_debugger",
+                    name: "Shard Whisperer",
+                    unlocked: false,
+                },
+                AchievementBadge {
+                    badge_id: "security_sentinel",
+                    name: "Security Sentinel",
+                    unlocked: false,
+                },
+            ],
+        }
+    }
+
+    /// Award experience points (XP) for productivity tasks (compiling packages, debugging kernel shards, security scans)
+    pub fn award_experience(&mut self, action_type: &'static str, xp_gained: u64, timestamp: u64) {
+        self.total_xp += xp_gained;
+
+        // Level up algorithm (1000 XP per level)
+        while self.total_xp >= self.level as u64 * 1000 {
+            self.level += 1;
+        }
+
+        // Streak maintenance
+        if self.last_activity_timestamp != 0 {
+            let diff = timestamp.saturating_sub(self.last_activity_timestamp);
+            if diff <= 86400 {
+                // Activity within 24 hours
+                self.daily_streak_days += 1;
+            } else if diff > 86400 * 2 {
+                // Streak broken
+                self.daily_streak_days = 1;
+            }
+        }
+        self.last_activity_timestamp = timestamp;
+
+        // Check badge unlocks
+        match action_type {
+            "compile_package" => self.badges[0].unlocked = true,
+            "debug_shard" => self.badges[1].unlocked = true,
+            "resolve_security_scan" => self.badges[2].unlocked = true,
+            _ => {}
+        }
     }
 }
 

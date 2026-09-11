@@ -179,12 +179,12 @@ impl UserAccount {
 /// System Configuration
 #[derive(Debug, Clone)]
 pub struct SystemConfiguration {
+    pub hostname: String,
     pub timezone: String,
     pub locale: String,
     pub keyboard_layout: String,
     pub network_config: NetworkConfig,
     pub services: Vec<String>,
-    pub hostname: String,
     pub is_admin: bool,
     pub auto_login: bool,
 }
@@ -196,21 +196,10 @@ pub struct PrivacySettings {
     pub location_services: bool,
 }
 
-
-#[derive(Debug, Clone)]
-pub struct NetworkConfig {
-    pub use_dhcp: bool,
-    pub static_ip: Option<String>,
-    pub gateway: Option<String>,
-    pub dns_servers: Vec<String>,
-}
-
 impl SystemConfiguration {
     pub fn new() -> Self {
         Self {
             hostname: String::from("sigmaos-pc"),
-            is_admin: true,
-            auto_login: false,
             timezone: String::from("UTC"),
             locale: String::from("en_US.UTF-8"),
             keyboard_layout: String::from("us"),
@@ -225,6 +214,8 @@ impl SystemConfiguration {
                 String::from("sshd"),
                 String::from("cron"),
             ],
+            is_admin: true,
+            auto_login: false,
         }
     }
 }
@@ -399,17 +390,17 @@ impl GuiInstallerWizard {
 
     /// Add custom partition
     pub fn add_custom_partition(&mut self, partition: PartitionEntry) {
-        self.custom_partitions.push(partition.clone());
         self.log(&format!(
             "Added custom partition: {} -> {}",
             partition.device, partition.mount_point
         ));
+        self.custom_partitions.push(partition);
     }
 
     /// Add user account
     pub fn add_user_account(&mut self, user: UserAccount) {
-        self.user_accounts.push(user.clone());
         self.log(&format!("Added user account: {}", user.username));
+        self.user_accounts.push(user);
     }
 
     /// Update system configuration
@@ -461,7 +452,7 @@ impl GuiInstallerWizard {
             InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
             InstallerScreen::Complete => "Installation Complete",
-            InstallerScreen::CompleteOnboarding => "Complete Onboarding",
+            InstallerScreen::CompleteOnboarding => "Onboarding Complete",
         }
     }
 
