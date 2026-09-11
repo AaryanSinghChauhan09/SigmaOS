@@ -33,3 +33,5 @@ pub use smart_optimizer::{
 };
 
 pub use tuned::{BootStageMetrics, PerformanceTuner, TuningProfileKind};
+pub mod cachyos_ultimate_gap_closure;
+pub use cachyos_ultimate_gap_closure::*;
