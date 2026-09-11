@@ -1,0 +1,29 @@
+name: NixOS Flake Devshell & Store Deduplication CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'src/sigpkg/universal_oop_system.rs'
+      - 'src/sigpkg/universal_engine.rs'
+      - '.github/workflows/nixos-flake-devshell-ci.yml'
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  nixos-store-test:
+    name: Verify Nix/Guix Store Deduplication & CAS GC Profiles
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Nix Universal System Tests
+        run: |
+          ./scripts/changed_files_rustc_tests.sh
