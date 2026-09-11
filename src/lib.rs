@@ -316,7 +316,7 @@ pub use driver::{
     ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
-    FileMode, FileType, FsError, Inode, VirtualFilesystem,
+    FileMode, FileType, FsError, Inode, VirtualFileSystem,
 };
 pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,

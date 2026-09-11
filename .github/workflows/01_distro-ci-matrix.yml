@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 2 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   distro-matrix:
     runs-on: ubuntu-latest

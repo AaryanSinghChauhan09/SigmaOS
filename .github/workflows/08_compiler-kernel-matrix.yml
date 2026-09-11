@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 9 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   compiler-kernel:
     runs-on: ubuntu-latest

@@ -175,10 +175,24 @@ impl UserAccount {
     }
 }
 
+/// Network Configuration
+#[derive(Debug, Clone)]
+pub struct NetworkConfig {
+    pub use_dhcp: bool,
+    pub static_ip: Option<String>,
+    pub gateway: Option<String>,
+    pub dns_servers: Vec<String>,
+}
+
 /// System Configuration
 #[derive(Debug, Clone)]
 pub struct SystemConfiguration {
     pub hostname: String,
+    pub timezone: String,
+    pub locale: String,
+    pub keyboard_layout: String,
+    pub network_config: NetworkConfig,
+    pub services: Vec<String>,
     pub is_admin: bool,
     pub auto_login: bool,
 }
@@ -208,7 +222,15 @@ impl SystemConfiguration {
                 String::from("sshd"),
                 String::from("cron"),
             ],
+            is_admin: true,
+            auto_login: false,
         }
+    }
+}
+
+impl Default for SystemConfiguration {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -219,7 +241,7 @@ pub struct GuiInstallerWizard {
     pub disk_info: Vec<DiskInfo>,
     pub detected_operating_systems: Vec<DetectedOperatingSystem>,
     pub selected_disk: Option<String>,
-    pub partitioning_operation: PartitioningOperation,
+    pub partitioning_strategy: PartitionStrategy,
     pub custom_partitions: Vec<PartitionEntry>,
     pub user_accounts: Vec<UserAccount>,
     pub system_config: SystemConfiguration,
@@ -235,7 +257,7 @@ impl GuiInstallerWizard {
             disk_info: Vec::new(),
             detected_operating_systems: Vec::new(),
             selected_disk: None,
-            partitioning_operation: PartitioningOperation::Automatic,
+            partitioning_strategy: PartitionStrategy::EraseDisk,
             custom_partitions: Vec::new(),
             user_accounts: Vec::new(),
             system_config: SystemConfiguration::new(),
@@ -293,8 +315,8 @@ impl GuiInstallerWizard {
             InstallerScreen::UserSetup => InstallerScreen::SystemConfiguration,
             InstallerScreen::SystemConfiguration => InstallerScreen::Summary,
             InstallerScreen::Summary => InstallerScreen::InstallationProgress,
-            InstallerScreen::InstallationProgress => InstallerScreen::Complete,
-            InstallerScreen::Complete => return Err(InstallerError::AlreadyComplete),
+            InstallerScreen::InstallationProgress => InstallerScreen::CompleteOnboarding,
+            InstallerScreen::CompleteOnboarding => return Err(InstallerError::AlreadyComplete),
         };
 
         Ok(())
@@ -316,10 +338,10 @@ impl GuiInstallerWizard {
         self.log(&format!("Selected disk: {}", disk));
     }
 
-    /// Set partitioning operation (e.g. Alongside for Dual-Boot)
-    pub fn set_partitioning_operation(&mut self, operation: PartitioningOperation) {
-        self.partitioning_operation = operation;
-        self.log(&format!("Partitioning operation: {:?}", operation));
+    /// Set partitioning strategy
+    pub fn set_partitioning_strategy(&mut self, strategy: PartitionStrategy) {
+        self.partitioning_strategy = strategy;
+        self.log(&format!("Partitioning strategy: {:?}", strategy));
     }
 
     /// Calculate Dual-Boot Alongside partitioning layout
@@ -370,7 +392,7 @@ impl GuiInstallerWizard {
         ));
 
         self.custom_partitions = partitions.clone();
-        self.partitioning_operation = PartitioningOperation::Alongside;
+        self.partitioning_strategy = PartitionStrategy::InstallAlongsideExisting;
         self.log(&format!(
             "Configured Dual-Boot Alongside OS: {} (Allocated {}MB for SigmaOS)",
             target_os.name, allocate_sigma_mb
@@ -381,17 +403,20 @@ impl GuiInstallerWizard {
 
     /// Add custom partition
     pub fn add_custom_partition(&mut self, partition: PartitionEntry) {
+        let device = partition.device.clone();
+        let mount_point = partition.mount_point.clone();
         self.custom_partitions.push(partition);
         self.log(&format!(
             "Added custom partition: {} -> {}",
-            partition.device, partition.mount_point
+            device, mount_point
         ));
     }
 
     /// Add user account
     pub fn add_user_account(&mut self, user: UserAccount) {
+        let username = user.username.clone();
         self.user_accounts.push(user);
-        self.log(&format!("Added user account: {}", user.username));
+        self.log(&format!("Added user account: {}", username));
     }
 
     /// Update system configuration
@@ -442,7 +467,7 @@ impl GuiInstallerWizard {
             InstallerScreen::SystemConfiguration => "Configure system settings",
             InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
-            InstallerScreen::Complete => "Installation Complete",
+            InstallerScreen::CompleteOnboarding => "Installation Complete",
         }
     }
 
@@ -450,11 +475,11 @@ impl GuiInstallerWizard {
     pub fn get_installation_summary(&self) -> InstallationSummary {
         InstallationSummary {
             target_disk: self.selected_disk.clone().unwrap_or_default(),
-            partitioning_operation: self.partitioning_operation,
+            partitioning_strategy: self.partitioning_strategy,
             user_count: self.user_accounts.len(),
             hostname: self.system_config.hostname.clone(),
-            filesystem: match self.partitioning_operation {
-                PartitioningOperation::Automatic | PartitioningOperation::Alongside => {
+            filesystem: match self.partitioning_strategy {
+                PartitionStrategy::EraseDisk | PartitionStrategy::InstallAlongsideExisting => {
                     FilesystemType::Btrfs
                 }
                 _ => FilesystemType::Ext4,
@@ -473,7 +498,7 @@ impl Default for GuiInstallerWizard {
 #[derive(Debug, Clone)]
 pub struct InstallationSummary {
     pub target_disk: String,
-    pub partitioning_operation: PartitioningOperation,
+    pub partitioning_strategy: PartitionStrategy,
     pub user_count: usize,
     pub hostname: String,
     pub filesystem: FilesystemType,
@@ -588,7 +613,7 @@ mod tests {
 
         let layout = wizard.calculate_alongside_layout("/dev/nvme0n1p2", 50000).unwrap();
         assert_eq!(layout.len(), 4);
-        assert_eq!(wizard.partitioning_operation, PartitioningOperation::Alongside);
+        assert_eq!(wizard.partitioning_strategy, PartitionStrategy::InstallAlongsideExisting);
     }
 
     #[test]

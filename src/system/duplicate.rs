@@ -151,36 +151,53 @@ impl DuplicateFinder {
         // Second pass: hash files with same size
         let mut files_by_hash: BTreeMap<String, Vec<FileMetadata>> = BTreeMap::new();
 
-        for (_size, files) in files_by_size {
-            if files.len() > 1 {
-                for mut file in files {
-                    if let Ok(hash) = self.algorithm.compute_hash(&file.path) {
-                        file.hash = Some(hash.clone());
-                        files_by_hash
-                            .entry(hash)
-                            .or_insert_with(Vec::new)
-                            .push(file);
+        let mut size_keys = Vec::new();
+        for (key, _) in &files_by_size {
+            size_keys.push(*key);
+        }
+
+        for size in size_keys {
+            if let Some(files) = files_by_size.remove(&size) {
+                if files.len() > 1 {
+                    for mut file in files {
+                        if let Ok(hash) = self.algorithm.compute_hash(&file.path) {
+                            file.hash = Some(hash.clone());
+                            if let Some(group_vec) = files_by_hash.get_mut_str(&hash) {
+                                group_vec.push(file);
+                            } else {
+                                let mut group_vec = Vec::new();
+                                group_vec.push(file);
+                                files_by_hash.insert(hash, group_vec);
+                            }
+                        }
                     }
                 }
             }
         }
 
         // Third pass: identify duplicates
-        for (hash, files) in files_by_hash {
-            if files.len() > 1 {
-                let mut group = DuplicateGroup::new(hash.clone());
-                let mut total_size = 0u64;
-                let files_count = files.len();
-                for file in files {
-                    total_size += file.size;
-                    group.add_file(file);
-                }
+        let mut hash_keys = Vec::new();
+        for (key, _) in &files_by_hash {
+            hash_keys.push(key.clone());
+        }
 
-                group.total_size = total_size;
-                self.scan_stats.duplicates_found += files_count - 1;
-                self.scan_stats.total_duplicate_size += total_size;
-                self.scan_stats.potential_savings += group.space_savings();
-                self.duplicate_groups.push(group);
+        for hash in hash_keys {
+            if let Some(files) = files_by_hash.remove_str(&hash) {
+                if files.len() > 1 {
+                    let mut group = DuplicateGroup::new(hash.clone());
+                    let mut total_size = 0u64;
+                    let files_count = files.len();
+                    for file in files {
+                        total_size += file.size;
+                        group.add_file(file);
+                    }
+
+                    group.total_size = total_size;
+                    self.scan_stats.duplicates_found += files_count - 1;
+                    self.scan_stats.total_duplicate_size += total_size;
+                    self.scan_stats.potential_savings += group.space_savings();
+                    self.duplicate_groups.push(group);
+                }
             }
         }
 
@@ -194,10 +211,13 @@ impl DuplicateFinder {
         files_by_size: &mut BTreeMap<u64, Vec<FileMetadata>>,
     ) -> Result<(), DuplicateError> {
         self.scan_stats.files_scanned += 1;
-        files_by_size
-            .entry(4096)
-            .or_insert_with(Vec::new)
-            .push(FileMetadata::new(path.to_string(), 4096));
+        if let Some(vec) = files_by_size.get_mut(&4096) {
+            vec.push(FileMetadata::new(path.to_string(), 4096));
+        } else {
+            let mut vec = Vec::new();
+            vec.push(FileMetadata::new(path.to_string(), 4096));
+            files_by_size.insert(4096, vec);
+        }
         Ok(())
     }
 

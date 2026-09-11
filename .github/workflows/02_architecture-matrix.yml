@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 3 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   architecture-build:
     runs-on: ${{ matrix.runner }}

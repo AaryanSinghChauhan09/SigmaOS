@@ -5693,6 +5693,12 @@ impl Default for FedoraRPMSeccompFilterEngine {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[cfg(test)]
+mod extra_fedora_tests {
+    use super::*;
+
 
     #[test]
     fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {

@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 5 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   desktop-matrix:
     runs-on: ubuntu-latest
