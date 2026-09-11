@@ -87,3 +87,10 @@ if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
     rustc --test --edition=2021 src/sigpkg/arch_pacman_engine.rs -o build/test_arch_engine
     ./build/test_arch_engine
 fi
+
+if [ -f "src/wiki_unimplemented_ideas.rs" ]; then
+    echo "Running GitHub Wiki Unimplemented Ideas Parity test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/wiki_unimplemented_ideas.rs -o build/test_wiki_unimplemented
+    ./build/test_wiki_unimplemented
+fi
