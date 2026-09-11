@@ -1,6 +1,6 @@
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
@@ -51,13 +51,8 @@ pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
-    AlpmHook, AlpineApkCachePeerSyncEngine, AlternativeGroup, AlternativeProvider,
-    ApkPackageChunk, AptPackageCandidate, AptPinRule, ArchAlpmHookTransactionEngine,
-    BsdPkgDbStorageEngine, BsdPkgRecord, CachePeerNode, DebianAptPinningEngine,
-    FreeBsdPkgMessageNotifierEngine, GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
-    OpenBsdPledgeUnveilSandboxScriptletEngine, OstreeDeploymentPin, OstreeLayer, PkgMessage,
-    PkgMessageTrigger, PledgePromises, RpmOstreeLayeredImageGovernorEngine, UnveilPath,
-    XbpsDebianAlternativesGovernorEngine,
+    AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
+    GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
 };
 pub mod spec;
 pub mod store;
@@ -91,15 +86,21 @@ pub use bsd_linux_package_innovations::{
     XbpsRestrictedNonFreeLicenseEngine, XbpsSonameAndOrphanEngine, ZypperPackageOffer,
     ZypperRepository,
 };
-pub use sovereign_sigpkg::*;
-pub use universal_adapter::{
-    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType,
-    UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
-    UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
+pub use zero_alloc_resolver::{
+    PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES,
 };
-pub use crate::package::universal::SnapcraftManifest;
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
+pub use universal_adapter::{
+    PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
+    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
+    FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
+    ZypperSpecManifest, SlackwarePkgManifest,
+    RpmSpecManifest, AppImageContainer, MappedScriptletHook,
+    SigmaPkgHookType, UniversalDependencyMapper, UniversalDryRunResult,
+    UniversalDryRunSimulator, UniversalFormatConverter, UniversalScriptletConverter,
+    UniversalPmCommandDispatcher, UniversalPmOperation, DispatchedPmAction,
+    SigPkgUniversalBridgeEngine,
+};
+pub use sovereign_sigpkg::*;
 
 pub use alpine_apk_engine::{AlpineCommunityRepo, ApkIndexParser, ApkPackage};
 pub use arch_compat::{
@@ -278,7 +279,7 @@ impl Package {
 }
 
 /// Package dependency
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,

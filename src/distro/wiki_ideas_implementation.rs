@@ -8,6 +8,7 @@
 
 extern crate alloc;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
