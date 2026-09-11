@@ -4627,6 +4627,11 @@ mod tests {
         assert_eq!(roles.applied_roles.len(), 2);
         assert_eq!(roles.configured_firewall_ports.len(), 3);
     }
+}
+
+#[cfg(test)]
+mod tests_fedora_mojikey {
+    use super::*;
 
     #[test]
     fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {

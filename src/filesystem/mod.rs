@@ -35,14 +35,11 @@ pub use disk_usage::{
     DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
 };
 pub use manager::{
-    ActivePane, BatchRegexRenamer, ClipboardOperation, FileItem, FileManager, FileManagerError,
-    FileOperation, FileTagAnnotation, FileTagColor, FileTagManager, FileType as ManagerFileType,
-    SortOrder, SplitPaneView, StandardFileOperation, TabEntry, TabbedBrowsingManager, ViewMode,
-    YaziSpatialPreviewEngine,
+    ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
+    FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
 pub use mount_namespace::{MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource, MountFlags};
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
-pub use crate::filesystem::vfs::{FileSystem as VfsFileSystem};
 // pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};
 pub use file_monitor::{
     EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
