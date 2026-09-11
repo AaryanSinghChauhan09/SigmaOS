@@ -17,6 +17,7 @@ pub mod sigma_fs;
 
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use vfs::{FileType, FsError, Inode, VirtualFileSystem, DirEntry, FileHandle, FileMode, VfsError, MountPoint};
+pub type VirtualFilesystem = VirtualFileSystem;
 pub use sigma_fs::{
     SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
     JournalState, SovereignFsJournal, SovereignFhsHierarchy, DistributedSovereignFS,

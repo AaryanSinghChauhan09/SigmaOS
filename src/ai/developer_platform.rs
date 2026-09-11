@@ -410,6 +410,82 @@ mod tests {
 }
 
 /// DVC & MLflow VFS CoW Snapshot Tracker
+pub type MlExperimentRun = ExperimentRun;
+
+#[derive(Debug, Clone)]
+pub struct AiSafetyGuardrails {
+    pub policy_engine: AiSafetyPolicyEngine,
+}
+
+impl AiSafetyGuardrails {
+    pub fn new() -> Self {
+        Self {
+            policy_engine: AiSafetyPolicyEngine::default_policy(),
+        }
+    }
+}
+
+impl Default for AiSafetyGuardrails {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CuratedAiModel {
+    pub model_id: String,
+    pub name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DevWorkspace {
+    pub workspace_id: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeveloperPlatformSuite {
+    pub orchestrator: LocalLlmOrchestrator,
+}
+
+impl DeveloperPlatformSuite {
+    pub fn new() -> Self {
+        Self {
+            orchestrator: LocalLlmOrchestrator::new(1024 * 1024 * 1024, 4 * 1024 * 1024 * 1024),
+        }
+    }
+}
+
+impl Default for DeveloperPlatformSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModelMarketplace {
+    pub marketplace: SignedModelMarketplace,
+}
+
+impl ModelMarketplace {
+    pub fn new() -> Self {
+        Self {
+            marketplace: SignedModelMarketplace::new(),
+        }
+    }
+}
+
+impl Default for ModelMarketplace {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SafetyViolationType {
+    UnboundedWrite,
+    BlacklistedCommand,
+}
+
 pub struct DvcMlflowVfsTracker {
     pub experiment_name: String,
     pub snapshots: Vec<String>,

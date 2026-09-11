@@ -7,6 +7,7 @@
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]
 #![allow(clippy::type_complexity)]
+pub use alloc::string::String;
 use core::fmt;
 use core::ops::{Deref, DerefMut};
 use crate::klib::vec::SigmaVec;

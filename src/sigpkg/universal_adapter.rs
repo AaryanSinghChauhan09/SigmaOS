@@ -7,7 +7,7 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
+pub use crate::package::universal::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
@@ -95,7 +95,8 @@ pub enum Permission {
 pub use crate::security::Permission;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
-#[derive(Debug, Clone, PartialEq, Eq)]
+pub type PacmanPkgbuildV2 = PacmanPkgbuild;
+
 pub struct PacmanPkgbuild {
     pub pkgname: String,
     pub pkgver: String,
@@ -248,6 +249,8 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "x86_64".to_string(),
+            maintainer: String::new(),
             depends,
             description,
             priority,

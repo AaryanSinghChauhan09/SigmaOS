@@ -91,6 +91,16 @@ impl SystemThread {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct TaskId(pub u64);
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
+}
+
 pub struct WorkItem {
     pub work_id: usize,
     pub is_processed: AtomicBool,

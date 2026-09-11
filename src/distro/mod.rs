@@ -1,6 +1,7 @@
 pub mod omarchy;
-pub use omarchy::{
+pub mod omarchy_inspiration;
 pub mod parrot_security;
+pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
     OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
@@ -116,13 +117,6 @@ pub use void_runit::{
     RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
 };
 pub mod sovereign_distro_dominance;
-pub mod future_roadmap_innovations;
-
-pub use future_roadmap_innovations::{
-    ClusteredDevicePoolEngine, ClusteredPooledDevice, CryptographicBootChainEngine,
-    NetworkNativeSessionEngine, NetworkSessionState, PoolDeviceKind, ShardAppManifest,
-    ShardsMarketplaceEngine, TemporalFilesystemEngine, TemporalSnapshot,
-};
 
 pub use arch_parity::{
     AlpmDatabase, ArchArchinstallEngine, ArchArchwebEngine, ArchCdevtoolsEngine, ArchPkgctlEngine,

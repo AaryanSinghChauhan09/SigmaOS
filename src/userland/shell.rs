@@ -51,7 +51,13 @@ pub enum ShellCommand {
     Redirect(Box<ShellCommand>, Redirect),
 }
 
-/// Legacy alias for backward compatibility
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StreamTarget {
+    Stdout,
+    Stderr,
+    File,
+    Fd(u32),
+}
 
 /// Target stream binding for file descriptor redirection
 #[derive(Debug, Clone, PartialEq, Eq)]

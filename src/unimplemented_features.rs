@@ -1798,8 +1798,8 @@ mod tests {
 
     #[test]
     fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8 };
-        let mmio = ModernMmioController { mmio_base: 0xFE00_0000 };
+        let pio = SpecLegacyPioController { port_base: 0x3F8, power_state: PowerState::D0Active };
+        let mmio = SpecModernMmioController { mmio_base: 0xFE00_0000, power_state: PowerState::D0Active };
 
         assert_eq!(pio.read_register(0), 0x3F8);
         assert_eq!(mmio.read_register(0), 0xFE00_0000);
@@ -1812,11 +1812,11 @@ mod tests {
 
     #[test]
     fn test_zero_allocation_udf_bytecode_vm() {
-        let mut vm = UdfVm::new();
+        let mut vm = SpecUdfVm::new();
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
-            UdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
+            SpecUdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
+            SpecUdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
+            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
         ];
         let res = vm.execute(&code).unwrap();
         assert_eq!(res, 0x3F8 + 10);
@@ -1824,17 +1824,17 @@ mod tests {
 
     #[test]
     fn test_constraint_sat_solver() {
-        let mut solver = ConstraintSatSolver::new();
+        let solver = ConstraintSatSolver::new();
         let nodes = [
-            PackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
-            PackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
+            SpecPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
+            SpecPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
         ];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 
     #[test]
     fn test_jbd2_transactional_ledger() {
-        let mut ledger = Jbd2TransactionLedger::new();
+        let mut ledger = SpecJbd2TransactionLedger::new();
         let tx_id = ledger.write_transaction(0x1000, &[1, 2, 3, 4]).unwrap();
         assert_eq!(tx_id, 1);
         assert_eq!(ledger.head, 1);
@@ -1846,22 +1846,22 @@ mod tests {
     #[test]
     fn test_sigmaos_component_inspection_suite() {
         // Inspect & verify zero-allocation VM bytecode execution
-        let mut vm = UdfVm::new();
+        let mut vm = SpecUdfVm::new();
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            UdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },
+            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 },
+            SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },
+            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
         ];
         assert_eq!(vm.execute(&code).unwrap(), 150);
 
         // Inspect & verify JBD2 crash transaction ledger
-        let mut ledger = Jbd2TransactionLedger::new();
+        let mut ledger = SpecJbd2TransactionLedger::new();
         assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);
         assert_eq!(ledger.head, 1);
 
         // Inspect & verify SAT Solver
         let solver = ConstraintSatSolver::new();
-        let nodes = [PackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
+        let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 }

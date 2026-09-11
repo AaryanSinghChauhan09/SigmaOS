@@ -2,6 +2,8 @@
 // Core library for SigmaOS operating system
 #![allow(ambiguous_glob_reexports)]
 
+extern crate alloc;
+
 // Core working modules
 pub mod open_source_os_gap_closure;
 pub mod accessibility;
@@ -100,6 +102,15 @@ pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
+pub mod distro;
+pub mod plugin;
+pub mod community;
+
+pub use crate::driver as drivers;
+pub use crate::hardware::win32 as windows_compat;
+pub use crate::security::pqc_enclave;
+pub use crate::security::governance;
+pub use crate::sigpkg::universal_oop_system as universal_support;
 
 pub use distro::{
     missing_distro_innovations::{
@@ -219,10 +230,7 @@ pub mod virtualization;
 pub mod interrupt;
 
 
-pub mod hardware {
-    pub mod compatibility;
-    pub mod win32;
-}
+pub mod hardware;
 pub mod power {
     pub mod governor;
 }

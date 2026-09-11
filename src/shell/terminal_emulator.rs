@@ -1308,6 +1308,40 @@ impl TerminalSession {
     /// - \x1B[0m (Reset SGR)
     /// Parses Operating System Commands (OSC) sequences (e.g., OSC 0/2 for title, OSC 8 for hyperlinks)
     /// Converts an AnsiColor enum value to exact RGB representation based on active TerminalTheme
+    pub fn parse_ansi(&mut self, seq: &str) {
+        if seq == "\x1B[31m" {
+            self.foreground = AnsiColor::Red;
+        } else if seq == "\x1B[42m" {
+            self.background = AnsiColor::Green;
+        } else if seq == "\x1B[1m" {
+            self.bold = true;
+        } else if seq == "\x1B[0m" {
+            self.foreground = AnsiColor::Default;
+            self.background = AnsiColor::Default;
+            self.bold = false;
+        } else if seq.starts_with("\x1B[38;5;") {
+            if let Ok(val) = seq.trim_start_matches("\x1B[38;5;").trim_end_matches('m').parse::<u8>() {
+                self.foreground = AnsiColor::Xterm256(val);
+            }
+        } else if seq.starts_with("\x1B[48;5;") {
+            if let Ok(val) = seq.trim_start_matches("\x1B[48;5;").trim_end_matches('m').parse::<u8>() {
+                self.background = AnsiColor::Xterm256(val);
+            }
+        } else if seq.starts_with("\x1B[") && seq.ends_with('A') {
+            let num = seq[2..seq.len()-1].parse::<usize>().unwrap_or(1);
+            self.cursor_y = self.cursor_y.saturating_sub(num);
+        } else if seq.starts_with("\x1B[") && seq.ends_with('B') {
+            let num = seq[2..seq.len()-1].parse::<usize>().unwrap_or(1);
+            self.cursor_y = (self.cursor_y + num).min(self.height - 1);
+        } else if seq.starts_with("\x1B[") && seq.ends_with('C') {
+            let num = seq[2..seq.len()-1].parse::<usize>().unwrap_or(1);
+            self.cursor_x = (self.cursor_x + num).min(self.width - 1);
+        } else if seq.starts_with("\x1B[") && seq.ends_with('D') {
+            let num = seq[2..seq.len()-1].parse::<usize>().unwrap_or(1);
+            self.cursor_x = self.cursor_x.saturating_sub(num);
+        }
+    }
+
     pub fn get_color_rgb(&self, color: AnsiColor) -> (u8, u8, u8) {
         match color {
             AnsiColor::Default => self.theme.foreground,

@@ -13,8 +13,8 @@ use std::string::String;
 use std::vec::Vec;
 
 // Re-export for other modules
-// pub use crate::kernel::structures::Task;
-// pub use crate::kernel::structures::TaskId;
+pub use crate::kernel::structures::Task;
+pub use crate::kernel::structures::TaskId;
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

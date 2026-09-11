@@ -52,7 +52,7 @@ pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
     AlpmHook, AlpineApkCachePeerSyncEngine, AlternativeGroup, AlternativeProvider,
-    ApkPackageChunk, AptPackageCandidate, AptPinRule, ArchAlpmHookTransactionEngine,
+    ApkPackageChunk, AptPackageCandidate, ArchAlpmHookTransactionEngine,
     BsdPkgDbStorageEngine, BsdPkgRecord, CachePeerNode, DebianAptPinningEngine,
     FreeBsdPkgMessageNotifierEngine, GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
     OpenBsdPledgeUnveilSandboxScriptletEngine, OstreeDeploymentPin, OstreeLayer, PkgMessage,

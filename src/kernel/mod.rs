@@ -55,11 +55,15 @@ pub mod sched;
 pub mod scheduler;
 pub mod missing_linux_kernel_components;
 pub mod structures;
+pub mod virtual_cpu;
+pub mod vmm_paging;
 
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, KernelAuditRecord, KernelAuditRecordType,
-    LinuxKernelAuditSubsystemEngine, UffdFaultEvent, UffdMode, UffdRegisteredRange,
-    UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
+    LinuxFanotifyEngine, LinuxFutex2WaitvEngine, LinuxKernelAuditSubsystemEngine,
+    LinuxKernelSamepageMergingEngine, SovereignMissingLinuxKernelComponentsSuite,
+    UffdFaultEvent, UffdMode, UffdRegisteredRange, UserfaultfdSubsystemEngine,
+    VirtioBalloonDriverEngine,
 };
 pub mod traits;
 
@@ -106,8 +110,6 @@ pub mod sigma_timer;
 pub mod sigma_workqueue;
 pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
-pub mod missing_linux_kernel_components;
-pub use missing_linux_kernel_components::*;
 
 pub mod linux_kernel_parity_synthesis;
 pub use linux_kernel_parity_synthesis::{

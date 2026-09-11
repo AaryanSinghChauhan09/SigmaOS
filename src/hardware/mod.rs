@@ -2,6 +2,7 @@
 
 pub mod compatibility;
 pub mod tech_powerup_hardware_monitors;
+pub mod win32;
 
 pub use compatibility::{
     AcpiLoadBalancer, AcpiPowerState, CompatibilityCheck, CompatibilityError, CompatibilityReport,

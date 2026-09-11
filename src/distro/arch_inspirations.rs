@@ -14,9 +14,6 @@
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 
 // ── Rolling release model ─────────────────────────────────────────────────────
 
