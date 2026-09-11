@@ -11,8 +11,6 @@ use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::klib::HashMap;
-#[cfg(test)]
-use std::collections::HashMap;
 
 // =========================================================================
 // 1. LINUX-STYLE EXPORT_SYMBOL REGISTRY

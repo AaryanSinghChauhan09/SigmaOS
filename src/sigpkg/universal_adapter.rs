@@ -1729,6 +1729,18 @@ impl UniversalDependencyMapper {
             "mesa" | "mesa-dev" | "mesa-libgl-devel" | "media-libs/mesa" => "mesa".to_string(),
             "git" | "git-base" | "dev-vcs/git" => "git".to_string(),
             "cmake" | "dev-build/cmake" => "cmake".to_string(),
+            "ffmpeg" | "libffmpeg-dev" | "media-video/ffmpeg" => "ffmpeg".to_string(),
+            "rust" | "rustc" | "dev-lang/rust" => "rust".to_string(),
+            "golang" | "go" | "dev-lang/go" => "go".to_string(),
+            "ninja" | "ninja-build" | "dev-build/ninja" => "ninja".to_string(),
+            "systemd" | "systemd-sysv" | "sys-apps/systemd" => "systemd".to_string(),
+            "fastfetch" | "neofetch" => "fastfetch".to_string(),
+            "btop" | "htop" => "btop".to_string(),
+            "ripgrep" | "rg" => "ripgrep".to_string(),
+            "bat" | "cat" => "bat".to_string(),
+            "fd" | "fd-find" => "fd".to_string(),
+            "zoxide" => "zoxide".to_string(),
+            "eza" | "exa" => "eza".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2413,6 +2425,115 @@ impl UniversalFormatConverter {
                         &parsed.package,
                         &parsed.version,
                         &parsed.description,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Pkg | PackageFormat::Ports => {
+                if text.contains("@name") {
+                    let obs = adapter
+                        .parse_openbsd_contents(&text)
+                        .map_err(|e: &'static str| e.to_string())?;
+                    let canonical_deps: Vec<String> = obs
+                        .depends
+                        .iter()
+                        .map(|d| self.dep_mapper.to_canonical_name(d))
+                        .collect();
+                    adapter
+                        .translate_to_native_package(
+                            &obs.pkgname,
+                            &obs.version,
+                            &obs.comment,
+                            &canonical_deps,
+                        )
+                        .map_err(|e: &'static str| e.to_string())
+                } else {
+                    let bsd = adapter
+                        .parse_freebsd_ucl_manifest(&text)
+                        .map_err(|e: &'static str| e.to_string())?;
+                    let canonical_deps: Vec<String> = bsd
+                        .deps
+                        .iter()
+                        .map(|d| self.dep_mapper.to_canonical_name(d))
+                        .collect();
+                    adapter
+                        .translate_to_native_package(
+                            &bsd.name,
+                            &bsd.version,
+                            &bsd.comment,
+                            &canonical_deps,
+                        )
+                        .map_err(|e: &'static str| e.to_string())
+                }
+            }
+            PackageFormat::Zypper => {
+                let zyp = adapter
+                    .parse_zypper_spec(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = zyp
+                    .requires
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &zyp.name,
+                        &zyp.version,
+                        &zyp.summary,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::Pkgsrc => {
+                let net = adapter
+                    .parse_netbsd_pkgsrc(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = net
+                    .depends
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &net.pkgname,
+                        &net.version,
+                        &net.comment,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::SlackBuild | PackageFormat::Txz => {
+                let slk = adapter
+                    .parse_slackware_pkg(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = slk
+                    .slack_required
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &slk.name,
+                        &slk.version,
+                        &slk.description,
+                        &canonical_deps,
+                    )
+                    .map_err(|e: &'static str| e.to_string())
+            }
+            PackageFormat::OpenBsdPkg => {
+                let obs = adapter
+                    .parse_openbsd_contents(&text)
+                    .map_err(|e: &'static str| e.to_string())?;
+                let canonical_deps: Vec<String> = obs
+                    .depends
+                    .iter()
+                    .map(|d| self.dep_mapper.to_canonical_name(d))
+                    .collect();
+                adapter
+                    .translate_to_native_package(
+                        &obs.pkgname,
+                        &obs.version,
+                        &obs.comment,
                         &canonical_deps,
                     )
                     .map_err(|e: &'static str| e.to_string())
