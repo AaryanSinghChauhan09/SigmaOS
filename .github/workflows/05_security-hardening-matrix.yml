@@ -121,7 +121,7 @@ jobs:
 
       - name: Install security tools
         run: |
-          apt-get install -y selinux-policy apparmor-profiles seccomp
+          apt-get install -y selinux-policy-default apparmor-profiles seccomp
 
       - name: Build with ${{ matrix.security }} hardening
         run: |
