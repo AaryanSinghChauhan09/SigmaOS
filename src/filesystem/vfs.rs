@@ -213,17 +213,59 @@ pub struct VirtualFileSystem {
     open_files: Vec<FileHandle>,
     next_fd: i32,
     inode_cache: Vec<(u64, Inode)>,
+    pub inodes: BTreeMap<u64, Inode>,
+    pub root_inode: u64,
+    next_inode_id: u64,
 }
 
 impl VirtualFileSystem {
     pub fn new() -> Self {
+        let mut inodes = BTreeMap::new();
+        let root_inode = Inode {
+            id: 1,
+            file_type: FileType::Directory,
+            size: 0,
+            permissions: 0o755,
+            owner: 0,
+            data: Vec::new(),
+            created_at: 0,
+            modified_at: 0,
+            entries: BTreeMap::new(),
+            link_count: 1,
+            hard_links_count: 1,
+        };
+        inodes.insert(1, root_inode);
+
         Self {
             filesystems: Vec::new(),
             mounts: Vec::new(),
             open_files: Vec::new(),
             next_fd: 3, // 0, 1, 2 are stdin, stdout, stderr
             inode_cache: Vec::new(),
+            inodes,
+            root_inode: 1,
+            next_inode_id: 2,
         }
+    }
+
+    pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let inode = Inode {
+            id,
+            file_type,
+            size: 0,
+            permissions: 0o644,
+            owner,
+            data: Vec::new(),
+            created_at: 0,
+            modified_at: 0,
+            entries: BTreeMap::new(),
+            link_count: 1,
+            hard_links_count: 1,
+        };
+        self.inodes.insert(id, inode);
+        Ok(id)
     }
 
     /// Creates a hard link pointing directly to the same underlying file Inode
@@ -414,8 +456,13 @@ impl VirtualFileSystem {
                 should_delete = true;
             }
         } else {
-            Err(VfsError::BadFileDescriptor)
+            return Err(FsError::NotFound);
         }
+
+        if should_delete {
+            self.inodes.remove(&inode_id);
+        }
+        Ok(())
     }
 
     /// Read from file descriptor
