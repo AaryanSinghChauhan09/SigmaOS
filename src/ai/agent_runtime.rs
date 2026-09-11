@@ -17,7 +17,7 @@ use alloc::string::String;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 use crate::klib::types::*;
-use crate::security::sandbox::{Landlock V5Guard, CapsicumRights};
+use crate::security::sandbox::{LandlockV5Guard, CapsicumRights};
 use crate::kernel::process::{ProcessId, ProcessState};
 
 /// Unique identifier for AI agents in the kernel
@@ -575,11 +575,8 @@ pub enum AgentError {
 
 // Re-export for other modules
 pub use self::{
-    AgentId, AgentCapability, AgentPriority, AgentState,
-    AgentProcess, AgentSandbox, AgentKernelBridge,
-    CrashDump, AgentReport, PluginSpec, Plugin,
-    UserIntent, ConfigDiff, SovereignAgentRuntime,
-    AgentError,
+    AgentCapability, AgentError, AgentId, AgentKernelBridge, AgentPriority, AgentProcess,
+    AgentReport, AgentSandbox, AgentState, CrashDump, Plugin, PluginSpec,
 };
 
 #[cfg(test)]
