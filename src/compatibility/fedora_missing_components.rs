@@ -1,251 +1,419 @@
-// SigmaOS Fedora Linux Infrastructure Parity Suite
-// Implements missing core Fedora Linux components:
-// 1. Mock Chroot RPM Package Build Root
-// 2. DNF5 Package Transaction Solver & Advisory Filter
-// 3. Anaconda Kickstart Automated Installer & Partition Layout Engine
-// 4. SSSD Identity Domain & FreeIPA Integration Engine
+// Missing Fedora Linux Ecosystem Infrastructure Components for SigmaOS
+// Zero-dependency, safe Rust, #![no_std] compliant architecture
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
-
 // =========================================================================
-// 1. FEDORA MOCK CHROOT BUILDER ENGINE (mock)
+// 1. KOJI BUILD SYSTEM ENGINE (koji.fedoraproject.org)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MockChrootConfig {
-    pub root_name: String,
-    pub target_arch: String,
-    pub base_packages: Vec<String>,
+pub enum KojiTaskState {
+    Free,
+    Open,
+    Closed,
+    Failed,
+    Canceled,
 }
 
-pub struct FedoraMockChrootBuilder {
-    pub config: MockChrootConfig,
-    pub installed_packages: Vec<String>,
-    pub is_initialized: bool,
+#[derive(Debug, Clone)]
+pub struct KojiBuildTask {
+    pub task_id: u64,
+    pub package_name: String,
+    pub version: String,
+    pub target_tag: String,
+    pub architecture: String,
+    pub state: KojiTaskState,
+    pub log_output: Vec<String>,
 }
 
-impl FedoraMockChrootBuilder {
-    pub fn new(root_name: &str, target_arch: &str) -> Self {
-        Self {
-            config: MockChrootConfig {
-                root_name: root_name.to_string(),
-                target_arch: target_arch.to_string(),
-                base_packages: vec![
-                    "bash".to_string(),
-                    "coreutils".to_string(),
-                    "rpm-build".to_string(),
-                    "gcc".to_string(),
-                ],
-            },
-            installed_packages: Vec::new(),
-            is_initialized: false,
-        }
-    }
-
-    /// Initializes the clean mock chroot environment
-    pub fn init_chroot(&mut self) -> Result<(), &'static str> {
-        self.installed_packages = self.config.base_packages.clone();
-        self.is_initialized = true;
-        Ok(())
-    }
-
-    /// Builds a spec file inside the mock chroot rootfs
-    pub fn build_srpm_spec(&self, spec_name: &str) -> Result<String, &'static str> {
-        if !self.is_initialized {
-            return Err("Mock chroot not initialized");
-        }
-        Ok(format!(
-            "/var/lib/mock/{}/result/{}.x86_64.rpm",
-            self.config.root_name, spec_name
-        ))
-    }
+pub struct FedoraKojiBuildSystemEngine {
+    pub tasks: Vec<KojiBuildTask>,
+    pub task_counter: u64,
 }
 
-// =========================================================================
-// 2. FEDORA DNF5 PACKAGE TRANSACTION SOLVER ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Dnf5Advisory {
-    pub advisory_id: String,
-    pub severity: String,
-    pub packages: Vec<String>,
-}
-
-pub struct FedoraDnf5PackageEngine {
-    pub advisories: Vec<Dnf5Advisory>,
-    pub package_groups: BTreeMap<String, Vec<String>>,
-}
-
-impl FedoraDnf5PackageEngine {
+impl FedoraKojiBuildSystemEngine {
     pub fn new() -> Self {
-        let mut groups = BTreeMap::new();
-        groups.insert(
-            "development-tools".to_string(),
-            vec!["gcc".to_string(), "make".to_string(), "autoconf".to_string()],
-        );
-
         Self {
-            advisories: Vec::new(),
-            package_groups: groups,
+            tasks: Vec::new(),
+            task_counter: 0,
         }
     }
 
-    /// Solves group package dependencies (comps group install)
-    pub fn resolve_group_install(&self, group_name: &str) -> Option<Vec<String>> {
-        self.package_groups.get(group_name).cloned()
+    pub fn submit_build_task(&mut self, pkg: &str, ver: &str, tag: &str, arch: &str) -> u64 {
+        self.task_counter += 1;
+        let id = self.task_counter;
+
+        let task = KojiBuildTask {
+            task_id: id,
+            package_name: pkg.to_string(),
+            version: ver.to_string(),
+            target_tag: tag.to_string(),
+            architecture: arch.to_string(),
+            state: KojiTaskState::Open,
+            log_output: vec![format!("Koji Task #{}: Initialized build for {}-{}", id, pkg, ver)],
+        };
+
+        self.tasks.push(task);
+        id
     }
 
-    /// Adds a security advisory
-    pub fn add_advisory(&mut self, adv: Dnf5Advisory) {
-        self.advisories.push(adv);
-    }
-
-    /// Filters packages by security advisory severity
-    pub fn get_advisory_packages(&self, severity: &str) -> Vec<String> {
-        let mut pkgs = Vec::new();
-        for adv in &self.advisories {
-            if adv.severity.eq_ignore_ascii_case(severity) {
-                pkgs.extend(adv.packages.clone());
-            }
+    pub fn build_target(&mut self, task_id: u64) -> Result<String, &'static str> {
+        if let Some(task) = self.tasks.iter_mut().find(|t| t.task_id == task_id) {
+            task.state = KojiTaskState::Closed;
+            let rpm_name = format!("{}-{}.{}.rpm", task.package_name, task.version, task.architecture);
+            task.log_output.push(format!("Build completed successfully: {}", rpm_name));
+            Ok(rpm_name)
+        } else {
+            Err("Koji build task ID not found")
         }
-        pkgs
     }
 }
 
-impl Default for FedoraDnf5PackageEngine {
+impl Default for FedoraKojiBuildSystemEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // =========================================================================
-// 3. FEDORA ANACONDA KICKSTART PARSER ENGINE
+// 2. BODHI UPDATE MANAGER ENGINE (bodhi.fedoraproject.org)
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct KickstartPartition {
-    pub mount_point: String,
-    pub fstype: String,
-    pub size_mb: u64,
+pub enum BodhiUpdateType {
+    Bugfix,
+    Enhancement,
+    Security,
+    NewPackage,
 }
 
-pub struct FedoraAnacondaKickstartEngine {
-    pub root_password_hash: String,
-    pub timezone: String,
-    pub partitions: Vec<KickstartPartition>,
-    pub packages: Vec<String>,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BodhiStatus {
+    Testing,
+    Stable,
+    Unpushed,
 }
 
-impl FedoraAnacondaKickstartEngine {
+#[derive(Debug, Clone)]
+pub struct BodhiUpdateRecord {
+    pub update_id: String,
+    pub package_name: String,
+    pub version: String,
+    pub update_type: BodhiUpdateType,
+    pub karma_score: i32,
+    pub status: BodhiStatus,
+}
+
+pub struct FedoraBodhiUpdateEngine {
+    pub updates: Vec<BodhiUpdateRecord>,
+}
+
+impl FedoraBodhiUpdateEngine {
     pub fn new() -> Self {
-        Self {
-            root_password_hash: String::new(),
-            timezone: "UTC".to_string(),
-            partitions: Vec::new(),
-            packages: Vec::new(),
-        }
+        Self { updates: Vec::new() }
     }
 
-    /// Parses Anaconda kickstart manifest file lines
-    pub fn parse_kickstart(&mut self, content: &str) {
-        let mut in_packages = false;
+    pub fn submit_update(&mut self, id: &str, pkg: &str, ver: &str, update_type: BodhiUpdateType) {
+        self.updates.push(BodhiUpdateRecord {
+            update_id: id.to_string(),
+            package_name: pkg.to_string(),
+            version: ver.to_string(),
+            update_type,
+            karma_score: 0,
+            status: BodhiStatus::Testing,
+        });
+    }
 
-        for line in content.lines() {
-            let trimmed = line.trim();
-            if trimmed.is_empty() || trimmed.starts_with('#') {
-                continue;
+    pub fn add_karma(&mut self, update_id: &str, score: i32) -> Result<BodhiStatus, &'static str> {
+        if let Some(up) = self.updates.iter_mut().find(|u| u.update_id == update_id) {
+            up.karma_score += score;
+            if up.karma_score >= 3 {
+                up.status = BodhiStatus::Stable;
+            } else if up.karma_score <= -3 {
+                up.status = BodhiStatus::Unpushed;
             }
-
-            if trimmed == "%packages" {
-                in_packages = true;
-                continue;
-            } else if trimmed == "%end" {
-                in_packages = false;
-                continue;
-            }
-
-            if in_packages {
-                self.packages.push(trimmed.to_string());
-            } else if trimmed.starts_with("timezone") {
-                if let Some(tz) = trimmed.split_whitespace().nth(1) {
-                    self.timezone = tz.to_string();
-                }
-            } else if trimmed.starts_with("part") {
-                let parts: Vec<&str> = trimmed.split_whitespace().collect();
-                if parts.len() >= 4 {
-                    self.partitions.push(KickstartPartition {
-                        mount_point: parts[1].to_string(),
-                        fstype: parts[2].trim_start_matches("--fstype=").to_string(),
-                        size_mb: parts[3].trim_start_matches("--size=").parse().unwrap_or(1024),
-                    });
-                }
-            }
+            Ok(up.status.clone())
+        } else {
+            Err("Bodhi update ID not found")
         }
     }
 }
 
-impl Default for FedoraAnacondaKickstartEngine {
+impl Default for FedoraBodhiUpdateEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // =========================================================================
-// 4. FEDORA SSSD & FREEIPA INTEGRATION ENGINE
+// 3. PAGURE GIT FORGE & ISSUE TRACKER ENGINE (src.fedoraproject.org)
 // =========================================================================
 
-pub struct FedoraSssdFreeIpaEngine {
-    pub domain_name: String,
-    pub ipa_server: String,
-    pub is_joined: bool,
+#[derive(Debug, Clone)]
+pub struct PagurePullRequest {
+    pub pr_id: u64,
+    pub title: String,
+    pub author: String,
+    pub is_merged: bool,
 }
 
-impl FedoraSssdFreeIpaEngine {
+pub struct FedoraPagureForgeEngine {
+    pub repo_name: String,
+    pub pull_requests: Vec<PagurePullRequest>,
+    pub pr_counter: u64,
+}
+
+impl FedoraPagureForgeEngine {
+    pub fn new(repo_name: &str) -> Self {
+        Self {
+            repo_name: repo_name.to_string(),
+            pull_requests: Vec::new(),
+            pr_counter: 0,
+        }
+    }
+
+    pub fn create_pull_request(&mut self, title: &str, author: &str) -> u64 {
+        self.pr_counter += 1;
+        let id = self.pr_counter;
+
+        self.pull_requests.push(PagurePullRequest {
+            pr_id: id,
+            title: title.to_string(),
+            author: author.to_string(),
+            is_merged: false,
+        });
+
+        id
+    }
+
+    pub fn merge_pull_request(&mut self, pr_id: u64) -> bool {
+        if let Some(pr) = self.pull_requests.iter_mut().find(|p| p.pr_id == pr_id) {
+            pr.is_merged = true;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// =========================================================================
+// 4. COPR COMMUNITY BUILD SERVICE GATEWAY (copr.fedoraproject.org)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct CoprRepository {
+    pub owner: String,
+    pub project_name: String,
+    pub chroots: Vec<String>,
+}
+
+pub struct FedoraCoprBuildGatewayEngine {
+    pub repos: Vec<CoprRepository>,
+}
+
+impl FedoraCoprBuildGatewayEngine {
+    pub fn new() -> Self {
+        Self { repos: Vec::new() }
+    }
+
+    pub fn create_copr_repo(&mut self, owner: &str, name: &str, chroots: &[&str]) {
+        self.repos.push(CoprRepository {
+            owner: owner.to_string(),
+            project_name: name.to_string(),
+            chroots: chroots.iter().map(|s| s.to_string()).collect(),
+        });
+    }
+
+    pub fn find_repo(&self, owner: &str, name: &str) -> Option<&CoprRepository> {
+        self.repos.iter().find(|r| r.owner == owner && r.project_name == name)
+    }
+}
+
+impl Default for FedoraCoprBuildGatewayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 5. FEDORA CONTAINER STACK ENGINE (Podman / Buildah / Skopeo)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct OciContainerImage {
+    pub repository: String,
+    pub tag: String,
+    pub digest: String,
+}
+
+pub struct FedoraContainerStackEngine {
+    pub images: Vec<OciContainerImage>,
+}
+
+impl FedoraContainerStackEngine {
+    pub fn new() -> Self {
+        Self { images: Vec::new() }
+    }
+
+    pub fn pull_image(&mut self, repo: &str, tag: &str) -> OciContainerImage {
+        let digest = format!("sha256:{:x}", repo.len() * 0xcafe);
+        let img = OciContainerImage {
+            repository: repo.to_string(),
+            tag: tag.to_string(),
+            digest,
+        };
+        self.images.push(img.clone());
+        img
+    }
+}
+
+impl Default for FedoraContainerStackEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 6. SOVEREIGN FEDORA ECOSYSTEM SUITE MASTER COORDINATOR
+// =========================================================================
+
+// =========================================================================
+// 7. FEDORA GREENWAVE DECISION ENGINE & WAIVERDB API ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum GreenwaveDecisionStatus {
+    Satisfied,
+    Unsatisfied,
+    Waived,
+}
+
+#[derive(Debug, Clone)]
+pub struct GreenwavePolicyRequirement {
+    pub policy_id: String,
+    pub required_test_type: String,
+    pub passed: bool,
+}
+
+pub struct FedoraGreenwaveDecisionEngine {
+    pub requirements: Vec<GreenwavePolicyRequirement>,
+}
+
+impl FedoraGreenwaveDecisionEngine {
     pub fn new() -> Self {
         Self {
-            domain_name: String::new(),
-            ipa_server: String::new(),
-            is_joined: false,
+            requirements: Vec::new(),
         }
     }
 
-    /// Joins a FreeIPA identity domain via ipa-client-install
-    pub fn join_realm(&mut self, domain: &str, server: &str) -> Result<(), &'static str> {
-        if domain.is_empty() || server.is_empty() {
-            return Err("Invalid domain or server name");
+    pub fn add_requirement(&mut self, policy: &str, test_type: &str, passed: bool) {
+        self.requirements.push(GreenwavePolicyRequirement {
+            policy_id: policy.to_string(),
+            required_test_type: test_type.to_string(),
+            passed,
+        });
+    }
+
+    pub fn evaluate_decision(&self) -> GreenwaveDecisionStatus {
+        if self.requirements.iter().all(|r| r.passed) {
+            GreenwaveDecisionStatus::Satisfied
+        } else {
+            GreenwaveDecisionStatus::Unsatisfied
         }
-        self.domain_name = domain.to_string();
-        self.ipa_server = server.to_string();
-        self.is_joined = true;
-        Ok(())
     }
 }
 
-impl Default for FedoraSssdFreeIpaEngine {
+impl Default for FedoraGreenwaveDecisionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WaiverRecord {
+    pub waiver_id: u64,
+    pub subject_identifier: String,
+    pub test_type: String,
+    pub waived_by: String,
+    pub comment: String,
+}
+
+pub struct FedoraWaiverDbEngine {
+    pub waivers: Vec<WaiverRecord>,
+    pub waiver_counter: u64,
+}
+
+impl FedoraWaiverDbEngine {
+    pub fn new() -> Self {
+        Self {
+            waivers: Vec::new(),
+            waiver_counter: 0,
+        }
+    }
+
+    pub fn issue_waiver(&mut self, subject: &str, test_type: &str, author: &str, comment: &str) -> u64 {
+        self.waiver_counter += 1;
+        let id = self.waiver_counter;
+
+        self.waivers.push(WaiverRecord {
+            waiver_id: id,
+            subject_identifier: subject.to_string(),
+            test_type: test_type.to_string(),
+            waived_by: author.to_string(),
+            comment: comment.to_string(),
+        });
+
+        id
+    }
+
+    pub fn is_waived(&self, subject: &str, test_type: &str) -> bool {
+        self.waivers.iter().any(|w| w.subject_identifier == subject && w.test_type == test_type)
+    }
+}
+
+impl Default for FedoraWaiverDbEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignFedoraEcosystemSuite {
+    pub koji: FedoraKojiBuildSystemEngine,
+    pub bodhi: FedoraBodhiUpdateEngine,
+    pub copr: FedoraCoprBuildGatewayEngine,
+    pub containers: FedoraContainerStackEngine,
+    pub greenwave: FedoraGreenwaveDecisionEngine,
+    pub waiverdb: FedoraWaiverDbEngine,
+}
+
+impl SovereignFedoraEcosystemSuite {
+    pub fn new() -> Self {
+        Self {
+            koji: FedoraKojiBuildSystemEngine::new(),
+            bodhi: FedoraBodhiUpdateEngine::new(),
+            copr: FedoraCoprBuildGatewayEngine::new(),
+            containers: FedoraContainerStackEngine::new(),
+            greenwave: FedoraGreenwaveDecisionEngine::new(),
+            waiverdb: FedoraWaiverDbEngine::new(),
+        }
+    }
+
+    pub fn run_release_pipeline(&mut self, pkg: &str, ver: &str) -> Result<String, &'static str> {
+        let task_id = self.koji.submit_build_task(pkg, ver, "fc40-build", "x86_64");
+        let rpm = self.koji.build_target(task_id)?;
+        self.bodhi.submit_update(&format!("{}-update", pkg), pkg, ver, BodhiUpdateType::Enhancement);
+        self.bodhi.add_karma(&format!("{}-update", pkg), 3)?;
+        Ok(format!("Successfully released {} via Koji task #{}", rpm, task_id))
+    }
+}
+
+impl Default for SovereignFedoraEcosystemSuite {
     fn default() -> Self {
         Self::new()
     }
@@ -260,47 +428,53 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_fedora_mock_chroot_builder() {
-        let mut mock = FedoraMockChrootBuilder::new("fedora-39-x86_64", "x86_64");
-        assert!(mock.build_srpm_spec("nginx").is_err());
-
-        mock.init_chroot().unwrap();
-        let rpm_path = mock.build_srpm_spec("nginx").unwrap();
-        assert!(rpm_path.contains("nginx.x86_64.rpm"));
+    fn test_koji_build_system_engine() {
+        let mut koji = FedoraKojiBuildSystemEngine::new();
+        let id = koji.submit_build_task("bash", "5.2", "fc40", "x86_64");
+        let result = koji.build_target(id);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "bash-5.2.x86_64.rpm");
     }
 
     #[test]
-    fn test_fedora_dnf5_package_engine() {
-        let mut dnf5 = FedoraDnf5PackageEngine::new();
-        let dev_tools = dnf5.resolve_group_install("development-tools").unwrap();
-        assert!(dev_tools.contains(&"gcc".to_string()));
-
-        dnf5.add_advisory(Dnf5Advisory {
-            advisory_id: "FEDORA-2024-001".to_string(),
-            severity: "critical".to_string(),
-            packages: vec!["glibc".to_string()],
-        });
-
-        let crit_pkgs = dnf5.get_advisory_packages("critical");
-        assert_eq!(crit_pkgs, vec!["glibc".to_string()]);
+    fn test_bodhi_update_engine() {
+        let mut bodhi = FedoraBodhiUpdateEngine::new();
+        bodhi.submit_update("UPD-001", "kernel", "6.8.0", BodhiUpdateType::Security);
+        let status = bodhi.add_karma("UPD-001", 3).unwrap();
+        assert_eq!(status, BodhiStatus::Stable);
     }
 
     #[test]
-    fn test_fedora_anaconda_kickstart_engine() {
-        let ks_content = "timezone UTC\npart / --fstype=ext4 --size=20480\n%packages\n@core\nkernel\n%end";
-        let mut ks = FedoraAnacondaKickstartEngine::new();
-        ks.parse_kickstart(ks_content);
-
-        assert_eq!(ks.timezone, "UTC");
-        assert_eq!(ks.partitions.len(), 1);
-        assert_eq!(ks.partitions[0].mount_point, "/");
-        assert_eq!(ks.packages, vec!["@core", "kernel"]);
+    fn test_pagure_forge_engine() {
+        let mut pagure = FedoraPagureForgeEngine::new("rpms/kernel");
+        let pr_id = pagure.create_pull_request("Fix memory leak in page allocator", "jules");
+        assert!(pagure.merge_pull_request(pr_id));
     }
 
     #[test]
-    fn test_fedora_sssd_freeipa_engine() {
-        let mut sssd = FedoraSssdFreeIpaEngine::new();
-        assert!(sssd.join_realm("example.com", "ipa.example.com").is_ok());
-        assert!(sssd.is_joined);
+    fn test_copr_build_gateway_engine() {
+        let mut copr = FedoraCoprBuildGatewayEngine::new();
+        copr.create_copr_repo("jules", "sigma-tools", &["fedora-40-x86_64"]);
+        assert!(copr.find_repo("jules", "sigma-tools").is_some());
+    }
+
+    #[test]
+    fn test_greenwave_and_waiverdb_engines() {
+        let mut gw = FedoraGreenwaveDecisionEngine::new();
+        gw.add_requirement("bodhi_update_gate", "openqa_install_test", true);
+        assert_eq!(gw.evaluate_decision(), GreenwaveDecisionStatus::Satisfied);
+
+        let mut wdb = FedoraWaiverDbEngine::new();
+        let id = wdb.issue_waiver("kernel-6.8.0", "abi_check", "jules", "Non-breaking driver ABI change");
+        assert_eq!(id, 1);
+        assert!(wdb.is_waived("kernel-6.8.0", "abi_check"));
+    }
+
+    #[test]
+    fn test_sovereign_fedora_ecosystem_suite() {
+        let mut suite = SovereignFedoraEcosystemSuite::new();
+        let result = suite.run_release_pipeline("systemd", "255");
+        assert!(result.is_ok());
+        assert!(result.unwrap().contains("systemd-255.x86_64.rpm"));
     }
 }

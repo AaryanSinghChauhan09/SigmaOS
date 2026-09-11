@@ -13,7 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 // SigmaOS Distro Improvements - Inspired by leading Linux distributions
 // Each section implements concepts adapted from a specific distribution's innovations.
 
@@ -971,8 +970,213 @@ impl Default for GentooGccCflagsTunerEngine {
     }
 }
 
+// ============================================================================
+// VOID LINUX — XBPS Binary Package Indexer & Delta Solver
+// ============================================================================
+
+/// XBPS package entry for Void Linux parity.
+#[derive(Debug, Clone)]
+pub struct VoidXbpsPackage {
+    pub name: String,
+    pub version: String,
+    pub architecture: String,
+    pub dependencies: Vec<String>,
+    pub installed: bool,
+}
+
+/// Void Linux XBPS binary repository indexer and package manager simulator.
+#[derive(Debug, Clone, Default)]
+pub struct VoidXbpsBinaryPackageEngine {
+    pub registered_packages: Vec<VoidXbpsPackage>,
+    pub repository_url: String,
+}
+
+impl VoidXbpsBinaryPackageEngine {
+    pub fn new() -> Self {
+        let mut engine = Self {
+            registered_packages: Vec::new(),
+            repository_url: "https://alpha.de.repo.voidlinux.org/current".to_string(),
+        };
+        engine.register_package("xbps", "0.59.1", "x86_64", vec![]);
+        engine.register_package("glibc", "2.38", "x86_64", vec![]);
+        engine
+    }
+
+    pub fn register_package(&mut self, name: &str, ver: &str, arch: &str, deps: Vec<&str>) {
+        self.registered_packages.push(VoidXbpsPackage {
+            name: name.to_string(),
+            version: ver.to_string(),
+            architecture: arch.to_string(),
+            dependencies: deps.into_iter().map(|s| s.to_string()).collect(),
+            installed: false,
+        });
+    }
+
+    pub fn install_package(&mut self, name: &str) -> bool {
+        if let Some(pkg) = self.registered_packages.iter_mut().find(|p| p.name == name) {
+            pkg.installed = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn installed_count(&self) -> usize {
+        self.registered_packages.iter().filter(|p| p.installed).count()
+    }
+}
+
+// ============================================================================
+// ALPINE LINUX — Diskless RAM Overlay & apk-world Keeper
+// ============================================================================
+
+/// Alpine Linux diskless RAM-boot volatile tmpfs overlay.
+#[derive(Debug, Clone, Default)]
+pub struct AlpineApkVolatileOverlayEngine {
+    pub world_packages: Vec<String>,
+    pub overlay_size_mb: usize,
+    pub is_diskless: bool,
+}
+
+impl AlpineApkVolatileOverlayEngine {
+    pub fn new() -> Self {
+        Self {
+            world_packages: vec!["alpine-base".to_string(), "busybox".to_string()],
+            overlay_size_mb: 256,
+            is_diskless: true,
+        }
+    }
+
+    pub fn add_to_world(&mut self, pkg: &str) {
+        if !self.world_packages.contains(&pkg.to_string()) {
+            self.world_packages.push(pkg.to_string());
+        }
+    }
+
+    pub fn commit_lbu(&self) -> String {
+        format!("lbu commit: backed up {} world packages to volatile media", self.world_packages.len())
+    }
+}
+
+// ============================================================================
+// FREEBSD — Poudriere Cleanroom Jail Port Builder
+// ============================================================================
+
+/// FreeBSD Poudriere cleanroom jail port build job.
+#[derive(Debug, Clone)]
+pub struct PoudrierePortJob {
+    pub port_origin: String,
+    pub jail_name: String,
+    pub is_successful: bool,
+}
+
+/// FreeBSD Poudriere cleanroom port builder engine.
+#[derive(Debug, Clone, Default)]
+pub struct FreeBsdPoudrierePortBuilder {
+    pub build_jobs: Vec<PoudrierePortJob>,
+    pub target_arch: String,
+}
+
+impl FreeBsdPoudrierePortBuilder {
+    pub fn new() -> Self {
+        Self {
+            build_jobs: Vec::new(),
+            target_arch: "amd64".to_string(),
+        }
+    }
+
+    pub fn submit_job(&mut self, origin: &str, jail: &str) {
+        self.build_jobs.push(PoudrierePortJob {
+            port_origin: origin.to_string(),
+            jail_name: jail.to_string(),
+            is_successful: false,
+        });
+    }
+
+    pub fn execute_bulk_build(&mut self) -> usize {
+        let mut count = 0;
+        for job in &mut self.build_jobs {
+            job.is_successful = true;
+            count += 1;
+        }
+        count
+    }
+}
+
+// ============================================================================
+// OPENBSD — Pledge & Unveil Security Governor
+// ============================================================================
+
+/// OpenBSD Pledge promises bitmask/governor.
+#[derive(Debug, Clone, Default)]
+pub struct OpenBsdPledgeUnveilSecurityGovernor {
+    pub promises: Vec<String>,
+    pub unveiled_paths: Vec<(String, String)>, // (path, permissions "r", "rw", "rwx")
+}
+
+impl OpenBsdPledgeUnveilSecurityGovernor {
+    pub fn new() -> Self {
+        Self {
+            promises: vec!["stdio".to_string(), "rpath".to_string()],
+            unveiled_paths: Vec::new(),
+        }
+    }
+
+    pub fn pledge(&mut self, promises: &str) {
+        for prom in promises.split_whitespace() {
+            if !self.promises.contains(&prom.to_string()) {
+                self.promises.push(prom.to_string());
+            }
+        }
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
+    }
+
+    pub fn is_path_accessible(&self, path: &str) -> bool {
+        self.unveiled_paths.iter().any(|(p, _)| path.starts_with(p))
+    }
+}
+
 
 mod tests {
+
+    #[test]
+    fn test_void_xbps_binary_package_engine() {
+        let mut engine = VoidXbpsBinaryPackageEngine::new();
+        assert_eq!(engine.registered_packages.len(), 2);
+        assert!(engine.install_package("xbps"));
+        assert_eq!(engine.installed_count(), 1);
+    }
+
+    #[test]
+    fn test_alpine_apk_volatile_overlay_engine() {
+        let mut alpine = AlpineApkVolatileOverlayEngine::new();
+        alpine.add_to_world("neovim");
+        assert_eq!(alpine.world_packages.len(), 3);
+        assert!(alpine.commit_lbu().contains("3 world packages"));
+    }
+
+    #[test]
+    fn test_freebsd_poudriere_port_builder() {
+        let mut poudriere = FreeBsdPoudrierePortBuilder::new();
+        poudriere.submit_job("sysutils/tmux", "140amd64-default");
+        assert_eq!(poudriere.build_jobs.len(), 1);
+        assert_eq!(poudriere.execute_bulk_build(), 1);
+        assert!(poudriere.build_jobs[0].is_successful);
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil_security_governor() {
+        let mut governor = OpenBsdPledgeUnveilSecurityGovernor::new();
+        governor.pledge("wpath cpath");
+        assert!(governor.promises.contains(&"wpath".to_string()));
+
+        governor.unveil("/var/log", "rw");
+        assert!(governor.is_path_accessible("/var/log/syslog"));
+        assert!(!governor.is_path_accessible("/etc/shadow"));
+    }
 
     #[test]
     fn test_gentoo_gcc_cflags_tuner_engine() {
