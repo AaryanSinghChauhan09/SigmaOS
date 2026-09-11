@@ -446,6 +446,37 @@ where
     }
 }
 
+pub struct IntoIter<K, V> {
+    entries: Vec<(K, V)>,
+}
+
+impl<K, V> Iterator for IntoIter<K, V> {
+    type Item = (K, V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.entries.is_empty() {
+            None
+        } else {
+            Some(self.entries.remove(0))
+        }
+    }
+}
+
+impl<K, V> IntoIterator for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = (K, V);
+    type IntoIter = IntoIter<K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        IntoIter {
+            entries: self.entries,
+        }
+    }
+}
+
 #[cfg(test_disabled)]
 mod tests {
     use super::*;
