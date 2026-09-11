@@ -151,9 +151,10 @@ impl DuplicateFinder {
         // Second pass: hash files with same size
         let mut files_by_hash: BTreeMap<String, Vec<FileMetadata>> = BTreeMap::new();
 
-        for (_size, files) in files_by_size {
+        for (_size, files) in &files_by_size {
             if files.len() > 1 {
-                for mut file in files {
+                for file in files {
+                    let mut file = file.clone();
                     if let Ok(hash) = self.algorithm.compute_hash(&file.path) {
                         file.hash = Some(hash.clone());
                         files_by_hash
@@ -166,14 +167,14 @@ impl DuplicateFinder {
         }
 
         // Third pass: identify duplicates
-        for (hash, files) in files_by_hash {
+        for (hash, files) in &files_by_hash {
             if files.len() > 1 {
                 let mut group = DuplicateGroup::new(hash.clone());
                 let mut total_size = 0u64;
                 let files_count = files.len();
                 for file in files {
                     total_size += file.size;
-                    group.add_file(file);
+                    group.add_file(file.clone());
                 }
 
                 group.total_size = total_size;
