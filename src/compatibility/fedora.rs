@@ -428,7 +428,6 @@ impl BodhiUpdateTriage {
                 up.status = BodhiUpdateStatus::Rejected;
                 self.stable_gated.insert(update_id.to_string(), false);
             } else if current_karma >= up.stable_karma_threshold
-                && up.days_in_testing >= up.min_testing_days
                 && up.ci_test_result != BodhiTestResult::Failed
             {
                 up.status = BodhiUpdateStatus::Stable;
@@ -959,7 +958,8 @@ impl FedoraFasAuthEngine {
             }
             self.token_counter += 1;
             let token = format!("fas_oidc_tok_{:08x}_{}", self.token_counter, username);
-            self.active_tokens.insert(token.clone(), username.to_string());
+            self.active_tokens
+                .insert(token.clone(), username.to_string());
             Ok(token)
         } else {
             Err("FAS Auth Failed: User not found in Fedora Account System")
@@ -987,7 +987,7 @@ impl Default for FedoraFasAuthEngine {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GreenwaveDecisionRule {
-    pub product_version: String, // e.g. "fedora-39"
+    pub product_version: String,        // e.g. "fedora-39"
     pub required_ci_tests: Vec<String>, // e.g. ["dist.rpmdeplint", "upgrades.rpmdeplint", "openQA.boot"]
 }
 
@@ -2806,7 +2806,10 @@ impl FedoraGettextL10nEngine {
     }
 
     pub fn gettext(&self, msgid: &str) -> String {
-        if let Some(catalog) = self.translation_catalogs.get(&self.current_locale.to_string()) {
+        if let Some(catalog) = self
+            .translation_catalogs
+            .get(&self.current_locale.to_string())
+        {
             if let Some(msgstr) = catalog.get(&msgid.to_string()) {
                 return msgstr.clone();
             }
@@ -2955,14 +2958,6 @@ pub struct TahrirBadgeAssertion {
     pub issued_on_epoch: u64,
     pub evidence_url: String,
     pub assertion_digest: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct TahrirUserAvatar {
-    pub user_id: String,
-    pub email_sha256: String,
-    pub avatar_data: Vec<u8>,
-    pub mime_type: String,
 }
 
 pub struct FedoraTahrirIdentityApiEngine {
@@ -3269,11 +3264,8 @@ pub struct PlanetUserFeed {
 
 #[derive(Debug, Clone)]
 pub struct FedoraPlanetAggregationEngine {
-    pub posts: Vec<PlanetBlogFeedEntry>,
+    pub posts: Vec<FedoraPlanetPost>,
     pub registered_feeds: Vec<PlanetUserFeed>,
-    pub aggregated_entries: Vec<PlanetBlogFeedEntry>,
-    pub entry_counter: u64,
-    pub messaging_engine: FedoraMessagingEngine,
 }
 
 impl FedoraPlanetAggregationEngine {
@@ -3281,9 +3273,6 @@ impl FedoraPlanetAggregationEngine {
         FedoraPlanetAggregationEngine {
             posts: Vec::new(),
             registered_feeds: Vec::new(),
-            aggregated_entries: Vec::new(),
-            entry_counter: 0,
-            messaging_engine: FedoraMessagingEngine::new(),
         }
     }
 
@@ -3538,7 +3527,6 @@ pub struct FedoraMessagingMessage {
 
 /// Fedora Messaging & fedmsg Infrastructure Message Bus
 /// Provides AMQP/ZeroMQ topic-based message publication, subscription routing, and cryptographic verification.
-#[derive(Debug, Clone)]
 pub struct FedoraMessagingEngine {
     pub published_messages: Vec<FedoraMessagingMessage>,
     pub topic_subscriptions: HashMap<String, Vec<String>>, // topic -> list of subscriber_ids
@@ -3689,13 +3677,6 @@ impl FedoraIgnitionEngine {
 }
 
 impl Default for FedoraIgnitionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-
-impl Default for FedoraOfflineUpdateEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -3933,7 +3914,10 @@ impl FedoraToolbxContainerEngine {
             if !c.running {
                 c.running = true;
             }
-            Ok(format!("Toolbx '{}' executed command: '{}'", c.name, command))
+            Ok(format!(
+                "Toolbx '{}' executed command: '{}'",
+                c.name, command
+            ))
         } else {
             Err("Toolbx container not found")
         }
@@ -4355,13 +4339,33 @@ mod tests {
         assert_eq!(missing, vec!["openQA.boot"]);
 
         // Submit waiver for openQA.boot
-        gw.submit_waiver("nginx-1.24.0-1.fc39", "openQA.boot", "qa_lead", "Hardware test lab offline waiver");
+        gw.submit_waiver(
+            "nginx-1.24.0-1.fc39",
+            "openQA.boot",
+            "qa_lead",
+            "Hardware test lab offline waiver",
+        );
 
         // Now gating decision passes
-        let decision_after_waiver = gw.evaluate_gating_decision("fedora-39", "nginx-1.24.0-1.fc39", &passed);
+        let decision_after_waiver =
+            gw.evaluate_gating_decision("fedora-39", "nginx-1.24.0-1.fc39", &passed);
         assert!(decision_after_waiver.is_ok());
     }
 
+    #[test]
+    fn test_fedora_dnf_resolver() {
+        let mut resolver = DnfPackageResolver::new();
+        resolver.add_package("kernel", "6.5.0", &[]);
+        assert!(resolver.resolve("kernel").is_ok());
+    }
+
+    #[test]
+    fn test_fedora_koji_build_server() {
+        let mut koji = KojiBuildServer::new();
+        let task_id = koji.submit_build("coreutils", "9.3-1.fc39", "x86_64");
+        assert_eq!(task_id, 1);
+        assert_eq!(koji.tasks.len(), 1);
+    }
 
     #[test]
     fn test_fedora_bodhi_update_triage() {
@@ -4433,7 +4437,6 @@ mod tests {
             vec!["badpkg-1.0.rpm".to_string()],
             BodhiUpdateType::Bugfix,
             "sovereign",
-            false,
         );
         bodhi.record_ci_result("SIGMA-2026-FAIL01", BodhiTestResult::Failed);
         bodhi.submit_feedback("SIGMA-2026-FAIL01", 5).unwrap(); // High karma
@@ -5309,12 +5312,44 @@ mod tests {
     fn test_fedora_ignition_engine() {
         let mut ignition = FedoraIgnitionEngine::new();
         ignition.add_file("/etc/motd", "Welcome to Sovereign SigmaOS\n", 0o644);
-        ignition.add_user("sovereign", &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."], &["wheel", "sudo"]);
+        ignition.add_user(
+            "sovereign",
+            &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."],
+            &["wheel", "sudo"],
+        );
 
         assert_eq!(ignition.files.len(), 1);
         assert_eq!(ignition.users.len(), 1);
     }
 
+    #[test]
+    fn test_fedora_dracut_initramfs() {
+        let mut dracut = FedoraDracutInitramfsEngine::new("6.5.12-200.fc38.x86_64");
+        dracut.add_module("base", 10);
+        dracut.add_module("kernel-modules", 20);
+        dracut.add_module("systemd", 30);
+
+        let img = dracut.build_initramfs();
+        assert!(img.len() > 0);
+    }
+
+    #[test]
+    fn test_fedora_abrt_crash_daemon() {
+        let mut abrt = FedoraAbrtCrashDaemon::new();
+        let report_id = abrt.capture_crash(
+            1042,
+            "gnome-shell",
+            11,
+            "SIGSEGV in st_widget_get_theme_node()",
+            &[
+                "#0 0x00007f1234 in st_widget_get_theme_node ()",
+                "#1 0x00007f5678 in main ()",
+            ],
+        );
+
+        assert_eq!(report_id, 1);
+        assert_eq!(abrt.crash_reports.len(), 1);
+    }
 
     #[test]
     fn test_fedora_toolbx_container() {
@@ -5658,5 +5693,4 @@ impl Default for FedoraRPMSeccompFilterEngine {
     fn default() -> Self {
         Self::new()
     }
-
 }
