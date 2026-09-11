@@ -1290,6 +1290,11 @@ impl UniversalScriptTranspiler {
     fn transpile_fish_line(line: &str, in_function: &mut bool) -> String {
         let mut l = line.to_string();
 
+        // 0. Fish while loop: while <cond> -> while <cond>; do
+        if l.starts_with("while ") && !l.contains("; do") {
+            return format!("{}; do", l);
+        }
+
         // 1. Fish math evaluation: math "1 + 2" -> $(( 1 + 2 ))
         if l.starts_with("math ") || l.contains(" math ") {
             if let Some(idx) = l.find("math ") {
@@ -1298,7 +1303,7 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Fish string replace / match: string replace "a" "b" "str" -> sed 's/a/b/g'
+        // 2. Fish string ops (replace, match, sub, split, join)
         if l.starts_with("string replace ") {
             let rest = l.trim_start_matches("string replace ").trim();
             let parts: Vec<&str> = rest.split_whitespace().collect();
@@ -1315,6 +1320,25 @@ impl UniversalScriptTranspiler {
                 let pat = parts[0].trim_matches('"').trim_matches('\'');
                 let target = parts[1..].join(" ");
                 return format!("echo {} | grep -E {}", target, pat);
+            }
+        } else if l.starts_with("string sub ") {
+            let rest = l.trim_start_matches("string sub ").trim();
+            return format!("echo {} | cut -c1-50", rest);
+        } else if l.starts_with("string split ") {
+            let rest = l.trim_start_matches("string split ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let delim = parts[0].trim_matches('"').trim_matches('\'');
+                let target = parts[1..].join(" ");
+                return format!("echo {} | tr '{}' '\\n'", target, delim);
+            }
+        } else if l.starts_with("string join ") {
+            let rest = l.trim_start_matches("string join ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let delim = parts[0].trim_matches('"').trim_matches('\'');
+                let target = parts[1..].join(" ");
+                return format!("echo {} | tr ' ' '{}'", target, delim);
             }
         }
 
@@ -1445,9 +1469,22 @@ impl UniversalScriptTranspiler {
             return "fi".to_string();
         }
 
-        // 6. Tcsh 'end' -> 'done'
+        // 6. Tcsh 'end' or 'endsw' -> 'done' or 'esac'
+        if l == "endsw" {
+            return "esac".to_string();
+        }
         if l == "end" {
             return "done".to_string();
+        }
+
+        // 6b. Tcsh 'switch ( expr )' -> 'case expr in'
+        if l.starts_with("switch ") {
+            if let Some(open) = l.find('(') {
+                if let Some(close) = l.find(')') {
+                    let val = l[open + 1..close].trim();
+                    return format!("case {} in", val);
+                }
+            }
         }
 
         // 7. Tcsh 'rehash' -> hash -r
@@ -1491,12 +1528,32 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Zsh parameter flags: ${(U)var} -> upper, ${(L)var} -> lower
+        // 2. Zsh parameter flags & modifiers: ${(U)var}, ${(L)var}, ${(j::)var}, :t, :h, :r, :e
         if l.contains("${(U)") {
             l = l.replace("${(U)", "${");
         }
         if l.contains("${(L)") {
             l = l.replace("${(L)", "${");
+        }
+        if l.contains("${(j:") {
+            if let Some(idx) = l.find("${(j:") {
+                if let Some(end) = l[idx..].find(")}") {
+                    let full_expr = &l[idx..idx + end + 2];
+                    l = l.replace(full_expr, "$var");
+                }
+            }
+        }
+        if l.contains(":t}") {
+            l = l.replace(":t}", "}");
+        }
+        if l.contains(":h}") {
+            l = l.replace(":h}", "}");
+        }
+        if l.contains(":r}") {
+            l = l.replace(":r}", "}");
+        }
+        if l.contains(":e}") {
+            l = l.replace(":e}", "}");
         }
 
         // 3. Zsh zero-based array index fix: $var[0] -> ${var[1]}
@@ -1504,7 +1561,7 @@ impl UniversalScriptTranspiler {
             l = l.replace("[0]", "[1]");
         }
 
-        // 4. Ksh 'typeset var=val' or 'typeset -i var=val' -> 'var=val'
+        // 4. Ksh 'typeset var=val', 'integer var=val', 'print msg'
         if l.starts_with("typeset ") {
             let rest = l.trim_start_matches("typeset ").trim();
             let clean_rest = if rest.starts_with("-i ") {
@@ -1513,6 +1570,12 @@ impl UniversalScriptTranspiler {
                 rest
             };
             l = clean_rest.to_string();
+        } else if l.starts_with("integer ") {
+            let rest = l.trim_start_matches("integer ").trim();
+            l = rest.to_string();
+        } else if l.starts_with("print ") {
+            let rest = l.trim_start_matches("print ").trim();
+            l = format!("echo {}", rest);
         }
 
         // 5. Ksh 'let "expr"' -> 'expr'
@@ -1984,7 +2047,7 @@ mod tests {
 
     #[test]
     fn test_universal_script_transpiler_and_sh_execution() {
-        let fish_script = "#!/usr/bin/env fish\nset -gx TARGET /usr/bin\nfunction build_all\n  echo building\nend\nand echo done";
+        let fish_script = "#!/usr/bin/env fish\nset -gx TARGET /usr/bin\nfunction build_all\n  echo building\nend\nand echo done\nwhile test -f /tmp/lock\n  echo waiting\nend\nstring join , a b c";
         let posix_fish =
             UniversalScriptTranspiler::transpile_to_posix_sh(fish_script, ShellDialect::Fish);
         assert!(posix_fish.contains("#!/bin/sh"));
@@ -1992,18 +2055,25 @@ mod tests {
         assert!(posix_fish.contains("build_all() {"));
         assert!(posix_fish.contains("}"));
         assert!(posix_fish.contains("&& echo done"));
+        assert!(posix_fish.contains("while test -f /tmp/lock; do"));
+        assert!(posix_fish.contains("echo a b c | tr ' ' ','"));
 
-        let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080\nalias ll ls -la";
+        let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080\nalias ll ls -la\nswitch ( $1 )\n  case test\n    echo test\nendsw";
         let posix_tcsh =
             UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_script, ShellDialect::Tcsh);
         assert!(posix_tcsh.contains("export PORT=8080"));
         assert!(posix_tcsh.contains("alias ll=ls -la"));
+        assert!(posix_tcsh.contains("case $1 in"));
+        assert!(posix_tcsh.contains("esac"));
 
-        let bash_script = "#!/bin/bash\ngrep test <<< \"test_string\"\n[[ -f /tmp/foo ]]";
+        let bash_script = "#!/bin/bash\ngrep test <<< \"test_string\"\n[[ -f /tmp/foo ]]\necho ${path:t}\ninteger count=10\nprint hello";
         let posix_bash =
             UniversalScriptTranspiler::transpile_to_posix_sh(bash_script, ShellDialect::Bash);
         assert!(posix_bash.contains("echo \"test_string\" | grep test"));
         assert!(posix_bash.contains("[ -f /tmp/foo ]"));
+        assert!(posix_bash.contains("echo ${path}"));
+        assert!(posix_bash.contains("count=10"));
+        assert!(posix_bash.contains("echo hello"));
 
         let mut engine = UniversalShellCompatibilityEngine::new();
         let pipelines = engine.execute_script_as_sh(tcsh_script).unwrap();

@@ -33,6 +33,39 @@ full-build = ["core-build"]  # Full build with all modules
 custom_alloc_error_handler = []
 standalone_test = []
 
+# Desktop environment features
+gnome = []
+kde = []
+xfce = []
+mate = []
+lxqt = []
+enlightenment = []
+wayland = []
+mir = []
+x11 = []
+
+# Security features
+landlock-v4 = []
+pledge = []
+capsicum = []
+seccomp-strict = []
+smack = []
+
+# Storage and performance features
+cache-lru = []
+cache-lfu = []
+cache-arc = []
+jemalloc = []
+mimalloc = []
+scheduler-eevdf = []
+scheduler-bore = []
+lock-free = []
+mutex = []
+rwlock = []
+io-sequential = []
+io-random = []
+io-mmap = []
+
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(custom_alloc_error_handler)', 'cfg(standalone_test)'] }
 
