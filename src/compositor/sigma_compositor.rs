@@ -17,6 +17,7 @@ use alloc::collections::BTreeMap;
 use alloc::string::String;
 use core::sync::atomic::{AtomicU64, AtomicBool, Ordering};
 
+use crate::klib::*;
 use crate::ai::agent_runtime::{AgentId, AgentKernelBridge};
 
 /// Compositor instance (singleton per display)
