@@ -246,3 +246,12 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
     SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
 };
+
+pub mod sovereign_distro_outpacing_engine;
+pub use sovereign_distro_outpacing_engine::{
+    BcachefsExtent, DrmSyncobjFrame, DynamicVersionedImageSpec, FreeBsd141JailSpec,
+    PinsyscallRange, SovereignFreeBsd141JailVnetEngine, SovereignLinux612BcachefsTieringEngine,
+    SovereignMasterOutpacingSuite, SovereignOpenBsd76PledgeUnveilAdvancementEngine,
+    SovereignSystemd256ParityAndBeyondEngine, SovereignWayland123ExplicitSyncEngine,
+    StorageDeviceTier, VarlinkIpcMessage,
+};

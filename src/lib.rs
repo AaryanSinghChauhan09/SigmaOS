@@ -91,7 +91,7 @@ pub use distro::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine,
     SovereignJournaldBinaryStorageEngine, SovereignLandlockV5Guard, SovereignSchedExtEngine,
     SovereignStatefulNatEngine, SovereignAheadOfDistrosSuite, SovereignDistroInspirationLeapEngine,
-    SovereignPredictiveSchedExtEngine,
+    SovereignPredictiveSchedExtEngine, SovereignMasterOutpacingSuite,
     SovereignOmniCasStoreEngine, SovereignCrossPlatformCapabilityEngine,
     SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine,
     StoreClosurePackage, SystemGenerationRecord, ZfsPoolState,
