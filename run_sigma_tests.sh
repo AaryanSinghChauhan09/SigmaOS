@@ -60,6 +60,27 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     ./build/arch_missing_test
 fi
 
+if [ -f "src/distro/arch_boxes.rs" ]; then
+    echo "Running Arch Linux Boxes & cloud-init test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_boxes.rs --edition=2021 -o build/arch_boxes_test
+    ./build/arch_boxes_test
+fi
+
+if [ -f "src/distro/arch_gap_closure.rs" ]; then
+    echo "Running Arch Linux gap closure test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_gap_closure.rs --edition=2021 -o build/arch_gap_closure_test
+    ./build/arch_gap_closure_test
+fi
+
+if [ -f "src/distro/arch_ultimate_gap_closure.rs" ]; then
+    echo "Running Arch Linux ultimate gap closure test suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_ultimate_gap_closure.rs --edition=2021 -o build/arch_ultimate_gap_closure_test
+    ./build/arch_ultimate_gap_closure_test
+fi
+
 if [ -f "src/package/universal.rs" ]; then
     echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
