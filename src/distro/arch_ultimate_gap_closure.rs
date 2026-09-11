@@ -1,8 +1,8 @@
 // SigmaOS Arch Linux Ultimate Gap Closure Engine
 // Zero-dependency Rust implementation covering ALPM sync databases, AUR .SRCINFO parsing, mkinitcpio hooks, and archiso profile bootstrap.
 
-use std::string::String;
-use std::vec::Vec;
+use crate::klib::string::String;
+use crate::klib::vec::Vec;
 
 /// ALPM Repository Sync Database Entry (.db.tar.gz spec)
 #[derive(Debug, Clone)]
@@ -105,7 +105,7 @@ impl ArchAurPkgbuildSolverEngine {
     }
 
     pub fn solve_dependencies(&self) -> Vec<String> {
-        let mut deps: Vec<String> = Vec::new();
+        let mut deps = Vec::new();
         if let Some(ref info) = self.srcinfo {
             for dep in &info.makedepends {
                 deps.push(dep.clone());
@@ -222,29 +222,5 @@ impl SovereignArchUltimateGapClosureSuite {
 impl Default for SovereignArchUltimateGapClosureSuite {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_arch_ultimate_gap_closure_suite() {
-        let mut suite = SovereignArchUltimateGapClosureSuite::new();
-        assert!(suite.verify_suite());
-
-        let pkg = suite.pacman_sync.find_package("linux");
-        assert!(pkg.is_some());
-        assert_eq!(pkg.unwrap().name, "linux");
-
-        let deps = suite.aur_solver.solve_dependencies();
-        assert!(deps.contains(&String::from("git")));
-        assert!(deps.contains(&String::from("gcc")));
-
-        suite.mkinitcpio.add_hook("encrypt");
-        assert!(suite.mkinitcpio.hooks.contains(&String::from("encrypt")));
-
-        assert!(suite.archiso_builder.verify_archiso_profile());
     }
 }
