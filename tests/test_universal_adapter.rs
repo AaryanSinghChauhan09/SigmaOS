@@ -1,11 +1,11 @@
 // Integration tests for SigmaOS Universal Package Format Adapter
 extern crate alloc;
 
-#[path = "../src/lib.rs"]
-mod sigmaos;
-
+#[cfg(not(feature = "standalone_test"))]
 use sigmaos::sigpkg::*;
-use sigmaos::sigpkg::Version;
+
+#[cfg(feature = "standalone_test")]
+use crate::sigpkg::*;
 
 #[test]
 fn test_universal_adapter_all_formats() {

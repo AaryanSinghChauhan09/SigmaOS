@@ -132,11 +132,12 @@ jobs:
         if: matrix.storage
         run: |
           sudo apt-get update
-          sudo apt-get install -y e2fsprogs btrfs-progs xfsprogs fio
+          sudo apt-get install -y e2fsprogs btrfs-progs xfsprogs fio zfsutils-linux || true
 
       - name: Prepare filesystem test
         if: matrix.storage
         run: |
+          sudo mkdir -p /mnt/test
           dd if=/dev/zero of=/tmp/test.img bs=1M count=1024
           ${{ matrix.format-cmd }}
           ${{ matrix.mount-cmd }}

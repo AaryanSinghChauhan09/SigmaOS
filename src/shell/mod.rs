@@ -1,6 +1,25 @@
 // src/shell/mod.rs
 // SigmaShell module - Desktop shell interface
-// Pure Nim implementation (no QML/JS dependencies)
+
+pub mod alias_system;
+pub mod busybox_applet;
+pub mod command;
+pub mod intelligent_terminal;
+pub mod kimi_code_agent;
+pub mod multicall;
+pub mod repl;
+pub mod sigma_sh;
+pub mod sovereign_shell_parity;
+pub mod tech_media_shell_innovations;
+pub mod terminal_emulator;
+pub mod zsh_bash_parity;
+
+pub use self::command::{ShellCommand, SimpleShellSession};
+pub use self::sigma_sh::{
+    ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
+    PipelineExecutor, ShellPledgeUnveilGuard, ShellSyntaxHighlighter, ZshPromptFormatter,
+};
+pub use self::repl::ShellRepl;
 
 // FFI bindings to Nim SigmaShell
 extern "C" {

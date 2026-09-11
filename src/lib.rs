@@ -301,7 +301,7 @@ pub use drivers::distro_device_expansion::{
     AppleNvmeAnsDriver, AtherosAr9271WifiDriver, Esp32HciBtBridgeDriver, LogitechUnifyingHidDriver,
     NvidiaNouveauOpenGspDriver, UsbAudioClass2Driver,
 };
-pub use driver::{
+pub use drivers::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
     EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
@@ -316,7 +316,7 @@ pub use driver::{
     ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
-    FileMode, FileType, FsError, Inode, VirtualFilesystem,
+    FileMode, FileType, FsError, Inode, VirtualFileSystem as VirtualFilesystem,
 };
 pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,

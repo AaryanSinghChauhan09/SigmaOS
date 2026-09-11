@@ -381,17 +381,17 @@ impl GuiInstallerWizard {
 
     /// Add custom partition
     pub fn add_custom_partition(&mut self, partition: PartitionEntry) {
+        self.custom_partitions.push(partition);
         self.log(&format!(
             "Added custom partition: {} -> {}",
             partition.device, partition.mount_point
         ));
-        self.custom_partitions.push(partition);
     }
 
     /// Add user account
     pub fn add_user_account(&mut self, user: UserAccount) {
-        self.log(&format!("Added user account: {}", user.username));
         self.user_accounts.push(user);
+        self.log(&format!("Added user account: {}", user.username));
     }
 
     /// Update system configuration
