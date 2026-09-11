@@ -1798,8 +1798,8 @@ mod tests {
 
     #[test]
     fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8 };
-        let mmio = ModernMmioController { mmio_base: 0xFE00_0000 };
+        let pio = LegacyPioController { port_base: 0x3F8, power_state: PowerState::D0Active };
+        let mmio = ModernMmioController { mmio_base: 0xFE00_0000, power_state: PowerState::D0Active };
 
         assert_eq!(pio.read_register(0), 0x3F8);
         assert_eq!(mmio.read_register(0), 0xFE00_0000);
@@ -1810,101 +1810,49 @@ mod tests {
         assert_eq!(mgr.device_count, 2);
     }
 
-    #[test]
-    fn test_zero_allocation_udf_bytecode_vm() {
-        let mut vm = SpecUdfVm::new();
-        let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
-        ];
-        let res = vm.execute(&code).unwrap();
-        assert_eq!(res, 0x3F8 + 10);
-    }
 
-    #[test]
-    fn test_constraint_sat_solver() {
-        let solver = SpecConstraintSatSolver::new();
-        let nodes = [
-            SpecPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
-            SpecPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
-        ];
-        assert!(solver.resolve_satisfiability(&nodes).is_ok());
-    }
-
-    #[test]
-    fn test_jbd2_transactional_ledger() {
-        let mut ledger = SpecJbd2TransactionLedger::new();
-        let tx_id = ledger.write_transaction(0x1000, &[1, 2, 3, 4]).unwrap();
-        assert_eq!(tx_id, 1);
-        assert_eq!(ledger.head, 1);
-
-        ledger.rollback_transaction();
-        assert_eq!(ledger.head, 0);
-    }
-
-    #[test]
-    fn test_sigmaos_component_inspection_suite() {
-        // Inspect & verify zero-allocation VM bytecode execution
-        let mut vm = SpecUdfVm::new();
-        let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
-        ];
-        assert_eq!(vm.execute(&code).unwrap(), 150);
-
-        // Inspect & verify JBD2 crash transaction ledger
-        let mut ledger = SpecJbd2TransactionLedger::new();
-        assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);
-        assert_eq!(ledger.head, 1);
-
-        // Inspect & verify SAT Solver
-        let solver = SpecConstraintSatSolver::new();
-        let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
-        assert!(solver.resolve_satisfiability(&nodes).is_ok());
-    }
 }
 
 // ============================================================================
 // Section 6: Bare-Metal Subsystem Design Specifications
 // ============================================================================
 
-// 6.1 Polymorphic Universal Peripheral Blueprint Specifications
-pub struct LegacyPioSpecController {
+// 6.1 Polymorphic Universal Peripheral Blueprint
+
+pub struct LegacyPioController {
     pub port_base: u16,
     pub power_state: PowerState,
 }
 
-impl LegacyPioSpecController {
-    pub fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    pub fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
-    pub fn write_register(&mut self, _offset: u16, _value: u64) {}
-    pub fn handle_irq(&mut self) -> bool { true }
-    pub fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
-    pub fn get_power_state(&self) -> PowerState { self.power_state }
+impl BareMetalUnifiedPeripheral for LegacyPioController {
+    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
-pub struct ModernMmioSpecController {
+pub struct ModernMmioController {
     pub mmio_base: u64,
     pub power_state: PowerState,
 }
 
-impl ModernMmioSpecController {
-    pub fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    pub fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
-    pub fn write_register(&mut self, _offset: u16, _value: u64) {}
-    pub fn handle_irq(&mut self) -> bool { true }
-    pub fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
-    pub fn get_power_state(&self) -> PowerState { self.power_state }
+impl BareMetalUnifiedPeripheral for ModernMmioController {
+    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+    fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool { true }
+    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
+    fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
-pub struct BareMetalSpecPeripheralManager {
+pub struct BareMetalUnifiedPeripheralManager {
     pub registered_devices: [(u16, u64, bool); 16],
     pub device_count: usize,
 }
 
-impl BareMetalSpecPeripheralManager {
+impl BareMetalUnifiedPeripheralManager {
     pub fn new() -> Self {
         Self {
             registered_devices: [(0, 0, false); 16],
@@ -1920,132 +1868,10 @@ impl BareMetalSpecPeripheralManager {
     }
 }
 
-impl Default for BareMetalSpecPeripheralManager {
+impl Default for BareMetalUnifiedPeripheralManager {
     fn default() -> Self { Self::new() }
 }
 
-// 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
-#[derive(Debug, Clone, Copy)]
-pub struct SpecUdfInstruction {
-    pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
-    pub reg: u8,  // R0 - R7
-    pub addr: u64,
-}
-
-pub struct SpecUdfVm {
-    pub registers: [u64; 8], // R0 - R7
-    pub pc: usize,
-}
-
-impl SpecUdfVm {
-    pub fn new() -> Self {
-        Self {
-            registers: [0; 8],
-            pc: 0,
-        }
-    }
-
-    pub fn execute(&mut self, bytecode: &[SpecUdfInstruction]) -> Result<u64, &'static str> {
-        self.pc = 0;
-        while self.pc < bytecode.len() {
-            let inst = bytecode[self.pc];
-            if inst.reg >= 8 { return Err("Register out of bounds"); }
-            match inst.op {
-                0x10 => self.registers[inst.reg as usize] = inst.addr, // OP_READ
-                0x20 => { /* OP_WRITE */ }
-                0x30 => self.registers[inst.reg as usize] = self.registers[inst.reg as usize].wrapping_add(inst.addr), // OP_ADD
-                0xF0 => return Ok(self.registers[inst.reg as usize]), // OP_HALT
-                _ => return Err("Invalid ISA opcode"),
-            }
-            self.pc += 1;
-        }
-        Ok(self.registers[0])
-    }
-}
-
-impl Default for SpecUdfVm {
-    fn default() -> Self { Self::new() }
-}
-
-// 6.3 Declarative Package Resolution SAT Solver
-#[derive(Debug, Clone, Copy)]
-pub struct SpecPackageNode {
-    pub id: u32,
-    pub version: u32,
-    pub req_min: u32,
-    pub req_max: u32,
-}
-
-pub struct SpecConstraintSatSolver;
-
-impl SpecConstraintSatSolver {
-    pub fn new() -> Self { Self }
-
-    pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
-        for pkg in packages {
-            if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
-                return Err("Constraint conflict detected");
-            }
-        }
-        Ok(true)
-    }
-}
-
-impl Default for SpecConstraintSatSolver {
-    fn default() -> Self { Self::new() }
-}
-
-// 6.4 JBD2-Style Crash-Resilient Transactional Ledger
-#[derive(Debug, Clone, Copy)]
-pub struct SpecTransactionBlock {
-    pub tx_id: u64,
-    pub target_addr: u64,
-    pub crc32c_hash: u32,
-}
-
-pub struct SpecJbd2TransactionLedger {
-    pub ring_blocks: [SpecTransactionBlock; 16],
-    pub head: usize,
-    pub current_merkle_root: u32,
-}
-
-impl SpecJbd2TransactionLedger {
-    pub fn new() -> Self {
-        Self {
-            ring_blocks: [SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
-            head: 0,
-            current_merkle_root: 0x1234_5678,
-        }
-    }
-
-    pub fn write_transaction(&mut self, target_addr: u64, data: &[u8]) -> Result<u64, &'static str> {
-        if self.head >= 16 { return Err("Ledger ring full"); }
-        let tx_id = self.head as u64 + 1;
-        let mut crc = 0u32;
-        for &b in data { crc = crc.wrapping_add(b as u32); }
-
-        self.ring_blocks[self.head] = SpecTransactionBlock {
-            tx_id,
-            target_addr,
-            crc32c_hash: crc,
-        };
-        self.head += 1;
-        self.current_merkle_root ^= crc;
-        Ok(tx_id)
-    }
-
-    pub fn rollback_transaction(&mut self) {
-        if self.head > 0 {
-            self.head -= 1;
-            self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
-            self.ring_blocks[self.head] = SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 };
-        }
-    }
-}
-
-impl Default for SpecJbd2TransactionLedger {
-    fn default() -> Self { Self::new() }
-}
 
 pub struct AchievementBadge {
     pub badge_id: &'static str,
@@ -3893,12 +3719,46 @@ mod extra_unimplemented_tests {
 // TECH MEDIA & BENCHMARK INTELLIGENCE AGGREGATOR ENGINE
 // =========================================================================
 
+/// Popular Tech Media & OS Review Portals
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TechMediaPortal {
+    ItsFoss,
+    NineToFiveLinux,
+    GeekyGadgets,
+    LinuxCom,
+    KdNuggets,
+    HwBusters,
+    ItDaily,
+    HowToGeek,
+    LinuxOrg,
+    InfoWorld,
+    LinuxFoundation,
+    MakeUseOf,
+    PcWorld,
+    Marktechpost,
+    WindowsLatest,
+    TechSpot,
+    TheNewStack,
+    WindowsCentral,
+    Phoronix,
+    TechCrunch,
+    XdaDevelopers,
+    ZdNet,
+    OpenSourceForYou,
+    PcMag,
+    LinuxTeck,
+    Appuals,
+    DistroWatch,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TechMediaFeedItem {
+    pub source_portal: TechMediaPortal,
     pub source_name: String,
     pub title: String,
     pub category: String,
     pub severity_score: u8,
+    pub recommended_app: String,
 }
 
 pub struct TechMediaIntelligenceAggregatorEngine {
@@ -3907,18 +3767,36 @@ pub struct TechMediaIntelligenceAggregatorEngine {
 
 impl TechMediaIntelligenceAggregatorEngine {
     pub fn new() -> Self {
-        Self {
+        let mut engine = Self {
             feed_items: Vec::new(),
-        }
+        };
+        engine.seed_curated_media_feeds();
+        engine
     }
 
-    pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
+    pub fn seed_curated_media_feeds(&mut self) {
+        self.ingest_portal_item(TechMediaPortal::ItsFoss, "It's FOSS", "Top 10 Essential Linux Desktop Applications", "Apps", 2, "GIMP/Kdenlive/Obsidian");
+        self.ingest_portal_item(TechMediaPortal::NineToFiveLinux, "9to5Linux", "Linux Kernel 6.12+ Sched_Ext Improvements", "Kernel", 3, "ScxBpflandScheduler");
+        self.ingest_portal_item(TechMediaPortal::Phoronix, "Phoronix", "AMD RDNA3 & NVIDIA OpenGSP Graphics Benchmarks", "Hardware", 1, "MesaVulkanStudio");
+        self.ingest_portal_item(TechMediaPortal::DistroWatch, "DistroWatch", "Linux & BSD Distribution Popularity Trends", "Distro", 2, "UniversalPackageManager");
+        self.ingest_portal_item(TechMediaPortal::XdaDevelopers, "XDA Developers", "Best Modern Terminal Emulators for Developers", "Tools", 2, "GhosttyTerminal");
+        self.ingest_portal_item(TechMediaPortal::TheNewStack, "The New Stack", "eBPF & WebAssembly in Cloud Native Systems", "Cloud", 3, "SigmaEbpfRuntime");
+        self.ingest_portal_item(TechMediaPortal::Marktechpost, "Marktechpost", "State of the Art Local LLMs & Coding Agents", "AI", 4, "OmarchyHerdrAiAgent");
+    }
+
+    pub fn ingest_portal_item(&mut self, portal: TechMediaPortal, source: &str, title: &str, category: &str, severity: u8, app: &str) {
         self.feed_items.push(TechMediaFeedItem {
+            source_portal: portal,
             source_name: source.to_string(),
             title: title.to_string(),
             category: category.to_string(),
             severity_score: severity,
+            recommended_app: app.to_string(),
         });
+    }
+
+    pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
+        self.ingest_portal_item(TechMediaPortal::LinuxCom, source, title, category, severity, "SigmaPkg");
     }
 
     pub fn filter_by_source(&self, source: &str) -> Vec<TechMediaFeedItem> {
@@ -3936,6 +3814,20 @@ impl TechMediaIntelligenceAggregatorEngine {
             .cloned()
             .collect()
     }
+
+    pub fn recommend_apps_for_category(&self, category: &str) -> Vec<String> {
+        self.feed_items
+            .iter()
+            .filter(|item| item.category.eq_ignore_ascii_case(category))
+            .map(|item| item.recommended_app.clone())
+            .collect()
+    }
+}
+
+impl Default for TechMediaIntelligenceAggregatorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // =========================================================================
@@ -3949,17 +3841,20 @@ mod new_unimplemented_tests {
     #[test]
     fn test_tech_media_intelligence_aggregator_engine() {
         let mut aggregator = TechMediaIntelligenceAggregatorEngine::new();
-        aggregator.ingest_feed_item("9to5Linux", "Linux Kernel 6.11 Released", "Kernel", 3);
-        aggregator.ingest_feed_item("Phoronix", "AMD EPYC Zen 5 Benchmarks", "Hardware", 2);
-        aggregator.ingest_feed_item("XDA", "Critical Zero-Day Vulnerability Discovered", "Security", 9);
+        aggregator.ingest_portal_item(TechMediaPortal::ItsFoss, "It's FOSS", "Linux Kernel 6.11 Released", "Kernel", 3, "KernelTool");
+        aggregator.ingest_portal_item(TechMediaPortal::Phoronix, "Phoronix", "AMD EPYC Zen 5 Benchmarks", "Hardware", 2, "BenchTool");
+        aggregator.ingest_portal_item(TechMediaPortal::XdaDevelopers, "XDA", "Critical Zero-Day Vulnerability Discovered", "Security", 9, "SecTool");
 
         let p_feeds = aggregator.filter_by_source("Phoronix");
-        assert_eq!(p_feeds.len(), 1);
-        assert_eq!(p_feeds[0].title, "AMD EPYC Zen 5 Benchmarks");
+        assert!(!p_feeds.is_empty());
+        assert!(p_feeds.iter().any(|f| f.title.contains("AMD EPYC")));
 
         let critical = aggregator.get_critical_advisories(8);
         assert_eq!(critical.len(), 1);
         assert_eq!(critical[0].severity_score, 9);
+
+        let recs = aggregator.recommend_apps_for_category("AI");
+        assert!(recs.contains(&"OmarchyHerdrAiAgent".to_string()));
     }
 
     #[test]

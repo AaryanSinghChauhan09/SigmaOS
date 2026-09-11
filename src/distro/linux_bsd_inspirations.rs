@@ -229,11 +229,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd
-            | DistroSubsystemMode::SolarisIllumos => {
-                supervisor == ServiceSupervisorType::OpenRC
-                    || supervisor == ServiceSupervisorType::Smf
-            }
+            | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC || supervisor == ServiceSupervisorType::Smf,
 
             DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
                 supervisor == ServiceSupervisorType::Runit
@@ -246,6 +242,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+            DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
         };
 
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
@@ -266,18 +263,15 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
             DistroSubsystemMode::LinuxGuix => format!("{}.scm", input_pkg),
             DistroSubsystemMode::LinuxGentoo => format!("{}.ebuild", input_pkg),
-            DistroSubsystemMode::LinuxFedora | DistroSubsystemMode::LinuxOpenSuse => {
-                format!("{}.rpm", input_pkg)
-            }
+            DistroSubsystemMode::LinuxFedora
+            | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
             DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
-            DistroSubsystemMode::OpenBsd
-            | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::SmartOs => {
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
                 format!("{}.tgz", input_pkg)
             }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
@@ -669,37 +663,14 @@ impl SovereignUniversalDistroBridge {
 
     pub fn verify_all_subsystems_compatibility_matrix(&mut self) -> bool {
         let subsystems = [
-            "init",
-            "package",
-            "vfs",
-            "security",
-            "storage",
-            "kernel",
-            "network",
-            "graphics",
-            "power",
-            "ipc",
-            "auth",
-            "audit",
-            "boot",
-            "container",
-            "virtualization",
-            "audio",
-            "input",
-            "thermal",
-            "memory",
-            "syscall",
-            "device",
-            "crypto",
-            "ai",
-            "monitoring",
+            "init", "package", "vfs", "security", "storage", "kernel",
+            "network", "graphics", "power", "ipc", "auth", "audit",
+            "boot", "container", "virtualization", "audio", "input",
+            "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
         ];
 
         for sub in subsystems {
-            if self
-                .dispatch_cross_subsystem_operation(sub, "test_action")
-                .is_err()
-            {
+            if self.dispatch_cross_subsystem_operation(sub, "test_action").is_err() {
                 return false;
             }
         }
@@ -2017,39 +1988,27 @@ mod cross_subsystem_tests {
     #[test]
     fn test_kali_distro_bridge_dispatch() {
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxKali);
-        let res1 = bridge
-            .dispatch_cross_subsystem_operation("kali_undercover", "Windows10Stealth")
-            .unwrap();
+        let res1 = bridge.dispatch_cross_subsystem_operation("kali_undercover", "Windows10Stealth").unwrap();
         assert!(res1.contains("Kali Undercover stealth theme toggle"));
 
-        let res2 = bridge
-            .dispatch_cross_subsystem_operation("kali_nethunter", "enable_hid")
-            .unwrap();
+        let res2 = bridge.dispatch_cross_subsystem_operation("kali_nethunter", "enable_hid").unwrap();
         assert!(res2.contains("Kali NetHunter mobile/HID attack orchestration"));
 
-        let res3 = bridge
-            .dispatch_cross_subsystem_operation("kali_winkex", "session_start")
-            .unwrap();
+        let res3 = bridge.dispatch_cross_subsystem_operation("kali_winkex", "session_start").unwrap();
         assert!(res3.contains("Kali WinKeX GUI session bridge"));
 
-        let res4 = bridge
-            .dispatch_cross_subsystem_operation("kali_metapackages", "kali-tools-top10")
-            .unwrap();
+        let res4 = bridge.dispatch_cross_subsystem_operation("kali_metapackages", "kali-tools-top10").unwrap();
         assert!(res4.contains("Kali Metapackage tool resolution"));
     }
 
     #[test]
     fn test_antix_zorin_distro_bridge_dispatch() {
         let mut antix_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxAntiX);
-        let res_antix = antix_bridge
-            .dispatch_cross_subsystem_operation("antix_service", "syslogd")
-            .unwrap();
+        let res_antix = antix_bridge.dispatch_cross_subsystem_operation("antix_service", "syslogd").unwrap();
         assert!(res_antix.contains("antiX Linux systemd-free lightweight init service action"));
 
         let mut zorin_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxZorin);
-        let res_zorin = zorin_bridge
-            .dispatch_cross_subsystem_operation("zorin_appearance", "MacOs")
-            .unwrap();
+        let res_zorin = zorin_bridge.dispatch_cross_subsystem_operation("zorin_appearance", "MacOs").unwrap();
         assert!(res_zorin.contains("Zorin OS appearance layout switch"));
     }
 
@@ -2112,30 +2071,10 @@ mod cross_subsystem_tests {
         ];
 
         let target_subsystems = [
-            "init",
-            "package",
-            "vfs",
-            "security",
-            "storage",
-            "kernel",
-            "network",
-            "graphics",
-            "power",
-            "ipc",
-            "auth",
-            "audit",
-            "boot",
-            "container",
-            "virtualization",
-            "audio",
-            "input",
-            "thermal",
-            "memory",
-            "syscall",
-            "device",
-            "crypto",
-            "ai",
-            "monitoring",
+            "init", "package", "vfs", "security", "storage", "kernel",
+            "network", "graphics", "power", "ipc", "auth", "audit",
+            "boot", "container", "virtualization", "audio", "input",
+            "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
         ];
 
         for m in modes {
@@ -2158,10 +2097,7 @@ mod cross_subsystem_tests {
         assert!(ipc.splice_channel(1, 2, 0).is_err());
 
         let mut auth = SovereignSystemdHomedAuthBridge::new();
-        assert_eq!(
-            auth.authenticate_and_mount("user", "pass").unwrap(),
-            "LUKS_HOME_MOUNTED"
-        );
+        assert_eq!(auth.authenticate_and_mount("user", "pass").unwrap(), "LUKS_HOME_MOUNTED");
         assert!(auth.authenticate_and_mount("", "pass").is_err());
 
         let mut syscall = SovereignMultiArchSyscallTranslator::new(DistroSubsystemMode::FreeBsd);
@@ -2173,11 +2109,8 @@ mod cross_subsystem_tests {
         assert!(entry.contains("SigmaKernel"));
         assert!(boot.configure_boot_entry("", "quiet").is_err());
 
-        let mut container =
-            SovereignCrossDistroContainerManager::new(DistroSubsystemMode::LinuxArch);
-        let id = container
-            .spawn_isolated_container("app", "/usr/bin")
-            .unwrap();
+        let mut container = SovereignCrossDistroContainerManager::new(DistroSubsystemMode::LinuxArch);
+        let id = container.spawn_isolated_container("app", "/usr/bin").unwrap();
         assert_eq!(id, 1);
         assert!(container.spawn_isolated_container("", "/path").is_err());
     }
@@ -2840,6 +2773,165 @@ impl OpenBsdRetguardEngine {
 }
 
 impl Default for OpenBsdRetguardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GuixDerivation {
+    pub name: String,
+    pub builder: String,
+    pub inputs: Vec<String>,
+    pub outputs: Vec<String>,
+    pub build_hash: String,
+}
+
+pub struct GuixDerivationEngine {
+    pub store_prefix: String,
+    pub derivations: Vec<GuixDerivation>,
+    pub built_outputs: Vec<String>,
+}
+
+impl GuixDerivationEngine {
+    pub fn new(store_prefix: &str) -> Self {
+        Self {
+            store_prefix: store_prefix.to_string(),
+            derivations: Vec::new(),
+            built_outputs: Vec::new(),
+        }
+    }
+
+    pub fn compute_derivation_hash(name: &str, builder: &str, inputs: &[&str]) -> String {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in name.as_bytes() {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        for &b in builder.as_bytes() {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        for input in inputs {
+            for &b in input.as_bytes() {
+                hash ^= b as u64;
+                hash = hash.wrapping_mul(0x100000001b3);
+            }
+        }
+        format!("{:016x}", hash)
+    }
+
+    pub fn register_derivation(&mut self, name: &str, builder: &str, inputs: &[&str]) -> String {
+        let build_hash = Self::compute_derivation_hash(name, builder, inputs);
+        let output_path = format!("{}/{}-{}", self.store_prefix, build_hash, name);
+
+        let drv = GuixDerivation {
+            name: name.to_string(),
+            builder: builder.to_string(),
+            inputs: inputs.iter().map(|s| s.to_string()).collect(),
+            outputs: vec![output_path.clone()],
+            build_hash,
+        };
+
+        self.derivations.push(drv);
+        output_path
+    }
+
+    pub fn build_derivation(&mut self, name: &str) -> Result<String, &'static str> {
+        let drv = self.derivations.iter().find(|d| d.name == name)
+            .ok_or("Derivation not found")?
+            .clone();
+
+        for input in &drv.inputs {
+            if !self.built_outputs.contains(input) {
+                return Err("Missing required input derivation build dependency");
+            }
+        }
+
+        let output_path = &drv.outputs[0];
+        if !self.built_outputs.contains(output_path) {
+            self.built_outputs.push(output_path.clone());
+        }
+
+        Ok(output_path.clone())
+    }
+}
+
+impl Default for GuixDerivationEngine {
+    fn default() -> Self {
+        Self::new("/gnu/store")
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShepherdService {
+    pub name: String,
+    pub provision: Vec<String>,
+    pub requirement: Vec<String>,
+    pub running: bool,
+    pub respawn: bool,
+}
+
+pub struct ShepherdServiceManager {
+    pub services: Vec<ShepherdService>,
+}
+
+impl ShepherdServiceManager {
+    pub fn new() -> Self {
+        Self { services: Vec::new() }
+    }
+
+    pub fn register_service(&mut self, name: &str, provision: &[&str], requirement: &[&str], respawn: bool) {
+        self.services.push(ShepherdService {
+            name: name.to_string(),
+            provision: provision.iter().map(|s| s.to_string()).collect(),
+            requirement: requirement.iter().map(|s| s.to_string()).collect(),
+            running: false,
+            respawn,
+        });
+    }
+
+    pub fn is_provisioned(&self, symbol: &str) -> bool {
+        self.services.iter().any(|s| s.running && s.provision.iter().any(|p| p == symbol))
+    }
+
+    pub fn start_service(&mut self, name: &str) -> Result<(), &'static str> {
+        let svc_idx = self.services.iter().position(|s| s.name == name)
+            .ok_or("Service not found in Shepherd graph")?;
+
+        let reqs = self.services[svc_idx].requirement.clone();
+
+        for req in reqs {
+            if !self.is_provisioned(&req) {
+                let provider_name = self.services.iter()
+                    .find(|s| s.provision.contains(&req))
+                    .map(|s| s.name.clone());
+
+                if let Some(pname) = provider_name {
+                    self.start_service(&pname)?;
+                } else {
+                    return Err("Unsatisfied Shepherd requirement dependency");
+                }
+            }
+        }
+
+        self.services[svc_idx].running = true;
+        Ok(())
+    }
+
+    pub fn stop_service(&mut self, name: &str) -> Result<(), &'static str> {
+        let svc = self.services.iter_mut().find(|s| s.name == name)
+            .ok_or("Service not found")?;
+        svc.running = false;
+        Ok(())
+    }
+}
+
+impl Default for ShepherdServiceManager {
     fn default() -> Self {
         Self::new()
     }
@@ -6581,103 +6673,6 @@ mod tests {
 // 28. GNU GUIX & SHEPHERD SERVICE MANAGER ENGINE
 // ==========================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GuixDerivation {
-    pub name: String,
-    pub builder: String,
-    pub inputs: Vec<String>,
-    pub outputs: Vec<String>,
-    pub build_hash: String,
-}
-
-pub struct GuixDerivationEngine {
-    pub store_prefix: String,
-    pub derivations: Vec<GuixDerivation>,
-    pub built_outputs: Vec<String>,
-}
-
-impl GuixDerivationEngine {
-    pub fn new(store_prefix: &str) -> Self {
-        Self {
-            store_prefix: store_prefix.to_string(),
-            derivations: Vec::new(),
-            built_outputs: Vec::new(),
-        }
-    }
-
-    pub fn compute_derivation_hash(name: &str, builder: &str, inputs: &[&str]) -> String {
-        let mut hash: u64 = 0xcbf29ce484222325;
-        for &b in name.as_bytes() {
-            hash ^= b as u64;
-            hash = hash.wrapping_mul(0x100000001b3);
-        }
-        for &b in builder.as_bytes() {
-            hash ^= b as u64;
-            hash = hash.wrapping_mul(0x100000001b3);
-        }
-        for input in inputs {
-            for &b in input.as_bytes() {
-                hash ^= b as u64;
-                hash = hash.wrapping_mul(0x100000001b3);
-            }
-        }
-        format!("{:016x}", hash)
-    }
-
-    pub fn register_derivation(&mut self, name: &str, builder: &str, inputs: &[&str]) -> String {
-        let build_hash = Self::compute_derivation_hash(name, builder, inputs);
-        let output_path = format!("{}/{}-{}", self.store_prefix, build_hash, name);
-
-        let drv = GuixDerivation {
-            name: name.to_string(),
-            builder: builder.to_string(),
-            inputs: inputs.iter().map(|s| s.to_string()).collect(),
-            outputs: vec![output_path.clone()],
-            build_hash,
-        };
-
-        self.derivations.push(drv);
-        output_path
-    }
-
-    pub fn build_derivation(&mut self, name: &str) -> Result<String, &'static str> {
-        let drv = self
-            .derivations
-            .iter()
-            .find(|d| d.name == name)
-            .ok_or("Derivation not found")?
-            .clone();
-
-        for input in &drv.inputs {
-            if !self.built_outputs.contains(input) {
-                return Err("Missing required input derivation build dependency");
-            }
-        }
-
-        let output_path = &drv.outputs[0];
-        if !self.built_outputs.contains(output_path) {
-            self.built_outputs.push(output_path.clone());
-        }
-
-        Ok(output_path.clone())
-    }
-}
-
-impl Default for GuixDerivationEngine {
-    fn default() -> Self {
-        Self::new("/gnu/store")
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ShepherdService {
-    pub name: String,
-    pub provision: Vec<String>,
-    pub requirement: Vec<String>,
-    pub running: bool,
-    pub respawn: bool,
-}
-
 // ==========================================
 // 40. CROSS-DISTRO IPC, AUTH, SYSCALL & CONTAINER BRIDGES
 // ==========================================
@@ -6693,12 +6688,7 @@ impl SovereignZeroCopyIpcBridge {
         }
     }
 
-    pub fn splice_channel(
-        &mut self,
-        _src_fd: i32,
-        _dst_fd: i32,
-        len: usize,
-    ) -> Result<usize, &'static str> {
+    pub fn splice_channel(&mut self, _src_fd: i32, _dst_fd: i32, len: usize) -> Result<usize, &'static str> {
         if len == 0 {
             return Err("Splice length must be greater than zero");
         }
@@ -6723,11 +6713,7 @@ impl SovereignSystemdHomedAuthBridge {
         }
     }
 
-    pub fn authenticate_and_mount(
-        &mut self,
-        username: &str,
-        password: &str,
-    ) -> Result<&'static str, &'static str> {
+    pub fn authenticate_and_mount(&mut self, username: &str, password: &str) -> Result<&'static str, &'static str> {
         if username.is_empty() || password.is_empty() {
             return Err("Invalid credentials");
         }
@@ -6756,10 +6742,7 @@ impl SovereignMultiArchSyscallTranslator {
             return Err("Syscall name cannot be empty");
         }
         match self.mode {
-            DistroSubsystemMode::FreeBsd
-            | DistroSubsystemMode::OpenBsd
-            | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
             DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(2002),
             _ => Ok(0),
         }
@@ -6777,11 +6760,7 @@ impl SovereignMultiArchBootChainBridge {
         }
     }
 
-    pub fn configure_boot_entry(
-        &mut self,
-        label: &str,
-        params: &str,
-    ) -> Result<String, &'static str> {
+    pub fn configure_boot_entry(&mut self, label: &str, params: &str) -> Result<String, &'static str> {
         if label.is_empty() {
             return Err("Boot label cannot be empty");
         }
@@ -6812,11 +6791,7 @@ impl SovereignCrossDistroContainerManager {
         }
     }
 
-    pub fn spawn_isolated_container(
-        &mut self,
-        name: &str,
-        path: &str,
-    ) -> Result<u64, &'static str> {
+    pub fn spawn_isolated_container(&mut self, name: &str, path: &str) -> Result<u64, &'static str> {
         if name.is_empty() || path.is_empty() {
             return Err("Container name and path cannot be empty");
         }
@@ -6827,84 +6802,6 @@ impl SovereignCrossDistroContainerManager {
     }
 }
 
-pub struct ShepherdServiceManager {
-    pub services: Vec<ShepherdService>,
-}
-
-impl ShepherdServiceManager {
-    pub fn new() -> Self {
-        Self {
-            services: Vec::new(),
-        }
-    }
-
-    pub fn register_service(
-        &mut self,
-        name: &str,
-        provision: &[&str],
-        requirement: &[&str],
-        respawn: bool,
-    ) {
-        self.services.push(ShepherdService {
-            name: name.to_string(),
-            provision: provision.iter().map(|s| s.to_string()).collect(),
-            requirement: requirement.iter().map(|s| s.to_string()).collect(),
-            running: false,
-            respawn,
-        });
-    }
-
-    pub fn is_provisioned(&self, symbol: &str) -> bool {
-        self.services
-            .iter()
-            .any(|s| s.running && s.provision.iter().any(|p| p == symbol))
-    }
-
-    pub fn start_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let svc_idx = self
-            .services
-            .iter()
-            .position(|s| s.name == name)
-            .ok_or("Service not found in Shepherd graph")?;
-
-        let reqs = self.services[svc_idx].requirement.clone();
-
-        for req in reqs {
-            if !self.is_provisioned(&req) {
-                let provider_name = self
-                    .services
-                    .iter()
-                    .find(|s| s.provision.contains(&req))
-                    .map(|s| s.name.clone());
-
-                if let Some(pname) = provider_name {
-                    self.start_service(&pname)?;
-                } else {
-                    return Err("Unsatisfied Shepherd requirement dependency");
-                }
-            }
-        }
-
-        self.services[svc_idx].running = true;
-        Ok(())
-    }
-
-    pub fn stop_service(&mut self, name: &str) -> Result<(), &'static str> {
-        let svc = self
-            .services
-            .iter_mut()
-            .find(|s| s.name == name)
-            .ok_or("Service not found")?;
-        svc.running = false;
-        Ok(())
-    }
-}
-
-impl Default for ShepherdServiceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// ============================================================================
 /// 9. Advanced Linux/BSD Distro Innovations Integration
@@ -6993,10 +6890,7 @@ impl UseFlagEngine {
     }
 
     pub fn add_package_flag(&mut self, package: &str, name: &str, enabled: bool) {
-        let entry = self
-            .package_flags
-            .entry(package.to_string())
-            .or_insert_with(Vec::new);
+        let entry = self.package_flags.entry(package.to_string()).or_insert_with(Vec::new);
         entry.push(UseFlag {
             name: name.to_string(),
             enabled,
@@ -7045,9 +6939,11 @@ impl AptRepository {
     pub fn generate_sources_entry(&self) -> String {
         let components_str = self.components.join(" ");
         let trusted_str = if self.trusted { "[trusted=yes]" } else { "" };
-        format!(
-            "deb {} {} {} {}",
-            trusted_str, self.url, self.distribution, components_str
+        format!("deb {} {} {} {}",
+            trusted_str,
+            self.url,
+            self.distribution,
+            components_str
         )
     }
 }
@@ -7088,20 +6984,20 @@ impl AdvancedDistroSecurityEngine {
 
     pub fn generate_composite_security_config(&self) -> String {
         let mut config = String::from("# Advanced Linux/BSD Security Configuration\n");
-
+        
         config.push_str("# AppArmor Profiles\n");
         for profile in &self.apparmor_profiles {
             config.push_str(&format!("profile {} {{\n", profile.name));
             config.push_str(&format!("  mode: {:?}\n", profile.mode));
             config.push_str("}\n");
         }
-
+        
         config.push_str("\n# APT Repositories\n");
         for repo in &self.apt_repositories {
             config.push_str(&repo.generate_sources_entry());
             config.push('\n');
         }
-
+        
         config
     }
 }

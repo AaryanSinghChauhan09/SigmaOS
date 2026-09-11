@@ -1,11 +1,9 @@
 // SigmaOS Advanced GUI Installer Wizard
 // Calamares-inspired graphical installer wizard with dual-boot alongside partitioning
 
-extern crate alloc;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::vec;
 
 /// Installer Screen / Calamares Module Sequence
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -20,17 +18,20 @@ pub enum InstallerScreen {
     Summary,
     InstallationProgress,
     Complete,
-    CompleteOnboarding,
 }
 
-/// Partitioning Operation Strategy / Mode
-pub type PartitionStrategy = PartitioningOperation;
-
+/// Partitioning Operation Mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PartitioningOperation {
     Automatic,
     Alongside,
     Manual,
+    EraseDisk,
+}
+
+/// Partitioning Operation Strategy
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartitionStrategy {
     EraseDisk,
     InstallAlongsideExisting,
     ManualCustomPartitions,
@@ -181,6 +182,7 @@ impl UserAccount {
     }
 }
 
+/// Network Configuration
 #[derive(Debug, Clone)]
 pub struct NetworkConfig {
     pub use_dhcp: bool,
@@ -208,6 +210,7 @@ pub struct PrivacySettings {
     pub send_crash_reports: bool,
     pub location_services: bool,
 }
+
 
 impl SystemConfiguration {
     pub fn new() -> Self {
@@ -315,8 +318,7 @@ impl GuiInstallerWizard {
             InstallerScreen::SystemConfiguration => InstallerScreen::Summary,
             InstallerScreen::Summary => InstallerScreen::InstallationProgress,
             InstallerScreen::InstallationProgress => InstallerScreen::Complete,
-            InstallerScreen::Complete => InstallerScreen::CompleteOnboarding,
-            InstallerScreen::CompleteOnboarding => return Err(InstallerError::AlreadyComplete),
+            InstallerScreen::Complete => return Err(InstallerError::AlreadyComplete),
         };
 
         Ok(())
@@ -465,7 +467,6 @@ impl GuiInstallerWizard {
             InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
             InstallerScreen::Complete => "Installation Complete",
-            InstallerScreen::CompleteOnboarding => "Onboarding Complete",
         }
     }
 
