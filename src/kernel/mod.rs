@@ -60,7 +60,8 @@ pub mod structures;
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, KernelAuditRecord, KernelAuditRecordType,
     LinuxKernelAuditSubsystemEngine, UffdFaultEvent, UffdMode, UffdRegisteredRange,
-    UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
+    UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine, LinuxLandlockLsmRulesetEngine,
+    LinuxZswapCompressedCacheEngine, LinuxKernelCryptoApiEngine, LinuxEbpfBloomFilterMapEngine,
 };
 pub mod traits;
 
