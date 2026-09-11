@@ -45,3 +45,7 @@
 ## 2026-09-13 - Fast Raw Byte-Scanning Path for JSON String Parsing
 **Learning:** In JSON recursive descent parsers, iterating over string characters using `.chars().next()` decodes UTF-8 multi-byte sequences for every byte in the input string. Scanning raw byte slices (`&[u8]`) directly until hitting delimiter bytes (`"` or `\`) bypasses character decoding entirely for escape-free strings (the majority of JSON strings), resulting in a significant parsing throughput increase while falling back safely to UTF-8 decoding when backslash escapes are encountered.
 **Action:** When parsing text formats or string literals, use raw byte-level scanning for delimiter detection and fast slicing before falling back to multi-byte UTF-8 character decoding.
+
+## 2026-09-14 - Binary Search for Vector-Backed Ordered Maps
+**Learning:** Linear iteration over vector-backed maps (`for (k, v) in self.entries`) incurs $O(N)$ comparisons for lookups, insertions, and removals. Since `entries` is maintained in sorted order by key, using `binary_search_by` reduces lookup complexity to $O(\log N)$ comparisons. In `insert`, `binary_search_by` returns `Ok(idx)` for in-place updates or `Err(idx)` giving the exact insertion position for `entries.insert(idx, (key, value))` in logarithmic time.
+**Action:** When implementing or optimizing vector-backed ordered map/set structures, maintain sorted order and use `binary_search_by` for $O(\log N)$ lookups and insertion index calculations.
