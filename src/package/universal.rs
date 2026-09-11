@@ -2382,6 +2382,88 @@ impl SovereignPackageRollbackEngine {
     }
 }
 
+/// Dynamic User-Defined Custom Constraint Solver
+pub struct UdfCustomConstraintSolver {
+    pub solver: Arc<dyn Fn(&str, &str) -> bool + Send + Sync>,
+}
+
+impl UdfCustomConstraintSolver {
+    pub fn new<F>(solver: F) -> Self
+    where
+        F: Fn(&str, &str) -> bool + Send + Sync + 'static,
+    {
+        Self {
+            solver: Arc::new(solver),
+        }
+    }
+
+    pub fn evaluate_constraint(&self, package_name: &str, constraint_expr: &str) -> bool {
+        (self.solver)(package_name, constraint_expr)
+    }
+}
+
+/// Dynamic User-Defined Package Build Lifecycle Hooks
+pub struct UdfPackageBuildHooks {
+    pub pre_build: Arc<dyn Fn(&str) -> Result<String, String> + Send + Sync>,
+    pub build: Arc<dyn Fn(&str) -> Result<String, String> + Send + Sync>,
+    pub post_build: Arc<dyn Fn(&str) -> Result<String, String> + Send + Sync>,
+}
+
+impl UdfPackageBuildHooks {
+    pub fn new<Pre, Bld, Post>(pre_build: Pre, build: Bld, post_build: Post) -> Self
+    where
+        Pre: Fn(&str) -> Result<String, String> + Send + Sync + 'static,
+        Bld: Fn(&str) -> Result<String, String> + Send + Sync + 'static,
+        Post: Fn(&str) -> Result<String, String> + Send + Sync + 'static,
+    {
+        Self {
+            pre_build: Arc::new(pre_build),
+            build: Arc::new(build),
+            post_build: Arc::new(post_build),
+        }
+    }
+
+    pub fn run_build_pipeline(&self, package_name: &str) -> Result<Vec<String>, String> {
+        let mut logs = Vec::new();
+        logs.push((self.pre_build)(package_name)?);
+        logs.push((self.build)(package_name)?);
+        logs.push((self.post_build)(package_name)?);
+        Ok(logs)
+    }
+}
+
+/// Repository Mirror Candidate
+#[derive(Debug, Clone)]
+pub struct RepoMirrorCandidate {
+    pub url: String,
+    pub ping_ms: u32,
+    pub pqc_verified: bool,
+    pub bandwidth_mbps: u32,
+}
+
+/// Dynamic User-Defined Mirror Selector
+pub struct UdfDynamicRepoMirrorSelector;
+
+impl UdfDynamicRepoMirrorSelector {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn select_best_mirror(&self, candidates: &[RepoMirrorCandidate]) -> Option<RepoMirrorCandidate> {
+        candidates
+            .iter()
+            .filter(|c| c.pqc_verified)
+            .min_by_key(|c| c.ping_ms)
+            .cloned()
+    }
+}
+
+impl Default for UdfDynamicRepoMirrorSelector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Universal Package Format Transpilation Bridge
 /// Auto-detects foreign Linux and BSD package formats and converts them into native `UnifiedPackage` instances
 pub struct UniversalPackageFormatBridge;
@@ -3050,6 +3132,53 @@ mod tests {
         };
 
         assert!(net_dec.restrict_network().is_ok());
+    }
+
+    #[test]
+    fn test_udf_engine_enhancements() {
+        // 1. UdfCustomConstraintSolver
+        let solver = UdfCustomConstraintSolver::new(|name, expr| {
+            name == "kernel-lts" && expr == ">= 6.1"
+        });
+        assert!(solver.evaluate_constraint("kernel-lts", ">= 6.1"));
+        assert!(!solver.evaluate_constraint("kernel-lts", "< 5.0"));
+
+        // 2. UdfPackageBuildHooks
+        let hooks = UdfPackageBuildHooks::new(
+            |pkg| Ok(format!("pre-build-{}", pkg)),
+            |pkg| Ok(format!("build-{}", pkg)),
+            |pkg| Ok(format!("post-build-{}", pkg)),
+        );
+        let logs = hooks.run_build_pipeline("nginx").unwrap();
+        assert_eq!(logs.len(), 3);
+        assert_eq!(logs[0], "pre-build-nginx");
+
+        // 3. UdfDynamicRepoMirrorSelector
+        let mirrors = vec![
+            RepoMirrorCandidate {
+                url: "https://slow.mirror".to_string(),
+                ping_ms: 150,
+                pqc_verified: true,
+                bandwidth_mbps: 100,
+            },
+            RepoMirrorCandidate {
+                url: "https://fast.mirror".to_string(),
+                ping_ms: 20,
+                pqc_verified: true,
+                bandwidth_mbps: 1000,
+            },
+            RepoMirrorCandidate {
+                url: "https://untrusted.mirror".to_string(),
+                ping_ms: 5,
+                pqc_verified: false,
+                bandwidth_mbps: 2000,
+            },
+        ];
+
+        let selector = UdfDynamicRepoMirrorSelector::new();
+        let best = selector.select_best_mirror(&mirrors).unwrap();
+        assert_eq!(best.url, "https://fast.mirror");
+        assert_eq!(best.ping_ms, 20);
     }
 }
 
