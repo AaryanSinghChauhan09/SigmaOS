@@ -383,6 +383,24 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
+        } else if normalized.ends_with(".sysupdate") {
+            Some(PackageFormat::Sysupdate)
         } else {
             None
         }
@@ -931,6 +949,19 @@ impl_generic_package_adapter!(
     "stratum-package: ",
     "stratum-version: "
 );
+impl_generic_package_adapter!(IpkAdapter, Ipk, "ipk-package:", "ipk-package: ", "ipk-version: ");
+impl_generic_package_adapter!(OpkgAdapter, Opkg, "opkg-package:", "opkg-package: ", "opkg-version: ");
+impl_generic_package_adapter!(OpenBsdPkgAdapter, OpenBsdPkg, "openbsd-pkg:", "openbsd-pkg: ", "openbsd-version: ");
+impl_generic_package_adapter!(SolarisIpsAdapter, SolarisIps, "solaris-ips:", "solaris-ips: ", "solaris-version: ");
+impl_generic_package_adapter!(GuixNarAdapter, GuixNar, "guix-nar:", "guix-nar: ", "guix-nar-version: ");
+impl_generic_package_adapter!(SpackAdapter, Spack, "spack-package:", "spack-package: ", "spack-version: ");
+impl_generic_package_adapter!(ConanAdapter, Conan, "conan-package:", "conan-package: ", "conan-version: ");
+impl_generic_package_adapter!(WheelAdapter, Wheel, "wheel-package:", "wheel-package: ", "wheel-version: ");
+impl_generic_package_adapter!(CrateAdapter, Crate, "crate-package:", "crate-package: ", "crate-version: ");
+impl_generic_package_adapter!(GemAdapter, Gem, "gem-package:", "gem-package: ", "gem-version: ");
+impl_generic_package_adapter!(NupkgAdapter, Nupkg, "nupkg-package:", "nupkg-package: ", "nupkg-version: ");
+impl_generic_package_adapter!(VcpkgAdapter, Vcpkg, "vcpkg-package:", "vcpkg-package: ", "vcpkg-version: ");
+impl_generic_package_adapter!(NarInfoAdapter, NarInfo, "narinfo-package:", "narinfo-package: ", "narinfo-version: ");
 
 /// Fedora/RHEL .rpm adapter
 pub struct RpmAdapter {
@@ -2907,6 +2938,20 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(CruxAdapter::new()));
         factory.register_parser(Box::new(DrpmAdapter::new()));
         factory.register_parser(Box::new(StratumAdapter::new()));
+        factory.register_parser(Box::new(IpkAdapter::new()));
+        factory.register_parser(Box::new(OpkgAdapter::new()));
+        factory.register_parser(Box::new(OpenBsdPkgAdapter::new()));
+        factory.register_parser(Box::new(SolarisIpsAdapter::new()));
+        factory.register_parser(Box::new(GuixNarAdapter::new()));
+        factory.register_parser(Box::new(SpackAdapter::new()));
+        factory.register_parser(Box::new(ConanAdapter::new()));
+        factory.register_parser(Box::new(WheelAdapter::new()));
+        factory.register_parser(Box::new(CrateAdapter::new()));
+        factory.register_parser(Box::new(GemAdapter::new()));
+        factory.register_parser(Box::new(NupkgAdapter::new()));
+        factory.register_parser(Box::new(VcpkgAdapter::new()));
+        factory.register_parser(Box::new(NarInfoAdapter::new()));
+        factory.register_parser(Box::new(SystemdSysupdateAdapter::new()));
 
         factory
     }
