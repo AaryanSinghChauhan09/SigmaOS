@@ -50,3 +50,9 @@ pub use sovereign_commands::{
 };
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
+pub mod open_source_tools_engine;
+pub use open_source_tools_engine::*;
+pub mod open_source_cli_tools_suite;
+pub use open_source_cli_tools_suite::*;
+pub mod open_source_tools_parity;
+pub use open_source_tools_parity::*;

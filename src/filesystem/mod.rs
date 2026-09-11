@@ -1,6 +1,8 @@
 // SigmaOS Filesystem Module
 pub mod archive;
 pub mod file_monitor;
+pub mod nextgen_filesystem_suite;
+pub use nextgen_filesystem_suite::*;
 pub mod watch;
 pub mod bsd_linux_innovations;
 pub mod cow_snapshot;
