@@ -280,3 +280,10 @@ pub use arch_gap_closure::{
     HookWhen as ArchHookWhen, KeyTrustLevel as ArchKeyTrustLevel, SovereignArchGapClosureSuite,
     SysuserRule, TmpfileRule,
 };
+
+pub mod fedora_gap_closure;
+pub use fedora_gap_closure::{
+    CoprPackageProject, FedoraAnacondaInstallerEngine, FedoraCoprBuildRepositoryEngine,
+    FedoraMockChrootBuildEngine, FedoraSelinuxMlsPolicyGovernorEngine, KickstartConfig,
+    MockChrootSpec, SelinuxMlsContext, SovereignFedoraGapClosureSuite,
+};
