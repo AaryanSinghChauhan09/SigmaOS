@@ -14,7 +14,6 @@ pub mod bus;
 pub mod classic_os;
 pub mod component;
 pub mod console;
-pub mod missing_linux_kernel_components;
 pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;
@@ -60,8 +59,7 @@ pub mod structures;
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, KernelAuditRecord, KernelAuditRecordType,
     LinuxKernelAuditSubsystemEngine, UffdFaultEvent, UffdMode, UffdRegisteredRange,
-    UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine, LinuxLandlockLsmRulesetEngine,
-    LinuxZswapCompressedCacheEngine, LinuxKernelCryptoApiEngine, LinuxEbpfBloomFilterMapEngine,
+    UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
 };
 pub mod traits;
 
@@ -108,3 +106,15 @@ pub mod sigma_timer;
 pub mod sigma_workqueue;
 pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
+pub mod missing_linux_kernel_components;
+pub use missing_linux_kernel_components::*;
+
+pub mod linux_kernel_parity_synthesis;
+pub use linux_kernel_parity_synthesis::{
+    DamonRegionNode, DmTargetDevice, DmTargetType, FutexSize, FutexWaitvEntry,
+    LinuxDamonAccessMonitorEngine, LinuxDeviceMapperEngine, LinuxKernelFutex2WaitvEngine,
+    LinuxPressureStallInfoEngine, PsiResourceKind, PsiStallMetrics,
+    SovereignLinuxKernelParitySynthesisSuite,
+};
+pub mod linux_kernel_gap_closure_ultimate;
+pub use linux_kernel_gap_closure_ultimate::*;
