@@ -124,6 +124,15 @@ pub fn validate_username(name: &[u8]) -> Result<(), ValidationError> {
 }
 
 /// Validate a hostname per RFC 952/1123.
+///
+/// Rules:
+/// - Non-empty, total length ≤ `MAX_HOSTNAME_LEN` (253 bytes)
+/// - Composed of dot-separated labels
+/// - Each label must be 1..=63 bytes long
+/// - Label characters must be ASCII alphanumeric or hyphen (`-`)
+/// - Labels MUST NOT start or end with a hyphen (`-`). This prevents command-line option
+///   injection (e.g. `-oProxyCommand=...` hostnames passed to network utilities).
+/// - No empty labels (disallows leading dot, trailing dot, and consecutive dots `..`).
 pub fn validate_hostname(name: &[u8]) -> Result<(), ValidationError> {
     if name.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -131,11 +140,24 @@ pub fn validate_hostname(name: &[u8]) -> Result<(), ValidationError> {
     if name.len() > MAX_HOSTNAME_LEN {
         return Err(ValidationError::TooLong);
     }
-    for &b in name {
-        if !b.is_ascii_alphanumeric() && b != b'-' && b != b'.' {
+
+    for label in name.split(|&b| b == b'.') {
+        if label.is_empty() {
             return Err(ValidationError::InvalidChars);
         }
+        if label.len() > 63 {
+            return Err(ValidationError::TooLong);
+        }
+        if label[0] == b'-' || label[label.len() - 1] == b'-' {
+            return Err(ValidationError::InvalidChars);
+        }
+        for &b in label {
+            if !b.is_ascii_alphanumeric() && b != b'-' {
+                return Err(ValidationError::InvalidChars);
+            }
+        }
     }
+
     Ok(())
 }
 
@@ -414,6 +436,37 @@ mod tests {
         assert_eq!(safe_add(10, 20), Some(30));
         assert_eq!(safe_mul(3, 7), Some(21));
         assert_eq!(safe_sub(10, 3), Some(7));
+    }
+
+    #[test]
+    fn test_hostname_validation() {
+        assert_eq!(validate_hostname(b"example.com"), Ok(()));
+        assert_eq!(validate_hostname(b"sub.domain-name.co.uk"), Ok(()));
+        assert_eq!(validate_hostname(b"localhost"), Ok(()));
+        assert_eq!(validate_hostname(b"node-123"), Ok(()));
+
+        // Command-line option injection prevention (leading hyphen in label)
+        assert_eq!(validate_hostname(b"-oProxyCommand"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_hostname(b"sub.-domain.com"), Err(ValidationError::InvalidChars));
+
+        // Trailing hyphen in label
+        assert_eq!(validate_hostname(b"domain-.com"), Err(ValidationError::InvalidChars));
+
+        // Empty labels / consecutive dots / leading or trailing dot
+        assert_eq!(validate_hostname(b"example..com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_hostname(b".example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_hostname(b"example.com."), Err(ValidationError::InvalidChars));
+
+        // Empty input
+        assert_eq!(validate_hostname(b""), Err(ValidationError::EmptyInput));
+
+        // Label length > 63
+        let long_label = [b'a'; 64];
+        assert_eq!(validate_hostname(&long_label), Err(ValidationError::TooLong));
+
+        // Total hostname length > 253
+        let long_hostname = [b'a'; MAX_HOSTNAME_LEN + 1];
+        assert_eq!(validate_hostname(&long_hostname), Err(ValidationError::TooLong));
     }
 
     #[test]
