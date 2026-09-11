@@ -12,11 +12,11 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::vec;
 use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use std::format;
+use std::string::{String, ToString};
+use std::vec;
+use std::vec::Vec;
 
 // SigmaOS Task Manager
 // OOP-based task management with Kanban boards and reminders
@@ -299,9 +299,7 @@ impl TaskManager {
     pub fn complete_task(&mut self, task_id: &str) -> Result<(), TaskError> {
         let mut task = self.storage.load_task(task_id)?;
         task.status = TaskStatus::Done;
-        task.completed_at = Some(
-            1700000000u64,
-        );
+        task.completed_at = Some(1700000000u64);
         self.storage.save_task(&task)
     }
 
@@ -639,7 +637,9 @@ mod tests {
             task_id,
             1000,
             ReminderType::SystemdTimerEvent,
-            DistroReminderDispatchMode::SystemdTimerOnCalendar("Mon..Fri *-*-* 09:00:00".to_string()),
+            DistroReminderDispatchMode::SystemdTimerOnCalendar(
+                "Mon..Fri *-*-* 09:00:00".to_string(),
+            ),
             250,
         );
 
