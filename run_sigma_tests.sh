@@ -23,6 +23,20 @@ if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     ./build/distro_inspirations_test
 fi
 
+if [ -f "src/distro/distro_inspiration_synthesis.rs" ]; then
+    echo "Running Linux & BSD distro inspiration synthesis test suite..."
+    mkdir -p build
+    rustc --test src/distro/distro_inspiration_synthesis.rs --edition=2021 -o build/distro_synthesis_test
+    ./build/distro_synthesis_test
+fi
+
+if [ -f "src/distro/linux_bsd_ultimate_synthesis.rs" ]; then
+    echo "Running Linux & BSD ultimate synthesis test suite..."
+    mkdir -p build
+    rustc --test src/distro/linux_bsd_ultimate_synthesis.rs --edition=2021 -o build/linux_bsd_ultimate_synthesis_test
+    ./build/linux_bsd_ultimate_synthesis_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
