@@ -62,8 +62,17 @@ pub use distro::{
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
-    AlpineApkVolatileOverlayEngine, FreeBsdPoudrierePortBuilder, GentooEmergeCliEngine,
+    AiAgentProvider, AlaPackageSnapshot, AlpineApkVolatileOverlayEngine, ArchAlpmDbIntegrityEngine,
+    ArchAuditScannerEngine, ArchAurPkgbuildSolverEngine, ArchAurWebRpcClient,
+    ArchBoxCatalogManager, ArchBoxFormat, ArchBoxImageRecord, ArchBoxesImageEngine,
+    ArchCloudInitProvisioner, ArchInstallProfile, ArchInstallProfileEngine,
+    ArchLinuxArchiveEngine, ArchMakepkgEngine, ArchMasterKey, ArchMkinitcpioHooksEngine,
+    ArchNamcapLinterEngine, ArchPacmanDatabaseSyncEngine, ArchPacmanKeyringManager,
+    ArchPkgbuild, ArchSecurityAdvisory, ArchTestingRepo, ArchTestingRepositoryManager,
+    ArchisoLiveImageBuilderEngine, AurPackageResult, AurSrcInfoMetadata,
+    CloudInitUserAccount, FreeBsdPoudrierePortBuilder, GentooEmergeCliEngine,
     GentooGccCflagsTunerEngine, GentooLaymanOverlayEngine, OpenBsdPledgeUnveilSecurityGovernor,
+    PacmanSyncPackageEntry, SovereignArchUltimateGapClosureSuite, VulnerabilitySeverity,
     VoidXbpsBinaryPackageEngine,
     ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode,
     DragonFlyHammer2EmergencyCowEngine, FedoraSelinuxMlsMcsGovernor, FreeBsdGeomVdevTopology,
@@ -79,6 +88,23 @@ pub use distro::{
     HardenedBsdPaxCfiEngine, NetBsdRumpUserlandEngine, SolusEopkgBudgieEngine,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
     OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig,
+    HerdrAiAgentTask, HerdrAgentTask, OmarchyDotfilesManagerEngine,
+    OmarchyFactoryResetGuardianEngine, OmarchyHardwareQuattroAdapterEngine,
+    OmarchyHerdrAiAgentManager, OmarchyHerdrAiOrchestratorEngine, OmarchyHyprlandAnimEngine,
+    OmarchyKeybindingsStudioEngine, OmarchyLuaConfigEngine, OmarchyPluginEntry,
+    OmarchyPluginMarketplace, OmarchyQuickshellBarEngine, OmarchyQuickshellEngine,
+    OmarchyReleaseChannel, OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio,
+    OmarchyThemePalette, PreflightSnapshot, QuickShellWidgetKind, QuickShellWidgetSpec,
+    QuickshellWidget, ShellComponentKind, SovereignOmarchyUltimateGapClosureSuite,
+};
+
+pub use desktop::{
+    Color, OmarchyThemeManager, SemanticColor, Theme, ThemeComponent,
+};
+
+pub use tools::{
+    CommandActionType, CommandPaletteItem, DriverPackage, MintDriverManager, MintDriverStatus,
+    MintDriverType, MintHardwareDevice, OmarchyCommandPalette,
 };
 
 pub use package::bsd_linux_package_innovations::{
