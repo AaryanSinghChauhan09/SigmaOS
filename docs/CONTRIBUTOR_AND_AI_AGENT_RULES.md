@@ -4,6 +4,15 @@ This document outlines the mandatory rules, development policies, and execution 
 
 ---
 
+## Executive Summary & Core Directives
+
+1. **Self-Contained `#![no_std]` Codebase**: SigmaOS is designed to be fully self-sufficient with zero third-party dependencies in `Cargo.toml`.
+2. **Standardized Branching**: All work must occur on branches named `jules-*`.
+3. **Multi-Distro Interoperability**: Every subsystem must support cross-distribution event routing and compatibility across 25+ Linux and BSD distribution modes.
+4. **Mandatory Testing & Verification**: Every change must pass standalone unit tests and the master test runner `./run_sigma_tests.sh`.
+
+---
+
 ## 1. Zero-Dependency & `#![no_std]` Architecture Directives
 
 1. **Strict Zero Third-Party Crates:**

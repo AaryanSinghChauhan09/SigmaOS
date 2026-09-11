@@ -23,8 +23,12 @@ pub mod vulnerability;
 pub mod hardening;
 pub mod deobfuscation;
 pub mod securelevels;
+pub mod audit;
+pub mod bsd_hardening;
+pub mod kali_components;
+pub mod qubes_isolation;
+pub mod root_improvement;
 pub mod pam;
-pub mod intrusion;
 pub mod crypto_utils;
 
 pub use kali_components::{
