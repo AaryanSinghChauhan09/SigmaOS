@@ -1,8 +1,6 @@
 // SigmaOS Filesystem Module
 pub mod archive;
 pub mod file_monitor;
-pub mod nextgen_filesystem_suite;
-pub use nextgen_filesystem_suite::*;
 pub mod watch;
 pub mod bsd_linux_innovations;
 pub mod cow_snapshot;
@@ -18,10 +16,11 @@ pub mod vfs;
 pub mod sigma_fs;
 
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
-pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use vfs::{FileType, FsError, Inode, VirtualFileSystem, DirEntry, FileHandle, FileMode, VfsError, MountPoint};
 pub use sigma_fs::{
-    SovereignFhsHierarchy, SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
-    JournalState, RaidLevel, SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid,
+    SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
+    JournalState, SovereignFsJournal, SovereignFhsHierarchy, DistributedSovereignFS,
+    PqcFileEncryptor, FileBlock, PseudoFilesystemNamespace, Blake3BlockDeduplicationEngine,
     SigmaFsCrypt, SigmaFsVirtio,
 };
 
@@ -41,6 +40,7 @@ pub use manager::{
 };
 pub use mount_namespace::{MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource, MountFlags};
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
+pub use crate::filesystem::vfs::{FileSystem as VfsFileSystem};
 // pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};
 pub use file_monitor::{
     EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,

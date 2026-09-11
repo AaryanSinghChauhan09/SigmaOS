@@ -5696,7 +5696,7 @@ impl Default for FedoraRPMSeccompFilterEngine {
 }
 
 #[cfg(test)]
-mod tests_fedora_mojikey {
+mod tests_fedora {
     use super::*;
 
     #[test]
