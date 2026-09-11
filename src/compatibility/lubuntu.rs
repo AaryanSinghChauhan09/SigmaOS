@@ -454,8 +454,136 @@ impl Default for CalamaresInstallerShim {
     }
 }
 
-#[cfg(test_disabled)]
+
+
+/// Lubuntu LXQt Panel & Taskbar Tray Manager
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LxqtPanelWidgetKind {
+    AppMenu,
+    Taskbar,
+    SystemTray,
+    Clock,
+}
+
+#[derive(Debug, Clone)]
+pub struct LxqtPanelWidget {
+    pub kind: LxqtPanelWidgetKind,
+    pub title: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct LubuntuLxqtPanelManager {
+    pub widgets: Vec<LxqtPanelWidget>,
+}
+
+impl LubuntuLxqtPanelManager {
+    pub fn new() -> Self {
+        let mut mgr = Self { widgets: Vec::new() };
+        mgr.add_widget(LxqtPanelWidgetKind::AppMenu, "LXQt Main Menu");
+        mgr.add_widget(LxqtPanelWidgetKind::Taskbar, "Taskbar Window List");
+        mgr.add_widget(LxqtPanelWidgetKind::SystemTray, "System Notification Tray");
+        mgr.add_widget(LxqtPanelWidgetKind::Clock, "Digital Clock");
+        mgr
+    }
+
+    pub fn add_widget(&mut self, kind: LxqtPanelWidgetKind, title: &str) {
+        self.widgets.push(LxqtPanelWidget {
+            kind,
+            title: title.to_string(),
+        });
+    }
+}
+
+
+
+/// Lubuntu LXQt Runner Quick Application Launcher Engine
+#[derive(Debug, Clone)]
+pub struct LxqtRunnerItem {
+    pub name: String,
+    pub exec_cmd: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct LubuntuLxqtRunnerEngine {
+    pub index: Vec<LxqtRunnerItem>,
+}
+
+impl LubuntuLxqtRunnerEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { index: Vec::new() };
+        engine.index.push(LxqtRunnerItem { name: "QTerminal".to_string(), exec_cmd: "qterminal".to_string() });
+        engine.index.push(LxqtRunnerItem { name: "FeatherPad".to_string(), exec_cmd: "featherpad".to_string() });
+        engine.index.push(LxqtRunnerItem { name: "PCManFM-Qt".to_string(), exec_cmd: "pcmanfm-qt".to_string() });
+        engine
+    }
+
+    pub fn query(&self, input: &str) -> Vec<&LxqtRunnerItem> {
+        let q = input.to_lowercase();
+        self.index.iter().filter(|item| item.name.to_lowercase().contains(&q) || item.exec_cmd.to_lowercase().contains(&q)).collect()
+    }
+}
+
+
+
+/// Lubuntu LXQt Appearance & Openbox Theme Engine
+#[derive(Debug, Clone)]
+pub struct LubuntuLxqtAppearanceEngine {
+    pub widget_style: String,
+    pub icon_theme: String,
+    pub openbox_theme: String,
+}
+
+impl LubuntuLxqtAppearanceEngine {
+    pub fn new() -> Self {
+        Self {
+            widget_style: "Fusion".to_string(),
+            icon_theme: "ePapirus".to_string(),
+            openbox_theme: "Arc-Dark".to_string(),
+        }
+    }
+
+    pub fn set_theme(&mut self, widget: &str, icon: &str, openbox: &str) {
+        self.widget_style = widget.to_string();
+        self.icon_theme = icon.to_string();
+        self.openbox_theme = openbox.to_string();
+    }
+}
+
+impl Default for LubuntuLxqtAppearanceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
 mod tests {
+
+    #[test]
+    fn test_lubuntu_lxqt_appearance_engine() {
+        let mut app = LubuntuLxqtAppearanceEngine::new();
+        assert_eq!(app.widget_style, "Fusion");
+        app.set_theme("Breeze", "Papirus-Dark", "Arc-Darker");
+        assert_eq!(app.widget_style, "Breeze");
+    }
+
+
+    #[test]
+    fn test_lubuntu_lxqt_runner_engine() {
+        let runner = LubuntuLxqtRunnerEngine::new();
+        let res = runner.query("qterm");
+        assert_eq!(res.len(), 1);
+        assert_eq!(res[0].exec_cmd, "qterminal");
+    }
+
+
+    #[test]
+    fn test_lubuntu_lxqt_panel_manager() {
+        let mut mgr = LubuntuLxqtPanelManager::new();
+        assert_eq!(mgr.widgets.len(), 4);
+        mgr.add_widget(LxqtPanelWidgetKind::Clock, "Secondary Clock");
+        assert_eq!(mgr.widgets.len(), 5);
+    }
+
     use super::*;
 
     #[test]

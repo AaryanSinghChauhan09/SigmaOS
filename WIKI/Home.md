@@ -19,6 +19,19 @@ SigmaOS is an advanced, sovereign, microkernel-based operating system built from
 - **Post-Quantum Cryptography:** Native Dilithium-5 and Kyber-1024 cryptographic verification for driver and package attestation.
 - **Zero-Trust Access Control & MAC:** Discretionary (DAC), Mandatory Access Control (MAC LSM Inode/Ptrace/Socket hooks), and Role-Based (RBAC) security enforcers.
 - **Zenith Desktop & Sovereign Media Suite:** Built-in zero-dependency multimedia tools, video editor (SigmaCut), audio DSP, and responsive UI components.
+- **Autonomous AI Agent Resource Management:** Intelligent microkernel and userland agent governors for compute, memory (DAMON/PSI), storage (ZFS ARC/CoW), network QoS (eBPF/VNET), and thermal power tuning via ACP/MCP protocols.
+
+---
+
+## 📚 Documentation Index
+
+- [AI Agents Resource Management Architecture](docs/ai-agents-resource-management.md)
+- [API Reference](docs/api-reference.md)
+- [Kernel Architecture](docs/kernel.md)
+- [Memory Management](docs/memory-management.md)
+- [Security Architecture](docs/security.md)
+- [Package Management](docs/package-manager.md)
+- [Linux & BSD Distro Innovations Inspiration](docs/distro_suggestions.md)
 
 ---
 

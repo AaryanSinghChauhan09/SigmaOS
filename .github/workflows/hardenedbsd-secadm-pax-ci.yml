@@ -24,4 +24,5 @@ jobs:
 
       - name: Test HardenedBSD Security Sandbox & DAC Control
         run: |
+          mkdir -p build
           cargo test --lib -- access::control::tests
