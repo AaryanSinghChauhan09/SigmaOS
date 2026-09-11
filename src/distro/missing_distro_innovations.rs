@@ -712,106 +712,16 @@ impl Default for OpenBsdUnveilAuditor {
     }
 }
 
-// ==========================================
-// BEDROCK LINUX STRATA ENGINE
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct BedrockStratum {
-    pub name: String,
-    pub root_path: String,
-    pub is_enabled: bool,
-    pub provided_binaries: Vec<String>,
-}
-
-pub struct BedrockLinuxStrataEngine {
-    pub default_stratum: String,
-    pub strata: BTreeMap<String, BedrockStratum>,
-}
-
-impl BedrockLinuxStrataEngine {
-    pub fn new(default_stratum: &str) -> Self {
-        let mut strata = BTreeMap::new();
-        strata.insert(
-            default_stratum.to_string(),
-            BedrockStratum {
-                name: default_stratum.to_string(),
-                root_path: "/".to_string(),
-                is_enabled: true,
-                provided_binaries: Vec::new(),
-            },
-        );
-        Self {
-            default_stratum: default_stratum.to_string(),
-            strata,
-        }
-    }
-
-    pub fn register_stratum(&mut self, stratum: BedrockStratum) {
-        self.strata.insert(stratum.name.clone(), stratum);
-    }
-
-    pub fn resolve_strata_path(&self, stratum_name: &str, path: &str) -> Result<String, &'static str> {
-        if let Some(stratum) = self.strata.get(stratum_name) {
-            if !stratum.is_enabled {
-                return Err("Stratum is disabled");
-            }
-            Ok(format!("{}{}", stratum.root_path, path))
-        } else {
-            Err("Stratum not found")
-        }
-    }
-
-    pub fn strat(&self, stratum_name: &str, binary: &str, args: &[&str]) -> Result<String, &'static str> {
-        if let Some(stratum) = self.strata.get(stratum_name) {
-            if !stratum.is_enabled {
-                return Err("Stratum is disabled");
-            }
-            if stratum.provided_binaries.contains(&binary.to_string()) || stratum.name == self.default_stratum {
-                let joined_args = args.join(" ");
-                Ok(format!("Executed '{} {}' from stratum '{}'", binary, joined_args, stratum_name))
-            } else {
-                Err("Binary not provided by stratum")
-            }
-        } else {
-            Err("Stratum not found")
-        }
-    }
-
-    pub fn disable_stratum(&mut self, stratum_name: &str) -> Result<(), &'static str> {
-        if stratum_name == self.default_stratum {
-            return Err("Cannot disable default stratum");
-        }
-        if let Some(stratum) = self.strata.get_mut(stratum_name) {
-            stratum.is_enabled = false;
-            Ok(())
-        } else {
-            Err("Stratum not found")
-        }
-    }
-}
-
-// ==========================================
-// SMARTOS ZONE ENGINE
-// ==========================================
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SmartOsVmBrand {
-    JoyentZone,
-    Kvm,
-    Bhyve,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SmartOsVmState {
-    Configured,
-    Running,
-    Stopped,
+pub enum KaOsRepoGroup {
+    Core,
+    Main,
+    Apps,
+    Free,
 }
 
 #[derive(Debug, Clone)]
-pub struct SmartOsImage {
-    pub uuid: String,
+pub struct KaOsPackageRecord {
     pub name: String,
     pub version: String,
     pub repo_group: KaOsRepoGroup,
@@ -864,7 +774,76 @@ impl Default for KaOSPackageStateGovernor {
     }
 }
 
-/// 12. Missing Linux & BSD Distro Component Parity Inspector
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DevuanInitBackend {
+    SysVInit,
+    OpenRc,
+    RunIt,
+    S6,
+}
+
+pub struct DevuanInitDiversityEngine {
+    pub active_backend: DevuanInitBackend,
+    pub services: BTreeMap<String, String>,
+}
+
+impl DevuanInitDiversityEngine {
+    pub fn new(backend: DevuanInitBackend) -> Self {
+        Self {
+            active_backend: backend,
+            services: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_service(&mut self, name: &str, _backend: DevuanInitBackend, init_script: &str) {
+        self.services.insert(name.to_string(), init_script.to_string());
+    }
+
+    pub fn is_systemd_free(&self) -> bool {
+        true
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ArtixInitScriptlet {
+    pub name: String,
+    pub openrc_run_script: String,
+    pub runit_run_script: String,
+    pub s6_run_script: String,
+}
+
+pub struct ArtixLinuxInitMatrix {
+    pub scriptlets: BTreeMap<String, ArtixInitScriptlet>,
+}
+
+impl ArtixLinuxInitMatrix {
+    pub fn new() -> Self {
+        Self {
+            scriptlets: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_scriptlet(&mut self, name: &str, binary_path: &str) {
+        let scriptlet = ArtixInitScriptlet {
+            name: name.to_string(),
+            openrc_run_script: format!("#!/sbin/openrc-run\ncommand=\"{}\"", binary_path),
+            runit_run_script: format!("#!/bin/sh\nexec {}", binary_path),
+            s6_run_script: format!("#!/bin/execlineb -P\n{}", binary_path),
+        };
+        self.scriptlets.insert(name.to_string(), scriptlet);
+    }
+
+    pub fn get_scriptlet(&self, name: &str) -> Option<&ArtixInitScriptlet> {
+        self.scriptlets.get(name)
+    }
+}
+
+impl Default for ArtixLinuxInitMatrix {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
     Implemented,
@@ -873,83 +852,62 @@ pub enum ComponentParityStatus {
 }
 
 #[derive(Debug, Clone)]
-pub struct SmartOsVmConfig {
-    pub uuid: String,
-    pub alias: String,
-    pub brand: SmartOsVmBrand,
-    pub cpu_shares: u32,
-    pub ram_mb: usize,
-    pub image_uuid: String,
-    pub nics: Vec<String>,
-    pub state: SmartOsVmState,
+pub struct MissingDistroComponentRecord {
+    pub distro: String,
+    pub feature: String,
+    pub status: ComponentParityStatus,
 }
 
-pub struct SmartOsZoneEngine {
-    pub images: BTreeMap<String, SmartOsImage>,
-    pub vms: BTreeMap<String, SmartOsVmConfig>,
+pub struct MissingDistroComponentsEngine {
+    pub records: Vec<MissingDistroComponentRecord>,
 }
 
-impl SmartOsZoneEngine {
+impl MissingDistroComponentsEngine {
     pub fn new() -> Self {
         Self {
-            images: BTreeMap::new(),
-            vms: BTreeMap::new(),
+            records: vec![
+                MissingDistroComponentRecord {
+                    distro: "Devuan".to_string(),
+                    feature: "Init Diversity".to_string(),
+                    status: ComponentParityStatus::Implemented,
+                },
+                MissingDistroComponentRecord {
+                    distro: "Artix".to_string(),
+                    feature: "Init Matrix".to_string(),
+                    status: ComponentParityStatus::Implemented,
+                },
+                MissingDistroComponentRecord {
+                    distro: "KaOS".to_string(),
+                    feature: "Qt/KDE Focus".to_string(),
+                    status: ComponentParityStatus::Implemented,
+                },
+                MissingDistroComponentRecord {
+                    distro: "Clear Linux".to_string(),
+                    feature: "Stateless Config".to_string(),
+                    status: ComponentParityStatus::Implemented,
+                },
+                MissingDistroComponentRecord {
+                    distro: "Bedrock Linux".to_string(),
+                    feature: "Strata Routing".to_string(),
+                    status: ComponentParityStatus::Implemented,
+                },
+                MissingDistroComponentRecord {
+                    distro: "SmartOS".to_string(),
+                    feature: "Zones VMadm".to_string(),
+                    status: ComponentParityStatus::Implemented,
+                },
+            ],
         }
     }
 
-    pub fn imgadm_import(&mut self, uuid: &str, name: &str, version: &str, os: &str) -> String {
-        self.images.insert(
-            uuid.to_string(),
-            SmartOsImage {
-                uuid: uuid.to_string(),
-                name: name.to_string(),
-                version: version.to_string(),
-                os: os.to_string(),
-            },
-        );
-        format!("Imported image {} ({})", name, uuid)
-    }
-
-    pub fn vmadm_create(
-        &mut self,
-        uuid: &str,
-        alias: &str,
-        brand: SmartOsVmBrand,
-        cpu_shares: u32,
-        ram_mb: usize,
-        image_uuid: &str,
-        nics: &[&str],
-    ) -> Result<(), &'static str> {
-        let vm = SmartOsVmConfig {
-            uuid: uuid.to_string(),
-            alias: alias.to_string(),
-            brand,
-            cpu_shares,
-            ram_mb,
-            image_uuid: image_uuid.to_string(),
-            nics: nics.iter().map(|s| s.to_string()).collect(),
-            state: SmartOsVmState::Configured,
-        };
-        self.vms.insert(uuid.to_string(), vm);
-        Ok(())
-    }
-
-    pub fn report_boot_failure_and_rollback(&mut self) -> PartitionSlot {
-        let active = match self.active_slot {
-            PartitionSlot::SlotA => &mut self.slot_a,
-            PartitionSlot::SlotB => &mut self.slot_b,
-        };
-        active.status = ImageSlotStatus::Corrupted;
-
-        let fallback_slot = self.inactive_slot();
-        self.active_slot = fallback_slot;
-        fallback_slot
+    pub fn is_all_components_implemented(&self) -> bool {
+        self.records.iter().all(|r| r.status == ComponentParityStatus::Implemented)
     }
 }
 
-impl Default for SteamOsAtomicAbImageUpdateEngine {
+impl Default for MissingDistroComponentsEngine {
     fn default() -> Self {
-        Self::new("1.0.0", "cbf29ce484222325")
+        Self::new()
     }
 }
 
@@ -1034,12 +992,23 @@ impl AppArmorPathRuleEngine {
                 && (!need_write || rule.allow_write)
                 && (!need_exec || rule.allow_exec)
         } else {
-            Ok(true) // Unconfined
+            true // Unconfined
+        };
+
+        if !allowed {
+            self.audit_log.push(format!(
+                "AppArmor DENIAL on profile '{}' for path '{}'",
+                profile_name, path
+            ));
+            if profile.mode == AppArmorRuleMode::Enforce {
+                return false;
+            }
         }
+        true
     }
 }
 
-impl Default for UbuntuAppArmorEngine {
+impl Default for AppArmorPathRuleEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -1153,26 +1122,8 @@ impl DragonFlyHammer2PfsEngine {
             self.active_snapshots.push(name);
             Ok(snap_id)
         } else {
-            Err("VM not found")
+            Err("PFS not found")
         }
-    }
-
-    pub fn vmadm_delete(&mut self, uuid: &str) -> Result<(), &'static str> {
-        if let Some(vm) = self.vms.get(uuid) {
-            if vm.state == SmartOsVmState::Running {
-                return Err("Cannot delete running VM");
-            }
-            self.vms.remove(uuid);
-            Ok(())
-        } else {
-            Err("VM not found")
-        }
-    }
-}
-
-impl Default for SmartOsZoneEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

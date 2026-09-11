@@ -247,12 +247,7 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignXdpCarpMeshEngine,
 };
 
-pub mod sovereign_ahead_distro_supremacy;
-pub use sovereign_ahead_distro_supremacy::{
-    DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchTier, PredictiveSchedPolicy,
-    PredictiveTaskDescriptor, ResilientBlockEntry, SecurityMultiOsMask, SimdJitFunctionTarget,
-    SovereignAheadOfDistrosSuite, SovereignCrossPlatformCapabilityEngine,
-    SovereignOmniCasStoreEngine, SovereignPredictiveSchedExtEngine,
-    SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
-    SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
-};
+
+
+pub mod arch_missing_components;
+pub use arch_missing_components::*;
