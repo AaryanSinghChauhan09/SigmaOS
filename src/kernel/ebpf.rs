@@ -364,22 +364,17 @@ impl BpfRingBufferEngine {
     }
 
     pub fn consume_next_sample(&mut self) -> Option<BpfRingBufferSample> {
-        if self.sample_order.is_empty() {
-            None
-        } else {
+        while !self.sample_order.is_empty() {
             let handle = self.sample_order.remove(0);
             if let Some(sample) = self.samples.remove(&handle) {
                 let total_size = sample.reserved_len + 8;
                 self.consumer_pos += total_size;
-                if sample.is_discarded {
-                    self.consume_next_sample()
-                } else {
-                    Some(sample)
+                if !sample.is_discarded {
+                    return Some(sample);
                 }
-            } else {
-                self.consume_next_sample()
             }
         }
+        None
     }
 }
 
