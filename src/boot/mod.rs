@@ -5,14 +5,22 @@ pub mod boot_snapshot;
 pub mod bridge_grid;
 pub mod firmware;
 pub mod firmware_bridge;
+pub mod multiboot2;
 pub mod optimization;
 pub mod pci;
 pub mod plymouth;
 pub mod post;
 pub mod secure;
 pub mod sigma_boot;
+pub mod sigma_bootloader;
 pub mod uefi;
 pub mod verified;
+
+pub use sigma_bootloader::{
+    BootArch, BootMemoryMap, BootPlatform, FramebufferInfo, KernelCmdline, MemoryRegion,
+    MemoryType, SigmaBootInfo, SigmaBootManager, SigmaBootloaderEngine, LiveEnvironmentConfig,
+    SIGMA_BOOT_MAGIC,
+};
 
 pub use firmware::{
     efi_attr, CpuMicrocodePatchEngine, EfiVariable, EfiVariableStore, EsrtEntry, EsrtFirmwareType,

@@ -3605,4 +3605,22 @@ requires {
         assert_eq!(obsd_manifest.pkgname, "htop");
         assert_eq!(obsd_manifest.version, "3.2.2");
     }
+
+    #[test]
+    fn test_expanded_pm_command_dispatcher() {
+        let dispatcher = UniversalPmCommandDispatcher::new();
+
+        let swupd_res = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
+        assert_eq!(swupd_res.source_pm, "swupd");
+        assert_eq!(swupd_res.operation, UniversalPmOperation::Install);
+        assert_eq!(swupd_res.target_packages, vec!["os-core"]);
+
+        let kiss_res = dispatcher.dispatch_command("kiss build busybox").unwrap();
+        assert_eq!(kiss_res.source_pm, "kiss");
+        assert_eq!(kiss_res.operation, UniversalPmOperation::Install);
+
+        let spack_res = dispatcher.dispatch_command("spack install openmpi").unwrap();
+        assert_eq!(spack_res.source_pm, "spack");
+        assert_eq!(spack_res.operation, UniversalPmOperation::Install);
+    }
 }
