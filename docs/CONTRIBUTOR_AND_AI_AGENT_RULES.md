@@ -58,3 +58,30 @@ This document outlines the mandatory rules, development policies, and execution 
 
 2. **Review Feedback Loop:**
    - Address all code review annotations prompt by re-verifying test execution and ensuring strict adherence to the project's whitepaper and contributor charter.
+
+---
+
+## 5. Rules for Human Contributors
+
+1. **Clean Commit History**:
+   - Keep commits logical, atomic, and well-described following conventional commit messages (`feat:`, `fix:`, `docs:`, `security:`, `perf:`).
+2. **Special Interest Group (SIG) Participation**:
+   - Align contributions with relevant Special Interest Groups (SIG Kernel, SIG Drivers, SIG Desktop, SIG Security, SIG Apps).
+3. **Double Maintainer Code Review**:
+   - All pull requests require review and approval from two maintainers before merging into `main`.
+
+---
+
+## 6. Directives for AI Agents
+
+1. **Tooling Protocol Sequence**:
+   - Always formulate a clear plan and call `set_plan` before modifying files.
+   - Use `request_plan_review` and `record_user_approval_for_plan` during initial task setup.
+   - Run `pre_commit_instructions` before requesting code review.
+   - Execute `request_code_review` and address any review findings.
+   - Record architectural learnings using `initiate_memory_recording`.
+   - Submit changes using `submit` with `jules-*` branch naming.
+2. **Zero Unverifiable Modifications**:
+   - Every file created or edited MUST be verified using read-only tools (`read_file`, `list_files`) or standalone test compilation (`rustc --test`).
+3. **Proactive Error Diagnosis**:
+   - Inspect build error logs, lock files, and type annotations before modifying code or environment configurations.
