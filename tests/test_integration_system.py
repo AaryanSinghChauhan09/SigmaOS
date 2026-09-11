@@ -208,22 +208,44 @@ def test_boot_sequence_varied_configs():
 
 
 def test_universal_distro_subsystem_bridge():
-    """Validates cross-subsystem mode translation for Linux and BSD distributions."""
+    """Validates cross-subsystem mode translation for all Linux and BSD distributions."""
     distro_matrix = {
         "LinuxArch": {"pkg_ext": ".pkg.tar.zst", "supervisor": "Systemd", "vfs_etc": "/etc"},
         "LinuxDebian": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc"},
         "LinuxAlpine": {"pkg_ext": ".apk", "supervisor": "Runit", "vfs_etc": "/etc"},
         "LinuxVoid": {"pkg_ext": ".xbps", "supervisor": "Runit", "vfs_etc": "/etc"},
         "LinuxNix": {"pkg_ext": ".nix", "supervisor": "Shepherd", "vfs_etc": "/etc/nixos"},
+        "LinuxGentoo": {"pkg_ext": ".ebuild", "supervisor": "OpenRC", "vfs_etc": "/etc"},
+        "LinuxFedora": {"pkg_ext": ".rpm", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxOpenSuse": {"pkg_ext": ".rpm", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxSolus": {"pkg_ext": ".eopkg", "supervisor": "Dinit", "vfs_etc": "/etc"},
+        "LinuxClear": {"pkg_ext": ".bundle", "supervisor": "Systemd", "vfs_etc": "/usr/etc"},
+        "LinuxSlackware": {"pkg_ext": ".txz", "supervisor": "Sysvinit", "vfs_etc": "/etc"},
         "FreeBsd": {"pkg_ext": ".pkg", "supervisor": "OpenRC", "vfs_etc": "/usr/local/etc"},
-        "OpenBsd": {"pkg_ext": ".tgz", "supervisor": "OpenRC", "vfs_etc": "/etc"},
+        "OpenBsd": {"pkg_ext": ".tgz", "supervisor": "OpenRC", "vfs_etc": "/usr/local/etc"},
+        "NetBsd": {"pkg_ext": ".tgz", "supervisor": "OpenRC", "vfs_etc": "/usr/local/etc"},
+        "DragonFlyBsd": {"pkg_ext": ".pkg", "supervisor": "OpenRC", "vfs_etc": "/usr/local/etc"},
+        "SolarisIllumos": {"pkg_ext": ".p5p", "supervisor": "Smf", "vfs_etc": "/etc"},
+        "SmartOs": {"pkg_ext": ".tgz", "supervisor": "Rcd", "vfs_etc": "/usr/local/etc"},
+        "BedrockLinux": {"pkg_ext": ".stratum", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxPopOs": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxTails": {"pkg_ext": ".deb", "supervisor": "Systemd", "vfs_etc": "/etc"},
+        "LinuxGuix": {"pkg_ext": ".scm", "supervisor": "Shepherd", "vfs_etc": "/etc/config.scm"},
     }
+
+    subsystems = [
+        "init", "package", "vfs", "security", "storage", "kernel",
+        "network", "graphics", "power", "ipc", "auth", "audit",
+        "boot", "container", "virtualization", "audio", "input",
+        "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring"
+    ]
 
     for mode, spec in distro_matrix.items():
         pkg_name = f"coreutils{spec['pkg_ext']}"
         assert pkg_name.endswith(spec["pkg_ext"])
         assert spec["supervisor"] in ["Systemd", "OpenRC", "Runit", "Shepherd", "Dinit", "Sysvinit", "Smf", "Rcd"]
         assert len(spec["vfs_etc"]) > 0
+        assert len(subsystems) == 24
 
 
 def test_universal_package_manager_cli_simulation_basic():

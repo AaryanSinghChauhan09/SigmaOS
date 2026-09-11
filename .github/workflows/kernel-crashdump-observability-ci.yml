@@ -24,10 +24,12 @@ jobs:
 
       - name: Test Kdump & Watchdog Engine
         run: |
+          mkdir -p build
           rustc --test src/kernel/watchdog.rs --edition=2021 -o build/watchdog_test
           ./build/watchdog_test
 
       - name: Test DTrace Tracing Engine
         run: |
+          mkdir -p build
           rustc --test src/kernel/dtrace_compat.rs --edition=2021 -o build/dtrace_test
           ./build/dtrace_test

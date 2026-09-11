@@ -24,5 +24,6 @@ jobs:
 
       - name: Verify Debian Package Parity & Reproducibility Context
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh
           ./run_sigma_tests.sh
