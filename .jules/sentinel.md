@@ -1,3 +1,8 @@
+## 2026-03-02 - Quantum-Resistant PQC Signature Envelope & Constant-Time Verification
+**Vulnerability:** Naive byte comparison of post-quantum cryptographic signature envelopes (Dilithium-5 / FALCON-1024) in user space IPC triggers timing side-channel attacks, allowing attackers to reconstruct signature bytes.
+**Learning:** Comparing cryptographic hashes or signature buffers using standard slice equality returns early on mismatch, leaking microsecond timing differences.
+**Prevention:** Always perform constant-time byte slice comparisons (constant-time XOR accumulation) when auditing PQC signatures and secret verification tokens.
+
 ## 2026-09-08 - Hostname Option Injection and Label Boundary Security Vulnerability
 **Vulnerability:** `validate_hostname` permitted hostnames starting with a hyphen (e.g. `-oProxyCommand=...` or `-rf`), leading to command-line option injection when hostnames are passed to network or shell utilities, as well as permitting malformed labels (empty labels `..` or label lengths >63).
 **Learning:** Checking only character set membership (`is_ascii_alphanumeric() || b == '-' || b == '.'`) is insufficient for hostname validation because hyphens at the start of labels act as option flags in CLI tool invocations, and RFC 952/1123 imposes strict per-label length (1..=63 octets) and formatting rules.
