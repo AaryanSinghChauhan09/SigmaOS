@@ -435,6 +435,134 @@ impl Default for FileManager {
     }
 }
 
+// ============================================================================
+// Open-Source File Manager Inspired Enhancements (Nautilus, Dolphin, Yazi, Ranger)
+// ============================================================================
+
+/// Dual-Pane Split View Manager Mode (inspired by Midnight Commander & Dolphin)
+#[derive(Debug, Clone)]
+pub struct DualPaneManagerMode {
+    pub left_path: String,
+    pub right_path: String,
+    pub active_pane_is_left: bool,
+}
+
+impl DualPaneManagerMode {
+    pub fn new(left_path: &str, right_path: &str) -> Self {
+        Self {
+            left_path: left_path.to_string(),
+            right_path: right_path.to_string(),
+            active_pane_is_left: true,
+        }
+    }
+
+    pub fn toggle_active_pane(&mut self) {
+        self.active_pane_is_left = !self.active_pane_is_left;
+    }
+
+    pub fn active_path(&self) -> &str {
+        if self.active_pane_is_left {
+            &self.left_path
+        } else {
+            &self.right_path
+        }
+    }
+}
+
+/// Fuzzy Search & Substring Filter Engine (inspired by FZF & Yazi)
+pub struct FuzzyFileSearchEngine;
+
+impl FuzzyFileSearchEngine {
+    pub fn fuzzy_score(pattern: &str, target: &str) -> usize {
+        let pattern_lower = pattern.to_lowercase();
+        let target_lower = target.to_lowercase();
+
+        if pattern_lower.is_empty() {
+            return 100;
+        }
+
+        let mut score = 0;
+        let mut p_idx = 0;
+        let p_chars: Vec<char> = pattern_lower.chars().collect();
+
+        for (t_idx, t_char) in target_lower.chars().enumerate() {
+            if p_idx < p_chars.len() && t_char == p_chars[p_idx] {
+                score += 10 + (100 / (t_idx + 1));
+                p_idx += 1;
+            }
+        }
+
+        if p_idx == p_chars.len() {
+            score
+        } else {
+            0
+        }
+    }
+
+    pub fn filter_items(pattern: &str, items: &[FileItem]) -> Vec<FileItem> {
+        let mut scored: Vec<(usize, FileItem)> = items
+            .iter()
+            .map(|item| (Self::fuzzy_score(pattern, &item.name), item.clone()))
+            .filter(|(s, _)| *s > 0)
+            .collect();
+
+        scored.sort_by(|a, b| b.0.cmp(&a.0));
+        scored.into_iter().map(|(_, item)| item).collect()
+    }
+}
+
+/// File Previewer & Metadata Extractor Engine (inspired by Ranger & Yazi)
+#[derive(Debug, Clone)]
+pub struct FilePreviewMetadataExtractor;
+
+impl FilePreviewMetadataExtractor {
+    pub fn generate_preview_summary(item: &FileItem) -> String {
+        if item.is_directory {
+            format!("Directory: {} | Subitems: Unknown", item.name)
+        } else {
+            format!(
+                "File: {} | Size: {} bytes | Type: {:?}",
+                item.name, item.size_bytes, item.file_type
+            )
+        }
+    }
+}
+
+/// Smart Bookmarks & Color Tagging System (inspired by Mac Finder & Dolphin)
+pub struct FileBookmarkTagManager {
+    pub tags: BTreeMap<String, Vec<String>>,
+}
+
+impl FileBookmarkTagManager {
+    pub fn new() -> Self {
+        Self {
+            tags: BTreeMap::new(),
+        }
+    }
+
+    pub fn add_tag_to_path(&mut self, tag: &str, path: &str) {
+        let tag_key = tag.to_string();
+        if let Some(paths) = self.tags.get_mut(&tag_key) {
+            let p_str = path.to_string();
+            if !paths.contains(&p_str) {
+                paths.push(path.to_string());
+            }
+        } else {
+            self.tags.insert(tag_key, vec![path.to_string()]);
+        }
+    }
+
+    pub fn get_paths_for_tag(&self, tag: &str) -> Vec<String> {
+        self.tags.get(&tag.to_string()).cloned().unwrap_or_default()
+    }
+}
+
+impl Default for FileBookmarkTagManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// File manager errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FileManagerError {
@@ -502,5 +630,102 @@ mod tests {
             String::from("/home/user/Documents"),
         );
         assert_eq!(manager.bookmarks().len(), 1);
+    }
+
+    #[test]
+    fn test_open_source_file_manager_enhancements() {
+        let mut dual_pane = DualPaneManagerMode::new("/home/user", "/var/log");
+        assert_eq!(dual_pane.active_path(), "/home/user");
+        dual_pane.toggle_active_pane();
+        assert_eq!(dual_pane.active_path(), "/var/log");
+
+        let score = FuzzyFileSearchEngine::fuzzy_score("doc", "documents.pdf");
+        assert!(score > 0);
+
+        let mut tag_mgr = FileBookmarkTagManager::new();
+        tag_mgr.add_tag_to_path("work", "/home/user/project");
+        assert_eq!(tag_mgr.get_paths_for_tag("work"), vec!["/home/user/project"]);
+    }
+}
+
+
+#[cfg(test)]
+mod open_source_file_manager_tests {
+    use super::*;
+
+    #[test]
+    fn test_dual_pane_manager_mode() {
+        let mut dual_pane = DualPaneManagerMode::new("/home/user", "/var/log");
+        assert_eq!(dual_pane.active_path(), "/home/user");
+        assert!(dual_pane.active_pane_is_left);
+
+        dual_pane.toggle_active_pane();
+        assert_eq!(dual_pane.active_path(), "/var/log");
+        assert!(!dual_pane.active_pane_is_left);
+    }
+
+    #[test]
+    fn test_fuzzy_file_search_engine() {
+        let score = FuzzyFileSearchEngine::fuzzy_score("doc", "documents.pdf");
+        assert!(score > 0);
+
+        let items = vec![
+            FileItem {
+                name: "documents.pdf".to_string(),
+                path: "/home/user/documents.pdf".to_string(),
+                size_bytes: 1024,
+                is_directory: false,
+                is_hidden: false,
+                is_readonly: false,
+                modified_at: 100,
+                created_at: 100,
+                file_type: FileType::Regular,
+            },
+            FileItem {
+                name: "image.png".to_string(),
+                path: "/home/user/image.png".to_string(),
+                size_bytes: 2048,
+                is_directory: false,
+                is_hidden: false,
+                is_readonly: false,
+                modified_at: 100,
+                created_at: 100,
+                file_type: FileType::Regular,
+            },
+        ];
+
+        let filtered = FuzzyFileSearchEngine::filter_items("doc", &items);
+        assert_eq!(filtered.len(), 1);
+        assert_eq!(filtered[0].name, "documents.pdf");
+    }
+
+    #[test]
+    fn test_file_preview_metadata_extractor() {
+        let item = FileItem {
+            name: "report.txt".to_string(),
+            path: "/home/user/report.txt".to_string(),
+            size_bytes: 512,
+            is_directory: false,
+            is_hidden: false,
+            is_readonly: false,
+            modified_at: 100,
+            created_at: 100,
+            file_type: FileType::Regular,
+        };
+
+        let summary = FilePreviewMetadataExtractor::generate_preview_summary(&item);
+        assert!(summary.contains("report.txt"));
+        assert!(summary.contains("512 bytes"));
+    }
+
+    #[test]
+    fn test_file_bookmark_tag_manager() {
+        let mut tag_mgr = FileBookmarkTagManager::new();
+        tag_mgr.add_tag_to_path("important", "/home/user/notes.txt");
+        tag_mgr.add_tag_to_path("important", "/home/user/project");
+
+        let paths = tag_mgr.get_paths_for_tag("important");
+        assert_eq!(paths.len(), 2);
+        assert!(paths.contains(&"/home/user/notes.txt".to_string()));
     }
 }

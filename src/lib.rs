@@ -66,6 +66,7 @@ pub use ai::{
     AiUsageQuota, AiUsageRecord, AiUsageTrackerEngine, ModelInferenceType,
 };
 pub use productivity::{
+    IndentedTextMindMapParserEngine, MindMapCreator, MindMapNode,
     EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
 };
 pub use process::{
@@ -395,6 +396,7 @@ pub use remote::{
     SimpleShellManager,
 };
 pub use productivity::{
+    MindMapCreator, MindMapNode,
     Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
     PomodoroState, PomodoroTimer, ProductivityScore, SplitDirection as TmuxSplitDirection,
     TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,

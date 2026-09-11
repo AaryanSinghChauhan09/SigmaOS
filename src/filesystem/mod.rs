@@ -34,6 +34,8 @@ pub use disk_usage::{
 pub use manager::{
     ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
+    DualPaneManagerMode, FuzzyFileSearchEngine, FilePreviewMetadataExtractor,
+    FileBookmarkTagManager,
 };
 pub use mount_namespace::{MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource, MountFlags};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
