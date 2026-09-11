@@ -62,6 +62,10 @@ pub use distro::{
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
+    AlpineApkVolatileOverlayEngine, DragonFlyHammer2PfsEngine, FreeBsdPoudrierePortBuilder,
+    GentooEmergeCliEngine, GentooGccCflagsTunerEngine, GentooLaymanOverlayEngine,
+    IllumosDTraceTracingGovernor, MageiaUrpmiMediaManager, OpenBsdPledgeUnveilSecurityGovernor,
+    SolusEopkgPackageEngine, VoidXbpsBinaryPackageEngine,
     ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode,
     DragonFlyHammer2EmergencyCowEngine, FedoraSelinuxMlsMcsGovernor, FreeBsdGeomVdevTopology,
     GarudaZenPerformanceEngine, GentooPortageSlotOperatorEngine, GeomVdevNode,
