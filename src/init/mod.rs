@@ -3,16 +3,9 @@ pub mod runit;
 pub mod s6;
 pub mod sigma_init;
 pub mod sigmainit;
-pub mod service_innovations_engine;
 pub mod systemd_init;
 pub mod service_innovations_engine;
 pub use service_innovations_engine::*;
-
-pub use service_innovations_engine::{
-    BenchmarkScore, LinuxNewsPressTechFeedsEngine, PowerTelemetryReading,
-    SystemHealthDiagnosticService, TechMediaBenchmarkAggregator, TechNewsFeedItem,
-    ZeroTrustServiceHardeningEngine,
-};
 
 pub use init_abstraction::*;
 pub use runit::*;
@@ -23,12 +16,4 @@ pub use systemd_init::{
     BsdRcOrder, InitSystemBridge, InitSystemType, JournalEntry, ParsedSystemdUnitFile,
     RestartPolicy, SystemdBetsyEngine, SystemdCgroupSliceGovernor, SystemdEngine,
     SystemdServiceWatchdog, SystemdUnit, SystemdUnitFileParser, UnitID, UnitState, UnitType,
-};
-
-pub mod tech_media_daemons_synthesis;
-pub use tech_media_daemons_synthesis::{
-    ConnectedCompanionDevice, InferenceJobRequest, ItsfossAutoCleanerHousekeepingDaemon,
-    LinuxFoundationSecurityPolicyDaemon, LivePatchModule, MarktechpostLocalAiInferenceDaemon,
-    PhoronixThermalDynamicGovernorDaemon, PowerGovernorProfile,
-    SovereignTechMediaDaemonsSuite, WindowsCentralDeviceCompanionDaemon,
 };
