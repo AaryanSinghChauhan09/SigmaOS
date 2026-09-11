@@ -101,3 +101,17 @@ if [ -f "src/driver/driver_test_framework.rs" ]; then
     rustc --test src/driver/driver_test_framework.rs --edition=2021 -o build/driver_test_framework
     ./build/driver_test_framework
 fi
+
+if [ -f "src/distro/omarchy.rs" ]; then
+    echo "Running Omarchy Linux desktop & theme test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/omarchy_test
+    ./build/omarchy_test
+fi
+
+if [ -f "src/distro/omarchy_ultimate_gap_closure.rs" ]; then
+    echo "Running Omarchy Linux ultimate gap closure test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_ultimate_gap_closure.rs --edition=2021 -o build/omarchy_ultimate_test
+    ./build/omarchy_ultimate_test
+fi

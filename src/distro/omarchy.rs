@@ -610,6 +610,7 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::distro::omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,

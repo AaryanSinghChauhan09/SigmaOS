@@ -7,6 +7,8 @@ pub mod mint_tools;
 pub mod moksha;
 pub mod omarchy_omakase;
 pub mod omarchy_theme;
+
+pub use omarchy_theme::{Color, OmarchyThemeManager, SemanticColor, Theme, ThemeComponent};
 pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
@@ -61,8 +63,4 @@ pub use zenith_compositor::{
 pub use omarchy_omakase::{
     AgenticWorkstationLayout, AgenticWorkstationOrchestrator, OmakasePresetConfig,
     OmarchySystemEngine, WorkstationPane, WorkstationPaneRole,
-};
-
-pub use omarchy_theme::{
-    Color, OmarchyThemeManager, SemanticColor, Theme, ThemeComponent,
 };
