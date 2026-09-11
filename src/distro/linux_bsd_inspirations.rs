@@ -542,6 +542,24 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "desktop" => {
+                Ok(format!(
+                    "Dispatched Wayland / Sway / Hyprland compositor surface management for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "telemetry" => {
+                Ok(format!(
+                    "Dispatched eBPF performance & metrics telemetry collector for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "hardware" => {
+                Ok(format!(
+                    "Dispatched multiarch HAL hardware topology discovery for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             _ => Err("Unknown target subsystem"),
         }
     }
@@ -552,6 +570,7 @@ impl SovereignUniversalDistroBridge {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "desktop", "telemetry", "hardware",
         ];
 
         for sub in subsystems {
@@ -1881,6 +1900,7 @@ mod cross_subsystem_tests {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "desktop", "telemetry", "hardware",
         ];
 
         for m in modes {

@@ -2754,6 +2754,33 @@ mod tests {
     }
 
     #[test]
+    fn test_all_package_format_strategies_and_adapters() {
+        let adapter = AlpineApkPackageAdapter;
+        adapter.test_all_package_format_strategies_and_adapters();
+    }
+
+    #[test]
+    fn test_expanded_decorators() {
+        let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
+        let base = BasePackageDecorator { package: pkg };
+
+        let sandbox_dec = SandboxDecorator {
+            decorated: base,
+            is_isolated: true,
+        };
+
+        assert!(sandbox_dec.enforce_sandbox().is_ok());
+        assert_eq!(sandbox_dec.get_package().name, "simd-app");
+
+        let net_dec = NetworkRestrictionDecorator {
+            decorated: sandbox_dec,
+            allowed_hosts: vec!["sigmaos.org".to_string()],
+        };
+
+        assert!(net_dec.restrict_network().is_ok());
+    }
+
+    #[test]
     fn test_package_format_from_filename_extensions() {
         assert_eq!(
             PackageFormat::from_filename("app.air"),
@@ -2988,26 +3015,5 @@ impl AlpineApkPackageAdapter {
                         && adapted.formats.contains(&PackageFormat::Nixpkg))
             );
         }
-    }
-
-    #[test]
-    fn test_expanded_decorators() {
-        let pkg = UnifiedPackage::new("simd-app".to_string(), "2.0.0".to_string());
-        let base = BasePackageDecorator { package: pkg };
-
-        let sandbox_dec = SandboxDecorator {
-            decorated: base,
-            is_isolated: true,
-        };
-
-        assert!(sandbox_dec.enforce_sandbox().is_ok());
-        assert_eq!(sandbox_dec.get_package().name, "simd-app");
-
-        let net_dec = NetworkRestrictionDecorator {
-            decorated: sandbox_dec,
-            allowed_hosts: vec!["sigmaos.org".to_string()],
-        };
-
-        assert!(net_dec.restrict_network().is_ok());
     }
 }
