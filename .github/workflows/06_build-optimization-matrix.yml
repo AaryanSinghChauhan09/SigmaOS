@@ -118,10 +118,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@7b737f3747eb115cf4e8f1766b8fb62b6948fb16 # stable
 
       - name: Install LLVM tools
         run: |
@@ -145,7 +145,7 @@ jobs:
 
       - name: Upload optimization report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
           name: optimization-${{ matrix.optimization }}
           path: |

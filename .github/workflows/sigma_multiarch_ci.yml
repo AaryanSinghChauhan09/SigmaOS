@@ -37,9 +37,9 @@ jobs:
             profile: kernel   # riscv64gc uses release profile only
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@23bcca282200e939c6f6d866a2869fee75922534 # v2.7.3
         with:
           key: "${{ matrix.arch }}-${{ matrix.profile }}"
 
@@ -135,7 +135,7 @@ jobs:
           done
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         if: always()
         with:
           name: "kernel-${{ matrix.arch }}-${{ matrix.profile }}"
@@ -159,7 +159,7 @@ jobs:
         arch: [x86_64]    # aarch64 added when kernel boots cleanly
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Install QEMU
         run: |
@@ -169,7 +169,7 @@ jobs:
             qemu-utils ovmf
 
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
         with:
           name: "kernel-${{ matrix.arch }}-release"
           path: boot-artifacts/
@@ -255,7 +255,7 @@ jobs:
 
       - name: Upload smoke test log
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
           name: "qemu-smoke-${{ matrix.arch }}"
           path: "qemu-smoke-${{ matrix.arch }}.log"
@@ -271,7 +271,7 @@ jobs:
       matrix:
         image: [hello-world, alpine]  # expand to 20 when kernel boots
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Install Docker + QEMU
         run: |
@@ -297,8 +297,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
+      - uses: Swatinem/rust-cache@23bcca282200e939c6f6d866a2869fee75922534 # v2.7.3
 
       - name: Build twice with same SOURCE_DATE_EPOCH
         run: |

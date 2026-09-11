@@ -22,10 +22,10 @@ jobs:
           - riscv64gc-unknown-linux-gnu
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@7b737f3747eb115cf4e8f1766b8fb62b6948fb16 # stable
         with:
           toolchain: stable
           targets: ${{ matrix.target }}

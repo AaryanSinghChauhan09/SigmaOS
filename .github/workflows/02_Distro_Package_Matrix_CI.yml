@@ -34,10 +34,10 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Setup Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@7b737f3747eb115cf4e8f1766b8fb62b6948fb16 # stable
         with:
           toolchain: stable
 
