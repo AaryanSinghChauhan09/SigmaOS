@@ -19,12 +19,18 @@ pub enum InstallerScreen {
     SystemConfiguration,
     Summary,
     InstallationProgress,
+    Complete,
     CompleteOnboarding,
 }
 
-/// Partitioning Operation Strategy
+/// Partitioning Operation Strategy / Mode
+pub type PartitionStrategy = PartitioningOperation;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PartitionStrategy {
+pub enum PartitioningOperation {
+    Automatic,
+    Alongside,
+    Manual,
     EraseDisk,
     InstallAlongsideExisting,
     ManualCustomPartitions,
@@ -175,6 +181,14 @@ impl UserAccount {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct NetworkConfig {
+    pub use_dhcp: bool,
+    pub static_ip: Option<String>,
+    pub gateway: Option<String>,
+    pub dns_servers: Vec<String>,
+}
+
 /// System Configuration
 #[derive(Debug, Clone)]
 pub struct SystemConfiguration {
@@ -300,7 +314,8 @@ impl GuiInstallerWizard {
             InstallerScreen::UserSetup => InstallerScreen::SystemConfiguration,
             InstallerScreen::SystemConfiguration => InstallerScreen::Summary,
             InstallerScreen::Summary => InstallerScreen::InstallationProgress,
-            InstallerScreen::InstallationProgress => InstallerScreen::CompleteOnboarding,
+            InstallerScreen::InstallationProgress => InstallerScreen::Complete,
+            InstallerScreen::Complete => InstallerScreen::CompleteOnboarding,
             InstallerScreen::CompleteOnboarding => return Err(InstallerError::AlreadyComplete),
         };
 
@@ -449,7 +464,8 @@ impl GuiInstallerWizard {
             InstallerScreen::SystemConfiguration => "Configure system settings",
             InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
-            InstallerScreen::CompleteOnboarding => "Installation Complete",
+            InstallerScreen::Complete => "Installation Complete",
+            InstallerScreen::CompleteOnboarding => "Onboarding Complete",
         }
     }
 

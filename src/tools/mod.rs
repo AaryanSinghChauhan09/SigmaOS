@@ -1,5 +1,6 @@
 // SigmaOS Tools Module - Real implementations of system utilities
 pub mod system_monitor;
+pub mod file_manager;
 
 pub mod data_tools;
 pub mod display_manager;
@@ -18,6 +19,11 @@ pub use open_source_tools_engine::{
 pub use open_source_cli_tools_suite::{
     EzaFormattedEntry, EzaLsEngine, FdFileEntry, FdFileSearchEngine, RipgrepMatchResult,
     RipgrepSearchEngine, ZoxideCdEngine, ZoxideEntry,
+};
+
+pub use file_manager::{
+    DolphinDualPaneSplitGovernor, NnnFastTraversalGovernor, RangerSixelImagePreviewEngine,
+    ThunarBulkRenamerRegexEngine, YaziLuaPluginEngine,
 };
 
 pub use open_source_tools_parity::{
