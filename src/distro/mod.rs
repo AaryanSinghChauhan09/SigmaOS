@@ -1,3 +1,5 @@
+pub mod omarchy_inspiration;
+pub use omarchy_inspiration::*;
 pub mod omarchy;
 pub mod omarchy_ultimate_gap_closure;
 pub mod omarchy_inspiration;
