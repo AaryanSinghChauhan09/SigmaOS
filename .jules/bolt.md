@@ -45,3 +45,7 @@
 ## 2026-09-13 - Fast Raw Byte-Scanning Path for JSON String Parsing
 **Learning:** In JSON recursive descent parsers, iterating over string characters using `.chars().next()` decodes UTF-8 multi-byte sequences for every byte in the input string. Scanning raw byte slices (`&[u8]`) directly until hitting delimiter bytes (`"` or `\`) bypasses character decoding entirely for escape-free strings (the majority of JSON strings), resulting in a significant parsing throughput increase while falling back safely to UTF-8 decoding when backslash escapes are encountered.
 **Action:** When parsing text formats or string literals, use raw byte-level scanning for delimiter detection and fast slicing before falling back to multi-byte UTF-8 character decoding.
+
+## 2026-09-14 - Pre-Allocated Capacity & Zero-Allocation Slicing in Base64 Codecs
+**Learning:** In string/binary base64 encoders and decoders, collecting input strings into heap vectors (`input.bytes().collect::<Vec<u8>>()`) and pushing into unallocated result vectors triggers step-wise reallocations (`0 -> 8 -> 16...`) and redundant heap copies. Operating directly on `input.as_bytes()` slice references and pre-allocating exact output vector capacity (`((input.len() + 2) / 3) * 4` for encoding, `(bytes.len() / 4) * 3` for decoding) eliminates intermediate allocations and dynamic vector growths completely.
+**Action:** In binary or string serialization codecs, calculate exact output bounds up front and pass `&[u8]` slice references directly instead of collecting temporary heap vectors.
