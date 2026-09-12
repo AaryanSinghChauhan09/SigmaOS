@@ -91,6 +91,39 @@ impl LandlockRuleset {
     }
 }
 
+/// OpenBSD Pledge & FreeBSD Capsicum Capability Sandbox Bridge
+#[derive(Debug, Clone, Default)]
+pub struct OpenBsdFreeBsdSandboxBridge {
+    pub pledged_promises: Vec<String>,
+    pub capsicum_rights: u64,
+}
+
+impl OpenBsdFreeBsdSandboxBridge {
+    pub fn new() -> Self {
+        Self {
+            pledged_promises: Vec::new(),
+            capsicum_rights: 0,
+        }
+    }
+
+    pub fn pledge(&mut self, promises: &[&str]) {
+        for p in promises {
+            self.pledged_promises.push(p.to_string());
+        }
+    }
+
+    pub fn set_capsicum_rights(&mut self, rights: u64) {
+        self.capsicum_rights = rights;
+    }
+
+    pub fn is_pledged_operation_permitted(&self, op: &str) -> bool {
+        if self.pledged_promises.is_empty() {
+            return true;
+        }
+        self.pledged_promises.iter().any(|p| p == op)
+    }
+}
+
 /// Linux Landlock Security Sandbox Engine
 pub struct LandlockEngine {
     pub rulesets: Vec<LandlockRuleset>,
@@ -189,5 +222,10 @@ mod tests {
         // Prohibited accesses
         assert!(!engine.validate_file_access(ruleset_id, "/etc/shadow", LANDLOCK_ACCESS_FS_READ_FILE));
         assert!(!engine.validate_file_access(ruleset_id, "/usr/bin/bash", LANDLOCK_ACCESS_FS_WRITE_FILE));
+
+        let mut bridge = OpenBsdFreeBsdSandboxBridge::new();
+        bridge.pledge(&["stdio", "rpath"]);
+        assert!(bridge.is_pledged_operation_permitted("stdio"));
+        assert!(!bridge.is_pledged_operation_permitted("exec"));
     }
 }

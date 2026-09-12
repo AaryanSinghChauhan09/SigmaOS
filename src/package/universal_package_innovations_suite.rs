@@ -3,6 +3,30 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+/// Gentoo & CachyOS Microarchitecture ISA Optimization Profile Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MicroarchIsaProfile {
+    X86_64_V1,
+    X86_64_V2,
+    X86_64_V3,
+    X86_64_V4,
+    ArmNeoverse,
+    RiscvVector,
+}
+
+impl MicroarchIsaProfile {
+    pub fn get_compiler_cflags(&self) -> &'static str {
+        match self {
+            Self::X86_64_V1 => "-march=x86-64 -mtune=generic",
+            Self::X86_64_V2 => "-march=x86-64-v2 -mssse3 -msse4.2",
+            Self::X86_64_V3 => "-march=x86-64-v3 -mavx2 -mbmi2",
+            Self::X86_64_V4 => "-march=x86-64-v4 -mavx512f -mavx512bw",
+            Self::ArmNeoverse => "-march=armv8.5-a+sve -mcpu=neoverse-n1",
+            Self::RiscvVector => "-march=rv64gcv -mabi=lp64d",
+        }
+    }
+}
+
 /// 1. Debian / Ubuntu netselect-apt Fast Mirror Latency & Throughput Ranker
 #[derive(Debug, Clone)]
 pub struct AptMirrorRecord {
@@ -184,6 +208,9 @@ mod tests {
 
     #[test]
     fn test_universal_package_innovations() {
+        let isa = MicroarchIsaProfile::X86_64_V3;
+        assert!(isa.get_compiler_cflags().contains("-march=x86-64-v3"));
+
         let mut netselect = DebianAptFastMirrorRanker::new();
         netselect.add_mirror("http://mirror.us.debian.org", 20, 100000);
         netselect.add_mirror("http://mirror.slow.com", 200, 5000);
