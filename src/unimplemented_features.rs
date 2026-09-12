@@ -3448,6 +3448,66 @@ impl PhoronixTestSuiteRunner {
     }
 }
 
+/// 9to5Google Android Ecosystem & Material You Dynamic Color Engine
+#[derive(Debug, Clone)]
+pub struct NineToFiveGoogleAndroidEcosystemEngine {
+    pub pixel_feature_drops_enabled: bool,
+    pub material_you_accent_color: String,
+    pub quick_share_bridge_active: bool,
+}
+
+impl NineToFiveGoogleAndroidEcosystemEngine {
+    pub fn new() -> Self {
+        Self {
+            pixel_feature_drops_enabled: true,
+            material_you_accent_color: String::from("#3C4043"),
+            quick_share_bridge_active: true,
+        }
+    }
+
+    pub fn apply_material_you_palette(&mut self, hex_color: &str) {
+        self.material_you_accent_color = String::from(hex_color);
+    }
+}
+
+impl Default for NineToFiveGoogleAndroidEcosystemEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// 9to5Mac Apple Ecosystem Continuity & AirPlay Receiver Engine
+#[derive(Debug, Clone)]
+pub struct NineToFiveMacAppleEcosystemEngine {
+    pub universal_control_active: bool,
+    pub airplay_stream_receiver_enabled: bool,
+    pub handoff_clipboard_synced: bool,
+}
+
+impl NineToFiveMacAppleEcosystemEngine {
+    pub fn new() -> Self {
+        Self {
+            universal_control_active: true,
+            airplay_stream_receiver_enabled: true,
+            handoff_clipboard_synced: true,
+        }
+    }
+
+    pub fn enable_universal_control(&mut self, enabled: bool) {
+        self.universal_control_active = enabled;
+    }
+
+    pub fn verify_continuity_stream(&self) -> bool {
+        self.airplay_stream_receiver_enabled && self.handoff_clipboard_synced
+    }
+}
+
+impl Default for NineToFiveMacAppleEcosystemEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod extra_unimplemented_tests {
     use super::*;
@@ -4042,5 +4102,17 @@ mod new_unimplemented_tests {
         phoronix.execute_benchmark("Unigine Heaven", 120.0);
         phoronix.execute_benchmark("Shadow of Tomb Raider", 80.0);
         assert_eq!(phoronix.calculate_composite_score(), 100.0);
+    }
+
+    #[test]
+    fn test_nine_to_five_google_and_mac_ecosystem_engines() {
+        let mut google_eng = NineToFiveGoogleAndroidEcosystemEngine::new();
+        google_eng.apply_material_you_palette("#4285F4");
+        assert!(google_eng.material_you_accent_color.contains("4285F4"));
+
+        let mut mac_eng = NineToFiveMacAppleEcosystemEngine::new();
+        mac_eng.enable_universal_control(true);
+        assert!(mac_eng.universal_control_active);
+        assert!(mac_eng.verify_continuity_stream());
     }
 }

@@ -58,6 +58,8 @@ impl SovereignTechNewsRedirectionEngine {
         let entries = vec![
             ("itsfoss", "ItsFOSS", "itsfoss.com", "https://itsfoss.com/feed/", "https://itsfoss.com", TechPublicationCategory::LinuxAndOpenSource, "Linux tutorials, distro news and open-source updates"),
             ("9to5linux", "9to5Linux", "9to5linux.com", "https://9to5linux.com/feed", "https://9to5linux.com", TechPublicationCategory::LinuxAndOpenSource, "Linux release news and desktop distro updates"),
+            ("9to5google", "9to5Google", "9to5google.com", "https://9to5google.com/feed/", "https://9to5google.com", TechPublicationCategory::WindowsAndCrossPlatform, "Android, Pixel feature drops and Google ecosystem news"),
+            ("9to5mac", "9to5Mac", "9to5mac.com", "https://9to5mac.com/feed/", "https://9to5mac.com", TechPublicationCategory::WindowsAndCrossPlatform, "Apple, macOS desktop continuity and iOS platform updates"),
             ("geekygadgets", "Geeky Gadgets", "geeky-gadgets.com", "https://www.geeky-gadgets.com/feed/", "https://www.geeky-gadgets.com", TechPublicationCategory::HardwareAndGadgets, "Gadget news, hardware reviews and tech innovations"),
             ("linuxdotcom", "Linux.com", "linux.com", "https://www.linux.com/feed/", "https://www.linux.com", TechPublicationCategory::LinuxAndOpenSource, "Official Linux news, developer guides and industry news"),
             ("kdnuggets", "KDnuggets", "kdnuggets.com", "https://www.kdnuggets.com/feed", "https://www.kdnuggets.com", TechPublicationCategory::AiAndDataScience, "AI, Machine Learning, Data Science & Analytics tutorials"),
@@ -197,6 +199,14 @@ mod tests {
         assert_eq!(
             engine.redirect_url("distrowatch"),
             Some("https://distrowatch.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("9to5google"),
+            Some("https://9to5google.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("9to5mac"),
+            Some("https://9to5mac.com".to_string())
         );
 
         // Domain matching
