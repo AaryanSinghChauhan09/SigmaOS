@@ -83,7 +83,11 @@ pub use distro::{
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
     OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig, OmarchyHyprlandWorkspaceSnapLayoutEngine,
     OmarchyLiveIsoBootstrapEngine, OmarchyLuaConfigEngine, OmarchyNeovimPresetStudioEngine,
-    OmarchyWaybarAppletStudioEngine,
+    OmarchyWaybarAppletStudioEngine, BoreTaskDescriptor, IsaMicroarchTarget, MerkleCasPackage,
+    PinsyscallBound, ScxBorePolicy, Sovereign2026DistroSuperiorityMasterEngine,
+    SovereignCachyosMicroarchV4PqcVerifier, SovereignNixGuixHermeticCasEngine,
+    SovereignOpenBsd77PinsyscallHardeningEngine, SovereignSchedExtBoreV2Governor,
+    SovereignWayland124ZenithHdrEngine, WaylandColorSpace, ZenithHdrFrame,
 };
 
 pub use package::bsd_linux_package_innovations::{

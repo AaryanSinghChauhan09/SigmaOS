@@ -254,3 +254,6 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
+
+pub mod sovereign_2026_distro_leap_engine;
+pub use sovereign_2026_distro_leap_engine::*;
