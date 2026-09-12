@@ -87,3 +87,10 @@ if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
     rustc --test --edition=2021 src/sigpkg/arch_pacman_engine.rs -o build/test_arch_engine
     ./build/test_arch_engine
 fi
+
+if [ -f "tests/test_md_wiki_ideas_verification.rs" ]; then
+    echo "Running MD and GitHub Wiki Ideas Verification test suite..."
+    mkdir -p build
+    rustc --test tests/test_md_wiki_ideas_verification.rs --edition=2021 -o build/md_wiki_ideas_verification_test
+    ./build/md_wiki_ideas_verification_test
+fi
