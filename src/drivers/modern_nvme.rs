@@ -100,6 +100,8 @@ pub struct AhciCommandHeader {
     pub reserved: [u32; 4],
 }
 
+pub type AhciCommandHeaderV3 = AhciCommandHeader;
+
 
 
 /// Simulated AHCI Port MMIO Register Map

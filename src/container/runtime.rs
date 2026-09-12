@@ -200,6 +200,44 @@ impl NamespaceConfig {
 }
 
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub enabled: bool,
+    pub allow_default: bool,
+    pub allowed_syscalls: Vec<u32>,
+    pub blocked_syscalls: Vec<u32>,
+    pub blocked_syscalls_mask: u32,
+    pub hardened: bool,
+}
+
+impl Default for SeccompProfile {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            allow_default: true,
+            allowed_syscalls: Vec::new(),
+            blocked_syscalls: Vec::new(),
+            blocked_syscalls_mask: 0,
+            hardened: false,
+        }
+    }
+}
+
+impl SeccompProfile {
+    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
+        if !self.hardened && !self.enabled {
+            return false;
+        }
+        self.blocked_syscalls.contains(&syscall_id)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SeccompProfileV2 {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
 impl SeccompProfileV2 {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened {
@@ -305,6 +343,7 @@ impl SimpleContainer {
                 blocked_syscalls: Vec::new(),
                 hardened: false,
                 blocked_syscalls_mask: 0,
+                ..SeccompProfile::default()
             },
         }
     }
@@ -1014,6 +1053,7 @@ mod tests {
             blocked_syscalls: Vec::new(),
             hardened: true,
             blocked_syscalls_mask: 1, // Block sys_mount (syscall 0)
+            ..SeccompProfile::default()
         };
 
         // Allowed syscall (e.g. syscall 1)

@@ -50,6 +50,8 @@ pub mod sched;
 pub mod scheduler;
 pub mod structures;
 pub mod traits;
+pub mod virtual_cpu;
+pub mod vmm_paging;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;

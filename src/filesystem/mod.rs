@@ -42,3 +42,6 @@ pub use file_monitor::{
     EventFilter, FileEvent, FileEventType, WatchConfig, WatchId, WatchManager, EventId,
 };
 pub use watch::{EventQueue, ThreadSafeEventQueue, RING_BUFFER_SIZE, COALESCE_WINDOW_MS};
+
+pub type FileDescriptor = i32;
+pub type FilePermissions = u32;

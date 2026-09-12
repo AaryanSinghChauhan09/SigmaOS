@@ -147,6 +147,26 @@ impl VoidRunitServiceSupervisorEngine {
             false
         }
     }
+
+    pub fn get_service_status(&self, name: &str) -> Option<(RunitServiceState, u32, bool)> {
+        self.services
+            .iter()
+            .find(|s| s.name == name)
+            .map(|s| (s.state, s.pid, s.auto_restart))
+    }
+
+    pub fn list_running_services(&self) -> Vec<String> {
+        self.services
+            .iter()
+            .filter(|s| s.state == RunitServiceState::Run)
+            .map(|s| s.name.clone())
+            .collect()
+    }
+
+    pub fn restart_service(&mut self, name: &str) -> Result<u32, &'static str> {
+        self.stop_service(name);
+        self.start_service(name)
+    }
 }
 
 impl Default for VoidRunitServiceSupervisorEngine {
@@ -194,6 +214,30 @@ impl AlpineApkVolatileOverlayEngine {
         self.lbu_commit_hash = hash_acc;
         self.is_committed = true;
         hash_acc
+    }
+
+    pub fn create_tmpfs_snapshot(&mut self) -> (u64, Vec<String>, usize) {
+        let hash = if self.is_committed {
+            self.lbu_commit_hash
+        } else {
+            self.lbu_commit()
+        };
+        (hash, self.staged_packages.clone(), self.volatile_tmpfs_bytes)
+    }
+
+    pub fn rollback_tmpfs_snapshot(&mut self, snapshot: &(u64, Vec<String>, usize)) -> bool {
+        self.lbu_commit_hash = snapshot.0;
+        self.staged_packages = snapshot.1.clone();
+        self.volatile_tmpfs_bytes = snapshot.2;
+        self.is_committed = true;
+        true
+    }
+
+    pub fn clear_overlay(&mut self) {
+        self.staged_packages.clear();
+        self.volatile_tmpfs_bytes = 0;
+        self.is_committed = false;
+        self.lbu_commit_hash = 0;
     }
 }
 
@@ -980,8 +1024,17 @@ mod tests {
         let pid = runit.start_service("sshd").unwrap();
         assert!(pid > 1000);
         assert_eq!(runit.services[0].state, RunitServiceState::Run);
+
+        let status = runit.get_service_status("sshd").unwrap();
+        assert_eq!(status, (RunitServiceState::Run, pid, true));
+        assert_eq!(runit.list_running_services(), vec!["sshd".to_string()]);
+
+        let new_pid = runit.restart_service("sshd").unwrap();
+        assert!(new_pid > pid);
+
         assert!(runit.stop_service("sshd"));
         assert_eq!(runit.services[0].state, RunitServiceState::Down);
+        assert!(runit.list_running_services().is_empty());
 
         let mut apk_overlay = AlpineApkVolatileOverlayEngine::new();
         apk_overlay.stage_volatile_apk("curl", 2048);
@@ -990,8 +1043,18 @@ mod tests {
         assert_eq!(apk_overlay.volatile_tmpfs_bytes, 3072);
         assert!(!apk_overlay.is_committed);
 
-        let hash = apk_overlay.lbu_commit();
-        assert!(hash > 0);
+        let snapshot = apk_overlay.create_tmpfs_snapshot();
+        assert!(snapshot.0 > 0);
+        assert_eq!(snapshot.1.len(), 2);
+        assert_eq!(snapshot.2, 3072);
+
+        apk_overlay.clear_overlay();
+        assert_eq!(apk_overlay.staged_packages.len(), 0);
+        assert_eq!(apk_overlay.volatile_tmpfs_bytes, 0);
+
+        assert!(apk_overlay.rollback_tmpfs_snapshot(&snapshot));
+        assert_eq!(apk_overlay.staged_packages.len(), 2);
+        assert_eq!(apk_overlay.volatile_tmpfs_bytes, 3072);
         assert!(apk_overlay.is_committed);
     }
 }

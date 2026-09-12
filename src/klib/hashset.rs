@@ -98,7 +98,7 @@ where
 }
 
 pub struct HashSetIter<'a, T> {
-    map_iter: BTreeMapIter<'a, T, ()>,
+    map_iter: std::collections::btree_map::Iter<'a, T, ()>,
 }
 
 impl<'a, T> Iterator for HashSetIter<'a, T>

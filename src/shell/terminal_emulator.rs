@@ -889,6 +889,7 @@ impl TerminalMultiplexerV1 {
 pub struct TriggerRule {
     pub pattern: String,
     pub action_command: String,
+    pub highlight_color: Option<String>,
 }
 
 /// Dynamic, user-defined shell function.
@@ -1026,8 +1027,8 @@ impl TriggerRule {
     pub fn new(pattern: &str, color: AnsiColor, action: Option<&str>) -> Self {
         Self {
             pattern: pattern.to_string(),
-            highlight_color: color,
-            action_command: action.map(|a| a.to_string()),
+            highlight_color: Some(format!("{:?}", color)),
+            action_command: action.unwrap_or("").to_string(),
         }
     }
 }
@@ -1289,6 +1290,7 @@ impl TerminalSession {
         self.trigger_rules.push(TriggerRule {
             pattern: pattern.to_string(),
             action_command: action.to_string(),
+            highlight_color: None,
         });
     }
 
@@ -1729,6 +1731,7 @@ mod tests {
         let url_rule = TriggerRule {
             pattern: "https://".to_string(),
             action_command: "open_browser".to_string(),
+            highlight_color: None,
         };
         session.add_trigger_rule(url_rule);
 

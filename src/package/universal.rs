@@ -10,12 +10,7 @@ use alloc::vec::Vec;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{Arc, HashMap, HashSet};
-
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
-#[cfg(any(feature = "standalone_test", test))]
 use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -215,18 +210,26 @@ pub enum PackageState {
     BrokenDependency,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackagePriority {
     Essential,
     Required,
     Important,
     Standard,
+    #[default]
     Optional,
 }
 
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    #[default]
     Deb,        // apt/dpkg
+    GuixNar,    // GNU Guix NAR archive (.nar)
+    OpenBsdPkg, // OpenBSD pkg_add (.tgz / .pkg)
+    Ipk,        // Opkg / OpenWrt (.ipk)
+    Opkg,       // Opkg package manager (.opkg / .ipk)
+    SolarisIps, // Solaris IPS package (.p5p / .pkg)
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
     Snap,       // snap/squashfs
@@ -1209,7 +1212,7 @@ impl PackageFactory {
             PackageFormat::SlackBuild => Box::new(SlackBuildInstallStrategy),
             PackageFormat::Crux => Box::new(CruxInstallStrategy),
             PackageFormat::Drpm => Box::new(DrpmInstallStrategy),
-            PackageFormat::Stratum => Box::new(StratumInstallStrategy),
+            PackageFormat::Stratum | _ => Box::new(StratumInstallStrategy),
         }
     }
 
@@ -1263,7 +1266,7 @@ impl PackageFactory {
             PackageFormat::SlackBuild => Box::new(SlackBuildMetadataAdapter),
             PackageFormat::Crux => Box::new(CruxMetadataAdapter),
             PackageFormat::Drpm => Box::new(DrpmMetadataAdapter),
-            PackageFormat::Stratum => Box::new(StratumMetadataAdapter),
+            PackageFormat::Stratum | _ => Box::new(StratumMetadataAdapter),
         }
     }
 }
@@ -1367,6 +1370,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: PackagePriority,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -1749,6 +1753,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();

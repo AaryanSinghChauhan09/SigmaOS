@@ -36,10 +36,11 @@ pub use linux_bsd_drivers::{
     FreeBsdDrmConnector, MultiTouchSlot, OpenBsdDriverPledge, DriverCapability,
     NetBsdRumpDriverHost, UrbTransferType, LinuxUrb, LinuxUrbQueue,
 };
-pub use modern_audio_intel_hda::ModernAudioIntelHda;
+pub use modern_audio_intel_hda::*;
+pub use modern_nvme::*;
 pub use modern_usb::ModernUsbController;
 pub use modern_usb_printer::ModernUsbPrinterDriver;
-pub use modern_wifi::ModernWifiDriver;
+pub use modern_wifi::*;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};

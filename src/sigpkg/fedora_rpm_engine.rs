@@ -2,18 +2,10 @@
 // SigmaOS Fedora/RPM Compatibility Engine
 // Implements RPM package management, DNF/YUM compatibility, and RPM spec file parsing
 
-#[cfg(not(any(test, feature = "standalone_test")))]
-use crate::klib::collections::HashMap;
-#[cfg(any(test, feature = "standalone_test"))]
-use alloc::collections::BTreeMap as HashMap;
-
-extern crate alloc;
-
-use alloc::collections::BTreeMap as HashMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::HashMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 /// RPM package metadata structure
 #[derive(Debug, Clone, PartialEq, Eq)]

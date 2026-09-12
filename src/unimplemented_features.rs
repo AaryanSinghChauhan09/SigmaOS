@@ -1,17 +1,8 @@
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
-
-#[cfg(not(test))]
-use crate::klib::collections::HashMap;
-use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-#[cfg(test)]
-use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::klib::collections::HashMap;
+use std::boxed::Box;
+use std::collections::{BTreeMap, HashMap};
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
 // ========================================================================
@@ -1685,6 +1676,12 @@ pub struct GestureVoiceControlEngine {
     pub registered_voice_commands: [Option<(&'static str, DesktopShellAction)>; 4],
 }
 
+impl GestureVoiceControlEngine {
+    pub fn new() -> Self {
+        Self {
+            registered_voice_commands: [None, None, None, None],
+        }
+    }
 
     pub fn parse_touchpad_gesture(
         &self,
@@ -1697,6 +1694,7 @@ pub struct GestureVoiceControlEngine {
             _ => None,
         }
     }
+}
 
 
 #[cfg(test)]
@@ -2175,9 +2173,9 @@ impl SovereignStatelessArchitectureEngine {
         user_overrides_exist: bool,
     ) -> String {
         if user_overrides_exist {
-            alloc::format!("{}/{}", self.user_override_path, config_key)
+            format!("{}/{}", self.user_override_path, config_key)
         } else {
-            alloc::format!("{}/{}", self.factory_default_path, config_key)
+            format!("{}/{}", self.factory_default_path, config_key)
         }
     }
 }

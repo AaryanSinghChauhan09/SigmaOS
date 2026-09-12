@@ -51,7 +51,7 @@ pub mod sovereign_sigpkg;
 pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
-    AlpmHook, ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
+    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord,
     GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
 };
 pub mod spec;
@@ -87,9 +87,10 @@ pub use bsd_linux_package_innovations::{
     ZypperRepository,
 };
 pub use sovereign_sigpkg::*;
+pub use crate::package::AptDebManifest;
 pub use universal_adapter::{
-    AppImageContainer, AptDebManifest, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
-    PackagePriority, PacmanPkgbuildV2, RpmSpecManifest, SigmaPkgHookType, SnapcraftManifest,
+    AppImageContainer, FlatpakManifest, MappedScriptletHook, PackageFormatAdapter,
+    PackagePriority, PacmanPkgbuild, RpmSpecManifest, SigmaPkgHookType,
     UniversalDependencyMapper, UniversalDryRunResult, UniversalDryRunSimulator,
     UniversalFormatConverter, UniversalPackageAdapter, UniversalScriptletConverter,
 };
@@ -146,10 +147,6 @@ pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use sovereign_package_innovations::{
-    ArchAlpmHookTransactionEngine, BsdPkgDbStorageEngine, BsdPkgRecord, GentooEbuildUseFlagSolver,
-    NixFlakeHermeticCacheStore,
-};
 pub use spec::{
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel, ManagerCapability, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo,

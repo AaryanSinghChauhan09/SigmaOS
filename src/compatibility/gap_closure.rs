@@ -100,6 +100,94 @@ impl Default for KernelModuleManager {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct OpenBsdSelfReportingSecurityGovernor {
+    pub pledged_promises: Vec<String>,
+}
+
+impl OpenBsdSelfReportingSecurityGovernor {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn apply_pledge(&mut self, pledge_str: &str) {
+        for p in pledge_str.split_whitespace() {
+            if !self.pledged_promises.contains(&p.to_string()) {
+                self.pledged_promises.push(p.to_string());
+            }
+        }
+    }
+    pub fn check_pledge(&self, promise: &str) -> bool {
+        self.pledged_promises.iter().any(|p| p == promise)
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FreeBsdGeomStorageStack {
+    pub providers: Vec<(String, String, u64)>,
+}
+
+impl FreeBsdGeomStorageStack {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn add_geom_provider(&mut self, name: &str, class_type: &str, capacity_bytes: u64) {
+        self.providers.push((name.to_string(), class_type.to_string(), capacity_bytes));
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct VoidLinuxRunitServiceSupervisor {
+    pub running_services: Vec<String>,
+}
+
+impl VoidLinuxRunitServiceSupervisor {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn register_service(&mut self, service: &str) {
+        if !self.running_services.contains(&service.to_string()) {
+            self.running_services.push(service.to_string());
+        }
+    }
+    pub fn start_service(&mut self, service: &str) -> bool {
+        self.register_service(service);
+        true
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct AlpineLinuxDisklessLbuPersistence {
+    pub backup_tarball_path: Option<String>,
+}
+
+impl AlpineLinuxDisklessLbuPersistence {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn commit_overlay_backup(&mut self, path: &str) {
+        self.backup_tarball_path = Some(path.to_string());
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct NixOsHermeticClosureEngine {
+    pub store_paths: Vec<String>,
+}
+
+impl NixOsHermeticClosureEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn add_store_path(&mut self, path: &str) {
+        if !self.store_paths.contains(&path.to_string()) {
+            self.store_paths.push(path.to_string());
+        }
+    }
+    pub fn verify_closure(&self, path: &str) -> bool {
+        self.store_paths.iter().any(|p| p == path)
+    }
+}
+
 // ==========================================
 // 2. Syscall Compatibility Registry
 // ==========================================

@@ -35,10 +35,6 @@ pub mod parrot_kali;
 pub mod parrot_linux;
 pub mod parrot_parity;
 pub mod pqc_measurement;
-pub use pqc_measurement::{
-    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
-    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
-};
 pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
@@ -56,17 +52,10 @@ pub mod vulnerability;
 pub mod kali_components;
 
 pub use kali_components::{
-    HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,
+    HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker,
     KaliPcapDissector, KaliRamMemoryForensics, KaliWebVulnScanner, PacketHeader, ProcessArtifact,
     ScanResult, ScanType, VulnType, WebVulnReport,
 };
-
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-};
-
-pub use qubes_isolation::*;
-pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
@@ -87,10 +76,7 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
+pub use defensive_audit::*;
 pub use forensics::*;
 pub use hardening::{
     MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
@@ -99,13 +85,7 @@ pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
-pub use kali_stack::{
-    HashMode, KaliAirgeddonWifiAudit, KaliBurpSuiteWebProxy, KaliHashcatGpuCracker,
-    KaliHydraPasswordBruteforce, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter,
-    KaliNiktoWebScanner, KaliNmapPortScanner, KaliSqlmapInjectionAuditor, KaliUndercoverThemeMode,
-    KaliWiresharkPacketAnalyzer, PcapPacketHeader, ScanTechnique, UndercoverDisguiseTheme,
-    WifiFrameType,
-};
+pub use kali_stack::*;
 pub use kernel_hardening::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError, PagePermissions,
     PledgePromise as KernelPledgePromise, RetpolineKptiMitigationEngine, SmepSmapEnforcer,
@@ -116,7 +96,7 @@ pub use libgksu::{
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,
 };
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
-pub use parrot::{
+pub use parrot_kali::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
@@ -125,11 +105,15 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{
-    promises, PledgeError, PledgeManager as OriginalPledgeManager,
+    promises, PledgeError, PledgeManager, PledgePromise, PledgeManager as OriginalPledgeManager,
     PledgePromise as OriginalPledgePromise,
 };
 pub use qubes_isolation::*;
 pub use root_improvement::*;
+pub use pqc_measurement::{
+    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
+    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
+};
 pub use rules::{
     AuditAccessType, AuditSyscallRule, AuditWatchRule, PfAction, PfFilterRule, PledgeRule,
     SecurelevelState, SovereignAuditRuleEngine, SovereignNetworkFilterRulesEngine,
@@ -161,5 +145,3 @@ pub use vulnerability::{
 };
 pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
 pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};
-pub mod defensive_audit;
-pub mod parrot;

@@ -1,5 +1,15 @@
 // SigmaOS Accessibility & Screen Reader Subsystem
 
+pub mod framework;
+pub mod keyboard;
+pub mod magnifier;
+pub mod screenreader;
+
+pub use framework::*;
+pub use keyboard::*;
+pub use magnifier::*;
+pub use screenreader::*;
+
 pub struct AccessibilityEngine;
 
 impl AccessibilityEngine {

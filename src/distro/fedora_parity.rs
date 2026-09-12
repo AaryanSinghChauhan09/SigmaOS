@@ -1,7 +1,7 @@
 // SigmaOS Fedora/RHEL Parity Implementation
 // Implements DNF package management, SELinux integration, and RPM support
 
-use crate::klib::Vec;
+use std::vec::Vec;
 use std::string::String;
 use core::cell::Cell;
 

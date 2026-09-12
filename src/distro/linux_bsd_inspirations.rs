@@ -119,6 +119,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
+            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -214,6 +215,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
+            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -234,15 +236,19 @@ impl SovereignUniversalDistroBridge {
                 DistroSubsystemMode::LinuxSlackware => {
                     supervisor == ServiceSupervisorType::Sysvinit
                 }
+                DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
                 DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            }
+            };
+        supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
         match self.mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxTails => format!("{}.deb", input_pkg),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
@@ -279,6 +285,7 @@ impl SovereignUniversalDistroBridge {
         let dst_pkg = match target_mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
+            | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxTails => format!("{}.deb", action),
             DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),

@@ -70,12 +70,12 @@ impl SovereignJsonValue {
     /// Bolt optimization: eliminates temporary heap allocations for array elements and object keys.
     fn append_json_string(&self, out: &mut String) {
         match self {
-            SovereignJsonValue::Null => "null".to_string(),
+            SovereignJsonValue::Null => out.push_str("null"),
             SovereignJsonValue::Bool(b) => {
                 if *b {
-                    "true".to_string()
+                    out.push_str("true");
                 } else {
-                    "false".to_string()
+                    out.push_str("false");
                 }
             }
             SovereignJsonValue::Number(n) => {

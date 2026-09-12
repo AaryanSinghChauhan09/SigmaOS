@@ -25,6 +25,12 @@ impl<T: PartialEq> Vec<T> {
     }
 }
 
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
