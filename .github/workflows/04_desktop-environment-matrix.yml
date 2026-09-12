@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 5 * * 0'  # Weekly
 
+
+permissions:
+  contents: read
 jobs:
   desktop-matrix:
     runs-on: ubuntu-latest
@@ -105,7 +108,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Update package manager
         run: |

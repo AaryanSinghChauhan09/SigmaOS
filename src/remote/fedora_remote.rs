@@ -204,7 +204,7 @@ impl FedoraFreeIpaKerberosAuth {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -212,7 +212,7 @@ mod tests {
     fn test_cockpit_remote_bridge() {
         let mut cockpit = FedoraCockpitRemoteBridge::new(9090);
         let sid = cockpit
-            .authenticate_session("admin", "secret_pass")
+            .authenticate_session("admin", "<SIGMA_SESSION_TOKEN>")
             .unwrap();
         assert_eq!(sid, 1);
         assert_eq!(cockpit.state, CockpitSessionState::Active);
@@ -235,7 +235,7 @@ mod tests {
     #[test]
     fn test_freeipa_kerberos_auth() {
         let mut ipa = FedoraFreeIpaKerberosAuth::new("FEDORA.LOCAL");
-        let ticket = ipa.kinit("admin@FEDORA.LOCAL", "Secret123").unwrap();
+        let ticket = ipa.kinit("admin@FEDORA.LOCAL", "<SIGMA_TEST_PASSWORD>").unwrap();
         assert_eq!(ticket.realm, "FEDORA.LOCAL");
         assert!(ipa.verify_gssapi_token(b"GSSAPI_TICKET_BLOB"));
     }

@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 10 * * 0'  # Weekly
 
+
+permissions:
+  contents: read
 jobs:
   storage-performance:
     runs-on: ubuntu-latest
@@ -51,10 +54,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@7b73730e263d91cf0ebbe694c03b1e3eb8fb14b1 # stable
 
       - name: Install filesystem tools
         if: matrix.storage
