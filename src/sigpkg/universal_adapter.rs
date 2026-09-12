@@ -15,6 +15,8 @@ use crate::package::AptDebManifest;
 pub struct AptDebManifest {
     pub package: String,
     pub version: String,
+    pub architecture: String,
+    pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
     pub priority: PackagePriority,
@@ -270,6 +272,8 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: "SigmaOS".to_string(),
             depends,
             description,
             priority,
