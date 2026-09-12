@@ -781,158 +781,6 @@ mod tests {
     }
 }
 
-// =========================================================================
-// OMARCHY & OMAKUB MISSING ECOSYSTEM GAP CLOSURE ENGINES
-// =========================================================================
-
-/// Hyprland compositor window rules, gestures, animations, and monitor scaling configuration engine
-pub struct OmarchyHyprlandCompositorConfigEngine {
-    pub monitor_scale: f32,
-    pub border_size: u32,
-    pub active_border_color: String,
-}
-
-impl OmarchyHyprlandCompositorConfigEngine {
-    pub fn new() -> Self {
-        Self {
-            monitor_scale: 1.0,
-            border_size: 2,
-            active_border_color: "rgba(33ccffee) rgba(00ff99ee) 45deg".to_string(),
-        }
-    }
-
-    pub fn generate_hyprland_conf(&self) -> String {
-        format!(
-            "monitor=,preferred,auto,{}\ngeneral {{\n  gaps_in = 5\n  gaps_out = 10\n  border_size = {}\n  col.active_border = {}\n}}\nwindowrulev2 = float,class:^(pavucontrol)$\n",
-            self.monitor_scale, self.border_size, self.active_border_color
-        )
-    }
-}
-
-impl Default for OmarchyHyprlandCompositorConfigEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Mise polyglot tool version manager engine (Node, Python, Rust, Go, Ruby)
-pub struct OmarchyMiseVersionManagerEngine {
-    pub default_tools: BTreeMap<String, String>,
-}
-
-impl OmarchyMiseVersionManagerEngine {
-    pub fn new() -> Self {
-        let mut tools = BTreeMap::new();
-        tools.insert("node".to_string(), "lts".to_string());
-        tools.insert("python".to_string(), "latest".to_string());
-        tools.insert("rust".to_string(), "stable".to_string());
-        tools.insert("go".to_string(), "latest".to_string());
-        Self { default_tools: tools }
-    }
-
-    pub fn generate_config_toml(&self) -> String {
-        let mut lines = vec!["[tools]".to_string()];
-        for (tool, ver) in &self.default_tools {
-            lines.push(format!("{} = \"{}\"", tool, ver));
-        }
-        lines.join("\n")
-    }
-}
-
-impl Default for OmarchyMiseVersionManagerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// LazyGit terminal TUI configuration generator engine
-pub struct OmarchyLazyGitConfigurationEngine {
-    pub theme: String,
-}
-
-impl OmarchyLazyGitConfigurationEngine {
-    pub fn new() -> Self {
-        Self {
-            theme: "tokyonight".to_string(),
-        }
-    }
-
-    pub fn generate_config_yml(&self) -> String {
-        format!(
-            "gui:\n  theme:\n    activeBorderColor:\n      - '#7aa2f7'\n      - bold\n  showIcons: true\ngit:\n  paging:\n    colorArg: always\n    pager: delta --dark --paging=never\n"
-        )
-    }
-}
-
-impl Default for OmarchyLazyGitConfigurationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Ayu Dark / Ayu Light theme palette and GTK CSS generator engine
-pub struct OmarchyAyuThemeEngine {
-    pub is_dark: bool,
-}
-
-impl OmarchyAyuThemeEngine {
-    pub fn new(is_dark: bool) -> Self {
-        Self { is_dark }
-    }
-
-    pub fn generate_gtk_css(&self) -> String {
-        if self.is_dark {
-            "@define-color bg_color #0f1419;\n@define-color fg_color #e6e1cf;\n@define-color accent_color #ffb454;\nwindow { background-color: @bg_color; color: @fg_color; }\n".to_string()
-        } else {
-            "@define-color bg_color #fafafa;\n@define-color fg_color #5c6166;\n@define-color accent_color #ff9940;\nwindow { background-color: @bg_color; color: @fg_color; }\n".to_string()
-        }
-    }
-}
-
-/// Starship cross-shell prompt config generator engine
-pub struct OmarchyStarshipPromptConfigEngine;
-
-impl OmarchyStarshipPromptConfigEngine {
-    pub fn generate_starship_toml() -> String {
-        "[format]\nformat = \"$username$hostname$directory$git_branch$character\"\n\n[directory]\ntruncation_length = 3\ntruncated_prefix = \"…/\"\n\n[character]\nsuccess_symbol = \"[❯](bold green)\"\nerror_symbol = \"[❯](bold red)\"\n".to_string()
-    }
-}
-
-#[cfg(test)]
-mod omarchy_gap_closure_tests {
-    use super::*;
-
-    #[test]
-    fn test_omarchy_hyprland_compositor_config_engine() {
-        let hypr = OmarchyHyprlandCompositorConfigEngine::new();
-        let conf = hypr.generate_hyprland_conf();
-        assert!(conf.contains("border_size = 2"));
-        assert!(conf.contains("windowrulev2 = float,class:^(pavucontrol)$"));
-    }
-
-    #[test]
-    fn test_omarchy_mise_and_lazygit_engines() {
-        let mise = OmarchyMiseVersionManagerEngine::new();
-        let mise_toml = mise.generate_config_toml();
-        assert!(mise_toml.contains("node = \"lts\""));
-        assert!(mise_toml.contains("rust = \"stable\""));
-
-        let lazygit = OmarchyLazyGitConfigurationEngine::new();
-        let lazy_yml = lazygit.generate_config_yml();
-        assert!(lazy_yml.contains("showIcons: true"));
-        assert!(lazy_yml.contains("delta --dark"));
-    }
-
-    #[test]
-    fn test_omarchy_ayu_and_starship_engines() {
-        let ayu_dark = OmarchyAyuThemeEngine::new(true);
-        let css = ayu_dark.generate_gtk_css();
-        assert!(css.contains("@define-color bg_color #0f1419"));
-
-        let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
-        assert!(starship_toml.contains("truncation_length = 3"));
-    }
-}
 
 // =========================================================================
 // OMARCHY & OMAKUB MISSING ECOSYSTEM GAP CLOSURE ENGINES
@@ -1051,6 +899,101 @@ impl OmarchyStarshipPromptConfigEngine {
     }
 }
 
+/// Ghostty GPU-accelerated terminal configuration generator engine
+pub struct OmarchyGhosttyTerminalConfigEngine {
+    pub font_family: String,
+    pub font_size: f32,
+    pub theme: String,
+    pub wayland_native: bool,
+}
+
+impl OmarchyGhosttyTerminalConfigEngine {
+    pub fn new(theme: &str) -> Self {
+        Self {
+            font_family: "JetBrainsMono Nerd Font".to_string(),
+            font_size: 11.5,
+            theme: theme.to_string(),
+            wayland_native: true,
+        }
+    }
+
+    pub fn generate_ghostty_config(&self) -> String {
+        format!(
+            "font-family = \"{}\"\nfont-size = {}\ntheme = \"{}\"\nwindow-decoration = false\ngtk-single-instance = true\nwayland-backend = {}\n",
+            self.font_family, self.font_size, self.theme, self.wayland_native
+        )
+    }
+}
+
+impl Default for OmarchyGhosttyTerminalConfigEngine {
+    fn default() -> Self {
+        Self::new("tokyonight")
+    }
+}
+
+/// Fastfetch TUI system information tool config generator engine
+pub struct OmarchyFastfetchSystemInfoEngine {
+    pub logo: String,
+    pub show_kernel: bool,
+    pub show_gpu: bool,
+    pub show_memory: bool,
+}
+
+impl OmarchyFastfetchSystemInfoEngine {
+    pub fn new() -> Self {
+        Self {
+            logo: "arch".to_string(),
+            show_kernel: true,
+            show_gpu: true,
+            show_memory: true,
+        }
+    }
+
+    pub fn generate_fastfetch_json(&self) -> String {
+        format!(
+            "{{\n  \"$schema\": \"https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json\",\n  \"logo\": {{\n    \"type\": \"builtin\",\n    \"source\": \"{}\"\n  }},\n  \"modules\": [\n    \"title\",\n    \"separator\",\n    \"os\",\n    \"host\",\n    \"kernel\",\n    \"uptime\",\n    \"packages\",\n    \"shell\",\n    \"display\",\n    \"wm\",\n    \"terminal\",\n    \"cpu\",\n    \"gpu\",\n    \"memory\",\n    \"break\",\n    \"colors\"\n  ]\n}}\n",
+            self.logo
+        )
+    }
+}
+
+impl Default for OmarchyFastfetchSystemInfoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Dynamic Hyprland dwindle tiling layout engine for automatic workspace layout calculations
+#[derive(Debug, Clone, PartialEq)]
+pub struct OmarchyHyprlandDwindleTilingEngine {
+    pub split_ratio: f32,
+    pub force_split: u32,
+    pub preserve_split: bool,
+}
+
+impl OmarchyHyprlandDwindleTilingEngine {
+    pub fn new() -> Self {
+        Self {
+            split_ratio: 1.0,
+            force_split: 2,
+            preserve_split: true,
+        }
+    }
+
+    pub fn generate_dwindle_conf(&self) -> String {
+        format!(
+            "dwindle {{\n  pseudotile = true\n  preserve_split = {}\n  force_split = {}\n  default_split_ratio = {}\n}}\n",
+            self.preserve_split, self.force_split, self.split_ratio
+        )
+    }
+}
+
+impl Default for OmarchyHyprlandDwindleTilingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod omarchy_gap_closure_tests {
     use super::*;
@@ -1084,5 +1027,23 @@ mod omarchy_gap_closure_tests {
 
         let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
         assert!(starship_toml.contains("truncation_length = 3"));
+    }
+
+    #[test]
+    fn test_omarchy_ghostty_fastfetch_dwindle_engines() {
+        let ghostty = OmarchyGhosttyTerminalConfigEngine::new("catppuccin");
+        let ghostty_cfg = ghostty.generate_ghostty_config();
+        assert!(ghostty_cfg.contains("theme = \"catppuccin\""));
+        assert!(ghostty_cfg.contains("wayland-backend = true"));
+
+        let fastfetch = OmarchyFastfetchSystemInfoEngine::default();
+        let ff_json = fastfetch.generate_fastfetch_json();
+        assert!(ff_json.contains("\"source\": \"arch\""));
+        assert!(ff_json.contains("\"modules\": ["));
+
+        let dwindle = OmarchyHyprlandDwindleTilingEngine::default();
+        let dwindle_conf = dwindle.generate_dwindle_conf();
+        assert!(dwindle_conf.contains("preserve_split = true"));
+        assert!(dwindle_conf.contains("force_split = 2"));
     }
 }
