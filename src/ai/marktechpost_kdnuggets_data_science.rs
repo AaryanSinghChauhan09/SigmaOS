@@ -1,8 +1,15 @@
 // SigmaOS KDnuggets & MarkTechPost AI Data Science Pipeline
 // Inspired by KDnuggets, MarkTechPost, and InfoWorld
 
-use crate::klib::string::String;
-use crate::klib::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::String;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::String;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// KDnuggets automated machine learning (AutoML) dataset preprocessor and model selector.
 #[derive(Debug, Clone)]

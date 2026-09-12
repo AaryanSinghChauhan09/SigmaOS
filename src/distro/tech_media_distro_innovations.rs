@@ -1,8 +1,15 @@
 // SigmaOS Tech Media Distro Innovations Engine
 // Inspired by DistroWatch, 9to5Linux, MakeUseOf, LinuxTeck, Appuals, ZDNet, and DistroWatch
 
-use crate::klib::string::String;
-use crate::klib::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::String;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::String;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// DistroWatch page-hit ranking and distribution release tracker engine.
 #[derive(Debug, Clone)]

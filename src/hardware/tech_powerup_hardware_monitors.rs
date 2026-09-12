@@ -1,7 +1,11 @@
 // SigmaOS Tech PowerUp & Hardware Busters Hardware Monitors
 // Inspired by TechPowerUp, Hardware Busters, PCWorld, and Geeky Gadgets
 
-use crate::klib::string::String;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::String;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::String;
 
 /// TechPowerUp GPU VBIOS profiler and clock/voltage monitoring engine.
 #[derive(Debug, Clone)]
