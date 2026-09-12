@@ -27,7 +27,7 @@ use std::vec::Vec;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(test)]
+#[cfg(all(test, not(feature = "standalone_test")))]
 pub use crate::sigpkg::Version;
 
 
@@ -58,6 +58,14 @@ impl Version {
         let patch = parts.get(2).and_then(|p| p.parse().ok()).unwrap_or(0);
         Ok(Self::new(major, minor, patch))
     }
+}
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
 }
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -4004,7 +4012,7 @@ impl Default for UserDefinedFunctionManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

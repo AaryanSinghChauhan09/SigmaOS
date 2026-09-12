@@ -82,13 +82,58 @@ pub enum PackageFormat {
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
+        if filename.ends_with(".deb") { Some(PackageFormat::Apt) }
+        else if filename.ends_with(".rpm") { Some(PackageFormat::Yum) }
         else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
+        else if filename.ends_with(".ebuild") { Some(PackageFormat::Portage) }
         else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
         else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
-        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
+        else if filename.ends_with(".sigma") || filename.ends_with(".sigpkg") { Some(PackageFormat::Sigma) }
+        else if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { Some(PackageFormat::Pacman) }
+        else if filename.ends_with(".air") { Some(PackageFormat::Air) }
+        else if filename.ends_with(".bottle") { Some(PackageFormat::Bottle) }
+        else if filename.ends_with(".ipa") { Some(PackageFormat::Ipa) }
+        else if filename.ends_with(".ports") { Some(PackageFormat::Ports) }
+        else if filename.ends_with(".pkg") { Some(PackageFormat::Pkg) }
+        else if filename.ends_with(".aab") { Some(PackageFormat::Aab) }
+        else if filename.ends_with(".tar.gz") || filename.ends_with(".tgz") { Some(PackageFormat::TarGz) }
+        else if filename.ends_with(".tar.xz") || filename.ends_with(".txz") { Some(PackageFormat::TarXz) }
+        else if filename.ends_with(".appbundle") { Some(PackageFormat::AppBundle) }
+        else if filename.ends_with(".hap") { Some(PackageFormat::Hap) }
+        else if filename.ends_with(".pisi") { Some(PackageFormat::Pisi) }
+        else if filename.ends_with(".superdeb") { Some(PackageFormat::Superdeb) }
+        else if filename.ends_with(".lzm") { Some(PackageFormat::Lzm) }
+        else if filename.ends_with(".pup") { Some(PackageFormat::Pup) }
+        else if filename.ends_with(".pet") { Some(PackageFormat::Pet) }
+        else if filename.ends_with(".flatpak") { Some(PackageFormat::Flatpak) }
+        else if filename.ends_with(".snap") { Some(PackageFormat::Snap) }
+        else if filename.ends_with(".guix") { Some(PackageFormat::Guix) }
+        else if filename.ends_with(".eopkg") { Some(PackageFormat::Pisi) }
+        else if filename.ends_with(".appimage") { Some(PackageFormat::AppImage) }
+        else if filename.ends_with(".moss") { Some(PackageFormat::Moss) }
+        else if filename.ends_with(".hpkg") { Some(PackageFormat::Hpkg) }
+        else if filename.ends_with(".tcz") { Some(PackageFormat::Tcz) }
+        else if filename.ends_with(".gobo") { Some(PackageFormat::Gobo) }
+        else if filename.ends_with(".ostree") { Some(PackageFormat::Ostree) }
+        else if filename.ends_with(".pkgsrc") { Some(PackageFormat::Pkgsrc) }
+        else if filename.ends_with(".sfs") { Some(PackageFormat::Sfs) }
+        else if filename.ends_with(".puk") { Some(PackageFormat::Puk) }
+        else if filename.ends_with(".dmg") { Some(PackageFormat::Dmg) }
+        else if filename.ends_with(".cports") { Some(PackageFormat::Cports) }
+        else if filename.ends_with(".ipk") { Some(PackageFormat::Ipk) }
+        else if filename.ends_with(".opkg") { Some(PackageFormat::Opkg) }
+        else if filename.ends_with(".p5p") || filename.ends_with(".ips") { Some(PackageFormat::SolarisIps) }
+        else if filename.ends_with(".nar") { Some(PackageFormat::GuixNar) }
+        else if filename.ends_with(".openbsd.tgz") { Some(PackageFormat::OpenBsdPkg) }
+        else if filename.ends_with(".spack") { Some(PackageFormat::Spack) }
+        else if filename.ends_with(".conan") { Some(PackageFormat::Conan) }
+        else if filename.ends_with(".whl") { Some(PackageFormat::Wheel) }
+        else if filename.ends_with(".crate") { Some(PackageFormat::Crate) }
+        else if filename.ends_with(".gem") { Some(PackageFormat::Gem) }
+        else if filename.ends_with(".nupkg") { Some(PackageFormat::Nupkg) }
+        else if filename.ends_with(".vcpkg") { Some(PackageFormat::Vcpkg) }
+        else if filename.ends_with(".narinfo") { Some(PackageFormat::NarInfo) }
+        else if filename.ends_with(".xbps") { Some(PackageFormat::Xbps) }
         else { None }
     }
 }
@@ -2308,7 +2353,7 @@ impl IPackageAdapter for OpenBsdPkgPackageAdapter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

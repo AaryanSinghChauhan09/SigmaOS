@@ -7,8 +7,23 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+#[cfg(not(feature = "standalone_test"))]
 use crate::package::AptDebManifest;
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(feature = "standalone_test")]
+pub use universal_oop_system::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,11 +85,21 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
+#[cfg(feature = "standalone_test")]
+#[path = "universal_engine.rs"]
+pub mod universal_engine;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+#[cfg(feature = "standalone_test")]
+#[path = "universal_oop_system.rs"]
+pub mod universal_oop_system;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::sigpkg::universal_engine;
+
+pub use universal_engine::PackageFormat;
+
+#[cfg(all(test, not(feature = "standalone_test")))]
+pub use crate::sigpkg::Version;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -107,7 +132,12 @@ pub struct PacmanPkgbuild {
 }
 
 /// Use universal_oop_system::UniversalPackageManager instead
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+
+#[cfg(feature = "standalone_test")]
+pub use universal_oop_system::UniversalPackageManager;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
@@ -1587,7 +1617,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = universal_oop_system::StandardPackage {
             metadata: universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: native_pkg.version,
+                version: native_pkg.version.clone(),
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
@@ -1697,7 +1727,7 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -2226,7 +2256,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_add" | "pkg_info" => {
+            "pkg_info" => {
                 if pm == "pkg_add" {
                     operation = UniversalPmOperation::Install;
                 } else {
@@ -2795,7 +2825,7 @@ impl Default for UniversalDryRunSimulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
