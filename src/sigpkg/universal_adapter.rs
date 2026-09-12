@@ -7,8 +7,24 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+#[cfg(not(feature = "standalone_test"))]
 use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
+
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(feature = "standalone_test")]
+pub use crate::universal_oop_system::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,11 +86,17 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
+#[cfg(feature = "standalone_test")]
+pub use crate::universal_engine::PackageFormat;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::universal_engine::PackageFormat;
+
+#[cfg(feature = "standalone_test")]
+pub use crate::universal_oop_system;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::sigpkg::universal_oop_system;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -107,7 +129,7 @@ pub struct PacmanPkgbuild {
 }
 
 /// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
@@ -2226,12 +2248,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_add" | "pkg_info" => {
-                if pm == "pkg_add" {
-                    operation = UniversalPmOperation::Install;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
+            "pkg_info" => {
+                operation = UniversalPmOperation::QueryInfo;
                 for arg in args {
                     if *arg == "-n" {
                         dry_run = true;
