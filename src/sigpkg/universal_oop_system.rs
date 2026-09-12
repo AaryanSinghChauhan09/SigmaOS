@@ -341,6 +341,8 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".sigma") {
+            Some(PackageFormat::Sigma)
         } else {
             None
         }
