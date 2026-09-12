@@ -29,3 +29,7 @@
 ## 2026-09-10 - Web Desktop Theme Switcher State & Skip Link Navigation
 **Learning:** Web OS desktops with multi-theme selection buttons require `aria-pressed` synchronization and a skip-to-content anchor link (`skip-link`) at the top of the DOM to prevent screen readers from having to traverse fixed header status bars on every page load.
 **Action:** Provide `aria-pressed` attributes on theme toggle buttons updated dynamically via event handlers and include a visually-hidden `.skip-link` element at the start of `<body>` that becomes visible on keyboard focus.
+
+## 2026-11-20 - Keyboard Focus Selector and Visual Focus Indicator Synchronization
+**Learning:** Querying non-standard attributes like `[tab-index="0"]` and omitting native tags (`<button>`, `<a href>`, `<input>`) breaks keyboard navigation for screen readers and keyboard users; additionally, custom focus classes added via event handlers (`.keyboard-focus`) must be mirrored in CSS focus rules alongside `:focus-visible`.
+**Action:** Always include native interactive HTML tags and standard `[tabindex="0"]` in keyboard event listener queries and mirror `.keyboard-focus` in CSS focus indicator rules for WCAG 2.1 Level AA compliance.
