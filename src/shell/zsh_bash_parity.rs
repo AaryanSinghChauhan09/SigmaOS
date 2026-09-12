@@ -1612,6 +1612,43 @@ impl UniversalScriptTranspiler {
             }
         }
 
+        // 9. Bash array syntax transpilation: declare -a arr=(a b) or arr=(a b)
+        if (l.starts_with("declare -a ") || l.contains("=(")) && l.ends_with(')') {
+            let clean = l.trim_start_matches("declare -a ").trim();
+            if let Some(eq) = clean.find("=(") {
+                let name = &clean[..eq];
+                let elems = &clean[eq + 2..clean.len() - 1].trim();
+                return format!("{}=\"{}\"", name, elems);
+            }
+        }
+
+        // 10. Ksh coproc command transpilation: coproc cmd -> cmd &
+        if l.starts_with("coproc ") {
+            let cmd = l.trim_start_matches("coproc ").trim();
+            return format!("{} &", cmd);
+        }
+
+        // 11. Zsh extended glob syntax transpilation: *(pat) -> *
+        if l.contains("*(") && l.contains(')') {
+            let mut res = String::new();
+            let mut chars = l.chars().peekable();
+            while let Some(c) = chars.next() {
+                if c == '*' && chars.peek() == Some(&'(') {
+                    chars.next(); // consume '('
+                    res.push('*');
+                    // skip until ')'
+                    for sub in chars.by_ref() {
+                        if sub == ')' {
+                            break;
+                        }
+                    }
+                } else {
+                    res.push(c);
+                }
+            }
+            return res;
+        }
+
         l
     }
 }
@@ -2119,5 +2156,25 @@ mod tests {
         assert_eq!(results.len(), 2);
         assert_eq!(results[0], "cargo test --lib");
         assert_eq!(results[1], "cargo build");
+    }
+
+    #[test]
+    fn test_expanded_shell_dialect_transpilation() {
+        let bash_array_script = "declare -a items=(alpha beta gamma)";
+        let posix_array = UniversalScriptTranspiler::transpile_to_posix_sh(bash_array_script, ShellDialect::Bash);
+        assert!(posix_array.contains("items=\"alpha beta gamma\""));
+
+        let ksh_coproc_script = "coproc my_worker";
+        let posix_coproc = UniversalScriptTranspiler::transpile_to_posix_sh(ksh_coproc_script, ShellDialect::Ksh);
+        assert!(posix_coproc.contains("my_worker &"));
+
+        let zsh_glob_script = "ls *(*.txt)";
+        let posix_glob = UniversalScriptTranspiler::transpile_to_posix_sh(zsh_glob_script, ShellDialect::Zsh);
+        assert!(posix_glob.contains("ls *"));
+
+        let mut env = BTreeMap::new();
+        env.insert("FILE".to_string(), "archive.tar.gz".to_string());
+        assert_eq!(BashParameterExpansion::expand("${FILE#archive.}", &env), "tar.gz");
+        assert_eq!(BashParameterExpansion::expand("${FILE%.gz}", &env), "archive.tar");
     }
 }

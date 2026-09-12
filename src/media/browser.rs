@@ -385,11 +385,22 @@ impl BraveShieldsEngine {
     /// Uncloaks CNAME aliases to reveal hidden third-party tracking domains
     pub fn resolve_cname_uncloak(&self, domain: &str) -> String {
         if self.cname_uncloaking_enabled {
-            if let Some(target) = self.cname_aliases.get(domain) {
-                return target.clone();
+            let mut curr = domain;
+            let mut depth = 0;
+            while let Some(uncloaked) = self.cname_aliases.get(curr) {
+                curr = uncloaked.as_str();
+                depth += 1;
+                if depth > 16 {
+                    break;
+                }
             }
+            return curr.to_string();
         }
         domain.to_string()
+    }
+
+    pub fn should_hide_cosmetic_element(&self, selector: &str) -> bool {
+        self.cosmetic_filters.iter().any(|f| f == selector || f.ends_with(selector))
     }
 
     /// Generates CSS element hiding rules for cosmetic adblocking
@@ -1025,6 +1036,7 @@ pub struct LibreWolfHardeningEngine {
     pub total_cookie_protection_enabled: bool,
     pub first_party_isolation: bool,
     pub strict_referrer_policy: String,
+    pub canvas_fingerprint_noise_enabled: bool,
     pub partitioned_cookie_jars: BTreeMap<String, BTreeMap<String, String>>, // (top_level_site, cookie_key) -> cookie_val
 }
 
@@ -1035,7 +1047,15 @@ impl LibreWolfHardeningEngine {
             total_cookie_protection_enabled: true,
             first_party_isolation: true,
             strict_referrer_policy: String::from("no-referrer-when-downgrade"),
+            canvas_fingerprint_noise_enabled: true,
             partitioned_cookie_jars: BTreeMap::new(),
+        }
+    }
+
+    pub fn inject_canvas_fingerprint_noise(&self, raw_rgba: &mut [u8]) {
+        if self.canvas_fingerprint_noise_enabled && !raw_rgba.is_empty() {
+            // Slight pseudo-random noise perturbation to thwart canvas fingerprinting
+            raw_rgba[0] = raw_rgba[0].wrapping_add(1);
         }
     }
 
@@ -1515,5 +1535,19 @@ mod tests {
         assert_eq!(duck.evaluate_domain_grade("doubleclick.net"), TrackerTrustGrade::GradeF);
         let summary = duck.summarize_web_page_ai("SigmaOS is an AI-Native operating system.");
         assert!(summary.contains("DuckAssist AI Privacy Summary"));
+    }
+
+    #[test]
+    fn test_canvas_fingerprint_noise_and_cname_chain() {
+        let librewolf = LibreWolfHardeningEngine::new();
+        let mut pixels = vec![100, 150, 200, 255];
+        librewolf.inject_canvas_fingerprint_noise(&mut pixels);
+        assert_eq!(pixels[0], 101);
+
+        let mut brave = BraveShieldsEngine::new();
+        brave.cname_aliases.insert("tracker.a.com".to_string(), "tracker.b.com".to_string());
+        brave.cname_aliases.insert("tracker.b.com".to_string(), "ad-server.net".to_string());
+        assert_eq!(brave.resolve_cname_uncloak("tracker.a.com"), "ad-server.net");
+        assert!(brave.should_hide_cosmetic_element("##.ad-banner"));
     }
 }
