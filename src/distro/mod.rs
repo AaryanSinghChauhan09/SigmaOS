@@ -23,7 +23,9 @@ pub mod arch_parity;
 
 pub use arch_missing_components::{
     AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAurWebRpcClient, ArchMakepkgEngine,
-    ArchNamcapLinterEngine, AurPackageResult, NamcapLintWarning, PkgbuildSpec,
+    ArchNamcapLinterEngine, ArchNewsAdvisoryFeedEngine, ArchNewsItem, ArchPacmanConflictResolverEngine,
+    ArchPkgctlDevtoolsEngine, ArchRepoBranch, ArchVercmpVersionComparisonEngine, AurPackageResult,
+    NamcapLintWarning, PacmanFileCollision, ParsedAlpmVersion, PkgbuildSpec,
 };
 pub mod certification;
 pub mod chakra_parity;
