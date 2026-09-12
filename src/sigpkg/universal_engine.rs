@@ -82,11 +82,32 @@ pub enum PackageFormat {
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
+        if filename.contains(".pkg.tar.") || filename.ends_with(".pacman") || filename == "pacman" { Some(PackageFormat::Pacman) }
+        else if filename.ends_with(".air") { Some(PackageFormat::Air) }
+        else if filename.ends_with(".bottle") { Some(PackageFormat::Bottle) }
+        else if filename.ends_with(".ipa") { Some(PackageFormat::Ipa) }
+        else if filename.ends_with(".ports") { Some(PackageFormat::Ports) }
+        else if filename.ends_with(".pkg") { Some(PackageFormat::Pkg) }
+        else if filename.ends_with(".aab") { Some(PackageFormat::Aab) }
         else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
-        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
+        else if filename.ends_with(".AppImage") || filename.ends_with(".appimage") { Some(PackageFormat::AppImage) }
+        else if filename.ends_with(".eopkg") { Some(PackageFormat::Eopkg) }
+        else if filename.ends_with(".nix") || filename.ends_with(".nixpkg") { Some(PackageFormat::Nix) }
+        else if filename.ends_with(".portage") || filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
+        else if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
+        else if filename.ends_with(".tar.gz") || filename.ends_with(".tgz") || filename.contains(".tar .gz") { Some(PackageFormat::TarGz) }
+        else if filename.ends_with(".tar.xz") || filename.ends_with(".xz") { Some(PackageFormat::TarXz) }
+        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
+        else if filename.ends_with(".flatpak") { Some(PackageFormat::Flatpak) }
+        else if filename.ends_with(".app") { Some(PackageFormat::AppBundle) }
+        else if filename.ends_with(".hap") { Some(PackageFormat::Hap) }
+        else if filename.ends_with(".PiSi") || filename.ends_with(".pisi") { Some(PackageFormat::Pisi) }
+        else if filename.ends_with(".superdeb") { Some(PackageFormat::Superdeb) }
+        else if filename.ends_with(".lzm") { Some(PackageFormat::Lzm) }
+        else if filename.ends_with(".pup") || filename == "pup" { Some(PackageFormat::Pup) }
+        else if filename.ends_with(".snap") { Some(PackageFormat::Snap) }
+        else if filename.ends_with(".tar") { Some(PackageFormat::Tar) }
+        else if filename.ends_with(".pet") || filename == "pet" { Some(PackageFormat::Pet) }
         else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
         else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
         else { None }
