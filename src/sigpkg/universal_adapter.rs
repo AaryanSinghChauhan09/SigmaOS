@@ -7,8 +7,21 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(feature = "standalone_test")]
+use universal_oop_system::{Dependency, Package, Version, VersionConstraint};
+
+/// Description of Debian / APT Control Manifest (.deb / dpkg parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,13 +83,26 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
+#[cfg(all(test, not(feature = "standalone_test")))]
 pub use crate::sigpkg::Version;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::universal_engine::PackageFormat;
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
+#[path = "universal_engine.rs"]
+mod universal_engine;
+#[cfg(feature = "standalone_test")]
+use universal_engine::PackageFormat;
+
+#[cfg(feature = "standalone_test")]
+#[path = "universal_oop_system.rs"]
+mod universal_oop_system;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
     NetworkTcp,
@@ -91,7 +117,7 @@ pub enum Permission {
     Execute,
 }
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::security::Permission;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -106,9 +132,8 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(feature = "standalone_test")]
+use universal_oop_system::UniversalPackageManager;
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -2150,7 +2175,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" | "pkg_add" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }

@@ -131,10 +131,17 @@ impl UniversalPackageTranslator {
 }
 
 fn debtor_to_sovereign_name(name: &str) -> &str {
-    if name.contains("ssl") {
+    let lower = name.to_lowercase();
+    if lower.contains("ssl") || lower.contains("crypto") {
         "sovereign-openssl"
-    } else if name.contains("libc") {
+    } else if lower.contains("libc") || lower == "musl" || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") {
         "sovereign-libc"
+    } else if lower.contains("zlib") {
+        "sovereign-zlib"
+    } else if lower.contains("python") {
+        "sovereign-python"
+    } else if lower == "bash" || lower == "zsh" || lower == "sh" {
+        "sovereign-shell"
     } else {
         name
     }
@@ -177,6 +184,18 @@ impl DistroRepoSyncEngine {
             distro_name: "Void".to_string(),
             repo_url: "voidlinux.org".to_string(),
         });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "FreeBSD".to_string(),
+            repo_url: "freebsd.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "Gentoo".to_string(),
+            repo_url: "gentoo.org".to_string(),
+        });
+        repos.push(RegisteredDistroRepo {
+            distro_name: "OpenBSD".to_string(),
+            repo_url: "openbsd.org".to_string(),
+        });
         Self {
             registered_repos: repos,
             indexed_manifests: HashMap::new(),
@@ -196,6 +215,15 @@ impl DistroRepoSyncEngine {
         self.indexed_manifests
             .get(name)
             .map(UniversalPackageTranslator::translate_to_sigma_pkg)
+    }
+
+    pub fn search_indexed_manifests(&self, query: &str) -> Vec<UnifiedPackage> {
+        let query_lower = query.to_lowercase();
+        self.indexed_manifests
+            .values()
+            .filter(|m| m.original_name.to_lowercase().contains(&query_lower))
+            .map(UniversalPackageTranslator::translate_to_sigma_pkg)
+            .collect()
     }
 }
 
