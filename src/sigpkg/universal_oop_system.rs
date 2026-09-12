@@ -231,6 +231,24 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
+    // HPC Spack package
+    Spack,
+    // Conan package manager
+    Conan,
+    // Python Wheel package
+    Wheel,
+    // Cargo Rust crate
+    Crate,
+    // RubyGems gem
+    Gem,
+    // .NET NuGet package
+    Nupkg,
+    // C++ Vcpkg package
+    Vcpkg,
+    // Nix NarInfo metadata
+    NarInfo,
+    // systemd-sysupdate image
+    Sysupdate,
 }
 
 impl PackageFormat {

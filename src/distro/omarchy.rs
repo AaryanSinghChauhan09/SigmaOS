@@ -610,18 +610,8 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-#[cfg(not(feature = "standalone_test"))]
-pub use crate::distro::omarchy_inspiration::{
-    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
-    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
-    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
-    QuickshellWidget, ShellComponentKind,
-};
-
-#[cfg(feature = "standalone_test")]
 #[path = "omarchy_inspiration.rs"]
 pub mod omarchy_inspiration;
-#[cfg(feature = "standalone_test")]
 pub use omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
@@ -898,124 +888,6 @@ impl OmarchyStarshipPromptConfigEngine {
     }
 }
 
-/// Hyprlock screen lock configuration generator engine (Omarchy / Omakub lockscreen parity)
-#[derive(Debug, Clone)]
-pub struct OmarchyHyprlockConfigEngine {
-    pub background_path: String,
-    pub blur_passes: u32,
-    pub font_family: String,
-}
-
-impl OmarchyHyprlockConfigEngine {
-    pub fn new(bg_path: &str) -> Self {
-        Self {
-            background_path: bg_path.to_string(),
-            blur_passes: 2,
-            font_family: "JetBrainsMono Nerd Font".to_string(),
-        }
-    }
-
-    pub fn generate_hyprlock_conf(&self, theme: &OmarchyTheme) -> String {
-        format!(
-            "background {{\n  path = {}\n  blur_passes = {}\n}}\ninput-field {{\n  size = 250, 50\n  outline_thickness = 3\n  outer_color = rgba({}ff)\n  inner_color = rgba({}ff)\n  font_color = rgba({}ff)\n  font_family = {}\n}}\n",
-            self.background_path,
-            self.blur_passes,
-            theme.accent_color().trim_start_matches('#'),
-            theme.bg_color().trim_start_matches('#'),
-            theme.fg_color().trim_start_matches('#'),
-            self.font_family
-        )
-    }
-}
-
-/// Waybar top status bar layout generator engine (Omarchy / Hyprland bar parity)
-#[derive(Debug, Clone)]
-pub struct OmarchyWaybarLayoutEngine {
-    pub modules_left: Vec<String>,
-    pub modules_center: Vec<String>,
-    pub modules_right: Vec<String>,
-}
-
-impl OmarchyWaybarLayoutEngine {
-    pub fn new() -> Self {
-        Self {
-            modules_left: vec!["hyprland/workspaces".to_string(), "hyprland/window".to_string()],
-            modules_center: vec!["clock".to_string()],
-            modules_right: vec![
-                "pulseaudio".to_string(),
-                "network".to_string(),
-                "cpu".to_string(),
-                "memory".to_string(),
-                "tray".to_string(),
-            ],
-        }
-    }
-
-    pub fn generate_waybar_json(&self) -> String {
-        format!(
-            "{{\n  \"layer\": \"top\",\n  \"position\": \"top\",\n  \"modules-left\": {:?},\n  \"modules-center\": {:?},\n  \"modules-right\": {:?}\n}}\n",
-            self.modules_left, self.modules_center, self.modules_right
-        )
-    }
-}
-
-impl Default for OmarchyWaybarLayoutEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Fastfetch terminal system information generator engine (Omarchy terminal fetch parity)
-pub struct OmarchyFastfetchConfigEngine;
-
-impl OmarchyFastfetchConfigEngine {
-    pub fn generate_fastfetch_json() -> String {
-        r#"{
-  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-  "logo": { "type": "builtin", "name": "arch" },
-  "modules": [
-    "title", "separator", "os", "host", "kernel", "uptime",
-    "packages", "shell", "wm", "terminal", "cpu", "gpu", "memory"
-  ]
-}"#.to_string()
-    }
-}
-
-/// Zsh + Oh-My-Zsh developer workstation environment setup engine (Omarchy / Omakub shell parity)
-#[derive(Debug, Clone)]
-pub struct OmarchyZshOmzEngine {
-    pub plugins: Vec<String>,
-    pub theme: String,
-}
-
-impl OmarchyZshOmzEngine {
-    pub fn new() -> Self {
-        Self {
-            plugins: vec![
-                "git".to_string(),
-                "zsh-autosuggestions".to_string(),
-                "zsh-syntax-highlighting".to_string(),
-                "sudo".to_string(),
-            ],
-            theme: "robbyrussell".to_string(),
-        }
-    }
-
-    pub fn generate_zshrc(&self) -> String {
-        format!(
-            "export ZSH=\"$HOME/.oh-my-zsh\"\nZSH_THEME=\"{}\"\nplugins=({})\nsource $ZSH/oh-my-zsh.sh\neval \"$(starship init zsh)\"\neval \"$(mise activate zsh)\"\n",
-            self.theme,
-            self.plugins.join(" ")
-        )
-    }
-}
-
-impl Default for OmarchyZshOmzEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod omarchy_gap_closure_tests {
     use super::*;
@@ -1049,26 +921,5 @@ mod omarchy_gap_closure_tests {
 
         let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
         assert!(starship_toml.contains("truncation_length = 3"));
-    }
-
-    #[test]
-    fn test_omarchy_hyprlock_waybar_fastfetch_zsh_engines() {
-        let hyprlock = OmarchyHyprlockConfigEngine::new("/usr/share/backgrounds/omarchy.png");
-        let lock_conf = hyprlock.generate_hyprlock_conf(&OmarchyTheme::TokyoNight);
-        assert!(lock_conf.contains("path = /usr/share/backgrounds/omarchy.png"));
-        assert!(lock_conf.contains("font_family = JetBrainsMono Nerd Font"));
-
-        let waybar = OmarchyWaybarLayoutEngine::new();
-        let bar_json = waybar.generate_waybar_json();
-        assert!(bar_json.contains("hyprland/workspaces"));
-        assert!(bar_json.contains("pulseaudio"));
-
-        let fastfetch_json = OmarchyFastfetchConfigEngine::generate_fastfetch_json();
-        assert!(fastfetch_json.contains("fastfetch"));
-
-        let zsh = OmarchyZshOmzEngine::new();
-        let zshrc = zsh.generate_zshrc();
-        assert!(zshrc.contains("zsh-autosuggestions"));
-        assert!(zshrc.contains("starship init zsh"));
     }
 }
