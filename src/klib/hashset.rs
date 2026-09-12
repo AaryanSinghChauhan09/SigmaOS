@@ -58,10 +58,10 @@ where
         }
     }
 
+    /// Inserts an item into the set. Returns `true` if the item was newly inserted,
+    /// or `false` if it was already present, using a single pass through `BTreeMap::insert`.
     pub fn insert(&mut self, item: T) -> bool {
-        let was_present = self.map.contains_key(&item);
-        self.map.insert(item, ());
-        !was_present
+        self.map.insert(item, ()).is_none()
     }
 
     pub fn remove(&mut self, item: &T) -> bool {

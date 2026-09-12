@@ -60,6 +60,13 @@ if [ -f "tests/test_hashmap_standalone.rs" ]; then
     ./build/hashmap_test
 fi
 
+if [ -f "tests/test_btreemap_standalone.rs" ]; then
+    echo "Running BTreeMap & HashSet performance & correctness test suite..."
+    mkdir -p build
+    rustc --test tests/test_btreemap_standalone.rs --edition=2021 -o build/btreemap_test
+    ./build/btreemap_test
+fi
+
 if [ -f "src/distro/arch.rs" ]; then
     echo "Running Arch Linux parity & tooling test suite..."
     mkdir -p build
