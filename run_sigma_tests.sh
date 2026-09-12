@@ -37,6 +37,20 @@ if [ -f "src/distro/linux_bsd_ultimate_synthesis.rs" ]; then
     ./build/linux_bsd_ultimate_synthesis_test
 fi
 
+if [ -f "src/distro/whonix_privacy_synthesis.rs" ]; then
+    echo "Running Whonix Dual-VM Privacy synthesis test suite..."
+    mkdir -p build
+    rustc --test src/distro/whonix_privacy_synthesis.rs --edition=2021 -o build/whonix_privacy_synthesis_test
+    ./build/whonix_privacy_synthesis_test
+fi
+
+if [ -f "src/distro/illumos_smf_engine.rs" ]; then
+    echo "Running Illumos SMF service management test suite..."
+    mkdir -p build
+    rustc --test src/distro/illumos_smf_engine.rs --edition=2021 -o build/illumos_smf_engine_test
+    ./build/illumos_smf_engine_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then

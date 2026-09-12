@@ -254,3 +254,15 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
+
+pub mod whonix_privacy_synthesis;
+pub use whonix_privacy_synthesis::{
+    SovereignWhonixPrivacySuite, StreamIsolationTag, TorCircuitRecord, WhonixGatewayConfig,
+    WhonixGatewayRoutingEngine, WhonixWorkstationIsolation,
+};
+
+pub mod illumos_smf_engine;
+pub use illumos_smf_engine::{
+    IllumosSmfDependencyEngine, SmfDependency, SmfDependencyGrouping, SmfServiceManifest,
+    SmfServiceState, SovereignIllumosSmfSuite,
+};
