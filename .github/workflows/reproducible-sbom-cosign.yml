@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
+        uses: actions/checkout@v4
 
       - name: Setup Rust Stable
-        uses: dtolnay/rust-toolchain@7b737f3747eb115cf4e8f1766b8fb62b6948fb16 # stable
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
 
@@ -58,10 +58,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
+        uses: actions/checkout@v4
 
       - name: Setup Rust Stable
-        uses: dtolnay/rust-toolchain@7b737f3747eb115cf4e8f1766b8fb62b6948fb16 # stable
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
 
@@ -70,14 +70,14 @@ jobs:
           cargo build --release --lib
 
       - name: Install SBOM Tool (Syft)
-        uses: anchore/sbom-action/download-syft@78fc58200f2e0ad3c326e54ee0d603a1188fb806 # v0.18.0
+        uses: anchore/sbom-action/download-syft@v0.18.0
 
       - name: Generate SPDX & CycloneDX SBOM
         run: |
           syft dir:. -o spdx-json=sbom.spdx.json -o cyclonedx-json=sbom.cyclonedx.json
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@d7d6bc7722e3daf835ebd020de1b501d0a6a8e36 # v3.8.1
+        uses: sigstore/cosign-installer@v3.8.1
 
       - name: Sign Release Artifacts with Cosign (Keyless)
         run: |
@@ -85,7 +85,7 @@ jobs:
           cosign sign-blob --yes target/release/libsigmaos.rlib --output-signature target/release/libsigmaos.rlib.sig
 
       - name: Upload SBOM & Signature Artifacts
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        uses: actions/upload-artifact@v4
         with:
           name: sigmaos-sbom-signatures
           path: |
