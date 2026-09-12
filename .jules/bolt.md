@@ -45,3 +45,7 @@
 ## 2026-09-13 - Fast Raw Byte-Scanning Path for JSON String Parsing
 **Learning:** In JSON recursive descent parsers, iterating over string characters using `.chars().next()` decodes UTF-8 multi-byte sequences for every byte in the input string. Scanning raw byte slices (`&[u8]`) directly until hitting delimiter bytes (`"` or `\`) bypasses character decoding entirely for escape-free strings (the majority of JSON strings), resulting in a significant parsing throughput increase while falling back safely to UTF-8 decoding when backslash escapes are encountered.
 **Action:** When parsing text formats or string literals, use raw byte-level scanning for delimiter detection and fast slicing before falling back to multi-byte UTF-8 character decoding.
+
+## 2026-09-14 - O(log N) Binary Searching & Single-Pass Insertion for BTreeMap and HashSet
+**Learning:** In custom sorted map/set abstractions (`BTreeMap` and `HashSet`), performing $O(N)$ linear scans for `insert`, `get`, `remove`, and `contains_key` degrades collection operations on larger data sets. Replacing linear scans with `binary_search_by` converts lookup, insert, and remove complexity to $O(\log N)$. Furthermore, refactoring `HashSet::insert` to evaluate `self.map.insert(item, ()).is_none()` eliminates redundant `contains_key` lookup passes, executing set insertion and presence detection in a single pass.
+**Action:** Always prefer logarithmic binary searches (`binary_search_by`) on sorted collections and leverage return values (`Option<V>`) to combine presence checks and insertions into a single pass.
