@@ -45,3 +45,7 @@
 ## 2026-09-13 - Fast Raw Byte-Scanning Path for JSON String Parsing
 **Learning:** In JSON recursive descent parsers, iterating over string characters using `.chars().next()` decodes UTF-8 multi-byte sequences for every byte in the input string. Scanning raw byte slices (`&[u8]`) directly until hitting delimiter bytes (`"` or `\`) bypasses character decoding entirely for escape-free strings (the majority of JSON strings), resulting in a significant parsing throughput increase while falling back safely to UTF-8 decoding when backslash escapes are encountered.
 **Action:** When parsing text formats or string literals, use raw byte-level scanning for delimiter detection and fast slicing before falling back to multi-byte UTF-8 character decoding.
+
+## 2026-09-14 - Direct Delegation to Full-Format Parser in Package Extension Detection
+**Learning:** Duplicating filename format detection routines in helper structs (e.g. `UniversalPackageManifestParser::detect_format_from_filename`) creates code drift, duplicates `to_lowercase` heap allocations, and restricts supported formats to a subset of available enum variants. Delegating directly to `PackageFormat::from_filename` eliminates redundant string processing and expands package format detection coverage from 28 formats to all 60+ supported package formats instantly.
+**Action:** Always delegate helper format detection methods to centralized domain models (`PackageFormat::from_filename`) to avoid duplicate string allocations and logic duplication.
