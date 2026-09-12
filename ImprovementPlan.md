@@ -10,10 +10,11 @@ The analysis evaluates the codebase across 8 key engineering domains, incorporat
 ## 1. Code Quality & Testing
 - **Current State**:
   - All native test suites in `./run_sigma_tests.sh` pass with **100% success rate** across 67 tests covering security input validation, Linux & BSD distro inspirations, subsystem bridge, launch readiness, VecDeque, HashMap, Arch Linux parity, and packaging engines.
-  - Standalone module test suites (`rustc --test --cfg 'feature="standalone_test"' ...`) pass cleanly for `src/package/universal.rs`, `src/sigpkg/universal_oop_system.rs`, `src/compatibility/fedora.rs`, `src/distro/void_runit.rs`, and `src/driver/distro_drivers.rs`.
+  - Standalone module test suites (`rustc --test --cfg 'feature="standalone_test"' ...`) pass cleanly for `src/package/universal.rs`, `src/sigpkg/universal_oop_system.rs`, `src/compatibility/fedora.rs`, `src/distro/void_runit.rs`, `src/driver/distro_drivers.rs`, and `src/distro/omarchy.rs` (25 unit tests passing).
 - **Key Fixes & Improvements**:
   - Removed duplicate feature key `cache-lru` in `Cargo.toml`.
   - Cleaned unused import `use alloc::vec;` in `src/package/universal.rs`.
+  - Cleaned duplicate struct declarations in `src/distro/omarchy.rs` and implemented missing Omarchy Linux ecosystem engines (`OmarchyHyprlockConfigEngine`, `OmarchyWaybarLayoutEngine`, `OmarchyFastfetchConfigEngine`, `OmarchyZshOmzEngine`).
 - **Refactoring Opportunities**:
   - Consolidate minor duplicate struct definitions across `src/package/universal.rs` and `src/sigpkg/universal_adapter.rs`.
   - Refactor monolithic driver files into smaller submodules under `src/driver/`.
@@ -40,6 +41,7 @@ The analysis evaluates the codebase across 8 key engineering domains, incorporat
 - **Defensive Security Mechanics**:
   - Strict input validation in `tests/test_input_validation.rs` enforces path traversal protection (`..` rejection), NUL byte filtering, hostname/IP validation, and arithmetic overflow protection.
   - Process sandboxing and privilege reduction via OpenBSD-inspired `pledge()` and `unveil()` and FreeBSD-inspired Capsicum capabilities in `src/package/universal.rs` and `src/driver/distro_drivers.rs`.
+  - Passwordless Sudo Expiry Guard (`PasswordlessSudoExpiryGuard`) with fail-closed security enforcement in `src/distro/omarchy.rs`.
 - **Regulatory & Standards Compliance**:
   - **GDPR & HIPAA**: Localized, sovereign data processing with zero telemetry and post-quantum cryptographic encryption.
   - **WCAG**: Zenith desktop interface accessibility guidelines incorporated into UI bridge design.
@@ -88,7 +90,7 @@ The analysis evaluates the codebase across 8 key engineering domains, incorporat
 
 ---
 
-## 8. Object-Oriented Programming (OOP) Principles
+## 8. Object-Oriented Programming (OOP) Principles & Omarchy Parity
 - **Applied OOP Patterns**:
   - **Encapsulation**: State, adapters, and lifecycle hooks encapsulated in `UniversalPackageManager` and `PackageTriggerRegistry`.
   - **Inheritance / Trait Polymorphism**: Dynamic dispatch via `Box<dyn InstallStrategy>`, `Box<dyn PackageMetadataAdapter>`, `Arc<dyn PackageHook>`, and `Box<dyn PackageObserver>`.
@@ -99,6 +101,10 @@ The analysis evaluates the codebase across 8 key engineering domains, incorporat
     - *Decorator Pattern*: `SandboxDecorator`, `NetworkRestrictionDecorator`, `HardwareOptimizationDecorator`, `ResourceLimitDecorator`, and `PqcSignedDecorator` implementing `PackageCapability`.
     - *Factory Pattern*: `PackageFactory` for instantiating strategies and adapters based on `PackageFormat`.
     - *Observer Pattern*: `PackageObserver` notifying listeners of `PackageState` transitions.
+- **Omarchy Linux Ecosystem Absorption**:
+  - **Declarative Hyprland & Hyprlock**: `OmarchyHyprlandCompositorConfigEngine` and `OmarchyHyprlockConfigEngine` generating theme-matched window compositor and lockscreen rules.
+  - **Status Bar & Terminal TUI**: `OmarchyWaybarLayoutEngine` generating top bar JSON layouts, `OmarchyFastfetchConfigEngine` providing system information banners, and `OmarchyLazyGitConfigurationEngine`.
+  - **Polyglot & Shell Environment**: `OmarchyMiseVersionManagerEngine` managing tool versions (Node, Python, Rust, Go) and `OmarchyZshOmzEngine` providing Oh-My-Zsh developer shell configuration.
 - **Priority**: **Medium**
 
 ---

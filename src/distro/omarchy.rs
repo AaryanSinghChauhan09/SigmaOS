@@ -898,156 +898,121 @@ impl OmarchyStarshipPromptConfigEngine {
     }
 }
 
-#[cfg(test)]
-mod omarchy_gap_closure_tests {
-    use super::*;
-
-    #[test]
-    fn test_omarchy_hyprland_compositor_config_engine() {
-        let hypr = OmarchyHyprlandCompositorConfigEngine::new();
-        let conf = hypr.generate_hyprland_conf();
-        assert!(conf.contains("border_size = 2"));
-        assert!(conf.contains("windowrulev2 = float,class:^(pavucontrol)$"));
-    }
-
-    #[test]
-    fn test_omarchy_mise_and_lazygit_engines() {
-        let mise = OmarchyMiseVersionManagerEngine::new();
-        let mise_toml = mise.generate_config_toml();
-        assert!(mise_toml.contains("node = \"lts\""));
-        assert!(mise_toml.contains("rust = \"stable\""));
-
-        let lazygit = OmarchyLazyGitConfigurationEngine::new();
-        let lazy_yml = lazygit.generate_config_yml();
-        assert!(lazy_yml.contains("showIcons: true"));
-        assert!(lazy_yml.contains("delta --dark"));
-    }
-
-    #[test]
-    fn test_omarchy_ayu_and_starship_engines() {
-        let ayu_dark = OmarchyAyuThemeEngine::new(true);
-        let css = ayu_dark.generate_gtk_css();
-        assert!(css.contains("@define-color bg_color #0f1419"));
-
-        let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
-        assert!(starship_toml.contains("truncation_length = 3"));
-    }
+/// Hyprlock screen lock configuration generator engine (Omarchy / Omakub lockscreen parity)
+#[derive(Debug, Clone)]
+pub struct OmarchyHyprlockConfigEngine {
+    pub background_path: String,
+    pub blur_passes: u32,
+    pub font_family: String,
 }
 
-// =========================================================================
-// OMARCHY & OMAKUB MISSING ECOSYSTEM GAP CLOSURE ENGINES
-// =========================================================================
-
-/// Hyprland compositor window rules, gestures, animations, and monitor scaling configuration engine
-pub struct OmarchyHyprlandCompositorConfigEngine {
-    pub monitor_scale: f32,
-    pub border_size: u32,
-    pub active_border_color: String,
-}
-
-impl OmarchyHyprlandCompositorConfigEngine {
-    pub fn new() -> Self {
+impl OmarchyHyprlockConfigEngine {
+    pub fn new(bg_path: &str) -> Self {
         Self {
-            monitor_scale: 1.0,
-            border_size: 2,
-            active_border_color: "rgba(33ccffee) rgba(00ff99ee) 45deg".to_string(),
+            background_path: bg_path.to_string(),
+            blur_passes: 2,
+            font_family: "JetBrainsMono Nerd Font".to_string(),
         }
     }
 
-    pub fn generate_hyprland_conf(&self) -> String {
+    pub fn generate_hyprlock_conf(&self, theme: &OmarchyTheme) -> String {
         format!(
-            "monitor=,preferred,auto,{}\ngeneral {{\n  gaps_in = 5\n  gaps_out = 10\n  border_size = {}\n  col.active_border = {}\n}}\nwindowrulev2 = float,class:^(pavucontrol)$\n",
-            self.monitor_scale, self.border_size, self.active_border_color
+            "background {{\n  path = {}\n  blur_passes = {}\n}}\ninput-field {{\n  size = 250, 50\n  outline_thickness = 3\n  outer_color = rgba({}ff)\n  inner_color = rgba({}ff)\n  font_color = rgba({}ff)\n  font_family = {}\n}}\n",
+            self.background_path,
+            self.blur_passes,
+            theme.accent_color().trim_start_matches('#'),
+            theme.bg_color().trim_start_matches('#'),
+            theme.fg_color().trim_start_matches('#'),
+            self.font_family
         )
     }
 }
 
-impl Default for OmarchyHyprlandCompositorConfigEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+/// Waybar top status bar layout generator engine (Omarchy / Hyprland bar parity)
+#[derive(Debug, Clone)]
+pub struct OmarchyWaybarLayoutEngine {
+    pub modules_left: Vec<String>,
+    pub modules_center: Vec<String>,
+    pub modules_right: Vec<String>,
 }
 
-/// Mise polyglot tool version manager engine (Node, Python, Rust, Go, Ruby)
-pub struct OmarchyMiseVersionManagerEngine {
-    pub default_tools: BTreeMap<String, String>,
-}
-
-impl OmarchyMiseVersionManagerEngine {
+impl OmarchyWaybarLayoutEngine {
     pub fn new() -> Self {
-        let mut tools = BTreeMap::new();
-        tools.insert("node".to_string(), "lts".to_string());
-        tools.insert("python".to_string(), "latest".to_string());
-        tools.insert("rust".to_string(), "stable".to_string());
-        tools.insert("go".to_string(), "latest".to_string());
-        Self { default_tools: tools }
+        Self {
+            modules_left: vec!["hyprland/workspaces".to_string(), "hyprland/window".to_string()],
+            modules_center: vec!["clock".to_string()],
+            modules_right: vec![
+                "pulseaudio".to_string(),
+                "network".to_string(),
+                "cpu".to_string(),
+                "memory".to_string(),
+                "tray".to_string(),
+            ],
+        }
     }
 
-    pub fn generate_config_toml(&self) -> String {
-        let mut lines = vec!["[tools]".to_string()];
-        for (tool, ver) in &self.default_tools {
-            lines.push(format!("{} = \"{}\"", tool, ver));
-        }
-        lines.join("\n")
+    pub fn generate_waybar_json(&self) -> String {
+        format!(
+            "{{\n  \"layer\": \"top\",\n  \"position\": \"top\",\n  \"modules-left\": {:?},\n  \"modules-center\": {:?},\n  \"modules-right\": {:?}\n}}\n",
+            self.modules_left, self.modules_center, self.modules_right
+        )
     }
 }
 
-impl Default for OmarchyMiseVersionManagerEngine {
+impl Default for OmarchyWaybarLayoutEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// LazyGit terminal TUI configuration generator engine
-pub struct OmarchyLazyGitConfigurationEngine {
+/// Fastfetch terminal system information generator engine (Omarchy terminal fetch parity)
+pub struct OmarchyFastfetchConfigEngine;
+
+impl OmarchyFastfetchConfigEngine {
+    pub fn generate_fastfetch_json() -> String {
+        r#"{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": { "type": "builtin", "name": "arch" },
+  "modules": [
+    "title", "separator", "os", "host", "kernel", "uptime",
+    "packages", "shell", "wm", "terminal", "cpu", "gpu", "memory"
+  ]
+}"#.to_string()
+    }
+}
+
+/// Zsh + Oh-My-Zsh developer workstation environment setup engine (Omarchy / Omakub shell parity)
+#[derive(Debug, Clone)]
+pub struct OmarchyZshOmzEngine {
+    pub plugins: Vec<String>,
     pub theme: String,
 }
 
-impl OmarchyLazyGitConfigurationEngine {
+impl OmarchyZshOmzEngine {
     pub fn new() -> Self {
         Self {
-            theme: "tokyonight".to_string(),
+            plugins: vec![
+                "git".to_string(),
+                "zsh-autosuggestions".to_string(),
+                "zsh-syntax-highlighting".to_string(),
+                "sudo".to_string(),
+            ],
+            theme: "robbyrussell".to_string(),
         }
     }
 
-    pub fn generate_config_yml(&self) -> String {
+    pub fn generate_zshrc(&self) -> String {
         format!(
-            "gui:\n  theme:\n    activeBorderColor:\n      - '#7aa2f7'\n      - bold\n  showIcons: true\ngit:\n  paging:\n    colorArg: always\n    pager: delta --dark --paging=never\n"
+            "export ZSH=\"$HOME/.oh-my-zsh\"\nZSH_THEME=\"{}\"\nplugins=({})\nsource $ZSH/oh-my-zsh.sh\neval \"$(starship init zsh)\"\neval \"$(mise activate zsh)\"\n",
+            self.theme,
+            self.plugins.join(" ")
         )
     }
 }
 
-impl Default for OmarchyLazyGitConfigurationEngine {
+impl Default for OmarchyZshOmzEngine {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-/// Ayu Dark / Ayu Light theme palette and GTK CSS generator engine
-pub struct OmarchyAyuThemeEngine {
-    pub is_dark: bool,
-}
-
-impl OmarchyAyuThemeEngine {
-    pub fn new(is_dark: bool) -> Self {
-        Self { is_dark }
-    }
-
-    pub fn generate_gtk_css(&self) -> String {
-        if self.is_dark {
-            "@define-color bg_color #0f1419;\n@define-color fg_color #e6e1cf;\n@define-color accent_color #ffb454;\nwindow { background-color: @bg_color; color: @fg_color; }\n".to_string()
-        } else {
-            "@define-color bg_color #fafafa;\n@define-color fg_color #5c6166;\n@define-color accent_color #ff9940;\nwindow { background-color: @bg_color; color: @fg_color; }\n".to_string()
-        }
-    }
-}
-
-/// Starship cross-shell prompt config generator engine
-pub struct OmarchyStarshipPromptConfigEngine;
-
-impl OmarchyStarshipPromptConfigEngine {
-    pub fn generate_starship_toml() -> String {
-        "[format]\nformat = \"$username$hostname$directory$git_branch$character\"\n\n[directory]\ntruncation_length = 3\ntruncated_prefix = \"…/\"\n\n[character]\nsuccess_symbol = \"[❯](bold green)\"\nerror_symbol = \"[❯](bold red)\"\n".to_string()
     }
 }
 
@@ -1084,5 +1049,26 @@ mod omarchy_gap_closure_tests {
 
         let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
         assert!(starship_toml.contains("truncation_length = 3"));
+    }
+
+    #[test]
+    fn test_omarchy_hyprlock_waybar_fastfetch_zsh_engines() {
+        let hyprlock = OmarchyHyprlockConfigEngine::new("/usr/share/backgrounds/omarchy.png");
+        let lock_conf = hyprlock.generate_hyprlock_conf(&OmarchyTheme::TokyoNight);
+        assert!(lock_conf.contains("path = /usr/share/backgrounds/omarchy.png"));
+        assert!(lock_conf.contains("font_family = JetBrainsMono Nerd Font"));
+
+        let waybar = OmarchyWaybarLayoutEngine::new();
+        let bar_json = waybar.generate_waybar_json();
+        assert!(bar_json.contains("hyprland/workspaces"));
+        assert!(bar_json.contains("pulseaudio"));
+
+        let fastfetch_json = OmarchyFastfetchConfigEngine::generate_fastfetch_json();
+        assert!(fastfetch_json.contains("fastfetch"));
+
+        let zsh = OmarchyZshOmzEngine::new();
+        let zshrc = zsh.generate_zshrc();
+        assert!(zshrc.contains("zsh-autosuggestions"));
+        assert!(zshrc.contains("starship init zsh"));
     }
 }
