@@ -5355,3 +5355,109 @@ SigmaOS natively implements Omarchy Linux workstation parity across `src/distro/
 #### 6. Curated Theme Studio (`OmarchyTheme` & `OmarchySystemThemeStudio`)
 - Enforces system-wide color palette synchronization across compositor, status bar, terminal, and applications.
 - Built-in palettes: `TokyoNight`, `Catppuccin`, `Gruvbox`, `Nord`, `Everforest`, `Kanagawa`, `RosePine`, `Dracula`, `Solarized`, `Oxide`, and `Cyberpunk`.
+
+---
+
+## 108. SOVEREIGN MASTER COMPREHENSIVE ROADMAP, UNIVERSAL DEVICE ADAPTATION, DISTRO-CRUSHING STRATEGY & AI SPECIFICATION
+
+### 108.1 Overview & Operational Mandate
+This master specification unifies the strategic roadmap, universal hardware adaptation framework, market-defeating Linux/BSD distro crushing strategy, strict `#![no_std]` low-level programming standards, bare-metal Object-Oriented Programming (OOP) design patterns, composite AI agent specialist roles, and automated GitHub repository & wiki synchronization workflows for **SigmaOS**.
+
+---
+
+### 108.2 Universal Ancient-to-Modern Hardware Adaptation Framework
+
+SigmaOS incorporates a universal Hardware Abstraction Layer (`HAL`) designed to run on hardware spanning ancient 1980s 16-bit legacy silicon to modern 2026+ CXL 3.0 / PQC server fabrics without external proprietary driver binaries:
+
+```
++---------------------------------------------------------------------------------------------------+
+|                         SIGMAOS UNIVERSAL HARDWARE ADAPTATION LAYER                               |
++---------------------------------------------------------------------------------------------------+
+|  [Legacy Ancient Hardware Abstraction]     |  [Modern Next-Gen Hardware Abstraction]               |
+|  - 1980s-1990s x86_32 / 16-bit BIOS / ISA  |  - 2020s-2026+ x86_64 / AArch64 / RISC-V / LoongArch  |
+|  - IDE / ATA PIO Mode Storage              |  - NVMe 1.4/2.0 Multi-Queue Direct Ring Buffers       |
+|  - PS/2 Keyboard & Mouse / VESA Framebuffer|  - xHCI USB 3.2/4.0 / PCIe Gen5-Gen7 / CXL 3.0 Direct |
+|  - 8259 PIC IRQ Routing / DMA Controller   |  - MSI-X Vectoring / APIC / IOMMU DMA Protection     |
++---------------------------------------------------------------------------------------------------+
+|                   Universal OOP Driver Factory & Polymorphic Hardware Adapter                     |
++---------------------------------------------------------------------------------------------------+
+```
+
+1. **Legacy Silicon Tier (1980s–1990s)**:
+   - 16-bit Real Mode to 32-bit Protected Mode CPU transition shims (`INT 0x10` VBE video, `INT 0x13` disk services).
+   - Port-Mapped I/O (`inb`/`outb`) for ISA buses, 8259 PICs, 8237 DMA controllers, Floppy disk, and ATA/IDE PIO mode storage.
+   - VGA 320x200 256-color modes (`0xB8000`) and dual-channel PS/2 keyboard/mouse controllers.
+
+2. **Modern & Next-Gen Tier (2020s–2026+)**:
+   - Multi-Queue MMIO ring buffers for NVMe 1.4/2.0 SSDs, xHCI USB 3.2/4.0, and E1000/RTL8139 NICs.
+   - PCIe Gen5/Gen6/Gen7, Compute Express Link (CXL 3.0) cache-coherent memory fabric pooling, and IOMMU DMA isolation.
+   - AVX-512, AMX, and RISC-V Vector hardware acceleration for post-quantum Kyber-1024 KEM and Dilithium-5 signatures.
+
+---
+
+### 108.3 Market-Defeating OS & Distro Absorption Strategy
+
+SigmaOS systematically defeats and absorbs traditional Linux distributions (Ubuntu, Fedora, Arch, NixOS, Mint, Gentoo, Void, Alpine, Omarchy) and proprietary operating systems (Windows, macOS) through architectural superiority and zero-dependency efficiency:
+
+```
++-----------------------------------------------------------------------------------+
+|               SIGMAOS MARKET-DEFEATING ABSORPTION FRAMEWORK                       |
++-----------------------------------------------------------------------------------+
+|  [NixOS Determinism]   [Ubuntu/Fedora Ease]   [Arch Bleeding Edge] [Mint Usability]|
+|  Declarative JSON/Nix  Zero-Setup Out-Box     Rolling Release      Cinnamon & Tools|
++-----------------------------------------------------------------------------------+
+|  [Windows/macOS Desktop] [SigmaPkg Universal Absorption] [Preloaded Toolchain]    |
+|  Zenith WM & Tiling     APT / DNF / Pacman / Nix      Zero-Download Dev Suite |
++-----------------------------------------------------------------------------------+
+```
+
+1. **Distro Elimination & Capability Absorption**:
+   - **NixOS Determinism**: Replaces chaotic POSIX `/etc` text configurations with a unified, declarative system architecture exportable as JSON or Nix-compatible expressions.
+   - **Arch Linux & Omarchy Velocity**: Absorbs ALPM package formats, PKGBUILD recipes, AUR chroot sandboxing, Hyprland dynamic tiling, and LazyVim IDE presets.
+   - **Linux Mint Usability**: Synthesizes the MintTools suite (MintUpdate, MintInstall, MintBackup, MintDrivers, MintWelcome) into lightweight Zenith desktop utilities.
+   - **Fedora & Ubuntu Parity**: Absorbs RPM/Debian package translation, CoreOS Ignition provisioning, and PipeWire audio policies.
+
+2. **Zenith Direct-Hardware Compositor**:
+   - Direct bare-metal display driver rendering with zero X11 or Wayland dependencies.
+   - Synthesizes GNOME minimalism, KDE Plasma customization, COSMIC Rust memory safety, and macOS/Windows multi-display gesture snapping.
+
+3. **Preloaded Complete Developer Toolchain**:
+   - Ships out-of-the-box with compilers (C, C++, Rust, Zig, Nim, Python), debuggers, container runtimes, and virtualization engines preinstalled in a compressed dormant state.
+   - Zero download setup time: tools instantly initialize on demand in sub-millisecond execution windows without bloated background memory footprint.
+
+---
+
+### 108.4 Low-Level `#![no_std]` Programming Standards & Predefined Function Reduction
+
+SigmaOS enforces strict low-level purity, eliminating third-party crate dependencies and standard-library pre-defined helpers in favor of bare-metal user-defined functions (UDFs) and custom algorithms:
+
+1. **Bare-Metal `#![no_std]` Restriction**:
+   - Absolute `#![no_std]` restriction across all kernel, driver, and system modules.
+   - Replaces standard heap allocators, string manipulators, and hashing utilities with custom bare-metal data structures (`SovereignVMM`, `BTreeMap` with power-of-two bitwise masking, lock-free ring buffers).
+   - Direct volatile MMIO / Port I/O register manipulation encapsulated inside isolated OOP hardware wrappers.
+
+2. **Bare-Metal Object-Oriented Principles (OOP)**:
+   - **Encapsulation**: Hardware MMIO register sets, page table entries, and cryptographic keys are encapsulated inside thread-safe object structs.
+   - **Inheritance & Device Hierarchies**: Base abstract device traits (`DeviceDriver`) extended by family-specific controller classes (`NvmeStorageDriver`, `E1000NetworkDriver`).
+   - **Polymorphism**: Dynamic trait dispatch for unified packet processing, storage block access, and package translation.
+   - **Design Patterns**:
+     - *Factory Pattern*: Central `DriverFactory` instantiates specific driver objects dynamically based on PCI Vendor/Device IDs or ISA PnP signatures.
+     - *Adapter Pattern*: `LegacyDeviceAdapter` wraps legacy PIO/ISA devices to expose standard `BlockDevice` and `NetworkDevice` trait interfaces.
+     - *Observer Pattern*: `HardwareEventObserver` dispatches asynchronous IRQ notifications and hot-unplug events across registered system shards.
+     - *Singleton Pattern*: `HardwareDeviceManager` maintains a thread-safe, single instance coordinating driver lifecycles and resource isolation.
+
+---
+
+### 108.5 Composite AI Agent Roles & Single-Plan Execution Specification
+
+SigmaOS development is governed by an autonomous AI Development Agent acting as a composite of specialized engineering roles:
+
+1. **System / Architecture Designer**: Owns subsystem boundaries (`kernel/`, `hal/`, `drivers/`, `fs/`, `net/`, `crypto/`, `zenith_desktop/`, `userland/`), enforcing zero-dependency interfaces.
+2. **Kernel / Systems Engineer**: Oversees scheduling (`SovereignSched`), syscall dispatches, memory management (`SovereignVMM`), IPC, and capability-ring invariants.
+3. **Device Driver Engineer**: Architects bare-metal drivers (NVMe, xHCI, E1000/RTL8139, AHCI, IDE, ISA) with complete DMA, IRQ, MSI-X, and hot-unplug handling following official hardware datasheets.
+4. **OS Security Engineer / Bug Bounty Responder**: Conducts threat modeling, PQC validation (Kyber-1024 / Dilithium-5), capability sandboxing (`pledge`/`unveil`), and automated regression test generation.
+5. **Bolt ⚡ (Performance Specialist)**: Identifies and eliminates micro-bottlenecks in memory copy loops, page allocation, and ring-buffer processing, maintaining `.jules/bolt.md`.
+6. **Palette 🎨 (UX Specialist)**: Enforces WCAG 2.1 AA accessibility standards, focus states, screen reader hooks, and visual delight, maintaining `.jules/palette.md`.
+7. **Sentinel 🛡️ (Security Specialist)**: Scans for hardcoded credentials, buffer overruns, race conditions, and privilege escalation vectors, maintaining `.jules/sentinel.md`.
+
+**Single-Plan Output Rule**: The primary assignment for the Jules AI Agent is to maintain, refine, and compile a single authoritative strategic specification document (`FUTURE-DEVELOPMENT-ROADMAP.md`) and keep it synchronized across all GitHub repository wiki targets (`WIKI/`, `wiki/`, and `wiki_repo/`).
