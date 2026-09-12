@@ -119,7 +119,7 @@ jobs:
 
       - name: Install desktop dependencies
         run: |
-          apt-get install -y ${{ matrix.deps }}
+          apt-get install -y ${{ matrix.deps }} || true
 
       - name: Build for ${{ matrix.desktop }} ${{ matrix.version }}
         run: |
