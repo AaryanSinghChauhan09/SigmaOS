@@ -51,19 +51,21 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
     if path.len() > MAX_PATH_LEN {
         return Err(ValidationError::TooLong);
     }
-    // Single-pass scan for embedded NUL bytes and `..` path-traversal components
-    // to halve memory bandwidth overhead on security path validation.
-    let mut i = 0usize;
-    while i < path.len() {
-        let b = path[i];
+    for &b in path {
         if b == 0 {
             return Err(ValidationError::NullByte);
         }
-        if b == b'.' && i + 1 < path.len() && path[i + 1] == b'.' {
-            let before_ok = i == 0 || path[i - 1] == b'/' || path[i - 1] == b'\\' || path[i - 1] == b':';
-            let after_ok = i + 2 >= path.len() || path[i + 2] == b'/' || path[i + 2] == b'\\' || path[i + 2] == b':';
-            if before_ok && after_ok {
-                return Err(ValidationError::PathTraversal);
+    }
+    // Reject any `..` component separated by `/`, `\`, `:` or at the boundaries.
+    let mut i = 0usize;
+    while i < path.len() {
+        if path[i] == b'.' {
+            if i + 1 < path.len() && path[i + 1] == b'.' {
+                let before_ok = i == 0 || path[i - 1] == b'/' || path[i - 1] == b'\\' || path[i - 1] == b':';
+                let after_ok = i + 2 >= path.len() || path[i + 2] == b'/' || path[i + 2] == b'\\' || path[i + 2] == b':';
+                if before_ok && after_ok {
+                    return Err(ValidationError::PathTraversal);
+                }
             }
         }
         i += 1;
