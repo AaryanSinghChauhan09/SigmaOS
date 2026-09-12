@@ -68,6 +68,7 @@ pub use distro::{
     GentooEmergeCliEngine, GentooGccCflagsTunerEngine, GentooLaymanOverlayEngine,
     IllumosDTraceTracingGovernor, MageiaUrpmiMediaManager, OpenBsdPledgeUnveilSecurityGovernor,
     SolusEopkgPackageEngine, VoidXbpsBinaryPackageEngine,
+    SovereignWhonixPrivacySuite, SovereignIllumosSmfSuite,
     ApkChrootBuildSandboxEngine, ClusterNodeRole, CpuGovernorMode,
     DragonFlyHammer2EmergencyCowEngine, FedoraSelinuxMlsMcsGovernor, FreeBsdGeomVdevTopology,
     GarudaZenPerformanceEngine, GentooPortageSlotOperatorEngine, GeomVdevNode,
