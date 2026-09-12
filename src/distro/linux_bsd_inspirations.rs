@@ -68,6 +68,13 @@ pub enum DistroSubsystemMode {
     LinuxTails,
     LinuxGuix,
     LinuxParrot,
+    LinuxKali,
+    LinuxAntiX,
+    LinuxZorin,
+    LinuxGaruda,
+    LinuxOmarchy,
+    LinuxCachy,
+    LinuxMint,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -81,6 +88,8 @@ pub enum ServiceSupervisorType {
     Sysvinit,
     Smf,
     Rcd,
+    S6,
+    Launchd,
 }
 
 pub struct SovereignUniversalDistroBridge {
@@ -120,7 +129,14 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxCachy
+            | DistroSubsystemMode::LinuxMint
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
+
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
@@ -136,7 +152,9 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => {
+                ServiceSupervisorType::Sysvinit
+            }
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
@@ -149,11 +167,22 @@ impl SovereignUniversalDistroBridge {
             (DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix, "/var/lib/pkg") => {
                 "/nix/store".to_string()
             }
-            (DistroSubsystemMode::LinuxArch, "/var/lib/pkg") => "/var/lib/pacman".to_string(),
+            (
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxGaruda
+                | DistroSubsystemMode::LinuxOmarchy
+                | DistroSubsystemMode::LinuxCachy,
+                "/var/lib/pkg",
+            ) => "/var/lib/pacman".to_string(),
             (
                 DistroSubsystemMode::LinuxDebian
                 | DistroSubsystemMode::LinuxPopOs
-                | DistroSubsystemMode::LinuxTails,
+                | DistroSubsystemMode::LinuxTails
+                | DistroSubsystemMode::LinuxParrot
+                | DistroSubsystemMode::LinuxKali
+                | DistroSubsystemMode::LinuxZorin
+                | DistroSubsystemMode::LinuxMint
+                | DistroSubsystemMode::LinuxAntiX,
                 "/var/lib/pkg",
             ) => "/var/lib/dpkg".to_string(),
             (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
@@ -216,6 +245,12 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxCachy
+            | DistroSubsystemMode::LinuxMint
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -233,7 +268,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => {
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
@@ -248,8 +283,15 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
-            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint
+            | DistroSubsystemMode::LinuxAntiX => format!("{}.deb", input_pkg),
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxCachy => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
@@ -287,8 +329,15 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
-            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint
+            | DistroSubsystemMode::LinuxAntiX => format!("{}.deb", action),
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxOmarchy
+            | DistroSubsystemMode::LinuxCachy => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
@@ -583,6 +632,198 @@ impl SovereignUniversalDistroBridge {
                     action, mprotect_res.is_ok(), self.mode
                 ))
             }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched AI subsystem governor/LLM inference context for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "auth" => {
+                Ok(format!(
+                    "Dispatched PAM/systemd-homed authentication action for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "bluetooth" => {
+                Ok(format!(
+                    "Dispatched BlueZ HCI Bluetooth controller operation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "boot" => {
+                Ok(format!(
+                    "Dispatched bootloader/GRUB/systemd-boot chain initialization for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cloud" => {
+                Ok(format!(
+                    "Dispatched cloud-init/OpenStack metadata agent provisioning for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compliance" => {
+                Ok(format!(
+                    "Dispatched OpenSCAP compliance audit evaluation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compression" => {
+                Ok(format!(
+                    "Dispatched ZSTD/LZ4 real-time compression engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "config" => {
+                Ok(format!(
+                    "Dispatched UCI/dconf declarative system configuration sync for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "device" => {
+                Ok(format!(
+                    "Dispatched udev/devd hardware device node event for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "diagnostics" => {
+                Ok(format!(
+                    "Dispatched ABRT/kdump crash diagnostics reporting for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "event" => {
+                Ok(format!(
+                    "Dispatched epoll/kqueue event loop dispatch for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "filesystem" => {
+                Ok(format!(
+                    "Dispatched VFS/ZFS/Btrfs filesystem operation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched locale/input method IME translation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "input" => {
+                Ok(format!(
+                    "Dispatched libinput HID event pipeline routing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "installer" => {
+                Ok(format!(
+                    "Dispatched Calamares/archinstall OS deployment step for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "iot" => {
+                Ok(format!(
+                    "Dispatched CoAP/MQTT IoT edge gateway message for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "logging" => {
+                Ok(format!(
+                    "Dispatched journald/syslog-ng structured log ingestion for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                Ok(format!(
+                    "Dispatched eBPF prometheus exporter telemetry stream for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "performance" => {
+                Ok(format!(
+                    "Dispatched perf/DTrace performance counter sampling for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "print" => {
+                Ok(format!(
+                    "Dispatched CUPS print daemon spooler queue for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "privacy" => {
+                Ok(format!(
+                    "Dispatched Tor/Anonsurf privacy routing guard for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "recovery" => {
+                Ok(format!(
+                    "Dispatched rescue ISO live recovery shell fallback for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "resource" => {
+                Ok(format!(
+                    "Dispatched cgroups v2/RACCT resource controller limit for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "rt" => {
+                Ok(format!(
+                    "Dispatched PREEMPT_RT deterministic realtime priority boost for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "runtime" => {
+                Ok(format!(
+                    "Dispatched WASM/OCI runtime sandbox execution for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "shell" => {
+                Ok(format!(
+                    "Dispatched Sovereign Shell/BusyBox applet invocation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "smartcard" => {
+                Ok(format!(
+                    "Dispatched PCSC smartcard PKCS#11 token verification for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "syscall" => {
+                Ok(format!(
+                    "Dispatched multi-arch POSIX/BSD syscall translation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched DTS thermal governor fan curve adjustment for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "toolchain" => {
+                Ok(format!(
+                    "Dispatched LLVM/GCC toolchain cross-compiler pipeline for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "virtualization" => {
+                Ok(format!(
+                    "Dispatched KVM/bhyve microVM hypervisor gateway for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "crypto" => {
+                Ok(format!(
+                    "Dispatched PQC Dilithium/WireGuard cryptographic subsystem for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             _ => Ok(format!(
                 "Dispatched subsystem '{}' action '{}' under distro mode '{:?}'",
                 target_subsystem, action, self.mode
@@ -594,8 +835,12 @@ impl SovereignUniversalDistroBridge {
         let subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
             "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
+            "boot", "container", "containers", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "bluetooth", "cloud", "compliance", "compression", "config", "diagnostics",
+            "event", "filesystem", "i18n", "installer", "iot", "logging", "performance",
+            "print", "privacy", "recovery", "resource", "rt", "runtime", "shell",
+            "smartcard", "toolchain", "ui", "process", "time", "virt",
         ];
 
         for sub in subsystems {
@@ -1915,6 +2160,14 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxGaruda,
+            DistroSubsystemMode::LinuxOmarchy,
+            DistroSubsystemMode::LinuxCachy,
+            DistroSubsystemMode::LinuxMint,
         ];
 
         for m in modes {
@@ -1947,13 +2200,25 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxGaruda,
+            DistroSubsystemMode::LinuxOmarchy,
+            DistroSubsystemMode::LinuxCachy,
+            DistroSubsystemMode::LinuxMint,
         ];
 
         let target_subsystems = [
             "init", "package", "vfs", "security", "storage", "kernel",
             "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
+            "boot", "container", "containers", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "bluetooth", "cloud", "compliance", "compression", "config", "diagnostics",
+            "event", "filesystem", "i18n", "installer", "iot", "logging", "performance",
+            "print", "privacy", "recovery", "resource", "rt", "runtime", "shell",
+            "smartcard", "toolchain", "ui", "process", "time", "virt",
         ];
 
         for m in modes {
