@@ -52,8 +52,8 @@ pub fn encode(input: &[u8]) -> String {
         }
     }
 
-    // Safety: All pushed bytes are ASCII values from BASE64_CHARS or b'='
-    String::from_utf8(result).unwrap_or_default()
+    // Safety: BASE64_CHARS and b'=' are all valid ASCII
+    unsafe { String::from_utf8_unchecked(result) }
 }
 
 /// Decode a base64 string into raw bytes

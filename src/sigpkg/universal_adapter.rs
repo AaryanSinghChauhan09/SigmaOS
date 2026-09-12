@@ -70,7 +70,11 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-pub use crate::sigpkg::universal_engine::PackageFormat;
+#[cfg(test)]
+pub use crate::sigpkg::Version;
+
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -2222,7 +2226,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_info" => {
+            "pkg_add" | "pkg_info" => {
                 if pm == "pkg_add" {
                     operation = UniversalPmOperation::Install;
                 } else {
