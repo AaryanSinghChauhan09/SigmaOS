@@ -86,6 +86,16 @@ pub use distro::{
     OmarchyWaybarAppletStudioEngine,
 };
 
+pub use package::universal_package_innovations_suite::{
+    AlpineLbuOverlayStateGovernor, AppStreamCatalogEntry, ArchPacstrapSeederEngine,
+    BinaryMitigationProfile, BrokenSharedLibraryRequirement, DebianAppStreamCatalogEngine,
+    DebianAptFastMirrorRanker, DnfGpgKeyRecord, FedoraDnfGpgKeyRotationEngine,
+    FedoraDnfGroupInstallSolver, FreeBsdPkgBaseRootfsEngine, GentooEcleanRevdepRebuildEngine,
+    HardenedBsdBinaryMitigationAuditorEngine, LbuSavedFileRecord, NixStorePathVerifyEngine,
+    OpenBsdPkgUpgradeRelinkerEngine, PacstrapPackageGroup, SharedLibMajorMinor,
+    StaleDistfileRecord, StorePathIntegrityRecord,
+};
+
 pub use package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ApkIndexMetadata, ApkSignatureKey, ApkV3SignatureEngine,
     AptBugReport, AptMarkRecord, AptMarkState, AptPinRule, ArchCachyosMicroarchOptimizationEngine,
