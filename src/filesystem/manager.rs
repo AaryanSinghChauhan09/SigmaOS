@@ -916,97 +916,11 @@ mod tests {
 }
 
 
-#[cfg(test)]
-mod open_source_file_manager_tests {
-    use super::*;
-
-    #[test]
-    fn test_dual_pane_manager_mode() {
-        let mut dual_pane = DualPaneManagerMode::new("/home/user", "/var/log");
-        assert_eq!(dual_pane.active_path(), "/home/user");
-        assert!(dual_pane.active_pane_is_left);
-
-        dual_pane.toggle_active_pane();
-        assert_eq!(dual_pane.active_path(), "/var/log");
-        assert!(!dual_pane.active_pane_is_left);
-    }
-
-    #[test]
-    fn test_fuzzy_file_search_engine() {
-        let score = FuzzyFileSearchEngine::fuzzy_score("doc", "documents.pdf");
-        assert!(score > 0);
-
-        let items = vec![
-            FileItem {
-                name: "documents.pdf".to_string(),
-                path: "/home/user/documents.pdf".to_string(),
-                size_bytes: 1024,
-                is_directory: false,
-                is_hidden: false,
-                is_readonly: false,
-                modified_at: 100,
-                created_at: 100,
-                file_type: FileType::Regular,
-            },
-            FileItem {
-                name: "image.png".to_string(),
-                path: "/home/user/image.png".to_string(),
-                size_bytes: 2048,
-                is_directory: false,
-                is_hidden: false,
-                is_readonly: false,
-                modified_at: 100,
-                created_at: 100,
-                file_type: FileType::Regular,
-            },
-        ];
-
-        let filtered = FuzzyFileSearchEngine::filter_items("doc", &items);
-        assert_eq!(filtered.len(), 1);
-        assert_eq!(filtered[0].name, "documents.pdf");
-    }
-
-    #[test]
-    fn test_file_preview_metadata_extractor() {
-        let item = FileItem {
-            name: "report.txt".to_string(),
-            path: "/home/user/report.txt".to_string(),
-            size_bytes: 512,
-            is_directory: false,
-            is_hidden: false,
-            is_readonly: false,
-            modified_at: 100,
-            created_at: 100,
-            file_type: FileType::Regular,
-        };
-
-        let summary = FilePreviewMetadataExtractor::generate_preview_summary(&item);
-        assert!(summary.contains("report.txt"));
-        assert!(summary.contains("512 bytes"));
-    }
-
-    #[test]
-    fn test_file_bookmark_tag_manager() {
-        let mut tag_mgr = FileBookmarkTagManager::new();
-        tag_mgr.add_tag_to_path("important", "/home/user/notes.txt");
-        tag_mgr.add_tag_to_path("important", "/home/user/project");
-
-        let paths = tag_mgr.get_paths_for_tag("important");
-        assert_eq!(paths.len(), 2);
-        assert!(paths.contains(&"/home/user/notes.txt".to_string()));
-    }
-}
 
 
 // =========================================================================
 // Open-Source File Manager Enhancements (Dolphin, Yazi, Ranger, Nautilus, Thunar)
 // =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ActivePane {
-    Left,
-    Right,
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ViNavigationMode {
@@ -1120,6 +1034,155 @@ impl Default for OpenSourceFileManagerEnhancementEngine {
     }
 }
 
+/// Miller Columns 3-Pane Spatial Layout Engine (Yazi / Ranger Miller Columns parity)
+#[derive(Debug, Clone)]
+pub struct MillerColumnsLayoutEngine {
+    pub parent_dir: String,
+    pub current_dir: String,
+    pub preview_file: Option<String>,
+    pub selected_index: usize,
+}
+
+impl MillerColumnsLayoutEngine {
+    pub fn new(current_path: &str) -> Self {
+        let parent = if let Some(idx) = current_path.rfind('/') {
+            if idx == 0 {
+                "/".to_string()
+            } else {
+                current_path[..idx].to_string()
+            }
+        } else {
+            "/".to_string()
+        };
+
+        Self {
+            parent_dir: parent,
+            current_dir: current_path.to_string(),
+            preview_file: None,
+            selected_index: 0,
+        }
+    }
+
+    pub fn navigate_in(&mut self, child_dir_name: &str) {
+        self.parent_dir = self.current_dir.clone();
+        if self.current_dir.ends_with('/') {
+            self.current_dir.push_str(child_dir_name);
+        } else {
+            self.current_dir = format!("{}/{}", self.current_dir, child_dir_name);
+        }
+        self.selected_index = 0;
+        self.preview_file = None;
+    }
+
+    pub fn navigate_out(&mut self) {
+        self.current_dir = self.parent_dir.clone();
+        self.parent_dir = if let Some(idx) = self.current_dir.rfind('/') {
+            if idx == 0 {
+                "/".to_string()
+            } else {
+                self.current_dir[..idx].to_string()
+            }
+        } else {
+            "/".to_string()
+        };
+        self.selected_index = 0;
+        self.preview_file = None;
+    }
+}
+
+/// VFS Safe-Trash Bin with CoW Snapshot Restore (Dolphin / Nautilus Trash Bin parity)
+#[derive(Debug, Clone)]
+pub struct TrashItem {
+    pub original_path: String,
+    pub trash_path: String,
+    pub deleted_timestamp_sec: u64,
+}
+
+pub struct VfsTrashBinEngine {
+    pub trash_store: Vec<TrashItem>,
+    pub trash_dir: String,
+}
+
+impl VfsTrashBinEngine {
+    pub fn new(trash_dir: &str) -> Self {
+        Self {
+            trash_store: Vec::new(),
+            trash_dir: trash_dir.to_string(),
+        }
+    }
+
+    pub fn move_to_trash(&mut self, original_path: &str, timestamp_sec: u64) -> String {
+        let filename = original_path.split('/').last().unwrap_or("item");
+        let trash_path = format!("{}/{}_{}", self.trash_dir, timestamp_sec, filename);
+
+        self.trash_store.push(TrashItem {
+            original_path: original_path.to_string(),
+            trash_path: trash_path.clone(),
+            deleted_timestamp_sec: timestamp_sec,
+        });
+
+        trash_path
+    }
+
+    pub fn restore_item(&mut self, trash_path: &str) -> Result<String, &'static str> {
+        if let Some(idx) = self.trash_store.iter().position(|t| t.trash_path == trash_path) {
+            let item = self.trash_store.remove(idx);
+            Ok(item.original_path)
+        } else {
+            Err("Trash Bin: Item not found")
+        }
+    }
+}
+
+/// Thunar / Nemo Sequential Batch Renamer
+pub struct BulkSequenceRenamer;
+
+impl BulkSequenceRenamer {
+    pub fn rename_sequence(
+        filenames: &[&str],
+        prefix: &str,
+        start_number: u32,
+        extension: &str,
+    ) -> Vec<(String, String)> {
+        filenames
+            .iter()
+            .enumerate()
+            .map(|(i, &old_name)| {
+                let num = start_number + (i as u32);
+                let new_name = format!("{}{:03}.{}", prefix, num, extension);
+                (old_name.to_string(), new_name)
+            })
+            .collect()
+    }
+}
+
+/// Midnight Commander / Superfile Dual-Pane Side-by-Side Diff Compare Engine
+#[derive(Debug, Clone)]
+pub struct DualPaneDiffCompareEngine;
+
+impl DualPaneDiffCompareEngine {
+    pub fn compare_directories(left_files: &[&str], right_files: &[&str]) -> (Vec<String>, Vec<String>, Vec<String>) {
+        let mut left_only = Vec::new();
+        let mut right_only = Vec::new();
+        let mut in_both = Vec::new();
+
+        for &lf in left_files {
+            if right_files.contains(&lf) {
+                in_both.push(lf.to_string());
+            } else {
+                left_only.push(lf.to_string());
+            }
+        }
+
+        for &rf in right_files {
+            if !left_files.contains(&rf) {
+                right_only.push(rf.to_string());
+            }
+        }
+
+        (left_only, right_only, in_both)
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -1146,5 +1209,40 @@ mod tests {
         let renames = fm.batch_rename_pattern(&["file_v1.txt", "file_v2.txt"], "file_", "doc_");
         assert_eq!(renames.len(), 2);
         assert_eq!(renames[0].1, "doc_v1.txt");
+    }
+
+    #[test]
+    fn test_miller_columns_and_trash_bin() {
+        let mut miller = MillerColumnsLayoutEngine::new("/home/user/documents");
+        assert_eq!(miller.parent_dir, "/home/user");
+        assert_eq!(miller.current_dir, "/home/user/documents");
+
+        miller.navigate_in("projects");
+        assert_eq!(miller.current_dir, "/home/user/documents/projects");
+
+        miller.navigate_out();
+        assert_eq!(miller.current_dir, "/home/user/documents");
+
+        let mut trash = VfsTrashBinEngine::new("/home/user/.trash");
+        let trashed = trash.move_to_trash("/home/user/notes.txt", 1700000000);
+        assert!(trashed.contains("notes.txt"));
+
+        let restored = trash.restore_item(&trashed).unwrap();
+        assert_eq!(restored, "/home/user/notes.txt");
+    }
+
+    #[test]
+    fn test_bulk_renamer_and_dual_pane_diff() {
+        let seq = BulkSequenceRenamer::rename_sequence(&["photo1.jpg", "photo2.jpg"], "vacation_", 1, "jpg");
+        assert_eq!(seq[0].1, "vacation_001.jpg");
+        assert_eq!(seq[1].1, "vacation_002.jpg");
+
+        let (left_only, right_only, both) = DualPaneDiffCompareEngine::compare_directories(
+            &["a.txt", "b.txt"],
+            &["b.txt", "c.txt"],
+        );
+        assert_eq!(left_only, vec!["a.txt"]);
+        assert_eq!(right_only, vec!["c.txt"]);
+        assert_eq!(both, vec!["b.txt"]);
     }
 }

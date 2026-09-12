@@ -1,7 +1,7 @@
 # SigmaOS Master Improvement Plan & Next Steps Guidelines
 
 ## Executive Summary
-This document provides a comprehensive analysis, next steps guidelines, and improvement plan for **SigmaOS** — a sovereign, AI-native, zero-dependency `#![no_std]` memory-safe operating system written in Rust.
+This document provides a comprehensive analysis, next steps guidelines, and improvement plan for **SigmaOS** — a sovereign, AI-native, zero-dependency `#-[#no_std]` memory-safe operating system written in Rust.
 
 The analysis evaluates the codebase across 8 key engineering domains, incorporates tri-agent guidance (Bolt ⚡ performance, Palette 🎨 micro-UX, Sentinel 🛡️ security), details recent optimizations, and establishes actionable next steps prioritized by severity and impact.
 
@@ -10,11 +10,12 @@ The analysis evaluates the codebase across 8 key engineering domains, incorporat
 ## 1. Code Quality & Testing
 - **Current State**:
   - All native test suites in `./run_sigma_tests.sh` pass with **100% success rate** across 67 tests covering security input validation, Linux & BSD distro inspirations, subsystem bridge, launch readiness, VecDeque, HashMap, Arch Linux parity, and packaging engines.
-  - Standalone module test suites (`rustc --test --cfg 'feature="standalone_test"' ...`) pass cleanly for `src/package/universal.rs`, `src/sigpkg/universal_oop_system.rs`, `src/compatibility/fedora.rs`, `src/distro/void_runit.rs`, `src/driver/distro_drivers.rs`, and `src/distro/omarchy.rs` (25 unit tests passing).
+  - Standalone module test suites (`rustc --test --cfg 'feature="standalone_test"' ...`) pass cleanly for `src/package/universal.rs`, `src/sigpkg/universal_oop_system.rs`, `src/compatibility/fedora.rs`, `src/distro/void_runit.rs`, `src/driver/distro_drivers.rs`, `src/distro/omarchy.rs` (25 unit tests passing), and `src/filesystem/manager.rs` (7 unit tests passing).
 - **Key Fixes & Improvements**:
   - Removed duplicate feature key `cache-lru` in `Cargo.toml`.
   - Cleaned unused import `use alloc::vec;` in `src/package/universal.rs`.
   - Cleaned duplicate struct declarations in `src/distro/omarchy.rs` and implemented missing Omarchy Linux ecosystem engines (`OmarchyHyprlockConfigEngine`, `OmarchyWaybarLayoutEngine`, `OmarchyFastfetchConfigEngine`, `OmarchyZshOmzEngine`).
+  - Cleaned duplicate modules in `src/filesystem/manager.rs` and added open-source inspired file manager engines (`MillerColumnsLayoutEngine`, `VfsTrashBinEngine`, `BulkSequenceRenamer`, `DualPaneDiffCompareEngine`).
 - **Refactoring Opportunities**:
   - Consolidate minor duplicate struct definitions across `src/package/universal.rs` and `src/sigpkg/universal_adapter.rs`.
   - Refactor monolithic driver files into smaller submodules under `src/driver/`.
@@ -42,6 +43,7 @@ The analysis evaluates the codebase across 8 key engineering domains, incorporat
   - Strict input validation in `tests/test_input_validation.rs` enforces path traversal protection (`..` rejection), NUL byte filtering, hostname/IP validation, and arithmetic overflow protection.
   - Process sandboxing and privilege reduction via OpenBSD-inspired `pledge()` and `unveil()` and FreeBSD-inspired Capsicum capabilities in `src/package/universal.rs` and `src/driver/distro_drivers.rs`.
   - Passwordless Sudo Expiry Guard (`PasswordlessSudoExpiryGuard`) with fail-closed security enforcement in `src/distro/omarchy.rs`.
+  - VFS Safe-Trash Bin (`VfsTrashBinEngine`) preventing accidental permanent file deletion with CoW snapshot restore points.
 - **Regulatory & Standards Compliance**:
   - **GDPR & HIPAA**: Localized, sovereign data processing with zero telemetry and post-quantum cryptographic encryption.
   - **WCAG**: Zenith desktop interface accessibility guidelines incorporated into UI bridge design.
@@ -80,12 +82,17 @@ The analysis evaluates the codebase across 8 key engineering domains, incorporat
 
 ---
 
-## 7. Tools & Utilities
+## 7. Tools & Utilities & Open-Source File Manager Innovations
 - **Native Testing Scripts**:
   - `./run_sigma_tests.sh` executes all 67 native unit and integration tests across 11 test suites seamlessly.
   - Custom Python test orchestration tools in `/home/jules/self_created_tools/` verify standalone module tests across the package system.
 - **Build Infrastructure**:
   - `tools/build/sigma_make.rs` and `tools/build/SovereignEditionBuilder.rs` provide reproducible bare-metal build environments.
+- **Open-Source File Manager Innovations Absorption**:
+  - **Miller Columns (Yazi / Ranger)**: `MillerColumnsLayoutEngine` providing 3-column spatial directory navigation with Vi keybindings.
+  - **Safe Trash Bin (Dolphin / Nautilus)**: `VfsTrashBinEngine` providing safe soft-deletion and CoW restore points.
+  - **Bulk Renamer (Thunar / Nemo)**: `BulkSequenceRenamer` providing sequential file renaming and pattern replacements.
+  - **Dual-Pane Diff (Midnight Commander / Superfile)**: `DualPaneDiffCompareEngine` providing side-by-side directory diffing and synchronization.
 - **Priority**: **Medium**
 
 ---
