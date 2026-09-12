@@ -77,14 +77,6 @@ impl LinuxPressFeedEngine {
             .collect()
     }
 
-    pub fn get_articles_by_category(&self, category: &str) -> Vec<TechMediaArticleFeed> {
-        self.articles
-            .iter()
-            .filter(|a| a.category.eq_ignore_ascii_case(category))
-            .cloned()
-            .collect()
-    }
-
     pub fn get_latest_news(&self) -> Vec<TechMediaArticleFeed> {
         let mut sorted = self.articles.clone();
         sorted.sort_by(|a, b| b.timestamp_epoch.cmp(&a.timestamp_epoch));
@@ -498,7 +490,6 @@ mod tests {
             timestamp_epoch: 1730000400,
         });
 
-        assert_eq!(engine.get_articles_by_category("Hardware").len(), 1);
         let news = engine.get_latest_news();
         assert_eq!(news[0].portal, "Phoronix");
     }

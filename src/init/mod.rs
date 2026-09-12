@@ -5,7 +5,8 @@ pub mod sigma_init;
 pub mod sigmainit;
 pub mod service_innovations_engine;
 pub mod systemd_init;
-pub mod tech_media_daemons_synthesis;
+pub mod service_innovations_engine;
+pub use service_innovations_engine::*;
 
 pub use service_innovations_engine::{
     BenchmarkScore, LinuxNewsPressTechFeedsEngine, PowerTelemetryReading,
@@ -13,10 +14,16 @@ pub use service_innovations_engine::{
     ZeroTrustServiceHardeningEngine,
 };
 
-pub use tech_media_daemons_synthesis::{
-    ConnectedCompanionDevice, ItsfossAutoCleanerHousekeepingDaemon, LinuxFoundationSecurityPolicyDaemon,
-    LivePatchModule, MarktechpostLocalAiInferenceDaemon, PhoronixThermalDynamicGovernorDaemon,
-    PowerGovernorProfile, SovereignTechMediaDaemonsSuite, WindowsCentralDeviceCompanionDaemon,
+pub use service_innovations_engine::{
+    BenchmarkScore, LinuxNewsPressTechFeedsEngine, PowerTelemetryReading,
+    SystemHealthDiagnosticService, TechMediaBenchmarkAggregator, TechNewsFeedItem,
+    ZeroTrustServiceHardeningEngine,
+};
+
+pub use service_innovations_engine::{
+    BenchmarkScore, LinuxNewsPressTechFeedsEngine, PowerTelemetryReading,
+    SystemHealthDiagnosticService, TechMediaBenchmarkAggregator, TechNewsFeedItem,
+    ZeroTrustServiceHardeningEngine,
 };
 
 pub use init_abstraction::*;

@@ -174,7 +174,7 @@ impl Default for DragonFlyHammerFs {
 }
 
 // ============================================================================
-// 7. Alpine Linux Volatile Tmpfs Rootfs RAM Overlay Engine & Dual CoW Auto-Recovery
+// 7. Alpine Linux Volatile Tmpfs Rootfs RAM Overlay Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -182,7 +182,6 @@ pub struct AlpineApkVolatileTmpfsOverlayEngine {
     pub tmpfs_size_bytes: usize,
     pub is_overlay_active: bool,
     pub committed_packages: Vec<&'static str>,
-    pub zfs_btrfs_active_snapshot: &'static str,
 }
 
 impl AlpineApkVolatileTmpfsOverlayEngine {
@@ -191,7 +190,6 @@ impl AlpineApkVolatileTmpfsOverlayEngine {
             tmpfs_size_bytes,
             is_overlay_active: true,
             committed_packages: Vec::new(),
-            zfs_btrfs_active_snapshot: "rootfs_stable_v1",
         }
     }
 
@@ -202,11 +200,6 @@ impl AlpineApkVolatileTmpfsOverlayEngine {
         } else {
             false
         }
-    }
-
-    pub fn trigger_auto_recovery_rollback(&mut self, target_snapshot: &'static str) -> bool {
-        self.zfs_btrfs_active_snapshot = target_snapshot;
-        true
     }
 
     pub fn get_committed_package_count(&self) -> usize {
@@ -985,9 +978,6 @@ mod tests {
         assert!(overlay.is_overlay_active);
         assert!(overlay.commit_package_overlay("htop"));
         assert_eq!(overlay.get_committed_package_count(), 1);
-
-        assert!(overlay.trigger_auto_recovery_rollback("rootfs_backup_snap"));
-        assert_eq!(overlay.zfs_btrfs_active_snapshot, "rootfs_backup_snap");
     }
 
     #[test]
