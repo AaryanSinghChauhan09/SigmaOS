@@ -24,11 +24,8 @@ use std::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-
-#[cfg(all(test, not(feature = "standalone_test")))]
-pub use crate::sigpkg::Version;
 
 use std::sync::Arc;
 

@@ -25,6 +25,15 @@ use std::string::String;
 #[cfg(test)]
 use std::vec::Vec;
 
+/// Runit Stage
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum RunitStage {
+    #[default]
+    Stage1,
+    Stage2,
+    Stage3,
+}
+
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitServiceStatus {
@@ -44,6 +53,7 @@ pub struct RunitService {
     pub auto_restart: bool,
     pub health_check_failures: u32,
     pub max_allowed_failures: u32,
+    pub dependencies: Vec<String>,
 }
 
 impl RunitService {
@@ -55,6 +65,7 @@ impl RunitService {
             auto_restart,
             health_check_failures: 0,
             max_allowed_failures,
+            dependencies: Vec::new(),
         }
     }
 
@@ -95,12 +106,16 @@ impl RunitService {
 /// Runit Service Supervisor Engine
 #[derive(Debug, Default, Clone)]
 pub struct RunitSupervisor {
+    pub stage: RunitStage,
+    pub current_stage_num: u8,
     pub services: BTreeMap<String, RunitService>,
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
+            stage: RunitStage::Stage1,
+            current_stage_num: 1,
             services: BTreeMap::new(),
         }
     }
@@ -172,6 +187,24 @@ impl RunitSupervisor {
                 }
             }
             true
+        } else {
+            false
+        }
+    }
+
+    /// Check if service can stop (dependents already stopped)
+    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+        for (other_name, service) in &self.services {
+            if service.dependencies.contains(&String::from(name)) && !stopped.contains(other_name) {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.start()
         } else {
             false
         }
