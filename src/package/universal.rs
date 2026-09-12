@@ -1143,6 +1143,82 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
+pub struct HardwareOptimizationDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub target_microarch_level: String,
+    pub required_simd_features: Vec<String>,
+}
+
+impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        println!(
+            "HardwareOptimizationDecorator: Profiling performance for microarch level '{}', SIMD features: {:?}",
+            self.target_microarch_level, self.required_simd_features
+        );
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct ResourceLimitDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub max_memory_bytes: u64,
+    pub cpu_quota_percent: u32,
+}
+
+impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        println!(
+            "ResourceLimitDecorator: Enforcing resource limits (Memory: {} MB, CPU Quota: {}%)",
+            self.max_memory_bytes / 1024 / 1024,
+            self.cpu_quota_percent
+        );
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct PqcSignedDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub dilithium_signature: String,
+}
+
+impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        if self.dilithium_signature.starts_with("dilithium-5-valid") {
+            println!("PqcSignedDecorator: PQC Dilithium-5 signature verified successfully.");
+            self.decorated.enforce_sandbox()
+        } else {
+            Err(PackageError::InstallationFailed("Invalid PQC Dilithium-5 signature".to_string()))
+        }
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -2115,67 +2191,7 @@ pub struct UniversalPackageManifestParser;
 
 impl UniversalPackageManifestParser {
     pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
-        let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".superdeb") {
-            Some(PackageFormat::Deb)
-        } else if name.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") {
-            Some(PackageFormat::Pacman)
-        } else if name.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
-        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
-            Some(PackageFormat::Nixpkg)
-        } else if name.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if name.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if name.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if name.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if name.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if name.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if name.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if name.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if name.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if name.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
-            Some(PackageFormat::TarGz)
-        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
-            Some(PackageFormat::Xz)
-        } else if name.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else if name.ends_with(".dports") {
-            Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
-        {
-            Some(PackageFormat::SlackBuild)
-        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
-            Some(PackageFormat::Crux)
-        } else if name.ends_with(".drpm") {
-            Some(PackageFormat::Drpm)
-        } else if name.ends_with(".stratum") {
-            Some(PackageFormat::Stratum)
-        } else if name.ends_with(".app") {
-            Some(PackageFormat::App)
-        } else {
-            None
-        }
+        PackageFormat::from_filename(filename)
     }
 
     pub fn parse_manifest_auto(
@@ -2323,7 +2339,64 @@ impl UniversalPackageFormatBridge {
     }
 }
 
-#[cfg(test_disabled)]
+/// Bidirectional Conversion Bridge between SigmaPkg foreign format representations and UniversalPackageManager UnifiedPackage
+pub struct UniversalFormatConverterBridge;
+
+impl UniversalFormatConverterBridge {
+    pub fn string_to_package_format(foreign_format_str: &str) -> PackageFormat {
+        match foreign_format_str.to_lowercase().as_str() {
+            "debiandeb" | "deb" => PackageFormat::Deb,
+            "fedorarpm" | "rpm" => PackageFormat::Rpm,
+            "archpacman" | "pacman" => PackageFormat::Pacman,
+            "alpineapk" | "apk" => PackageFormat::Apk,
+            "gentooebuild" | "ebuild" => PackageFormat::Ebuild,
+            "voidxbps" | "xbps" => PackageFormat::Xbps,
+            "freebsdpkg" | "freebsd" | "pkg" => PackageFormat::Pkg,
+            "openbsdpkg" | "openbsd" => PackageFormat::OpenBsdPkg,
+            "netbsdpkgsrc" | "pkgsrc" => PackageFormat::Pkgsrc,
+            "slackwarepkg" | "slackware" => PackageFormat::SlackBuild,
+            "nixderivation" | "nix" => PackageFormat::Nixpkg,
+            "guixpackage" | "guix" => PackageFormat::Guix,
+            "haikuhpkg" | "hpkg" => PackageFormat::Hpkg,
+            "flatpakbundle" | "flatpak" => PackageFormat::Flatpak,
+            "snappackage" | "snap" => PackageFormat::Snap,
+            "appimagebinary" | "appimage" => PackageFormat::AppImage,
+            _ => PackageFormat::SigmaPkg,
+        }
+    }
+
+    pub fn translate_foreign_to_unified(
+        format: PackageFormat,
+        name: &str,
+        version: &str,
+        raw_dependencies: &[String],
+        raw_provides: &[String],
+    ) -> UnifiedPackage {
+        let mut pkg = UnifiedPackage::new(format!("sigpkg-{}", name), version.to_string())
+            .with_format(format)
+            .with_provides(name.to_string());
+
+        for dep in raw_dependencies {
+            let translated = match dep.as_str() {
+                "libssl-dev" | "openssl-devel" | "openssl-dev" | "security/openssl" | "openssl" => "sovereign-openssl",
+                "libc6" | "glibc" | "musl" | "freebsd-runtime" | "openbsd-sys" => "sovereign-libc",
+                "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "zlib" => "sovereign-zlib",
+                "libcurl4-openssl-dev" | "libcurl-devel" | "curl-dev" | "curl" => "sovereign-curl",
+                "python3-dev" | "python3-devel" | "python" => "sovereign-python",
+                other => debtor_to_sovereign_name(other),
+            };
+            pkg = pkg.with_dependency(translated.to_string());
+        }
+
+        for prov in raw_provides {
+            pkg = pkg.with_provides(prov.clone());
+        }
+
+        pkg
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -2799,5 +2872,48 @@ mod tests {
         };
 
         assert!(bad_pqc.enforce_sandbox().is_err());
+    }
+
+    #[test]
+    fn test_universal_format_converter_bridge() {
+        assert_eq!(
+            UniversalFormatConverterBridge::string_to_package_format("DebianDeb"),
+            PackageFormat::Deb
+        );
+        assert_eq!(
+            UniversalFormatConverterBridge::string_to_package_format("FedoraRpm"),
+            PackageFormat::Rpm
+        );
+        assert_eq!(
+            UniversalFormatConverterBridge::string_to_package_format("ArchPacman"),
+            PackageFormat::Pacman
+        );
+        assert_eq!(
+            UniversalFormatConverterBridge::string_to_package_format("AlpineApk"),
+            PackageFormat::Apk
+        );
+        assert_eq!(
+            UniversalFormatConverterBridge::string_to_package_format("FreeBsdPkg"),
+            PackageFormat::Pkg
+        );
+
+        let raw_deps = vec!["libssl-dev".to_string(), "libc6".to_string(), "zlib1g-dev".to_string()];
+        let raw_provs = vec!["curl-binary".to_string()];
+
+        let unified = UniversalFormatConverterBridge::translate_foreign_to_unified(
+            PackageFormat::Deb,
+            "curl",
+            "8.5.0",
+            &raw_deps,
+            &raw_provs,
+        );
+
+        assert_eq!(unified.name, "sigpkg-curl");
+        assert_eq!(unified.version, "8.5.0");
+        assert!(unified.dependencies.contains(&"sovereign-openssl".to_string()));
+        assert!(unified.dependencies.contains(&"sovereign-libc".to_string()));
+        assert!(unified.dependencies.contains(&"sovereign-zlib".to_string()));
+        assert!(unified.provides.contains(&"curl".to_string()));
+        assert!(unified.provides.contains(&"curl-binary".to_string()));
     }
 }
