@@ -17,6 +17,16 @@ pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod tmux;
 pub mod itsfoss_apps_synthesis;
+pub mod sigma_office;
+pub mod enterprise_productivity_suite;
+
+pub use enterprise_productivity_suite::{
+    AggregationType, AttendanceRecord, ContactInteraction, CrmPipelineStage, DashboardKpiWidget,
+    EnterpriseLead, InlineCommentThread, MetricField, OdooKanbanTask, PresentationSlide,
+    SigmaDocsEnterpriseCollaborationEngine, SigmaLookerAnalyticsEngine, SigmaSlidesPresenterEngine,
+    SlideAnimationKeyframe, SlideTransitionEffect, SovereignEnterpriseCrmErpEngine,
+    SovereignOdooBitrixSuite, SuggestionEdit, TaskStatus, WorkfeedPost,
+};
 
 pub use itsfoss_apps_synthesis::{
     IptvChannelNode, ItsFossBulkyBatchRenamerEngine, ItsFossHypnotixIptvEngine,
