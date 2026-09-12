@@ -87,3 +87,10 @@ if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
     rustc --test --edition=2021 src/sigpkg/arch_pacman_engine.rs -o build/test_arch_engine
     ./build/test_arch_engine
 fi
+
+if [ -f "tests/test_universal_adapter.rs" ]; then
+    echo "Running Universal Package Format Adapter integration test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 tests/test_universal_adapter.rs -o build/test_universal_adapter_file
+    ./build/test_universal_adapter_file
+fi
