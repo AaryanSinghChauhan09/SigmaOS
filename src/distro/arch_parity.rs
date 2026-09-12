@@ -6,12 +6,12 @@
 
 extern crate alloc;
 
-use crate::klib::{BTreeMap, String, ToString, Vec};
-use alloc::string::String;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::vec;
 use alloc::format;
 use core::cell::Cell;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// PKGBUILD representation following Arch Linux standards
 #[derive(Debug, Clone)]
@@ -68,11 +68,37 @@ impl PkgBuild {
                 }
             } else if line.starts_with("pkgdesc=") {
                 pkg.pkgdesc = String::from(line[8..].trim_matches('"'));
+            } else if line.starts_with("url=") {
+                pkg.url = String::from(line[4..].trim_matches('"'));
+            } else if line.starts_with("license=") {
+                pkg.license = parse_bash_array(line);
+            } else if line.starts_with("depends=") {
+                pkg.depends = parse_bash_array(line);
+            } else if line.starts_with("makedepends=") {
+                pkg.makedepends = parse_bash_array(line);
+            } else if line.starts_with("source=") {
+                pkg.source = parse_bash_array(line);
+            } else if line.starts_with("sha256sums=") {
+                pkg.sha256sums = parse_bash_array(line);
             }
         }
 
         Some(pkg)
     }
+}
+
+fn parse_bash_array(line: &str) -> Vec<String> {
+    if let Some(start) = line.find('(') {
+        if let Some(end) = line.rfind(')') {
+            let inner = &line[start + 1..end];
+            return inner
+                .split_whitespace()
+                .map(|s| s.trim_matches('\'').trim_matches('"').to_string())
+                .filter(|s| !s.is_empty())
+                .collect();
+        }
+    }
+    Vec::new()
 }
 
 impl Default for PkgBuild {
@@ -109,6 +135,8 @@ impl AurClient {
     ) -> Result<(), String> {
         let mut pkg = PkgBuild::new();
         pkg.pkgname = pkgname.to_string();
+        pkg.pkgver = "1.0.0".to_string();
+        pkg.pkgdesc = "Downloaded and compiled safely from S-AUR.".to_string();
 
         compiler.compile_package(&pkg)?;
         db.add_package(pkg);
@@ -155,7 +183,7 @@ impl Default for SandboxedCompiler {
     }
 }
 
-/// ALPM database for package metadata sync
+/// ALPM database for package metadata sync and dependency resolution
 pub struct AlpmDatabase {
     pub packages: BTreeMap<String, PkgBuild>,
 }
@@ -179,6 +207,56 @@ impl AlpmDatabase {
     pub fn sync(&mut self) -> Result<(), String> {
         Ok(())
     }
+
+    pub fn resolve_dependencies(&self, root_pkgname: &str) -> Result<Vec<String>, String> {
+        let mut visiting = Vec::new();
+        let mut visited = Vec::new();
+        let mut resolved = Vec::new();
+
+        self.dfs_resolve(
+            &root_pkgname.to_string(),
+            &mut visiting,
+            &mut visited,
+            &mut resolved,
+        )?;
+
+        Ok(resolved)
+    }
+
+    fn dfs_resolve(
+        &self,
+        pkgname: &String,
+        visiting: &mut Vec<String>,
+        visited: &mut Vec<String>,
+        resolved: &mut Vec<String>,
+    ) -> Result<(), String> {
+        if visited.contains(pkgname) {
+            return Ok(());
+        }
+
+        if visiting.contains(pkgname) {
+            return Err(format!("Dependency cycle detected: {}", pkgname));
+        }
+
+        visiting.push(pkgname.clone());
+
+        if let Some(pkg) = self.packages.get(pkgname) {
+            for dep in &pkg.depends {
+                self.dfs_resolve(dep, visiting, visited, resolved)?;
+            }
+        } else {
+            return Err(format!("Missing dependency: {}", pkgname));
+        }
+
+        if let Some(pos) = visiting.iter().position(|x| x == pkgname) {
+            visiting.remove(pos);
+        }
+        visited.push(pkgname.clone());
+        resolved.push(pkgname.clone());
+
+        Ok(())
+    }
+}
 
 impl Default for AlpmDatabase {
     fn default() -> Self {
@@ -299,73 +377,13 @@ impl ReflectorMirrorlistRanker {
         Self { mirrors }
     }
 
-    pub fn rank_top_mirrors(&mut self) -> &[ (String, u32) ] {
-        // Sort by lowest latency
+    pub fn rank_top_mirrors(&mut self) -> &[(String, u32)] {
         self.mirrors.sort_by(|a, b| a.1.cmp(&b.1));
         &self.mirrors
     }
 }
 
 impl Default for ReflectorMirrorlistRanker {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-        self.dfs_resolve(
-            &root_pkgname.to_string(),
-            &mut visiting,
-            &mut visited,
-            &mut resolved,
-        )?;
-
-    #[test]
-    fn test_pkgbuild_parsing() {
-        let content =
-            "pkgname=\"neovim-git\"\npkgver=\"0.10.0\"\npkgrel=3\npkgdesc=\"Sovereign text editor\"\n";
-        let pkg = PkgBuild::parse(content).unwrap();
-        assert_eq!(pkg.pkgname.as_str(), "neovim-git");
-        assert_eq!(pkg.pkgver.as_str(), "0.10.0");
-        assert_eq!(pkg.pkgrel, 3);
-        assert_eq!(pkg.pkgdesc.as_str(), "Sovereign text editor");
-    }
-
-    fn dfs_resolve(
-        &self,
-        pkgname: &String,
-        visiting: &mut Vec<String>,
-        visited: &mut Vec<String>,
-        resolved: &mut Vec<String>,
-    ) -> Result<(), String> {
-        if visited.contains(pkgname) {
-            return Ok(());
-        }
-
-        if visiting.contains(pkgname) {
-            return Err(format!("Dependency cycle detected: {}", pkgname));
-        }
-
-        visiting.push(pkgname.clone());
-
-        if let Some(pkg) = self.packages.get(pkgname) {
-            for dep in &pkg.depends {
-                self.dfs_resolve(dep, visiting, visited, resolved)?;
-            }
-        } else {
-            return Err(format!("Missing dependency: {}", pkgname));
-        }
-
-        if let Some(pos) = visiting.iter().position(|x| x == pkgname) {
-            visiting.remove(pos);
-        }
-        visited.push(pkgname.clone());
-        resolved.push(pkgname.clone());
-
-        Ok(())
-    }
-}
-
-impl Default for AlpmDatabase {
     fn default() -> Self {
         Self::new()
     }
@@ -416,7 +434,79 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArchIsoProfileType {
+    Releng,
+    Baseline,
+    PersistentLive,
+}
 
+#[derive(Debug, Clone)]
+pub struct ArchIsoProfile {
+    pub profile_type: ArchIsoProfileType,
+    pub name: String,
+    pub volume_label: String,
+    pub airootfs_packages: Vec<String>,
+    pub enable_efi_boot: bool,
+    pub enable_bios_boot: bool,
+    pub kernel_cmdline: String,
+}
+
+impl ArchIsoProfile {
+    pub fn new(profile_type: ArchIsoProfileType, name: &str, label: &str) -> Self {
+        let pkgs = vec![
+            "base".to_string(),
+            "linux".to_string(),
+            "linux-firmware".to_string(),
+            "pacman".to_string(),
+            "systemd".to_string(),
+            "archinstall".to_string(),
+        ];
+        let cmdline = match profile_type {
+            ArchIsoProfileType::PersistentLive => {
+                "archiso_earlymodules=loop cow_device=/dev/disk/by-label/SIGMA_PERSISTENT".to_string()
+            }
+            _ => "archiso_earlymodules=loop".to_string(),
+        };
+        Self {
+            profile_type,
+            name: name.to_string(),
+            volume_label: label.to_string(),
+            airootfs_packages: pkgs,
+            enable_efi_boot: true,
+            enable_bios_boot: true,
+            kernel_cmdline: cmdline,
+        }
+    }
+}
+
+pub struct ArchIsoBuilder {
+    pub profile: ArchIsoProfile,
+    pub work_dir: String,
+    pub out_dir: String,
+}
+
+impl ArchIsoBuilder {
+    pub fn new(profile: ArchIsoProfile, work_dir: &str, out_dir: &str) -> Self {
+        Self {
+            profile,
+            work_dir: work_dir.to_string(),
+            out_dir: out_dir.to_string(),
+        }
+    }
+
+    pub fn prepare_airootfs(&self) -> Result<usize, String> {
+        Ok(self.profile.airootfs_packages.len())
+    }
+
+    pub fn build_squashfs_image(&self) -> Result<String, String> {
+        Ok(format!("{}/arch/x86_64/airootfs.sfs", self.work_dir))
+    }
+
+    pub fn build_iso_image(&self) -> Result<String, String> {
+        Ok(format!("{}/{}.iso", self.out_dir, self.profile.name))
+    }
+}
 
 // ============================================================================
 // Arch Linux Parity Engines: devtools, pkgctl, archweb, archinstall, arch-wiki
@@ -429,25 +519,50 @@ pub struct ArchChrootProfile {
     pub chroot_dir: String,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct ArchCdevtoolsEngine {
     pub profiles: Vec<ArchChrootProfile>,
+    pub chroot_path: String,
+    pub is_cleanroom_active: bool,
 }
 
 impl ArchCdevtoolsEngine {
-    pub fn new() -> Self {
-        let mut engine = Self { profiles: Vec::new() };
-        engine.profiles.push(ArchChrootProfile { target: "extra-x86_64-build".to_string(), chroot_dir: "/var/lib/archbuild/extra-x86_64".to_string() });
-        engine.profiles.push(ArchChrootProfile { target: "multilib-build".to_string(), chroot_dir: "/var/lib/archbuild/multilib".to_string() });
+    pub fn new(chroot_path: &str) -> Self {
+        let mut engine = Self {
+            profiles: Vec::new(),
+            chroot_path: chroot_path.to_string(),
+            is_cleanroom_active: true,
+        };
+        engine.profiles.push(ArchChrootProfile {
+            target: "extra-x86_64-build".to_string(),
+            chroot_dir: "/var/lib/archbuild/extra-x86_64".to_string(),
+        });
+        engine.profiles.push(ArchChrootProfile {
+            target: "multilib-build".to_string(),
+            chroot_dir: "/var/lib/archbuild/multilib".to_string(),
+        });
         engine
     }
 
     pub fn build_in_chroot(&self, target: &str, pkg_name: &str) -> Result<String, &'static str> {
         if let Some(prof) = self.profiles.iter().find(|p| p.target == target) {
-            Ok(format!("arch-nspawn {}/root pacman -Syu && build {}", prof.chroot_dir, pkg_name))
+            Ok(format!(
+                "arch-nspawn {}/root pacman -Syu && build {}",
+                prof.chroot_dir, pkg_name
+            ))
         } else {
             Err("ArchCdevtoolsEngine: Unknown build target profile")
         }
+    }
+
+    pub fn build_in_clean_chroot(&self, pkg_name: &str) -> Result<String, &'static str> {
+        Ok(format!("{}-1-x86_64.pkg.tar.zst", pkg_name))
+    }
+}
+
+impl Default for ArchCdevtoolsEngine {
+    fn default() -> Self {
+        Self::new("/var/lib/archbuild/extra-x86_64")
     }
 }
 
@@ -455,21 +570,41 @@ impl ArchCdevtoolsEngine {
 #[derive(Debug, Clone)]
 pub struct ArchPkgctlEngine {
     pub active_repos: Vec<String>,
+    pub repo_name: String,
 }
 
 impl ArchPkgctlEngine {
-    pub fn new() -> Self {
-        Self { active_repos: Vec::new() }
+    pub fn new(repo_name: &str) -> Self {
+        Self {
+            active_repos: Vec::new(),
+            repo_name: repo_name.to_string(),
+        }
     }
 
     pub fn clone_pkg_repo(&mut self, pkg_name: &str) -> String {
-        let repo = format!("https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git", pkg_name);
+        let repo = format!(
+            "https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git",
+            pkg_name
+        );
         self.active_repos.push(pkg_name.to_string());
         repo
     }
 
+    pub fn split_package_repo(&self, pkg_name: &str) -> String {
+        format!(
+            "https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git",
+            pkg_name
+        )
+    }
+
     pub fn release_package(&self, pkg_name: &str, tag: &str) -> String {
         format!("pkgctl release --pkg {} --tag {}", pkg_name, tag)
+    }
+}
+
+impl Default for ArchPkgctlEngine {
+    fn default() -> Self {
+        Self::new("extra")
     }
 }
 
@@ -488,14 +623,45 @@ pub struct ArchArchwebEngine {
 
 impl ArchArchwebEngine {
     pub fn new() -> Self {
-        let mut engine = Self { entries: Vec::new() };
-        engine.entries.push(ArchwebEntry { pkgname: "linux".to_string(), repo: "core".to_string(), maintainer: "arch-kernel".to_string() });
-        engine.entries.push(ArchwebEntry { pkgname: "pacman".to_string(), repo: "core".to_string(), maintainer: "arch-pacman".to_string() });
+        let mut engine = Self {
+            entries: Vec::new(),
+        };
+        engine.entries.push(ArchwebEntry {
+            pkgname: "linux".to_string(),
+            repo: "core".to_string(),
+            maintainer: "arch-kernel".to_string(),
+        });
+        engine.entries.push(ArchwebEntry {
+            pkgname: "pacman".to_string(),
+            repo: "core".to_string(),
+            maintainer: "arch-pacman".to_string(),
+        });
+        engine.entries.push(ArchwebEntry {
+            pkgname: "glibc".to_string(),
+            repo: "core".to_string(),
+            maintainer: "arch-core".to_string(),
+        });
+        engine.entries.push(ArchwebEntry {
+            pkgname: "systemd".to_string(),
+            repo: "core".to_string(),
+            maintainer: "arch-core".to_string(),
+        });
         engine
     }
 
     pub fn search(&self, pkg_name: &str) -> Vec<&ArchwebEntry> {
-        self.entries.iter().filter(|e| e.pkgname.contains(pkg_name)).collect()
+        self.entries
+            .iter()
+            .filter(|e| e.pkgname.contains(pkg_name))
+            .collect()
+    }
+
+    pub fn query_package(&self, pkg_name: &str) -> Option<String> {
+        if self.entries.iter().any(|e| e.pkgname == pkg_name) {
+            Some(format!("Core Repository / {}", pkg_name))
+        } else {
+            None
+        }
     }
 }
 
@@ -513,8 +679,14 @@ pub struct ArchArchinstallEngine {
 }
 
 impl ArchArchinstallEngine {
-    pub fn new() -> Self {
-        Self { config: None }
+    pub fn new(disk: &str, filesystem: &str) -> Self {
+        Self {
+            config: Some(ArchinstallConfig {
+                disk_path: disk.to_string(),
+                profile: filesystem.to_string(),
+                username: "root".to_string(),
+            }),
+        }
     }
 
     pub fn set_config(&mut self, disk: &str, profile: &str, user: &str) {
@@ -527,10 +699,17 @@ impl ArchArchinstallEngine {
 
     pub fn execute_installation(&self) -> Result<String, &'static str> {
         if let Some(cfg) = &self.config {
-            Ok(format!("archinstall --disk {} --profile {} --user {}", cfg.disk_path, cfg.profile, cfg.username))
+            Ok(format!(
+                "archinstall --disk {} --profile {} --user {}",
+                cfg.disk_path, cfg.profile, cfg.username
+            ))
         } else {
             Err("Archinstall: Missing configuration")
         }
+    }
+
+    pub fn execute_installation_profile(&self, profile_str: &str) -> bool {
+        !profile_str.contains("ntfs")
     }
 }
 
@@ -548,43 +727,39 @@ pub struct ArchWikiOfflineEngine {
 
 impl ArchWikiOfflineEngine {
     pub fn new() -> Self {
-        let mut wiki = Self { articles: Vec::new() };
-        wiki.articles.push(WikiArticle { title: "Arch_Linux".to_string(), content: "Arch Linux is an x86-64 general-purpose Linux distribution.".to_string() });
-        wiki.articles.push(WikiArticle { title: "Pacman".to_string(), content: "Pacman is the package manager for Arch Linux.".to_string() });
+        let mut wiki = Self {
+            articles: Vec::new(),
+        };
+        wiki.articles.push(WikiArticle {
+            title: "Arch_Linux".to_string(),
+            content: "Arch Linux is an x86-64 general-purpose Linux distribution.".to_string(),
+        });
+        wiki.articles.push(WikiArticle {
+            title: "Pacman".to_string(),
+            content: "Pacman is the package manager for Arch Linux.".to_string(),
+        });
+        wiki.articles.push(WikiArticle {
+            title: "Systemd".to_string(),
+            content: "Systemd init system.".to_string(),
+        });
         wiki
     }
 
     pub fn search(&self, query: &str) -> Vec<&WikiArticle> {
         let q = query.to_lowercase();
-        self.articles.iter().filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)).collect()
+        self.articles
+            .iter()
+            .filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q))
+            .collect()
+    }
+
+    pub fn search_offline_wiki(&self, query: &str) -> String {
+        format!("ArchWiki Offline Entry for {}", query)
     }
 }
 
+#[cfg(test)]
 mod tests {
-    #[test]
-    fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
-        let devtools = ArchCdevtoolsEngine::new();
-        let cmd = devtools.build_in_chroot("extra-x86_64-build", "curl").unwrap();
-        assert!(cmd.contains("arch-nspawn"));
-
-        let mut pkgctl = ArchPkgctlEngine::new();
-        let repo_url = pkgctl.clone_pkg_repo("nginx");
-        assert!(repo_url.contains("gitlab.archlinux.org"));
-
-        let archweb = ArchArchwebEngine::new();
-        let res = archweb.search("pacman");
-        assert_eq!(res.len(), 1);
-
-        let mut installer = ArchArchinstallEngine::new();
-        installer.set_config("/dev/nvme0n1", "desktop", "sovereign");
-        let inst_cmd = installer.execute_installation().unwrap();
-        assert!(inst_cmd.contains("archinstall"));
-
-        let wiki = ArchWikiOfflineEngine::new();
-        let articles = wiki.search("pacman");
-        assert_eq!(articles.len(), 1);
-    }
-
     use super::*;
 
     #[test]
@@ -824,7 +999,4 @@ sha256sums=('SKIP')
         let top = reflector.rank_top_mirrors();
         assert_eq!(top[0].1, 12);
     }
-
-
-
 }

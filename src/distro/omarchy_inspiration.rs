@@ -471,6 +471,434 @@ impl Default for OmarchyHyprlandAnimEngine {
     }
 }
 
+/// Omarchy Hyprland Window Rules & Tiling Workspace Snap Layouts Engine
+#[derive(Debug, Clone)]
+pub struct HyprlandWindowRule {
+    pub window_class: String,
+    pub title_pattern: String,
+    pub is_floating: bool,
+    pub target_workspace: u32,
+    pub opacity: f32,
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyHyprlandWorkspaceSnapLayoutEngine {
+    pub active_workspace: u32,
+    pub window_rules: Vec<HyprlandWindowRule>,
+    pub dwindle_split_ratio: f32,
+    pub gaps_in: u32,
+    pub gaps_out: u32,
+}
+
+impl OmarchyHyprlandWorkspaceSnapLayoutEngine {
+    pub fn new() -> Self {
+        Self {
+            active_workspace: 1,
+            window_rules: Vec::new(),
+            dwindle_split_ratio: 0.5,
+            gaps_in: 5,
+            gaps_out: 10,
+        }
+    }
+
+    pub fn assign_window_rule(&mut self, rule: HyprlandWindowRule) {
+        self.window_rules.push(rule);
+    }
+
+    pub fn calculate_dwindle_split(&self, window_count: usize) -> (u32, u32) {
+        if window_count <= 1 {
+            (1920, 1080)
+        } else {
+            let width = (1920.0 * self.dwindle_split_ratio) as u32;
+            let height = 1080 / (window_count as u32);
+            (width, height)
+        }
+    }
+
+    pub fn generate_hyprland_rules_cfg(&self) -> String {
+        let mut cfg = format!("general {{ gaps_in = {}\n gaps_out = {} }}\n", self.gaps_in, self.gaps_out);
+        for rule in &self.window_rules {
+            if rule.is_floating {
+                cfg.push_str(&format!("windowrulev2 = float, class:({})\n", rule.window_class));
+            } else {
+                cfg.push_str(&format!("windowrulev2 = workspace {}, class:({})\n", rule.target_workspace, rule.window_class));
+            }
+        }
+        cfg
+    }
+}
+
+impl Default for OmarchyHyprlandWorkspaceSnapLayoutEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Neovim Omakase Developer Preset Studio Engine
+#[derive(Debug, Clone)]
+pub struct NeovimLspConfig {
+    pub language_server: String,
+    pub filetypes: Vec<String>,
+    pub auto_format_on_save: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct OmarchyNeovimPresetStudioEngine {
+    pub lsp_servers: Vec<NeovimLspConfig>,
+    pub theme_colorscheme: String,
+    pub enabled_plugins: Vec<String>,
+}
+
+impl OmarchyNeovimPresetStudioEngine {
+    pub fn new() -> Self {
+        let mut studio = Self {
+            lsp_servers: Vec::new(),
+            theme_colorscheme: "tokyonight".to_string(),
+            enabled_plugins: vec![
+                "lazy.nvim".to_string(),
+                "nvim-treesitter".to_string(),
+                "telescope.nvim".to_string(),
+                "rustaceanvim".to_string(),
+            ],
+        };
+        studio.register_lsp("rust_analyzer", &["rust"], true);
+        studio.register_lsp("clangd", &["c", "cpp"], true);
+        studio
+    }
+
+    pub fn register_lsp(&mut self, name: &str, filetypes: &[&str], auto_format: bool) {
+        self.lsp_servers.push(NeovimLspConfig {
+            language_server: name.to_string(),
+            filetypes: filetypes.iter().map(|s| s.to_string()).collect(),
+            auto_format_on_save: auto_format,
+        });
+    }
+
+    pub fn generate_init_lua(&self) -> String {
+        let mut lua = format!("-- Omarchy Neovim Omakase Config\nvim.cmd([[colorscheme {}]])\n", self.theme_colorscheme);
+        lua.push_str("require('lazy').setup({\n");
+        for plugin in &self.enabled_plugins {
+            lua.push_str(&format!("  '{}',\n", plugin));
+        }
+        lua.push_str("})\n");
+        lua
+    }
+}
+
+impl Default for OmarchyNeovimPresetStudioEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Terminal Emulator Kind
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TerminalEmulatorKind {
+    Ghostty,
+    Kitty,
+    Alacritty,
+    Foot,
+}
+
+/// Ghostty & Kitty Hardware-Accelerated Terminal Theme & Font Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyTerminalFontStudioEngine {
+    pub font_family: String,
+    pub font_size: f32,
+    pub window_opacity: f32,
+    pub enable_ligatures: bool,
+}
+
+impl OmarchyTerminalFontStudioEngine {
+    pub fn new() -> Self {
+        Self {
+            font_family: "JetBrainsMono Nerd Font".to_string(),
+            font_size: 11.5,
+            window_opacity: 0.92,
+            enable_ligatures: true,
+        }
+    }
+
+    pub fn generate_ghostty_config(&self) -> String {
+        format!(
+            "font-family = {}\nfont-size = {}\nbackground-opacity = {}\ncursor-style = block\n",
+            self.font_family, self.font_size, self.window_opacity
+        )
+    }
+
+    pub fn generate_kitty_config(&self) -> String {
+        format!(
+            "font_family {}\nfont_size {}\nbackground_opacity {}\ndisable_ligatures {}\n",
+            self.font_family,
+            self.font_size,
+            self.window_opacity,
+            if self.enable_ligatures { "never" } else { "always" }
+        )
+    }
+}
+
+impl Default for OmarchyTerminalFontStudioEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Waybar Module Kind
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WaybarModuleKind {
+    Workspaces,
+    Clock,
+    Cpu,
+    Memory,
+    Battery,
+    Network,
+    PulseAudio,
+    Tray,
+}
+
+/// Waybar & Quickshell System Applets Engine
+#[derive(Debug, Clone)]
+pub struct OmarchyWaybarAppletStudioEngine {
+    pub active_modules: Vec<WaybarModuleKind>,
+    pub bar_height: u32,
+    pub position_top: bool,
+}
+
+impl OmarchyWaybarAppletStudioEngine {
+    pub fn new() -> Self {
+        Self {
+            active_modules: vec![
+                WaybarModuleKind::Workspaces,
+                WaybarModuleKind::Clock,
+                WaybarModuleKind::Cpu,
+                WaybarModuleKind::Memory,
+                WaybarModuleKind::PulseAudio,
+                WaybarModuleKind::Battery,
+                WaybarModuleKind::Network,
+                WaybarModuleKind::Tray,
+            ],
+            bar_height: 30,
+            position_top: true,
+        }
+    }
+
+    pub fn generate_waybar_config_json(&self) -> String {
+        format!(
+            "{{\"layer\": \"top\", \"position\": \"{}\", \"height\": {}, \"modules-left\": [\"hyprland/workspaces\"], \"modules-right\": [\"cpu\", \"memory\", \"pulseaudio\", \"clock\", \"tray\"]}}",
+            if self.position_top { "top" } else { "bottom" },
+            self.bar_height
+        )
+    }
+}
+
+impl Default for OmarchyWaybarAppletStudioEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Omakase Live ISO Bootstrap Engine
+pub struct OmarchyLiveIsoBootstrapEngine {
+    pub target_disk: String,
+    pub developer_username: String,
+    pub is_60sec_bootstrap_complete: bool,
+}
+
+impl OmarchyLiveIsoBootstrapEngine {
+    pub fn new(disk: &str, user: &str) -> Self {
+        Self {
+            target_disk: disk.to_string(),
+            developer_username: user.to_string(),
+            is_60sec_bootstrap_complete: false,
+        }
+    }
+
+    pub fn execute_60sec_bootstrap(&mut self) -> Result<String, &'static str> {
+        if self.target_disk.is_empty() || self.developer_username.is_empty() {
+            return Err("Target disk and username must be configured");
+        }
+        self.is_60sec_bootstrap_complete = true;
+        Ok(format!(
+            "Omarchy Omakase 60-Second Bootstrap Success on {}: User '{}', Hyprland WM, Ghostty Terminal, Neovim Omakase Suite provisioned.",
+            self.target_disk, self.developer_username
+        ))
+    }
+}
+
+/// Omarchy Fuzzy Application Launchpad Engine
+#[derive(Debug, Clone)]
+pub struct LaunchpadAppEntry {
+    pub app_name: String,
+    pub exec_cmd: String,
+    pub category: String,
+    pub launch_count: u32,
+}
+
+pub struct OmarchyMenuLaunchpadEngine {
+    pub apps: Vec<LaunchpadAppEntry>,
+}
+
+impl OmarchyMenuLaunchpadEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { apps: Vec::new() };
+        engine.register_app("Ghostty Terminal", "ghostty", "Terminal");
+        engine.register_app("Neovim Editor", "nvim", "Development");
+        engine.register_app("Firefox Browser", "firefox", "Internet");
+        engine.register_app("Obsidian Notes", "obsidian", "Productivity");
+        engine
+    }
+
+    pub fn register_app(&mut self, name: &str, exec: &str, category: &str) {
+        self.apps.push(LaunchpadAppEntry {
+            app_name: name.to_string(),
+            exec_cmd: exec.to_string(),
+            category: category.to_string(),
+            launch_count: 0,
+        });
+    }
+
+    pub fn search(&self, query: &str) -> Vec<LaunchpadAppEntry> {
+        self.apps
+            .iter()
+            .filter(|a| a.app_name.to_lowercase().contains(&query.to_lowercase()) || a.category.to_lowercase().contains(&query.to_lowercase()))
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for OmarchyMenuLaunchpadEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Audio Codec Kind
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OmarchyAudioCodec {
+    Ldac,
+    AptXHD,
+    Aac,
+    Sbc,
+}
+
+/// Omarchy Pipewire/Wireplumber Audio Session Governor
+pub struct OmarchyAudioPipewireGovernor {
+    pub volume_percent: u8,
+    pub is_muted: bool,
+    pub active_codec: OmarchyAudioCodec,
+}
+
+impl OmarchyAudioPipewireGovernor {
+    pub fn new() -> Self {
+        Self {
+            volume_percent: 80,
+            is_muted: false,
+            active_codec: OmarchyAudioCodec::Ldac,
+        }
+    }
+
+    pub fn set_volume(&mut self, vol: u8) {
+        self.volume_percent = vol.min(100);
+    }
+
+    pub fn toggle_mute(&mut self) -> bool {
+        self.is_muted = !self.is_muted;
+        self.is_muted
+    }
+}
+
+impl Default for OmarchyAudioPipewireGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Live Wallpaper & Transition Studio Engine
+pub struct OmarchyWallpaperEngine {
+    pub current_wallpaper: String,
+    pub transition_duration_sec: u32,
+}
+
+impl OmarchyWallpaperEngine {
+    pub fn new() -> Self {
+        Self {
+            current_wallpaper: "omarchy_dark_mountains.png".to_string(),
+            transition_duration_sec: 2,
+        }
+    }
+
+    pub fn set_wallpaper(&mut self, path: &str) {
+        self.current_wallpaper = path.to_string();
+    }
+}
+
+impl Default for OmarchyWallpaperEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Omarchy Display Manager & Greeter Engine
+pub struct OmarchyDisplayManagerGreeter {
+    pub sessions: Vec<String>,
+    pub active_session: String,
+}
+
+impl OmarchyDisplayManagerGreeter {
+    pub fn new() -> Self {
+        Self {
+            sessions: vec!["Hyprland".to_string(), "Sway".to_string(), "Zenith".to_string()],
+            active_session: "Hyprland".to_string(),
+        }
+    }
+
+    pub fn select_session(&mut self, session: &str) -> bool {
+        if self.sessions.iter().any(|s| s == session) {
+            self.active_session = session.to_string();
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for OmarchyDisplayManagerGreeter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Power Profile Kind
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OmarchyPowerProfile {
+    Performance,
+    Balanced,
+    PowerSaver,
+}
+
+/// Omarchy Power Profile & CPU-Power Governor
+pub struct OmarchyPowerProfileGovernor {
+    pub active_profile: OmarchyPowerProfile,
+}
+
+impl OmarchyPowerProfileGovernor {
+    pub fn new() -> Self {
+        Self {
+            active_profile: OmarchyPowerProfile::Balanced,
+        }
+    }
+
+    pub fn set_profile(&mut self, profile: OmarchyPowerProfile) {
+        self.active_profile = profile;
+    }
+}
+
+impl Default for OmarchyPowerProfileGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 
 #[cfg(test)]
 mod omarchy_tests {
@@ -569,5 +997,57 @@ mod omarchy_tests {
         let snap = engine.create_preflight_update_snapshot(1700000000);
         assert!(snap.contains("snapshot_Stable_1700000000"));
         assert_eq!(engine.snapshots.len(), 1);
+    }
+
+    #[test]
+    fn test_new_omarchy_components() {
+        let mut hypr = OmarchyHyprlandWorkspaceSnapLayoutEngine::new();
+        hypr.assign_window_rule(HyprlandWindowRule {
+            window_class: "ghostty".to_string(),
+            title_pattern: "*".to_string(),
+            is_floating: false,
+            target_workspace: 1,
+            opacity: 0.95,
+        });
+        assert!(hypr.generate_hyprland_rules_cfg().contains("workspace 1, class:(ghostty)"));
+
+        let nvim = OmarchyNeovimPresetStudioEngine::new();
+        assert!(nvim.generate_init_lua().contains("rustaceanvim"));
+
+        let term = OmarchyTerminalFontStudioEngine::new();
+        assert!(term.generate_ghostty_config().contains("JetBrainsMono"));
+
+        let waybar = OmarchyWaybarAppletStudioEngine::new();
+        assert!(waybar.generate_waybar_config_json().contains("hyprland/workspaces"));
+
+        let mut boot = OmarchyLiveIsoBootstrapEngine::new("/dev/nvme0n1", "sovereign");
+        let res = boot.execute_60sec_bootstrap().unwrap();
+        assert!(res.contains("Omarchy Omakase 60-Second Bootstrap Success"));
+
+        // Launchpad Menu
+        let launchpad = OmarchyMenuLaunchpadEngine::new();
+        let search_res = launchpad.search("ghostty");
+        assert_eq!(search_res.len(), 1);
+
+        // Audio Governor
+        let mut audio = OmarchyAudioPipewireGovernor::new();
+        audio.set_volume(90);
+        assert_eq!(audio.volume_percent, 90);
+        assert!(audio.toggle_mute());
+
+        // Wallpaper Studio
+        let mut wp = OmarchyWallpaperEngine::new();
+        wp.set_wallpaper("custom.png");
+        assert_eq!(wp.current_wallpaper, "custom.png");
+
+        // Display Manager Greeter
+        let mut greeter = OmarchyDisplayManagerGreeter::new();
+        assert!(greeter.select_session("Sway"));
+        assert_eq!(greeter.active_session, "Sway");
+
+        // Power Governor
+        let mut power = OmarchyPowerProfileGovernor::new();
+        power.set_profile(OmarchyPowerProfile::Performance);
+        assert_eq!(power.active_profile, OmarchyPowerProfile::Performance);
     }
 }

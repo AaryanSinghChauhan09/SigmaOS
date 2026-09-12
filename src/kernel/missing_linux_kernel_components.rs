@@ -629,6 +629,276 @@ impl Default for LinuxDeviceMapperEngine {
 // MASTER SUITE
 // =========================================================================
 
+// =========================================================================
+// 7. LINUX LANDLOCK V5 ACCESS CONTROL ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct LandlockPathBeneathRule {
+    pub allowed_access: u64,
+    pub parent_path: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct LandlockNetPortRule {
+    pub allowed_access: u64,
+    pub port: u16,
+}
+
+pub struct LinuxLandlockV5AccessEngine {
+    pub is_restricted: bool,
+    pub path_rules: Vec<LandlockPathBeneathRule>,
+    pub net_rules: Vec<LandlockNetPortRule>,
+}
+
+impl LinuxLandlockV5AccessEngine {
+    pub fn new() -> Self {
+        Self {
+            is_restricted: false,
+            path_rules: Vec::new(),
+            net_rules: Vec::new(),
+        }
+    }
+
+    pub fn add_path_rule(&mut self, path: &str, access_mask: u64) {
+        self.path_rules.push(LandlockPathBeneathRule {
+            allowed_access: access_mask,
+            parent_path: path.to_string(),
+        });
+    }
+
+    pub fn add_net_rule(&mut self, port: u16, access_mask: u64) {
+        self.net_rules.push(LandlockNetPortRule {
+            allowed_access: access_mask,
+            port,
+        });
+    }
+
+    pub fn restrict_self(&mut self) -> Result<(), &'static str> {
+        self.is_restricted = true;
+        Ok(())
+    }
+
+    pub fn check_path_access(&self, path: &str, requested_access: u64) -> bool {
+        if !self.is_restricted {
+            return true;
+        }
+        self.path_rules.iter().any(|r| {
+            path.starts_with(&r.parent_path) && (r.allowed_access & requested_access) == requested_access
+        })
+    }
+}
+
+impl Default for LinuxLandlockV5AccessEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 8. LINUX BINDER IPC TRANSACTION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct BinderTransaction {
+    pub transaction_id: u64,
+    pub sender_pid: u32,
+    pub target_handle: u32,
+    pub code: u32,
+    pub data_payload: Vec<u8>,
+}
+
+pub struct LinuxBinderIpcEngine {
+    pub active_nodes: BTreeMap<u32, String>,
+    pub pending_transactions: Vec<BinderTransaction>,
+    pub next_tx_id: u64,
+}
+
+impl LinuxBinderIpcEngine {
+    pub fn new() -> Self {
+        Self {
+            active_nodes: BTreeMap::new(),
+            pending_transactions: Vec::new(),
+            next_tx_id: 1,
+        }
+    }
+
+    pub fn register_binder_node(&mut self, handle: u32, name: &str) {
+        self.active_nodes.insert(handle, name.to_string());
+    }
+
+    pub fn send_transaction(&mut self, sender_pid: u32, target_handle: u32, code: u32, data: &[u8]) -> Result<u64, &'static str> {
+        if !self.active_nodes.contains_key(&target_handle) {
+            return Err("Target Binder handle not found");
+        }
+        let tx_id = self.next_tx_id;
+        self.next_tx_id += 1;
+
+        self.pending_transactions.push(BinderTransaction {
+            transaction_id: tx_id,
+            sender_pid,
+            target_handle,
+            code,
+            data_payload: data.to_vec(),
+        });
+
+        Ok(tx_id)
+    }
+}
+
+impl Default for LinuxBinderIpcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 9. LINUX ZSWAP / ZRAM COMPRESSED SWAP STORAGE ENGINE
+// =========================================================================
+
+pub struct LinuxZswapCompressedStorageEngine {
+    pub compressed_pool: BTreeMap<u64, Vec<u8>>,
+    pub original_pages_count: usize,
+    pub compressed_bytes_total: usize,
+}
+
+impl LinuxZswapCompressedStorageEngine {
+    pub fn new() -> Self {
+        Self {
+            compressed_pool: BTreeMap::new(),
+            original_pages_count: 0,
+            compressed_bytes_total: 0,
+        }
+    }
+
+    pub fn compress_and_store_page(&mut self, page_index: u64, page_data: &[u8; 4096]) -> usize {
+        let mut compressed = Vec::new();
+        let mut i = 0;
+        while i < page_data.len() {
+            let b = page_data[i];
+            let mut count = 1u8;
+            while i + 1 < page_data.len() && page_data[i + 1] == b && count < 255 {
+                count += 1;
+                i += 1;
+            }
+            compressed.push(count);
+            compressed.push(b);
+            i += 1;
+        }
+
+        let comp_len = compressed.len();
+        self.compressed_bytes_total += comp_len;
+        self.original_pages_count += 1;
+        self.compressed_pool.insert(page_index, compressed);
+
+        comp_len
+    }
+
+    pub fn compression_ratio(&self) -> f32 {
+        if self.original_pages_count == 0 {
+            return 1.0;
+        }
+        let orig_total = (self.original_pages_count * 4096) as f32;
+        orig_total / (self.compressed_bytes_total as f32).max(1.0)
+    }
+}
+
+impl Default for LinuxZswapCompressedStorageEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 10. LINUX OVERLAYFS MULTI-LOWER LAYER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct OverlayfsMount {
+    pub lower_dirs: Vec<String>,
+    pub upper_dir: String,
+    pub work_dir: String,
+}
+
+pub struct LinuxOverlayfsMountEngine {
+    pub mounts: Vec<OverlayfsMount>,
+}
+
+impl LinuxOverlayfsMountEngine {
+    pub fn new() -> Self {
+        Self { mounts: Vec::new() }
+    }
+
+    pub fn mount_overlay(&mut self, lowers: &[&str], upper: &str, work: &str) {
+        self.mounts.push(OverlayfsMount {
+            lower_dirs: lowers.iter().map(|s| s.to_string()).collect(),
+            upper_dir: upper.to_string(),
+            work_dir: work.to_string(),
+        });
+    }
+
+    pub fn resolve_path(&self, relative_path: &str) -> String {
+        if let Some(m) = self.mounts.first() {
+            format!("{}/{}", m.upper_dir, relative_path)
+        } else {
+            relative_path.to_string()
+        }
+    }
+}
+
+impl Default for LinuxOverlayfsMountEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 11. LINUX MEMFD_SECRET ANONYMOUS SECRET MEMORY ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct MemfdSecretRegion {
+    pub fd: i32,
+    pub size_bytes: usize,
+    pub is_locked: bool,
+}
+
+pub struct LinuxMemfdSecretEngine {
+    pub secret_regions: BTreeMap<i32, MemfdSecretRegion>,
+    pub next_fd: i32,
+}
+
+impl LinuxMemfdSecretEngine {
+    pub fn new() -> Self {
+        Self {
+            secret_regions: BTreeMap::new(),
+            next_fd: 100,
+        }
+    }
+
+    pub fn create_secret_memfd(&mut self, size: usize) -> Result<i32, &'static str> {
+        if size == 0 {
+            return Err("MemfdSecret size must be > 0");
+        }
+        let fd = self.next_fd;
+        self.next_fd += 1;
+
+        self.secret_regions.insert(fd, MemfdSecretRegion {
+            fd,
+            size_bytes: size,
+            is_locked: true,
+        });
+
+        Ok(fd)
+    }
+}
+
+impl Default for LinuxMemfdSecretEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SovereignMissingLinuxKernelComponentsSuite {
     pub psi: LinuxPressureStallInfoEngine,
     pub ksm: LinuxKernelSamepageMergingEngine,
@@ -636,6 +906,11 @@ pub struct SovereignMissingLinuxKernelComponentsSuite {
     pub fanotify: LinuxFanotifyEngine,
     pub futex2: LinuxFutex2WaitvEngine,
     pub dm: LinuxDeviceMapperEngine,
+    pub landlock: LinuxLandlockV5AccessEngine,
+    pub binder: LinuxBinderIpcEngine,
+    pub zswap: LinuxZswapCompressedStorageEngine,
+    pub overlayfs: LinuxOverlayfsMountEngine,
+    pub memfd_secret: LinuxMemfdSecretEngine,
 }
 
 impl SovereignMissingLinuxKernelComponentsSuite {
@@ -647,6 +922,11 @@ impl SovereignMissingLinuxKernelComponentsSuite {
             fanotify: LinuxFanotifyEngine::new(),
             futex2: LinuxFutex2WaitvEngine::new(),
             dm: LinuxDeviceMapperEngine::new(),
+            landlock: LinuxLandlockV5AccessEngine::new(),
+            binder: LinuxBinderIpcEngine::new(),
+            zswap: LinuxZswapCompressedStorageEngine::new(),
+            overlayfs: LinuxOverlayfsMountEngine::new(),
+            memfd_secret: LinuxMemfdSecretEngine::new(),
         }
     }
 }
@@ -724,5 +1004,38 @@ mod tests {
         let computed_hash = dm.compute_block_hash(b"SECURE_BLOCK_DATA");
         dm.create_dm_verity_target("rootfs", computed_hash);
         assert!(dm.verify_block_integrity("rootfs", b"SECURE_BLOCK_DATA"));
+    }
+
+    #[test]
+    fn test_landlock_binder_zswap_overlay_memfd_engines() {
+        // 1. Landlock
+        let mut landlock = LinuxLandlockV5AccessEngine::new();
+        landlock.add_path_rule("/usr/bin", 0x1);
+        landlock.restrict_self().unwrap();
+        assert!(landlock.check_path_access("/usr/bin/cargo", 0x1));
+        assert!(!landlock.check_path_access("/etc/shadow", 0x1));
+
+        // 2. Binder
+        let mut binder = LinuxBinderIpcEngine::new();
+        binder.register_binder_node(1, "surfaceflinger");
+        let tx_id = binder.send_transaction(100, 1, 10, b"DRAW_FRAME").unwrap();
+        assert_eq!(tx_id, 1);
+
+        // 3. Zswap
+        let mut zswap = LinuxZswapCompressedStorageEngine::new();
+        let dummy_page = [0x41u8; 4096];
+        let comp_sz = zswap.compress_and_store_page(0, &dummy_page);
+        assert!(comp_sz < 4096);
+        assert!(zswap.compression_ratio() > 10.0);
+
+        // 4. OverlayFS
+        let mut overlay = LinuxOverlayfsMountEngine::new();
+        overlay.mount_overlay(&["/lower1", "/lower2"], "/upper", "/work");
+        assert_eq!(overlay.resolve_path("etc/nginx.conf"), "/upper/etc/nginx.conf");
+
+        // 5. MemfdSecret
+        let mut memfd = LinuxMemfdSecretEngine::new();
+        let secret_fd = memfd.create_secret_memfd(4096).unwrap();
+        assert_eq!(secret_fd, 100);
     }
 }

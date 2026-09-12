@@ -151,8 +151,9 @@ pub use arch_linux::{
     DevFileType, FirewallRule, KeyTrustLevel, LsmMode, LsmSentinel, MkinitcpioGenerator, NewsItem,
     PacmanDbCleaner, PacmanEngine, PacmanError, PacmanKey, PacmanKeyring, PamGate, PaneLayout,
     ProcFile, ProcFileType, ReflectorMirrorlist, RuleAction, RunlevelTarget, ServiceState,
-    SovereignEnvRegistry, SubvolumeConfig, SystemdBootMetrics, TmuxMultiplexer, WikiPage,
-    YayParuAdapter,
+    SovereignArchChrootVfsEngine, SovereignEnvRegistry, SovereignMakepkgConfEngine,
+    SovereignPacmanConfEngine, SovereignSvntogitEngine, SubvolumeConfig, SystemdBootMetrics,
+    TmuxMultiplexer, WikiPage, YayParuAdapter,
 };
 
 pub use open_source_tier1::{
