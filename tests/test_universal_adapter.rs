@@ -17,10 +17,25 @@ pub mod security {
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
 
-pub use universal_adapter::universal_oop_system;
+pub mod package {
+    use alloc::string::String;
+    use alloc::vec::Vec;
+
+    #[derive(Debug, Clone)]
+    pub struct AptDebManifest {
+        pub package: String,
+        pub version: String,
+        pub depends: Vec<String>,
+        pub description: String,
+        pub priority: crate::universal_adapter::PackagePriority,
+    }
+}
 
 pub mod sigpkg {
     use alloc::string::String;
@@ -30,6 +45,7 @@ pub mod sigpkg {
     pub use crate::universal_adapter;
     pub use crate::universal_engine;
     pub use crate::universal_oop_system;
+    pub use crate::universal_engine::PackageFormat;
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     pub struct Version {
@@ -149,12 +165,12 @@ fn test_universal_adapter_all_formats() {
     let mut bridge = SigPkgUniversalBridgeEngine::new();
     let pkg_bsd = bridge.absorb_and_register("redis.pkg", freebsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
