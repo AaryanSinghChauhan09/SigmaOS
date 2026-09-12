@@ -82,13 +82,52 @@ pub enum PackageFormat {
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
-        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
-        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
-        else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
-        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
+        let lower = filename.to_lowercase();
+        if lower.ends_with(".ipk") { Some(PackageFormat::Ipk) }
+        else if lower.ends_with(".opkg") { Some(PackageFormat::Opkg) }
+        else if lower.ends_with(".p5p") { Some(PackageFormat::SolarisIps) }
+        else if lower.ends_with(".nar") { Some(PackageFormat::GuixNar) }
+        else if lower.ends_with(".openbsd.tgz") { Some(PackageFormat::OpenBsdPkg) }
+        else if lower.ends_with(".moss") { Some(PackageFormat::Moss) }
+        else if lower.ends_with(".hpkg") { Some(PackageFormat::Hpkg) }
+        else if lower.ends_with(".air") { Some(PackageFormat::Air) }
+        else if lower.ends_with(".bottle") { Some(PackageFormat::Bottle) }
+        else if lower.ends_with(".ipa") { Some(PackageFormat::Ipa) }
+        else if lower.ends_with(".ports") { Some(PackageFormat::Ports) }
+        else if lower.ends_with(".pkg") { Some(PackageFormat::Pkg) }
+        else if lower.ends_with(".aab") { Some(PackageFormat::Aab) }
+        else if lower.ends_with(".apk") { Some(PackageFormat::Apk) }
+        else if lower.ends_with(".appimage") { Some(PackageFormat::AppImage) }
+        else if lower.ends_with(".eopkg") { Some(PackageFormat::Eopkg) }
+        else if lower.ends_with(".nix") || lower.ends_with(".nixpkg") { Some(PackageFormat::Nix) }
+        else if lower.ends_with(".portage") { Some(PackageFormat::Ports) }
+        else if lower.ends_with(".deb") { Some(PackageFormat::Apt) }
+        else if lower.contains("pkg.tar") { Some(PackageFormat::Pacman) }
+        else if lower.ends_with(".tar.gz") || lower.ends_with(".tgz") || lower.contains(".tar .gz") { Some(PackageFormat::TarGz) }
+        else if lower.ends_with(".tar.xz") { Some(PackageFormat::TarXz) }
+        else if lower.ends_with(".xz") { Some(PackageFormat::TarXz) }
+        else if lower.ends_with(".rpm") { Some(PackageFormat::Yum) }
+        else if lower.ends_with(".ebuild") { Some(PackageFormat::Portage) }
+        else if lower.ends_with(".flatpak") { Some(PackageFormat::Flatpak) }
+        else if lower.ends_with(".app") { Some(PackageFormat::AppBundle) }
+        else if lower.ends_with(".hap") { Some(PackageFormat::Hap) }
+        else if lower.ends_with(".pisi") { Some(PackageFormat::Pisi) }
+        else if lower.ends_with(".superdeb") { Some(PackageFormat::Superdeb) }
+        else if lower.ends_with(".lzm") { Some(PackageFormat::Lzm) }
+        else if lower.ends_with(".pup") { Some(PackageFormat::Pup) }
+        else if lower.ends_with(".pet") { Some(PackageFormat::Pet) }
+        else if lower.ends_with(".snap") { Some(PackageFormat::Snap) }
+        else if lower.ends_with(".tar") { Some(PackageFormat::Tar) }
+        else if lower.ends_with(".spack") { Some(PackageFormat::Spack) }
+        else if lower.ends_with(".conan") { Some(PackageFormat::Conan) }
+        else if lower.ends_with(".whl") { Some(PackageFormat::Wheel) }
+        else if lower.ends_with(".crate") { Some(PackageFormat::Crate) }
+        else if lower.ends_with(".gem") { Some(PackageFormat::Gem) }
+        else if lower.ends_with(".nupkg") { Some(PackageFormat::Nupkg) }
+        else if lower.ends_with(".vcpkg") { Some(PackageFormat::Vcpkg) }
+        else if lower.ends_with(".narinfo") { Some(PackageFormat::NarInfo) }
+        else if lower.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
+        else if lower.ends_with(".sigma") { Some(PackageFormat::Sigma) }
         else { None }
     }
 }
