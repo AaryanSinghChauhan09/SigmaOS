@@ -845,7 +845,30 @@ impl Default for OmarchyMiseVersionManagerEngine {
     }
 }
 
+/// LazyGit terminal TUI configuration generator engine
+pub struct OmarchyLazyGitConfigurationEngine {
+    pub theme: String,
+}
 
+impl OmarchyLazyGitConfigurationEngine {
+    pub fn new() -> Self {
+        Self {
+            theme: "tokyonight".to_string(),
+        }
+    }
+
+    pub fn generate_config_yml(&self) -> String {
+        format!(
+            "gui:\n  theme:\n    activeBorderColor:\n      - '#7aa2f7'\n      - bold\n  showIcons: true\ngit:\n  paging:\n    colorArg: always\n    pager: delta --dark --paging=never\n"
+        )
+    }
+}
+
+impl Default for OmarchyLazyGitConfigurationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Ayu Dark / Ayu Light theme palette and GTK CSS generator engine
 pub struct OmarchyAyuThemeEngine {

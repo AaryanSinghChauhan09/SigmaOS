@@ -134,14 +134,17 @@ pub struct PacmanPkgbuild {
 use universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-/// Debian-style package priority levels (DFSG and APT standard)
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::package::universal::PackagePriority;
+
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PackagePriority {
     Optional = 0,
     Standard = 1,
     Important = 2,
     Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
+    Essential = 4,
 }
 
 pub trait PackageFormatAdapter {
