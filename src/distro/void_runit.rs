@@ -5,25 +5,18 @@
  * health checking, and automatic restart policy governance.
  */
 
-
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 
-
-#[cfg(not(test))]
-use std::collections::BTreeMap;
-#[cfg(not(test))]
-use std::string::String;
-#[cfg(not(test))]
-use std::vec::Vec;
-
-#[cfg(test)]
-use std::collections::BTreeMap;
-#[cfg(test)]
-use std::string::String;
-#[cfg(test)]
-use std::vec::Vec;
+/// Runit Supervision Stage
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum RunitStage {
+    #[default]
+    Stage1,
+    Stage2,
+    Stage3,
+}
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,6 +37,7 @@ pub struct RunitService {
     pub auto_restart: bool,
     pub health_check_failures: u32,
     pub max_allowed_failures: u32,
+    pub dependencies: Vec<String>,
 }
 
 impl RunitService {
@@ -55,7 +49,12 @@ impl RunitService {
             auto_restart,
             health_check_failures: 0,
             max_allowed_failures,
+            dependencies: Vec::new(),
         }
+    }
+
+    pub fn add_dependency(&mut self, dep: &str) {
+        self.dependencies.push(String::from(dep));
     }
 
     pub fn start(&mut self) -> bool {
@@ -96,12 +95,16 @@ impl RunitService {
 #[derive(Debug, Default, Clone)]
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
+    pub stage: RunitStage,
+    pub current_stage_num: u8,
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
             services: BTreeMap::new(),
+            stage: RunitStage::Stage1,
+            current_stage_num: 1,
         }
     }
 
@@ -172,6 +175,26 @@ impl RunitSupervisor {
                 }
             }
             true
+        } else {
+            false
+        }
+    }
+
+    /// Check if service can stop (no dependent active services)
+    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+        for service in self.services.values() {
+            if service.status == RunitServiceStatus::Running && !stopped.contains(&service.name) {
+                if service.dependencies.contains(&String::from(name)) {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.start()
         } else {
             false
         }
