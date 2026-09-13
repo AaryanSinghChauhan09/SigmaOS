@@ -524,7 +524,7 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "containers" => {
+            "containers" | "container" => {
                 let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
                 chroot_engine.enter_chroot()?;
                 Ok(format!(
@@ -569,11 +569,189 @@ impl SovereignUniversalDistroBridge {
                     action, timeslice, self.mode
                 ))
             }
-            "virt" => {
+            "virt" | "virtualization" => {
                 Ok(format!(
                     "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
+            }
+            "auth" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd
+                    | DistroSubsystemMode::OpenBsd
+                    | DistroSubsystemMode::NetBsd
+                    | DistroSubsystemMode::DragonFlyBsd => {
+                        Ok(format!(
+                            "Dispatched BSD login.conf class auth limits and doas delegation for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => {
+                        Ok(format!(
+                            "Dispatched Solaris PAM RBAC authorization profile for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched Linux PAM and systemd-homed identity management for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "boot" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
+                        Ok(format!(
+                            "Dispatched FreeBSD bectl ZFS boot environment manager for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    DistroSubsystemMode::LinuxFedora => {
+                        Ok(format!(
+                            "Dispatched Fedora Ignition and Dracut initramfs stage execution for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
+                        Ok(format!(
+                            "Dispatched OpenBSD bootloader stage for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched multi-distro systemd-boot/GRUB kernel stub entry for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "input" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd
+                    | DistroSubsystemMode::NetBsd
+                    | DistroSubsystemMode::FreeBsd => {
+                        Ok(format!(
+                            "Dispatched BSD wscons keyboard/mouse console multiplexer for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched Wayland libinput gesture and multi-touch event router for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "thermal" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd
+                    | DistroSubsystemMode::OpenBsd
+                    | DistroSubsystemMode::NetBsd
+                    | DistroSubsystemMode::DragonFlyBsd => {
+                        Ok(format!(
+                            "Dispatched BSD sysctl hw.acpi.thermal/coretemp governor for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched Linux thermald active/passive CPU cooling governor for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "syscall" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd => {
+                        Ok(format!(
+                            "Dispatched OpenBSD pledge/unveil restriction sentinel filter for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    DistroSubsystemMode::FreeBsd => {
+                        Ok(format!(
+                            "Dispatched FreeBSD capsicum capability mode descriptor filter for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched Linux seccomp-bpf syscall filter rule engine for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "device" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd
+                    | DistroSubsystemMode::OpenBsd
+                    | DistroSubsystemMode::NetBsd
+                    | DistroSubsystemMode::DragonFlyBsd => {
+                        Ok(format!(
+                            "Dispatched BSD devd event daemon and dynamic devfs notifier for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched Linux udev rule matching and dynamic devfs device manager for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "crypto" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd => {
+                        Ok(format!(
+                            "Dispatched FreeBSD GELI transparent volume crypto and kernel Crypto framework for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    DistroSubsystemMode::OpenBsd => {
+                        Ok(format!(
+                            "Dispatched OpenBSD retguard stack canary and LibreSSL engine for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched Linux Kernel Crypto API and LUKS2 dm-crypt hardware acceleration for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
+            }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched CachyOS BORE AI scheduler and Omarchy Herdr AI Agent task optimizer for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd
+                    | DistroSubsystemMode::OpenBsd
+                    | DistroSubsystemMode::NetBsd
+                    | DistroSubsystemMode::DragonFlyBsd => {
+                        Ok(format!(
+                            "Dispatched BSD sysctl MIB tree inspection and kqueue kernel metrics for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                    _ => {
+                        Ok(format!(
+                            "Dispatched eBPF system observability and /proc /sys metrics exporter for '{}' under distro mode '{:?}'",
+                            action, self.mode
+                        ))
+                    }
+                }
             }
             "audit" => {
                 let mut pax_engine = HardenedBsdPaxGuardEngine::new();
@@ -1967,6 +2145,61 @@ mod cross_subsystem_tests {
                 assert!(!msg.is_empty());
             }
         }
+    }
+
+    #[test]
+    fn test_specific_subsystems_distro_dispatches() {
+        let mut linux_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        let auth_linux = linux_bridge.dispatch_cross_subsystem_operation("auth", "login").unwrap();
+        assert!(auth_linux.contains("Linux PAM and systemd-homed"));
+
+        let boot_linux = linux_bridge.dispatch_cross_subsystem_operation("boot", "vmlinuz").unwrap();
+        assert!(boot_linux.contains("systemd-boot/GRUB"));
+
+        let sys_linux = linux_bridge.dispatch_cross_subsystem_operation("syscall", "read").unwrap();
+        assert!(sys_linux.contains("seccomp-bpf"));
+
+        let dev_linux = linux_bridge.dispatch_cross_subsystem_operation("device", "sda1").unwrap();
+        assert!(dev_linux.contains("udev"));
+
+        let crypto_linux = linux_bridge.dispatch_cross_subsystem_operation("crypto", "aes-256").unwrap();
+        assert!(crypto_linux.contains("Kernel Crypto API"));
+
+        let ai_res = linux_bridge.dispatch_cross_subsystem_operation("ai", "train").unwrap();
+        assert!(ai_res.contains("CachyOS BORE AI scheduler"));
+
+        let mon_linux = linux_bridge.dispatch_cross_subsystem_operation("monitoring", "cpu").unwrap();
+        assert!(mon_linux.contains("eBPF system observability"));
+
+        let mut freebsd_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::FreeBsd);
+        let auth_bsd = freebsd_bridge.dispatch_cross_subsystem_operation("auth", "login").unwrap();
+        assert!(auth_bsd.contains("BSD login.conf"));
+
+        let boot_bsd = freebsd_bridge.dispatch_cross_subsystem_operation("boot", "zfs_env").unwrap();
+        assert!(boot_bsd.contains("bectl ZFS boot environment"));
+
+        let sys_bsd = freebsd_bridge.dispatch_cross_subsystem_operation("syscall", "cap_enter").unwrap();
+        assert!(sys_bsd.contains("capsicum capability mode"));
+
+        let dev_bsd = freebsd_bridge.dispatch_cross_subsystem_operation("device", "ada0").unwrap();
+        assert!(dev_bsd.contains("devd event daemon"));
+
+        let crypto_bsd = freebsd_bridge.dispatch_cross_subsystem_operation("crypto", "geli_init").unwrap();
+        assert!(crypto_bsd.contains("GELI transparent volume crypto"));
+
+        let mon_bsd = freebsd_bridge.dispatch_cross_subsystem_operation("monitoring", "sysctl").unwrap();
+        assert!(mon_bsd.contains("sysctl MIB tree inspection"));
+
+        let mut openbsd_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::OpenBsd);
+        let sys_openbsd = openbsd_bridge.dispatch_cross_subsystem_operation("syscall", "pledge").unwrap();
+        assert!(sys_openbsd.contains("pledge/unveil restriction sentinel"));
+
+        let crypto_openbsd = openbsd_bridge.dispatch_cross_subsystem_operation("crypto", "retguard").unwrap();
+        assert!(crypto_openbsd.contains("retguard stack canary"));
+
+        let mut fedora_bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxFedora);
+        let boot_fedora = fedora_bridge.dispatch_cross_subsystem_operation("boot", "ignition").unwrap();
+        assert!(boot_fedora.contains("Fedora Ignition and Dracut"));
     }
 
     #[test]
