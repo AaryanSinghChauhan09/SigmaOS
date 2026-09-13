@@ -10,13 +10,20 @@ use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 
-/// Runit Supervision Stage
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RunitStage {
-    Stage1,
-    Stage2,
-    Stage3,
-}
+
+#[cfg(not(test))]
+use std::collections::BTreeMap;
+#[cfg(not(test))]
+use std::string::String;
+#[cfg(not(test))]
+use std::vec::Vec;
+
+#[cfg(test)]
+use std::collections::BTreeMap;
+#[cfg(test)]
+use std::string::String;
+#[cfg(test)]
+use std::vec::Vec;
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,6 +33,14 @@ pub enum RunitServiceStatus {
     Running,
     Stopping,
     Failed,
+}
+
+/// Runit Stage Execution Phase
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1,
+    Stage2,
+    Stage3,
 }
 
 /// Runit Service Definition
@@ -92,7 +107,13 @@ impl RunitService {
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
     pub stage: RunitStage,
-    pub current_stage_num: u32,
+    pub current_stage_num: u8,
+}
+
+impl Default for RunitSupervisor {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl RunitSupervisor {
@@ -176,7 +197,13 @@ impl RunitSupervisor {
         }
     }
 
-    fn can_stop_service(&self, _name: &str, _stopped: &[String]) -> bool {
+    /// Check if service can stop (no active dependents)
+    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+        for (other_name, service) in &self.services {
+            if !stopped.contains(other_name) && service.dependencies.contains(&name.to_string()) {
+                return false;
+            }
+        }
         true
     }
 

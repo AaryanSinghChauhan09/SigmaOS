@@ -509,61 +509,42 @@ impl Default for CronJobScheduler {
     }
 }
 
-// ============================================================================
-// 7. Encrypted DNS-over-TLS & DNSSEC Resolver Engine (systemd-resolved / Unbound)
-// ============================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
 
 #[derive(Debug, Clone)]
 pub struct DnsRecordEntry {
-    pub domain_name: &'static str,
+    pub domain: String,
     pub ip_address: [u8; 4],
-    pub ttl_seconds: u32,
-    pub dnssec_validated: bool,
 }
 
-#[derive(Debug)]
 pub struct SovereignDnsTlsResolverEngine {
-    pub upstream_dot_server: [u8; 4], // e.g. 1.1.1.1
-    pub dot_port: u16,                // 853
-    pub local_cache: Vec<DnsRecordEntry>,
-    pub dnssec_enforced: bool,
+    pub primary_dns_ip: [u8; 4],
+    pub records: Vec<DnsRecordEntry>,
 }
 
 impl SovereignDnsTlsResolverEngine {
-    pub fn new(upstream_dot_server: [u8; 4]) -> Self {
-        let mut resolver = Self {
-            upstream_dot_server,
-            dot_port: 853,
-            local_cache: Vec::new(),
-            dnssec_enforced: true,
-        };
-        resolver.cache_record("localhost", [127, 0, 0, 1], 3600, true);
-        resolver
-    }
-
-    pub fn cache_record(&mut self, domain_name: &'static str, ip_address: [u8; 4], ttl_seconds: u32, dnssec_validated: bool) {
-        self.local_cache.push(DnsRecordEntry {
-            domain_name,
-            ip_address,
-            ttl_seconds,
-            dnssec_validated,
+    pub fn new(primary_dns_ip: [u8; 4]) -> Self {
+        let mut records = Vec::new();
+        records.push(DnsRecordEntry {
+            domain: "localhost".to_string(),
+            ip_address: [127, 0, 0, 1],
         });
+        Self { primary_dns_ip, records }
     }
 
-    pub fn resolve_domain(&self, domain_name: &str) -> Option<[u8; 4]> {
-        self.local_cache
-            .iter()
-            .find(|r| r.domain_name == domain_name)
-            .map(|r| r.ip_address)
+    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
+        self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
     }
+}
 
-    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-        match alias {
-            "char-major-10-200" => Some("tun"),
-            "net-pf-10" => Some("ipv6"),
-            "block-major-8-0" => Some("sda"),
-            _ => None,
-        }
+impl Default for DemandPagingSwapEngine {
+    fn default() -> Self {
+        Self::new(2048)
     }
 }
 
@@ -655,13 +636,6 @@ impl Default for SovereignDynamicDevfsEngine {
 // ============================================================================
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-    Masquerade,
-}
 
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
