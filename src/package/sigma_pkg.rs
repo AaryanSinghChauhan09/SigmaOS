@@ -892,4 +892,44 @@ mod tests {
         assert!(manifest.contains("Package: firefox"));
         assert!(manifest.contains("Format: FedoraRpm"));
     }
+
+    #[test]
+    fn test_query_foreign_package_manifest_formats() {
+        let pkg_mgr = SigmaPkg {
+            config: PkgConfig::default(),
+            repositories: vec![],
+            local_packages: HashMap::new(),
+            cache_dir: PathBuf::from("/tmp/sigma_cache_test2"),
+            database_dir: PathBuf::from("/tmp/sigma_db_test2"),
+        };
+
+        let formats_to_test = [
+            ("app.deb", "DebianDeb"),
+            ("app.pkg.tar.zst", "ArchPacman"),
+            ("app.rpm", "FedoraRpm"),
+            ("app.apk", "AlpineApk"),
+            ("app.ebuild", "GentooEbuild"),
+            ("app.xbps", "VoidXbps"),
+            ("app.txz", "FreeBsdPkg"),
+            ("app.openbsd.tgz", "OpenBsdPkg"),
+            ("app.pkgsrc.tgz", "NetBsdPkgsrc"),
+            ("app.slackware.txz", "SlackwarePkg"),
+            ("app.nix", "NixDerivation"),
+            ("app.scm", "GuixPackage"),
+            ("app.hpkg", "HaikuHpkg"),
+            ("app.flatpak", "FlatpakBundle"),
+            ("app.snap", "SnapPackage"),
+            ("app.AppImage", "AppImageBinary"),
+        ];
+
+        for (filename, expected_format) in formats_to_test {
+            let manifest = pkg_mgr.query_foreign_package_manifest(filename).unwrap();
+            assert!(
+                manifest.contains(expected_format),
+                "Manifest output for '{}' did not contain format '{}'",
+                filename,
+                expected_format
+            );
+        }
+    }
 }
