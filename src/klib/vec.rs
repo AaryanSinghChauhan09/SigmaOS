@@ -10,17 +10,12 @@ pub struct Vec<T> {
 }
 
 impl<T: PartialEq> Vec<T> {
+    /// Check if the vector contains `item`.
+    /// Optimized by Bolt ⚡: replaces manual pointer offset loop with `self.as_slice().contains(item)`.
+    /// Delegating to core slice searching enables compiler auto-vectorization (SIMD byte/word search)
+    /// and eliminates per-iteration pointer arithmetic and unsafe blocks.
     pub fn contains(&self, item: &T) -> bool {
-        for i in 0..self.len {
-            // SAFETY: `i` is always in `0..self.len`, and `self.data` points to a valid,
-            // initialised allocation of at least `self.len` elements.
-            unsafe {
-                if &*self.data.add(i) == item {
-                    return true;
-                }
-            }
-        }
-        false
+        self.as_slice().contains(item)
     }
 }
 
@@ -683,5 +678,22 @@ mod tests {
         let removed_tail = v.remove(3);
         assert_eq!(removed_tail, 35);
         assert_eq!(v.as_slice(), &[10, 20, 30]);
+    }
+
+    #[test]
+    fn test_vec_contains() {
+        let empty: Vec<i32> = Vec::new();
+        assert!(!empty.contains(&10));
+
+        let mut v: Vec<i32> = Vec::new();
+        v.push(100);
+        v.push(200);
+        v.push(300);
+
+        assert!(v.contains(&100));
+        assert!(v.contains(&200));
+        assert!(v.contains(&300));
+        assert!(!v.contains(&400));
+        assert!(!v.contains(&0));
     }
 }

@@ -45,3 +45,7 @@
 ## 2026-09-13 - Fast Raw Byte-Scanning Path for JSON String Parsing
 **Learning:** In JSON recursive descent parsers, iterating over string characters using `.chars().next()` decodes UTF-8 multi-byte sequences for every byte in the input string. Scanning raw byte slices (`&[u8]`) directly until hitting delimiter bytes (`"` or `\`) bypasses character decoding entirely for escape-free strings (the majority of JSON strings), resulting in a significant parsing throughput increase while falling back safely to UTF-8 decoding when backslash escapes are encountered.
 **Action:** When parsing text formats or string literals, use raw byte-level scanning for delimiter detection and fast slicing before falling back to multi-byte UTF-8 character decoding.
+
+## 2026-09-14 - Vectorized Slice Searching in Custom `Vec` Traversals
+**Learning:** In raw `Vec` abstractions, manually looping over elements with raw pointer indexing (`self.data.add(i)`) prevents LLVM from recognizing SIMD auto-vectorization patterns and adds unnecessary pointer arithmetic overhead per element. Delegating linear searches to `self.as_slice().contains(item)` converts raw pointer iterations into core slice search operations, allowing the compiler to emit vectorized SSE/AVX/NEON search routines or fast `memchr` byte scans.
+**Action:** Always delegate element linear searches in custom vector or collection types to `as_slice()` slice operations to enable compiler auto-vectorization.
