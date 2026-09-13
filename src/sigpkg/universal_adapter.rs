@@ -1740,8 +1740,6 @@ impl UniversalDependencyMapper {
             "git" | "git-base" | "dev-vcs/git" => "git".to_string(),
             "cmake" | "dev-build/cmake" => "cmake".to_string(),
             "ffmpeg" | "libffmpeg-dev" | "media-video/ffmpeg" => "ffmpeg".to_string(),
-            "archlinux-keyring-wkd" | "arch-keyring" => "arch-keyring".to_string(),
-            "pacman-utils" | "pacman-contrib" => "pacman-contrib".to_string(),
             "rust" | "rustc" | "dev-lang/rust" => "rust".to_string(),
             "golang" | "go" | "dev-lang/go" => "go".to_string(),
             "ninja" | "ninja-build" | "dev-build/ninja" => "ninja".to_string(),
