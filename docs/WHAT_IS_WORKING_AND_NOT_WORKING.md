@@ -318,6 +318,16 @@ Recent GitHub Actions CI checks revealed key failure modes across workflow confi
 - **Root Cause**: Structs needed by standalone test runners were deleted or gated behind `#[cfg(not(feature = "standalone_test"))]`.
 - **Fix Pattern**: Ensure all structs and enums referenced in `mod tests` are unconditionally defined or properly gated with `#[cfg(any(feature = "standalone_test", test))]`.
 
+### Case 5: `Cargo.toml` Duplicate Feature Key (`TOML parse error`)
+- **Symptom**: `error: failed to parse manifest at Cargo.toml: duplicate key cache-lru in table features`
+- **Root Cause**: Redundant or copy-pasted feature flag keys (`cache-lru = []`) in `Cargo.toml` causing Cargo build failure (exit code 101).
+- **Fix Pattern**: Audit `Cargo.toml` under `[features]` and remove duplicate feature key definitions.
+
+### Case 6: Incomplete Extension Handling in `PackageFormat::from_filename`
+- **Symptom**: Tests in `tests/test_universal_adapter.rs` fail assertion when evaluating extended distro package formats (`.air`, `.bottle`, `.ipa`, `.ports`, `.aab`, `.AppImage`, `.eopkg`, `.superdeb`, `.lzm`, `.pup`, `.pet`, `.snap`, `.flatpak`, `.hpkg`, `.moss`, `.tcz`, `.gobo`, `.ostree`, `.pkgsrc`, `.sfs`, `.puk`, `.dmg`, `.cports`, `.dports`, `.slackbuild`, `.crux`, `.stratum`, `.xbps`, `.zypper`, `.guix`).
+- **Root Cause**: `PackageFormat::from_filename` in `src/sigpkg/universal_engine.rs` only handled primary formats (`.deb`, `.rpm`, `.apk`, `.ebuild`, `.nix`, `.sysupdate`, `.sigma`).
+- **Fix Pattern**: Normalize filename case and spaces, then match suffixes across all 29 supported package format extensions.
+
 
 ## 4. Production-Grade Safe Rust Code Blueprints (How To Fix It)
 
