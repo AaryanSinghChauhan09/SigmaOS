@@ -231,14 +231,6 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
-    Spack,
-    Conan,
-    Wheel,
-    Crate,
-    Gem,
-    Nupkg,
-    Vcpkg,
-    NarInfo,
 }
 
 impl PackageFormat {
