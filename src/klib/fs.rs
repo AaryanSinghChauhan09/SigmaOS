@@ -1,7 +1,7 @@
 //! Custom file system implementation for SigmaOS
 //! This module provides no_std alternatives to std::fs
 
-use core::ffi::c_char;
+type c_char = i8;
 use core::fmt;
 use std::string::String;
 use std::vec::Vec;
