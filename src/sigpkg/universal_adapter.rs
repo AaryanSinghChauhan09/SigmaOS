@@ -75,23 +75,9 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(not(feature = "standalone_test"))]
-pub use crate::sigpkg::Version;
-
-#[cfg(feature = "standalone_test")]
-pub use crate::universal_oop_system::Version;
-
-#[cfg(not(feature = "standalone_test"))]
-pub use crate::sigpkg::universal_engine::PackageFormat;
-
-#[cfg(feature = "standalone_test")]
-pub use crate::universal_engine::PackageFormat;
-
-#[cfg(not(feature = "standalone_test"))]
-pub use crate::sigpkg::universal_oop_system;
-
-#[cfg(feature = "standalone_test")]
-pub use crate::universal_oop_system;
+pub use super::universal_engine::PackageFormat;
+pub use super::universal_oop_system;
+pub use super::universal_oop_system::Version;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

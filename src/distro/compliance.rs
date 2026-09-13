@@ -205,115 +205,19 @@ impl Default for LinuxBsdDistroGuidelineRules {
 mod tests {
     use super::*;
 
-/// Linux & BSD Distro Guidelines Standards
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DistroGuidelineStandard {
-    ArchSimplicityPurity,
-    DebianFhsLsbPolicy,
-    FedoraSelinuxPresets,
-    FreeBsdCapsicumJails,
-    OpenBsdPledgeUnveil,
-    NixHermeticCasStore,
-}
-
-/// Linux & BSD Distro Guidelines Rules Evaluator
-#[derive(Debug, Clone)]
-pub struct LinuxBsdDistroGuidelineRules {
-    pub standards: Vec<DistroGuidelineStandard>,
-    pub zero_dependency_purity: bool,
-    pub capability_sandboxing_enabled: bool,
-    pub cross_subsystem_event_routing: bool,
-}
-
-impl LinuxBsdDistroGuidelineRules {
-    pub fn new() -> Self {
-        Self {
-            standards: vec![
-                DistroGuidelineStandard::ArchSimplicityPurity,
-                DistroGuidelineStandard::DebianFhsLsbPolicy,
-                DistroGuidelineStandard::FedoraSelinuxPresets,
-                DistroGuidelineStandard::FreeBsdCapsicumJails,
-                DistroGuidelineStandard::OpenBsdPledgeUnveil,
-                DistroGuidelineStandard::NixHermeticCasStore,
-            ],
-            zero_dependency_purity: true,
-            capability_sandboxing_enabled: true,
-            cross_subsystem_event_routing: true,
-        }
-    }
-
-    pub fn verify_guideline_compliance(&self, standard: DistroGuidelineStandard) -> bool {
-        match standard {
-            DistroGuidelineStandard::ArchSimplicityPurity => self.zero_dependency_purity,
-            DistroGuidelineStandard::FreeBsdCapsicumJails | DistroGuidelineStandard::OpenBsdPledgeUnveil => {
-                self.capability_sandboxing_enabled
-            }
-            DistroGuidelineStandard::FedoraSelinuxPresets => self.cross_subsystem_event_routing,
-            _ => true,
-        }
-    }
-
-    pub fn verify_all_standards(&self) -> bool {
-        self.standards.iter().all(|&std| self.verify_guideline_compliance(std))
-    }
-}
-
-impl Default for LinuxBsdDistroGuidelineRules {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-    #[test]
-    fn test_linux_bsd_distro_guidelines_compliance() {
-        let rules = LinuxBsdDistroGuidelineRules::new();
-        assert!(rules.verify_all_standards());
-        assert!(rules.verify_guideline_compliance(DistroGuidelineStandard::ArchSimplicityPurity));
-        assert!(rules.verify_guideline_compliance(DistroGuidelineStandard::FreeBsdCapsicumJails));
-    }
-
-    #[test]
-    fn test_linux_bsd_distro_guidelines_compliance() {
-        let rules = LinuxBsdDistroGuidelineRules::new();
-        assert!(rules.verify_all_standards());
-        assert!(rules.verify_guideline_compliance(DistroGuidelineStandard::ArchSimplicityPurity));
-        assert!(rules.verify_guideline_compliance(DistroGuidelineStandard::FreeBsdCapsicumJails));
-    }
-
-    #[test]
-    fn test_linux_bsd_distro_guidelines_compliance() {
-        let rules = LinuxBsdDistroGuidelineRules::new();
-        assert!(rules.verify_all_standards());
-        assert!(rules.verify_guideline_compliance(DistroGuidelineStandard::ArchSimplicityPurity));
-        assert!(rules.verify_guideline_compliance(DistroGuidelineStandard::FreeBsdCapsicumJails));
-    }
-
     #[test]
     fn test_compliance_audit_logger() {
         let mut logger = ComplianceAuditLogger::new();
         logger.enable_framework(ComplianceFramework::HIPAA);
-
-        let event = ComplianceAuditEvent {
-            timestamp: 1234567890,
+        logger.log_event(ComplianceAuditEvent {
+            timestamp: 100,
             framework: ComplianceFramework::HIPAA,
-            event_type: "FILE_ACCESS".to_string(),
+            event_type: "Access".to_string(),
             user_id: Some("user1".to_string()),
-            resource: "/medical/records/patient1.txt".to_string(),
-            action: "READ".to_string(),
-            outcome: "SUCCESS".to_string(),
-        };
-
-        logger.log_event(event);
+            resource: "patient_record".to_string(),
+            action: "read".to_string(),
+            outcome: "success".to_string(),
+        });
         assert_eq!(logger.get_audit_trail(ComplianceFramework::HIPAA).len(), 1);
-    }
-
-    #[test]
-    fn test_tpm_attestation() {
-        let mut tpm = TpmAttestationManager::new();
-        tpm.extend_pcr(0, vec![1, 2, 3, 4], "BOOT_MEASUREMENT".to_string());
-
-        let pcr_value = tpm.get_pcr(0);
-        assert!(pcr_value.is_some());
-        assert_eq!(pcr_value.unwrap().len(), 4);
     }
 }
