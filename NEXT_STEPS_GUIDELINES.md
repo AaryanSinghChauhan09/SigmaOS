@@ -16,7 +16,7 @@ This document provides a complete, actionable technical analysis, guidelines, an
 * To run standalone module tests, execute:
   ```bash
   rustc --test src/package/universal.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_universal && /tmp/test_universal
-  rustc --test src/distro/omarchy.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_omarchy && /tmp/test_omarchy
+  rustc --test src/sigpkg/universal_oop_system.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_sigpkg_oop && /tmp/test_sigpkg_oop
   ```
 * Ensure all unit test suites maintain a 100% pass rate before committing changes directly to `main`.
 
