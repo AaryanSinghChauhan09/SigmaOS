@@ -54,7 +54,6 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod missing_linux_kernel_components;
 pub mod structures;
 
 pub use missing_linux_kernel_components::{

@@ -67,7 +67,6 @@ pub use qubes_isolation::{
     DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
 };
 
-pub use qubes_isolation::*;
 pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
@@ -130,8 +129,6 @@ pub use pledge::{
     promises, PledgeError, PledgeManager as OriginalPledgeManager,
     PledgePromise as OriginalPledgePromise,
 };
-pub use qubes_isolation::*;
-pub use root_improvement::*;
 pub use rules::{
     AuditAccessType, AuditSyscallRule, AuditWatchRule, PfAction, PfFilterRule, PledgeRule,
     SecurelevelState, SovereignAuditRuleEngine, SovereignNetworkFilterRulesEngine,
@@ -163,5 +160,3 @@ pub use vulnerability::{
 };
 pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
 pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};
-pub mod defensive_audit;
-pub mod parrot;

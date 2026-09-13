@@ -15,23 +15,6 @@ where
     entries: Vec<(K, V)>,
 }
 
-impl<K, V> PartialEq for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: PartialEq + Clone,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.entries == other.entries
-    }
-}
-
-impl<K, V> Eq for BTreeMap<K, V>
-where
-    K: Eq + Clone + Ord,
-    V: Eq + Clone,
-{
-}
-
 impl<K, V> Clone for BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -43,22 +26,6 @@ where
         }
     }
 }
-
-impl<K, V> PartialEq for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: PartialEq + Clone,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.entries == other.entries
-    }
-}
-
-impl<K, V> Eq for BTreeMap<K, V>
-where
-    K: Eq + Clone + Ord,
-    V: Eq + Clone,
-{}
 
 pub enum Entry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
     Occupied(OccupiedEntry<'a, K, V>),
@@ -111,75 +78,62 @@ where
         }
     }
 
-    pub fn insert(&mut self, key: K, value: V) {
-        // Find insertion point to maintain sorted order
-        let mut insert_idx = self.entries.len();
-        for (i, (k, _)) in self.entries.iter().enumerate() {
-            if k == &key {
-                // Update existing
-                self.entries[i] = (key, value);
-                return;
+    /// Inserts a key-value pair into the map in sorted order using O(log N) binary search.
+    /// Returns the previous value if the key was already present in the map.
+    pub fn insert(&mut self, key: K, value: V) -> Option<V> {
+        match self.entries.binary_search_by(|(k, _)| k.cmp(&key)) {
+            Ok(idx) => {
+                let old = core::mem::replace(&mut self.entries[idx].1, value);
+                Some(old)
             }
-            if k > &key {
-                insert_idx = i;
-                break;
+            Err(idx) => {
+                self.entries.insert(idx, (key, value));
+                None
             }
         }
-        self.entries.insert(insert_idx, (key, value));
     }
 
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
-        for i in 0..self.entries.len() {
-            if self.entries[i].0 == key {
-                return Entry::Occupied(OccupiedEntry {
-                    map: self,
-                    index: i,
-                });
-            }
+        match self.entries.binary_search_by(|(k, _)| k.cmp(&key)) {
+            Ok(idx) => Entry::Occupied(OccupiedEntry {
+                map: self,
+                index: idx,
+            }),
+            Err(_) => Entry::Vacant(VacantEntry { map: self, key }),
         }
-        Entry::Vacant(VacantEntry { map: self, key })
     }
 
     pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
-        Q: PartialEq,
+        Q: Ord,
     {
-        for (k, v) in self.entries.iter() {
-            let b: &Q = k.borrow();
-            if b == key {
-                return Some(v);
-            }
+        match self.entries.binary_search_by(|(k, _)| k.borrow().cmp(key)) {
+            Ok(idx) => Some(&self.entries[idx].1),
+            Err(_) => None,
         }
-        None
     }
 
     pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
     where
         K: Borrow<Q>,
-        Q: PartialEq,
+        Q: Ord,
     {
-        for (k, v) in self.entries.iter_mut() {
-            let b: &Q = (*k).borrow();
-            if b == key {
-                return Some(v);
-            }
+        match self.entries.binary_search_by(|(k, _)| k.borrow().cmp(key)) {
+            Ok(idx) => Some(&mut self.entries[idx].1),
+            Err(_) => None,
         }
-        None
     }
 
     pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
     where
         K: Borrow<Q>,
-        Q: PartialEq,
+        Q: Ord,
     {
-        for i in 0..self.entries.len() {
-            let b: &Q = self.entries[i].0.borrow();
-            if b == key {
-                return Some(self.entries.remove(i).1);
-            }
+        match self.entries.binary_search_by(|(k, _)| k.borrow().cmp(key)) {
+            Ok(idx) => Some(self.entries.remove(idx).1),
+            Err(_) => None,
         }
-        None
     }
 
     pub fn remove_str(&mut self, key: &str) -> Option<V>
@@ -197,7 +151,7 @@ where
     pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
     where
         K: Borrow<Q>,
-        Q: PartialEq,
+        Q: Ord,
     {
         self.get(key).is_some()
     }
