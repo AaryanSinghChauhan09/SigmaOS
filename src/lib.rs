@@ -83,7 +83,10 @@ pub use distro::{
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
     OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig, OmarchyHyprlandWorkspaceSnapLayoutEngine,
     OmarchyLiveIsoBootstrapEngine, OmarchyLuaConfigEngine, OmarchyNeovimPresetStudioEngine,
-    OmarchyWaybarAppletStudioEngine,
+    OmarchyWaybarAppletStudioEngine, PopOsSystem76PowerSchedulerEngine, System76PowerProfile,
+    GpuSwitchMode, UbuntuSnapAppArmorSecurityEngine, AppArmorProfileMode, SnapSecurityConfinement,
+    DeepinDdeWindowManagerEngine, DdeDockMode, GhostBsdNetworkMgrEngine, WifiAccessPoint,
+    SovereignLinuxBsdDistroGapsSynthesisSuite,
 };
 
 pub use package::bsd_linux_package_innovations::{
