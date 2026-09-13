@@ -45,7 +45,7 @@ export class SovereignDomSelector {
 
 export function initKeyboardNavigation() {
   const interactiveElements = SovereignDomSelector.selectAll(
-    '[role="button"], [tab-index="0"]',
+    'button, [role="button"], [tabindex="0"], [tab-index="0"], [role="tab"], a[href], input, select, textarea',
   );
 
   interactiveElements.forEach((element) => {

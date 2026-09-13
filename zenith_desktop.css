@@ -887,13 +887,15 @@ body.high-contrast-active .wizard-btn {
 }
 
 /* Accessibility focus indicators for keyboard navigation (WCAG 2.1 Level AA) */
-:focus-visible {
+:focus-visible,
+.keyboard-focus {
     outline: 3px solid var(--accent-gold, #ffaa00) !important;
     outline-offset: 3px !important;
     box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.2), 0 0 15px var(--accent-gold-glow, rgba(255, 170, 0, 0.4)) !important;
 }
 
-body.high-contrast-active :focus-visible {
+body.high-contrast-active :focus-visible,
+body.high-contrast-active .keyboard-focus {
     outline: 4px solid #ffffff !important;
     outline-offset: 4px !important;
     box-shadow: 0 0 0 8px #000000, 0 0 0 12px #ffffff !important;
