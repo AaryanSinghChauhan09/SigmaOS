@@ -5,24 +5,8 @@
  * health checking, and automatic restart policy governance.
  */
 
-
 use std::collections::BTreeMap;
 use std::string::String;
-use std::vec::Vec;
-
-
-#[cfg(not(test))]
-use std::collections::BTreeMap;
-#[cfg(not(test))]
-use std::string::String;
-#[cfg(not(test))]
-use std::vec::Vec;
-
-#[cfg(test)]
-use std::collections::BTreeMap;
-#[cfg(test)]
-use std::string::String;
-#[cfg(test)]
 use std::vec::Vec;
 
 /// Runit Stage
@@ -179,7 +163,7 @@ impl RunitSupervisor {
     }
 
     /// Check if service can start (dependencies satisfied)
-    fn can_start_service(&self, name: &str, started: &[String]) -> bool {
+    pub fn can_start_service(&self, name: &str, started: &[String]) -> bool {
         if let Some(service) = self.services.get(name) {
             for dep in &service.dependencies {
                 if !started.contains(dep) {
@@ -193,7 +177,7 @@ impl RunitSupervisor {
     }
 
     /// Check if service can stop (dependents already stopped)
-    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+    pub fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
         for (other_name, service) in &self.services {
             if service.dependencies.contains(&String::from(name)) && !stopped.contains(other_name) {
                 return false;
@@ -252,6 +236,8 @@ impl RunitSupervisor {
         }
     }
 }
+
+pub type ServiceState = RunitServiceStatus;
 
 #[cfg(test)]
 mod tests {
