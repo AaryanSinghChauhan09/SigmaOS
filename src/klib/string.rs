@@ -400,18 +400,24 @@ impl core::ops::Index<usize> for SigmaString {
 
 /// Pattern trait for string operations
 pub trait Pattern {
-    fn find_in(&self, haystack: &SigmaString) -> Option<usize>;
-    fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize>;
+    fn find_in(&self, haystack: &SigmaString) -> Option<usize> {
+        self.find_in_str(haystack.as_str())
+    }
+    fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize> {
+        self.find_in_str_from(haystack.as_str(), start)
+    }
+    fn find_in_str(&self, haystack: &str) -> Option<usize>;
+    fn find_in_str_from(&self, haystack: &str, start: usize) -> Option<usize>;
     fn pattern_len(&self) -> usize;
 }
 
 impl Pattern for char {
-    fn find_in(&self, haystack: &SigmaString) -> Option<usize> {
-        haystack.as_str().find(*self)
+    fn find_in_str(&self, haystack: &str) -> Option<usize> {
+        haystack.find(*self)
     }
 
-    fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize> {
-        haystack.as_str()[start..].find(*self).map(|i| start + i)
+    fn find_in_str_from(&self, haystack: &str, start: usize) -> Option<usize> {
+        haystack[start..].find(*self).map(|i| start + i)
     }
 
     fn pattern_len(&self) -> usize {
@@ -420,12 +426,12 @@ impl Pattern for char {
 }
 
 impl Pattern for &str {
-    fn find_in(&self, haystack: &SigmaString) -> Option<usize> {
-        haystack.as_str().find(*self)
+    fn find_in_str(&self, haystack: &str) -> Option<usize> {
+        haystack.find(*self)
     }
 
-    fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize> {
-        haystack.as_str()[start..].find(*self).map(|i| start + i)
+    fn find_in_str_from(&self, haystack: &str, start: usize) -> Option<usize> {
+        haystack[start..].find(*self).map(|i| start + i)
     }
 
     fn pattern_len(&self) -> usize {
@@ -434,6 +440,8 @@ impl Pattern for &str {
 }
 
 /// Split iterator for SigmaString
+/// Optimized by Bolt ⚡: searches `self.haystack` directly via `find_in_str` without creating
+/// a temporary `SigmaString` heap allocation per iteration step.
 pub struct Split<'a, P> {
     haystack: &'a str,
     pat: P,
@@ -450,8 +458,7 @@ where
         if self.finished {
             return None;
         }
-        let temp_string = SigmaString::from_str(self.haystack);
-        if let Some(idx) = self.pat.find_in(&temp_string) {
+        if let Some(idx) = self.pat.find_in_str(self.haystack) {
             let end = idx + self.pat.pattern_len();
             let result = SigmaString::from_str(&self.haystack[..idx]);
             self.haystack = &self.haystack[end..];
