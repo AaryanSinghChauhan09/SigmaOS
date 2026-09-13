@@ -2150,7 +2150,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" | "pkg_add" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
@@ -2166,6 +2166,20 @@ impl UniversalPmCommandDispatcher {
                         _ => {}
                     }
                     i += 1;
+                }
+            }
+            "pkg_add" | "pkg_info" => {
+                if pm == "pkg_add" {
+                    operation = UniversalPmOperation::Install;
+                } else {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
+                for arg in args {
+                    if *arg == "-n" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
                 }
             }
             "slackpkg" | "installpkg" | "removepkg" => {
@@ -2204,7 +2218,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "flatpak" | "snap" | "pkgman" | "swupd" | "brew" => {
+            "flatpak" | "snap" | "pkgman" | "swupd" | "brew" | "cachyos-hello" | "chwd" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2224,20 +2238,6 @@ impl UniversalPmCommandDispatcher {
                         _ => {}
                     }
                     i += 1;
-                }
-            }
-            "pkg_add" | "pkg_info" => {
-                if pm == "pkg_add" {
-                    operation = UniversalPmOperation::Install;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
-                for arg in args {
-                    if *arg == "-n" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
-                    }
                 }
             }
             "pisi" | "urpmi" | "slapt-get" => {
@@ -2795,7 +2795,7 @@ impl Default for UniversalDryRunSimulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
