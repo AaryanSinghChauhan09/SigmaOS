@@ -57,6 +57,8 @@ pub mod open_source_obsoletion;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
+pub mod wiki_unimplemented_ideas;
+pub use wiki_unimplemented_ideas::*;
 
 pub use distro::{
     ArchMkinitcpioGeneratorEngine, ArchPacmanKeyringEngine, ArchPowerpillParallelDownloadEngine,

@@ -1798,71 +1798,87 @@ mod tests {
 
     #[test]
     fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8 };
-        let mmio = ModernMmioController { mmio_base: 0xFE00_0000 };
+        let pio = LegacyController { base_port: 0x3F8, ports_buffer: [0u8; 16], power_state: PowerState::D0Active };
+        let mmio = ModernController { mmio_base_addr: 0xFE00_0000, mmio_buffer: [0u64; 16], power_state: PowerState::D0Active };
 
-        assert_eq!(pio.read_register(0), 0x3F8);
-        assert_eq!(mmio.read_register(0), 0xFE00_0000);
+        assert_eq!(pio.base_port, 0x3F8);
+        assert_eq!(mmio.mmio_base_addr, 0xFE00_0000);
 
-        let mut mgr = BareMetalUnifiedPeripheralManager::new();
-        assert!(mgr.register_device(0x1002, 0x3F8, false).is_ok());
-        assert!(mgr.register_device(0x8086, 0xFE00_0000, true).is_ok());
-        assert_eq!(mgr.device_count, 2);
+        let mut mgr = BareMetalPeripheralManager::new();
+        assert!(mgr.register_device(alloc::boxed::Box::new(pio)).is_ok());
+        assert!(mgr.register_device(alloc::boxed::Box::new(mmio)).is_ok());
+        assert_eq!(mgr.registry.len(), 2);
     }
 
     #[test]
     fn test_zero_allocation_udf_bytecode_vm() {
-        let mut vm = UdfVm::new();
+        let mut vm = UdfVm::new(0x0, 0x1000);
+        let mut pio = LegacyController {
+            base_port: 0x3F8,
+            ports_buffer: [0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0],
+            power_state: PowerState::D0Active,
+        };
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
-            UdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
+            UdfInstruction { opcode: 0x10, reg_dest: 0, reg_src: 0, address_or_imm: 0x3F8 },
+            UdfInstruction { opcode: 0x30, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction { opcode: 0xF0, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
         ];
-        let res = vm.execute(&code).unwrap();
-        assert_eq!(res, 0x3F8 + 10);
+        let res = vm.execute_program(&code, &mut pio).unwrap();
+        assert_eq!(res, 200);
     }
 
     #[test]
     fn test_constraint_sat_solver() {
-        let mut solver = ConstraintSatSolver::new();
-        let nodes = [
-            PackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
-            PackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
-        ];
-        assert!(solver.resolve_satisfiability(&nodes).is_ok());
+        let mut solver = SatSolverEngine::new();
+        let node1 = PackageNode {
+            pkg_id: 1,
+            version: PkgVersion { major: 1, minor: 0 },
+            dependencies: [None, None, None, None],
+        };
+        assert!(solver.add_package_node(node1));
+        assert!(solver.solve(1));
     }
 
     #[test]
     fn test_jbd2_transactional_ledger() {
-        let mut ledger = Jbd2TransactionLedger::new();
-        let tx_id = ledger.write_transaction(0x1000, &[1, 2, 3, 4]).unwrap();
-        assert_eq!(tx_id, 1);
-        assert_eq!(ledger.head, 1);
+        let mut ledger = Jbd2TransactionLedger::new(0x1000);
+        let res = ledger.commit_transaction(1, 0x2000, &[0u8; 64]);
+        assert!(res.is_ok());
+        assert_eq!(ledger.head_ptr, 1);
 
-        ledger.rollback_transaction();
-        assert_eq!(ledger.head, 0);
+        assert!(ledger.rollback_last_transaction().is_ok());
+        assert_eq!(ledger.head_ptr, 0);
     }
 
     #[test]
     fn test_sigmaos_component_inspection_suite() {
         // Inspect & verify zero-allocation VM bytecode execution
-        let mut vm = UdfVm::new();
+        let mut vm = UdfVm::new(0x0, 0x1000);
+        let mut pio = LegacyController {
+            base_port: 0x3F8,
+            ports_buffer: [0, 0, 0, 0, 0, 0, 0, 0, 0x38, 0, 0, 0, 0, 0, 0, 0],
+            power_state: PowerState::D0Active,
+        };
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            UdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },
+            UdfInstruction { opcode: 0x10, reg_dest: 0, reg_src: 0, address_or_imm: 0x3F8 },
+            UdfInstruction { opcode: 0xF0, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
         ];
-        assert_eq!(vm.execute(&code).unwrap(), 150);
+        assert_eq!(vm.execute_program(&code, &mut pio).unwrap(), 0x38);
 
         // Inspect & verify JBD2 crash transaction ledger
-        let mut ledger = Jbd2TransactionLedger::new();
-        assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);
-        assert_eq!(ledger.head, 1);
+        let mut ledger = Jbd2TransactionLedger::new(0x1000);
+        assert!(ledger.commit_transaction(1, 0x2000, &[0u8; 64]).is_ok());
+        assert_eq!(ledger.head_ptr, 1);
 
         // Inspect & verify SAT Solver
-        let solver = ConstraintSatSolver::new();
-        let nodes = [PackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
-        assert!(solver.resolve_satisfiability(&nodes).is_ok());
+        let mut solver = SatSolverEngine::new();
+        let node = PackageNode {
+            pkg_id: 1,
+            version: PkgVersion { major: 1, minor: 0 },
+            dependencies: [None, None, None, None],
+        };
+        assert!(solver.add_package_node(node));
+        assert!(solver.solve(1));
     }
 }
 
@@ -3942,6 +3958,156 @@ impl TechMediaIntelligenceAggregatorEngine {
 }
 
 // =========================================================================
+// FRAPPE LOW-CODE ECOSYSTEM & METADATA ENGINE (frappe.io inspired)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct FrappeDocTypeField {
+    pub fieldname: String,
+    pub fieldtype: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FrappeDocTypeDefinition {
+    pub name: String,
+    pub module: String,
+    pub is_submittable: bool,
+    pub fields: Vec<FrappeDocTypeField>,
+}
+
+pub struct FrappeLowCodeEcosystemEngine {
+    pub doctype_registry: BTreeMap<String, FrappeDocTypeDefinition>,
+    pub workflow_states: Vec<String>,
+    pub hooks_registered: Vec<String>,
+}
+
+impl FrappeLowCodeEcosystemEngine {
+    pub fn new() -> Self {
+        Self {
+            doctype_registry: BTreeMap::new(),
+            workflow_states: vec![
+                "Draft".to_string(),
+                "Pending Approval".to_string(),
+                "Approved".to_string(),
+                "Cancelled".to_string(),
+            ],
+            hooks_registered: Vec::new(),
+        }
+    }
+
+    pub fn define_doctype(&mut self, name: &str, module: &str, is_submittable: bool, fields: &[(&str, &str)]) {
+        let doc_fields = fields
+            .iter()
+            .map(|(fn_name, ft_type)| FrappeDocTypeField {
+                fieldname: fn_name.to_string(),
+                fieldtype: ft_type.to_string(),
+            })
+            .collect();
+
+        self.doctype_registry.insert(
+            name.to_string(),
+            FrappeDocTypeDefinition {
+                name: name.to_string(),
+                module: module.to_string(),
+                is_submittable,
+                fields: doc_fields,
+            },
+        );
+    }
+
+    pub fn register_doc_hook(&mut self, doctype: &str, event: &str, handler: &str) {
+        self.hooks_registered.push(format!("{}:{}:{}", doctype, event, handler));
+    }
+
+    pub fn validate_workflow_transition(&self, current_state: &str, target_state: &str) -> bool {
+        self.workflow_states.contains(&current_state.to_string())
+            && self.workflow_states.contains(&target_state.to_string())
+    }
+
+    pub fn generate_openapi_schema(&self) -> String {
+        format!(
+            "{{\"doc_types\": {}, \"workflow_states\": {}}}",
+            self.doctype_registry.len(),
+            self.workflow_states.len()
+        )
+    }
+}
+
+impl Default for FrappeLowCodeEcosystemEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// ANDROID 15/16 MOBILE ECOSYSTEM & PIXEL ENGINE (Android Authority / Android Police inspired)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct PixelFeatureDrop {
+    pub title: String,
+    pub category: String,
+    pub is_enabled: bool,
+}
+
+pub struct AndroidAuthorityPoliceEcosystemEngine {
+    pub private_space_locked: bool,
+    pub pixel_feature_drops: Vec<PixelFeatureDrop>,
+    pub material_you_palette: Vec<u32>,
+    pub quick_share_device_name: String,
+    pub thermal_throttling_level: u8,
+}
+
+impl AndroidAuthorityPoliceEcosystemEngine {
+    pub fn new(device_name: &str) -> Self {
+        Self {
+            private_space_locked: true,
+            pixel_feature_drops: Vec::new(),
+            material_you_palette: vec![0xFF6200EE, 0xFF03DAC6, 0xFF018786, 0xFFB00020],
+            quick_share_device_name: device_name.to_string(),
+            thermal_throttling_level: 0,
+        }
+    }
+
+    pub fn toggle_private_space(&mut self, authenticated: bool) -> bool {
+        if authenticated {
+            self.private_space_locked = !self.private_space_locked;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn register_pixel_feature_drop(&mut self, title: &str, category: &str) {
+        self.pixel_feature_drops.push(PixelFeatureDrop {
+            title: title.to_string(),
+            category: category.to_string(),
+            is_enabled: true,
+        });
+    }
+
+    pub fn extract_material_you_palette(&mut self, seed_color: u32) -> Vec<u32> {
+        let r = (seed_color >> 16) & 0xFF;
+        let g = (seed_color >> 8) & 0xFF;
+        let b = seed_color & 0xFF;
+
+        let primary = (0xFF << 24) | (r << 16) | (g << 8) | b;
+        let secondary = (0xFF << 24) | ((g) << 16) | ((b) << 8) | r;
+        let tertiary = (0xFF << 24) | ((b) << 16) | ((r) << 8) | g;
+
+        self.material_you_palette = vec![primary, secondary, tertiary];
+        self.material_you_palette.clone()
+    }
+
+    pub fn initiate_quick_share(&self, target_peer: &str, payload_bytes: usize) -> String {
+        format!(
+            "QUICK_SHARE_P2P:{}:{}->{}:{}B",
+            self.quick_share_device_name, self.quick_share_device_name, target_peer, payload_bytes
+        )
+    }
+}
+
+// =========================================================================
 // DISTRO-INSPIRED ECOSYSTEM ENCOUNTER ENFORCE ENGINES
 // =========================================================================
 
@@ -4042,5 +4208,29 @@ mod new_unimplemented_tests {
         phoronix.execute_benchmark("Unigine Heaven", 120.0);
         phoronix.execute_benchmark("Shadow of Tomb Raider", 80.0);
         assert_eq!(phoronix.calculate_composite_score(), 100.0);
+    }
+
+    #[test]
+    fn test_frappe_low_code_ecosystem_engine() {
+        let mut frappe = FrappeLowCodeEcosystemEngine::new();
+        frappe.define_doctype("DocTypeItem", "Core", true, &[("item_code", "Data"), ("quantity", "Int")]);
+        frappe.register_doc_hook("DocTypeItem", "validate", "custom_script_check");
+        assert!(frappe.validate_workflow_transition("Draft", "Approved"));
+        assert_eq!(frappe.doctype_registry.len(), 1);
+        assert_eq!(frappe.hooks_registered.len(), 1);
+        assert!(frappe.generate_openapi_schema().contains("\"doc_types\": 1"));
+    }
+
+    #[test]
+    fn test_android_authority_police_ecosystem_engine() {
+        let mut android = AndroidAuthorityPoliceEcosystemEngine::new("SigmaPhone_Pixel");
+        assert!(android.toggle_private_space(true));
+        assert!(!android.private_space_locked);
+        android.register_pixel_feature_drop("Magic Cue", "AI");
+        let palette = android.extract_material_you_palette(0x123456);
+        assert_eq!(palette.len(), 3);
+        assert_eq!(android.pixel_feature_drops.len(), 1);
+        let share_msg = android.initiate_quick_share("Tablet_Node", 4096);
+        assert!(share_msg.contains("QUICK_SHARE_P2P"));
     }
 }
