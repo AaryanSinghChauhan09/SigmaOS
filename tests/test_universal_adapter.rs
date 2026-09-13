@@ -7,6 +7,9 @@ pub mod klib {
     }
 }
 
+#[path = "../src/package/universal.rs"]
+pub mod package;
+
 #[path = "../src/security/capability.rs"]
 pub mod capability;
 
@@ -14,13 +17,14 @@ pub mod security {
     pub use super::capability::*;
 }
 
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
-
-pub use universal_adapter::universal_oop_system;
 
 pub mod sigpkg {
     use alloc::string::String;
@@ -30,38 +34,7 @@ pub mod sigpkg {
     pub use crate::universal_adapter;
     pub use crate::universal_engine;
     pub use crate::universal_oop_system;
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    pub struct Version {
-        pub major: u64,
-        pub minor: u64,
-        pub patch: u64,
-    }
-
-    impl Version {
-        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-            Self { major, minor, patch }
-        }
-
-        pub fn parse(version_str: &str) -> Result<Self, &'static str> {
-            let clean = version_str.split('-').next().unwrap_or(version_str);
-            let mut parts = clean.split('.');
-
-            let major_str = parts.next().unwrap_or("0");
-            let minor_str = parts.next().unwrap_or("0");
-            let patch_str = parts.next().unwrap_or("0");
-
-            let major_clean: String = major_str.chars().filter(|c| c.is_ascii_digit()).collect();
-            let minor_clean: String = minor_str.chars().filter(|c| c.is_ascii_digit()).collect();
-            let patch_clean: String = patch_str.chars().filter(|c| c.is_ascii_digit()).collect();
-
-            let major = if major_clean.is_empty() { 0 } else { major_clean.parse::<u64>().unwrap_or(0) };
-            let minor = if minor_clean.is_empty() { 0 } else { minor_clean.parse::<u64>().unwrap_or(0) };
-            let patch = if patch_clean.is_empty() { 0 } else { patch_clean.parse::<u64>().unwrap_or(0) };
-
-            Ok(Version::new(major, minor, patch))
-        }
-    }
+    pub use crate::universal_oop_system::Version;
 
     #[derive(Debug, Clone)]
     pub struct Package {
@@ -149,12 +122,12 @@ fn test_universal_adapter_all_formats() {
     let mut bridge = SigPkgUniversalBridgeEngine::new();
     let pkg_bsd = bridge.absorb_and_register("redis.pkg", freebsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -209,7 +182,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
