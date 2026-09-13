@@ -19,8 +19,6 @@ jobs:
 
       - name: Set up Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
 
       - name: Execute Test Suite
         run: |
