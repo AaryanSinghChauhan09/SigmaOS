@@ -33,7 +33,6 @@ full-build = ["core-build"]  # Full build with all modules
 custom_alloc_error_handler = []
 standalone_test = []
 # Storage & Performance Matrix features
-cache-lru = []
 cache-lfu = []
 cache-arc = []
 jemalloc = []
@@ -63,21 +62,6 @@ enlightenment = []
 wayland = []
 mir = []
 x11 = []
-
-# Storage & Performance matrix features
-cache-lru = []
-cache-lfu = []
-cache-arc = []
-jemalloc = []
-mimalloc = []
-scheduler-eevdf = []
-scheduler-bore = []
-lock-free = []
-mutex = []
-rwlock = []
-io-sequential = []
-io-random = []
-io-mmap = []
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [

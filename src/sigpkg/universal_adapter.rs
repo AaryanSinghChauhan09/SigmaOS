@@ -7,6 +7,9 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+#[cfg(not(test))]
+use crate::package::AptDebManifest;
+#[cfg(test)]
 use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
@@ -70,11 +73,10 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
+#[cfg(not(test))]
+pub use crate::sigpkg::universal_engine::PackageFormat;
 #[cfg(test)]
-pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -107,7 +109,10 @@ pub struct PacmanPkgbuild {
 }
 
 /// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+#[cfg(not(test))]
+use crate::sigpkg::universal_oop_system;
+#[cfg(test)]
+use crate::universal_oop_system;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
