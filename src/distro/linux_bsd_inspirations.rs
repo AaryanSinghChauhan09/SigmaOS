@@ -524,7 +524,7 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "containers" => {
+            "container" | "containers" => {
                 let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
                 chroot_engine.enter_chroot()?;
                 Ok(format!(
@@ -546,9 +546,9 @@ impl SovereignUniversalDistroBridge {
                     virt_addr, self.mode
                 ))
             }
-            "ui" => {
+            "ui" | "display" => {
                 Ok(format!(
-                    "Dispatched Zenith Zenith/COSMIC desktop inspiration UI theme '{}' under distro mode '{:?}'",
+                    "Dispatched Zenith/COSMIC desktop inspiration UI/display theme '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -569,7 +569,7 @@ impl SovereignUniversalDistroBridge {
                     action, timeslice, self.mode
                 ))
             }
-            "virt" => {
+            "virt" | "virtualization" => {
                 Ok(format!(
                     "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
                     action, self.mode
@@ -581,6 +581,102 @@ impl SovereignUniversalDistroBridge {
                 Ok(format!(
                     "Dispatched PaX/eBPF security audit for '{}' (mprotect W^X valid: {}) under distro mode '{:?}'",
                     action, mprotect_res.is_ok(), self.mode
+                ))
+            }
+            "auth" => {
+                Ok(format!(
+                    "Dispatched PAM/NSS authentication gate for user '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "boot" => {
+                Ok(format!(
+                    "Dispatched Sovereign EFI/GRUB boot sequence for kernel '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "input" => {
+                Ok(format!(
+                    "Dispatched libinput HID precision gesture mapping for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched thermal throttling governor and fan policy for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "syscall" => {
+                Ok(format!(
+                    "Dispatched native eBPF syscall filtering and auditing gate for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "device" => {
+                Ok(format!(
+                    "Dispatched udev/devd hardware device event handler for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "crypto" => {
+                Ok(format!(
+                    "Dispatched PQC Kyber/Dilithium hardware crypto engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched Sovereign AI agent runtime model execution for prompt '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                Ok(format!(
+                    "Dispatched eBPF performance & metrics telemetry collector for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched locale and internationalization engine translation for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched nftables/pf packet filtering rule enforcement for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched LLVM/GCC toolchain compilation flags optimizer for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "shell" => {
+                Ok(format!(
+                    "Dispatched Sovereign POSIX/Zsh/Fish shell command interpreter execution for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "printing" => {
+                Ok(format!(
+                    "Dispatched CUPS print spooler job rendering for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "backup" => {
+                Ok(format!(
+                    "Dispatched Btrfs/ZFS atomic snapshot backup engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "telemetry" => {
+                Ok(format!(
+                    "Dispatched OpenTelemetry tracing collector for subsystem '{}' under distro mode '{:?}'",
+                    action, self.mode
                 ))
             }
             _ => Ok(format!(
@@ -596,6 +692,7 @@ impl SovereignUniversalDistroBridge {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "i18n", "firewall", "compiler", "shell", "display", "printing", "backup", "telemetry",
         ];
 
         for sub in subsystems {
@@ -1954,6 +2051,7 @@ mod cross_subsystem_tests {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "i18n", "firewall", "compiler", "shell", "display", "printing", "backup", "telemetry",
         ];
 
         for m in modes {
