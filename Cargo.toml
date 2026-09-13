@@ -33,7 +33,6 @@ full-build = ["core-build"]  # Full build with all modules
 custom_alloc_error_handler = []
 standalone_test = []
 # Storage & Performance Matrix features
-cache-lru = []
 cache-lfu = []
 cache-arc = []
 jemalloc = []
