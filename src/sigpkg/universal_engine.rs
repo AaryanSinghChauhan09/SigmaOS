@@ -82,14 +82,134 @@ pub enum PackageFormat {
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
-        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
-        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
-        else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
-        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
-        else { None }
+        let lower = filename.to_lowercase();
+        let trimmed = lower.trim();
+        let name = trimmed.replace(" ", "");
+
+        if name.ends_with(".deb") || name.ends_with(".udeb") {
+            Some(PackageFormat::Apt)
+        } else if name.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if name.ends_with(".rpm") || name.ends_with(".drpm") {
+            Some(PackageFormat::Yum)
+        } else if name.ends_with(".pkg.tar.zst")
+            || name.ends_with(".pkg.tar.xz")
+            || name.ends_with(".pkg.tar.gz")
+            || name.contains("pacman")
+            || name.ends_with(".pacman")
+        {
+            Some(PackageFormat::Pacman)
+        } else if name.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if name.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if name.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if name.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if name.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if name.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if name.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if name.ends_with(".app") {
+            Some(PackageFormat::AppBundle)
+        } else if name.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if name.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if name.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if name.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
+            Some(PackageFormat::Nix)
+        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
+            Some(PackageFormat::Portage)
+        } else if name.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
+        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
+            Some(PackageFormat::TarXz)
+        } else if name.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if name.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if name.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if name.ends_with(".pup") || name == "pup" {
+            Some(PackageFormat::Pup)
+        } else if name.ends_with(".pet") || name == "pet" {
+            Some(PackageFormat::Pet)
+        } else if name.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else if name.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if name.ends_with(".zypper") {
+            Some(PackageFormat::Zypper)
+        } else if name.ends_with(".guix") || name.ends_with(".scm") {
+            Some(PackageFormat::Guix)
+        } else if name.ends_with(".moss") {
+            Some(PackageFormat::Moss)
+        } else if name.ends_with(".hpkg") {
+            Some(PackageFormat::Hpkg)
+        } else if name.ends_with(".tcz") {
+            Some(PackageFormat::Tcz)
+        } else if name.ends_with(".gobo") {
+            Some(PackageFormat::Gobo)
+        } else if name.ends_with(".commit") || name.ends_with(".ostree") {
+            Some(PackageFormat::Ostree)
+        } else if name.ends_with(".pkgsrc") {
+            Some(PackageFormat::Pkgsrc)
+        } else if name.ends_with(".sfs") {
+            Some(PackageFormat::Sfs)
+        } else if name.ends_with(".puk") {
+            Some(PackageFormat::Puk)
+        } else if name.ends_with(".dmg") {
+            Some(PackageFormat::Dmg)
+        } else if name.ends_with(".cports") {
+            Some(PackageFormat::Cports)
+        } else if name.ends_with(".dports") {
+            Some(PackageFormat::Dports)
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+            Some(PackageFormat::SlackBuild)
+        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
+            Some(PackageFormat::Crux)
+        } else if name.ends_with(".stratum") {
+            Some(PackageFormat::Stratum)
+        } else if name.ends_with(".ipk") {
+            Some(PackageFormat::Ipk)
+        } else if name.ends_with(".opkg") {
+            Some(PackageFormat::Opkg)
+        } else if name.ends_with(".p5p") || name.ends_with(".ips") {
+            Some(PackageFormat::SolarisIps)
+        } else if name.ends_with(".nar") {
+            Some(PackageFormat::GuixNar)
+        } else if name.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if name.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if name.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if name.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if name.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if name.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
+        } else if name.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if name.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if name.ends_with(".sysupdate") {
+            Some(PackageFormat::Sysupdate)
+        } else if name.ends_with(".sigma") || name.ends_with(".sigpkg") {
+            Some(PackageFormat::Sovereign)
+        } else {
+            None
+        }
     }
 }
 
