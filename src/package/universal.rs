@@ -215,11 +215,13 @@ pub enum PackageState {
     BrokenDependency,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum PackagePriority {
     Essential,
     Required,
     Important,
     Standard,
+    #[default]
     Optional,
 }
 
@@ -1393,6 +1395,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: PackagePriority,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -2525,6 +2528,7 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
+            priority: PackagePriority::Standard,
         };
 
         let _pkgbuild = PacmanPkgbuild {
