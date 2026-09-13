@@ -1,3 +1,19 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceNodeType {
+    CharacterDevice,
+    BlockDevice,
+    Fifo,
+    Socket,
+    Block,
+    Character,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
 // SPDX-License-Identifier: MIT
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
@@ -512,12 +528,20 @@ impl Default for CronJobScheduler {
 #[derive(Debug, Clone)]
 pub struct DnsRecordEntry {
     pub domain: String,
+    pub domain_name: &'static str,
     pub ip_address: [u8; 4],
+    pub ttl_seconds: u32,
+    pub dnssec_validated: bool,
 }
 
+#[derive(Debug)]
 pub struct SovereignDnsTlsResolverEngine {
     pub primary_dns_ip: [u8; 4],
+    pub upstream_dot_server: [u8; 4],
+    pub dot_port: u16,
+    pub local_cache: Vec<DnsRecordEntry>,
     pub records: Vec<DnsRecordEntry>,
+    pub dnssec_enforced: bool,
 }
 
 impl SovereignDnsTlsResolverEngine {
@@ -525,13 +549,32 @@ impl SovereignDnsTlsResolverEngine {
         let mut records = Vec::new();
         records.push(DnsRecordEntry {
             domain: "localhost".to_string(),
+            domain_name: "localhost",
             ip_address: [127, 0, 0, 1],
+            ttl_seconds: 3600,
+            dnssec_validated: true,
         });
-        Self { primary_dns_ip, records }
+        Self {
+            primary_dns_ip,
+            upstream_dot_server: [1, 1, 1, 1],
+            dot_port: 853,
+            local_cache: records.clone(),
+            records,
+            dnssec_enforced: true,
+        }
     }
 
     pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
-        self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
+        self.records.iter().find(|r| r.domain == domain || r.domain_name == domain).map(|r| r.ip_address)
+    }
+
+    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
+        match alias {
+            "char-major-10-200" => Some("tun"),
+            "net-pf-10" => Some("ipv6"),
+            "block-major-8-0" => Some("sda"),
+            _ => None,
+        }
     }
 }
 
@@ -1213,3 +1256,11 @@ impl Default for SovereignUniversalDistroGapResolver {
         Self::new()
     }
 }
+
+// Compatibility type aliases for distro module re-exports
+pub type DnsRecord = DnsRecordEntry;
+pub type DynamicDeviceNode = DeviceNodeEntry;
+pub type JournalBinaryRecord = JournaldLogRecord;
+pub type JournalLogLevel = u8;
+pub type NatRule = ConntrackTableEntry;
+pub type NatRuleKind = NatType;
