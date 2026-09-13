@@ -8,7 +8,7 @@ use std::vec::Vec;
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 #[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
 
 #[cfg(feature = "standalone_test")]
 use universal_oop_system::{Dependency, Package, Version, VersionConstraint};
@@ -83,24 +83,26 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(all(test, not(feature = "standalone_test")))]
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::Version;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(feature = "standalone_test")]
 #[path = "universal_engine.rs"]
-mod universal_engine;
+pub mod universal_engine;
 #[cfg(feature = "standalone_test")]
-use universal_engine::PackageFormat;
+pub use universal_engine::PackageFormat;
+
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::sigpkg::universal_oop_system;
 
 #[cfg(feature = "standalone_test")]
 #[path = "universal_oop_system.rs"]
-mod universal_oop_system;
+pub mod universal_oop_system;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use universal_oop_system::UniversalPackageManager;
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

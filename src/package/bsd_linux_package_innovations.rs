@@ -4711,7 +4711,7 @@ MAINTAINER="SigmaOS"
             ("solus.eopkg", PackageFormat::Eopkg),
             ("nix.nixpkg", PackageFormat::Nix),
             ("gentoo.portage", PackageFormat::Portage),
-            ("debian.deb", PackageFormat::Apt),
+            ("debian.deb", PackageFormat::Deb),
             ("archive.tar.gz", PackageFormat::TarGz),
             ("archive.tar .gz", PackageFormat::TarGz),
             ("compressed.xz", PackageFormat::TarXz),
