@@ -10,7 +10,7 @@ use std::vec::Vec;
 #[cfg(not(feature = "standalone_test"))]
 use crate::package::AptDebManifest;
 #[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{universal_oop_system, Dependency, Package, Version, VersionConstraint};
 
 #[cfg(feature = "standalone_test")]
 pub use universal_oop_system::{Dependency, Package, Version, VersionConstraint};
@@ -98,8 +98,6 @@ use crate::sigpkg::universal_engine;
 
 pub use universal_engine::PackageFormat;
 
-#[cfg(all(test, not(feature = "standalone_test")))]
-pub use crate::sigpkg::Version;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
