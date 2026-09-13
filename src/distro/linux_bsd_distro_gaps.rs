@@ -546,41 +546,8 @@ pub enum DeviceNodeType {
     BlockDevice,
     Fifo,
     Socket,
-}
-
-#[derive(Debug, Clone)]
-pub struct DeviceNodeEntry {
-    pub name: String,
-    pub node_type: DeviceNodeType,
-    pub major: u32,
-    pub minor: u32,
-    pub symlink_paths: Vec<String>,
-}
-
-pub struct SovereignDynamicDevfsEngine {
-    pub nodes: Vec<DeviceNodeEntry>,
-}
-
-impl SovereignDynamicDevfsEngine {
-    pub fn new() -> Self {
-        Self { nodes: Vec::new() }
-    }
-
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        self.nodes.push(DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            symlink_paths: Vec::new(),
-        });
-    }
-}
-
-impl Default for SovereignDynamicDevfsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
+    Block,
+    Character,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -647,38 +614,6 @@ impl SovereignStatefulNatEngine {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_epoch_ms: u64,
-    pub identifier: String,
-    pub message: String,
-    pub priority: u8,
-}
-
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub log_records: Vec<JournaldLogRecord>,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new() -> Self {
-        Self { log_records: Vec::new() }
-    }
-
-    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
-        self.log_records.push(JournaldLogRecord {
-            timestamp_epoch_ms: 1000,
-            identifier: identifier.to_string(),
-            message: message.to_string(),
-            priority,
-        });
-    }
-}
-
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct DnsRecordEntry {
@@ -716,32 +651,27 @@ impl Default for DemandPagingSwapEngine {
 // 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
 // ============================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    Block,
-    Character,
-}
-
 #[derive(Debug, Clone)]
 pub struct DeviceNodeEntry {
-    pub name: &'static str,
+    pub name: String,
     pub node_type: DeviceNodeType,
     pub major: u32,
     pub minor: u32,
     pub owner_uid: u32,
     pub group_gid: u32,
     pub mode_octal: u16,
-    pub symlink_paths: Vec<&'static str>,
+    pub symlink_paths: Vec<String>,
 }
 
-#[derive(Debug)]
 pub struct SovereignDynamicDevfsEngine {
+    pub nodes: Vec<DeviceNodeEntry>,
     pub devices: Vec<DeviceNodeEntry>,
 }
 
 impl SovereignDynamicDevfsEngine {
     pub fn new() -> Self {
         let mut devfs = Self {
+            nodes: Vec::new(),
             devices: Vec::new(),
         };
 
@@ -753,9 +683,24 @@ impl SovereignDynamicDevfsEngine {
         devfs
     }
 
+    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
+        let entry = DeviceNodeEntry {
+            name: name.to_string(),
+            node_type,
+            major,
+            minor,
+            owner_uid: 0,
+            group_gid: 0,
+            mode_octal: 0o660,
+            symlink_paths: Vec::new(),
+        };
+        self.nodes.push(entry.clone());
+        self.devices.push(entry);
+    }
+
     pub fn create_node(
         &mut self,
-        name: &'static str,
+        name: &str,
         node_type: DeviceNodeType,
         major: u32,
         minor: u32,
@@ -763,8 +708,8 @@ impl SovereignDynamicDevfsEngine {
         group_gid: u32,
         mode_octal: u16,
     ) {
-        self.devices.push(DeviceNodeEntry {
-            name,
+        let entry = DeviceNodeEntry {
+            name: name.to_string(),
             node_type,
             major,
             minor,
@@ -772,12 +717,14 @@ impl SovereignDynamicDevfsEngine {
             group_gid,
             mode_octal,
             symlink_paths: Vec::new(),
-        });
+        };
+        self.nodes.push(entry.clone());
+        self.devices.push(entry);
     }
 
-    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &'static str) -> bool {
+    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
         if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink);
+            dev.symlink_paths.push(symlink.to_string());
             true
         } else {
             false
@@ -787,7 +734,7 @@ impl SovereignDynamicDevfsEngine {
     pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
         self.devices
             .iter()
-            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| *s == name))
+            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
     }
 }
 
@@ -1066,14 +1013,17 @@ impl Default for SovereignMasterDistroEcosystemEngine {
 
 #[derive(Debug, Clone)]
 pub struct JournaldLogRecord {
+    pub timestamp_epoch_ms: u64,
     pub timestamp_unix_epoch: u64,
+    pub identifier: String,
+    pub unit_name: String,
+    pub message: String,
     pub priority: u8, // 0=Emergency, 3=Error, 6=Info
-    pub unit_name: &'static str,
-    pub message: &'static str,
 }
 
 #[derive(Debug)]
 pub struct SovereignJournaldBinaryStorageEngine {
+    pub log_records: Vec<JournaldLogRecord>,
     pub logs: Vec<JournaldLogRecord>,
     pub max_logs_capacity: usize,
 }
@@ -1081,21 +1031,39 @@ pub struct SovereignJournaldBinaryStorageEngine {
 impl SovereignJournaldBinaryStorageEngine {
     pub fn new(capacity: usize) -> Self {
         Self {
+            log_records: Vec::new(),
             logs: Vec::new(),
             max_logs_capacity: capacity,
         }
     }
 
-    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
+    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
+        let rec = JournaldLogRecord {
+            timestamp_epoch_ms: 1000,
+            timestamp_unix_epoch: 1000,
+            identifier: identifier.to_string(),
+            unit_name: identifier.to_string(),
+            message: message.to_string(),
+            priority,
+        };
+        self.log_records.push(rec.clone());
+        self.logs.push(rec);
+    }
+
+    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &str, msg: &str) {
         if self.logs.len() >= self.max_logs_capacity {
             self.logs.remove(0); // Journal rotation
         }
-        self.logs.push(JournaldLogRecord {
+        let rec = JournaldLogRecord {
+            timestamp_epoch_ms: timestamp,
             timestamp_unix_epoch: timestamp,
-            priority,
-            unit_name: unit,
+            identifier: unit.to_string(),
+            unit_name: unit.to_string(),
             message: msg.to_string(),
-        });
+            priority,
+        };
+        self.log_records.push(rec.clone());
+        self.logs.push(rec);
     }
 
     pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
@@ -1104,6 +1072,12 @@ impl SovereignJournaldBinaryStorageEngine {
 
     pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
         self.logs.iter().filter(|l| l.priority <= min_priority).collect()
+    }
+}
+
+impl Default for SovereignJournaldBinaryStorageEngine {
+    fn default() -> Self {
+        Self::new(1000)
     }
 }
 
