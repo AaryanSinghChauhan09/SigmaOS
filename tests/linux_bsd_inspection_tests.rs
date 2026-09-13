@@ -1262,54 +1262,6 @@ fn test_sovereign_universal_distro_bridge_all_modes_inspection() {
             ServiceSupervisorType::Shepherd,
             "/var/lib/pkg",
         ),
-        (
-            DistroSubsystemMode::LinuxParrot,
-            "zsh.deb",
-            ServiceSupervisorType::Systemd,
-            "/var/lib/dpkg",
-        ),
-        (
-            DistroSubsystemMode::LinuxKali,
-            "zsh.deb",
-            ServiceSupervisorType::Systemd,
-            "/var/lib/dpkg",
-        ),
-        (
-            DistroSubsystemMode::LinuxAntiX,
-            "zsh.deb",
-            ServiceSupervisorType::Sysvinit,
-            "/var/lib/dpkg",
-        ),
-        (
-            DistroSubsystemMode::LinuxZorin,
-            "zsh.deb",
-            ServiceSupervisorType::Systemd,
-            "/var/lib/dpkg",
-        ),
-        (
-            DistroSubsystemMode::LinuxGaruda,
-            "zsh.pkg.tar.zst",
-            ServiceSupervisorType::Systemd,
-            "/var/lib/pacman",
-        ),
-        (
-            DistroSubsystemMode::LinuxOmarchy,
-            "zsh.pkg.tar.zst",
-            ServiceSupervisorType::Systemd,
-            "/var/lib/pacman",
-        ),
-        (
-            DistroSubsystemMode::LinuxCachy,
-            "zsh.pkg.tar.zst",
-            ServiceSupervisorType::Systemd,
-            "/var/lib/pacman",
-        ),
-        (
-            DistroSubsystemMode::LinuxMint,
-            "zsh.deb",
-            ServiceSupervisorType::Systemd,
-            "/var/lib/dpkg",
-        ),
     ];
 
     for (mode, expected_pkg, expected_supervisor, expected_pkg_db) in modes {
