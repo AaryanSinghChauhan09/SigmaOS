@@ -81,6 +81,13 @@ if [ -f "src/package/universal.rs" ]; then
     ./build/universal_pkg_test
 fi
 
+if [ -f "src/package/universal_package_innovations_suite.rs" ]; then
+    echo "Running Universal Package Innovations Suite test suite..."
+    mkdir -p build
+    rustc --test src/package/universal_package_innovations_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/universal_innovations_test
+    ./build/universal_innovations_test
+fi
+
 if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
     echo "Running Arch Pacman Engine & AUR compilation test suite..."
     mkdir -p build
