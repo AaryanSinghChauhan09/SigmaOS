@@ -29,3 +29,7 @@
 ## 2026-09-10 - Web Desktop Theme Switcher State & Skip Link Navigation
 **Learning:** Web OS desktops with multi-theme selection buttons require `aria-pressed` synchronization and a skip-to-content anchor link (`skip-link`) at the top of the DOM to prevent screen readers from having to traverse fixed header status bars on every page load.
 **Action:** Provide `aria-pressed` attributes on theme toggle buttons updated dynamically via event handlers and include a visually-hidden `.skip-link` element at the start of `<body>` that becomes visible on keyboard focus.
+
+## 2026-11-02 - Web Desktop Modal & Overlay Escape Key Dismissal
+**Learning:** Desktop web interfaces featuring floating dialogs, command palettes, and context menus trap keyboard users unless a global `Escape` key listener is attached to automatically dismiss active overlays.
+**Action:** Register global keydown handlers for `Escape` to close active modal overlays, context menus, and help dialogs, restoring keyboard focus to the desktop viewport.
