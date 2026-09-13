@@ -54,6 +54,8 @@ pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
 pub mod open_source_obsoletion;
+pub mod tech_media_reexports;
+pub use tech_media_reexports::*;
 pub mod unimplemented_features;
 pub mod unimplemented_tools;
 pub mod userland;
