@@ -28,6 +28,7 @@ use std::vec::Vec;
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(test)]
+#[cfg(all(test, not(feature = "standalone_test")))]
 pub use crate::sigpkg::Version;
 
 
