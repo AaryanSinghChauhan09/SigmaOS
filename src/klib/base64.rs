@@ -19,42 +19,57 @@ fn char_to_val(c: u8) -> Option<u8> {
 }
 
 /// Encode raw bytes into a base64 string
+///
+/// OPTIMIZATION:
+/// 1. Pre-allocate exact output buffer capacity `((input.len() + 2) / 3) * 4` to eliminate dynamic heap reallocations.
+/// 2. Push ASCII byte literals directly onto `Vec<u8>` rather than pushing `char` onto `String` to avoid UTF-8 character encoding overhead.
 pub fn encode(input: &[u8]) -> String {
-    let mut result = String::new();
-    let chunks = input.chunks(3);
+    if input.is_empty() {
+        return String::new();
+    }
 
-    for chunk in chunks {
+    let capacity = ((input.len() + 2) / 3) * 4;
+    let mut result = Vec::with_capacity(capacity);
+
+    for chunk in input.chunks(3) {
         let b0 = chunk[0];
         let b1 = if chunk.len() > 1 { chunk[1] } else { 0 };
         let b2 = if chunk.len() > 2 { chunk[2] } else { 0 };
 
-        result.push(BASE64_CHARS[(b0 >> 2) as usize] as char);
-        result.push(BASE64_CHARS[((b0 & 0x03) << 4 | (b1 >> 4)) as usize] as char);
+        result.push(BASE64_CHARS[(b0 >> 2) as usize]);
+        result.push(BASE64_CHARS[((b0 & 0x03) << 4 | (b1 >> 4)) as usize]);
 
         if chunk.len() > 1 {
-            result.push(BASE64_CHARS[((b1 & 0x0F) << 2 | (b2 >> 6)) as usize] as char);
+            result.push(BASE64_CHARS[((b1 & 0x0F) << 2 | (b2 >> 6)) as usize]);
         } else {
-            result.push('=');
+            result.push(b'=');
         }
 
         if chunk.len() > 2 {
-            result.push(BASE64_CHARS[(b2 & 0x3F) as usize] as char);
+            result.push(BASE64_CHARS[(b2 & 0x3F) as usize]);
         } else {
-            result.push('=');
+            result.push(b'=');
         }
     }
 
-    result
+    // Safety: BASE64_CHARS and b'=' are all valid ASCII
+    unsafe { String::from_utf8_unchecked(result) }
 }
 
 /// Decode a base64 string into raw bytes
+///
+/// OPTIMIZATION:
+/// 1. Slice `input.as_bytes()` directly instead of calling `input.bytes().collect::<Vec<u8>>()`, eliminating redundant intermediate heap allocations.
+/// 2. Pre-allocate `Vec<u8>` capacity `(input.len() / 4) * 3` to prevent step-wise vector growth reallocations during decoding.
 pub fn decode(input: &str) -> Result<Vec<u8>, &'static str> {
-    let bytes = input.bytes().collect::<Vec<u8>>();
-    let mut result = Vec::new();
+    let bytes = input.as_bytes();
 
     if bytes.len() % 4 != 0 {
         return Err("Base64 input length must be a multiple of 4");
     }
+
+    let estimated_capacity = (bytes.len() / 4) * 3;
+    let mut result = Vec::with_capacity(estimated_capacity);
 
     for chunk in bytes.chunks(4) {
         if chunk.is_empty() {
@@ -92,7 +107,7 @@ pub fn decode(input: &str) -> Result<Vec<u8>, &'static str> {
     Ok(result)
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
