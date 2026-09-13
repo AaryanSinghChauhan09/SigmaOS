@@ -42,6 +42,7 @@ pub trait Volume {
 pub struct SimpleVolume {
     pub id: VolumeID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub volume_type: AtomicUsize,
     pub size: AtomicUsize,
     pub mounted: AtomicUsize,
@@ -57,6 +58,7 @@ impl SimpleVolume {
         SimpleVolume {
             id,
             name: name_array,
+            name_len: name_len as u8,
             volume_type: AtomicUsize::new(volume_type as usize),
             size: AtomicUsize::new(size as usize),
             mounted: AtomicUsize::new(0),
@@ -89,7 +91,9 @@ impl Volume for SimpleVolume {
         self.id
     }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        // Bolt ⚡ Optimization: Store name_len during construction to convert O(N) linear zero-byte search
+        // (.position(|&b| b == 0)) on every volume name access into O(1) constant-time slice indexing.
+        let len = (self.name_len as usize).min(64);
         &self.name[..len]
     }
     fn volume_type(&self) -> VolumeType {
