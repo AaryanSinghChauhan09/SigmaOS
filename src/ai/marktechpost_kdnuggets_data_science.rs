@@ -1,7 +1,7 @@
 // SigmaOS KDnuggets & MarkTechPost AI Data Science Pipeline
 // Inspired by KDnuggets, MarkTechPost, and InfoWorld
 
-use crate::klib::string::String;
+use std::string::String;
 use crate::klib::vec::Vec;
 
 /// KDnuggets automated machine learning (AutoML) dataset preprocessor and model selector.

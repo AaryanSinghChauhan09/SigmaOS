@@ -8,7 +8,7 @@ use std::vec::Vec;
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{universal_oop_system, Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,11 +70,8 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::universal_oop_system::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -106,9 +103,6 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -208,7 +202,7 @@ impl UniversalPackageAdapter {
         let mut version = String::new();
         let mut depends = Vec::new();
         let mut description = String::new();
-        let mut priority = PackagePriority::Optional;
+        let mut _priority = PackagePriority::Optional;
 
         for line in text.lines() {
             let line = line.trim();
@@ -228,7 +222,7 @@ impl UniversalPackageAdapter {
                     }
                     "Description" => description = val.to_string(),
                     "Priority" => {
-                        priority = match val.to_lowercase().as_str() {
+                        _priority = match val.to_lowercase().as_str() {
                             "essential" => PackagePriority::Essential,
                             "required" => PackagePriority::Required,
                             "important" => PackagePriority::Important,
@@ -248,9 +242,10 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "x86_64".to_string(),
+            maintainer: String::new(),
             depends,
             description,
-            priority,
         })
     }
 
@@ -1015,22 +1010,8 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::GuixNar) // Nix / Guix NAR archive magic
         } else if data.starts_with(b"OBSD") {
             Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
-        } else if data.starts_with(b"SPAK") {
-            Some(PackageFormat::Spack) // HPC Spack magic
-        } else if data.starts_with(b"CONA") {
-            Some(PackageFormat::Conan) // Conan package magic
-        } else if data.starts_with(b"WHEL") {
-            Some(PackageFormat::Wheel) // Python Wheel magic
-        } else if data.starts_with(b"CRAT") {
-            Some(PackageFormat::Crate) // Cargo crate magic
-        } else if data.starts_with(b"GEMS") {
-            Some(PackageFormat::Gem) // RubyGems magic
-        } else if data.starts_with(b"NUPK") {
-            Some(PackageFormat::Nupkg) // NuGet magic
-        } else if data.starts_with(b"VCPK") {
-            Some(PackageFormat::Vcpkg) // Vcpkg magic
-        } else if data.starts_with(b"NARI") {
-            Some(PackageFormat::NarInfo) // NarInfo magic
+        } else if data.starts_with(b"OBSD") {
+            Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
         } else {
             None
         }
@@ -2224,20 +2205,6 @@ impl UniversalPmCommandDispatcher {
                         _ => {}
                     }
                     i += 1;
-                }
-            }
-            "pkg_add" | "pkg_info" => {
-                if pm == "pkg_add" {
-                    operation = UniversalPmOperation::Install;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
-                for arg in args {
-                    if *arg == "-n" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
-                    }
                 }
             }
             "pisi" | "urpmi" | "slapt-get" => {
