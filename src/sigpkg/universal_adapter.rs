@@ -7,8 +7,10 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+pub use super::universal_engine::PackageFormat;
+pub use super::universal_oop_system;
+pub use super::universal_oop_system::UniversalPackageManager;
+pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,12 +72,6 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
-
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
@@ -106,9 +102,7 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
+/// UniversalPackageManager imported above via conditional features
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -118,6 +112,16 @@ pub enum PackagePriority {
     Important = 2,
     Required = 3,
     Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
+}
+
+/// Description of Debian / APT Control Manifest (.deb / dpkg parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
 }
 
 pub trait PackageFormatAdapter {
@@ -1429,14 +1433,14 @@ impl Default for UniversalServerImageAdapter {
 /// into native Sigma-pkg models, mapping dependencies, sandboxing capabilities, and registering with Universal PM.
 pub struct SigPkgUniversalBridgeEngine {
     adapter: UniversalPackageAdapter,
-    pm: universal_oop_system::UniversalPackageManager,
+    pm: super::universal_oop_system::UniversalPackageManager,
 }
 
 impl SigPkgUniversalBridgeEngine {
     pub fn new() -> Self {
         Self {
             adapter: UniversalPackageAdapter::new(),
-            pm: universal_oop_system::UniversalPackageManager::new(),
+            pm: super::universal_oop_system::UniversalPackageManager::new(),
         }
     }
 
@@ -1584,8 +1588,8 @@ impl SigPkgUniversalBridgeEngine {
         raw_data: &[u8],
     ) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let standard_pkg = universal_oop_system::StandardPackage {
-            metadata: universal_oop_system::PackageMetadata {
+        let standard_pkg = super::universal_oop_system::StandardPackage {
+            metadata: super::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
                 version: native_pkg.version,
                 description: native_pkg.description.clone(),
@@ -1601,7 +1605,7 @@ impl SigPkgUniversalBridgeEngine {
                 supported_architectures: Vec::new(),
             },
             dependencies: Vec::new(),
-            format: universal_oop_system::PackageFormat::Sigma,
+            format: super::universal_oop_system::PackageFormat::Sigma,
         };
         let _ = self.pm.install_package(Box::new(standard_pkg));
         Ok(native_pkg)
@@ -1697,7 +1701,7 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" | "musl-dev" | "libc-dev" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -2150,7 +2154,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" | "pkg_add" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
@@ -2166,6 +2170,20 @@ impl UniversalPmCommandDispatcher {
                         _ => {}
                     }
                     i += 1;
+                }
+            }
+            "pkg_add" | "pkg_info" => {
+                if pm == "pkg_add" {
+                    operation = UniversalPmOperation::Install;
+                } else {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
+                for arg in args {
+                    if *arg == "-n" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
                 }
             }
             "slackpkg" | "installpkg" | "removepkg" => {
@@ -2204,7 +2222,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "flatpak" | "snap" | "pkgman" | "swupd" | "brew" => {
+            "flatpak" | "snap" | "pkgman" | "swupd" | "brew" | "cachyos-hello" | "chwd" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2224,20 +2242,6 @@ impl UniversalPmCommandDispatcher {
                         _ => {}
                     }
                     i += 1;
-                }
-            }
-            "pkg_add" | "pkg_info" => {
-                if pm == "pkg_add" {
-                    operation = UniversalPmOperation::Install;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
-                for arg in args {
-                    if *arg == "-n" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
-                    }
                 }
             }
             "pisi" | "urpmi" | "slapt-get" => {
@@ -2795,7 +2799,7 @@ impl Default for UniversalDryRunSimulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -3038,15 +3042,15 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Pisi)
+            Some(PackageFormat::Eopkg)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
-            Some(PackageFormat::Portage)
+            Some(PackageFormat::Ebuild)
         );
         assert_eq!(
             adapter.detect_format_by_extension("ubuntu.deb"),
-            Some(PackageFormat::Apt)
+            Some(PackageFormat::Deb)
         );
         assert_eq!(
             adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -3054,7 +3058,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("fedora.rpm"),
-            Some(PackageFormat::Yum)
+            Some(PackageFormat::Rpm)
         );
         assert_eq!(
             adapter.detect_format_by_extension("harmony.hap"),

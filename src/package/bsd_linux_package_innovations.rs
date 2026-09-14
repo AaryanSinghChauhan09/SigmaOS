@@ -4716,7 +4716,7 @@ MAINTAINER="SigmaOS"
             ("archive.tar .gz", PackageFormat::TarGz),
             ("compressed.xz", PackageFormat::TarXz),
             ("fedora.rpm", PackageFormat::Yum),
-            ("gentoo.ebuild", PackageFormat::Portage),
+            ("gentoo.ebuild", PackageFormat::Ebuild),
             ("arch.pkg.tar.xz", PackageFormat::Pacman),
             ("app.flatpak", PackageFormat::Flatpak),
             ("macos.app", PackageFormat::AppBundle),
