@@ -107,8 +107,8 @@ impl PackageFormat {
         else if f.ends_with(".pisi") { Some(PackageFormat::Pisi) }
         else if f.ends_with(".superdeb") { Some(PackageFormat::Superdeb) }
         else if f.ends_with(".lzm") { Some(PackageFormat::Lzm) }
-        else if f.ends_with(".pup") { Some(PackageFormat::Pup) }
-        else if f.ends_with(".pet") { Some(PackageFormat::Pet) }
+        else if f.ends_with(".pup") || f == "pup" { Some(PackageFormat::Pup) }
+        else if f.ends_with(".pet") || f == "pet" { Some(PackageFormat::Pet) }
         else if f.ends_with(".flatpak") || f.ends_with(".flatpakref") { Some(PackageFormat::Flatpak) }
         else if f.ends_with(".snap") { Some(PackageFormat::Snap) }
         else if f.ends_with(".txz") { Some(PackageFormat::Txz) }

@@ -1393,6 +1393,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: crate::sigpkg::universal_adapter::PackagePriority,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -2525,6 +2526,7 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
+            priority: crate::sigpkg::universal_adapter::PackagePriority::Optional,
         };
 
         let _pkgbuild = PacmanPkgbuild {
