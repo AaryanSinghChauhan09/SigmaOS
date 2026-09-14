@@ -48,8 +48,5 @@ pub use sovereign_commands::{
     SovereignDevDmesg, SovereignDfDu, SovereignGccToolchain, SovereignInitramfsSystemd,
     SovereignOpenBsdDoas, SovereignSudo, SovereignTopHtop,
 };
-pub mod tech_media_innovations;
-pub use tech_media_innovations::*;
-
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
