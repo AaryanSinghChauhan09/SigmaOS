@@ -11,10 +11,7 @@ use alloc::vec::Vec;
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{HashMap, HashSet};
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::sync::Arc;
+use crate::klib::{Arc, HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
@@ -1396,7 +1393,6 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
-    pub priority: String,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)

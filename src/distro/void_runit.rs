@@ -5,6 +5,7 @@
  * health checking, and automatic restart policy governance.
  */
 
+
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
@@ -90,17 +91,17 @@ impl RunitService {
 /// Runit Service Supervisor Engine
 #[derive(Debug, Default, Clone)]
 pub struct RunitSupervisor {
+    pub services: BTreeMap<String, RunitService>,
     pub stage: RunitStage,
     pub current_stage_num: u8,
-    pub services: BTreeMap<String, RunitService>,
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
+            services: BTreeMap::new(),
             stage: RunitStage::Stage1,
             current_stage_num: 1,
-            services: BTreeMap::new(),
         }
     }
 
@@ -163,7 +164,7 @@ impl RunitSupervisor {
     }
 
     /// Check if service can start (dependencies satisfied)
-    pub fn can_start_service(&self, name: &str, started: &[String]) -> bool {
+    fn can_start_service(&self, name: &str, started: &[String]) -> bool {
         if let Some(service) = self.services.get(name) {
             for dep in &service.dependencies {
                 if !started.contains(dep) {
@@ -176,10 +177,10 @@ impl RunitSupervisor {
         }
     }
 
-    /// Check if service can stop (dependents already stopped)
-    pub fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
-        for (other_name, service) in &self.services {
-            if service.dependencies.contains(&String::from(name)) && !stopped.contains(other_name) {
+    /// Check if service can stop (no active services depend on it)
+    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+        for (other_name, other_service) in &self.services {
+            if !stopped.contains(other_name) && other_service.dependencies.contains(&name.to_string()) {
                 return false;
             }
         }
@@ -236,8 +237,6 @@ impl RunitSupervisor {
         }
     }
 }
-
-pub type ServiceState = RunitServiceStatus;
 
 #[cfg(test)]
 mod tests {
