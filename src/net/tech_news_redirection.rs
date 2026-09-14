@@ -84,6 +84,11 @@ impl SovereignTechNewsRedirectionEngine {
             ("linuxteck", "LinuxTeck", "linuxteck.com", "https://www.linuxteck.com/feed/", "https://www.linuxteck.com", TechPublicationCategory::LinuxAndOpenSource, "Linux sysadmin tutorials, DevOps and security guides"),
             ("appuals", "Appuals", "appuals.com", "https://appuals.com/feed/", "https://appuals.com", TechPublicationCategory::WindowsAndCrossPlatform, "Software troubleshooting, OS error fixes and guides"),
             ("distrowatch", "DistroWatch", "distrowatch.com", "https://distrowatch.com/news/dw.xml", "https://distrowatch.com", TechPublicationCategory::LinuxAndOpenSource, "Linux and BSD distribution release tracking and rankings"),
+            ("9to5google", "9to5Google", "9to5google.com", "https://9to5google.com/feed/", "https://9to5google.com", TechPublicationCategory::WindowsAndCrossPlatform, "Google, Android, Pixel hardware and ChromeOS ecosystem updates"),
+            ("9to5mac", "9to5Mac", "9to5mac.com", "https://9to5mac.com/feed/", "https://9to5mac.com", TechPublicationCategory::HardwareAndGadgets, "Apple, macOS, iOS hardware and developer ecosystem news"),
+            ("androidauthority", "Android Authority", "androidauthority.com", "https://www.androidauthority.com/feed/", "https://www.androidauthority.com", TechPublicationCategory::WindowsAndCrossPlatform, "Android smartphones, mobile OS news, apps and reviews"),
+            ("androidpolice", "Android Police", "androidpolice.com", "https://www.androidpolice.com/feed/", "https://www.androidpolice.com", TechPublicationCategory::WindowsAndCrossPlatform, "Android APK breakdowns, OS updates and mobile ecosystem news"),
+            ("frappe", "Frappe", "frappe.io", "https://frappe.io/blog/rss.xml", "https://frappe.io", TechPublicationCategory::EnterpriseAndCloud, "Frappe open-source framework, ERPNext development and low-code tooling"),
         ];
 
         for (id, name, domain, feed_url, canonical_url, category, desc) in entries {
