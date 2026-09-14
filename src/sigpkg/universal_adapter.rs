@@ -70,11 +70,13 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
 pub use crate::sigpkg::Version;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::universal_engine::PackageFormat;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::sigpkg::universal_oop_system;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
