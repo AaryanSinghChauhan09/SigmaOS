@@ -2151,7 +2151,9 @@ impl UniversalPmCommandDispatcher {
                 }
             }
             "pkgin" | "pkg_delete" | "pkg_add" => {
-                if pm == "pkg_delete" {
+                if pm == "pkg_add" {
+                    operation = UniversalPmOperation::Install;
+                } else if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
                 let mut i = 0;
@@ -2226,12 +2228,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_add" | "pkg_info" => {
-                if pm == "pkg_add" {
-                    operation = UniversalPmOperation::Install;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
+            "pkg_info" => {
+                operation = UniversalPmOperation::QueryInfo;
                 for arg in args {
                     if *arg == "-n" {
                         dry_run = true;
