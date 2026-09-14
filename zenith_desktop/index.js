@@ -166,6 +166,31 @@ export function initHighContrastSupport() {
   }
 }
 
+/**
+ * Initializes Escape key listener to dismiss active modal overlays (#cmd-palette, #context-menu, #help-overlay).
+ */
+export function initEscapeKeyDismissal() {
+  if (typeof document === "undefined") return;
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" || event.key === "Esc") {
+      const cmdPalette = SovereignDomSelector.selectOne("#cmd-palette");
+      if (cmdPalette && cmdPalette.classList.contains("active")) {
+        cmdPalette.classList.remove("active");
+      }
+
+      const contextMenu = SovereignDomSelector.selectOne("#context-menu");
+      if (contextMenu && contextMenu.style.display !== "none") {
+        contextMenu.style.display = "none";
+      }
+
+      const helpOverlay = SovereignDomSelector.selectOne("#help-overlay");
+      if (helpOverlay && !helpOverlay.classList.contains("wizard-overlay--hidden")) {
+        helpOverlay.classList.add("wizard-overlay--hidden");
+      }
+    }
+  });
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   if (document.readyState === "loading") {
@@ -173,11 +198,13 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initKeyboardNavigation();
       initHighContrastSupport();
       initTablistNavigation();
+      initEscapeKeyDismissal();
     });
   } else {
     initKeyboardNavigation();
     initHighContrastSupport();
     initTablistNavigation();
+    initEscapeKeyDismissal();
   }
 }
 
