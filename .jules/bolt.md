@@ -45,3 +45,7 @@
 ## 2026-09-13 - Fast Raw Byte-Scanning Path for JSON String Parsing
 **Learning:** In JSON recursive descent parsers, iterating over string characters using `.chars().next()` decodes UTF-8 multi-byte sequences for every byte in the input string. Scanning raw byte slices (`&[u8]`) directly until hitting delimiter bytes (`"` or `\`) bypasses character decoding entirely for escape-free strings (the majority of JSON strings), resulting in a significant parsing throughput increase while falling back safely to UTF-8 decoding when backslash escapes are encountered.
 **Action:** When parsing text formats or string literals, use raw byte-level scanning for delimiter detection and fast slicing before falling back to multi-byte UTF-8 character decoding.
+
+## 2026-09-14 - Single-Pass Slice Joining vs Format Macro Allocations
+**Learning:** Formatting slice arguments via `format!("{}/{}", args, " ")` incurs dynamic formatting macro overhead and fails type trait bounds for slice types. Replacing manual format macros with `args.join(" ")` allocates a single heap buffer pre-sized to the combined length of all elements, eliminating intermediate string copies.
+**Action:** Always prefer `slice.join(" ")` over `format!` macros when concatenating collections of string slices.
