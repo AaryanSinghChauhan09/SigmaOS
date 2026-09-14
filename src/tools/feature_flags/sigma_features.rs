@@ -16,6 +16,8 @@ use std::vec::Vec;
 pub struct FeatureFlag {
     pub name: [u8; 64],
     pub description: [u8; 256],
+    pub name_len: u8,
+    pub description_len: u16,
     pub enabled: bool,
     pub global: bool,
     pub dependencies: [u64; 16], // Other flags this depends on
@@ -28,6 +30,8 @@ impl FeatureFlag {
         Self {
             name: [0; 64],
             description: [0; 256],
+            name_len: 0,
+            description_len: 0,
             enabled: false,
             global: false,
             dependencies: [0; 16],
@@ -39,17 +43,15 @@ impl FeatureFlag {
     pub fn new(name: &str, description: &str, enabled: bool, global: bool) -> Self {
         let mut flag = Self::empty();
 
-        // Copy name (truncated if too long)
         let name_bytes = name.as_bytes();
-        for (i, &byte) in name_bytes.iter().enumerate().take(64) {
-            flag.name[i] = byte;
-        }
+        let name_len = name_bytes.len().min(64);
+        flag.name[..name_len].copy_from_slice(&name_bytes[..name_len]);
+        flag.name_len = name_len as u8;
 
-        // Copy description (truncated if too long)
         let desc_bytes = description.as_bytes();
-        for (i, &byte) in desc_bytes.iter().enumerate().take(256) {
-            flag.description[i] = byte;
-        }
+        let desc_len = desc_bytes.len().min(256);
+        flag.description[..desc_len].copy_from_slice(&desc_bytes[..desc_len]);
+        flag.description_len = desc_len as u16;
 
         flag.enabled = enabled;
         flag.global = global;
@@ -58,13 +60,15 @@ impl FeatureFlag {
 
     /// Get name as string
     pub fn get_name(&self) -> String {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        // Bolt ⚡ performance optimization: O(1) direct slice indexing using cached name_len instead of O(N) zero-byte linear scan
+        let len = (self.name_len as usize).min(64);
         String::from_utf8_lossy(&self.name[..len]).to_string()
     }
 
     /// Get description as string
     pub fn get_description(&self) -> String {
-        let len = self.description.iter().position(|&b| b == 0).unwrap_or(256);
+        // Bolt ⚡ performance optimization: O(1) direct slice indexing using cached description_len instead of O(N) zero-byte linear scan
+        let len = (self.description_len as usize).min(256);
         String::from_utf8_lossy(&self.description[..len]).to_string()
     }
 
@@ -443,7 +447,7 @@ pub fn calculate_flag_hash(name: &str) -> u64 {
     hash
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
