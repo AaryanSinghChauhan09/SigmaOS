@@ -143,7 +143,7 @@ pub mod memory {
             i += 1;
         }
         // Prevent compiler optimization
-        core::sync::atomic::compiler_fence(core::sync::atomic::Ordering::SeqCst);
+        core::hint::black_box(());
     }
 }
 

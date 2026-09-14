@@ -70,8 +70,11 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
+#[cfg(test)]
 pub use crate::sigpkg::Version;
-pub use crate::sigpkg::universal_engine::PackageFormat;
+
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -107,7 +110,15 @@ pub struct PacmanPkgbuild {
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub use crate::package::universal::PackagePriority;
+/// Debian-style package priority levels (DFSG and APT standard)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PackagePriority {
+    Optional = 0,
+    Standard = 1,
+    Important = 2,
+    Required = 3,
+    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
+}
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -237,8 +248,6 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
-            architecture: "amd64".to_string(),
-            maintainer: "Debian Maintainers".to_string(),
             depends,
             description,
             priority,
@@ -2141,7 +2150,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" => {
+            "pkgin" | "pkg_delete" | "pkg_add" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }

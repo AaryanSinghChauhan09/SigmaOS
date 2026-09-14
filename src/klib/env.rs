@@ -2,7 +2,7 @@
 //! Custom environment variable access for SigmaOS
 //! Inspired by Linux & BSD distribution standards (XDG Base Directory, OpenBSD secure_getenv, FreeBSD defaults)
 
-pub type c_char = i8;
+use core::ffi::c_char;
 use core::sync::atomic::{AtomicBool, Ordering};
 use std::boxed::Box;
 use std::string::FromUtf8Error as Utf8Error;

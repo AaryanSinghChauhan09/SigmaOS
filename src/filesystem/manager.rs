@@ -1003,6 +1003,12 @@ mod open_source_file_manager_tests {
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ActivePane {
+    Left,
+    Right,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ViNavigationMode {
     Normal,
     Visual,

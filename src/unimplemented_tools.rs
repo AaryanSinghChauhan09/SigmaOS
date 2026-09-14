@@ -5347,14 +5347,14 @@ impl NetworkPcapForensicSniffer {
 
 pub struct BsdCapsicumRightsSandboxingEngine {
     pub capability_mode: bool,
-    pub allowed_rights: std::collections::BTreeMap<i32, Vec<String>>,
+    pub allowed_rights: BTreeMap<i32, Vec<String>>,
 }
 
 impl BsdCapsicumRightsSandboxingEngine {
     pub fn new() -> Self {
         Self {
             capability_mode: false,
-            allowed_rights: std::collections::BTreeMap::new(),
+            allowed_rights: BTreeMap::new(),
         }
     }
 
@@ -5372,7 +5372,7 @@ impl BsdCapsicumRightsSandboxingEngine {
             return true;
         }
         if let Some(rights) = self.allowed_rights.get(&fd) {
-            rights.iter().any(|r| r.eq_ignore_ascii_case(right))
+            rights.iter().any(|r: &String| r.eq_ignore_ascii_case(right))
         } else {
             false
         }
