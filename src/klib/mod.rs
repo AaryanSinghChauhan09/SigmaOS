@@ -49,6 +49,7 @@ pub mod toml;
 pub mod utf8_utils;
 pub mod uuid;
 pub mod uvm;
+pub mod zero_dependency_elimination;
 
 pub mod string {
     pub use crate::klib::custom_string::SigmaString;
@@ -60,11 +61,14 @@ pub mod vec {
 
 // Re-exports
 pub use arc::Arc;
+pub use btreemap::BTreeMap;
 pub use custom_string::SigmaString;
 pub use linked_list::{LinkedList, SList};
 pub use ring_buffer::{HeapRingBuffer, RingBuffer};
 pub use slab::{SlabCache, TypedSlabCache};
 pub use uuid::Uuid;
+pub use zero_dependency_elimination::ZeroDependencyMasterHub as ZeroDependencyPrimitiveHub;
+pub use zero_dependency_elimination::ZeroDependencyMasterHub;
 
 #[cfg(not(target_os = "none"))]
 pub use std::vec::Vec;

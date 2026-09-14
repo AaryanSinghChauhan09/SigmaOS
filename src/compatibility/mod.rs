@@ -36,7 +36,6 @@ pub use fedora::*;
 pub mod fedora_missing_components;
 pub use fedora_missing_components::*;
 pub mod fedora_domination;
-pub mod fedora_missing_components;
 
 pub use fedora_missing_components::{
     Dnf5Advisory, FedoraAnacondaKickstartEngine, FedoraDnf5PackageEngine,
@@ -133,9 +132,9 @@ pub mod relay_nexus;
 pub mod scosmos;
 pub mod sigmawin;
 pub use sigmawin::{
-    D3dToVulkanTranslator, D3dVersion, NtNativeSyscallTranslator, PeHeaderInfo, RegistryHive,
-    SovereignRegistryEngine, SovereignWin32Subsystem, User32MessageQueue, Win32Message,
-    Win32PeExecutableParser, WinSockAdapter, WindowsPowerShellShimEngine,
+    D3dToVulkanTranslator, D3dVersion, NtNativeSyscallTranslator, PeHeaderInfo,
+    User32MessageQueue, Win32Message, Win32PeExecutableParser, WinSockAdapter,
+    WindowsPowerShellShimEngine,
 };
 pub mod solid_kernel;
 pub mod sovereign_suite;

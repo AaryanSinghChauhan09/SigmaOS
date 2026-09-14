@@ -12,18 +12,12 @@ use std::vec::Vec;
 
 
 #[cfg(not(test))]
-use std::collections::BTreeMap;
 #[cfg(not(test))]
-use std::string::String;
 #[cfg(not(test))]
-use std::vec::Vec;
 
 #[cfg(test)]
-use std::collections::BTreeMap;
 #[cfg(test)]
-use std::string::String;
 #[cfg(test)]
-use std::vec::Vec;
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
