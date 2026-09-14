@@ -163,7 +163,13 @@ pub fn validate_hostname(name: &[u8]) -> Result<(), ValidationError> {
 
 // ── Environment variables ──────────────────────────────────────────────────
 
-/// Validate an environment variable key (no `=`, no NUL).
+/// Validate an environment variable key per POSIX IEEE Std 1003.1.
+///
+/// Rules:
+/// - Non-empty, ≤ `MAX_ENV_KEY_LEN` (256 bytes)
+/// - First byte MUST be ASCII letter or underscore (`[a-zA-Z_]`).
+/// - Subsequent bytes MUST be ASCII alphanumeric or underscore (`[a-zA-Z0-9_]`).
+/// - Rejects leading digits, hyphens (`-`), `=`, NUL bytes, and special characters.
 pub fn validate_env_key(key: &[u8]) -> Result<(), ValidationError> {
     if key.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -171,8 +177,12 @@ pub fn validate_env_key(key: &[u8]) -> Result<(), ValidationError> {
     if key.len() > MAX_ENV_KEY_LEN {
         return Err(ValidationError::TooLong);
     }
-    for &b in key {
-        if b == 0 || b == b'=' {
+    let first = key[0];
+    if !first.is_ascii_alphabetic() && first != b'_' {
+        return Err(ValidationError::InvalidChars);
+    }
+    for &b in &key[1..] {
+        if !b.is_ascii_alphanumeric() && b != b'_' {
             return Err(ValidationError::InvalidChars);
         }
     }
@@ -467,6 +477,26 @@ mod tests {
         // Total hostname length > 253
         let long_hostname = [b'a'; MAX_HOSTNAME_LEN + 1];
         assert_eq!(validate_hostname(&long_hostname), Err(ValidationError::TooLong));
+    }
+
+    #[test]
+    fn test_validate_env_key() {
+        assert_eq!(validate_env_key(b"PATH"), Ok(()));
+        assert_eq!(validate_env_key(b"_USER"), Ok(()));
+        assert_eq!(validate_env_key(b"VAR_123"), Ok(()));
+        assert_eq!(validate_env_key(b""), Err(ValidationError::EmptyInput));
+
+        // Reject leading digits
+        assert_eq!(validate_env_key(b"123VAR"), Err(ValidationError::InvalidChars));
+
+        // Reject hyphens, equals, NUL, and special characters
+        assert_eq!(validate_env_key(b"MY-VAR"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"KEY=VAL"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"FOO$BAR"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_env_key(b"KEY\x00"), Err(ValidationError::InvalidChars));
+
+        let long_key = [b'A'; MAX_ENV_KEY_LEN + 1];
+        assert_eq!(validate_env_key(&long_key), Err(ValidationError::TooLong));
     }
 
     #[test]
