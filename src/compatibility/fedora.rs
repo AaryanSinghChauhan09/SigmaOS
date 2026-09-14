@@ -6,9 +6,6 @@ use std::vec;
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-#[cfg(test_disabled)]
 use std::collections::HashMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
