@@ -254,3 +254,12 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
+
+pub mod sovereign_2026_distro_leap_engine;
+pub use sovereign_2026_distro_leap_engine::{
+    ApkV3PqcSpec, BoreTaskMetrics, ColorSpaceHdr, InstructionBoundsSpec, MicroarchIsaTarget,
+    PqcMerkleClosureSpec, PressureStallMetrics, SchedExtBorePolicy,
+    Sovereign2026DistroSuperiorityMasterEngine, SovereignCachyosMicroarchV4PqcVerifier,
+    SovereignNixGuixHermeticCasEngine, SovereignOpenBsd77PinsyscallHardeningEngine,
+    SovereignSchedExtBoreV2Governor, SovereignWayland124ZenithHdrEngine, ToneMappingLutSpec,
+};
