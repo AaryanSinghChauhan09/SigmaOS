@@ -2,7 +2,6 @@
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
 
-
 use std::string::ToString;
 use std::vec;
 use std::vec::Vec;
@@ -510,175 +509,8 @@ impl Default for CronJobScheduler {
 }
 
 // ============================================================================
-// 7. Encrypted DNS-over-TLS & DNSSEC Resolver Engine (systemd-resolved / Unbound)
+// 7. Encrypted DNS-over-TLS & DNSSEC Resolver Engine
 // ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain_name: &'static str,
-    pub ip_address: [u8; 4],
-    pub ttl_seconds: u32,
-    pub dnssec_validated: bool,
-}
-
-#[derive(Debug)]
-pub struct SovereignDnsTlsResolverEngine {
-    pub upstream_dot_server: [u8; 4], // e.g. 1.1.1.1
-    pub dot_port: u16,                // 853
-    pub local_cache: Vec<DnsRecordEntry>,
-    pub dnssec_enforced: bool,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-        match alias {
-            "char-major-10-200" => Some("tun"),
-            "net-pf-10" => Some("ipv6"),
-            "block-major-8-0" => Some("sda"),
-            _ => None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    CharacterDevice,
-    BlockDevice,
-    Fifo,
-    Socket,
-}
-
-#[derive(Debug, Clone)]
-pub struct DeviceNodeEntry {
-    pub name: String,
-    pub node_type: DeviceNodeType,
-    pub major: u32,
-    pub minor: u32,
-    pub symlink_paths: Vec<String>,
-}
-
-pub struct SovereignDynamicDevfsEngine {
-    pub nodes: Vec<DeviceNodeEntry>,
-}
-
-impl SovereignDynamicDevfsEngine {
-    pub fn new() -> Self {
-        Self { nodes: Vec::new() }
-    }
-
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        self.nodes.push(DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            symlink_paths: Vec::new(),
-        });
-    }
-}
-
-impl Default for SovereignDynamicDevfsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-    Masquerade,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConntrackTableEntry {
-    pub original_src: [u8; 4],
-    pub original_dst: [u8; 4],
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub translated_ip: [u8; 4],
-    pub translated_port: u16,
-    pub nat_type: NatType,
-    pub packets_counter: u64,
-}
-
-pub struct SovereignStatefulNatEngine {
-    pub public_ip: [u8; 4],
-    pub conntrack_table: Vec<ConntrackTableEntry>,
-}
-
-impl SovereignStatefulNatEngine {
-    pub fn new(public_ip: [u8; 4]) -> Self {
-        Self {
-            public_ip,
-            conntrack_table: Vec::new(),
-        }
-    }
-
-    pub fn create_snat_mapping(
-        &mut self,
-        internal_src: [u8; 4],
-        dst_ip: [u8; 4],
-        src_port: u16,
-        dst_port: u16,
-        protocol: u8,
-    ) -> ([u8; 4], u16) {
-        let _ = protocol;
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
-                && c.src_port == src_port
-                && c.original_dst == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConntrackTableEntry {
-                original_src: internal_src,
-                original_dst: dst_ip,
-                src_port,
-                dst_port,
-                translated_ip: self.public_ip,
-                translated_port: src_port,
-                nat_type: NatType::Snat,
-                packets_counter: 1,
-            });
-        }
-        (self.public_ip, src_port)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_epoch_ms: u64,
-    pub identifier: String,
-    pub message: String,
-    pub priority: u8,
-}
-
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub log_records: Vec<JournaldLogRecord>,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new() -> Self {
-        Self { log_records: Vec::new() }
-    }
-
-    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
-        self.log_records.push(JournaldLogRecord {
-            timestamp_epoch_ms: 1000,
-            identifier: identifier.to_string(),
-            message: message.to_string(),
-            priority,
-        });
-    }
-}
-
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct DnsRecordEntry {
@@ -704,11 +536,20 @@ impl SovereignDnsTlsResolverEngine {
     pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
         self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
     }
+
+    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
+        match alias {
+            "char-major-10-200" => Some("tun"),
+            "net-pf-10" => Some("ipv6"),
+            "block-major-8-0" => Some("sda"),
+            _ => None,
+        }
+    }
 }
 
-impl Default for DemandPagingSwapEngine {
+impl Default for SovereignDnsTlsResolverEngine {
     fn default() -> Self {
-        Self::new(2048)
+        Self::new([1, 1, 1, 1])
     }
 }
 
@@ -720,30 +561,32 @@ impl Default for DemandPagingSwapEngine {
 pub enum DeviceNodeType {
     Block,
     Character,
+    CharacterDevice,
+    BlockDevice,
+    Fifo,
+    Socket,
 }
 
 #[derive(Debug, Clone)]
 pub struct DeviceNodeEntry {
-    pub name: &'static str,
+    pub name: String,
     pub node_type: DeviceNodeType,
     pub major: u32,
     pub minor: u32,
     pub owner_uid: u32,
     pub group_gid: u32,
     pub mode_octal: u16,
-    pub symlink_paths: Vec<&'static str>,
+    pub symlink_paths: Vec<String>,
 }
 
 #[derive(Debug)]
 pub struct SovereignDynamicDevfsEngine {
-    pub devices: Vec<DeviceNodeEntry>,
+    pub nodes: Vec<DeviceNodeEntry>,
 }
 
 impl SovereignDynamicDevfsEngine {
     pub fn new() -> Self {
-        let mut devfs = Self {
-            devices: Vec::new(),
-        };
+        let mut devfs = Self { nodes: Vec::new() };
 
         // Populate default device nodes
         devfs.create_node("null", DeviceNodeType::Character, 1, 3, 0, 0, 0o666);
@@ -755,7 +598,7 @@ impl SovereignDynamicDevfsEngine {
 
     pub fn create_node(
         &mut self,
-        name: &'static str,
+        name: &str,
         node_type: DeviceNodeType,
         major: u32,
         minor: u32,
@@ -763,8 +606,8 @@ impl SovereignDynamicDevfsEngine {
         group_gid: u32,
         mode_octal: u16,
     ) {
-        self.devices.push(DeviceNodeEntry {
-            name,
+        self.nodes.push(DeviceNodeEntry {
+            name: name.to_string(),
             node_type,
             major,
             minor,
@@ -775,9 +618,13 @@ impl SovereignDynamicDevfsEngine {
         });
     }
 
-    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &'static str) -> bool {
-        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink);
+    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
+        self.create_node(name, node_type, major, minor, 0, 0, 0o660);
+    }
+
+    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
+        if let Some(dev) = self.nodes.iter_mut().find(|d| d.name == dev_name) {
+            dev.symlink_paths.push(symlink.to_string());
             true
         } else {
             false
@@ -785,9 +632,9 @@ impl SovereignDynamicDevfsEngine {
     }
 
     pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
-        self.devices
+        self.nodes
             .iter()
-            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| *s == name))
+            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
     }
 }
 
@@ -800,6 +647,13 @@ impl Default for SovereignDynamicDevfsEngine {
 // ============================================================================
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
 
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
@@ -835,8 +689,6 @@ impl SovereignStatefulNatEngine {
         dst_port: u16,
         _protocol: u8,
     ) -> ([u8; 4], u16) {
-
-        // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
             c.original_src == internal_src
                 && c.src_port == src_port
@@ -871,6 +723,67 @@ impl SovereignStatefulNatEngine {
             }
         }
         None
+    }
+}
+
+// ============================================================================
+// 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct JournaldLogRecord {
+    pub timestamp_unix_epoch: u64,
+    pub timestamp_epoch_ms: u64,
+    pub identifier: String,
+    pub unit_name: String,
+    pub message: String,
+    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
+}
+
+#[derive(Debug)]
+pub struct SovereignJournaldBinaryStorageEngine {
+    pub log_records: Vec<JournaldLogRecord>,
+    pub max_logs_capacity: usize,
+}
+
+impl SovereignJournaldBinaryStorageEngine {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            log_records: Vec::new(),
+            max_logs_capacity: capacity,
+        }
+    }
+
+    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &str, msg: &str) {
+        if self.log_records.len() >= self.max_logs_capacity {
+            self.log_records.remove(0); // Journal rotation
+        }
+        self.log_records.push(JournaldLogRecord {
+            timestamp_unix_epoch: timestamp,
+            timestamp_epoch_ms: timestamp * 1000,
+            identifier: unit.to_string(),
+            unit_name: unit.to_string(),
+            message: msg.to_string(),
+            priority,
+        });
+    }
+
+    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
+        self.log(1000, priority, identifier, message);
+    }
+
+    pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
+        self.log_records.iter().filter(|l| l.unit_name == unit || l.identifier == unit).collect()
+    }
+
+    pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
+        self.log_records.iter().filter(|l| l.priority <= min_priority).collect()
+    }
+}
+
+impl Default for SovereignJournaldBinaryStorageEngine {
+    fn default() -> Self {
+        Self::new(1000)
     }
 }
 
@@ -911,8 +824,6 @@ pub struct SecurityBlueprintStatus {
 }
 
 /// Sovereign Master Distro Ecosystem Engine
-/// Addresses all core component gaps and advanced feature requirements to elevate SigmaOS
-/// into a full distribution ecosystem comparable to Linux and BSD.
 #[derive(Debug, Clone)]
 pub struct SovereignMasterDistroEcosystemEngine {
     pub active_roadmap_phase: DistroRoadmapPhase,
@@ -933,7 +844,6 @@ impl SovereignMasterDistroEcosystemEngine {
         }
     }
 
-    /// Evaluates the complete Comparison Snapshot Matrix against mature Linux & BSD ecosystems
     pub fn evaluate_distro_gap_snapshot(&self) -> Vec<DistroComponentSnapshot> {
         vec![
             DistroComponentSnapshot {
@@ -1002,17 +912,15 @@ impl SovereignMasterDistroEcosystemEngine {
         ]
     }
 
-    /// Evaluates execution readiness for a given roadmap phase
     pub fn evaluate_roadmap_phase(&self, phase: DistroRoadmapPhase) -> bool {
         match phase {
-            DistroRoadmapPhase::Phase1Foundation | DistroRoadmapPhase::ShortTerm => true, // Init, Universal PM, Coreutils ready
-            DistroRoadmapPhase::Phase2Parity | DistroRoadmapPhase::MidTerm => true,       // Networking, Filesystems, Drivers ready
-            DistroRoadmapPhase::Phase3Competitiveness | DistroRoadmapPhase::LongTerm => true, // Containers, Hypervisors, Rollbacks
-            DistroRoadmapPhase::Phase4Sovereignty => true, // MAC, Cryptographic boot, Telemetry, Accessibility & i18n ready
+            DistroRoadmapPhase::Phase1Foundation | DistroRoadmapPhase::ShortTerm => true,
+            DistroRoadmapPhase::Phase2Parity | DistroRoadmapPhase::MidTerm => true,
+            DistroRoadmapPhase::Phase3Competitiveness | DistroRoadmapPhase::LongTerm => true,
+            DistroRoadmapPhase::Phase4Sovereignty => true,
         }
     }
 
-    /// Evaluates the complete Security & Sovereignty Blueprint Status
     pub fn evaluate_security_blueprint(&self) -> Vec<SecurityBlueprintStatus> {
         vec![
             SecurityBlueprintStatus {
@@ -1061,49 +969,89 @@ impl Default for SovereignMasterDistroEcosystemEngine {
 }
 
 // ============================================================================
-// 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
+// 11. Universal Linux & BSD Distro Gap Resolver
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_unix_epoch: u64,
-    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
-    pub unit_name: &'static str,
-    pub message: &'static str,
+pub struct PamFaillockGuard {
+    pub failed_attempts: u32,
+    pub max_failures: u32,
+    pub is_locked: bool,
 }
 
-#[derive(Debug)]
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub logs: Vec<JournaldLogRecord>,
-    pub max_logs_capacity: usize,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new(capacity: usize) -> Self {
+impl PamFaillockGuard {
+    pub fn new(max_failures: u32) -> Self {
         Self {
-            logs: Vec::new(),
-            max_logs_capacity: capacity,
+            failed_attempts: 0,
+            max_failures,
+            is_locked: false,
         }
     }
 
-    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
-        if self.logs.len() >= self.max_logs_capacity {
-            self.logs.remove(0); // Journal rotation
+    pub fn record_failure(&mut self) -> bool {
+        self.failed_attempts += 1;
+        if self.failed_attempts >= self.max_failures {
+            self.is_locked = true;
         }
-        self.logs.push(JournaldLogRecord {
-            timestamp_unix_epoch: timestamp,
-            priority,
-            unit_name: unit,
-            message: msg.to_string(),
-        });
+        self.is_locked
     }
 
-    pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.unit_name == unit).collect()
+    pub fn reset(&mut self) {
+        self.failed_attempts = 0;
+        self.is_locked = false;
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignUniversalDistroGapResolver {
+    pub dracut_modules_loaded: Vec<&'static str>,
+    pub faillock_guard: PamFaillockGuard,
+    pub bsd_geom_layers: Vec<&'static str>,
+    pub auto_modprobe_aliases: Vec<(&'static str, &'static str)>,
+}
+
+impl SovereignUniversalDistroGapResolver {
+    pub fn new() -> Self {
+        let mut auto_modprobe_aliases = Vec::new();
+        auto_modprobe_aliases.push(("net-pf-16-proto-12", "xfrm_user"));
+        auto_modprobe_aliases.push(("char-major-10-200", "tun"));
+        auto_modprobe_aliases.push(("block-major-8-0", "sd_mod"));
+
+        Self {
+            dracut_modules_loaded: vec![
+                "bash",
+                "systemd",
+                "kernel-modules",
+                "rootfs-generator",
+                "network",
+            ],
+            faillock_guard: PamFaillockGuard::new(3),
+            bsd_geom_layers: vec!["geom_mirror", "geom_stripe", "geom_eli"],
+            auto_modprobe_aliases,
+        }
     }
 
-    pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
+    pub fn resolve_dracut_initramfs_dependencies(&self) -> usize {
+        self.dracut_modules_loaded.len()
+    }
+
+    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
+        for &(a, mod_name) in &self.auto_modprobe_aliases {
+            if a == alias {
+                return Some(mod_name);
+            }
+        }
+        None
+    }
+
+    pub fn verify_bsd_geom_storage_readiness(&self) -> bool {
+        !self.bsd_geom_layers.is_empty()
+    }
+}
+
+impl Default for SovereignUniversalDistroGapResolver {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -1111,7 +1059,7 @@ impl SovereignJournaldBinaryStorageEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1228,7 +1176,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_dns_tls_resolver() {
-        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
+        let resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
     }
@@ -1253,95 +1201,5 @@ mod tests {
         resolver.faillock_guard.record_failure();
         resolver.faillock_guard.reset();
         assert!(!resolver.faillock_guard.is_locked);
-    }
-}
-
-// ============================================================================
-// 7. Universal Linux & BSD Distro Gap Resolver
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct PamFaillockGuard {
-    pub failed_attempts: u32,
-    pub max_failures: u32,
-    pub is_locked: bool,
-}
-
-impl PamFaillockGuard {
-    pub fn new(max_failures: u32) -> Self {
-        Self {
-            failed_attempts: 0,
-            max_failures,
-            is_locked: false,
-        }
-    }
-
-    pub fn record_failure(&mut self) -> bool {
-        self.failed_attempts += 1;
-        if self.failed_attempts >= self.max_failures {
-            self.is_locked = true;
-        }
-        self.is_locked
-    }
-
-    pub fn reset(&mut self) {
-        self.failed_attempts = 0;
-        self.is_locked = false;
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SovereignUniversalDistroGapResolver {
-    pub dracut_modules_loaded: Vec<&'static str>,
-    pub faillock_guard: PamFaillockGuard,
-    pub bsd_geom_layers: Vec<&'static str>,
-    pub auto_modprobe_aliases: Vec<(&'static str, &'static str)>,
-}
-
-impl SovereignUniversalDistroGapResolver {
-    pub fn new() -> Self {
-        #[cfg(not(target_os = "none"))]
-        use std::vec;
-
-        let mut auto_modprobe_aliases = Vec::new();
-        auto_modprobe_aliases.push(("net-pf-16-proto-12", "xfrm_user"));
-        auto_modprobe_aliases.push(("char-major-10-200", "tun"));
-        auto_modprobe_aliases.push(("block-major-8-0", "sd_mod"));
-
-        Self {
-            dracut_modules_loaded: vec![
-                "bash",
-                "systemd",
-                "kernel-modules",
-                "rootfs-generator",
-                "network",
-            ],
-            faillock_guard: PamFaillockGuard::new(3),
-            bsd_geom_layers: vec!["geom_mirror", "geom_stripe", "geom_eli"],
-            auto_modprobe_aliases,
-        }
-    }
-
-    pub fn resolve_dracut_initramfs_dependencies(&self) -> usize {
-        self.dracut_modules_loaded.len()
-    }
-
-    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-        for &(a, mod_name) in &self.auto_modprobe_aliases {
-            if a == alias {
-                return Some(mod_name);
-            }
-        }
-        None
-    }
-
-    pub fn verify_bsd_geom_storage_readiness(&self) -> bool {
-        !self.bsd_geom_layers.is_empty()
-    }
-}
-
-impl Default for SovereignUniversalDistroGapResolver {
-    fn default() -> Self {
-        Self::new()
     }
 }
