@@ -33,32 +33,6 @@ pub use crate::sigpkg::Version;
 
 use std::sync::Arc;
 
-#[cfg(feature = "standalone_test")]
-impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-    }
-}
-
-#[cfg(feature = "standalone_test")]
-impl Version {
-    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self {
-            major,
-            minor,
-            patch,
-        }
-    }
-    pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let clean: String = s.chars().map(|c| if c.is_ascii_digit() || c == '.' { c } else { ' ' }).collect();
-        let first_num = clean.split_whitespace().next().unwrap_or("1.0.0");
-        let parts: Vec<&str> = first_num.split('.').collect();
-        let major = parts.get(0).and_then(|p| p.parse().ok()).unwrap_or(1);
-        let minor = parts.get(1).and_then(|p| p.parse().ok()).unwrap_or(0);
-        let patch = parts.get(2).and_then(|p| p.parse().ok()).unwrap_or(0);
-        Ok(Self::new(major, minor, patch))
-    }
-}
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, PartialEq, Eq)]
