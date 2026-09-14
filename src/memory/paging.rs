@@ -333,7 +333,7 @@ impl SimpleVMM {
     }
 
     /// Maps a standard 4KB page
-    pub fn map_page(
+    pub fn map_page_default(
         &mut self,
         virt: VirtualAddress,
         phys: PhysicalAddress,
