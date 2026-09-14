@@ -20,15 +20,11 @@ pub mod universal_engine;
 #[path = "../src/sigpkg/universal_oop_system.rs"]
 pub mod universal_oop_system;
 
-#[path = "../src/sigpkg/universal_adapter.rs"]
-pub mod universal_adapter;
-
 pub mod sigpkg {
     use alloc::string::String;
     use alloc::vec::Vec;
 
     pub use crate::security;
-    pub use crate::universal_adapter;
     pub use crate::universal_engine;
     pub use crate::universal_oop_system;
 
@@ -107,6 +103,9 @@ pub mod sigpkg {
         Any,
     }
 }
+
+#[path = "../src/sigpkg/universal_adapter.rs"]
+pub mod universal_adapter;
 
 #[test]
 fn test_universal_adapter_all_formats() {
@@ -210,7 +209,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_adapter::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -225,7 +224,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
     assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));

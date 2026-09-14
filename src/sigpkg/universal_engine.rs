@@ -83,7 +83,17 @@ pub enum PackageFormat {
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
         let f_lower = filename.to_lowercase();
-        if f_lower.ends_with(".deb") {
+        if f_lower.ends_with(".ipk") {
+            Some(PackageFormat::Ipk)
+        } else if f_lower.ends_with(".opkg") {
+            Some(PackageFormat::Opkg)
+        } else if f_lower.ends_with(".p5p") {
+            Some(PackageFormat::SolarisIps)
+        } else if f_lower.ends_with(".nar") {
+            Some(PackageFormat::GuixNar)
+        } else if f_lower.contains("openbsd") || f_lower.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
+        } else if f_lower.ends_with(".deb") {
             Some(PackageFormat::Apt)
         } else if f_lower.ends_with(".rpm") {
             Some(PackageFormat::Yum)

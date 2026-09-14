@@ -7,8 +7,21 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub architecture: String,
+    pub maintainer: String,
+    pub depends: Vec<String>,
+    pub description: String,
+}
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
+pub use crate::sigpkg::Version;
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -71,7 +84,7 @@ pub struct HaikuHpkgManifest {
 }
 
 pub use crate::sigpkg::universal_engine::PackageFormat;
-use crate::sigpkg::universal_oop_system;
+pub use crate::sigpkg::universal_oop_system;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
