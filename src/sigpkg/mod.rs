@@ -72,9 +72,6 @@ pub mod zero_alloc_resolver;
 
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
-#[path = "../package/distro_package_innovations.rs"]
-pub mod distro_package_innovations;
-pub use distro_package_innovations::*;
 pub use bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
     ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,

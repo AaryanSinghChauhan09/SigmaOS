@@ -19,7 +19,6 @@ pub mod apm;
 pub mod arch_aur;
 pub mod aur_integration;
 pub mod bsd_linux_package_innovations;
-pub mod distro_package_innovations;
 pub mod cache;
 pub mod checkupdates;
 pub mod debian;
@@ -47,7 +46,6 @@ pub mod store;
 pub mod universal;
 pub mod updater;
 pub mod universal_package_innovations_suite;
-pub use distro_package_innovations::*;
 pub use universal_package_innovations_suite::*;
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
