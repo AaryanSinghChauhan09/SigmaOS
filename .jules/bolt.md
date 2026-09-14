@@ -45,3 +45,7 @@
 ## 2026-09-13 - Fast Raw Byte-Scanning Path for JSON String Parsing
 **Learning:** In JSON recursive descent parsers, iterating over string characters using `.chars().next()` decodes UTF-8 multi-byte sequences for every byte in the input string. Scanning raw byte slices (`&[u8]`) directly until hitting delimiter bytes (`"` or `\`) bypasses character decoding entirely for escape-free strings (the majority of JSON strings), resulting in a significant parsing throughput increase while falling back safely to UTF-8 decoding when backslash escapes are encountered.
 **Action:** When parsing text formats or string literals, use raw byte-level scanning for delimiter detection and fast slicing before falling back to multi-byte UTF-8 character decoding.
+
+## 2026-09-14 - Bulk Substring Slicing for JSON String Escaping
+**Learning:** In JSON serialization, iterating through string characters with `.chars()` and calling `out.push(c)` / `out.push_str(...)` for every single character decodes UTF-8 and performs repeated small string buffer reallocations/appends. Scanning raw byte slices (`s.as_bytes()`) for ASCII escape characters (`"`, `\`, `\n`, `\r`, `\t`) and appending contiguous unescaped byte slices in bulk via `out.push_str(&s[last..i])` bypasses per-character UTF-8 decoding and drastically reduces buffer append calls for clean JSON strings.
+**Action:** When serializing or escaping string data into a target buffer, iterate over raw byte indices and slice contiguous unescaped regions in bulk.
