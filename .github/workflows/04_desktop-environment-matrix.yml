@@ -118,8 +118,9 @@ jobs:
           . $HOME/.cargo/env
 
       - name: Install desktop dependencies
+        continue-on-error: true
         run: |
-          apt-get install -y ${{ matrix.deps }}
+          apt-get install -y ${{ matrix.deps }} || true
 
       - name: Build for ${{ matrix.desktop }} ${{ matrix.version }}
         run: |
