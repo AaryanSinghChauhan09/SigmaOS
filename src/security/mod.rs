@@ -64,7 +64,7 @@ pub use kali_components::{
 };
 
 pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+    DomainID, DomainType, IsolatedDomain, IsolationError,
 };
 
 pub use qubes_isolation::*;
@@ -89,10 +89,7 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
+pub use defensive_audit::DefensiveAuditLog as DefensiveAuditSystem;
 pub use forensics::*;
 pub use hardening::{
     MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
@@ -102,11 +99,11 @@ pub use intrusion::{
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
 pub use kali_stack::{
-    HashMode, KaliAirgeddonWifiAudit, KaliBurpSuiteWebProxy, KaliHashcatGpuCracker,
-    KaliHydraPasswordBruteforce, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter,
-    KaliNiktoWebScanner, KaliNmapPortScanner, KaliSqlmapInjectionAuditor, KaliUndercoverThemeMode,
-    KaliWiresharkPacketAnalyzer, PcapPacketHeader, ScanTechnique, UndercoverDisguiseTheme,
-    WifiFrameType,
+    CronDaemon, CronJob, DmesgLog, FirewallRule, IptablesFirewall, KaliAirgeddonWifiAudit,
+    KaliError, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter, KaliSqlmapInjectionAuditor,
+    KaliUndercoverThemeMode, KaliWiresharkPacketAnalyzer, PcapPacketHeader,
+    PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
+    TmuxPane, UndercoverDisguiseTheme, WifiFrameType,
 };
 pub use kernel_hardening::{
     HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError, PagePermissions,
@@ -118,7 +115,7 @@ pub use libgksu::{
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,
 };
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
-pub use parrot::{
+pub use parrot_parity::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
@@ -163,3 +160,6 @@ pub use vulnerability::{
 };
 pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
 pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};
+
+pub mod landlock_sovereign;
+pub use landlock_sovereign::*;

@@ -6,9 +6,9 @@
  */
 
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -20,14 +20,6 @@ pub enum RunitServiceStatus {
     Failed,
 }
 
-/// Runit Lifecycle Stages
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RunitStage {
-    Stage1,
-    Stage2,
-    Stage3,
-}
-
 /// Runit Service Definition
 #[derive(Debug, Clone)]
 pub struct RunitService {
@@ -37,7 +29,6 @@ pub struct RunitService {
     pub auto_restart: bool,
     pub health_check_failures: u32,
     pub max_allowed_failures: u32,
-    pub dependencies: Vec<String>,
 }
 
 impl RunitService {
@@ -49,7 +40,6 @@ impl RunitService {
             auto_restart,
             health_check_failures: 0,
             max_allowed_failures,
-            dependencies: Vec::new(),
         }
     }
 
@@ -88,25 +78,15 @@ impl RunitService {
 }
 
 /// Runit Service Supervisor Engine
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
-    pub stage: RunitStage,
-    pub current_stage_num: u32,
-}
-
-impl Default for RunitSupervisor {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
             services: BTreeMap::new(),
-            stage: RunitStage::Stage1,
-            current_stage_num: 1,
         }
     }
 
@@ -177,19 +157,6 @@ impl RunitSupervisor {
                 }
             }
             true
-        } else {
-            false
-        }
-    }
-
-    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
-        let _ = (name, stopped);
-        true
-    }
-
-    pub fn start_service(&mut self, name: &str) -> bool {
-        if let Some(service) = self.services.get_mut(name) {
-            service.start()
         } else {
             false
         }

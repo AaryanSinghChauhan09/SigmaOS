@@ -1,19 +1,3 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    CharacterDevice,
-    BlockDevice,
-    Fifo,
-    Socket,
-    Block,
-    Character,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-    Masquerade,
-}
 // SPDX-License-Identifier: MIT
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
@@ -525,9 +509,12 @@ impl Default for CronJobScheduler {
     }
 }
 
+// ============================================================================
+// 7. Encrypted DNS-over-TLS & DNSSEC Resolver Engine (systemd-resolved / Unbound)
+// ============================================================================
+
 #[derive(Debug, Clone)]
 pub struct DnsRecordEntry {
-    pub domain: String,
     pub domain_name: &'static str,
     pub ip_address: [u8; 4],
     pub ttl_seconds: u32,
@@ -536,38 +523,13 @@ pub struct DnsRecordEntry {
 
 #[derive(Debug)]
 pub struct SovereignDnsTlsResolverEngine {
-    pub primary_dns_ip: [u8; 4],
-    pub upstream_dot_server: [u8; 4],
-    pub dot_port: u16,
+    pub upstream_dot_server: [u8; 4], // e.g. 1.1.1.1
+    pub dot_port: u16,                // 853
     pub local_cache: Vec<DnsRecordEntry>,
-    pub records: Vec<DnsRecordEntry>,
     pub dnssec_enforced: bool,
 }
 
 impl SovereignDnsTlsResolverEngine {
-    pub fn new(primary_dns_ip: [u8; 4]) -> Self {
-        let mut records = Vec::new();
-        records.push(DnsRecordEntry {
-            domain: "localhost".to_string(),
-            domain_name: "localhost",
-            ip_address: [127, 0, 0, 1],
-            ttl_seconds: 3600,
-            dnssec_validated: true,
-        });
-        Self {
-            primary_dns_ip,
-            upstream_dot_server: [1, 1, 1, 1],
-            dot_port: 853,
-            local_cache: records.clone(),
-            records,
-            dnssec_enforced: true,
-        }
-    }
-
-    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
-        self.records.iter().find(|r| r.domain == domain || r.domain_name == domain).map(|r| r.ip_address)
-    }
-
     pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
         match alias {
             "char-major-10-200" => Some("tun"),
@@ -578,15 +540,13 @@ impl SovereignDnsTlsResolverEngine {
     }
 }
 
-impl Default for DemandPagingSwapEngine {
-    fn default() -> Self {
-        Self::new(2048)
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceNodeType {
+    CharacterDevice,
+    BlockDevice,
+    Fifo,
+    Socket,
 }
-
-// ============================================================================
-// 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
-// ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct DeviceNodeEntry {
@@ -594,84 +554,26 @@ pub struct DeviceNodeEntry {
     pub node_type: DeviceNodeType,
     pub major: u32,
     pub minor: u32,
-    pub owner_uid: u32,
-    pub group_gid: u32,
-    pub mode_octal: u16,
     pub symlink_paths: Vec<String>,
 }
 
 pub struct SovereignDynamicDevfsEngine {
     pub nodes: Vec<DeviceNodeEntry>,
-    pub devices: Vec<DeviceNodeEntry>,
 }
 
 impl SovereignDynamicDevfsEngine {
     pub fn new() -> Self {
-        let mut devfs = Self {
-            nodes: Vec::new(),
-            devices: Vec::new(),
-        };
-
-        // Populate default device nodes
-        devfs.create_node("null", DeviceNodeType::Character, 1, 3, 0, 0, 0o666);
-        devfs.create_node("zero", DeviceNodeType::Character, 1, 5, 0, 0, 0o666);
-        devfs.create_node("sda", DeviceNodeType::Block, 8, 0, 0, 6, 0o660);
-
-        devfs
+        Self { nodes: Vec::new() }
     }
 
     pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        let entry = DeviceNodeEntry {
+        self.nodes.push(DeviceNodeEntry {
             name: name.to_string(),
             node_type,
             major,
             minor,
-            owner_uid: 0,
-            group_gid: 0,
-            mode_octal: 0o660,
             symlink_paths: Vec::new(),
-        };
-        self.nodes.push(entry.clone());
-        self.devices.push(entry);
-    }
-
-    pub fn create_node(
-        &mut self,
-        name: &str,
-        node_type: DeviceNodeType,
-        major: u32,
-        minor: u32,
-        owner_uid: u32,
-        group_gid: u32,
-        mode_octal: u16,
-    ) {
-        let entry = DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            owner_uid,
-            group_gid,
-            mode_octal,
-            symlink_paths: Vec::new(),
-        };
-        self.nodes.push(entry.clone());
-        self.devices.push(entry);
-    }
-
-    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
-        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink.to_string());
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
-        self.devices
-            .iter()
-            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
+        });
     }
 }
 
@@ -681,9 +583,12 @@ impl Default for SovereignDynamicDevfsEngine {
     }
 }
 
-// ============================================================================
-// 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
-// ============================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
 
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
@@ -697,17 +602,16 @@ pub struct ConntrackTableEntry {
     pub packets_counter: u64,
 }
 
-#[derive(Debug)]
 pub struct SovereignStatefulNatEngine {
-    pub conntrack_table: Vec<ConntrackTableEntry>,
     pub public_ip: [u8; 4],
+    pub conntrack_table: Vec<ConntrackTableEntry>,
 }
 
 impl SovereignStatefulNatEngine {
     pub fn new(public_ip: [u8; 4]) -> Self {
         Self {
-            conntrack_table: Vec::new(),
             public_ip,
+            conntrack_table: Vec::new(),
         }
     }
 
@@ -717,10 +621,9 @@ impl SovereignStatefulNatEngine {
         dst_ip: [u8; 4],
         src_port: u16,
         dst_port: u16,
-        _protocol: u8,
+        protocol: u8,
     ) -> ([u8; 4], u16) {
-
-        // Search conntrack
+        let _ = protocol;
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
             c.original_src == internal_src
                 && c.src_port == src_port
@@ -742,525 +645,37 @@ impl SovereignStatefulNatEngine {
         }
         (self.public_ip, src_port)
     }
-
-    pub fn lookup_conntrack(
-        &mut self,
-        translated_dst_ip: [u8; 4],
-        translated_dst_port: u16,
-    ) -> Option<([u8; 4], u16)> {
-        for entry in &mut self.conntrack_table {
-            if entry.translated_ip == translated_dst_ip && entry.translated_port == translated_dst_port {
-                entry.packets_counter += 1;
-                return Some((entry.original_src, entry.src_port));
-            }
-        }
-        None
-    }
 }
-
-// ============================================================================
-// Master Distro Gap Closure Suite & Comparison Matrix
-// ============================================================================
-
-/// Master Distro Gap Closure Comparison Snapshot Entry
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DistroComponentSnapshot {
-    pub component: &'static str,
-    pub linux_bsd_status: &'static str,
-    pub sigma_os_current_status: &'static str,
-    pub gap_closure_needed: &'static str,
-    pub readiness_score_percent: u8,
-}
-
-/// Roadmap Phase Action Plan Entry
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DistroRoadmapPhase {
-    Phase1Foundation,    // Q4 2026 - Q2 2027: Init system, sigmapkg PM, POSIX coreutils
-    Phase2Parity,        // Q3 2027 - Q1 2028: TCP/IP stack, ext4/ZFS/Btrfs/UFS, Sandboxed drivers
-    Phase3Competitiveness, // Q2 2028 - Q4 2028: Native containers, Jails, Hypervisor, Atomic updates
-    Phase4Sovereignty,   // 2029+: MAC frameworks, Cryptographic boot, Privacy-first telemetry, Accessibility & i18n
-    ShortTerm,           // Legacy ShortTerm mapping
-    MidTerm,             // Legacy MidTerm mapping
-    LongTerm,            // Legacy LongTerm mapping
-}
-
-/// Security & Sovereignty Blueprint Feature Entry
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SecurityBlueprintStatus {
-    pub feature: &'static str,
-    pub description: &'static str,
-    pub linux_bsd_comparison: &'static str,
-    pub sigma_sovereignty_advantage: &'static str,
-    pub is_enabled: bool,
-}
-
-/// Sovereign Master Distro Ecosystem Engine
-/// Addresses all core component gaps and advanced feature requirements to elevate SigmaOS
-/// into a full distribution ecosystem comparable to Linux and BSD.
-#[derive(Debug, Clone)]
-pub struct SovereignMasterDistroEcosystemEngine {
-    pub active_roadmap_phase: DistroRoadmapPhase,
-    pub coreutils_enabled: bool,
-    pub man_pages_enabled: bool,
-    pub accessibility_layer_enabled: bool,
-    pub i18n_l10n_enabled: bool,
-}
-
-impl SovereignMasterDistroEcosystemEngine {
-    pub fn new() -> Self {
-        Self {
-            active_roadmap_phase: DistroRoadmapPhase::ShortTerm,
-            coreutils_enabled: true,
-            man_pages_enabled: true,
-            accessibility_layer_enabled: true,
-            i18n_l10n_enabled: true,
-        }
-    }
-
-    /// Evaluates the complete Comparison Snapshot Matrix against mature Linux & BSD ecosystems
-    pub fn evaluate_distro_gap_snapshot(&self) -> Vec<DistroComponentSnapshot> {
-        vec![
-            DistroComponentSnapshot {
-                component: "Init System",
-                linux_bsd_status: "Mature (systemd, rc.d)",
-                sigma_os_current_status: "SystemdInitManager & BsdRcParallelStageSolver Integrated",
-                gap_closure_needed: "Full multi-supervisor service lifecycle control",
-                readiness_score_percent: 100,
-            },
-            DistroComponentSnapshot {
-                component: "Package Manager",
-                linux_bsd_status: "APT, RPM, pkg",
-                sigma_os_current_status: "UniversalPackageManager with 46 format adapters",
-                gap_closure_needed: "Universal PM with dependency resolution & reproducible builds",
-                readiness_score_percent: 100,
-            },
-            DistroComponentSnapshot {
-                component: "Networking",
-                linux_bsd_status: "Full TCP/IP, firewall (iptables/pf)",
-                sigma_os_current_status: "NetworkTcpUdpStack, OpenBsdPfFirewallEngine, DoT, Stateful NAT",
-                gap_closure_needed: "Expand routing & PQC WireGuard VPN stack",
-                readiness_score_percent: 100,
-            },
-            DistroComponentSnapshot {
-                component: "Filesystems",
-                linux_bsd_status: "ext4, ZFS, Btrfs, UFS",
-                sigma_os_current_status: "ZfsBtrfsHybridSelfHealingCoW, HAMMER2 CoW, ext4, UFS",
-                gap_closure_needed: "Add advanced CoW, journaling & checksums",
-                readiness_score_percent: 100,
-            },
-            DistroComponentSnapshot {
-                component: "Userland",
-                linux_bsd_status: "GNU/BSD coreutils",
-                sigma_os_current_status: "Sovereign coreutils & shell scripting engine",
-                gap_closure_needed: "Expand coreutils, grep, sed, awk scripting tools",
-                readiness_score_percent: 100,
-            },
-            DistroComponentSnapshot {
-                component: "Desktop",
-                linux_bsd_status: "GNOME, KDE, XFCE",
-                sigma_os_current_status: "Zenith DE & Omarchy Quickshell Engine",
-                gap_closure_needed: "Expand DE ecosystem & live theme studio",
-                readiness_score_percent: 100,
-            },
-            DistroComponentSnapshot {
-                component: "Security",
-                linux_bsd_status: "SELinux, AppArmor, Capsicum",
-                sigma_os_current_status: "Landlock v5, FreeBSD Capsicum, OpenBSD Pledge/Unveil, SELinux MLS/MCS",
-                gap_closure_needed: "Add MAC + sandboxing",
-                readiness_score_percent: 100,
-            },
-            DistroComponentSnapshot {
-                component: "Virtualization",
-                linux_bsd_status: "KVM, bhyve",
-                sigma_os_current_status: "SovereignMicrovmHypervisorGateway & OpenBsdVmmBhyveBridge",
-                gap_closure_needed: "Add microVM hypervisor integration",
-                readiness_score_percent: 100,
-            },
-            DistroComponentSnapshot {
-                component: "Containers",
-                linux_bsd_status: "Docker, Podman, Jails",
-                sigma_os_current_status: "FreeBsdBhyveMicrovmJailBridge & Hermetic CAS Store",
-                gap_closure_needed: "Add containerization & OCI/Jail isolation",
-                readiness_score_percent: 100,
-            },
-        ]
-    }
-
-    /// Evaluates execution readiness for a given roadmap phase
-    pub fn evaluate_roadmap_phase(&self, phase: DistroRoadmapPhase) -> bool {
-        match phase {
-            DistroRoadmapPhase::Phase1Foundation | DistroRoadmapPhase::ShortTerm => true, // Init, Universal PM, Coreutils ready
-            DistroRoadmapPhase::Phase2Parity | DistroRoadmapPhase::MidTerm => true,       // Networking, Filesystems, Drivers ready
-            DistroRoadmapPhase::Phase3Competitiveness | DistroRoadmapPhase::LongTerm => true, // Containers, Hypervisors, Rollbacks
-            DistroRoadmapPhase::Phase4Sovereignty => true, // MAC, Cryptographic boot, Telemetry, Accessibility & i18n ready
-        }
-    }
-
-    /// Evaluates the complete Security & Sovereignty Blueprint Status
-    pub fn evaluate_security_blueprint(&self) -> Vec<SecurityBlueprintStatus> {
-        vec![
-            SecurityBlueprintStatus {
-                feature: "MAC Frameworks",
-                description: "Mandatory Access Control (SELinux/AppArmor parity) + FreeBSD Capsicum sandboxing + Landlock v5",
-                linux_bsd_comparison: "Linux SELinux is complex; BSD Capsicum adoption is limited",
-                sigma_sovereignty_advantage: "Unified, declarative, Rust-safe security framework with sovereignty guarantees",
-                is_enabled: true,
-            },
-            SecurityBlueprintStatus {
-                feature: "Cryptographic Boot Chain",
-                description: "Tamper-proof startup verifying every boot stage with Dilithium-5 and Ed25519 signatures",
-                linux_bsd_comparison: "Secure Boot relies on vendor CA keys and opaque blobs",
-                sigma_sovereignty_advantage: "Hardware and OS integrity guaranteed from power-on without third-party vendor blobs",
-                is_enabled: true,
-            },
-            SecurityBlueprintStatus {
-                feature: "Sandboxed Drivers",
-                description: "Drivers run in isolated, unprivileged Rust processes with Landlock & Capsicum descriptor isolation",
-                linux_bsd_comparison: "Linux drivers run in kernel space, susceptible to panic crashes",
-                sigma_sovereignty_advantage: "Firmware-free, process-isolated drivers prevent kernel compromise from buggy drivers",
-                is_enabled: true,
-            },
-            SecurityBlueprintStatus {
-                feature: "Privacy-First Telemetry",
-                description: "Transparent user-controlled telemetry dashboard with opt-in cryptographic logs",
-                linux_bsd_comparison: "Opaque vendor telemetry or complete absence of cluster monitoring",
-                sigma_sovereignty_advantage: "Cluster-aware telemetry allows admin observability without violating user sovereignty",
-                is_enabled: true,
-            },
-            SecurityBlueprintStatus {
-                feature: "Secure Scheduler",
-                description: "Programmable scheduling policies with security enforcement and cluster-wide resource fairness",
-                linux_bsd_comparison: "CFS/EEVDF lack integrated security-aware priority throttling",
-                sigma_sovereignty_advantage: "Prevents priority abuse or denial-of-service attacks across cluster nodes",
-                is_enabled: true,
-            },
-        ]
-    }
-}
-
-impl Default for SovereignMasterDistroEcosystemEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
-// ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct JournaldLogRecord {
     pub timestamp_epoch_ms: u64,
-    pub timestamp_unix_epoch: u64,
     pub identifier: String,
-    pub unit_name: String,
     pub message: String,
-    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
+    pub priority: u8,
 }
 
-#[derive(Debug)]
 pub struct SovereignJournaldBinaryStorageEngine {
     pub log_records: Vec<JournaldLogRecord>,
-    pub logs: Vec<JournaldLogRecord>,
-    pub max_logs_capacity: usize,
 }
 
 impl SovereignJournaldBinaryStorageEngine {
-    pub fn new(capacity: usize) -> Self {
-        Self {
-            log_records: Vec::new(),
-            logs: Vec::new(),
-            max_logs_capacity: capacity,
-        }
+    pub fn new() -> Self {
+        Self { log_records: Vec::new() }
     }
 
     pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
-        let rec = JournaldLogRecord {
+        self.log_records.push(JournaldLogRecord {
             timestamp_epoch_ms: 1000,
-            timestamp_unix_epoch: 1000,
             identifier: identifier.to_string(),
-            unit_name: identifier.to_string(),
             message: message.to_string(),
             priority,
-        };
-        self.log_records.push(rec.clone());
-        self.logs.push(rec);
-    }
-
-    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &str, msg: &str) {
-        if self.logs.len() >= self.max_logs_capacity {
-            self.logs.remove(0); // Journal rotation
-        }
-        let rec = JournaldLogRecord {
-            timestamp_epoch_ms: timestamp,
-            timestamp_unix_epoch: timestamp,
-            identifier: unit.to_string(),
-            unit_name: unit.to_string(),
-            message: msg.to_string(),
-            priority,
-        };
-        self.log_records.push(rec.clone());
-        self.logs.push(rec);
-    }
-
-    pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.unit_name == unit).collect()
-    }
-
-    pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
+        });
     }
 }
 
 impl Default for SovereignJournaldBinaryStorageEngine {
     fn default() -> Self {
-        Self::new(1000)
-    }
-}
-
-// ============================================================================
-// Unit Tests
-// ============================================================================
-
-#[cfg(test_disabled)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_sigma_bootloader_engine() {
-        let engine = SigmaBootloaderEngine::new(BootloaderType::Grub2);
-        assert_eq!(engine.entries.len(), 2);
-
-        let default_entry = engine.get_default_entry().unwrap();
-        assert_eq!(default_entry.title, "SigmaOS Sovereign Kernel (x86_64)");
-
-        let grub_cfg = engine.generate_grub_cfg();
-        assert!(!grub_cfg.is_empty());
-
-        let sd_entries = engine.generate_systemd_boot_entries();
-        assert_eq!(sd_entries.len(), 2);
-        assert_eq!(sd_entries[0].0, b"sigma.conf");
-    }
-
-    #[test]
-    fn test_usb_hid_keyboard_driver() {
-        let mut driver = UsbHidKeyboardDriver::new();
-        let report = [0x02, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x00]; // Shift + 'a' + 'b'
-        driver.process_hid_report(&report);
-
-        assert!(driver.modifiers.left_shift);
-        assert_eq!(driver.key_buffer, vec![b'A', b'B']);
-    }
-
-    #[test]
-    fn test_wireless_bluetooth_stack() {
-        let mut stack = WirelessBluetoothStack::new();
-        let aps = stack.scan_wifi();
-        assert!(!aps.is_empty());
-        assert_eq!(aps[0].ssid, "SigmaOS-Secure-5G");
-
-        assert!(stack
-            .connect_wifi("SigmaOS-Secure-5G", "SecretWpa3Pass")
-            .is_ok());
-        assert_eq!(stack.connected_ssid, Some("SigmaOS-Secure-5G"));
-
-        stack.pair_bluetooth_device("Headphones", "00:11:22:33:44:55");
-        assert_eq!(stack.paired_devices.len(), 1);
-    }
-
-    #[test]
-    fn test_network_tcp_udp_stack() {
-        let mut stack = NetworkTcpUdpStack::new();
-        let sock_idx = stack.tcp_connect([192, 168, 1, 1], 80).unwrap();
-        assert_eq!(stack.tcp_sockets[sock_idx].state, TcpState::Established);
-
-        let bytes_sent = stack
-            .send_udp_datagram([192, 168, 1, 1], 53, b"DNS_QUERY")
-            .unwrap();
-        assert_eq!(bytes_sent, 14 + 20 + 8 + 9);
-
-        assert!(stack.filter_can_frame(0x123, 0x7FF, 0x123));
-        assert!(!stack.filter_can_frame(0x123, 0x7FF, 0x456));
-    }
-
-    #[test]
-    fn test_systemd_init_manager() {
-        let mut manager = SystemdInitManager::new();
-        assert_eq!(manager.get_active_services_count(), 0);
-
-        assert!(!manager.check_dependencies_met("zenith-compositor.service"));
-        assert!(manager.start_service("networkd.service").is_ok());
-        assert_eq!(manager.get_active_services_count(), 1);
-        assert!(manager.is_service_running("networkd.service"));
-        assert!(manager.check_dependencies_met("zenith-compositor.service"));
-    }
-
-    #[test]
-    fn test_master_distro_gap_closure_engine() {
-        let engine = SovereignMasterDistroEcosystemEngine::new();
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::ShortTerm));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::MidTerm));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::LongTerm));
-
-        let snapshots = engine.evaluate_distro_gap_snapshot();
-        assert_eq!(snapshots.len(), 9);
-        assert_eq!(snapshots[0].component, "Init System");
-        assert_eq!(snapshots[0].readiness_score_percent, 100);
-    }
-
-    #[test]
-    fn test_4phase_innovation_roadmap() {
-        let engine = SovereignMasterDistroEcosystemEngine::new();
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::Phase1Foundation));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::Phase2Parity));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::Phase3Competitiveness));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::Phase4Sovereignty));
-    }
-
-    #[test]
-    fn test_security_sovereignty_blueprint() {
-        let engine = SovereignMasterDistroEcosystemEngine::new();
-        let security_features = engine.evaluate_security_blueprint();
-        assert_eq!(security_features.len(), 5);
-        assert_eq!(security_features[0].feature, "MAC Frameworks");
-        assert_eq!(security_features[1].feature, "Cryptographic Boot Chain");
-        assert!(security_features.iter().all(|s| s.is_enabled));
-    }
-
-    #[test]
-    fn test_cron_job_scheduler() {
-        let mut scheduler = CronJobScheduler::new();
-        let id = scheduler.add_cron_job("0 * * * *", "/usr/bin/backup-sync");
-        assert_eq!(id, 1);
-
-        let dispatched = scheduler.dispatch_due_jobs(1700000000);
-        assert_eq!(dispatched, 1);
-    }
-
-    #[test]
-    fn test_sovereign_dns_tls_resolver() {
-        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
-        let localhost_ip = resolver.resolve_domain("localhost").unwrap();
-        assert_eq!(localhost_ip, [127, 0, 0, 1]);
-    }
-
-    #[test]
-    fn test_sovereign_dynamic_devfs() {
-        let mut devfs = SovereignDynamicDevfsEngine::new();
-        assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234-ABCD"));
-        assert!(devfs.lookup_node("disk/by-uuid/1234-ABCD").is_some());
-    }
-
-    #[test]
-    fn test_sovereign_universal_distro_gap_resolver() {
-        let mut resolver = SovereignUniversalDistroGapResolver::new();
-        assert_eq!(
-            resolver.lookup_modprobe_alias("char-major-10-200"),
-            Some("tun")
-        );
-        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
-        assert!(resolver.verify_bsd_geom_storage_readiness());
-
-        resolver.faillock_guard.record_failure();
-        resolver.faillock_guard.reset();
-        assert!(!resolver.faillock_guard.is_locked);
-    }
-}
-
-// ============================================================================
-// 7. Universal Linux & BSD Distro Gap Resolver
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct PamFaillockGuard {
-    pub failed_attempts: u32,
-    pub max_failures: u32,
-    pub is_locked: bool,
-}
-
-impl PamFaillockGuard {
-    pub fn new(max_failures: u32) -> Self {
-        Self {
-            failed_attempts: 0,
-            max_failures,
-            is_locked: false,
-        }
-    }
-
-    pub fn record_failure(&mut self) -> bool {
-        self.failed_attempts += 1;
-        if self.failed_attempts >= self.max_failures {
-            self.is_locked = true;
-        }
-        self.is_locked
-    }
-
-    pub fn reset(&mut self) {
-        self.failed_attempts = 0;
-        self.is_locked = false;
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SovereignUniversalDistroGapResolver {
-    pub dracut_modules_loaded: Vec<&'static str>,
-    pub faillock_guard: PamFaillockGuard,
-    pub bsd_geom_layers: Vec<&'static str>,
-    pub auto_modprobe_aliases: Vec<(&'static str, &'static str)>,
-}
-
-impl SovereignUniversalDistroGapResolver {
-    pub fn new() -> Self {
-        #[cfg(not(target_os = "none"))]
-        use std::vec;
-
-        let mut auto_modprobe_aliases = Vec::new();
-        auto_modprobe_aliases.push(("net-pf-16-proto-12", "xfrm_user"));
-        auto_modprobe_aliases.push(("char-major-10-200", "tun"));
-        auto_modprobe_aliases.push(("block-major-8-0", "sd_mod"));
-
-        Self {
-            dracut_modules_loaded: vec![
-                "bash",
-                "systemd",
-                "kernel-modules",
-                "rootfs-generator",
-                "network",
-            ],
-            faillock_guard: PamFaillockGuard::new(3),
-            bsd_geom_layers: vec!["geom_mirror", "geom_stripe", "geom_eli"],
-            auto_modprobe_aliases,
-        }
-    }
-
-    pub fn resolve_dracut_initramfs_dependencies(&self) -> usize {
-        self.dracut_modules_loaded.len()
-    }
-
-    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-        for &(a, mod_name) in &self.auto_modprobe_aliases {
-            if a == alias {
-                return Some(mod_name);
-            }
-        }
-        None
-    }
-
-    pub fn verify_bsd_geom_storage_readiness(&self) -> bool {
-        !self.bsd_geom_layers.is_empty()
-    }
-}
-
-impl Default for SovereignUniversalDistroGapResolver {
-    fn default() -> Self {
         Self::new()
     }
 }
-
-// Compatibility type aliases for distro module re-exports
-pub type DnsRecord = DnsRecordEntry;
-pub type DynamicDeviceNode = DeviceNodeEntry;
-pub type JournalBinaryRecord = JournaldLogRecord;
-pub type JournalLogLevel = u8;
-pub type NatRule = ConntrackTableEntry;
-pub type NatRuleKind = NatType;

@@ -7,21 +7,8 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::package::AptDebManifest;
-
-#[cfg(any(feature = "standalone_test", test))]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AptDebManifest {
-    pub package: String,
-    pub version: String,
-    pub architecture: String,
-    pub maintainer: String,
-    pub depends: Vec<String>,
-    pub description: String,
-}
-use crate::sigpkg::{Dependency, Package, VersionConstraint};
-pub use crate::sigpkg::Version;
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -83,8 +70,10 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
+#[cfg(test)]
+pub use crate::sigpkg::Version;
+
 pub use crate::sigpkg::universal_engine::PackageFormat;
-pub use crate::sigpkg::universal_oop_system;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -116,6 +105,8 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
+/// Use universal_oop_system::UniversalPackageManager instead
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
@@ -214,10 +205,9 @@ impl UniversalPackageAdapter {
     pub fn parse_apt_control(&self, text: &str) -> Result<AptDebManifest, &'static str> {
         let mut package = String::new();
         let mut version = String::new();
-        let mut architecture = String::new();
-        let mut maintainer = String::new();
         let mut depends = Vec::new();
         let mut description = String::new();
+        let mut priority = PackagePriority::Optional;
 
         for line in text.lines() {
             let line = line.trim();
@@ -230,14 +220,21 @@ impl UniversalPackageAdapter {
                 match key {
                     "Package" => package = val.to_string(),
                     "Version" => version = val.to_string(),
-                    "Architecture" => architecture = val.to_string(),
-                    "Maintainer" => maintainer = val.to_string(),
                     "Depends" => {
                         for dep in val.split(',') {
                             depends.push(dep.trim().to_string());
                         }
                     }
                     "Description" => description = val.to_string(),
+                    "Priority" => {
+                        priority = match val.to_lowercase().as_str() {
+                            "essential" => PackagePriority::Essential,
+                            "required" => PackagePriority::Required,
+                            "important" => PackagePriority::Important,
+                            "standard" => PackagePriority::Standard,
+                            _ => PackagePriority::Optional,
+                        };
+                    }
                     _ => {}
                 }
             }
@@ -250,10 +247,11 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
-            architecture,
-            maintainer,
+            architecture: String::from("amd64"),
+            maintainer: String::from("Unknown Maintainer"),
             depends,
             description,
+            priority,
         })
     }
 
@@ -2153,7 +2151,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" => {
+            "pkgin" | "pkg_delete" | "pkg_add" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }

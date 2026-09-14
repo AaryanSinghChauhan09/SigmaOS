@@ -132,8 +132,8 @@ pub mod relay_nexus;
 pub mod scosmos;
 pub mod sigmawin;
 pub use sigmawin::{
-    D3dToVulkanTranslator, D3dVersion, NtNativeSyscallTranslator, PeHeaderInfo, RegistryHive,
-    SovereignRegistryEngine, SovereignWin32Subsystem, User32MessageQueue, Win32Message,
+    D3dToVulkanTranslator, D3dVersion, NtNativeSyscallTranslator, PeHeaderInfo,
+    User32MessageQueue, Win32Message,
     Win32PeExecutableParser, WinSockAdapter, WindowsPowerShellShimEngine,
 };
 pub mod solid_kernel;
