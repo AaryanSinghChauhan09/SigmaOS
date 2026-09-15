@@ -9,6 +9,7 @@ pub mod sovereign_commands;
 pub mod open_source_tools_engine;
 pub mod open_source_cli_tools_suite;
 pub mod open_source_tools_parity;
+pub mod tech_media_innovations;
 
 pub use open_source_tools_engine::{
     BatSyntaxHighlighterEngine, FzfFuzzyFinderEngine, FzfSearchResult, HtopProcessEntry,
@@ -23,6 +24,19 @@ pub use open_source_cli_tools_suite::{
 pub use open_source_tools_parity::{
     DufDeviceUsage, DufDiskUsageEngine, DustDirectoryTreeEngine, DustNode, FastfetchSysinfo,
     ItsFossFastfetchSysinfoEngine, SimpleJqJsonQueryEngine,
+};
+
+pub use tech_media_innovations::{
+    AiMlTensorDatasetPipeline, AppualsTroubleshootingEngine as TechMediaAppualsTroubleshootingEngine,
+    CommunityContributionRecord, CrossPlatformDeviceBridge, CrossPlatformDeviceSpec, FleetServerSlaNode,
+    FossStackDescriptor, GadgetPerformanceSpec, GeekyGadgetsTechReviewEngine, HardwareTelemetryMonitor,
+    HowToGeekGuideSystemEngine, ItDailyEnterpriseItGovernor, LinuxDotComCommunityNewsEngine,
+    LinuxPressFeedEngine, LinuxTeckSysadminToolkitEngine, LlmInferenceMetrics, ModelPerformanceBenchmark,
+    OpenSourceForUModularEngine, OpenSourceGovernanceEngine, PcmagHardwareBenchEngine, PcmagHardwareRatingNode,
+    PhoronixBenchEngine, PhoronixBenchmarkSuiteNode, PowerThermalTelemetryNode, SbomLicenseComplianceRecord,
+    SovereignTechMediaMasterSuite, SysadminScriptTask, SystemTroubleshootingGuide, TechMediaArticleFeed,
+    TensorColumnData, TheNewStackCloudNativeEngine, WasmMicroserviceTelemetry, ZeroTrustSandboxPolicy,
+    ZeroTrustSecuritySandbox,
 };
 
 pub use data_tools::{
