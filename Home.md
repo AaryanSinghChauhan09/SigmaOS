@@ -35,6 +35,7 @@
 - **AI Agent Zones Operation Management Guide:** [[AI_AGENT_ZONES_OPERATION_MANAGEMENT]] - Solaris container zones, VNIC networking, FreeBSD VM zones, and thermal power zones for AI agents.
 - **AI Agent C Language Elimination Guide:** [[AI_AGENT_C_LANGUAGE_ELIMINATION]] - C dependency reduction, malloc/free replacement, RAII memory safety, and pure Rust driver frameworks for AI agents.
 - **Arch Linux Wiki-Inspired Master Portal:** [[ARCH_WIKI_INSPIRED_SIGMAOS_MASTER_WIKI]] - Master technical navigation portal, hardware drivers, and architectural reference.
+- **Master AI Agent Algorithm Diagnostics & Fix Guide:** [[WHAT_IS_WORKING_AND_NOT_WORKING]] - Comprehensive AI Agent Algorithm Diagnostics, Safe-Rust Fix Blueprints, and 4-Step Fix Protocol.
 - **Master Linux & BSD Distro Strategic Roadmap:** [[MASTER_LINUX_BSD_GAP_CLOSURE_STRATEGIC_PLAN]] - Master strategic plan, gap closure roadmap, 2026-2029+ timeline, and strategy to surpass Linux distros.
 - **Arch Linux Parity Gap Closure Blueprint:** [[ARCH_LINUX_PARITY_GAP_CLOSURE_BLUEPRINT]] - Comprehensive Arch Linux (Pacman, AUR, makepkg, ALA, archinstall, arch-audit) parity blueprint.
 - **Sovereign OS Self-Sufficiency Ultra Encyclopedia V25:** [[SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V25]] - Master self-sufficiency ultra-encyclopedia V25 eliminating all third-party software, frameworks, models, codecs, and formats.
