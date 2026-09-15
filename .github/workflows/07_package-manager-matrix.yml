@@ -27,7 +27,7 @@ jobs:
             distro: alpine
             container: alpine:latest
             install-cmd: "apk add --no-cache"
-            deps: "build-base rust cargo bash"
+            deps: "build-base rust cargo"
             create-cmd: "apk pack -o /tmp/sigmaos.apk ./src"
             verify-cmd: "apk verify /tmp/sigmaos.apk"
 
@@ -35,7 +35,7 @@ jobs:
           - pm: deb
             distro: debian
             container: debian:bookworm
-            install-cmd: "apt-get update && apt-get install -y"
+            install-cmd: "apt-get install -y"
             deps: "build-essential rustc cargo debhelper"
             create-cmd: "dpkg-deb --build ./src /tmp/sigmaos.deb"
             verify-cmd: "dpkg -c /tmp/sigmaos.deb"
@@ -53,7 +53,7 @@ jobs:
           - pm: pkg
             distro: arch
             container: archlinux:latest
-            install-cmd: "pacman -Sy --noconfirm"
+            install-cmd: "pacman -S --noconfirm"
             deps: "base-devel rust git"
             create-cmd: "makepkg -si"
             verify-cmd: "pacman -Q sigmaos"
@@ -62,7 +62,7 @@ jobs:
           - pm: aur
             distro: arch
             container: archlinux:latest
-            install-cmd: "pacman -Sy --noconfirm"
+            install-cmd: "pacman -S --noconfirm"
             deps: "base-devel rust git"
             create-cmd: "git clone /tmp/sigmaos-aur && cd sigmaos-aur && makepkg -si"
             verify-cmd: "pacman -Q sigmaos"
@@ -71,7 +71,7 @@ jobs:
           - pm: emerge
             distro: gentoo
             container: gentoo/stage3:latest
-            install-cmd: "emerge-webrsync || true && emerge"
+            install-cmd: "emerge"
             deps: "dev-lang/rust sys-devel/gcc"
             create-cmd: "ebuild sigmaos.ebuild digest && ebuild sigmaos.ebuild merge"
             verify-cmd: "equery list sigmaos"
@@ -80,7 +80,7 @@ jobs:
           - pm: zypper
             distro: opensuse
             container: opensuse/leap:latest
-            install-cmd: "zypper refresh && zypper install -y"
+            install-cmd: "zypper install -y"
             deps: "gcc rust cargo"
             create-cmd: "rpmbuild -ta /tmp/sigmaos.tar.gz"
             verify-cmd: "rpm -K /tmp/sigmaos.rpm"
@@ -89,7 +89,7 @@ jobs:
           - pm: xbps
             distro: void
             container: voidlinux/voidlinux:latest
-            install-cmd: "xbps-install -Sy"
+            install-cmd: "xbps-install -S"
             deps: "base-devel rust cargo"
             create-cmd: "xbps-src pkg sigmaos"
             verify-cmd: "xbps-query -l | grep sigmaos"
@@ -107,8 +107,8 @@ jobs:
           - pm: opkg
             distro: openwrt
             container: ubuntu:latest
-            install-cmd: "apt-get update && apt-get install -y"
-            deps: "build-essential"
+            install-cmd: "apt-get install -y"
+            deps: "opkg-utils build-essential"
             create-cmd: "ipk-pack ./src sigmaos.ipk"
             verify-cmd: "opkg info sigmaos.ipk"
 
@@ -116,7 +116,7 @@ jobs:
           - pm: flatpak
             distro: flatpak
             container: ubuntu:latest
-            install-cmd: "apt-get update && apt-get install -y"
+            install-cmd: "apt-get install -y"
             deps: "flatpak flatpak-builder"
             create-cmd: "flatpak-builder --repo=/tmp/repo /tmp/sigmaos com.sigmaos.SigmaOS.json"
             verify-cmd: "flatpak info --app-id=com.sigmaos.SigmaOS"
@@ -125,8 +125,8 @@ jobs:
           - pm: snap
             distro: snap
             container: ubuntu:latest
-            install-cmd: "apt-get update && apt-get install -y"
-            deps: "snapd"
+            install-cmd: "apt-get install -y"
+            deps: "snapcraft"
             create-cmd: "snapcraft"
             verify-cmd: "snap info sigmaos"
 
@@ -138,7 +138,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        shell: sh
+        shell: bash
         run: |
           ${{ matrix.install-cmd }} ${{ matrix.deps }}
 
