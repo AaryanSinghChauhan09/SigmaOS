@@ -1696,13 +1696,11 @@ impl UniversalDependencyMapper {
 
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
-            | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
-                "libc".to_string()
-            }
-            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
-                "zlib".to_string()
-            }
+            | "dev-libs/openssl" | "openssl3" | "libssl" => "openssl".to_string(),
+            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc"
+            | "musl-dev" | "glibc-devel" | "bsd_libc" | "eglibc" => "libc".to_string(),
+            "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib"
+            | "zlib1g" | "zlib-ng" | "libz" => "zlib".to_string(),
             "python" | "python3" | "python3-dev" | "python3-devel" | "dev-lang/python"
             | "lang/python" => "python".to_string(),
             "curl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl"
@@ -2001,17 +1999,17 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "-S" | "-Sy" => operation = UniversalPmOperation::Install,
-                        "-R" | "-Rns" => operation = UniversalPmOperation::Remove,
-                        "-Syu" | "-Syyu" => operation = UniversalPmOperation::Upgrade,
-                        "-Ss" | "-Qs" => operation = UniversalPmOperation::Search,
-                        "-Si" | "-Qi" => operation = UniversalPmOperation::QueryInfo,
-                        "-Sc" | "-Scc" => operation = UniversalPmOperation::CleanCache,
-                        "--print" | "--dryrun" => dry_run = true,
+                        "-S" | "-Sy" | "install" => operation = UniversalPmOperation::Install,
+                        "-R" | "-Rns" | "-Rs" | "remove" => operation = UniversalPmOperation::Remove,
+                        "-Syu" | "-Syyu" | "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "-Ss" | "-Qs" | "search" => operation = UniversalPmOperation::Search,
+                        "-Si" | "-Qi" | "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        "-Sc" | "-Scc" | "clean" => operation = UniversalPmOperation::CleanCache,
+                        "--print" | "--dryrun" | "--dry-run" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
@@ -2083,20 +2081,26 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "xbps-install" | "xbps-remove" | "xbps-query" => {
+            "xbps-install" | "xbps-remove" | "xbps-query" | "xbps" => {
                 if pm == "xbps-install" {
                     operation = UniversalPmOperation::Install;
                 } else if pm == "xbps-remove" {
                     operation = UniversalPmOperation::Remove;
-                } else {
+                } else if pm == "xbps-query" {
                     operation = UniversalPmOperation::QueryInfo;
                 }
-                for arg in args {
-                    if *arg == "-n" || *arg == "--dry-run" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "-S" | "install" | "add" => operation = UniversalPmOperation::Install,
+                        "-R" | "remove" | "remove-orphan" => operation = UniversalPmOperation::Remove,
+                        "-Su" | "-u" | "sync" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "-s" | "search" => operation = UniversalPmOperation::Search,
+                        "-n" | "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
                     }
+                    i += 1;
                 }
             }
             "emerge" | "ebuild" => {
