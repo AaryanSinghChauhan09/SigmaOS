@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
+permissions:
+  contents: read
+
 jobs:
   opensuse-obs-kiwi:
     name: openSUSE Open Build Service (OBS) & Kiwi Deployment Matrix
