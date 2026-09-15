@@ -1,7 +1,7 @@
 // SigmaOS Tech Media Distro Innovations Engine
 // Inspired by DistroWatch, 9to5Linux, MakeUseOf, LinuxTeck, Appuals, ZDNet, and DistroWatch
 
-use crate::klib::string::String;
+use std::string::String;
 use crate::klib::vec::Vec;
 
 /// DistroWatch page-hit ranking and distribution release tracker engine.

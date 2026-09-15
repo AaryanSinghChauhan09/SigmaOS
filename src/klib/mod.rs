@@ -66,6 +66,42 @@ pub use ring_buffer::{HeapRingBuffer, RingBuffer};
 pub use slab::{SlabCache, TypedSlabCache};
 pub use uuid::Uuid;
 
+/// Zero Dependency Primitive Hub
+#[derive(Debug, Clone, Copy)]
+pub struct ZeroDependencyPrimitiveHub;
+
+impl ZeroDependencyPrimitiveHub {
+    pub fn fnv1a_hash_64(data: &[u8]) -> u64 {
+        hash::fnv1a_hash(data)
+    }
+
+    pub fn format_u64_stack<'a>(mut val: u64, buf: &'a mut [u8]) -> &'a str {
+        if val == 0 {
+            if !buf.is_empty() {
+                buf[0] = b'0';
+                return core::str::from_utf8(&buf[..1]).unwrap_or("0");
+            }
+            return "0";
+        }
+        let mut len = 0;
+        let mut tmp = val;
+        while tmp > 0 {
+            len += 1;
+            tmp /= 10;
+        }
+        if buf.len() < len {
+            return "0";
+        }
+        let mut pos = len;
+        while val > 0 {
+            pos -= 1;
+            buf[pos] = b'0' + (val % 10) as u8;
+            val /= 10;
+        }
+        core::str::from_utf8(&buf[..len]).unwrap_or("0")
+    }
+}
+
 #[cfg(not(target_os = "none"))]
 pub use std::vec::Vec;
 

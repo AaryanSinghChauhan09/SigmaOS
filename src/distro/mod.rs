@@ -9,6 +9,24 @@ pub use omarchy::{
     OmarchySwayNcEngine, OmarchyTerminalFontConfig, OmarchyTheme, OmarchyWalkerLauncherEngine,
     OmarchyWaybarEngine, PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
 };
+pub mod omarchy_inspiration;
+pub use omarchy_inspiration::*;
+pub mod omarchy_advanced_parity;
+pub use omarchy_advanced_parity::*;
+pub mod omarchy_app_ecosystem;
+pub use omarchy_app_ecosystem::*;
+pub mod omarchy_complete_gap_closure;
+pub use omarchy_complete_gap_closure::*;
+pub mod omarchy_final_gap_closure;
+pub use omarchy_final_gap_closure::*;
+pub mod omarchy_ultimate_gap_closure;
+pub use omarchy_ultimate_gap_closure::*;
+pub mod arch_boxes;
+pub use arch_boxes::*;
+pub mod arch_gap_closure;
+pub use arch_gap_closure::*;
+pub mod arch_ultimate_gap_closure;
+pub use arch_ultimate_gap_closure::*;
 pub mod parrot_security;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
@@ -112,7 +130,7 @@ pub use visual_dashboard::{
     VpnStatus, VpnTunnel, VpnType,
 };
 pub use void_runit::{
-    RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
+    RunitService, RunitSupervisor, ServiceState as RunitServiceState,
 };
 pub mod sovereign_distro_dominance;
 pub mod future_roadmap_innovations;

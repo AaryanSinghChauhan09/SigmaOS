@@ -10,13 +10,13 @@ use alloc::vec::Vec;
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
+use alloc::sync::Arc;
+
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{Arc, HashMap, HashSet};
+use crate::klib::{HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
-#[cfg(any(feature = "standalone_test", test))]
-use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -215,6 +215,7 @@ pub enum PackageState {
     BrokenDependency,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackagePriority {
     Essential,
     Required,
@@ -432,10 +433,11 @@ impl CustomPackageHook {
     where
         F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
     {
+        let boxed_handler: Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync> = Arc::new(handler);
         Self {
             name: name.to_string(),
             timing,
-            handler: Arc::new(handler),
+            handler: boxed_handler,
         }
     }
 }
@@ -1393,6 +1395,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: PackagePriority,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)

@@ -1,7 +1,7 @@
 // SigmaOS Extended Tech Media Innovations Engine
 // Inspired by TechCrunch, TechSpot, OpenSourceForU, and Appuals
 
-use crate::klib::string::String;
+use std::string::String;
 use crate::klib::vec::Vec;
 
 /// TechCrunch Open-Source Project Health & Startup Ecosystem Metrics

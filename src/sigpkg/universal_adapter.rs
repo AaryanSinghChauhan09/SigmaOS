@@ -106,6 +106,8 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
+pub type PacmanPkgbuildV2 = PacmanPkgbuild;
+
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -245,12 +247,22 @@ impl UniversalPackageAdapter {
             return Err("Invalid Debian control manifest: missing Package or Version");
         }
 
+        let canonical_priority = match priority {
+            PackagePriority::Essential => crate::package::PackagePriority::Essential,
+            PackagePriority::Required => crate::package::PackagePriority::Required,
+            PackagePriority::Important => crate::package::PackagePriority::Important,
+            PackagePriority::Standard => crate::package::PackagePriority::Standard,
+            _ => crate::package::PackagePriority::Optional,
+        };
+
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: "Debian Packagers".to_string(),
             depends,
             description,
-            priority,
+            priority: canonical_priority,
         })
     }
 

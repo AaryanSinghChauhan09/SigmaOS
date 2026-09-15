@@ -1,7 +1,7 @@
 // SigmaOS Omarchy Final Gap Closure Subsystem
 // Zero-dependency Rust implementation covering Chromium Ozone Wayland PWA launchers, Wofi/Rofi fuzzy finder keybindings, NVIDIA Early KMS module flags, and Fail-Closed Sudo Expiry guards.
 
-use crate::klib::string::String;
+use std::string::String;
 use crate::klib::vec::Vec;
 
 /// Chromium Ozone Wayland PWA Spec
