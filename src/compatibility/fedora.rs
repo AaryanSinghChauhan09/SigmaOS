@@ -8,7 +8,7 @@ use std::vec;
 
 #[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::HashMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
