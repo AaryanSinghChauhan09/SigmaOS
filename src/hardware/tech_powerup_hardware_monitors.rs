@@ -1,7 +1,7 @@
 // SigmaOS Tech PowerUp & Hardware Busters Hardware Monitors
 // Inspired by TechPowerUp, Hardware Busters, PCWorld, and Geeky Gadgets
 
-use crate::klib::string::String;
+use std::string::String;
 
 /// TechPowerUp GPU VBIOS profiler and clock/voltage monitoring engine.
 #[derive(Debug, Clone)]

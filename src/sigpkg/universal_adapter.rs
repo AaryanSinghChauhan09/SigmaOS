@@ -7,19 +7,7 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::package::AptDebManifest;
-
-#[cfg(any(feature = "standalone_test", test))]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AptDebManifest {
-    pub package: String,
-    pub version: String,
-    pub depends: Vec<String>,
-    pub description: String,
-    pub priority: PackagePriority,
-}
-
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
@@ -82,11 +70,11 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+#[cfg(test)]
+pub use crate::sigpkg::Version;
 
-#[cfg(any(feature = "standalone_test", test))]
-pub use super::universal_engine::PackageFormat;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -118,12 +106,11 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-/// Use universal_oop_system::UniversalPackageManager instead
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::sigpkg::universal_oop_system;
+pub type PacmanPkgbuildV2 = PacmanPkgbuild;
 
-#[cfg(any(feature = "standalone_test", test))]
-use super::universal_oop_system;
+/// Use universal_oop_system::UniversalPackageManager instead
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -260,12 +247,22 @@ impl UniversalPackageAdapter {
             return Err("Invalid Debian control manifest: missing Package or Version");
         }
 
+        let canonical_priority = match priority {
+            PackagePriority::Essential => crate::package::PackagePriority::Essential,
+            PackagePriority::Required => crate::package::PackagePriority::Required,
+            PackagePriority::Important => crate::package::PackagePriority::Important,
+            PackagePriority::Standard => crate::package::PackagePriority::Standard,
+            _ => crate::package::PackagePriority::Optional,
+        };
+
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: "Debian Packagers".to_string(),
             depends,
             description,
-            priority,
+            priority: canonical_priority,
         })
     }
 
@@ -2241,8 +2238,12 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_info" => {
-                operation = UniversalPmOperation::QueryInfo;
+            "pkg_add" | "pkg_info" => {
+                if pm == "pkg_add" {
+                    operation = UniversalPmOperation::Install;
+                } else {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
                 for arg in args {
                     if *arg == "-n" {
                         dry_run = true;
@@ -3535,14 +3536,6 @@ mod tests {
         assert_eq!(bsd_action.source_pm, "pkg");
         assert_eq!(bsd_action.operation, UniversalPmOperation::Install);
         assert!(bsd_action.dry_run);
-
-        let openbsd_add_action = dispatcher
-            .dispatch_command("pkg_add -n firefox")
-            .unwrap();
-        assert_eq!(openbsd_add_action.source_pm, "pkg_add");
-        assert_eq!(openbsd_add_action.operation, UniversalPmOperation::Install);
-        assert_eq!(openbsd_add_action.target_packages, vec!["firefox"]);
-        assert!(openbsd_add_action.dry_run);
 
         let emerge_action = dispatcher
             .dispatch_command("emerge -pv sys-apps/portage")

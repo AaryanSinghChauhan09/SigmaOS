@@ -285,11 +285,11 @@ impl SimpleVMM {
         writable: bool,
         executable: bool,
     ) -> Result<(), MemoryError> {
-        self.map_page(virt, phys, writable, !executable)
+        self.map_simple_page(virt, phys, writable, !executable)
     }
 
-    /// Maps a standard 4KB page
-    pub fn map_page(
+    /// Maps a standard 4KB page with default flags
+    pub fn map_simple_page(
         &mut self,
         virt: VirtualAddress,
         phys: PhysicalAddress,
@@ -519,7 +519,7 @@ impl SimpleVMM {
                 // Decompress page and map it back on demand (zram decompression swap-in)
                 let decompressed_phys = PhysicalAddress(virt.0); // mapped back
                 self.zram_pool.remove(i);
-                self.map_page(virt, decompressed_phys, true, false).unwrap();
+                self.map_simple_page(virt, decompressed_phys, true, false).unwrap();
                 return Ok(decompressed_phys);
             }
         }
