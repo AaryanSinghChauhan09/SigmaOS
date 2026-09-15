@@ -1303,13 +1303,7 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 1b. Fish PATH helper: fish_add_path /path -> export PATH="$PATH:/path"
-        if l.starts_with("fish_add_path ") {
-            let path_val = l.trim_start_matches("fish_add_path ").trim();
-            return format!("export PATH=\"$PATH:{}\"", path_val);
-        }
-
-        // 2. Fish string ops (replace, match, sub, split, join, trim, length, repeat)
+        // 2. Fish string ops (replace, match, sub, split, join)
         if l.starts_with("string replace ") {
             let rest = l.trim_start_matches("string replace ").trim();
             let parts: Vec<&str> = rest.split_whitespace().collect();
@@ -1346,15 +1340,6 @@ impl UniversalScriptTranspiler {
                 let target = parts[1..].join(" ");
                 return format!("echo {} | tr ' ' '{}'", target, delim);
             }
-        } else if l.starts_with("string trim ") {
-            let rest = l.trim_start_matches("string trim ").trim();
-            return format!("echo {} | xargs", rest);
-        } else if l.starts_with("string length ") {
-            let rest = l.trim_start_matches("string length ").trim();
-            return format!("echo -n {} | wc -c", rest);
-        } else if l.starts_with("string repeat ") {
-            let rest = l.trim_start_matches("string repeat ").trim();
-            return format!("echo {}", rest);
         }
 
         // 3. Fish 'for var in list' -> 'for var in list; do'
@@ -1451,13 +1436,6 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 1b. Tcsh variable definition & path list: 'set path = ( ... )'
-        if l.starts_with("set path = (") && l.ends_with(')') {
-            let inner = &l[12..l.len() - 1].trim();
-            let paths = inner.replace(' ', ":");
-            return format!("export PATH=\"{}\"", paths);
-        }
-
         // 2. Tcsh 'unsetenv VAR' -> 'unset VAR'
         if l.starts_with("unsetenv ") {
             let var = l.trim_start_matches("unsetenv ").trim();
@@ -1481,10 +1459,6 @@ impl UniversalScriptTranspiler {
             if let Some(open) = l.find('(') {
                 if let Some(close) = l.find(')') {
                     let cond = l[open + 1..close].trim();
-                    if cond.starts_with("$?") {
-                        let var = &cond[2..];
-                        return format!("if [ -n \"${{{}}}\" ]; then", var);
-                    }
                     return format!("if [ {} ]; then", cond);
                 }
             }
@@ -1554,13 +1528,7 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Zsh parameter flags & modifiers: ${(U)var}, ${(L)var}, ${(j::)var}, ${(A)...}, ${=var}, :t, :h, :r, :e
-        if l.contains("${= ") || l.contains("${=") {
-            l = l.replace("${=", "${");
-        }
-        if l.contains("${(A)") {
-            l = l.replace("${(A)", "${");
-        }
+        // 2. Zsh parameter flags & modifiers: ${(U)var}, ${(L)var}, ${(j::)var}, :t, :h, :r, :e
         if l.contains("${(U)") {
             l = l.replace("${(U)", "${");
         }
@@ -1605,9 +1573,6 @@ impl UniversalScriptTranspiler {
         } else if l.starts_with("integer ") {
             let rest = l.trim_start_matches("integer ").trim();
             l = rest.to_string();
-        } else if l.starts_with("print -r ") {
-            let rest = l.trim_start_matches("print -r ").trim();
-            l = format!("echo -n {}", rest);
         } else if l.starts_with("print ") {
             let rest = l.trim_start_matches("print ").trim();
             l = format!("echo {}", rest);
@@ -2082,12 +2047,10 @@ mod tests {
 
     #[test]
     fn test_universal_script_transpiler_and_sh_execution() {
-        let fish_script = "#!/usr/bin/env fish\nfish_add_path /opt/bin\nstring trim hello\nset -gx TARGET /usr/bin\nfunction build_all\n  echo building\nend\nand echo done\nwhile test -f /tmp/lock\n  echo waiting\nend\nstring join , a b c";
+        let fish_script = "#!/usr/bin/env fish\nset -gx TARGET /usr/bin\nfunction build_all\n  echo building\nend\nand echo done\nwhile test -f /tmp/lock\n  echo waiting\nend\nstring join , a b c";
         let posix_fish =
             UniversalScriptTranspiler::transpile_to_posix_sh(fish_script, ShellDialect::Fish);
         assert!(posix_fish.contains("#!/bin/sh"));
-        assert!(posix_fish.contains("export PATH=\"$PATH:/opt/bin\""));
-        assert!(posix_fish.contains("echo hello | xargs"));
         assert!(posix_fish.contains("export TARGET=/usr/bin"));
         assert!(posix_fish.contains("build_all() {"));
         assert!(posix_fish.contains("}"));
@@ -2095,23 +2058,22 @@ mod tests {
         assert!(posix_fish.contains("while test -f /tmp/lock; do"));
         assert!(posix_fish.contains("echo a b c | tr ' ' ','"));
 
-        let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080\nset path = ( /bin /usr/bin )\nalias ll ls -la\nswitch ( $1 )\n  case test\n    echo test\nendsw";
+        let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080\nalias ll ls -la\nswitch ( $1 )\n  case test\n    echo test\nendsw";
         let posix_tcsh =
             UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_script, ShellDialect::Tcsh);
         assert!(posix_tcsh.contains("export PORT=8080"));
-        assert!(posix_tcsh.contains("export PATH=\"/bin:/usr/bin\""));
         assert!(posix_tcsh.contains("alias ll=ls -la"));
         assert!(posix_tcsh.contains("case $1 in"));
         assert!(posix_tcsh.contains("esac"));
 
-        let bash_script = "#!/bin/bash\ngrep test <<< \"test_string\"\n[[ -f /tmp/foo ]]\necho ${=word_split}\ninteger count=10\nprint -r hello";
+        let bash_script = "#!/bin/bash\ngrep test <<< \"test_string\"\n[[ -f /tmp/foo ]]\necho ${path:t}\ninteger count=10\nprint hello";
         let posix_bash =
             UniversalScriptTranspiler::transpile_to_posix_sh(bash_script, ShellDialect::Bash);
         assert!(posix_bash.contains("echo \"test_string\" | grep test"));
         assert!(posix_bash.contains("[ -f /tmp/foo ]"));
-        assert!(posix_bash.contains("echo ${word_split}"));
+        assert!(posix_bash.contains("echo ${path}"));
         assert!(posix_bash.contains("count=10"));
-        assert!(posix_bash.contains("echo -n hello"));
+        assert!(posix_bash.contains("echo hello"));
 
         let mut engine = UniversalShellCompatibilityEngine::new();
         let pipelines = engine.execute_script_as_sh(tcsh_script).unwrap();
