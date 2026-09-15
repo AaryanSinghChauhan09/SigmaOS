@@ -68,6 +68,12 @@ pub enum DistroSubsystemMode {
     LinuxTails,
     LinuxGuix,
     LinuxParrot,
+    LinuxKali,
+    LinuxAntiX,
+    LinuxZorin,
+    LinuxMint,
+    LinuxGaruda,
+    LinuxCachyOS,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -120,16 +126,22 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
+
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
 
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                ServiceSupervisorType::Runit
-            }
+            DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxVoid
+            | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 ServiceSupervisorType::Shepherd
@@ -153,7 +165,12 @@ impl SovereignUniversalDistroBridge {
             (
                 DistroSubsystemMode::LinuxDebian
                 | DistroSubsystemMode::LinuxPopOs
-                | DistroSubsystemMode::LinuxTails,
+                | DistroSubsystemMode::LinuxTails
+                | DistroSubsystemMode::LinuxParrot
+                | DistroSubsystemMode::LinuxKali
+                | DistroSubsystemMode::LinuxAntiX
+                | DistroSubsystemMode::LinuxZorin
+                | DistroSubsystemMode::LinuxMint,
                 "/var/lib/pkg",
             ) => "/var/lib/dpkg".to_string(),
             (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
@@ -216,6 +233,11 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -224,9 +246,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                supervisor == ServiceSupervisorType::Runit
-            }
+            DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxVoid
+            | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 supervisor == ServiceSupervisorType::Shepherd
@@ -248,8 +270,14 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
-            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint => format!("{}.deb", input_pkg),
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
@@ -287,8 +315,14 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
-            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint => format!("{}.deb", action),
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
@@ -427,6 +461,102 @@ impl SovereignUniversalDistroBridge {
             "omarchy_herdr_agent" => {
                 Ok(format!(
                     "Dispatched Omarchy Herdr AI Agent task spawning for prompt '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_recon" => {
+                Ok(format!(
+                    "Dispatched Kali Security Nmap/Wireshark/Metasploit reconnaissance for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "antix_runit" => {
+                Ok(format!(
+                    "Dispatched AntiX SysVinit/Runit lightweight sys-admin service control for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "zorin_chameleon" => {
+                Ok(format!(
+                    "Dispatched Zorin OS Chameleon dynamic desktop layout switcher to '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "mint_cinnamon" => {
+                Ok(format!(
+                    "Dispatched Linux Mint Cinnamon desktop applet & Timeshift snapshot manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "garuda_dracut" => {
+                Ok(format!(
+                    "Dispatched Garuda Linux Dracut Btrfs Snapper automatic rollback for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cachy_bore" => {
+                Ok(format!(
+                    "Dispatched CachyOS BORE v2 dynamic latency scheduler tuning for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "auth" => {
+                Ok(format!(
+                    "Dispatched PAM / SystemdHomed authentication & privilege check for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "boot" => {
+                Ok(format!(
+                    "Dispatched Multiboot2 / EFI boot entry configuration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "virtualization" => {
+                Ok(format!(
+                    "Dispatched MicroVM hypervisor / FreeBSD Jail bridge for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "input" => {
+                Ok(format!(
+                    "Dispatched USB HID keyboard / gamepad event handling for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched thermal governor & fan speed profile control for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "syscall" => {
+                Ok(format!(
+                    "Dispatched multi-architecture ABI syscall translator for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "device" => {
+                Ok(format!(
+                    "Dispatched dynamic devfs device node symlink manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "crypto" => {
+                Ok(format!(
+                    "Dispatched PQC Dilithium / WireGuard cryptographic engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched Sovereign AI-native copilot & task orchestrator for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                Ok(format!(
+                    "Dispatched Btop / Fastfetch hardware telemetry monitoring for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -1915,6 +2045,13 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxMint,
+            DistroSubsystemMode::LinuxGaruda,
+            DistroSubsystemMode::LinuxCachyOS,
         ];
 
         for m in modes {
@@ -1947,6 +2084,13 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxMint,
+            DistroSubsystemMode::LinuxGaruda,
+            DistroSubsystemMode::LinuxCachyOS,
         ];
 
         let target_subsystems = [
@@ -1954,6 +2098,8 @@ mod cross_subsystem_tests {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
+            "kali_recon", "antix_runit", "zorin_chameleon", "mint_cinnamon",
+            "garuda_dracut", "cachy_bore",
         ];
 
         for m in modes {
