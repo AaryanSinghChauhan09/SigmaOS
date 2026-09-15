@@ -60,6 +60,13 @@ if [ -f "tests/test_hashmap_standalone.rs" ]; then
     ./build/hashmap_test
 fi
 
+if [ -f "tests/test_string_parser_standalone.rs" ]; then
+    echo "Running String, Config & TOML parser performance & correctness test suite..."
+    mkdir -p build
+    rustc --test tests/test_string_parser_standalone.rs --edition=2021 -o build/string_parser_test
+    ./build/string_parser_test
+fi
+
 if [ -f "src/distro/arch.rs" ]; then
     echo "Running Arch Linux parity & tooling test suite..."
     mkdir -p build
