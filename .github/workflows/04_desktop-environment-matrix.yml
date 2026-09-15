@@ -36,13 +36,13 @@ jobs:
           - desktop: kde
             version: "5"
             container: ubuntu:jammy
-            deps: "qtbase5-dev"
+            deps: "libkf5-dev libqt5-dev"
             build-cmd: "cargo build --features kde --release"
 
           - desktop: kde
             version: "6"
             container: ubuntu:noble
-            deps: "qt6-base-dev"
+            deps: "libkf6-dev libqt6-dev"
             build-cmd: "cargo build --features kde --release"
 
           # XFCE
@@ -56,21 +56,21 @@ jobs:
           - desktop: mate
             version: "1.26"
             container: ubuntu:jammy
-            deps: "libmate-desktop-dev"
+            deps: "libmate-desktop-dev libmatecomponent-dev"
             build-cmd: "cargo build --features mate --release"
 
           # LXQt
           - desktop: lxqt
             version: latest
             container: ubuntu:jammy
-            deps: "qtbase5-dev"
+            deps: "liblxqt-dev libqt5-dev"
             build-cmd: "cargo build --features lxqt --release"
 
           # Enlightenment
           - desktop: enlightenment
             version: "0.26"
             container: ubuntu:jammy
-            deps: "libefl-all-dev"
+            deps: "libefl-dev libevas-dev"
             build-cmd: "cargo build --features enlightenment --release"
 
           # Wayland Compositors
@@ -90,7 +90,7 @@ jobs:
           - desktop: mir
             version: latest
             container: ubuntu:jammy
-            deps: "libmircore-dev"
+            deps: "mir-dev"
             build-cmd: "cargo build --features mir --release"
 
           # X11
@@ -119,7 +119,7 @@ jobs:
 
       - name: Install desktop dependencies
         run: |
-          apt-get install -y ${{ matrix.deps }} || true
+          apt-get install -y ${{ matrix.deps }}
 
       - name: Build for ${{ matrix.desktop }} ${{ matrix.version }}
         run: |
