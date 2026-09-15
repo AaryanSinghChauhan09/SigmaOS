@@ -21,11 +21,10 @@ pub mod sigma_office;
 pub mod enterprise_productivity_suite;
 
 pub use enterprise_productivity_suite::{
-    AnalyticsWidget, ChartMetricType, CommentThread, CrmLead, DataDimension, DataMetric,
-    Invoice, InvoiceLine, InventoryItem, KanbanTask, PresentationSlide, SalesDeal,
+    AnalyticsChartWidget, CrmLead, DocumentSuggestion, HrAttendanceClock, InvoiceItem,
+    LeadStage, LiveCollaboratorCursor, MultiCurrencyInvoice, PresentationSlide,
     SigmaDocsEnterpriseCollaborationEngine, SigmaLookerAnalyticsEngine,
-    SigmaSlidesPresenterEngine, SlideAnimation, SlideTransition, SovereignEnterpriseCrmErpEngine,
-    SovereignOdooBitrixSuite, SuggestionEdit, SupportCase, UserCursorState, WorkOrder,
+    SigmaSlidesPresenterEngine, SovereignEnterpriseCrmErpEngine, SovereignOdooBitrixSuite,
 };
 
 pub use itsfoss_apps_synthesis::{

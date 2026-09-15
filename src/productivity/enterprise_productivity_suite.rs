@@ -1,173 +1,89 @@
-// Enterprise Productivity Suite for SigmaOS
-// Inspired by Google Workspace (Looker Studio, Slides, Docs), Zoho Suites, Salesforce, Odoo, and Bitrix24.
+// SPDX-License-Identifier: MIT
+// SigmaOS Enterprise Productivity Suite
+// Inspired by Google Workspace (Looker Studio, Slides, Docs), Zoho CRM, Salesforce, Odoo, and Bitrix24.
 
+use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-
 // =========================================================================
-// 1. Google Looker Studio / PowerBI Analytics Engine (SigmaLookerAnalyticsEngine)
+// 1. Google Looker Studio / PowerBI Parity Analytics Engine
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum ChartMetricType {
-    Sum,
-    Average,
-    Count,
-    Min,
-    Max,
-}
-
-#[derive(Debug, Clone)]
-pub struct DataDimension {
-    pub dimension_id: String,
-    pub name: String,
-    pub values: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct DataMetric {
-    pub metric_id: String,
-    pub name: String,
-    pub values: Vec<f64>,
-    pub aggregation: ChartMetricType,
-}
-
-#[derive(Debug, Clone)]
-pub struct AnalyticsWidget {
+pub struct AnalyticsChartWidget {
     pub widget_id: String,
     pub title: String,
-    pub chart_type: String, // "bar", "pie", "line", "scorecard", "geo_map"
-    pub dimension_id: String,
-    pub metric_id: String,
+    pub chart_type: String, // "bar", "line", "pie", "scorecard"
+    pub data_source: String,
+    pub metrics: Vec<String>,
 }
 
-/// Google Looker Studio & Microsoft PowerBI Inspired Sovereign Data Visualization Engine
+#[derive(Debug, Clone)]
 pub struct SigmaLookerAnalyticsEngine {
-    pub dashboard_name: String,
-    pub dimensions: HashMap<String, DataDimension>,
-    pub metrics: HashMap<String, DataMetric>,
-    pub widgets: Vec<AnalyticsWidget>,
+    pub dashboard_title: String,
+    pub widgets: BTreeMap<String, AnalyticsChartWidget>,
+    pub data_records: Vec<BTreeMap<String, String>>,
 }
 
 impl SigmaLookerAnalyticsEngine {
-    pub fn new(dashboard_name: &str) -> Self {
+    pub fn new(title: &str) -> Self {
         Self {
-            dashboard_name: dashboard_name.to_string(),
-            dimensions: HashMap::new(),
-            metrics: HashMap::new(),
-            widgets: Vec::new(),
+            dashboard_title: title.to_string(),
+            widgets: BTreeMap::new(),
+            data_records: Vec::new(),
         }
     }
 
-    pub fn add_dimension(&mut self, id: &str, name: &str, values: Vec<String>) {
-        self.dimensions.insert(
-            id.to_string(),
-            DataDimension {
-                dimension_id: id.to_string(),
-                name: name.to_string(),
-                values,
-            },
-        );
+    pub fn add_widget(&mut self, widget: AnalyticsChartWidget) {
+        self.widgets.insert(widget.widget_id.clone(), widget);
     }
 
-    pub fn add_metric(&mut self, id: &str, name: &str, values: Vec<f64>, agg: ChartMetricType) {
-        self.metrics.insert(
-            id.to_string(),
-            DataMetric {
-                metric_id: id.to_string(),
-                name: name.to_string(),
-                values,
-                aggregation: agg,
-            },
-        );
+    pub fn ingest_record(&mut self, record: BTreeMap<String, String>) {
+        self.data_records.push(record);
     }
 
-    pub fn add_widget(&mut self, widget_id: &str, title: &str, chart_type: &str, dim_id: &str, metric_id: &str) {
-        self.widgets.push(AnalyticsWidget {
-            widget_id: widget_id.to_string(),
-            title: title.to_string(),
-            chart_type: chart_type.to_string(),
-            dimension_id: dim_id.to_string(),
-            metric_id: metric_id.to_string(),
-        });
-    }
-
-    pub fn compute_metric_aggregate(&self, metric_id: &str) -> Option<f64> {
-        let metric = self.metrics.get(metric_id)?;
-        if metric.values.is_empty() {
-            return Some(0.0);
+    pub fn compute_metric_sum(&self, field_name: &str) -> f64 {
+        let mut total = 0.0;
+        for rec in &self.data_records {
+            if let Some(val_str) = rec.get(field_name) {
+                if let Ok(val) = val_str.parse::<f64>() {
+                    total += val;
+                }
+            }
         }
-
-        match metric.aggregation {
-            ChartMetricType::Sum => Some(metric.values.iter().sum()),
-            ChartMetricType::Average => Some(metric.values.iter().sum::<f64>() / metric.values.len() as f64),
-            ChartMetricType::Count => Some(metric.values.len() as f64),
-            ChartMetricType::Min => metric.values.iter().cloned().reduce(f64::min),
-            ChartMetricType::Max => metric.values.iter().cloned().reduce(f64::max),
-        }
+        total
     }
 
-    pub fn render_widget_summary(&self, widget_id: &str) -> Result<String, &'static str> {
-        let widget = self
-            .widgets
-            .iter()
-            .find(|w| w.widget_id == widget_id)
-            .ok_or("Widget not found")?;
-
-        let dim = self
-            .dimensions
-            .get(&widget.dimension_id)
-            .ok_or("Dimension not found")?;
-
-        let agg = self
-            .compute_metric_aggregate(&widget.metric_id)
-            .ok_or("Metric not found")?;
-
-        Ok(format!(
-            "[{}] Chart: {}, Dim: {}, Aggregate: {:.2}",
-            widget.title, widget.chart_type, dim.name, agg
-        ))
+    pub fn export_dashboard_summary(&self) -> String {
+        format!(
+            "Dashboard: {} | Widgets: {} | Records Ingested: {}",
+            self.dashboard_title,
+            self.widgets.len(),
+            self.data_records.len()
+        )
     }
 }
 
 // =========================================================================
-// 2. Google Slides / PowerPoint Presentation Engine (SigmaSlidesPresenterEngine)
+// 2. Google Slides / PowerPoint Parity Presentation Engine
 // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct SlideTransition {
-    pub effect_name: String, // "Fade", "Dissolve", "Slide Left", "Zoom"
-    pub duration_ms: u32,
-}
-
-#[derive(Debug, Clone)]
-pub struct SlideAnimation {
-    pub element_id: String,
-    pub animation_type: String, // "FlyIn", "FadeIn", "Spin", "Bounce"
-    pub trigger_on_click: bool,
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PresentationSlide {
     pub slide_number: u32,
     pub title: String,
+    pub body_markdown: String,
     pub speaker_notes: String,
-    pub transition: SlideTransition,
-    pub animations: Vec<SlideAnimation>,
 }
 
-/// Google Slides & Microsoft PowerPoint Inspired Sovereign Presentation Engine
+#[derive(Debug, Clone)]
 pub struct SigmaSlidesPresenterEngine {
     pub presentation_title: String,
     pub slides: Vec<PresentationSlide>,
-    pub active_slide_index: usize,
-    pub presenter_mode_active: bool,
+    pub current_slide_idx: usize,
+    pub is_presenter_mode: bool,
 }
 
 impl SigmaSlidesPresenterEngine {
@@ -175,271 +91,171 @@ impl SigmaSlidesPresenterEngine {
         Self {
             presentation_title: title.to_string(),
             slides: Vec::new(),
-            active_slide_index: 0,
-            presenter_mode_active: false,
+            current_slide_idx: 0,
+            is_presenter_mode: false,
         }
     }
 
-    pub fn create_slide(&mut self, title: &str, speaker_notes: &str) -> u32 {
-        let slide_num = (self.slides.len() + 1) as u32;
+    pub fn add_slide(&mut self, title: &str, body_markdown: &str, notes: &str) -> u32 {
+        let slide_number = (self.slides.len() as u32) + 1;
         self.slides.push(PresentationSlide {
-            slide_number: slide_num,
+            slide_number,
             title: title.to_string(),
-            speaker_notes: speaker_notes.to_string(),
-            transition: SlideTransition {
-                effect_name: "Fade".to_string(),
-                duration_ms: 300,
-            },
-            animations: Vec::new(),
+            body_markdown: body_markdown.to_string(),
+            speaker_notes: notes.to_string(),
         });
-        slide_num
+        slide_number
     }
 
-    pub fn add_animation(&mut self, slide_num: u32, elem_id: &str, anim_type: &str, on_click: bool) -> Result<(), &'static str> {
-        let slide = self
-            .slides
-            .iter_mut()
-            .find(|s| s.slide_number == slide_num)
-            .ok_or("Slide not found")?;
-
-        slide.animations.push(SlideAnimation {
-            element_id: elem_id.to_string(),
-            animation_type: anim_type.to_string(),
-            trigger_on_click: on_click,
-        });
-        Ok(())
-    }
-
-    pub fn start_presenter_view(&mut self) -> Result<String, &'static str> {
-        if self.slides.is_empty() {
-            return Err("Presentation has no slides");
-        }
-        self.presenter_mode_active = true;
-        self.active_slide_index = 0;
-        let slide = &self.slides[0];
-        Ok(format!(
-            "Presenter View Started [Slide 1/{}]: {} | Notes: {}",
-            self.slides.len(),
-            slide.title,
-            slide.speaker_notes
-        ))
+    pub fn start_presentation(&mut self) {
+        self.current_slide_idx = 0;
+        self.is_presenter_mode = true;
     }
 
     pub fn next_slide(&mut self) -> Option<&PresentationSlide> {
-        if self.active_slide_index + 1 < self.slides.len() {
-            self.active_slide_index += 1;
-            Some(&self.slides[self.active_slide_index])
+        if self.current_slide_idx + 1 < self.slides.len() {
+            self.current_slide_idx += 1;
+            Some(&self.slides[self.current_slide_idx])
         } else {
-            None
+            self.get_current_slide()
         }
+    }
+
+    pub fn get_current_slide(&self) -> Option<&PresentationSlide> {
+        self.slides.get(self.current_slide_idx)
     }
 }
 
 // =========================================================================
-// 3. Google Docs Enterprise Collaboration Engine (SigmaDocsEnterpriseCollaborationEngine)
+// 3. Google Docs / MS Word Parity Real-time Collaboration Engine
 // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct UserCursorState {
-    pub username: String,
-    pub cursor_offset: usize,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LiveCollaboratorCursor {
+    pub user_id: String,
+    pub user_name: String,
+    pub cursor_position: usize,
     pub selection_length: usize,
-    pub user_color_hex: String,
 }
 
-#[derive(Debug, Clone)]
-pub struct CommentThread {
-    pub thread_id: u32,
-    pub author: String,
-    pub selected_text: String,
-    pub comment_text: String,
-    pub resolved: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct SuggestionEdit {
-    pub suggestion_id: u32,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DocumentSuggestion {
+    pub suggestion_id: String,
     pub author: String,
     pub original_text: String,
     pub suggested_text: String,
-    pub status: String, // "Pending", "Accepted", "Rejected"
+    pub is_accepted: bool,
 }
 
-/// Google Docs & MS Word Inspired Sovereign Collaborative Editor Engine
+#[derive(Debug, Clone)]
 pub struct SigmaDocsEnterpriseCollaborationEngine {
-    pub doc_id: String,
-    pub document_text: String,
-    pub live_cursors: HashMap<String, UserCursorState>,
-    pub comments: Vec<CommentThread>,
-    pub suggestions: Vec<SuggestionEdit>,
-    pub next_id: u32,
+    pub document_id: String,
+    pub content: String,
+    pub cursors: BTreeMap<String, LiveCollaboratorCursor>,
+    pub suggestions: Vec<DocumentSuggestion>,
 }
 
 impl SigmaDocsEnterpriseCollaborationEngine {
     pub fn new(doc_id: &str, initial_content: &str) -> Self {
         Self {
-            doc_id: doc_id.to_string(),
-            document_text: initial_content.to_string(),
-            live_cursors: HashMap::new(),
-            comments: Vec::new(),
+            document_id: doc_id.to_string(),
+            content: initial_content.to_string(),
+            cursors: BTreeMap::new(),
             suggestions: Vec::new(),
-            next_id: 1,
         }
     }
 
-    pub fn update_user_cursor(&mut self, username: &str, offset: usize, sel_len: usize, color: &str) {
-        self.live_cursors.insert(
-            username.to_string(),
-            UserCursorState {
-                username: username.to_string(),
-                cursor_offset: offset,
-                selection_length: sel_len,
-                user_color_hex: color.to_string(),
-            },
-        );
+    pub fn update_cursor(&mut self, cursor: LiveCollaboratorCursor) {
+        self.cursors.insert(cursor.user_id.clone(), cursor);
     }
 
-    pub fn add_comment(&mut self, author: &str, selected_text: &str, comment: &str) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.comments.push(CommentThread {
-            thread_id: id,
-            author: author.to_string(),
-            selected_text: selected_text.to_string(),
-            comment_text: comment.to_string(),
-            resolved: false,
-        });
-        id
-    }
-
-    pub fn propose_suggestion(&mut self, author: &str, orig: &str, suggested: &str) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.suggestions.push(SuggestionEdit {
-            suggestion_id: id,
+    pub fn propose_suggestion(&mut self, author: &str, orig: &str, replacement: &str) -> String {
+        let sug_id = format!("sug-{}", self.suggestions.len() + 1);
+        self.suggestions.push(DocumentSuggestion {
+            suggestion_id: sug_id.clone(),
             author: author.to_string(),
             original_text: orig.to_string(),
-            suggested_text: suggested.to_string(),
-            status: "Pending".to_string(),
+            suggested_text: replacement.to_string(),
+            is_accepted: false,
         });
-        id
+        sug_id
     }
 
-    pub fn accept_suggestion(&mut self, suggestion_id: u32) -> Result<bool, &'static str> {
-        let sug = self
-            .suggestions
-            .iter_mut()
-            .find(|s| s.suggestion_id == suggestion_id)
-            .ok_or("Suggestion not found")?;
-
-        if sug.status != "Pending" {
-            return Ok(false);
+    pub fn accept_suggestion(&mut self, sug_id: &str) -> bool {
+        if let Some(sug) = self.suggestions.iter_mut().find(|s| s.suggestion_id == sug_id) {
+            if !sug.is_accepted {
+                sug.is_accepted = true;
+                self.content = self.content.replace(&sug.original_text, &sug.suggested_text);
+                return true;
+            }
         }
-
-        sug.status = "Accepted".to_string();
-        if self.document_text.contains(&sug.original_text) {
-            self.document_text = self
-                .document_text
-                .replace(&sug.original_text, &sug.suggested_text);
-        }
-        Ok(true)
+        false
     }
 }
 
 // =========================================================================
-// 4. Zoho CRM & Salesforce Enterprise Suite (SovereignEnterpriseCrmErpEngine)
+// 4. Zoho CRM / Salesforce Parity Sales Pipeline & Lead Engine
 // =========================================================================
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LeadStage {
+    New,
+    Contacted,
+    Qualified,
+    ProposalSent,
+    ClosedWon,
+    ClosedLost,
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct CrmLead {
-    pub lead_id: u32,
+    pub lead_id: String,
     pub contact_name: String,
     pub company: String,
-    pub lead_score: u32,
-    pub status: String, // "New", "Contacted", "Qualified", "Converted"
+    pub estimated_value_usd: f64,
+    pub stage: LeadStage,
+    pub score: u32,
 }
 
 #[derive(Debug, Clone)]
-pub struct SalesDeal {
-    pub deal_id: u32,
-    pub deal_name: String,
-    pub amount: f64,
-    pub probability: f64, // 0.0 to 1.0
-    pub stage: String,    // "Prospecting", "Proposal", "Closed-Won", "Closed-Lost"
-}
-
-#[derive(Debug, Clone)]
-pub struct SupportCase {
-    pub case_id: u32,
-    pub customer_name: String,
-    pub issue_title: String,
-    pub priority: String, // "Low", "Medium", "High", "Critical"
-    pub is_closed: bool,
-}
-
-/// Zoho CRM & Salesforce Inspired Sovereign Enterprise CRM Engine
 pub struct SovereignEnterpriseCrmErpEngine {
-    pub leads: Vec<CrmLead>,
-    pub deals: Vec<SalesDeal>,
-    pub cases: Vec<SupportCase>,
-    pub next_id: u32,
+    pub leads: BTreeMap<String, CrmLead>,
 }
 
 impl SovereignEnterpriseCrmErpEngine {
     pub fn new() -> Self {
         Self {
-            leads: Vec::new(),
-            deals: Vec::new(),
-            cases: Vec::new(),
-            next_id: 1,
+            leads: BTreeMap::new(),
         }
     }
 
-    pub fn add_lead(&mut self, contact: &str, company: &str, score: u32) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.leads.push(CrmLead {
-            lead_id: id,
-            contact_name: contact.to_string(),
-            company: company.to_string(),
-            lead_score: score,
-            status: "New".to_string(),
-        });
-        id
+    pub fn add_lead(&mut self, lead: CrmLead) {
+        self.leads.insert(lead.lead_id.clone(), lead);
     }
 
-    pub fn add_deal(&mut self, name: &str, amount: f64, prob: f64, stage: &str) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.deals.push(SalesDeal {
-            deal_id: id,
-            deal_name: name.to_string(),
-            amount,
-            probability: prob.clamp(0.0, 1.0),
-            stage: stage.to_string(),
-        });
-        id
+    pub fn update_stage(&mut self, lead_id: &str, new_stage: LeadStage) -> bool {
+        if let Some(lead) = self.leads.get_mut(lead_id) {
+            lead.stage = new_stage;
+            true
+        } else {
+            false
+        }
     }
 
-    pub fn compute_forecasted_pipeline_revenue(&self) -> f64 {
-        self.deals
-            .iter()
-            .filter(|d| d.stage != "Closed-Lost")
-            .map(|d| d.amount * d.probability)
-            .sum()
-    }
-
-    pub fn create_support_case(&mut self, customer: &str, issue: &str, priority: &str) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.cases.push(SupportCase {
-            case_id: id,
-            customer_name: customer.to_string(),
-            issue_title: issue.to_string(),
-            priority: priority.to_string(),
-            is_closed: false,
-        });
-        id
+    pub fn calculate_pipeline_forecast(&self) -> f64 {
+        let mut total = 0.0;
+        for lead in self.leads.values() {
+            let probability = match lead.stage {
+                LeadStage::New => 0.10,
+                LeadStage::Contacted => 0.25,
+                LeadStage::Qualified => 0.50,
+                LeadStage::ProposalSent => 0.75,
+                LeadStage::ClosedWon => 1.00,
+                LeadStage::ClosedLost => 0.00,
+            };
+            total += lead.estimated_value_usd * probability;
+        }
+        total
     }
 }
 
@@ -450,136 +266,79 @@ impl Default for SovereignEnterpriseCrmErpEngine {
 }
 
 // =========================================================================
-// 5. Odoo & Bitrix24 Sovereign ERP & Project Management Suite (SovereignOdooBitrixSuite)
+// 5. Odoo / Bitrix24 Parity ERP, Kanban & HR Clock-In Suite
 // =========================================================================
 
-#[derive(Debug, Clone)]
-pub struct KanbanTask {
-    pub task_id: u32,
-    pub title: String,
-    pub column: String, // "Backlog", "In Progress", "Code Review", "Done"
-    pub assignee: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct InventoryItem {
-    pub sku: String,
-    pub item_name: String,
-    pub quantity_on_hand: u32,
-    pub unit_price: f64,
-}
-
-#[derive(Debug, Clone)]
-pub struct InvoiceLine {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InvoiceItem {
     pub description: String,
     pub quantity: u32,
-    pub unit_price: f64,
+    pub unit_price_cents: u64,
 }
 
-#[derive(Debug, Clone)]
-pub struct Invoice {
-    pub invoice_id: u32,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MultiCurrencyInvoice {
+    pub invoice_id: String,
     pub customer_name: String,
-    pub currency: String,
-    pub lines: Vec<InvoiceLine>,
-    pub paid: bool,
+    pub currency_code: String, // "USD", "EUR", "INR"
+    pub items: Vec<InvoiceItem>,
+    pub is_paid: bool,
+}
+
+impl MultiCurrencyInvoice {
+    pub fn calculate_total_cents(&self) -> u64 {
+        self.items
+            .iter()
+            .map(|item| (item.quantity as u64) * item.unit_price_cents)
+            .sum()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HrAttendanceClock {
+    pub employee_id: String,
+    pub clock_in_sec: u64,
+    pub clock_out_sec: Option<u64>,
 }
 
 #[derive(Debug, Clone)]
-pub struct WorkOrder {
-    pub order_id: u32,
-    pub product_name: String,
-    pub planned_quantity: u32,
-    pub status: String, // "Draft", "In Production", "Completed"
-}
-
-/// Odoo & Bitrix24 Inspired Sovereign ERP & All-in-One Suite Engine
 pub struct SovereignOdooBitrixSuite {
-    pub tasks: Vec<KanbanTask>,
-    pub inventory: HashMap<String, InventoryItem>,
-    pub invoices: Vec<Invoice>,
-    pub work_orders: Vec<WorkOrder>,
-    pub employee_clock_ins: HashMap<String, u64>, // employee_id -> timestamp_ms
-    pub next_id: u32,
+    pub invoices: BTreeMap<String, MultiCurrencyInvoice>,
+    pub attendance_logs: Vec<HrAttendanceClock>,
 }
 
 impl SovereignOdooBitrixSuite {
     pub fn new() -> Self {
         Self {
-            tasks: Vec::new(),
-            inventory: HashMap::new(),
-            invoices: Vec::new(),
-            work_orders: Vec::new(),
-            employee_clock_ins: HashMap::new(),
-            next_id: 1,
+            invoices: BTreeMap::new(),
+            attendance_logs: Vec::new(),
         }
     }
 
-    pub fn create_kanban_task(&mut self, title: &str, assignee: &str) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.tasks.push(KanbanTask {
-            task_id: id,
-            title: title.to_string(),
-            column: "Backlog".to_string(),
-            assignee: assignee.to_string(),
-        });
-        id
+    pub fn issue_invoice(&mut self, invoice: MultiCurrencyInvoice) {
+        self.invoices.insert(invoice.invoice_id.clone(), invoice);
     }
 
-    pub fn move_kanban_task(&mut self, task_id: u32, target_column: &str) -> bool {
-        if let Some(task) = self.tasks.iter_mut().find(|t| t.task_id == task_id) {
-            task.column = target_column.to_string();
+    pub fn clock_in(&mut self, emp_id: &str, now_sec: u64) {
+        self.attendance_logs.push(HrAttendanceClock {
+            employee_id: emp_id.to_string(),
+            clock_in_sec: now_sec,
+            clock_out_sec: None,
+        });
+    }
+
+    pub fn clock_out(&mut self, emp_id: &str, now_sec: u64) -> bool {
+        if let Some(log) = self
+            .attendance_logs
+            .iter_mut()
+            .rev()
+            .find(|l| l.employee_id == emp_id && l.clock_out_sec.is_none())
+        {
+            log.clock_out_sec = Some(now_sec);
             true
         } else {
             false
         }
-    }
-
-    pub fn update_inventory(&mut self, sku: &str, name: &str, qty: u32, price: f64) {
-        self.inventory.insert(
-            sku.to_string(),
-            InventoryItem {
-                sku: sku.to_string(),
-                item_name: name.to_string(),
-                quantity_on_hand: qty,
-                unit_price: price,
-            },
-        );
-    }
-
-    pub fn create_invoice(&mut self, customer: &str, currency: &str, lines: Vec<InvoiceLine>) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.invoices.push(Invoice {
-            invoice_id: id,
-            customer_name: customer.to_string(),
-            currency: currency.to_string(),
-            lines,
-            paid: false,
-        });
-        id
-    }
-
-    pub fn calculate_invoice_total(&self, invoice_id: u32) -> Option<f64> {
-        let inv = self.invoices.iter().find(|i| i.invoice_id == invoice_id)?;
-        Some(inv.lines.iter().map(|l| l.quantity as f64 * l.unit_price).sum())
-    }
-
-    pub fn create_manufacturing_work_order(&mut self, product: &str, qty: u32) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.work_orders.push(WorkOrder {
-            order_id: id,
-            product_name: product.to_string(),
-            planned_quantity: qty,
-            status: "Draft".to_string(),
-        });
-        id
-    }
-
-    pub fn hr_clock_in(&mut self, employee_id: &str, timestamp_ms: u64) {
-        self.employee_clock_ins.insert(employee_id.to_string(), timestamp_ms);
     }
 }
 
@@ -589,75 +348,100 @@ impl Default for SovereignOdooBitrixSuite {
     }
 }
 
-// =========================================================================
-// Tests
-// =========================================================================
-
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_looker_analytics_engine() {
         let mut engine = SigmaLookerAnalyticsEngine::new("Sales Dashboard");
-        engine.add_dimension("region", "Region", vec!["North".to_string(), "South".to_string()]);
-        engine.add_metric("revenue", "Revenue", vec![1000.0, 2500.0, 1500.0], ChartMetricType::Sum);
-        engine.add_widget("w1", "Regional Revenue", "bar", "region", "revenue");
+        engine.add_widget(AnalyticsChartWidget {
+            widget_id: "w1".to_string(),
+            title: "Revenue".to_string(),
+            chart_type: "bar".to_string(),
+            data_source: "sales_db".to_string(),
+            metrics: vec!["amount".to_string()],
+        });
 
-        let agg = engine.compute_metric_aggregate("revenue").unwrap();
-        assert_eq!(agg, 5000.0);
+        let mut r1 = BTreeMap::new();
+        r1.insert("amount".to_string(), "1500.50".to_string());
+        let mut r2 = BTreeMap::new();
+        r2.insert("amount".to_string(), "2499.50".to_string());
 
-        let summary = engine.render_widget_summary("w1").unwrap();
-        assert!(summary.contains("5000.00"));
+        engine.ingest_record(r1);
+        engine.ingest_record(r2);
+
+        assert_eq!(engine.compute_metric_sum("amount"), 4000.0);
+        assert!(engine.export_dashboard_summary().contains("Sales Dashboard"));
     }
 
     #[test]
     fn test_slides_presenter_engine() {
-        let mut slides = SigmaSlidesPresenterEngine::new("Keynote");
-        let s1 = slides.create_slide("Intro", "Welcome everyone");
-        slides.add_animation(s1, "title_box", "FlyIn", true).unwrap();
+        let mut slides = SigmaSlidesPresenterEngine::new("SigmaOS Overview");
+        let s1 = slides.add_slide("Intro", "# Welcome", "Key points for slide 1");
+        assert_eq!(s1, 1);
 
-        let presenter_text = slides.start_presenter_view().unwrap();
-        assert!(presenter_text.contains("Welcome everyone"));
-        assert_eq!(slides.active_slide_index, 0);
+        slides.add_slide("Architecture", "Microkernel details", "Key points for slide 2");
+
+        slides.start_presentation();
+        assert_eq!(slides.get_current_slide().unwrap().title, "Intro");
+
+        slides.next_slide();
+        assert_eq!(slides.get_current_slide().unwrap().title, "Architecture");
     }
 
     #[test]
     fn test_docs_collaboration_engine() {
-        let mut doc = SigmaDocsEnterpriseCollaborationEngine::new("doc1", "The Quick Brown Fox");
-        doc.update_user_cursor("alice", 5, 0, "#FF0000");
-        let sug_id = doc.propose_suggestion("bob", "Quick", "Fast");
-        assert!(doc.accept_suggestion(sug_id).unwrap());
-        assert_eq!(doc.document_text, "The Fast Brown Fox");
+        let mut docs = SigmaDocsEnterpriseCollaborationEngine::new("doc-001", "Hello World");
+        docs.update_cursor(LiveCollaboratorCursor {
+            user_id: "user-1".to_string(),
+            user_name: "Alice".to_string(),
+            cursor_position: 5,
+            selection_length: 0,
+        });
+
+        let sug_id = docs.propose_suggestion("Bob", "World", "SigmaOS");
+        assert!(docs.accept_suggestion(&sug_id));
+        assert_eq!(docs.content, "Hello SigmaOS");
     }
 
     #[test]
     fn test_crm_erp_engine() {
         let mut crm = SovereignEnterpriseCrmErpEngine::new();
-        crm.add_lead("John Doe", "Acme Corp", 85);
-        crm.add_deal("Enterprise License", 100000.0, 0.8, "Proposal");
-        let forecast = crm.compute_forecasted_pipeline_revenue();
-        assert_eq!(forecast, 80000.0);
+        crm.add_lead(CrmLead {
+            lead_id: "lead-101".to_string(),
+            contact_name: "John Doe".to_string(),
+            company: "Acme Corp".to_string(),
+            estimated_value_usd: 10000.0,
+            stage: LeadStage::Qualified,
+            score: 80,
+        });
+
+        assert_eq!(crm.calculate_pipeline_forecast(), 5000.0);
+
+        crm.update_stage("lead-101", LeadStage::ClosedWon);
+        assert_eq!(crm.calculate_pipeline_forecast(), 10000.0);
     }
 
     #[test]
     fn test_odoo_bitrix_suite() {
-        let mut odoo = SovereignOdooBitrixSuite::new();
-        let task_id = odoo.create_kanban_task("Setup Server", "DevOp");
-        assert!(odoo.move_kanban_task(task_id, "In Progress"));
-
-        odoo.update_inventory("SKU-100", "Widget A", 50, 19.99);
-
-        let inv_id = odoo.create_invoice(
-            "Global Tech",
-            "USD",
-            vec![InvoiceLine {
-                description: "Consulting".to_string(),
-                quantity: 10,
-                unit_price: 150.0,
+        let mut suite = SovereignOdooBitrixSuite::new();
+        suite.issue_invoice(MultiCurrencyInvoice {
+            invoice_id: "inv-001".to_string(),
+            customer_name: "Enterprise Client".to_string(),
+            currency_code: "USD".to_string(),
+            items: vec![InvoiceItem {
+                description: "License".to_string(),
+                quantity: 2,
+                unit_price_cents: 5000,
             }],
-        );
-        let total = odoo.calculate_invoice_total(inv_id).unwrap();
-        assert_eq!(total, 1500.0);
+            is_paid: false,
+        });
+
+        let inv = suite.invoices.get("inv-001").unwrap();
+        assert_eq!(inv.calculate_total_cents(), 10000);
+
+        suite.clock_in("emp-1", 1000);
+        assert!(suite.clock_out("emp-1", 5000));
     }
 }

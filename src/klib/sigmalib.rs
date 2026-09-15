@@ -142,8 +142,8 @@ pub mod memory {
             *s.add(i) = 0;
             i += 1;
         }
-        // Prevent compiler optimization
-        core::hint::black_box(());
+        // Prevent compiler optimization using volatile write
+        core::ptr::write_volatile(s.add(0), 0);
     }
 }
 
