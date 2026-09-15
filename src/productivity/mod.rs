@@ -41,3 +41,6 @@ pub use tmux::{
 };
 
 pub use mind_map::{IndentedTextMindMapParserEngine, MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection};
+
+pub mod enterprise_productivity_suite;
+pub use enterprise_productivity_suite::*;
