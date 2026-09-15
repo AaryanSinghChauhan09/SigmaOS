@@ -1417,7 +1417,7 @@ impl ShellRepl {
             }
 
             ShellCommand::Jobs => {
-                let jobs_list = self.job_control.list_jobs();
+                let jobs_list = self.job_control.list_jobs().join("\n");
                 Ok(jobs_list)
             }
             ShellCommand::JobFg { job_id } => {
