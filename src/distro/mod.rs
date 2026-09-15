@@ -115,7 +115,16 @@ pub use void_runit::{
     RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
 };
 pub mod sovereign_distro_dominance;
+pub mod sovereign_distro_outpacing_engine;
 pub mod future_roadmap_innovations;
+
+pub use sovereign_distro_outpacing_engine::{
+    BcachefsExtent, DynamicVersionedImageSpec, FreeBsd141JailSpec, PinsyscallRange,
+    SovereignFreeBsd141JailVnetEngine, SovereignLinux612BcachefsTieringEngine,
+    SovereignMasterOutpacingSuite, SovereignOpenBsd76PledgeUnveilAdvancementEngine,
+    SovereignSystemd256ParityAndBeyondEngine, SovereignWayland123ExplicitSyncEngine,
+    StorageDeviceTier, VarlinkIpcMessage,
+};
 
 pub use future_roadmap_innovations::{
     ClusteredDevicePoolEngine, ClusteredPooledDevice, CryptographicBootChainEngine,

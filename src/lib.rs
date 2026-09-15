@@ -60,7 +60,10 @@ pub mod userland;
 
 pub use distro::{
     ArchMkinitcpioGeneratorEngine, ArchPacmanKeyringEngine, ArchPowerpillParallelDownloadEngine,
-    ArchReflectorMirrorlistEngine,
+    ArchReflectorMirrorlistEngine, SovereignFreeBsd141JailVnetEngine,
+    SovereignLinux612BcachefsTieringEngine, SovereignMasterOutpacingSuite,
+    SovereignOpenBsd76PledgeUnveilAdvancementEngine, SovereignSystemd256ParityAndBeyondEngine,
+    SovereignWayland123ExplicitSyncEngine,
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
