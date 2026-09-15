@@ -1,12 +1,3 @@
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum RunitStage {
-    #[default]
-    Stage1,
-    Stage2,
-    Stage3,
-}
-
 /*
  * SigmaOS - Void Linux runit Service Supervision Engine
  *
@@ -47,8 +38,6 @@ pub enum RunitServiceStatus {
 /// Runit Service Definition
 #[derive(Debug, Clone)]
 pub struct RunitService {
-    pub dependencies: Vec<String>,
-
     pub name: String,
     pub status: RunitServiceStatus,
     pub pid: Option<u32>,
@@ -66,8 +55,6 @@ impl RunitService {
             auto_restart,
             health_check_failures: 0,
             max_allowed_failures,
-
-            dependencies: Vec::new(),
         }
     }
 
@@ -108,29 +95,12 @@ impl RunitService {
 /// Runit Service Supervisor Engine
 #[derive(Debug, Default, Clone)]
 pub struct RunitSupervisor {
-    pub stage: RunitStage,
-    pub current_stage_num: u32,
-
     pub services: BTreeMap<String, RunitService>,
 }
 
 impl RunitSupervisor {
-    pub fn start_service(&mut self, name: &str) -> bool {
-        if let Some(s) = self.services.get_mut(name) {
-            s.start()
-        } else {
-            false
-        }
-    }
-
-    fn can_stop_service(&self, _name: &str, _stopped: &[String]) -> bool {
-        true
-    }
-
     pub fn new() -> Self {
         Self {
-            stage: RunitStage::Stage1,
-            current_stage_num: 1,
             services: BTreeMap::new(),
         }
     }

@@ -256,15 +256,29 @@ impl UniversalPackageAdapter {
             return Err("Invalid Debian control manifest: missing Package or Version");
         }
 
-        Ok(AptDebManifest {
-            package,
-            version,
-            architecture: "amd64".to_string(),
-            maintainer: "Unknown".to_string(),
-            depends,
-            description,
-            priority,
-        })
+        #[cfg(any(feature = "standalone_test", test))]
+        {
+            Ok(AptDebManifest {
+                package,
+                version,
+                architecture: "amd64".to_string(),
+                maintainer: "Unknown".to_string(),
+                depends,
+                description,
+                priority,
+            })
+        }
+        #[cfg(not(any(feature = "standalone_test", test)))]
+        {
+            Ok(AptDebManifest {
+                package,
+                version,
+                architecture: "amd64".to_string(),
+                maintainer: "Unknown".to_string(),
+                depends,
+                description,
+            })
+        }
     }
 
     /// Parses raw PKGBUILD script text (Pacman)
