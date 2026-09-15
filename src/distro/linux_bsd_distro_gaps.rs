@@ -2,7 +2,6 @@
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
 
-
 use std::string::ToString;
 use std::vec;
 use std::vec::Vec;
@@ -510,209 +509,6 @@ impl Default for CronJobScheduler {
 }
 
 // ============================================================================
-// 7. Encrypted DNS-over-TLS & DNSSEC Resolver Engine (systemd-resolved / Unbound)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain_name: &'static str,
-    pub ip_address: [u8; 4],
-    pub ttl_seconds: u32,
-    pub dnssec_validated: bool,
-}
-
-#[derive(Debug)]
-pub struct SovereignDnsTlsResolverEngine {
-    pub upstream_dot_server: [u8; 4], // e.g. 1.1.1.1
-    pub dot_port: u16,                // 853
-    pub local_cache: Vec<DnsRecordEntry>,
-    pub dnssec_enforced: bool,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-        match alias {
-            "char-major-10-200" => Some("tun"),
-            "net-pf-10" => Some("ipv6"),
-            "block-major-8-0" => Some("sda"),
-            _ => None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    CharacterDevice,
-    BlockDevice,
-    Fifo,
-    Socket,
-}
-
-#[derive(Debug, Clone)]
-pub struct DeviceNodeEntry {
-    pub name: String,
-    pub node_type: DeviceNodeType,
-    pub major: u32,
-    pub minor: u32,
-    pub symlink_paths: Vec<String>,
-}
-
-pub struct SovereignDynamicDevfsEngine {
-    pub nodes: Vec<DeviceNodeEntry>,
-}
-
-impl SovereignDynamicDevfsEngine {
-    pub fn new() -> Self {
-        Self { nodes: Vec::new() }
-    }
-
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        self.nodes.push(DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            symlink_paths: Vec::new(),
-        });
-    }
-}
-
-impl Default for SovereignDynamicDevfsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-    Masquerade,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConntrackTableEntry {
-    pub original_src: [u8; 4],
-    pub original_dst: [u8; 4],
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub translated_ip: [u8; 4],
-    pub translated_port: u16,
-    pub nat_type: NatType,
-    pub packets_counter: u64,
-}
-
-pub struct SovereignStatefulNatEngine {
-    pub public_ip: [u8; 4],
-    pub conntrack_table: Vec<ConntrackTableEntry>,
-}
-
-impl SovereignStatefulNatEngine {
-    pub fn new(public_ip: [u8; 4]) -> Self {
-        Self {
-            public_ip,
-            conntrack_table: Vec::new(),
-        }
-    }
-
-    pub fn create_snat_mapping(
-        &mut self,
-        internal_src: [u8; 4],
-        dst_ip: [u8; 4],
-        src_port: u16,
-        dst_port: u16,
-        protocol: u8,
-    ) -> ([u8; 4], u16) {
-        let _ = protocol;
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
-                && c.src_port == src_port
-                && c.original_dst == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConntrackTableEntry {
-                original_src: internal_src,
-                original_dst: dst_ip,
-                src_port,
-                dst_port,
-                translated_ip: self.public_ip,
-                translated_port: src_port,
-                nat_type: NatType::Snat,
-                packets_counter: 1,
-            });
-        }
-        (self.public_ip, src_port)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_epoch_ms: u64,
-    pub identifier: String,
-    pub message: String,
-    pub priority: u8,
-}
-
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub log_records: Vec<JournaldLogRecord>,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new() -> Self {
-        Self { log_records: Vec::new() }
-    }
-
-    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
-        self.log_records.push(JournaldLogRecord {
-            timestamp_epoch_ms: 1000,
-            identifier: identifier.to_string(),
-            message: message.to_string(),
-            priority,
-        });
-    }
-}
-
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain: String,
-    pub ip_address: [u8; 4],
-}
-
-pub struct SovereignDnsTlsResolverEngine {
-    pub primary_dns_ip: [u8; 4],
-    pub records: Vec<DnsRecordEntry>,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn new(primary_dns_ip: [u8; 4]) -> Self {
-        let mut records = Vec::new();
-        records.push(DnsRecordEntry {
-            domain: "localhost".to_string(),
-            ip_address: [127, 0, 0, 1],
-        });
-        Self { primary_dns_ip, records }
-    }
-
-    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
-        self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
-    }
-}
-
-impl Default for DemandPagingSwapEngine {
-    fn default() -> Self {
-        Self::new(2048)
-    }
-}
-
-// ============================================================================
 // 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
 // ============================================================================
 
@@ -835,7 +631,6 @@ impl SovereignStatefulNatEngine {
         dst_port: u16,
         _protocol: u8,
     ) -> ([u8; 4], u16) {
-
         // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
             c.original_src == internal_src
@@ -865,7 +660,9 @@ impl SovereignStatefulNatEngine {
         translated_dst_port: u16,
     ) -> Option<([u8; 4], u16)> {
         for entry in &mut self.conntrack_table {
-            if entry.translated_ip == translated_dst_ip && entry.translated_port == translated_dst_port {
+            if entry.translated_ip == translated_dst_ip
+                && entry.translated_port == translated_dst_port
+            {
                 entry.packets_counter += 1;
                 return Some((entry.original_src, entry.src_port));
             }
@@ -891,13 +688,13 @@ pub struct DistroComponentSnapshot {
 /// Roadmap Phase Action Plan Entry
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroRoadmapPhase {
-    Phase1Foundation,    // Q4 2026 - Q2 2027: Init system, sigmapkg PM, POSIX coreutils
-    Phase2Parity,        // Q3 2027 - Q1 2028: TCP/IP stack, ext4/ZFS/Btrfs/UFS, Sandboxed drivers
+    Phase1Foundation, // Q4 2026 - Q2 2027: Init system, sigmapkg PM, POSIX coreutils
+    Phase2Parity,     // Q3 2027 - Q1 2028: TCP/IP stack, ext4/ZFS/Btrfs/UFS, Sandboxed drivers
     Phase3Competitiveness, // Q2 2028 - Q4 2028: Native containers, Jails, Hypervisor, Atomic updates
-    Phase4Sovereignty,   // 2029+: MAC frameworks, Cryptographic boot, Privacy-first telemetry, Accessibility & i18n
-    ShortTerm,           // Legacy ShortTerm mapping
-    MidTerm,             // Legacy MidTerm mapping
-    LongTerm,            // Legacy LongTerm mapping
+    Phase4Sovereignty, // 2029+: MAC frameworks, Cryptographic boot, Privacy-first telemetry, Accessibility & i18n
+    ShortTerm,         // Legacy ShortTerm mapping
+    MidTerm,           // Legacy MidTerm mapping
+    LongTerm,          // Legacy LongTerm mapping
 }
 
 /// Security & Sovereignty Blueprint Feature Entry
@@ -953,7 +750,8 @@ impl SovereignMasterDistroEcosystemEngine {
             DistroComponentSnapshot {
                 component: "Networking",
                 linux_bsd_status: "Full TCP/IP, firewall (iptables/pf)",
-                sigma_os_current_status: "NetworkTcpUdpStack, OpenBsdPfFirewallEngine, DoT, Stateful NAT",
+                sigma_os_current_status:
+                    "NetworkTcpUdpStack, OpenBsdPfFirewallEngine, DoT, Stateful NAT",
                 gap_closure_needed: "Expand routing & PQC WireGuard VPN stack",
                 readiness_score_percent: 100,
             },
@@ -981,14 +779,16 @@ impl SovereignMasterDistroEcosystemEngine {
             DistroComponentSnapshot {
                 component: "Security",
                 linux_bsd_status: "SELinux, AppArmor, Capsicum",
-                sigma_os_current_status: "Landlock v5, FreeBSD Capsicum, OpenBSD Pledge/Unveil, SELinux MLS/MCS",
+                sigma_os_current_status:
+                    "Landlock v5, FreeBSD Capsicum, OpenBSD Pledge/Unveil, SELinux MLS/MCS",
                 gap_closure_needed: "Add MAC + sandboxing",
                 readiness_score_percent: 100,
             },
             DistroComponentSnapshot {
                 component: "Virtualization",
                 linux_bsd_status: "KVM, bhyve",
-                sigma_os_current_status: "SovereignMicrovmHypervisorGateway & OpenBsdVmmBhyveBridge",
+                sigma_os_current_status:
+                    "SovereignMicrovmHypervisorGateway & OpenBsdVmmBhyveBridge",
                 gap_closure_needed: "Add microVM hypervisor integration",
                 readiness_score_percent: 100,
             },
@@ -1006,7 +806,7 @@ impl SovereignMasterDistroEcosystemEngine {
     pub fn evaluate_roadmap_phase(&self, phase: DistroRoadmapPhase) -> bool {
         match phase {
             DistroRoadmapPhase::Phase1Foundation | DistroRoadmapPhase::ShortTerm => true, // Init, Universal PM, Coreutils ready
-            DistroRoadmapPhase::Phase2Parity | DistroRoadmapPhase::MidTerm => true,       // Networking, Filesystems, Drivers ready
+            DistroRoadmapPhase::Phase2Parity | DistroRoadmapPhase::MidTerm => true, // Networking, Filesystems, Drivers ready
             DistroRoadmapPhase::Phase3Competitiveness | DistroRoadmapPhase::LongTerm => true, // Containers, Hypervisors, Rollbacks
             DistroRoadmapPhase::Phase4Sovereignty => true, // MAC, Cryptographic boot, Telemetry, Accessibility & i18n ready
         }
@@ -1103,7 +903,10 @@ impl SovereignJournaldBinaryStorageEngine {
     }
 
     pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
+        self.logs
+            .iter()
+            .filter(|l| l.priority <= min_priority)
+            .collect()
     }
 }
 
