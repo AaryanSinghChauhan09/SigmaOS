@@ -208,7 +208,7 @@ impl UniversalPackageAdapter {
         let mut version = String::new();
         let mut depends = Vec::new();
         let mut description = String::new();
-        let mut priority = PackagePriority::Optional;
+        let mut priority = crate::package::PackagePriority::Optional;
 
         for line in text.lines() {
             let line = line.trim();
@@ -229,11 +229,11 @@ impl UniversalPackageAdapter {
                     "Description" => description = val.to_string(),
                     "Priority" => {
                         priority = match val.to_lowercase().as_str() {
-                            "essential" => PackagePriority::Essential,
-                            "required" => PackagePriority::Required,
-                            "important" => PackagePriority::Important,
-                            "standard" => PackagePriority::Standard,
-                            _ => PackagePriority::Optional,
+                            "essential" => crate::package::PackagePriority::Essential,
+                            "required" => crate::package::PackagePriority::Required,
+                            "important" => crate::package::PackagePriority::Important,
+                            "standard" => crate::package::PackagePriority::Standard,
+                            _ => crate::package::PackagePriority::Optional,
                         };
                     }
                     _ => {}
@@ -248,6 +248,8 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: "Debian Package Maintainers".to_string(),
             depends,
             description,
             priority,
