@@ -45,7 +45,7 @@ impl MultiCallShell {
     pub fn execute_command(command: SysCommandType, args: &[&str]) -> Result<String, &'static str> {
         match command {
             SysCommandType::Echo => {
-                let output = format!("{}/{}", args, " ");
+                let output = format!("{:?}/{}", args, " ");
                 Ok(output)
             }
             SysCommandType::WhoAmI => Ok("sigma".to_string()),

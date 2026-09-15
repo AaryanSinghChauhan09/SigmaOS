@@ -428,14 +428,14 @@ pub struct CustomPackageHook {
 }
 
 impl CustomPackageHook {
-    pub fn new<F>(name: &str, timing: HookTiming, handler: F) -> Self
+    pub fn new<F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static>(name: &str, timing: HookTiming, handler: F) -> Self
     where
         F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
     {
         Self {
             name: name.to_string(),
             timing,
-            handler: Arc::new(handler),
+            handler: Arc::new(handler) as Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static>,
         }
     }
 }
