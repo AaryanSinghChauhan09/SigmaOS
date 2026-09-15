@@ -166,6 +166,23 @@ export function initHighContrastSupport() {
   }
 }
 
+/**
+ * Dismisses open modal overlays (#cmd-palette, #context-menu, #help-overlay) when Escape key is pressed.
+ */
+export function initEscapeKeyDismissal() {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      const cmdPalette = document.getElementById("cmd-palette");
+      if (cmdPalette) cmdPalette.classList.remove("active");
+      const contextMenu = document.getElementById("context-menu");
+      if (contextMenu) contextMenu.style.display = "none";
+      const helpOverlay = document.getElementById("help-overlay");
+      if (helpOverlay) helpOverlay.classList.add("wizard-overlay--hidden");
+    }
+  });
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   if (document.readyState === "loading") {
@@ -173,11 +190,13 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initKeyboardNavigation();
       initHighContrastSupport();
       initTablistNavigation();
+      initEscapeKeyDismissal();
     });
   } else {
     initKeyboardNavigation();
     initHighContrastSupport();
     initTablistNavigation();
+    initEscapeKeyDismissal();
   }
 }
 
