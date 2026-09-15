@@ -36,13 +36,13 @@ jobs:
           - desktop: kde
             version: "5"
             container: ubuntu:jammy
-            deps: "libkf5-dev libqt5-dev"
+            deps: "extra-cmake-modules qtbase5-dev"
             build-cmd: "cargo build --features kde --release"
 
           - desktop: kde
             version: "6"
             container: ubuntu:noble
-            deps: "libkf6-dev libqt6-dev"
+            deps: "extra-cmake-modules qt6-base-dev"
             build-cmd: "cargo build --features kde --release"
 
           # XFCE
@@ -56,21 +56,21 @@ jobs:
           - desktop: mate
             version: "1.26"
             container: ubuntu:jammy
-            deps: "libmate-desktop-dev libmatecomponent-dev"
+            deps: "libmate-desktop-dev"
             build-cmd: "cargo build --features mate --release"
 
           # LXQt
           - desktop: lxqt
             version: latest
             container: ubuntu:jammy
-            deps: "liblxqt-dev libqt5-dev"
+            deps: "liblxqt0-dev qtbase5-dev"
             build-cmd: "cargo build --features lxqt --release"
 
           # Enlightenment
           - desktop: enlightenment
             version: "0.26"
             container: ubuntu:jammy
-            deps: "libefl-dev libevas-dev"
+            deps: "libefl-all-dev"
             build-cmd: "cargo build --features enlightenment --release"
 
           # Wayland Compositors
@@ -90,7 +90,7 @@ jobs:
           - desktop: mir
             version: latest
             container: ubuntu:jammy
-            deps: "mir-dev"
+            deps: "mir-graphics-drivers-desktop"
             build-cmd: "cargo build --features mir --release"
 
           # X11
