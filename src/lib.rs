@@ -160,7 +160,6 @@ pub mod interrupt;
 
 
 pub mod hardware {
-    pub mod compatibility;
     pub mod win32;
 }
 pub mod power {

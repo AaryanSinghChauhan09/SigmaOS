@@ -3,8 +3,16 @@ use core::fmt;
 /// SigmaOS: Virtual File System (VFS) Layer
 /// Provides unified filesystem abstraction supporting multiple filesystem types
 /// Integrates with syscall dispatcher for read, write, open, close operations
+use std::collections::{BTreeMap, HashMap};
 use std::string::String;
+use std::string::ToString;
 use std::vec::Vec;
+use crate::security::capability::{CapabilityToken, Permission};
+
+pub const O_CREAT: u32 = 0o100;
+pub const O_EXCL: u32 = 0o200;
+pub const O_TRUNC: u32 = 0o1000;
+pub const O_APPEND: u32 = 0o2000;
 
 /// File types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -98,6 +106,7 @@ pub struct Inode {
     pub symlink_target: Option<String>,
     pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
+    pub data_blocks: Vec<u64>,
     pub entries: HashMap<String, u64>, // Directory entries
 }
 
@@ -118,6 +127,7 @@ impl Inode {
             symlink_target: None,
             xattrs: HashMap::new(),
             data: Vec::new(),
+            data_blocks: Vec::new(),
             entries: HashMap::new(),
         }
     }
@@ -238,6 +248,7 @@ pub struct VirtualFileSystem {
     filesystems: Vec<(String, u64)>, // (fs_type, block_device_id)
     mounts: Vec<MountPoint>,
     open_files: Vec<FileHandle>,
+    pub file_descriptors: BTreeMap<u64, FileDescriptor>,
     next_fd: i32,
     inode_cache: Vec<(u64, Inode)>,
     pub inodes: BTreeMap<u64, Inode>,
@@ -245,21 +256,34 @@ pub struct VirtualFileSystem {
     next_inode_id: u64,
 }
 
+#[derive(Debug, Clone)]
+pub struct FileDescriptor {
+    pub fd: u64,
+    pub inode_id: u64,
+    pub offset: u64,
+    pub flags: u32,
+}
+
 impl VirtualFileSystem {
     pub fn new() -> Self {
         let mut inodes = BTreeMap::new();
         let root_inode = Inode {
-            id: 1,
+            inode_number: 1,
             file_type: FileType::Directory,
+            mode: FileMode::new(0o755),
             size: 0,
-            permissions: 0o755,
             owner: 0,
-            data: Vec::new(),
-            created_at: 0,
-            modified_at: 0,
-            entries: BTreeMap::new(),
-            link_count: 1,
+            group: 0,
+            created: 0,
+            modified: 0,
+            capabilities: CapabilityToken::new(),
             hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            data_blocks: Vec::new(),
+            entries: HashMap::new(),
         };
         inodes.insert(1, root_inode);
 
@@ -267,6 +291,7 @@ impl VirtualFileSystem {
             filesystems: Vec::new(),
             mounts: Vec::new(),
             open_files: Vec::new(),
+            file_descriptors: BTreeMap::new(),
             next_fd: 3, // 0, 1, 2 are stdin, stdout, stderr
             inode_cache: Vec::new(),
             inodes,
@@ -279,17 +304,22 @@ impl VirtualFileSystem {
         let id = self.next_inode_id;
         self.next_inode_id += 1;
         let inode = Inode {
-            id,
+            inode_number: id,
             file_type,
+            mode: FileMode::new(0o644),
             size: 0,
-            permissions: 0o644,
             owner,
-            data: Vec::new(),
-            created_at: 0,
-            modified_at: 0,
-            entries: BTreeMap::new(),
-            link_count: 1,
+            group: 0,
+            created: 0,
+            modified: 0,
+            capabilities: CapabilityToken::new(),
             hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            data_blocks: Vec::new(),
+            entries: HashMap::new(),
         };
         self.inodes.insert(id, inode);
         Ok(id)
@@ -330,7 +360,7 @@ impl VirtualFileSystem {
     }
 
     /// Open file - returns file descriptor
-    pub fn open(&mut self, path: &str, flags: u32, mode: u32) -> Result<i32, VfsError> {
+        pub fn open(&mut self, path: &str, flags: u32, mode: u32) -> Result<i32, VfsError> {
         if path.len() > 4096 {
             return Err(VfsError::NameTooLong);
         }
@@ -355,6 +385,7 @@ impl VirtualFileSystem {
         Ok(fd)
     }
 
+    pub fn close(&mut self, fd: i32) -> Result<(), VfsError> { self.close_file(fd as u64).map_err(|_| VfsError::NotFound) }
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
         if !self.file_descriptors.contains_key(&fd) {
             return Err(FsError::InvalidFd);
@@ -376,7 +407,7 @@ impl VirtualFileSystem {
             .ok_or(FsError::NotFound)?;
 
         // Check read permission
-        if !inode.permissions.read {
+        if !inode.mode.owner_read {
             return Err(FsError::PermissionDenied);
         }
 
@@ -415,7 +446,7 @@ impl VirtualFileSystem {
             .ok_or(FsError::NotFound)?;
 
         // Check write permission
-        if !inode.permissions.write {
+        if !inode.mode.owner_write {
             return Err(FsError::PermissionDenied);
         }
 
