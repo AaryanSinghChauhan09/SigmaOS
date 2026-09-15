@@ -83,7 +83,9 @@ pub use distro::{
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
     OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig, OmarchyHyprlandWorkspaceSnapLayoutEngine,
     OmarchyLiveIsoBootstrapEngine, OmarchyLuaConfigEngine, OmarchyNeovimPresetStudioEngine,
-    OmarchyWaybarAppletStudioEngine,
+    OmarchyWaybarAppletStudioEngine, OmarchyHyprlockScreenLocker, OmarchyOmakubBootstrapEngine,
+    OmarchyRofiAppLauncher, OmarchyThunarFileActions, OmarchyZellijSessionManager,
+    SovereignOmarchyExpandedParitySuite,
 };
 
 pub use package::bsd_linux_package_innovations::{

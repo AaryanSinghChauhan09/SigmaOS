@@ -1,8 +1,15 @@
 // SigmaOS Extended Tech Media Innovations Engine
 // Inspired by TechCrunch, TechSpot, OpenSourceForU, and Appuals
 
+#[cfg(not(test))]
 use crate::klib::string::String;
+#[cfg(not(test))]
 use crate::klib::vec::Vec;
+
+#[cfg(test)]
+use std::string::String;
+#[cfg(test)]
+use std::vec::Vec;
 
 /// TechCrunch Open-Source Project Health & Startup Ecosystem Metrics
 #[derive(Debug, Clone)]
@@ -162,5 +169,19 @@ impl SovereignTechMediaExtendedInnovationsSuite {
 impl Default for SovereignTechMediaExtendedInnovationsSuite {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tech_media_extended_innovations() {
+        let mut suite = SovereignTechMediaExtendedInnovationsSuite::new();
+        assert!(suite.verify_suite());
+        assert_eq!(suite.techcrunch.get_top_project_name(), "SigmaOS");
+        assert!(suite.techspot.verify_gaming_performance());
+        assert!(suite.os4u.run_enterprise_audit());
     }
 }

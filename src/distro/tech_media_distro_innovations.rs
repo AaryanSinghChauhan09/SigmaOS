@@ -1,8 +1,15 @@
 // SigmaOS Tech Media Distro Innovations Engine
 // Inspired by DistroWatch, 9to5Linux, MakeUseOf, LinuxTeck, Appuals, ZDNet, and DistroWatch
 
+#[cfg(not(test))]
 use crate::klib::string::String;
+#[cfg(not(test))]
 use crate::klib::vec::Vec;
+
+#[cfg(test)]
+use std::string::String;
+#[cfg(test)]
+use std::vec::Vec;
 
 /// DistroWatch page-hit ranking and distribution release tracker engine.
 #[derive(Debug, Clone)]
@@ -164,5 +171,22 @@ impl SovereignTechMediaDistroInnovationsSuite {
 impl Default for SovereignTechMediaDistroInnovationsSuite {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tech_media_distro_innovations() {
+        let mut suite = SovereignTechMediaDistroInnovationsSuite::new();
+        assert!(suite.verify_suite());
+        assert_eq!(suite.rank_tracker.get_top_ranked_distro(), "Debian");
+        assert!(suite.release_matrix.is_kernel_up_to_date("6.12.0-sigma"));
+        assert_eq!(
+            suite.recommendation.recommend_profile_for_ram(512),
+            "SigmaOS AntiX-Inspired Ultralight GUI"
+        );
     }
 }

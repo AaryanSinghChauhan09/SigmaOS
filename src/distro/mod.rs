@@ -254,3 +254,9 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
+
+pub mod omarchy_expanded_parity;
+pub use omarchy_expanded_parity::{
+    OmarchyHyprlockScreenLocker, OmarchyOmakubBootstrapEngine, OmarchyRofiAppLauncher,
+    OmarchyThunarFileActions, OmarchyZellijSessionManager, SovereignOmarchyExpandedParitySuite,
+};
