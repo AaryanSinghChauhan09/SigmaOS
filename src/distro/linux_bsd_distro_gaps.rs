@@ -530,6 +530,29 @@ pub struct SovereignDnsTlsResolverEngine {
 }
 
 impl SovereignDnsTlsResolverEngine {
+    pub fn new(upstream_dot_server: [u8; 4]) -> Self {
+        let mut local_cache = Vec::new();
+        local_cache.push(DnsRecordEntry {
+            domain_name: "localhost",
+            ip_address: [127, 0, 0, 1],
+            ttl_seconds: 3600,
+            dnssec_validated: true,
+        });
+        Self {
+            upstream_dot_server,
+            dot_port: 853,
+            local_cache,
+            dnssec_enforced: true,
+        }
+    }
+
+    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
+        self.local_cache
+            .iter()
+            .find(|r| r.domain_name == domain)
+            .map(|r| r.ip_address)
+    }
+
     pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
         match alias {
             "char-major-10-200" => Some("tun"),
