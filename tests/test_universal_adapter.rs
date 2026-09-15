@@ -20,10 +20,14 @@ pub mod universal_engine;
 #[path = "../src/sigpkg/universal_oop_system.rs"]
 pub mod universal_oop_system;
 
+#[path = "../src/package/universal.rs"]
+pub mod package;
+
 pub mod sigpkg {
     use alloc::string::String;
     use alloc::vec::Vec;
 
+    pub use crate::package;
     pub use crate::security;
     pub use crate::universal_engine;
     pub use crate::universal_oop_system;
