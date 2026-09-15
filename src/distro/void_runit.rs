@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 
-/// Runit Control Stages
+/// Runit Service Stage
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitStage {
     Stage1,
@@ -92,7 +92,7 @@ impl RunitService {
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
     pub stage: RunitStage,
-    pub current_stage_num: u8,
+    pub current_stage_num: u32,
 }
 
 impl RunitSupervisor {
@@ -176,7 +176,7 @@ impl RunitSupervisor {
         }
     }
 
-    /// Check if service can stop
+    /// Check if service can stop (no active dependents)
     fn can_stop_service(&self, _name: &str, _stopped: &[String]) -> bool {
         true
     }

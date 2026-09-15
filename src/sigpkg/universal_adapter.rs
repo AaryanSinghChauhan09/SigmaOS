@@ -245,12 +245,14 @@ impl UniversalPackageAdapter {
             return Err("Invalid Debian control manifest: missing Package or Version");
         }
 
+        let _ = priority;
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "all".to_string(),
+            maintainer: "unknown".to_string(),
             depends,
             description,
-            priority,
         })
     }
 

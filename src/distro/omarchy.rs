@@ -933,3 +933,5 @@ mod omarchy_gap_closure_tests {
         assert!(starship_toml.contains("truncation_length = 3"));
     }
 }
+
+// =========================================================================
