@@ -35,6 +35,22 @@ pub enum RunitServiceStatus {
     Failed,
 }
 
+pub type ServiceState = RunitServiceStatus;
+
+/// Runit Init Stage
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1,
+    Stage2,
+    Stage3,
+}
+
+impl Default for RunitStage {
+    fn default() -> Self {
+        RunitStage::Stage1
+    }
+}
+
 /// Runit Service Definition
 #[derive(Debug, Clone)]
 pub struct RunitService {
@@ -44,6 +60,7 @@ pub struct RunitService {
     pub auto_restart: bool,
     pub health_check_failures: u32,
     pub max_allowed_failures: u32,
+    pub dependencies: Vec<String>,
 }
 
 impl RunitService {
@@ -55,6 +72,7 @@ impl RunitService {
             auto_restart,
             health_check_failures: 0,
             max_allowed_failures,
+            dependencies: Vec::new(),
         }
     }
 
@@ -96,13 +114,31 @@ impl RunitService {
 #[derive(Debug, Default, Clone)]
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
+    pub stage: RunitStage,
+    pub current_stage_num: u8,
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
             services: BTreeMap::new(),
+            stage: RunitStage::Stage1,
+            current_stage_num: 1,
         }
+    }
+
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.start();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+        let _ = (name, stopped);
+        true
     }
 
     pub fn register_service(&mut self, service: RunitService) {
