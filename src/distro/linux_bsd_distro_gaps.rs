@@ -515,177 +515,11 @@ impl Default for CronJobScheduler {
 
 #[derive(Debug, Clone)]
 pub struct DnsRecordEntry {
-    pub domain_name: &'static str,
-    pub ip_address: [u8; 4],
-    pub ttl_seconds: u32,
-    pub dnssec_validated: bool,
-}
-
-#[derive(Debug)]
-pub struct SovereignDnsTlsResolverEngine {
-    pub upstream_dot_server: [u8; 4], // e.g. 1.1.1.1
-    pub dot_port: u16,                // 853
-    pub local_cache: Vec<DnsRecordEntry>,
-    pub dnssec_enforced: bool,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
-        match alias {
-            "char-major-10-200" => Some("tun"),
-            "net-pf-10" => Some("ipv6"),
-            "block-major-8-0" => Some("sda"),
-            _ => None,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    CharacterDevice,
-    BlockDevice,
-    Fifo,
-    Socket,
-}
-
-#[derive(Debug, Clone)]
-pub struct DeviceNodeEntry {
-    pub name: String,
-    pub node_type: DeviceNodeType,
-    pub major: u32,
-    pub minor: u32,
-    pub symlink_paths: Vec<String>,
-}
-
-pub struct SovereignDynamicDevfsEngine {
-    pub nodes: Vec<DeviceNodeEntry>,
-}
-
-impl SovereignDynamicDevfsEngine {
-    pub fn new() -> Self {
-        Self { nodes: Vec::new() }
-    }
-
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        self.nodes.push(DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            symlink_paths: Vec::new(),
-        });
-    }
-}
-
-impl Default for SovereignDynamicDevfsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-    Masquerade,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConntrackTableEntry {
-    pub original_src: [u8; 4],
-    pub original_dst: [u8; 4],
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub translated_ip: [u8; 4],
-    pub translated_port: u16,
-    pub nat_type: NatType,
-    pub packets_counter: u64,
-}
-
-pub struct SovereignStatefulNatEngine {
-    pub public_ip: [u8; 4],
-    pub conntrack_table: Vec<ConntrackTableEntry>,
-}
-
-impl SovereignStatefulNatEngine {
-    pub fn new(public_ip: [u8; 4]) -> Self {
-        Self {
-            public_ip,
-            conntrack_table: Vec::new(),
-        }
-    }
-
-    pub fn create_snat_mapping(
-        &mut self,
-        internal_src: [u8; 4],
-        dst_ip: [u8; 4],
-        src_port: u16,
-        dst_port: u16,
-        protocol: u8,
-    ) -> ([u8; 4], u16) {
-        let _ = protocol;
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
-                && c.src_port == src_port
-                && c.original_dst == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConntrackTableEntry {
-                original_src: internal_src,
-                original_dst: dst_ip,
-                src_port,
-                dst_port,
-                translated_ip: self.public_ip,
-                translated_port: src_port,
-                nat_type: NatType::Snat,
-                packets_counter: 1,
-            });
-        }
-        (self.public_ip, src_port)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_epoch_ms: u64,
-    pub identifier: String,
-    pub message: String,
-    pub priority: u8,
-}
-
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub log_records: Vec<JournaldLogRecord>,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new() -> Self {
-        Self { log_records: Vec::new() }
-    }
-
-    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
-        self.log_records.push(JournaldLogRecord {
-            timestamp_epoch_ms: 1000,
-            identifier: identifier.to_string(),
-            message: message.to_string(),
-            priority,
-        });
-    }
-}
-
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
     pub domain: String,
     pub ip_address: [u8; 4],
 }
 
+#[derive(Debug)]
 pub struct SovereignDnsTlsResolverEngine {
     pub primary_dns_ip: [u8; 4],
     pub records: Vec<DnsRecordEntry>,
@@ -704,11 +538,20 @@ impl SovereignDnsTlsResolverEngine {
     pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
         self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
     }
+
+    pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
+        match alias {
+            "char-major-10-200" => Some("tun"),
+            "net-pf-10" => Some("ipv6"),
+            "block-major-8-0" => Some("sda"),
+            _ => None,
+        }
+    }
 }
 
-impl Default for DemandPagingSwapEngine {
+impl Default for SovereignDnsTlsResolverEngine {
     fn default() -> Self {
-        Self::new(2048)
+        Self::new([1, 1, 1, 1])
     }
 }
 
@@ -720,18 +563,20 @@ impl Default for DemandPagingSwapEngine {
 pub enum DeviceNodeType {
     Block,
     Character,
+    Fifo,
+    Socket,
 }
 
 #[derive(Debug, Clone)]
 pub struct DeviceNodeEntry {
-    pub name: &'static str,
+    pub name: String,
     pub node_type: DeviceNodeType,
     pub major: u32,
     pub minor: u32,
     pub owner_uid: u32,
     pub group_gid: u32,
     pub mode_octal: u16,
-    pub symlink_paths: Vec<&'static str>,
+    pub symlink_paths: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -755,7 +600,7 @@ impl SovereignDynamicDevfsEngine {
 
     pub fn create_node(
         &mut self,
-        name: &'static str,
+        name: &str,
         node_type: DeviceNodeType,
         major: u32,
         minor: u32,
@@ -764,7 +609,7 @@ impl SovereignDynamicDevfsEngine {
         mode_octal: u16,
     ) {
         self.devices.push(DeviceNodeEntry {
-            name,
+            name: name.to_string(),
             node_type,
             major,
             minor,
@@ -775,9 +620,13 @@ impl SovereignDynamicDevfsEngine {
         });
     }
 
-    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &'static str) -> bool {
+    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
+        self.create_node(name, node_type, major, minor, 0, 0, 0o660);
+    }
+
+    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
         if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink);
+            dev.symlink_paths.push(symlink.to_string());
             true
         } else {
             false
@@ -787,7 +636,7 @@ impl SovereignDynamicDevfsEngine {
     pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
         self.devices
             .iter()
-            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| *s == name))
+            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
     }
 }
 
@@ -800,6 +649,13 @@ impl Default for SovereignDynamicDevfsEngine {
 // ============================================================================
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
 
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
@@ -835,8 +691,6 @@ impl SovereignStatefulNatEngine {
         dst_port: u16,
         _protocol: u8,
     ) -> ([u8; 4], u16) {
-
-        // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
             c.original_src == internal_src
                 && c.src_port == src_port
@@ -871,6 +725,63 @@ impl SovereignStatefulNatEngine {
             }
         }
         None
+    }
+}
+
+// ============================================================================
+// 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct JournaldLogRecord {
+    pub timestamp_unix_epoch: u64,
+    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
+    pub unit_name: String,
+    pub message: String,
+}
+
+#[derive(Debug)]
+pub struct SovereignJournaldBinaryStorageEngine {
+    pub log_records: Vec<JournaldLogRecord>,
+    pub max_logs_capacity: usize,
+}
+
+impl SovereignJournaldBinaryStorageEngine {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            log_records: Vec::new(),
+            max_logs_capacity: capacity,
+        }
+    }
+
+    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
+        self.log(1000, priority, identifier, message);
+    }
+
+    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &str, msg: &str) {
+        if self.log_records.len() >= self.max_logs_capacity {
+            self.log_records.remove(0); // Journal rotation
+        }
+        self.log_records.push(JournaldLogRecord {
+            timestamp_unix_epoch: timestamp,
+            priority,
+            unit_name: unit.to_string(),
+            message: msg.to_string(),
+        });
+    }
+
+    pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
+        self.log_records.iter().filter(|l| l.unit_name == unit).collect()
+    }
+
+    pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
+        self.log_records.iter().filter(|l| l.priority <= min_priority).collect()
+    }
+}
+
+impl Default for SovereignJournaldBinaryStorageEngine {
+    fn default() -> Self {
+        Self::new(1000)
     }
 }
 
@@ -1061,203 +972,7 @@ impl Default for SovereignMasterDistroEcosystemEngine {
 }
 
 // ============================================================================
-// 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_unix_epoch: u64,
-    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
-    pub unit_name: &'static str,
-    pub message: &'static str,
-}
-
-#[derive(Debug)]
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub logs: Vec<JournaldLogRecord>,
-    pub max_logs_capacity: usize,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new(capacity: usize) -> Self {
-        Self {
-            logs: Vec::new(),
-            max_logs_capacity: capacity,
-        }
-    }
-
-    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
-        if self.logs.len() >= self.max_logs_capacity {
-            self.logs.remove(0); // Journal rotation
-        }
-        self.logs.push(JournaldLogRecord {
-            timestamp_unix_epoch: timestamp,
-            priority,
-            unit_name: unit,
-            message: msg.to_string(),
-        });
-    }
-
-    pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.unit_name == unit).collect()
-    }
-
-    pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
-    }
-}
-
-// ============================================================================
-// Unit Tests
-// ============================================================================
-
-#[cfg(test_disabled)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_sigma_bootloader_engine() {
-        let engine = SigmaBootloaderEngine::new(BootloaderType::Grub2);
-        assert_eq!(engine.entries.len(), 2);
-
-        let default_entry = engine.get_default_entry().unwrap();
-        assert_eq!(default_entry.title, "SigmaOS Sovereign Kernel (x86_64)");
-
-        let grub_cfg = engine.generate_grub_cfg();
-        assert!(!grub_cfg.is_empty());
-
-        let sd_entries = engine.generate_systemd_boot_entries();
-        assert_eq!(sd_entries.len(), 2);
-        assert_eq!(sd_entries[0].0, b"sigma.conf");
-    }
-
-    #[test]
-    fn test_usb_hid_keyboard_driver() {
-        let mut driver = UsbHidKeyboardDriver::new();
-        let report = [0x02, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x00]; // Shift + 'a' + 'b'
-        driver.process_hid_report(&report);
-
-        assert!(driver.modifiers.left_shift);
-        assert_eq!(driver.key_buffer, vec![b'A', b'B']);
-    }
-
-    #[test]
-    fn test_wireless_bluetooth_stack() {
-        let mut stack = WirelessBluetoothStack::new();
-        let aps = stack.scan_wifi();
-        assert!(!aps.is_empty());
-        assert_eq!(aps[0].ssid, "SigmaOS-Secure-5G");
-
-        assert!(stack
-            .connect_wifi("SigmaOS-Secure-5G", "SecretWpa3Pass")
-            .is_ok());
-        assert_eq!(stack.connected_ssid, Some("SigmaOS-Secure-5G"));
-
-        stack.pair_bluetooth_device("Headphones", "00:11:22:33:44:55");
-        assert_eq!(stack.paired_devices.len(), 1);
-    }
-
-    #[test]
-    fn test_network_tcp_udp_stack() {
-        let mut stack = NetworkTcpUdpStack::new();
-        let sock_idx = stack.tcp_connect([192, 168, 1, 1], 80).unwrap();
-        assert_eq!(stack.tcp_sockets[sock_idx].state, TcpState::Established);
-
-        let bytes_sent = stack
-            .send_udp_datagram([192, 168, 1, 1], 53, b"DNS_QUERY")
-            .unwrap();
-        assert_eq!(bytes_sent, 14 + 20 + 8 + 9);
-
-        assert!(stack.filter_can_frame(0x123, 0x7FF, 0x123));
-        assert!(!stack.filter_can_frame(0x123, 0x7FF, 0x456));
-    }
-
-    #[test]
-    fn test_systemd_init_manager() {
-        let mut manager = SystemdInitManager::new();
-        assert_eq!(manager.get_active_services_count(), 0);
-
-        assert!(!manager.check_dependencies_met("zenith-compositor.service"));
-        assert!(manager.start_service("networkd.service").is_ok());
-        assert_eq!(manager.get_active_services_count(), 1);
-        assert!(manager.is_service_running("networkd.service"));
-        assert!(manager.check_dependencies_met("zenith-compositor.service"));
-    }
-
-    #[test]
-    fn test_master_distro_gap_closure_engine() {
-        let engine = SovereignMasterDistroEcosystemEngine::new();
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::ShortTerm));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::MidTerm));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::LongTerm));
-
-        let snapshots = engine.evaluate_distro_gap_snapshot();
-        assert_eq!(snapshots.len(), 9);
-        assert_eq!(snapshots[0].component, "Init System");
-        assert_eq!(snapshots[0].readiness_score_percent, 100);
-    }
-
-    #[test]
-    fn test_4phase_innovation_roadmap() {
-        let engine = SovereignMasterDistroEcosystemEngine::new();
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::Phase1Foundation));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::Phase2Parity));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::Phase3Competitiveness));
-        assert!(engine.evaluate_roadmap_phase(DistroRoadmapPhase::Phase4Sovereignty));
-    }
-
-    #[test]
-    fn test_security_sovereignty_blueprint() {
-        let engine = SovereignMasterDistroEcosystemEngine::new();
-        let security_features = engine.evaluate_security_blueprint();
-        assert_eq!(security_features.len(), 5);
-        assert_eq!(security_features[0].feature, "MAC Frameworks");
-        assert_eq!(security_features[1].feature, "Cryptographic Boot Chain");
-        assert!(security_features.iter().all(|s| s.is_enabled));
-    }
-
-    #[test]
-    fn test_cron_job_scheduler() {
-        let mut scheduler = CronJobScheduler::new();
-        let id = scheduler.add_cron_job("0 * * * *", "/usr/bin/backup-sync");
-        assert_eq!(id, 1);
-
-        let dispatched = scheduler.dispatch_due_jobs(1700000000);
-        assert_eq!(dispatched, 1);
-    }
-
-    #[test]
-    fn test_sovereign_dns_tls_resolver() {
-        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
-        let localhost_ip = resolver.resolve_domain("localhost").unwrap();
-        assert_eq!(localhost_ip, [127, 0, 0, 1]);
-    }
-
-    #[test]
-    fn test_sovereign_dynamic_devfs() {
-        let mut devfs = SovereignDynamicDevfsEngine::new();
-        assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234-ABCD"));
-        assert!(devfs.lookup_node("disk/by-uuid/1234-ABCD").is_some());
-    }
-
-    #[test]
-    fn test_sovereign_universal_distro_gap_resolver() {
-        let mut resolver = SovereignUniversalDistroGapResolver::new();
-        assert_eq!(
-            resolver.lookup_modprobe_alias("char-major-10-200"),
-            Some("tun")
-        );
-        assert_eq!(resolver.lookup_modprobe_alias("unknown-alias"), None);
-        assert!(resolver.verify_bsd_geom_storage_readiness());
-
-        resolver.faillock_guard.record_failure();
-        resolver.faillock_guard.reset();
-        assert!(!resolver.faillock_guard.is_locked);
-    }
-}
-
-// ============================================================================
-// 7. Universal Linux & BSD Distro Gap Resolver
+// 11. Universal Linux & BSD Distro Gap Resolver
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -1300,9 +1015,6 @@ pub struct SovereignUniversalDistroGapResolver {
 
 impl SovereignUniversalDistroGapResolver {
     pub fn new() -> Self {
-        #[cfg(not(target_os = "none"))]
-        use std::vec;
-
         let mut auto_modprobe_aliases = Vec::new();
         auto_modprobe_aliases.push(("net-pf-16-proto-12", "xfrm_user"));
         auto_modprobe_aliases.push(("char-major-10-200", "tun"));
