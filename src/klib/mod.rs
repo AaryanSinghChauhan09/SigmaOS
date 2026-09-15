@@ -81,3 +81,43 @@ pub use std::collections::HashSet;
 pub use hashmap::HashMap;
 #[cfg(target_os = "none")]
 pub use hashset::HashSet;
+
+pub struct ZeroDependencyPrimitiveHub;
+
+impl ZeroDependencyPrimitiveHub {
+    pub fn fnv1a_hash_64(bytes: &[u8]) -> u64 {
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &byte in bytes {
+            hash ^= byte as u64;
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+        hash
+    }
+
+    pub fn format_u64_stack(val: u64, buf: &mut [u8]) -> usize {
+        if val == 0 {
+            if !buf.is_empty() {
+                buf[0] = b"0";
+                return 1;
+            }
+            return 0;
+        }
+        let mut temp = [0u8; 20];
+        let mut i = 0;
+        let mut n = val;
+        while n > 0 {
+            temp[i] = b"0" + (n % 10) as u8;
+            n /= 10;
+            i += 1;
+        }
+        let len = i;
+        if buf.len() < len {
+            return 0;
+        }
+        for j in 0..len {
+            buf[j] = temp[len - 1 - j];
+        }
+        len
+    }
+}
+pub use ZeroDependencyPrimitiveHub as PrimitiveHub;

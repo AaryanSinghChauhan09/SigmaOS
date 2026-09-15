@@ -435,7 +435,7 @@ impl CustomPackageHook {
         Self {
             name: name.to_string(),
             timing,
-            handler: Arc::new(handler),
+            handler: alloc::sync::Arc::new(handler),
         }
     }
 }

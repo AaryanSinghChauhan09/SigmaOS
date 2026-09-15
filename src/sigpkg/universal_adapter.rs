@@ -250,7 +250,6 @@ impl UniversalPackageAdapter {
             version,
             depends,
             description,
-            priority,
         })
     }
 
@@ -961,7 +960,18 @@ impl UniversalPackageAdapter {
 
     /// Detects package format based on file extension
     pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
-        PackageFormat::from_filename(filename)
+        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
+        else if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { Some(PackageFormat::Arch) }
+        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
+        else if filename.ends_with(".nix") || filename.ends_with(".nar") { Some(PackageFormat::Nix) }
+        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
+        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
+        else if filename.ends_with(".xbps") { Some(PackageFormat::Xbps) }
+        else if filename.ends_with(".eopkg") { Some(PackageFormat::Eopkg) }
+        else if filename.ends_with(".flatpak") { Some(PackageFormat::Flatpak) }
+        else if filename.ends_with(".snap") { Some(PackageFormat::Snap) }
+        else if filename.ends_with(".appimage") { Some(PackageFormat::AppImage) }
+        else { None }
     }
 
     /// Detects package format based on header byte signatures (magic bytes)

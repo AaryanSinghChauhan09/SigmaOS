@@ -5,25 +5,23 @@
  * health checking, and automatic restart policy governance.
  */
 
-
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 
+/// Runit Supervisor Stages
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1,
+    Stage2,
+    Stage3,
+}
 
-#[cfg(not(test))]
-use std::collections::BTreeMap;
-#[cfg(not(test))]
-use std::string::String;
-#[cfg(not(test))]
-use std::vec::Vec;
-
-#[cfg(test)]
-use std::collections::BTreeMap;
-#[cfg(test)]
-use std::string::String;
-#[cfg(test)]
-use std::vec::Vec;
+impl Default for RunitStage {
+    fn default() -> Self {
+        RunitStage::Stage1
+    }
+}
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,6 +42,7 @@ pub struct RunitService {
     pub auto_restart: bool,
     pub health_check_failures: u32,
     pub max_allowed_failures: u32,
+    pub dependencies: Vec<String>,
 }
 
 impl RunitService {
@@ -55,6 +54,7 @@ impl RunitService {
             auto_restart,
             health_check_failures: 0,
             max_allowed_failures,
+            dependencies: Vec::new(),
         }
     }
 
@@ -96,17 +96,29 @@ impl RunitService {
 #[derive(Debug, Default, Clone)]
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
+    pub stage: RunitStage,
+    pub current_stage_num: u8,
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
             services: BTreeMap::new(),
+            stage: RunitStage::Stage1,
+            current_stage_num: 1,
         }
     }
 
     pub fn register_service(&mut self, service: RunitService) {
         self.services.insert(service.name.clone(), service);
+    }
+
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.start()
+        } else {
+            false
+        }
     }
 
     /// Start stage 1 (one-time initialization)
@@ -164,7 +176,7 @@ impl RunitSupervisor {
     }
 
     /// Check if service can start (dependencies satisfied)
-    fn can_start_service(&self, name: &str, started: &[String]) -> bool {
+    pub fn can_start_service(&self, name: &str, started: &[String]) -> bool {
         if let Some(service) = self.services.get(name) {
             for dep in &service.dependencies {
                 if !started.contains(dep) {
@@ -175,6 +187,11 @@ impl RunitSupervisor {
         } else {
             false
         }
+    }
+
+    /// Check if service can stop
+    pub fn can_stop_service(&self, _name: &str, _stopped: &[String]) -> bool {
+        true
     }
 
     pub fn stop_service(&mut self, name: &str) -> bool {

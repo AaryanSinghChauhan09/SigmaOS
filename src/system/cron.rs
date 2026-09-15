@@ -664,7 +664,7 @@ impl SovereignCronDaemon {
             true
         };
 
-        for (_id, job) in self.base_daemon.jobs.iter_mut() {
+        for (id, job) in self.base_daemon.jobs.iter_mut() {
             if job.enabled && is_permitted(&job.user) {
                 if job.last_run.is_none() || (current_time > job.next_run) {
                     job.last_run = Some(current_time);
