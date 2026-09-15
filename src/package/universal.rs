@@ -283,6 +283,19 @@ pub enum PackageFormat {
     Opkg,       // OPKG package (.opkg)
     SolarisIps, // Solaris IPS package (.p5p, .ips)
     GuixNar,    // Guix NAR archive (.nar)
+    Apt,        // Debian APT (.deb)
+    Yum,        // RedHat YUM/RPM (.rpm)
+    Portage,    // Gentoo Portage (.ebuild)
+    TarXz,      // Compressed Tar.XZ archive (.tar.xz)
+    Sovereign,  // Sovereign package format (.sigpkg)
+    Spack,      // HPC Spack package (.spack)
+    Conan,      // C/C++ Conan package (.conan)
+    Wheel,      // Python Wheel package (.whl)
+    Crate,      // Rust Cargo Crate (.crate)
+    Gem,        // Ruby Gem package (.gem)
+    Nupkg,      // .NET NuGet package (.nupkg)
+    Vcpkg,      // C++ Vcpkg package (.vcpkg)
+    NarInfo,    // Nix NAR Info (.narinfo)
 }
 
 impl PackageFormat {
@@ -834,6 +847,19 @@ impl_generic_install_strategy!(IpkInstallStrategy);
 impl_generic_install_strategy!(OpkgInstallStrategy);
 impl_generic_install_strategy!(SolarisIpsInstallStrategy);
 impl_generic_install_strategy!(GuixNarInstallStrategy);
+impl_generic_install_strategy!(AptInstallStrategy);
+impl_generic_install_strategy!(YumInstallStrategy);
+impl_generic_install_strategy!(PortageInstallStrategy);
+impl_generic_install_strategy!(TarXzInstallStrategy);
+impl_generic_install_strategy!(SovereignInstallStrategy);
+impl_generic_install_strategy!(SpackInstallStrategy);
+impl_generic_install_strategy!(ConanInstallStrategy);
+impl_generic_install_strategy!(WheelInstallStrategy);
+impl_generic_install_strategy!(CrateInstallStrategy);
+impl_generic_install_strategy!(GemInstallStrategy);
+impl_generic_install_strategy!(NupkgInstallStrategy);
+impl_generic_install_strategy!(VcpkgInstallStrategy);
+impl_generic_install_strategy!(NarInfoInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1088,6 +1114,19 @@ impl_generic_metadata_adapter!(IpkMetadataAdapter, Ipk);
 impl_generic_metadata_adapter!(OpkgMetadataAdapter, Opkg);
 impl_generic_metadata_adapter!(SolarisIpsMetadataAdapter, SolarisIps);
 impl_generic_metadata_adapter!(GuixNarMetadataAdapter, GuixNar);
+impl_generic_metadata_adapter!(AptMetadataAdapter, Apt);
+impl_generic_metadata_adapter!(YumMetadataAdapter, Yum);
+impl_generic_metadata_adapter!(PortageMetadataAdapter, Portage);
+impl_generic_metadata_adapter!(TarXzMetadataAdapter, TarXz);
+impl_generic_metadata_adapter!(SovereignMetadataAdapter, Sovereign);
+impl_generic_metadata_adapter!(SpackMetadataAdapter, Spack);
+impl_generic_metadata_adapter!(ConanMetadataAdapter, Conan);
+impl_generic_metadata_adapter!(WheelMetadataAdapter, Wheel);
+impl_generic_metadata_adapter!(CrateMetadataAdapter, Crate);
+impl_generic_metadata_adapter!(GemMetadataAdapter, Gem);
+impl_generic_metadata_adapter!(NupkgMetadataAdapter, Nupkg);
+impl_generic_metadata_adapter!(VcpkgMetadataAdapter, Vcpkg);
+impl_generic_metadata_adapter!(NarInfoMetadataAdapter, NarInfo);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1231,6 +1270,19 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgInstallStrategy),
             PackageFormat::SolarisIps => Box::new(SolarisIpsInstallStrategy),
             PackageFormat::GuixNar => Box::new(GuixNarInstallStrategy),
+            PackageFormat::Apt => Box::new(AptInstallStrategy),
+            PackageFormat::Yum => Box::new(YumInstallStrategy),
+            PackageFormat::Portage => Box::new(PortageInstallStrategy),
+            PackageFormat::TarXz => Box::new(TarXzInstallStrategy),
+            PackageFormat::Sovereign => Box::new(SovereignInstallStrategy),
+            PackageFormat::Spack => Box::new(SpackInstallStrategy),
+            PackageFormat::Conan => Box::new(ConanInstallStrategy),
+            PackageFormat::Wheel => Box::new(WheelInstallStrategy),
+            PackageFormat::Crate => Box::new(CrateInstallStrategy),
+            PackageFormat::Gem => Box::new(GemInstallStrategy),
+            PackageFormat::Nupkg => Box::new(NupkgInstallStrategy),
+            PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
+            PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
         }
     }
 
@@ -1290,6 +1342,19 @@ impl PackageFactory {
             PackageFormat::Opkg => Box::new(OpkgMetadataAdapter),
             PackageFormat::SolarisIps => Box::new(SolarisIpsMetadataAdapter),
             PackageFormat::GuixNar => Box::new(GuixNarMetadataAdapter),
+            PackageFormat::Apt => Box::new(AptMetadataAdapter),
+            PackageFormat::Yum => Box::new(YumMetadataAdapter),
+            PackageFormat::Portage => Box::new(PortageMetadataAdapter),
+            PackageFormat::TarXz => Box::new(TarXzMetadataAdapter),
+            PackageFormat::Sovereign => Box::new(SovereignMetadataAdapter),
+            PackageFormat::Spack => Box::new(SpackMetadataAdapter),
+            PackageFormat::Conan => Box::new(ConanMetadataAdapter),
+            PackageFormat::Wheel => Box::new(WheelMetadataAdapter),
+            PackageFormat::Crate => Box::new(CrateMetadataAdapter),
+            PackageFormat::Gem => Box::new(GemMetadataAdapter),
+            PackageFormat::Nupkg => Box::new(NupkgMetadataAdapter),
+            PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
+            PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
         }
     }
 }
