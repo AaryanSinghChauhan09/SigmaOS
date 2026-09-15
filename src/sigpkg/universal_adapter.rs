@@ -7,7 +7,7 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
+use crate::package::{AptDebManifest, PackagePriority};
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
@@ -70,11 +70,11 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::sigpkg::universal_engine::PackageFormat;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+#[cfg(any(feature = "standalone_test", test))]
+pub use crate::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -107,18 +107,13 @@ pub struct PacmanPkgbuild {
 }
 
 /// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::sigpkg::universal_oop_system;
+
+#[cfg(any(feature = "standalone_test", test))]
+pub use crate::universal_oop_system;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-/// Debian-style package priority levels (DFSG and APT standard)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PackagePriority {
-    Optional = 0,
-    Standard = 1,
-    Important = 2,
-    Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
-}
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -206,6 +201,8 @@ impl UniversalPackageAdapter {
     pub fn parse_apt_control(&self, text: &str) -> Result<AptDebManifest, &'static str> {
         let mut package = String::new();
         let mut version = String::new();
+        let mut architecture = String::from("amd64");
+        let mut maintainer = String::new();
         let mut depends = Vec::new();
         let mut description = String::new();
         let mut priority = PackagePriority::Optional;
@@ -221,6 +218,8 @@ impl UniversalPackageAdapter {
                 match key {
                     "Package" => package = val.to_string(),
                     "Version" => version = val.to_string(),
+                    "Architecture" => architecture = val.to_string(),
+                    "Maintainer" => maintainer = val.to_string(),
                     "Depends" => {
                         for dep in val.split(',') {
                             depends.push(dep.trim().to_string());
@@ -248,6 +247,8 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture,
+            maintainer,
             depends,
             description,
             priority,
@@ -2150,7 +2151,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" | "pkg_add" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
