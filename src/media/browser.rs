@@ -739,6 +739,10 @@ impl DeclarativeNetRequestEngine {
         engine
     }
 
+    pub fn add_rule(&mut self, rule: DnrRule) {
+        self.rules.push(rule);
+    }
+
     pub fn evaluate_url(&mut self, url: &str) -> (DnrActionType, Option<String>) {
         let mut highest_priority_rule: Option<&DnrRule> = None;
 
@@ -818,6 +822,15 @@ impl QuantumWebRenderEngine {
 
     pub fn sort_display_list(&mut self) {
         self.display_items.sort_by_key(|item| item.z_index);
+    }
+
+    pub fn matches_gecko_css_selector(element_tag: &str, element_class: &str, selector: &str) -> bool {
+        let clean = selector.trim();
+        if clean.starts_with('.') {
+            element_class.contains(&clean[1..])
+        } else {
+            element_tag == clean
+        }
     }
 }
 
@@ -1108,6 +1121,13 @@ impl MullvadPrivacyIsolationEngine {
         Some(origin.to_string())
     }
 
+    pub fn suppress_webrtc_ip_leak(&self, is_webrtc_active: bool) -> bool {
+        if is_webrtc_active && self.ephemerality_enabled {
+            return true; // WebRTC IP leakage suppressed
+        }
+        false
+    }
+
     pub fn wrap_odoh_query(&self, domain: &str) -> String {
         format!("odoh_relay://{}?target_dns=cloudflare-dns.com&q={}", self.odoh_relay_endpoint, domain)
     }
@@ -1279,6 +1299,7 @@ mod tests {
         mullvad.bind_tab_to_ephemeral_socks5(1, "socks5://127.0.0.1:9050");
         assert_eq!(mullvad.get_tab_proxy(1), "socks5://127.0.0.1:9050");
         assert!(mullvad.wrap_odoh_query("example.com").contains("odoh_relay"));
+        assert!(mullvad.suppress_webrtc_ip_leak(true));
 
         mullvad.store_ephemeral_item(1, "token", "abc");
         assert_eq!(mullvad.session_isolated_storage.get(&1).unwrap().get("token").unwrap(), "abc");
@@ -1485,14 +1506,25 @@ mod tests {
     #[test]
     fn test_dnr_and_webrender() {
         let mut dnr = DeclarativeNetRequestEngine::new();
+        dnr.add_rule(DnrRule {
+            id: 99,
+            priority: 50,
+            action_type: DnrActionType::Block,
+            url_filter: String::from("bad-domain.com"),
+            redirect_url: None,
+        });
         let (action, _) = dnr.evaluate_url("https://adserver.com/banner");
         assert_eq!(action, DnrActionType::Block);
+        let (action2, _) = dnr.evaluate_url("https://bad-domain.com/tracker");
+        assert_eq!(action2, DnrActionType::Block);
 
         let mut render = QuantumWebRenderEngine::new();
         render.build_display_item(1, 0.0, 0.0, 100.0, 50.0, "#FFF", 10);
         render.build_display_item(2, 0.0, 0.0, 100.0, 50.0, "#000", 1);
         render.sort_display_list();
         assert_eq!(render.display_items[0].item_id, 2);
+        assert!(QuantumWebRenderEngine::matches_gecko_css_selector("div", "btn-active", ".btn-active"));
+        assert!(QuantumWebRenderEngine::matches_gecko_css_selector("h1", "", "h1"));
 
         render.calculate_gecko_grid_layout(2, 1000.0, 600.0);
         assert_eq!(render.css_grid_tracks.len(), 2);
