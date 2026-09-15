@@ -7,8 +7,19 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
+
+pub use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+pub use crate::sigpkg::universal_oop_system;
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,11 +81,6 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -105,9 +111,6 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
