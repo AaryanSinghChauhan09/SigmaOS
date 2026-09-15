@@ -95,10 +95,6 @@ pub mod universal_engine;
 #[cfg(feature = "standalone_test")]
 pub use universal_engine::PackageFormat;
 
-#[cfg(not(feature = "standalone_test"))]
-pub use crate::sigpkg::universal_oop_system;
-
-#[cfg(feature = "standalone_test")]
 #[path = "universal_oop_system.rs"]
 pub mod universal_oop_system;
 
