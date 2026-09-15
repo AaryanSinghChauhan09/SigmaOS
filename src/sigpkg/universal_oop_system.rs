@@ -27,9 +27,16 @@ use std::vec::Vec;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(test)]
+#[cfg(all(test, not(feature = "standalone_test")))]
 pub use crate::sigpkg::Version;
 
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
 
 use std::sync::Arc;
 
@@ -231,6 +238,14 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
 }
 
 impl PackageFormat {
