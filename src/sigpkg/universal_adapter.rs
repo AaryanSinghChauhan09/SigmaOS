@@ -8,7 +8,7 @@ use std::vec::Vec;
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,11 +70,18 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::universal_engine::PackageFormat;
+
+#[cfg(feature = "standalone_test")]
+#[path = "universal_engine.rs"]
+pub mod universal_engine;
+#[cfg(feature = "standalone_test")]
+pub use universal_engine::PackageFormat;
+
+#[cfg(feature = "standalone_test")]
+#[path = "universal_oop_system.rs"]
+pub mod universal_oop_system;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -108,7 +115,7 @@ pub struct PacmanPkgbuild {
 
 /// Use universal_oop_system::UniversalPackageManager instead
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -248,9 +255,11 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: "SigmaOS".to_string(),
             depends,
             description,
-            priority,
+            priority: format!("{:?}", priority),
         })
     }
 
@@ -1697,7 +1706,7 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -2795,7 +2804,7 @@ impl Default for UniversalDryRunSimulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -2814,7 +2823,7 @@ mod tests {
         assert_eq!(parsed.package, "curl");
         assert_eq!(parsed.version, "8.2.1");
         assert_eq!(parsed.depends.len(), 3);
-        assert_eq!(parsed.priority, PackagePriority::Standard);
+        assert_eq!(parsed.priority, "Standard");
 
         // Test parsing system essential priority (Debian-style)
         let essential_text = r#"
@@ -2823,7 +2832,7 @@ mod tests {
             Priority: essential
         "#;
         let parsed_essential = adapter.parse_apt_control(essential_text).unwrap();
-        assert_eq!(parsed_essential.priority, PackagePriority::Essential);
+        assert_eq!(parsed_essential.priority, "Essential");
 
         let native = adapter
             .translate_to_native_package(
@@ -3038,7 +3047,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Pisi)
+            Some(PackageFormat::Eopkg)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),

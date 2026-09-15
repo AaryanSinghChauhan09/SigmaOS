@@ -1,6 +1,6 @@
 // Sovereign Tech News & Technology Media Redirection Engine
 // Inspiring content aggregation, RSS/Atom feed parsing, and smart URL redirection
-// across 28 top Linux & Tech publications for SigmaOS browser and desktop news widgets.
+// across 33 top Linux & Tech publications for SigmaOS browser and desktop news widgets.
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
 extern crate alloc;
@@ -84,6 +84,11 @@ impl SovereignTechNewsRedirectionEngine {
             ("linuxteck", "LinuxTeck", "linuxteck.com", "https://www.linuxteck.com/feed/", "https://www.linuxteck.com", TechPublicationCategory::LinuxAndOpenSource, "Linux sysadmin tutorials, DevOps and security guides"),
             ("appuals", "Appuals", "appuals.com", "https://appuals.com/feed/", "https://appuals.com", TechPublicationCategory::WindowsAndCrossPlatform, "Software troubleshooting, OS error fixes and guides"),
             ("distrowatch", "DistroWatch", "distrowatch.com", "https://distrowatch.com/news/dw.xml", "https://distrowatch.com", TechPublicationCategory::LinuxAndOpenSource, "Linux and BSD distribution release tracking and rankings"),
+            ("9to5google", "9to5Google", "9to5google.com", "https://9to5google.com/feed/", "https://9to5google.com", TechPublicationCategory::WindowsAndCrossPlatform, "Android, Pixel, Chrome, Google news and hardware updates"),
+            ("9to5mac", "9to5Mac", "9to5mac.com", "https://9to5mac.com/feed/", "https://9to5mac.com", TechPublicationCategory::WindowsAndCrossPlatform, "Apple, macOS, iOS, iPadOS and Mac hardware news"),
+            ("androidauthority", "Android Authority", "androidauthority.com", "https://www.androidauthority.com/feed/", "https://www.androidauthority.com", TechPublicationCategory::WindowsAndCrossPlatform, "Android news, smartphone reviews and mobile ecosystem"),
+            ("androidpolice", "Android Police", "androidpolice.com", "https://www.androidpolice.com/feed/", "https://www.androidpolice.com", TechPublicationCategory::WindowsAndCrossPlatform, "Android APK tear-downs, OS updates, apps and games"),
+            ("frappe", "Frappe Framework", "frappe.io", "https://frappe.io/blog/rss.xml", "https://frappe.io", TechPublicationCategory::EnterpriseAndCloud, "Low-code framework, ERPNext ecosystem and web metadata"),
         ];
 
         for (id, name, domain, feed_url, canonical_url, category, desc) in entries {
@@ -231,5 +236,52 @@ mod tests {
         let search_res = engine.search_articles("Kernel");
         assert_eq!(search_res.len(), 1);
         assert_eq!(search_res[0].title, "Linux Kernel 6.12 Benchmarks");
+    }
+
+    #[test]
+    fn test_all_33_urls_redirection() {
+        let engine = SovereignTechNewsRedirectionEngine::new();
+        let target_urls = [
+            ("9to5google", "https://9to5google.com"),
+            ("9to5linux", "https://9to5linux.com"),
+            ("9to5mac", "https://9to5mac.com"),
+            ("androidauthority", "https://www.androidauthority.com"),
+            ("androidpolice", "https://www.androidpolice.com"),
+            ("appuals", "https://appuals.com"),
+            ("distrowatch", "https://distrowatch.com"),
+            ("frappe", "https://frappe.io"),
+            ("geekygadgets", "https://www.geeky-gadgets.com"),
+            ("hwbusters", "https://hwbusters.com"),
+            ("howtogeek", "https://www.howtogeek.com"),
+            ("infoworld", "https://www.infoworld.com"),
+            ("itsfoss", "https://itsfoss.com"),
+            ("itdaily", "https://www.itdaily.com"),
+            ("kdnuggets", "https://www.kdnuggets.com"),
+            ("linuxdotcom", "https://www.linux.com"),
+            ("linuxorg", "https://www.linux.org"),
+            ("linuxfoundation", "https://www.linuxfoundation.org"),
+            ("linuxteck", "https://www.linuxteck.com"),
+            ("makeuseof", "https://www.makeuseof.com"),
+            ("marktechpost", "https://www.marktechpost.com"),
+            ("opensourceforu", "https://www.opensourceforu.com"),
+            ("pcmag", "https://www.pcmag.com"),
+            ("pcworld", "https://www.pcworld.com"),
+            ("phoronix", "https://www.phoronix.com"),
+            ("techcrunch", "https://techcrunch.com"),
+            ("techpowerup", "https://www.techpowerup.com"),
+            ("techspot", "https://www.techspot.com"),
+            ("thenewstack", "https://thenewstack.io"),
+            ("windowscentral", "https://www.windowscentral.com"),
+            ("windowslatest", "https://www.windowslatest.com"),
+            ("xdadevelopers", "https://www.xda-developers.com"),
+            ("zdnet", "https://www.zdnet.com"),
+        ];
+
+        assert_eq!(engine.publications.len(), 33);
+
+        for (key, expected_canonical) in target_urls {
+            let res = engine.redirect_url(key);
+            assert_eq!(res, Some(expected_canonical.to_string()), "Failed for key {}", key);
+        }
     }
 }

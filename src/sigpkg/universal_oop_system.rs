@@ -27,11 +27,15 @@ use std::vec::Vec;
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-
 use std::sync::Arc;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
 
 #[cfg(feature = "standalone_test")]
 impl core::fmt::Display for Version {

@@ -87,3 +87,24 @@ if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
     rustc --test --edition=2021 src/sigpkg/arch_pacman_engine.rs -o build/test_arch_engine
     ./build/test_arch_engine
 fi
+
+if [ -f "src/wiki_unimplemented_ideas.rs" ]; then
+    echo "Running GitHub Wiki Unimplemented Ideas test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/wiki_unimplemented_ideas.rs -o build/test_wiki_unimplemented
+    ./build/test_wiki_unimplemented
+fi
+
+if [ -f "src/net/tech_news_redirection.rs" ]; then
+    echo "Running Tech News & Publications redirection test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/net/tech_news_redirection.rs -o build/test_tech_news
+    ./build/test_tech_news
+fi
+
+if [ -f "src/unimplemented_features.rs" ]; then
+    echo "Running Unimplemented Features & Low-Code / Mobile Ecosystem test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/unimplemented_features.rs --cfg 'feature="standalone_test"' -o build/test_unimplemented_features
+    ./build/test_unimplemented_features
+fi
