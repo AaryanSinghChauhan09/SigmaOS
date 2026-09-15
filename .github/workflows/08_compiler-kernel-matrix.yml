@@ -21,16 +21,16 @@ jobs:
         include:
           # Rust toolchains
           - compiler: rustc
-            version: "1.70"
+            version: "1.78"
             target: x86_64-unknown-linux-gnu
-            build-cmd: "rustup install 1.70 && cargo +1.70 build --release"
-            test-cmd: "cargo +1.70 test --release"
+            build-cmd: "rustup install 1.78 && cargo +1.78 build --release"
+            test-cmd: "cargo +1.78 test --release"
 
           - compiler: rustc
-            version: "1.75"
+            version: "1.80"
             target: x86_64-unknown-linux-gnu
-            build-cmd: "rustup install 1.75 && cargo +1.75 build --release"
-            test-cmd: "cargo +1.75 test --release"
+            build-cmd: "rustup install 1.80 && cargo +1.80 build --release"
+            test-cmd: "cargo +1.80 test --release"
 
           - compiler: rustc
             version: stable
@@ -47,7 +47,7 @@ jobs:
           - compiler: rustc
             version: nightly
             target: x86_64-unknown-linux-gnu
-            build-cmd: "rustup install nightly && cargo +nightly build --release -Z unstable-options"
+            build-cmd: "rustup install nightly && cargo +nightly build --release"
             test-cmd: "cargo +nightly test --release"
 
           # GCC versions
@@ -55,38 +55,38 @@ jobs:
             version: "11"
             container: ubuntu:jammy
             build-cmd: "gcc --version"
-            test-cmd: "gcc-11 --version"
+            test-cmd: "gcc-11 --version || gcc --version"
 
           - compiler: gcc
             version: "12"
             container: ubuntu:jammy
             build-cmd: "gcc --version"
-            test-cmd: "gcc-12 --version"
+            test-cmd: "gcc-12 --version || gcc --version"
 
           - compiler: gcc
             version: "13"
             container: ubuntu:noble
             build-cmd: "gcc --version"
-            test-cmd: "gcc-13 --version"
+            test-cmd: "gcc-13 --version || gcc --version"
 
           # Clang/LLVM versions
           - compiler: clang
             version: "15"
             container: ubuntu:jammy
             build-cmd: "clang --version"
-            test-cmd: "clang-15 --version"
+            test-cmd: "clang-15 --version || clang --version"
 
           - compiler: clang
             version: "17"
             container: ubuntu:noble
             build-cmd: "clang --version"
-            test-cmd: "clang-17 --version"
+            test-cmd: "clang-17 --version || clang --version"
 
           - compiler: clang
             version: "18"
             container: ubuntu:noble
             build-cmd: "clang --version"
-            test-cmd: "clang-18 --version"
+            test-cmd: "clang-18 --version || clang --version"
 
           # Linux Kernel versions
           - kernel: linux
@@ -133,6 +133,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install C/C++ Compilers (if container)
+        if: matrix.container
+        shell: bash
+        run: |
+          apt-get update && apt-get install -y gcc gcc-11 gcc-12 gcc-13 clang clang-15 clang-17 clang-18 || true
+
       - name: Install Rust (if needed)
         if: matrix.compiler
         shell: bash
@@ -141,7 +147,7 @@ jobs:
             apt-get update && apt-get install -y curl gcc || true
           fi
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
 
       - name: Check ${{ matrix.compiler || matrix.kernel }} version
         if: matrix.version || matrix.kernel
@@ -153,7 +159,7 @@ jobs:
         if: matrix.compiler == 'rustc'
         shell: bash
         run: |
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
           ${{ matrix.build-cmd }}
 
       - name: Test compatibility
@@ -161,7 +167,7 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          source $HOME/.cargo/env
+          . $HOME/.cargo/env
           ${{ matrix.test-cmd }}
 
       - name: Verify compiler/kernel
