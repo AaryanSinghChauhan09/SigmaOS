@@ -14,6 +14,9 @@ pub mod security {
     pub use super::capability::*;
 }
 
+#[path = "../src/package/universal.rs"]
+pub mod package;
+
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
@@ -30,38 +33,7 @@ pub mod sigpkg {
     pub use crate::universal_adapter;
     pub use crate::universal_engine;
     pub use crate::universal_oop_system;
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    pub struct Version {
-        pub major: u64,
-        pub minor: u64,
-        pub patch: u64,
-    }
-
-    impl Version {
-        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-            Self { major, minor, patch }
-        }
-
-        pub fn parse(version_str: &str) -> Result<Self, &'static str> {
-            let clean = version_str.split('-').next().unwrap_or(version_str);
-            let mut parts = clean.split('.');
-
-            let major_str = parts.next().unwrap_or("0");
-            let minor_str = parts.next().unwrap_or("0");
-            let patch_str = parts.next().unwrap_or("0");
-
-            let major_clean: String = major_str.chars().filter(|c| c.is_ascii_digit()).collect();
-            let minor_clean: String = minor_str.chars().filter(|c| c.is_ascii_digit()).collect();
-            let patch_clean: String = patch_str.chars().filter(|c| c.is_ascii_digit()).collect();
-
-            let major = if major_clean.is_empty() { 0 } else { major_clean.parse::<u64>().unwrap_or(0) };
-            let minor = if minor_clean.is_empty() { 0 } else { minor_clean.parse::<u64>().unwrap_or(0) };
-            let patch = if patch_clean.is_empty() { 0 } else { patch_clean.parse::<u64>().unwrap_or(0) };
-
-            Ok(Version::new(major, minor, patch))
-        }
-    }
+    pub use crate::universal_oop_system::Version;
 
     #[derive(Debug, Clone)]
     pub struct Package {
@@ -209,7 +181,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_adapter::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -224,7 +196,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
     assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));

@@ -78,7 +78,7 @@ pub mod node_distribution_dummy {
 }
 
 #[cfg(any(feature = "standalone_test", test))]
-use node_distribution_dummy::*;
+use self::node_distribution_dummy::*;
 
 /// Foreign distro manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1392,6 +1392,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: String,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
