@@ -530,6 +530,15 @@ pub struct SovereignDnsTlsResolverEngine {
 }
 
 impl SovereignDnsTlsResolverEngine {
+    pub fn new(upstream_dot_server: [u8; 4]) -> Self {
+        Self {
+            upstream_dot_server,
+            dot_port: 853,
+            local_cache: Vec::new(),
+            dnssec_enforced: true,
+        }
+    }
+
     pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
         match alias {
             "char-major-10-200" => Some("tun"),
@@ -538,177 +547,22 @@ impl SovereignDnsTlsResolverEngine {
             _ => None,
         }
     }
-}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    CharacterDevice,
-    BlockDevice,
-    Fifo,
-    Socket,
-}
-
-#[derive(Debug, Clone)]
-pub struct DeviceNodeEntry {
-    pub name: String,
-    pub node_type: DeviceNodeType,
-    pub major: u32,
-    pub minor: u32,
-    pub symlink_paths: Vec<String>,
-}
-
-pub struct SovereignDynamicDevfsEngine {
-    pub nodes: Vec<DeviceNodeEntry>,
-}
-
-impl SovereignDynamicDevfsEngine {
-    pub fn new() -> Self {
-        Self { nodes: Vec::new() }
-    }
-
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        self.nodes.push(DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            symlink_paths: Vec::new(),
-        });
-    }
-}
-
-impl Default for SovereignDynamicDevfsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-    Masquerade,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConntrackTableEntry {
-    pub original_src: [u8; 4],
-    pub original_dst: [u8; 4],
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub translated_ip: [u8; 4],
-    pub translated_port: u16,
-    pub nat_type: NatType,
-    pub packets_counter: u64,
-}
-
-pub struct SovereignStatefulNatEngine {
-    pub public_ip: [u8; 4],
-    pub conntrack_table: Vec<ConntrackTableEntry>,
-}
-
-impl SovereignStatefulNatEngine {
-    pub fn new(public_ip: [u8; 4]) -> Self {
-        Self {
-            public_ip,
-            conntrack_table: Vec::new(),
+    pub fn resolve_domain(&mut self, domain: &'static str) -> Option<[u8; 4]> {
+        if let Some(entry) = self.local_cache.iter().find(|e| e.domain_name == domain) {
+            return Some(entry.ip_address);
         }
-    }
-
-    pub fn create_snat_mapping(
-        &mut self,
-        internal_src: [u8; 4],
-        dst_ip: [u8; 4],
-        src_port: u16,
-        dst_port: u16,
-        protocol: u8,
-    ) -> ([u8; 4], u16) {
-        let _ = protocol;
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
-                && c.src_port == src_port
-                && c.original_dst == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConntrackTableEntry {
-                original_src: internal_src,
-                original_dst: dst_ip,
-                src_port,
-                dst_port,
-                translated_ip: self.public_ip,
-                translated_port: src_port,
-                nat_type: NatType::Snat,
-                packets_counter: 1,
+        if domain == "localhost" {
+            let addr = [127, 0, 0, 1];
+            self.local_cache.push(DnsRecordEntry {
+                domain_name: "localhost",
+                ip_address: addr,
+                ttl_seconds: 3600,
+                dnssec_validated: true,
             });
+            return Some(addr);
         }
-        (self.public_ip, src_port)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_epoch_ms: u64,
-    pub identifier: String,
-    pub message: String,
-    pub priority: u8,
-}
-
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub log_records: Vec<JournaldLogRecord>,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new() -> Self {
-        Self { log_records: Vec::new() }
-    }
-
-    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
-        self.log_records.push(JournaldLogRecord {
-            timestamp_epoch_ms: 1000,
-            identifier: identifier.to_string(),
-            message: message.to_string(),
-            priority,
-        });
-    }
-}
-
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain: String,
-    pub ip_address: [u8; 4],
-}
-
-pub struct SovereignDnsTlsResolverEngine {
-    pub primary_dns_ip: [u8; 4],
-    pub records: Vec<DnsRecordEntry>,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn new(primary_dns_ip: [u8; 4]) -> Self {
-        let mut records = Vec::new();
-        records.push(DnsRecordEntry {
-            domain: "localhost".to_string(),
-            ip_address: [127, 0, 0, 1],
-        });
-        Self { primary_dns_ip, records }
-    }
-
-    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
-        self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
-    }
-}
-
-impl Default for DemandPagingSwapEngine {
-    fn default() -> Self {
-        Self::new(2048)
+        None
     }
 }
 
@@ -800,6 +654,13 @@ impl Default for SovereignDynamicDevfsEngine {
 // ============================================================================
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
 
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
@@ -1067,14 +928,17 @@ impl Default for SovereignMasterDistroEcosystemEngine {
 #[derive(Debug, Clone)]
 pub struct JournaldLogRecord {
     pub timestamp_unix_epoch: u64,
+    pub timestamp_epoch_ms: u64,
     pub priority: u8, // 0=Emergency, 3=Error, 6=Info
     pub unit_name: &'static str,
-    pub message: &'static str,
+    pub identifier: String,
+    pub message: String,
 }
 
 #[derive(Debug)]
 pub struct SovereignJournaldBinaryStorageEngine {
     pub logs: Vec<JournaldLogRecord>,
+    pub log_records: Vec<JournaldLogRecord>,
     pub max_logs_capacity: usize,
 }
 
@@ -1082,20 +946,38 @@ impl SovereignJournaldBinaryStorageEngine {
     pub fn new(capacity: usize) -> Self {
         Self {
             logs: Vec::new(),
+            log_records: Vec::new(),
             max_logs_capacity: capacity,
         }
     }
 
+    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
+        let rec = JournaldLogRecord {
+            timestamp_unix_epoch: 1000,
+            timestamp_epoch_ms: 1000,
+            priority,
+            unit_name: "system",
+            identifier: identifier.to_string(),
+            message: message.to_string(),
+        };
+        self.log_records.push(rec.clone());
+        self.logs.push(rec);
+    }
+
     pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
         if self.logs.len() >= self.max_logs_capacity {
-            self.logs.remove(0); // Journal rotation
+            self.logs.remove(0);
         }
-        self.logs.push(JournaldLogRecord {
+        let rec = JournaldLogRecord {
             timestamp_unix_epoch: timestamp,
+            timestamp_epoch_ms: timestamp * 1000,
             priority,
             unit_name: unit,
+            identifier: unit.to_string(),
             message: msg.to_string(),
-        });
+        };
+        self.logs.push(rec.clone());
+        self.log_records.push(rec);
     }
 
     pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
@@ -1104,6 +986,12 @@ impl SovereignJournaldBinaryStorageEngine {
 
     pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
         self.logs.iter().filter(|l| l.priority <= min_priority).collect()
+    }
+}
+
+impl Default for SovereignJournaldBinaryStorageEngine {
+    fn default() -> Self {
+        Self::new(1024)
     }
 }
 

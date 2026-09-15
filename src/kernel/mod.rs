@@ -54,7 +54,6 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod missing_linux_kernel_components;
 pub mod structures;
 
 pub use missing_linux_kernel_components::{
@@ -101,7 +100,7 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
+pub mod vmm_paging;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 
 pub mod sigma_kthread;

@@ -7,7 +7,7 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
+pub use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
@@ -112,14 +112,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PackagePriority {
-    Optional = 0,
-    Standard = 1,
-    Important = 2,
-    Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
-}
-
+pub use crate::package::PackagePriority;
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
     fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
@@ -246,6 +239,8 @@ impl UniversalPackageAdapter {
         }
 
         Ok(AptDebManifest {
+            architecture: "all".to_string(),
+            maintainer: "Unknown".to_string(),
             package,
             version,
             depends,

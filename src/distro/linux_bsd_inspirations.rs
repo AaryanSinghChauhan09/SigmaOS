@@ -4741,7 +4741,7 @@ impl SovereignBcachefsTieringEngine {
 
 impl Default for SovereignBcachefsTieringEngine {
     fn default() -> Self {
-        Self::new(1024 * 1024 * 1024, 10 * 1024 * 1024 * 1024)
+        Self::new(1024 * 1024 * 1024, 10u64 * 1024 * 1024 * 1024)
     }
 }
 
