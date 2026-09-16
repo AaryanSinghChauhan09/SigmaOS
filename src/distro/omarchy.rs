@@ -778,3 +778,5 @@ mod tests {
         let mut pwa = OmarchyAppLauncherEngine::default();
         assert!(pwa.register_pwa_app("Linear"));
         assert!(!pwa.register_pwa_app("Linear"));
+    }
+}
