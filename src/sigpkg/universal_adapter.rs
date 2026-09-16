@@ -2137,10 +2137,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" => {
-                if pm == "pkg_delete" {
-                    operation = UniversalPmOperation::Remove;
-                }
+            "pkgin" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
