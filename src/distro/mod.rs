@@ -41,6 +41,8 @@ pub mod distro_inspiration_synthesis;
 pub use distro_inspiration_synthesis::*;
 pub mod linux_bsd_ultimate_synthesis;
 pub use linux_bsd_ultimate_synthesis::*;
+pub mod linux_bsd_advanced_synthesis;
+pub use linux_bsd_advanced_synthesis::*;
 pub mod distro_inspiration_engine;
 pub use distro_inspiration_engine::{
     AlpineLbuApkOverlayEngine, ApkovlCommit, ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine,
