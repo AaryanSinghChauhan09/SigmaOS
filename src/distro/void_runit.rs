@@ -238,6 +238,7 @@ impl RunitSupervisor {
         } else {
             false
         }
+        true
     }
 
     pub fn start_all(&mut self) {
@@ -265,7 +266,11 @@ impl RunitSupervisor {
             .count()
     }
 
-    pub fn monitor_service_health(&mut self, name: &str, is_healthy: bool) -> Option<RunitServiceStatus> {
+    pub fn monitor_service_health(
+        &mut self,
+        name: &str,
+        is_healthy: bool,
+    ) -> Option<RunitServiceStatus> {
         if let Some(service) = self.services.get_mut(name) {
             let state = service.check_health(is_healthy);
             Some(state)
