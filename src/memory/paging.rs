@@ -332,13 +332,13 @@ impl SimpleVMM {
         Ok(())
     }
 
-    /// Maps a standard 4KB page
-    pub fn map_page(
+    /// Maps a standard 4KB page with default flags (writable, non-NX)
+    pub fn map_page_default(
         &mut self,
         virt: VirtualAddress,
         phys: PhysicalAddress,
     ) -> Result<(), MemoryError> {
-        self.map_page_with_flags(virt, phys, true, false)
+        self.map_page(virt, phys, true, false)
     }
 
     /// Maps a 2MB Huge Page (at the Page Directory level)

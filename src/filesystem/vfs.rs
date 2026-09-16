@@ -3,8 +3,15 @@ use core::fmt;
 /// SigmaOS: Virtual File System (VFS) Layer
 /// Provides unified filesystem abstraction supporting multiple filesystem types
 /// Integrates with syscall dispatcher for read, write, open, close operations
+use std::collections::{BTreeMap, HashMap};
 use std::string::String;
 use std::vec::Vec;
+use crate::security::{CapabilityToken, Permission};
+
+pub const O_APPEND: u32 = 0o2000;
+pub const O_CREAT: u32 = 0o100;
+pub const O_EXCL: u32 = 0o200;
+pub const O_TRUNC: u32 = 0o1000;
 
 /// File types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -108,7 +115,7 @@ impl Inode {
             file_type,
             mode: FileMode::new(mode),
             size: 0,
-            owner,
+            owner: 0,
             group: 0,
             created: 0,
             modified: 0,
@@ -249,17 +256,21 @@ impl VirtualFileSystem {
     pub fn new() -> Self {
         let mut inodes = BTreeMap::new();
         let root_inode = Inode {
-            id: 1,
+            inode_number: 1,
             file_type: FileType::Directory,
+            mode: FileMode::new(0o755),
             size: 0,
-            permissions: 0o755,
             owner: 0,
-            data: Vec::new(),
-            created_at: 0,
-            modified_at: 0,
-            entries: BTreeMap::new(),
-            link_count: 1,
+            group: 0,
+            created: 0,
+            modified: 0,
+            capabilities: CapabilityToken::new(),
             hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            entries: HashMap::new(),
         };
         inodes.insert(1, root_inode);
 
@@ -279,17 +290,21 @@ impl VirtualFileSystem {
         let id = self.next_inode_id;
         self.next_inode_id += 1;
         let inode = Inode {
-            id,
+            inode_number: id,
             file_type,
+            mode: FileMode::new(0o644),
             size: 0,
-            permissions: 0o644,
             owner,
-            data: Vec::new(),
-            created_at: 0,
-            modified_at: 0,
-            entries: BTreeMap::new(),
-            link_count: 1,
+            group: 0,
+            created: 0,
+            modified: 0,
+            capabilities: CapabilityToken::new(),
             hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            entries: HashMap::new(),
         };
         self.inodes.insert(id, inode);
         Ok(id)
@@ -356,98 +371,85 @@ impl VirtualFileSystem {
     }
 
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
-        if !self.file_descriptors.contains_key(&fd) {
-            return Err(FsError::InvalidFd);
+        let fd_i32 = fd as i32;
+        if let Some(pos) = self.open_files.iter().position(|h| h.fd == fd_i32) {
+            self.open_files.remove(pos);
+            Ok(())
+        } else {
+            Err(FsError::InvalidFd)
         }
-
-        self.file_descriptors.remove(&fd);
-        Ok(())
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+        let fd_i32 = fd as i32;
+        let handle = self
+            .open_files
+            .iter_mut()
+            .find(|h| h.fd == fd_i32)
             .ok_or(FsError::InvalidFd)?;
 
         let inode = self
             .inodes
-            .get(&file_descriptor.inode_id)
+            .get(&handle.inode_number)
             .ok_or(FsError::NotFound)?;
 
-        // Check read permission
-        if !inode.permissions.read {
-            return Err(FsError::PermissionDenied);
-        }
-
-        // Check file offset and file size
-        if file_descriptor.offset >= inode.size {
+        if handle.position >= inode.size {
             return Ok(0);
         }
 
-        let remaining = (inode.size - file_descriptor.offset) as usize;
+        let remaining = (inode.size - handle.position) as usize;
         let bytes_to_read = buffer.len().min(remaining);
 
-        // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
-            .offset
-            .checked_add(bytes_to_read as u64)
-            .ok_or(FsError::InvalidFd)?;
-
-        // Read the actual bytes from storage data
-        let start = file_descriptor.offset as usize;
+        let start = handle.position as usize;
         let end = start + bytes_to_read;
         buffer[..bytes_to_read].copy_from_slice(&inode.data[start..end]);
 
-        file_descriptor.offset += bytes_to_read as u64;
+        handle.position += bytes_to_read as u64;
         Ok(bytes_to_read)
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+        let fd_i32 = fd as i32;
+        let handle = self
+            .open_files
+            .iter_mut()
+            .find(|h| h.fd == fd_i32)
             .ok_or(FsError::InvalidFd)?;
+
+        let inode_number = handle.inode_number;
+        let flags = handle.flags;
+        let mut position = handle.position;
 
         let inode = self
             .inodes
-            .get_mut(&file_descriptor.inode_id)
+            .get_mut(&inode_number)
             .ok_or(FsError::NotFound)?;
 
-        // Check write permission
-        if !inode.permissions.write {
-            return Err(FsError::PermissionDenied);
+        if (flags & O_APPEND) != 0 {
+            position = inode.size;
         }
 
-        // If open flag O_APPEND is set, offset is moved to the end of the file before each write
-        if (file_descriptor.flags & O_APPEND) != 0 {
-            file_descriptor.offset = inode.size;
-        }
-
-        // Prevent integer overflow in size and offset calculation
-        let _new_size = inode
-            .size
+        let new_offset = position
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
-        let new_offset = file_descriptor
-            .offset
-            .checked_add(buffer.len() as u64)
-            .ok_or(FsError::NoSpace)?;
-
-        // Resize storage data buffer if offset + written bytes exceeds size (handling holes)
         if new_offset > inode.size {
             inode.data.resize(new_offset as usize, 0);
             inode.size = new_offset;
         }
 
-        // Write the actual bytes into file storage data
-        let start = file_descriptor.offset as usize;
+        let start = position as usize;
         let end = start + buffer.len();
         inode.data[start..end].copy_from_slice(buffer);
 
-        file_descriptor.offset = new_offset;
-        inode.modified = 1716000000; // Simulated timestamp
+        let handle_mut = self
+            .open_files
+            .iter_mut()
+            .find(|h| h.fd == fd_i32)
+            .unwrap();
+        handle_mut.position = new_offset;
+
+        inode.modified = 1716000000;
 
         Ok(buffer.len())
     }

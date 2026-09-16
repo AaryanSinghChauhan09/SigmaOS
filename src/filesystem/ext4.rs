@@ -206,15 +206,21 @@ impl FileSystem for Ext4FileSystem {
         let written = data.len();
         let new_size = (offset + written as u64).max(inode.size);
 
-        // Allocate blocks if needed
-        while (inode.data_blocks.len() * self.superblock.block_size as usize) < (new_size as usize) {
-            let block = self.allocate_block();
-            match block {
-                Ok(b) => inode.data_blocks.push(b),
-                Err(_) => break,
+        let block_size = self.superblock.block_size as usize;
+        let current_blocks = if block_size > 0 { (inode.data.len() + block_size - 1) / block_size } else { 0 };
+        let needed_blocks = if block_size > 0 { (new_size as usize + block_size - 1) / block_size } else { 0 };
+
+        for _ in current_blocks..needed_blocks {
+            if self.allocate_block().is_err() {
+                break;
             }
         }
 
+        let end_idx = (offset as usize) + written;
+        if end_idx > inode.data.len() {
+            inode.data.resize(end_idx, 0);
+        }
+        inode.data[(offset as usize)..end_idx].copy_from_slice(data);
         inode.size = new_size;
         self.write_inode(&inode)?;
 
@@ -269,9 +275,10 @@ impl FileSystem for Ext4FileSystem {
         let inode_num = self.lookup(parent_inode, name)?;
         let inode = self.read_inode(inode_num)?;
 
-        // Free all data blocks
-        for block in inode.data_blocks {
-            self.deallocate_block(block)?;
+        let block_size = self.superblock.block_size as usize;
+        let block_count = if block_size > 0 { (inode.data.len() + block_size - 1) / block_size } else { 0 };
+        for block in 0..block_count {
+            let _ = self.deallocate_block(block as u64);
         }
 
         // Deallocate inode

@@ -19,6 +19,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: PackagePriority,
 }
 
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -273,7 +274,6 @@ impl UniversalPackageAdapter {
             return Err("Invalid Debian control manifest: missing Package or Version");
         }
 
-        let _ = priority;
         Ok(AptDebManifest {
             package,
             version,
@@ -281,6 +281,7 @@ impl UniversalPackageAdapter {
             maintainer: String::new(),
             depends,
             description,
+            priority,
         })
     }
 
