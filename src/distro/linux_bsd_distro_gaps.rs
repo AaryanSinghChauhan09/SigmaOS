@@ -528,6 +528,37 @@ pub struct SovereignDnsTlsResolverEngine {
     pub local_cache: Vec<DnsRecordEntry>,
     pub dnssec_enforced: bool,
 }
+
+impl SovereignDnsTlsResolverEngine {
+    pub fn new(upstream_dot_server: [u8; 4]) -> Self {
+        let mut engine = Self {
+            upstream_dot_server,
+            dot_port: 853,
+            local_cache: Vec::new(),
+            dnssec_enforced: true,
+        };
+        engine.local_cache.push(DnsRecordEntry {
+            domain_name: "localhost",
+            ip_address: [127, 0, 0, 1],
+            ttl_seconds: 86400,
+            dnssec_validated: true,
+        });
+        engine
+    }
+
+    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
+        self.local_cache
+            .iter()
+            .find(|r| r.domain_name == domain)
+            .map(|r| r.ip_address)
+    }
+}
+
+impl Default for SovereignDnsTlsResolverEngine {
+    fn default() -> Self {
+        Self::new([1, 1, 1, 1])
+    }
+}
 // 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
 // ============================================================================
 
@@ -615,6 +646,13 @@ impl Default for SovereignDynamicDevfsEngine {
 // ============================================================================
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
 
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
@@ -909,7 +947,7 @@ impl SovereignJournaldBinaryStorageEngine {
             timestamp_unix_epoch: timestamp,
             priority,
             unit_name: unit,
-            message: msg.to_string(),
+            message: msg,
         });
     }
 
@@ -926,7 +964,7 @@ impl SovereignJournaldBinaryStorageEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1043,7 +1081,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_dns_tls_resolver() {
-        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
+        let resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
     }

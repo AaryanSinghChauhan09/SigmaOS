@@ -17,10 +17,13 @@ pub mod security {
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
 
-pub use universal_adapter::universal_oop_system;
+// removed duplicate
 
 pub mod sigpkg {
     use alloc::string::String;
@@ -149,12 +152,12 @@ fn test_universal_adapter_all_formats() {
     let mut bridge = SigPkgUniversalBridgeEngine::new();
     let pkg_bsd = bridge.absorb_and_register("redis.pkg", freebsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -167,25 +170,25 @@ fn test_universal_adapter_all_formats() {
 
 #[test]
 fn test_universal_adapter_extended_linux_bsd_formats() {
-    use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation, PackageFormat};
+    use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation};
 
     let adapter = UniversalPackageAdapter::new();
 
     // Test Extension Detection for Linux & BSD Formats
-    assert_eq!(adapter.detect_format_by_extension("pkg.ipk"), Some(PackageFormat::Ipk));
-    assert_eq!(adapter.detect_format_by_extension("pkg.opkg"), Some(PackageFormat::Opkg));
-    assert_eq!(adapter.detect_format_by_extension("pkg.p5p"), Some(PackageFormat::SolarisIps));
-    assert_eq!(adapter.detect_format_by_extension("pkg.nar"), Some(PackageFormat::GuixNar));
-    assert_eq!(adapter.detect_format_by_extension("pkg.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
-    assert_eq!(adapter.detect_format_by_extension("pkg.moss"), Some(PackageFormat::Moss));
-    assert_eq!(adapter.detect_format_by_extension("pkg.hpkg"), Some(PackageFormat::Hpkg));
+    assert_eq!(adapter.detect_format_by_extension("pkg.ipk"), Some(universal_engine::PackageFormat::Ipk));
+    assert_eq!(adapter.detect_format_by_extension("pkg.opkg"), Some(universal_engine::PackageFormat::Opkg));
+    assert_eq!(adapter.detect_format_by_extension("pkg.p5p"), Some(universal_engine::PackageFormat::SolarisIps));
+    assert_eq!(adapter.detect_format_by_extension("pkg.nar"), Some(universal_engine::PackageFormat::GuixNar));
+    assert_eq!(adapter.detect_format_by_extension("pkg.openbsd.tgz"), Some(universal_engine::PackageFormat::OpenBsdPkg));
+    assert_eq!(adapter.detect_format_by_extension("pkg.moss"), Some(universal_engine::PackageFormat::Moss));
+    assert_eq!(adapter.detect_format_by_extension("pkg.hpkg"), Some(universal_engine::PackageFormat::Hpkg));
 
     // Test Magic Header Detection
-    assert_eq!(adapter.detect_format_by_header(b"IPK!1234"), Some(PackageFormat::Ipk));
-    assert_eq!(adapter.detect_format_by_header(b"OPKG1234"), Some(PackageFormat::Opkg));
-    assert_eq!(adapter.detect_format_by_header(b"P5P!1234"), Some(PackageFormat::SolarisIps));
-    assert_eq!(adapter.detect_format_by_header(b"NARS1234"), Some(PackageFormat::GuixNar));
-    assert_eq!(adapter.detect_format_by_header(b"OBSD1234"), Some(PackageFormat::OpenBsdPkg));
+    assert_eq!(adapter.detect_format_by_header(b"IPK!1234"), Some(universal_engine::PackageFormat::Ipk));
+    assert_eq!(adapter.detect_format_by_header(b"OPKG1234"), Some(universal_engine::PackageFormat::Opkg));
+    assert_eq!(adapter.detect_format_by_header(b"P5P!1234"), Some(universal_engine::PackageFormat::SolarisIps));
+    assert_eq!(adapter.detect_format_by_header(b"NARS1234"), Some(universal_engine::PackageFormat::GuixNar));
+    assert_eq!(adapter.detect_format_by_header(b"OBSD1234"), Some(universal_engine::PackageFormat::OpenBsdPkg));
 
     // Test Command Dispatcher across multiple package managers
     let dispatcher = UniversalPmCommandDispatcher::new();
@@ -209,39 +212,39 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    // removed duplicate
 
     let adapter = UniversalPackageAdapter::new();
 
     // Verify detection for all 29 Linux & BSD distro formats specified in prompt
-    assert_eq!(adapter.detect_format_by_extension("app.air"), Some(PackageFormat::Air));
-    assert_eq!(adapter.detect_format_by_extension("pkg.bottle"), Some(PackageFormat::Bottle));
-    assert_eq!(adapter.detect_format_by_extension("app.ipa"), Some(PackageFormat::Ipa));
-    assert_eq!(adapter.detect_format_by_extension("bsd.ports"), Some(PackageFormat::Ports));
-    assert_eq!(adapter.detect_format_by_extension("mac.pkg"), Some(PackageFormat::Pkg));
-    assert_eq!(adapter.detect_format_by_extension("app.aab"), Some(PackageFormat::Aab));
-    assert_eq!(adapter.detect_format_by_extension("app.apk"), Some(PackageFormat::Apk));
-    assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
-    assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
-    assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
-    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
-    assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
-    assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
-    assert_eq!(adapter.detect_format_by_extension("compressed.xz"), Some(PackageFormat::TarXz));
-    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Yum));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
-    assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
-    assert_eq!(adapter.detect_format_by_extension("app.flatpak"), Some(PackageFormat::Flatpak));
-    assert_eq!(adapter.detect_format_by_extension("macos.app"), Some(PackageFormat::AppBundle));
-    assert_eq!(adapter.detect_format_by_extension("harmony.hap"), Some(PackageFormat::Hap));
-    assert_eq!(adapter.detect_format_by_extension("pardus.PiSi"), Some(PackageFormat::Pisi));
-    assert_eq!(adapter.detect_format_by_extension("archive.tgz"), Some(PackageFormat::TarGz));
-    assert_eq!(adapter.detect_format_by_extension("deepin.superdeb"), Some(PackageFormat::Superdeb));
-    assert_eq!(adapter.detect_format_by_extension("slax.lzm"), Some(PackageFormat::Lzm));
-    assert_eq!(adapter.detect_format_by_extension("puppy.pup"), Some(PackageFormat::Pup));
-    assert_eq!(adapter.detect_format_by_extension("canonical.snap"), Some(PackageFormat::Snap));
-    assert_eq!(adapter.detect_format_by_extension("pacman.pkg.tar.zst"), Some(PackageFormat::Pacman));
-    assert_eq!(adapter.detect_format_by_extension("plain.tar"), Some(PackageFormat::Tar));
-    assert_eq!(adapter.detect_format_by_extension("puppy.pet"), Some(PackageFormat::Pet));
+    assert_eq!(adapter.detect_format_by_extension("app.air"), Some(universal_engine::PackageFormat::Air));
+    assert_eq!(adapter.detect_format_by_extension("pkg.bottle"), Some(universal_engine::PackageFormat::Bottle));
+    assert_eq!(adapter.detect_format_by_extension("app.ipa"), Some(universal_engine::PackageFormat::Ipa));
+    assert_eq!(adapter.detect_format_by_extension("bsd.ports"), Some(universal_engine::PackageFormat::Ports));
+    assert_eq!(adapter.detect_format_by_extension("mac.pkg"), Some(universal_engine::PackageFormat::Pkg));
+    assert_eq!(adapter.detect_format_by_extension("app.aab"), Some(universal_engine::PackageFormat::Aab));
+    assert_eq!(adapter.detect_format_by_extension("app.apk"), Some(universal_engine::PackageFormat::Apk));
+    assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(universal_engine::PackageFormat::AppImage));
+    assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(universal_engine::PackageFormat::Eopkg));
+    assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(universal_engine::PackageFormat::Nix));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(universal_engine::PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(universal_engine::PackageFormat::Apt));
+    assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(universal_engine::PackageFormat::TarGz));
+    assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(universal_engine::PackageFormat::TarGz));
+    assert_eq!(adapter.detect_format_by_extension("compressed.xz"), Some(universal_engine::PackageFormat::TarXz));
+    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(universal_engine::PackageFormat::Yum));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(universal_engine::PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(universal_engine::PackageFormat::Pacman));
+    assert_eq!(adapter.detect_format_by_extension("app.flatpak"), Some(universal_engine::PackageFormat::Flatpak));
+    assert_eq!(adapter.detect_format_by_extension("macos.app"), Some(universal_engine::PackageFormat::AppBundle));
+    assert_eq!(adapter.detect_format_by_extension("harmony.hap"), Some(universal_engine::PackageFormat::Hap));
+    assert_eq!(adapter.detect_format_by_extension("pardus.PiSi"), Some(universal_engine::PackageFormat::Pisi));
+    assert_eq!(adapter.detect_format_by_extension("archive.tgz"), Some(universal_engine::PackageFormat::TarGz));
+    assert_eq!(adapter.detect_format_by_extension("deepin.superdeb"), Some(universal_engine::PackageFormat::Superdeb));
+    assert_eq!(adapter.detect_format_by_extension("slax.lzm"), Some(universal_engine::PackageFormat::Lzm));
+    assert_eq!(adapter.detect_format_by_extension("puppy.pup"), Some(universal_engine::PackageFormat::Pup));
+    assert_eq!(adapter.detect_format_by_extension("canonical.snap"), Some(universal_engine::PackageFormat::Snap));
+    assert_eq!(adapter.detect_format_by_extension("pacman.pkg.tar.zst"), Some(universal_engine::PackageFormat::Pacman));
+    assert_eq!(adapter.detect_format_by_extension("plain.tar"), Some(universal_engine::PackageFormat::Tar));
+    assert_eq!(adapter.detect_format_by_extension("puppy.pet"), Some(universal_engine::PackageFormat::Pet));
 }
