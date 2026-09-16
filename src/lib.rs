@@ -1,6 +1,8 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
 // Core working modules
 pub mod accessibility;
 pub mod ai;
@@ -13,7 +15,10 @@ pub mod customization;
 pub mod dashboard;
 pub mod desktop;
 pub mod device;
+pub mod distro;
 pub mod driver;
+pub mod drivers;
+pub mod governance;
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;

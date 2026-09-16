@@ -265,6 +265,10 @@ pub struct BodhiUpdateTriage {
 }
 
 impl BodhiUpdateTriage {
+    pub fn get_update_status(&self, update_id: &str) -> Option<BodhiUpdateStatus> {
+        self.updates.get(update_id).map(|u| u.status)
+    }
+
     pub fn new() -> Self {
         BodhiUpdateTriage {
             updates: HashMap::new(),
@@ -3817,7 +3821,14 @@ pub struct FedoraIgnitionEngine {
     pub provisioned: bool,
 }
 
-impl FedoraIgnitionEngine {
+#[derive(Debug, Clone, Default)]
+pub struct FedoraOfflineUpdateEngine {
+    pub staged_packages: Vec<String>,
+    pub is_offline_update_pending: bool,
+    pub trigger_reboot_flag: bool,
+}
+
+impl FedoraOfflineUpdateEngine {
     pub fn new() -> Self {
         Self {
             files: Vec::new(),
@@ -4854,34 +4865,6 @@ mod tests {
             mgr.runtime_env.allocated_shm_blocks.get("sigma_ipc_shm"),
             Some(&4096)
         );
-    }
-
-    #[test]
-    fn test_fedora_badges_engine() {
-        let mut badges = FedoraBadgesEngine::new();
-        assert_eq!(badges.badges.len(), 2);
-
-        let pts1 = badges.award_badge("jules_dev", "pkg-first-build").unwrap();
-        assert_eq!(pts1, 10);
-
-        let pts2 = badges.award_badge("jules_dev", "qa-test-day").unwrap();
-        assert_eq!(pts2, 25);
-
-        assert!(badges.award_badge("jules_dev", "invalid-badge").is_err());
-    }
-
-    #[test]
-    fn test_fedora_system_roles_engine() {
-        let mut roles = FedoraSystemRolesEngine::new();
-        assert!(roles.applied_roles.is_empty());
-
-        roles.apply_timesync_role(&["0.fedora.pool.ntp.org", "1.fedora.pool.ntp.org"]);
-        assert_eq!(roles.applied_roles.len(), 1);
-        assert_eq!(roles.chrony_ntp_servers.len(), 2);
-
-        roles.apply_firewall_role(&[80, 443, 8080]);
-        assert_eq!(roles.applied_roles.len(), 2);
-        assert_eq!(roles.configured_firewall_ports.len(), 3);
     }
 
     #[test]

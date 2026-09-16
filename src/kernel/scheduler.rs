@@ -368,10 +368,6 @@ impl CfsScheduler {
         }
     }
 
-    pub fn schedule(&mut self) -> Option<Task> {
-        self.pick_next_task()
-    }
-
     fn sort_tasks(&mut self) {
         for i in 1..self.task_count {
             let mut j = i;

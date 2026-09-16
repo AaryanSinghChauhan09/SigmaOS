@@ -65,6 +65,8 @@ pub use missing_linux_kernel_components::{
     UffdRegisteredRange, UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
 };
 pub mod traits;
+pub mod virtual_cpu;
+pub mod vmm_paging;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;

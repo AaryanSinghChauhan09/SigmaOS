@@ -562,6 +562,15 @@ pub enum DeviceType {
     Filter,
 }
 
+pub struct DeviceObjectX86 {
+    pub device_type: DeviceType,
+    pub driver_object: *mut DriverObjectX86,
+    pub driver_name: &'static str,
+    pub next_device: *mut DeviceObjectX86,
+    pub attached_device: *mut DeviceObjectX86,
+}
+
+pub type DeviceObject = DeviceObjectX86;
 
 #[derive(Debug, Clone)]
 pub struct DeviceObjectX86 {
@@ -645,9 +654,10 @@ impl Irp {
         if let Some(routine) = self.completion_routine {
             let dummy_dev = DeviceObjectX86 {
                 device_type: DeviceType::Functional,
+                driver_object: core::ptr::null_mut(),
                 driver_name: "dummy",
-                next_device: None,
-                attached_device: None,
+                next_device: core::ptr::null_mut(),
+                attached_device: core::ptr::null_mut(),
             };
             routine(&dummy_dev, self);
         }

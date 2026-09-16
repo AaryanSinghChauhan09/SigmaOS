@@ -43,10 +43,6 @@ pub mod parrot_kali;
 pub mod parrot_linux;
 pub mod parrot_parity;
 pub mod pqc_measurement;
-pub use pqc_measurement::{
-    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
-    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
-};
 pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
@@ -84,10 +80,7 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
+pub use defensive_audit::*;
 pub use forensics::*;
 pub use hardening::{
     MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
@@ -112,7 +105,7 @@ pub use libgksu::{
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,
 };
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
-pub use parrot::{
+pub use parrot_kali::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
@@ -121,11 +114,15 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{
-    promises, PledgeError, PledgeManager as OriginalPledgeManager,
+    promises, PledgeError, PledgeManager, PledgePromise, PledgeManager as OriginalPledgeManager,
     PledgePromise as OriginalPledgePromise,
 };
 pub use qubes_isolation::*;
 pub use root_improvement::*;
+pub use pqc_measurement::{
+    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
+    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
+};
 pub use rules::{
     AuditAccessType, AuditSyscallRule, AuditWatchRule, PfAction, PfFilterRule, PledgeRule,
     SecurelevelState, SovereignAuditRuleEngine, SovereignNetworkFilterRulesEngine,

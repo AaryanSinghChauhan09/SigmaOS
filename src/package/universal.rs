@@ -206,11 +206,13 @@ pub enum PackageState {
     BrokenDependency,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackagePriority {
     Essential,
     Required,
     Important,
     Standard,
+    #[default]
     Optional,
 }
 
@@ -219,6 +221,11 @@ pub enum PackagePriority {
 pub enum PackageFormat {
     #[default]
     Deb,        // apt/dpkg
+    GuixNar,    // GNU Guix NAR archive (.nar)
+    OpenBsdPkg, // OpenBSD pkg_add (.tgz / .pkg)
+    Ipk,        // Opkg / OpenWrt (.ipk)
+    Opkg,       // Opkg package manager (.opkg / .ipk)
+    SolarisIps, // Solaris IPS package (.p5p / .pkg)
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
     Snap,       // snap/squashfs
@@ -1384,6 +1391,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: PackagePriority,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)

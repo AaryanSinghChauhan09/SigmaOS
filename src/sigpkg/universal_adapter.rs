@@ -110,8 +110,75 @@ pub enum Permission {
 #[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::security::Permission;
 
+use super::universal_oop_system;
+
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchPkgInfoManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+    pub architecture: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GentooEbuildMetadata {
+    pub category: String,
+    pub name: String,
+    pub package_name: String,
+    pub version: String,
+    pub slot: String,
+    pub eapi: String,
+    pub keywords: Vec<String>,
+    pub use_flags: Vec<String>,
+    pub depends: Vec<String>,
+    pub rdepend: Vec<String>,
+    pub depend: Vec<String>,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkIndexManifest {
+    pub pkgname: String,
+    pub pkgver: String,
+    pub pkgdesc: String,
+    pub depends: Vec<String>,
+    pub arch: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XbpsManifest {
+    pub pkgname: String,
+    pub version: String,
+    pub short_desc: String,
+    pub run_depends: Vec<String>,
+    pub architecture: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+    pub summary: String,
+    pub description: String,
+    pub confinement: String,
+    pub grade: String,
+    pub base: String,
+    pub apps: Vec<String>,
+    pub plugs: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HaikuHpkgManifest {
+    pub name: String,
+    pub version: String,
+    pub architecture: String,
+    pub summary: String,
+    pub description: String,
+    pub requires: Vec<String>,
+}
+
 pub struct PacmanPkgbuild {
     pub pkgname: String,
     pub pkgver: String,
@@ -131,15 +198,7 @@ use crate::universal_oop_system::UniversalPackageManager;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-/// Debian-style package priority levels (DFSG and APT standard)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PackagePriority {
-    Optional = 0,
-    Standard = 1,
-    Important = 2,
-    Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
-}
+pub use crate::package::universal::PackagePriority;
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -436,10 +495,15 @@ impl UniversalPackageAdapter {
 
         Ok(GentooEbuildMetadata {
             category,
+            name: package_name.clone(),
             package_name,
             version,
-            rdepend,
-            depend,
+            slot: String::from("0"),
+            eapi: String::from("8"),
+            keywords: Vec::new(),
+            rdepend: rdepend.clone(),
+            depend: depend.clone(),
+            depends: depend,
             description,
             use_flags,
         })
@@ -479,6 +543,7 @@ impl UniversalPackageAdapter {
             pkgver,
             pkgdesc,
             depends,
+            arch: String::from("x86_64"),
         })
     }
 
@@ -524,6 +589,7 @@ impl UniversalPackageAdapter {
             version,
             short_desc,
             run_depends,
+            architecture: String::from("x86_64"),
         })
     }
 
@@ -572,8 +638,12 @@ impl UniversalPackageAdapter {
         Ok(SnapcraftManifest {
             name,
             version,
-            summary,
+            summary: summary.clone(),
+            description: summary,
             confinement,
+            grade: String::from("stable"),
+            base: String::from("core22"),
+            apps: Vec::new(),
             plugs,
         })
     }
@@ -644,7 +714,8 @@ impl UniversalPackageAdapter {
         Ok(HaikuHpkgManifest {
             name,
             version,
-            summary,
+            summary: summary.clone(),
+            description: summary,
             architecture,
             requires,
         })

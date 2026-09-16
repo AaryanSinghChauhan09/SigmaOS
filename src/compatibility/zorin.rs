@@ -6,6 +6,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Switchable desktop layout personas
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -82,9 +83,14 @@ pub enum ZorinSnapPosition {
     TopRight,
     BottomLeft,
     BottomRight,
+    TopLeftQuarter,
+    TopRightQuarter,
+    BottomLeftQuarter,
+    BottomRightQuarter,
     LeftHalf,
     RightHalf,
     Maximize,
+    Maximized,
 }
 
 pub struct ZorinGridDesktopManager {

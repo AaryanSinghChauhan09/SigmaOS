@@ -1,6 +1,7 @@
 use std::string::String;
 use std::vec;
 use std::vec::Vec;
+use crate::kernel::structures::CpuArchitectureClass;
 // 1. Instructions and CPU Initialization
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
