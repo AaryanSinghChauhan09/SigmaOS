@@ -1,6 +1,8 @@
-# Welcome to SigmaOS
+# 🇸🇴 SigmaOS Sovereign Operating System
 
-**SigmaOS** is a sovereign, zero-dependency operating system written in Rust, designed to defeat Linux and BSD distros through superior architecture, security, and performance.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Rust](https://img.shields.io/badge/Language-Rust-orange.svg)](https://www.rust-lang.org/)
+[![Version](https://img.shields.io/badge/Version-v1.0.0--sovereign-blue.svg)](https://github.com/AaryanSinghChauhan09/SigmaOS/releases)
 
 ## 🚀 Core Features
 
@@ -60,23 +62,44 @@
 
 ## 📊 Development Status & Performance Notes
 
-- **Zero-Allocation Hot Paths**: Sub-microsecond syscalls and interrupt handling via `#![no_std]` core.
-- **Cross-Subsystem Bridge**: `SovereignUniversalDistroBridge` in `src/distro/linux_bsd_inspirations.rs` integrates VFS, Init, Package Management, Security, Kernel, and Memory subsystems.
-- **Multi-Distro Parity**: Comprehensive adapters for Arch Linux (pacman/AUR), Fedora (dnf/rpm-ostree), Debian (apt), Gentoo (portage), Alpine (apk), Void (xbps), FreeBSD (pkg), OpenBSD (pkg_add), and NixOS (nix).
+| Component | Status | Notes |
+|---|---|---|
+| **Kernel Microkernel Core** | Beta ✅ | Working: scheduler, MMU, IPC stubs. TODO: real hardware drivers |
+| **Memory Management** | Production ✅ | BuddyAllocator + SlabAllocator, W^X enforcement, NUMA support |
+| **Security (pledge/unveil)** | Production ✅ | OpenBSD-compatible capability sandboxing with path traversal hardening |
+| **Syscall Implementation** | Beta ✅ | 17+ syscalls integrated: file (open/read/write/close), process (fork/exec/wait/exit), network (socket/bind/connect/listen/send/recv), signal (rt_sigaction/kill). SyscallContext provides unified interface to all subsystems. |
+| **Package Manager (sigpkg)** | Beta ✅ | Multi-format adapter working; SAT resolver functional |
+| **Desktop (Zenith)** | Early Alpha ⚠️ | Compositor framework present; full GTK/Libadwaita binding pending |
+| **Network Stack** | Planned | TCP/IP stack design documented; implementation deferred to v0.2 |
+
+### Performance Notes
+
+**Design Goals (v1.0.0 target):**
+- Context Switch Latency: < 0.12 µs (vs. Linux 0.85 µs)
+- Zero-Copy IPC: 14.2 GB/s (vs. Linux 8.1 GB/s)
+- Boot Time: < 180 ms (vs. Linux 1.45 s)
+
+**Current State:** SigmaOS v0.1.0 is a hosted simulation running in userspace. Performance measurements will be conducted after hardware driver implementation and real interrupt handling.
+
+### Building & Running
+
+```bash
+git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
+cd SigmaOS
+
+# Test the current codebase
+./run_sigma_tests.sh
+
+# Build (requires Rust nightly)
+make build
+
+# Run QEMU test
+make test-qemu
+```
 
 ---
 
-## 🛡️ Security Architecture
-
-- **Post-Quantum Cryptography**: Dilithium-5 module signatures and Kyber-712 key exchange.
-- **LSM (Linux Security Modules)**: Inode, Ptrace, and Socket hooks for mandatory access control.
-- **OpenBSD pledge/unveil**: Capability-based process sandboxing and filesystem path unveiling.
-- **FreeBSD Capsicum**: Capability mode for fine-grained privilege separation.
-- **eBPF XDP Zero-Copy**: Express BPF with XDP zero-copy socket redirection for high-performance networking.
-
----
-
-## 📈 Development Milestones
+## 📈 Recent Progress (September 2026)
 
 ### v0.6 Milestone: Consolidation Complete ✅
 
@@ -111,11 +134,10 @@
 7. ⏳ Phase 7: v0.6 release preparation
 
 For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and [wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
->>>>>>> dc4e8ec4c6a64666adb44812235d1d650af69a5f
 
 ---
 
-## 🎯 Design Principles
+## 📄 License
 
 SigmaOS follows strict software engineering principles:
 

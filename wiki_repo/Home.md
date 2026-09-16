@@ -111,7 +111,6 @@
 7. ⏳ Phase 7: v0.6 release preparation
 
 For detailed progress information, see [RELEASE_NOTES.md](RELEASE_NOTES.md) and [wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
->>>>>>> dc4e8ec4c6a64666adb44812235d1d650af69a5f
 
 ---
 

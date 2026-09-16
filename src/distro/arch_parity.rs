@@ -1026,6 +1026,62 @@ impl Default for ArchWikiOfflineEngine {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn test_arch_pacman_keyring_engine() {
+        let mut keyring = ArchPacmanKeyringEngine::new();
+        assert!(!keyring.is_initialized);
+        let count = keyring.populate_archlinux();
+        assert!(keyring.is_initialized);
+        assert_eq!(count, 2);
+    }
+
+    #[test]
+    fn test_arch_reflector_mirrorlist_engine() {
+        let mut reflector = ArchReflectorMirrorlistEngine::new();
+        let list = reflector.generate_mirrorlist("Germany");
+        assert!(list.contains("geo.mirror.pkgbuild.com"));
+    }
+
+    #[test]
+    fn test_arch_mkinitcpio_generator_engine() {
+        let mkinit = ArchMkinitcpioGeneratorEngine::new();
+        let res = mkinit.generate_initramfs("linux").unwrap();
+        assert!(res.contains("/boot/initramfs-linux.img"));
+    }
+
+    #[test]
+    fn test_arch_powerpill_parallel_download_engine() {
+        let powerpill = ArchPowerpillParallelDownloadEngine::new();
+        let urls = powerpill.prepare_parallel_download_urls(&["linux", "glibc"]);
+        assert_eq!(urls.len(), 2);
+        assert!(urls[0].contains("linux.pkg.tar.zst"));
+    }
+
+    #[test]
+    fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
+        let devtools = ArchCdevtoolsEngine::new();
+        let cmd = devtools.build_in_chroot("extra-x86_64-build", "curl").unwrap();
+        assert!(cmd.contains("arch-nspawn"));
+
+        let mut pkgctl = ArchPkgctlEngine::new();
+        let repo_url = pkgctl.clone_pkg_repo("nginx");
+        assert!(repo_url.contains("gitlab.archlinux.org"));
+
+        let archweb = ArchArchwebEngine::new();
+        let res = archweb.search("pacman");
+        assert_eq!(res.len(), 1);
+
+        let mut installer = ArchArchinstallEngine::new();
+        installer.set_config("/dev/nvme0n1", "desktop", "sovereign");
+        let inst_cmd = installer.execute_installation().unwrap();
+        assert!(inst_cmd.contains("archinstall"));
+
+        let wiki = ArchWikiOfflineEngine::new();
+        let articles = wiki.search("pacman");
+        assert_eq!(articles.len(), 1);
+    }
+
     use super::*;
 
     #[test]

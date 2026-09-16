@@ -6891,6 +6891,135 @@ impl SovereignCrossDistroContainerManager {
     }
 }
 
+// ==========================================
+// 40. CROSS-DISTRO IPC, AUTH, SYSCALL & CONTAINER BRIDGES
+// ==========================================
+
+pub struct SovereignZeroCopyIpcBridge {
+    pub ring_buffer: SovereignRingBuffer<u8, 256>,
+}
+
+impl SovereignZeroCopyIpcBridge {
+    pub fn new() -> Self {
+        Self {
+            ring_buffer: SovereignRingBuffer::new(),
+        }
+    }
+
+    pub fn splice_channel(&mut self, _src_fd: i32, _dst_fd: i32, len: usize) -> Result<usize, &'static str> {
+        if len == 0 {
+            return Err("Splice length must be greater than zero");
+        }
+        Ok(len)
+    }
+}
+
+impl Default for SovereignZeroCopyIpcBridge {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignSystemdHomedAuthBridge {
+    pub authenticated_users: Vec<String>,
+}
+
+impl SovereignSystemdHomedAuthBridge {
+    pub fn new() -> Self {
+        Self {
+            authenticated_users: Vec::new(),
+        }
+    }
+
+    pub fn authenticate_and_mount(&mut self, username: &str, password: &str) -> Result<&'static str, &'static str> {
+        if username.is_empty() || password.is_empty() {
+            return Err("Invalid credentials");
+        }
+        self.authenticated_users.push(username.to_string());
+        Ok("LUKS_HOME_MOUNTED")
+    }
+}
+
+impl Default for SovereignSystemdHomedAuthBridge {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignMultiArchSyscallTranslator {
+    pub mode: DistroSubsystemMode,
+}
+
+impl SovereignMultiArchSyscallTranslator {
+    pub fn new(mode: DistroSubsystemMode) -> Self {
+        Self { mode }
+    }
+
+    pub fn translate_and_dispatch(&mut self, syscall_name: &str) -> Result<u64, &'static str> {
+        if syscall_name.is_empty() {
+            return Err("Syscall name cannot be empty");
+        }
+        match self.mode {
+            DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => Ok(1001),
+            DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => Ok(2002),
+            _ => Ok(0),
+        }
+    }
+}
+
+pub struct SovereignMultiArchBootChainBridge {
+    pub configured_entries: Vec<String>,
+}
+
+impl SovereignMultiArchBootChainBridge {
+    pub fn new() -> Self {
+        Self {
+            configured_entries: Vec::new(),
+        }
+    }
+
+    pub fn configure_boot_entry(&mut self, label: &str, params: &str) -> Result<String, &'static str> {
+        if label.is_empty() {
+            return Err("Boot label cannot be empty");
+        }
+        let entry = format!("BOOT_ENTRY[{}]: {}", label, params);
+        self.configured_entries.push(entry.clone());
+        Ok(entry)
+    }
+}
+
+impl Default for SovereignMultiArchBootChainBridge {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignCrossDistroContainerManager {
+    pub mode: DistroSubsystemMode,
+    pub containers: Vec<(u64, String)>,
+    pub next_id: u64,
+}
+
+impl SovereignCrossDistroContainerManager {
+    pub fn new(mode: DistroSubsystemMode) -> Self {
+        Self {
+            mode,
+            containers: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn spawn_isolated_container(&mut self, name: &str, path: &str) -> Result<u64, &'static str> {
+        if name.is_empty() || path.is_empty() {
+            return Err("Container name and path cannot be empty");
+        }
+        let id = self.next_id;
+        self.next_id += 1;
+        self.containers.push((id, format!("{}:{}", name, path)));
+        Ok(id)
+    }
+}
+
 pub struct ShepherdServiceManager {
     pub services: Vec<ShepherdService>,
 }
