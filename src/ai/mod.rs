@@ -1,6 +1,7 @@
 // SigmaOS AI Module
 // S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, quantization, and Agentic OS runtime
 
+pub mod agent_runtime;
 
 pub mod agent;
 pub mod agent_runtime;

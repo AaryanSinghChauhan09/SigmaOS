@@ -1610,6 +1610,7 @@ impl UniversalDistroAdapterPipeline {
 /// Description of Debian / APT Control Manifest (.deb / dpkg parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AptDebManifest {
+    pub priority: PackagePriority,
     pub package: String,
     pub version: String,
     pub architecture: String,
@@ -2679,6 +2680,7 @@ mod tests {
 
         // 3. Verify general manifest definitions compile (AptDebManifest and PacmanPkgbuild)
         let _deb = AptDebManifest {
+            priority: PackagePriority::Optional,
             package: "curl".to_string(),
             version: "7.81.0".to_string(),
             architecture: "amd64".to_string(),

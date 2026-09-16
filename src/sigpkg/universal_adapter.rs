@@ -326,6 +326,8 @@ impl UniversalPackageAdapter {
         }
 
         Ok(AptDebManifest {
+            architecture: "all".to_string(),
+            maintainer: "Unknown".to_string(),
             package,
             version,
             architecture: "amd64".to_string(),

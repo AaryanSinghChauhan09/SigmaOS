@@ -282,7 +282,7 @@ impl SigmaOsLaunchReadinessSuite {
         Self {
             idt,
             syscall_dispatcher: SyscallDispatcher::new(),
-            pmm: SovereignPhysicalMemoryManager::new(16 * 1024 * 1024 * 1024), // 16 GB default
+            pmm: SovereignPhysicalMemoryManager::new(16u64 * 1024 * 1024 * 1024), // 16 GB default
             scheduler: SovereignPreemptiveScheduler::new(),
             is_ready_for_launch: AtomicBool::new(true),
         }

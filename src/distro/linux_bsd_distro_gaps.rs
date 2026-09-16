@@ -974,6 +974,7 @@ impl Default for SovereignMasterDistroEcosystemEngine {
 #[derive(Debug, Clone)]
 pub struct JournaldLogRecord {
     pub timestamp_unix_epoch: u64,
+    pub timestamp_epoch_ms: u64,
     pub priority: u8, // 0=Emergency, 3=Error, 6=Info
     pub unit_name: &'static str,
     pub message: String,
@@ -988,12 +989,26 @@ impl PamFaillockGuard {
         }
     }
 
+    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
+        let rec = JournaldLogRecord {
+            timestamp_unix_epoch: 1000,
+            timestamp_epoch_ms: 1000,
+            priority,
+            unit_name: "system",
+            identifier: identifier.to_string(),
+            message: message.to_string(),
+        };
+        self.log_records.push(rec.clone());
+        self.logs.push(rec);
+    }
+
     pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
         if self.logs.len() >= self.max_logs_capacity && self.max_logs_capacity > 0 {
             self.logs.remove(0);
         }
-        self.logs.push(JournaldLogRecord {
+        let rec = JournaldLogRecord {
             timestamp_unix_epoch: timestamp,
+            timestamp_epoch_ms: timestamp * 1000,
             priority,
             unit_name: unit,
             message: msg,
@@ -1087,6 +1102,12 @@ impl SovereignDnsTlsResolverEngine {
         } else {
             Ok([192, 168, 1, 1])
         }
+    }
+}
+
+impl Default for SovereignJournaldBinaryStorageEngine {
+    fn default() -> Self {
+        Self::new(1024)
     }
 }
 

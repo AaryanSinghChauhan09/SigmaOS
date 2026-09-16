@@ -263,3 +263,7 @@ pub use omarchy_expanded_parity::{
     OmarchyHyprlockScreenLocker, OmarchyOmakubBootstrapEngine, OmarchyRofiAppLauncher,
     OmarchyThunarFileActions, OmarchyZellijSessionManager, SovereignOmarchyExpandedParitySuite,
 };
+pub use arch_parity::*;
+pub use improvements::*;
+pub use missing_distro_innovations::*;
+pub use omarchy_inspiration::*;

@@ -130,7 +130,7 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
+pub mod vmm_paging;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 // Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
