@@ -20,6 +20,12 @@ pub enum NavigationMode {
     ControlTree, // openSUSE YaST / FreeBSD bsdconfig settings navigator
 }
 
+pub type AppCategory = NavigationMode;
+pub type LauncherAppItem = AppLauncherItem;
+pub type SystemControlNode = ControlTreeNode;
+pub type NavDirection = FocusDirection;
+pub type HudActionResult = CommandHudEntry;
+
 /// GNOME / Pop!_OS COSMIC Launcher Navigation
 #[derive(Debug, Clone)]
 pub struct AppLauncherItem {

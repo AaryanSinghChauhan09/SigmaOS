@@ -1,11 +1,12 @@
+
 // SigmaOS klib: Slab Allocator (like Linux SLUB/SLAB, FreeBSD UMA)
 // Custom memory allocator for fixed-size object allocation pools
 // No external dependencies - fully sovereign implementation
 
-use core::ptr::NonNull;
-use core::sync::atomic::{AtomicUsize, Ordering};
 #[allow(dead_code)]
 use std::alloc::Layout;
+use core::ptr::NonNull;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// A slab cache for fixed-size allocations.
 /// Inspired by Linux's SLAB/SLUB allocator and FreeBSD's UMA (Universal Memory Allocator).

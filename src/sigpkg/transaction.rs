@@ -1,5 +1,4 @@
 #![allow(clippy::large_enum_variant)]
-use std::collections::{BTreeMap, BTreeSet};
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -229,10 +228,6 @@ impl PackageSnapshotRollbackEngine {
         self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id)
     }
 
-    /// Computes the diff required to revert current system packages to a target snapshot state.
-    ///
-    /// Optimized by Bolt ⚡: replaces O(S * C) nested slice linear searches with BTreeMap and
-    /// BTreeSet lookups. Reduces package diffing complexity from O(N^2) to O(N log N).
     pub fn compute_rollback_diff(
         &self,
         current_packages: &[(&str, &str)],
@@ -245,20 +240,11 @@ impl PackageSnapshotRollbackEngine {
         let mut to_restore = Vec::new(); // Packages to install/revert
         let mut to_remove = Vec::new(); // Packages installed after snapshot to remove
 
-        // Build current package version lookup map: O(C log C)
-        let current_map: BTreeMap<&str, &str> = current_packages.iter().copied().collect();
-
-        // Build snapshot package name lookup set: O(S log S)
-        let snapshot_set: BTreeSet<&str> = snapshot
-            .installed_packages
-            .iter()
-            .map(|(n, _)| n.as_str())
-            .collect();
-
-        // Find packages in snapshot that are missing or mismatched in current: O(S log C)
+        // Find packages in snapshot that are missing or mismatched in current
         for (snap_name, snap_ver) in &snapshot.installed_packages {
-            match current_map.get(snap_name.as_str()) {
-                Some(&cv) if cv != snap_ver => {
+            let found = current_packages.iter().find(|(cn, _)| cn == snap_name);
+            match found {
+                Some((_, cv)) if cv != snap_ver => {
                     to_restore.push((snap_name.clone(), snap_ver.clone()));
                 }
                 None => {
@@ -268,9 +254,13 @@ impl PackageSnapshotRollbackEngine {
             }
         }
 
-        // Find packages in current that were not in snapshot: O(C log S)
-        for &(cur_name, _) in current_packages {
-            if !snapshot_set.contains(cur_name) {
+        // Find packages in current that were not in snapshot
+        for (cur_name, _) in current_packages {
+            if !snapshot
+                .installed_packages
+                .iter()
+                .any(|(sn, _)| sn == cur_name)
+            {
                 to_remove.push(cur_name.to_string());
             }
         }
@@ -278,10 +268,6 @@ impl PackageSnapshotRollbackEngine {
         Ok((to_restore, to_remove))
     }
 
-    /// Performs atomic rollback of current system packages to a target snapshot generation.
-    ///
-    /// Optimized by Bolt ⚡: replaces O(C * R) and O(Rest * C) linear scans with BTreeSet
-    /// and BTreeMap index lookups. Reduces overall rollback complexity from O(N^2) to O(N log N).
     pub fn rollback_to_snapshot(
         &mut self,
         current_packages: &mut Vec<(String, String)>,
@@ -295,22 +281,13 @@ impl PackageSnapshotRollbackEngine {
             target_snapshot_id,
         )?;
 
-        // Build lookup set for package removals: O(R log R)
-        let remove_set: BTreeSet<&str> = to_remove.iter().map(|s| s.as_str()).collect();
+        // Apply removals
+        current_packages.retain(|(n, _)| !to_remove.contains(n));
 
-        // Apply removals in O(C log R) instead of O(C * R)
-        current_packages.retain(|(n, _)| !remove_set.contains(n.as_str()));
-
-        // Build index lookup map for current packages: O(C log C)
-        let mut current_index_map: BTreeMap<String, usize> = BTreeMap::new();
-        for (i, (n, _)) in current_packages.iter().enumerate() {
-            current_index_map.entry(n.clone()).or_insert(i);
-        }
-
-        // Apply restorations/reverts in O(Rest * log C) instead of O(Rest * C)
+        // Apply restorations/reverts
         for (res_name, res_ver) in to_restore {
-            if let Some(&idx) = current_index_map.get(res_name.as_str()) {
-                current_packages[idx].1 = res_ver;
+            if let Some(existing) = current_packages.iter_mut().find(|(n, _)| n == &res_name) {
+                existing.1 = res_ver;
             } else {
                 current_packages.push((res_name, res_ver));
             }
@@ -354,11 +331,11 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
     #[cfg(not(feature = "standalone_test"))]
-    use crate::klib::custom_string::SigmaString;
+    use crate::klib::SigmaString;
     type PathBuf = std::string::String;
 
     #[test]

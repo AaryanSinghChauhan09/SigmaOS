@@ -3,9 +3,9 @@
 // Implements starvation-avoidance (aging), nice-value weighting, sliding window burst score decay,
 // FreeBSD ULE interactivity ranking, CachyOS interactive wakeup boost, and Real-Time priority lanes.
 
-use core::sync::atomic::{AtomicU64, Ordering};
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BoreTaskType {

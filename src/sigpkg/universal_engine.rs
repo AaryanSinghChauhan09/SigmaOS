@@ -58,6 +58,11 @@ pub enum PackageFormat {
     Dports,
     SlackBuild,
     Crux,
+    Deb,
+    Rpm,
+    Ebuild,
+    Sysupdate,
+    Sigma,
     Drpm,
     Stratum,
     Ipk,
@@ -73,68 +78,26 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
-    Deb,
-    Rpm,
-    Ebuild,
-    Sigma,
-    Sysupdate,
 }
+
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        let name = filename.to_lowercase();
-        if name.ends_with(".openbsd.tgz") { Some(PackageFormat::OpenBsdPkg) }
-        else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") { Some(PackageFormat::Pacman) }
-        else if name.ends_with(".air") { Some(PackageFormat::Air) }
-        else if name.ends_with(".bottle") { Some(PackageFormat::Bottle) }
-        else if name.ends_with(".ipa") { Some(PackageFormat::Ipa) }
-        else if name.ends_with(".ports") || name.ends_with(".portage") { Some(PackageFormat::Ports) }
-        else if name.ends_with(".pkg") { Some(PackageFormat::Pkg) }
-        else if name.ends_with(".aab") { Some(PackageFormat::Aab) }
-        else if name.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if name.ends_with(".appimage") { Some(PackageFormat::AppImage) }
-        else if name.ends_with(".eopkg") { Some(PackageFormat::Eopkg) }
-        else if name.ends_with(".nix") || name.ends_with(".nixpkg") { Some(PackageFormat::Nix) }
-        else if name.ends_with(".deb") { Some(PackageFormat::Apt) }
-        else if name.ends_with(".tar.gz") || name.ends_with(".tgz") || name.ends_with(".tar .gz") { Some(PackageFormat::TarGz) }
-        else if name.ends_with(".tar.xz") || name.ends_with(".xz") { Some(PackageFormat::TarXz) }
-        else if name.ends_with(".rpm") { Some(PackageFormat::Yum) }
-        else if name.ends_with(".ebuild") { Some(PackageFormat::Portage) }
-        else if name.ends_with(".flatpak") { Some(PackageFormat::Flatpak) }
-        else if name.ends_with(".app") { Some(PackageFormat::AppBundle) }
-        else if name.ends_with(".hap") { Some(PackageFormat::Hap) }
-        else if name.ends_with(".pisi") { Some(PackageFormat::Pisi) }
-        else if name.ends_with(".superdeb") { Some(PackageFormat::Superdeb) }
-        else if name.ends_with(".lzm") { Some(PackageFormat::Lzm) }
-        else if name.ends_with(".pup") { Some(PackageFormat::Pup) }
-        else if name.ends_with(".snap") { Some(PackageFormat::Snap) }
-        else if name.ends_with(".tar") { Some(PackageFormat::Tar) }
-        else if name.ends_with(".pet") { Some(PackageFormat::Pet) }
-        else if name.ends_with(".moss") { Some(PackageFormat::Moss) }
-        else if name.ends_with(".hpkg") { Some(PackageFormat::Hpkg) }
-        else if name.ends_with(".tcz") { Some(PackageFormat::Tcz) }
-        else if name.ends_with(".gobo") { Some(PackageFormat::Gobo) }
-        else if name.ends_with(".ostree") { Some(PackageFormat::Ostree) }
-        else if name.ends_with(".pkgsrc") { Some(PackageFormat::Pkgsrc) }
-        else if name.ends_with(".sfs") { Some(PackageFormat::Sfs) }
-        else if name.ends_with(".puk") { Some(PackageFormat::Puk) }
-        else if name.ends_with(".dmg") { Some(PackageFormat::Dmg) }
-        else if name.ends_with(".cports") { Some(PackageFormat::Cports) }
-        else if name.ends_with(".ipk") { Some(PackageFormat::Ipk) }
-        else if name.ends_with(".opkg") { Some(PackageFormat::Opkg) }
-        else if name.ends_with(".p5p") { Some(PackageFormat::SolarisIps) }
-        else if name.ends_with(".nar") { Some(PackageFormat::GuixNar) }
-        else if name.ends_with(".whl") { Some(PackageFormat::Wheel) }
-        else if name.ends_with(".crate") { Some(PackageFormat::Crate) }
-        else if name.ends_with(".gem") { Some(PackageFormat::Gem) }
-        else if name.ends_with(".nupkg") { Some(PackageFormat::Nupkg) }
-        else if name.ends_with(".vcpkg") { Some(PackageFormat::Vcpkg) }
-        else if name.ends_with(".narinfo") { Some(PackageFormat::NarInfo) }
-        else if name.ends_with(".spack") { Some(PackageFormat::Spack) }
-        else if name.ends_with(".conan") { Some(PackageFormat::Conan) }
-        else if name.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
-        else if name.ends_with(".sigma") { Some(PackageFormat::Sigma) }
-        else { None }
+        if filename.ends_with(".deb") { return Some(PackageFormat::Deb); }
+        if filename.ends_with(".rpm") { return Some(PackageFormat::Rpm); }
+        if filename.ends_with(".tar.gz") || filename.ends_with(".tgz") { return Some(PackageFormat::TarGz); }
+        if filename.ends_with(".tar.xz") { return Some(PackageFormat::TarXz); }
+        if filename.ends_with(".tar") { return Some(PackageFormat::Tar); }
+        if filename.ends_with(".snap") { return Some(PackageFormat::Snap); }
+        if filename.ends_with(".flatpak") { return Some(PackageFormat::Flatpak); }
+        if filename.ends_with(".appimage") || filename.ends_with(".AppImage") { return Some(PackageFormat::AppImage); }
+        if filename.ends_with(".apk") { return Some(PackageFormat::Apk); }
+        if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { return Some(PackageFormat::Pacman); }
+        if filename.ends_with(".dmg") { return Some(PackageFormat::Dmg); }
+        if filename.ends_with(".nix") { return Some(PackageFormat::Nix); }
+        if filename.ends_with(".ebuild") { return Some(PackageFormat::Ebuild); }
+        if filename.ends_with(".txz") { return Some(PackageFormat::Txz); }
+        None
     }
 }
 
@@ -1692,8 +1655,8 @@ impl IPackageAdapter for PetPackageAdapter {
 pub struct SnapPackageAdapter;
 impl IPackageAdapter for SnapPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Snap
-    }
+        PackageFormat::Apt
+    } // or custom snap mapping
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
             return Err("Empty Snap payload");
@@ -1701,7 +1664,7 @@ impl IPackageAdapter for SnapPackageAdapter {
         Ok(PackageContext {
             name: "snap-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Snap,
+            format: PackageFormat::Apt,
             dependencies: vec![],
             files: vec![],
             hash: [0x21; 32],
@@ -1718,7 +1681,7 @@ impl IPackageAdapter for SnapPackageAdapter {
 
 impl IPackageAdapter for FlatpakPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Flatpak
+        PackageFormat::Apt
     }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
@@ -1727,7 +1690,7 @@ impl IPackageAdapter for FlatpakPackageAdapter {
         Ok(PackageContext {
             name: "flatpak-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Flatpak,
+            format: PackageFormat::Apt,
             dependencies: vec![],
             files: vec![],
             hash: [0x22; 32],

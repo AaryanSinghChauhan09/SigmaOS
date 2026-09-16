@@ -2,9 +2,11 @@
 // Implements Intel Clear Linux's stateless configuration and immutable root layers
 // Inspired by Clear Linux's performance-optimized architecture
 
+
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
+extern crate alloc;
 
 /// Configuration file location
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
