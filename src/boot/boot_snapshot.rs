@@ -63,7 +63,9 @@ impl BootSnapshotEngine {
 
     pub fn create_preboot_snapshot(&mut self, label: &str, timestamp: u64) -> BootSnapshotItem {
         let snap_id = format!("boot_snap_{}_{}", timestamp, self.snapshots.len() + 1);
-        let hash = timestamp.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        let hash = timestamp
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
 
         let item = BootSnapshotItem {
             id: snap_id.clone(),
@@ -86,7 +88,10 @@ impl BootSnapshotEngine {
 
     pub fn verify_boot_integrity(&mut self, snapshot_id: &str) -> bool {
         if let Some(snap) = self.snapshots.iter_mut().find(|s| s.id == snapshot_id) {
-            let expected_hash = snap.timestamp.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            let expected_hash = snap
+                .timestamp
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             if snap.hash_checksum == expected_hash {
                 snap.status = BootSnapshotStatus::Verified;
                 snap.is_clean_boot = true;

@@ -1,7 +1,6 @@
 // SigmaOS AI Module
 // S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, quantization, and Agentic OS runtime
 
-
 pub mod agent;
 pub mod agentic_os_runtime;
 pub mod apm;
@@ -46,6 +45,10 @@ pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,
 };
+pub use developer_platform::{
+    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite, MlExperimentRun,
+    MlExperimentTracker, ModelMarketplace, SafetyViolationType,
+};
 pub use llm::{
     BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,
     LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
@@ -63,10 +66,6 @@ pub use system::{
 pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
-};
-pub use developer_platform::{
-    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
-    MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
 };
 
 pub use marktechpost_kdnuggets_data_science::{

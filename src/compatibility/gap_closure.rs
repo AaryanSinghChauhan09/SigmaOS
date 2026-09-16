@@ -1057,7 +1057,9 @@ pub struct OpenBsdSelfReportingSecurityGovernor {
 
 impl OpenBsdSelfReportingSecurityGovernor {
     pub fn new() -> Self {
-        Self { pledged_promises: Vec::new() }
+        Self {
+            pledged_promises: Vec::new(),
+        }
     }
     pub fn pledge_process(&mut self, promises: &[&str]) {
         for p in promises {
@@ -1081,10 +1083,13 @@ pub struct FreeBsdGeomStorageStack {
 
 impl FreeBsdGeomStorageStack {
     pub fn new() -> Self {
-        Self { providers: Vec::new() }
+        Self {
+            providers: Vec::new(),
+        }
     }
     pub fn add_geom_provider(&mut self, name: &str, provider_type: &str, capacity: u64) {
-        self.providers.push((name.to_string(), provider_type.to_string(), capacity));
+        self.providers
+            .push((name.to_string(), provider_type.to_string(), capacity));
     }
 }
 
@@ -1101,7 +1106,10 @@ pub struct VoidLinuxRunitServiceSupervisor {
 
 impl VoidLinuxRunitServiceSupervisor {
     pub fn new() -> Self {
-        Self { registered_services: Vec::new(), running_services: Vec::new() }
+        Self {
+            registered_services: Vec::new(),
+            running_services: Vec::new(),
+        }
     }
     pub fn register_service(&mut self, name: &str) {
         self.registered_services.push(name.to_string());
@@ -1130,7 +1138,9 @@ pub struct AlpineLinuxDisklessLbuPersistence {
 
 impl AlpineLinuxDisklessLbuPersistence {
     pub fn new() -> Self {
-        Self { backup_tarball_path: None }
+        Self {
+            backup_tarball_path: None,
+        }
     }
     pub fn commit_overlay_backup(&mut self, path: &str) {
         self.backup_tarball_path = Some(path.to_string());
@@ -1149,7 +1159,9 @@ pub struct NixOsHermeticClosureEngine {
 
 impl NixOsHermeticClosureEngine {
     pub fn new() -> Self {
-        Self { store_paths: Vec::new() }
+        Self {
+            store_paths: Vec::new(),
+        }
     }
     pub fn add_store_path(&mut self, path: &str) {
         self.store_paths.push(path.to_string());

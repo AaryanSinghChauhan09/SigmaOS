@@ -12,10 +12,10 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
 use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::fmt;
 
 /// Installation configuration
@@ -111,9 +111,9 @@ impl fmt::Display for BootloaderType {
 /// Desktop environments
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DesktopEnvironment {
-    Sigma,      // Custom SigmaOS DE
-    Minimal,    // Window manager only
-    Server,     // No GUI
+    Sigma,   // Custom SigmaOS DE
+    Minimal, // Window manager only
+    Server,  // No GUI
 }
 
 impl fmt::Display for DesktopEnvironment {
@@ -188,7 +188,7 @@ impl DiskInfo {
     pub fn size_gb(&self) -> u64 {
         self.size_bytes / (1024 * 1024 * 1024)
     }
-    
+
     pub fn is_ssd(&self) -> bool {
         !self.is_rotational
     }
@@ -227,23 +227,23 @@ impl LightningInstaller {
             available_disks: Vec::new(),
         }
     }
-    
+
     pub fn set_config(&mut self, config: InstallConfig) {
         self.config = config;
     }
-    
+
     pub fn get_config(&self) -> &InstallConfig {
         &self.config
     }
-    
+
     pub fn get_stage(&self) -> InstallStage {
         self.stage
     }
-    
+
     /// Detect available disks
     pub fn detect_disks(&mut self) -> Result<Vec<DiskInfo>, InstallerError> {
         self.stage = InstallStage::DiskDetection;
-        
+
         // In real implementation, would read from /sys/block/
         // For now, return mock data
         let disks = vec![
@@ -264,15 +264,15 @@ impl LightningInstaller {
                 is_rotational: false,
             },
         ];
-        
+
         self.available_disks = disks.clone();
         Ok(disks)
     }
-    
+
     /// Generate automatic partition layout
     pub fn generate_partition_layout(&self, disk_size_gb: u64) -> Vec<Partition> {
         let mut partitions = Vec::new();
-        
+
         // EFI System Partition
         partitions.push(Partition {
             mount_point: "/boot/efi".into(),
@@ -284,7 +284,7 @@ impl LightningInstaller {
                 swap: false,
             },
         });
-        
+
         // Swap partition (2x RAM, max 8GB)
         let swap_size = if disk_size_gb >= 64 {
             8 * 1024
@@ -293,7 +293,7 @@ impl LightningInstaller {
         } else {
             2 * 1024
         };
-        
+
         partitions.push(Partition {
             mount_point: "swap".into(),
             size_mb: swap_size,
@@ -304,123 +304,123 @@ impl LightningInstaller {
                 swap: true,
             },
         });
-        
+
         // Root partition (rest of disk)
         let used_mb = 512 + swap_size;
         let root_size = (disk_size_gb * 1024) - used_mb;
-        
+
         partitions.push(Partition {
             mount_point: "/".into(),
             size_mb: root_size,
             filesystem: self.config.filesystem,
             flags: PartitionFlags::default(),
         });
-        
+
         partitions
     }
-    
+
     /// Start installation process
     pub fn install(&mut self) -> Result<(), InstallerError> {
         self.start_time = Self::get_time_seconds();
-        
+
         // Stage 1: Detect disks
         self.stage = InstallStage::DiskDetection;
         self.detect_disks()?;
-        
+
         // Stage 2: Partition disk
         self.stage = InstallStage::Partitioning;
         self.partition_disk()?;
-        
+
         // Stage 3: Format filesystems
         self.stage = InstallStage::Formatting;
         self.format_filesystems()?;
-        
+
         // Stage 4: Mount filesystems
         self.stage = InstallStage::MountingFilesystems;
         self.mount_filesystems()?;
-        
+
         // Stage 5: Install base system
         self.stage = InstallStage::InstallingBase;
         self.install_base_system()?;
-        
+
         // Stage 6: Install kernel
         self.stage = InstallStage::InstallingKernel;
         self.install_kernel()?;
-        
+
         // Stage 7: Install bootloader
         self.stage = InstallStage::InstallingBootloader;
         self.install_bootloader()?;
-        
+
         // Stage 8: Configure system
         self.stage = InstallStage::ConfiguringSystem;
         self.configure_system()?;
-        
+
         // Stage 9: Install drivers
         self.stage = InstallStage::InstallingDrivers;
         self.install_drivers()?;
-        
+
         // Stage 10: Create user
         self.stage = InstallStage::CreatingUser;
         self.create_user()?;
-        
+
         // Stage 11: Finalize
         self.stage = InstallStage::Finalizing;
         self.finalize()?;
-        
+
         self.stage = InstallStage::Complete;
         Ok(())
     }
-    
+
     fn partition_disk(&self) -> Result<(), InstallerError> {
         // Would use parted/sgdisk in real implementation
         Ok(())
     }
-    
+
     fn format_filesystems(&self) -> Result<(), InstallerError> {
         // Would use mkfs.* commands in real implementation
         Ok(())
     }
-    
+
     fn mount_filesystems(&self) -> Result<(), InstallerError> {
         // Would mount partitions to /mnt
         Ok(())
     }
-    
+
     fn install_base_system(&self) -> Result<(), InstallerError> {
         // Would copy/extract base system files
         Ok(())
     }
-    
+
     fn install_kernel(&self) -> Result<(), InstallerError> {
         // Would install kernel and initramfs
         Ok(())
     }
-    
+
     fn install_bootloader(&self) -> Result<(), InstallerError> {
         // Would configure bootloader
         Ok(())
     }
-    
+
     fn configure_system(&self) -> Result<(), InstallerError> {
         // Would set hostname, locale, timezone, etc.
         Ok(())
     }
-    
+
     fn install_drivers(&self) -> Result<(), InstallerError> {
         // Would auto-detect and install hardware drivers
         Ok(())
     }
-    
+
     fn create_user(&self) -> Result<(), InstallerError> {
         // Would create user account and home directory
         Ok(())
     }
-    
+
     fn finalize(&self) -> Result<(), InstallerError> {
         // Would unmount filesystems and cleanup
         Ok(())
     }
-    
+
     pub fn get_progress(&self) -> InstallProgress {
         let percent = match self.stage {
             InstallStage::Initializing => 0,
@@ -437,9 +437,9 @@ impl LightningInstaller {
             InstallStage::Finalizing => 98,
             InstallStage::Complete => 100,
         };
-        
+
         let elapsed = Self::get_time_seconds() - self.start_time;
-        
+
         InstallProgress {
             stage: self.stage,
             percent,
@@ -447,7 +447,7 @@ impl LightningInstaller {
             elapsed_seconds: elapsed,
         }
     }
-    
+
     fn get_time_seconds() -> u64 {
         // In real implementation, would get actual time
         0
@@ -483,7 +483,7 @@ impl fmt::Display for InstallerError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_default_config() {
         let config = InstallConfig::default();
@@ -491,7 +491,7 @@ mod tests {
         assert_eq!(config.filesystem, FilesystemType::Btrfs);
         assert_eq!(config.partition_scheme, PartitionScheme::Gpt);
     }
-    
+
     #[test]
     fn test_disk_info() {
         let disk = DiskInfo {
@@ -502,28 +502,28 @@ mod tests {
             is_removable: false,
             is_rotational: false,
         };
-        
+
         assert_eq!(disk.size_gb(), 512);
         assert!(disk.is_ssd());
     }
-    
+
     #[test]
     fn test_partition_layout() {
         let installer = LightningInstaller::new();
         let partitions = installer.generate_partition_layout(512);
-        
+
         assert_eq!(partitions.len(), 3);
         assert_eq!(partitions[0].mount_point, "/boot/efi");
         assert!(partitions[0].flags.esp);
         assert!(partitions[1].flags.swap);
         assert_eq!(partitions[2].mount_point, "/");
     }
-    
+
     #[test]
     fn test_installer_stages() {
         let mut installer = LightningInstaller::new();
         assert_eq!(installer.get_stage(), InstallStage::Initializing);
-        
+
         installer.detect_disks().unwrap();
         assert_eq!(installer.available_disks.len(), 2);
     }

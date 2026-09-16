@@ -13,13 +13,13 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-pub mod process;
 pub mod pid_namespace;
+pub mod process;
 pub mod process_descriptor;
 
-pub use process::{
-    Process, ProcessCapability, ProcessManager, ProcessPriority, ProcessSignal, ProcessState,
-    SupervisedServiceTarget, ProcessNamespaceContext,
-};
 pub use pid_namespace::{PidNamespace, PidNamespaceStats, ProcessId};
+pub use process::{
+    Process, ProcessCapability, ProcessManager, ProcessNamespaceContext, ProcessPriority,
+    ProcessSignal, ProcessState, SupervisedServiceTarget,
+};
 pub use process_descriptor::ProcessDescriptor;

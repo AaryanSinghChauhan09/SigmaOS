@@ -625,8 +625,16 @@ impl ManjaroIsoArchitectEngine {
     }
 
     pub fn compile_iso_image(&self, de: &str) -> Result<String, &'static str> {
-        if let Some(prof) = self.active_profiles.iter().find(|p| p.desktop_environment == de) {
-            Ok(format!("manjaro-{}-{}-2026.04.iso", prof.desktop_environment.to_lowercase(), prof.kernel_variant))
+        if let Some(prof) = self
+            .active_profiles
+            .iter()
+            .find(|p| p.desktop_environment == de)
+        {
+            Ok(format!(
+                "manjaro-{}-{}-2026.04.iso",
+                prof.desktop_environment.to_lowercase(),
+                prof.kernel_variant
+            ))
         } else {
             Err("Manjaro ISO profile for requested DE not found")
         }

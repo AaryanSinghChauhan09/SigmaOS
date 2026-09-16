@@ -31,11 +31,13 @@ impl NativeWasmDesktopEngine {
     }
 
     pub fn set_aria_label(&mut self, element_id: &str, label: &str) {
-        self.aria_attributes.insert(element_id.to_string(), label.to_string());
+        self.aria_attributes
+            .insert(element_id.to_string(), label.to_string());
     }
 
     pub fn set_secure_text(&mut self, element_id: &str, text: &str) {
-        self.text_node_contents.insert(element_id.to_string(), text.to_string());
+        self.text_node_contents
+            .insert(element_id.to_string(), text.to_string());
     }
 }
 
@@ -48,7 +50,10 @@ mod tests {
         let mut engine = NativeWasmDesktopEngine::new();
         engine.set_aria_label("dock-launcher", "Application Launcher");
         assert_eq!(
-            engine.aria_attributes.get("dock-launcher").map(|s| s.as_str()),
+            engine
+                .aria_attributes
+                .get("dock-launcher")
+                .map(|s| s.as_str()),
             Some("Application Launcher")
         );
 
@@ -58,7 +63,10 @@ mod tests {
 
         engine.set_secure_text("app-title", "SigmaOS Zenith Desktop");
         assert_eq!(
-            engine.text_node_contents.get("app-title").map(|s| s.as_str()),
+            engine
+                .text_node_contents
+                .get("app-title")
+                .map(|s| s.as_str()),
             Some("SigmaOS Zenith Desktop")
         );
     }

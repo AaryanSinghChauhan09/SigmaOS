@@ -1,14 +1,13 @@
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 // Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
 // Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
-
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -188,16 +187,20 @@ impl TCPConnection for SimpleSocket {
             return Err(NetworkError::ConnectionFailed);
         }
 
-        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
 
         // Transition: Closed -> SynSent -> Established
-        self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
-        self.state.store(TCPState::Established as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
 
     fn listen(&mut self) -> Result<(), NetworkError> {
-        self.state.store(TCPState::Listen as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Listen as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -227,7 +230,8 @@ impl TCPConnection for SimpleSocket {
     }
 
     fn close(&mut self) -> Result<(), NetworkError> {
-        self.state.store(TCPState::Closed as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Closed as usize, Ordering::SeqCst);
         Ok(())
     }
 
@@ -255,7 +259,8 @@ pub trait UDPSocket {
 
 impl UDPSocket for SimpleSocket {
     fn sendto(&mut self, data: &[u8], remote_port: Port) -> Result<usize, NetworkError> {
-        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
         Ok(data.len())
     }
 
@@ -492,7 +497,8 @@ impl ZeroCopyNetwork {
 
 impl ZeroCopy for ZeroCopyNetwork {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError> {
-        self.dma_buffer.store(data.as_ptr() as usize, Ordering::SeqCst);
+        self.dma_buffer
+            .store(data.as_ptr() as usize, Ordering::SeqCst);
         Ok(data.len())
     }
 
@@ -696,7 +702,6 @@ impl Default for SimpleNetworkStack {
     }
 }
 
-
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
@@ -706,7 +711,11 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        if let Some(pos) = self.sockets.iter().position(|s| s.as_ref().map_or(false, |s| s.id() == id)) {
+        if let Some(pos) = self
+            .sockets
+            .iter()
+            .position(|s| s.as_ref().map_or(false, |s| s.id() == id))
+        {
             self.sockets.remove(pos);
             Ok(())
         } else {

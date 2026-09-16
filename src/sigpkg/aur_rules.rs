@@ -2,7 +2,6 @@
 // SigmaOS AUR Rules, Linting & Reproducible Compilation Pipeline
 // Native Rust implementation of Arch Linux AUR security linting (namcap parity) & makepkg pipeline
 
-
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -330,7 +329,11 @@ impl AurTrustedUserAdoptionEngine {
         }
     }
 
-    pub fn adopt_orphaned_pkgbase(&mut self, pkgbase: &str, new_maintainer: &str) -> Result<(), &'static str> {
+    pub fn adopt_orphaned_pkgbase(
+        &mut self,
+        pkgbase: &str,
+        new_maintainer: &str,
+    ) -> Result<(), &'static str> {
         if let Some(rec) = self.records.get_mut(pkgbase) {
             if rec.maintainer.is_none() {
                 rec.maintainer = Some(new_maintainer.to_string());
@@ -344,7 +347,12 @@ impl AurTrustedUserAdoptionEngine {
         }
     }
 
-    pub fn promote_by_tu_vote(&mut self, pkgbase: &str, tu_user: &str, vote_threshold: u32) -> Result<bool, &'static str> {
+    pub fn promote_by_tu_vote(
+        &mut self,
+        pkgbase: &str,
+        tu_user: &str,
+        vote_threshold: u32,
+    ) -> Result<bool, &'static str> {
         if !tu_user.starts_with("tu_") {
             return Err("AurTU: Only Trusted Users may initiate package promotion");
         }
@@ -394,7 +402,8 @@ impl AurNamcapPortclippyLinter {
                     findings.push(AurLintFinding {
                         rule_id: "PORTCLIPPY-LIC-001".to_string(),
                         severity: LintSeverity::Warning,
-                        message: "Non-standard license taxonomy string detected in .SRCINFO".to_string(),
+                        message: "Non-standard license taxonomy string detected in .SRCINFO"
+                            .to_string(),
                         line_number: Some(line_no),
                     });
                 }
@@ -403,7 +412,9 @@ impl AurNamcapPortclippyLinter {
                 findings.push(AurLintFinding {
                     rule_id: "NAMCAP-SEC-002".to_string(),
                     severity: LintSeverity::Warning,
-                    message: "Insecure unencrypted http:// source URL in .SRCINFO (prefer https://)".to_string(),
+                    message:
+                        "Insecure unencrypted http:// source URL in .SRCINFO (prefer https://)"
+                            .to_string(),
                     line_number: Some(line_no),
                 });
             }
@@ -512,11 +523,17 @@ mod tests {
         tu_engine.register_pkgbase("neovim-git", None);
 
         assert!(tu_engine.flag_out_of_date("neovim-git"));
-        assert!(tu_engine.adopt_orphaned_pkgbase("neovim-git", "archdev").is_ok());
+        assert!(tu_engine
+            .adopt_orphaned_pkgbase("neovim-git", "archdev")
+            .is_ok());
 
         // Test promotion voting
-        assert!(!tu_engine.promote_by_tu_vote("neovim-git", "tu_alice", 10).unwrap());
-        let is_promoted = tu_engine.promote_by_tu_vote("neovim-git", "tu_bob", 10).unwrap();
+        assert!(!tu_engine
+            .promote_by_tu_vote("neovim-git", "tu_alice", 10)
+            .unwrap());
+        let is_promoted = tu_engine
+            .promote_by_tu_vote("neovim-git", "tu_bob", 10)
+            .unwrap();
         assert!(is_promoted);
     }
 
@@ -531,6 +548,8 @@ mod tests {
         let bad_srcinfo = "source = https://example.com/myapp.tar.gz\n";
         let bad_findings = linter.lint_srcinfo(bad_srcinfo);
         assert!(bad_findings.iter().any(|f| f.rule_id == "NAMCAP-SRC-001"));
-        assert!(bad_findings.iter().any(|f| f.rule_id == "PORTCLIPPY-LIC-002"));
+        assert!(bad_findings
+            .iter()
+            .any(|f| f.rule_id == "PORTCLIPPY-LIC-002"));
     }
 }

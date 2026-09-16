@@ -1,8 +1,8 @@
-use std::vec::Vec;
 /// Next-Generation AI-Native and Energy-Aware Subsystems for SigmaOS
 /// Replicates adaptive personas, predictive syscall pre-fetching,
 /// AI scheduling, and local multi-model orchestrations.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 // ==========================================
 // 1. Adaptive Kernel Personas

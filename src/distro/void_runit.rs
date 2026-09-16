@@ -5,7 +5,6 @@
  * health checking, and automatic restart policy governance.
  */
 
-
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
@@ -228,7 +227,11 @@ impl RunitSupervisor {
             .count()
     }
 
-    pub fn monitor_service_health(&mut self, name: &str, is_healthy: bool) -> Option<RunitServiceStatus> {
+    pub fn monitor_service_health(
+        &mut self,
+        name: &str,
+        is_healthy: bool,
+    ) -> Option<RunitServiceStatus> {
         if let Some(service) = self.services.get_mut(name) {
             let state = service.check_health(is_healthy);
             Some(state)

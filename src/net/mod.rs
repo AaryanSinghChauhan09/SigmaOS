@@ -1,22 +1,22 @@
 pub mod dns;
-pub mod socket;
-pub mod stack;
+pub mod linux_bsd_network_innovations;
 pub mod mesh;
-pub mod torrent;
-pub mod tcp_ip_implementation;
 pub mod network_namespace;
 pub mod network_syscalls;
-pub mod linux_bsd_network_innovations;
+pub mod socket;
+pub mod stack;
+pub mod tcp_ip_implementation;
+pub mod torrent;
 
 pub use linux_bsd_network_innovations::{
     BbrState, CongestionAlgorithm, FreeBsdNetgraphGraphRouter, LinuxBbrCongestionEngine,
-    NetgraphNode, NetgraphNodeType, OpenBsdPfCarpPfsyncStateEngine, PfStateEntry, WireguardPqcTunnelEngine,
-    XdpAction, XdpZeroCopyPacketRingEngine,
+    NetgraphNode, NetgraphNodeType, OpenBsdPfCarpPfsyncStateEngine, PfStateEntry,
+    WireguardPqcTunnelEngine, XdpAction, XdpZeroCopyPacketRingEngine,
 };
 
 pub use torrent::{
-    BencodeValue, DhtNode, DhtRoutingTable, MagnetLink, PieceDescriptor, PieceManager,
-    PieceState, TorrentClient, TorrentMetadata, UtpDelayController,
+    BencodeValue, DhtNode, DhtRoutingTable, MagnetLink, PieceDescriptor, PieceManager, PieceState,
+    TorrentClient, TorrentMetadata, UtpDelayController,
 };
 
 pub use stack::{
@@ -25,30 +25,33 @@ pub use stack::{
 };
 
 pub use tcp_ip_implementation::{
-    TcpIpStack, TcpSocket, UdpSocket, IPv4Address, MacAddress, Port, RoutingTable, Route,
-    ArpTable, DnsResolver, DhcpClient, TcpConnectionControlBlock,
+    ArpTable, DhcpClient, DnsResolver, IPv4Address, MacAddress, Port, Route, RoutingTable,
+    TcpConnectionControlBlock, TcpIpStack, TcpSocket, UdpSocket,
 };
 
 pub use network_namespace::{
-    NetworkNamespace, NetworkNamespaceId, NetworkInterface, Route as NamespaceRoute, FirewallRule, FirewallAction,
-    VirtualBridge, NetworkNamespaceManager,
+    FirewallAction, FirewallRule, NetworkInterface, NetworkNamespace, NetworkNamespaceId,
+    NetworkNamespaceManager, Route as NamespaceRoute, VirtualBridge,
 };
 
 pub use network_syscalls::{
-    NetworkSyscalls, SocketFd, SocketMetadata, SockAddr, SocketState, NamespaceSocketTable,
-    CLONE_NEWNET, AF_INET, AF_INET6, AF_UNIX, SOCK_STREAM, SOCK_DGRAM, SOCK_RAW,
-    IPPROTO_TCP, IPPROTO_UDP, IPPROTO_IP,
+    NamespaceSocketTable, NetworkSyscalls, SockAddr, SocketFd, SocketMetadata, SocketState,
+    AF_INET, AF_INET6, AF_UNIX, CLONE_NEWNET, IPPROTO_IP, IPPROTO_TCP, IPPROTO_UDP, SOCK_DGRAM,
+    SOCK_RAW, SOCK_STREAM,
 };
 
 pub mod tc_qdisc_sovereign;
-pub use tc_qdisc_sovereign::{TbfQdisc, PrioQdisc, HtbQdisc, HtbClass, FqCodelQdisc, Packet as QdiscPacket};
+pub use tc_qdisc_sovereign::{
+    FqCodelQdisc, HtbClass, HtbQdisc, Packet as QdiscPacket, PrioQdisc, TbfQdisc,
+};
 
 pub mod wireguard_sovereign;
 pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};
 
 pub mod tech_news_redirection;
 pub use tech_news_redirection::{
-    NewsArticleItem, SovereignTechNewsRedirectionEngine, TechPublicationCategory, TechPublicationEntry,
+    NewsArticleItem, SovereignTechNewsRedirectionEngine, TechPublicationCategory,
+    TechPublicationEntry,
 };
 
 pub mod open_source_browser_innovations;

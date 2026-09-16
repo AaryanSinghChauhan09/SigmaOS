@@ -4,9 +4,9 @@ pub mod distro_drivers;
 pub mod dkms_autoloader;
 pub mod driver_test_framework;
 pub mod framework;
+pub mod gpu_amd_rdna;
 pub mod gpu_framework;
 pub mod gpu_intel_i915;
-pub mod gpu_amd_rdna;
 pub mod grid;
 pub mod irp_system;
 pub mod mapper;
@@ -22,26 +22,30 @@ pub mod ubuntu_common_drivers;
 pub mod vault;
 pub mod wifi_broadcom_bcm4318;
 
-pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use driver_test_framework::{
-    DriverTestRunner, TestResult, TestStatus, TestSummary, GpuTestSuite, NicTestSuite,
-    StorageTestSuite, WifiTestSuite, MockPciDevice, MockMmioSpace, QemuSimulator, GuestOs,
-};
-pub use gpu_intel_i915::{
-    IntelGpuDriver, IntelGpuPciDriver, GpuMemoryManager, DisplayMode, GpuCommandBuilder,
+    DriverTestRunner, GpuTestSuite, GuestOs, MockMmioSpace, MockPciDevice, NicTestSuite,
+    QemuSimulator, StorageTestSuite, TestResult, TestStatus, TestSummary, WifiTestSuite,
 };
 pub use gpu_amd_rdna::{
-    AmdGpuDriver, AmdGpuPciDriver, AmdGpuMemoryManager, DisplayConfiguration, GpxCommandQueue,
+    AmdGpuDriver, AmdGpuMemoryManager, AmdGpuPciDriver, DisplayConfiguration, GpxCommandQueue,
 };
+pub use gpu_framework::{
+    AmdgpuDriver, GpuBuffer, GpuDriver, GpuError, GpuInfo, GpuManager, GpuType, IntelDriver,
+    NvidiaDriver, VirtioGpuDriver,
+};
+pub use gpu_intel_i915::{
+    DisplayMode, GpuCommandBuilder, GpuMemoryManager, IntelGpuDriver, IntelGpuPciDriver,
+};
+pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use mapper::{DriverMapper, MapperCategory};
-pub use nic_intel_e1000::{
-    IntelNicDriver, IntelNicPciDriver, DmaRing, RxDescriptor, TxDescriptor,
+pub use network_framework::{
+    AtherosAthDriver, BroadcomBrcmDriver, EthernetDriver, IntelIwlWifiDriver, NetworkDriver,
+    NetworkError, NetworkInfo, NetworkManager, NetworkType, RealtekRtwDriver, WifiChipsetVendor,
+    WirelessNetwork,
 };
+pub use nic_intel_e1000::{DmaRing, IntelNicDriver, IntelNicPciDriver, RxDescriptor, TxDescriptor};
 pub use nvme_storage::{
-    NvmeController, NvmePciDriver, NvmeNamespace, QueuePair, NvmeCompletionEntry,
-};
-pub use wifi_broadcom_bcm4318::{
-    BroadcomWifiDriver, BroadcomWifiPciDriver, WifiStandard, Band, AssociationState,
+    NvmeCompletionEntry, NvmeController, NvmeNamespace, NvmePciDriver, QueuePair,
 };
 pub use pci_bus::{
     PciAddress, PciBarInfo, PciBarType, PciBusManager, PciDeviceNode, PciDriverMatchRule,
@@ -49,13 +53,17 @@ pub use pci_bus::{
     SimulatedPciHardwareAccess,
 };
 pub use pci_enumeration::{
-    PciEnumerator, PciDeviceInfo, PciBar, PciDriver, PciDriverManager, PciBarType as EnumPciBarType,
-    pci_read_u8, pci_read_u16, pci_read_u32, pci_write_u8, pci_write_u16, pci_write_u32,
+    pci_read_u16, pci_read_u32, pci_read_u8, pci_write_u16, pci_write_u32, pci_write_u8, PciBar,
+    PciBarType as EnumPciBarType, PciDeviceInfo, PciDriver, PciDriverManager, PciEnumerator,
 };
 pub use pods::{PeripheralPod, PodType};
 pub use rootkit::{
     FileDirectoryEntry, MappedView, SectionBackingType, SectionObject, StealthFilterDriver,
     SyscallStubDisassembler,
+};
+pub use shims::{
+    HdaSampleRate, IntelE1000Driver, IntelHdaDriver, VirtioBlockDriver, VirtioBlockOp,
+    VirtioBlockRequest,
 };
 pub use ubuntu_common_drivers::{
     DkmsAbiRebuildEngine, DkmsModuleSpec, DriverHardwareCategory, DriverLicense,
@@ -63,13 +71,6 @@ pub use ubuntu_common_drivers::{
     UbuntuLivepatchDriverHook,
 };
 pub use vault::{DriverArchiveVault, VaultEntry};
-pub use shims::{IntelE1000Driver, HdaSampleRate, IntelHdaDriver, VirtioBlockOp, VirtioBlockRequest, VirtioBlockDriver};
-pub use gpu_framework::{
-    AmdgpuDriver, GpuBuffer, GpuDriver, GpuError, GpuInfo, GpuManager, GpuType, IntelDriver,
-    NvidiaDriver, VirtioGpuDriver,
-};
-pub use network_framework::{
-    AtherosAthDriver, BroadcomBrcmDriver, EthernetDriver, IntelIwlWifiDriver, NetworkDriver,
-    NetworkError, NetworkInfo, NetworkManager, NetworkType, RealtekRtwDriver, WifiChipsetVendor,
-    WirelessNetwork,
+pub use wifi_broadcom_bcm4318::{
+    AssociationState, Band, BroadcomWifiDriver, BroadcomWifiPciDriver, WifiStandard,
 };

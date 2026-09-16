@@ -1,8 +1,8 @@
-use std::vec::Vec;
 /// Open-Source Absorption and Synchronization Subsystem for SigmaOS
 /// Implements Pledge/Unveil sandboxing, Post-Quantum Cryptography secure channels,
 /// DPLL SAT-solving package dependency resolvers, and Content-Addressed Storage.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 // ==========================================
 // 1. Process Privilege Reduction (Pledge & Unveil)
@@ -491,7 +491,11 @@ mod tests {
     #[test]
     fn test_gitops_drift_reconciliation() {
         let mut gitops = GitOpsDeclarativeStateEngine::new(true);
-        gitops.track_resource("etc/hosts", b"127.0.0.1 localhost", b"127.0.0.1 localhost\n10.0.0.1 rogue");
+        gitops.track_resource(
+            "etc/hosts",
+            b"127.0.0.1 localhost",
+            b"127.0.0.1 localhost\n10.0.0.1 rogue",
+        );
 
         let drifted = gitops.detect_drift();
         assert_eq!(drifted.len(), 1);

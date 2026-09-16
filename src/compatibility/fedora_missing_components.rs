@@ -105,7 +105,11 @@ impl FedoraDnf5PackageEngine {
         let mut groups = BTreeMap::new();
         groups.insert(
             "development-tools".to_string(),
-            vec!["gcc".to_string(), "make".to_string(), "autoconf".to_string()],
+            vec![
+                "gcc".to_string(),
+                "make".to_string(),
+                "autoconf".to_string(),
+            ],
         );
 
         Self {
@@ -200,7 +204,10 @@ impl FedoraAnacondaKickstartEngine {
                     self.partitions.push(KickstartPartition {
                         mount_point: parts[1].to_string(),
                         fstype: parts[2].trim_start_matches("--fstype=").to_string(),
-                        size_mb: parts[3].trim_start_matches("--size=").parse().unwrap_or(1024),
+                        size_mb: parts[3]
+                            .trim_start_matches("--size=")
+                            .parse()
+                            .unwrap_or(1024),
                     });
                 }
             }
@@ -287,7 +294,8 @@ mod tests {
 
     #[test]
     fn test_fedora_anaconda_kickstart_engine() {
-        let ks_content = "timezone UTC\npart / --fstype=ext4 --size=20480\n%packages\n@core\nkernel\n%end";
+        let ks_content =
+            "timezone UTC\npart / --fstype=ext4 --size=20480\n%packages\n@core\nkernel\n%end";
         let mut ks = FedoraAnacondaKickstartEngine::new();
         ks.parse_kickstart(ks_content);
 

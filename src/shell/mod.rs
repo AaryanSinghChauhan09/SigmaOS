@@ -15,11 +15,11 @@ pub mod terminal_emulator;
 pub mod zsh_bash_parity;
 
 pub use self::command::{ShellCommand, SimpleShellSession};
+pub use self::repl::ShellRepl;
 pub use self::sigma_sh::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
     PipelineExecutor, ShellPledgeUnveilGuard, ShellSyntaxHighlighter, ZshPromptFormatter,
 };
-pub use self::repl::ShellRepl;
 
 // FFI bindings to Nim SigmaShell
 extern "C" {
@@ -48,7 +48,7 @@ impl SigmaShell {
             }
         }
     }
-    
+
     pub fn run(&mut self) {
         unsafe {
             sigma_shell_run(self.handle);
@@ -67,7 +67,7 @@ impl Drop for SigmaShell {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_shell_creation() {
         // Note: Requires Nim library to be compiled

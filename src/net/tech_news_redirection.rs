@@ -56,34 +56,258 @@ impl SovereignTechNewsRedirectionEngine {
 
     fn bootstrap_default_publications(&mut self) {
         let entries = vec![
-            ("itsfoss", "ItsFOSS", "itsfoss.com", "https://itsfoss.com/feed/", "https://itsfoss.com", TechPublicationCategory::LinuxAndOpenSource, "Linux tutorials, distro news and open-source updates"),
-            ("9to5linux", "9to5Linux", "9to5linux.com", "https://9to5linux.com/feed", "https://9to5linux.com", TechPublicationCategory::LinuxAndOpenSource, "Linux release news and desktop distro updates"),
-            ("geekygadgets", "Geeky Gadgets", "geeky-gadgets.com", "https://www.geeky-gadgets.com/feed/", "https://www.geeky-gadgets.com", TechPublicationCategory::HardwareAndGadgets, "Gadget news, hardware reviews and tech innovations"),
-            ("linuxdotcom", "Linux.com", "linux.com", "https://www.linux.com/feed/", "https://www.linux.com", TechPublicationCategory::LinuxAndOpenSource, "Official Linux news, developer guides and industry news"),
-            ("kdnuggets", "KDnuggets", "kdnuggets.com", "https://www.kdnuggets.com/feed", "https://www.kdnuggets.com", TechPublicationCategory::AiAndDataScience, "AI, Machine Learning, Data Science & Analytics tutorials"),
-            ("hwbusters", "HW Busters", "hwbusters.com", "https://hwbusters.com/feed/", "https://hwbusters.com", TechPublicationCategory::HardwareAndGadgets, "Power supply, GPU, CPU and hardware benchmarking analysis"),
-            ("itdaily", "ITDaily", "itdaily.com", "https://www.itdaily.com/feed/", "https://www.itdaily.com", TechPublicationCategory::EnterpriseAndCloud, "Enterprise IT, cloud computing and infrastructure insights"),
-            ("howtogeek", "How-To Geek", "howtogeek.com", "https://www.howtogeek.com/feed/", "https://www.howtogeek.com", TechPublicationCategory::WindowsAndCrossPlatform, "Tech explainer guides, software tips and OS tutorials"),
-            ("linuxorg", "Linux.org", "linux.org", "https://www.linux.org/forums/-/index.rss", "https://www.linux.org", TechPublicationCategory::LinuxAndOpenSource, "Linux community discussions and distro forums"),
-            ("infoworld", "InfoWorld", "infoworld.com", "https://www.infoworld.com/feed/", "https://www.infoworld.com", TechPublicationCategory::EnterpriseAndCloud, "Software development, architecture and enterprise tech"),
-            ("linuxfoundation", "Linux Foundation", "linuxfoundation.org", "https://www.linuxfoundation.org/feed", "https://www.linuxfoundation.org", TechPublicationCategory::LinuxAndOpenSource, "Open source ecosystem governance and standards"),
-            ("makeuseof", "MakeUseOf", "makeuseof.com", "https://www.makeuseof.com/feed/", "https://www.makeuseof.com", TechPublicationCategory::WindowsAndCrossPlatform, "Consumer tech guides, Linux tricks and software reviews"),
-            ("pcworld", "PCWorld", "pcworld.com", "https://www.pcworld.com/feed/", "https://www.pcworld.com", TechPublicationCategory::HardwareAndGadgets, "PC hardware, GPU benchmarks and desktop software"),
-            ("marktechpost", "MarkTechPost", "marktechpost.com", "https://www.marktechpost.com/feed/", "https://www.marktechpost.com", TechPublicationCategory::AiAndDataScience, "Artificial Intelligence research and LLM model breakthroughs"),
-            ("windowslatest", "Windows Latest", "windowslatest.com", "https://www.windowslatest.com/feed/", "https://www.windowslatest.com", TechPublicationCategory::WindowsAndCrossPlatform, "Windows OS updates, features and platform news"),
-            ("techspot", "TechSpot", "techspot.com", "https://www.techspot.com/backend/rss.xml", "https://www.techspot.com", TechPublicationCategory::HardwareAndGadgets, "Tech news, hardware reviews and gaming performance"),
-            ("thenewstack", "The New Stack", "thenewstack.io", "https://thenewstack.io/feed/", "https://thenewstack.io", TechPublicationCategory::EnterpriseAndCloud, "Cloud-native, Kubernetes, microservices and devops"),
-            ("techpowerup", "TechPowerUp", "techpowerup.com", "https://www.techpowerup.com/rss/news", "https://www.techpowerup.com", TechPublicationCategory::HardwareAndGadgets, "GPU databases, hardware news and firmware reviews"),
-            ("windowscentral", "Windows Central", "windowscentral.com", "https://www.windowscentral.com/rss.xml", "https://www.windowscentral.com", TechPublicationCategory::WindowsAndCrossPlatform, "Windows ecosystem, laptops, surface and PC hardware"),
-            ("phoronix", "Phoronix", "phoronix.com", "https://www.phoronix.com/phoronix-rss.php", "https://www.phoronix.com", TechPublicationCategory::LinuxAndOpenSource, "Linux hardware benchmarks, kernel patches and graphics drivers"),
-            ("techcrunch", "TechCrunch", "techcrunch.com", "https://techcrunch.com/feed/", "https://techcrunch.com", TechPublicationCategory::EnterpriseAndCloud, "Tech startup news, venture capital and industry trends"),
-            ("xdadevelopers", "XDA Developers", "xda-developers.com", "https://www.xda-developers.com/feed/", "https://www.xda-developers.com", TechPublicationCategory::WindowsAndCrossPlatform, "Android, mobile tech, custom ROMs and PC hardware"),
-            ("zdnet", "ZDNET", "zdnet.com", "https://www.zdnet.com/news/rss.xml", "https://www.zdnet.com", TechPublicationCategory::EnterpriseAndCloud, "Enterprise technology news, security and business IT"),
-            ("opensourceforu", "Open Source For You", "opensourceforu.com", "https://www.opensourceforu.com/feed/", "https://www.opensourceforu.com", TechPublicationCategory::LinuxAndOpenSource, "Open source development, Linux kernel articles and tools"),
-            ("pcmag", "PCMag", "pcmag.com", "https://www.pcmag.com/rss.xml", "https://www.pcmag.com", TechPublicationCategory::HardwareAndGadgets, "Lab-tested hardware reviews and technology buyer guides"),
-            ("linuxteck", "LinuxTeck", "linuxteck.com", "https://www.linuxteck.com/feed/", "https://www.linuxteck.com", TechPublicationCategory::LinuxAndOpenSource, "Linux sysadmin tutorials, DevOps and security guides"),
-            ("appuals", "Appuals", "appuals.com", "https://appuals.com/feed/", "https://appuals.com", TechPublicationCategory::WindowsAndCrossPlatform, "Software troubleshooting, OS error fixes and guides"),
-            ("distrowatch", "DistroWatch", "distrowatch.com", "https://distrowatch.com/news/dw.xml", "https://distrowatch.com", TechPublicationCategory::LinuxAndOpenSource, "Linux and BSD distribution release tracking and rankings"),
+            (
+                "itsfoss",
+                "ItsFOSS",
+                "itsfoss.com",
+                "https://itsfoss.com/feed/",
+                "https://itsfoss.com",
+                TechPublicationCategory::LinuxAndOpenSource,
+                "Linux tutorials, distro news and open-source updates",
+            ),
+            (
+                "9to5linux",
+                "9to5Linux",
+                "9to5linux.com",
+                "https://9to5linux.com/feed",
+                "https://9to5linux.com",
+                TechPublicationCategory::LinuxAndOpenSource,
+                "Linux release news and desktop distro updates",
+            ),
+            (
+                "geekygadgets",
+                "Geeky Gadgets",
+                "geeky-gadgets.com",
+                "https://www.geeky-gadgets.com/feed/",
+                "https://www.geeky-gadgets.com",
+                TechPublicationCategory::HardwareAndGadgets,
+                "Gadget news, hardware reviews and tech innovations",
+            ),
+            (
+                "linuxdotcom",
+                "Linux.com",
+                "linux.com",
+                "https://www.linux.com/feed/",
+                "https://www.linux.com",
+                TechPublicationCategory::LinuxAndOpenSource,
+                "Official Linux news, developer guides and industry news",
+            ),
+            (
+                "kdnuggets",
+                "KDnuggets",
+                "kdnuggets.com",
+                "https://www.kdnuggets.com/feed",
+                "https://www.kdnuggets.com",
+                TechPublicationCategory::AiAndDataScience,
+                "AI, Machine Learning, Data Science & Analytics tutorials",
+            ),
+            (
+                "hwbusters",
+                "HW Busters",
+                "hwbusters.com",
+                "https://hwbusters.com/feed/",
+                "https://hwbusters.com",
+                TechPublicationCategory::HardwareAndGadgets,
+                "Power supply, GPU, CPU and hardware benchmarking analysis",
+            ),
+            (
+                "itdaily",
+                "ITDaily",
+                "itdaily.com",
+                "https://www.itdaily.com/feed/",
+                "https://www.itdaily.com",
+                TechPublicationCategory::EnterpriseAndCloud,
+                "Enterprise IT, cloud computing and infrastructure insights",
+            ),
+            (
+                "howtogeek",
+                "How-To Geek",
+                "howtogeek.com",
+                "https://www.howtogeek.com/feed/",
+                "https://www.howtogeek.com",
+                TechPublicationCategory::WindowsAndCrossPlatform,
+                "Tech explainer guides, software tips and OS tutorials",
+            ),
+            (
+                "linuxorg",
+                "Linux.org",
+                "linux.org",
+                "https://www.linux.org/forums/-/index.rss",
+                "https://www.linux.org",
+                TechPublicationCategory::LinuxAndOpenSource,
+                "Linux community discussions and distro forums",
+            ),
+            (
+                "infoworld",
+                "InfoWorld",
+                "infoworld.com",
+                "https://www.infoworld.com/feed/",
+                "https://www.infoworld.com",
+                TechPublicationCategory::EnterpriseAndCloud,
+                "Software development, architecture and enterprise tech",
+            ),
+            (
+                "linuxfoundation",
+                "Linux Foundation",
+                "linuxfoundation.org",
+                "https://www.linuxfoundation.org/feed",
+                "https://www.linuxfoundation.org",
+                TechPublicationCategory::LinuxAndOpenSource,
+                "Open source ecosystem governance and standards",
+            ),
+            (
+                "makeuseof",
+                "MakeUseOf",
+                "makeuseof.com",
+                "https://www.makeuseof.com/feed/",
+                "https://www.makeuseof.com",
+                TechPublicationCategory::WindowsAndCrossPlatform,
+                "Consumer tech guides, Linux tricks and software reviews",
+            ),
+            (
+                "pcworld",
+                "PCWorld",
+                "pcworld.com",
+                "https://www.pcworld.com/feed/",
+                "https://www.pcworld.com",
+                TechPublicationCategory::HardwareAndGadgets,
+                "PC hardware, GPU benchmarks and desktop software",
+            ),
+            (
+                "marktechpost",
+                "MarkTechPost",
+                "marktechpost.com",
+                "https://www.marktechpost.com/feed/",
+                "https://www.marktechpost.com",
+                TechPublicationCategory::AiAndDataScience,
+                "Artificial Intelligence research and LLM model breakthroughs",
+            ),
+            (
+                "windowslatest",
+                "Windows Latest",
+                "windowslatest.com",
+                "https://www.windowslatest.com/feed/",
+                "https://www.windowslatest.com",
+                TechPublicationCategory::WindowsAndCrossPlatform,
+                "Windows OS updates, features and platform news",
+            ),
+            (
+                "techspot",
+                "TechSpot",
+                "techspot.com",
+                "https://www.techspot.com/backend/rss.xml",
+                "https://www.techspot.com",
+                TechPublicationCategory::HardwareAndGadgets,
+                "Tech news, hardware reviews and gaming performance",
+            ),
+            (
+                "thenewstack",
+                "The New Stack",
+                "thenewstack.io",
+                "https://thenewstack.io/feed/",
+                "https://thenewstack.io",
+                TechPublicationCategory::EnterpriseAndCloud,
+                "Cloud-native, Kubernetes, microservices and devops",
+            ),
+            (
+                "techpowerup",
+                "TechPowerUp",
+                "techpowerup.com",
+                "https://www.techpowerup.com/rss/news",
+                "https://www.techpowerup.com",
+                TechPublicationCategory::HardwareAndGadgets,
+                "GPU databases, hardware news and firmware reviews",
+            ),
+            (
+                "windowscentral",
+                "Windows Central",
+                "windowscentral.com",
+                "https://www.windowscentral.com/rss.xml",
+                "https://www.windowscentral.com",
+                TechPublicationCategory::WindowsAndCrossPlatform,
+                "Windows ecosystem, laptops, surface and PC hardware",
+            ),
+            (
+                "phoronix",
+                "Phoronix",
+                "phoronix.com",
+                "https://www.phoronix.com/phoronix-rss.php",
+                "https://www.phoronix.com",
+                TechPublicationCategory::LinuxAndOpenSource,
+                "Linux hardware benchmarks, kernel patches and graphics drivers",
+            ),
+            (
+                "techcrunch",
+                "TechCrunch",
+                "techcrunch.com",
+                "https://techcrunch.com/feed/",
+                "https://techcrunch.com",
+                TechPublicationCategory::EnterpriseAndCloud,
+                "Tech startup news, venture capital and industry trends",
+            ),
+            (
+                "xdadevelopers",
+                "XDA Developers",
+                "xda-developers.com",
+                "https://www.xda-developers.com/feed/",
+                "https://www.xda-developers.com",
+                TechPublicationCategory::WindowsAndCrossPlatform,
+                "Android, mobile tech, custom ROMs and PC hardware",
+            ),
+            (
+                "zdnet",
+                "ZDNET",
+                "zdnet.com",
+                "https://www.zdnet.com/news/rss.xml",
+                "https://www.zdnet.com",
+                TechPublicationCategory::EnterpriseAndCloud,
+                "Enterprise technology news, security and business IT",
+            ),
+            (
+                "opensourceforu",
+                "Open Source For You",
+                "opensourceforu.com",
+                "https://www.opensourceforu.com/feed/",
+                "https://www.opensourceforu.com",
+                TechPublicationCategory::LinuxAndOpenSource,
+                "Open source development, Linux kernel articles and tools",
+            ),
+            (
+                "pcmag",
+                "PCMag",
+                "pcmag.com",
+                "https://www.pcmag.com/rss.xml",
+                "https://www.pcmag.com",
+                TechPublicationCategory::HardwareAndGadgets,
+                "Lab-tested hardware reviews and technology buyer guides",
+            ),
+            (
+                "linuxteck",
+                "LinuxTeck",
+                "linuxteck.com",
+                "https://www.linuxteck.com/feed/",
+                "https://www.linuxteck.com",
+                TechPublicationCategory::LinuxAndOpenSource,
+                "Linux sysadmin tutorials, DevOps and security guides",
+            ),
+            (
+                "appuals",
+                "Appuals",
+                "appuals.com",
+                "https://appuals.com/feed/",
+                "https://appuals.com",
+                TechPublicationCategory::WindowsAndCrossPlatform,
+                "Software troubleshooting, OS error fixes and guides",
+            ),
+            (
+                "distrowatch",
+                "DistroWatch",
+                "distrowatch.com",
+                "https://distrowatch.com/news/dw.xml",
+                "https://distrowatch.com",
+                TechPublicationCategory::LinuxAndOpenSource,
+                "Linux and BSD distribution release tracking and rankings",
+            ),
         ];
 
         for (id, name, domain, feed_url, canonical_url, category, desc) in entries {
@@ -165,7 +389,9 @@ impl SovereignTechNewsRedirectionEngine {
         let q = query.to_lowercase();
         self.cached_articles
             .iter()
-            .filter(|a| a.title.to_lowercase().contains(&q) || a.summary.to_lowercase().contains(&q))
+            .filter(|a| {
+                a.title.to_lowercase().contains(&q) || a.summary.to_lowercase().contains(&q)
+            })
             .cloned()
             .collect()
     }
@@ -210,12 +436,14 @@ mod tests {
     fn test_category_filtering() {
         let engine = SovereignTechNewsRedirectionEngine::new();
 
-        let linux_pubs = engine.get_publications_by_category(TechPublicationCategory::LinuxAndOpenSource);
+        let linux_pubs =
+            engine.get_publications_by_category(TechPublicationCategory::LinuxAndOpenSource);
         assert!(linux_pubs.iter().any(|p| p.name == "ItsFOSS"));
         assert!(linux_pubs.iter().any(|p| p.name == "DistroWatch"));
         assert!(linux_pubs.iter().any(|p| p.name == "Phoronix"));
 
-        let ai_pubs = engine.get_publications_by_category(TechPublicationCategory::AiAndDataScience);
+        let ai_pubs =
+            engine.get_publications_by_category(TechPublicationCategory::AiAndDataScience);
         assert!(ai_pubs.iter().any(|p| p.name == "KDnuggets"));
         assert!(ai_pubs.iter().any(|p| p.name == "MarkTechPost"));
     }

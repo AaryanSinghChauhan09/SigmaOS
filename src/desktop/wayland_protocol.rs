@@ -263,7 +263,9 @@ impl WaylandProtocolEngine {
     }
 
     pub fn get_surface_mut(&mut self, surface_id: u32) -> Option<&mut WlSurface> {
-        self.surfaces.iter_mut().find(|s| s.surface_id == surface_id)
+        self.surfaces
+            .iter_mut()
+            .find(|s| s.surface_id == surface_id)
     }
 
     pub fn attach_buffer(
@@ -369,7 +371,8 @@ impl WaylandProtocolEngine {
         }
         let seat = WlSeat::new(seat_id, name);
         self.seats.push(seat);
-        self.data_devices.push(WlDataDevice::new(seat_id + 1000, seat_id));
+        self.data_devices
+            .push(WlDataDevice::new(seat_id + 1000, seat_id));
         Ok(())
     }
 
@@ -571,7 +574,9 @@ mod tests {
         let offer_id = 500;
         let mimes = ["text/plain;charset=utf-8", "text/uri-list"];
 
-        assert!(engine.register_data_offer(device_id, offer_id, &mimes).is_ok());
+        assert!(engine
+            .register_data_offer(device_id, offer_id, &mimes)
+            .is_ok());
         assert!(engine.set_selection(device_id, offer_id).is_ok());
 
         let device = &engine.data_devices[0];

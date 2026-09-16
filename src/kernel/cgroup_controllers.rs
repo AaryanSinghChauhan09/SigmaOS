@@ -75,7 +75,13 @@ impl DeviceController {
         self.deny_rules.push(rule);
     }
 
-    pub fn check_device_access(&mut self, device_type: DeviceType, major: u32, minor: u32, access: &str) -> bool {
+    pub fn check_device_access(
+        &mut self,
+        device_type: DeviceType,
+        major: u32,
+        minor: u32,
+        access: &str,
+    ) -> bool {
         // Check deny rules first
         for rule in &self.deny_rules {
             if self.matches_rule(rule, device_type, major, minor, access) {
@@ -95,7 +101,14 @@ impl DeviceController {
         self.default_allow
     }
 
-    fn matches_rule(&self, rule: &DeviceRule, device_type: DeviceType, major: u32, minor: u32, access: &str) -> bool {
+    fn matches_rule(
+        &self,
+        rule: &DeviceRule,
+        device_type: DeviceType,
+        major: u32,
+        minor: u32,
+        access: &str,
+    ) -> bool {
         if rule.device_type != DeviceType::Any && rule.device_type != device_type {
             return false;
         }
@@ -159,9 +172,9 @@ impl Controller for DeviceController {
 /// Hugetlb page sizes supported
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum HugepageSize {
-    Two,    // 2MB
-    One,    // 1GB
-    Thirty, // 32MB
+    Two,       // 2MB
+    One,       // 1GB
+    Thirty,    // 32MB
     SixtyFour, // 64MB
 }
 
@@ -187,9 +200,9 @@ impl HugepageSize {
 
 /// Hugetlb cgroup controller - manages huge page allocations
 pub struct HugetlbController {
-    limits: HashMap<HugepageSize, u64>, // bytes
+    limits: HashMap<HugepageSize, u64>,        // bytes
     current_usage: HashMap<HugepageSize, u64>, // bytes
-    peak_usage: HashMap<HugepageSize, u64>, // bytes
+    peak_usage: HashMap<HugepageSize, u64>,    // bytes
 }
 
 impl HugetlbController {
@@ -266,7 +279,12 @@ impl Controller for HugetlbController {
         for (size, &limit) in &self.limits {
             if let Some(&usage) = self.current_usage.get(size) {
                 if usage > limit {
-                    return Err(format!("Hugepage {} usage {} exceeds limit {}", size.name(), usage, limit));
+                    return Err(format!(
+                        "Hugepage {} usage {} exceeds limit {}",
+                        size.name(),
+                        usage,
+                        limit
+                    ));
                 }
             }
         }
@@ -284,7 +302,8 @@ impl Controller for HugetlbController {
                 _ => return Err(format!("Unknown hugepage size: {}", size_str)),
             };
 
-            let limit: u64 = value.parse()
+            let limit: u64 = value
+                .parse()
                 .map_err(|_| format!("Invalid limit value: {}", value))?;
 
             self.set_limit(size, limit);
@@ -311,10 +330,10 @@ impl Controller for HugetlbController {
 /// RDMA resource object type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RdmaObjectType {
-    Hca,    // Host Channel Adapter
-    Qp,     // Queue Pair
-    Cq,     // Completion Queue
-    Mr,     // Memory Region
+    Hca, // Host Channel Adapter
+    Qp,  // Queue Pair
+    Cq,  // Completion Queue
+    Mr,  // Memory Region
 }
 
 /// RDMA cgroup controller - limits RDMA resource usage
@@ -389,10 +408,16 @@ impl Controller for RdmaController {
 
     fn enforce(&mut self) -> Result<(), String> {
         if self.qp_current > self.qp_limit {
-            return Err(format!("Queue pair usage {} exceeds limit {}", self.qp_current, self.qp_limit));
+            return Err(format!(
+                "Queue pair usage {} exceeds limit {}",
+                self.qp_current, self.qp_limit
+            ));
         }
         if self.cq_current > self.cq_limit {
-            return Err(format!("Completion queue usage {} exceeds limit {}", self.cq_current, self.cq_limit));
+            return Err(format!(
+                "Completion queue usage {} exceeds limit {}",
+                self.cq_current, self.cq_limit
+            ));
         }
         Ok(())
     }
@@ -400,13 +425,15 @@ impl Controller for RdmaController {
     fn update_setting(&mut self, key: &str, value: &str) -> Result<(), String> {
         match key {
             "qp_limit" => {
-                let limit: u32 = value.parse()
+                let limit: u32 = value
+                    .parse()
                     .map_err(|_| format!("Invalid QP limit: {}", value))?;
                 self.set_qp_limit(limit);
                 Ok(())
             }
             "cq_limit" => {
-                let limit: u32 = value.parse()
+                let limit: u32 = value
+                    .parse()
                     .map_err(|_| format!("Invalid CQ limit: {}", value))?;
                 self.set_cq_limit(limit);
                 Ok(())
@@ -496,7 +523,10 @@ impl Controller for PidsController {
 
     fn enforce(&mut self) -> Result<(), String> {
         if self.current_pids > self.max_pids {
-            return Err(format!("PID usage {} exceeds limit {}", self.current_pids, self.max_pids));
+            return Err(format!(
+                "PID usage {} exceeds limit {}",
+                self.current_pids, self.max_pids
+            ));
         }
         Ok(())
     }
@@ -504,7 +534,8 @@ impl Controller for PidsController {
     fn update_setting(&mut self, key: &str, value: &str) -> Result<(), String> {
         match key {
             "max" => {
-                let max: u64 = value.parse()
+                let max: u64 = value
+                    .parse()
                     .map_err(|_| format!("Invalid PID limit: {}", value))?;
                 self.set_max_pids(max);
                 Ok(())
@@ -574,7 +605,8 @@ impl Controller for NetClsController {
     fn update_setting(&mut self, key: &str, value: &str) -> Result<(), String> {
         match key {
             "classid" => {
-                let class_id: u32 = value.parse()
+                let class_id: u32 = value
+                    .parse()
                     .map_err(|_| format!("Invalid class ID: {}", value))?;
                 self.set_class_id(class_id);
                 Ok(())
@@ -626,7 +658,10 @@ mod tests {
 
         let result = controller.allocate(HugepageSize::Two, 10);
         assert!(result.is_ok(), "Allocation should succeed");
-        assert_eq!(controller.get_usage(HugepageSize::Two), 10 * 2 * 1024 * 1024);
+        assert_eq!(
+            controller.get_usage(HugepageSize::Two),
+            10 * 2 * 1024 * 1024
+        );
     }
 
     #[test]
@@ -635,7 +670,10 @@ mod tests {
         controller.set_limit(HugepageSize::Two, 100 * 1024 * 1024);
 
         let result = controller.allocate(HugepageSize::Two, 100);
-        assert!(result.is_err(), "Allocation should fail when exceeding limit");
+        assert!(
+            result.is_err(),
+            "Allocation should fail when exceeding limit"
+        );
     }
 
     #[test]
@@ -662,7 +700,10 @@ mod tests {
         controller.set_max_pids(3);
 
         for _ in 0..3 {
-            assert!(controller.fork_process().is_ok(), "Fork within limit should succeed");
+            assert!(
+                controller.fork_process().is_ok(),
+                "Fork within limit should succeed"
+            );
         }
 
         let result = controller.fork_process();

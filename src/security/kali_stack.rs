@@ -1,12 +1,11 @@
-
-use std::vec::Vec;
-use std::string::String;
-use std::string::ToString;
-use std::format;
 /// Sovereign Kali Linux-Grade System Security and Administration Suite for SigmaOS
 /// Provides PAM authentication, Iptables/Ufw firewalling, Cron Daemons, Sudo,
 /// Tmux Session multiplexing, Swap memory space, and Kernel Dmesg ring logging.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::format;
+use std::string::String;
+use std::string::ToString;
+use std::vec::Vec;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -413,8 +412,6 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-
-
 /// Kali Undercover Desktop Disguise Mode Switcher
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum UndercoverDisguiseTheme {
@@ -432,10 +429,15 @@ pub struct KaliUndercoverThemeMode {
 
 impl KaliUndercoverThemeMode {
     pub fn new() -> Self {
-        Self { active_theme: UndercoverDisguiseTheme::DefaultKali }
+        Self {
+            active_theme: UndercoverDisguiseTheme::DefaultKali,
+        }
     }
 
-    pub fn toggle_undercover(&mut self, target_theme: UndercoverDisguiseTheme) -> UndercoverDisguiseTheme {
+    pub fn toggle_undercover(
+        &mut self,
+        target_theme: UndercoverDisguiseTheme,
+    ) -> UndercoverDisguiseTheme {
         if self.active_theme == target_theme {
             self.active_theme = UndercoverDisguiseTheme::DefaultKali;
         } else {
@@ -445,8 +447,6 @@ impl KaliUndercoverThemeMode {
     }
 }
 
-
-
 /// Kali Sqlmap SQL Injection Vulnerability Auditor
 #[derive(Debug, Clone, Default)]
 pub struct KaliSqlmapInjectionAuditor {
@@ -455,7 +455,9 @@ pub struct KaliSqlmapInjectionAuditor {
 
 impl KaliSqlmapInjectionAuditor {
     pub fn new() -> Self {
-        Self { detected_vulnerabilities: Vec::new() }
+        Self {
+            detected_vulnerabilities: Vec::new(),
+        }
     }
 
     pub fn audit_url(&mut self, url: &str, parameter_value: &str) -> bool {
@@ -463,13 +465,12 @@ impl KaliSqlmapInjectionAuditor {
             || parameter_value.contains("' OR '1'='1")
             || parameter_value.contains("SLEEP(");
         if is_vulnerable {
-            self.detected_vulnerabilities.push(format!("SQLi at {}: {}", url, parameter_value));
+            self.detected_vulnerabilities
+                .push(format!("SQLi at {}: {}", url, parameter_value));
         }
         is_vulnerable
     }
 }
-
-
 
 /// Kali John The Ripper Hash Cracker & Password Audit Engine
 #[derive(Debug, Clone, Default)]
@@ -479,7 +480,9 @@ pub struct KaliJohnTheRipperCracker {
 
 impl KaliJohnTheRipperCracker {
     pub fn new() -> Self {
-        let mut cracker = Self { wordlist: Vec::new() };
+        let mut cracker = Self {
+            wordlist: Vec::new(),
+        };
         cracker.wordlist.push("123456".to_string());
         cracker.wordlist.push("password".to_string());
         cracker.wordlist.push("sovereign".to_string());
@@ -491,16 +494,17 @@ impl KaliJohnTheRipperCracker {
     }
 }
 
-
 mod tests {
 
     #[test]
     fn test_kali_john_the_ripper_cracker() {
         let cracker = KaliJohnTheRipperCracker::new();
-        assert_eq!(cracker.crack_simple_hash("password"), Some("password".to_string()));
+        assert_eq!(
+            cracker.crack_simple_hash("password"),
+            Some("password".to_string())
+        );
         assert_eq!(cracker.crack_simple_hash("unknown_secret"), None);
     }
-
 
     #[test]
     fn test_kali_sqlmap_injection_auditor() {
@@ -510,15 +514,20 @@ mod tests {
         assert_eq!(auditor.detected_vulnerabilities.len(), 1);
     }
 
-
     #[test]
     fn test_kali_undercover_theme_mode() {
         let mut undercover = KaliUndercoverThemeMode::new();
-        assert_eq!(undercover.active_theme, UndercoverDisguiseTheme::DefaultKali);
+        assert_eq!(
+            undercover.active_theme,
+            UndercoverDisguiseTheme::DefaultKali
+        );
 
         let toggled = undercover.toggle_undercover(UndercoverDisguiseTheme::Windows10Disguise);
         assert_eq!(toggled, UndercoverDisguiseTheme::Windows10Disguise);
-        assert_eq!(undercover.active_theme, UndercoverDisguiseTheme::Windows10Disguise);
+        assert_eq!(
+            undercover.active_theme,
+            UndercoverDisguiseTheme::Windows10Disguise
+        );
 
         let reset = undercover.toggle_undercover(UndercoverDisguiseTheme::Windows10Disguise);
         assert_eq!(reset, UndercoverDisguiseTheme::DefaultKali);

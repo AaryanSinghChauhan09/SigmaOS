@@ -18,7 +18,6 @@
 
 #![allow(dead_code)]
 
-
 use std::collections::VecDeque;
 use std::string::String;
 use std::vec::Vec;

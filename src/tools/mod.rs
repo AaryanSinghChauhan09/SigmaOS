@@ -3,16 +3,17 @@ pub mod system_monitor;
 
 pub mod data_tools;
 pub mod display_manager;
+pub mod open_source_cli_tools_suite;
+pub mod open_source_tools_engine;
+pub mod open_source_tools_parity;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
-pub mod open_source_tools_engine;
-pub mod open_source_cli_tools_suite;
-pub mod open_source_tools_parity;
 
 pub use open_source_tools_engine::{
     BatSyntaxHighlighterEngine, FzfFuzzyFinderEngine, FzfSearchResult, HtopProcessEntry,
-    HtopProcessMonitorEngine, HtopSortField, RsyncBlockChecksum, RsyncDeltaOp, RsyncDeltaSyncEngine,
+    HtopProcessMonitorEngine, HtopSortField, RsyncBlockChecksum, RsyncDeltaOp,
+    RsyncDeltaSyncEngine,
 };
 
 pub use open_source_cli_tools_suite::{
@@ -27,8 +28,8 @@ pub use open_source_tools_parity::{
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
-    DataPipelineEtlEngine, DataQueryEngine, DataValue, ParquetArrowDataEngine,
-    DataVisualizationEngine,
+    DataPipelineEtlEngine, DataQueryEngine, DataValue, DataVisualizationEngine,
+    ParquetArrowDataEngine,
 };
 
 pub use simple_scan::{

@@ -12,12 +12,12 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::boxed::Box;
+use std::collections::{BTreeMap, VecDeque};
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::{BTreeMap, VecDeque};
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c

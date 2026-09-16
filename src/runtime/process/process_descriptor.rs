@@ -3,7 +3,7 @@
 //! This module provides ProcessDescriptor which tracks the complete lifecycle
 //! of a process including its namespace context and resource associations.
 
-use crate::runtime::process::process::{ProcessNamespaceContext, ProcessID};
+use crate::runtime::process::process::{ProcessID, ProcessNamespaceContext};
 
 /// Process Descriptor tracks complete process state including namespace context
 #[derive(Clone)]

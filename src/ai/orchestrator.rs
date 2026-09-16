@@ -2,10 +2,10 @@
 // Implements sigma-ai core with multi-agent coordination, workflow automation,
 // and self-diagnosis capabilities for system optimization
 
+use core::sync::atomic::AtomicUsize;
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::AtomicUsize;
 
 pub type AgentID = usize;
 

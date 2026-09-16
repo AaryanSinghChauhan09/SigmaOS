@@ -62,10 +62,30 @@ impl OmarchyQuickshellEngine {
 
         // Default unified shell widgets replacing 8 separate legacy components
         engine.register_widget("bar_clock", "System Clock", ShellComponentKind::TopBar, 0);
-        engine.register_widget("bar_workspaces", "Workspace Switcher", ShellComponentKind::TopBar, 1);
-        engine.register_widget("walker_launcher", "Walker Application Launcher", ShellComponentKind::AppLauncher, 0);
-        engine.register_widget("mako_notifications", "Notification Daemon", ShellComponentKind::NotificationCenter, 0);
-        engine.register_widget("hyprlock_screen", "Lock Screen", ShellComponentKind::LockScreen, 0);
+        engine.register_widget(
+            "bar_workspaces",
+            "Workspace Switcher",
+            ShellComponentKind::TopBar,
+            1,
+        );
+        engine.register_widget(
+            "walker_launcher",
+            "Walker Application Launcher",
+            ShellComponentKind::AppLauncher,
+            0,
+        );
+        engine.register_widget(
+            "mako_notifications",
+            "Notification Daemon",
+            ShellComponentKind::NotificationCenter,
+            0,
+        );
+        engine.register_widget(
+            "hyprlock_screen",
+            "Lock Screen",
+            ShellComponentKind::LockScreen,
+            0,
+        );
         engine
     }
 
@@ -175,13 +195,19 @@ impl OmarchyLuaConfigEngine {
     }
 
     pub fn register_lua_script(&mut self, script_name: &str, lua_content: &str) {
-        self.lua_scripts.insert(script_name.to_string(), lua_content.to_string());
+        self.lua_scripts
+            .insert(script_name.to_string(), lua_content.to_string());
     }
 
     pub fn live_reload(&mut self, script_name: &str) -> Result<String, &'static str> {
         if let Some(script) = self.lua_scripts.get(script_name) {
             self.live_reloads_triggered += 1;
-            Ok(format!("[Lua Live Reload #{}] Evaluated {} bytes for '{}'", self.live_reloads_triggered, script.len(), script_name))
+            Ok(format!(
+                "[Lua Live Reload #{}] Evaluated {} bytes for '{}'",
+                self.live_reloads_triggered,
+                script.len(),
+                script_name
+            ))
         } else {
             Err("Lua configuration script not found")
         }
@@ -219,12 +245,31 @@ impl OmarchyPluginMarketplace {
         };
 
         // Seed popular marketplace plugins
-        market.add_plugin_to_catalog("quick_weather", "Quickshell Weather Widget", "1.2.0", "Community", 4.9);
-        market.add_plugin_to_catalog("gpu_telemetry", "NVIDIA/AMD GPU Gauges", "2.0.1", "Omarchy Core", 5.0);
+        market.add_plugin_to_catalog(
+            "quick_weather",
+            "Quickshell Weather Widget",
+            "1.2.0",
+            "Community",
+            4.9,
+        );
+        market.add_plugin_to_catalog(
+            "gpu_telemetry",
+            "NVIDIA/AMD GPU Gauges",
+            "2.0.1",
+            "Omarchy Core",
+            5.0,
+        );
         market
     }
 
-    pub fn add_plugin_to_catalog(&mut self, id: &str, name: &str, ver: &str, author: &str, rating: f32) {
+    pub fn add_plugin_to_catalog(
+        &mut self,
+        id: &str,
+        name: &str,
+        ver: &str,
+        author: &str,
+        rating: f32,
+    ) {
         self.catalog.insert(
             id.to_string(),
             OmarchyPluginEntry {
@@ -245,7 +290,10 @@ impl OmarchyPluginMarketplace {
             }
             plugin.is_installed = true;
             self.installed_count += 1;
-            Ok(format!("Successfully installed plugin '{}' v{}", plugin.name, plugin.version))
+            Ok(format!(
+                "Successfully installed plugin '{}' v{}",
+                plugin.name, plugin.version
+            ))
         } else {
             Err("Plugin ID not found in marketplace catalog")
         }
@@ -346,7 +394,10 @@ impl OmarchyReleaseChannelSnapshotEngine {
         }
     }
 
-    pub fn switch_channel(&mut self, target_channel: OmarchyReleaseChannel) -> OmarchyReleaseChannel {
+    pub fn switch_channel(
+        &mut self,
+        target_channel: OmarchyReleaseChannel,
+    ) -> OmarchyReleaseChannel {
         self.current_channel = target_channel;
         self.current_channel
     }
@@ -368,7 +419,6 @@ impl Default for OmarchyReleaseChannelSnapshotEngine {
     }
 }
 
-
 /// Omarchy Dotfiles Versioning & Stow Profile Manager Engine
 #[derive(Debug, Clone)]
 pub struct StowProfile {
@@ -384,7 +434,9 @@ pub struct OmarchyDotfilesManagerEngine {
 
 impl OmarchyDotfilesManagerEngine {
     pub fn new() -> Self {
-        let mut engine = Self { profiles: Vec::new() };
+        let mut engine = Self {
+            profiles: Vec::new(),
+        };
         engine.profiles.push(StowProfile {
             package_name: "hypr".to_string(),
             target_dir: "/home/sovereign/.config/hypr".to_string(),
@@ -408,8 +460,6 @@ impl OmarchyDotfilesManagerEngine {
     }
 }
 
-
-
 /// Omarchy Keybindings Studio Engine
 #[derive(Debug, Clone)]
 pub struct CustomShortcut {
@@ -424,7 +474,9 @@ pub struct OmarchyKeybindingsStudioEngine {
 
 impl OmarchyKeybindingsStudioEngine {
     pub fn new() -> Self {
-        let mut engine = Self { bindings: Vec::new() };
+        let mut engine = Self {
+            bindings: Vec::new(),
+        };
         engine.bind_keys("SUPER+RETURN", "kitty");
         engine.bind_keys("SUPER+D", "rofi -show drun");
         engine
@@ -438,11 +490,12 @@ impl OmarchyKeybindingsStudioEngine {
     }
 
     pub fn generate_hyprland_binds(&self) -> Vec<String> {
-        self.bindings.iter().map(|b| format!("bind = {}, exec, {}", b.keys, b.command)).collect()
+        self.bindings
+            .iter()
+            .map(|b| format!("bind = {}, exec, {}", b.keys, b.command))
+            .collect()
     }
 }
-
-
 
 /// Omarchy Hyprland Custom Animation Curve Tuner Engine
 #[derive(Debug, Clone)]
@@ -460,8 +513,11 @@ impl OmarchyHyprlandAnimEngine {
     }
 
     pub fn generate_hyprland_anim_cfg(&self) -> String {
-        format!("bezier = myBezier, {}
-animation = windows, 1, 7, myBezier", self.bezier_curve)
+        format!(
+            "bezier = myBezier, {}
+animation = windows, 1, 7, myBezier",
+            self.bezier_curve
+        )
     }
 }
 
@@ -509,12 +565,19 @@ impl OmarchyHyprlandWorkspaceSnapLayoutEngine {
     }
 
     pub fn generate_hyprland_layout_config(&self) -> String {
-        let mut cfg = String::from("dwindle {\n    pseudotile = true\n    preserve_split = true\n}\n");
+        let mut cfg =
+            String::from("dwindle {\n    pseudotile = true\n    preserve_split = true\n}\n");
         for rule in &self.window_rules {
             if rule.is_floating {
-                cfg.push_str(&format!("windowrulev2 = float, class:^({})$\n", rule.class_pattern));
+                cfg.push_str(&format!(
+                    "windowrulev2 = float, class:^({})$\n",
+                    rule.class_pattern
+                ));
             }
-            cfg.push_str(&format!("windowrulev2 = workspace {}, class:^({})$\n", rule.target_workspace, rule.class_pattern));
+            cfg.push_str(&format!(
+                "windowrulev2 = workspace {}, class:^({})$\n",
+                rule.target_workspace, rule.class_pattern
+            ));
         }
         cfg
     }
@@ -533,8 +596,17 @@ pub struct OmarchyNeovimPresetStudioEngine {
 impl OmarchyNeovimPresetStudioEngine {
     pub fn new() -> Self {
         Self {
-            lsp_servers: vec!["rust_analyzer".to_string(), "pyright".to_string(), "clangd".to_string()],
-            treesitter_parsers: vec!["rust".to_string(), "python".to_string(), "c".to_string(), "lua".to_string()],
+            lsp_servers: vec![
+                "rust_analyzer".to_string(),
+                "pyright".to_string(),
+                "clangd".to_string(),
+            ],
+            treesitter_parsers: vec![
+                "rust".to_string(),
+                "python".to_string(),
+                "c".to_string(),
+                "lua".to_string(),
+            ],
         }
     }
 
@@ -575,7 +647,9 @@ pub struct OmarchyWaybarAppletStudioEngine {
 
 impl OmarchyWaybarAppletStudioEngine {
     pub fn new() -> Self {
-        let mut studio = Self { modules: Vec::new() };
+        let mut studio = Self {
+            modules: Vec::new(),
+        };
         studio.add_module("hyprland/workspaces", "left");
         studio.add_module("clock", "center");
         studio.add_module("pulseaudio", "right");
@@ -622,10 +696,12 @@ impl OmarchyLiveIsoBootstrapEngine {
         }
         self.is_bootstrap_completed = true;
         self.deployed_dotfiles_count = 12;
-        Ok(format!("Omarchy live bootstrap installed to {} with 12 dotfile profiles", self.target_disk))
+        Ok(format!(
+            "Omarchy live bootstrap installed to {} with 12 dotfile profiles",
+            self.target_disk
+        ))
     }
 }
-
 
 #[cfg(test)]
 mod omarchy_tests {
@@ -656,7 +732,6 @@ mod omarchy_tests {
         let cfg = anim.generate_hyprland_anim_cfg();
         assert!(cfg.contains("bezier = myBezier"));
     }
-
 
     #[test]
     fn test_omarchy_hyprland_workspace_snap_layout_engine() {
@@ -696,8 +771,12 @@ mod omarchy_tests {
     fn test_quickshell_engine() {
         let mut shell = OmarchyQuickshellEngine::new("quattro_pro");
         assert_eq!(shell.widgets.len(), 5);
-        assert!(shell.update_shell_json("{\"bar\": {\"height\": 32}}").is_ok());
-        assert!(shell.render_shell_summary().contains("5 unified components"));
+        assert!(shell
+            .update_shell_json("{\"bar\": {\"height\": 32}}")
+            .is_ok());
+        assert!(shell
+            .render_shell_summary()
+            .contains("5 unified components"));
     }
 
     #[test]
@@ -719,7 +798,10 @@ mod omarchy_tests {
     #[test]
     fn test_lua_config_engine() {
         let mut lua = OmarchyLuaConfigEngine::new();
-        lua.register_lua_script("hyprland.lua", "hyprland.bind('SUPER', 'Q', 'exec terminal')");
+        lua.register_lua_script(
+            "hyprland.lua",
+            "hyprland.bind('SUPER', 'Q', 'exec terminal')",
+        );
         let res = lua.live_reload("hyprland.lua").unwrap();
         assert!(res.contains("Live Reload #1"));
         assert_eq!(lua.live_reloads_triggered, 1);

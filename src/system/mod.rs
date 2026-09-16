@@ -16,10 +16,11 @@
 // SigmaOS System Utilities Module
 // System-level utilities and tools
 
-pub mod declarative_state;
+pub mod automation;
 pub mod cleanup;
 pub mod config;
 pub mod cron;
+pub mod declarative_state;
 pub mod defrag;
 pub mod duplicate;
 pub mod generation_manager;
@@ -34,12 +35,9 @@ pub mod snapshot_schedule;
 pub mod startup;
 pub mod state;
 pub mod syslog;
-pub mod automation;
 pub mod user;
 
-pub use automation::{
-    AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus,
-};
+pub use automation::{AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus};
 
 pub use cleanup::{
     CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
@@ -87,8 +85,7 @@ pub use snapshot::{
     SnapshotMetadata, SnapshotResult, SnapshotStorage, SystemSnapshotManager,
 };
 pub use snapshot_schedule::{
-    CreatedSnapshotRecord, RetentionPolicy, ScheduledSnapshotEngine, SnapshotFrequency,
-    SnapshotJob,
+    CreatedSnapshotRecord, RetentionPolicy, ScheduledSnapshotEngine, SnapshotFrequency, SnapshotJob,
 };
 pub use startup::{
     DependencyBasedOptimizer, ProfileBasedOptimizer, ServicePriority, StartupAnalysis,

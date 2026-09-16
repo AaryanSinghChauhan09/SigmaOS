@@ -13,7 +13,6 @@ pub enum InstructionCyclePhase {
 }
 
 #[cfg(not(feature = "standalone_test"))]
-
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ThreadState {
@@ -447,7 +446,6 @@ impl S390xHal {
     }
 }
 
-
 pub struct MemoryDescriptorList {
     pub virtual_address: usize,
     pub byte_count: usize,
@@ -557,7 +555,6 @@ impl SystemServiceDescriptorTable {
         }
     }
 }
-
 
 // 6. Unified Architecture Engine
 

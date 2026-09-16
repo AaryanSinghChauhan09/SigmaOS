@@ -47,9 +47,9 @@ impl LinuxBbrCongestionEngine {
         Self {
             algorithm,
             bbr_state: BbrState::Startup,
-            min_rtt_us: 10_000, // 10ms default
+            min_rtt_us: 10_000,                // 10ms default
             max_bw_bytes_per_sec: 100_000_000, // 100MB/s default
-            cwnd_bytes: 14_600, // 10 MSS initial window
+            cwnd_bytes: 14_600,                // 10 MSS initial window
             pacing_rate_bytes_per_sec: 200_000_000,
             is_loss_event: false,
         }
@@ -157,7 +157,11 @@ impl FreeBsdNetgraphGraphRouter {
         }
     }
 
-    pub fn inject_packet(&mut self, entry_node: &str, packet_data: &[u8]) -> Result<u32, &'static str> {
+    pub fn inject_packet(
+        &mut self,
+        entry_node: &str,
+        packet_data: &[u8],
+    ) -> Result<u32, &'static str> {
         if packet_data.is_empty() {
             return Err("Empty packet payload");
         }
@@ -231,7 +235,14 @@ impl OpenBsdPfCarpPfsyncStateEngine {
         self.carp_state = CarpState::Master;
     }
 
-    pub fn register_pf_state(&mut self, src_ip: &str, dst_ip: &str, src_port: u16, dst_port: u16, proto: &str) {
+    pub fn register_pf_state(
+        &mut self,
+        src_ip: &str,
+        dst_ip: &str,
+        src_port: u16,
+        dst_port: u16,
+        proto: &str,
+    ) {
         self.state_table.push(PfStateEntry {
             src_ip: src_ip.to_string(),
             dst_ip: dst_ip.to_string(),
@@ -322,7 +333,10 @@ impl WireguardPqcTunnelEngine {
         }
     }
 
-    pub fn perform_kyber_dilithium_handshake(&mut self, client_hello: &[u8]) -> Result<String, &'static str> {
+    pub fn perform_kyber_dilithium_handshake(
+        &mut self,
+        client_hello: &[u8],
+    ) -> Result<String, &'static str> {
         if client_hello.is_empty() {
             return Err("WireGuard PQC: Empty client hello payload");
         }
@@ -390,7 +404,9 @@ mod tests {
     #[test]
     fn test_wireguard_pqc_tunnel_engine() {
         let mut wg = WireguardPqcTunnelEngine::new("wg0", "PUBKEY12345");
-        let res = wg.perform_kyber_dilithium_handshake(b"CLIENT_HANDSHAKE").unwrap();
+        let res = wg
+            .perform_kyber_dilithium_handshake(b"CLIENT_HANDSHAKE")
+            .unwrap();
         assert!(res.contains("WG-PQC-ESTABLISHED"));
         assert!(wg.is_pqc_handshake_complete);
 

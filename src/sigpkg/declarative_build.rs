@@ -10,11 +10,11 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 
 // ==========================================
 // 1. Nix-Style Store Derivations
@@ -424,7 +424,8 @@ impl OpenBsdSignifyPackageReproducer {
     }
 
     pub fn verify_package_signature(&self, signed_manifest: &str) -> bool {
-        signed_manifest.contains("untrusted comment: verify with") && signed_manifest.contains("SIG:")
+        signed_manifest.contains("untrusted comment: verify with")
+            && signed_manifest.contains("SIG:")
     }
 }
 
@@ -475,10 +476,19 @@ impl VoidXbpsSrcReproducibleContainer {
     }
 
     pub fn build_reproducible_xbps_package(&self) -> (String, Vec<u8>) {
-        let filename = format!("{}-{}_{}.x86_64.xbps", self.pkgname, self.version, self.revision);
-        let mut manifest = format!("pkgname={}\nversion={}\nrevision={}\nmtime={}\n", self.pkgname, self.version, self.revision, self.source_date_epoch);
+        let filename = format!(
+            "{}-{}_{}.x86_64.xbps",
+            self.pkgname, self.version, self.revision
+        );
+        let mut manifest = format!(
+            "pkgname={}\nversion={}\nrevision={}\nmtime={}\n",
+            self.pkgname, self.version, self.revision, self.source_date_epoch
+        );
         for entry in &self.entries {
-            manifest.push_str(&format!("entry={}:{:o}:{}:{}:{}\n", entry.name, entry.mode, entry.uid, entry.gid, entry.mtime));
+            manifest.push_str(&format!(
+                "entry={}:{:o}:{}:{}:{}\n",
+                entry.name, entry.mode, entry.uid, entry.gid, entry.mtime
+            ));
         }
         (filename, manifest.into_bytes())
     }
@@ -504,7 +514,10 @@ impl DebianReproBuildEnvironmentSanitizer {
 
     pub fn sanitize_environment(&self) -> HashMap<String, String> {
         let mut env = HashMap::new();
-        env.insert("SOURCE_DATE_EPOCH".to_string(), self.source_date_epoch.to_string());
+        env.insert(
+            "SOURCE_DATE_EPOCH".to_string(),
+            self.source_date_epoch.to_string(),
+        );
         env.insert("LANG".to_string(), "C.UTF-8".to_string());
         env.insert("LC_ALL".to_string(), "C.UTF-8".to_string());
         env.insert("TZ".to_string(), "UTC".to_string());
@@ -550,18 +563,16 @@ impl SigmaPkgReproducibilityPipeline {
         }
     }
 
-    pub fn execute_reproducible_pipeline(
-        &self,
-        bin1: &[u8],
-        bin2: &[u8],
-    ) -> PipelineResult {
-        let sanitizer = DebianReproBuildEnvironmentSanitizer::new(self.source_date_epoch, "/build/sigmaos");
+    pub fn execute_reproducible_pipeline(&self, bin1: &[u8], bin2: &[u8]) -> PipelineResult {
+        let sanitizer =
+            DebianReproBuildEnvironmentSanitizer::new(self.source_date_epoch, "/build/sigmaos");
         let _env = sanitizer.sanitize_environment();
 
         let diff_report = ReproducibleBuildDiffInspector::inspect_diffs(bin1, bin2);
         let is_fully_reproducible = diff_report.is_empty();
 
-        let repro_inspector = ArchLinuxReproBuildInspector::new(&self.pkg_name, "1.0.0", self.source_date_epoch);
+        let repro_inspector =
+            ArchLinuxReproBuildInspector::new(&self.pkg_name, "1.0.0", self.source_date_epoch);
         let build_info_hash = repro_inspector.compute_buildinfo_hash();
 
         let raw_manifest = format!(
@@ -992,12 +1003,17 @@ mod tests {
         let sanitizer = DebianReproBuildEnvironmentSanitizer::new(1700000000, "/build/workspace");
         let env = sanitizer.sanitize_environment();
 
-        assert_eq!(env.get("SOURCE_DATE_EPOCH").map(|s| s.as_str()), Some("1700000000"));
+        assert_eq!(
+            env.get("SOURCE_DATE_EPOCH").map(|s| s.as_str()),
+            Some("1700000000")
+        );
         assert_eq!(env.get("TZ").map(|s| s.as_str()), Some("UTC"));
         assert_eq!(env.get("LANG").map(|s| s.as_str()), Some("C.UTF-8"));
 
         let flags = sanitizer.generate_repro_compiler_flags();
-        assert!(flags.iter().any(|f| f.contains("-fdebug-prefix-map=/build/workspace=")));
+        assert!(flags
+            .iter()
+            .any(|f| f.contains("-fdebug-prefix-map=/build/workspace=")));
         assert!(flags.iter().any(|f| f.contains("-Wl,--build-id=sha1")));
     }
 

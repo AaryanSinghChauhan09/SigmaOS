@@ -29,7 +29,7 @@ use std::vec::Vec;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RsyncBlockChecksum {
     pub block_index: usize,
-    pub weak_checksum: u32,  // Adler-32 inspired rolling checksum
+    pub weak_checksum: u32,   // Adler-32 inspired rolling checksum
     pub strong_checksum: u64, // FNV-1a strong hash
 }
 
@@ -85,7 +85,11 @@ impl RsyncDeltaSyncEngine {
         sigs
     }
 
-    pub fn compute_delta(&self, target_data: &[u8], signature: &[RsyncBlockChecksum]) -> Vec<RsyncDeltaOp> {
+    pub fn compute_delta(
+        &self,
+        target_data: &[u8],
+        signature: &[RsyncBlockChecksum],
+    ) -> Vec<RsyncDeltaOp> {
         let mut delta = Vec::new();
         let mut cursor = 0;
         let mut pending_literal = Vec::new();
@@ -98,7 +102,10 @@ impl RsyncDeltaSyncEngine {
                 let weak = Self::compute_weak_checksum(chunk);
                 let strong = Self::compute_strong_checksum(chunk);
 
-                if let Some(matched) = signature.iter().find(|s| s.weak_checksum == weak && s.strong_checksum == strong) {
+                if let Some(matched) = signature
+                    .iter()
+                    .find(|s| s.weak_checksum == weak && s.strong_checksum == strong)
+                {
                     if !pending_literal.is_empty() {
                         delta.push(RsyncDeltaOp::LiteralData {
                             bytes: pending_literal.clone(),
@@ -174,8 +181,16 @@ impl HtopProcessMonitorEngine {
     pub fn sort_processes(&mut self, sort_by: HtopSortField) {
         match sort_by {
             HtopSortField::ByPid => self.processes.sort_by_key(|p| p.pid),
-            HtopSortField::ByCpu => self.processes.sort_by(|a, b| b.cpu_percent.partial_cmp(&a.cpu_percent).unwrap_or(core::cmp::Ordering::Equal)),
-            HtopSortField::ByMemory => self.processes.sort_by(|a, b| b.mem_percent.partial_cmp(&a.mem_percent).unwrap_or(core::cmp::Ordering::Equal)),
+            HtopSortField::ByCpu => self.processes.sort_by(|a, b| {
+                b.cpu_percent
+                    .partial_cmp(&a.cpu_percent)
+                    .unwrap_or(core::cmp::Ordering::Equal)
+            }),
+            HtopSortField::ByMemory => self.processes.sort_by(|a, b| {
+                b.mem_percent
+                    .partial_cmp(&a.mem_percent)
+                    .unwrap_or(core::cmp::Ordering::Equal)
+            }),
             HtopSortField::ByName => self.processes.sort_by(|a, b| a.name.cmp(&b.name)),
         }
     }
@@ -184,10 +199,16 @@ impl HtopProcessMonitorEngine {
         let mut lines = Vec::new();
         for p in &self.processes {
             if p.ppid == 0 || p.ppid == 1 {
-                lines.push(format!("[PID {:>5}] {} ({:.1}% CPU, {:.1}% RAM)", p.pid, p.name, p.cpu_percent, p.mem_percent));
+                lines.push(format!(
+                    "[PID {:>5}] {} ({:.1}% CPU, {:.1}% RAM)",
+                    p.pid, p.name, p.cpu_percent, p.mem_percent
+                ));
                 for child in &self.processes {
                     if child.ppid == p.pid {
-                        lines.push(format!("  └── [PID {:>5}] {} ({:.1}% CPU)", child.pid, child.name, child.cpu_percent));
+                        lines.push(format!(
+                            "  └── [PID {:>5}] {} ({:.1}% CPU)",
+                            child.pid, child.name, child.cpu_percent
+                        ));
                     }
                 }
             }
@@ -221,14 +242,19 @@ impl BatSyntaxHighlighterEngine {
 
     pub fn highlight_code(&self, filename: &str, code: &str) -> String {
         let mut output = String::new();
-        output.push_str(&format!("─── File: {} ─── Theme: {} ───\n", filename, self.theme));
+        output.push_str(&format!(
+            "─── File: {} ─── Theme: {} ───\n",
+            filename, self.theme
+        ));
 
         for (idx, line) in code.lines().enumerate() {
             let line_num = idx + 1;
             let mut highlighted = line.to_string();
 
             // Highlight Rust keywords
-            for kw in &["fn", "let", "mut", "pub", "struct", "enum", "impl", "use", "return"] {
+            for kw in &[
+                "fn", "let", "mut", "pub", "struct", "enum", "impl", "use", "return",
+            ] {
                 if highlighted.contains(kw) {
                     highlighted = highlighted.replace(kw, &format!("\x1b[35m{}\x1b[0m", kw));
                 }
@@ -287,7 +313,10 @@ impl FzfFuzzyFinderEngine {
         for (c_idx, &c) in cand_chars.iter().enumerate() {
             if query_idx < query_chars.len() && c == query_chars[query_idx] {
                 score += 10 + consecutive_bonus;
-                if c_idx == 0 || cand_chars.get(c_idx - 1) == Some(&'/') || cand_chars.get(c_idx - 1) == Some(&'_') {
+                if c_idx == 0
+                    || cand_chars.get(c_idx - 1) == Some(&'/')
+                    || cand_chars.get(c_idx - 1) == Some(&'_')
+                {
                     score += 15; // Prefix / boundary bonus
                 }
                 consecutive_bonus += 5;
@@ -384,7 +413,11 @@ mod tests {
     #[test]
     fn test_fzf_fuzzy_finder() {
         let fzf = FzfFuzzyFinderEngine::new();
-        let candidates = ["src/kernel/main.rs", "src/security/landlock.rs", "src/filesystem/erofs.rs"];
+        let candidates = [
+            "src/kernel/main.rs",
+            "src/security/landlock.rs",
+            "src/filesystem/erofs.rs",
+        ];
         let results = fzf.filter_and_rank(&candidates, "landlock");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].candidate, "src/security/landlock.rs");

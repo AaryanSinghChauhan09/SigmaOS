@@ -51,7 +51,12 @@ impl FdFileSearchEngine {
     }
 
     /// Filters files matching query, extension, hidden file settings, and max depth
-    pub fn search<'a>(&self, entries: &'a [FdFileEntry], query: &str, depth: usize) -> Vec<&'a FdFileEntry> {
+    pub fn search<'a>(
+        &self,
+        entries: &'a [FdFileEntry],
+        query: &str,
+        depth: usize,
+    ) -> Vec<&'a FdFileEntry> {
         let query_lower = query.to_lowercase();
 
         entries
@@ -176,11 +181,14 @@ impl ZoxideCdEngine {
 
     /// Records directory access, incrementing frecency score
     pub fn add_visit(&mut self, path: &str, current_time: u64) {
-        let entry = self.database.entry(path.to_string()).or_insert_with(|| ZoxideEntry {
-            path: path.to_string(),
-            frecency_score: 0.0,
-            last_accessed_timestamp: current_time,
-        });
+        let entry = self
+            .database
+            .entry(path.to_string())
+            .or_insert_with(|| ZoxideEntry {
+                path: path.to_string(),
+                frecency_score: 0.0,
+                last_accessed_timestamp: current_time,
+            });
 
         entry.frecency_score += 10.0;
         entry.last_accessed_timestamp = current_time;
@@ -196,7 +204,11 @@ impl ZoxideCdEngine {
             .filter(|e| e.path.to_lowercase().contains(&kw_lower))
             .collect();
 
-        matches.sort_by(|a, b| b.frecency_score.partial_cmp(&a.frecency_score).unwrap_or(core::cmp::Ordering::Equal));
+        matches.sort_by(|a, b| {
+            b.frecency_score
+                .partial_cmp(&a.frecency_score)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
         matches.first().map(|e| e.path.clone())
     }
 }

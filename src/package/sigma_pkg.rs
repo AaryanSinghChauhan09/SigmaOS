@@ -120,25 +120,55 @@ impl UniversalPackageImporter {
             .to_string();
 
         let (license, raw_deps) = match format {
-            UniversalPackageFormat::DebianDeb => ("GPL-3.0-or-later", vec!["libc6".to_string(), "libssl-dev".to_string()]),
-            UniversalPackageFormat::ArchPacman => ("MIT", vec!["glibc".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::FedoraRpm => {
-                ("GPLv2+", vec!["glibc".to_string(), "bash".to_string(), "openssl-devel".to_string()])
+            UniversalPackageFormat::DebianDeb => (
+                "GPL-3.0-or-later",
+                vec!["libc6".to_string(), "libssl-dev".to_string()],
+            ),
+            UniversalPackageFormat::ArchPacman => {
+                ("MIT", vec!["glibc".to_string(), "openssl".to_string()])
             }
-            UniversalPackageFormat::AlpineApk => ("MIT/GPL-2.0", vec!["musl".to_string(), "openssl-dev".to_string()]),
-            UniversalPackageFormat::FreeBsdPkg => {
-                ("BSD-2-Clause", vec!["freebsd-runtime".to_string(), "security/openssl".to_string()])
+            UniversalPackageFormat::FedoraRpm => (
+                "GPLv2+",
+                vec![
+                    "glibc".to_string(),
+                    "bash".to_string(),
+                    "openssl-devel".to_string(),
+                ],
+            ),
+            UniversalPackageFormat::AlpineApk => (
+                "MIT/GPL-2.0",
+                vec!["musl".to_string(), "openssl-dev".to_string()],
+            ),
+            UniversalPackageFormat::FreeBsdPkg => (
+                "BSD-2-Clause",
+                vec![
+                    "freebsd-runtime".to_string(),
+                    "security/openssl".to_string(),
+                ],
+            ),
+            UniversalPackageFormat::OpenBsdPkg => (
+                "ISC/BSD",
+                vec!["openbsd-sys".to_string(), "security/openssl".to_string()],
+            ),
+            UniversalPackageFormat::NetBsdPkgsrc => (
+                "BSD-3-Clause",
+                vec!["pkgsrc-core".to_string(), "security/openssl".to_string()],
+            ),
+            UniversalPackageFormat::SlackwarePkg => {
+                ("GPL", vec!["slack-base".to_string(), "openssl".to_string()])
             }
-            UniversalPackageFormat::OpenBsdPkg => ("ISC/BSD", vec!["openbsd-sys".to_string(), "security/openssl".to_string()]),
-            UniversalPackageFormat::NetBsdPkgsrc => {
-                ("BSD-3-Clause", vec!["pkgsrc-core".to_string(), "security/openssl".to_string()])
-            }
-            UniversalPackageFormat::SlackwarePkg => ("GPL", vec!["slack-base".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::NixDerivation => {
-                ("MIT/Apache-2.0", vec!["nix-store".to_string(), "openssl.dev".to_string()])
-            }
-            UniversalPackageFormat::GuixPackage => ("GPL-3.0+", vec!["guix-daemon".to_string(), "openssl".to_string()]),
-            UniversalPackageFormat::HaikuHpkg => ("MIT", vec!["haiku-libroot".to_string(), "openssl".to_string()]),
+            UniversalPackageFormat::NixDerivation => (
+                "MIT/Apache-2.0",
+                vec!["nix-store".to_string(), "openssl.dev".to_string()],
+            ),
+            UniversalPackageFormat::GuixPackage => (
+                "GPL-3.0+",
+                vec!["guix-daemon".to_string(), "openssl".to_string()],
+            ),
+            UniversalPackageFormat::HaikuHpkg => (
+                "MIT",
+                vec!["haiku-libroot".to_string(), "openssl".to_string()],
+            ),
             _ => ("GPL/MIT/BSD", vec!["sovereign-core-sys".to_string()]),
         };
 
@@ -150,7 +180,10 @@ impl UniversalPackageImporter {
             description: format!("Imported {:?} package '{}'", format, pkg_name),
             dependencies: translated_deps,
             conflicts: vec![],
-            provides: vec![pkg_name.clone(), format!("foreign-compat-{:?}", format).to_lowercase()],
+            provides: vec![
+                pkg_name.clone(),
+                format!("foreign-compat-{:?}", format).to_lowercase(),
+            ],
             size: 10_000_000,
             installed_size: 25_000_000,
             url: Some(format!("file://{}", filename)),
@@ -169,7 +202,12 @@ impl UniversalPackageImporter {
                 let dep_lower = dep.to_lowercase();
                 if dep_lower.contains("ssl") || dep_lower.contains("crypto") {
                     "sovereign-openssl".to_string()
-                } else if dep_lower.contains("libc") || dep_lower == "musl" || dep_lower.contains("freebsd-runtime") || dep_lower.contains("openbsd-sys") || dep_lower.contains("haiku-libroot") {
+                } else if dep_lower.contains("libc")
+                    || dep_lower == "musl"
+                    || dep_lower.contains("freebsd-runtime")
+                    || dep_lower.contains("openbsd-sys")
+                    || dep_lower.contains("haiku-libroot")
+                {
                     "sovereign-libc".to_string()
                 } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "sh" {
                     "sovereign-shell".to_string()
@@ -382,7 +420,10 @@ impl SigmaPkg {
 
             for (name, package) in &repo.packages {
                 if name.to_lowercase().contains(query_lower.as_str())
-                    || package.description.to_lowercase().contains(query_lower.as_str())
+                    || package
+                        .description
+                        .to_lowercase()
+                        .contains(query_lower.as_str())
                 {
                     results.push(package);
                 }
@@ -717,7 +758,10 @@ impl SigmaPkg {
     }
 
     /// Import and perform full transactional installation of foreign package format with dependency resolution
-    pub fn import_and_install_foreign_package(&mut self, file_path: &str) -> Result<Package, String> {
+    pub fn import_and_install_foreign_package(
+        &mut self,
+        file_path: &str,
+    ) -> Result<Package, String> {
         let pkg = self.import_foreign_package(file_path)?;
         let mut missing_deps = Vec::new();
         for dep in &pkg.dependencies {
@@ -755,9 +799,18 @@ impl SigmaPkg {
         let foreign_repos = [
             ("apt-debian-main", "https://deb.debian.org/debian"),
             ("pacman-arch-extra", "https://archlinux.org/packages"),
-            ("dnf-fedora-updates", "https://mirrors.fedoraproject.org/metalink?repo=updates-released"),
-            ("apk-alpine-main", "https://dl-cdn.alpinelinux.org/alpine/v3.19/main"),
-            ("pkg-freebsd-ports", "https://pkg.freebsd.org/FreeBSD:14:amd64/quarterly"),
+            (
+                "dnf-fedora-updates",
+                "https://mirrors.fedoraproject.org/metalink?repo=updates-released",
+            ),
+            (
+                "apk-alpine-main",
+                "https://dl-cdn.alpinelinux.org/alpine/v3.19/main",
+            ),
+            (
+                "pkg-freebsd-ports",
+                "https://pkg.freebsd.org/FreeBSD:14:amd64/quarterly",
+            ),
         ];
 
         let mut count = 0;

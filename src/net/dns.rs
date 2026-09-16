@@ -18,6 +18,7 @@ use std::vec;
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based DNS Resolver for SigmaOS
 /// Based on Ideas-999-Structured: Networking & Communication Item 751
 /// Implements DNS resolution and caching
@@ -30,10 +31,8 @@ use std::vec;
 /// 5. Advanced caching: negative caching, stale-while-revalidate (optimistic), capacity limits.
 /// 6. Redundant parallel querying with stagger delay.
 /// 7. Secure DoH / DoT transport channel fallbacks.
-
 use std::boxed::Box;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type RecordID = usize;
 
@@ -513,7 +512,11 @@ impl DnsWireMessage {
             let qtype = u16::from_be_bytes([data[offset], data[offset + 1]]);
             let qclass = u16::from_be_bytes([data[offset + 2], data[offset + 3]]);
             offset += 4;
-            questions.push(DnsWireQuestion { name, qtype, qclass });
+            questions.push(DnsWireQuestion {
+                name,
+                qtype,
+                qclass,
+            });
         }
 
         let mut answers = Vec::new();
@@ -525,7 +528,12 @@ impl DnsWireMessage {
             }
             let rtype = u16::from_be_bytes([data[offset], data[offset + 1]]);
             let rclass = u16::from_be_bytes([data[offset + 2], data[offset + 3]]);
-            let ttl = u32::from_be_bytes([data[offset + 4], data[offset + 5], data[offset + 6], data[offset + 7]]);
+            let ttl = u32::from_be_bytes([
+                data[offset + 4],
+                data[offset + 5],
+                data[offset + 6],
+                data[offset + 7],
+            ]);
             let rdlen = u16::from_be_bytes([data[offset + 8], data[offset + 9]]) as usize;
             offset += 10;
 
@@ -535,7 +543,13 @@ impl DnsWireMessage {
             let rdata = data[offset..offset + rdlen].to_vec();
             offset += rdlen;
 
-            answers.push(DnsWireRecord { name, rtype, rclass, ttl, rdata });
+            answers.push(DnsWireRecord {
+                name,
+                rtype,
+                rclass,
+                ttl,
+                rdata,
+            });
         }
 
         Ok(Self {
@@ -579,7 +593,11 @@ impl DnsOverTlsClient {
     }
 
     /// Formats query with 2-byte RFC 7858 TCP/TLS framing length prefix
-    pub fn build_dot_frame(&self, hostname: &[u8], record_type: RecordType) -> Result<Vec<u8>, DNSError> {
+    pub fn build_dot_frame(
+        &self,
+        hostname: &[u8],
+        record_type: RecordType,
+    ) -> Result<Vec<u8>, DNSError> {
         if !self.tls_handshake_completed {
             return Err(DNSError::Timeout);
         }
@@ -592,10 +610,20 @@ impl DnsOverTlsClient {
         Ok(frame)
     }
 
-    pub fn query_dot(&self, hostname: &[u8], record_type: RecordType) -> Result<SimpleDNSRecord, DNSError> {
+    pub fn query_dot(
+        &self,
+        hostname: &[u8],
+        record_type: RecordType,
+    ) -> Result<SimpleDNSRecord, DNSError> {
         let _frame = self.build_dot_frame(hostname, record_type)?;
         let data = [1, 1, 1, 1]; // Encrypted resolution result over TLS
-        Ok(SimpleDNSRecord::new(1001, hostname, record_type, 300, &data))
+        Ok(SimpleDNSRecord::new(
+            1001,
+            hostname,
+            record_type,
+            300,
+            &data,
+        ))
     }
 }
 
@@ -656,7 +684,12 @@ impl DnssecChainValidator {
         self.trust_anchors.push(key);
     }
 
-    pub fn validate_rrsig(&self, hostname: &[u8], rrsig_data: &[u8], dnskey: &DnssecKeyRecord) -> bool {
+    pub fn validate_rrsig(
+        &self,
+        hostname: &[u8],
+        rrsig_data: &[u8],
+        dnskey: &DnssecKeyRecord,
+    ) -> bool {
         // Validate DNSSEC signature against DNSKEY key tag
         let key_tag = dnskey.calculate_key_tag();
         key_tag != 0 && !rrsig_data.is_empty() && !dnskey.public_key.is_empty()
@@ -696,11 +729,22 @@ impl SigmaTldLocalAuthority {
         authority.register_record(b"os.sigma", RecordType::A, 86400, &[127, 0, 0, 1]);
         authority.register_record(b"gateway.sigma", RecordType::A, 86400, &[10, 0, 0, 1]);
         authority.register_record(b"node.sigma", RecordType::A, 86400, &[192, 168, 1, 1]);
-        authority.register_record(b"node.sigma", RecordType::AAAA, 86400, &[0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+        authority.register_record(
+            b"node.sigma",
+            RecordType::AAAA,
+            86400,
+            &[0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        );
         authority
     }
 
-    pub fn register_record(&mut self, hostname: &[u8], record_type: RecordType, ttl: u32, data: &[u8]) {
+    pub fn register_record(
+        &mut self,
+        hostname: &[u8],
+        record_type: RecordType,
+        ttl: u32,
+        data: &[u8],
+    ) {
         self.records.push(SigmaRecordEntry {
             hostname: hostname.to_vec(),
             record_type,
@@ -709,10 +753,20 @@ impl SigmaTldLocalAuthority {
         });
     }
 
-    pub fn resolve_sigma_domain(&self, hostname: &[u8], record_type: RecordType) -> Option<SimpleDNSRecord> {
+    pub fn resolve_sigma_domain(
+        &self,
+        hostname: &[u8],
+        record_type: RecordType,
+    ) -> Option<SimpleDNSRecord> {
         for entry in &self.records {
             if entry.hostname == hostname && entry.record_type == record_type {
-                return Some(SimpleDNSRecord::new(2002, hostname, record_type, entry.ttl, &entry.data));
+                return Some(SimpleDNSRecord::new(
+                    2002,
+                    hostname,
+                    record_type,
+                    entry.ttl,
+                    &entry.data,
+                ));
             }
         }
         None
@@ -954,12 +1008,18 @@ mod tests {
     #[test]
     fn test_sigma_tld_local_authority() {
         let authority = SigmaTldLocalAuthority::new();
-        let rec = authority.resolve_sigma_domain(b"os.sigma", RecordType::A).unwrap();
+        let rec = authority
+            .resolve_sigma_domain(b"os.sigma", RecordType::A)
+            .unwrap();
         assert_eq!(rec.data(), &[127, 0, 0, 1]);
 
-        let node_rec = authority.resolve_sigma_domain(b"node.sigma", RecordType::A).unwrap();
+        let node_rec = authority
+            .resolve_sigma_domain(b"node.sigma", RecordType::A)
+            .unwrap();
         assert_eq!(node_rec.data(), &[192, 168, 1, 1]);
 
-        assert!(authority.resolve_sigma_domain(b"nonexistent.sigma", RecordType::A).is_none());
+        assert!(authority
+            .resolve_sigma_domain(b"nonexistent.sigma", RecordType::A)
+            .is_none());
     }
 }

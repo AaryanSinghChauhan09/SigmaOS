@@ -1,7 +1,5 @@
 use std::format;
 
-
-
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec;
@@ -1128,7 +1126,6 @@ impl TerminalSession {
         }
     }
 
-
     pub fn register_alias(&mut self, name: &str, value: &str) {
         self.aliases.insert(name.to_string(), value.to_string());
     }
@@ -1292,7 +1289,8 @@ impl TerminalSession {
     }
 
     pub fn register_trigger_rule(&mut self, pattern: &str, action: &str) {
-        self.trigger_rules.push(TriggerRule::new(pattern, AnsiColor::Default, Some(action)));
+        self.trigger_rules
+            .push(TriggerRule::new(pattern, AnsiColor::Default, Some(action)));
     }
 
     /// Parses basic ANSI Escape Sequences (CSIs)

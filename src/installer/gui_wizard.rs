@@ -2,8 +2,8 @@
 // Calamares-inspired graphical installer wizard with dual-boot alongside partitioning
 
 use std::string::{String, ToString};
-use std::vec::Vec;
 use std::vec;
+use std::vec::Vec;
 
 /// Installer Screen / Calamares Module Sequence
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -211,7 +211,6 @@ pub struct PrivacySettings {
     pub location_services: bool,
 }
 
-
 impl SystemConfiguration {
     pub fn new() -> Self {
         Self {
@@ -273,12 +272,10 @@ impl GuiInstallerWizard {
     /// Scans co-resident operating systems for Calamares dual-boot alongside mode
     pub fn scan_hardware_and_os(&mut self) {
         let mut nvme = DiskInfo::new("/dev/nvme0n1", 512000, "Samsung NVMe SSD 512GB");
-        nvme.add_partition(PartitionEntry::new(
-            "/dev/nvme0n1p1",
-            512,
-            FilesystemType::Fat32,
-            "/boot/efi",
-        ).with_flag("esp"));
+        nvme.add_partition(
+            PartitionEntry::new("/dev/nvme0n1p1", 512, FilesystemType::Fat32, "/boot/efi")
+                .with_flag("esp"),
+        );
         nvme.add_partition(PartitionEntry::new(
             "/dev/nvme0n1p2",
             250000,
@@ -288,20 +285,22 @@ impl GuiInstallerWizard {
 
         self.disk_info.push(nvme);
 
-        self.detected_operating_systems.push(DetectedOperatingSystem::new(
-            "Windows 11 Home",
-            "/dev/nvme0n1p2",
-            FilesystemType::Ntfs,
-            250000,
-            120000,
-        ));
-        self.detected_operating_systems.push(DetectedOperatingSystem::new(
-            "Ubuntu 24.04 LTS",
-            "/dev/sda2",
-            FilesystemType::Ext4,
-            100000,
-            60000,
-        ));
+        self.detected_operating_systems
+            .push(DetectedOperatingSystem::new(
+                "Windows 11 Home",
+                "/dev/nvme0n1p2",
+                FilesystemType::Ntfs,
+                250000,
+                120000,
+            ));
+        self.detected_operating_systems
+            .push(DetectedOperatingSystem::new(
+                "Ubuntu 24.04 LTS",
+                "/dev/sda2",
+                FilesystemType::Ext4,
+                100000,
+                60000,
+            ));
     }
 
     /// Navigate to next screen in Calamares module sequence
@@ -347,7 +346,11 @@ impl GuiInstallerWizard {
     }
 
     /// Calculate Dual-Boot Alongside partitioning layout
-    pub fn calculate_alongside_layout(&mut self, target_os_partition: &str, allocate_sigma_mb: u64) -> Result<Vec<PartitionEntry>, InstallerError> {
+    pub fn calculate_alongside_layout(
+        &mut self,
+        target_os_partition: &str,
+        allocate_sigma_mb: u64,
+    ) -> Result<Vec<PartitionEntry>, InstallerError> {
         let target_os = self
             .detected_operating_systems
             .iter()
@@ -369,12 +372,11 @@ impl GuiInstallerWizard {
         ));
 
         // 2. SigmaOS ESP EFI Partition
-        partitions.push(PartitionEntry::new(
-            "/dev/nvme0n1p3",
-            512,
-            FilesystemType::Fat32,
-            "/boot/efi",
-        ).with_flag("boot").with_flag("esp"));
+        partitions.push(
+            PartitionEntry::new("/dev/nvme0n1p3", 512, FilesystemType::Fat32, "/boot/efi")
+                .with_flag("boot")
+                .with_flag("esp"),
+        );
 
         // 3. SigmaOS Root Partition
         let root_mb = allocate_sigma_mb.saturating_sub(4512);
@@ -461,7 +463,9 @@ impl GuiInstallerWizard {
             InstallerScreen::Language => "Select your language",
             InstallerScreen::Location => "Select your location and timezone",
             InstallerScreen::Keyboard => "Select keyboard layout",
-            InstallerScreen::Partitioning => "Configure disk partitioning & dual-boot alongside setup",
+            InstallerScreen::Partitioning => {
+                "Configure disk partitioning & dual-boot alongside setup"
+            }
             InstallerScreen::UserSetup => "Create user accounts",
             InstallerScreen::SystemConfiguration => "Configure system settings",
             InstallerScreen::Summary => "Review installation summary before committing",
@@ -546,8 +550,13 @@ impl PartitioningCalculator {
 
         // Boot partition
         partitions.push(
-            PartitionEntry::new("/dev/sda1", self.boot_size_mb, FilesystemType::Ext4, "/boot")
-                .with_flag("boot"),
+            PartitionEntry::new(
+                "/dev/sda1",
+                self.boot_size_mb,
+                FilesystemType::Ext4,
+                "/boot",
+            )
+            .with_flag("boot"),
         );
 
         // Swap partition
@@ -611,9 +620,14 @@ mod tests {
         let mut wizard = GuiInstallerWizard::new();
         assert!(!wizard.detected_operating_systems.is_empty());
 
-        let layout = wizard.calculate_alongside_layout("/dev/nvme0n1p2", 50000).unwrap();
+        let layout = wizard
+            .calculate_alongside_layout("/dev/nvme0n1p2", 50000)
+            .unwrap();
         assert_eq!(layout.len(), 4);
-        assert_eq!(wizard.partitioning_operation, PartitioningOperation::Alongside);
+        assert_eq!(
+            wizard.partitioning_operation,
+            PartitioningOperation::Alongside
+        );
     }
 
     #[test]

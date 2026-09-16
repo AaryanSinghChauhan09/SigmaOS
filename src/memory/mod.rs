@@ -9,10 +9,10 @@
 // SigmaOS Memory Module
 // Virtual memory management, paging, physical memory allocation, and TLB caching
 
-pub mod quota;
 pub mod cgroups;
 pub mod kswapd;
 pub mod paging;
+pub mod quota;
 pub mod segmentation_paging;
 pub mod tlb_associative;
 pub mod zone;
@@ -24,6 +24,10 @@ pub use paging::{
 
 pub use cgroups::{MemCgroup, MemCgroupManager};
 pub use kswapd::{LinuxKswapd, PageState};
+pub use quota::{
+    MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, PageCacheStat,
+    ProcessMemoryAccount,
+};
 pub use segmentation_paging::{
     AddressBindingMode, AddressType, AslrEntropyConfig, CpuRing, ExecutableAddressBinding,
     RandomizedAddressSpace, SegmentDescriptor, SegmentSelector, SegmentationPagingEngine,
@@ -31,4 +35,3 @@ pub use segmentation_paging::{
 };
 pub use tlb_associative::{AssociativeTlbCache, TlbAssociativityMode, TlbEntry, TlbPageFlags};
 pub use zone::{BsdZoneAllocator, Slab, Zone, ZoneStats};
-pub use quota::{MemoryController, MemoryStats, MemoryUnit, OomEvent, OomPolicy, ProcessMemoryAccount, PageCacheStat};

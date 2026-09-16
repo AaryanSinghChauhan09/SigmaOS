@@ -2,8 +2,8 @@
 // Implements DNF package management, SELinux integration, and RPM support
 
 use crate::klib::Vec;
-use std::string::String;
 use core::cell::Cell;
+use std::string::String;
 
 pub use crate::compatibility::fedora::BodhiUpdateTriage;
 
@@ -551,7 +551,8 @@ mod fedora_parity_tests {
         assert_eq!(ver, "1.25.3");
         assert_eq!(rel, "1.fc40");
 
-        let task_id = builder.submit_koji_build(&name, &ver, &rel, TargetArchitecture::X86_64, true);
+        let task_id =
+            builder.submit_koji_build(&name, &ver, &rel, TargetArchitecture::X86_64, true);
         assert_eq!(task_id, 1000);
         assert!(builder.complete_task(task_id));
         assert!(builder.build_tasks[0].is_completed);

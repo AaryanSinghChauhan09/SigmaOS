@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: MIT
 // SigmaOS NextGen Distro Leap Subsystem
 // Superiority capabilities taking SigmaOS beyond Linux (Fedora, Arch, CachyOS, NixOS, Pop!_OS) & BSD (FreeBSD, OpenBSD, DragonFly BSD) distributions:

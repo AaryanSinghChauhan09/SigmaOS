@@ -5023,7 +5023,9 @@ mod tests {
         let matches = mqtt.publish("sensors/temperature/room_1", b"22.5C", 1, true);
         assert_eq!(matches, 1);
         assert_eq!(mqtt.published_count, 1);
-        assert!(mqtt.retained_messages.contains_key("sensors/temperature/room_1"));
+        assert!(mqtt
+            .retained_messages
+            .contains_key("sensors/temperature/room_1"));
     }
 
     #[test]

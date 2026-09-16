@@ -16,15 +16,15 @@ use std::vec::Vec;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OmakasePresetConfig {
     pub preset_name: String,
-    pub wm_compositor: String,      // Hyprland
-    pub shell_ui: String,           // Quickshell
-    pub terminal_emulator: String,  // Ghostty
-    pub multiplexer: String,        // Tmux
-    pub default_editor: String,     // Neovim
-    pub tiling_mode: String,        // Dwindle / Master
-    pub super_key_binding: String,  // Super / Mod4
-    pub ai_assistant_key: String,   // Super + Ctrl + Return (Herdr agent manager)
-    pub tdl_layout_key: String,     // Super + Alt + K
+    pub wm_compositor: String,         // Hyprland
+    pub shell_ui: String,              // Quickshell
+    pub terminal_emulator: String,     // Ghostty
+    pub multiplexer: String,           // Tmux
+    pub default_editor: String,        // Neovim
+    pub tiling_mode: String,           // Dwindle / Master
+    pub super_key_binding: String,     // Super / Mod4
+    pub ai_assistant_key: String,      // Super + Ctrl + Return (Herdr agent manager)
+    pub tdl_layout_key: String,        // Super + Alt + K
     pub quickstart_bootstrap_sec: u32, // 60s target
 }
 
@@ -65,7 +65,9 @@ impl OmakasePresetConfig {
         cfg.push_str("    layout = dwindle\n");
         cfg.push_str("}\n\n");
         cfg.push_str("# Agentic Workstation Keybindings\n");
-        cfg.push_str(&format!("bind = SUPER CTRL, Return, exec, herdr-agent-manager\n"));
+        cfg.push_str(&format!(
+            "bind = SUPER CTRL, Return, exec, herdr-agent-manager\n"
+        ));
         cfg.push_str(&format!("bind = SUPER ALT, K, exec, sigomarchy tdl ai\n"));
         cfg.push_str("bind = SUPER, Return, exec, ghostty\n");
         cfg.push_str("bind = SUPER, Q, killactive,\n");
@@ -214,7 +216,11 @@ impl OmarchySystemEngine {
                 bar.render_qml_bar_spec()
             }
             "herdr-run" => {
-                let prompt = if args.len() > 1 { args[1] } else { "Optimize kernel scheduler" };
+                let prompt = if args.len() > 1 {
+                    args[1]
+                } else {
+                    "Optimize kernel scheduler"
+                };
                 let mut agent = OmarchyHerdrAiWorkflowAgent::new("Sovereign-Coder-v1");
                 agent.execute_ai_task(prompt)
             }

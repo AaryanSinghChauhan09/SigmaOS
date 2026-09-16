@@ -2,9 +2,9 @@ use std::boxed::Box;
 use std::format;
 use std::vec;
 
+use core::any::Any;
 use std::string::String;
 use std::vec::Vec;
-use core::any::Any;
 
 use crate::kernel::object::{KObject, KRef, KernelObject};
 use crate::security::capability::CapabilityToken;

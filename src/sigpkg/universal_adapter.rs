@@ -3,14 +3,14 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
+pub use super::universal_engine::PackageFormat;
+pub use super::universal_oop_system;
 /// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-pub use super::universal_engine::PackageFormat;
-pub use super::universal_oop_system;
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -72,7 +72,6 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Permission {
@@ -102,7 +101,6 @@ pub struct PacmanPkgbuild {
     pub makedepends: Vec<String>,
     pub source_urls: Vec<String>,
 }
-
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -168,8 +166,6 @@ pub struct NetBsdPkgsrcManifest {
     pub comment: String,
     pub depends: Vec<String>,
 }
-
-
 
 /// Description of openSUSE Zypper RPM spec/manifest
 #[derive(Debug, Clone)]
@@ -1721,8 +1717,12 @@ impl UniversalDependencyMapper {
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
             "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
-            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => "glib".to_string(),
-            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => "pcre".to_string(),
+            "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => {
+                "glib".to_string()
+            }
+            "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => {
+                "pcre".to_string()
+            }
             "libuv" | "libuv-dev" | "libuv-devel" | "dev-libs/libuv" => "libuv".to_string(),
             "openssh" | "openssh-server" | "net-misc/openssh" => "openssh".to_string(),
             "mesa" | "mesa-dev" | "mesa-libgl-devel" | "media-libs/mesa" => "mesa".to_string(),
@@ -3537,7 +3537,6 @@ mod tests {
         assert_eq!(slack_action.source_pm, "slackpkg");
         assert_eq!(slack_action.operation, UniversalPmOperation::Install);
     }
-
 
     #[test]
     fn test_haiku_hpkg_manifest_parsing_and_bridge() {

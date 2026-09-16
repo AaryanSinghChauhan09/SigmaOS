@@ -9,14 +9,12 @@
 // dependency on std::collections::HashMap (uses the crate's own SigmaHashMap
 // from klib where maps are required).
 
-
-
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ── Rolling release model ─────────────────────────────────────────────────────
 

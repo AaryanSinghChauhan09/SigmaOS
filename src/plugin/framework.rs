@@ -79,7 +79,11 @@ impl SovereignPluginFramework {
     }
 
     pub fn unload_plugin(&mut self, plugin_id: &str) -> bool {
-        if let Some(pos) = self.loaded_plugins.iter().position(|(m, _)| m.id == plugin_id) {
+        if let Some(pos) = self
+            .loaded_plugins
+            .iter()
+            .position(|(m, _)| m.id == plugin_id)
+        {
             self.loaded_plugins.remove(pos);
             true
         } else {
@@ -95,7 +99,12 @@ impl SovereignPluginFramework {
         }
     }
 
-    pub fn execute_plugin_ipc(&self, plugin_id: &str, action: &str, payload: &str) -> Result<String, &'static str> {
+    pub fn execute_plugin_ipc(
+        &self,
+        plugin_id: &str,
+        action: &str,
+        payload: &str,
+    ) -> Result<String, &'static str> {
         let (_, ctx) = self
             .loaded_plugins
             .iter()
@@ -106,7 +115,12 @@ impl SovereignPluginFramework {
             return Err("Plugin is inactive");
         }
 
-        Ok(format!("ipc_ack_{}_{}_{}", plugin_id, action, payload.len()))
+        Ok(format!(
+            "ipc_ack_{}_{}_{}",
+            plugin_id,
+            action,
+            payload.len()
+        ))
     }
 
     pub fn loaded_plugins(&self) -> Vec<&PluginManifest> {
@@ -114,7 +128,10 @@ impl SovereignPluginFramework {
     }
 
     pub fn active_plugins_count(&self) -> usize {
-        self.loaded_plugins.iter().filter(|(_, c)| c.is_active).count()
+        self.loaded_plugins
+            .iter()
+            .filter(|(_, c)| c.is_active)
+            .count()
     }
 }
 

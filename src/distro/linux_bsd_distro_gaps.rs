@@ -2,7 +2,6 @@
 // SigmaOS Distro Gap Resolution Subsystem (Bootloader, USB HID, Wireless/Bluetooth, TCP/UDP Stack, Init Manager & Job Scheduler)
 // Parity extensions address infrastructure gaps compared to established Linux and BSD distributions
 
-
 use std::string::ToString;
 use std::vec;
 use std::vec::Vec;
@@ -684,7 +683,6 @@ impl SovereignStatefulNatEngine {
         dst_port: u16,
         _protocol: u8,
     ) -> ([u8; 4], u16) {
-
         // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
             c.original_src == internal_src
@@ -714,7 +712,9 @@ impl SovereignStatefulNatEngine {
         translated_dst_port: u16,
     ) -> Option<([u8; 4], u16)> {
         for entry in &mut self.conntrack_table {
-            if entry.translated_ip == translated_dst_ip && entry.translated_port == translated_dst_port {
+            if entry.translated_ip == translated_dst_ip
+                && entry.translated_port == translated_dst_port
+            {
                 entry.packets_counter += 1;
                 return Some((entry.original_src, entry.src_port));
             }
@@ -740,13 +740,13 @@ pub struct DistroComponentSnapshot {
 /// Roadmap Phase Action Plan Entry
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroRoadmapPhase {
-    Phase1Foundation,    // Q4 2026 - Q2 2027: Init system, sigmapkg PM, POSIX coreutils
-    Phase2Parity,        // Q3 2027 - Q1 2028: TCP/IP stack, ext4/ZFS/Btrfs/UFS, Sandboxed drivers
+    Phase1Foundation, // Q4 2026 - Q2 2027: Init system, sigmapkg PM, POSIX coreutils
+    Phase2Parity,     // Q3 2027 - Q1 2028: TCP/IP stack, ext4/ZFS/Btrfs/UFS, Sandboxed drivers
     Phase3Competitiveness, // Q2 2028 - Q4 2028: Native containers, Jails, Hypervisor, Atomic updates
-    Phase4Sovereignty,   // 2029+: MAC frameworks, Cryptographic boot, Privacy-first telemetry, Accessibility & i18n
-    ShortTerm,           // Legacy ShortTerm mapping
-    MidTerm,             // Legacy MidTerm mapping
-    LongTerm,            // Legacy LongTerm mapping
+    Phase4Sovereignty, // 2029+: MAC frameworks, Cryptographic boot, Privacy-first telemetry, Accessibility & i18n
+    ShortTerm,         // Legacy ShortTerm mapping
+    MidTerm,           // Legacy MidTerm mapping
+    LongTerm,          // Legacy LongTerm mapping
 }
 
 /// Security & Sovereignty Blueprint Feature Entry
@@ -802,7 +802,8 @@ impl SovereignMasterDistroEcosystemEngine {
             DistroComponentSnapshot {
                 component: "Networking",
                 linux_bsd_status: "Full TCP/IP, firewall (iptables/pf)",
-                sigma_os_current_status: "NetworkTcpUdpStack, OpenBsdPfFirewallEngine, DoT, Stateful NAT",
+                sigma_os_current_status:
+                    "NetworkTcpUdpStack, OpenBsdPfFirewallEngine, DoT, Stateful NAT",
                 gap_closure_needed: "Expand routing & PQC WireGuard VPN stack",
                 readiness_score_percent: 100,
             },
@@ -830,14 +831,16 @@ impl SovereignMasterDistroEcosystemEngine {
             DistroComponentSnapshot {
                 component: "Security",
                 linux_bsd_status: "SELinux, AppArmor, Capsicum",
-                sigma_os_current_status: "Landlock v5, FreeBSD Capsicum, OpenBSD Pledge/Unveil, SELinux MLS/MCS",
+                sigma_os_current_status:
+                    "Landlock v5, FreeBSD Capsicum, OpenBSD Pledge/Unveil, SELinux MLS/MCS",
                 gap_closure_needed: "Add MAC + sandboxing",
                 readiness_score_percent: 100,
             },
             DistroComponentSnapshot {
                 component: "Virtualization",
                 linux_bsd_status: "KVM, bhyve",
-                sigma_os_current_status: "SovereignMicrovmHypervisorGateway & OpenBsdVmmBhyveBridge",
+                sigma_os_current_status:
+                    "SovereignMicrovmHypervisorGateway & OpenBsdVmmBhyveBridge",
                 gap_closure_needed: "Add microVM hypervisor integration",
                 readiness_score_percent: 100,
             },
@@ -855,7 +858,7 @@ impl SovereignMasterDistroEcosystemEngine {
     pub fn evaluate_roadmap_phase(&self, phase: DistroRoadmapPhase) -> bool {
         match phase {
             DistroRoadmapPhase::Phase1Foundation | DistroRoadmapPhase::ShortTerm => true, // Init, Universal PM, Coreutils ready
-            DistroRoadmapPhase::Phase2Parity | DistroRoadmapPhase::MidTerm => true,       // Networking, Filesystems, Drivers ready
+            DistroRoadmapPhase::Phase2Parity | DistroRoadmapPhase::MidTerm => true, // Networking, Filesystems, Drivers ready
             DistroRoadmapPhase::Phase3Competitiveness | DistroRoadmapPhase::LongTerm => true, // Containers, Hypervisors, Rollbacks
             DistroRoadmapPhase::Phase4Sovereignty => true, // MAC, Cryptographic boot, Telemetry, Accessibility & i18n ready
         }
@@ -952,7 +955,10 @@ impl SovereignJournaldBinaryStorageEngine {
     }
 
     pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
+        self.logs
+            .iter()
+            .filter(|l| l.priority <= min_priority)
+            .collect()
     }
 }
 

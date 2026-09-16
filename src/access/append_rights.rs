@@ -2,7 +2,6 @@ use std::string::String;
 use std::vec::Vec;
 // Appending Access Rights & Immutable Journal Stream Enforcement for SigmaOS
 
-
 /// Appending Access Rights Stream Flags
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AppendingRightsFlags {

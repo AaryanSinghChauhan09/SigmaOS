@@ -10,11 +10,11 @@
 //! 8. Norigin Spatial Navigation (Euclidean-distance directional focus routing, nested container isolation, and navigation locks).
 use std::vec;
 
+use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // ==========================================
 // 1. NumPy Parity: SovereignNumPy

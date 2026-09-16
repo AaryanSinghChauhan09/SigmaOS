@@ -1,18 +1,17 @@
 // Multiboot2 Loader and Specification Parser
 // High-fidelity Multiboot2 specification validation and parsing inspired by Linux/BSD loaders
 
-
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-use crate::boot::firmware::{BootLoader, BootParams, BootError};
+use crate::boot::firmware::{BootError, BootLoader, BootParams};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Multiboot2Header {
-    pub magic: u32,           // Must be 0xE85250D6
-    pub architecture: u32,    // 0 = i386, 4 = MIPS
-    pub header_length: u32,   // Total length of header + tags
-    pub checksum: u32,        // magic + arch + header_length + checksum == 0
+    pub magic: u32,         // Must be 0xE85250D6
+    pub architecture: u32,  // 0 = i386, 4 = MIPS
+    pub header_length: u32, // Total length of header + tags
+    pub checksum: u32,      // magic + arch + header_length + checksum == 0
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -135,13 +134,15 @@ pub fn parse_mbi(mbi_bytes: &[u8]) -> Result<ParsedMbi, &'static str> {
             1 => {
                 // Boot command line (null-terminated string starting at offset 8)
                 if tag_size > 8 {
-                    cmdline = parse_null_terminated_string(&mbi_bytes[offset + 8..offset + tag_size]);
+                    cmdline =
+                        parse_null_terminated_string(&mbi_bytes[offset + 8..offset + tag_size]);
                 }
             }
             2 => {
                 // Boot loader name
                 if tag_size > 8 {
-                    boot_loader_name = parse_null_terminated_string(&mbi_bytes[offset + 8..offset + tag_size]);
+                    boot_loader_name =
+                        parse_null_terminated_string(&mbi_bytes[offset + 8..offset + tag_size]);
                 }
             }
             3 => {
@@ -237,7 +238,7 @@ fn u64_from_le(slice: &[u8]) -> u64 {
 
 fn parse_null_terminated_string(bytes: &[u8]) -> Option<String> {
     let len = bytes.iter().position(|&b| b == 0).unwrap_or(bytes.len());
-    let s = core:: String::from_utf8(&bytes[..len]).ok()?;
+    let s = core::String::from_utf8(&bytes[..len]).ok()?;
     Some(s.to_string())
 }
 
@@ -257,7 +258,11 @@ impl Multiboot2BootLoader {
 }
 
 impl BootLoader for Multiboot2BootLoader {
-    fn enter_kernel(&self, kernel_entry: usize, _params: *const BootParams) -> Result<(), BootError> {
+    fn enter_kernel(
+        &self,
+        kernel_entry: usize,
+        _params: *const BootParams,
+    ) -> Result<(), BootError> {
         if kernel_entry == 0 {
             return Err(BootError::InvalidConfiguration);
         }
@@ -305,7 +310,10 @@ mod tests {
         let architecture = 0u32;
         let header_length = 16u32;
         // magic + arch + header_length + checksum = 0
-        let checksum = 0u32.wrapping_sub(magic).wrapping_sub(architecture).wrapping_sub(header_length);
+        let checksum = 0u32
+            .wrapping_sub(magic)
+            .wrapping_sub(architecture)
+            .wrapping_sub(header_length);
 
         image[offset..offset + 4].copy_from_slice(&magic.to_le_bytes());
         image[offset + 4..offset + 8].copy_from_slice(&architecture.to_le_bytes());

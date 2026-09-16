@@ -1,5 +1,5 @@
-use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use std::vec::Vec;
 
 pub type ShellVec<T> = std::vec::Vec<T>;
 pub type CommandID = usize;

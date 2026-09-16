@@ -9,8 +9,8 @@ use std::vec::Vec;
 // accept_keywords architecture evaluation, Manifest distfile digest verification,
 // OpenRC runlevel dependency supervision, and Catalyst stage compilation.
 
-use crate::klib::hashset::HashSet;
 use crate::klib::btreemap::BTreeMap;
+use crate::klib::hashset::HashSet;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,

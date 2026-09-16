@@ -403,7 +403,9 @@ mod tests {
     #[test]
     fn test_dvc_mlflow_vfs_tracker() {
         let mut dvc = DvcMlflowVfsTracker::new("mnist-model");
-        let snap_id = dvc.snapshot_training_state("epoch-10", "/var/models/mnist.bin").unwrap();
+        let snap_id = dvc
+            .snapshot_training_state("epoch-10", "/var/models/mnist.bin")
+            .unwrap();
         assert_eq!(snap_id, "snap-1");
         assert_eq!(dvc.snapshots.len(), 1);
     }
@@ -423,9 +425,14 @@ impl DvcMlflowVfsTracker {
         }
     }
 
-    pub fn snapshot_training_state(&mut self, stage: &str, model_path: &str) -> Result<String, &'static str> {
+    pub fn snapshot_training_state(
+        &mut self,
+        stage: &str,
+        model_path: &str,
+    ) -> Result<String, &'static str> {
         let snap_id = format!("snap-{}", self.snapshots.len() + 1);
-        self.snapshots.push(format!("{}:{}:{}", snap_id, stage, model_path));
+        self.snapshots
+            .push(format!("{}:{}:{}", snap_id, stage, model_path));
         Ok(snap_id)
     }
 }

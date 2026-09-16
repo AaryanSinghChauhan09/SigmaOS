@@ -1567,7 +1567,11 @@ mod tests {
         keyring.init_keyring();
         assert!(keyring.is_initialized);
 
-        keyring.import_pgp_key("0x1234567890ABCDEF", "Arch Linux Master Key", PgpTrustLevel::Ultimate);
+        keyring.import_pgp_key(
+            "0x1234567890ABCDEF",
+            "Arch Linux Master Key",
+            PgpTrustLevel::Ultimate,
+        );
         assert!(keyring.verify_key_trust("0x1234567890ABCDEF"));
 
         keyring.revoke_pgp_key("0x1234567890ABCDEF");
@@ -1600,7 +1604,12 @@ mod tests {
     #[test]
     fn test_aur_rpc_client() {
         let mut aur = ArchUserRepositoryRpcClientEngine::new();
-        aur.register_mock_aur_package("yay", "12.3.0", "Yet another Yogurt - AUR Helper", vec!["go", "git"]);
+        aur.register_mock_aur_package(
+            "yay",
+            "12.3.0",
+            "Yet another Yogurt - AUR Helper",
+            vec!["go", "git"],
+        );
 
         let pkg = aur.search_aur_package("yay").unwrap();
         assert_eq!(pkg.version, "12.3.0");
@@ -1719,7 +1728,11 @@ impl ArchReflectorMirrorlistEngine {
         });
     }
 
-    pub fn rank_mirrors(&self, target_country: &str, min_speed_mbps: f32) -> Vec<ReflectorMirrorRecord> {
+    pub fn rank_mirrors(
+        &self,
+        target_country: &str,
+        min_speed_mbps: f32,
+    ) -> Vec<ReflectorMirrorRecord> {
         let mut candidates: Vec<ReflectorMirrorRecord> = self
             .mirrors
             .iter()
@@ -1798,7 +1811,13 @@ impl ArchUserRepositoryRpcClientEngine {
         }
     }
 
-    pub fn register_mock_aur_package(&mut self, name: &str, ver: &str, desc: &str, deps: Vec<&str>) {
+    pub fn register_mock_aur_package(
+        &mut self,
+        name: &str,
+        ver: &str,
+        desc: &str,
+        deps: Vec<&str>,
+    ) {
         self.mock_aur_database.insert(
             name.to_string(),
             AurRpcPackageRecord {

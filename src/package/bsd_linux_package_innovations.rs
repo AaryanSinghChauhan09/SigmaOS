@@ -4,7 +4,6 @@
 // Arch ALPM hooks, Fedora DNF5 DeltaRPM, Gentoo Portage subslots, Haiku PackageFS,
 // Debian apt-mark, Void xbps-src, Fedora DNF history, and NetBSD pkgin.
 
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -1767,7 +1766,10 @@ impl FedoraDnfHistoryRollbackJournalEngine {
         tx_id
     }
 
-    pub fn compute_rollback_actions(&self, target_tx_id: u64) -> Result<Vec<DnfActionRecord>, &'static str> {
+    pub fn compute_rollback_actions(
+        &self,
+        target_tx_id: u64,
+    ) -> Result<Vec<DnfActionRecord>, &'static str> {
         let mut undo_actions = Vec::new();
         let target_idx = self
             .history
@@ -1944,7 +1946,11 @@ impl XbpsDowngradeRepoEngine {
         self.held_packages.contains(&name.to_string())
     }
 
-    pub fn find_downgrade_candidate(&self, name: &str, current_version: &str) -> Option<XbpsCachedPkg> {
+    pub fn find_downgrade_candidate(
+        &self,
+        name: &str,
+        current_version: &str,
+    ) -> Option<XbpsCachedPkg> {
         self.cached_packages
             .iter()
             .filter(|p| p.name == name && p.version != current_version)
@@ -2049,7 +2055,9 @@ impl FreeBsdPkgAuditEngine {
     pub fn audit_package(&self, name: &str, version: &str) -> Vec<PkgAuditAdvisory> {
         self.advisories
             .iter()
-            .filter(|a| a.package_name == name && a.vulnerable_versions.contains(&version.to_string()))
+            .filter(|a| {
+                a.package_name == name && a.vulnerable_versions.contains(&version.to_string())
+            })
             .cloned()
             .collect()
     }
@@ -2062,7 +2070,10 @@ impl FreeBsdPkgAuditEngine {
                     true,
                     Some(format!(
                         "Installation blocked: {} version {} has advisory {} (CVSS {})",
-                        name, version, vuln.id, vuln.cvss_score as f32 / 10.0
+                        name,
+                        version,
+                        vuln.id,
+                        vuln.cvss_score as f32 / 10.0
                     )),
                 );
             }
@@ -2270,10 +2281,17 @@ impl RpmDeltaReconstitutionEngine {
         let spec = self
             .available_deltas
             .iter()
-            .find(|d| d.package_name == package_name && d.base_version == base_ver && d.target_version == target_ver)
+            .find(|d| {
+                d.package_name == package_name
+                    && d.base_version == base_ver
+                    && d.target_version == target_ver
+            })
             .ok_or("Delta RPM spec not found")?;
 
-        Ok(format!("{}-{}.x86_64.rpm", spec.package_name, spec.target_version))
+        Ok(format!(
+            "{}-{}.x86_64.rpm",
+            spec.package_name, spec.target_version
+        ))
     }
 
     pub fn total_bandwidth_saved(&self) -> u64 {
@@ -2409,7 +2427,9 @@ impl PacmanKeyringEngine {
         let mut current_id = key_id.to_string();
         for _ in 0..10 {
             if let Some(key) = self.keyring.get(&current_id) {
-                if key.trust_level == PacmanKeyTrust::Revoked || key.trust_level == PacmanKeyTrust::Expired {
+                if key.trust_level == PacmanKeyTrust::Revoked
+                    || key.trust_level == PacmanKeyTrust::Expired
+                {
                     return false;
                 }
                 if let Some(ref issuer) = key.issuer_key_id {
@@ -2470,16 +2490,27 @@ impl SovereignPackageBuildProvenanceEngine {
     }
 
     pub fn record_attestation(&mut self, attestation: PackageBuildAttestation) {
-        self.attestations.insert(attestation.package_name.clone(), attestation);
+        self.attestations
+            .insert(attestation.package_name.clone(), attestation);
     }
 
-    pub fn verify_reproducible_match(&self, pkg_name: &str, computed_sha256: &str) -> Result<bool, &'static str> {
-        let att = self.attestations.get(pkg_name).ok_or("Attestation record not found")?;
+    pub fn verify_reproducible_match(
+        &self,
+        pkg_name: &str,
+        computed_sha256: &str,
+    ) -> Result<bool, &'static str> {
+        let att = self
+            .attestations
+            .get(pkg_name)
+            .ok_or("Attestation record not found")?;
         Ok(att.artifact_sha256.eq_ignore_ascii_case(computed_sha256))
     }
 
     pub fn generate_buildinfo_manifest(&self, pkg_name: &str) -> Result<String, &'static str> {
-        let att = self.attestations.get(pkg_name).ok_or("Attestation record not found")?;
+        let att = self
+            .attestations
+            .get(pkg_name)
+            .ok_or("Attestation record not found")?;
         let mut info = String::from("Format: 1.0\n");
         info.push_str(&format!("Build-Origin: {}\n", att.package_name));
         info.push_str(&format!("Version: {}\n", att.version));
@@ -2527,7 +2558,10 @@ impl ArchCachyOsMicroarchBuildProfileEngine {
                 target_level: MicroarchitectureLevel::V4,
                 march_flag: "-march=x86-64-v4".to_string(),
                 opt_level: "-O3".to_string(),
-                extra_cflags: vec!["-flto=thin".to_string(), "-mprefer-vector-width=512".to_string()],
+                extra_cflags: vec![
+                    "-flto=thin".to_string(),
+                    "-mprefer-vector-width=512".to_string(),
+                ],
             },
             MicroarchitectureLevel::V3 => MicroarchCompilerFlags {
                 target_level: MicroarchitectureLevel::V3,
@@ -2550,7 +2584,10 @@ impl ArchCachyOsMicroarchBuildProfileEngine {
         }
     }
 
-    pub fn resolve_fallback_level(&self, available_levels: &[MicroarchitectureLevel]) -> MicroarchitectureLevel {
+    pub fn resolve_fallback_level(
+        &self,
+        available_levels: &[MicroarchitectureLevel],
+    ) -> MicroarchitectureLevel {
         let mut sorted = available_levels.to_vec();
         sorted.sort();
         for level in sorted.into_iter().rev() {
@@ -2594,7 +2631,8 @@ impl OpenBsdSignifyBinaryIntegrityEngine {
     }
 
     pub fn register_key(&mut self, key_id: &str, pubkey: &str) {
-        self.trusted_signify_keys.insert(key_id.to_string(), pubkey.to_string());
+        self.trusted_signify_keys
+            .insert(key_id.to_string(), pubkey.to_string());
     }
 
     pub fn revoke_key(&mut self, key_id: &str) {
@@ -2602,15 +2640,22 @@ impl OpenBsdSignifyBinaryIntegrityEngine {
         self.trusted_signify_keys.remove(key_id);
     }
 
-    pub fn verify_dual_signature(&self, header: &SignifyPqcSignatureHeader) -> Result<bool, &'static str> {
+    pub fn verify_dual_signature(
+        &self,
+        header: &SignifyPqcSignatureHeader,
+    ) -> Result<bool, &'static str> {
         if self.revoked_keys.contains(&header.signify_key_id) {
             return Err("Signify key has been revoked in CRL");
         }
 
-        let pubkey = self.trusted_signify_keys.get(&header.signify_key_id).ok_or("Untrusted Signify key ID")?;
+        let pubkey = self
+            .trusted_signify_keys
+            .get(&header.signify_key_id)
+            .ok_or("Untrusted Signify key ID")?;
 
         let signify_valid = !header.signify_sig_b64.is_empty() && !pubkey.is_empty();
-        let pqc_valid = header.dilithium5_sig_b64.contains("dilithium5") || !header.dilithium5_sig_b64.is_empty();
+        let pqc_valid = header.dilithium5_sig_b64.contains("dilithium5")
+            || !header.dilithium5_sig_b64.is_empty();
 
         Ok(signify_valid && pqc_valid)
     }
@@ -2709,14 +2754,21 @@ pub struct FreeBsdPkgMessageNotifierEngine {
 
 impl FreeBsdPkgMessageNotifierEngine {
     pub fn new() -> Self {
-        Self { notices: Vec::new() }
+        Self {
+            notices: Vec::new(),
+        }
     }
 
     pub fn register_notice(&mut self, notice: PkgMessageNotice) {
         self.notices.push(notice);
     }
 
-    pub fn collect_notices_for_action(&self, pkg_name: &str, event: &str, current_ver: &str) -> Vec<String> {
+    pub fn collect_notices_for_action(
+        &self,
+        pkg_name: &str,
+        event: &str,
+        current_ver: &str,
+    ) -> Vec<String> {
         let mut result = Vec::new();
         for notice in &self.notices {
             if notice.package_name == pkg_name && notice.trigger_event.eq_ignore_ascii_case(event) {
@@ -2778,7 +2830,13 @@ impl OpenBsdPledgeUnveilSandboxScriptletEngine {
         self.policies.insert(key, policy);
     }
 
-    pub fn validate_scriptlet_access(&self, pkg_name: &str, scriptlet_type: &str, target_path: &str, req_perm: &str) -> bool {
+    pub fn validate_scriptlet_access(
+        &self,
+        pkg_name: &str,
+        scriptlet_type: &str,
+        target_path: &str,
+        req_perm: &str,
+    ) -> bool {
         let key = format!("{}/{}", pkg_name, scriptlet_type);
         if let Some(policy) = self.policies.get(&key) {
             for rule in &policy.unveil_rules {
@@ -2828,7 +2886,10 @@ impl AlpineApkCachePeerSyncEngine {
     pub fn find_local_peer_with_artifact(&self, artifact_sha256: &str) -> Option<ApkPeerNode> {
         self.peers
             .iter()
-            .find(|p| p.available_sha256_hashes.contains(&artifact_sha256.to_string()))
+            .find(|p| {
+                p.available_sha256_hashes
+                    .contains(&artifact_sha256.to_string())
+            })
             .cloned()
     }
 }
@@ -2858,7 +2919,9 @@ pub struct AptListChangesNewsAuditorEngine {
 
 impl AptListChangesNewsAuditorEngine {
     pub fn new() -> Self {
-        Self { news_db: Vec::new() }
+        Self {
+            news_db: Vec::new(),
+        }
     }
 
     pub fn register_news(&mut self, entry: AptNewsEntry) {
@@ -2904,7 +2967,9 @@ pub struct PacdiffConfigMergeGovernorEngine {
 
 impl PacdiffConfigMergeGovernorEngine {
     pub fn new() -> Self {
-        Self { candidates: Vec::new() }
+        Self {
+            candidates: Vec::new(),
+        }
     }
 
     pub fn register_candidate(&mut self, config_path: &str, pacnew_path: &str) {
@@ -2916,7 +2981,11 @@ impl PacdiffConfigMergeGovernorEngine {
     }
 
     pub fn apply_decision(&mut self, config_path: &str, decision: PacdiffMergeDecision) -> bool {
-        if let Some(cand) = self.candidates.iter_mut().find(|c| c.config_path == config_path) {
+        if let Some(cand) = self
+            .candidates
+            .iter_mut()
+            .find(|c| c.config_path == config_path)
+        {
             cand.pending_decision = Some(decision);
             true
         } else {
@@ -2949,7 +3018,9 @@ pub struct PortageEtcUpdateGitOverlayEngine {
 
 impl PortageEtcUpdateGitOverlayEngine {
     pub fn new() -> Self {
-        Self { commits: Vec::new() }
+        Self {
+            commits: Vec::new(),
+        }
     }
 
     pub fn record_config_change(&mut self, path: &str, hash: &str, now_sec: u64, summary: &str) {
@@ -2995,7 +3066,9 @@ pub struct RpmOstreeLayeredImageGovernorEngine {
 
 impl RpmOstreeLayeredImageGovernorEngine {
     pub fn new() -> Self {
-        Self { deployments: Vec::new() }
+        Self {
+            deployments: Vec::new(),
+        }
     }
 
     pub fn register_deployment(&mut self, dep: OstreeLayeredDeployment) {
@@ -3162,7 +3235,9 @@ pub struct FedoraModularityModulemdEngine {
 
 impl FedoraModularityModulemdEngine {
     pub fn new() -> Self {
-        Self { modules: Vec::new() }
+        Self {
+            modules: Vec::new(),
+        }
     }
 
     pub fn register_module_stream(&mut self, spec: ModulemdStreamSpec) {
@@ -3298,7 +3373,9 @@ pub struct AlpineApkEdgeOverlayEngine {
 
 impl AlpineApkEdgeOverlayEngine {
     pub fn new() -> Self {
-        Self { overlays: Vec::new() }
+        Self {
+            overlays: Vec::new(),
+        }
     }
 
     pub fn add_overlay(&mut self, name: &str, url: &str, testing: bool) {
@@ -3434,8 +3511,15 @@ impl ArchVoidCleanChrootBuildEngine {
         format!("{}/root", base_path)
     }
 
-    pub fn install_chroot_build_deps(&mut self, chroot_id: &str, deps: &[&str]) -> Result<usize, &'static str> {
-        let env = self.chroots.get_mut(chroot_id).ok_or("Chroot environment not found")?;
+    pub fn install_chroot_build_deps(
+        &mut self,
+        chroot_id: &str,
+        deps: &[&str],
+    ) -> Result<usize, &'static str> {
+        let env = self
+            .chroots
+            .get_mut(chroot_id)
+            .ok_or("Chroot environment not found")?;
         let mut added = 0;
         for &dep in deps {
             if !env.installed_build_deps.contains(&dep.to_string()) {
@@ -3448,15 +3532,28 @@ impl ArchVoidCleanChrootBuildEngine {
     }
 
     pub fn reset_chroot(&mut self, chroot_id: &str) -> Result<bool, &'static str> {
-        let env = self.chroots.get_mut(chroot_id).ok_or("Chroot environment not found")?;
+        let env = self
+            .chroots
+            .get_mut(chroot_id)
+            .ok_or("Chroot environment not found")?;
         env.installed_build_deps.clear();
         env.is_dirty = false;
         Ok(true)
     }
 
-    pub fn build_in_chroot(&self, chroot_id: &str, package_name: &str) -> Result<String, &'static str> {
-        let env = self.chroots.get(chroot_id).ok_or("Chroot environment not found")?;
-        Ok(format!("{}/build/{}.pkg", env.rootfs_base_path, package_name))
+    pub fn build_in_chroot(
+        &self,
+        chroot_id: &str,
+        package_name: &str,
+    ) -> Result<String, &'static str> {
+        let env = self
+            .chroots
+            .get(chroot_id)
+            .ok_or("Chroot environment not found")?;
+        Ok(format!(
+            "{}/build/{}.pkg",
+            env.rootfs_base_path, package_name
+        ))
     }
 }
 
@@ -3500,7 +3597,12 @@ impl BsdLibraryAbiCompatMatrixEngine {
         self.registered_libraries.insert(spec.soname.clone(), spec);
     }
 
-    pub fn audit_package_abi(&self, pkg_name: &str, required_sonames: &[&str], required_symbols: &[&str]) -> BsdAbiAuditReport {
+    pub fn audit_package_abi(
+        &self,
+        pkg_name: &str,
+        required_sonames: &[&str],
+        required_symbols: &[&str],
+    ) -> BsdAbiAuditReport {
         let mut missing_sonames = Vec::new();
         let mut missing_symbols = Vec::new();
 
@@ -3511,7 +3613,10 @@ impl BsdLibraryAbiCompatMatrixEngine {
         }
 
         for &req_sym in required_symbols {
-            let found = self.registered_libraries.values().any(|lib| lib.exported_symbols.contains(&req_sym.to_string()));
+            let found = self
+                .registered_libraries
+                .values()
+                .any(|lib| lib.exported_symbols.contains(&req_sym.to_string()));
             if !found {
                 missing_symbols.push(req_sym.to_string());
             }
@@ -3581,7 +3686,11 @@ impl FedoraDeclarativeSysusersTmpfilesEngine {
             if parts.len() >= 2 && parts[0] == "u" {
                 let username = parts[1].to_string();
                 let uid_gid = parts.get(2).unwrap_or(&"-").to_string();
-                let gecos = parts.get(3).map(|s| s.trim_matches('"')).unwrap_or("System User").to_string();
+                let gecos = parts
+                    .get(3)
+                    .map(|s| s.trim_matches('"'))
+                    .unwrap_or("System User")
+                    .to_string();
                 let home_dir = parts.get(4).unwrap_or(&"/var/empty").to_string();
                 let shell = parts.get(5).unwrap_or(&"/sbin/nologin").to_string();
 
@@ -3732,7 +3841,11 @@ impl PortagePackageLicenseGovernorEngine {
     }
 
     pub fn allow_package_license(&mut self, pkg_pattern: &str, license_name: &str) {
-        if let Some(rule) = self.package_rules.iter_mut().find(|r| r.package_pattern == pkg_pattern) {
+        if let Some(rule) = self
+            .package_rules
+            .iter_mut()
+            .find(|r| r.package_pattern == pkg_pattern)
+        {
             if !rule.allowed_licenses.contains(&license_name.to_string()) {
                 rule.allowed_licenses.push(license_name.to_string());
             }
@@ -3745,7 +3858,11 @@ impl PortagePackageLicenseGovernorEngine {
     }
 
     pub fn is_license_accepted(&self, package_name: &str, license_name: &str) -> bool {
-        if self.global_accept_licenses.contains(&license_name.to_string()) || self.global_accept_licenses.contains(&"*".to_string()) {
+        if self
+            .global_accept_licenses
+            .contains(&license_name.to_string())
+            || self.global_accept_licenses.contains(&"*".to_string())
+        {
             return true;
         }
 
@@ -4211,7 +4328,10 @@ MAINTAINER="SigmaOS"
         assert_eq!(gov.find_autoremove_candidates().len(), 0);
 
         gov.mark_package("libzstd", AptMarkState::Auto);
-        assert_eq!(gov.find_autoremove_candidates(), vec!["libzstd".to_string()]);
+        assert_eq!(
+            gov.find_autoremove_candidates(),
+            vec!["libzstd".to_string()]
+        );
     }
 
     #[test]
@@ -4330,7 +4450,10 @@ MAINTAINER="SigmaOS"
 
         gc.add_gc_root("/nix/store/hash1-glibc-2.38", "system-profile");
         assert_eq!(
-            gc.calculate_closure_size(&["/nix/store/hash1-glibc-2.38", "/nix/store/hash2-unused-lib"]),
+            gc.calculate_closure_size(&[
+                "/nix/store/hash1-glibc-2.38",
+                "/nix/store/hash2-unused-lib"
+            ]),
             15_000_000
         );
 
@@ -4367,7 +4490,9 @@ MAINTAINER="SigmaOS"
             delta_sha256: "delta_sha256_hash".to_string(),
         });
 
-        let rpm = engine.reconstruct_rpm_package("bash", "5.2.15", "5.2.21").unwrap();
+        let rpm = engine
+            .reconstruct_rpm_package("bash", "5.2.15", "5.2.21")
+            .unwrap();
         assert_eq!(rpm, "bash-5.2.21.x86_64.rpm");
         assert_eq!(engine.total_bandwidth_saved(), 1_700_000);
     }
@@ -4386,10 +4511,7 @@ MAINTAINER="SigmaOS"
             engine.resolve_target_path("/bin/sh", "bash"),
             "/bin/sh.distrib"
         );
-        assert_eq!(
-            engine.resolve_target_path("/bin/sh", "dash"),
-            "/bin/sh"
-        );
+        assert_eq!(engine.resolve_target_path("/bin/sh", "dash"), "/bin/sh");
     }
 
     #[test]
@@ -4422,14 +4544,22 @@ MAINTAINER="SigmaOS"
                 build_flags: "-C target-cpu=native -O3".to_string(),
                 environment_hashes: BTreeMap::new(),
             },
-            artifact_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+            artifact_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                .to_string(),
             slsa_level: 4,
         };
 
         provenance.record_attestation(att);
-        assert!(provenance.verify_reproducible_match("sigma-core", "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855").unwrap());
+        assert!(provenance
+            .verify_reproducible_match(
+                "sigma-core",
+                "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+            )
+            .unwrap());
 
-        let buildinfo = provenance.generate_buildinfo_manifest("sigma-core").unwrap();
+        let buildinfo = provenance
+            .generate_buildinfo_manifest("sigma-core")
+            .unwrap();
         assert!(buildinfo.contains("Build-Origin: sigma-core"));
         assert!(buildinfo.contains("SLSA-Level: 4"));
     }
@@ -4441,7 +4571,8 @@ MAINTAINER="SigmaOS"
         assert_eq!(flags.march_flag, "-march=x86-64-v4");
         assert_eq!(flags.opt_level, "-O3");
 
-        let fallback = engine.resolve_fallback_level(&[MicroarchitectureLevel::V1, MicroarchitectureLevel::V3]);
+        let fallback = engine
+            .resolve_fallback_level(&[MicroarchitectureLevel::V1, MicroarchitectureLevel::V3]);
         assert_eq!(fallback, MicroarchitectureLevel::V3);
     }
 
@@ -4509,11 +4640,25 @@ MAINTAINER="SigmaOS"
                 path: "/etc/nginx".to_string(),
                 permissions: "rw".to_string(),
             }],
-            pledge_promises: vec!["stdio".to_string(), "rpath".to_string(), "wpath".to_string()],
+            pledge_promises: vec![
+                "stdio".to_string(),
+                "rpath".to_string(),
+                "wpath".to_string(),
+            ],
         });
 
-        assert!(sandbox.validate_scriptlet_access("nginx", "post-install", "/etc/nginx/nginx.conf", "r"));
-        assert!(!sandbox.validate_scriptlet_access("nginx", "post-install", "/usr/local/bin/malicious", "x"));
+        assert!(sandbox.validate_scriptlet_access(
+            "nginx",
+            "post-install",
+            "/etc/nginx/nginx.conf",
+            "r"
+        ));
+        assert!(!sandbox.validate_scriptlet_access(
+            "nginx",
+            "post-install",
+            "/usr/local/bin/malicious",
+            "x"
+        ));
     }
 
     #[test]
@@ -4525,7 +4670,9 @@ MAINTAINER="SigmaOS"
             available_sha256_hashes: vec!["hash123".to_string()],
         });
 
-        let peer = sync_engine.find_local_peer_with_artifact("hash123").unwrap();
+        let peer = sync_engine
+            .find_local_peer_with_artifact("hash123")
+            .unwrap();
         assert_eq!(peer.node_id, "node-lan-1");
     }
 
@@ -4550,7 +4697,10 @@ MAINTAINER="SigmaOS"
         let mut governor = PacdiffConfigMergeGovernorEngine::new();
         governor.register_candidate("/etc/pacman.conf", "/etc/pacman.conf.pacnew");
 
-        assert!(governor.apply_decision("/etc/pacman.conf", PacdiffMergeDecision::OverwriteWithPacnew));
+        assert!(governor.apply_decision(
+            "/etc/pacman.conf",
+            PacdiffMergeDecision::OverwriteWithPacnew
+        ));
         assert_eq!(
             governor.candidates[0].pending_decision,
             Some(PacdiffMergeDecision::OverwriteWithPacnew)
@@ -4560,7 +4710,12 @@ MAINTAINER="SigmaOS"
     #[test]
     fn test_portage_etc_update_git_overlay() {
         let mut overlay = PortageEtcUpdateGitOverlayEngine::new();
-        overlay.record_config_change("/etc/portage/make.conf", "abc123commit", 1700000000, "Updated CFLAGS");
+        overlay.record_config_change(
+            "/etc/portage/make.conf",
+            "abc123commit",
+            1700000000,
+            "Updated CFLAGS",
+        );
 
         let history = overlay.query_history_for_file("/etc/portage/make.conf");
         assert_eq!(history.len(), 1);
@@ -4581,7 +4736,14 @@ MAINTAINER="SigmaOS"
         let staged_id = ostree.stage_package_layer("htop");
         assert_eq!(staged_id, "dep-2");
         assert!(ostree.activate_deployment("dep-2"));
-        assert!(ostree.deployments.iter().find(|d| d.deployment_id == "dep-2").unwrap().is_active);
+        assert!(
+            ostree
+                .deployments
+                .iter()
+                .find(|d| d.deployment_id == "dep-2")
+                .unwrap()
+                .is_active
+        );
     }
 
     #[test]
@@ -4635,14 +4797,32 @@ MAINTAINER="SigmaOS"
         });
 
         assert!(mod_engine.enable_stream("nodejs", "20"));
-        assert!(mod_engine.modules.iter().find(|m| m.stream_name == "20").unwrap().is_enabled);
-        assert!(!mod_engine.modules.iter().find(|m| m.stream_name == "18").unwrap().is_enabled);
+        assert!(
+            mod_engine
+                .modules
+                .iter()
+                .find(|m| m.stream_name == "20")
+                .unwrap()
+                .is_enabled
+        );
+        assert!(
+            !mod_engine
+                .modules
+                .iter()
+                .find(|m| m.stream_name == "18")
+                .unwrap()
+                .is_enabled
+        );
     }
 
     #[test]
     fn test_arch_pacman_parallel_download() {
         let mut dl_engine = ArchPacmanParallelDownloadEngine::new(5);
-        dl_engine.enqueue_download("linux", "https://mirror.archlinux.org/linux.pkg.tar.zst", 120_000_000);
+        dl_engine.enqueue_download(
+            "linux",
+            "https://mirror.archlinux.org/linux.pkg.tar.zst",
+            120_000_000,
+        );
 
         assert_eq!(dl_engine.pending_downloads.len(), 1);
         assert_eq!(dl_engine.max_parallel_streams, 5);
@@ -4659,14 +4839,20 @@ MAINTAINER="SigmaOS"
             short_desc: "Void Linux multilib repository".to_string(),
         });
 
-        let bin_name = sandbox.generate_binary_xbps_name("void-repo-multilib").unwrap();
+        let bin_name = sandbox
+            .generate_binary_xbps_name("void-repo-multilib")
+            .unwrap();
         assert_eq!(bin_name, "void-repo-multilib-1.0_3.xbps");
     }
 
     #[test]
     fn test_alpine_apk_edge_overlay() {
         let mut overlay_engine = AlpineApkEdgeOverlayEngine::new();
-        overlay_engine.add_overlay("testing", "https://dl-cdn.alpinelinux.org/alpine/edge/testing", true);
+        overlay_engine.add_overlay(
+            "testing",
+            "https://dl-cdn.alpinelinux.org/alpine/edge/testing",
+            true,
+        );
 
         let active_testing = overlay_engine.enabled_testing_overlays();
         assert_eq!(active_testing.len(), 1);
@@ -4691,7 +4877,10 @@ MAINTAINER="SigmaOS"
 
         let target = alt_gov.select_best_provider("editor").unwrap();
         assert_eq!(target, "/usr/bin/nvim");
-        assert_eq!(alt_gov.active_selections.get("editor"), Some(&"neovim".to_string()));
+        assert_eq!(
+            alt_gov.active_selections.get("editor"),
+            Some(&"neovim".to_string())
+        );
     }
 
     #[cfg(not(feature = "standalone_test"))]
@@ -4751,14 +4940,24 @@ MAINTAINER="SigmaOS"
         let root = engine.prepare_chroot("chroot-x86_64", "/var/lib/chroot/x86_64");
         assert_eq!(root, "/var/lib/chroot/x86_64/root");
 
-        let added = engine.install_chroot_build_deps("chroot-x86_64", &["gcc", "make", "pkg-config"]).unwrap();
+        let added = engine
+            .install_chroot_build_deps("chroot-x86_64", &["gcc", "make", "pkg-config"])
+            .unwrap();
         assert_eq!(added, 3);
 
         let pkg_path = engine.build_in_chroot("chroot-x86_64", "htop").unwrap();
         assert_eq!(pkg_path, "/var/lib/chroot/x86_64/build/htop.pkg");
 
         assert!(engine.reset_chroot("chroot-x86_64").unwrap());
-        assert_eq!(engine.chroots.get("chroot-x86_64").unwrap().installed_build_deps.len(), 0);
+        assert_eq!(
+            engine
+                .chroots
+                .get("chroot-x86_64")
+                .unwrap()
+                .installed_build_deps
+                .len(),
+            0
+        );
     }
 
     #[test]
@@ -4773,9 +4972,13 @@ MAINTAINER="SigmaOS"
         let report = engine.audit_package_abi("curl", &["libssl.so.3"], &["SSL_read"]);
         assert!(!report.is_abi_broken);
 
-        let broken_report = engine.audit_package_abi("legacy-app", &["libssl.so.1.1"], &["SSL_read"]);
+        let broken_report =
+            engine.audit_package_abi("legacy-app", &["libssl.so.1.1"], &["SSL_read"]);
         assert!(broken_report.is_abi_broken);
-        assert_eq!(broken_report.missing_sonames, vec!["libssl.so.1.1".to_string()]);
+        assert_eq!(
+            broken_report.missing_sonames,
+            vec!["libssl.so.1.1".to_string()]
+        );
     }
 
     #[test]

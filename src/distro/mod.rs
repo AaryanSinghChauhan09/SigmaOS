@@ -2,10 +2,10 @@ pub mod omarchy;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig, OmarchyAyuThemeEngine, OmarchyFastfetchSysinfoEngine,
-    OmarchyGhosttyTerminalEngine, OmarchyHyprlandCompositorConfigEngine, OmarchyHypridleEngine,
+    OmarchyGhosttyTerminalEngine, OmarchyHypridleEngine, OmarchyHyprlandCompositorConfigEngine,
     OmarchyHyprpaperWallpaperEngine, OmarchyLazyGitConfigurationEngine,
-    OmarchyMiseVersionManagerEngine, OmarchyModernDesktopEngine, OmarchyNerdFont,
-    OmarchyNeovimPresetEngine, OmarchyOmakubDevInstaller, OmarchyStarshipPromptConfigEngine,
+    OmarchyMiseVersionManagerEngine, OmarchyModernDesktopEngine, OmarchyNeovimPresetEngine,
+    OmarchyNerdFont, OmarchyOmakubDevInstaller, OmarchyStarshipPromptConfigEngine,
     OmarchySwayNcEngine, OmarchyTerminalFontConfig, OmarchyTheme, OmarchyWalkerLauncherEngine,
     OmarchyWaybarEngine, PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
 };
@@ -63,8 +63,8 @@ pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_distro_gaps::{
-    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeEntry, DeviceNodeType,
-    DnsRecordEntry, JournaldLogRecord, NatType,
+    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler,
+    DeviceNodeEntry, DeviceNodeType, DnsRecordEntry, JournaldLogRecord, NatType,
     NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SovereignDnsTlsResolverEngine,
     SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine,
     SystemdInitManager, SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver,
@@ -120,8 +120,8 @@ pub use visual_dashboard::{
 pub use void_runit::{
     RunitService, RunitServiceStatus as RunitServiceState, RunitStage, RunitSupervisor,
 };
-pub mod sovereign_distro_dominance;
 pub mod future_roadmap_innovations;
+pub mod sovereign_distro_dominance;
 
 pub use future_roadmap_innovations::{
     ClusteredDevicePoolEngine, ClusteredPooledDevice, CryptographicBootChainEngine,

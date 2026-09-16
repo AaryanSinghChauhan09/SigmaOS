@@ -2,11 +2,11 @@
 // SigmaOS Functional TCP/IP Network Stack Implementation
 // Full-featured IPv4/TCP/UDP protocol suite with modern congestion control
 
+use core::sync::atomic::{AtomicU16, Ordering};
+use core::time::Duration;
 use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicU16, Ordering};
-use core::time::Duration;
 
 use crate::net::stack::*;
 
@@ -151,10 +151,10 @@ pub struct TcpConnectionControlBlock {
     recv_buffer_ptr: usize,
 
     // Congestion control
-    cwnd: u32,           // Congestion window
-    ssthresh: u32,       // Slow start threshold
-    mss: u32,            // Maximum segment size
-    rtt: Duration,       // Round-trip time estimate
+    cwnd: u32,     // Congestion window
+    ssthresh: u32, // Slow start threshold
+    mss: u32,      // Maximum segment size
+    rtt: Duration, // Round-trip time estimate
     retransmit_count: u32,
 
     // Connection metadata
@@ -218,7 +218,9 @@ impl TcpConnectionControlBlock {
     pub fn can_receive(&self) -> bool {
         matches!(
             self.state,
-            TcpConnectionState::Established | TcpConnectionState::FinWait1 | TcpConnectionState::FinWait2
+            TcpConnectionState::Established
+                | TcpConnectionState::FinWait1
+                | TcpConnectionState::FinWait2
         )
     }
 }
@@ -434,9 +436,7 @@ pub struct RoutingTable {
 
 impl RoutingTable {
     pub fn new() -> Self {
-        RoutingTable {
-            routes: Vec::new(),
-        }
+        RoutingTable { routes: Vec::new() }
     }
 
     pub fn add_route(&mut self, dest: IPv4Address, mask: IPv4Address, gw: IPv4Address) {
@@ -630,7 +630,11 @@ impl TcpIpStack {
         self.interface_mac = mac;
     }
 
-    pub fn socket(&mut self, socket_type: SocketType, protocol: SocketProtocol) -> Result<u32, NetworkError> {
+    pub fn socket(
+        &mut self,
+        socket_type: SocketType,
+        protocol: SocketProtocol,
+    ) -> Result<u32, NetworkError> {
         let socket_id = self.next_socket_id;
         self.next_socket_id += 1;
 
@@ -754,7 +758,9 @@ mod tests {
     #[test]
     fn test_tcp_socket_creation() {
         let mut stack = TcpIpStack::new();
-        let socket_id = stack.socket(SocketType::Stream, SocketProtocol::Tcp).unwrap();
+        let socket_id = stack
+            .socket(SocketType::Stream, SocketProtocol::Tcp)
+            .unwrap();
         assert!(socket_id > 0);
     }
 
