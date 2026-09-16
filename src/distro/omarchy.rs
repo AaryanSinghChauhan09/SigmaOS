@@ -612,12 +612,18 @@ impl Default for OmarchyAudioPipewireConfig {
 
 #[path = "omarchy_inspiration.rs"]
 pub mod omarchy_inspiration;
+
 pub use omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
     OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
     QuickshellWidget, ShellComponentKind,
 };
+
+#[path = "."]
+pub mod distro {
+    pub use super::omarchy_inspiration;
+}
 
 /// Omarchy Liveboot ISO & Automated Installer Engine
 #[derive(Debug, Clone)]
