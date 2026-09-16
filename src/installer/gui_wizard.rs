@@ -18,7 +18,6 @@ pub enum InstallerScreen {
     Summary,
     InstallationProgress,
     Complete,
-    CompleteOnboarding,
 }
 
 /// Partitioning Operation Mode
@@ -319,7 +318,7 @@ impl GuiInstallerWizard {
             InstallerScreen::SystemConfiguration => InstallerScreen::Summary,
             InstallerScreen::Summary => InstallerScreen::InstallationProgress,
             InstallerScreen::InstallationProgress => InstallerScreen::Complete,
-            InstallerScreen::Complete | InstallerScreen::CompleteOnboarding => return Err(InstallerError::AlreadyComplete),
+            InstallerScreen::Complete => return Err(InstallerError::AlreadyComplete),
         };
 
         Ok(())
