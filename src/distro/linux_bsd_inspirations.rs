@@ -144,6 +144,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
+
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
@@ -570,6 +571,102 @@ impl SovereignUniversalDistroBridge {
             "omarchy_herdr_agent" => {
                 Ok(format!(
                     "Dispatched Omarchy Herdr AI Agent task spawning for prompt '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_recon" => {
+                Ok(format!(
+                    "Dispatched Kali Security Nmap/Wireshark/Metasploit reconnaissance for target '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "antix_runit" => {
+                Ok(format!(
+                    "Dispatched AntiX SysVinit/Runit lightweight sys-admin service control for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "zorin_chameleon" => {
+                Ok(format!(
+                    "Dispatched Zorin OS Chameleon dynamic desktop layout switcher to '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "mint_cinnamon" => {
+                Ok(format!(
+                    "Dispatched Linux Mint Cinnamon desktop applet & Timeshift snapshot manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "garuda_dracut" => {
+                Ok(format!(
+                    "Dispatched Garuda Linux Dracut Btrfs Snapper automatic rollback for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cachy_bore" => {
+                Ok(format!(
+                    "Dispatched CachyOS BORE v2 dynamic latency scheduler tuning for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "auth" => {
+                Ok(format!(
+                    "Dispatched PAM / SystemdHomed authentication & privilege check for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "boot" => {
+                Ok(format!(
+                    "Dispatched Multiboot2 / EFI boot entry configuration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "virtualization" => {
+                Ok(format!(
+                    "Dispatched MicroVM hypervisor / FreeBSD Jail bridge for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "input" => {
+                Ok(format!(
+                    "Dispatched USB HID keyboard / gamepad event handling for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "thermal" => {
+                Ok(format!(
+                    "Dispatched thermal governor & fan speed profile control for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "syscall" => {
+                Ok(format!(
+                    "Dispatched multi-architecture ABI syscall translator for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "device" => {
+                Ok(format!(
+                    "Dispatched dynamic devfs device node symlink manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "crypto" => {
+                Ok(format!(
+                    "Dispatched PQC Dilithium / WireGuard cryptographic engine for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "ai" => {
+                Ok(format!(
+                    "Dispatched Sovereign AI-native copilot & task orchestrator for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "monitoring" => {
+                Ok(format!(
+                    "Dispatched Btop / Fastfetch hardware telemetry monitoring for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
