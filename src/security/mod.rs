@@ -90,11 +90,11 @@ pub use intrusion::{
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
 pub use kali_stack::{
-    HashMode, KaliAirgeddonWifiAudit, KaliBurpSuiteWebProxy, KaliHashcatGpuCracker,
-    KaliHydraPasswordBruteforce, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter,
-    KaliNiktoWebScanner, KaliNmapPortScanner, KaliSqlmapInjectionAuditor, KaliUndercoverThemeMode,
-    KaliWiresharkPacketAnalyzer, PcapPacketHeader, ScanTechnique, UndercoverDisguiseTheme,
-    WifiFrameType,
+    CronDaemon, CronJob, DmesgLog, FirewallRule, IptablesFirewall, KaliAirgeddonWifiAudit,
+    KaliError, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter, KaliSqlmapInjectionAuditor,
+    KaliUndercoverThemeMode, KaliWiresharkPacketAnalyzer, PcapPacketHeader,
+    PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
+    TmuxPane, UndercoverDisguiseTheme, WifiFrameType,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use crate::security::selinux::{

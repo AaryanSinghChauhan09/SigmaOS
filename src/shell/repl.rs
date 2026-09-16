@@ -31,7 +31,7 @@ use crate::shell::zsh_bash_parity::{
 };
 #[cfg(not(test))]
 use crate::shell::{
-    BashParameterExpansion, HistoryExpansionEngine, JobControlManager,
+    HistoryExpansionEngine, JobControlManager,
 };
 
 // Non-test imports (stable)

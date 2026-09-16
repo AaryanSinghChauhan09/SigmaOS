@@ -24,7 +24,6 @@ pub mod filesystem;
 pub mod futuristic_modules;
 pub mod kernel;
 pub mod klib;
-pub use klib::ZeroDependencyPrimitiveHub;
 pub mod memory;
 pub mod network;
 pub mod observability;

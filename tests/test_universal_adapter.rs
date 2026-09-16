@@ -29,13 +29,15 @@ pub mod universal_adapter;
 
 pub mod sigpkg {
     pub use crate::security;
-    pub use crate::universal_adapter;
     pub use crate::universal_engine;
     pub use crate::universal_oop_system;
     pub use crate::universal_engine::PackageFormat;
 
     pub use crate::universal_oop_system::{Dependency, Package, Version, VersionConstraint};
 }
+
+#[path = "../src/sigpkg/universal_adapter.rs"]
+pub mod universal_adapter;
 
 #[test]
 fn test_universal_adapter_all_formats() {
