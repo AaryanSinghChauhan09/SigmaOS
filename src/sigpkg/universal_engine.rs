@@ -126,6 +126,8 @@ impl PackageFormat {
             Some(PackageFormat::Nix)
         } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
             Some(PackageFormat::Portage)
+        } else if normalized.ends_with(".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
         } else if normalized.ends_with(".txz")
@@ -147,9 +149,9 @@ impl PackageFormat {
             Some(PackageFormat::Pisi)
         } else if normalized.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if normalized.ends_with(".pup") {
+        } else if normalized.ends_with(".pup") || normalized == "pup" {
             Some(PackageFormat::Pup)
-        } else if normalized.ends_with(".pet") {
+        } else if normalized.ends_with(".pet") || normalized == "pet" {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
             Some(PackageFormat::Sigma)
@@ -189,8 +191,6 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
-        } else if normalized.ends_with(".openbsd.tgz") {
-            Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".spack") {
             Some(PackageFormat::Spack)
         } else if normalized.ends_with(".conan") {

@@ -7,8 +7,22 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
+pub use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::Version;
+
+#[cfg(not(feature = "standalone_test"))]
 use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,11 +84,6 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -106,9 +115,76 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::sigpkg::universal_oop_system;
+
+#[cfg(feature = "standalone_test")]
+pub mod universal_oop_system {
+    use alloc::boxed::Box;
+    use alloc::string::{String, ToString};
+    use alloc::vec::Vec;
+    use crate::sigpkg::Version;
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub enum PackageFormat {
+        Sigma,
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct PackageMetadata {
+        pub name: String,
+        pub version: Version,
+        pub description: String,
+        pub license: String,
+        pub maintainer: String,
+        pub homepage: String,
+        pub architecture: String,
+        pub checksum: String,
+        pub size: u64,
+        pub install_date: Option<u64>,
+        pub pqc_signature: Option<Vec<u8>>,
+        pub gpg_key_id: Option<String>,
+        pub supported_architectures: Vec<String>,
+    }
+
+    pub trait PackageTrait {
+        fn name(&self) -> &str;
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct StandardPackage {
+        pub metadata: PackageMetadata,
+        pub dependencies: Vec<String>,
+        pub format: PackageFormat,
+    }
+
+    impl PackageTrait for StandardPackage {
+        fn name(&self) -> &str {
+            &self.metadata.name
+        }
+    }
+
+    pub struct UniversalPackageManager {
+        packages: Vec<Box<dyn PackageTrait>>,
+    }
+
+    impl UniversalPackageManager {
+        pub fn new() -> Self {
+            Self { packages: Vec::new() }
+        }
+
+        pub fn install_package(&mut self, pkg: Box<dyn PackageTrait>) -> Result<(), String> {
+            self.packages.push(pkg);
+            Ok(())
+        }
+
+        pub fn get_package(&self, name: &str) -> Option<&Box<dyn PackageTrait>> {
+            self.packages.iter().find(|p| p.name() == name)
+        }
+    }
+}
+
+use universal_oop_system::UniversalPackageManager;
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -1825,7 +1901,7 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc" | "libc6" | "glibc" | "musl" | "musl-dev" | "musl-devel" | "devel/glibc" | "sys-libs/glibc" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -3166,7 +3242,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Pisi)
+            Some(PackageFormat::Eopkg)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
@@ -3174,7 +3250,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("ubuntu.deb"),
-            Some(PackageFormat::Apt)
+            Some(PackageFormat::Deb)
         );
         assert_eq!(
             adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -3182,7 +3258,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("fedora.rpm"),
-            Some(PackageFormat::Yum)
+            Some(PackageFormat::Rpm)
         );
         assert_eq!(
             adapter.detect_format_by_extension("harmony.hap"),
