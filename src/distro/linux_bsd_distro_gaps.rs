@@ -1181,6 +1181,19 @@ impl Default for SovereignJournaldBinaryStorageEngine {
     }
 }
 
+impl Default for SovereignJournaldBinaryStorageEngine {
+    fn default() -> Self {
+        Self::new(1000)
+    }
+}
+
+pub type DnsRecord = DnsRecordEntry;
+pub type DynamicDeviceNode = DeviceNodeEntry;
+pub type JournalBinaryRecord = JournaldLogRecord;
+pub type JournalLogLevel = u8;
+pub type NatRule = ConntrackTableEntry;
+pub type NatRuleKind = NatType;
+
 // ============================================================================
 // 11. Universal Linux & BSD Distro Gap Resolver
 // ============================================================================

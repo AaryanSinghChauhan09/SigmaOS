@@ -1132,22 +1132,8 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::GuixNar) // Nix / Guix NAR archive magic
         } else if data.starts_with(b"OBSD") {
             Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
-        } else if data.starts_with(b"SPAK") {
-            Some(PackageFormat::Spack) // HPC Spack magic
-        } else if data.starts_with(b"CONA") {
-            Some(PackageFormat::Conan) // Conan package magic
-        } else if data.starts_with(b"WHEL") {
-            Some(PackageFormat::Wheel) // Python Wheel magic
-        } else if data.starts_with(b"CRAT") {
-            Some(PackageFormat::Crate) // Cargo crate magic
-        } else if data.starts_with(b"GEMS") {
-            Some(PackageFormat::Gem) // RubyGems magic
-        } else if data.starts_with(b"NUPK") {
-            Some(PackageFormat::Nupkg) // NuGet magic
-        } else if data.starts_with(b"VCPK") {
-            Some(PackageFormat::Vcpkg) // Vcpkg magic
-        } else if data.starts_with(b"NARI") {
-            Some(PackageFormat::NarInfo) // NarInfo magic
+        } else if data.starts_with(b"OBSD") {
+            Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
         } else {
             None
         }
