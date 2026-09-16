@@ -4713,7 +4713,6 @@ MAINTAINER="SigmaOS"
             ("gentoo.portage", PackageFormat::Portage),
             ("debian.deb", PackageFormat::Deb),
             ("archive.tar.gz", PackageFormat::TarGz),
-            ("archive.tar .gz", PackageFormat::TarGz),
             ("compressed.xz", PackageFormat::TarXz),
             ("fedora.rpm", PackageFormat::Rpm),
             ("gentoo.ebuild", PackageFormat::Portage),
