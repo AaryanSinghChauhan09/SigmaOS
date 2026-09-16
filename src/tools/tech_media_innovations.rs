@@ -949,6 +949,12 @@ impl AppualsTroubleshootingEngine {
 
 #[derive(Debug, Default)]
 pub struct SovereignTechMediaMasterSuite {
+    pub geeky_gadgets: GeekyGadgetsTechReviewEngine,
+    pub it_daily: ItDailyEnterpriseItGovernor,
+    pub how_to_geek: HowToGeekGuideSystemEngine,
+    pub the_new_stack: TheNewStackCloudNativeEngine,
+    pub linux_com: LinuxDotComCommunityNewsEngine,
+    pub pcmag: PcmagHardwareBenchEngine,
     pub press_feeds: LinuxPressFeedEngine,
     pub telemetry: HardwareTelemetryMonitor,
     pub phoronix_bench: PhoronixBenchEngine,
@@ -971,6 +977,12 @@ pub struct SovereignTechMediaMasterSuite {
 impl SovereignTechMediaMasterSuite {
     pub fn new() -> Self {
         Self {
+            geeky_gadgets: GeekyGadgetsTechReviewEngine::new(),
+            it_daily: ItDailyEnterpriseItGovernor::new(),
+            how_to_geek: HowToGeekGuideSystemEngine::new(),
+            the_new_stack: TheNewStackCloudNativeEngine::new(),
+            linux_com: LinuxDotComCommunityNewsEngine::new(),
+            pcmag: PcmagHardwareBenchEngine::new(),
             press_feeds: LinuxPressFeedEngine::new(),
             telemetry: HardwareTelemetryMonitor::new(),
             phoronix_bench: PhoronixBenchEngine::new(),
@@ -1171,6 +1183,28 @@ mod tests {
         assert!(bridge.verify_bridge_status());
         assert!(bridge.sideload_app("dev_android_1", "com.sigma.app").is_ok());
         assert!(bridge.sideload_app("invalid_dev", "com.sigma.app").is_err());
+    }
+
+    #[test]
+    fn test_portal_specific_innovations() {
+        let geeky = GeekyGadgetsTechReviewEngine::new();
+        assert!(geeky.evaluate_hardware_viability());
+
+        let it_daily = ItDailyEnterpriseItGovernor::new();
+        assert!(it_daily.audit_compliance());
+
+        let mut guide = HowToGeekGuideSystemEngine::new();
+        let solution = guide.solve_common_issue("audio_jack");
+        assert!(solution.contains("audio_jack"));
+
+        let stack = TheNewStackCloudNativeEngine::new();
+        assert!(stack.verify_cloud_native_stack());
+
+        let linux_com = LinuxDotComCommunityNewsEngine::new();
+        assert_eq!(linux_com.get_sponsor_count(), 2);
+
+        let pcmag = PcmagHardwareBenchEngine::new();
+        assert!(pcmag.is_editor_choice());
     }
 
     #[test]
