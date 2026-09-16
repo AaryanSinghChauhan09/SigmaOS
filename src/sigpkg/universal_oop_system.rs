@@ -327,9 +327,9 @@ impl PackageFormat {
             Some(PackageFormat::Pisi)
         } else if normalized.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if normalized.ends_with(".pup") {
+        } else if normalized.ends_with(".pup") || normalized == "pup" {
             Some(PackageFormat::Pup)
-        } else if normalized.ends_with(".pet") {
+        } else if normalized.ends_with(".pet") || normalized == "pet" {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".tar") {
             Some(PackageFormat::Tar)
