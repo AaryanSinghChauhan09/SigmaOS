@@ -143,7 +143,7 @@ jobs:
           apt-get update && apt-get install -y gcc gcc-11 gcc-12 gcc-13 clang clang-15 clang-17 clang-18 || true
 
       - name: Install Rust (if needed)
-        if: matrix.compiler
+        if: matrix.compiler == 'rustc'
         shell: bash
         run: |
           if command -v apt-get >/dev/null 2>&1; then

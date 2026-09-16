@@ -48,6 +48,8 @@ pub mod virtualization;
 pub mod interrupt;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
+    CachyosGamescopeHandheldOverlay, ItsFossQuickShareAndBackupHud, PhoronixPerformanceBenchmarkWidget,
+    PopOsKdeTilingWorkspaceGridEngine, SovereignUxMasterEngine, WindowsCopilotAiAssistantSidebar,
 };
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,

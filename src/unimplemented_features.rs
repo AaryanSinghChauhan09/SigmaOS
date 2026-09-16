@@ -1886,7 +1886,7 @@ impl SpecBareMetalUnifiedPeripheral for LegacyPioController {
     fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
-pub struct ModernMmioController {
+pub struct ModernMmioSpecController {
     pub mmio_base: u64,
     pub power_state: PowerState,
 }
@@ -1900,12 +1900,12 @@ impl SpecBareMetalUnifiedPeripheral for ModernMmioController {
     fn get_power_state(&self) -> PowerState { self.power_state }
 }
 
-pub struct BareMetalUnifiedPeripheralManager {
+pub struct BareMetalSpecPeripheralManager {
     pub registered_devices: [(u16, u64, bool); 16],
     pub device_count: usize,
 }
 
-impl BareMetalUnifiedPeripheralManager {
+impl BareMetalSpecPeripheralManager {
     pub fn new() -> Self {
         Self {
             registered_devices: [(0, 0, false); 16],
@@ -1921,7 +1921,7 @@ impl BareMetalUnifiedPeripheralManager {
     }
 }
 
-impl Default for BareMetalUnifiedPeripheralManager {
+impl Default for BareMetalSpecPeripheralManager {
     fn default() -> Self { Self::new() }
 }
 
@@ -1977,9 +1977,9 @@ pub struct SpecPackageNode {
     pub req_max: u32,
 }
 
-pub struct ConstraintSatSolver;
+pub struct SpecConstraintSatSolver;
 
-impl ConstraintSatSolver {
+impl SpecConstraintSatSolver {
     pub fn new() -> Self { Self }
 
     pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
@@ -1992,7 +1992,7 @@ impl ConstraintSatSolver {
     }
 }
 
-impl Default for ConstraintSatSolver {
+impl Default for SpecConstraintSatSolver {
     fn default() -> Self { Self::new() }
 }
 
