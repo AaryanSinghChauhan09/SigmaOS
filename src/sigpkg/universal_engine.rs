@@ -58,6 +58,11 @@ pub enum PackageFormat {
     Dports,
     SlackBuild,
     Crux,
+    Deb,
+    Rpm,
+    Ebuild,
+    Sysupdate,
+    Sigma,
     Drpm,
     Stratum,
     Ipk,
@@ -73,23 +78,66 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
-    Deb,
-    Rpm,
-    Ebuild,
-    Sigma,
-    Sysupdate,
 }
+
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
-        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
-        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
-        else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
-        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
-        else { None }
+        let clean = filename.trim().to_lowercase();
+        let s = clean.as_str();
+
+        if s.ends_with(".air") || s == "air" { return Some(PackageFormat::Air); }
+        if s.ends_with(".bottle") || s == "bottle" { return Some(PackageFormat::Bottle); }
+        if s.ends_with(".ipa") || s == "ipa" { return Some(PackageFormat::Ipa); }
+        if s.ends_with(".ports") || s == "ports" { return Some(PackageFormat::Ports); }
+        if s.ends_with(".pkg") || s == "pkg" { return Some(PackageFormat::Pkg); }
+        if s.ends_with(".aab") || s == "aab" { return Some(PackageFormat::Aab); }
+        if s.ends_with(".apk") || s == "apk" { return Some(PackageFormat::Apk); }
+        if s.ends_with(".appimage") || s == "appimage" { return Some(PackageFormat::AppImage); }
+        if s.ends_with(".eopkg") || s == "eopkg" { return Some(PackageFormat::Eopkg); }
+        if s.ends_with(".nixpkg") || s.ends_with(".nix") || s == "nix" { return Some(PackageFormat::Nix); }
+        if s.ends_with(".portage") { return Some(PackageFormat::Portage); }
+        if s.ends_with(".pkg.tar.zst") || s.ends_with(".pkg.tar.xz") || s == "pacman" { return Some(PackageFormat::Pacman); }
+        if s.ends_with(".deb") || s == "deb" { return Some(PackageFormat::Apt); }
+        if s.ends_with(".tar.gz") || s.ends_with(".tar .gz") || s.ends_with(".tgz") || s == "tgz" { return Some(PackageFormat::TarGz); }
+        if s.ends_with(".tar.xz") || s.ends_with(".xz") { return Some(PackageFormat::TarXz); }
+        if s.ends_with(".tar") || s == "tar" { return Some(PackageFormat::Tar); }
+        if s.ends_with(".rpm") || s == "rpm" { return Some(PackageFormat::Yum); }
+        if s.ends_with(".ebuild") || s == "ebuild" { return Some(PackageFormat::Portage); }
+        if s.ends_with(".flatpak") || s == "flatpak" { return Some(PackageFormat::Flatpak); }
+        if s.ends_with(".app") || s == "app" { return Some(PackageFormat::AppBundle); }
+        if s.ends_with(".hap") || s == "hap" { return Some(PackageFormat::Hap); }
+        if s.ends_with(".pisi") || s == "pisi" { return Some(PackageFormat::Pisi); }
+        if s.ends_with(".superdeb") || s == "superdeb" { return Some(PackageFormat::Superdeb); }
+        if s.ends_with(".lzm") || s == "lzm" { return Some(PackageFormat::Lzm); }
+        if s.ends_with(".pup") || s == "pup" { return Some(PackageFormat::Pup); }
+        if s.ends_with(".pet") || s == "pet" { return Some(PackageFormat::Pet); }
+        if s.ends_with(".snap") || s == "snap" { return Some(PackageFormat::Snap); }
+        if s.ends_with(".moss") || s == "moss" { return Some(PackageFormat::Moss); }
+        if s.ends_with(".hpkg") || s == "hpkg" { return Some(PackageFormat::Hpkg); }
+        if s.ends_with(".tcz") || s == "tcz" { return Some(PackageFormat::Tcz); }
+        if s.ends_with(".gobo") || s == "gobo" { return Some(PackageFormat::Gobo); }
+        if s.ends_with(".ostree") || s == "ostree" { return Some(PackageFormat::Ostree); }
+        if s.ends_with(".pkgsrc") || s == "pkgsrc" { return Some(PackageFormat::Pkgsrc); }
+        if s.ends_with(".sfs") || s == "sfs" { return Some(PackageFormat::Sfs); }
+        if s.ends_with(".puk") || s == "puk" { return Some(PackageFormat::Puk); }
+        if s.ends_with(".dmg") || s == "dmg" { return Some(PackageFormat::Dmg); }
+        if s.ends_with(".cports") || s == "cports" { return Some(PackageFormat::Cports); }
+        if s.ends_with(".dports") || s == "dports" { return Some(PackageFormat::Dports); }
+        if s.ends_with(".spack") || s == "spack" { return Some(PackageFormat::Spack); }
+        if s.ends_with(".conan") || s == "conan" { return Some(PackageFormat::Conan); }
+        if s.ends_with(".whl") || s == "whl" { return Some(PackageFormat::Wheel); }
+        if s.ends_with(".crate") || s == "crate" { return Some(PackageFormat::Crate); }
+        if s.ends_with(".gem") || s == "gem" { return Some(PackageFormat::Gem); }
+        if s.ends_with(".nupkg") || s == "nupkg" { return Some(PackageFormat::Nupkg); }
+        if s.ends_with(".vcpkg") || s == "vcpkg" { return Some(PackageFormat::Vcpkg); }
+        if s.ends_with(".narinfo") || s == "narinfo" { return Some(PackageFormat::NarInfo); }
+        if s.ends_with(".sysupdate") || s == "sysupdate" { return Some(PackageFormat::Sysupdate); }
+        if s.ends_with(".ipk") || s == "ipk" { return Some(PackageFormat::Ipk); }
+        if s.ends_with(".opkg") || s == "opkg" { return Some(PackageFormat::Opkg); }
+        if s.ends_with(".slackbuild") { return Some(PackageFormat::SlackBuild); }
+
+        None
     }
 }
 
@@ -1647,8 +1695,8 @@ impl IPackageAdapter for PetPackageAdapter {
 pub struct SnapPackageAdapter;
 impl IPackageAdapter for SnapPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Snap
-    }
+        PackageFormat::Apt
+    } // or custom snap mapping
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
             return Err("Empty Snap payload");
@@ -1656,7 +1704,7 @@ impl IPackageAdapter for SnapPackageAdapter {
         Ok(PackageContext {
             name: "snap-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Snap,
+            format: PackageFormat::Apt,
             dependencies: vec![],
             files: vec![],
             hash: [0x21; 32],
@@ -1673,7 +1721,7 @@ impl IPackageAdapter for SnapPackageAdapter {
 
 impl IPackageAdapter for FlatpakPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Flatpak
+        PackageFormat::Apt
     }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
@@ -1682,7 +1730,7 @@ impl IPackageAdapter for FlatpakPackageAdapter {
         Ok(PackageContext {
             name: "flatpak-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Flatpak,
+            format: PackageFormat::Apt,
             dependencies: vec![],
             files: vec![],
             hash: [0x22; 32],

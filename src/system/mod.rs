@@ -16,7 +16,6 @@
 // SigmaOS System Utilities Module
 // System-level utilities and tools
 
-pub mod declarative_state;
 pub mod cleanup;
 pub mod config;
 pub mod cron;
@@ -30,7 +29,6 @@ pub mod process_supervisor;
 pub mod sandbox;
 pub mod shredder;
 pub mod snapshot;
-pub mod snapshot_schedule;
 pub mod startup;
 pub mod state;
 pub mod syslog;
@@ -85,10 +83,6 @@ pub use shredder::{
 pub use snapshot::{
     FileSnapshotStorage, MerkleSnapshotStorage, RestoreResult, SnapshotConfig, SnapshotError,
     SnapshotMetadata, SnapshotResult, SnapshotStorage, SystemSnapshotManager,
-};
-pub use snapshot_schedule::{
-    CreatedSnapshotRecord, RetentionPolicy, ScheduledSnapshotEngine, SnapshotFrequency,
-    SnapshotJob,
 };
 pub use startup::{
     DependencyBasedOptimizer, ProfileBasedOptimizer, ServicePriority, StartupAnalysis,

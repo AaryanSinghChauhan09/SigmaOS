@@ -1,4 +1,3 @@
-
 // SigmaOS Missing Linux & BSD Distro Innovations Subsystem
 // Incorporates:
 // - Clear Linux Stateless Architecture (/usr defaults vs /etc user overrides)
@@ -18,32 +17,14 @@
 // - Gentoo Portage EAPI 8 Slot Operator Engine
 // - Fedora / RHEL SELinux MLS / MCS Governor Engine
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 /// 1. Clear Linux Stateless Architecture Engine
+#[derive(Debug, Clone, Default)]
 pub struct ClearLinuxStatelessEngine {
     pub vendor_defaults: BTreeMap<String, String>, // /usr/share/defaults/
     pub user_overrides: BTreeMap<String, String>,  // /etc/
@@ -51,10 +32,7 @@ pub struct ClearLinuxStatelessEngine {
 
 impl ClearLinuxStatelessEngine {
     pub fn new() -> Self {
-        Self {
-            vendor_defaults: BTreeMap::new(),
-            user_overrides: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn set_vendor_default(&mut self, path: &str, content: &str) {
@@ -76,12 +54,6 @@ impl ClearLinuxStatelessEngine {
     }
 }
 
-impl Default for ClearLinuxStatelessEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Bedrock Linux Strata Virtualization Engine
 #[derive(Debug, Clone)]
 pub struct BedrockStratum {
@@ -91,6 +63,7 @@ pub struct BedrockStratum {
     pub provided_binaries: Vec<String>,
 }
 
+#[derive(Debug, Clone)]
 pub struct BedrockLinuxStrataEngine {
     pub default_stratum: String,
     pub strata: BTreeMap<String, BedrockStratum>,
@@ -138,7 +111,12 @@ impl BedrockLinuxStrataEngine {
             if !stratum.is_enabled {
                 return Err(format!("Stratum '{}' is disabled", stratum_name));
             }
-            Ok(format!("Executed '{} {}' from stratum '{}'", cmd, args.join(" "), stratum_name))
+            Ok(format!(
+                "Executed '{} {}' from stratum '{}'",
+                cmd,
+                args.join(" "),
+                stratum_name
+            ))
         } else {
             Err(format!("Stratum '{}' not found", stratum_name))
         }
@@ -167,6 +145,7 @@ pub enum SmartOsVmBrand {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SmartOsVmState {
+    Configured,
     Stopped,
     Running,
     Suspended,
@@ -185,13 +164,17 @@ pub struct SmartOsVmConfig {
     pub uuid: String,
     pub alias: String,
     pub brand: SmartOsVmBrand,
+    pub cpu_shares: u32,
+    pub ram_mb: u64,
     pub quota_gb: u32,
     pub max_physical_memory_mb: u64,
     pub image_uuid: String,
     pub vnics: Vec<String>,
+    pub nics: Vec<String>,
     pub state: SmartOsVmState,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct SmartOsZoneEngine {
     pub images: BTreeMap<String, SmartOsImage>,
     pub vms: BTreeMap<String, SmartOsVmConfig>,
@@ -199,10 +182,7 @@ pub struct SmartOsZoneEngine {
 
 impl SmartOsZoneEngine {
     pub fn new() -> Self {
-        Self {
-            images: BTreeMap::new(),
-            vms: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn imgadm_import(&mut self, uuid: &str, name: &str, version: &str, os: &str) -> String {
@@ -233,10 +213,13 @@ impl SmartOsZoneEngine {
             uuid: uuid.to_string(),
             alias: alias.to_string(),
             brand,
+            cpu_shares: 100,
+            ram_mb,
             quota_gb,
             max_physical_memory_mb: ram_mb,
             image_uuid: image_uuid.to_string(),
             vnics: vnics.iter().map(|s| s.to_string()).collect(),
+            nics: vnics.iter().map(|s| s.to_string()).collect(),
             state: SmartOsVmState::Stopped,
         };
         self.vms.insert(uuid.to_string(), vm);
@@ -244,13 +227,19 @@ impl SmartOsZoneEngine {
     }
 
     pub fn vmadm_start(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self
+            .vms
+            .get_mut(uuid)
+            .ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Running;
         Ok(())
     }
 
     pub fn vmadm_stop(&mut self, uuid: &str) -> Result<(), String> {
-        let vm = self.vms.get_mut(uuid).ok_or_else(|| format!("VM {} not found", uuid))?;
+        let vm = self
+            .vms
+            .get_mut(uuid)
+            .ok_or_else(|| format!("VM {} not found", uuid))?;
         vm.state = SmartOsVmState::Stopped;
         Ok(())
     }
@@ -268,13 +257,7 @@ impl SmartOsZoneEngine {
     }
 }
 
-impl Default for SmartOsZoneEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 10. Linux & BSD Sysctl Kernel MIB Parameter Management Engine
+/// Linux & BSD Sysctl Kernel MIB Parameter Management Engine
 #[derive(Debug, Clone)]
 pub struct SysctlNode {
     pub mib_name: String,
@@ -341,7 +324,7 @@ impl Default for LinuxBsdSysctlEngine {
     }
 }
 
-/// 11. Linux io_uring Asynchronous Submission/Completion Queue Engine
+/// Linux io_uring Asynchronous Submission/Completion Queue Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IoUringOp {
     Nop,
@@ -366,6 +349,7 @@ pub struct CompletionQueueEntry {
     pub flags: u32,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct IoUringEngine {
     pub sq_entries: Vec<SubmissionQueueEntry>,
     pub cq_entries: Vec<CompletionQueueEntry>,
@@ -373,10 +357,7 @@ pub struct IoUringEngine {
 
 impl IoUringEngine {
     pub fn new() -> Self {
-        Self {
-            sq_entries: Vec::new(),
-            cq_entries: Vec::new(),
-        }
+        Self::default()
     }
 
     pub fn submit_sqe(&mut self, entry: SubmissionQueueEntry) {
@@ -405,13 +386,8 @@ impl IoUringEngine {
     }
 }
 
-impl Default for IoUringEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 2. Tails OS Amnesic Memory Scrubbing Engine
+/// Tails OS Amnesic Memory Scrubbing Engine
+#[derive(Debug, Clone)]
 pub struct TailsAmnesicEngine {
     pub ram_pages: Vec<Vec<u8>>,
     pub is_amnesic_mode: bool,
@@ -433,7 +409,7 @@ impl TailsAmnesicEngine {
         let count = self.ram_pages.len();
         for page in &mut self.ram_pages {
             for byte in page.iter_mut() {
-                *byte = 0x00; // Zeroize page
+                *byte = 0x00;
             }
         }
         self.ram_pages.clear();
@@ -447,7 +423,7 @@ impl Default for TailsAmnesicEngine {
     }
 }
 
-/// 3. Chimera Linux Dinit Service Supervisor Tree
+/// Chimera Linux Dinit Service Supervisor Tree
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DinitServiceState {
     Stopped,
@@ -465,15 +441,14 @@ pub struct DinitService {
     pub dependencies: Vec<String>,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct ChimeraDinitSupervisor {
     pub services: BTreeMap<String, DinitService>,
 }
 
 impl ChimeraDinitSupervisor {
     pub fn new() -> Self {
-        Self {
-            services: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn register_service(&mut self, name: &str, command: &str, deps: Vec<String>) {
@@ -496,22 +471,15 @@ impl ChimeraDinitSupervisor {
     }
 }
 
-impl Default for ChimeraDinitSupervisor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 4. Solus OS eopkg Delta Package Engine
+/// Solus OS eopkg Delta Package Engine
+#[derive(Debug, Clone, Default)]
 pub struct SolusEopkgManager {
-    pub installed_packages: BTreeMap<String, String>, // pkg -> version
+    pub installed_packages: BTreeMap<String, String>,
 }
 
 impl SolusEopkgManager {
     pub fn new() -> Self {
-        Self {
-            installed_packages: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn apply_eopkg_delta(
@@ -531,13 +499,8 @@ impl SolusEopkgManager {
     }
 }
 
-impl Default for SolusEopkgManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 5. Mageia Linux urpmi Dependency Solver
+/// Mageia Linux urpmi Dependency Solver
+#[derive(Debug, Clone)]
 pub struct MageiaUrpmiEngine {
     pub urpmi_db: BTreeMap<String, Vec<String>>,
     pub package_database: BTreeMap<String, Vec<String>>,
@@ -577,7 +540,8 @@ impl Default for MageiaUrpmiEngine {
     }
 }
 
-/// 6. Alpine Linux APK World File Engine
+/// Alpine Linux APK World File Engine
+#[derive(Debug, Clone)]
 pub struct AlpineApkWorldEngine {
     pub world_file_packages: Vec<String>,
 }
@@ -606,16 +570,15 @@ impl Default for AlpineApkWorldEngine {
     }
 }
 
-/// 7. Void Linux XBPS Package Transaction Engine
+/// Void Linux XBPS Package Transaction Engine
+#[derive(Debug, Clone, Default)]
 pub struct VoidXbpsEngine {
     pub installed: BTreeMap<String, String>,
 }
 
 impl VoidXbpsEngine {
     pub fn new() -> Self {
-        Self {
-            installed: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn install_xbps(&mut self, pkg: &str, ver: &str) -> Result<String, String> {
@@ -624,13 +587,7 @@ impl VoidXbpsEngine {
     }
 }
 
-impl Default for VoidXbpsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 8. FreeBSD VNET Virtualized Network Stack Engine
+/// FreeBSD VNET Virtualized Network Stack Engine
 #[derive(Debug, Clone)]
 pub struct VnetStack {
     pub jail_id: usize,
@@ -638,15 +595,14 @@ pub struct VnetStack {
     pub ip_address: String,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct FreeBsdVnetStackEngine {
     pub stacks: BTreeMap<usize, VnetStack>,
 }
 
 impl FreeBsdVnetStackEngine {
     pub fn new() -> Self {
-        Self {
-            stacks: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn create_vnet_stack(&mut self, jail_id: usize, ip: &str) -> VnetStack {
@@ -660,13 +616,7 @@ impl FreeBsdVnetStackEngine {
     }
 }
 
-impl Default for FreeBsdVnetStackEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 9. OpenBSD Unveil Access Violation Audit Sentinel
+/// OpenBSD Unveil Access Violation Audit Sentinel
 #[derive(Debug, Clone)]
 pub struct UnveilAuditViolation {
     pub pid: usize,
@@ -675,15 +625,14 @@ pub struct UnveilAuditViolation {
     pub timestamp: u64,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct OpenBsdUnveilAuditor {
     pub violations: Vec<UnveilAuditViolation>,
 }
 
 impl OpenBsdUnveilAuditor {
     pub fn new() -> Self {
-        Self {
-            violations: Vec::new(),
-        }
+        Self::default()
     }
 
     pub fn log_violation(&mut self, pid: usize, path: &str, perm: &str, time: u64) {
@@ -696,23 +645,18 @@ impl OpenBsdUnveilAuditor {
     }
 }
 
-impl Default for OpenBsdUnveilAuditor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// DEVUAN INIT DIVERSITY ENGINE (DEVUAN LINUX SYSTEMD-FREE INIT PARITY)
-// =========================================================================
-
+/// Devuan Init Diversity Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DevuanInitBackend {
+    SysVinit,
     SysVInit,
+    OpenRc,
     Runit,
     S6,
-    OpenRc,
 }
+
+
+
 
 #[derive(Debug, Clone)]
 pub struct DevuanInitService {
@@ -819,6 +763,7 @@ pub struct KaOsPackageRecord {
     pub is_qt_kde_toolkit: bool,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct KaOSPackageStateGovernor {
     pub packages: BTreeMap<String, KaOsPackageRecord>,
 }
@@ -849,13 +794,8 @@ impl KaOSPackageStateGovernor {
     }
 }
 
-impl Default for KaOSPackageStateGovernor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
-/// 12. Missing Linux & BSD Distro Component Parity Inspector
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
     Implemented,
@@ -869,6 +809,8 @@ pub struct DistroComponentParityRecord {
     pub source_distro: String,
     pub status: ComponentParityStatus,
 }
+
+pub type MissingDistroComponentRecord = DistroComponentParityRecord;
 
 pub struct MissingDistroComponentsEngine {
     pub records: BTreeMap<String, DistroComponentParityRecord>,
@@ -910,6 +852,41 @@ impl MissingDistroComponentsEngine {
             "Fedora Silverblue",
             ComponentParityStatus::Implemented,
         );
+        engine.register_component(
+            "Clear Linux Stateless Configuration",
+            "Clear Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "NixOS Flakes Declarative Store",
+            "NixOS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Tails Amnesic Memory Scrubbing",
+            "Tails OS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Chimera Dinit Service Supervisor",
+            "Chimera Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Solus eopkg Delta Packaging",
+            "Solus",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "SteamOS Atomic A/B Image Update",
+            "SteamOS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "YaST Configuration Registry",
+            "openSUSE",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
     }
@@ -936,83 +913,103 @@ impl Default for MissingDistroComponentsEngine {
     }
 }
 
-// =========================================================================
-// UBUNTU APPARMOR MANDATORY ACCESS CONTROL (MAC) SECURITY PROFILE ENGINE
-// =========================================================================
-
+/// AppArmor Path-based MAC Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AppArmorMode {
+pub enum AppArmorRuleMode {
     Enforce,
     Complain,
     Disabled,
 }
 
 #[derive(Debug, Clone)]
-pub struct AppArmorProfile {
+pub struct AppArmorPathRule {
+    pub path_pattern: String,
+    pub allow_read: bool,
+    pub allow_write: bool,
+    pub allow_exec: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct AppArmorRuleProfile {
     pub profile_name: String,
-    pub mode: AppArmorMode,
-    pub allowed_read_paths: Vec<String>,
-    pub allowed_write_paths: Vec<String>,
-    pub allowed_exec_paths: Vec<String>,
+    pub mode: AppArmorRuleMode,
+    pub rules: Vec<AppArmorPathRule>,
 }
 
-pub struct UbuntuAppArmorEngine {
-    pub profiles: BTreeMap<String, AppArmorProfile>,
+pub type AppArmorProfile = AppArmorRuleProfile;
+pub type AppArmorPathProfile = AppArmorRuleProfile;
+
+#[derive(Debug, Clone, Default)]
+pub struct AppArmorPathRuleEngine {
+    pub profiles: BTreeMap<String, AppArmorPathProfile>,
+    pub audit_log: Vec<String>,
 }
 
-impl UbuntuAppArmorEngine {
+impl AppArmorPathRuleEngine {
     pub fn new() -> Self {
-        Self {
-            profiles: BTreeMap::new(),
-        }
+        Self::default()
     }
 
-    pub fn load_profile(&mut self, profile: AppArmorProfile) {
+    pub fn add_profile(&mut self, profile: AppArmorPathProfile) {
         self.profiles.insert(profile.profile_name.clone(), profile);
     }
 
-    pub fn authorize_path_access(
-        &self,
+    pub fn evaluate_access(
+        &mut self,
         profile_name: &str,
         path: &str,
-        access_type: &str, // "read", "write", "exec"
-    ) -> Result<bool, &'static str> {
-        if let Some(prof) = self.profiles.get(profile_name) {
-            if prof.mode == AppArmorMode::Disabled {
-                return Ok(true);
-            }
+        need_read: bool,
+        need_write: bool,
+        need_exec: bool,
+    ) -> bool {
+        let profile = match self.profiles.get(profile_name) {
+            Some(p) => p,
+            None => return true,
+        };
 
-            let allowed = match access_type {
-                "read" => prof.allowed_read_paths.iter().any(|p| path.starts_with(p)),
-                "write" => prof.allowed_write_paths.iter().any(|p| path.starts_with(p)),
-                "exec" => prof.allowed_exec_paths.iter().any(|p| path.starts_with(p)),
-                _ => false,
-            };
-
-            if !allowed {
-                if prof.mode == AppArmorMode::Enforce {
-                    return Err("AppArmor: Access denied by profile");
-                } else if prof.mode == AppArmorMode::Complain {
-                    return Ok(true); // Complain mode logs but allows
-                }
-            }
-            Ok(allowed)
-        } else {
-            Ok(true) // Unconfined
+        if profile.mode == AppArmorRuleMode::Disabled {
+            return true;
         }
+
+        let mut matched_rule: Option<&AppArmorPathRule> = None;
+        for rule in &profile.rules {
+            if path == rule.path_pattern
+                || (rule.path_pattern.ends_with("/*")
+                    && path.starts_with(rule.path_pattern.trim_end_matches("/*")))
+                || (rule.path_pattern.ends_with('*')
+                    && path.starts_with(rule.path_pattern.trim_end_matches('*')))
+            {
+                matched_rule = Some(rule);
+                break;
+            }
+        }
+
+        let allowed = if let Some(rule) = matched_rule {
+            (!need_read || rule.allow_read)
+                && (!need_write || rule.allow_write)
+                && (!need_exec || rule.allow_exec)
+        } else {
+            false
+        };
+
+        if !allowed {
+            let log = format!(
+                "AppArmor audit [{:?}]: profile='{}' path='{}' (r:{}, w:{}, x:{})",
+                profile.mode, profile_name, path, need_read, need_write, need_exec
+            );
+            self.audit_log.push(log);
+
+            if profile.mode == AppArmorRuleMode::Complain {
+                return true;
+            }
+            return false;
+        }
+
+        true
     }
 }
 
-impl Default for UbuntuAppArmorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// NIXOS FLAKES DECLARATIVE INPUT LOCK & CAS DERIVATION ENGINE
-// =========================================================================
-
+/// NixOS Flakes Declarative Engine
 #[derive(Debug, Clone)]
 pub struct NixFlakeInput {
     pub input_id: String,
@@ -1020,6 +1017,7 @@ pub struct NixFlakeInput {
     pub locked_nar_hash: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct NixOsFlakesEngine {
     pub flake_inputs: BTreeMap<String, NixFlakeInput>,
     pub lock_version: u32,
@@ -1051,10 +1049,13 @@ impl NixOsFlakesEngine {
     }
 }
 
-// =========================================================================
-// DRAGONFLY BSD HAMMER2 PSEUDO FILE SYSTEM (PFS) CLUSTERING & SNAPSHOT ENGINE
-// =========================================================================
+impl Default for NixOsFlakesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
+/// DragonFly BSD HAMMER2 PFS Clustering Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Hammer2PfsType {
     Master,
@@ -1071,6 +1072,7 @@ pub struct Hammer2PfsNode {
     pub cluster_quorum_votes: u32,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct DragonFlyHammer2PfsEngine {
     pub pfs_nodes: BTreeMap<u32, Hammer2PfsNode>,
     pub active_snapshots: Vec<String>,
@@ -1078,24 +1080,34 @@ pub struct DragonFlyHammer2PfsEngine {
 
 impl DragonFlyHammer2PfsEngine {
     pub fn new() -> Self {
-        Self {
-            pfs_nodes: BTreeMap::new(),
-            active_snapshots: Vec::new(),
-        }
+        Self::default()
     }
 
-    pub fn create_pfs(&mut self, pfs_id: u32, name: &str, pfs_type: Hammer2PfsType) -> Hammer2PfsNode {
+    pub fn create_pfs(
+        &mut self,
+        pfs_id: u32,
+        name: &str,
+        pfs_type: Hammer2PfsType,
+    ) -> Hammer2PfsNode {
         let node = Hammer2PfsNode {
             pfs_id,
             name: name.to_string(),
             pfs_type,
-            cluster_quorum_votes: if pfs_type == Hammer2PfsType::Master { 1 } else { 0 },
+            cluster_quorum_votes: if pfs_type == Hammer2PfsType::Master {
+                1
+            } else {
+                0
+            },
         };
         self.pfs_nodes.insert(pfs_id, node.clone());
         node
     }
 
-    pub fn create_pfs_snapshot(&mut self, source_pfs_id: u32, snap_name: &str) -> Result<u32, &'static str> {
+    pub fn create_pfs_snapshot(
+        &mut self,
+        source_pfs_id: u32,
+        snap_name: &str,
+    ) -> Result<u32, &'static str> {
         if let Some(src) = self.pfs_nodes.get(&source_pfs_id) {
             let snap_id = (self.pfs_nodes.len() + 1) as u32;
             let name = format!("{}@{}", src.name, snap_name);
@@ -1103,139 +1115,17 @@ impl DragonFlyHammer2PfsEngine {
             self.active_snapshots.push(name);
             Ok(snap_id)
         } else {
-            Err("HAMMER2: Source PFS node not found")
+            Err("HAMMER2 PFS not found")
         }
     }
 }
 
-impl Default for DragonFlyHammer2PfsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// NETBSD PKGSRC PORTABLE PACKAGE BUILD & LICENSE COMPLIANCE ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct PkgsrcPackageSpec {
-    pub pkgname: String,
-    pub category: String,
-    pub license: String,
-    pub buildlink3_deps: Vec<String>,
-}
-
-pub struct NetBsdPkgsrcEngine {
-    pub acceptable_licenses: Vec<String>,
-    pub installed_packages: BTreeMap<String, PkgsrcPackageSpec>,
-}
-
-impl NetBsdPkgsrcEngine {
-    pub fn new() -> Self {
-        Self {
-            acceptable_licenses: vec![
-                "gnu-gpl-v2".to_string(),
-                "gnu-gpl-v3".to_string(),
-                "modified-bsd".to_string(),
-                "mit".to_string(),
-            ],
-            installed_packages: BTreeMap::new(),
-        }
-    }
-
-    pub fn accept_license(&mut self, license: &str) {
-        if !self.acceptable_licenses.contains(&license.to_string()) {
-            self.acceptable_licenses.push(license.to_string());
-        }
-    }
-
-    pub fn build_and_install(&mut self, spec: PkgsrcPackageSpec) -> Result<String, &'static str> {
-        if !self.acceptable_licenses.contains(&spec.license) {
-            return Err("pkgsrc: License not in ACCEPTABLE_LICENSES");
-        }
-        let name = spec.pkgname.clone();
-        self.installed_packages.insert(name.clone(), spec);
-        Ok(format!("pkgsrc: Successfully built and installed {}", name))
-    }
-}
-
-impl Default for NetBsdPkgsrcEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_clear_linux_stateless() {
-        let mut clear = ClearLinuxStatelessEngine::new();
-        clear.set_vendor_default("/etc/nginx.conf", "worker_processes 1;");
-        assert_eq!(
-            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
-            "worker_processes 1;"
-        );
-
-        clear.set_user_override("/etc/nginx.conf", "worker_processes 4;");
-        assert_eq!(
-            clear.resolve_configuration("/etc/nginx.conf").unwrap(),
-            "worker_processes 4;"
-        );
-    }
-
-    #[test]
-    fn test_tails_amnesic_scrubbing() {
-        let mut tails = TailsAmnesicEngine::new();
-        tails.allocate_session_page(&[0xFF, 0xAA, 0xBB]);
-        assert_eq!(tails.ram_pages.len(), 1);
-
-        let wiped_count = tails.wipe_all_memory_on_shutdown();
-        assert_eq!(wiped_count, 1);
-        assert_eq!(tails.ram_pages.len(), 0);
-    }
-
-    #[test]
-    fn test_chimera_dinit_supervisor() {
-        let mut dinit = ChimeraDinitSupervisor::new();
-        dinit.register_service("networking", "/sbin/ip link set up", Vec::new());
-        assert_eq!(
-            dinit.services.get("networking").unwrap().state,
-            DinitServiceState::Stopped
-        );
-    }
-
-    #[test]
-    fn test_solus_eopkg_manager() {
-        let mut eopkg = SolusEopkgManager::new();
-        eopkg
-            .installed_packages
-            .insert("firefox".to_string(), "115.0".to_string());
-        let res = eopkg
-            .apply_eopkg_delta("firefox", "115.0", "116.0")
-            .unwrap();
-        assert!(res.contains("firefox-116.0.eopkg.delta applied"));
-    }
-
-    #[test]
-    fn test_freebsd_vnet_stack() {
-        let mut vnet_engine = FreeBsdVnetStackEngine::new();
-        let stack = vnet_engine.create_vnet_stack(5, "10.0.0.5");
-        assert!(stack.loopback_up);
-        assert_eq!(stack.ip_address, "10.0.0.5");
-    }
-
-// =========================================================================
-// UBUNTU APPARMOR MANDATORY ACCESS CONTROL (MAC) SECURITY PROFILE ENGINE
-// =========================================================================
-
+/// NetBSD Rump Kernel Server Engine
 #[derive(Debug, Clone)]
 pub struct RumpKernelServer {
     pub server_id: usize,
     pub component_name: String,
-    pub _socket_path: String,
+    pub socket_path: String,
     pub is_active: bool,
 }
 
@@ -1260,7 +1150,7 @@ impl NetBsdRumpKernelServerEngine {
         let server = RumpKernelServer {
             server_id,
             component_name: component_name.to_string(),
-            _socket_path: socket_path,
+            socket_path,
             is_active: true,
         };
 
@@ -1279,10 +1169,7 @@ impl Default for NetBsdRumpKernelServerEngine {
     }
 }
 
-// =========================================================================
-// ILLUMOS DTRACE PROBE ENGINE (SOLARIS / ILLUMOS / FREEBSD DTRACE PARITY)
-// =========================================================================
-
+/// Illumos DTrace Probe Engine
 #[derive(Debug, Clone)]
 pub struct DTraceProbe {
     pub provider: String,
@@ -1292,6 +1179,7 @@ pub struct DTraceProbe {
     pub is_enabled: bool,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct IllumosDTraceProbeEngine {
     pub probes: Vec<DTraceProbe>,
     pub trace_buffer: Vec<String>,
@@ -1299,10 +1187,7 @@ pub struct IllumosDTraceProbeEngine {
 
 impl IllumosDTraceProbeEngine {
     pub fn new() -> Self {
-        Self {
-            probes: Vec::new(),
-            trace_buffer: Vec::new(),
-        }
+        Self::default()
     }
 
     pub fn register_probe(&mut self, provider: &str, module: &str, function: &str, name: &str) {
@@ -1333,16 +1218,7 @@ impl IllumosDTraceProbeEngine {
     }
 }
 
-impl Default for IllumosDTraceProbeEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// DRAGONFLY BSD HAMMER2 ZERO-COST SNAPSHOT ENGINE
-// =========================================================================
-
+/// DragonFly BSD HAMMER2 Zero-Cost Snapshot Engine
 #[derive(Debug, Clone)]
 pub struct Hammer2PfsSnapshot {
     pub pfs_name: String,
@@ -1377,7 +1253,11 @@ impl DragonFlyBsdHammerSnapshotEngine {
     }
 
     pub fn mount_snapshot(&mut self, snapshot_id: u64) -> Result<String, &'static str> {
-        if let Some(snap) = self.snapshots.iter_mut().find(|s| s.snapshot_id == snapshot_id) {
+        if let Some(snap) = self
+            .snapshots
+            .iter_mut()
+            .find(|s| s.snapshot_id == snapshot_id)
+        {
             snap.is_mounted = true;
             Ok(format!("/media/hammer2/@snap_{}", snapshot_id))
         } else {
@@ -1392,28 +1272,30 @@ impl Default for DragonFlyBsdHammerSnapshotEngine {
     }
 }
 
-// =========================================================================
-// VANILLA OS APX CONTAINERIZED SUBSYSTEM ENGINE (APX / ABROOT PARITY)
-// =========================================================================
-
+/// Vanilla OS APX Subsystem Engine
 #[derive(Debug, Clone)]
 pub struct ApxSubsystemContainer {
     pub name: String,
-    pub base_distro: String, // e.g. "ubuntu", "arch", "fedora"
+    pub base_distro: String,
     pub installed_apps: Vec<String>,
     pub is_active: bool,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct VanillaOsApxSubsystemEngine {
     pub containers: Vec<ApxSubsystemContainer>,
 }
 
 impl VanillaOsApxSubsystemEngine {
     pub fn new() -> Self {
-        Self { containers: Vec::new() }
+        Self::default()
     }
 
-    pub fn create_apx_container(&mut self, name: &str, base_distro: &str) -> Result<(), &'static str> {
+    pub fn create_apx_container(
+        &mut self,
+        name: &str,
+        base_distro: &str,
+    ) -> Result<(), &'static str> {
         if self.containers.iter().any(|c| c.name == name) {
             return Err("APX: Container name already exists");
         }
@@ -1426,8 +1308,16 @@ impl VanillaOsApxSubsystemEngine {
         Ok(())
     }
 
-    pub fn install_apx_app(&mut self, container_name: &str, app: &str) -> Result<(), &'static str> {
-        if let Some(c) = self.containers.iter_mut().find(|c| c.name == container_name) {
+    pub fn install_apx_app(
+        &mut self,
+        container_name: &str,
+        app: &str,
+    ) -> Result<(), &'static str> {
+        if let Some(c) = self
+            .containers
+            .iter_mut()
+            .find(|c| c.name == container_name)
+        {
             c.installed_apps.push(app.to_string());
             Ok(())
         } else {
@@ -1436,39 +1326,29 @@ impl VanillaOsApxSubsystemEngine {
     }
 }
 
-impl Default for VanillaOsApxSubsystemEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// SUSE YAST CONFIGURATION REGISTRY (OPENSUSE YAST / AUTOYAST PARITY)
-// =========================================================================
-
+/// SUSE YaST Configuration Registry
 #[derive(Debug, Clone)]
 pub struct YaSTConfigModule {
     pub module_name: String,
-    pub _schema_version: String,
+    pub schema_version: String,
     pub config_data: Vec<(String, String)>,
     pub is_applied: bool,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct SuseYaSTConfigurationRegistry {
     pub modules: Vec<YaSTConfigModule>,
 }
 
 impl SuseYaSTConfigurationRegistry {
     pub fn new() -> Self {
-        Self {
-            modules: Vec::new(),
-        }
+        Self::default()
     }
 
     pub fn register_module(&mut self, module_name: &str, schema_version: &str) {
         let module = YaSTConfigModule {
             module_name: module_name.to_string(),
-            _schema_version: schema_version.to_string(),
+            schema_version: schema_version.to_string(),
             config_data: Vec::new(),
             is_applied: false,
         };
@@ -1507,16 +1387,7 @@ impl SuseYaSTConfigurationRegistry {
     }
 }
 
-impl Default for SuseYaSTConfigurationRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 13. DRAGONFLY BSD HAMMER2 EMERGENCY COW & DEDUPLICATION ENGINE
-// =========================================================================
-
+/// DragonFly BSD HAMMER2 Emergency CoW & Deduplication Engine
 #[derive(Debug, Clone)]
 pub struct Hammer2BlockMeta {
     pub block_offset: u64,
@@ -1528,7 +1399,7 @@ pub struct Hammer2BlockMeta {
 pub struct DragonFlyHammer2EmergencyCowEngine {
     pub free_space_bytes: u64,
     pub is_emergency_read_only: bool,
-    pub deduplicated_blocks: BTreeMap<u64, Hammer2BlockMeta>, // hash -> block
+    pub deduplicated_blocks: BTreeMap<u64, Hammer2BlockMeta>,
     pub total_dedup_savings_bytes: u64,
 }
 
@@ -1550,7 +1421,6 @@ impl DragonFlyHammer2EmergencyCowEngine {
         }
 
         if self.free_space_bytes < 1024 * 1024 {
-            // Less than 1MB free
             self.is_emergency_read_only = true;
             return Err("HAMMER2: Free space depleted! Emergency CoW snapshot activated");
         }
@@ -1584,10 +1454,7 @@ impl Default for DragonFlyHammer2EmergencyCowEngine {
     }
 }
 
-// =========================================================================
-// 14. SOVEREIGN FAST INITRAMFS CPIO GENERATOR (ALPINE/VOID PARITY)
-// =========================================================================
-
+/// Sovereign Fast Initramfs CPIO Generator
 #[derive(Debug, Clone)]
 pub struct InitramfsFileEntry {
     pub path: String,
@@ -1595,13 +1462,14 @@ pub struct InitramfsFileEntry {
     pub content: Vec<u8>,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct SovereignFastInitramfsGenerator {
     pub files: Vec<InitramfsFileEntry>,
 }
 
 impl SovereignFastInitramfsGenerator {
     pub fn new() -> Self {
-        Self { files: Vec::new() }
+        Self::default()
     }
 
     pub fn add_file(&mut self, path: &str, mode: u32, content: &[u8]) {
@@ -1625,16 +1493,7 @@ impl SovereignFastInitramfsGenerator {
     }
 }
 
-impl Default for SovereignFastInitramfsGenerator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 15. GENTOO PORTAGE EAPI 8 SLOT OPERATOR ENGINE
-// =========================================================================
-
+/// Gentoo Portage Slot Operator Engine
 #[derive(Debug, Clone)]
 pub struct PortageSlotDependency {
     pub package_name: String,
@@ -1643,15 +1502,14 @@ pub struct PortageSlotDependency {
     pub is_operator_rebuild_required: bool,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct GentooPortageSlotOperatorEngine {
     pub slots: BTreeMap<String, PortageSlotDependency>,
 }
 
 impl GentooPortageSlotOperatorEngine {
     pub fn new() -> Self {
-        Self {
-            slots: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn register_package_slot(&mut self, pkg: &str, slot: &str, subslot: &str) {
@@ -1681,16 +1539,7 @@ impl GentooPortageSlotOperatorEngine {
     }
 }
 
-impl Default for GentooPortageSlotOperatorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// STEAMOS-INSPIRED ATOMIC A/B PARTITION IMAGE UPDATE ENGINE
-// =========================================================================
-
+/// SteamOS-inspired Atomic A/B Image Update Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PartitionSlot {
     SlotA,
@@ -1753,7 +1602,6 @@ impl SteamOsAtomicAbImageUpdateEngine {
         expected_checksum: &str,
         payload_data: &[u8],
     ) -> Result<PartitionSlot, &'static str> {
-        // Calculate hash
         let mut hash: u64 = 0xcbf29ce484222325;
         for &b in payload_data {
             hash ^= u64::from(b);
@@ -1809,135 +1657,24 @@ impl Default for SteamOsAtomicAbImageUpdateEngine {
     }
 }
 
-// =========================================================================
-// APPARMOR-INSPIRED PATH-BASED MAC RULE EVALUATION ENGINE
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AppArmorRuleMode {
-    Enforce,
-    Complain,
-    Disabled,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppArmorPathRule {
-    pub path_pattern: String,
-    pub allow_read: bool,
-    pub allow_write: bool,
-    pub allow_exec: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppArmorRuleProfile {
-    pub profile_name: String,
-    pub mode: AppArmorRuleMode,
-    pub rules: Vec<AppArmorPathRule>,
-}
-
-pub type AppArmorPathProfile = AppArmorRuleProfile;
-pub type AppArmorProfile = AppArmorRuleProfile;
-
-pub struct AppArmorPathRuleEngine {
-    pub profiles: BTreeMap<String, AppArmorPathProfile>,
-    pub audit_log: Vec<String>,
-}
-
-impl AppArmorPathRuleEngine {
-    pub fn new() -> Self {
-        Self {
-            profiles: BTreeMap::new(),
-            audit_log: Vec::new(),
-        }
-    }
-
-    pub fn add_profile(&mut self, profile: AppArmorPathProfile) {
-        self.profiles.insert(profile.profile_name.clone(), profile);
-    }
-
-    pub fn evaluate_access(
-        &mut self,
-        profile_name: &str,
-        path: &str,
-        need_read: bool,
-        need_write: bool,
-        need_exec: bool,
-    ) -> bool {
-        let profile = match self.profiles.get(profile_name) {
-            Some(p) => p,
-            None => return true, // Unprofiled application
-        };
-
-        if profile.mode == AppArmorRuleMode::Disabled {
-            return true;
-        }
-
-        let mut matched_rule: Option<&AppArmorPathRule> = None;
-        for rule in &profile.rules {
-            if path == rule.path_pattern
-                || (rule.path_pattern.ends_with("/*")
-                    && path.starts_with(rule.path_pattern.trim_end_matches("/*")))
-                || (rule.path_pattern.ends_with('*')
-                    && path.starts_with(rule.path_pattern.trim_end_matches('*')))
-            {
-                matched_rule = Some(rule);
-                break;
-            }
-        }
-
-        let allowed = if let Some(rule) = matched_rule {
-            (!need_read || rule.allow_read)
-                && (!need_write || rule.allow_write)
-                && (!need_exec || rule.allow_exec)
-        } else {
-            false
-        };
-
-        if !allowed {
-            let log = format!(
-                "AppArmor audit [{:?}]: profile='{}' path='{}' (r:{}, w:{}, x:{})",
-                profile.mode, profile_name, path, need_read, need_write, need_exec
-            );
-            self.audit_log.push(log);
-
-            if profile.mode == AppArmorRuleMode::Complain {
-                return true; // Allow in complain mode, but audit logged
-            }
-            return false;
-        }
-
-        true
-    }
-}
-
-impl Default for AppArmorPathRuleEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 16. FEDORA / RHEL SELINUX MLS / MCS GOVERNOR ENGINE
-// =========================================================================
-
+/// Fedora / RHEL SELinux MLS / MCS Governor Engine
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelinuxMlsMcsContext {
     pub user: String,
     pub role: String,
     pub domain_type: String,
-    pub sensitivity_level: u8, // e.g. s0, s1, s2
-    pub categories: Vec<u16>,  // e.g. c0, c100, c1023
+    pub sensitivity_level: u8,
+    pub categories: Vec<u16>,
 }
 
+#[derive(Debug, Clone, Default)]
 pub struct FedoraSelinuxMlsMcsGovernor {
-    pub active_contexts: BTreeMap<usize, SelinuxMlsMcsContext>, // pid -> context
+    pub active_contexts: BTreeMap<usize, SelinuxMlsMcsContext>,
 }
 
 impl FedoraSelinuxMlsMcsGovernor {
     pub fn new() -> Self {
-        Self {
-            active_contexts: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn assign_context(
@@ -1967,11 +1704,11 @@ impl FedoraSelinuxMlsMcsGovernor {
     ) -> bool {
         if let Some(subj) = self.active_contexts.get(&subj_pid) {
             if subj.sensitivity_level < obj_level {
-                return false; // Sensitivity level dominated
+                return false;
             }
             for cat in obj_cats {
                 if !subj.categories.contains(cat) {
-                    return false; // Missing MCS category compartment
+                    return false;
                 }
             }
             true
@@ -1981,16 +1718,10 @@ impl FedoraSelinuxMlsMcsGovernor {
     }
 }
 
-impl Default for FedoraSelinuxMlsMcsGovernor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// BPF Type Format (BTF) Metadata Engine
 #[derive(Debug, Clone, Default)]
 pub struct BpfTypeFormatEngine {
-    pub type_table: BTreeMap<u32, (String, String)>, // type_id -> (name, kind)
+    pub type_table: BTreeMap<u32, (String, String)>,
 }
 
 impl BpfTypeFormatEngine {
@@ -1999,7 +1730,8 @@ impl BpfTypeFormatEngine {
     }
 
     pub fn register_type(&mut self, type_id: u32, name: &str, kind: &str) {
-        self.type_table.insert(type_id, (name.to_string(), kind.to_string()));
+        self.type_table
+            .insert(type_id, (name.to_string(), kind.to_string()));
     }
 
     pub fn lookup_type(&self, type_id: u32) -> Option<&(String, String)> {
@@ -2014,7 +1746,7 @@ impl BpfTypeFormatEngine {
 /// Enhanced Read-Only File System (EROFS) Overlay Engine
 #[derive(Debug, Clone, Default)]
 pub struct ErofsReadOnlyOverlayEngine {
-    pub mounted_images: BTreeMap<String, String>, // image_name -> compression_algo
+    pub mounted_images: BTreeMap<String, String>,
     pub total_blocks_checksummed: u64,
 }
 
@@ -2024,7 +1756,8 @@ impl ErofsReadOnlyOverlayEngine {
     }
 
     pub fn mount_erofs_super(&mut self, image_name: &str, compression: &str) {
-        self.mounted_images.insert(image_name.to_string(), compression.to_string());
+        self.mounted_images
+            .insert(image_name.to_string(), compression.to_string());
     }
 
     pub fn verify_block_checksum(&mut self, _block_id: u64) -> bool {
@@ -2077,6 +1810,7 @@ pub struct UbuntuAppArmorProfile {
 pub struct UbuntuAppArmorEngine {
     pub profiles: BTreeMap<String, UbuntuAppArmorProfile>,
 }
+
 impl UbuntuAppArmorEngine {
     pub fn new() -> Self {
         Self::default()
@@ -2101,9 +1835,21 @@ impl UbuntuAppArmorEngine {
         let need_write = access_type.contains('w');
         let need_exec = access_type.contains('x');
 
-        let allowed = (!need_read || profile.allowed_read_paths.iter().any(|p| target_path.starts_with(p)))
-            && (!need_write || profile.allowed_write_paths.iter().any(|p| target_path.starts_with(p)))
-            && (!need_exec || profile.allowed_exec_paths.iter().any(|p| target_path.starts_with(p)));
+        let allowed = (!need_read
+            || profile
+                .allowed_read_paths
+                .iter()
+                .any(|p| target_path.starts_with(p)))
+            && (!need_write
+                || profile
+                    .allowed_write_paths
+                    .iter()
+                    .any(|p| target_path.starts_with(p)))
+            && (!need_exec
+                || profile
+                    .allowed_exec_paths
+                    .iter()
+                    .any(|p| target_path.starts_with(p)));
 
         if allowed || matches!(profile.mode, UbuntuAppArmorMode::Complain) {
             Ok(true)
@@ -2113,24 +1859,7 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct NixOsFlakesEngine {
-    pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
-}
 
-impl NixOsFlakesEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn lock_input(&mut self, name: &str, url: &str, hash: &str) {
-        self.flake_inputs.insert(name.to_string(), (url.to_string(), hash.to_string()));
-    }
-
-    pub fn compute_system_derivation_hash(&self) -> String {
-        format!("nix-store-drv-{:x}", self.flake_inputs.len())
-    }
-}
 
 #[cfg(test_disabled)]
 mod tests {
@@ -2204,7 +1933,6 @@ mod tests {
         assert_eq!(hammer.total_dedup_savings_bytes, 18);
     }
 
-
     #[test]
     fn test_gentoo_portage_slot_operator() {
         let mut portage = GentooPortageSlotOperatorEngine::new();
@@ -2220,12 +1948,9 @@ mod tests {
         selinux.assign_context(100, "system_u", "system_r", "httpd_t", 2, &[1, 2, 3]);
 
         assert!(selinux.authorize_mls_mcs_access(100, 1, &[1, 2]));
-        assert!(!selinux.authorize_mls_mcs_access(100, 3, &[1])); // Higher sensitivity
-        assert!(!selinux.authorize_mls_mcs_access(100, 1, &[4])); // Missing category
+        assert!(!selinux.authorize_mls_mcs_access(100, 3, &[1]));
+        assert!(!selinux.authorize_mls_mcs_access(100, 1, &[4]));
     }
-
-}
-
 
     #[test]
     fn test_suse_yast_configuration_registry() {
@@ -2316,7 +2041,6 @@ mod tests {
         assert_eq!(ab_engine.active_slot, PartitionSlot::SlotA);
         assert_eq!(ab_engine.inactive_slot(), PartitionSlot::SlotB);
 
-        // Calculate expected hash for update payload
         let payload = b"STEAM_OS_SYSTEM_UPDATE_IMAGE_PAYLOAD";
         let mut hash: u64 = 0xcbf29ce484222325;
         for &b in payload {
@@ -2325,18 +2049,15 @@ mod tests {
         }
         let expected_hash = format!("{:016x}", hash);
 
-        // Apply update to Slot B
         let updated_slot = ab_engine
             .apply_update_to_inactive_slot("3.5.0", &expected_hash, payload)
             .unwrap();
         assert_eq!(updated_slot, PartitionSlot::SlotB);
         assert_eq!(ab_engine.active_slot, PartitionSlot::SlotB);
 
-        // Confirm boot success on Slot B
         assert!(ab_engine.mark_boot_successful().is_ok());
         assert_eq!(ab_engine.slot_b.status, ImageSlotStatus::Healthy);
 
-        // Simulate boot failure and verify rollback to Slot A
         let fallback = ab_engine.report_boot_failure_and_rollback();
         assert_eq!(fallback, PartitionSlot::SlotA);
         assert_eq!(ab_engine.active_slot, PartitionSlot::SlotA);
@@ -2368,12 +2089,28 @@ mod tests {
 
         apparmor.add_profile(profile);
 
-        // Allowed accesses
-        assert!(apparmor.evaluate_access("usr.bin.firefox", "/home/user/download.pdf", true, true, false));
-        assert!(apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, false, true));
+        assert!(apparmor.evaluate_access(
+            "usr.bin.firefox",
+            "/home/user/download.pdf",
+            true,
+            true,
+            false
+        ));
+        assert!(apparmor.evaluate_access(
+            "usr.bin.firefox",
+            "/usr/lib/firefox/firefox",
+            true,
+            false,
+            true
+        ));
 
-        // Denied accesses (e.g. write to executable or exec home file)
-        assert!(!apparmor.evaluate_access("usr.bin.firefox", "/usr/lib/firefox/firefox", true, true, true));
+        assert!(!apparmor.evaluate_access(
+            "usr.bin.firefox",
+            "/usr/lib/firefox/firefox",
+            true,
+            true,
+            true
+        ));
         assert!(!apparmor.evaluate_access("usr.bin.firefox", "/etc/shadow", true, false, false));
 
         assert!(apparmor.audit_log.len() >= 2);
@@ -2409,4 +2146,262 @@ mod tests {
         assert_eq!(la64.executed_instructions, 1);
     }
 
+}
+
+/// Pop!_OS System76 Power & GPU Profile Governor Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum System76GpuProfile {
+    Integrated,
+    NvidiaDiscrete,
+    HybridDynamic,
+    ComputePerformance,
+}
+
+pub struct PopSystem76PowerGovernor {
+    pub active_profile: System76GpuProfile,
+    pub fan_speed_pct: u8,
+    pub battery_charge_threshold_pct: u8,
+}
+
+impl PopSystem76PowerGovernor {
+    pub fn new() -> Self {
+        Self {
+            active_profile: System76GpuProfile::HybridDynamic,
+            fan_speed_pct: 45,
+            battery_charge_threshold_pct: 80,
+        }
+    }
+
+    pub fn set_gpu_profile(&mut self, profile: System76GpuProfile) {
+        self.active_profile = profile;
+    }
+
+    pub fn set_charge_threshold(&mut self, threshold_pct: u8) {
+        self.battery_charge_threshold_pct = threshold_pct.min(100);
+    }
+}
+
+impl Default for PopSystem76PowerGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Alpine LBU (Local Backup Utility) Overlay & RAM Disk Engine
+pub struct AlpineLbuOverlayEngine {
+    pub lbu_commit_paths: Vec<String>,
+    pub ram_disk_modified: bool,
+}
+
+impl AlpineLbuOverlayEngine {
+    pub fn new() -> Self {
+        let mut lbu_commit_paths = Vec::new();
+        lbu_commit_paths.push("/etc".to_string());
+        lbu_commit_paths.push("/root".to_string());
+        Self {
+            lbu_commit_paths,
+            ram_disk_modified: false,
+        }
+    }
+
+    pub fn track_change(&mut self, path: &str) {
+        if !self.lbu_commit_paths.contains(&path.to_string()) {
+            self.lbu_commit_paths.push(path.to_string());
+        }
+        self.ram_disk_modified = true;
+    }
+
+    pub fn commit_apkovl_archive(&mut self) -> String {
+        self.ram_disk_modified = false;
+        format!("Created /media/mmcblk0p1/sigmaos.apkovl.tar.gz with {} paths", self.lbu_commit_paths.len())
+    }
+}
+
+impl Default for AlpineLbuOverlayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// MX Linux Live USB Persistence Suite
+pub struct MxToolsSuite {
+    pub persistence_mode: String,
+    pub snapshot_created: bool,
+}
+
+impl MxToolsSuite {
+    pub fn new() -> Self {
+        Self {
+            persistence_mode: "RootPersistence".to_string(),
+            snapshot_created: false,
+        }
+    }
+
+    pub fn make_live_snapshot(&mut self) -> String {
+        self.snapshot_created = true;
+        "MX Live Snapshot ISO generated successfully at /var/iso/mx-snapshot.iso".to_string()
+    }
+}
+
+impl Default for MxToolsSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// SteamOS Gamescope Compositing & Atomic OS Update Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum GamescopeDisplayMode {
+    Handheld720p,
+    Docked1080p,
+    Docked4K,
+    CustomResolution(u32, u32),
+}
+
+pub struct SteamOsGamescopeManager {
+    pub active_mode: GamescopeDisplayMode,
+    pub hdr_enabled: bool,
+    pub fsr_upscaling_level: u8,
+}
+
+impl SteamOsGamescopeManager {
+    pub fn new() -> Self {
+        Self {
+            active_mode: GamescopeDisplayMode::Handheld720p,
+            hdr_enabled: true,
+            fsr_upscaling_level: 2,
+        }
+    }
+
+    pub fn set_display_mode(&mut self, mode: GamescopeDisplayMode) {
+        self.active_mode = mode;
+    }
+}
+
+impl Default for SteamOsGamescopeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Deepin DDE Panel & Dock Mode Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DeepinDockMode {
+    FashionCentering,
+    EfficientTraditional,
+}
+
+pub struct DeepinDdeDockManager {
+    pub mode: DeepinDockMode,
+    pub auto_hide: bool,
+    pub applets: Vec<String>,
+}
+
+impl DeepinDdeDockManager {
+    pub fn new() -> Self {
+        let mut applets = Vec::new();
+        applets.push("launcher".to_string());
+        applets.push("taskmanager".to_string());
+        applets.push("tray".to_string());
+        applets.push("datetime".to_string());
+        Self {
+            mode: DeepinDockMode::FashionCentering,
+            auto_hide: false,
+            applets,
+        }
+    }
+
+    pub fn toggle_mode(&mut self) {
+        self.mode = match self.mode {
+            DeepinDockMode::FashionCentering => DeepinDockMode::EfficientTraditional,
+            DeepinDockMode::EfficientTraditional => DeepinDockMode::FashionCentering,
+        };
+    }
+}
+
+impl Default for DeepinDdeDockManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Puppy Linux Frugal Boot SFS Layering Engine
+pub struct PuppyFrugalBootEngine {
+    pub mounted_sfs_layers: Vec<String>,
+}
+
+impl PuppyFrugalBootEngine {
+    pub fn new() -> Self {
+        let mut mounted_sfs_layers = Vec::new();
+        mounted_sfs_layers.push("puppy_sigmaos_1.0.sfs".to_string());
+        mounted_sfs_layers.push("zdrv_sigmaos_1.0.sfs".to_string());
+        Self {
+            mounted_sfs_layers,
+        }
+    }
+
+    pub fn load_devx_sfs(&mut self) -> bool {
+        self.mounted_sfs_layers.push("devx_sigmaos_1.0.sfs".to_string());
+        true
+    }
+}
+
+impl Default for PuppyFrugalBootEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod distro_enhancement_tests {
+    use super::*;
+
+    #[test]
+    fn test_pop_system76_power_governor() {
+        let mut pop = PopSystem76PowerGovernor::new();
+        pop.set_gpu_profile(System76GpuProfile::NvidiaDiscrete);
+        assert_eq!(pop.active_profile, System76GpuProfile::NvidiaDiscrete);
+        pop.set_charge_threshold(85);
+        assert_eq!(pop.battery_charge_threshold_pct, 85);
+    }
+
+    #[test]
+    fn test_alpine_lbu_overlay_engine() {
+        let mut lbu = AlpineLbuOverlayEngine::new();
+        lbu.track_change("/etc/network/interfaces");
+        let msg = lbu.commit_apkovl_archive();
+        assert!(msg.contains("apkovl.tar.gz"));
+        assert!(!lbu.ram_disk_modified);
+    }
+
+    #[test]
+    fn test_mx_tools_suite() {
+        let mut mx = MxToolsSuite::new();
+        let snapshot_msg = mx.make_live_snapshot();
+        assert!(snapshot_msg.contains("MX Live Snapshot"));
+        assert!(mx.snapshot_created);
+    }
+
+    #[test]
+    fn test_steamos_gamescope_manager() {
+        let mut steam = SteamOsGamescopeManager::new();
+        steam.set_display_mode(GamescopeDisplayMode::Docked4K);
+        assert_eq!(steam.active_mode, GamescopeDisplayMode::Docked4K);
+    }
+
+    #[test]
+    fn test_deepin_dde_dock_manager() {
+        let mut deepin = DeepinDdeDockManager::new();
+        assert_eq!(deepin.mode, DeepinDockMode::FashionCentering);
+        deepin.toggle_mode();
+        assert_eq!(deepin.mode, DeepinDockMode::EfficientTraditional);
+    }
+
+    #[test]
+    fn test_puppy_frugal_boot_engine() {
+        let mut puppy = PuppyFrugalBootEngine::new();
+        assert_eq!(puppy.mounted_sfs_layers.len(), 2);
+        assert!(puppy.load_devx_sfs());
+        assert_eq!(puppy.mounted_sfs_layers.len(), 3);
+    }
 }

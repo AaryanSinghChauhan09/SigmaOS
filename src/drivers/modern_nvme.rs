@@ -105,14 +105,14 @@ pub struct AhciCommandHeader {
 /// Simulated AHCI Port MMIO Register Map
 pub struct AhciPort {
     pub cmd_issue: u32,
-    pub cmd_headers: [AhciCommandHeaderV3; 32], // 32 command slots
+    pub cmd_headers: [AhciCommandHeader; 32], // 32 command slots
 }
 
 impl AhciPort {
     pub const fn new() -> Self {
         Self {
             cmd_issue: 0,
-            cmd_headers: [AhciCommandHeaderV3 {
+            cmd_headers: [AhciCommandHeader {
                 opts: 0,
                 prdtl: 0,
                 prdbc: 0,

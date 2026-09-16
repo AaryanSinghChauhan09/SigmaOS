@@ -511,8 +511,7 @@ impl NetBsdRumpComponentEngine {
     }
 
     pub fn register_rump_server(&mut self, server_id: &str, subsystem: &str) {
-        self.rump_servers
-            .insert(server_id.to_string(), subsystem.to_string());
+        self.rump_servers.insert(server_id.to_string(), subsystem.to_string());
     }
 
     pub fn mount_rump_vfs(&self, server_id: &str, _mount_path: &str) -> bool {
@@ -539,8 +538,7 @@ impl OpenBsdUnveilAuditor {
     }
 
     pub fn add_unveil_mapping(&mut self, path: &str, permissions: &str) {
-        self.unveiled_paths
-            .insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
     }
 
     pub fn audit_access(&self, file_path: &str, required_perm: &str) -> bool {

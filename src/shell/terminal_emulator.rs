@@ -892,8 +892,7 @@ impl TerminalMultiplexerV1 {
 #[derive(Debug, Clone)]
 pub struct TriggerRule {
     pub pattern: String,
-    pub highlight_color: AnsiColor,
-    pub action_command: Option<String>,
+    pub action_command: String,
 }
 
 /// Dynamic, user-defined shell function.
@@ -1028,11 +1027,10 @@ pub struct TerminalSession {
 }
 
 impl TriggerRule {
-    pub fn new(pattern: &str, color: AnsiColor, action: Option<&str>) -> Self {
+    pub fn new(pattern: &str, _color: AnsiColor, action: Option<&str>) -> Self {
         Self {
             pattern: pattern.to_string(),
-            highlight_color: color,
-            action_command: action.map(|a| a.to_string()),
+            action_command: action.unwrap_or("").to_string(),
         }
     }
 }
@@ -1292,7 +1290,10 @@ impl TerminalSession {
     }
 
     pub fn register_trigger_rule(&mut self, pattern: &str, action: &str) {
-        self.trigger_rules.push(TriggerRule::new(pattern, AnsiColor::Default, Some(action)));
+        self.trigger_rules.push(TriggerRule {
+            pattern: pattern.to_string(),
+            action_command: action.to_string(),
+        });
     }
 
     /// Parses basic ANSI Escape Sequences (CSIs)
@@ -1364,9 +1365,9 @@ impl TerminalSession {
                 }
                 _ => {}
             }
-            return Some(action);
+            Some(action)
         } else {
-            return None;
+            None
         }
     }
 }

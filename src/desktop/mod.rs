@@ -3,8 +3,10 @@ pub use mobile_variant::*;
 
 // SigmaOS Desktop Module
 pub mod mate_betsy;
+pub mod mint_desktop;
 pub mod mint_tools;
 pub mod moksha;
+pub mod omarchy_theme;
 pub mod omarchy_omakase;
 pub mod pantheon;
 pub mod screensaver;
@@ -13,10 +15,13 @@ pub mod web_wasm_bridge;
 pub mod zenith_compositor;
 pub mod ultimate_distro_desktop;
 pub mod wayland_protocol;
+pub mod weather_panel;
 
 pub use wayland_protocol::*;
 
-pub use sovereign_navigation_engine::*;
+pub use crate::desktop::sovereign_navigation_engine::*;
+
+pub use crate::desktop::sovereign_navigation_engine::*;
 
 pub use ultimate_distro_desktop::{
     ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
@@ -31,6 +36,13 @@ pub use mate_betsy::{
     MateBetsyDesktopEnvironment, PlumaTextEditor,
 };
 
+pub use mint_desktop::{
+    CinnamonDesklet, CinnamonDesktopManager, CinnamonExtension, CinnamonPanel, CinnamonPanelPosition,
+    CinnamonTheme, PanelApplet, PanelAppletType, XAppPreferences,
+};
+pub use omarchy_theme::{
+    Color, OmarchyThemeManager, SemanticColor, Theme, ThemeComponent,
+};
 pub use mint_tools::{
     AppMetadata, MintSoftwareManager, MintTimeshiftEngine, MintUpdateManager, SnapshotType,
     TimeshiftSnapshot, UpdateLevel, UpdatePackage,
@@ -57,7 +69,12 @@ pub use zenith_compositor::{
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
 };
 
-pub use omarchy_omakase::{
-    AgenticWorkstationLayout, AgenticWorkstationOrchestrator, OmakasePresetConfig,
-    OmarchySystemEngine, WorkstationPane, WorkstationPaneRole,
+pub use crate::desktop::sovereign_navigation_engine::{
+    AppCategory, GnomePopLauncherNav, HudActionResult, KrunnerRofiCommandHud, LauncherAppItem,
+    NavDirection, RangerDolphinSpatialFileNav, SovereignUniversalNavigationEngine,
+    SystemControlNode, TilingWindowManagerNav, WindowNode, YastBsdConfigControlTreeNav,
+};
+
+pub use weather_panel::{
+    WeatherCondition, WeatherData, WeatherForecast, WeatherPanel,
 };
