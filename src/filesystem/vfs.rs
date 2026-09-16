@@ -249,17 +249,21 @@ impl VirtualFileSystem {
     pub fn new() -> Self {
         let mut inodes = BTreeMap::new();
         let root_inode = Inode {
-            id: 1,
+            inode_number: 1,
             file_type: FileType::Directory,
+            mode: FileMode::new(0o755),
             size: 0,
-            permissions: 0o755,
             owner: 0,
-            data: Vec::new(),
-            created_at: 0,
-            modified_at: 0,
-            entries: BTreeMap::new(),
-            link_count: 1,
+            group: 0,
+            created: 0,
+            modified: 0,
+            capabilities: CapabilityToken::new(),
             hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            entries: HashMap::new(),
         };
         inodes.insert(1, root_inode);
 
@@ -279,17 +283,21 @@ impl VirtualFileSystem {
         let id = self.next_inode_id;
         self.next_inode_id += 1;
         let inode = Inode {
-            id,
+            inode_number: id,
             file_type,
+            mode: FileMode::new(0o644),
             size: 0,
-            permissions: 0o644,
             owner,
-            data: Vec::new(),
-            created_at: 0,
-            modified_at: 0,
-            entries: BTreeMap::new(),
-            link_count: 1,
+            group: 0,
+            created: 0,
+            modified: 0,
+            capabilities: CapabilityToken::new(),
             hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            entries: HashMap::new(),
         };
         self.inodes.insert(id, inode);
         Ok(id)

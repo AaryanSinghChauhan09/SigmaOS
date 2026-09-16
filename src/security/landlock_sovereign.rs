@@ -266,6 +266,10 @@ impl SovereignLandlockV5Guard {
 pub struct CapsicumRights(u64);
 
 impl CapsicumRights {
+    pub const fn empty() -> Self {
+        CapsicumRights(0)
+    }
+
     pub const CAP_READ:     CapsicumRights = CapsicumRights(1 << 0);
     pub const CAP_WRITE:    CapsicumRights = CapsicumRights(1 << 1);
     pub const CAP_SEEK:     CapsicumRights = CapsicumRights(1 << 2);

@@ -6,7 +6,7 @@ use super::Vec;
 use core::borrow::Borrow;
 use core::cmp::PartialEq;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,

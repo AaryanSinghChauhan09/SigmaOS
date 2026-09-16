@@ -31,7 +31,7 @@ impl AgentId {
 }
 
 /// Agent capability domains (sandboxed execution contexts)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AgentCapability {
     /// Analyze kernel crashes, panics, and core dumps
     SystemAnalysis,
@@ -107,7 +107,7 @@ pub struct AgentSandbox {
 impl AgentSandbox {
     pub fn new_strict() -> Self {
         Self {
-            landlock: LandlockV5Guard::new(),
+            landlock: LandlockV5Guard::new(5),
             capsicum: CapsicumRights::empty(),
             pledge_promises: 0, // No promises initially
             unveil_paths: Vec::new(),
@@ -195,7 +195,7 @@ pub struct AgentReport {
 }
 
 /// Plugin specification for code generation
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PluginSpec {
     pub name: String,
     pub description: String,
