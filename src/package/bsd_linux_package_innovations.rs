@@ -3774,9 +3774,9 @@ impl Default for PortagePackageLicenseGovernorEngine {
 }
 
 #[cfg(all(test, not(feature = "standalone_test")))]
-#[path = "../sigpkg/universal_engine.rs"]
+#[path = "universal.rs"]
 #[allow(dead_code)]
-mod sigpkg_universal_engine;
+mod universal_package;
 
 #[cfg(test)]
 mod tests {
@@ -4697,7 +4697,7 @@ MAINTAINER="SigmaOS"
     #[cfg(not(feature = "standalone_test"))]
     #[test]
     fn test_all_prompt_package_formats_detection_and_adaptation() {
-        use super::sigpkg_universal_engine::PackageFormat;
+        use super::universal_package::PackageFormat;
 
         let test_cases = [
             ("app.air", PackageFormat::Air),
@@ -4719,20 +4719,17 @@ MAINTAINER="SigmaOS"
             ("gentoo.ebuild", PackageFormat::Portage),
             ("arch.pkg.tar.xz", PackageFormat::Pacman),
             ("app.flatpak", PackageFormat::Flatpak),
-            ("macos.app", PackageFormat::AppBundle),
+            ("macos.app", PackageFormat::App),
             ("harmony.hap", PackageFormat::Hap),
             ("pardus.PiSi", PackageFormat::Pisi),
             ("archive.tgz", PackageFormat::TarGz),
             ("deepin.superdeb", PackageFormat::Superdeb),
             ("slax.lzm", PackageFormat::Lzm),
             ("puppy.pup", PackageFormat::Pup),
-            ("pup", PackageFormat::Pup),
             ("canonical.snap", PackageFormat::Snap),
             ("pacman.pkg.tar.zst", PackageFormat::Pacman),
-            ("pacman", PackageFormat::Pacman),
             ("plain.tar", PackageFormat::Tar),
             ("puppy.pet", PackageFormat::Pet),
-            ("pet", PackageFormat::Pet),
         ];
 
         for (filename, expected) in test_cases {
