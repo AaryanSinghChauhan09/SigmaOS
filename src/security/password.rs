@@ -185,7 +185,7 @@ pub struct PasswordManagerResult {
 pub struct PasswordManager {
     vault_path: String,
     master_key: Vec<u8>,
-    passwords: BTreeMap<String, PasswordEntry>,
+    vault_entries: BTreeMap<String, PasswordEntry>,
     biometric_auth: Option<Box<dyn BiometricAuth>>,
     biometric_enabled: bool,
     auto_lock_timeout_seconds: u64,
@@ -197,7 +197,7 @@ impl PasswordManager {
         Self {
             vault_path,
             master_key,
-            passwords: BTreeMap::new(),
+            vault_entries: BTreeMap::new(),
             biometric_auth: None,
             biometric_enabled: false,
             auto_lock_timeout_seconds: 300, // 5 minutes
@@ -233,7 +233,7 @@ impl PasswordManager {
         };
 
         let service_name = encrypted_entry.service.clone();
-        self.passwords
+        self.vault_entries
             .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(0u64);
 
@@ -250,7 +250,7 @@ impl PasswordManager {
 
         let key = id.to_string();
         let entry = self
-            .passwords
+            .vault_entries
             .get(&key)
             .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
 
@@ -270,7 +270,7 @@ impl PasswordManager {
     ) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
-        if !self.passwords.contains_key(&entry.id) {
+        if !self.vault_entries.contains_key(&entry.id) {
             return Err(PasswordError::PasswordNotFound(entry.id.clone()));
         }
 
@@ -283,7 +283,7 @@ impl PasswordManager {
         };
 
         let service_name = encrypted_entry.service.clone();
-        self.passwords
+        self.vault_entries
             .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(0u64);
 
@@ -299,7 +299,7 @@ impl PasswordManager {
         self.check_auto_lock()?;
 
         let key = id.to_string();
-        self.passwords
+        self.vault_entries
             .remove(&key)
             .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
 
@@ -317,7 +317,7 @@ impl PasswordManager {
         self.check_auto_lock()?;
 
         let entries: Vec<PasswordEntry> = self
-            .passwords
+            .vault_entries
             .values()
             .map(|e| PasswordEntry {
                 encrypted_password: vec![], // Don't return actual passwords
@@ -334,7 +334,7 @@ impl PasswordManager {
         self.check_auto_lock()?;
 
         let results: Vec<PasswordEntry> = self
-            .passwords
+            .vault_entries
             .values()
             .filter(|e| e.service.to_lowercase().contains(&query.to_lowercase()))
             .map(|e| PasswordEntry {

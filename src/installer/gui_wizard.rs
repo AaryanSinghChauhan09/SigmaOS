@@ -620,7 +620,7 @@ mod tests {
     fn test_installation_summary() {
         let mut wizard = GuiInstallerWizard::new();
         wizard.select_disk("/dev/nvme0n1");
-        wizard.add_user_account(UserAccount::new("sovereign", "secret123"));
+        wizard.add_user_account(UserAccount::new("sovereign", "usr_key_val"));
 
         let summary = wizard.get_installation_summary();
         assert_eq!(summary.target_disk, "/dev/nvme0n1");

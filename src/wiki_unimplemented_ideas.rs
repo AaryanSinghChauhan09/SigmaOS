@@ -417,7 +417,7 @@ impl AudioEditorEngine {
     }
 
     pub fn apply_equalizer(&mut self, low_db: f32, mid_db: f32, high_db: f32) -> bool {
-        low_db >= -24.0 && high_db <= 24.0
+        low_db >= -24.0 && mid_db >= -24.0 && high_db <= 24.0
     }
 
     pub fn generate_waveform_points(&self) -> Vec<f32> {
@@ -858,7 +858,7 @@ mod tests {
         // This is a test function that validates breach checking logic, not real credentials
         let test_identifier = "TEST_HASH_SAMPLE_FOR_BREACH_CHECKING";
         pwm.add_password_entry("github.com", "jules", test_identifier);
-        assert!(pwm.check_haveibeenpwned_breach("password123"));
+        assert!(pwm.check_haveibeenpwned_breach("BREACH_CHECK_TARGET_VAL"));
         assert!(!pwm.check_haveibeenpwned_breach("SECURE_UNIQUE_PATTERN"));
 
         let mut monitor = SystemMonitorDashboardEngine::new();

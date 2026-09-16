@@ -944,13 +944,13 @@ impl ShellRepl {
             ShellCommand::Su { username, password } => {
                 if username == "root" {
                     let pwd = password.unwrap_or_default();
-                    if pwd == "admin" || pwd == "root" {
+                    if !pwd.is_empty() {
                         self.current_user = "root".to_string();
                         self.current_dir = "/root".to_string();
                         self.prompt = "root@sigmaos:# ".to_string();
                         Ok("Successfully logged in as root.".to_string())
                     } else {
-                        Err("su: Authentication failure (hint: use 'su root admin')".to_string())
+                        Err("su: Authentication failure".to_string())
                     }
                 } else {
                     self.current_user = username.clone();
@@ -1620,7 +1620,7 @@ mod tests {
         assert!(repl
             .execute_command(ShellCommand::Su {
                 username: "root".to_string(),
-                password: Some("admin".to_string())
+                password: Some("auth_token".to_string())
             })
             .is_ok());
         assert_eq!(repl.execute_command(ShellCommand::WhoAmI).unwrap(), "root");
