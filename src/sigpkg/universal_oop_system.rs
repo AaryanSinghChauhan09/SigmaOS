@@ -24,7 +24,7 @@ use std::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 #[cfg(all(not(feature = "standalone_test"), test))]
@@ -40,6 +40,14 @@ pub struct Version {
 
 
 use std::sync::Arc;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
 
 #[cfg(feature = "standalone_test")]
 impl core::fmt::Display for Version {
@@ -68,20 +76,20 @@ impl Version {
     }
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
     pub name: String,
@@ -91,7 +99,7 @@ pub struct Package {
     pub checksum: String,
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 impl Package {
     pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
         Self {

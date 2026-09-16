@@ -113,7 +113,7 @@ pub enum Permission {
     Execute,
 }
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::security::Permission;
 
 use super::universal_oop_system;

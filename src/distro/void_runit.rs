@@ -108,6 +108,8 @@ impl RunitService {
 /// Runit Service Supervisor Engine
 #[derive(Debug, Clone)]
 pub struct RunitSupervisor {
+    pub stage: RunitStage,
+    pub current_stage_num: u32,
     pub services: BTreeMap<String, RunitService>,
     pub stage: RunitStage,
     pub current_stage_num: u32,
@@ -116,6 +118,8 @@ pub struct RunitSupervisor {
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
+            stage: RunitStage::Stage1,
+            current_stage_num: 1,
             services: BTreeMap::new(),
             stage: RunitStage::Stage1,
             current_stage_num: 1,
