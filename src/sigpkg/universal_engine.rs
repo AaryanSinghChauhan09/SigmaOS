@@ -58,6 +58,11 @@ pub enum PackageFormat {
     Dports,
     SlackBuild,
     Crux,
+    Deb,
+    Rpm,
+    Ebuild,
+    Sysupdate,
+    Sigma,
     Drpm,
     Stratum,
     Ipk,
@@ -73,23 +78,26 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
-    Deb,
-    Rpm,
-    Ebuild,
-    Sigma,
-    Sysupdate,
 }
+
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
-        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
-        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
-        else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
-        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
-        else { None }
+        if filename.ends_with(".deb") { return Some(PackageFormat::Deb); }
+        if filename.ends_with(".rpm") { return Some(PackageFormat::Rpm); }
+        if filename.ends_with(".tar.gz") || filename.ends_with(".tgz") { return Some(PackageFormat::TarGz); }
+        if filename.ends_with(".tar.xz") { return Some(PackageFormat::TarXz); }
+        if filename.ends_with(".tar") { return Some(PackageFormat::Tar); }
+        if filename.ends_with(".snap") { return Some(PackageFormat::Snap); }
+        if filename.ends_with(".flatpak") { return Some(PackageFormat::Flatpak); }
+        if filename.ends_with(".appimage") || filename.ends_with(".AppImage") { return Some(PackageFormat::AppImage); }
+        if filename.ends_with(".apk") { return Some(PackageFormat::Apk); }
+        if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { return Some(PackageFormat::Pacman); }
+        if filename.ends_with(".dmg") { return Some(PackageFormat::Dmg); }
+        if filename.ends_with(".nix") { return Some(PackageFormat::Nix); }
+        if filename.ends_with(".ebuild") { return Some(PackageFormat::Ebuild); }
+        if filename.ends_with(".txz") { return Some(PackageFormat::Txz); }
+        None
     }
 }
 
@@ -1647,8 +1655,8 @@ impl IPackageAdapter for PetPackageAdapter {
 pub struct SnapPackageAdapter;
 impl IPackageAdapter for SnapPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Snap
-    }
+        PackageFormat::Apt
+    } // or custom snap mapping
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
             return Err("Empty Snap payload");
@@ -1656,7 +1664,7 @@ impl IPackageAdapter for SnapPackageAdapter {
         Ok(PackageContext {
             name: "snap-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Snap,
+            format: PackageFormat::Apt,
             dependencies: vec![],
             files: vec![],
             hash: [0x21; 32],
@@ -1673,7 +1681,7 @@ impl IPackageAdapter for SnapPackageAdapter {
 
 impl IPackageAdapter for FlatpakPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Flatpak
+        PackageFormat::Apt
     }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
@@ -1682,7 +1690,7 @@ impl IPackageAdapter for FlatpakPackageAdapter {
         Ok(PackageContext {
             name: "flatpak-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Flatpak,
+            format: PackageFormat::Apt,
             dependencies: vec![],
             files: vec![],
             hash: [0x22; 32],

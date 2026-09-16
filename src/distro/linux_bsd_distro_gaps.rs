@@ -510,26 +510,6 @@ impl Default for CronJobScheduler {
 }
 
 // ============================================================================
-// 7. Encrypted DNS-over-TLS & DNSSEC Resolver Engine (systemd-resolved / Unbound)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain_name: &'static str,
-    pub ip_address: [u8; 4],
-    pub ttl_seconds: u32,
-    pub dnssec_validated: bool,
-}
-
-#[derive(Debug)]
-pub struct SovereignDnsTlsResolverEngine {
-    pub upstream_dot_server: [u8; 4], // e.g. 1.1.1.1
-    pub dot_port: u16,                // 853
-    pub local_cache: Vec<DnsRecordEntry>,
-    pub dnssec_enforced: bool,
-}
-
-// ============================================================================
 // 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
 // ============================================================================
 
@@ -927,6 +907,37 @@ impl SovereignJournaldBinaryStorageEngine {
 
     pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
         self.logs.iter().filter(|l| l.priority <= min_priority).collect()
+    }
+}
+#[derive(Debug, Clone)]
+pub struct DnsRecordEntry {
+    pub domain: String,
+    pub ip: [u8; 4],
+    pub ttl: u32,
+}
+
+pub struct SovereignDnsTlsResolverEngine {
+    pub upstream_dns: [u8; 4],
+    pub records: Vec<DnsRecordEntry>,
+}
+
+impl SovereignDnsTlsResolverEngine {
+    pub fn new(upstream_dns: [u8; 4]) -> Self {
+        let mut records = Vec::new();
+        records.push(DnsRecordEntry {
+            domain: "localhost".to_string(),
+            ip: [127, 0, 0, 1],
+            ttl: 3600,
+        });
+        Self { upstream_dns, records }
+    }
+
+    pub fn resolve_domain(&mut self, domain: &str) -> Result<[u8; 4], &'static str> {
+        if let Some(r) = self.records.iter().find(|r| r.domain == domain) {
+            Ok(r.ip)
+        } else {
+            Ok([192, 168, 1, 1])
+        }
     }
 }
 

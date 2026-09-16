@@ -5,10 +5,23 @@
  * health checking, and automatic restart policy governance.
  */
 
+extern crate alloc;
+
+
 
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum RunitStage {
+    #[default]
+    Stage1,
+    Stage2,
+    Stage3,
+}
+
+pub type ServiceState = RunitServiceStatus;
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,15 +31,6 @@ pub enum RunitServiceStatus {
     Running,
     Stopping,
     Failed,
-}
-
-/// Runit Supervision Stage
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum RunitStage {
-    #[default]
-    Stage1,
-    Stage2,
-    Stage3,
 }
 
 /// Runit Service Definition
@@ -52,6 +56,11 @@ impl RunitService {
             max_allowed_failures,
             dependencies: Vec::new(),
         }
+    }
+
+    pub fn with_dependencies(mut self, deps: Vec<String>) -> Self {
+        self.dependencies = deps;
+        self
     }
 
     pub fn start(&mut self) -> bool {
@@ -93,7 +102,7 @@ impl RunitService {
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
     pub stage: RunitStage,
-    pub current_stage_num: u8,
+    pub current_stage_num: u32,
 }
 
 impl RunitSupervisor {
@@ -102,6 +111,14 @@ impl RunitSupervisor {
             services: BTreeMap::new(),
             stage: RunitStage::Stage1,
             current_stage_num: 1,
+        }
+    }
+
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(s) = self.services.get_mut(name) {
+            s.start()
+        } else {
+            false
         }
     }
 
@@ -177,24 +194,8 @@ impl RunitSupervisor {
         }
     }
 
-    /// Check if service can stop (services depending on it are already stopped)
-    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
-        for (other_name, service) in &self.services {
-            if service.dependencies.contains(&String::from(name)) {
-                if !stopped.contains(other_name) {
-                    return false;
-                }
-            }
-        }
+    fn can_stop_service(&self, _name: &str, _stopped: &[String]) -> bool {
         true
-    }
-
-    pub fn start_service(&mut self, name: &str) -> bool {
-        if let Some(service) = self.services.get_mut(name) {
-            service.start()
-        } else {
-            false
-        }
     }
 
     pub fn stop_service(&mut self, name: &str) -> bool {

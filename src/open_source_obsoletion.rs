@@ -281,16 +281,8 @@ impl SovereignFdiskDiskPartitioner {
         }
     }
 
-    pub fn add_partition(
-        &mut self,
-        sectors_count: u64,
-        type_guid: &str,
-    ) -> Result<usize, &'static str> {
-        let last_end = self
-            .partitions
-            .last()
-            .map(|p| p.end_sector + 1)
-            .unwrap_or(2048); // 1MB initial alignment
+    pub fn add_partition(&mut self, sectors_count: u64, type_guid: &str) -> Result<usize, &'static str> {
+        let last_end = self.partitions.last().map(|p| p.end_sector + 1).unwrap_or(2048); // 1MB initial alignment
         let end_sector = last_end + sectors_count - 1;
 
         if end_sector >= self.total_disk_sectors {
@@ -453,11 +445,7 @@ impl SovereignHtopProcessMonitorEngine {
 
     pub fn get_top_cpu_processes(&self, limit: usize) -> Vec<ProcessTaskSnapshot> {
         let mut sorted = self.process_snapshots.clone();
-        sorted.sort_by(|a, b| {
-            b.cpu_pct
-                .partial_cmp(&a.cpu_pct)
-                .unwrap_or(core::cmp::Ordering::Equal)
-        });
+        sorted.sort_by(|a, b| b.cpu_pct.partial_cmp(&a.cpu_pct).unwrap_or(core::cmp::Ordering::Equal));
         sorted.truncate(limit);
         sorted
     }
@@ -507,10 +495,7 @@ impl SovereignAnsibleAutomationEngine {
         self.playbooks.push(playbook);
     }
 
-    pub fn execute_playbook(
-        &mut self,
-        playbook_name: &str,
-    ) -> Result<(usize, usize), &'static str> {
+    pub fn execute_playbook(&mut self, playbook_name: &str) -> Result<(usize, usize), &'static str> {
         let playbook = self
             .playbooks
             .iter()
@@ -522,10 +507,7 @@ impl SovereignAnsibleAutomationEngine {
 
         for task in &playbook.tasks {
             task_count += 1;
-            if task.target_state == "present"
-                || task.target_state == "started"
-                || task.target_state == "absent"
-            {
+            if task.target_state == "present" || task.target_state == "started" || task.target_state == "absent" {
                 changed_count += 1;
             }
         }
@@ -1884,9 +1866,7 @@ pub struct SovereignApacheSparkDataEngine {
 
 impl SovereignApacheSparkDataEngine {
     pub fn new() -> Self {
-        Self {
-            dataset: Vec::new(),
-        }
+        Self { dataset: Vec::new() }
     }
 
     pub fn load_dataset(&mut self, records: Vec<SparkDataRecord>) {
@@ -1894,11 +1874,7 @@ impl SovereignApacheSparkDataEngine {
     }
 
     pub fn filter_by_min_value(&self, min_val: u64) -> Vec<SparkDataRecord> {
-        self.dataset
-            .iter()
-            .filter(|r| r.value >= min_val)
-            .cloned()
-            .collect()
+        self.dataset.iter().filter(|r| r.value >= min_val).cloned().collect()
     }
 
     pub fn map_transform<F>(&self, transform: F) -> Vec<SparkDataRecord>
@@ -1919,245 +1895,6 @@ impl SovereignApacheSparkDataEngine {
 }
 
 impl Default for SovereignApacheSparkDataEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 59. SOVEREIGN SUPABASE BACKEND ENGINE (Superseding Supabase & Firebase)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RealtimeCdcChangeEvent {
-    pub table_name: String,
-    pub action: String, // "INSERT", "UPDATE", "DELETE"
-    pub row_data: BTreeMap<String, String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RlsTokenPolicy {
-    pub role: String,
-    pub allowed_table: String,
-    pub can_select: bool,
-    pub can_insert: bool,
-}
-
-pub struct SovereignSupabaseBackendEngine {
-    pub cdc_events: Vec<RealtimeCdcChangeEvent>,
-    pub rls_policies: Vec<RlsTokenPolicy>,
-    pub active_jwt_tokens: Vec<String>,
-}
-
-impl SovereignSupabaseBackendEngine {
-    pub fn new() -> Self {
-        Self {
-            cdc_events: Vec::new(),
-            rls_policies: Vec::new(),
-            active_jwt_tokens: Vec::new(),
-        }
-    }
-
-    pub fn add_rls_policy(&mut self, policy: RlsTokenPolicy) {
-        self.rls_policies.push(policy);
-    }
-
-    pub fn emit_cdc_event(&mut self, table: &str, action: &str, row: BTreeMap<String, String>) {
-        self.cdc_events.push(RealtimeCdcChangeEvent {
-            table_name: table.to_string(),
-            action: action.to_string(),
-            row_data: row,
-        });
-    }
-
-    pub fn evaluate_rls(&self, role: &str, table: &str, action: &str) -> bool {
-        for p in &self.rls_policies {
-            if p.role == role && p.allowed_table == table {
-                if action == "SELECT" && p.can_select {
-                    return true;
-                }
-                if action == "INSERT" && p.can_insert {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-}
-
-impl Default for SovereignSupabaseBackendEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 60. SOVEREIGN ZELLIJ MULTIPLEXER ENGINE (Superseding Zellij & Tmux)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ZellijPane {
-    pub pane_id: u32,
-    pub title: String,
-    pub is_floating: bool,
-    pub wasm_plugin_active: bool,
-}
-
-pub struct SovereignZellijMultiplexerEngine {
-    pub session_name: String,
-    pub panes: Vec<ZellijPane>,
-    pub layout_preset: String,
-}
-
-impl SovereignZellijMultiplexerEngine {
-    pub fn new(session_name: &str) -> Self {
-        Self {
-            session_name: session_name.to_string(),
-            panes: Vec::new(),
-            layout_preset: "default".to_string(),
-        }
-    }
-
-    pub fn spawn_pane(&mut self, title: &str, is_floating: bool, wasm_plugin: bool) -> u32 {
-        let pane_id = (self.panes.len() + 1) as u32;
-        self.panes.push(ZellijPane {
-            pane_id,
-            title: title.to_string(),
-            is_floating,
-            wasm_plugin_active: wasm_plugin,
-        });
-        pane_id
-    }
-
-    pub fn toggle_floating(&mut self, pane_id: u32) -> bool {
-        if let Some(pane) = self.panes.iter_mut().find(|p| p.pane_id == pane_id) {
-            pane.is_floating = !pane.is_floating;
-            true
-        } else {
-            false
-        }
-    }
-}
-
-// =========================================================================
-// 61. SOVEREIGN MOSQUITTO MQTT BROKER (Superseding Mosquitto & EMQX)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MqttMessage {
-    pub topic: String,
-    pub payload: Vec<u8>,
-    pub qos: u8, // 0, 1, or 2
-}
-
-pub struct SovereignMosquittoMqttBroker {
-    pub active_subscriptions: Vec<(String, String)>, // (topic_filter, client_id)
-    pub retained_messages: BTreeMap<String, MqttMessage>,
-    pub published_count: u64,
-}
-
-impl SovereignMosquittoMqttBroker {
-    pub fn new() -> Self {
-        Self {
-            active_subscriptions: Vec::new(),
-            retained_messages: BTreeMap::new(),
-            published_count: 0,
-        }
-    }
-
-    pub fn subscribe(&mut self, topic_filter: &str, client_id: &str) {
-        self.active_subscriptions
-            .push((topic_filter.to_string(), client_id.to_string()));
-    }
-
-    pub fn publish(&mut self, topic: &str, payload: &[u8], qos: u8, retain: bool) -> usize {
-        self.published_count += 1;
-        let msg = MqttMessage {
-            topic: topic.to_string(),
-            payload: payload.to_vec(),
-            qos,
-        };
-
-        if retain {
-            self.retained_messages.insert(topic.to_string(), msg);
-        }
-
-        self.active_subscriptions
-            .iter()
-            .filter(|(filter, _)| {
-                filter == "#"
-                    || filter == topic
-                    || (filter.ends_with("/#") && topic.starts_with(&filter[..filter.len() - 2]))
-            })
-            .count()
-    }
-}
-
-impl Default for SovereignMosquittoMqttBroker {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 62. SOVEREIGN RESTIC BORG BACKUP ENGINE (Superseding Restic & BorgBackup)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct BackupSnapshot {
-    pub snapshot_id: String,
-    pub timestamp_secs: u64,
-    pub chunk_hashes: Vec<[u8; 32]>,
-    pub is_encrypted_pqc: bool,
-}
-
-pub struct SovereignResticBorgBackupEngine {
-    pub chunk_repository: BTreeMap<[u8; 32], Vec<u8>>,
-    pub snapshots: Vec<BackupSnapshot>,
-}
-
-impl SovereignResticBorgBackupEngine {
-    pub fn new() -> Self {
-        Self {
-            chunk_repository: BTreeMap::new(),
-            snapshots: Vec::new(),
-        }
-    }
-
-    pub fn store_chunk(&mut self, data: &[u8]) -> [u8; 32] {
-        let mut hash = [0u8; 32];
-        for (i, &b) in data.iter().enumerate() {
-            hash[i % 32] ^= b.wrapping_add((i * 13) as u8);
-        }
-        self.chunk_repository
-            .entry(hash)
-            .or_insert_with(|| data.to_vec());
-        hash
-    }
-
-    pub fn create_snapshot(&mut self, timestamp: u64, chunks: Vec<[u8; 32]>) -> String {
-        let snap_id = format!("snap_{:08x}", self.snapshots.len() + 1);
-        self.snapshots.push(BackupSnapshot {
-            snapshot_id: snap_id.clone(),
-            timestamp_secs: timestamp,
-            chunk_hashes: chunks,
-            is_encrypted_pqc: true,
-        });
-        snap_id
-    }
-
-    pub fn prune_old_snapshots(&mut self, keep_count: usize) -> usize {
-        if self.snapshots.len() > keep_count {
-            let removed = self.snapshots.len() - keep_count;
-            self.snapshots.drain(0..removed);
-            removed
-        } else {
-            0
-        }
-    }
-}
-
-impl Default for SovereignResticBorgBackupEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -2189,10 +1926,6 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub cilium_bpf: SovereignCiliumBpfNetworkEngine,
     pub k8s_orchestrator: SovereignK8sOrchestratorEngine,
     pub ansible: SovereignAnsibleAutomationEngine,
-    pub supabase: SovereignSupabaseBackendEngine,
-    pub zellij: SovereignZellijMultiplexerEngine,
-    pub mosquitto: SovereignMosquittoMqttBroker,
-    pub restic_backup: SovereignResticBorgBackupEngine,
     pub supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
     pub total_obsoleted_projects_count: u32,
 }
@@ -2231,12 +1964,8 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             cilium_bpf: SovereignCiliumBpfNetworkEngine::new(),
             k8s_orchestrator: SovereignK8sOrchestratorEngine::new(),
             ansible: SovereignAnsibleAutomationEngine::new(),
-            supabase: SovereignSupabaseBackendEngine::new(),
-            zellij: SovereignZellijMultiplexerEngine::new("sovereign_term"),
-            mosquitto: SovereignMosquittoMqttBroker::new(),
-            restic_backup: SovereignResticBorgBackupEngine::new(),
             supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
-            total_obsoleted_projects_count: 50,
+            total_obsoleted_projects_count: 46,
         }
     }
 
@@ -4319,21 +4048,9 @@ mod tests {
     fn test_sovereign_apache_spark_data_engine() {
         let mut spark = SovereignApacheSparkDataEngine::new();
         let records = vec![
-            SparkDataRecord {
-                id: 1,
-                key: "CPU".to_string(),
-                value: 40,
-            },
-            SparkDataRecord {
-                id: 2,
-                key: "RAM".to_string(),
-                value: 80,
-            },
-            SparkDataRecord {
-                id: 3,
-                key: "CPU".to_string(),
-                value: 60,
-            },
+            SparkDataRecord { id: 1, key: "CPU".to_string(), value: 40 },
+            SparkDataRecord { id: 2, key: "RAM".to_string(), value: 80 },
+            SparkDataRecord { id: 3, key: "CPU".to_string(), value: 60 },
         ];
         spark.load_dataset(records);
 
@@ -4917,9 +4634,7 @@ mod tests {
     #[test]
     fn test_sovereign_fdisk_partitioner() {
         let mut fdisk = SovereignFdiskDiskPartitioner::new(PartitionTableType::Gpt, 100_000_000);
-        let p1 = fdisk
-            .add_partition(204800, "C12A7328-F81F-11D2-BA4B-00A0C93EC93B")
-            .unwrap();
+        let p1 = fdisk.add_partition(204800, "C12A7328-F81F-11D2-BA4B-00A0C93EC93B").unwrap();
         assert_eq!(p1, 1);
         assert!(fdisk.is_lba_aligned());
     }
@@ -4927,9 +4642,7 @@ mod tests {
     #[test]
     fn test_sovereign_curl_http_client() {
         let curl = SovereignCurlHttpClientEngine::new();
-        let resp = curl
-            .execute_http_get("https://api.sigmaos.org/v1/health")
-            .unwrap();
+        let resp = curl.execute_http_get("https://api.sigmaos.org/v1/health").unwrap();
         assert_eq!(resp.status_code, 200);
         assert!(resp.headers.contains_key("server"));
     }
@@ -4983,67 +4696,9 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_supabase_backend_engine() {
-        let mut supabase = SovereignSupabaseBackendEngine::new();
-        supabase.add_rls_policy(RlsTokenPolicy {
-            role: "anon".to_string(),
-            allowed_table: "posts".to_string(),
-            can_select: true,
-            can_insert: false,
-        });
-
-        assert!(supabase.evaluate_rls("anon", "posts", "SELECT"));
-        assert!(!supabase.evaluate_rls("anon", "posts", "INSERT"));
-
-        let mut row = BTreeMap::new();
-        row.insert("title".to_string(), "SigmaOS Native Supabase".to_string());
-        supabase.emit_cdc_event("posts", "INSERT", row);
-        assert_eq!(supabase.cdc_events.len(), 1);
-        assert_eq!(supabase.cdc_events[0].table_name, "posts");
-    }
-
-    #[test]
-    fn test_sovereign_zellij_multiplexer_engine() {
-        let mut zellij = SovereignZellijMultiplexerEngine::new("workspace");
-        let p1 = zellij.spawn_pane("terminal_1", false, false);
-        let p2 = zellij.spawn_pane("status_plugin", true, true);
-
-        assert_eq!(p1, 1);
-        assert_eq!(p2, 2);
-        assert!(zellij.panes[1].is_floating);
-        assert!(zellij.toggle_floating(p1));
-        assert!(zellij.panes[0].is_floating);
-    }
-
-    #[test]
-    fn test_sovereign_mosquitto_mqtt_broker() {
-        let mut mqtt = SovereignMosquittoMqttBroker::new();
-        mqtt.subscribe("sensors/temperature/#", "client_101");
-
-        let matches = mqtt.publish("sensors/temperature/room_1", b"22.5C", 1, true);
-        assert_eq!(matches, 1);
-        assert_eq!(mqtt.published_count, 1);
-        assert!(mqtt.retained_messages.contains_key("sensors/temperature/room_1"));
-    }
-
-    #[test]
-    fn test_sovereign_restic_borg_backup_engine() {
-        let mut backup = SovereignResticBorgBackupEngine::new();
-        let h1 = backup.store_chunk(b"chunk_data_block_1");
-        let h2 = backup.store_chunk(b"chunk_data_block_2");
-
-        let snap_id = backup.create_snapshot(1700000000, vec![h1, h2]);
-        assert!(snap_id.starts_with("snap_"));
-        assert_eq!(backup.snapshots.len(), 1);
-        assert!(backup.snapshots[0].is_encrypted_pqc);
-
-        assert_eq!(backup.prune_old_snapshots(1), 0);
-    }
-
-    #[test]
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("50 legacy open-source projects obsoleted"));
+        assert!(status.contains("46 legacy open-source projects obsoleted"));
     }
 }

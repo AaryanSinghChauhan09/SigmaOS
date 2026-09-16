@@ -7,13 +7,12 @@ pub enum SecurityError {
     PrivilegeEscalationDetected,
 }
 
-#[cfg(feature = "standalone_test")]
 #[derive(Debug, PartialEq, Eq)]
 pub enum SigmaError {
     Security(SecurityError),
 }
-use core::sync::atomic::{AtomicU8, Ordering};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU8, Ordering};
 
 /// Granular system capabilities inspired by Linux capability sets
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

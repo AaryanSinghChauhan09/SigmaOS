@@ -258,6 +258,7 @@ extern "C" {
 }
 
 #[cfg(test_disabled)]
+extern crate std;
 
 #[cfg(test_disabled)]
 unsafe fn alloc(size: usize) -> *mut u8 {

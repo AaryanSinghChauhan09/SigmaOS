@@ -16,9 +16,6 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-
-extern crate alloc;
-
 use std::format;
 use std::vec;
 
@@ -439,6 +436,6 @@ impl WhisperGgufDecoder {
         if audio_data.is_empty() {
             return Err("Empty audio buffer");
         }
-        Ok(alloc::format!("System Voice Command: Transcribed {} bytes using Whisper GGUF 4-bit model", audio_data.len()))
+        Ok(std::format!("System Voice Command: Transcribed {} bytes using Whisper GGUF 4-bit model", audio_data.len()))
     }
 }

@@ -4,6 +4,7 @@
 
 
 #[cfg(test_disabled)]
+extern crate std;
 
 
 use std::string::String;

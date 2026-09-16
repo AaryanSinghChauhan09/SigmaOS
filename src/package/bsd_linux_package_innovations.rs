@@ -3774,9 +3774,9 @@ impl Default for PortagePackageLicenseGovernorEngine {
 }
 
 #[cfg(all(test, not(feature = "standalone_test")))]
-#[path = "universal.rs"]
+#[path = "../sigpkg/universal_engine.rs"]
 #[allow(dead_code)]
-mod universal_package;
+mod sigpkg_universal_engine;
 
 #[cfg(test)]
 mod tests {
@@ -4697,7 +4697,7 @@ MAINTAINER="SigmaOS"
     #[cfg(not(feature = "standalone_test"))]
     #[test]
     fn test_all_prompt_package_formats_detection_and_adaptation() {
-        use super::universal_package::PackageFormat;
+        use super::sigpkg_universal_engine::PackageFormat;
 
         let test_cases = [
             ("app.air", PackageFormat::Air),
@@ -4709,27 +4709,30 @@ MAINTAINER="SigmaOS"
             ("app.apk", PackageFormat::Apk),
             ("app.AppImage", PackageFormat::AppImage),
             ("solus.eopkg", PackageFormat::Eopkg),
-            ("nix.nixpkg", PackageFormat::Nixpkg),
-            ("gentoo.portage", PackageFormat::Ebuild),
-            ("debian.deb", PackageFormat::Deb),
+            ("nix.nixpkg", PackageFormat::Nix),
+            ("gentoo.portage", PackageFormat::Portage),
+            ("debian.deb", PackageFormat::Apt),
             ("archive.tar.gz", PackageFormat::TarGz),
             ("archive.tar .gz", PackageFormat::TarGz),
-            ("compressed.xz", PackageFormat::Xz),
-            ("fedora.rpm", PackageFormat::Rpm),
-            ("gentoo.ebuild", PackageFormat::Ebuild),
+            ("compressed.xz", PackageFormat::TarXz),
+            ("fedora.rpm", PackageFormat::Yum),
+            ("gentoo.ebuild", PackageFormat::Portage),
             ("arch.pkg.tar.xz", PackageFormat::Pacman),
             ("app.flatpak", PackageFormat::Flatpak),
-            ("macos.app", PackageFormat::App),
+            ("macos.app", PackageFormat::AppBundle),
             ("harmony.hap", PackageFormat::Hap),
             ("pardus.PiSi", PackageFormat::Pisi),
             ("archive.tgz", PackageFormat::TarGz),
             ("deepin.superdeb", PackageFormat::Superdeb),
             ("slax.lzm", PackageFormat::Lzm),
             ("puppy.pup", PackageFormat::Pup),
+            ("pup", PackageFormat::Pup),
             ("canonical.snap", PackageFormat::Snap),
             ("pacman.pkg.tar.zst", PackageFormat::Pacman),
+            ("pacman", PackageFormat::Pacman),
             ("plain.tar", PackageFormat::Tar),
             ("puppy.pet", PackageFormat::Pet),
+            ("pet", PackageFormat::Pet),
         ];
 
         for (filename, expected) in test_cases {

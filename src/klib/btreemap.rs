@@ -6,30 +6,13 @@ use super::Vec;
 use core::borrow::Borrow;
 use core::cmp::PartialEq;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
     V: Clone,
 {
     entries: Vec<(K, V)>,
-}
-
-impl<K, V> PartialEq for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: PartialEq + Clone,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.entries == other.entries
-    }
-}
-
-impl<K, V> Eq for BTreeMap<K, V>
-where
-    K: Eq + Clone + Ord,
-    V: Eq + Clone,
-{
 }
 
 impl<K, V> Clone for BTreeMap<K, V>
@@ -43,22 +26,6 @@ where
         }
     }
 }
-
-impl<K, V> PartialEq for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: PartialEq + Clone,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.entries == other.entries
-    }
-}
-
-impl<K, V> Eq for BTreeMap<K, V>
-where
-    K: Eq + Clone + Ord,
-    V: Eq + Clone,
-{}
 
 pub enum Entry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
     Occupied(OccupiedEntry<'a, K, V>),
@@ -342,6 +309,8 @@ where
         Self::new()
     }
 }
+
+
 
 impl<K, V> BTreeMap<K, V>
 where

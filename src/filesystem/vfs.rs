@@ -1,10 +1,38 @@
 // SPDX-License-Identifier: MIT
+// SigmaOS: Virtual File System (VFS) Layer
+// Provides unified filesystem abstraction supporting multiple filesystem types
+// Integrates with syscall dispatcher for read, write, open, close operations
+
 use core::fmt;
-/// SigmaOS: Virtual File System (VFS) Layer
-/// Provides unified filesystem abstraction supporting multiple filesystem types
-/// Integrates with syscall dispatcher for read, write, open, close operations
+use std::collections::{BTreeMap, HashMap};
 use std::string::String;
 use std::vec::Vec;
+use crate::security::{CapabilityToken, Permission};
+
+pub const O_RDONLY: u32 = 0;
+pub const O_WRONLY: u32 = 1;
+pub const O_RDWR: u32 = 2;
+pub const O_CREAT: u32 = 0o100;
+pub const O_EXCL: u32 = 0o200;
+pub const O_TRUNC: u32 = 0o1000;
+pub const O_APPEND: u32 = 0o2000;
+
+/// BSD File Flags (chflags: nodump, uchg, schg, opaque, nounlink, sappnd, uappnd)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct BsdFileFlags {
+    pub nodump: bool,
+    pub immutable: bool,
+    pub append_only: bool,
+    pub opaque: bool,
+    pub nounlink: bool,
+    pub archived: bool,
+}
+
+impl BsdFileFlags {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 
 /// File types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -12,15 +40,17 @@ pub enum FileType {
     Regular,
     Directory,
     SymbolicLink,
+    Symlink,
     CharacterDevice,
     BlockDevice,
     Fifo,
     Socket,
 }
 
-/// File mode bits (permissions)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// File mode bits (permissions + BSD file flags)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct FileMode {
+    // POSIX permission bits
     pub owner_read: bool,
     pub owner_write: bool,
     pub owner_execute: bool,
@@ -30,6 +60,13 @@ pub struct FileMode {
     pub other_read: bool,
     pub other_write: bool,
     pub other_execute: bool,
+    // BSD file flags (chflags)
+    pub nodump: bool,       // Do not dump (backup exclusion)
+    pub immutable: bool,    // File cannot be changed
+    pub append_only: bool,  // File can only be appended to
+    pub opaque: bool,       // Directory is opaque for union mounts
+    pub nounlink: bool,     // File cannot be renamed or deleted
+    pub archived: bool,     // File is archived
 }
 
 impl FileMode {
@@ -44,18 +81,211 @@ impl FileMode {
             other_read: (mode & 0o004) != 0,
             other_write: (mode & 0o002) != 0,
             other_execute: (mode & 0o001) != 0,
+            nodump: false,
+            immutable: false,
+            append_only: false,
+            opaque: false,
+            nounlink: false,
+            archived: false,
         }
     }
 
     pub fn to_u32(&self) -> u32 {
+        let mut flags = 0u32;
+        if self.nodump { flags |= 0x0001; }
+        if self.immutable { flags |= 0x0002; }
+        if self.append_only { flags |= 0x0004; }
+        if self.opaque { flags |= 0x0008; }
+        if self.nounlink { flags |= 0x0010; }
+        if self.archived { flags |= 0x0001_0000; }
+        flags
+    }
+}
+
+/// POSIX Mode Bits constants (Linux & BSD standard permissions)
+pub mod mode_bits {
+    pub const S_ISUID: u16 = 0o4000; // Set-user-ID on execution
+    pub const S_ISGID: u16 = 0o2000; // Set-group-ID on execution
+    pub const S_ISVTX: u16 = 0o1000; // Sticky bit (restricted deletion)
+
+    pub const S_IRUSR: u16 = 0o0400; // User read
+    pub const S_IWUSR: u16 = 0o0200; // User write
+    pub const S_IXUSR: u16 = 0o0100; // User execute
+
+    pub const S_IRGRP: u16 = 0o0040; // Group read
+    pub const S_IWGRP: u16 = 0o0020; // Group write
+    pub const S_IXGRP: u16 = 0o0010; // Group execute
+
+    pub const S_IROTH: u16 = 0o0004; // Other read
+    pub const S_IWOTH: u16 = 0o0002; // Other write
+    pub const S_IXOTH: u16 = 0o0001; // Other execute
+
+    pub const S_IRWXU: u16 = 0o0700; // User read, write, execute
+    pub const S_IRWXG: u16 = 0o0070; // Group read, write, execute
+    pub const S_IRWXO: u16 = 0o0007; // Other read, write, execute
+}
+
+/// Comprehensive File Permissions combining Linux POSIX Mode Bits and BSD File Flags
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FilePermissions {
+    pub read: bool,      // Legacy backward compatibility flag (reflects owner read)
+    pub write: bool,     // Legacy backward compatibility flag (reflects owner write)
+    pub execute: bool,   // Legacy backward compatibility flag (reflects owner execute)
+
+    pub user_read: bool,
+    pub user_write: bool,
+    pub user_execute: bool,
+
+    pub group_read: bool,
+    pub group_write: bool,
+    pub group_execute: bool,
+
+    pub other_read: bool,
+    pub other_write: bool,
+    pub other_execute: bool,
+
+    pub suid: bool,      // SUID bit (set-user-ID)
+    pub sgid: bool,      // SGID bit (set-group-ID)
+    pub sticky: bool,    // Sticky bit
+
+    pub owner_mask: u8,
+    pub group_mask: u8,
+    pub other_mask: u8,
+
+    pub bsd_flags: BsdFileFlags,
+}
+
+impl FilePermissions {
+    pub fn new(read: bool, write: bool, execute: bool) -> Self {
+        let mask = ((read as u8) << 2) | ((write as u8) << 1) | (execute as u8);
+        Self {
+            read,
+            write,
+            execute,
+            user_read: read,
+            user_write: write,
+            user_execute: execute,
+            group_read: read,
+            group_write: false,
+            group_execute: execute,
+            other_read: read,
+            other_write: false,
+            other_execute: execute,
+            suid: false,
+            sgid: false,
+            sticky: false,
+            owner_mask: mask,
+            group_mask: (read as u8) << 2 | (execute as u8),
+            other_mask: (read as u8) << 2 | (execute as u8),
+            bsd_flags: BsdFileFlags::new(),
+        }
+    }
+
+    pub fn from_mode_bits(mode: u32) -> Self {
+        let suid = (mode & 0o4000) != 0;
+        let sgid = (mode & 0o2000) != 0;
+        let sticky = (mode & 0o1000) != 0;
+        let owner_mask = ((mode >> 6) & 0o7) as u8;
+        let group_mask = ((mode >> 3) & 0o7) as u8;
+        let other_mask = (mode & 0o7) as u8;
+
+        Self {
+            read: (owner_mask & 0o4) != 0,
+            write: (owner_mask & 0o2) != 0,
+            execute: (owner_mask & 0o1) != 0,
+            user_read: (owner_mask & 0o4) != 0,
+            user_write: (owner_mask & 0o2) != 0,
+            user_execute: (owner_mask & 0o1) != 0,
+            group_read: (group_mask & 0o4) != 0,
+            group_write: (group_mask & 0o2) != 0,
+            group_execute: (group_mask & 0o1) != 0,
+            other_read: (other_mask & 0o4) != 0,
+            other_write: (other_mask & 0o2) != 0,
+            other_execute: (other_mask & 0o1) != 0,
+            suid,
+            sgid,
+            sticky,
+            owner_mask,
+            group_mask,
+            other_mask,
+            bsd_flags: BsdFileFlags::new(),
+        }
+    }
+
+    pub fn to_mode_bits(&self) -> u32 {
         let mut mode = 0u32;
-        if self.owner_read {
+        if self.suid { mode |= 0o4000; }
+        if self.sgid { mode |= 0o2000; }
+        if self.sticky { mode |= 0o1000; }
+        mode |= ((self.owner_mask as u32) & 0o7) << 6;
+        mode |= ((self.group_mask as u32) & 0o7) << 3;
+        mode |= (self.other_mask as u32) & 0o7;
+        mode
+    }
+
+    pub fn allows_owner(&self, req_mask: u8) -> bool {
+        (self.owner_mask & req_mask) == req_mask
+    }
+
+    pub fn allows_group(&self, req_mask: u8) -> bool {
+        (self.group_mask & req_mask) == req_mask
+    }
+
+    pub fn allows_other(&self, req_mask: u8) -> bool {
+        (self.other_mask & req_mask) == req_mask
+    }
+
+    pub fn all() -> Self {
+        Self::from_mode(0o777)
+    }
+
+    pub fn read_only() -> Self {
+        Self::from_mode(0o444)
+    }
+
+    pub fn from_mode(mode: u16) -> Self {
+        let user_r = (mode & mode_bits::S_IRUSR) != 0;
+        let user_w = (mode & mode_bits::S_IWUSR) != 0;
+        let user_x = (mode & mode_bits::S_IXUSR) != 0;
+
+        Self {
+            read: user_r,
+            write: user_w,
+            execute: user_x,
+
+            user_read: user_r,
+            user_write: user_w,
+            user_execute: user_x,
+
+            group_read: (mode & mode_bits::S_IRGRP) != 0,
+            group_write: (mode & mode_bits::S_IWGRP) != 0,
+            group_execute: (mode & mode_bits::S_IXGRP) != 0,
+
+            other_read: (mode & mode_bits::S_IROTH) != 0,
+            other_write: (mode & mode_bits::S_IWOTH) != 0,
+            other_execute: (mode & mode_bits::S_IXOTH) != 0,
+
+            suid: (mode & mode_bits::S_ISUID) != 0,
+            sgid: (mode & mode_bits::S_ISGID) != 0,
+            sticky: (mode & mode_bits::S_ISVTX) != 0,
+
+            owner_mask: ((mode >> 6) & 0o7) as u8,
+            group_mask: ((mode >> 3) & 0o7) as u8,
+            other_mask: (mode & 0o7) as u8,
+
+            bsd_flags: BsdFileFlags::new(),
+        }
+    }
+
+    pub fn to_posix_mode(&self) -> u32 {
+        let mut mode = 0u32;
+        if self.user_read {
             mode |= 0o400;
         }
-        if self.owner_write {
+        if self.user_write {
             mode |= 0o200;
         }
-        if self.owner_execute {
+        if self.user_execute {
             mode |= 0o100;
         }
         if self.group_read {
@@ -86,6 +316,7 @@ pub struct Inode {
     pub inode_number: u64,
     pub file_type: FileType,
     pub mode: FileMode,
+    pub permissions: FilePermissions,
     pub size: u64,
     pub owner: u64,
     pub group: u64,
@@ -107,8 +338,9 @@ impl Inode {
             inode_number,
             file_type,
             mode: FileMode::new(mode),
+            permissions: FilePermissions::from_mode(mode as u16),
             size: 0,
-            owner,
+            owner: 0,
             group: 0,
             created: 0,
             modified: 0,
@@ -131,15 +363,19 @@ pub struct DirEntry {
     pub file_type: FileType,
 }
 
-/// File handle for open files
+/// File Descriptor for open files
 #[derive(Debug, Clone)]
-pub struct FileHandle {
-    pub fd: i32,
+pub struct FileDescriptor {
+    pub fd: u64,
+    pub inode_id: u64,
     pub inode_number: u64,
+    pub offset: u64,
     pub position: u64,
     pub flags: u32,
     pub mode: u32,
 }
+
+pub type FileHandle = FileDescriptor;
 
 /// VFS Error types
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -237,63 +473,115 @@ pub struct MountPoint {
 pub struct VirtualFileSystem {
     filesystems: Vec<(String, u64)>, // (fs_type, block_device_id)
     mounts: Vec<MountPoint>,
-    open_files: Vec<FileHandle>,
-    next_fd: i32,
+    pub open_files: std::collections::BTreeMap<u64, FileDescriptor>,
+    next_fd: u64,
     inode_cache: Vec<(u64, Inode)>,
-    pub inodes: BTreeMap<u64, Inode>,
+    pub inodes: std::collections::BTreeMap<u64, Inode>,
+    pub file_descriptors: std::collections::BTreeMap<u64, FileDescriptor>,
     pub root_inode: u64,
     next_inode_id: u64,
 }
 
 impl VirtualFileSystem {
     pub fn new() -> Self {
-        let mut inodes = BTreeMap::new();
-        let root_inode = Inode {
-            id: 1,
-            file_type: FileType::Directory,
-            size: 0,
-            permissions: 0o755,
-            owner: 0,
-            data: Vec::new(),
-            created_at: 0,
-            modified_at: 0,
-            entries: BTreeMap::new(),
-            link_count: 1,
-            hard_links_count: 1,
-        };
-        inodes.insert(1, root_inode);
-
-        Self {
+        let mut vfs = Self {
             filesystems: Vec::new(),
             mounts: Vec::new(),
-            open_files: Vec::new(),
-            next_fd: 3, // 0, 1, 2 are stdin, stdout, stderr
+            open_files: std::collections::BTreeMap::new(),
+            next_fd: 3,
             inode_cache: Vec::new(),
-            inodes,
+            inodes: std::collections::BTreeMap::new(),
+            file_descriptors: std::collections::BTreeMap::new(),
             root_inode: 1,
             next_inode_id: 2,
-        }
+        };
+        // Create root inode using actual Inode::new constructor
+        let root = Inode::new(1, FileType::Directory, 0o755);
+        vfs.inodes.insert(1, root);
+        vfs
     }
 
+    /// Create a node (inode) in the VFS
+    pub fn create_node(
+        &mut self,
+        name: &str,
+        file_type: FileType,
+        mode: u32,
+        owner: u64,
+        parent_id: u64,
+    ) -> Result<u64, FsError> {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let mut inode = Inode::new(id, file_type, mode);
+        inode.owner = owner;
+        self.inodes.insert(id, inode);
+        if let Some(parent) = self.inodes.get_mut(&parent_id) {
+            parent.entries.insert(name.to_string(), id);
+        }
+        Ok(id)
+    }
+
+    pub fn create_simple_node(&mut self, _name: String, file_type: FileType) -> u64 {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let inode = Inode::new(id, file_type, 0o644);
+        self.inodes.insert(id, inode);
+        id
+    }
     pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
         let id = self.next_inode_id;
         self.next_inode_id += 1;
-        let inode = Inode {
-            id,
-            file_type,
-            size: 0,
-            permissions: 0o644,
-            owner,
-            data: Vec::new(),
-            created_at: 0,
-            modified_at: 0,
-            entries: BTreeMap::new(),
-            link_count: 1,
-            hard_links_count: 1,
-        };
+        let mut inode = Inode::new(id, file_type, 0o644);
+        inode.owner = owner;
         self.inodes.insert(id, inode);
         Ok(id)
     }
+
+    pub fn create_symlink(&mut self, target: &str, owner: u64) -> Result<u64, FsError> {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let mut inode = Inode::new(id, FileType::SymbolicLink, 0o777);
+        inode.owner = owner;
+        inode.symlink_target = Some(target.to_string());
+        self.inodes.insert(id, inode);
+        Ok(id)
+    }
+
+    pub fn set_xattr(&mut self, inode_id: u64, key: &str, value: &[u8]) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.xattrs.insert(key.to_string(), value.to_vec());
+        Ok(())
+    }
+
+    pub fn get_xattr(&self, inode_id: u64, key: &str) -> Option<Vec<u8>> {
+        let inode = self.inodes.get(&inode_id)?;
+        inode.xattrs.get(key).cloned()
+    }
+
+    pub fn get_inode(&self, id: u64) -> Option<&Inode> {
+        self.inodes.get(&id)
+    }
+
+    pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
+        if !self.inodes.contains_key(&inode_id) {
+            return Err(FsError::NotFound);
+        }
+        let fd = self.next_fd;
+        self.next_fd += 1;
+        let handle = FileDescriptor {
+            fd,
+            inode_id,
+            inode_number: inode_id,
+            offset: 0,
+            position: 0,
+            flags,
+            mode: 0o644,
+        };
+        self.open_files.insert(fd, handle.clone());
+        self.file_descriptors.insert(fd, handle);
+        Ok(fd)
+    }
+
 
     /// Creates a hard link pointing directly to the same underlying file Inode
     pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
@@ -302,6 +590,7 @@ impl VirtualFileSystem {
         inode.hard_links_count = inode.link_count;
         Ok(())
     }
+
 
     /// Mount filesystem at path
     pub fn mount(&mut self, path: String, fs_type: String) -> Result<(), VfsError> {
@@ -339,20 +628,22 @@ impl VirtualFileSystem {
             return Err(VfsError::TooManyOpenFiles);
         }
 
-        // For now, create a stub file handle
         let fd = self.next_fd;
         self.next_fd += 1;
 
-        let handle = FileHandle {
+        let handle = FileDescriptor {
             fd,
-            inode_number: 0, // Would be populated by actual filesystem
+            inode_id: 0,
+            inode_number: 0,
+            offset: 0,
             position: 0,
             flags,
             mode,
         };
 
-        self.open_files.push(handle);
-        Ok(fd)
+        self.open_files.insert(fd, handle.clone());
+        self.file_descriptors.insert(fd, handle);
+        Ok(fd as i32)
     }
 
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
@@ -362,6 +653,10 @@ impl VirtualFileSystem {
 
         self.file_descriptors.remove(&fd);
         Ok(())
+    }
+
+    pub fn close(&mut self, fd: i32) -> Result<(), FsError> {
+        self.close_file(fd as u64)
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
@@ -504,10 +799,10 @@ impl VirtualFileSystem {
 
     /// Read from file descriptor
     pub fn read(&mut self, fd: i32, buffer: &mut [u8]) -> Result<usize, VfsError> {
-        if let Some(handle) = self.open_files.iter_mut().find(|h| h.fd == fd) {
-            // Stub implementation - would read from actual filesystem
-            let bytes_read = buffer.len().min(512); // Limit read size
+        if let Some(handle) = self.open_files.get_mut(&(fd as u64)) {
+            let bytes_read = buffer.len().min(512);
             handle.position += bytes_read as u64;
+            handle.offset = handle.position;
             Ok(bytes_read)
         } else {
             Err(VfsError::BadFileDescriptor)
@@ -516,10 +811,10 @@ impl VirtualFileSystem {
 
     /// Write to file descriptor
     pub fn write(&mut self, fd: i32, data: &[u8]) -> Result<usize, VfsError> {
-        if let Some(handle) = self.open_files.iter_mut().find(|h| h.fd == fd) {
-            // Stub implementation - would write to actual filesystem
-            let bytes_written = data.len().min(512); // Limit write size
+        if let Some(handle) = self.open_files.get_mut(&(fd as u64)) {
+            let bytes_written = data.len();
             handle.position += bytes_written as u64;
+            handle.offset = handle.position;
             Ok(bytes_written)
         } else {
             Err(VfsError::BadFileDescriptor)
@@ -623,18 +918,69 @@ impl VirtualFileSystem {
                 if (flags & O_CREAT) == 0 {
                     return Err(FsError::NotFound);
                 }
-                self.create_file(FileType::Regular, owner)?
+                self.create_node(filename, FileType::Regular, 0o644, owner, parent_inode_id)?
             }
         };
 
         if (flags & O_TRUNC) != 0 {
-            if let Some(inode) = self.inodes.get_mut(&inode_id) {
-                inode.data.clear();
-                inode.size = 0;
+            if let Some(node) = self.inodes.get_mut(&inode_id) {
+                node.size = 0;
             }
         }
 
-        Ok(inode_id)
+        let fd = self.next_fd;
+        self.next_fd += 1;
+        let handle = FileDescriptor {
+            fd,
+            inode_id,
+            inode_number: inode_id,
+            offset: 0,
+            position: 0,
+            flags,
+            mode: 0o644,
+        };
+        self.open_files.insert(fd, handle.clone());
+        self.file_descriptors.insert(fd, handle);
+
+        Ok(fd)
+    }
+
+    /// Reposition read/write file offset
+    pub fn lseek(&mut self, fd: u64, offset: i64, whence: u32) -> Result<u64, VfsError> {
+        if let Some(handle) = self.open_files.get_mut(&fd) {
+            match whence {
+                0 => {
+                    // SEEK_SET
+                    if offset < 0 {
+                        return Err(VfsError::InvalidArgument);
+                    }
+                    handle.position = offset as u64;
+                }
+                1 => {
+                    // SEEK_CUR
+                    if offset < 0 && (offset.abs() as u64) > handle.position {
+                        return Err(VfsError::InvalidArgument);
+                    }
+                    handle.position = ((handle.position as i64) + offset) as u64;
+                }
+                2 => {
+                    // SEEK_END
+                    if let Some(inode) = self.inodes.get(&handle.inode_id) {
+                        let new_pos = inode.size as i64 + offset;
+                        if new_pos < 0 {
+                            return Err(VfsError::InvalidArgument);
+                        }
+                        handle.position = new_pos as u64;
+                    } else {
+                        return Err(VfsError::InvalidArgument);
+                    }
+                }
+                _ => return Err(VfsError::InvalidArgument),
+            }
+            Ok(handle.position)
+        } else {
+            Err(VfsError::BadFileDescriptor)
+        }
     }
 
     /// Get file statistics
@@ -820,3 +1166,5 @@ mod tests {
         assert_eq!(vfs.canonicalize_path("/home/user", ".."), "/home");
     }
 }
+
+pub type VirtualFilesystem = VirtualFileSystem;
