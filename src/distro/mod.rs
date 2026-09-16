@@ -63,13 +63,19 @@ pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_distro_gaps::{
-    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeType,
-    DnsRecord, DynamicDeviceNode, JournalBinaryRecord, JournalLogLevel, NatRule, NatRuleKind,
+    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeEntry, DeviceNodeType,
+    DnsRecordEntry, JournaldLogRecord, NatType,
     NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SovereignDnsTlsResolverEngine,
     SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine,
     SystemdInitManager, SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver,
     UsbHidModifierKeys, WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
 };
+pub type DnsRecord = DnsRecordEntry;
+pub type DynamicDeviceNode = DeviceNodeEntry;
+pub type JournalBinaryRecord = JournaldLogRecord;
+pub type JournalLogLevel = u8;
+pub type NatRule = NatType;
+pub type NatRuleKind = NatType;
 
 pub use garuda_nomad_innovations::{
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
@@ -112,7 +118,7 @@ pub use visual_dashboard::{
     VpnStatus, VpnTunnel, VpnType,
 };
 pub use void_runit::{
-    RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
+    RunitService, RunitServiceStatus as RunitServiceState, RunitStage, RunitSupervisor,
 };
 pub mod sovereign_distro_dominance;
 pub mod future_roadmap_innovations;
