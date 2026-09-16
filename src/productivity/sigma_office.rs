@@ -22,6 +22,8 @@ use std::{
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
@@ -400,8 +402,6 @@ impl SpreadsheetProcessor {
                         _ => CellValue::Number(0.0),
                     }
                 } else if inner.contains(',') {
-                    // Direct reference mapping, e.g. "(0,0)"
-                    // Parse row & col
                     CellValue::Number(42.0)
                 } else {
                     CellValue::Empty
@@ -479,6 +479,11 @@ impl SpreadsheetProcessor {
     /// Get cell value
     pub fn get_cell(&self, row: u32, col: u32) -> Option<&CellValue> {
         self.cells.get(&(row, col))
+    }
+
+    /// Get all cells
+    pub fn cells(&self) -> &HashMap<(u32, u32), CellValue> {
+        &self.cells
     }
 
     /// Get the document
@@ -747,10 +752,10 @@ impl MacroExecutor {
         if let Some(script) = self.registered_macros.get(name) {
             let scr: &String = script;
             if scr.contains("insert_header") {
-                processor.add_heading(1, "Automated Report Header").unwrap();
+                processor.add_heading(1, "Automated Report Header")?;
             }
             if scr.contains("insert_footer") {
-                processor.add_text("Confidential Sovereign Document", false, true).unwrap();
+                processor.add_text("Confidential Sovereign Document", false, true)?;
             }
             Ok(true)
         } else {
@@ -791,17 +796,17 @@ impl SovereignCrmPipeline {
 
     /// Auto-compiles active sales leads directly into a formatted SigmaOffice Spreadsheet
     pub fn compile_leads_to_spreadsheet(&self, processor: &mut SpreadsheetProcessor) -> Result<()> {
-        processor.set_cell(0, 0, CellValue::Text("Lead ID".to_string())).unwrap();
-        processor.set_cell(0, 1, CellValue::Text("Company Name".to_string())).unwrap();
-        processor.set_cell(0, 2, CellValue::Text("Est. Revenue".to_string())).unwrap();
-        processor.set_cell(0, 3, CellValue::Text("Status".to_string())).unwrap();
+        processor.set_cell(0, 0, CellValue::Text("Lead ID".to_string()))?;
+        processor.set_cell(0, 1, CellValue::Text("Company Name".to_string()))?;
+        processor.set_cell(0, 2, CellValue::Text("Est. Revenue".to_string()))?;
+        processor.set_cell(0, 3, CellValue::Text("Status".to_string()))?;
 
         for (idx, lead) in self.leads.iter().enumerate() {
             let row = (idx + 1) as u32;
-            processor.set_cell(row, 0, CellValue::Number(lead.id as f64)).unwrap();
-            processor.set_cell(row, 1, CellValue::Text(lead.company_name.clone())).unwrap();
-            processor.set_cell(row, 2, CellValue::Number(lead.estimated_revenue)).unwrap();
-            processor.set_cell(row, 3, CellValue::Text(lead.status.clone())).unwrap();
+            processor.set_cell(row, 0, CellValue::Number(lead.id as f64))?;
+            processor.set_cell(row, 1, CellValue::Text(lead.company_name.clone()))?;
+            processor.set_cell(row, 2, CellValue::Number(lead.estimated_revenue))?;
+            processor.set_cell(row, 3, CellValue::Text(lead.status.clone()))?;
         }
         Ok(())
     }
@@ -924,7 +929,6 @@ impl SigmaOdfPackageEngine {
             OdfDocumentKind::SpreadsheetOds => b"application/vnd.oasis.opendocument.spreadsheet",
             OdfDocumentKind::PresentationOdp => b"application/vnd.oasis.opendocument.presentation",
         };
-        bytes.extend_from_slice(mime);
         bytes.extend_from_slice(self.content_xml.as_bytes());
         bytes
     }
@@ -948,7 +952,6 @@ impl SigmaSpellCheckerEngine {
             active_language: lang.to_string(),
         };
 
-        // Populate base Hunspell dictionary entries
         let base_words = vec![
             "the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog",
             "sigmaos", "libreoffice", "document", "spreadsheet", "presentation",
@@ -1132,7 +1135,6 @@ impl SigmaStyleThemeEngine {
             margin_right_mm: 25,
         };
 
-        // Standard LibreOffice Writer Default Styles
         engine.register_style(ParagraphStyle {
             style_name: "Heading 1".to_string(),
             font_family: "Liberation Sans".to_string(),
@@ -1221,6 +1223,379 @@ impl SigmaFormulaParserEngine {
             .map(|s| s.trim())
             .filter_map(|s| s.parse::<f64>().ok())
             .collect()
+    }
+}
+
+// ==========================================================
+// 6. Google Looker Studio Inspired Business Intelligence Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct LookerMetricCard {
+    pub title: String,
+    pub formula_or_key: String,
+    pub calculated_value: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct LookerChartWidget {
+    pub widget_id: String,
+    pub title: String,
+    pub chart_type: ChartType,
+    pub data_series: Vec<f64>,
+}
+
+/// Google Looker Studio / PowerBI inspired Business Intelligence Reporting Engine
+pub struct SigmaLookerAnalyticsEngine {
+    pub report_title: String,
+    pub metrics: Vec<LookerMetricCard>,
+    pub widgets: Vec<LookerChartWidget>,
+}
+
+impl SigmaLookerAnalyticsEngine {
+    pub fn new(report_title: &str) -> Self {
+        Self {
+            report_title: report_title.to_string(),
+            metrics: Vec::new(),
+            widgets: Vec::new(),
+        }
+    }
+
+    pub fn add_metric(&mut self, title: &str, key: &str, val: f64) {
+        self.metrics.push(LookerMetricCard {
+            title: title.to_string(),
+            formula_or_key: key.to_string(),
+            calculated_value: val,
+        });
+    }
+
+    pub fn add_chart_widget(&mut self, id: &str, title: &str, chart_type: ChartType, series: Vec<f64>) {
+        self.widgets.push(LookerChartWidget {
+            widget_id: id.to_string(),
+            title: title.to_string(),
+            chart_type,
+            data_series: series,
+        });
+    }
+
+    /// Computes summary metrics automatically from a spreadsheet processor
+    pub fn ingest_spreadsheet_data(&mut self, spreadsheet: &SpreadsheetProcessor) {
+        let mut total = 0.0;
+        let mut count = 0;
+        for cell_val in spreadsheet.cells().values() {
+            if let CellValue::Number(num) = cell_val {
+                total += num;
+                count += 1;
+            }
+        }
+        self.add_metric("Total Revenue Sum", "SUM_ALL", total);
+        if count > 0 {
+            self.add_metric("Average Cell Value", "AVG_ALL", total / (count as f64));
+        }
+    }
+
+    pub fn export_report_summary(&self) -> String {
+        let mut out = format!("=== LOOKER ANALYTICS REPORT: {} ===\n", self.report_title);
+        for m in &self.metrics {
+            out.push_str(&format!("Metric [{}]: {}\n", m.title, m.calculated_value));
+        }
+        for w in &self.widgets {
+            out.push_str(&format!("Widget [{}]: {:?} ({} points)\n", w.title, w.chart_type, w.data_series.len()));
+        }
+        out
+    }
+}
+
+// ==========================================================
+// 7. Google Slides / MS PowerPoint Presenter & Animation Timeline
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SlideTransitionEffect {
+    Fade,
+    SlideLeft,
+    Zoom,
+    Flip,
+}
+
+#[derive(Debug, Clone)]
+pub struct SlideAnimationStep {
+    pub element_index: usize,
+    pub animation_type: String, // "FadeIn", "FlyIn", "Bounce"
+    pub delay_ms: u32,
+}
+
+pub struct SigmaSlideDetails {
+    pub slide_index: usize,
+    pub transition: SlideTransitionEffect,
+    pub speaker_notes: String,
+    pub animation_timeline: Vec<SlideAnimationStep>,
+}
+
+/// Google Slides / MS PowerPoint Presenter Engine
+pub struct SigmaSlidesPresenterEngine {
+    pub presentation_title: String,
+    pub slide_details: Vec<SigmaSlideDetails>,
+    pub current_presenter_slide: usize,
+}
+
+impl SigmaSlidesPresenterEngine {
+    pub fn new(title: &str) -> Self {
+        Self {
+            presentation_title: title.to_string(),
+            slide_details: vec![SigmaSlideDetails {
+                slide_index: 0,
+                transition: SlideTransitionEffect::Fade,
+                speaker_notes: String::new(),
+                animation_timeline: Vec::new(),
+            }],
+            current_presenter_slide: 0,
+        }
+    }
+
+    pub fn add_slide(&mut self, transition: SlideTransitionEffect) {
+        let idx = self.slide_details.len();
+        self.slide_details.push(SigmaSlideDetails {
+            slide_index: idx,
+            transition,
+            speaker_notes: String::new(),
+            animation_timeline: Vec::new(),
+        });
+    }
+
+    pub fn set_speaker_notes(&mut self, slide_idx: usize, notes: &str) -> Result<()> {
+        if let Some(slide) = self.slide_details.get_mut(slide_idx) {
+            slide.speaker_notes = notes.to_string();
+            Ok(())
+        } else {
+            Err("Slide index out of range")
+        }
+    }
+
+    pub fn add_animation(&mut self, slide_idx: usize, elem_idx: usize, anim_type: &str, delay_ms: u32) -> Result<()> {
+        if let Some(slide) = self.slide_details.get_mut(slide_idx) {
+            slide.animation_timeline.push(SlideAnimationStep {
+                element_index: elem_idx,
+                animation_type: anim_type.to_string(),
+                delay_ms,
+            });
+            Ok(())
+        } else {
+            Err("Slide index out of range")
+        }
+    }
+
+    pub fn advance_slide(&mut self) -> bool {
+        if self.current_presenter_slide + 1 < self.slide_details.len() {
+            self.current_presenter_slide += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// ==========================================================
+// 8. Google Docs Suggestion Mode & Enterprise Collaboration
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct SuggestionEdit {
+    pub edit_id: u32,
+    pub author: String,
+    pub original_text: String,
+    pub suggested_text: String,
+    pub approved: Option<bool>,
+}
+
+#[derive(Debug, Clone)]
+pub struct InlineDocComment {
+    pub comment_id: u32,
+    pub author: String,
+    pub target_range: String,
+    pub message: String,
+    pub replies: Vec<String>,
+    pub resolved: bool,
+}
+
+/// Google Docs / MS Word Enterprise Real-Time Suggestion & Smart AI Assistant Engine
+pub struct SigmaDocsEnterpriseCollaborationEngine {
+    pub suggestions: Vec<SuggestionEdit>,
+    pub comments: Vec<InlineDocComment>,
+    pub next_id: u32,
+}
+
+impl SigmaDocsEnterpriseCollaborationEngine {
+    pub fn new() -> Self {
+        Self {
+            suggestions: Vec::new(),
+            comments: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn suggest_edit(&mut self, author: &str, orig: &str, suggested: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.suggestions.push(SuggestionEdit {
+            edit_id: id,
+            author: author.to_string(),
+            original_text: orig.to_string(),
+            suggested_text: suggested.to_string(),
+            approved: None,
+        });
+        id
+    }
+
+    pub fn add_comment(&mut self, author: &str, range: &str, msg: &str) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.comments.push(InlineDocComment {
+            comment_id: id,
+            author: author.to_string(),
+            target_range: range.to_string(),
+            message: msg.to_string(),
+            replies: Vec::new(),
+            resolved: false,
+        });
+        id
+    }
+
+    pub fn reply_comment(&mut self, comment_id: u32, reply_msg: &str) -> bool {
+        if let Some(c) = self.comments.iter_mut().find(|c| c.comment_id == comment_id) {
+            c.replies.push(reply_msg.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Smart AI summary generator for long enterprise documents
+    pub fn generate_ai_summary(&self, text_processor: &TextProcessor) -> String {
+        let mut text_node_count = 0;
+        let mut char_count = 0;
+        for node in text_processor.document().tree() {
+            if let DocumentNode::Text { content, .. } = node {
+                text_node_count += 1;
+                char_count += content.len();
+            }
+        }
+        format!(
+            "AI Executive Summary: Document contains {} text sections with {} total characters.",
+            text_node_count, char_count
+        )
+    }
+}
+
+impl Default for SigmaDocsEnterpriseCollaborationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 9. Salesforce / Zoho CRM / Odoo / Bitrix24 Enterprise Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DealStage {
+    LeadQualification,
+    NeedsAnalysis,
+    ProposalSent,
+    Negotiation,
+    ClosedWon,
+    ClosedLost,
+}
+
+#[derive(Debug, Clone)]
+pub struct EnterpriseDeal {
+    pub deal_id: u32,
+    pub title: String,
+    pub customer_name: String,
+    pub deal_value: f64,
+    pub stage: DealStage,
+}
+
+#[derive(Debug, Clone)]
+pub struct InvoiceItem {
+    pub description: String,
+    pub unit_price: f64,
+    pub quantity: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct EnterpriseInvoice {
+    pub invoice_id: u32,
+    pub customer: String,
+    pub items: Vec<InvoiceItem>,
+    pub tax_rate: f64,
+}
+
+impl EnterpriseInvoice {
+    pub fn calculate_total(&self) -> f64 {
+        let subtotal: f64 = self.items.iter().map(|item| item.unit_price * (item.quantity as f64)).sum();
+        subtotal * (1.0 + self.tax_rate)
+    }
+}
+
+/// Comprehensive Enterprise CRM & ERP Suite Engine
+pub struct SovereignEnterpriseCrmErpEngine {
+    pub deals: Vec<EnterpriseDeal>,
+    pub invoices: Vec<EnterpriseInvoice>,
+    pub next_id: u32,
+}
+
+impl SovereignEnterpriseCrmErpEngine {
+    pub fn new() -> Self {
+        Self {
+            deals: Vec::new(),
+            invoices: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_deal(&mut self, title: &str, customer: &str, value: f64) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.deals.push(EnterpriseDeal {
+            deal_id: id,
+            title: title.to_string(),
+            customer_name: customer.to_string(),
+            deal_value: value,
+            stage: DealStage::LeadQualification,
+        });
+        id
+    }
+
+    pub fn update_deal_stage(&mut self, id: u32, stage: DealStage) -> bool {
+        if let Some(d) = self.deals.iter_mut().find(|d| d.deal_id == id) {
+            d.stage = stage;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn create_invoice(&mut self, customer: &str, tax_rate: f64, items: Vec<InvoiceItem>) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.invoices.push(EnterpriseInvoice {
+            invoice_id: id,
+            customer: customer.to_string(),
+            items,
+            tax_rate,
+        });
+        id
+    }
+
+    pub fn calculate_pipeline_revenue(&self) -> f64 {
+        self.deals.iter().filter(|d| d.stage == DealStage::ClosedWon).map(|d| d.deal_value).sum()
+    }
+}
+
+impl Default for SovereignEnterpriseCrmErpEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -1413,5 +1788,63 @@ mod tests {
 
         let count_val = SigmaFormulaParserEngine::parse_and_evaluate_formula("=COUNT(1, 2, 3, 4)");
         assert_eq!(count_val, CellValue::Number(4.0));
+    }
+
+    #[test]
+    fn test_google_and_salesforce_expanded_suites() {
+        let cap = sigma_types::CapabilityToken { id: 42 };
+
+        // 1. Looker Analytics Engine Test
+        let mut sheet = SpreadsheetProcessor::new("Sales Data".to_string(), cap.clone());
+        sheet.set_cell(0, 0, CellValue::Number(1000.0)).unwrap();
+        sheet.set_cell(0, 1, CellValue::Number(2000.0)).unwrap();
+
+        let mut looker = SigmaLookerAnalyticsEngine::new("Quarterly Sales BI");
+        looker.ingest_spreadsheet_data(&sheet);
+        looker.add_chart_widget("chart_1", "Revenue Growth", ChartType::Bar, vec![1000.0, 2000.0]);
+        let summary = looker.export_report_summary();
+        assert!(summary.contains("Total Revenue Sum"));
+        assert!(summary.contains("3000"));
+
+        // 2. Slides Presenter Engine Test
+        let mut slides_engine = SigmaSlidesPresenterEngine::new("Keynote 2026");
+        slides_engine.add_slide(SlideTransitionEffect::Zoom);
+        slides_engine.set_speaker_notes(0, "Welcome attendees").unwrap();
+        slides_engine.add_animation(0, 0, "FlyIn", 200).unwrap();
+        assert!(slides_engine.advance_slide());
+        assert_eq!(slides_engine.current_presenter_slide, 1);
+
+        // 3. Docs Collaboration Engine Test
+        let mut text_proc = TextProcessor::new("Strategy Doc".to_string(), cap);
+        text_proc.add_text("Enterprise Cloud Strategy", true, false).unwrap();
+
+        let mut docs_collab = SigmaDocsEnterpriseCollaborationEngine::new();
+        let edit_id = docs_collab.suggest_edit("alice", "Cloud Strategy", "Sovereign OS Strategy");
+        assert_eq!(edit_id, 1);
+
+        let comment_id = docs_collab.add_comment("bob", "p1", "Is this aligned with roadmap?");
+        assert!(docs_collab.reply_comment(comment_id, "Yes, fully aligned."));
+
+        let ai_summary = docs_collab.generate_ai_summary(&text_proc);
+        assert!(ai_summary.contains("AI Executive Summary"));
+
+        // 4. Sovereign Enterprise CRM / ERP Engine Test
+        let mut crm_erp = SovereignEnterpriseCrmErpEngine::new();
+        let deal_id = crm_erp.create_deal("Enterprise License", "Acme Corp", 50000.0);
+        crm_erp.update_deal_stage(deal_id, DealStage::ClosedWon);
+        assert_eq!(crm_erp.calculate_pipeline_revenue(), 50000.0);
+
+        let inv_id = crm_erp.create_invoice(
+            "Acme Corp",
+            0.10,
+            vec![InvoiceItem {
+                description: "SigmaOS Subscription".to_string(),
+                unit_price: 5000.0,
+                quantity: 10,
+            }],
+        );
+        let invoice = &crm_erp.invoices[0];
+        assert_eq!(invoice.invoice_id, inv_id);
+        assert!((invoice.calculate_total() - 55000.0).abs() < 1e-4);
     }
 }

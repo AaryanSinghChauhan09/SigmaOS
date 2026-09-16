@@ -13,6 +13,7 @@ pub mod media;
 pub mod mind_map;
 pub mod mint_competitor;
 pub mod reminders_advanced;
+pub mod sigma_office;
 pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod tmux;
@@ -50,3 +51,14 @@ pub use tmux::{
 };
 
 pub use mind_map::{IndentedTextMindMapParserEngine, MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection};
+
+pub use sigma_office::{
+    CellValue, DealStage, DocumentNode, DocumentType, EnterpriseDeal, EnterpriseInvoice,
+    InlineDocComment, InvoiceItem, LiveCoAuthoringManager, LookerChartWidget, LookerMetricCard,
+    MacroExecutor, OdfDocumentKind, ParagraphStyle, PresentationProcessor,
+    SigmaDocsEnterpriseCollaborationEngine, SigmaFormulaParserEngine, SigmaLookerAnalyticsEngine,
+    SigmaOdfPackageEngine, SigmaOffice, SigmaSlideDetails, SigmaSlidesPresenterEngine,
+    SigmaSpellCheckerEngine, SigmaStyleThemeEngine, SigmaTrackChangesEngine,
+    SovereignCrmPipeline, SovereignEnterpriseCrmErpEngine, SpreadsheetProcessor, SuggestionEdit,
+    TextProcessor, TypographyRenderer, VersionHistoryManager,
+};
