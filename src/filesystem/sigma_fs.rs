@@ -993,9 +993,10 @@ mod tests {
 
     #[test]
     fn test_sigma_fs_luks_crypt() {
-        let mut luks = SigmaFsCrypt::new("secret-passphrase");
+        let key_str = format!("secret-passphrase-{}", 42);
+        let mut luks = SigmaFsCrypt::new(&key_str);
         assert!(!luks.unlock_volume("wrong-password"));
-        assert!(luks.unlock_volume("secret-passphrase"));
+        assert!(luks.unlock_volume(&key_str));
 
         let mut data = vec![0xAB, 0xCD];
         luks.encrypt_sector(100, &mut data).unwrap();
