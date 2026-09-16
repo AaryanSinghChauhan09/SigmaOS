@@ -21,13 +21,13 @@ jobs:
         include:
           # Rust toolchains
           - compiler: rustc
-            version: "1.70"
+            version: "1.78"
             target: x86_64-unknown-linux-gnu
             build-cmd: "rustup install 1.70 && rm -f Cargo.lock && cargo +1.70 build --release"
             test-cmd: "cargo +1.70 test --release"
 
           - compiler: rustc
-            version: "1.75"
+            version: "1.80"
             target: x86_64-unknown-linux-gnu
             build-cmd: "rustup install 1.75 && rm -f Cargo.lock && cargo +1.75 build --release"
             test-cmd: "cargo +1.75 test --release"
@@ -47,7 +47,7 @@ jobs:
           - compiler: rustc
             version: nightly
             target: x86_64-unknown-linux-gnu
-            build-cmd: "rustup install nightly && cargo +nightly build --release -Z unstable-options"
+            build-cmd: "rustup install nightly && cargo +nightly build --release"
             test-cmd: "cargo +nightly test --release"
 
           # GCC versions
@@ -132,6 +132,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install C/C++ Compilers (if container)
+        if: matrix.container
+        shell: bash
+        run: |
+          apt-get update && apt-get install -y gcc gcc-11 gcc-12 gcc-13 clang clang-15 clang-17 clang-18 || true
 
       - name: Install Rust (if needed)
         if: matrix.compiler

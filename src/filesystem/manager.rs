@@ -788,7 +788,7 @@ impl Default for FileTagManager {
 }
 
 #[cfg(test)]
-mod open_source_file_manager_tests {
+mod open_source_file_manager_tests_2 {
     use super::*;
 
     #[test]
