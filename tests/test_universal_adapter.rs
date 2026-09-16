@@ -34,6 +34,7 @@ pub mod sigpkg {
     pub use crate::universal_adapter;
     pub use crate::universal_engine;
     pub use crate::universal_oop_system;
+    pub use crate::universal_engine::PackageFormat;
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     pub struct Version {
