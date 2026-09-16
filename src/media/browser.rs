@@ -1161,7 +1161,157 @@ impl ArcBrowserBoostEngine {
 }
 
 // =========================================================================
-// 19. UNIFIED SIGMAWEB BROWSER SUITE
+// 19. WATERFOX LEGACY EXTENSION & USERCHROME CSS ENGINE
+// =========================================================================
+
+pub struct WaterfoxLegacyExtensionEngine {
+    pub user_chrome_css: String,
+    pub user_content_css: String,
+    pub legacy_xul_enabled: bool,
+    pub active_legacy_addons: Vec<String>,
+}
+
+impl WaterfoxLegacyExtensionEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            user_chrome_css: String::from("#nav-bar { border-radius: 8px !important; }"),
+            user_content_css: String::from("body { scroll-behavior: smooth !important; }"),
+            legacy_xul_enabled: true,
+            active_legacy_addons: vec![String::from("classic-theme-restorer@waterfox")],
+        }
+    }
+
+    pub fn inject_user_chrome_css(&self) -> &str {
+        &self.user_chrome_css
+    }
+
+    pub fn register_legacy_addon(&mut self, addon_id: &str) -> bool {
+        if self.legacy_xul_enabled {
+            self.active_legacy_addons.push(addon_id.to_string());
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// =========================================================================
+// 20. LADYBIRD LIBWEB LAYOUT & CSS BOX TREE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct LadybirdLayoutBox {
+    pub node_id: u32,
+    pub tag_name: String,
+    pub is_flex_child: bool,
+    pub flex_grow: f32,
+    pub computed_width: f32,
+    pub computed_height: f32,
+}
+
+pub struct LadybirdLibWebEngine {
+    pub layout_tree: Vec<LadybirdLayoutBox>,
+    pub html_tokenizer_state: String,
+    pub flexbox_gap_px: f32,
+}
+
+impl LadybirdLibWebEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            layout_tree: Vec::new(),
+            html_tokenizer_state: String::from("DataState"),
+            flexbox_gap_px: 8.0,
+        }
+    }
+
+    pub fn push_layout_box(&mut self, id: u32, tag: &str, is_flex: bool, grow: f32, w: f32, h: f32) {
+        self.layout_tree.push(LadybirdLayoutBox {
+            node_id: id,
+            tag_name: tag.to_string(),
+            is_flex_child: is_flex,
+            flex_grow: grow,
+            computed_width: w,
+            computed_height: h,
+        });
+    }
+
+    pub fn compute_flex_layout(&mut self, container_width: f32) {
+        let total_grow: f32 = self.layout_tree.iter().filter(|b| b.is_flex_child).map(|b| b.flex_grow).sum();
+        if total_grow > 0.0 {
+            let available = container_width - (self.layout_tree.len() as f32 * self.flexbox_gap_px);
+            for box_node in self.layout_tree.iter_mut() {
+                if box_node.is_flex_child {
+                    box_node.computed_width = (box_node.flex_grow / total_grow) * available;
+                }
+            }
+        }
+    }
+}
+
+// =========================================================================
+// 21. TOR PLUGGABLE TRANSPORTS & ANTI-CENSORSHIP BRIDGE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TorTransportType {
+    Obfs4,
+    Snowflake,
+    Meek,
+}
+
+#[derive(Debug, Clone)]
+pub struct PluggableTransportBridge {
+    pub transport_type: TorTransportType,
+    pub bridge_address: String,
+    pub is_active: bool,
+}
+
+pub struct TorPluggableTransportEngine {
+    pub bridges: Vec<PluggableTransportBridge>,
+    pub active_transport: Option<TorTransportType>,
+}
+
+impl TorPluggableTransportEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            bridges: Vec::new(),
+            active_transport: Some(TorTransportType::Obfs4),
+        };
+        engine.bridges.push(PluggableTransportBridge {
+            transport_type: TorTransportType::Obfs4,
+            bridge_address: String::from("192.0.2.1:443 cert=a1b2c3 iat-mode=0"),
+            is_active: true,
+        });
+        engine.bridges.push(PluggableTransportBridge {
+            transport_type: TorTransportType::Snowflake,
+            bridge_address: String::from("snowflake 192.0.2.3:8080 fingerprint=xyz"),
+            is_active: false,
+        });
+        engine
+    }
+
+    pub fn obfuscate_packet_handshake(&self, payload: &[u8]) -> Vec<u8> {
+        let mut obfuscated = Vec::new();
+        obfuscated.push(0xE3); // Entropy marker
+        for &b in payload {
+            obfuscated.push(b ^ 0x3C);
+        }
+        obfuscated
+    }
+
+    pub fn set_transport(&mut self, transport: TorTransportType) {
+        self.active_transport = Some(transport);
+        for bridge in &mut self.bridges {
+            bridge.is_active = bridge.transport_type == transport;
+        }
+    }
+}
+
+// =========================================================================
+// 22. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
 pub struct SigmaWebBrowser {
@@ -1183,6 +1333,9 @@ pub struct SigmaWebBrowser {
     pub mullvad_isolation: MullvadPrivacyIsolationEngine,
     pub librewolf_hardening: LibreWolfHardeningEngine,
     pub arc_boost: ArcBrowserBoostEngine,
+    pub waterfox_legacy: WaterfoxLegacyExtensionEngine,
+    pub ladybird_libweb: LadybirdLibWebEngine,
+    pub tor_transport: TorPluggableTransportEngine,
 }
 
 impl SigmaWebBrowser {
@@ -1207,6 +1360,9 @@ impl SigmaWebBrowser {
             mullvad_isolation: MullvadPrivacyIsolationEngine::new(),
             librewolf_hardening: LibreWolfHardeningEngine::new(),
             arc_boost: ArcBrowserBoostEngine::new(),
+            waterfox_legacy: WaterfoxLegacyExtensionEngine::new(),
+            ladybird_libweb: LadybirdLibWebEngine::new(),
+            tor_transport: TorPluggableTransportEngine::new(),
         }
     }
 
@@ -1294,6 +1450,26 @@ mod tests {
         assert_eq!(arc.active_space, "Work");
         let boost = arc.get_boost_for_domain("github.com").unwrap();
         assert!(boost.custom_css.contains("JetBrains Mono"));
+    }
+
+    #[test]
+    fn test_waterfox_ladybird_and_tor_transports() {
+        let mut wf = WaterfoxLegacyExtensionEngine::new();
+        assert!(wf.inject_user_chrome_css().contains("border-radius"));
+        assert!(wf.register_legacy_addon("noscript@waterfox"));
+        assert_eq!(wf.active_legacy_addons.len(), 2);
+
+        let mut lb = LadybirdLibWebEngine::new();
+        lb.push_layout_box(1, "div", true, 1.0, 0.0, 100.0);
+        lb.push_layout_box(2, "div", true, 1.0, 0.0, 100.0);
+        lb.compute_flex_layout(1000.0);
+        assert!(lb.layout_tree[0].computed_width > 400.0);
+
+        let mut tor_trans = TorPluggableTransportEngine::new();
+        tor_trans.set_transport(TorTransportType::Snowflake);
+        assert_eq!(tor_trans.active_transport, Some(TorTransportType::Snowflake));
+        let obfuscated = tor_trans.obfuscate_packet_handshake(b"hello");
+        assert_eq!(obfuscated[0], 0xE3);
     }
 
     #[test]
