@@ -155,16 +155,16 @@
                             <div class="settings-group">
                                 <h4>Workflow Profiles</h4>
                                 <div class="form-switch">
-                                    <span>Enable Neural Layout Engine</span>
+                                    <label for="toggle-neural-layout" style="cursor: pointer;">Enable Neural Layout Engine</label>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout">
+                                        <input id="toggle-neural-layout" type="checkbox" checked onchange="neural.setMindfulness(this.checked)" title="Enable Neural Layout" aria-label="Enable Neural Layout">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
                                 <div class="form-switch">
-                                    <span>Ambient VSync Overdrive</span>
+                                    <label for="toggle-ambient-vsync" style="cursor: pointer;">Ambient VSync Overdrive</label>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" title="Toggle Ambient VSync" aria-label="Toggle Ambient VSync">
+                                        <input id="toggle-ambient-vsync" type="checkbox" title="Toggle Ambient VSync" aria-label="Toggle Ambient VSync">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
