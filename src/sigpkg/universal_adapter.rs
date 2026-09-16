@@ -216,6 +216,16 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub use crate::package::universal::PackagePriority;
 
+/// Description of Debian / APT Control Manifest (.deb / dpkg parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
+
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
     fn parse_manifest(&self, raw: &[u8]) -> Result<Package, String>;
@@ -2405,6 +2415,20 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
+            "pkg_add" | "pkg_info" => {
+                if pm == "pkg_add" {
+                    operation = UniversalPmOperation::Install;
+                } else {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
+                for arg in args {
+                    if *arg == "-n" {
+                        dry_run = true;
+                    } else if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
+                }
+            }
             "slackpkg" | "installpkg" | "removepkg" => {
                 if pm == "installpkg" {
                     operation = UniversalPmOperation::Install;
@@ -2441,7 +2465,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "flatpak" | "snap" | "pkgman" | "swupd" | "brew" => {
+            "flatpak" | "snap" | "pkgman" | "swupd" | "brew" | "cachyos-hello" | "chwd" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -3275,7 +3299,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
-            Some(PackageFormat::Portage)
+            Some(PackageFormat::Ebuild)
         );
         assert_eq!(
             adapter.detect_format_by_extension("ubuntu.deb"),
