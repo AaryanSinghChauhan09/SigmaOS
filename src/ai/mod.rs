@@ -11,7 +11,6 @@ pub mod developer_platform;
 pub mod lift_engine;
 pub mod llm;
 pub mod local_llm;
-pub mod marktechpost_kdnuggets_data_science;
 pub mod next_gen;
 pub mod open_computer;
 pub mod openclaw;
@@ -31,12 +30,6 @@ pub use agentic_os_runtime::{
     AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,
     EbpfNetworkFilter, EphemeralAgentSandbox, GpuBackend, HybridContainerRuntime, LocalLlmDaemon,
     LocalLlmSystemDaemon, OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
-};
-
-pub use agent_runtime::{
-    AgentCapability, AgentError, AgentId, AgentKernelBridge, AgentPriority, AgentProcess,
-    AgentReport, AgentSandbox, AgentState, ConfigDiff, CrashDump, Plugin, PluginLanguage,
-    PluginSpec, PluginTarget, SovereignAgentRuntime, UserIntent,
 };
 
 pub use openclaw::{AlertPlatform, ClawBackgroundDaemon, ClawChatIntegrator, ClawVoiceTranscriber};
@@ -67,9 +60,4 @@ pub use voice::{
 pub use developer_platform::{
     AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
     MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
-};
-
-pub use marktechpost_kdnuggets_data_science::{
-    InfoWorldEnterpriseAiDeploymentEngine, KdnuggetsAutoMlPipelineEngine,
-    MarkTechPostVectorIndexEngine, SovereignAiDataSciencePipelineSuite,
 };

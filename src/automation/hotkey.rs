@@ -58,9 +58,8 @@ impl SimpleHotkey {
     pub fn new(id: HotkeyID, modifiers: u8, key: u8, action: &[u8]) -> Self {
         let mut action_array = [0u8; 64];
         let action_len = action.len().min(63);
-        for i in 0..action_len {
-            action_array[i] = action[i];
-        }
+        // Bolt optimization: use copy_from_slice for vectorized bulk memory transfer
+        action_array[..action_len].copy_from_slice(&action[..action_len]);
         SimpleHotkey {
             id,
             modifiers: AtomicUsize::new(modifiers as usize),
@@ -82,9 +81,7 @@ impl Hotkey for SimpleHotkey {
         self.key.load(Ordering::SeqCst) as u8
     }
     fn action(&self) -> &[u8] {
-        // Bolt ⚡ Optimization: Store explicit action length on instantiation to eliminate
-        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every hotkey action lookup,
-        // reducing slice retrieval to instantaneous O(1) constant time.
+        // Bolt optimization: O(1) slice lookup using explicit byte length field instead of O(N) null-byte search scan
         &self.action[..self.action_len as usize]
     }
 }

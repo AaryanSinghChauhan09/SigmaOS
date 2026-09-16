@@ -7,17 +7,11 @@
 #![allow(unexpected_cfgs)]
 extern crate alloc;
 
+use std::collections::BTreeMap;
 use alloc::boxed::Box;
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-
-// Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
-// Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::collections::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(test)]
+use std::collections::HashMap;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -152,447 +146,6 @@ impl GentooPortageMaskResolver {
     }
 }
 
-impl BareMetalUnifiedPeripheral for LegacyController {
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::D0Active;
-        Ok(())
-    }
-
-    fn read_register(&self, offset: u16) -> u64 {
-        let idx = (offset as usize) % self.ports_buffer.len();
-        self.ports_buffer[idx] as u64
-    }
-
-    fn write_register(&mut self, offset: u16, value: u64) {
-        let idx = (offset as usize) % self.ports_buffer.len();
-        self.ports_buffer[idx] = value as u8;
-    }
-
-    fn handle_irq(&mut self) -> bool {
-        true
-    }
-
-    fn set_power_state(&mut self, state: PowerState) {
-        self.power_state = state;
-    }
-
-    fn get_power_state(&self) -> PowerState {
-        self.power_state
-    }
-}
-
-pub struct ModernController {
-    pub mmio_base_addr: u64,
-    pub power_state: PowerState,
-    pub mmio_buffer: [u64; 16],
-}
-
-impl ModernController {
-    pub fn new(mmio_base_addr: u64) -> Self {
-        Self {
-            mmio_base_addr,
-            power_state: PowerState::D3Off,
-            mmio_buffer: [0u64; 16],
-        }
-    }
-}
-
-impl BareMetalUnifiedPeripheral for ModernController {
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        self.power_state = PowerState::D0Active;
-        Ok(())
-    }
-
-    fn read_register(&self, offset: u16) -> u64 {
-        let idx = ((offset as usize) / 8) % self.mmio_buffer.len();
-        self.mmio_buffer[idx]
-    }
-
-    fn write_register(&mut self, offset: u16, value: u64) {
-        let idx = ((offset as usize) / 8) % self.mmio_buffer.len();
-        self.mmio_buffer[idx] = value;
-    }
-
-    fn handle_irq(&mut self) -> bool {
-        true
-    }
-
-    fn set_power_state(&mut self, state: PowerState) {
-        self.power_state = state;
-    }
-
-    fn get_power_state(&self) -> PowerState {
-        self.power_state
-    }
-}
-
-pub struct BareMetalPeripheralManager {
-    pub registry: Vec<Box<dyn BareMetalUnifiedPeripheral>>,
-}
-
-impl BareMetalPeripheralManager {
-    pub fn new() -> Self {
-        Self {
-            registry: Vec::new(),
-        }
-    }
-
-    pub fn register_device(
-        &mut self,
-        mut dev: Box<dyn BareMetalUnifiedPeripheral>,
-    ) -> Result<usize, &'static str> {
-        dev.initialize()?;
-        self.registry.push(dev);
-        Ok(self.registry.len() - 1)
-    }
-
-    pub fn poll_all_irqs(&mut self) -> usize {
-        let mut count = 0;
-        for dev in self.registry.iter_mut() {
-            if dev.handle_irq() {
-                count += 1;
-            }
-        }
-        count
-    }
-}
-
-impl Default for BareMetalPeripheralManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==================================================================
-// 6.2 ZERO-ALLOCATION UDF BYTECODE INTERPRETER SPECIFICATION
-// ==================================================================
-pub const OP_READ: u8 = 0x10;
-pub const OP_WRITE: u8 = 0x20;
-pub const OP_ADD: u8 = 0x30;
-pub const OP_HALT: u8 = 0xF0;
-
-#[derive(Debug, Clone, Copy)]
-pub struct UdfInstruction {
-    pub opcode: u8,
-    pub reg_dest: u8,
-    pub reg_src: u8,
-    pub address_or_imm: u16,
-}
-
-pub struct UdfVm {
-    pub registers: [u64; 8], // R0 through R7
-    pub pc: usize,
-    pub min_addr: u16,
-    pub max_addr: u16,
-    pub is_halted: bool,
-}
-
-impl UdfVm {
-    pub fn new(min_addr: u16, max_addr: u16) -> Self {
-        Self {
-            registers: [0u64; 8],
-            pc: 0,
-            min_addr,
-            max_addr,
-            is_halted: false,
-        }
-    }
-
-    pub fn execute_program(
-        &mut self,
-        instructions: &[UdfInstruction],
-        hardware: &mut dyn BareMetalUnifiedPeripheral,
-    ) -> Result<u64, &'static str> {
-        self.pc = 0;
-        self.is_halted = false;
-
-        while self.pc < instructions.len() && !self.is_halted {
-            let instr = instructions[self.pc];
-
-            // Bounds and parameter safety check
-            if instr.reg_dest >= 8 || instr.reg_src >= 8 {
-                return Err("UDF VM Error: Register index out of bounds");
-            }
-
-            match instr.opcode {
-                0x10 => {
-                    if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr
-                    {
-                        return Err("UDF VM Safety Guard: Read address out of peripheral boundary");
-                    }
-                    let val = hardware.read_register(instr.address_or_imm);
-                    self.registers[instr.reg_dest as usize] = val;
-                }
-                0x20 => {
-                    if instr.address_or_imm < self.min_addr || instr.address_or_imm > self.max_addr
-                    {
-                        return Err(
-                            "UDF VM Safety Guard: Write address out of peripheral boundary",
-                        );
-                    }
-                    let val = self.registers[instr.reg_src as usize];
-                    hardware.write_register(instr.address_or_imm, val);
-                }
-                0x30 => {
-                    let r_dest = instr.reg_dest as usize;
-                    let r_src = instr.reg_src as usize;
-                    self.registers[r_dest] =
-                        self.registers[r_dest].wrapping_add(self.registers[r_src]);
-                }
-                0xF0 => {
-                    self.is_halted = true;
-                    return Ok(self.registers[instr.reg_dest as usize]);
-                }
-                _ => return Err("UDF VM Error: Invalid Instruction Opcode"),
-            }
-
-            self.pc += 1;
-        }
-
-        Ok(self.registers[0])
-    }
-}
-
-// ==================================================================
-// 6.3 DECLARATIVE PACKAGE RESOLUTION SAT SOLVER SPECIFICATIONS
-// ===========================================================
-pub const MAX_NODES: usize = 8;
-pub const MAX_DEPS: usize = 4;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PkgVersion {
-    pub major: u16,
-    pub minor: u16,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct PackageConstraint {
-    pub target_id: u16,
-    pub min_version: PkgVersion,
-    pub max_version: PkgVersion,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct PackageNode {
-    pub pkg_id: u16,
-    pub version: PkgVersion,
-    pub dependencies: [Option<PackageConstraint>; MAX_DEPS],
-}
-
-pub struct SatSolverEngine {
-    pub available_nodes: [Option<PackageNode>; MAX_NODES],
-    pub selected_version: [Option<PkgVersion>; MAX_NODES], // Indexed by pkg_id
-    pub node_count: usize,
-}
-
-impl SatSolverEngine {
-    pub fn new() -> Self {
-        Self {
-            available_nodes: [None; MAX_NODES],
-            selected_version: [None; MAX_NODES],
-            node_count: 0,
-        }
-    }
-
-    pub fn add_package_node(&mut self, node: PackageNode) -> bool {
-        if self.node_count >= MAX_NODES {
-            return false;
-        }
-        self.available_nodes[self.node_count] = Some(node);
-        self.node_count += 1;
-        true
-    }
-
-    pub fn solve(&mut self, root_pkg_id: u16) -> bool {
-        self.selected_version = [None; MAX_NODES];
-        self.backtrack(root_pkg_id)
-    }
-
-    fn backtrack(&mut self, pkg_id: u16) -> bool {
-        let pkg_idx = pkg_id as usize;
-        if pkg_idx >= MAX_NODES {
-            return false;
-        }
-
-        // If already resolved, check consistency
-        if self.selected_version[pkg_idx].is_some() {
-            return true;
-        }
-
-        // Try available versions for pkg_id
-        for i in 0..self.node_count {
-            if let Some(node) = self.available_nodes[i] {
-                if node.pkg_id == pkg_id {
-                    // Test assignment
-                    self.selected_version[pkg_idx] = Some(node.version);
-
-                    // Validate all active dependencies
-                    let mut valid = true;
-                    for dep_opt in node.dependencies.iter() {
-                        if let Some(dep) = dep_opt {
-                            let dep_id = dep.target_id as usize;
-                            if dep_id < MAX_NODES {
-                                if let Some(assigned_ver) = self.selected_version[dep_id] {
-                                    if assigned_ver.major < dep.min_version.major
-                                        || assigned_ver.major > dep.max_version.major
-                                    {
-                                        valid = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if valid {
-                        let mut deps_satisfied = true;
-                        for dep_opt in node.dependencies.iter() {
-                            if let Some(dep) = dep_opt {
-                                if !self.backtrack(dep.target_id) {
-                                    deps_satisfied = false;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if deps_satisfied {
-                            return true;
-                        }
-                    }
-
-                    // Backtrack state on conflict
-                    self.selected_version[pkg_idx] = None;
-                }
-            }
-        }
-
-        false
-    }
-}
-
-impl Default for SatSolverEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==================================================================
-// 6.4 JBD2-STYLE CRASH-RESILIENT TRANSACTIONAL LEDGER SPECIFICATIONS
-// ===========================================================
-pub const JOURNAL_CAPACITY: usize = 8;
-
-#[derive(Debug, Clone, Copy)]
-pub struct TransactionBlock {
-    pub transaction_id: u64,
-    pub target_block_addr: u64,
-    pub crc32c_hash: u32,
-    pub data: [u8; 64],
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct MerkleJournalNode {
-    pub transaction_id: u64,
-    pub merkle_root_hash: u64,
-}
-
-pub struct Jbd2TransactionLedger {
-    pub journal: [Option<TransactionBlock>; JOURNAL_CAPACITY],
-    pub merkle_nodes: [MerkleJournalNode; JOURNAL_CAPACITY],
-    pub head_ptr: usize,
-    pub initial_merkle_root: u64,
-    pub current_merkle_root: u64,
-    pub active_transaction_count: usize,
-}
-
-impl Jbd2TransactionLedger {
-    pub fn new(initial_merkle_root: u64) -> Self {
-        Self {
-            journal: [None; JOURNAL_CAPACITY],
-            merkle_nodes: [MerkleJournalNode {
-                transaction_id: 0,
-                merkle_root_hash: initial_merkle_root,
-            }; JOURNAL_CAPACITY],
-            head_ptr: 0,
-            initial_merkle_root,
-            current_merkle_root: initial_merkle_root,
-            active_transaction_count: 0,
-        }
-    }
-
-    pub fn compute_crc32c(data: &[u8]) -> u32 {
-        let mut crc: u32 = 0xFFFFFFFF;
-        for &byte in data {
-            crc ^= byte as u32;
-            for _ in 0..8 {
-                if (crc & 1) != 0 {
-                    crc = (crc >> 1) ^ 0x82F63B78;
-                } else {
-                    crc >>= 1;
-                }
-            }
-        }
-        !crc
-    }
-
-    pub fn commit_transaction(
-        &mut self,
-        tx_id: u64,
-        target_block_addr: u64,
-        data: &[u8; 64],
-    ) -> Result<u64, &'static str> {
-        let crc = Self::compute_crc32c(data);
-        let block = TransactionBlock {
-            transaction_id: tx_id,
-            target_block_addr,
-            crc32c_hash: crc,
-            data: *data,
-        };
-
-        // XOR incremental Merkle root computation
-        let new_merkle = self.current_merkle_root ^ (tx_id ^ (crc as u64));
-
-        self.journal[self.head_ptr] = Some(block);
-        self.merkle_nodes[self.head_ptr] = MerkleJournalNode {
-            transaction_id: tx_id,
-            merkle_root_hash: new_merkle,
-        };
-
-        self.current_merkle_root = new_merkle;
-        self.head_ptr = (self.head_ptr + 1) % JOURNAL_CAPACITY;
-        self.active_transaction_count += 1;
-
-        Ok(new_merkle)
-    }
-
-    pub fn rollback_last_transaction(&mut self) -> Result<u64, &'static str> {
-        if self.active_transaction_count == 0 {
-            return Err("No active transaction in ledger to rollback");
-        }
-
-        let prev_ptr = if self.head_ptr == 0 {
-            JOURNAL_CAPACITY - 1
-        } else {
-            self.head_ptr - 1
-        };
-
-        self.journal[prev_ptr] = None;
-        self.head_ptr = prev_ptr;
-        self.active_transaction_count -= 1;
-
-        if self.active_transaction_count == 0 {
-            self.current_merkle_root = self.initial_merkle_root;
-        } else {
-            let last_valid_ptr = if self.head_ptr == 0 {
-                JOURNAL_CAPACITY - 1
-            } else {
-                self.head_ptr - 1
-            };
-            self.current_merkle_root = self.merkle_nodes[last_valid_ptr].merkle_root_hash;
-        }
-
-        Ok(self.current_merkle_root)
-    }
-}
 
 // ==================================================================// 1. S-BOOT FIRMWARE (BIOS & UEFI SPECIFICATION)
 // ===========================================================pub const PCI_MAX_BUS: usize = 256;
@@ -1718,7 +1271,6 @@ impl Default for GestureVoiceControlEngine {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1750,17 +1302,42 @@ mod tests {
         let mut vm = UdfVm::new(0, 16);
 
         let program = [
-            UdfInstruction { opcode: OP_WRITE, reg_dest: 0, reg_src: 0, address_or_imm: 4 }, // write R0 (0) to addr 4
-            UdfInstruction { opcode: OP_READ, reg_dest: 1, reg_src: 0, address_or_imm: 4 },  // read addr 4 to R1
-            UdfInstruction { opcode: OP_ADD, reg_dest: 1, reg_src: 1, address_or_imm: 0 },   // R1 = R1 + R1
-            UdfInstruction { opcode: OP_HALT, reg_dest: 1, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction {
+                opcode: OP_WRITE,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 4,
+            }, // write R0 (0) to addr 4
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 1,
+                reg_src: 0,
+                address_or_imm: 4,
+            }, // read addr 4 to R1
+            UdfInstruction {
+                opcode: OP_ADD,
+                reg_dest: 1,
+                reg_src: 1,
+                address_or_imm: 0,
+            }, // R1 = R1 + R1
+            UdfInstruction {
+                opcode: OP_HALT,
+                reg_dest: 1,
+                reg_src: 0,
+                address_or_imm: 0,
+            },
         ];
 
         let res = vm.execute_program(&program, &mut dev).unwrap();
         assert_eq!(res, 0);
 
         let invalid_program = [
-            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 }, // out of bounds
+            UdfInstruction {
+                opcode: OP_READ,
+                reg_dest: 0,
+                reg_src: 0,
+                address_or_imm: 100,
+            }, // out of bounds
         ];
         assert!(vm.execute_program(&invalid_program, &mut dev).is_err());
     }
@@ -1778,7 +1355,9 @@ mod tests {
                     min_version: PkgVersion { major: 2, minor: 0 },
                     max_version: PkgVersion { major: 2, minor: 5 },
                 }),
-                None, None, None,
+                None,
+                None,
+                None,
             ],
         };
 
@@ -1798,8 +1377,14 @@ mod tests {
 
     #[test]
     fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8 };
-        let mmio = ModernMmioController { mmio_base: 0xFE00_0000 };
+        let pio = LegacyPioController {
+            port_base: 0x3F8,
+            power_state: PowerState::D0Active,
+        };
+        let mmio = ModernMmioController {
+            mmio_base: 0xFE00_0000,
+            power_state: PowerState::D0Active,
+        };
 
         assert_eq!(pio.read_register(0), 0x3F8);
         assert_eq!(mmio.read_register(0), 0xFE00_0000);
@@ -1814,9 +1399,21 @@ mod tests {
     fn test_zero_allocation_udf_bytecode_vm() {
         let mut vm = UdfVm::new();
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
-            UdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
+            UdfInstruction {
+                op: 0x10,
+                reg: 0,
+                addr: 0x3F8,
+            }, // READ R0 from 0x3F8 -> 0x3F8
+            UdfInstruction {
+                op: 0x30,
+                reg: 0,
+                addr: 10,
+            }, // ADD R0, 10
+            UdfInstruction {
+                op: 0xF0,
+                reg: 0,
+                addr: 0,
+            }, // HALT
         ];
         let res = vm.execute(&code).unwrap();
         assert_eq!(res, 0x3F8 + 10);
@@ -1826,8 +1423,18 @@ mod tests {
     fn test_constraint_sat_solver() {
         let mut solver = ConstraintSatSolver::new();
         let nodes = [
-            PackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
-            PackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
+            PackageNode {
+                id: 1,
+                version: 10,
+                req_min: 1,
+                req_max: 20,
+            },
+            PackageNode {
+                id: 2,
+                version: 5,
+                req_min: 1,
+                req_max: 10,
+            },
         ];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
@@ -1848,9 +1455,21 @@ mod tests {
         // Inspect & verify zero-allocation VM bytecode execution
         let mut vm = UdfVm::new();
         let code = [
-            UdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            UdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            UdfInstruction { op: 0xF0, reg: 0, addr: 0 },
+            UdfInstruction {
+                op: 0x10,
+                reg: 0,
+                addr: 100,
+            },
+            UdfInstruction {
+                op: 0x30,
+                reg: 0,
+                addr: 50,
+            },
+            UdfInstruction {
+                op: 0xF0,
+                reg: 0,
+                addr: 0,
+            },
         ];
         assert_eq!(vm.execute(&code).unwrap(), 150);
 
@@ -1861,7 +1480,12 @@ mod tests {
 
         // Inspect & verify SAT Solver
         let solver = ConstraintSatSolver::new();
-        let nodes = [PackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
+        let nodes = [PackageNode {
+            id: 1,
+            version: 1,
+            req_min: 1,
+            req_max: 5,
+        }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }
 }
@@ -1870,24 +1494,28 @@ mod tests {
 // Section 6: Bare-Metal Subsystem Design Specifications
 // ============================================================================
 
-// 6.1 Polymorphic Universal Peripheral Blueprint
-pub trait SpecBareMetalUnifiedPeripheral {
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn read_register(&self, offset: u32) -> u64;
-    fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
-    fn handle_irq(&mut self) -> u32;
-}
-
 pub struct LegacyPioController {
     pub port_base: u16,
     pub power_state: PowerState,
 }
 
-impl SpecBareMetalUnifiedPeripheral for LegacyPioController {
-    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+impl BareMetalUnifiedPeripheral for LegacyPioController {
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn read_register(&self, offset: u16) -> u64 {
+        self.port_base as u64 + offset as u64
+    }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool {
+        true
+    }
+    fn set_power_state(&mut self, state: PowerState) {
+        self.power_state = state;
+    }
+    fn get_power_state(&self) -> PowerState {
+        self.power_state
+    }
 }
 
 pub struct ModernMmioController {
@@ -1895,11 +1523,23 @@ pub struct ModernMmioController {
     pub power_state: PowerState,
 }
 
-impl SpecBareMetalUnifiedPeripheral for ModernMmioController {
-    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
+impl BareMetalUnifiedPeripheral for ModernMmioController {
+    fn initialize(&mut self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn read_register(&self, offset: u16) -> u64 {
+        self.mmio_base + offset as u64
+    }
+    fn write_register(&mut self, _offset: u16, _value: u64) {}
+    fn handle_irq(&mut self) -> bool {
+        true
+    }
+    fn set_power_state(&mut self, state: PowerState) {
+        self.power_state = state;
+    }
+    fn get_power_state(&self) -> PowerState {
+        self.power_state
+    }
 }
 
 pub struct BareMetalUnifiedPeripheralManager {
@@ -1915,8 +1555,15 @@ impl BareMetalUnifiedPeripheralManager {
         }
     }
 
-    pub fn register_device(&mut self, vendor_id: u16, base_addr: u64, is_mmio: bool) -> Result<(), &'static str> {
-        if self.device_count >= 16 { return Err("Registry full"); }
+    pub fn register_device(
+        &mut self,
+        vendor_id: u16,
+        base_addr: u64,
+        is_mmio: bool,
+    ) -> Result<(), &'static str> {
+        if self.device_count >= 16 {
+            return Err("Registry full");
+        }
         self.registered_devices[self.device_count] = (vendor_id, base_addr, is_mmio);
         self.device_count += 1;
         Ok(())
@@ -1924,10 +1571,19 @@ impl BareMetalUnifiedPeripheralManager {
 }
 
 impl Default for BareMetalUnifiedPeripheralManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
+#[derive(Debug, Clone, Copy)]
+pub struct UdfInstruction {
+    pub op: u8,  // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
+    pub reg: u8, // R0 - R7
+    pub addr: u64,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct SpecUdfInstruction {
     pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
@@ -1935,12 +1591,12 @@ pub struct SpecUdfInstruction {
     pub addr: u64,
 }
 
-pub struct SpecUdfVm {
+pub struct UdfVm {
     pub registers: [u64; 8], // R0 - R7
     pub pc: usize,
 }
 
-impl SpecUdfVm {
+impl UdfVm {
     pub fn new() -> Self {
         Self {
             registers: [0; 8],
@@ -1952,11 +1608,16 @@ impl SpecUdfVm {
         self.pc = 0;
         while self.pc < bytecode.len() {
             let inst = bytecode[self.pc];
-            if inst.reg >= 8 { return Err("Register out of bounds"); }
+            if inst.reg >= 8 {
+                return Err("Register out of bounds");
+            }
             match inst.op {
                 0x10 => self.registers[inst.reg as usize] = inst.addr, // OP_READ
                 0x20 => { /* OP_WRITE */ }
-                0x30 => self.registers[inst.reg as usize] = self.registers[inst.reg as usize].wrapping_add(inst.addr), // OP_ADD
+                0x30 => {
+                    self.registers[inst.reg as usize] =
+                        self.registers[inst.reg as usize].wrapping_add(inst.addr)
+                } // OP_ADD
                 0xF0 => return Ok(self.registers[inst.reg as usize]), // OP_HALT
                 _ => return Err("Invalid ISA opcode"),
             }
@@ -1966,8 +1627,10 @@ impl SpecUdfVm {
     }
 }
 
-impl Default for SpecUdfVm {
-    fn default() -> Self { Self::new() }
+impl Default for UdfVm {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // 6.3 Declarative Package Resolution SAT Solver
@@ -1982,7 +1645,9 @@ pub struct SpecPackageNode {
 pub struct ConstraintSatSolver;
 
 impl ConstraintSatSolver {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 
     pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
         for pkg in packages {
@@ -1995,7 +1660,9 @@ impl ConstraintSatSolver {
 }
 
 impl Default for ConstraintSatSolver {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // 6.4 JBD2-Style Crash-Resilient Transactional Ledger
@@ -2006,26 +1673,38 @@ pub struct SpecTransactionBlock {
     pub crc32c_hash: u32,
 }
 
-pub struct SpecJbd2TransactionLedger {
+pub struct Jbd2TransactionLedger {
     pub ring_blocks: [SpecTransactionBlock; 16],
     pub head: usize,
     pub current_merkle_root: u32,
 }
 
-impl SpecJbd2TransactionLedger {
+impl Jbd2TransactionLedger {
     pub fn new() -> Self {
         Self {
-            ring_blocks: [SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 }; 16],
+            ring_blocks: [SpecTransactionBlock {
+                tx_id: 0,
+                target_addr: 0,
+                crc32c_hash: 0,
+            }; 16],
             head: 0,
             current_merkle_root: 0x1234_5678,
         }
     }
 
-    pub fn write_transaction(&mut self, target_addr: u64, data: &[u8]) -> Result<u64, &'static str> {
-        if self.head >= 16 { return Err("Ledger ring full"); }
+    pub fn write_transaction(
+        &mut self,
+        target_addr: u64,
+        data: &[u8],
+    ) -> Result<u64, &'static str> {
+        if self.head >= 16 {
+            return Err("Ledger ring full");
+        }
         let tx_id = self.head as u64 + 1;
         let mut crc = 0u32;
-        for &b in data { crc = crc.wrapping_add(b as u32); }
+        for &b in data {
+            crc = crc.wrapping_add(b as u32);
+        }
 
         self.ring_blocks[self.head] = SpecTransactionBlock {
             tx_id,
@@ -2041,13 +1720,19 @@ impl SpecJbd2TransactionLedger {
         if self.head > 0 {
             self.head -= 1;
             self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
-            self.ring_blocks[self.head] = SpecTransactionBlock { tx_id: 0, target_addr: 0, crc32c_hash: 0 };
+            self.ring_blocks[self.head] = SpecTransactionBlock {
+                tx_id: 0,
+                target_addr: 0,
+                crc32c_hash: 0,
+            };
         }
     }
 }
 
-impl Default for SpecJbd2TransactionLedger {
-    fn default() -> Self { Self::new() }
+impl Default for Jbd2TransactionLedger {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct AchievementBadge {
@@ -2123,8 +1808,154 @@ impl GamifiedProductivityLayer {
     }
 }
 
-// ==================================================================// 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
-// ========================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZenithProfileMode {
+    Developer,
+    Minimalist,
+    Gamer,
+}
+
+#[derive(Debug, Clone)]
+pub struct ZenithProfileConfig {
+    pub mode: ZenithProfileMode,
+    pub target_clock_mhz: u32,
+    pub idle_ram_budget_mb: u32,
+    pub compositor_fps: u32,
+}
+
+pub struct ZenithDesktopProfileManager {
+    pub active_config: ZenithProfileConfig,
+}
+
+impl ZenithDesktopProfileManager {
+    pub fn new() -> Self {
+        Self {
+            active_config: ZenithProfileConfig {
+                mode: ZenithProfileMode::Developer,
+                target_clock_mhz: 2400,
+                idle_ram_budget_mb: 128,
+                compositor_fps: 60,
+            },
+        }
+    }
+
+    pub fn switch_profile(&mut self, mode: ZenithProfileMode) {
+        self.active_config = match mode {
+            ZenithProfileMode::Developer => ZenithProfileConfig {
+                mode,
+                target_clock_mhz: 2400,
+                idle_ram_budget_mb: 128,
+                compositor_fps: 60,
+            },
+            ZenithProfileMode::Minimalist => ZenithProfileConfig {
+                mode,
+                target_clock_mhz: 800,
+                idle_ram_budget_mb: 24,
+                compositor_fps: 30,
+            },
+            ZenithProfileMode::Gamer => ZenithProfileConfig {
+                mode,
+                target_clock_mhz: 4500,
+                idle_ram_budget_mb: 256,
+                compositor_fps: 144,
+            },
+        };
+    }
+}
+
+pub struct CrossDeviceContinuityEngine {
+    pub active_app: Option<String>,
+    pub app_offset: u64,
+    pub shared_clipboard_data: String,
+}
+
+impl CrossDeviceContinuityEngine {
+    pub fn new() -> Self {
+        Self {
+            active_app: None,
+            app_offset: 0,
+            shared_clipboard_data: String::new(),
+        }
+    }
+
+    pub fn snapshot_application_context(&mut self, app_name: &str, offset: u64, _bounds: (i32, i32, u32, u32), _timestamp: u64) {
+        self.active_app = Some(app_name.to_string());
+        self.app_offset = offset;
+    }
+
+    pub fn sync_clipboard_content(&mut self, text: &str) {
+        self.shared_clipboard_data = text.to_string();
+    }
+
+    pub fn resume_context_on_target_device(&self) -> Option<(String, u64)> {
+        self.active_app.as_ref().map(|app| (app.clone(), self.app_offset))
+    }
+}
+
+#[cfg(test)]
+mod zenith_desktop_core_tests {
+    use super::*;
+
+    #[test]
+    fn test_zenith_desktop_profile_switching() {
+        let mut manager = ZenithDesktopProfileManager::new();
+        assert_eq!(manager.active_config.mode, ZenithProfileMode::Developer);
+
+        // Switch to Minimalist profile (<30MB idle RAM target)
+        manager.switch_profile(ZenithProfileMode::Minimalist);
+        assert_eq!(manager.active_config.mode, ZenithProfileMode::Minimalist);
+        assert_eq!(manager.active_config.target_clock_mhz, 800);
+        assert!(manager.active_config.idle_ram_budget_mb < 30);
+
+        // Switch to Gamer profile
+        manager.switch_profile(ZenithProfileMode::Gamer);
+        assert_eq!(manager.active_config.mode, ZenithProfileMode::Gamer);
+        assert_eq!(manager.active_config.compositor_fps, 144);
+    }
+
+    #[test]
+    fn test_cross_device_continuity() {
+        let mut continuity = CrossDeviceContinuityEngine::new();
+        continuity.snapshot_application_context("SigmaDev IDE", 42, (0, 0, 1024, 768), 1000);
+        continuity.sync_clipboard_content("SOVEREIGN_PASTE_BUFFER");
+
+        assert_eq!(continuity.shared_clipboard_data, "SOVEREIGN_PASTE_BUFFER");
+        let (app, offset) = continuity.resume_context_on_target_device().unwrap();
+        assert_eq!(app, "SigmaDev IDE");
+        assert_eq!(offset, 42);
+    }
+
+    #[test]
+    fn test_gesture_and_voice_control() {
+        let engine = GestureVoiceControlEngine::new();
+
+        // Touchpad gesture matching
+        assert_eq!(engine.parse_touchpad_gesture(3, true), Some(DesktopShellAction::ToggleOverview));
+        assert_eq!(engine.parse_touchpad_gesture(2, false), None);
+
+        // Voice phrase matching
+        assert_eq!(engine.match_voice_phrase("open terminal"), Some(DesktopShellAction::OpenTerminal));
+        assert_eq!(engine.match_voice_phrase("unknown phrase"), None);
+    }
+
+    #[test]
+    fn test_gamified_productivity_layer() {
+        let mut gamification = GamifiedProductivityLayer::new();
+        assert_eq!(gamification.level, 1);
+        assert!(!gamification.badges[0].unlocked);
+
+        // Award XP for compiling package
+        gamification.award_experience("compile_package", 1200, 10000);
+        assert_eq!(gamification.total_xp, 1200);
+        assert_eq!(gamification.level, 2);
+        assert!(gamification.badges[0].unlocked); // "Package Artisan" unlocked
+    }
+}
+
+// =========================================================================
+// 37. LINUX STABLE LTS UPSTREAM ADAPTER (EEVDF, LANDLOCK LSM, IO_URING RINGS)
+// =========================================================================
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxLtsVersion {
     Lts5_15, // Long-Term Support 5.15
@@ -2262,6 +2093,7 @@ impl GentooUseFlagEngine {
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
 pub const CAP_SEEK: u64 = 1 << 2;
+
 
 pub struct FreeBsdCapsicumEngine {
     pub is_capability_mode: bool,
@@ -3954,7 +3786,12 @@ mod new_unimplemented_tests {
         let mut aggregator = TechMediaIntelligenceAggregatorEngine::new();
         aggregator.ingest_feed_item("9to5Linux", "Linux Kernel 6.11 Released", "Kernel", 3);
         aggregator.ingest_feed_item("Phoronix", "AMD EPYC Zen 5 Benchmarks", "Hardware", 2);
-        aggregator.ingest_feed_item("XDA", "Critical Zero-Day Vulnerability Discovered", "Security", 9);
+        aggregator.ingest_feed_item(
+            "XDA",
+            "Critical Zero-Day Vulnerability Discovered",
+            "Security",
+            9,
+        );
 
         let p_feeds = aggregator.filter_by_source("Phoronix");
         assert_eq!(p_feeds.len(), 1);

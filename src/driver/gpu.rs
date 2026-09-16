@@ -1,9 +1,8 @@
 // Sovereign GPU Acceleration & DRM/KMS Framework for SigmaOS
 // Provides zero-dependency GPU mode setting, display pipeline control, and buffer object management.
 
+extern crate alloc;
 
-use alloc::string::String;
-use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuVendor {

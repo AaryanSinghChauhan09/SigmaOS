@@ -1,18 +1,19 @@
+#![allow(unused_imports)]
 // SigmaOS Wayland Protocol Engine (Zero-Dependency Bare-Metal Display Protocol Engine)
 // Implements core Wayland wire encoding/decoding, xdg_shell surface lifecycle,
 // wl_seat input event dispatching, and wl_data_device clipboard negotiations.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
+
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
+use std::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
+use std::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
+use std::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
@@ -388,20 +389,14 @@ impl WaylandProtocolEngine {
         seat.pointer_x = x;
         seat.pointer_y = y;
 
-        // Find matching surface under pointer (enforce non-negative coordinates)
-        let focused_id = if x >= 0.0 && y >= 0.0 {
-            let ux = x as u32;
-            let uy = y as u32;
-            self.surfaces.iter().find_map(|s| {
-                if ux < s.width && uy < s.height {
-                    Some(s.surface_id)
-                } else {
-                    None
-                }
-            })
-        } else {
-            None
-        };
+        // Find matching surface under pointer
+        let focused_id = self.surfaces.iter().find_map(|s| {
+            if (x as u32) < s.width && (y as u32) < s.height {
+                Some(s.surface_id)
+            } else {
+                None
+            }
+        });
 
         seat.focused_surface_id = focused_id;
         Ok(())
