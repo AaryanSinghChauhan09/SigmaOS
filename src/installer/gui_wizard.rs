@@ -467,6 +467,7 @@ impl GuiInstallerWizard {
             InstallerScreen::Summary => "Review installation summary before committing",
             InstallerScreen::InstallationProgress => "Installing SigmaOS",
             InstallerScreen::Complete => "Installation Complete",
+            InstallerScreen::CompleteOnboarding => "Onboarding Complete",
         }
     }
 
