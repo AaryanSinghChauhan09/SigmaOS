@@ -208,6 +208,9 @@ impl RunitSupervisor {
                     started.push(name.clone());
                 }
             }
+            if !progress {
+                break;
+            }
         }
     }
 
@@ -224,6 +227,9 @@ impl RunitSupervisor {
                     s.stop();
                     stopped.push(name.clone());
                 }
+            }
+            if !progress {
+                break;
             }
         }
     }
@@ -340,5 +346,30 @@ mod tests {
         let status = supervisor.monitor_service_health("sshd", false);
         assert_eq!(status, Some(RunitServiceStatus::Running));
         assert_eq!(supervisor.active_service_count(), 1);
+    }
+
+    #[test]
+    fn test_runit_stages_and_dependencies() {
+        let mut supervisor = RunitSupervisor::new();
+        let db = RunitService::new("db", true, 3);
+        let mut app = RunitService::new("app", true, 3);
+        app.add_dependency("db");
+
+        supervisor.register_service(db);
+        supervisor.register_service(app);
+
+        supervisor.run_stage1();
+        assert_eq!(supervisor.stage, RunitStage::Stage1);
+        assert_eq!(supervisor.current_stage_num, 1);
+
+        supervisor.run_stage2();
+        assert_eq!(supervisor.stage, RunitStage::Stage2);
+        assert_eq!(supervisor.current_stage_num, 2);
+        assert_eq!(supervisor.active_service_count(), 2);
+
+        supervisor.run_stage3();
+        assert_eq!(supervisor.stage, RunitStage::Stage3);
+        assert_eq!(supervisor.current_stage_num, 3);
+        assert_eq!(supervisor.active_service_count(), 0);
     }
 }

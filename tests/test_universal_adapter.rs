@@ -109,20 +109,20 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
     let adapter = UniversalPackageAdapter::new();
 
     // Test Extension Detection for Linux & BSD Formats
-    assert_eq!(adapter.detect_format_by_extension("pkg.ipk"), Some(PackageFormat::Ipk));
-    assert_eq!(adapter.detect_format_by_extension("pkg.opkg"), Some(PackageFormat::Opkg));
-    assert_eq!(adapter.detect_format_by_extension("pkg.p5p"), Some(PackageFormat::SolarisIps));
-    assert_eq!(adapter.detect_format_by_extension("pkg.nar"), Some(PackageFormat::GuixNar));
-    assert_eq!(adapter.detect_format_by_extension("pkg.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
-    assert_eq!(adapter.detect_format_by_extension("pkg.moss"), Some(PackageFormat::Moss));
-    assert_eq!(adapter.detect_format_by_extension("pkg.hpkg"), Some(PackageFormat::Hpkg));
+    assert_eq!(adapter.detect_format_by_extension("pkg.ipk"), Some(universal_engine::PackageFormat::Ipk));
+    assert_eq!(adapter.detect_format_by_extension("pkg.opkg"), Some(universal_engine::PackageFormat::Opkg));
+    assert_eq!(adapter.detect_format_by_extension("pkg.p5p"), Some(universal_engine::PackageFormat::SolarisIps));
+    assert_eq!(adapter.detect_format_by_extension("pkg.nar"), Some(universal_engine::PackageFormat::GuixNar));
+    assert_eq!(adapter.detect_format_by_extension("pkg.openbsd.tgz"), Some(universal_engine::PackageFormat::OpenBsdPkg));
+    assert_eq!(adapter.detect_format_by_extension("pkg.moss"), Some(universal_engine::PackageFormat::Moss));
+    assert_eq!(adapter.detect_format_by_extension("pkg.hpkg"), Some(universal_engine::PackageFormat::Hpkg));
 
     // Test Magic Header Detection
-    assert_eq!(adapter.detect_format_by_header(b"IPK!1234"), Some(PackageFormat::Ipk));
-    assert_eq!(adapter.detect_format_by_header(b"OPKG1234"), Some(PackageFormat::Opkg));
-    assert_eq!(adapter.detect_format_by_header(b"P5P!1234"), Some(PackageFormat::SolarisIps));
-    assert_eq!(adapter.detect_format_by_header(b"NARS1234"), Some(PackageFormat::GuixNar));
-    assert_eq!(adapter.detect_format_by_header(b"OBSD1234"), Some(PackageFormat::OpenBsdPkg));
+    assert_eq!(adapter.detect_format_by_header(b"IPK!1234"), Some(universal_engine::PackageFormat::Ipk));
+    assert_eq!(adapter.detect_format_by_header(b"OPKG1234"), Some(universal_engine::PackageFormat::Opkg));
+    assert_eq!(adapter.detect_format_by_header(b"P5P!1234"), Some(universal_engine::PackageFormat::SolarisIps));
+    assert_eq!(adapter.detect_format_by_header(b"NARS1234"), Some(universal_engine::PackageFormat::GuixNar));
+    assert_eq!(adapter.detect_format_by_header(b"OBSD1234"), Some(universal_engine::PackageFormat::OpenBsdPkg));
 
     // Test Command Dispatcher across multiple package managers
     let dispatcher = UniversalPmCommandDispatcher::new();
