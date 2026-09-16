@@ -72,11 +72,7 @@ pub struct HaikuHpkgManifest {
 }
 
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::sigpkg::universal_engine::PackageFormat;
-
-#[cfg(any(feature = "standalone_test", test))]
-pub use crate::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -108,13 +104,15 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-/// Use universal_oop_system::UniversalPackageManager instead
 #[cfg(all(not(feature = "standalone_test"), not(test)))]
 use crate::sigpkg::universal_oop_system;
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+
 #[cfg(any(feature = "standalone_test", test))]
 use crate::universal_oop_system;
-
-use universal_oop_system::UniversalPackageManager;
+#[cfg(any(feature = "standalone_test", test))]
+use crate::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub use crate::package::PackagePriority;
