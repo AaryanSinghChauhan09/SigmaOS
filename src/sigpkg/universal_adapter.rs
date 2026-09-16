@@ -7,8 +7,17 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
-use crate::package::AptDebManifest;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+/// Description of Debian control manifest (Apt)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,11 +79,7 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -106,9 +111,7 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-/// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::sigpkg::universal_oop_system;
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -2224,20 +2227,6 @@ impl UniversalPmCommandDispatcher {
                         _ => {}
                     }
                     i += 1;
-                }
-            }
-            "pkg_add" | "pkg_info" => {
-                if pm == "pkg_add" {
-                    operation = UniversalPmOperation::Install;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
-                for arg in args {
-                    if *arg == "-n" {
-                        dry_run = true;
-                    } else if !arg.starts_with('-') {
-                        target_packages.push(arg.to_string());
-                    }
                 }
             }
             "pisi" | "urpmi" | "slapt-get" => {
