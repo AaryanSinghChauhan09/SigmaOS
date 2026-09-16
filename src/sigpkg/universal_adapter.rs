@@ -7,8 +7,21 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
+
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::sigpkg::Version;
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,11 +83,10 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
+#[cfg(any(feature = "standalone_test", test))]
 pub use crate::sigpkg::Version;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -107,7 +119,13 @@ pub struct PacmanPkgbuild {
 }
 
 /// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::sigpkg::universal_oop_system;
+
+#[cfg(any(feature = "standalone_test", test))]
+use crate::universal_oop_system;
+
+use universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Debian-style package priority levels (DFSG and APT standard)
@@ -1584,8 +1602,13 @@ impl SigPkgUniversalBridgeEngine {
         raw_data: &[u8],
     ) -> Result<Package, &'static str> {
         let native_pkg = self.convert_to_sigpkg(filename, raw_data)?;
-        let standard_pkg = universal_oop_system::StandardPackage {
-            metadata: universal_oop_system::PackageMetadata {
+        #[cfg(not(any(feature = "standalone_test", test)))]
+        use crate::sigpkg::universal_oop_system::{StandardPackage, PackageMetadata, PackageFormat as OopPackageFormat};
+        #[cfg(any(feature = "standalone_test", test))]
+        use crate::universal_oop_system::{StandardPackage, PackageMetadata, PackageFormat as OopPackageFormat};
+
+        let standard_pkg = StandardPackage {
+            metadata: PackageMetadata {
                 name: native_pkg.name.clone(),
                 version: native_pkg.version,
                 description: native_pkg.description.clone(),
@@ -1601,7 +1624,7 @@ impl SigPkgUniversalBridgeEngine {
                 supported_architectures: Vec::new(),
             },
             dependencies: Vec::new(),
-            format: universal_oop_system::PackageFormat::Sigma,
+            format: OopPackageFormat::Sigma,
         };
         let _ = self.pm.install_package(Box::new(standard_pkg));
         Ok(native_pkg)
