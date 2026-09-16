@@ -1,16 +1,32 @@
-use std::vec;
-use std::boxed::Box;
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
 //! # SigmaOffice - Sovereign Office Suite (SigmaCalc, SigmaWrite)
 //!
 //! This module implements SigmaOffice:
 //! - **SigmaCalc (Spreadsheet)**: Lazy cell DAG recalculation, functional formula parser, native CSV/Excel/ODS.
 //! - **SigmaWrite (Document Editor)**: Lightweight WYSIWYG, markdown support, LaTeX math rendering, SigmaNet mesh co-authoring.
 
-use sigma_types::{CapabilityToken, Result};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::{
+    format,
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::{
+    format,
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
+
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
+
+use sigma_types::{CapabilityToken, Result};
 
 /// Document type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -576,7 +592,7 @@ impl TypographyRenderer {
     }
 
     /// Render text node to GPU buffer
-    pub fn render_text(&self, text: &str, font_size: u32, position: (f32, f32)) -> Result<Vec<u8>> {
+    pub fn render_text(&self, text: &str, _font_size: u32, _position: (f32, f32)) -> Result<Vec<u8>> {
         let mut buffer = Vec::new();
         buffer.extend_from_slice(text.as_bytes());
         Ok(buffer)
@@ -585,6 +601,12 @@ impl TypographyRenderer {
     /// Measure text width
     pub fn measure_text(&self, text: &str, font_size: u32) -> Result<f32> {
         Ok(text.len() as f32 * font_size as f32 * 0.6)
+    }
+}
+
+impl Default for TypographyRenderer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -654,15 +676,16 @@ impl SigmaOffice {
 
     /// Save document to SigmaFS
     pub fn save_document(&self, doc_idx: usize, _path: &str) -> Result<()> {
-        let _doc = self.documents.get(doc_idx).ok_or_else(|| {
-            std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found")
-        })?;
-        Ok(())
+        if self.documents.get(doc_idx).is_some() {
+            Ok(())
+        } else {
+            Err("Document not found")
+        }
     }
 
     /// Load document from SigmaFS
     pub fn load_document(&mut self, _path: &str) -> Result<SigmaDocument> {
-        Err(std::io::Error::new(std::io::ErrorKind::NotFound, "Not implemented").into())
+        Err("Not implemented")
     }
 }
 
@@ -860,10 +883,10 @@ pub struct SigmaOdfPackageEngine {
 
 impl SigmaOdfPackageEngine {
     pub fn new(kind: OdfDocumentKind) -> Self {
-        let (m_type, main_ext) = match kind {
-            OdfDocumentKind::TextOdt => ("application/vnd.oasis.opendocument.text", "odt"),
-            OdfDocumentKind::SpreadsheetOds => ("application/vnd.oasis.opendocument.spreadsheet", "ods"),
-            OdfDocumentKind::PresentationOdp => ("application/vnd.oasis.opendocument.presentation", "odp"),
+        let m_type = match kind {
+            OdfDocumentKind::TextOdt => "application/vnd.oasis.opendocument.text",
+            OdfDocumentKind::SpreadsheetOds => "application/vnd.oasis.opendocument.spreadsheet",
+            OdfDocumentKind::PresentationOdp => "application/vnd.oasis.opendocument.presentation",
         };
 
         let mut manifest = Vec::new();
@@ -896,7 +919,7 @@ impl SigmaOdfPackageEngine {
         let mut bytes = Vec::new();
         bytes.extend_from_slice(b"PK\x03\x04"); // Standard Zip Header
         bytes.extend_from_slice(b"mimetype");
-        let mime = match self.kind {
+        let mime: &[u8] = match self.kind {
             OdfDocumentKind::TextOdt => b"application/vnd.oasis.opendocument.text",
             OdfDocumentKind::SpreadsheetOds => b"application/vnd.oasis.opendocument.spreadsheet",
             OdfDocumentKind::PresentationOdp => b"application/vnd.oasis.opendocument.presentation",
@@ -975,7 +998,7 @@ impl SigmaSpellCheckerEngine {
 
         for dict_word in self.dictionary.keys() {
             if Self::levenshtein_distance(&lower, dict_word) <= 2 {
-                suggestions.push(dict_word.clone());
+                suggestions.push(dict_word.to_string());
             }
         }
         suggestions
@@ -1068,6 +1091,12 @@ impl SigmaTrackChangesEngine {
     }
 }
 
+impl Default for SigmaTrackChangesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ==========================================================
 // 4. LibreOffice Writer Paragraph Styles & Template Theme Engine
 // ==========================================================
@@ -1136,6 +1165,12 @@ impl SigmaStyleThemeEngine {
     }
 }
 
+impl Default for SigmaStyleThemeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ==========================================================
 // 5. LibreOffice Calc Advanced Math Formula Parser Engine
 // ==========================================================
@@ -1199,7 +1234,7 @@ mod sigma_types {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
