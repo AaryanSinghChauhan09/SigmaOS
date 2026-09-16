@@ -1496,6 +1496,9 @@ impl ShellRepl {
 
             ShellCommand::Script { code } => {
                 let mut compat = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::new();
+                for (k, v) in &self.variables {
+                    compat.environment.push((k.clone(), v.clone()));
+                }
                 match compat.execute_script_as_sh(&code) {
                     Ok(pipelines) => Ok(format!(
                         "Successfully transpiled and parsed script ({} pipelines executed).",

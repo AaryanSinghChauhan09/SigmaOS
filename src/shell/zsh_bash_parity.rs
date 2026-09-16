@@ -479,6 +479,15 @@ impl BashParameterExpansion {
 
         let inner = &expr[2..expr.len() - 1];
 
+        // 0. ${!VAR} - indirect variable expansion
+        if inner.starts_with('!') {
+            let ind_key = &inner[1..];
+            if let Some(target_key) = env.get(ind_key) {
+                return env.get(target_key).cloned().unwrap_or_default();
+            }
+            return String::new();
+        }
+
         // 1. ${#VAR} - string length
         if inner.starts_with('#') {
             let var_name = &inner[1..];
@@ -486,7 +495,21 @@ impl BashParameterExpansion {
             return val.len().to_string();
         }
 
-        // 2. ${VAR//search/replace} - global replace
+        // 1b. ${VAR^^} - uppercase conversion
+        if inner.ends_with("^^") {
+            let var_name = &inner[..inner.len() - 2];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            return val.to_uppercase();
+        }
+
+        // 1c. ${VAR,,} - lowercase conversion
+        if inner.ends_with(",,") {
+            let var_name = &inner[..inner.len() - 2];
+            let val = env.get(var_name).cloned().unwrap_or_default();
+            return val.to_lowercase();
+        }
+
+        // 2. ${VAR//search/replace} vs ${VAR/search/replace}
         if let Some(pos) = inner.find("//") {
             let var_name = &inner[..pos];
             let rest = &inner[pos + 2..];
@@ -497,6 +520,24 @@ impl BashParameterExpansion {
                 return val.replace(pattern, replacement);
             } else {
                 return val.replace(rest, "");
+            }
+        } else if let Some(pos) = inner.find('/') {
+            let var_name = &inner[..pos];
+            if !var_name.contains('#') && !var_name.contains('%') && !var_name.contains(':') {
+                let rest = &inner[pos + 1..];
+                let val = env.get(var_name).cloned().unwrap_or_default();
+                if let Some(sep) = rest.find('/') {
+                    let pattern = &rest[..sep];
+                    let replacement = &rest[sep + 1..];
+                    if let Some(match_pos) = val.find(pattern) {
+                        let mut res = val.clone();
+                        res.replace_range(match_pos..match_pos + pattern.len(), replacement);
+                        return res;
+                    }
+                    return val;
+                } else {
+                    return val.replace(rest, "");
+                }
             }
         }
 
@@ -1349,6 +1390,20 @@ impl UniversalScriptTranspiler {
                 let target = parts[1..].join(" ");
                 return format!("echo {} | tr ' ' '{}'", target, delim);
             }
+        } else if l.starts_with("string trim ") {
+            let rest = l.trim_start_matches("string trim ").trim();
+            return format!("echo {} | xargs", rest);
+        } else if l.starts_with("string length ") {
+            let rest = l.trim_start_matches("string length ").trim();
+            return format!("echo -n {} | wc -m", rest);
+        } else if l.starts_with("string repeat ") {
+            let rest = l.trim_start_matches("string repeat ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let count = parts[0];
+                let target = parts[1..].join(" ");
+                return format!("seq -s '' {} | sed 's/[0-9]/{}/g'", count, target);
+            }
         }
 
         // 3. Fish 'for var in list' -> 'for var in list; do'
@@ -1484,11 +1539,15 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 4. Tcsh 'if ( expr ) then' -> 'if [ expr ]; then'
+        // 4. Tcsh 'if ( expr ) then' -> 'if [ expr ]; then' (including $?VAR existence checks)
         if l.starts_with("if ") && l.contains("then") {
             if let Some(open) = l.find('(') {
                 if let Some(close) = l.find(')') {
                     let cond = l[open + 1..close].trim();
+                    if cond.starts_with("$?") {
+                        let var_name = &cond[2..];
+                        return format!("if [ -n \"${{{}}}\" ]; then", var_name);
+                    }
                     return format!("if [ {} ]; then", cond);
                 }
             }
@@ -1680,6 +1739,12 @@ impl UniversalScriptTranspiler {
         if l.starts_with("let ") {
             let expr = l.trim_start_matches("let ").trim().trim_matches('"').trim_matches('\'');
             l = format!(": $(( {} ))", expr);
+        }
+
+        // 5b. Ksh 'coproc cmd' -> 'cmd &'
+        if l.starts_with("coproc ") {
+            let cmd = l.trim_start_matches("coproc ").trim();
+            l = format!("{} &", cmd);
         }
 
         // 6. [[ expr ]] -> [ expr ]
@@ -1944,6 +2009,34 @@ mod tests {
 
         // Substring slicing
         assert_eq!(BashParameterExpansion::expand("${USER:0:5}", &env), "sover");
+
+        // Uppercase / Lowercase conversion
+        assert_eq!(BashParameterExpansion::expand("${USER^^}", &env), "SOVEREIGN");
+        assert_eq!(BashParameterExpansion::expand("${USER,,}", &env), "sovereign");
+
+        // Indirect variable expansion
+        env.insert("PTR".to_string(), "USER".to_string());
+        assert_eq!(BashParameterExpansion::expand("${!PTR}", &env), "sovereign");
+
+        // Single pattern replacement
+        assert_eq!(BashParameterExpansion::expand("${FILE/document/file}", &env), "file.txt");
+    }
+
+    #[test]
+    fn test_extended_shell_transpilation() {
+        let fish_str = "string trim '  hello  '\nstring length hello\nstring repeat 3 x";
+        let posix_fish = UniversalScriptTranspiler::transpile_to_posix_sh(fish_str, ShellDialect::Fish);
+        assert!(posix_fish.contains("echo '  hello  ' | xargs"));
+        assert!(posix_fish.contains("echo -n hello | wc -m"));
+        assert!(posix_fish.contains("seq -s '' 3 | sed 's/[0-9]/x/g'"));
+
+        let tcsh_str = "if ( $?PATH ) then\n  echo path set\nendif";
+        let posix_tcsh = UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_str, ShellDialect::Tcsh);
+        assert!(posix_tcsh.contains("if [ -n \"${PATH}\" ]; then"));
+
+        let ksh_str = "coproc my_daemon";
+        let posix_ksh = UniversalScriptTranspiler::transpile_to_posix_sh(ksh_str, ShellDialect::Ksh);
+        assert!(posix_ksh.contains("my_daemon &"));
     }
 
     #[test]
