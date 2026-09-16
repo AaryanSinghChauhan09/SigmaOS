@@ -106,7 +106,7 @@ impl RunitService {
 }
 
 /// Runit Service Supervisor Engine
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
     pub stage: RunitStage,
