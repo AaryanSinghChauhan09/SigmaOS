@@ -52,12 +52,13 @@ fn main() {
         "install" => cmd_install(&args[1..]),
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
-        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "yay" | "paru" | "microdnf"
-        | "rpm" | "apk" | "pkg" | "pkg_add" | "pkg_delete" | "pkgin" | "zypper" | "xbps"
-        | "xbps-install" | "xbps-remove" | "emerge" | "ebuild" | "eopkg" | "moss" | "nix"
-        | "nix-env" | "guix" | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt"
-        | "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" | "brew"
-        | "flatpak" | "snap" => {
+        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "yay" | "paru" | "pikaur"
+        | "trizen" | "aura" | "microdnf" | "rpm" | "apk" | "pkg" | "pkg_add" | "pkg_delete"
+        | "pkg_info" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
+        | "xbps-query" | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env" | "guix"
+        | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" | "spack" | "conan"
+        | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" | "brew" | "flatpak" | "snap"
+        | "opkg" | "ipkg" | "pkgman" | "swupd" | "slapt-get" | "urpmi" | "pisi" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),
@@ -297,8 +298,56 @@ fn cmd_install(args: &[String]) {
             "--nar" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::GuixNar)
             }
+            "--narinfo" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::NarInfo)
+            }
             "--openbsd" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::OpenBsdPkg)
+            }
+            "--cachy" | "--cachyos" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pacman)
+            }
+            "--swupd" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sysupdate)
+            }
+            "--stratum" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Stratum)
+            }
+            "--crux" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Crux)
+            }
+            "--drpm" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Drpm)
+            }
+            "--sfs" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sfs)
+            }
+            "--wheel" | "--whl" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Wheel)
+            }
+            "--crate" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Crate)
+            }
+            "--gem" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Gem)
+            }
+            "--nupkg" | "--nuget" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nupkg)
+            }
+            "--vcpkg" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Vcpkg)
+            }
+            "--spack" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Spack)
+            }
+            "--conan" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Conan)
+            }
+            "--sigma" | "--sigpkg" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sigma)
+            }
+            "--sysupdate" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sysupdate)
             }
             a if a.starts_with('-') => {
                 // Ignore operational flags like -y or --yes
