@@ -684,6 +684,21 @@ impl SovereignDynamicDevfsEngine {
             .iter()
             .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
     }
+
+    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
+        if let Some(dev) = self.nodes.iter_mut().find(|d| d.name == dev_name) {
+            dev.symlink_paths.push(symlink.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
+        self.nodes
+            .iter()
+            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
+    }
 }
 
 impl Default for SovereignDynamicDevfsEngine {
