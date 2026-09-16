@@ -2,6 +2,7 @@
 // Implements Gala Window Manager, Wingpanel Status Bar, Plank Dock, Slingshot Launcher, AppCenter, and Greeter.
 
 #[cfg(test_disabled)]
+extern crate std;
 
 use std::string::String;
 use std::string::ToString;

@@ -287,6 +287,14 @@ pub struct SignedModelMarketplace {
     pub models: Vec<MarketplaceModel>,
 }
 
+pub type ModelMarketplace = SignedModelMarketplace;
+pub type CuratedAiModel = MarketplaceModel;
+pub type MlExperimentRun = ExperimentRun;
+pub type AiSafetyGuardrails = AiSafetyPolicyEngine;
+pub type DeveloperPlatformSuite = LocalLlmOrchestrator;
+pub type DevWorkspace = PrivacyRouter;
+pub type SafetyViolationType = String;
+
 impl SignedModelMarketplace {
     pub fn new() -> Self {
         Self { models: Vec::new() }

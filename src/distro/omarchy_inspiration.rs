@@ -8,12 +8,12 @@
 //! - `OmarchyHerdrAiAgentManager`: Multi-agent orchestrator managing parallel AI coding agents (Claude, Codex, Grok, Gemini, Local)
 //! - `OmarchyReleaseChannelSnapshotEngine`: Multi-channel system release tracking (Stable, Edge, RC, Dev) with automated update pre-flight snapshots
 
-extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Release channels available in Omarchy-style system management
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -471,161 +471,6 @@ impl Default for OmarchyHyprlandAnimEngine {
     }
 }
 
-// ============================================================================
-// OMARCHY 4 - HYPRLAND WORKSPACE SNAP LAYOUT ENGINE
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct WindowRule {
-    pub class_pattern: String,
-    pub target_workspace: u32,
-    pub is_floating: bool,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct OmarchyHyprlandWorkspaceSnapLayoutEngine {
-    pub window_rules: Vec<WindowRule>,
-    pub split_ratio: f32,
-}
-
-impl OmarchyHyprlandWorkspaceSnapLayoutEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            window_rules: Vec::new(),
-            split_ratio: 0.5,
-        };
-        engine.add_rule("kitty", 1, false);
-        engine.add_rule("firefox", 2, false);
-        engine.add_rule("pavucontrol", 9, true);
-        engine
-    }
-
-    pub fn add_rule(&mut self, class_name: &str, workspace: u32, floating: bool) {
-        self.window_rules.push(WindowRule {
-            class_pattern: class_name.to_string(),
-            target_workspace: workspace,
-            is_floating: floating,
-        });
-    }
-
-    pub fn generate_hyprland_layout_config(&self) -> String {
-        let mut cfg = String::from("dwindle {\n    pseudotile = true\n    preserve_split = true\n}\n");
-        for rule in &self.window_rules {
-            if rule.is_floating {
-                cfg.push_str(&format!("windowrulev2 = float, class:^({})$\n", rule.class_pattern));
-            }
-            cfg.push_str(&format!("windowrulev2 = workspace {}, class:^({})$\n", rule.target_workspace, rule.class_pattern));
-        }
-        cfg
-    }
-}
-
-// ============================================================================
-// OMARCHY 4 - NEOVIM PRESET STUDIO ENGINE
-// ============================================================================
-
-#[derive(Debug, Clone, Default)]
-pub struct OmarchyNeovimPresetStudioEngine {
-    pub lsp_servers: Vec<String>,
-    pub treesitter_parsers: Vec<String>,
-}
-
-impl OmarchyNeovimPresetStudioEngine {
-    pub fn new() -> Self {
-        Self {
-            lsp_servers: vec!["rust_analyzer".to_string(), "pyright".to_string(), "clangd".to_string()],
-            treesitter_parsers: vec!["rust".to_string(), "python".to_string(), "c".to_string(), "lua".to_string()],
-        }
-    }
-
-    pub fn register_lsp_server(&mut self, server: &str) -> bool {
-        if !self.lsp_servers.contains(&server.to_string()) {
-            self.lsp_servers.push(server.to_string());
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn register_treesitter(&mut self, lang: &str) -> bool {
-        if !self.treesitter_parsers.contains(&lang.to_string()) {
-            self.treesitter_parsers.push(lang.to_string());
-            true
-        } else {
-            false
-        }
-    }
-}
-
-// ============================================================================
-// OMARCHY 4 - WAYBAR APPLET STUDIO ENGINE
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct WaybarModule {
-    pub module_name: String,
-    pub position: String, // "left", "center", "right"
-    pub is_enabled: bool,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct OmarchyWaybarAppletStudioEngine {
-    pub modules: Vec<WaybarModule>,
-}
-
-impl OmarchyWaybarAppletStudioEngine {
-    pub fn new() -> Self {
-        let mut studio = Self { modules: Vec::new() };
-        studio.add_module("hyprland/workspaces", "left");
-        studio.add_module("clock", "center");
-        studio.add_module("pulseaudio", "right");
-        studio.add_module("network", "right");
-        studio
-    }
-
-    pub fn add_module(&mut self, name: &str, pos: &str) {
-        self.modules.push(WaybarModule {
-            module_name: name.to_string(),
-            position: pos.to_string(),
-            is_enabled: true,
-        });
-    }
-
-    pub fn render_waybar_config_json(&self) -> String {
-        format!("{{\"layer\": \"top\", \"position\": \"top\", \"modules_left\": [\"hyprland/workspaces\"], \"modules_center\": [\"clock\"], \"modules_right\": [\"pulseaudio\", \"network\"]}}")
-    }
-}
-
-// ============================================================================
-// OMARCHY 4 - LIVE ISO BOOTSTRAP & DEVELOPER INSTALLER
-// ============================================================================
-
-#[derive(Debug, Clone, Default)]
-pub struct OmarchyLiveIsoBootstrapEngine {
-    pub target_disk: String,
-    pub is_bootstrap_completed: bool,
-    pub deployed_dotfiles_count: u32,
-}
-
-impl OmarchyLiveIsoBootstrapEngine {
-    pub fn new(disk: &str) -> Self {
-        Self {
-            target_disk: disk.to_string(),
-            is_bootstrap_completed: false,
-            deployed_dotfiles_count: 0,
-        }
-    }
-
-    pub fn run_60s_bootstrap_installer(&mut self) -> Result<String, &'static str> {
-        if self.target_disk.is_empty() {
-            return Err("Target disk not specified for Omarchy live bootstrap");
-        }
-        self.is_bootstrap_completed = true;
-        self.deployed_dotfiles_count = 12;
-        Ok(format!("Omarchy live bootstrap installed to {} with 12 dotfile profiles", self.target_disk))
-    }
-}
-
 
 #[cfg(test)]
 mod omarchy_tests {
@@ -657,40 +502,6 @@ mod omarchy_tests {
         assert!(cfg.contains("bezier = myBezier"));
     }
 
-
-    #[test]
-    fn test_omarchy_hyprland_workspace_snap_layout_engine() {
-        let mut layout = OmarchyHyprlandWorkspaceSnapLayoutEngine::new();
-        layout.add_rule("discord", 3, false);
-        let cfg = layout.generate_hyprland_layout_config();
-        assert!(cfg.contains("workspace 3, class:^(discord)$"));
-        assert!(cfg.contains("float, class:^(pavucontrol)$"));
-    }
-
-    #[test]
-    fn test_omarchy_neovim_preset_studio_engine() {
-        let mut nvim = OmarchyNeovimPresetStudioEngine::new();
-        assert!(nvim.register_lsp_server("gopls"));
-        assert!(!nvim.register_lsp_server("rust_analyzer")); // Already present
-        assert!(nvim.register_treesitter("go"));
-    }
-
-    #[test]
-    fn test_omarchy_waybar_applet_studio_engine() {
-        let mut waybar = OmarchyWaybarAppletStudioEngine::new();
-        waybar.add_module("battery", "right");
-        let json = waybar.render_waybar_config_json();
-        assert!(json.contains("hyprland/workspaces"));
-        assert!(json.contains("pulseaudio"));
-    }
-
-    #[test]
-    fn test_omarchy_live_iso_bootstrap_engine() {
-        let mut iso = OmarchyLiveIsoBootstrapEngine::new("/dev/nvme0n1");
-        let res = iso.run_60s_bootstrap_installer().unwrap();
-        assert!(res.contains("installed to /dev/nvme0n1"));
-        assert!(iso.is_bootstrap_completed);
-    }
 
     #[test]
     fn test_quickshell_engine() {

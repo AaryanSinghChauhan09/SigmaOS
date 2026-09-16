@@ -2,10 +2,10 @@
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 826
 /// Implements screen magnification and zoom
 
-extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+
+use std::boxed::Box;
+use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type MagnifierID = usize;

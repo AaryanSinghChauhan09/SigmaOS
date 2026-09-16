@@ -58,6 +58,11 @@ pub enum PackageFormat {
     Dports,
     SlackBuild,
     Crux,
+    Deb,
+    Rpm,
+    Ebuild,
+    Sysupdate,
+    Sigma,
     Drpm,
     Stratum,
     Ipk,
@@ -73,121 +78,26 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
-    Deb,
-    Rpm,
-    Ebuild,
-    Sigma,
-    Sysupdate,
 }
+
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        let f = filename.trim().to_lowercase();
-        if f.ends_with(".air") {
-            Some(PackageFormat::Air)
-        } else if f.ends_with(".bottle") {
-            Some(PackageFormat::Bottle)
-        } else if f.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if f.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if f.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if f.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if f.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if f.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if f.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if f.ends_with(".nixpkg") || f.ends_with(".nix") {
-            Some(PackageFormat::Nix)
-        } else if f.ends_with(".portage") || f.ends_with(".ebuild") {
-            Some(PackageFormat::Portage)
-        } else if f.ends_with(".deb") {
-            Some(PackageFormat::Apt)
-        } else if f.ends_with(".tar.gz") || f.ends_with(".tgz") || f.ends_with(".tar .gz") {
-            Some(PackageFormat::TarGz)
-        } else if f.ends_with(".tar.xz") || f.ends_with(".xz") {
-            Some(PackageFormat::TarXz)
-        } else if f.ends_with(".rpm") {
-            Some(PackageFormat::Yum)
-        } else if f.ends_with(".pkg.tar.xz") || f.ends_with(".pkg.tar.zst") {
-            Some(PackageFormat::Pacman)
-        } else if f.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if f.ends_with(".app") {
-            Some(PackageFormat::AppBundle)
-        } else if f.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if f.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if f.ends_with(".superdeb") {
-            Some(PackageFormat::Superdeb)
-        } else if f.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if f.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if f.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if f.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else if f.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if f.ends_with(".ipk") {
-            Some(PackageFormat::Ipk)
-        } else if f.ends_with(".opkg") {
-            Some(PackageFormat::Opkg)
-        } else if f.ends_with(".p5p") {
-            Some(PackageFormat::SolarisIps)
-        } else if f.ends_with(".nar") {
-            Some(PackageFormat::GuixNar)
-        } else if f.ends_with(".openbsd.tgz") {
-            Some(PackageFormat::OpenBsdPkg)
-        } else if f.ends_with(".moss") {
-            Some(PackageFormat::Moss)
-        } else if f.ends_with(".hpkg") {
-            Some(PackageFormat::Hpkg)
-        } else if f.ends_with(".tcz") {
-            Some(PackageFormat::Tcz)
-        } else if f.ends_with(".gobo") {
-            Some(PackageFormat::Gobo)
-        } else if f.ends_with(".ostree") {
-            Some(PackageFormat::Ostree)
-        } else if f.ends_with(".pkgsrc") {
-            Some(PackageFormat::Pkgsrc)
-        } else if f.ends_with(".sfs") {
-            Some(PackageFormat::Sfs)
-        } else if f.ends_with(".puk") {
-            Some(PackageFormat::Puk)
-        } else if f.ends_with(".dmg") {
-            Some(PackageFormat::Dmg)
-        } else if f.ends_with(".cports") {
-            Some(PackageFormat::Cports)
-        } else if f.ends_with(".spack") {
-            Some(PackageFormat::Spack)
-        } else if f.ends_with(".conan") {
-            Some(PackageFormat::Conan)
-        } else if f.ends_with(".whl") {
-            Some(PackageFormat::Wheel)
-        } else if f.ends_with(".crate") {
-            Some(PackageFormat::Crate)
-        } else if f.ends_with(".gem") {
-            Some(PackageFormat::Gem)
-        } else if f.ends_with(".nupkg") {
-            Some(PackageFormat::Nupkg)
-        } else if f.ends_with(".vcpkg") {
-            Some(PackageFormat::Vcpkg)
-        } else if f.ends_with(".narinfo") {
-            Some(PackageFormat::NarInfo)
-        } else if f.ends_with(".sigpkg") || f.ends_with(".sigma") {
-            Some(PackageFormat::Sovereign)
-        } else if f.ends_with(".sysupdate") {
-            Some(PackageFormat::Sysupdate)
-        } else {
-            None
-        }
+        if filename.ends_with(".deb") { return Some(PackageFormat::Deb); }
+        if filename.ends_with(".rpm") { return Some(PackageFormat::Rpm); }
+        if filename.ends_with(".tar.gz") || filename.ends_with(".tgz") { return Some(PackageFormat::TarGz); }
+        if filename.ends_with(".tar.xz") { return Some(PackageFormat::TarXz); }
+        if filename.ends_with(".tar") { return Some(PackageFormat::Tar); }
+        if filename.ends_with(".snap") { return Some(PackageFormat::Snap); }
+        if filename.ends_with(".flatpak") { return Some(PackageFormat::Flatpak); }
+        if filename.ends_with(".appimage") || filename.ends_with(".AppImage") { return Some(PackageFormat::AppImage); }
+        if filename.ends_with(".apk") { return Some(PackageFormat::Apk); }
+        if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { return Some(PackageFormat::Pacman); }
+        if filename.ends_with(".dmg") { return Some(PackageFormat::Dmg); }
+        if filename.ends_with(".nix") { return Some(PackageFormat::Nix); }
+        if filename.ends_with(".ebuild") { return Some(PackageFormat::Ebuild); }
+        if filename.ends_with(".txz") { return Some(PackageFormat::Txz); }
+        None
     }
 }
 
@@ -1745,8 +1655,8 @@ impl IPackageAdapter for PetPackageAdapter {
 pub struct SnapPackageAdapter;
 impl IPackageAdapter for SnapPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Snap
-    }
+        PackageFormat::Apt
+    } // or custom snap mapping
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
             return Err("Empty Snap payload");
@@ -1754,7 +1664,7 @@ impl IPackageAdapter for SnapPackageAdapter {
         Ok(PackageContext {
             name: "snap-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Snap,
+            format: PackageFormat::Apt,
             dependencies: vec![],
             files: vec![],
             hash: [0x21; 32],
@@ -1771,7 +1681,7 @@ impl IPackageAdapter for SnapPackageAdapter {
 
 impl IPackageAdapter for FlatpakPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Flatpak
+        PackageFormat::Apt
     }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
@@ -1780,7 +1690,7 @@ impl IPackageAdapter for FlatpakPackageAdapter {
         Ok(PackageContext {
             name: "flatpak-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Flatpak,
+            format: PackageFormat::Apt,
             dependencies: vec![],
             files: vec![],
             hash: [0x22; 32],

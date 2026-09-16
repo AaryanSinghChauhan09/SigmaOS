@@ -14,13 +14,13 @@ pub mod bus;
 pub mod classic_os;
 pub mod component;
 pub mod console;
-pub mod missing_linux_kernel_components;
 pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;
 pub mod driver;
 pub mod dtrace_compat;
 pub mod ebpf;
+pub mod bsd_kernel_parity;
 pub mod ebpf_vm;
 pub mod ebpf_verification;
 pub mod exports;
@@ -29,15 +29,11 @@ pub mod gap_filling;
 pub mod generation_manager;
 pub mod io_uring;
 pub mod ipc;
-pub mod kqueue;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
-pub use linux_parity::{
-    CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
-    LinuxKernelWorkqueueEngine, LinuxRcuSynchronizationEngine, RcuCallback, WorkItem,
-};
 pub mod memory;
+pub mod missing_linux_kernel_components;
 pub mod meta;
 pub mod module_loader;
 pub mod namespaces;
@@ -54,22 +50,17 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod missing_linux_kernel_components;
 pub mod structures;
-
-pub use missing_linux_kernel_components::{
-    BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
-    KprobeEntry, LinuxEpollEventPollEngine, LinuxKernelAuditSubsystemEngine,
-    LinuxKprobesTracepointEngine, LinuxMemoryCgroupV2OomKillerEngine,
-    LinuxSeccompBpfSyscallFilterEngine, MemcgProcessEntry, SeccompAction, UffdFaultEvent, UffdMode,
-    UffdRegisteredRange, UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
-};
-pub mod traits;
+pub mod subsystem;
+pub mod syscall;
+pub mod task_name_cache;
+pub mod virtual_cpu;
+pub mod vmm_paging;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;
 pub use bus::*;
-pub use linux_bsd_innovations::*;
+pub use crate::kernel::linux_bsd_innovations::*;
 pub use pipes::*;
 pub use policy_mechanism::*;
 #[allow(ambiguous_glob_reexports)]
@@ -85,7 +76,34 @@ pub use gap_closing::{
 pub use generation_manager::{Generation, GenerationManager};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
+pub use crate::kernel::linux_bsd_innovations::{
+    AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
+    BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
+    BsdPfStateTable, CapabilityDerivationTree, CarpSecurityRouter, CgroupResourceLimits, CowBlock,
+    CowStorageEngine, CpuIsaMicroarch, DevlinkHealthReporter, DynamicLkmLoader, EbpfInstruction,
+    EbpfRuntime, ExokernelHardwareMultiplexer, FastPacketFrame, FreeBsdCapsicumEngine,
+    FreeBsdGeomTopology, FreeBsdJail, FreeBsdVfsNullfs, FreeBsdVnetManager, FutexOp, FutexWaiter,
+    GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
+    Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
+    HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
+    KernelAccessController, KernelCapability, KernelFastPacketEngine, KernelModule, KmdfDriver,
+    KmdfIoRequest, KmdfPnpState, KmdfPowerState, LandlockAccessRight, LandlockPathRule,
+    LinuxDevlinkHealthMonitor, LinuxFutexEngine, LinuxLandlockLsmRuleEngine,
+    MemoryCompactionSuperpagesAllocator, MicrokernelCore, MicrokernelTranslatorRegistry,
+    MultikernelMessage, MultikernelMessagePassing, NamespaceType, NanokernelHardwareBroker,
+    NanokernelIrq, NetBsdRumpKernel, NinePProtocolTranslator, NinePResource,
+    NixOsDeclarativeManager, NtExecutiveService, NullfsLayerNode, OpenBsdPledge,
+    OpenBsdUnveilEngine, OpenSuseSnapperEngine, PfFiveTuple, PfStateEntry, PhysicalFrameBlock,
+    ReactorEvent, ReactorRegistration, ResourceBinding, RumpComponent, SnapperSnapshot,
+    SoftIrqType, SovereignCgroupGovernor, SovereignEventReactor, SovereignNamespaceContainer,
+    SovereignSwapEngine, SovereignZone, SovereignZonesManager, SwapDeviceConfig, SwapPage,
+    UnveilPathRule, VnetNetworkStack, VoidLinuxRunitSupervisor, VoidRunitInit, VoidRunitService,
+    VoidRunitStage, XdpAction, ZramCompressedPage, CAP_MMAP_FLAG, CAP_READ_FLAG, CAP_SEEK_FLAG,
+    CAP_WRITE_FLAG, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_EXEC, PLEDGE_INET, PLEDGE_RPATH,
+    PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
+};
 pub use linux_parity::*;
+pub use missing_linux_kernel_components::*;
 pub use memory::{
     BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
     MemoryBlock, PcieResourceAllocator, ResourceLimits, SigmaResourceAllocatorHub,
@@ -101,11 +119,11 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use namespaces::{
+    KernelNamespace, NamespaceId, KernelNamespaceType, NamespaceConfig, NamespaceError,
+    NamespaceIdGenerator, next_namespace_id, MAX_NAMESPACES, MAX_PIDS_PER_NAMESPACE,
+};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-
-pub mod sigma_kthread;
-pub mod sigma_timer;
-pub mod sigma_workqueue;
-pub mod sigma_cgroup_v2;
-pub mod sigma_signal;
+// Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
+pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
