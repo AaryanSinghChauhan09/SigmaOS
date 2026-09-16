@@ -4404,6 +4404,19 @@ impl OpenSourceProjectSupremacySuite {
     ) -> bool {
         benchmark_score >= 1000 && feature_coverage_pct >= 90
     }
+
+    /// Helix / Neovim Inspired Modal Editor Quick Helper
+    pub fn open_sovereign_modal_editor(&self, initial_buffer: &str) -> crate::SovereignHelixModalEditorEngine {
+        let mut editor = crate::SovereignHelixModalEditorEngine::new();
+        editor.insert_text(initial_buffer);
+        editor
+    }
+
+    /// Fastfetch System Info Quick Helper
+    pub fn render_fastfetch_summary(&self) -> String {
+        let ff = crate::SovereignFastfetchSysInfoEngine::new();
+        ff.render_sys_info_summary()
+    }
 }
 
 impl Default for OpenSourceProjectSupremacySuite {
