@@ -953,8 +953,59 @@ impl MissingDistroComponentsEngine {
             "Fedora Silverblue",
             ComponentParityStatus::Implemented,
         );
+        engine.register_component(
+            "APX Container Subsystems",
+            "Vanilla OS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Atomic A/B Partition Updates",
+            "SteamOS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "eopkg Delta Packages",
+            "Solus",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "urpmi Media Dependency Solver",
+            "Mageia",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Stateless Configuration Defaults",
+            "Clear Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "SELinux MLS/MCS Security Levels",
+            "Fedora/RHEL",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "YaST Control Center Registry",
+            "openSUSE",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "HAMMER2 Emergency CoW & Dedup",
+            "DragonFly BSD",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
+    }
+
+    pub fn total_components_count(&self) -> usize {
+        self.records.len()
+    }
+
+    pub fn implemented_components_count(&self) -> usize {
+        self.records
+            .values()
+            .filter(|r| r.status == ComponentParityStatus::Implemented)
+            .count()
     }
 
     pub fn register_component(&mut self, name: &str, distro: &str, status: ComponentParityStatus) {
@@ -2343,7 +2394,9 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 6);
+        assert_eq!(engine.records.len(), 14);
+        assert_eq!(engine.total_components_count(), 14);
+        assert_eq!(engine.implemented_components_count(), 14);
         assert!(engine.is_all_components_implemented());
     }
 
