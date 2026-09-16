@@ -51,6 +51,7 @@ pub mod community;
 pub mod open_source_os_gap_closure;
 pub mod tools;
 pub use open_source_os_gap_closure::*;
+pub use tools::tech_media_extended_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
 pub mod open_source_obsoletion;

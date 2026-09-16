@@ -48,5 +48,14 @@ pub use sovereign_commands::{
     SovereignDevDmesg, SovereignDfDu, SovereignGccToolchain, SovereignInitramfsSystemd,
     SovereignOpenBsdDoas, SovereignSudo, SovereignTopHtop,
 };
+pub mod tech_media_extended_suite;
+pub use tech_media_extended_suite::{
+    AssetStreamingConfig, DriverHealthStatus, EbpfObserverMetrics, FanThermalCurve,
+    GpuPacingMetrics, HwbustersPowerTelemetryEngine, KdnuggetsAiQuantizerEngine,
+    LightweightPodSpec, PowerRailNoiseReport, QuantizationModelProfile,
+    SovereignTechMediaExtendedMasterSuite, StorageCleanupReport, TechSpotGpuAcceleratorEngine,
+    TheNewStackCloudNativeEngine, VectorCacheMetrics, WindowsCentralPcHealthEngine,
+};
+
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
