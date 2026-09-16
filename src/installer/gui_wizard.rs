@@ -19,6 +19,7 @@ pub enum InstallerScreen {
     InstallationProgress,
     CompleteOnboarding,
     Complete,
+    CompleteOnboarding,
 }
 
 pub type InstallerStep = InstallerScreen;

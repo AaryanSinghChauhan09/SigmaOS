@@ -32,6 +32,15 @@ pub enum RunitServiceStatus {
     Failed,
 }
 
+/// Runit Stage
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum RunitStage {
+    #[default]
+    Stage1,
+    Stage2,
+    Stage3,
+}
+
 /// Runit Service Definition
 #[derive(Debug, Clone)]
 pub struct RunitService {

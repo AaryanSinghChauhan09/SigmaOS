@@ -598,6 +598,13 @@ impl Default for SovereignDynamicDevfsEngine {
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
+
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
     pub original_src: [u8; 4],
@@ -891,7 +898,7 @@ impl SovereignJournaldBinaryStorageEngine {
             timestamp_unix_epoch: timestamp,
             priority,
             unit_name: unit,
-            message: msg.to_string(),
+            message: msg,
         });
     }
 

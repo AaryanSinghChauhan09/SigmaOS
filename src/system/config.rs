@@ -111,7 +111,7 @@ impl SystemConfigManager {
 
         // Ensure directory exists
         if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
+            fs::create_dir_all(parent).map_err(|e: std::io::Error| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
         }
 
         let entries = self
