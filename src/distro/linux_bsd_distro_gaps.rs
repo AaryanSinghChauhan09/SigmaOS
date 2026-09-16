@@ -682,53 +682,7 @@ impl Default for DemandPagingSwapEngine {
     }
 }
 
-
-#[derive(Debug)]
-pub struct SovereignStatefulNatEngine {
-    pub conntrack_table: Vec<ConntrackTableEntry>,
-    pub public_ip: [u8; 4],
-}
-
 impl SovereignStatefulNatEngine {
-    pub fn new(public_ip: [u8; 4]) -> Self {
-        Self {
-            conntrack_table: Vec::new(),
-            public_ip,
-        }
-    }
-
-    pub fn create_snat_mapping(
-        &mut self,
-        internal_src: [u8; 4],
-        dst_ip: [u8; 4],
-        src_port: u16,
-        dst_port: u16,
-        _protocol: u8,
-    ) -> ([u8; 4], u16) {
-
-        // Search conntrack
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
-                && c.src_port == src_port
-                && c.original_dst == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConntrackTableEntry {
-                original_src: internal_src,
-                original_dst: dst_ip,
-                src_port,
-                dst_port,
-                translated_ip: self.public_ip,
-                translated_port: src_port,
-                nat_type: NatType::Snat,
-                packets_counter: 1,
-            });
-        }
-        (self.public_ip, src_port)
-    }
-
     pub fn lookup_conntrack(
         &mut self,
         translated_dst_ip: [u8; 4],
