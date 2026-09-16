@@ -82,14 +82,68 @@ pub enum PackageFormat {
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
-        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
-        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
-        else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
-        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
-        else { None }
+        let f = filename.to_lowercase();
+        let trimmed = f.trim();
+
+        if trimmed == "pacman" || trimmed.ends_with(".pkg.tar.xz") || trimmed.ends_with(".pkg.tar.zst") {
+            Some(PackageFormat::Pacman)
+        } else if trimmed == "pup" || trimmed.ends_with(".pup") {
+            Some(PackageFormat::Pup)
+        } else if trimmed == "pet" || trimmed.ends_with(".pet") {
+            Some(PackageFormat::Pet)
+        } else if trimmed.ends_with(".air") {
+            Some(PackageFormat::Air)
+        } else if trimmed.ends_with(".bottle") {
+            Some(PackageFormat::Bottle)
+        } else if trimmed.ends_with(".ipa") {
+            Some(PackageFormat::Ipa)
+        } else if trimmed.ends_with(".ports") {
+            Some(PackageFormat::Ports)
+        } else if trimmed.ends_with(".pkg") {
+            Some(PackageFormat::Pkg)
+        } else if trimmed.ends_with(".aab") {
+            Some(PackageFormat::Aab)
+        } else if trimmed.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if trimmed.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if trimmed.ends_with(".eopkg") {
+            Some(PackageFormat::Eopkg)
+        } else if trimmed.ends_with(".nixpkg") || trimmed.ends_with(".nix") {
+            Some(PackageFormat::Nix)
+        } else if trimmed.ends_with(".portage") || trimmed.ends_with(".ebuild") {
+            Some(PackageFormat::Portage)
+        } else if trimmed.ends_with(".deb") {
+            Some(PackageFormat::Apt)
+        } else if trimmed.ends_with(".rpm") {
+            Some(PackageFormat::Yum)
+        } else if trimmed.ends_with(".tar.gz") || trimmed.ends_with(".tar .gz") || trimmed.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if trimmed.ends_with(".tar.xz") || trimmed.ends_with(".xz") {
+            Some(PackageFormat::TarXz)
+        } else if trimmed.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if trimmed.ends_with(".app") {
+            Some(PackageFormat::AppBundle)
+        } else if trimmed.ends_with(".hap") {
+            Some(PackageFormat::Hap)
+        } else if trimmed.ends_with(".pisi") {
+            Some(PackageFormat::Pisi)
+        } else if trimmed.ends_with(".superdeb") {
+            Some(PackageFormat::Superdeb)
+        } else if trimmed.ends_with(".lzm") {
+            Some(PackageFormat::Lzm)
+        } else if trimmed.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if trimmed.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else if trimmed.ends_with(".sysupdate") {
+            Some(PackageFormat::Sysupdate)
+        } else if trimmed.ends_with(".sigma") {
+            Some(PackageFormat::Sigma)
+        } else {
+            None
+        }
     }
 }
 
