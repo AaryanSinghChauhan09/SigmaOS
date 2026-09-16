@@ -2137,10 +2137,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" => {
-                if pm == "pkg_delete" {
-                    operation = UniversalPmOperation::Remove;
-                }
+            "pkgin" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -3531,5 +3528,46 @@ requires {
         let obsd_manifest = adapter.parse_openbsd_contents(openbsd_contents).unwrap();
         assert_eq!(obsd_manifest.pkgname, "htop");
         assert_eq!(obsd_manifest.version, "3.2.2");
+    }
+
+    #[test]
+    fn test_universal_foreign_pm_dispatch_all_formats() {
+        let dispatcher = UniversalPmCommandDispatcher::new();
+
+        // 1. microdnf
+        let act = dispatcher.dispatch_command("microdnf install htop").unwrap();
+        assert_eq!(act.source_pm, "microdnf");
+        assert_eq!(act.operation, UniversalPmOperation::Install);
+        assert_eq!(act.target_packages, vec!["htop"]);
+
+        // 2. pkg_info
+        let act = dispatcher.dispatch_command("pkg_info zsh").unwrap();
+        assert_eq!(act.source_pm, "pkg_info");
+        assert_eq!(act.operation, UniversalPmOperation::QueryInfo);
+        assert_eq!(act.target_packages, vec!["zsh"]);
+
+        // 3. yay (AUR)
+        let act = dispatcher.dispatch_command("yay -S ripgrep").unwrap();
+        assert_eq!(act.source_pm, "yay");
+        assert_eq!(act.operation, UniversalPmOperation::Install);
+        assert_eq!(act.target_packages, vec!["ripgrep"]);
+
+        // 4. flatpak
+        let act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
+        assert_eq!(act.source_pm, "flatpak");
+        assert_eq!(act.operation, UniversalPmOperation::Install);
+        assert_eq!(act.target_packages, vec!["org.gimp.GIMP"]);
+
+        // 5. spack
+        let act = dispatcher.dispatch_command("spack install gcc").unwrap();
+        assert_eq!(act.source_pm, "spack");
+        assert_eq!(act.operation, UniversalPmOperation::Install);
+        assert_eq!(act.target_packages, vec!["gcc"]);
+
+        // 6. opkg
+        let act = dispatcher.dispatch_command("opkg install dropbear").unwrap();
+        assert_eq!(act.source_pm, "opkg");
+        assert_eq!(act.operation, UniversalPmOperation::Install);
+        assert_eq!(act.target_packages, vec!["dropbear"]);
     }
 }

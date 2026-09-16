@@ -64,10 +64,13 @@ fn main() {
         "install" => cmd_install(&args[1..]),
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
-        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "apk" | "pkg" | "pkg_add"
-        | "pkg_delete" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
-        | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env" | "guix"
-        | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" => {
+        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "microdnf" | "pacman" | "yay" | "paru"
+        | "pikaur" | "trizen" | "aura" | "apk" | "pkg" | "pkg_add" | "pkg_delete" | "pkg_info"
+        | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove" | "emerge" | "ebuild"
+        | "eopkg" | "moss" | "nix" | "nix-env" | "guix" | "slackpkg" | "installpkg" | "removepkg"
+        | "kiss" | "cpt" | "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg"
+        | "flatpak" | "snap" | "opkg" | "ipkg" | "pkgman" | "swupd" | "slapt-get" | "urpmi"
+        | "pisi" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),
@@ -179,8 +182,8 @@ fn cmd_install(args: &[String]) {
     for arg in args {
         match arg.as_str() {
             "--apt" | "--deb" => forced_format = Some(PackageFormat::Apt),
-            "--dnf" | "--rpm" | "--yum" => forced_format = Some(PackageFormat::Yum),
-            "--pacman" | "--arch" => forced_format = Some(PackageFormat::Pacman),
+            "--dnf" | "--rpm" | "--yum" | "--microdnf" => forced_format = Some(PackageFormat::Yum),
+            "--pacman" | "--arch" | "--yay" | "--paru" => forced_format = Some(PackageFormat::Pacman),
             "--apk" | "--alpine" => forced_format = Some(PackageFormat::Apk),
             "--pkg" | "--bsd" | "--freebsd" => forced_format = Some(PackageFormat::Pkg),
             "--xbps" | "--void" => forced_format = Some(PackageFormat::Xbps),
@@ -193,7 +196,7 @@ fn cmd_install(args: &[String]) {
             "--nix" => forced_format = Some(PackageFormat::Nix),
             "--guix" => forced_format = Some(PackageFormat::Guix),
             "--haiku" | "--hpkg" => forced_format = Some(PackageFormat::Hpkg),
-            "--slackware" | "--slackbuild" => forced_format = Some(PackageFormat::SlackBuild),
+            "--slackware" | "--slackbuild" | "--slapt-get" => forced_format = Some(PackageFormat::SlackBuild),
             "--pkgsrc" => forced_format = Some(PackageFormat::Pkgsrc),
             "--moss" => forced_format = Some(PackageFormat::Moss),
             "--tcz" => forced_format = Some(PackageFormat::Tcz),
@@ -222,6 +225,9 @@ fn cmd_install(args: &[String]) {
             "--ips" | "--p5p" => forced_format = Some(PackageFormat::SolarisIps),
             "--nar" => forced_format = Some(PackageFormat::GuixNar),
             "--openbsd" => forced_format = Some(PackageFormat::OpenBsdPkg),
+            "--spack" | "--conan" | "--pip" | "--cargo" | "--gem" | "--nuget" | "--vcpkg" | "--urpmi" => {
+                forced_format = Some(PackageFormat::Sovereign)
+            }
             a if a.starts_with('-') => {
                 // Ignore operational flags like -y or --yes
             }
