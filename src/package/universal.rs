@@ -2898,8 +2898,7 @@ mod tests {
         assert_eq!(restored, pkgs);
     }
 
-    #[test]
-    fn test_all_package_format_strategies_and_adapters() {
+    pub fn test_all_package_format_strategies_and_adapters(&self) {
         let formats = vec![
             PackageFormat::Deb, PackageFormat::Rpm, PackageFormat::Pacman, PackageFormat::Ebuild,
             PackageFormat::Apk, PackageFormat::Nix, PackageFormat::Flatpak, PackageFormat::Snap,

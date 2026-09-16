@@ -1,3 +1,11 @@
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TahrirUserAvatar {
+    pub user_id: String,
+    pub email_sha256: String,
+    pub avatar_data: Vec<u8>,
+    pub mime_type: String,
+}
+
 use std::format;
 use std::vec;
 // SigmaOS Fedora Clean-Room Parity Subsystem
@@ -435,6 +443,7 @@ impl BodhiUpdateTriage {
                 self.stable_gated.insert(update_id.to_string(), false);
             } else if current_karma >= up.stable_karma_threshold
                 && up.ci_test_result != BodhiTestResult::Failed
+                && up.days_in_testing >= up.min_testing_days
             {
                 up.status = BodhiUpdateStatus::Stable;
                 self.stable_gated.insert(update_id.to_string(), true);
@@ -4427,7 +4436,8 @@ impl FedoraBadgesEngine {
             user_badges.push(badge_id.to_string());
         }
 
-        let total_points = user_badges
+        let badge_ids: Vec<String> = user_badges.clone();
+        let total_points = badge_ids
             .iter()
             .filter_map(|id| self.badges.get(id))
             .map(|b| b.points)
@@ -4693,16 +4703,17 @@ mod tests {
     #[test]
     fn test_fedora_dnf_resolver() {
         let mut resolver = DnfPackageResolver::new();
-        resolver.add_package("kernel", "6.5.0", &[]);
-        assert!(resolver.resolve("kernel").is_ok());
+        resolver.sync_repodata();
+        resolver.register_rpm("kernel", vec![]);
+        assert!(resolver.resolve_and_install("kernel").is_ok());
     }
 
     #[test]
     fn test_fedora_koji_build_server() {
         let mut koji = KojiBuildServer::new();
-        let task_id = koji.submit_build("coreutils", "9.3-1.fc39", "x86_64");
+        let task_id = koji.submit_task("coreutils.src.rpm", "x86_64").unwrap();
         assert_eq!(task_id, 1);
-        assert_eq!(koji.tasks.len(), 1);
+        assert_eq!(koji.build_queue.len(), 1);
     }
 
     #[test]
@@ -4714,6 +4725,7 @@ mod tests {
             "254.1-1.fc39",
             BodhiUpdateType::Bugfix,
             "sovereign",
+            false,
         );
         assert_eq!(bodhi.get_update(update_id).unwrap().title, "systemd-254.1-1.fc39");
     }
@@ -4731,27 +4743,27 @@ mod tests {
     #[test]
     fn test_fedora_dracut_initramfs() {
         let mut dracut = FedoraDracutInitramfsEngine::new("6.5.12-200.fc38.x86_64");
-        dracut.add_module("base", 10);
-        dracut.add_module("kernel-modules", 20);
-        dracut.add_module("systemd", 30);
+        dracut.include_module("base", "pre-pivot", &["ext4"]);
+        dracut.include_module("kernel-modules", "pre-pivot", &["nvme"]);
+        dracut.include_module("systemd", "cmdline", &[]);
 
-        let img = dracut.build_initramfs();
+        let img = dracut.generate_initramfs_img().unwrap();
         assert!(img.len() > 0);
     }
 
     #[test]
     fn test_fedora_abrt_crash_daemon() {
         let mut abrt = FedoraAbrtCrashDaemon::new();
-        let report_id = abrt.capture_crash(
-            1042,
-            "gnome-shell",
-            11,
-            "SIGSEGV in st_widget_get_theme_node()",
-            &["#0 0x00007f1234 in st_widget_get_theme_node ()", "#1 0x00007f5678 in main ()"],
+        let report = abrt.capture_crash(
+            "/usr/bin/gnome-shell",
+            "SIGSEGV",
+            "st_widget_get_theme_node()",
+            "6.8.0-1.fc40",
+            1700000000,
         );
 
-        assert_eq!(report_id, 1);
-        assert_eq!(abrt.crash_reports.len(), 1);
+        assert_eq!(report.crash_id, "abrt-00000001");
+        assert_eq!(abrt.captured_crashes.len(), 1);
     }
 
     #[test]

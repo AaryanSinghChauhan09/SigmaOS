@@ -149,6 +149,18 @@ impl PkgBuild {
             None
         }
     }
+
+    fn parse_array(value: &str) -> Vec<String> {
+        let trimmed = value.trim().trim_start_matches('(').trim_end_matches(')');
+        let mut result = Vec::new();
+        for item in trimmed.split_whitespace() {
+            let clean = item.trim_matches('"').trim_matches('\'');
+            if !clean.is_empty() {
+                result.push(String::from(clean));
+            }
+        }
+        result
+    }
 }
 
 impl Default for PkgBuild {
@@ -715,29 +727,58 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
+pub struct ReflectorMirrorlistRanker {
+    pub mirrors: Vec<(String, u32)>,
+}
 
+impl ReflectorMirrorlistRanker {
+    pub fn new() -> Self {
+        let mut mirrors = Vec::new();
+        mirrors.push(("https://mirror.rackspace.com/archlinux/".to_string(), 18));
+        mirrors.push(("https://arch.mirror.constant.com/".to_string(), 25));
+        mirrors.push(("https://geo.mirror.pkgbuild.com/".to_string(), 12));
 
-// ============================================================================
-// Arch Linux Parity Engines: devtools, pkgctl, archweb, archinstall, arch-wiki
-// ============================================================================
+        Self { mirrors }
+    }
 
-/// Arch Linux devtools Cleanroom Chroot Build Engine
+    pub fn rank_top_mirrors(&mut self) -> &[(String, u32)] {
+        self.mirrors.sort_by(|a, b| a.1.cmp(&b.1));
+        &self.mirrors
+    }
+}
+
+impl Default for ReflectorMirrorlistRanker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ArchChrootProfile {
     pub target: String,
     pub chroot_dir: String,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct ArchCdevtoolsEngine {
     pub profiles: Vec<ArchChrootProfile>,
+    pub is_cleanroom_active: bool,
 }
 
 impl ArchCdevtoolsEngine {
     pub fn new() -> Self {
-        let mut engine = Self { profiles: Vec::new() };
-        engine.profiles.push(ArchChrootProfile { target: "extra-x86_64-build".to_string(), chroot_dir: "/var/lib/archbuild/extra-x86_64".to_string() });
-        engine.profiles.push(ArchChrootProfile { target: "multilib-build".to_string(), chroot_dir: "/var/lib/archbuild/multilib".to_string() });
+        let mut engine = Self {
+            profiles: Vec::new(),
+            is_cleanroom_active: true,
+        };
+        engine.profiles.push(ArchChrootProfile {
+            target: "extra-x86_64-build".to_string(),
+            chroot_dir: "/var/lib/archbuild/extra-x86_64".to_string(),
+        });
+        engine.profiles.push(ArchChrootProfile {
+            target: "multilib-build".to_string(),
+            chroot_dir: "/var/lib/archbuild/multilib".to_string(),
+        });
         engine
     }
 
@@ -752,7 +793,6 @@ impl ArchCdevtoolsEngine {
 
 }
 
-/// Arch Linux pkgctl Packaging & Git Repo Engine
 #[derive(Debug, Clone)]
 pub struct ArchPkgctlEngine {
     pub active_repos: Vec<String>,
@@ -769,12 +809,21 @@ impl ArchPkgctlEngine {
         repo
     }
 
+    pub fn split_package_repo(&self, pkg_name: &str) -> String {
+        format!("https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git", pkg_name)
+    }
+
     pub fn release_package(&self, pkg_name: &str, tag: &str) -> String {
         format!("pkgctl release --pkg {} --tag {}", pkg_name, tag)
     }
 }
 
-/// Arch Linux archweb Package Search Portal
+impl Default for ArchPkgctlEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ArchwebEntry {
     pub pkgname: String,
@@ -782,7 +831,7 @@ pub struct ArchwebEntry {
     pub maintainer: String,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct ArchArchwebEngine {
     pub entries: Vec<ArchwebEntry>,
 }
@@ -798,9 +847,22 @@ impl ArchArchwebEngine {
     pub fn search(&self, pkg_name: &str) -> Vec<&ArchwebEntry> {
         self.entries.iter().filter(|e| e.pkgname.contains(pkg_name)).collect()
     }
+
+    pub fn query_package(&self, pkg_name: &str) -> Option<String> {
+        if let Some(entry) = self.entries.iter().find(|e| e.pkgname == pkg_name) {
+            Some(format!("{} - Core Repository", entry.pkgname))
+        } else {
+            None
+        }
+    }
 }
 
-/// Arch Linux archinstall Automated Declarative Installer Engine
+impl Default for ArchArchwebEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ArchinstallConfig {
     pub disk_path: String,
@@ -808,7 +870,7 @@ pub struct ArchinstallConfig {
     pub username: String,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct ArchArchinstallEngine {
     pub config: Option<ArchinstallConfig>,
 }
@@ -833,16 +895,25 @@ impl ArchArchinstallEngine {
             Err("Archinstall: Missing configuration")
         }
     }
+
+    pub fn execute_installation_profile(&self, profile_str: &str) -> bool {
+        !profile_str.is_empty() && !profile_str.contains("ntfs")
+    }
 }
 
-/// Arch Linux arch-wiki-docs Offline Search Engine
+impl Default for ArchArchinstallEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct WikiArticle {
     pub title: String,
     pub content: String,
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct ArchWikiOfflineEngine {
     pub articles: Vec<WikiArticle>,
 }
@@ -859,8 +930,19 @@ impl ArchWikiOfflineEngine {
         let q = query.to_lowercase();
         self.articles.iter().filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)).collect()
     }
+
+    pub fn search_offline_wiki(&self, query: &str) -> String {
+        format!("ArchWiki Offline Entry for {}", query)
+    }
 }
 
+impl Default for ArchWikiOfflineEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
