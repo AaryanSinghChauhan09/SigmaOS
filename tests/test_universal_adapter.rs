@@ -182,14 +182,14 @@ fn test_universal_adapter_all_formats() {
         .absorb_and_register("redis.pkg", freebsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge
         .absorb_and_register("tmux.tgz", openbsd_data.as_bytes())
         .unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -225,7 +225,7 @@ fn test_universal_adapter_all_formats() {
     assert_eq!(microdnf_action.target_packages, vec!["httpd"]);
 
     // 8. Dependency Mapper Canonicalization
-    let dep_mapper = universal_adapter::UniversalDependencyMapper::new();
+    let dep_mapper = UniversalDependencyMapper::new();
     assert_eq!(dep_mapper.to_canonical_name("libffi-dev"), "libffi");
     assert_eq!(dep_mapper.to_canonical_name("glib2-devel"), "glib");
     assert_eq!(dep_mapper.to_canonical_name("libpcre2-dev"), "pcre");
