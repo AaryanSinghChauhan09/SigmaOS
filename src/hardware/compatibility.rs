@@ -2,6 +2,7 @@
 //! Implements supported legacy, ancient (1980s/1990s), and modern hardware devices compatibility matrix.
 
 
+use std::collections::BTreeMap;
 use std::boxed::Box;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -19,15 +20,15 @@ pub enum AcpiPowerState {
 }
 
 pub struct SimpleAcpiManager {
-    pub irq_routing: crate::klib::BTreeMap<u32, u32>,
-    pub power_states: crate::klib::BTreeMap<DeviceID, AcpiPowerState>,
+    pub irq_routing: BTreeMap<u32, u32>,
+    pub power_states: BTreeMap<DeviceID, AcpiPowerState>,
 }
 
 impl SimpleAcpiManager {
     pub fn new() -> Self {
         Self {
-            irq_routing: crate::klib::BTreeMap::new(),
-            power_states: crate::klib::BTreeMap::new(),
+            irq_routing: BTreeMap::new(),
+            power_states: BTreeMap::new(),
         }
     }
 

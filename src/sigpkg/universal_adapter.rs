@@ -58,6 +58,7 @@ pub struct SnapcraftManifest {
     pub summary: String,
     pub confinement: String,
     pub plugs: Vec<String>,
+    pub slots: Vec<String>,
 }
 
 /// Description of Haiku .hpkg Manifest
@@ -1674,7 +1675,7 @@ impl UniversalDependencyMapper {
     /// Translates a foreign package dependency name to a canonical Sigma-pkg dependency name
     pub fn to_canonical_name(&self, foreign_name: &str) -> String {
         let raw = foreign_name.trim().to_lowercase();
-        let clean_prefix = if let Some(stripped) = raw.strip_prefix("so:") {
+        let clean = if let Some(stripped) = raw.strip_prefix("so:") {
             if stripped.starts_with("libc.") {
                 "libc".to_string()
             } else {
@@ -1686,7 +1687,7 @@ impl UniversalDependencyMapper {
             raw.clone()
         };
 
-        match clean {
+        match clean.as_str() {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
             "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {

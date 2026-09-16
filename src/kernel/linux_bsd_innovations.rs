@@ -4394,6 +4394,8 @@ pub struct VoidLinuxRunitSupervisor {
     pub services: HashMap<String, VoidRunitService>,
 }
 
+pub type VoidRunitInit = VoidLinuxRunitSupervisor;
+
 impl VoidLinuxRunitSupervisor {
     pub fn new() -> Self {
         Self {

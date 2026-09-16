@@ -1,7 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
@@ -18,15 +18,17 @@ use crate::compatibility::{
 #[cfg(not(test))]
 use crate::customization::{CustomizationEngine, Theme};
 #[cfg(not(test))]
-use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
+use crate::dashboard::{DashboardWidget, MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
 #[cfg(not(test))]
 use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
+#[cfg(not(test))]
+use crate::virtualization::{VirtualizationOrchestrator, VirtualizationTech, VirtualMachine, Container};
 #[cfg(not(test))]
 use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
 #[cfg(not(test))]
 use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
-    ZshSyntaxHighlighter, UniversalShellCompatibilityEngine,
+    ZshSyntaxHighlighter, UniversalShellCompatibilityEngine, ShellArithmeticEvaluator,
 };
 #[cfg(not(test))]
 use crate::shell::{
@@ -1738,7 +1740,7 @@ impl ShellRepl {
                     "high_contrast" | "highcontrast" => AccessibilityFeature::HighContrast,
                     "screen_reader" | "screenreader" => AccessibilityFeature::ScreenReader,
                     "magnifier" => AccessibilityFeature::Magnifier,
-                    "sticky_keys" | "stickykeys" => AccessibilityFeature::StickyKeys,
+                    "sticky_keys" | "stickykeys" => AccessibilityFeature::KeyboardNavigation,
                     _ => AccessibilityFeature::ScreenReader,
                 };
                 #[cfg(not(test))]
@@ -1746,7 +1748,7 @@ impl ShellRepl {
                     feature,
                     enabled,
                     intensity: 1.0,
-                    custom_params: std::collections::BTreeMap::new(),
+                    custom_params: BTreeMap::<String, String>::new(),
                 };
                 #[cfg(test)]
                 let s = AccessibilitySetting { enabled };
@@ -1840,10 +1842,9 @@ impl ShellRepl {
                 let v_tech = match tech.to_lowercase().as_str() {
                     "docker" => VirtualizationTech::Docker,
                     "podman" => VirtualizationTech::Podman,
-                    "lxc" => VirtualizationTech::Lxc,
+                    "lxc" | "lxd" => VirtualizationTech::LXC,
                     "xen" => VirtualizationTech::Xen,
-                    "bhyve" => VirtualizationTech::Bhyve,
-                    _ => VirtualizationTech::QemuKvm,
+                    _ => VirtualizationTech::KVM,
                 };
                 #[cfg(not(test))]
                 let mut vm = VirtualMachine::new(id.clone(), name.clone(), v_tech).with_resources(4, 4096, 40);
@@ -1880,15 +1881,15 @@ impl ShellRepl {
             ShellCommand::PlatformRun { name, platform, format } => {
                 #[cfg(not(test))]
                 let b_format = match format.to_lowercase().as_str() {
-                    "exe" | "pe" | "pe32" | "pe32plus" => BinaryFormat::Pe32Plus,
-                    "macho" | "dmg" => BinaryFormat::MachO64,
-                    "wasm" => BinaryFormat::Wasm32,
-                    _ => BinaryFormat::Elf64,
+                    "exe" | "pe" | "pe32" | "pe32plus" => BinaryFormat::Exe,
+                    "macho" | "dmg" => BinaryFormat::Dmg,
+                    "wasm" | "bin" => BinaryFormat::Bin,
+                    _ => BinaryFormat::Elf,
                 };
                 #[cfg(not(test))]
                 let t_platform = match platform.to_lowercase().as_str() {
                     "windows" | "win32" | "win64" => TargetPlatform::Windows,
-                    "macos" | "darwin" => TargetPlatform::MacOs,
+                    "macos" | "darwin" => TargetPlatform::MacOS,
                     "android" => TargetPlatform::Android,
                     _ => TargetPlatform::Linux,
                 };
@@ -1957,7 +1958,7 @@ impl ShellRepl {
                 }
             }
             ShellCommand::JobFg { job_id } => {
-                match self.job_control.bring_to_foreground(job_id) {
+                match self.job_control.bring_to_foreground(job_id as usize) {
                     Ok(msg) => Ok(msg),
                     Err(_) => Err(format!("fg: Job %{} not found.", job_id)),
                 }

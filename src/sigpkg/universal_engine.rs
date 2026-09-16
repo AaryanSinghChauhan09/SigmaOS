@@ -58,6 +58,11 @@ pub enum PackageFormat {
     Dports,
     SlackBuild,
     Crux,
+    Deb,
+    Rpm,
+    Ebuild,
+    Sysupdate,
+    Sigma,
     Drpm,
     Stratum,
     Ipk,
@@ -73,6 +78,27 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
+}
+
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        if filename.ends_with(".deb") { return Some(PackageFormat::Deb); }
+        if filename.ends_with(".rpm") { return Some(PackageFormat::Rpm); }
+        if filename.ends_with(".tar.gz") || filename.ends_with(".tgz") { return Some(PackageFormat::TarGz); }
+        if filename.ends_with(".tar.xz") { return Some(PackageFormat::TarXz); }
+        if filename.ends_with(".tar") { return Some(PackageFormat::Tar); }
+        if filename.ends_with(".snap") { return Some(PackageFormat::Snap); }
+        if filename.ends_with(".flatpak") { return Some(PackageFormat::Flatpak); }
+        if filename.ends_with(".appimage") || filename.ends_with(".AppImage") { return Some(PackageFormat::AppImage); }
+        if filename.ends_with(".apk") { return Some(PackageFormat::Apk); }
+        if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { return Some(PackageFormat::Pacman); }
+        if filename.ends_with(".dmg") { return Some(PackageFormat::Dmg); }
+        if filename.ends_with(".nix") { return Some(PackageFormat::Nix); }
+        if filename.ends_with(".ebuild") { return Some(PackageFormat::Ebuild); }
+        if filename.ends_with(".txz") { return Some(PackageFormat::Txz); }
+        None
+    }
 }
 
 #[derive(Debug, Clone)]

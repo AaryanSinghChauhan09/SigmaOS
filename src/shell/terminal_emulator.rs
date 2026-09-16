@@ -1027,11 +1027,10 @@ pub struct TerminalSession {
 }
 
 impl TriggerRule {
-    pub fn new(pattern: &str, color: AnsiColor, action: Option<&str>) -> Self {
+    pub fn new(pattern: &str, _color: AnsiColor, action: Option<&str>) -> Self {
         Self {
             pattern: pattern.to_string(),
-            highlight_color: color,
-            action_command: action.map(|a| a.to_string()),
+            action_command: action.unwrap_or("").to_string(),
         }
     }
 }
@@ -1312,7 +1311,7 @@ impl TerminalSession {
     /// Converts an AnsiColor enum value to exact RGB representation based on active TerminalTheme
     pub fn get_color_rgb(&self, color: AnsiColor) -> (u8, u8, u8) {
         match color {
-            AnsiColor::Default => self.theme.fg_color_rgb,
+            AnsiColor::Default => self.theme.foreground,
             AnsiColor::Black => (0, 0, 0),
             AnsiColor::Red => (255, 0, 0),
             AnsiColor::Green => (0, 255, 0),
@@ -1370,7 +1369,6 @@ impl TerminalSession {
         } else {
             None
         }
-        None
     }
 }
 

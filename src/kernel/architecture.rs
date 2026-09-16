@@ -19,29 +19,12 @@ pub enum InstructionCyclePhase {
     Commit,
 }
 
-#[cfg(not(feature = "standalone_test"))]
-use super::structures::ThreadState;
-
-#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ThreadState {
     Ready,
     Running,
     Blocked,
     Terminated,
-}
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86_32,
-    X86_64,
-    AArch64,
-    RiscV32,
-    RiscV64,
-    LoongArch64,
-    PowerPC64,
-    S390x,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -584,6 +567,9 @@ pub enum CpuArchitectureClass {
     AArch64,
     RiscV32,
     RiscV64,
+    LoongArch64,
+    PowerPC64,
+    S390x,
 }
 
 // 6. Unified Architecture Engine

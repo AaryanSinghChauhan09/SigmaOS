@@ -3005,6 +3005,9 @@ pub trait IPackageDeltaStrategy: Send + Sync {
     fn compute_delta(&self, _source: &[u8], target: &[u8]) -> Vec<u8> {
         target.to_vec()
     }
+    fn calculate_delta(&self, old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        self.compute_delta(old_data, new_data)
+    }
     fn apply_delta(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
         self.apply(source, patch)
     }

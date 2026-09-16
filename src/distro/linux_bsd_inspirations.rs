@@ -8,10 +8,7 @@
 #[cfg(not(any(feature = "standalone_test", test)))]
 #[cfg(not(any(feature = "standalone_test", test)))]
 
-// Test environment compatibility: Use std for testing only
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -275,6 +272,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
+            _ => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -375,6 +373,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+            _ => supervisor == ServiceSupervisorType::Systemd,
         };
 
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
@@ -407,6 +406,7 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
+            _ => format!("{}.deb", input_pkg),
         }
     }
 
@@ -447,6 +447,7 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
+            _ => format!("{}.sig", action),
         };
 
         Ok(format!(

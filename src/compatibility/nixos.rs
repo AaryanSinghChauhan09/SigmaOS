@@ -211,7 +211,7 @@ impl NixosConfig {
     }
 
     pub fn get_option(&self, key: &str) -> Option<&ConfigOption> {
-        self.options.get_str(key)
+        self.options.get(key)
     }
 
     pub fn enable_service(&mut self, service: &str) {
@@ -221,7 +221,7 @@ impl NixosConfig {
     }
 
     pub fn disable_service(&mut self, service: &str) {
-        if let Some(config) = self.services.get_mut_str(service) {
+        if let Some(config) = self.services.get_mut(service) {
             config.insert(String::from("enable"), ConfigOption::Boolean(false));
         }
     }
@@ -372,7 +372,7 @@ impl NixChannels {
     }
 
     pub fn set_channel(&mut self, name: &str) -> Result<(), &'static str> {
-        if self.channels.contains_key_str(name) {
+        if self.channels.contains_key(name) {
             self.current_channel = name.to_string();
             Ok(())
         } else {

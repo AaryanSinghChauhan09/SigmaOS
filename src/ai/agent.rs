@@ -1,6 +1,7 @@
 //! OOP-based AI Agent Framework for SigmaOS
 //! Implements AI agent using OOP principles with traits and structs.
 
+use std::collections::BTreeMap;
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};

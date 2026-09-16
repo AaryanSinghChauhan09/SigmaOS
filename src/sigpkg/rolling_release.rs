@@ -3,7 +3,9 @@ use std::vec::Vec;
 // Rolling Release System - Arch Linux Inspired
 // Provides continuous updates without major version bumps
 
-use crate::klib::{hashmap::HashMap, string::SigmaString};
+use std::collections::HashMap;
+use std::string::String;
+type SigmaString = String;
 use crate::sigpkg::Version;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -8,6 +8,7 @@ use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::string::String;
 use std::vec::Vec;
+use crate::kernel::architecture::CpuArchitectureClass;
 
 // 1. Singly, Sequenced, and Circular Doubly Linked Lists
 

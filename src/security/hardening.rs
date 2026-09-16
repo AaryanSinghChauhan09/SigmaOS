@@ -3,9 +3,17 @@
 // W^X enforcement, stack protection, and memory security
 // Inspired by OpenBSD and Linux security mitigations
 
-#[cfg(feature = "standalone_test")]
-use std::vec::Vec;
+use core::sync::atomic::Ordering;
 use core::sync::atomic::AtomicU64;
+
+/// Severity level for intrusion/audit events
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IntrusionSeverity {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
 
 /// Secure Memory Zeroization utility
 /// Overwrites memory containing sensitive keys, credentials, or capability data

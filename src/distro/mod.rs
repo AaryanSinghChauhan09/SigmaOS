@@ -1,11 +1,11 @@
 pub mod omarchy;
+pub mod omarchy_inspiration;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
 pub mod mint_innovations;
 
 pub use omarchy::{
-pub mod parrot_security;
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
     OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
@@ -246,11 +246,10 @@ pub use ultimate_distro_innovations::{
 
 pub mod sovereign_ahead_distro_supremacy;
 pub use sovereign_ahead_distro_supremacy::{
-    AccessRight as CapabilityAccessRight, CarpNodeStatus, CoWBlockExtent,
-    DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchIsaTarget, MicroarchTier,
-    OmniCasBlob, OmniGenRecord, PfsyncConnEntry, PredictiveSchedPolicy, PredictiveTaskDescriptor,
-    ResilientBlockEntry, SchedPolicyKind, SchedTaskDescriptor, SchedTaskState, SecurityMultiOsMask,
-    SimdJitFunctionTarget, SimdJitPatch, SovereignAheadOfDistrosSuite,
+    DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchTier,
+    PredictiveSchedPolicy, PredictiveTaskDescriptor,
+    ResilientBlockEntry, SecurityMultiOsMask,
+    SimdJitFunctionTarget, SovereignAheadOfDistrosSuite,
     SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
     SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine,
     SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,

@@ -60,7 +60,7 @@ pub mod vmm_paging;
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;
 pub use bus::*;
-pub use linux_bsd_innovations::*;
+pub use crate::kernel::linux_bsd_innovations::*;
 pub use pipes::*;
 pub use policy_mechanism::*;
 #[allow(ambiguous_glob_reexports)]
@@ -76,7 +76,7 @@ pub use gap_closing::{
 pub use generation_manager::{Generation, GenerationManager};
 pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use linux_bsd_innovations::{
+pub use crate::kernel::linux_bsd_innovations::{
     AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
     BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
     BsdPfStateTable, CapabilityDerivationTree, CarpSecurityRouter, CgroupResourceLimits, CowBlock,
@@ -125,5 +125,5 @@ pub use namespaces::{
 };
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-// Note: linux_bsd_innovations types fully re-exported via `pub use linux_bsd_innovations::*` above.
+// Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};

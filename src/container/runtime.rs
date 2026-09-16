@@ -93,7 +93,7 @@ impl ContainerInfo {
             pid: None,
             memory_limit: 0,
             cpu_limit: 0,
-            capability: RuntimeCapability::full(),
+            capability: ContainerCapability::full(),
         }
     }
 }
@@ -197,6 +197,23 @@ impl NamespaceConfig {
         self.pid && self.mnt && self.net && self.uts && self.ipc && self.user && self.cgroup
     }
 }
+
+/// Seccomp profile v2 with bitmask-based syscall blocking
+#[derive(Debug, Clone)]
+pub struct SeccompProfileV2 {
+    pub blocked_syscalls: Vec<u32>,
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
+impl SeccompProfileV2 {
+    pub fn new() -> Self {
+        Self { blocked_syscalls: Vec::new(), hardened: false, blocked_syscalls_mask: 0 }
+    }
+}
+
+/// Seccomp profile (alias for SeccompProfileV2)
+pub type SeccompProfile = SeccompProfileV2;
 
 impl SeccompProfileV2 {
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {

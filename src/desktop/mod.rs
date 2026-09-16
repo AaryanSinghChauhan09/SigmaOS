@@ -19,9 +19,9 @@ pub mod weather_panel;
 
 pub use wayland_protocol::*;
 
-pub use sovereign_navigation_engine::*;
+pub use crate::desktop::sovereign_navigation_engine::*;
 
-pub use sovereign_navigation_engine::*;
+pub use crate::desktop::sovereign_navigation_engine::*;
 
 pub use ultimate_distro_desktop::{
     ContainerSplitDirection, Gnome46MutterEngine, KRunnerQueryResult, KdePlasma6Engine,
@@ -69,7 +69,7 @@ pub use zenith_compositor::{
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
 };
 
-pub use sovereign_navigation_engine::{
+pub use crate::desktop::sovereign_navigation_engine::{
     AppCategory, GnomePopLauncherNav, HudActionResult, KrunnerRofiCommandHud, LauncherAppItem,
     NavDirection, RangerDolphinSpatialFileNav, SovereignUniversalNavigationEngine,
     SystemControlNode, TilingWindowManagerNav, WindowNode, YastBsdConfigControlTreeNav,

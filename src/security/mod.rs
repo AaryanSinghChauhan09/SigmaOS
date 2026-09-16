@@ -67,9 +67,8 @@ pub use hardening::{
     MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
-    SecurityRule, SelinuxPermission,
+pub use crate::security::selinux::{
+    PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
@@ -83,7 +82,7 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use vulnerability::{
+pub use crate::security::vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
 };
-pub use vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};
+pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};

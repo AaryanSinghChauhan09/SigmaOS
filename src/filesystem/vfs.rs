@@ -4,8 +4,35 @@
 // Integrates with syscall dispatcher for read, write, open, close operations
 
 use core::fmt;
+use std::collections::{BTreeMap, HashMap};
 use std::string::String;
 use std::vec::Vec;
+use crate::security::{CapabilityToken, Permission};
+
+pub const O_RDONLY: u32 = 0;
+pub const O_WRONLY: u32 = 1;
+pub const O_RDWR: u32 = 2;
+pub const O_CREAT: u32 = 0o100;
+pub const O_EXCL: u32 = 0o200;
+pub const O_TRUNC: u32 = 0o1000;
+pub const O_APPEND: u32 = 0o2000;
+
+/// BSD File Flags (chflags: nodump, uchg, schg, opaque, nounlink, sappnd, uappnd)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct BsdFileFlags {
+    pub nodump: bool,
+    pub immutable: bool,
+    pub append_only: bool,
+    pub opaque: bool,
+    pub nounlink: bool,
+    pub archived: bool,
+}
+
+impl BsdFileFlags {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 
 /// File types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -13,15 +40,17 @@ pub enum FileType {
     Regular,
     Directory,
     SymbolicLink,
+    Symlink,
     CharacterDevice,
     BlockDevice,
     Fifo,
     Socket,
 }
 
-/// File mode bits (permissions)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// File mode bits (permissions + BSD file flags)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct FileMode {
+    // POSIX permission bits
     pub owner_read: bool,
     pub owner_write: bool,
     pub owner_execute: bool,
@@ -31,6 +60,13 @@ pub struct FileMode {
     pub other_read: bool,
     pub other_write: bool,
     pub other_execute: bool,
+    // BSD file flags (chflags)
+    pub nodump: bool,       // Do not dump (backup exclusion)
+    pub immutable: bool,    // File cannot be changed
+    pub append_only: bool,  // File can only be appended to
+    pub opaque: bool,       // Directory is opaque for union mounts
+    pub nounlink: bool,     // File cannot be renamed or deleted
+    pub archived: bool,     // File is archived
 }
 
 impl FileMode {
@@ -45,6 +81,12 @@ impl FileMode {
             other_read: (mode & 0o004) != 0,
             other_write: (mode & 0o002) != 0,
             other_execute: (mode & 0o001) != 0,
+            nodump: false,
+            immutable: false,
+            append_only: false,
+            opaque: false,
+            nounlink: false,
+            archived: false,
         }
     }
 
@@ -274,6 +316,7 @@ pub struct Inode {
     pub inode_number: u64,
     pub file_type: FileType,
     pub mode: FileMode,
+    pub permissions: FilePermissions,
     pub size: u64,
     pub owner: u64,
     pub group: u64,
@@ -295,8 +338,9 @@ impl Inode {
             inode_number,
             file_type,
             mode: FileMode::new(mode),
+            permissions: FilePermissions::from_mode(mode as u16),
             size: 0,
-            owner,
+            owner: 0,
             group: 0,
             created: 0,
             modified: 0,
@@ -319,15 +363,19 @@ pub struct DirEntry {
     pub file_type: FileType,
 }
 
-/// File handle for open files
+/// File Descriptor for open files
 #[derive(Debug, Clone)]
-pub struct FileHandle {
-    pub fd: i32,
+pub struct FileDescriptor {
+    pub fd: u64,
+    pub inode_id: u64,
     pub inode_number: u64,
+    pub offset: u64,
     pub position: u64,
     pub flags: u32,
     pub mode: u32,
 }
+
+pub type FileHandle = FileDescriptor;
 
 /// VFS Error types
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -425,21 +473,115 @@ pub struct MountPoint {
 pub struct VirtualFileSystem {
     filesystems: Vec<(String, u64)>, // (fs_type, block_device_id)
     mounts: Vec<MountPoint>,
-    open_files: Vec<FileHandle>,
-    next_fd: i32,
+    pub open_files: std::collections::BTreeMap<u64, FileDescriptor>,
+    next_fd: u64,
     inode_cache: Vec<(u64, Inode)>,
+    pub inodes: std::collections::BTreeMap<u64, Inode>,
+    pub file_descriptors: std::collections::BTreeMap<u64, FileDescriptor>,
+    pub root_inode: u64,
+    next_inode_id: u64,
 }
 
 impl VirtualFileSystem {
     pub fn new() -> Self {
-        Self {
+        let mut vfs = Self {
             filesystems: Vec::new(),
             mounts: Vec::new(),
-            open_files: Vec::new(),
-            next_fd: 3, // 0, 1, 2 are stdin, stdout, stderr
+            open_files: std::collections::BTreeMap::new(),
+            next_fd: 3,
             inode_cache: Vec::new(),
-        }
+            inodes: std::collections::BTreeMap::new(),
+            file_descriptors: std::collections::BTreeMap::new(),
+            root_inode: 1,
+            next_inode_id: 2,
+        };
+        // Create root inode using actual Inode::new constructor
+        let root = Inode::new(1, FileType::Directory, 0o755);
+        vfs.inodes.insert(1, root);
+        vfs
     }
+
+    /// Create a node (inode) in the VFS
+    pub fn create_node(
+        &mut self,
+        name: &str,
+        file_type: FileType,
+        mode: u32,
+        owner: u64,
+        parent_id: u64,
+    ) -> Result<u64, FsError> {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let mut inode = Inode::new(id, file_type, mode);
+        inode.owner = owner;
+        self.inodes.insert(id, inode);
+        if let Some(parent) = self.inodes.get_mut(&parent_id) {
+            parent.entries.insert(name.to_string(), id);
+        }
+        Ok(id)
+    }
+
+    pub fn create_simple_node(&mut self, _name: String, file_type: FileType) -> u64 {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let inode = Inode::new(id, file_type, 0o644);
+        self.inodes.insert(id, inode);
+        id
+    }
+    pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let mut inode = Inode::new(id, file_type, 0o644);
+        inode.owner = owner;
+        self.inodes.insert(id, inode);
+        Ok(id)
+    }
+
+    pub fn create_symlink(&mut self, target: &str, owner: u64) -> Result<u64, FsError> {
+        let id = self.next_inode_id;
+        self.next_inode_id += 1;
+        let mut inode = Inode::new(id, FileType::SymbolicLink, 0o777);
+        inode.owner = owner;
+        inode.symlink_target = Some(target.to_string());
+        self.inodes.insert(id, inode);
+        Ok(id)
+    }
+
+    pub fn set_xattr(&mut self, inode_id: u64, key: &str, value: &[u8]) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.xattrs.insert(key.to_string(), value.to_vec());
+        Ok(())
+    }
+
+    pub fn get_xattr(&self, inode_id: u64, key: &str) -> Option<Vec<u8>> {
+        let inode = self.inodes.get(&inode_id)?;
+        inode.xattrs.get(key).cloned()
+    }
+
+    pub fn get_inode(&self, id: u64) -> Option<&Inode> {
+        self.inodes.get(&id)
+    }
+
+    pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
+        if !self.inodes.contains_key(&inode_id) {
+            return Err(FsError::NotFound);
+        }
+        let fd = self.next_fd;
+        self.next_fd += 1;
+        let handle = FileDescriptor {
+            fd,
+            inode_id,
+            inode_number: inode_id,
+            offset: 0,
+            position: 0,
+            flags,
+            mode: 0o644,
+        };
+        self.open_files.insert(fd, handle.clone());
+        self.file_descriptors.insert(fd, handle);
+        Ok(fd)
+    }
+
 
     /// Creates a hard link pointing directly to the same underlying file Inode
     pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
@@ -448,6 +590,7 @@ impl VirtualFileSystem {
         inode.hard_links_count = inode.link_count;
         Ok(())
     }
+
 
     /// Mount filesystem at path
     pub fn mount(&mut self, path: String, fs_type: String) -> Result<(), VfsError> {
@@ -485,20 +628,22 @@ impl VirtualFileSystem {
             return Err(VfsError::TooManyOpenFiles);
         }
 
-        // For now, create a stub file handle
         let fd = self.next_fd;
         self.next_fd += 1;
 
-        let handle = FileHandle {
+        let handle = FileDescriptor {
             fd,
-            inode_number: 0, // Would be populated by actual filesystem
+            inode_id: 0,
+            inode_number: 0,
+            offset: 0,
             position: 0,
             flags,
             mode,
         };
 
-        self.open_files.push(handle);
-        Ok(fd)
+        self.open_files.insert(fd, handle.clone());
+        self.file_descriptors.insert(fd, handle);
+        Ok(fd as i32)
     }
 
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
@@ -508,6 +653,10 @@ impl VirtualFileSystem {
 
         self.file_descriptors.remove(&fd);
         Ok(())
+    }
+
+    pub fn close(&mut self, fd: i32) -> Result<(), FsError> {
+        self.close_file(fd as u64)
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
@@ -639,16 +788,21 @@ impl VirtualFileSystem {
                 should_delete = true;
             }
         } else {
-            Err(VfsError::BadFileDescriptor)
+            return Err(FsError::NotFound);
         }
+
+        if should_delete {
+            self.inodes.remove(&inode_id);
+        }
+        Ok(())
     }
 
     /// Read from file descriptor
     pub fn read(&mut self, fd: i32, buffer: &mut [u8]) -> Result<usize, VfsError> {
-        if let Some(handle) = self.open_files.iter_mut().find(|h| h.fd == fd) {
-            // Stub implementation - would read from actual filesystem
-            let bytes_read = buffer.len().min(512); // Limit read size
+        if let Some(handle) = self.open_files.get_mut(&(fd as u64)) {
+            let bytes_read = buffer.len().min(512);
             handle.position += bytes_read as u64;
+            handle.offset = handle.position;
             Ok(bytes_read)
         } else {
             Err(VfsError::BadFileDescriptor)
@@ -657,10 +811,10 @@ impl VirtualFileSystem {
 
     /// Write to file descriptor
     pub fn write(&mut self, fd: i32, data: &[u8]) -> Result<usize, VfsError> {
-        if let Some(handle) = self.open_files.iter_mut().find(|h| h.fd == fd) {
-            // Stub implementation - would write to actual filesystem
-            let bytes_written = data.len().min(512); // Limit write size
+        if let Some(handle) = self.open_files.get_mut(&(fd as u64)) {
+            let bytes_written = data.len();
             handle.position += bytes_written as u64;
+            handle.offset = handle.position;
             Ok(bytes_written)
         } else {
             Err(VfsError::BadFileDescriptor)
@@ -776,14 +930,17 @@ impl VirtualFileSystem {
 
         let fd = self.next_fd;
         self.next_fd += 1;
-        self.open_files.insert(
+        let handle = FileDescriptor {
             fd,
-            FileDescriptor {
-                inode_id,
-                position: 0,
-                flags,
-            },
-        );
+            inode_id,
+            inode_number: inode_id,
+            offset: 0,
+            position: 0,
+            flags,
+            mode: 0o644,
+        };
+        self.open_files.insert(fd, handle.clone());
+        self.file_descriptors.insert(fd, handle);
 
         Ok(fd)
     }
@@ -1009,3 +1166,5 @@ mod tests {
         assert_eq!(vfs.canonicalize_path("/home/user", ".."), "/home");
     }
 }
+
+pub type VirtualFilesystem = VirtualFileSystem;

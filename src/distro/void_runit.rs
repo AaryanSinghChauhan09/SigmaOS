@@ -9,19 +9,19 @@ extern crate alloc;
 
 
 
-#[cfg(not(test))]
 use std::collections::BTreeMap;
-#[cfg(not(test))]
 use std::string::String;
-#[cfg(not(test))]
 use std::vec::Vec;
 
-#[cfg(test)]
-use std::collections::BTreeMap;
-#[cfg(test)]
-use std::string::String;
-#[cfg(test)]
-use std::vec::Vec;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum RunitStage {
+    #[default]
+    Stage1,
+    Stage2,
+    Stage3,
+}
+
+pub type ServiceState = RunitServiceStatus;
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -42,6 +42,7 @@ pub struct RunitService {
     pub auto_restart: bool,
     pub health_check_failures: u32,
     pub max_allowed_failures: u32,
+    pub dependencies: Vec<String>,
 }
 
 impl RunitService {
@@ -53,7 +54,13 @@ impl RunitService {
             auto_restart,
             health_check_failures: 0,
             max_allowed_failures,
+            dependencies: Vec::new(),
         }
+    }
+
+    pub fn with_dependencies(mut self, deps: Vec<String>) -> Self {
+        self.dependencies = deps;
+        self
     }
 
     pub fn start(&mut self) -> bool {
@@ -94,12 +101,24 @@ impl RunitService {
 #[derive(Debug, Default, Clone)]
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
+    pub stage: RunitStage,
+    pub current_stage_num: u32,
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
             services: BTreeMap::new(),
+            stage: RunitStage::Stage1,
+            current_stage_num: 1,
+        }
+    }
+
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(s) = self.services.get_mut(name) {
+            s.start()
+        } else {
+            false
         }
     }
 
@@ -173,6 +192,10 @@ impl RunitSupervisor {
         } else {
             false
         }
+    }
+
+    fn can_stop_service(&self, _name: &str, _stopped: &[String]) -> bool {
+        true
     }
 
     pub fn stop_service(&mut self, name: &str) -> bool {

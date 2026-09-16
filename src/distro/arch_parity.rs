@@ -2,12 +2,11 @@
 // Implements PKGBUILD parsing, makepkg compiler parity, ALPM database,
 // Pacman engine, mkinitcpio initramfs builder, archiso, and reflector mirror ranker.
 
-#![no_std]
 
 
 
-use crate::klib::{BTreeMap, String, ToString, Vec};
-use std::string::String;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
 use core::cell::Cell;
@@ -180,6 +179,58 @@ impl AlpmDatabase {
         Ok(())
     }
 
+    /// Resolve dependencies of a package and return the correct installation order.
+    /// Returns Err if a dependency is missing and cannot be resolved, or if a dependency cycle is detected.
+    pub fn resolve_dependencies(&self, root_pkgname: &str) -> Result<Vec<String>, String> {
+        let mut resolved = Vec::new();
+        let mut visiting = Vec::new();
+        let mut visited = Vec::new();
+
+        self.dfs_resolve(
+            &root_pkgname.to_string(),
+            &mut visiting,
+            &mut visited,
+            &mut resolved,
+        )?;
+
+        Ok(resolved)
+    }
+
+    fn dfs_resolve(
+        &self,
+        pkgname: &String,
+        visiting: &mut Vec<String>,
+        visited: &mut Vec<String>,
+        resolved: &mut Vec<String>,
+    ) -> Result<(), String> {
+        if visited.contains(pkgname) {
+            return Ok(());
+        }
+
+        if visiting.contains(pkgname) {
+            return Err(format!("Dependency cycle detected: {}", pkgname));
+        }
+
+        visiting.push(pkgname.clone());
+
+        if let Some(pkg) = self.packages.get(pkgname) {
+            for dep in &pkg.depends {
+                self.dfs_resolve(dep, visiting, visited, resolved)?;
+            }
+        } else {
+            return Err(format!("Missing dependency: {}", pkgname));
+        }
+
+        if let Some(pos) = visiting.iter().position(|x| x == pkgname) {
+            visiting.remove(pos);
+        }
+        visited.push(pkgname.clone());
+        resolved.push(pkgname.clone());
+
+        Ok(())
+    }
+}
+
 impl Default for AlpmDatabase {
     fn default() -> Self {
         Self::new()
@@ -312,65 +363,6 @@ impl Default for ReflectorMirrorlistRanker {
     }
 }
 
-        self.dfs_resolve(
-            &root_pkgname.to_string(),
-            &mut visiting,
-            &mut visited,
-            &mut resolved,
-        )?;
-
-    #[test]
-    fn test_pkgbuild_parsing() {
-        let content =
-            "pkgname=\"neovim-git\"\npkgver=\"0.10.0\"\npkgrel=3\npkgdesc=\"Sovereign text editor\"\n";
-        let pkg = PkgBuild::parse(content).unwrap();
-        assert_eq!(pkg.pkgname.as_str(), "neovim-git");
-        assert_eq!(pkg.pkgver.as_str(), "0.10.0");
-        assert_eq!(pkg.pkgrel, 3);
-        assert_eq!(pkg.pkgdesc.as_str(), "Sovereign text editor");
-    }
-
-    fn dfs_resolve(
-        &self,
-        pkgname: &String,
-        visiting: &mut Vec<String>,
-        visited: &mut Vec<String>,
-        resolved: &mut Vec<String>,
-    ) -> Result<(), String> {
-        if visited.contains(pkgname) {
-            return Ok(());
-        }
-
-        if visiting.contains(pkgname) {
-            return Err(format!("Dependency cycle detected: {}", pkgname));
-        }
-
-        visiting.push(pkgname.clone());
-
-        if let Some(pkg) = self.packages.get(pkgname) {
-            for dep in &pkg.depends {
-                self.dfs_resolve(dep, visiting, visited, resolved)?;
-            }
-        } else {
-            return Err(format!("Missing dependency: {}", pkgname));
-        }
-
-        if let Some(pos) = visiting.iter().position(|x| x == pkgname) {
-            visiting.remove(pos);
-        }
-        visited.push(pkgname.clone());
-        resolved.push(pkgname.clone());
-
-        Ok(())
-    }
-}
-
-impl Default for AlpmDatabase {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Representation of an Arch Linux mirror for ranking
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ArchMirror {
@@ -450,9 +442,7 @@ impl ArchCdevtoolsEngine {
         }
     }
 
-    pub fn build_in_chroot(&self, env: &str, pkg_name: &str) -> Result<String, &'static str> {
-        Ok(format!("arch-nspawn {}/{} {}", self.chroot_path, env, pkg_name))
-    }
+
 }
 
 /// Arch Linux pkgctl Packaging & Git Repo Engine
@@ -585,31 +575,18 @@ impl ArchWikiOfflineEngine {
 }
 
 mod tests {
-    #[test]
-    fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
-        let devtools = ArchCdevtoolsEngine::default();
-        let cmd = devtools.build_in_chroot("extra-x86_64-build", "curl").unwrap();
-        assert!(cmd.contains("arch-nspawn"));
-
-        let pkgctl = ArchPkgctlEngine::default();
-        let repo_url = pkgctl.clone_pkg_repo("nginx");
-        assert!(repo_url.contains("gitlab.archlinux.org"));
-
-        let archweb = ArchArchwebEngine::new();
-        let res = archweb.search("pacman");
-        assert_eq!(res.len(), 1);
-
-        let mut installer = ArchArchinstallEngine::default();
-        installer.set_config("/dev/nvme0n1", "desktop", "sovereign");
-        let inst_cmd = installer.execute_installation().unwrap();
-        assert!(inst_cmd.contains("archinstall"));
-
-        let wiki = ArchWikiOfflineEngine::new();
-        let articles = wiki.search("pacman");
-        assert_eq!(articles.len(), 1);
-    }
-
     use super::*;
+
+    #[test]
+    fn test_pkgbuild_parsing() {
+        let content =
+            "pkgname=\"neovim-git\"\npkgver=\"0.10.0\"\npkgrel=3\npkgdesc=\"Sovereign text editor\"\n";
+        let pkg = PkgBuild::parse(content).unwrap();
+        assert_eq!(pkg.pkgname.as_str(), "neovim-git");
+        assert_eq!(pkg.pkgver.as_str(), "0.10.0");
+        assert_eq!(pkg.pkgrel, 3);
+        assert_eq!(pkg.pkgdesc.as_str(), "Sovereign text editor");
+    }
 
     #[test]
     fn test_arch_devtools_pkgctl_archweb_archinstall_wiki() {
@@ -851,4 +828,22 @@ sha256sums=('SKIP')
 
 
 
+}
+
+/// Arch Linux svntogit Git repository integration engine
+#[derive(Debug, Clone, Default)]
+pub struct SvntogitPackageRepo {
+    pub repo_name: String,
+    pub package_names: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SovereignSvntogitEngine {
+    pub repositories: Vec<SvntogitPackageRepo>,
+}
+
+impl SovereignSvntogitEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
 }

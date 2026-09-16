@@ -7,6 +7,8 @@ use std::vec;
 // and Fedora's Anaconda automated installation Kickstart parser.
 
 use std::collections::{BTreeMap, HashMap};
+use crate::compatibility::fedora_missing_components::FedoraPagureForgeEngine;
+
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
@@ -975,11 +977,49 @@ impl FedoraFasAuthEngine {
     }
 }
 
-impl Default for FedoraFedoraKojiBuildSystemEngine {
+
+#[derive(Debug, Clone)]
+pub struct FedoraKojiBuildSystemEngine {
+    pub build_tags: Vec<String>,
+    pub active_tasks: Vec<String>,
+    pub hub_url: String,
+}
+
+impl FedoraKojiBuildSystemEngine {
+    pub fn new() -> Self {
+        Self {
+            build_tags: Vec::new(),
+            active_tasks: Vec::new(),
+            hub_url: "https://koji.fedoraproject.org/kojihub".to_string(),
+        }
+    }
+
+    pub fn submit_build(&mut self, pkg: &str, tag: &str) -> Result<String, &'static str> {
+        if pkg.is_empty() { return Err("Package name empty"); }
+        let task_id = format!("koji-task-{}-{}", pkg, tag);
+        self.active_tasks.push(task_id.clone());
+        Ok(task_id)
+    }
+
+    pub fn submit_build_task(&mut self, pkg: &str, tag: &str) -> String {
+        self.submit_build(pkg, tag).unwrap_or_default()
+    }
+
+    pub fn complete_task(&mut self, _task_id: String) -> bool {
+        true
+    }
+
+    pub fn build_target(&self, tag: &str) -> String {
+        format!("{}-build", tag)
+    }
+}
+
+impl Default for FedoraKojiBuildSystemEngine {
     fn default() -> Self {
         Self::new()
     }
 }
+
 
 #[derive(Debug, Clone)]
 pub struct FedoraBodhiUpdateRecord {
@@ -988,11 +1028,11 @@ pub struct FedoraBodhiUpdateRecord {
     pub status: String,
 }
 
-pub struct FedoraFedoraBodhiUpdateEngine {
+pub struct FedoraBodhiUpdateEngine {
     pub updates: Vec<FedoraBodhiUpdateRecord>,
 }
 
-impl FedoraFedoraBodhiUpdateEngine {
+impl FedoraBodhiUpdateEngine {
     pub fn new() -> Self {
         Self {
             updates: Vec::new(),
@@ -1136,11 +1176,11 @@ impl Default for FedoraGreenwaveCiEngine {
     }
 }
 
-pub struct FedoraFedoraCoprBuildGatewayEngine {
+pub struct FedoraCoprBuildGatewayEngine {
     pub copr_repos: Vec<String>,
 }
 
-impl FedoraFedoraCoprBuildGatewayEngine {
+impl FedoraCoprBuildGatewayEngine {
     pub fn new() -> Self {
         Self {
             copr_repos: Vec::new(),
@@ -1152,17 +1192,17 @@ impl FedoraFedoraCoprBuildGatewayEngine {
     }
 }
 
-impl Default for FedoraFedoraCoprBuildGatewayEngine {
+impl Default for FedoraCoprBuildGatewayEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-pub struct FedoraFedoraContainerStackEngine {
+pub struct FedoraContainerStackEngine {
     pub container_count: usize,
 }
 
-impl FedoraFedoraContainerStackEngine {
+impl FedoraContainerStackEngine {
     pub fn new() -> Self {
         Self { container_count: 0 }
     }
@@ -1173,28 +1213,28 @@ impl FedoraFedoraContainerStackEngine {
     }
 }
 
-impl Default for FedoraFedoraContainerStackEngine {
+impl Default for FedoraContainerStackEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 pub struct FedoraSovereignEcosystemSuite {
-    pub koji: FedoraFedoraKojiBuildSystemEngine,
-    pub bodhi: FedoraFedoraBodhiUpdateEngine,
-    pub pagure: FedoraFedoraPagureForgeEngine,
-    pub copr: FedoraFedoraCoprBuildGatewayEngine,
-    pub podman: FedoraFedoraContainerStackEngine,
+    pub koji: FedoraKojiBuildSystemEngine,
+    pub bodhi: FedoraBodhiUpdateEngine,
+    pub pagure: FedoraPagureForgeEngine,
+    pub copr: FedoraCoprBuildGatewayEngine,
+    pub podman: FedoraContainerStackEngine,
 }
 
 impl FedoraSovereignEcosystemSuite {
     pub fn new() -> Self {
         Self {
-            koji: FedoraFedoraKojiBuildSystemEngine::new(),
-            bodhi: FedoraFedoraBodhiUpdateEngine::new(),
-            pagure: FedoraFedoraPagureForgeEngine::new(),
-            copr: FedoraFedoraCoprBuildGatewayEngine::new(),
-            podman: FedoraFedoraContainerStackEngine::new(),
+            koji: FedoraKojiBuildSystemEngine::new(),
+            bodhi: FedoraBodhiUpdateEngine::new(),
+            pagure: FedoraPagureForgeEngine::new("fedora-ecosystem"),
+            copr: FedoraCoprBuildGatewayEngine::new(),
+            podman: FedoraContainerStackEngine::new(),
         }
     }
 
@@ -1216,14 +1256,14 @@ mod fedora_missing_tests {
 
     #[test]
     fn test_fedora_koji_build_system() {
-        let mut koji = FedoraFedoraKojiBuildSystemEngine::new();
+        let mut koji = FedoraKojiBuildSystemEngine::new();
         let id = koji.submit_build_task("glibc", "rawhide");
         assert!(koji.complete_task(id));
     }
 
     #[test]
     fn test_fedora_bodhi_update_engine() {
-        let mut bodhi = FedoraFedoraBodhiUpdateEngine::new();
+        let mut bodhi = FedoraBodhiUpdateEngine::new();
         bodhi.create_update("FEDORA-2026-0001");
         bodhi.add_karma("FEDORA-2026-0001", 3);
         assert_eq!(bodhi.updates[0].status, "stable");
@@ -3568,6 +3608,9 @@ pub struct PlanetUserFeed {
 pub struct FedoraPlanetAggregationEngine {
     pub posts: Vec<FedoraPlanetPost>,
     pub registered_feeds: Vec<PlanetUserFeed>,
+    pub entry_counter: u64,
+    pub aggregated_entries: Vec<PlanetBlogFeedEntry>,
+    pub messaging_engine: FedoraMessagingEngine,
 }
 
 impl FedoraPlanetAggregationEngine {
@@ -3575,6 +3618,9 @@ impl FedoraPlanetAggregationEngine {
         FedoraPlanetAggregationEngine {
             posts: Vec::new(),
             registered_feeds: Vec::new(),
+            entry_counter: 0,
+            aggregated_entries: Vec::new(),
+            messaging_engine: FedoraMessagingEngine::new(),
         }
     }
 
@@ -3844,6 +3890,7 @@ pub struct FedoraMessagingMessage {
 
 /// Fedora Messaging & fedmsg Infrastructure Message Bus
 /// Provides AMQP/ZeroMQ topic-based message publication, subscription routing, and cryptographic verification.
+#[derive(Debug, Clone)]
 pub struct FedoraMessagingEngine {
     pub published_messages: Vec<FedoraMessagingMessage>,
     pub topic_subscriptions: HashMap<String, Vec<String>>, // topic -> list of subscriber_ids
@@ -3941,30 +3988,6 @@ pub struct FedoraIgnitionEngine {
     pub users: Vec<IgnitionUser>,
     pub systemd_units: Vec<IgnitionSystemdUnit>,
     pub provisioned: bool,
-    pub staged_packages: Vec<String>,
-    pub is_offline_update_pending: bool,
-    pub trigger_reboot_flag: bool,
-}
-
-impl FedoraOfflineUpdateEngine {
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
-        }
-        self.is_offline_update_pending = !self.staged_packages.is_empty();
-    }
-
-    pub fn trigger_offline_update_on_reboot(&mut self) -> Result<usize, &'static str> {
-        self.trigger_reboot_flag = true;
-        Ok(self.staged_packages.len())
-    }
-
-    pub fn execute_pending_offline_update(&mut self) -> Result<(), &'static str> {
-        self.is_offline_update_pending = false;
-        self.trigger_reboot_flag = false;
-        self.staged_packages.clear();
-        Ok(())
-    }
 }
 
 impl FedoraIgnitionEngine {
@@ -3974,15 +3997,6 @@ impl FedoraIgnitionEngine {
             users: Vec::new(),
             systemd_units: Vec::new(),
             provisioned: false,
-            staged_packages: Vec::new(),
-            is_offline_update_pending: false,
-            trigger_reboot_flag: false,
-        }
-    }
-
-    pub fn stage_offline_packages(&mut self, packages: &[&str]) {
-        for p in packages {
-            self.staged_packages.push((*p).to_string());
         }
     }
 

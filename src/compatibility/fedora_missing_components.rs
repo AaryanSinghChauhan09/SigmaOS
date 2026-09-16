@@ -1,3 +1,5 @@
+pub type FedoraRootlessOciContainerEngine = FedoraContainerStackEngine;
+pub type CoprRepository = CoprProjectConfig;
 // SigmaOS Fedora Ecosystem Parity & Missing Components Subsystem
 // Zero-dependency, `#![no_std]` compliant implementations of core Fedora infrastructure & tooling components:
 // 1. Koji Build System Engine (Task scheduling, tag builds, build target release builds, build log auditing)
@@ -6,7 +8,7 @@
 // 4. COPR Community Build Engine (Custom repository builds, chroot environment builds, RPM repo generation)
 // 5. Rootless OCI Container Engine (Podman / Buildah / Skopeo OCI container lifecycle and rootless user namespace isolation)
 
-#![cfg_attr(not(test), no_std)]
+
 
 
 
@@ -87,6 +89,15 @@ impl FedoraKojiBuildSystemEngine {
 
         self.tasks.insert(id, task);
         Ok(id)
+    }
+
+    pub fn build_target(&mut self, task_id: usize) -> Result<String, &'static str> {
+        if let Some(task) = self.tasks.get_mut(&task_id) {
+            task.state = KojiTaskState::Closed;
+            Ok(format!("{}-{}.x86_64.rpm", task.package_name, task.version))
+        } else {
+            Err("Koji: Task not found")
+        }
     }
 
     pub fn complete_build_task(&mut self, task_id: usize, success: bool) -> Result<(), &'static str> {
@@ -177,6 +188,18 @@ impl FedoraBodhiUpdateEngine {
             security_cve_ids: cves.iter().map(|s| s.to_string()).collect(),
         };
         self.updates.insert(update_id.to_string(), record);
+    }
+
+    pub fn add_karma(&mut self, update_id: &str, karma: i32) -> Result<i32, &'static str> {
+        if let Some(record) = self.updates.get_mut(update_id) {
+            record.karma_score += karma;
+            if record.karma_score >= record.karma_threshold {
+                record.status = BodhiUpdateStatus::Stable;
+            }
+            Ok(record.karma_score)
+        } else {
+            Err("Bodhi: Update ID not found")
+        }
     }
 
     pub fn cast_karma_vote(&mut self, update_id: &str, is_positive: bool) -> Result<i32, &'static str> {
@@ -313,20 +336,15 @@ impl FedoraCoprBuildGatewayEngine {
         } else {
             Err("COPR: Project not found")
         }
-
-        Self { repos: Vec::new() }
     }
 
     pub fn create_copr_repo(&mut self, owner: &str, name: &str, chroots: &[&str]) {
-        self.repos.push(CoprRepository {
-            owner: owner.to_string(),
-            project_name: name.to_string(),
-            chroots: chroots.iter().map(|s| s.to_string()).collect(),
-        });
+        self.create_copr_project(owner, name, chroots);
     }
 
-    pub fn find_repo(&self, owner: &str, name: &str) -> Option<&CoprRepository> {
-        self.repos.iter().find(|r| r.owner == owner && r.project_name == name)
+    pub fn find_repo(&self, owner: &str, name: &str) -> Option<&CoprProjectConfig> {
+        let key = format!("{}/{}", owner, name);
+        self.projects.get(&key)
     }
 }
 
@@ -424,11 +442,7 @@ impl FedoraGreenwaveDecisionEngine {
     }
 }
 
-impl Default for FedoraRootlessOciContainerEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+
 
 // =========================================================================
 // 6. FEDORA MOCK CHROOT BUILD ENVIRONMENT ENGINE
@@ -666,6 +680,10 @@ pub struct FedoraAnacondaKickstartConfig {
 pub struct FedoraAnacondaKickstartEngine;
 
 impl FedoraAnacondaKickstartEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
     /// Parses an Anaconda Kickstart file format string
     pub fn parse_kickstart(content: &str) -> Result<FedoraAnacondaKickstartConfig, &'static str> {
         let mut keyboard = "us".to_string();
@@ -816,11 +834,14 @@ pub struct SovereignFedoraEcosystemSuite {
     pub bodhi: FedoraBodhiUpdateEngine,
     pub pagure: FedoraPagureForgeEngine,
     pub copr: FedoraCoprBuildGatewayEngine,
-    pub podman: FedoraRootlessOciContainerEngine,
+    pub podman: FedoraContainerStackEngine,
     pub mock: FedoraMockChrootBuilder,
     pub dnf5: FedoraDnf5PackageEngine,
     pub anaconda: FedoraAnacondaKickstartEngine,
     pub sssd: FedoraSssdFreeIpaEngine,
+    pub containers: FedoraContainerStackEngine,
+    pub greenwave: FedoraGreenwaveDecisionEngine,
+    pub waiverdb: FedoraWaiverDbEngine,
 }
 
 impl SovereignFedoraEcosystemSuite {
@@ -828,7 +849,13 @@ impl SovereignFedoraEcosystemSuite {
         Self {
             koji: FedoraKojiBuildSystemEngine::new(),
             bodhi: FedoraBodhiUpdateEngine::new(),
+            pagure: FedoraPagureForgeEngine::new("default"),
             copr: FedoraCoprBuildGatewayEngine::new(),
+            podman: FedoraContainerStackEngine::new(),
+            mock: FedoraMockChrootBuilder::new(),
+            dnf5: FedoraDnf5PackageEngine::new(),
+            anaconda: FedoraAnacondaKickstartEngine::new(),
+            sssd: FedoraSssdFreeIpaEngine::new(),
             containers: FedoraContainerStackEngine::new(),
             greenwave: FedoraGreenwaveDecisionEngine::new(),
             waiverdb: FedoraWaiverDbEngine::new(),
@@ -836,9 +863,9 @@ impl SovereignFedoraEcosystemSuite {
     }
 
     pub fn run_release_pipeline(&mut self, pkg: &str, ver: &str) -> Result<String, &'static str> {
-        let task_id = self.koji.submit_build_task(pkg, ver, "fc40-build", "x86_64");
+        let task_id = self.koji.submit_build_task(pkg, ver, "1", "f40-build", "sovereign-builder")?;
         let rpm = self.koji.build_target(task_id)?;
-        self.bodhi.submit_update(&format!("{}-update", pkg), pkg, ver, BodhiUpdateType::Enhancement);
+        self.bodhi.submit_update(&format!("{}-update", pkg), &format!("{}-{}", pkg, ver), BodhiUpdateType::Enhancement, &[]);
         self.bodhi.add_karma(&format!("{}-update", pkg), 3)?;
         Ok(format!("Successfully released {} via Koji task #{}", rpm, task_id))
     }
@@ -1060,5 +1087,44 @@ glibc
         let auth_res = sssd.authenticate_user("ipa.example.com", "admin").unwrap();
         assert!(auth_res.contains("Successfully authenticated"));
         assert_eq!(sssd.cached_kerberos_tickets.len(), 1);
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct WaiverRecord {
+    pub subject: String,
+    pub test_type: String,
+    pub waver: String,
+    pub comment: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FedoraWaiverDbEngine {
+    pub waivers: BTreeMap<usize, WaiverRecord>,
+    pub next_waiver_id: usize,
+}
+
+impl FedoraWaiverDbEngine {
+    pub fn new() -> Self {
+        Self {
+            waivers: BTreeMap::new(),
+            next_waiver_id: 1,
+        }
+    }
+
+    pub fn issue_waiver(&mut self, subject: &str, test_type: &str, waver: &str, comment: &str) -> usize {
+        let id = self.next_waiver_id;
+        self.next_waiver_id += 1;
+        self.waivers.insert(id, WaiverRecord {
+            subject: subject.to_string(),
+            test_type: test_type.to_string(),
+            waver: waver.to_string(),
+            comment: comment.to_string(),
+        });
+        id
+    }
+
+    pub fn is_waived(&self, subject: &str, test_type: &str) -> bool {
+        self.waivers.values().any(|w| w.subject == subject && w.test_type == test_type)
     }
 }

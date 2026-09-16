@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 // SPDX-License-Identifier: MIT
 // Sovereign OS Wiki & Documentation Master Absorption Engine
 // Absorbs and implements all unimplemented ideas, specifications, roadmaps, and gap-closing matrices

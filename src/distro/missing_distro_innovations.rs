@@ -17,24 +17,10 @@
 // - Gentoo Portage EAPI 8 Slot Operator Engine
 // - Fedora / RHEL SELinux MLS / MCS Governor Engine
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 /// 1. Clear Linux Stateless Architecture Engine
@@ -663,31 +649,14 @@ impl OpenBsdUnveilAuditor {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DevuanInitBackend {
     SysVinit,
-    OpenRc,
-    Runit,
-    S6,
-}
-
-
-// =========================================================================
-// DEVUAN INIT DIVERSITY ENGINE (DEVUAN LINUX SYSTEMD-FREE INIT PARITY)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DevuanInitBackend {
     SysVInit,
+    OpenRc,
     Runit,
     S6,
-    OpenRc,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DevuanInitBackend {
-    OpenRc,
-    SysVInit,
-    Runit,
-    S6,
-}
+
+
 
 #[derive(Debug, Clone)]
 pub struct DevuanInitService {
@@ -801,7 +770,9 @@ pub struct KaOSPackageStateGovernor {
 
 impl KaOSPackageStateGovernor {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            packages: BTreeMap::new(),
+        }
     }
 
     pub fn register_package(&mut self, name: &str, version: &str, group: KaOsRepoGroup, is_qt_kde: bool) {
@@ -823,11 +794,7 @@ impl KaOSPackageStateGovernor {
     }
 }
 
-impl Default for KaOSPackageStateGovernor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
@@ -838,12 +805,12 @@ pub enum ComponentParityStatus {
 
 #[derive(Debug, Clone)]
 pub struct DistroComponentParityRecord {
-
-pub struct MissingDistroComponentRecord {
     pub component_name: String,
     pub source_distro: String,
     pub status: ComponentParityStatus,
 }
+
+pub type MissingDistroComponentRecord = DistroComponentParityRecord;
 
 pub struct MissingDistroComponentsEngine {
     pub records: BTreeMap<String, DistroComponentParityRecord>,
@@ -1892,24 +1859,7 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct NixOsFlakesEngine {
-    pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
-}
 
-impl NixOsFlakesEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn lock_input(&mut self, name: &str, url: &str, hash: &str) {
-        self.flake_inputs.insert(name.to_string(), (url.to_string(), hash.to_string()));
-    }
-
-    pub fn compute_system_derivation_hash(&self) -> String {
-        format!("nix-store-drv-{:x}", self.flake_inputs.len())
-    }
-}
 
 #[cfg(test_disabled)]
 mod tests {

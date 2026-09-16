@@ -802,14 +802,7 @@ impl ShellJobControl {
         list
     }
 
-    pub fn bring_to_foreground(&mut self, id: u32) -> Result<String, &'static str> {
-        if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id as usize) {
-            job.state = JobState::Running;
-            Ok(format!("Job [{}] '{}' brought to foreground.", job.id, job.command))
-        } else {
-            Err("Job not found")
-        }
-    }
+
 
     pub fn bring_to_foreground(&mut self, id: usize) -> Result<String, String> {
         if let Some(job) = self.jobs.iter_mut().find(|j| j.id == id) {

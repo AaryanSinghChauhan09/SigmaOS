@@ -7,6 +7,7 @@
 #![allow(unexpected_cfgs)]
 extern crate alloc;
 
+use std::collections::BTreeMap;
 use alloc::boxed::Box;
 #[cfg(test)]
 use std::collections::HashMap;
@@ -1681,7 +1682,7 @@ pub struct Jbd2TransactionLedger {
 impl Jbd2TransactionLedger {
     pub fn new() -> Self {
         Self {
-            ring_blocks: [TransactionBlock {
+            ring_blocks: [SpecTransactionBlock {
                 tx_id: 0,
                 target_addr: 0,
                 crc32c_hash: 0,
@@ -1719,7 +1720,7 @@ impl Jbd2TransactionLedger {
         if self.head > 0 {
             self.head -= 1;
             self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
-            self.ring_blocks[self.head] = TransactionBlock {
+            self.ring_blocks[self.head] = SpecTransactionBlock {
                 tx_id: 0,
                 target_addr: 0,
                 crc32c_hash: 0,
@@ -2093,7 +2094,6 @@ pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
 pub const CAP_SEEK: u64 = 1 << 2;
 
-use alloc::collections::BTreeMap as HashMap;
 
 pub struct FreeBsdCapsicumEngine {
     pub is_capability_mode: bool,

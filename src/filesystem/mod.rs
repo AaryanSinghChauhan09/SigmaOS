@@ -16,9 +16,9 @@ pub mod vfs;
 pub mod sigma_fs;
 
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
-pub use vfs::{FileType, FsError, Inode, VirtualFilesystem, VfsError};
+pub use crate::filesystem::vfs::{FileType, FsError, Inode, VirtualFilesystem, VfsError};
 // Removed non-existent vfs exports: FileDescriptor, FilePermissions
-pub use sigma_fs::{
+pub use crate::filesystem::sigma_fs::{
     SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
     JournalState, SigmaFsCrypt, SigmaFsVirtio,
     // Removed potentially incomplete exports: RaidLevel, SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid

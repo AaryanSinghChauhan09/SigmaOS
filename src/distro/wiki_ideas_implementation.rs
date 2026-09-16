@@ -13,8 +13,7 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 #[cfg(not(any(feature = "standalone_test", test)))]
 
-// Test environment compatibility: Use std for testing only
-#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};

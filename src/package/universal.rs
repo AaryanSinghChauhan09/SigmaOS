@@ -6,14 +6,8 @@ use alloc::boxed::Box;
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
 // Zero-dependency architecture: Use klib primitives for no_std compatibility
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{Arc, HashMap, HashSet};
-
-// Test environment compatibility: Use std for testing only
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::{HashMap, HashSet};
-#[cfg(any(feature = "standalone_test", test))]
 use std::sync::Arc;
+use std::collections::{HashMap, HashSet};
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{NodeBinaryDistroEngine, NodeBinaryPackage};
@@ -470,7 +464,7 @@ impl CustomPackageHook {
         Self {
             name: name.to_string(),
             timing,
-            handler: Arc::new(handler),
+            handler: Arc::new(move |pkg: &UnifiedPackage| handler(pkg)),
         }
     }
 }
