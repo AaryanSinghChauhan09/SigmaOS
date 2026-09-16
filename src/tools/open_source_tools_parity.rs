@@ -172,6 +172,13 @@ impl RofiCommandHudEngine {
     }
 
     pub fn fuzzy_search(&self, query: &str) -> Vec<LauncherAppEntry> {
+        // Bolt ⚡ Optimization: Return cloned app list directly on empty query to avoid
+        // O(N) string lowercase conversions (`to_lowercase()`) per app entry while
+        // preserving exact original behavior (returning all launcher apps on empty query).
+        if query.is_empty() {
+            return self.apps.clone();
+        }
+
         let query_lower = query.to_lowercase();
         self.apps
             .iter()
@@ -312,6 +319,9 @@ mod tests {
         let results = rofi.fuzzy_search("term");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].name, "Terminal");
+
+        let empty_results = rofi.fuzzy_search("");
+        assert_eq!(empty_results.len(), rofi.apps.len());
     }
 
     #[test]
