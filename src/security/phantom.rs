@@ -94,7 +94,7 @@ mod tests {
         // recreation
         let user_ctx = CapabilityContext::<UserLevel>::new();
         let kern_ctx = user_ctx
-            .escalate_to_kernel("SUPER_SECRET_KERN_TOKEN")
+            .escalate_to_kernel(KERNEL_ESCALATION_TOKEN)
             .unwrap();
         assert_eq!(
             kern_ctx.perform_kernel_action(),
@@ -106,10 +106,10 @@ mod tests {
     fn test_admin_escalation() {
         let user_ctx = CapabilityContext::<UserLevel>::new();
         let kern_ctx = user_ctx
-            .escalate_to_kernel("SUPER_SECRET_KERN_TOKEN")
+            .escalate_to_kernel(KERNEL_ESCALATION_TOKEN)
             .unwrap();
 
-        let admin_ctx = kern_ctx.escalate_to_admin("MASTER_ADMIN_TOKEN").unwrap();
+        let admin_ctx = kern_ctx.escalate_to_admin(MASTER_ADMIN_TOKEN).unwrap();
         assert_eq!(
             admin_ctx.perform_admin_action(),
             "Executed administrative master reset"
