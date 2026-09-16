@@ -130,6 +130,20 @@ impl RunitSupervisor {
         }
     }
 
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.start();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+        let _ = (name, stopped);
+        true
+    }
+
     pub fn register_service(&mut self, service: RunitService) {
         self.services.insert(service.name.clone(), service);
     }

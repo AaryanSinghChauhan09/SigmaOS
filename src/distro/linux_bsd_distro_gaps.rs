@@ -873,7 +873,7 @@ pub struct JournaldLogRecord {
     pub timestamp_unix_epoch: u64,
     pub priority: u8, // 0=Emergency, 3=Error, 6=Info
     pub unit_name: &'static str,
-    pub message: &'static str,
+    pub message: String,
 }
 
 #[derive(Debug)]
