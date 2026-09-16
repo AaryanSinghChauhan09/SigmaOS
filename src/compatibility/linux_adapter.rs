@@ -3,7 +3,6 @@
 // Supports System V IPC, ProcFS emulation, GLIBC environment shims, and ELF binary Aux Vectors loading.
 
 #[cfg(test_disabled)]
-extern crate std;
 
 use std::format;
 use std::string::String;

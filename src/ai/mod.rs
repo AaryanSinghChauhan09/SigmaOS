@@ -11,6 +11,7 @@ pub mod developer_platform;
 pub mod lift_engine;
 pub mod llm;
 pub mod local_llm;
+pub mod marktechpost_kdnuggets_data_science;
 pub mod next_gen;
 pub mod open_computer;
 pub mod openclaw;
@@ -60,4 +61,9 @@ pub use voice::{
 pub use developer_platform::{
     AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
     MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
+};
+
+pub use marktechpost_kdnuggets_data_science::{
+    InfoWorldEnterpriseAiDeploymentEngine, KdnuggetsAutoMlPipelineEngine,
+    MarkTechPostVectorIndexEngine, SovereignAiDataSciencePipelineSuite,
 };

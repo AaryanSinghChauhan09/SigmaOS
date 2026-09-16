@@ -305,7 +305,118 @@ impl ContentAddressedStorage {
     }
 }
 
-#[cfg(test_disabled)]
+// ==========================================
+// 5. GitOps Declarative State Drift Engine (ArgoCD/FluxCD Inspired)
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GitOpsResource {
+    pub key: String,
+    pub expected_hash: [u8; 32],
+    pub current_hash: [u8; 32],
+}
+
+pub struct GitOpsDeclarativeStateEngine {
+    pub resources: Vec<GitOpsResource>,
+    pub auto_reconcile: bool,
+}
+
+impl GitOpsDeclarativeStateEngine {
+    pub fn new(auto_reconcile: bool) -> Self {
+        Self {
+            resources: Vec::new(),
+            auto_reconcile,
+        }
+    }
+
+    pub fn track_resource(&mut self, key: &str, expected_data: &[u8], current_data: &[u8]) {
+        let expected_hash = CasObject::calculate_sha256(expected_data);
+        let current_hash = CasObject::calculate_sha256(current_data);
+
+        self.resources.push(GitOpsResource {
+            key: key.to_string(),
+            expected_hash,
+            current_hash,
+        });
+    }
+
+    pub fn detect_drift(&self) -> Vec<String> {
+        let mut drifted = Vec::new();
+        for res in &self.resources {
+            if res.expected_hash != res.current_hash {
+                drifted.push(res.key.clone());
+            }
+        }
+        drifted
+    }
+
+    pub fn reconcile_drift(&mut self) -> usize {
+        let mut reconciled_count = 0;
+        for res in &mut self.resources {
+            if res.expected_hash != res.current_hash {
+                res.current_hash = res.expected_hash;
+                reconciled_count += 1;
+            }
+        }
+        reconciled_count
+    }
+}
+
+// ==========================================
+// 6. OpenMetrics Telemetry Engine (Prometheus Inspired)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct MetricSample {
+    pub name: String,
+    pub help: String,
+    pub metric_type: String, // "counter", "gauge"
+    pub value: f64,
+}
+
+pub struct OpenMetricsTelemetryEngine {
+    pub samples: Vec<MetricSample>,
+}
+
+impl Default for OpenMetricsTelemetryEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl OpenMetricsTelemetryEngine {
+    pub fn new() -> Self {
+        Self {
+            samples: Vec::new(),
+        }
+    }
+
+    pub fn record_gauge(&mut self, name: &str, help: &str, value: f64) {
+        if let Some(s) = self.samples.iter_mut().find(|s| s.name == name) {
+            s.value = value;
+        } else {
+            self.samples.push(MetricSample {
+                name: name.to_string(),
+                help: help.to_string(),
+                metric_type: "gauge".to_string(),
+                value,
+            });
+        }
+    }
+
+    pub fn render_openmetrics_text(&self) -> String {
+        let mut output = String::new();
+        for s in &self.samples {
+            output.push_str(&format!("# HELP {} {}\n", s.name, s.help));
+            output.push_str(&format!("# TYPE {} {}\n", s.name, s.metric_type));
+            output.push_str(&format!("{} {}\n", s.name, s.value));
+        }
+        output.push_str("# EOF\n");
+        output
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -375,5 +486,30 @@ mod tests {
         let hash2 = cas.inject_object(payload1);
         assert_eq!(hash1, hash2);
         assert_eq!(cas.store.len(), 1);
+    }
+
+    #[test]
+    fn test_gitops_drift_reconciliation() {
+        let mut gitops = GitOpsDeclarativeStateEngine::new(true);
+        gitops.track_resource("etc/hosts", b"127.0.0.1 localhost", b"127.0.0.1 localhost\n10.0.0.1 rogue");
+
+        let drifted = gitops.detect_drift();
+        assert_eq!(drifted.len(), 1);
+        assert_eq!(drifted[0], "etc/hosts");
+
+        let reconciled = gitops.reconcile_drift();
+        assert_eq!(reconciled, 1);
+        assert!(gitops.detect_drift().is_empty());
+    }
+
+    #[test]
+    fn test_openmetrics_export() {
+        let mut metrics = OpenMetricsTelemetryEngine::new();
+        metrics.record_gauge("sigmaos_cpu_usage_percent", "CPU utilization", 12.5);
+
+        let text = metrics.render_openmetrics_text();
+        assert!(text.contains("# TYPE sigmaos_cpu_usage_percent gauge"));
+        assert!(text.contains("sigmaos_cpu_usage_percent 12.5"));
+        assert!(text.contains("# EOF"));
     }
 }

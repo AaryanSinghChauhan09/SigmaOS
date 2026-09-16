@@ -3,6 +3,8 @@
 // Based on Ideas-999-Structured: AI & Machine Learning Item 936
 // Implements model training and optimization
 
+extern crate alloc;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type TrainingID = usize;

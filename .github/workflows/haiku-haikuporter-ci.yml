@@ -1,4 +1,7 @@
 name: Haiku HaikuPorter & HPKG Package CI
+permissions:
+  contents: read
+
 
 on:
   push:
@@ -9,6 +12,7 @@ on:
 jobs:
   haiku-hpkg:
     name: Haiku HaikuPorter Recipe & HPKG Package Manifest Audit
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

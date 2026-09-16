@@ -1,4 +1,7 @@
 name: Intel Clear Linux Stateless Config & Clr-boot-manager CI
+permissions:
+  contents: read
+
 
 on:
   push:
@@ -9,6 +12,7 @@ on:
 jobs:
   clear-linux-stateless:
     name: Intel Clear Linux Stateless /etc & /usr Resolution & Boot Manager Audit
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

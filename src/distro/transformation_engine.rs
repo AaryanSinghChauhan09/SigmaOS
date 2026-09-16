@@ -227,10 +227,33 @@ impl DeveloperToolkitConverter {
     }
 
     pub fn convert_python_to_rust(&self, python_code: &str) -> Result<String, &'static str> {
-        if python_code.contains("print(\"") {
-            Ok(python_code.replace("print(\"", "println!(\"").replace("\")", "\");"))
-        } else if python_code.contains("def ") {
-            Ok(python_code.replace("def ", "fn ").replace(":", " {").to_string() + "\n}")
+        let mut rust_code = python_code.to_string();
+
+        if rust_code.contains("import sys") {
+            rust_code = rust_code.replace("import sys", "use std::env;");
+        }
+        if rust_code.contains("import json") {
+            rust_code = rust_code.replace("import json", "// Native Rust JSON parsing used");
+        }
+        if rust_code.contains("import os") {
+            rust_code = rust_code.replace("import os", "use std::fs; use std::path::Path;");
+        }
+        if rust_code.contains("print(") {
+            rust_code = rust_code.replace("print(", "println!(");
+        }
+        if rust_code.contains("def ") {
+            rust_code = rust_code.replace("def ", "fn ");
+        }
+        if rust_code.contains("class ") {
+            rust_code = rust_code.replace("class ", "pub struct ");
+        }
+        if rust_code.contains("if __name__ == '__main__':") {
+            rust_code = rust_code.replace("if __name__ == '__main__':", "fn main() {");
+            rust_code.push_str("\n}");
+        }
+
+        if !rust_code.is_empty() {
+            Ok(rust_code)
         } else {
             Err("Converter: Unrecognized or complex python construct")
         }
@@ -404,8 +427,10 @@ mod tests {
     fn test_dev_toolkit_converter() {
         let converter = DeveloperToolkitConverter::new();
 
-        let py_rust = converter.convert_python_to_rust("print(\"Hello World\")").unwrap();
-        assert_eq!(py_rust, "println!(\"Hello World\");");
+        let py_rust = converter.convert_python_to_rust("import sys\ndef hello():\n    print(\"Hello World\")").unwrap();
+        assert!(py_rust.contains("println!(\"Hello World\")"));
+        assert!(py_rust.contains("use std::env;"));
+        assert!(py_rust.contains("fn hello():"));
 
         let cpp_rust = converter.convert_cpp_to_rust("#include <iostream>\nstd::cout << \"Hello World\";").unwrap();
         assert!(cpp_rust.contains("println!(\"Hello World\");"));

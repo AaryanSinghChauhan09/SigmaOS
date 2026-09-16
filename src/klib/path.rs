@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Minimal Path and PathBuf for no_std klib
 
-use std::string::String;
 use core::ops::Deref;
+use std::string::String;
 
 pub type Path = PathBuf;
 

@@ -701,7 +701,7 @@ impl AbsorbedExt4Driver {
                 version: String::from("1.0.0"),
                 fs_type: FilesystemType::LinuxDerived,
                 linux_heritage: None,
-                max_file_size: 16 * 1024 * 1024 * 1024, // 16TB
+                max_file_size: 16u64 * 1024 * 1024 * 1024, // 16TB
                 max_filename_length: 255,
                 features: {
                     let mut v = Vec::new();

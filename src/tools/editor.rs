@@ -1,8 +1,9 @@
+// Text Editor (gedit/nano Inspiration)
+// Document management, syntax highlighting, and editor features
+
 use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
-//! Text Editor (gedit/nano Inspiration)
-//! Document management, syntax highlighting, and editor features
 
 
 
@@ -107,8 +108,8 @@ impl TextEditor {
     }
 
     pub fn save_current(&mut self) -> Result<(), EditorError> {
-        if let Some(id) = &self.current_document {
-            if let Some(doc) = self.get_document(id) {
+        if let Some(id) = self.current_document.clone() {
+            if let Some(doc) = self.get_document(&id) {
                 doc.save()
             } else {
                 Err(EditorError::DocumentNotFound)
@@ -151,8 +152,81 @@ impl Default for TextEditor {
     }
 }
 
-#[cfg(test_disabled)]
+/// Online Web File Editor Engine (inspired by Cockpit / Webmin / VS Code Web)
+#[derive(Debug, Clone)]
+pub struct OnlineWebFileEditorEngine {
+    pub active_tabs: Vec<Document>,
+    pub selected_tab_id: Option<String>,
+    pub auto_save_enabled: bool,
+    pub version_history: Vec<(String, String)>, // (timestamp/version, content)
+}
+
+impl OnlineWebFileEditorEngine {
+    pub fn new() -> Self {
+        Self {
+            active_tabs: Vec::new(),
+            selected_tab_id: None,
+            auto_save_enabled: true,
+            version_history: Vec::new(),
+        }
+    }
+
+    pub fn open_tab(&mut self, path: &str, content: &str) -> String {
+        let id = format!("tab-{}", self.active_tabs.len() + 1);
+        let mut doc = Document::new(&id, path);
+        doc.set_content(content);
+        self.active_tabs.push(doc);
+        self.selected_tab_id = Some(id.clone());
+        id
+    }
+
+    pub fn save_version(&mut self, id: &str, version_label: &str) -> Result<usize, EditorError> {
+        if let Some(doc) = self.active_tabs.iter_mut().find(|d| d.id == id) {
+            doc.save()?;
+            self.version_history.push((version_label.to_string(), doc.content.clone()));
+            Ok(self.version_history.len())
+        } else {
+            Err(EditorError::DocumentNotFound)
+        }
+    }
+
+    pub fn render_live_html_preview(&self, id: &str) -> String {
+        if let Some(doc) = self.active_tabs.iter().find(|d| d.id == id) {
+            format!("<div class=\"sigma-web-editor-preview\">{}</div>", doc.content)
+        } else {
+            String::from("<div class=\"error\">No Document</div>")
+        }
+    }
+}
+
+impl Default for OnlineWebFileEditorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
+    use super::*;
+
+    #[test]
+    fn test_online_web_file_editor() {
+        let mut engine = OnlineWebFileEditorEngine::new();
+        let tab_id = engine.open_tab("/etc/sigma/config.conf", "SERVER_PORT=8080");
+
+        assert_eq!(engine.active_tabs.len(), 1);
+        assert_eq!(engine.selected_tab_id.as_deref(), Some(tab_id.as_str()));
+
+        let versions = engine.save_version(&tab_id, "v1.0.0").unwrap();
+        assert_eq!(versions, 1);
+
+        let preview = engine.render_live_html_preview(&tab_id);
+        assert!(preview.contains("SERVER_PORT=8080"));
+    }
+}
+
+#[cfg(test_disabled)]
+mod tests_disabled {
     use super::*;
 
     #[test]

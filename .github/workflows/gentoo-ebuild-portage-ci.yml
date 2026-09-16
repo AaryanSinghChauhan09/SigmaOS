@@ -1,4 +1,7 @@
 name: Gentoo Portage Ebuild & USE Flag Matrix CI
+permissions:
+  contents: read
+
 
 on:
   push:
@@ -9,6 +12,7 @@ on:
 jobs:
   gentoo-portage-ebuild:
     name: Gentoo Portage Ebuild Compilation & USE Flag Dependency Audit
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

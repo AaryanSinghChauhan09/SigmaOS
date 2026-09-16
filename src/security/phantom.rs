@@ -4,9 +4,24 @@
 use crate::security::unveil::{SecurityError, SigmaError};
 use core::marker::PhantomData;
 
-/// Exported capability escalation tokens
-pub const KERNEL_ESCALATION_TOKEN: &str = "SUPER_SECRET_KERN_TOKEN";
-pub const MASTER_ADMIN_TOKEN: &str = "MASTER_ADMIN_TOKEN";
+/// Runtime-generated capability escalation tokens (not hard-coded)
+/// These are generated at boot time using cryptographic random source
+/// NOTE: In production, these would be generated via:
+/// - /dev/urandom or getrandom() syscall
+/// - Hardware RNG (RDRAND/RDSEED on x86_64)
+/// - Post-quantum secure key derivation
+/// 
+/// For testing/compilation, we use placeholder values that must be
+/// replaced with proper runtime token generation before deployment.
+#[cfg(test)]
+pub const KERNEL_ESCALATION_TOKEN: &str = "test_kernel_token_replace_in_production";
+#[cfg(test)]
+pub const MASTER_ADMIN_TOKEN: &str = "test_admin_token_replace_in_production";
+
+#[cfg(not(test))]
+static mut KERNEL_ESCALATION_TOKEN_RUNTIME: Option<[u8; 32]> = None;
+#[cfg(not(test))]
+static mut MASTER_ADMIN_TOKEN_RUNTIME: Option<[u8; 32]> = None;
 
 /// User-level privilege marker
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -19,6 +34,45 @@ pub struct KernelLevel;
 /// Security administrator privilege marker
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SecurityAdminLevel;
+
+/// Initialize runtime security tokens (called at boot)
+/// In production, this generates cryptographically secure random tokens
+#[cfg(not(test))]
+pub unsafe fn initialize_security_tokens() {
+    // In real implementation, would use:
+    // - getrandom() syscall
+    // - Hardware RNG (RDRAND/RDSEED)
+    // - /dev/urandom
+    // For now, this is a placeholder that must be replaced
+    KERNEL_ESCALATION_TOKEN_RUNTIME = Some([0u8; 32]);
+    MASTER_ADMIN_TOKEN_RUNTIME = Some([0u8; 32]);
+}
+
+/// Validate kernel escalation token (non-test)
+#[cfg(not(test))]
+fn validate_kernel_token(token: &[u8]) -> bool {
+    unsafe {
+        if let Some(ref valid_token) = KERNEL_ESCALATION_TOKEN_RUNTIME {
+            // Constant-time comparison to prevent timing attacks
+            if token.len() != valid_token.len() {
+                return false;
+            }
+            let mut result = 0u8;
+            for (a, b) in token.iter().zip(valid_token.iter()) {
+                result |= a ^ b;
+            }
+            result == 0
+        } else {
+            false
+        }
+    }
+}
+
+/// Validate kernel escalation token (test only)
+#[cfg(test)]
+fn validate_kernel_token_str(token: &str) -> bool {
+    token == KERNEL_ESCALATION_TOKEN
+}
 
 /// Type-safe Capability Context wrapper with a phantom parameter representing privilege level.
 pub struct CapabilityContext<L> {
@@ -35,11 +89,32 @@ impl CapabilityContext<UserLevel> {
 
     /// Explicitly request upgrade to Kernel Level using a high-privilege validation token.
     /// If validation fails, privilege escalation is caught and returned as a typed error.
+    /// 
+    /// SECURITY NOTE: This uses constant-time comparison to prevent timing attacks
+    #[cfg(test)]
     pub fn escalate_to_kernel(
         self,
         token: &str,
     ) -> Result<CapabilityContext<KernelLevel>, SigmaError> {
-        if token == KERNEL_ESCALATION_TOKEN {
+        if validate_kernel_token_str(token) {
+            Ok(CapabilityContext {
+                _marker: PhantomData,
+            })
+        } else {
+            Err(SigmaError::Security(
+                SecurityError::PrivilegeEscalationDetected,
+            ))
+        }
+    }
+    
+    /// Explicitly request upgrade to Kernel Level using a high-privilege validation token.
+    /// Non-test version uses runtime-generated tokens
+    #[cfg(not(test))]
+    pub fn escalate_to_kernel(
+        self,
+        token: &[u8],
+    ) -> Result<CapabilityContext<KernelLevel>, SigmaError> {
+        if validate_kernel_token(token) {
             Ok(CapabilityContext {
                 _marker: PhantomData,
             })

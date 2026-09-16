@@ -1,4 +1,7 @@
 name: Slackware SlackBuilds & Pkgtools CI
+permissions:
+  contents: read
+
 
 on:
   push:
@@ -9,6 +12,7 @@ on:
 jobs:
   slackware-pkgtools:
     name: Slackware SlackBuilds Shell Scripts & pkgtools Integration Matrix
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

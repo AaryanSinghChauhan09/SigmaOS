@@ -1,4 +1,5 @@
 // SigmaOS Network Stack Module
+pub mod device_discovery;
 pub mod discovery;
 pub mod ring_buffer_stack;
 pub mod security;
@@ -10,6 +11,9 @@ pub mod zenithnet;
 pub mod routing;
 pub mod socket;
 
+pub use device_discovery::{
+    DeviceDiscoverySyncEngine, DeviceType, DiscoveredPeerDevice, DiscoveryProtocol,
+};
 pub use discovery::{
     DiscoveredNetworkService, DiscoveryProtocolType, Icmpv6NdpEntry, LlmnrNbnsResolver,
     NetworkDevicePeer, SovereignNetworkDiscoveryEngine, SsdpDiscoveryPacket,

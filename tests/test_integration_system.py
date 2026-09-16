@@ -259,6 +259,7 @@ def test_universal_package_manager_cli_simulation_basic():
     package_formats = ["deb", "rpm", "pkg.tar.zst", "apk", "xbps", "econstruct"]
     assert len(package_formats) == 6
 
+    distros = ["LinuxArch", "LinuxDebian", "LinuxFedora", "LinuxAlpine", "FreeBsd", "OpenBsd"]
     for d in distros:
         bridge = UniversalDistroSubsystemBridge(mode=d)
         params = bridge.get_distro_parameters()

@@ -12,15 +12,20 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::boxed::Box;
-use std::vec;
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec;
 
-use std::collections::BTreeMap;
-use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
+#[cfg(feature = "std")]
 use std::collections::HashMap;
+
+#[cfg(not(feature = "std"))]
+use alloc::collections::BTreeMap as HashMap;
 // SigmaOS AI Orchestrator for System Optimization
 // OOP-based AI system optimization with predictive modeling
 

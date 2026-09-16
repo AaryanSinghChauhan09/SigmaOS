@@ -11,12 +11,14 @@ pub mod collections;
 pub mod config_parser;
 #[macro_use]
 pub mod console;
+pub mod buddy_allocator;
 pub mod conversion;
 pub mod custom_allocator;
 pub mod custom_string;
 pub mod env;
 pub mod ffi;
 pub mod fs;
+pub mod hash;
 pub mod hashmap;
 pub mod hashset;
 pub mod io;
@@ -45,10 +47,8 @@ pub mod time;
 pub mod time_impl;
 pub mod toml;
 pub mod utf8_utils;
-pub mod uvm;
 pub mod uuid;
-pub mod buddy_allocator;
-pub mod hash;
+pub mod uvm;
 
 // Re-exports
 pub use arc::Arc;

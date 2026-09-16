@@ -6,6 +6,9 @@ use std::vec;
 extern crate alloc;
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
+use alloc::format;
+use alloc::string::String;
+use alloc::vec::Vec;
 #[cfg(test)]
 use std::collections::HashMap;
 
@@ -1741,13 +1744,17 @@ mod tests {
         let vm_id = kvm.create_vm(&config).unwrap();
         assert_eq!(kvm.get_vm_state(&vm_id).unwrap(), VmState::Stopped);
 
-        kvm.attach_virtio_blk(&vm_id, VirtioBlockDeviceConfig {
-            image_path: "/var/lib/images/rootfs.qcow2".to_string(),
-            read_only: false,
-            direct_io: true,
-            queue_size: 256,
-            block_size: 512,
-        }).unwrap();
+        kvm.attach_virtio_blk(
+            &vm_id,
+            VirtioBlockDeviceConfig {
+                image_path: "/var/lib/images/rootfs.qcow2".to_string(),
+                read_only: false,
+                direct_io: true,
+                queue_size: 256,
+                block_size: 512,
+            },
+        )
+        .unwrap();
 
         kvm.attach_virtio_net(
             &vm_id,

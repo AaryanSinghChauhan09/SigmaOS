@@ -193,6 +193,177 @@ impl SovereignMultiArchHalEngine {
     }
 }
 
+// =========================================================================
+// 1. SOVEREIGN SYSCALL ABI TRANSLATOR
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SyscallAbiCallingConvention {
+    pub instruction: &'static str,
+    pub syscall_num_reg: &'static str,
+    pub arg_regs: Vec<&'static str>,
+    pub return_reg: &'static str,
+}
+
+pub struct SovereignSyscallAbiTranslator;
+
+impl SovereignSyscallAbiTranslator {
+    pub fn get_calling_convention(arch: ArchitectureClass) -> SyscallAbiCallingConvention {
+        match arch {
+            ArchitectureClass::X86_32 => SyscallAbiCallingConvention {
+                instruction: "int 0x80 / sysenter",
+                syscall_num_reg: "eax",
+                arg_regs: vec!["ebx", "ecx", "edx", "esi", "edi", "ebp"],
+                return_reg: "eax",
+            },
+            ArchitectureClass::X86_64 => SyscallAbiCallingConvention {
+                instruction: "syscall",
+                syscall_num_reg: "rax",
+                arg_regs: vec!["rdi", "rsi", "rdx", "r10", "r8", "r9"],
+                return_reg: "rax",
+            },
+            ArchitectureClass::AArch64 => SyscallAbiCallingConvention {
+                instruction: "svc #0",
+                syscall_num_reg: "x8",
+                arg_regs: vec!["x0", "x1", "x2", "x3", "x4", "x5"],
+                return_reg: "x0",
+            },
+            ArchitectureClass::RiscV32 | ArchitectureClass::RiscV64 => SyscallAbiCallingConvention {
+                instruction: "ecall",
+                syscall_num_reg: "a7",
+                arg_regs: vec!["a0", "a1", "a2", "a3", "a4", "a5"],
+                return_reg: "a0",
+            },
+            ArchitectureClass::LoongArch64 => SyscallAbiCallingConvention {
+                instruction: "syscall 0",
+                syscall_num_reg: "a7",
+                arg_regs: vec!["a0", "a1", "a2", "a3", "a4", "a5"],
+                return_reg: "a0",
+            },
+            ArchitectureClass::PowerPC64 => SyscallAbiCallingConvention {
+                instruction: "sc",
+                syscall_num_reg: "r0",
+                arg_regs: vec!["r3", "r4", "r5", "r6", "r7", "r8"],
+                return_reg: "r3",
+            },
+            ArchitectureClass::S390x => SyscallAbiCallingConvention {
+                instruction: "svc 0",
+                syscall_num_reg: "r1",
+                arg_regs: vec!["r2", "r3", "r4", "r5", "r6", "r7"],
+                return_reg: "r2",
+            },
+        }
+    }
+}
+
+// =========================================================================
+// 2. SOVEREIGN MMU PAGE TABLE WALKER
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PhysicalTranslation {
+    pub virtual_addr: u64,
+    pub physical_addr: u64,
+    pub page_size_bytes: usize,
+    pub is_user_accessible: bool,
+    pub is_executable: bool,
+    pub is_writable: bool,
+}
+
+pub struct SovereignMmuPageTableWalker {
+    pub arch: ArchitectureClass,
+    pub page_table_mode: CpuPageTableMode,
+}
+
+impl SovereignMmuPageTableWalker {
+    pub fn new(arch: ArchitectureClass) -> Self {
+        let page_table_mode = match arch {
+            ArchitectureClass::X86_32 => CpuPageTableMode::X86_4LevelPaging,
+            ArchitectureClass::X86_64 => CpuPageTableMode::X86_4LevelPaging,
+            ArchitectureClass::AArch64 => CpuPageTableMode::Arm64_4Level48Bit,
+            ArchitectureClass::RiscV32 => CpuPageTableMode::RiscvSv39,
+            ArchitectureClass::RiscV64 => CpuPageTableMode::RiscvSv48,
+            ArchitectureClass::LoongArch64 => CpuPageTableMode::LoongArchLA64,
+            ArchitectureClass::PowerPC64 => CpuPageTableMode::PowerPCLinuxRadix,
+            ArchitectureClass::S390x => CpuPageTableMode::S390xRegion1Table,
+        };
+
+        Self {
+            arch,
+            page_table_mode,
+        }
+    }
+
+    pub fn walk_page_table(&self, root_table_phys: u64, virt_addr: u64) -> PhysicalTranslation {
+        // Identity / offset page translation simulation
+        let page_offset = virt_addr & 0xFFF;
+        let base_phys = (root_table_phys + (virt_addr >> 12)) & !0xFFF;
+        let physical_addr = base_phys + page_offset;
+
+        PhysicalTranslation {
+            virtual_addr: virt_addr,
+            physical_addr,
+            page_size_bytes: 4096,
+            is_user_accessible: virt_addr < 0x8000_0000_0000,
+            is_executable: true,
+            is_writable: true,
+        }
+    }
+}
+
+// =========================================================================
+// 3. SOVEREIGN SIMD VECTOR DISPATCHER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VectorInstructionSet {
+    Avx2,
+    Avx512,
+    ArmNeon,
+    ArmSve2,
+    RiscvVector10,
+    LoongArchLasx,
+    FallbackScalar,
+}
+
+pub struct SovereignSimdVectorDispatcher {
+    pub preferred_isa: VectorInstructionSet,
+}
+
+impl SovereignSimdVectorDispatcher {
+    pub fn auto_detect(caps: &IsaVectorCapabilities) -> Self {
+        let preferred = if caps.has_avx512 {
+            VectorInstructionSet::Avx512
+        } else if caps.has_avx2 {
+            VectorInstructionSet::Avx2
+        } else if caps.has_sve2 {
+            VectorInstructionSet::ArmSve2
+        } else if caps.has_neon {
+            VectorInstructionSet::ArmNeon
+        } else if caps.has_riscv_v {
+            VectorInstructionSet::RiscvVector10
+        } else if caps.has_loongarch_lasx {
+            VectorInstructionSet::LoongArchLasx
+        } else {
+            VectorInstructionSet::FallbackScalar
+        };
+
+        Self {
+            preferred_isa: preferred,
+        }
+    }
+
+    pub fn vector_add_u32(&self, a: &[u32], b: &[u32]) -> Vec<u32> {
+        let len = a.len().min(b.len());
+        let mut result = vec![0u32; len];
+
+        for i in 0..len {
+            result[i] = a[i].wrapping_add(b[i]);
+        }
+        result
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -218,5 +389,47 @@ mod tests {
         let mut rv_hal = SovereignMultiArchHalEngine::new(ArchitectureClass::RiscV64);
         assert_eq!(rv_hal.get_root_register_name(), "SATP");
         assert!(rv_hal.vector_caps.has_riscv_v);
+    }
+
+    #[test]
+    fn test_syscall_abi_translation() {
+        let x64_abi = SovereignSyscallAbiTranslator::get_calling_convention(ArchitectureClass::X86_64);
+        assert_eq!(x64_abi.instruction, "syscall");
+        assert_eq!(x64_abi.syscall_num_reg, "rax");
+        assert_eq!(x64_abi.arg_regs[0], "rdi");
+
+        let arm64_abi = SovereignSyscallAbiTranslator::get_calling_convention(ArchitectureClass::AArch64);
+        assert_eq!(arm64_abi.instruction, "svc #0");
+        assert_eq!(arm64_abi.syscall_num_reg, "x8");
+        assert_eq!(arm64_abi.arg_regs[0], "x0");
+
+        let riscv_abi = SovereignSyscallAbiTranslator::get_calling_convention(ArchitectureClass::RiscV64);
+        assert_eq!(riscv_abi.instruction, "ecall");
+        assert_eq!(riscv_abi.syscall_num_reg, "a7");
+        assert_eq!(riscv_abi.arg_regs[0], "a0");
+    }
+
+    #[test]
+    fn test_mmu_page_table_walker() {
+        let walker = SovereignMmuPageTableWalker::new(ArchitectureClass::X86_64);
+        let translation = walker.walk_page_table(0x1000, 0x0040_1234);
+
+        assert_eq!(translation.virtual_addr, 0x0040_1234);
+        assert!(translation.is_user_accessible);
+        assert_eq!(translation.page_size_bytes, 4096);
+    }
+
+    #[test]
+    fn test_simd_vector_dispatcher() {
+        let caps_x64 = IsaVectorCapabilities::for_arch(ArchitectureClass::X86_64);
+        let dispatcher_x64 = SovereignSimdVectorDispatcher::auto_detect(&caps_x64);
+        assert_eq!(dispatcher_x64.preferred_isa, VectorInstructionSet::Avx512);
+
+        let res = dispatcher_x64.vector_add_u32(&[10, 20, 30], &[1, 2, 3]);
+        assert_eq!(res, vec![11, 22, 33]);
+
+        let caps_arm64 = IsaVectorCapabilities::for_arch(ArchitectureClass::AArch64);
+        let dispatcher_arm = SovereignSimdVectorDispatcher::auto_detect(&caps_arm64);
+        assert_eq!(dispatcher_arm.preferred_isa, VectorInstructionSet::ArmSve2);
     }
 }

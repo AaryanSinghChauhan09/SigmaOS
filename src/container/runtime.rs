@@ -1,6 +1,7 @@
-use core::sync::atomic::{AtomicUsize, Ordering};
+
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -220,13 +221,15 @@ impl SeccompProfileV2 {
         if !self.hardened {
             return false;
         }
-        if syscall_id < 32 {
+        if syscall_id < 64 {
             (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
         } else {
-            false
+            self.blocked_syscalls.contains(&syscall_id)
         }
     }
 }
+
+pub type SeccompProfileV2 = SeccompProfile;
 
 /// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]
@@ -277,25 +280,6 @@ pub struct SimpleContainer {
     pub capability: ContainerCapability,
     pub environment: [u8; 512],
     pub seccomp: SeccompProfile,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SeccompAction {
-    Allow,
-    Errno,
-    Kill,
-}
-
-#[derive(Debug, Clone)]
-pub struct SeccompPolicy {
-    pub default_action: SeccompAction,
-    pub blocked_syscalls: Vec<u32>,
-}
-
-impl SeccompPolicy {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        self.blocked_syscalls.contains(&syscall_id)
-    }
 }
 
 impl SimpleContainer {

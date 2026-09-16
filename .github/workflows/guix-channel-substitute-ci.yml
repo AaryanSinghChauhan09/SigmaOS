@@ -1,4 +1,7 @@
 name: GNU Guix Channel & Functional Graft CI
+permissions:
+  contents: read
+
 
 on:
   push:
@@ -9,6 +12,7 @@ on:
 jobs:
   guix-channel:
     name: GNU Guix Functional Channel & Graft Evaluation Matrix
+
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

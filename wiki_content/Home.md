@@ -5,6 +5,7 @@ Welcome to SigmaOS! A modern, production-ready operating system implementing ent
 ## Quick Links
 
 - **[Getting Started](#getting-started)** - Build and run SigmaOS
+- **[Master AI Agent Algorithm Diagnostics & Fix Guide](WHAT_IS_WORKING_AND_NOT_WORKING.md)** - Diagnostics & Safe Rust Blueprints
 - **[Architecture](#architecture)** - System design and components
 - **[Phase 8 Features](#phase-8-features)** - 5 Tier 1 features (v0.8)
 - **[API Reference](#api-reference)** - Complete API documentation

@@ -1,0 +1,33 @@
+name: Fedora DNF5 Advisory & DeltaRPM Reconstitution CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'src/compatibility/fedora.rs'
+      - 'src/distro/fedora_parity.rs'
+      - '.github/workflows/fedora-dnf5-advisory-ci.yml'
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  fedora-dnf5-test:
+    name: Verify Fedora DNF5 Security Advisory & DeltaRPM Engines
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test Fedora Compatibility Modules
+        run: |
+          mkdir -p build
+          rustc --test --edition=2021 src/compatibility/fedora.rs -o build/test_fedora_compat
+          ./build/test_fedora_compat
+          rustc --test --edition=2021 src/distro/fedora_parity.rs -o build/test_fedora_parity
+          ./build/test_fedora_parity

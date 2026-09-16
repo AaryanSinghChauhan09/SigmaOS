@@ -395,7 +395,7 @@ impl PciDriver for UsbXhciPciDriver {
 // Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

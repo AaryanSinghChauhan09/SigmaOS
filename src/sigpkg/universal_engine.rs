@@ -78,6 +78,24 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
+    Deb,
+    Rpm,
+    Ebuild,
+    Sigma,
+    Sysupdate,
+}
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
+        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
+        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
+        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
+        else if filename.ends_with(".nix") { Some(PackageFormat::Nix) }
+        else if filename.ends_with(".sysupdate") { Some(PackageFormat::Sysupdate) }
+        else if filename.ends_with(".sigma") { Some(PackageFormat::Sigma) }
+        else { None }
+    }
 }
 
 
@@ -1655,8 +1673,8 @@ impl IPackageAdapter for PetPackageAdapter {
 pub struct SnapPackageAdapter;
 impl IPackageAdapter for SnapPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Apt
-    } // or custom snap mapping
+        PackageFormat::Snap
+    }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
             return Err("Empty Snap payload");
@@ -1664,7 +1682,7 @@ impl IPackageAdapter for SnapPackageAdapter {
         Ok(PackageContext {
             name: "snap-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Apt,
+            format: PackageFormat::Snap,
             dependencies: vec![],
             files: vec![],
             hash: [0x21; 32],
@@ -1681,7 +1699,7 @@ impl IPackageAdapter for SnapPackageAdapter {
 
 impl IPackageAdapter for FlatpakPackageAdapter {
     fn format(&self) -> PackageFormat {
-        PackageFormat::Apt
+        PackageFormat::Flatpak
     }
     fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
         if raw_data.is_empty() {
@@ -1690,7 +1708,7 @@ impl IPackageAdapter for FlatpakPackageAdapter {
         Ok(PackageContext {
             name: "flatpak-compat-pkg".to_string(),
             version: "1.0.0".to_string(),
-            format: PackageFormat::Apt,
+            format: PackageFormat::Flatpak,
             dependencies: vec![],
             files: vec![],
             hash: [0x22; 32],

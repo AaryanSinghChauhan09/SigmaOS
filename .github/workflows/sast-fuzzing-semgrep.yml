@@ -101,7 +101,7 @@ jobs:
       - name: Setup Rust Nightly (for cargo-fuzz)
         uses: dtolnay/rust-toolchain@stable # stable
         with:
-          toolchain: stable
+          toolchain: nightly
 
       - name: Check for fuzz targets
         run: |

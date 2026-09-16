@@ -14,13 +14,13 @@ pub mod bus;
 pub mod classic_os;
 pub mod component;
 pub mod console;
+pub mod missing_linux_kernel_components;
 pub mod cpu_features;
 pub mod cpufreq;
 pub mod device;
 pub mod driver;
 pub mod dtrace_compat;
 pub mod ebpf;
-pub mod bsd_kernel_parity;
 pub mod ebpf_vm;
 pub mod ebpf_verification;
 pub mod exports;
@@ -29,11 +29,15 @@ pub mod gap_filling;
 pub mod generation_manager;
 pub mod io_uring;
 pub mod ipc;
+pub mod kqueue;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
+pub use linux_parity::{
+    CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
+    LinuxKernelWorkqueueEngine, LinuxRcuSynchronizationEngine, RcuCallback, WorkItem,
+};
 pub mod memory;
-pub mod missing_linux_kernel_components;
 pub mod meta;
 pub mod module_loader;
 pub mod namespaces;
@@ -50,12 +54,17 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
+pub mod missing_linux_kernel_components;
 pub mod structures;
-pub mod subsystem;
-pub mod syscall;
-pub mod task_name_cache;
-pub mod virtual_cpu;
-pub mod vmm_paging;
+
+pub use missing_linux_kernel_components::{
+    BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
+    KprobeEntry, LinuxEpollEventPollEngine, LinuxKernelAuditSubsystemEngine,
+    LinuxKprobesTracepointEngine, LinuxMemoryCgroupV2OomKillerEngine,
+    LinuxSeccompBpfSyscallFilterEngine, MemcgProcessEntry, SeccompAction, UffdFaultEvent, UffdMode,
+    UffdRegisteredRange, UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
+};
+pub mod traits;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;
@@ -103,7 +112,6 @@ pub use crate::kernel::linux_bsd_innovations::{
     PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
 };
 pub use linux_parity::*;
-pub use missing_linux_kernel_components::*;
 pub use memory::{
     BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
     MemoryBlock, PcieResourceAllocator, ResourceLimits, SigmaResourceAllocatorHub,
@@ -119,10 +127,6 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use namespaces::{
-    KernelNamespace, NamespaceId, KernelNamespaceType, NamespaceConfig, NamespaceError,
-    NamespaceIdGenerator, next_namespace_id, MAX_NAMESPACES, MAX_PIDS_PER_NAMESPACE,
-};
 pub use virtual_cpu::SovereignVirtualCPU as VirtualCpu;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 // Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.

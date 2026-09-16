@@ -3,7 +3,6 @@
 
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 use std::vec;
 
 /// Installer Screen / Calamares Module Sequence
@@ -196,10 +195,24 @@ impl UserAccount {
     }
 }
 
+/// Network Configuration
+#[derive(Debug, Clone)]
+pub struct NetworkConfig {
+    pub use_dhcp: bool,
+    pub static_ip: Option<String>,
+    pub gateway: Option<String>,
+    pub dns_servers: Vec<String>,
+}
+
 /// System Configuration
 #[derive(Debug, Clone)]
 pub struct SystemConfiguration {
     pub hostname: String,
+    pub timezone: String,
+    pub locale: String,
+    pub keyboard_layout: String,
+    pub network_config: NetworkConfig,
+    pub services: Vec<String>,
     pub is_admin: bool,
     pub auto_login: bool,
     pub timezone: String,
@@ -215,6 +228,7 @@ pub struct PrivacySettings {
     pub send_crash_reports: bool,
     pub location_services: bool,
 }
+
 
 impl SystemConfiguration {
     pub fn new() -> Self {
@@ -236,6 +250,8 @@ impl SystemConfiguration {
                 String::from("sshd"),
                 String::from("cron"),
             ],
+            is_admin: true,
+            auto_login: false,
         }
     }
 }

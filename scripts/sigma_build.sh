@@ -19,6 +19,11 @@ DRY_RUN=0
 SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-1704067200}"
 export SOURCE_DATE_EPOCH
 
+# Tech Media & Benchmark Integrations (Phoronix / DistroWatch / Linux Foundation inspired)
+PHORONIX_BENCHMARK="${PHORONIX_BENCHMARK:-0}"
+DISTROWATCH_METADATA="${DISTROWATCH_METADATA:-1}"
+START_TIME=$(date +%s 2>/dev/null || echo 0)
+
 # ── OS & Platform Detection (Linux/BSD/Darwin) ─────────────────────────────
 HOST_OS="$(uname -s 2>/dev/null || echo "Unknown")"
 HOST_ARCH="$(uname -m 2>/dev/null || echo "Unknown")"
@@ -235,6 +240,17 @@ main() {
     build_nim_tools
     build_zig_apps
     check_reproducibility
+
+    if [ "$DISTROWATCH_METADATA" -eq 1 ]; then
+        step "Generating DistroWatch / Tech Media Metadata Summary"
+        GIT_COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo 'release')"
+        END_TIME=$(date +%s 2>/dev/null || echo 0)
+        DURATION=$((END_TIME - START_TIME))
+        log "  Distro Status: Active / Sovereign"
+        log "  Package Manager: sigpkg (universal .deb/.rpm/PKGBUILD/apk/pkg/xbps)"
+        log "  Git Commit Hash: ${GIT_COMMIT}"
+        log "  Build Duration: ${DURATION}s"
+    fi
 
     log "${COLOR_GREEN}Build COMPLETE.${COLOR_RESET}"
 }

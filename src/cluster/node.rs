@@ -5,13 +5,11 @@ use std::boxed::Box;
 /// Raft-style distributed consensus, and active CARP-inspired failover routing.
 
 #[cfg(test_disabled)]
-extern crate std;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 #[cfg(test_disabled)]
-extern crate alloc;
 
 pub type NodeID = usize;
 pub type PodID = usize;

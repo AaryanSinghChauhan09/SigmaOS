@@ -1092,7 +1092,211 @@ fn parse_debian_deps(s: &str) -> Vec<DebianDependency> {
     }).collect()
 }
 
-#[cfg(test_disabled)]
+// ══════════════════════════════════════════════════════
+// 13. Clear Linux: Stateless OS Architecture
+// ══════════════════════════════════════════════════════
+
+/// Clear Linux inspired stateless system architecture engine.
+/// Keeps `/etc` and `/var` clean by serving default configurations from `/usr/share/defaults`.
+#[derive(Debug, Clone)]
+pub struct ClearLinuxStatelessArchitectureEngine {
+    pub factory_defaults_path: String,
+    pub user_override_path: String,
+    pub active_bundles: Vec<ClearLinuxBundleStream>,
+    pub stateless_sync_count: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct ClearLinuxBundleStream {
+    pub bundle_name: String,
+    pub version: u32,
+    pub file_count: u32,
+    pub total_size_bytes: u64,
+    pub dependencies: Vec<String>,
+}
+
+impl ClearLinuxStatelessArchitectureEngine {
+    pub fn new() -> Self {
+        Self {
+            factory_defaults_path: "/usr/share/defaults".to_string(),
+            user_override_path: "/etc".to_string(),
+            active_bundles: Vec::new(),
+            stateless_sync_count: 0,
+        }
+    }
+
+    pub fn install_bundle(&mut self, bundle: ClearLinuxBundleStream) {
+        if !self.active_bundles.iter().any(|b| b.bundle_name == bundle.bundle_name) {
+            self.active_bundles.push(bundle);
+        }
+    }
+
+    pub fn resolve_config_path(&self, rel_path: &str, user_override_exists: bool) -> String {
+        if user_override_exists {
+            format!("{}/{}", self.user_override_path, rel_path)
+        } else {
+            format!("{}/{}", self.factory_defaults_path, rel_path)
+        }
+    }
+
+    pub fn reset_user_configuration(&mut self) -> u64 {
+        self.stateless_sync_count += 1;
+        self.stateless_sync_count
+    }
+}
+
+// ══════════════════════════════════════════════════════
+// 14. Void Linux: Runit Minimal Service Supervisor
+// ══════════════════════════════════════════════════════
+
+/// Void Linux inspired runit minimal service supervisor engine.
+#[derive(Debug, Clone)]
+pub struct VoidLinuxRunitSupervisorEngine {
+    pub current_stage: RunitBootStage,
+    pub services: BTreeMap<String, RunitServiceSpec>,
+    pub supervised_pid_counter: u32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitBootStage {
+    Stage1OneTimeInit,
+    Stage2MultiUserRun,
+    Stage3ShutdownHalt,
+}
+
+#[derive(Debug, Clone)]
+pub struct RunitServiceSpec {
+    pub name: String,
+    pub run_script: String,
+    pub finish_script: Option<String>,
+    pub is_enabled: bool,
+    pub pid: Option<u32>,
+    pub restart_count: u32,
+}
+
+impl VoidLinuxRunitSupervisorEngine {
+    pub fn new() -> Self {
+        Self {
+            current_stage: RunitBootStage::Stage1OneTimeInit,
+            services: BTreeMap::new(),
+            supervised_pid_counter: 100,
+        }
+    }
+
+    pub fn transition_stage(&mut self, stage: RunitBootStage) {
+        self.current_stage = stage;
+    }
+
+    pub fn register_service(&mut self, name: &str, run_script: &str) {
+        let spec = RunitServiceSpec {
+            name: name.to_string(),
+            run_script: run_script.to_string(),
+            finish_script: None,
+            is_enabled: true,
+            pid: None,
+            restart_count: 0,
+        };
+        self.services.insert(name.to_string(), spec);
+    }
+
+    pub fn supervise_tick(&mut self) -> u32 {
+        let mut started = 0;
+        for service in self.services.values_mut() {
+            if service.is_enabled && service.pid.is_none() {
+                self.supervised_pid_counter += 1;
+                service.pid = Some(self.supervised_pid_counter);
+                service.restart_count += 1;
+                started += 1;
+            }
+        }
+        started
+    }
+
+    pub fn stop_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.is_enabled = false;
+            service.pid = None;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+// ══════════════════════════════════════════════════════
+// 15. GNU Guix: Declarative Scheme Profile Engine
+// ══════════════════════════════════════════════════════
+
+/// GNU Guix inspired functional declarative Scheme engine.
+#[derive(Debug, Clone)]
+pub struct GuixGNUDeclarativeSchemeEngine {
+    pub current_profile_generation: u32,
+    pub derivations: Vec<GuixSchemeDerivation>,
+    pub profile_history: Vec<GuixProfileState>,
+}
+
+#[derive(Debug, Clone)]
+pub struct GuixSchemeDerivation {
+    pub package_name: String,
+    pub version: String,
+    pub scheme_expression: String,
+    pub store_hash: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct GuixProfileState {
+    pub generation: u32,
+    pub installed_packages: Vec<String>,
+}
+
+impl GuixGNUDeclarativeSchemeEngine {
+    pub fn new() -> Self {
+        Self {
+            current_profile_generation: 1,
+            derivations: Vec::new(),
+            profile_history: vec![GuixProfileState {
+                generation: 1,
+                installed_packages: Vec::new(),
+            }],
+        }
+    }
+
+    pub fn declare_package(&mut self, name: &str, version: &str, scheme_expr: &str) {
+        let store_hash = format!("/gnu/store/guix-{}", name);
+        self.derivations.push(GuixSchemeDerivation {
+            package_name: name.to_string(),
+            version: version.to_string(),
+            scheme_expression: scheme_expr.to_string(),
+            store_hash,
+        });
+    }
+
+    pub fn build_generation(&mut self, packages: Vec<String>) -> u32 {
+        self.current_profile_generation += 1;
+        let gen = self.current_profile_generation;
+        self.profile_history.push(GuixProfileState {
+            generation: gen,
+            installed_packages: packages,
+        });
+        gen
+    }
+
+    pub fn rollback(&mut self) -> Result<u32, &'static str> {
+        if self.profile_history.len() > 1 {
+            self.profile_history.pop();
+            if let Some(last) = self.profile_history.last() {
+                self.current_profile_generation = last.generation;
+                Ok(self.current_profile_generation)
+            } else {
+                Err("No profile history remaining")
+            }
+        } else {
+            Err("Cannot rollback initial profile generation")
+        }
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1181,5 +1385,45 @@ depends=("glibc" "openssl")
         patch.patch_data = vec![0x90]; // NOP sled placeholder
         assert!(mgr.apply_patch(patch).is_ok());
         assert!(mgr.list_applied_cves().contains(&"CVE-2024-1234".to_string()));
+    }
+
+    #[test]
+    fn test_clear_linux_stateless() {
+        let mut engine = ClearLinuxStatelessArchitectureEngine::new();
+        engine.install_bundle(ClearLinuxBundleStream {
+            bundle_name: "os-core".to_string(),
+            version: 1,
+            file_count: 150,
+            total_size_bytes: 50_000_000,
+            dependencies: vec![],
+        });
+        assert_eq!(engine.active_bundles.len(), 1);
+        let path = engine.resolve_config_path("hostname", false);
+        assert_eq!(path, "/usr/share/defaults/hostname");
+        let path_override = engine.resolve_config_path("hostname", true);
+        assert_eq!(path_override, "/etc/hostname");
+        assert_eq!(engine.reset_user_configuration(), 1);
+    }
+
+    #[test]
+    fn test_void_runit_supervisor() {
+        let mut runit = VoidLinuxRunitSupervisorEngine::new();
+        runit.register_service("dbus", "/etc/sv/dbus/run");
+        runit.transition_stage(RunitBootStage::Stage2MultiUserRun);
+        let started = runit.supervise_tick();
+        assert_eq!(started, 1);
+        assert!(runit.services.get("dbus").unwrap().pid.is_some());
+        assert!(runit.stop_service("dbus"));
+        assert!(!runit.services.get("dbus").unwrap().is_enabled);
+    }
+
+    #[test]
+    fn test_guix_declarative_scheme() {
+        let mut guix = GuixGNUDeclarativeSchemeEngine::new();
+        guix.declare_package("coreutils", "9.1", "(package (name \"coreutils\"))");
+        assert_eq!(guix.derivations.len(), 1);
+        let gen2 = guix.build_generation(vec!["coreutils".to_string()]);
+        assert_eq!(gen2, 2);
+        assert_eq!(guix.rollback().unwrap(), 1);
     }
 }

@@ -1,11 +1,13 @@
 use std::format;
+use std::string::{String, ToString};
 use std::vec;
+use std::vec::Vec;
+use std::collections::BTreeMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Systemd-Grade Init and Target State Engine for SigmaOS
 /// Provides robust target dependency graphs, wants/requires properties,
 /// and target states to defeat Fedora's Systemd initialization.
-use std::collections::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type UnitID = usize;
 
@@ -1556,9 +1558,8 @@ impl SystemdEngine {
                 blame_list.push((unit.id, unit.duration_ms));
             }
         }
-        let len = blame_list.len();
-        for i in 0..len {
-            for j in 0..len.saturating_sub(1).saturating_sub(i) {
+        for i in 0..blame_list.len() {
+            for j in 0..blame_list.len() - 1 - i {
                 if blame_list[j].1 < blame_list[j + 1].1 {
                     let temp = blame_list[j].clone();
                     blame_list[j] = blame_list[j + 1].clone();

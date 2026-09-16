@@ -1,9 +1,9 @@
+extern crate alloc;
 
-
-use std::format;
-use std::string::String;
-use std::vec;
-use std::vec::Vec;
+use alloc::format;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// MintDesktop-inspired desktop settings manager
 /// Provides additional desktop environment settings similar to Linux Mint's mintdesktop

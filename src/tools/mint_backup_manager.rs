@@ -1,9 +1,9 @@
+extern crate alloc;
 
-
-use std::format;
-use std::string::{String, ToString};
-use std::vec;
-use std::vec::Vec;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// MintBackup-inspired backup tool GUI
 /// Provides text-based interface for system backup and restore

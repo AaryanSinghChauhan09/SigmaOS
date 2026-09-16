@@ -1,0 +1,25 @@
+name: FreeBSD Poudriere Ports & VuXML Security Auditor CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  freebsd-poudriere-audit:
+    name: Verify FreeBSD Ports Flavours & VuXML Vulnerability Scanner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Execute Test Suite
+        run: |
+          ./run_sigma_tests.sh

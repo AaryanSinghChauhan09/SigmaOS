@@ -16,9 +16,16 @@
 pub mod atomic;
 pub mod delta;
 pub mod distro_update_parity;
+pub mod manager;
 
 pub use distro_update_parity::{
     ArchRollingReleaseUpdater, DebianUnattendedUpgradesEngine, FreeBsdPatchEntry,
     FreeBsdUpdateEngine, OstreeAbPartitionUpdater, OstreeDeploymentState, PacnewMergeConflict,
     PartitionSlot, PostQuantumSignedUpdateVerifier, UnattendedUpgradeRule,
+    SovereignSystemUpdateAndTestingEngine, SystemDiagnosticReport,
+};
+pub use manager::{
+    PreflightCheckResult, SovereignSystemUpdateManager, SystemUpdatePayload, SystemUpdatePolicy,
+    SystemUpdateStrategy, UpdateHealthVerifier, UpdateLedgerEntry, UpdateSeverity,
+    UpdateTransactionLedger,
 };

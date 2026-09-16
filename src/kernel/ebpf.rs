@@ -3,7 +3,21 @@
 // and execution over standard in-kernel maps.
 
 
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap as HashMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap as HashMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -263,6 +277,7 @@ pub struct BpfRingBufferHeader {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BpfRingBufferSample {
     pub producer_offset: u32,
+    pub reserved_len: usize,
     pub payload: Vec<u8>,
     pub is_discarded: bool,
 }
@@ -272,7 +287,9 @@ pub struct BpfRingBufferEngine {
     pub capacity: usize,
     pub producer_pos: usize,
     pub consumer_pos: usize,
-    pub samples: Vec<BpfRingBufferSample>,
+    pub next_handle: usize,
+    pub samples: BTreeMap<usize, BpfRingBufferSample>,
+    pub sample_order: Vec<usize>,
     pub dropped_samples_count: u64,
 }
 
@@ -288,7 +305,9 @@ impl BpfRingBufferEngine {
             capacity: cap,
             producer_pos: 0,
             consumer_pos: 0,
-            samples: Vec::new(),
+            next_handle: 1,
+            samples: BTreeMap::new(),
+            sample_order: Vec::new(),
             dropped_samples_count: 0,
         }
     }
@@ -300,21 +319,28 @@ impl BpfRingBufferEngine {
             return Err("BPF_MAP_TYPE_RINGBUF: Buffer overflow");
         }
 
-        let sample_id = self.samples.len();
-        self.samples.push(BpfRingBufferSample {
-            producer_offset: (self.producer_pos % self.capacity) as u32,
-            payload: vec![0u8; payload_len],
-            is_discarded: false,
-        });
+        let handle = self.next_handle;
+        self.next_handle += 1;
+
+        self.samples.insert(
+            handle,
+            BpfRingBufferSample {
+                producer_offset: (self.producer_pos % self.capacity) as u32,
+                reserved_len: payload_len,
+                payload: vec![0u8; payload_len],
+                is_discarded: false,
+            },
+        );
+        self.sample_order.push(handle);
 
         self.producer_pos += total_size;
-        Ok(sample_id)
+        Ok(handle)
     }
 
-    pub fn submit_sample(&mut self, sample_id: usize, data: &[u8]) -> Result<(), &'static str> {
+    pub fn submit_sample(&mut self, handle: usize, data: &[u8]) -> Result<(), &'static str> {
         let sample = self
             .samples
-            .get_mut(sample_id)
+            .get_mut(&handle)
             .ok_or("BPF_MAP_TYPE_RINGBUF: Invalid sample handle")?;
 
         if sample.payload.len() != data.len() {
@@ -326,10 +352,10 @@ impl BpfRingBufferEngine {
         Ok(())
     }
 
-    pub fn discard_sample(&mut self, sample_id: usize) -> Result<(), &'static str> {
+    pub fn discard_sample(&mut self, handle: usize) -> Result<(), &'static str> {
         let sample = self
             .samples
-            .get_mut(sample_id)
+            .get_mut(&handle)
             .ok_or("BPF_MAP_TYPE_RINGBUF: Invalid sample handle")?;
 
         sample.is_discarded = true;
@@ -338,18 +364,17 @@ impl BpfRingBufferEngine {
     }
 
     pub fn consume_next_sample(&mut self) -> Option<BpfRingBufferSample> {
-        if self.samples.is_empty() {
-            None
-        } else {
-            let sample = self.samples.remove(0);
-            let total_size = sample.payload.len() + 8;
-            self.consumer_pos += total_size;
-            if sample.is_discarded {
-                self.consume_next_sample()
-            } else {
-                Some(sample)
+        while !self.sample_order.is_empty() {
+            let handle = self.sample_order.remove(0);
+            if let Some(sample) = self.samples.remove(&handle) {
+                let total_size = sample.reserved_len + 8;
+                self.consumer_pos += total_size;
+                if !sample.is_discarded {
+                    return Some(sample);
+                }
             }
         }
+        None
     }
 }
 

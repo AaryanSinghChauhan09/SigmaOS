@@ -5,7 +5,6 @@
  * health checking, and automatic restart policy governance.
  */
 
-extern crate alloc;
 
 
 

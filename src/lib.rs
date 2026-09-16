@@ -1,15 +1,9 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-extern crate alloc;
-
 // Core working modules
-pub mod open_source_os_gap_closure;
 pub mod accessibility;
 pub mod ai;
-pub mod audio;
-pub mod ipc;
-pub mod init;
 pub mod app;
 pub mod auth;
 pub mod automation;
@@ -25,7 +19,7 @@ pub mod filesystem;
 pub mod futuristic_modules;
 pub mod kernel;
 pub mod klib;
-// pub use klib::ZeroDependencyPrimitiveHub;
+pub use klib::ZeroDependencyPrimitiveHub;
 pub mod memory;
 pub mod network;
 pub mod observability;
@@ -58,19 +52,9 @@ pub use process::{
     SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
     WNOHANG, WUNTRACED,
 };
-pub mod linuxmint_inspirations;
-pub use linuxmint_inspirations::{
-    AppTheme, BulkyRenamer, CaptainInstaller, CaptainSource, ConfigBackend, DebPackage,
-    DesktopIconFlags, DiagnosticField, FsFormat, HypnotixIptvPlayer, IsolationMode, IptvProvider,
-    LanPeer, LanWarpEngine, MintConfigHub, MintDesktopEngine, MintLocaleEngine, MintMenuEngine,
-    MintMenuItem, MintNannyFilter, MintReportDiagnostics, MintStickFormatter, MintStickIsoVerifier,
-    MintUpgradeEngine, MintUpgradePhase, MintWelcomeFlow, NannyDecision, PartitionScheme,
-    ProviderType, RenameConflict, RenameRule, RenamedFile, RequestIncoming, SessionControlAction,
-    StickyNote, StickyNotesManager, ThingyEntry, ThingyKind, ThingyRecentDocs, TransferOutcome,
-    TransferRequest, TvChannel, UsbDevice, WARP_AUTH_PORT, WARP_MDNS_UDP_PORT, WARP_TRANSFER_PORT,
-    WebEngineKind, Webapp, WebappManager, WelcomeStep, XAppImageViewer, XAppStatusIconBadgeManager,
-    XAppTextEditor, XAppThemeEngine, XAppTrayBadge,
-};
+pub mod access;
+pub mod community;
+pub mod open_source_os_gap_closure;
 pub mod tools;
 pub use open_source_os_gap_closure::*;
 pub mod sovereign_wiki_master_engine;

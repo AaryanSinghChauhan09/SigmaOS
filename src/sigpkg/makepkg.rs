@@ -65,6 +65,8 @@ impl Package {
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::collections::BTreeMap;
+extern crate alloc;
+
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::format;
 #[cfg(not(any(feature = "standalone_test", test)))]

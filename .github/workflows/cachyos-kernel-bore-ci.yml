@@ -1,0 +1,38 @@
+name: CachyOS Kernel BORE Scheduler & LTO CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'src/distro/cachy.rs'
+      - 'src/compatibility/cachy_os.rs'
+      - 'src/scheduler/**'
+      - '.github/workflows/cachyos-kernel-bore-ci.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'src/distro/cachy.rs'
+      - 'src/compatibility/cachy_os.rs'
+      - 'src/scheduler/**'
+
+permissions:
+  contents: read
+
+jobs:
+  cachyos-kernel-test:
+    name: Verify CachyOS BORE Scheduler & Microarch Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test CachyOS Components
+        run: |
+          mkdir -p build
+          rustc --test --edition=2021 src/distro/cachy.rs -o build/test_cachy
+          ./build/test_cachy
+          rustc --test --edition=2021 src/compatibility/cachy_os.rs -o build/test_cachy_os
+          ./build/test_cachy_os

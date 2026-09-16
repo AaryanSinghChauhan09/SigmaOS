@@ -1,9 +1,5 @@
-use std::boxed::Box;
-#[cfg(not(target_os = "none"))]
 extern crate alloc;
-#[cfg(not(target_os = "none"))]
-use std_std::boxed::Box;
-
+use alloc::boxed::Box;
 
 /// OOP-based Advanced Asynchronous Timer, APC, DPC & IOCTL Execution Engine for SigmaOS
 /// Implements high-fidelity timer management, Windows-inspired Asynchronous Procedure Calls (APC),

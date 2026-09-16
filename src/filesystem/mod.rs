@@ -39,6 +39,7 @@ pub use manager::{
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
 pub use mount_namespace::{MountId, MountInfo, MountNamespace, MountNamespaceStats, MountSource, MountFlags};
+pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use support::{FilesystemError, FilesystemType, SimpleFilesystem, SimpleFilesystemManager};
 // Removed duplicate vfs imports - already imported above
 // pub use ext4::{Ext4FileSystem, Ext4Superblock as Ext4SB, BlockGroupDescriptor};

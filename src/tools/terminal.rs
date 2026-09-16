@@ -1,8 +1,9 @@
+// Terminal Emulator (gnome-terminal/konsole Inspiration)
+// Terminal sessions, profiles, and PTY management
+
 use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
-//! Terminal Emulator (gnome-terminal/konsole Inspiration)
-//! Terminal sessions, profiles, and PTY management
 
 
 
@@ -159,8 +160,74 @@ impl Default for TerminalEmulator {
     }
 }
 
-#[cfg(test_disabled)]
+/// Sovereign Terminal Enhancement Engine (inspired by Ghostty, Alacritty, Starship, Fastfetch)
+#[derive(Debug, Clone)]
+pub struct SovereignTerminalEnhancementEngine {
+    pub gpu_accelerated: bool,
+    pub prompt_theme: String,
+    pub ai_suggestions_enabled: bool,
+    pub history_cache: Vec<String>,
+}
+
+impl SovereignTerminalEnhancementEngine {
+    pub fn new() -> Self {
+        Self {
+            gpu_accelerated: true,
+            prompt_theme: String::from("starship-powerline"),
+            ai_suggestions_enabled: true,
+            history_cache: Vec::new(),
+        }
+    }
+
+    pub fn generate_fastfetch_summary(&self, hostname: &str) -> String {
+        format!(
+            "OS: SigmaOS Sovereign\nHost: {}\nKernel: Safe-Rust #![no_std]\nCompositor: Zenith\nPrompt: {}",
+            hostname, self.prompt_theme
+        )
+    }
+
+    pub fn suggest_command_completion(&self, partial: &str) -> Vec<String> {
+        let candidates = vec![
+            "sigpkg install",
+            "sigpkg search",
+            "sigma-sh status",
+            "sovereign-top",
+            "fastfetch",
+        ];
+        candidates
+            .into_iter()
+            .filter(|c| c.starts_with(partial))
+            .map(|c| c.to_string())
+            .collect()
+    }
+}
+
+impl Default for SovereignTerminalEnhancementEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sovereign_terminal_enhancement() {
+        let engine = SovereignTerminalEnhancementEngine::new();
+        assert!(engine.gpu_accelerated);
+
+        let summary = engine.generate_fastfetch_summary("sigma-workstation");
+        assert!(summary.contains("SigmaOS Sovereign"));
+        assert!(summary.contains("sigma-workstation"));
+
+        let suggestions = engine.suggest_command_completion("sigpkg");
+        assert_eq!(suggestions.len(), 2);
+    }
+}
+
+#[cfg(test_disabled)]
+mod tests_disabled {
     use super::*;
 
     #[test]

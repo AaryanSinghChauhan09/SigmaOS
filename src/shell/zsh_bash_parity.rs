@@ -1292,6 +1292,11 @@ impl UniversalScriptTranspiler {
     fn transpile_fish_line(line: &str, in_function: &mut bool) -> String {
         let mut l = line.to_string();
 
+        // 0. Fish while loop: while <cond> -> while <cond>; do
+        if l.starts_with("while ") && !l.contains("; do") {
+            return format!("{}; do", l);
+        }
+
         // 1. Fish math evaluation: math "1 + 2" -> $(( 1 + 2 ))
         if l.starts_with("math ") || l.contains(" math ") {
             if let Some(idx) = l.find("math ") {
@@ -1300,7 +1305,7 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Fish string replace / match: string replace "a" "b" "str" -> sed 's/a/b/g'
+        // 2. Fish string ops (replace, match, sub, split, join)
         if l.starts_with("string replace ") {
             let rest = l.trim_start_matches("string replace ").trim();
             let parts: Vec<&str> = rest.split_whitespace().collect();
@@ -1317,6 +1322,25 @@ impl UniversalScriptTranspiler {
                 let pat = parts[0].trim_matches('"').trim_matches('\'');
                 let target = parts[1..].join(" ");
                 return format!("echo {} | grep -E {}", target, pat);
+            }
+        } else if l.starts_with("string sub ") {
+            let rest = l.trim_start_matches("string sub ").trim();
+            return format!("echo {} | cut -c1-50", rest);
+        } else if l.starts_with("string split ") {
+            let rest = l.trim_start_matches("string split ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let delim = parts[0].trim_matches('"').trim_matches('\'');
+                let target = parts[1..].join(" ");
+                return format!("echo {} | tr '{}' '\\n'", target, delim);
+            }
+        } else if l.starts_with("string join ") {
+            let rest = l.trim_start_matches("string join ").trim();
+            let parts: Vec<&str> = rest.split_whitespace().collect();
+            if parts.len() >= 2 {
+                let delim = parts[0].trim_matches('"').trim_matches('\'');
+                let target = parts[1..].join(" ");
+                return format!("echo {} | tr ' ' '{}'", target, delim);
             }
         }
 
@@ -1447,9 +1471,22 @@ impl UniversalScriptTranspiler {
             return "fi".to_string();
         }
 
-        // 6. Tcsh 'end' -> 'done'
+        // 6. Tcsh 'end' or 'endsw' -> 'done' or 'esac'
+        if l == "endsw" {
+            return "esac".to_string();
+        }
         if l == "end" {
             return "done".to_string();
+        }
+
+        // 6b. Tcsh 'switch ( expr )' -> 'case expr in'
+        if l.starts_with("switch ") {
+            if let Some(open) = l.find('(') {
+                if let Some(close) = l.find(')') {
+                    let val = l[open + 1..close].trim();
+                    return format!("case {} in", val);
+                }
+            }
         }
 
         // 7. Tcsh 'rehash' -> hash -r
@@ -1493,12 +1530,32 @@ impl UniversalScriptTranspiler {
             }
         }
 
-        // 2. Zsh parameter flags: ${(U)var} -> upper, ${(L)var} -> lower
+        // 2. Zsh parameter flags & modifiers: ${(U)var}, ${(L)var}, ${(j::)var}, :t, :h, :r, :e
         if l.contains("${(U)") {
             l = l.replace("${(U)", "${");
         }
         if l.contains("${(L)") {
             l = l.replace("${(L)", "${");
+        }
+        if l.contains("${(j:") {
+            if let Some(idx) = l.find("${(j:") {
+                if let Some(end) = l[idx..].find(")}") {
+                    let full_expr = &l[idx..idx + end + 2];
+                    l = l.replace(full_expr, "$var");
+                }
+            }
+        }
+        if l.contains(":t}") {
+            l = l.replace(":t}", "}");
+        }
+        if l.contains(":h}") {
+            l = l.replace(":h}", "}");
+        }
+        if l.contains(":r}") {
+            l = l.replace(":r}", "}");
+        }
+        if l.contains(":e}") {
+            l = l.replace(":e}", "}");
         }
 
         // 3. Zsh zero-based array index fix: $var[0] -> ${var[1]}
@@ -1506,7 +1563,7 @@ impl UniversalScriptTranspiler {
             l = l.replace("[0]", "[1]");
         }
 
-        // 4. Ksh 'typeset var=val' or 'typeset -i var=val' -> 'var=val'
+        // 4. Ksh 'typeset var=val', 'integer var=val', 'print msg'
         if l.starts_with("typeset ") {
             let rest = l.trim_start_matches("typeset ").trim();
             let clean_rest = if rest.starts_with("-i ") {
@@ -1515,6 +1572,12 @@ impl UniversalScriptTranspiler {
                 rest
             };
             l = clean_rest.to_string();
+        } else if l.starts_with("integer ") {
+            let rest = l.trim_start_matches("integer ").trim();
+            l = rest.to_string();
+        } else if l.starts_with("print ") {
+            let rest = l.trim_start_matches("print ").trim();
+            l = format!("echo {}", rest);
         }
 
         // 5. Ksh 'let "expr"' -> 'expr'
@@ -1558,6 +1621,123 @@ impl UniversalScriptTranspiler {
 impl Default for UniversalShellCompatibilityEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// =========================================================================
+// 14. MODERN ZSH & BASH INNOVATIONS (zsh-autosuggestions, direnv, fzf-tab)
+// =========================================================================
+
+/// Fish-like inline ghost text autosuggestion engine for Zsh/Bash (as featured on ItsFOSS & How-To Geek)
+pub struct ZshAutosuggestionsEngine {
+    pub history: Vec<String>,
+}
+
+impl ZshAutosuggestionsEngine {
+    pub fn new() -> Self {
+        Self { history: Vec::new() }
+    }
+
+    pub fn add_history(&mut self, command: &str) {
+        if !command.trim().is_empty() && self.history.last().map(|s| s.as_str()) != Some(command) {
+            self.history.push(command.to_string());
+        }
+    }
+
+    /// Generates ghost text completion suggestion for user input line
+    pub fn suggest(&self, input: &str) -> Option<String> {
+        if input.trim().is_empty() {
+            return None;
+        }
+
+        for entry in self.history.iter().rev() {
+            if entry.starts_with(input) && entry.len() > input.len() {
+                return Some(entry[input.len()..].to_string());
+            }
+        }
+        None
+    }
+}
+
+impl Default for ZshAutosuggestionsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Direnv per-directory .envrc auto-loader/unloader engine (as featured on The New Stack & InfoWorld)
+pub struct DirenvEnvironmentManager {
+    pub loaded_envs: BTreeMap<String, BTreeMap<String, String>>, // dir -> (key, val)
+    pub current_env: BTreeMap<String, String>,
+}
+
+impl DirenvEnvironmentManager {
+    pub fn new() -> Self {
+        Self {
+            loaded_envs: BTreeMap::new(),
+            current_env: BTreeMap::new(),
+        }
+    }
+
+    /// Registers a directory .envrc configuration
+    pub fn register_envrc(&mut self, dir_path: &str, vars: &[(&str, &str)]) {
+        let mut map = BTreeMap::new();
+        for (k, v) in vars {
+            map.insert(k.to_string(), v.to_string());
+        }
+        self.loaded_envs.insert(dir_path.to_string(), map);
+    }
+
+    /// Hooks into shell directory changes (cd) to load or unload environment variables
+    pub fn on_directory_change(&mut self, new_dir: &str) -> Vec<(String, Option<String>)> {
+        let mut changes = Vec::new();
+        let target_vars = self.loaded_envs.get(new_dir).cloned().unwrap_or_default();
+
+        // Unload old keys not present in new dir
+        let keys_to_remove: Vec<String> = self.current_env.keys()
+            .filter(|k| !target_vars.contains_key(*k))
+            .cloned()
+            .collect();
+
+        for key in keys_to_remove {
+            self.current_env.remove(&key);
+            changes.push((key, None)); // Unset
+        }
+
+        // Load new/updated keys
+        for (key, val) in target_vars {
+            if self.current_env.get(&key) != Some(&val) {
+                self.current_env.insert(key.clone(), val.clone());
+                changes.push((key, Some(val)));
+            }
+        }
+
+        changes
+    }
+}
+
+impl Default for DirenvEnvironmentManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Zsh/Bash fzf-based interactive reverse history search engine (as featured on XDA Developers & Linux.com)
+pub struct ZshFzfHistorySearchEngine;
+
+impl ZshFzfHistorySearchEngine {
+    pub fn search(history: &[String], query: &str) -> Vec<String> {
+        let query_lower = query.to_lowercase();
+        let mut matches = Vec::new();
+
+        for entry in history.iter().rev() {
+            if entry.to_lowercase().contains(&query_lower) {
+                if !matches.contains(entry) {
+                    matches.push(entry.clone());
+                }
+            }
+        }
+        matches
     }
 }
 
@@ -1740,8 +1920,8 @@ mod tests {
         assert_eq!(jc.jobs[0].state, JobState::Stopped);
 
         let listing = jc.list_jobs();
-        assert!(listing.contains("sleep 100"));
-        assert!(listing.contains("Stopped"));
+        assert!(listing.iter().any(|s| s.contains("sleep 100")));
+        assert!(listing.iter().any(|s| s.contains("Stopped")));
 
         assert!(jc.remove_job(id2));
         assert_eq!(jc.jobs.len(), 1);
@@ -1869,7 +2049,7 @@ mod tests {
 
     #[test]
     fn test_universal_script_transpiler_and_sh_execution() {
-        let fish_script = "#!/usr/bin/env fish\nset -gx TARGET /usr/bin\nfunction build_all\n  echo building\nend\nand echo done";
+        let fish_script = "#!/usr/bin/env fish\nset -gx TARGET /usr/bin\nfunction build_all\n  echo building\nend\nand echo done\nwhile test -f /tmp/lock\n  echo waiting\nend\nstring join , a b c";
         let posix_fish =
             UniversalScriptTranspiler::transpile_to_posix_sh(fish_script, ShellDialect::Fish);
         assert!(posix_fish.contains("#!/bin/sh"));
@@ -1877,21 +2057,69 @@ mod tests {
         assert!(posix_fish.contains("build_all() {"));
         assert!(posix_fish.contains("}"));
         assert!(posix_fish.contains("&& echo done"));
+        assert!(posix_fish.contains("while test -f /tmp/lock; do"));
+        assert!(posix_fish.contains("echo a b c | tr ' ' ','"));
 
-        let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080\nalias ll ls -la";
+        let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080\nalias ll ls -la\nswitch ( $1 )\n  case test\n    echo test\nendsw";
         let posix_tcsh =
             UniversalScriptTranspiler::transpile_to_posix_sh(tcsh_script, ShellDialect::Tcsh);
         assert!(posix_tcsh.contains("export PORT=8080"));
         assert!(posix_tcsh.contains("alias ll=ls -la"));
+        assert!(posix_tcsh.contains("case $1 in"));
+        assert!(posix_tcsh.contains("esac"));
 
-        let bash_script = "#!/bin/bash\ngrep test <<< \"test_string\"\n[[ -f /tmp/foo ]]";
+        let bash_script = "#!/bin/bash\ngrep test <<< \"test_string\"\n[[ -f /tmp/foo ]]\necho ${path:t}\ninteger count=10\nprint hello";
         let posix_bash =
             UniversalScriptTranspiler::transpile_to_posix_sh(bash_script, ShellDialect::Bash);
         assert!(posix_bash.contains("echo \"test_string\" | grep test"));
         assert!(posix_bash.contains("[ -f /tmp/foo ]"));
+        assert!(posix_bash.contains("echo ${path}"));
+        assert!(posix_bash.contains("count=10"));
+        assert!(posix_bash.contains("echo hello"));
 
         let mut engine = UniversalShellCompatibilityEngine::new();
         let pipelines = engine.execute_script_as_sh(tcsh_script).unwrap();
         assert!(!pipelines.is_empty());
+    }
+
+    #[test]
+    fn test_zsh_autosuggestions_engine() {
+        let mut suggest_engine = ZshAutosuggestionsEngine::new();
+        suggest_engine.add_history("git status");
+        suggest_engine.add_history("git commit -m 'feat'");
+        suggest_engine.add_history("cargo test --lib");
+
+        assert_eq!(suggest_engine.suggest("car"), Some("go test --lib".to_string()));
+        assert_eq!(suggest_engine.suggest("git c"), Some("ommit -m 'feat'".to_string()));
+        assert_eq!(suggest_engine.suggest("unknown"), None);
+    }
+
+    #[test]
+    fn test_direnv_environment_manager() {
+        let mut direnv = DirenvEnvironmentManager::new();
+        direnv.register_envrc("/proj/a", &[("NODE_ENV", "development"), ("PORT", "3000")]);
+        direnv.register_envrc("/proj/b", &[("NODE_ENV", "production")]);
+
+        let changes_a = direnv.on_directory_change("/proj/a");
+        assert_eq!(changes_a.len(), 2);
+        assert_eq!(direnv.current_env.get("PORT"), Some(&"3000".to_string()));
+
+        let _changes_b = direnv.on_directory_change("/proj/b");
+        assert_eq!(direnv.current_env.get("PORT"), None);
+        assert_eq!(direnv.current_env.get("NODE_ENV"), Some(&"production".to_string()));
+    }
+
+    #[test]
+    fn test_zsh_fzf_history_search() {
+        let history = vec![
+            "cargo build".to_string(),
+            "git push origin main".to_string(),
+            "cargo test --lib".to_string(),
+        ];
+
+        let results = ZshFzfHistorySearchEngine::search(&history, "cargo");
+        assert_eq!(results.len(), 2);
+        assert_eq!(results[0], "cargo test --lib");
+        assert_eq!(results[1], "cargo build");
     }
 }

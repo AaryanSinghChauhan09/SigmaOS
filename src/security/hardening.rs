@@ -5,6 +5,8 @@
 
 use core::sync::atomic::Ordering;
 use core::sync::atomic::AtomicU64;
+#[cfg(feature = "standalone_test")]
+use std::vec::Vec;
 
 /// Severity level for intrusion/audit events
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -134,7 +136,8 @@ fn canary_base() -> u64 {
     };
 
     // compare_exchange ensures only one writer wins in concurrent contexts.
-    match CANARY_BASE_SEED.compare_exchange(0, FILE_PATH_HASH, Ordering::SeqCst, Ordering::Relaxed) {
+    match CANARY_BASE_SEED.compare_exchange(0, FILE_PATH_HASH, Ordering::SeqCst, Ordering::Relaxed)
+    {
         Ok(_) => FILE_PATH_HASH,
         Err(winner) => winner,
     }

@@ -1,9 +1,9 @@
 // Model-View-Intent (MVI) Reactive State Architecture for SigmaOS
 // Implements a generic Store<S, A> with Reducers and Subscribers under `#![no_std]`.
 
+use core::cell::RefCell;
 use std::boxed::Box;
 use std::vec::Vec;
-use core::cell::RefCell;
 
 /// Trait defining state transition logic
 pub trait Reducer<S, A> {

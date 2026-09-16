@@ -9,6 +9,7 @@
 #![allow(clippy::type_complexity)]
 use core::fmt;
 use core::ops::{Deref, DerefMut};
+use crate::klib::vec::SigmaVec;
 
 /// Custom string type for SigmaOS with reduced dependency on predefined functions
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -399,17 +400,14 @@ impl core::ops::Index<usize> for SigmaString {
 
 /// Pattern trait for string operations
 pub trait Pattern {
-    fn find_in_str(&self, haystack: &str) -> Option<usize>;
-    fn find_in(&self, haystack: &SigmaString) -> Option<usize> {
-        self.find_in_str(haystack.as_str())
-    }
+    fn find_in(&self, haystack: &SigmaString) -> Option<usize>;
     fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize>;
     fn pattern_len(&self) -> usize;
 }
 
 impl Pattern for char {
-    fn find_in_str(&self, haystack: &str) -> Option<usize> {
-        haystack.find(*self)
+    fn find_in(&self, haystack: &SigmaString) -> Option<usize> {
+        haystack.as_str().find(*self)
     }
 
     fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize> {
@@ -422,8 +420,8 @@ impl Pattern for char {
 }
 
 impl Pattern for &str {
-    fn find_in_str(&self, haystack: &str) -> Option<usize> {
-        haystack.find(*self)
+    fn find_in(&self, haystack: &SigmaString) -> Option<usize> {
+        haystack.as_str().find(*self)
     }
 
     fn find_in_from(&self, haystack: &SigmaString, start: usize) -> Option<usize> {
