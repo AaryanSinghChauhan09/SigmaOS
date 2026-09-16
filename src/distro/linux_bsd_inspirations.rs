@@ -68,6 +68,12 @@ pub enum DistroSubsystemMode {
     LinuxTails,
     LinuxGuix,
     LinuxParrot,
+    LinuxKali,
+    LinuxAntiX,
+    LinuxZorin,
+    LinuxMint,
+    LinuxGaruda,
+    LinuxCachyOS,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -120,6 +126,11 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -127,9 +138,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
 
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                ServiceSupervisorType::Runit
-            }
+            DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxVoid
+            | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 ServiceSupervisorType::Shepherd
@@ -149,11 +160,21 @@ impl SovereignUniversalDistroBridge {
             (DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix, "/var/lib/pkg") => {
                 "/nix/store".to_string()
             }
-            (DistroSubsystemMode::LinuxArch, "/var/lib/pkg") => "/var/lib/pacman".to_string(),
+            (
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxGaruda
+                | DistroSubsystemMode::LinuxCachyOS,
+                "/var/lib/pkg",
+            ) => "/var/lib/pacman".to_string(),
             (
                 DistroSubsystemMode::LinuxDebian
                 | DistroSubsystemMode::LinuxPopOs
-                | DistroSubsystemMode::LinuxTails,
+                | DistroSubsystemMode::LinuxTails
+                | DistroSubsystemMode::LinuxParrot
+                | DistroSubsystemMode::LinuxKali
+                | DistroSubsystemMode::LinuxAntiX
+                | DistroSubsystemMode::LinuxZorin
+                | DistroSubsystemMode::LinuxMint,
                 "/var/lib/pkg",
             ) => "/var/lib/dpkg".to_string(),
             (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
@@ -216,6 +237,11 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxClear
             | DistroSubsystemMode::LinuxTails
             | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -224,9 +250,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
-            DistroSubsystemMode::LinuxAlpine | DistroSubsystemMode::LinuxVoid => {
-                supervisor == ServiceSupervisorType::Runit
-            }
+            DistroSubsystemMode::LinuxAlpine
+            | DistroSubsystemMode::LinuxVoid
+            | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 supervisor == ServiceSupervisorType::Shepherd
@@ -248,8 +274,14 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", input_pkg),
-            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint => format!("{}.deb", input_pkg),
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
@@ -287,8 +319,14 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxPopOs
             | DistroSubsystemMode::LinuxTails
-            | DistroSubsystemMode::LinuxParrot => format!("{}.deb", action),
-            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
+            | DistroSubsystemMode::LinuxParrot
+            | DistroSubsystemMode::LinuxKali
+            | DistroSubsystemMode::LinuxAntiX
+            | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxMint => format!("{}.deb", action),
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
@@ -1915,6 +1953,13 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxMint,
+            DistroSubsystemMode::LinuxGaruda,
+            DistroSubsystemMode::LinuxCachyOS,
         ];
 
         for m in modes {
@@ -1947,6 +1992,13 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxPopOs,
             DistroSubsystemMode::LinuxTails,
             DistroSubsystemMode::LinuxGuix,
+            DistroSubsystemMode::LinuxParrot,
+            DistroSubsystemMode::LinuxKali,
+            DistroSubsystemMode::LinuxAntiX,
+            DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxMint,
+            DistroSubsystemMode::LinuxGaruda,
+            DistroSubsystemMode::LinuxCachyOS,
         ];
 
         let target_subsystems = [
