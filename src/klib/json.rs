@@ -468,6 +468,11 @@ mod tests {
         let serialized = parsed.to_json_string();
         assert!(serialized.contains("\"name\": \"SigmaOS\""));
         assert!(serialized.contains("\"zero_dependency\": true"));
+
+        // Test string escaping optimization edge cases
+        let escaped_str = SovereignJsonValue::String("hello \"world\"\n\t\\test".into());
+        let ser_escaped = escaped_str.to_json_string();
+        assert_eq!(ser_escaped, r#""hello \"world\"\n\t\\test""#);
     }
 
     #[test]
