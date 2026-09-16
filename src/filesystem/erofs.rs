@@ -53,38 +53,22 @@ impl ErofsSuperblock {
         }
 
         let checksum = u32::from_le_bytes([sb_bytes[4], sb_bytes[5], sb_bytes[6], sb_bytes[7]]);
-        let feature_compat =
-            u32::from_le_bytes([sb_bytes[8], sb_bytes[9], sb_bytes[10], sb_bytes[11]]);
+        let feature_compat = u32::from_le_bytes([sb_bytes[8], sb_bytes[9], sb_bytes[10], sb_bytes[11]]);
         let blkszbits = sb_bytes[12];
         let sb_extslots = sb_bytes[13];
         let root_nid = u16::from_le_bytes([sb_bytes[14], sb_bytes[15]]);
         let inos = u64::from_le_bytes([
-            sb_bytes[16],
-            sb_bytes[17],
-            sb_bytes[18],
-            sb_bytes[19],
-            sb_bytes[20],
-            sb_bytes[21],
-            sb_bytes[22],
-            sb_bytes[23],
+            sb_bytes[16], sb_bytes[17], sb_bytes[18], sb_bytes[19],
+            sb_bytes[20], sb_bytes[21], sb_bytes[22], sb_bytes[23],
         ]);
         let build_time = u64::from_le_bytes([
-            sb_bytes[24],
-            sb_bytes[25],
-            sb_bytes[26],
-            sb_bytes[27],
-            sb_bytes[28],
-            sb_bytes[29],
-            sb_bytes[30],
-            sb_bytes[31],
+            sb_bytes[24], sb_bytes[25], sb_bytes[26], sb_bytes[27],
+            sb_bytes[28], sb_bytes[29], sb_bytes[30], sb_bytes[31],
         ]);
-        let build_time_nsec =
-            u32::from_le_bytes([sb_bytes[32], sb_bytes[33], sb_bytes[34], sb_bytes[35]]);
+        let build_time_nsec = u32::from_le_bytes([sb_bytes[32], sb_bytes[33], sb_bytes[34], sb_bytes[35]]);
         let blocks = u32::from_le_bytes([sb_bytes[36], sb_bytes[37], sb_bytes[38], sb_bytes[39]]);
-        let meta_blkaddr =
-            u32::from_le_bytes([sb_bytes[40], sb_bytes[41], sb_bytes[42], sb_bytes[43]]);
-        let xattr_blkaddr =
-            u32::from_le_bytes([sb_bytes[44], sb_bytes[45], sb_bytes[46], sb_bytes[47]]);
+        let meta_blkaddr = u32::from_le_bytes([sb_bytes[40], sb_bytes[41], sb_bytes[42], sb_bytes[43]]);
+        let xattr_blkaddr = u32::from_le_bytes([sb_bytes[44], sb_bytes[45], sb_bytes[46], sb_bytes[47]]);
 
         let vol_bytes = &sb_bytes[48..64];
         let vol_str = String::from_utf8_lossy(vol_bytes)

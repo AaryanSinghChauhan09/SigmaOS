@@ -3,6 +3,7 @@ use std::boxed::Box;
 // Zero-dependency, safe, robust command multiplexing for sovereign userland shell
 // Inspired by Alpine Linux BusyBox multicall binary architecture
 
+
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -54,20 +55,14 @@ impl BusyBoxAppletDispatcher {
             if args.len() < 2 {
                 return Err("grep: usage: grep <pattern> <file>");
             }
-            Ok(format!(
-                "applet [grep]: Matched pattern '{}' in '{}'",
-                args[0], args[1]
-            ))
+            Ok(format!("applet [grep]: Matched pattern '{}' in '{}'", args[0], args[1]))
         });
 
         self.register_applet("cp", |args| {
             if args.len() < 2 {
                 return Err("cp: usage: cp <source> <destination>");
             }
-            Ok(format!(
-                "applet [cp]: Copied '{}' -> '{}'",
-                args[0], args[1]
-            ))
+            Ok(format!("applet [cp]: Copied '{}' -> '{}'", args[0], args[1]))
         });
     }
 

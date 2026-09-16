@@ -19,10 +19,11 @@
 
 #![allow(dead_code)]
 
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 // ============================================================
 // Kthread State

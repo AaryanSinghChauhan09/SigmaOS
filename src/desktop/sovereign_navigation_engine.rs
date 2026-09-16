@@ -13,11 +13,11 @@ use std::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NavigationMode {
-    Launcher,     // Pop!_OS COSMIC / GNOME Shell fuzzy launcher
-    CommandHud,   // KDE KRunner / Rofi calc, command & window launcher
-    SpatialFile,  // Ranger / Dolphin Miller column navigation
-    TilingWindow, // i3 / Hyprland directional focus switcher
-    ControlTree,  // openSUSE YaST / FreeBSD bsdconfig settings navigator
+    Launcher,    // Pop!_OS COSMIC / GNOME Shell fuzzy launcher
+    CommandHud,  // KDE KRunner / Rofi calc, command & window launcher
+    SpatialFile, // Ranger / Dolphin Miller column navigation
+    TilingWindow,// i3 / Hyprland directional focus switcher
+    ControlTree, // openSUSE YaST / FreeBSD bsdconfig settings navigator
 }
 
 /// GNOME / Pop!_OS COSMIC Launcher Navigation
@@ -38,27 +38,9 @@ pub struct GnomePopLauncherNav {
 impl GnomePopLauncherNav {
     pub fn new() -> Self {
         let mut nav = Self { items: Vec::new() };
-        nav.register(
-            "term",
-            "Terminal",
-            "System",
-            "sigma-terminal",
-            "utilities-terminal",
-        );
-        nav.register(
-            "files",
-            "File Manager",
-            "System",
-            "sigma-fm",
-            "system-file-manager",
-        );
-        nav.register(
-            "settings",
-            "Settings",
-            "Setup",
-            "sigma-control",
-            "preferences-system",
-        );
+        nav.register("term", "Terminal", "System", "sigma-terminal", "utilities-terminal");
+        nav.register("files", "File Manager", "System", "sigma-fm", "system-file-manager");
+        nav.register("settings", "Settings", "Setup", "sigma-control", "preferences-system");
         nav
     }
 
@@ -76,9 +58,7 @@ impl GnomePopLauncherNav {
         let q = query.to_lowercase();
         self.items
             .iter()
-            .filter(|i| {
-                i.name.to_lowercase().contains(&q) || i.category.to_lowercase().contains(&q)
-            })
+            .filter(|i| i.name.to_lowercase().contains(&q) || i.category.to_lowercase().contains(&q))
             .collect()
     }
 }
@@ -98,9 +78,7 @@ pub struct KrunnerRofiCommandHud {
 
 impl KrunnerRofiCommandHud {
     pub fn new() -> Self {
-        let mut hud = Self {
-            entries: Vec::new(),
-        };
+        let mut hud = Self { entries: Vec::new() };
         hud.entries.push(CommandHudEntry {
             prefix: "=".to_string(),
             description: "Calculator Evaluator".to_string(),
@@ -220,10 +198,7 @@ impl TilingWindowManagerNav {
     }
 
     pub fn focus_dir(&mut self, dir: FocusDirection) -> Option<u32> {
-        let current = self
-            .windows
-            .iter()
-            .find(|w| Some(w.id) == self.focused_id)?;
+        let current = self.windows.iter().find(|w| Some(w.id) == self.focused_id)?;
 
         let target = match dir {
             FocusDirection::Left => self
@@ -272,9 +247,7 @@ pub struct YastBsdConfigControlTreeNav {
 
 impl YastBsdConfigControlTreeNav {
     pub fn new() -> Self {
-        let mut tree = Self {
-            modules: Vec::new(),
-        };
+        let mut tree = Self { modules: Vec::new() };
         tree.modules.push(ControlTreeNode {
             id: "net".to_string(),
             label: "Network Devices & Interfaces".to_string(),

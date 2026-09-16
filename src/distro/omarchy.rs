@@ -9,10 +9,10 @@
 //! - Fast Terminal & Development Environment Provisioner
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
+use std::format;
+use std::vec;
 
 /// Supported Omarchy Curated Themes
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -364,6 +364,7 @@ impl Default for OmarchyModernDesktopEngine {
     }
 }
 
+
 /// Sovereign Agent Definition (inspired by omacom/omarchy: ori-agent, hermes-agent, openclaw-agent, add-default-agent)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SovereignAgentKind {
@@ -442,15 +443,9 @@ impl FactoryResetGuardian {
 
     pub fn plan_rollback_instructions(&self) -> Vec<String> {
         vec![
-            format!(
-                "btrfs subvolume snapshot -r {} {}",
-                self.btrfs_subvolume_root, "/@pre-reset-backup"
-            ),
+            format!("btrfs subvolume snapshot -r {} {}", self.btrfs_subvolume_root, "/@pre-reset-backup"),
             format!("btrfs subvolume delete {}", self.btrfs_subvolume_root),
-            format!(
-                "btrfs subvolume snapshot {} {}",
-                self.btrfs_subvolume_factory, self.btrfs_subvolume_root
-            ),
+            format!("btrfs subvolume snapshot {} {}", self.btrfs_subvolume_factory, self.btrfs_subvolume_root),
             "systemctl reboot".to_string(),
         ]
     }
@@ -482,9 +477,7 @@ impl HardwareQuirkAdapter {
 
     /// Framework 16 & ASUS ROG Keyboard RGB / Backlight Quirk
     pub fn probe_rgb_keyboard(device_name: &str) -> Option<Self> {
-        if device_name.to_lowercase().contains("framework16")
-            || device_name.to_lowercase().contains("asus-rog")
-        {
+        if device_name.to_lowercase().contains("framework16") || device_name.to_lowercase().contains("asus-rog") {
             Some(Self {
                 pci_id: "usb:input-rgb".to_string(),
                 device_name: device_name.to_string(),
@@ -732,11 +725,7 @@ mod tests {
     #[test]
     fn test_omarchy_web2app_registration() {
         let mut engine = OmarchyModernDesktopEngine::new();
-        engine.register_webapp(
-            "Slack",
-            "https://app.slack.com/",
-            "https://example.com/slack.png",
-        );
+        engine.register_webapp("Slack", "https://app.slack.com/", "https://example.com/slack.png");
         let desktop = engine.generate_desktop_entry("Slack").unwrap();
         assert!(desktop.contains("Name=Slack"));
         assert!(desktop.contains("--ozone-platform=wayland"));
@@ -838,9 +827,7 @@ impl OmarchyMiseVersionManagerEngine {
         tools.insert("python".to_string(), "latest".to_string());
         tools.insert("rust".to_string(), "stable".to_string());
         tools.insert("go".to_string(), "latest".to_string());
-        Self {
-            default_tools: tools,
-        }
+        Self { default_tools: tools }
     }
 
     pub fn generate_config_toml(&self) -> String {
@@ -948,3 +935,154 @@ mod omarchy_gap_closure_tests {
 }
 
 // =========================================================================
+// OMARCHY & OMAKUB MISSING ECOSYSTEM GAP CLOSURE ENGINES
+// =========================================================================
+
+/// Hyprland compositor window rules, gestures, animations, and monitor scaling configuration engine
+pub struct OmarchyHyprlandCompositorConfigEngine {
+    pub monitor_scale: f32,
+    pub border_size: u32,
+    pub active_border_color: String,
+}
+
+impl OmarchyHyprlandCompositorConfigEngine {
+    pub fn new() -> Self {
+        Self {
+            monitor_scale: 1.0,
+            border_size: 2,
+            active_border_color: "rgba(33ccffee) rgba(00ff99ee) 45deg".to_string(),
+        }
+    }
+
+    pub fn generate_hyprland_conf(&self) -> String {
+        format!(
+            "monitor=,preferred,auto,{}\ngeneral {{\n  gaps_in = 5\n  gaps_out = 10\n  border_size = {}\n  col.active_border = {}\n}}\nwindowrulev2 = float,class:^(pavucontrol)$\n",
+            self.monitor_scale, self.border_size, self.active_border_color
+        )
+    }
+}
+
+impl Default for OmarchyHyprlandCompositorConfigEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Mise polyglot tool version manager engine (Node, Python, Rust, Go, Ruby)
+pub struct OmarchyMiseVersionManagerEngine {
+    pub default_tools: BTreeMap<String, String>,
+}
+
+impl OmarchyMiseVersionManagerEngine {
+    pub fn new() -> Self {
+        let mut tools = BTreeMap::new();
+        tools.insert("node".to_string(), "lts".to_string());
+        tools.insert("python".to_string(), "latest".to_string());
+        tools.insert("rust".to_string(), "stable".to_string());
+        tools.insert("go".to_string(), "latest".to_string());
+        Self { default_tools: tools }
+    }
+
+    pub fn generate_config_toml(&self) -> String {
+        let mut lines = vec!["[tools]".to_string()];
+        for (tool, ver) in &self.default_tools {
+            lines.push(format!("{} = \"{}\"", tool, ver));
+        }
+        lines.join("\n")
+    }
+}
+
+impl Default for OmarchyMiseVersionManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// LazyGit terminal TUI configuration generator engine
+pub struct OmarchyLazyGitConfigurationEngine {
+    pub theme: String,
+}
+
+impl OmarchyLazyGitConfigurationEngine {
+    pub fn new() -> Self {
+        Self {
+            theme: "tokyonight".to_string(),
+        }
+    }
+
+    pub fn generate_config_yml(&self) -> String {
+        format!(
+            "gui:\n  theme:\n    activeBorderColor:\n      - '#7aa2f7'\n      - bold\n  showIcons: true\ngit:\n  paging:\n    colorArg: always\n    pager: delta --dark --paging=never\n"
+        )
+    }
+}
+
+impl Default for OmarchyLazyGitConfigurationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Ayu Dark / Ayu Light theme palette and GTK CSS generator engine
+pub struct OmarchyAyuThemeEngine {
+    pub is_dark: bool,
+}
+
+impl OmarchyAyuThemeEngine {
+    pub fn new(is_dark: bool) -> Self {
+        Self { is_dark }
+    }
+
+    pub fn generate_gtk_css(&self) -> String {
+        if self.is_dark {
+            "@define-color bg_color #0f1419;\n@define-color fg_color #e6e1cf;\n@define-color accent_color #ffb454;\nwindow { background-color: @bg_color; color: @fg_color; }\n".to_string()
+        } else {
+            "@define-color bg_color #fafafa;\n@define-color fg_color #5c6166;\n@define-color accent_color #ff9940;\nwindow { background-color: @bg_color; color: @fg_color; }\n".to_string()
+        }
+    }
+}
+
+/// Starship cross-shell prompt config generator engine
+pub struct OmarchyStarshipPromptConfigEngine;
+
+impl OmarchyStarshipPromptConfigEngine {
+    pub fn generate_starship_toml() -> String {
+        "[format]\nformat = \"$username$hostname$directory$git_branch$character\"\n\n[directory]\ntruncation_length = 3\ntruncated_prefix = \"…/\"\n\n[character]\nsuccess_symbol = \"[❯](bold green)\"\nerror_symbol = \"[❯](bold red)\"\n".to_string()
+    }
+}
+
+#[cfg(test)]
+mod omarchy_gap_closure_tests {
+    use super::*;
+
+    #[test]
+    fn test_omarchy_hyprland_compositor_config_engine() {
+        let hypr = OmarchyHyprlandCompositorConfigEngine::new();
+        let conf = hypr.generate_hyprland_conf();
+        assert!(conf.contains("border_size = 2"));
+        assert!(conf.contains("windowrulev2 = float,class:^(pavucontrol)$"));
+    }
+
+    #[test]
+    fn test_omarchy_mise_and_lazygit_engines() {
+        let mise = OmarchyMiseVersionManagerEngine::new();
+        let mise_toml = mise.generate_config_toml();
+        assert!(mise_toml.contains("node = \"lts\""));
+        assert!(mise_toml.contains("rust = \"stable\""));
+
+        let lazygit = OmarchyLazyGitConfigurationEngine::new();
+        let lazy_yml = lazygit.generate_config_yml();
+        assert!(lazy_yml.contains("showIcons: true"));
+        assert!(lazy_yml.contains("delta --dark"));
+    }
+
+    #[test]
+    fn test_omarchy_ayu_and_starship_engines() {
+        let ayu_dark = OmarchyAyuThemeEngine::new(true);
+        let css = ayu_dark.generate_gtk_css();
+        assert!(css.contains("@define-color bg_color #0f1419"));
+
+        let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
+        assert!(starship_toml.contains("truncation_length = 3"));
+    }
+}

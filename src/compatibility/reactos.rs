@@ -1,4 +1,6 @@
+
 #[cfg(not(target_os = "none"))]
+
 use core::mem;
 /// ReactOS-inspired Windows NT Subsystem Compatibility Layer for SigmaOS
 /// Provides Portable Executable (PE) parsing, NT Registry Hive management,

@@ -1,11 +1,11 @@
 // SigmaOS Sovereign Cross-Platform Kernel Internals Layer
 // Parity bridge representing low-level kernel mechanisms from Linux, Windows, and BSD
 
-use core::sync::atomic::{AtomicU8, Ordering};
 use std::collections::{BTreeMap as HashMap, VecDeque};
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU8, Ordering};
 
 // =========================================================================
 // 1. Virtual Address Space & 4-Level Page Table Layout

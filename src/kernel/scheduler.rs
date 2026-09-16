@@ -375,10 +375,7 @@ impl CfsScheduler {
     fn sort_tasks(&mut self) {
         for i in 1..self.task_count {
             let mut j = i;
-            while j > 0
-                && self.tasks[j - 1].as_ref().unwrap().vruntime
-                    > self.tasks[j].as_ref().unwrap().vruntime
-            {
+            while j > 0 && self.tasks[j - 1].as_ref().unwrap().vruntime > self.tasks[j].as_ref().unwrap().vruntime {
                 self.tasks.swap(j - 1, j);
                 j -= 1;
             }

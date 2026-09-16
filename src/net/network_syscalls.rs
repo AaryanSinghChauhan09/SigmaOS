@@ -3,13 +3,10 @@
 //! Provides socket family syscalls with network namespace support (CLONE_NEWNET).
 //! Implements socket(2), bind(2), listen(2), accept(2), connect(2) with per-namespace isolation.
 
-use super::network_namespace::NetworkNamespaceId;
 use std::collections::HashMap;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr as StdSocketAddr};
-use std::sync::{
-    atomic::{AtomicU32, Ordering},
-    Arc, Mutex,
-};
+use std::sync::{Arc, Mutex, atomic::{AtomicU32, Ordering}};
+use super::network_namespace::NetworkNamespaceId;
 
 /// Socket file descriptor type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -34,9 +31,9 @@ pub const AF_INET: u32 = 2;
 pub const AF_INET6: u32 = 10;
 
 /// Socket type constants
-pub const SOCK_STREAM: u32 = 1; // TCP
-pub const SOCK_DGRAM: u32 = 2; // UDP
-pub const SOCK_RAW: u32 = 3; // Raw
+pub const SOCK_STREAM: u32 = 1;  // TCP
+pub const SOCK_DGRAM: u32 = 2;   // UDP
+pub const SOCK_RAW: u32 = 3;     // Raw
 
 /// Protocol constants
 pub const IPPROTO_TCP: u32 = 6;
@@ -146,8 +143,7 @@ impl NamespaceSocketTable {
 
     pub fn get_socket(&self, fd: SocketFd) -> Result<SocketMetadata, String> {
         let sockets = self.sockets.lock().map_err(|e| e.to_string())?;
-        sockets
-            .get(&fd.raw())
+        sockets.get(&fd.raw())
             .cloned()
             .ok_or_else(|| format!("Socket {} not found", fd.raw()))
     }
@@ -197,13 +193,9 @@ impl NetworkSyscalls {
     }
 
     /// Get socket table for namespace
-    pub fn get_namespace_table(
-        &self,
-        ns_id: NetworkNamespaceId,
-    ) -> Result<NamespaceSocketTable, String> {
+    pub fn get_namespace_table(&self, ns_id: NetworkNamespaceId) -> Result<NamespaceSocketTable, String> {
         let tables = self.namespace_tables.lock().map_err(|e| e.to_string())?;
-        tables
-            .get(&ns_id)
+        tables.get(&ns_id)
             .cloned()
             .ok_or_else(|| format!("No socket table for namespace {:?}", ns_id))
     }
@@ -361,7 +353,11 @@ impl NetworkSyscalls {
     }
 
     /// close(2) - Close socket
-    pub fn sys_close(&self, fd: SocketFd, namespace_id: NetworkNamespaceId) -> Result<(), String> {
+    pub fn sys_close(
+        &self,
+        fd: SocketFd,
+        namespace_id: NetworkNamespaceId,
+    ) -> Result<(), String> {
         let table = self.get_namespace_table(namespace_id)?;
         let mut metadata = table.get_socket(fd)?;
 
@@ -380,9 +376,7 @@ impl NetworkSyscalls {
         let table = self.get_namespace_table(namespace_id)?;
         let metadata = table.get_socket(fd)?;
 
-        metadata
-            .local_addr
-            .ok_or_else(|| "Socket not bound".to_string())
+        metadata.local_addr.ok_or_else(|| "Socket not bound".to_string())
     }
 
     /// Get peer address
@@ -394,9 +388,7 @@ impl NetworkSyscalls {
         let table = self.get_namespace_table(namespace_id)?;
         let metadata = table.get_socket(fd)?;
 
-        metadata
-            .remote_addr
-            .ok_or_else(|| "Socket not connected".to_string())
+        metadata.remote_addr.ok_or_else(|| "Socket not connected".to_string())
     }
 }
 
@@ -415,8 +407,7 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
         assert_ne!(fd.raw(), 0);
     }
@@ -426,8 +417,7 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
@@ -439,8 +429,7 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
@@ -454,15 +443,15 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
         syscalls.sys_bind(fd, addr, ns_id).expect("Failed to bind");
         syscalls.sys_listen(fd, 5, ns_id).expect("Failed to listen");
 
-        let (conn_fd, _peer_addr) = syscalls.sys_accept(fd, ns_id).expect("Failed to accept");
+        let (conn_fd, _peer_addr) = syscalls.sys_accept(fd, ns_id)
+            .expect("Failed to accept");
         assert_ne!(conn_fd.raw(), fd.raw());
     }
 
@@ -471,8 +460,7 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
@@ -485,11 +473,9 @@ mod tests {
         let ns1 = NetworkNamespaceId::new(1);
         let ns2 = NetworkNamespaceId::new(2);
 
-        let fd1 = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns1)
+        let fd1 = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns1)
             .expect("Failed to create socket in ns1");
-        let fd2 = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns2)
+        let fd2 = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns2)
             .expect("Failed to create socket in ns2");
 
         // Same FD number in different namespaces should be allowed
@@ -499,19 +485,11 @@ mod tests {
         let addr1 = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
         let addr2 = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 2), 8081);
 
-        syscalls
-            .sys_bind(fd1, addr1, ns1)
-            .expect("Failed to bind in ns1");
-        syscalls
-            .sys_bind(fd2, addr2, ns2)
-            .expect("Failed to bind in ns2");
+        syscalls.sys_bind(fd1, addr1, ns1).expect("Failed to bind in ns1");
+        syscalls.sys_bind(fd2, addr2, ns2).expect("Failed to bind in ns2");
 
-        let retrieved1 = syscalls
-            .sys_getsockname(fd1, ns1)
-            .expect("Failed to get name in ns1");
-        let retrieved2 = syscalls
-            .sys_getsockname(fd2, ns2)
-            .expect("Failed to get name in ns2");
+        let retrieved1 = syscalls.sys_getsockname(fd1, ns1).expect("Failed to get name in ns1");
+        let retrieved2 = syscalls.sys_getsockname(fd2, ns2).expect("Failed to get name in ns2");
 
         assert_eq!(retrieved1.port, 8080);
         assert_eq!(retrieved2.port, 8081);
@@ -522,8 +500,7 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         assert!(syscalls.sys_close(fd, ns_id).is_ok());
@@ -552,18 +529,13 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         let addr = SockAddr::new_ipv4(Ipv4Addr::new(127, 0, 0, 1), 8080);
-        syscalls
-            .sys_connect(fd, addr.clone(), ns_id)
-            .expect("Failed to connect");
+        syscalls.sys_connect(fd, addr.clone(), ns_id).expect("Failed to connect");
 
-        let peer = syscalls
-            .sys_getpeername(fd, ns_id)
-            .expect("Failed to get peer name");
+        let peer = syscalls.sys_getpeername(fd, ns_id).expect("Failed to get peer name");
         assert_eq!(peer.port, 8080);
     }
 
@@ -572,8 +544,7 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket");
 
         // Verify initial state
@@ -608,22 +579,17 @@ mod tests {
         let syscalls = NetworkSyscalls::new();
         let ns_id = NetworkNamespaceId::new(1);
 
-        let fd1 = syscalls
-            .sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd1 = syscalls.sys_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket 1");
-        let fd2 = syscalls
-            .sys_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, ns_id)
+        let fd2 = syscalls.sys_socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, ns_id)
             .expect("Failed to create socket 2");
-        let fd3 = syscalls
-            .sys_socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP, ns_id)
+        let fd3 = syscalls.sys_socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP, ns_id)
             .expect("Failed to create socket 3");
 
         assert_ne!(fd1.raw(), fd2.raw());
         assert_ne!(fd2.raw(), fd3.raw());
 
-        let table = syscalls
-            .get_namespace_table(ns_id)
-            .expect("Failed to get table");
+        let table = syscalls.get_namespace_table(ns_id).expect("Failed to get table");
         let count = table.count().expect("Failed to count");
         assert_eq!(count, 3);
     }

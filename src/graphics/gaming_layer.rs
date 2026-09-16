@@ -62,10 +62,7 @@ impl SovereignGamingEngine {
     }
 
     pub fn launch_game_session(&mut self, game_id: &str) -> Result<String, &'static str> {
-        let profile = self
-            .profiles
-            .get(game_id)
-            .ok_or("GamingEngine: Game profile not found")?;
+        let profile = self.profiles.get(game_id).ok_or("GamingEngine: Game profile not found")?;
 
         self.shader_precompiled_cache_count += 128; // Pre-compiled Vulkan pipeline cache
         self.active_game_session = Some(game_id.to_string());

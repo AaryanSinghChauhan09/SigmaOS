@@ -1,13 +1,22 @@
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
 use std::collections::{HashMap, HashSet};
 
-use crate::accessibility::{AccessibilityFeature, AccessibilityFramework, AccessibilitySetting};
-use crate::compatibility::{ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform};
+
+use crate::accessibility::{
+    AccessibilityFeature, AccessibilityFramework,
+    AccessibilitySetting,
+};
+use crate::shell::{
+    BashParameterExpansion, HistoryExpansionEngine, JobControlManager,
+};
+use crate::compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform,
+};
 use crate::customization::CustomizationEngine;
 use crate::dashboard::SystemMonitor;
 use crate::package::{UnifiedPackage, UniversalPackageManager};
@@ -16,7 +25,6 @@ use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
     ZshSyntaxHighlighter,
 };
-use crate::shell::{BashParameterExpansion, HistoryExpansionEngine, JobControlManager};
 use crate::virtualization::{
     Container, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
 };
@@ -356,8 +364,8 @@ impl ShellRepl {
         } else {
             let mut suggestions = Vec::new();
             let commands = [
-                "help", "ps", "ls", "pwd", "whoami", "uname", "clear", "touch", "mkdir", "theme",
-                "profile", "a11y", "set", "get", "alias",
+                "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
+                "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
             ];
             for cmd in &commands {
                 if cmd.starts_with(prefix) {
@@ -415,9 +423,7 @@ impl ShellRepl {
 
         let mut fully_expanded = BashParameterExpansion::expand(&alias_expanded, &env_map);
         if fully_expanded.contains("$(( ") || fully_expanded.contains("$(((") {
-            if let Ok(val) =
-                crate::shell::zsh_bash_parity::ShellArithmeticEvaluator::evaluate(&fully_expanded)
-            {
+            if let Ok(val) = crate::shell::zsh_bash_parity::ShellArithmeticEvaluator::evaluate(&fully_expanded) {
                 let val_i64: i64 = val;
                 fully_expanded = val_i64.to_string();
             }

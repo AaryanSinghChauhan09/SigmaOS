@@ -1,8 +1,8 @@
-use core::sync::atomic::AtomicUsize;
 /// OOP-based Access Control System for SigmaOS
 /// Based on Roadmap Item 14: Access control system
 use std::boxed::Box;
 use std::vec::Vec;
+use core::sync::atomic::AtomicUsize;
 
 pub type PermissionID = usize;
 

@@ -83,11 +83,7 @@ impl NetworkPanelGuiEngine {
     }
 
     pub fn connect_wifi(&mut self, interface_name: &str, _ssid: &str, _passphrase: &str) -> bool {
-        if let Some(iface) = self
-            .interfaces
-            .iter_mut()
-            .find(|i| i.name == interface_name && i.conn_type == NetworkConnectionType::Wifi)
-        {
+        if let Some(iface) = self.interfaces.iter_mut().find(|i| i.name == interface_name && i.conn_type == NetworkConnectionType::Wifi) {
             iface.status = NetworkConnectionStatus::Connected;
             true
         } else {
@@ -96,11 +92,7 @@ impl NetworkPanelGuiEngine {
     }
 
     pub fn disconnect_interface(&mut self, interface_name: &str) -> bool {
-        if let Some(iface) = self
-            .interfaces
-            .iter_mut()
-            .find(|i| i.name == interface_name)
-        {
+        if let Some(iface) = self.interfaces.iter_mut().find(|i| i.name == interface_name) {
             iface.status = NetworkConnectionStatus::Disconnected;
             true
         } else {
@@ -124,11 +116,7 @@ impl NetworkPanelGuiEngine {
     }
 
     pub fn record_traffic(&mut self, interface_name: &str, rx_delta: u64, tx_delta: u64) {
-        if let Some(iface) = self
-            .interfaces
-            .iter_mut()
-            .find(|i| i.name == interface_name)
-        {
+        if let Some(iface) = self.interfaces.iter_mut().find(|i| i.name == interface_name) {
             iface.rx_bytes += rx_delta;
             iface.tx_bytes += tx_delta;
         }
@@ -151,10 +139,7 @@ mod tests {
         assert_eq!(engine.list_interfaces().len(), 1);
 
         assert!(engine.connect_wifi("wlan0", "Home_5G", "secure_pass_123"));
-        assert_eq!(
-            engine.list_interfaces()[0].status,
-            NetworkConnectionStatus::Connected
-        );
+        assert_eq!(engine.list_interfaces()[0].status, NetworkConnectionStatus::Connected);
 
         let vpn_res = engine.toggle_vpn("vpn_wireguard_main");
         assert!(vpn_res.is_ok());

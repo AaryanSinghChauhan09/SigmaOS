@@ -192,22 +192,16 @@ mod tests {
 
         let old_pkg = b"glibc-2.37-binary-data-stream";
         let new_pkg = b"glibc-2.38-binary-data-stream";
-        let patch = ArchPacmanDeltaSyncEngine::create_delta_patch(
-            "glibc", "2.37", "2.38", old_pkg, new_pkg,
-        );
+        let patch = ArchPacmanDeltaSyncEngine::create_delta_patch("glibc", "2.37", "2.38", old_pkg, new_pkg);
         let reconstructed = ArchPacmanDeltaSyncEngine::apply_delta_patch(old_pkg, &patch);
         assert_eq!(&reconstructed[..], new_pkg);
 
         let dnf_solver = FedoraDnfGroupInstallSolver::new();
-        let dev_pkgs = dnf_solver
-            .resolve_group_packages("development-tools", false)
-            .unwrap();
+        let dev_pkgs = dnf_solver.resolve_group_packages("development-tools", false).unwrap();
         assert!(dev_pkgs.contains(&"gcc".to_string()));
 
         let mut pkg_base = FreeBsdPkgBaseRootfsEngine::new("14.0-RELEASE");
-        let upgrade_msg = pkg_base
-            .upgrade_pkg_base_with_be("14.1-RELEASE", "be_14_1")
-            .unwrap();
+        let upgrade_msg = pkg_base.upgrade_pkg_base_with_be("14.1-RELEASE", "be_14_1").unwrap();
         assert!(upgrade_msg.contains("14.1-RELEASE"));
         assert_eq!(pkg_base.active_boot_env, "be_14_1");
     }

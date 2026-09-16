@@ -1,14 +1,10 @@
 // SigmaOS Interrupt & Bare-Metal Hardware Module
 
-pub mod apic_driver;
 pub mod blog_os;
 pub mod controller;
 pub mod handler;
+pub mod apic_driver;
 
-pub use apic_driver::{
-    ApicManager, InterruptDispatchTable, IoApic, LocalApic, LocalApicId, VECTOR_DISK, VECTOR_ERROR,
-    VECTOR_KEYBOARD, VECTOR_NETWORK, VECTOR_TIMER,
-};
 pub use blog_os::{
     ColorCode, ExceptionType, ScreenChar, TaskStateSegment, VGAColor, VGATextBuffer, GDT, IDT,
 };
@@ -18,4 +14,8 @@ pub use controller::{
 };
 pub use handler::{
     InterruptHandler, InterruptNumber, InterruptResult, RegisterSet, SimpleInterruptHandler,
+};
+pub use apic_driver::{
+    ApicManager, LocalApic, IoApic, InterruptDispatchTable, LocalApicId,
+    VECTOR_TIMER, VECTOR_KEYBOARD, VECTOR_NETWORK, VECTOR_DISK, VECTOR_ERROR,
 };

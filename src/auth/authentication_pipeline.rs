@@ -2,6 +2,7 @@ use std::string::String;
 use std::vec::Vec;
 // Linux & BSD Inspired User Identification, Multi-Step Authentication & Computer Security Pipeline for SigmaOS
 
+
 /// Steps of User Identification & Multi-Factor Verification Pipeline
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AuthenticationStep {

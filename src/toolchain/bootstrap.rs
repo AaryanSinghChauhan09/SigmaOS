@@ -142,10 +142,10 @@ pub struct Phase6BuildOptimizer {
 impl Phase6BuildOptimizer {
     pub fn new() -> Self {
         Self {
-            lto_enabled: true,        // Fat LTO
-            pgo_profile_active: true, // Profile-Guided Optimization
-            strip_symbols: true,      // Strip debug symbols
-            codegen_units: 1,         // Maximum optimization pass
+            lto_enabled: true,          // Fat LTO
+            pgo_profile_active: true,   // Profile-Guided Optimization
+            strip_symbols: true,        // Strip debug symbols
+            codegen_units: 1,           // Maximum optimization pass
         }
     }
 

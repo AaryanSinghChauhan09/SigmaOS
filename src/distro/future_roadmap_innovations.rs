@@ -69,10 +69,7 @@ impl ShardsMarketplaceEngine {
             self.installed_apps.push(app_id.to_string());
         }
 
-        Ok(format!(
-            "Successfully installed shard app '{}' version {}",
-            app.app_id, app.version
-        ))
+        Ok(format!("Successfully installed shard app '{}' version {}", app.app_id, app.version))
     }
 }
 
@@ -111,11 +108,7 @@ impl CryptographicBootChainEngine {
         let pcr_entry = format!(
             "Stage: {} | Alg: {} | Meas: {:016x}",
             stage_name,
-            if self.post_quantum_enabled {
-                "Dilithium5-PQC"
-            } else {
-                "SHA-256"
-            },
+            if self.post_quantum_enabled { "Dilithium5-PQC" } else { "SHA-256" },
             hash
         );
 
@@ -165,26 +158,18 @@ impl ClusteredDevicePoolEngine {
     }
 
     pub fn register_device(&mut self, device: ClusteredPooledDevice) {
-        self.pooled_devices
-            .retain(|d| d.device_id != device.device_id);
+        self.pooled_devices.retain(|d| d.device_id != device.device_id);
         self.pooled_devices.push(device);
     }
 
     pub fn allocate_pooled_device(&mut self, kind: PoolDeviceKind) -> Option<String> {
-        let dev = self
-            .pooled_devices
-            .iter_mut()
-            .find(|d| d.kind == kind && !d.is_allocated)?;
+        let dev = self.pooled_devices.iter_mut().find(|d| d.kind == kind && !d.is_allocated)?;
         dev.is_allocated = true;
         Some(dev.device_id.clone())
     }
 
     pub fn release_device(&mut self, device_id: &str) -> bool {
-        if let Some(dev) = self
-            .pooled_devices
-            .iter_mut()
-            .find(|d| d.device_id == device_id)
-        {
+        if let Some(dev) = self.pooled_devices.iter_mut().find(|d| d.device_id == device_id) {
             dev.is_allocated = false;
             true
         } else {
@@ -233,10 +218,7 @@ impl NetworkNativeSessionEngine {
         session
     }
 
-    pub fn pause_and_serialize_session(
-        &mut self,
-        session_id: &str,
-    ) -> Result<String, &'static str> {
+    pub fn pause_and_serialize_session(&mut self, session_id: &str) -> Result<String, &'static str> {
         let session = self
             .active_sessions
             .iter_mut()
@@ -252,11 +234,7 @@ impl NetworkNativeSessionEngine {
         ))
     }
 
-    pub fn migrate_session(
-        &mut self,
-        session_id: &str,
-        target_host: &str,
-    ) -> Result<String, &'static str> {
+    pub fn migrate_session(&mut self, session_id: &str, target_host: &str) -> Result<String, &'static str> {
         let session = self
             .active_sessions
             .iter_mut()
@@ -354,10 +332,7 @@ mod tests {
 
         let res = store.install_shard_app("org.sigmaos.terminal").unwrap();
         assert!(res.contains("Successfully installed"));
-        assert_eq!(
-            store.installed_apps,
-            vec!["org.sigmaos.terminal".to_string()]
-        );
+        assert_eq!(store.installed_apps, vec!["org.sigmaos.terminal".to_string()]);
     }
 
     #[test]
@@ -378,9 +353,7 @@ mod tests {
             is_allocated: false,
         });
 
-        let allocated = pool
-            .allocate_pooled_device(PoolDeviceKind::RemoteGpu)
-            .unwrap();
+        let allocated = pool.allocate_pooled_device(PoolDeviceKind::RemoteGpu).unwrap();
         assert_eq!(allocated, "gpu-node-01");
         assert!(pool.release_device("gpu-node-01"));
     }

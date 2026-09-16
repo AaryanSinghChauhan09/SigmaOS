@@ -4,12 +4,12 @@ pub use system_policy_rules::*;
 // SigmaOS Security Subsystem
 pub mod audit;
 pub mod capability;
-pub mod defensive_audit;
-pub mod hardening;
-pub mod kernel_hardening;
 pub mod seccomp;
 pub mod seccomp_ebpf;
 pub mod syscall_filter;
+pub mod defensive_audit;
+pub mod hardening;
+pub mod kernel_hardening;
 pub mod user_namespace;
 
 pub mod bridge;
@@ -39,8 +39,6 @@ pub use pqc_measurement::{
     Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
     SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
 };
-pub mod kali_components;
-pub mod landlock;
 pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
@@ -55,6 +53,8 @@ pub mod unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod kali_components;
+pub mod landlock;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
 
 pub use kali_components::{
@@ -94,7 +94,9 @@ pub use defensive_audit::{
     SIGNATURE_LEN,
 };
 pub use forensics::*;
-pub use hardening::{MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary};
+pub use hardening::{
+    MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
+};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
@@ -136,19 +138,12 @@ pub use rules::{
     SovereignSandboxingRulesEngine, SovereignSecurelevelRuleEngine, SovereignSysctlHardeningRules,
     SysctlParameterRule, UnveilRule,
 };
-pub use seccomp::{
-    ArgumentConstraint, CompareOp, FilterRule, SeccompAction, SeccompContext, SeccompFilter,
-    SeccompManager,
-};
 pub use selinux::{PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux};
 pub use selinux_advanced::{AdvancedSELinuxManager, MlsLevel, SELinuxBoolean, SELinuxModule};
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{
     UnveilEntry as SigmaUnveilEntry, UnveilManager as SigmaUnveilManager, UnveilPermissions,
     UnveilState,
-};
-pub use syscall_filter::{
-    FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy,
 };
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
@@ -166,5 +161,7 @@ pub use vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, SimpleVulnerabilityScanner,
     VulnerabilityClass, VulnerabilityReport,
 };
+pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
+pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};
 pub mod defensive_audit;
 pub mod parrot;

@@ -275,11 +275,7 @@ impl AURHelper {
     }
 
     /// Compiles an AUR PKGBUILD string, parses dependencies, and registers the compiled package into local AUR cache
-    pub fn compile_aur_pkgbuild(
-        &mut self,
-        pkgname: &str,
-        pkgbuild_content: &str,
-    ) -> Result<ArchPacmanPackage, String> {
+    pub fn compile_aur_pkgbuild(&mut self, pkgname: &str, pkgbuild_content: &str) -> Result<ArchPacmanPackage, String> {
         let mut abs = ArchBuildSystem::new();
         abs.parse_pkgbuild(pkgbuild_content)?;
         abs.build_package()?;
@@ -991,4 +987,5 @@ depends=('glibc')
         let deps = contrib.finddeps(&local_db, "glibc");
         assert_eq!(deps, vec!["linux-zen".to_string()]);
     }
+
 }

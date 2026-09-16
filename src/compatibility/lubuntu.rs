@@ -1,9 +1,9 @@
 // Lubuntu-Inspired Lightweight System Configuration & Hardware Optimizer
 // Focuses on extreme memory conservation, diagnostics, and running flawlessly on legacy/low-end systems.
 
-use core::sync::atomic::{AtomicU8, AtomicUsize, Ordering};
 use std::string::String;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU8, AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuGovernor {
@@ -229,18 +229,9 @@ pub struct LubuntuGlobalHotkeyManager {
 impl LubuntuGlobalHotkeyManager {
     pub fn new() -> Self {
         let mut bindings = Vec::new();
-        bindings.push(HotkeyBindingNode {
-            shortcut: String::from("Ctrl+Alt+T"),
-            command: String::from("qterminal"),
-        });
-        bindings.push(HotkeyBindingNode {
-            shortcut: String::from("Super+L"),
-            command: String::from("lxqt-leave --lockscreen"),
-        });
-        bindings.push(HotkeyBindingNode {
-            shortcut: String::from("XF86AudioRaiseVolume"),
-            command: String::from("pactl set-sink-volume @DEFAULT_SINK@ +5%"),
-        });
+        bindings.push(HotkeyBindingNode { shortcut: String::from("Ctrl+Alt+T"), command: String::from("qterminal") });
+        bindings.push(HotkeyBindingNode { shortcut: String::from("Super+L"), command: String::from("lxqt-leave --lockscreen") });
+        bindings.push(HotkeyBindingNode { shortcut: String::from("XF86AudioRaiseVolume"), command: String::from("pactl set-sink-volume @DEFAULT_SINK@ +5%") });
 
         Self { bindings }
     }
@@ -253,10 +244,7 @@ impl LubuntuGlobalHotkeyManager {
     }
 
     pub fn trigger_shortcut(&self, shortcut: &str) -> Option<&str> {
-        self.bindings
-            .iter()
-            .find(|b| b.shortcut == shortcut)
-            .map(|b| b.command.as_str())
+        self.bindings.iter().find(|b| b.shortcut == shortcut).map(|b| b.command.as_str())
     }
 }
 
@@ -447,14 +435,8 @@ impl LubuntuPpaRepositoryManager {
         let mut mgr = Self {
             repositories: Vec::new(),
         };
-        mgr.add_ppa(
-            "ppa:lubuntu-dev/stable",
-            "https://ppa.launchpadcontent.net/lubuntu-dev/stable/ubuntu",
-        );
-        mgr.add_ppa(
-            "ppa:lubuntu-desktop/ppa",
-            "https://ppa.launchpadcontent.net/lubuntu-desktop/ppa/ubuntu",
-        );
+        mgr.add_ppa("ppa:lubuntu-dev/stable", "https://ppa.launchpadcontent.net/lubuntu-dev/stable/ubuntu");
+        mgr.add_ppa("ppa:lubuntu-desktop/ppa", "https://ppa.launchpadcontent.net/lubuntu-desktop/ppa/ubuntu");
         mgr
     }
 
@@ -472,11 +454,7 @@ impl LubuntuPpaRepositoryManager {
     }
 
     pub fn disable_ppa(&mut self, ppa_name: &str) -> bool {
-        if let Some(repo) = self
-            .repositories
-            .iter_mut()
-            .find(|r| r.ppa_name == ppa_name)
-        {
+        if let Some(repo) = self.repositories.iter_mut().find(|r| r.ppa_name == ppa_name) {
             repo.is_enabled = false;
             true
         } else {
@@ -541,25 +519,15 @@ impl LxqtPackageUpdateNotifierEngine {
     }
 
     pub fn get_security_updates(&self) -> Vec<&LubuntuPackageUpdateNotice> {
-        self.pending_updates
-            .iter()
-            .filter(|u| u.is_security_update)
-            .collect()
+        self.pending_updates.iter().filter(|u| u.is_security_update).collect()
     }
 
     pub fn calculate_total_download_size_kb(&self) -> usize {
-        self.pending_updates
-            .iter()
-            .map(|u| u.download_size_kb)
-            .sum()
+        self.pending_updates.iter().map(|u| u.download_size_kb).sum()
     }
 
     pub fn apply_update(&mut self, pkg: &str) -> bool {
-        if let Some(pos) = self
-            .pending_updates
-            .iter()
-            .position(|u| u.package_name == pkg)
-        {
+        if let Some(pos) = self.pending_updates.iter().position(|u| u.package_name == pkg) {
             self.pending_updates.remove(pos);
             true
         } else {
@@ -811,6 +779,8 @@ impl Default for CalamaresInstallerShim {
     }
 }
 
+
+
 /// Lubuntu LXQt Panel & Taskbar Tray Manager
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LxqtPanelWidgetKind {
@@ -833,9 +803,7 @@ pub struct LubuntuLxqtPanelManager {
 
 impl LubuntuLxqtPanelManager {
     pub fn new() -> Self {
-        let mut mgr = Self {
-            widgets: Vec::new(),
-        };
+        let mut mgr = Self { widgets: Vec::new() };
         mgr.add_widget(LxqtPanelWidgetKind::AppMenu, "LXQt Main Menu");
         mgr.add_widget(LxqtPanelWidgetKind::Taskbar, "Taskbar Window List");
         mgr.add_widget(LxqtPanelWidgetKind::SystemTray, "System Notification Tray");
@@ -850,6 +818,8 @@ impl LubuntuLxqtPanelManager {
         });
     }
 }
+
+
 
 /// Lubuntu LXQt Runner Quick Application Launcher Engine
 #[derive(Debug, Clone)]
@@ -866,31 +836,19 @@ pub struct LubuntuLxqtRunnerEngine {
 impl LubuntuLxqtRunnerEngine {
     pub fn new() -> Self {
         let mut engine = Self { index: Vec::new() };
-        engine.index.push(LxqtRunnerItem {
-            name: "QTerminal".to_string(),
-            exec_cmd: "qterminal".to_string(),
-        });
-        engine.index.push(LxqtRunnerItem {
-            name: "FeatherPad".to_string(),
-            exec_cmd: "featherpad".to_string(),
-        });
-        engine.index.push(LxqtRunnerItem {
-            name: "PCManFM-Qt".to_string(),
-            exec_cmd: "pcmanfm-qt".to_string(),
-        });
+        engine.index.push(LxqtRunnerItem { name: "QTerminal".to_string(), exec_cmd: "qterminal".to_string() });
+        engine.index.push(LxqtRunnerItem { name: "FeatherPad".to_string(), exec_cmd: "featherpad".to_string() });
+        engine.index.push(LxqtRunnerItem { name: "PCManFM-Qt".to_string(), exec_cmd: "pcmanfm-qt".to_string() });
         engine
     }
 
     pub fn query(&self, input: &str) -> Vec<&LxqtRunnerItem> {
         let q = input.to_lowercase();
-        self.index
-            .iter()
-            .filter(|item| {
-                item.name.to_lowercase().contains(&q) || item.exec_cmd.to_lowercase().contains(&q)
-            })
-            .collect()
+        self.index.iter().filter(|item| item.name.to_lowercase().contains(&q) || item.exec_cmd.to_lowercase().contains(&q)).collect()
     }
 }
+
+
 
 /// Lubuntu LXQt Appearance & Openbox Theme Engine
 #[derive(Debug, Clone)]
@@ -922,6 +880,7 @@ impl Default for LubuntuLxqtAppearanceEngine {
     }
 }
 
+
 mod tests {
 
     #[test]
@@ -932,6 +891,7 @@ mod tests {
         assert_eq!(app.widget_style, "Breeze");
     }
 
+
     #[test]
     fn test_lubuntu_lxqt_runner_engine() {
         let runner = LubuntuLxqtRunnerEngine::new();
@@ -939,6 +899,7 @@ mod tests {
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].exec_cmd, "qterminal");
     }
+
 
     #[test]
     fn test_lubuntu_lxqt_panel_manager() {
@@ -1114,10 +1075,7 @@ mod tests {
         let mut ppa_mgr = LubuntuPpaRepositoryManager::new();
         assert_eq!(ppa_mgr.get_enabled_ppas().len(), 2);
 
-        ppa_mgr.add_ppa(
-            "ppa:lubuntu-dev/backports",
-            "https://ppa.launchpadcontent.net/lubuntu-dev/backports/ubuntu",
-        );
+        ppa_mgr.add_ppa("ppa:lubuntu-dev/backports", "https://ppa.launchpadcontent.net/lubuntu-dev/backports/ubuntu");
         assert_eq!(ppa_mgr.get_enabled_ppas().len(), 3);
 
         assert!(ppa_mgr.disable_ppa("ppa:lubuntu-dev/backports"));

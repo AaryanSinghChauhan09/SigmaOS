@@ -2,10 +2,10 @@ pub mod omarchy;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig, OmarchyAyuThemeEngine, OmarchyFastfetchSysinfoEngine,
-    OmarchyGhosttyTerminalEngine, OmarchyHypridleEngine, OmarchyHyprlandCompositorConfigEngine,
+    OmarchyGhosttyTerminalEngine, OmarchyHyprlandCompositorConfigEngine, OmarchyHypridleEngine,
     OmarchyHyprpaperWallpaperEngine, OmarchyLazyGitConfigurationEngine,
-    OmarchyMiseVersionManagerEngine, OmarchyModernDesktopEngine, OmarchyNeovimPresetEngine,
-    OmarchyNerdFont, OmarchyOmakubDevInstaller, OmarchyStarshipPromptConfigEngine,
+    OmarchyMiseVersionManagerEngine, OmarchyModernDesktopEngine, OmarchyNerdFont,
+    OmarchyNeovimPresetEngine, OmarchyOmakubDevInstaller, OmarchyStarshipPromptConfigEngine,
     OmarchySwayNcEngine, OmarchyTerminalFontConfig, OmarchyTheme, OmarchyWalkerLauncherEngine,
     OmarchyWaybarEngine, PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
 };
@@ -63,19 +63,13 @@ pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_distro_gaps::{
-    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler,
-    DeviceNodeEntry, DeviceNodeType, DnsRecordEntry, JournaldLogRecord, NatType,
+    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeType,
+    DnsRecord, DynamicDeviceNode, JournalBinaryRecord, JournalLogLevel, NatRule, NatRuleKind,
     NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SovereignDnsTlsResolverEngine,
     SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine,
     SystemdInitManager, SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver,
     UsbHidModifierKeys, WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
 };
-pub type DnsRecord = DnsRecordEntry;
-pub type DynamicDeviceNode = DeviceNodeEntry;
-pub type JournalBinaryRecord = JournaldLogRecord;
-pub type JournalLogLevel = u8;
-pub type NatRule = NatType;
-pub type NatRuleKind = NatType;
 
 pub use garuda_nomad_innovations::{
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
@@ -118,10 +112,10 @@ pub use visual_dashboard::{
     VpnStatus, VpnTunnel, VpnType,
 };
 pub use void_runit::{
-    RunitService, RunitServiceStatus as RunitServiceState, RunitStage, RunitSupervisor,
+    RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
 };
-pub mod future_roadmap_innovations;
 pub mod sovereign_distro_dominance;
+pub mod future_roadmap_innovations;
 
 pub use future_roadmap_innovations::{
     ClusteredDevicePoolEngine, ClusteredPooledDevice, CryptographicBootChainEngine,

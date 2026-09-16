@@ -50,8 +50,7 @@ fn test_all_11_implementation_plan_modules() {
     assert_eq!(created.len(), 1);
 
     // 2. Boot Snapshot
-    let mut boot =
-        boot_snapshot::BootSnapshotEngine::new(boot_snapshot::BootSnapshotConfig::default());
+    let mut boot = boot_snapshot::BootSnapshotEngine::new(boot_snapshot::BootSnapshotConfig::default());
     let snap = boot.create_preboot_snapshot("Pre-Kernel-Update", 1700000000);
     assert!(boot.verify_boot_integrity(&snap.id));
 
@@ -79,13 +78,7 @@ fn test_all_11_implementation_plan_modules() {
         required_capabilities: vec![plugin_framework::PluginCapability::FileSystemAccess],
         entry_point: "entry.wasm".into(),
     };
-    let plug_id = plugin_fw
-        .load_plugin(
-            manifest,
-            vec![plugin_framework::PluginCapability::FileSystemAccess],
-            64,
-        )
-        .unwrap();
+    let plug_id = plugin_fw.load_plugin(manifest, vec![plugin_framework::PluginCapability::FileSystemAccess], 64).unwrap();
     assert_eq!(plugin_fw.active_plugins_count(), 1);
     assert!(plugin_fw.unload_plugin(&plug_id));
 
@@ -99,17 +92,12 @@ fn test_all_11_implementation_plan_modules() {
 
     // 7. Advanced Notifications
     let mut notif = notifications::AdvancedNotificationEngine::new(10);
-    let n_id = notif
-        .send_notification(
-            "App",
-            "Title",
-            "Body",
-            notifications::NotificationCategory::System,
-            notifications::NotificationUrgency::Normal,
-            1700000000,
-            &[],
-        )
-        .unwrap();
+    let n_id = notif.send_notification(
+        "App", "Title", "Body",
+        notifications::NotificationCategory::System,
+        notifications::NotificationUrgency::Normal,
+        1700000000, &[],
+    ).unwrap();
     assert!(notif.mark_as_read(n_id));
 
     // 8. Text Scaling
@@ -119,40 +107,18 @@ fn test_all_11_implementation_plan_modules() {
 
     // 9. AI Usage Tracker
     let mut ai_track = usage_tracker::AiUsageTrackerEngine::default();
-    ai_track.record_usage(
-        "sess",
-        "ModelX",
-        usage_tracker::ModelInferenceType::TextGeneration,
-        1000,
-        500,
-        100,
-        1700000000,
-    );
+    ai_track.record_usage("sess", "ModelX", usage_tracker::ModelInferenceType::TextGeneration, 1000, 500, 100, 1700000000);
     assert_eq!(ai_track.total_tokens_used(), 1500);
 
     // 10. Advanced Clipboard
     let mut clip = clipboard_advanced::AdvancedClipboardEngine::new("dev", 10);
-    let c_id = clip.push_clip(
-        clipboard_advanced::ClipboardContentType::Text,
-        b"hello",
-        "hello",
-        clipboard_advanced::ClipboardCategory::Work,
-        1700000000,
-    );
+    let c_id = clip.push_clip(clipboard_advanced::ClipboardContentType::Text, b"hello", "hello", clipboard_advanced::ClipboardCategory::Work, 1700000000);
     assert_eq!(clip.search_clips("hello").len(), 1);
     assert!(clip.toggle_pin(c_id));
 
     // 11. Enhanced Reminders
     let mut rem = reminders_advanced::EnhancedRemindersEngine::new();
-    let r_id = rem.add_reminder(
-        "Task",
-        "Desc",
-        "Cat",
-        reminders_advanced::ReminderPriority::High,
-        1700000000,
-        reminders_advanced::RecurrencePattern::Once,
-        &["tag"],
-    );
+    let r_id = rem.add_reminder("Task", "Desc", "Cat", reminders_advanced::ReminderPriority::High, 1700000000, reminders_advanced::RecurrencePattern::Once, &["tag"]);
     assert_eq!(rem.filter_by_tag("tag").len(), 1);
     assert!(rem.mark_completed(r_id, 1700000000));
 }

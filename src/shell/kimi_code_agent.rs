@@ -20,10 +20,11 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::format;
 
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// State of the autonomous agent session
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

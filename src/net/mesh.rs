@@ -66,12 +66,7 @@ impl SigmaNetMesh {
         hash
     }
 
-    pub fn sync_chunk_with_peer(
-        &mut self,
-        peer_id: u64,
-        chunk_id: u32,
-        payload: &[u8],
-    ) -> Result<(), &'static str> {
+    pub fn sync_chunk_with_peer(&mut self, peer_id: u64, chunk_id: u32, payload: &[u8]) -> Result<(), &'static str> {
         let mut peer_found = false;
         for peer in &mut self.peers {
             if peer.node_id == peer_id && peer.is_alive {
@@ -114,9 +109,7 @@ mod tests {
         assert_eq!(mesh.local_chunks.len(), 1);
         assert_ne!(hash, [0u8; 32]);
 
-        assert!(mesh
-            .sync_chunk_with_peer(2002, 2, b"COLLABORATIVE_PAYLOAD")
-            .is_ok());
+        assert!(mesh.sync_chunk_with_peer(2002, 2, b"COLLABORATIVE_PAYLOAD").is_ok());
         assert_eq!(mesh.peers[0].shared_chunks_count, 1);
         assert_eq!(mesh.local_chunks.len(), 2);
 

@@ -80,9 +80,7 @@ impl AdvancedNotificationEngine {
     ) -> Option<u64> {
         // DND filtering check
         if self.dnd_config.enabled {
-            if !(self.dnd_config.allow_critical_override
-                && urgency == NotificationUrgency::Critical)
-            {
+            if !(self.dnd_config.allow_critical_override && urgency == NotificationUrgency::Critical) {
                 return None; // Suppressed by Do-Not-Disturb
             }
         }

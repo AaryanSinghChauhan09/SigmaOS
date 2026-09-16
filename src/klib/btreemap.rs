@@ -58,8 +58,7 @@ impl<K, V> Eq for BTreeMap<K, V>
 where
     K: Eq + Clone + Ord,
     V: Eq + Clone,
-{
-}
+{}
 
 pub enum Entry<'a, K: 'a + PartialEq + Clone + Ord, V: 'a + Clone> {
     Occupied(OccupiedEntry<'a, K, V>),

@@ -62,10 +62,7 @@ pub struct BraveShieldV2Engine {
 impl BraveShieldV2Engine {
     pub fn new() -> Self {
         let mut uncloak = BTreeMap::new();
-        uncloak.insert(
-            "track.example.com".to_string(),
-            "analytics.google-analytics.com".to_string(),
-        );
+        uncloak.insert("track.example.com".to_string(), "analytics.google-analytics.com".to_string());
 
         Self {
             adblock_patterns: vec![
@@ -93,9 +90,7 @@ impl BraveShieldV2Engine {
 
     pub fn should_block_request(&self, request_url: &str) -> bool {
         let effective_url = self.resolve_uncloaked_domain(request_url);
-        self.adblock_patterns
-            .iter()
-            .any(|pattern| effective_url.contains(pattern))
+        self.adblock_patterns.iter().any(|pattern| effective_url.contains(pattern))
     }
 
     pub fn upgrade_url_to_https(&self, url: &str) -> String {
@@ -138,33 +133,24 @@ pub struct FirefoxContainerIsolationEngine {
 impl FirefoxContainerIsolationEngine {
     pub fn new() -> Self {
         let mut containers = BTreeMap::new();
-        containers.insert(
-            1,
-            ContainerIdentity {
-                id: 1,
-                name: "Personal".to_string(),
-                color_hex: "#33ccff".to_string(),
-                icon_name: "user".to_string(),
-            },
-        );
-        containers.insert(
-            2,
-            ContainerIdentity {
-                id: 2,
-                name: "Work".to_string(),
-                color_hex: "#ff9933".to_string(),
-                icon_name: "briefcase".to_string(),
-            },
-        );
-        containers.insert(
-            3,
-            ContainerIdentity {
-                id: 3,
-                name: "Banking".to_string(),
-                color_hex: "#33cc33".to_string(),
-                icon_name: "dollar".to_string(),
-            },
-        );
+        containers.insert(1, ContainerIdentity {
+            id: 1,
+            name: "Personal".to_string(),
+            color_hex: "#33ccff".to_string(),
+            icon_name: "user".to_string(),
+        });
+        containers.insert(2, ContainerIdentity {
+            id: 2,
+            name: "Work".to_string(),
+            color_hex: "#ff9933".to_string(),
+            icon_name: "briefcase".to_string(),
+        });
+        containers.insert(3, ContainerIdentity {
+            id: 3,
+            name: "Banking".to_string(),
+            color_hex: "#33cc33".to_string(),
+            icon_name: "dollar".to_string(),
+        });
 
         Self {
             containers,
@@ -181,7 +167,9 @@ impl FirefoxContainerIsolationEngine {
     }
 
     pub fn get_container_cookie(&self, container_id: u32, key: &str) -> Option<&String> {
-        self.isolated_cookie_jars.get(&container_id)?.get(key)
+        self.isolated_cookie_jars
+            .get(&container_id)?
+            .get(key)
     }
 
     pub fn purge_container_data(&mut self, container_id: u32) {
@@ -211,10 +199,7 @@ impl ObliviousDohResolverEngine {
     }
 
     pub fn resolve_encrypted_query(&self, domain: &str) -> String {
-        format!(
-            "ODoH[{}]->Relay[{}]->IP(1.1.1.1) for {}",
-            self.odoh_target_server, self.odoh_relay_server, domain
-        )
+        format!("ODoH[{}]->Relay[{}]->IP(1.1.1.1) for {}", self.odoh_target_server, self.odoh_relay_server, domain)
     }
 }
 
@@ -244,24 +229,15 @@ mod tests {
         // 2. Brave Shield v2 CNAME Uncloaking
         let shield = BraveShieldV2Engine::new();
         assert!(shield.should_block_request("https://track.example.com/pixel.gif"));
-        assert_eq!(
-            shield.upgrade_url_to_https("http://example.com"),
-            "https://example.com"
-        );
+        assert_eq!(shield.upgrade_url_to_https("http://example.com"), "https://example.com");
 
         // 3. Firefox Container Isolation
         let mut containers = FirefoxContainerIsolationEngine::new();
         containers.set_container_cookie(1, "session", "personal_token_123");
         containers.set_container_cookie(2, "session", "work_token_456");
 
-        assert_eq!(
-            containers.get_container_cookie(1, "session").unwrap(),
-            "personal_token_123"
-        );
-        assert_eq!(
-            containers.get_container_cookie(2, "session").unwrap(),
-            "work_token_456"
-        );
+        assert_eq!(containers.get_container_cookie(1, "session").unwrap(), "personal_token_123");
+        assert_eq!(containers.get_container_cookie(2, "session").unwrap(), "work_token_456");
 
         containers.purge_container_data(1);
         assert!(containers.get_container_cookie(1, "session").is_none());

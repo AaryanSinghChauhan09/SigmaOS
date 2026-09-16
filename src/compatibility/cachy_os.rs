@@ -488,6 +488,8 @@ impl Default for CachyosKernelFeatureMatrix {
     }
 }
 
+
+
 /// CachyOS Kernel Manager Engine
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CachyKernelVariant {
@@ -517,10 +519,7 @@ impl CachyosKernelManagerEngine {
         }
     }
 
-    pub fn set_active_kernel(
-        &mut self,
-        variant: CachyKernelVariant,
-    ) -> Result<String, &'static str> {
+    pub fn set_active_kernel(&mut self, variant: CachyKernelVariant) -> Result<String, &'static str> {
         if self.installed_kernels.contains(&variant) {
             self.active_kernel = variant.clone();
             Ok(format!("Bootloader updated to boot {:?}", variant))
@@ -529,6 +528,8 @@ impl CachyosKernelManagerEngine {
         }
     }
 }
+
+
 
 /// CachyOS Package Installer Engine
 #[derive(Debug, Clone)]
@@ -544,37 +545,24 @@ pub struct CachyosPackageInstallerEngine {
 
 impl CachyosPackageInstallerEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            available_bundles: Vec::new(),
-        };
+        let mut engine = Self { available_bundles: Vec::new() };
         engine.available_bundles.push(CachyPackageBundle {
             name: "gaming".to_string(),
-            packages: vec![
-                "steam".to_string(),
-                "proton-ge-custom".to_string(),
-                "mangohud".to_string(),
-                "gamemode".to_string(),
-            ],
+            packages: vec!["steam".to_string(), "proton-ge-custom".to_string(), "mangohud".to_string(), "gamemode".to_string()],
         });
         engine.available_bundles.push(CachyPackageBundle {
             name: "developer".to_string(),
-            packages: vec![
-                "rust".to_string(),
-                "clang".to_string(),
-                "git".to_string(),
-                "docker".to_string(),
-            ],
+            packages: vec!["rust".to_string(), "clang".to_string(), "git".to_string(), "docker".to_string()],
         });
         engine
     }
 
     pub fn resolve_bundle_packages(&self, bundle_name: &str) -> Option<Vec<String>> {
-        self.available_bundles
-            .iter()
-            .find(|b| b.name == bundle_name)
-            .map(|b| b.packages.clone())
+        self.available_bundles.iter().find(|b| b.name == bundle_name).map(|b| b.packages.clone())
     }
 }
+
+
 
 /// CachyOS Sysctl Tuning Engine
 #[derive(Debug, Clone)]
@@ -594,10 +582,8 @@ impl CachyosSysctlTuningEngine {
     }
 
     pub fn apply_tuning(&mut self) -> String {
-        format!(
-            "Applied CachyOS Sysctl: bore_latency={}ns, compaction={}, zswap={}",
-            self.bore_sched_latency_ns, self.vm_compaction_proactiveness, self.zswap_compressor
-        )
+        format!("Applied CachyOS Sysctl: bore_latency={}ns, compaction={}, zswap={}",
+            self.bore_sched_latency_ns, self.vm_compaction_proactiveness, self.zswap_compressor)
     }
 }
 
@@ -606,6 +592,7 @@ impl Default for CachyosSysctlTuningEngine {
         Self::new()
     }
 }
+
 
 mod tests {
 
@@ -616,6 +603,7 @@ mod tests {
         assert!(res.contains("bore_latency=3000000ns"));
     }
 
+
     #[test]
     fn test_cachyos_package_installer() {
         let installer = CachyosPackageInstallerEngine::new();
@@ -624,15 +612,14 @@ mod tests {
         assert!(installer.resolve_bundle_packages("nonexistent").is_none());
     }
 
+
     #[test]
     fn test_cachyos_kernel_manager() {
         let mut km = CachyosKernelManagerEngine::new();
         assert_eq!(km.active_kernel, CachyKernelVariant::LinuxCachyosBore);
 
         km.install_kernel(CachyKernelVariant::LinuxCachyosSchedExt);
-        assert!(km
-            .set_active_kernel(CachyKernelVariant::LinuxCachyosSchedExt)
-            .is_ok());
+        assert!(km.set_active_kernel(CachyKernelVariant::LinuxCachyosSchedExt).is_ok());
         assert_eq!(km.active_kernel, CachyKernelVariant::LinuxCachyosSchedExt);
     }
 

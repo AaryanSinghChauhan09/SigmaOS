@@ -228,9 +228,7 @@ impl SigmaToolsSuitePipeline {
                 self.deployed_systems_count = 9;
                 RolloutPhase::Phase5RigorousTrustVerification
             }
-            RolloutPhase::Phase5RigorousTrustVerification => {
-                RolloutPhase::Phase5RigorousTrustVerification
-            }
+            RolloutPhase::Phase5RigorousTrustVerification => RolloutPhase::Phase5RigorousTrustVerification,
         };
     }
 }
@@ -1425,10 +1423,7 @@ mod replicated_tests {
         let mut pipeline = SigmaToolsSuitePipeline::new();
         assert_eq!(pipeline.deployed_systems_count, 2);
         pipeline.advance_phase();
-        assert_eq!(
-            pipeline.current_phase,
-            RolloutPhase::Phase2ZeroDowntimeResilience
-        );
+        assert_eq!(pipeline.current_phase, RolloutPhase::Phase2ZeroDowntimeResilience);
         assert_eq!(pipeline.deployed_systems_count, 4);
     }
 
@@ -1469,8 +1464,7 @@ impl RipgrepFastSearchEngine {
     }
 
     pub fn index_file(&mut self, file_path: &str, content: &str) {
-        self.indexed_files
-            .insert(file_path.to_string(), content.to_string());
+        self.indexed_files.insert(file_path.to_string(), content.to_string());
     }
 
     pub fn search(&self, pattern: &str) -> Vec<(String, usize, String)> {

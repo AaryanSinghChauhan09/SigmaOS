@@ -111,8 +111,7 @@ impl SystemConfigManager {
 
         // Ensure directory exists
         if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent)
-                .map_err(|e| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
+            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
         }
 
         let entries = self
@@ -310,8 +309,8 @@ impl ServiceManager {
     pub fn load_service(&mut self, name: &str) -> Result<(), ConfigError> {
         let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
 
-        let content = fs::read_to_string(&file_path)
-            .map_err(|e| ConfigError::ReadError(file_path, e.to_string()))?;
+        let content =
+            fs::read_to_string(&file_path).map_err(|e| ConfigError::ReadError(file_path, e.to_string()))?;
 
         let service = self.parse_service_unit(&content, name);
         self.services.insert(name.to_string(), service);
@@ -388,8 +387,7 @@ impl ServiceManager {
         let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
 
         if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent)
-                .map_err(|e| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
+            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
         }
 
         fs::write(&file_path, service.to_unit_file())

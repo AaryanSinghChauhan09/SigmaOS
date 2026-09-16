@@ -87,10 +87,7 @@ impl AiUsageTrackerEngine {
     }
 
     pub fn total_tokens_used(&self) -> usize {
-        self.records
-            .iter()
-            .map(|r| r.prompt_tokens + r.completion_tokens)
-            .sum()
+        self.records.iter().map(|r| r.prompt_tokens + r.completion_tokens).sum()
     }
 
     pub fn total_cost_cents(&self) -> u64 {

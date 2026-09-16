@@ -62,11 +62,7 @@ impl NetBsdRumpUserlandDriverEngine {
         }
     }
 
-    pub fn issue_hypercall(
-        &mut self,
-        driver_id: u32,
-        payload_bytes: usize,
-    ) -> Result<u64, &'static str> {
+    pub fn issue_hypercall(&mut self, driver_id: u32, payload_bytes: usize) -> Result<u64, &'static str> {
         if let Some(drv) = self.drivers.iter_mut().find(|d| d.driver_id == driver_id) {
             if !drv.is_isolated {
                 return Err("RUMP_DRIVER: Driver isolation boundary breached!");
@@ -398,12 +394,7 @@ impl NixOsFlakeGcEngine {
         }
     }
 
-    pub fn register_generation(
-        &mut self,
-        gen_number: u32,
-        store_path: &'static str,
-        set_current: bool,
-    ) {
+    pub fn register_generation(&mut self, gen_number: u32, store_path: &'static str, set_current: bool) {
         if set_current {
             for g in &mut self.generations {
                 g.is_current = false;
@@ -416,12 +407,7 @@ impl NixOsFlakeGcEngine {
         });
     }
 
-    pub fn pin_gc_root(
-        &mut self,
-        pin_id: u32,
-        target_store_path: &'static str,
-        owner: &'static str,
-    ) {
+    pub fn pin_gc_root(&mut self, pin_id: u32, target_store_path: &'static str, owner: &'static str) {
         self.gc_roots.push(GcRootPin {
             pin_id,
             target_store_path,
@@ -432,10 +418,7 @@ impl NixOsFlakeGcEngine {
     pub fn collect_garbage(&mut self) -> usize {
         let mut deleted_count = 0;
         self.generations.retain(|gen| {
-            let is_pinned = self
-                .gc_roots
-                .iter()
-                .any(|pin| pin.target_store_path == gen.store_path);
+            let is_pinned = self.gc_roots.iter().any(|pin| pin.target_store_path == gen.store_path);
             let should_keep = gen.is_current || is_pinned;
             if !should_keep {
                 deleted_count += 1;
@@ -487,45 +470,26 @@ impl SovereignDistroInspirationSynthesisSuite {
 
     pub fn synthesize_and_verify_all(&mut self) -> bool {
         // Verify Rump engine
-        self.rump_engine
-            .register_driver(1, "nvme_rump", RumpComponentKind::Storage, 501);
+        self.rump_engine.register_driver(1, "nvme_rump", RumpComponentKind::Storage, 501);
         let hcall = self.rump_engine.issue_hypercall(1, 512).is_ok();
 
         // Verify LBU engine
         self.lbu_engine.stage_file("/etc/network/interfaces");
-        let commit = self
-            .lbu_engine
-            .commit_apkovl("root.apkovl.tar.gz", 1700000000);
+        let commit = self.lbu_engine.commit_apkovl("root.apkovl.tar.gz", 1700000000);
         let lbu_ok = commit.files_saved == 1;
 
         // Verify VNET jail engine
         self.vnet_engine.create_vnet_jail(10, "web_jail", 1);
-        let vnet_ok = self
-            .vnet_engine
-            .attach_epair_interface(
-                10,
-                "epair0b",
-                [0x02, 0x00, 0x00, 0x00, 0x00, 0x01],
-                [192, 168, 1, 50],
-            )
-            .is_ok();
+        let vnet_ok = self.vnet_engine.attach_epair_interface(10, "epair0b", [0x02, 0x00, 0x00, 0x00, 0x00, 0x01], [192, 168, 1, 50]).is_ok();
 
         // Verify Pledge/Unveil sentinel
-        self.pledge_sentinel.unveil_path(
-            "/usr/bin",
-            &[UnveilPermission::Read, UnveilPermission::Execute],
-        );
-        let pledge_ok = self
-            .pledge_sentinel
-            .check_path_access("/usr/bin/cargo", UnveilPermission::Execute);
+        self.pledge_sentinel.unveil_path("/usr/bin", &[UnveilPermission::Read, UnveilPermission::Execute]);
+        let pledge_ok = self.pledge_sentinel.check_path_access("/usr/bin/cargo", UnveilPermission::Execute);
 
         // Verify Nix Flake GC engine
-        self.flake_gc_engine
-            .register_generation(1, "/nix/store/abc-1.0", false);
-        self.flake_gc_engine
-            .register_generation(2, "/nix/store/xyz-2.0", true);
-        self.flake_gc_engine
-            .pin_gc_root(101, "/nix/store/abc-1.0", "systemd_root");
+        self.flake_gc_engine.register_generation(1, "/nix/store/abc-1.0", false);
+        self.flake_gc_engine.register_generation(2, "/nix/store/xyz-2.0", true);
+        self.flake_gc_engine.pin_gc_root(101, "/nix/store/abc-1.0", "systemd_root");
         let gc_deleted = self.flake_gc_engine.collect_garbage();
         let gc_ok = gc_deleted == 0 && self.flake_gc_engine.get_generation_count() == 2;
 
@@ -576,14 +540,7 @@ mod tests {
         vnet.create_vnet_jail(1, "isolated_db", 2);
 
         assert_eq!(vnet.get_jail_count(), 1);
-        assert!(vnet
-            .attach_epair_interface(
-                1,
-                "epair1b",
-                [0x02, 0x11, 0x22, 0x33, 0x44, 0x55],
-                [10, 0, 0, 2]
-            )
-            .is_ok());
+        assert!(vnet.attach_epair_interface(1, "epair1b", [0x02, 0x11, 0x22, 0x33, 0x44, 0x55], [10, 0, 0, 2]).is_ok());
         assert_eq!(vnet.get_jail_interface_count(1), 1);
     }
 
@@ -592,15 +549,11 @@ mod tests {
         let mut sentinel = OpenBsdPledgeUnveilSentinel::new();
 
         assert!(sentinel.check_syscall_allowed(SyscallPromise::Stdio));
-        assert!(sentinel
-            .set_pledge_promises(&[SyscallPromise::Stdio, SyscallPromise::Rpath])
-            .is_ok());
+        assert!(sentinel.set_pledge_promises(&[SyscallPromise::Stdio, SyscallPromise::Rpath]).is_ok());
         assert!(!sentinel.check_syscall_allowed(SyscallPromise::Exec));
 
         // Attempting to expand promise mask should fail once locked
-        assert!(sentinel
-            .set_pledge_promises(&[SyscallPromise::Stdio, SyscallPromise::Exec])
-            .is_err());
+        assert!(sentinel.set_pledge_promises(&[SyscallPromise::Stdio, SyscallPromise::Exec]).is_err());
 
         sentinel.unveil_path("/tmp", &[UnveilPermission::Read, UnveilPermission::Write]);
         assert!(sentinel.check_path_access("/tmp/cache.txt", UnveilPermission::Write));

@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeSet, BTreeMap};
 // SigmaOS APT (Advanced Package Tool) Implementation
 // Implements Debian-style package management for SigmaOS
 // Inspired by Debian's APT for advanced package operations

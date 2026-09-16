@@ -858,6 +858,8 @@ impl SigmaDistroEngine {
 
 // Bring alloc into scope for format! and vec!
 
+
+
 /// Gentoo emerge CLI & Portage World File Manager Engine
 #[derive(Debug, Clone, Default)]
 pub struct GentooEmergeCliEngine {
@@ -883,10 +885,7 @@ impl GentooEmergeCliEngine {
     }
 
     pub fn emerge_world_rebuild(&self) -> String {
-        format!(
-            "emerge --ask --update --deep --changed-use @world ({} atoms)",
-            self.world_packages.len()
-        )
+        format!("emerge --ask --update --deep --changed-use @world ({} atoms)", self.world_packages.len())
     }
 
     pub fn run_etc_update(&mut self) -> usize {
@@ -895,6 +894,8 @@ impl GentooEmergeCliEngine {
         count
     }
 }
+
+
 
 /// Gentoo Layman Overlay Repository Manager
 #[derive(Debug, Clone)]
@@ -911,9 +912,7 @@ pub struct GentooLaymanOverlayEngine {
 
 impl GentooLaymanOverlayEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            registered_overlays: Vec::new(),
-        };
+        let mut engine = Self { registered_overlays: Vec::new() };
         engine.add_overlay("guru", "https://github.com/gentoo/guru.git", 50);
         engine
     }
@@ -930,6 +929,8 @@ impl GentooLaymanOverlayEngine {
         self.registered_overlays.len()
     }
 }
+
+
 
 /// Gentoo CFLAGS Optimization & make.conf Tuner
 #[derive(Debug, Clone)]
@@ -1021,10 +1022,7 @@ impl VoidXbpsBinaryPackageEngine {
     }
 
     pub fn installed_count(&self) -> usize {
-        self.registered_packages
-            .iter()
-            .filter(|p| p.installed)
-            .count()
+        self.registered_packages.iter().filter(|p| p.installed).count()
     }
 }
 
@@ -1056,10 +1054,7 @@ impl AlpineApkVolatileOverlayEngine {
     }
 
     pub fn commit_lbu(&self) -> String {
-        format!(
-            "lbu commit: backed up {} world packages to volatile media",
-            self.world_packages.len()
-        )
+        format!("lbu commit: backed up {} world packages to volatile media", self.world_packages.len())
     }
 }
 
@@ -1136,8 +1131,7 @@ impl OpenBsdPledgeUnveilSecurityGovernor {
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) {
-        self.unveiled_paths
-            .push((path.to_string(), permissions.to_string()));
+        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
     }
 
     pub fn is_path_accessible(&self, path: &str) -> bool {
@@ -1209,13 +1203,8 @@ pub struct MageiaUrpmiMediaManager {
 
 impl MageiaUrpmiMediaManager {
     pub fn new() -> Self {
-        let mut mgr = Self {
-            media_list: Vec::new(),
-        };
-        mgr.add_media(
-            "core-release",
-            "https://mirrors.kernel.org/mageia/distrib/9/x86_64/media/core/release",
-        );
+        let mut mgr = Self { media_list: Vec::new() };
+        mgr.add_media("core-release", "https://mirrors.kernel.org/mageia/distrib/9/x86_64/media/core/release");
         mgr
     }
 
@@ -1250,9 +1239,7 @@ pub struct DragonFlyHammer2PfsEngine {
 
 impl DragonFlyHammer2PfsEngine {
     pub fn new() -> Self {
-        Self {
-            snapshots: Vec::new(),
-        }
+        Self { snapshots: Vec::new() }
     }
 
     pub fn create_snapshot(&mut self, name: &str, node_id: u32, is_master: bool) {
@@ -1312,6 +1299,7 @@ impl IllumosDTraceTracingGovernor {
     }
 }
 
+
 mod tests {
 
     #[test]
@@ -1326,10 +1314,7 @@ mod tests {
     fn test_mageia_urpmi_media_manager() {
         let mut urpmi = MageiaUrpmiMediaManager::new();
         assert_eq!(urpmi.active_media_count(), 1);
-        urpmi.add_media(
-            "nonfree-release",
-            "https://mirrors.kernel.org/mageia/distrib/9/x86_64/media/nonfree/release",
-        );
+        urpmi.add_media("nonfree-release", "https://mirrors.kernel.org/mageia/distrib/9/x86_64/media/nonfree/release");
         assert_eq!(urpmi.active_media_count(), 2);
     }
 
@@ -1394,6 +1379,7 @@ mod tests {
         assert!(flags.contains("-flto"));
     }
 
+
     #[test]
     fn test_gentoo_layman_overlay_engine() {
         let mut layman = GentooLaymanOverlayEngine::new();
@@ -1401,6 +1387,7 @@ mod tests {
         layman.add_overlay("science", "https://github.com/gentoo/science.git", 10);
         assert_eq!(layman.sync_all_overlays(), 2);
     }
+
 
     #[test]
     fn test_gentoo_emerge_cli_engine() {

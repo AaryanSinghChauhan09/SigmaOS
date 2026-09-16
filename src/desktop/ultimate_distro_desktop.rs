@@ -3,12 +3,12 @@
 //! GNOME 46 (Mutter fractional scaling & Shell extensions), XFCE 4.18 (Thunar custom actions & Panel plugins),
 //! Lumina BSD Desktop (BSD hardware sysctl & Lumina-FM ZFS snapshot restore), and Sway / Regolith (Tree-based Tiling WM).
 
-use crate::klib::btreemap::BTreeMap;
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+use crate::klib::btreemap::BTreeMap;
 
 /// KDE Plasma 6 Inspired: KWin Wayland Split-Tiling & KRunner Search Dispatcher
 #[derive(Debug, Clone)]
@@ -65,11 +65,7 @@ impl KdePlasma6Engine {
                 half_w,
                 i * slot_h,
                 screen_width - half_w,
-                if i == right_count - 1 {
-                    screen_height - (i * slot_h)
-                } else {
-                    slot_h
-                },
+                if i == right_count - 1 { screen_height - (i * slot_h) } else { slot_h },
             ));
         }
         grid
@@ -111,10 +107,7 @@ impl KdePlasma6Engine {
 
     /// Extracts dominant accent color from wallpaper RGB histogram
     pub fn extract_wallpaper_accent_color(&mut self, rgb_sample: (u8, u8, u8)) -> String {
-        self.wallpaper_accent_color = format!(
-            "#{:02x}{:02x}{:02x}",
-            rgb_sample.0, rgb_sample.1, rgb_sample.2
-        );
+        self.wallpaper_accent_color = format!("#{:02x}{:02x}{:02x}", rgb_sample.0, rgb_sample.1, rgb_sample.2);
         self.wallpaper_accent_color.clone()
     }
 }
@@ -168,18 +161,13 @@ impl Gnome46MutterEngine {
     }
 
     /// Validates GNOME Shell Extension sandbox permissions before loading `.shell-extension`
-    pub fn validate_shell_extension(
-        &self,
-        extension_id: &str,
-        requested_permissions: &[&str],
-    ) -> bool {
+    pub fn validate_shell_extension(&self, extension_id: &str, requested_permissions: &[&str]) -> bool {
         if extension_id.is_empty() {
             return false;
         }
         if self.extensions_sandbox_active {
             // Reject unauthorized root / raw memory extensions
-            !requested_permissions.contains(&"root_access")
-                && !requested_permissions.contains(&"raw_mem")
+            !requested_permissions.contains(&"root_access") && !requested_permissions.contains(&"raw_mem")
         } else {
             true
         }
@@ -232,8 +220,7 @@ impl Xfce418Engine {
 
     /// Registers XFCE Panel Applet Plugin IPC port
     pub fn register_panel_plugin_port(&mut self, plugin_name: &str, port: u16) {
-        self.panel_plugin_ipc_ports
-            .insert(plugin_name.to_string(), port);
+        self.panel_plugin_ipc_ports.insert(plugin_name.to_string(), port);
     }
 }
 
@@ -417,22 +404,12 @@ mod tests {
     #[test]
     fn test_lumina_bsd_desktop_engine() {
         let mut lumina = LuminaBsdDesktopEngine::new();
-        assert_eq!(
-            lumina.query_bsd_sysctl_hardware("hw.acpi.battery.life"),
-            Some(String::from("100"))
-        );
-        assert_eq!(
-            lumina.query_bsd_sysctl_hardware("hw.model"),
-            Some(String::from("BSD Sovereign CPU"))
-        );
+        assert_eq!(lumina.query_bsd_sysctl_hardware("hw.acpi.battery.life"), Some(String::from("100")));
+        assert_eq!(lumina.query_bsd_sysctl_hardware("hw.model"), Some(String::from("BSD Sovereign CPU")));
 
-        let restored =
-            lumina.restore_lumina_zfs_file_snapshot("etc/rc.conf", "zfs_auto_snapshot_2023");
+        let restored = lumina.restore_lumina_zfs_file_snapshot("etc/rc.conf", "zfs_auto_snapshot_2023");
         assert!(restored.is_ok());
-        assert_eq!(
-            restored.unwrap(),
-            "/.zfs/snapshot/zfs_auto_snapshot_2023/etc/rc.conf"
-        );
+        assert_eq!(restored.unwrap(), "/.zfs/snapshot/zfs_auto_snapshot_2023/etc/rc.conf");
     }
 
     #[test]

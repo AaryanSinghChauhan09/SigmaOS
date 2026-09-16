@@ -101,19 +101,12 @@ impl PluginMarketplaceEngine {
         let query_lower = query;
         self.catalog
             .iter()
-            .filter(|l| {
-                l.name.contains(query_lower)
-                    || l.description.contains(query_lower)
-                    || l.id.contains(query_lower)
-            })
+            .filter(|l| l.name.contains(query_lower) || l.description.contains(query_lower) || l.id.contains(query_lower))
             .collect()
     }
 
     pub fn filter_by_category(&self, category: MarketplaceCategory) -> Vec<&MarketplaceListing> {
-        self.catalog
-            .iter()
-            .filter(|l| l.category == category)
-            .collect()
+        self.catalog.iter().filter(|l| l.category == category).collect()
     }
 
     pub fn verify_signature(&self, listing_id: &str) -> bool {
@@ -124,11 +117,7 @@ impl PluginMarketplaceEngine {
         }
     }
 
-    pub fn install_plugin(
-        &mut self,
-        listing_id: &str,
-        current_timestamp: u64,
-    ) -> Result<String, &'static str> {
+    pub fn install_plugin(&mut self, listing_id: &str, current_timestamp: u64) -> Result<String, &'static str> {
         if !self.verify_signature(listing_id) {
             return Err("Invalid or unverified plugin signature");
         }
@@ -147,11 +136,7 @@ impl PluginMarketplaceEngine {
             install_timestamp: current_timestamp,
         };
 
-        if let Some(pos) = self
-            .installed
-            .iter()
-            .position(|i| i.listing_id == listing_id)
-        {
+        if let Some(pos) = self.installed.iter().position(|i| i.listing_id == listing_id) {
             self.installed[pos] = record;
         } else {
             self.installed.push(record);

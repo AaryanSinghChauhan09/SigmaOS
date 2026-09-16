@@ -27,6 +27,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+
 use sigma_types::Result;
 
 use std::collections::BTreeSet as HashSet;

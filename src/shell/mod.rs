@@ -15,11 +15,11 @@ pub mod terminal_emulator;
 pub mod zsh_bash_parity;
 
 pub use self::command::{ShellCommand, SimpleShellSession};
-pub use self::repl::ShellRepl;
 pub use self::sigma_sh::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
     PipelineExecutor, ShellPledgeUnveilGuard, ShellSyntaxHighlighter, ZshPromptFormatter,
 };
+pub use self::repl::ShellRepl;
 
 // FFI bindings to Nim SigmaShell
 extern "C" {

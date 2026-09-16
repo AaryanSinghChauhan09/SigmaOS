@@ -3,9 +3,9 @@
 //! Provides user/group isolation per-namespace with UID/GID mapping,
 //! capability sets, and thread-safe namespace management.
 
+use std::sync::{Arc, Mutex, RwLock};
 use std::collections::HashMap;
 use std::fmt;
-use std::sync::{Arc, Mutex, RwLock};
 
 /// Unique identifier for a user namespace
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -130,13 +130,14 @@ impl UidGidMapping {
 
     /// Check if a container ID falls within this mapping
     pub fn contains_container_id(&self, container_id: u32) -> bool {
-        container_id >= self.container_id
-            && container_id < self.container_id.saturating_add(self.count)
+        container_id >= self.container_id &&
+        container_id < self.container_id.saturating_add(self.count)
     }
 
     /// Check if a host ID falls within this mapping
     pub fn contains_host_id(&self, host_id: u32) -> bool {
-        host_id >= self.host_id && host_id < self.host_id.saturating_add(self.count)
+        host_id >= self.host_id &&
+        host_id < self.host_id.saturating_add(self.count)
     }
 
     /// Get the container ID for a given host ID
@@ -162,7 +163,11 @@ impl UidGidMapping {
 
 impl fmt::Display for UidGidMapping {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}:{}:{}", self.container_id, self.host_id, self.count)
+        write!(
+            f,
+            "{}:{}:{}",
+            self.container_id, self.host_id, self.count
+        )
     }
 }
 
@@ -270,7 +275,12 @@ impl SubuidAllocationTracker {
     }
 
     /// Allocate a range for a user
-    pub fn allocate_range(&self, user: &str, start: u32, count: u32) -> Result<(u32, u32), String> {
+    pub fn allocate_range(
+        &self,
+        user: &str,
+        start: u32,
+        count: u32,
+    ) -> Result<(u32, u32), String> {
         // Check for conflicts
         self.check_conflict(user, start, count)?;
 
@@ -451,7 +461,11 @@ pub struct UserNamespace {
 
 impl UserNamespace {
     /// Create a new user namespace
-    pub fn new(id: UserNamespaceId, owner_uid: u32, parent_id: Option<UserNamespaceId>) -> Self {
+    pub fn new(
+        id: UserNamespaceId,
+        owner_uid: u32,
+        parent_id: Option<UserNamespaceId>,
+    ) -> Self {
         Self {
             id,
             uid_map: Vec::new(),

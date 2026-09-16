@@ -1,10 +1,10 @@
-/// OOP-based User Authentication for SigmaOS
-/// Based on Roadmap Item 13: User authentication
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+/// OOP-based User Authentication for SigmaOS
+/// Based on Roadmap Item 13: User authentication
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// OOP-based User Authentication for SigmaOS
 /// Based on Roadmap Item 13: User authentication
@@ -350,12 +350,7 @@ impl FedoraNogginUserPortal {
         // Generate dynamic 16-character Base32 secret derived from username and account traits
         const BASE32_ALPHABET: &[u8; 32] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
         let mut secret_chars = String::with_capacity(16);
-        for (i, byte) in username
-            .bytes()
-            .chain(acc.email.bytes())
-            .take(16)
-            .enumerate()
-        {
+        for (i, byte) in username.bytes().chain(acc.email.bytes()).take(16).enumerate() {
             let idx = ((byte as usize) + i * 31) % 32;
             secret_chars.push(BASE32_ALPHABET[idx] as char);
         }

@@ -88,9 +88,7 @@ impl SimpleJqJsonQueryEngine {
                     return Some(rest[start..start + end].to_string());
                 }
             } else {
-                let end = rest
-                    .find(|c: char| c == ',' || c == '}' || c == ']')
-                    .unwrap_or(rest.len());
+                let end = rest.find(|c: char| c == ',' || c == '}' || c == ']').unwrap_or(rest.len());
                 return Some(rest[..end].trim().to_string());
             }
         }

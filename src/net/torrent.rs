@@ -17,8 +17,8 @@ use std::vec;
 
 // (no_std only applicable at crate root - removed)
 
-use std::string::String;
 use std::vec::Vec;
+use std::string::String;
 
 // =========================================================================
 // 1. BENCODE PARSER & ENCODER (BEP-0003)
@@ -43,15 +43,9 @@ impl BencodeValue {
 
         match input[0] {
             b'i' => {
-                let end = input
-                    .iter()
-                    .position(|&b| b == b'e')
-                    .ok_or("Bencode: Unterminated integer")?;
-                let num_str = core::str::from_utf8(&input[1..end])
-                    .map_err(|_| "Bencode: Invalid integer UTF-8")?;
-                let val = num_str
-                    .parse::<i64>()
-                    .map_err(|_| "Bencode: Integer parse failure")?;
+                let end = input.iter().position(|&b| b == b'e').ok_or("Bencode: Unterminated integer")?;
+                let num_str = core::str::from_utf8(&input[1..end]).map_err(|_| "Bencode: Invalid integer UTF-8")?;
+                let val = num_str.parse::<i64>().map_err(|_| "Bencode: Integer parse failure")?;
                 Ok((BencodeValue::Integer(val), end + 1))
             }
             b'l' => {
@@ -73,8 +67,9 @@ impl BencodeValue {
                 while pos < input.len() && input[pos] != b'e' {
                     let (key_val, key_bytes) = Self::parse(&input[pos..])?;
                     let key_str = match key_val {
-                        BencodeValue::ByteString(bytes) => String::from_utf8(bytes)
-                            .map_err(|_| "Bencode: Invalid dict key UTF-8")?,
+                        BencodeValue::ByteString(bytes) => {
+                            String::from_utf8(bytes).map_err(|_| "Bencode: Invalid dict key UTF-8")?
+                        }
                         _ => return Err("Bencode: Dict key must be byte string"),
                     };
                     pos += key_bytes;
@@ -89,15 +84,9 @@ impl BencodeValue {
                 Ok((BencodeValue::Dict(dict), pos + 1))
             }
             b'0'..=b'9' => {
-                let colon = input
-                    .iter()
-                    .position(|&b| b == b':')
-                    .ok_or("Bencode: Missing string length colon")?;
-                let len_str = core::str::from_utf8(&input[..colon])
-                    .map_err(|_| "Bencode: Invalid length UTF-8")?;
-                let len = len_str
-                    .parse::<usize>()
-                    .map_err(|_| "Bencode: Invalid string length")?;
+                let colon = input.iter().position(|&b| b == b':').ok_or("Bencode: Missing string length colon")?;
+                let len_str = core::str::from_utf8(&input[..colon]).map_err(|_| "Bencode: Invalid length UTF-8")?;
+                let len = len_str.parse::<usize>().map_err(|_| "Bencode: Invalid string length")?;
                 let start = colon + 1;
                 let end = start + len;
                 if end > input.len() {
@@ -234,10 +223,7 @@ impl DhtRoutingTable {
         let bucket_idx = self.xor_distance(&self.local_node_id, &node.node_id);
         if bucket_idx < 160 {
             if self.buckets[bucket_idx].len() < 20 {
-                if !self.buckets[bucket_idx]
-                    .iter()
-                    .any(|n| n.node_id == node.node_id)
-                {
+                if !self.buckets[bucket_idx].iter().any(|n| n.node_id == node.node_id) {
                     self.buckets[bucket_idx].push(node);
                 }
             }
@@ -318,9 +304,7 @@ impl PieceManager {
             computed[i % 20] ^= (state >> ((i % 8) * 8)) as u8;
         }
 
-        if computed == self.pieces[index].expected_hash
-            || data.len() == self.pieces[index].length_bytes
-        {
+        if computed == self.pieces[index].expected_hash || data.len() == self.pieces[index].length_bytes {
             self.pieces[index].state = PieceState::Complete;
             true
         } else {
@@ -357,10 +341,7 @@ impl UtpDelayController {
             self.cwnd_bytes += (off_target as u32) * 10;
         } else {
             // Delay high: back off window to prevent router bufferbloat
-            self.cwnd_bytes = self
-                .cwnd_bytes
-                .saturating_sub((-off_target as u32) * 20)
-                .max(3000);
+            self.cwnd_bytes = self.cwnd_bytes.saturating_sub((-off_target as u32) * 20).max(3000);
         }
     }
 }
@@ -428,10 +409,9 @@ impl TorrentClient {
         match val {
             BencodeValue::Dict(dict) => {
                 let announce = match dict.get("announce") {
-                    Some(BencodeValue::ByteString(bytes)) => String::from_utf8(bytes.clone())
-                        .unwrap_or_else(|_| {
-                            "udp://tracker.opentrackr.org:1337/announce".to_string()
-                        }),
+                    Some(BencodeValue::ByteString(bytes)) => {
+                        String::from_utf8(bytes.clone()).unwrap_or_else(|_| "udp://tracker.opentrackr.org:1337/announce".to_string())
+                    }
                     _ => "udp://tracker.opentrackr.org:1337/announce".to_string(),
                 };
 
@@ -475,11 +455,7 @@ impl TorrentClient {
     pub fn load_magnet(&mut self, magnet_uri: &str) -> Result<String, &'static str> {
         let magnet = MagnetLink::parse(magnet_uri)?;
         let meta = TorrentMetadata {
-            announce_url: magnet
-                .trackers
-                .first()
-                .cloned()
-                .unwrap_or_else(|| "udp://tracker.opentrackr.org:1337/announce".to_string()),
+            announce_url: magnet.trackers.first().cloned().unwrap_or_else(|| "udp://tracker.opentrackr.org:1337/announce".to_string()),
             piece_length: 262144,
             pieces: vec![[0u8; 20]],
             total_length: 0,
@@ -497,10 +473,7 @@ mod tests {
     #[test]
     fn test_bencode_parser_and_encoder() {
         let mut dict = BTreeMap::new();
-        dict.insert(
-            "announce".to_string(),
-            BencodeValue::ByteString(b"http://tracker.org".to_vec()),
-        );
+        dict.insert("announce".to_string(), BencodeValue::ByteString(b"http://tracker.org".to_vec()));
         dict.insert("length".to_string(), BencodeValue::Integer(1048576));
 
         let bencode_dict = BencodeValue::Dict(dict);
@@ -514,10 +487,7 @@ mod tests {
     fn test_magnet_link_parser() {
         let uri = "magnet:?xt=urn:btih:e3b0c44298fc1c149afbf4c8996fb92427ae41e4&dn=ubuntu-24.04.iso&tr=udp://tracker.ubuntu.com";
         let magnet = MagnetLink::parse(uri).unwrap();
-        assert_eq!(
-            magnet.info_hash_hex,
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4"
-        );
+        assert_eq!(magnet.info_hash_hex, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4");
         assert_eq!(magnet.display_name, "ubuntu-24.04.iso");
         assert_eq!(magnet.trackers.len(), 1);
     }

@@ -9,9 +9,9 @@
 //! - Zero-downtime hot-reloads
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+use std::format;
 
 /// Package Declaration
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -115,8 +115,7 @@ impl SystemState {
 
     /// Serialize current system state to declarative TOML format
     pub fn to_toml(&self) -> String {
-        let mut out =
-            String::from("# SigmaOS Declarative System State Configuration\n\n[kernel_params]\n");
+        let mut out = String::from("# SigmaOS Declarative System State Configuration\n\n[kernel_params]\n");
         for (k, v) in &self.kernel_params {
             out.push_str(&format!("{} = \"{}\"\n", k, v));
         }
@@ -128,11 +127,7 @@ impl SystemState {
 
         out.push_str("\n[services]\n");
         for svc in &self.services {
-            out.push_str(&format!(
-                "{} = \"{}\"\n",
-                svc.name,
-                if svc.enabled { "enabled" } else { "disabled" }
-            ));
+            out.push_str(&format!("{} = \"{}\"\n", svc.name, if svc.enabled { "enabled" } else { "disabled" }));
         }
 
         out
@@ -203,16 +198,10 @@ networking = "enabled"
 sshd = "disabled"
 "#;
         let state = SystemState::from_toml(toml_data).unwrap();
-        assert_eq!(
-            state.kernel_params.get("sysctl.vm.swappiness").unwrap(),
-            "10"
-        );
+        assert_eq!(state.kernel_params.get("sysctl.vm.swappiness").unwrap(), "10");
         assert_eq!(state.packages.len(), 2);
         assert_eq!(state.services.len(), 2);
-        assert!(state
-            .services
-            .iter()
-            .any(|s| s.name == "networking" && s.enabled));
+        assert!(state.services.iter().any(|s| s.name == "networking" && s.enabled));
     }
 
     #[test]
@@ -236,9 +225,7 @@ sshd = "disabled"
     #[test]
     fn test_system_state_to_toml_roundtrip() {
         let mut state = SystemState::new();
-        state
-            .kernel_params
-            .insert("kernel.printk".to_string(), "4".to_string());
+        state.kernel_params.insert("kernel.printk".to_string(), "4".to_string());
         state.packages.push(PackageDeclaration {
             name: "curl".to_string(),
             version: "8.5.0".to_string(),

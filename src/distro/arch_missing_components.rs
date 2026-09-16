@@ -66,12 +66,7 @@ impl ArchMakepkgEngine {
 
     /// Synthesizes package file name (e.g., pkgname-pkgver-pkgrel-arch.pkg.tar.zst)
     pub fn build_target_filename(&self) -> String {
-        let arch_str = self
-            .spec
-            .arch
-            .first()
-            .cloned()
-            .unwrap_or_else(|| "x86_64".to_string());
+        let arch_str = self.spec.arch.first().cloned().unwrap_or_else(|| "x86_64".to_string());
         format!(
             "{}-{}-{}-{}.pkg.tar.zst",
             self.spec.pkgname, self.spec.pkgver, self.spec.pkgrel, arch_str
@@ -117,8 +112,7 @@ impl ArchNamcapLinterEngine {
                 warnings.push(NamcapLintWarning {
                     line_number: Some(idx + 1),
                     rule_id: "fhs-usr-local".to_string(),
-                    message: "FHS Violation: Arch packages must not install into /usr/local"
-                        .to_string(),
+                    message: "FHS Violation: Arch packages must not install into /usr/local".to_string(),
                 });
             }
         }
@@ -228,10 +222,7 @@ mod tests {
         };
 
         let makepkg = ArchMakepkgEngine::new(spec);
-        assert_eq!(
-            makepkg.build_target_filename(),
-            "neofetch-7.1.0-1-x86_64.pkg.tar.zst"
-        );
+        assert_eq!(makepkg.build_target_filename(), "neofetch-7.1.0-1-x86_64.pkg.tar.zst");
         assert!(makepkg.generate_pkginfo().contains("pkgname = neofetch"));
     }
 

@@ -249,9 +249,7 @@ impl DpkgDatabase {
 
     /// Get package status
     pub fn get_package_status(&self, package_name: &str) -> Option<&str> {
-        self.status_database
-            .get(package_name)
-            .map(|s: &String| s.as_str())
+        self.status_database.get(package_name).map(|s: &String| s.as_str())
     }
 
     /// Get installed package

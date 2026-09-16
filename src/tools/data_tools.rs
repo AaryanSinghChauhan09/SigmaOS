@@ -3,9 +3,11 @@
 // Inspired by DuckDB, Apache Arrow, Polars, and Pandas
 // Provides fast tabular queries, columnar dataset inspection, ETL pipelines, and statistical summaries.
 
+
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
+
 
 /// Data DataType for Tabular Data Fields
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -154,12 +156,7 @@ impl DataQueryEngine {
     }
 
     /// Filters rows where a numeric column satisfies a predicate threshold
-    pub fn filter_gt(
-        &self,
-        df: &DataFrame,
-        col_name: &str,
-        threshold: f64,
-    ) -> Result<DataFrame, &'static str> {
+    pub fn filter_gt(&self, df: &DataFrame, col_name: &str, threshold: f64) -> Result<DataFrame, &'static str> {
         let col_idx = df
             .columns
             .iter()
@@ -180,11 +177,7 @@ impl DataQueryEngine {
     }
 
     /// Computes summary aggregation statistics (SUM, AVG, MIN, MAX, COUNT) for a column
-    pub fn aggregate(
-        &self,
-        df: &DataFrame,
-        col_name: &str,
-    ) -> Result<DataAggregationResult, &'static str> {
+    pub fn aggregate(&self, df: &DataFrame, col_name: &str) -> Result<DataAggregationResult, &'static str> {
         let col_idx = df
             .columns
             .iter()
@@ -350,12 +343,7 @@ impl DataVisualizationEngine {
     }
 
     /// Renders an ASCII Bar Chart for categorical or numeric distributions
-    pub fn render_ascii_bar_chart(
-        &self,
-        title: &str,
-        data: &[(&str, f64)],
-        max_width_chars: usize,
-    ) -> String {
+    pub fn render_ascii_bar_chart(&self, title: &str, data: &[(&str, f64)], max_width_chars: usize) -> String {
         let mut chart = format!("=== {} ===\n", title);
         let max_val = data.iter().map(|(_, v)| *v).fold(0.0, f64::max);
 

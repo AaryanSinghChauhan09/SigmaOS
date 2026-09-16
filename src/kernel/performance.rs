@@ -1,8 +1,8 @@
 // Kernel Performance - Zero-Copy IPC & UDF Scheduler VM
 // High-speed zero-copy IPC and autonomic UDF CPU scheduling engine
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IpcError {

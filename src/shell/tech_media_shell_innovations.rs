@@ -133,25 +133,12 @@ impl XdaAndroidAdbFastbootShellBridge {
             product_model: "Pixel_8_Pro".to_string(),
             state: "device".to_string(),
         });
-        Self {
-            connected_devices: devices,
-        }
+        Self { connected_devices: devices }
     }
 
-    pub fn push_apex_package(
-        &mut self,
-        serial: &str,
-        apex_path: &str,
-    ) -> Result<String, &'static str> {
-        if let Some(dev) = self
-            .connected_devices
-            .iter()
-            .find(|d| d.serial_number == serial)
-        {
-            Ok(format!(
-                "ADB_PUSH: Sideloaded APEX package '{}' to device '{}'",
-                apex_path, dev.product_model
-            ))
+    pub fn push_apex_package(&mut self, serial: &str, apex_path: &str) -> Result<String, &'static str> {
+        if let Some(dev) = self.connected_devices.iter().find(|d| d.serial_number == serial) {
+            Ok(format!("ADB_PUSH: Sideloaded APEX package '{}' to device '{}'", apex_path, dev.product_model))
         } else {
             Err("ADB_PUSH: Specified ADB device serial not connected")
         }
@@ -206,10 +193,7 @@ impl TheNewStackCloudKubectlEngine {
     }
 
     pub fn get_pod_status(&self, name: &str) -> Option<String> {
-        self.pods
-            .iter()
-            .find(|p| p.name == name)
-            .map(|p| p.status.clone())
+        self.pods.iter().find(|p| p.name == name).map(|p| p.status.clone())
     }
 
     pub fn get_pod_count(&self) -> usize {
@@ -292,15 +276,12 @@ impl SovereignTechMediaShellInnovationsSuite {
         let kdnuggets_ok = mean == Some(20.0);
 
         // Verify XDA ADB
-        let adb_res = self
-            .xda_adb
-            .push_apex_package("ADB123456789", "/apex/com.android.runtime.apex");
+        let adb_res = self.xda_adb.push_apex_package("ADB123456789", "/apex/com.android.runtime.apex");
         let adb_ok = adb_res.is_ok() && self.xda_adb.get_device_count() == 1;
 
         // Verify The New Stack Kubectl
         let pod_status = self.tns_kubectl.get_pod_status("sigma-gateway-7f89d");
-        let tns_ok =
-            pod_status == Some("Running".to_string()) && self.tns_kubectl.get_pod_count() == 2;
+        let tns_ok = pod_status == Some("Running".to_string()) && self.tns_kubectl.get_pod_count() == 2;
 
         // Verify Hardware Busters
         let hwbusters_ok = self.hwbusters.is_psu_within_efficiency_gold_range();
@@ -339,10 +320,7 @@ mod tests {
     #[test]
     fn test_tns_kubectl_and_hwbusters_engines() {
         let tns = TheNewStackCloudKubectlEngine::new();
-        assert_eq!(
-            tns.get_pod_status("sigma-gateway-7f89d").unwrap(),
-            "Running"
-        );
+        assert_eq!(tns.get_pod_status("sigma-gateway-7f89d").unwrap(), "Running");
 
         let hwbusters = HwbustersPsuSensorMonitorEngine::new();
         assert!(hwbusters.is_psu_within_efficiency_gold_range());

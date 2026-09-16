@@ -71,10 +71,7 @@ impl SovereignAutomationEngine {
             .ok_or("Automation task not found")?;
 
         task.status = TaskStatus::Running;
-        let mut log = format!(
-            "[AUTOMATION-RUST] Executing task '{}' (Kind: {:?})\n",
-            task.name, task.kind
-        );
+        let mut log = format!("[AUTOMATION-RUST] Executing task '{}' (Kind: {:?})\n", task.name, task.kind);
 
         match task.kind {
             AutomationTaskKind::BuildValidation => {
@@ -86,9 +83,7 @@ impl SovereignAutomationEngine {
                 task.status = TaskStatus::Passed;
             }
             AutomationTaskKind::IsoStaging => {
-                log.push_str(
-                    "OK: Staged bootloader stage-1/stage-2 binaries and initramfs into ISO root.\n",
-                );
+                log.push_str("OK: Staged bootloader stage-1/stage-2 binaries and initramfs into ISO root.\n");
                 task.status = TaskStatus::Passed;
             }
             AutomationTaskKind::ChangelogGeneration => {
@@ -96,15 +91,11 @@ impl SovereignAutomationEngine {
                 task.status = TaskStatus::Passed;
             }
             AutomationTaskKind::TestOrchestration => {
-                log.push_str(
-                    "OK: Orchestrated native Rust inspection matrix and universal package tests.\n",
-                );
+                log.push_str("OK: Orchestrated native Rust inspection matrix and universal package tests.\n");
                 task.status = TaskStatus::Passed;
             }
             AutomationTaskKind::SecurityAudit => {
-                log.push_str(
-                    "OK: Audited OpenBSD pledge/unveil bounds and eBPF LSM policy hooks.\n",
-                );
+                log.push_str("OK: Audited OpenBSD pledge/unveil bounds and eBPF LSM policy hooks.\n");
                 task.status = TaskStatus::Passed;
             }
             AutomationTaskKind::BinaryPackaging => {

@@ -63,10 +63,7 @@ impl ItsFossHypnotixIptvEngine {
     pub fn play_channel(&mut self, id: u32) -> Result<String, &'static str> {
         if let Some(chan) = self.channels.iter().find(|c| c.id == id) {
             self.active_channel_id = Some(id);
-            Ok(format!(
-                "HYPNOTIX_STREAM: Streaming '{}' ({})",
-                chan.name, chan.stream_url
-            ))
+            Ok(format!("HYPNOTIX_STREAM: Streaming '{}' ({})", chan.name, chan.stream_url))
         } else {
             Err("HYPNOTIX_STREAM: Channel ID not found in playlist")
         }
@@ -119,12 +116,7 @@ impl ItsFossWarpinatorLanSharingEngine {
         );
     }
 
-    pub fn send_file_payload(
-        &self,
-        peer_id: &str,
-        filename: &str,
-        size_bytes: u64,
-    ) -> Result<String, &'static str> {
+    pub fn send_file_payload(&self, peer_id: &str, filename: &str, size_bytes: u64) -> Result<String, &'static str> {
         if let Some(peer) = self.discovered_peers.get(peer_id) {
             Ok(format!(
                 "WARPINATOR_TRANSFER: Transmitted '{}' ({} bytes) to peer '{}' ({:?})",
@@ -154,11 +146,7 @@ pub struct RenameRuleResult {
 pub struct ItsFossBulkyBatchRenamerEngine;
 
 impl ItsFossBulkyBatchRenamerEngine {
-    pub fn apply_replace_rule(
-        files: &[&str],
-        find_str: &str,
-        replace_str: &str,
-    ) -> Vec<RenameRuleResult> {
+    pub fn apply_replace_rule(files: &[&str], find_str: &str, replace_str: &str) -> Vec<RenameRuleResult> {
         let mut results = Vec::new();
         for &file in files {
             let new_name = file.replace(find_str, replace_str);
@@ -245,24 +233,16 @@ impl SovereignItsFossAppsSuite {
         let hypnotix_ok = play_res.is_ok();
 
         // Verify Warpinator
-        self.warpinator
-            .register_lan_peer("p1", "laptop_mint", [192, 168, 1, 100], true);
-        let send_res = self
-            .warpinator
-            .send_file_payload("p1", "ISO_image.iso", 1000000);
+        self.warpinator.register_lan_peer("p1", "laptop_mint", [192, 168, 1, 100], true);
+        let send_res = self.warpinator.send_file_payload("p1", "ISO_image.iso", 1000000);
         let warpinator_ok = send_res.is_ok() && self.warpinator.get_peer_count() == 1;
 
         // Verify Bulky
-        let renamed = ItsFossBulkyBatchRenamerEngine::apply_replace_rule(
-            &["IMG_01.jpg", "IMG_02.jpg"],
-            "IMG_",
-            "VACATION_",
-        );
+        let renamed = ItsFossBulkyBatchRenamerEngine::apply_replace_rule(&["IMG_01.jpg", "IMG_02.jpg"], "IMG_", "VACATION_");
         let bulky_ok = renamed.len() == 2 && renamed[0].new_path == "VACATION_01.jpg";
 
         // Verify Sticky Notes
-        self.sticky
-            .create_note(10, "Todo", "Finish SigmaOS parity", "yellow");
+        self.sticky.create_note(10, "Todo", "Finish SigmaOS parity", "yellow");
         let sticky_ok = self.sticky.get_note_count() == 1;
 
         hypnotix_ok && warpinator_ok && bulky_ok && sticky_ok
@@ -286,9 +266,7 @@ mod tests {
         let mut warp = ItsFossWarpinatorLanSharingEngine::new(42000);
         warp.register_lan_peer("peer_alpha", "Alpha_PC", [10, 0, 0, 5], true);
         assert_eq!(warp.get_peer_count(), 1);
-        assert!(warp
-            .send_file_payload("peer_alpha", "doc.pdf", 2048)
-            .is_ok());
+        assert!(warp.send_file_payload("peer_alpha", "doc.pdf", 2048).is_ok());
     }
 
     #[test]

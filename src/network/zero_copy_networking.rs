@@ -4,6 +4,8 @@
 #![allow(clippy::new_without_default)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+
+
 // SigmaOS Sovereign Zero-Copy Networking
 // Implements Linux XDP (eXpress Data Path) + io_uring-style zero-copy networking
 // in 100% safe Rust with no external dependencies.
@@ -13,12 +15,14 @@
 //   - Linux io_uring (Linux 5.1+)
 //   - FreeBSD sendfile(2) zero-copy send
 //   - FreeBSD UMEM / netmap zero-copy receive
+
+
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 
@@ -27,20 +31,15 @@ use std::vec::Vec;
 /// A fixed-size memory chunk descriptor in the UMEM pool.
 #[derive(Debug, Clone)]
 pub struct UmemChunk {
-    pub addr: u64, // offset within UMEM region
-    pub len: u32,  // actual data length
+    pub addr: u64,   // offset within UMEM region
+    pub len: u32,    // actual data length
     pub headroom: u16,
     pub in_use: bool,
 }
 
 impl UmemChunk {
     pub fn new(addr: u64, max_len: u32) -> Self {
-        UmemChunk {
-            addr,
-            len: max_len,
-            headroom: 256,
-            in_use: false,
-        }
+        UmemChunk { addr, len: max_len, headroom: 256, in_use: false }
     }
 }
 
@@ -83,12 +82,8 @@ impl UmemPool {
     }
 
     pub fn free_chunk(&mut self, idx: usize) -> bool {
-        if idx >= self.chunks.len() {
-            return false;
-        }
-        if !self.chunks[idx].in_use {
-            return false;
-        }
+        if idx >= self.chunks.len() { return false; }
+        if !self.chunks[idx].in_use { return false; }
         self.chunks[idx].in_use = false;
         self.free_count = self.free_count.saturating_add(1);
         self.free_total = self.free_total.saturating_add(1);
@@ -96,9 +91,7 @@ impl UmemPool {
     }
 
     pub fn utilization_pct(&self) -> u32 {
-        if self.total_chunks == 0 {
-            return 0;
-        }
+        if self.total_chunks == 0 { return 0; }
         let used = self.total_chunks - self.free_count;
         (used * 100) / self.total_chunks
     }
@@ -146,20 +139,14 @@ impl XdpRing {
     }
 
     pub fn dequeue(&mut self) -> Option<PacketRingDescriptor> {
-        if self.producer == self.consumer {
-            return None;
-        }
-        if self.entries.is_empty() {
-            return None;
-        }
+        if self.producer == self.consumer { return None; }
+        if self.entries.is_empty() { return None; }
         self.consumer = self.consumer.wrapping_add(1);
         self.packets_processed = self.packets_processed.saturating_add(1);
         // Drain from front (FIFO)
         if !self.entries.is_empty() {
             Some(self.entries.remove(0))
-        } else {
-            None
-        }
+        } else { None }
     }
 
     pub fn available(&self) -> usize {
@@ -171,11 +158,11 @@ impl XdpRing {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum XdpAction {
-    Pass,     // XDP_PASS: pass packet up the stack
-    Drop,     // XDP_DROP: drop at NIC driver level
-    Tx,       // XDP_TX: reflect/bounce back out the same interface
-    Redirect, // XDP_REDIRECT: send to another queue or interface
-    Aborted,  // XDP_ABORTED: error in XDP program
+    Pass,        // XDP_PASS: pass packet up the stack
+    Drop,        // XDP_DROP: drop at NIC driver level
+    Tx,          // XDP_TX: reflect/bounce back out the same interface
+    Redirect,    // XDP_REDIRECT: send to another queue or interface
+    Aborted,     // XDP_ABORTED: error in XDP program
 }
 
 // ─── io_uring-style Completion Queue Entry ────────────────────────────────────
@@ -183,7 +170,7 @@ pub enum XdpAction {
 #[derive(Debug, Clone)]
 pub struct IoCompletionEntry {
     pub user_data: u64,
-    pub result: i32, // bytes transferred or -errno
+    pub result: i32,  // bytes transferred or -errno
     pub flags: u32,
 }
 
@@ -207,30 +194,20 @@ impl IoCompletionQueue {
     }
 
     pub fn post_completion(&mut self, user_data: u64, result: i32) -> bool {
-        if self.entries.len() >= self.capacity {
-            return false;
-        }
-        self.entries.push(IoCompletionEntry {
-            user_data,
-            result,
-            flags: 0,
-        });
+        if self.entries.len() >= self.capacity { return false; }
+        self.entries.push(IoCompletionEntry { user_data, result, flags: 0 });
         self.tail = self.tail.wrapping_add(1);
         self.total_completed = self.total_completed.saturating_add(1);
         true
     }
 
     pub fn consume(&mut self) -> Option<IoCompletionEntry> {
-        if self.entries.is_empty() {
-            return None;
-        }
+        if self.entries.is_empty() { return None; }
         self.head = self.head.wrapping_add(1);
         Some(self.entries.remove(0))
     }
 
-    pub fn pending_count(&self) -> usize {
-        self.entries.len()
-    }
+    pub fn pending_count(&self) -> usize { self.entries.len() }
 }
 
 // ─── Zero-Copy Socket (AF_XDP-style) ─────────────────────────────────────────
@@ -241,7 +218,7 @@ pub struct SovereignZeroCopySocket {
     pub umem: UmemPool,
     pub rx_ring: XdpRing,
     pub tx_ring: XdpRing,
-    pub fill_ring: XdpRing,       // kernel fills with rx descriptors
+    pub fill_ring: XdpRing,   // kernel fills with rx descriptors
     pub completion_ring: XdpRing, // kernel notifies tx completions
     pub cq: IoCompletionQueue,
     pub rx_packets: u64,
@@ -282,7 +259,7 @@ impl SovereignZeroCopySocket {
         };
         if self.rx_ring.enqueue(desc) {
             self.rx_packets = self.rx_packets.saturating_add(1);
-            self.rx_bytes = self.rx_bytes.saturating_add(len as u64);
+            self.rx_bytes   = self.rx_bytes.saturating_add(len as u64);
             Some(chunk_idx)
         } else {
             self.umem.free_chunk(chunk_idx);
@@ -307,21 +284,14 @@ impl SovereignZeroCopySocket {
 
     /// Zero-copy transmit a chunk.
     pub fn tx_packet(&mut self, chunk_idx: usize, len: u32) -> bool {
-        let desc = PacketRingDescriptor {
-            chunk_idx,
-            data_offset: 256,
-            data_len: len,
-            flags: 0,
-        };
+        let desc = PacketRingDescriptor { chunk_idx, data_offset: 256, data_len: len, flags: 0 };
         if self.tx_ring.enqueue(desc) {
             self.tx_packets = self.tx_packets.saturating_add(1);
-            self.tx_bytes = self.tx_bytes.saturating_add(len as u64);
+            self.tx_bytes   = self.tx_bytes.saturating_add(len as u64);
             // Post completion immediately (simulate NIC DMA done)
             self.cq.post_completion(chunk_idx as u64, len as i32);
             true
-        } else {
-            false
-        }
+        } else { false }
     }
 
     pub fn stats_summary(&self) -> String {
@@ -364,20 +334,10 @@ mod tests {
     fn test_xdp_ring_enqueue_dequeue() {
         let mut ring = XdpRing::new(4);
         for i in 0..4 {
-            ring.enqueue(PacketRingDescriptor {
-                chunk_idx: i,
-                data_offset: 256,
-                data_len: 1500,
-                flags: 0,
-            });
+            ring.enqueue(PacketRingDescriptor { chunk_idx: i, data_offset: 256, data_len: 1500, flags: 0 });
         }
         // Ring full — should drop
-        assert!(!ring.enqueue(PacketRingDescriptor {
-            chunk_idx: 99,
-            data_offset: 0,
-            data_len: 1,
-            flags: 0
-        }));
+        assert!(!ring.enqueue(PacketRingDescriptor { chunk_idx: 99, data_offset: 0, data_len: 1, flags: 0 }));
         assert_eq!(ring.drops, 1);
         let d = ring.dequeue().unwrap();
         assert_eq!(d.chunk_idx, 0);

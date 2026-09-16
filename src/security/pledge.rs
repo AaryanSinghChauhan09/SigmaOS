@@ -1,8 +1,10 @@
+
 use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(test)]
+
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 
 use core::sync::atomic::{AtomicBool, Ordering};
@@ -165,8 +167,7 @@ impl PledgeManager {
             buf
         };
         let lower_path = core::str::from_utf8(&lower[..path.len().min(512)]).unwrap_or("");
-        if lower_path.contains("%2e%2e") || lower_path.contains("%2f") || lower_path.contains("%5c")
-        {
+        if lower_path.contains("%2e%2e") || lower_path.contains("%2f") || lower_path.contains("%5c") {
             return false;
         }
 
@@ -287,8 +288,8 @@ impl Default for PledgeManager {
 
 /// Common pledge promises
 pub mod promises {
-    use super::PledgePromise;
     use crate::security::capability::Permission;
+    use super::PledgePromise;
 
     /// Stdio promise - basic I/O only
     pub fn stdio() -> PledgePromise {

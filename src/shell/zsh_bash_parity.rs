@@ -797,10 +797,7 @@ impl ShellJobControl {
                 JobState::Stopped => "Stopped",
                 JobState::Terminated => "Terminated",
             };
-            list.push(format!(
-                "[{}] PID {}  {}  {}",
-                job.id, job.pid, state_str, job.command
-            ));
+            list.push(format!("[{}] PID {}  {}  {}", job.id, job.pid, state_str, job.command));
         }
         list
     }
@@ -1385,10 +1382,7 @@ impl UniversalScriptTranspiler {
                 return format!("export {}={}", var, val);
             }
         } else if l.starts_with("set -e ") || l.starts_with("set -e") {
-            let var = l
-                .trim_start_matches("set -e ")
-                .trim_start_matches("set -e")
-                .trim();
+            let var = l.trim_start_matches("set -e ").trim_start_matches("set -e").trim();
             return format!("unset {}", var);
         } else if l.starts_with("set -l ") || l.starts_with("set -g ") || l.starts_with("set ") {
             let rest = l
@@ -1586,11 +1580,7 @@ impl UniversalScriptTranspiler {
 
         // 5. Ksh 'let "expr"' -> 'expr'
         if l.starts_with("let ") {
-            let expr = l
-                .trim_start_matches("let ")
-                .trim()
-                .trim_matches('"')
-                .trim_matches('\'');
+            let expr = l.trim_start_matches("let ").trim().trim_matches('"').trim_matches('\'');
             l = format!(": $(( {} ))", expr);
         }
 
@@ -1643,9 +1633,7 @@ pub struct ZshAutosuggestionsEngine {
 
 impl ZshAutosuggestionsEngine {
     pub fn new() -> Self {
-        Self {
-            history: Vec::new(),
-        }
+        Self { history: Vec::new() }
     }
 
     pub fn add_history(&mut self, command: &str) {
@@ -1704,9 +1692,7 @@ impl DirenvEnvironmentManager {
         let target_vars = self.loaded_envs.get(new_dir).cloned().unwrap_or_default();
 
         // Unload old keys not present in new dir
-        let keys_to_remove: Vec<String> = self
-            .current_env
-            .keys()
+        let keys_to_remove: Vec<String> = self.current_env.keys()
             .filter(|k| !target_vars.contains_key(*k))
             .cloned()
             .collect();
@@ -2101,14 +2087,8 @@ mod tests {
         suggest_engine.add_history("git commit -m 'feat'");
         suggest_engine.add_history("cargo test --lib");
 
-        assert_eq!(
-            suggest_engine.suggest("car"),
-            Some("go test --lib".to_string())
-        );
-        assert_eq!(
-            suggest_engine.suggest("git c"),
-            Some("ommit -m 'feat'".to_string())
-        );
+        assert_eq!(suggest_engine.suggest("car"), Some("go test --lib".to_string()));
+        assert_eq!(suggest_engine.suggest("git c"), Some("ommit -m 'feat'".to_string()));
         assert_eq!(suggest_engine.suggest("unknown"), None);
     }
 
@@ -2124,10 +2104,7 @@ mod tests {
 
         let _changes_b = direnv.on_directory_change("/proj/b");
         assert_eq!(direnv.current_env.get("PORT"), None);
-        assert_eq!(
-            direnv.current_env.get("NODE_ENV"),
-            Some(&"production".to_string())
-        );
+        assert_eq!(direnv.current_env.get("NODE_ENV"), Some(&"production".to_string()));
     }
 
     #[test]

@@ -3,8 +3,8 @@
 // Protection & Isolation, Optimization for the Common Case, Privilege Levels, and Interrupt Handling.
 
 use crate::security::CapabilityToken;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use std::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrivilegeLevel {

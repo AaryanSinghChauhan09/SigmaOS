@@ -365,6 +365,7 @@ impl<'a> SovereignJsonParser<'a> {
     }
 }
 
+
 /// Helper to append an escaped string to an existing String buffer without heap reallocations or cloning.
 fn append_escaped_json_string(s: &str, out: &mut String) {
     out.push('"');

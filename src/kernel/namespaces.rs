@@ -9,9 +9,9 @@
 //! - **NamespaceRegistry**: Central registry for namespace management
 //! - **Specific namespace implementations**: PID, IPC, Network, etc. (PID implemented here)
 
-use std::string::String;
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::Arc;
+use std::string::String;
 
 /// Maximum number of namespaces in the system
 pub const MAX_NAMESPACES: usize = 1024;
@@ -41,7 +41,7 @@ pub enum KernelNamespaceType {
     Pid,
     Ipc,
     Network,
-    Uts, // UTS (hostname/domainname)
+    Uts,  // UTS (hostname/domainname)
     User,
     Cgroup,
     Mount,

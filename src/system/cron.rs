@@ -345,8 +345,8 @@ pub struct SshSession {
 #[derive(Debug, Clone)]
 pub struct SshDaemonConfig {
     pub permit_root_login: bool,
-    pub password_authentication: bool, // Password authentication (default false)
-    pub pubkey_authentication: bool,   // Public key authentication (default true)
+    pub password_authentication: bool,        // Password authentication (default false)
+    pub pubkey_authentication: bool,          // Public key authentication (default true)
     pub allow_users: Vec<String>,
     pub deny_users: Vec<String>,
     pub max_auth_tries: u32,
@@ -371,9 +371,7 @@ impl Default for SshDaemonConfig {
             allow_users: Vec::new(),
             deny_users: Vec::new(),
             max_auth_tries: 3,
-            banner: Some(
-                "SigmaOS Post-Quantum Secure SSH Daemon (OpenSSH/Dropbear Inspired)".to_string(),
-            ),
+            banner: Some("SigmaOS Post-Quantum Secure SSH Daemon (OpenSSH/Dropbear Inspired)".to_string()),
             subsystems,
             privilege_separation: true,
             strict_modes: true,
