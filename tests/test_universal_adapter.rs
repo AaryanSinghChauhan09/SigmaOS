@@ -8,6 +8,9 @@ pub mod klib {
     }
 }
 
+#[path = "../src/package/universal.rs"]
+pub mod package;
+
 #[path = "../src/security/capability.rs"]
 pub mod capability;
 

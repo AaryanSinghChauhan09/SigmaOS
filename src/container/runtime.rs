@@ -914,12 +914,6 @@ pub mod oci {
         pub options: Vec<String>,
     }
 
-    pub enum ContainerState {
-        Created,
-        Running,
-        Paused,
-        Stopped,
-        Deleted,
     }
 
     pub struct Container {
