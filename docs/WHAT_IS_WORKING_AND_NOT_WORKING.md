@@ -318,6 +318,21 @@ Recent GitHub Actions CI checks revealed key failure modes across workflow confi
 - **Root Cause**: Structs needed by standalone test runners were deleted or gated behind `#[cfg(not(feature = "standalone_test"))]`.
 - **Fix Pattern**: Ensure all structs and enums referenced in `mod tests` are unconditionally defined or properly gated with `#[cfg(any(feature = "standalone_test", test))]`.
 
+### Case 5: Conditional Compilation Import Scoping Discrepancies (`E0425`, `E0433`)
+- **Symptom**: `error[E0425]: cannot find type 'BTreeMap' in this scope` or `error[E0432]: unresolved imports std::dealloc` under `#[cfg(feature = "standalone_test")]` or test harnesses.
+- **Root Cause**: Over-zealous conditional compilation gates (such as `#[cfg(not(any(feature = "standalone_test", test)))]`) placed above standard imports (`use std::collections::BTreeMap;` or `use std::alloc::{dealloc, Layout};`), causing imports to be hidden during test execution.
+- **Fix Pattern**: Ensure core collection and allocation imports are unconditionally accessible or gated uniformly across all build profiles:
+  ```rust
+  // RIGHT: Unconditional or properly gated imports for BTreeMap/Layout/dealloc
+  use std::collections::BTreeMap;
+  use std::alloc::{dealloc, Layout};
+  ```
+
+### Case 6: Cross-Subsystem Matrix & Test Array Mismatches (`E0282` / Test Panics)
+- **Symptom**: `thread 'cross_subsystem_tests::test_all_subsystems_matrix_dispatch_verification' panicked at 'Subsystem 'compiler' failed for mode LinuxArch'`
+- **Root Cause**: The test matrix array (`target_subsystems`) queried subsystem keys (`"compiler"`, `"i18n"`, `"firewall"`, `"vfs"`) that were omitted from `dispatch_cross_subsystem_operation` match arms or `verify_all_subsystems_compatibility_matrix`.
+- **Fix Pattern**: Maintain complete 1-to-1 parity between subsystem keys in `dispatch_cross_subsystem_operation`, `verify_all_subsystems_compatibility_matrix`, and test suite assertions.
+
 
 ## 4. Production-Grade Safe Rust Code Blueprints (How To Fix It)
 
