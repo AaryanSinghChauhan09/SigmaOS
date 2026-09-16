@@ -583,7 +583,7 @@ pub struct IrpStackLocation {
     pub ioctl_code: u32,
 }
 
-pub type CompletionRoutine = fn(&DeviceObjectX86, &mut Irp) -> u32;
+pub type CompletionRoutine = fn(&DeviceObject, &mut Irp) -> u32;
 
 pub struct Irp {
     pub major_function: IrpMajorFunction,
@@ -644,10 +644,8 @@ impl Irp {
         self.status = status;
         if let Some(routine) = self.completion_routine {
             let dummy_dev = DeviceObjectX86 {
-                device_type: DeviceType::Functional,
-                driver_name: "dummy",
-                next_device: None,
-                attached_device: None,
+                device_type: 1, // Functional
+                reference_count: 1,
             };
             routine(&dummy_dev, self);
         }

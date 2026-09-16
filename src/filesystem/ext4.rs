@@ -207,10 +207,10 @@ impl FileSystem for Ext4FileSystem {
         let new_size = (offset + written as u64).max(inode.size);
 
         // Allocate blocks if needed
-        while (inode.data_blocks.len() * self.superblock.block_size as usize) < (new_size as usize) {
+        while inode.data.len() < new_size as usize {
             let block = self.allocate_block();
             match block {
-                Ok(b) => inode.data_blocks.push(b),
+                Ok(_) => inode.data.resize(new_size as usize, 0),
                 Err(_) => break,
             }
         }
@@ -270,8 +270,10 @@ impl FileSystem for Ext4FileSystem {
         let inode = self.read_inode(inode_num)?;
 
         // Free all data blocks
-        for block in inode.data_blocks {
-            self.deallocate_block(block)?;
+        let num_blocks = (inode.data.len() + self.superblock.block_size as usize - 1)
+            / self.superblock.block_size as usize;
+        for i in 0..num_blocks {
+            let _ = self.deallocate_block(i as u64);
         }
 
         // Deallocate inode

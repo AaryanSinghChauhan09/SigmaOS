@@ -3573,7 +3573,7 @@ mod tests_extra_1 {
 
     #[test]
     fn test_void_runit_init() {
-        let mut runit = VoidRunitInit::new();
+        let mut runit = VoidLinuxRunitSupervisor::new();
         runit.register_service("nginx", 101);
         assert!(runit.is_service_active("nginx"));
         assert!(!runit.is_service_active("postgresql"));

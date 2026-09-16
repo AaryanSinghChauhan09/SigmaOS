@@ -1102,6 +1102,55 @@ impl TerminalSession {
     }
 
     /// Parses Sixel (\x1BPq) or Kitty (\x1B_G) graphics escape sequences
+    pub fn parse_ansi(&mut self, seq: &str) {
+        if !seq.starts_with("\x1B[") || !seq.ends_with('m') && !seq.ends_with('A') && !seq.ends_with('B') && !seq.ends_with('C') && !seq.ends_with('D') {
+            return;
+        }
+        let code = &seq[2..seq.len() - 1];
+        let command_char = seq.chars().last().unwrap_or(' ');
+
+        match command_char {
+            'A' => {
+                let count: usize = code.parse().unwrap_or(1);
+                self.cursor_y = self.cursor_y.saturating_sub(count);
+            }
+            'B' => {
+                let count: usize = code.parse().unwrap_or(1);
+                self.cursor_y += count;
+            }
+            'C' => {
+                let count: usize = code.parse().unwrap_or(1);
+                self.cursor_x += count;
+            }
+            'D' => {
+                let count: usize = code.parse().unwrap_or(1);
+                self.cursor_x = self.cursor_x.saturating_sub(count);
+            }
+            'm' => {
+                if code == "0" {
+                    self.foreground = AnsiColor::Default;
+                    self.background = AnsiColor::Default;
+                    self.bold = false;
+                } else if code == "1" {
+                    self.bold = true;
+                } else if code == "31" {
+                    self.foreground = AnsiColor::Red;
+                } else if code == "42" {
+                    self.background = AnsiColor::Green;
+                } else if code.starts_with("38;5;") {
+                    if let Ok(color_id) = code[5..].parse::<u8>() {
+                        self.foreground = AnsiColor::Xterm256(color_id);
+                    }
+                } else if code.starts_with("48;5;") {
+                    if let Ok(color_id) = code[5..].parse::<u8>() {
+                        self.background = AnsiColor::Xterm256(color_id);
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+
     pub fn parse_graphics_escape(&mut self, seq: &str) -> bool {
         if seq.starts_with("\x1BPq") {
             // Sixel header

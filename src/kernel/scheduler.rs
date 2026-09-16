@@ -12,9 +12,15 @@ use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
-// Re-export for other modules
-// pub use crate::kernel::structures::Task;
-// pub use crate::kernel::structures::TaskId;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TaskId(pub u64);
+
+#[derive(Debug, Clone)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
+}
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

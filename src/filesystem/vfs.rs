@@ -12,6 +12,7 @@ pub enum FileType {
     Regular,
     Directory,
     SymbolicLink,
+    Symlink,
     CharacterDevice,
     BlockDevice,
     Fifo,
@@ -330,6 +331,33 @@ impl VirtualFileSystem {
     }
 
     /// Open file - returns file descriptor
+    pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
+        let fd = self.next_fd as u64;
+        self.next_fd += 1;
+        self.file_descriptors.insert(
+            fd,
+            FileDescriptor {
+                inode_id,
+                offset: 0,
+                flags,
+            },
+        );
+        Ok(fd)
+    }
+
+    pub fn seek(&mut self, fd: u64, offset: i64, whence: u32) -> Result<u64, FsError> {
+        let handle = self.file_descriptors.get_mut(&fd).ok_or(FsError::InvalidFd)?;
+        let inode = self.inodes.get(&handle.inode_id).ok_or(FsError::NotFound)?;
+        let new_offset = match whence {
+            0 => offset as u64, // SEEK_SET
+            1 => handle.offset.wrapping_add(offset as u64), // SEEK_CUR
+            2 => inode.size.wrapping_add(offset as u64), // SEEK_END
+            _ => return Err(FsError::InvalidFd),
+        };
+        handle.offset = new_offset;
+        Ok(new_offset)
+    }
+
     pub fn open(&mut self, path: &str, flags: u32, mode: u32) -> Result<i32, VfsError> {
         if path.len() > 4096 {
             return Err(VfsError::NameTooLong);
@@ -353,6 +381,15 @@ impl VirtualFileSystem {
 
         self.open_files.push(handle);
         Ok(fd)
+    }
+
+    pub fn close(&mut self, fd: i32) -> Result<(), VfsError> {
+        if let Some(pos) = self.open_files.iter().position(|h| h.fd == fd) {
+            self.open_files.remove(pos);
+            Ok(())
+        } else {
+            Err(VfsError::BadFileDescriptor)
+        }
     }
 
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
@@ -723,7 +760,8 @@ mod tests {
     #[test]
     fn test_seek_operations() {
         let mut vfs = VirtualFileSystem::new();
-        let fd = vfs.open("/test.txt", 0, 0o644).unwrap();
+        let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
+        let fd = vfs.open_file(inode_id, 0).unwrap();
 
         // SEEK_SET
         let pos = vfs.seek(fd, 100, 0).unwrap();
@@ -733,7 +771,13 @@ mod tests {
         let pos = vfs.seek(fd, 50, 1).unwrap();
         assert_eq!(pos, 150);
 
-        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
+        let bad_token = CapabilityToken::new();
+        let mut read_token = CapabilityToken::new();
+        read_token.grant_permission(Permission::FileRead);
+        let mut write_token = CapabilityToken::new();
+        write_token.grant_permission(Permission::FileWrite);
+
+        // Write should fail with bad_token and read_token, but succeed with write_token
         assert_eq!(
             vfs.write_file_gated(fd, b"gated", &bad_token),
             Err(FsError::PermissionDenied)
@@ -746,8 +790,9 @@ mod tests {
 
         // Re-open file to reset offset to 0 for reading
         let read_fd = vfs.open_file(inode_id, 0).unwrap();
+        let mut buf = [0u8; 5];
 
-        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
+        // Read should fail with bad_token and write_token, but succeed with read_token
         assert_eq!(
             vfs.read_file_gated(read_fd, &mut buf, &bad_token),
             Err(FsError::PermissionDenied)
