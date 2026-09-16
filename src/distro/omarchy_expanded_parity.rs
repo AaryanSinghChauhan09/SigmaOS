@@ -40,7 +40,7 @@ impl OmarchyOmakubBootstrapEngine {
     }
 
     pub fn is_app_installed(&self, app_name: &str) -> bool {
-        self.installed_apps.iter().any(|a| a.eq_ignore_ascii_case(app_name))
+        self.installed_apps.iter().any(|a: &String| a.eq_ignore_ascii_case(app_name))
     }
 }
 
