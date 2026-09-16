@@ -99,7 +99,7 @@ impl PackageFormat {
         else if f_clean.ends_with(".ports") { Some(PackageFormat::Ports) }
         else if f_clean.ends_with(".pkg") { Some(PackageFormat::Pkg) }
         else if f_clean.ends_with(".aab") { Some(PackageFormat::Aab) }
-        else if f_clean.ends_with(".tar.gz") || f_clean.contains(".tar .gz") || f_clean.ends_with(".tgz") { Some(PackageFormat::TarGz) }
+        else if f_clean.ends_with(".tar.gz") || f_clean.contains(".tar.gz") || f_clean.ends_with(".tgz") { Some(PackageFormat::TarGz) }
         else if f_clean.ends_with(".tar.xz") || f_clean.ends_with(".xz") { Some(PackageFormat::TarXz) }
         else if f_clean.ends_with(".tar") { Some(PackageFormat::Tar) }
         else if f_clean.ends_with(".appbundle") || f_clean.ends_with(".app") { Some(PackageFormat::AppBundle) }

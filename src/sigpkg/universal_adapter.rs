@@ -70,9 +70,9 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-pub use crate::sigpkg::universal_engine::PackageFormat;
-pub use crate::sigpkg::universal_oop_system;
-pub use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+pub use super::universal_engine::PackageFormat;
+pub use super::universal_oop_system;
+pub use super::universal_oop_system::UniversalPackageManager;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
