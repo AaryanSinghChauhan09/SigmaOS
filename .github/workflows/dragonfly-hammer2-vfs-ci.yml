@@ -1,7 +1,4 @@
 name: DragonFly BSD HAMMER2 PFS & Emergency CoW CI
-permissions:
-  contents: read
-
 
 on:
   push:
@@ -12,7 +9,6 @@ on:
 jobs:
   dragonfly-hammer2:
     name: DragonFly BSD HAMMER2 Pseudo-Filesystem & Emergency CoW Snapshot Audit
-
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

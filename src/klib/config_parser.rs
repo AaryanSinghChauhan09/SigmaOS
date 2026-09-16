@@ -87,10 +87,14 @@ impl Default for ConfigStore {
     }
 }
 
-/// Optimized line trimming - Bolt ⚡
-/// Replaces dual-pass character counting and index slicing with single-pass native slicing.
 fn trim_line(s: &str) -> &str {
-    s.trim()
+    let start = s.chars().take_while(|c| c.is_whitespace()).count();
+    let end = s.chars().rev().take_while(|c| c.is_whitespace()).count();
+    if start + end >= s.len() {
+        ""
+    } else {
+        &s[start..s.len() - end]
+    }
 }
 
 fn find_key_value_sep(s: &str) -> Option<usize> {

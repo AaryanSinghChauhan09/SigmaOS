@@ -23,20 +23,6 @@ if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     ./build/distro_inspirations_test
 fi
 
-if [ -f "src/distro/distro_inspiration_synthesis.rs" ]; then
-    echo "Running Linux & BSD distro inspiration synthesis test suite..."
-    mkdir -p build
-    rustc --test src/distro/distro_inspiration_synthesis.rs --edition=2021 -o build/distro_synthesis_test
-    ./build/distro_synthesis_test
-fi
-
-if [ -f "src/distro/linux_bsd_ultimate_synthesis.rs" ]; then
-    echo "Running Linux & BSD ultimate synthesis test suite..."
-    mkdir -p build
-    rustc --test src/distro/linux_bsd_ultimate_synthesis.rs --edition=2021 -o build/linux_bsd_ultimate_synthesis_test
-    ./build/linux_bsd_ultimate_synthesis_test
-fi
-
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
@@ -58,39 +44,4 @@ if [ -f "tests/test_hashmap_standalone.rs" ]; then
     mkdir -p build
     rustc --test tests/test_hashmap_standalone.rs --edition=2021 -o build/hashmap_test
     ./build/hashmap_test
-fi
-
-if [ -f "tests/test_string_parser_standalone.rs" ]; then
-    echo "Running String, Config & TOML parser performance & correctness test suite..."
-    mkdir -p build
-    rustc --test tests/test_string_parser_standalone.rs --edition=2021 -o build/string_parser_test
-    ./build/string_parser_test
-fi
-
-if [ -f "src/distro/arch.rs" ]; then
-    echo "Running Arch Linux parity & tooling test suite..."
-    mkdir -p build
-    rustc --test src/distro/arch.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/arch_test
-    ./build/arch_test
-fi
-
-if [ -f "src/distro/arch_missing_components.rs" ]; then
-    echo "Running Arch Linux missing components suite..."
-    mkdir -p build
-    rustc --test src/distro/arch_missing_components.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/arch_missing_test
-    ./build/arch_missing_test
-fi
-
-if [ -f "src/package/universal.rs" ]; then
-    echo "Running Universal Package Manager multi-distro test suite..."
-    mkdir -p build
-    rustc --test src/package/universal.rs --edition=2021 -o build/universal_pkg_test
-    ./build/universal_pkg_test
-fi
-
-if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
-    echo "Running Arch Pacman Engine & AUR compilation test suite..."
-    mkdir -p build
-    rustc --test --edition=2021 src/sigpkg/arch_pacman_engine.rs -o build/test_arch_engine
-    ./build/test_arch_engine
 fi

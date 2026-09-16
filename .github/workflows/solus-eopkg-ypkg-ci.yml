@@ -1,7 +1,4 @@
 name: Solus ypkg & eopkg Package Subsystem CI
-permissions:
-  contents: read
-
 
 on:
   push:
@@ -12,7 +9,6 @@ on:
 jobs:
   solus-eopkg:
     name: Solus ypkg Build Recipes & eopkg Package Subsystem Matrix
-
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

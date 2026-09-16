@@ -2,9 +2,6 @@
 
 This document provides guidelines, architectural specifications, and verification protocols for AI agents developing, inspecting, maintaining, or extending the **SigmaOS Universal Package Management Subsystem**.
 
-## Master Reference Plan
-- [Universal Package System Implementation Plan](UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN.md)
-
 ---
 
 ## 1. System Architecture & Subsystem Layout

@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 // SigmaOS Daemonless Container & Micro-VM Orchestration Subsystem (S-RANCHER)
 // Absorbs and obsoletes Rancher OS, k3os, Bottlerocket, and containerd
@@ -5,7 +6,7 @@ use std::string::{String, ToString};
 
 #[cfg(not(test))]
 use crate::security::capability::CapabilityToken;
-use std::collections::BTreeMap;
+extern crate alloc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {

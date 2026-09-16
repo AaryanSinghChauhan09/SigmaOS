@@ -2,7 +2,8 @@ use std::format;
 // SigmaOS Cron Daemon - Linux-inspired task scheduler
 // Zero-dependency implementation of cron-like functionality
 
-use crate::klib::{btreemap::BTreeMap, Vec};
+use std::collections::BTreeMap;
+use std::vec::Vec;
 use std::string::{String, ToString};
 
 /// Cron job specification
@@ -327,7 +328,6 @@ impl Default for CronDaemon {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyExchangeAlgorithm {
     Kyber1024Ed25519,
-    Dilithium5Ed25519,
     Curve25519Sha256,
 }
 
@@ -345,19 +345,12 @@ pub struct SshSession {
 #[derive(Debug, Clone)]
 pub struct SshDaemonConfig {
     pub permit_root_login: bool,
-    pub password_authentication: bool,        // Password authentication (default false)
-    pub pubkey_authentication: bool,          // Public key authentication (default true)
     pub allow_users: Vec<String>,
     pub deny_users: Vec<String>,
     pub max_auth_tries: u32,
     pub banner: Option<String>,
     pub subsystems: BTreeMap<String, String>, // e.g. "sftp" -> "/usr/libexec/sftp-server"
     pub privilege_separation: bool,           // OpenBSD Privilege Separation
-    pub strict_modes: bool,                   // Strict file permission checks (~/.ssh)
-    pub x11_forwarding: bool,                 // X11 Forwarding gateway
-    pub agent_forwarding: bool,               // SSH Agent forwarding
-    pub tcp_keep_alive: bool,                 // TCP keep-alive probe heartbeat
-    pub idle_timeout_seconds: u32,            // ClientAliveInterval / ClientAliveCountMax
 }
 
 impl Default for SshDaemonConfig {
@@ -366,19 +359,12 @@ impl Default for SshDaemonConfig {
         subsystems.insert("sftp".to_string(), "/usr/libexec/sftp-server".to_string());
         Self {
             permit_root_login: false,
-            password_authentication: false,
-            pubkey_authentication: true,
             allow_users: Vec::new(),
             deny_users: Vec::new(),
             max_auth_tries: 3,
-            banner: Some("SigmaOS Post-Quantum Secure SSH Daemon (OpenSSH/Dropbear Inspired)".to_string()),
+            banner: Some("SigmaOS Post-Quantum Secure SSH Daemon".to_string()),
             subsystems,
             privilege_separation: true,
-            strict_modes: true,
-            x11_forwarding: false,
-            agent_forwarding: false,
-            tcp_keep_alive: true,
-            idle_timeout_seconds: 300,
         }
     }
 }
@@ -532,12 +518,6 @@ impl SovereignSshDaemon {
     }
 
     /// Dispatches an SSH channel multiplexing request (Pty, Exec, Subsystem/SFTP, DirectTcpIp)
-    /// Audit SSH host key fingerprint and post-quantum key exchange protocol
-    pub fn verify_host_key_fingerprint(&self) -> String {
-        format!("SHA256:{}", self.host_key_fp)
-    }
-
-    /// Dispatches an SSH channel multiplexing request (Pty, Exec, Subsystem/SFTP, DirectTcpIp)
     pub fn open_channel(
         &self,
         session_id: u64,
@@ -664,7 +644,7 @@ impl SovereignCronDaemon {
             true
         };
 
-        for (_id, job) in self.base_daemon.jobs.iter_mut() {
+        for (id, job) in self.base_daemon.jobs.iter_mut() {
             if job.enabled && is_permitted(&job.user) {
                 if job.last_run.is_none() || (current_time > job.next_run) {
                     job.last_run = Some(current_time);

@@ -37,15 +37,3 @@
 ## 2026-09-11 - Fast Bitwise Bitmasking for Power-of-Two Hash Table Indexing
 **Learning:** Computing hash bucket indices using hardware modulo division (`hash % capacity`) triggers CPU `div` instructions taking ~10-40 clock cycles. Since custom hash table structures guarantee bucket capacity as power-of-two values, replacing modulo division with bitwise AND mask (`hash & (capacity - 1)`) evaluates bucket indexing in a single CPU cycle.
 **Action:** When designing custom hash tables, ring buffers, or fixed-capacity pools, maintain capacity as a power of two and use bitwise AND bitmasking (`& (capacity - 1)`) instead of integer division (`% capacity`).
-
-## 2026-09-12 - Single-Pass Move Insertion for Hash Map Entry API
-**Learning:** In map `Entry` API implementations (`or_insert` / `or_insert_with`), calling `map.insert(entry.key.clone(), val)` followed by `map.get_mut(&entry.key).unwrap()` forces key cloning, duplicate hash calculations, double bucket search passes, and unwrap checks. Implementing a single-pass `insert_entry(&mut self, key: K, value: V) -> &mut V` method moves the key directly into the map without cloning (`K: Clone` bound dropped), computes the hash once, and returns a mutable reference to the inserted/updated value directly.
-**Action:** For map `Entry` APIs or upsert operations, provide a single-pass `insert_entry` method that consumes owned keys and returns mutable value references directly.
-
-## 2026-09-13 - Fast Raw Byte-Scanning Path for JSON String Parsing
-**Learning:** In JSON recursive descent parsers, iterating over string characters using `.chars().next()` decodes UTF-8 multi-byte sequences for every byte in the input string. Scanning raw byte slices (`&[u8]`) directly until hitting delimiter bytes (`"` or `\`) bypasses character decoding entirely for escape-free strings (the majority of JSON strings), resulting in a significant parsing throughput increase while falling back safely to UTF-8 decoding when backslash escapes are encountered.
-**Action:** When parsing text formats or string literals, use raw byte-level scanning for delimiter detection and fast slicing before falling back to multi-byte UTF-8 character decoding.
-
-## 2026-09-14 - Fast-Path Literal Processing & Zero-Allocation Slice Operations in Klib Parsers
-**Learning:** Custom string, INI/config, and TOML parsers often perform character-by-character loops, re-allocating intermediate string buffers for every token split or unescape check. Adding fast-path presence checks (`!s.contains('\\')`, `!line.contains('#')`) bypasses character decoding and string allocation entirely for escape-free or comment-free literals (the majority of manifest strings). Furthermore, replacing dual character-counting passes (`.chars().take_while(...).count()`) with native `str::trim()` and `str::split()` reduces memory iteration passes from 2 down to 1 and avoids multi-byte UTF-8 slicing boundary bugs.
-**Action:** In text and configuration parsers, always add fast-path presence checks (`contains()`) for optional delimiter/escape processing and prefer single-pass native slice operations over custom character-by-character allocation loops.

@@ -1,13 +1,10 @@
+use std::collections::BTreeMap;
 // SPDX-License-Identifier: MIT
 // Sovereign OS Wiki & Documentation Master Absorption Engine
 // Absorbs and implements all unimplemented ideas, specifications, roadmaps, and gap-closing matrices
 // from `.md` files and GitHub Wiki of SigmaOS / SovereignOS.
 
-use std::collections::BTreeMap;
-use std::format;
-use std::string::{String, ToString};
-use std::vec;
-use std::vec::Vec;
+extern crate alloc;
 
 /// ---------------------------------------------------------------------------
 /// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)

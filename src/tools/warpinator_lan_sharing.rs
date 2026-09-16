@@ -1,8 +1,8 @@
-extern crate alloc;
 
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Warpinator-inspired LAN file sharing GUI
 /// Provides text-based interface for secure LAN file sharing
