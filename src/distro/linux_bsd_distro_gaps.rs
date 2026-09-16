@@ -613,7 +613,7 @@ pub struct ConntrackTableEntry {
     pub dst_port: u16,
     pub translated_ip: [u8; 4],
     pub translated_port: u16,
-    pub nat_type: NatType,
+    pub nat_type: &'static str,
     pub packets_counter: u64,
 }
 
@@ -656,7 +656,7 @@ impl SovereignStatefulNatEngine {
                 dst_port,
                 translated_ip: self.public_ip,
                 translated_port: src_port,
-                nat_type: NatType::Snat,
+                nat_type: "SNAT",
                 packets_counter: 1,
             });
         }

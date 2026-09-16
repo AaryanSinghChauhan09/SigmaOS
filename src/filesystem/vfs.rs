@@ -2,6 +2,7 @@
 use core::fmt;
 use std::collections::{BTreeMap, HashMap};
 use std::string::String;
+use std::string::ToString;
 use std::vec::Vec;
 use crate::security::{CapabilityToken, Permission};
 
@@ -138,6 +139,7 @@ pub struct Inode {
     pub symlink_target: Option<String>,
     pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
+    pub data_blocks: Vec<u64>,
     pub entries: HashMap<String, u64>, // Directory entries
 }
 
@@ -159,6 +161,7 @@ impl Inode {
             symlink_target: None,
             xattrs: HashMap::new(),
             data: Vec::new(),
+            data_blocks: Vec::new(),
             entries: HashMap::new(),
         }
     }
@@ -289,6 +292,14 @@ pub struct VirtualFileSystem {
     pub file_descriptors: std::collections::BTreeMap<u64, FileDescriptor>,
     pub root_inode: u64,
     next_inode_id: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct FileDescriptor {
+    pub fd: u64,
+    pub inode_id: u64,
+    pub offset: u64,
+    pub flags: u32,
 }
 
 impl VirtualFileSystem {
@@ -428,7 +439,7 @@ impl VirtualFileSystem {
     }
 
     /// Open file - returns file descriptor
-    pub fn open(&mut self, path: &str, flags: u32, mode: u32) -> Result<i32, VfsError> {
+        pub fn open(&mut self, path: &str, flags: u32, mode: u32) -> Result<i32, VfsError> {
         if path.len() > 4096 {
             return Err(VfsError::NameTooLong);
         }
@@ -455,6 +466,7 @@ impl VirtualFileSystem {
         Ok(fd as i32)
     }
 
+    pub fn close(&mut self, fd: i32) -> Result<(), VfsError> { self.close_file(fd as u64).map_err(|_| VfsError::NotFound) }
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
         if !self.file_descriptors.contains_key(&fd) {
             return Err(FsError::InvalidFd);
@@ -480,7 +492,7 @@ impl VirtualFileSystem {
             .ok_or(FsError::NotFound)?;
 
         // Check read permission
-        if !inode.permissions.read {
+        if !inode.mode.owner_read {
             return Err(FsError::PermissionDenied);
         }
 
@@ -519,7 +531,7 @@ impl VirtualFileSystem {
             .ok_or(FsError::NotFound)?;
 
         // Check write permission
-        if !inode.permissions.write {
+        if !inode.mode.owner_write {
             return Err(FsError::PermissionDenied);
         }
 

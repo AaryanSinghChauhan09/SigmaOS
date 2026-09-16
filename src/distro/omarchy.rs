@@ -629,6 +629,11 @@ pub use omarchy_inspiration::{
     QuickshellWidget, ShellComponentKind,
 };
 
+#[path = "."]
+pub mod distro {
+    pub use super::omarchy_inspiration;
+}
+
 /// Omarchy Liveboot ISO & Automated Installer Engine
 #[derive(Debug, Clone)]
 pub struct OmarchyIsoInstallerEngine {

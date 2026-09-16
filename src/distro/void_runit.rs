@@ -211,7 +211,7 @@ impl RunitSupervisor {
     }
 
     /// Check if service can start (dependencies satisfied)
-    fn can_start_service(&self, name: &str, started: &[String]) -> bool {
+    pub fn can_start_service(&self, name: &str, started: &[String]) -> bool {
         if let Some(service) = self.services.get(name) {
             for dep in &service.dependencies {
                 if !started.contains(dep) {
