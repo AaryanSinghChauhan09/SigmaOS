@@ -20,6 +20,7 @@ pub use self::sigma_sh::{
     ContextualCompleter, HistoryExpansionEngine, JobControlManager, ParameterExpansionEngine,
     PipelineExecutor, ShellPledgeUnveilGuard, ShellSyntaxHighlighter, ZshPromptFormatter,
 };
+pub use self::zsh_bash_parity::{BashParameterExpansion, ZshAutosuggestionsEngine, ZshAutosuggestionsEngine as ZshAutoSuggestionEngine};
 pub use self::repl::ShellRepl;
 pub use self::zsh_bash_parity::*;
 

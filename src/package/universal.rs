@@ -471,6 +471,7 @@ impl CustomPackageHook {
     where
         F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
     {
+        let boxed_handler: Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync> = Arc::new(handler);
         Self {
             name: name.to_string(),
             timing,

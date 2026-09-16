@@ -120,7 +120,7 @@ pub struct AgentSandbox {
 impl AgentSandbox {
     pub fn new_strict() -> Self {
         Self {
-            landlock: LandlockV5Guard::new(),
+            landlock: LandlockV5Guard::new(5),
             capsicum: CapsicumRights::empty(),
             pledge_promises: 0, // No promises initially
             unveil_paths: Vec::new(),

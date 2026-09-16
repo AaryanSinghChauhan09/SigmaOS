@@ -60,6 +60,7 @@ pub mod vulnerability;
 pub mod kali_components;
 pub mod landlock;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
+pub mod landlock_sovereign;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
@@ -109,6 +110,7 @@ pub use parrot_kali::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
+pub use parrot::ParrotSecurityFingerprintEngine;
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,

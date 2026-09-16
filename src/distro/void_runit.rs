@@ -31,8 +31,9 @@ pub enum RunitStage {
 }
 
 /// Runit Service Status
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum RunitServiceStatus {
+    #[default]
     Down,
     Starting,
     Running,

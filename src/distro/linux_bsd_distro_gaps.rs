@@ -538,6 +538,7 @@ impl Default for CronJobScheduler {
     }
 }
 
+
 // ============================================================================
 // 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
 // ============================================================================
@@ -550,18 +551,21 @@ pub enum DeviceNodeType {
 
 #[derive(Debug, Clone)]
 pub struct DeviceNodeEntry {
-    pub name: &'static str,
+    pub name: String,
     pub node_type: DeviceNodeType,
     pub major: u32,
     pub minor: u32,
     pub owner_uid: u32,
     pub group_gid: u32,
     pub mode_octal: u16,
-    pub symlink_paths: Vec<&'static str>,
+    pub symlink_paths: Vec<String>,
 }
+
+pub type DynamicDeviceNode = DeviceNodeEntry;
 
 #[derive(Debug)]
 pub struct SovereignDynamicDevfsEngine {
+    pub nodes: Vec<DeviceNodeEntry>,
     pub devices: Vec<DeviceNodeEntry>,
 }
 
@@ -571,7 +575,6 @@ impl SovereignDynamicDevfsEngine {
             nodes: Vec::new(),
         };
 
-        // Populate default device nodes
         devfs.create_node("null", DeviceNodeType::Character, 1, 3, 0, 0, 0o666);
         devfs.create_node("zero", DeviceNodeType::Character, 1, 5, 0, 0, 0o666);
         devfs.create_node("sda", DeviceNodeType::Block, 8, 0, 0, 6, 0o660);
@@ -611,7 +614,9 @@ impl SovereignDynamicDevfsEngine {
             group_gid,
             mode_octal,
             symlink_paths: Vec::new(),
-        });
+        };
+        self.nodes.push(entry.clone());
+        self.devices.push(entry);
     }
 
     pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
@@ -621,6 +626,11 @@ impl SovereignDynamicDevfsEngine {
         } else {
             false
         }
+        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
+            dev.symlink_paths.push(symlink.to_string());
+            found = true;
+        }
+        found
     }
 
     pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
@@ -681,8 +691,6 @@ impl SovereignStatefulNatEngine {
         dst_port: u16,
         _protocol: u8,
     ) -> ([u8; 4], u16) {
-
-        // Search conntrack
         if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
             c.original_src == internal_src
                 && c.src_port == src_port
@@ -711,7 +719,9 @@ impl SovereignStatefulNatEngine {
         translated_dst_port: u16,
     ) -> Option<([u8; 4], u16)> {
         for entry in &mut self.conntrack_table {
-            if entry.translated_ip == translated_dst_ip && entry.translated_port == translated_dst_port {
+            if entry.translated_ip == translated_dst_ip
+                && entry.translated_port == translated_dst_port
+            {
                 entry.packets_counter += 1;
                 return Some((entry.original_src, entry.src_port));
             }
@@ -798,13 +808,13 @@ pub struct DistroComponentSnapshot {
 /// Roadmap Phase Action Plan Entry
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DistroRoadmapPhase {
-    Phase1Foundation,    // Q4 2026 - Q2 2027: Init system, sigmapkg PM, POSIX coreutils
-    Phase2Parity,        // Q3 2027 - Q1 2028: TCP/IP stack, ext4/ZFS/Btrfs/UFS, Sandboxed drivers
-    Phase3Competitiveness, // Q2 2028 - Q4 2028: Native containers, Jails, Hypervisor, Atomic updates
-    Phase4Sovereignty,   // 2029+: MAC frameworks, Cryptographic boot, Privacy-first telemetry, Accessibility & i18n
-    ShortTerm,           // Legacy ShortTerm mapping
-    MidTerm,             // Legacy MidTerm mapping
-    LongTerm,            // Legacy LongTerm mapping
+    Phase1Foundation,
+    Phase2Parity,
+    Phase3Competitiveness,
+    Phase4Sovereignty,
+    ShortTerm,
+    MidTerm,
+    LongTerm,
 }
 
 /// Security & Sovereignty Blueprint Feature Entry
@@ -818,8 +828,6 @@ pub struct SecurityBlueprintStatus {
 }
 
 /// Sovereign Master Distro Ecosystem Engine
-/// Addresses all core component gaps and advanced feature requirements to elevate SigmaOS
-/// into a full distribution ecosystem comparable to Linux and BSD.
 #[derive(Debug, Clone)]
 pub struct SovereignMasterDistroEcosystemEngine {
     pub active_roadmap_phase: DistroRoadmapPhase,
@@ -840,7 +848,6 @@ impl SovereignMasterDistroEcosystemEngine {
         }
     }
 
-    /// Evaluates the complete Comparison Snapshot Matrix against mature Linux & BSD ecosystems
     pub fn evaluate_distro_gap_snapshot(&self) -> Vec<DistroComponentSnapshot> {
         vec![
             DistroComponentSnapshot {
@@ -909,17 +916,15 @@ impl SovereignMasterDistroEcosystemEngine {
         ]
     }
 
-    /// Evaluates execution readiness for a given roadmap phase
     pub fn evaluate_roadmap_phase(&self, phase: DistroRoadmapPhase) -> bool {
         match phase {
-            DistroRoadmapPhase::Phase1Foundation | DistroRoadmapPhase::ShortTerm => true, // Init, Universal PM, Coreutils ready
-            DistroRoadmapPhase::Phase2Parity | DistroRoadmapPhase::MidTerm => true,       // Networking, Filesystems, Drivers ready
-            DistroRoadmapPhase::Phase3Competitiveness | DistroRoadmapPhase::LongTerm => true, // Containers, Hypervisors, Rollbacks
-            DistroRoadmapPhase::Phase4Sovereignty => true, // MAC, Cryptographic boot, Telemetry, Accessibility & i18n ready
+            DistroRoadmapPhase::Phase1Foundation | DistroRoadmapPhase::ShortTerm => true,
+            DistroRoadmapPhase::Phase2Parity | DistroRoadmapPhase::MidTerm => true,
+            DistroRoadmapPhase::Phase3Competitiveness | DistroRoadmapPhase::LongTerm => true,
+            DistroRoadmapPhase::Phase4Sovereignty => true,
         }
     }
 
-    /// Evaluates the complete Security & Sovereignty Blueprint Status
     pub fn evaluate_security_blueprint(&self) -> Vec<SecurityBlueprintStatus> {
         vec![
             SecurityBlueprintStatus {
@@ -970,6 +975,18 @@ impl Default for SovereignMasterDistroEcosystemEngine {
 // ============================================================================
 // 7. Universal Linux & BSD Distro Gap Resolver
 // ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum JournalLogLevel {
+    Emergency = 0,
+    Alert = 1,
+    Critical = 2,
+    Error = 3,
+    Warning = 4,
+    Notice = 5,
+    Info = 6,
+    Debug = 7,
+}
 
 #[derive(Debug, Clone)]
 pub struct JournaldLogRecord {
@@ -1112,7 +1129,7 @@ impl Default for SovereignJournaldBinaryStorageEngine {
 }
 
 // ============================================================================
-// Unit Tests
+// 11. Universal Linux & BSD Distro Gap Resolver
 // ============================================================================
 
 #[cfg(test)]
@@ -1138,7 +1155,7 @@ mod tests {
     #[test]
     fn test_usb_hid_keyboard_driver() {
         let mut driver = UsbHidKeyboardDriver::new();
-        let report = [0x02, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x00]; // Shift + 'a' + 'b'
+        let report = [0x02, 0x00, 0x04, 0x05, 0x00, 0x00, 0x00, 0x00];
         driver.process_hid_report(&report);
 
         assert!(driver.modifiers.left_shift);
