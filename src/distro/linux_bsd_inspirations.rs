@@ -72,6 +72,17 @@ pub enum DistroSubsystemMode {
     LinuxTails,
     LinuxGuix,
     LinuxParrot,
+    LinuxUbuntu,
+    LinuxMint,
+    LinuxKali,
+    LinuxGaruda,
+    LinuxEndeavour,
+    LinuxManjaro,
+    LinuxCachyOS,
+    LinuxChimera,
+    LinuxTinyCore,
+    LinuxAntiX,
+    LinuxZorin,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -178,6 +189,13 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::LinuxZorin,
                 "/var/lib/pkg",
             ) => "/var/lib/dpkg".to_string(),
+            (
+                DistroSubsystemMode::LinuxGaruda
+                | DistroSubsystemMode::LinuxEndeavour
+                | DistroSubsystemMode::LinuxManjaro
+                | DistroSubsystemMode::LinuxCachyOS,
+                "/var/lib/pkg",
+            ) => "/var/lib/pacman".to_string(),
             (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
             (DistroSubsystemMode::LinuxVoid, "/var/lib/pkg") => "/var/db/xbps".to_string(),
             (
@@ -268,6 +286,11 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxTinyCore => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
+
+            DistroSubsystemMode::LinuxSlackware
+            | DistroSubsystemMode::LinuxTinyCore
+            | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Sysvinit,
+
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
             _ => supervisor == ServiceSupervisorType::Systemd,
