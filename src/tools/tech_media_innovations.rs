@@ -10,8 +10,7 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ============================================================================
-// 1. Linux & Open Source Press Feed Aggregator
-// Inspired by ItsFOSS, 9to5Linux, Linux.org, TechCrunch, ZDNet, MakeUseOf, DistroWatch
+// 1. Linux & Open Source Press Feed Aggregator (28 Media Outlets)
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -59,6 +58,174 @@ impl LinuxPressFeedEngine {
                 category: "DistroReview".to_string(),
                 timestamp_epoch: 1730000300,
             },
+            TechMediaArticleFeed {
+                title: "DIY Linux Handhelds & RISC-V Single Board Computer Hacks".to_string(),
+                portal: "Geeky-Gadgets".to_string(),
+                url: "https://geeky-gadgets.com/diy-riscv-handheld".to_string(),
+                category: "Hardware".to_string(),
+                timestamp_epoch: 1730000400,
+            },
+            TechMediaArticleFeed {
+                title: "Enterprise Linux Administration & Zero-Trust Infrastructure".to_string(),
+                portal: "Linux.com".to_string(),
+                url: "https://linux.com/enterprise-zero-trust".to_string(),
+                category: "Sysadmin".to_string(),
+                timestamp_epoch: 1730000500,
+            },
+            TechMediaArticleFeed {
+                title: "KDnuggets Guide to Optimizing LLM Memory Pipelines in Rust".to_string(),
+                portal: "KDnuggets".to_string(),
+                url: "https://kdnuggets.com/rust-llm-memory-optimization".to_string(),
+                category: "DataScience".to_string(),
+                timestamp_epoch: 1730000600,
+            },
+            TechMediaArticleFeed {
+                title: "HWBusters PSU Rail Voltage Ripple & Transient Spike Analysis".to_string(),
+                portal: "HWBusters".to_string(),
+                url: "https://hwbusters.com/psu-ripple-analysis".to_string(),
+                category: "Hardware".to_string(),
+                timestamp_epoch: 1730000700,
+            },
+            TechMediaArticleFeed {
+                title: "ITDaily Enterprise IT Cloud Hybrid Governance Framework".to_string(),
+                portal: "ITDaily".to_string(),
+                url: "https://itdaily.com/enterprise-cloud-governance".to_string(),
+                category: "Enterprise".to_string(),
+                timestamp_epoch: 1730000800,
+            },
+            TechMediaArticleFeed {
+                title: "How-To Geek Terminal Guide to High-Performance Disk Tuning".to_string(),
+                portal: "HowToGeek".to_string(),
+                url: "https://howtogeek.com/terminal-disk-tuning".to_string(),
+                category: "Desktop".to_string(),
+                timestamp_epoch: 1730000900,
+            },
+            TechMediaArticleFeed {
+                title: "Linux.org Kernel Optimization & Preemptive Scheduler Tweaks".to_string(),
+                portal: "Linux.org".to_string(),
+                url: "https://linux.org/kernel-scheduler-tweaks".to_string(),
+                category: "Kernel".to_string(),
+                timestamp_epoch: 1730001000,
+            },
+            TechMediaArticleFeed {
+                title: "InfoWorld Enterprise Software Architecture & Cloud-Native Security".to_string(),
+                portal: "InfoWorld".to_string(),
+                url: "https://infoworld.com/cloud-native-security".to_string(),
+                category: "Security".to_string(),
+                timestamp_epoch: 1730001100,
+            },
+            TechMediaArticleFeed {
+                title: "LinuxFoundation Open Source SBOM & License Compliance Standards".to_string(),
+                portal: "LinuxFoundation".to_string(),
+                url: "https://linuxfoundation.org/sbom-standards".to_string(),
+                category: "Governance".to_string(),
+                timestamp_epoch: 1730001200,
+            },
+            TechMediaArticleFeed {
+                title: "MakeUseOf Lightweight Desktop Environment Comparisons for Low-RAM Systems".to_string(),
+                portal: "MakeUseOf".to_string(),
+                url: "https://makeuseof.com/lightweight-desktop-guide".to_string(),
+                category: "Desktop".to_string(),
+                timestamp_epoch: 1730001300,
+            },
+            TechMediaArticleFeed {
+                title: "PCWorld Laptop Battery Health Threshold Charging Benchmarks".to_string(),
+                portal: "PCWorld".to_string(),
+                url: "https://pcworld.com/battery-health-benchmarks".to_string(),
+                category: "Hardware".to_string(),
+                timestamp_epoch: 1730001400,
+            },
+            TechMediaArticleFeed {
+                title: "MarkTechPost SOTA Local RAG Vector Embeddings Context Benchmark".to_string(),
+                portal: "MarkTechPost".to_string(),
+                url: "https://marktechpost.com/local-rag-vector-benchmark".to_string(),
+                category: "AI".to_string(),
+                timestamp_epoch: 1730001500,
+            },
+            TechMediaArticleFeed {
+                title: "WindowsLatest WSL Cross-Platform Kernel Interoperability Advances".to_string(),
+                portal: "WindowsLatest".to_string(),
+                url: "https://windowslatest.com/wsl-kernel-advances".to_string(),
+                category: "Interoperability".to_string(),
+                timestamp_epoch: 1730001600,
+            },
+            TechMediaArticleFeed {
+                title: "TechSpot Gaming Driver Performance & Frame Pacing Comparison".to_string(),
+                portal: "TechSpot".to_string(),
+                url: "https://techspot.com/driver-frame-pacing".to_string(),
+                category: "Gaming".to_string(),
+                timestamp_epoch: 1730001700,
+            },
+            TechMediaArticleFeed {
+                title: "TheNewStack eBPF-Powered Kubernetes Service Mesh Observability".to_string(),
+                portal: "TheNewStack".to_string(),
+                url: "https://thenewstack.io/ebpf-service-mesh".to_string(),
+                category: "CloudNative".to_string(),
+                timestamp_epoch: 1730001800,
+            },
+            TechMediaArticleFeed {
+                title: "TechPowerUp GPU-Z VRM Thermal & Power Curve Telemetry Analysis".to_string(),
+                portal: "TechPowerUp".to_string(),
+                url: "https://techpowerup.com/gpu-vrm-telemetry".to_string(),
+                category: "Hardware".to_string(),
+                timestamp_epoch: 1730001900,
+            },
+            TechMediaArticleFeed {
+                title: "WindowsCentral Phone Link & Unified Cross-Device Clipboard Integration".to_string(),
+                portal: "WindowsCentral".to_string(),
+                url: "https://windowscentral.com/phone-link-clipboard".to_string(),
+                category: "Interoperability".to_string(),
+                timestamp_epoch: 1730002000,
+            },
+            TechMediaArticleFeed {
+                title: "Phoronix Test Suite Automated Performance Benchmark Matrix Update".to_string(),
+                portal: "Phoronix".to_string(),
+                url: "https://phoronix.com/phoronix-test-suite-update".to_string(),
+                category: "Benchmarks".to_string(),
+                timestamp_epoch: 1730002100,
+            },
+            TechMediaArticleFeed {
+                title: "XDA-Developers Android APK Sideloading & Custom Kernel Tweaks".to_string(),
+                portal: "XDA-Developers".to_string(),
+                url: "https://xda-developers.com/android-kernel-tweaks".to_string(),
+                category: "Mobile".to_string(),
+                timestamp_epoch: 1730002200,
+            },
+            TechMediaArticleFeed {
+                title: "ZDNet Enterprise Security Deployment & Linux Server Hardening Audits".to_string(),
+                portal: "ZDNet".to_string(),
+                url: "https://zdnet.com/enterprise-linux-hardening".to_string(),
+                category: "Security".to_string(),
+                timestamp_epoch: 1730002300,
+            },
+            TechMediaArticleFeed {
+                title: "OpenSourceForU SELinux Mandatory Access Control Policy Tutorial".to_string(),
+                portal: "OpenSourceForU".to_string(),
+                url: "https://opensourceforu.com/selinux-mac-tutorial".to_string(),
+                category: "Security".to_string(),
+                timestamp_epoch: 1730002400,
+            },
+            TechMediaArticleFeed {
+                title: "PCMag Comprehensive Linux Endpoint Security & Anti-Malware Review".to_string(),
+                portal: "PCMag".to_string(),
+                url: "https://pcmag.com/linux-security-review".to_string(),
+                category: "Security".to_string(),
+                timestamp_epoch: 1730002500,
+            },
+            TechMediaArticleFeed {
+                title: "LinuxTeck Automated iptables & UFW Security Hardening Guide".to_string(),
+                portal: "LinuxTeck".to_string(),
+                url: "https://linuxteck.com/ufw-iptables-hardening".to_string(),
+                category: "Security".to_string(),
+                timestamp_epoch: 1730002600,
+            },
+            TechMediaArticleFeed {
+                title: "Appuals Automated System Repair & Dependency Troubleshooting Guide".to_string(),
+                portal: "Appuals".to_string(),
+                url: "https://appuals.com/linux-system-repair-guide".to_string(),
+                category: "Troubleshooting".to_string(),
+                timestamp_epoch: 1730002700,
+            },
         ];
         Self {
             articles: sample_articles,
@@ -77,10 +244,28 @@ impl LinuxPressFeedEngine {
             .collect()
     }
 
+    pub fn get_articles_by_category(&self, category: &str) -> Vec<TechMediaArticleFeed> {
+        self.articles
+            .iter()
+            .filter(|a| a.category.eq_ignore_ascii_case(category))
+            .cloned()
+            .collect()
+    }
+
     pub fn get_latest_news(&self) -> Vec<TechMediaArticleFeed> {
         let mut sorted = self.articles.clone();
         sorted.sort_by(|a, b| b.timestamp_epoch.cmp(&a.timestamp_epoch));
         sorted
+    }
+
+    pub fn get_portal_coverage_count(&self) -> usize {
+        let mut portals = Vec::new();
+        for a in &self.articles {
+            if !portals.contains(&a.portal) {
+                portals.push(a.portal.clone());
+            }
+        }
+        portals.len()
     }
 }
 
@@ -93,11 +278,15 @@ impl LinuxPressFeedEngine {
 pub struct PowerThermalTelemetryNode {
     pub cpu_temp_c: f32,
     pub gpu_temp_c: f32,
+    pub gpu_vrm_temp_c: f32,
     pub rail_12v_v: f32,
     pub rail_5v_v: f32,
     pub rail_3v3_v: f32,
+    pub psu_ripple_mv: f32,
     pub total_draw_watts: f32,
     pub fan_rpm: u32,
+    pub transient_spike_detected: bool,
+    pub frame_pacing_latency_ms: f32,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -120,11 +309,15 @@ impl HardwareTelemetryMonitor {
             current_telemetry: PowerThermalTelemetryNode {
                 cpu_temp_c: 42.0,
                 gpu_temp_c: 39.5,
+                gpu_vrm_temp_c: 45.2,
                 rail_12v_v: 12.04,
                 rail_5v_v: 5.02,
                 rail_3v3_v: 3.31,
+                psu_ripple_mv: 15.4,
                 total_draw_watts: 75.2,
                 fan_rpm: 1200,
+                transient_spike_detected: false,
+                frame_pacing_latency_ms: 1.2,
             },
         }
     }
@@ -133,12 +326,24 @@ impl HardwareTelemetryMonitor {
         let t = &self.current_telemetry;
         t.cpu_temp_c < 85.0
             && t.gpu_temp_c < 88.0
+            && t.gpu_vrm_temp_c < 95.0
             && t.rail_12v_v >= 11.4
             && t.rail_12v_v <= 12.6
             && t.rail_5v_v >= 4.75
             && t.rail_5v_v <= 5.25
             && t.rail_3v3_v >= 3.13
             && t.rail_3v3_v <= 3.47
+            && t.psu_ripple_mv <= 30.0
+            && !t.transient_spike_detected
+    }
+
+    pub fn verify_vrm_and_psu_ripple(&self) -> bool {
+        let t = &self.current_telemetry;
+        t.gpu_vrm_temp_c < 100.0 && t.psu_ripple_mv < 50.0 && !t.transient_spike_detected
+    }
+
+    pub fn validate_frame_pacing(&self) -> bool {
+        self.current_telemetry.frame_pacing_latency_ms <= 8.33 // Smooth 120 FPS frame pacing
     }
 }
 
@@ -215,6 +420,7 @@ pub struct LlmInferenceMetrics {
     pub tokens_per_sec: f64,
     pub memory_vram_mb: u32,
     pub quantization_level: String,
+    pub context_window_tokens: u32,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -254,6 +460,16 @@ impl AiMlTensorDatasetPipeline {
         let variance: f64 = col.values.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / col.values.len() as f64;
         Some(variance.sqrt())
     }
+
+    pub fn calculate_drift_ratio(&self, baseline_col: &str, current_col: &str) -> Option<f64> {
+        let mean_base = self.calculate_mean(baseline_col)?;
+        let mean_curr = self.calculate_mean(current_col)?;
+        if mean_base == 0.0 {
+            Some(0.0)
+        } else {
+            Some(((mean_curr - mean_base) / mean_base).abs())
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -269,12 +485,14 @@ impl ModelPerformanceBenchmark {
                 tokens_per_sec: 142.5,
                 memory_vram_mb: 2048,
                 quantization_level: "Q4_K_M".to_string(),
+                context_window_tokens: 8192,
             },
             LlmInferenceMetrics {
                 model_name: "Sigma-CodeAgent-7B".to_string(),
                 tokens_per_sec: 88.0,
                 memory_vram_mb: 4096,
                 quantization_level: "Q8_0".to_string(),
+                context_window_tokens: 16384,
             },
         ];
         Self { models }
@@ -283,11 +501,27 @@ impl ModelPerformanceBenchmark {
     pub fn evaluate_llm_performance(&self, model_name: &str) -> Option<LlmInferenceMetrics> {
         self.models.iter().find(|m| m.model_name == model_name).cloned()
     }
+
+    pub fn estimate_context_window_vram(&self, model_name: &str, context_tokens: u32) -> Option<u32> {
+        let model = self.evaluate_llm_performance(model_name)?;
+        let base_vram = model.memory_vram_mb;
+        let token_cost_mb = (context_tokens as f64 * 0.125) as u32;
+        Some(base_vram + token_cost_mb)
+    }
+
+    pub fn measure_quantization_throughput(&self, model_name: &str) -> Option<f64> {
+        let model = self.evaluate_llm_performance(model_name)?;
+        if model.quantization_level.contains("Q4") {
+            Some(model.tokens_per_sec * 1.4)
+        } else {
+            Some(model.tokens_per_sec)
+        }
+    }
 }
 
 // ============================================================================
 // 4. Zero-Trust Security Sandbox & Open-Source Governance Engine
-// Inspired by InfoWorld, LinuxFoundation
+// Inspired by InfoWorld, LinuxFoundation, LinuxTeck
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -309,6 +543,7 @@ pub struct SbomLicenseComplianceRecord {
 #[derive(Debug, Clone, Default)]
 pub struct ZeroTrustSecuritySandbox {
     pub policies: BTreeMap<String, ZeroTrustSandboxPolicy>,
+    pub firewall_rules_active: usize,
 }
 
 impl ZeroTrustSecuritySandbox {
@@ -323,12 +558,33 @@ impl ZeroTrustSecuritySandbox {
                 rlimit_mem_mb: 256,
             },
         );
-        Self { policies }
+        Self {
+            policies,
+            firewall_rules_active: 24,
+        }
     }
 
     pub fn verify_sandbox_policy(&self, service_name: &str) -> bool {
         if let Some(p) = self.policies.get(service_name) {
             !p.pledge_promises.is_empty() && !p.unveil_paths.is_empty() && p.rlimit_mem_mb > 0
+        } else {
+            false
+        }
+    }
+
+    pub fn audit_firewall_rules(&self) -> bool {
+        self.firewall_rules_active >= 10
+    }
+
+    pub fn enforce_strict_pledge_unveil(&mut self, service_name: &str, promise: &str, path: &str) -> bool {
+        if let Some(p) = self.policies.get_mut(service_name) {
+            if !p.pledge_promises.contains(&promise.to_string()) {
+                p.pledge_promises.push(promise.to_string());
+            }
+            if !p.unveil_paths.contains(&path.to_string()) {
+                p.unveil_paths.push(path.to_string());
+            }
+            true
         } else {
             false
         }
@@ -364,6 +620,10 @@ impl OpenSourceGovernanceEngine {
             .iter()
             .all(|r| r.vulnerability_count == 0 && (r.license_spdx == "MIT" || r.license_spdx == "Apache-2.0"))
     }
+
+    pub fn scan_sbom_vulnerabilities(&self) -> u32 {
+        self.records.iter().map(|r| r.vulnerability_count).sum()
+    }
 }
 
 // ============================================================================
@@ -382,6 +642,8 @@ pub struct CrossPlatformDeviceSpec {
 #[derive(Debug, Clone, Default)]
 pub struct CrossPlatformDeviceBridge {
     pub devices: Vec<CrossPlatformDeviceSpec>,
+    pub shared_clipboard_text: String,
+    pub synced_notifications: Vec<String>,
 }
 
 impl CrossPlatformDeviceBridge {
@@ -392,7 +654,11 @@ impl CrossPlatformDeviceBridge {
             connection_type: "ADB_WiFi".to_string(),
             side_loaded_apps: vec!["org.sigma.terminal".to_string()],
         }];
-        Self { devices }
+        Self {
+            devices,
+            shared_clipboard_text: String::new(),
+            synced_notifications: Vec::new(),
+        }
     }
 
     pub fn register_device(&mut self, device: CrossPlatformDeviceSpec) {
@@ -406,6 +672,14 @@ impl CrossPlatformDeviceBridge {
         } else {
             Err("Device not found")
         }
+    }
+
+    pub fn sync_clipboard(&mut self, text: &str) {
+        self.shared_clipboard_text = text.to_string();
+    }
+
+    pub fn mirror_notification(&mut self, notif: &str) {
+        self.synced_notifications.push(notif.to_string());
     }
 
     pub fn verify_bridge_status(&self) -> bool {
@@ -444,26 +718,40 @@ impl SovereignTechMediaMasterSuite {
     }
 
     pub fn synthesize_and_verify_all(&mut self) -> bool {
-        // Verify Press Feeds
+        // Verify Press Feeds across 28 outlets
         let latest_news = self.press_feeds.get_latest_news();
-        let feeds_ok = !latest_news.is_empty();
+        let feeds_ok = !latest_news.is_empty() && self.press_feeds.get_portal_coverage_count() >= 25;
 
         // Verify Hardware Telemetry & Bench
-        let telemetry_ok = self.telemetry.is_power_and_thermal_nominal();
+        let telemetry_ok = self.telemetry.is_power_and_thermal_nominal()
+            && self.telemetry.verify_vrm_and_psu_ripple()
+            && self.telemetry.validate_frame_pacing();
         let bench_res = self.phoronix_bench.run_automated_benchmark("synthetic_mem");
         let bench_ok = bench_res.score_ops_per_sec > 0.0;
 
         // Verify AI / ML Tensor Pipeline & Models
-        self.tensor_pipeline.load_column("loss", &[0.5, 0.4, 0.3, 0.2, 0.1]);
-        let mean = self.tensor_pipeline.calculate_mean("loss");
-        let ai_ok = mean == Some(0.3) && self.model_bench.evaluate_llm_performance("Sigma-SLM-3B").is_some();
+        self.tensor_pipeline.load_column("baseline_loss", &[0.5, 0.4, 0.3, 0.2, 0.1]);
+        self.tensor_pipeline.load_column("current_loss", &[0.52, 0.41, 0.31, 0.21, 0.11]);
+        let mean = self.tensor_pipeline.calculate_mean("baseline_loss");
+        let drift = self.tensor_pipeline.calculate_drift_ratio("baseline_loss", "current_loss");
+        let ai_ok = mean == Some(0.3)
+            && drift.is_some()
+            && self.model_bench.evaluate_llm_performance("Sigma-SLM-3B").is_some()
+            && self.model_bench.estimate_context_window_vram("Sigma-SLM-3B", 8192).unwrap_or(0) > 2048;
 
         // Verify Security & Governance
-        let sec_ok = self.zero_trust.verify_sandbox_policy("network_subsystem") && self.governance.audit_license_compliance();
+        let sec_ok = self.zero_trust.verify_sandbox_policy("network_subsystem")
+            && self.zero_trust.audit_firewall_rules()
+            && self.governance.audit_license_compliance()
+            && self.governance.scan_sbom_vulnerabilities() == 0;
 
         // Verify Device Bridge
+        self.device_bridge.sync_clipboard("https://sigmaos.org");
+        self.device_bridge.mirror_notification("Incoming Call from Pixel 8 Pro");
         let bridge_ok = self.device_bridge.verify_bridge_status()
-            && self.device_bridge.sideload_app("dev_android_1", "org.sigma.pqc_vpn").is_ok();
+            && self.device_bridge.sideload_app("dev_android_1", "org.sigma.pqc_vpn").is_ok()
+            && !self.device_bridge.shared_clipboard_text.is_empty()
+            && !self.device_bridge.synced_notifications.is_empty();
 
         feeds_ok && telemetry_ok && bench_ok && ai_ok && sec_ok && bridge_ok
     }
@@ -491,7 +779,16 @@ mod tests {
         });
 
         let news = engine.get_latest_news();
-        assert_eq!(news[0].portal, "Phoronix");
+        assert_eq!(news[0].portal, "Appuals");
+    }
+
+    #[test]
+    fn test_expanded_28_media_press_feeds() {
+        let engine = LinuxPressFeedEngine::new();
+        assert!(engine.get_portal_coverage_count() >= 28);
+        assert!(!engine.get_articles_by_category("Kernel").is_empty());
+        assert!(!engine.get_articles_by_category("Security").is_empty());
+        assert!(!engine.get_articles_by_category("Hardware").is_empty());
     }
 
     #[test]
@@ -504,6 +801,13 @@ mod tests {
         assert_eq!(res.test_name, "crypto_aes");
         let ranked = bench.rank_system_benchmarks();
         assert!(ranked[0].score_ops_per_sec >= ranked[1].score_ops_per_sec);
+    }
+
+    #[test]
+    fn test_gpu_vrm_psu_ripple_telemetry() {
+        let monitor = HardwareTelemetryMonitor::new();
+        assert!(monitor.verify_vrm_and_psu_ripple());
+        assert!(monitor.validate_frame_pacing());
     }
 
     #[test]
@@ -520,6 +824,23 @@ mod tests {
     }
 
     #[test]
+    fn test_ai_ml_dataset_drift_and_model_benchmark() {
+        let mut pipeline = AiMlTensorDatasetPipeline::new();
+        pipeline.load_column("base", &[100.0, 100.0, 100.0]);
+        pipeline.load_column("curr", &[110.0, 110.0, 110.0]);
+        let drift = pipeline.calculate_drift_ratio("base", "curr");
+        assert!(drift.is_some());
+        assert!((drift.unwrap() - 0.10).abs() < 1e-4);
+
+        let model_bench = ModelPerformanceBenchmark::new();
+        let vram = model_bench.estimate_context_window_vram("Sigma-SLM-3B", 8192);
+        assert_eq!(vram, Some(2048 + 1024));
+
+        let tp = model_bench.measure_quantization_throughput("Sigma-SLM-3B");
+        assert!(tp.unwrap() > 142.5);
+    }
+
+    #[test]
     fn test_zero_trust_sandbox_and_governance() {
         let zero_trust = ZeroTrustSecuritySandbox::new();
         assert!(zero_trust.verify_sandbox_policy("network_subsystem"));
@@ -527,6 +848,22 @@ mod tests {
 
         let gov = OpenSourceGovernanceEngine::new();
         assert!(gov.audit_license_compliance());
+    }
+
+    #[test]
+    fn test_zero_trust_and_companion_bridge() {
+        let mut zero_trust = ZeroTrustSecuritySandbox::new();
+        assert!(zero_trust.audit_firewall_rules());
+        assert!(zero_trust.enforce_strict_pledge_unveil("network_subsystem", "dns", "/etc/hosts"));
+
+        let gov = OpenSourceGovernanceEngine::new();
+        assert_eq!(gov.scan_sbom_vulnerabilities(), 0);
+
+        let mut bridge = CrossPlatformDeviceBridge::new();
+        bridge.sync_clipboard("Test Clipboard String");
+        bridge.mirror_notification("Low Battery Warning");
+        assert_eq!(bridge.shared_clipboard_text, "Test Clipboard String");
+        assert_eq!(bridge.synced_notifications.len(), 1);
     }
 
     #[test]
