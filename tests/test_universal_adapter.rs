@@ -47,6 +47,7 @@ fn test_universal_adapter_all_formats() {
         FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
         ZypperSpecManifest, SlackwarePkgManifest,
     };
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -99,7 +100,8 @@ fn test_universal_adapter_all_formats() {
 
 #[test]
 fn test_universal_adapter_extended_linux_bsd_formats() {
-    use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation, PackageFormat};
+    use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation};
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
