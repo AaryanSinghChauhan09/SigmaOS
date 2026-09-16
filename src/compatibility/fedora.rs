@@ -4769,8 +4769,8 @@ mod tests {
     #[test]
     fn test_fedora_toolbx_container() {
         let mut toolbx = FedoraToolbxContainerEngine::new();
-        let container_name = toolbx.create_toolbx("fedora-toolbox-39", "registry.fedoraproject.org/fedora-toolbox:39").unwrap();
-        assert_eq!(container_name, "fedora-toolbox-39");
+        let container = toolbx.create_toolbx("fedora-toolbox-39", "registry.fedoraproject.org/fedora-toolbox:39");
+        assert_eq!(container.name, "fedora-toolbox-39");
 
         assert!(toolbx.add_host_mount("fedora-toolbox-39", "/home/sovereign"));
         let output = toolbx.run_command("fedora-toolbox-39", "dnf install -y gcc").unwrap();
