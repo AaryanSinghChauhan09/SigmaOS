@@ -387,7 +387,7 @@ impl ServiceManager {
         let file_path = format!("{}/{}", self.service_dir, format!("{}.service", name));
 
         if let Some(parent) = None::<&str> {
-            fs::create_dir_all(parent).map_err(|e| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
+            fs::create_dir_all(parent).map_err(|e: std::io::Error| ConfigError::WriteError(parent.to_string(), e.to_string()))?;
         }
 
         fs::write(&file_path, service.to_unit_file())

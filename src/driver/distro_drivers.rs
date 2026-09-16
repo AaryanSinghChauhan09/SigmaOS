@@ -912,6 +912,155 @@ impl XhciHostControllerDriver {
     }
 }
 
+// ============================================================================
+// 14. FreeBSD GEOM Storage Provider & Consumer Driver
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeomClassType {
+    Disk,
+    Mirror,
+    Stripe,
+    Eli,
+}
+
+pub struct GeomDiskProvider {
+    pub name: String,
+    pub class_type: GeomClassType,
+    pub sector_size: u32,
+    pub total_sectors: u64,
+    pub consumers: Vec<String>,
+}
+
+impl GeomDiskProvider {
+    pub fn new(name: &str, class_type: GeomClassType, sector_size: u32, total_sectors: u64) -> Self {
+        Self {
+            name: name.to_string(),
+            class_type,
+            sector_size,
+            total_sectors,
+            consumers: Vec::new(),
+        }
+    }
+
+    pub fn attach_consumer(&mut self, consumer_name: &str) {
+        self.consumers.push(consumer_name.to_string());
+    }
+
+    pub fn capacity_bytes(&self) -> u64 {
+        (self.sector_size as u64) * self.total_sectors
+    }
+}
+
+// ============================================================================
+// 15. FreeBSD CAM SCSI Target Subsystem Driver
+// ============================================================================
+
+pub struct CamScsiTarget {
+    pub bus_id: u32,
+    pub target_id: u32,
+    pub vendor: String,
+    pub model: String,
+    pub commands_processed: u64,
+}
+
+impl CamScsiTarget {
+    pub fn new(bus_id: u32, target_id: u32, vendor: &str, model: &str) -> Self {
+        Self {
+            bus_id,
+            target_id,
+            vendor: vendor.to_string(),
+            model: model.to_string(),
+            commands_processed: 0,
+        }
+    }
+
+    pub fn dispatch_cdb(&mut self, cdb: &[u8]) -> Result<usize, &'static str> {
+        if cdb.is_empty() {
+            return Err("Empty SCSI CDB packet");
+        }
+        self.commands_processed += 1;
+        Ok(36) // Return mock 36-byte INQUIRY payload length
+    }
+}
+
+// ============================================================================
+// 16. Linux eBPF XDP Driver Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum XdpAction {
+    XdpPass,
+    XdpDrop,
+    XdpTx,
+    XdpRedirect,
+}
+
+pub struct XdpDriverEngine {
+    pub redirected_packets: u64,
+}
+
+impl XdpDriverEngine {
+    pub fn new() -> Self {
+        Self { redirected_packets: 0 }
+    }
+
+    pub fn process_rx_frame(&mut self, frame: &[u8]) -> XdpAction {
+        if frame.len() >= 14 && frame[12] == 0x88 && frame[13] == 0xF7 {
+            self.redirected_packets += 1;
+            XdpAction::XdpRedirect
+        } else {
+            XdpAction::XdpPass
+        }
+    }
+}
+
+impl Default for XdpDriverEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 17. OpenBSD Driver Sandbox Guard (Landlock/Pledge Parity)
+// ============================================================================
+
+pub struct BsdDriverSandboxGuard {
+    pub driver_name: String,
+    pub mmio_start: u64,
+    pub mmio_end: u64,
+    pub allowed_irqs: Vec<u32>,
+    pub is_sandboxed: bool,
+}
+
+impl BsdDriverSandboxGuard {
+    pub fn new(driver_name: &str, start: u64, end: u64, irqs: &[u32]) -> Self {
+        Self {
+            driver_name: driver_name.to_string(),
+            mmio_start: start,
+            mmio_end: end,
+            allowed_irqs: irqs.to_vec(),
+            is_sandboxed: false,
+        }
+    }
+
+    pub fn pledge_sandbox(&mut self) {
+        self.is_sandboxed = true;
+    }
+
+    pub fn validate_access(&self, addr: u64, irq: Option<u32>) -> bool {
+        if addr < self.mmio_start || addr > self.mmio_end {
+            return false;
+        }
+        if let Some(irq_num) = irq {
+            if !self.allowed_irqs.contains(&irq_num) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

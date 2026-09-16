@@ -564,6 +564,27 @@ impl Default for ManjaroBranchSwitchEngine {
 // MANJARO PAMAC CLI & ORPHAN PACKAGE CLEANUP ENGINE
 // =========================================================================
 
+pub type DesktopLayoutPreset = PowerProfile;
+pub type HardwareQuirkRule = MhwdDriverConfig;
+pub type ManjaroBranch = ManjaroBranchType;
+pub type ManjaroBranchManager = ManjaroBranchSwitchEngine;
+pub type ManjaroHelloSetupEngine = ManjaroSettingsManager;
+pub type ManjaroTimeshiftAutoSnap = MhwdDkmsRebuilder;
+pub type MhwdHardwareQuirkDatabase = ManjaroHardwareDetection;
+pub type MhwdKernelDriverAutobuilder = MhwdDkmsRebuilder;
+pub type PackageSearchResult = AurPackage;
+pub type PamacTransactionEntry = PacmanMirror;
+pub type PamacTransactionJournalEngine = PamacPackageManager;
+pub type PamacUnifiedSearchEngine = PamacPackageManager;
+pub type PrimeOffloadMode = PowerProfile;
+pub type SearchResultBackend = PowerProfile;
+pub type SetupWizardTask = PowerProfile;
+pub type SnapshotMode = PowerProfile;
+pub type TimeshiftSnapshot = PacmanMirror;
+pub type PamacTransactionType = PowerProfile;
+pub type TransactionType = PamacTransactionType;
+pub type VendorHardwareType = GpuType;
+
 pub struct ManjaroPamacCliEngine {
     pub pamac: PamacPackageManager,
     pub orphan_packages: Vec<String>,

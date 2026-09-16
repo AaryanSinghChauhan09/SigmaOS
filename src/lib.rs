@@ -3,6 +3,8 @@
 
 extern crate alloc;
 
+extern crate alloc;
+
 // Core working modules
 pub mod accessibility;
 pub mod ai;
