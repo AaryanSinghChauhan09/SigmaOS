@@ -89,6 +89,12 @@ pub use crate::sigpkg::Version;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::sigpkg::universal_engine::PackageFormat;
 
+#[cfg(feature = "standalone_test")]
+pub use crate::universal_oop_system;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::sigpkg::universal_oop_system;
+
 #[cfg(any(feature = "standalone_test", test))]
 pub use crate::universal_engine::PackageFormat;
 
@@ -2319,12 +2325,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_add" | "pkg_info" => {
-                if pm == "pkg_add" {
-                    operation = UniversalPmOperation::Install;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
+            "pkg_info" => {
+                operation = UniversalPmOperation::QueryInfo;
                 for arg in args {
                     if *arg == "-n" {
                         dry_run = true;

@@ -46,7 +46,15 @@ pub mod store;
 pub mod universal;
 pub mod updater;
 pub mod universal_package_innovations_suite;
-pub use universal_package_innovations_suite::*;
+pub use universal_package_innovations_suite::{
+    AlpineLbuOverlayStateGovernor, AppStreamCatalogEntry, ArchPacstrapSeederEngine,
+    BinaryMitigationProfile, BrokenSharedLibraryRequirement, DebianAppStreamCatalogEngine,
+    DebianAptFastMirrorRanker, DnfGpgKeyRecord, FedoraDnfGpgKeyRotationEngine,
+    FedoraDnfGroupInstallSolver, FreeBsdPkgBaseRootfsEngine, GentooEcleanRevdepRebuildEngine,
+    HardenedBsdBinaryMitigationAuditorEngine, LbuSavedFileRecord, NixStorePathVerifyEngine,
+    OpenBsdPkgUpgradeRelinkerEngine, PacstrapPackageGroup, SharedLibMajorMinor,
+    StaleDistfileRecord, StorePathIntegrityRecord,
+};
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};

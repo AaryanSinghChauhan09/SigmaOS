@@ -134,6 +134,14 @@ impl RunitSupervisor {
         self.services.insert(service.name.clone(), service);
     }
 
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.start()
+        } else {
+            false
+        }
+    }
+
     /// Start stage 1 (one-time initialization)
     pub fn run_stage1(&mut self) {
         self.stage = RunitStage::Stage1;

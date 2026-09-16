@@ -1,5 +1,6 @@
 // Standalone Test Runner for SigmaOS Universal Package Format Adapter
 extern crate alloc;
+extern crate core;
 
 pub mod klib {
     pub mod collections {
@@ -27,89 +28,13 @@ pub mod universal_oop_system;
 pub mod universal_adapter;
 
 pub mod sigpkg {
-    use alloc::string::String;
-    use alloc::vec::Vec;
-
     pub use crate::security;
     pub use crate::universal_adapter;
     pub use crate::universal_engine;
     pub use crate::universal_oop_system;
     pub use crate::universal_engine::PackageFormat;
 
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    pub struct Version {
-        pub major: u64,
-        pub minor: u64,
-        pub patch: u64,
-    }
-
-    impl Version {
-        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-            Self { major, minor, patch }
-        }
-
-        pub fn parse(version_str: &str) -> Result<Self, &'static str> {
-            let clean = version_str.split('-').next().unwrap_or(version_str);
-            let mut parts = clean.split('.');
-
-            let major_str = parts.next().unwrap_or("0");
-            let minor_str = parts.next().unwrap_or("0");
-            let patch_str = parts.next().unwrap_or("0");
-
-            let major_clean: String = major_str.chars().filter(|c| c.is_ascii_digit()).collect();
-            let minor_clean: String = minor_str.chars().filter(|c| c.is_ascii_digit()).collect();
-            let patch_clean: String = patch_str.chars().filter(|c| c.is_ascii_digit()).collect();
-
-            let major = if major_clean.is_empty() { 0 } else { major_clean.parse::<u64>().unwrap_or(0) };
-            let minor = if minor_clean.is_empty() { 0 } else { minor_clean.parse::<u64>().unwrap_or(0) };
-            let patch = if patch_clean.is_empty() { 0 } else { patch_clean.parse::<u64>().unwrap_or(0) };
-
-            Ok(Version::new(major, minor, patch))
-        }
-    }
-
-    #[derive(Debug, Clone)]
-    pub struct Package {
-        pub name: String,
-        pub version: Version,
-        pub description: String,
-        pub dependencies: Vec<Dependency>,
-        pub checksum: String,
-    }
-
-    impl Package {
-        pub fn new(
-            name: String,
-            version: Version,
-            description: String,
-            dependencies: Vec<Dependency>,
-            checksum: String,
-        ) -> Self {
-            Self {
-                name,
-                version,
-                description,
-                dependencies,
-                checksum,
-            }
-        }
-    }
-
-    #[derive(Debug, Clone)]
-    pub struct Dependency {
-        pub name: String,
-        pub version_constraint: VersionConstraint,
-    }
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-    pub enum VersionConstraint {
-        Exact(Version),
-        GreaterThan(Version),
-        LessThan(Version),
-        GreaterOrEqual(Version),
-        LessOrEqual(Version),
-        Any,
-    }
+    pub use crate::universal_oop_system::{Dependency, Package, Version, VersionConstraint};
 }
 
 #[test]
