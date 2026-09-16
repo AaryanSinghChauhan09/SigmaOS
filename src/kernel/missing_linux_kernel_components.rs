@@ -658,4 +658,37 @@ mod extended_kernel_tests {
         assert_eq!(seccomp.evaluate_syscall(1), SeccompAction::Allow);
         assert_eq!(seccomp.evaluate_syscall(2), SeccompAction::KillProcess);
     }
+
+    #[test]
+    fn test_landlock_binder_zswap_overlay_memfd_engines() {
+        // 1. Landlock
+        let mut landlock = LinuxLandlockV5AccessEngine::new();
+        landlock.add_path_rule("/usr/bin", 0x1);
+        landlock.restrict_self().unwrap();
+        assert!(landlock.check_path_access("/usr/bin/cargo", 0x1));
+        assert!(!landlock.check_path_access("/etc/shadow", 0x1));
+
+        // 2. Binder
+        let mut binder = LinuxBinderIpcEngine::new();
+        binder.register_binder_node(1, "surfaceflinger");
+        let tx_id = binder.send_transaction(100, 1, 10, b"DRAW_FRAME").unwrap();
+        assert_eq!(tx_id, 1);
+
+        // 3. Zswap
+        let mut zswap = LinuxZswapCompressedStorageEngine::new();
+        let dummy_page = [0x41u8; 4096];
+        let comp_sz = zswap.compress_and_store_page(0, &dummy_page);
+        assert!(comp_sz < 4096);
+        assert!(zswap.compression_ratio() > 10.0);
+
+        // 4. OverlayFS
+        let mut overlay = LinuxOverlayfsMountEngine::new();
+        overlay.mount_overlay(&["/lower1", "/lower2"], "/upper", "/work");
+        assert_eq!(overlay.resolve_path("etc/nginx.conf"), "/upper/etc/nginx.conf");
+
+        // 5. MemfdSecret
+        let mut memfd = LinuxMemfdSecretEngine::new();
+        let secret_fd = memfd.create_secret_memfd(4096).unwrap();
+        assert_eq!(secret_fd, 100);
+    }
 }

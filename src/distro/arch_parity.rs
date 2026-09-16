@@ -163,6 +163,20 @@ impl PkgBuild {
     }
 }
 
+fn parse_bash_array(line: &str) -> Vec<String> {
+    if let Some(start) = line.find('(') {
+        if let Some(end) = line.rfind(')') {
+            let inner = &line[start + 1..end];
+            return inner
+                .split_whitespace()
+                .map(|s| s.trim_matches('\'').trim_matches('"').to_string())
+                .filter(|s| !s.is_empty())
+                .collect();
+        }
+    }
+    Vec::new()
+}
+
 impl Default for PkgBuild {
     fn default() -> Self {
         Self::new()
@@ -668,8 +682,7 @@ impl ReflectorMirrorlistRanker {
         Self { mirrors }
     }
 
-    pub fn rank_top_mirrors(&mut self) -> &[ (String, u32) ] {
-        // Sort by lowest latency
+    pub fn rank_top_mirrors(&mut self) -> &[(String, u32)] {
         self.mirrors.sort_by(|a, b| a.1.cmp(&b.1));
         &self.mirrors
     }
@@ -784,7 +797,10 @@ impl ArchCdevtoolsEngine {
 
     pub fn build_in_chroot(&self, target: &str, pkg_name: &str) -> Result<String, &'static str> {
         if let Some(prof) = self.profiles.iter().find(|p| p.target == target) {
-            Ok(format!("arch-nspawn {}/root pacman -Syu && build {}", prof.chroot_dir, pkg_name))
+            Ok(format!(
+                "arch-nspawn {}/root pacman -Syu && build {}",
+                prof.chroot_dir, pkg_name
+            ))
         } else {
             Err("ArchCdevtoolsEngine: Unknown build target profile")
         }
@@ -796,15 +812,22 @@ impl ArchCdevtoolsEngine {
 #[derive(Debug, Clone)]
 pub struct ArchPkgctlEngine {
     pub active_repos: Vec<String>,
+    pub repo_name: String,
 }
 
 impl ArchPkgctlEngine {
-    pub fn new() -> Self {
-        Self { active_repos: Vec::new() }
+    pub fn new(repo_name: &str) -> Self {
+        Self {
+            active_repos: Vec::new(),
+            repo_name: repo_name.to_string(),
+        }
     }
 
     pub fn clone_pkg_repo(&mut self, pkg_name: &str) -> String {
-        let repo = format!("https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git", pkg_name);
+        let repo = format!(
+            "https://gitlab.archlinux.org/archlinux/packaging/packages/{}.git",
+            pkg_name
+        );
         self.active_repos.push(pkg_name.to_string());
         repo
     }
@@ -838,14 +861,45 @@ pub struct ArchArchwebEngine {
 
 impl ArchArchwebEngine {
     pub fn new() -> Self {
-        let mut engine = Self { entries: Vec::new() };
-        engine.entries.push(ArchwebEntry { pkgname: "linux".to_string(), repo: "core".to_string(), maintainer: "arch-kernel".to_string() });
-        engine.entries.push(ArchwebEntry { pkgname: "pacman".to_string(), repo: "core".to_string(), maintainer: "arch-pacman".to_string() });
+        let mut engine = Self {
+            entries: Vec::new(),
+        };
+        engine.entries.push(ArchwebEntry {
+            pkgname: "linux".to_string(),
+            repo: "core".to_string(),
+            maintainer: "arch-kernel".to_string(),
+        });
+        engine.entries.push(ArchwebEntry {
+            pkgname: "pacman".to_string(),
+            repo: "core".to_string(),
+            maintainer: "arch-pacman".to_string(),
+        });
+        engine.entries.push(ArchwebEntry {
+            pkgname: "glibc".to_string(),
+            repo: "core".to_string(),
+            maintainer: "arch-core".to_string(),
+        });
+        engine.entries.push(ArchwebEntry {
+            pkgname: "systemd".to_string(),
+            repo: "core".to_string(),
+            maintainer: "arch-core".to_string(),
+        });
         engine
     }
 
     pub fn search(&self, pkg_name: &str) -> Vec<&ArchwebEntry> {
-        self.entries.iter().filter(|e| e.pkgname.contains(pkg_name)).collect()
+        self.entries
+            .iter()
+            .filter(|e| e.pkgname.contains(pkg_name))
+            .collect()
+    }
+
+    pub fn query_package(&self, pkg_name: &str) -> Option<String> {
+        if self.entries.iter().any(|e| e.pkgname == pkg_name) {
+            Some(format!("Core Repository / {}", pkg_name))
+        } else {
+            None
+        }
     }
 
     pub fn query_package(&self, pkg_name: &str) -> Option<String> {
@@ -876,8 +930,14 @@ pub struct ArchArchinstallEngine {
 }
 
 impl ArchArchinstallEngine {
-    pub fn new() -> Self {
-        Self { config: None }
+    pub fn new(disk: &str, filesystem: &str) -> Self {
+        Self {
+            config: Some(ArchinstallConfig {
+                disk_path: disk.to_string(),
+                profile: filesystem.to_string(),
+                username: "root".to_string(),
+            }),
+        }
     }
 
     pub fn set_config(&mut self, disk: &str, profile: &str, user: &str) {
@@ -890,7 +950,10 @@ impl ArchArchinstallEngine {
 
     pub fn execute_installation(&self) -> Result<String, &'static str> {
         if let Some(cfg) = &self.config {
-            Ok(format!("archinstall --disk {} --profile {} --user {}", cfg.disk_path, cfg.profile, cfg.username))
+            Ok(format!(
+                "archinstall --disk {} --profile {} --user {}",
+                cfg.disk_path, cfg.profile, cfg.username
+            ))
         } else {
             Err("Archinstall: Missing configuration")
         }
@@ -920,15 +983,34 @@ pub struct ArchWikiOfflineEngine {
 
 impl ArchWikiOfflineEngine {
     pub fn new() -> Self {
-        let mut wiki = Self { articles: Vec::new() };
-        wiki.articles.push(WikiArticle { title: "Arch_Linux".to_string(), content: "Arch Linux is an x86-64 general-purpose Linux distribution.".to_string() });
-        wiki.articles.push(WikiArticle { title: "Pacman".to_string(), content: "Pacman is the package manager for Arch Linux.".to_string() });
+        let mut wiki = Self {
+            articles: Vec::new(),
+        };
+        wiki.articles.push(WikiArticle {
+            title: "Arch_Linux".to_string(),
+            content: "Arch Linux is an x86-64 general-purpose Linux distribution.".to_string(),
+        });
+        wiki.articles.push(WikiArticle {
+            title: "Pacman".to_string(),
+            content: "Pacman is the package manager for Arch Linux.".to_string(),
+        });
+        wiki.articles.push(WikiArticle {
+            title: "Systemd".to_string(),
+            content: "Systemd init system.".to_string(),
+        });
         wiki
     }
 
     pub fn search(&self, query: &str) -> Vec<&WikiArticle> {
         let q = query.to_lowercase();
-        self.articles.iter().filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q)).collect()
+        self.articles
+            .iter()
+            .filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q))
+            .collect()
+    }
+
+    pub fn search_offline_wiki(&self, query: &str) -> String {
+        format!("ArchWiki Offline Entry for {}", query)
     }
 
     pub fn search_offline_wiki(&self, query: &str) -> String {

@@ -1248,6 +1248,162 @@ impl Default for ArchWikiSearchEngine {
     }
 }
 
+// ══════════════════════════════════════════════════════
+// Sovereign Makepkg.conf Configuration Engine
+// ══════════════════════════════════════════════════════
+
+/// `/etc/makepkg.conf` configuration engine
+#[derive(Debug, Clone)]
+pub struct SovereignMakepkgConfEngine {
+    pub cflags: String,
+    pub cxxflags: String,
+    pub makeflags: String,
+    pub pkgext: String,
+    pub buildenv: Vec<String>,
+    pub integrity_checks: Vec<String>,
+}
+
+impl SovereignMakepkgConfEngine {
+    pub fn new_default() -> Self {
+        Self {
+            cflags: "-march=x86-64-v3 -O2 -pipe -fno-plt -fexceptions".to_string(),
+            cxxflags: "-march=x86-64-v3 -O2 -pipe -fno-plt -fexceptions".to_string(),
+            makeflags: "-j16".to_string(),
+            pkgext: ".pkg.tar.zst".to_string(),
+            buildenv: vec!["!distcc".to_string(), "color".to_string(), "!ccache".to_string(), "check".to_string(), "sign".to_string()],
+            integrity_checks: vec!["sha256".to_string()],
+        }
+    }
+
+    pub fn parse_conf(content: &str) -> Self {
+        let mut engine = Self::new_default();
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("CFLAGS=") {
+                engine.cflags = val.trim_matches('"').trim_matches('\'').to_string();
+            } else if let Some(val) = line.strip_prefix("CXXFLAGS=") {
+                engine.cxxflags = val.trim_matches('"').trim_matches('\'').to_string();
+            } else if let Some(val) = line.strip_prefix("MAKEFLAGS=") {
+                engine.makeflags = val.trim_matches('"').trim_matches('\'').to_string();
+            } else if let Some(val) = line.strip_prefix("PKGEXT=") {
+                engine.pkgext = val.trim_matches('"').trim_matches('\'').to_string();
+            }
+        }
+        engine
+    }
+
+    pub fn validate_optimization(&self) -> bool {
+        self.cflags.contains("-O2") || self.cflags.contains("-O3") || self.cflags.contains("-march=")
+    }
+}
+
+// ══════════════════════════════════════════════════════
+// Sovereign Pacman.conf Configuration Engine
+// ══════════════════════════════════════════════════════
+
+/// `/etc/pacman.conf` configuration engine
+#[derive(Debug, Clone)]
+pub struct SovereignPacmanConfEngine {
+    pub sig_level: String,
+    pub local_file_sig_level: String,
+    pub hold_pkg: Vec<String>,
+    pub repositories: Vec<String>,
+    pub parallel_downloads: u32,
+}
+
+impl SovereignPacmanConfEngine {
+    pub fn new() -> Self {
+        Self {
+            sig_level: "Required DatabaseOptional".to_string(),
+            local_file_sig_level: "Optional".to_string(),
+            hold_pkg: vec!["pacman".to_string(), "glibc".to_string()],
+            repositories: vec!["core".to_string(), "extra".to_string(), "multilib".to_string()],
+            parallel_downloads: 5,
+        }
+    }
+
+    pub fn parse_pacman_conf(content: &str) -> Self {
+        let mut engine = Self::new();
+        for line in content.lines() {
+            let line = line.trim();
+            if let Some(val) = line.strip_prefix("SigLevel = ") {
+                engine.sig_level = val.to_string();
+            } else if let Some(val) = line.strip_prefix("ParallelDownloads = ") {
+                if let Ok(n) = val.parse::<u32>() {
+                    engine.parallel_downloads = n;
+                }
+            } else if line.starts_with('[') && line.ends_with(']') {
+                let repo = line.trim_matches('[').trim_matches(']').to_string();
+                if repo != "options" && !engine.repositories.contains(&repo) {
+                    engine.repositories.push(repo);
+                }
+            }
+        }
+        engine
+    }
+}
+
+// ══════════════════════════════════════════════════════
+// Sovereign Arch-Chroot VFS Engine
+// ══════════════════════════════════════════════════════
+
+/// `arch-chroot` chroot VFS bind mount helper
+#[derive(Debug, Clone)]
+pub struct SovereignArchChrootVfsEngine {
+    pub chroot_dir: String,
+    pub bound_mounts: Vec<String>,
+}
+
+impl SovereignArchChrootVfsEngine {
+    pub fn new(chroot_dir: &str) -> Self {
+        Self {
+            chroot_dir: chroot_dir.to_string(),
+            bound_mounts: Vec::new(),
+        }
+    }
+
+    pub fn prepare_system_vfs(&mut self) -> Vec<String> {
+        let mounts = vec![
+            format!("{}/dev", self.chroot_dir),
+            format!("{}/proc", self.chroot_dir),
+            format!("{}/sys", self.chroot_dir),
+            format!("{}/run", self.chroot_dir),
+        ];
+        self.bound_mounts = mounts.clone();
+        mounts
+    }
+
+    pub fn generate_chroot_command(&self, cmd: &str) -> String {
+        format!("arch-chroot {} {}", self.chroot_dir, cmd)
+    }
+}
+
+// ══════════════════════════════════════════════════════
+// Sovereign Svntogit Repository Migration Engine
+// ══════════════════════════════════════════════════════
+
+/// SVN-to-Git (`archco`, `communityco`, `commitpkg`, `archrelease`) repo migration helper
+#[derive(Debug, Clone)]
+pub struct SovereignSvntogitEngine {
+    pub pkg_repo_url: String,
+    pub migrated_packages: Vec<String>,
+}
+
+impl SovereignSvntogitEngine {
+    pub fn new() -> Self {
+        Self {
+            pkg_repo_url: "https://gitlab.archlinux.org/archlinux/packaging/packages/".to_string(),
+            migrated_packages: Vec::new(),
+        }
+    }
+
+    pub fn convert_svn_repo_to_git(&mut self, pkg_name: &str) -> String {
+        let url = format!("{}{}.git", self.pkg_repo_url, pkg_name);
+        self.migrated_packages.push(pkg_name.to_string());
+        url
+    }
+}
+
 // ==========================================
 // 16. Integration Tests Module
 // ==========================================
@@ -1255,6 +1411,37 @@ impl Default for ArchWikiSearchEngine {
 #[cfg(any(feature = "standalone_test", test))]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_sovereign_makepkg_conf_engine() {
+        let conf = SovereignMakepkgConfEngine::parse_conf("CFLAGS=\"-march=x86-64-v3 -O3 -pipe\"\nMAKEFLAGS=\"-j8\"\nPKGEXT=\".pkg.tar.zst\"");
+        assert!(conf.validate_optimization());
+        assert_eq!(conf.makeflags, "-j8");
+        assert_eq!(conf.pkgext, ".pkg.tar.zst");
+    }
+
+    #[test]
+    fn test_sovereign_pacman_conf_engine() {
+        let conf = SovereignPacmanConfEngine::parse_pacman_conf("[options]\nSigLevel = Required\nParallelDownloads = 10\n[core]\n[extra]\n[multilib]\n[custom]");
+        assert_eq!(conf.parallel_downloads, 10);
+        assert!(conf.repositories.contains(&"custom".to_string()));
+    }
+
+    #[test]
+    fn test_sovereign_arch_chroot_vfs_engine() {
+        let mut chroot = SovereignArchChrootVfsEngine::new("/mnt/target");
+        let mounts = chroot.prepare_system_vfs();
+        assert_eq!(mounts.len(), 4);
+        assert_eq!(chroot.generate_chroot_command("pacman -Syu"), "arch-chroot /mnt/target pacman -Syu");
+    }
+
+    #[test]
+    fn test_sovereign_svntogit_engine() {
+        let mut svn = SovereignSvntogitEngine::new();
+        let url = svn.convert_svn_repo_to_git("linux");
+        assert!(url.contains("gitlab.archlinux.org"));
+        assert_eq!(svn.migrated_packages.len(), 1);
+    }
 
     #[test]
     fn test_virtual_filesystems() {
