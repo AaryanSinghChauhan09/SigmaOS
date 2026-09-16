@@ -7,6 +7,7 @@ use std::vec::Vec;
 
 const BASE64_CHARS: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+#[inline(always)]
 fn char_to_val(c: u8) -> Option<u8> {
     match c {
         b'A'..=b'Z' => Some(c - b'A'),
@@ -77,17 +78,14 @@ pub fn decode(input: &str) -> Result<Vec<u8>, &'static str> {
         }
 
         let a = char_to_val(chunk[0]).ok_or("Invalid base64 character")?;
-        let b = if chunk.len() > 1 {
-            char_to_val(chunk[1]).ok_or("Invalid base64 character")?
-        } else {
-            return Err("Truncated base64 input");
-        };
-        let c = if chunk.len() > 2 && chunk[2] != b'=' {
+        let b = char_to_val(chunk[1]).ok_or("Invalid base64 character")?;
+
+        let c = if chunk[2] != b'=' {
             char_to_val(chunk[2]).ok_or("Invalid base64 character")?
         } else {
             0
         };
-        let d = if chunk.len() > 3 && chunk[3] != b'=' {
+        let d = if chunk[3] != b'=' {
             char_to_val(chunk[3]).ok_or("Invalid base64 character")?
         } else {
             0
@@ -95,11 +93,11 @@ pub fn decode(input: &str) -> Result<Vec<u8>, &'static str> {
 
         result.push((a << 2) | (b >> 4));
 
-        if chunk.len() > 2 && chunk[2] != b'=' {
+        if chunk[2] != b'=' {
             result.push(((b & 0x0F) << 4) | (c >> 2));
         }
 
-        if chunk.len() > 3 && chunk[3] != b'=' {
+        if chunk[3] != b'=' {
             result.push(((c & 0x03) << 6) | d);
         }
     }

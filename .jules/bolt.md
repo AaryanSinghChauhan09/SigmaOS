@@ -1,3 +1,7 @@
+## 2026-09-14 - Pre-allocating Vector Capacity & Eliminating Heap Copies in Base64 Codec
+**Learning:** In string/byte codec processing (like Base64 `encode`/`decode`), calling `input.bytes().collect::<Vec<u8>>()` forces an unnecessary $O(N)$ heap vector allocation before chunk iteration. Pre-calculating exact target capacity (`Vec::with_capacity(capacity)`) and directly chunking borrowed byte slices (`input.as_bytes().chunks(4)`) eliminates all intermediate allocations and prevents capacity reallocation overhead during encoding and decoding.
+**Action:** When implementing codecs or byte formatters, operate directly on borrowed byte slices (`as_bytes()`) and pre-allocate target buffer capacities before loop iterations.
+
 ## 2025-03-02 - Bulk Memory Operations for `SigmaVec` and `SigmaString`
 **Learning:** In standard `no_std` kernel/klib data structures, looping over slice elements using `push` incurs repetitive capacity bounds checks and reallocations. Replacing element-by-element iteration with `reserve(other.len())` followed by `core::ptr::copy_nonoverlapping` turns slice extension into an O(1) bulk SIMD/memcpy operation. Additionally, chaining `trim_start().trim_end()` allocates intermediate string buffers; calculating start/end indices in a single pass eliminates redundant heap allocations.
 **Action:** When working with custom vector or string abstractions in `klib`, always prefer single-pass boundary calculations and bulk `extend_from_slice` memory copies over element-by-element loops.
