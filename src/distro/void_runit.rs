@@ -183,7 +183,6 @@ impl RunitSupervisor {
     pub fn run_stage2(&mut self) {
         self.stage = Some(RunitStage::Stage2);
         self.current_stage_num = 2;
-        println!("Running Stage 2: Concurrent process supervision");
 
         let mut started = Vec::new();
         let names: Vec<String> = self.services.keys().cloned().collect();
@@ -201,7 +200,6 @@ impl RunitSupervisor {
     pub fn run_stage3(&mut self) {
         self.stage = Some(RunitStage::Stage3);
         self.current_stage_num = 3;
-        println!("Running Stage 3: Clean system shutdown");
 
         let mut stopped = Vec::new();
         let names: Vec<String> = self.services.keys().cloned().collect();
@@ -213,8 +211,6 @@ impl RunitSupervisor {
                 }
             }
         }
-
-        println!("Unmounting filesystems");
     }
 
     /// Check if service can start (dependencies satisfied)

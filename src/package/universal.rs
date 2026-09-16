@@ -467,7 +467,7 @@ pub struct CustomPackageHook {
 }
 
 impl CustomPackageHook {
-    pub fn new<F>(name: &str, timing: HookTiming, handler: F) -> Self
+    pub fn new<F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static>(name: &str, timing: HookTiming, handler: F) -> Self
     where
         F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
     {

@@ -468,12 +468,12 @@ impl VirtualFileSystem {
 
     pub fn close(&mut self, fd: i32) -> Result<(), VfsError> { self.close_file(fd as u64).map_err(|_| VfsError::NotFound) }
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
-        if !self.file_descriptors.contains_key(&fd) {
-            return Err(FsError::InvalidFd);
+        if let Some(pos) = self.open_files.iter().position(|fh| fh.fd == (fd as i32)) {
+            self.open_files.remove(pos);
+            Ok(())
+        } else {
+            Err(FsError::InvalidFd)
         }
-
-        self.file_descriptors.remove(&fd);
-        Ok(())
     }
 
     pub fn close(&mut self, fd: i32) -> Result<(), FsError> {
@@ -482,13 +482,14 @@ impl VirtualFileSystem {
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
         let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+            .open_files
+            .iter_mut()
+            .find(|fh| fh.fd == (fd as i32))
             .ok_or(FsError::InvalidFd)?;
 
         let inode = self
             .inodes
-            .get(&file_descriptor.inode_id)
+            .get(&file_descriptor.inode_number)
             .ok_or(FsError::NotFound)?;
 
         // Check read permission
@@ -501,33 +502,29 @@ impl VirtualFileSystem {
             return Ok(0);
         }
 
-        let remaining = (inode.size - file_descriptor.offset) as usize;
+        let remaining = (inode.size - file_descriptor.position) as usize;
         let bytes_to_read = buffer.len().min(remaining);
 
-        // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
-            .offset
-            .checked_add(bytes_to_read as u64)
-            .ok_or(FsError::InvalidFd)?;
-
-        // Read the actual bytes from storage data
-        let start = file_descriptor.offset as usize;
+        let start = file_descriptor.position as usize;
         let end = start + bytes_to_read;
-        buffer[..bytes_to_read].copy_from_slice(&inode.data[start..end]);
+        if end <= inode.data.len() {
+            buffer[..bytes_to_read].copy_from_slice(&inode.data[start..end]);
+        }
 
-        file_descriptor.offset += bytes_to_read as u64;
+        file_descriptor.position += bytes_to_read as u64;
         Ok(bytes_to_read)
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
         let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+            .open_files
+            .iter_mut()
+            .find(|fh| fh.fd == (fd as i32))
             .ok_or(FsError::InvalidFd)?;
 
         let inode = self
             .inodes
-            .get_mut(&file_descriptor.inode_id)
+            .get_mut(&file_descriptor.inode_number)
             .ok_or(FsError::NotFound)?;
 
         // Check write permission
@@ -913,7 +910,7 @@ mod tests {
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
         // Re-open file to reset offset to 0 for reading
-        let read_fd = vfs.open_file(inode_id, 0).unwrap();
+        let read_fd = vfs.open_file(inode_inode_number: id, 0).unwrap();
 
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
         assert_eq!(
@@ -933,10 +930,10 @@ mod tests {
 
         // 1. Create a regular file with extended attribute (user.mime_type = "text/plain")
         let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
-        vfs.set_xattr(inode_id, "user.mime_type", b"text/plain")
+        vfs.set_xattr(inode_inode_number: id, "user.mime_type", b"text/plain")
             .unwrap();
         assert_eq!(
-            vfs.get_xattr(inode_id, "user.mime_type").unwrap(),
+            vfs.get_xattr(inode_inode_number: id, "user.mime_type").unwrap(),
             b"text/plain"
         );
 

@@ -22,6 +22,16 @@ pub struct AptDebManifest {
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::sigpkg::Version;
 
+/// Description of Debian / APT Control Manifest (.deb / dpkg parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub depends: Vec<String>,
+    pub description: String,
+    pub priority: PackagePriority,
+}
+
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ArchPkgInfoManifest {

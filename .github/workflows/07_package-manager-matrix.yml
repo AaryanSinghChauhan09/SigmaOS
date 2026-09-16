@@ -80,7 +80,7 @@ jobs:
           - pm: zypper
             distro: opensuse
             container: opensuse/leap:latest
-            install-cmd: "zypper install -y"
+            install-cmd: "zypper refresh && zypper install -y"
             deps: "gcc rust cargo"
             create-cmd: "rpmbuild -ta /tmp/sigmaos.tar.gz"
             verify-cmd: "rpm -K /tmp/sigmaos.rpm"
@@ -98,7 +98,7 @@ jobs:
           - pm: nix
             distro: nixos
             container: nixos/nix:latest
-            install-cmd: "nix-env -i"
+            install-cmd: "nix-env -iA nixpkgs."
             deps: "rustup gcc"
             create-cmd: "nix build .#sigmaos"
             verify-cmd: "nix-store -q --outputs /nix/store/*sigmaos*"

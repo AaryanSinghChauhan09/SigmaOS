@@ -8,6 +8,7 @@ use std::vec;
 /// Installer Screen / Calamares Module Sequence
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstallerScreen {
+    CompleteOnboarding,
     Welcome,
     Language,
     Location,
