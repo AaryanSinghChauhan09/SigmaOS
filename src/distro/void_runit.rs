@@ -44,6 +44,20 @@ impl Default for RunitStage {
     }
 }
 
+/// Runit Stage
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1,
+    Stage2,
+    Stage3,
+}
+
+impl Default for RunitStage {
+    fn default() -> Self {
+        Self::Stage1
+    }
+}
+
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum RunitServiceStatus {
