@@ -174,7 +174,6 @@ impl RunitSupervisor {
         self.current_stage_num = 1;
         println!("Running Stage 1: One-time system initialization");
 
-        // Run one-time initialization tasks
         println!("Mounting virtual filesystems");
         println!("Setting hostname");
         println!("Initializing devices");
@@ -186,9 +185,7 @@ impl RunitSupervisor {
         self.current_stage_num = 2;
         println!("Running Stage 2: Concurrent process supervision");
 
-        // Start all services respecting dependencies
         let mut started = Vec::new();
-
         let names: Vec<String> = self.services.keys().cloned().collect();
         for name in names {
             if self.can_start_service(&name, &started) {
@@ -206,9 +203,7 @@ impl RunitSupervisor {
         self.current_stage_num = 3;
         println!("Running Stage 3: Clean system shutdown");
 
-        // Stop all services in reverse dependency order
         let mut stopped = Vec::new();
-
         let names: Vec<String> = self.services.keys().cloned().collect();
         for name in names {
             if self.can_stop_service(&name, &stopped) {

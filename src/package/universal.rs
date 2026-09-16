@@ -2304,6 +2304,7 @@ pub enum PackageError {
     _AdapterNotFound,
     InstallationFailed(String),
     _ConflictDetected(Vec<(String, String)>),
+    ValidationError(String),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
