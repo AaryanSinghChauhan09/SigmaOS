@@ -4661,7 +4661,7 @@ impl FedoraIrcotEngine {
         self.channels.push(IrcChannel { channel_name: name.to_string(), topic: topic.to_string() });
     }
 
-    pub fn broadcast_message(&self, message: &str) -> usize {
+    pub fn broadcast_message(&self, _message: &str) -> usize {
         self.channels.len()
     }
 }
@@ -4697,6 +4697,7 @@ impl FedoraElectionsEngine {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -4719,15 +4720,14 @@ mod tests {
     #[test]
     fn test_fedora_bodhi_update_triage() {
         let mut bodhi = BodhiUpdateTriage::new();
-        let update_id = bodhi.submit_update(
+        bodhi.create_update(
             "systemd-254.1-1.fc39",
-            "systemd",
-            "254.1-1.fc39",
+            vec!["systemd-254.1-1.fc39.rpm".to_string()],
             BodhiUpdateType::Bugfix,
             "sovereign",
             false,
         );
-        assert_eq!(bodhi.get_update(update_id).unwrap().title, "systemd-254.1-1.fc39");
+        assert_eq!(bodhi.updates.get("systemd-254.1-1.fc39").unwrap().update_id, "systemd-254.1-1.fc39");
     }
 
     #[test]

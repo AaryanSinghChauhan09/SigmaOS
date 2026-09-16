@@ -583,7 +583,7 @@ impl SovereignDynamicDevfsEngine {
     }
 
     pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        self.nodes.push(DeviceNodeEntry {
+        let entry = DeviceNodeEntry {
             name: name.to_string(),
             node_type,
             major,
@@ -592,7 +592,53 @@ impl SovereignDynamicDevfsEngine {
             group_gid: 0,
             mode_octal: 0o660,
             symlink_paths: Vec::new(),
-        });
+        };
+        self.nodes.push(entry.clone());
+        self.devices.push(entry);
+    }
+
+    pub fn create_node(
+        &mut self,
+        name: &str,
+        node_type: DeviceNodeType,
+        major: u32,
+        minor: u32,
+        owner_uid: u32,
+        group_gid: u32,
+        mode_octal: u16,
+    ) {
+        let entry = DeviceNodeEntry {
+            name: name.to_string(),
+            node_type,
+            major,
+            minor,
+            owner_uid,
+            group_gid,
+            mode_octal,
+            symlink_paths: Vec::new(),
+        };
+        self.nodes.push(entry.clone());
+        self.devices.push(entry);
+    }
+
+    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
+        let mut found = false;
+        if let Some(dev) = self.nodes.iter_mut().find(|d| d.name == dev_name) {
+            dev.symlink_paths.push(symlink.to_string());
+            found = true;
+        }
+        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
+            dev.symlink_paths.push(symlink.to_string());
+            found = true;
+        }
+        found
+    }
+
+    pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
+        self.devices
+            .iter()
+            .chain(self.nodes.iter())
+            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
     }
 
     pub fn create_node(
@@ -990,6 +1036,7 @@ pub enum JournalLogLevel {
 
 #[derive(Debug, Clone)]
 pub struct JournaldLogRecord {
+    pub timestamp_epoch_ms: u64,
     pub timestamp_unix_epoch: u64,
     pub timestamp_epoch_ms: u64,
     pub priority: u8, // 0=Emergency, 3=Error, 6=Info
@@ -1125,6 +1172,12 @@ impl SovereignDnsTlsResolverEngine {
 impl Default for SovereignJournaldBinaryStorageEngine {
     fn default() -> Self {
         Self::new(1024)
+    }
+}
+
+impl Default for SovereignJournaldBinaryStorageEngine {
+    fn default() -> Self {
+        Self::new(1000)
     }
 }
 
