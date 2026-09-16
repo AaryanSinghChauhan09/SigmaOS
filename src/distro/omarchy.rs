@@ -620,7 +620,7 @@ pub use omarchy_inspiration::{
     QuickshellWidget, ShellComponentKind,
 };
 
-#[path = "."]
+#[cfg(test)]
 pub mod distro {
     pub use super::omarchy_inspiration;
 }
