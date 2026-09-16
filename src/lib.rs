@@ -60,7 +60,11 @@ pub mod userland;
 
 pub use distro::{
     ArchMkinitcpioGeneratorEngine, ArchPacmanKeyringEngine, ArchPowerpillParallelDownloadEngine,
-    ArchReflectorMirrorlistEngine,
+    ArchReflectorMirrorlistEngine, QubesOsDisposableAppVmEngine, QubeVmState, DisposableQube,
+    VoidLinuxRunitServiceSupervisorEngine, RunitManagedService, RunitServiceStatus,
+    HaikuAppServerBServerWindowEngine, BMessage, BWindowBounds,
+    IllumosSmfDependencyGraphEngine, SmfServiceState, SmfServiceManifest,
+    AlpineLbuCryptographicOverlayEngine, LbuApkovlCommit, SovereignLinuxBsdAdvancedSynthesisSuite,
     missing_distro_innovations::{
         CompletionQueueEntry, IoUringEngine, IoUringOp, LinuxBsdSysctlEngine, SubmissionQueueEntry,
     },
