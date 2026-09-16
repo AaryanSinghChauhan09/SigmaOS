@@ -17,10 +17,11 @@ pub mod security {
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
-
-pub use universal_adapter::universal_oop_system;
 
 pub mod sigpkg {
     use alloc::string::String;
@@ -30,6 +31,7 @@ pub mod sigpkg {
     pub use crate::universal_adapter;
     pub use crate::universal_engine;
     pub use crate::universal_oop_system;
+    pub use crate::universal_engine::PackageFormat;
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     pub struct Version {
@@ -115,6 +117,7 @@ fn test_universal_adapter_all_formats() {
         FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
         ZypperSpecManifest, SlackwarePkgManifest,
     };
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -149,12 +152,12 @@ fn test_universal_adapter_all_formats() {
     let mut bridge = SigPkgUniversalBridgeEngine::new();
     let pkg_bsd = bridge.absorb_and_register("redis.pkg", freebsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -167,7 +170,8 @@ fn test_universal_adapter_all_formats() {
 
 #[test]
 fn test_universal_adapter_extended_linux_bsd_formats() {
-    use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation, PackageFormat};
+    use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation};
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -209,7 +213,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -224,7 +228,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
     assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
