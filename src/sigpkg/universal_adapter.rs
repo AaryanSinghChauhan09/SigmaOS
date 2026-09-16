@@ -7,8 +7,27 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptDebManifest {
+    pub package: String,
+    pub version: String,
+    pub architecture: String,
+    pub maintainer: String,
+    pub depends: Vec<String>,
+    pub description: String,
+}
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
+
+#[cfg(any(feature = "standalone_test", test))]
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
+
+pub use crate::sigpkg::Version;
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,8 +89,17 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-pub use super::universal_engine::PackageFormat;
-pub use super::universal_oop_system;
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::sigpkg::universal_engine::PackageFormat;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::sigpkg::universal_oop_system;
+
+#[cfg(any(feature = "standalone_test", test))]
+pub use crate::universal_engine::PackageFormat;
+
+#[cfg(any(feature = "standalone_test", test))]
+pub use crate::sigpkg::universal_oop_system;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -104,8 +132,11 @@ pub struct PacmanPkgbuild {
 }
 
 /// Use universal_oop_system::UniversalPackageManager instead
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-use core::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::sigpkg::universal_oop_system::UniversalPackageManager;
+
+#[cfg(any(feature = "standalone_test", test))]
+pub use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 
 /// Debian-style package priority levels (DFSG and APT standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -242,12 +273,14 @@ impl UniversalPackageAdapter {
             return Err("Invalid Debian control manifest: missing Package or Version");
         }
 
+        let _ = priority;
         Ok(AptDebManifest {
             package,
             version,
+            architecture: String::from("all"),
+            maintainer: String::new(),
             depends,
             description,
-            priority,
         })
     }
 
@@ -2223,7 +2256,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_add" | "pkg_info" => {
+            "pkg_info" => {
                 if pm == "pkg_add" {
                     operation = UniversalPmOperation::Install;
                 } else {

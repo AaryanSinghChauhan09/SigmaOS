@@ -17,10 +17,11 @@ pub mod security {
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
-
-pub use universal_adapter::universal_oop_system;
 
 pub mod sigpkg {
     use alloc::string::String;
@@ -209,11 +210,11 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_adapter::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
-    // Verify detection for all 29 Linux & BSD distro formats specified in prompt
+    // Verify detection for all Linux & BSD distro formats
     assert_eq!(adapter.detect_format_by_extension("app.air"), Some(PackageFormat::Air));
     assert_eq!(adapter.detect_format_by_extension("pkg.bottle"), Some(PackageFormat::Bottle));
     assert_eq!(adapter.detect_format_by_extension("app.ipa"), Some(PackageFormat::Ipa));
@@ -224,7 +225,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
     assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));

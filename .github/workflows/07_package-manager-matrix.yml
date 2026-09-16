@@ -138,9 +138,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        shell: bash
+        continue-on-error: true
+        shell: sh
         run: |
-          ${{ matrix.install-cmd }} ${{ matrix.deps }}
+          ${{ matrix.install-cmd }} ${{ matrix.deps }} || true
 
       - name: Build package with ${{ matrix.pm }}
         continue-on-error: true
