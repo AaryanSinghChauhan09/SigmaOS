@@ -17,6 +17,7 @@ pub enum InstallerScreen {
     SystemConfiguration,
     Summary,
     InstallationProgress,
+    Complete,
     CompleteOnboarding,
     Complete,
     CompleteOnboarding,
@@ -208,6 +209,11 @@ pub struct NetworkConfig {
 /// System Configuration
 #[derive(Debug, Clone)]
 pub struct SystemConfiguration {
+    pub timezone: String,
+    pub locale: String,
+    pub keyboard_layout: String,
+    pub network_config: NetworkConfig,
+    pub services: Vec<String>,
     pub hostname: String,
     pub timezone: String,
     pub locale: String,
