@@ -5,6 +5,7 @@ pub mod clipboard_manager;
 pub mod document_engine;
 pub mod editor;
 pub mod email;
+pub mod enterprise_productivity_suite;
 pub mod finance;
 pub mod flint_chart;
 pub mod gamification;
@@ -26,6 +27,14 @@ pub use enterprise_productivity_suite::{
     LeadStage, LiveCollaboratorCursor, MultiCurrencyInvoice, PresentationSlide,
     SigmaDocsEnterpriseCollaborationEngine, SigmaLookerAnalyticsEngine,
     SigmaSlidesPresenterEngine, SovereignEnterpriseCrmErpEngine, SovereignOdooBitrixSuite,
+};
+
+pub use enterprise_productivity_suite::{
+    ActiveCollaborator, AnalyticsDataRow, CrmLead, DealStage, InventoryStockItem, KanbanTask,
+    KanbanTaskStatus, MetricAggregation, OtDeltaRecord, PivotResult, PresentationSlide,
+    SigmaDocsEnterpriseCollaborationEngine, SigmaLookerAnalyticsEngine, SigmaSlidesPresenterEngine,
+    SlideTransitionEffect, SovereignEnterpriseCrmErpEngine, SovereignOdooBitrixSuite,
+    WorkflowTriggerRule,
 };
 
 pub use itsfoss_apps_synthesis::{
