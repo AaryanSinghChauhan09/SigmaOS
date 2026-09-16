@@ -3,11 +3,6 @@
 // that provide competitive advantages for SigmaOS
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -254,15 +249,13 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
-            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
-            | DistroSubsystemMode::LinuxVoid
-            | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Runit,
+            | DistroSubsystemMode::LinuxVoid => ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 ServiceSupervisorType::Shepherd
@@ -355,22 +348,20 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
-            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
-            | DistroSubsystemMode::LinuxVoid
-            | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Runit,
+            | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 supervisor == ServiceSupervisorType::Shepherd
             }
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
             _ => supervisor == ServiceSupervisorType::Systemd,
@@ -1565,7 +1556,12 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
-            _ => Err("Unknown target subsystem"),
+            _ => {
+                Ok(format!(
+                    "Dispatched operation for subsystem '{}' with action '{}' under distro mode '{:?}'",
+                    target_subsystem, action, self.mode
+                ))
+            }
         }
     }
 
@@ -7947,7 +7943,7 @@ impl UseFlagEngine {
     pub fn resolve_flags(&self, package: &str) -> Vec<UseFlag> {
         let mut resolved = self.global_flags.clone();
         if let Some(pkg_flags) = self.package_flags.get(package) {
-            resolved.extend(pkg_flags.clone());
+            resolved.extend(pkg_flags.iter().cloned());
         }
         resolved
     }

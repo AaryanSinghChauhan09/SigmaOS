@@ -1,16 +1,19 @@
-use std::vec;
-use std::boxed::Box;
+// # SigmaOffice - Sovereign Office Suite (SigmaCalc, SigmaWrite)
+//
+// This module implements SigmaOffice:
+// - **SigmaCalc (Spreadsheet)**: Lazy cell DAG recalculation, functional formula parser, native CSV/Excel/ODS.
+// - **SigmaWrite (Document Editor)**: Lightweight WYSIWYG, markdown support, LaTeX math rendering, SigmaNet mesh co-authoring.
+
 use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
-//! # SigmaOffice - Sovereign Office Suite (SigmaCalc, SigmaWrite)
-//!
-//! This module implements SigmaOffice:
-//! - **SigmaCalc (Spreadsheet)**: Lazy cell DAG recalculation, functional formula parser, native CSV/Excel/ODS.
-//! - **SigmaWrite (Document Editor)**: Lightweight WYSIWYG, markdown support, LaTeX math rendering, SigmaNet mesh co-authoring.
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::HashMap;
 
 use sigma_types::{CapabilityToken, Result};
-use crate::klib::HashMap;
 
 /// Document type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -576,7 +579,7 @@ impl TypographyRenderer {
     }
 
     /// Render text node to GPU buffer
-    pub fn render_text(&self, text: &str, font_size: u32, position: (f32, f32)) -> Result<Vec<u8>> {
+    pub fn render_text(&self, text: &str, _font_size: u32, _position: (f32, f32)) -> Result<Vec<u8>> {
         let mut buffer = Vec::new();
         buffer.extend_from_slice(text.as_bytes());
         Ok(buffer)
@@ -654,15 +657,13 @@ impl SigmaOffice {
 
     /// Save document to SigmaFS
     pub fn save_document(&self, doc_idx: usize, _path: &str) -> Result<()> {
-        let _doc = self.documents.get(doc_idx).ok_or_else(|| {
-            std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found")
-        })?;
+        let _doc = self.documents.get(doc_idx).ok_or("Document not found")?;
         Ok(())
     }
 
     /// Load document from SigmaFS
     pub fn load_document(&mut self, _path: &str) -> Result<SigmaDocument> {
-        Err(std::io::Error::new(std::io::ErrorKind::NotFound, "Not implemented").into())
+        Err("Not implemented")
     }
 }
 
@@ -860,7 +861,7 @@ pub struct SigmaOdfPackageEngine {
 
 impl SigmaOdfPackageEngine {
     pub fn new(kind: OdfDocumentKind) -> Self {
-        let (m_type, main_ext) = match kind {
+        let (m_type, _main_ext) = match kind {
             OdfDocumentKind::TextOdt => ("application/vnd.oasis.opendocument.text", "odt"),
             OdfDocumentKind::SpreadsheetOds => ("application/vnd.oasis.opendocument.spreadsheet", "ods"),
             OdfDocumentKind::PresentationOdp => ("application/vnd.oasis.opendocument.presentation", "odp"),
@@ -896,7 +897,7 @@ impl SigmaOdfPackageEngine {
         let mut bytes = Vec::new();
         bytes.extend_from_slice(b"PK\x03\x04"); // Standard Zip Header
         bytes.extend_from_slice(b"mimetype");
-        let mime = match self.kind {
+        let mime: &[u8] = match self.kind {
             OdfDocumentKind::TextOdt => b"application/vnd.oasis.opendocument.text",
             OdfDocumentKind::SpreadsheetOds => b"application/vnd.oasis.opendocument.spreadsheet",
             OdfDocumentKind::PresentationOdp => b"application/vnd.oasis.opendocument.presentation",
@@ -1189,6 +1190,1079 @@ impl SigmaFormulaParserEngine {
     }
 }
 
+// ==========================================================
+// 6. Sovereign Looker Studio & Power BI Inspired Analytics Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AnalyticsWidgetType {
+    Scorecard,
+    TimeSeries,
+    BarChart,
+    GeoMap,
+    Heatmap,
+    PivotTable,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AggregationFunc {
+    Sum,
+    Avg,
+    Count,
+    DistinctCount,
+    Min,
+    Max,
+}
+
+#[derive(Debug, Clone)]
+pub struct CalculatedMetric {
+    pub name: String,
+    pub target_field: String,
+    pub agg_func: AggregationFunc,
+}
+
+#[derive(Debug, Clone)]
+pub struct AnalyticsDataSource {
+    pub source_name: String,
+    pub fields: Vec<String>,
+    pub records: Vec<HashMap<String, String>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DashboardWidget {
+    pub widget_id: String,
+    pub title: String,
+    pub widget_type: AnalyticsWidgetType,
+    pub dimension_field: String,
+    pub metric_name: String,
+    pub evaluated_metric_value: f64,
+}
+
+pub struct SigmaLookerAnalyticsEngine {
+    pub data_sources: HashMap<String, AnalyticsDataSource>,
+    pub calculated_metrics: Vec<CalculatedMetric>,
+    pub widgets: Vec<DashboardWidget>,
+    pub active_cross_filters: HashMap<String, String>,
+}
+
+impl SigmaLookerAnalyticsEngine {
+    pub fn new() -> Self {
+        Self {
+            data_sources: HashMap::new(),
+            calculated_metrics: Vec::new(),
+            widgets: Vec::new(),
+            active_cross_filters: HashMap::new(),
+        }
+    }
+
+    pub fn register_data_source(&mut self, source: AnalyticsDataSource) {
+        self.data_sources.insert(source.source_name.clone(), source);
+    }
+
+    pub fn add_calculated_metric(&mut self, metric: CalculatedMetric) {
+        self.calculated_metrics.push(metric);
+    }
+
+    pub fn aggregate_metric(
+        &self,
+        source_name: &str,
+        field: &str,
+        agg_func: AggregationFunc,
+    ) -> f64 {
+        let source = match self.data_sources.get(source_name) {
+            Some(src) => src,
+            None => return 0.0,
+        };
+
+        // Filter records by active_cross_filters if applicable
+        let filtered_records: Vec<&HashMap<String, String>> = source
+            .records
+            .iter()
+            .filter(|rec| {
+                for (filter_key, filter_val) in &self.active_cross_filters {
+                    if let Some(val) = rec.get(filter_key) {
+                        if val != filter_val {
+                            return false;
+                        }
+                    }
+                }
+                true
+            })
+            .collect();
+
+        if filtered_records.is_empty() {
+            return 0.0;
+        }
+
+        let num_values: Vec<f64> = filtered_records
+            .iter()
+            .filter_map(|r| r.get(field).and_then(|v| v.parse::<f64>().ok()))
+            .collect();
+
+        match agg_func {
+            AggregationFunc::Sum => num_values.iter().sum(),
+            AggregationFunc::Avg => {
+                if num_values.is_empty() {
+                    0.0
+                } else {
+                    num_values.iter().sum::<f64>() / num_values.len() as f64
+                }
+            }
+            AggregationFunc::Count => filtered_records.len() as f64,
+            AggregationFunc::DistinctCount => {
+                let mut distinct = Vec::new();
+                for r in &filtered_records {
+                    if let Some(v) = r.get(field) {
+                        if !distinct.contains(v) {
+                            distinct.push(v.clone());
+                        }
+                    }
+                }
+                distinct.len() as f64
+            }
+            AggregationFunc::Min => num_values.iter().cloned().fold(f64::MAX, f64::min),
+            AggregationFunc::Max => num_values.iter().cloned().fold(f64::MIN, f64::max),
+        }
+    }
+
+    pub fn add_widget(
+        &mut self,
+        widget_id: &str,
+        title: &str,
+        widget_type: AnalyticsWidgetType,
+        source_name: &str,
+        dimension_field: &str,
+        metric_name: &str,
+        agg_func: AggregationFunc,
+    ) -> DashboardWidget {
+        let val = self.aggregate_metric(source_name, dimension_field, agg_func);
+        let widget = DashboardWidget {
+            widget_id: widget_id.to_string(),
+            title: title.to_string(),
+            widget_type,
+            dimension_field: dimension_field.to_string(),
+            metric_name: metric_name.to_string(),
+            evaluated_metric_value: val,
+        };
+        self.widgets.push(widget.clone());
+        widget
+    }
+
+    pub fn apply_cross_filter(&mut self, field: &str, value: &str) {
+        self.active_cross_filters
+            .insert(field.to_string(), value.to_string());
+    }
+
+    pub fn clear_cross_filters(&mut self) {
+        self.active_cross_filters.clear();
+    }
+}
+
+impl Default for SigmaLookerAnalyticsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 7. Sovereign Forms & Survey Engine (Google Forms / Zoho Forms)
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum QuestionType {
+    ShortText,
+    LongText,
+    MultipleChoice,
+    Checkboxes,
+    Dropdown,
+    LinearScale,
+    Rating,
+}
+
+#[derive(Debug, Clone)]
+pub struct FormQuestion {
+    pub question_id: u32,
+    pub prompt: String,
+    pub question_type: QuestionType,
+    pub options: Vec<String>,
+    pub required: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct LogicBranchRule {
+    pub question_id: u32,
+    pub trigger_answer: String,
+    pub jump_to_question_id: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct FormResponse {
+    pub response_id: u32,
+    pub respondent: String,
+    pub answers: HashMap<u32, String>, // question_id -> answer
+    pub timestamp_sec: u64,
+}
+
+pub struct SovereignFormsSurveyEngine {
+    pub form_id: String,
+    pub title: String,
+    pub description: String,
+    pub questions: Vec<FormQuestion>,
+    pub logic_rules: Vec<LogicBranchRule>,
+    pub responses: Vec<FormResponse>,
+    pub next_question_id: u32,
+    pub next_response_id: u32,
+}
+
+impl SovereignFormsSurveyEngine {
+    pub fn new(form_id: &str, title: &str) -> Self {
+        Self {
+            form_id: form_id.to_string(),
+            title: title.to_string(),
+            description: String::new(),
+            questions: Vec::new(),
+            logic_rules: Vec::new(),
+            responses: Vec::new(),
+            next_question_id: 1,
+            next_response_id: 1,
+        }
+    }
+
+    pub fn add_question(
+        &mut self,
+        prompt: &str,
+        question_type: QuestionType,
+        options: &[&str],
+        required: bool,
+    ) -> u32 {
+        let qid = self.next_question_id;
+        self.next_question_id += 1;
+
+        self.questions.push(FormQuestion {
+            question_id: qid,
+            prompt: prompt.to_string(),
+            question_type,
+            options: options.iter().map(|s| s.to_string()).collect(),
+            required,
+        });
+
+        qid
+    }
+
+    pub fn add_logic_rule(
+        &mut self,
+        question_id: u32,
+        trigger_answer: &str,
+        jump_to_question_id: u32,
+    ) {
+        self.logic_rules.push(LogicBranchRule {
+            question_id,
+            trigger_answer: trigger_answer.to_string(),
+            jump_to_question_id,
+        });
+    }
+
+    pub fn submit_response(
+        &mut self,
+        respondent: &str,
+        answers: HashMap<u32, String>,
+        timestamp_sec: u64,
+    ) -> Result<u32> {
+        // Validate required questions
+        for q in &self.questions {
+            if q.required && !answers.contains_key(&q.question_id) {
+                return Err("Required question missing in response");
+            }
+        }
+
+        let rid = self.next_response_id;
+        self.next_response_id += 1;
+
+        self.responses.push(FormResponse {
+            response_id: rid,
+            respondent: respondent.to_string(),
+            answers,
+            timestamp_sec,
+        });
+
+        Ok(rid)
+    }
+
+    pub fn get_next_question_id(&self, current_q_id: u32, selected_answer: &str) -> Option<u32> {
+        if let Some(rule) = self.logic_rules.iter().find(|r| {
+            r.question_id == current_q_id && r.trigger_answer == selected_answer
+        }) {
+            return Some(rule.jump_to_question_id);
+        }
+
+        // Default next sequential question
+        let pos = self.questions.iter().position(|q| q.question_id == current_q_id)?;
+        if pos + 1 < self.questions.len() {
+            Some(self.questions[pos + 1].question_id)
+        } else {
+            None
+        }
+    }
+
+    pub fn export_responses_to_spreadsheet(
+        &self,
+        processor: &mut SpreadsheetProcessor,
+    ) -> Result<()> {
+        processor
+            .set_cell(0, 0, CellValue::Text("Response ID".to_string()))
+            .unwrap();
+        processor
+            .set_cell(0, 1, CellValue::Text("Respondent".to_string()))
+            .unwrap();
+
+        for (col_idx, q) in self.questions.iter().enumerate() {
+            processor
+                .set_cell(0, (col_idx + 2) as u32, CellValue::Text(q.prompt.clone()))
+                .unwrap();
+        }
+
+        for (row_idx, resp) in self.responses.iter().enumerate() {
+            let row = (row_idx + 1) as u32;
+            processor
+                .set_cell(row, 0, CellValue::Number(resp.response_id as f64))
+                .unwrap();
+            processor
+                .set_cell(row, 1, CellValue::Text(resp.respondent.clone()))
+                .unwrap();
+
+            for (col_idx, q) in self.questions.iter().enumerate() {
+                let ans = resp
+                    .answers
+                    .get(&q.question_id)
+                    .cloned()
+                    .unwrap_or_default();
+                processor
+                    .set_cell(row, (col_idx + 2) as u32, CellValue::Text(ans))
+                    .unwrap();
+            }
+        }
+
+        Ok(())
+    }
+}
+
+// ==========================================================
+// 8. Sovereign Enterprise CRM & Service Cloud Engine (Salesforce / Bitrix24)
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DealStage {
+    Lead,
+    Qualified,
+    Opportunity,
+    Proposal,
+    Negotiation,
+    ClosedWon,
+    ClosedLost,
+}
+
+#[derive(Debug, Clone)]
+pub struct CrmDealRecord {
+    pub deal_id: u32,
+    pub company_name: String,
+    pub amount: f64,
+    pub stage: DealStage,
+    pub assigned_agent: String,
+    pub created_sec: u64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SlaPriority {
+    Low,
+    Medium,
+    High,
+    Urgent,
+}
+
+#[derive(Debug, Clone)]
+pub struct SupportTicket {
+    pub ticket_id: u32,
+    pub customer_id: String,
+    pub subject: String,
+    pub priority: SlaPriority,
+    pub created_sec: u64,
+    pub sla_target_sec: u64,
+    pub status: String, // "Open", "InProgress", "Resolved", "Escalated"
+    pub assigned_agent: String,
+    pub escalated: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct CustomerActivity {
+    pub activity_id: u32,
+    pub customer_id: String,
+    pub channel: String, // "Call", "Email", "Chat", "Meeting"
+    pub notes: String,
+    pub timestamp_sec: u64,
+}
+
+pub struct SovereignEnterpriseCrmErpEngine {
+    pub deals: Vec<CrmDealRecord>,
+    pub tickets: Vec<SupportTicket>,
+    pub activities: Vec<CustomerActivity>,
+    pub next_deal_id: u32,
+    pub next_ticket_id: u32,
+    pub next_activity_id: u32,
+}
+
+impl SovereignEnterpriseCrmErpEngine {
+    pub fn new() -> Self {
+        Self {
+            deals: Vec::new(),
+            tickets: Vec::new(),
+            activities: Vec::new(),
+            next_deal_id: 1,
+            next_ticket_id: 1,
+            next_activity_id: 1,
+        }
+    }
+
+    pub fn create_deal(&mut self, company_name: &str, amount: f64, agent: &str, created_sec: u64) -> u32 {
+        let id = self.next_deal_id;
+        self.next_deal_id += 1;
+
+        self.deals.push(CrmDealRecord {
+            deal_id: id,
+            company_name: company_name.to_string(),
+            amount,
+            stage: DealStage::Lead,
+            assigned_agent: agent.to_string(),
+            created_sec,
+        });
+
+        id
+    }
+
+    pub fn advance_deal_stage(&mut self, deal_id: u32, target_stage: DealStage) -> Result<()> {
+        let deal = self
+            .deals
+            .iter_mut()
+            .find(|d| d.deal_id == deal_id)
+            .ok_or("Deal not found")?;
+
+        deal.stage = target_stage;
+        Ok(())
+    }
+
+    pub fn enqueue_ticket(
+        &mut self,
+        customer_id: &str,
+        subject: &str,
+        priority: SlaPriority,
+        created_sec: u64,
+        sla_target_sec: u64,
+    ) -> u32 {
+        let id = self.next_ticket_id;
+        self.next_ticket_id += 1;
+
+        self.tickets.push(SupportTicket {
+            ticket_id: id,
+            customer_id: customer_id.to_string(),
+            subject: subject.to_string(),
+            priority,
+            created_sec,
+            sla_target_sec,
+            status: "Open".to_string(),
+            assigned_agent: "Unassigned".to_string(),
+            escalated: false,
+        });
+
+        id
+    }
+
+    pub fn escalate_overdue_tickets(&mut self, current_timestamp_sec: u64) -> usize {
+        let mut count = 0;
+        for ticket in &mut self.tickets {
+            if ticket.status != "Resolved" && current_timestamp_sec > ticket.sla_target_sec {
+                if !ticket.escalated {
+                    ticket.escalated = true;
+                    ticket.status = "Escalated".to_string();
+                    count += 1;
+                }
+            }
+        }
+        count
+    }
+
+    pub fn log_customer_activity(
+        &mut self,
+        customer_id: &str,
+        channel: &str,
+        notes: &str,
+        timestamp_sec: u64,
+    ) -> u32 {
+        let id = self.next_activity_id;
+        self.next_activity_id += 1;
+
+        self.activities.push(CustomerActivity {
+            activity_id: id,
+            customer_id: customer_id.to_string(),
+            channel: channel.to_string(),
+            notes: notes.to_string(),
+            timestamp_sec,
+        });
+
+        id
+    }
+
+    pub fn get_customer_timeline(&self, customer_id: &str) -> Vec<CustomerActivity> {
+        self.activities
+            .iter()
+            .filter(|a| a.customer_id == customer_id)
+            .cloned()
+            .collect()
+    }
+}
+
+impl Default for SovereignEnterpriseCrmErpEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 9. Sovereign Modular ERP, Inventory, HR & Accounting Suite (Odoo)
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct JournalEntry {
+    pub entry_id: u32,
+    pub account_code: String,
+    pub debit: f64,
+    pub credit: f64,
+    pub description: String,
+    pub timestamp_sec: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct InventorySku {
+    pub sku: String,
+    pub name: String,
+    pub quantity_on_hand: u32,
+    pub reorder_level: u32,
+    pub unit_cost: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct EmployeeRecord {
+    pub employee_id: u32,
+    pub full_name: String,
+    pub department: String,
+    pub monthly_base_salary: f64,
+    pub attendance_days: u32,
+}
+
+pub struct SovereignOdooBitrixSuite {
+    pub general_ledger: Vec<JournalEntry>,
+    pub inventory: HashMap<String, InventorySku>,
+    pub employees: HashMap<u32, EmployeeRecord>,
+    pub next_entry_id: u32,
+    pub next_employee_id: u32,
+}
+
+impl SovereignOdooBitrixSuite {
+    pub fn new() -> Self {
+        Self {
+            general_ledger: Vec::new(),
+            inventory: HashMap::new(),
+            employees: HashMap::new(),
+            next_entry_id: 1,
+            next_employee_id: 1001,
+        }
+    }
+
+    pub fn post_journal_entry(
+        &mut self,
+        account_code: &str,
+        debit: f64,
+        credit: f64,
+        description: &str,
+        timestamp_sec: u64,
+    ) -> u32 {
+        let id = self.next_entry_id;
+        self.next_entry_id += 1;
+
+        self.general_ledger.push(JournalEntry {
+            entry_id: id,
+            account_code: account_code.to_string(),
+            debit,
+            credit,
+            description: description.to_string(),
+            timestamp_sec,
+        });
+
+        id
+    }
+
+    pub fn is_general_ledger_balanced(&self) -> bool {
+        let total_debit: f64 = self.general_ledger.iter().map(|e| e.debit).sum();
+        let total_credit: f64 = self.general_ledger.iter().map(|e| e.credit).sum();
+        (total_debit - total_credit).abs() < 1e-6
+    }
+
+    pub fn upsert_inventory_sku(
+        &mut self,
+        sku: &str,
+        name: &str,
+        qty: u32,
+        reorder_level: u32,
+        unit_cost: f64,
+    ) {
+        self.inventory.insert(
+            sku.to_string(),
+            InventorySku {
+                sku: sku.to_string(),
+                name: name.to_string(),
+                quantity_on_hand: qty,
+                reorder_level,
+                unit_cost,
+            },
+        );
+    }
+
+    pub fn update_sku_stock(&mut self, sku: &str, delta_qty: i32) -> Result<u32> {
+        let item = self.inventory.get_mut(sku).ok_or("SKU not found")?;
+
+        let new_qty = (item.quantity_on_hand as i64) + (delta_qty as i64);
+        if new_qty < 0 {
+            return Err("Negative stock quantity disallowed");
+        }
+
+        item.quantity_on_hand = new_qty as u32;
+        Ok(item.quantity_on_hand)
+    }
+
+    pub fn check_reorder_alerts(&self) -> Vec<InventorySku> {
+        self.inventory
+            .values()
+            .filter(|item| item.quantity_on_hand <= item.reorder_level)
+            .cloned()
+            .collect()
+    }
+
+    pub fn add_employee(
+        &mut self,
+        full_name: &str,
+        department: &str,
+        monthly_base_salary: f64,
+    ) -> u32 {
+        let id = self.next_employee_id;
+        self.next_employee_id += 1;
+
+        self.employees.insert(
+            id,
+            EmployeeRecord {
+                employee_id: id,
+                full_name: full_name.to_string(),
+                department: department.to_string(),
+                monthly_base_salary,
+                attendance_days: 0,
+            },
+        );
+
+        id
+    }
+
+    pub fn record_employee_attendance(&mut self, employee_id: u32, days: u32) -> Result<()> {
+        let emp = self
+            .employees
+            .get_mut(&employee_id)
+            .ok_or("Employee not found")?;
+        emp.attendance_days += days;
+        Ok(())
+    }
+
+    pub fn generate_monthly_payroll_slip(
+        &self,
+        employee_id: u32,
+        working_days_in_month: u32,
+    ) -> Result<f64> {
+        let emp = self
+            .employees
+            .get(&employee_id)
+            .ok_or("Employee not found")?;
+
+        if working_days_in_month == 0 {
+            return Ok(0.0);
+        }
+
+        let proration = (emp.attendance_days as f64) / (working_days_in_month as f64);
+        let payout = emp.monthly_base_salary * proration.min(1.0);
+        Ok(payout)
+    }
+}
+
+impl Default for SovereignOdooBitrixSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 10. Sovereign Workgroup & Gantt Task Engine (Bitrix24 Workgroups / Zoho Projects)
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaskDependencyType {
+    FinishToStart,
+    StartToStart,
+}
+
+#[derive(Debug, Clone)]
+pub struct TaskDependency {
+    pub predecessor_id: u32,
+    pub successor_id: u32,
+    pub dep_type: TaskDependencyType,
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkgroupTask {
+    pub task_id: u32,
+    pub title: String,
+    pub duration_days: u32,
+    pub start_day: u32,
+    pub finish_day: u32,
+    pub assigned_user: String,
+    pub is_critical_path: bool,
+}
+
+pub struct SovereignWorkgroupGanttEngine {
+    pub workgroup_name: String,
+    pub tasks: Vec<WorkgroupTask>,
+    pub dependencies: Vec<TaskDependency>,
+    pub next_task_id: u32,
+}
+
+impl SovereignWorkgroupGanttEngine {
+    pub fn new(workgroup_name: &str) -> Self {
+        Self {
+            workgroup_name: workgroup_name.to_string(),
+            tasks: Vec::new(),
+            dependencies: Vec::new(),
+            next_task_id: 1,
+        }
+    }
+
+    pub fn create_task(&mut self, title: &str, duration_days: u32, assigned_user: &str) -> u32 {
+        let id = self.next_task_id;
+        self.next_task_id += 1;
+
+        self.tasks.push(WorkgroupTask {
+            task_id: id,
+            title: title.to_string(),
+            duration_days,
+            start_day: 0,
+            finish_day: duration_days,
+            assigned_user: assigned_user.to_string(),
+            is_critical_path: false,
+        });
+
+        id
+    }
+
+    pub fn add_dependency(
+        &mut self,
+        predecessor_id: u32,
+        successor_id: u32,
+        dep_type: TaskDependencyType,
+    ) -> Result<()> {
+        if predecessor_id == successor_id {
+            return Err("Self-dependency disallowed");
+        }
+
+        let pred_exists = self.tasks.iter().any(|t| t.task_id == predecessor_id);
+        let succ_exists = self.tasks.iter().any(|t| t.task_id == successor_id);
+
+        if !pred_exists || !succ_exists {
+            return Err("Predecessor or successor task not found");
+        }
+
+        self.dependencies.push(TaskDependency {
+            predecessor_id,
+            successor_id,
+            dep_type,
+        });
+
+        Ok(())
+    }
+
+    /// Topological schedule calculation & Critical Path Method (CPM)
+    pub fn schedule_and_compute_critical_path(&mut self) -> Vec<u32> {
+        let num_tasks = self.tasks.len();
+        if num_tasks == 0 {
+            return Vec::new();
+        }
+
+        // Multiple passes to resolve start_day and finish_day for FinishToStart dependencies
+        for _ in 0..num_tasks {
+            for dep in self.dependencies.clone() {
+                let pred_finish = self
+                    .tasks
+                    .iter()
+                    .find(|t| t.task_id == dep.predecessor_id)
+                    .map(|t| t.finish_day)
+                    .unwrap_or(0);
+
+                let pred_start = self
+                    .tasks
+                    .iter()
+                    .find(|t| t.task_id == dep.predecessor_id)
+                    .map(|t| t.start_day)
+                    .unwrap_or(0);
+
+                if let Some(succ) = self
+                    .tasks
+                    .iter_mut()
+                    .find(|t| t.task_id == dep.successor_id)
+                {
+                    match dep.dep_type {
+                        TaskDependencyType::FinishToStart => {
+                            if pred_finish > succ.start_day {
+                                succ.start_day = pred_finish;
+                                succ.finish_day = succ.start_day + succ.duration_days;
+                            }
+                        }
+                        TaskDependencyType::StartToStart => {
+                            if pred_start > succ.start_day {
+                                succ.start_day = pred_start;
+                                succ.finish_day = succ.start_day + succ.duration_days;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Identify max finish day
+        let max_finish = self
+            .tasks
+            .iter()
+            .map(|t| t.finish_day)
+            .max()
+            .unwrap_or(0);
+
+        let mut critical_path = Vec::new();
+        for task in &mut self.tasks {
+            if task.finish_day == max_finish || task.start_day == 0 {
+                task.is_critical_path = true;
+                critical_path.push(task.task_id);
+            }
+        }
+
+        critical_path
+    }
+
+    pub fn generate_gantt_chart_timeline(&self) -> String {
+        let mut chart = format!("=== Gantt Chart Timeline: {} ===\n", self.workgroup_name);
+        for task in &self.tasks {
+            let padding = " ".repeat(task.start_day as usize);
+            let bar = "=".repeat(task.duration_days as usize);
+            let cp_flag = if task.is_critical_path { " [CRITICAL]" } else { "" };
+            chart.push_str(&format!(
+                "Task #{}: {:<15} |{}{}{} (Days {}-{})\n",
+                task.task_id, task.title, padding, bar, cp_flag, task.start_day, task.finish_day
+            ));
+        }
+        chart
+    }
+}
+
+impl Default for SovereignWorkgroupGanttEngine {
+    fn default() -> Self {
+        Self::new("Default Workgroup")
+    }
+}
+
+// ==========================================================
+// 11. Sovereign Google Slides & Docs Collaboration Extensions
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SlideTransition {
+    Fade,
+    SlideLeft,
+    Zoom,
+    Dissolve,
+}
+
+#[derive(Debug, Clone)]
+pub struct BoundChartWidget {
+    pub widget_id: String,
+    pub chart_type: ChartType,
+    pub spreadsheet_title: String,
+    pub cell_range_ref: String,
+}
+
+pub struct SigmaSlidesPresenterEngine {
+    pub presentation: PresentationProcessor,
+    pub transitions: HashMap<usize, SlideTransition>,
+    pub speaker_notes: HashMap<usize, String>,
+    pub bound_charts: Vec<BoundChartWidget>,
+}
+
+impl SigmaSlidesPresenterEngine {
+    pub fn new(title: &str, capability: CapabilityToken) -> Self {
+        Self {
+            presentation: PresentationProcessor::new(title.to_string(), capability),
+            transitions: HashMap::new(),
+            speaker_notes: HashMap::new(),
+            bound_charts: Vec::new(),
+        }
+    }
+
+    pub fn set_slide_transition(&mut self, slide_idx: usize, transition: SlideTransition) {
+        self.transitions.insert(slide_idx, transition);
+    }
+
+    pub fn add_speaker_note(&mut self, slide_idx: usize, note: &str) {
+        self.speaker_notes.insert(slide_idx, note.to_string());
+    }
+
+    pub fn bind_chart_widget_to_spreadsheet(
+        &mut self,
+        widget_id: &str,
+        chart_type: ChartType,
+        spreadsheet_title: &str,
+        cell_range_ref: &str,
+    ) {
+        self.bound_charts.push(BoundChartWidget {
+            widget_id: widget_id.to_string(),
+            chart_type,
+            spreadsheet_title: spreadsheet_title.to_string(),
+            cell_range_ref: cell_range_ref.to_string(),
+        });
+    }
+
+    pub fn render_presentation_deck_summary(&self) -> String {
+        format!(
+            "Deck Title: '{}' | Total Slides: {} | Bound Charts: {} | Transition Effects: {}",
+            self.presentation.document().title(),
+            self.presentation.total_slides(),
+            self.bound_charts.len(),
+            self.transitions.len()
+        )
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TableOfContentsNode {
+    pub level: u32,
+    pub title: String,
+    pub node_index: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct FootNoteEntry {
+    pub note_id: u32,
+    pub marker: String,
+    pub text: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct CitationEntry {
+    pub citation_id: String,
+    pub author: String,
+    pub title: String,
+    pub year: u32,
+    pub publisher: String,
+}
+
+pub struct SigmaDocsEnterpriseCollaborationEngine {
+    pub text_processor: TextProcessor,
+    pub toc_tree: Vec<TableOfContentsNode>,
+    pub footnotes: Vec<FootNoteEntry>,
+    pub citations: Vec<CitationEntry>,
+    pub ai_prompt_hooks: Vec<String>,
+    pub next_footnote_id: u32,
+}
+
+impl SigmaDocsEnterpriseCollaborationEngine {
+    pub fn new(title: &str, capability: CapabilityToken) -> Self {
+        Self {
+            text_processor: TextProcessor::new(title.to_string(), capability),
+            toc_tree: Vec::new(),
+            footnotes: Vec::new(),
+            citations: Vec::new(),
+            ai_prompt_hooks: Vec::new(),
+            next_footnote_id: 1,
+        }
+    }
+
+    pub fn add_heading_with_toc(&mut self, level: u32, content: &str) -> Result<()> {
+        self.text_processor.add_heading(level, content)?;
+        let idx = self.text_processor.document().tree().len() - 1;
+
+        self.toc_tree.push(TableOfContentsNode {
+            level,
+            title: content.to_string(),
+            node_index: idx,
+        });
+
+        Ok(())
+    }
+
+    pub fn generate_table_of_contents(&self) -> Vec<TableOfContentsNode> {
+        self.toc_tree.clone()
+    }
+
+    pub fn add_footnote(&mut self, text: &str) -> Result<String> {
+        let id = self.next_footnote_id;
+        self.next_footnote_id += 1;
+
+        let marker = format!("[^{}]", id);
+        self.footnotes.push(FootNoteEntry {
+            note_id: id,
+            marker: marker.clone(),
+            text: text.to_string(),
+        });
+
+        self.text_processor.add_text(&marker, false, false)?;
+        Ok(marker)
+    }
+
+    pub fn register_citation(
+        &mut self,
+        citation_id: &str,
+        author: &str,
+        title: &str,
+        year: u32,
+        publisher: &str,
+    ) {
+        self.citations.push(CitationEntry {
+            citation_id: citation_id.to_string(),
+            author: author.to_string(),
+            title: title.to_string(),
+            year,
+            publisher: publisher.to_string(),
+        });
+    }
+
+    pub fn generate_bibliography_markdown(&self) -> String {
+        let mut bib = String::from("## References & Bibliography\n");
+        for cit in &self.citations {
+            bib.push_str(&format!(
+                "- [{}] {}, *{}*, {}: {}\n",
+                cit.citation_id, cit.author, cit.title, cit.publisher, cit.year
+            ));
+        }
+        bib
+    }
+
+    pub fn trigger_ai_smart_reply_or_summary(&mut self, prompt: &str) -> String {
+        self.ai_prompt_hooks.push(prompt.to_string());
+        if prompt.contains("summarize") {
+            format!("AI Summary of '{}': Sovereign OS enterprise collaboration doc with {} nodes.", self.text_processor.document().title(), self.text_processor.document().tree().len())
+        } else {
+            format!("AI Smart Reply: Formulated response for prompt '{}'.", prompt)
+        }
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -1199,7 +2273,7 @@ mod sigma_types {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -1378,5 +2452,188 @@ mod tests {
 
         let count_val = SigmaFormulaParserEngine::parse_and_evaluate_formula("=COUNT(1, 2, 3, 4)");
         assert_eq!(count_val, CellValue::Number(4.0));
+    }
+
+    #[test]
+    fn test_looker_analytics_engine() {
+        let mut engine = SigmaLookerAnalyticsEngine::new();
+
+        let mut rec1 = HashMap::new();
+        rec1.insert("region".to_string(), "US-East".to_string());
+        rec1.insert("revenue".to_string(), "100".to_string());
+
+        let mut rec2 = HashMap::new();
+        rec2.insert("region".to_string(), "US-West".to_string());
+        rec2.insert("revenue".to_string(), "200".to_string());
+
+        let mut rec3 = HashMap::new();
+        rec3.insert("region".to_string(), "US-East".to_string());
+        rec3.insert("revenue".to_string(), "300".to_string());
+
+        let source = AnalyticsDataSource {
+            source_name: "sales_db".to_string(),
+            fields: vec!["region".to_string(), "revenue".to_string()],
+            records: vec![rec1, rec2, rec3],
+        };
+
+        engine.register_data_source(source);
+
+        let total_rev = engine.aggregate_metric("sales_db", "revenue", AggregationFunc::Sum);
+        assert_eq!(total_rev, 600.0);
+
+        let avg_rev = engine.aggregate_metric("sales_db", "revenue", AggregationFunc::Avg);
+        assert_eq!(avg_rev, 200.0);
+
+        // Cross filter
+        engine.apply_cross_filter("region", "US-East");
+        let east_rev = engine.aggregate_metric("sales_db", "revenue", AggregationFunc::Sum);
+        assert_eq!(east_rev, 400.0);
+
+        engine.clear_cross_filters();
+
+        let widget = engine.add_widget(
+            "w1",
+            "Total Revenue Scorecard",
+            AnalyticsWidgetType::Scorecard,
+            "sales_db",
+            "revenue",
+            "Sum Revenue",
+            AggregationFunc::Sum,
+        );
+        assert_eq!(widget.evaluated_metric_value, 600.0);
+    }
+
+    #[test]
+    fn test_forms_survey_engine() {
+        let mut form = SovereignFormsSurveyEngine::new("f1", "Customer Feedback Survey");
+        let q1 = form.add_question("How satisfied are you?", QuestionType::Rating, &["1", "2", "3", "4", "5"], true);
+        let q2 = form.add_question("Any comments?", QuestionType::LongText, &[], false);
+
+        form.add_logic_rule(q1, "1", q2);
+        assert_eq!(form.get_next_question_id(q1, "1"), Some(q2));
+
+        let mut ans1 = HashMap::new();
+        ans1.insert(q1, "5".to_string());
+        ans1.insert(q2, "Great OS!".to_string());
+
+        let rid = form.submit_response("alice@sigmaos.org", ans1, 1000).unwrap();
+        assert_eq!(rid, 1);
+
+        let capability = sigma_types::CapabilityToken { id: 1 };
+        let mut sheet_proc = SpreadsheetProcessor::new("Form Export".to_string(), capability);
+        form.export_responses_to_spreadsheet(&mut sheet_proc).unwrap();
+
+        assert_eq!(sheet_proc.get_cell(1, 1), Some(&CellValue::Text("alice@sigmaos.org".to_string())));
+    }
+
+    #[test]
+    fn test_enterprise_crm_service_engine() {
+        let mut crm = SovereignEnterpriseCrmErpEngine::new();
+
+        let deal_id = crm.create_deal("AeroCorp", 500000.0, "agent_1", 1000);
+        assert_eq!(crm.deals[0].stage, DealStage::Lead);
+
+        crm.advance_deal_stage(deal_id, DealStage::Opportunity).unwrap();
+        assert_eq!(crm.deals[0].stage, DealStage::Opportunity);
+
+        let _t_id = crm.enqueue_ticket("cust_101", "Login issue", SlaPriority::High, 1000, 1100);
+        assert_eq!(crm.tickets[0].escalated, false);
+
+        // Escalation when current time exceeds SLA target (1200 > 1100)
+        let count = crm.escalate_overdue_tickets(1200);
+        assert_eq!(count, 1);
+        assert_eq!(crm.tickets[0].escalated, true);
+        assert_eq!(crm.tickets[0].status, "Escalated");
+
+        crm.log_customer_activity("cust_101", "Call", "Spoke with CTO", 1050);
+        let timeline = crm.get_customer_timeline("cust_101");
+        assert_eq!(timeline.len(), 1);
+        assert_eq!(timeline[0].notes, "Spoke with CTO");
+    }
+
+    #[test]
+    fn test_odoo_erp_accounting_inventory_hr() {
+        let mut erp = SovereignOdooBitrixSuite::new();
+
+        // Balanced journal entries
+        erp.post_journal_entry("1010-CASH", 1000.0, 0.0, "Customer payment", 1000);
+        erp.post_journal_entry("4010-REV", 0.0, 1000.0, "Service revenue", 1000);
+        assert!(erp.is_general_ledger_balanced());
+
+        // Inventory management
+        erp.upsert_inventory_sku("SKU-SERVER", "Sigma Blade Server", 10, 5, 2500.0);
+        erp.update_sku_stock("SKU-SERVER", -6).unwrap();
+        assert_eq!(erp.inventory.get("SKU-SERVER").unwrap().quantity_on_hand, 4);
+
+        let reorder_alerts = erp.check_reorder_alerts();
+        assert_eq!(reorder_alerts.len(), 1);
+        assert_eq!(reorder_alerts[0].sku, "SKU-SERVER");
+
+        // HR & Payroll
+        let emp_id = erp.add_employee("John Doe", "Engineering", 8000.0);
+        erp.record_employee_attendance(emp_id, 20).unwrap();
+        let payout = erp.generate_monthly_payroll_slip(emp_id, 20).unwrap();
+        assert_eq!(payout, 8000.0);
+    }
+
+    #[test]
+    fn test_workgroup_gantt_cpm_engine() {
+        let mut workgroup = SovereignWorkgroupGanttEngine::new("SigmaOS 2026 Core Release");
+
+        let t1 = workgroup.create_task("Kernel Spec", 5, "alice");
+        let t2 = workgroup.create_task("Userland Build", 10, "bob");
+        let t3 = workgroup.create_task("ISO Packaging", 3, "charlie");
+
+        workgroup.add_dependency(t1, t2, TaskDependencyType::FinishToStart).unwrap();
+        workgroup.add_dependency(t2, t3, TaskDependencyType::FinishToStart).unwrap();
+
+        let cp = workgroup.schedule_and_compute_critical_path();
+        assert!(cp.contains(&t3));
+
+        assert_eq!(workgroup.tasks[0].start_day, 0);
+        assert_eq!(workgroup.tasks[0].finish_day, 5);
+
+        assert_eq!(workgroup.tasks[1].start_day, 5);
+        assert_eq!(workgroup.tasks[1].finish_day, 15);
+
+        assert_eq!(workgroup.tasks[2].start_day, 15);
+        assert_eq!(workgroup.tasks[2].finish_day, 18);
+
+        let gantt_ascii = workgroup.generate_gantt_chart_timeline();
+        assert!(gantt_ascii.contains("Days 15-18"));
+    }
+
+    #[test]
+    fn test_slides_presenter_and_docs_collaboration_engines() {
+        let capability = sigma_types::CapabilityToken { id: 1 };
+
+        // Test Slides Presenter
+        let mut presenter = SigmaSlidesPresenterEngine::new("Keynote 2026", capability.clone());
+        presenter.set_slide_transition(0, SlideTransition::Zoom);
+        presenter.add_speaker_note(0, "Introduce SigmaOS architecture");
+        presenter.bind_chart_widget_to_spreadsheet("chart1", ChartType::Bar, "Q1 Revenue", "A1:B10");
+
+        let summary = presenter.render_presentation_deck_summary();
+        assert!(summary.contains("Keynote 2026"));
+        assert!(summary.contains("Bound Charts: 1"));
+
+        // Test Docs Collaboration
+        let mut docs = SigmaDocsEnterpriseCollaborationEngine::new("Whitepaper", capability);
+        docs.add_heading_with_toc(1, "Executive Summary").unwrap();
+        docs.add_heading_with_toc(2, "Architectural Foundations").unwrap();
+
+        let toc = docs.generate_table_of_contents();
+        assert_eq!(toc.len(), 2);
+        assert_eq!(toc[0].title, "Executive Summary");
+
+        let marker = docs.add_footnote("Refer to SigmaOS OS Security Architecture Specification").unwrap();
+        assert_eq!(marker, "[^1]");
+
+        docs.register_citation("CIT-101", "Jules Software Engineer", "Sovereign OS Design", 2026, "SigmaOS Press");
+        let bib = docs.generate_bibliography_markdown();
+        assert!(bib.contains("Jules Software Engineer"));
+
+        let ai_res = docs.trigger_ai_smart_reply_or_summary("Please summarize this document");
+        assert!(ai_res.contains("AI Summary of 'Whitepaper'"));
     }
 }

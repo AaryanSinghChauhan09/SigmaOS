@@ -12,9 +12,18 @@ pub mod linux_bsd_tools;
 pub mod media;
 pub mod mind_map;
 pub mod mint_competitor;
+pub mod sigma_office;
 pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod tmux;
+
+pub use sigma_office::{
+    AnalyticsDataSource, AnalyticsWidgetType, DealStage, DocumentType, InventorySku,
+    PresentationProcessor, SigmaDocsEnterpriseCollaborationEngine, SigmaLookerAnalyticsEngine,
+    SigmaOffice, SigmaSlidesPresenterEngine, SovereignEnterpriseCrmErpEngine,
+    SovereignFormsSurveyEngine, SovereignOdooBitrixSuite, SovereignWorkgroupGanttEngine,
+    SpreadsheetProcessor, TextProcessor,
+};
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,

@@ -33,6 +33,11 @@ pub mod orchestration;
 pub mod package;
 pub mod process;
 pub mod productivity;
+pub use productivity::{
+    SigmaDocsEnterpriseCollaborationEngine, SigmaLookerAnalyticsEngine, SigmaOffice,
+    SigmaSlidesPresenterEngine, SovereignEnterpriseCrmErpEngine, SovereignFormsSurveyEngine,
+    SovereignOdooBitrixSuite, SovereignWorkgroupGanttEngine, SpreadsheetProcessor, TextProcessor,
+};
 pub mod remote;
 pub mod resilience;
 pub mod runtime;
