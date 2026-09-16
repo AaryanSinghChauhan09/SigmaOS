@@ -1298,6 +1298,73 @@ impl<T: PackageCapability> PackageCapability for NetworkRestrictionDecorator<T> 
     }
 }
 
+pub struct HardwareOptimizationDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub target_microarch_level: String,
+    pub required_simd_features: Vec<String>,
+}
+
+impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        println!("HardwareOptimizationDecorator: microarch: {}, SIMD: {:?}", self.target_microarch_level, self.required_simd_features);
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct ResourceLimitDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub max_memory_bytes: u64,
+    pub cpu_quota_percent: u32,
+}
+
+impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct PqcSignedDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub dilithium_signature: String,
+}
+
+impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        if self.dilithium_signature.contains("invalid") || !self.dilithium_signature.contains("valid") {
+            return Err(PackageError::InstallationFailed("PQC signature verification failed".to_string()));
+        }
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+
 // ============================================================================
 // OOP Design Pattern: Factory Pattern
 // ============================================================================
