@@ -4776,7 +4776,7 @@ mod tests {
 
         assert!(toolbx.add_host_mount("fedora-toolbox-39", "/home/sovereign"));
         let output = toolbx.run_command("fedora-toolbox-39", "dnf install -y gcc").unwrap();
-        assert!(output.contains("gcc"));
+        assert!(output.contains("executed command: 'dnf install -y gcc'"));
     }
 
     #[test]
