@@ -788,7 +788,7 @@ impl Default for FileTagManager {
 }
 
 #[cfg(test)]
-mod open_source_file_manager_tests {
+mod open_source_file_manager_tests_2 {
     use super::*;
 
     #[test]
@@ -1001,12 +1001,6 @@ mod open_source_file_manager_tests {
 // =========================================================================
 // Open-Source File Manager Enhancements (Dolphin, Yazi, Ranger, Nautilus, Thunar)
 // =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ActivePane {
-    Left,
-    Right,
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ViNavigationMode {

@@ -73,8 +73,7 @@ pub struct HaikuHpkgManifest {
 #[cfg(test)]
 pub use crate::sigpkg::Version;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
