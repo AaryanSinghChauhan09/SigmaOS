@@ -73,7 +73,7 @@ pub mod zero_alloc_resolver;
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
+    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState,
     ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
     CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
     DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
@@ -96,7 +96,7 @@ pub use zero_alloc_resolver::{
 };
 pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
-    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
+    AptDebManifest, PacmanPkgbuild as PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
     FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
     ZypperSpecManifest, SlackwarePkgManifest,
     RpmSpecManifest, AppImageContainer, MappedScriptletHook,

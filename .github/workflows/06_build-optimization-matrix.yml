@@ -49,7 +49,7 @@ jobs:
           - optimization: pgo-optimize
             profile: release
             build-cmd: "cargo build --release"
-            rustflags: "-C llvm-args=-use-sample-profile=samples.prof"
+            rustflags: "-C llvm-args=-profile-sample-use=samples.prof"
 
           # BOLT (Post-link optimization)
           - optimization: bolt

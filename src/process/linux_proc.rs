@@ -200,11 +200,11 @@ impl ProcFileSystem {
         // Create default root cgroups
         pfs.cgroups.insert(
             "system.slice".to_string(),
-            CGroup::new("system.slice", 8 * 1024 * 1024 * 1024, 1024),
+            CGroup::new("system.slice", (8u64 * 1024 * 1024 * 1024).min(usize::MAX as u64) as usize, 1024),
         );
         pfs.cgroups.insert(
             "user.slice".to_string(),
-            CGroup::new("user.slice", 8 * 1024 * 1024 * 1024, 1024),
+            CGroup::new("user.slice", (8u64 * 1024 * 1024 * 1024).min(usize::MAX as u64) as usize, 1024),
         );
 
         // Create root PID namespace

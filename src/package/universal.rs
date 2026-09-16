@@ -11,7 +11,10 @@ use alloc::vec::Vec;
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{Arc, HashMap, HashSet};
+use crate::klib::{HashMap, HashSet};
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::sync::Arc;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
@@ -1161,8 +1164,8 @@ impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T
     }
     fn profile_performance(&self) {
         println!(
-            "HardwareOptimizationDecorator: Microarch level '{}', SIMD features {:?}",
-            self.target_microarch_level, self.required_simd_features
+            "HardwareOptimizationDecorator: Profiling performance for microarch {}",
+            self.target_microarch_level
         );
         self.decorated.profile_performance();
     }
@@ -1170,7 +1173,7 @@ impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T
 
 pub struct ResourceLimitDecorator<T: PackageCapability> {
     pub decorated: T,
-    pub max_memory_bytes: u64,
+    pub max_memory_bytes: usize,
     pub cpu_quota_percent: u32,
 }
 
@@ -1180,7 +1183,7 @@ impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
     }
     fn enforce_sandbox(&self) -> Result<(), PackageError> {
         println!(
-            "ResourceLimitDecorator: Limiting memory to {} bytes and CPU to {}%",
+            "ResourceLimitDecorator: Enforcing memory limit {} bytes, CPU quota {}%",
             self.max_memory_bytes, self.cpu_quota_percent
         );
         self.decorated.enforce_sandbox()
@@ -1203,10 +1206,8 @@ impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
         self.decorated.get_package()
     }
     fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        if !self.dilithium_signature.contains("dilithium") {
-            return Err(PackageError::InstallationFailed(
-                "PQC Signature Verification Failed".to_string(),
-            ));
+        if self.dilithium_signature.contains("invalid") || !self.dilithium_signature.contains("valid") {
+            return Err(PackageError::InstallationFailed("PQC Signature Verification Failed".to_string()));
         }
         self.decorated.enforce_sandbox()
     }

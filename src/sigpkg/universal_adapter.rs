@@ -248,9 +248,10 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "amd64".to_string(),
+            maintainer: "SigmaOS".to_string(),
             depends,
             description,
-            priority,
         })
     }
 

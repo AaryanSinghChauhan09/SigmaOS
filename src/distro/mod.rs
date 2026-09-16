@@ -64,7 +64,8 @@ pub mod linux_bsd_parity_extended;
 
 pub use linux_bsd_distro_gaps::{
     BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeType,
-    DnsRecord, DynamicDeviceNode, JournalBinaryRecord, JournalLogLevel, NatRule, NatRuleKind,
+    DnsRecordEntry as DnsRecord, DeviceNodeEntry as DynamicDeviceNode, JournaldLogRecord as JournalBinaryRecord,
+    JournaldLogRecord, NatType as NatRuleKind,
     NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SovereignDnsTlsResolverEngine,
     SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine,
     SystemdInitManager, SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver,
@@ -112,7 +113,7 @@ pub use visual_dashboard::{
     VpnStatus, VpnTunnel, VpnType,
 };
 pub use void_runit::{
-    RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
+    RunitService, RunitSupervisor, ServiceState as RunitServiceState,
 };
 pub mod sovereign_distro_dominance;
 pub mod future_roadmap_innovations;
