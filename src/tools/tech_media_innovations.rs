@@ -414,6 +414,347 @@ impl CrossPlatformDeviceBridge {
 }
 
 // ============================================================================
+// 6. Geeky-Gadgets Hardware Review & Gadget Benchmark Engine
+// Inspired by Geeky-Gadgets
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct GadgetPerformanceSpec {
+    pub device_name: String,
+    pub category: String,
+    pub battery_life_hours: f32,
+    pub performance_score: u32,
+    pub price_to_performance_ratio: f32,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct GeekyGadgetsTechReviewEngine {
+    pub reviews: Vec<GadgetPerformanceSpec>,
+}
+
+impl GeekyGadgetsTechReviewEngine {
+    pub fn new() -> Self {
+        let reviews = vec![
+            GadgetPerformanceSpec {
+                device_name: "Sigma-Mini-PC-V1".to_string(),
+                category: "MiniPC".to_string(),
+                battery_life_hours: 0.0,
+                performance_score: 9500,
+                price_to_performance_ratio: 9.8,
+            },
+            GadgetPerformanceSpec {
+                device_name: "Sovereign-Steam-Deck-Pro".to_string(),
+                category: "Handheld".to_string(),
+                battery_life_hours: 6.5,
+                performance_score: 8200,
+                price_to_performance_ratio: 9.2,
+            },
+        ];
+        Self { reviews }
+    }
+
+    pub fn add_review(&mut self, review: GadgetPerformanceSpec) {
+        self.reviews.push(review);
+    }
+
+    pub fn get_top_rated_gadget(&self) -> Option<GadgetPerformanceSpec> {
+        self.reviews
+            .iter()
+            .max_by(|a, b| a.performance_score.cmp(&b.performance_score))
+            .cloned()
+    }
+}
+
+// ============================================================================
+// 7. ITDaily Enterprise IT Fleet Governance & SLA Compliance Engine
+// Inspired by ITDaily
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FleetServerSlaNode {
+    pub hostname: String,
+    pub uptime_target_pct: u32,
+    pub current_uptime_pct: u32,
+    pub is_patch_compliant: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ItDailyEnterpriseItGovernor {
+    pub fleet: Vec<FleetServerSlaNode>,
+}
+
+impl ItDailyEnterpriseItGovernor {
+    pub fn new() -> Self {
+        let fleet = vec![
+            FleetServerSlaNode {
+                hostname: "srv-core-01.sigmaos.org".to_string(),
+                uptime_target_pct: 99,
+                current_uptime_pct: 100,
+                is_patch_compliant: true,
+            },
+            FleetServerSlaNode {
+                hostname: "srv-db-01.sigmaos.org".to_string(),
+                uptime_target_pct: 99,
+                current_uptime_pct: 99,
+                is_patch_compliant: true,
+            },
+        ];
+        Self { fleet }
+    }
+
+    pub fn is_sla_compliant(&self) -> bool {
+        self.fleet
+            .iter()
+            .all(|node| node.current_uptime_pct >= node.uptime_target_pct && node.is_patch_compliant)
+    }
+}
+
+// ============================================================================
+// 8. HowToGeek Interactive Troubleshooting & Guide Engine
+// Inspired by HowToGeek
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SystemTroubleshootingGuide {
+    pub topic: String,
+    pub issue_symptom: String,
+    pub solution_command: String,
+    pub difficulty_level: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct HowToGeekGuideSystemEngine {
+    pub guides: Vec<SystemTroubleshootingGuide>,
+}
+
+impl HowToGeekGuideSystemEngine {
+    pub fn new() -> Self {
+        let guides = vec![
+            SystemTroubleshootingGuide {
+                topic: "Network".to_string(),
+                issue_symptom: "No IP address assigned via DHCP".to_string(),
+                solution_command: "sigma-net-cli renew --interface eth0".to_string(),
+                difficulty_level: "Beginner".to_string(),
+            },
+            SystemTroubleshootingGuide {
+                topic: "Storage".to_string(),
+                issue_symptom: "Disk space full in /var/log".to_string(),
+                solution_command: "journalctl --vacuum-size=100M".to_string(),
+                difficulty_level: "Intermediate".to_string(),
+            },
+        ];
+        Self { guides }
+    }
+
+    pub fn find_solution(&self, symptom_query: &str) -> Option<String> {
+        self.guides
+            .iter()
+            .find(|g| g.issue_symptom.to_lowercase().contains(&symptom_query.to_lowercase()))
+            .map(|g| g.solution_command.clone())
+    }
+}
+
+// ============================================================================
+// 9. TheNewStack Cloud-Native Microservices & WebAssembly Telemetry Engine
+// Inspired by TheNewStack
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct WasmMicroserviceTelemetry {
+    pub service_name: String,
+    pub heap_memory_kb: usize,
+    pub requests_per_sec: f64,
+    pub avg_latency_us: f64,
+    pub is_sandboxed: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct TheNewStackCloudNativeEngine {
+    pub services: Vec<WasmMicroserviceTelemetry>,
+}
+
+impl TheNewStackCloudNativeEngine {
+    pub fn new() -> Self {
+        let services = vec![
+            WasmMicroserviceTelemetry {
+                service_name: "auth-wasm-service".to_string(),
+                heap_memory_kb: 512,
+                requests_per_sec: 45000.0,
+                avg_latency_us: 18.5,
+                is_sandboxed: true,
+            },
+            WasmMicroserviceTelemetry {
+                service_name: "router-wasm-service".to_string(),
+                heap_memory_kb: 256,
+                requests_per_sec: 120000.0,
+                avg_latency_us: 8.2,
+                is_sandboxed: true,
+            },
+        ];
+        Self { services }
+    }
+
+    pub fn verify_cloud_native_health(&self) -> bool {
+        self.services.iter().all(|s| s.is_sandboxed && s.avg_latency_us < 100.0)
+    }
+}
+
+// ============================================================================
+// 10. Linux.com Community Highlights & Open-Source Telemetry Engine
+// Inspired by Linux.com
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CommunityContributionRecord {
+    pub contributor_name: String,
+    pub repository: String,
+    pub patch_count: u32,
+    pub badge: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct LinuxDotComCommunityNewsEngine {
+    pub contributions: Vec<CommunityContributionRecord>,
+}
+
+impl LinuxDotComCommunityNewsEngine {
+    pub fn new() -> Self {
+        let contributions = vec![
+            CommunityContributionRecord {
+                contributor_name: "SovereignDev".to_string(),
+                repository: "sigmaos/kernel".to_string(),
+                patch_count: 42,
+                badge: "Kernel Maintainer".to_string(),
+            },
+            CommunityContributionRecord {
+                contributor_name: "RustAce".to_string(),
+                repository: "sigmaos/userland".to_string(),
+                patch_count: 18,
+                badge: "Core Contributor".to_string(),
+            },
+        ];
+        Self { contributions }
+    }
+
+    pub fn get_top_contributor(&self) -> Option<CommunityContributionRecord> {
+        self.contributions
+            .iter()
+            .max_by(|a, b| a.patch_count.cmp(&b.patch_count))
+            .cloned()
+    }
+}
+
+// ============================================================================
+// 11. PCMag Consumer Hardware Benchmark & Battery Health Engine
+// Inspired by PCMag
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct PcmagHardwareRatingNode {
+    pub system_model: String,
+    pub editor_rating_stars: f32,
+    pub battery_life_mins: u32,
+    pub thermal_stress_pass: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct PcmagHardwareBenchEngine {
+    pub benchmarks: Vec<PcmagHardwareRatingNode>,
+}
+
+impl PcmagHardwareBenchEngine {
+    pub fn new() -> Self {
+        let benchmarks = vec![PcmagHardwareRatingNode {
+            system_model: "Sigma Workstation Pro".to_string(),
+            editor_rating_stars: 4.8,
+            battery_life_mins: 720,
+            thermal_stress_pass: true,
+        }];
+        Self { benchmarks }
+    }
+
+    pub fn evaluate_hardware_quality(&self) -> bool {
+        self.benchmarks
+            .iter()
+            .all(|node| node.editor_rating_stars >= 4.0 && node.thermal_stress_pass)
+    }
+}
+
+// ============================================================================
+// 12. LinuxTeck Sysadmin Automation & Toolkit Engine
+// Inspired by LinuxTeck
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SysadminScriptTask {
+    pub script_name: String,
+    pub description: String,
+    pub is_automated: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct LinuxTeckSysadminToolkitEngine {
+    pub tasks: Vec<SysadminScriptTask>,
+}
+
+impl LinuxTeckSysadminToolkitEngine {
+    pub fn new() -> Self {
+        let tasks = vec![
+            SysadminScriptTask {
+                script_name: "auto_backup_zfs.sh".to_string(),
+                description: "Automated ZFS snapshot replication".to_string(),
+                is_automated: true,
+            },
+            SysadminScriptTask {
+                script_name: "audit_ssh_keys.sh".to_string(),
+                description: "SSH authorized_keys audit and rotation".to_string(),
+                is_automated: true,
+            },
+        ];
+        Self { tasks }
+    }
+
+    pub fn run_sysadmin_suite(&self) -> bool {
+        !self.tasks.is_empty() && self.tasks.iter().all(|t| t.is_automated)
+    }
+}
+
+// ============================================================================
+// 13. OpenSourceForU Modular FOSS Stack Engine
+// Inspired by OpenSourceForU
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FossStackDescriptor {
+    pub stack_name: String,
+    pub components: Vec<String>,
+    pub recommended_for: String,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct OpenSourceForUModularEngine {
+    pub stacks: Vec<FossStackDescriptor>,
+}
+
+impl OpenSourceForUModularEngine {
+    pub fn new() -> Self {
+        let stacks = vec![FossStackDescriptor {
+            stack_name: "SigmaOS Sovereign Web Stack".to_string(),
+            components: vec!["sigma-httpd".to_string(), "sigma-sqlite".to_string(), "sigma-auth".to_string()],
+            recommended_for: "Zero-Dependency Enterprise Microservices".to_string(),
+        }];
+        Self { stacks }
+    }
+
+    pub fn get_recommended_stack(&self, use_case: &str) -> Option<FossStackDescriptor> {
+        self.stacks
+            .iter()
+            .find(|s| s.recommended_for.to_lowercase().contains(&use_case.to_lowercase()))
+            .cloned()
+    }
+}
+
+// ============================================================================
 // Sovereign Tech Media Master Suite
 // ============================================================================
 
@@ -427,6 +768,14 @@ pub struct SovereignTechMediaMasterSuite {
     pub zero_trust: ZeroTrustSecuritySandbox,
     pub governance: OpenSourceGovernanceEngine,
     pub device_bridge: CrossPlatformDeviceBridge,
+    pub geeky_gadgets: GeekyGadgetsTechReviewEngine,
+    pub it_daily: ItDailyEnterpriseItGovernor,
+    pub how_to_geek: HowToGeekGuideSystemEngine,
+    pub the_new_stack: TheNewStackCloudNativeEngine,
+    pub linux_dot_com: LinuxDotComCommunityNewsEngine,
+    pub pcmag_bench: PcmagHardwareBenchEngine,
+    pub linuxteck_toolkit: LinuxTeckSysadminToolkitEngine,
+    pub os_for_u: OpenSourceForUModularEngine,
 }
 
 impl SovereignTechMediaMasterSuite {
@@ -440,6 +789,14 @@ impl SovereignTechMediaMasterSuite {
             zero_trust: ZeroTrustSecuritySandbox::new(),
             governance: OpenSourceGovernanceEngine::new(),
             device_bridge: CrossPlatformDeviceBridge::new(),
+            geeky_gadgets: GeekyGadgetsTechReviewEngine::new(),
+            it_daily: ItDailyEnterpriseItGovernor::new(),
+            how_to_geek: HowToGeekGuideSystemEngine::new(),
+            the_new_stack: TheNewStackCloudNativeEngine::new(),
+            linux_dot_com: LinuxDotComCommunityNewsEngine::new(),
+            pcmag_bench: PcmagHardwareBenchEngine::new(),
+            linuxteck_toolkit: LinuxTeckSysadminToolkitEngine::new(),
+            os_for_u: OpenSourceForUModularEngine::new(),
         }
     }
 
@@ -465,7 +822,30 @@ impl SovereignTechMediaMasterSuite {
         let bridge_ok = self.device_bridge.verify_bridge_status()
             && self.device_bridge.sideload_app("dev_android_1", "org.sigma.pqc_vpn").is_ok();
 
-        feeds_ok && telemetry_ok && bench_ok && ai_ok && sec_ok && bridge_ok
+        // Verify New Media Engines
+        let gadget_ok = self.geeky_gadgets.get_top_rated_gadget().is_some();
+        let it_daily_ok = self.it_daily.is_sla_compliant();
+        let htg_ok = self.how_to_geek.find_solution("DHCP").is_some();
+        let tns_ok = self.the_new_stack.verify_cloud_native_health();
+        let linux_com_ok = self.linux_dot_com.get_top_contributor().is_some();
+        let pcmag_ok = self.pcmag_bench.evaluate_hardware_quality();
+        let linuxteck_ok = self.linuxteck_toolkit.run_sysadmin_suite();
+        let os4u_ok = self.os_for_u.get_recommended_stack("Enterprise").is_some();
+
+        feeds_ok
+            && telemetry_ok
+            && bench_ok
+            && ai_ok
+            && sec_ok
+            && bridge_ok
+            && gadget_ok
+            && it_daily_ok
+            && htg_ok
+            && tns_ok
+            && linux_com_ok
+            && pcmag_ok
+            && linuxteck_ok
+            && os4u_ok
     }
 }
 
@@ -535,6 +915,33 @@ mod tests {
         assert!(bridge.verify_bridge_status());
         assert!(bridge.sideload_app("dev_android_1", "com.sigma.app").is_ok());
         assert!(bridge.sideload_app("invalid_dev", "com.sigma.app").is_err());
+    }
+
+    #[test]
+    fn test_new_tech_media_engines() {
+        let geeky = GeekyGadgetsTechReviewEngine::new();
+        assert!(geeky.get_top_rated_gadget().is_some());
+
+        let it_daily = ItDailyEnterpriseItGovernor::new();
+        assert!(it_daily.is_sla_compliant());
+
+        let htg = HowToGeekGuideSystemEngine::new();
+        assert!(htg.find_solution("DHCP").is_some());
+
+        let tns = TheNewStackCloudNativeEngine::new();
+        assert!(tns.verify_cloud_native_health());
+
+        let linux_com = LinuxDotComCommunityNewsEngine::new();
+        assert!(linux_com.get_top_contributor().is_some());
+
+        let pcmag = PcmagHardwareBenchEngine::new();
+        assert!(pcmag.evaluate_hardware_quality());
+
+        let linuxteck = LinuxTeckSysadminToolkitEngine::new();
+        assert!(linuxteck.run_sysadmin_suite());
+
+        let os4u = OpenSourceForUModularEngine::new();
+        assert!(os4u.get_recommended_stack("Enterprise").is_some());
     }
 
     #[test]
