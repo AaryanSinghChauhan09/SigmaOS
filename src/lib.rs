@@ -86,6 +86,7 @@ pub use distro::{
     OmarchyWaybarAppletStudioEngine,
 };
 
+pub use package::sovereign_distro_package_matrix::*;
 pub use package::bsd_linux_package_innovations::{
     AlpineApkWorldAndVirtualPkgEngine, ApkIndexMetadata, ApkSignatureKey, ApkV3SignatureEngine,
     AptBugReport, AptMarkRecord, AptMarkState, AptPinRule, ArchCachyosMicroarchOptimizationEngine,
