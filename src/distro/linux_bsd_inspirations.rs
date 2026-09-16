@@ -3,11 +3,6 @@
 // that provide competitive advantages for SigmaOS
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -507,6 +502,12 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'firewall' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "accessibility" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'accessibility' with action '{}' under distro mode '{:?}'",
@@ -673,6 +674,12 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'compiler' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "dashboard" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'dashboard' with action '{}' under distro mode '{:?}'",
@@ -832,6 +839,12 @@ impl SovereignUniversalDistroBridge {
             "hardware" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'hardware' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'i18n' with action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }

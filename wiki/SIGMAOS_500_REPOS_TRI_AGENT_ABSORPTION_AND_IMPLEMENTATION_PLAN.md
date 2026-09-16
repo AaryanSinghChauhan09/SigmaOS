@@ -762,6 +762,19 @@ To establish SigmaOS as a sovereign alternative, SigmaOS implements a radical di
 
 ---
 
+
+### 33. Sovereign Utilities, System Documentation & Administration Repositories (Absorbed)
+501. `jaywcjlove/linux-command` — Comprehensive Linux command manual & search tool engine with offline indexing and multi-lingual documentation.
+502. `0xAX/linux-insides` — Interactive kernel internals visualization book, syscall flow mapping, and boot process trace specs.
+503. `GameServerManagers/LinuxGSM` — Automated game server deployment engine, systemd unit generation, and service management.
+504. `SuperManito/LinuxMirrors` — Dynamic package mirror speed ranking, country-aware mirror switching, and Docker mirror routing.
+505. `bin456789/reinstall` — One-click automated OS re-installation scripts, cloud-init provisioners, and VPS migration toolkit.
+506. `termux/termux-packages` — Android Linux terminal build system, cross-compilation toolchain, and sub-system package porting.
+507. `inputsh/awesome-linux` — Curated Linux system software index, dependency graph mapping, and component taxonomy classification.
+508. `sirredbeard/awesome-unix` — UNIX/Linux/BSD legacy compatibility mapping, POSIX feature matrix, and system API standard compliance tracker.
+
+---
+
 ### 6. Multi-Phase Execution Roadmap (5-Year Extended Plan)
 
 ```
