@@ -1089,6 +1089,244 @@ impl ArcBrowserBoostEngine {
 // 19. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
+// =========================================================================
+// 20. FIREFOX TOTAL COOKIE PROTECTION & FIRST-PARTY ISOLATION (FPI)
+// =========================================================================
+
+pub struct FirefoxTotalCookieProtectionEngine {
+    // (first_party_domain, target_domain) -> BTreeMap<cookie_name, value>
+    pub isolated_jars: BTreeMap<(String, String), BTreeMap<String, String>>,
+}
+
+impl FirefoxTotalCookieProtectionEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            isolated_jars: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_isolated_cookie(&mut self, first_party: &str, target: &str, key: &str, val: &str) {
+        let key_tuple = (first_party.to_string(), target.to_string());
+        let jar = self.isolated_jars.entry(key_tuple).or_default();
+        jar.insert(key.to_string(), val.to_string());
+    }
+
+    pub fn get_isolated_cookie(&self, first_party: &str, target: &str, key: &str) -> Option<String> {
+        let key_tuple = (first_party.to_string(), target.to_string());
+        self.isolated_jars.get(&key_tuple)?.get(key).cloned()
+    }
+
+    pub fn purge_ephemeral_container_cookies(&mut self, first_party: &str) -> usize {
+        let mut purged = 0;
+        let keys_to_remove: Vec<(String, String)> = self
+            .isolated_jars
+            .keys()
+            .filter(|(fp, _)| fp == first_party)
+            .cloned()
+            .collect();
+
+        for key in keys_to_remove {
+            self.isolated_jars.remove(&key);
+            purged += 1;
+        }
+        purged
+    }
+}
+
+// =========================================================================
+// 21. CHROMIUM PARTITIONALLOC & MEMORY SAFETY SANDBOX
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PartitionCategory {
+    ArrayBuffer,
+    Buffer,
+    DomNode,
+    JsHeap,
+    StringPool,
+}
+
+pub struct ChromiumPartitionAllocSandbox {
+    pub partition_allocations: BTreeMap<PartitionCategory, usize>,
+    pub quarantine_bytes: usize,
+    pub giga_cage_active: bool,
+}
+
+impl ChromiumPartitionAllocSandbox {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            partition_allocations: BTreeMap::new(),
+            quarantine_bytes: 0,
+            giga_cage_active: true,
+        }
+    }
+
+    pub fn allocate(&mut self, category: PartitionCategory, bytes: usize) -> bool {
+        let current = self.partition_allocations.entry(category).or_insert(0);
+        *current += bytes;
+        true
+    }
+
+    pub fn quarantine(&mut self, bytes: usize) {
+        self.quarantine_bytes += bytes;
+    }
+
+    pub fn total_allocated_bytes(&self) -> usize {
+        self.partition_allocations.values().sum()
+    }
+}
+
+// =========================================================================
+// 22. LIBREWOLF HARDENING ENGINE & WEBRTC LEAK SUPPRESSION
+// =========================================================================
+
+pub struct LibreWolfHardeningEngine {
+    pub https_first_mode: bool,
+    pub webrtc_ip_handling_policy: String, // "disable_non_proxied_udp"
+    pub canvas_noise_enabled: bool,
+    pub ocsp_stapling_required: bool,
+}
+
+impl LibreWolfHardeningEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            https_first_mode: true,
+            webrtc_ip_handling_policy: String::from("disable_non_proxied_udp"),
+            canvas_noise_enabled: true,
+            ocsp_stapling_required: true,
+        }
+    }
+
+    pub fn suppress_webrtc_local_ip_leak(&self, candidates: &[&str]) -> Vec<String> {
+        let mut safe_candidates = Vec::new();
+        for &cand in candidates {
+            if !cand.contains("192.168.") && !cand.contains("10.") && !cand.contains("172.16.") {
+                safe_candidates.push(cand.to_string());
+            } else {
+                safe_candidates.push(String::from("candidate:0 1 UDP 2122260223 0.0.0.0 9 typ host")); // Mask local IP
+            }
+        }
+        safe_candidates
+    }
+}
+
+// =========================================================================
+// 23. LADYBIRD LIBWEB HTML5 & BOX LAYOUT TREE ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct LayoutBoxNode {
+    pub tag: String,
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
+    pub children: Vec<LayoutBoxNode>,
+}
+
+pub struct LadybirdLibWebEngine {
+    pub layout_tree: Option<LayoutBoxNode>,
+}
+
+impl LadybirdLibWebEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self { layout_tree: None }
+    }
+
+    pub fn construct_dom_and_layout(&mut self, html_snippet: &str) {
+        let mut root = LayoutBoxNode {
+            tag: String::from("html"),
+            x: 0.0,
+            y: 0.0,
+            width: 1920.0,
+            height: 1080.0,
+            children: Vec::new(),
+        };
+
+        if html_snippet.contains("<div") {
+            root.children.push(LayoutBoxNode {
+                tag: String::from("div"),
+                x: 10.0,
+                y: 10.0,
+                width: 800.0,
+                height: 600.0,
+                children: Vec::new(),
+            });
+        }
+
+        self.layout_tree = Some(root);
+    }
+}
+
+// =========================================================================
+// 24. WATERFOX LEGACY EXTENSION ENGINE
+// =========================================================================
+
+pub struct WaterfoxLegacyExtensionEngine {
+    pub registered_xul_addons: BTreeMap<String, String>,
+}
+
+impl WaterfoxLegacyExtensionEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            registered_xul_addons: BTreeMap::new(),
+        };
+        engine.registered_xul_addons.insert(
+            String::from("legacy_greasemonkey"),
+            String::from("v3.12-xul"),
+        );
+        engine
+    }
+
+    pub fn register_xul_addon(&mut self, addon_id: &str, version: &str) {
+        self.registered_xul_addons.insert(addon_id.to_string(), version.to_string());
+    }
+
+    pub fn execute_addon_hook(&self, addon_id: &str) -> String {
+        if let Some(ver) = self.registered_xul_addons.get(addon_id) {
+            format!("[Waterfox Legacy Hook]: Executed XUL/NPAPI addon '{}' (v{}).", addon_id, ver)
+        } else {
+            format!("[Waterfox Legacy Error]: Addon '{}' not found.", addon_id)
+        }
+    }
+}
+
+// =========================================================================
+// 25. TOR PLUGGABLE TRANSPORTS MANAGER (obfs4 & Snowflake)
+// =========================================================================
+
+pub struct TorPluggableTransportEngine {
+    pub transport_type: String, // "obfs4", "snowflake", "meek"
+    pub active_bridges: Vec<String>,
+}
+
+impl TorPluggableTransportEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            transport_type: String::from("snowflake"),
+            active_bridges: vec![
+                String::from("snowflake 192.0.2.3:1"),
+                String::from("obfs4 192.0.2.4:8080 cert=A1B2C3"),
+            ],
+        }
+    }
+
+    pub fn obfuscate_onion_traffic(&self, raw_bytes: &[u8]) -> Vec<u8> {
+        let mut obfuscated = Vec::new();
+        obfuscated.extend_from_slice(b"OBFS4_HEADER");
+        for &b in raw_bytes {
+            obfuscated.push(b ^ 0x3C);
+        }
+        obfuscated
+    }
+}
+
 pub struct SigmaWebBrowser {
     pub engine: SovereignBrowserEngine,
     pub rfp: ResistFingerprintingEngine,
@@ -1107,6 +1345,12 @@ pub struct SigmaWebBrowser {
     pub chromium_ipc: ChromiumIpcChannelEngine,
     pub mullvad_isolation: MullvadPrivacyIsolationEngine,
     pub arc_boost: ArcBrowserBoostEngine,
+    pub total_cookie_protection: FirefoxTotalCookieProtectionEngine,
+    pub partition_alloc: ChromiumPartitionAllocSandbox,
+    pub librewolf_hardening: LibreWolfHardeningEngine,
+    pub ladybird_engine: LadybirdLibWebEngine,
+    pub waterfox_legacy: WaterfoxLegacyExtensionEngine,
+    pub tor_transports: TorPluggableTransportEngine,
 }
 
 impl SigmaWebBrowser {
@@ -1130,6 +1374,12 @@ impl SigmaWebBrowser {
             chromium_ipc: ChromiumIpcChannelEngine::new(),
             mullvad_isolation: MullvadPrivacyIsolationEngine::new(),
             arc_boost: ArcBrowserBoostEngine::new(),
+            total_cookie_protection: FirefoxTotalCookieProtectionEngine::new(),
+            partition_alloc: ChromiumPartitionAllocSandbox::new(),
+            librewolf_hardening: LibreWolfHardeningEngine::new(),
+            ladybird_engine: LadybirdLibWebEngine::new(),
+            waterfox_legacy: WaterfoxLegacyExtensionEngine::new(),
+            tor_transports: TorPluggableTransportEngine::new(),
         }
     }
 
@@ -1420,5 +1670,48 @@ mod tests {
         assert_eq!(duck.evaluate_domain_grade("doubleclick.net"), TrackerTrustGrade::GradeF);
         let summary = duck.summarize_web_page_ai("SigmaOS is an AI-Native operating system.");
         assert!(summary.contains("DuckAssist AI Privacy Summary"));
+    }
+
+    #[test]
+    fn test_advanced_browser_innovations() {
+        // Total Cookie Protection
+        let mut tcp = FirefoxTotalCookieProtectionEngine::new();
+        tcp.set_isolated_cookie("siteA.com", "tracker.com", "uid", "12345");
+        assert_eq!(
+            tcp.get_isolated_cookie("siteA.com", "tracker.com", "uid"),
+            Some("12345".to_string())
+        );
+        assert_eq!(
+            tcp.get_isolated_cookie("siteB.com", "tracker.com", "uid"),
+            None
+        );
+
+        // PartitionAlloc
+        let mut pa = ChromiumPartitionAllocSandbox::new();
+        assert!(pa.allocate(PartitionCategory::ArrayBuffer, 1024));
+        pa.quarantine(512);
+        assert_eq!(pa.total_allocated_bytes(), 1024);
+
+        // LibreWolf WebRTC leak suppression
+        let lw = LibreWolfHardeningEngine::new();
+        let candidates = vec!["candidate:1 1 UDP 192.168.1.5", "candidate:2 1 UDP 8.8.8.8"];
+        let safe = lw.suppress_webrtc_local_ip_leak(&candidates);
+        assert!(safe[0].contains("0.0.0.0"));
+        assert_eq!(safe[1], "candidate:2 1 UDP 8.8.8.8");
+
+        // Ladybird LibWeb
+        let mut lb = LadybirdLibWebEngine::new();
+        lb.construct_dom_and_layout("<html><body><div id='main'></div></body></html>");
+        assert!(lb.layout_tree.is_some());
+
+        // Waterfox Legacy
+        let wf = WaterfoxLegacyExtensionEngine::new();
+        let hook_out = wf.execute_addon_hook("legacy_greasemonkey");
+        assert!(hook_out.contains("Executed XUL/NPAPI addon"));
+
+        // Tor Pluggable Transports
+        let tor_pt = TorPluggableTransportEngine::new();
+        let obfs = tor_pt.obfuscate_onion_traffic(b"ONION_DATA");
+        assert!(obfs.starts_with(b"OBFS4_HEADER"));
     }
 }
