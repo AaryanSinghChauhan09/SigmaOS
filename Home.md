@@ -39,7 +39,7 @@
 - **AI Agent Universal Package Management Guide:** [[AI_AGENT_UNIVERSAL_PACKAGE_MANAGEMENT]] - Foreign package adapters (.deb, .rpm, PKGBUILD, ebuild, apk, hpkg), dependency canonicalization, and Universal PM for AI agents.
 - **AI Agent GitHub Workflows Management Guide:** [[AI_AGENT_GITHUB_WORKFLOWS_MANAGEMENT]] - CI/CD, multi-distro matrix, reproducible SBOMs, Cosign signing, and Pages auto-deploy workflows for AI agents.
 - **AI Agent GitHub Wiki Management Guide:** [[AI_AGENT_GITHUB_WIKI_MANAGEMENT]] - Dual-repository wiki synchronization, Home.md index updates, and zero-drift documentation rules for AI agents.
-- **Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia (V23):** [[SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V23]] - Complete application, library, model, framework, codec, format, and dependency elimination guide.
+- **Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia (V24):** [[SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V24]] - Complete application, library, model, framework, codec, format, and dependency elimination guide.
 
 ---
 
