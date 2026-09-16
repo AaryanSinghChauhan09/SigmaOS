@@ -200,6 +200,36 @@ impl Default for UsbHidKeyboardDriver {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dynamic_devfs() {
+        let mut devfs = SovereignDynamicDevfsEngine::new();
+        assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234"));
+        assert!(devfs.lookup_node("disk/by-uuid/1234").is_some());
+    }
+
+    #[test]
+    fn test_stateful_nat() {
+        let mut nat = SovereignStatefulNatEngine::new([1, 2, 3, 4]);
+        let (ip, port) = nat.create_snat_mapping([10, 0, 0, 2], [8, 8, 8, 8], 1024, 80, 6);
+        assert_eq!(ip, [1, 2, 3, 4]);
+        assert_eq!(port, 1024);
+        let orig = nat.lookup_conntrack([1, 2, 3, 4], 1024);
+        assert_eq!(orig, Some(([10, 0, 0, 2], 1024)));
+    }
+
+    #[test]
+    fn test_journald_binary_storage() {
+        let mut storage = SovereignJournaldBinaryStorageEngine::new(10);
+        storage.log(1000, 3, "init", "Service started");
+        assert_eq!(storage.query_unit("init").len(), 1);
+        assert_eq!(storage.query_priority(3).len(), 1);
+    }
+}
+
 // ============================================================================
 // 3. Wireless (802.11ax / WPA3-SAE) & Bluetooth (BlueZ) Stack
 // ============================================================================
@@ -530,6 +560,29 @@ pub struct SovereignDnsTlsResolverEngine {
 }
 
 impl SovereignDnsTlsResolverEngine {
+    pub fn new(primary_dns_ip: [u8; 4]) -> Self {
+        let mut records = Vec::new();
+        records.push(DnsRecordEntry {
+            domain_name: "localhost",
+            ip_address: [127, 0, 0, 1],
+            ttl_seconds: 3600,
+            dnssec_validated: true,
+        });
+        Self {
+            upstream_dot_server: primary_dns_ip,
+            dot_port: 853,
+            local_cache: records,
+            dnssec_enforced: true,
+        }
+    }
+
+    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
+        self.local_cache
+            .iter()
+            .find(|r| r.domain_name == domain)
+            .map(|r| r.ip_address)
+    }
+
     pub fn lookup_modprobe_alias(&self, alias: &str) -> Option<&'static str> {
         match alias {
             "char-major-10-200" => Some("tun"),
@@ -540,175 +593,9 @@ impl SovereignDnsTlsResolverEngine {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    CharacterDevice,
-    BlockDevice,
-    Fifo,
-    Socket,
-}
-
-#[derive(Debug, Clone)]
-pub struct DeviceNodeEntry {
-    pub name: String,
-    pub node_type: DeviceNodeType,
-    pub major: u32,
-    pub minor: u32,
-    pub symlink_paths: Vec<String>,
-}
-
-pub struct SovereignDynamicDevfsEngine {
-    pub nodes: Vec<DeviceNodeEntry>,
-}
-
-impl SovereignDynamicDevfsEngine {
-    pub fn new() -> Self {
-        Self { nodes: Vec::new() }
-    }
-
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
-        self.nodes.push(DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            symlink_paths: Vec::new(),
-        });
-    }
-}
-
-impl Default for SovereignDynamicDevfsEngine {
+impl Default for SovereignDnsTlsResolverEngine {
     fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NatType {
-    Snat,
-    Dnat,
-    Masquerade,
-}
-
-#[derive(Debug, Clone)]
-pub struct ConntrackTableEntry {
-    pub original_src: [u8; 4],
-    pub original_dst: [u8; 4],
-    pub src_port: u16,
-    pub dst_port: u16,
-    pub translated_ip: [u8; 4],
-    pub translated_port: u16,
-    pub nat_type: NatType,
-    pub packets_counter: u64,
-}
-
-pub struct SovereignStatefulNatEngine {
-    pub public_ip: [u8; 4],
-    pub conntrack_table: Vec<ConntrackTableEntry>,
-}
-
-impl SovereignStatefulNatEngine {
-    pub fn new(public_ip: [u8; 4]) -> Self {
-        Self {
-            public_ip,
-            conntrack_table: Vec::new(),
-        }
-    }
-
-    pub fn create_snat_mapping(
-        &mut self,
-        internal_src: [u8; 4],
-        dst_ip: [u8; 4],
-        src_port: u16,
-        dst_port: u16,
-        protocol: u8,
-    ) -> ([u8; 4], u16) {
-        let _ = protocol;
-        if let Some(conn) = self.conntrack_table.iter_mut().find(|c| {
-            c.original_src == internal_src
-                && c.src_port == src_port
-                && c.original_dst == dst_ip
-                && c.dst_port == dst_port
-        }) {
-            conn.packets_counter += 1;
-        } else {
-            self.conntrack_table.push(ConntrackTableEntry {
-                original_src: internal_src,
-                original_dst: dst_ip,
-                src_port,
-                dst_port,
-                translated_ip: self.public_ip,
-                translated_port: src_port,
-                nat_type: NatType::Snat,
-                packets_counter: 1,
-            });
-        }
-        (self.public_ip, src_port)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_epoch_ms: u64,
-    pub identifier: String,
-    pub message: String,
-    pub priority: u8,
-}
-
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub log_records: Vec<JournaldLogRecord>,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new() -> Self {
-        Self { log_records: Vec::new() }
-    }
-
-    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
-        self.log_records.push(JournaldLogRecord {
-            timestamp_epoch_ms: 1000,
-            identifier: identifier.to_string(),
-            message: message.to_string(),
-            priority,
-        });
-    }
-}
-
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain: String,
-    pub ip_address: [u8; 4],
-}
-
-pub struct SovereignDnsTlsResolverEngine {
-    pub primary_dns_ip: [u8; 4],
-    pub records: Vec<DnsRecordEntry>,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn new(primary_dns_ip: [u8; 4]) -> Self {
-        let mut records = Vec::new();
-        records.push(DnsRecordEntry {
-            domain: "localhost".to_string(),
-            ip_address: [127, 0, 0, 1],
-        });
-        Self { primary_dns_ip, records }
-    }
-
-    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
-        self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
-    }
-}
-
-impl Default for DemandPagingSwapEngine {
-    fn default() -> Self {
-        Self::new(2048)
+        Self::new([1, 1, 1, 1])
     }
 }
 
@@ -800,6 +687,13 @@ impl Default for SovereignDynamicDevfsEngine {
 // ============================================================================
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
 // ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NatType {
+    Snat,
+    Dnat,
+    Masquerade,
+}
 
 #[derive(Debug, Clone)]
 pub struct ConntrackTableEntry {
@@ -1094,7 +988,7 @@ impl SovereignJournaldBinaryStorageEngine {
             timestamp_unix_epoch: timestamp,
             priority,
             unit_name: unit,
-            message: msg.to_string(),
+            message: msg,
         });
     }
 
