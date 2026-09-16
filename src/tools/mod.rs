@@ -9,6 +9,19 @@ pub mod sovereign_commands;
 pub mod open_source_tools_engine;
 pub mod open_source_cli_tools_suite;
 pub mod open_source_tools_parity;
+pub mod tech_media_innovations;
+
+pub use tech_media_innovations::{
+    AiMlTensorDatasetPipeline, AppualsTroubleshootingEngine, CrossPlatformDeviceBridge,
+    CrossPlatformDeviceSpec, EnterpriseItGovernanceConfig, GeekyGadgetsTechReviewEngine,
+    HardwareTelemetryMonitor, HowToGeekGuideSystemEngine, ItDailyEnterpriseItGovernor,
+    LinuxDotComCommunityNewsEngine, LinuxPressFeedEngine, LinuxTeckSysadminToolkitEngine,
+    LlmInferenceMetrics, ModelPerformanceBenchmark, OpenSourceForUModularEngine,
+    OpenSourceGovernanceEngine, PcmagHardwareBenchEngine, PhoronixBenchEngine,
+    PhoronixBenchmarkSuiteNode, PowerThermalTelemetryNode, SbcPinoutConfig,
+    SbomLicenseComplianceRecord, SovereignTechMediaMasterSuite, TechMediaArticleFeed,
+    TheNewStackCloudNativeEngine, ZeroTrustSandboxPolicy, ZeroTrustSecuritySandbox,
+};
 
 pub use open_source_tools_engine::{
     BatSyntaxHighlighterEngine, FzfFuzzyFinderEngine, FzfSearchResult, HtopProcessEntry,

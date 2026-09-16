@@ -255,3 +255,9 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine,
     SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
 };
+
+pub mod omarchy_expanded_parity;
+pub use omarchy_expanded_parity::{
+    OmarchyHyprlockScreenLocker, OmarchyOmakubBootstrapEngine, OmarchyRofiAppLauncher,
+    OmarchyThunarFileActions, OmarchyZellijSessionManager, SovereignOmarchyExpandedParitySuite,
+};
