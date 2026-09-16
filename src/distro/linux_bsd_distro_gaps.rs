@@ -891,8 +891,8 @@ impl SovereignJournaldBinaryStorageEngine {
     }
 
     pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
-        if self.logs.len() >= self.max_logs_capacity {
-            self.logs.remove(0); // Journal rotation
+        if self.logs.len() >= self.max_logs_capacity && self.max_logs_capacity > 0 {
+            self.logs.remove(0);
         }
         self.logs.push(JournaldLogRecord {
             timestamp_unix_epoch: timestamp,
@@ -946,7 +946,7 @@ impl SovereignDnsTlsResolverEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
