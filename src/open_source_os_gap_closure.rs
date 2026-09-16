@@ -92,6 +92,224 @@ pub struct Plan9P2000ProtocolEngine {
     pub processed_msg_count: u64,
 }
 
+// =========================================================================
+// 40. GOOGLE GHOST OS USER-SPACE SCHEDULER ENGINE (ghOSt Inspired)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GhostThreadState {
+    Runnable,
+    Running,
+    Blocked,
+    Completed,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GhostThreadDescriptor {
+    pub tid: u64,
+    pub cpu_id: u32,
+    pub priority: u32,
+    pub state: GhostThreadState,
+}
+
+pub struct SovereignGhostOsUserSpaceSchedulerEngine {
+    pub threads: BTreeMap<u64, GhostThreadDescriptor>,
+    pub total_switch_count: u64,
+}
+
+impl SovereignGhostOsUserSpaceSchedulerEngine {
+    pub fn new() -> Self {
+        Self {
+            threads: BTreeMap::new(),
+            total_switch_count: 0,
+        }
+    }
+
+    pub fn spawn_thread(&mut self, tid: u64, priority: u32) {
+        self.threads.insert(
+            tid,
+            GhostThreadDescriptor {
+                tid,
+                cpu_id: 0,
+                priority,
+                state: GhostThreadState::Runnable,
+            },
+        );
+    }
+
+    pub fn schedule_next_on_cpu(&mut self, cpu_id: u32) -> Option<u64> {
+        let mut highest_tid: Option<u64> = None;
+        let mut max_prio = 0u32;
+
+        for (tid, desc) in &self.threads {
+            if desc.state == GhostThreadState::Runnable && desc.priority >= max_prio {
+                max_prio = desc.priority;
+                highest_tid = Some(*tid);
+            }
+        }
+
+        if let Some(tid) = highest_tid {
+            if let Some(desc) = self.threads.get_mut(&tid) {
+                desc.state = GhostThreadState::Running;
+                desc.cpu_id = cpu_id;
+                self.total_switch_count += 1;
+            }
+        }
+        highest_tid
+    }
+
+    pub fn yield_thread(&mut self, tid: u64) -> bool {
+        if let Some(desc) = self.threads.get_mut(&tid) {
+            desc.state = GhostThreadState::Runnable;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignGhostOsUserSpaceSchedulerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 41. ILLUMOS / SOLARIS MDB MODULAR DEBUGGER KERNEL ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MdbKernelSymbol {
+    pub symbol_name: String,
+    pub vaddr: u64,
+    pub size_bytes: usize,
+}
+
+pub struct SovereignIllumosMdbKernelDebuggerEngine {
+    pub symbols: BTreeMap<String, MdbKernelSymbol>,
+    pub stack_trace: Vec<u64>,
+}
+
+impl SovereignIllumosMdbKernelDebuggerEngine {
+    pub fn new() -> Self {
+        Self {
+            symbols: BTreeMap::new(),
+            stack_trace: Vec::new(),
+        }
+    }
+
+    pub fn register_symbol(&mut self, name: &str, vaddr: u64, size: usize) {
+        self.symbols.insert(
+            name.to_string(),
+            MdbKernelSymbol {
+                symbol_name: name.to_string(),
+                vaddr,
+                size_bytes: size,
+            },
+        );
+    }
+
+    pub fn resolve_address(&self, vaddr: u64) -> Option<String> {
+        for sym in self.symbols.values() {
+            if vaddr >= sym.vaddr && vaddr < sym.vaddr + (sym.size_bytes as u64) {
+                let offset = vaddr - sym.vaddr;
+                return Some(format!("{}+{:#x}", sym.symbol_name, offset));
+            }
+        }
+        None
+    }
+
+    pub fn capture_crash_stack_trace(&mut self, pcs: &[u64]) {
+        self.stack_trace = pcs.to_vec();
+    }
+}
+
+impl Default for SovereignIllumosMdbKernelDebuggerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 42. FREEBSD CAPSICUM FILE DESCRIPTOR CAPABILITY RIGHTS ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapsicumRights {
+    pub cap_read: bool,
+    pub cap_write: bool,
+    pub cap_seek: bool,
+    pub cap_fcntl: bool,
+    pub cap_ioctl: bool,
+}
+
+impl Default for CapsicumRights {
+    fn default() -> Self {
+        Self {
+            cap_read: true,
+            cap_write: true,
+            cap_seek: true,
+            cap_fcntl: true,
+            cap_ioctl: true,
+        }
+    }
+}
+
+pub struct SovereignFreeBsdCapsicumRightsEngine {
+    pub fd_rights: BTreeMap<i32, CapsicumRights>,
+    pub capability_mode: bool,
+}
+
+impl SovereignFreeBsdCapsicumRightsEngine {
+    pub fn new() -> Self {
+        Self {
+            fd_rights: BTreeMap::new(),
+            capability_mode: false,
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.capability_mode = true;
+    }
+
+    pub fn limit_fd_rights(&mut self, fd: i32, rights: CapsicumRights) -> Result<(), &'static str> {
+        if let Some(existing) = self.fd_rights.get(&fd) {
+            // Rights can only be reduced, not escalated
+            if (rights.cap_read && !existing.cap_read)
+                || (rights.cap_write && !existing.cap_write)
+                || (rights.cap_seek && !existing.cap_seek)
+            {
+                return Err("Capsicum: Attempted capability rights escalation");
+            }
+        }
+        self.fd_rights.insert(fd, rights);
+        Ok(())
+    }
+
+    pub fn check_fd_right(&self, fd: i32, require_read: bool, require_write: bool) -> bool {
+        if !self.capability_mode {
+            return true;
+        }
+        if let Some(rights) = self.fd_rights.get(&fd) {
+            if require_read && !rights.cap_read {
+                return false;
+            }
+            if require_write && !rights.cap_write {
+                return false;
+            }
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignFreeBsdCapsicumRightsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Plan9P2000ProtocolEngine {
     pub fn new(max_msize: u32) -> Self {
         Self {
@@ -3631,6 +3849,48 @@ mod tests {
 
         assert_eq!(auditor.block_windows_telemetry_hosts(), 3);
     }
+
+    #[test]
+    fn test_sovereign_ghost_os_scheduler_engine() {
+        let mut ghost = SovereignGhostOsUserSpaceSchedulerEngine::new();
+        ghost.spawn_thread(101, 10);
+        ghost.spawn_thread(102, 50);
+
+        let scheduled = ghost.schedule_next_on_cpu(0).unwrap();
+        assert_eq!(scheduled, 102);
+        assert_eq!(ghost.total_switch_count, 1);
+        assert!(ghost.yield_thread(102));
+    }
+
+    #[test]
+    fn test_sovereign_illumos_mdb_debugger_engine() {
+        let mut mdb = SovereignIllumosMdbKernelDebuggerEngine::new();
+        mdb.register_symbol("sys_call_entry", 0xFFFFFFFF81000000, 0x100);
+
+        let sym = mdb.resolve_address(0xFFFFFFFF81000020).unwrap();
+        assert_eq!(sym, "sys_call_entry+0x20");
+
+        mdb.capture_crash_stack_trace(&[0xFFFFFFFF81000020, 0xFFFFFFFF81000050]);
+        assert_eq!(mdb.stack_trace.len(), 2);
+    }
+
+    #[test]
+    fn test_sovereign_freebsd_capsicum_rights_engine() {
+        let mut caps = SovereignFreeBsdCapsicumRightsEngine::new();
+        caps.enter_capability_mode();
+
+        let r = CapsicumRights {
+            cap_read: true,
+            cap_write: false,
+            cap_seek: true,
+            cap_fcntl: false,
+            cap_ioctl: false,
+        };
+        assert!(caps.limit_fd_rights(3, r).is_ok());
+
+        assert!(caps.check_fd_right(3, true, false));
+        assert!(!caps.check_fd_right(3, true, true)); // Needs write right, should fail
+    }
 }
 
 // =========================================================================
@@ -3789,6 +4049,9 @@ pub struct OpenSourceProjectSupremacySuite {
     pub pf_carp_engine: OpenBsdPfCarpStateEngine,
     pub arrow_engine: ApacheArrowVectorizedEngine,
     pub sched_ext_engine: LinuxSchedExtScxEngine,
+    pub ghost_scheduler: SovereignGhostOsUserSpaceSchedulerEngine,
+    pub mdb_debugger: SovereignIllumosMdbKernelDebuggerEngine,
+    pub capsicum_engine: SovereignFreeBsdCapsicumRightsEngine,
 }
 
 #[derive(Debug, Clone)]
@@ -3817,6 +4080,9 @@ impl OpenSourceProjectSupremacySuite {
             pf_carp_engine: OpenBsdPfCarpStateEngine::new(1, 1, 0),
             arrow_engine: ApacheArrowVectorizedEngine::new(),
             sched_ext_engine: LinuxSchedExtScxEngine::new(ScxSchedulerKind::BpfLand),
+            ghost_scheduler: SovereignGhostOsUserSpaceSchedulerEngine::new(),
+            mdb_debugger: SovereignIllumosMdbKernelDebuggerEngine::new(),
+            capsicum_engine: SovereignFreeBsdCapsicumRightsEngine::new(),
         }
     }
 
