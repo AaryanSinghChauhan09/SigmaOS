@@ -1,6 +1,6 @@
 // Sovereign Tech News & Technology Media Redirection Engine
 // Inspiring content aggregation, RSS/Atom feed parsing, and smart URL redirection
-// across 28 top Linux & Tech publications for SigmaOS browser and desktop news widgets.
+// across 33 top Linux & Tech publications for SigmaOS browser and desktop news widgets.
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
 extern crate alloc;
@@ -84,6 +84,11 @@ impl SovereignTechNewsRedirectionEngine {
             ("linuxteck", "LinuxTeck", "linuxteck.com", "https://www.linuxteck.com/feed/", "https://www.linuxteck.com", TechPublicationCategory::LinuxAndOpenSource, "Linux sysadmin tutorials, DevOps and security guides"),
             ("appuals", "Appuals", "appuals.com", "https://appuals.com/feed/", "https://appuals.com", TechPublicationCategory::WindowsAndCrossPlatform, "Software troubleshooting, OS error fixes and guides"),
             ("distrowatch", "DistroWatch", "distrowatch.com", "https://distrowatch.com/news/dw.xml", "https://distrowatch.com", TechPublicationCategory::LinuxAndOpenSource, "Linux and BSD distribution release tracking and rankings"),
+            ("9to5google", "9to5Google", "9to5google.com", "https://9to5google.com/feed/", "https://9to5google.com", TechPublicationCategory::HardwareAndGadgets, "Google, Android, Pixel, and ChromeOS news and updates"),
+            ("9to5mac", "9to5Mac", "9to5mac.com", "https://9to5mac.com/feed/", "https://9to5mac.com", TechPublicationCategory::HardwareAndGadgets, "Apple, iPhone, Mac, and iOS/macOS news and updates"),
+            ("androidauthority", "Android Authority", "androidauthority.com", "https://www.androidauthority.com/feed/", "https://www.androidauthority.com", TechPublicationCategory::HardwareAndGadgets, "Android devices, mobile tech, and mobile ecosystem news"),
+            ("androidpolice", "Android Police", "androidpolice.com", "https://www.androidpolice.com/feed/", "https://www.androidpolice.com", TechPublicationCategory::HardwareAndGadgets, "Android apps, OS news, device reviews, and tutorials"),
+            ("frappe", "Frappe Framework", "frappe.io", "https://frappe.io/feed", "https://frappe.io", TechPublicationCategory::EnterpriseAndCloud, "Low-code open-source ERP & enterprise framework"),
         ];
 
         for (id, name, domain, feed_url, canonical_url, category, desc) in entries {
@@ -185,6 +190,9 @@ mod tests {
     fn test_tech_publication_redirects() {
         let engine = SovereignTechNewsRedirectionEngine::new();
 
+        // Verify total publication count is exactly 33
+        assert_eq!(engine.publications.len(), 33);
+
         // Direct key shortcuts
         assert_eq!(
             engine.redirect_url("phoronix"),
@@ -197,6 +205,26 @@ mod tests {
         assert_eq!(
             engine.redirect_url("distrowatch"),
             Some("https://distrowatch.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("9to5google"),
+            Some("https://9to5google.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("9to5mac"),
+            Some("https://9to5mac.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("androidauthority"),
+            Some("https://www.androidauthority.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("androidpolice"),
+            Some("https://www.androidpolice.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("frappe"),
+            Some("https://frappe.io".to_string())
         );
 
         // Domain matching
