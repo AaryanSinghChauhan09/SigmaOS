@@ -610,20 +610,10 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-#[cfg(feature = "standalone_test")]
 #[path = "omarchy_inspiration.rs"]
 pub mod omarchy_inspiration;
 
-#[cfg(feature = "standalone_test")]
 pub use omarchy_inspiration::{
-    AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
-    OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
-    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
-    QuickshellWidget, ShellComponentKind,
-};
-
-#[cfg(not(feature = "standalone_test"))]
-pub use super::omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
     OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
