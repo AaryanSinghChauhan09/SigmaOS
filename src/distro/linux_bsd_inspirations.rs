@@ -3,10 +3,6 @@
 // that provide competitive advantages for SigmaOS
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
 
 use std::collections::BTreeMap;
 use std::format;
@@ -617,6 +613,12 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'compiler' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "compatibility" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'compatibility' with action '{}' under distro mode '{:?}'",
@@ -763,6 +765,12 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'firewall' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "filesystem" => {
                 let translated_path = self.translate_vfs_path(action);
                 Ok(format!(
@@ -832,6 +840,12 @@ impl SovereignUniversalDistroBridge {
             "hardware" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'hardware' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'i18n' with action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
