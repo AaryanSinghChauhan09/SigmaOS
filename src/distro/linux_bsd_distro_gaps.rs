@@ -527,6 +527,25 @@ pub struct SovereignDnsTlsResolverEngine {
     pub dot_port: u16,                // 853
     pub local_cache: Vec<DnsRecordEntry>,
     pub dnssec_enforced: bool,
+}
+
+impl SovereignDnsTlsResolverEngine {
+    pub fn new(upstream_dot_server: [u8; 4]) -> Self {
+        Self {
+            upstream_dot_server,
+            dot_port: 853,
+            local_cache: Vec::new(),
+            dnssec_enforced: true,
+        }
+    }
+}
+
+impl Default for SovereignDnsTlsResolverEngine {
+    fn default() -> Self {
+        Self::new([1, 1, 1, 1])
+    }
+}
+
 // 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
 // ============================================================================
 
