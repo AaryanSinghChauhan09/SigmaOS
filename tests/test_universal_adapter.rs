@@ -149,12 +149,12 @@ fn test_universal_adapter_all_formats() {
     let mut bridge = SigPkgUniversalBridgeEngine::new();
     let pkg_bsd = bridge.absorb_and_register("redis.pkg", freebsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, crate::sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, crate::sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -209,7 +209,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_adapter::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
