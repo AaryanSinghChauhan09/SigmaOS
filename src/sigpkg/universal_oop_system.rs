@@ -3492,6 +3492,7 @@ impl SandboxedPackageDecorator {
             unveil_paths,
         }
     }
+
 }
 
 impl IPackage for SandboxedPackageDecorator {
@@ -3792,6 +3793,7 @@ impl DebianDiverterEngine {
             path
         }
     }
+
 }
 
 impl Default for DebianDiverterEngine {
