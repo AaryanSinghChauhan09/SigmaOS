@@ -37,6 +37,13 @@ if [ -f "src/distro/linux_bsd_ultimate_synthesis.rs" ]; then
     ./build/linux_bsd_ultimate_synthesis_test
 fi
 
+if [ -f "src/distro/sovereign_2026_distro_leap_engine.rs" ]; then
+    echo "Running 2026 Distro Leap test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_2026_distro_leap_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_2026_leap
+    ./build/test_2026_leap
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
