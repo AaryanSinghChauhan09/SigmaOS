@@ -96,6 +96,8 @@ pub enum ServiceSupervisorType {
     Sysvinit,
     Smf,
     Rcd,
+    S6,
+    Launchd,
 }
 
 pub struct SovereignUniversalDistroBridge {
