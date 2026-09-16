@@ -289,144 +289,188 @@ pub enum PackageFormat {
     Sysupdate,
 }
 
-impl PackageFormat {
-    pub fn from_filename(filename: &str) -> Option<Self> {
-        let name = filename.to_lowercase();
-        let name = name.trim();
-        let normalized = name.replace(" ", "");
+/// Helper function to check if a string ends with `suffix`, ignoring ASCII case and spaces.
+/// Optimized by Bolt ⚡: eliminates intermediate String heap allocations (`to_lowercase()`, `replace(" ", "")`),
+/// executing $O(N)$ suffix matching in place directly on string slices.
+fn ends_with_ic(s: &str, suffix: &str) -> bool {
+    let mut f_bytes = s.as_bytes().iter().copied().rev().filter(|&b| b != b' ');
+    let mut s_bytes = suffix.as_bytes().iter().copied().rev().filter(|&b| b != b' ');
 
-        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
-            Some(PackageFormat::Deb)
-        } else if normalized.ends_with(".superdeb") {
+    loop {
+        match (s_bytes.next(), f_bytes.next()) {
+            (Some(sb), Some(fb)) => {
+                if sb.to_ascii_lowercase() != fb.to_ascii_lowercase() {
+                    return false;
+                }
+            }
+            (None, _) => return true,
+            (Some(_), None) => return false,
+        }
+    }
+}
+
+/// Helper function to check if a string contains `needle`, ignoring ASCII case and spaces.
+/// Uses stack window scanning for zero-allocation performance and robust pattern matching.
+fn contains_ic(s: &str, needle: &str) -> bool {
+    let needle_len = needle.len();
+    if needle_len == 0 {
+        return true;
+    }
+    let mut buf = [0u8; 128];
+    let mut len = 0;
+    for &b in s.as_bytes() {
+        if b != b' ' && len < buf.len() {
+            buf[len] = b.to_ascii_lowercase();
+            len += 1;
+        }
+    }
+    let s_bytes = &buf[..len];
+    let needle_bytes = needle.as_bytes();
+
+    if s_bytes.len() < needle_len {
+        return false;
+    }
+
+    s_bytes.windows(needle_len).any(|window| {
+        window.iter().zip(needle_bytes.iter()).all(|(&b1, &b2)| b1 == b2.to_ascii_lowercase())
+    })
+}
+
+impl PackageFormat {
+    /// Detects package format from filename.
+    /// Optimized by Bolt ⚡: operates in-place without heap allocations (`String::to_lowercase`
+    /// or `replace(" ", "")`), eliminating allocator strain and enabling $O(1)$ fast-path detection.
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let name = filename.trim();
+
+        if ends_with_ic(name, ".superdeb") {
             Some(PackageFormat::Superdeb)
-        } else if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+        } else if ends_with_ic(name, ".deb") || ends_with_ic(name, ".udeb") {
+            Some(PackageFormat::Deb)
+        } else if ends_with_ic(name, ".rpm") || ends_with_ic(name, ".drpm") {
             Some(PackageFormat::Rpm)
-        } else if normalized.ends_with(".pkg.tar.zst")
-            || normalized.ends_with(".pkg.tar.xz")
-            || normalized.ends_with(".pkg.tar.gz")
-            || normalized.contains("pacman")
-            || normalized.ends_with(".pacman")
+        } else if ends_with_ic(name, ".openbsd.tgz") {
+            Some(PackageFormat::OpenBsdPkg)
+        } else if ends_with_ic(name, ".pkg.tar.zst")
+            || ends_with_ic(name, ".pkg.tar.xz")
+            || ends_with_ic(name, ".pkg.tar.gz")
+            || contains_ic(name, "pacman")
+            || ends_with_ic(name, ".pacman")
         {
             Some(PackageFormat::Pacman)
-        } else if normalized.ends_with(".snap") {
+        } else if ends_with_ic(name, ".snap") {
             Some(PackageFormat::Snap)
-        } else if normalized.ends_with(".flatpak") {
+        } else if ends_with_ic(name, ".flatpak") {
             Some(PackageFormat::Flatpak)
-        } else if normalized.ends_with(".appimage") {
+        } else if ends_with_ic(name, ".appimage") {
             Some(PackageFormat::AppImage)
-        } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
+        } else if ends_with_ic(name, ".sigpkg") || ends_with_ic(name, ".sigma") {
             Some(PackageFormat::SigmaPkg)
-        } else if normalized.ends_with(".air") {
+        } else if ends_with_ic(name, ".air") {
             Some(PackageFormat::Air)
-        } else if normalized.ends_with(".bottle") {
+        } else if ends_with_ic(name, ".bottle") {
             Some(PackageFormat::Bottle)
-        } else if normalized.ends_with(".ipa") {
+        } else if ends_with_ic(name, ".ipa") {
             Some(PackageFormat::Ipa)
-        } else if normalized.ends_with(".ports") {
+        } else if ends_with_ic(name, ".ports") {
             Some(PackageFormat::Ports)
-        } else if normalized.ends_with(".pkg") {
+        } else if ends_with_ic(name, ".pkg") {
             Some(PackageFormat::Pkg)
-        } else if normalized.contains("pacman") || normalized.ends_with(".pacman") {
-            Some(PackageFormat::Pacman)
-        } else if normalized.ends_with(".aab") {
+        } else if ends_with_ic(name, ".aab") {
             Some(PackageFormat::Aab)
-        } else if normalized.ends_with(".apk") {
+        } else if ends_with_ic(name, ".apk") {
             Some(PackageFormat::Apk)
-        } else if normalized.ends_with(".eopkg") {
+        } else if ends_with_ic(name, ".eopkg") {
             Some(PackageFormat::Eopkg)
-        } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
+        } else if ends_with_ic(name, ".nixpkg") || ends_with_ic(name, ".nix") {
             Some(PackageFormat::Nixpkg)
-        } else if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
-            Some(PackageFormat::Deb)
-        } else if normalized.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
+        } else if ends_with_ic(name, ".ebuild") || ends_with_ic(name, ".portage") {
             Some(PackageFormat::Portage)
-        } else if normalized.ends_with(".openbsd.tgz") {
-            Some(PackageFormat::OpenBsdPkg)
-        } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+        } else if ends_with_ic(name, ".tar.gz") || ends_with_ic(name, ".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz")
-            || normalized.ends_with(".tar.xz")
-            || normalized.ends_with(".xz")
+        } else if ends_with_ic(name, ".txz")
+            || ends_with_ic(name, ".tar.xz")
+            || ends_with_ic(name, ".xz")
         {
             Some(PackageFormat::Xz)
-        } else if normalized.ends_with(".xbps") {
+        } else if ends_with_ic(name, ".xbps") {
             Some(PackageFormat::Xbps)
-        } else if normalized.ends_with(".zypper") {
+        } else if ends_with_ic(name, ".zypper") {
             Some(PackageFormat::Zypper)
-        } else if normalized.ends_with(".guix") || normalized.ends_with(".scm") {
+        } else if ends_with_ic(name, ".guix") || ends_with_ic(name, ".scm") {
             Some(PackageFormat::Guix)
-        } else if normalized.ends_with(".moss") {
+        } else if ends_with_ic(name, ".moss") {
             Some(PackageFormat::Moss)
-        } else if normalized.ends_with(".hpkg") {
+        } else if ends_with_ic(name, ".hpkg") {
             Some(PackageFormat::Hpkg)
-        } else if normalized.ends_with(".tcz") {
+        } else if ends_with_ic(name, ".tcz") {
             Some(PackageFormat::Tcz)
-        } else if normalized.ends_with(".gobo") {
+        } else if ends_with_ic(name, ".gobo") {
             Some(PackageFormat::Gobo)
-        } else if normalized.ends_with(".commit") || normalized.ends_with(".ostree") {
+        } else if ends_with_ic(name, ".commit") || ends_with_ic(name, ".ostree") {
             Some(PackageFormat::Ostree)
-        } else if normalized.ends_with(".pkgsrc") {
+        } else if ends_with_ic(name, ".pkgsrc") {
             Some(PackageFormat::Pkgsrc)
-        } else if normalized.ends_with(".sfs") {
+        } else if ends_with_ic(name, ".sfs") {
             Some(PackageFormat::Sfs)
-        } else if normalized.ends_with(".puk") {
+        } else if ends_with_ic(name, ".puk") {
             Some(PackageFormat::Puk)
-        } else if normalized.ends_with(".dmg") {
+        } else if ends_with_ic(name, ".dmg") {
             Some(PackageFormat::Dmg)
-        } else if normalized.ends_with(".cports") {
+        } else if ends_with_ic(name, ".cports") {
             Some(PackageFormat::Cports)
-        } else if normalized.ends_with(".cachy") || normalized.ends_with(".cachyos") {
+        } else if ends_with_ic(name, ".cachy") || ends_with_ic(name, ".cachyos") {
             Some(PackageFormat::Cachy)
-        } else if normalized.ends_with(".dports") {
+        } else if ends_with_ic(name, ".dports") {
             Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
+        } else if ends_with_ic(name, ".slackbuild")
+            || ends_with_ic(name, ".tlz")
+            || ends_with_ic(name, ".tbz")
         {
             Some(PackageFormat::SlackBuild)
-        } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
+        } else if ends_with_ic(name, ".crux") || ends_with_ic(name, ".pkgfile") {
             Some(PackageFormat::Crux)
-        } else if normalized.ends_with(".stratum") {
+        } else if ends_with_ic(name, ".stratum") {
             Some(PackageFormat::Stratum)
-        } else if normalized.ends_with(".app") {
+        } else if ends_with_ic(name, ".app") {
             Some(PackageFormat::App)
-        } else if normalized.ends_with(".hap") {
+        } else if ends_with_ic(name, ".hap") {
             Some(PackageFormat::Hap)
-        } else if normalized.ends_with(".pisi") {
+        } else if ends_with_ic(name, ".pisi") {
             Some(PackageFormat::Pisi)
-        } else if normalized.ends_with(".lzm") {
+        } else if ends_with_ic(name, ".lzm") {
             Some(PackageFormat::Lzm)
-        } else if normalized.ends_with(".pup") {
+        } else if ends_with_ic(name, ".pup") {
             Some(PackageFormat::Pup)
-        } else if normalized.ends_with(".pet") {
+        } else if ends_with_ic(name, ".pet") {
             Some(PackageFormat::Pet)
-        } else if normalized.ends_with(".tar") {
+        } else if ends_with_ic(name, ".tar") {
             Some(PackageFormat::Tar)
-        } else if normalized.ends_with(".ipk") {
+        } else if ends_with_ic(name, ".ipk") {
             Some(PackageFormat::Ipk)
-        } else if normalized.ends_with(".opkg") {
+        } else if ends_with_ic(name, ".opkg") {
             Some(PackageFormat::Opkg)
-        } else if normalized.ends_with(".p5p") || normalized.ends_with(".ips") {
+        } else if ends_with_ic(name, ".p5p") || ends_with_ic(name, ".ips") {
             Some(PackageFormat::SolarisIps)
-        } else if normalized.ends_with(".nar") {
+        } else if ends_with_ic(name, ".nar") {
             Some(PackageFormat::GuixNar)
-        } else if normalized.ends_with(".spack") {
+        } else if ends_with_ic(name, ".spack") {
             Some(PackageFormat::Spack)
-        } else if normalized.ends_with(".conan") {
+        } else if ends_with_ic(name, ".conan") {
             Some(PackageFormat::Conan)
-        } else if normalized.ends_with(".whl") {
+        } else if ends_with_ic(name, ".whl") {
             Some(PackageFormat::Wheel)
-        } else if normalized.ends_with(".crate") {
+        } else if ends_with_ic(name, ".crate") {
             Some(PackageFormat::Crate)
-        } else if normalized.ends_with(".gem") {
+        } else if ends_with_ic(name, ".gem") {
             Some(PackageFormat::Gem)
-        } else if normalized.ends_with(".nupkg") {
+        } else if ends_with_ic(name, ".nupkg") {
             Some(PackageFormat::Nupkg)
-        } else if normalized.ends_with(".vcpkg") {
+        } else if ends_with_ic(name, ".vcpkg") {
             Some(PackageFormat::Vcpkg)
-        } else if normalized.ends_with(".narinfo") {
+        } else if ends_with_ic(name, ".narinfo") {
             Some(PackageFormat::NarInfo)
-        } else if normalized.ends_with(".sysupdate") {
+        } else if ends_with_ic(name, ".sysupdate") {
             Some(PackageFormat::Sysupdate)
         } else {
             None
