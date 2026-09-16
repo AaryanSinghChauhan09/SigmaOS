@@ -177,7 +177,12 @@ impl SovereignUniversalDistroBridge {
             (DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix, "/var/lib/pkg") => {
                 "/nix/store".to_string()
             }
-            (DistroSubsystemMode::LinuxArch, "/var/lib/pkg") => "/var/lib/pacman".to_string(),
+            (
+                DistroSubsystemMode::LinuxArch
+                | DistroSubsystemMode::LinuxGaruda
+                | DistroSubsystemMode::LinuxCachyOS,
+                "/var/lib/pkg",
+            ) => "/var/lib/pacman".to_string(),
             (
                 DistroSubsystemMode::LinuxDebian
                 | DistroSubsystemMode::LinuxUbuntu
@@ -487,6 +492,42 @@ impl SovereignUniversalDistroBridge {
                 self.enforce_security_isolation(1001, action)?;
                 Ok(format!(
                     "Dispatched security isolation for path '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_recon" => {
+                Ok(format!(
+                    "Dispatched Kali Linux recon port and vulnerability scanner for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "antix_runit" => {
+                Ok(format!(
+                    "Dispatched AntiX lightweight runit init supervisor for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "zorin_chameleon" => {
+                Ok(format!(
+                    "Dispatched Zorin OS Chameleon desktop layout transformer for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "mint_cinnamon" => {
+                Ok(format!(
+                    "Dispatched Linux Mint Cinnamon desktop applet & widget manager for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "garuda_dracut" => {
+                Ok(format!(
+                    "Dispatched Garuda Linux Dracut Btrfs automated Snapper snapshot for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cachy_bore" => {
+                Ok(format!(
+                    "Dispatched CachyOS BORE latency scheduler & x86-64-v4 ISA tuner for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -2109,6 +2150,33 @@ mod cross_subsystem_tests {
 
         let res3 = bridge.dispatch_cross_subsystem_operation("parrot_forensics", "/dev/sdb1").unwrap();
         assert!(res3.contains("Parrot Digital Forensics read-only evidence acquisition"));
+    }
+
+    #[test]
+    fn test_new_distro_cross_subsystem_dispatches() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxKali);
+        let r1 = bridge.dispatch_cross_subsystem_operation("kali_recon", "scan_target").unwrap();
+        assert!(r1.contains("Kali Linux recon port and vulnerability scanner"));
+
+        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxAntiX);
+        let r2 = bridge.dispatch_cross_subsystem_operation("antix_runit", "fast_boot").unwrap();
+        assert!(r2.contains("AntiX lightweight runit init supervisor"));
+
+        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxZorin);
+        let r3 = bridge.dispatch_cross_subsystem_operation("zorin_chameleon", "windows_layout").unwrap();
+        assert!(r3.contains("Zorin OS Chameleon desktop layout transformer"));
+
+        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxMint);
+        let r4 = bridge.dispatch_cross_subsystem_operation("mint_cinnamon", "desklet_panel").unwrap();
+        assert!(r4.contains("Linux Mint Cinnamon desktop applet & widget manager"));
+
+        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxGaruda);
+        let r5 = bridge.dispatch_cross_subsystem_operation("garuda_dracut", "snapper_take").unwrap();
+        assert!(r5.contains("Garuda Linux Dracut Btrfs automated Snapper snapshot"));
+
+        bridge.set_subsystem_mode(DistroSubsystemMode::LinuxCachyOS);
+        let r6 = bridge.dispatch_cross_subsystem_operation("cachy_bore", "tune_v4").unwrap();
+        assert!(r6.contains("CachyOS BORE latency scheduler & x86-64-v4 ISA tuner"));
     }
 
     #[test]
