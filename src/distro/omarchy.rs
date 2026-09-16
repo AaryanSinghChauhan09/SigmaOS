@@ -610,7 +610,7 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::distro::omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
@@ -618,10 +618,10 @@ pub use crate::distro::omarchy_inspiration::{
     QuickshellWidget, ShellComponentKind,
 };
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[path = "omarchy_inspiration.rs"]
 pub mod omarchy_inspiration;
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 pub use omarchy_inspiration::{
     AiAgentProvider, HerdrAgentTask, OmarchyHerdrAiAgentManager, OmarchyLuaConfigEngine,
     OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,

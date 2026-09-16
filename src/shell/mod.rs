@@ -20,6 +20,7 @@ pub use self::sigma_sh::{
     PipelineExecutor, ShellPledgeUnveilGuard, ShellSyntaxHighlighter, ZshPromptFormatter,
 };
 pub use self::repl::ShellRepl;
+pub use self::zsh_bash_parity::*;
 
 // FFI bindings to Nim SigmaShell
 extern "C" {

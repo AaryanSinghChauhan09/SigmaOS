@@ -51,11 +51,12 @@ pub mod paging;
 pub mod performance;
 pub mod pipes;
 pub mod policy_mechanism;
+pub mod process;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod missing_linux_kernel_components;
 pub mod structures;
+pub mod virtual_cpu;
 
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
