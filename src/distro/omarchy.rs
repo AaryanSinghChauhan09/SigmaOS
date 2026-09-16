@@ -791,6 +791,101 @@ mod tests {
 // =========================================================================
 
 
+/// Ghostty GPU-accelerated terminal configuration generator engine
+pub struct OmarchyGhosttyTerminalConfigEngine {
+    pub font_family: String,
+    pub font_size: f32,
+    pub theme: String,
+    pub wayland_native: bool,
+}
+
+impl OmarchyGhosttyTerminalConfigEngine {
+    pub fn new(theme: &str) -> Self {
+        Self {
+            font_family: "JetBrainsMono Nerd Font".to_string(),
+            font_size: 11.5,
+            theme: theme.to_string(),
+            wayland_native: true,
+        }
+    }
+
+    pub fn generate_ghostty_config(&self) -> String {
+        format!(
+            "font-family = \"{}\"\nfont-size = {}\ntheme = \"{}\"\nwindow-decoration = false\ngtk-single-instance = true\nwayland-backend = {}\n",
+            self.font_family, self.font_size, self.theme, self.wayland_native
+        )
+    }
+}
+
+impl Default for OmarchyGhosttyTerminalConfigEngine {
+    fn default() -> Self {
+        Self::new("tokyonight")
+    }
+}
+
+/// Fastfetch TUI system information tool config generator engine
+pub struct OmarchyFastfetchSystemInfoEngine {
+    pub logo: String,
+    pub show_kernel: bool,
+    pub show_gpu: bool,
+    pub show_memory: bool,
+}
+
+impl OmarchyFastfetchSystemInfoEngine {
+    pub fn new() -> Self {
+        Self {
+            logo: "arch".to_string(),
+            show_kernel: true,
+            show_gpu: true,
+            show_memory: true,
+        }
+    }
+
+    pub fn generate_fastfetch_json(&self) -> String {
+        format!(
+            "{{\n  \"$schema\": \"https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json\",\n  \"logo\": {{\n    \"type\": \"builtin\",\n    \"source\": \"{}\"\n  }},\n  \"modules\": [\n    \"title\",\n    \"separator\",\n    \"os\",\n    \"host\",\n    \"kernel\",\n    \"uptime\",\n    \"packages\",\n    \"shell\",\n    \"display\",\n    \"wm\",\n    \"terminal\",\n    \"cpu\",\n    \"gpu\",\n    \"memory\",\n    \"break\",\n    \"colors\"\n  ]\n}}\n",
+            self.logo
+        )
+    }
+}
+
+impl Default for OmarchyFastfetchSystemInfoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Dynamic Hyprland dwindle tiling layout engine for automatic workspace layout calculations
+#[derive(Debug, Clone, PartialEq)]
+pub struct OmarchyHyprlandDwindleTilingEngine {
+    pub split_ratio: f32,
+    pub force_split: u32,
+    pub preserve_split: bool,
+}
+
+impl OmarchyHyprlandDwindleTilingEngine {
+    pub fn new() -> Self {
+        Self {
+            split_ratio: 1.0,
+            force_split: 2,
+            preserve_split: true,
+        }
+    }
+
+    pub fn generate_dwindle_conf(&self) -> String {
+        format!(
+            "dwindle {{\n  pseudotile = true\n  preserve_split = {}\n  force_split = {}\n  default_split_ratio = {}\n}}\n",
+            self.preserve_split, self.force_split, self.split_ratio
+        )
+    }
+}
+
+impl Default for OmarchyHyprlandDwindleTilingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod omarchy_gap_closure_tests {
     use super::*;
@@ -824,5 +919,23 @@ mod omarchy_gap_closure_tests {
 
         let starship_toml = OmarchyStarshipPromptConfigEngine::generate_starship_toml();
         assert!(starship_toml.contains("truncation_length = 3"));
+    }
+
+    #[test]
+    fn test_omarchy_ghostty_fastfetch_dwindle_engines() {
+        let ghostty = OmarchyGhosttyTerminalConfigEngine::new("catppuccin");
+        let ghostty_cfg = ghostty.generate_ghostty_config();
+        assert!(ghostty_cfg.contains("theme = \"catppuccin\""));
+        assert!(ghostty_cfg.contains("wayland-backend = true"));
+
+        let fastfetch = OmarchyFastfetchSystemInfoEngine::default();
+        let ff_json = fastfetch.generate_fastfetch_json();
+        assert!(ff_json.contains("\"source\": \"arch\""));
+        assert!(ff_json.contains("\"modules\": ["));
+
+        let dwindle = OmarchyHyprlandDwindleTilingEngine::default();
+        let dwindle_conf = dwindle.generate_dwindle_conf();
+        assert!(dwindle_conf.contains("preserve_split = true"));
+        assert!(dwindle_conf.contains("force_split = 2"));
     }
 }
