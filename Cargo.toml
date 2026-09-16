@@ -64,8 +64,6 @@ wayland = []
 mir = []
 x11 = []
 
-# Storage & Performance matrix features
-
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(custom_alloc_error_handler)',

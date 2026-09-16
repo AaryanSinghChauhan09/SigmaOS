@@ -5372,7 +5372,14 @@ impl BsdCapsicumRightsSandboxingEngine {
             return true;
         }
         if let Some(rights) = self.allowed_rights.get(&fd) {
-            rights.iter().any(|r: &String| r.eq_ignore_ascii_case(right))
+            let right_lower = right.to_lowercase();
+            let rights_vec: &Vec<String> = rights;
+            for r in rights_vec {
+                if r.to_lowercase() == right_lower {
+                    return true;
+                }
+            }
+            false
         } else {
             false
         }

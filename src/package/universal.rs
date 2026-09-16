@@ -11,7 +11,9 @@ use alloc::vec::Vec;
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::klib::{Arc, HashMap, HashSet};
+use alloc::sync::Arc;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::{HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
@@ -215,12 +217,13 @@ pub enum PackageState {
     BrokenDependency,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackagePriority {
-    Essential,
-    Required,
-    Important,
-    Standard,
-    Optional,
+    Optional = 0,
+    Standard = 1,
+    Important = 2,
+    Required = 3,
+    Essential = 4,
 }
 
 /// Supported package formats across Linux and BSD ecosystems
@@ -1393,6 +1396,7 @@ pub struct AptDebManifest {
     pub maintainer: String,
     pub depends: Vec<String>,
     pub description: String,
+    pub priority: PackagePriority,
 }
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -2525,6 +2529,7 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
+            priority: PackagePriority::Standard,
         };
 
         let _pkgbuild = PacmanPkgbuild {

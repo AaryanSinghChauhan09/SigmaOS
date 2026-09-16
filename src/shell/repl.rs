@@ -1418,7 +1418,11 @@ impl ShellRepl {
 
             ShellCommand::Jobs => {
                 let jobs_list = self.job_control.list_jobs();
-                Ok(jobs_list)
+                if jobs_list.is_empty() {
+                    Ok("No active jobs".to_string())
+                } else {
+                    Ok(jobs_list.join("\n"))
+                }
             }
             ShellCommand::JobFg { job_id } => {
                 match self.job_control.bring_to_foreground(job_id as usize) {

@@ -5,9 +5,39 @@
  * health checking, and automatic restart policy governance.
  */
 
+
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
+
+
+#[cfg(not(test))]
+use std::collections::BTreeMap;
+#[cfg(not(test))]
+use std::string::String;
+#[cfg(not(test))]
+use std::vec::Vec;
+
+#[cfg(test)]
+use std::collections::BTreeMap;
+#[cfg(test)]
+use std::string::String;
+#[cfg(test)]
+use std::vec::Vec;
+
+/// Runit Stage
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1,
+    Stage2,
+    Stage3,
+}
+
+impl Default for RunitStage {
+    fn default() -> Self {
+        Self::Stage1
+    }
+}
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -17,14 +47,6 @@ pub enum RunitServiceStatus {
     Running,
     Stopping,
     Failed,
-}
-
-/// Runit Stage
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RunitStage {
-    Stage1,
-    Stage2,
-    Stage3,
 }
 
 /// Runit Service Definition
@@ -90,16 +112,16 @@ impl RunitService {
 #[derive(Debug, Default, Clone)]
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
-    pub stage: Option<RunitStage>,
-    pub current_stage_num: u32,
+    pub stage: RunitStage,
+    pub current_stage_num: u8,
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
             services: BTreeMap::new(),
-            stage: None,
-            current_stage_num: 0,
+            stage: RunitStage::Stage1,
+            current_stage_num: 1,
         }
     }
 
@@ -107,17 +129,9 @@ impl RunitSupervisor {
         self.services.insert(service.name.clone(), service);
     }
 
-    pub fn start_service(&mut self, name: &str) -> bool {
-        if let Some(service) = self.services.get_mut(name) {
-            service.start()
-        } else {
-            false
-        }
-    }
-
     /// Start stage 1 (one-time initialization)
     pub fn run_stage1(&mut self) {
-        self.stage = Some(RunitStage::Stage1);
+        self.stage = RunitStage::Stage1;
         self.current_stage_num = 1;
         println!("Running Stage 1: One-time system initialization");
 
@@ -129,7 +143,7 @@ impl RunitSupervisor {
 
     /// Start stage 2 (concurrent supervision)
     pub fn run_stage2(&mut self) {
-        self.stage = Some(RunitStage::Stage2);
+        self.stage = RunitStage::Stage2;
         self.current_stage_num = 2;
         println!("Running Stage 2: Concurrent process supervision");
 
@@ -149,7 +163,7 @@ impl RunitSupervisor {
 
     /// Start stage 3 (clean shutdown)
     pub fn run_stage3(&mut self) {
-        self.stage = Some(RunitStage::Stage3);
+        self.stage = RunitStage::Stage3;
         self.current_stage_num = 3;
         println!("Running Stage 3: Clean system shutdown");
 
@@ -183,8 +197,25 @@ impl RunitSupervisor {
         }
     }
 
-    fn can_stop_service(&self, _name: &str, _stopped: &[String]) -> bool {
-        true
+    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+        if self.services.contains_key(name) {
+            for (other_name, other_service) in &self.services {
+                if !stopped.contains(other_name) && other_service.dependencies.contains(&name.to_string()) {
+                    return false;
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.start()
+        } else {
+            false
+        }
     }
 
     pub fn stop_service(&mut self, name: &str) -> bool {

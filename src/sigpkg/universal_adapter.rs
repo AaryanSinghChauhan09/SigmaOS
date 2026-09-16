@@ -248,9 +248,17 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture: "all".to_string(),
+            maintainer: "Debian Maintainers".to_string(),
             depends,
             description,
-            priority,
+            priority: match priority {
+                PackagePriority::Essential => crate::package::PackagePriority::Essential,
+                PackagePriority::Required => crate::package::PackagePriority::Required,
+                PackagePriority::Important => crate::package::PackagePriority::Important,
+                PackagePriority::Standard => crate::package::PackagePriority::Standard,
+                PackagePriority::Optional => crate::package::PackagePriority::Optional,
+            },
         })
     }
 
