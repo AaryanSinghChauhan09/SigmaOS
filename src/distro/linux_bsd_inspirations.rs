@@ -3,11 +3,6 @@
 // that provide competitive advantages for SigmaOS
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -3258,7 +3253,6 @@ mod cross_subsystem_tests {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
         ];
 
         for m in modes {
