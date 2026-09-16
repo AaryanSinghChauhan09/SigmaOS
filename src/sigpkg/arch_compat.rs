@@ -9,9 +9,8 @@ use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec as AllocVec;
 
-use crate::klib::collections::HashMap;
-use crate::klib::string::SigmaString;
-use crate::klib;
+use std::collections::HashMap;
+pub type SigmaString = String;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Version {

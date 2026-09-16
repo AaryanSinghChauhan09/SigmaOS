@@ -1,3 +1,4 @@
+use core::sync::atomic::{AtomicU8, Ordering};
 // SigmaOS antiX-Linux Parity & Legacy Hardware Optimization Shard
 // Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Bypasses standard resource overhead through a systemd-free init model, custom task trimmers, and zero-allocation visual swap profiles.

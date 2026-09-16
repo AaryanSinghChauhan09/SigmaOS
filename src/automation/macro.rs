@@ -12,11 +12,10 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::format;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -115,9 +114,9 @@ impl MacroRecorder for SimpleMacroRecorder {
     
     fn record_action(&mut self, id: MacroID, _action: u32) -> Result<(), MacroError> {
         for macro_option in &mut self.macros {
-            if let Some(ref mut macro) = *macro_option {
-                if macro.id() == id {
-                    macro.actions.fetch_add(1, Ordering::SeqCst);
+            if let Some(ref mut macro_item) = *macro_option {
+                if macro_item.id() == id {
+                    macro_item.actions.fetch_add(1, Ordering::SeqCst);
                     return Ok(());
                 }
             }

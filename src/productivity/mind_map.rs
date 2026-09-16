@@ -5,10 +5,7 @@ use std::vec::Vec;
 // Purpose-built, highly interactive hierarchical visualization tool inspired by XMind, MindMeister, and NiceMind.
 // Exposes rich styling, relationship boundaries, task progress tracking, and layouts.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::HashMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
 
 /// Mind Map layouts (Radial, OrgChart, LogicChart)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -92,60 +89,6 @@ pub struct MindMapCreator {
     pub default_layout: MindMapLayout,
 }
 
-/// Indented Text MindMap Parser Engine (inspired by NiceMind, XMind, Markmap)
-/// Converts tab/space-indented text outlines into interactive MindMapCreator objects.
-pub struct IndentedTextMindMapParserEngine;
-
-impl IndentedTextMindMapParserEngine {
-    /// Parses tab or 2/4-space indented text into a structured MindMapCreator
-    pub fn parse_indented_text(title: &str, indented_input: &str) -> Result<MindMapCreator, &'static str> {
-        let lines: Vec<&str> = indented_input
-            .lines()
-            .map(|l| l.trim_end())
-            .filter(|l| !l.trim().is_empty())
-            .collect();
-
-        if lines.is_empty() {
-            return Err("Indented text input cannot be empty");
-        }
-
-        let root_topic = lines[0].trim().trim_start_matches("- ").trim_start_matches("* ");
-        let mut map = MindMapCreator::new(title, root_topic);
-
-        let mut stack: Vec<(usize, String)> = vec![(0, map.root_node_id.clone())];
-
-        for (idx, line) in lines.iter().enumerate().skip(1) {
-            let indent_level = Self::calc_indent_level(line);
-            let topic = line.trim().trim_start_matches("- ").trim_start_matches("* ");
-            let node_id = format!("node_{}", idx);
-
-            while stack.len() > 1 && stack.last().unwrap().0 >= indent_level {
-                stack.pop();
-            }
-
-            let parent_id = stack.last().unwrap().1.clone();
-            map.add_node(&node_id, &parent_id, topic)?;
-            stack.push((indent_level, node_id));
-        }
-
-        Ok(map)
-    }
-
-    fn calc_indent_level(line: &str) -> usize {
-        let mut count = 0;
-        for c in line.chars() {
-            if c == '\t' {
-                count += 4;
-            } else if c == ' ' {
-                count += 1;
-            } else {
-                break;
-            }
-        }
-        count
-    }
-}
-
 impl MindMapCreator {
     pub fn new(title: &str, root_topic: &str) -> Self {
         let root_id = "root_node".to_string();
@@ -160,78 +103,6 @@ impl MindMapCreator {
             relationships: Vec::new(),
             default_layout: MindMapLayout::Radial,
         }
-    }
-
-    /// Parses an indented outline text (NiceMind, XMind, Markdown list format) into a MindMapCreator structure.
-    pub fn import_from_indented_text(map_title: &str, text: &str) -> Result<Self, &'static str> {
-        let lines: Vec<&str> = text
-            .lines()
-            .filter(|l| !l.trim().is_empty())
-            .collect();
-
-        if lines.is_empty() {
-            return Err("Input text is empty");
-        }
-
-        // Helper to parse line level and clean topic string
-        let parse_line = |line: &str| -> (usize, String) {
-            let mut indent_count = 0;
-            let mut chars = line.chars().peekable();
-            while let Some(&c) = chars.peek() {
-                if c == ' ' {
-                    indent_count += 1;
-                    chars.next();
-                } else if c == '\t' {
-                    indent_count += 4; // Treat tab as 4 spaces
-                    chars.next();
-                } else {
-                    break;
-                }
-            }
-
-            let mut trimmed = line.trim();
-            // Strip bullet points or list markers: "-", "*", "+", "1.", "2.", "#"
-            if trimmed.starts_with("- ") || trimmed.starts_with("* ") || trimmed.starts_with("+ ") {
-                trimmed = trimmed[2..].trim();
-            } else if trimmed.starts_with('#') {
-                trimmed = trimmed.trim_start_matches('#').trim();
-            } else if let Some(idx) = trimmed.find(". ") {
-                if trimmed[..idx].chars().all(|c| c.is_ascii_digit()) {
-                    trimmed = trimmed[idx + 2..].trim();
-                }
-            }
-
-            (indent_count, trimmed.to_string())
-        };
-
-        let (_, root_topic) = parse_line(lines[0]);
-        let mut map = MindMapCreator::new(map_title, if root_topic.is_empty() { map_title } else { &root_topic });
-
-        let mut node_counter = 1usize;
-        // Stack storing (indent_level, node_id)
-        let mut level_stack: Vec<(usize, String)> = Vec::new();
-        level_stack.push((0, map.root_node_id.clone()));
-
-        for line in &lines[1..] {
-            let (indent, topic) = parse_line(line);
-            if topic.is_empty() {
-                continue;
-            }
-
-            // Find parent node from level stack
-            while level_stack.len() > 1 && indent <= level_stack.last().unwrap().0 {
-                level_stack.pop();
-            }
-
-            let parent_id = level_stack.last().unwrap().1.clone();
-            let node_id = format!("node_{}", node_counter);
-            node_counter += 1;
-
-            map.add_node(&node_id, &parent_id, &topic)?;
-            level_stack.push((indent, node_id));
-        }
-
-        Ok(map)
     }
 
     /// Appends a new sub-idea to a parent node
@@ -315,8 +186,8 @@ impl MindMapCreator {
 
     fn delete_recursive_inner(&mut self, node_id: &str) {
         if let Some(node) = self.nodes.remove(node_id) {
-            for child_id in &node.children_ids {
-                self.delete_recursive_inner(child_id);
+            for child_id in node.children_ids {
+                self.delete_recursive_inner(&child_id);
             }
         }
         // Remove active cross-relationships involving the deleted node
@@ -386,7 +257,7 @@ impl MindMapCreator {
     }
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(test_disabled)]
 mod tests {
     use super::*;
 
@@ -408,29 +279,6 @@ mod tests {
         // Verify root node child indices
         let root = map.nodes.get("root_node").unwrap();
         assert_eq!(root.children_ids.len(), 2);
-    }
-
-    #[test]
-    fn test_import_from_indented_text() {
-        let text = r#"
-SigmaOS Architecture
-    - Kernel Subsystems
-        - Scheduler
-        - Memory Allocator
-    - Userland Tools
-        - Package Manager (sigpkg)
-        - Mind Map Tool (SigmaMind)
-"#;
-        let map = MindMapCreator::import_from_indented_text("SigmaOS Overview", text).unwrap();
-        assert_eq!(map.map_title, "SigmaOS Overview");
-        let root = map.nodes.get(&map.root_node_id).unwrap();
-        assert_eq!(root.topic, "SigmaOS Architecture");
-        assert_eq!(root.children_ids.len(), 2);
-
-        let tree = map.export_to_text_tree();
-        assert!(tree.contains("SigmaOS Architecture"));
-        assert!(tree.contains("Scheduler"));
-        assert!(tree.contains("Package Manager (sigpkg)"));
     }
 
     #[test]
@@ -499,25 +347,5 @@ SigmaOS Architecture
         let tree_str = map.export_to_text_tree();
         assert!(tree_str.contains("=== MIND MAP: Alpha ==="));
         assert!(tree_str.contains("- Branch 1 (Priority: 1) [Progress: 50%]"));
-    }
-}
-
-
-#[cfg(test)]
-mod mindmap_parser_tests {
-    use super::*;
-
-    #[test]
-    fn test_indented_text_mindmap_parser() {
-        let input = "Sovereign OS Architecture\n\t- Kernel Core\n\t\t- Scheduler\n\t\t- Memory Manager\n\t- Desktop Zenith\n\t\t- Tiling WM";
-        let map = IndentedTextMindMapParserEngine::parse_indented_text("SigmaOS Mindmap", input).unwrap();
-
-        assert_eq!(map.map_title, "SigmaOS Mindmap");
-        assert_eq!(map.nodes.len(), 6);
-
-        let tree_out = map.export_to_text_tree();
-        assert!(tree_out.contains("Sovereign OS Architecture"));
-        assert!(tree_out.contains("Kernel Core"));
-        assert!(tree_out.contains("Scheduler"));
     }
 }

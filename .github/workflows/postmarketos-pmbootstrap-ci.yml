@@ -1,7 +1,4 @@
 name: postmarketOS pmbootstrap & Mobile Kernel CI
-permissions:
-  contents: read
-
 
 on:
   push:
@@ -12,7 +9,6 @@ on:
 jobs:
   postmarketos-pmbootstrap:
     name: postmarketOS pmbootstrap Tooling & Alpine Mobile Architecture Audit
-
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

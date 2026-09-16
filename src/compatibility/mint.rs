@@ -3,8 +3,6 @@
 // Zero-dependency implementations of Linux Mint's core tooling
 // Inspired by mintupdate, mintinstall, Cinnamon, and xapps
 
-extern crate alloc;
-
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]

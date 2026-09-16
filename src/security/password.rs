@@ -240,7 +240,7 @@ impl PasswordManager {
         Ok(PasswordManagerResult {
             success: true,
             operation: "add_password".to_string(),
-            message: format!("Password added for service: {}", service_name),
+            message: "Password added successfully.".to_string(),
         })
     }
 
@@ -290,7 +290,7 @@ impl PasswordManager {
         Ok(PasswordManagerResult {
             success: true,
             operation: "update_password".to_string(),
-            message: format!("Password updated for service: {}", service_name),
+            message: "Password updated successfully.".to_string(),
         })
     }
 
@@ -308,7 +308,7 @@ impl PasswordManager {
         Ok(PasswordManagerResult {
             success: true,
             operation: "delete_password".to_string(),
-            message: format!("Password deleted: {}", id),
+            message: "Password deleted successfully.".to_string(),
         })
     }
 

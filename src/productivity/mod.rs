@@ -12,17 +12,9 @@ pub mod linux_bsd_tools;
 pub mod media;
 pub mod mind_map;
 pub mod mint_competitor;
-pub mod reminders_advanced;
 pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod tmux;
-pub mod itsfoss_apps_synthesis;
-
-pub use itsfoss_apps_synthesis::{
-    IptvChannelNode, ItsFossBulkyBatchRenamerEngine, ItsFossHypnotixIptvEngine,
-    ItsFossStickyNotesEngine, ItsFossWarpinatorLanSharingEngine, RenameRuleResult,
-    SovereignItsFossAppsSuite, StickyNoteEntry, WarpinatorLanPeer,
-};
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -33,11 +25,6 @@ pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
     TextNode,
 };
-pub use reminders_advanced::{
-    EnhancedRemindersEngine, RecurrencePattern, ReminderItem, ReminderPriority,
-};
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
-
-pub use mind_map::{IndentedTextMindMapParserEngine, MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection};

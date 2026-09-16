@@ -3,10 +3,10 @@
 //! VNET network stacks, User/Mount namespaces, and resource quotas (FreeBSD rctl / cgroups v2).
 use std::format;
 
-use core::sync::atomic::{AtomicU32, Ordering};
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 /// Administrative capabilities inside a jail
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

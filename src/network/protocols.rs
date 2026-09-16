@@ -61,8 +61,8 @@ impl UdpSocketSim {
 
     pub fn send_packet(
         &mut self,
-        dest: [u8; 4],
-        dest_port: u16,
+        _dest: [u8; 4],
+        _dest_port: u16,
         payload: &[u8],
     ) -> Result<usize, &'static str> {
         if payload.is_empty() {
@@ -1585,13 +1585,8 @@ mod tests {
         assert!(session.is_authenticated);
 
         // 5. Test root login permission check (root permitted is false)
-        let root_res = daemon.authenticate(
-            "192.168.1.1",
-            "root",
-            "password",
-            b"<SIGMA_TEST_CREDENTIAL>",
-            None,
-        );
+        let root_res =
+            daemon.authenticate("192.168.1.1", "root", "password", b"<SIGMA_TEST_CREDENTIAL>", None);
         assert!(root_res.is_err());
 
         // 6. Test PAM-like MFA support
@@ -1634,8 +1629,7 @@ mod tests {
         // Blocklisted after 2 attempts
         assert!(daemon.blocklisted_ips.contains(&ip.to_string()));
 
-        let res_blocked =
-            daemon.authenticate(ip, "user1", "password", b"<SIGMA_TEST_CREDENTIAL>", None);
+        let res_blocked = daemon.authenticate(ip, "user1", "password", b"<SIGMA_TEST_CREDENTIAL>", None);
         assert!(res_blocked.is_err());
     }
 
