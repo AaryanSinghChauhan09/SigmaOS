@@ -73,7 +73,7 @@ impl GoogleDocsRealtimeCollaborativeEditorEngine {
     }
 
     pub fn insert_text(&mut self, user_id: &str, position: usize, text: &str) -> bool {
-        if position > self.text_buffer.len() {
+        if position > self.text_buffer.len() || !self.text_buffer.is_char_boundary(position) {
             return false;
         }
 
