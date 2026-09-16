@@ -5,7 +5,14 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
 
-
+fn escape_html(input: &str) -> String {
+    input
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&#x27;")
+}
 
 
 /// Document
@@ -192,7 +199,7 @@ impl OnlineWebFileEditorEngine {
 
     pub fn render_live_html_preview(&self, id: &str) -> String {
         if let Some(doc) = self.active_tabs.iter().find(|d| d.id == id) {
-            format!("<div class=\"sigma-web-editor-preview\">{}</div>", doc.content)
+            format!("<div class=\"sigma-web-editor-preview\">{}</div>", escape_html(&doc.content))
         } else {
             String::from("<div class=\"error\">No Document</div>")
         }
@@ -222,6 +229,15 @@ mod tests {
 
         let preview = engine.render_live_html_preview(&tab_id);
         assert!(preview.contains("SERVER_PORT=8080"));
+    }
+
+    #[test]
+    fn test_online_web_file_editor_xss_sanitization() {
+        let mut engine = OnlineWebFileEditorEngine::new();
+        let tab_id = engine.open_tab("/tmp/test.html", "<script>alert('xss')</script>");
+        let preview = engine.render_live_html_preview(&tab_id);
+        assert!(!preview.contains("<script>"));
+        assert!(preview.contains("&lt;script&gt;"));
     }
 }
 

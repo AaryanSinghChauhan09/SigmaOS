@@ -22,6 +22,14 @@ pub enum RunitStage {
 
 pub type ServiceState = RunitServiceStatus;
 
+/// Runit Supervision Stage
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1,
+    Stage2,
+    Stage3,
+}
+
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitServiceStatus {
@@ -162,7 +170,7 @@ impl RunitSupervisor {
 
     /// Start stage 1 (one-time initialization)
     pub fn run_stage1(&mut self) {
-        self.stage = RunitStage::Stage1;
+        self.stage = Some(RunitStage::Stage1);
         self.current_stage_num = 1;
         println!("Running Stage 1: One-time system initialization");
 
@@ -174,7 +182,7 @@ impl RunitSupervisor {
 
     /// Start stage 2 (concurrent supervision)
     pub fn run_stage2(&mut self) {
-        self.stage = RunitStage::Stage2;
+        self.stage = Some(RunitStage::Stage2);
         self.current_stage_num = 2;
         println!("Running Stage 2: Concurrent process supervision");
 
@@ -194,7 +202,7 @@ impl RunitSupervisor {
 
     /// Start stage 3 (clean shutdown)
     pub fn run_stage3(&mut self) {
-        self.stage = RunitStage::Stage3;
+        self.stage = Some(RunitStage::Stage3);
         self.current_stage_num = 3;
         println!("Running Stage 3: Clean system shutdown");
 
