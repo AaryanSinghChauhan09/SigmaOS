@@ -475,6 +475,123 @@ impl Default for Minix3ReincarnationServer {
 }
 
 // =========================================================================
+// 40. LINUX CGROUPS V2 MEMORY CONTROLLER (MEMCG)
+// =========================================================================
+
+pub struct LinuxMemcgV2MemoryController {
+    pub cgroup_name: String,
+    pub memory_max_bytes: u64,
+    pub memory_high_bytes: u64,
+    pub current_usage_bytes: u64,
+    pub oom_kill_count: u32,
+}
+
+impl LinuxMemcgV2MemoryController {
+    pub fn new(cgroup_name: &str, max_mb: u64, high_mb: u64) -> Self {
+        Self {
+            cgroup_name: cgroup_name.to_string(),
+            memory_max_bytes: max_mb * 1024 * 1024,
+            memory_high_bytes: high_mb * 1024 * 1024,
+            current_usage_bytes: 0,
+            oom_kill_count: 0,
+        }
+    }
+
+    pub fn try_charge(&mut self, bytes: u64) -> Result<(), &'static str> {
+        if self.current_usage_bytes + bytes > self.memory_max_bytes {
+            self.oom_kill_count += 1;
+            return Err("memcg: Out of Memory (OOM) killed process");
+        }
+        self.current_usage_bytes += bytes;
+        Ok(())
+    }
+
+    pub fn uncharge(&mut self, bytes: u64) {
+        self.current_usage_bytes = self.current_usage_bytes.saturating_sub(bytes);
+    }
+
+    pub fn is_high_watermark_exceeded(&self) -> bool {
+        self.current_usage_bytes > self.memory_high_bytes
+    }
+}
+
+// =========================================================================
+// 41. LINUX KERNEL SAMEPAGE MERGING DEDUPLICATION (KSM)
+// =========================================================================
+
+pub struct LinuxKsmKernelSamepageMerging {
+    pub page_hashes: BTreeMap<u64, u64>, // Hash -> Frame Physical Address
+    pub merged_pages_count: usize,
+    pub pages_scanned_count: usize,
+}
+
+impl LinuxKsmKernelSamepageMerging {
+    pub fn new() -> Self {
+        Self {
+            page_hashes: BTreeMap::new(),
+            merged_pages_count: 0,
+            pages_scanned_count: 0,
+        }
+    }
+
+    pub fn scan_and_merge_page(&mut self, phys_addr: u64, page_data: &[u8]) -> Option<u64> {
+        self.pages_scanned_count += 1;
+        let mut hash: u64 = 0xcbf29ce484222325;
+        for &b in page_data {
+            hash ^= u64::from(b);
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+
+        if let Some(&existing_paddr) = self.page_hashes.get(&hash) {
+            self.merged_pages_count += 1;
+            Some(existing_paddr) // Return existing shared page frame for CoW mapping
+        } else {
+            self.page_hashes.insert(hash, phys_addr);
+            None
+        }
+    }
+}
+
+impl Default for LinuxKsmKernelSamepageMerging {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 42. LINUX OVERLAYFS UNION MOUNT COPY-UP ENGINE
+// =========================================================================
+
+pub struct LinuxOverlayFsEngine {
+    pub lower_dir: String,
+    pub upper_dir: String,
+    pub work_dir: String,
+    pub merged_dir: String,
+    pub copy_up_count: usize,
+}
+
+impl LinuxOverlayFsEngine {
+    pub fn new(lower: &str, upper: &str, work: &str, merged: &str) -> Self {
+        Self {
+            lower_dir: lower.to_string(),
+            upper_dir: upper.to_string(),
+            work_dir: work.to_string(),
+            merged_dir: merged.to_string(),
+            copy_up_count: 0,
+        }
+    }
+
+    pub fn copy_up_file_on_write(&mut self, relative_path: &str) -> String {
+        self.copy_up_count += 1;
+        format!("{}/{}", self.upper_dir, relative_path)
+    }
+
+    pub fn create_whiteout_dev_entry(&self, relative_path: &str) -> String {
+        format!("{}/{}.wh.deleted", self.upper_dir, relative_path)
+    }
+}
+
+// =========================================================================
 // 35. PHORONIX TEST SUITE AUTOMATED BENCHMARK HARNESS (Phoronix.com)
 // =========================================================================
 
@@ -3296,6 +3413,50 @@ impl Default for PosixSyscallComplianceBridge {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_linux_memcg_v2_memory_controller() {
+        let mut memcg = LinuxMemcgV2MemoryController::new("app.slice", 100, 80);
+        assert!(!memcg.is_high_watermark_exceeded());
+
+        assert!(memcg.try_charge(85 * 1024 * 1024).is_ok());
+        assert!(memcg.is_high_watermark_exceeded());
+
+        // Overshoot limit
+        assert!(memcg.try_charge(20 * 1024 * 1024).is_err());
+        assert_eq!(memcg.oom_kill_count, 1);
+
+        memcg.uncharge(30 * 1024 * 1024);
+        assert!(!memcg.is_high_watermark_exceeded());
+    }
+
+    #[test]
+    fn test_linux_ksm_kernel_samepage_merging() {
+        let mut ksm = LinuxKsmKernelSamepageMerging::new();
+        let page_data = [0x42u8; 4096];
+
+        let paddr1 = 0x100000;
+        let res1 = ksm.scan_and_merge_page(paddr1, &page_data);
+        assert_eq!(res1, None);
+
+        let paddr2 = 0x200000;
+        let res2 = ksm.scan_and_merge_page(paddr2, &page_data);
+        assert_eq!(res2, Some(paddr1));
+
+        assert_eq!(ksm.merged_pages_count, 1);
+        assert_eq!(ksm.pages_scanned_count, 2);
+    }
+
+    #[test]
+    fn test_linux_overlayfs_engine() {
+        let mut overlay = LinuxOverlayFsEngine::new("/lower", "/upper", "/work", "/merged");
+        let path = overlay.copy_up_file_on_write("etc/config.txt");
+        assert_eq!(path, "/upper/etc/config.txt");
+        assert_eq!(overlay.copy_up_count, 1);
+
+        let wh = overlay.create_whiteout_dev_entry("etc/old.txt");
+        assert_eq!(wh, "/upper/etc/old.txt.wh.deleted");
+    }
 
     #[test]
     fn test_desktop_system_health_and_repo_helpers() {
