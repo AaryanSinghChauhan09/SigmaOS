@@ -1,7 +1,7 @@
 // SigmaOS Capability-Based Security System
 // Implements 64-bit hardware-enforced capability model
 
-use core::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

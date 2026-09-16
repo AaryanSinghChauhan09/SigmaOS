@@ -262,4 +262,51 @@ mod tests {
         assert_eq!(search_res.len(), 1);
         assert_eq!(search_res[0].title, "Linux Kernel 6.12 Benchmarks");
     }
+
+    #[test]
+    fn test_all_33_urls_redirection() {
+        let engine = SovereignTechNewsRedirectionEngine::new();
+        let target_urls = [
+            ("9to5google", "https://9to5google.com"),
+            ("9to5linux", "https://9to5linux.com"),
+            ("9to5mac", "https://9to5mac.com"),
+            ("androidauthority", "https://www.androidauthority.com"),
+            ("androidpolice", "https://www.androidpolice.com"),
+            ("appuals", "https://appuals.com"),
+            ("distrowatch", "https://distrowatch.com"),
+            ("frappe", "https://frappe.io"),
+            ("geekygadgets", "https://www.geeky-gadgets.com"),
+            ("hwbusters", "https://hwbusters.com"),
+            ("howtogeek", "https://www.howtogeek.com"),
+            ("infoworld", "https://www.infoworld.com"),
+            ("itsfoss", "https://itsfoss.com"),
+            ("itdaily", "https://www.itdaily.com"),
+            ("kdnuggets", "https://www.kdnuggets.com"),
+            ("linuxdotcom", "https://www.linux.com"),
+            ("linuxorg", "https://www.linux.org"),
+            ("linuxfoundation", "https://www.linuxfoundation.org"),
+            ("linuxteck", "https://www.linuxteck.com"),
+            ("makeuseof", "https://www.makeuseof.com"),
+            ("marktechpost", "https://www.marktechpost.com"),
+            ("opensourceforu", "https://www.opensourceforu.com"),
+            ("pcmag", "https://www.pcmag.com"),
+            ("pcworld", "https://www.pcworld.com"),
+            ("phoronix", "https://www.phoronix.com"),
+            ("techcrunch", "https://techcrunch.com"),
+            ("techpowerup", "https://www.techpowerup.com"),
+            ("techspot", "https://www.techspot.com"),
+            ("thenewstack", "https://thenewstack.io"),
+            ("windowscentral", "https://www.windowscentral.com"),
+            ("windowslatest", "https://www.windowslatest.com"),
+            ("xdadevelopers", "https://www.xda-developers.com"),
+            ("zdnet", "https://www.zdnet.com"),
+        ];
+
+        assert_eq!(engine.publications.len(), 33);
+
+        for (key, expected_canonical) in target_urls {
+            let res = engine.redirect_url(key);
+            assert_eq!(res, Some(expected_canonical.to_string()), "Failed for key {}", key);
+        }
+    }
 }

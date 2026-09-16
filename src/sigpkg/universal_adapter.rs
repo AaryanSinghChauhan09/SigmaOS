@@ -1814,7 +1814,7 @@ impl UniversalDependencyMapper {
         match clean.as_str() {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -2908,7 +2908,7 @@ impl Default for UniversalDryRunSimulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -2927,7 +2927,7 @@ mod tests {
         assert_eq!(parsed.package, "curl");
         assert_eq!(parsed.version, "8.2.1");
         assert_eq!(parsed.depends.len(), 3);
-        assert_eq!(parsed.priority, PackagePriority::Standard);
+        assert_eq!(parsed.priority, "Standard");
 
         // Test parsing system essential priority (Debian-style)
         let essential_text = r#"
@@ -2936,7 +2936,7 @@ mod tests {
             Priority: essential
         "#;
         let parsed_essential = adapter.parse_apt_control(essential_text).unwrap();
-        assert_eq!(parsed_essential.priority, PackagePriority::Essential);
+        assert_eq!(parsed_essential.priority, "Essential");
 
         let native = adapter
             .translate_to_native_package(
@@ -3151,7 +3151,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Pisi)
+            Some(PackageFormat::Eopkg)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),

@@ -2,9 +2,13 @@
 // SigmaOS GitHub Wiki Unimplemented Ideas Parity Subsystem
 // Zero-dependency, zero-allocation-ready, safe Rust implementations of Phase 2-8 Wiki Roadmap Tasks
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 
 // ============================================================================
 // 1. SIGMAOFFICE SUITE ENGINE

@@ -8,9 +8,6 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use core::default::Default;
-use core::option::Option::{self, None, Some};
-use core::result::Result::{self, Err, Ok};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
