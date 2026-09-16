@@ -5364,7 +5364,7 @@ impl BsdCapsicumRightsSandboxingEngine {
     }
 
     pub fn limit_fd_rights(&mut self, fd: i32, rights: Vec<&str>) {
-        let rights_vec: Vec<String> = rights.into_iter().map(|s| s.to_string()).collect();
+        let rights_vec: Vec<String> = rights.iter().map(|s| s.to_string()).collect();
         self.allowed_rights.insert(fd, rights_vec);
     }
 
@@ -5373,7 +5373,7 @@ impl BsdCapsicumRightsSandboxingEngine {
             return true;
         }
         if let Some(rights) = self.allowed_rights.get(&fd) {
-            rights.iter().any(|r: &String| r.eq_ignore_ascii_case(right))
+            rights.iter().any(|r| r.eq_ignore_ascii_case(right))
         } else {
             false
         }
