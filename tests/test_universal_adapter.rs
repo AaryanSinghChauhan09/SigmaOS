@@ -88,7 +88,7 @@ fn test_universal_adapter_all_formats() {
     assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
-    let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
+    let pkg_obsd = bridge.absorb_and_register("tmux.openbsd.tgz", openbsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
     assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));

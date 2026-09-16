@@ -1191,7 +1191,7 @@ impl UniversalPackageAdapter {
     ) -> Result<Package, &'static str> {
         let fmt = self.detect_format_by_extension(filename);
         match fmt {
-            Some(PackageFormat::Apt) | Some(PackageFormat::Superdeb) => {
+            Some(PackageFormat::Apt) | Some(PackageFormat::Deb) | Some(PackageFormat::Superdeb) => {
                 let deb = self.parse_apt_control(raw_text)?;
                 self.translate_to_native_package(
                     &deb.package,
@@ -1222,7 +1222,7 @@ impl UniversalPackageAdapter {
                     )
                 }
             }
-            Some(PackageFormat::Yum) | Some(PackageFormat::Pisi) => {
+            Some(PackageFormat::Yum) | Some(PackageFormat::Rpm) | Some(PackageFormat::Drpm) | Some(PackageFormat::Pisi) | Some(PackageFormat::Eopkg) => {
                 let spec = self.parse_rpm_spec(raw_text)?;
                 self.translate_to_native_package(
                     &spec.name,
@@ -1249,7 +1249,7 @@ impl UniversalPackageAdapter {
                     &xbps.run_depends,
                 )
             }
-            Some(PackageFormat::Portage) => {
+            Some(PackageFormat::Portage) | Some(PackageFormat::Ebuild) => {
                 let ebuild = self.parse_gentoo_ebuild(filename, raw_text)?;
                 let mut deps = ebuild.rdepend.clone();
                 deps.extend(ebuild.depend.clone());
@@ -1258,6 +1258,134 @@ impl UniversalPackageAdapter {
                     &ebuild.version,
                     &ebuild.description,
                     &deps,
+                )
+            }
+            Some(PackageFormat::Snap) => {
+                let snap = self.parse_snapcraft_yaml(raw_text)?;
+                self.translate_to_native_package(
+                    &snap.name,
+                    &snap.version,
+                    &snap.summary,
+                    &snap.plugs,
+                )
+            }
+            Some(PackageFormat::Flatpak) => {
+                let flatpak = self.parse_flatpak_json(raw_text)?;
+                self.translate_to_native_package(
+                    &flatpak.app_id,
+                    "1.0.0",
+                    "Flatpak Sandboxed App",
+                    &flatpak.finish_args,
+                )
+            }
+            Some(PackageFormat::Hpkg) => {
+                let haiku = self.parse_haiku_hpkg(raw_text)?;
+                self.translate_to_native_package(
+                    &haiku.name,
+                    &haiku.version,
+                    &haiku.summary,
+                    &haiku.requires,
+                )
+            }
+            Some(PackageFormat::Pkg) | Some(PackageFormat::Ports) | Some(PackageFormat::OpenBsdPkg) => {
+                if raw_text.contains("@name") {
+                    let obs = self.parse_openbsd_contents(raw_text)?;
+                    self.translate_to_native_package(
+                        &obs.pkgname,
+                        &obs.version,
+                        &obs.comment,
+                        &obs.depends,
+                    )
+                } else {
+                    let bsd = self.parse_freebsd_ucl_manifest(raw_text)?;
+                    self.translate_to_native_package(
+                        &bsd.name,
+                        &bsd.version,
+                        &bsd.comment,
+                        &bsd.deps,
+                    )
+                }
+            }
+            Some(PackageFormat::Zypper) => {
+                let zyp = self.parse_zypper_spec(raw_text)?;
+                self.translate_to_native_package(
+                    &zyp.name,
+                    &zyp.version,
+                    &zyp.summary,
+                    &zyp.requires,
+                )
+            }
+            Some(PackageFormat::Pkgsrc) => {
+                let net = self.parse_netbsd_pkgsrc(raw_text)?;
+                self.translate_to_native_package(
+                    &net.pkgname,
+                    &net.version,
+                    &net.comment,
+                    &net.depends,
+                )
+            }
+            Some(PackageFormat::SlackBuild) | Some(PackageFormat::Txz) => {
+                let slk = self.parse_slackware_pkg(raw_text)?;
+                self.translate_to_native_package(
+                    &slk.name,
+                    &slk.version,
+                    &slk.description,
+                    &slk.slack_required,
+                )
+            }
+            Some(PackageFormat::Air)
+            | Some(PackageFormat::Bottle)
+            | Some(PackageFormat::Ipa)
+            | Some(PackageFormat::Aab)
+            | Some(PackageFormat::Hap)
+            | Some(PackageFormat::AppBundle)
+            | Some(PackageFormat::Lzm)
+            | Some(PackageFormat::Pup)
+            | Some(PackageFormat::Pet)
+            | Some(PackageFormat::TarGz)
+            | Some(PackageFormat::TarXz)
+            | Some(PackageFormat::Tar)
+            | Some(PackageFormat::AppImage)
+            | Some(PackageFormat::Nix)
+            | Some(PackageFormat::Guix)
+            | Some(PackageFormat::Sigma)
+            | Some(PackageFormat::Moss)
+            | Some(PackageFormat::Tcz)
+            | Some(PackageFormat::Gobo)
+            | Some(PackageFormat::Ostree)
+            | Some(PackageFormat::Sfs)
+            | Some(PackageFormat::Puk)
+            | Some(PackageFormat::Dmg)
+            | Some(PackageFormat::Cports)
+            | Some(PackageFormat::Dports)
+            | Some(PackageFormat::Crux)
+            | Some(PackageFormat::Stratum)
+            | Some(PackageFormat::Ipk)
+            | Some(PackageFormat::Opkg)
+            | Some(PackageFormat::SolarisIps)
+            | Some(PackageFormat::GuixNar)
+            | Some(PackageFormat::Spack)
+            | Some(PackageFormat::Conan)
+            | Some(PackageFormat::Wheel)
+            | Some(PackageFormat::Crate)
+            | Some(PackageFormat::Gem)
+            | Some(PackageFormat::Nupkg)
+            | Some(PackageFormat::Vcpkg)
+            | Some(PackageFormat::NarInfo)
+            | Some(PackageFormat::Sysupdate) => {
+                let clean_name = filename
+                    .split('/')
+                    .last()
+                    .unwrap_or(filename)
+                    .split('.')
+                    .next()
+                    .unwrap_or("app");
+                let clean_name = if clean_name.is_empty() { "app" } else { clean_name };
+                self.translate_to_native_package(
+                    clean_name,
+                    "1.0.0",
+                    &format!("{:?} Package Format", fmt.unwrap()),
+                    &[],
                 )
             }
             _ => {
@@ -3151,7 +3279,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("ubuntu.deb"),
-            Some(PackageFormat::Apt)
+            Some(PackageFormat::Deb)
         );
         assert_eq!(
             adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -3159,7 +3287,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("fedora.rpm"),
-            Some(PackageFormat::Yum)
+            Some(PackageFormat::Rpm)
         );
         assert_eq!(
             adapter.detect_format_by_extension("harmony.hap"),

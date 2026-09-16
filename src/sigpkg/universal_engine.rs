@@ -2487,7 +2487,7 @@ impl IPackageAdapter for OpenBsdPkgPackageAdapter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
