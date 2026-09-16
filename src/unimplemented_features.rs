@@ -1879,11 +1879,9 @@ pub struct LegacyPioController {
 
 impl SpecBareMetalUnifiedPeripheral for LegacyPioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u16) -> u64 { self.port_base as u64 + offset as u64 }
-    fn write_register(&mut self, _offset: u16, _value: u64) {}
-    fn handle_irq(&mut self) -> bool { true }
-    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
-    fn get_power_state(&self) -> PowerState { self.power_state }
+    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
+    fn handle_irq(&mut self) -> u32 { 1 }
 }
 
 pub struct ModernMmioSpecController {
@@ -1893,11 +1891,9 @@ pub struct ModernMmioSpecController {
 
 impl SpecBareMetalUnifiedPeripheral for ModernMmioController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u16) -> u64 { self.mmio_base + offset as u64 }
-    fn write_register(&mut self, _offset: u16, _value: u64) {}
-    fn handle_irq(&mut self) -> bool { true }
-    fn set_power_state(&mut self, state: PowerState) { self.power_state = state; }
-    fn get_power_state(&self) -> PowerState { self.power_state }
+    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
+    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
+    fn handle_irq(&mut self) -> u32 { 1 }
 }
 
 pub struct BareMetalSpecPeripheralManager {

@@ -1,4 +1,4 @@
-# 🇸🇴 SigmaOS Sovereign Operating System
+# 🚀 SigmaOS — The Post-Linux Sovereign Operating System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/Language-Rust-orange.svg)](https://www.rust-lang.org/)
@@ -84,17 +84,11 @@
 ### Building & Running
 
 ```bash
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
+# Build the core library
+cargo check --lib
 
-# Test the current codebase
+# Run the native test suite
 ./run_sigma_tests.sh
-
-# Build (requires Rust nightly)
-make build
-
-# Run QEMU test
-make test-qemu
 ```
 
 ---
