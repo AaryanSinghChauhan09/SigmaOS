@@ -254,3 +254,10 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine,
     SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
 };
+
+pub mod linux_bsd_distro_strategic_innovations;
+pub use linux_bsd_distro_strategic_innovations::{
+    AbrootImageCommit, AbrootSlot, BinaryVerificationResult, BootHealthCheck, BootHealthStatus,
+    ExecGuardRecommendation, FedoraGreenbootHealthCheckEngine, ObfuscatedInputEvent,
+    VanillaAbrootImageTransactionEngine, WhonixKloakInputObfuscationEngine, ZorinExecGuardSubsystem,
+};
