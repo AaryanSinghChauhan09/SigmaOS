@@ -256,15 +256,14 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::DragonFlyBsd => ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
-            | DistroSubsystemMode::LinuxVoid
-            | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Runit,
+            | DistroSubsystemMode::LinuxVoid => ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 ServiceSupervisorType::Shepherd
             }
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
             _ => ServiceSupervisorType::Systemd,
@@ -357,8 +356,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::DragonFlyBsd => supervisor == ServiceSupervisorType::OpenRC,
 
             DistroSubsystemMode::LinuxAlpine
-            | DistroSubsystemMode::LinuxVoid
-            | DistroSubsystemMode::LinuxAntiX => supervisor == ServiceSupervisorType::Runit,
+            | DistroSubsystemMode::LinuxVoid => supervisor == ServiceSupervisorType::Runit,
 
             DistroSubsystemMode::LinuxNix | DistroSubsystemMode::LinuxGuix => {
                 supervisor == ServiceSupervisorType::Shepherd
@@ -502,15 +500,15 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
-            "compiler" => {
-                Ok(format!(
-                    "Dispatched operation for subsystem 'compiler' with action '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
             "firewall" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'firewall' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'compiler' with action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -3294,9 +3292,8 @@ mod cross_subsystem_tests {
         assert!(ipc.splice_channel(1, 2, 0).is_err());
 
         let mut auth = SovereignSystemdHomedAuthBridge::new();
-        let pass_val = format!("{}ss", "pa");
-        assert_eq!(auth.authenticate_and_mount("user", &pass_val).unwrap(), "LUKS_HOME_MOUNTED");
-        assert!(auth.authenticate_and_mount("", &pass_val).is_err());
+        assert_eq!(auth.authenticate_and_mount("user", "pass").unwrap(), "LUKS_HOME_MOUNTED");
+        assert!(auth.authenticate_and_mount("", "pass").is_err());
 
         let mut syscall = SovereignMultiArchSyscallTranslator::new(DistroSubsystemMode::FreeBsd);
         assert_eq!(syscall.translate_and_dispatch("sys_read").unwrap(), 1001);
@@ -7961,7 +7958,7 @@ impl UseFlagEngine {
     pub fn resolve_flags(&self, package: &str) -> Vec<UseFlag> {
         let mut resolved = self.global_flags.clone();
         if let Some(pkg_flags) = self.package_flags.get(package) {
-            resolved.extend(pkg_flags.clone());
+            resolved.extend(pkg_flags.iter().cloned());
         }
         resolved
     }
