@@ -24,4 +24,5 @@ jobs:
 
       - name: Test Clear Linux Stateless Overlay & ISA Optimization
         run: |
+          mkdir -p build
           cargo test --lib -- unimplemented_features::tests::test_sovereign_stateless_architecture

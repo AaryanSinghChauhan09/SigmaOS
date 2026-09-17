@@ -488,8 +488,141 @@ impl Default for CachyosKernelFeatureMatrix {
     }
 }
 
-#[cfg(test_disabled)]
+
+
+/// CachyOS Kernel Manager Engine
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CachyKernelVariant {
+    LinuxCachyosBore,
+    LinuxCachyosSchedExt,
+    LinuxCachyosHardened,
+    LinuxCachyosLts,
+}
+
+#[derive(Debug, Clone)]
+pub struct CachyosKernelManagerEngine {
+    pub active_kernel: CachyKernelVariant,
+    pub installed_kernels: Vec<CachyKernelVariant>,
+}
+
+impl CachyosKernelManagerEngine {
+    pub fn new() -> Self {
+        Self {
+            active_kernel: CachyKernelVariant::LinuxCachyosBore,
+            installed_kernels: vec![CachyKernelVariant::LinuxCachyosBore],
+        }
+    }
+
+    pub fn install_kernel(&mut self, variant: CachyKernelVariant) {
+        if !self.installed_kernels.contains(&variant) {
+            self.installed_kernels.push(variant);
+        }
+    }
+
+    pub fn set_active_kernel(&mut self, variant: CachyKernelVariant) -> Result<String, &'static str> {
+        if self.installed_kernels.contains(&variant) {
+            self.active_kernel = variant.clone();
+            Ok(format!("Bootloader updated to boot {:?}", variant))
+        } else {
+            Err("Kernel variant not installed")
+        }
+    }
+}
+
+
+
+/// CachyOS Package Installer Engine
+#[derive(Debug, Clone)]
+pub struct CachyPackageBundle {
+    pub name: String,
+    pub packages: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct CachyosPackageInstallerEngine {
+    pub available_bundles: Vec<CachyPackageBundle>,
+}
+
+impl CachyosPackageInstallerEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { available_bundles: Vec::new() };
+        engine.available_bundles.push(CachyPackageBundle {
+            name: "gaming".to_string(),
+            packages: vec!["steam".to_string(), "proton-ge-custom".to_string(), "mangohud".to_string(), "gamemode".to_string()],
+        });
+        engine.available_bundles.push(CachyPackageBundle {
+            name: "developer".to_string(),
+            packages: vec!["rust".to_string(), "clang".to_string(), "git".to_string(), "docker".to_string()],
+        });
+        engine
+    }
+
+    pub fn resolve_bundle_packages(&self, bundle_name: &str) -> Option<Vec<String>> {
+        self.available_bundles.iter().find(|b| b.name == bundle_name).map(|b| b.packages.clone())
+    }
+}
+
+
+
+/// CachyOS Sysctl Tuning Engine
+#[derive(Debug, Clone)]
+pub struct CachyosSysctlTuningEngine {
+    pub bore_sched_latency_ns: u64,
+    pub vm_compaction_proactiveness: u32,
+    pub zswap_compressor: String,
+}
+
+impl CachyosSysctlTuningEngine {
+    pub fn new() -> Self {
+        Self {
+            bore_sched_latency_ns: 3_000_000,
+            vm_compaction_proactiveness: 80,
+            zswap_compressor: "zstd".to_string(),
+        }
+    }
+
+    pub fn apply_tuning(&mut self) -> String {
+        format!("Applied CachyOS Sysctl: bore_latency={}ns, compaction={}, zswap={}",
+            self.bore_sched_latency_ns, self.vm_compaction_proactiveness, self.zswap_compressor)
+    }
+}
+
+impl Default for CachyosSysctlTuningEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+
 mod tests {
+
+    #[test]
+    fn test_cachyos_sysctl_tuning() {
+        let mut tuner = CachyosSysctlTuningEngine::new();
+        let res = tuner.apply_tuning();
+        assert!(res.contains("bore_latency=3000000ns"));
+    }
+
+
+    #[test]
+    fn test_cachyos_package_installer() {
+        let installer = CachyosPackageInstallerEngine::new();
+        let gaming_pkgs = installer.resolve_bundle_packages("gaming").unwrap();
+        assert!(gaming_pkgs.contains(&"steam".to_string()));
+        assert!(installer.resolve_bundle_packages("nonexistent").is_none());
+    }
+
+
+    #[test]
+    fn test_cachyos_kernel_manager() {
+        let mut km = CachyosKernelManagerEngine::new();
+        assert_eq!(km.active_kernel, CachyKernelVariant::LinuxCachyosBore);
+
+        km.install_kernel(CachyKernelVariant::LinuxCachyosSchedExt);
+        assert!(km.set_active_kernel(CachyKernelVariant::LinuxCachyosSchedExt).is_ok());
+        assert_eq!(km.active_kernel, CachyKernelVariant::LinuxCachyosSchedExt);
+    }
+
     use super::*;
     use std::string::ToString;
 

@@ -27,14 +27,17 @@ jobs:
 
       - name: Verify Security Hardening & PQC Attestation
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh
 
       - name: Verify FreeBSD Capsicum Capability Sandbox
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh
 
       - name: Verify Post-Quantum Cryptography (PQC) Measurement & Firmitas Attestation
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh
 
       - name: Run TruffleHog Secret Scanner

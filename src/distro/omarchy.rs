@@ -585,7 +585,115 @@ impl Default for OmarchyAudioPipewireConfig {
     }
 }
 
-#[cfg(test_disabled)]
+// ============================================================================
+// OMARCHY GITHUB REPO INSPIRED DOTFILES STOW PROFILE ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct StowPackageProfile {
+    pub name: String,
+    pub target_path: String,
+    pub is_enabled: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct OmarchyDotfilesStowProfileEngine {
+    pub profiles: Vec<StowPackageProfile>,
+}
+
+impl OmarchyDotfilesStowProfileEngine {
+    pub fn new() -> Self {
+        let mut engine = Self { profiles: Vec::new() };
+        engine.add_profile("hypr", "/home/sovereign/.config/hypr");
+        engine.add_profile("waybar", "/home/sovereign/.config/waybar");
+        engine.add_profile("kitty", "/home/sovereign/.config/kitty");
+        engine
+    }
+
+    pub fn add_profile(&mut self, name: &str, target: &str) {
+        self.profiles.push(StowPackageProfile {
+            name: name.to_string(),
+            target_path: target.to_string(),
+            is_enabled: true,
+        });
+    }
+
+    pub fn stow_all(&self) -> usize {
+        self.profiles.iter().filter(|p| p.is_enabled).count()
+    }
+}
+
+// ============================================================================
+// OMARCHY GITHUB REPO INSPIRED KEYBINDINGS STUDIO
+// ============================================================================
+
+#[derive(Debug, Clone, Default)]
+pub struct OmarchyKeybindingsStudio {
+    pub shortcuts: Vec<KeybindingDefinition>,
+}
+
+impl OmarchyKeybindingsStudio {
+    pub fn new() -> Self {
+        Self {
+            shortcuts: Vec::new(),
+        }
+    }
+
+    pub fn register_shortcut(&mut self, mods: &[&str], key: &str, cmd: &str, desc: &str) {
+        self.shortcuts.push(KeybindingDefinition {
+            modifiers: mods.iter().map(|s| s.to_string()).collect(),
+            key: key.to_string(),
+            command: cmd.to_string(),
+            description: desc.to_string(),
+        });
+    }
+
+    pub fn generate_hyprland_bind_cmds(&self) -> Vec<String> {
+        self.shortcuts
+            .iter()
+            .map(|s| {
+                let mods_str = s.modifiers.join(" ");
+                format!("bind = {}, {}, exec, {}", mods_str, s.key, s.command)
+            })
+            .collect()
+    }
+}
+
+// ============================================================================
+// OMARCHY GITHUB REPO INSPIRED HYPRLAND ANIMATION CURVE ENGINE
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct OmarchyHyprlandAnimCurveEngine {
+    pub bezier_name: String,
+    pub curve_params: String,
+    pub speed_ms: u32,
+}
+
+impl OmarchyHyprlandAnimCurveEngine {
+    pub fn new() -> Self {
+        Self {
+            bezier_name: "omarchyBezier".to_string(),
+            curve_params: "0.05, 0.9, 0.1, 1.05".to_string(),
+            speed_ms: 250,
+        }
+    }
+
+    pub fn render_animation_config(&self) -> String {
+        format!(
+            "bezier = {}, {}\nanimation = windows, 1, {}, {}",
+            self.bezier_name, self.curve_params, self.speed_ms / 30, self.bezier_name
+        )
+    }
+}
+
+impl Default for OmarchyHyprlandAnimCurveEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -646,5 +754,30 @@ mod tests {
         assert!(audio.set_low_latency(64));
         assert_eq!(audio.quantum_buffer_size, 64);
         assert!(!audio.set_low_latency(0));
+    }
+
+    #[test]
+    fn test_omarchy_dotfiles_stow_profile_engine() {
+        let mut stow = OmarchyDotfilesStowProfileEngine::new();
+        assert_eq!(stow.stow_all(), 3);
+        stow.add_profile("zsh", "/home/sovereign/.config/zsh");
+        assert_eq!(stow.stow_all(), 4);
+    }
+
+    #[test]
+    fn test_omarchy_keybindings_studio() {
+        let mut studio = OmarchyKeybindingsStudio::new();
+        studio.register_shortcut(&["SUPER", "SHIFT"], "Q", "hyprctl dispatch exit", "Quit Hyprland");
+        let cmds = studio.generate_hyprland_bind_cmds();
+        assert_eq!(cmds.len(), 1);
+        assert!(cmds[0].contains("SUPER SHIFT"));
+    }
+
+    #[test]
+    fn test_omarchy_hyprland_anim_curve_engine() {
+        let curve = OmarchyHyprlandAnimCurveEngine::new();
+        let cfg = curve.render_animation_config();
+        assert!(cfg.contains("bezier = omarchyBezier"));
+        assert!(cfg.contains("0.05, 0.9, 0.1, 1.05"));
     }
 }
