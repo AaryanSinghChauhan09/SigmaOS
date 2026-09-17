@@ -1,4 +1,5 @@
-use alloc::string::String;
+use alloc::format;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
@@ -51,7 +52,7 @@ pub mod svntogit_repro;
 
 pub use sovereign_package_innovations::{
     AlpmHook, AlpineApkCachePeerSyncEngine, AlternativeGroup, AlternativeProvider,
-    ApkPackageChunk, AptPackageCandidate, ArchAlpmHookTransactionEngine,
+    ApkPackageChunk, AptPackageCandidate, AptPinRule, ArchAlpmHookTransactionEngine,
     BsdPkgDbStorageEngine, BsdPkgRecord, CachePeerNode, DebianAptPinningEngine,
     FreeBsdPkgMessageNotifierEngine, GentooEbuildUseFlagSolver, NixFlakeHermeticCacheStore,
     OpenBsdPledgeUnveilSandboxScriptletEngine, OstreeDeploymentPin, OstreeLayer, PkgMessage,
@@ -69,13 +70,12 @@ pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use crate::package::sovereign_distro_package_innovations::*;
 pub use crate::package::sovereign_distro_package_matrix::*;
 
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState,
+    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
     ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
     CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
     DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
@@ -98,7 +98,7 @@ pub use zero_alloc_resolver::{
 };
 pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
-    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest,
+    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
     FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
     ZypperSpecManifest, SlackwarePkgManifest,
     RpmSpecManifest, AppImageContainer, MappedScriptletHook,
@@ -328,9 +328,3 @@ mod tests {
         assert!(v1 < v2);
     }
 }
-
-// ─── Phase 2: Universal Packaging Engine — New Sovereign Modules ──────────────
-pub mod delta_engine;
-pub mod merkle_store;
-pub mod boolean_dep_solver;
-pub mod package_signing;

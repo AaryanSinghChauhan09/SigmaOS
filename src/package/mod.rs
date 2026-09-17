@@ -26,7 +26,6 @@ pub mod debian_apt;
 pub mod debian_translator;
 pub mod dependency_graph;
 pub mod dependency_resolver;
-pub mod dpll_solver;
 pub mod fedora_dnf;
 pub mod gentoo_opt;
 pub mod gentoo_portage;
@@ -46,20 +45,10 @@ pub mod spac;
 pub mod store;
 pub mod universal;
 pub mod updater;
-pub mod sovereign_distro_package_innovations;
-pub use sovereign_distro_package_innovations::*;
 pub mod sovereign_distro_package_matrix;
 pub use sovereign_distro_package_matrix::*;
 pub mod universal_package_innovations_suite;
-pub use universal_package_innovations_suite::{
-    AlpineLbuOverlayStateGovernor, AppStreamCatalogEntry, ArchPacstrapSeederEngine,
-    BinaryMitigationProfile, BrokenSharedLibraryRequirement, DebianAppStreamCatalogEngine,
-    DebianAptFastMirrorRanker, DnfGpgKeyRecord, FedoraDnfGpgKeyRotationEngine,
-    FedoraDnfGroupInstallSolver, FreeBsdPkgBaseRootfsEngine, GentooEcleanRevdepRebuildEngine,
-    HardenedBsdBinaryMitigationAuditorEngine, LbuSavedFileRecord, NixStorePathVerifyEngine,
-    OpenBsdPkgUpgradeRelinkerEngine, PacstrapPackageGroup, SharedLibMajorMinor,
-    StaleDistfileRecord, StorePathIntegrityRecord,
-};
+pub use universal_package_innovations_suite::*;
 
 pub use alpine_apk::{ApkPackage, ApkPackageManager, ApkRepository, ApkWorld};
 pub use arch_aur::{AURPackage, BuildError, SigmaAUR, PKGBUILD};
@@ -97,7 +86,6 @@ pub use debian_apt::{AptDatabase, AptError, AptPackage, SigmaAPT, SourcesEntry};
 pub use dependency_graph::{
     DependencyConstraint, DependencyGraph, PackageNode, PackageVersion, VersionConstraint,
 };
-pub use dpll_solver::{DpllClause, DpllLiteral, DpllSatSolver, VariableAssignment};
 pub use fedora_dnf::{
     DnfError, DnfPackage, Repository, SigmaDNF, Transaction, TransactionOperation,
 };
