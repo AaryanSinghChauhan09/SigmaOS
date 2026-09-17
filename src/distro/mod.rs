@@ -305,3 +305,10 @@ pub use sovereign_2028_distro_supremacy_engine::{
     SovereignOpenBsd78FineIbtCfiGuard, SovereignSystemd258VmspawnEngine,
     SovereignWayland125DirectScanoutEngine, VnetDualStackInterface,
 };
+
+// ─── Omarchy Master Synthesis Suite ──────────────────────────────────────────
+pub mod omarchy_master_synthesis;
+pub use omarchy_master_synthesis::{
+    OmarchyAppSandbox, OmarchyHerdrAiScheduler, OmarchyQuickShellBridge,
+    OmarchyThemeLiveEngine, ShellElementType, ThemePalette,
+};
