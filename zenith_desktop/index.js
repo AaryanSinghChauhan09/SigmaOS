@@ -80,13 +80,24 @@ export function initKeyboardNavigation() {
 }
 
 /**
- * Initializes WAI-ARIA tablist keyboard navigation (Arrow keys, Home, End).
+ * Initializes WAI-ARIA tablist keyboard navigation (Arrow keys, Home, End) with roving tabindex.
  */
 export function initTablistNavigation() {
   const tablists = SovereignDomSelector.selectAll('[role="tablist"]');
   tablists.forEach((tablist) => {
     const tabs = SovereignDomSelector.selectAll('[role="tab"]', tablist);
+    const updateRovingTabindex = (selectedTab) => {
+      tabs.forEach((t) => {
+        const isSelected = t === selectedTab;
+        t.setAttribute("tabindex", isSelected ? "0" : "-1");
+      });
+    };
+
+    const initialTab = tabs.find((t) => t.getAttribute("aria-selected") === "true") || tabs[0];
+    if (initialTab) updateRovingTabindex(initialTab);
+
     tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => updateRovingTabindex(tab));
       tab.addEventListener("keydown", (event) => {
         let targetIndex = null;
         if (event.key === "ArrowRight" || event.key === "ArrowDown") {
@@ -101,11 +112,19 @@ export function initTablistNavigation() {
 
         if (targetIndex !== null) {
           event.preventDefault();
+          updateRovingTabindex(tabs[targetIndex]);
           tabs[targetIndex].focus();
           tabs[targetIndex].click();
         }
       });
     });
+  });
+
+  const tabpanels = SovereignDomSelector.selectAll('[role="tabpanel"]');
+  tabpanels.forEach((panel) => {
+    if (!panel.hasAttribute("tabindex")) {
+      panel.setAttribute("tabindex", "0");
+    }
   });
 }
 
