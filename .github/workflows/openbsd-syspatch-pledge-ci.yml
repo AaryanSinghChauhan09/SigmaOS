@@ -1,5 +1,8 @@
 name: OpenBSD Syspatch & Pledge/Unveil CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main", "master", "jules-*" ]

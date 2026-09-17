@@ -1,5 +1,8 @@
 name: Gentoo Catalyst Stage3 & Portage EAPI 8 CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main", "master", "jules-*" ]
