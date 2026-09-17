@@ -288,3 +288,11 @@ pub use omarchy_expanded_parity::{
     OmarchyThunarFileActions, OmarchyZellijSessionManager, SovereignOmarchyExpandedParitySuite,
 };
 
+pub mod linux_bsd_pinnacle_synthesis;
+pub use linux_bsd_pinnacle_synthesis::{
+    ChimeraDinitCportsEngine, CportsPackageSpec, DinitServiceSpec, DinitServiceState,
+    EopkgDeltaPackage, FreeBsdMacFrameworkEngine, KarlKernelImage, MacAccessRequest, MacLabel,
+    MacPolicyModel, MageiaUrpmiMediaEngine, OpenBsdKarlPinSyscallEngine, PinnedSyscallRegion,
+    RavenNotification, RavenWidget, SolusRavenEopkgEngine, SovereignLinuxBsdPinnacleSynthesisSuite,
+    UrpmiMediaSource, UrpmiPackageRecord,
+};
