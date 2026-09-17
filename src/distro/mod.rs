@@ -254,3 +254,12 @@ pub use sovereign_nextgen_distro_leap::{
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
     SovereignSchedExtEngine, SystemGenerationRecord,
 };
+
+pub mod sovereign_2026_distro_leap_engine;
+pub use sovereign_2026_distro_leap_engine::{
+    BoreV2TaskDescriptor, MicroarchIsaTarget, NixGuixGeneration,
+    Sovereign2026DistroSuperiorityMasterEngine, SovereignCachyosMicroarchV4PqcVerifier,
+    SovereignNixGuixHermeticCasEngine, SovereignOpenBsd77PinsyscallHardeningEngine,
+    SovereignSchedExtBoreV2Governor, SovereignWayland124ZenithHdrEngine, UnveilLockState,
+    WorkloadLatencyClass as BoreV2WorkloadLatencyClass, ZenithHdrToneMapMode, ZenithWaylandFrame,
+};

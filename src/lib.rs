@@ -83,7 +83,10 @@ pub use distro::{
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont,
     OmarchyNeovimPresetEngine, OmarchyTerminalFontConfig, OmarchyHyprlandWorkspaceSnapLayoutEngine,
     OmarchyLiveIsoBootstrapEngine, OmarchyLuaConfigEngine, OmarchyNeovimPresetStudioEngine,
-    OmarchyWaybarAppletStudioEngine,
+    OmarchyWaybarAppletStudioEngine, Sovereign2026DistroSuperiorityMasterEngine,
+    SovereignCachyosMicroarchV4PqcVerifier, SovereignNixGuixHermeticCasEngine,
+    SovereignOpenBsd77PinsyscallHardeningEngine, SovereignSchedExtBoreV2Governor,
+    SovereignWayland124ZenithHdrEngine,
 };
 
 pub use package::bsd_linux_package_innovations::{
