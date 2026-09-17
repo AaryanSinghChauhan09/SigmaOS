@@ -16,8 +16,7 @@ use alloc::vec::Vec;
 use alloc::string::String;
 use core::sync::atomic::{AtomicU64, Ordering};
 
-use crate::klib::types::*;
-use crate::security::sandbox::{Landlock V5Guard, CapsicumRights};
+use crate::security::SovereignLandlockV5Guard;
 use crate::kernel::process::{ProcessId, ProcessState};
 
 /// Unique identifier for AI agents in the kernel
@@ -32,7 +31,7 @@ impl AgentId {
 }
 
 /// Agent capability domains (sandboxed execution contexts)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AgentCapability {
     /// Analyze kernel crashes, panics, and core dumps
     SystemAnalysis,
@@ -97,8 +96,7 @@ pub struct AgentProcess {
 /// Sandboxing context for agent execution
 #[derive(Debug)]
 pub struct AgentSandbox {
-    pub landlock: LandlockV5Guard,
-    pub capsicum: CapsicumRights,
+    pub landlock: SovereignLandlockV5Guard,
     pub pledge_promises: u64,
     pub unveil_paths: Vec<(String, u32)>,
     pub memory_limit: usize,
@@ -108,8 +106,7 @@ pub struct AgentSandbox {
 impl AgentSandbox {
     pub fn new_strict() -> Self {
         Self {
-            landlock: LandlockV5Guard::new(),
-            capsicum: CapsicumRights::empty(),
+            landlock: SovereignLandlockV5Guard::new(5),
             pledge_promises: 0, // No promises initially
             unveil_paths: Vec::new(),
             memory_limit: 512 * 1024 * 1024, // 512 MB default
@@ -196,7 +193,7 @@ pub struct AgentReport {
 }
 
 /// Plugin specification for code generation
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PluginSpec {
     pub name: String,
     pub description: String,
@@ -573,14 +570,6 @@ pub enum AgentError {
     AnalysisFailed,
 }
 
-// Re-export for other modules
-pub use self::{
-    AgentId, AgentCapability, AgentPriority, AgentState,
-    AgentProcess, AgentSandbox, AgentKernelBridge,
-    CrashDump, AgentReport, PluginSpec, Plugin,
-    UserIntent, ConfigDiff, SovereignAgentRuntime,
-    AgentError,
-};
 
 #[cfg(test)]
 mod tests {

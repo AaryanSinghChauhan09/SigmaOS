@@ -1,7 +1,3 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
 //! Shell/Command Interpreter (bash/zsh Inspiration)
 //! Advanced shell with history, completion, aliases, and job control
 
@@ -206,9 +202,11 @@ impl SigmaShell {
         let parsed = self.parse_command(command)?;
         
         // Check for aliases
-        let command_name = parsed.argv.first().unwrap_or(&String::new());
-        if let Some(alias) = self.get_alias(command_name) {
-            return self.execute_command(&alias.value);
+        let default_cmd = String::new();
+        let command_name = parsed.argv.first().unwrap_or(&default_cmd);
+        let alias_val = self.get_alias(command_name).map(|a| a.value.clone());
+        if let Some(alias_value) = alias_val {
+            return self.execute_command(&alias_value);
         }
         
         // Execute built-in commands

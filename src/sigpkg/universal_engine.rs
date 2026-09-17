@@ -15,11 +15,16 @@ use core::result::Result::{self, Err, Ok};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
     Apt,
+    Deb,
     Yum,
+    Rpm,
     Pacman,
     Portage,
+    Ebuild,
     Sovereign,
+    Sigma,
     Nix,
+    Sysupdate,
     Apk,
     Xbps,
     Air,
@@ -73,6 +78,50 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
+}
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        let name = filename.to_lowercase();
+        let name = name.trim();
+        let normalized = name.replace(" ", "");
+
+        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+            Some(PackageFormat::Rpm)
+        } else if normalized.ends_with(".pkg.tar.zst")
+            || normalized.ends_with(".pkg.tar.xz")
+            || normalized.ends_with(".pkg.tar.gz")
+            || normalized.ends_with(".pacman")
+        {
+            Some(PackageFormat::Pacman)
+        } else if normalized.ends_with(".snap") {
+            Some(PackageFormat::Snap)
+        } else if normalized.ends_with(".flatpak") {
+            Some(PackageFormat::Flatpak)
+        } else if normalized.ends_with(".appimage") {
+            Some(PackageFormat::AppImage)
+        } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
+            Some(PackageFormat::Sigma)
+        } else if normalized.ends_with(".apk") {
+            Some(PackageFormat::Apk)
+        } else if normalized.ends_with(".xbps") {
+            Some(PackageFormat::Xbps)
+        } else if normalized.ends_with(".ebuild") {
+            Some(PackageFormat::Ebuild)
+        } else if normalized.ends_with(".nix") {
+            Some(PackageFormat::Nix)
+        } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
+            Some(PackageFormat::TarGz)
+        } else if normalized.ends_with(".tar.xz") || normalized.ends_with(".txz") {
+            Some(PackageFormat::TarXz)
+        } else if normalized.ends_with(".tar") {
+            Some(PackageFormat::Tar)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

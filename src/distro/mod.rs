@@ -1,8 +1,10 @@
 pub mod omarchy;
+pub mod omarchy_inspiration;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
 
+pub use omarchy_inspiration::*;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
@@ -246,3 +248,10 @@ pub use sovereign_ahead_distro_supremacy::{
     SovereignResilientHammer2Engine, SovereignUniversalMicroarchEngine,
     SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
 };
+
+pub mod arch_missing_components;
+pub mod mint_innovations;
+
+pub use arch_missing_components::*;
+pub use crate::compatibility::fedora_missing_components::*;
+pub use mint_innovations::*;

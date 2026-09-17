@@ -2,8 +2,16 @@
 // Core library for SigmaOS operating system
 #![allow(ambiguous_glob_reexports)]
 
+extern crate alloc;
+
 // Core working modules
 pub mod open_source_os_gap_closure;
+pub mod community;
+pub mod distro;
+pub mod drivers;
+pub mod governance;
+pub mod pillars;
+pub mod launch_ready;
 pub mod accessibility;
 pub mod ai;
 pub mod audio;
@@ -301,7 +309,7 @@ pub use drivers::distro_device_expansion::{
     AppleNvmeAnsDriver, AtherosAr9271WifiDriver, Esp32HciBtBridgeDriver, LogitechUnifyingHidDriver,
     NvidiaNouveauOpenGspDriver, UsbAudioClass2Driver,
 };
-pub use driver::{
+pub use drivers::{
     AudioDspStream, AudioSampleFormat, Bluetooth54LeAudioDriver, BusType, DriverCapability,
     DriverIsolationRingGuard, DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent,
     EvdevEventType, EvdevInputDevice, FreeBsdDrmConnector, GpioDirection, GpioState,
@@ -316,7 +324,7 @@ pub use driver::{
     ZeroCopyPacketDriverEngine,
 };
 pub use filesystem::{
-    FileMode, FileType, FsError, Inode, VirtualFilesystem,
+    FileMode, FileType, FsError, Inode, VirtualFileSystem,
 };
 pub use governance::{
     FoundationModel, FoundationMember, ReleaseType, RoadmapMilestone, TransparentRoadmap,

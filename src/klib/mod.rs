@@ -49,28 +49,33 @@ pub mod uvm;
 pub mod uuid;
 pub mod buddy_allocator;
 pub mod hash;
+pub mod string;
+pub mod vec;
+pub mod vecdeque;
+pub mod adt;
+pub mod error;
+pub mod paging;
+pub mod zero_dependency_elimination;
 
-pub mod string {
+pub mod types {
     pub use crate::klib::custom_string::SigmaString;
-}
-
-pub mod vec {
+    pub use std::string::String;
     pub use std::vec::Vec;
 }
 
 // Re-exports
+pub use alloc::string::{String, ToString};
 pub use arc::Arc;
+pub use btreemap::BTreeMap;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
 pub use custom_string::SigmaString;
 pub use uuid::Uuid;
+pub use vec::SigmaVec;
 
 #[cfg(not(target_os = "none"))]
 pub use std::vec::Vec;
-
-#[cfg(target_os = "none")]
-pub use vec::Vec;
 
 #[cfg(not(target_os = "none"))]
 pub use std::collections::HashMap;

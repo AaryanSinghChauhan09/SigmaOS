@@ -5,7 +5,9 @@
 
 use std::string::String;
 use std::vec::Vec;
+use std::collections::HashMap;
 use core::fmt;
+use crate::security::capability::{CapabilityToken, Permission};
 
 /// File types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -13,11 +15,26 @@ pub enum FileType {
     Regular,
     Directory,
     SymbolicLink,
+    Symlink,
     CharacterDevice,
     BlockDevice,
     Fifo,
     Socket,
 }
+
+#[derive(Debug, Clone)]
+pub struct FileDescriptor {
+    pub inode_id: u64,
+    pub offset: u64,
+    pub flags: u32,
+}
+
+pub const O_APPEND: u32 = 0o2000;
+pub const O_CREAT: u32 = 0o100;
+pub const O_EXCL: u32 = 0o200;
+pub const O_TRUNC: u32 = 0o1000;
+
+pub type VirtualFilesystem = VirtualFileSystem;
 
 /// File mode bits (permissions)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -213,17 +230,100 @@ pub struct VirtualFileSystem {
     open_files: Vec<FileHandle>,
     next_fd: i32,
     inode_cache: Vec<(u64, Inode)>,
+    pub inodes: HashMap<u64, Inode>,
+    pub file_descriptors: HashMap<u64, FileDescriptor>,
+    pub root_inode: u64,
 }
 
 impl VirtualFileSystem {
     pub fn new() -> Self {
+        let root_inode = 1;
+        let mut inodes = HashMap::new();
+        inodes.insert(root_inode, Inode::new(root_inode, FileType::Directory, 0o755));
         Self {
             filesystems: Vec::new(),
             mounts: Vec::new(),
             open_files: Vec::new(),
             next_fd: 3, // 0, 1, 2 are stdin, stdout, stderr
             inode_cache: Vec::new(),
+            inodes,
+            file_descriptors: HashMap::new(),
+            root_inode,
         }
+    }
+
+    pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
+        let inode_id = (self.inodes.len() as u64) + 1;
+        let mut inode = Inode::new(inode_id, file_type, 0o644);
+        inode.owner = owner;
+        self.inodes.insert(inode_id, inode);
+        Ok(inode_id)
+    }
+
+    pub fn get_inode(&self, inode_id: u64) -> Option<&Inode> {
+        self.inodes.get(&inode_id)
+    }
+
+    pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
+        if !self.inodes.contains_key(&inode_id) {
+            return Err(FsError::NotFound);
+        }
+        let fd = (self.file_descriptors.len() as u64) + 1;
+        self.file_descriptors.insert(
+            fd,
+            FileDescriptor {
+                inode_id,
+                offset: 0,
+                flags,
+            },
+        );
+        Ok(fd)
+    }
+
+    pub fn close(&mut self, fd: i32) -> Result<(), VfsError> {
+        if let Some(pos) = self.open_files.iter().position(|h| h.fd == fd) {
+            self.open_files.remove(pos);
+            Ok(())
+        } else {
+            Err(VfsError::BadFileDescriptor)
+        }
+    }
+
+    pub fn seek(&mut self, fd: i32, offset: i64, whence: i32) -> Result<u64, VfsError> {
+        if let Some(handle) = self.open_files.iter_mut().find(|h| h.fd == fd) {
+            let new_pos = match whence {
+                0 => offset as u64,
+                1 => (handle.position as i64 + offset) as u64,
+                _ => return Err(VfsError::InvalidArgument),
+            };
+            handle.position = new_pos;
+            Ok(new_pos)
+        } else {
+            Err(VfsError::BadFileDescriptor)
+        }
+    }
+
+    pub fn set_xattr(&mut self, inode_id: u64, name: &str, value: &[u8]) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.xattrs.insert(name.to_string(), value.to_vec());
+        Ok(())
+    }
+
+    pub fn get_xattr(&self, inode_id: u64, name: &str) -> Result<Vec<u8>, FsError> {
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+        inode
+            .xattrs
+            .get(name)
+            .cloned()
+            .ok_or(FsError::AttributeNotFound)
+    }
+
+    pub fn create_symlink(&mut self, target: &str, owner: u64) -> Result<u64, FsError> {
+        let inode_id = self.create_file(FileType::Symlink, owner)?;
+        if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            inode.symlink_target = Some(target.to_string());
+        }
+        Ok(inode_id)
     }
 
     /// Creates a hard link pointing directly to the same underlying file Inode
@@ -307,7 +407,7 @@ impl VirtualFileSystem {
             .ok_or(FsError::NotFound)?;
 
         // Check read permission
-        if !inode.permissions.read {
+        if !inode.mode.owner_read {
             return Err(FsError::PermissionDenied);
         }
 
@@ -346,7 +446,7 @@ impl VirtualFileSystem {
             .ok_or(FsError::NotFound)?;
 
         // Check write permission
-        if !inode.permissions.write {
+        if !inode.mode.owner_write {
             return Err(FsError::PermissionDenied);
         }
 
@@ -405,16 +505,17 @@ impl VirtualFileSystem {
             return Err(FsError::PermissionDenied);
         }
 
-        let mut should_delete = false;
         if let Some(inode) = self.inodes.get_mut(&inode_id) {
             if inode.link_count > 1 {
                 inode.link_count -= 1;
                 inode.hard_links_count = inode.link_count;
+                Ok(())
             } else {
-                should_delete = true;
+                self.inodes.remove(&inode_id);
+                Ok(())
             }
         } else {
-            Err(VfsError::BadFileDescriptor)
+            Err(FsError::NotFound)
         }
     }
 

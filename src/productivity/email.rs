@@ -158,7 +158,7 @@ impl EmailBackend for ImapSmtpBackend {
         // Simulated fetching
         let mut results = Vec::new();
 
-        for (_id, email) in &self.emails {
+        for (_id, email) in self.emails.iter() {
             if email.folder == folder {
                 results.push(email.clone());
                 if results.len() >= limit {

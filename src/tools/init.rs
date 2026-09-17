@@ -1,7 +1,3 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
 //! Init System (systemd/OpenRC Inspiration)
 //! Service management, target units, and dependency resolution
 
@@ -180,13 +176,15 @@ impl InitSystem {
     }
 
     pub fn start_service(&mut self, name: &str) -> Result<(), InitError> {
-        if let Some(service) = self.get_service(name) {
+        if self.services.iter().any(|s| s.name == name) {
             // Resolve dependencies
             self.resolve_dependencies(name)?;
             
             // Start service
-            service.state = ServiceState::Activating;
-            service.state = ServiceState::Active;
+            if let Some(service) = self.get_service(name) {
+                service.state = ServiceState::Activating;
+                service.state = ServiceState::Active;
+            }
             Ok(())
         } else {
             Err(InitError::ServiceNotFound)
@@ -209,19 +207,22 @@ impl InitSystem {
     }
 
     pub fn switch_target(&mut self, target_name: &str) -> Result<(), InitError> {
+        if !self.targets.iter().any(|t| t.name == target_name) {
+            return Err(InitError::TargetNotFound);
+        }
+
+        // Stop current target services
+        let current = self.current_target.clone();
+        if let Some(ref curr) = current {
+            let _ = self.stop_target(curr);
+        }
+
+        // Start new target services
         if let Some(target) = self.get_target(target_name) {
-            // Stop current target services
-            if let Some(current) = &self.current_target {
-                self.stop_target(current)?;
-            }
-            
-            // Start new target services
             target.state = ServiceState::Active;
             self.current_target = Some(target_name.to_string());
-            Ok(())
-        } else {
-            Err(InitError::TargetNotFound)
         }
+        Ok(())
     }
 
     fn resolve_dependencies(&self, service_name: &str) -> Result<(), InitError> {

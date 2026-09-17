@@ -1,7 +1,3 @@
-use std::vec;
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
 //! Text Processing Tools (sed/awk/grep Inspiration)
 //! Stream editor, text processor, and pattern search
 

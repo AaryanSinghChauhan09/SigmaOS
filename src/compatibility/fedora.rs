@@ -3266,6 +3266,9 @@ pub struct PlanetUserFeed {
 pub struct FedoraPlanetAggregationEngine {
     pub posts: Vec<FedoraPlanetPost>,
     pub registered_feeds: Vec<PlanetUserFeed>,
+    pub aggregated_entries: Vec<PlanetBlogFeedEntry>,
+    pub entry_counter: u64,
+    pub messaging_engine: FedoraMessagingEngine,
 }
 
 impl FedoraPlanetAggregationEngine {
@@ -3273,6 +3276,9 @@ impl FedoraPlanetAggregationEngine {
         FedoraPlanetAggregationEngine {
             posts: Vec::new(),
             registered_feeds: Vec::new(),
+            aggregated_entries: Vec::new(),
+            entry_counter: 0,
+            messaging_engine: FedoraMessagingEngine::new(),
         }
     }
 
@@ -3527,6 +3533,7 @@ pub struct FedoraMessagingMessage {
 
 /// Fedora Messaging & fedmsg Infrastructure Message Bus
 /// Provides AMQP/ZeroMQ topic-based message publication, subscription routing, and cryptographic verification.
+#[derive(Debug, Clone)]
 pub struct FedoraMessagingEngine {
     pub published_messages: Vec<FedoraMessagingMessage>,
     pub topic_subscriptions: HashMap<String, Vec<String>>, // topic -> list of subscriber_ids

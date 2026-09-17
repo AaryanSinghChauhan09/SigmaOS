@@ -462,7 +462,7 @@ pub trait PackageHook: Send + Sync {
 pub struct CustomPackageHook {
     pub name: String,
     pub timing: HookTiming,
-    pub handler: Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
+    pub handler: std::sync::Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
 }
 
 impl CustomPackageHook {
@@ -473,7 +473,7 @@ impl CustomPackageHook {
         Self {
             name: name.to_string(),
             timing,
-            handler: Arc::new(handler),
+            handler: std::sync::Arc::new(handler),
         }
     }
 }
