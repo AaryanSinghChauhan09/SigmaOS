@@ -4060,14 +4060,32 @@ impl UniversalDistroPackageUnifierEngine {
         // 2. Map dependencies to unified sovereign system dependencies
         let mut unified_deps = Vec::new();
         for dep in foreign_package.dependencies() {
-            let mapped_name = match dep.name.as_str() {
-                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
-                "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
-                "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
-                _ => &dep.name,
+            let lower = dep.name.to_lowercase();
+            let mapped_name = if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
+                "sovereign-openssl".to_string()
+            } else if lower.contains("libc") || lower == "musl" || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") {
+                "sovereign-libc".to_string()
+            } else if lower.contains("zlib") {
+                "sovereign-zlib".to_string()
+            } else if lower.contains("zstd") || lower.contains("lz4") || lower.contains("xz") || lower.contains("bzip2") {
+                "sovereign-compression".to_string()
+            } else if lower.contains("python") {
+                "sovereign-python".to_string()
+            } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" {
+                "sovereign-shell".to_string()
+            } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("runit") || lower.contains("sysvinit") || lower.contains("s6") || lower.contains("dinit") {
+                "sovereign-init".to_string()
+            } else if lower.contains("gcc") || lower.contains("clang") || lower.contains("llvm") || lower.contains("binutils") || lower == "make" || lower == "cmake" {
+                "sovereign-toolchain".to_string()
+            } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") || lower.contains("vulkan") {
+                "sovereign-graphics".to_string()
+            } else if lower.contains("curl") || lower.contains("wget") || lower.contains("openssh") || lower.contains("net-tools") || lower.contains("iproute2") {
+                "sovereign-network-tools".to_string()
+            } else {
+                dep.name.clone()
             };
             unified_deps.push(Dependency {
-                name: mapped_name.to_string(),
+                name: mapped_name,
                 version_constraint: dep.version_constraint,
             });
         }

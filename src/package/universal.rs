@@ -125,16 +125,26 @@ impl UniversalPackageTranslator {
 
 fn debtor_to_sovereign_name(name: &str) -> &str {
     let lower = name.to_lowercase();
-    if lower.contains("ssl") || lower.contains("crypto") {
+    if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
         "sovereign-openssl"
     } else if lower.contains("libc") || lower == "musl" || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") {
         "sovereign-libc"
     } else if lower.contains("zlib") {
         "sovereign-zlib"
+    } else if lower.contains("zstd") || lower.contains("lz4") || lower.contains("xz") || lower.contains("bzip2") {
+        "sovereign-compression"
     } else if lower.contains("python") {
         "sovereign-python"
-    } else if lower == "bash" || lower == "zsh" || lower == "sh" {
+    } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" {
         "sovereign-shell"
+    } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("runit") || lower.contains("sysvinit") || lower.contains("s6") || lower.contains("dinit") {
+        "sovereign-init"
+    } else if lower.contains("gcc") || lower.contains("clang") || lower.contains("llvm") || lower.contains("binutils") || lower == "make" || lower == "cmake" {
+        "sovereign-toolchain"
+    } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") || lower.contains("vulkan") {
+        "sovereign-graphics"
+    } else if lower.contains("curl") || lower.contains("wget") || lower.contains("openssh") || lower.contains("net-tools") || lower.contains("iproute2") {
+        "sovereign-network-tools"
     } else {
         name
     }
