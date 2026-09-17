@@ -138,8 +138,9 @@ impl ArtixPacman {
 
         if !recursive {
             // Check if other packages depend on this one
-            for (_, pkg) in &self.installed {
-                if pkg.dependencies.contains(&package.to_string()) {
+            for (_, pkg) in self.installed.iter() {
+                let pkg_deps: &Vec<String> = &pkg.dependencies;
+                if pkg_deps.contains(&package.to_string()) {
                     return Err(ArtixError::DependencyError);
                 }
             }
@@ -154,8 +155,8 @@ impl ArtixPacman {
         let mut upgrade_count = 0;
         let mut to_upgrade = Vec::new();
 
-        for (name, installed_pkg) in &self.installed {
-            if let Some(available_pkg) = self.available.get(name) {
+        for (name, installed_pkg) in self.installed.iter() {
+            if let Some(available_pkg) = self.available.get_str(name) {
                 if available_pkg.version != installed_pkg.version
                     || available_pkg.release != installed_pkg.release
                 {
@@ -165,7 +166,7 @@ impl ArtixPacman {
         }
 
         for name in to_upgrade {
-            if let Some(available_pkg) = self.available.get(&name) {
+            if let Some(available_pkg) = self.available.get_str(&name) {
                 self.installed.insert(name.clone(), available_pkg.clone());
                 upgrade_count += 1;
             }

@@ -1,6 +1,3 @@
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
 //! Window Manager (i3/sway Inspiration)
 //! Tiling window manager with workspaces and containers
 
