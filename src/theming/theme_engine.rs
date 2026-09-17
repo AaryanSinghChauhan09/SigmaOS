@@ -393,7 +393,7 @@ impl ThemeEngine {
     pub fn generate_from_description(
         &mut self,
         description: &str,
-        agent: &mut SovereignAgentRuntime,
+        _agent: &mut SovereignAgentRuntime,
     ) -> Result<Theme, ThemeError> {
         // TODO: Integrate with agent runtime for AI generation
         // For now, return a variant based on keywords

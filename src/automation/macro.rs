@@ -113,7 +113,7 @@ impl MacroRecorder for SimpleMacroRecorder {
         }
     }
     
-    fn record_action(&mut self, id: MacroID, _action: u32) -> Result<(), MacroError> {
+    fn record_action(&mut self, _id: MacroID, _action: u32) -> Result<(), MacroError> {
         for macro_option in &mut self.macros {
             if let Some(ref mut macro) = *macro_option {
                 if macro.id() == id {

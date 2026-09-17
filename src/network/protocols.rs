@@ -61,8 +61,8 @@ impl UdpSocketSim {
 
     pub fn send_packet(
         &mut self,
-        dest: [u8; 4],
-        dest_port: u16,
+        _dest: [u8; 4],
+        _dest_port: u16,
         payload: &[u8],
     ) -> Result<usize, &'static str> {
         if payload.is_empty() {
