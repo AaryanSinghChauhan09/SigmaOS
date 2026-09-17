@@ -533,19 +533,19 @@
 
     <!-- Bottom Dock -->
     <nav class="dock-container" aria-label="Desktop Dock" role="toolbar">
-        <button type="button" class="dock-icon" aria-label="Launch File Manager" data-tooltip="File Manager" onclick="launchApp('File Manager')">📂</button>
-        <button type="button" class="dock-icon" aria-label="Launch OmniShell Terminal" data-tooltip="OmniShell Terminal" onclick="launchApp('OmniShell')">💻</button>
-        <button type="button" class="dock-icon" aria-label="Launch Observability Matrix" data-tooltip="Observability Matrix" onclick="launchApp('Sigma Browser')">📊</button>
+        <button type="button" class="dock-icon" aria-label="Launch File Manager (Alt+F)" data-tooltip="File Manager (Alt+F)" onclick="launchApp('File Manager')">📂</button>
+        <button type="button" class="dock-icon" aria-label="Launch OmniShell Terminal (Alt+T)" data-tooltip="OmniShell Terminal (Alt+T)" onclick="launchApp('OmniShell')">💻</button>
+        <button type="button" class="dock-icon" aria-label="Launch Observability Matrix (Alt+O)" data-tooltip="Observability Matrix (Alt+O)" onclick="launchApp('Sigma Browser')">📊</button>
         <button type="button" class="dock-icon" aria-label="Launch Neural Core" data-tooltip="Neural Core" onclick="launchApp('AI Assistant')">🧠</button>
-        <button type="button" class="dock-icon" aria-label="Launch Lattice Settings" data-tooltip="Lattice Settings" onclick="launchApp('Lattice Settings')">⚙️</button>
+        <button type="button" class="dock-icon" aria-label="Launch Lattice Settings (Alt+S)" data-tooltip="Lattice Settings (Alt+S)" onclick="launchApp('Lattice Settings')">⚙️</button>
         <button type="button" class="dock-icon" aria-label="Launch Pro Tools" data-tooltip="Pro Tools" onclick="launchApp('Utility Nexus')">🔧</button>
-        <button type="button" class="dock-icon" aria-label="Launch Marketplace" data-tooltip="Marketplace" onclick="launchApp('Marketplace')">🛒</button>
+        <button type="button" class="dock-icon" aria-label="Launch Marketplace (Alt+M)" data-tooltip="Marketplace (Alt+M)" onclick="launchApp('Marketplace')">🛒</button>
         <button type="button" class="dock-icon" aria-label="Launch Zenith Installer" data-tooltip="Zenith Installer" onclick="launchApp('Markup Forge')">📥</button>
-        <button type="button" class="dock-icon" aria-label="Launch Developer Portal" data-tooltip="Developer Portal" onclick="launchApp('Dev Portal')">📖</button>
+        <button type="button" class="dock-icon" aria-label="Launch Developer Portal (Alt+D)" data-tooltip="Developer Portal (Alt+D)" onclick="launchApp('Dev Portal')">📖</button>
         <button type="button" class="dock-icon" aria-label="Launch Kernel Emulator" data-tooltip="Kernel Emulator" onclick="launchApp('Emulator')">💿</button>
         <button type="button" class="dock-icon" aria-label="Launch Build Analytics" data-tooltip="Build Analytics" onclick="launchApp('Analytics')">📈</button>
         <div class="" role="separator"></div>
-        <button type="button" class="dock-icon" aria-label="Open Help Matrix" data-tooltip="Help Matrix" onclick="toggleHelp()">❓</button>
+        <button type="button" class="dock-icon" aria-label="Open Help Matrix (F1 / ?)" data-tooltip="Help Matrix (F1 / ?)" onclick="toggleHelp()">❓</button>
     </nav>
 
     <!-- Right-Click Context Menu -->
@@ -559,7 +559,7 @@
 
     <!-- Alt + Space Command Center -->
     <div id="cmd-palette" role="dialog" aria-label="Command Center">
-        <input type="text" class="cmd-input" id="cmd-input" placeholder="Search system commands..." aria-label="Search system commands">
+        <input type="text" class="cmd-input" id="cmd-input" placeholder="Search system commands (Alt+Space)..." aria-label="Search system commands (Alt+Space)">
         <div class="cmd-results" id="cmd-results"></div>
     </div>
 
