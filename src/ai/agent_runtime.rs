@@ -543,7 +543,7 @@ proc new{}*(): {} =
     fn analyze_intent(
         &self,
         _agent_id: AgentId,
-        intent: &UserIntent,
+        _intent: &UserIntent,
     ) -> Result<ConfigDiff, AgentError> {
         // TODO: Integrate LLM intent analysis
         

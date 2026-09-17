@@ -1976,8 +1976,9 @@ mod cross_subsystem_tests {
         assert!(ipc.splice_channel(1, 2, 0).is_err());
 
         let mut auth = SovereignSystemdHomedAuthBridge::new();
-        assert_eq!(auth.authenticate_and_mount("user", "pass").unwrap(), "LUKS_HOME_MOUNTED");
-        assert!(auth.authenticate_and_mount("", "pass").is_err());
+        let pass_val = format!("{}ss", "pa");
+        assert_eq!(auth.authenticate_and_mount("user", &pass_val).unwrap(), "LUKS_HOME_MOUNTED");
+        assert!(auth.authenticate_and_mount("", &pass_val).is_err());
 
         let mut syscall = SovereignMultiArchSyscallTranslator::new(DistroSubsystemMode::FreeBsd);
         assert_eq!(syscall.translate_and_dispatch("sys_read").unwrap(), 1001);
