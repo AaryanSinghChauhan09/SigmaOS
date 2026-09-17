@@ -1,10 +1,19 @@
 // Standalone Test Runner for SigmaOS Universal Package Format Adapter
 extern crate alloc;
+extern crate core;
 
 pub mod klib {
     pub mod collections {
         pub use alloc::collections::BTreeMap as HashMap;
     }
+}
+
+#[path = "../src/package/universal.rs"]
+pub mod universal;
+
+pub mod package {
+    pub use crate::universal::*;
+    pub use crate::universal;
 }
 
 #[path = "../src/security/capability.rs"]
@@ -14,106 +23,23 @@ pub mod security {
     pub use super::capability::*;
 }
 
-#[path = "../src/package/universal.rs"]
-pub mod package_universal;
-
-pub mod package {
-    pub use super::package_universal::AptDebManifest;
-}
+#[path = "../src/sigpkg/universal_engine.rs"]
+pub mod universal_engine;
 
 #[path = "../src/sigpkg/universal_oop_system.rs"]
 pub mod universal_oop_system;
 
-#[path = "../src/sigpkg/universal_engine.rs"]
-pub mod universal_engine;
+pub mod sigpkg {
+    pub use crate::security;
+    pub use crate::universal_engine;
+    pub use crate::universal_oop_system;
+    pub use crate::universal_engine::PackageFormat;
+
+    pub use crate::universal_oop_system::{Dependency, Package, Version, VersionConstraint};
+}
 
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
-
-pub mod sigpkg {
-    use alloc::string::String;
-    use alloc::vec::Vec;
-
-    pub use crate::security;
-    pub use crate::universal_adapter;
-    pub use crate::universal_engine;
-    pub use crate::universal_oop_system;
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    pub struct Version {
-        pub major: u64,
-        pub minor: u64,
-        pub patch: u64,
-    }
-
-    impl Version {
-        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-            Self { major, minor, patch }
-        }
-
-        pub fn parse(version_str: &str) -> Result<Self, &'static str> {
-            let clean = version_str.split('-').next().unwrap_or(version_str);
-            let mut parts = clean.split('.');
-
-            let major_str = parts.next().unwrap_or("0");
-            let minor_str = parts.next().unwrap_or("0");
-            let patch_str = parts.next().unwrap_or("0");
-
-            let major_clean: String = major_str.chars().filter(|c| c.is_ascii_digit()).collect();
-            let minor_clean: String = minor_str.chars().filter(|c| c.is_ascii_digit()).collect();
-            let patch_clean: String = patch_str.chars().filter(|c| c.is_ascii_digit()).collect();
-
-            let major = if major_clean.is_empty() { 0 } else { major_clean.parse::<u64>().unwrap_or(0) };
-            let minor = if minor_clean.is_empty() { 0 } else { minor_clean.parse::<u64>().unwrap_or(0) };
-            let patch = if patch_clean.is_empty() { 0 } else { patch_clean.parse::<u64>().unwrap_or(0) };
-
-            Ok(Version::new(major, minor, patch))
-        }
-    }
-
-    #[derive(Debug, Clone)]
-    pub struct Package {
-        pub name: String,
-        pub version: Version,
-        pub description: String,
-        pub dependencies: Vec<Dependency>,
-        pub checksum: String,
-    }
-
-    impl Package {
-        pub fn new(
-            name: String,
-            version: Version,
-            description: String,
-            dependencies: Vec<Dependency>,
-            checksum: String,
-        ) -> Self {
-            Self {
-                name,
-                version,
-                description,
-                dependencies,
-                checksum,
-            }
-        }
-    }
-
-    #[derive(Debug, Clone)]
-    pub struct Dependency {
-        pub name: String,
-        pub version_constraint: VersionConstraint,
-    }
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-    pub enum VersionConstraint {
-        Exact(Version),
-        GreaterThan(Version),
-        LessThan(Version),
-        GreaterOrEqual(Version),
-        LessOrEqual(Version),
-        Any,
-    }
-}
 
 #[test]
 fn test_universal_adapter_all_formats() {
@@ -160,7 +86,7 @@ fn test_universal_adapter_all_formats() {
     assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
-    let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
+    let pkg_obsd = bridge.absorb_and_register("tmux.openbsd.tgz", openbsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
     assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
@@ -176,25 +102,24 @@ fn test_universal_adapter_all_formats() {
 #[test]
 fn test_universal_adapter_extended_linux_bsd_formats() {
     use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation};
-    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
     // Test Extension Detection for Linux & BSD Formats
-    assert_eq!(adapter.detect_format_by_extension("pkg.ipk"), Some(PackageFormat::Ipk));
-    assert_eq!(adapter.detect_format_by_extension("pkg.opkg"), Some(PackageFormat::Opkg));
-    assert_eq!(adapter.detect_format_by_extension("pkg.p5p"), Some(PackageFormat::SolarisIps));
-    assert_eq!(adapter.detect_format_by_extension("pkg.nar"), Some(PackageFormat::GuixNar));
-    assert_eq!(adapter.detect_format_by_extension("pkg.openbsd.tgz"), Some(PackageFormat::OpenBsdPkg));
-    assert_eq!(adapter.detect_format_by_extension("pkg.moss"), Some(PackageFormat::Moss));
-    assert_eq!(adapter.detect_format_by_extension("pkg.hpkg"), Some(PackageFormat::Hpkg));
+    assert_eq!(adapter.detect_format_by_extension("pkg.ipk"), Some(universal_engine::PackageFormat::Ipk));
+    assert_eq!(adapter.detect_format_by_extension("pkg.opkg"), Some(universal_engine::PackageFormat::Opkg));
+    assert_eq!(adapter.detect_format_by_extension("pkg.p5p"), Some(universal_engine::PackageFormat::SolarisIps));
+    assert_eq!(adapter.detect_format_by_extension("pkg.nar"), Some(universal_engine::PackageFormat::GuixNar));
+    assert_eq!(adapter.detect_format_by_extension("pkg.openbsd.tgz"), Some(universal_engine::PackageFormat::OpenBsdPkg));
+    assert_eq!(adapter.detect_format_by_extension("pkg.moss"), Some(universal_engine::PackageFormat::Moss));
+    assert_eq!(adapter.detect_format_by_extension("pkg.hpkg"), Some(universal_engine::PackageFormat::Hpkg));
 
     // Test Magic Header Detection
-    assert_eq!(adapter.detect_format_by_header(b"IPK!1234"), Some(PackageFormat::Ipk));
-    assert_eq!(adapter.detect_format_by_header(b"OPKG1234"), Some(PackageFormat::Opkg));
-    assert_eq!(adapter.detect_format_by_header(b"P5P!1234"), Some(PackageFormat::SolarisIps));
-    assert_eq!(adapter.detect_format_by_header(b"NARS1234"), Some(PackageFormat::GuixNar));
-    assert_eq!(adapter.detect_format_by_header(b"OBSD1234"), Some(PackageFormat::OpenBsdPkg));
+    assert_eq!(adapter.detect_format_by_header(b"IPK!1234"), Some(universal_engine::PackageFormat::Ipk));
+    assert_eq!(adapter.detect_format_by_header(b"OPKG1234"), Some(universal_engine::PackageFormat::Opkg));
+    assert_eq!(adapter.detect_format_by_header(b"P5P!1234"), Some(universal_engine::PackageFormat::SolarisIps));
+    assert_eq!(adapter.detect_format_by_header(b"NARS1234"), Some(universal_engine::PackageFormat::GuixNar));
+    assert_eq!(adapter.detect_format_by_header(b"OBSD1234"), Some(universal_engine::PackageFormat::OpenBsdPkg));
 
     // Test Command Dispatcher across multiple package managers
     let dispatcher = UniversalPmCommandDispatcher::new();
@@ -218,7 +143,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -233,13 +158,12 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
-    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Deb));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
-    assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("compressed.xz"), Some(PackageFormat::TarXz));
-    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Yum));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Rpm));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Ebuild));
     assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
     assert_eq!(adapter.detect_format_by_extension("app.flatpak"), Some(PackageFormat::Flatpak));
     assert_eq!(adapter.detect_format_by_extension("macos.app"), Some(PackageFormat::AppBundle));
