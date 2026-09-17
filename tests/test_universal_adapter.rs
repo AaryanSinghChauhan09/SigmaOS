@@ -9,7 +9,12 @@ pub mod klib {
 }
 
 #[path = "../src/package/universal.rs"]
-pub mod package;
+pub mod universal;
+
+pub mod package {
+    pub use crate::universal::*;
+    pub use crate::universal;
+}
 
 #[path = "../src/security/capability.rs"]
 pub mod capability;
@@ -18,17 +23,11 @@ pub mod security {
     pub use super::capability::*;
 }
 
-#[path = "../src/sigpkg/universal_oop_system.rs"]
-pub mod universal_oop_system;
-
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
 #[path = "../src/sigpkg/universal_oop_system.rs"]
 pub mod universal_oop_system;
-
-#[path = "../src/sigpkg/universal_adapter.rs"]
-pub mod universal_adapter;
 
 pub mod sigpkg {
     pub use crate::security;
@@ -50,7 +49,6 @@ fn test_universal_adapter_all_formats() {
         FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
         ZypperSpecManifest, SlackwarePkgManifest,
     };
-    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -104,7 +102,6 @@ fn test_universal_adapter_all_formats() {
 #[test]
 fn test_universal_adapter_extended_linux_bsd_formats() {
     use universal_adapter::{UniversalPackageAdapter, UniversalPmCommandDispatcher, UniversalPmOperation};
-    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -146,7 +143,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::PackageFormat;
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -162,11 +159,11 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
     assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
-    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
+    assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Deb));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("compressed.xz"), Some(PackageFormat::TarXz));
     assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Rpm));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Ebuild));
     assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
     assert_eq!(adapter.detect_format_by_extension("app.flatpak"), Some(PackageFormat::Flatpak));
     assert_eq!(adapter.detect_format_by_extension("macos.app"), Some(PackageFormat::AppBundle));

@@ -84,10 +84,14 @@ impl PackageFormat {
         let normalized = name.replace(' ', "");
 
         if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
+            Some(PackageFormat::Deb)
+        } else if normalized.ends_with(".apt") {
             Some(PackageFormat::Apt)
         } else if normalized.ends_with(".superdeb") {
             Some(PackageFormat::Superdeb)
-        } else if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") {
+        } else if normalized.ends_with(".rpm") {
+            Some(PackageFormat::Rpm)
+        } else if normalized.ends_with(".drpm") {
             Some(PackageFormat::Yum)
         } else if normalized.ends_with(".pkg.tar.zst")
             || normalized.ends_with(".pkg.tar.xz")
@@ -122,7 +126,9 @@ impl PackageFormat {
             Some(PackageFormat::Eopkg)
         } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
             Some(PackageFormat::Nix)
-        } else if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") {
+        } else if normalized.ends_with(".ebuild") {
+            Some(PackageFormat::Ebuild)
+        } else if normalized.ends_with(".portage") {
             Some(PackageFormat::Portage)
         } else if normalized.ends_with(".openbsd.tgz") {
             Some(PackageFormat::OpenBsdPkg)
