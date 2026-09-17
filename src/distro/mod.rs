@@ -320,4 +320,11 @@ pub use sovereign_2026_distro_leap_engine::{
     SovereignNixGuixHermeticCasEngine, SovereignOpenBsd77PinsyscallHardeningEngine,
     SovereignSchedExtBoreV2Governor, SovereignWayland124ZenithHdrEngine, UnveilLockState,
     WorkloadLatencyClass as BoreV2WorkloadLatencyClass, ZenithHdrToneMapMode, ZenithWaylandFrame,
+
+pub mod linux_bsd_distro_strategic_innovations;
+pub use linux_bsd_distro_strategic_innovations::{
+    AbrootImageCommit, AbrootSlot, BinaryVerificationResult, BootHealthCheck, BootHealthStatus,
+    ExecGuardRecommendation, FedoraGreenbootHealthCheckEngine, ObfuscatedInputEvent,
+    VanillaAbrootImageTransactionEngine, WhonixKloakInputObfuscationEngine, ZorinExecGuardSubsystem,
+
 };

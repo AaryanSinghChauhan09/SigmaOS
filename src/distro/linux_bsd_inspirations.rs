@@ -500,6 +500,24 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'compiler' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'firewall' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'i18n' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "accessibility" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'accessibility' with action '{}' under distro mode '{:?}'",
@@ -7958,7 +7976,7 @@ impl UseFlagEngine {
     pub fn resolve_flags(&self, package: &str) -> Vec<UseFlag> {
         let mut resolved = self.global_flags.clone();
         if let Some(pkg_flags) = self.package_flags.get(package) {
-            resolved.extend(pkg_flags.clone());
+            resolved.extend(pkg_flags.iter().cloned());
         }
         resolved
     }
