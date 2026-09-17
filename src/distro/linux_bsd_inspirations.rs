@@ -2511,6 +2511,24 @@ mod cross_subsystem_tests {
         assert!(init_caps.contains(&"OpenRC".to_string()));
         assert!(init_caps.contains(&"Runit".to_string()));
     }
+
+    #[test]
+    fn test_opensuse_autoyast_parser() {
+        let mut parser = SuseAutoYastXmlParser::new("gnome_desktop");
+        parser.add_pattern("gnome-basic");
+        let manifest = parser.parse_autoyast_manifest();
+        assert!(manifest.contains("<profile>gnome_desktop</profile>"));
+        assert!(manifest.contains("gnome-basic"));
+    }
+
+    #[test]
+    fn test_solus_eopkg_delta_validation() {
+        let validator = SolusEopkgDeltaValidator::new("firefox", 115, 116);
+        assert!(validator.is_valid_delta_transition());
+
+        let invalid = SolusEopkgDeltaValidator::new("firefox", 116, 115);
+        assert!(!invalid.is_valid_delta_transition());
+    }
 }
 
 // ==========================================
@@ -6993,6 +7011,55 @@ impl SovereignCrossDistroContainerManager {
         self.next_id += 1;
         self.containers.push((id, format!("{}:{}", name, path)));
         Ok(id)
+    }
+}
+
+/// openSUSE AutoYaST XML Profile Automation Parser
+#[derive(Debug, Clone, Default)]
+pub struct SuseAutoYastXmlParser {
+    pub profile_name: String,
+    pub selected_patterns: Vec<String>,
+}
+
+impl SuseAutoYastXmlParser {
+    pub fn new(profile_name: &str) -> Self {
+        Self {
+            profile_name: profile_name.to_string(),
+            selected_patterns: Vec::new(),
+        }
+    }
+
+    pub fn add_pattern(&mut self, pattern: &str) {
+        self.selected_patterns.push(pattern.to_string());
+    }
+
+    pub fn parse_autoyast_manifest(&self) -> String {
+        format!(
+            "<autoyast><profile>{}</profile><patterns>{:?}</patterns></autoyast>",
+            self.profile_name, self.selected_patterns
+        )
+    }
+}
+
+/// Solus eopkg Delta Package Validator
+#[derive(Debug, Clone, Default)]
+pub struct SolusEopkgDeltaValidator {
+    pub package_name: String,
+    pub old_revision: u32,
+    pub new_revision: u32,
+}
+
+impl SolusEopkgDeltaValidator {
+    pub fn new(package_name: &str, old_rev: u32, new_rev: u32) -> Self {
+        Self {
+            package_name: package_name.to_string(),
+            old_revision: old_rev,
+            new_revision: new_rev,
+        }
+    }
+
+    pub fn is_valid_delta_transition(&self) -> bool {
+        self.new_revision > self.old_revision
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
