@@ -22,10 +22,10 @@ jobs:
     name: Cargo Dependency Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@v4
 
 
-      - uses: dtolnay/rust-toolchain@7b73730e263d91cf0ebbe694c03b1e3eb8fb14b1 # stable
+      - uses: dtolnay/rust-toolchain@stable # stable
         with:
           toolchain: stable
 
@@ -43,7 +43,7 @@ jobs:
     name: Unsafe Blocks Without SAFETY Comments
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@v4
 
 
       - name: Detect unsafe blocks missing SAFETY comments
@@ -71,7 +71,7 @@ jobs:
     name: Hardcoded Secret Detection
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@v4
 
 
       - name: Scan for hardcoded secrets
@@ -101,7 +101,7 @@ jobs:
     name: Unwrap Without Safety Justification
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@v4
 
 
       - name: Detect bare unwrap/expect in production code
@@ -134,7 +134,7 @@ jobs:
     name: Integer Overflow Pattern Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@v4
 
 
       - name: Flag unchecked integer casts in kernel code
