@@ -3,11 +3,6 @@
 // that provide competitive advantages for SigmaOS
 
 // Zero-dependency architecture: Use alloc:: primitives for no_std compatibility
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -254,7 +249,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxZorin
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
-            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
@@ -269,7 +263,7 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
-            DistroSubsystemMode::LinuxSlackware | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
             _ => ServiceSupervisorType::Systemd,
@@ -355,7 +349,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
-            | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::FreeBsd
             | DistroSubsystemMode::OpenBsd
             | DistroSubsystemMode::NetBsd
@@ -504,6 +497,24 @@ impl SovereignUniversalDistroBridge {
             "access" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'access' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compiler" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'compiler' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "firewall" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'firewall' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "i18n" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'i18n' with action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -7947,7 +7958,7 @@ impl UseFlagEngine {
     pub fn resolve_flags(&self, package: &str) -> Vec<UseFlag> {
         let mut resolved = self.global_flags.clone();
         if let Some(pkg_flags) = self.package_flags.get(package) {
-            resolved.extend(pkg_flags.clone());
+            resolved.extend(pkg_flags.iter().cloned());
         }
         resolved
     }
