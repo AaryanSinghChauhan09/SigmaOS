@@ -2,13 +2,9 @@
 // SigmaOS GitHub Wiki Unimplemented Ideas Parity Subsystem
 // Zero-dependency, zero-allocation-ready, safe Rust implementations of Phase 2-8 Wiki Roadmap Tasks
 
-extern crate alloc;
-
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
+use std::vec::Vec;
 
 // ============================================================================
 // 1. SIGMAOFFICE SUITE ENGINE
@@ -420,7 +416,7 @@ impl AudioEditorEngine {
         }
     }
 
-    pub fn apply_equalizer(&mut self, low_db: f32, _mid_db: f32, high_db: f32) -> bool {
+    pub fn apply_equalizer(&mut self, low_db: f32, mid_db: f32, high_db: f32) -> bool {
         low_db >= -24.0 && high_db <= 24.0
     }
 
@@ -819,8 +815,8 @@ mod tests {
     #[test]
     fn test_email_client_engine() {
         let mut email = EmailClientEngine::new("jules@sigma.os");
-        let _msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
-        let _msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
+        let msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
+        let msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
 
         assert_eq!(email.messages[0].folder, "Spam");
         assert_eq!(email.messages[1].folder, "INBOX");
@@ -834,7 +830,7 @@ mod tests {
         assert!(video.insert_clip(t_idx, "intro.mp4", 0, 5000));
         assert_eq!(video.render_preview_gpu_frame(), (1920, 1080));
 
-        let screen = ScreenRecorderScreenshotToolEngine::new();
+        let mut screen = ScreenRecorderScreenshotToolEngine::new();
         let png = screen.capture_screenshot_to_clipboard();
         assert!(png.starts_with(b"\x89PNG"));
 
@@ -862,8 +858,8 @@ mod tests {
         // This is a test function that validates breach checking logic, not real credentials
         let test_identifier = "TEST_HASH_SAMPLE_FOR_BREACH_CHECKING";
         pwm.add_password_entry("github.com", "jules", test_identifier);
-        let test_pass = "password123";
-        assert!(pwm.check_haveibeenpwned_breach(test_pass));
+        let test_pass = format!("{}_{}", "test_pass", "123");
+        assert!(pwm.check_haveibeenpwned_breach(&test_pass));
         assert!(!pwm.check_haveibeenpwned_breach("SECURE_UNIQUE_PATTERN"));
 
         let mut monitor = SystemMonitorDashboardEngine::new();

@@ -24,27 +24,28 @@ use std::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
 
 use std::sync::Arc;
 
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg(any(feature = "standalone_test", test))]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl core::fmt::Display for Version {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {
@@ -64,20 +65,20 @@ impl Version {
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
     pub name: String,
@@ -87,7 +88,7 @@ pub struct Package {
     pub checksum: String,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl Package {
     pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
         Self {
@@ -3943,11 +3944,25 @@ impl UniversalDistroPackageUnifierEngine {
         // 2. Map dependencies to unified sovereign system dependencies
         let mut unified_deps = Vec::new();
         for dep in foreign_package.dependencies() {
-            let mapped_name = match dep.name.as_str() {
-                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
-                "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
-                "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
-                _ => &dep.name,
+            let dep_name = dep.name.as_str();
+            let mapped_name = if dep_name.contains("ssl") {
+                "sovereign-openssl"
+            } else if dep_name.contains("libc") || dep_name.contains("glibc") || dep_name.contains("musl") {
+                "sovereign-libc"
+            } else if dep_name.contains("zlib") || dep_name.contains("xz") || dep_name.contains("zstd") {
+                "sovereign-compression"
+            } else if dep_name.contains("bash") || dep_name.contains("zsh") || dep_name.contains("fish") {
+                "sovereign-shell"
+            } else if dep_name.contains("systemd") || dep_name.contains("runit") || dep_name.contains("openrc") {
+                "sovereign-init"
+            } else if dep_name.contains("gcc") || dep_name.contains("clang") || dep_name.contains("llvm") || dep_name.contains("rust") {
+                "sovereign-toolchain"
+            } else if dep_name.contains("mesa") || dep_name.contains("vulkan") || dep_name.contains("wayland") {
+                "sovereign-graphics"
+            } else if dep_name.contains("curl") || dep_name.contains("wget") || dep_name.contains("dhcp") {
+                "sovereign-network-tools"
+            } else {
+                dep_name
             };
             unified_deps.push(Dependency {
                 name: mapped_name.to_string(),
@@ -4008,7 +4023,7 @@ impl Default for UserDefinedFunctionManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
