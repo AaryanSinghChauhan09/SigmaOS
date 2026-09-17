@@ -135,6 +135,18 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         "sovereign-compression"
     } else if lower.contains("python") {
         "sovereign-python"
+    } else if lower.contains("openjdk") || lower.contains("java") || lower.contains("jre") || lower.contains("jdk") {
+        "sovereign-jvm"
+    } else if lower.contains("node") || lower.contains("npm") {
+        "sovereign-node"
+    } else if lower.contains("wasm") || lower.contains("wasi") {
+        "sovereign-wasm"
+    } else if lower.contains("php") {
+        "sovereign-php"
+    } else if lower.contains("perl") {
+        "sovereign-perl"
+    } else if lower.contains("lua") {
+        "sovereign-lua"
     } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" {
         "sovereign-shell"
     } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("runit") || lower.contains("sysvinit") || lower.contains("s6") || lower.contains("dinit") {
@@ -330,6 +342,23 @@ pub enum PackageFormat {
     Vcpkg,      // C++ Vcpkg package (.vcpkg)
     NarInfo,    // Nix NAR Info (.narinfo)
     Sysupdate,  // systemd-sysupdate format (.sysupdate)
+    AixBff,       // IBM AIX LPP / BFF package (.bff, .lpp)
+    HpuxDepot,    // HP-UX SD Software Depot (.depot)
+    IrixTardist,  // SGI IRIX Software tardist (.tardist)
+    Tru64Setld,   // Tru64 Unix setld package (.setld)
+    Plan9Pkg,     // Plan 9 / Inferno package (.9pkg)
+    GentooGpkg,   // Gentoo GPKG binary package (.gpkg)
+    AndroidApex,  // Android APEX module container (.apex)
+    WasmWasi,     // WebAssembly WASI package (.wasm, .wasi)
+    JavaJar,      // Java Executable Archive (.jar, .war, .ear)
+    NpmTarball,   // Node / NPM package tarball (.npm)
+    PhpPhar,      // PHP Executable Archive (.phar)
+    PerlCpan,     // Perl CPAN / PPM package (.cpan, .ppm)
+    LuaRock,      // LuaRocks package (.rock, .rockspec)
+    ElixirHex,    // Elixir Hex package (.hex)
+    HaskellCabal, // Haskell Hackage Cabal package (.cabal)
+    JuliaPkg,     // Julia language package (.jl)
+    RCran,        // R CRAN package (.rpkg)
 }
 
 impl PackageFormat {
@@ -464,6 +493,40 @@ impl PackageFormat {
             Some(PackageFormat::NarInfo)
         } else if normalized.ends_with(".sysupdate") {
             Some(PackageFormat::Sysupdate)
+        } else if normalized.ends_with(".bff") || normalized.ends_with(".lpp") {
+            Some(PackageFormat::AixBff)
+        } else if normalized.ends_with(".depot") {
+            Some(PackageFormat::HpuxDepot)
+        } else if normalized.ends_with(".tardist") {
+            Some(PackageFormat::IrixTardist)
+        } else if normalized.ends_with(".setld") {
+            Some(PackageFormat::Tru64Setld)
+        } else if normalized.ends_with(".9pkg") {
+            Some(PackageFormat::Plan9Pkg)
+        } else if normalized.ends_with(".gpkg") {
+            Some(PackageFormat::GentooGpkg)
+        } else if normalized.ends_with(".apex") {
+            Some(PackageFormat::AndroidApex)
+        } else if normalized.ends_with(".wasm") || normalized.ends_with(".wasi") {
+            Some(PackageFormat::WasmWasi)
+        } else if normalized.ends_with(".jar") || normalized.ends_with(".war") || normalized.ends_with(".ear") {
+            Some(PackageFormat::JavaJar)
+        } else if normalized.ends_with(".npm") {
+            Some(PackageFormat::NpmTarball)
+        } else if normalized.ends_with(".phar") {
+            Some(PackageFormat::PhpPhar)
+        } else if normalized.ends_with(".cpan") || normalized.ends_with(".ppm") {
+            Some(PackageFormat::PerlCpan)
+        } else if normalized.ends_with(".rock") || normalized.ends_with(".rockspec") {
+            Some(PackageFormat::LuaRock)
+        } else if normalized.ends_with(".hex") {
+            Some(PackageFormat::ElixirHex)
+        } else if normalized.ends_with(".cabal") {
+            Some(PackageFormat::HaskellCabal)
+        } else if normalized.ends_with(".jl") {
+            Some(PackageFormat::JuliaPkg)
+        } else if normalized.ends_with(".rpkg") {
+            Some(PackageFormat::RCran)
         } else {
             None
         }
@@ -912,6 +975,23 @@ impl_generic_install_strategy!(GemInstallStrategy);
 impl_generic_install_strategy!(NupkgInstallStrategy);
 impl_generic_install_strategy!(VcpkgInstallStrategy);
 impl_generic_install_strategy!(NarInfoInstallStrategy);
+impl_generic_install_strategy!(AixBffInstallStrategy);
+impl_generic_install_strategy!(HpuxDepotInstallStrategy);
+impl_generic_install_strategy!(IrixTardistInstallStrategy);
+impl_generic_install_strategy!(Tru64SetldInstallStrategy);
+impl_generic_install_strategy!(Plan9PkgInstallStrategy);
+impl_generic_install_strategy!(GentooGpkgInstallStrategy);
+impl_generic_install_strategy!(AndroidApexInstallStrategy);
+impl_generic_install_strategy!(WasmWasiInstallStrategy);
+impl_generic_install_strategy!(JavaJarInstallStrategy);
+impl_generic_install_strategy!(NpmTarballInstallStrategy);
+impl_generic_install_strategy!(PhpPharInstallStrategy);
+impl_generic_install_strategy!(PerlCpanInstallStrategy);
+impl_generic_install_strategy!(LuaRockInstallStrategy);
+impl_generic_install_strategy!(ElixirHexInstallStrategy);
+impl_generic_install_strategy!(HaskellCabalInstallStrategy);
+impl_generic_install_strategy!(JuliaPkgInstallStrategy);
+impl_generic_install_strategy!(RCranInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1179,6 +1259,23 @@ impl_generic_metadata_adapter!(GemMetadataAdapter, Gem);
 impl_generic_metadata_adapter!(NupkgMetadataAdapter, Nupkg);
 impl_generic_metadata_adapter!(VcpkgMetadataAdapter, Vcpkg);
 impl_generic_metadata_adapter!(NarInfoMetadataAdapter, NarInfo);
+impl_generic_metadata_adapter!(AixBffMetadataAdapter, AixBff);
+impl_generic_metadata_adapter!(HpuxDepotMetadataAdapter, HpuxDepot);
+impl_generic_metadata_adapter!(IrixTardistMetadataAdapter, IrixTardist);
+impl_generic_metadata_adapter!(Tru64SetldMetadataAdapter, Tru64Setld);
+impl_generic_metadata_adapter!(Plan9PkgMetadataAdapter, Plan9Pkg);
+impl_generic_metadata_adapter!(GentooGpkgMetadataAdapter, GentooGpkg);
+impl_generic_metadata_adapter!(AndroidApexMetadataAdapter, AndroidApex);
+impl_generic_metadata_adapter!(WasmWasiMetadataAdapter, WasmWasi);
+impl_generic_metadata_adapter!(JavaJarMetadataAdapter, JavaJar);
+impl_generic_metadata_adapter!(NpmTarballMetadataAdapter, NpmTarball);
+impl_generic_metadata_adapter!(PhpPharMetadataAdapter, PhpPhar);
+impl_generic_metadata_adapter!(PerlCpanMetadataAdapter, PerlCpan);
+impl_generic_metadata_adapter!(LuaRockMetadataAdapter, LuaRock);
+impl_generic_metadata_adapter!(ElixirHexMetadataAdapter, ElixirHex);
+impl_generic_metadata_adapter!(HaskellCabalMetadataAdapter, HaskellCabal);
+impl_generic_metadata_adapter!(JuliaPkgMetadataAdapter, JuliaPkg);
+impl_generic_metadata_adapter!(RCranMetadataAdapter, RCran);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1402,6 +1499,23 @@ impl PackageFactory {
             PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
             PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
             PackageFormat::Sysupdate => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::AixBff => Box::new(AixBffInstallStrategy),
+            PackageFormat::HpuxDepot => Box::new(HpuxDepotInstallStrategy),
+            PackageFormat::IrixTardist => Box::new(IrixTardistInstallStrategy),
+            PackageFormat::Tru64Setld => Box::new(Tru64SetldInstallStrategy),
+            PackageFormat::Plan9Pkg => Box::new(Plan9PkgInstallStrategy),
+            PackageFormat::GentooGpkg => Box::new(GentooGpkgInstallStrategy),
+            PackageFormat::AndroidApex => Box::new(AndroidApexInstallStrategy),
+            PackageFormat::WasmWasi => Box::new(WasmWasiInstallStrategy),
+            PackageFormat::JavaJar => Box::new(JavaJarInstallStrategy),
+            PackageFormat::NpmTarball => Box::new(NpmTarballInstallStrategy),
+            PackageFormat::PhpPhar => Box::new(PhpPharInstallStrategy),
+            PackageFormat::PerlCpan => Box::new(PerlCpanInstallStrategy),
+            PackageFormat::LuaRock => Box::new(LuaRockInstallStrategy),
+            PackageFormat::ElixirHex => Box::new(ElixirHexInstallStrategy),
+            PackageFormat::HaskellCabal => Box::new(HaskellCabalInstallStrategy),
+            PackageFormat::JuliaPkg => Box::new(JuliaPkgInstallStrategy),
+            PackageFormat::RCran => Box::new(RCranInstallStrategy),
         }
     }
 
@@ -1475,6 +1589,23 @@ impl PackageFactory {
             PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
             PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
             PackageFormat::Sysupdate => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::AixBff => Box::new(AixBffMetadataAdapter),
+            PackageFormat::HpuxDepot => Box::new(HpuxDepotMetadataAdapter),
+            PackageFormat::IrixTardist => Box::new(IrixTardistMetadataAdapter),
+            PackageFormat::Tru64Setld => Box::new(Tru64SetldMetadataAdapter),
+            PackageFormat::Plan9Pkg => Box::new(Plan9PkgMetadataAdapter),
+            PackageFormat::GentooGpkg => Box::new(GentooGpkgMetadataAdapter),
+            PackageFormat::AndroidApex => Box::new(AndroidApexMetadataAdapter),
+            PackageFormat::WasmWasi => Box::new(WasmWasiMetadataAdapter),
+            PackageFormat::JavaJar => Box::new(JavaJarMetadataAdapter),
+            PackageFormat::NpmTarball => Box::new(NpmTarballMetadataAdapter),
+            PackageFormat::PhpPhar => Box::new(PhpPharMetadataAdapter),
+            PackageFormat::PerlCpan => Box::new(PerlCpanMetadataAdapter),
+            PackageFormat::LuaRock => Box::new(LuaRockMetadataAdapter),
+            PackageFormat::ElixirHex => Box::new(ElixirHexMetadataAdapter),
+            PackageFormat::HaskellCabal => Box::new(HaskellCabalMetadataAdapter),
+            PackageFormat::JuliaPkg => Box::new(JuliaPkgMetadataAdapter),
+            PackageFormat::RCran => Box::new(RCranMetadataAdapter),
         }
     }
 }
@@ -2788,6 +2919,39 @@ mod tests {
                 UniversalPackageManifestParser::detect_format_from_filename(filename),
                 Some(expected_format),
                 "Failed format detection for filename: {}",
+                filename
+            );
+        }
+
+        // Test expanded Unix, distro, and language package formats
+        let expanded_cases = [
+            ("sys.bff", PackageFormat::AixBff),
+            ("sys.lpp", PackageFormat::AixBff),
+            ("sys.depot", PackageFormat::HpuxDepot),
+            ("sys.tardist", PackageFormat::IrixTardist),
+            ("sys.setld", PackageFormat::Tru64Setld),
+            ("sys.9pkg", PackageFormat::Plan9Pkg),
+            ("sys.gpkg", PackageFormat::GentooGpkg),
+            ("sys.apex", PackageFormat::AndroidApex),
+            ("sys.wasm", PackageFormat::WasmWasi),
+            ("sys.wasi", PackageFormat::WasmWasi),
+            ("app.jar", PackageFormat::JavaJar),
+            ("pkg.npm", PackageFormat::NpmTarball),
+            ("app.phar", PackageFormat::PhpPhar),
+            ("mod.cpan", PackageFormat::PerlCpan),
+            ("mod.ppm", PackageFormat::PerlCpan),
+            ("rock.rock", PackageFormat::LuaRock),
+            ("pkg.hex", PackageFormat::ElixirHex),
+            ("pkg.cabal", PackageFormat::HaskellCabal),
+            ("pkg.jl", PackageFormat::JuliaPkg),
+            ("pkg.rpkg", PackageFormat::RCran),
+        ];
+
+        for (filename, expected_format) in expanded_cases {
+            assert_eq!(
+                UniversalPackageManifestParser::detect_format_from_filename(filename),
+                Some(expected_format),
+                "Failed expanded format detection for filename: {}",
                 filename
             );
         }

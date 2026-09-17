@@ -247,6 +247,23 @@ pub enum PackageFormat {
     Vcpkg,
     NarInfo,
     Sysupdate,
+    AixBff,
+    HpuxDepot,
+    IrixTardist,
+    Tru64Setld,
+    Plan9Pkg,
+    GentooGpkg,
+    AndroidApex,
+    WasmWasi,
+    JavaJar,
+    NpmTarball,
+    PhpPhar,
+    PerlCpan,
+    LuaRock,
+    ElixirHex,
+    HaskellCabal,
+    JuliaPkg,
+    RCran,
 }
 
 impl PackageFormat {
@@ -375,6 +392,40 @@ impl PackageFormat {
             Some(PackageFormat::NarInfo)
         } else if normalized.ends_with(".sysupdate") {
             Some(PackageFormat::Sysupdate)
+        } else if normalized.ends_with(".bff") || normalized.ends_with(".lpp") {
+            Some(PackageFormat::AixBff)
+        } else if normalized.ends_with(".depot") {
+            Some(PackageFormat::HpuxDepot)
+        } else if normalized.ends_with(".tardist") {
+            Some(PackageFormat::IrixTardist)
+        } else if normalized.ends_with(".setld") {
+            Some(PackageFormat::Tru64Setld)
+        } else if normalized.ends_with(".9pkg") {
+            Some(PackageFormat::Plan9Pkg)
+        } else if normalized.ends_with(".gpkg") {
+            Some(PackageFormat::GentooGpkg)
+        } else if normalized.ends_with(".apex") {
+            Some(PackageFormat::AndroidApex)
+        } else if normalized.ends_with(".wasm") || normalized.ends_with(".wasi") {
+            Some(PackageFormat::WasmWasi)
+        } else if normalized.ends_with(".jar") || normalized.ends_with(".war") || normalized.ends_with(".ear") {
+            Some(PackageFormat::JavaJar)
+        } else if normalized.ends_with(".npm") {
+            Some(PackageFormat::NpmTarball)
+        } else if normalized.ends_with(".phar") {
+            Some(PackageFormat::PhpPhar)
+        } else if normalized.ends_with(".cpan") || normalized.ends_with(".ppm") {
+            Some(PackageFormat::PerlCpan)
+        } else if normalized.ends_with(".rock") || normalized.ends_with(".rockspec") {
+            Some(PackageFormat::LuaRock)
+        } else if normalized.ends_with(".hex") {
+            Some(PackageFormat::ElixirHex)
+        } else if normalized.ends_with(".cabal") {
+            Some(PackageFormat::HaskellCabal)
+        } else if normalized.ends_with(".jl") {
+            Some(PackageFormat::JuliaPkg)
+        } else if normalized.ends_with(".rpkg") {
+            Some(PackageFormat::RCran)
         } else {
             None
         }
@@ -923,6 +974,23 @@ impl_generic_package_adapter!(
     "stratum-package: ",
     "stratum-version: "
 );
+impl_generic_package_adapter!(AixBffAdapter, AixBff, "aix-bff:", "aix-bff: ", "aix-version: ");
+impl_generic_package_adapter!(HpuxDepotAdapter, HpuxDepot, "hpux-depot:", "hpux-depot: ", "hpux-version: ");
+impl_generic_package_adapter!(IrixTardistAdapter, IrixTardist, "irix-tardist:", "irix-tardist: ", "irix-version: ");
+impl_generic_package_adapter!(Tru64SetldAdapter, Tru64Setld, "tru64-setld:", "tru64-setld: ", "tru64-version: ");
+impl_generic_package_adapter!(Plan9PkgAdapter, Plan9Pkg, "plan9-pkg:", "plan9-pkg: ", "plan9-version: ");
+impl_generic_package_adapter!(GentooGpkgAdapter, GentooGpkg, "gentoo-gpkg:", "gentoo-gpkg: ", "gentoo-version: ");
+impl_generic_package_adapter!(AndroidApexAdapter, AndroidApex, "android-apex:", "android-apex: ", "apex-version: ");
+impl_generic_package_adapter!(WasmWasiAdapter, WasmWasi, "wasm-wasi:", "wasm-wasi: ", "wasi-version: ");
+impl_generic_package_adapter!(JavaJarAdapter, JavaJar, "java-jar:", "java-jar: ", "jar-version: ");
+impl_generic_package_adapter!(NpmTarballAdapter, NpmTarball, "npm-package:", "npm-package: ", "npm-version: ");
+impl_generic_package_adapter!(PhpPharAdapter, PhpPhar, "php-phar:", "php-phar: ", "phar-version: ");
+impl_generic_package_adapter!(PerlCpanAdapter, PerlCpan, "perl-cpan:", "perl-cpan: ", "cpan-version: ");
+impl_generic_package_adapter!(LuaRockAdapter, LuaRock, "lua-rock:", "lua-rock: ", "rock-version: ");
+impl_generic_package_adapter!(ElixirHexAdapter, ElixirHex, "elixir-hex:", "elixir-hex: ", "hex-version: ");
+impl_generic_package_adapter!(HaskellCabalAdapter, HaskellCabal, "haskell-cabal:", "haskell-cabal: ", "cabal-version: ");
+impl_generic_package_adapter!(JuliaPkgAdapter, JuliaPkg, "julia-pkg:", "julia-pkg: ", "julia-version: ");
+impl_generic_package_adapter!(RCranAdapter, RCran, "r-cran:", "r-cran: ", "cran-version: ");
 
 /// Fedora/RHEL .rpm adapter
 pub struct RpmAdapter {
@@ -2607,6 +2675,23 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(CruxAdapter::new()));
         factory.register_parser(Box::new(DrpmAdapter::new()));
         factory.register_parser(Box::new(StratumAdapter::new()));
+        factory.register_parser(Box::new(AixBffAdapter::new()));
+        factory.register_parser(Box::new(HpuxDepotAdapter::new()));
+        factory.register_parser(Box::new(IrixTardistAdapter::new()));
+        factory.register_parser(Box::new(Tru64SetldAdapter::new()));
+        factory.register_parser(Box::new(Plan9PkgAdapter::new()));
+        factory.register_parser(Box::new(GentooGpkgAdapter::new()));
+        factory.register_parser(Box::new(AndroidApexAdapter::new()));
+        factory.register_parser(Box::new(WasmWasiAdapter::new()));
+        factory.register_parser(Box::new(JavaJarAdapter::new()));
+        factory.register_parser(Box::new(NpmTarballAdapter::new()));
+        factory.register_parser(Box::new(PhpPharAdapter::new()));
+        factory.register_parser(Box::new(PerlCpanAdapter::new()));
+        factory.register_parser(Box::new(LuaRockAdapter::new()));
+        factory.register_parser(Box::new(ElixirHexAdapter::new()));
+        factory.register_parser(Box::new(HaskellCabalAdapter::new()));
+        factory.register_parser(Box::new(JuliaPkgAdapter::new()));
+        factory.register_parser(Box::new(RCranAdapter::new()));
 
         factory
     }

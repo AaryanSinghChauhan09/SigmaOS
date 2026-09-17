@@ -1046,6 +1046,34 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Vcpkg)
         } else if data.starts_with(b"NARI") {
             Some(PackageFormat::NarInfo)
+        } else if data.starts_with(b"AIXBFF") {
+            Some(PackageFormat::AixBff)
+        } else if data.starts_with(b"HPUX") {
+            Some(PackageFormat::HpuxDepot)
+        } else if data.starts_with(b"IRIX") {
+            Some(PackageFormat::IrixTardist)
+        } else if data.starts_with(b"SETL") {
+            Some(PackageFormat::Tru64Setld)
+        } else if data.starts_with(b"GPKG") {
+            Some(PackageFormat::GentooGpkg)
+        } else if data.starts_with(b"APEX") {
+            Some(PackageFormat::AndroidApex)
+        } else if data.starts_with(b"\x00asm") {
+            Some(PackageFormat::WasmWasi)
+        } else if data.starts_with(b"JAR!") {
+            Some(PackageFormat::JavaJar)
+        } else if data.starts_with(b"PHAR") {
+            Some(PackageFormat::PhpPhar)
+        } else if data.starts_with(b"LUAR") {
+            Some(PackageFormat::LuaRock)
+        } else if data.starts_with(b"HEX1") {
+            Some(PackageFormat::ElixirHex)
+        } else if data.starts_with(b"CABA") {
+            Some(PackageFormat::HaskellCabal)
+        } else if data.starts_with(b"JL01") {
+            Some(PackageFormat::JuliaPkg)
+        } else if data.starts_with(b"CRAN") {
+            Some(PackageFormat::RCran)
         } else {
             None
         }
@@ -1894,6 +1922,17 @@ impl UniversalDependencyMapper {
             "fd" | "fd-find" => "fd".to_string(),
             "zoxide" => "zoxide".to_string(),
             "eza" | "exa" => "eza".to_string(),
+            "openjdk" | "java" | "jre" | "jdk" | "java-11-openjdk" | "java-17-openjdk" => "jvm".to_string(),
+            "node" | "nodejs" | "npm" => "nodejs".to_string(),
+            "wasm" | "wasi" | "wasmtime" => "wasm".to_string(),
+            "php" | "php8" | "php81" | "php82" => "php".to_string(),
+            "perl" | "cpan" => "perl".to_string(),
+            "lua" | "luarocks" | "lua54" => "lua".to_string(),
+            "elixir" | "mix" => "elixir".to_string(),
+            "haskell" | "ghc" | "cabal" => "haskell".to_string(),
+            "julia" => "julia".to_string(),
+            "r-base" | "cran" => "r".to_string(),
+            "aix-libc" | "hpux-libc" | "irix-libc" => "libc".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2128,16 +2167,19 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" => {
+            "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" | "npm" | "yarn" | "pnpm" | "composer" | "luarocks" | "cpan" | "cpanm" | "mix" | "cabal" | "installp" | "swinstall" | "swremove" | "inst" => {
+                if pm == "swremove" {
+                    operation = UniversalPmOperation::Remove;
+                }
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "install" | "add" => operation = UniversalPmOperation::Install,
-                        "uninstall" | "remove" | "rm" => operation = UniversalPmOperation::Remove,
-                        "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "install" | "add" | "get" | "i" | "-a" => operation = UniversalPmOperation::Install,
+                        "uninstall" | "remove" | "rm" | "delete" | "-r" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "up" => operation = UniversalPmOperation::Upgrade,
                         "search" | "find" => operation = UniversalPmOperation::Search,
                         "info" | "show" => operation = UniversalPmOperation::QueryInfo,
-                        "--dry-run" | "--dryrun" => dry_run = true,
+                        "--dry-run" | "--dryrun" | "-n" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
@@ -3702,6 +3744,52 @@ mod tests {
             .unwrap();
         assert_eq!(slack_action.source_pm, "slackpkg");
         assert_eq!(slack_action.operation, UniversalPmOperation::Install);
+
+        // Test expanded PM command dispatchers (Ecosystem & Unix)
+        let npm_action = dispatcher.dispatch_command("npm install express").unwrap();
+        assert_eq!(npm_action.source_pm, "npm");
+        assert_eq!(npm_action.operation, UniversalPmOperation::Install);
+        assert_eq!(npm_action.target_packages, vec!["express"]);
+
+        let composer_action = dispatcher.dispatch_command("composer update").unwrap();
+        assert_eq!(composer_action.source_pm, "composer");
+        assert_eq!(composer_action.operation, UniversalPmOperation::Upgrade);
+
+        let cpan_action = dispatcher.dispatch_command("cpanm install Net::SSLeay").unwrap();
+        assert_eq!(cpan_action.source_pm, "cpanm");
+        assert_eq!(cpan_action.operation, UniversalPmOperation::Install);
+
+        let mix_action = dispatcher.dispatch_command("mix get phoenix").unwrap();
+        assert_eq!(mix_action.source_pm, "mix");
+        assert_eq!(mix_action.operation, UniversalPmOperation::Install);
+    }
+
+    #[test]
+    fn test_expanded_format_headers_and_dependencies() {
+        let adapter = UniversalPackageAdapter::new();
+        assert_eq!(adapter.detect_format_by_header(b"AIXBFF123"), Some(PackageFormat::AixBff));
+        assert_eq!(adapter.detect_format_by_header(b"HPUX123"), Some(PackageFormat::HpuxDepot));
+        assert_eq!(adapter.detect_format_by_header(b"IRIX123"), Some(PackageFormat::IrixTardist));
+        assert_eq!(adapter.detect_format_by_header(b"SETL123"), Some(PackageFormat::Tru64Setld));
+        assert_eq!(adapter.detect_format_by_header(b"GPKG123"), Some(PackageFormat::GentooGpkg));
+        assert_eq!(adapter.detect_format_by_header(b"APEX123"), Some(PackageFormat::AndroidApex));
+        assert_eq!(adapter.detect_format_by_header(b"\x00asm123"), Some(PackageFormat::WasmWasi));
+        assert_eq!(adapter.detect_format_by_header(b"JAR!123"), Some(PackageFormat::JavaJar));
+        assert_eq!(adapter.detect_format_by_header(b"PHAR123"), Some(PackageFormat::PhpPhar));
+        assert_eq!(adapter.detect_format_by_header(b"LUAR123"), Some(PackageFormat::LuaRock));
+        assert_eq!(adapter.detect_format_by_header(b"HEX1123"), Some(PackageFormat::ElixirHex));
+        assert_eq!(adapter.detect_format_by_header(b"CABA123"), Some(PackageFormat::HaskellCabal));
+        assert_eq!(adapter.detect_format_by_header(b"JL01123"), Some(PackageFormat::JuliaPkg));
+        assert_eq!(adapter.detect_format_by_header(b"CRAN123"), Some(PackageFormat::RCran));
+
+        let mapper = UniversalDependencyMapper::new();
+        assert_eq!(mapper.to_canonical_name("openjdk"), "jvm");
+        assert_eq!(mapper.to_canonical_name("nodejs"), "nodejs");
+        assert_eq!(mapper.to_canonical_name("wasmtime"), "wasm");
+        assert_eq!(mapper.to_canonical_name("php82"), "php");
+        assert_eq!(mapper.to_canonical_name("luarocks"), "lua");
+        assert_eq!(mapper.to_canonical_name("ghc"), "haskell");
+        assert_eq!(mapper.to_canonical_name("r-base"), "r");
     }
 
 
