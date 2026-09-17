@@ -14,13 +14,17 @@ pub mod security {
     pub use super::capability::*;
 }
 
+#[path = "../src/package/universal.rs"]
+pub mod package;
+
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
+#[path = "../src/sigpkg/universal_oop_system.rs"]
+pub mod universal_oop_system;
+
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
-
-pub use universal_adapter::universal_oop_system;
 
 pub mod sigpkg {
     use alloc::string::String;
@@ -70,6 +74,11 @@ pub mod sigpkg {
         pub description: String,
         pub dependencies: Vec<Dependency>,
         pub checksum: String,
+        pub mirrors: Vec<String>,
+        pub signing_keys: Vec<String>,
+        pub licenses: Vec<String>,
+        pub maintainers: Vec<String>,
+        pub changelogs: Vec<String>,
     }
 
     impl Package {
@@ -86,6 +95,11 @@ pub mod sigpkg {
                 description,
                 dependencies,
                 checksum,
+                mirrors: Vec::new(),
+                signing_keys: Vec::new(),
+                licenses: Vec::new(),
+                maintainers: Vec::new(),
+                changelogs: Vec::new(),
             }
         }
     }
@@ -209,7 +223,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::universal_oop_system::PackageFormat;
+    use universal_adapter::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
