@@ -16,7 +16,6 @@ use crate::runtime::node_distribution::{
 
 #[cfg(any(feature = "standalone_test", test))]
 pub mod node_distribution_dummy {
-    use super::*;
     #[derive(Debug, Clone)]
     pub enum LibcFlavor {
         Musl,
@@ -72,7 +71,6 @@ pub mod node_distribution_dummy {
 pub use node_distribution_dummy::*;
 
 #[cfg(any(feature = "standalone_test", test))]
-use self::node_distribution_dummy::*;
 
 /// Foreign distro manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
