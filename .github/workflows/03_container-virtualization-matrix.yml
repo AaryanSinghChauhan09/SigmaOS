@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload logs
         if: always()
-        uses: actions/upload-artifact@604373da6381f2420692400f9164853be0e697b5 # v4.3.6
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.3.6
         with:
           name: ${{ matrix.container || matrix.vm }}-${{ matrix.version || matrix.image }}-logs
           path: logs/
