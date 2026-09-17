@@ -132,3 +132,8 @@ pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 // Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
+
+// ─── Phase 1: Safe-Rust Kernel Foundation — New Sovereign Modules ─────────────
+pub mod sigma_version;
+pub mod sigma_kernel_autotuner_v2;
+pub mod xdp_engine_sovereign;

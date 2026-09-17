@@ -327,3 +327,9 @@ mod tests {
         assert!(v1 < v2);
     }
 }
+
+// ─── Phase 2: Universal Packaging Engine — New Sovereign Modules ──────────────
+pub mod delta_engine;
+pub mod merkle_store;
+pub mod boolean_dep_solver;
+pub mod package_signing;

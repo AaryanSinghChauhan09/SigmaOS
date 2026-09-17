@@ -35,3 +35,6 @@ pub use systemd_init::{
     RestartPolicy, SystemdBetsyEngine, SystemdCgroupSliceGovernor, SystemdEngine,
     SystemdServiceWatchdog, SystemdUnit, SystemdUnitFileParser, UnitID, UnitState, UnitType,
 };
+
+// ─── Sub-Second Boot Sequencer ────────────────────────────────────────────────
+pub mod subsecond_boot_sequencer;

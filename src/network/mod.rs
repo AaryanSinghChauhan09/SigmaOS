@@ -54,3 +54,6 @@ pub use tc_qdisc_sovereign::{TbfQdisc, PrioQdisc, HtbQdisc, HtbClass, FqCodelQdi
 
 pub mod wireguard_sovereign;
 pub use wireguard_sovereign::{SovereignWireGuardTunnel, WgPeer, WgSessionState};
+
+// ─── Phase 1: Post-Quantum WireGuard Bridge ───────────────────────────────────
+pub mod wireguard_pqc_bridge;
