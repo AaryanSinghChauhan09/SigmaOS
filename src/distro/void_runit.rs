@@ -105,8 +105,6 @@ pub struct RunitSupervisor {
     pub stage: RunitStage,
     pub current_stage_num: u32,
     pub services: BTreeMap<String, RunitService>,
-    pub stage: RunitStage,
-    pub current_stage_num: u8,
 }
 
 impl Default for RunitSupervisor {
@@ -121,8 +119,6 @@ impl RunitSupervisor {
             stage: RunitStage::Stage1,
             current_stage_num: 1,
             services: BTreeMap::new(),
-            stage: RunitStage::Stage1,
-            current_stage_num: 1,
         }
     }
 
@@ -136,11 +132,6 @@ impl RunitSupervisor {
         } else {
             false
         }
-    }
-
-    pub fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
-        let _ = (name, stopped);
-        true
     }
 
     /// Start stage 1 (one-time initialization)
@@ -211,7 +202,7 @@ impl RunitSupervisor {
         }
     }
 
-    fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+    pub fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
         for service in self.services.values() {
             if service.status == RunitServiceStatus::Running && !stopped.contains(&service.name) {
                 if service.dependencies.iter().any(|dep| dep == name) {
@@ -220,14 +211,6 @@ impl RunitSupervisor {
             }
         }
         true
-    }
-
-    pub fn start_service(&mut self, name: &str) -> bool {
-        if let Some(service) = self.services.get_mut(name) {
-            service.start()
-        } else {
-            false
-        }
     }
 
     pub fn stop_service(&mut self, name: &str) -> bool {
@@ -274,12 +257,6 @@ impl RunitSupervisor {
         } else {
             None
         }
-    }
-}
-
-impl Default for RunitSupervisor {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
