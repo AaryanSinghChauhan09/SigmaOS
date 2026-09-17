@@ -312,3 +312,9 @@ pub use omarchy_master_synthesis::{
     OmarchyAppSandbox, OmarchyHerdrAiScheduler, OmarchyQuickShellBridge,
     OmarchyThemeLiveEngine, ShellElementType, ThemePalette,
 };
+
+pub mod sovereign_open_source_distro_synthesis;
+pub use sovereign_open_source_distro_synthesis::*;
+
+pub mod sovereign_omarchy_repository_innovations;
+pub use sovereign_omarchy_repository_innovations::*;
