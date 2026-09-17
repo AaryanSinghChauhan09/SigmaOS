@@ -352,3 +352,5 @@ pub use linux_bsd_distro_strategic_innovations::{
     ExecGuardRecommendation, FedoraGreenbootHealthCheckEngine, ObfuscatedInputEvent,
     VanillaAbrootImageTransactionEngine, WhonixKloakInputObfuscationEngine, ZorinExecGuardSubsystem,
 };
+pub mod sovereign_open_source_distro_synthesis;
+pub use sovereign_open_source_distro_synthesis::*;
