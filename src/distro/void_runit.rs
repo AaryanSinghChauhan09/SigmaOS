@@ -6,24 +6,9 @@
  */
 
 
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
-
-
-#[cfg(not(test))]
-use std::collections::BTreeMap;
-#[cfg(not(test))]
-use std::string::String;
-#[cfg(not(test))]
-use std::vec::Vec;
-
-#[cfg(test)]
-use std::collections::BTreeMap;
-#[cfg(test)]
-use std::string::String;
-#[cfg(test)]
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

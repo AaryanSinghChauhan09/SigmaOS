@@ -54,7 +54,6 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod missing_linux_kernel_components;
 pub mod structures;
 
 pub use missing_linux_kernel_components::{
@@ -109,3 +108,5 @@ pub mod sigma_timer;
 pub mod sigma_workqueue;
 pub mod sigma_cgroup_v2;
 pub mod sigma_signal;
+pub mod virtual_cpu;
+pub mod vmm_paging;

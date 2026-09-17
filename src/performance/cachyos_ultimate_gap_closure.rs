@@ -1,8 +1,8 @@
 // SigmaOS CachyOS Ultimate Gap Closure Engine
 // Zero-dependency Rust implementation covering scx (sched_ext) BORE BPF scheduler, Ananicy-CPP rule auto-nicer, x86-64-v4 microarchitecture ISA optimizer, and UKSM / GameMode kernel tuners.
 
-use crate::klib::string::String;
-use crate::klib::vec::Vec;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Linux BORE (Burst-Oriented Response Enhancer) Task State
 #[derive(Debug, Clone)]

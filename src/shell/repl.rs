@@ -11,8 +11,9 @@ use crate::accessibility::{
     AccessibilityFeature, AccessibilityFramework,
     AccessibilitySetting,
 };
+use crate::shell::zsh_bash_parity::BashParameterExpansion;
 use crate::shell::{
-    BashParameterExpansion, HistoryExpansionEngine, JobControlManager,
+    HistoryExpansionEngine, JobControlManager,
 };
 use crate::compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform,
