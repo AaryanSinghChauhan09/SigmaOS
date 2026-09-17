@@ -288,3 +288,11 @@ pub use omarchy_expanded_parity::{
     OmarchyThunarFileActions, OmarchyZellijSessionManager, SovereignOmarchyExpandedParitySuite,
 };
 
+pub mod sovereign_2028_distro_supremacy_engine;
+pub use sovereign_2028_distro_supremacy_engine::{
+    BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard,
+    MicroVmSpawnSpec, PqcHomedUserEntry, Sovereign2028DistroSupremacyMasterSuite,
+    SovereignEbpfSchedExtAiGovernor, SovereignFreeBsd15VnetXdpEngine,
+    SovereignOpenBsd78FineIbtCfiGuard, SovereignSystemd258VmspawnEngine,
+    SovereignWayland125DirectScanoutEngine, VnetDualStackInterface,
+};
