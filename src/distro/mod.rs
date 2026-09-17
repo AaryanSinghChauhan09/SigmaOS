@@ -296,3 +296,12 @@ pub use linux_bsd_pinnacle_synthesis::{
     RavenNotification, RavenWidget, SolusRavenEopkgEngine, SovereignLinuxBsdPinnacleSynthesisSuite,
     UrpmiMediaSource, UrpmiPackageRecord,
 };
+
+pub mod sovereign_2028_distro_supremacy_engine;
+pub use sovereign_2028_distro_supremacy_engine::{
+    BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard,
+    MicroVmSpawnSpec, PqcHomedUserEntry, Sovereign2028DistroSupremacyMasterSuite,
+    SovereignEbpfSchedExtAiGovernor, SovereignFreeBsd15VnetXdpEngine,
+    SovereignOpenBsd78FineIbtCfiGuard, SovereignSystemd258VmspawnEngine,
+    SovereignWayland125DirectScanoutEngine, VnetDualStackInterface,
+};
