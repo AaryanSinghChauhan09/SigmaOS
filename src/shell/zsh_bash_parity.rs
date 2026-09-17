@@ -1036,6 +1036,8 @@ pub enum ShellDialect {
     Ksh,
     Dash,
     BsdSh,
+    Nu,
+    Ion,
 }
 
 pub struct FishAbbreviationEngine {
@@ -1257,6 +1259,10 @@ impl UniversalShellCompatibilityEngine {
                     return ShellDialect::Ksh;
                 } else if trimmed.contains("dash") {
                     return ShellDialect::Dash;
+                } else if trimmed.contains("nu") {
+                    return ShellDialect::Nu;
+                } else if trimmed.contains("ion") {
+                    return ShellDialect::Ion;
                 } else if trimmed.contains("sh") {
                     return ShellDialect::BsdSh;
                 }
@@ -1320,6 +1326,8 @@ impl UniversalScriptTranspiler {
                 ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh => {
                     Self::transpile_bash_zsh_line(trimmed)
                 }
+                ShellDialect::Nu => Self::transpile_nu_line(trimmed),
+                ShellDialect::Ion => Self::transpile_ion_line(trimmed),
                 ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
             };
 
@@ -1474,13 +1482,94 @@ impl UniversalScriptTranspiler {
             return format!("{}() {{", func_name);
         }
 
-        // 10. Fish 'end' -> '}' or 'done' or 'esac'
+        // 10. Fish 'if test ...' / 'if ...' -> 'if [ ... ]; then' or 'if ...; then'
+        if l.starts_with("if ") && !l.contains("; then") {
+            let rest = l.trim_start_matches("if ").trim();
+            if rest.starts_with("test ") {
+                let cond = rest.trim_start_matches("test ").trim();
+                return format!("if [ {} ]; then", cond);
+            }
+            return format!("if {}; then", rest);
+        } else if l.starts_with("else if ") && !l.contains("; then") {
+            let rest = l.trim_start_matches("else if ").trim();
+            if rest.starts_with("test ") {
+                let cond = rest.trim_start_matches("test ").trim();
+                return format!("elif [ {} ]; then", cond);
+            }
+            return format!("elif {}; then", rest);
+        } else if l == "else" {
+            return "else".to_string();
+        }
+
+        // 11. Fish 'end' -> '}' or 'done' or 'fi' or 'esac'
         if l == "end" {
             if *in_function {
                 *in_function = false;
                 return "}".to_string();
             }
-            return "done".to_string();
+            return "fi".to_string();
+        }
+
+        l
+    }
+
+    fn transpile_nu_line(line: &str) -> String {
+        let l = line.to_string();
+
+        if l.starts_with("let-env ") || l.starts_with("$env.") {
+            if let Some(eq_idx) = l.find('=') {
+                let var = l[..eq_idx].trim_start_matches("let-env ").trim_start_matches("$env.").trim();
+                let val = l[eq_idx + 1..].trim();
+                return format!("export {}={}", var, val);
+            }
+        } else if l.starts_with("let ") {
+            if let Some(eq_idx) = l.find('=') {
+                let var = l[..eq_idx].trim_start_matches("let ").trim();
+                let val = l[eq_idx + 1..].trim();
+                return format!("{}={}", var, val);
+            }
+        } else if l.starts_with("def ") {
+            if let Some(open) = l.find('[') {
+                let name = l[4..open].trim();
+                return format!("{}() {{", name);
+            }
+        } else if l.starts_with("each {") || l == "}" {
+            return "}".to_string();
+        }
+
+        l
+    }
+
+    fn transpile_ion_line(line: &str) -> String {
+        let l = line.to_string();
+
+        if l.starts_with("export ") && l.contains(" = ") {
+            let rest = l.trim_start_matches("export ").trim();
+            if let Some(eq_idx) = rest.find('=') {
+                let var = rest[..eq_idx].trim();
+                let val = rest[eq_idx + 1..].trim();
+                return format!("export {}={}", var, val);
+            }
+        } else if l.starts_with("let ") && l.contains(" = ") {
+            let rest = l.trim_start_matches("let ").trim();
+            if let Some(eq_idx) = rest.find('=') {
+                let var = rest[..eq_idx].trim();
+                let val = rest[eq_idx + 1..].trim();
+                return format!("{}={}", var, val);
+            }
+        } else if l.starts_with("fn ") {
+            let rest = l.trim_start_matches("fn ").trim();
+            let func_name = rest.split_whitespace().next().unwrap_or("fn");
+            return format!("{}() {{", func_name);
+        } else if l == "end" {
+            return "}".to_string();
+        } else if l.starts_with("for ") && !l.contains("; do") {
+            let rest = l.trim_start_matches("for ").trim();
+            if let Some(in_idx) = rest.find(" in ") {
+                let var = rest[..in_idx].trim();
+                let items = rest[in_idx + 4..].trim();
+                return format!("for {} in {}; do", var, items);
+            }
         }
 
         l
@@ -2373,5 +2462,17 @@ mod tests {
         env.insert("FILE".to_string(), "archive.tar.gz".to_string());
         assert_eq!(BashParameterExpansion::expand("${FILE#archive.}", &env), "tar.gz");
         assert_eq!(BashParameterExpansion::expand("${FILE%.gz}", &env), "archive.tar");
+
+        // Test Nushell and Ion transpilation
+        let nu_script = "let-env PORT = 8080\nlet HOST = localhost";
+        let posix_nu = UniversalScriptTranspiler::transpile_to_posix_sh(nu_script, ShellDialect::Nu);
+        assert!(posix_nu.contains("export PORT=8080"));
+        assert!(posix_nu.contains("HOST=localhost"));
+
+        let ion_script = "export PATH = /usr/bin\nfn greet\n  echo hi\nend";
+        let posix_ion = UniversalScriptTranspiler::transpile_to_posix_sh(ion_script, ShellDialect::Ion);
+        assert!(posix_ion.contains("export PATH=/usr/bin"));
+        assert!(posix_ion.contains("greet() {"));
+        assert!(posix_ion.contains("}"));
     }
 }
