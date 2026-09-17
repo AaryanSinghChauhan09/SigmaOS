@@ -24,15 +24,10 @@ use std::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(all(not(feature = "standalone_test"), test))]
-pub use crate::sigpkg::Version;
-
-use std::sync::Arc;
-
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,
@@ -40,7 +35,9 @@ pub struct Version {
     pub patch: u64,
 }
 
-#[cfg(feature = "standalone_test")]
+use std::sync::Arc;
+
+#[cfg(any(feature = "standalone_test", test))]
 impl core::fmt::Display for Version {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
@@ -67,20 +64,20 @@ impl Version {
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
     pub name: String,
@@ -90,7 +87,7 @@ pub struct Package {
     pub checksum: String,
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl Package {
     pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
         Self {
@@ -4060,32 +4057,14 @@ impl UniversalDistroPackageUnifierEngine {
         // 2. Map dependencies to unified sovereign system dependencies
         let mut unified_deps = Vec::new();
         for dep in foreign_package.dependencies() {
-            let lower = dep.name.to_lowercase();
-            let mapped_name = if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
-                "sovereign-openssl".to_string()
-            } else if lower.contains("libc") || lower == "musl" || lower.contains("freebsd-runtime") || lower.contains("openbsd-sys") || lower.contains("haiku-libroot") {
-                "sovereign-libc".to_string()
-            } else if lower.contains("zlib") {
-                "sovereign-zlib".to_string()
-            } else if lower.contains("zstd") || lower.contains("lz4") || lower.contains("xz") || lower.contains("bzip2") {
-                "sovereign-compression".to_string()
-            } else if lower.contains("python") {
-                "sovereign-python".to_string()
-            } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" {
-                "sovereign-shell".to_string()
-            } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("runit") || lower.contains("sysvinit") || lower.contains("s6") || lower.contains("dinit") {
-                "sovereign-init".to_string()
-            } else if lower.contains("gcc") || lower.contains("clang") || lower.contains("llvm") || lower.contains("binutils") || lower == "make" || lower == "cmake" {
-                "sovereign-toolchain".to_string()
-            } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") || lower.contains("vulkan") {
-                "sovereign-graphics".to_string()
-            } else if lower.contains("curl") || lower.contains("wget") || lower.contains("openssh") || lower.contains("net-tools") || lower.contains("iproute2") {
-                "sovereign-network-tools".to_string()
-            } else {
-                dep.name.clone()
+            let mapped_name = match dep.name.as_str() {
+                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
+                "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
+                "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
+                _ => &dep.name,
             };
             unified_deps.push(Dependency {
-                name: mapped_name,
+                name: mapped_name.to_string(),
                 version_constraint: dep.version_constraint,
             });
         }
