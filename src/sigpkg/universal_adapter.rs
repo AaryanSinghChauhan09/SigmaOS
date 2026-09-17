@@ -70,11 +70,8 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::universal_oop_system;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -1751,6 +1748,20 @@ impl UniversalDependencyMapper {
             "fd" | "fd-find" => "fd".to_string(),
             "zoxide" => "zoxide".to_string(),
             "eza" | "exa" => "eza".to_string(),
+            "libxml2" | "libxml2-dev" | "libxml2-devel" | "textproc/libxml2" => "libxml2".to_string(),
+            "icu" | "libicu-dev" | "libicu-devel" | "devel/icu" => "icu".to_string(),
+            "brotli" | "libbrotli-dev" | "libbrotli-devel" | "archivers/brotli" => "brotli".to_string(),
+            "bzip2" | "libbz2-dev" | "bzip2-devel" | "archivers/bzip2" => "bzip2".to_string(),
+            "libpng" | "libpng-dev" | "libpng-devel" | "graphics/png" => "libpng".to_string(),
+            "freetype" | "libfreetype6-dev" | "freetype2-devel" | "print/freetype2" => "freetype".to_string(),
+            "vulkan" | "vulkan-headers" | "vulkan-loader" | "graphics/vulkan-loader" => "vulkan".to_string(),
+            "sdl2" | "libsdl2-dev" | "sdl2-devel" | "devel/sdl20" => "sdl2".to_string(),
+            "wireguard" | "wireguard-tools" | "net/wireguard-tools" => "wireguard".to_string(),
+            "flatpak" | "sys-apps/flatpak" => "flatpak".to_string(),
+            "podman" | "app-containers/podman" => "podman".to_string(),
+            "docker" | "docker-io" | "app-containers/docker" => "docker".to_string(),
+            "boost" | "libboost-dev" | "boost-devel" | "devel/boost-libs" => "boost".to_string(),
+            "protobuf" | "libprotobuf-dev" | "protobuf-devel" | "devel/protobuf" => "protobuf".to_string(),
             _ => clean.to_string(),
         }
     }
@@ -2150,7 +2161,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" | "pkg_add" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
