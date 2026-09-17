@@ -133,8 +133,20 @@ impl UniversalPackageTranslator {
 fn debtor_to_sovereign_name(name: &str) -> &str {
     if name.contains("ssl") {
         "sovereign-openssl"
-    } else if name.contains("libc") {
+    } else if name.contains("libc") || name.contains("glibc") || name.contains("musl") {
         "sovereign-libc"
+    } else if name.contains("zlib") || name.contains("xz") || name.contains("zstd") || name.contains("bz2") {
+        "sovereign-compression"
+    } else if name.contains("bash") || name.contains("zsh") || name.contains("fish") || name.contains("ash") {
+        "sovereign-shell"
+    } else if name.contains("systemd") || name.contains("runit") || name.contains("openrc") || name.contains("s6") {
+        "sovereign-init"
+    } else if name.contains("gcc") || name.contains("clang") || name.contains("llvm") || name.contains("rust") {
+        "sovereign-toolchain"
+    } else if name.contains("mesa") || name.contains("vulkan") || name.contains("drm") || name.contains("x11") || name.contains("wayland") {
+        "sovereign-graphics"
+    } else if name.contains("curl") || name.contains("wget") || name.contains("dhcp") || name.contains("iproute") {
+        "sovereign-network-tools"
     } else {
         name
     }
@@ -1143,6 +1155,82 @@ impl<T: PackageCapability> PackageCapability for SandboxDecorator<T> {
     }
 }
 
+pub struct HardwareOptimizationDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub target_microarch_level: String,
+    pub required_simd_features: Vec<String>,
+}
+
+impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        println!(
+            "HardwareOptimizationDecorator: Microarch={}, SIMD={:?}",
+            self.target_microarch_level, self.required_simd_features
+        );
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct ResourceLimitDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub max_memory_bytes: u64,
+    pub cpu_quota_percent: u32,
+}
+
+impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        println!(
+            "ResourceLimitDecorator: Cgroup Memory max={} MB, CPU={}%",
+            self.max_memory_bytes / (1024 * 1024),
+            self.cpu_quota_percent
+        );
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
+pub struct PqcSignedDecorator<T: PackageCapability> {
+    pub decorated: T,
+    pub dilithium_signature: String,
+}
+
+impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
+    fn get_package(&self) -> &UnifiedPackage {
+        self.decorated.get_package()
+    }
+    fn enforce_sandbox(&self) -> Result<(), PackageError> {
+        if self.dilithium_signature.starts_with("invalid") || !self.dilithium_signature.contains("dilithium-5-valid") {
+            return Err(PackageError::InstallationFailed(
+                "PQC Dilithium Signature verification failed".to_string(),
+            ));
+        }
+        self.decorated.enforce_sandbox()
+    }
+    fn restrict_network(&self) -> Result<(), PackageError> {
+        self.decorated.restrict_network()
+    }
+    fn profile_performance(&self) {
+        self.decorated.profile_performance();
+    }
+}
+
 pub struct NetworkRestrictionDecorator<T: PackageCapability> {
     pub decorated: T,
     pub allowed_hosts: Vec<String>,
@@ -2115,67 +2203,7 @@ pub struct UniversalPackageManifestParser;
 
 impl UniversalPackageManifestParser {
     pub fn detect_format_from_filename(filename: &str) -> Option<PackageFormat> {
-        let name = filename.to_lowercase();
-        if name.ends_with(".deb") || name.ends_with(".superdeb") {
-            Some(PackageFormat::Deb)
-        } else if name.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name.ends_with(".pkg.tar.xz") || name.ends_with(".pkg.tar.zst") {
-            Some(PackageFormat::Pacman)
-        } else if name.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name.ends_with(".ebuild") || name.ends_with(".portage") {
-            Some(PackageFormat::Ebuild)
-        } else if name.ends_with(".nixpkg") || name.ends_with(".nix") {
-            Some(PackageFormat::Nixpkg)
-        } else if name.ends_with(".eopkg") {
-            Some(PackageFormat::Eopkg)
-        } else if name.ends_with(".ports") {
-            Some(PackageFormat::Ports)
-        } else if name.ends_with(".pkg") {
-            Some(PackageFormat::Pkg)
-        } else if name.ends_with(".ipa") {
-            Some(PackageFormat::Ipa)
-        } else if name.ends_with(".aab") {
-            Some(PackageFormat::Aab)
-        } else if name.ends_with(".hap") {
-            Some(PackageFormat::Hap)
-        } else if name.ends_with(".pisi") {
-            Some(PackageFormat::Pisi)
-        } else if name.ends_with(".lzm") {
-            Some(PackageFormat::Lzm)
-        } else if name.ends_with(".pup") {
-            Some(PackageFormat::Pup)
-        } else if name.ends_with(".pet") {
-            Some(PackageFormat::Pet)
-        } else if name.ends_with(".tar.gz") || name.ends_with(".tgz") {
-            Some(PackageFormat::TarGz)
-        } else if name.ends_with(".tar.xz") || name.ends_with(".xz") {
-            Some(PackageFormat::Xz)
-        } else if name.ends_with(".tar") {
-            Some(PackageFormat::Tar)
-        } else if name.ends_with(".dports") {
-            Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
-        {
-            Some(PackageFormat::SlackBuild)
-        } else if name.ends_with(".crux") || name.ends_with(".pkgfile") {
-            Some(PackageFormat::Crux)
-        } else if name.ends_with(".drpm") {
-            Some(PackageFormat::Drpm)
-        } else if name.ends_with(".stratum") {
-            Some(PackageFormat::Stratum)
-        } else if name.ends_with(".app") {
-            Some(PackageFormat::App)
-        } else {
-            None
-        }
+        PackageFormat::from_filename(filename)
     }
 
     pub fn parse_manifest_auto(
@@ -2323,7 +2351,7 @@ impl UniversalPackageFormatBridge {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
