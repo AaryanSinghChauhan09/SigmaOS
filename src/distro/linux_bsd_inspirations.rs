@@ -152,7 +152,6 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
-            _ => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -271,14 +270,12 @@ impl SovereignUniversalDistroBridge {
             }
 
             DistroSubsystemMode::LinuxSlackware
-            | DistroSubsystemMode::LinuxTinyCore
-            | DistroSubsystemMode::LinuxAntiX => {
+            | DistroSubsystemMode::LinuxTinyCore => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
 
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
-            _ => supervisor == ServiceSupervisorType::Systemd,
         };
 
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
@@ -325,7 +322,6 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
-            _ => format!("{}.deb", input_pkg),
         }
     }
 
@@ -375,7 +371,6 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
-            _ => format!("{}.sig", action),
         };
 
         Ok(format!(
@@ -553,99 +548,69 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
-            "kali_recon" => {
+            "nixos_declarative" => {
                 Ok(format!(
-                    "Dispatched Kali Security Nmap/Wireshark/Metasploit reconnaissance for target '{}' under distro mode '{:?}'",
+                    "Dispatched NixOS declarative Nix expression reconciliation for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "antix_runit" => {
+            "void_runit" => {
                 Ok(format!(
-                    "Dispatched AntiX SysVinit/Runit lightweight sys-admin service control for '{}' under distro mode '{:?}'",
+                    "Dispatched Void Linux runit stage controller for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "zorin_chameleon" => {
+            "alpine_apk" => {
                 Ok(format!(
-                    "Dispatched Zorin OS Chameleon dynamic desktop layout switcher to '{}' under distro mode '{:?}'",
+                    "Dispatched Alpine Linux APK package manager & lbu overlay for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "mint_cinnamon" => {
+            "gentoo_portage" => {
                 Ok(format!(
-                    "Dispatched Linux Mint Cinnamon desktop applet & Timeshift snapshot manager for '{}' under distro mode '{:?}'",
+                    "Dispatched Gentoo Portage ebuild slot governor for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "garuda_dracut" => {
+            "freebsd_jails" => {
                 Ok(format!(
-                    "Dispatched Garuda Linux Dracut Btrfs Snapper automatic rollback for '{}' under distro mode '{:?}'",
+                    "Dispatched FreeBSD Jails VNET network isolation sandbox for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "cachy_bore" => {
+            "openbsd_pledge" => {
                 Ok(format!(
-                    "Dispatched CachyOS BORE v2 dynamic latency scheduler tuning for '{}' under distro mode '{:?}'",
+                    "Dispatched OpenBSD pledge/unveil syscall path lock down for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "auth" => {
+            "dragonfly_hammer2" => {
                 Ok(format!(
-                    "Dispatched PAM / SystemdHomed authentication & privilege check for '{}' under distro mode '{:?}'",
+                    "Dispatched DragonFly BSD HAMMER2 multi-master CoW snapshot for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "boot" => {
+            "illumos_zones" => {
                 Ok(format!(
-                    "Dispatched Multiboot2 / EFI boot entry configuration for '{}' under distro mode '{:?}'",
+                    "Dispatched Illumos Zones & Solaris SMF service manager for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "virtualization" => {
+            "bedrock_strata" => {
                 Ok(format!(
-                    "Dispatched MicroVM hypervisor / FreeBSD Jail bridge for '{}' under distro mode '{:?}'",
+                    "Dispatched Bedrock Linux strata filesystem fusion bridge for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "input" => {
+            "tails_amnesic" => {
                 Ok(format!(
-                    "Dispatched USB HID keyboard / gamepad event handling for '{}' under distro mode '{:?}'",
+                    "Dispatched Tails amnesic RAM purge & MAC address spoofing for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
-            "thermal" => {
+            "qubes_zen" => {
                 Ok(format!(
-                    "Dispatched thermal governor & fan speed profile control for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "syscall" => {
-                Ok(format!(
-                    "Dispatched multi-architecture ABI syscall translator for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "device" => {
-                Ok(format!(
-                    "Dispatched dynamic devfs device node symlink manager for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "crypto" => {
-                Ok(format!(
-                    "Dispatched PQC Dilithium / WireGuard cryptographic engine for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "ai" => {
-                Ok(format!(
-                    "Dispatched Sovereign AI-native copilot & task orchestrator for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "monitoring" => {
-                Ok(format!(
-                    "Dispatched Btop / Fastfetch hardware telemetry monitoring for '{}' under distro mode '{:?}'",
+                    "Dispatched Qubes OS compartmented VM isolation guard for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -957,7 +922,12 @@ impl SovereignUniversalDistroBridge {
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
             "i18n", "firewall", "compiler", "shell", "display", "printing",
-            "backup", "telemetry",
+            "backup", "telemetry", "kali_recon", "antix_runit", "zorin_chameleon",
+            "mint_cinnamon", "garuda_dracut", "cachy_bore", "parrot_anonsurf",
+            "parrot_apparmor", "parrot_forensics", "omarchy_quickshell", "omarchy_theme",
+            "omarchy_lua_reload", "omarchy_herdr_agent", "nixos_declarative", "void_runit",
+            "alpine_apk", "gentoo_portage", "freebsd_jails", "openbsd_pledge",
+            "dragonfly_hammer2", "illumos_zones", "bedrock_strata", "tails_amnesic", "qubes_zen",
         ];
 
         for sub in subsystems {
@@ -1065,7 +1035,7 @@ impl SovereignUniversalSubsystemMatrixEngine {
                 DistroSubsystemMode::LinuxGuix,
                 DistroSubsystemMode::LinuxParrot,
             ],
-            verified_subsystems_count: 32,
+            verified_subsystems_count: 56,
         }
     }
 
@@ -1091,7 +1061,13 @@ impl SovereignUniversalSubsystemMatrixEngine {
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai",
             "monitoring", "i18n", "firewall", "compiler", "shell",
-            "display", "printing", "backup", "telemetry",
+            "display", "printing", "backup", "telemetry", "kali_recon",
+            "antix_runit", "zorin_chameleon", "mint_cinnamon", "garuda_dracut",
+            "cachy_bore", "parrot_anonsurf", "parrot_apparmor", "parrot_forensics",
+            "omarchy_quickshell", "omarchy_theme", "omarchy_lua_reload", "omarchy_herdr_agent",
+            "nixos_declarative", "void_runit", "alpine_apk", "gentoo_portage",
+            "freebsd_jails", "openbsd_pledge", "dragonfly_hammer2", "illumos_zones",
+            "bedrock_strata", "tails_amnesic", "qubes_zen",
         ];
 
         let mut results = Vec::new();
@@ -2444,7 +2420,12 @@ mod cross_subsystem_tests {
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
             "i18n", "firewall", "compiler", "shell", "display", "printing",
-            "backup", "telemetry",
+            "backup", "telemetry", "kali_recon", "antix_runit", "zorin_chameleon",
+            "mint_cinnamon", "garuda_dracut", "cachy_bore", "parrot_anonsurf",
+            "parrot_apparmor", "parrot_forensics", "omarchy_quickshell", "omarchy_theme",
+            "omarchy_lua_reload", "omarchy_herdr_agent", "nixos_declarative", "void_runit",
+            "alpine_apk", "gentoo_portage", "freebsd_jails", "openbsd_pledge",
+            "dragonfly_hammer2", "illumos_zones", "bedrock_strata", "tails_amnesic", "qubes_zen",
         ];
 
         for m in modes {
@@ -2491,13 +2472,13 @@ mod cross_subsystem_tests {
     fn test_sovereign_universal_subsystem_matrix_engine() {
         let mut matrix_engine = SovereignUniversalSubsystemMatrixEngine::new(DistroSubsystemMode::LinuxArch);
 
-        // Test full matrix verification across all 22 distro modes x 32 subsystem categories
+        // Test full matrix verification across all 22 distro modes x 56 subsystem categories
         let verified_count = matrix_engine.run_full_subsystem_matrix_verification().unwrap();
-        assert_eq!(verified_count, 22 * 32);
+        assert_eq!(verified_count, 22 * 56);
 
-        // Test cross-orchestration of all 32 subsystems
+        // Test cross-orchestration of all 56 subsystems
         let results = matrix_engine.cross_orchestrate_all_subsystems("universal_test_payload").unwrap();
-        assert_eq!(results.len(), 32);
+        assert_eq!(results.len(), 56);
         for res in results {
             assert!(!res.is_empty());
         }
