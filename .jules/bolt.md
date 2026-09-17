@@ -53,3 +53,7 @@
 ## 2026-09-14 - Single-Pass Slice Joining vs Format Macro Allocations
 **Learning:** Formatting slice arguments via `format!("{}/{}", args, " ")` incurs dynamic formatting macro overhead and fails type trait bounds for slice types. Replacing manual format macros with `args.join(" ")` allocates a single heap buffer pre-sized to the combined length of all elements, eliminating intermediate string copies.
 **Action:** Always prefer `slice.join(" ")` over `format!` macros when concatenating collections of string slices.
+
+## 2026-09-15 - Zero-Allocation Slice Delegation & Safe Power-of-Two Indexing
+**Learning:** Delegating string tokenization directly to zero-allocation reference tokenizers (`tokenize_whitespace_ref`) eliminates intermediate `Vec<u8>` heap allocations and byte-by-byte pushes. Furthermore, when substituting bitwise AND masks (`& (cap - 1)`) for CPU modulo division (`% cap`), checking `cap.is_power_of_two()` ensures safety against arbitrary capacity configurations and zero capacities without risking infinite probing loops or arithmetic overflow.
+**Action:** Delegate owned string tokenization to borrowing slice tokenizers, and guard power-of-two bitwise masks with `cap.is_power_of_two()` fallbacks.
