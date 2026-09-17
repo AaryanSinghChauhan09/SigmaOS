@@ -43,6 +43,7 @@ pub enum ValidationError {
 /// - Non-empty
 /// - ≤ `MAX_PATH_LEN` bytes
 /// - No embedded NUL bytes
+/// - No ASCII control characters (`b < 32` or `b == 127`) to prevent log/terminal injection
 /// - No `..` path-traversal component
 pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
     let len = path.len();
@@ -53,13 +54,16 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::TooLong);
     }
 
-    // Single-pass byte slice scan combining NUL-byte injection checks and
-    // path-traversal (`..`) detection without multiple iterations.
+    // Single-pass byte slice scan combining NUL-byte injection checks,
+    // ASCII control character rejection, and path-traversal (`..`) detection.
     let mut i = 0usize;
     while i < len {
         let b = path[i];
         if b == 0 {
             return Err(ValidationError::NullByte);
+        }
+        if b < 32 || b == 127 {
+            return Err(ValidationError::InvalidChars);
         }
         if b == b'.' && i + 1 < len && path[i + 1] == b'.' {
             let before_ok = i == 0 || matches!(path[i - 1], b'/' | b'\\' | b':');
@@ -74,6 +78,14 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
 }
 
 /// Validate a filename (single component — no directory separators).
+///
+/// Rules:
+/// - Non-empty, ≤ `MAX_FILENAME_LEN` bytes
+/// - Not `.` or `..`
+/// - No directory separators (`/` or `\`)
+/// - No embedded NUL bytes (returns `NullByte`)
+/// - No ASCII control characters (`b < 32` or `b == 127`) to prevent log injection (CWE-117),
+///   terminal escape sequence hijacking (CWE-150), and shell script line-splitting.
 pub fn validate_filename(name: &[u8]) -> Result<(), ValidationError> {
     if name.is_empty() {
         return Err(ValidationError::EmptyInput);
@@ -85,7 +97,10 @@ pub fn validate_filename(name: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::PathTraversal);
     }
     for &b in name {
-        if b == 0 || b == b'/' || b == b'\\' {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+        if b < 32 || b == 127 || b == b'/' || b == b'\\' {
             return Err(ValidationError::InvalidChars);
         }
     }
@@ -425,9 +440,25 @@ mod tests {
         assert_eq!(validate_filename(b".."), Err(ValidationError::PathTraversal));
         assert_eq!(validate_filename(b"dir/file"), Err(ValidationError::InvalidChars));
         assert_eq!(validate_filename(b"dir\\file"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_filename(&[b'a', 0, b'b']), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(&[b'a', 0, b'b']), Err(ValidationError::NullByte));
+
+        // ASCII control character injection prevention (prevents log injection and ANSI escape sequence hijacking)
+        assert_eq!(validate_filename(b"file\nname.txt"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"file\rname.txt"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"file\tname.txt"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"file\x1b[31m.txt"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"file\x7f.txt"), Err(ValidationError::InvalidChars));
+
         let long_name = [b'a'; MAX_FILENAME_LEN + 1];
         assert_eq!(validate_filename(&long_name), Err(ValidationError::TooLong));
+    }
+
+    #[test]
+    fn test_path_control_char_rejected() {
+        assert_eq!(validate_path(b"/usr/bin/foo\nbar"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_path(b"/var/log/app\r.log"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_path(b"/etc/config\x1b[31m"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_path(b"/tmp/file\x7f"), Err(ValidationError::InvalidChars));
     }
 
     #[test]
