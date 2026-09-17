@@ -135,7 +135,7 @@ jobs:
           done
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4.3.6
+        uses: actions/upload-artifact@42116035029a8a76b91c1a017997a31b67f13f17 # v4.6.1
         if: always()
         with:
           name: "kernel-${{ matrix.arch }}-${{ matrix.profile }}"
@@ -169,7 +169,7 @@ jobs:
             qemu-utils ovmf
 
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@cc203385981b70ca67e34cd23281d0288b68ea5f # v4.1.9
         with:
           name: "kernel-${{ matrix.arch }}-release"
           path: boot-artifacts/

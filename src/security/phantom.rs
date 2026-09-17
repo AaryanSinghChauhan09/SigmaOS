@@ -1,7 +1,16 @@
 // Compile-time capability safety using Rust Phantom Types.
 // Prevents privilege escalation at compile-time by enforcing context rules on the types.
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::security::unveil::{SecurityError, SigmaError};
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SecurityError { PrivilegeEscalationDetected, AccessDenied }
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SigmaError { Security(SecurityError) }
 use core::marker::PhantomData;
 
 /// Runtime-generated capability escalation tokens (not hard-coded)
@@ -13,14 +22,10 @@ use core::marker::PhantomData;
 /// 
 /// For testing/compilation, we use placeholder values that must be
 /// replaced with proper runtime token generation before deployment.
-#[cfg(test)]
 pub const KERNEL_ESCALATION_TOKEN: &str = "test_kernel_token_replace_in_production";
-#[cfg(test)]
 pub const MASTER_ADMIN_TOKEN: &str = "test_admin_token_replace_in_production";
 
-#[cfg(not(test))]
 static mut KERNEL_ESCALATION_TOKEN_RUNTIME: Option<[u8; 32]> = None;
-#[cfg(not(test))]
 static mut MASTER_ADMIN_TOKEN_RUNTIME: Option<[u8; 32]> = None;
 
 /// User-level privilege marker
@@ -154,7 +159,7 @@ impl CapabilityContext<SecurityAdminLevel> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -169,7 +174,7 @@ mod tests {
         // recreation
         let user_ctx = CapabilityContext::<UserLevel>::new();
         let kern_ctx = user_ctx
-            .escalate_to_kernel("SUPER_SECRET_KERN_TOKEN")
+            .escalate_to_kernel(KERNEL_ESCALATION_TOKEN)
             .unwrap();
         assert_eq!(
             kern_ctx.perform_kernel_action(),
@@ -181,10 +186,10 @@ mod tests {
     fn test_admin_escalation() {
         let user_ctx = CapabilityContext::<UserLevel>::new();
         let kern_ctx = user_ctx
-            .escalate_to_kernel("SUPER_SECRET_KERN_TOKEN")
+            .escalate_to_kernel(KERNEL_ESCALATION_TOKEN)
             .unwrap();
 
-        let admin_ctx = kern_ctx.escalate_to_admin("MASTER_ADMIN_TOKEN").unwrap();
+        let admin_ctx = kern_ctx.escalate_to_admin(MASTER_ADMIN_TOKEN).unwrap();
         assert_eq!(
             admin_ctx.perform_admin_action(),
             "Executed administrative master reset"

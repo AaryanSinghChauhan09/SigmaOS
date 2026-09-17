@@ -25,6 +25,14 @@ use std::string::String;
 #[cfg(test)]
 use std::vec::Vec;
 
+/// Runit Stage
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunitStage {
+    Stage1,
+    Stage2,
+    Stage3,
+}
+
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RunitServiceStatus {
@@ -44,6 +52,7 @@ pub struct RunitService {
     pub auto_restart: bool,
     pub health_check_failures: u32,
     pub max_allowed_failures: u32,
+    pub dependencies: Vec<String>,
 }
 
 impl RunitService {
@@ -55,6 +64,7 @@ impl RunitService {
             auto_restart,
             health_check_failures: 0,
             max_allowed_failures,
+            dependencies: Vec::new(),
         }
     }
 
@@ -93,20 +103,42 @@ impl RunitService {
 }
 
 /// Runit Service Supervisor Engine
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct RunitSupervisor {
     pub services: BTreeMap<String, RunitService>,
+    pub stage: RunitStage,
+    pub current_stage_num: u8,
+}
+
+impl Default for RunitSupervisor {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
             services: BTreeMap::new(),
+            stage: RunitStage::Stage1,
+            current_stage_num: 1,
         }
     }
 
     pub fn register_service(&mut self, service: RunitService) {
         self.services.insert(service.name.clone(), service);
+    }
+
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.start()
+        } else {
+            false
+        }
+    }
+
+    fn can_stop_service(&self, _name: &str, _stopped: &[String]) -> bool {
+        true
     }
 
     /// Start stage 1 (one-time initialization)

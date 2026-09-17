@@ -110,15 +110,7 @@ pub struct PacmanPkgbuild {
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-/// Debian-style package priority levels (DFSG and APT standard)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PackagePriority {
-    Optional = 0,
-    Standard = 1,
-    Important = 2,
-    Required = 3,
-    Essential = 4, // Systems block removing these (e.g. init, libc, kernel)
-}
+pub use crate::package::PackagePriority;
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -206,6 +198,8 @@ impl UniversalPackageAdapter {
     pub fn parse_apt_control(&self, text: &str) -> Result<AptDebManifest, &'static str> {
         let mut package = String::new();
         let mut version = String::new();
+        let mut architecture = String::from("all");
+        let mut maintainer = String::from("unknown");
         let mut depends = Vec::new();
         let mut description = String::new();
         let mut priority = PackagePriority::Optional;
@@ -221,6 +215,8 @@ impl UniversalPackageAdapter {
                 match key {
                     "Package" => package = val.to_string(),
                     "Version" => version = val.to_string(),
+                    "Architecture" => architecture = val.to_string(),
+                    "Maintainer" => maintainer = val.to_string(),
                     "Depends" => {
                         for dep in val.split(',') {
                             depends.push(dep.trim().to_string());
@@ -248,6 +244,8 @@ impl UniversalPackageAdapter {
         Ok(AptDebManifest {
             package,
             version,
+            architecture,
+            maintainer,
             depends,
             description,
             priority,

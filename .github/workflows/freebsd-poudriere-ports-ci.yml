@@ -1,5 +1,8 @@
 name: FreeBSD Poudriere Ports & Jails CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main", "master", "jules-*" ]

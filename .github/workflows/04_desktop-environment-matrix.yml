@@ -1,5 +1,8 @@
 name: Desktop Environment Matrix
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main ]

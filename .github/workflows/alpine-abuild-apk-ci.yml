@@ -1,5 +1,8 @@
 name: Alpine Abuild & APK Security CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main", "master", "jules-*" ]
