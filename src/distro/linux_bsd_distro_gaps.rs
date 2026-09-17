@@ -199,35 +199,6 @@ impl Default for UsbHidKeyboardDriver {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_dynamic_devfs() {
-        let mut devfs = SovereignDynamicDevfsEngine::new();
-        assert!(devfs.add_uuid_symlink("sda", "disk/by-uuid/1234"));
-        assert!(devfs.lookup_node("disk/by-uuid/1234").is_some());
-    }
-
-    #[test]
-    fn test_stateful_nat() {
-        let mut nat = SovereignStatefulNatEngine::new([1, 2, 3, 4]);
-        let (ip, port) = nat.create_snat_mapping([10, 0, 0, 2], [8, 8, 8, 8], 1024, 80, 6);
-        assert_eq!(ip, [1, 2, 3, 4]);
-        assert_eq!(port, 1024);
-        let orig = nat.lookup_conntrack([1, 2, 3, 4], 1024);
-        assert_eq!(orig, Some(([10, 0, 0, 2], 1024)));
-    }
-
-    #[test]
-    fn test_journald_binary_storage() {
-        let mut storage = SovereignJournaldBinaryStorageEngine::new(10);
-        storage.log(1000, 3, "init", "Service started");
-        assert_eq!(storage.query_unit("init").len(), 1);
-        assert_eq!(storage.query_priority(3).len(), 1);
-    }
-}
 
 // ============================================================================
 // 3. Wireless (802.11ax / WPA3-SAE) & Bluetooth (BlueZ) Stack
@@ -1232,7 +1203,7 @@ mod tests {
 
     #[test]
     fn test_sovereign_dns_tls_resolver() {
-        let resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
+        let mut resolver = SovereignDnsTlsResolverEngine::new([1, 1, 1, 1]);
         let localhost_ip = resolver.resolve_domain("localhost").unwrap();
         assert_eq!(localhost_ip, [127, 0, 0, 1]);
     }

@@ -108,6 +108,7 @@ jobs:
 
       - name: Install cross-compilation tools
         run: |
+          rustup target add ${{ matrix.target }}
           cargo install cross
 
       - name: Build for ${{ matrix.arch }}

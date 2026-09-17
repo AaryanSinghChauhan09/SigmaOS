@@ -32,4 +32,5 @@ jobs:
 
       - name: Run Cross-Compilation Check
         run: |
+          rustup target add ${{ matrix.target }}
           cargo check --target ${{ matrix.target }} --no-default-features
