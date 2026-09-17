@@ -680,31 +680,6 @@ impl Default for SovereignJournaldBinaryStorageEngine {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct DnsRecordEntry {
-    pub domain: String,
-    pub ip_address: [u8; 4],
-}
-
-pub struct SovereignDnsTlsResolverEngine {
-    pub primary_dns_ip: [u8; 4],
-    pub records: Vec<DnsRecordEntry>,
-}
-
-impl SovereignDnsTlsResolverEngine {
-    pub fn new(primary_dns_ip: [u8; 4]) -> Self {
-        let mut records = Vec::new();
-        records.push(DnsRecordEntry {
-            domain: "localhost".to_string(),
-            ip_address: [127, 0, 0, 1],
-        });
-        Self { primary_dns_ip, records }
-    }
-
-    pub fn resolve_domain(&self, domain: &str) -> Option<[u8; 4]> {
-        self.records.iter().find(|r| r.domain == domain).map(|r| r.ip_address)
-    }
-}
 
 impl Default for DemandPagingSwapEngine {
     fn default() -> Self {
@@ -712,90 +687,6 @@ impl Default for DemandPagingSwapEngine {
     }
 }
 
-// ============================================================================
-// 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceNodeType {
-    Block,
-    Character,
-}
-
-#[derive(Debug, Clone)]
-pub struct DeviceNodeEntry {
-    pub name: &'static str,
-    pub node_type: DeviceNodeType,
-    pub major: u32,
-    pub minor: u32,
-    pub owner_uid: u32,
-    pub group_gid: u32,
-    pub mode_octal: u16,
-    pub symlink_paths: Vec<&'static str>,
-}
-
-#[derive(Debug)]
-pub struct SovereignDynamicDevfsEngine {
-    pub devices: Vec<DeviceNodeEntry>,
-}
-
-impl SovereignDynamicDevfsEngine {
-    pub fn new() -> Self {
-        let mut devfs = Self {
-            devices: Vec::new(),
-        };
-
-        // Populate default device nodes
-        devfs.create_node("null", DeviceNodeType::Character, 1, 3, 0, 0, 0o666);
-        devfs.create_node("zero", DeviceNodeType::Character, 1, 5, 0, 0, 0o666);
-        devfs.create_node("sda", DeviceNodeType::Block, 8, 0, 0, 6, 0o660);
-
-        devfs
-    }
-
-    pub fn create_node(
-        &mut self,
-        name: &'static str,
-        node_type: DeviceNodeType,
-        major: u32,
-        minor: u32,
-        owner_uid: u32,
-        group_gid: u32,
-        mode_octal: u16,
-    ) {
-        self.devices.push(DeviceNodeEntry {
-            name,
-            node_type,
-            major,
-            minor,
-            owner_uid,
-            group_gid,
-            mode_octal,
-            symlink_paths: Vec::new(),
-        });
-    }
-
-    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &'static str) -> bool {
-        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink);
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
-        self.devices
-            .iter()
-            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| *s == name))
-    }
-}
-
-impl Default for SovereignDynamicDevfsEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 // ============================================================================
 // 9. Stateful NAT & Connection Tracking Engine (OpenBSD PF / Linux conntrack)
@@ -1060,52 +951,6 @@ impl Default for SovereignMasterDistroEcosystemEngine {
     }
 }
 
-// ============================================================================
-// 10. Structured Binary Journal Storage Engine (systemd-journald / syslogd)
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_unix_epoch: u64,
-    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
-    pub unit_name: &'static str,
-    pub message: &'static str,
-}
-
-#[derive(Debug)]
-pub struct SovereignJournaldBinaryStorageEngine {
-    pub logs: Vec<JournaldLogRecord>,
-    pub max_logs_capacity: usize,
-}
-
-impl SovereignJournaldBinaryStorageEngine {
-    pub fn new(capacity: usize) -> Self {
-        Self {
-            logs: Vec::new(),
-            max_logs_capacity: capacity,
-        }
-    }
-
-    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
-        if self.logs.len() >= self.max_logs_capacity {
-            self.logs.remove(0); // Journal rotation
-        }
-        self.logs.push(JournaldLogRecord {
-            timestamp_unix_epoch: timestamp,
-            priority,
-            unit_name: unit,
-            message: msg.to_string(),
-        });
-    }
-
-    pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.unit_name == unit).collect()
-    }
-
-    pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.logs.iter().filter(|l| l.priority <= min_priority).collect()
-    }
-}
 
 // ============================================================================
 // Unit Tests

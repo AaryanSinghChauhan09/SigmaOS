@@ -1,5 +1,8 @@
 name: Arch Linux Namcap & AUR Security Audit CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main", "master", "jules-*" ]

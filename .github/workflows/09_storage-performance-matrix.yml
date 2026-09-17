@@ -1,5 +1,8 @@
 name: Storage & Performance Matrix
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main ]
@@ -55,6 +58,8 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
 
       - name: Install filesystem tools
         if: matrix.storage

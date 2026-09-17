@@ -5,8 +5,20 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
 
-
-
+fn escape_html(input: &str) -> String {
+    let mut escaped = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#x27;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
+}
 
 /// Document
 #[derive(Debug, Clone)]
@@ -192,7 +204,7 @@ impl OnlineWebFileEditorEngine {
 
     pub fn render_live_html_preview(&self, id: &str) -> String {
         if let Some(doc) = self.active_tabs.iter().find(|d| d.id == id) {
-            format!("<div class=\"sigma-web-editor-preview\">{}</div>", doc.content)
+            format!("<div class=\"sigma-web-editor-preview\">{}</div>", escape_html(&doc.content))
         } else {
             String::from("<div class=\"error\">No Document</div>")
         }
@@ -212,7 +224,7 @@ mod tests {
     #[test]
     fn test_online_web_file_editor() {
         let mut engine = OnlineWebFileEditorEngine::new();
-        let tab_id = engine.open_tab("/etc/sigma/config.conf", "SERVER_PORT=8080");
+        let tab_id = engine.open_tab("/etc/sigma/config.conf", "SERVER_PORT=8080 & <script>");
 
         assert_eq!(engine.active_tabs.len(), 1);
         assert_eq!(engine.selected_tab_id.as_deref(), Some(tab_id.as_str()));
@@ -221,7 +233,7 @@ mod tests {
         assert_eq!(versions, 1);
 
         let preview = engine.render_live_html_preview(&tab_id);
-        assert!(preview.contains("SERVER_PORT=8080"));
+        assert!(preview.contains("SERVER_PORT=8080 &amp; &lt;script&gt;"));
     }
 }
 
