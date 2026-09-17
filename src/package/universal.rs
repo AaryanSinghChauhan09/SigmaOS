@@ -2652,7 +2652,6 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
-            priority: PackagePriority::Optional,
         };
 
         let _pkgbuild = PacmanPkgbuild {
