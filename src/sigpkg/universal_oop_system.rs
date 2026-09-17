@@ -27,9 +27,6 @@ use std::vec::Vec;
 #[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(all(not(feature = "standalone_test"), test))]
-pub use crate::sigpkg::Version;
-
 use std::sync::Arc;
 
 #[cfg(feature = "standalone_test")]
@@ -47,7 +44,7 @@ impl core::fmt::Display for Version {
     }
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {
