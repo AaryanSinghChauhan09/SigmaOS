@@ -143,3 +143,6 @@ pub use crate::security::vulnerability::{
     ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
 };
 pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};
+
+// ─── Capability Monitor (pledge + unveil + Capsicum) ─────────────────────────
+pub mod capability_monitor;

@@ -137,3 +137,6 @@ pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, I
 pub mod sigma_version;
 pub mod sigma_kernel_autotuner_v2;
 pub mod xdp_engine_sovereign;
+
+// ─── Live Migration Engine (CRIU / QEMU inspired) ─────────────────────────────
+pub mod live_migration_engine;
