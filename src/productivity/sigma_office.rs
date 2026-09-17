@@ -924,7 +924,7 @@ impl SigmaOdfPackageEngine {
         let mut bytes = Vec::new();
         bytes.extend_from_slice(b"PK\x03\x04"); // Standard Zip Header
         bytes.extend_from_slice(b"mimetype");
-        let mime: &[u8] = match self.kind {
+        let _mime: &[u8] = match self.kind {
             OdfDocumentKind::TextOdt => b"application/vnd.oasis.opendocument.text",
             OdfDocumentKind::SpreadsheetOds => b"application/vnd.oasis.opendocument.spreadsheet",
             OdfDocumentKind::PresentationOdp => b"application/vnd.oasis.opendocument.presentation",

@@ -15,7 +15,6 @@
 use std::vec;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // SigmaOS Network Driver
 // Hardware abstraction for network interfaces

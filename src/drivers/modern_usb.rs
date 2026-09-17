@@ -1,6 +1,3 @@
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::format;
 // Modern USB 3.x xHCI (eXtensible Host Controller Interface) Driver
 // Demonstrates modern USB 3.0/3.1/3.2 SuperSpeed host controller architecture in SigmaOS
 

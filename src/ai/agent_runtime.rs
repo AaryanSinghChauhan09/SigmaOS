@@ -17,7 +17,7 @@ use alloc::vec;
 use alloc::format;
 use core::sync::atomic::{AtomicU64, Ordering};
 
-use crate::kernel::process::{ProcessId, ProcessState};
+use crate::kernel::process::ProcessId;
 
 #[derive(Debug, Clone)]
 pub struct LandlockV5Guard;

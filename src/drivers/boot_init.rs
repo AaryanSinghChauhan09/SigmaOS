@@ -16,8 +16,6 @@
 // SigmaOS UEFI GOP Framebuffer & ACPI / xHCI Boot Controller
 // Based on Roadmap Phase G: Kernel Boot elements
 
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use crate::security::capability::CapabilityToken;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// UEFI Graphics Output Protocol (GOP) Framebuffer Initialization

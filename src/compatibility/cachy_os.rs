@@ -744,8 +744,8 @@ mod tests {
         assert_eq!(km.active_kernel, CachyKernelVariant::LinuxCachyosSchedExt);
     }
 
-    use super::*;
-    use std::string::ToString;
+    
+    
 
     #[test]
     fn test_bore_scheduler_ticks() {

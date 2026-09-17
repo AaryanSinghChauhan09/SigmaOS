@@ -9,7 +9,6 @@
 // - Network packet classification
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
 
 /// Cgroup controller trait
 pub trait Controller: Send + Sync {
@@ -134,7 +133,7 @@ impl Controller for DeviceController {
         Ok(())
     }
 
-    fn update_setting(&mut self, key: &str, value: &str) -> Result<(), String> {
+    fn update_setting(&mut self, key: &str, _value: &str) -> Result<(), String> {
         match key {
             "allow" => {
                 // Parse device rule from value

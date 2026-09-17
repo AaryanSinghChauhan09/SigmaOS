@@ -1,4 +1,3 @@
-use core::mem;
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy

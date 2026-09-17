@@ -18,7 +18,7 @@
 
 // (no_std only applicable at crate root - removed)
 
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

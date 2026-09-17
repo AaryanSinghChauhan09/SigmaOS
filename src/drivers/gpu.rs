@@ -2,8 +2,6 @@ use std::vec;
 // SigmaOS GPU Driver
 // Hardware abstraction for graphics rendering with Vulkan/Mesa-parity pipeline models and self-healing recovery
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::security::capability::CapabilityToken;
 use std::string::String;
 use std::vec::Vec;
 

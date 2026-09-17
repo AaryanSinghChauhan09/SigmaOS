@@ -1,6 +1,5 @@
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
-use crate::security::capability::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {

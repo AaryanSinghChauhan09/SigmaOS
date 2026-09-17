@@ -8,7 +8,6 @@
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use std::boxed::Box;
 
 // =========================================================================
 // 1. Linux Evdev Subsystem (Multi-Touch, Force Feedback, Event Streaming)

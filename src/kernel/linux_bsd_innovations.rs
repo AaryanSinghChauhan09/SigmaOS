@@ -1,5 +1,4 @@
 
-use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -4572,7 +4571,7 @@ impl OpenSuseSnapperEngine {
 }
 
 mod linux_bsd_extra_tests {
-    use super::*;
+    
 
     #[test]
     fn test_linux_landlock_lsm_rules() {

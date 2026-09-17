@@ -5,7 +5,6 @@ use std::vec::Vec;
 // Implements Debian-style package management for SigmaOS
 // Inspired by Debian's APT for advanced package operations
 
-use crate::klib::collections::HashSet;
 
 /// APT error types
 #[derive(Debug, Clone)]

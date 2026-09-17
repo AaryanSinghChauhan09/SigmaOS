@@ -15,12 +15,8 @@
 
 use std::boxed::Box;
 use std::collections::VecDeque;
-use std::string::{String, ToString};
 use std::vec::Vec;
 
-/// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
-/// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// A network packet in the qdisc layer (simplified)
 #[derive(Debug, Clone)]

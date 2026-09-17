@@ -8,7 +8,7 @@ use std::vec;
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 use crate::compatibility::fedora_missing_components::FedoraPagureForgeEngine;
 
 
@@ -4440,7 +4440,7 @@ impl FedoraBadgesEngine {
         if !user_badges.contains(&badge_id.to_string()) {
             user_badges.push(badge_id.to_string());
         }
-        let badge_ids = user_badges.clone();
+        let _badge_ids = user_badges.clone();
 
         let badge_ids: Vec<String> = user_badges.clone();
         let total_points = badge_ids

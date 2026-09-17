@@ -524,7 +524,7 @@ mod tests {
         assert_eq!(reset, UndercoverDisguiseTheme::DefaultKali);
     }
 
-    use super::*;
+    
 
     #[test]
     fn test_pam_and_sudo_escalations() {

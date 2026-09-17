@@ -4,7 +4,6 @@ use std::vec;
 // Enhanced AUR Integration for SigmaOS
 // Inspired by Arch Linux AUR with modern security features
 
-use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;

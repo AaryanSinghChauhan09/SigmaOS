@@ -2,11 +2,10 @@
 // Conforms to zero-dependency, #![no_std] compliant OOP structures
 
 use core::cell::{Cell, RefCell};
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+use core::sync::atomic::AtomicBool;
 
 
 use std::boxed::Box;
-use std::string::String;
 use std::vec::Vec;
 use crate::kernel::architecture::CpuArchitectureClass;
 

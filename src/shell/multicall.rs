@@ -1,4 +1,3 @@
-use std::boxed::Box;
 // BusyBox-Style: Multi-Call `sigma-sh` Command Parser
 // Combining utilities into a single executable reduces binary overhead by up to 90%
 

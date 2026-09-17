@@ -17,8 +17,6 @@ pub use crate::sigpkg::universal_engine::PackageFormat;
 #[cfg(feature = "standalone_test")]
 pub use crate::universal_oop_system;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::sigpkg::universal_oop_system;
 
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -116,9 +114,7 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 
 pub trait PackageFormatAdapter {

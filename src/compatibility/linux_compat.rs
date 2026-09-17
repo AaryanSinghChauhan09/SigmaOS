@@ -834,7 +834,7 @@ mod tests {
         assert_eq!(comp_bytes, 2048);
         assert_eq!(zram.total_compressed_bytes, 2048);
     }
-    use super::*;
+    
 
     #[test]
     fn test_linux_compat_spec() {

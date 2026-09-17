@@ -5,7 +5,6 @@
 
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 use std::vec::Vec;
 use std::boxed::Box;
 

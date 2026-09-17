@@ -1,6 +1,4 @@
-use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // SigmaOS VESA Framebuffer Driver
 // Hardware abstraction for VESA BIOS extensions + PeripheralDevice OOP integration
 

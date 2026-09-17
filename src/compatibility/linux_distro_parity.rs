@@ -622,7 +622,7 @@ impl Default for LinuxCoreDumpFilterEngine {
 // ==========================================
 
 mod tests {
-    use super::*;
+    
 
     #[test]
     fn test_lsb_os_release_parser() {

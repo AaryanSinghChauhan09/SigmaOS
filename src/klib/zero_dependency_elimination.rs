@@ -6,7 +6,7 @@
 
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use std::string::{String, ToString};
+use std::string::String;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]

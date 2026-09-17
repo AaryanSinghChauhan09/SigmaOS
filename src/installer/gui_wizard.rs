@@ -1,7 +1,7 @@
 // SigmaOS Advanced GUI Installer Wizard
 // Calamares-inspired graphical installer wizard with dual-boot alongside partitioning
 
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 use std::vec;
 

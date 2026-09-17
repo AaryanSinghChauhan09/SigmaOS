@@ -1,6 +1,5 @@
 use std::string::String;
 use std::vec::Vec;
-use std::sync::Arc;
 
 use core::mem;
 /// Custom Process Management for SigmaOS

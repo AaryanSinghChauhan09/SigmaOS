@@ -11,16 +11,16 @@ use crate::accessibility::{
     AccessibilitySetting,
 };
 use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
+    ApplicationBinary, BinaryFormat, CompatibilityManager, TargetPlatform,
 };
-use crate::customization::{CustomizationEngine, Theme};
-use crate::dashboard::{DashboardWidget, MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
-use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
+use crate::customization::CustomizationEngine;
+use crate::dashboard::SystemMonitor;
+use crate::package::{UnifiedPackage, UniversalPackageManager};
 use crate::virtualization::{VirtualizationOrchestrator, VirtualizationTech, VirtualMachine, Container};
-use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
+use crate::resilience::SelfHealingModule;
 use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
-    ZshSyntaxHighlighter, UniversalShellCompatibilityEngine, ShellArithmeticEvaluator,
+    ZshSyntaxHighlighter,
 };
 use crate::shell::{
     HistoryExpansionEngine, JobControlManager,

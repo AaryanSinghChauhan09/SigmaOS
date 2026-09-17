@@ -16,7 +16,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::format;
 
-use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;

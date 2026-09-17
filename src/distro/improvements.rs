@@ -1398,7 +1398,7 @@ mod tests {
         assert!(emerge.emerge_world_rebuild().contains("3 atoms"));
     }
 
-    use super::*;
+    
 
     #[test]
     fn test_rolling_release_manager() {
