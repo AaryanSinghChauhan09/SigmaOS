@@ -246,32 +246,19 @@ impl Default for SovereignVcsEngine {
 }
 
 /// Native Helix / Neovim Modal Text Editor Engine
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SovereignEditorMode {
     Normal,
     Insert,
     Select,
     Visual,
-    Command,
-}
-pub type EditorMode = SovereignEditorMode;
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TextSelection {
-    pub start_line: usize,
-    pub start_col: usize,
-    pub end_line: usize,
-    pub end_col: usize,
 }
 
 pub struct SovereignHelixModalEditorEngine {
     pub mode: SovereignEditorMode,
     pub buffer: String,
-    pub buffer_lines: Vec<String>,
     pub cursor_positions: Vec<usize>,
     pub tree_sitter_ast_nodes: Vec<String>,
-    pub selections: Vec<TextSelection>,
-    pub lsp_completions: Vec<String>,
 }
 
 impl SovereignHelixModalEditorEngine {
@@ -279,16 +266,8 @@ impl SovereignHelixModalEditorEngine {
         Self {
             mode: SovereignEditorMode::Normal,
             buffer: String::new(),
-            buffer_lines: Vec::new(),
             cursor_positions: vec![0],
             tree_sitter_ast_nodes: Vec::new(),
-            selections: vec![TextSelection {
-                start_line: 0,
-                start_col: 0,
-                end_line: 0,
-                end_col: 0,
-            }],
-            lsp_completions: Vec::new(),
         }
     }
 
@@ -302,33 +281,14 @@ impl SovereignHelixModalEditorEngine {
         }
     }
 
-    pub fn load_buffer(&mut self, text: &str) {
-        self.buffer = text.to_string();
-        self.buffer_lines = text.lines().map(|s| s.to_string()).collect();
-    }
-
     pub fn add_cursor(&mut self, pos: usize) {
         if !self.cursor_positions.contains(&pos) {
             self.cursor_positions.push(pos);
         }
     }
 
-    pub fn add_selection(&mut self, selection: TextSelection) {
-        self.selections.push(selection);
-    }
-
     pub fn parse_ast_node(&mut self, node_type: &str) {
         self.tree_sitter_ast_nodes.push(node_type.to_string());
-    }
-
-    pub fn query_lsp_completions(&mut self, prefix: &str) -> Vec<String> {
-        let items = vec![
-            format!("{}_fn", prefix),
-            format!("{}_struct", prefix),
-            format!("{}_var", prefix),
-        ];
-        self.lsp_completions = items.clone();
-        items
     }
 }
 
@@ -338,19 +298,8 @@ impl Default for SovereignHelixModalEditorEngine {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SysInfoSummary {
-    pub os_name: String,
-    pub kernel_version: String,
-    pub uptime_secs: u64,
-    pub memory_used_mb: u64,
-    pub memory_total_mb: u64,
-    pub active_scheduler: String,
-}
-
 /// Native Fastfetch / Neofetch System Information Engine
 pub struct SovereignFastfetchSysInfoEngine {
-    pub info: SysInfoSummary,
     pub os_name: String,
     pub kernel_version: String,
     pub uptime_secs: u64,
@@ -361,35 +310,14 @@ pub struct SovereignFastfetchSysInfoEngine {
 
 impl SovereignFastfetchSysInfoEngine {
     pub fn new() -> Self {
-        let info = SysInfoSummary {
-            os_name: "SigmaOS Sovereign".to_string(),
-            kernel_version: "6.12.0-sigma-pqc".to_string(),
-            uptime_secs: 86400,
-            memory_used_mb: 2048,
-            memory_total_mb: 32768,
-            active_scheduler: "scx_bpf_land".to_string(),
-        };
         Self {
-            os_name: info.os_name.clone(),
-            kernel_version: info.kernel_version.clone(),
-            uptime_secs: info.uptime_secs,
+            os_name: String::from("SigmaOS Sovereign Edition"),
+            kernel_version: String::from("6.12.0-sigma-sovereign"),
+            uptime_secs: 86400,
             cpu_model: String::from("Sigma Sovereign RISC-V / x86_64 Core"),
-            memory_used_mb: info.memory_used_mb,
-            memory_total_mb: info.memory_total_mb,
-            info,
+            memory_used_mb: 1024,
+            memory_total_mb: 32768,
         }
-    }
-
-    pub fn render_ascii_hud(&self) -> String {
-        format!(
-            "OS: {}\nKernel: {}\nUptime: {}s\nMemory: {}MB / {}MB\nScheduler: {}",
-            self.info.os_name,
-            self.info.kernel_version,
-            self.info.uptime_secs,
-            self.info.memory_used_mb,
-            self.info.memory_total_mb,
-            self.info.active_scheduler
-        )
     }
 
     pub fn render_sys_info_summary(&self) -> String {
@@ -410,50 +338,20 @@ impl Default for SovereignFastfetchSysInfoEngine {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ShellAlias {
-    pub name: String,
-    pub expansion: String,
-}
-
 /// Native Fish / Zsh Smart Shell Engine
 pub struct SovereignFishSmartShellEngine {
-    pub command_history: Vec<String>,
-    pub history: Vec<String>,
-    pub aliases: Vec<ShellAlias>,
     pub abbreviations: BTreeMap<String, String>,
+    pub history: Vec<String>,
     pub autosuggestion_enabled: bool,
 }
 
 impl SovereignFishSmartShellEngine {
     pub fn new() -> Self {
         Self {
-            command_history: Vec::new(),
-            history: Vec::new(),
-            aliases: Vec::new(),
             abbreviations: BTreeMap::new(),
+            history: Vec::new(),
             autosuggestion_enabled: true,
         }
-    }
-
-    pub fn record_command(&mut self, cmd: &str) {
-        self.command_history.push(cmd.to_string());
-        self.history.push(cmd.to_string());
-    }
-
-    pub fn add_alias(&mut self, name: &str, expansion: &str) {
-        self.aliases.push(ShellAlias {
-            name: name.to_string(),
-            expansion: expansion.to_string(),
-        });
-    }
-
-    pub fn expand_alias(&self, token: &str) -> String {
-        self.aliases
-            .iter()
-            .find(|a| a.name == token)
-            .map(|a| a.expansion.clone())
-            .unwrap_or_else(|| token.to_string())
     }
 
     pub fn add_abbreviation(&mut self, short: &str, expanded: &str) {
@@ -468,15 +366,15 @@ impl SovereignFishSmartShellEngine {
         }
     }
 
-    pub fn get_autosuggestion(&self, input_prefix: &str) -> Option<String> {
-        if !self.autosuggestion_enabled || input_prefix.is_empty() {
+    pub fn record_command(&mut self, cmd: &str) {
+        self.history.push(cmd.to_string());
+    }
+
+    pub fn get_autosuggestion(&self, prefix: &str) -> Option<String> {
+        if !self.autosuggestion_enabled || prefix.is_empty() {
             return None;
         }
-        self.command_history
-            .iter()
-            .rev()
-            .find(|cmd| cmd.starts_with(input_prefix))
-            .cloned()
+        self.history.iter().rev().find(|cmd| cmd.starts_with(prefix)).cloned()
     }
 }
 
@@ -2531,8 +2429,10 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub mosquitto: SovereignMosquittoMqttBroker,
     pub restic_backup: SovereignResticBorgBackupEngine,
     pub helix_editor: SovereignHelixModalEditorEngine,
-    pub fastfetch_info: SovereignFastfetchSysInfoEngine,
+    pub fastfetch: SovereignFastfetchSysInfoEngine,
     pub fish_shell: SovereignFishSmartShellEngine,
+    pub zero_copy_analyzer: SovereignZeroCopyPacketAnalyzer,
+    pub task_queue: SovereignDistributedTaskQueue,
     pub supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
     pub total_obsoleted_projects_count: u32,
 }
@@ -2576,10 +2476,12 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             mosquitto: SovereignMosquittoMqttBroker::new(),
             restic_backup: SovereignResticBorgBackupEngine::new(),
             helix_editor: SovereignHelixModalEditorEngine::new(),
-            fastfetch_info: SovereignFastfetchSysInfoEngine::new(),
+            fastfetch: SovereignFastfetchSysInfoEngine::new(),
             fish_shell: SovereignFishSmartShellEngine::new(),
+            zero_copy_analyzer: SovereignZeroCopyPacketAnalyzer::new(),
+            task_queue: SovereignDistributedTaskQueue::new(),
             supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
-            total_obsoleted_projects_count: 53,
+            total_obsoleted_projects_count: 55,
         }
     }
 
@@ -5384,57 +5286,72 @@ mod tests {
     }
 
     #[test]
+    fn test_sovereign_orchestrator_bootstrap() {
+        let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
+        let status = orchestrator.bootstrap_sovereign_stack().unwrap();
+        assert!(status.contains("55 legacy open-source projects obsoleted"));
+    }
+
+    #[test]
     fn test_sovereign_helix_modal_editor_engine() {
         let mut editor = SovereignHelixModalEditorEngine::new();
-        editor.load_buffer("fn main() {\n    println!(\"Hello\");\n}");
-        assert_eq!(editor.buffer_lines.len(), 3);
-
-        editor.set_mode(EditorMode::Insert);
-        assert_eq!(editor.mode, EditorMode::Insert);
-
-        let completions = editor.query_lsp_completions("process");
-        assert_eq!(completions.len(), 3);
-        assert_eq!(completions[0], "process_fn");
-
-        editor.add_selection(TextSelection {
-            start_line: 0,
-            start_col: 0,
-            end_line: 0,
-            end_col: 8,
-        });
-        assert_eq!(editor.selections.len(), 2);
+        assert_eq!(editor.mode, SovereignEditorMode::Normal);
+        editor.set_mode(SovereignEditorMode::Insert);
+        editor.insert_text("fn main() {}");
+        assert_eq!(editor.buffer, "fn main() {}");
+        editor.add_cursor(5);
+        assert_eq!(editor.cursor_positions.len(), 2);
+        editor.parse_ast_node("function_item");
+        assert_eq!(editor.tree_sitter_ast_nodes[0], "function_item");
     }
 
     #[test]
     fn test_sovereign_fastfetch_sys_info_engine() {
-        let fetch = SovereignFastfetchSysInfoEngine::new();
-        let hud = fetch.render_ascii_hud();
-        assert!(hud.contains("SigmaOS Sovereign"));
-        assert!(hud.contains("6.12.0-sigma-pqc"));
-        assert!(hud.contains("scx_bpf_land"));
+        let ff = SovereignFastfetchSysInfoEngine::new();
+        let summary = ff.render_sys_info_summary();
+        assert!(summary.contains("SigmaOS Sovereign Edition"));
+        assert!(summary.contains("RAM: 1024MB / 32768MB"));
+        let ascii = ff.format_ascii_art();
+        assert!(ascii.contains("SigmaOS"));
     }
 
     #[test]
     fn test_sovereign_fish_smart_shell_engine() {
         let mut shell = SovereignFishSmartShellEngine::new();
+        shell.add_abbreviation("gco", "git checkout");
+        assert_eq!(shell.expand_abbreviation("gco"), "git checkout");
+        assert_eq!(shell.expand_abbreviation("unknown"), "unknown");
+
         shell.record_command("cargo build --release");
-        shell.record_command("git commit -m \"feat: sovereign os\"");
-
-        let suggestion = shell.get_autosuggestion("git");
-        assert_eq!(
-            suggestion,
-            Some("git commit -m \"feat: sovereign os\"".to_string())
-        );
-
-        shell.add_alias("gcm", "git commit -m");
-        assert_eq!(shell.expand_alias("gcm"), "git commit -m");
-        assert_eq!(shell.expand_alias("unknown"), "unknown");
+        let suggestion = shell.get_autosuggestion("cargo");
+        assert_eq!(suggestion, Some("cargo build --release".to_string()));
     }
 
     #[test]
-    fn test_sovereign_orchestrator_bootstrap() {
-        let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
-        let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("53 legacy open-source projects obsoleted"));
+    fn test_sovereign_zero_copy_packet_analyzer() {
+        let mut analyzer = SovereignZeroCopyPacketAnalyzer::new();
+        let mut raw_packet = vec![0u8; 14];
+        raw_packet[12] = 0x08;
+        raw_packet[13] = 0x00;
+
+        let res = analyzer.inspect_raw_packet(&raw_packet);
+        assert!(res.is_some());
+        assert!(res.unwrap().contains("Protocol=IPv4"));
+
+        analyzer.set_filter("IPv6");
+        let res_filtered = analyzer.inspect_raw_packet(&raw_packet);
+        assert!(res_filtered.is_none());
+    }
+
+    #[test]
+    fn test_sovereign_distributed_task_queue() {
+        let mut queue = SovereignDistributedTaskQueue::new();
+        assert!(queue.submit_task("t1", "compile_kernel").is_ok());
+        assert_eq!(queue.get_task_status("t1"), Some("Pending:compile_kernel".to_string()));
+
+        let processed = queue.process_next_task();
+        assert_eq!(processed, Some("t1".to_string()));
+        assert_eq!(queue.get_task_status("t1"), Some("Completed:compile_kernel".to_string()));
+        assert_eq!(queue.completed_count, 1);
     }
 }

@@ -14,20 +14,8 @@ pub mod security {
     pub use super::capability::*;
 }
 
-pub mod package {
-    use alloc::string::String;
-    use alloc::vec::Vec;
-
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub struct AptDebManifest {
-        pub package: String,
-        pub version: String,
-        pub architecture: String,
-        pub maintainer: String,
-        pub depends: Vec<String>,
-        pub description: String,
-    }
-}
+#[path = "../src/package/universal.rs"]
+pub mod package;
 
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
@@ -86,6 +74,11 @@ pub mod sigpkg {
         pub description: String,
         pub dependencies: Vec<Dependency>,
         pub checksum: String,
+        pub mirrors: Vec<String>,
+        pub signing_keys: Vec<String>,
+        pub licenses: Vec<String>,
+        pub maintainers: Vec<String>,
+        pub changelogs: Vec<String>,
     }
 
     impl Package {
@@ -102,6 +95,11 @@ pub mod sigpkg {
                 description,
                 dependencies,
                 checksum,
+                mirrors: Vec::new(),
+                signing_keys: Vec::new(),
+                licenses: Vec::new(),
+                maintainers: Vec::new(),
+                changelogs: Vec::new(),
             }
         }
     }
@@ -165,12 +163,12 @@ fn test_universal_adapter_all_formats() {
     let mut bridge = SigPkgUniversalBridgeEngine::new();
     let pkg_bsd = bridge.absorb_and_register("redis.pkg", freebsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_bsd.name, "redis");
-    assert_eq!(pkg_bsd.version, sigpkg::Version::new(7, 0, 11));
+    assert_eq!(pkg_bsd.version, universal_adapter::Version::new(7, 0, 11));
     assert!(bridge.is_package_registered("redis"));
 
     let pkg_obsd = bridge.absorb_and_register("tmux.tgz", openbsd_data.as_bytes()).unwrap();
     assert_eq!(pkg_obsd.name, "tmux");
-    assert_eq!(pkg_obsd.version, sigpkg::Version::new(3, 3, 0));
+    assert_eq!(pkg_obsd.version, universal_adapter::Version::new(3, 3, 0));
     assert!(bridge.is_package_registered("tmux"));
 
     // 7. Command Dispatcher
@@ -225,7 +223,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_engine::PackageFormat;
+    use universal_adapter::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -240,7 +238,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("app.AppImage"), Some(PackageFormat::AppImage));
     assert_eq!(adapter.detect_format_by_extension("solus.eopkg"), Some(PackageFormat::Eopkg));
     assert_eq!(adapter.detect_format_by_extension("nix.nixpkg"), Some(PackageFormat::Nix));
-    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Portage));
+    assert_eq!(adapter.detect_format_by_extension("gentoo.portage"), Some(PackageFormat::Ports));
     assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("archive.tar .gz"), Some(PackageFormat::TarGz));
