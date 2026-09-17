@@ -8,17 +8,11 @@
 
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-
-use std::collections::BTreeMap;
-use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// 1. NixOS-Style Declarative System Configuration & Generation Manager
 #[derive(Debug, Clone, PartialEq, Eq)]
