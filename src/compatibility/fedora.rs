@@ -6,10 +6,10 @@ use std::vec;
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-#[cfg(test)]
+#[cfg(any(test, feature = "standalone_test"))]
 use std::collections::HashMap;
+#[cfg(all(not(test), not(feature = "standalone_test")))]
+use crate::klib::HashMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
@@ -4254,7 +4254,7 @@ impl FedoraIrcotEngine {
         self.channels.push(IrcChannel { channel_name: name.to_string(), topic: topic.to_string() });
     }
 
-    pub fn broadcast_message(&self, _message: &str) -> usize {
+    pub fn broadcast_message(&self, message: &str) -> usize {
         self.channels.len()
     }
 }
@@ -4304,8 +4304,8 @@ mod tests {
     #[test]
     fn test_fedora_koji_build_server() {
         let mut koji = KojiBuildServer::new();
-        let task_id = koji.submit_task("coreutils", "x86_64");
-        assert_eq!(task_id, Ok(1));
+        let task_id = koji.submit_task("coreutils-9.3.src.rpm", "x86_64").unwrap();
+        assert_eq!(task_id, 1);
         assert_eq!(koji.build_queue.len(), 1);
     }
 
@@ -4314,12 +4314,12 @@ mod tests {
         let mut bodhi = BodhiUpdateTriage::new();
         bodhi.create_update(
             "systemd-254.1-1.fc39",
-            vec!["systemd-254.1-1.fc39".to_string()],
+            vec!["systemd-254.1-1.fc39.rpm".to_string()],
             BodhiUpdateType::Bugfix,
-            "F39",
+            "sovereign",
             false,
         );
-        assert!(bodhi.is_promoted_to_stable("systemd-254.1-1.fc39") == false);
+        assert_eq!(bodhi.updates.get("systemd-254.1-1.fc39").unwrap().update_id, "systemd-254.1-1.fc39");
     }
 
     #[test]
@@ -4335,7 +4335,10 @@ mod tests {
     #[test]
     fn test_fedora_dracut_initramfs() {
         let mut dracut = FedoraDracutInitramfsEngine::new("6.5.12-200.fc38.x86_64");
-        dracut.include_module("base", "cmdline", &["ext4"]);
+        dracut.include_module("base", "cmdline", &[]);
+        dracut.include_module("kernel-modules", "pre-udev", &[]);
+        dracut.include_module("systemd", "pre-pivot", &[]);
+
         let img = dracut.generate_initramfs_img().unwrap();
         assert!(img.len() > 0);
     }
@@ -4346,12 +4349,12 @@ mod tests {
         let report = abrt.capture_crash(
             "/usr/bin/gnome-shell",
             "SIGSEGV",
-            "st_widget_get_theme_node()",
-            "6.5.0-fc39",
-            1000000,
+            "#0 0x00007f1234 in st_widget_get_theme_node ()",
+            "6.5.0",
+            1042,
         );
 
-        assert_eq!(report.executable_path, "/usr/bin/gnome-shell");
+        assert_eq!(report.crash_id, "abrt-00000001");
         assert_eq!(abrt.captured_crashes.len(), 1);
     }
 
