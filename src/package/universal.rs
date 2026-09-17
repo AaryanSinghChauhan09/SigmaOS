@@ -2998,7 +2998,8 @@ impl AlpineApkPackageAdapter {
 mod alpine_apk_tests {
     use super::*;
 
-    pub fn test_all_package_format_strategies_and_adapters(&self) {
+    #[test]
+    pub fn test_all_package_format_strategies_and_adapters() {
         let formats = vec![
             PackageFormat::Deb,
             PackageFormat::Rpm,

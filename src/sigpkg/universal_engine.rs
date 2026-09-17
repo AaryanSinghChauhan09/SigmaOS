@@ -83,20 +83,68 @@ pub enum PackageFormat {
 
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { return Some(PackageFormat::Deb); }
-        if filename.ends_with(".rpm") { return Some(PackageFormat::Rpm); }
-        if filename.ends_with(".tar.gz") || filename.ends_with(".tgz") { return Some(PackageFormat::TarGz); }
-        if filename.ends_with(".tar.xz") { return Some(PackageFormat::TarXz); }
-        if filename.ends_with(".tar") { return Some(PackageFormat::Tar); }
-        if filename.ends_with(".snap") { return Some(PackageFormat::Snap); }
-        if filename.ends_with(".flatpak") { return Some(PackageFormat::Flatpak); }
-        if filename.ends_with(".appimage") || filename.ends_with(".AppImage") { return Some(PackageFormat::AppImage); }
-        if filename.ends_with(".apk") { return Some(PackageFormat::Apk); }
-        if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { return Some(PackageFormat::Pacman); }
-        if filename.ends_with(".dmg") { return Some(PackageFormat::Dmg); }
-        if filename.ends_with(".nix") { return Some(PackageFormat::Nix); }
-        if filename.ends_with(".ebuild") { return Some(PackageFormat::Ebuild); }
-        if filename.ends_with(".txz") { return Some(PackageFormat::Txz); }
+        let name = filename.to_lowercase();
+        let name = name.trim();
+        let normalized = name.replace(" ", "");
+
+        if normalized.ends_with(".air") { return Some(PackageFormat::Air); }
+        if normalized.ends_with(".bottle") { return Some(PackageFormat::Bottle); }
+        if normalized.ends_with(".ipa") { return Some(PackageFormat::Ipa); }
+        if normalized.ends_with(".ports") { return Some(PackageFormat::Ports); }
+        if normalized.ends_with(".aab") { return Some(PackageFormat::Aab); }
+        if normalized.ends_with(".eopkg") { return Some(PackageFormat::Eopkg); }
+        if normalized.ends_with(".openbsd.tgz") { return Some(PackageFormat::OpenBsdPkg); }
+        if normalized.ends_with(".pkg.tar.zst") || normalized.ends_with(".pkg.tar.xz") || normalized.ends_with(".pkg.tar.gz") { return Some(PackageFormat::Pacman); }
+        if normalized.ends_with(".ebuild") || normalized.ends_with(".portage") { return Some(PackageFormat::Portage); }
+        if normalized.ends_with(".deb") || normalized.ends_with(".udeb") { return Some(PackageFormat::Apt); }
+        if normalized.ends_with(".superdeb") { return Some(PackageFormat::Superdeb); }
+        if normalized.ends_with(".rpm") || normalized.ends_with(".drpm") { return Some(PackageFormat::Yum); }
+        if normalized.ends_with(".snap") { return Some(PackageFormat::Snap); }
+        if normalized.ends_with(".flatpak") { return Some(PackageFormat::Flatpak); }
+        if normalized.ends_with(".appimage") { return Some(PackageFormat::AppImage); }
+        if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") { return Some(PackageFormat::Sigma); }
+        if normalized.ends_with(".apk") { return Some(PackageFormat::Apk); }
+        if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") { return Some(PackageFormat::Nix); }
+        if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") { return Some(PackageFormat::TarGz); }
+        if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") { return Some(PackageFormat::TarXz); }
+        if normalized.ends_with(".tar") { return Some(PackageFormat::Tar); }
+        if normalized.ends_with(".xbps") { return Some(PackageFormat::Xbps); }
+        if normalized.ends_with(".zypper") { return Some(PackageFormat::Zypper); }
+        if normalized.ends_with(".guix") || normalized.ends_with(".scm") { return Some(PackageFormat::Guix); }
+        if normalized.ends_with(".moss") { return Some(PackageFormat::Moss); }
+        if normalized.ends_with(".hpkg") { return Some(PackageFormat::Hpkg); }
+        if normalized.ends_with(".tcz") { return Some(PackageFormat::Tcz); }
+        if normalized.ends_with(".gobo") { return Some(PackageFormat::Gobo); }
+        if normalized.ends_with(".commit") || normalized.ends_with(".ostree") { return Some(PackageFormat::Ostree); }
+        if normalized.ends_with(".pkgsrc") { return Some(PackageFormat::Pkgsrc); }
+        if normalized.ends_with(".sfs") { return Some(PackageFormat::Sfs); }
+        if normalized.ends_with(".puk") { return Some(PackageFormat::Puk); }
+        if normalized.ends_with(".dmg") { return Some(PackageFormat::Dmg); }
+        if normalized.ends_with(".cports") { return Some(PackageFormat::Cports); }
+        if normalized.ends_with(".dports") { return Some(PackageFormat::Dports); }
+        if normalized.ends_with(".slackbuild") { return Some(PackageFormat::SlackBuild); }
+        if normalized.ends_with(".crux") { return Some(PackageFormat::Crux); }
+        if normalized.ends_with(".stratum") { return Some(PackageFormat::Stratum); }
+        if normalized.ends_with(".ipk") { return Some(PackageFormat::Ipk); }
+        if normalized.ends_with(".opkg") { return Some(PackageFormat::Opkg); }
+        if normalized.ends_with(".p5p") { return Some(PackageFormat::SolarisIps); }
+        if normalized.ends_with(".nar") { return Some(PackageFormat::GuixNar); }
+        if normalized.ends_with(".whl") { return Some(PackageFormat::Wheel); }
+        if normalized.ends_with(".crate") { return Some(PackageFormat::Crate); }
+        if normalized.ends_with(".gem") { return Some(PackageFormat::Gem); }
+        if normalized.ends_with(".nupkg") { return Some(PackageFormat::Nupkg); }
+        if normalized.ends_with(".vcpkg") { return Some(PackageFormat::Vcpkg); }
+        if normalized.ends_with(".narinfo") { return Some(PackageFormat::NarInfo); }
+        if normalized.ends_with(".spack") { return Some(PackageFormat::Spack); }
+        if normalized.ends_with(".conan") { return Some(PackageFormat::Conan); }
+        if normalized.ends_with(".hap") { return Some(PackageFormat::Hap); }
+        if normalized.ends_with(".pisi") { return Some(PackageFormat::Pisi); }
+        if normalized.ends_with(".lzm") { return Some(PackageFormat::Lzm); }
+        if normalized == "pup" || normalized.ends_with(".pup") { return Some(PackageFormat::Pup); }
+        if normalized == "pet" || normalized.ends_with(".pet") { return Some(PackageFormat::Pet); }
+        if normalized == "pacman" || normalized.ends_with(".pacman") { return Some(PackageFormat::Pacman); }
+        if normalized.ends_with(".app") { return Some(PackageFormat::AppBundle); }
+        if normalized.ends_with(".pkg") { return Some(PackageFormat::Pkg); }
         None
     }
 }

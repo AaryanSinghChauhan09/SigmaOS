@@ -133,11 +133,8 @@ pub mod sigpkg {
     }
 }
 
-#[cfg(feature = "standalone_test")]
-use crate::sigpkg::*;
-
-#[cfg(feature = "standalone_test")]
-use crate::sigpkg::*;
+use sigpkg::*;
+use universal_adapter::UniversalDependencyMapper;
 
 #[test]
 fn test_universal_adapter_all_formats() {
