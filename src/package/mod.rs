@@ -46,6 +46,8 @@ pub mod spac;
 pub mod store;
 pub mod universal;
 pub mod updater;
+pub mod sovereign_distro_package_innovations;
+pub use sovereign_distro_package_innovations::*;
 pub mod sovereign_distro_package_matrix;
 pub use sovereign_distro_package_matrix::*;
 pub mod universal_package_innovations_suite;
