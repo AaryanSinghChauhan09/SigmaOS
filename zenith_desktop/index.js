@@ -45,7 +45,7 @@ export class SovereignDomSelector {
 
 export function initKeyboardNavigation() {
   const interactiveElements = SovereignDomSelector.selectAll(
-    '[role="button"], [tabindex="0"], [tab-index="0"]',
+    '[role="button"], [tab-index="0"]',
   );
 
   interactiveElements.forEach((element) => {
@@ -167,26 +167,18 @@ export function initHighContrastSupport() {
 }
 
 /**
- * Initializes Escape key listener to dismiss active modal overlays (#cmd-palette, #context-menu, #help-overlay).
+ * Dismisses open modal overlays (#cmd-palette, #context-menu, #help-overlay) when Escape key is pressed.
  */
 export function initEscapeKeyDismissal() {
-  if (typeof document === "undefined") return;
+  if (typeof window === "undefined" || typeof document === "undefined") return;
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" || event.key === "Esc") {
-      const cmdPalette = SovereignDomSelector.selectOne("#cmd-palette");
-      if (cmdPalette && cmdPalette.classList.contains("active")) {
-        cmdPalette.classList.remove("active");
-      }
-
-      const contextMenu = SovereignDomSelector.selectOne("#context-menu");
-      if (contextMenu && contextMenu.style.display !== "none") {
-        contextMenu.style.display = "none";
-      }
-
-      const helpOverlay = SovereignDomSelector.selectOne("#help-overlay");
-      if (helpOverlay && !helpOverlay.classList.contains("wizard-overlay--hidden")) {
-        helpOverlay.classList.add("wizard-overlay--hidden");
-      }
+    if (event.key === "Escape") {
+      const cmdPalette = document.getElementById("cmd-palette");
+      if (cmdPalette) cmdPalette.classList.remove("active");
+      const contextMenu = document.getElementById("context-menu");
+      if (contextMenu) contextMenu.style.display = "none";
+      const helpOverlay = document.getElementById("help-overlay");
+      if (helpOverlay) helpOverlay.classList.add("wizard-overlay--hidden");
     }
   });
 }
