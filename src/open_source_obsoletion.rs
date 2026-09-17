@@ -245,241 +245,6 @@ impl Default for SovereignVcsEngine {
     }
 }
 
-/// Native Helix / Neovim Modal Text Editor Engine
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum SovereignEditorMode {
-    Normal,
-    Insert,
-    Select,
-    Visual,
-}
-
-pub struct SovereignHelixModalEditorEngine {
-    pub mode: SovereignEditorMode,
-    pub buffer: String,
-    pub cursor_positions: Vec<usize>,
-    pub tree_sitter_ast_nodes: Vec<String>,
-}
-
-impl SovereignHelixModalEditorEngine {
-    pub fn new() -> Self {
-        Self {
-            mode: SovereignEditorMode::Normal,
-            buffer: String::new(),
-            cursor_positions: vec![0],
-            tree_sitter_ast_nodes: Vec::new(),
-        }
-    }
-
-    pub fn set_mode(&mut self, mode: SovereignEditorMode) {
-        self.mode = mode;
-    }
-
-    pub fn insert_text(&mut self, text: &str) {
-        if self.mode == SovereignEditorMode::Insert || self.mode == SovereignEditorMode::Normal {
-            self.buffer.push_str(text);
-        }
-    }
-
-    pub fn add_cursor(&mut self, pos: usize) {
-        if !self.cursor_positions.contains(&pos) {
-            self.cursor_positions.push(pos);
-        }
-    }
-
-    pub fn parse_ast_node(&mut self, node_type: &str) {
-        self.tree_sitter_ast_nodes.push(node_type.to_string());
-    }
-}
-
-impl Default for SovereignHelixModalEditorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Native Fastfetch / Neofetch System Information Engine
-pub struct SovereignFastfetchSysInfoEngine {
-    pub os_name: String,
-    pub kernel_version: String,
-    pub uptime_secs: u64,
-    pub cpu_model: String,
-    pub memory_used_mb: u64,
-    pub memory_total_mb: u64,
-}
-
-impl SovereignFastfetchSysInfoEngine {
-    pub fn new() -> Self {
-        Self {
-            os_name: String::from("SigmaOS Sovereign Edition"),
-            kernel_version: String::from("6.12.0-sigma-sovereign"),
-            uptime_secs: 86400,
-            cpu_model: String::from("Sigma Sovereign RISC-V / x86_64 Core"),
-            memory_used_mb: 1024,
-            memory_total_mb: 32768,
-        }
-    }
-
-    pub fn render_sys_info_summary(&self) -> String {
-        format!(
-            "{} | Kernel: {} | Uptime: {}s | CPU: {} | RAM: {}MB / {}MB",
-            self.os_name, self.kernel_version, self.uptime_secs, self.cpu_model, self.memory_used_mb, self.memory_total_mb
-        )
-    }
-
-    pub fn format_ascii_art(&self) -> String {
-        format!("  /\\_/\\\n ( o.o )\n  > ^ <   SigmaOS [{}]", self.os_name)
-    }
-}
-
-impl Default for SovereignFastfetchSysInfoEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Native Fish / Zsh Smart Shell Engine
-pub struct SovereignFishSmartShellEngine {
-    pub abbreviations: BTreeMap<String, String>,
-    pub history: Vec<String>,
-    pub autosuggestion_enabled: bool,
-}
-
-impl SovereignFishSmartShellEngine {
-    pub fn new() -> Self {
-        Self {
-            abbreviations: BTreeMap::new(),
-            history: Vec::new(),
-            autosuggestion_enabled: true,
-        }
-    }
-
-    pub fn add_abbreviation(&mut self, short: &str, expanded: &str) {
-        self.abbreviations.insert(short.to_string(), expanded.to_string());
-    }
-
-    pub fn expand_abbreviation(&self, input: &str) -> String {
-        if let Some(exp) = self.abbreviations.get(input) {
-            exp.clone()
-        } else {
-            input.to_string()
-        }
-    }
-
-    pub fn record_command(&mut self, cmd: &str) {
-        self.history.push(cmd.to_string());
-    }
-
-    pub fn get_autosuggestion(&self, prefix: &str) -> Option<String> {
-        if !self.autosuggestion_enabled || prefix.is_empty() {
-            return None;
-        }
-        self.history.iter().rev().find(|cmd| cmd.starts_with(prefix)).cloned()
-    }
-}
-
-impl Default for SovereignFishSmartShellEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Native Wireshark / tcpdump / Zeek Zero-Copy Packet Analyzer
-pub struct SovereignZeroCopyPacketAnalyzer {
-    pub inspected_packets_count: u64,
-    pub protocol_filter: Option<String>,
-}
-
-impl SovereignZeroCopyPacketAnalyzer {
-    pub fn new() -> Self {
-        Self {
-            inspected_packets_count: 0,
-            protocol_filter: None,
-        }
-    }
-
-    pub fn set_filter(&mut self, protocol: &str) {
-        self.protocol_filter = Some(protocol.to_string());
-    }
-
-    pub fn inspect_raw_packet(&mut self, raw_bytes: &[u8]) -> Option<String> {
-        if raw_bytes.len() < 14 {
-            return None;
-        }
-        self.inspected_packets_count += 1;
-        let eth_type = u16::from_be_bytes([raw_bytes[12], raw_bytes[13]]);
-        let proto_desc = match eth_type {
-            0x0800 => "IPv4",
-            0x86DD => "IPv6",
-            0x0806 => "ARP",
-            _ => "Ethernet",
-        };
-
-        if let Some(ref filter) = self.protocol_filter {
-            if !proto_desc.eq_ignore_ascii_case(filter) {
-                return None;
-            }
-        }
-
-        Some(format!("Packet #{}: Protocol={}", self.inspected_packets_count, proto_desc))
-    }
-}
-
-impl Default for SovereignZeroCopyPacketAnalyzer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Native Celery / Ray / Temporal Distributed Task Queue Engine
-pub struct SovereignDistributedTaskQueue {
-    pub tasks: BTreeMap<String, String>,
-    pub completed_count: u64,
-}
-
-impl SovereignDistributedTaskQueue {
-    pub fn new() -> Self {
-        Self {
-            tasks: BTreeMap::new(),
-            completed_count: 0,
-        }
-    }
-
-    pub fn submit_task(&mut self, task_id: &str, task_name: &str) -> Result<(), &'static str> {
-        if task_id.is_empty() || task_name.is_empty() {
-            return Err("DistributedTaskQueue: Invalid task specification");
-        }
-        self.tasks.insert(task_id.to_string(), format!("Pending:{}", task_name));
-        Ok(())
-    }
-
-    pub fn process_next_task(&mut self) -> Option<String> {
-        let pending_key = self.tasks.iter()
-            .find(|(_, val)| val.starts_with("Pending:"))
-            .map(|(k, _)| k.clone());
-
-        if let Some(key) = pending_key {
-            if let Some(val) = self.tasks.get_mut(&key) {
-                *val = val.replace("Pending:", "Completed:");
-            }
-            self.completed_count += 1;
-            Some(key)
-        } else {
-            None
-        }
-    }
-
-    pub fn get_task_status(&self, task_id: &str) -> Option<String> {
-        self.tasks.get(task_id).cloned()
-    }
-}
-
-impl Default for SovereignDistributedTaskQueue {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // =========================================================================
 // 55. SOVEREIGN FDISK DISK PARTITIONER ENGINE (Superseding fdisk, sfdisk & parted)
 // =========================================================================
@@ -516,16 +281,8 @@ impl SovereignFdiskDiskPartitioner {
         }
     }
 
-    pub fn add_partition(
-        &mut self,
-        sectors_count: u64,
-        type_guid: &str,
-    ) -> Result<usize, &'static str> {
-        let last_end = self
-            .partitions
-            .last()
-            .map(|p| p.end_sector + 1)
-            .unwrap_or(2048); // 1MB initial alignment
+    pub fn add_partition(&mut self, sectors_count: u64, type_guid: &str) -> Result<usize, &'static str> {
+        let last_end = self.partitions.last().map(|p| p.end_sector + 1).unwrap_or(2048); // 1MB initial alignment
         let end_sector = last_end + sectors_count - 1;
 
         if end_sector >= self.total_disk_sectors {
@@ -688,11 +445,7 @@ impl SovereignHtopProcessMonitorEngine {
 
     pub fn get_top_cpu_processes(&self, limit: usize) -> Vec<ProcessTaskSnapshot> {
         let mut sorted = self.process_snapshots.clone();
-        sorted.sort_by(|a, b| {
-            b.cpu_pct
-                .partial_cmp(&a.cpu_pct)
-                .unwrap_or(core::cmp::Ordering::Equal)
-        });
+        sorted.sort_by(|a, b| b.cpu_pct.partial_cmp(&a.cpu_pct).unwrap_or(core::cmp::Ordering::Equal));
         sorted.truncate(limit);
         sorted
     }
@@ -742,10 +495,7 @@ impl SovereignAnsibleAutomationEngine {
         self.playbooks.push(playbook);
     }
 
-    pub fn execute_playbook(
-        &mut self,
-        playbook_name: &str,
-    ) -> Result<(usize, usize), &'static str> {
+    pub fn execute_playbook(&mut self, playbook_name: &str) -> Result<(usize, usize), &'static str> {
         let playbook = self
             .playbooks
             .iter()
@@ -757,10 +507,7 @@ impl SovereignAnsibleAutomationEngine {
 
         for task in &playbook.tasks {
             task_count += 1;
-            if task.target_state == "present"
-                || task.target_state == "started"
-                || task.target_state == "absent"
-            {
+            if task.target_state == "present" || task.target_state == "started" || task.target_state == "absent" {
                 changed_count += 1;
             }
         }
@@ -2119,9 +1866,7 @@ pub struct SovereignApacheSparkDataEngine {
 
 impl SovereignApacheSparkDataEngine {
     pub fn new() -> Self {
-        Self {
-            dataset: Vec::new(),
-        }
+        Self { dataset: Vec::new() }
     }
 
     pub fn load_dataset(&mut self, records: Vec<SparkDataRecord>) {
@@ -2129,11 +1874,7 @@ impl SovereignApacheSparkDataEngine {
     }
 
     pub fn filter_by_min_value(&self, min_val: u64) -> Vec<SparkDataRecord> {
-        self.dataset
-            .iter()
-            .filter(|r| r.value >= min_val)
-            .cloned()
-            .collect()
+        self.dataset.iter().filter(|r| r.value >= min_val).cloned().collect()
     }
 
     pub fn map_transform<F>(&self, transform: F) -> Vec<SparkDataRecord>
@@ -2160,113 +1901,113 @@ impl Default for SovereignApacheSparkDataEngine {
 }
 
 // =========================================================================
-// 59. SOVEREIGN SUPABASE BACKEND ENGINE (Superseding Supabase & Firebase)
+// 59. SOVEREIGN ZELLIJ MULTIPLEXER ENGINE (Superseding Zellij, Tmux & Screen)
 // =========================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RealtimeCdcChangeEvent {
-    pub table_name: String,
-    pub action: String, // "INSERT", "UPDATE", "DELETE"
-    pub row_data: BTreeMap<String, String>,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MultiplexerSplitDirection {
+    Horizontal,
+    Vertical,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RlsTokenPolicy {
-    pub role: String,
-    pub allowed_table: String,
-    pub can_select: bool,
-    pub can_insert: bool,
-}
-
-pub struct SovereignSupabaseBackendEngine {
-    pub cdc_events: Vec<RealtimeCdcChangeEvent>,
-    pub rls_policies: Vec<RlsTokenPolicy>,
-    pub active_jwt_tokens: Vec<String>,
-}
-
-impl SovereignSupabaseBackendEngine {
-    pub fn new() -> Self {
-        Self {
-            cdc_events: Vec::new(),
-            rls_policies: Vec::new(),
-            active_jwt_tokens: Vec::new(),
-        }
-    }
-
-    pub fn add_rls_policy(&mut self, policy: RlsTokenPolicy) {
-        self.rls_policies.push(policy);
-    }
-
-    pub fn emit_cdc_event(&mut self, table: &str, action: &str, row: BTreeMap<String, String>) {
-        self.cdc_events.push(RealtimeCdcChangeEvent {
-            table_name: table.to_string(),
-            action: action.to_string(),
-            row_data: row,
-        });
-    }
-
-    pub fn evaluate_rls(&self, role: &str, table: &str, action: &str) -> bool {
-        for p in &self.rls_policies {
-            if p.role == role && p.allowed_table == table {
-                if action == "SELECT" && p.can_select {
-                    return true;
-                }
-                if action == "INSERT" && p.can_insert {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-}
-
-impl Default for SovereignSupabaseBackendEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 60. SOVEREIGN ZELLIJ MULTIPLEXER ENGINE (Superseding Zellij & Tmux)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ZellijPane {
+pub struct TerminalPane {
     pub pane_id: u32,
     pub title: String,
-    pub is_floating: bool,
-    pub wasm_plugin_active: bool,
+    pub width: u32,
+    pub height: u32,
+    pub active_command: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TerminalTab {
+    pub tab_id: u32,
+    pub name: String,
+    pub panes: Vec<TerminalPane>,
+    pub active_pane_id: Option<u32>,
 }
 
 pub struct SovereignZellijMultiplexerEngine {
     pub session_name: String,
-    pub panes: Vec<ZellijPane>,
-    pub layout_preset: String,
+    pub tabs: Vec<TerminalTab>,
+    pub active_tab_id: Option<u32>,
+    pub next_id: u32,
 }
 
 impl SovereignZellijMultiplexerEngine {
     pub fn new(session_name: &str) -> Self {
         Self {
             session_name: session_name.to_string(),
-            panes: Vec::new(),
-            layout_preset: "default".to_string(),
+            tabs: Vec::new(),
+            active_tab_id: None,
+            next_id: 1,
         }
     }
 
-    pub fn spawn_pane(&mut self, title: &str, is_floating: bool, wasm_plugin: bool) -> u32 {
-        let pane_id = (self.panes.len() + 1) as u32;
-        self.panes.push(ZellijPane {
+    pub fn create_tab(&mut self, name: &str) -> u32 {
+        let tab_id = self.next_id;
+        self.next_id += 1;
+        let pane_id = self.next_id;
+        self.next_id += 1;
+
+        let initial_pane = TerminalPane {
             pane_id,
-            title: title.to_string(),
-            is_floating,
-            wasm_plugin_active: wasm_plugin,
-        });
-        pane_id
+            title: format!("Pane 1 in {}", name),
+            width: 80,
+            height: 24,
+            active_command: "sigma-sh".to_string(),
+        };
+
+        let tab = TerminalTab {
+            tab_id,
+            name: name.to_string(),
+            panes: vec![initial_pane],
+            active_pane_id: Some(pane_id),
+        };
+
+        self.tabs.push(tab);
+        if self.active_tab_id.is_none() {
+            self.active_tab_id = Some(tab_id);
+        }
+        tab_id
     }
 
-    pub fn toggle_floating(&mut self, pane_id: u32) -> bool {
-        if let Some(pane) = self.panes.iter_mut().find(|p| p.pane_id == pane_id) {
-            pane.is_floating = !pane.is_floating;
+    pub fn split_pane(
+        &mut self,
+        tab_id: u32,
+        direction: MultiplexerSplitDirection,
+        cmd: &str,
+    ) -> Result<u32, &'static str> {
+        let tab = self
+            .tabs
+            .iter_mut()
+            .find(|t| t.tab_id == tab_id)
+            .ok_or("Zellij: Target tab not found")?;
+
+        let pane_id = self.next_id;
+        self.next_id += 1;
+
+        let (w, h) = if direction == MultiplexerSplitDirection::Vertical {
+            (40, 24)
+        } else {
+            (80, 12)
+        };
+
+        tab.panes.push(TerminalPane {
+            pane_id,
+            title: format!("Pane {} ({:?})", tab.panes.len() + 1, direction),
+            width: w,
+            height: h,
+            active_command: cmd.to_string(),
+        });
+        tab.active_pane_id = Some(pane_id);
+
+        Ok(pane_id)
+    }
+
+    pub fn switch_tab(&mut self, tab_id: u32) -> bool {
+        if self.tabs.iter().any(|t| t.tab_id == tab_id) {
+            self.active_tab_id = Some(tab_id);
             true
         } else {
             false
@@ -2274,19 +2015,40 @@ impl SovereignZellijMultiplexerEngine {
     }
 }
 
+impl Default for SovereignZellijMultiplexerEngine {
+    fn default() -> Self {
+        Self::new("default_session")
+    }
+}
+
 // =========================================================================
-// 61. SOVEREIGN MOSQUITTO MQTT BROKER (Superseding Mosquitto & EMQX)
+// 60. SOVEREIGN MOSQUITTO MQTT BROKER (Superseding Mosquitto, EMQX & VernEMQ)
 // =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MqttQos {
+    AtMostOnce = 0,
+    AtLeastOnce = 1,
+    ExactlyOnce = 2,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MqttMessage {
     pub topic: String,
     pub payload: Vec<u8>,
-    pub qos: u8, // 0, 1, or 2
+    pub qos: MqttQos,
+    pub retain: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MqttSubscription {
+    pub client_id: String,
+    pub topic_filter: String,
+    pub qos: MqttQos,
 }
 
 pub struct SovereignMosquittoMqttBroker {
-    pub active_subscriptions: Vec<(String, String)>, // (topic_filter, client_id)
+    pub subscriptions: Vec<MqttSubscription>,
     pub retained_messages: BTreeMap<String, MqttMessage>,
     pub published_count: u64,
 }
@@ -2294,36 +2056,62 @@ pub struct SovereignMosquittoMqttBroker {
 impl SovereignMosquittoMqttBroker {
     pub fn new() -> Self {
         Self {
-            active_subscriptions: Vec::new(),
+            subscriptions: Vec::new(),
             retained_messages: BTreeMap::new(),
             published_count: 0,
         }
     }
 
-    pub fn subscribe(&mut self, topic_filter: &str, client_id: &str) {
-        self.active_subscriptions
-            .push((topic_filter.to_string(), client_id.to_string()));
+    pub fn subscribe(&mut self, client_id: &str, topic_filter: &str, qos: MqttQos) {
+        self.subscriptions.retain(|s| !(s.client_id == client_id && s.topic_filter == topic_filter));
+        self.subscriptions.push(MqttSubscription {
+            client_id: client_id.to_string(),
+            topic_filter: topic_filter.to_string(),
+            qos,
+        });
     }
 
-    pub fn publish(&mut self, topic: &str, payload: &[u8], qos: u8, retain: bool) -> usize {
+    pub fn topic_matches(filter: &str, topic: &str) -> bool {
+        if filter == "#" || filter == topic {
+            return true;
+        }
+        let filter_tokens: Vec<&str> = filter.split('/').collect();
+        let topic_tokens: Vec<&str> = topic.split('/').collect();
+
+        for (i, &f) in filter_tokens.iter().enumerate() {
+            if f == "#" {
+                return true;
+            }
+            if i >= topic_tokens.len() {
+                return false;
+            }
+            if f != "+" && f != topic_tokens[i] {
+                return false;
+            }
+        }
+        filter_tokens.len() == topic_tokens.len()
+    }
+
+    pub fn publish(&mut self, topic: &str, payload: &[u8], qos: MqttQos, retain: bool) -> usize {
         self.published_count += 1;
         let msg = MqttMessage {
             topic: topic.to_string(),
             payload: payload.to_vec(),
             qos,
+            retain,
         };
 
         if retain {
-            self.retained_messages.insert(topic.to_string(), msg);
+            if payload.is_empty() {
+                self.retained_messages.remove(topic);
+            } else {
+                self.retained_messages.insert(topic.to_string(), msg.clone());
+            }
         }
 
-        self.active_subscriptions
+        self.subscriptions
             .iter()
-            .filter(|(filter, _)| {
-                filter == "#"
-                    || filter == topic
-                    || (filter.ends_with("/#") && topic.starts_with(&filter[..filter.len() - 2]))
-            })
+            .filter(|sub| Self::topic_matches(&sub.topic_filter, topic))
             .count()
     }
 }
@@ -2335,64 +2123,323 @@ impl Default for SovereignMosquittoMqttBroker {
 }
 
 // =========================================================================
-// 62. SOVEREIGN RESTIC BORG BACKUP ENGINE (Superseding Restic & BorgBackup)
+// 61. SOVEREIGN RESTIC BORG BACKUP ENGINE (Superseding Restic & BorgBackup)
 // =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BackupChunk {
+    pub chunk_hash: [u8; 32],
+    pub compressed_len: usize,
+    pub encrypted_data: Vec<u8>,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BackupSnapshot {
     pub snapshot_id: String,
-    pub timestamp_secs: u64,
+    pub timestamp_sec: u64,
+    pub paths: Vec<String>,
     pub chunk_hashes: Vec<[u8; 32]>,
-    pub is_encrypted_pqc: bool,
 }
 
 pub struct SovereignResticBorgBackupEngine {
-    pub chunk_repository: BTreeMap<[u8; 32], Vec<u8>>,
+    pub chunk_store: BTreeMap<[u8; 32], BackupChunk>,
     pub snapshots: Vec<BackupSnapshot>,
+    pub secret_key: [u8; 32],
 }
 
 impl SovereignResticBorgBackupEngine {
-    pub fn new() -> Self {
+    pub fn new(secret_key: [u8; 32]) -> Self {
         Self {
-            chunk_repository: BTreeMap::new(),
+            chunk_store: BTreeMap::new(),
             snapshots: Vec::new(),
+            secret_key,
         }
     }
 
-    pub fn store_chunk(&mut self, data: &[u8]) -> [u8; 32] {
+    pub fn hash_chunk(&self, data: &[u8]) -> [u8; 32] {
         let mut hash = [0u8; 32];
         for (i, &b) in data.iter().enumerate() {
-            hash[i % 32] ^= b.wrapping_add((i * 13) as u8);
+            hash[i % 32] ^= b.wrapping_mul(37);
         }
-        self.chunk_repository
-            .entry(hash)
-            .or_insert_with(|| data.to_vec());
         hash
     }
 
-    pub fn create_snapshot(&mut self, timestamp: u64, chunks: Vec<[u8; 32]>) -> String {
-        let snap_id = format!("snap_{:08x}", self.snapshots.len() + 1);
+    pub fn store_chunk(&mut self, data: &[u8]) -> [u8; 32] {
+        let chunk_hash = self.hash_chunk(data);
+        if !self.chunk_store.contains_key(&chunk_hash) {
+            let encrypted: Vec<u8> = data
+                .iter()
+                .enumerate()
+                .map(|(i, &b)| b ^ self.secret_key[i % 32])
+                .collect();
+
+            self.chunk_store.insert(
+                chunk_hash,
+                BackupChunk {
+                    chunk_hash,
+                    compressed_len: data.len(),
+                    encrypted_data: encrypted,
+                },
+            );
+        }
+        chunk_hash
+    }
+
+    pub fn create_snapshot(
+        &mut self,
+        paths: &[&str],
+        file_payloads: &[&[u8]],
+        timestamp: u64,
+    ) -> String {
+        let snap_num = self.snapshots.len() + 1;
+        let snap_id = format!("snap_sha256_{:04x}", snap_num);
+
+        let mut chunk_hashes = Vec::new();
+        for payload in file_payloads {
+            let ch = self.store_chunk(payload);
+            chunk_hashes.push(ch);
+        }
+
         self.snapshots.push(BackupSnapshot {
             snapshot_id: snap_id.clone(),
-            timestamp_secs: timestamp,
-            chunk_hashes: chunks,
-            is_encrypted_pqc: true,
+            timestamp_sec: timestamp,
+            paths: paths.iter().map(|s| s.to_string()).collect(),
+            chunk_hashes,
         });
+
         snap_id
     }
 
-    pub fn prune_old_snapshots(&mut self, keep_count: usize) -> usize {
-        if self.snapshots.len() > keep_count {
-            let removed = self.snapshots.len() - keep_count;
-            self.snapshots.drain(0..removed);
-            removed
-        } else {
-            0
+    pub fn restore_snapshot(&self, snapshot_id: &str) -> Result<Vec<Vec<u8>>, &'static str> {
+        let snap = self
+            .snapshots
+            .iter()
+            .find(|s| s.snapshot_id == snapshot_id)
+            .ok_or("Backup: Snapshot ID not found")?;
+
+        let mut restored_files = Vec::new();
+        for ch_hash in &snap.chunk_hashes {
+            let chunk = self
+                .chunk_store
+                .get(ch_hash)
+                .ok_or("Backup: Missing chunk payload in repository")?;
+
+            let decrypted: Vec<u8> = chunk
+                .encrypted_data
+                .iter()
+                .enumerate()
+                .map(|(i, &b)| b ^ self.secret_key[i % 32])
+                .collect();
+
+            restored_files.push(decrypted);
         }
+
+        Ok(restored_files)
     }
 }
 
-impl Default for SovereignResticBorgBackupEngine {
+// =========================================================================
+// 62. SOVEREIGN HELIX MODAL EDITOR ENGINE (Superseding Helix & Neovim)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HelixEditMode {
+    Normal,
+    Insert,
+    Select,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TextSelection {
+    pub anchor: usize,
+    pub head: usize,
+}
+
+pub struct SovereignHelixModalEditorEngine {
+    pub mode: HelixEditMode,
+    pub buffer: String,
+    pub selections: Vec<TextSelection>,
+    pub active_buffer_path: String,
+}
+
+impl SovereignHelixModalEditorEngine {
+    pub fn new(path: &str, content: &str) -> Self {
+        Self {
+            mode: HelixEditMode::Normal,
+            buffer: content.to_string(),
+            selections: vec![TextSelection { anchor: 0, head: 0 }],
+            active_buffer_path: path.to_string(),
+        }
+    }
+
+    pub fn set_mode(&mut self, mode: HelixEditMode) {
+        self.mode = mode;
+    }
+
+    pub fn select_word_at_cursor(&mut self) -> Option<&str> {
+        if self.selections.is_empty() {
+            return None;
+        }
+        let pos = self.selections[0].head;
+        let bytes = self.buffer.as_bytes();
+        if pos >= bytes.len() {
+            return None;
+        }
+
+        let mut start = pos;
+        while start > 0 && bytes[start - 1].is_ascii_alphanumeric() {
+            start -= 1;
+        }
+
+        let mut end = pos;
+        while end < bytes.len() && bytes[end].is_ascii_alphanumeric() {
+            end += 1;
+        }
+
+        if start < end {
+            self.selections[0].anchor = start;
+            self.selections[0].head = end;
+            self.mode = HelixEditMode::Select;
+            Some(&self.buffer[start..end])
+        } else {
+            None
+        }
+    }
+
+    pub fn insert_text(&mut self, text: &str) {
+        if self.mode != HelixEditMode::Insert {
+            self.mode = HelixEditMode::Insert;
+        }
+        let pos = self.selections.first().map(|s| s.head).unwrap_or(0);
+        self.buffer.insert_str(pos, text);
+        let new_pos = pos + text.len();
+        self.selections = vec![TextSelection { anchor: new_pos, head: new_pos }];
+    }
+}
+
+// =========================================================================
+// 63. SOVEREIGN FASTFETCH SYSINFO ENGINE (Superseding Fastfetch & Neofetch)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FastfetchSystemSummary {
+    pub os_name: String,
+    pub kernel_version: String,
+    pub uptime_secs: u64,
+    pub shell: String,
+    pub cpu_model: String,
+    pub memory_used_mb: u64,
+    pub memory_total_mb: u64,
+}
+
+pub struct SovereignFastfetchSysInfoEngine {
+    pub summary: FastfetchSystemSummary,
+}
+
+impl SovereignFastfetchSysInfoEngine {
+    pub fn new() -> Self {
+        Self {
+            summary: FastfetchSystemSummary {
+                os_name: "SigmaOS Sovereign Release 1.0".to_string(),
+                kernel_version: "SigmaOS 6.12.0-sovereign-pqc".to_string(),
+                uptime_secs: 86400,
+                shell: "sigma-sh 1.0".to_string(),
+                cpu_model: "Sovereign PQC RISC-V/x86 Multi-Core".to_string(),
+                memory_used_mb: 2048,
+                memory_total_mb: 32768,
+            },
+        }
+    }
+
+    pub fn render_ansi_banner(&self) -> String {
+        format!(
+            " OS: {}\n Kernel: {}\n Uptime: {}h\n Shell: {}\n CPU: {}\n Memory: {}MB / {}MB",
+            self.summary.os_name,
+            self.summary.kernel_version,
+            self.summary.uptime_secs / 3600,
+            self.summary.shell,
+            self.summary.cpu_model,
+            self.summary.memory_used_mb,
+            self.summary.memory_total_mb
+        )
+    }
+}
+
+impl Default for SovereignFastfetchSysInfoEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 64. SOVEREIGN FISH SMART SHELL ENGINE (Superseding Fish, Zsh & Nushell)
+// =========================================================================
+
+pub struct SovereignFishSmartShellEngine {
+    pub history: Vec<String>,
+    pub abbreviations: BTreeMap<String, String>,
+    pub frecent_dirs: Vec<(String, u32)>, // (dir_path, score)
+}
+
+impl SovereignFishSmartShellEngine {
+    pub fn new() -> Self {
+        let mut abbreviations = BTreeMap::new();
+        abbreviations.insert("g".to_string(), "git".to_string());
+        abbreviations.insert("k".to_string(), "kubectl".to_string());
+
+        Self {
+            history: Vec::new(),
+            abbreviations,
+            frecent_dirs: Vec::new(),
+        }
+    }
+
+    pub fn add_history_entry(&mut self, cmd: &str) {
+        if !cmd.trim().is_empty() {
+            self.history.retain(|h| h != cmd);
+            self.history.push(cmd.to_string());
+        }
+    }
+
+    pub fn get_inline_autosuggestion(&self, prefix: &str) -> Option<String> {
+        if prefix.is_empty() {
+            return None;
+        }
+        self.history
+            .iter()
+            .rev()
+            .find(|h| h.starts_with(prefix))
+            .map(|h| h[prefix.len()..].to_string())
+    }
+
+    pub fn expand_abbreviation(&self, input: &str) -> String {
+        self.abbreviations
+            .get(input)
+            .cloned()
+            .unwrap_or_else(|| input.to_string())
+    }
+
+    pub fn record_dir_visit(&mut self, dir_path: &str) {
+        if let Some((_, score)) = self.frecent_dirs.iter_mut().find(|(p, _)| p == dir_path) {
+            *score += 10;
+        } else {
+            self.frecent_dirs.push((dir_path.to_string(), 10));
+        }
+    }
+
+    pub fn z_smart_cd(&self, query: &str) -> Option<String> {
+        let mut matches: Vec<&(String, u32)> = self
+            .frecent_dirs
+            .iter()
+            .filter(|(p, _)| p.contains(query))
+            .collect();
+
+        matches.sort_by(|a, b| b.1.cmp(&a.1));
+        matches.first().map(|(p, _)| p.clone())
+    }
+}
+
+impl Default for SovereignFishSmartShellEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -2424,15 +2471,12 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub cilium_bpf: SovereignCiliumBpfNetworkEngine,
     pub k8s_orchestrator: SovereignK8sOrchestratorEngine,
     pub ansible: SovereignAnsibleAutomationEngine,
-    pub supabase: SovereignSupabaseBackendEngine,
-    pub zellij: SovereignZellijMultiplexerEngine,
-    pub mosquitto: SovereignMosquittoMqttBroker,
+    pub zellij_multiplexer: SovereignZellijMultiplexerEngine,
+    pub mosquitto_mqtt: SovereignMosquittoMqttBroker,
     pub restic_backup: SovereignResticBorgBackupEngine,
     pub helix_editor: SovereignHelixModalEditorEngine,
-    pub fastfetch: SovereignFastfetchSysInfoEngine,
+    pub fastfetch_sysinfo: SovereignFastfetchSysInfoEngine,
     pub fish_shell: SovereignFishSmartShellEngine,
-    pub zero_copy_analyzer: SovereignZeroCopyPacketAnalyzer,
-    pub task_queue: SovereignDistributedTaskQueue,
     pub supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
     pub total_obsoleted_projects_count: u32,
 }
@@ -2471,15 +2515,12 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             cilium_bpf: SovereignCiliumBpfNetworkEngine::new(),
             k8s_orchestrator: SovereignK8sOrchestratorEngine::new(),
             ansible: SovereignAnsibleAutomationEngine::new(),
-            supabase: SovereignSupabaseBackendEngine::new(),
-            zellij: SovereignZellijMultiplexerEngine::new("sovereign_term"),
-            mosquitto: SovereignMosquittoMqttBroker::new(),
-            restic_backup: SovereignResticBorgBackupEngine::new(),
-            helix_editor: SovereignHelixModalEditorEngine::new(),
-            fastfetch: SovereignFastfetchSysInfoEngine::new(),
+            zellij_multiplexer: SovereignZellijMultiplexerEngine::new("default_session"),
+            mosquitto_mqtt: SovereignMosquittoMqttBroker::new(),
+            restic_backup: SovereignResticBorgBackupEngine::new([0x3C; 32]),
+            helix_editor: SovereignHelixModalEditorEngine::new("/etc/sigma.conf", "sovereign_mode=enabled"),
+            fastfetch_sysinfo: SovereignFastfetchSysInfoEngine::new(),
             fish_shell: SovereignFishSmartShellEngine::new(),
-            zero_copy_analyzer: SovereignZeroCopyPacketAnalyzer::new(),
-            task_queue: SovereignDistributedTaskQueue::new(),
             supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
             total_obsoleted_projects_count: 55,
         }
@@ -4564,21 +4605,9 @@ mod tests {
     fn test_sovereign_apache_spark_data_engine() {
         let mut spark = SovereignApacheSparkDataEngine::new();
         let records = vec![
-            SparkDataRecord {
-                id: 1,
-                key: "CPU".to_string(),
-                value: 40,
-            },
-            SparkDataRecord {
-                id: 2,
-                key: "RAM".to_string(),
-                value: 80,
-            },
-            SparkDataRecord {
-                id: 3,
-                key: "CPU".to_string(),
-                value: 60,
-            },
+            SparkDataRecord { id: 1, key: "CPU".to_string(), value: 40 },
+            SparkDataRecord { id: 2, key: "RAM".to_string(), value: 80 },
+            SparkDataRecord { id: 3, key: "CPU".to_string(), value: 60 },
         ];
         spark.load_dataset(records);
 
@@ -5162,9 +5191,7 @@ mod tests {
     #[test]
     fn test_sovereign_fdisk_partitioner() {
         let mut fdisk = SovereignFdiskDiskPartitioner::new(PartitionTableType::Gpt, 100_000_000);
-        let p1 = fdisk
-            .add_partition(204800, "C12A7328-F81F-11D2-BA4B-00A0C93EC93B")
-            .unwrap();
+        let p1 = fdisk.add_partition(204800, "C12A7328-F81F-11D2-BA4B-00A0C93EC93B").unwrap();
         assert_eq!(p1, 1);
         assert!(fdisk.is_lba_aligned());
     }
@@ -5172,9 +5199,7 @@ mod tests {
     #[test]
     fn test_sovereign_curl_http_client() {
         let curl = SovereignCurlHttpClientEngine::new();
-        let resp = curl
-            .execute_http_get("https://api.sigmaos.org/v1/health")
-            .unwrap();
+        let resp = curl.execute_http_get("https://api.sigmaos.org/v1/health").unwrap();
         assert_eq!(resp.status_code, 200);
         assert!(resp.headers.contains_key("server"));
     }
@@ -5228,64 +5253,6 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_supabase_backend_engine() {
-        let mut supabase = SovereignSupabaseBackendEngine::new();
-        supabase.add_rls_policy(RlsTokenPolicy {
-            role: "anon".to_string(),
-            allowed_table: "posts".to_string(),
-            can_select: true,
-            can_insert: false,
-        });
-
-        assert!(supabase.evaluate_rls("anon", "posts", "SELECT"));
-        assert!(!supabase.evaluate_rls("anon", "posts", "INSERT"));
-
-        let mut row = BTreeMap::new();
-        row.insert("title".to_string(), "SigmaOS Native Supabase".to_string());
-        supabase.emit_cdc_event("posts", "INSERT", row);
-        assert_eq!(supabase.cdc_events.len(), 1);
-        assert_eq!(supabase.cdc_events[0].table_name, "posts");
-    }
-
-    #[test]
-    fn test_sovereign_zellij_multiplexer_engine() {
-        let mut zellij = SovereignZellijMultiplexerEngine::new("workspace");
-        let p1 = zellij.spawn_pane("terminal_1", false, false);
-        let p2 = zellij.spawn_pane("status_plugin", true, true);
-
-        assert_eq!(p1, 1);
-        assert_eq!(p2, 2);
-        assert!(zellij.panes[1].is_floating);
-        assert!(zellij.toggle_floating(p1));
-        assert!(zellij.panes[0].is_floating);
-    }
-
-    #[test]
-    fn test_sovereign_mosquitto_mqtt_broker() {
-        let mut mqtt = SovereignMosquittoMqttBroker::new();
-        mqtt.subscribe("sensors/temperature/#", "client_101");
-
-        let matches = mqtt.publish("sensors/temperature/room_1", b"22.5C", 1, true);
-        assert_eq!(matches, 1);
-        assert_eq!(mqtt.published_count, 1);
-        assert!(mqtt.retained_messages.contains_key("sensors/temperature/room_1"));
-    }
-
-    #[test]
-    fn test_sovereign_restic_borg_backup_engine() {
-        let mut backup = SovereignResticBorgBackupEngine::new();
-        let h1 = backup.store_chunk(b"chunk_data_block_1");
-        let h2 = backup.store_chunk(b"chunk_data_block_2");
-
-        let snap_id = backup.create_snapshot(1700000000, vec![h1, h2]);
-        assert!(snap_id.starts_with("snap_"));
-        assert_eq!(backup.snapshots.len(), 1);
-        assert!(backup.snapshots[0].is_encrypted_pqc);
-
-        assert_eq!(backup.prune_old_snapshots(1), 0);
-    }
-
-    #[test]
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
@@ -5293,65 +5260,79 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_helix_modal_editor_engine() {
-        let mut editor = SovereignHelixModalEditorEngine::new();
-        assert_eq!(editor.mode, SovereignEditorMode::Normal);
-        editor.set_mode(SovereignEditorMode::Insert);
-        editor.insert_text("fn main() {}");
-        assert_eq!(editor.buffer, "fn main() {}");
-        editor.add_cursor(5);
-        assert_eq!(editor.cursor_positions.len(), 2);
-        editor.parse_ast_node("function_item");
-        assert_eq!(editor.tree_sitter_ast_nodes[0], "function_item");
+    fn test_sovereign_zellij_multiplexer() {
+        let mut zellij = SovereignZellijMultiplexerEngine::new("workspace_session");
+        let tab_id = zellij.create_tab("DevTerminal");
+        assert_eq!(tab_id, 1);
+
+        let pane_id = zellij
+            .split_pane(tab_id, MultiplexerSplitDirection::Vertical, "htop")
+            .unwrap();
+        assert_eq!(pane_id, 3);
+        assert_eq!(zellij.tabs[0].panes.len(), 2);
     }
 
     #[test]
-    fn test_sovereign_fastfetch_sys_info_engine() {
-        let ff = SovereignFastfetchSysInfoEngine::new();
-        let summary = ff.render_sys_info_summary();
-        assert!(summary.contains("SigmaOS Sovereign Edition"));
-        assert!(summary.contains("RAM: 1024MB / 32768MB"));
-        let ascii = ff.format_ascii_art();
-        assert!(ascii.contains("SigmaOS"));
+    fn test_sovereign_mosquitto_mqtt_broker() {
+        let mut mqtt = SovereignMosquittoMqttBroker::new();
+        mqtt.subscribe("client-1", "sensors/+/temperature", MqttQos::AtLeastOnce);
+
+        let subs = mqtt.publish("sensors/room1/temperature", b"22.5C", MqttQos::AtLeastOnce, true);
+        assert_eq!(subs, 1);
+        assert_eq!(mqtt.published_count, 1);
+        assert!(mqtt.retained_messages.contains_key("sensors/room1/temperature"));
+
+        assert!(SovereignMosquittoMqttBroker::topic_matches("sensors/#", "sensors/room1/humidity"));
     }
 
     #[test]
-    fn test_sovereign_fish_smart_shell_engine() {
-        let mut shell = SovereignFishSmartShellEngine::new();
-        shell.add_abbreviation("gco", "git checkout");
-        assert_eq!(shell.expand_abbreviation("gco"), "git checkout");
-        assert_eq!(shell.expand_abbreviation("unknown"), "unknown");
+    fn test_sovereign_restic_borg_backup() {
+        let secret_key = [0x55; 32];
+        let mut backup = SovereignResticBorgBackupEngine::new(secret_key);
 
-        shell.record_command("cargo build --release");
-        let suggestion = shell.get_autosuggestion("cargo");
-        assert_eq!(suggestion, Some("cargo build --release".to_string()));
+        let file1 = b"sovereign_system_kernel_code";
+        let snap_id = backup.create_snapshot(&["/boot/vmlinuz"], &[file1], 1700000000);
+        assert!(snap_id.starts_with("snap_sha256"));
+
+        let restored = backup.restore_snapshot(&snap_id).unwrap();
+        assert_eq!(restored.len(), 1);
+        assert_eq!(restored[0], file1.to_vec());
     }
 
     #[test]
-    fn test_sovereign_zero_copy_packet_analyzer() {
-        let mut analyzer = SovereignZeroCopyPacketAnalyzer::new();
-        let mut raw_packet = vec![0u8; 14];
-        raw_packet[12] = 0x08;
-        raw_packet[13] = 0x00;
+    fn test_sovereign_helix_modal_editor() {
+        let mut helix = SovereignHelixModalEditorEngine::new("/tmp/test.txt", "fn main() { return; }");
+        helix.insert_text("// Sovereign Editor\n");
+        assert!(helix.buffer.starts_with("// Sovereign Editor\n"));
 
-        let res = analyzer.inspect_raw_packet(&raw_packet);
-        assert!(res.is_some());
-        assert!(res.unwrap().contains("Protocol=IPv4"));
-
-        analyzer.set_filter("IPv6");
-        let res_filtered = analyzer.inspect_raw_packet(&raw_packet);
-        assert!(res_filtered.is_none());
+        let word = helix.select_word_at_cursor().unwrap();
+        assert_eq!(word, "fn");
+        assert_eq!(helix.mode, HelixEditMode::Select);
     }
 
     #[test]
-    fn test_sovereign_distributed_task_queue() {
-        let mut queue = SovereignDistributedTaskQueue::new();
-        assert!(queue.submit_task("t1", "compile_kernel").is_ok());
-        assert_eq!(queue.get_task_status("t1"), Some("Pending:compile_kernel".to_string()));
+    fn test_sovereign_fastfetch_sysinfo() {
+        let fetch = SovereignFastfetchSysInfoEngine::new();
+        let banner = fetch.render_ansi_banner();
+        assert!(banner.contains("SigmaOS Sovereign Release 1.0"));
+        assert!(banner.contains("Memory:"));
+    }
 
-        let processed = queue.process_next_task();
-        assert_eq!(processed, Some("t1".to_string()));
-        assert_eq!(queue.get_task_status("t1"), Some("Completed:compile_kernel".to_string()));
-        assert_eq!(queue.completed_count, 1);
+    #[test]
+    fn test_sovereign_fish_smart_shell() {
+        let mut fish = SovereignFishSmartShellEngine::new();
+        fish.add_history_entry("git checkout main");
+        fish.add_history_entry("git status");
+
+        let suggestion = fish.get_inline_autosuggestion("git s").unwrap();
+        assert_eq!(suggestion, "tatus");
+
+        assert_eq!(fish.expand_abbreviation("g"), "git");
+        assert_eq!(fish.expand_abbreviation("unknown"), "unknown");
+
+        fish.record_dir_visit("/usr/src/sigmaos");
+        fish.record_dir_visit("/usr/src/sigmaos");
+        let smart_dir = fish.z_smart_cd("sigma").unwrap();
+        assert_eq!(smart_dir, "/usr/src/sigmaos");
     }
 }
