@@ -46,6 +46,178 @@ impl Default for OmakasePresetConfig {
     }
 }
 
+// ==========================================
+// ADDITIONAL OMARCHY DESKTOP ENHANCEMENTS
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct TilingWindowNode {
+    pub window_id: u32,
+    pub title: String,
+    pub width_pct: u32,
+    pub height_pct: u32,
+}
+
+pub struct OmarchyHyprlandScrollLayoutEngine {
+    pub windows: Vec<TilingWindowNode>,
+    pub active_window_id: Option<u32>,
+    pub is_scrolling_mode: bool,
+}
+
+impl OmarchyHyprlandScrollLayoutEngine {
+    pub fn new() -> Self {
+        Self {
+            windows: Vec::new(),
+            active_window_id: None,
+            is_scrolling_mode: true,
+        }
+    }
+
+    pub fn open_window(&mut self, window_id: u32, title: &str) {
+        self.windows.push(TilingWindowNode {
+            window_id,
+            title: title.to_string(),
+            width_pct: 50,
+            height_pct: 100,
+        });
+        self.active_window_id = Some(window_id);
+    }
+
+    pub fn focus_next_window(&mut self) -> Option<u32> {
+        if self.windows.is_empty() {
+            return None;
+        }
+        if let Some(curr) = self.active_window_id {
+            let pos = self.windows.iter().position(|w| w.window_id == curr).unwrap_or(0);
+            let next_pos = (pos + 1) % self.windows.len();
+            self.active_window_id = Some(self.windows[next_pos].window_id);
+            self.active_window_id
+        } else {
+            self.active_window_id = Some(self.windows[0].window_id);
+            self.active_window_id
+        }
+    }
+}
+
+impl Default for OmarchyHyprlandScrollLayoutEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct OmarchyLazyGitConfigurationEngine {
+    pub theme_name: String,
+    pub keybinding_preset: String,
+}
+
+impl OmarchyLazyGitConfigurationEngine {
+    pub fn new(theme_name: &str) -> Self {
+        Self {
+            theme_name: theme_name.to_string(),
+            keybinding_preset: "omarchy_default".to_string(),
+        }
+    }
+
+    pub fn generate_lazygit_yaml(&self) -> String {
+        format!(
+            "gui:\n  theme:\n    activeBorderColor:\n      - '#7aa2f7'\n    selectedLineBgColor:\n      - '#2ac3de'\n  overrideGpg: true\n# Omarchy Theme: {}\n",
+            self.theme_name
+        )
+    }
+}
+
+impl Default for OmarchyLazyGitConfigurationEngine {
+    fn default() -> Self {
+        Self::new("TokyoNight")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WidgetBarStatus {
+    pub cpu_percent: f32,
+    pub ram_percent: f32,
+    pub active_window_title: String,
+    pub battery_percent: u8,
+    pub tray_icons_count: usize,
+}
+
+pub struct OmarchyQuattroWidgetBarEngine {
+    pub status: WidgetBarStatus,
+}
+
+impl OmarchyQuattroWidgetBarEngine {
+    pub fn new() -> Self {
+        Self {
+            status: WidgetBarStatus {
+                cpu_percent: 15.0,
+                ram_percent: 35.0,
+                active_window_title: "Neovim - SigmaOS".to_string(),
+                battery_percent: 98,
+                tray_icons_count: 5,
+            },
+        }
+    }
+
+    pub fn update_status(&mut self, cpu: f32, ram: f32, window_title: &str) {
+        self.status.cpu_percent = cpu;
+        self.status.ram_percent = ram;
+        self.status.active_window_title = window_title.to_string();
+    }
+
+    pub fn render_quickshell_bar_json(&self) -> String {
+        format!(
+            "{{\"cpu\": {:.1}, \"ram\": {:.1}, \"title\": \"{}\", \"battery\": {}}}",
+            self.status.cpu_percent,
+            self.status.ram_percent,
+            self.status.active_window_title,
+            self.status.battery_percent
+        )
+    }
+}
+
+impl Default for OmarchyQuattroWidgetBarEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Web2AppInstance {
+    pub app_name: String,
+    pub pwa_url: String,
+    pub container_id: String,
+    pub is_isolated: bool,
+}
+
+pub struct OmarchyWeb2AppPwaSandbox {
+    pub instances: Vec<Web2AppInstance>,
+}
+
+impl OmarchyWeb2AppPwaSandbox {
+    pub fn new() -> Self {
+        Self {
+            instances: Vec::new(),
+        }
+    }
+
+    pub fn launch_pwa_sandbox(&mut self, app_name: &str, pwa_url: &str) -> String {
+        let container_id = format!("PWA_CONTAINER_{}", self.instances.len() + 1);
+        self.instances.push(Web2AppInstance {
+            app_name: app_name.to_string(),
+            pwa_url: pwa_url.to_string(),
+            container_id: container_id.clone(),
+            is_isolated: true,
+        });
+        container_id
+    }
+}
+
+impl Default for OmarchyWeb2AppPwaSandbox {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl OmakasePresetConfig {
     pub fn new() -> Self {
         Self::default()
@@ -346,5 +518,32 @@ mod tests {
         assert!(task_res.contains("Agent-007"));
         assert!(task_res.contains("Fix memory leak"));
         assert_eq!(agent.executed_tasks.len(), 1);
+    }
+
+    #[test]
+    fn test_additional_omarchy_enhancements() {
+        let mut scroll = OmarchyHyprlandScrollLayoutEngine::new();
+        scroll.open_window(101, "Ghostty");
+        scroll.open_window(102, "Neovim");
+        assert_eq!(scroll.windows.len(), 2);
+        assert_eq!(scroll.active_window_id, Some(102));
+
+        let next = scroll.focus_next_window();
+        assert_eq!(next, Some(101));
+
+        let lazygit = OmarchyLazyGitConfigurationEngine::new("Dracula");
+        let lazygit_yaml = lazygit.generate_lazygit_yaml();
+        assert!(lazygit_yaml.contains("Omarchy Theme: Dracula"));
+
+        let mut widget_bar = OmarchyQuattroWidgetBarEngine::new();
+        widget_bar.update_status(25.5, 42.0, "Ghostty Terminal");
+        let json = widget_bar.render_quickshell_bar_json();
+        assert!(json.contains("\"cpu\": 25.5"));
+        assert!(json.contains("Ghostty Terminal"));
+
+        let mut pwa = OmarchyWeb2AppPwaSandbox::new();
+        let cid = pwa.launch_pwa_sandbox("GitHub", "https://github.com");
+        assert_eq!(cid, "PWA_CONTAINER_1");
+        assert_eq!(pwa.instances.len(), 1);
     }
 }
