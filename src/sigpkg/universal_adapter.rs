@@ -7,8 +7,117 @@ use std::vec::Vec;
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
+#[cfg(feature = "standalone_test")]
+#[path = "universal_engine.rs"]
+pub mod universal_engine;
+
+#[cfg(feature = "standalone_test")]
+#[path = "universal_oop_system.rs"]
+pub mod universal_oop_system;
+
+#[cfg(feature = "standalone_test")]
+pub mod package_dummy {
+    use super::*;
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct AptDebManifest {
+        pub package: String,
+        pub version: String,
+        pub depends: Vec<String>,
+        pub description: String,
+        pub priority: PackagePriority,
+    }
+}
+#[cfg(feature = "standalone_test")]
+pub use package_dummy::AptDebManifest;
+#[cfg(not(feature = "standalone_test"))]
 use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(feature = "standalone_test")]
+pub mod sigpkg_dummy {
+    use super::*;
+
+    #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+    pub struct Version {
+        pub major: u64,
+        pub minor: u64,
+        pub patch: u64,
+    }
+
+    impl core::fmt::Display for Version {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+        }
+    }
+
+    impl Version {
+        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+            Self {
+                major,
+                minor,
+                patch,
+            }
+        }
+        pub fn parse(s: &str) -> Result<Self, &'static str> {
+            let clean: String = s.chars().map(|c| if c.is_ascii_digit() || c == '.' { c } else { ' ' }).collect();
+            let first_num = clean.split_whitespace().next().unwrap_or("1.0.0");
+            let parts: Vec<&str> = first_num.split('.').collect();
+            let major = parts.get(0).and_then(|p| p.parse().ok()).unwrap_or(1);
+            let minor = parts.get(1).and_then(|p| p.parse().ok()).unwrap_or(0);
+            let patch = parts.get(2).and_then(|p| p.parse().ok()).unwrap_or(0);
+            Ok(Self::new(major, minor, patch))
+        }
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub enum VersionConstraint {
+        Exact(Version),
+        GreaterThan(Version),
+        LessThan(Version),
+        GreaterOrEqual(Version),
+        LessOrEqual(Version),
+        Any,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Dependency {
+        pub name: String,
+        pub version_constraint: VersionConstraint,
+    }
+
+    #[derive(Debug, Clone)]
+    pub struct Package {
+        pub name: String,
+        pub version: Version,
+        pub description: String,
+        pub dependencies: Vec<Dependency>,
+        pub checksum: String,
+        pub mirrors: Vec<String>,
+    }
+
+    impl Package {
+        pub fn new(
+            name: String,
+            version: Version,
+            description: String,
+            dependencies: Vec<Dependency>,
+            checksum: String,
+        ) -> Self {
+            Self {
+                name,
+                version,
+                description,
+                dependencies,
+                checksum,
+                mirrors: Vec::new(),
+            }
+        }
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+pub use sigpkg_dummy::*;
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Description of Arch Linux binary .PKGINFO Manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,11 +179,10 @@ pub struct HaikuHpkgManifest {
     pub requires: Vec<String>,
 }
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+#[cfg(feature = "standalone_test")]
+pub use universal_engine::PackageFormat;
+#[cfg(not(feature = "standalone_test"))]
+pub use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -107,6 +215,9 @@ pub struct PacmanPkgbuild {
 }
 
 /// Use universal_oop_system::UniversalPackageManager instead
+#[cfg(feature = "standalone_test")]
+pub use universal_oop_system::UniversalPackageManager;
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -1587,7 +1698,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = universal_oop_system::StandardPackage {
             metadata: universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: native_pkg.version,
+                version: native_pkg.version.clone(),
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
@@ -1697,7 +1808,7 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -2150,7 +2261,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkgin" | "pkg_delete" | "pkg_add" => {
+            "pkgin" | "pkg_delete" => {
                 if pm == "pkg_delete" {
                     operation = UniversalPmOperation::Remove;
                 }
@@ -2795,7 +2906,7 @@ impl Default for UniversalDryRunSimulator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -3038,7 +3149,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("solus.eopkg"),
-            Some(PackageFormat::Pisi)
+            Some(PackageFormat::Eopkg)
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),

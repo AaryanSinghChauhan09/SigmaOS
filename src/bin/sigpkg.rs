@@ -78,6 +78,52 @@ fn main() {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_universal_pm_dispatcher_integration() {
+        let dispatcher = UniversalPmCommandDispatcher::new();
+
+        let apt = dispatcher.dispatch_command("apt install nginx curl -y").unwrap();
+        assert_eq!(apt.source_pm, "apt");
+        assert_eq!(apt.operation, UniversalPmOperation::Install);
+        assert_eq!(apt.target_packages, vec!["nginx", "curl"]);
+
+        let dnf = dispatcher.dispatch_command("dnf remove httpd").unwrap();
+        assert_eq!(dnf.source_pm, "dnf");
+        assert_eq!(dnf.operation, UniversalPmOperation::Remove);
+        assert_eq!(dnf.target_packages, vec!["httpd"]);
+
+        let pacman = dispatcher.dispatch_command("pacman -Syu --dryrun").unwrap();
+        assert_eq!(pacman.source_pm, "pacman");
+        assert_eq!(pacman.operation, UniversalPmOperation::Upgrade);
+        assert!(pacman.dry_run);
+
+        let apk = dispatcher.dispatch_command("apk add musl").unwrap();
+        assert_eq!(apk.source_pm, "apk");
+        assert_eq!(apk.operation, UniversalPmOperation::Install);
+        assert_eq!(apk.target_packages, vec!["musl"]);
+
+        let bsd_pkg = dispatcher.dispatch_command("pkg install -n postgresql15-server").unwrap();
+        assert_eq!(bsd_pkg.source_pm, "pkg");
+        assert_eq!(bsd_pkg.operation, UniversalPmOperation::Install);
+        assert!(bsd_pkg.dry_run);
+    }
+
+    #[test]
+    fn test_canonical_dependency_mapper_cli_integration() {
+        let mapper = UniversalDependencyMapper::new();
+        assert_eq!(mapper.to_canonical_name("libssl-dev"), "openssl");
+        assert_eq!(mapper.to_canonical_name("openssl-devel"), "openssl");
+        assert_eq!(mapper.to_canonical_name("libc6"), "libc");
+        assert_eq!(mapper.to_canonical_name("musl-dev"), "libc");
+        assert_eq!(mapper.to_canonical_name("python3-dev"), "python");
+        assert_eq!(mapper.to_canonical_name("zlib1g-dev"), "zlib");
+    }
+}
+
 fn cmd_dispatch(args: &[String]) {
     if args.is_empty() {
         eprintln!("sigpkg: dispatch requires a foreign command string");
