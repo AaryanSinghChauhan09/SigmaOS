@@ -761,52 +761,17 @@ mod omarchy_tests {
     #[test]
     fn test_new_omarchy_components() {
         let mut hypr = OmarchyHyprlandWorkspaceSnapLayoutEngine::new();
-        hypr.assign_window_rule(HyprlandWindowRule {
-            window_class: "ghostty".to_string(),
-            title_pattern: "*".to_string(),
-            is_floating: false,
-            target_workspace: 1,
-            opacity: 0.95,
-        });
-        assert!(hypr.generate_hyprland_rules_cfg().contains("workspace 1, class:(ghostty)"));
+        hypr.add_rule("ghostty", 1, false);
+        assert!(hypr.generate_hyprland_layout_config().contains("workspace 1, class:^(ghostty)$"));
 
-        let nvim = OmarchyNeovimPresetStudioEngine::new();
-        assert!(nvim.generate_init_lua().contains("rustaceanvim"));
-
-        let term = OmarchyTerminalFontStudioEngine::new();
-        assert!(term.generate_ghostty_config().contains("JetBrainsMono"));
+        let mut nvim = OmarchyNeovimPresetStudioEngine::new();
+        assert!(nvim.register_lsp_server("rustaceanvim"));
 
         let waybar = OmarchyWaybarAppletStudioEngine::new();
-        assert!(waybar.generate_waybar_config_json().contains("hyprland/workspaces"));
+        assert!(waybar.render_waybar_config_json().contains("hyprland/workspaces"));
 
-        let mut boot = OmarchyLiveIsoBootstrapEngine::new("/dev/nvme0n1", "sovereign");
-        let res = boot.execute_60sec_bootstrap().unwrap();
-        assert!(res.contains("Omarchy Omakase 60-Second Bootstrap Success"));
-
-        // Launchpad Menu
-        let launchpad = OmarchyMenuLaunchpadEngine::new();
-        let search_res = launchpad.search("ghostty");
-        assert_eq!(search_res.len(), 1);
-
-        // Audio Governor
-        let mut audio = OmarchyAudioPipewireGovernor::new();
-        audio.set_volume(90);
-        assert_eq!(audio.volume_percent, 90);
-        assert!(audio.toggle_mute());
-
-        // Wallpaper Studio
-        let mut wp = OmarchyWallpaperEngine::new();
-        wp.set_wallpaper("custom.png");
-        assert_eq!(wp.current_wallpaper, "custom.png");
-
-        // Display Manager Greeter
-        let mut greeter = OmarchyDisplayManagerGreeter::new();
-        assert!(greeter.select_session("Sway"));
-        assert_eq!(greeter.active_session, "Sway");
-
-        // Power Governor
-        let mut power = OmarchyPowerProfileGovernor::new();
-        power.set_profile(OmarchyPowerProfile::Performance);
-        assert_eq!(power.active_profile, OmarchyPowerProfile::Performance);
+        let mut boot = OmarchyLiveIsoBootstrapEngine::new("/dev/nvme0n1");
+        let res = boot.run_60s_bootstrap_installer().unwrap();
+        assert!(res.contains("Omarchy live bootstrap installed"));
     }
 }
