@@ -111,6 +111,7 @@ impl SovereignUniversalDistroBridge {
     }
 
     pub fn get_supervisor_type(&self) -> ServiceSupervisorType {
+        #[allow(unreachable_patterns)]
         match self.mode {
             DistroSubsystemMode::LinuxArch
             | DistroSubsystemMode::LinuxDebian
@@ -152,6 +153,7 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
+            _ => ServiceSupervisorType::Systemd,
         }
     }
 
@@ -232,6 +234,7 @@ impl SovereignUniversalDistroBridge {
         let pkg_spec = self.translate_package_specifier("coreutils");
         let vfs_etc = self.translate_vfs_path("/etc");
 
+        #[allow(unreachable_patterns)]
         let supervisor_valid = match self.mode {
             DistroSubsystemMode::LinuxArch
             | DistroSubsystemMode::LinuxDebian
@@ -276,12 +279,14 @@ impl SovereignUniversalDistroBridge {
 
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
+            _ => supervisor == ServiceSupervisorType::Systemd,
         };
 
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
 
     pub fn translate_package_specifier(&self, input_pkg: &str) -> String {
+        #[allow(unreachable_patterns)]
         match self.mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxUbuntu
@@ -322,6 +327,7 @@ impl SovereignUniversalDistroBridge {
             }
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
+            _ => format!("{}.deb", input_pkg),
         }
     }
 
@@ -334,6 +340,7 @@ impl SovereignUniversalDistroBridge {
             return Err("Action cannot be empty");
         }
         let src_pkg = self.translate_package_specifier(action);
+        #[allow(unreachable_patterns)]
         let dst_pkg = match target_mode {
             DistroSubsystemMode::LinuxDebian
             | DistroSubsystemMode::LinuxUbuntu
@@ -371,6 +378,7 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
+            _ => format!("{}.sig", action),
         };
 
         Ok(format!(
@@ -548,84 +556,6 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
-            "auth" => {
-                Ok(format!(
-                    "Dispatched PAM / SystemdHomed authentication & privilege check for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "nixos_declarative" => {
-                Ok(format!(
-                    "Dispatched NixOS declarative Nix expression reconciliation for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "void_runit" => {
-                Ok(format!(
-                    "Dispatched Void Linux runit stage controller for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "alpine_apk" => {
-                Ok(format!(
-                    "Dispatched Alpine Linux APK package manager & lbu overlay for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "gentoo_portage" => {
-                Ok(format!(
-                    "Dispatched Gentoo Portage ebuild slot governor for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "freebsd_jails" => {
-                Ok(format!(
-                    "Dispatched FreeBSD Jails VNET network isolation sandbox for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "openbsd_pledge" => {
-                Ok(format!(
-                    "Dispatched OpenBSD pledge/unveil syscall path lock down for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "dragonfly_hammer2" => {
-                Ok(format!(
-                    "Dispatched DragonFly BSD HAMMER2 multi-master CoW snapshot for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "device" => {
-                Ok(format!(
-                    "Dispatched dynamic devfs device node symlink manager for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "illumos_zones" => {
-                Ok(format!(
-                    "Dispatched Illumos Zones & Solaris SMF service manager for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "bedrock_strata" => {
-                Ok(format!(
-                    "Dispatched Bedrock Linux strata filesystem fusion bridge for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "tails_amnesic" => {
-                Ok(format!(
-                    "Dispatched Tails amnesic RAM purge & MAC address spoofing for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
-            "qubes_zen" => {
-                Ok(format!(
-                    "Dispatched Qubes OS compartmented VM isolation guard for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
             "storage" => {
                 let healed = self
                     .verify_and_self_heal_cow_file("@root", action, b"default")
@@ -720,14 +650,6 @@ impl SovereignUniversalDistroBridge {
                     }
                 }
             }
-            "containers" => {
-                let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
-                chroot_engine.enter_chroot()?;
-                Ok(format!(
-                    "Dispatched container build sandbox '{}' (active: {}) under distro mode '{:?}'",
-                    action, chroot_engine.is_active, self.mode
-                ))
-            }
             "time" => {
                 Ok(format!(
                     "Dispatched Chrony/NTP clock synchronization for target '{}' under distro mode '{:?}'",
@@ -765,12 +687,6 @@ impl SovereignUniversalDistroBridge {
                     action, timeslice, self.mode
                 ))
             }
-            "virt" => {
-                Ok(format!(
-                    "Dispatched bhyve/VirtIO microVM hypervisor instance for '{}' under distro mode '{:?}'",
-                    action, self.mode
-                ))
-            }
             "audit" => {
                 let mut pax_engine = HardenedBsdPaxGuardEngine::new();
                 let mprotect_res = pax_engine.check_mprotect(100, 0x1000, false, true);
@@ -779,15 +695,146 @@ impl SovereignUniversalDistroBridge {
                     action, mprotect_res.is_ok(), self.mode
                 ))
             }
+            "auth" => {
+                Ok(format!(
+                    "Dispatched PAM / SystemdHomed authentication & privilege check for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "boot" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::DragonFlyBsd => {
+                        Ok(format!("Dispatched BSD Loader / EFI boot entry configuration for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => {
+                        Ok(format!("Dispatched Illumos ZFS loader boot manager for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    _ => {
+                        Ok(format!("Dispatched systemd-boot / GRUB / EFI boot manager action '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                }
+            }
+            "container" | "containers" => {
+                let mut chroot_engine = ApkChrootBuildSandboxEngine::new("cross-sandbox", action, true);
+                chroot_engine.enter_chroot()?;
+                Ok(format!(
+                    "Dispatched container build sandbox '{}' (active: {}) under distro mode '{:?}'",
+                    action, chroot_engine.is_active, self.mode
+                ))
+            }
+            "virtualization" | "virt" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
+                        Ok(format!("Dispatched bhyve hypervisor microVM instance for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    DistroSubsystemMode::OpenBsd => {
+                        Ok(format!("Dispatched OpenBSD vmm(4) hypervisor instance for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    _ => {
+                        Ok(format!("Dispatched MicroVM hypervisor / VirtIO bridge instance for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                }
+            }
+            "input" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
+                        Ok(format!("Dispatched BSD wsmouse / wscons gaming input driver action '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    _ => {
+                        Ok(format!("Dispatched libinput / evdev multi-touch gaming input driver action '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                }
+            }
+            "thermal" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
+                        Ok(format!("Dispatched BSD coretemp thermal power governor action '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    _ => {
+                        Ok(format!("Dispatched thermald / System76 thermal power governor action '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                }
+            }
+            "syscall" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
+                        Ok(format!("Dispatched BSD native syscall translation and pledge/unveil filter for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    _ => {
+                        Ok(format!("Dispatched multi-arch Linux System V ABI syscall translation for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                }
+            }
+            "device" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => {
+                        Ok(format!("Dispatched BSD devfs / devd PCIe NVMe device manager action '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    DistroSubsystemMode::SolarisIllumos | DistroSubsystemMode::SmartOs => {
+                        Ok(format!("Dispatched Illumos devfs / sysevent device manager action '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    _ => {
+                        Ok(format!("Dispatched udev / sysfs PCIe NVMe device manager action '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                }
+            }
+            "crypto" => {
+                match self.mode {
+                    DistroSubsystemMode::OpenBsd => {
+                        Ok(format!("Dispatched OpenBSD LibreSSL / Post-Quantum Kyber-1024 crypto operation '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    _ => {
+                        Ok(format!("Dispatched Post-Quantum Kyber-1024 / Dilithium-5 crypto operation '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                }
+            }
+            "ai" => {
+                match self.mode {
+                    DistroSubsystemMode::LinuxCachyOS | DistroSubsystemMode::LinuxGaruda => {
+                        Ok(format!("Dispatched x86-64-v4 ISA accelerated GGUF LLM / BORE copilot for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    _ => {
+                        Ok(format!("Dispatched zero-dependency GGUF LLM / Herdr AI agent inference for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                }
+            }
+            "monitoring" => {
+                match self.mode {
+                    DistroSubsystemMode::FreeBsd | DistroSubsystemMode::OpenBsd => {
+                        Ok(format!("Dispatched BSD systat / DTrace performance metric capture for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                    _ => {
+                        Ok(format!("Dispatched htop / OpenTelemetry / BPFmon performance metric capture for '{}' under distro mode '{:?}'", action, self.mode))
+                    }
+                }
+            }
             "i18n" => {
                 Ok(format!(
                     "Dispatched GNU gettext / BSD locale internationalization for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
+            "bluetooth" => {
+                Ok(format!(
+                    "Dispatched BlueZ / BSD Netgraph Bluetooth adapter profile action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "firewall" => {
                 Ok(format!(
                     "Dispatched pf / nftables / ipfw firewall packet filter action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "diagnostics" => {
+                Ok(format!(
+                    "Dispatched ABRT / DTrace automated crash diagnostics action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "recovery" => {
+                Ok(format!(
+                    "Dispatched Snapper / ZFS Boot Environments state recovery action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -852,36 +899,40 @@ impl SovereignUniversalDistroBridge {
         match subsystem {
             "init" => vec!["Systemd".to_string(), "OpenRC".to_string(), "Runit".to_string(), "Shepherd".to_string(), "Dinit".to_string(), "SysVInit".to_string(), "Smf".to_string(), "Rcd".to_string()],
             "package" => vec!["deb".to_string(), "pkg.tar.zst".to_string(), "apk".to_string(), "xbps".to_string(), "nix".to_string(), "scm".to_string(), "ebuild".to_string(), "rpm".to_string(), "eopkg".to_string(), "txz".to_string(), "pkg".to_string(), "tgz".to_string(), "p5p".to_string()],
-            "vfs" => vec!["FHS".to_string(), "GoboLinux /Programs".to_string(), "Nix /nix/store".to_string(), "Silverblue OSTree".to_string(), "Android APEX".to_string(), "OpenBSD unveil".to_string()],
             "security" => vec!["Pledge".to_string(), "Unveil".to_string(), "Capsicum".to_string(), "Jails".to_string(), "Landlock".to_string(), "Zones".to_string(), "AppArmor".to_string(), "SELinux".to_string()],
             "storage" => vec!["ZFS".to_string(), "Btrfs".to_string(), "HAMMER2".to_string(), "Bcachefs".to_string(), "CoW".to_string()],
-            "kernel" => vec!["EEVDF".to_string(), "BORE".to_string(), "SCHED_EXT".to_string(), "MLFQ".to_string(), "eBPF livepatch".to_string(), "KARL W^X".to_string()],
             "network" => vec!["VNET".to_string(), "Crossbow".to_string(), "eBPF/XDP".to_string(), "Anonsurf".to_string(), "WireGuard PQC".to_string()],
-            "graphics" => vec!["DRM/KMS".to_string(), "Gamescope".to_string(), "Mesa v4".to_string(), "Wayland 1.24".to_string(), "X11".to_string(), "HDR".to_string()],
-            "power" => vec!["System76 Power".to_string(), "DVFS".to_string(), "EAS Big.LITTLE".to_string(), "ACPI".to_string(), "FreeBSD powerd".to_string()],
-            "ipc" => vec!["Splice".to_string(), "POSIX /dev/shm".to_string(), "kqueue/epoll".to_string(), "Capsicum descriptor passing".to_string(), "Illumos Doors".to_string()],
-            "auth" => vec!["systemd-homed".to_string(), "PAM".to_string(), "OpenBSD login.conf".to_string(), "doas".to_string(), "sudo".to_string(), "FIDO2".to_string()],
-            "audit" => vec!["DTrace".to_string(), "eBPF tracepoints".to_string(), "PaX MPROTECT".to_string(), "Auditd".to_string(), "BSM Audit".to_string()],
-            "boot" => vec!["systemd-boot".to_string(), "GRUB2".to_string(), "ZFS Boot Environments".to_string(), "Limine".to_string(), "Multiboot2".to_string(), "UEFI".to_string()],
-            "container" => vec!["FreeBSD Jails".to_string(), "Illumos Zones".to_string(), "Toolbx".to_string(), "Docker/Podman".to_string(), "Apk Chroot Sandbox".to_string(), "Qubes AppVM".to_string()],
-            "virtualization" => vec!["KVM/SovereignVMM".to_string(), "bhyve".to_string(), "OpenBSD vmm".to_string(), "Illumos Brand".to_string(), "VirtIO".to_string()],
-            "audio" => vec!["PipeWire".to_string(), "PulseAudio".to_string(), "sndio".to_string(), "ALSA".to_string(), "OSSv4".to_string()],
-            "input" => vec!["libinput".to_string(), "Evdev".to_string(), "BSD wsmouse".to_string(), "HID Precision Touchpad".to_string()],
-            "thermal" => vec!["thermald".to_string(), "BSD coretemp".to_string(), "DVFS Trip Points".to_string()],
-            "memory" => vec!["KARL W^X".to_string(), "KASLR".to_string(), "CMA".to_string(), "ZRAM".to_string(), "PAX PAGEEXEC".to_string()],
-            "syscall" => vec!["Linux x86_64 ABI".to_string(), "FreeBSD ABI".to_string(), "OpenBSD pledge/unveil".to_string(), "NetBSD Rump".to_string(), "Illumos LxBrand".to_string()],
-            "device" => vec!["udev".to_string(), "FreeBSD devd".to_string(), "devfs".to_string(), "EDID/DDC".to_string(), "NVMe PCIe".to_string()],
-            "crypto" => vec!["Kyber-1024".to_string(), "Dilithium-5".to_string(), "Falcon-1024".to_string(), "WireGuard PQC".to_string(), "CSPRNG".to_string()],
-            "ai" => vec!["Sovereign Agentic LLM".to_string(), "GGUF KV-Cache".to_string(), "Herdr AI Task Engine".to_string(), "WasiNN".to_string()],
-            "monitoring" => vec!["Btop".to_string(), "Fastfetch".to_string(), "OpenTelemetry".to_string(), "BPFmon".to_string(), "Journald".to_string()],
-            "i18n" => vec!["GNU gettext".to_string(), "BSD locale".to_string(), "XKB".to_string(), "Fcitx5 / IBus".to_string()],
-            "firewall" => vec!["pf".to_string(), "nftables".to_string(), "ipfw".to_string(), "Solaris IPFilter".to_string(), "firewalld".to_string()],
-            "compiler" => vec!["Makepkg".to_string(), "Sbuild".to_string(), "Poudriere".to_string(), "Portage EAPI8".to_string(), "XBPS-src".to_string(), "Apk Chroot".to_string()],
-            "shell" => vec!["Sovereign Stdin VT100".to_string(), "Starship Prompt".to_string(), "Fastfetch Summary".to_string(), "Fish Autocomplete".to_string()],
-            "display" => vec!["Wayland Layer-Shell".to_string(), "Hyprland Aesthetics".to_string(), "X11 Rootless".to_string(), "Snap Layouts".to_string()],
-            "printing" => vec!["CUPS".to_string(), "BSD lpd".to_string(), "IPP Everywhere".to_string(), "Ghostscript".to_string()],
-            "backup" => vec!["Timeshift Btrfs/Rsync".to_string(), "BorgBackup".to_string(), "Snapper CoW".to_string(), "ZFS / HAMMER2 Snapshots".to_string()],
-            "telemetry" => vec!["OpenTelemetry Distributed Tracing".to_string(), "eBPF Probe Auditing".to_string(), "Fastfetch System Telemetry".to_string()],
+            "kernel" => vec!["EEVDF".to_string(), "BORE".to_string(), "MLFQ".to_string(), "SCHED_EXT".to_string(), "eBPF".to_string()],
+            "graphics" => vec!["DRM/KMS".to_string(), "Wayland".to_string(), "Gamescope".to_string(), "Hyprland".to_string()],
+            "power" => vec!["System76 Power".to_string(), "DVFS".to_string(), "CPUPower".to_string()],
+            "ipc" => vec!["Zero-Copy Pipe".to_string(), "Capsicum Fd".to_string(), "POSIX Shm".to_string()],
+            "auth" => vec!["PAM".to_string(), "systemd-homed".to_string(), "login.conf".to_string(), "doas".to_string()],
+            "audit" => vec!["eBPF Trace".to_string(), "DTrace Probes".to_string(), "PaX Mprotect".to_string()],
+            "boot" => vec!["Multiboot2".to_string(), "systemd-boot".to_string(), "GRUB2".to_string(), "Limine".to_string()],
+            "container" | "containers" => vec!["ApkChroot".to_string(), "Toolbx".to_string(), "FreeBSD Jails".to_string(), "Zones".to_string()],
+            "virtualization" | "virt" => vec!["MicroVM".to_string(), "bhyve".to_string(), "OpenBSD VMM".to_string(), "KVM".to_string()],
+            "audio" => vec!["PipeWire".to_string(), "PulseAudio".to_string(), "sndio".to_string(), "ALSA".to_string()],
+            "input" => vec!["libinput".to_string(), "wsmouse".to_string(), "evdev".to_string()],
+            "thermal" => vec!["thermald".to_string(), "coretemp".to_string()],
+            "memory" => vec!["KARL W^X".to_string(), "KASLR".to_string(), "zram".to_string()],
+            "syscall" => vec!["UniversalSyscallShim".to_string(), "ABI Translator".to_string()],
+            "device" => vec!["devfs".to_string(), "udev".to_string(), "devd".to_string()],
+            "crypto" => vec!["Dilithium-5".to_string(), "Kyber-1024".to_string(), "WireGuard PQC".to_string()],
+            "ai" => vec!["Herdr Agent".to_string(), "GGUF LLM".to_string(), "Local Copilot".to_string()],
+            "monitoring" => vec!["Btop".to_string(), "Fastfetch".to_string(), "OpenTelemetry".to_string()],
+            "desktop" | "ui" => vec!["Zenith COSMIC".to_string(), "Adwaita".to_string(), "Breeze".to_string(), "Chameleon".to_string()],
+            "compiler" => vec!["LLVM".to_string(), "GCC".to_string(), "Portage EAPI8".to_string(), "xbps-src".to_string()],
+            "i18n" => vec!["GNU gettext".to_string(), "BSD Locale".to_string()],
+            "bluetooth" => vec!["BlueZ".to_string(), "Netgraph Bluetooth".to_string()],
+            "firewall" => vec!["pf".to_string(), "nftables".to_string(), "ipfw".to_string()],
+            "diagnostics" => vec!["ABRT".to_string(), "DTrace".to_string(), "Crash Reporter".to_string()],
+            "recovery" => vec!["Snapper".to_string(), "ZFS Boot Environments".to_string(), "TimeTravel".to_string()],
+            "time" => vec!["Chrony".to_string(), "NTP".to_string(), "CLOCK_MONOTONIC_PRECISE".to_string()],
+            "shell" => vec!["VT100 Shell".to_string(), "Sovereign Terminal".to_string()],
+            "display" => vec!["Wayland Compositor".to_string(), "X11 Bridge".to_string()],
+            "printing" => vec!["CUPS".to_string(), "lpd".to_string()],
+            "backup" => vec!["Timeshift".to_string(), "Borg".to_string(), "ZFS Snapshots".to_string()],
+            "telemetry" => vec!["eBPF Tracepoints".to_string(), "OpenTelemetry".to_string()],
             _ => vec!["UniversalCompatibility".to_string(), "SovereignBridge".to_string()],
         }
     }
@@ -892,13 +943,8 @@ impl SovereignUniversalDistroBridge {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "i18n", "firewall", "compiler", "shell", "display", "printing",
-            "backup", "telemetry", "kali_recon", "antix_runit", "zorin_chameleon",
-            "mint_cinnamon", "garuda_dracut", "cachy_bore", "parrot_anonsurf",
-            "parrot_apparmor", "parrot_forensics", "omarchy_quickshell", "omarchy_theme",
-            "omarchy_lua_reload", "omarchy_herdr_agent", "nixos_declarative", "void_runit",
-            "alpine_apk", "gentoo_portage", "freebsd_jails", "openbsd_pledge",
-            "dragonfly_hammer2", "illumos_zones", "bedrock_strata", "tails_amnesic", "qubes_zen",
+            "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
+            "compiler", "shell", "display", "printing", "backup", "telemetry", "desktop",
         ];
 
         for sub in subsystems {
@@ -1006,7 +1052,7 @@ impl SovereignUniversalSubsystemMatrixEngine {
                 DistroSubsystemMode::LinuxGuix,
                 DistroSubsystemMode::LinuxParrot,
             ],
-            verified_subsystems_count: 56,
+            verified_subsystems_count: 32,
         }
     }
 
@@ -1032,13 +1078,7 @@ impl SovereignUniversalSubsystemMatrixEngine {
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai",
             "monitoring", "i18n", "firewall", "compiler", "shell",
-            "display", "printing", "backup", "telemetry", "kali_recon",
-            "antix_runit", "zorin_chameleon", "mint_cinnamon", "garuda_dracut",
-            "cachy_bore", "parrot_anonsurf", "parrot_apparmor", "parrot_forensics",
-            "omarchy_quickshell", "omarchy_theme", "omarchy_lua_reload", "omarchy_herdr_agent",
-            "nixos_declarative", "void_runit", "alpine_apk", "gentoo_portage",
-            "freebsd_jails", "openbsd_pledge", "dragonfly_hammer2", "illumos_zones",
-            "bedrock_strata", "tails_amnesic", "qubes_zen",
+            "display", "printing", "backup", "telemetry",
         ];
 
         let mut results = Vec::new();
@@ -1048,49 +1088,6 @@ impl SovereignUniversalSubsystemMatrixEngine {
         }
 
         Ok(results)
-    }
-}
-
-pub struct SovereignCrossDistroSubsystemOrchestrator {
-    pub matrix_engine: SovereignUniversalSubsystemMatrixEngine,
-    pub active_subsystems: Vec<String>,
-}
-
-impl SovereignCrossDistroSubsystemOrchestrator {
-    pub fn new(initial_mode: DistroSubsystemMode) -> Self {
-        Self {
-            matrix_engine: SovereignUniversalSubsystemMatrixEngine::new(initial_mode),
-            active_subsystems: vec![
-                "init".to_string(), "package".to_string(), "vfs".to_string(), "security".to_string(),
-                "storage".to_string(), "kernel".to_string(), "network".to_string(), "graphics".to_string(),
-                "power".to_string(), "ipc".to_string(), "auth".to_string(), "audit".to_string(),
-                "boot".to_string(), "container".to_string(), "virtualization".to_string(), "audio".to_string(),
-                "input".to_string(), "thermal".to_string(), "memory".to_string(), "syscall".to_string(),
-                "device".to_string(), "crypto".to_string(), "ai".to_string(), "monitoring".to_string(),
-                "i18n".to_string(), "firewall".to_string(), "compiler".to_string(), "shell".to_string(),
-                "display".to_string(), "printing".to_string(), "backup".to_string(), "telemetry".to_string(),
-            ],
-        }
-    }
-
-    pub fn orchestrate_subsystem(
-        &mut self,
-        distro_mode: DistroSubsystemMode,
-        subsystem: &str,
-        action: &str,
-    ) -> Result<String, &'static str> {
-        self.matrix_engine.bridge.set_subsystem_mode(distro_mode);
-        self.matrix_engine
-            .bridge
-            .dispatch_cross_subsystem_operation(subsystem, action)
-    }
-
-    pub fn verify_universal_subsystem_matrix(&mut self) -> Result<usize, &'static str> {
-        self.matrix_engine.run_full_subsystem_matrix_verification()
-    }
-
-    pub fn query_all_subsystem_capabilities(&self, subsystem: &str) -> Vec<String> {
-        self.matrix_engine.bridge.query_subsystem_capabilities(subsystem)
     }
 }
 
@@ -2433,13 +2430,8 @@ mod cross_subsystem_tests {
             "network", "graphics", "power", "ipc", "auth", "audit",
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "i18n", "firewall", "compiler", "shell", "display", "printing",
-            "backup", "telemetry", "kali_recon", "antix_runit", "zorin_chameleon",
-            "mint_cinnamon", "garuda_dracut", "cachy_bore", "parrot_anonsurf",
-            "parrot_apparmor", "parrot_forensics", "omarchy_quickshell", "omarchy_theme",
-            "omarchy_lua_reload", "omarchy_herdr_agent", "nixos_declarative", "void_runit",
-            "alpine_apk", "gentoo_portage", "freebsd_jails", "openbsd_pledge",
-            "dragonfly_hammer2", "illumos_zones", "bedrock_strata", "tails_amnesic", "qubes_zen",
+            "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
+            "compiler", "shell", "display", "printing", "backup", "telemetry", "desktop",
         ];
 
         for m in modes {
@@ -2486,13 +2478,13 @@ mod cross_subsystem_tests {
     fn test_sovereign_universal_subsystem_matrix_engine() {
         let mut matrix_engine = SovereignUniversalSubsystemMatrixEngine::new(DistroSubsystemMode::LinuxArch);
 
-        // Test full matrix verification across all 22 distro modes x 56 subsystem categories
+        // Test full matrix verification across all 22 distro modes x 32 subsystem categories
         let verified_count = matrix_engine.run_full_subsystem_matrix_verification().unwrap();
-        assert_eq!(verified_count, 22 * 56);
+        assert_eq!(verified_count, 22 * 32);
 
-        // Test cross-orchestration of all 56 subsystems
+        // Test cross-orchestration of all 32 subsystems
         let results = matrix_engine.cross_orchestrate_all_subsystems("universal_test_payload").unwrap();
-        assert_eq!(results.len(), 56);
+        assert_eq!(results.len(), 32);
         for res in results {
             assert!(!res.is_empty());
         }
@@ -2505,31 +2497,6 @@ mod cross_subsystem_tests {
         assert!(init_caps.contains(&"Systemd".to_string()));
         assert!(init_caps.contains(&"OpenRC".to_string()));
         assert!(init_caps.contains(&"Runit".to_string()));
-    }
-
-    #[test]
-    fn test_cross_distro_subsystem_orchestrator() {
-        let mut orchestrator = SovereignCrossDistroSubsystemOrchestrator::new(DistroSubsystemMode::LinuxArch);
-
-        // Test orchestration across all 32 subsystems in different Linux and BSD modes
-        let target_subsystems = [
-            "init", "package", "vfs", "security", "storage", "kernel",
-            "network", "graphics", "power", "ipc", "auth", "audit",
-            "boot", "container", "virtualization", "audio", "input",
-            "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
-            "i18n", "firewall", "compiler", "shell", "display", "printing",
-            "backup", "telemetry",
-        ];
-
-        for sub in target_subsystems {
-            let res = orchestrator.orchestrate_subsystem(DistroSubsystemMode::FreeBsd, sub, "test_action");
-            assert!(res.is_ok(), "Subsystem '{}' orchestration failed", sub);
-            let caps = orchestrator.query_all_subsystem_capabilities(sub);
-            assert!(!caps.is_empty(), "Capabilities for '{}' must not be empty", sub);
-        }
-
-        let total_verified = orchestrator.verify_universal_subsystem_matrix().unwrap();
-        assert_eq!(total_verified, 22 * 32);
     }
 }
 
