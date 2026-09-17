@@ -2643,7 +2643,6 @@ mod tests {
                 v
             },
             description: "command line tool for transferring data with URLs".to_string(),
-            priority: PackagePriority::Optional,
         };
 
         let _pkgbuild = PacmanPkgbuild {
@@ -2849,7 +2848,8 @@ mod tests {
         assert_eq!(restored, pkgs);
     }
 
-    pub fn test_all_package_format_strategies_and_adapters(&self) {
+    #[test]
+    fn test_all_package_format_strategies_and_adapters() {
         let formats = vec![
             PackageFormat::Deb, PackageFormat::Rpm, PackageFormat::Pacman, PackageFormat::Ebuild,
             PackageFormat::Apk, PackageFormat::Nix, PackageFormat::Flatpak, PackageFormat::Snap,

@@ -58,7 +58,13 @@ This document specifies the core architectural guidelines, packaging purity stan
 
 ---
 
-## 8. AI Agent & Contributor Task Execution Guidelines
+## 8. openSUSE & Solus: Profile Automation & Delta Package Management Guidelines
+- **openSUSE AutoYaST XML Profile Automation:** Declarative system provisioning profiles specify selected patterns, packages, and network configurations for hands-off deployment.
+- **Solus eopkg Delta Package Management:** Bandwidth-efficient package upgrades use strictly monotonic delta revision validation (`new_revision > old_revision`) to construct binary diffs.
+
+---
+
+## 9. AI Agent & Contributor Task Execution Guidelines
 - **Zero-Dependency `#![no_std]` Strictness:** All kernel and distro core modules must maintain zero third-party dependencies and adhere to `#![no_std]` compatibility.
 - **Git Branch Naming Standard:** All developer and AI agent working branches must begin with the `jules-*` prefix (e.g. `jules-ahead-distro-supremacy`).
 - **Mandatory Practice Proactive Testing:** Every task change must include unit test verification executable via `rustc --test` or `./run_sigma_tests.sh` before submitting pull requests.
