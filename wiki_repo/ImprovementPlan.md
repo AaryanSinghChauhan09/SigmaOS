@@ -7,13 +7,6 @@ All improvements and updates in this plan are committed directly to the `main` b
 
 ---
 
-## Agent Steering Integration (Tri-Agent System)
-* ⚡ **Bolt Agent**: Focused on zero-allocation buffer operations, $O(N \log N)$ map lookups, and vectorized memory operations.
-* 🎨 **Palette Agent**: Focused on WCAG 2.1 AA keyboard accessibility, visual focus indicators, high-contrast forced-colors support, and explicit ARIA annotations.
-* 🛡️ **Sentinel Agent**: Focused on strict input validation (preventing NUL byte injection, hostname flag injection, IPv4/IPv6 address parsing differentials) and post-quantum cryptographic enclaves.
-
----
-
 ## 1. Code Quality & Testing Audit
 
 ### 1.1 Bug Detection & Compilation Integrity

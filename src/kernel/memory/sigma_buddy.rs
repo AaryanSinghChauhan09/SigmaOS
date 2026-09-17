@@ -321,7 +321,7 @@ impl SigmaBuddyAllocator {
         let pages = block.size / PAGE_SIZE;
 
         // Scrub and poison memory on free if poison_on_free is enabled
-        if self.poison_on_free && !block.addr.as_ptr().is_null() {
+        if self.poison_on_free && block.size > 0 {
             unsafe {
                 core::ptr::write_bytes(block.addr.as_ptr(), 0xDE, block.size);
             }

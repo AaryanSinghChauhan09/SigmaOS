@@ -48,7 +48,6 @@ print("\n=== FIX 3: Fix selinux bare imports ===")
 result = subprocess.run(["grep", "-rn", "use selinux::", os.path.join(REPO, "src/")], capture_output=True, text=True)
 for line in result.stdout.strip().split('\n'):
     if line:
-        filepath = ':'.join(line.split(':')[:1] if ':' in line else [line])
         filepath = line.split(':')[0]
         content = read_file(filepath)
         new_content = content.replace("use selinux::", "use crate::security::selinux::")
@@ -238,7 +237,7 @@ for filepath in result.stdout.strip().split('\n'):
 
 # FIX 18: Show where filesystem::FileMode is defined
 print("\n=== FIX 18: FileMode investigation ===")
-result = subprocess.run(["grep", "-rn", "struct FileMode\|pub struct FileMode", os.path.join(REPO, "src/")], capture_output=True, text=True)
+result = subprocess.run(["grep", "-rn", r"struct FileMode\|pub struct FileMode", os.path.join(REPO, "src/")], capture_output=True, text=True)
 print(result.stdout[:500])
 
 # FIX 19: Show duplicate function locations
