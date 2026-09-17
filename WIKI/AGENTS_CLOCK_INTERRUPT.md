@@ -1,34 +1,28 @@
-# SigmaOS AI Agent Clock Interrupt Management Directive (`AGENTS_CLOCK_INTERRUPT.md`)
+# AI Agent Clock Interrupt Management Architecture (`docs/AGENTS_CLOCK_INTERRUPT.md`)
 
-This document defines technical directives, timer interrupt handling protocols, and timekeeping guidelines for AI agents managing clock interrupts in SigmaOS.
-
----
-
-## 1. Core Principles for Clock Interrupt Management
-
-Clock interrupts (PIT, Local APIC timer, HPET, and ARM Generic Timers) drive kernel timekeeping, process preemption, and high-resolution timer queues in SigmaOS. AI agents modifying timer routines must observe the following rules:
-
-1. **Reentrancy & Interrupt Safety:**
-   - Clock interrupt service routines (ISRs) must execute with minimal latency. Avoid blocking lock acquisitions or memory allocations inside timer interrupt handlers.
-   - Timer state modifications (`start_time`, `is_running`) must utilize lock-free atomic variables (`AtomicBool`, `AtomicU64`) with `Ordering::SeqCst` memory orderings.
-
-2. **Timer Descriptor Management (`TimerDescriptor`, `TimerCapability`):**
-   - Timers managed via `TimerDescriptor` must validate `TimerCapability` and interval bounds before starting or resetting.
-   - Periodic and one-shot timer callbacks must execute safely without leaking resources or causing recursive ISR invocation.
-
-3. **Timekeeping Accuracy & Drift Compensation:**
-   - Monotonic time calculations must derive from hardware timestamp counters (TSC/Generic Timers) synchronized across CPU cores.
-   - Prevent timer drift during process context switches by calculating elapsed interval ticks atomically.
-
-4. **Zero-Dependency `#![no_std]` Compatibility:**
-   - Timer subsystems in core kernel layers must maintain zero-dependency `#![no_std]` compliance.
+This guide details the technical architecture, timer descriptor interfaces, and AI agent monitoring protocols for clock interrupt management in SigmaOS.
 
 ---
 
-## 2. Pre-Commit Clock Interrupt Verification Checklist
+## 1. Subsystem Architecture
 
-Before submitting code modifications, AI agents must verify:
-- [ ] Clock ISRs operate without memory allocations or blocking locks.
-- [ ] Timer descriptors (`TimerDescriptor`) validate interval bounds before activation.
-- [ ] Atomic timer state transitions handle concurrent start/stop requests safely.
-- [ ] `./run_sigma_tests.sh` executes with 100% test pass rate.
+SigmaOS provides low-latency timer interrupt handling and high-resolution timekeeping:
+
+### A. Timer Abstractions & Descriptors
+- Located in `src/timer/timer.rs`.
+- Defines `TimerDescriptor`, `TimerCapability`, and `TimerInfo` for managing periodic and one-shot hardware timers.
+- Uses atomic integers (`AtomicU64`, `AtomicBool`) to track timer start times, intervals, and active states without lock contention inside ISRs.
+
+### B. Hardware Timer Ticks & Preemption
+- APIC and HPET hardware timers generate periodic interrupts that trigger the kernel scheduler (`src/kernel/scheduler.rs`) to calculate process virtual deadlines and enforce EEVDF/ULE preemption.
+
+### C. Timer Callback Execution
+- Dispatches registered callback functions (`fn(TimerID)`) upon timer expiration, automatically resetting periodic timers to the next interval tick.
+
+---
+
+## 2. AI Agent Operational Directives
+
+1. **ISR Non-Blocking Audit:** Ensure clock interrupt handlers avoid heap allocations or lock contention.
+2. **Atomic Synchronization:** Verify atomic load/store operations on `is_running` and `start_time` fields prevent race conditions between interrupt context and process threads.
+3. **Automated Verification:** Execute `./run_sigma_tests.sh` to confirm timer unit tests pass.

@@ -1,33 +1,26 @@
-# SigmaOS AI Agent Constrained Application Protocol (CoAP) Management Directive (`AGENTS_COAP_MANAGEMENT.md`)
+# AI Agent Constrained Application Protocol (CoAP) Architecture (`docs/AGENTS_COAP_MANAGEMENT.md`)
 
-This document defines technical directives, IoT resource endpoint rules, and communication protocols for AI agents managing the Constrained Application Protocol (CoAP) in SigmaOS.
-
----
-
-## 1. Core Principles for CoAP Management
-
-CoAP (RFC 7252) provides lightweight, low-overhead RESTful messaging over UDP for constrained IoT environments in SigmaOS. AI agents modifying or extending CoAP interfaces must observe the following rules:
-
-1. **Resource Endpoint Handling (`CoAPResource`, `SimpleCoAPResource`):**
-   - CoAP resource endpoints must implement the `CoAPResource` trait.
-   - Request URI paths and payloads must be validated before processing to prevent path traversal or buffer read overruns in constrained memory devices.
-
-2. **Method Dispatch & Error Mapping (`CoAPMethod`, `CoAPError`):**
-   - Standard RESTful request methods (`GET`, `POST`, `PUT`, `DELETE`) must map to `CoAPMethod` enum variants.
-   - Resource access or request failures must return explicit `CoAPError` codes (`Success`, `NotFound`, `RequestFailed`) rather than panicking in IoT kernel contexts.
-
-3. **Resource Observation (`observe`):**
-   - Subscriptions to observable resource endpoints (`observe`) must track client registration states and dispatch state delta updates efficiently without saturating network bandwidth.
-
-4. **Zero-Dependency `#![no_std]` Compatibility:**
-   - CoAP message encoding, option parsing, and resource registries in `src/iot/coap.rs` must maintain zero-dependency `#![no_std]` design compliance.
+This guide details the technical architecture, IoT resource interfaces, and AI agent monitoring protocols for Constrained Application Protocol (CoAP) management in SigmaOS.
 
 ---
 
-## 2. Pre-Commit CoAP Verification Checklist
+## 1. Subsystem Architecture
 
-Before submitting code modifications, AI agents must verify:
-- [ ] CoAP server resource registration (`add_resource`, `remove_resource`) handles non-existent IDs cleanly.
-- [ ] Request URI path and payload inputs are validated against buffer bounds.
-- [ ] CoAP client request/observe invocations handle transport errors safely.
-- [ ] `./run_sigma_tests.sh` executes with 100% test pass rate.
+SigmaOS provides a lightweight CoAP client and server implementation for embedded and IoT workloads:
+
+### A. CoAP Protocol & Resource Endpoint Abstractions
+- Located in `src/iot/coap.rs`.
+- Defines `CoAPResource`, `SimpleCoAPResource`, `CoAPMethod` (`GET`, `POST`, `PUT`, `DELETE`), and `CoAPError`.
+- Provides lightweight RESTful URI routing and payload processing over UDP for resource-constrained devices.
+
+### B. Client & Server Communication
+- `CoAPClient` / `SimpleCoAPClient` sends request messages (`send_request`) and manages resource observation (`observe`).
+- `CoAPServer` / `SimpleCoAPServer` manages dynamic resource registration (`add_resource`, `remove_resource`) and dispatches incoming request payloads to registered endpoints.
+
+---
+
+## 2. AI Agent Operational Directives
+
+1. **Payload Bounds Checks:** Ensure incoming CoAP request payloads and URI paths enforce strict bounds checking to prevent buffer overruns.
+2. **Graceful Error Handling:** Confirm unhandled resource paths return `CoAPError::NotFound` without crashing the IoT service daemon.
+3. **Automated Verification:** Execute `./run_sigma_tests.sh` to confirm IoT and CoAP unit tests pass.

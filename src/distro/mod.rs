@@ -1,26 +1,12 @@
 pub mod omarchy_inspiration;
 pub use omarchy_inspiration::*;
 pub mod omarchy;
-pub mod omarchy_inspiration;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
     OmarchyAudioPipewireConfig,
     OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
     OmarchyTerminalFontConfig, OmarchyTheme,
     PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
-    OmarchyAudioPipewireConfig, OmarchyDotfilesStowProfileEngine, OmarchyHyprlandAnimCurveEngine,
-    OmarchyKeybindingsStudio, OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
-    OmarchyTerminalFontConfig, OmarchyTheme, PasswordlessSudoExpiryGuard, SovereignAgentKind,
-    StowPackageProfile, WebAppSpec,
-};
-pub use omarchy_inspiration::{
-    AiAgentProvider, HerdrAgentTask, MakoNotification, OmarchyHerdrAiAgentManager,
-    OmarchyHyprlandWorkspaceSnapLayoutEngine, OmarchyHyprlockGuardEngine, OmarchyLiveIsoBootstrapEngine,
-    OmarchyLuaConfigEngine, OmarchyMakoNotificationDaemonEngine, OmarchyNeovimPresetStudioEngine,
-    OmarchyPluginEntry, OmarchyPluginMarketplace, OmarchyQuickshellEngine, OmarchyReleaseChannel,
-    OmarchyReleaseChannelSnapshotEngine, OmarchySystemThemeStudio, OmarchyThemePalette,
-    OmarchyWalkerLauncherEngine, OmarchyWaybarAppletStudioEngine, OmarchyWaybarStatusAppletStudio,
-    PreflightSnapshot, QuickshellWidget, ShellComponentKind, WalkerAppEntry, WindowRule,
 };
 pub mod parrot_security;
 pub mod kali_security;
@@ -129,8 +115,8 @@ pub use clear_linux::{
     ClearLinuxStatelessEngine, ConfigLocation, ConfigState, SwupdBundle, SwupdUpdateManager,
 };
 pub use compliance::{
-    ComplianceAuditEvent, ComplianceAuditLogger, ComplianceFramework, DistroGuidelineStandard,
-    LinuxBsdDistroGuidelineRules, TpmAttestationManager, TpmPcrMeasurement,
+    ComplianceAuditEvent, ComplianceAuditLogger, ComplianceFramework, TpmAttestationManager,
+    TpmPcrMeasurement,
 };
 pub use sovereign_system_innovations::{
     AdaptiveWmOverlayController, EventWorkloadTask, ExtensibleSyscallHookGate, FirewallRule,
@@ -167,9 +153,6 @@ pub use arch_parity::{
     AlpmDatabase, ArchArchinstallEngine, ArchArchwebEngine, ArchCdevtoolsEngine, ArchPkgctlEngine,
     ArchWikiOfflineEngine, AurClient, PkgBuild, SandboxedCompiler, SovereignSvntogitEngine,
     SvntogitPackageRepo,
-    AlpmDatabase, ArchGpgKey, ArchMkinitcpioGeneratorEngine, ArchPacmanKeyringEngine,
-    ArchPowerpillParallelDownloadEngine, ArchReflectorMirrorlistEngine, AurClient, PkgBuild,
-    SandboxedCompiler, SovereignSvntogitEngine, SvntogitPackageRepo,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -352,5 +335,3 @@ pub use linux_bsd_distro_strategic_innovations::{
     ExecGuardRecommendation, FedoraGreenbootHealthCheckEngine, ObfuscatedInputEvent,
     VanillaAbrootImageTransactionEngine, WhonixKloakInputObfuscationEngine, ZorinExecGuardSubsystem,
 };
-pub mod sovereign_open_source_distro_synthesis;
-pub use sovereign_open_source_distro_synthesis::*;
