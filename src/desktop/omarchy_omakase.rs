@@ -546,4 +546,31 @@ mod tests {
         assert_eq!(cid, "PWA_CONTAINER_1");
         assert_eq!(pwa.instances.len(), 1);
     }
+
+    #[test]
+    fn test_additional_omarchy_enhancements() {
+        let mut scroll = OmarchyHyprlandScrollLayoutEngine::new();
+        scroll.open_window(101, "Ghostty");
+        scroll.open_window(102, "Neovim");
+        assert_eq!(scroll.windows.len(), 2);
+        assert_eq!(scroll.active_window_id, Some(102));
+
+        let next = scroll.focus_next_window();
+        assert_eq!(next, Some(101));
+
+        let lazygit = OmarchyLazyGitConfigurationEngine::new("Dracula");
+        let lazygit_yaml = lazygit.generate_lazygit_yaml();
+        assert!(lazygit_yaml.contains("Omarchy Theme: Dracula"));
+
+        let mut widget_bar = OmarchyQuattroWidgetBarEngine::new();
+        widget_bar.update_status(25.5, 42.0, "Ghostty Terminal");
+        let json = widget_bar.render_quickshell_bar_json();
+        assert!(json.contains("\"cpu\": 25.5"));
+        assert!(json.contains("Ghostty Terminal"));
+
+        let mut pwa = OmarchyWeb2AppPwaSandbox::new();
+        let cid = pwa.launch_pwa_sandbox("GitHub", "https://github.com");
+        assert_eq!(cid, "PWA_CONTAINER_1");
+        assert_eq!(pwa.instances.len(), 1);
+    }
 }
