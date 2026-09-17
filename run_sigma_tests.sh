@@ -102,6 +102,13 @@ if [ -f "src/package/universal_package_innovations_suite.rs" ]; then
     ./build/universal_innovations_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_innovations.rs" ]; then
+    echo "Running Sovereign Distro Package Innovations test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_innovations_test
+    ./build/sovereign_innovations_test
+fi
+
 if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
     echo "Running Arch Pacman Engine & AUR compilation test suite..."
     mkdir -p build

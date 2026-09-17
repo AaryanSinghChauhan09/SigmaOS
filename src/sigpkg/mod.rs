@@ -69,6 +69,7 @@ pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
+pub use crate::package::sovereign_distro_package_innovations::*;
 pub use crate::package::sovereign_distro_package_matrix::*;
 
 #[path = "../package/bsd_linux_package_innovations.rs"]
