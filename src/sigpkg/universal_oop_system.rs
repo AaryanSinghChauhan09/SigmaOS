@@ -31,7 +31,7 @@ pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use std::sync::Arc;
 
 #[cfg(any(feature = "standalone_test", test))]
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,
     pub minor: u64,
@@ -3944,25 +3944,11 @@ impl UniversalDistroPackageUnifierEngine {
         // 2. Map dependencies to unified sovereign system dependencies
         let mut unified_deps = Vec::new();
         for dep in foreign_package.dependencies() {
-            let dep_name = dep.name.as_str();
-            let mapped_name = if dep_name.contains("ssl") {
-                "sovereign-openssl"
-            } else if dep_name.contains("libc") || dep_name.contains("glibc") || dep_name.contains("musl") {
-                "sovereign-libc"
-            } else if dep_name.contains("zlib") || dep_name.contains("xz") || dep_name.contains("zstd") {
-                "sovereign-compression"
-            } else if dep_name.contains("bash") || dep_name.contains("zsh") || dep_name.contains("fish") {
-                "sovereign-shell"
-            } else if dep_name.contains("systemd") || dep_name.contains("runit") || dep_name.contains("openrc") {
-                "sovereign-init"
-            } else if dep_name.contains("gcc") || dep_name.contains("clang") || dep_name.contains("llvm") || dep_name.contains("rust") {
-                "sovereign-toolchain"
-            } else if dep_name.contains("mesa") || dep_name.contains("vulkan") || dep_name.contains("wayland") {
-                "sovereign-graphics"
-            } else if dep_name.contains("curl") || dep_name.contains("wget") || dep_name.contains("dhcp") {
-                "sovereign-network-tools"
-            } else {
-                dep_name
+            let mapped_name = match dep.name.as_str() {
+                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
+                "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
+                "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
+                _ => &dep.name,
             };
             unified_deps.push(Dependency {
                 name: mapped_name.to_string(),
