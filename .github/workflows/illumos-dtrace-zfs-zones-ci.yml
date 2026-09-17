@@ -24,4 +24,5 @@ jobs:
 
       - name: Test OpenSource Gap Closure Supremacy Engine
         run: |
+          mkdir -p build
           cargo test --lib -- open_source_os_gap_closure::tests

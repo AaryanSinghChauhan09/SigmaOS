@@ -23,4 +23,5 @@ jobs:
 
       - name: Verify FreeBSD Boot Environment & Storage
         run: |
+          mkdir -p build
           ./run_sigma_tests.sh

@@ -23,6 +23,7 @@ jobs:
 
       - name: Execute Wiki Synchronization
         run: |
+          mkdir -p build
           if [ -f ./scripts/sync_wiki.sh ]; then
             chmod +x ./scripts/sync_wiki.sh
             ./scripts/sync_wiki.sh
@@ -30,6 +31,7 @@ jobs:
 
       - name: Generate Rustdoc API Documentation
         run: |
+          mkdir -p build
           cargo doc --no-deps 2>&1 || true
 
       - name: Upload Documentation Artifact

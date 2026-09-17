@@ -20,11 +20,7 @@ use std::vec::Vec;
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-#[cfg(not(target_os = "none"))]
-use crate::klib::HashMap;
-
-#[cfg(target_os = "none")]
-use crate::klib::BTreeMap as HashMap;
+use std::collections::HashMap;
 
 /// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -519,7 +515,131 @@ impl Default for ManjaroSettingsManager {
     }
 }
 
-#[cfg(test_disabled)]
+// =========================================================================
+// MANJARO BRANCH SWITCHING & PACMAN-MIRRORS BRANCH GOVERNOR
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ManjaroBranchType {
+    Stable,
+    Testing,
+    Unstable,
+}
+
+pub struct ManjaroBranchSwitchEngine {
+    pub current_branch: ManjaroBranchType,
+    pub mirror_url: String,
+    pub branch_switches_count: usize,
+}
+
+impl ManjaroBranchSwitchEngine {
+    pub fn new() -> Self {
+        Self {
+            current_branch: ManjaroBranchType::Stable,
+            mirror_url: "https://repo.manjaro.org/repo/stable".to_string(),
+            branch_switches_count: 0,
+        }
+    }
+
+    pub fn set_branch(&mut self, target: ManjaroBranchType) -> String {
+        self.current_branch = target;
+        self.branch_switches_count += 1;
+        let branch_name = match target {
+            ManjaroBranchType::Stable => "stable",
+            ManjaroBranchType::Testing => "testing",
+            ManjaroBranchType::Unstable => "unstable",
+        };
+        self.mirror_url = format!("https://repo.manjaro.org/repo/{}", branch_name);
+        self.mirror_url.clone()
+    }
+}
+
+impl Default for ManjaroBranchSwitchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// MANJARO PAMAC CLI & ORPHAN PACKAGE CLEANUP ENGINE
+// =========================================================================
+
+pub struct ManjaroPamacCliEngine {
+    pub pamac: PamacPackageManager,
+    pub orphan_packages: Vec<String>,
+}
+
+impl ManjaroPamacCliEngine {
+    pub fn new() -> Self {
+        Self {
+            pamac: PamacPackageManager::new(),
+            orphan_packages: vec!["libunneeded".to_string(), "old-dep".to_string()],
+        }
+    }
+
+    pub fn remove_orphans(&mut self) -> usize {
+        let count = self.orphan_packages.len();
+        self.orphan_packages.clear();
+        count
+    }
+}
+
+impl Default for ManjaroPamacCliEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// MANJARO ISO ARCHITECT / BUILD-ISO ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ManjaroIsoProfile {
+    pub desktop_environment: String, // "KDE", "GNOME", "XFCE"
+    pub kernel_variant: String,
+    pub included_packages: Vec<String>,
+}
+
+pub struct ManjaroIsoArchitectEngine {
+    pub active_profiles: Vec<ManjaroIsoProfile>,
+}
+
+impl ManjaroIsoArchitectEngine {
+    pub fn new() -> Self {
+        let sample_profiles = vec![
+            ManjaroIsoProfile {
+                desktop_environment: "XFCE".to_string(),
+                kernel_variant: "linux612".to_string(),
+                included_packages: vec!["mhwd".to_string(), "pamac-gtk".to_string()],
+            },
+            ManjaroIsoProfile {
+                desktop_environment: "KDE".to_string(),
+                kernel_variant: "linux622".to_string(),
+                included_packages: vec!["mhwd".to_string(), "pamac-qt".to_string()],
+            },
+        ];
+        Self {
+            active_profiles: sample_profiles,
+        }
+    }
+
+    pub fn compile_iso_image(&self, de: &str) -> Result<String, &'static str> {
+        if let Some(prof) = self.active_profiles.iter().find(|p| p.desktop_environment == de) {
+            Ok(format!("manjaro-{}-{}-2026.04.iso", prof.desktop_environment.to_lowercase(), prof.kernel_variant))
+        } else {
+            Err("Manjaro ISO profile for requested DE not found")
+        }
+    }
+}
+
+impl Default for ManjaroIsoArchitectEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -587,10 +707,6 @@ mod tests {
             .langpack_installer
             .installed_packs
             .contains(&"firefox-i18n-de".to_string()));
-        assert!(msm
-            .langpack_installer
-            .installed_packs
-            .contains(&"firefox-i18n-de".to_string()));
 
         msm.configure_thermal_profile(true);
         assert_eq!(msm.optimal_thermal_fan_speed_rpm, 4500);
@@ -599,5 +715,20 @@ mod tests {
             PowerProfile::Performance
         );
         assert_eq!(msm.power_governor.target_cpu_freq_mhz, 4800);
+    }
+
+    #[test]
+    fn test_manjaro_branch_pamac_and_architect() {
+        let mut branch_eng = ManjaroBranchSwitchEngine::new();
+        let url = branch_eng.set_branch(ManjaroBranchType::Testing);
+        assert!(url.contains("testing"));
+
+        let mut pamac_cli = ManjaroPamacCliEngine::new();
+        assert_eq!(pamac_cli.remove_orphans(), 2);
+
+        let architect = ManjaroIsoArchitectEngine::new();
+        let iso_res = architect.compile_iso_image("XFCE");
+        assert!(iso_res.is_ok());
+        assert!(iso_res.unwrap().contains("xfce"));
     }
 }
