@@ -203,7 +203,9 @@ pub mod math {
         n |= n >> 4;
         n |= n >> 8;
         n |= n >> 16;
-        n |= n >> 32;
+        if usize::BITS >= 64 {
+            n |= n >> 32;
+        }
         n + 1
     }
 
