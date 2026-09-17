@@ -1,15 +1,9 @@
-// SigmaOS Security Subsystem
-pub mod capability;
-pub mod pqc_enclave;
-pub mod governance;
-pub mod audit;
-pub mod bsd_hardening;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
-pub mod vault;
-pub mod vpn;
+pub mod system_policy_rules;
+pub use system_policy_rules::*;
 
 // SigmaOS Security Subsystem
+pub mod audit;
+pub mod capability;
 pub mod seccomp;
 pub mod seccomp_ebpf;
 pub mod syscall_filter;
@@ -19,6 +13,7 @@ pub mod kernel_hardening;
 pub mod user_namespace;
 
 pub mod bridge;
+pub mod bsd_hardening;
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
@@ -32,6 +27,7 @@ pub mod mac;
 pub mod openbsd_karl;
 pub mod password;
 pub mod pledge;
+pub mod pqc_enclave;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod kali_stack;
 pub mod parrot;
@@ -39,6 +35,10 @@ pub mod parrot_kali;
 pub mod parrot_linux;
 pub mod parrot_parity;
 pub mod pqc_measurement;
+pub use pqc_measurement::{
+    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
+    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
+};
 pub mod prism;
 pub mod qubes_isolation;
 pub mod root_improvement;
@@ -47,12 +47,28 @@ pub mod scanner;
 pub mod secrets;
 pub mod selinux;
 pub mod selinux_advanced;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
 pub mod unveil;
+pub mod vault;
+pub mod vpn;
 pub mod vulnerability;
 pub mod kali_components;
 pub mod landlock;
 pub use landlock::{LandlockEngine, LandlockPathBeneathAttr, LandlockRuleset};
-pub mod landlock_sovereign;
+
+pub use kali_components::{
+    HashType, KaliCredentialCracker, KaliExploitEncoder, KaliHashcatCracker, KaliNmapPortScanner,
+    KaliPcapDissector, KaliRamMemoryForensics, KaliWebVulnScanner, PacketHeader, ProcessArtifact,
+    ScanResult, ScanType, VulnType, WebVulnReport,
+};
+
+pub use qubes_isolation::{
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+};
+
+pub use qubes_isolation::*;
+pub use root_improvement::*;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use bsd_hardening::{
@@ -73,7 +89,10 @@ pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use defensive_audit::*;
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
+};
 pub use forensics::*;
 pub use hardening::{
     MemoryProtectionState, RelroState, SecurityHardeningConfig, StackCanary,
@@ -83,37 +102,36 @@ pub use intrusion::{
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
 pub use kali_stack::{
-    CronDaemon, CronJob, DmesgLog, FirewallRule, IptablesFirewall, KaliAirgeddonWifiAudit,
-    KaliError, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter, KaliSqlmapInjectionAuditor,
-    KaliUndercoverThemeMode, KaliWiresharkPacketAnalyzer, PcapPacketHeader,
-    PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
-    TmuxPane, UndercoverDisguiseTheme, WifiFrameType,
+    HashMode, KaliAirgeddonWifiAudit, KaliBurpSuiteWebProxy, KaliHashcatGpuCracker,
+    KaliHydraPasswordBruteforce, KaliJohnTheRipperCracker, KaliMetasploitPayloadFilter,
+    KaliNiktoWebScanner, KaliNmapPortScanner, KaliSqlmapInjectionAuditor, KaliUndercoverThemeMode,
+    KaliWiresharkPacketAnalyzer, PcapPacketHeader, ScanTechnique, UndercoverDisguiseTheme,
+    WifiFrameType,
 };
-
+pub use kernel_hardening::{
+    HardenedSyscallDispatcher, HardenedSyscallError, MemoryAccessError, PagePermissions,
+    PledgePromise as KernelPledgePromise, RetpolineKptiMitigationEngine, SmepSmapEnforcer,
+    SovereignKaslrEngine, SyscallCategory,
+};
 pub use libgksu::{
     GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,
 };
 pub use openbsd_karl::{KarlKernelRelinker, KernelBinarySection, KernelSectionKind};
-pub use parrot_kali::{
+pub use parrot::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF,
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
-pub use parrot::ParrotSecurityFingerprintEngine;
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{
-    promises, PledgeError, PledgeManager, PledgePromise, PledgeManager as OriginalPledgeManager,
+    promises, PledgeError, PledgeManager as OriginalPledgeManager,
     PledgePromise as OriginalPledgePromise,
 };
 pub use qubes_isolation::*;
 pub use root_improvement::*;
-pub use pqc_measurement::{
-    Dilithium5KernelSignatureVerifier, FedoraCryptoPolicyProfile, HybridPqcMeasurementEngine,
-    SovereignFirmitasAttestationEngine, Tpm2PcrBank, Tpm2PcrRegister, TPM2_PCR_COUNT,
-};
 pub use rules::{
     AuditAccessType, AuditSyscallRule, AuditWatchRule, PfAction, PfFilterRule, PledgeRule,
     SecurelevelState, SovereignAuditRuleEngine, SovereignNetworkFilterRulesEngine,
@@ -139,10 +157,9 @@ pub use vpn::{
     VpnConfig, VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-pub use crate::security::vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+pub use vulnerability::{
+    ExploitPayload, PenetrationAssistant, SecurityScanner, SimpleVulnerabilityScanner,
+    VulnerabilityClass, VulnerabilityReport,
 };
-pub use crate::security::vulnerability::{SimpleVulnerability, SimpleVulnerabilityScanner};
-
-// ─── Capability Monitor (pledge + unveil + Capsicum) ─────────────────────────
-pub mod capability_monitor;
+pub use seccomp::{SeccompAction, SeccompContext, SeccompFilter, SeccompManager, FilterRule, ArgumentConstraint, CompareOp};
+pub use syscall_filter::{FilterType, ProcessSyscallFilter, SyscallFilterManager, SyscallFilterPolicy};

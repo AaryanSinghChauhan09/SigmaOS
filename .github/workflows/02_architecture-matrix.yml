@@ -103,6 +103,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@7b73730e263d91cf0ebbe694c03b1e3eb8fb14b1 # stable
         with:
+          toolchain: stable
           targets: ${{ matrix.target }}
 
       - name: Install cross-compilation tools

@@ -1,5 +1,8 @@
 name: Compiler & Kernel Matrix
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main ]

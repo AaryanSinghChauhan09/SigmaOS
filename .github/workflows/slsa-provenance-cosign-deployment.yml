@@ -1,5 +1,8 @@
 name: SLSA Level 3 Provenance & Cosign Deployment CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main", "master", "jules-*" ]

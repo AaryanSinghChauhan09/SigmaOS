@@ -6,14 +6,19 @@ use std::vec::Vec;
 use std::format;
 
 fn escape_html(input: &str) -> String {
-    input
-        .replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
-        .replace('\'', "&#x27;")
+    let mut escaped = String::with_capacity(input.len());
+    for c in input.chars() {
+        match c {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#x27;"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped
 }
-
 
 /// Document
 #[derive(Debug, Clone)]
@@ -219,7 +224,7 @@ mod tests {
     #[test]
     fn test_online_web_file_editor() {
         let mut engine = OnlineWebFileEditorEngine::new();
-        let tab_id = engine.open_tab("/etc/sigma/config.conf", "SERVER_PORT=8080");
+        let tab_id = engine.open_tab("/etc/sigma/config.conf", "SERVER_PORT=8080 & <script>");
 
         assert_eq!(engine.active_tabs.len(), 1);
         assert_eq!(engine.selected_tab_id.as_deref(), Some(tab_id.as_str()));
@@ -228,16 +233,7 @@ mod tests {
         assert_eq!(versions, 1);
 
         let preview = engine.render_live_html_preview(&tab_id);
-        assert!(preview.contains("SERVER_PORT=8080"));
-    }
-
-    #[test]
-    fn test_online_web_file_editor_xss_sanitization() {
-        let mut engine = OnlineWebFileEditorEngine::new();
-        let tab_id = engine.open_tab("/tmp/test.html", "<script>alert('xss')</script>");
-        let preview = engine.render_live_html_preview(&tab_id);
-        assert!(!preview.contains("<script>"));
-        assert!(preview.contains("&lt;script&gt;"));
+        assert!(preview.contains("SERVER_PORT=8080 &amp; &lt;script&gt;"));
     }
 }
 
