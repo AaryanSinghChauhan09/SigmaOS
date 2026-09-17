@@ -41,7 +41,6 @@ pub use fedora_missing_components::{
     FedoraMockChrootBuilder, FedoraSssdFreeIpaEngine, KickstartPartition, MockChrootConfig,
 };
 pub use fedora_domination::*;
-pub mod fedora_missing_components;
 pub use fedora_missing_components::{
     BodhiStatus, BodhiUpdateRecord, BodhiUpdateType, CoprRepository, CryptoPolicyProfile,
     FedoraBodhiUpdateEngine, FedoraContainerStackEngine, FedoraCoprBuildGatewayEngine,

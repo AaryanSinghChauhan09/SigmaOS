@@ -9,8 +9,6 @@ use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 use std::format;
-use std::string::{String, ToString};
-use std::vec::Vec;
 use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards
@@ -740,31 +738,6 @@ impl Default for ReflectorMirrorRanker {
     }
 }
 
-pub struct ReflectorMirrorlistRanker {
-    pub mirrors: Vec<(String, u32)>,
-}
-
-impl ReflectorMirrorlistRanker {
-    pub fn new() -> Self {
-        let mut mirrors = Vec::new();
-        mirrors.push(("https://mirror.rackspace.com/archlinux/".to_string(), 18));
-        mirrors.push(("https://arch.mirror.constant.com/".to_string(), 25));
-        mirrors.push(("https://geo.mirror.pkgbuild.com/".to_string(), 12));
-
-        Self { mirrors }
-    }
-
-    pub fn rank_top_mirrors(&mut self) -> &[(String, u32)] {
-        self.mirrors.sort_by(|a, b| a.1.cmp(&b.1));
-        &self.mirrors
-    }
-}
-
-impl Default for ReflectorMirrorlistRanker {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct ArchChrootProfile {
@@ -843,7 +816,7 @@ impl ArchPkgctlEngine {
 
 impl Default for ArchPkgctlEngine {
     fn default() -> Self {
-        Self::new()
+        Self::new("default")
     }
 }
 
@@ -897,14 +870,6 @@ impl ArchArchwebEngine {
     pub fn query_package(&self, pkg_name: &str) -> Option<String> {
         if self.entries.iter().any(|e| e.pkgname == pkg_name) {
             Some(format!("Core Repository / {}", pkg_name))
-        } else {
-            None
-        }
-    }
-
-    pub fn query_package(&self, pkg_name: &str) -> Option<String> {
-        if let Some(entry) = self.entries.iter().find(|e| e.pkgname == pkg_name) {
-            Some(format!("{} - Core Repository", entry.pkgname))
         } else {
             None
         }
@@ -966,7 +931,7 @@ impl ArchArchinstallEngine {
 
 impl Default for ArchArchinstallEngine {
     fn default() -> Self {
-        Self::new()
+        Self::new("/dev/sda", "ext4")
     }
 }
 
@@ -1007,10 +972,6 @@ impl ArchWikiOfflineEngine {
             .iter()
             .filter(|a| a.title.to_lowercase().contains(&q) || a.content.to_lowercase().contains(&q))
             .collect()
-    }
-
-    pub fn search_offline_wiki(&self, query: &str) -> String {
-        format!("ArchWiki Offline Entry for {}", query)
     }
 
     pub fn search_offline_wiki(&self, query: &str) -> String {
@@ -1631,23 +1592,5 @@ impl ArchPowerpillParallelDownloadEngine {
             .iter()
             .map(|pkg| format!("https://geo.mirror.pkgbuild.com/core/os/x86_64/{}.pkg.tar.zst", pkg))
             .collect()
-    }
-}
-
-/// Arch Linux svntogit Git repository integration engine
-#[derive(Debug, Clone, Default)]
-pub struct SvntogitPackageRepo {
-    pub repo_name: String,
-    pub package_names: Vec<String>,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct SovereignSvntogitEngine {
-    pub repositories: Vec<SvntogitPackageRepo>,
-}
-
-impl SovereignSvntogitEngine {
-    pub fn new() -> Self {
-        Self::default()
     }
 }

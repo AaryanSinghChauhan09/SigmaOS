@@ -3,7 +3,6 @@
 
 extern crate alloc;
 
-extern crate alloc;
 
 // Core working modules
 pub mod accessibility;
@@ -75,7 +74,3 @@ pub mod unimplemented_tools;
 pub mod wiki_unimplemented_ideas;
 pub use wiki_unimplemented_ideas::*;
 pub mod userland;
-pub mod distro;
-pub mod drivers;
-pub mod community;
-pub mod governance;

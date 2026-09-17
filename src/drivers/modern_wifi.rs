@@ -8,7 +8,6 @@ use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
 
-#[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[cfg(test_disabled)]

@@ -594,17 +594,13 @@ pub struct FedoraAnacondaKickstartEngine {
 
 impl FedoraAnacondaKickstartEngine {
     pub fn new() -> Self {
-        Self
+        Self {
+            root_password_hash: String::new(),
+            timezone: "UTC".to_string(),
+            partitions: Vec::new(),
+            packages: Vec::new(),
+        }
     }
-
-    /// Parses an Anaconda Kickstart file format string
-    pub fn parse_kickstart(content: &str) -> Result<FedoraAnacondaKickstartConfig, &'static str> {
-        let mut keyboard = "us".to_string();
-        let mut lang = "en_US.UTF-8".to_string();
-        let mut timezone = "UTC".to_string();
-        let mut partition_layout = Vec::new();
-        let mut selected_packages = Vec::new();
-        let mut enabled_services = Vec::new();
 
     /// Parses Anaconda kickstart manifest file lines
     pub fn parse_kickstart(&mut self, content: &str) {
@@ -654,6 +650,26 @@ impl Default for FedoraAnacondaKickstartEngine {
 // 4. FEDORA SSSD & FREEIPA INTEGRATION ENGINE
 // =========================================================================
 
+pub struct FedoraSssdFreeIpaEngine {
+    pub realm: String,
+    pub enrolled_hosts: Vec<String>,
+}
+
+impl FedoraSssdFreeIpaEngine {
+    pub fn new() -> Self {
+        Self {
+            realm: String::new(),
+            enrolled_hosts: Vec::new(),
+        }
+    }
+}
+
+impl Default for FedoraSssdFreeIpaEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SovereignFedoraEcosystemSuite {
     pub koji: FedoraKojiBuildSystemEngine,
     pub bodhi: FedoraBodhiUpdateEngine,
@@ -669,7 +685,7 @@ pub struct SovereignFedoraEcosystemSuite {
     pub waiverdb: FedoraWaiverDbEngine,
 }
 
-impl FedoraSssdFreeIpaEngine {
+impl SovereignFedoraEcosystemSuite {
     pub fn new() -> Self {
         Self {
             koji: FedoraKojiBuildSystemEngine::new(),
@@ -677,7 +693,7 @@ impl FedoraSssdFreeIpaEngine {
             pagure: FedoraPagureForgeEngine::new("default"),
             copr: FedoraCoprBuildGatewayEngine::new(),
             podman: FedoraContainerStackEngine::new(),
-            mock: FedoraMockChrootBuilder::new(),
+            mock: FedoraMockChrootBuilder::new("fedora-rawhide-x86_64", "x86_64"),
             dnf5: FedoraDnf5PackageEngine::new(),
             anaconda: FedoraAnacondaKickstartEngine::new(),
             sssd: FedoraSssdFreeIpaEngine::new(),
@@ -696,7 +712,7 @@ impl FedoraSssdFreeIpaEngine {
     }
 }
 
-impl Default for FedoraSssdFreeIpaEngine {
+impl Default for SovereignFedoraEcosystemSuite {
     fn default() -> Self {
         Self::new()
     }
@@ -793,4 +809,94 @@ impl FedoraWaiverDbEngine {
     pub fn is_waived(&self, subject: &str, test_type: &str) -> bool {
         self.waivers.values().any(|w| w.subject == subject && w.test_type == test_type)
     }
+}
+
+// =========================================================================
+// MISSING TYPE STUBS (referenced by compatibility/mod.rs)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct CryptoPolicyProfile {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraCryptoPoliciesEngine {
+    pub active_policy: CryptoPolicyProfile,
+}
+
+impl FedoraCryptoPoliciesEngine {
+    pub fn new() -> Self {
+        Self {
+            active_policy: CryptoPolicyProfile {
+                name: "DEFAULT".to_string(),
+                description: "Default Fedora crypto policy".to_string(),
+            },
+        }
+    }
+}
+
+impl Default for FedoraCryptoPoliciesEngine {
+    fn default() -> Self { Self::new() }
+}
+
+pub type FedoraMockChrootBuilderEngine = FedoraMockChrootBuilder;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OpenQaJobStatus {
+    Passed,
+    Failed,
+    Running,
+    Scheduled,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenQaTestJob {
+    pub id: u64,
+    pub name: String,
+    pub status: OpenQaJobStatus,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraOpenQaTestGatewayEngine {
+    pub jobs: Vec<OpenQaTestJob>,
+}
+
+impl FedoraOpenQaTestGatewayEngine {
+    pub fn new() -> Self {
+        Self { jobs: Vec::new() }
+    }
+}
+
+impl Default for FedoraOpenQaTestGatewayEngine {
+    fn default() -> Self { Self::new() }
+}
+
+#[derive(Debug, Clone)]
+pub struct RpmOstreeDeployment {
+    pub checksum: String,
+    pub version: String,
+    pub booted: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FedoraRpmostreeAtomicEngine {
+    pub deployments: Vec<RpmOstreeDeployment>,
+}
+
+impl FedoraRpmostreeAtomicEngine {
+    pub fn new() -> Self {
+        Self { deployments: Vec::new() }
+    }
+}
+
+impl Default for FedoraRpmostreeAtomicEngine {
+    fn default() -> Self { Self::new() }
+}
+
+#[derive(Debug, Clone)]
+pub struct MockChrootProfile {
+    pub name: String,
+    pub arch: String,
 }

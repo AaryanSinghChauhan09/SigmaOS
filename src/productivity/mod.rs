@@ -19,23 +19,8 @@ pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod tmux;
 pub mod itsfoss_apps_synthesis;
-pub mod sigma_office;
-pub mod enterprise_productivity_suite;
 
-pub use enterprise_productivity_suite::{
-    AnalyticsChartWidget, CrmLead, DocumentSuggestion, HrAttendanceClock, InvoiceItem,
-    LeadStage, LiveCollaboratorCursor, MultiCurrencyInvoice, PresentationSlide,
-    SigmaDocsEnterpriseCollaborationEngine, SigmaLookerAnalyticsEngine,
-    SigmaSlidesPresenterEngine, SovereignEnterpriseCrmErpEngine, SovereignOdooBitrixSuite,
-};
-
-pub use enterprise_productivity_suite::{
-    ActiveCollaborator, AnalyticsDataRow, CrmLead, DealStage, InventoryStockItem, KanbanTask,
-    KanbanTaskStatus, MetricAggregation, OtDeltaRecord, PivotResult, PresentationSlide,
-    SigmaDocsEnterpriseCollaborationEngine, SigmaLookerAnalyticsEngine, SigmaSlidesPresenterEngine,
-    SlideTransitionEffect, SovereignEnterpriseCrmErpEngine, SovereignOdooBitrixSuite,
-    WorkflowTriggerRule,
-};
+pub use enterprise_productivity_suite::*;
 
 pub use itsfoss_apps_synthesis::{
     IptvChannelNode, ItsFossBulkyBatchRenamerEngine, ItsFossHypnotixIptvEngine,
@@ -62,12 +47,11 @@ pub use tmux::{
 pub use mind_map::{IndentedTextMindMapParserEngine, MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection};
 
 pub use sigma_office::{
-    CellValue, DealStage, DocumentNode, DocumentType, EnterpriseDeal, EnterpriseInvoice,
-    InlineDocComment, InvoiceItem, LiveCoAuthoringManager, LookerChartWidget, LookerMetricCard,
+    CellValue, DocumentNode, DocumentType, EnterpriseDeal, EnterpriseInvoice,
+    InlineDocComment, LiveCoAuthoringManager, LookerChartWidget, LookerMetricCard,
     MacroExecutor, OdfDocumentKind, ParagraphStyle, PresentationProcessor,
-    SigmaDocsEnterpriseCollaborationEngine, SigmaFormulaParserEngine, SigmaLookerAnalyticsEngine,
-    SigmaOdfPackageEngine, SigmaOffice, SigmaSlideDetails, SigmaSlidesPresenterEngine,
+    SigmaFormulaParserEngine, SigmaOdfPackageEngine, SigmaOffice, SigmaSlideDetails,
     SigmaSpellCheckerEngine, SigmaStyleThemeEngine, SigmaTrackChangesEngine,
-    SovereignCrmPipeline, SovereignEnterpriseCrmErpEngine, SpreadsheetProcessor, SuggestionEdit,
+    SovereignCrmPipeline, SpreadsheetProcessor, SuggestionEdit,
     TextProcessor, TypographyRenderer, VersionHistoryManager,
 };

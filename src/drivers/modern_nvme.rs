@@ -1,7 +1,6 @@
 // Modern high-performance NVMe PCIe block storage & AHCI SATA Controller Driver
 // Conforms to SigmaOS Unified Peripheral Architecture
 
-#[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

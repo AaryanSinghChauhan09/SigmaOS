@@ -8,96 +8,11 @@ use std::vec::Vec;
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::sigpkg::{Dependency, Package, VersionConstraint};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::package::AptDebManifest;
-#[cfg(any(feature = "standalone_test", test))]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AptDebManifest {
-    pub package: String,
-    pub version: String,
-    pub depends: Vec<String>,
-    pub description: String,
-    pub priority: PackagePriority,
-}
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::sigpkg::Version;
-
-/// Description of Debian / APT Control Manifest (.deb / dpkg parity)
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AptDebManifest {
-    pub package: String,
-    pub version: String,
-    pub depends: Vec<String>,
-    pub description: String,
-    pub priority: PackagePriority,
-}
-
-/// Description of Arch Linux binary .PKGINFO Manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ArchPkgInfoManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub depends: Vec<String>,
-    pub architecture: String,
-}
-
-/// Description of Gentoo .ebuild specification metadata
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GentooEbuildMetadata {
-    pub category: String,
-    pub package_name: String,
-    pub version: String,
-    pub rdepend: Vec<String>,
-    pub depend: Vec<String>,
-    pub description: String,
-    pub use_flags: Vec<String>,
-}
-
-/// Description of Alpine Linux APKINDEX Manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ApkIndexManifest {
-    pub pkgname: String,
-    pub pkgver: String,
-    pub pkgdesc: String,
-    pub depends: Vec<String>,
-}
-
-/// Description of Void Linux XBPS Manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct XbpsManifest {
-    pub pkgname: String,
-    pub version: String,
-    pub short_desc: String,
-    pub run_depends: Vec<String>,
-}
-
-/// Description of Ubuntu Snapcraft Manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SnapcraftManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub confinement: String,
-    pub plugs: Vec<String>,
-    pub slots: Vec<String>,
-}
-
-/// Description of Haiku .hpkg Manifest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct HaikuHpkgManifest {
-    pub name: String,
-    pub version: String,
-    pub summary: String,
-    pub architecture: String,
-    pub requires: Vec<String>,
-}
-
-#[cfg(any(feature = "standalone_test", test))]
+pub use crate::package::AptDebManifest;
+pub use crate::package::universal::PackagePriority;
 pub use crate::sigpkg::Version;
+pub use crate::sigpkg::universal_engine::PackageFormat;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(feature = "standalone_test")]
 pub use crate::universal_oop_system;
@@ -105,8 +20,6 @@ pub use crate::universal_oop_system;
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::universal_oop_system;
 
-#[cfg(any(feature = "standalone_test", test))]
-pub use crate::universal_engine::PackageFormat;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -125,8 +38,6 @@ pub enum Permission {
 
 #[cfg(not(feature = "standalone_test"))]
 pub use crate::security::Permission;
-
-use super::universal_oop_system;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -205,26 +116,10 @@ pub struct PacmanPkgbuild {
     pub source_urls: Vec<String>,
 }
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::sigpkg::universal_oop_system::UniversalPackageManager;
-#[cfg(any(feature = "standalone_test", test))]
-pub use crate::universal_oop_system;
-#[cfg(any(feature = "standalone_test", test))]
-use crate::universal_oop_system::UniversalPackageManager;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub use crate::package::universal::PackagePriority;
-
-/// Description of Debian / APT Control Manifest (.deb / dpkg parity)
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct AptDebManifest {
-    pub package: String,
-    pub version: String,
-    pub depends: Vec<String>,
-    pub description: String,
-    pub priority: PackagePriority,
-}
 
 pub trait PackageFormatAdapter {
     fn format_name(&self) -> &str;
@@ -345,16 +240,14 @@ impl UniversalPackageAdapter {
             return Err("Invalid Debian control manifest: missing Package or Version");
         }
 
-        let _ = priority;
         Ok(AptDebManifest {
-            architecture: "all".to_string(),
-            maintainer: "Unknown".to_string(),
             package,
             version,
-            architecture: "amd64".to_string(),
-            maintainer: String::new(),
+            architecture,
+            maintainer,
             depends,
             description,
+            priority: PackagePriority::Standard,
         })
     }
 
@@ -1078,7 +971,7 @@ impl UniversalPackageAdapter {
     /// Detects package format based on file extension
     pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
         if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { Some(PackageFormat::Arch) }
+        else if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { Some(PackageFormat::Pacman) }
         else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
         else if filename.ends_with(".nix") || filename.ends_with(".nar") { Some(PackageFormat::Nix) }
         else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
@@ -1935,7 +1828,7 @@ impl UniversalDependencyMapper {
             raw.as_str()
         };
 
-        match clean.as_str() {
+        match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {

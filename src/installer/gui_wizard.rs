@@ -8,7 +8,6 @@ use std::vec;
 /// Installer Screen / Calamares Module Sequence
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstallerScreen {
-    CompleteOnboarding,
     Welcome,
     Language,
     Location,
@@ -18,8 +17,6 @@ pub enum InstallerScreen {
     SystemConfiguration,
     Summary,
     InstallationProgress,
-    Complete,
-    CompleteOnboarding,
     Complete,
     CompleteOnboarding,
 }
@@ -198,23 +195,9 @@ impl UserAccount {
     }
 }
 
-/// Network Configuration
-#[derive(Debug, Clone)]
-pub struct NetworkConfig {
-    pub use_dhcp: bool,
-    pub static_ip: Option<String>,
-    pub gateway: Option<String>,
-    pub dns_servers: Vec<String>,
-}
-
 /// System Configuration
 #[derive(Debug, Clone)]
 pub struct SystemConfiguration {
-    pub timezone: String,
-    pub locale: String,
-    pub keyboard_layout: String,
-    pub network_config: NetworkConfig,
-    pub services: Vec<String>,
     pub hostname: String,
     pub timezone: String,
     pub locale: String,
@@ -223,11 +206,6 @@ pub struct SystemConfiguration {
     pub services: Vec<String>,
     pub is_admin: bool,
     pub auto_login: bool,
-    pub timezone: String,
-    pub locale: String,
-    pub keyboard_layout: String,
-    pub network_config: NetworkConfig,
-    pub services: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -258,8 +236,6 @@ impl SystemConfiguration {
                 String::from("sshd"),
                 String::from("cron"),
             ],
-            is_admin: true,
-            auto_login: false,
         }
     }
 }

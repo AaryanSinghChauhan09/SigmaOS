@@ -117,7 +117,7 @@ impl TceLoader {
         for (path, content) in &files {
             if let Ok(fd) = vfs.open(path, 1, 0o644) {
                 let _ = vfs.write(fd, content.as_bytes());
-                let _ = vfs.close_file(fd);
+                let _ = vfs.close_file(fd as u64);
             }
         }
 
@@ -254,7 +254,7 @@ impl FrugalLoader {
             for (path, content) in &self.filetool.ram_changes {
                 if let Ok(fd) = vfs.open(path, 1, 0o644) {
                     let _ = vfs.write(fd, content.as_bytes());
-                    let _ = vfs.close_file(fd);
+                    let _ = vfs.close_file(fd as u64);
                 }
             }
         }

@@ -10,35 +10,20 @@ use crate::accessibility::{
     AccessibilityFeature, AccessibilityFramework,
     AccessibilitySetting,
 };
-#[cfg(not(test))]
 use crate::compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
 };
-#[cfg(not(test))]
 use crate::customization::{CustomizationEngine, Theme};
-#[cfg(not(test))]
 use crate::dashboard::{DashboardWidget, MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
-#[cfg(not(test))]
 use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
-#[cfg(not(test))]
 use crate::virtualization::{VirtualizationOrchestrator, VirtualizationTech, VirtualMachine, Container};
-#[cfg(not(test))]
 use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
-#[cfg(not(test))]
 use crate::shell::zsh_bash_parity::{
     BsdDirectoryStack, FuzzyCompletionEngine, PowerlinePromptBuilder, ShellJobControl,
     ZshSyntaxHighlighter, UniversalShellCompatibilityEngine, ShellArithmeticEvaluator,
 };
-#[cfg(not(test))]
 use crate::shell::{
     HistoryExpansionEngine, JobControlManager,
-};
-
-// Non-test imports (stable)
-#[cfg(not(test))]
-use crate::compatibility::{
-    ApplicationBinary as CompatAppBinary, BinaryFormat as CompatBinaryFmt,
-    CompatibilityManager as CompatMgr, TargetPlatform as CompatTargetPlatform,
 };
 
 /// Shell command type
@@ -433,7 +418,7 @@ impl ShellRepl {
         env_map.insert("USER".to_string(), self.current_user.clone());
         env_map.insert("PWD".to_string(), self.current_dir.clone());
 
-        let mut fully_expanded = BashParameterExpansion::expand(&alias_expanded, &env_map);
+        let mut fully_expanded = crate::shell::zsh_bash_parity::BashParameterExpansion::expand(&alias_expanded, &env_map);
         if fully_expanded.contains("$(( ") || fully_expanded.contains("$(((") {
             if let Ok(val) = crate::shell::zsh_bash_parity::ShellArithmeticEvaluator::evaluate(&fully_expanded) {
                 let val_i64: i64 = val;
@@ -1338,7 +1323,6 @@ impl ShellRepl {
             }
             ShellCommand::VmCreate { name, tech } => {
                 let id = format!("vm-{}", name.to_lowercase());
-                #[cfg(not(test))]
                 let v_tech = match tech.to_lowercase().as_str() {
                     "docker" => VirtualizationTech::Docker,
                     "podman" => VirtualizationTech::Podman,
@@ -1346,8 +1330,7 @@ impl ShellRepl {
                     "xen" => VirtualizationTech::Xen,
                     _ => VirtualizationTech::KVM,
                 };
-                let id = format!("vm-{}", name.to_lowercase());
-                let mut vm = VirtualMachine::new(id.clone(), name.clone(), t).with_resources(4, 4096, 40);
+                let mut vm = VirtualMachine::new(id.clone(), name.clone(), v_tech).with_resources(4, 4096, 40);
                 vm.start().unwrap();
                 match self.virt_orchestrator.add_virtual_machine(vm) {
                     Ok(_) => Ok(format!("Guest VM '{}' successfully created and booted.", name)),
@@ -1375,14 +1358,12 @@ impl ShellRepl {
 
             // Cross-Platform Compatibility Layer (Wine / Rosetta equivalent)
             ShellCommand::PlatformRun { name, platform, format } => {
-                #[cfg(not(test))]
                 let b_format = match format.to_lowercase().as_str() {
                     "exe" | "pe" | "pe32" | "pe32plus" => BinaryFormat::Exe,
                     "macho" | "dmg" => BinaryFormat::Dmg,
                     "wasm" | "bin" => BinaryFormat::Bin,
                     _ => BinaryFormat::Elf,
                 };
-                #[cfg(not(test))]
                 let t_platform = match platform.to_lowercase().as_str() {
                     "windows" | "win32" | "win64" => TargetPlatform::Windows,
                     "macos" | "darwin" => TargetPlatform::MacOS,
@@ -1390,7 +1371,7 @@ impl ShellRepl {
                     _ => TargetPlatform::Linux,
                 };
 
-                let mut bin = ApplicationBinary::new(name.clone(), b_format, target_p);
+                let mut bin = ApplicationBinary::new(name.clone(), b_format, t_platform);
                 self.compatibility.auto_configure_binary(&mut bin);
                 self.compatibility.register_binary(bin);
 

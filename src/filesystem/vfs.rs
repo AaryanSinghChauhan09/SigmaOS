@@ -149,7 +149,7 @@ impl Inode {
             inode_number,
             file_type,
             mode: FileMode::new(mode),
-            permissions: FilePermissions::from_mode(mode as u16),
+            permissions: mode,
             size: 0,
             owner: 0,
             group: 0,
@@ -188,6 +188,7 @@ pub struct FileDescriptor {
 }
 
 pub type FileHandle = FileDescriptor;
+pub type FilePermissions = u32;
 
 /// VFS Error types
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -294,13 +295,6 @@ pub struct VirtualFileSystem {
     next_inode_id: u64,
 }
 
-#[derive(Debug, Clone)]
-pub struct FileDescriptor {
-    pub fd: u64,
-    pub inode_id: u64,
-    pub offset: u64,
-    pub flags: u32,
-}
 
 impl VirtualFileSystem {
     pub fn new() -> Self {
@@ -466,25 +460,23 @@ impl VirtualFileSystem {
         Ok(fd as i32)
     }
 
-    pub fn close(&mut self, fd: i32) -> Result<(), VfsError> { self.close_file(fd as u64).map_err(|_| VfsError::NotFound) }
+    pub fn close(&mut self, fd: i32) -> Result<(), VfsError> {
+        self.close_file(fd as u64).map_err(|_| VfsError::NotFound)
+    }
+
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
-        if let Some(pos) = self.open_files.iter().position(|fh| fh.fd == (fd as i32)) {
-            self.open_files.remove(pos);
+        if self.open_files.remove(&fd).is_some() {
+            self.file_descriptors.remove(&fd);
             Ok(())
         } else {
             Err(FsError::InvalidFd)
         }
     }
 
-    pub fn close(&mut self, fd: i32) -> Result<(), FsError> {
-        self.close_file(fd as u64)
-    }
-
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
         let file_descriptor = self
             .open_files
-            .iter_mut()
-            .find(|fh| fh.fd == (fd as i32))
+            .get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
 
         let inode = self
@@ -518,8 +510,7 @@ impl VirtualFileSystem {
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
         let file_descriptor = self
             .open_files
-            .iter_mut()
-            .find(|fh| fh.fd == (fd as i32))
+            .get_mut(&fd)
             .ok_or(FsError::InvalidFd)?;
 
         let inode = self
@@ -910,7 +901,7 @@ mod tests {
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
         // Re-open file to reset offset to 0 for reading
-        let read_fd = vfs.open_file(inode_inode_number: id, 0).unwrap();
+        let read_fd = vfs.open_file(id, 0).unwrap();
 
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
         assert_eq!(
@@ -930,10 +921,10 @@ mod tests {
 
         // 1. Create a regular file with extended attribute (user.mime_type = "text/plain")
         let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
-        vfs.set_xattr(inode_inode_number: id, "user.mime_type", b"text/plain")
+        vfs.set_xattr(inode_id, "user.mime_type", b"text/plain")
             .unwrap();
         assert_eq!(
-            vfs.get_xattr(inode_inode_number: id, "user.mime_type").unwrap(),
+            vfs.get_xattr(inode_id, "user.mime_type").unwrap(),
             b"text/plain"
         );
 

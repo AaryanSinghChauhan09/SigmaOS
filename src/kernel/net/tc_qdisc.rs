@@ -17,8 +17,6 @@ use std::boxed::Box;
 use std::collections::VecDeque;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::string::{String, ToString};
-use std::collections::VecDeque;
 
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
 /// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel

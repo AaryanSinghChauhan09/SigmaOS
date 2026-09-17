@@ -1,10 +1,4 @@
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TahrirUserAvatar {
-    pub user_id: String,
-    pub email_sha256: String,
-    pub avatar_data: Vec<u8>,
-    pub mime_type: String,
-}
+
 
 use std::format;
 use std::vec;
@@ -3839,6 +3833,16 @@ pub struct FedoraOfflineUpdateEngine {
 }
 
 impl FedoraOfflineUpdateEngine {
+    pub fn new() -> Self {
+        Self {
+            staged_packages: Vec::new(),
+            is_offline_update_pending: false,
+            trigger_reboot_flag: false,
+        }
+    }
+}
+
+impl FedoraIgnitionEngine {
     pub fn new() -> Self {
         Self {
             files: Vec::new(),

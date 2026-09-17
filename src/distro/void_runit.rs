@@ -22,41 +22,6 @@ pub enum RunitStage {
 
 pub type ServiceState = RunitServiceStatus;
 
-/// Runit Supervision Stage
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RunitStage {
-    Stage1,
-    Stage2,
-    Stage3,
-}
-
-/// Runit Stage
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RunitStage {
-    Stage1,
-    Stage2,
-    Stage3,
-}
-
-impl Default for RunitStage {
-    fn default() -> Self {
-        RunitStage::Stage1
-    }
-}
-
-/// Runit Stage
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RunitStage {
-    Stage1,
-    Stage2,
-    Stage3,
-}
-
-impl Default for RunitStage {
-    fn default() -> Self {
-        Self::Stage1
-    }
-}
 
 /// Runit Service Status
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -69,14 +34,6 @@ pub enum RunitServiceStatus {
     Failed,
 }
 
-/// Runit Stage
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum RunitStage {
-    #[default]
-    Stage1,
-    Stage2,
-    Stage3,
-}
 
 /// Runit Service Definition
 #[derive(Debug, Clone)]
@@ -148,8 +105,6 @@ pub struct RunitSupervisor {
     pub stage: RunitStage,
     pub current_stage_num: u32,
     pub services: BTreeMap<String, RunitService>,
-    pub stage: RunitStage,
-    pub current_stage_num: u32,
 }
 
 impl RunitSupervisor {
@@ -158,31 +113,7 @@ impl RunitSupervisor {
             stage: RunitStage::Stage1,
             current_stage_num: 1,
             services: BTreeMap::new(),
-            stage: RunitStage::Stage1,
-            current_stage_num: 1,
         }
-    }
-
-    pub fn start_service(&mut self, name: &str) -> bool {
-        if let Some(s) = self.services.get_mut(name) {
-            s.start()
-        } else {
-            false
-        }
-    }
-
-    pub fn start_service(&mut self, name: &str) -> bool {
-        if let Some(service) = self.services.get_mut(name) {
-            service.start();
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
-        let _ = (name, stopped);
-        true
     }
 
     pub fn register_service(&mut self, service: RunitService) {
@@ -197,20 +128,20 @@ impl RunitSupervisor {
         }
     }
 
+    pub fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+        let _ = (name, stopped);
+        true
+    }
+
     /// Start stage 1 (one-time initialization)
     pub fn run_stage1(&mut self) {
-        self.stage = Some(RunitStage::Stage1);
+        self.stage = RunitStage::Stage1;
         self.current_stage_num = 1;
-        println!("Running Stage 1: One-time system initialization");
-
-        println!("Mounting virtual filesystems");
-        println!("Setting hostname");
-        println!("Initializing devices");
     }
 
     /// Start stage 2 (concurrent supervision)
     pub fn run_stage2(&mut self) {
-        self.stage = Some(RunitStage::Stage2);
+        self.stage = RunitStage::Stage2;
         self.current_stage_num = 2;
 
         let mut started = Vec::new();
@@ -234,7 +165,7 @@ impl RunitSupervisor {
 
     /// Start stage 3 (clean shutdown)
     pub fn run_stage3(&mut self) {
-        self.stage = Some(RunitStage::Stage3);
+        self.stage = RunitStage::Stage3;
         self.current_stage_num = 3;
 
         let mut stopped = Vec::new();
@@ -270,17 +201,12 @@ impl RunitSupervisor {
         }
     }
 
-    fn can_stop_service(&self, _name: &str, _stopped: &[String]) -> bool {
-        true
-    }
-
     pub fn stop_service(&mut self, name: &str) -> bool {
         if let Some(service) = self.services.get_mut(name) {
             service.stop()
         } else {
             false
         }
-        true
     }
 
     pub fn start_all(&mut self) {

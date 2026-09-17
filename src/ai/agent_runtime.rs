@@ -8,7 +8,6 @@
 // - Memory-safe (Rust vs Python/JS)
 // - Microkernel isolation
 
-#![no_std]
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
@@ -120,7 +119,7 @@ pub struct AgentSandbox {
 impl AgentSandbox {
     pub fn new_strict() -> Self {
         Self {
-            landlock: LandlockV5Guard::new(5),
+            landlock: LandlockV5Guard::new(),
             capsicum: CapsicumRights::empty(),
             pledge_promises: 0, // No promises initially
             unveil_paths: Vec::new(),

@@ -199,23 +199,7 @@ impl NamespaceConfig {
     }
 }
 
-/// Seccomp profile v2 with bitmask-based syscall blocking
-#[derive(Debug, Clone)]
-pub struct SeccompProfileV2 {
-    pub blocked_syscalls: Vec<u32>,
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
-
-impl SeccompProfileV2 {
-    pub fn new() -> Self {
-        Self { blocked_syscalls: Vec::new(), hardened: false, blocked_syscalls_mask: 0 }
-    }
-}
-
-/// Seccomp profile (alias for SeccompProfileV2)
-pub type SeccompProfile = SeccompProfileV2;
-
+/// Seccomp profile with bitmask and list-based syscall blocking
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SeccompProfile {
     pub enabled: bool,
@@ -240,30 +224,18 @@ impl Default for SeccompProfile {
 }
 
 impl SeccompProfile {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
         if !self.hardened && !self.enabled {
             return false;
         }
+        if syscall_id < 64 && self.blocked_syscalls_mask != 0 {
+            return (self.blocked_syscalls_mask & (1 << syscall_id)) != 0;
+        }
         self.blocked_syscalls.contains(&syscall_id)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SeccompProfileV2 {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
-
-impl SeccompProfileV2 {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if !self.hardened {
-            return false;
-        }
-        if syscall_id < 64 {
-            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
-        } else {
-            self.blocked_syscalls.contains(&syscall_id)
-        }
     }
 }
 
@@ -847,6 +819,7 @@ pub mod oci {
     extern crate alloc;
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
+    use crate::container::ContainerState;
     
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
@@ -912,8 +885,6 @@ pub mod oci {
         pub r#type: String,
         pub source: String,
         pub options: Vec<String>,
-    }
-
     }
 
     pub struct Container {
@@ -1002,7 +973,6 @@ pub mod oci {
 
 #[cfg(test_disabled)]
 mod tests {
-    extern crate alloc;
     use super::*;
     use std::string::ToString;
     use std::vec;

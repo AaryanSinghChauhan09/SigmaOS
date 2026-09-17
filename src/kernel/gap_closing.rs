@@ -572,13 +572,6 @@ pub struct DeviceObjectX86 {
 
 pub type DeviceObject = DeviceObjectX86;
 
-#[derive(Debug, Clone)]
-pub struct DeviceObjectX86 {
-    pub device_type: u32,
-    pub reference_count: u32,
-}
-
-pub type DeviceObject = DeviceObjectX86;
 
 pub struct DriverObjectX86 {
     pub driver_name: &'static str,

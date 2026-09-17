@@ -52,7 +52,6 @@ pub mod performance;
 pub mod pipes;
 pub mod process;
 pub mod policy_mechanism;
-pub mod process;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
@@ -67,7 +66,6 @@ pub use missing_linux_kernel_components::{
     UffdRegisteredRange, UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
 };
 pub mod traits;
-pub mod virtual_cpu;
 pub mod vmm_paging;
 
 #[allow(ambiguous_glob_reexports)]
@@ -131,7 +129,6 @@ pub use roundrobin::{
     RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
 };
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub mod vmm_paging;
 pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
 // Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
 pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};

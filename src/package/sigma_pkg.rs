@@ -168,6 +168,14 @@ impl UniversalPackageImporter {
             UniversalPackageFormat::FlatpakBundle => ("LGPL-2.1+", vec!["glibc".to_string(), "openssl".to_string()]),
             UniversalPackageFormat::SnapPackage => ("GPL-3.0+", vec!["libc6".to_string(), "libssl-dev".to_string()]),
             UniversalPackageFormat::AppImageBinary => ("MIT", vec!["glibc".to_string()]),
+            UniversalPackageFormat::SolusEopkg => ("GPL-2.0-only", vec!["glibc".to_string(), "openssl".to_string()]),
+            UniversalPackageFormat::OpenWrtIpk => ("GPL-2.0-only", vec!["musl".to_string(), "libustream-openssl".to_string()]),
+            UniversalPackageFormat::TinyCoreTcz => ("GPL-2.0-only", vec!["glibc".to_string(), "openssl".to_string()]),
+            UniversalPackageFormat::ChimeraCports => ("BSD-2-Clause", vec!["musl".to_string(), "openssl".to_string()]),
+            UniversalPackageFormat::MacOsBottle => ("BSD-2-Clause", vec!["openssl".to_string()]),
+            UniversalPackageFormat::IosIpa => ("Proprietary", vec![]),
+            UniversalPackageFormat::AndroidAab => ("Apache-2.0", vec![]),
+            UniversalPackageFormat::HarmonyHap => ("Apache-2.0", vec![]),
         };
 
         let translated_deps = Self::translate_foreign_dependencies(&raw_deps);

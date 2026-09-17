@@ -498,7 +498,7 @@ impl ModelPerformanceBenchmark {
 
     pub fn estimate_context_window_vram(&self, model_name: &str, context_tokens: u32) -> Option<u32> {
         let model = self.evaluate_llm_performance(model_name)?;
-        let base_vram = model.memory_vram_mb;
+        let base_vram = model.memory_vram_mb as u32;
         let token_cost_mb = (context_tokens as f64 * 0.125) as u32;
         Some(base_vram + token_cost_mb)
     }
@@ -506,9 +506,9 @@ impl ModelPerformanceBenchmark {
     pub fn measure_quantization_throughput(&self, model_name: &str) -> Option<f64> {
         let model = self.evaluate_llm_performance(model_name)?;
         if model.quantization_level.contains("Q4") {
-            Some(model.tokens_per_sec * 1.4)
+            Some((model.tokens_per_sec as f64) * 1.4)
         } else {
-            Some(model.tokens_per_sec)
+            Some(model.tokens_per_sec as f64)
         }
     }
 }
@@ -963,12 +963,7 @@ pub struct SovereignTechMediaMasterSuite {
     pub zero_trust: ZeroTrustSecuritySandbox,
     pub governance: OpenSourceGovernanceEngine,
     pub device_bridge: CrossPlatformDeviceBridge,
-    pub geeky_gadgets: GeekyGadgetsTechReviewEngine,
-    pub it_daily: ItDailyEnterpriseItGovernor,
-    pub how_to_geek: HowToGeekGuideSystemEngine,
     pub thenewstack: TheNewStackCloudNativeEngine,
-    pub linux_com: LinuxDotComCommunityNewsEngine,
-    pub pcmag: PcmagHardwareBenchEngine,
     pub linuxteck: LinuxTeckSysadminToolkitEngine,
     pub os4u: OpenSourceForUModularEngine,
     pub appuals: AppualsTroubleshootingEngine,
@@ -991,12 +986,7 @@ impl SovereignTechMediaMasterSuite {
             zero_trust: ZeroTrustSecuritySandbox::new(),
             governance: OpenSourceGovernanceEngine::new(),
             device_bridge: CrossPlatformDeviceBridge::new(),
-            geeky_gadgets: GeekyGadgetsTechReviewEngine::new(),
-            it_daily: ItDailyEnterpriseItGovernor::new(),
-            how_to_geek: HowToGeekGuideSystemEngine::new(),
             thenewstack: TheNewStackCloudNativeEngine::new(),
-            linux_com: LinuxDotComCommunityNewsEngine::new(),
-            pcmag: PcmagHardwareBenchEngine::new(),
             linuxteck: LinuxTeckSysadminToolkitEngine::new(),
             os4u: OpenSourceForUModularEngine::new(),
             appuals: AppualsTroubleshootingEngine::new(),

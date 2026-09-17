@@ -24,6 +24,7 @@ pub struct ModelAllocation {
     pub allocated_size_bytes: usize,
 }
 
+#[derive(Debug, Clone)]
 pub struct LocalLlmOrchestrator {
     pub tpu_capacity_bytes: usize,
     pub tpu_used_bytes: usize,
@@ -237,6 +238,7 @@ impl MlExperimentTracker {
 // 4. AI SAFETY GUARDRAILS POLICY ENGINE
 // =========================================================================
 
+#[derive(Debug, Clone)]
 pub struct AiSafetyPolicyEngine {
     pub max_file_write_bytes: usize,
     pub enforce_sandbox: bool,
@@ -283,17 +285,12 @@ pub struct MarketplaceModel {
     pub is_verified: bool,
 }
 
+#[derive(Debug, Clone)]
 pub struct SignedModelMarketplace {
     pub models: Vec<MarketplaceModel>,
 }
 
-pub type ModelMarketplace = SignedModelMarketplace;
-pub type CuratedAiModel = MarketplaceModel;
-pub type MlExperimentRun = ExperimentRun;
-pub type AiSafetyGuardrails = AiSafetyPolicyEngine;
-pub type DeveloperPlatformSuite = LocalLlmOrchestrator;
-pub type DevWorkspace = PrivacyRouter;
-pub type SafetyViolationType = String;
+
 
 impl SignedModelMarketplace {
     pub fn new() -> Self {
@@ -417,8 +414,7 @@ mod tests {
     }
 }
 
-/// DVC & MLflow VFS CoW Snapshot Tracker
-pub type MlExperimentRun = ExperimentRun;
+
 
 #[derive(Debug, Clone)]
 pub struct AiSafetyGuardrails {

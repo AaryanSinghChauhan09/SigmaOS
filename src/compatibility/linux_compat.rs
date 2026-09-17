@@ -593,8 +593,6 @@ impl Default for LinuxCgroupV2PsiEngine {
     }
 }
 
-#[cfg(test)]
-
 // =========================================================================
 // Linux Kernel Pidfd Race-Free Process File Descriptor Engine
 // =========================================================================

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS PCI Device Enumeration & Device Binding
 // Complete PCI bus enumeration, BAR allocation, and device driver binding
+#![allow(unused_unsafe)]
 
 use std::collections::BTreeMap;
 use std::vec::Vec;

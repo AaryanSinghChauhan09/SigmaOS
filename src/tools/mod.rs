@@ -9,58 +9,11 @@ pub mod simple_scan;
 pub mod sovereign_commands;
 pub mod open_source_tools_engine;
 pub mod open_source_cli_tools_suite;
-pub mod open_source_tools_parity;
 pub mod tech_media_innovations;
 
-pub use tech_media_innovations::{
-    AiMlTensorDatasetPipeline, AppualsTroubleshootingEngine, CrossPlatformDeviceBridge,
-    CrossPlatformDeviceSpec, EnterpriseItGovernanceConfig, GeekyGadgetsTechReviewEngine,
-    HardwareTelemetryMonitor, HowToGeekGuideSystemEngine, ItDailyEnterpriseItGovernor,
-    LinuxDotComCommunityNewsEngine, LinuxPressFeedEngine, LinuxTeckSysadminToolkitEngine,
-    LlmInferenceMetrics, ModelPerformanceBenchmark, OpenSourceForUModularEngine,
-    OpenSourceGovernanceEngine, PcmagHardwareBenchEngine, PhoronixBenchEngine,
-    PhoronixBenchmarkSuiteNode, PowerThermalTelemetryNode, SbcPinoutConfig,
-    SbomLicenseComplianceRecord, SovereignTechMediaMasterSuite, TechMediaArticleFeed,
-    TheNewStackCloudNativeEngine, ZeroTrustSandboxPolicy, ZeroTrustSecuritySandbox,
-};
-
-pub use open_source_tools_engine::{
-    BatSyntaxHighlighterEngine, FzfFuzzyFinderEngine, FzfSearchResult, HtopProcessEntry,
-    HtopProcessMonitorEngine, HtopSortField, RsyncBlockChecksum, RsyncDeltaOp, RsyncDeltaSyncEngine,
-};
-
-pub use open_source_cli_tools_suite::{
-    EzaFormattedEntry, EzaLsEngine, FdFileEntry, FdFileSearchEngine, RipgrepMatchResult,
-    RipgrepSearchEngine, ZoxideCdEngine, ZoxideEntry,
-};
-
-pub use open_source_tools_parity::{
-    DufDeviceUsage, DufDiskUsageEngine, DustDirectoryTreeEngine, DustNode, FastfetchSysinfo,
-    ItsFossFastfetchSysinfoEngine, SimpleJqJsonQueryEngine,
-};
-
-pub use tech_media_innovations::{
-    AiMlTensorDatasetPipeline, AppualsTroubleshootingEngine as TechMediaAppualsTroubleshootingEngine,
-    CommunityContributionRecord, CrossPlatformDeviceBridge, CrossPlatformDeviceSpec, FleetServerSlaNode,
-    FossStackDescriptor, GadgetPerformanceSpec, GeekyGadgetsTechReviewEngine, HardwareTelemetryMonitor,
-    HowToGeekGuideSystemEngine, ItDailyEnterpriseItGovernor, LinuxDotComCommunityNewsEngine,
-    LinuxPressFeedEngine, LinuxTeckSysadminToolkitEngine, LlmInferenceMetrics, ModelPerformanceBenchmark,
-    OpenSourceForUModularEngine, OpenSourceGovernanceEngine, PcmagHardwareBenchEngine, PcmagHardwareRatingNode,
-    PhoronixBenchEngine, PhoronixBenchmarkSuiteNode, PowerThermalTelemetryNode, SbomLicenseComplianceRecord,
-    SovereignTechMediaMasterSuite, SysadminScriptTask, SystemTroubleshootingGuide, TechMediaArticleFeed,
-    TensorColumnData, TheNewStackCloudNativeEngine, WasmMicroserviceTelemetry, ZeroTrustSandboxPolicy,
-    ZeroTrustSecuritySandbox,
-};
-
-pub use open_source_tools_parity::{
-    BatSyntaxPagerEngine, BtopProcessNode, BtopSystemMonitorEngine, DufDiskFreeInfoEngine,
-    DufMountPoint, DustFastDuEngine, DustFolderUsage, EzaFileItem, EzaModernLsEngine,
-    FastfetchInfoEngine, FastfetchSysInfo, FdFastFindEngine, LauncherAppEntry,
-    NcduDiskUsageAnalyzerEngine, NcduNode, ProcsModernPsEngine, ProcsProcessEntry,
-    RipgrepRegexSearchEngine, RofiCommandHudEngine, SearchMatch, SovereignAbridgeTool,
-    SovereignXcpTool, StarshipPromptEngine, TldrCommandPage, TldrQuickPagesEngine,
-    XcpCopyProgress, ZoxideFastCdEngine, ZoxidePathEntry,
-};
+pub use tech_media_innovations::*;
+pub use open_source_tools_engine::*;
+pub use open_source_cli_tools_suite::*;
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
@@ -91,7 +44,7 @@ pub use tech_media_extended_suite::{
     GpuPacingMetrics, HwbustersPowerTelemetryEngine, KdnuggetsAiQuantizerEngine,
     LightweightPodSpec, PowerRailNoiseReport, QuantizationModelProfile,
     SovereignTechMediaExtendedMasterSuite, StorageCleanupReport, TechSpotGpuAcceleratorEngine,
-    TheNewStackCloudNativeEngine, VectorCacheMetrics, WindowsCentralPcHealthEngine,
+    TheNewStackCloudNativeEngine as ExtendedTheNewStackCloudNativeEngine, VectorCacheMetrics, WindowsCentralPcHealthEngine,
 };
 
 pub mod dependency_reduction;

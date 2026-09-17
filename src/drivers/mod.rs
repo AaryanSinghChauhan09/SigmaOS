@@ -61,12 +61,4 @@ pub use sovereign_driver_lifecycle::{
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
-pub use distro_device_expansion::{
-    AppleNvmeAnsDriver, AtherosAr9271WifiDriver, CanBusSocketDriver,
-    Esp32HciBtBridgeDriver, IntelI2cSmbusControllerDriver,
-    IntelIgbNicDriver, IntelIwfWifiDriver, LogitechUnifyingHidDriver,
-    Mpt3SasControllerDriver, NvidiaNouveauOpenGspDriver, RadeonKmsGpuDriver,
-    RaspberryPiGpioMailboxDriver, RealtekAlcAudioDriver, RealtekRtl8169Driver,
-    SynapticsTouchpadDriver, UsbAudioClass2Driver, VirtioScsiControllerDriver,
-    WacomGraphicsTabletDriver,
-};
+pub use distro_device_expansion::*;

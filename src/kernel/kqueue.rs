@@ -3,6 +3,7 @@
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(i32)]
 pub enum FilterFlags {
     EVFILT_READ = -1,
     EVFILT_WRITE = -2,

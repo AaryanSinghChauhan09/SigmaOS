@@ -1,24 +1,13 @@
 pub mod omarchy_inspiration;
 pub use omarchy_inspiration::*;
 pub mod omarchy;
-pub mod omarchy_inspiration;
 pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
 pub mod mint_innovations;
 
-pub use omarchy::{
-    FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
-    OmarchyAudioPipewireConfig, OmarchyAyuThemeEngine, OmarchyFastfetchSysinfoEngine,
-    OmarchyGhosttyTerminalEngine, OmarchyHyprlandCompositorConfigEngine, OmarchyHypridleEngine,
-    OmarchyHyprpaperWallpaperEngine, OmarchyLazyGitConfigurationEngine,
-    OmarchyMiseVersionManagerEngine, OmarchyModernDesktopEngine, OmarchyNerdFont,
-    OmarchyNeovimPresetEngine, OmarchyOmakubDevInstaller, OmarchyStarshipPromptConfigEngine,
-    OmarchySwayNcEngine, OmarchyTerminalFontConfig, OmarchyTheme, OmarchyWalkerLauncherEngine,
-    OmarchyWaybarEngine, PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
-};
-pub mod omarchy_inspiration;
-pub use omarchy_inspiration::*;
+pub use omarchy::*;
+
 pub mod omarchy_advanced_parity;
 pub use omarchy_advanced_parity::*;
 pub mod omarchy_app_ecosystem;
@@ -35,7 +24,6 @@ pub mod arch_gap_closure;
 pub use arch_gap_closure::*;
 pub mod arch_ultimate_gap_closure;
 pub use arch_ultimate_gap_closure::*;
-pub mod parrot_security;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
 pub use arch::*;
@@ -88,7 +76,6 @@ pub mod linux_bsd_distro_gaps_synthesis;
 pub use linux_bsd_distro_gaps_synthesis::*;
 pub mod linux_bsd_inspirations;
 
-pub use linux_distro_innovations::*;
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 
@@ -238,7 +225,6 @@ pub use wiki_ideas_implementation::{
 };
 
 pub use missing_distro_innovations::*;
-pub use linux_bsd_inspirations::*;
 
 pub use sovereign_distro_dominance::{
     AlpineApkCASPackageCache, CachyBoreDynamicAiScheduler, CasPackageBlob, ClusterNodeConfig,
@@ -301,7 +287,4 @@ pub use omarchy_expanded_parity::{
     OmarchyHyprlockScreenLocker, OmarchyOmakubBootstrapEngine, OmarchyRofiAppLauncher,
     OmarchyThunarFileActions, OmarchyZellijSessionManager, SovereignOmarchyExpandedParitySuite,
 };
-pub use arch_parity::*;
-pub use improvements::*;
-pub use missing_distro_innovations::*;
-pub use omarchy_inspiration::*;
+

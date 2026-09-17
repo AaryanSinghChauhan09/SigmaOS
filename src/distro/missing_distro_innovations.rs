@@ -680,7 +680,6 @@ impl OpenBsdUnveilAuditor {
 /// Devuan Init Diversity Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DevuanInitBackend {
-    SysVinit,
     SysVInit,
     OpenRc,
     Runit,
@@ -826,76 +825,6 @@ impl KaOSPackageStateGovernor {
 }
 
 
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DevuanInitBackend {
-    SysVInit,
-    OpenRc,
-    RunIt,
-    S6,
-}
-
-pub struct DevuanInitDiversityEngine {
-    pub active_backend: DevuanInitBackend,
-    pub services: BTreeMap<String, String>,
-}
-
-impl DevuanInitDiversityEngine {
-    pub fn new(backend: DevuanInitBackend) -> Self {
-        Self {
-            active_backend: backend,
-            services: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_service(&mut self, name: &str, _backend: DevuanInitBackend, init_script: &str) {
-        self.services.insert(name.to_string(), init_script.to_string());
-    }
-
-    pub fn is_systemd_free(&self) -> bool {
-        true
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ArtixInitScriptlet {
-    pub name: String,
-    pub openrc_run_script: String,
-    pub runit_run_script: String,
-    pub s6_run_script: String,
-}
-
-pub struct ArtixLinuxInitMatrix {
-    pub scriptlets: BTreeMap<String, ArtixInitScriptlet>,
-}
-
-impl ArtixLinuxInitMatrix {
-    pub fn new() -> Self {
-        Self {
-            scriptlets: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_scriptlet(&mut self, name: &str, binary_path: &str) {
-        let scriptlet = ArtixInitScriptlet {
-            name: name.to_string(),
-            openrc_run_script: format!("#!/sbin/openrc-run\ncommand=\"{}\"", binary_path),
-            runit_run_script: format!("#!/bin/sh\nexec {}", binary_path),
-            s6_run_script: format!("#!/bin/execlineb -P\n{}", binary_path),
-        };
-        self.scriptlets.insert(name.to_string(), scriptlet);
-    }
-
-    pub fn get_scriptlet(&self, name: &str) -> Option<&ArtixInitScriptlet> {
-        self.scriptlets.get(name)
-    }
-}
-
-impl Default for ArtixLinuxInitMatrix {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
@@ -1092,23 +1021,12 @@ impl UbuntuAppArmorEngine {
             }
             Ok(allowed)
         } else {
-            true // Unconfined
-        };
-
-        if !allowed {
-            self.audit_log.push(format!(
-                "AppArmor DENIAL on profile '{}' for path '{}'",
-                profile_name, path
-            ));
-            if profile.mode == AppArmorRuleMode::Enforce {
-                return false;
-            }
+            Ok(true) // Unconfined
         }
-        true
     }
 }
 
-impl Default for AppArmorPathRuleEngine {
+impl Default for UbuntuAppArmorEngine {
     fn default() -> Self {
         Self::new()
     }

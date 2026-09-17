@@ -60,11 +60,6 @@ pub enum PackageFormat {
     Dports,
     SlackBuild,
     Crux,
-    Deb,
-    Rpm,
-    Ebuild,
-    Sysupdate,
-    Sigma,
     Drpm,
     Stratum,
     Ipk,
@@ -80,11 +75,6 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
-    Deb,
-    Rpm,
-    Ebuild,
-    Sigma,
-    Sysupdate,
 }
 
 impl PackageFormat {
@@ -223,26 +213,6 @@ impl PackageFormat {
 }
 
 
-impl PackageFormat {
-    pub fn from_filename(filename: &str) -> Option<Self> {
-        if filename.ends_with(".deb") { return Some(PackageFormat::Deb); }
-        if filename.ends_with(".rpm") { return Some(PackageFormat::Rpm); }
-        if filename.ends_with(".tar.gz") || filename.ends_with(".tgz") { return Some(PackageFormat::TarGz); }
-        if filename.ends_with(".tar.xz") { return Some(PackageFormat::TarXz); }
-        if filename.ends_with(".tar") { return Some(PackageFormat::Tar); }
-        if filename.ends_with(".snap") { return Some(PackageFormat::Snap); }
-        if filename.ends_with(".flatpak") { return Some(PackageFormat::Flatpak); }
-        if filename.ends_with(".appimage") || filename.ends_with(".AppImage") { return Some(PackageFormat::AppImage); }
-        if filename.ends_with(".apk") { return Some(PackageFormat::Apk); }
-        if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { return Some(PackageFormat::Pacman); }
-        if filename.ends_with(".dmg") { return Some(PackageFormat::Dmg); }
-        if filename.ends_with(".nix") { return Some(PackageFormat::Nix); }
-        if filename.ends_with(".ebuild") { return Some(PackageFormat::Ebuild); }
-        if filename.ends_with(".txz") { return Some(PackageFormat::Txz); }
-        None
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct PackageContext {
     pub name: String,
@@ -253,35 +223,6 @@ pub struct PackageContext {
     pub hash: [u8; 32],
 }
 
-/// Dynamic Polymorphic Interface for Package Formats (OOP Adapter pattern)
-impl PackageFormat {
-    pub fn from_filename(filename: &str) -> Option<Self> {
-        let name_lower = filename.to_lowercase();
-        if name_lower.ends_with(".deb") {
-            Some(PackageFormat::Deb)
-        } else if name_lower.ends_with(".rpm") {
-            Some(PackageFormat::Rpm)
-        } else if name_lower.ends_with(".ebuild") {
-            Some(PackageFormat::Ebuild)
-        } else if name_lower.ends_with(".apk") {
-            Some(PackageFormat::Apk)
-        } else if name_lower.ends_with(".xbps") {
-            Some(PackageFormat::Xbps)
-        } else if name_lower.ends_with(".pkg.tar.zst") || name_lower.ends_with(".pkg.tar.xz") {
-            Some(PackageFormat::Pacman)
-        } else if name_lower.ends_with(".flatpak") {
-            Some(PackageFormat::Flatpak)
-        } else if name_lower.ends_with(".snap") {
-            Some(PackageFormat::Snap)
-        } else if name_lower.ends_with(".appimage") {
-            Some(PackageFormat::AppImage)
-        } else if name_lower.ends_with(".sigma") {
-            Some(PackageFormat::Sigma)
-        } else {
-            None
-        }
-    }
-}
 
 pub trait IPackageAdapter {
     fn format(&self) -> PackageFormat;

@@ -68,6 +68,8 @@ pub mod node_distribution_dummy {
         }
     }
 }
+#[cfg(any(feature = "standalone_test", test))]
+pub use node_distribution_dummy::*;
 
 #[cfg(any(feature = "standalone_test", test))]
 use self::node_distribution_dummy::*;
@@ -304,11 +306,6 @@ pub enum PackageFormat {
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
     Stratum,    // Bedrock Linux Stratum (.stratum)
-    OpenBsdPkg, // OpenBSD package (.openbsd.tgz)
-    Ipk,        // IPK package (.ipk)
-    Opkg,       // OPKG package (.opkg)
-    SolarisIps, // Solaris IPS package (.p5p, .ips)
-    GuixNar,    // Guix NAR archive (.nar)
     Apt,        // Debian APT (.deb)
     Yum,        // RedHat YUM/RPM (.rpm)
     Portage,    // Gentoo Portage (.ebuild)
@@ -322,6 +319,7 @@ pub enum PackageFormat {
     Nupkg,      // .NET NuGet package (.nupkg)
     Vcpkg,      // C++ Vcpkg package (.vcpkg)
     NarInfo,    // Nix NAR Info (.narinfo)
+    Sysupdate,  // systemd-sysupdate format (.sysupdate)
 }
 
 impl PackageFormat {
@@ -489,11 +487,10 @@ impl CustomPackageHook {
     where
         F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
     {
-        let boxed_handler: Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync> = Arc::new(handler);
         Self {
             name: name.to_string(),
             timing,
-            handler: Arc::new(move |pkg: &UnifiedPackage| handler(pkg)),
+            handler: Arc::new(handler),
         }
     }
 }
@@ -1317,72 +1314,6 @@ impl<T: PackageCapability> PackageCapability for NetworkRestrictionDecorator<T> 
     }
 }
 
-pub struct HardwareOptimizationDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub target_microarch_level: String,
-    pub required_simd_features: Vec<String>,
-}
-
-impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        println!("HardwareOptimizationDecorator: microarch: {}, SIMD: {:?}", self.target_microarch_level, self.required_simd_features);
-        self.decorated.profile_performance();
-    }
-}
-
-pub struct ResourceLimitDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub max_memory_bytes: u64,
-    pub cpu_quota_percent: u32,
-}
-
-impl<T: PackageCapability> PackageCapability for ResourceLimitDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
-}
-
-pub struct PqcSignedDecorator<T: PackageCapability> {
-    pub decorated: T,
-    pub dilithium_signature: String,
-}
-
-impl<T: PackageCapability> PackageCapability for PqcSignedDecorator<T> {
-    fn get_package(&self) -> &UnifiedPackage {
-        self.decorated.get_package()
-    }
-    fn enforce_sandbox(&self) -> Result<(), PackageError> {
-        if self.dilithium_signature.contains("invalid") || !self.dilithium_signature.contains("valid") {
-            return Err(PackageError::InstallationFailed("PQC signature verification failed".to_string()));
-        }
-        self.decorated.enforce_sandbox()
-    }
-    fn restrict_network(&self) -> Result<(), PackageError> {
-        self.decorated.restrict_network()
-    }
-    fn profile_performance(&self) {
-        self.decorated.profile_performance();
-    }
-}
-
 
 // ============================================================================
 // OOP Design Pattern: Factory Pattern
@@ -1460,6 +1391,7 @@ impl PackageFactory {
             PackageFormat::Nupkg => Box::new(NupkgInstallStrategy),
             PackageFormat::Vcpkg => Box::new(VcpkgInstallStrategy),
             PackageFormat::NarInfo => Box::new(NarInfoInstallStrategy),
+            PackageFormat::Sysupdate => Box::new(SigmaPkgInstallStrategy),
         }
     }
 
@@ -1532,6 +1464,7 @@ impl PackageFactory {
             PackageFormat::Nupkg => Box::new(NupkgMetadataAdapter),
             PackageFormat::Vcpkg => Box::new(VcpkgMetadataAdapter),
             PackageFormat::NarInfo => Box::new(NarInfoMetadataAdapter),
+            PackageFormat::Sysupdate => Box::new(SigmaPkgMetadataAdapter),
         }
     }
 }
@@ -1629,7 +1562,6 @@ impl UniversalDistroAdapterPipeline {
 /// Description of Debian / APT Control Manifest (.deb / dpkg parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AptDebManifest {
-    pub priority: PackagePriority,
     pub package: String,
     pub version: String,
     pub architecture: String,

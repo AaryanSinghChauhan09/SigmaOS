@@ -10,8 +10,6 @@ pub mod vault;
 pub mod vpn;
 
 // SigmaOS Security Subsystem
-pub mod audit;
-pub mod capability;
 pub mod seccomp;
 pub mod seccomp_ebpf;
 pub mod syscall_filter;
@@ -21,7 +19,6 @@ pub mod kernel_hardening;
 pub mod user_namespace;
 
 pub mod bridge;
-pub mod bsd_hardening;
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
@@ -35,7 +32,6 @@ pub mod mac;
 pub mod openbsd_karl;
 pub mod password;
 pub mod pledge;
-pub mod pqc_enclave;
 pub use deobfuscation::ArithmeticSubstitutionDeobfuscator;
 pub mod kali_stack;
 pub mod parrot;
@@ -51,11 +47,7 @@ pub mod scanner;
 pub mod secrets;
 pub mod selinux;
 pub mod selinux_advanced;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
 pub mod unveil;
-pub mod vault;
-pub mod vpn;
 pub mod vulnerability;
 pub mod kali_components;
 pub mod landlock;
@@ -97,10 +89,7 @@ pub use kali_stack::{
     PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
     TmuxPane, UndercoverDisguiseTheme, WifiFrameType,
 };
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use crate::security::selinux::{
-    PolicyRule, SELinuxPolicy, SecurityContext, SigmaSELinux,
-};
+
 pub use libgksu::{
     GksuAuthBackend, GksuDisplayServer, GksuExecutionRequest, GksuExecutionResult,
     GksuSecurityGuard, LibGksuGraphicalSudoEngine,

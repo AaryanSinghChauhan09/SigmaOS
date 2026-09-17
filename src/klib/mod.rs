@@ -51,13 +51,11 @@ pub mod uuid;
 pub mod uvm;
 pub mod zero_dependency_elimination;
 
-// Re-exports
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
 pub use uuid::Uuid;
-pub use zero_dependency_elimination::ZeroDependencyMasterHub as ZeroDependencyPrimitiveHub;
 pub use zero_dependency_elimination::ZeroDependencyMasterHub;
 
 /// Zero Dependency Primitive Hub

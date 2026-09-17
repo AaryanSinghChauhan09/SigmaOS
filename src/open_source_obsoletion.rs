@@ -246,19 +246,32 @@ impl Default for SovereignVcsEngine {
 }
 
 /// Native Helix / Neovim Modal Text Editor Engine
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignEditorMode {
     Normal,
     Insert,
     Select,
     Visual,
+    Command,
+}
+pub type EditorMode = SovereignEditorMode;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TextSelection {
+    pub start_line: usize,
+    pub start_col: usize,
+    pub end_line: usize,
+    pub end_col: usize,
 }
 
 pub struct SovereignHelixModalEditorEngine {
     pub mode: SovereignEditorMode,
     pub buffer: String,
+    pub buffer_lines: Vec<String>,
     pub cursor_positions: Vec<usize>,
     pub tree_sitter_ast_nodes: Vec<String>,
+    pub selections: Vec<TextSelection>,
+    pub lsp_completions: Vec<String>,
 }
 
 impl SovereignHelixModalEditorEngine {
@@ -266,8 +279,16 @@ impl SovereignHelixModalEditorEngine {
         Self {
             mode: SovereignEditorMode::Normal,
             buffer: String::new(),
+            buffer_lines: Vec::new(),
             cursor_positions: vec![0],
             tree_sitter_ast_nodes: Vec::new(),
+            selections: vec![TextSelection {
+                start_line: 0,
+                start_col: 0,
+                end_line: 0,
+                end_col: 0,
+            }],
+            lsp_completions: Vec::new(),
         }
     }
 
@@ -281,14 +302,33 @@ impl SovereignHelixModalEditorEngine {
         }
     }
 
+    pub fn load_buffer(&mut self, text: &str) {
+        self.buffer = text.to_string();
+        self.buffer_lines = text.lines().map(|s| s.to_string()).collect();
+    }
+
     pub fn add_cursor(&mut self, pos: usize) {
         if !self.cursor_positions.contains(&pos) {
             self.cursor_positions.push(pos);
         }
     }
 
+    pub fn add_selection(&mut self, selection: TextSelection) {
+        self.selections.push(selection);
+    }
+
     pub fn parse_ast_node(&mut self, node_type: &str) {
         self.tree_sitter_ast_nodes.push(node_type.to_string());
+    }
+
+    pub fn query_lsp_completions(&mut self, prefix: &str) -> Vec<String> {
+        let items = vec![
+            format!("{}_fn", prefix),
+            format!("{}_struct", prefix),
+            format!("{}_var", prefix),
+        ];
+        self.lsp_completions = items.clone();
+        items
     }
 }
 
@@ -298,8 +338,19 @@ impl Default for SovereignHelixModalEditorEngine {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SysInfoSummary {
+    pub os_name: String,
+    pub kernel_version: String,
+    pub uptime_secs: u64,
+    pub memory_used_mb: u64,
+    pub memory_total_mb: u64,
+    pub active_scheduler: String,
+}
+
 /// Native Fastfetch / Neofetch System Information Engine
 pub struct SovereignFastfetchSysInfoEngine {
+    pub info: SysInfoSummary,
     pub os_name: String,
     pub kernel_version: String,
     pub uptime_secs: u64,
@@ -310,14 +361,35 @@ pub struct SovereignFastfetchSysInfoEngine {
 
 impl SovereignFastfetchSysInfoEngine {
     pub fn new() -> Self {
-        Self {
-            os_name: String::from("SigmaOS Sovereign Edition"),
-            kernel_version: String::from("6.12.0-sigma-sovereign"),
+        let info = SysInfoSummary {
+            os_name: "SigmaOS Sovereign".to_string(),
+            kernel_version: "6.12.0-sigma-pqc".to_string(),
             uptime_secs: 86400,
-            cpu_model: String::from("Sigma Sovereign RISC-V / x86_64 Core"),
-            memory_used_mb: 1024,
+            memory_used_mb: 2048,
             memory_total_mb: 32768,
+            active_scheduler: "scx_bpf_land".to_string(),
+        };
+        Self {
+            os_name: info.os_name.clone(),
+            kernel_version: info.kernel_version.clone(),
+            uptime_secs: info.uptime_secs,
+            cpu_model: String::from("Sigma Sovereign RISC-V / x86_64 Core"),
+            memory_used_mb: info.memory_used_mb,
+            memory_total_mb: info.memory_total_mb,
+            info,
         }
+    }
+
+    pub fn render_ascii_hud(&self) -> String {
+        format!(
+            "OS: {}\nKernel: {}\nUptime: {}s\nMemory: {}MB / {}MB\nScheduler: {}",
+            self.info.os_name,
+            self.info.kernel_version,
+            self.info.uptime_secs,
+            self.info.memory_used_mb,
+            self.info.memory_total_mb,
+            self.info.active_scheduler
+        )
     }
 
     pub fn render_sys_info_summary(&self) -> String {
@@ -338,20 +410,50 @@ impl Default for SovereignFastfetchSysInfoEngine {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShellAlias {
+    pub name: String,
+    pub expansion: String,
+}
+
 /// Native Fish / Zsh Smart Shell Engine
 pub struct SovereignFishSmartShellEngine {
-    pub abbreviations: BTreeMap<String, String>,
+    pub command_history: Vec<String>,
     pub history: Vec<String>,
+    pub aliases: Vec<ShellAlias>,
+    pub abbreviations: BTreeMap<String, String>,
     pub autosuggestion_enabled: bool,
 }
 
 impl SovereignFishSmartShellEngine {
     pub fn new() -> Self {
         Self {
-            abbreviations: BTreeMap::new(),
+            command_history: Vec::new(),
             history: Vec::new(),
+            aliases: Vec::new(),
+            abbreviations: BTreeMap::new(),
             autosuggestion_enabled: true,
         }
+    }
+
+    pub fn record_command(&mut self, cmd: &str) {
+        self.command_history.push(cmd.to_string());
+        self.history.push(cmd.to_string());
+    }
+
+    pub fn add_alias(&mut self, name: &str, expansion: &str) {
+        self.aliases.push(ShellAlias {
+            name: name.to_string(),
+            expansion: expansion.to_string(),
+        });
+    }
+
+    pub fn expand_alias(&self, token: &str) -> String {
+        self.aliases
+            .iter()
+            .find(|a| a.name == token)
+            .map(|a| a.expansion.clone())
+            .unwrap_or_else(|| token.to_string())
     }
 
     pub fn add_abbreviation(&mut self, short: &str, expanded: &str) {
@@ -366,15 +468,15 @@ impl SovereignFishSmartShellEngine {
         }
     }
 
-    pub fn record_command(&mut self, cmd: &str) {
-        self.history.push(cmd.to_string());
-    }
-
-    pub fn get_autosuggestion(&self, prefix: &str) -> Option<String> {
-        if !self.autosuggestion_enabled || prefix.is_empty() {
+    pub fn get_autosuggestion(&self, input_prefix: &str) -> Option<String> {
+        if !self.autosuggestion_enabled || input_prefix.is_empty() {
             return None;
         }
-        self.history.iter().rev().find(|cmd| cmd.starts_with(prefix)).cloned()
+        self.command_history
+            .iter()
+            .rev()
+            .find(|cmd| cmd.starts_with(input_prefix))
+            .cloned()
     }
 }
 
@@ -2393,188 +2495,6 @@ impl SovereignResticBorgBackupEngine {
 }
 
 impl Default for SovereignResticBorgBackupEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 63. SOVEREIGN HELIX MODAL EDITOR ENGINE (Superseding Helix & Neovim)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum EditorMode {
-    Normal,
-    Insert,
-    Visual,
-    Command,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TextSelection {
-    pub start_line: usize,
-    pub start_col: usize,
-    pub end_line: usize,
-    pub end_col: usize,
-}
-
-pub struct SovereignHelixModalEditorEngine {
-    pub mode: EditorMode,
-    pub selections: Vec<TextSelection>,
-    pub buffer_lines: Vec<String>,
-    pub lsp_completions: Vec<String>,
-}
-
-impl SovereignHelixModalEditorEngine {
-    pub fn new() -> Self {
-        Self {
-            mode: EditorMode::Normal,
-            selections: vec![TextSelection {
-                start_line: 0,
-                start_col: 0,
-                end_line: 0,
-                end_col: 0,
-            }],
-            buffer_lines: Vec::new(),
-            lsp_completions: Vec::new(),
-        }
-    }
-
-    pub fn set_mode(&mut self, mode: EditorMode) {
-        self.mode = mode;
-    }
-
-    pub fn load_buffer(&mut self, text: &str) {
-        self.buffer_lines = text.lines().map(|s| s.to_string()).collect();
-    }
-
-    pub fn add_selection(&mut self, selection: TextSelection) {
-        self.selections.push(selection);
-    }
-
-    pub fn query_lsp_completions(&mut self, prefix: &str) -> Vec<String> {
-        let items = vec![
-            format!("{}_fn", prefix),
-            format!("{}_struct", prefix),
-            format!("{}_var", prefix),
-        ];
-        self.lsp_completions = items.clone();
-        items
-    }
-}
-
-impl Default for SovereignHelixModalEditorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 64. SOVEREIGN FASTFETCH SYSINFO ENGINE (Superseding Fastfetch & Neofetch)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SysInfoSummary {
-    pub os_name: String,
-    pub kernel_version: String,
-    pub uptime_secs: u64,
-    pub memory_used_mb: u64,
-    pub memory_total_mb: u64,
-    pub active_scheduler: String,
-}
-
-pub struct SovereignFastfetchSysInfoEngine {
-    pub info: SysInfoSummary,
-}
-
-impl SovereignFastfetchSysInfoEngine {
-    pub fn new() -> Self {
-        Self {
-            info: SysInfoSummary {
-                os_name: "SigmaOS Sovereign".to_string(),
-                kernel_version: "6.12.0-sigma-pqc".to_string(),
-                uptime_secs: 86400,
-                memory_used_mb: 2048,
-                memory_total_mb: 32768,
-                active_scheduler: "scx_bpf_land".to_string(),
-            },
-        }
-    }
-
-    pub fn render_ascii_hud(&self) -> String {
-        format!(
-            "OS: {}\nKernel: {}\nUptime: {}s\nMemory: {}MB / {}MB\nScheduler: {}",
-            self.info.os_name,
-            self.info.kernel_version,
-            self.info.uptime_secs,
-            self.info.memory_used_mb,
-            self.info.memory_total_mb,
-            self.info.active_scheduler
-        )
-    }
-}
-
-impl Default for SovereignFastfetchSysInfoEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// 65. SOVEREIGN FISH SMART SHELL ENGINE (Superseding Fish & Zsh)
-// =========================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ShellAlias {
-    pub name: String,
-    pub expansion: String,
-}
-
-pub struct SovereignFishSmartShellEngine {
-    pub command_history: Vec<String>,
-    pub aliases: Vec<ShellAlias>,
-}
-
-impl SovereignFishSmartShellEngine {
-    pub fn new() -> Self {
-        Self {
-            command_history: Vec::new(),
-            aliases: Vec::new(),
-        }
-    }
-
-    pub fn record_command(&mut self, cmd: &str) {
-        self.command_history.push(cmd.to_string());
-    }
-
-    pub fn add_alias(&mut self, name: &str, expansion: &str) {
-        self.aliases.push(ShellAlias {
-            name: name.to_string(),
-            expansion: expansion.to_string(),
-        });
-    }
-
-    pub fn get_autosuggestion(&self, input_prefix: &str) -> Option<String> {
-        if input_prefix.is_empty() {
-            return None;
-        }
-        self.command_history
-            .iter()
-            .rev()
-            .find(|cmd| cmd.starts_with(input_prefix))
-            .cloned()
-    }
-
-    pub fn expand_alias(&self, token: &str) -> String {
-        self.aliases
-            .iter()
-            .find(|a| a.name == token)
-            .map(|a| a.expansion.clone())
-            .unwrap_or_else(|| token.to_string())
-    }
-}
-
-impl Default for SovereignFishSmartShellEngine {
     fn default() -> Self {
         Self::new()
     }

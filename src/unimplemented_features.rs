@@ -1889,7 +1889,7 @@ pub struct ModernMmioSpecController {
     pub power_state: PowerState,
 }
 
-impl SpecBareMetalUnifiedPeripheral for ModernMmioController {
+impl SpecBareMetalUnifiedPeripheral for ModernMmioSpecController {
     fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
     fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
     fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }

@@ -573,6 +573,7 @@ impl SovereignDynamicDevfsEngine {
     pub fn new() -> Self {
         let mut devfs = Self {
             nodes: Vec::new(),
+            devices: Vec::new(),
         };
 
         devfs.create_node("null", DeviceNodeType::Character, 1, 3, 0, 0, 0o666);
@@ -638,65 +639,6 @@ impl SovereignDynamicDevfsEngine {
         self.devices
             .iter()
             .chain(self.nodes.iter())
-            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
-    }
-
-    pub fn create_node(
-        &mut self,
-        name: &str,
-        node_type: DeviceNodeType,
-        major: u32,
-        minor: u32,
-        owner_uid: u32,
-        group_gid: u32,
-        mode_octal: u16,
-    ) {
-        self.nodes.push(DeviceNodeEntry {
-            name: name.to_string(),
-            node_type,
-            major,
-            minor,
-            owner_uid,
-            group_gid,
-            mode_octal,
-            symlink_paths: Vec::new(),
-        };
-        self.nodes.push(entry.clone());
-        self.devices.push(entry);
-    }
-
-    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
-        if let Some(dev) = self.nodes.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink.to_string());
-            true
-        } else {
-            false
-        }
-        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink.to_string());
-            found = true;
-        }
-        found
-    }
-
-    pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
-        self.nodes
-            .iter()
-            .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
-    }
-
-    pub fn add_uuid_symlink(&mut self, dev_name: &str, symlink: &str) -> bool {
-        if let Some(dev) = self.nodes.iter_mut().find(|d| d.name == dev_name) {
-            dev.symlink_paths.push(symlink.to_string());
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn lookup_node(&self, name: &str) -> Option<&DeviceNodeEntry> {
-        self.nodes
-            .iter()
             .find(|d| d.name == name || d.symlink_paths.iter().any(|s| s == name))
     }
 }
@@ -1050,13 +992,10 @@ pub enum JournalLogLevel {
 }
 
 #[derive(Debug, Clone)]
-pub struct JournaldLogRecord {
-    pub timestamp_epoch_ms: u64,
-    pub timestamp_unix_epoch: u64,
-    pub timestamp_epoch_ms: u64,
-    pub priority: u8, // 0=Emergency, 3=Error, 6=Info
-    pub unit_name: &'static str,
-    pub message: String,
+pub struct PamFaillockGuard {
+    pub failed_attempts: u32,
+    pub max_failures: u32,
+    pub is_locked: bool,
 }
 
 impl PamFaillockGuard {
@@ -1068,30 +1007,12 @@ impl PamFaillockGuard {
         }
     }
 
-    pub fn append_log(&mut self, identifier: &str, message: &str, priority: u8) {
-        let rec = JournaldLogRecord {
-            timestamp_unix_epoch: 1000,
-            timestamp_epoch_ms: 1000,
-            priority,
-            unit_name: "system",
-            identifier: identifier.to_string(),
-            message: message.to_string(),
-        };
-        self.log_records.push(rec.clone());
-        self.logs.push(rec);
-    }
-
-    pub fn log(&mut self, timestamp: u64, priority: u8, unit: &'static str, msg: &'static str) {
-        if self.logs.len() >= self.max_logs_capacity && self.max_logs_capacity > 0 {
-            self.logs.remove(0);
+    pub fn record_failure(&mut self) -> bool {
+        self.failed_attempts += 1;
+        if self.failed_attempts >= self.max_failures {
+            self.is_locked = true;
         }
-        let rec = JournaldLogRecord {
-            timestamp_unix_epoch: timestamp,
-            timestamp_epoch_ms: timestamp * 1000,
-            priority,
-            unit_name: unit,
-            message: msg,
-        });
+        self.is_locked
     }
 
     pub fn reset(&mut self) {
@@ -1184,28 +1105,9 @@ impl SovereignDnsTlsResolverEngine {
     }
 }
 
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new(1024)
-    }
-}
-
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new(1000)
-    }
-}
-
-impl Default for SovereignJournaldBinaryStorageEngine {
-    fn default() -> Self {
-        Self::new(1000)
-    }
-}
 
 pub type DnsRecord = DnsRecordEntry;
-pub type DynamicDeviceNode = DeviceNodeEntry;
 pub type JournalBinaryRecord = JournaldLogRecord;
-pub type JournalLogLevel = u8;
 pub type NatRule = ConntrackTableEntry;
 pub type NatRuleKind = NatType;
 

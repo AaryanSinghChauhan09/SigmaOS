@@ -1028,10 +1028,11 @@ pub struct TerminalSession {
 }
 
 impl TriggerRule {
-    pub fn new(pattern: &str, _color: AnsiColor, action: Option<&str>) -> Self {
+    pub fn new(pattern: &str, color: AnsiColor, action: Option<&str>) -> Self {
         Self {
             pattern: pattern.to_string(),
-            action_command: action.unwrap_or("").to_string(),
+            highlight_color: color,
+            action_command: action.map(|s| s.to_string()),
         }
     }
 }

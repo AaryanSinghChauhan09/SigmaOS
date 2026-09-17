@@ -27,6 +27,73 @@ use core::option::Option::{self, None, Some};
 use core::result::Result::{self, Err, Ok};
 
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RepositoryGpgKey {
+    pub key_id: String,
+    pub owner: String,
+    pub is_valid: bool,
+}
+
+impl RepositoryGpgKey {
+    pub fn new(key_id: &str, owner: &str) -> Self {
+        Self {
+            key_id: key_id.to_string(),
+            owner: owner.to_string(),
+            is_valid: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum OfficialArchiveSource {
+    #[default]
+    Main,
+    Universe,
+    Multiverse,
+    Restricted,
+}
+
+pub struct PpaRepository {
+    pub owner: String,
+    pub ppa_name: String,
+    pub gpg_key_fingerprint: String,
+}
+
+impl PpaRepository {
+    pub fn new(owner: &str, ppa_name: &str, gpg_key_fingerprint: &str) -> Self {
+        Self {
+            owner: owner.to_string(),
+            ppa_name: ppa_name.to_string(),
+            gpg_key_fingerprint: gpg_key_fingerprint.to_string(),
+        }
+    }
+
+    pub fn to_sources_list_entry(&self) -> String {
+        format!("deb https://ppa.launchpadcontent.net/{}/{}/ubuntu main", self.owner, self.ppa_name)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MirrorBenchmarkResult {
+    pub url: String,
+    pub latency_ms: u32,
+}
+
+pub struct MirrorBenchmarkEngine;
+
+impl MirrorBenchmarkEngine {
+    pub fn benchmark_mirrors(mirrors: &[String]) -> Vec<MirrorBenchmarkResult> {
+        mirrors
+            .iter()
+            .enumerate()
+            .map(|(i, url)| MirrorBenchmarkResult {
+                url: url.clone(),
+                latency_ms: (i as u32 + 1) * 10,
+            })
+            .collect()
+    }
+}
+
 /// Repository configuration (Debian sources.list inspiration)
 #[derive(Debug, Clone)]
 pub struct Repository {

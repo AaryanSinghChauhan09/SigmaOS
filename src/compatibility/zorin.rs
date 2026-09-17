@@ -6,7 +6,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Switchable desktop layout personas
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -115,20 +114,20 @@ impl ZorinGridDesktopManager {
         match snap {
             ZorinSnapPosition::LeftHalf => (0, 0, screen_width / 2, screen_height),
             ZorinSnapPosition::RightHalf => (screen_width / 2, 0, screen_width / 2, screen_height),
-            ZorinSnapPosition::TopLeft => (0, 0, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::TopRight => {
+            ZorinSnapPosition::TopLeft | ZorinSnapPosition::TopLeftQuarter => (0, 0, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::TopRight | ZorinSnapPosition::TopRightQuarter => {
                 (screen_width / 2, 0, screen_width / 2, screen_height / 2)
             }
-            ZorinSnapPosition::BottomLeft => {
+            ZorinSnapPosition::BottomLeft | ZorinSnapPosition::BottomLeftQuarter => {
                 (0, screen_height / 2, screen_width / 2, screen_height / 2)
             }
-            ZorinSnapPosition::BottomRight => (
+            ZorinSnapPosition::BottomRight | ZorinSnapPosition::BottomRightQuarter => (
                 screen_width / 2,
                 screen_height / 2,
                 screen_width / 2,
                 screen_height / 2,
             ),
-            ZorinSnapPosition::Maximize => (0, 0, screen_width, screen_height),
+            ZorinSnapPosition::Maximize | ZorinSnapPosition::Maximized => (0, 0, screen_width, screen_height),
         }
     }
 }

@@ -59,9 +59,11 @@ where
     }
 
     /// Inserts an item into the set. Returns `true` if the item was newly inserted,
-    /// or `false` if it was already present, using a single pass through `BTreeMap::insert`.
+    /// or `false` if it was already present.
     pub fn insert(&mut self, item: T) -> bool {
-        self.map.insert(item, ()).is_none()
+        let already_present = self.map.contains_key(&item);
+        self.map.insert(item, ());
+        !already_present
     }
 
     pub fn remove(&mut self, item: &T) -> bool {
@@ -97,7 +99,7 @@ where
 }
 
 pub struct HashSetIter<'a, T> {
-    map_iter: std::collections::btree_map::Iter<'a, T, ()>,
+    map_iter: BTreeMapIter<'a, T, ()>,
 }
 
 impl<'a, T> Iterator for HashSetIter<'a, T>

@@ -255,6 +255,7 @@ pub enum PackageFormat {
     Nupkg,
     Vcpkg,
     NarInfo,
+    Sysupdate,
 }
 
 impl PackageFormat {
@@ -2748,7 +2749,9 @@ pub struct PackageDeltaEngine {
 
 impl PackageDeltaEngine {
     pub fn new() -> Self {
-        Self
+        Self {
+            strategies: HashMap::new(),
+        }
     }
 
     /// Reconstitutes a full package by applying a binary patch to a cached source package

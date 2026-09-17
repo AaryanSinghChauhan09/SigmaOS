@@ -4,7 +4,6 @@
 pub mod agent_runtime;
 
 pub mod agent;
-pub mod agent_runtime;
 pub mod agentic_os_runtime;
 pub mod apm;
 pub mod autogen;
