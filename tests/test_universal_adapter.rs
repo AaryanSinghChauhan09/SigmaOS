@@ -24,9 +24,6 @@ pub mod universal_oop_system;
 #[path = "../src/sigpkg/universal_engine.rs"]
 pub mod universal_engine;
 
-#[path = "../src/sigpkg/universal_oop_system.rs"]
-pub mod universal_oop_system;
-
 #[path = "../src/sigpkg/universal_adapter.rs"]
 pub mod universal_adapter;
 
@@ -38,9 +35,6 @@ pub mod sigpkg {
 
     pub use crate::universal_oop_system::{Dependency, Package, Version, VersionConstraint};
 }
-
-#[path = "../src/sigpkg/universal_adapter.rs"]
-pub mod universal_adapter;
 
 #[test]
 fn test_universal_adapter_all_formats() {
@@ -146,7 +140,7 @@ fn test_universal_adapter_extended_linux_bsd_formats() {
 #[test]
 fn test_all_prompt_package_formats() {
     use universal_adapter::UniversalPackageAdapter;
-    use universal_adapter::PackageFormat;
+    use universal_engine::PackageFormat;
 
     let adapter = UniversalPackageAdapter::new();
 
@@ -165,7 +159,7 @@ fn test_all_prompt_package_formats() {
     assert_eq!(adapter.detect_format_by_extension("debian.deb"), Some(PackageFormat::Apt));
     assert_eq!(adapter.detect_format_by_extension("archive.tar.gz"), Some(PackageFormat::TarGz));
     assert_eq!(adapter.detect_format_by_extension("compressed.xz"), Some(PackageFormat::TarXz));
-    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Rpm));
+    assert_eq!(adapter.detect_format_by_extension("fedora.rpm"), Some(PackageFormat::Yum));
     assert_eq!(adapter.detect_format_by_extension("gentoo.ebuild"), Some(PackageFormat::Portage));
     assert_eq!(adapter.detect_format_by_extension("arch.pkg.tar.xz"), Some(PackageFormat::Pacman));
     assert_eq!(adapter.detect_format_by_extension("app.flatpak"), Some(PackageFormat::Flatpak));
