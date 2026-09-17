@@ -2632,7 +2632,6 @@ mod tests {
 
         // 3. Verify general manifest definitions compile (AptDebManifest and PacmanPkgbuild)
         let _deb = AptDebManifest {
-            priority: PackagePriority::Optional,
             package: "curl".to_string(),
             version: "7.81.0".to_string(),
             architecture: "amd64".to_string(),
@@ -2849,7 +2848,8 @@ mod tests {
         assert_eq!(restored, pkgs);
     }
 
-    pub fn test_all_package_format_strategies_and_adapters(&self) {
+    #[test]
+    fn test_all_package_format_strategies_and_adapters() {
         let formats = vec![
             PackageFormat::Deb, PackageFormat::Rpm, PackageFormat::Pacman, PackageFormat::Ebuild,
             PackageFormat::Apk, PackageFormat::Nix, PackageFormat::Flatpak, PackageFormat::Snap,

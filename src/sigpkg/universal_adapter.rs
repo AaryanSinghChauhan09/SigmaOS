@@ -9,7 +9,7 @@ use std::vec::Vec;
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::sigpkg::{Dependency, Package, VersionConstraint};
 pub use crate::package::AptDebManifest;
-pub use crate::package::universal::PackagePriority;
+pub use crate::package::PackagePriority;
 pub use crate::sigpkg::Version;
 pub use crate::sigpkg::universal_engine::PackageFormat;
 
@@ -208,6 +208,7 @@ impl UniversalPackageAdapter {
         let mut depends = Vec::new();
         let mut description = String::new();
 
+        let mut priority = PackagePriority::Standard;
         for line in text.lines() {
             let line = line.trim();
             if line.is_empty() {
@@ -227,6 +228,15 @@ impl UniversalPackageAdapter {
                         }
                     }
                     "Description" => description = val.to_string(),
+                    "Priority" => {
+                        match val.to_lowercase().as_str() {
+                            "essential" => priority = PackagePriority::Essential,
+                            "required" => priority = PackagePriority::Required,
+                            "important" => priority = PackagePriority::Important,
+                            "standard" => priority = PackagePriority::Standard,
+                            _ => priority = PackagePriority::Optional,
+                        }
+                    }
                     _ => {}
                 }
             }
@@ -243,7 +253,7 @@ impl UniversalPackageAdapter {
             maintainer,
             depends,
             description,
-            priority: PackagePriority::Standard,
+            priority,
         })
     }
 
@@ -966,18 +976,7 @@ impl UniversalPackageAdapter {
 
     /// Detects package format based on file extension
     pub fn detect_format_by_extension(&self, filename: &str) -> Option<PackageFormat> {
-        if filename.ends_with(".deb") { Some(PackageFormat::Deb) }
-        else if filename.ends_with(".pkg.tar.zst") || filename.ends_with(".pkg.tar.xz") { Some(PackageFormat::Pacman) }
-        else if filename.ends_with(".rpm") { Some(PackageFormat::Rpm) }
-        else if filename.ends_with(".nix") || filename.ends_with(".nar") { Some(PackageFormat::Nix) }
-        else if filename.ends_with(".apk") { Some(PackageFormat::Apk) }
-        else if filename.ends_with(".ebuild") { Some(PackageFormat::Ebuild) }
-        else if filename.ends_with(".xbps") { Some(PackageFormat::Xbps) }
-        else if filename.ends_with(".eopkg") { Some(PackageFormat::Eopkg) }
-        else if filename.ends_with(".flatpak") { Some(PackageFormat::Flatpak) }
-        else if filename.ends_with(".snap") { Some(PackageFormat::Snap) }
-        else if filename.ends_with(".appimage") { Some(PackageFormat::AppImage) }
-        else { None }
+        PackageFormat::from_filename(filename)
     }
 
     /// Detects package format based on header byte signatures (magic bytes)
@@ -1031,8 +1030,22 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::GuixNar) // Nix / Guix NAR archive magic
         } else if data.starts_with(b"OBSD") {
             Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
-        } else if data.starts_with(b"OBSD") {
-            Some(PackageFormat::OpenBsdPkg) // OpenBSD pkg_add magic
+        } else if data.starts_with(b"SPAK") {
+            Some(PackageFormat::Spack)
+        } else if data.starts_with(b"CONA") {
+            Some(PackageFormat::Conan)
+        } else if data.starts_with(b"WHEL") {
+            Some(PackageFormat::Wheel)
+        } else if data.starts_with(b"CRAT") {
+            Some(PackageFormat::Crate)
+        } else if data.starts_with(b"GEMS") {
+            Some(PackageFormat::Gem)
+        } else if data.starts_with(b"NUPK") {
+            Some(PackageFormat::Nupkg)
+        } else if data.starts_with(b"VCPK") {
+            Some(PackageFormat::Vcpkg)
+        } else if data.starts_with(b"NARI") {
+            Some(PackageFormat::NarInfo)
         } else {
             None
         }
@@ -2304,12 +2317,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg_add" | "pkg_info" => {
-                if pm == "pkg_add" {
-                    operation = UniversalPmOperation::Install;
-                } else {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
+            "pkg_add" => {
+                operation = UniversalPmOperation::Install;
                 for arg in args {
                     if *arg == "-n" {
                         dry_run = true;
@@ -2960,7 +2969,7 @@ mod tests {
         assert_eq!(parsed.package, "curl");
         assert_eq!(parsed.version, "8.2.1");
         assert_eq!(parsed.depends.len(), 3);
-        assert_eq!(parsed.priority, "Standard");
+        assert_eq!(parsed.priority, PackagePriority::Standard);
 
         // Test parsing system essential priority (Debian-style)
         let essential_text = r#"
@@ -2969,7 +2978,7 @@ mod tests {
             Priority: essential
         "#;
         let parsed_essential = adapter.parse_apt_control(essential_text).unwrap();
-        assert_eq!(parsed_essential.priority, "Essential");
+        assert_eq!(parsed_essential.priority, PackagePriority::Essential);
 
         let native = adapter
             .translate_to_native_package(
@@ -3188,11 +3197,11 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
-            Some(PackageFormat::Ebuild)
+            Some(PackageFormat::Portage)
         );
         assert_eq!(
             adapter.detect_format_by_extension("ubuntu.deb"),
-            Some(PackageFormat::Deb)
+            Some(PackageFormat::Apt)
         );
         assert_eq!(
             adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -3200,7 +3209,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("fedora.rpm"),
-            Some(PackageFormat::Rpm)
+            Some(PackageFormat::Yum)
         );
         assert_eq!(
             adapter.detect_format_by_extension("harmony.hap"),
