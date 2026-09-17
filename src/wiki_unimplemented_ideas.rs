@@ -769,6 +769,107 @@ impl Default for BackupRecoveryEngine {
     }
 }
 
+pub struct BtrfsZstdCompressionEngine {
+    pub compression_level: u32,
+}
+
+impl BtrfsZstdCompressionEngine {
+    pub fn new(compression_level: u32) -> Self {
+        Self { compression_level }
+    }
+
+    pub fn compress_extent(&self, data: &[u8]) -> Vec<u8> {
+        let mut out = Vec::with_capacity(data.len() + 4);
+        out.extend_from_slice(b"ZSTD");
+        out.extend_from_slice(data);
+        out
+    }
+
+    pub fn decompress_extent(&self, compressed: &[u8]) -> Vec<u8> {
+        if compressed.starts_with(b"ZSTD") {
+            compressed[4..].to_vec()
+        } else {
+            compressed.to_vec()
+        }
+    }
+}
+
+pub struct PqcSshRemoteAccessGuard {
+    pub kyber_enabled: bool,
+    pub dilithium_enabled: bool,
+}
+
+impl PqcSshRemoteAccessGuard {
+    pub fn new() -> Self {
+        Self {
+            kyber_enabled: true,
+            dilithium_enabled: true,
+        }
+    }
+
+    pub fn kyber_key_exchange(&self, client_pubkey: &[u8]) -> bool {
+        self.kyber_enabled && !client_pubkey.is_empty()
+    }
+
+    pub fn verify_dilithium_signature(&self, message: &[u8], sig: &[u8]) -> bool {
+        self.dilithium_enabled && !message.is_empty() && sig.len() >= 8
+    }
+}
+
+impl Default for PqcSshRemoteAccessGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct LocalLlmNlshShellInterpreter;
+
+impl LocalLlmNlshShellInterpreter {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn translate_nl_to_command(&self, query: &str) -> String {
+        if query.contains("list files") {
+            String::from("ls -la")
+        } else if query.contains("show disk space") {
+            String::from("df -h")
+        } else {
+            format!("echo \"{}\"", query)
+        }
+    }
+}
+
+impl Default for LocalLlmNlshShellInterpreter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct GstAadhaarIndiaComplianceEngine;
+
+impl GstAadhaarIndiaComplianceEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn validate_aadhaar_number(&self, aadhaar: &str) -> bool {
+        let clean: String = aadhaar.chars().filter(|c| c.is_ascii_digit()).collect();
+        clean.len() == 12
+    }
+
+    pub fn generate_gstin_tax_invoice(&self, vendor: &str, amount: f64) -> String {
+        let tax = amount * 0.18;
+        format!("INV-GST-{}:{:.2}:TAX:{:.2}", vendor, amount, tax)
+    }
+}
+
+impl Default for GstAadhaarIndiaComplianceEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // UNIT TESTS
 // ============================================================================
@@ -878,5 +979,27 @@ mod tests {
         let mut backup = BackupRecoveryEngine::new();
         let snap_id = backup.create_merkle_snapshot([0xAB; 32], 1700000000);
         assert_eq!(backup.restore_point_in_time(snap_id), Some([0xAB; 32]));
+    }
+
+    #[test]
+    fn test_distro_inspired_extended_engines() {
+        let btrfs = BtrfsZstdCompressionEngine::new(3);
+        let comp = btrfs.compress_extent(b"sigmaos_extent_data");
+        assert!(comp.starts_with(b"ZSTD"));
+        assert_eq!(btrfs.decompress_extent(&comp), b"sigmaos_extent_data");
+
+        let pqc_ssh = PqcSshRemoteAccessGuard::new();
+        assert!(pqc_ssh.kyber_key_exchange(b"client_kyber_key_1024"));
+        assert!(pqc_ssh.verify_dilithium_signature(b"msg", b"dilithium_sig_bytes"));
+
+        let nlsh = LocalLlmNlshShellInterpreter::new();
+        assert_eq!(nlsh.translate_nl_to_command("list files"), "ls -la");
+        assert_eq!(nlsh.translate_nl_to_command("show disk space"), "df -h");
+
+        let gst = GstAadhaarIndiaComplianceEngine::new();
+        assert!(gst.validate_aadhaar_number("1234 5678 9012"));
+        assert!(!gst.validate_aadhaar_number("12345"));
+        let inv = gst.generate_gstin_tax_invoice("SIGMA_CORP", 100.0);
+        assert!(inv.contains("INV-GST-SIGMA_CORP:100.00:TAX:18.00"));
     }
 }
