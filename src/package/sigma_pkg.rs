@@ -126,6 +126,8 @@ impl UniversalPackageImporter {
                 ("GPLv2+", vec!["glibc".to_string(), "bash".to_string(), "openssl-devel".to_string()])
             }
             UniversalPackageFormat::AlpineApk => ("MIT/GPL-2.0", vec!["musl".to_string(), "openssl-dev".to_string()]),
+            UniversalPackageFormat::GentooEbuild => ("GPL-2.0-or-later", vec!["sys-libs/glibc".to_string(), "dev-libs/openssl".to_string()]),
+            UniversalPackageFormat::VoidXbps => ("BSD-2-Clause", vec!["libc6".to_string(), "libssl-dev".to_string()]),
             UniversalPackageFormat::FreeBsdPkg => {
                 ("BSD-2-Clause", vec!["freebsd-runtime".to_string(), "security/openssl".to_string()])
             }
@@ -139,7 +141,9 @@ impl UniversalPackageImporter {
             }
             UniversalPackageFormat::GuixPackage => ("GPL-3.0+", vec!["guix-daemon".to_string(), "openssl".to_string()]),
             UniversalPackageFormat::HaikuHpkg => ("MIT", vec!["haiku-libroot".to_string(), "openssl".to_string()]),
-            _ => ("GPL/MIT/BSD", vec!["sovereign-core-sys".to_string()]),
+            UniversalPackageFormat::FlatpakBundle => ("LGPL-2.1+", vec!["glibc".to_string(), "openssl".to_string()]),
+            UniversalPackageFormat::SnapPackage => ("GPL-3.0+", vec!["libc6".to_string(), "libssl-dev".to_string()]),
+            UniversalPackageFormat::AppImageBinary => ("MIT", vec!["glibc".to_string()]),
         };
 
         let translated_deps = Self::translate_foreign_dependencies(&raw_deps);
@@ -171,6 +175,10 @@ impl UniversalPackageImporter {
                     "sovereign-openssl".to_string()
                 } else if dep_lower.contains("libc") || dep_lower == "musl" || dep_lower.contains("freebsd-runtime") || dep_lower.contains("openbsd-sys") || dep_lower.contains("haiku-libroot") {
                     "sovereign-libc".to_string()
+                } else if dep_lower.contains("zlib") {
+                    "sovereign-zlib".to_string()
+                } else if dep_lower.contains("python") {
+                    "sovereign-python".to_string()
                 } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "sh" {
                     "sovereign-shell".to_string()
                 } else {
