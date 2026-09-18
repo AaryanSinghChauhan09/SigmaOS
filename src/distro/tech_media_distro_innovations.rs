@@ -2,7 +2,7 @@
 // Inspired by DistroWatch, 9to5Linux, MakeUseOf, LinuxTeck, Appuals, ZDNet, and DistroWatch
 
 #[cfg(not(test))]
-use crate::klib::string::String;
+use crate::klib::custom_string::SigmaString;
 #[cfg(not(test))]
 use crate::klib::vec::Vec;
 
