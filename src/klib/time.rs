@@ -103,25 +103,22 @@ pub struct SystemTime {
 impl SystemTime {
     pub fn now() -> Self {
         #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-        {
-            // SAFETY: Reading hardware timestamp counter is safe for time estimation
-            unsafe {
-                let mut rdtsc: u64;
-                core::arch::asm!(
-                    "rdtsc",
-                    out("rax") rdtsc,
-                    out("rdx") _,
-                    options(nostack, nomem)
-                );
-                SystemTime {
-                    secs_since_epoch: rdtsc / 1_000_000_000, // Convert nanoseconds to seconds
-                }
+        unsafe {
+            let mut rdtsc: u64;
+            core::arch::asm!(
+                "rdtsc",
+                out("rax") rdtsc,
+                out("rdx") _,
+                options(nostack, nomem)
+            );
+            SystemTime {
+                secs_since_epoch: rdtsc / 1_000_000_000, // Convert nanoseconds to seconds
             }
         }
         #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
         {
             SystemTime {
-                secs_since_epoch: 0,
+                secs_since_epoch: monotonic_ms() / 1000,
             }
         }
     }

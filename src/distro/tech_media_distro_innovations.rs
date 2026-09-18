@@ -2,7 +2,7 @@
 // Inspired by DistroWatch, 9to5Linux, MakeUseOf, LinuxTeck, Appuals, ZDNet, and DistroWatch
 
 #[cfg(not(test))]
-use crate::klib::string::String;
+use crate::klib::custom_string::SigmaString;
 #[cfg(not(test))]
 use crate::klib::vec::Vec;
 
@@ -42,6 +42,15 @@ impl DistroWatchRankTrackerEngine {
             self.tracked_distros[0].clone()
         }
     }
+
+    pub fn rank_distro_hits(&self, distro_name: &str) -> usize {
+        for (idx, d) in self.tracked_distros.iter().enumerate() {
+            if d.eq_ignore_ascii_case(distro_name) {
+                return idx + 1;
+            }
+        }
+        999
+    }
 }
 
 impl Default for DistroWatchRankTrackerEngine {
@@ -73,6 +82,10 @@ impl NineToFiveLinuxReleaseMatrixEngine {
 
     pub fn is_kernel_up_to_date(&self, current: &str) -> bool {
         current.contains("6.12") || current.contains("sigma")
+    }
+
+    pub fn verify_sched_ext_support(&self) -> bool {
+        self.latest_kernel_version.contains("6.12") || self.latest_kernel_version.contains("sigma")
     }
 }
 
@@ -258,10 +271,12 @@ mod tests {
 
     #[test]
     fn test_tech_media_distro_innovations() {
-        let mut suite = SovereignTechMediaDistroInnovationsSuite::new();
+        let suite = SovereignTechMediaDistroInnovationsSuite::new();
         assert!(suite.verify_suite());
         assert_eq!(suite.rank_tracker.get_top_ranked_distro(), "Debian");
+        assert_eq!(suite.rank_tracker.rank_distro_hits("Arch Linux"), 3);
         assert!(suite.release_matrix.is_kernel_up_to_date("6.12.0-sigma"));
+        assert!(suite.release_matrix.verify_sched_ext_support());
         assert_eq!(
             suite.recommendation.recommend_profile_for_ram(512),
             "SigmaOS AntiX-Inspired Ultralight GUI"

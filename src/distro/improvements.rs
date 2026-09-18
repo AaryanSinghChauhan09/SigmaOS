@@ -1303,7 +1303,6 @@ impl IllumosDTraceTracingGovernor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::*;
 
     #[test]
     fn test_solus_eopkg_package_engine() {
