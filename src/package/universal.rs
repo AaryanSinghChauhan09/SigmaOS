@@ -180,6 +180,10 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         || lower.contains("x11")
         || lower.contains("mesa")
         || lower.contains("vulkan")
+        || lower.contains("xorg")
+        || lower.contains("xcb")
+        || lower.contains("wlroots")
+        || lower.contains("pixman")
     {
         "sovereign-graphics"
     } else if lower.contains("curl")
@@ -189,6 +193,53 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         || lower.contains("iproute2")
     {
         "sovereign-network-tools"
+    } else if lower.contains("postgres")
+        || lower.contains("mariadb")
+        || lower.contains("mysql")
+        || lower.contains("sqlite")
+        || lower.contains("redis")
+    {
+        "sovereign-database"
+    } else if lower.contains("docker")
+        || lower.contains("podman")
+        || lower.contains("containerd")
+        || lower.contains("runc")
+        || lower.contains("qemu")
+        || lower.contains("libvirt")
+        || lower.contains("kvm")
+    {
+        "sovereign-containers-virtualization"
+    } else if lower.contains("gnome")
+        || lower.contains("kde")
+        || lower.contains("plasma")
+        || lower.contains("hyprland")
+        || lower.contains("sway")
+        || lower.contains("xfce")
+        || lower.contains("mate")
+        || lower.contains("cinnamon")
+        || lower.contains("enlightenment")
+    {
+        "sovereign-desktop-environment"
+    } else if lower.contains("ffmpeg")
+        || lower.contains("gstreamer")
+        || lower.contains("pipewire")
+        || lower.contains("pulseaudio")
+        || lower.contains("alsa")
+        || lower.contains("codec")
+        || lower.contains("x264")
+        || lower.contains("x265")
+    {
+        "sovereign-multimedia"
+    } else if lower.contains("pam")
+        || lower.contains("sudo")
+        || lower.contains("doas")
+        || lower.contains("selinux")
+        || lower.contains("apparmor")
+        || lower.contains("audit")
+        || lower.contains("polkit")
+        || lower.contains("kerberos")
+    {
+        "sovereign-security"
     } else {
         name
     }
@@ -1416,6 +1467,10 @@ impl<T: PackageCapability> PackageCapability for HardwareOptimizationDecorator<T
         self.decorated.restrict_network()
     }
     fn profile_performance(&self) {
+        println!(
+            "HardwareOptimizationDecorator: Target microarch level '{}', SIMD features: {:?}",
+            self.target_microarch_level, self.required_simd_features
+        );
         self.decorated.profile_performance();
     }
 }
@@ -3322,5 +3377,14 @@ mod tests {
         };
 
         assert!(bad_pqc.enforce_sandbox().is_err());
+    }
+
+    #[test]
+    fn test_expanded_debtor_to_sovereign_mappings() {
+        assert_eq!(debtor_to_sovereign_name("postgresql-15"), "sovereign-database");
+        assert_eq!(debtor_to_sovereign_name("podman-docker"), "sovereign-containers-virtualization");
+        assert_eq!(debtor_to_sovereign_name("gnome-shell"), "sovereign-desktop-environment");
+        assert_eq!(debtor_to_sovereign_name("ffmpeg-free"), "sovereign-multimedia");
+        assert_eq!(debtor_to_sovereign_name("pam-modules"), "sovereign-security");
     }
 }

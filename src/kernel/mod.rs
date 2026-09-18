@@ -147,3 +147,10 @@ pub use universal_modular_system::{
     SovereignDriverManager, SovereignModularKernelEngine, SovereignNetworkStackManager,
     SovereignPeripheralAccessManager, SovereignProcessControlManager, SovereignVfsStorageManager,
 };
+
+// ─── Universal Kernel Format Engine (Linux & BSD Parity) ───────────────────────
+pub mod universal_kernel_format;
+pub use universal_kernel_format::{
+    KernelArch, KernelCompression, KernelFormat, KernelFormatSymbol, KernelSection,
+    ParsedKernelImage, SigmaKernelExecutionPayload, UniversalKernelFormatEngine,
+};

@@ -4323,6 +4323,10 @@ impl UniversalDistroPackageUnifierEngine {
                     || lower.contains("x11")
                     || lower.contains("mesa")
                     || lower.contains("vulkan")
+                    || lower.contains("xorg")
+                    || lower.contains("xcb")
+                    || lower.contains("wlroots")
+                    || lower.contains("pixman")
                 {
                     "sovereign-graphics".to_string()
                 } else if lower.contains("curl")
@@ -4332,6 +4336,53 @@ impl UniversalDistroPackageUnifierEngine {
                     || lower.contains("iproute2")
                 {
                     "sovereign-network-tools".to_string()
+                } else if lower.contains("postgres")
+                    || lower.contains("mariadb")
+                    || lower.contains("mysql")
+                    || lower.contains("sqlite")
+                    || lower.contains("redis")
+                {
+                    "sovereign-database".to_string()
+                } else if lower.contains("docker")
+                    || lower.contains("podman")
+                    || lower.contains("containerd")
+                    || lower.contains("runc")
+                    || lower.contains("qemu")
+                    || lower.contains("libvirt")
+                    || lower.contains("kvm")
+                {
+                    "sovereign-containers-virtualization".to_string()
+                } else if lower.contains("gnome")
+                    || lower.contains("kde")
+                    || lower.contains("plasma")
+                    || lower.contains("hyprland")
+                    || lower.contains("sway")
+                    || lower.contains("xfce")
+                    || lower.contains("mate")
+                    || lower.contains("cinnamon")
+                    || lower.contains("enlightenment")
+                {
+                    "sovereign-desktop-environment".to_string()
+                } else if lower.contains("ffmpeg")
+                    || lower.contains("gstreamer")
+                    || lower.contains("pipewire")
+                    || lower.contains("pulseaudio")
+                    || lower.contains("alsa")
+                    || lower.contains("codec")
+                    || lower.contains("x264")
+                    || lower.contains("x265")
+                {
+                    "sovereign-multimedia".to_string()
+                } else if lower.contains("pam")
+                    || lower.contains("sudo")
+                    || lower.contains("doas")
+                    || lower.contains("selinux")
+                    || lower.contains("apparmor")
+                    || lower.contains("audit")
+                    || lower.contains("polkit")
+                    || lower.contains("kerberos")
+                {
+                    "sovereign-security".to_string()
                 } else {
                     dep.name.clone()
                 };
@@ -4385,6 +4436,16 @@ impl UserDefinedFunctionManager {
             ran += 1;
         }
         Ok(ran)
+    }
+
+    pub fn run_all_phase_closures_and_hooks(
+        &self,
+        phase: PackageBuildPhase,
+        package: &mut dyn IPackage,
+    ) -> Result<usize, HookError> {
+        let pipeline_ran = self.pipeline.execute_phase(phase, package)?;
+        let hooks_ran = self.run_hooks_on(package)?;
+        Ok(pipeline_ran + hooks_ran)
     }
 }
 
@@ -5409,5 +5470,60 @@ Description: Hook test";
                 filename
             );
         }
+    }
+
+    #[test]
+    fn test_udf_manager_closures_and_hooks() {
+        let mut udf_mgr = UserDefinedFunctionManager::new();
+
+        udf_mgr.pipeline.register_closure(
+            "set-license",
+            PackageBuildPhase::Prepare,
+            |pkg: &mut dyn IPackage| {
+                pkg.metadata_mut().license = "Apache-2.0".to_string();
+                Ok(())
+            },
+        );
+
+        struct MaintainerHook;
+        impl UserDefinedHook for MaintainerHook {
+            fn name(&self) -> &str {
+                "maintainer-hook"
+            }
+            fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+                pkg.metadata_mut().maintainer = "sovereign-team".to_string();
+                Ok(())
+            }
+        }
+
+        udf_mgr.register_hook(Arc::new(MaintainerHook));
+
+        let mut test_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "udf-combined".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "test".to_string(),
+                license: "GPL".to_string(),
+                maintainer: "unknown".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: String::new(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        let total_ran = udf_mgr
+            .run_all_phase_closures_and_hooks(PackageBuildPhase::Prepare, test_pkg.as_mut())
+            .unwrap();
+
+        assert_eq!(total_ran, 2);
+        assert_eq!(test_pkg.metadata().license, "Apache-2.0");
+        assert_eq!(test_pkg.metadata().maintainer, "sovereign-team");
     }
 }
