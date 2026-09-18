@@ -125,11 +125,11 @@ impl PackageFormat {
             || normalized.ends_with(".pacman")
         {
             Some(PackageFormat::Pacman)
-        } else if normalized.ends_with(".snap") {
+        } else if normalized.ends_with(".snap") || normalized == "snap" {
             Some(PackageFormat::Snap)
-        } else if normalized.ends_with(".flatpak") {
+        } else if normalized.ends_with(".flatpak") || normalized == "flatpak" {
             Some(PackageFormat::Flatpak)
-        } else if normalized.ends_with(".appimage") {
+        } else if normalized.ends_with(".appimage") || normalized == "appimage" {
             Some(PackageFormat::AppImage)
         } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
             Some(PackageFormat::Sovereign)
@@ -213,9 +213,9 @@ impl PackageFormat {
             Some(PackageFormat::Pisi)
         } else if normalized.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if normalized.ends_with(".pup") {
+        } else if normalized.ends_with(".pup") || normalized == "pup" {
             Some(PackageFormat::Pup)
-        } else if normalized.ends_with(".pet") {
+        } else if normalized.ends_with(".pet") || normalized == "pet" {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".tar") {
             Some(PackageFormat::Tar)
