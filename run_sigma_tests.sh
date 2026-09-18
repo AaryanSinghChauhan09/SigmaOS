@@ -122,3 +122,10 @@ if [ -f "src/wiki_unimplemented_ideas.rs" ]; then
     rustc --test --edition=2021 src/wiki_unimplemented_ideas.rs -o build/test_wiki_unimplemented
     ./build/test_wiki_unimplemented
 fi
+
+if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
+    echo "Running Sovereign Universal Distro Driver Suite test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/drivers/sovereign_distro_driver_suite.rs -o build/test_sovereign_distro_driver_suite
+    ./build/test_sovereign_distro_driver_suite
+fi
