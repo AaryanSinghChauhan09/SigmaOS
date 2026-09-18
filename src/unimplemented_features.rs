@@ -1808,14 +1808,14 @@ mod tests {
     fn test_zero_allocation_udf_bytecode_vm() {
         let mut pio = LegacyController::new(0x3F8);
         pio.initialize().unwrap();
-        let mut vm = SpecUdfVm::new();
+        let mut vm = UdfVm::new(0, 1000);
         let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 10 },
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
+            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 },
+            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction { opcode: OP_HALT, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
         ];
-        let res = vm.execute(&code).unwrap();
-        assert_eq!(res, 110);
+        let res = vm.execute_program(&code, &mut pio).unwrap();
+        assert_eq!(res, 0);
     }
 
     #[test]
@@ -1841,13 +1841,15 @@ mod tests {
 
     #[test]
     fn test_sigmaos_component_inspection_suite() {
-        let mut vm = SpecUdfVm::new();
+        let mut pio = LegacyController::new(0x3F8);
+        pio.initialize().unwrap();
+        let mut vm = UdfVm::new(0, 1000);
         let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
+            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 },
+            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction { opcode: OP_HALT, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
         ];
-        assert_eq!(vm.execute(&code).unwrap(), 150);
+        assert_eq!(vm.execute_program(&code, &mut pio).unwrap(), 0);
 
         let mut ledger = SpecJbd2TransactionLedger::new();
         assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);

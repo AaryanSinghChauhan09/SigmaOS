@@ -454,7 +454,7 @@ pub struct DeveloperPlatformSuite {
 impl DeveloperPlatformSuite {
     pub fn new() -> Self {
         Self {
-            orchestrator: LocalLlmOrchestrator::new(1024 * 1024 * 1024, 4 * 1024 * 1024 * 1024),
+            orchestrator: LocalLlmOrchestrator::new(1024 * 1024 * 1024, (2u64 * 1024 * 1024 * 1024) as usize),
         }
     }
 }
