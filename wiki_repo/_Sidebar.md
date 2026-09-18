@@ -74,6 +74,12 @@ n- **[[Dynamic Kernel Module Loading|Dynamic-Kernel-Module-Loading]]**
 - **[[Cgroups v2 Memory Controller|Cgroups-v2-Memory-Controller]]**
 - **[[Linux io_uring|Linux-io_uring-Implementation]]**
 - **[[FreeBSD Capsicum|FreeBSD-Capsicum-Integration]]**
+n- **[[ZFS Integration with ARC|ZFS-Integration-with-ARC]]**
+- **[[Btrfs Subvolumes & Send/Receive|Btrfs-Subvolumes-and-Send-Receive]]**
+- **[[XDP Zero-Copy Networking|XDP-Zero-Copy-Networking]]**
+- **[[PF Firewall with CARP/pfsync|PF-Firewall-with-CARP-pfsync]]**
+- **[[Nix/Guix Hermetic Build Sandboxing|Nix-Guix-Hermetic-Build-Sandboxing]]**
+
 
 ---
 

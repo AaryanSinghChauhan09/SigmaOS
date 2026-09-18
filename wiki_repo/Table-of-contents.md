@@ -64,6 +64,11 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 - [Cgroups v2 Memory Controller](Cgroups-v2-Memory-Controller) — Fine-grained memory resource management and isolation
 - [Linux io_uring](Linux-io_uring-Implementation) — High-performance asynchronous I/O with zero-copy support
 - [FreeBSD Capsicum](FreeBSD-Capsicum-Integration) — Capability-based access control and sandboxing
+- [ZFS Integration with ARC](ZFS-Integration-with-ARC) — Advanced storage management with data integrity and compression
+- [Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive) — Copy-on-write filesystem with snapshot replication
+- [XDP Zero-Copy Networking](XDP-Zero-Copy-Networking) — Ultra-high-performance packet processing at NIC level
+- [PF Firewall with CARP/pfsync](PF-Firewall-with-CARP-pfsync) — Stateful firewalling with high availability
+- [Nix/Guix Hermetic Build Sandboxing](Nix-Guix-Hermetic-Build-Sandboxing) — Reproducible builds with complete isolation
 - [Performance & BORE Scheduler](Performance-Tuning-and-Kernel) — Performance tuning and BORE scheduler configuration
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support

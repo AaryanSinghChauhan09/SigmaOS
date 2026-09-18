@@ -138,6 +138,23 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Cgroups v2 Memory Controller](Cgroups-v2-Memory-Controller)**
   Fine-grained memory resource management and isolation.
 
+
+- **[ZFS Integration with ARC](ZFS-Integration-with-ARC)**
+  Advanced storage management with data integrity and compression.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+  Copy-on-write filesystem with snapshot replication.
+
+- **[XDP Zero-Copy Networking](XDP-Zero-Copy-Networking)**
+  Ultra-high-performance packet processing at NIC level.
+
+- **[PF Firewall with CARP/pfsync](PF-Firewall-with-CARP-pfsync)**
+  Stateful firewalling with high availability.
+
+- **[Nix/Guix Hermetic Build Sandboxing](Nix-Guix-Hermetic-Build-Sandboxing)**
+  Reproducible builds with complete isolation.
+
+
 - **[Linux io_uring](Linux-io_uring-Implementation)**
   High-performance asynchronous I/O with zero-copy support.
 
