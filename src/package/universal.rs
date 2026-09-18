@@ -70,8 +70,6 @@ pub mod node_distribution_dummy {
 #[cfg(any(feature = "standalone_test", test))]
 pub use node_distribution_dummy::*;
 
-#[cfg(any(feature = "standalone_test", test))]
-
 /// Foreign distro manifest
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ForeignDistroManifest {
