@@ -1838,7 +1838,7 @@ impl UniversalDependencyMapper {
         };
 
         match clean {
-            "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
+            "libssl-dev" | "libssl3" | "libssl1.1" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
@@ -1850,7 +1850,10 @@ impl UniversalDependencyMapper {
             | "lang/python" => "python".to_string(),
             "curl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl"
             | "net-misc/curl" => "curl".to_string(),
+            "wget" | "net-misc/wget" | "ftp/wget" => "wget".to_string(),
             "bash" | "shells/bash" | "app-shells/bash" => "bash".to_string(),
+            "zsh" | "shells/zsh" | "app-shells/zsh" => "zsh".to_string(),
+            "fish" | "shells/fish" | "app-shells/fish" => "fish".to_string(),
             "libx11"
             | "libx11-dev"
             | "libx11-devel"
@@ -1871,9 +1874,12 @@ impl UniversalDependencyMapper {
                 "sqlite".to_string()
             }
             "gtk3" | "libgtk-3-dev" | "gtk3-devel" | "x11-toolkits/gtk30" => "gtk3".to_string(),
+            "gtk4" | "libgtk-4-dev" | "gtk4-devel" | "x11-toolkits/gtk40" => "gtk4".to_string(),
             "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "qt5".to_string(),
+            "qt6" | "qt6-base" | "qt6-base-devel" => "qt6".to_string(),
             "llvm" | "llvm-dev" | "llvm-devel" | "sys-devel/llvm" => "llvm".to_string(),
             "gcc" | "gcc-c++" | "sys-devel/gcc" => "gcc".to_string(),
+            "clang" | "sys-devel/clang" => "clang".to_string(),
             "libffi" | "libffi-dev" | "libffi-devel" | "dev-libs/libffi" => "libffi".to_string(),
             "glib" | "glib2" | "glib2-devel" | "libglib2.0-dev" | "dev-libs/glib" => "glib".to_string(),
             "pcre" | "pcre2" | "libpcre2-dev" | "pcre2-devel" | "dev-libs/libpcre2" => "pcre".to_string(),
@@ -1887,6 +1893,10 @@ impl UniversalDependencyMapper {
             "golang" | "go" | "dev-lang/go" => "go".to_string(),
             "ninja" | "ninja-build" | "dev-build/ninja" => "ninja".to_string(),
             "systemd" | "systemd-sysv" | "sys-apps/systemd" => "systemd".to_string(),
+            "openrc" | "sys-apps/openrc" => "openrc".to_string(),
+            "runit" | "sys-process/runit" => "runit".to_string(),
+            "s6" | "sys-apps/s6" => "s6".to_string(),
+            "dinit" => "dinit".to_string(),
             "fastfetch" | "neofetch" => "fastfetch".to_string(),
             "btop" | "htop" => "btop".to_string(),
             "ripgrep" | "rg" => "ripgrep".to_string(),
@@ -2109,7 +2119,7 @@ impl UniversalPmCommandDispatcher {
         let mut dry_run = false;
 
         match pm.as_str() {
-            "apt" | "apt-get" | "dpkg" => {
+            "apt" | "apt-get" | "dpkg" | "debian" | "ubuntu" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2122,6 +2132,166 @@ impl UniversalPmCommandDispatcher {
                         "show" | "status" => operation = UniversalPmOperation::QueryInfo,
                         "clean" | "autoclean" => operation = UniversalPmOperation::CleanCache,
                         "-s" | "--dry-run" | "--simulate" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "dnf" | "yum" | "zypper" | "microdnf" | "fedora" | "rhel" | "centos" | "opensuse" | "suse" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "in" => operation = UniversalPmOperation::Install,
+                        "remove" | "erase" | "rm" => operation = UniversalPmOperation::Remove,
+                        "update" | "upgrade" | "up" => operation = UniversalPmOperation::Upgrade,
+                        "search" | "se" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "clean" => operation = UniversalPmOperation::CleanCache,
+                        "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachy" | "cachyos" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "-S" | "-Sy" | "install" => operation = UniversalPmOperation::Install,
+                        "-R" | "-Rns" | "-Rs" | "remove" => operation = UniversalPmOperation::Remove,
+                        "-Syu" | "-Syyu" | "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
+                        "-Ss" | "-Qs" | "search" => operation = UniversalPmOperation::Search,
+                        "-Si" | "-Qi" | "info" | "show" => operation = UniversalPmOperation::QueryInfo,
+                        "-Sc" | "-Scc" | "clean" => operation = UniversalPmOperation::CleanCache,
+                        "--print" | "--dryrun" | "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "apk" | "alpine" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "add" | "install" => operation = UniversalPmOperation::Install,
+                        "del" | "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-s" | "--simulate" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "pkg" | "pkgsend" | "freebsd" | "openbsd" | "netbsd" | "bsd" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" | "add" => operation = UniversalPmOperation::Install,
+                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-n" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "xbps-install" | "xbps-remove" | "xbps-query" | "xbps" | "void" => {
+                if pm == "xbps-install" {
+                    operation = UniversalPmOperation::Install;
+                } else if pm == "xbps-remove" {
+                    operation = UniversalPmOperation::Remove;
+                } else if pm == "xbps-query" {
+                    operation = UniversalPmOperation::QueryInfo;
+                }
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "-S" | "install" | "add" => operation = UniversalPmOperation::Install,
+                        "-R" | "remove" | "remove-orphan" => operation = UniversalPmOperation::Remove,
+                        "-Su" | "-u" | "sync" | "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
+                        "-s" | "search" => operation = UniversalPmOperation::Search,
+                        "-n" | "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "emerge" | "ebuild" | "gentoo" | "portage" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "-a" | "--ask" | "-pv" | "--pretend" | "-p" => dry_run = true,
+                        "-u" | "-uN" | "-uDN" | "--update" | "@world" | "update" | "upgrade" => {
+                            operation = UniversalPmOperation::Upgrade
+                        }
+                        "-C" | "--unmerge" | "deselect" | "remove" => operation = UniversalPmOperation::Remove,
+                        "install" => operation = UniversalPmOperation::Install,
+                        "-s" | "--search" | "search" => operation = UniversalPmOperation::Search,
+                        "-S" | "--searchdesc" => operation = UniversalPmOperation::Search,
+                        "-c" | "--depclean" => operation = UniversalPmOperation::CleanCache,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "eopkg" | "moss" | "solus" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "it" | "install" => operation = UniversalPmOperation::Install,
+                        "rm" | "remove" => operation = UniversalPmOperation::Remove,
+                        "up" | "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
+                        "sr" | "search" => operation = UniversalPmOperation::Search,
+                        "info" => operation = UniversalPmOperation::QueryInfo,
+                        "-dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "nix" | "nix-env" | "guix" | "nixos" | "guixsd" => {
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "-i" | "-iA" | "install" | "package" => {
+                            operation = UniversalPmOperation::Install
+                        }
+                        "-e" | "uninstall" | "remove" => operation = UniversalPmOperation::Remove,
+                        "-u" | "--upgrade" | "upgrade" | "update" => operation = UniversalPmOperation::Upgrade,
+                        "-q" | "-qa" | "search" => operation = UniversalPmOperation::Search,
+                        "--dry-run" => dry_run = true,
+                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
+                        _ => {}
+                    }
+                    i += 1;
+                }
+            }
+            "slackpkg" | "installpkg" | "removepkg" | "slackware" => {
+                if pm == "installpkg" {
+                    operation = UniversalPmOperation::Install;
+                } else if pm == "removepkg" {
+                    operation = UniversalPmOperation::Remove;
+                }
+                let mut i = 0;
+                while i < args.len() {
+                    match args[i] {
+                        "install" => operation = UniversalPmOperation::Install,
+                        "remove" => operation = UniversalPmOperation::Remove,
+                        "upgrade" | "upgrade-all" | "update" => operation = UniversalPmOperation::Upgrade,
+                        "search" => operation = UniversalPmOperation::Search,
+                        "clean-system" => operation = UniversalPmOperation::CleanCache,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }

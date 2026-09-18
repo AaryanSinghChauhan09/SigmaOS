@@ -106,6 +106,44 @@ fn test_universal_pm_command_dispatcher_all_distros() {
     let xbps_act = dispatcher.dispatch_command("xbps-install -S bash").unwrap();
     assert_eq!(xbps_act.source_pm, "xbps-install");
     assert_eq!(xbps_act.operation, UniversalPmOperation::Install);
+
+    // Distro Name Aliases
+    let debian_act = dispatcher.dispatch_command("debian install nginx").unwrap();
+    assert_eq!(debian_act.source_pm, "debian");
+    assert_eq!(debian_act.operation, UniversalPmOperation::Install);
+    assert_eq!(debian_act.target_packages, vec!["nginx"]);
+
+    let fedora_act = dispatcher.dispatch_command("fedora remove httpd").unwrap();
+    assert_eq!(fedora_act.source_pm, "fedora");
+    assert_eq!(fedora_act.operation, UniversalPmOperation::Remove);
+
+    let arch_act = dispatcher.dispatch_command("arch search ripgrep").unwrap();
+    assert_eq!(arch_act.source_pm, "arch");
+    assert_eq!(arch_act.operation, UniversalPmOperation::Search);
+
+    let alpine_act = dispatcher.dispatch_command("alpine add musl-dev").unwrap();
+    assert_eq!(alpine_act.source_pm, "alpine");
+    assert_eq!(alpine_act.operation, UniversalPmOperation::Install);
+
+    let freebsd_act = dispatcher.dispatch_command("freebsd install postgresql15").unwrap();
+    assert_eq!(freebsd_act.source_pm, "freebsd");
+    assert_eq!(freebsd_act.operation, UniversalPmOperation::Install);
+
+    let void_act = dispatcher.dispatch_command("void install bash").unwrap();
+    assert_eq!(void_act.source_pm, "void");
+    assert_eq!(void_act.operation, UniversalPmOperation::Install);
+
+    let gentoo_act = dispatcher.dispatch_command("gentoo install portage").unwrap();
+    assert_eq!(gentoo_act.source_pm, "gentoo");
+    assert_eq!(gentoo_act.operation, UniversalPmOperation::Install);
+
+    let opensuse_act = dispatcher.dispatch_command("opensuse in gcc").unwrap();
+    assert_eq!(opensuse_act.source_pm, "opensuse");
+    assert_eq!(opensuse_act.operation, UniversalPmOperation::Install);
+
+    let nixos_act = dispatcher.dispatch_command("nixos install firefox").unwrap();
+    assert_eq!(nixos_act.source_pm, "nixos");
+    assert_eq!(nixos_act.operation, UniversalPmOperation::Install);
 }
 
 #[test]
@@ -114,17 +152,24 @@ fn test_universal_scriptlet_and_dependency_mapper() {
     assert_eq!(dep_mapper.to_canonical_name("libssl-dev"), "openssl");
     assert_eq!(dep_mapper.to_canonical_name("openssl-devel"), "openssl");
     assert_eq!(dep_mapper.to_canonical_name("libc6"), "libc");
+    assert_eq!(dep_mapper.to_canonical_name("musl-dev"), "libc");
+    assert_eq!(dep_mapper.to_canonical_name("python3-dev"), "python");
+    assert_eq!(dep_mapper.to_canonical_name("zlib1g-dev"), "zlib");
+    assert_eq!(dep_mapper.to_canonical_name("sys-apps/systemd"), "systemd");
+    assert_eq!(dep_mapper.to_canonical_name("sys-apps/openrc"), "openrc");
+    assert_eq!(dep_mapper.to_canonical_name("media-video/pipewire"), "pipewire");
+    assert_eq!(dep_mapper.to_canonical_name("dev-libs/wayland"), "wayland");
 
     let scriptlet_conv = UniversalScriptletConverter::new();
     let hook = scriptlet_conv
-        .convert_scriptlet(PackageFormat::Apt, "postinst", "echo post")
+        .convert_scriptlet(universal_engine::PackageFormat::Apt, "postinst", "echo post")
         .unwrap();
     assert_eq!(hook.hook_type, SigmaPkgHookType::PostInstall);
 
     let simulator = UniversalDryRunSimulator::new();
     let result = simulator
         .simulate_install(
-            PackageFormat::Apt,
+            universal_engine::PackageFormat::Apt,
             b"Package: curl\nVersion: 8.2.1\nDepends: libssl-dev, libc6\n",
         )
         .unwrap();
