@@ -53,3 +53,7 @@
 ## 2026-09-14 - Single-Pass Slice Joining vs Format Macro Allocations
 **Learning:** Formatting slice arguments via `format!("{}/{}", args, " ")` incurs dynamic formatting macro overhead and fails type trait bounds for slice types. Replacing manual format macros with `args.join(" ")` allocates a single heap buffer pre-sized to the combined length of all elements, eliminating intermediate string copies.
 **Action:** Always prefer `slice.join(" ")` over `format!` macros when concatenating collections of string slices.
+
+## 2026-09-18 - Eliminating Heap String Clones in Map Lookups during INI Parsing
+**Learning:** In configuration or text parsers (such as INI line parsers), using entry API pattern `map.entry(current_section.clone()).or_default()` inside line processing loops forces a heap `String` allocation for every key-value line even when the section entry already exists in the map. Ensuring initial section defaults and using borrow-based lookup `map.get_mut_str(&current_section)` eliminates $O(N)$ string heap clones across configuration parsing iterations.
+**Action:** In map lookup loops where keys are modified infrequently (e.g. section headers), perform borrow-based lookups (`get_mut_str` / `get_mut`) rather than `entry(key.clone())` on repeated loop cycles.

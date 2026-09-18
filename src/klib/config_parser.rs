@@ -22,6 +22,8 @@ impl ConfigStore {
     /// Parse INI-formatted text into the store
     pub fn parse(&mut self, input: &str) -> Result<(), &'static str> {
         let mut current_section = String::new();
+        // Bolt ⚡: Ensure initial default section ("") exists to enable zero-allocation lookups
+        self.sections.entry(current_section.clone()).or_default();
 
         for (_line_no, line) in input.lines().enumerate() {
             let trimmed = trim_line(line);
@@ -39,8 +41,13 @@ impl ConfigStore {
             if let Some(sep_pos) = find_key_value_sep(&trimmed) {
                 let key = trimmed[..sep_pos].trim().to_string();
                 let value = trimmed[sep_pos + 1..].trim().to_string();
-                let section = self.sections.entry(current_section.clone()).or_default();
-                section.insert(key, value);
+                // Bolt ⚡: Use zero-allocation `get_mut_str` borrow lookup instead of cloning `current_section` String on every key=value line
+                if let Some(section) = self.sections.get_mut_str(&current_section) {
+                    section.insert(key, value);
+                } else {
+                    let section = self.sections.entry(current_section.clone()).or_default();
+                    section.insert(key, value);
+                }
             } else {
                 return Err("Invalid config line");
             }
