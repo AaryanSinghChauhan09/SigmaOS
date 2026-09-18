@@ -113,9 +113,17 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Category:Security](Category:Security)**
   Security and hardening articles.
 
----
 
 ## Performance & Kernel
+
+- **[Demand Paging & Swap](Demand-Paging-and-Swap)**
+  Memory management with demand paging and swap support.
+
+- **[Kernel Syscall Enforcement](Kernel-Syscall-Enforcement)**
+  Kernel-space syscall restriction and security enforcement.
+
+- **[eBPF JIT Compilation](eBPF-JIT-Compilation)**
+  eBPF JIT compiler for high-performance packet filtering.
 
 - **[Performance & BORE Scheduler](Performance-Tuning-and-Kernel)**
   Performance tuning and BORE scheduler configuration.
@@ -133,7 +141,6 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
   Performance and kernel articles.
 
 ---
-
 ## Maintenance & Recovery
 
 - **[Rollback Engine & Snapshots](Maintenance-and-Rollback-Engine)**

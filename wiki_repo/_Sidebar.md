@@ -63,6 +63,9 @@
 - **[[Performance & BORE Scheduler|Performance-Tuning-and-Kernel]]**
 - **[[MGLRU & Memory Reclamation|Performance-Tuning-and-Kernel#mglru--memory-reclamation]]**
 - **[[eBPF / XDP Networking|Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking]]**
+n- **[[Demand Paging & Swap|Demand-Paging-and-Swap]]**
+- **[[Kernel Syscall Enforcement|Kernel-Syscall-Enforcement]]**
+- **[[eBPF JIT Compilation|eBPF-JIT-Compilation]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 

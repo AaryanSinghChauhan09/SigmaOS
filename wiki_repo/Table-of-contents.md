@@ -56,6 +56,9 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 
 ## Performance & Kernel
 
+- [Demand Paging & Swap](Demand-Paging-and-Swap) — Memory management with demand paging and swap support
+- [Kernel Syscall Enforcement](Kernel-Syscall-Enforcement) — Kernel-space syscall restriction and security enforcement
+- [eBPF JIT Compilation](eBPF-JIT-Compilation) — eBPF JIT compiler for high-performance packet filtering
 - [Performance & BORE Scheduler](Performance-Tuning-and-Kernel) — Performance tuning and BORE scheduler configuration
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support
