@@ -268,7 +268,6 @@ impl SovereignUniversalDistroBridge {
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::NetBsd => ServiceSupervisorType::OpenRC,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
             _ => ServiceSupervisorType::Systemd,
@@ -376,7 +375,6 @@ impl SovereignUniversalDistroBridge {
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
-            DistroSubsystemMode::NetBsd => supervisor == ServiceSupervisorType::OpenRC,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
             _ => supervisor == ServiceSupervisorType::Systemd,
