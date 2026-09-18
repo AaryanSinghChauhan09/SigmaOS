@@ -212,7 +212,7 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Comprehensive OS Analysis](SIGMAOS_COMPREHENSIVE_OS_ANALYSIS)**
   Consolidated analysis of SigmaOS architecture and comparisons.
 
-- **[Category:Development](Category-Development)**
+- **[Category:Development](Category:Development)**
   Development and technical articles.
 
 ---
