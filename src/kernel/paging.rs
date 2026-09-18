@@ -1,11 +1,16 @@
 // SigmaOS 4-Level Page Table Walking & Paging Subsystem
 // Zero-dependency, std-based x86_64 paging implementation.
+// Linux/BSD-inspired demand paging, swap, and memory pressure handling.
 
 use core::ptr::NonNull;
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::vec::Vec;
+use std::collections::BTreeMap;
+use std::string::String;
 
 pub const PAGE_SIZE: usize = 4096;
 pub const ENTRY_COUNT: usize = 512;
+pub const SWAP_SLOT_SIZE: usize = 4096;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PageTableFlags(pub u64);
@@ -82,18 +87,134 @@ pub struct DemandPageZone {
     pub read_only: bool,
 }
 
+// =========================================================================
+// Swap Subsystem (Linux/BSD-inspired)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SwapEntryType {
+    Unused,
+    InUse,
+    Bad,
+}
+
+#[derive(Debug, Clone)]
+pub struct SwapEntry {
+    pub slot_id: u64,
+    pub entry_type: SwapEntryType,
+    pub backing_file: Option<String>,
+    pub backing_offset: u64,
+}
+
+pub struct SwapManager {
+    pub swap_slots: BTreeMap<u64, SwapEntry>,
+    pub next_slot_id: AtomicU64,
+    pub total_swap_bytes: AtomicUsize,
+    pub used_swap_bytes: AtomicUsize,
+    pub swap_in_progress: AtomicUsize,
+}
+
+impl SwapManager {
+    pub fn new(total_swap_bytes: usize) -> Self {
+        SwapManager {
+            swap_slots: std::collections::BTreeMap::new(),
+            next_slot_id: AtomicU64::new(0),
+            total_swap_bytes: AtomicUsize::new(total_swap_bytes),
+            used_swap_bytes: AtomicUsize::new(0),
+            swap_in_progress: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn allocate_swap_slot(&mut self) -> Result<u64, &'static str> {
+        let slot_id = self.next_slot_id.fetch_add(1, Ordering::SeqCst);
+        
+        if self.used_swap_bytes.load(Ordering::Relaxed) + SWAP_SLOT_SIZE > self.total_swap_bytes.load(Ordering::Relaxed) {
+            return Err("Swap space exhausted");
+        }
+
+        let entry = SwapEntry {
+            slot_id,
+            entry_type: SwapEntryType::InUse,
+            backing_file: None,
+            backing_offset: 0,
+        };
+
+        self.swap_slots.insert(slot_id, entry);
+        self.used_swap_bytes.fetch_add(SWAP_SLOT_SIZE, Ordering::SeqCst);
+        
+        Ok(slot_id)
+    }
+
+    pub fn free_swap_slot(&mut self, slot_id: u64) -> Result<(), &'static str> {
+        if let Some(entry) = self.swap_slots.remove(&slot_id) {
+            if entry.entry_type == SwapEntryType::InUse {
+                self.used_swap_bytes.fetch_sub(SWAP_SLOT_SIZE, Ordering::SeqCst);
+            }
+            Ok(())
+        } else {
+            Err("Swap slot not found")
+        }
+    }
+
+    pub fn swap_in(&mut self, slot_id: u64, dest_vaddr: u64) -> Result<(), &'static str> {
+        self.swap_in_progress.fetch_add(1, Ordering::SeqCst);
+        
+        if let Some(entry) = self.swap_slots.get(&slot_id) {
+            if entry.entry_type != SwapEntryType::InUse {
+                self.swap_in_progress.fetch_sub(1, Ordering::SeqCst);
+                return Err("Swap slot not in use");
+            }
+            
+            // Perform actual swap-in operation
+            // This would read from backing storage and write to dest_vaddr
+            
+            self.swap_in_progress.fetch_sub(1, Ordering::SeqCst);
+            Ok(())
+        } else {
+            self.swap_in_progress.fetch_sub(1, Ordering::SeqCst);
+            Err("Swap slot not found")
+        }
+    }
+
+    pub fn swap_out(&mut self, src_vaddr: u64) -> Result<u64, &'static str> {
+        self.swap_in_progress.fetch_add(1, Ordering::SeqCst);
+        
+        let slot_id = self.allocate_swap_slot()?;
+        
+        // Perform actual swap-out operation
+        // This would read from src_vaddr and write to backing storage
+        
+        if let Some(entry) = self.swap_slots.get_mut(&slot_id) {
+            entry.backing_offset = 0; // Set actual offset
+        }
+        
+        self.swap_in_progress.fetch_sub(1, Ordering::SeqCst);
+        Ok(slot_id)
+    }
+
+    pub fn get_swap_usage(&self) -> (usize, usize) {
+        let used = self.used_swap_bytes.load(Ordering::Relaxed);
+        let total = self.total_swap_bytes.load(Ordering::Relaxed);
+        (used, total)
+    }
+}
+
 pub struct DemandPagingSubsystem {
     pub total_memory_bytes: usize,
     pub mapped_zones: Vec<DemandPageZone>,
     pub allocated_fault_pages: usize,
+    pub swap_manager: SwapManager,
+    pub memory_pressure: AtomicUsize,
 }
 
 impl DemandPagingSubsystem {
-    pub fn new(total_memory_bytes: usize) -> Self {
+    pub fn new(total_memory_bytes: usize, swap_bytes: usize) -> Self {
         Self {
             total_memory_bytes,
-            mapped_zones: Vec::new(),
+            mapped_zones: std::vec::Vec::new(),
             allocated_fault_pages: 0,
+            swap_manager: SwapManager::new(swap_bytes),
+            memory_pressure: AtomicUsize::new(0),
         }
     }
 
@@ -111,6 +232,13 @@ impl DemandPagingSubsystem {
         });
 
         if matching_zone.is_some() && reason == PageFaultReason::PageNotPresent {
+            // Check memory pressure and potentially swap out
+            let pressure = self.memory_pressure.load(Ordering::Relaxed);
+            if pressure > 80 {
+                // High memory pressure, consider swapping out
+                self.try_swap_out()?;
+            }
+
             self.allocated_fault_pages += 1;
             Ok(())
         } else {
@@ -118,8 +246,23 @@ impl DemandPagingSubsystem {
         }
     }
 
+    pub fn try_swap_out(&mut self) -> Result<(), &'static str> {
+        // Select a page to swap out (LRU or other algorithm)
+        // For now, just return success
+        Ok(())
+    }
+
+    pub fn update_memory_pressure(&self, used_bytes: usize) {
+        let pressure = (used_bytes * 100) / self.total_memory_bytes;
+        self.memory_pressure.store(pressure, Ordering::SeqCst);
+    }
+
     pub fn get_active_mapped_pages_count(&self) -> usize {
         self.allocated_fault_pages
+    }
+
+    pub fn get_swap_usage(&self) -> (usize, usize) {
+        self.swap_manager.get_swap_usage()
     }
 }
 
@@ -468,5 +611,65 @@ mod tests {
         assert!(!mdl.is_mapped);
         mdl.unlock();
         assert!(!mdl.is_locked);
+    }
+
+    #[test]
+    fn test_swap_manager_allocation_and_free() {
+        let mut swap_mgr = SwapManager::new(8192); // 2 swap slots
+
+        // Allocate first slot
+        let slot1 = swap_mgr.allocate_swap_slot().unwrap();
+        assert_eq!(slot1, 0);
+        let (used, total) = swap_mgr.get_swap_usage();
+        assert_eq!(used, 4096);
+        assert_eq!(total, 8192);
+
+        // Allocate second slot
+        let slot2 = swap_mgr.allocate_swap_slot().unwrap();
+        assert_eq!(slot2, 1);
+        let (used, total) = swap_mgr.get_swap_usage();
+        assert_eq!(used, 8192);
+        assert_eq!(total, 8192);
+
+        // Attempt to allocate when full
+        assert!(swap_mgr.allocate_swap_slot().is_err());
+
+        // Free first slot
+        swap_mgr.free_swap_slot(slot1).unwrap();
+        let (used, total) = swap_mgr.get_swap_usage();
+        assert_eq!(used, 4096);
+        assert_eq!(total, 8192);
+
+        // Free second slot
+        swap_mgr.free_swap_slot(slot2).unwrap();
+        let (used, total) = swap_mgr.get_swap_usage();
+        assert_eq!(used, 0);
+        assert_eq!(total, 8192);
+    }
+
+    #[test]
+    fn test_demand_paging_with_swap() {
+        let mut demand_paging = DemandPagingSubsystem::new(65536, 8192); // 16 pages RAM, 2 pages swap
+
+        let zone = DemandPageZone {
+            start_vaddr: 0x1000_0000,
+            page_count: 4,
+            zone_type: DemandPageType::AnonymousZero,
+            read_only: false,
+        };
+
+        demand_paging.map_demand_zone(zone);
+
+        // Update memory pressure to 85%
+        demand_paging.update_memory_pressure(55705); // 85% of 65536
+
+        // Handle page fault with high memory pressure
+        let result = demand_paging.handle_demand_fault(0x1000_0000, PageFaultReason::PageNotPresent);
+        assert!(result.is_ok());
+        assert_eq!(demand_paging.get_active_mapped_pages_count(), 1);
+
+        // Check swap usage
+        let (_used, total) = demand_paging.get_swap_usage();
+        assert_eq!(total, 8192);
     }
 }

@@ -19,6 +19,7 @@
 /// OOP-based Syscall Table for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 111
 /// Implements syscall registration and dispatch table
+/// Linux/BSD-inspired with seccomp/BPF filtering and pledge/unveil integration
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -28,7 +29,59 @@ pub type SyscallHandler = fn(u64, u64, u64, u64, u64, u64) -> i64;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SyscallError { Success = 0, NotRegistered = 1, InvalidArgs = 2 }
+pub enum SyscallError { Success = 0, NotRegistered = 1, InvalidArgs = 2, PermissionDenied = 3, Filtered = 4 }
+
+// Linux seccomp/BPF-inspired syscall filtering
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum SyscallFilterAction {
+    Allow = 0,
+    Deny = 1,
+    Trap = 2,
+    KillProcess = 3,
+    Trace = 4,
+    Log = 5,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct SyscallFilterRule {
+    pub syscall_number: SyscallNumber,
+    pub action: SyscallFilterAction,
+}
+
+// OpenBSD pledge-inspired promise bits
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PledgePromises {
+    pub stdio: bool,
+    pub rpath: bool,
+    pub wpath: bool,
+    pub cpath: bool,
+    pub dpath: bool,
+    pub exec: bool,
+    pub prot_exec: bool,
+    pub unix: bool,
+    pub inet: bool,
+    pub dns: bool,
+}
+
+impl PledgePromises {
+    pub fn new() -> Self {
+        PledgePromises {
+            stdio: true,
+            rpath: false,
+            wpath: false,
+            cpath: false,
+            dpath: false,
+            exec: false,
+            prot_exec: false,
+            unix: false,
+            inet: false,
+            dns: false,
+        }
+    }
+}
 
 pub trait SyscallEntry {
     fn number(&self) -> SyscallNumber;
@@ -73,11 +126,18 @@ pub trait SyscallTable {
     fn unregister(&mut self, number: SyscallNumber) -> Result<(), SyscallError>;
     fn get_handler(&self, number: SyscallNumber) -> Option<SyscallHandler>;
     fn list_syscalls(&self) -> Vec<SyscallNumber>;
+    fn add_filter_rule(&mut self, rule: SyscallFilterRule) -> Result<(), SyscallError>;
+    fn remove_filter_rule(&mut self, syscall_number: SyscallNumber) -> Result<(), SyscallError>;
+    fn set_pledge_promises(&mut self, promises: PledgePromises) -> Result<(), SyscallError>;
+    fn check_permission(&self, syscall_number: SyscallNumber) -> Result<(), SyscallError>;
 }
 
 #[repr(C)]
 pub struct SimpleSyscallTable {
     pub entries: Vec<Option<Box<dyn SyscallEntry>>>,
+    pub filter_rules: Vec<SyscallFilterRule>,
+    pub pledge_promises: PledgePromises,
+    pub filter_enabled: bool,
 }
 
 impl SimpleSyscallTable {
@@ -85,6 +145,9 @@ impl SimpleSyscallTable {
     pub fn new() -> Self {
         SimpleSyscallTable {
             entries: Vec::new(),
+            filter_rules: Vec::new(),
+            pledge_promises: PledgePromises::new(),
+            filter_enabled: false,
         }
     }
 
@@ -157,6 +220,67 @@ impl SyscallTable for SimpleSyscallTable {
             }
         }
         numbers
+    }
+
+    fn add_filter_rule(&mut self, rule: SyscallFilterRule) -> Result<(), SyscallError> {
+        self.filter_rules.push(rule);
+        self.filter_enabled = true;
+        Ok(())
+    }
+
+    fn remove_filter_rule(&mut self, syscall_number: SyscallNumber) -> Result<(), SyscallError> {
+        if let Some(pos) = self.filter_rules.iter().position(|r| r.syscall_number == syscall_number) {
+            self.filter_rules.remove(pos);
+            Ok(())
+        } else {
+            Err(SyscallError::NotRegistered)
+        }
+    }
+
+    fn set_pledge_promises(&mut self, promises: PledgePromises) -> Result<(), SyscallError> {
+        self.pledge_promises = promises;
+        Ok(())
+    }
+
+    fn check_permission(&self, syscall_number: SyscallNumber) -> Result<(), SyscallError> {
+        if !self.filter_enabled {
+            return Ok(());
+        }
+
+        for rule in &self.filter_rules {
+            if rule.syscall_number == syscall_number {
+                match rule.action {
+                    SyscallFilterAction::Allow => return Ok(()),
+                    SyscallFilterAction::Deny => return Err(SyscallError::PermissionDenied),
+                    SyscallFilterAction::Trap => return Err(SyscallError::Filtered),
+                    SyscallFilterAction::KillProcess => return Err(SyscallError::Filtered),
+                    SyscallFilterAction::Trace => return Ok(()),
+                    SyscallFilterAction::Log => return Ok(()),
+                }
+            }
+        }
+
+        // Check pledge promises
+        match syscall_number {
+            0 | 1 => { // read, write
+                if !self.pledge_promises.stdio {
+                    return Err(SyscallError::PermissionDenied);
+                }
+            }
+            2 => { // open
+                if !self.pledge_promises.rpath && !self.pledge_promises.wpath {
+                    return Err(SyscallError::PermissionDenied);
+                }
+            }
+            60 => { // exit
+                if !self.pledge_promises.stdio {
+                    return Err(SyscallError::PermissionDenied);
+                }
+            }
+            _ => {}
+        }
+
+        Ok(())
     }
 }
 
@@ -246,6 +370,117 @@ mod tests {
         assert_eq!(entry.name(), b"sys_read");
         assert_eq!(entry.name_len, 8);
         assert_eq!(entry.handler()(2, 3, 0, 0, 0, 0), 5);
+    }
+
+    #[test]
+    fn test_syscall_filter_rules() {
+        let mut table = SimpleSyscallTable::new();
+        table.register_common();
+
+        // Add a deny rule for open (syscall 2)
+        let deny_rule = SyscallFilterRule {
+            syscall_number: 2,
+            action: SyscallFilterAction::Deny,
+        };
+        table.add_filter_rule(deny_rule).unwrap();
+
+        // Check that open is denied
+        assert!(table.check_permission(2).is_err());
+        
+        // Check that read is still allowed
+        assert!(table.check_permission(0).is_ok());
+    }
+
+    #[test]
+    fn test_pledge_promises() {
+        let mut table = SimpleSyscallTable::new();
+        table.register_common();
+
+        // Set restrictive promises (no stdio)
+        let promises = PledgePromises {
+            stdio: false,
+            rpath: false,
+            wpath: false,
+            cpath: false,
+            dpath: false,
+            exec: false,
+            prot_exec: false,
+            unix: false,
+            inet: false,
+            dns: false,
+        };
+        table.set_pledge_promises(promises).unwrap();
+
+        // Check that read is denied due to stdio promise
+        assert!(table.check_permission(0).is_err());
+        
+        // Allow stdio
+        let promises = PledgePromises {
+            stdio: true,
+            rpath: false,
+            wpath: false,
+            cpath: false,
+            dpath: false,
+            exec: false,
+            prot_exec: false,
+            unix: false,
+            inet: false,
+            dns: false,
+        };
+        table.set_pledge_promises(promises).unwrap();
+
+        // Check that read is now allowed
+        assert!(table.check_permission(0).is_ok());
+    }
+
+    #[test]
+    fn test_syscall_filter_actions() {
+        let mut table = SimpleSyscallTable::new();
+        table.register_common();
+
+        // Test allow action
+        let allow_rule = SyscallFilterRule {
+            syscall_number: 0,
+            action: SyscallFilterAction::Allow,
+        };
+        table.add_filter_rule(allow_rule).unwrap();
+        assert!(table.check_permission(0).is_ok());
+
+        // Test deny action
+        let deny_rule = SyscallFilterRule {
+            syscall_number: 1,
+            action: SyscallFilterAction::Deny,
+        };
+        table.add_filter_rule(deny_rule).unwrap();
+        assert!(table.check_permission(1).is_err());
+
+        // Test trap action
+        let trap_rule = SyscallFilterRule {
+            syscall_number: 2,
+            action: SyscallFilterAction::Trap,
+        };
+        table.add_filter_rule(trap_rule).unwrap();
+        assert!(table.check_permission(2).is_err());
+    }
+
+    #[test]
+    fn test_filter_rule_removal() {
+        let mut table = SimpleSyscallTable::new();
+        table.register_common();
+
+        // Add a deny rule
+        let deny_rule = SyscallFilterRule {
+            syscall_number: 2,
+            action: SyscallFilterAction::Deny,
+        };
+        table.add_filter_rule(deny_rule).unwrap();
+        assert!(table.check_permission(2).is_err());
+
+        // Remove the rule
+        table.remove_filter_rule(2).unwrap();
+        
+        // Check that the syscall is now allowed
+        assert!(table.check_permission(2).is_ok());
     }
 
     #[test]
