@@ -127,7 +127,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@v4 # v4.3.6
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3 # v4.3.6
         with:
           name: build-${{ matrix.distro }}-${{ matrix.version }}
           path: target/release/
