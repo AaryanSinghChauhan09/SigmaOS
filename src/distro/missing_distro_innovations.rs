@@ -922,6 +922,26 @@ impl MissingDistroComponentsEngine {
             "DragonFly BSD",
             ComponentParityStatus::Implemented,
         );
+        engine.register_component(
+            "Nobara Gaming Proton Sync",
+            "Nobara Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Asahi Apple Silicon HAL",
+            "Asahi Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Oracle UEK KSplice Livepatch",
+            "Oracle Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "pmbootstrap Mobile Device Tree",
+            "PostmarketOS",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
     }
@@ -2312,9 +2332,9 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 14);
-        assert_eq!(engine.total_components_count(), 14);
-        assert_eq!(engine.implemented_components_count(), 14);
+        assert_eq!(engine.records.len(), 18);
+        assert_eq!(engine.total_components_count(), 18);
+        assert_eq!(engine.implemented_components_count(), 18);
         assert!(engine.is_all_components_implemented());
     }
 
