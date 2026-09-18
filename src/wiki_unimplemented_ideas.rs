@@ -2,6 +2,8 @@
 // SigmaOS GitHub Wiki Unimplemented Ideas Parity Subsystem
 // Zero-dependency, zero-allocation-ready, safe Rust implementations of Phase 2-8 Wiki Roadmap Tasks
 
+#![allow(dead_code)]
+
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;

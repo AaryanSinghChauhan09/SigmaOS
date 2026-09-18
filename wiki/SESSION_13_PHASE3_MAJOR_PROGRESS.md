@@ -256,10 +256,10 @@
 
 ## 🎯 Phase 3 Remaining Components
 
-### 4. Notification System (Rust) - ⏳ TODO
+### 4. Notification System (Rust) - ✅ IMPLEMENTED (`src/desktop/notifications.rs`)
 **Priority-based notification management**
 
-Planned Features:
+Features:
 - Priority queuing (Critical, High, Normal, Low)
 - Do Not Disturb mode
 - Action buttons (Quick reply, Dismiss, Snooze)
@@ -268,10 +268,10 @@ Planned Features:
 - Sound/vibration support
 - Grouped notifications
 
-### 5. System Monitor (Zig) - ⏳ TODO
+### 5. System Monitor - ✅ IMPLEMENTED (`src/dashboard/monitor.rs` & `src/compositor/vulkan_renderer.zig`)
 **Real-time system monitoring**
 
-Planned Features:
+Features:
 - Real-time CPU/RAM/GPU graphs
 - Process management (list, kill, priority)
 - Resource alerts (thresholds)
