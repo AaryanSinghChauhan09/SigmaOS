@@ -57,6 +57,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 ## Package Management
 
+- **[SigmaPkg - Universal Package Manager](SigmaPkg)**
+  Universal package management system with multi-format support.
+
 - **[Universal Package Engine (sigpkg)](Package-Management-and-Sigpkg)**
   Overview of the SigmaPkg package management system.
 
@@ -91,6 +94,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 ---
 
 ## Security & Hardening
+
+- **[Security Sandbox & Isolation](Security-Sandbox-Isolation)**
+  Comprehensive security sandboxing with Landlock, Capsicum, and pledge/unveil.
 
 - **[Security & Sandboxing](Security-Sandboxing-and-Hardening)**
   Comprehensive security model and sandboxing capabilities.

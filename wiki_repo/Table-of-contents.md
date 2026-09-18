@@ -27,6 +27,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 
 ## Package Management
 
+- [SigmaPkg - Universal Package Manager](SigmaPkg) — Universal package management system with multi-format support
 - [Universal Package Engine (sigpkg)](Package-Management-and-Sigpkg) — Overview of the SigmaPkg package management system
 - [Arch PKGBUILD & AUR Helper](ARCH_LINUX_PARITY_FEATURES) — Integration with Arch Linux package formats and AUR
 - [Multi-Distro Adapters](UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN) — Support for multiple Linux and BSD package formats
@@ -45,6 +46,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 
 ## Security & Hardening
 
+- [Security Sandbox & Isolation](Security-Sandbox-Isolation) — Comprehensive security sandboxing with Landlock, Capsicum, and pledge/unveil
 - [Security & Sandboxing](Security-Sandboxing-and-Hardening) — Comprehensive security model and sandboxing capabilities
 - [Zorin Exec Guard](Security-Sandboxing-and-Hardening#zorin-exec-guard) — Default-deny capability permission model
 - [Hardware Enclaves & PQC](Security-Sandboxing-and-Hardening#hardware-enclaves--post-quantum-cryptography) — Hardware enclaves and post-quantum cryptography support

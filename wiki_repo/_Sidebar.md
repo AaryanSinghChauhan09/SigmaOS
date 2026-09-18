@@ -32,6 +32,7 @@
 ---
 
 #### 📦 Package Management
+- **[[SigmaPkg - Universal Package Manager|SigmaPkg]]**
 - **[[Universal Package Engine (sigpkg)|Package-Management-and-Sigpkg]]**
 - **[[Arch PKGBUILD & AUR Helper|ARCH_LINUX_PARITY_FEATURES]]**
 - **[[Multi-Distro Adapters|UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN]]**
@@ -49,6 +50,7 @@
 ---
 
 #### 🛡️ Security & Hardening
+- **[[Security Sandbox & Isolation|Security-Sandbox-Isolation]]**
 - **[[Security & Sandboxing|Security-Sandboxing-and-Hardening]]**
 - **[[Zorin Exec Guard|Security-Sandboxing-and-Hardening#zorin-exec-guard]]**
 - **[[Hardware Enclaves & PQC|Security-Sandboxing-and-Hardening#hardware-enclaves--post-quantum-cryptography]]**
