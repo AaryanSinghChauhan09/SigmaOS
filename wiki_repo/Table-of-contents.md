@@ -36,7 +36,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## System Administration
-
+- [System Monitoring & Observability](System-Monitoring-and-Observability) — Real-time metrics, distributed tracing, log aggregation, and alerting
 - [Services & Supervision](System-Administration-and-Services) — Service management and supervision system
 - [Privilege Delegation (doas)](SECURITY) — Secure privilege escalation and delegation
 - [Networking & WireGuard](networking) — Network configuration and WireGuard VPN integration
@@ -82,6 +82,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Maintenance & Recovery
+- [Container Orchestration](Container-Orchestration) — Kubernetes-compatible APIs, pod scheduling, service discovery, and autoscaling
 
 - [Rollback Engine & Snapshots](Maintenance-and-Rollback-Engine) — Atomic rollback engine and system snapshots
 - [Declarative Generations](Maintenance-and-Rollback-Engine#declarative-system-generations) — Declarative system state and generation management

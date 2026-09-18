@@ -144,6 +144,16 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
 
+- **[Container Orchestration](Container-Orchestration)**
+  Kubernetes-compatible APIs, pod scheduling, service discovery, and autoscaling.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
+- **[System Monitoring & Observability](System-Monitoring-and-Observability)**
+  Real-time metrics, distributed tracing, log aggregation, and alerting.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
 - **[Advanced NVIDIA GPU Support](Advanced-NVIDIA-GPU-Support)**
   NVIDIA GPU support with CUDA acceleration.
 
