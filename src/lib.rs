@@ -53,6 +53,9 @@ pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
     CachyosGamescopeHandheldOverlay, ItsFossQuickShareAndBackupHud, PhoronixPerformanceBenchmarkWidget,
     PopOsKdeTilingWorkspaceGridEngine, SovereignUxMasterEngine, WindowsCopilotAiAssistantSidebar,
+    CosmicHyprlandFormatAdapter, DesktopFormat, GnomeShellFormatAdapter, KdePlasmaFormatAdapter,
+    SovereignUniversalDesktopSuite, UniversalDesktopSessionRuntime, XdgSessionDesktopFile,
+    XdgSessionDesktopFileParser, XfceFormatAdapter,
 };
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
