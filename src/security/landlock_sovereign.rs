@@ -217,13 +217,22 @@ impl SovereignLandlockV5Guard {
         allowed
     }
 
-    /// Check unveil permissions
+    /// Check unveil permissions with path boundary verification to prevent prefix confusion
     pub fn check_unveil(&self, path: &str, perm: &UnveilPermission) -> bool {
         if self.state == SandboxState::Building { return true; }
 
         for entry in &self.unveil_entries {
             if path.starts_with(&entry.path) {
-                return entry.has(perm);
+                let e_len = entry.path.len();
+                let is_boundary = path.len() == e_len
+                    || path.as_bytes().get(e_len).copied() == Some(b'/')
+                    || path.as_bytes().get(e_len).copied() == Some(b'\\')
+                    || entry.path.ends_with('/')
+                    || entry.path.ends_with('\\');
+
+                if is_boundary {
+                    return entry.has(perm);
+                }
             }
         }
         false // Default-deny
@@ -366,6 +375,21 @@ mod tests {
         assert!(guard.check_unveil("/home/user/file", &UnveilPermission::Write));
         assert!(!guard.check_unveil("/home/user/file", &UnveilPermission::Execute));
         assert!(!guard.check_unveil("/etc/passwd", &UnveilPermission::Read));
+    }
+
+    #[test]
+    fn test_unveil_path_prefix_boundary_isolation() {
+        let mut guard = SovereignLandlockV5Guard::new(5);
+        guard.unveil("/home/user", "rw");
+        guard.enforce(true);
+
+        // Exact path and child path should be allowed
+        assert!(guard.check_unveil("/home/user", &UnveilPermission::Read));
+        assert!(guard.check_unveil("/home/user/document.txt", &UnveilPermission::Read));
+
+        // Prefix confusion sibling path (e.g., /home/user-secret) MUST be rejected
+        assert!(!guard.check_unveil("/home/user-secret", &UnveilPermission::Read));
+        assert!(!guard.check_unveil("/home/user_backup/passwords.txt", &UnveilPermission::Read));
     }
 
     #[test]
