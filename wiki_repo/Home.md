@@ -144,6 +144,11 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
 
+- **[Security Hardening Guide](Security-Hardening-Guide)**
+  Kernel hardening, application sandboxing, secure coding practices.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
 - **[Filesystem Support Matrix](Filesystem-Support-Matrix)**
   ext4, XFS, Btrfs, ZFS, UFS, Hammer2, NFS, SMB, SSHFS, encryption.
 

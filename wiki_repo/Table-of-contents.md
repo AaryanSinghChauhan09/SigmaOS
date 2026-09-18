@@ -45,6 +45,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Security & Hardening
+- [Security Hardening Guide](Security-Hardening-Guide) — Kernel hardening, application sandboxing, secure coding practices
 
 - [Security Sandbox & Isolation](Security-Sandbox-Isolation) — Comprehensive security sandboxing with Landlock, Capsicum, and pledge/unveil
 - [Security & Sandboxing](Security-Sandboxing-and-Hardening) — Comprehensive security model and sandboxing capabilities
