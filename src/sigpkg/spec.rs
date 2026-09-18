@@ -593,11 +593,11 @@ impl UniversalPackageType {
             || normalized.contains("pacman")
         {
             Some(UniversalPackageType::Pacman)
-        } else if normalized.ends_with(".snap") {
+        } else if normalized.ends_with(".snap") || normalized == "snap" {
             Some(UniversalPackageType::Snap)
-        } else if normalized.ends_with(".flatpak") {
+        } else if normalized.ends_with(".flatpak") || normalized == "flatpak" {
             Some(UniversalPackageType::Flatpak)
-        } else if normalized.ends_with(".appimage") {
+        } else if normalized.ends_with(".appimage") || normalized == "appimage" {
             Some(UniversalPackageType::AppImage)
         } else if normalized.ends_with(".air") {
             Some(UniversalPackageType::Air)
@@ -640,9 +640,9 @@ impl UniversalPackageType {
             Some(UniversalPackageType::Pisi)
         } else if normalized.ends_with(".lzm") {
             Some(UniversalPackageType::Lzm)
-        } else if normalized.ends_with(".pup") {
+        } else if normalized.ends_with(".pup") || normalized == "pup" {
             Some(UniversalPackageType::Pup)
-        } else if normalized.ends_with(".pet") {
+        } else if normalized.ends_with(".pet") || normalized == "pet" {
             Some(UniversalPackageType::Pet)
         } else if normalized.ends_with(".sigpkg") || normalized.ends_with(".sigma") {
             Some(UniversalPackageType::Sigma)
