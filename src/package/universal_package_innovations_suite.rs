@@ -32,8 +32,19 @@ pub struct OrchestratedPackageResult {
 /// Sovereign Universal Package Orchestrator Engine synthesizing multi-format auto-detection,
 /// PQC/GPG signature verification, canonical dependency resolution, sandboxing translation,
 /// and atomic rollback snapshots across Linux and BSD ecosystems.
+#[cfg(not(feature = "standalone_test"))]
+use crate::package::linux_bsd_package_advancements::SovereignLinuxBsdPackageAdvancementsSuite;
+
+#[cfg(feature = "standalone_test")]
+#[path = "linux_bsd_package_advancements.rs"]
+pub mod linux_bsd_package_advancements;
+
+#[cfg(feature = "standalone_test")]
+pub use linux_bsd_package_advancements::SovereignLinuxBsdPackageAdvancementsSuite;
+
 pub struct SovereignUniversalPackageOrchestratorEngine {
     pub rollback_engine: SovereignPackageRollbackEngine,
+    pub advancements_suite: SovereignLinuxBsdPackageAdvancementsSuite,
     pub installed_packages: Vec<UnifiedPackage>,
 }
 
@@ -41,6 +52,7 @@ impl SovereignUniversalPackageOrchestratorEngine {
     pub fn new() -> Self {
         Self {
             rollback_engine: SovereignPackageRollbackEngine::new(),
+            advancements_suite: SovereignLinuxBsdPackageAdvancementsSuite::new(),
             installed_packages: Vec::new(),
         }
     }
@@ -110,6 +122,8 @@ impl SovereignUniversalPackageOrchestratorEngine {
         for dep in &canonical_deps {
             pkg = pkg.with_dependency(dep.clone());
         }
+
+        self.advancements_suite.audit_and_enrich_package(&mut pkg)?;
 
         self.installed_packages.push(pkg);
 
