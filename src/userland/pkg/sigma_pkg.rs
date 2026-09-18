@@ -34,7 +34,7 @@ pub type PackageID = usize;
 pub enum PackageError { Success = 0, PackageNotFound = 1, InstallFailed = 2, RemoveFailed = 3, InvalidSignature = 4 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageState { NotInstalled = 0, Installed = 1, Broken = 2 }
 
 pub trait Package {
@@ -88,7 +88,13 @@ impl Package for SimplePackage {
         // Bolt ⚡ performance optimization: O(1) direct slice indexing using cached version_len instead of O(N) zero-byte linear scan
         &self.version[..self.version_len as usize]
     }
-    fn state(&self) -> PackageState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> PackageState {
+        match self.state.load(Ordering::SeqCst) {
+            1 => PackageState::Installed,
+            2 => PackageState::Broken,
+            _ => PackageState::NotInstalled,
+        }
+    }
     fn dependencies(&self) -> Vec<PackageID> { self.deps.clone() }
 }
 
@@ -121,8 +127,6 @@ impl SigmaPackageManager {
 impl PackageManager for SigmaPackageManager {
     fn install(&mut self, pkg: Box<dyn Package>) -> Result<PackageID, PackageError> {
         let id = pkg.id();
-        let mut pkg = pkg;
-        pkg.state.store(PackageState::Installed as usize, Ordering::SeqCst);
         self.packages.push(Some(pkg));
         self.installed_count.fetch_add(1, Ordering::SeqCst);
         Ok(id)
@@ -132,7 +136,6 @@ impl PackageManager for SigmaPackageManager {
         for pkg_option in &mut self.packages {
             if let Some(ref mut pkg) = *pkg_option {
                 if pkg.id() == id {
-                    pkg.state.store(PackageState::NotInstalled as usize, Ordering::SeqCst);
                     self.installed_count.fetch_sub(1, Ordering::SeqCst);
                     return Ok(());
                 }
@@ -261,7 +264,7 @@ impl LocalPackageRegistry {
     }
     
     pub fn seed_with_defaults(&mut self) {
-        let default_packages = [
+        let default_packages: [(&[u8], &[u8]); 6] = [
             (b"sigma-sh", b"1.0"),
             (b"sigma-vim", b"8.2"),
             (b"sigma-curl", b"7.88"),
@@ -272,7 +275,7 @@ impl LocalPackageRegistry {
         
         for (name, version) in &default_packages {
             let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-            let pkg = SimplePackage::new(id, name, version);
+            let pkg = SimplePackage::new(id, *name, *version);
             self.packages.push(Some(Box::new(pkg)));
         }
     }
@@ -355,85 +358,5 @@ impl ReproducibleBuild for ReproducibleBuildSystem {
             }
         }
         true
-    }
-}
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn clone(&self) -> Vec<T> {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                let item = core::ptr::read(self.data.add(i));
-                new_vec.push(item);
-            }
-        }
-        new_vec
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
     }
 }

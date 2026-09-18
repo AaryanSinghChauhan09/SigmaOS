@@ -30,6 +30,8 @@ pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
+pub mod power;
+pub use power::*;
 pub mod process;
 pub mod productivity;
 pub use productivity::*;
