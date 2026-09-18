@@ -69,6 +69,8 @@ x11 = []
 unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(custom_alloc_error_handler)',
     'cfg(standalone_test)',
+    'cfg(std)',
+    'cfg(sigmaos_lib)',
     'cfg(feature, values("cache-lru", "cache-lfu", "cache-arc", "jemalloc", "mimalloc", "scheduler-eevdf", "scheduler-bore", "lock-free", "mutex", "rwlock", "io-sequential", "io-random", "io-mmap"))'
 ] }
 
