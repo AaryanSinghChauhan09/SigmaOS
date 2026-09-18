@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
+        uses: actions/checkout@v4 # v4.2.2
 
       - name: Setup Rust Stable
         uses: dtolnay/rust-toolchain@stable # stable
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
+        uses: actions/checkout@v4 # v4.2.2
 
       - name: Setup Rust Stable
         uses: dtolnay/rust-toolchain@stable # stable
@@ -85,7 +85,7 @@ jobs:
           cosign sign-blob --yes target/release/libsigmaos.rlib --output-signature target/release/libsigmaos.rlib.sig
 
       - name: Upload SBOM & Signature Artifacts
-        uses: actions/upload-artifact@604373da6381f2420692400f9164853be0e697b5 # v4.3.6
+        uses: actions/upload-artifact@v4 # v4.3.6
         with:
           name: sigmaos-sbom-signatures
           path: |
