@@ -429,6 +429,7 @@ impl Iterator for ArgsIterator {
 }
 
 // Inline syscall function (platform-specific)
+#[cfg(target_arch = "x86_64")]
 #[inline(always)]
 unsafe fn syscall(num: usize, arg1: *const u8, arg2: *const u8) -> isize {
     let mut ret: isize;
@@ -446,7 +447,8 @@ unsafe fn syscall(num: usize, arg1: *const u8, arg2: *const u8) -> isize {
 
 #[cfg(not(target_arch = "x86_64"))]
 #[inline(always)]
-unsafe fn syscall(_num: usize, _arg1: *const u8, _arg2: *const u8) -> isize {
+unsafe fn syscall(num: usize, arg1: *const u8, arg2: *const u8) -> isize {
+    let _ = (num, arg1, arg2);
     0
 }
 

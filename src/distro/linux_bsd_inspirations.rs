@@ -4143,10 +4143,10 @@ pub struct SovereignRingBuffer<T, const N: usize> {
     pub read_idx: usize,
 }
 
-impl<T, const N: usize> SovereignRingBuffer<T, N> {
+impl<T: Copy, const N: usize> SovereignRingBuffer<T, N> {
     pub const fn new() -> Self {
         Self {
-            buffer: [const { None }; N],
+            buffer: [None; N],
             write_idx: 0,
             read_idx: 0,
         }

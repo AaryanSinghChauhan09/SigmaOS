@@ -47,11 +47,15 @@ pub use tmux::{
 pub use mind_map::{IndentedTextMindMapParserEngine, MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection};
 
 pub use sigma_office::{
-    CellValue, DocumentNode, DocumentType, EnterpriseDeal, EnterpriseInvoice,
-    InlineDocComment, LiveCoAuthoringManager, LookerChartWidget, LookerMetricCard,
-    MacroExecutor, OdfDocumentKind, ParagraphStyle, PresentationProcessor,
-    SigmaFormulaParserEngine, SigmaOdfPackageEngine, SigmaOffice, SigmaSlideDetails,
-    SigmaSpellCheckerEngine, SigmaStyleThemeEngine, SigmaTrackChangesEngine,
-    SovereignCrmPipeline, SpreadsheetProcessor, SuggestionEdit,
-    TextProcessor, TypographyRenderer, VersionHistoryManager,
+    AggregationFunction, CellValue, CitationManager, CitationSource, CitationStyle,
+    ConditionOperator, ConditionalFormatRule, CrmWorkflowRule, CrmWorkflowRuleEngine,
+    DataValidationRule, DocumentMetrics, DocumentNode, DocumentType, EnterpriseDeal,
+    EnterpriseErpLedger, EnterpriseInvoice, InlineDocComment, LedgerJournalEntry,
+    LiveCoAuthoringManager, LookerChartWidget, LookerMetricCard, MacroExecutor,
+    MasterSlideLayout, OdfDocumentKind, ParagraphStyle, PivotTableField, PresentationProcessor,
+    SigmaFormulaParserEngine, SigmaOdfPackageEngine, SigmaOffice, SigmaPivotTableEngine,
+    SigmaSlideDetails, SigmaSpellCheckerEngine, SigmaStyleThemeEngine, SigmaTrackChangesEngine,
+    SovereignCrmPipeline, SpreadsheetProcessor, SuggestionEdit, TableOfContentsEntry,
+    TableOfContentsGenerator, TextProcessor, TypographyRenderer, ValidationRuleType,
+    VersionHistoryManager,
 };

@@ -63,7 +63,7 @@ impl SigmaOfficeSuiteEngine {
     }
 
     pub fn export_to_pdf_stream(&self) -> Vec<u8> {
-        let mut pdf = Vec::from(b"%PDF-1.7\n%SigmaOffice Export\n");
+        let mut pdf = b"%PDF-1.7\n%SigmaOffice Export\n".to_vec();
         pdf.extend_from_slice(self.word_document_content.as_bytes());
         pdf
     }
@@ -375,7 +375,7 @@ impl ScreenRecorderScreenshotToolEngine {
     }
 
     pub fn capture_screenshot_to_clipboard(&self) -> Vec<u8> {
-        let mut raw_png = Vec::from(b"\x89PNG\r\n\x1a\n");
+        let mut raw_png = b"\x89PNG\r\n\x1a\n".to_vec();
         raw_png.extend_from_slice(b"SCREENSHOT_FRAME_DATA");
         raw_png
     }
@@ -416,7 +416,7 @@ impl AudioEditorEngine {
         }
     }
 
-    pub fn apply_equalizer(&mut self, low_db: f32, _mid_db: f32, high_db: f32) -> bool {
+    pub fn apply_equalizer(&mut self, low_db: f32, mid_db: f32, high_db: f32) -> bool {
         low_db >= -24.0 && high_db <= 24.0
     }
 
@@ -559,7 +559,7 @@ impl HardwareBackedPasswordManager {
     }
 
     pub fn add_password_entry(&mut self, domain: &str, user: &str, password: &str) {
-        let mut encrypted = Vec::from(b"TPM2_SEALED:");
+        let mut encrypted = b"TPM2_SEALED:".to_vec();
         encrypted.extend_from_slice(password.as_bytes());
         self.entries.push(PasswordEntry {
             domain: String::from(domain),
@@ -815,8 +815,8 @@ mod tests {
     #[test]
     fn test_email_client_engine() {
         let mut email = EmailClientEngine::new("jules@sigma.os");
-        let _msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
-        let _msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
+        let msg1 = email.receive_email("spammer@bot.com", "You WON!", "WINNER_LOTTERY click here", false);
+        let msg2 = email.receive_email("alice@sigma.os", "Release", "Build is ready", true);
 
         assert_eq!(email.messages[0].folder, "Spam");
         assert_eq!(email.messages[1].folder, "INBOX");
@@ -830,7 +830,7 @@ mod tests {
         assert!(video.insert_clip(t_idx, "intro.mp4", 0, 5000));
         assert_eq!(video.render_preview_gpu_frame(), (1920, 1080));
 
-        let screen = ScreenRecorderScreenshotToolEngine::new();
+        let mut screen = ScreenRecorderScreenshotToolEngine::new();
         let png = screen.capture_screenshot_to_clipboard();
         assert!(png.starts_with(b"\x89PNG"));
 

@@ -58,41 +58,23 @@ pub fn is_valid_utf8(data: &[u8]) -> bool {
 }
 
 /// Trim ASCII whitespace (space, tab, newline, carriage return) from both ends
+/// Single-pass O(N) boundary location with fast early-exit when input is all whitespace.
 pub fn trim_ascii_whitespace(data: &[u8]) -> &[u8] {
-    let start = data.iter().take_while(|b| is_ascii_whitespace(**b)).count();
-    let end = data
-        .iter()
-        .rev()
-        .take_while(|b| is_ascii_whitespace(**b))
-        .count();
-    if start + end >= data.len() {
-        &[]
-    } else {
-        &data[start..data.len() - end]
-    }
+    let start = match data.iter().position(|b| !is_ascii_whitespace(*b)) {
+        Some(pos) => pos,
+        None => return &[],
+    };
+    let end = data.iter().rposition(|b| !is_ascii_whitespace(*b)).map(|i| i + 1).unwrap_or(start);
+    &data[start..end]
 }
 
 /// Tokenize a byte slice on ASCII whitespace, returning owned String tokens
+/// Delegates directly to zero-allocation `tokenize_whitespace_ref` to avoid intermediate byte vector allocations.
 pub fn tokenize_whitespace(data: &[u8]) -> Vec<String> {
-    let mut tokens = Vec::new();
-    let mut current = Vec::new();
-
-    for &byte in data {
-        if is_ascii_whitespace(byte) {
-            if !current.is_empty() {
-                tokens.push(String::from_utf8_lossy(&current).into_owned());
-                current.clear();
-            }
-        } else {
-            current.push(byte);
-        }
-    }
-
-    if !current.is_empty() {
-        tokens.push(String::from_utf8_lossy(&current).into_owned());
-    }
-
-    tokens
+    tokenize_whitespace_ref(data)
+        .into_iter()
+        .map(|slice| String::from_utf8_lossy(slice).into_owned())
+        .collect()
 }
 
 /// Tokenize returning byte-slice references without allocation
@@ -135,7 +117,7 @@ const fn is_ascii_whitespace(byte: u8) -> bool {
     matches!(byte, b' ' | b'\t' | b'\n' | b'\r' | b'\x0B' | b'\x0C')
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

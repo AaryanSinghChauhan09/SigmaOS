@@ -1,8 +1,3 @@
-## 2026-09-24 - Unveil Path Boundary Prefix Confusion Sandbox Bypass
-**Vulnerability:** `SovereignLandlockV5Guard::check_unveil` and `UnveilEntry::covers` relied on simple string `starts_with` prefix matching without enforcing directory boundary constraints. This allowed sandboxed processes to access unauthorized sibling paths with matching prefixes (e.g., requesting `/home/user-secret` matched an unveil entry for `/home/user`).
-**Learning:** Raw prefix matching (`path.starts_with(entry_path)`) on path strings without trailing slash or separator boundary validation causes path confusion security vulnerabilities in sandboxing logic.
-**Prevention:** Always verify path boundary condition: check `path.len() == entry_path.len()` or `path[entry_path.len()..]` starts with a path separator (`/` or `\`), or `entry_path.ends_with('/')`.
-
 ## 2026-09-17 - ASCII Control Character Injection in Filename and Path Validation
 **Vulnerability:** `validate_filename` and `validate_path` permitted ASCII control characters (`b < 32 || b == 127`, such as `\n`, `\r`, `\t`, ESC `\x1b`, DEL `\x7f`), leading to log forgery/injection (CWE-117), ANSI escape sequence terminal hijacking (CWE-150), and shell script argument/line splitting when filenames or paths are logged, printed, or processed by utilities.
 **Learning:** Checking only for directory separators (`/`, `\`) or NUL bytes (`\0`) is insufficient for filename and path validation because non-printable control characters and newline characters split log streams, trigger terminal commands, and break script parsers.

@@ -103,3 +103,11 @@ name = "sigmaos_setup_wizard"
 path = "tools/build/SigmaOSSetupWizard.rs"
 test = false
 required-features = ["microkernel"]
+
+[[bin]]
+name = "sigpkg"
+path = "src/bin/sigpkg.rs"
+
+[[bin]]
+name = "sigma-pkg"
+path = "src/bin/sigma_pkg.rs"

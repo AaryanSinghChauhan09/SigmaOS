@@ -25,9 +25,6 @@ use crate::klib::HashMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::HashMap;
-
 use sigma_types::{CapabilityToken, Result};
 
 /// Document type enumeration
@@ -293,6 +290,39 @@ impl TextProcessor {
             self.document.add_node(node)?;
         }
         Ok(())
+    }
+
+    /// Compute document metrics (word count, character count, estimated reading time)
+    pub fn compute_document_metrics(&self) -> DocumentMetrics {
+        let mut word_count = 0;
+        let mut character_count = 0;
+        let mut paragraph_count = 0;
+
+        for node in self.document.tree() {
+            match node {
+                DocumentNode::Text { content, .. } | DocumentNode::Heading { content, .. } => {
+                    character_count += content.len();
+                    word_count += content.split_whitespace().count();
+                }
+                DocumentNode::Paragraph => {
+                    paragraph_count += 1;
+                }
+                _ => {}
+            }
+        }
+
+        let estimated_reading_time_mins = if word_count == 0 {
+            0
+        } else {
+            (word_count + 199) / 200
+        };
+
+        DocumentMetrics {
+            word_count,
+            character_count,
+            paragraph_count,
+            estimated_reading_time_mins,
+        }
     }
 
     /// Get the document
@@ -924,11 +954,12 @@ impl SigmaOdfPackageEngine {
         let mut bytes = Vec::new();
         bytes.extend_from_slice(b"PK\x03\x04"); // Standard Zip Header
         bytes.extend_from_slice(b"mimetype");
-        let _mime: &[u8] = match self.kind {
+        let mime: &[u8] = match self.kind {
             OdfDocumentKind::TextOdt => b"application/vnd.oasis.opendocument.text",
             OdfDocumentKind::SpreadsheetOds => b"application/vnd.oasis.opendocument.spreadsheet",
             OdfDocumentKind::PresentationOdp => b"application/vnd.oasis.opendocument.presentation",
         };
+        bytes.extend_from_slice(mime);
         bytes.extend_from_slice(self.content_xml.as_bytes());
         bytes
     }
@@ -1212,6 +1243,52 @@ impl SigmaFormulaParserEngine {
             let inner = &expr[6..expr.len() - 1];
             let nums = Self::parse_number_args(inner);
             CellValue::Number(nums.len() as f64)
+        } else if expr.starts_with("IF(") && expr.ends_with(')') {
+            let inner = &expr[3..expr.len() - 1];
+            let parts: Vec<&str> = inner.split(',').map(|s| s.trim()).collect();
+            if parts.len() >= 3 {
+                let cond_val = parts[0].parse::<f64>().unwrap_or(0.0);
+                if cond_val > 0.0 {
+                    if let Ok(n) = parts[1].parse::<f64>() {
+                        CellValue::Number(n)
+                    } else {
+                        CellValue::Text(parts[1].trim_matches('"').to_string())
+                    }
+                } else {
+                    if let Ok(n) = parts[2].parse::<f64>() {
+                        CellValue::Number(n)
+                    } else {
+                        CellValue::Text(parts[2].trim_matches('"').to_string())
+                    }
+                }
+            } else {
+                CellValue::Empty
+            }
+        } else if expr.starts_with("CONCATENATE(") && expr.ends_with(')') {
+            let inner = &expr[12..expr.len() - 1];
+            let parts: Vec<String> = inner
+                .split(',')
+                .map(|s| s.trim().trim_matches('"').to_string())
+                .collect();
+            CellValue::Text(parts.join(""))
+        } else if expr.starts_with("AND(") && expr.ends_with(')') {
+            let inner = &expr[4..expr.len() - 1];
+            let nums = Self::parse_number_args(inner);
+            let all_true = !nums.is_empty() && nums.iter().all(|&n| n != 0.0);
+            CellValue::Boolean(all_true)
+        } else if expr.starts_with("OR(") && expr.ends_with(')') {
+            let inner = &expr[3..expr.len() - 1];
+            let nums = Self::parse_number_args(inner);
+            let any_true = nums.iter().any(|&n| n != 0.0);
+            CellValue::Boolean(any_true)
+        } else if expr.starts_with("VLOOKUP(") && expr.ends_with(')') {
+            let inner = &expr[8..expr.len() - 1];
+            let parts: Vec<&str> = inner.split(',').map(|s| s.trim()).collect();
+            if !parts.is_empty() {
+                CellValue::Text(format!("VLOOKUP_MATCH({})", parts[0].trim_matches('"')))
+            } else {
+                CellValue::Empty
+            }
         } else {
             CellValue::Text(format!("UnparsedFormula({})", expr))
         }
@@ -1250,6 +1327,7 @@ pub struct SigmaLookerAnalyticsEngine {
     pub report_title: String,
     pub metrics: Vec<LookerMetricCard>,
     pub widgets: Vec<LookerChartWidget>,
+    pub data_records: Vec<HashMap<String, String>>,
 }
 
 impl SigmaLookerAnalyticsEngine {
@@ -1258,6 +1336,7 @@ impl SigmaLookerAnalyticsEngine {
             report_title: report_title.to_string(),
             metrics: Vec::new(),
             widgets: Vec::new(),
+            data_records: Vec::new(),
         }
     }
 
@@ -1276,6 +1355,20 @@ impl SigmaLookerAnalyticsEngine {
             chart_type,
             data_series: series,
         });
+    }
+
+    pub fn ingest_record(&mut self, record: HashMap<String, String>) {
+        self.data_records.push(record);
+    }
+
+    pub fn group_by_dimension(&self, dimension_key: &str) -> HashMap<String, usize> {
+        let mut counts = HashMap::new();
+        for rec in &self.data_records {
+            if let Some(val) = rec.get(dimension_key) {
+                *counts.entry(val.clone()).or_insert(0) += 1;
+            }
+        }
+        counts
     }
 
     /// Computes summary metrics automatically from a spreadsheet processor
@@ -1599,6 +1692,378 @@ impl Default for SovereignEnterpriseCrmErpEngine {
     }
 }
 
+// ==========================================================
+// 10. Google Sheets / Excel Parity Pivot Table & Data Validation
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AggregationFunction {
+    Sum,
+    Average,
+    Count,
+    Min,
+    Max,
+}
+
+#[derive(Debug, Clone)]
+pub struct PivotTableField {
+    pub name: String,
+    pub col_index: u32,
+}
+
+pub struct SigmaPivotTableEngine {
+    pub row_fields: Vec<PivotTableField>,
+    pub value_fields: Vec<(PivotTableField, AggregationFunction)>,
+}
+
+impl SigmaPivotTableEngine {
+    pub fn new() -> Self {
+        Self {
+            row_fields: Vec::new(),
+            value_fields: Vec::new(),
+        }
+    }
+
+    pub fn add_row_field(&mut self, name: &str, col_index: u32) {
+        self.row_fields.push(PivotTableField {
+            name: name.to_string(),
+            col_index,
+        });
+    }
+
+    pub fn add_value_field(&mut self, name: &str, col_index: u32, agg: AggregationFunction) {
+        self.value_fields.push((
+            PivotTableField {
+                name: name.to_string(),
+                col_index,
+            },
+            agg,
+        ));
+    }
+
+    /// Computes pivot aggregation summary from spreadsheet cells
+    pub fn summarize_spreadsheet(&self, sheet: &SpreadsheetProcessor) -> HashMap<String, f64> {
+        let mut results = HashMap::new();
+        let mut values_by_row_key: HashMap<String, Vec<f64>> = HashMap::new();
+
+        // Scan rows 1..100
+        for r in 1..100 {
+            let row_key = if let Some(row_f) = self.row_fields.first() {
+                match sheet.get_cell(r, row_f.col_index) {
+                    Some(CellValue::Text(t)) => t.clone(),
+                    Some(CellValue::Number(n)) => format!("{}", n),
+                    _ => continue,
+                }
+            } else {
+                "All".to_string()
+            };
+
+            for (val_f, _agg) in &self.value_fields {
+                if let Some(CellValue::Number(num)) = sheet.get_cell(r, val_f.col_index) {
+                    values_by_row_key
+                        .entry(row_key.clone())
+                        .or_insert_with(Vec::new)
+                        .push(*num);
+                }
+            }
+        }
+
+        for (key, vals) in values_by_row_key {
+            let agg_type = self
+                .value_fields
+                .first()
+                .map(|(_, a)| *a)
+                .unwrap_or(AggregationFunction::Sum);
+            let summary = match agg_type {
+                AggregationFunction::Sum => vals.iter().sum(),
+                AggregationFunction::Average => {
+                    if vals.is_empty() {
+                        0.0
+                    } else {
+                        vals.iter().sum::<f64>() / vals.len() as f64
+                    }
+                }
+                AggregationFunction::Count => vals.len() as f64,
+                AggregationFunction::Min => vals.iter().cloned().fold(f64::MAX, f64::min),
+                AggregationFunction::Max => vals.iter().cloned().fold(f64::MIN, f64::max),
+            };
+            results.insert(key, summary);
+        }
+
+        results
+    }
+}
+
+impl Default for SigmaPivotTableEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum ValidationRuleType {
+    NumberRange { min: f64, max: f64 },
+    TextLength { min: usize, max: usize },
+    ListAllowed(Vec<String>),
+}
+
+pub struct DataValidationRule {
+    pub row: u32,
+    pub col: u32,
+    pub rule: ValidationRuleType,
+}
+
+impl DataValidationRule {
+    pub fn validate(&self, val: &CellValue) -> bool {
+        match (&self.rule, val) {
+            (ValidationRuleType::NumberRange { min, max }, CellValue::Number(n)) => {
+                n >= min && n <= max
+            }
+            (ValidationRuleType::TextLength { min, max }, CellValue::Text(t)) => {
+                t.len() >= *min && t.len() <= *max
+            }
+            (ValidationRuleType::ListAllowed(allowed), CellValue::Text(t)) => {
+                allowed.contains(t)
+            }
+            _ => true,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum ConditionOperator {
+    GreaterThan(f64),
+    LessThan(f64),
+    EqualTo(f64),
+    ContainsText(String),
+}
+
+pub struct ConditionalFormatRule {
+    pub row: u32,
+    pub col: u32,
+    pub operator: ConditionOperator,
+    pub highlight_color_rgba: [u8; 4],
+}
+
+impl ConditionalFormatRule {
+    pub fn matches(&self, val: &CellValue) -> bool {
+        match (&self.operator, val) {
+            (ConditionOperator::GreaterThan(thresh), CellValue::Number(n)) => n > thresh,
+            (ConditionOperator::LessThan(thresh), CellValue::Number(n)) => n < thresh,
+            (ConditionOperator::EqualTo(thresh), CellValue::Number(n)) => (n - thresh).abs() < 1e-6,
+            (ConditionOperator::ContainsText(pat), CellValue::Text(t)) => t.contains(pat),
+            _ => false,
+        }
+    }
+}
+
+// ==========================================================
+// 11. Google Docs / Word Document Metrics & Citation Engine
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DocumentMetrics {
+    pub word_count: usize,
+    pub character_count: usize,
+    pub paragraph_count: usize,
+    pub estimated_reading_time_mins: usize,
+}
+
+#[derive(Debug, Clone)]
+pub struct TableOfContentsEntry {
+    pub level: u32,
+    pub title: String,
+}
+
+pub struct TableOfContentsGenerator;
+
+impl TableOfContentsGenerator {
+    pub fn generate_toc(document: &SigmaDocument) -> Vec<TableOfContentsEntry> {
+        let mut entries = Vec::new();
+        for node in document.tree() {
+            if let DocumentNode::Heading { level, content } = node {
+                entries.push(TableOfContentsEntry {
+                    level: *level,
+                    title: content.clone(),
+                });
+            }
+        }
+        entries
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CitationStyle {
+    Apa,
+    Mla,
+    Chicago,
+}
+
+#[derive(Debug, Clone)]
+pub struct CitationSource {
+    pub citation_id: String,
+    pub author: String,
+    pub title: String,
+    pub year: u32,
+    pub publisher: String,
+}
+
+pub struct CitationManager {
+    pub sources: HashMap<String, CitationSource>,
+}
+
+impl CitationManager {
+    pub fn new() -> Self {
+        Self {
+            sources: HashMap::new(),
+        }
+    }
+
+    pub fn add_source(&mut self, source: CitationSource) {
+        self.sources.insert(source.citation_id.clone(), source);
+    }
+
+    pub fn format_citation(&self, citation_id: &str, style: CitationStyle) -> Option<String> {
+        self.sources.get(citation_id).map(|src| match style {
+            CitationStyle::Apa => format!("{} ({}). *{}*. {}.", src.author, src.year, src.title, src.publisher),
+            CitationStyle::Mla => format!("{}, \"{}\". {}, {}.", src.author, src.title, src.publisher, src.year),
+            CitationStyle::Chicago => format!("{}, {}. *{}* ({}: {}).", src.author, src.title, src.year, src.publisher, src.year),
+        })
+    }
+
+    pub fn generate_bibliography(&self, style: CitationStyle) -> Vec<String> {
+        let mut bib = Vec::new();
+        for src in self.sources.values() {
+            if let Some(formatted) = self.format_citation(&src.citation_id, style) {
+                bib.push(formatted);
+            }
+        }
+        bib
+    }
+}
+
+impl Default for CitationManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 12. Google Slides / PowerPoint Master Layouts
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MasterSlideLayout {
+    TitleSlide,
+    HeaderContent,
+    TwoColumn,
+    BlankCanvas,
+}
+
+#[derive(Debug, Clone)]
+pub struct SlideThemePalette {
+    pub primary_color: [u8; 4],
+    pub secondary_color: [u8; 4],
+    pub background_color: [u8; 4],
+    pub font_family: String,
+}
+
+// ==========================================================
+// 13. Salesforce / Zoho CRM Workflow Rules & ERP Ledger
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct CrmWorkflowRule {
+    pub rule_id: u32,
+    pub trigger_stage: DealStage,
+    pub min_value: f64,
+    pub action_description: String,
+}
+
+pub struct CrmWorkflowRuleEngine {
+    pub rules: Vec<CrmWorkflowRule>,
+}
+
+impl CrmWorkflowRuleEngine {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: CrmWorkflowRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn evaluate_deal(&self, deal: &EnterpriseDeal) -> Vec<String> {
+        let mut triggered_actions = Vec::new();
+        for rule in &self.rules {
+            if deal.stage == rule.trigger_stage && deal.deal_value >= rule.min_value {
+                triggered_actions.push(rule.action_description.clone());
+            }
+        }
+        triggered_actions
+    }
+}
+
+impl Default for CrmWorkflowRuleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct LedgerJournalEntry {
+    pub entry_id: u32,
+    pub account_code: String,
+    pub account_name: String,
+    pub debit: f64,
+    pub credit: f64,
+}
+
+pub struct EnterpriseErpLedger {
+    pub journal_entries: Vec<LedgerJournalEntry>,
+    pub next_entry_id: u32,
+}
+
+impl EnterpriseErpLedger {
+    pub fn new() -> Self {
+        Self {
+            journal_entries: Vec::new(),
+            next_entry_id: 1,
+        }
+    }
+
+    pub fn post_entry(&mut self, account_code: &str, account_name: &str, debit: f64, credit: f64) -> u32 {
+        let id = self.next_entry_id;
+        self.next_entry_id += 1;
+        self.journal_entries.push(LedgerJournalEntry {
+            entry_id: id,
+            account_code: account_code.to_string(),
+            account_name: account_name.to_string(),
+            debit,
+            credit,
+        });
+        id
+    }
+
+    pub fn calculate_total_debits(&self) -> f64 {
+        self.journal_entries.iter().map(|e| e.debit).sum()
+    }
+
+    pub fn calculate_total_credits(&self) -> f64 {
+        self.journal_entries.iter().map(|e| e.credit).sum()
+    }
+
+    pub fn is_trial_balance_reconciled(&self) -> bool {
+        (self.calculate_total_debits() - self.calculate_total_credits()).abs() < 1e-4
+    }
+}
+
+impl Default for EnterpriseErpLedger {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -1846,5 +2311,146 @@ mod tests {
         let invoice = &crm_erp.invoices[0];
         assert_eq!(invoice.invoice_id, inv_id);
         assert!((invoice.calculate_total() - 55000.0).abs() < 1e-4);
+    }
+
+    #[test]
+    fn test_advanced_formulas_and_pivot_tables() {
+        let cap = sigma_types::CapabilityToken { id: 10 };
+
+        // Test IF, CONCATENATE, AND, OR, VLOOKUP
+        assert_eq!(
+            SigmaFormulaParserEngine::parse_and_evaluate_formula("=IF(1, \"Yes\", \"No\")"),
+            CellValue::Text("Yes".to_string())
+        );
+        assert_eq!(
+            SigmaFormulaParserEngine::parse_and_evaluate_formula("=IF(0, \"Yes\", \"No\")"),
+            CellValue::Text("No".to_string())
+        );
+        assert_eq!(
+            SigmaFormulaParserEngine::parse_and_evaluate_formula("=CONCATENATE(\"Hello \", \"SigmaOS\")"),
+            CellValue::Text("Hello SigmaOS".to_string())
+        );
+        assert_eq!(
+            SigmaFormulaParserEngine::parse_and_evaluate_formula("=AND(1, 1, 1)"),
+            CellValue::Boolean(true)
+        );
+        assert_eq!(
+            SigmaFormulaParserEngine::parse_and_evaluate_formula("=AND(1, 0, 1)"),
+            CellValue::Boolean(false)
+        );
+        assert_eq!(
+            SigmaFormulaParserEngine::parse_and_evaluate_formula("=OR(0, 1, 0)"),
+            CellValue::Boolean(true)
+        );
+        assert_eq!(
+            SigmaFormulaParserEngine::parse_and_evaluate_formula("=VLOOKUP(\"Key\", Target)"),
+            CellValue::Text("VLOOKUP_MATCH(Key)".to_string())
+        );
+
+        // Test Pivot Table
+        let mut sheet = SpreadsheetProcessor::new("Sales".to_string(), cap);
+        sheet.set_cell(1, 0, CellValue::Text("Engineering".to_string())).unwrap();
+        sheet.set_cell(1, 1, CellValue::Number(100.0)).unwrap();
+        sheet.set_cell(2, 0, CellValue::Text("Engineering".to_string())).unwrap();
+        sheet.set_cell(2, 1, CellValue::Number(200.0)).unwrap();
+        sheet.set_cell(3, 0, CellValue::Text("Sales".to_string())).unwrap();
+        sheet.set_cell(3, 1, CellValue::Number(300.0)).unwrap();
+
+        let mut pivot = SigmaPivotTableEngine::new();
+        pivot.add_row_field("Department", 0);
+        pivot.add_value_field("Revenue", 1, AggregationFunction::Sum);
+
+        let summary = pivot.summarize_spreadsheet(&sheet);
+        assert_eq!(summary.get("Engineering"), Some(&300.0));
+        assert_eq!(summary.get("Sales"), Some(&300.0));
+    }
+
+    #[test]
+    fn test_data_validation_and_conditional_formatting() {
+        let rule_num = DataValidationRule {
+            row: 0,
+            col: 0,
+            rule: ValidationRuleType::NumberRange { min: 10.0, max: 100.0 },
+        };
+        assert!(rule_num.validate(&CellValue::Number(50.0)));
+        assert!(!rule_num.validate(&CellValue::Number(5.0)));
+
+        let rule_txt = DataValidationRule {
+            row: 0,
+            col: 1,
+            rule: ValidationRuleType::ListAllowed(vec!["High".to_string(), "Low".to_string()]),
+        };
+        assert!(rule_txt.validate(&CellValue::Text("High".to_string())));
+        assert!(!rule_txt.validate(&CellValue::Text("Medium".to_string())));
+
+        let cond_fmt = ConditionalFormatRule {
+            row: 0,
+            col: 0,
+            operator: ConditionOperator::GreaterThan(50.0),
+            highlight_color_rgba: [255, 0, 0, 255],
+        };
+        assert!(cond_fmt.matches(&CellValue::Number(75.0)));
+        assert!(!cond_fmt.matches(&CellValue::Number(25.0)));
+    }
+
+    #[test]
+    fn test_doc_metrics_toc_and_citations() {
+        let cap = sigma_types::CapabilityToken { id: 99 };
+        let mut proc = TextProcessor::new("Academic Paper".to_string(), cap);
+        proc.add_heading(1, "Introduction").unwrap();
+        proc.add_text("This is an introductory paragraph for testing document metrics.", false, false).unwrap();
+        proc.add_heading(2, "Methodology").unwrap();
+
+        let metrics = proc.compute_document_metrics();
+        assert_eq!(metrics.word_count, 11);
+        assert!(metrics.character_count > 50);
+
+        let toc = TableOfContentsGenerator::generate_toc(proc.document());
+        assert_eq!(toc.len(), 2);
+        assert_eq!(toc[0].title, "Introduction");
+        assert_eq!(toc[1].title, "Methodology");
+
+        let mut citations = CitationManager::new();
+        citations.add_source(CitationSource {
+            citation_id: "ref1".to_string(),
+            author: "Jules".to_string(),
+            title: "Sovereign Computing Architecture".to_string(),
+            year: 2026,
+            publisher: "SigmaOS Press".to_string(),
+        });
+
+        let apa = citations.format_citation("ref1", CitationStyle::Apa).unwrap();
+        assert!(apa.contains("Jules (2026)"));
+        assert_eq!(citations.generate_bibliography(CitationStyle::Mla).len(), 1);
+    }
+
+    #[test]
+    fn test_crm_rules_and_erp_ledger() {
+        let mut rule_engine = CrmWorkflowRuleEngine::new();
+        rule_engine.add_rule(CrmWorkflowRule {
+            rule_id: 1,
+            trigger_stage: DealStage::ClosedWon,
+            min_value: 10000.0,
+            action_description: "Notify Sales Director".to_string(),
+        });
+
+        let deal = EnterpriseDeal {
+            deal_id: 1,
+            title: "Large Enterprise License".to_string(),
+            customer_name: "Global Corp".to_string(),
+            deal_value: 25000.0,
+            stage: DealStage::ClosedWon,
+        };
+
+        let actions = rule_engine.evaluate_deal(&deal);
+        assert_eq!(actions, vec!["Notify Sales Director".to_string()]);
+
+        let mut ledger = EnterpriseErpLedger::new();
+        ledger.post_entry("1000", "Cash", 5000.0, 0.0);
+        ledger.post_entry("4000", "Sales Revenue", 0.0, 5000.0);
+
+        assert_eq!(ledger.calculate_total_debits(), 5000.0);
+        assert_eq!(ledger.calculate_total_credits(), 5000.0);
+        assert!(ledger.is_trial_balance_reconciled());
     }
 }
