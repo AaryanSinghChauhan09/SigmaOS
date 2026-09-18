@@ -306,4 +306,51 @@ fn test_all_prompt_package_formats() {
         adapter.detect_format_by_extension("puppy.pet"),
         Some(PackageFormat::Pet)
     );
+    assert_eq!(
+        adapter.detect_format_by_extension("clearlinux.swupd"),
+        Some(PackageFormat::Swupd)
+    );
+    assert_eq!(
+        adapter.detect_format_by_extension("starling.starling"),
+        Some(PackageFormat::Starling)
+    );
+    assert_eq!(
+        adapter.detect_format_by_extension("cachy.cachyos"),
+        Some(PackageFormat::Pacman)
+    );
+    assert_eq!(
+        adapter.detect_format_by_extension("clearlinux.swupd"),
+        Some(PackageFormat::Swupd)
+    );
+    assert_eq!(
+        adapter.detect_format_by_extension("starling.starling"),
+        Some(PackageFormat::Starling)
+    );
+    assert_eq!(
+        adapter.detect_format_by_extension("cachy.cachyos"),
+        Some(PackageFormat::Pacman)
+    );
+}
+
+#[test]
+fn test_all_unified_package_formats_resolution() {
+    use universal_adapter::UniversalPackageAdapter;
+    let adapter = UniversalPackageAdapter::new();
+    let formats = vec![
+        ("app.swupd", PackageFormat::Swupd),
+        ("app.starling", PackageFormat::Starling),
+        ("app.cachyos", PackageFormat::Pacman),
+        ("app.deb", PackageFormat::Deb),
+        ("app.rpm", PackageFormat::Rpm),
+        ("app.apk", PackageFormat::Apk),
+        ("app.xbps", PackageFormat::Xbps),
+    ];
+
+    for (file, fmt) in formats {
+        assert_eq!(adapter.detect_format_by_extension(file), Some(fmt));
+        let pkg = adapter
+            .parse_and_translate_manifest(file, "Package: demo\nVersion: 1.0.0")
+            .expect("manifest parsing should succeed");
+        assert_eq!(pkg.name, "demo");
+    }
 }

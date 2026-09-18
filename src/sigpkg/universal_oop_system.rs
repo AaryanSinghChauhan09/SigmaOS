@@ -276,6 +276,14 @@ pub enum PackageFormat {
     HaskellCabal,
     JuliaPkg,
     RCran,
+    Swupd,
+    Starling,
+    Cachy,
+    CachyOS,
+    App,
+    SigmaPkg,
+    Nixpkg,
+    Xz,
 }
 
 impl PackageFormat {

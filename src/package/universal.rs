@@ -355,6 +355,8 @@ pub enum PackageFormat {
     CachyOS,      // CachyOS (.cachyos)
     Swupd,        // Clear Linux swupd (.swupd)
     Starling,     // Starling format (.starling)
+    Sigma,        // SigmaOS native
+    AppBundle,    // macOS AppBundle
     Dports,       // DragonFly BSD DPorts (.dports)
     SlackBuild,   // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
     Crux,         // CRUX Linux (.crux / .pkgfile)
@@ -477,6 +479,10 @@ impl PackageFormat {
             Some(PackageFormat::Dmg)
         } else if normalized.ends_with(".cports") {
             Some(PackageFormat::Cports)
+        } else if normalized.ends_with(".swupd") {
+            Some(PackageFormat::Swupd)
+        } else if normalized.ends_with(".starling") {
+            Some(PackageFormat::Starling)
         } else if normalized.ends_with(".cachy") || normalized.ends_with(".cachyos") {
             Some(PackageFormat::Cachy)
         } else if normalized.ends_with(".dports") {
@@ -1511,7 +1517,8 @@ impl PackageFactory {
             PackageFormat::Cachy | PackageFormat::CachyOS => Box::new(CachyOSInstallStrategy),
             PackageFormat::Swupd => Box::new(SwupdInstallStrategy),
             PackageFormat::Starling => Box::new(StarlingInstallStrategy),
-            PackageFormat::SigmaPkg => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::SigmaPkg | PackageFormat::Sigma => Box::new(SigmaPkgInstallStrategy),
+            PackageFormat::AppBundle => Box::new(AppInstallStrategy),
             PackageFormat::Air => Box::new(AirInstallStrategy),
             PackageFormat::Bottle => Box::new(BottleInstallStrategy),
             PackageFormat::Ipa => Box::new(IpaInstallStrategy),
@@ -1601,7 +1608,8 @@ impl PackageFactory {
             PackageFormat::Cachy | PackageFormat::CachyOS => Box::new(CachyOSMetadataAdapter),
             PackageFormat::Swupd => Box::new(SwupdMetadataAdapter),
             PackageFormat::Starling => Box::new(StarlingMetadataAdapter),
-            PackageFormat::SigmaPkg => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::SigmaPkg | PackageFormat::Sigma => Box::new(SigmaPkgMetadataAdapter),
+            PackageFormat::AppBundle => Box::new(AppMetadataAdapter),
             PackageFormat::Air => Box::new(AirMetadataAdapter),
             PackageFormat::Bottle => Box::new(BottleMetadataAdapter),
             PackageFormat::Ipa => Box::new(IpaMetadataAdapter),

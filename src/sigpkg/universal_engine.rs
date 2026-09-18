@@ -92,6 +92,14 @@ pub enum PackageFormat {
     HaskellCabal,
     JuliaPkg,
     RCran,
+    Swupd,
+    Starling,
+    Cachy,
+    CachyOS,
+    App,
+    SigmaPkg,
+    Nixpkg,
+    Xz,
 }
 
 impl PackageFormat {
@@ -182,6 +190,10 @@ impl PackageFormat {
             Some(PackageFormat::Dmg)
         } else if normalized.ends_with(".cports") {
             Some(PackageFormat::Cports)
+        } else if normalized.ends_with(".swupd") {
+            Some(PackageFormat::Swupd)
+        } else if normalized.ends_with(".starling") {
+            Some(PackageFormat::Starling)
         } else if normalized.ends_with(".cachy") || normalized.ends_with(".cachyos") {
             Some(PackageFormat::Pacman)
         } else if normalized.ends_with(".dports") {
@@ -653,8 +665,12 @@ impl PackageAdapterFactory {
             PackageFormat::Portage | PackageFormat::Ebuild => {
                 Box::new(EbuildPackageAdapter::new(Vec::new()))
             }
-            PackageFormat::Sovereign | PackageFormat::Sigma => Box::new(SovereignPackageAdapter),
-            PackageFormat::Nix => Box::new(NixPackageAdapter),
+            PackageFormat::Sovereign | PackageFormat::Sigma | PackageFormat::SigmaPkg | PackageFormat::Starling => Box::new(SovereignPackageAdapter),
+            PackageFormat::Nix | PackageFormat::Nixpkg => Box::new(NixPackageAdapter),
+            PackageFormat::TarXz | PackageFormat::Xz => Box::new(TarXzPackageAdapter),
+            PackageFormat::AppBundle | PackageFormat::App => Box::new(AppBundlePackageAdapter),
+            PackageFormat::Cachy | PackageFormat::CachyOS => Box::new(PacmanPackageAdapter),
+            PackageFormat::Swupd => Box::new(SysupdatePackageAdapter),
             PackageFormat::Apk => Box::new(ApkPackageAdapter),
             PackageFormat::Xbps => Box::new(XbpsPackageAdapter::new(None)),
             PackageFormat::Air => Box::new(AirPackageAdapter),
@@ -664,9 +680,7 @@ impl PackageAdapterFactory {
             PackageFormat::Pkg => Box::new(PkgPackageAdapter),
             PackageFormat::Aab => Box::new(AabPackageAdapter),
             PackageFormat::TarGz => Box::new(TarGzPackageAdapter),
-            PackageFormat::TarXz => Box::new(TarXzPackageAdapter),
             PackageFormat::Tar => Box::new(TarPackageAdapter),
-            PackageFormat::AppBundle => Box::new(AppBundlePackageAdapter),
             PackageFormat::Hap => Box::new(HapPackageAdapter),
             PackageFormat::Pisi => Box::new(PisiPackageAdapter),
             PackageFormat::Superdeb => Box::new(SuperdebPackageAdapter),
