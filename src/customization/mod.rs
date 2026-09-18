@@ -10,8 +10,9 @@ pub use routines::{
 };
 
 pub use profile::{
-    GameDifficultyBalancer, GamifiedProductivity as CustomGamifiedProductivity, PerformanceProfile,
-    ProfileSwitcher, ZenithProfile,
+    CoreOsToolBundle, GameDifficultyBalancer, GamifiedProductivity as CustomGamifiedProductivity,
+    LightweightBundleManager, OptionalPersonaAddonSuite, PerformanceProfile, ProfileSwitcher,
+    ZenithProfile,
 };
 
 pub use cursor::{CursorImageFrame, CursorShape, CursorTheme, CursorThemeEngine};

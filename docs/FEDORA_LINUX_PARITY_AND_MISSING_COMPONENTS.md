@@ -12,6 +12,25 @@ All components are implemented in `src/compatibility/fedora_missing_components.r
 
 ---
 
+## TIERED PRIORITIZATION PLAN: SIGMAOS VS. FEDORA
+
+| Tier | Gap vs Fedora | SigmaOS Strategic Implementation Plan |
+|------|---------------|---------------------------------------|
+| 🔴 **Critical** | Governance & Sponsorship | Defined contributor governance model, clear dual Apache 2.0 / MIT licensing, and technical steering committees. |
+| 🔴 **Critical** | Release Engineering | Reproducible builds, PQC-signed packages, and predictable release cadence via `sigpkg`. |
+| 🔴 **Critical** | Package Ecosystem | DNF5/RPM parity, Flatpak/AppImage universal app runtime, and cross-distro package name translation. |
+| 🔴 **Critical** | Security & Compliance | SELinux/AppArmor-style MAC access controls, Landlock LSM, OpenBSD pledge/unveil, and hardened kernel profiles. |
+| 🔴 **Critical** | Hardware Support | Broadening beyond x86_64 to ARM64, RISC-V, IoT edge, and cloud images with selective driver bundling tiers. |
+| 🟠 **Important** | Accessibility & i18n | WCAG 2.2 AA compliant screen reader, Bhashini multilingual packs, and adaptive display scaling. |
+| 🟠 **Important** | Community & Docs | Comprehensive SigmaOS 15-chapter handbook, contributor guidelines (`AGENTS.md`), and interactive wiki. |
+| 🟠 **Important** | Backup & Rollback | Timeshift-lite atomic snapshots (`sigpkg rollback`), Btrfs/ZFS COWs, and workflow recovery dashboards. |
+| 🟢 **Optional** | Adaptive Personas | Persona switcher (Developer, Student, Gaming, Compliance, Minimalist) with dynamic micro-tool overlays. |
+| 🟢 **Optional** | Cross-Domain Views | Integrated compliance, resource monitoring, and productivity dashboards in Zenith desktop. |
+| 🟢 **Optional** | Gamified Productivity | Gamified XP/level progression, Pomodoro timers, flashcards, and daily task streak tracking. |
+| 🟢 **Optional** | Workflow Recovery | Beyond system rollback: restoring active compliance tasks, IDE state, and productivity goals. |
+
+---
+
 ## IMPLEMENTED FEDORA COMPONENTS & ARCHITECTURE
 
 ### 1. Koji Build System Engine (`FedoraKojiBuildSystemEngine`)
