@@ -87,3 +87,45 @@ if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
     rustc --test --edition=2021 src/sigpkg/arch_pacman_engine.rs -o build/test_arch_engine
     ./build/test_arch_engine
 fi
+
+if [ -f "src/unimplemented_features.rs" ]; then
+    echo "Running Unimplemented Features & Distro Parity test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/unimplemented_features.rs -o build/test_unimplemented_features
+    ./build/test_unimplemented_features
+fi
+
+if [ -f "src/unimplemented_tools.rs" ]; then
+    echo "Running Unimplemented Tools & 100-Ideas test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/unimplemented_tools.rs -o build/test_unimplemented_tools
+    ./build/test_unimplemented_tools
+fi
+
+if [ -f "src/wiki_unimplemented_ideas.rs" ]; then
+    echo "Running Wiki Unimplemented Ideas test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/wiki_unimplemented_ideas.rs -o build/test_wiki_unimplemented_ideas
+    ./build/test_wiki_unimplemented_ideas
+fi
+
+if [ -f "src/sovereign_wiki_master_engine.rs" ]; then
+    echo "Running Sovereign Wiki Master Engine test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/sovereign_wiki_master_engine.rs -o build/test_sovereign_wiki_master_engine
+    ./build/test_sovereign_wiki_master_engine
+fi
+
+if [ -f "src/expanded_wiki_innovations.rs" ]; then
+    echo "Running Expanded Wiki Innovations test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/expanded_wiki_innovations.rs -o build/test_expanded_wiki_innovations
+    ./build/test_expanded_wiki_innovations
+fi
+
+if [ -f "tests/test_md_wiki_ideas_verification.rs" ]; then
+    echo "Running .MD Files & Wiki Ideas Master Verification test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 tests/test_md_wiki_ideas_verification.rs -o build/test_md_wiki_ideas
+    ./build/test_md_wiki_ideas
+fi
