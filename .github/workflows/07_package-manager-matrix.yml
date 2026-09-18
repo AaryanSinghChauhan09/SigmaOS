@@ -90,7 +90,7 @@ jobs:
             distro: void
             container: voidlinux/voidlinux:latest
             install-cmd: "xbps-install -Sy"
-            deps: "base-devel rust cargo"
+            deps: "base-devel rust cargo libstdc++"
             create-cmd: "xbps-src pkg sigmaos"
             verify-cmd: "xbps-query -l | grep sigmaos"
 
