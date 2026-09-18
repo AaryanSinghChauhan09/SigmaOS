@@ -26,7 +26,6 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Package Management
-
 - [SigmaPkg - Universal Package Manager](SigmaPkg) — Universal package management system with multi-format support
 - [Universal Package Engine (sigpkg)](Package-Management-and-Sigpkg) — Overview of the SigmaPkg package management system
 - [Arch PKGBUILD & AUR Helper](ARCH_LINUX_PARITY_FEATURES) — Integration with Arch Linux package formats and AUR
@@ -88,7 +87,9 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Maintenance & Recovery
+- [Boot Process and Recovery](Boot-Process-and-Recovery) — Bootloaders, init system, recovery modes, snapshots
 - [Container Orchestration](Container-Orchestration) — Kubernetes-compatible APIs, pod scheduling, service discovery, and autoscaling
+- [Package Management](Package-Management) — Universal package manager, dependency resolution, repository management
 
 - [Rollback Engine & Snapshots](Maintenance-and-Rollback-Engine) — Atomic rollback engine and system snapshots
 - [Declarative Generations](Maintenance-and-Rollback-Engine#declarative-system-generations) — Declarative system state and generation management

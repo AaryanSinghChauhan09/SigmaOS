@@ -144,6 +144,14 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
 
+- **[Boot Process and Recovery](Boot-Process-and-Recovery)**
+  Bootloaders, init system, recovery modes, snapshots.
+
+- **[Package Management](Package-Management)**
+  Universal package manager, dependency resolution, repository management.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
 - **[Concurrency and Deadlocks](Concurrency-and-Deadlocks)**
   Thread management, synchronization primitives, deadlock detection, lock-free algorithms.
 
