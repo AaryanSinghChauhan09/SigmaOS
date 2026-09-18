@@ -1,10 +1,9 @@
 //! GPU Driver Framework (Linux DRM & BSD drm-kmod Inspiration)
 //! Native bare-metal hardware drivers for AMD, Intel, NVIDIA, and VirtIO-GPU
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::boxed::Box;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// GPU device types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,6 +45,50 @@ pub struct GpuBuffer {
     pub height: u32,
     pub stride: u32,
     pub size_bytes: usize,
+}
+
+impl GpuBuffer {
+    /// Validate buffer dimensions and size
+    pub fn validate(&self) -> Result<(), GpuError> {
+        if self.width == 0 || self.height == 0 {
+            return Err(GpuError::BufferCreationFailed);
+        }
+        if self.stride == 0 {
+            return Err(GpuError::BufferCreationFailed);
+        }
+        if self.size_bytes == 0 {
+            return Err(GpuError::BufferCreationFailed);
+        }
+        // Check for overflow in size calculation
+        let expected_size = (self.stride as u64) * (self.height as u64);
+        if expected_size > usize::MAX as u64 {
+            return Err(GpuError::BufferCreationFailed);
+        }
+        if self.size_bytes != expected_size as usize {
+            return Err(GpuError::BufferCreationFailed);
+        }
+        Ok(())
+    }
+
+    /// Create a new validated buffer
+    pub fn new(width: u32, height: u32, stride: u32) -> Result<Self, GpuError> {
+        let size_bytes = (stride as u64) * (height as u64);
+        if size_bytes > usize::MAX as u64 {
+            return Err(GpuError::BufferCreationFailed);
+        }
+
+        let buffer = GpuBuffer {
+            ptr: std::ptr::null_mut(),
+            handle: 0,
+            width,
+            height,
+            stride,
+            size_bytes: size_bytes as usize,
+        };
+
+        buffer.validate()?;
+        Ok(buffer)
+    }
 }
 
 /// GPU errors
@@ -171,22 +214,16 @@ impl GpuDriver for AmdgpuDriver {
             return Err(GpuError::InitializationFailed);
         }
         let stride = width * 4;
-        let size_bytes = (stride * height) as usize;
-
-        Ok(GpuBuffer {
-            ptr: core::ptr::null_mut(),
-            handle: 0x1002,
-            width,
-            height,
-            stride,
-            size_bytes,
-        })
+        let mut buffer = GpuBuffer::new(width, height, stride)?;
+        buffer.handle = 0x1002;
+        Ok(buffer)
     }
 
     fn render_frame(&mut self, buffer: &GpuBuffer) -> Result<(), GpuError> {
         if !self.initialized {
             return Err(GpuError::InitializationFailed);
         }
+        buffer.validate()?;
         if buffer.size_bytes == 0 {
             return Err(GpuError::RenderFailed);
         }
@@ -300,23 +337,17 @@ impl GpuDriver for IntelDriver {
             return Err(GpuError::InitializationFailed);
         }
         let stride = width * 4;
-        let size_bytes = (stride * height) as usize;
-        self.ggtt_mapped_pages += (size_bytes as u32 + 4095) / 4096;
-
-        Ok(GpuBuffer {
-            ptr: core::ptr::null_mut(),
-            handle: 0x8086,
-            width,
-            height,
-            stride,
-            size_bytes,
-        })
+        let mut buffer = GpuBuffer::new(width, height, stride)?;
+        self.ggtt_mapped_pages += (buffer.size_bytes as u32 + 4095) / 4096;
+        buffer.handle = 0x8086;
+        Ok(buffer)
     }
 
     fn render_frame(&mut self, buffer: &GpuBuffer) -> Result<(), GpuError> {
         if !self.initialized {
             return Err(GpuError::InitializationFailed);
         }
+        buffer.validate()?;
         if buffer.size_bytes == 0 {
             return Err(GpuError::RenderFailed);
         }
@@ -416,22 +447,16 @@ impl GpuDriver for NvidiaDriver {
             return Err(GpuError::InitializationFailed);
         }
         let stride = width * 4;
-        let size_bytes = (stride * height) as usize;
-
-        Ok(GpuBuffer {
-            ptr: core::ptr::null_mut(),
-            handle: 0x10DE,
-            width,
-            height,
-            stride,
-            size_bytes,
-        })
+        let mut buffer = GpuBuffer::new(width, height, stride)?;
+        buffer.handle = 0x10DE;
+        Ok(buffer)
     }
 
     fn render_frame(&mut self, buffer: &GpuBuffer) -> Result<(), GpuError> {
         if !self.initialized {
             return Err(GpuError::InitializationFailed);
         }
+        buffer.validate()?;
         if buffer.size_bytes == 0 {
             return Err(GpuError::RenderFailed);
         }
@@ -528,22 +553,16 @@ impl GpuDriver for VirtioGpuDriver {
             return Err(GpuError::InitializationFailed);
         }
         let stride = width * 4;
-        let size_bytes = (stride * height) as usize;
-
-        Ok(GpuBuffer {
-            ptr: core::ptr::null_mut(),
-            handle: 0x1AF4,
-            width,
-            height,
-            stride,
-            size_bytes,
-        })
+        let mut buffer = GpuBuffer::new(width, height, stride)?;
+        buffer.handle = 0x1AF4;
+        Ok(buffer)
     }
 
     fn render_frame(&mut self, buffer: &GpuBuffer) -> Result<(), GpuError> {
         if !self.initialized {
             return Err(GpuError::InitializationFailed);
         }
+        buffer.validate()?;
         if buffer.size_bytes == 0 {
             return Err(GpuError::RenderFailed);
         }
@@ -621,6 +640,30 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_gpu_buffer_validation() {
+        // Valid buffer
+        let buffer = GpuBuffer::new(1920, 1080, 7680).unwrap();
+        assert!(buffer.validate().is_ok());
+        assert_eq!(buffer.width, 1920);
+        assert_eq!(buffer.height, 1080);
+        assert_eq!(buffer.stride, 7680);
+        assert_eq!(buffer.size_bytes, 1920 * 1080 * 4);
+
+        // Invalid: zero width
+        assert!(GpuBuffer::new(0, 1080, 7680).is_err());
+
+        // Invalid: zero height
+        assert!(GpuBuffer::new(1920, 0, 7680).is_err());
+
+        // Invalid: zero stride
+        assert!(GpuBuffer::new(1920, 1080, 0).is_err());
+
+        // Invalid: overflow in size calculation
+        let huge_width = u32::MAX / 4;
+        assert!(GpuBuffer::new(huge_width, 2, huge_width * 4).is_err());
+    }
+
+    #[test]
     fn test_amdgpu_driver() {
         let mut driver = AmdgpuDriver::new(0x731F);
         assert!(driver.initialize().is_ok());
@@ -633,6 +676,12 @@ mod tests {
 
         let packets = [0x0001, 0x0002, 0x0003];
         assert_eq!(driver.submit_command_ring(&packets), Ok(3));
+
+        // Test buffer creation with validation
+        let buffer = driver.create_buffer(1920, 1080).unwrap();
+        assert!(buffer.validate().is_ok());
+        assert_eq!(buffer.width, 1920);
+        assert_eq!(buffer.height, 1080);
     }
 
     #[test]
@@ -646,6 +695,7 @@ mod tests {
 
         let buf = driver.create_buffer(1920, 1080).unwrap();
         assert_eq!(buf.stride, 1920 * 4);
+        assert!(buf.validate().is_ok());
     }
 
     #[test]
@@ -654,6 +704,9 @@ mod tests {
         assert!(driver.initialize().is_ok());
         let ch = driver.allocate_fifo_channel().unwrap();
         assert_eq!(ch, 1);
+
+        let buffer = driver.create_buffer(1920, 1080).unwrap();
+        assert!(buffer.validate().is_ok());
     }
 
     #[test]
@@ -662,6 +715,10 @@ mod tests {
         assert!(driver.initialize().is_ok());
         let res_id = driver.create_resource_2d(800, 600).unwrap();
         assert_eq!(res_id, 1);
+
+        let buffer = driver.create_buffer(800, 600).unwrap();
+        assert!(buffer.validate().is_ok());
+        assert!(driver.render_frame(&buffer).is_ok());
     }
 
     #[test]
@@ -671,5 +728,19 @@ mod tests {
         manager.register_driver(Box::new(IntelDriver::new(0x9A49)));
         assert_eq!(manager.detect_and_initialize(), Ok(()));
         assert!(manager.get_active_driver().is_some());
+    }
+
+    #[test]
+    fn test_render_frame_validation() {
+        let mut driver = AmdgpuDriver::new(0x731F);
+        driver.initialize().unwrap();
+
+        let valid_buffer = driver.create_buffer(1920, 1080).unwrap();
+        assert!(driver.render_frame(&valid_buffer).is_ok());
+
+        // Test that render_frame validates the buffer
+        let mut invalid_buffer = GpuBuffer::new(1920, 1080, 7680).unwrap();
+        invalid_buffer.width = 0; // Corrupt the buffer
+        assert!(driver.render_frame(&invalid_buffer).is_err());
     }
 }
