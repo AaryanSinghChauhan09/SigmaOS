@@ -25,7 +25,7 @@ pub const BCM4356: u16 = 0x4356;   // BCM4356 802.11ac
 
 // Cypress WiFi Device IDs (802.11ax)
 pub const CYW89820: u16 = 0x0AE0;  // CYW89820 802.11ax
-pub const CYW54591: u16 = 0x0AE0;  // CYW54591 WiFi 6E
+pub const CYW54591: u16 = 0x0AE1;  // CYW54591 WiFi 6E
 
 // MMIO Register Base
 pub const MMIO_SIZE: u32 = 512 * 1024; // 512 KB typical

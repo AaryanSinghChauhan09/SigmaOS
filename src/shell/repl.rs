@@ -1492,19 +1492,6 @@ impl ShellRepl {
                 let dialect = crate::shell::zsh_bash_parity::UniversalShellCompatibilityEngine::detect_shebang_dialect(&code);
                 Ok(format!("Detected shell script dialect: {:?}", dialect))
             }
-
-            ShellCommand::Echo { message } => Ok(message.clone()),
-            ShellCommand::Set { variable, value } => {
-                self.variables.insert(variable.clone(), value.clone());
-                Ok(format!("{} = {}", variable, value))
-            }
-            ShellCommand::Get { variable } => {
-                if let Some(val) = self.variables.get(variable.as_str()) {
-                    Ok(val.clone())
-                } else {
-                    Err(format!("Variable '{}' not found", variable))
-                }
-            }
             _ => Ok("Command executed successfully.".to_string()),
         }
     }
