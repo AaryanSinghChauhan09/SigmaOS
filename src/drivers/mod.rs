@@ -22,6 +22,7 @@ pub mod touch_jingos;
 pub mod printing;
 pub mod usb_hid;
 pub mod sovereign_driver_lifecycle;
+pub mod sovereign_distro_driver_suite;
 pub mod vesa;
 
 pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
@@ -62,3 +63,4 @@ pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 pub use distro_device_expansion::*;
+pub use sovereign_distro_driver_suite::*;
