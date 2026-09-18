@@ -63,6 +63,8 @@ pub enum DistroSubsystemMode {
     LinuxAntiX,
     LinuxZorin,
     LinuxMint,
+    LinuxGaruda,
+    LinuxCachyOS,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -247,6 +249,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::BedrockLinux => ServiceSupervisorType::Systemd,
             DistroSubsystemMode::LinuxGentoo
             | DistroSubsystemMode::FreeBsd
@@ -284,6 +288,11 @@ impl SovereignUniversalDistroBridge {
                 | DistroSubsystemMode::LinuxTails,
                 "/var/lib/pkg",
             ) => "/var/lib/dpkg".to_string(),
+            (
+                DistroSubsystemMode::LinuxGaruda
+                | DistroSubsystemMode::LinuxCachyOS,
+                "/var/lib/pkg",
+            ) => "/var/lib/pacman".to_string(),
             (DistroSubsystemMode::LinuxAlpine, "/var/lib/pkg") => "/lib/apk/db".to_string(),
             (DistroSubsystemMode::LinuxVoid, "/var/lib/pkg") => "/var/db/xbps".to_string(),
             (
@@ -346,6 +355,8 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxParrot
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxZorin
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS
             | DistroSubsystemMode::BedrockLinux => supervisor == ServiceSupervisorType::Systemd,
 
             DistroSubsystemMode::LinuxGentoo
@@ -381,7 +392,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::LinuxZorin => format!("{}.deb", input_pkg),
-            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", input_pkg),
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS => format!("{}.pkg.tar.zst", input_pkg),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", input_pkg),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", input_pkg),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", input_pkg),
@@ -420,7 +433,9 @@ impl SovereignUniversalDistroBridge {
             | DistroSubsystemMode::LinuxKali
             | DistroSubsystemMode::LinuxAntiX
             | DistroSubsystemMode::LinuxZorin => format!("{}.deb", action),
-            DistroSubsystemMode::LinuxArch => format!("{}.pkg.tar.zst", action),
+            DistroSubsystemMode::LinuxArch
+            | DistroSubsystemMode::LinuxGaruda
+            | DistroSubsystemMode::LinuxCachyOS => format!("{}.pkg.tar.zst", action),
             DistroSubsystemMode::LinuxAlpine => format!("{}.apk", action),
             DistroSubsystemMode::LinuxVoid => format!("{}.xbps", action),
             DistroSubsystemMode::LinuxNix => format!("{}.nix", action),
@@ -637,6 +652,12 @@ impl SovereignUniversalDistroBridge {
             "compliance" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'compliance' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "compositor" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'compositor' with action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -930,6 +951,12 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "launcher" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'launcher' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "legal" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'legal' with action '{}' under distro mode '{:?}'",
@@ -988,9 +1015,21 @@ impl SovereignUniversalDistroBridge {
                     virt_addr, action, self.mode
                 ))
             }
+            "monitor" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'monitor' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "monitoring" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'monitoring' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "notification" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'notification' with action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -1075,6 +1114,12 @@ impl SovereignUniversalDistroBridge {
             "observability" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'observability' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "onboarding" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'onboarding' with action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -1308,6 +1353,12 @@ impl SovereignUniversalDistroBridge {
             "testing" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'testing' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "theming" => {
+                Ok(format!(
+                    "Dispatched operation for subsystem 'theming' with action '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -1576,6 +1627,36 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "garuda_dracut" => {
+                Ok(format!(
+                    "Dispatched Garuda Linux Dracut initramfs Btrfs snapshot hook for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "cachy_bore" => {
+                Ok(format!(
+                    "Dispatched CachyOS BORE latency scheduler tuning for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "antix_runit" => {
+                Ok(format!(
+                    "Dispatched antiX Linux runit fast boot supervisor for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "zorin_chameleon" => {
+                Ok(format!(
+                    "Dispatched Zorin OS Chameleon UI adaptive theme switching for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "kali_recon" => {
+                Ok(format!(
+                    "Dispatched Kali Linux automated recon suite orchestration for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             _ => Err("Unknown target subsystem"),
         }
     }
@@ -1602,6 +1683,7 @@ impl SovereignUniversalDistroBridge {
             "community",
             "compatibility",
             "compliance",
+            "compositor",
             "compression",
             "config",
             "container",
@@ -1648,6 +1730,7 @@ impl SovereignUniversalDistroBridge {
             "klib",
             "lang",
             "launch_ready",
+            "launcher",
             "legal",
             "loader",
             "location",
@@ -1657,13 +1740,16 @@ impl SovereignUniversalDistroBridge {
             "microphone",
             "ml",
             "mm",
+            "monitor",
             "monitoring",
             "net",
             "network",
             "networking",
             "nim",
             "nlp",
+            "notification",
             "observability",
+            "onboarding",
             "orchestration",
             "package",
             "performance",
@@ -1700,6 +1786,7 @@ impl SovereignUniversalDistroBridge {
             "syscall",
             "system",
             "testing",
+            "theming",
             "thermal",
             "thread",
             "time",
@@ -3226,6 +3313,9 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxKali,
             DistroSubsystemMode::LinuxAntiX,
             DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxMint,
+            DistroSubsystemMode::LinuxGaruda,
+            DistroSubsystemMode::LinuxCachyOS,
         ];
 
         for m in modes {
@@ -3262,6 +3352,9 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::LinuxKali,
             DistroSubsystemMode::LinuxAntiX,
             DistroSubsystemMode::LinuxZorin,
+            DistroSubsystemMode::LinuxMint,
+            DistroSubsystemMode::LinuxGaruda,
+            DistroSubsystemMode::LinuxCachyOS,
         ];
 
         let target_subsystems = [
@@ -3270,6 +3363,8 @@ mod cross_subsystem_tests {
             "boot", "container", "virtualization", "audio", "input",
             "thermal", "memory", "syscall", "device", "crypto", "ai", "monitoring",
             "desktop", "compiler", "i18n", "bluetooth", "firewall", "diagnostics", "recovery", "time",
+            "compositor", "launcher", "monitor", "notification", "onboarding", "theming",
+            "garuda_dracut", "cachy_bore", "antix_runit", "zorin_chameleon", "kali_recon",
         ];
 
         for m in modes {
