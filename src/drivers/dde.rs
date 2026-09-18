@@ -725,7 +725,7 @@ impl Default for HardwareBroker {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::vec;

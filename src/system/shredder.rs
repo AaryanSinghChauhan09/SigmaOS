@@ -219,7 +219,7 @@ pub enum ShredderError {
     FileTooLarge,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

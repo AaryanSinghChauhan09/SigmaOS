@@ -490,7 +490,7 @@ impl Default for DamageTracker {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::format;

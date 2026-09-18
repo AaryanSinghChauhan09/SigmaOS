@@ -410,7 +410,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

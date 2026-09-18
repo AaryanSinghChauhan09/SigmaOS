@@ -192,7 +192,7 @@ impl Default for SovereignPdf24Engine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::string::ToString;

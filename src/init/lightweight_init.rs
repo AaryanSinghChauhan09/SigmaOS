@@ -202,7 +202,7 @@ impl Default for LightweightInitDaemon {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -28,13 +28,13 @@ use core::mem;
 #[cfg(not(test))]
 use core::ops::{Deref, DerefMut};
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use core::ptr::{self, NonNull};
-#[cfg(test_disabled)]
+#[cfg(test)]
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(test_disabled)]
+#[cfg(test)]
 use core::mem;
-#[cfg(test_disabled)]
+#[cfg(test)]
 use core::ops::{Deref, DerefMut};
 
 /// Report ID
@@ -663,14 +663,14 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc, Layout};
     let layout = Layout::from_size_align_unchecked(size, 8);
     std::alloc::alloc(layout)
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 unsafe fn free(_ptr: *mut u8) {
     // No-op for test stub allocation
 }
@@ -714,7 +714,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

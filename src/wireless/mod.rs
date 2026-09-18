@@ -305,7 +305,7 @@ impl Default for WirelessManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

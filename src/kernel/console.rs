@@ -1,9 +1,7 @@
-#![cfg_attr(not(test), no_std)]
 // SigmaOS Kernel Console Output Infrastructure
 // Provides VGA and serial output for kernel logging and panic messages
 // Solves critical gap: no actual kernel output implementation
 
-use core::fmt::Write;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// Console output backend type
@@ -258,7 +256,7 @@ pub fn klog(level: LogLevel, message: &str) {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

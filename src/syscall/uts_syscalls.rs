@@ -194,7 +194,7 @@ pub fn sys_getdomainname(
     0
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

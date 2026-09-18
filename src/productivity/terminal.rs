@@ -387,7 +387,7 @@ pub enum TerminalError {
     ShellError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

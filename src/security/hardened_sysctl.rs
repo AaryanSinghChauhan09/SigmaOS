@@ -206,7 +206,7 @@ impl Default for HardenedSysctlManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

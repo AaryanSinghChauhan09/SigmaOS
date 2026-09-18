@@ -302,7 +302,7 @@ fn f64_sqrt(x: f64) -> f64 {
     res
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

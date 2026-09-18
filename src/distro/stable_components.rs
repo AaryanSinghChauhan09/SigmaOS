@@ -325,7 +325,7 @@ impl SystemdCgroupGovernor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -300,7 +300,7 @@ impl Default for NetworkTuner {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

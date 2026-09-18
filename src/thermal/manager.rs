@@ -202,7 +202,7 @@ impl ThermalThrottling for SimpleThermalThrottling {
     fn get_throttle_level(&self) -> u32 { self.throttle_level.load(Ordering::SeqCst) as u32 }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

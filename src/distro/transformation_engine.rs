@@ -372,7 +372,7 @@ impl Default for IotDeviceMeshOrchestrator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

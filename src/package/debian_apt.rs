@@ -316,7 +316,7 @@ impl Default for SigmaAPT {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

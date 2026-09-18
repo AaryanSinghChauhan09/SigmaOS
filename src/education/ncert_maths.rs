@@ -460,7 +460,7 @@ impl Default for NcertTeacherAnalyticsEngine {
 // UNIT TESTS
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

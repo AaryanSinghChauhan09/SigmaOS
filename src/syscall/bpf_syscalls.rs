@@ -315,7 +315,7 @@ fn sys_bpf_prog_test(
     Ok(0)
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

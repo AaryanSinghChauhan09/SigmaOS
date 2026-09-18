@@ -346,7 +346,7 @@ impl FileSearch for SimpleFileSearch {
 }
 
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

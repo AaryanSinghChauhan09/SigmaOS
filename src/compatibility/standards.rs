@@ -115,7 +115,7 @@ impl PartialOrd for PosixComplianceLevel {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

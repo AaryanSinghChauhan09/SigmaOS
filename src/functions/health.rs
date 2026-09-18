@@ -309,7 +309,7 @@ impl Default for RecoveryTool {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -162,7 +162,7 @@ impl Default for SovereignOliveTinEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

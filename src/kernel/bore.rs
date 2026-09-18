@@ -267,7 +267,7 @@ impl Default for BoreScheduler {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -478,7 +478,7 @@ impl Default for SigmaAudio {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

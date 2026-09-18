@@ -1,4 +1,3 @@
-#![cfg_attr(not(test), no_std)]
 // SigmaOS Syslog System
 // Linux/BSD distro-inspired logging system
 // Handles system logging, log rotation, and log management
@@ -337,7 +336,7 @@ pub enum SyslogError {
     RotationError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

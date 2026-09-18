@@ -168,7 +168,7 @@ impl Default for ThermalScheduler {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

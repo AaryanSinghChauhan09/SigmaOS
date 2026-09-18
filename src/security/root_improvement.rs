@@ -1060,7 +1060,7 @@ impl Default for RootlessPortBindingManager {
 // Comprehensive Unit Tests
 // ==========================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

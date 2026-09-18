@@ -566,7 +566,7 @@ pub enum UpdateError {
     ChecksumMismatch(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

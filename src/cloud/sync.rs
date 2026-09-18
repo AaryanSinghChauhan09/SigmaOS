@@ -198,7 +198,7 @@ impl AutoSync for SimpleAutoSync {
     fn is_auto_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

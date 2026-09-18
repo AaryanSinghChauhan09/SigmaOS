@@ -218,7 +218,7 @@ pub enum TcpError {
     ConnectionRefused,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

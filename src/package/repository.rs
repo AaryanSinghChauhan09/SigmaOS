@@ -3,8 +3,6 @@
 // Manages package repositories, sources, APT/DNF-style pinning, signature verification,
 // rankmirrors/reflector mirror failover, drpm delta indexes, and Nix/Guix content-addressed stores.
 
-#![cfg_attr(not(test), no_std)]
-
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -703,7 +701,7 @@ pub struct PackageTransaction {
     pub status_completed: bool,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

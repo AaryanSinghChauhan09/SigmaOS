@@ -237,7 +237,7 @@ impl Default for SovereignFilesystem {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

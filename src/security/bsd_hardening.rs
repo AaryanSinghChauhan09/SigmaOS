@@ -399,7 +399,7 @@ impl Default for BsdHardeningSuite {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

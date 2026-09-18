@@ -99,7 +99,7 @@ impl Default for ProcFileSystem {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -727,7 +727,7 @@ impl Default for SimpleVMM {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

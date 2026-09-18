@@ -3,7 +3,7 @@
 // FIPS/CIS Compliance Scanners, Automated Remediation Playbooks, and System Drift Detectors.
 
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 
 
 use std::string::String;
@@ -243,7 +243,7 @@ impl Default for SupportServicesManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

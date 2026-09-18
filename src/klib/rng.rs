@@ -106,7 +106,7 @@ impl Rng for OsRng {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

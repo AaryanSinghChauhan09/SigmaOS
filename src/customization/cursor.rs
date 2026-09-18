@@ -154,7 +154,7 @@ impl Default for CursorThemeEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

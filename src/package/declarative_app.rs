@@ -228,7 +228,7 @@ impl Default for ShardsMarketplace {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

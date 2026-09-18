@@ -576,7 +576,7 @@ impl<const BITMAP_SIZE: usize> BitmapFrameAllocator<BITMAP_SIZE> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

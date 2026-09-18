@@ -454,7 +454,7 @@ impl Default for FuzzingTestFramework {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

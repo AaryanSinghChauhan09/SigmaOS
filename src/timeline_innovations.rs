@@ -807,7 +807,7 @@ impl Default for MultiPhaseHardwareSovereigntyEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

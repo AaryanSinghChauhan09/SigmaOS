@@ -252,7 +252,7 @@ impl Default for GuixShepherdServiceEngine {
 // Unit Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

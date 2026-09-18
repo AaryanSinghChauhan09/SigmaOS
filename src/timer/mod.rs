@@ -148,7 +148,7 @@ impl Default for TimerCallback {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     

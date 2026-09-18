@@ -235,7 +235,7 @@ impl Default for SubsystemRegistry {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

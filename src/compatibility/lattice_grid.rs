@@ -354,7 +354,7 @@ impl PeripheralNexus for TapeNexus {
 // TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

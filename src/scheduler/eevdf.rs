@@ -336,7 +336,7 @@ impl Default for SInitSupervisor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

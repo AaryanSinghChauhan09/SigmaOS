@@ -216,7 +216,7 @@ impl Default for AssociativeTlbCache {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

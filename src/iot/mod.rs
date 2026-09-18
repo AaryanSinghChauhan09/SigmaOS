@@ -329,7 +329,7 @@ impl Default for SigmaIoT {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

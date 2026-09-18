@@ -501,7 +501,7 @@ impl Default for SovereignCatalog {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

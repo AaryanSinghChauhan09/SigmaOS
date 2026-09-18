@@ -676,7 +676,7 @@ impl NativeStr {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

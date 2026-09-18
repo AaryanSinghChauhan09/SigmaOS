@@ -728,7 +728,7 @@ impl Default for MultiDistroDependencyInstaller {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

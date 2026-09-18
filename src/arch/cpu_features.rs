@@ -721,7 +721,7 @@ impl Default for SovereignXcr0State {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     

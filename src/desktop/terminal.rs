@@ -522,13 +522,13 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 extern "C" {
     fn malloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     malloc(size)
@@ -577,7 +577,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

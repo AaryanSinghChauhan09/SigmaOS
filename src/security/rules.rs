@@ -1,4 +1,3 @@
-#![cfg_attr(not(test), no_std)]
 // SPDX-License-Identifier: MIT
 // SigmaOS Security Rules Subsystem (`src/security/rules.rs`)
 // Linux & BSD Distribution-Inspired System Security, Audit, Sandboxing,
@@ -533,7 +532,7 @@ impl Default for SovereignCapsicumRightsRules {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

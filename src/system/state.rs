@@ -359,7 +359,7 @@ pub fn get_system_config_mut() -> &'static mut SystemConfiguration {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

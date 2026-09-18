@@ -1027,7 +1027,7 @@ impl LegalLicensingAuditor {
 // UNIT TESTS (Items 61-80)
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

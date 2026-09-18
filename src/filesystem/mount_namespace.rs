@@ -513,7 +513,7 @@ impl KernelNamespace for MountNamespace {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

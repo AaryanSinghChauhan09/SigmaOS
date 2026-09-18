@@ -607,7 +607,7 @@ fn log2_usize(val: usize) -> u32 {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

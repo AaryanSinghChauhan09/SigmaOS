@@ -220,7 +220,7 @@ impl Default for StatutoryGovernanceLayer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

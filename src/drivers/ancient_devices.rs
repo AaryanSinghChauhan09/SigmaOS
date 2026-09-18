@@ -222,7 +222,7 @@ pub fn create_cga_graphics() -> UdfAncientDevice {
     UdfAncientDevice::new("CGA Video Adapter", 0x3D4, &cga_bytecode)
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

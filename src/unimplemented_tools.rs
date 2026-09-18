@@ -3923,7 +3923,7 @@ impl Default for ClearLinuxStatelessEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

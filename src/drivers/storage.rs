@@ -128,7 +128,7 @@ pub enum StorageError {
     WriteProtected,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

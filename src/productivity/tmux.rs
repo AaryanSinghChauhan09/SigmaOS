@@ -683,7 +683,7 @@ impl Default for TmuxSessionManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

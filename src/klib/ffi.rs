@@ -108,7 +108,7 @@ pub unsafe fn cstrcat(dest: *mut i8, src: *const i8) -> *mut i8 {
     dest
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -237,7 +237,7 @@ impl Default for Compositor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

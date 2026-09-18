@@ -2,7 +2,7 @@
 // Implements Arch Build System (ABS), Pacman database synchronizations, AUR package compilation helper, and Mirror ranker.
 
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 extern crate std;
 
 
@@ -655,7 +655,7 @@ impl Default for AurHelper {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

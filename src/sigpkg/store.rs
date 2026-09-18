@@ -114,7 +114,7 @@ pub enum StoreError {
     IoError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -289,7 +289,7 @@ impl NixOsHermeticCasStore {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod distro_pkg_tests {
     use super::*;
 

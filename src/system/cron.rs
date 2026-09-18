@@ -697,7 +697,7 @@ impl Default for SovereignCronDaemon {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

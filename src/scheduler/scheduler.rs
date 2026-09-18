@@ -543,7 +543,7 @@ impl Scheduler for PriorityScheduler {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

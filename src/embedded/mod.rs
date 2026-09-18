@@ -466,7 +466,7 @@ impl EmbeddedSubsystem {
 /// Global embedded subsystem
 pub static GLOBAL_EMBEDDED_SUBSYSTEM: EmbeddedSubsystem = EmbeddedSubsystem::new();
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

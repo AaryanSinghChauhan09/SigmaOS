@@ -454,7 +454,7 @@ impl Default for Ext4FilesystemManager {
 // Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

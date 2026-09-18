@@ -9,13 +9,13 @@ use core::any::Any;
 
 use crate::security::CapabilityToken;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub bits: u64,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 impl CapabilityToken {
     pub fn new() -> Self {
         Self { bits: 0 }
@@ -720,7 +720,7 @@ pub enum RegistryError {
 // Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::vec;
@@ -976,7 +976,7 @@ impl PackageRecipeParser {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod extra_tests {
     use super::*;
 

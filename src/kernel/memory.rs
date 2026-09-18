@@ -7,7 +7,7 @@ use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::klib::HashMap;
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::HashMap;
 
 #[path = "memory/resource_allocator.rs"]
@@ -599,7 +599,7 @@ impl Ne2000DmaBuffer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

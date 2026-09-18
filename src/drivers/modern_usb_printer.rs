@@ -16,21 +16,21 @@
 // Modern Plug-and-Play USB printing driver
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceGeneration {
     Legacy,
     Modern,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerState {
     Off,
     On,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 pub trait PeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
@@ -112,7 +112,7 @@ impl PeripheralDevice for ModernUsbPrinterDriver {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

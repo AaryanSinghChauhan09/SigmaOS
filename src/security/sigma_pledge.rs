@@ -172,7 +172,7 @@ impl Default for SyscallFilter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

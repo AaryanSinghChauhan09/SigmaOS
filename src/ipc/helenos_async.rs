@@ -785,7 +785,7 @@ impl Default for HelenAsyncSystem {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

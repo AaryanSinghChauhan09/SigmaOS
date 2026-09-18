@@ -1677,7 +1677,7 @@ pub enum VmError {
     FeatureNotSupported(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

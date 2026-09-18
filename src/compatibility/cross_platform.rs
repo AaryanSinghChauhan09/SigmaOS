@@ -1002,7 +1002,7 @@ pub enum CompatibilityError {
     ContainerizationFailed,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

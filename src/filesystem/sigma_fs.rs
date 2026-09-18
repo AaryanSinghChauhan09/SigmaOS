@@ -716,7 +716,7 @@ impl SigmaFsVirtio {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     #[test]
     fn test_enhanced_sovereign_fhs_hierarchy() {

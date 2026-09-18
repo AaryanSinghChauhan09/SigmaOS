@@ -147,7 +147,7 @@ impl SchedClass for MlfqSchedClass {
     fn prio_changed(&self, _rq: &mut RunQueue, _task: &mut Task) {}
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

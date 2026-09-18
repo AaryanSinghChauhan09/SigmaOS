@@ -215,7 +215,7 @@ impl Default for SovereignLinkEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

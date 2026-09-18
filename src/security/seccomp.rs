@@ -392,7 +392,7 @@ impl Clone for SeccompManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

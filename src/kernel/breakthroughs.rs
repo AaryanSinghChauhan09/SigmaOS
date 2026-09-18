@@ -5,13 +5,13 @@
 
 use crate::security::CapabilityToken;
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub permissions: u64,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 impl CapabilityToken {
     pub fn from_bits(permissions: u64) -> Self {
         Self { permissions }

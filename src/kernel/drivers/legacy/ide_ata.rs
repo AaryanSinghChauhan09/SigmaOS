@@ -284,7 +284,7 @@ impl Default for IdeAtaController {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

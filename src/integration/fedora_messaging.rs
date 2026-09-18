@@ -416,7 +416,7 @@ impl Default for Bugzilla2FedmsgBridgeEngine {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

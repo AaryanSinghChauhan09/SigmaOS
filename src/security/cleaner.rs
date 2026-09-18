@@ -66,7 +66,7 @@ impl SecureCleaner {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -201,7 +201,7 @@ impl Default for MetadataScrubber {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tails_parity_tests {
     use super::*;
 

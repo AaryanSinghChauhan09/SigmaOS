@@ -449,7 +449,7 @@ impl Default for SovereignPowerToys {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -525,7 +525,7 @@ impl Default for VoidMuslToolchain {
 // UNIT TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

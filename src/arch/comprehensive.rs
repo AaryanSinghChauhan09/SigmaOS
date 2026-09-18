@@ -570,7 +570,7 @@ impl SysctlNode {
     pub fn is_writable(&self) -> bool { self.is_writable }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

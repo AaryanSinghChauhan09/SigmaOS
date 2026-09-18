@@ -151,7 +151,7 @@ impl VisaVulnerabilityAgenticHarness {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

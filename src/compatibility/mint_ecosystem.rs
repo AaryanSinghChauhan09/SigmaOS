@@ -316,7 +316,7 @@ impl Default for LinuxMintEcosystemHub {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

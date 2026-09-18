@@ -186,7 +186,7 @@ impl PeripheralDevice for ModernUsbController {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

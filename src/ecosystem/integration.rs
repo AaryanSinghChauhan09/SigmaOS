@@ -5,7 +5,7 @@ use std::format;
 // Mobile/embedded presence matrices, enterprise partnerships, hardware/software certification pipelines,
 // zero-setup dev environments, IDE debugger support, Docker compatibility layers, and Kubernetes bootstrap configurations.
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use crate::klib::HashMap;
 #[cfg(not(test))]
 use crate::klib::HashMap;
@@ -197,7 +197,7 @@ impl Default for EcosystemManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

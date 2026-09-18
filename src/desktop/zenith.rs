@@ -426,7 +426,7 @@ impl DesktopCompositor for SimpleDesktopCompositor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

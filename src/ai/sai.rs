@@ -735,7 +735,7 @@ impl Default for SaiEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

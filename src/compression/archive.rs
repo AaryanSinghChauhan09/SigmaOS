@@ -159,7 +159,7 @@ impl Default for ArchiveManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

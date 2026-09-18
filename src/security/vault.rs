@@ -427,7 +427,7 @@ pub enum VaultError {
     PermissionDenied(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -214,7 +214,7 @@ impl Default for TilingWindowManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

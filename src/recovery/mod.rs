@@ -266,7 +266,7 @@ impl Default for RecoveryManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

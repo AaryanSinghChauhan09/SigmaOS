@@ -391,7 +391,7 @@ fn sigma_oom(layout: Layout) -> ! {
 // Unit tests (no_std compatible via test harness)
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::alloc::Layout;

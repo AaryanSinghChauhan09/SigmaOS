@@ -590,7 +590,7 @@ impl Controller for NetClsController {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

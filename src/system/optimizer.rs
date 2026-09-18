@@ -561,7 +561,7 @@ pub enum OptimizationError {
     SystemError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

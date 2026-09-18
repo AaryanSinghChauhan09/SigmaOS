@@ -579,7 +579,7 @@ fn rand_simple() -> u32 {
     (next_seed / 65536) % 32768
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -198,7 +198,7 @@ impl Default for NumaAllocator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

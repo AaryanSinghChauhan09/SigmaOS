@@ -542,7 +542,7 @@ impl Default for PerformanceOptimizer {
 // Tests
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

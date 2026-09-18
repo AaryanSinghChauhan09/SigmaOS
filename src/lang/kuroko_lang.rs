@@ -1277,7 +1277,7 @@ impl Default for KurokoREPL {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

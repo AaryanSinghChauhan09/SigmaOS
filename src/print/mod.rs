@@ -147,7 +147,7 @@ impl Default for PrintSpooler {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     

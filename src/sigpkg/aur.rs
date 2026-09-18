@@ -346,7 +346,7 @@ impl Default for AurSandboxOrchestrator {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

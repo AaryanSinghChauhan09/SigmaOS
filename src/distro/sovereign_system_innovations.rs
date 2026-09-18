@@ -354,7 +354,7 @@ impl Default for GamifiedSystemMonitor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

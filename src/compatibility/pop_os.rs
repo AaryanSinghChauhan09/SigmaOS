@@ -182,7 +182,7 @@ impl Default for PopOsCosmicScheduler {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

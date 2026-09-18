@@ -249,7 +249,7 @@ macro_rules! check_pledge {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

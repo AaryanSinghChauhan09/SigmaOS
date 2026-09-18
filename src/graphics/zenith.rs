@@ -563,7 +563,7 @@ impl Default for ZenithCompositor {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

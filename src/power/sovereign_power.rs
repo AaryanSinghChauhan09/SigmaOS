@@ -113,7 +113,7 @@ impl Default for SovereignPowerThermalGovernance {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

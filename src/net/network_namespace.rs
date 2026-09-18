@@ -346,7 +346,7 @@ impl Default for NetworkNamespaceManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

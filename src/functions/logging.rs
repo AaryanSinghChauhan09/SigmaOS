@@ -315,7 +315,7 @@ impl Default for LogAnalyzer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

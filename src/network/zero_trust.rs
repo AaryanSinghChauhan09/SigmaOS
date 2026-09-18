@@ -560,7 +560,7 @@ impl ZeroTrustEngine for SimpleZeroTrustEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

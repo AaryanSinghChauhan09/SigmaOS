@@ -696,7 +696,7 @@ pub struct PfStats {
     pub log_enabled: bool,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

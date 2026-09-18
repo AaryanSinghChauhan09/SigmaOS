@@ -216,7 +216,7 @@ impl Default for SimpleTaskQueue {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

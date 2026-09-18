@@ -2177,6 +2177,7 @@ pub struct RedoxOsSchemeHandlerEngine {
     pub next_fd: u32,
 }
 
+#[allow(dead_code)]
 impl RedoxOsSchemeHandlerEngine {
     pub fn new(scheme_name: &str) -> Self {
         Self {
@@ -2228,12 +2229,14 @@ impl RedoxOsSchemeHandlerEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub struct GenodeCapability {
     pub cap_id: u64,
     pub service_name: String,
     pub local_name: String,
 }
 
+#[allow(dead_code)]
 pub struct GenodeCapabilityRouterEngine {
     pub capabilities: Vec<GenodeCapability>,
     pub active_sessions_count: u64,
@@ -2279,12 +2282,14 @@ impl Default for GenodeCapabilityRouterEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub struct ZirconHandle {
     pub handle_val: u32,
     pub rights: u32, // e.g. ZX_RIGHT_READ | ZX_RIGHT_WRITE
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub struct ZirconChannelMessage {
     pub txid: u32,
     pub ordinal: u64, // FIDL method ordinal
@@ -2292,6 +2297,7 @@ pub struct ZirconChannelMessage {
     pub handles: Vec<ZirconHandle>,
 }
 
+#[allow(dead_code)]
 pub struct FuchsiaZirconChannelEngine {
     pub channel_messages: Vec<ZirconChannelMessage>,
     pub handles: Vec<ZirconHandle>,
@@ -2344,12 +2350,14 @@ impl Default for FuchsiaZirconChannelEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub struct XbpsTriggerHook {
     pub trigger_name: String, // e.g. "update-desktop-database", "fontconfig-cache"
     pub target_directory: String,
     pub is_executed: bool,
 }
 
+#[allow(dead_code)]
 pub struct VoidXbpsTriggerEngine {
     pub registered_triggers: Vec<XbpsTriggerHook>,
     pub executed_triggers_count: u64,
@@ -2401,6 +2409,7 @@ impl Default for VoidXbpsTriggerEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub struct Apk3PackageManifest {
     pub pkg_name: String,
     pub version: String,
@@ -2408,6 +2417,7 @@ pub struct Apk3PackageManifest {
     pub ed25519_signature: Vec<u8>,
 }
 
+#[allow(dead_code)]
 pub struct AlpineApk3SignatureEngine {
     pub trusted_keys: Vec<Vec<u8>>,
     pub verified_packages_count: u64,
@@ -2452,6 +2462,7 @@ impl Default for AlpineApk3SignatureEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum IoUringOpcode {
     Nop,
     Readv,
@@ -2461,6 +2472,7 @@ pub enum IoUringOpcode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub struct IoUringSqEntry {
     pub user_data: u64,
     pub opcode: IoUringOpcode,
@@ -2470,12 +2482,14 @@ pub struct IoUringSqEntry {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub struct IoUringCqEntry {
     pub user_data: u64,
     pub res: i32,
     pub flags: u32,
 }
 
+#[allow(dead_code)]
 pub struct SovereignIoUringEngine {
     pub sq_ring: Vec<IoUringSqEntry>,
     pub cq_ring: Vec<IoUringCqEntry>,
@@ -2543,6 +2557,7 @@ impl SovereignIoUringEngine {
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum GeomClassType {
     Stripe,
     Mirror,
@@ -2551,6 +2566,7 @@ pub enum GeomClassType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum GeomBioCmd {
     Read,
     Write,
@@ -2558,6 +2574,7 @@ pub enum GeomBioCmd {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub struct GeomBioRequest {
     pub cmd: GeomBioCmd,
     pub offset: u64,
@@ -2566,6 +2583,7 @@ pub struct GeomBioRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[allow(dead_code)]
 pub struct GeomProvider {
     pub provider_name: String,
     pub class_type: GeomClassType,
@@ -2574,6 +2592,7 @@ pub struct GeomProvider {
     pub sub_providers: Vec<String>,
 }
 
+#[allow(dead_code)]
 pub struct FreeBsdGeomTopologyEngine {
     pub providers: Vec<GeomProvider>,
 }
@@ -3704,6 +3723,7 @@ impl Default for SovereignNginxIngressRouter {
 // =========================================================================
 
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
 pub struct MetricCounter {
     pub name: String,
     pub value: u64,

@@ -147,7 +147,7 @@ impl Default for GamepadDriver {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     

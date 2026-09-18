@@ -15,7 +15,7 @@
 
 /// SigmaOS Workqueue async deferred execution engine
 /// Runs deferred kernel tasks in thread context (Linux kernel workqueue.c & BSD taskqueue parity)
-#[cfg(test_disabled)]
+#[cfg(test)]
 use crate::klib::VecDeque;
 
 #[cfg(not(test))]
@@ -144,7 +144,7 @@ impl Workqueue {
 // Unit Tests Module
 // ==========================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use core::sync::atomic::{AtomicUsize, Ordering};

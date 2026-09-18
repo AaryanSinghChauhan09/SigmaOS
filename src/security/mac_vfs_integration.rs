@@ -266,7 +266,7 @@ pub fn get_mac_vfs_mut() -> Option<&'static mut MacVfsIntegration> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

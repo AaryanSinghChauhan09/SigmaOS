@@ -2,7 +2,7 @@
 // Implements x86-64-v3/v4 Microarchitecture detection, BORE CPU Scheduler Governor, and CachyOS Kernel Variant Selector.
 
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 
 
 use std::format;

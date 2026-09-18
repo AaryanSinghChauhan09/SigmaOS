@@ -22,7 +22,7 @@ use std::vec::Vec;
 // OOP-based startup process optimization with dependency analysis
 
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::BTreeMap;
 
 // Instant not in no_std
@@ -644,7 +644,7 @@ impl Default for StartupOptimizer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

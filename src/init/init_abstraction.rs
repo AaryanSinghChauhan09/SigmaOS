@@ -154,7 +154,7 @@ impl InitSystem for UniversalInitController {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

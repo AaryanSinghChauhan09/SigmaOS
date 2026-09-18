@@ -591,7 +591,7 @@ pub struct StorageStats {
     pub arc_hit_ratio: f64,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -233,7 +233,7 @@ impl NotificationManager for SimpleNotificationManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

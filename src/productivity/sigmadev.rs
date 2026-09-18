@@ -74,7 +74,7 @@ impl SigmaDevIde {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

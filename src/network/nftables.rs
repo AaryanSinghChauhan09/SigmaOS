@@ -1031,7 +1031,7 @@ pub struct NftablesStats {
     pub total_connections: usize,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

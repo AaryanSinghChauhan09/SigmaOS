@@ -362,7 +362,7 @@ impl OfflineMode for SimpleOfflineMode {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

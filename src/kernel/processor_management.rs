@@ -217,7 +217,7 @@ impl Default for HardwarePerfCounters {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

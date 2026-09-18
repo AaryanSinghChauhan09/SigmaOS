@@ -455,7 +455,7 @@ impl Clone for MemoryController {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

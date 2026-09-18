@@ -52,7 +52,7 @@ impl<S: Clone, A> Store<S, A> {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::rc::Rc;

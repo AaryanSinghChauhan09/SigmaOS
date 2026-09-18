@@ -178,7 +178,7 @@ impl UserDefinedKernelManager {
 // TESTS
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

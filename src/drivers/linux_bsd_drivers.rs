@@ -1740,7 +1740,7 @@ impl SocketCanDriver {
 // Unit Tests Module
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

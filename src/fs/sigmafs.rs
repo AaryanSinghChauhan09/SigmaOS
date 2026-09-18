@@ -357,7 +357,7 @@ impl Default for TransactionalJournal {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

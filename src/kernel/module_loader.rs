@@ -274,7 +274,7 @@ impl Default for SovereignKernelModuleManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

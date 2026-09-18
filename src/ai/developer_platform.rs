@@ -332,7 +332,7 @@ pub fn compute_blake3_simulated(data: &[u8]) -> [u8; 32] {
     hash
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -236,7 +236,7 @@ pub enum VerifyError {
     KeyNotFound,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

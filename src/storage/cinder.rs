@@ -293,7 +293,7 @@ impl Default for CinderBlockStorageEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

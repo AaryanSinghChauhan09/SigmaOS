@@ -21,7 +21,7 @@ use std::vec::Vec;
 // OOP-based calendar with events, reminders, and scheduling
 
 use crate::klib::btreemap::BTreeMap;
-#[cfg(test_disabled)]
+#[cfg(test)]
 use std::collections::BTreeMap;
 // SystemTime not in no_std
 
@@ -406,7 +406,7 @@ pub enum CalendarError {
     StorageError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

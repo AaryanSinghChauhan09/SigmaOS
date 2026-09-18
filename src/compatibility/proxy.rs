@@ -819,7 +819,7 @@ impl PrivacySandbox {
 // Unit Tests for the Proxy-Based Compatibility Subsystems
 // =========================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

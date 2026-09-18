@@ -511,7 +511,7 @@ impl Default for NetworkManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

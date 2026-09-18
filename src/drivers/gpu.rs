@@ -315,7 +315,7 @@ pub enum GpuError {
     HardwareHang,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -841,7 +841,7 @@ mod open_source_file_manager_tests_2 {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     #[test]
     fn test_opensource_file_manager_enhancements() {

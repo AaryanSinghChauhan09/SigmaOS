@@ -154,7 +154,7 @@ pub enum GoodsType {
     LuxuryWithCess,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

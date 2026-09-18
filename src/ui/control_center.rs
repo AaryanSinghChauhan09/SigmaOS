@@ -212,7 +212,7 @@ impl Default for UnifiedControlCenter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

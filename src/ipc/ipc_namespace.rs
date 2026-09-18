@@ -529,7 +529,7 @@ impl KernelNamespace for IpcNamespace {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

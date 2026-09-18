@@ -159,7 +159,7 @@ impl Default for AsyncIoRingEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

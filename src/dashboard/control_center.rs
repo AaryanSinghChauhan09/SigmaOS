@@ -483,7 +483,7 @@ pub enum ControlCenterError {
     UpdateError(String),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

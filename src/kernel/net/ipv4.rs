@@ -338,7 +338,7 @@ impl Ipv4Stack {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

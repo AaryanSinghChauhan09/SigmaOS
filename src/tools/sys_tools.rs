@@ -196,7 +196,7 @@ impl Default for SovereignSysctl {
 // 4. Unit Tests
 // ==========================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

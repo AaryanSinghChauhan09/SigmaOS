@@ -800,7 +800,7 @@ pub enum VpnError {
     ProtocolNotSupported,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

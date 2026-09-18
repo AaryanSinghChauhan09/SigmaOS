@@ -533,7 +533,7 @@ pub struct CompatibilityReport {
     pub results: Vec<(DeviceID, CompatibilityResult)>,
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

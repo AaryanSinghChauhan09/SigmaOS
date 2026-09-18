@@ -1093,7 +1093,7 @@ impl Default for BpfVm {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

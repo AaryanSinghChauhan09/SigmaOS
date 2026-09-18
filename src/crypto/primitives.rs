@@ -421,7 +421,7 @@ pub fn xor_bytes(a: &[u8], b: &[u8], out: &mut [u8]) {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

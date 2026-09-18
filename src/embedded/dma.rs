@@ -187,7 +187,7 @@ impl CircularBuffer for SimpleCircularBuffer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -593,7 +593,7 @@ impl Clone for CgroupHierarchy {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

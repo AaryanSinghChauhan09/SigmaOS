@@ -398,7 +398,7 @@ impl Default for NetworkSyscalls {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

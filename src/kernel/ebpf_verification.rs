@@ -417,7 +417,7 @@ fn is_valid_register(reg: u8) -> bool {
     reg <= 10
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

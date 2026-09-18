@@ -419,7 +419,7 @@ impl Default for SigmaDeviceIntegrationRoadmapEngine {
 // UNIT TESTS
 // ============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

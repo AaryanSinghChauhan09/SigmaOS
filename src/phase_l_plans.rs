@@ -312,7 +312,7 @@ pub mod zenithnet {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test_disabled)]
+    #[cfg(test)]
     mod tests {
         use super::*;
 
@@ -588,7 +588,7 @@ use std::vec::Vec;
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test_disabled)]
+    #[cfg(test)]
     mod tests {
 
         #[test]
@@ -926,7 +926,7 @@ pub mod sovereign_vmm {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test_disabled)]
+    #[cfg(test)]
     mod tests {
 
         #[test]
@@ -1200,7 +1200,7 @@ pub mod sovereign_browser {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test_disabled)]
+    #[cfg(test)]
     mod tests {
 
         #[test]
@@ -1503,7 +1503,7 @@ pub mod sovereign_sched {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test_disabled)]
+    #[cfg(test)]
     mod tests {
 
         #[test]
@@ -1787,7 +1787,7 @@ pub mod sigmafs_extended {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test_disabled)]
+    #[cfg(test)]
     mod tests {
 
         #[test]
@@ -2095,7 +2095,7 @@ pub mod s_ai_engine {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test_disabled)]
+    #[cfg(test)]
     mod tests {
 
         #[test]
@@ -2419,7 +2419,7 @@ pub mod s_cosmos {
     // Unit Tests
     // ------------------------------------------------------------------
 
-    #[cfg(test_disabled)]
+    #[cfg(test)]
     mod tests {
 
         #[test]

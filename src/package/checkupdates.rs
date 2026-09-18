@@ -96,7 +96,7 @@ impl Default for CheckupdatesEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

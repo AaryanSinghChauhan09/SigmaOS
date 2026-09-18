@@ -165,7 +165,7 @@ pub fn next_namespace_id() -> NamespaceId {
     NAMESPACE_ID_GEN.next()
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

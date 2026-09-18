@@ -222,7 +222,7 @@ impl Default for SovereignFdTable {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

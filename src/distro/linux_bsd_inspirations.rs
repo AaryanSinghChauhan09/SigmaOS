@@ -6723,7 +6723,7 @@ impl Default for SovereignDragonflyNpotEngine {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

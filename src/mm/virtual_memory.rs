@@ -924,7 +924,7 @@ impl Default for SovereignPageReclaimer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

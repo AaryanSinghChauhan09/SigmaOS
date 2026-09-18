@@ -155,7 +155,7 @@ impl ColorFilter for SimpleColorFilter {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -247,7 +247,7 @@ impl PeripheralDevice for E1000Driver {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -276,7 +276,7 @@ macro_rules! sigma_unveil {
     }};
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

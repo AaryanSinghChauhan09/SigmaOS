@@ -1140,7 +1140,7 @@ impl Default for OpenSourceCompetitorOrchestrator {
 }
 
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

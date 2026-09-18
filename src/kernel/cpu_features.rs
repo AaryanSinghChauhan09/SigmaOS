@@ -236,7 +236,7 @@ impl Default for SovereignCompilerOptimizer {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::vec;

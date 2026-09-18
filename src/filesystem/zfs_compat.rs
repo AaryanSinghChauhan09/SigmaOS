@@ -319,7 +319,7 @@ pub enum ZfsError {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

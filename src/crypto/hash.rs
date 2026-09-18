@@ -260,7 +260,7 @@ impl<'a, T> IntoIterator for &'a VecImpl<T> {
 
 
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

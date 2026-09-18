@@ -85,7 +85,7 @@ impl Default for LeanstralSafeVerify {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

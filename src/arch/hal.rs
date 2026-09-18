@@ -1163,7 +1163,7 @@ impl Apc {
 // 11. Architecture HAL Unit Tests
 // ==============================================================================
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

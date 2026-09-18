@@ -258,7 +258,7 @@ impl Default for TlsConfig {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

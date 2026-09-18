@@ -313,7 +313,7 @@ impl Default for PodcastRecorder {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

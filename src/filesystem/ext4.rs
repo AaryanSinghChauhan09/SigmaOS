@@ -303,7 +303,7 @@ impl FileSystem for Ext4FileSystem {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

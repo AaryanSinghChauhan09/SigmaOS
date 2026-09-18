@@ -197,7 +197,7 @@ impl Default for MateBetsyDesktopEnvironment {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
