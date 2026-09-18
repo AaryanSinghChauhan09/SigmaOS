@@ -102,7 +102,7 @@ pub struct SystemTime {
 
 impl SystemTime {
     pub fn now() -> Self {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
         unsafe {
             let mut rdtsc: u64;
             core::arch::asm!(
@@ -112,14 +112,13 @@ impl SystemTime {
                 options(nostack, nomem)
             );
             SystemTime {
-                secs_since_epoch: rdtsc / 1_000_000_000,
+                secs_since_epoch: rdtsc / 1_000_000_000, // Convert nanoseconds to seconds
             }
         }
-
-        #[cfg(not(target_arch = "x86_64"))]
+        #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
         {
             SystemTime {
-                secs_since_epoch: 1_700_000_000,
+                secs_since_epoch: monotonic_ms() / 1000,
             }
         }
     }
