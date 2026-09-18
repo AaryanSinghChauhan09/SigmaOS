@@ -102,8 +102,7 @@ pub struct SystemTime {
 
 impl SystemTime {
     pub fn now() -> Self {
-        // SAFETY: Reading hardware timestamp counter is safe for time estimation
-        // In production, this would use proper hardware time sources
+        #[cfg(target_arch = "x86_64")]
         unsafe {
             let mut rdtsc: u64;
             core::arch::asm!(
@@ -113,7 +112,14 @@ impl SystemTime {
                 options(nostack, nomem)
             );
             SystemTime {
-                secs_since_epoch: rdtsc / 1_000_000_000, // Convert nanoseconds to seconds
+                secs_since_epoch: rdtsc / 1_000_000_000,
+            }
+        }
+
+        #[cfg(not(target_arch = "x86_64"))]
+        {
+            SystemTime {
+                secs_since_epoch: 1_700_000_000,
             }
         }
     }
