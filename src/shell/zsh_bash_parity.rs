@@ -1015,6 +1015,11 @@ impl ShellArithmeticEvaluator {
                         Ok(left % right)
                     }
                 }
+                "&" => Ok(left & right),
+                "|" => Ok(left | right),
+                "^" => Ok(left ^ right),
+                "<<" => Ok(left << right),
+                ">>" => Ok(left >> right),
                 _ => Err("Unsupported arithmetic operator"),
             }
         } else {
@@ -1411,6 +1416,17 @@ impl UniversalScriptTranspiler {
             return format!("{}; do", l);
         }
 
+        // 3b. Fish 'if ...' / 'else if ...' / 'else' conditionals
+        if l.starts_with("if ") && !l.contains("; then") {
+            let cond = l.trim_start_matches("if ").trim();
+            return format!("if {}; then", cond);
+        } else if l.starts_with("else if ") && !l.contains("; then") {
+            let cond = l.trim_start_matches("else if ").trim();
+            return format!("elif {}; then", cond);
+        } else if l == "else" {
+            return "else".to_string();
+        }
+
         // 4. Fish 'switch val' and 'case pat' -> 'case val in' / 'pat)'
         if l.starts_with("switch ") {
             let val = l.trim_start_matches("switch ").trim();
@@ -1496,6 +1512,16 @@ impl UniversalScriptTranspiler {
                     let items = l[open + 1..close].trim();
                     let joined = items.split_whitespace().collect::<Vec<&str>>().join(":");
                     return format!("export PATH=\"{}\"", joined);
+                }
+            }
+        }
+
+        // 4b. Tcsh 'while ( expr )' -> 'while [ expr ]; do'
+        if l.starts_with("while ") {
+            if let Some(open) = l.find('(') {
+                if let Some(close) = l.find(')') {
+                    let cond = l[open + 1..close].trim();
+                    return format!("while [ {} ]; do", cond);
                 }
             }
         }
@@ -1640,6 +1666,12 @@ impl UniversalScriptTranspiler {
                 let val = rest[eq_idx + 1..].trim().trim_matches('(').trim_matches(')');
                 return format!("{}=\"{}\"", var, val);
             }
+        }
+
+        // 0c2. Bash local var=val -> var=val
+        if l.starts_with("local ") {
+            let rest = l.trim_start_matches("local ").trim();
+            return rest.to_string();
         }
 
         // 0d. Zsh ${(A)var=...} -> var=...
@@ -2174,6 +2206,8 @@ mod tests {
         assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 50 - 15 ))"), Ok(35));
         assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 6 * 7 ))"), Ok(42));
         assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 100 / 5 ))"), Ok(20));
+        assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 12 & 10 ))"), Ok(8));
+        assert_eq!(ShellArithmeticEvaluator::evaluate("$(( 1 << 4 ))"), Ok(16));
         assert_eq!(
             ShellArithmeticEvaluator::evaluate("$(( 100 / 0 ))"),
             Err("Division by zero")
@@ -2275,7 +2309,7 @@ mod tests {
 
     #[test]
     fn test_universal_script_transpiler_and_sh_execution() {
-        let fish_script = "#!/usr/bin/env fish\nset -gx TARGET /usr/bin\nfish_add_path /opt/bin\nfunction build_all\n  echo building\nend\nand echo done\nwhile test -f /tmp/lock\n  echo waiting\nend\nstring join , a b c";
+        let fish_script = "#!/usr/bin/env fish\nset -gx TARGET /usr/bin\nfish_add_path /opt/bin\nfunction build_all\n  echo building\nend\nand echo done\nwhile test -f /tmp/lock\n  echo waiting\nend\nif test -f /tmp/a\n  echo a\nelse if test -f /tmp/b\n  echo b\nelse\n  echo c\nend\nstring join , a b c";
         let posix_fish =
             UniversalScriptTranspiler::transpile_to_posix_sh(fish_script, ShellDialect::Fish);
         assert!(posix_fish.contains("#!/bin/sh"));
@@ -2285,6 +2319,8 @@ mod tests {
         assert!(posix_fish.contains("}"));
         assert!(posix_fish.contains("&& echo done"));
         assert!(posix_fish.contains("while test -f /tmp/lock; do"));
+        assert!(posix_fish.contains("if test -f /tmp/a; then"));
+        assert!(posix_fish.contains("elif test -f /tmp/b; then"));
         assert!(posix_fish.contains("echo a b c | tr ' ' ','"));
 
         let tcsh_script = "#!/bin/tcsh\nsetenv PORT 8080\nset path = ( /bin /usr/bin )\n@ val = 10 + 20\nalias ll ls -la\nswitch ( $1 )\n  case test\n    echo test\nendsw";

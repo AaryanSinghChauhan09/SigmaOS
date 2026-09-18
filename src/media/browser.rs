@@ -1291,7 +1291,164 @@ impl LadybirdLibWebEngine {
 }
 
 // =========================================================================
-// 21. TOR PLUGGABLE TRANSPORTS & ANTI-CENSORSHIP BRIDGE ENGINE
+// 21. FIREFOX COOKIE BANNER AUTO-REJECT ENGINE
+// =========================================================================
+
+pub struct FirefoxCookieBannerRejectEngine {
+    pub enabled: bool,
+    pub cmp_selectors: Vec<String>,
+    pub auto_declined_banners_count: u64,
+}
+
+impl FirefoxCookieBannerRejectEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            enabled: true,
+            cmp_selectors: Vec::new(),
+            auto_declined_banners_count: 0,
+        };
+        engine.cmp_selectors.push(String::from("#onetrust-consent-sdk"));
+        engine.cmp_selectors.push(String::from("#CybotCookiebotDialog"));
+        engine.cmp_selectors.push(String::from("#didomi-host"));
+        engine.cmp_selectors.push(String::from(".qc-cmp2-container"));
+        engine.cmp_selectors.push(String::from("#cookie-notice"));
+        engine
+    }
+
+    pub fn generate_rejection_script(&mut self, html_body: &str) -> Option<String> {
+        if !self.enabled {
+            return None;
+        }
+
+        for selector in &self.cmp_selectors {
+            let key = selector.trim_start_matches('#').trim_start_matches('.');
+            if html_body.contains(key) {
+                self.auto_declined_banners_count += 1;
+                return Some(format!(
+                    "/* Firefox Cookie Banner Auto-Reject */ document.querySelector('{}')?.remove();",
+                    selector
+                ));
+            }
+        }
+        None
+    }
+}
+
+// =========================================================================
+// 22. BRAVE DE-AMP & READER VIEW ENGINE
+// =========================================================================
+
+pub struct BraveDeAmpReaderEngine {
+    pub de_amp_enabled: bool,
+    pub reader_mode_active: bool,
+}
+
+impl BraveDeAmpReaderEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            de_amp_enabled: true,
+            reader_mode_active: false,
+        }
+    }
+
+    /// Strips Google/Bing AMP proxy prefixes to navigate directly to canonical publisher URLs
+    pub fn unwrap_amp_url(&self, url: &str) -> String {
+        if !self.de_amp_enabled {
+            return url.to_string();
+        }
+
+        if let Some(pos) = url.find("/amp/s/") {
+            let canonical = &url[pos + 7..];
+            return format!("https://{}", canonical);
+        } else if let Some(pos) = url.find("/amp/") {
+            let canonical = &url[pos + 5..];
+            return format!("https://{}", canonical);
+        } else if url.contains(".cdn.ampproject.org/c/s/") {
+            if let Some(pos) = url.find(".cdn.ampproject.org/c/s/") {
+                let canonical = &url[pos + 24..];
+                return format!("https://{}", canonical);
+            }
+        }
+
+        url.to_string()
+    }
+
+    /// Extracts clean reader mode text content by stripping clutter HTML elements
+    pub fn extract_reader_content(&self, raw_html: &str) -> String {
+        let mut clean = String::new();
+        let mut in_tag = false;
+
+        for c in raw_html.chars() {
+            if c == '<' {
+                in_tag = true;
+            } else if c == '>' {
+                in_tag = false;
+                clean.push(' ');
+            } else if !in_tag {
+                clean.push(c);
+            }
+        }
+
+        let words: Vec<&str> = clean.split_whitespace().collect();
+        format!("[Reader Mode Content]: {}", words.join(" "))
+    }
+}
+
+// =========================================================================
+// 23. CHROMIUM V8 ISOLATE MEMORY BOUNDS AUDITOR
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct V8IsolateMemoryBounds {
+    pub isolate_id: u32,
+    pub heap_limit_bytes: usize,
+    pub allocated_bytes: usize,
+    pub is_sandbox_violation: bool,
+}
+
+pub struct V8IsolateBoundsAuditor {
+    pub max_heap_per_isolate: usize, // e.g., 1 GB per V8 isolate
+    pub isolates: BTreeMap<u32, V8IsolateMemoryBounds>,
+}
+
+impl V8IsolateBoundsAuditor {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            max_heap_per_isolate: 1024 * 1024 * 1024, // 1 GB
+            isolates: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_isolate(&mut self, isolate_id: u32) {
+        self.isolates.insert(
+            isolate_id,
+            V8IsolateMemoryBounds {
+                isolate_id,
+                heap_limit_bytes: self.max_heap_per_isolate,
+                allocated_bytes: 0,
+                is_sandbox_violation: false,
+            },
+        );
+    }
+
+    pub fn audit_memory_allocation(&mut self, isolate_id: u32, additional_bytes: usize) -> bool {
+        if let Some(bounds) = self.isolates.get_mut(&isolate_id) {
+            bounds.allocated_bytes = bounds.allocated_bytes.saturating_add(additional_bytes);
+            if bounds.allocated_bytes > bounds.heap_limit_bytes {
+                bounds.is_sandbox_violation = true;
+                return false; // Out of bounds memory allocation rejected
+            }
+            return true;
+        }
+        false
+    }
+}
+
+// =========================================================================
+// 24. TOR PLUGGABLE TRANSPORTS & ANTI-CENSORSHIP BRIDGE ENGINE
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1351,7 +1508,7 @@ impl TorPluggableTransportEngine {
 }
 
 // =========================================================================
-// 22. UNIFIED SIGMAWEB BROWSER SUITE
+// 25. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
 pub struct SigmaWebBrowser {
@@ -1376,6 +1533,9 @@ pub struct SigmaWebBrowser {
     pub waterfox_legacy: WaterfoxLegacyExtensionEngine,
     pub ladybird_libweb: LadybirdLibWebEngine,
     pub tor_transport: TorPluggableTransportEngine,
+    pub cookie_reject: FirefoxCookieBannerRejectEngine,
+    pub de_amp_reader: BraveDeAmpReaderEngine,
+    pub v8_bounds_auditor: V8IsolateBoundsAuditor,
 }
 
 impl SigmaWebBrowser {
@@ -1403,21 +1563,28 @@ impl SigmaWebBrowser {
             waterfox_legacy: WaterfoxLegacyExtensionEngine::new(),
             ladybird_libweb: LadybirdLibWebEngine::new(),
             tor_transport: TorPluggableTransportEngine::new(),
+            cookie_reject: FirefoxCookieBannerRejectEngine::new(),
+            de_amp_reader: BraveDeAmpReaderEngine::new(),
+            v8_bounds_auditor: V8IsolateBoundsAuditor::new(),
         }
     }
 
     /// Fully processes an incoming navigation URL applying HTTPS upgrade,
-    /// DeclarativeNetRequest rules, CNAME uncloaking, telemetry parameter scrubbing,
-    /// adblock filtering, Tor onion circuit routing, and DoH / ECH resolution.
+    /// De-AMP canonical URL unwrapping, DeclarativeNetRequest rules, CNAME uncloaking,
+    /// telemetry parameter scrubbing, adblock filtering, Tor onion circuit routing,
+    /// and DoH / ECH resolution.
     pub fn navigate_protected(&mut self, raw_url: &str) -> Result<String, &'static str> {
+        // 0. De-AMP URL unwrap
+        let de_amped = self.de_amp_reader.unwrap_amp_url(raw_url);
+
         // 1. DeclarativeNetRequest Evaluation
-        let (action, _redirect) = self.dnr.evaluate_url(raw_url);
+        let (action, _redirect) = self.dnr.evaluate_url(&de_amped);
         if action == DnrActionType::Block {
             return Err("Navigation Blocked: DeclarativeNetRequest Rule Triggered");
         }
 
         // 2. HTTPS Upgrade
-        let upgraded = self.brave_shields.upgrade_to_https(raw_url);
+        let upgraded = self.brave_shields.upgrade_to_https(&de_amped);
 
         // 3. Telemetry and tracking parameter scrubbing
         let sanitized = self.stripper.sanitize_url(&upgraded);
@@ -1458,6 +1625,29 @@ impl SigmaWebBrowser {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_new_open_source_browser_innovations() {
+        let mut cookie_engine = FirefoxCookieBannerRejectEngine::new();
+        let sample_html = "<html><body><div id=\"onetrust-consent-sdk\">Banner</div></body></html>";
+        let script = cookie_engine.generate_rejection_script(sample_html);
+        assert!(script.is_some());
+        assert!(script.unwrap().contains("#onetrust-consent-sdk"));
+        assert_eq!(cookie_engine.auto_declined_banners_count, 1);
+
+        let de_amp = BraveDeAmpReaderEngine::new();
+        let amp_url = "https://google.com/amp/s/example.com/article";
+        let canonical = de_amp.unwrap_amp_url(amp_url);
+        assert_eq!(canonical, "https://example.com/article");
+
+        let reader_text = de_amp.extract_reader_content("<h1>Article</h1><p>Content text</p>");
+        assert!(reader_text.contains("Article Content text"));
+
+        let mut v8_auditor = V8IsolateBoundsAuditor::new();
+        v8_auditor.register_isolate(100);
+        assert!(v8_auditor.audit_memory_allocation(100, 500 * 1024 * 1024)); // 500 MB
+        assert!(!v8_auditor.audit_memory_allocation(100, 600 * 1024 * 1024)); // >1 GB total
+    }
 
     #[test]
     fn test_chromium_ipc_and_mullvad_arc_engines() {
