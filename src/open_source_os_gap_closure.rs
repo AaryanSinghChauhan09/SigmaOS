@@ -29,6 +29,8 @@ use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
+use crate::open_source_obsoletion::{SovereignHelixModalEditorEngine, SovereignFastfetchSysInfoEngine};
+
 // =========================================================================
 // 1. PLAN 9 FROM BELL LABS / 9FRONT (9P2000 RPC & rfork Namespace Isolation)
 // =========================================================================
@@ -3990,14 +3992,14 @@ impl OpenSourceProjectSupremacySuite {
     }
 
     /// Helix / Neovim Inspired Modal Editor Quick Helper
-    pub fn open_sovereign_modal_editor(&self, initial_buffer: &str) -> crate::open_source_obsoletion::SovereignHelixModalEditorEngine {
-        let editor = crate::open_source_obsoletion::SovereignHelixModalEditorEngine::new("scratch", initial_buffer);
+    pub fn open_sovereign_modal_editor(&self, initial_buffer: &str) -> SovereignHelixModalEditorEngine {
+        let editor = SovereignHelixModalEditorEngine::new("scratch", initial_buffer);
         editor
     }
 
     /// Fastfetch System Info Quick Helper
     pub fn render_fastfetch_summary(&self) -> String {
-        let ff = crate::open_source_obsoletion::SovereignFastfetchSysInfoEngine::new();
+        let ff = SovereignFastfetchSysInfoEngine::new();
         ff.render_ansi_banner()
     }
 }

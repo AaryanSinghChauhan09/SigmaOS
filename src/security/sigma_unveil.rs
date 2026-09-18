@@ -95,9 +95,18 @@ impl UnveilEntry {
         self.permissions
     }
 
-    /// Check if this entry covers the given path
+    /// Check if this entry covers the given path (enforces strict path boundary checking)
     pub fn covers(&self, path: &Path) -> bool {
-        path.starts_with(&self.path)
+        if path.starts_with(&self.path) {
+            let e_len = self.path.len();
+            path.len() == e_len
+                || path.as_bytes().get(e_len).copied() == Some(b'/')
+                || path.as_bytes().get(e_len).copied() == Some(b'\\')
+                || self.path.ends_with('/')
+                || self.path.ends_with('\\')
+        } else {
+            false
+        }
     }
 }
 
