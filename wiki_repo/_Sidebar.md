@@ -2,33 +2,44 @@
 
 ---
 
-#### 🚀 Installation & Setup
-- **[[Installation Guide|Installation-Guide]]**
-- **[[Bootloader & Secure Boot|bootloader]]**
-- **[[Virtual Filesystem|filesystem]]**
+#### 📋 Navigation
+- **[[Table of Contents|Table-of-contents]]**
+- **[[Help:Reading|Help-Reading]]**
+- **[[Help:Browsing|Help-Browsing]]**
+- **[[Wiki:Contributing|Wiki-Contributing]]**
 
 ---
 
-#### 🎨 Zenith & Omarchy Workstation
+#### 🚀 The Distribution
+- **[[About SigmaOS|About-SigmaOS]]**
+- **[[Frequently Asked Questions|Frequently-Asked-Questions]]**
+- **[[SigmaOS Compared to Other Distributions|SigmaOS-Compared-to-Other-Distributions]]**
+- **[[Installation Guide|Installation-Guide]]**
+- **[[General Recommendations|General-Recommendations]]**
+- **[[List of Applications|List-of-Applications]]**
+
+---
+
+#### 🎨 Desktop Environment
+- **[[Zenith Compositor|Zenith-Compositor]]**
 - **[[Zenith Desktop & Workflow|Zenith-Desktop-and-Omarchy-Workflow]]**
 - **[[Bolt ⚡ Fast Launcher|Zenith-Desktop-and-Omarchy-Workflow#bolt-fast-path-launcher-and-agentic-steering]]**
 - **[[Palette 🎨 UI Themes|Zenith-Desktop-and-Omarchy-Workflow#palette-dynamic-theme--color-engine]]**
 - **[[Sentinel 🛡️ Exec Guard|Zenith-Desktop-and-Omarchy-Workflow#sentinel-sandboxing--exec-guard]]**
-- **[[Omakase Workstation Presets|Zenith-Desktop-and-Omarchy-Workflow#omakase-developer-preset-workstation]]**
 
 ---
 
 #### 📦 Package Management
-- **[[Universal Package Engine (`sigpkg`)|Package-Management-and-Sigpkg]]**
+- **[[Universal Package Engine (sigpkg)|Package-Management-and-Sigpkg]]**
 - **[[Arch PKGBUILD & AUR Helper|ARCH_LINUX_PARITY_FEATURES]]**
 - **[[Multi-Distro Adapters|UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN]]**
-- **[[Mirror Ranking & Reflector|arch-pacman-engine]]**
+- **[[Content-Addressed Storage|Content-Addressed-Storage]]**
 
 ---
 
 #### 🎛️ System Administration
 - **[[Services & Supervision|System-Administration-and-Services]]**
-- **[[Privilege Delegation (`doas`)|SECURITY]]**
+- **[[Privilege Delegation (doas)|SECURITY]]**
 - **[[Networking & WireGuard|networking]]**
 - **[[Logging & Journalctl|syslog]]**
 
@@ -38,6 +49,7 @@
 - **[[Security & Sandboxing|Security-Sandboxing-and-Hardening]]**
 - **[[Zorin Exec Guard|Security-Sandboxing-and-Hardening#zorin-exec-guard]]**
 - **[[Hardware Enclaves & PQC|Security-Sandboxing-and-Hardening#hardware-enclaves--post-quantum-cryptography]]**
+- **[[Memory Safety Guarantees|SECURITY]]**
 
 ---
 
@@ -45,6 +57,7 @@
 - **[[Performance & BORE Scheduler|Performance-Tuning-and-Kernel]]**
 - **[[MGLRU & Memory Reclamation|Performance-Tuning-and-Kernel#mglru--memory-reclamation]]**
 - **[[eBPF / XDP Networking|Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking]]**
+- **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 
 ---
 
@@ -52,10 +65,28 @@
 - **[[Rollback Engine & Snapshots|Maintenance-and-Rollback-Engine]]**
 - **[[Declarative Generations|Maintenance-and-Rollback-Engine#declarative-system-generations]]**
 - **[[ZFS Boot Environments|freebsd-zfs]]**
+- **[[Btrfs Subvolumes|SIGMA_VFS_LAYER]]**
 
 ---
 
-#### 🛠️ Reference & Matrix
+#### 💻 Hardware & Platform
 - **[[Hardware Support Matrix|SUPPORT_MATRIX]]**
+- **[[Multi-Architecture Support|ARCHITECTURE]]**
+- **[[Virtualization & Containers|Virtualization-and-Containers-Isolation]]**
+- **[[Device Drivers|Device-Drivers]]**
+
+---
+
+#### 👥 Community
+- **[[Code of Conduct|Code-of-Conduct]]**
+- **[[Getting Involved|Getting-Involved]]**
+- **[[Contributing|Contributing]]**
+- **[[International Communities|International-Communities]]**
+
+---
+
+#### 📚 Reference
 - **[[Product Vision & Manifesto|PRODUCT_VISION]]**
 - **[[Release Criteria|RELEASE_CRITERIA]]**
+- **[[Architecture Decision Records|ARCHITECTURE_DECISIONS]]**
+- **[[Comprehensive OS Analysis|SIGMAOS_COMPREHENSIVE_OS_ANALYSIS]]**
