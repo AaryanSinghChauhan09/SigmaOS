@@ -191,8 +191,8 @@ impl ProcFileSystem {
             namespaces: HashMap::new(),
             active_namespace_id: 0,
             system_uptime: 43200,          // 12 hours
-            total_memory: 16777216 * 1024, // 16GB
-            used_memory: 4194304 * 1024,   // 4GB
+            total_memory: (16777216u64 * 1024) as usize, // 16GB
+            used_memory: (4194304u64 * 1024) as usize,   // 4GB
             cpu_model: "Sigma Core AI-Native 9".to_string(),
             cpu_cores: 16,
         };
