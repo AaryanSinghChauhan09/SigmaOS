@@ -140,3 +140,10 @@ pub mod xdp_engine_sovereign;
 
 // ─── Live Migration Engine (CRIU / QEMU inspired) ─────────────────────────────
 pub mod live_migration_engine;
+
+// ─── Universal Kernel Format Engine (Linux & BSD Parity) ───────────────────────
+pub mod universal_kernel_format;
+pub use universal_kernel_format::{
+    KernelArch, KernelCompression, KernelFormat, KernelFormatSymbol, KernelSection,
+    ParsedKernelImage, SigmaKernelExecutionPayload, UniversalKernelFormatEngine,
+};
