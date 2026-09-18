@@ -63,7 +63,7 @@ impl SigmaOfficeSuiteEngine {
     }
 
     pub fn export_to_pdf_stream(&self) -> Vec<u8> {
-        let mut pdf = Vec::from(b"%PDF-1.7\n%SigmaOffice Export\n");
+        let mut pdf = b"%PDF-1.7\n%SigmaOffice Export\n".to_vec();
         pdf.extend_from_slice(self.word_document_content.as_bytes());
         pdf
     }
@@ -375,7 +375,7 @@ impl ScreenRecorderScreenshotToolEngine {
     }
 
     pub fn capture_screenshot_to_clipboard(&self) -> Vec<u8> {
-        let mut raw_png = Vec::from(b"\x89PNG\r\n\x1a\n");
+        let mut raw_png = b"\x89PNG\r\n\x1a\n".to_vec();
         raw_png.extend_from_slice(b"SCREENSHOT_FRAME_DATA");
         raw_png
     }
@@ -559,7 +559,7 @@ impl HardwareBackedPasswordManager {
     }
 
     pub fn add_password_entry(&mut self, domain: &str, user: &str, password: &str) {
-        let mut encrypted = Vec::from(b"TPM2_SEALED:");
+        let mut encrypted = b"TPM2_SEALED:".to_vec();
         encrypted.extend_from_slice(password.as_bytes());
         self.entries.push(PasswordEntry {
             domain: String::from(domain),

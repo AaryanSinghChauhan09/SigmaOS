@@ -43,7 +43,7 @@ pub struct ZeroCopyQueue<T: Copy, const N: usize> {
 impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
     pub fn new() -> Self {
         Self {
-            buffer: [const { None }; N],
+            buffer: [None; N],
             head: AtomicUsize::new(0),
             tail: AtomicUsize::new(0),
             metrics: ZeroCopyMetrics::default(),
@@ -311,14 +311,17 @@ impl SovereignSimdOptimizer {
         // Execute raw assembly to read processor features if on x86_64
         #[cfg(target_arch = "x86_64")]
         unsafe {
+            let mut _eax = 7u32;
+            let mut _ecx = 0u32;
+            let mut _edx = 0u32;
             core::arch::asm!(
                 "push rbx",
                 "cpuid",
                 "mov {tmp:e}, ebx",
                 "pop rbx",
-                inout("eax") 7 => _,
-                out("ecx") _,
-                out("edx") _,
+                inout("eax") _eax,
+                out("ecx") _ecx,
+                out("edx") _edx,
                 tmp = out(reg) ebx_val,
             );
         }
