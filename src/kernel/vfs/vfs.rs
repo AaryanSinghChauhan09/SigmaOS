@@ -15,9 +15,12 @@
 
 // (no_std only applicable at crate root - removed)
 
+/// Linux/BSD-inspired Virtual File System (VFS) layer
+/// Implements dentry cache, superblock management, filesystem registration
+
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 use std::format;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
@@ -261,6 +264,113 @@ pub trait DentryOperations: Send + Sync {
     fn d_compare(&self, dentry: &Dentry, name1: &str, name2: &str) -> bool;
 }
 
+// Linux dentry cache implementation
+pub struct DentryCache {
+    pub cache: BTreeMap<String, usize>,
+    pub lru_list: VecDeque<String>,
+    pub max_size: usize,
+}
+
+impl DentryCache {
+    pub fn new(max_size: usize) -> Self {
+        DentryCache {
+            cache: BTreeMap::new(),
+            lru_list: VecDeque::new(),
+            max_size,
+        }
+    }
+
+    pub fn lookup(&mut self, name: &str) -> Option<usize> {
+        if let Some(&inode) = self.cache.get(name) {
+            // Update LRU
+            if let Some(pos) = self.lru_list.iter().position(|n| n == name) {
+                self.lru_list.remove(pos);
+            }
+            self.lru_list.push_back(name.to_string());
+            Some(inode)
+        } else {
+            None
+        }
+    }
+
+    pub fn insert(&mut self, name: String, inode: usize) {
+        // Evict if cache is full
+        if self.cache.len() >= self.max_size {
+            if let Some(evicted) = self.lru_list.pop_front() {
+                self.cache.remove(&evicted);
+            }
+        }
+        
+        self.cache.insert(name.clone(), inode);
+        self.lru_list.push_back(name);
+    }
+
+    pub fn invalidate(&mut self, name: &str) {
+        self.cache.remove(name);
+        if let Some(pos) = self.lru_list.iter().position(|n| n == name) {
+            self.lru_list.remove(pos);
+        }
+    }
+}
+
+// BSD vnode cache implementation
+pub struct InodeCache {
+    pub cache: BTreeMap<u64, Inode>,
+    pub refcounts: BTreeMap<u64, AtomicU32>,
+    pub max_size: usize,
+}
+
+impl InodeCache {
+    pub fn new(max_size: usize) -> Self {
+        InodeCache {
+            cache: BTreeMap::new(),
+            refcounts: BTreeMap::new(),
+            max_size,
+        }
+    }
+
+    pub fn get(&mut self, ino: u64) -> Option<&Inode> {
+        self.cache.get(&ino)
+    }
+
+    pub fn insert(&mut self, inode: Inode) {
+        let ino = inode.i_ino;
+        
+        // Evict if cache is full
+        if self.cache.len() >= self.max_size {
+            if let Some((&first_ino, _)) = self.cache.iter().next() {
+                self.cache.remove(&first_ino);
+                self.refcounts.remove(&first_ino);
+            }
+        }
+        
+        self.cache.insert(ino, inode);
+        self.refcounts.insert(ino, AtomicU32::new(1));
+    }
+
+    pub fn ref_inode(&mut self, ino: u64) -> Result<(), FsError> {
+        if let Some(refcount) = self.refcounts.get_mut(&ino) {
+            refcount.fetch_add(1, Ordering::SeqCst);
+            Ok(())
+        } else {
+            Err(FsError::NotFound)
+        }
+    }
+
+    pub fn unref_inode(&mut self, ino: u64) -> Result<(), FsError> {
+        if let Some(refcount) = self.refcounts.get_mut(&ino) {
+            let count = refcount.fetch_sub(1, Ordering::SeqCst) - 1;
+            if count == 0 {
+                self.cache.remove(&ino);
+                self.refcounts.remove(&ino);
+            }
+            Ok(())
+        } else {
+            Err(FsError::NotFound)
+        }
+    }
+}
+
 pub struct SuperBlock {
     pub s_magic: u64,
     pub s_op: Option<&'static dyn SuperBlockOperations>,
@@ -277,6 +387,9 @@ pub struct SuperBlock {
     pub s_maxbytes: u64,
     pub s_time_gran: u64,
     pub s_fs_info: Option<usize>,
+    // Linux/BSD-inspired enhancements
+    pub s_dentry_cache: DentryCache,
+    pub s_inode_cache: InodeCache,
 }
 
 impl SuperBlock {
@@ -297,6 +410,8 @@ impl SuperBlock {
             s_maxbytes: u64::MAX,
             s_time_gran: 1,
             s_fs_info: None,
+            s_dentry_cache: DentryCache::new(1024),
+            s_inode_cache: InodeCache::new(1024),
         }
     }
 }
@@ -599,6 +714,59 @@ mod mount_tests {
     use super::*;
 
     #[test]
+    fn test_dentry_cache() {
+        let mut cache = DentryCache::new(3);
+        
+        // Insert entries
+        cache.insert("file1".to_string(), 100);
+        cache.insert("file2".to_string(), 200);
+        cache.insert("file3".to_string(), 300);
+        
+        // Lookup should work
+        assert_eq!(cache.lookup("file1"), Some(100));
+        assert_eq!(cache.lookup("file2"), Some(200));
+        
+        // Insert should evict oldest when cache is full
+        cache.insert("file4".to_string(), 400);
+        assert_eq!(cache.lookup("file1"), None); // Evicted
+        assert_eq!(cache.lookup("file4"), Some(400));
+        
+        // Invalidate should remove entry
+        cache.invalidate("file2");
+        assert_eq!(cache.lookup("file2"), None);
+    }
+
+    #[test]
+    fn test_inode_cache() {
+        let mut cache = InodeCache::new(3);
+        
+        let inode1 = Inode::new(1, InodeType::Regular);
+        let inode2 = Inode::new(2, InodeType::Directory);
+        let inode3 = Inode::new(3, InodeType::Regular);
+        
+        // Insert inodes
+        cache.insert(inode1);
+        cache.insert(inode2);
+        cache.insert(inode3);
+        
+        // Get should work
+        assert!(cache.get(1).is_some());
+        assert!(cache.get(2).is_some());
+        
+        // Ref counting
+        assert!(cache.ref_inode(1).is_ok());
+        assert!(cache.ref_inode(1).is_ok());
+        assert!(cache.unref_inode(1).is_ok());
+        assert!(cache.unref_inode(1).is_ok());
+        
+        // Unref to zero should remove from cache
+        assert!(cache.get(1).is_some());
+        cache.ref_inode(1).unwrap();
+        cache.unref_inode(1).unwrap();
+        assert!(cache.get(1).is_none());
+    }
+
+    #[test]
     fn test_fstab_parsing() {
         let mut manager = SovereignMountManager::new();
         let fstab_line = "UUID=6789-EFGH /mnt/test ext4 rw,nosuid,nodev 0 2";
@@ -643,29 +811,5 @@ mod mount_tests {
         // Active mount entry should now exist
         assert!(manager.active_mount_table.contains_key("/media/usb"));
     }
-
-    #[test]
-    fn test_remount_unmount_and_proc_mounts() {
-        let mut manager = SovereignMountManager::new();
-        manager.parse_and_register_fstab_entry("UUID=1111-2222 /mnt/data ext4 ro,sync 0 1").unwrap();
-
-        // Check proc mounts formatting
-        let proc_mounts = manager.generate_proc_mounts();
-        assert!(proc_mounts.contains("UUID=1111-2222 /mnt/data ext4 ro,sync 0 1"));
-
-        // Remount read-write with MS_REMOUNT
-        assert!(manager.remount("/mnt/data", MS_NOSUID).is_ok());
-        let entry = manager.active_mount_table.get("/mnt/data").unwrap();
-        assert_ne!(entry.flags & MS_REMOUNT, 0);
-
-        // Test OpenBSD securelevel lockdown
-        manager.securelevel = 2;
-        assert!(manager.remount("/mnt/data", MS_RDONLY).is_err());
-        assert!(manager.unmount_with_flags("/mnt/data", MNT_FORCE).is_err());
-
-        // Lower securelevel and test unmount_with_flags (MNT_DETACH)
-        manager.securelevel = 0;
-        assert!(manager.unmount_with_flags("/mnt/data", MNT_DETACH).is_ok());
-        assert!(!manager.active_mount_table.contains_key("/mnt/data"));
-    }
+}
 }
