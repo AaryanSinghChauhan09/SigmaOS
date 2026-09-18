@@ -27,4 +27,4 @@ jobs:
 
       - name: Test Package Format Adapter (${{ matrix.distro_format }})
         run: |
-          cargo test --lib
+          ./run_sigma_tests.sh

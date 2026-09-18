@@ -32,7 +32,10 @@ jobs:
         uses: dtolnay/rust-toolchain@stable # stable
         with:
           toolchain: stable
-          targets: ${{ matrix.target }}
+
+      - name: Add Target Component
+        run: |
+          rustup target add ${{ matrix.target }}
 
       - name: Run Cross-Compilation Check
         run: |

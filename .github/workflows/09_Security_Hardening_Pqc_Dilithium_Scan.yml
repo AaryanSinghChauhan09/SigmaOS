@@ -35,4 +35,4 @@ jobs:
 
       - name: Verify Post-Quantum Dilithium-5 Signature Compliance
         run: |
-          cargo test --lib
+          ./run_sigma_tests.sh
