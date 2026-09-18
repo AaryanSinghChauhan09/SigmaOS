@@ -16,7 +16,7 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::package::universal::{PackageError, PackageFormat, UnifiedPackage};
+use crate::package::universal::UnifiedPackage;
 
 #[cfg(feature = "standalone_test")]
 pub use super::universal::{PackageError, PackageFormat, UnifiedPackage};

@@ -5,7 +5,6 @@
 /// Based on Roadmap Item 8: Power management stack
 
 use std::boxed::Box;
-use std::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Power profile

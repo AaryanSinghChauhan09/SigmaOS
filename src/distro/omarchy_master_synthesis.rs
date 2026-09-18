@@ -163,7 +163,7 @@ pub struct OmarchyAppSandbox {
 }
 
 impl OmarchyAppSandbox {
-    pub fn new_web2app(app_id: &str, pwa_url: &str) -> Self {
+    pub fn new_web2app(app_id: &str, _pwa_url: &str) -> Self {
         Self {
             app_id: app_id.to_string(),
             read_paths: vec!["/etc/ssl".to_string(), "/usr/share/fonts".to_string()],

@@ -13,7 +13,7 @@
 //! - **Thread-safe operations**: All operations use Arc<Mutex<>> for thread safety
 //! - **Namespace-aware ID generation**: IPC IDs scoped to specific namespaces
 
-use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
 use std::collections::BTreeMap;
 

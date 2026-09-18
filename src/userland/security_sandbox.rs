@@ -5,9 +5,7 @@
 // unveil() filesystem path sandboxing, and HardenedBSD PaX W^X memory security enforcement.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 /// OpenBSD pledge() syscall capability categories.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

@@ -13,9 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -25,7 +23,6 @@ use std::format;
 /// Implements sigpkg v1 format, local registry, package installation/removal
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type PackageID = usize;
 

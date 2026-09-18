@@ -4254,7 +4254,7 @@ impl FedoraIrcotEngine {
         self.channels.push(IrcChannel { channel_name: name.to_string(), topic: topic.to_string() });
     }
 
-    pub fn broadcast_message(&self, message: &str) -> usize {
+    pub fn broadcast_message(&self, _message: &str) -> usize {
         self.channels.len()
     }
 }
@@ -4291,7 +4291,7 @@ impl FedoraElectionsEngine {
 }
 
 mod tests {
-    use super::*;
+    
 
     #[test]
     fn test_fedora_dnf_resolver() {

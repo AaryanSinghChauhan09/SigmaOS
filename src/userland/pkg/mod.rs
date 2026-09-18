@@ -6,8 +6,7 @@
 pub mod sigma_pkg;
 
 use std::vec::Vec;
-use std::string::{String, ToString};
-use std::boxed::Box;
+use std::string::String;
 use core::fmt;
 
 /// Error type for the UserPkg module

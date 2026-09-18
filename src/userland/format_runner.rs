@@ -6,7 +6,6 @@
 // macOS (Mach-O), Windows (PE/COFF), and Android (APEX/APK).
 
 use std::collections::BTreeMap;
-use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

@@ -28,7 +28,7 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[List of Applications](List-of-Applications)**
   Categorized presentation of common applications and packages.
 
-- **[Category:Installation](Category:Installation)**
+- **[Category:Installation](Category-Installation)**
   Installation-related articles and guides.
 
 ---
@@ -69,7 +69,7 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Content-Addressed Storage](Content-Addressed-Storage)**
   Immutable, cryptographically-verified package storage.
 
-- **[Category:Package-Management](Category:Package-Management)**
+- **[Category:Package-Management](Category-Package-Management)**
   Package management articles and guides.
 
 ---
@@ -123,7 +123,7 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Lock-Free Data Structures](SIGMA_CONCURRENCY_PRIMITIVES)**
   Lock-free concurrency primitives and data structures.
 
-- **[Category:Performance](Category:Performance)**
+- **[Category:Performance](Category-Performance)**
   Performance and kernel articles.
 
 ---
@@ -177,7 +177,7 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[International Communities](International-Communities)**
   Collection of links to SigmaOS communities around the world.
 
-- **[Category:Community](Category:Community)**
+- **[Category:Community](Category-Community)**
   Community articles and guidelines.
 
 ---
@@ -212,8 +212,24 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Comprehensive OS Analysis](SIGMAOS_COMPREHENSIVE_OS_ANALYSIS)**
   Consolidated analysis of SigmaOS architecture and comparisons.
 
-- **[Category:Development](Category:Development)**
+- **[Category:Development](Category-Development)**
   Development and technical articles.
+
+---
+
+## Gap Closure Roadmap
+
+- **[Phase 1: Critical Foundation](Phase-1-Gap-Closure-Implementation-Plan)**
+  PCI/PCIe enumeration, GPU drivers, demand paging, pledge/unveil, eBPF JIT (Months 1-3)
+
+- **[Phase 2: Core Features](Phase-2-Gap-Closure-Implementation-Plan)**
+  Kernel modules, IRQ balancing, Cgroups v2, io_uring, Capsicum (Months 4-6)
+
+- **[Phase 3: Advanced Features](Phase-3-Gap-Closure-Implementation-Plan)**
+  ZFS, Btrfs, XDP, PF firewall, Nix/Guix builds (Months 7-12)
+
+- **[Phase 4: Enterprise Features](Phase-4-Gap-Closure-Implementation-Plan)**
+  NVIDIA GPU, Wi-Fi 6E/7, USB3/4, Mach/Zircon IPC, Portage (Months 13-18)
 
 ---
 
