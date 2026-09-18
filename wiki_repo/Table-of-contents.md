@@ -57,6 +57,8 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Performance & Kernel
+- [Concurrency and Deadlocks](Concurrency-and-Deadlocks) — Thread management, synchronization primitives, deadlock detection, lock-free algorithms
+- [Operating System Structure](Operating-System-Structure) — Microkernel design, HAL, system call interface, IPC mechanisms
 - [Process Management](Process-Management) — Process scheduling, cgroups, resource limits, namespaces
 - [Memory Management](Memory-Management) — Virtual memory, demand paging, slab allocator, memory compaction
 

@@ -144,6 +144,14 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
 
+- **[Concurrency and Deadlocks](Concurrency-and-Deadlocks)**
+  Thread management, synchronization primitives, deadlock detection, lock-free algorithms.
+
+- **[Operating System Structure](Operating-System-Structure)**
+  Microkernel design, HAL, system call interface, IPC mechanisms.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
 - **[File Management](File-Management)**
   VFS, file permissions, file locking, directory operations.
 
