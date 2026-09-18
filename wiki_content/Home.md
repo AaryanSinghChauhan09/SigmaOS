@@ -1,187 +1,196 @@
-# SigmaOS - Modern Operating System with Linux/BSD Features
+# Welcome to the SigmaOS Wiki
 
-Welcome to SigmaOS! A modern, production-ready operating system implementing enterprise-grade features comparable to Linux and BSD.
+**Your source for SigmaOS documentation on the web.**
 
-## Quick Links
+SigmaOS is a secure, fast, opinionated Rust desktop operating system with atomic updates, capability-based applications, and a curated Zenith workflow.
 
-- **[Getting Started](#getting-started)** - Build and run SigmaOS
-- **[Master AI Agent Algorithm Diagnostics & Fix Guide](WHAT_IS_WORKING_AND_NOT_WORKING.md)** - Diagnostics & Safe Rust Blueprints
-- **[Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V28](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V28.md)** - Master Omnipresent Self-Sufficiency Blueprint
-- **[Architecture](#architecture)** - System design and components
-- **[Phase 8 Features](#phase-8-features)** - 5 Tier 1 features (v0.8)
-- **[API Reference](#api-reference)** - Complete API documentation
-- **[Contributing](#contributing)** - Development guidelines
-- **[Roadmap](#roadmap)** - Future development plans
-
-## Getting Started
-
-### Build Requirements
-- Rust 1.70+
-- cargo
-- Linux kernel headers (for FFI)
-
-### Build Instructions
-
-```bash
-# Clone repository
-git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
-cd SigmaOS
-
-# Build library
-cargo build --lib
-
-# Run tests
-cargo test --lib
-
-# Build with optimizations
-cargo build --lib --release
-```
-
-## Architecture
-
-SigmaOS is structured around **5 major Tier 1 features**:
-
-1. **Process Namespaces** - Container-like process isolation
-2. **File Monitoring** - Reactive filesystem watching (inotify-like)
-3. **Resource Limits** - Fair resource allocation (cgroups v2-like)
-4. **Security Framework** - Syscall filtering and sandboxing (seccomp-like)
-5. **Event System** - Efficient event multiplexing (kqueue-like)
-
-### Module Structure
-
-```
-src/
-├── kernel/          # Core kernel modules
-│   ├── namespaces.rs
-│   ├── cgroup_v2.rs
-│   └── kqueue_event.rs
-├── filesystem/      # File system related
-│   ├── file_monitor.rs
-│   └── watch.rs
-├── memory/          # Memory management
-│   └── quota.rs
-├── security/        # Security modules
-│   ├── seccomp.rs
-│   └── syscall_filter.rs
-└── syscall/         # Syscall implementations
-    ├── namespace_syscalls.rs
-    ├── inotify_syscalls.rs
-    └── kevent_syscalls.rs
-```
-
-## Phase 8 Features
-
-### v0.8 - Production Ready ✅
-
-**Status**: All 5 Tier 1 features implemented and tested
-
-- **11,800+ LOC** of production code
-- **348+ tests** (100% passing)
-- **Zero compilation errors**
-- **Linux/BSD compatible** syscalls
-- **Enterprise-grade** quality
-
-[Read Full Release Notes](RELEASE_NOTES_v0.8)
-
-## API Reference
-
-Complete API documentation available for:
-
-- [Namespaces API](API-Namespaces) - PID, IPC, Mount isolation
-- [File Monitoring API](API-File-Monitoring) - inotify-like syscalls
-- [Resource Limits API](API-Resource-Limits) - cgroups management
-- [Security API](API-Security) - seccomp and syscall filtering
-- [Event System API](API-Event-System) - kqueue multiplexing
-
-## Examples
-
-### Create Isolated Namespace
-
-```rust
-// Create PID namespace
-let ns_id = create_pid_namespace(None)?;
-
-// Clone process into namespace
-let pid = sys_clone(CLONE_NEWPID, ...)?;
-```
-
-### Monitor Files
-
-```rust
-// Create inotify descriptor
-let fd = sys_inotify_init1(IN_NONBLOCK)?;
-
-// Add watch
-let wd = sys_inotify_add_watch(fd, "/app", IN_ALL_EVENTS)?;
-
-// Read events
-let events = read_inotify_events(fd, buf)?;
-```
-
-### Set Resource Limits
-
-```rust
-let hierarchy = CgroupHierarchy::new()?;
-let cg = hierarchy.create_cgroup(PathBuf::from("/app"), None)?;
-
-hierarchy.set_memory_limit(cg, 512 * 1024 * 1024)?;
-hierarchy.set_cpu_limit(cg, 1_000_000, 1_000_000)?;
-```
-
-### Enable Security Filtering
-
-```rust
-let mut filter = SeccompFilter::new(SeccompAction::Kill);
-filter.add_rule(FilterRule::new(1, SeccompAction::Allow)); // read
-
-manager.set_filter(pid, filter)?;
-manager.enable_seccomp(pid)?;
-```
-
-### Event Multiplexing
-
-```rust
-let kq_fd = sys_kqueue()?;
-let event = Kevent::new(3, FilterType::Read, 0, 0);
-sys_kevent_add(kq_fd, event)?;
-
-let events = sys_kevent(kq_fd, vec![], 256, -1)?;
-```
-
-## Contributing
-
-See [Contributing Guidelines](Contributing) for:
-- Development setup
-- Code standards
-- Testing requirements
-- Pull request process
-
-## Roadmap
-
-### v0.9 (Planned)
-- UTS Namespace (hostname isolation)
-- Network Namespace (network stack isolation)
-- eBPF support for advanced filtering
-- Extended cgroups controllers
-
-### v1.0 (Planned)
-- User Namespace (UID/GID mapping)
-- Advanced scheduling policies
-- Distributed tracing integration
-- Performance optimizations
-
-## Support
-
-- **Documentation**: See Wiki pages
-- **Issues**: Report on GitHub Issues
-- **Discussions**: Join GitHub Discussions
-
-## License
-
-SigmaOS is licensed under [See LICENSE file]
+Visit the [Table of contents](Table-of-contents) for a listing of article categories.
 
 ---
 
-**Current Version**: v0.8 (Production Ready)
-**Last Updated**: 2024
-**Status**: ✅ Active Development
+## The Distribution
+
+- **[About SigmaOS](About-SigmaOS)**
+  Overview of SigmaOS describing what to expect from a SigmaOS system.
+
+- **[Frequently Asked Questions](Frequently-Asked-Questions)**
+  Notable questions and facts about the distribution.
+
+- **[SigmaOS Compared to Other Distributions](SigmaOS-Compared-to-Other-Distributions)**
+  Summarizes the similarities and differences between SigmaOS and other distributions.
+
+- **[Installation Guide](Installation-Guide)**
+  Guide through the process of installing SigmaOS.
+
+- **[General Recommendations](General-Recommendations)**
+  Annotated index of post-installation tutorials and other popular articles.
+
+- **[List of Applications](List-of-Applications)**
+  Categorized presentation of common applications and packages.
+
+---
+
+## The Desktop Environment
+
+- **[Zenith Compositor](Zenith-Compositor)**
+  Overview of the Zenith desktop environment and compositor system.
+
+- **[Zenith Desktop & Omarchy Workflow](Zenith-Desktop-and-Omarchy-Workflow)**
+  Detailed guide to the Zenith desktop workflow and Omarchy integration.
+
+- **[Bolt ⚡ Fast Launcher](Zenith-Desktop-and-Omarchy-Workflow#bolt-fast-path-launcher-and-agentic-steering)**
+  Fast path launcher and agentic steering system.
+
+- **[Palette 🎨 UI Themes](Zenith-Desktop-and-Omarchy-Workflow#palette-dynamic-theme--color-engine)**
+  Dynamic theme and color engine for Zenith.
+
+- **[Sentinel 🛡️ Exec Guard](Zenith-Desktop-and-Omarchy-Workflow#sentinel-sandboxing--exec-guard)**
+  Capability-based sandboxing and execution guard.
+
+---
+
+## Package Management
+
+- **[Universal Package Engine (sigpkg)](Package-Management-and-Sigpkg)**
+  Overview of the SigmaPkg package management system.
+
+- **[Arch PKGBUILD & AUR Helper](ARCH_LINUX_PARITY_FEATURES)**
+  Integration with Arch Linux package formats and AUR.
+
+- **[Multi-Distro Adapters](UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN)**
+  Support for multiple Linux and BSD package formats.
+
+- **[Content-Addressed Storage](Content-Addressed-Storage)**
+  Immutable, cryptographically-verified package storage.
+
+---
+
+## System Administration
+
+- **[Services & Supervision](System-Administration-and-Services)**
+  Service management and supervision system.
+
+- **[Privilege Delegation (doas)](SECURITY)**
+  Secure privilege escalation and delegation.
+
+- **[Networking & WireGuard](networking)**
+  Network configuration and WireGuard VPN integration.
+
+- **[Logging & Journalctl](syslog)**
+  System logging and journal management.
+
+---
+
+## Security & Hardening
+
+- **[Security & Sandboxing](Security-Sandboxing-and-Hardening)**
+  Comprehensive security model and sandboxing capabilities.
+
+- **[Zorin Exec Guard](Security-Sandboxing-and-Hardening#zorin-exec-guard)**
+  Default-deny capability permission model.
+
+- **[Hardware Enclaves & PQC](Security-Sandboxing-and-Hardening#hardware-enclaves--post-quantum-cryptography)**
+  Hardware enclaves and post-quantum cryptography support.
+
+- **[Memory Safety Guarantees](SECURITY)**
+  Rust-enforced memory safety and kernel hardening features.
+
+---
+
+## Performance & Kernel
+
+- **[Performance & BORE Scheduler](Performance-Tuning-and-Kernel)**
+  Performance tuning and BORE scheduler configuration.
+
+- **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
+  Multi-Gen LRU and memory reclamation optimization.
+
+- **[eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking)**
+  eBPF and XDP zero-copy networking support.
+
+- **[Lock-Free Data Structures](SIGMA_CONCURRENCY_PRIMITIVES)**
+  Lock-free concurrency primitives and data structures.
+
+---
+
+## Maintenance & Recovery
+
+- **[Rollback Engine & Snapshots](Maintenance-and-Rollback-Engine)**
+  Atomic rollback engine and system snapshots.
+
+- **[Declarative Generations](Maintenance-and-Rollback-Engine#declarative-system-generations)**
+  Declarative system state and generation management.
+
+- **[ZFS Boot Environments](freebsd-zfs)**
+  ZFS boot environment management.
+
+- **[Btrfs Subvolumes](SIGMA_VFS_LAYER)**
+  Btrfs subvolume management and CoW filesystems.
+
+---
+
+## Hardware & Platform
+
+- **[Hardware Support Matrix](SUPPORT_MATRIX)**
+  Comprehensive hardware compatibility and support matrix.
+
+- **[Multi-Architecture Support](ARCHITECTURE)**
+  Support for x86_64, AArch64, and other architectures.
+
+- **[Virtualization & Containers](Virtualization-and-Containers-Isolation)**
+  Virtualization and container isolation features.
+
+- **[Device Drivers](Device-Drivers)**
+  Device driver support and management.
+
+---
+
+## Our Community
+
+- **[Code of Conduct](Code-of-Conduct)**
+  Guidelines for the SigmaOS community.
+
+- **[Getting Involved](Getting-Involved)**
+  Describes various ways contributors can participate in the SigmaOS community.
+
+- **[Contributing](Contributing)**
+  Guide to contributing to SigmaOS development and documentation.
+
+- **[International Communities](International-Communities)**
+  Collection of links to SigmaOS communities around the world.
+
+---
+
+## Wiki Interaction
+
+- **[Help:Reading](Help-Reading)**
+  Find clarifications if you struggle to understand instructions in some articles.
+
+- **[Help:Browsing](Help-Browsing)**
+  How to search the wiki, find related articles and view the wiki offline.
+
+- **[Wiki:Contributing](Wiki-Contributing)**
+  The starting point for those willing to contribute to the wiki.
+
+- **[Help:Editing](Help-Editing)**
+  Tutorial on editing articles and introduction to wiki text syntax.
+
+---
+
+## Reference Documentation
+
+- **[Product Vision & Manifesto](PRODUCT_VISION)**
+  Strategic vision and product manifesto.
+
+- **[Release Criteria](RELEASE_CRITERIA)**
+  Quality gates and release criteria.
+
+- **[Architecture Decision Records](ARCHITECTURE_DECISIONS)**
+  Key architectural decisions and their rationale.
+
+- **[Comprehensive OS Analysis](SIGMAOS_COMPREHENSIVE_OS_ANALYSIS)**
+  Consolidated analysis of SigmaOS architecture and comparisons.
+
+---
+
+**[View all wiki pages](Table-of-contents)**

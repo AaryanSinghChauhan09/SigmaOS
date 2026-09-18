@@ -1,122 +1,196 @@
-# 🏛️ SigmaOS Master Wiki — Arch & Omarchy Edition
+# Welcome to the SigmaOS Wiki
 
-Welcome to the **SigmaOS Documentation Portal**, modeled after the world-class **Arch Linux Wiki Principles** (conciseness, technical accuracy, completeness, user empowerment) and the **Omarchy Linux Desktop Philosophy** (curated, keyboard-driven Wayland tiling experience with agentic AI steering).
+**Your source for SigmaOS documentation on the web.**
 
-SigmaOS is a sovereign, secure, bare-metal desktop operating system built in zero-dependency safe Rust (`#![no_std]`). It combines atomic image-based system updates (`sysupdate`), sub-second Copy-on-Write (CoW) rollbacks, a universal package engine (`sigpkg`), and the Zenith Wayland compositor.
+SigmaOS is a secure, fast, opinionated Rust desktop operating system with atomic updates, capability-based applications, and a curated Zenith workflow.
 
----
-
-## 🎯 The SigmaOS Philosophy
-
-```
-  ┌────────────────────────────────────────────────────────────────────────┐
-  │                           SOVEREIGN WORKFLOW                           │
-  ├────────────────────────────────────────────────────────────────────────┤
-  │ boot ➔ install ➔ login ➔ Zenith desktop ➔ sigpkg ➔ update ➔ rollback   │
-  └────────────────────────────────────────────────────────────────────────┘
-```
-
-1. **Simplicity & Zero-Dependency:** Self-contained architecture built natively in safe Rust. No external C runtime dependencies or bloated scripting bridges.
-2. **Modern Wayland Desktop:** Keyboard-driven Zenith Wayland tiling compositor with GPU-accelerated terminal (Ghostty), Fastfetch system diagnostic banner, and Hyprpaper wallpaper management.
-3. **Omarchy Agentic Steering:** AI agentic triad steering integrated into desktop workflow:
-   - **Bolt ⚡:** Fast-path app launcher and automated task runner (`tdl`, `herdr-run`).
-   - **Palette 🎨:** Dynamic color scheme & UI theme manager.
-   - **Sentinel 🛡️:** Sandboxing guard and capability permission auditor.
-4. **Universal Package Management (`sigpkg`):** Native signed `.sigpkg` format with built-in Arch `PKGBUILD` / `AurHelper` (Yay/Paru) compilation, mirror ranking (`Reflector`), and containerized adapters (`.deb`, `.rpm`, `.apk`, `.xbps`, `.hpkg`, `.txz`).
-5. **Transactional State & Sub-Second Rollback:** Dual-root A/B system deployments with Copy-on-Write (CoW) snapshots (<1ms rollback time) and NixOS declarative state generation profile management.
+Visit the [Table of contents](Table-of-contents) for a listing of article categories.
 
 ---
 
-## 🗂️ Master Wiki Category Portals
+## The Distribution
 
-```
-   ┌────────────────────────────────────────────────────────────────────────┐
-   │                        SIGMAOS DOCUMENTATION                           │
-   ├───────────────────┬────────────────────┬───────────────────────────────┤
-   │  1. Installation  │  2. Desktop Workflow│  3. Package Management        │
-   │  4. System Admin  │  5. Security       │  6. Performance & Kernel      │
-   │  7. Rollback      │  8. Hardware       │  9. Developer & API           │
-   └───────────────────┴────────────────────┴───────────────────────────────┘
-```
+- **[About SigmaOS](About-SigmaOS)**
+  Overview of SigmaOS describing what to expect from a SigmaOS system.
 
----
+- **[Frequently Asked Questions](Frequently-Asked-Questions)**
+  Notable questions and facts about the distribution.
 
-### 🚀 Portal 1: Installation & Initial Setup
-- **[[Installation-Guide]]**: Complete Arch-style installation guide for bare-metal targets, QEMU/KVM, and VirtualBox (`sigpstrap`, disk partitioning, rootfs setup).
-- **[[Bootloader-and-Secure-Boot|bootloader]]**: `SigmaBootloaderEngine` setup supporting systemd-boot and GRUB EFI configurations with TPM measured boot.
-- **[[Virtual-Filesystem-and-Storage|filesystem]]**: Sovereign VFS layout (`/sovereign/store`), bcachefs/ZFS CoW pools, and volatile tmpfs overlays.
+- **[SigmaOS Compared to Other Distributions](SigmaOS-Compared-to-Other-Distributions)**
+  Summarizes the similarities and differences between SigmaOS and other distributions.
 
----
+- **[Installation Guide](Installation-Guide)**
+  Guide through the process of installing SigmaOS.
 
-### 🎨 Portal 2: Zenith Desktop & Omarchy Workflow
-- **[[Zenith-Desktop-and-Omarchy-Workflow]]**: In-depth guide to Zenith Wayland compositor, tiling layout keybindings, and desktop customization.
-- **Agentic Steering Triad:**
-  - **Bolt ⚡:** Fast-path app execution and automated task orchestration.
-  - **Palette 🎨:** Dynamic theme Provider and WCAG 2.1 AAA high-contrast switching.
-  - **Sentinel 🛡️:** Exec guard capability permission dialogs and sandboxing.
-- **Omakase Workstation Presets (`sigomarchy`):** Curated configurations for Ghostty terminal, Fastfetch sysinfo banner, Neovim, Tmux, and Waybar/Quickshell.
+- **[General Recommendations](General-Recommendations)**
+  Annotated index of post-installation tutorials and other popular articles.
+
+- **[List of Applications](List-of-Applications)**
+  Categorized presentation of common applications and packages.
 
 ---
 
-### 📦 Portal 3: Universal Package Management (`sigpkg`)
-- **[[Package-Management-and-Sigpkg]]**: Package management facade (`sigpkg`), query syntax, dependency resolution (SAT solver), and transaction checkpoints.
-- **[[Arch-PKGBUILD-and-AUR-Helper|ARCH_LINUX_PARITY_FEATURES]]**: Native parsing of Arch Linux `PKGBUILD` recipes, Yay/Paru-style `AurHelper`, AST security scanning, and chroot builds.
-- **[[Multi-Distro-Adapter-Pipeline|UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN]]**: Containerized wrappers (`apx`) translating `.deb`, `.rpm`, `.apk`, `.xbps`, `.hpkg`, and `.txz` foreign packages into native `.sigpkg`.
-- **Mirror Ranking & Maintenance:** `ReflectorMirrorRanker` latency sorting, `paccache_clean` cache pruning, and non-locking index updates.
+## The Desktop Environment
+
+- **[Zenith Compositor](Zenith-Compositor)**
+  Overview of the Zenith desktop environment and compositor system.
+
+- **[Zenith Desktop & Omarchy Workflow](Zenith-Desktop-and-Omarchy-Workflow)**
+  Detailed guide to the Zenith desktop workflow and Omarchy integration.
+
+- **[Bolt ⚡ Fast Launcher](Zenith-Desktop-and-Omarchy-Workflow#bolt-fast-path-launcher-and-agentic-steering)**
+  Fast path launcher and agentic steering system.
+
+- **[Palette 🎨 UI Themes](Zenith-Desktop-and-Omarchy-Workflow#palette-dynamic-theme--color-engine)**
+  Dynamic theme and color engine for Zenith.
+
+- **[Sentinel 🛡️ Exec Guard](Zenith-Desktop-and-Omarchy-Workflow#sentinel-sandboxing--exec-guard)**
+  Capability-based sandboxing and execution guard.
 
 ---
 
-### 🎛️ Portal 4: System Administration & Services
-- **[[System-Administration-and-Services]]**: Service supervision manifests (`SovereignServiceManifest`), `systemd` / `OpenRC` / `Runit` unit parity, and parallel dependency startup.
-- **[[User-Permissions-and-Doas|SECURITY]]**: Privilege delegation via OpenBSD `doas` (`SovereignOpenBsdDoas`), PAM authentication, and user boundaries.
-- **[[Network-Configuration-and-WireGuard|networking]]**: Wayland network applet, static/DHCP IP management, WPA3 wireless profiles, and WireGuard VPN tunnels.
-- **[[System-Logging-and-Journalctl|syslog]]**: `SovereignJournalLogger` zero-allocation binary logging and `journalctl` query interface.
+## Package Management
+
+- **[Universal Package Engine (sigpkg)](Package-Management-and-Sigpkg)**
+  Overview of the SigmaPkg package management system.
+
+- **[Arch PKGBUILD & AUR Helper](ARCH_LINUX_PARITY_FEATURES)**
+  Integration with Arch Linux package formats and AUR.
+
+- **[Multi-Distro Adapters](UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN)**
+  Support for multiple Linux and BSD package formats.
+
+- **[Content-Addressed Storage](Content-Addressed-Storage)**
+  Immutable, cryptographically-verified package storage.
 
 ---
 
-### 🛡️ Portal 5: Security, Sandboxing & Hardening
-- **[[Security-Sandboxing-and-Hardening]]**: Multi-layer sandboxing combining OpenBSD `pledge`/`unveil`, Linux Landlock v5, and FreeBSD Capsicum descriptor delegation.
-- **Zorin Exec Guard Security:** Default-deny capability permission model intercepting untrusted execution requests.
-- **Hardware Enclave Isolation:** AMD SEV-SNP and Intel TDX confidential enclave isolation with constant-time cryptographic zeroization.
-- **Post-Quantum Integrity:** Dilithium-5 signatures and Kyber-1024 KEM key exchange for livepatching and package attestations.
+## System Administration
+
+- **[Services & Supervision](System-Administration-and-Services)**
+  Service management and supervision system.
+
+- **[Privilege Delegation (doas)](SECURITY)**
+  Secure privilege escalation and delegation.
+
+- **[Networking & WireGuard](networking)**
+  Network configuration and WireGuard VPN integration.
+
+- **[Logging & Journalctl](syslog)**
+  System logging and journal management.
 
 ---
 
-### ⚡ Portal 6: Performance Tuning & Kernel Architecture
-- **[[Performance-Tuning-and-Kernel]]**: CachyOS BORE (Burst-Oriented Response Enhancer) desktop task scheduler for low-latency interactivity.
-- **CPU Governors (`CachyOsAutoFreqEngine`):** Dynamic power profile switching (Performance, Balanced, Powersave) and Energy Performance Preference (EPP) tuning.
-- **Memory Reclamation (`DemandPagingSwapEngine`):** Multi-Generational LRU (`MGLRU`) page frame reclamation, Copy-on-Write (`CoW`) faulting, KSM deduplication, and zram compressed swap.
-- **eBPF & XDP Networking:** Zero-copy XDP packet filtering and lock-free ring buffers (`BPF_MAP_TYPE_RINGBUF`).
+## Security & Hardening
+
+- **[Security & Sandboxing](Security-Sandboxing-and-Hardening)**
+  Comprehensive security model and sandboxing capabilities.
+
+- **[Zorin Exec Guard](Security-Sandboxing-and-Hardening#zorin-exec-guard)**
+  Default-deny capability permission model.
+
+- **[Hardware Enclaves & PQC](Security-Sandboxing-and-Hardening#hardware-enclaves--post-quantum-cryptography)**
+  Hardware enclaves and post-quantum cryptography support.
+
+- **[Memory Safety Guarantees](SECURITY)**
+  Rust-enforced memory safety and kernel hardening features.
 
 ---
 
-### 🔄 Portal 7: Maintenance, State & System Recovery
-- **[[Maintenance-and-Rollback-Engine]]**: Sub-millisecond Copy-on-Write transaction snapshots and rollbacks (openSUSE Snapper parity).
-- **Declarative State Graph (`DeclarativeStateGraph`):** Atomic system generation profiles (NixOS profile parity).
-- **ZFS Boot Environments:** FreeBSD `bectl` boot environment selection integrated into bootloader.
-- **Offline Updates (`FedoraOfflineUpdateEngine`):** Staged update execution during reboot (`systemd-offline-update` parity).
+## Performance & Kernel
+
+- **[Performance & BORE Scheduler](Performance-Tuning-and-Kernel)**
+  Performance tuning and BORE scheduler configuration.
+
+- **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
+  Multi-Gen LRU and memory reclamation optimization.
+
+- **[eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking)**
+  eBPF and XDP zero-copy networking support.
+
+- **[Lock-Free Data Structures](SIGMA_CONCURRENCY_PRIMITIVES)**
+  Lock-free concurrency primitives and data structures.
 
 ---
 
-### 🛠️ Portal 8: Hardware Support Matrix
-- **[[Hardware-Support-Matrix|SUPPORT_MATRIX]]**: Verified hardware compatibility table for CPUs, GPUs, NVMe storage, WiFi/Bluetooth, touchpads, and monitors.
-- **Device Drivers:** `EdidMonitorDdcDisplayDriver`, `PcSpeakerInternalAudioDriver`, `UvcWebcamVideoCameraDriver`, `IntelBtUsbBluetoothDriver`, `NvmePCIeHostControllerDriver`.
+## Maintenance & Recovery
+
+- **[Rollback Engine & Snapshots](Maintenance-and-Rollback-Engine)**
+  Atomic rollback engine and system snapshots.
+
+- **[Declarative Generations](Maintenance-and-Rollback-Engine#declarative-system-generations)**
+  Declarative system state and generation management.
+
+- **[ZFS Boot Environments](freebsd-zfs)**
+  ZFS boot environment management.
+
+- **[Btrfs Subvolumes](SIGMA_VFS_LAYER)**
+  Btrfs subvolume management and CoW filesystems.
 
 ---
 
-### ⌨️ Quick CLI Cheatsheet
+## Hardware & Platform
 
-| Command | Subsystem | Action Description |
-|---------|-----------|--------------------|
-| `sigpkg install <pkg>` | Package Manager | Resolves dependencies and installs package |
-| `sigpkg aur build <pkg>` | AUR Helper | Downloads, audits PKGBUILD diff, and compiles package in chroot |
-| `sigpkg rankmirrors` | Mirror Manager | Benchmarks and ranks package mirror latency |
-| `sigpkg rollback <id>` | Transaction Engine | Reverts system state to snapshot `<id>` in < 1ms |
-| `sigomarchy preset apply <name>` | Workstation Manager | Applies Omakase desktop config preset (Ghostty, Neovim, Waybar) |
-| `doas <cmd>` | Privilege Escalation | Executes command with delegated capabilities per rule |
-| `sysctl <key>=<val>` | Kernel Tuner | Queries or modifies kernel MIB configuration tree |
-| `journalctl -u <service>` | System Logger | Filters binary journal logs by service unit |
+- **[Hardware Support Matrix](SUPPORT_MATRIX)**
+  Comprehensive hardware compatibility and support matrix.
+
+- **[Multi-Architecture Support](ARCHITECTURE)**
+  Support for x86_64, AArch64, and other architectures.
+
+- **[Virtualization & Containers](Virtualization-and-Containers-Isolation)**
+  Virtualization and container isolation features.
+
+- **[Device Drivers](Device-Drivers)**
+  Device driver support and management.
 
 ---
 
-*Documentation maintained according to Arch Linux Wiki standards and Omarchy Linux desktop principles. Verified by `./run_sigma_tests.sh`.*
+## Our Community
+
+- **[Code of Conduct](Code-of-Conduct)**
+  Guidelines for the SigmaOS community.
+
+- **[Getting Involved](Getting-Involved)**
+  Describes various ways contributors can participate in the SigmaOS community.
+
+- **[Contributing](Contributing)**
+  Guide to contributing to SigmaOS development and documentation.
+
+- **[International Communities](International-Communities)**
+  Collection of links to SigmaOS communities around the world.
+
+---
+
+## Wiki Interaction
+
+- **[Help:Reading](Help-Reading)**
+  Find clarifications if you struggle to understand instructions in some articles.
+
+- **[Help:Browsing](Help-Browsing)**
+  How to search the wiki, find related articles and view the wiki offline.
+
+- **[Wiki:Contributing](Wiki-Contributing)**
+  The starting point for those willing to contribute to the wiki.
+
+- **[Help:Editing](Help-Editing)**
+  Tutorial on editing articles and introduction to wiki text syntax.
+
+---
+
+## Reference Documentation
+
+- **[Product Vision & Manifesto](PRODUCT_VISION)**
+  Strategic vision and product manifesto.
+
+- **[Release Criteria](RELEASE_CRITERIA)**
+  Quality gates and release criteria.
+
+- **[Architecture Decision Records](ARCHITECTURE_DECISIONS)**
+  Key architectural decisions and their rationale.
+
+- **[Comprehensive OS Analysis](SIGMAOS_COMPREHENSIVE_OS_ANALYSIS)**
+  Consolidated analysis of SigmaOS architecture and comparisons.
+
+---
+
+**[View all wiki pages](Table-of-contents)**
