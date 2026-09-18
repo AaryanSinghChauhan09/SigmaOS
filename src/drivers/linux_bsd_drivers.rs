@@ -1737,11 +1737,11 @@ impl SocketCanDriver {
 }
 
 // =========================================================================
-// Unit Tests Module
+// Integration Tests Module
 // =========================================================================
 
 #[cfg(test)]
-mod tests {
+mod integration_tests {
     use super::*;
 
     #[test]

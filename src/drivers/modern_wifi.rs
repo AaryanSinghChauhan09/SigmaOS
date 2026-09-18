@@ -7,8 +7,7 @@
 use std::string::String;
 use std::string::ToString;
 use std::vec::Vec;
-
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+use crate::drivers::peripheral::PowerState;
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,14 +17,7 @@ pub enum DeviceGeneration {
 }
 
 #[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PowerState {
-    Off,
-    On,
-}
-
-#[cfg(test)]
-pub trait PeripheralDevice {
+pub trait TestPeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
     fn initialize(&mut self) -> Result<(), &'static str>;
@@ -221,7 +213,9 @@ impl ModernWifiDriver {
     }
 }
 
-impl PeripheralDevice for ModernWifiDriver {
+#[cfg(test)]
+#[allow(dead_code)]
+impl TestPeripheralDevice for ModernWifiDriver {
     fn name(&self) -> &'static str {
         "802.11 Modern Wireless Driver"
     }

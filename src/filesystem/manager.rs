@@ -1140,7 +1140,7 @@ impl Default for OpenSourceFileManagerEnhancementEngine {
 
 
 #[cfg(test)]
-mod tests {
+mod integration_tests {
     use super::*;
 
     #[test]

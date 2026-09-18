@@ -14,7 +14,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // Modern Plug-and-Play USB printing driver
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+use crate::drivers::peripheral::PowerState;
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -24,14 +24,7 @@ pub enum DeviceGeneration {
 }
 
 #[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PowerState {
-    Off,
-    On,
-}
-
-#[cfg(test)]
-pub trait PeripheralDevice {
+pub trait TestPeripheralDevice {
     fn name(&self) -> &'static str;
     fn generation(&self) -> DeviceGeneration;
     fn initialize(&mut self) -> Result<(), &'static str>;
@@ -56,7 +49,9 @@ impl ModernUsbPrinterDriver {
     }
 }
 
-impl PeripheralDevice for ModernUsbPrinterDriver {
+#[cfg(test)]
+#[allow(dead_code)]
+impl TestPeripheralDevice for ModernUsbPrinterDriver {
     fn name(&self) -> &'static str {
         "HP/Epson Modern USB Line Printer"
     }

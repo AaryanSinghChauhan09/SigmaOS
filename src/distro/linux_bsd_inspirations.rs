@@ -268,6 +268,7 @@ impl SovereignUniversalDistroBridge {
 
             DistroSubsystemMode::LinuxSolus => ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::NetBsd => ServiceSupervisorType::OpenRC,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
             _ => ServiceSupervisorType::Systemd,
@@ -375,6 +376,7 @@ impl SovereignUniversalDistroBridge {
 
             DistroSubsystemMode::LinuxSolus => supervisor == ServiceSupervisorType::Dinit,
             DistroSubsystemMode::LinuxSlackware => supervisor == ServiceSupervisorType::Sysvinit,
+            DistroSubsystemMode::NetBsd => supervisor == ServiceSupervisorType::OpenRC,
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
             _ => supervisor == ServiceSupervisorType::Systemd,
@@ -403,13 +405,13 @@ impl SovereignUniversalDistroBridge {
             DistroSubsystemMode::LinuxFedora
             | DistroSubsystemMode::LinuxOpenSuse => format!("{}.rpm", input_pkg),
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", input_pkg),
-            DistroSubsystemMode::LinuxClear => format!("{}.bundle", input_pkg),
+            DistroSubsystemMode::LinuxSlackware => format!("{}.txz", input_pkg),
+            DistroSubsystemMode::LinuxClear => format!("{}.rpm", input_pkg),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", input_pkg)
             }
-            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd | DistroSubsystemMode::SmartOs => {
-                format!("{}.tgz", input_pkg)
-            }
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => format!("{}.tgz", input_pkg),
+            DistroSubsystemMode::SmartOs => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", input_pkg),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", input_pkg),
             _ => format!("{}.deb", input_pkg),
@@ -445,13 +447,12 @@ impl SovereignUniversalDistroBridge {
                 format!("{}.rpm", action)
             }
             DistroSubsystemMode::LinuxSolus => format!("{}.eopkg", action),
-            DistroSubsystemMode::LinuxClear => format!("{}.bundle", action),
+            DistroSubsystemMode::LinuxClear => format!("{}.rpm", action),
             DistroSubsystemMode::FreeBsd | DistroSubsystemMode::DragonFlyBsd => {
                 format!("{}.pkg", action)
             }
-            DistroSubsystemMode::OpenBsd
-            | DistroSubsystemMode::NetBsd
-            | DistroSubsystemMode::SmartOs => format!("{}.tgz", action),
+            DistroSubsystemMode::OpenBsd | DistroSubsystemMode::NetBsd => format!("{}.tgz", action),
+            DistroSubsystemMode::SmartOs => format!("{}.p5p", action),
             DistroSubsystemMode::LinuxSlackware => format!("{}.txz", action),
             DistroSubsystemMode::SolarisIllumos => format!("{}.p5p", action),
             DistroSubsystemMode::BedrockLinux => format!("{}.stratum", action),
@@ -579,6 +580,14 @@ impl SovereignUniversalDistroBridge {
                 Ok(format!(
                     "Dispatched auth systemd-homed LUKS/PAM check for user under distro mode '{:?}' (status: {})",
                     self.mode, status
+                ))
+            }
+            "containers" => {
+                let mut container_mgr = SovereignCrossDistroContainerManager::new(self.mode);
+                let container_id = container_mgr.spawn_isolated_container("test-container", action)?;
+                Ok(format!(
+                    "Dispatched container operation '{}' (container_id: {}) under distro mode '{:?}'",
+                    action, container_id, self.mode
                 ))
             }
             "automation" => {
@@ -6765,11 +6774,6 @@ mod tests {
                 ServiceSupervisorType::Runit,
             ),
             (
-                DistroSubsystemMode::LinuxSlackware,
-                "txz",
-                ServiceSupervisorType::Sysvinit,
-            ),
-            (
                 DistroSubsystemMode::LinuxOpenSuse,
                 "rpm",
                 ServiceSupervisorType::Systemd,
@@ -6785,13 +6789,18 @@ mod tests {
                 ServiceSupervisorType::Dinit,
             ),
             (
+                DistroSubsystemMode::LinuxSlackware,
+                "txz",
+                ServiceSupervisorType::Sysvinit,
+            ),
+            (
                 DistroSubsystemMode::LinuxGuix,
                 "scm",
                 ServiceSupervisorType::Shepherd,
             ),
             (
                 DistroSubsystemMode::LinuxClear,
-                "bundle",
+                "rpm",
                 ServiceSupervisorType::Systemd,
             ),
             (
@@ -6801,7 +6810,7 @@ mod tests {
             ),
             (
                 DistroSubsystemMode::SmartOs,
-                "tgz",
+                "p5p",
                 ServiceSupervisorType::Rcd,
             ),
             (
