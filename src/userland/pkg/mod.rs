@@ -3,6 +3,7 @@
 // Userland package utilities
 // Zero-dependency implementation - no external libraries required
 
+pub mod sigma_pkg;
 
 use std::vec::Vec;
 use std::string::{String, ToString};
@@ -147,7 +148,7 @@ impl Default for PackageInstaller {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
     
