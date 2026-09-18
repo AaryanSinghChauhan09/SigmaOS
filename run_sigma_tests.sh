@@ -44,6 +44,13 @@ if [ -f "src/distro/sovereign_2026_distro_leap_engine.rs" ]; then
     ./build/test_2026_leap
 fi
 
+if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
+    echo "Running Linux & BSD Distro Breakthroughs test suite..."
+    mkdir -p build
+    rustc --test src/distro/linux_bsd_distro_breakthroughs.rs --edition=2021 -o build/distro_breakthroughs_test
+    ./build/distro_breakthroughs_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
