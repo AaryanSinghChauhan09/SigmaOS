@@ -707,15 +707,3 @@ mod tests {
         assert_eq!(tokens.color_background, 0xFF000000); // Strict black background
     }
 }
-
-// Placeholder types for compilation
-mod sigma_types {
-
-
-    pub type Result<T> = core::result::Result<T, &'static str>;
-
-    #[derive(Debug, Clone)]
-    pub struct CapabilityToken {
-        pub id: u64,
-    }
-}

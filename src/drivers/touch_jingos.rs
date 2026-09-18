@@ -13,8 +13,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-// JingOS tablet-centric capacitive touchscreen gestural input driver simulator
-#[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[cfg(test_disabled)]

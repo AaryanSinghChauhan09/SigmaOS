@@ -8,12 +8,10 @@
 //! - `OmarchyHerdrAiAgentManager`: Multi-agent orchestrator managing parallel AI coding agents (Claude, Codex, Grok, Gemini, Local)
 //! - `OmarchyReleaseChannelSnapshotEngine`: Multi-channel system release tracking (Stable, Edge, RC, Dev) with automated update pre-flight snapshots
 
-extern crate alloc;
-
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use std::collections::BTreeMap;
+use std::format;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// Release channels available in Omarchy-style system management
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -758,5 +756,22 @@ mod omarchy_tests {
         let snap = engine.create_preflight_update_snapshot(1700000000);
         assert!(snap.contains("snapshot_Stable_1700000000"));
         assert_eq!(engine.snapshots.len(), 1);
+    }
+
+    #[test]
+    fn test_new_omarchy_components() {
+        let mut hypr = OmarchyHyprlandWorkspaceSnapLayoutEngine::new();
+        hypr.add_rule("ghostty", 1, false);
+        assert!(hypr.generate_hyprland_layout_config().contains("workspace 1, class:^(ghostty)$"));
+
+        let mut nvim = OmarchyNeovimPresetStudioEngine::new();
+        assert!(nvim.register_lsp_server("rustaceanvim"));
+
+        let waybar = OmarchyWaybarAppletStudioEngine::new();
+        assert!(waybar.render_waybar_config_json().contains("hyprland/workspaces"));
+
+        let mut boot = OmarchyLiveIsoBootstrapEngine::new("/dev/nvme0n1");
+        let res = boot.run_60s_bootstrap_installer().unwrap();
+        assert!(res.contains("Omarchy live bootstrap installed"));
     }
 }

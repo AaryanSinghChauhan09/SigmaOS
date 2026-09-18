@@ -285,20 +285,6 @@ impl SimpleVMM {
         writable: bool,
         executable: bool,
     ) -> Result<(), MemoryError> {
-        self.map_page(virt, phys, writable, !executable)
-    }
-
-    /// Maps a standard 4KB page
-    pub fn map_page(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        writable: bool,
-        execute_disable: bool,
-    ) -> Result<(), MemoryError> {
-        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
-            return Err(MemoryError::InvalidAddress);
-        }
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -322,7 +308,7 @@ impl SimpleVMM {
 
         let pd = pdpt.get_table_mut(pd_idx).unwrap();
 
-        let pte = PageTableEntry::with_attributes(phys, writable, false, execute_disable);
+        let pte = PageTableEntry::with_attributes(phys, writable, false, !executable);
         pd.set_entry(pt_idx, pte)?;
 
         if !self.active_pages_for_clock.contains(&virt) {
@@ -332,14 +318,7 @@ impl SimpleVMM {
         Ok(())
     }
 
-    /// Maps a standard 4KB page
-    pub fn map_page(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-    ) -> Result<(), MemoryError> {
-        self.map_page_with_flags(virt, phys, true, false)
-    }
+
 
     /// Maps a 2MB Huge Page (at the Page Directory level)
     pub fn map_huge_2mb(
@@ -519,7 +498,7 @@ impl SimpleVMM {
                 // Decompress page and map it back on demand (zram decompression swap-in)
                 let decompressed_phys = PhysicalAddress(virt.0); // mapped back
                 self.zram_pool.remove(i);
-                self.map_page(virt, decompressed_phys, true, false).unwrap();
+                self.map_page_with_flags(virt, decompressed_phys, true, false).unwrap();
                 return Ok(decompressed_phys);
             }
         }

@@ -1,7 +1,4 @@
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use std::collections::BTreeMap;
+
 use std::string::{String, ToString};
 use std::vec::Vec;
 
@@ -4418,6 +4415,8 @@ pub struct VoidLinuxRunitSupervisor {
     pub services: HashMap<String, VoidRunitService>,
 }
 
+pub type VoidRunitInit = VoidLinuxRunitSupervisor;
+
 impl VoidLinuxRunitSupervisor {
     pub fn new() -> Self {
         Self {
@@ -4572,7 +4571,7 @@ impl OpenSuseSnapperEngine {
 }
 
 mod linux_bsd_extra_tests {
-    use super::*;
+    
 
     #[test]
     fn test_linux_landlock_lsm_rules() {

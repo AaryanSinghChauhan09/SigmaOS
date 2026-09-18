@@ -788,7 +788,7 @@ impl Default for FileTagManager {
 }
 
 #[cfg(test)]
-mod open_source_file_manager_tests {
+mod open_source_file_manager_tests_2 {
     use super::*;
 
     #[test]
@@ -843,6 +843,28 @@ mod open_source_file_manager_tests {
 
 #[cfg(test_disabled)]
 mod tests {
+    #[test]
+    fn test_opensource_file_manager_enhancements() {
+        let mut fm = OpenSourceFileManagerEnhancementEngine::new("/home/user");
+        assert_eq!(fm.active_pane, ActivePane::Left);
+
+        assert_eq!(fm.switch_active_pane(), ActivePane::Right);
+        assert_eq!(fm.active_pane, ActivePane::Right);
+
+        fm.set_vi_mode(ViNavigationMode::Visual);
+        assert_eq!(fm.vi_mode, ViNavigationMode::Visual);
+
+        fm.set_git_status("/home/user/main.rs", GitFileStatus::Modified);
+        let meta = fm.metadata_store.get("/home/user/main.rs").unwrap();
+        assert_eq!(meta.git_status, GitFileStatus::Modified);
+
+        let preview = fm.generate_async_preview("/home/user/main.rs", b"fn main() { hello }");
+        assert!(preview.contains("Preview: fn main()"));
+
+        let renames = fm.batch_rename_pattern(&["file_v1.txt", "file_v2.txt"], "file_", "doc_");
+        assert_eq!(renames.len(), 2);
+        assert_eq!(renames[0].1, "doc_v1.txt");
+    }
     use super::*;
 
     #[test]
@@ -1002,11 +1024,7 @@ mod open_source_file_manager_tests {
 // Open-Source File Manager Enhancements (Dolphin, Yazi, Ranger, Nautilus, Thunar)
 // =========================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ActivePane {
-    Left,
-    Right,
-}
+
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ViNavigationMode {
@@ -1148,3 +1166,4 @@ mod tests {
         assert_eq!(renames[0].1, "doc_v1.txt");
     }
 }
+

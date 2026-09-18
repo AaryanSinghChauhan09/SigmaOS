@@ -18,13 +18,13 @@ jobs:
         distro_format: [deb, rpm, arch, apk, ebuild, freebsd_pkg]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@stable # stable
         with:
           toolchain: stable
 
       - name: Test Package Format Adapter (${{ matrix.distro_format }})
         run: |
-          cargo test --lib
+          ./run_sigma_tests.sh

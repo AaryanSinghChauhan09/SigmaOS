@@ -1,6 +1,6 @@
 // Sovereign Tech News & Technology Media Redirection Engine
 // Inspiring content aggregation, RSS/Atom feed parsing, and smart URL redirection
-// across 28 top Linux & Tech publications for SigmaOS browser and desktop news widgets.
+// across 33 top Linux & Tech publications for SigmaOS browser and desktop news widgets.
 // 100% Safe Rust `#![no_std]` compliant with zero external dependencies.
 
 extern crate alloc;
@@ -58,6 +58,8 @@ impl SovereignTechNewsRedirectionEngine {
         let entries = vec![
             ("itsfoss", "ItsFOSS", "itsfoss.com", "https://itsfoss.com/feed/", "https://itsfoss.com", TechPublicationCategory::LinuxAndOpenSource, "Linux tutorials, distro news and open-source updates"),
             ("9to5linux", "9to5Linux", "9to5linux.com", "https://9to5linux.com/feed", "https://9to5linux.com", TechPublicationCategory::LinuxAndOpenSource, "Linux release news and desktop distro updates"),
+            ("9to5google", "9to5Google", "9to5google.com", "https://9to5google.com/feed/", "https://9to5google.com", TechPublicationCategory::WindowsAndCrossPlatform, "Android, Pixel feature drops and Google ecosystem news"),
+            ("9to5mac", "9to5Mac", "9to5mac.com", "https://9to5mac.com/feed/", "https://9to5mac.com", TechPublicationCategory::WindowsAndCrossPlatform, "Apple, macOS desktop continuity and iOS platform updates"),
             ("geekygadgets", "Geeky Gadgets", "geeky-gadgets.com", "https://www.geeky-gadgets.com/feed/", "https://www.geeky-gadgets.com", TechPublicationCategory::HardwareAndGadgets, "Gadget news, hardware reviews and tech innovations"),
             ("linuxdotcom", "Linux.com", "linux.com", "https://www.linux.com/feed/", "https://www.linux.com", TechPublicationCategory::LinuxAndOpenSource, "Official Linux news, developer guides and industry news"),
             ("kdnuggets", "KDnuggets", "kdnuggets.com", "https://www.kdnuggets.com/feed", "https://www.kdnuggets.com", TechPublicationCategory::AiAndDataScience, "AI, Machine Learning, Data Science & Analytics tutorials"),
@@ -84,6 +86,11 @@ impl SovereignTechNewsRedirectionEngine {
             ("linuxteck", "LinuxTeck", "linuxteck.com", "https://www.linuxteck.com/feed/", "https://www.linuxteck.com", TechPublicationCategory::LinuxAndOpenSource, "Linux sysadmin tutorials, DevOps and security guides"),
             ("appuals", "Appuals", "appuals.com", "https://appuals.com/feed/", "https://appuals.com", TechPublicationCategory::WindowsAndCrossPlatform, "Software troubleshooting, OS error fixes and guides"),
             ("distrowatch", "DistroWatch", "distrowatch.com", "https://distrowatch.com/news/dw.xml", "https://distrowatch.com", TechPublicationCategory::LinuxAndOpenSource, "Linux and BSD distribution release tracking and rankings"),
+            ("9to5google", "9to5Google", "9to5google.com", "https://9to5google.com/feed/", "https://9to5google.com", TechPublicationCategory::HardwareAndGadgets, "Google, Android, Pixel, and ChromeOS news and updates"),
+            ("9to5mac", "9to5Mac", "9to5mac.com", "https://9to5mac.com/feed/", "https://9to5mac.com", TechPublicationCategory::HardwareAndGadgets, "Apple, iPhone, Mac, and iOS/macOS news and updates"),
+            ("androidauthority", "Android Authority", "androidauthority.com", "https://www.androidauthority.com/feed/", "https://www.androidauthority.com", TechPublicationCategory::HardwareAndGadgets, "Android devices, mobile tech, and mobile ecosystem news"),
+            ("androidpolice", "Android Police", "androidpolice.com", "https://www.androidpolice.com/feed/", "https://www.androidpolice.com", TechPublicationCategory::HardwareAndGadgets, "Android apps, OS news, device reviews, and tutorials"),
+            ("frappe", "Frappe Framework", "frappe.io", "https://frappe.io/feed", "https://frappe.io", TechPublicationCategory::EnterpriseAndCloud, "Low-code open-source ERP & enterprise framework"),
         ];
 
         for (id, name, domain, feed_url, canonical_url, category, desc) in entries {
@@ -185,6 +192,9 @@ mod tests {
     fn test_tech_publication_redirects() {
         let engine = SovereignTechNewsRedirectionEngine::new();
 
+        // Verify total publication count is exactly 33
+        assert_eq!(engine.publications.len(), 33);
+
         // Direct key shortcuts
         assert_eq!(
             engine.redirect_url("phoronix"),
@@ -197,6 +207,26 @@ mod tests {
         assert_eq!(
             engine.redirect_url("distrowatch"),
             Some("https://distrowatch.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("9to5google"),
+            Some("https://9to5google.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("9to5mac"),
+            Some("https://9to5mac.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("androidauthority"),
+            Some("https://www.androidauthority.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("androidpolice"),
+            Some("https://www.androidpolice.com".to_string())
+        );
+        assert_eq!(
+            engine.redirect_url("frappe"),
+            Some("https://frappe.io".to_string())
         );
 
         // Domain matching
@@ -231,5 +261,52 @@ mod tests {
         let search_res = engine.search_articles("Kernel");
         assert_eq!(search_res.len(), 1);
         assert_eq!(search_res[0].title, "Linux Kernel 6.12 Benchmarks");
+    }
+
+    #[test]
+    fn test_all_33_urls_redirection() {
+        let engine = SovereignTechNewsRedirectionEngine::new();
+        let target_urls = [
+            ("9to5google", "https://9to5google.com"),
+            ("9to5linux", "https://9to5linux.com"),
+            ("9to5mac", "https://9to5mac.com"),
+            ("androidauthority", "https://www.androidauthority.com"),
+            ("androidpolice", "https://www.androidpolice.com"),
+            ("appuals", "https://appuals.com"),
+            ("distrowatch", "https://distrowatch.com"),
+            ("frappe", "https://frappe.io"),
+            ("geekygadgets", "https://www.geeky-gadgets.com"),
+            ("hwbusters", "https://hwbusters.com"),
+            ("howtogeek", "https://www.howtogeek.com"),
+            ("infoworld", "https://www.infoworld.com"),
+            ("itsfoss", "https://itsfoss.com"),
+            ("itdaily", "https://www.itdaily.com"),
+            ("kdnuggets", "https://www.kdnuggets.com"),
+            ("linuxdotcom", "https://www.linux.com"),
+            ("linuxorg", "https://www.linux.org"),
+            ("linuxfoundation", "https://www.linuxfoundation.org"),
+            ("linuxteck", "https://www.linuxteck.com"),
+            ("makeuseof", "https://www.makeuseof.com"),
+            ("marktechpost", "https://www.marktechpost.com"),
+            ("opensourceforu", "https://www.opensourceforu.com"),
+            ("pcmag", "https://www.pcmag.com"),
+            ("pcworld", "https://www.pcworld.com"),
+            ("phoronix", "https://www.phoronix.com"),
+            ("techcrunch", "https://techcrunch.com"),
+            ("techpowerup", "https://www.techpowerup.com"),
+            ("techspot", "https://www.techspot.com"),
+            ("thenewstack", "https://thenewstack.io"),
+            ("windowscentral", "https://www.windowscentral.com"),
+            ("windowslatest", "https://www.windowslatest.com"),
+            ("xdadevelopers", "https://www.xda-developers.com"),
+            ("zdnet", "https://www.zdnet.com"),
+        ];
+
+        assert_eq!(engine.publications.len(), 33);
+
+        for (key, expected_canonical) in target_urls {
+            let res = engine.redirect_url(key);
+            assert_eq!(res, Some(expected_canonical.to_string()), "Failed for key {}", key);
+        }
     }
 }

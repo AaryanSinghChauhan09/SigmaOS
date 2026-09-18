@@ -30,12 +30,6 @@ pub struct DinitServiceManager {
     pub running_count: AtomicUsize,
 }
 
-impl Default for DinitServiceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl DinitServiceManager {
     pub fn new() -> Self {
         Self {

@@ -1,4 +1,3 @@
-use std::boxed::Box;
 // SigmaOS Alpine Linux BusyBox-Inspired Multi-Call Applet Command Dispatcher
 // Zero-dependency, safe, robust command multiplexing for sovereign userland shell
 // Inspired by Alpine Linux BusyBox multicall binary architecture
@@ -7,7 +6,6 @@ use std::boxed::Box;
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 pub type AppletHandler = fn(args: &[&str]) -> Result<String, &'static str>;
 
@@ -29,7 +27,7 @@ impl BusyBoxAppletDispatcher {
     }
 
     fn register_default_applets(&mut self) {
-        self.register_applet("ls", |args| {
+        self.register_applet("ls", |_args| {
             Ok("applet [ls]: .  ..  bin  dev  etc  proc  sys  usr  var".to_string())
         });
 
@@ -81,7 +79,7 @@ impl Default for BusyBoxAppletDispatcher {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

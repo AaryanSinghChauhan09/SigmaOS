@@ -1,6 +1,6 @@
+use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
-use std::vec;
 use std::vec::Vec;
 use std::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -788,7 +788,7 @@ impl BetsySystemdCompatShim {
 pub struct TransientServiceGenerator;
 
 impl TransientServiceGenerator {
-    pub fn create_transient_unit(cmd: &str, service_name: &str) -> SystemdUnit {
+    pub fn create_transient_unit(_cmd: &str, service_name: &str) -> SystemdUnit {
         let mut unit = SystemdUnit::new(999, service_name.as_bytes(), UnitType::Service);
         unit.restart_policy = RestartPolicy::No;
         unit

@@ -3,64 +3,19 @@
 // Eliminates dependency on std::collections
 
 use core::cell::Cell;
-use std::collections::BTreeMap as AllocBTreeMap;
-use std::collections::BTreeSet as AllocBTreeSet;
-use std::collections::VecDeque as AllocVecDeque;
 
+pub use super::btreemap::BTreeMap;
 pub use super::hashmap::{Entry, HashMap};
-
-/// Simple BTreeMap implementation for klib
-pub struct BTreeMap<K, V> {
-    inner: AllocBTreeMap<K, V>,
-}
-
-impl<K: Ord, V> BTreeMap<K, V> {
-    pub fn new() -> Self {
-        Self {
-            inner: AllocBTreeMap::new(),
-        }
-    }
-
-    pub fn insert(&mut self, key: K, value: V) -> Option<V> {
-        self.inner.insert(key, value)
-    }
-
-    pub fn get(&self, key: &K) -> Option<&V> {
-        self.inner.get(key)
-    }
-
-    pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
-        self.inner.get_mut(key)
-    }
-
-    pub fn remove(&mut self, key: &K) -> Option<V> {
-        self.inner.remove(key)
-    }
-
-    pub fn len(&self) -> usize {
-        self.inner.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.inner.is_empty()
-    }
-}
-
-impl<K: Ord, V> Default for BTreeMap<K, V> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 /// Simple HashSet implementation for klib (Using BTreeSet internally)
 pub struct HashSet<T> {
-    inner: AllocBTreeSet<T>,
+    inner: alloc::collections::BTreeSet<T>,
 }
 
 impl<T: Ord> HashSet<T> {
     pub fn new() -> Self {
         Self {
-            inner: AllocBTreeSet::new(),
+            inner: alloc::collections::BTreeSet::new(),
         }
     }
 
@@ -94,13 +49,13 @@ impl<T: Ord> Default for HashSet<T> {
 /// Simple VecDeque implementation for klib
 #[derive(Clone)]
 pub struct VecDeque<T> {
-    inner: AllocVecDeque<T>,
+    inner: alloc::collections::VecDeque<T>,
 }
 
 impl<T> VecDeque<T> {
     pub fn new() -> Self {
         Self {
-            inner: AllocVecDeque::new(),
+            inner: alloc::collections::VecDeque::new(),
         }
     }
 
@@ -136,7 +91,7 @@ impl<T> VecDeque<T> {
         self.inner.is_empty()
     }
 
-    pub fn drain<R>(&mut self, range: R) -> std::collections::vec_deque::Drain<'_, T>
+    pub fn drain<R>(&mut self, range: R) -> alloc::collections::vec_deque::Drain<'_, T>
     where
         R: core::ops::RangeBounds<usize>,
     {

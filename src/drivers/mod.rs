@@ -22,6 +22,7 @@ pub mod touch_jingos;
 pub mod printing;
 pub mod usb_hid;
 pub mod sovereign_driver_lifecycle;
+pub mod sovereign_distro_driver_suite;
 pub mod vesa;
 
 pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
@@ -42,10 +43,11 @@ pub use linux_bsd_drivers::{
     UvcCameraDriver, VideoPixelFormat, VirtioGpu3dDriver, VirtioSoundDriver,
     WacomPrecisionTouchpadDriver, WifiMode,
 };
-pub use modern_audio_intel_hda::ModernAudioIntelHda;
+pub use modern_audio_intel_hda::*;
+pub use modern_nvme::*;
 pub use modern_usb::ModernUsbController;
 pub use modern_usb_printer::ModernUsbPrinterDriver;
-pub use modern_wifi::ModernWifiDriver;
+pub use modern_wifi::*;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
@@ -60,12 +62,5 @@ pub use sovereign_driver_lifecycle::{
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
-pub use distro_device_expansion::{
-    AppleNvmeAnsDriver, AtherosAr9271WifiDriver, CanBusSocketDriver, Cxl3MemoryExpanderDriver,
-    Esp32HciBtBridgeDriver, FloppyDiskControllerDriver, IntelI2cSmbusControllerDriver,
-    IntelIgbNicDriver, IntelIwfWifiDriver, IntelXeArcGpuDriver, LogitechUnifyingHidDriver,
-    Mpt3SasControllerDriver, NvidiaNouveauOpenGspDriver, RadeonKmsGpuDriver,
-    RaspberryPiGpioMailboxDriver, RealtekAlcAudioDriver, RealtekRtl8169Driver,
-    SoundBlaster16IsaDriver, SynapticsTouchpadDriver, ThreeCom3c59xEthernetDriver,
-    UsbAudioClass2Driver, VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
-};
+pub use distro_device_expansion::*;
+pub use sovereign_distro_driver_suite::*;

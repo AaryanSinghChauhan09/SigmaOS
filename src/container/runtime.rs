@@ -199,24 +199,43 @@ impl NamespaceConfig {
     }
 }
 
-
+/// Seccomp profile with bitmask and list-based syscall blocking
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SeccompProfile {
+    pub enabled: bool,
+    pub allow_default: bool,
+    pub allowed_syscalls: Vec<u32>,
     pub blocked_syscalls: Vec<u32>,
+    pub blocked_syscalls_mask: u32,
     pub hardened: bool,
-    pub blocked_syscalls_mask: u64,
+}
+
+impl Default for SeccompProfile {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            allow_default: true,
+            allowed_syscalls: Vec::new(),
+            blocked_syscalls: Vec::new(),
+            blocked_syscalls_mask: 0,
+            hardened: false,
+        }
+    }
 }
 
 impl SeccompProfile {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if !self.hardened {
+        if !self.hardened && !self.enabled {
             return false;
         }
-        if syscall_id < 64 {
-            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
-        } else {
-            self.blocked_syscalls.contains(&syscall_id)
+        if syscall_id < 64 && self.blocked_syscalls_mask != 0 {
+            return (self.blocked_syscalls_mask & (1 << syscall_id)) != 0;
         }
+        self.blocked_syscalls.contains(&syscall_id)
     }
 }
 
@@ -314,6 +333,7 @@ impl SimpleContainer {
                 blocked_syscalls: Vec::new(),
                 hardened: false,
                 blocked_syscalls_mask: 0,
+                ..SeccompProfile::default()
             },
         }
     }
@@ -799,8 +819,8 @@ pub mod oci {
     extern crate alloc;
     use crate::container::runtime::NamespaceConfig;
     use crate::container::ContainerError;
-    use alloc::vec::Vec;
-
+    use crate::container::ContainerState;
+    
     pub struct NamespaceSet {
         pub pidns: Option<usize>,
         pub mntns: Option<usize>,
@@ -865,14 +885,6 @@ pub mod oci {
         pub r#type: String,
         pub source: String,
         pub options: Vec<String>,
-    }
-
-    pub enum ContainerState {
-        Created,
-        Running,
-        Paused,
-        Stopped,
-        Deleted,
     }
 
     pub struct Container {
@@ -961,7 +973,6 @@ pub mod oci {
 
 #[cfg(test_disabled)]
 mod tests {
-    extern crate alloc;
     use super::*;
     use std::string::ToString;
     use std::vec;
@@ -1023,6 +1034,7 @@ mod tests {
             blocked_syscalls: Vec::new(),
             hardened: true,
             blocked_syscalls_mask: 1, // Block sys_mount (syscall 0)
+            ..SeccompProfile::default()
         };
 
         // Allowed syscall (e.g. syscall 1)

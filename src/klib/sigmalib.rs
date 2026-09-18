@@ -142,8 +142,8 @@ pub mod memory {
             *s.add(i) = 0;
             i += 1;
         }
-        // Prevent compiler optimization
-        core::hint::black_box(());
+        // Prevent compiler optimization using volatile write
+        core::ptr::write_volatile(s.add(0), 0);
     }
 }
 
@@ -203,7 +203,9 @@ pub mod math {
         n |= n >> 4;
         n |= n >> 8;
         n |= n >> 16;
-        n |= n >> 32;
+        if usize::BITS >= 64 {
+            n |= n >> 32;
+        }
         n + 1
     }
 

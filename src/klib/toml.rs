@@ -84,7 +84,8 @@ impl TomlDocument {
             let full_key = if table.is_empty() {
                 key
             } else {
-                let mut f = table.clone();
+                let mut f = String::with_capacity(table.len() + 1 + key.len());
+                f.push_str(&table);
                 f.push('.');
                 f.push_str(&key);
                 f
@@ -161,7 +162,11 @@ fn parse_value(value: &str) -> Result<TomlValue, &'static str> {
 }
 
 /// Strip a leading `#` comment, but not one inside a quoted string.
+/// Optimized by Bolt ⚡: fast-path check bypasses char loop for uncommented lines.
 fn trim_comment(line: &str) -> &str {
+    if !line.contains('#') {
+        return line;
+    }
     let mut in_str = false;
     for (i, c) in line.char_indices() {
         if c == '"' {
@@ -173,8 +178,14 @@ fn trim_comment(line: &str) -> &str {
     line
 }
 
+/// Optimized string unescaping - Bolt ⚡
+/// Fast-path returns owned string directly for escape-free literals without per-character iteration or re-allocations;
+/// pre-allocates String capacity for escaped literals.
 fn unescape(s: &str) -> String {
-    let mut out = String::new();
+    if !s.contains('\\') {
+        return String::from(s);
+    }
+    let mut out = String::with_capacity(s.len());
     let bytes = s.as_bytes();
     let mut i = 0;
     while i < bytes.len() {
@@ -198,7 +209,7 @@ fn unescape(s: &str) -> String {
     out
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

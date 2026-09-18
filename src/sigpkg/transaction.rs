@@ -358,7 +358,7 @@ impl From<crate::sigpkg::resolver::ResolveError> for TransactionError {
 mod tests {
     use super::*;
     #[cfg(not(feature = "standalone_test"))]
-    use crate::klib::custom_string::SigmaString;
+    use crate::klib::SigmaString;
     type PathBuf = std::string::String;
 
     #[test]

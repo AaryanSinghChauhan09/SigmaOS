@@ -3,27 +3,17 @@ pub mod system_monitor;
 
 pub mod data_tools;
 pub mod display_manager;
+pub mod open_source_tools_parity;
 pub mod sigmatools;
 pub mod simple_scan;
 pub mod sovereign_commands;
 pub mod open_source_tools_engine;
 pub mod open_source_cli_tools_suite;
-pub mod open_source_tools_parity;
+pub mod tech_media_innovations;
 
-pub use open_source_tools_engine::{
-    BatSyntaxHighlighterEngine, FzfFuzzyFinderEngine, FzfSearchResult, HtopProcessEntry,
-    HtopProcessMonitorEngine, HtopSortField, RsyncBlockChecksum, RsyncDeltaOp, RsyncDeltaSyncEngine,
-};
-
-pub use open_source_cli_tools_suite::{
-    EzaFormattedEntry, EzaLsEngine, FdFileEntry, FdFileSearchEngine, RipgrepMatchResult,
-    RipgrepSearchEngine, ZoxideCdEngine, ZoxideEntry,
-};
-
-pub use open_source_tools_parity::{
-    DufDeviceUsage, DufDiskUsageEngine, DustDirectoryTreeEngine, DustNode, FastfetchSysinfo,
-    ItsFossFastfetchSysinfoEngine, SimpleJqJsonQueryEngine,
-};
+pub use tech_media_innovations::*;
+pub use open_source_tools_engine::*;
+pub use open_source_cli_tools_suite::*;
 
 pub use data_tools::{
     ColumnSchema, ColumnarStats, DataAggregationResult, DataFieldType, DataFrame,
@@ -48,5 +38,14 @@ pub use sovereign_commands::{
     SovereignDevDmesg, SovereignDfDu, SovereignGccToolchain, SovereignInitramfsSystemd,
     SovereignOpenBsdDoas, SovereignSudo, SovereignTopHtop,
 };
+pub mod tech_media_extended_suite;
+pub use tech_media_extended_suite::{
+    AssetStreamingConfig, DriverHealthStatus, EbpfObserverMetrics, FanThermalCurve,
+    GpuPacingMetrics, HwbustersPowerTelemetryEngine, KdnuggetsAiQuantizerEngine,
+    LightweightPodSpec, PowerRailNoiseReport, QuantizationModelProfile,
+    SovereignTechMediaExtendedMasterSuite, StorageCleanupReport, TechSpotGpuAcceleratorEngine,
+    TheNewStackCloudNativeEngine as ExtendedTheNewStackCloudNativeEngine, VectorCacheMetrics, WindowsCentralPcHealthEngine,
+};
+
 pub mod dependency_reduction;
 pub use dependency_reduction::*;

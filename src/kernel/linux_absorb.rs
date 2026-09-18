@@ -4,7 +4,7 @@
 
 use std::string::String;
 use std::vec::Vec;
-use core::any::Any;
+use std::any::Any;
 
 pub mod subsystem {
     use super::*;
@@ -893,8 +893,8 @@ impl AbsorbedBuddyAllocator {
                         v
                     },
                 }),
-                total_memory: 4 * 1024 * 1024 * 1024, // 4GB
-                available_memory: 4 * 1024 * 1024 * 1024,
+                total_memory: (4u64 * 1024 * 1024 * 1024) as usize, // 4GB
+                available_memory: (4u64 * 1024 * 1024 * 1024) as usize,
                 page_size: 4096,
             },
             allocated_blocks: Vec::new(),
@@ -1102,10 +1102,12 @@ impl SovereignEbpfEngine {
                 }
                 0x35 => {
                     // LOAD from context with offset (packet parsing helper)
-                    let idx = if offset != 0 {
+                    let idx = if offset > 0 {
                         offset as usize
-                    } else {
+                    } else if imm <= (usize::MAX as u64) {
                         imm as usize
+                    } else {
+                        usize::MAX
                     };
                     if idx < context.len() {
                         self.registers[dst_reg] = context[idx] as u64;

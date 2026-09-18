@@ -1,3 +1,5 @@
+use core::sync::atomic::{AtomicUsize, Ordering};
+
 /// Zorin OS Compatibility Subsystem for SigmaOS
 /// Implements familiarity-first layout switching, Chameleon dynamic auto-theming,
 /// Zorin Connect smartphone integration, and Windows App support.
@@ -80,9 +82,14 @@ pub enum ZorinSnapPosition {
     TopRight,
     BottomLeft,
     BottomRight,
+    TopLeftQuarter,
+    TopRightQuarter,
+    BottomLeftQuarter,
+    BottomRightQuarter,
     LeftHalf,
     RightHalf,
     Maximize,
+    Maximized,
 }
 
 pub struct ZorinGridDesktopManager {
@@ -107,20 +114,20 @@ impl ZorinGridDesktopManager {
         match snap {
             ZorinSnapPosition::LeftHalf => (0, 0, screen_width / 2, screen_height),
             ZorinSnapPosition::RightHalf => (screen_width / 2, 0, screen_width / 2, screen_height),
-            ZorinSnapPosition::TopLeft => (0, 0, screen_width / 2, screen_height / 2),
-            ZorinSnapPosition::TopRight => {
+            ZorinSnapPosition::TopLeft | ZorinSnapPosition::TopLeftQuarter => (0, 0, screen_width / 2, screen_height / 2),
+            ZorinSnapPosition::TopRight | ZorinSnapPosition::TopRightQuarter => {
                 (screen_width / 2, 0, screen_width / 2, screen_height / 2)
             }
-            ZorinSnapPosition::BottomLeft => {
+            ZorinSnapPosition::BottomLeft | ZorinSnapPosition::BottomLeftQuarter => {
                 (0, screen_height / 2, screen_width / 2, screen_height / 2)
             }
-            ZorinSnapPosition::BottomRight => (
+            ZorinSnapPosition::BottomRight | ZorinSnapPosition::BottomRightQuarter => (
                 screen_width / 2,
                 screen_height / 2,
                 screen_width / 2,
                 screen_height / 2,
             ),
-            ZorinSnapPosition::Maximize => (0, 0, screen_width, screen_height),
+            ZorinSnapPosition::Maximize | ZorinSnapPosition::Maximized => (0, 0, screen_width, screen_height),
         }
     }
 }

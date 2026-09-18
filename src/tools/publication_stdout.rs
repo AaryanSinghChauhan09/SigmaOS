@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR GPL-2.0
+//! SPDX-License-Identifier: MIT OR GPL-2.0
 //! Sovereign Publication-Inspired Stdout Engine for SigmaOS
 //!
 //! Inspired by leading tech publications and developer media:

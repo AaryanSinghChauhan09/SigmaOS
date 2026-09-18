@@ -52,12 +52,13 @@ fn main() {
         "install" => cmd_install(&args[1..]),
         "convert" => cmd_convert(&args[1..]),
         "dispatch" => cmd_dispatch(&args[1..]),
-        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "yay" | "paru" | "microdnf"
-        | "rpm" | "apk" | "pkg" | "pkg_add" | "pkg_delete" | "pkgin" | "zypper" | "xbps"
-        | "xbps-install" | "xbps-remove" | "emerge" | "ebuild" | "eopkg" | "moss" | "nix"
-        | "nix-env" | "guix" | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt"
-        | "spack" | "conan" | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" | "brew"
-        | "flatpak" | "snap" => {
+        "apt" | "apt-get" | "dpkg" | "dnf" | "yum" | "pacman" | "yay" | "paru" | "pikaur"
+        | "trizen" | "aura" | "microdnf" | "rpm" | "apk" | "pkg" | "pkg_add" | "pkg_delete"
+        | "pkg_info" | "pkgin" | "zypper" | "xbps" | "xbps-install" | "xbps-remove"
+        | "xbps-query" | "emerge" | "ebuild" | "eopkg" | "moss" | "nix" | "nix-env" | "guix"
+        | "slackpkg" | "installpkg" | "removepkg" | "kiss" | "cpt" | "spack" | "conan"
+        | "pip" | "cargo" | "gem" | "nuget" | "vcpkg" | "brew" | "flatpak" | "snap"
+        | "opkg" | "ipkg" | "pkgman" | "swupd" | "slapt-get" | "urpmi" | "pisi" => {
             cmd_foreign_pm(&args[0], &args[1..])
         }
         "remove" => cmd_remove(&args[1..]),
@@ -75,6 +76,52 @@ fn main() {
             eprintln!("sigpkg: unknown command '{}'", args[0]);
             usage();
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_universal_pm_dispatcher_integration() {
+        let dispatcher = UniversalPmCommandDispatcher::new();
+
+        let apt = dispatcher.dispatch_command("apt install nginx curl -y").unwrap();
+        assert_eq!(apt.source_pm, "apt");
+        assert_eq!(apt.operation, UniversalPmOperation::Install);
+        assert_eq!(apt.target_packages, vec!["nginx", "curl"]);
+
+        let dnf = dispatcher.dispatch_command("dnf remove httpd").unwrap();
+        assert_eq!(dnf.source_pm, "dnf");
+        assert_eq!(dnf.operation, UniversalPmOperation::Remove);
+        assert_eq!(dnf.target_packages, vec!["httpd"]);
+
+        let pacman = dispatcher.dispatch_command("pacman -Syu --dryrun").unwrap();
+        assert_eq!(pacman.source_pm, "pacman");
+        assert_eq!(pacman.operation, UniversalPmOperation::Upgrade);
+        assert!(pacman.dry_run);
+
+        let apk = dispatcher.dispatch_command("apk add musl").unwrap();
+        assert_eq!(apk.source_pm, "apk");
+        assert_eq!(apk.operation, UniversalPmOperation::Install);
+        assert_eq!(apk.target_packages, vec!["musl"]);
+
+        let bsd_pkg = dispatcher.dispatch_command("pkg install -n postgresql15-server").unwrap();
+        assert_eq!(bsd_pkg.source_pm, "pkg");
+        assert_eq!(bsd_pkg.operation, UniversalPmOperation::Install);
+        assert!(bsd_pkg.dry_run);
+    }
+
+    #[test]
+    fn test_canonical_dependency_mapper_cli_integration() {
+        let mapper = UniversalDependencyMapper::new();
+        assert_eq!(mapper.to_canonical_name("libssl-dev"), "openssl");
+        assert_eq!(mapper.to_canonical_name("openssl-devel"), "openssl");
+        assert_eq!(mapper.to_canonical_name("libc6"), "libc");
+        assert_eq!(mapper.to_canonical_name("musl-dev"), "libc");
+        assert_eq!(mapper.to_canonical_name("python3-dev"), "python");
+        assert_eq!(mapper.to_canonical_name("zlib1g-dev"), "zlib");
     }
 }
 
@@ -297,8 +344,56 @@ fn cmd_install(args: &[String]) {
             "--nar" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::GuixNar)
             }
+            "--narinfo" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::NarInfo)
+            }
             "--openbsd" => {
                 forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::OpenBsdPkg)
+            }
+            "--cachy" | "--cachyos" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Pacman)
+            }
+            "--swupd" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sysupdate)
+            }
+            "--stratum" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Stratum)
+            }
+            "--crux" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Crux)
+            }
+            "--drpm" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Drpm)
+            }
+            "--sfs" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sfs)
+            }
+            "--wheel" | "--whl" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Wheel)
+            }
+            "--crate" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Crate)
+            }
+            "--gem" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Gem)
+            }
+            "--nupkg" | "--nuget" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Nupkg)
+            }
+            "--vcpkg" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Vcpkg)
+            }
+            "--spack" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Spack)
+            }
+            "--conan" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Conan)
+            }
+            "--sigma" | "--sigpkg" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sigma)
+            }
+            "--sysupdate" => {
+                forced_format = Some(sigmaos::sigpkg::universal_engine::PackageFormat::Sysupdate)
             }
             a if a.starts_with('-') => {
                 // Ignore operational flags like -y or --yes

@@ -1,8 +1,13 @@
 // SigmaOS KDnuggets & MarkTechPost AI Data Science Pipeline
 // Inspired by KDnuggets, MarkTechPost, and InfoWorld
 
-use crate::klib::string::String;
-use crate::klib::vec::Vec;
+use std::string::String;
+use std::vec::Vec;
+
+#[cfg(test)]
+use std::string::String;
+#[cfg(test)]
+use std::vec::Vec;
 
 /// KDnuggets automated machine learning (AutoML) dataset preprocessor and model selector.
 #[derive(Debug, Clone)]
@@ -124,5 +129,18 @@ impl SovereignAiDataSciencePipelineSuite {
 impl Default for SovereignAiDataSciencePipelineSuite {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_marktechpost_kdnuggets_data_science() {
+        let mut suite = SovereignAiDataSciencePipelineSuite::new();
+        assert!(suite.verify_suite());
+        assert_eq!(suite.vector_index.query_nearest_vectors(10, 3), vec![10, 11, 12]);
+        assert!(suite.enterprise_ai.is_ready_for_production());
     }
 }

@@ -51,6 +51,7 @@ pub struct SimpleHotkey {
     pub modifiers: AtomicUsize,
     pub key: AtomicUsize,
     pub action: [u8; 64],
+    pub action_len: u8,
 }
 
 impl SimpleHotkey {
@@ -65,6 +66,7 @@ impl SimpleHotkey {
             modifiers: AtomicUsize::new(modifiers as usize),
             key: AtomicUsize::new(key as usize),
             action: action_array,
+            action_len: action_len as u8,
         }
     }
 }
@@ -80,8 +82,10 @@ impl Hotkey for SimpleHotkey {
         self.key.load(Ordering::SeqCst) as u8
     }
     fn action(&self) -> &[u8] {
-        let len = self.action.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.action[..len]
+        // Bolt ⚡ Optimization: Store explicit action length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every hotkey action lookup,
+        // reducing slice retrieval to instantaneous O(1) constant time.
+        &self.action[..self.action_len as usize]
     }
 }
 

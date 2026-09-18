@@ -1,6 +1,7 @@
 // SigmaOS AI Module
 // S-AI engine, agents, orchestrator, local inference, tensor memory, scheduler, quantization, and Agentic OS runtime
 
+pub mod agent_runtime;
 
 pub mod agent;
 pub mod agentic_os_runtime;
@@ -33,12 +34,6 @@ pub use agentic_os_runtime::{
     LocalLlmSystemDaemon, OmniAutomatorStudioApi, TamperProofActionAuditLog, TpmHardwareVault,
 };
 
-pub use agent_runtime::{
-    AgentCapability, AgentError, AgentId, AgentKernelBridge, AgentPriority, AgentProcess,
-    AgentReport, AgentSandbox, AgentState, ConfigDiff, CrashDump, Plugin, PluginLanguage,
-    PluginSpec, PluginTarget, SovereignAgentRuntime, UserIntent,
-};
-
 pub use openclaw::{AlertPlatform, ClawBackgroundDaemon, ClawChatIntegrator, ClawVoiceTranscriber};
 
 pub use agent::{AIAgent, SimpleAIAgent};
@@ -65,8 +60,9 @@ pub use voice::{
     VoiceRecognizer, VoiceSynthesizer,
 };
 pub use developer_platform::{
-    AiSafetyGuardrails, CuratedAiModel, DevWorkspace, DeveloperPlatformSuite,
-    MlExperimentRun, MlExperimentTracker, ModelMarketplace, SafetyViolationType,
+    AiSafetyPolicyEngine, DefaultDenyNetworkPolicy, DeviceTarget, DvcMlflowVfsTracker,
+    ExperimentRun, LocalLlmOrchestrator, MarketplaceModel, MlExperimentTracker,
+    ModelAllocation, OpenShellAgentSandbox, PrivacyRouter, SignedModelMarketplace,
 };
 
 pub use marktechpost_kdnuggets_data_science::{

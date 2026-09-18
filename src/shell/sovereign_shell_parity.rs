@@ -248,7 +248,7 @@ impl Default for SovereignBashZshParityShell {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

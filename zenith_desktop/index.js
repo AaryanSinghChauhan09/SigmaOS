@@ -80,13 +80,24 @@ export function initKeyboardNavigation() {
 }
 
 /**
- * Initializes WAI-ARIA tablist keyboard navigation (Arrow keys, Home, End).
+ * Initializes WAI-ARIA tablist keyboard navigation (Arrow keys, Home, End) with roving tabindex.
  */
 export function initTablistNavigation() {
   const tablists = SovereignDomSelector.selectAll('[role="tablist"]');
   tablists.forEach((tablist) => {
     const tabs = SovereignDomSelector.selectAll('[role="tab"]', tablist);
+    const updateRovingTabindex = (selectedTab) => {
+      tabs.forEach((t) => {
+        const isSelected = t === selectedTab;
+        t.setAttribute("tabindex", isSelected ? "0" : "-1");
+      });
+    };
+
+    const initialTab = tabs.find((t) => t.getAttribute("aria-selected") === "true") || tabs[0];
+    if (initialTab) updateRovingTabindex(initialTab);
+
     tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => updateRovingTabindex(tab));
       tab.addEventListener("keydown", (event) => {
         let targetIndex = null;
         if (event.key === "ArrowRight" || event.key === "ArrowDown") {
@@ -101,11 +112,19 @@ export function initTablistNavigation() {
 
         if (targetIndex !== null) {
           event.preventDefault();
+          updateRovingTabindex(tabs[targetIndex]);
           tabs[targetIndex].focus();
           tabs[targetIndex].click();
         }
       });
     });
+  });
+
+  const tabpanels = SovereignDomSelector.selectAll('[role="tabpanel"]');
+  tabpanels.forEach((panel) => {
+    if (!panel.hasAttribute("tabindex")) {
+      panel.setAttribute("tabindex", "0");
+    }
   });
 }
 
@@ -166,6 +185,23 @@ export function initHighContrastSupport() {
   }
 }
 
+/**
+ * Dismisses open modal overlays (#cmd-palette, #context-menu, #help-overlay) when Escape key is pressed.
+ */
+export function initEscapeKeyDismissal() {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      const cmdPalette = document.getElementById("cmd-palette");
+      if (cmdPalette) cmdPalette.classList.remove("active");
+      const contextMenu = document.getElementById("context-menu");
+      if (contextMenu) contextMenu.style.display = "none";
+      const helpOverlay = document.getElementById("help-overlay");
+      if (helpOverlay) helpOverlay.classList.add("wizard-overlay--hidden");
+    }
+  });
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   if (document.readyState === "loading") {
@@ -173,11 +209,13 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
       initKeyboardNavigation();
       initHighContrastSupport();
       initTablistNavigation();
+      initEscapeKeyDismissal();
     });
   } else {
     initKeyboardNavigation();
     initHighContrastSupport();
     initTablistNavigation();
+    initEscapeKeyDismissal();
   }
 }
 

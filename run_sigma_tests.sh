@@ -37,6 +37,13 @@ if [ -f "src/distro/linux_bsd_ultimate_synthesis.rs" ]; then
     ./build/linux_bsd_ultimate_synthesis_test
 fi
 
+if [ -f "src/distro/sovereign_2026_distro_leap_engine.rs" ]; then
+    echo "Running 2026 Distro Leap test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_2026_distro_leap_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_2026_leap
+    ./build/test_2026_leap
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
@@ -60,6 +67,13 @@ if [ -f "tests/test_hashmap_standalone.rs" ]; then
     ./build/hashmap_test
 fi
 
+if [ -f "tests/test_string_parser_standalone.rs" ]; then
+    echo "Running String, Config & TOML parser performance & correctness test suite..."
+    mkdir -p build
+    rustc --test tests/test_string_parser_standalone.rs --edition=2021 -o build/string_parser_test
+    ./build/string_parser_test
+fi
+
 if [ -f "src/distro/arch.rs" ]; then
     echo "Running Arch Linux parity & tooling test suite..."
     mkdir -p build
@@ -79,6 +93,20 @@ if [ -f "src/package/universal.rs" ]; then
     mkdir -p build
     rustc --test src/package/universal.rs --edition=2021 -o build/universal_pkg_test
     ./build/universal_pkg_test
+fi
+
+if [ -f "src/package/universal_package_innovations_suite.rs" ]; then
+    echo "Running Universal Package Innovations Suite test suite..."
+    mkdir -p build
+    rustc --test src/package/universal_package_innovations_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/universal_innovations_test
+    ./build/universal_innovations_test
+fi
+
+if [ -f "src/package/sovereign_distro_package_innovations.rs" ]; then
+    echo "Running Sovereign Distro Package Innovations test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_innovations.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_innovations_test
+    ./build/sovereign_innovations_test
 fi
 
 if [ -f "src/sigpkg/arch_pacman_engine.rs" ]; then
@@ -128,4 +156,18 @@ if [ -f "tests/test_md_wiki_ideas_verification.rs" ]; then
     mkdir -p build
     rustc --test --edition=2021 tests/test_md_wiki_ideas_verification.rs -o build/test_md_wiki_ideas
     ./build/test_md_wiki_ideas
+fi
+
+if [ -f "src/wiki_unimplemented_ideas.rs" ]; then
+    echo "Running GitHub Wiki Unimplemented Ideas Parity test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/wiki_unimplemented_ideas.rs -o build/test_wiki_unimplemented
+    ./build/test_wiki_unimplemented
+fi
+
+if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
+    echo "Running Sovereign Universal Distro Driver Suite test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/drivers/sovereign_distro_driver_suite.rs -o build/test_sovereign_distro_driver_suite
+    ./build/test_sovereign_distro_driver_suite
 fi

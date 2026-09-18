@@ -24,7 +24,7 @@ use std::format;
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// State of the autonomous agent session
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

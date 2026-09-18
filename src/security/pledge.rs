@@ -1,10 +1,6 @@
-
-use crate::klib::BTreeMap;
+use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
-
-#[cfg(test)]
-
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
 
 use core::sync::atomic::{AtomicBool, Ordering};
@@ -244,7 +240,7 @@ impl PledgeManager {
                     Permission::ProcessExec => token = token.allow_exec(),
                     Permission::Ipc => token = token.allow_ipc(),
                     Permission::AudioPlayback | Permission::DisplayAccess => {
-                        token.allow_capability(1 << perm as u64)
+                        token.allow_capability(1 << perm as u64);
                     }
                 }
             }

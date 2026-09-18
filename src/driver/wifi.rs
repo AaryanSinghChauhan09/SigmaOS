@@ -2,8 +2,6 @@
 // Provides zero-dependency 802.11a/b/g/n/ac/ax/be frame management, WPA3 authentication, and channel scanning.
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WifiState {

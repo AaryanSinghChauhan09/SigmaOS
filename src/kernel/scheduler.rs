@@ -13,8 +13,8 @@ use std::string::String;
 use std::vec::Vec;
 
 // Re-export for other modules
-// pub use crate::kernel::structures::Task;
-// pub use crate::kernel::structures::TaskId;
+pub use crate::kernel::structures::Task;
+pub use crate::kernel::structures::TaskId;
 
 /// Process priority level
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -366,10 +366,6 @@ impl CfsScheduler {
             }
             self.sort_tasks();
         }
-    }
-
-    pub fn schedule(&mut self) -> Option<Task> {
-        self.pick_next_task()
     }
 
     fn sort_tasks(&mut self) {

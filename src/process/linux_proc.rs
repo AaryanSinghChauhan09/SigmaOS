@@ -4,7 +4,7 @@ use std::vec::Vec;
 // Linux-inspired Process & ProcFS Emulation for SigmaOS
 // Implements advanced process hierarchies, PID namespace isolation, nice priorities, cgroups, signal handling, and dynamic /proc pseudo-filesystem.
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxProcessState {
@@ -200,11 +200,11 @@ impl ProcFileSystem {
         // Create default root cgroups
         pfs.cgroups.insert(
             "system.slice".to_string(),
-            CGroup::new("system.slice", 8 * 1024 * 1024 * 1024, 1024),
+            CGroup::new("system.slice", (8u64 * 1024 * 1024 * 1024) as usize, 1024),
         );
         pfs.cgroups.insert(
             "user.slice".to_string(),
-            CGroup::new("user.slice", 8 * 1024 * 1024 * 1024, 1024),
+            CGroup::new("user.slice", (8u64 * 1024 * 1024 * 1024) as usize, 1024),
         );
 
         // Create root PID namespace
@@ -346,7 +346,7 @@ impl ProcFileSystem {
     pub fn send_signal(&mut self, target: i32, signal: LinuxSignal) -> Result<(), String> {
         if target < 0 {
             // Signal process group
-            let pgid = (-target) as usize;
+            let pgid = target.unsigned_abs() as usize;
             let mut pids_to_kill = Vec::new();
             for proc in self.processes.values() {
                 if proc.pgid == pgid {

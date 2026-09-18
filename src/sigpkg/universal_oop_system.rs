@@ -24,14 +24,18 @@ use std::vec::Vec;
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
-#[cfg(test)]
-pub use crate::sigpkg::Version;
-
-
 use std::sync::Arc;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
 
 #[cfg(feature = "standalone_test")]
 impl core::fmt::Display for Version {
@@ -40,7 +44,7 @@ impl core::fmt::Display for Version {
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {
@@ -50,7 +54,16 @@ impl Version {
         }
     }
     pub fn parse(s: &str) -> Result<Self, &'static str> {
-        let clean: String = s.chars().map(|c| if c.is_ascii_digit() || c == '.' { c } else { ' ' }).collect();
+        let clean: String = s
+            .chars()
+            .map(|c| {
+                if c.is_ascii_digit() || c == '.' {
+                    c
+                } else {
+                    ' '
+                }
+            })
+            .collect();
         let first_num = clean.split_whitespace().next().unwrap_or("1.0.0");
         let parts: Vec<&str> = first_num.split('.').collect();
         let major = parts.get(0).and_then(|p| p.parse().ok()).unwrap_or(1);
@@ -60,20 +73,20 @@ impl Version {
     }
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Any,
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
     pub name: String,
@@ -83,9 +96,15 @@ pub struct Package {
     pub checksum: String,
 }
 
-#[cfg(any(feature = "standalone_test", test))]
+#[cfg(feature = "standalone_test")]
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
         Self {
             name,
             version,
@@ -231,6 +250,40 @@ pub enum PackageFormat {
     SolarisIps,
     // GNU Guix / Nix Archive (.nar)
     GuixNar,
+    Spack,
+    Conan,
+    Wheel,
+    Crate,
+    Gem,
+    Nupkg,
+    Vcpkg,
+    NarInfo,
+    Sysupdate,
+    AixBff,
+    HpuxDepot,
+    IrixTardist,
+    Tru64Setld,
+    Plan9Pkg,
+    GentooGpkg,
+    AndroidApex,
+    WasmWasi,
+    JavaJar,
+    NpmTarball,
+    PhpPhar,
+    PerlCpan,
+    LuaRock,
+    ElixirHex,
+    HaskellCabal,
+    JuliaPkg,
+    RCran,
+    Swupd,
+    Starling,
+    Cachy,
+    CachyOS,
+    App,
+    SigmaPkg,
+    Nixpkg,
+    Xz,
 }
 
 impl PackageFormat {
@@ -283,7 +336,10 @@ impl PackageFormat {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::TarXz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -313,7 +369,10 @@ impl PackageFormat {
             Some(PackageFormat::Cports)
         } else if normalized.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if normalized.ends_with(".slackbuild") || normalized.ends_with(".tlz") || normalized.ends_with(".tbz") {
+        } else if normalized.ends_with(".slackbuild")
+            || normalized.ends_with(".tlz")
+            || normalized.ends_with(".tbz")
+        {
             Some(PackageFormat::SlackBuild)
         } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -327,9 +386,9 @@ impl PackageFormat {
             Some(PackageFormat::Pisi)
         } else if normalized.ends_with(".lzm") {
             Some(PackageFormat::Lzm)
-        } else if normalized.ends_with(".pup") {
+        } else if normalized.ends_with(".pup") || normalized == "pup" {
             Some(PackageFormat::Pup)
-        } else if normalized.ends_with(".pet") {
+        } else if normalized.ends_with(".pet") || normalized == "pet" {
             Some(PackageFormat::Pet)
         } else if normalized.ends_with(".tar") {
             Some(PackageFormat::Tar)
@@ -341,6 +400,61 @@ impl PackageFormat {
             Some(PackageFormat::SolarisIps)
         } else if normalized.ends_with(".nar") {
             Some(PackageFormat::GuixNar)
+        } else if normalized.ends_with(".spack") {
+            Some(PackageFormat::Spack)
+        } else if normalized.ends_with(".conan") {
+            Some(PackageFormat::Conan)
+        } else if normalized.ends_with(".whl") {
+            Some(PackageFormat::Wheel)
+        } else if normalized.ends_with(".crate") {
+            Some(PackageFormat::Crate)
+        } else if normalized.ends_with(".gem") {
+            Some(PackageFormat::Gem)
+        } else if normalized.ends_with(".nupkg") {
+            Some(PackageFormat::Nupkg)
+        } else if normalized.ends_with(".vcpkg") {
+            Some(PackageFormat::Vcpkg)
+        } else if normalized.ends_with(".narinfo") {
+            Some(PackageFormat::NarInfo)
+        } else if normalized.ends_with(".sysupdate") {
+            Some(PackageFormat::Sysupdate)
+        } else if normalized.ends_with(".bff") || normalized.ends_with(".lpp") {
+            Some(PackageFormat::AixBff)
+        } else if normalized.ends_with(".depot") {
+            Some(PackageFormat::HpuxDepot)
+        } else if normalized.ends_with(".tardist") {
+            Some(PackageFormat::IrixTardist)
+        } else if normalized.ends_with(".setld") {
+            Some(PackageFormat::Tru64Setld)
+        } else if normalized.ends_with(".9pkg") {
+            Some(PackageFormat::Plan9Pkg)
+        } else if normalized.ends_with(".gpkg") {
+            Some(PackageFormat::GentooGpkg)
+        } else if normalized.ends_with(".apex") {
+            Some(PackageFormat::AndroidApex)
+        } else if normalized.ends_with(".wasm") || normalized.ends_with(".wasi") {
+            Some(PackageFormat::WasmWasi)
+        } else if normalized.ends_with(".jar")
+            || normalized.ends_with(".war")
+            || normalized.ends_with(".ear")
+        {
+            Some(PackageFormat::JavaJar)
+        } else if normalized.ends_with(".npm") {
+            Some(PackageFormat::NpmTarball)
+        } else if normalized.ends_with(".phar") {
+            Some(PackageFormat::PhpPhar)
+        } else if normalized.ends_with(".cpan") || normalized.ends_with(".ppm") {
+            Some(PackageFormat::PerlCpan)
+        } else if normalized.ends_with(".rock") || normalized.ends_with(".rockspec") {
+            Some(PackageFormat::LuaRock)
+        } else if normalized.ends_with(".hex") {
+            Some(PackageFormat::ElixirHex)
+        } else if normalized.ends_with(".cabal") {
+            Some(PackageFormat::HaskellCabal)
+        } else if normalized.ends_with(".jl") {
+            Some(PackageFormat::JuliaPkg)
+        } else if normalized.ends_with(".rpkg") {
+            Some(PackageFormat::RCran)
         } else {
             None
         }
@@ -889,6 +1003,119 @@ impl_generic_package_adapter!(
     "stratum-package: ",
     "stratum-version: "
 );
+impl_generic_package_adapter!(
+    AixBffAdapter,
+    AixBff,
+    "aix-bff:",
+    "aix-bff: ",
+    "aix-version: "
+);
+impl_generic_package_adapter!(
+    HpuxDepotAdapter,
+    HpuxDepot,
+    "hpux-depot:",
+    "hpux-depot: ",
+    "hpux-version: "
+);
+impl_generic_package_adapter!(
+    IrixTardistAdapter,
+    IrixTardist,
+    "irix-tardist:",
+    "irix-tardist: ",
+    "irix-version: "
+);
+impl_generic_package_adapter!(
+    Tru64SetldAdapter,
+    Tru64Setld,
+    "tru64-setld:",
+    "tru64-setld: ",
+    "tru64-version: "
+);
+impl_generic_package_adapter!(
+    Plan9PkgAdapter,
+    Plan9Pkg,
+    "plan9-pkg:",
+    "plan9-pkg: ",
+    "plan9-version: "
+);
+impl_generic_package_adapter!(
+    GentooGpkgAdapter,
+    GentooGpkg,
+    "gentoo-gpkg:",
+    "gentoo-gpkg: ",
+    "gentoo-version: "
+);
+impl_generic_package_adapter!(
+    AndroidApexAdapter,
+    AndroidApex,
+    "android-apex:",
+    "android-apex: ",
+    "apex-version: "
+);
+impl_generic_package_adapter!(
+    WasmWasiAdapter,
+    WasmWasi,
+    "wasm-wasi:",
+    "wasm-wasi: ",
+    "wasi-version: "
+);
+impl_generic_package_adapter!(
+    JavaJarAdapter,
+    JavaJar,
+    "java-jar:",
+    "java-jar: ",
+    "jar-version: "
+);
+impl_generic_package_adapter!(
+    NpmTarballAdapter,
+    NpmTarball,
+    "npm-package:",
+    "npm-package: ",
+    "npm-version: "
+);
+impl_generic_package_adapter!(
+    PhpPharAdapter,
+    PhpPhar,
+    "php-phar:",
+    "php-phar: ",
+    "phar-version: "
+);
+impl_generic_package_adapter!(
+    PerlCpanAdapter,
+    PerlCpan,
+    "perl-cpan:",
+    "perl-cpan: ",
+    "cpan-version: "
+);
+impl_generic_package_adapter!(
+    LuaRockAdapter,
+    LuaRock,
+    "lua-rock:",
+    "lua-rock: ",
+    "rock-version: "
+);
+impl_generic_package_adapter!(
+    ElixirHexAdapter,
+    ElixirHex,
+    "elixir-hex:",
+    "elixir-hex: ",
+    "hex-version: "
+);
+impl_generic_package_adapter!(
+    HaskellCabalAdapter,
+    HaskellCabal,
+    "haskell-cabal:",
+    "haskell-cabal: ",
+    "cabal-version: "
+);
+impl_generic_package_adapter!(
+    JuliaPkgAdapter,
+    JuliaPkg,
+    "julia-pkg:",
+    "julia-pkg: ",
+    "julia-version: "
+);
+impl_generic_package_adapter!(RCranAdapter, RCran, "r-cran:", "r-cran: ", "cran-version: ");
 
 /// Fedora/RHEL .rpm adapter
 pub struct RpmAdapter {
@@ -2573,6 +2800,23 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(CruxAdapter::new()));
         factory.register_parser(Box::new(DrpmAdapter::new()));
         factory.register_parser(Box::new(StratumAdapter::new()));
+        factory.register_parser(Box::new(AixBffAdapter::new()));
+        factory.register_parser(Box::new(HpuxDepotAdapter::new()));
+        factory.register_parser(Box::new(IrixTardistAdapter::new()));
+        factory.register_parser(Box::new(Tru64SetldAdapter::new()));
+        factory.register_parser(Box::new(Plan9PkgAdapter::new()));
+        factory.register_parser(Box::new(GentooGpkgAdapter::new()));
+        factory.register_parser(Box::new(AndroidApexAdapter::new()));
+        factory.register_parser(Box::new(WasmWasiAdapter::new()));
+        factory.register_parser(Box::new(JavaJarAdapter::new()));
+        factory.register_parser(Box::new(NpmTarballAdapter::new()));
+        factory.register_parser(Box::new(PhpPharAdapter::new()));
+        factory.register_parser(Box::new(PerlCpanAdapter::new()));
+        factory.register_parser(Box::new(LuaRockAdapter::new()));
+        factory.register_parser(Box::new(ElixirHexAdapter::new()));
+        factory.register_parser(Box::new(HaskellCabalAdapter::new()));
+        factory.register_parser(Box::new(JuliaPkgAdapter::new()));
+        factory.register_parser(Box::new(RCranAdapter::new()));
 
         factory
     }
@@ -2619,11 +2863,102 @@ pub struct PackageDeltaPatch {
     pub delta_payload: Vec<u8>,
 }
 
-pub struct PackageDeltaEngine;
+pub trait IPackageDeltaStrategy: Send + Sync {
+    fn name(&self) -> &str;
+    fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str>;
+    fn compute_delta(&self, _source: &[u8], target: &[u8]) -> Vec<u8> {
+        target.to_vec()
+    }
+    fn calculate_delta(&self, old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        self.compute_delta(old_data, new_data)
+    }
+    fn apply_delta(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        self.apply(source, patch)
+    }
+}
+
+pub struct DnfDeltaRpmStrategy;
+impl IPackageDeltaStrategy for DnfDeltaRpmStrategy {
+    fn name(&self) -> &str {
+        "drpm"
+    }
+    fn apply(&self, source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        let mut out = source.to_vec();
+        out.extend_from_slice(patch);
+        Ok(out)
+    }
+
+    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        let mut delta = vec![0x44, 0x52, 0x50, 0x4d];
+        delta.extend_from_slice(new_data);
+        delta
+    }
+    fn apply_delta(&self, old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &'static str> {
+        if delta.len() >= 4 && &delta[..4] == b"DRPM" {
+            let mut res = old_data.to_vec();
+            res.extend_from_slice(&delta[4..]);
+            Ok(res)
+        } else {
+            Err("Invalid DRPM payload header")
+        }
+    }
+}
+
+pub struct SovereignBinaryDeltaStrategy;
+impl IPackageDeltaStrategy for SovereignBinaryDeltaStrategy {
+    fn name(&self) -> &str {
+        "moss-stone-delta"
+    }
+    fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(patch.to_vec())
+    }
+
+    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        let mut delta = vec![0x4d, 0x4f, 0x53, 0x53];
+        delta.extend_from_slice(new_data);
+        delta
+    }
+    fn apply_delta(&self, _old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &'static str> {
+        if delta.len() >= 4 && &delta[..4] == b"MOSS" {
+            Ok(delta[4..].to_vec())
+        } else {
+            Err("Invalid MOSS delta payload header")
+        }
+    }
+}
+
+pub struct ZstdChunkedDeltaStrategy;
+impl IPackageDeltaStrategy for ZstdChunkedDeltaStrategy {
+    fn name(&self) -> &str {
+        "zstd-chunked"
+    }
+    fn apply(&self, _source: &[u8], patch: &[u8]) -> Result<Vec<u8>, &'static str> {
+        Ok(patch.to_vec())
+    }
+
+    fn calculate_delta(&self, _old_data: &[u8], new_data: &[u8]) -> Vec<u8> {
+        let mut delta = vec![0x5a, 0x53, 0x54, 0x44];
+        delta.extend_from_slice(new_data);
+        delta
+    }
+    fn apply_delta(&self, _old_data: &[u8], delta: &[u8]) -> Result<Vec<u8>, &'static str> {
+        if delta.len() >= 4 && &delta[..4] == b"ZSTD" {
+            Ok(delta[4..].to_vec())
+        } else {
+            Err("Invalid ZSTD delta payload header")
+        }
+    }
+}
+
+pub struct PackageDeltaEngine {
+    pub strategies: HashMap<String, Arc<dyn IPackageDeltaStrategy>>,
+}
 
 impl PackageDeltaEngine {
     pub fn new() -> Self {
-        Self
+        Self {
+            strategies: HashMap::new(),
+        }
     }
 
     /// Reconstitutes a full package by applying a binary patch to a cached source package
@@ -3232,8 +3567,7 @@ impl DebianTriggerManager {
         let mut executed_count = 0;
         for trigger in &self.triggers {
             if let Some(matched_paths) = self.activated_triggers.get(trigger.trigger_name()) {
-                let paths_ref: Vec<&str> =
-                    matched_paths.iter().map(|s| s.as_str()).collect();
+                let paths_ref: Vec<&str> = matched_paths.iter().map(|s| s.as_str()).collect();
                 trigger.execute(&paths_ref)?;
                 executed_count += 1;
             }
@@ -3634,7 +3968,9 @@ impl SovereignAlternativesEngine {
     }
 
     pub fn get_active_alternative(&self, name: &str) -> Option<&str> {
-        self.active_selections.get(name).map(|s: &String| s.as_str())
+        self.active_selections
+            .get(name)
+            .map(|s: &String| s.as_str())
     }
 }
 
@@ -3712,7 +4048,9 @@ impl PortageSlotResolver {
 
     pub fn is_slot_compatible(&self, pkg_name: &str, target_slot: &str) -> bool {
         if let Some(slots) = self.installed_slots.get(pkg_name) {
-            slots.iter().any(|s: &PortageSlotInfo| s.slot == target_slot)
+            slots
+                .iter()
+                .any(|s: &PortageSlotInfo| s.slot == target_slot)
         } else {
             false
         }
@@ -3930,7 +4268,10 @@ impl UniversalDistroPackageUnifierEngine {
 
     /// Takes an IPackage from any external Linux distro format (Debian, RPM, Pacman, Ebuild, Apk, Nix, Flatpak, Snap, AppImage, Xbps, Zypper, etc.)
     /// and transforms it into a unified native Sigma package with normalized dependencies, expanded macros, and security audit wrappers.
-    pub fn unify_package(&self, foreign_package: &dyn IPackage) -> Result<Box<dyn IPackage>, ParseError> {
+    pub fn unify_package(
+        &self,
+        foreign_package: &dyn IPackage,
+    ) -> Result<Box<dyn IPackage>, ParseError> {
         let meta = foreign_package.metadata();
 
         // 1. Expand macros in description/paths if applicable
@@ -3939,14 +4280,114 @@ impl UniversalDistroPackageUnifierEngine {
         // 2. Map dependencies to unified sovereign system dependencies
         let mut unified_deps = Vec::new();
         for dep in foreign_package.dependencies() {
-            let mapped_name = match dep.name.as_str() {
-                "libssl-dev" | "openssl-devel" | "dev-libs/openssl" | "openssl" => "sovereign-openssl",
-                "libc6" | "glibc" | "sys-libs/glibc" | "musl" => "sovereign-libc",
-                "zlib1g-dev" | "zlib-devel" | "sys-libs/zlib" => "sovereign-zlib",
-                _ => &dep.name,
-            };
+            let lower = dep.name.to_lowercase();
+            let mapped_name =
+                if lower.contains("ssl") || lower.contains("crypto") || lower.contains("tls") {
+                    "sovereign-openssl".to_string()
+                } else if lower.contains("libc")
+                    || lower == "musl"
+                    || lower.contains("freebsd-runtime")
+                    || lower.contains("openbsd-sys")
+                    || lower.contains("haiku-libroot")
+                {
+                    "sovereign-libc".to_string()
+                } else if lower.contains("zlib") {
+                    "sovereign-zlib".to_string()
+                } else if lower.contains("zstd")
+                    || lower.contains("lz4")
+                    || lower.contains("xz")
+                    || lower.contains("bzip2")
+                {
+                    "sovereign-compression".to_string()
+                } else if lower.contains("python") {
+                    "sovereign-python".to_string()
+                } else if lower == "bash" || lower == "zsh" || lower == "sh" || lower == "fish" {
+                    "sovereign-shell".to_string()
+                } else if lower.contains("systemd")
+                    || lower.contains("openrc")
+                    || lower.contains("runit")
+                    || lower.contains("sysvinit")
+                    || lower.contains("s6")
+                    || lower.contains("dinit")
+                {
+                    "sovereign-init".to_string()
+                } else if lower.contains("gcc")
+                    || lower.contains("clang")
+                    || lower.contains("llvm")
+                    || lower.contains("binutils")
+                    || lower == "make"
+                    || lower == "cmake"
+                {
+                    "sovereign-toolchain".to_string()
+                } else if lower.contains("wayland")
+                    || lower.contains("x11")
+                    || lower.contains("mesa")
+                    || lower.contains("vulkan")
+                    || lower.contains("xorg")
+                    || lower.contains("xcb")
+                    || lower.contains("wlroots")
+                    || lower.contains("pixman")
+                {
+                    "sovereign-graphics".to_string()
+                } else if lower.contains("curl")
+                    || lower.contains("wget")
+                    || lower.contains("openssh")
+                    || lower.contains("net-tools")
+                    || lower.contains("iproute2")
+                {
+                    "sovereign-network-tools".to_string()
+                } else if lower.contains("postgres")
+                    || lower.contains("mariadb")
+                    || lower.contains("mysql")
+                    || lower.contains("sqlite")
+                    || lower.contains("redis")
+                {
+                    "sovereign-database".to_string()
+                } else if lower.contains("docker")
+                    || lower.contains("podman")
+                    || lower.contains("containerd")
+                    || lower.contains("runc")
+                    || lower.contains("qemu")
+                    || lower.contains("libvirt")
+                    || lower.contains("kvm")
+                {
+                    "sovereign-containers-virtualization".to_string()
+                } else if lower.contains("gnome")
+                    || lower.contains("kde")
+                    || lower.contains("plasma")
+                    || lower.contains("hyprland")
+                    || lower.contains("sway")
+                    || lower.contains("xfce")
+                    || lower.contains("mate")
+                    || lower.contains("cinnamon")
+                    || lower.contains("enlightenment")
+                {
+                    "sovereign-desktop-environment".to_string()
+                } else if lower.contains("ffmpeg")
+                    || lower.contains("gstreamer")
+                    || lower.contains("pipewire")
+                    || lower.contains("pulseaudio")
+                    || lower.contains("alsa")
+                    || lower.contains("codec")
+                    || lower.contains("x264")
+                    || lower.contains("x265")
+                {
+                    "sovereign-multimedia".to_string()
+                } else if lower.contains("pam")
+                    || lower.contains("sudo")
+                    || lower.contains("doas")
+                    || lower.contains("selinux")
+                    || lower.contains("apparmor")
+                    || lower.contains("audit")
+                    || lower.contains("polkit")
+                    || lower.contains("kerberos")
+                {
+                    "sovereign-security".to_string()
+                } else {
+                    dep.name.clone()
+                };
             unified_deps.push(Dependency {
-                name: mapped_name.to_string(),
+                name: mapped_name,
                 version_constraint: dep.version_constraint,
             });
         }
@@ -3996,6 +4437,16 @@ impl UserDefinedFunctionManager {
         }
         Ok(ran)
     }
+
+    pub fn run_all_phase_closures_and_hooks(
+        &self,
+        phase: PackageBuildPhase,
+        package: &mut dyn IPackage,
+    ) -> Result<usize, HookError> {
+        let pipeline_ran = self.pipeline.execute_phase(phase, package)?;
+        let hooks_ran = self.run_hooks_on(package)?;
+        Ok(pipeline_ran + hooks_ran)
+    }
 }
 
 impl Default for UserDefinedFunctionManager {
@@ -4004,7 +4455,7 @@ impl Default for UserDefinedFunctionManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -4928,14 +5379,22 @@ Description: Hook test";
         assert!(unified.metadata().description.contains("/usr/bin/nginx"));
 
         // Normalized dependency mapping check
-        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-openssl"));
-        assert!(unified.dependencies().iter().any(|d| d.name == "sovereign-libc"));
+        assert!(unified
+            .dependencies()
+            .iter()
+            .any(|d| d.name == "sovereign-openssl"));
+        assert!(unified
+            .dependencies()
+            .iter()
+            .any(|d| d.name == "sovereign-libc"));
 
         // UserDefinedFunctionManager check
         let mut udf_mgr = UserDefinedFunctionManager::new();
         struct CustomSuffixHook;
         impl UserDefinedHook for CustomSuffixHook {
-            fn name(&self) -> &str { "suffix-hook" }
+            fn name(&self) -> &str {
+                "suffix-hook"
+            }
             fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
                 pkg.metadata_mut().maintainer = "sovereign-built".to_string();
                 Ok(())
@@ -5011,5 +5470,60 @@ Description: Hook test";
                 filename
             );
         }
+    }
+
+    #[test]
+    fn test_udf_manager_closures_and_hooks() {
+        let mut udf_mgr = UserDefinedFunctionManager::new();
+
+        udf_mgr.pipeline.register_closure(
+            "set-license",
+            PackageBuildPhase::Prepare,
+            |pkg: &mut dyn IPackage| {
+                pkg.metadata_mut().license = "Apache-2.0".to_string();
+                Ok(())
+            },
+        );
+
+        struct MaintainerHook;
+        impl UserDefinedHook for MaintainerHook {
+            fn name(&self) -> &str {
+                "maintainer-hook"
+            }
+            fn execute(&self, pkg: &mut dyn IPackage) -> Result<(), HookError> {
+                pkg.metadata_mut().maintainer = "sovereign-team".to_string();
+                Ok(())
+            }
+        }
+
+        udf_mgr.register_hook(Arc::new(MaintainerHook));
+
+        let mut test_pkg: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name: "udf-combined".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "test".to_string(),
+                license: "GPL".to_string(),
+                maintainer: "unknown".to_string(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: String::new(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+        });
+
+        let total_ran = udf_mgr
+            .run_all_phase_closures_and_hooks(PackageBuildPhase::Prepare, test_pkg.as_mut())
+            .unwrap();
+
+        assert_eq!(total_ran, 2);
+        assert_eq!(test_pkg.metadata().license, "Apache-2.0");
+        assert_eq!(test_pkg.metadata().maintainer, "sovereign-team");
     }
 }

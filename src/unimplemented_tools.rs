@@ -5348,14 +5348,14 @@ impl NetworkPcapForensicSniffer {
 
 pub struct BsdCapsicumRightsSandboxingEngine {
     pub capability_mode: bool,
-    pub allowed_rights: BTreeMap<i32, Vec<String>>,
+    pub allowed_rights: std::collections::BTreeMap<i32, Vec<String>>,
 }
 
 impl BsdCapsicumRightsSandboxingEngine {
     pub fn new() -> Self {
         Self {
             capability_mode: false,
-            allowed_rights: BTreeMap::new(),
+            allowed_rights: std::collections::BTreeMap::new(),
         }
     }
 
@@ -5364,7 +5364,7 @@ impl BsdCapsicumRightsSandboxingEngine {
     }
 
     pub fn limit_fd_rights(&mut self, fd: i32, rights: Vec<&str>) {
-        let rights_vec: Vec<String> = rights.into_iter().map(|s| s.to_string()).collect();
+        let rights_vec: Vec<String> = rights.iter().map(|s| s.to_string()).collect();
         self.allowed_rights.insert(fd, rights_vec);
     }
 

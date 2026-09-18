@@ -107,9 +107,9 @@ WikiSyncEngine_run_sync() {
 
     echo "[WikiSyncEngine::run_sync] Syncing files from '$wiki_dir' to '$target_dir'..."
 
-    # 1. Re-sync README to Home.md in the WIKI directory first if WIKI exists
-    if [ -f "README.md" ] && [ -d "$wiki_dir" ]; then
-        echo "  [WikiSyncEngine::run_sync] Aligning README.md -> $wiki_dir/Home.md"
+    # 1. Align README.md to Home.md only if Home.md does not already exist in wiki_dir
+    if [ -f "README.md" ] && [ -d "$wiki_dir" ] && [ ! -f "$wiki_dir/Home.md" ]; then
+        echo "  [WikiSyncEngine::run_sync] Initializing $wiki_dir/Home.md from README.md"
         cp README.md "$wiki_dir/Home.md"
     fi
 

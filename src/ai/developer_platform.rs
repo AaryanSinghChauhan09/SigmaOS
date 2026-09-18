@@ -24,6 +24,7 @@ pub struct ModelAllocation {
     pub allocated_size_bytes: usize,
 }
 
+#[derive(Debug, Clone)]
 pub struct LocalLlmOrchestrator {
     pub tpu_capacity_bytes: usize,
     pub tpu_used_bytes: usize,
@@ -237,6 +238,7 @@ impl MlExperimentTracker {
 // 4. AI SAFETY GUARDRAILS POLICY ENGINE
 // =========================================================================
 
+#[derive(Debug, Clone)]
 pub struct AiSafetyPolicyEngine {
     pub max_file_write_bytes: usize,
     pub enforce_sandbox: bool,
@@ -283,9 +285,12 @@ pub struct MarketplaceModel {
     pub is_verified: bool,
 }
 
+#[derive(Debug, Clone)]
 pub struct SignedModelMarketplace {
     pub models: Vec<MarketplaceModel>,
 }
+
+
 
 impl SignedModelMarketplace {
     pub fn new() -> Self {
@@ -409,7 +414,82 @@ mod tests {
     }
 }
 
-/// DVC & MLflow VFS CoW Snapshot Tracker
+
+
+#[derive(Debug, Clone)]
+pub struct AiSafetyGuardrails {
+    pub policy_engine: AiSafetyPolicyEngine,
+}
+
+impl AiSafetyGuardrails {
+    pub fn new() -> Self {
+        Self {
+            policy_engine: AiSafetyPolicyEngine::default_policy(),
+        }
+    }
+}
+
+impl Default for AiSafetyGuardrails {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CuratedAiModel {
+    pub model_id: String,
+    pub name: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DevWorkspace {
+    pub workspace_id: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeveloperPlatformSuite {
+    pub orchestrator: LocalLlmOrchestrator,
+}
+
+impl DeveloperPlatformSuite {
+    pub fn new() -> Self {
+        Self {
+            orchestrator: LocalLlmOrchestrator::new(1024 * 1024 * 1024, 4 * 1024 * 1024 * 1024),
+        }
+    }
+}
+
+impl Default for DeveloperPlatformSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModelMarketplace {
+    pub marketplace: SignedModelMarketplace,
+}
+
+impl ModelMarketplace {
+    pub fn new() -> Self {
+        Self {
+            marketplace: SignedModelMarketplace::new(),
+        }
+    }
+}
+
+impl Default for ModelMarketplace {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SafetyViolationType {
+    UnboundedWrite,
+    BlacklistedCommand,
+}
+
 pub struct DvcMlflowVfsTracker {
     pub experiment_name: String,
     pub snapshots: Vec<String>,

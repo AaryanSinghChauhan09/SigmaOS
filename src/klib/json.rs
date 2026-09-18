@@ -1,5 +1,5 @@
 use std::format;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
 // Use std::collections::BTreeMap during standalone test compilation or custom BTreeMap otherwise
 use std::collections::BTreeMap;
@@ -365,19 +365,31 @@ impl<'a> SovereignJsonParser<'a> {
     }
 }
 
-
 /// Helper to append an escaped string to an existing String buffer without heap reallocations or cloning.
+/// Bolt optimization ⚡: Bulk slice push for escape-free strings and contiguous sub-slices.
 fn append_escaped_json_string(s: &str, out: &mut String) {
     out.push('"');
-    for c in s.chars() {
-        match c {
-            '"' => out.push_str("\\\""),
-            '\\' => out.push_str("\\\\"),
-            '\n' => out.push_str("\\n"),
-            '\r' => out.push_str("\\r"),
-            '\t' => out.push_str("\\t"),
-            _ => out.push(c),
+    let bytes = s.as_bytes();
+    let mut last = 0;
+    for (i, &b) in bytes.iter().enumerate() {
+        let esc = match b {
+            b'"' => "\\\"",
+            b'\\' => "\\\\",
+            b'\n' => "\\n",
+            b'\r' => "\\r",
+            b'\t' => "\\t",
+            _ => continue,
+        };
+        if i > last {
+            out.push_str(&s[last..i]);
         }
+        out.push_str(esc);
+        last = i + 1;
+    }
+    if last == 0 {
+        out.push_str(s);
+    } else if last < s.len() {
+        out.push_str(&s[last..]);
     }
     out.push('"');
 }
@@ -455,5 +467,21 @@ mod tests {
         let serialized = parsed.to_json_string();
         assert!(serialized.contains("\"name\": \"SigmaOS\""));
         assert!(serialized.contains("\"zero_dependency\": true"));
+
+        // Test string escaping optimization edge cases
+        let escaped_str = SovereignJsonValue::String("hello \"world\"\n\t\\test".into());
+        let ser_escaped = escaped_str.to_json_string();
+        assert_eq!(ser_escaped, r#""hello \"world\"\n\t\\test""#);
+    }
+
+    #[test]
+    fn test_escaped_string_formatting() {
+        let mut out = String::new();
+        append_escaped_json_string("Hello \"World\"\nLine 2\tTabbed", &mut out);
+        assert_eq!(out, r#""Hello \"World\"\nLine 2\tTabbed""#);
+
+        let clean_val = SovereignJsonValue::String("Plain String".into());
+        let serialized_clean = clean_val.to_json_string();
+        assert_eq!(serialized_clean, r#""Plain String""#);
     }
 }

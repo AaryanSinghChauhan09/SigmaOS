@@ -6,34 +6,34 @@
  */
 
 
+
+
 use std::collections::BTreeMap;
 use std::string::String;
 use std::vec::Vec;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum RunitStage {
+    #[default]
+    Stage1,
+    Stage2,
+    Stage3,
+}
 
-#[cfg(not(test))]
-use std::collections::BTreeMap;
-#[cfg(not(test))]
-use std::string::String;
-#[cfg(not(test))]
-use std::vec::Vec;
+pub type ServiceState = RunitServiceStatus;
 
-#[cfg(test)]
-use std::collections::BTreeMap;
-#[cfg(test)]
-use std::string::String;
-#[cfg(test)]
-use std::vec::Vec;
 
 /// Runit Service Status
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum RunitServiceStatus {
+    #[default]
     Down,
     Starting,
     Running,
     Stopping,
     Failed,
 }
+
 
 /// Runit Service Definition
 #[derive(Debug, Clone)]
@@ -44,6 +44,7 @@ pub struct RunitService {
     pub auto_restart: bool,
     pub health_check_failures: u32,
     pub max_allowed_failures: u32,
+    pub dependencies: Vec<String>,
 }
 
 impl RunitService {
@@ -55,7 +56,13 @@ impl RunitService {
             auto_restart,
             health_check_failures: 0,
             max_allowed_failures,
+            dependencies: Vec::new(),
         }
+    }
+
+    pub fn with_dependencies(mut self, deps: Vec<String>) -> Self {
+        self.dependencies = deps;
+        self
     }
 
     pub fn start(&mut self) -> bool {
@@ -93,14 +100,24 @@ impl RunitService {
 }
 
 /// Runit Service Supervisor Engine
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct RunitSupervisor {
+    pub stage: RunitStage,
+    pub current_stage_num: u32,
     pub services: BTreeMap<String, RunitService>,
+}
+
+impl Default for RunitSupervisor {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl RunitSupervisor {
     pub fn new() -> Self {
         Self {
+            stage: RunitStage::Stage1,
+            current_stage_num: 1,
             services: BTreeMap::new(),
         }
     }
@@ -109,34 +126,40 @@ impl RunitSupervisor {
         self.services.insert(service.name.clone(), service);
     }
 
+    pub fn start_service(&mut self, name: &str) -> bool {
+        if let Some(service) = self.services.get_mut(name) {
+            service.start()
+        } else {
+            false
+        }
+    }
+
     /// Start stage 1 (one-time initialization)
     pub fn run_stage1(&mut self) {
         self.stage = RunitStage::Stage1;
         self.current_stage_num = 1;
-        println!("Running Stage 1: One-time system initialization");
-
-        // Run one-time initialization tasks
-        println!("Mounting virtual filesystems");
-        println!("Setting hostname");
-        println!("Initializing devices");
     }
 
     /// Start stage 2 (concurrent supervision)
     pub fn run_stage2(&mut self) {
         self.stage = RunitStage::Stage2;
         self.current_stage_num = 2;
-        println!("Running Stage 2: Concurrent process supervision");
 
-        // Start all services respecting dependencies
         let mut started = Vec::new();
-
         let names: Vec<String> = self.services.keys().cloned().collect();
-        for name in names {
-            if self.can_start_service(&name, &started) {
-                if let Some(s) = self.services.get_mut(&name) {
-                    s.start();
-                    started.push(name.clone());
+        loop {
+            let mut progress = false;
+            for name in &names {
+                if !started.contains(name) && self.can_start_service(name, &started) {
+                    if let Some(s) = self.services.get_mut(name) {
+                        s.start();
+                        started.push(name.clone());
+                        progress = true;
+                    }
                 }
+            }
+            if !progress {
+                break;
             }
         }
     }
@@ -145,26 +168,28 @@ impl RunitSupervisor {
     pub fn run_stage3(&mut self) {
         self.stage = RunitStage::Stage3;
         self.current_stage_num = 3;
-        println!("Running Stage 3: Clean system shutdown");
 
-        // Stop all services in reverse dependency order
         let mut stopped = Vec::new();
-
         let names: Vec<String> = self.services.keys().cloned().collect();
-        for name in names {
-            if self.can_stop_service(&name, &stopped) {
-                if let Some(s) = self.services.get_mut(&name) {
-                    s.stop();
-                    stopped.push(name.clone());
+        loop {
+            let mut progress = false;
+            for name in &names {
+                if !stopped.contains(name) && self.can_stop_service(name, &stopped) {
+                    if let Some(s) = self.services.get_mut(name) {
+                        s.stop();
+                        stopped.push(name.clone());
+                        progress = true;
+                    }
                 }
             }
+            if !progress {
+                break;
+            }
         }
-
-        println!("Unmounting filesystems");
     }
 
     /// Check if service can start (dependencies satisfied)
-    fn can_start_service(&self, name: &str, started: &[String]) -> bool {
+    pub fn can_start_service(&self, name: &str, started: &[String]) -> bool {
         if let Some(service) = self.services.get(name) {
             for dep in &service.dependencies {
                 if !started.contains(dep) {
@@ -175,6 +200,17 @@ impl RunitSupervisor {
         } else {
             false
         }
+    }
+
+    pub fn can_stop_service(&self, name: &str, stopped: &[String]) -> bool {
+        for service in self.services.values() {
+            if service.status == RunitServiceStatus::Running && !stopped.contains(&service.name) {
+                if service.dependencies.iter().any(|dep| dep == name) {
+                    return false;
+                }
+            }
+        }
+        true
     }
 
     pub fn stop_service(&mut self, name: &str) -> bool {
@@ -210,7 +246,11 @@ impl RunitSupervisor {
             .count()
     }
 
-    pub fn monitor_service_health(&mut self, name: &str, is_healthy: bool) -> Option<RunitServiceStatus> {
+    pub fn monitor_service_health(
+        &mut self,
+        name: &str,
+        is_healthy: bool,
+    ) -> Option<RunitServiceStatus> {
         if let Some(service) = self.services.get_mut(name) {
             let state = service.check_health(is_healthy);
             Some(state)
@@ -260,5 +300,30 @@ mod tests {
         let status = supervisor.monitor_service_health("sshd", false);
         assert_eq!(status, Some(RunitServiceStatus::Running));
         assert_eq!(supervisor.active_service_count(), 1);
+    }
+
+    #[test]
+    fn test_runit_stages_and_dependencies() {
+        let mut supervisor = RunitSupervisor::new();
+        let db = RunitService::new("db", true, 3);
+        let mut app = RunitService::new("app", true, 3);
+        app.add_dependency("db");
+
+        supervisor.register_service(db);
+        supervisor.register_service(app);
+
+        supervisor.run_stage1();
+        assert_eq!(supervisor.stage, RunitStage::Stage1);
+        assert_eq!(supervisor.current_stage_num, 1);
+
+        supervisor.run_stage2();
+        assert_eq!(supervisor.stage, RunitStage::Stage2);
+        assert_eq!(supervisor.current_stage_num, 2);
+        assert_eq!(supervisor.active_service_count(), 2);
+
+        supervisor.run_stage3();
+        assert_eq!(supervisor.stage, RunitStage::Stage3);
+        assert_eq!(supervisor.current_stage_num, 3);
+        assert_eq!(supervisor.active_service_count(), 0);
     }
 }

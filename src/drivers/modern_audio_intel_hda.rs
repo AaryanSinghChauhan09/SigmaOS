@@ -1,5 +1,4 @@
 // Modern Intel High Definition Audio (HDA) DSP driver
-#[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[cfg(test_disabled)]

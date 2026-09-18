@@ -1,7 +1,6 @@
 // Bluetooth Host Controller Interface (HCI) Driver
 // Conforms to SigmaOS Unified Peripheral Architecture
 
-#[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[cfg(test_disabled)]

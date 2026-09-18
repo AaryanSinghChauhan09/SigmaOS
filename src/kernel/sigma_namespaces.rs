@@ -225,7 +225,7 @@ impl IpcNamespace {
             mq_max: 256,
             sem_count: 0,
             shm_count: 0,
-            shmall: 8 * 1024 * 1024 * 1024,
+            shmall: 8u64 * 1024 * 1024 * 1024,
         } // 8GB default
     }
 }

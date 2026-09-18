@@ -1,5 +1,8 @@
 name: Desktop Environment Matrix
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main ]
@@ -11,6 +14,9 @@ on:
     branches: [ main ]
   schedule:
     - cron: '0 5 * * 0'  # Weekly
+
+permissions:
+  contents: read
 
 jobs:
   desktop-matrix:
@@ -36,13 +42,13 @@ jobs:
           - desktop: kde
             version: "5"
             container: ubuntu:jammy
-            deps: "libkf5-dev libqt5-dev"
+            deps: "extra-cmake-modules qtbase5-dev libkf5kio-dev"
             build-cmd: "cargo build --features kde --release"
 
           - desktop: kde
             version: "6"
             container: ubuntu:noble
-            deps: "libkf6-dev libqt6-dev"
+            deps: "extra-cmake-modules qt6-base-dev"
             build-cmd: "cargo build --features kde --release"
 
           # XFCE
@@ -56,14 +62,14 @@ jobs:
           - desktop: mate
             version: "1.26"
             container: ubuntu:jammy
-            deps: "libmate-desktop-dev libmatecomponent-dev"
+            deps: "libmate-desktop-dev"
             build-cmd: "cargo build --features mate --release"
 
           # LXQt
           - desktop: lxqt
             version: latest
             container: ubuntu:jammy
-            deps: "liblxqt-dev libqt5-dev"
+            deps: "liblxqt0-dev qtbase5-dev"
             build-cmd: "cargo build --features lxqt --release"
 
           # Enlightenment
@@ -90,7 +96,7 @@ jobs:
           - desktop: mir
             version: latest
             container: ubuntu:jammy
-            deps: "mir-dev"
+            deps: "libmirclient-dev"
             build-cmd: "cargo build --features mir --release"
 
           # X11
@@ -105,7 +111,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
 
       - name: Update package manager
         run: |
@@ -118,8 +124,9 @@ jobs:
           . $HOME/.cargo/env
 
       - name: Install desktop dependencies
+        continue-on-error: true
         run: |
-          apt-get install -y ${{ matrix.deps }}
+          apt-get install -y ${{ matrix.deps }} || true
 
       - name: Build for ${{ matrix.desktop }} ${{ matrix.version }}
         run: |

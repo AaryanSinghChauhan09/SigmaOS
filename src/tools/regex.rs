@@ -2,8 +2,6 @@
 // Provides zero-dependency pattern matching, character classes, wildcards, and substring extraction under #![no_std].
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RegexMatch {

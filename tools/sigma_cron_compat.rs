@@ -329,7 +329,7 @@ pub unsafe extern "C" fn cron_add_job(
     month: *const u8,
     day_of_week: *const u8,
 ) -> SigmaI32 {
-    if !CRON_INITIALIZED || CRON_JOB_COUNT >= MAX_CRON_JOBS as SigmaU32 {
+    if !CRON_INITIALIZED || CRON_JOB_COUNT >= MAX_CRON_JOBS as SigmaU32 || name.is_null() || command.is_null() {
         return -1;
     }
     

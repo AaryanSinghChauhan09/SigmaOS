@@ -3,6 +3,7 @@ use std::vec;
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
+extern crate alloc;
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 use alloc::format;

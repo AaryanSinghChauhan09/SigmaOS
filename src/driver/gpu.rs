@@ -2,8 +2,6 @@
 // Provides zero-dependency GPU mode setting, display pipeline control, and buffer object management.
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuVendor {

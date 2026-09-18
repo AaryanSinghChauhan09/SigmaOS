@@ -1,7 +1,7 @@
 // SigmaOS Linux Kernel Gap Closure Ultimate Subsystem
 // Zero-dependency Rust implementation covering Seccomp BPF syscall filtering, Perf Events PMC hardware counters, Netfilter IPtables hook chains, and OverlayFS Copy-On-Write layer stacking.
 
-use crate::klib::string::String;
+use std::string::String;
 use crate::klib::vec::Vec;
 
 /// Seccomp BPF Syscall Action Decision

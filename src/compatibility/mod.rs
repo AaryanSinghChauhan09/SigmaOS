@@ -34,15 +34,23 @@ pub mod federation;
 pub mod fedora;
 pub use fedora::*;
 pub mod fedora_missing_components;
-pub use fedora_missing_components::*;
 pub mod fedora_domination;
-pub mod fedora_missing_components;
 
 pub use fedora_missing_components::{
     Dnf5Advisory, FedoraAnacondaKickstartEngine, FedoraDnf5PackageEngine,
     FedoraMockChrootBuilder, FedoraSssdFreeIpaEngine, KickstartPartition, MockChrootConfig,
 };
 pub use fedora_domination::*;
+pub use fedora_missing_components::{
+    BodhiStatus, BodhiUpdateRecord, BodhiUpdateType, CoprRepository, CryptoPolicyProfile,
+    FedoraBodhiUpdateEngine, FedoraContainerStackEngine, FedoraCoprBuildGatewayEngine,
+    FedoraCryptoPoliciesEngine, FedoraGreenwaveDecisionEngine, FedoraKojiBuildSystemEngine,
+    FedoraMockChrootBuilderEngine, FedoraOpenQaTestGatewayEngine, FedoraPagureForgeEngine,
+    FedoraRpmostreeAtomicEngine, FedoraWaiverDbEngine, GreenwaveDecisionStatus,
+    GreenwavePolicyRequirement, KojiBuildTask, KojiTaskState, MockChrootProfile, OciContainerImage,
+    OpenQaJobStatus, OpenQaTestJob, PagurePullRequest, RpmOstreeDeployment,
+    SovereignFedoraEcosystemSuite, WaiverRecord,
+};
 // pub mod freebsd_jails;
 pub mod freedos;
 pub mod gap_closure;
@@ -132,10 +140,11 @@ pub mod register_set;
 pub mod relay_nexus;
 pub mod scosmos;
 pub mod sigmawin;
+pub use reactos::RegistryHive;
 pub use sigmawin::{
-    D3dToVulkanTranslator, D3dVersion, NtNativeSyscallTranslator, PeHeaderInfo, RegistryHive,
-    SovereignRegistryEngine, SovereignWin32Subsystem, User32MessageQueue, Win32Message,
-    Win32PeExecutableParser, WinSockAdapter, WindowsPowerShellShimEngine,
+    D3dToVulkanTranslator, D3dVersion, NtNativeSyscallTranslator, PeHeaderInfo,
+    User32MessageQueue, Win32Message, Win32PeExecutableParser, WinSockAdapter,
+    WindowsPowerShellShimEngine,
 };
 pub mod solid_kernel;
 pub mod sovereign_suite;
@@ -169,8 +178,9 @@ pub use arch_linux::{
     DevFileType, FirewallRule, KeyTrustLevel, LsmMode, LsmSentinel, MkinitcpioGenerator, NewsItem,
     PacmanDbCleaner, PacmanEngine, PacmanError, PacmanKey, PacmanKeyring, PamGate, PaneLayout,
     ProcFile, ProcFileType, ReflectorMirrorlist, RuleAction, RunlevelTarget, ServiceState,
-    SovereignEnvRegistry, SubvolumeConfig, SystemdBootMetrics, TmuxMultiplexer, WikiPage,
-    YayParuAdapter,
+    SovereignArchChrootVfsEngine, SovereignEnvRegistry, SovereignMakepkgConfEngine,
+    SovereignPacmanConfEngine, SovereignSvntogitEngine, SubvolumeConfig, SystemdBootMetrics,
+    TmuxMultiplexer, WikiPage, YayParuAdapter,
 };
 
 pub use open_source_tier1::{

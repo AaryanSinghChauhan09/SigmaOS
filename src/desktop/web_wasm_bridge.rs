@@ -4,7 +4,6 @@
 
 use std::collections::HashMap;
 use std::string::String;
-use std::vec::Vec;
 
 /// Native WebAssembly Desktop Engine
 /// Bypasses JavaScript engine overheads for desktop event handling and ARIA accessibility
@@ -21,7 +20,7 @@ impl NativeWasmDesktopEngine {
         Self::default()
     }
 
-    pub fn dispatch_key_event(&mut self, element_id: &str, role: &str, key: &str) -> bool {
+    pub fn dispatch_key_event(&mut self, element_id: &str, _role: &str, key: &str) -> bool {
         self.key_events_count += 1;
         let is_activation = key == "Enter" || key == " ";
         if is_activation {

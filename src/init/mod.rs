@@ -5,7 +5,6 @@ pub mod sigma_init;
 pub mod sigmainit;
 pub mod service_innovations_engine;
 pub mod systemd_init;
-pub mod service_innovations_engine;
 pub use service_innovations_engine::*;
 
 pub use service_innovations_engine::{
@@ -36,3 +35,6 @@ pub use systemd_init::{
     RestartPolicy, SystemdBetsyEngine, SystemdCgroupSliceGovernor, SystemdEngine,
     SystemdServiceWatchdog, SystemdUnit, SystemdUnitFileParser, UnitID, UnitState, UnitType,
 };
+
+// ─── Sub-Second Boot Sequencer ────────────────────────────────────────────────
+pub mod subsecond_boot_sequencer;

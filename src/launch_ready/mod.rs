@@ -12,7 +12,7 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::String;
+use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -282,7 +282,7 @@ impl SigmaOsLaunchReadinessSuite {
         Self {
             idt,
             syscall_dispatcher: SyscallDispatcher::new(),
-            pmm: SovereignPhysicalMemoryManager::new(16 * 1024 * 1024 * 1024), // 16 GB default
+            pmm: SovereignPhysicalMemoryManager::new(16u64 * 1024 * 1024 * 1024), // 16 GB default
             scheduler: SovereignPreemptiveScheduler::new(),
             is_ready_for_launch: AtomicBool::new(true),
         }

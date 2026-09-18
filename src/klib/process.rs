@@ -3,7 +3,7 @@ use std::vec::Vec;
 // Process management module for SigmaOS
 // Replaces std::process functionality
 
-use crate::klib::custom_string::SigmaString;
+use crate::klib::SigmaString;
 
 pub struct SigmaProcess {
     pid: u32,

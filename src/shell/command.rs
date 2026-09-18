@@ -645,17 +645,17 @@ impl SimpleCommandRegistry {
         static mut GLOBAL_DIR_STACK: DirectoryStack = DirectoryStack { stack: Vec::new() };
         unsafe {
             let pushd = PushdCommand {
-                dir_stack: &raw mut GLOBAL_DIR_STACK,
+                dir_stack: core::ptr::addr_of_mut!(GLOBAL_DIR_STACK),
             };
             self.commands.push(Some(Box::new(pushd)));
 
             let popd = PopdCommand {
-                dir_stack: &raw mut GLOBAL_DIR_STACK,
+                dir_stack: core::ptr::addr_of_mut!(GLOBAL_DIR_STACK),
             };
             self.commands.push(Some(Box::new(popd)));
 
             let dirs = DirsCommand {
-                dir_stack: &raw mut GLOBAL_DIR_STACK,
+                dir_stack: core::ptr::addr_of_mut!(GLOBAL_DIR_STACK),
             };
             self.commands.push(Some(Box::new(dirs)));
         }
@@ -966,7 +966,7 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 

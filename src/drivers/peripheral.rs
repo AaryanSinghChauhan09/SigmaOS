@@ -1,4 +1,3 @@
-use std::vec;
 // SigmaOS Unified Peripheral Device Architecture
 // Implements OOP principles for robust, low footprint device management
 // Improved with Windows Driver Model (WDM), WDF/KMDF/UMDF concepts,

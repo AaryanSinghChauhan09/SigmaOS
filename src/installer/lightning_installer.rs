@@ -12,9 +12,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
 use alloc::format;
 use core::fmt;
 

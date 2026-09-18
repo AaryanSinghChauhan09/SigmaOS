@@ -1,7 +1,7 @@
 // SigmaOS Tech PowerUp & Hardware Busters Hardware Monitors
 // Inspired by TechPowerUp, Hardware Busters, PCWorld, and Geeky Gadgets
 
-use crate::klib::string::String;
+use std::string::String;
 
 /// TechPowerUp GPU VBIOS profiler and clock/voltage monitoring engine.
 #[derive(Debug, Clone)]
@@ -121,5 +121,19 @@ impl SovereignTechPowerUpHardwareMonitorsSuite {
 impl Default for SovereignTechPowerUpHardwareMonitorsSuite {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tech_powerup_hardware_monitors() {
+        let suite = SovereignTechPowerUpHardwareMonitorsSuite::new();
+        assert!(suite.verify_suite());
+        assert!(suite.gpu_profiler.is_optimal_performance());
+        assert!(suite.psu_monitor.verify_power_stability());
+        assert!(suite.battery_controller.should_stop_charging(85));
     }
 }

@@ -1301,6 +1301,7 @@ impl IllumosDTraceTracingGovernor {
 
 
 mod tests {
+    use super::*;
 
     #[test]
     fn test_solus_eopkg_package_engine() {
@@ -1398,7 +1399,7 @@ mod tests {
         assert!(emerge.emerge_world_rebuild().contains("3 atoms"));
     }
 
-    use super::*;
+    
 
     #[test]
     fn test_rolling_release_manager() {

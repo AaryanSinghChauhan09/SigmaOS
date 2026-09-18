@@ -1,7 +1,4 @@
-use std::vec;
-use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 // SigmaOS USB HID Keyboard Driver
 // Hardware abstraction for USB HID devices + PeripheralDevice OOP integration
 

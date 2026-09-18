@@ -1,73 +1,60 @@
-# Next Steps Guidelines & Comprehensive Repository Improvements
+# Next Steps & Continuous Improvement Guidelines for SigmaOS
 
-## Overview & Executive Summary
-This document provides a complete, actionable technical analysis, guidelines, and improvements roadmap for the **SigmaOS** operating system repository (`https://github.com/AaryanSinghChauhan09/SigmaOS/`). It encompasses deep audits across code quality, performance optimization, security compliance, developer workflow, repository governance, community engagement, tools & utilities, object-oriented design (OOP) principles, micro-UX accessibility, and strategic next steps directly applied to the `main` branch.
-
----
-
-## 1. Code Quality & Testing Guidelines
-
-### 1.1 Trait Implementation & Syntax Correctness
-* Ensure trait implementations (such as `Default`, `Eq`, `PartialEq`, `Clone`, and `Debug`) are declared only once per struct type across all modules.
-* Always implement all required methods when fulfilling a trait contract (e.g. `load(&mut self)` and `unload(&mut self)` for `Driver` implementors).
-* Ensure pattern matches on enums are strictly exhaustive or include appropriate fallback handling.
-
-### 1.2 Test Execution Procedures
-* To run standalone module tests, execute:
-  ```bash
-  rustc --test src/package/universal.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_universal && /tmp/test_universal
-  rustc --test src/distro/omarchy.rs --edition=2021 --cfg 'feature="standalone_test"' -o /tmp/test_omarchy && /tmp/test_omarchy
-  ```
-* Ensure all unit test suites maintain a 100% pass rate before committing changes directly to `main`.
+## Overview
+This document outlines the operational protocols, architectural guidelines, and prioritized execution steps for maintainers and AI agents working on **SigmaOS** (`https://github.com/AaryanSinghChauhan09/SigmaOS/`).
 
 ---
 
-## 2. Performance & Optimization Guidelines (⚡ Bolt Agent Mode)
-
-* **Bulk Copy Operations**: Replace element-by-element loops over byte arrays with bulk `copy_from_slice` SIMD/memcpy primitives.
-* **Map Lookup Hoisting**: Hoist outer map lookups out of inner nested loops in audit routines to convert $O(N^2)$ iterations into $O(N \log N)$ operations.
-* **Single-Pass Allocation**: Preallocate buffer capacities (`String::with_capacity` and `Vec::with_capacity`) prior to serializing recursive tree structures.
-
----
-
-## 3. Security & Compliance Directives (🛡️ Sentinel Agent Mode)
-
-* **Cryptographic Enclaves**: Store all credentials and sensitive cryptographic material in post-quantum Dilithium-5 / FALCON-1024 encrypted key envelopes.
-* **Memory Zeroization**: Invoke `zeroize_memory` on sensitive memory pages prior to deallocation.
-* **Compliance**: Enforce strict data boundaries for GDPR, HIPAA, WCAG 2.1 AA, and ISO 27001 standards across all userland and kernel subsystems.
+## 1. Development & Direct Commit Workflow
+* **No PR Policy**: All verified changes must be committed directly to the `main` branch. Pull requests should not be opened.
+* **Verification First**: Before committing, run `bash run_sigma_tests.sh` to confirm that all 67 native unit test suites pass without regression.
+* **Clean Compilation**: Ensure `cargo check --lib --tests` runs with zero syntax or unresolved symbol errors.
 
 ---
 
-## 4. Micro-UX & Accessibility Guidelines (🎨 Palette Agent Mode)
+## 2. Tri-Agent Steering System Protocols
 
-* **ARIA Attributes**: Ensure every interactive Web UI element contains explicit `aria-label`, `role`, and `type="button"` attributes.
-* **Keyboard Navigation**: Provide visual focus indicators (`focus-visible:ring-2`) and support standard tab key order across desktop control panels.
+### ⚡ Bolt Agent Protocol (Performance & Optimization)
+1. **Identify Bottlenecks**: Focus on inner loops, memory allocations, and linear scans in package resolution and IPC buffers.
+2. **SIMD & Vectorization**: Prefer `copy_from_slice`, `extend_from_slice`, and zero-copy slicing over manual byte-copy loops.
+3. **Map Query Reduction**: Hoist repeated map/hash lookups out of nested loops to achieve $O(N \log N)$ or $O(N)$ complexity.
+4. **Journaling**: Record unexpected performance learnings in `.jules/bolt.md`.
 
----
+### 🎨 Palette Agent Protocol (Micro-UX & Accessibility)
+1. **WCAG 2.1 AA Compliance**: Ensure every interactive UI element in Zenith Web Desktop (`zenith_desktop/`) includes proper `aria-label`, `type="button"`, and keyboard focus visible indicators.
+2. **Keyboard Navigation**: Maintain logical tab index ordering across windows, system tray, and desktop shortcuts.
+3. **Responsive Spacing**: Use semantic CSS classes and standard design tokens without adding custom inline overrides.
+4. **Journaling**: Record accessibility insights and UX constraints in `.jules/palette.md`.
 
-## 5. Object-Oriented Design (OOP) Principles & Next Steps
-
-1. **Encapsulation**: Enclose physical memory frame tables and virtual page directory managers in domain classes with explicit mutating methods.
-2. **Inheritance & Abstraction**: Utilize core driver base traits (`SigmaDriver`) to share initialization and teardown logic across device controllers.
-3. **Polymorphism**: Implement `Box<dyn PackageFormatAdapter>` dynamic dispatch for multi-format package conversion.
-4. **Design Patterns**:
-   * Apply **Singleton** pattern for global hardware brokers (`HardwareBroker`).
-   * Apply **Factory** pattern for package format converter instantiations.
-   * Apply **Observer** pattern for kernel event notifier chains.
-
----
-
-## 6. Execution Roadmap & Priority Next Steps
-
-1. **Immediate (High Priority)**:
-   - Finalize trait duplicate removal across large compatibility modules.
-   - Expand PQC signature verification to stage-2 bootloaders.
-2. **Short-Term (Medium Priority)**:
-   - Implement lock-free SPSC ring buffers for zero-copy IPC messaging.
-   - Decompose `src/compatibility/fedora.rs` into sub-file directories.
-3. **Long-Term (Low Priority)**:
-   - Maintain multi-directory documentation mirroring across `wiki/`, `WIKI/`, and `wiki_repo/`.
+### 🛡️ Sentinel Agent Protocol (Security & Compliance)
+1. **Zero Secret Policy**: Scan all files for hardcoded credentials, API keys, or private certificates before pushing.
+2. **Memory Safety & Scrubbing**: Enforce `zeroize_memory` across user namespaces, key vaults, and process control blocks upon process exit.
+3. **Capability Sandboxing**: Apply OpenBSD `pledge`/`unveil` syscall restrictions and Linux Landlock LSM rules to isolated worker tasks.
+4. **Post-Quantum Cryptography**: Maintain FALCON-1024 and Dilithium-5 signature verification across package manifests.
+5. **Journaling**: Record security vulnerability learnings in `.jules/sentinel.md`.
 
 ---
 
-*Directives apply directly to `main` branch.*
+## 3. Prioritized Implementation Roadmap
+
+### Phase 1: High-Priority Engineering (Immediate)
+1. **Modular Subsystem Decomposition**:
+   - Refactor monolithic files (`src/compatibility/fedora.rs` and `src/package/universal.rs`) into clean subdirectories (`src/compatibility/fedora/` and `src/package/universal/`).
+2. **Lock-Free IPC Ring Buffers**:
+   - Replace mutex-guarded process queues in `src/process/` with SPSC atomic ring buffers modeled on Linux `kfifo`.
+3. **24-Hour PQC Key Rotation**:
+   - Automate scheduled post-quantum cryptographic key rotation in `src/security/secrets.rs`.
+
+### Phase 2: Medium-Priority Refactoring (Short-Term)
+1. **High-Contrast Desktop Themes**:
+   - Add `@media (forced-colors: active)` support in `zenith_desktop/zenith_desktop.css` for high-contrast accessibility.
+2. **Encapsulate PML4 Page Tables**:
+   - Refactor bare CR3 register operations in `src/kernel/vmm.rs` into an encapsulated `VmmSpace` object.
+
+### Phase 3: Low-Priority Maintenance (Ongoing)
+1. **Wiki Bidirectional Sync Automation**:
+   - Maintain `tools/sync_wiki.sh` to synchronize Markdown specifications across `docs/`, `wiki/`, `WIKI/`, and `wiki_repo/`.
+
+---
+
+*SigmaOS Maintainer Guidelines — Main Branch.*

@@ -3,7 +3,6 @@
 // Eliminates reliance on external shell scripts (.sh, .bash) by providing
 // native Rust automation for build verification, no_std checks, test orchestration, and release packaging.
 
-use std::boxed::Box;
 use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;

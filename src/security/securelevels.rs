@@ -7,7 +7,6 @@ pub enum SecurityError {
     PrivilegeEscalationDetected,
 }
 
-#[cfg(feature = "standalone_test")]
 #[derive(Debug, PartialEq, Eq)]
 pub enum SigmaError {
     Security(SecurityError),

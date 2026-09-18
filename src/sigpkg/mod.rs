@@ -70,10 +70,13 @@ pub use universal_oop_system::*;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
+pub use crate::package::sovereign_distro_package_matrix::*;
+pub use crate::package::linux_bsd_package_advancements::*;
+
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;
 pub use bsd_linux_package_innovations::{
-    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState, AptPinRule,
+    AlpineApkWorldAndVirtualPkgEngine, AptBugReport, AptMarkRecord, AptMarkState,
     ArchCachyosMicroarchOptimizationEngine, ArchSplitPackageHookRunnerEngine, CachedPackageFile,
     CommunityPackageBuildSource, CommunityRepoBackend, CoprAurBuildRepositoryGatewayEngine,
     DebconfPreseedEntry, DebconfQuestionType, DebianAptMarkPackageStateGovernor,
@@ -96,7 +99,7 @@ pub use zero_alloc_resolver::{
 };
 pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageAdapter, PackagePriority,
-    AptDebManifest, PacmanPkgbuildV2, SnapcraftManifest, FlatpakManifest,
+    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest,
     FreeBsdUclManifest, OpenBsdContentsManifest, NetBsdPkgsrcManifest,
     ZypperSpecManifest, SlackwarePkgManifest,
     RpmSpecManifest, AppImageContainer, MappedScriptletHook,

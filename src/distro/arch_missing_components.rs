@@ -4,6 +4,10 @@
 // 2. namcap Package & PKGBUILD Linter
 // 3. ALPM Local Database Integrity & Orphan Detector
 // 4. AUR v5 Web RPC Search Client
+// 5. vercmp ALPM Package Version Comparison Engine
+// 6. arch-news Arch Linux News & Manual Intervention Detector
+// 7. pkgctl Devtools Package Repo Management Engine
+// 8. pacman File Collision & Conflict Resolution Engine
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -203,6 +207,213 @@ impl ArchAurWebRpcClient {
 }
 
 // =========================================================================
+// 5. VERCMP ALPM PACKAGE VERSION COMPARISON ENGINE (vercmp)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParsedAlpmVersion {
+    pub epoch: u32,
+    pub pkgver: String,
+    pub pkgrel: u32,
+}
+
+pub struct ArchVercmpVersionComparisonEngine;
+
+impl ArchVercmpVersionComparisonEngine {
+    /// Parses an ALPM version string into epoch, pkgver, and pkgrel
+    pub fn parse_version(version: &str) -> ParsedAlpmVersion {
+        let mut epoch = 0;
+        let mut ver_rel = version;
+
+        if let Some(colon_pos) = version.find(':') {
+            if let Ok(ep) = version[..colon_pos].parse::<u32>() {
+                epoch = ep;
+            }
+            ver_rel = &version[colon_pos + 1..];
+        }
+
+        let mut pkgver = ver_rel;
+        let mut pkgrel = 1;
+
+        if let Some(dash_pos) = ver_rel.rfind('-') {
+            pkgver = &ver_rel[..dash_pos];
+            if let Ok(rel) = ver_rel[dash_pos + 1..].parse::<u32>() {
+                pkgrel = rel;
+            }
+        }
+
+        ParsedAlpmVersion {
+            epoch,
+            pkgver: pkgver.to_string(),
+            pkgrel,
+        }
+    }
+
+    /// Compares two ALPM package version strings: returns <0 if ver1 < ver2, 0 if equal, >0 if ver1 > ver2
+    pub fn compare_versions(ver1: &str, ver2: &str) -> i32 {
+        let v1 = Self::parse_version(ver1);
+        let v2 = Self::parse_version(ver2);
+
+        if v1.epoch != v2.epoch {
+            return if v1.epoch > v2.epoch { 1 } else { -1 };
+        }
+
+        if v1.pkgver != v2.pkgver {
+            return if v1.pkgver > v2.pkgver { 1 } else { -1 };
+        }
+
+        if v1.pkgrel != v2.pkgrel {
+            return if v1.pkgrel > v2.pkgrel { 1 } else { -1 };
+        }
+
+        0
+    }
+}
+
+// =========================================================================
+// 6. ARCH-NEWS NEWS & MANUAL INTERVENTION DETECTOR
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchNewsItem {
+    pub title: String,
+    pub pub_date: String,
+    pub requires_manual_intervention: bool,
+    pub affected_packages: Vec<String>,
+    pub description: String,
+}
+
+pub struct ArchNewsAdvisoryFeedEngine {
+    pub news_feed: Vec<ArchNewsItem>,
+}
+
+impl ArchNewsAdvisoryFeedEngine {
+    pub fn new() -> Self {
+        let sample_news = vec![
+            ArchNewsItem {
+                title: "Python 3.12 rebuild requires manual intervention".to_string(),
+                pub_date: "2024-04-01".to_string(),
+                requires_manual_intervention: true,
+                affected_packages: vec!["python".to_string(), "python-pip".to_string()],
+                description: "User must run pacman -Syu --overwrite '/usr/lib/python3.12/*'".to_string(),
+            },
+            ArchNewsItem {
+                title: "Linux kernel 6.8 released in core".to_string(),
+                pub_date: "2024-03-25".to_string(),
+                requires_manual_intervention: false,
+                affected_packages: vec!["linux".to_string()],
+                description: "Standard Linux kernel release update.".to_string(),
+            },
+        ];
+        Self { news_feed: sample_news }
+    }
+
+    /// Checks if any pending news items require manual intervention before system upgrade
+    pub fn check_pending_interventions(&self, upgrade_packages: &[&str]) -> Vec<ArchNewsItem> {
+        let mut critical_news = Vec::new();
+        for item in &self.news_feed {
+            if item.requires_manual_intervention {
+                if item.affected_packages.iter().any(|p| upgrade_packages.contains(&p.as_str())) {
+                    critical_news.push(item.clone());
+                }
+            }
+        }
+        critical_news
+    }
+}
+
+impl Default for ArchNewsAdvisoryFeedEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 7. PKGCTL DEVTOOLS PACKAGE REPO MANAGEMENT ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ArchRepoBranch {
+    Core,
+    Extra,
+    Multilib,
+    Testing,
+}
+
+pub struct ArchPkgctlDevtoolsEngine {
+    pub chroot_name: String,
+    pub target_branch: ArchRepoBranch,
+}
+
+impl ArchPkgctlDevtoolsEngine {
+    pub fn new(chroot_name: &str, branch: ArchRepoBranch) -> Self {
+        Self {
+            chroot_name: chroot_name.to_string(),
+            target_branch: branch,
+        }
+    }
+
+    /// Formats clean chroot build command for `pkgctl build`
+    pub fn format_build_command(&self) -> String {
+        let branch_str = match self.target_branch {
+            ArchRepoBranch::Core => "extra-x86_64",
+            ArchRepoBranch::Extra => "extra-x86_64",
+            ArchRepoBranch::Multilib => "multilib-x86_64",
+            ArchRepoBranch::Testing => "testing-x86_64",
+        };
+
+        format!("pkgctl build --arch x86_64 --target {} --clean", branch_str)
+    }
+}
+
+// =========================================================================
+// 8. PACMAN FILE COLLISION & CONFLICT RESOLUTION ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PacmanFileCollision {
+    pub file_path: String,
+    pub existing_owner: String,
+    pub new_owner: String,
+}
+
+pub struct ArchPacmanConflictResolverEngine {
+    pub installed_file_map: BTreeMap<String, String>, // file_path -> owning_package
+}
+
+impl ArchPacmanConflictResolverEngine {
+    pub fn new() -> Self {
+        let mut map = BTreeMap::new();
+        map.insert("/usr/bin/bash".to_string(), "bash".to_string());
+        map.insert("/usr/bin/python".to_string(), "python".to_string());
+        Self { installed_file_map: map }
+    }
+
+    /// Checks for file collisions when installing a new package
+    pub fn detect_collisions(&self, new_package: &str, new_files: &[&str]) -> Vec<PacmanFileCollision> {
+        let mut collisions = Vec::new();
+        for &file in new_files {
+            if let Some(existing_owner) = self.installed_file_map.get(file) {
+                if existing_owner != new_package {
+                    collisions.push(PacmanFileCollision {
+                        file_path: file.to_string(),
+                        existing_owner: existing_owner.clone(),
+                        new_owner: new_package.to_string(),
+                    });
+                }
+            }
+        }
+        collisions
+    }
+}
+
+impl Default for ArchPacmanConflictResolverEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -264,5 +475,36 @@ mod tests {
         let res = ArchAurWebRpcClient::parse_rpc_response(sample_json);
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].name, "yay");
+    }
+
+    #[test]
+    fn test_arch_vercmp_engine() {
+        let parsed = ArchVercmpVersionComparisonEngine::parse_version("1:2.38-2");
+        assert_eq!(parsed.epoch, 1);
+        assert_eq!(parsed.pkgver, "2.38");
+        assert_eq!(parsed.pkgrel, 2);
+
+        assert!(ArchVercmpVersionComparisonEngine::compare_versions("1:1.0-1", "0:2.0-1") > 0);
+        assert!(ArchVercmpVersionComparisonEngine::compare_versions("2.38-1", "2.38-2") < 0);
+        assert_eq!(ArchVercmpVersionComparisonEngine::compare_versions("2.38-1", "2.38-1"), 0);
+    }
+
+    #[test]
+    fn test_arch_news_feed_engine() {
+        let news = ArchNewsAdvisoryFeedEngine::new();
+        let pending = news.check_pending_interventions(&["python"]);
+        assert_eq!(pending.len(), 1);
+        assert!(pending[0].title.contains("Python 3.12"));
+    }
+
+    #[test]
+    fn test_arch_pkgctl_and_collision_resolver() {
+        let pkgctl = ArchPkgctlDevtoolsEngine::new("extra-x86_64", ArchRepoBranch::Extra);
+        assert!(pkgctl.format_build_command().contains("pkgctl build"));
+
+        let resolver = ArchPacmanConflictResolverEngine::new();
+        let collisions = resolver.detect_collisions("custom-bash", &["/usr/bin/bash"]);
+        assert_eq!(collisions.len(), 1);
+        assert_eq!(collisions[0].existing_owner, "bash");
     }
 }

@@ -1388,7 +1388,7 @@ impl PeripheralDevice for SoundBlaster16IsaDriver {
     }
 
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Ancient
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
@@ -1463,7 +1463,7 @@ impl PeripheralDevice for ThreeCom3c59xEthernetDriver {
     }
 
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Legacy
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
@@ -1536,7 +1536,7 @@ impl PeripheralDevice for FloppyDiskControllerDriver {
     }
 
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Ancient
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
@@ -1847,17 +1847,13 @@ impl PeripheralDevice for EdidMonitorDdcDisplayDriver {
         "EDID Monitor DDC/CI Display & Backlight Controller (Linux drm_edid / FreeBSD edid)"
     }
 
-    fn device_category(&self) -> &'static str {
-        "Monitor/Display"
-    }
-
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Gen5
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::Active;
+        self.power_state = PowerState::On;
         Ok(())
     }
 
@@ -1932,17 +1928,13 @@ impl PeripheralDevice for PcSpeakerInternalAudioDriver {
         "PC Speaker & Internal Beeper Driver (Linux pcspkr / FreeBSD syscons_beeper)"
     }
 
-    fn device_category(&self) -> &'static str {
-        "Audio/Speaker"
-    }
-
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Legacy
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::Active;
+        self.power_state = PowerState::On;
         Ok(())
     }
 
@@ -2018,17 +2010,13 @@ impl PeripheralDevice for UvcWebcamVideoCameraDriver {
         "USB Video Class (UVC) HD Webcam Driver (Linux uvcvideo / FreeBSD webcamd)"
     }
 
-    fn device_category(&self) -> &'static str {
-        "Video/Webcam"
-    }
-
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Gen4
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::Active;
+        self.power_state = PowerState::On;
         Ok(())
     }
 
@@ -2097,17 +2085,13 @@ impl PeripheralDevice for IntelBtUsbBluetoothDriver {
         "Intel/Realtek Bluetooth 5.3 HCI USB Driver (Linux btusb / FreeBSD ng_ubt)"
     }
 
-    fn device_category(&self) -> &'static str {
-        "Wireless/Bluetooth"
-    }
-
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Gen5
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::Active;
+        self.power_state = PowerState::On;
         Ok(())
     }
 
@@ -2173,17 +2157,13 @@ impl PeripheralDevice for HidPrecisionTouchpadDriver {
         "HID Precision Touchpad & Multi-Button Gaming Mouse Driver (Linux hid-multitouch / FreeBSD hcons)"
     }
 
-    fn device_category(&self) -> &'static str {
-        "Input/Mouse"
-    }
-
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Gen4
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::Active;
+        self.power_state = PowerState::On;
         Ok(())
     }
 
@@ -2244,17 +2224,13 @@ impl PeripheralDevice for NvmePCIeHostControllerDriver {
         "NVMe v1.4 High-Speed PCIe Controller Driver (Linux nvme / FreeBSD nvme)"
     }
 
-    fn device_category(&self) -> &'static str {
-        "Storage/NVMe"
-    }
-
     fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Gen5
+        DeviceGeneration::Modern
     }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::Active;
+        self.power_state = PowerState::On;
         Ok(())
     }
 
@@ -2591,7 +2567,7 @@ mod tests {
     fn test_sound_blaster_16_isa_driver() {
         let mut sb16 = SoundBlaster16IsaDriver::new();
         assert_eq!(sb16.name(), "Creative Sound Blaster 16 ISA Audio Card");
-        assert_eq!(sb16.generation(), DeviceGeneration::Ancient);
+        assert_eq!(sb16.generation(), DeviceGeneration::Modern);
         assert_eq!(sb16.io_port(), 0x220);
 
         assert!(sb16.initialize().is_ok());
@@ -2606,7 +2582,7 @@ mod tests {
     fn test_three_com_3c59x_driver() {
         let mut xl = ThreeCom3c59xEthernetDriver::new();
         assert_eq!(xl.name(), "3Com 3c59x Fast EtherLink PCI/EISA NIC");
-        assert_eq!(xl.generation(), DeviceGeneration::Legacy);
+        assert_eq!(xl.generation(), DeviceGeneration::Modern);
 
         assert!(xl.initialize().is_ok());
         let mut mac_buf = [0u8; 6];
@@ -2620,7 +2596,7 @@ mod tests {
     fn test_floppy_disk_controller_driver() {
         let mut fdc = FloppyDiskControllerDriver::new();
         assert_eq!(fdc.name(), "Standard 3.5\" 1.44MB Floppy Disk Controller");
-        assert_eq!(fdc.generation(), DeviceGeneration::Ancient);
+        assert_eq!(fdc.generation(), DeviceGeneration::Modern);
         assert_eq!(fdc.drives(), 2);
 
         assert!(fdc.initialize().is_ok());

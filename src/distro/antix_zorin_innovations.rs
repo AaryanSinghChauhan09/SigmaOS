@@ -9,7 +9,6 @@
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
-use std::vec::Vec;
 
 /// antiX Service State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

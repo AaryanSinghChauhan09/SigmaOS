@@ -2,7 +2,7 @@
 // Reduces dependency on std::sync::Arc
 
 use core::convert::AsRef;
-use core::ops::{Deref, DerefMut};
+use core::ops::Deref;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::boxed::Box;

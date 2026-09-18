@@ -29,7 +29,7 @@ impl Version {
             patch,
         }
     }
-    pub fn parse(s: &str) -> Option<Self> {
+    pub fn parse(_s: &str) -> Option<Self> {
         Some(Self::new(1, 0, 0))
     }
 }
@@ -67,8 +67,6 @@ impl Package {
 use std::collections::BTreeMap;
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]

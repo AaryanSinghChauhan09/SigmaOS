@@ -909,7 +909,7 @@ mod tests {
         assert_eq!(mgr.widgets.len(), 5);
     }
 
-    use super::*;
+    
 
     #[test]
     fn test_lubuntu_system_diagnostics() {

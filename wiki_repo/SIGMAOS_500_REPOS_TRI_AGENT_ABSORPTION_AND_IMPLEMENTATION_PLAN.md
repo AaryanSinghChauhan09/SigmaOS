@@ -238,365 +238,374 @@ SigmaOS systematically absorbs concepts, algorithms, tools, and paradigms from *
 32. `sabayon/sabayon-distro` — Entropy hybrid binary/source package manager rules.
 33. `chakra-linux/chakra` — Pure Qt/KDE desktop bundle isolate framework.
 34. `peppermintos/peppermintos` — Ice SSB (Single Site Browser) desktop web app integration.
-35. `bodhilinux/bodhi` — Moksha desktop environment and AppCenter integration.
-36. `zorinos/zorin-os` — Windows/macOS visual layout switcher and compatibility wrappers.
-37. `elementary/os` — Gala Pantheon window manager and Granate UX guidelines.
-38. `deepin-community/deepin` — DDE desktop Qt widgets and control center styling.
-39. `mx-linux/mx` — MX Tools hardware diagnostics and antiX live-USB persistence engine.
-40. `rocky-linux/rocky` — RHEL downstream binary source translation pipelines.
+35. `peppermintos/iso` — Peppermint OS ISO image creation scripts.
+36. `bodhilinux/bodhi` — Moksha desktop environment and AppCenter integration.
+37. `zorinos/zorin-os` — Windows/macOS visual layout switcher and compatibility wrappers.
+38. `elementary/os` — Gala Pantheon window manager and Granate UX guidelines.
+39. `deepin-community/deepin` — DDE desktop Qt widgets and control center styling.
+40. `mx-linux/mx` — MX Tools hardware diagnostics and antiX live-USB persistence engine.
+41. `rocky-linux/rocky` — RHEL downstream binary source translation pipelines.
 
 ### CATEGORY 4: LIGHTWEIGHT & SPECIAL PURPOSE DISTROS
-41. `tinycorelinux/Core` — Ultra-minimal RAM disk operating system booting in <10MB.
-42. `puppylinux-woof-CE/woof-CE` — Woof-CE build system for assembling puppy distros from foreign packages.
-43. `dietpi/dietpi` — SBC optimization scripts with RAM-logging and process priority tuning.
-44. `postmarketOS/pmaports` — Alpine-based mobile phone Linux distribution with Phosh/Plasma Mobile.
-45. `LFS/lfs` — Linux From Scratch systematic step-by-step OS generation instructions.
-46. `chimera-linux/chimera` — FreeBSD userland utilities running on Linux kernel with LLVM/Musl.
-47. `serpent-os/core` — Moss package manager with memory-mapped AST packaging format.
-48. `hyperbola/hyperbola-packages` — Hyperbola BSD-licensed GPL-free Linux kernel/userland packages.
-49. `kisslinux/kiss` — Pure POSIX shell 100-line source package manager.
-50. `artix-linux/packages` — Arch Linux packages modified to run without systemd (OpenRC, Runit, dinit, s6).
+42. `tinycorelinux/Core` — Ultra-minimal RAM disk operating system booting in <10MB.
+43. `puppylinux-woof-CE/woof-CE` — Woof-CE build system for assembling puppy distros from foreign packages.
+44. `dietpi/dietpi` — SBC optimization scripts with RAM-logging and process priority tuning.
+45. `postmarketOS/pmaports` — Alpine-based mobile phone Linux distribution with Phosh/Plasma Mobile.
+46. `LFS/lfs` — Linux From Scratch systematic step-by-step OS generation instructions.
+47. `chimera-linux/chimera` — FreeBSD userland utilities running on Linux kernel with LLVM/Musl.
+48. `serpent-os/core` — Moss package manager with memory-mapped AST packaging format.
+49. `hyperbola/hyperbola-packages` — Hyperbola BSD-licensed GPL-free Linux kernel/userland packages.
+50. `kisslinux/kiss` — Pure POSIX shell 100-line source package manager.
+51. `artix-linux/packages` — Arch Linux packages modified to run without systemd (OpenRC, Runit, dinit, s6).
 
-### CATEGORY 5: ALTERNATIVE OS, UNIKERNELS & MICROKERNELS
-51. `unikernel-org/unikernel` — Single-address-space hypervisor-targeted binary wrappers.
-52. `rumpkernel/rumpkernel` — NetBSD runnable drivers detached from kernel address space.
-53. `seL4/seL4` — Formally verified L4 microkernel capability access graphs.
-54. `genode/genode` — Microkernel abstraction layer and object-oriented OS framework.
-55. `haiku/haiku` — BeOS desktop successor with multi-threaded BApplication architecture.
-56. `reactos/reactos` — Open-source Windows NT kernel and Win32 subsystem implementation.
-57. `plan9foundation/plan9` — Plan 9 9P distributed VFS protocol and per-process namespace views.
-58. `openbsd/src` — OpenBSD kernel with W^X memory execution, Pledge, Unveil, and ASLR.
-59. `freebsd/freebsd` — FreeBSD kernel, Capsicum sandbox, ZFS root, Jails, and bhyve hypervisor.
-60. `netbsd/src` — NetBSD highly portable kernel, RUMP architecture, and pftf packet filter.
+### CATEGORY 5: UTILITIES, GUIDES & OS TOOLS
+52. `jaywcjlove/linux-command` — Comprehensive Linux command manual & search tool.
+53. `0xAX/linux-insides` — Book-style exploration of Linux kernel internals.
+54. `GameServerManagers/LinuxGSM` — Tool for deploying/managing Linux game servers.
+55. `SuperManito/LinuxMirrors` — Scripts for changing system mirrors & Docker setup.
+56. `bin456789/reinstall` — One-click OS reinstall scripts for VPS.
+57. `termux/termux-packages` — Package build system for Termux (Android Linux environment).
+58. `inputsh/awesome-linux` — Curated list of Linux projects & resources.
+59. `sirredbeard/awesome-unix` — Collection of UNIX/Linux/BSD resources.
 
-### CATEGORY 6: PACKAGE MANAGERS & BUILD SYSTEMS
-61. `rpm-software-management/rpm` — RPM database format, macro evaluation, and SPEC file parser.
-62. `dpkg/dpkg` — Debian `deb` package extractor, `control` parser, and update-alternatives.
-63. `pacman/pacman` — Arch Linux sync databases, libalpm, and PKGBUILD execution.
-64. `flatpak/flatpak` — Bubblewrap sandboxed app runtime, OSTree store, and Portal DBus API.
-65. `snapcore/snapd` — AppArmor sandboxed snaps, SquashFS mounting, and snapd REST API.
-66. `homebrew/linuxbrew-core` — Homebrew Ruby DSL package formulas for non-root user installation.
-67. `spack/spack` — Supercomputing package manager with combinatoric dependency solver.
-68. `nix-community/home-manager` — Declarative user home directory dotfile and service manager.
-69. `openembedded/openembedded-core` — BitBake task execution DAG and cross-compilation layers.
-70. `pkgsrc/pkgsrc` — NetBSD portable package source tree compiling on 20+ operating systems.
-71. `conda/conda` — Binary package manager for scientific Python and C/C++ shared libraries.
-72. `nix-community/nix` — Pure functional language parser and lazy store derivation evaluator.
-73. `apk-tools/apk-tools` — Alpine Linux tar-gz based high-speed package manager written in C.
-74. `xbps-src/xbps` — Void Linux C-based package manager with fast dependency graph resolution.
-75. `gentoo/portage` — Python-based Portage ebuild solver, USE flags, and package slotting engine.
+### CATEGORY 6: ALTERNATIVE OS, UNIKERNELS & MICROKERNELS
+60. `unikernel-org/unikernel` — Single-address-space hypervisor-targeted binary wrappers.
+61. `rumpkernel/rumpkernel` — NetBSD runnable drivers detached from kernel address space.
+62. `seL4/seL4` — Formally verified L4 microkernel capability access graphs.
+63. `genode/genode` — Microkernel abstraction layer and object-oriented OS framework.
+64. `haiku/haiku` — BeOS desktop successor with multi-threaded BApplication architecture.
+65. `reactos/reactos` — Open-source Windows NT kernel and Win32 subsystem implementation.
+66. `plan9foundation/plan9` — Plan 9 9P distributed VFS protocol and per-process namespace views.
+67. `openbsd/src` — OpenBSD kernel with W^X memory execution, Pledge, Unveil, and ASLR.
+68. `freebsd/freebsd` — FreeBSD kernel, Capsicum sandbox, ZFS root, Jails, and bhyve hypervisor.
+69. `netbsd/src` — NetBSD highly portable kernel, RUMP architecture, and pftf packet filter.
 
-### CATEGORY 7: SYSTEM UTILITIES & CORE OS TOOLS
-76. `systemd/systemd` — Systemd init, journald logging, udev device manager, resolve_path, resolved, hostnamed.
-77. `busybox/busybox` — Single binary bundling 300+ UNIX utilities with minimal RAM usage.
-78. `util-linux/util-linux` — Essential Linux utilities (fdisk, mount, lsblk, dmesg, blkid, nsenter).
-79. `coreutils/coreutils` — GNU core utilities (cat, ls, cp, mv, rm, chmod, chown).
-80. `iputils/iputils` — Ping, tracepath, clockdiff network diagnostics.
-81. `net-tools/net-tools` — Legacy networking utilities (ifconfig, route, netstat, arp).
-82. `procps-ng/procps` — Process metrics monitors (ps, top, vmstat, w, sysctl, pkill).
-83. `e2fsprogs/e2fsprogs` — Ext2/3/4 filesystem creation (`mke2fs`) and consistency checker (`fsck`).
-84. `btrfs/btrfs-progs` — Btrfs subvolume management, RAID balancing, and snapshot commands.
-85. `zfs/zfs` — OpenZFS pool management (`zpool`), datasets (`zfs`), and ARC memory allocator.
+### CATEGORY 7: PACKAGE MANAGERS & BUILD SYSTEMS
+70. `rpm-software-management/rpm` — RPM database format, macro evaluation, and SPEC file parser.
+71. `dpkg/dpkg` — Debian `deb` package extractor, `control` parser, and update-alternatives.
+72. `pacman/pacman` — Arch Linux sync databases, libalpm, and PKGBUILD execution.
+73. `flatpak/flatpak` — Bubblewrap sandboxed app runtime, OSTree store, and Portal DBus API.
+74. `snapcore/snapd` — AppArmor sandboxed snaps, SquashFS mounting, and snapd REST API.
+75. `homebrew/linuxbrew-core` — Homebrew Ruby DSL package formulas for non-root user installation.
+76. `spack/spack` — Supercomputing package manager with combinatoric dependency solver.
+77. `nix-community/home-manager` — Declarative user home directory dotfile and service manager.
+78. `openembedded/openembedded-core` — BitBake task execution DAG and cross-compilation layers.
+79. `pkgsrc/pkgsrc` — NetBSD portable package source tree compiling on 20+ operating systems.
+80. `conda/conda` — Binary package manager for scientific Python and C/C++ shared libraries.
+81. `nix-community/nix` — Pure functional language parser and lazy store derivation evaluator.
+82. `apk-tools/apk-tools` — Alpine Linux tar-gz based high-speed package manager written in C.
+83. `xbps-src/xbps` — Void Linux C-based package manager with fast dependency graph resolution.
+84. `gentoo/portage` — Python-based Portage ebuild solver, USE flags, and package slotting engine.
 
-### CATEGORY 8: SECURITY, CRYPTOGRAPHY & NETWORKING
-86. `openvpn/openvpn` — SSL/TLS virtual private network daemon and TUN/TAP routing engine.
-87. `wireguard/wireguard-linux` — In-kernel Noise protocol state machine VPN engine.
-88. `iptables/iptables` — Netfilter IPv4/IPv6 packet filtering and NAT table manipulator.
-89. `nftables/nftables` — Next-gen packet classification bytecode VM replacing iptables.
-90. `openssh/openssh-portable` — Secure Shell daemon, SSH keys, SFTP, and SSH certificate validation.
-91. `gnupg/gnupg` — OpenPGP signature verification, keyrings, and asymmetric encryption.
-92. `selinuxProject/selinux` — Mandatory Access Control policy compiler, security context labels, and audit logs.
-93. `clamav/clamav` — Antivirus signature scanner, byte-code rule engine, and quarantine manager.
-94. `fail2ban/fail2ban` — Log scanning daemon dynamically writing firewall blocking rules.
-95. `suricata/suricata` — High-performance Network IDS/IPS and deep packet inspection engine.
+### CATEGORY 8: SYSTEM UTILITIES & CORE OS TOOLS
+85. `systemd/systemd` — Systemd init, journald logging, udev device manager, resolve_path, resolved, hostnamed.
+86. `busybox/busybox` — Single binary bundling 300+ UNIX utilities with minimal RAM usage.
+87. `util-linux/util-linux` — Essential Linux utilities (fdisk, mount, lsblk, dmesg, blkid, nsenter).
+88. `coreutils/coreutils` — GNU core utilities (cat, ls, cp, mv, rm, chmod, chown).
+89. `iputils/iputils` — Ping, tracepath, clockdiff network diagnostics.
+90. `net-tools/net-tools` — Legacy networking utilities (ifconfig, route, netstat, arp).
+91. `procps-ng/procps` — Process metrics monitors (ps, top, vmstat, w, sysctl, pkill).
+92. `e2fsprogs/e2fsprogs` — Ext2/3/4 filesystem creation (`mke2fs`) and consistency checker (`fsck`).
+93. `btrfs/btrfs-progs` — Btrfs subvolume management, RAID balancing, and snapshot commands.
+94. `zfs/zfs` — OpenZFS pool management (`zpool`), datasets (`zfs`), and ARC memory allocator.
 
-### CATEGORY 9: DESKTOP ENVIRONMENTS & WINDOW MANAGERS
-96. `GNOME/gnome-shell` — Mutter compositor, JS extensions, accessibility AT-SPI2 integration.
-97. `KDE/plasma-desktop` — Qt/QML desktop shell, KWin compositor, and plasma applets.
-98. `xfce/xfce4-panel` — GTK lightweight panel, task list, applets, and session manager.
-99. `lxde/lxde-common` — Ultra-lightweight GTK desktop environment components.
-100. `mate-desktop/mate-panel` — GNOME 2 fork desktop components maintaining classic workflow.
-101. `swaywm/sway` — Wayland i3-compatible tiling window manager compositor.
-102. `i3/i3` — X11 tree-based manual tiling window manager.
-103. `awesomeWM/awesome` — Lua-configurable highly dynamic tiling window manager.
-104. `openbox/openbox` — Fast, lightweight, standards-compliant ICCCM/EWMH window manager.
-105. `fluxbox/fluxbox` — Minimal tabbed window manager written in C++.
+### CATEGORY 9: SECURITY, CRYPTOGRAPHY & NETWORKING
+95. `openvpn/openvpn` — SSL/TLS virtual private network daemon and TUN/TAP routing engine.
+96. `wireguard/wireguard-linux` — In-kernel Noise protocol state machine VPN engine.
+97. `iptables/iptables` — Netfilter IPv4/IPv6 packet filtering and NAT table manipulator.
+98. `nftables/nftables` — Next-gen packet classification bytecode VM replacing iptables.
+99. `openssh/openssh-portable` — Secure Shell daemon, SSH keys, SFTP, and SSH certificate validation.
+100. `gnupg/gnupg` — OpenPGP signature verification, keyrings, and asymmetric encryption.
+101. `selinuxProject/selinux` — Mandatory Access Control policy compiler, security context labels, and audit logs.
+102. `clamav/clamav` — Antivirus signature scanner, byte-code rule engine, and quarantine manager.
+103. `fail2ban/fail2ban` — Log scanning daemon dynamically writing firewall blocking rules.
+104. `suricata/suricata` — High-performance Network IDS/IPS and deep packet inspection engine.
 
-### CATEGORY 10: ENTERPRISE, CLOUD & SERVER DISTROS
-106. `almalinux/almalinux` — Community-driven enterprise RHEL binary compatible OS.
-107. `oracle/linux` — Unbreakable Enterprise Kernel (UEK) with dynamic DTrace tracing.
-108. `cloudlinux/cloudlinux` — LVE (Lightweight Virtual Environment) process tenant isolation.
-109. `rancher/k3s` — Lightweight single-binary Kubernetes distribution.
-110. `hashicorp/nomad` — Easy-to-use workload orchestrator for containers and non-container apps.
-111. `kubernetes/kubernetes` — Container orchestration, Pod scheduling, and CNI/CSI drivers.
-112. `openshift/origin` — Red Hat enterprise Kubernetes distribution with security constraints.
-113. `vmware/photon` — Minimal Linux OS optimized for VMware vSphere infrastructure.
-114. `amazon/amazon-linux-2023` — AWS Cloud-optimized RPM-based operating system.
-115. `mirantis/k0s` — Zero-friction single-binary Kubernetes engine.
+### CATEGORY 10: DESKTOP ENVIRONMENTS & WINDOW MANAGERS
+105. `GNOME/gnome-shell` — Mutter compositor, JS extensions, accessibility AT-SPI2 integration.
+106. `KDE/plasma-desktop` — Qt/QML desktop shell, KWin compositor, and plasma applets.
+107. `xfce/xfce4-panel` — GTK lightweight panel, task list, applets, and session manager.
+108. `lxde/lxde-common` — Ultra-lightweight GTK desktop environment components.
+109. `mate-desktop/mate-panel` — GNOME 2 fork desktop components maintaining classic workflow.
+110. `swaywm/sway` — Wayland i3-compatible tiling window manager compositor.
+111. `i3/i3` — X11 tree-based manual tiling window manager.
+112. `awesomeWM/awesome` — Lua-configurable highly dynamic tiling window manager.
+113. `openbox/openbox` — Fast, lightweight, standards-compliant ICCCM/EWMH window manager.
+114. `fluxbox/fluxbox` — Minimal tabbed window manager written in C++.
 
-### CATEGORY 11: FILESYSTEMS & STORAGE MANAGEMENT
-116. `xfs/xfsprogs` — High-performance 64-bit journaling filesystem utilities.
-117. `f2fs-tools/f2fs-tools` — Flash-Friendly Filesystem allocation for NVMe/SSD storage.
-118. `nilfs/nilfs-tools` — Continuous snapshotting log-structured filesystem.
-119. `reiserfs/reiserfsprogs` — Legacy tree-based small file filesystem utilities.
-120. `ceph/ceph` — Distributed object store, block device (RBD), and POSIX filesystem (CephFS).
-121. `gluster/glusterfs` — Distributed scale-out network filesystem.
-122. `lustre/lustre` — Parallel distributed filesystem for supercomputing clusters.
-123. `bcachefs/bcachefs-tools` — Modern copy-on-write filesystem with built-in encryption and caching.
-124. `overlayfs/overlayfs-tools` — Upper/lower directory overlay filesystem inspection utilities.
-125. `squashfs-tools/squashfs-tools` — High-ratio compressed read-only filesystem generator (`mksquashfs`).
+### CATEGORY 11: ENTERPRISE, CLOUD & SERVER DISTROS
+115. `almalinux/almalinux` — Community-driven enterprise RHEL binary compatible OS.
+116. `oracle/linux` — Unbreakable Enterprise Kernel (UEK) with dynamic DTrace tracing.
+117. `cloudlinux/cloudlinux` — LVE (Lightweight Virtual Environment) process tenant isolation.
+118. `rancher/k3s` — Lightweight single-binary Kubernetes distribution.
+119. `hashicorp/nomad` — Easy-to-use workload orchestrator for containers and non-container apps.
+120. `kubernetes/kubernetes` — Container orchestration, Pod scheduling, and CNI/CSI drivers.
+121. `openshift/origin` — Red Hat enterprise Kubernetes distribution with security constraints.
+122. `vmware/photon` — Minimal Linux OS optimized for VMware vSphere infrastructure.
+123. `amazon/amazon-linux-2023` — AWS Cloud-optimized RPM-based operating system.
+124. `mirantis/k0s` — Zero-friction single-binary Kubernetes engine.
 
-### CATEGORY 12: MONITORING, TELEMETRY & PERFORMANCE
-126. `htop-dev/htop` — Interactive process viewer with color-coded CPU and memory bars.
-127. `atop/atop` — Advanced system and process monitor logging historical resource load.
-128. `glances/glances` — Cross-platform curses and web-based system monitoring tool.
-129. `collectd/collectd` — System statistics collection daemon with multi-plugin exporters.
-130. `sysstat/sysstat` — System performance metrics collection tools (`sar`, `iostat`, `mpstat`).
-131. `iotop/iotop` — Top-like utility for monitoring disk I/O usage per process.
-132. `dstat/dstat` — Versatile replacement for vmstat, iostat, netstat, and ifstat.
-133. `nmon/nmon` — Performance monitoring tool for AIX and Linux systems.
-134. `sar/sar` — Historical activity data recorder and report analyzer.
-135. `perf/perf` — Linux kernel hardware performance counters and event profiler.
+### CATEGORY 12: FILESYSTEMS & STORAGE MANAGEMENT
+125. `xfs/xfsprogs` — High-performance 64-bit journaling filesystem utilities.
+126. `f2fs-tools/f2fs-tools` — Flash-Friendly Filesystem allocation for NVMe/SSD storage.
+127. `nilfs/nilfs-tools` — Continuous snapshotting log-structured filesystem.
+128. `reiserfs/reiserfsprogs` — Legacy tree-based small file filesystem utilities.
+129. `ceph/ceph` — Distributed object store, block device (RBD), and POSIX filesystem (CephFS).
+130. `gluster/glusterfs` — Distributed scale-out network filesystem.
+131. `lustre/lustre` — Parallel distributed filesystem for supercomputing clusters.
+132. `bcachefs/bcachefs-tools` — Modern copy-on-write filesystem with built-in encryption and caching.
+133. `overlayfs/overlayfs-tools` — Upper/lower directory overlay filesystem inspection utilities.
+134. `squashfs-tools/squashfs-tools` — High-ratio compressed read-only filesystem generator (`mksquashfs`).
 
-### CATEGORY 13: NETWORKING TOOLS & DIAGNOSTICS
-136. `curl/curl` — Command line tool and libcurl library for transferring data with URLs.
-137. `wget/wget` — Network file downloader supporting HTTP, HTTPS, and FTP.
-138. `netcat/netcat` — Networking utility for reading/writing data across network connections.
-139. `traceroute/traceroute` — Traces hop paths of network packets toward a remote destination.
-140. `tcpdump/tcpdump` — Command-line packet analyzer using pcap library.
-141. `wireshark/wireshark` — Graphical deep network protocol analyzer.
-142. `iftop/iftop` — Display bandwidth usage on an interface by host pairs.
-143. `mtr/mtr` — Network diagnostic tool combining traceroute and ping functionality.
-144. `ethtool/ethtool` — Query and control network driver and hardware settings.
-145. `bridge-utils/bridge-utils` — Utilities for configuring Linux ethernet bridges.
+### CATEGORY 13: MONITORING, TELEMETRY & PERFORMANCE
+135. `htop-dev/htop` — Interactive process viewer with color-coded CPU and memory bars.
+136. `atop/atop` — Advanced system and process monitor logging historical resource load.
+137. `glances/glances` — Cross-platform curses and web-based system monitoring tool.
+138. `collectd/collectd` — System statistics collection daemon with multi-plugin exporters.
+139. `sysstat/sysstat` — System performance metrics collection tools (`sar`, `iostat`, `mpstat`).
+140. `iotop/iotop` — Top-like utility for monitoring disk I/O usage per process.
+141. `dstat/dstat` — Versatile replacement for vmstat, iostat, netstat, and ifstat.
+142. `nmon/nmon` — Performance monitoring tool for AIX and Linux systems.
+143. `sar/sar` — Historical activity data recorder and report analyzer.
+144. `perf/perf` — Linux kernel hardware performance counters and event profiler.
 
-### CATEGORY 14: MODERN SHELLS & TERMINALS
-146. `bash/bash` — GNU Bourne-Again SHell command execution environment.
-147. `zsh-users/zsh` — Advanced shell with programmable completions and theme hooks.
-148. `fish-shell/fish-shell` — User-friendly command line shell with syntax highlighting and auto-suggestions.
-149. `xonsh/xonsh` — Python-powered, cross-platform shell language.
-150. `nushell/nushell` — Modern structured data shell treating command output as tables.
-151. `elvish/elvish` — Expressive programming language and multi-tab interactive shell.
-152. `powershell/powershell` — Cross-platform object-oriented task automation framework.
-153. `termux/termux-app` — Terminal emulator app for Android OS.
-154. `alacritty/alacritty` — GPU-accelerated terminal emulator written in Rust.
-155. `kitty/kitty` — Fast, feature-rich, GPU-based terminal emulator with graphics protocols.
+### CATEGORY 14: NETWORKING TOOLS & DIAGNOSTICS
+145. `curl/curl` — Command line tool and libcurl library for transferring data with URLs.
+146. `wget/wget` — Network file downloader supporting HTTP, HTTPS, and FTP.
+147. `netcat/netcat` — Networking utility for reading/writing data across network connections.
+148. `traceroute/traceroute` — Traces hop paths of network packets toward a remote destination.
+149. `tcpdump/tcpdump` — Command-line packet analyzer using pcap library.
+150. `wireshark/wireshark` — Graphical deep network protocol analyzer.
+151. `iftop/iftop` — Display bandwidth usage on an interface by host pairs.
+152. `mtr/mtr` — Network diagnostic tool combining traceroute and ping functionality.
+153. `ethtool/ethtool` — Query and control network driver and hardware settings.
+154. `bridge-utils/bridge-utils` — Utilities for configuring Linux ethernet bridges.
 
-### CATEGORY 15: EMBEDDED, MOBILE & IOT SYSTEMS
-156. `yoctoproject/poky` — Reference embedded Linux distribution generator.
-157. `openwrt/openwrt` — Linux operating system targeting wireless routers and embedded devices.
-158. `buildroot/buildroot` — Simple, efficient tool for generating embedded Linux systems via cross-compilation.
-159. `android/linux` — Android Linux kernel source tree.
-160. `ubiquiti/unifi-linux` — Ubiquiti enterprise network appliance firmware runtime.
-161. `balena-os/balena-os` — Yocto-based containerized OS for IoT edge devices.
-162. `resin-os/meta-resin` — Resin.io Yocto layers for fleet device management.
-163. `tizen/tizen` — Samsung open-source mobile/smart TV OS.
-164. `webos/webos` — LG open-source smart TV OS platform.
-165. `sailfishos/sailfishos` — Jolla mobile Linux OS with Silica UI framework.
+### CATEGORY 15: MODERN SHELLS & TERMINALS
+155. `bash/bash` — GNU Bourne-Again SHell command execution environment.
+156. `zsh-users/zsh` — Advanced shell with programmable completions and theme hooks.
+157. `fish-shell/fish-shell` — User-friendly command line shell with syntax highlighting and auto-suggestions.
+158. `xonsh/xonsh` — Python-powered, cross-platform shell language.
+159. `nushell/nushell` — Modern structured data shell treating command output as tables.
+160. `elvish/elvish` — Expressive programming language and multi-tab interactive shell.
+161. `powershell/powershell` — Cross-platform object-oriented task automation framework.
+162. `termux/termux-app` — Terminal emulator app for Android OS.
+163. `alacritty/alacritty` — GPU-accelerated terminal emulator written in Rust.
+164. `kitty/kitty` — Fast, feature-rich, GPU-based terminal emulator with graphics protocols.
 
-### CATEGORY 16: REAL-TIME & FORMAL MICROKERNELS
-166. `rt-linux/rt-linux` — Real-time Linux kernel project.
-167. `xenomai/xenomai` — Real-time development framework.
-168. `preempt-rt/preempt-rt` — Preemption real-time patch set.
-169. `unikernel-org/unikernel` — Lightweight single-purpose operating systems.
-170. `rumpkernel/rumpkernel` — Modular kernel architecture.
-171. `seL4/seL4` — Formally verified microkernel.
-172. `genode/genode` — Framework for building custom OS userlands.
-173. `haiku/haiku` — BeOS replacement focused on personal desktop computing.
-174. `reactos/reactos` — Windows NT compatible OS implementation.
-175. `plan9foundation/plan9` — Distributed operating system from Bell Labs.
+### CATEGORY 16: EMBEDDED, MOBILE & IOT SYSTEMS
+165. `yoctoproject/poky` — Reference embedded Linux distribution generator.
+166. `openwrt/openwrt` — Linux operating system targeting wireless routers and embedded devices.
+167. `buildroot/buildroot` — Simple, efficient tool for generating embedded Linux systems via cross-compilation.
+168. `android/linux` — Android Linux kernel source tree.
+169. `ubiquiti/unifi-linux` — Ubiquiti enterprise network appliance firmware runtime.
+170. `balena-os/balena-os` — Yocto-based containerized OS for IoT edge devices.
+171. `resin-os/meta-resin` — Resin.io Yocto layers for fleet device management.
+172. `tizen/tizen` — Samsung open-source mobile/smart TV OS.
+173. `webos/webos` — LG open-source smart TV OS platform.
+174. `sailfishos/sailfishos` — Jolla mobile Linux OS with Silica UI framework.
 
-### CATEGORY 17: CONTAINER RUNTIMES & VIRTUALIZATION
-176. `docker/docker-ce` — Docker engine and CLI client.
-177. `moby/moby` — Upstream framework for assembling container systems.
-178. `containerd/containerd` — Core container runtime managing complete container lifecycle.
-179. `opencontainers/runc` — OCI compliant CLI tool for spawning containers according to spec.
-180. `podman/podman` — Daemonless container engine for developing, managing OCI pods.
-181. `lxc/lxc` — Linux Containers userspace control commands.
-182. `kubernetes/kubernetes` — Automated container deployment and management.
-183. `cri-o/cri-o` — Lightweight container runtime specifically for Kubernetes.
-184. `kata-containers/kata-containers` — Lightweight virtual machines providing container isolation.
-185. `firecracker-microvm/firecracker` — Minimalist microVM runtime for serverless computing.
+### CATEGORY 17: REAL-TIME & FORMAL MICROKERNELS
+175. `rt-linux/rt-linux` — Real-time Linux kernel project.
+176. `xenomai/xenomai` — Real-time development framework.
+177. `preempt-rt/preempt-rt` — Preemption real-time patch set.
+178. `unikernel-org/unikernel` — Lightweight single-purpose operating systems.
+179. `rumpkernel/rumpkernel` — Modular kernel architecture.
+180. `seL4/seL4` — Formally verified microkernel.
+181. `genode/genode` — Framework for building custom OS userlands.
+182. `haiku/haiku` — BeOS replacement focused on personal desktop computing.
+183. `reactos/reactos` — Windows NT compatible OS implementation.
+184. `plan9foundation/plan9` — Distributed operating system from Bell Labs.
 
-### CATEGORY 18: INIT SYSTEMS & SERVICE SUPERVISORS
-186. `openrc/openrc` — Dependency-based init system working with system-provided init.
-187. `runit/runit` — Minimal UNIX init scheme with service supervision.
-188. `s6/s6` — Small, secure supervision suite for UNIX processes.
-189. `upstart/upstart` — Event-based replacement for the traditional init daemon.
-190. `monit/monit` — Utility for managing and monitoring processes, files, directories.
-191. `supervisord/supervisor` — Process control system for UNIX-like operating systems.
-192. `daemontools/daemontools` — Collection of tools for managing UNIX services.
-193. `systemd/systemd-stable` — Stable release branch of systemd init system.
-194. `initng/initng` — Next generation asynchronous init system.
-195. `smf/smf` — Solaris Service Management Facility architecture.
+### CATEGORY 18: CONTAINER RUNTIMES & VIRTUALIZATION
+185. `docker/docker-ce` — Docker engine and CLI client.
+186. `moby/moby` — Upstream framework for assembling container systems.
+187. `containerd/containerd` — Core container runtime managing complete container lifecycle.
+188. `opencontainers/runc` — OCI compliant CLI tool for spawning containers according to spec.
+189. `podman/podman` — Daemonless container engine for developing, managing OCI pods.
+190. `lxc/lxc` — Linux Containers userspace control commands.
+191. `kubernetes/kubernetes` — Automated container deployment and management.
+192. `cri-o/cri-o` — Lightweight container runtime specifically for Kubernetes.
+193. `kata-containers/kata-containers` — Lightweight virtual machines providing container isolation.
+194. `firecracker-microvm/firecracker` — Minimalist microVM runtime for serverless computing.
 
-### CATEGORY 19: BACKUP, SNAPSHOT & RECOVERY TOOLS
-196. `rsnapshot/rsnapshot` — Filesystem snapshot utility based on rsync and hard links.
-197. `borgbackup/borg` — Deduplicating, authenticated, and encrypted backup tool.
-198. `restic/restic` — Fast, secure, efficient backup program using content-addressable storage.
-199. `duplicity/duplicity` — Encrypted bandwidth-efficient backup using librsync.
-200. `timeshift/timeshift` — System restore utility for Linux taking rsync or Btrfs snapshots.
-201. `rsync/rsync` — Fast, versatile remote and local file-copying tool.
-202. `tar/tar` — Tape Archiver file packaging utility.
-203. `ddrescue/ddrescue` — Data recovery tool copying data from corrupted block devices.
-204. `clonezilla/clonezilla` — Partition and disk imaging/cloning solution.
-205. `partclone/partclone` — Partition cloning tool supporting Ext4, Btrfs, NTFS, XFS.
+### CATEGORY 19: INIT SYSTEMS & SERVICE SUPERVISORS
+195. `openrc/openrc` — Dependency-based init system working with system-provided init.
+196. `runit/runit` — Minimal UNIX init scheme with service supervision.
+197. `s6/s6` — Small, secure supervision suite for UNIX processes.
+198. `upstart/upstart` — Event-based replacement for the traditional init daemon.
+199. `monit/monit` — Utility for managing and monitoring processes, files, directories.
+200. `supervisord/supervisor` — Process control system for UNIX-like operating systems.
+201. `daemontools/daemontools` — Collection of tools for managing UNIX services.
+202. `systemd/systemd-stable` — Stable release branch of systemd init system.
+203. `initng/initng` — Next generation asynchronous init system.
+204. `smf/smf` — Solaris Service Management Facility architecture.
 
-### CATEGORY 20: TERMINAL MULTIPLEXERS & TEXT EDITORS
-206. `screen/screen` — Full-screen window manager multiplexing physical terminal.
-207. `tmux/tmux` — Terminal multiplexer enabling multiple terminal sessions in one window.
-208. `mc/midnight-commander` — Visual file manager and full-screen text menu interface.
-209. `nano/nano` — Friendly, easy-to-use terminal text editor.
-210. `vim/vim` — Highly configurable modal text editor.
-211. `emacs/emacs` — Extensible, customizable, self-documenting real-time display editor.
-212. `joe-editor/joe` — WordStar-like full-screen terminal text editor.
-213. `micro-editor/micro` — Modern and intuitive terminal-based text editor.
-214. `neovim/neovim` — Vim-fork focused on extensibility and asynchronous Lua plugins.
-215. `helix-editor/helix` — Modal selection-first editor written in Rust with Tree-sitter built in.
+### CATEGORY 20: BACKUP, SNAPSHOT & RECOVERY TOOLS
+205. `rsnapshot/rsnapshot` — Filesystem snapshot utility based on rsync and hard links.
+206. `borgbackup/borg` — Deduplicating, authenticated, and encrypted backup tool.
+207. `restic/restic` — Fast, secure, efficient backup program using content-addressable storage.
+208. `duplicity/duplicity` — Encrypted bandwidth-efficient backup using librsync.
+209. `timeshift/timeshift` — System restore utility for Linux taking rsync or Btrfs snapshots.
+210. `rsync/rsync` — Fast, versatile remote and local file-copying tool.
+211. `tar/tar` — Tape Archiver file packaging utility.
+212. `ddrescue/ddrescue` — Data recovery tool copying data from corrupted block devices.
+213. `clonezilla/clonezilla` — Partition and disk imaging/cloning solution.
+214. `partclone/partclone` — Partition cloning tool supporting Ext4, Btrfs, NTFS, XFS.
 
-### CATEGORY 21: HPC & SCIENTIFIC COMPUTING
-216. `slurm/slurm` — Workload manager and job scheduler for HPC clusters.
-217. `openmpi/ompi` — Open source Message Passing Interface implementation.
-218. `mpich/mpich` — High-performance MPI implementation.
-219. `petsc/petsc` — Portable Extensible Toolkit for Scientific Computation.
-220. `hdfgroup/hdf5` — Data model, library, and file format for storing complex scientific data.
-221. `netcdf/netcdf-c` — Array-oriented scientific data access interfaces.
-222. `paraview/paraview` — Multi-platform data analysis and visualization application.
-223. `visit-dav/visit` — Interactive parallel visualization and graphical analysis tool.
-224. `openfoam/openfoam` — Computational Fluid Dynamics (CFD) software toolbox.
-225. `gromacs/gromacs` — High-throughput molecular dynamics simulation package.
+### CATEGORY 21: TERMINAL MULTIPLEXERS & TEXT EDITORS
+215. `screen/screen` — Full-screen window manager multiplexing physical terminal.
+216. `tmux/tmux` — Terminal multiplexer enabling multiple terminal sessions in one window.
+217. `mc/midnight-commander` — Visual file manager and full-screen text menu interface.
+218. `nano/nano` — Friendly, easy-to-use terminal text editor.
+219. `vim/vim` — Highly configurable modal text editor.
+220. `emacs/emacs` — Extensible, customizable, self-documenting real-time display editor.
+221. `joe-editor/joe` — WordStar-like full-screen terminal text editor.
+222. `micro-editor/micro` — Modern and intuitive terminal-based text editor.
+223. `neovim/neovim` — Vim-fork focused on extensibility and asynchronous Lua plugins.
+224. `helix-editor/helix` — Modal selection-first editor written in Rust with Tree-sitter built in.
 
-### CATEGORY 22: PENETRATION TESTING & FORENSIC TOOLS
-226. `nmap/nmap` — Network exploration tool and security / port scanner.
-227. `metasploit/metasploit-framework` — Penetration testing and exploit development platform.
-228. `aircrack-ng/aircrack-ng` — Wi-Fi network security auditing tools.
-229. `john/john` — John the Ripper password cracker.
-230. `hashcat/hashcat` — Advanced GPU-accelerated password recovery utility.
-231. `openvas/openvas` — Vulnerability scanner engine for network devices.
-232. `ossec/ossec-hids` — Host-based intrusion detection system.
-233. `snort/snort` — Network intrusion prevention and detection system.
-234. `clamav/clamav` — Open-source antivirus engine.
-235. `parrotsec/parrot-core` — Core packages of Parrot Security OS (forensics & RAM scrubber).
+### CATEGORY 22: HPC & SCIENTIFIC COMPUTING
+225. `slurm/slurm` — Workload manager and job scheduler for HPC clusters.
+226. `openmpi/ompi` — Open source Message Passing Interface implementation.
+227. `mpich/mpich` — High-performance MPI implementation.
+228. `petsc/petsc` — Portable Extensible Toolkit for Scientific Computation.
+229. `hdfgroup/hdf5` — Data model, library, and file format for storing complex scientific data.
+230. `netcdf/netcdf-c` — Array-oriented scientific data access interfaces.
+231. `paraview/paraview` — Multi-platform data analysis and visualization application.
+232. `visit-dav/visit` — Interactive parallel visualization and graphical analysis tool.
+233. `openfoam/openfoam` — Computational Fluid Dynamics (CFD) software toolbox.
+234. `gromacs/gromacs` — High-throughput molecular dynamics simulation package.
 
-### CATEGORY 23: ALTERNATIVE SHELLS & SCRIPTING ENVIRONMENTS
-236. `oil-shell/oil` — Modern POSIX-compatible shell language (Oils).
-237. `dash-shell/dash` — POSIX-compliant implementation of /bin/sh fast execution shell.
-238. `mksh/mksh` — MirBSD Korn Shell.
-239. `busybox/ash` — Almquist shell implementation inside BusyBox.
-240. `ksh93/ksh` — AT&T KornShell command and programming language.
-241. `rc-shell/rc` — Plan 9 command interpreter shell.
-242. `es-shell/es` — Extensible shell based on Plan 9 rc shell.
-243. `yash-shell/yash` — POSIX-compliant command line shell with strict compliance checks.
-244. `osh/osh` — Oil Shell parser and execution sub-engine.
-245. `closh/closh` — Clojure-based bash replacement shell.
+### CATEGORY 23: PENETRATION TESTING & FORENSIC TOOLS
+235. `nmap/nmap` — Network exploration tool and security / port scanner.
+236. `metasploit/metasploit-framework` — Penetration testing and exploit development platform.
+237. `aircrack-ng/aircrack-ng` — Wi-Fi network security auditing tools.
+238. `john/john` — John the Ripper password cracker.
+239. `hashcat/hashcat` — Advanced GPU-accelerated password recovery utility.
+240. `openvas/openvas` — Vulnerability scanner engine for network devices.
+241. `ossec/ossec-hids` — Host-based intrusion detection system.
+242. `snort/snort` — Network intrusion prevention and detection system.
+243. `clamav/clamav` — Open-source antivirus engine.
+244. `parrotsec/parrot-core` — Core packages of Parrot Security OS (forensics & RAM scrubber).
 
-### CATEGORY 24: HYPERVISORS & CLOUD AUTOMATION
-246. `qemu/qemu` — Generic machine emulator and virtualizer.
-247. `kvm/kvm` — Kernel-based Virtual Machine module in Linux.
-248. `xen-project/xen` — Bare-metal Type-1 hypervisor.
-249. `virtualbox/virtualbox` — Cross-platform x86 virtualizer.
-250. `proxmox/proxmox-ve` — Open-source server management platform for VMs and containers.
-251. `libvirt/libvirt` — Virtualization API management library.
-252. `vagrant/vagrant` — Tool for building and managing virtual machine environments.
-253. `ganeti/ganeti` — Cluster virtual instance management software upon KVM/Xen.
-254. `opennebula/one` — Simple, enterprise cloud management platform.
-255. `cloudstack/cloudstack` — Turnkey Infrastructure as a Service (IaaS) cloud management.
+### CATEGORY 24: ALTERNATIVE SHELLS & SCRIPTING ENVIRONMENTS
+245. `oil-shell/oil` — Modern POSIX-compatible shell language (Oils).
+246. `dash-shell/dash` — POSIX-compliant implementation of /bin/sh fast execution shell.
+247. `mksh/mksh` — MirBSD Korn Shell.
+248. `busybox/ash` — Almquist shell implementation inside BusyBox.
+249. `ksh93/ksh` — AT&T KornShell command and programming language.
+250. `rc-shell/rc` — Plan 9 command interpreter shell.
+251. `es-shell/es` — Extensible shell based on Plan 9 rc shell.
+252. `yash-shell/yash` — POSIX-compliant command line shell with strict compliance checks.
+253. `osh/osh` — Oil Shell parser and execution sub-engine.
+254. `closh/closh` — Clojure-based bash replacement shell.
 
-### CATEGORY 25: OBSERVABILITY & DISTRIBUTED LOGGING
-256. `prometheus/prometheus` — Time-series monitoring service and metrics collector.
-257. `grafana/grafana` — Observability dashboard and visualization platform.
-258. `elastic/elasticsearch` — Distributed search and analytics engine.
-259. `logstash/logstash` — Server-side data processing pipeline ingesting from multiple sources.
-260. `kibana/kibana` — Data visualization dashboard for Elasticsearch data.
-261. `graylog/graylog` — Centralized log management and security analytics.
-262. `fluent/fluentd` — Open-source data collector for unified logging layer.
-263. `vector/vector` — High-performance observability data pipeline written in Rust.
-264. `loki/loki` — Horizontally scalable log aggregation system inspired by Prometheus.
-265. `syslog-ng/syslog-ng` — Enhanced log daemon supporting structured logs and remote sinks.
+### CATEGORY 25: HYPERVISORS & CLOUD AUTOMATION
+255. `qemu/qemu` — Generic machine emulator and virtualizer.
+256. `kvm/kvm` — Kernel-based Virtual Machine module in Linux.
+257. `xen-project/xen` — Bare-metal Type-1 hypervisor.
+258. `virtualbox/virtualbox` — Cross-platform x86 virtualizer.
+259. `proxmox/proxmox-ve` — Open-source server management platform for VMs and containers.
+260. `libvirt/libvirt` — Virtualization API management library.
+261. `vagrant/vagrant` — Tool for building and managing virtual machine environments.
+262. `ganeti/ganeti` — Cluster virtual instance management software upon KVM/Xen.
+263. `opennebula/one` — Simple, enterprise cloud management platform.
+264. `cloudstack/cloudstack` — Turnkey Infrastructure as a Service (IaaS) cloud management.
 
-### CATEGORY 26: NETWORK SERVICES & ROUTING DAEMONS
-266. `bind/bind9` — Reference implementation of Domain Name System (DNS) protocols.
-267. `dnsmasq/dnsmasq` — Lightweight DNS forwarder and DHCP server.
-268. `unbound/unbound` — Validating, recursive, caching DNS resolver.
-269. `bird/bird` — Dynamic Internet Routing Daemon supporting BGP, OSPF, RIP.
-270. `quagga/quagga` — TCP/IP based routing software suite.
-271. `frrouting/frr` — FRRouting IP routing protocol suite for Linux and Unix platforms.
-272. `openvswitch/ovs` — Production-quality multilayer virtual switch.
-273. `strongswan/strongswan` — Complete IPsec implementation for Linux and FreeBSD.
-274. `ppp/ppp` — Point-to-Point Protocol daemon.
-275. `netdata/netdata` — Real-time infrastructure monitoring agent.
+### CATEGORY 26: OBSERVABILITY & DISTRIBUTED LOGGING
+265. `prometheus/prometheus` — Time-series monitoring service and metrics collector.
+266. `grafana/grafana` — Observability dashboard and visualization platform.
+267. `elastic/elasticsearch` — Distributed search and analytics engine.
+268. `logstash/logstash` — Server-side data processing pipeline ingesting from multiple sources.
+269. `kibana/kibana` — Data visualization dashboard for Elasticsearch data.
+270. `graylog/graylog` — Centralized log management and security analytics.
+271. `fluent/fluentd` — Open-source data collector for unified logging layer.
+272. `vector/vector` — High-performance observability data pipeline written in Rust.
+273. `loki/loki` — Horizontally scalable log aggregation system inspired by Prometheus.
+274. `syslog-ng/syslog-ng` — Enhanced log daemon supporting structured logs and remote sinks.
 
-### CATEGORY 27: CLUSTER & NETWORK FILESYSTEMS
-276. `aufs/aufs` — Advanced multi-layered unification filesystem.
-277. `ocfs2/ocfs2-tools` — Oracle Cluster Filesystem tools.
-278. `gfs2/gfs2-utils` — Red Hat Global Filesystem 2 utilities.
-279. `vfat/vfat-tools` — FAT12/16/32 filesystem support.
-280. `exfat/exfat-utils` — Free exFAT filesystem implementation utilities.
-281. `ntfs-3g/ntfs-3g` — Read/write NTFS driver for Linux and Unix.
-282. `samba-team/samba` — Windows SMB/CIFS networking protocol suite.
-283. `nfs-utils/nfs-utils` — Linux Network File System userland daemons (`mount.nfs`, `nfsd`).
-284. `glusterfs/glusterfs` — Scalable network storage filesystem.
-285. `ceph/ceph-csi` — Ceph Container Storage Interface driver for Kubernetes.
+### CATEGORY 27: NETWORK SERVICES & ROUTING DAEMONS
+275. `bind/bind9` — Reference implementation of Domain Name System (DNS) protocols.
+276. `dnsmasq/dnsmasq` — Lightweight DNS forwarder and DHCP server.
+277. `unbound/unbound` — Validating, recursive, caching DNS resolver.
+278. `bird/bird` — Dynamic Internet Routing Daemon supporting BGP, OSPF, RIP.
+279. `quagga/quagga` — TCP/IP based routing software suite.
+280. `frrouting/frr` — FRRouting IP routing protocol suite for Linux and Unix platforms.
+281. `openvswitch/ovs` — Production-quality multilayer virtual switch.
+282. `strongswan/strongswan` — Complete IPsec implementation for Linux and FreeBSD.
+283. `ppp/ppp` — Point-to-Point Protocol daemon.
+284. `netdata/netdata` — Real-time infrastructure monitoring agent.
 
-### CATEGORY 28: TRACING, DEBUGGING & PROFILING
-286. `cron/cron` — Classic daemon to run scheduled commands.
-287. `anacron/anacron` — Periodic command scheduler for systems not running 24/7.
-288. `systemtap/systemtap` — Infrastructure to monitor and analyze operating system activities.
-289. `bcc/bcc` — BPF Compiler Collection utilities for kernel tracing.
-290. `bpftrace/bpftrace` — High-level tracing language for Linux eBPF.
-291. `strace/strace` — System call tracer and signal monitor.
-292. `ltrace/ltrace` — Dynamic library call tracer.
-293. `gdb/gdb` — GNU Project Debugger.
-294. `valgrind/valgrind` — Instrumentation framework for building dynamic analysis tools.
-295. `radareorg/radare2` — UNIX-like reverse engineering framework and command-line hex editor.
+### CATEGORY 28: CLUSTER & NETWORK FILESYSTEMS
+285. `aufs/aufs` — Advanced multi-layered unification filesystem.
+286. `ocfs2/ocfs2-tools` — Oracle Cluster Filesystem tools.
+287. `gfs2/gfs2-utils` — Red Hat Global Filesystem 2 utilities.
+288. `vfat/vfat-tools` — FAT12/16/32 filesystem support.
+289. `exfat/exfat-utils` — Free exFAT filesystem implementation utilities.
+290. `ntfs-3g/ntfs-3g` — Read/write NTFS driver for Linux and Unix.
+291. `samba-team/samba` — Windows SMB/CIFS networking protocol suite.
+292. `nfs-utils/nfs-utils` — Linux Network File System userland daemons (`mount.nfs`, `nfsd`).
+293. `glusterfs/glusterfs` — Scalable network storage filesystem.
+294. `ceph/ceph-csi` — Ceph Container Storage Interface driver for Kubernetes.
 
-### CATEGORY 29: AI ACCELERATION & INFERENCE ENGINES
-296. `ggerganov/llama.cpp` — C/C++ LLM inference engine with AVX-512 and ARM NEON quantization.
-297. `huggingface/transformers` — Model architecture definitions and tokenizer specs.
-298. `onnx/onnxruntime` — Cross-platform, high-performance ONNX model execution engine.
-299. `vllm-project/vllm` — High-throughput LLM serving engine with PagedAttention.
-300. `triton-inference-server/server` — Enterprise multi-framework model serving daemon.
-301. `bitsandbytes-foundation/bitsandbytes` — 8-bit and 4-bit quantization kernels.
-302. `tensorrt/tensorrt` — NVIDIA GPU accelerated deep learning inference SDK.
-303. `flash-attention/flash-attention` — Fast and memory-efficient exact attention algorithm.
-304. `deepseek-ai/DeepSeek-V3` — High-efficiency MoE LLM architecture and multi-head latent attention specifications.
-305. `ollama/ollama` — Local LLM runner and model bundle repository engine.
+### CATEGORY 29: TRACING, DEBUGGING & PROFILING
+295. `cron/cron` — Classic daemon to run scheduled commands.
+296. `anacron/anacron` — Periodic command scheduler for systems not running 24/7.
+297. `systemtap/systemtap` — Infrastructure to monitor and analyze operating system activities.
+298. `bcc/bcc` — BPF Compiler Collection utilities for kernel tracing.
+299. `bpftrace/bpftrace` — High-level tracing language for Linux eBPF.
+300. `strace/strace` — System call tracer and signal monitor.
+301. `ltrace/ltrace` — Dynamic library call tracer.
+302. `gdb/gdb` — GNU Project Debugger.
+303. `valgrind/valgrind` — Instrumentation framework for building dynamic analysis tools.
+304. `radareorg/radare2` — UNIX-like reverse engineering framework and command-line hex editor.
 
-### CATEGORY 30: SYSTEM AUTOMATION & CONFIGURATION MANAGEMENT
-306. `ansible/ansible` — Agentless IT automation engine using YAML playbooks.
-307. `chef/chef` — Infrastructure as Code management framework in Ruby DSL.
-308. `puppetlabs/puppet` — Declarative system configuration management system.
-309. `saltstack/salt` — High-speed event-driven remote execution and configuration management.
-310. `terraform/terraform` — HashiCorp Infrastructure as Code declarative cloud provisioner.
-311. `pulumi/pulumi` — Infrastructure as Code using general purpose programming languages.
-312. `nixos/nix` — Pure functional configuration engine.
-313. `hashicorp/packer` — Multi-platform automated machine image builder.
-314. `cloud-init/cloud-init` — Industry standard multi-distribution instance initialization engine.
-315. `bcfg2/bcfg2` — Configuration management system driving client states towards a spec.
+### CATEGORY 30: AI ACCELERATION & INFERENCE ENGINES
+305. `ggerganov/llama.cpp` — C/C++ LLM inference engine with AVX-512 and ARM NEON quantization.
+306. `huggingface/transformers` — Model architecture definitions and tokenizer specs.
+307. `onnx/onnxruntime` — Cross-platform, high-performance ONNX model execution engine.
+308. `vllm-project/vllm` — High-throughput LLM serving engine with PagedAttention.
+309. `triton-inference-server/server` — Enterprise multi-framework model serving daemon.
+310. `bitsandbytes-foundation/bitsandbytes` — 8-bit and 4-bit quantization kernels.
+311. `tensorrt/tensorrt` — NVIDIA GPU accelerated deep learning inference SDK.
+312. `flash-attention/flash-attention` — Fast and memory-efficient exact attention algorithm.
+313. `deepseek-ai/DeepSeek-V3` — High-efficiency MoE LLM architecture and multi-head latent attention specifications.
+314. `ollama/ollama` — Local LLM runner and model bundle repository engine.
 
-### CATEGORY 31: AUDIO, DISPLAY & MULTIMEDIA SUBSYSTEMS
-316. `PipeWire/pipewire` — Low-latency audio and video processing daemon.
-317. `pulseaudio/pulseaudio` — POSIX sound server daemon with network audio streaming.
-318. `alsa-project/alsa-lib` — Advanced Linux Sound Architecture userland interfaces.
-319. `gstreamer/gstreamer` — Pipeline-based multimedia framework.
-320. `mpv-player/mpv` — Command line media player with GPU video decoding.
-321. `FFmpeg/FFmpeg` — Complete solution to record, convert and stream audio and video.
-322. `mesa/mesa` — Open-source OpenGL and Vulkan graphics driver implementations.
-323. `Wayland/wayland` — Modern display server protocol and IPC library.
-324. `xorg/xserver` — Reference X Window System display server.
-325. `freedesktop/dbus` — Inter-process communication (IPC) message bus system.
+### CATEGORY 31: SYSTEM AUTOMATION & CONFIGURATION MANAGEMENT
+315. `ansible/ansible` — Agentless IT automation engine using YAML playbooks.
+316. `chef/chef` — Infrastructure as Code management framework in Ruby DSL.
+317. `puppetlabs/puppet` — Declarative system configuration management system.
+318. `saltstack/salt` — High-speed event-driven remote execution and configuration management.
+319. `terraform/terraform` — HashiCorp Infrastructure as Code declarative cloud provisioner.
+320. `pulumi/pulumi` — Infrastructure as Code using general purpose programming languages.
+321. `nixos/nix` — Pure functional configuration engine.
+322. `hashicorp/packer` — Multi-platform automated machine image builder.
+323. `cloud-init/cloud-init` — Industry standard multi-distribution instance initialization engine.
+324. `bcfg2/bcfg2` — Configuration management system driving client states towards a spec.
 
-### CATEGORY 32: HARDWARE ABSTRACTION & FIRMWARE INTERFACES
-326. `tianocore/edk2` — Open-source UEFI firmware implementation.
-327. `u-boot/u-boot` — Universal bootloader for embedded devices.
-328. `coreboot/coreboot` — Fast, lightweight open-source system firmware replacing BIOS.
-329. `linuxboot/linuxboot` — Replacing UEFI drivers with Linux kernel boot environment.
-330. `fwupd/fwupd` — System daemon for installing firmware updates on Linux devices.
-331. `acpica/acpica` — ACPI component architecture and AML interpreter.
-332. `pciutils/pciutils` — Utilities for inspecting and configuring PCI devices (`lspci`).
-333. `usbutils/usbutils` — Utilities for inspecting USB devices (`lsusb`).
-334. `smartmontools/smartmontools` — S.M.A.R.T. disk drive monitoring utilities.
-335. `lm-sensors/lm-sensors` — Hardware health monitoring software for temperature/fan sensors.
+### CATEGORY 32: HARDWARE ABSTRACTION, MULTIMEDIA & FIRMWARE INTERFACES
+325. `PipeWire/pipewire` — Low-latency audio and video processing daemon.
+326. `pulseaudio/pulseaudio` — POSIX sound server daemon with network audio streaming.
+327. `alsa-project/alsa-lib` — Advanced Linux Sound Architecture userland interfaces.
+328. `gstreamer/gstreamer` — Pipeline-based multimedia framework.
+329. `mpv-player/mpv` — Command line media player with GPU video decoding.
+330. `FFmpeg/FFmpeg` — Complete solution to record, convert and stream audio and video.
+331. `mesa/mesa` — Open-source OpenGL and Vulkan graphics driver implementations.
+332. `Wayland/wayland` — Modern display server protocol and IPC library.
+333. `xorg/xserver` — Reference X Window System display server.
+334. `freedesktop/dbus` — Inter-process communication (IPC) message bus system.
+335. `tianocore/edk2` — Open-source UEFI firmware implementation.
+336. `u-boot/u-boot` — Universal bootloader for embedded devices.
+337. `coreboot/coreboot` — Fast, lightweight open-source system firmware replacing BIOS.
+338. `linuxboot/linuxboot` — Replacing UEFI drivers with Linux kernel boot environment.
+339. `fwupd/fwupd` — System daemon for installing firmware updates on Linux devices.
+340. `acpica/acpica` — ACPI component architecture and AML interpreter.
+341. `pciutils/pciutils` — Utilities for inspecting and configuring PCI devices (`lspci`).
+342. `usbutils/usbutils` — Utilities for inspecting USB devices (`lsusb`).
+343. `smartmontools/smartmontools` — S.M.A.R.T. disk drive monitoring utilities.
+344. `lm-sensors/lm-sensors` — Hardware health monitoring software for temperature/fan sensors.
 
 ---
 
@@ -762,7 +771,7 @@ To establish SigmaOS as a sovereign alternative, SigmaOS implements a radical di
 
 ---
 
-### 6. Multi-Phase Execution Roadmap (5-Year Extended Plan)
+### 8. Multi-Phase Execution Roadmap (5-Year Extended Plan)
 
 ```
 ========================================================================================

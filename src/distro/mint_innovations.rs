@@ -7,10 +7,6 @@
 //! - `MintstickUsbFormatterEngine`: Low-level USB image writer, ISO burner, and FAT32/exFAT formatter
 
 
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 
 /// Cinnamon Desktop Theme Configuration
 #[derive(Debug, Clone)]

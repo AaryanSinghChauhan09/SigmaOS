@@ -2,12 +2,12 @@
 // Conforms to zero-dependency, #![no_std] compliant OOP structures
 
 use core::cell::{Cell, RefCell};
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+use core::sync::atomic::AtomicBool;
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
+
+use std::boxed::Box;
+use std::vec::Vec;
+use crate::kernel::architecture::CpuArchitectureClass;
 
 // 1. Singly, Sequenced, and Circular Doubly Linked Lists
 
@@ -65,13 +65,6 @@ impl<T> CircularDoublyLinkedList<T> {
 
 // 2. Scheduler SystemThread, WorkItems, APCs
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchitectureClass {
-    X86,
-    X64,
-    Arm,
-    Cisc,
-}
 
 pub struct SystemThread {
     pub thread_id: usize,
@@ -89,6 +82,16 @@ impl SystemThread {
             register_context: [0u64; 16],
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct TaskId(pub u64);
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Task {
+    pub id: TaskId,
+    pub vruntime: u64,
+    pub priority: u32,
 }
 
 pub struct WorkItem {

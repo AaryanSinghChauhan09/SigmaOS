@@ -1,7 +1,6 @@
 use std::boxed::Box;
-use std::string::{String, ToString};
+use std::string::String;
 use std::vec::Vec;
-use std::format;
 // SigmaOS RFC & Proposal Governance System
 // Standard compliance based on Ideas-999-Structured: Community & Governance
 

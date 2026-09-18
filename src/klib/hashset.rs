@@ -58,10 +58,12 @@ where
         }
     }
 
+    /// Inserts an item into the set. Returns `true` if the item was newly inserted,
+    /// or `false` if it was already present.
     pub fn insert(&mut self, item: T) -> bool {
-        let was_present = self.map.contains_key(&item);
+        let already_present = self.map.contains_key(&item);
         self.map.insert(item, ());
-        !was_present
+        !already_present
     }
 
     pub fn remove(&mut self, item: &T) -> bool {

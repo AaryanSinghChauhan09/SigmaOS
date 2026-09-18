@@ -1,29 +1,48 @@
+pub mod omarchy_inspiration;
+pub use omarchy_inspiration::*;
 pub mod omarchy;
 pub use omarchy::{
     FactoryResetGuardian, GpuDriverConfig, HardwareQuirkAdapter, KeybindingDefinition,
-    OmarchyAudioPipewireConfig, OmarchyAyuThemeEngine, OmarchyFastfetchSysinfoEngine,
-    OmarchyGhosttyTerminalEngine, OmarchyHyprlandCompositorConfigEngine, OmarchyHypridleEngine,
-    OmarchyHyprpaperWallpaperEngine, OmarchyLazyGitConfigurationEngine,
-    OmarchyMiseVersionManagerEngine, OmarchyModernDesktopEngine, OmarchyNerdFont,
-    OmarchyNeovimPresetEngine, OmarchyOmakubDevInstaller, OmarchyStarshipPromptConfigEngine,
-    OmarchySwayNcEngine, OmarchyTerminalFontConfig, OmarchyTheme, OmarchyWalkerLauncherEngine,
-    OmarchyWaybarEngine, PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
+    OmarchyAudioPipewireConfig,
+    OmarchyModernDesktopEngine, OmarchyNerdFont, OmarchyNeovimPresetEngine,
+    OmarchyTerminalFontConfig, OmarchyTheme,
+    PasswordlessSudoExpiryGuard, SovereignAgentKind, WebAppSpec,
 };
 pub mod parrot_security;
+pub mod kali_security;
+pub mod antix_zorin_innovations;
+pub mod mint_innovations;
+
+pub use omarchy::*;
+
+pub mod omarchy_advanced_parity;
+pub use omarchy_advanced_parity::*;
+pub mod omarchy_app_ecosystem;
+pub use omarchy_app_ecosystem::*;
+pub mod omarchy_complete_gap_closure;
+pub use omarchy_complete_gap_closure::*;
+pub mod omarchy_final_gap_closure;
+pub use omarchy_final_gap_closure::*;
+pub mod omarchy_ultimate_gap_closure;
+pub use omarchy_ultimate_gap_closure::*;
+pub mod arch_boxes;
+pub use arch_boxes::*;
+pub mod arch_gap_closure;
+pub use arch_gap_closure::*;
+pub mod arch_ultimate_gap_closure;
+pub use arch_ultimate_gap_closure::*;
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch;
-pub use arch::{
-    AlpmHook, AlpmHookWhen, ArchGpgKey, ArchKeyringEngine, ArchPacmanHookManager,
-    ArchReflectorEngine, ArchinstallEngine, FilesystemType as ArchFilesystemType,
-    InstallerProfile as ArchInstallerProfile, KeyTrustLevel, ReflectorMirror, ReflectorSortKey,
-};
+pub use arch::*;
 pub mod arch_inspirations;
 pub mod arch_missing_components;
 pub mod arch_parity;
 
 pub use arch_missing_components::{
     AlpmInstalledPackage, ArchAlpmDbIntegrityEngine, ArchAurWebRpcClient, ArchMakepkgEngine,
-    ArchNamcapLinterEngine, AurPackageResult, NamcapLintWarning, PkgbuildSpec,
+    ArchNamcapLinterEngine, ArchNewsAdvisoryFeedEngine, ArchNewsItem, ArchPacmanConflictResolverEngine,
+    ArchPkgctlDevtoolsEngine, ArchRepoBranch, ArchVercmpVersionComparisonEngine, AurPackageResult,
+    NamcapLintWarning, PacmanFileCollision, ParsedAlpmVersion, PkgbuildSpec,
 };
 pub mod certification;
 pub mod chakra_parity;
@@ -37,6 +56,8 @@ pub mod distro_inspiration_synthesis;
 pub use distro_inspiration_synthesis::*;
 pub mod linux_bsd_ultimate_synthesis;
 pub use linux_bsd_ultimate_synthesis::*;
+pub mod linux_bsd_advanced_synthesis;
+pub use linux_bsd_advanced_synthesis::*;
 pub mod distro_inspiration_engine;
 pub use distro_inspiration_engine::{
     AlpineLbuApkOverlayEngine, ApkovlCommit, ArcCacheBlock, ArcState, ClearLinuxIsaSelectorEngine,
@@ -45,7 +66,7 @@ pub use distro_inspiration_engine::{
     NixOsDeclarativeStateReconciliationEngine, NixOsPureStoreDerivationEngine,
     OpenBsdStatefulPacketFilterEngine, OpenWrtUciSqmRouterEngine, PaxSecurityLevel, PfProtocol,
     PfStateEntry, PortageUseFlag, PortageUseFlagGovernor, QubeDomainType,
-    QubesHardenedBsdSecurityGuard, RunitStage, ServiceRunState, SqmAlgorithm, StoreDerivationPath,
+    QubesHardenedBsdSecurityGuard, ServiceRunState, SqmAlgorithm, StoreDerivationPath,
     UciSection, UseFlagState, VoidRunitStageController,
 };
 pub mod ecosystem_dimensions;
@@ -58,18 +79,14 @@ pub mod gentoo_inspirations;
 pub mod i18n;
 pub mod improvements;
 pub mod linux_bsd_distro_gaps;
+pub mod linux_bsd_distro_gaps_synthesis;
+pub use linux_bsd_distro_gaps_synthesis::*;
 pub mod linux_bsd_inspirations;
+
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;
 
-pub use linux_bsd_distro_gaps::{
-    BluetoothDevice, BootMenuEntry, BootloaderType, CronJobEntry, CronJobScheduler, DeviceNodeType,
-    DnsRecord, DynamicDeviceNode, JournalBinaryRecord, JournalLogLevel, NatRule, NatRuleKind,
-    NetworkTcpUdpStack, ServiceState, SigmaBootloaderEngine, SovereignDnsTlsResolverEngine,
-    SovereignDynamicDevfsEngine, SovereignJournaldBinaryStorageEngine, SovereignStatefulNatEngine,
-    SystemdInitManager, SystemdUnitService, TcpSocket, TcpState, UsbHidKeyboardDriver,
-    UsbHidModifierKeys, WifiAccessPoint, WifiSecurity, WirelessBluetoothStack,
-};
+pub use linux_bsd_distro_gaps::*;
 
 pub use garuda_nomad_innovations::{
     CpuGovernorMode, GarudaZenPerformanceEngine, GuixShepherdServiceEngine,
@@ -112,10 +129,19 @@ pub use visual_dashboard::{
     VpnStatus, VpnTunnel, VpnType,
 };
 pub use void_runit::{
-    RunitService, RunitStage, RunitSupervisor, ServiceState as RunitServiceState,
+    RunitService, RunitStage as VoidRunitStage, RunitSupervisor, ServiceState as RunitServiceState,
 };
 pub mod sovereign_distro_dominance;
+pub mod sovereign_distro_outpacing_engine;
 pub mod future_roadmap_innovations;
+
+pub use sovereign_distro_outpacing_engine::{
+    BcachefsExtent, DynamicVersionedImageSpec, FreeBsd141JailSpec, PinsyscallRange,
+    SovereignFreeBsd141JailVnetEngine, SovereignLinux612BcachefsTieringEngine,
+    SovereignMasterOutpacingSuite, SovereignOpenBsd76PledgeUnveilAdvancementEngine,
+    SovereignSystemd256ParityAndBeyondEngine, SovereignWayland123ExplicitSyncEngine,
+    StorageDeviceTier, VarlinkIpcMessage,
+};
 
 pub use future_roadmap_innovations::{
     ClusteredDevicePoolEngine, ClusteredPooledDevice, CryptographicBootChainEngine,
@@ -154,6 +180,13 @@ pub use gentoo::{
     GentooCatalystStageBuilder, GentooDistfilesDigestEngine, GentooKeywordsAcceptanceEngine,
     KeywordStatus, ManifestEntry, ManifestEntryType, OpenRcRunlevel, OpenRcRunlevelSupervisor,
     PortageEapi8PhaseEngine, SigmaBuildGraph, UseFlag,
+};
+pub use improvements::{
+    AlpineApkVolatileOverlayEngine, DragonFlyHammer2PfsEngine, FreeBsdPoudrierePortBuilder,
+    GentooEmergeCliEngine, GentooGccCflagsTunerEngine, GentooLaymanOverlayEngine,
+    Hammer2PfsSnapshot, IllumosDTraceTracingGovernor, MageiaUrpmiMediaManager,
+    OpenBsdPledgeUnveilSecurityGovernor, PoudrierePortJob, SolusEopkgPackageEngine,
+    VoidXbpsBinaryPackageEngine, VoidXbpsPackage,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
 pub use linux_bsd_parity_extended::{
@@ -198,30 +231,7 @@ pub use wiki_ideas_implementation::{
     SystemdUnitState, SystemdUnitType, CAP_FSTAT, CAP_READ, CAP_SEEK, CAP_WRITE,
 };
 
-pub use missing_distro_innovations::{
-    BedrockLinuxStrataEngine, BedrockStratum, ChimeraDinitSupervisor, ComponentParityStatus,
-    DinitService, DinitServiceState, DragonFlyHammer2EmergencyCowEngine,
-    FedoraSelinuxMlsMcsGovernor, GentooPortageSlotOperatorEngine, MageiaUrpmiEngine,
-    MissingDistroComponentsEngine, SmartOsImage, SmartOsVmBrand, SmartOsVmConfig, SmartOsVmState,
-    SmartOsZoneEngine, SolusEopkgManager, SovereignFastInitramfsGenerator, TailsAmnesicEngine,
-};
-
-pub use linux_bsd_inspirations::{
-    ApkChrootBuildSandboxEngine, ApkXbpsHookEngine, AptPinStore, ArchDependencyResolver,
-    BsdCapsicumRights, CachyBoreScheduler, DistroSubsystemMode, DrmModeInfo, FreeBSDJail,
-    FreeBsdGeomVdevTopology, FreeBsdRacctVnetGuard, GentooUseFlagsManager, GeomVdevNode,
-    GpuSwitchMode, Hammer2MultiVersionEngine, Hammer2PfsClusterQuorumEngine,
-    HardenedBsdPaxGuardEngine, HermeticStoreClosureEngine, NetBsdRumpRouter, NixStyleStore,
-    OpenBSDPledge, OpenBSDUnveil, OpenBsdFdPledgeGate, OpenBsdPledgeUnveilSentinel,
-    OpenBsdRetguardEngine, OpenRCService, PaxViolationLog, PaxViolationType, PfsNodeVote,
-    PowerProfileMode, SerpentMossEngine, ServiceSupervisorType, SovereignBcachefsTieringEngine,
-    SovereignBpfCoReEngine, SovereignDTraceEngine, SovereignDeclarativeSystemEngine,
-    SovereignDragonflyNpotEngine, SovereignEbpfEngine, SovereignIllumosZonesEngine,
-    SovereignIoUring, SovereignKaslrWxAllocator, SovereignLandlockLsm, SovereignOstreeEngine,
-    SovereignPrivSepSandbox, SovereignRaidSelfHealer, SovereignRingBuffer,
-    SovereignRunitSupervisor, SovereignUniversalDistroBridge, SovereignZfsPoolEngine, StorageTier,
-    StoreClosurePackage, System76PowerGovernor, ZoneBrand, ZoneState,
-};
+pub use missing_distro_innovations::*;
 
 pub use sovereign_distro_dominance::{
     AlpineApkCASPackageCache, CachyBoreDynamicAiScheduler, CasPackageBlob, ClusterNodeConfig,
@@ -252,5 +262,85 @@ pub use sovereign_nextgen_distro_leap::{
     ClusterNodeRole, HaStateEntry, HermeticClosureRecord, LandlockAccessType, LandlockV5Rule,
     SchedExtTask, ScxSchedulerKind, ScxTaskState, SovereignDistroLeapSuite,
     SovereignHermeticCasStoreEngine, SovereignHighAvailabilityMeshEngine, SovereignLandlockV5Guard,
-    SovereignSchedExtEngine, SystemGenerationRecord,
+    SovereignMicroarchJitEngine, SovereignSchedExtEngine, SystemGenerationRecord,
+};
+
+pub mod open_source_distro_innovations;
+pub use open_source_distro_innovations::{
+    NuttxRealtimeTaskGovernor, NuttxTask, OpenBsdVmmBhyveHypervisorBridge, MicroVmGuest, VmState,
+    IllumosDTraceProbeProvider, DTraceProbe, GentooPortageEapi8SlotResolver, EbuildPackageRecord,
+};
+
+pub mod ultimate_distro_innovations;
+pub use ultimate_distro_innovations::{
+    AptPinRule, CpuGovernorMode as UltimateCpuGovernorMode, DebianMultiarchAptEngine,
+    GarudaPerformanceTweakEngine, HardenedBsdPaxCfiEngine, IoSchedulerMode, NetBsdRumpUserlandEngine,
+    RumpDriverType, SolusEopkgBudgieEngine,
+};
+
+pub mod sovereign_ahead_distro_supremacy;
+pub use sovereign_ahead_distro_supremacy::{
+    DeclarativeCapabilityRule, MicroDeltaPatch, MicroarchTier,
+    PredictiveSchedPolicy, PredictiveTaskDescriptor,
+    ResilientBlockEntry, SecurityMultiOsMask,
+    SimdJitFunctionTarget, SovereignAheadOfDistrosSuite,
+    SovereignCrossPlatformCapabilityEngine, SovereignOmniCasStoreEngine,
+    SovereignPredictiveSchedExtEngine, SovereignResilientHammer2Engine,
+    SovereignUniversalMicroarchEngine, SovereignXdpCarpMeshEngine, XdpCarpMeshConnection,
+};
+
+pub mod omarchy_expanded_parity;
+pub use omarchy_expanded_parity::{
+    OmarchyHyprlockScreenLocker, OmarchyOmakubBootstrapEngine, OmarchyRofiAppLauncher,
+    OmarchyThunarFileActions, OmarchyZellijSessionManager, SovereignOmarchyExpandedParitySuite,
+};
+
+pub mod linux_bsd_pinnacle_synthesis;
+pub use linux_bsd_pinnacle_synthesis::{
+    ChimeraDinitCportsEngine, CportsPackageSpec, DinitServiceSpec, DinitServiceState,
+    EopkgDeltaPackage, FreeBsdMacFrameworkEngine, KarlKernelImage, MacAccessRequest, MacLabel,
+    MacPolicyModel, MageiaUrpmiMediaEngine, OpenBsdKarlPinSyscallEngine, PinnedSyscallRegion,
+    RavenNotification, RavenWidget, SolusRavenEopkgEngine, SovereignLinuxBsdPinnacleSynthesisSuite,
+    UrpmiMediaSource, UrpmiPackageRecord,
+};
+
+pub mod sovereign_2028_distro_supremacy_engine;
+pub use sovereign_2028_distro_supremacy_engine::{
+    BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard,
+    MicroVmSpawnSpec, PqcHomedUserEntry, Sovereign2028DistroSupremacyMasterSuite,
+    SovereignEbpfSchedExtAiGovernor, SovereignFreeBsd15VnetXdpEngine,
+    SovereignOpenBsd78FineIbtCfiGuard, SovereignSystemd258VmspawnEngine,
+    SovereignWayland125DirectScanoutEngine, VnetDualStackInterface,
+};
+
+pub mod sovereign_2030_distro_supremacy_engine;
+pub use sovereign_2030_distro_supremacy_engine::{
+    DirectKmsFrame2030, NetlinkVnetJailSpec, OpenBsd80UnveilRule, QuantumSchedPolicy, QuantumSchedTask,
+    Sovereign2030DistroSupremacyMasterSuite, SovereignEbpfSchedExtQuantumPredictiveGovernor,
+    SovereignFreeBsd16NetlinkVnetJailEngine, SovereignOpenBsd80StrictPledgeUnveilLandlockEngine,
+    SovereignSystemd260SystemdExecAiSandboxingEngine, SovereignWayland126DirectKmsScanoutEngine,
+    SystemdExecAiProfile,
+};
+
+// ─── Omarchy Master Synthesis Suite ──────────────────────────────────────────
+pub mod omarchy_master_synthesis;
+pub use omarchy_master_synthesis::{
+    OmarchyAppSandbox, OmarchyHerdrAiScheduler, OmarchyQuickShellBridge,
+    OmarchyThemeLiveEngine, ShellElementType, ThemePalette,
+};
+
+pub mod sovereign_2026_distro_leap_engine;
+pub use sovereign_2026_distro_leap_engine::{
+    BoreV2TaskDescriptor, MicroarchIsaTarget, NixGuixGeneration,
+    Sovereign2026DistroSuperiorityMasterEngine, SovereignCachyosMicroarchV4PqcVerifier,
+    SovereignNixGuixHermeticCasEngine, SovereignOpenBsd77PinsyscallHardeningEngine,
+    SovereignSchedExtBoreV2Governor, SovereignWayland124ZenithHdrEngine, UnveilLockState,
+    WorkloadLatencyClass as BoreV2WorkloadLatencyClass, ZenithHdrToneMapMode, ZenithWaylandFrame,
+};
+
+pub mod linux_bsd_distro_strategic_innovations;
+pub use linux_bsd_distro_strategic_innovations::{
+    AbrootImageCommit, AbrootSlot, BinaryVerificationResult, BootHealthCheck, BootHealthStatus,
+    ExecGuardRecommendation, FedoraGreenbootHealthCheckEngine, ObfuscatedInputEvent,
+    VanillaAbrootImageTransactionEngine, WhonixKloakInputObfuscationEngine, ZorinExecGuardSubsystem,
 };

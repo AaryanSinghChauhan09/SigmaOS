@@ -465,8 +465,8 @@ impl SovereignMintStickEngine {
     /// Format target USB device with selected filesystem (mintstick -m format)
     pub fn format_usb_drive(
         &mut self,
-        fs: UsbFileSystem,
-        volume_label: &str,
+        _fs: UsbFileSystem,
+        _volume_label: &str,
     ) -> Result<(), &'static str> {
         if self.target_device.is_empty() || self.target_device == "/dev/sda" {
             self.mode = MintStickMode::Failed;

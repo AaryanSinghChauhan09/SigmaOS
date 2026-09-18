@@ -225,6 +225,8 @@ impl IoUringCqe {
 // ============================================================
 
 /// Fixed-size ring buffer for SQE/CQE.
+/// Optimized by Bolt ⚡: uses wrapping `tail.wrapping_sub(head)` distance logic and bitwise bitmasking (`& (capacity - 1)`)
+/// to allow full 100% capacity utilization without off-by-one slot wastage or modulo division overhead.
 struct RingBuffer<T> {
     entries: Vec<Option<T>>,
     head: usize,
@@ -245,37 +247,35 @@ impl<T: Clone> RingBuffer<T> {
     }
 
     fn push(&mut self, item: T) -> bool {
-        let next_tail = (self.tail + 1) & (self.capacity - 1);
-        if next_tail == self.head {
+        if self.is_full() {
             return false;
-        } // full
-        self.entries[self.tail] = Some(item);
-        self.tail = next_tail;
+        }
+        let slot = self.tail & (self.capacity - 1);
+        self.entries[slot] = Some(item);
+        self.tail = self.tail.wrapping_add(1);
         true
     }
 
     fn pop(&mut self) -> Option<T> {
-        if self.head == self.tail {
+        if self.is_empty() {
             return None;
-        } // empty
-        let item = self.entries[self.head].take();
-        self.head = (self.head + 1) & (self.capacity - 1);
+        }
+        let slot = self.head & (self.capacity - 1);
+        let item = self.entries[slot].take();
+        self.head = self.head.wrapping_add(1);
         item
     }
 
     fn len(&self) -> usize {
-        if self.tail >= self.head {
-            self.tail - self.head
-        } else {
-            self.capacity - self.head + self.tail
-        }
+        self.tail.wrapping_sub(self.head)
     }
 
     fn is_empty(&self) -> bool {
         self.head == self.tail
     }
+
     fn is_full(&self) -> bool {
-        ((self.tail + 1) & (self.capacity - 1)) == self.head
+        self.len() == self.capacity
     }
 }
 

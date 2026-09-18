@@ -14,7 +14,6 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // Modern Plug-and-Play USB printing driver
-#[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[cfg(test_disabled)]

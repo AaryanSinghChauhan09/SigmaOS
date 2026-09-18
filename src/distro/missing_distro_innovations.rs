@@ -18,29 +18,10 @@
 // - Gentoo Portage EAPI 8 Slot Operator Engine
 // - Fedora / RHEL SELinux MLS / MCS Governor Engine
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
 use std::format;
-#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
 /// 1. Clear Linux Stateless Architecture Engine
@@ -696,23 +677,17 @@ impl OpenBsdUnveilAuditor {
     }
 }
 
-impl Default for OpenBsdUnveilAuditor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// DEVUAN INIT DIVERSITY ENGINE (DEVUAN LINUX SYSTEMD-FREE INIT PARITY)
-// =========================================================================
-
+/// Devuan Init Diversity Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DevuanInitBackend {
     SysVInit,
+    OpenRc,
     Runit,
     S6,
-    OpenRc,
 }
+
+
+
 
 #[derive(Debug, Clone)]
 pub struct DevuanInitService {
@@ -849,13 +824,8 @@ impl KaOSPackageStateGovernor {
     }
 }
 
-impl Default for KaOSPackageStateGovernor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
-/// 12. Missing Linux & BSD Distro Component Parity Inspector
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
     Implemented,
@@ -869,6 +839,8 @@ pub struct DistroComponentParityRecord {
     pub source_distro: String,
     pub status: ComponentParityStatus,
 }
+
+pub type MissingDistroComponentRecord = DistroComponentParityRecord;
 
 pub struct MissingDistroComponentsEngine {
     pub records: BTreeMap<String, DistroComponentParityRecord>,
@@ -910,8 +882,59 @@ impl MissingDistroComponentsEngine {
             "Fedora Silverblue",
             ComponentParityStatus::Implemented,
         );
+        engine.register_component(
+            "APX Container Subsystems",
+            "Vanilla OS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Atomic A/B Partition Updates",
+            "SteamOS",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "eopkg Delta Packages",
+            "Solus",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "urpmi Media Dependency Solver",
+            "Mageia",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "Stateless Configuration Defaults",
+            "Clear Linux",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "SELinux MLS/MCS Security Levels",
+            "Fedora/RHEL",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "YaST Control Center Registry",
+            "openSUSE",
+            ComponentParityStatus::Implemented,
+        );
+        engine.register_component(
+            "HAMMER2 Emergency CoW & Dedup",
+            "DragonFly BSD",
+            ComponentParityStatus::Implemented,
+        );
 
         engine
+    }
+
+    pub fn total_components_count(&self) -> usize {
+        self.records.len()
+    }
+
+    pub fn implemented_components_count(&self) -> usize {
+        self.records
+            .values()
+            .filter(|r| r.status == ComponentParityStatus::Implemented)
+            .count()
     }
 
     pub fn register_component(&mut self, name: &str, distro: &str, status: ComponentParityStatus) {
@@ -1071,12 +1094,12 @@ pub struct Hammer2PfsNode {
     pub cluster_quorum_votes: u32,
 }
 
-pub struct DragonFlyHammer2PfsEngine {
+pub struct DragonFlyHammer2PfsEngineV2 {
     pub pfs_nodes: BTreeMap<u32, Hammer2PfsNode>,
     pub active_snapshots: Vec<String>,
 }
 
-impl DragonFlyHammer2PfsEngine {
+impl DragonFlyHammer2PfsEngineV2 {
     pub fn new() -> Self {
         Self {
             pfs_nodes: BTreeMap::new(),
@@ -1108,7 +1131,7 @@ impl DragonFlyHammer2PfsEngine {
     }
 }
 
-impl Default for DragonFlyHammer2PfsEngine {
+impl Default for DragonFlyHammer2PfsEngineV2 {
     fn default() -> Self {
         Self::new()
     }
@@ -2113,24 +2136,7 @@ impl UbuntuAppArmorEngine {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct NixOsFlakesEngine {
-    pub flake_inputs: BTreeMap<String, (String, String)>, // name -> (url, hash)
-}
 
-impl NixOsFlakesEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn lock_input(&mut self, name: &str, url: &str, hash: &str) {
-        self.flake_inputs.insert(name.to_string(), (url.to_string(), hash.to_string()));
-    }
-
-    pub fn compute_system_derivation_hash(&self) -> String {
-        format!("nix-store-drv-{:x}", self.flake_inputs.len())
-    }
-}
 
 #[cfg(test_disabled)]
 mod tests {
@@ -2306,7 +2312,9 @@ mod tests {
     #[test]
     fn test_missing_distro_components_engine() {
         let engine = MissingDistroComponentsEngine::new();
-        assert_eq!(engine.records.len(), 6);
+        assert_eq!(engine.records.len(), 14);
+        assert_eq!(engine.total_components_count(), 14);
+        assert_eq!(engine.implemented_components_count(), 14);
         assert!(engine.is_all_components_implemented());
     }
 

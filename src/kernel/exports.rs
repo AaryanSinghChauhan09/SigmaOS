@@ -5,10 +5,8 @@
 
 extern crate alloc;
 
-use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::format;
-use alloc::vec;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 

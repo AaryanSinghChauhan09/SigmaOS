@@ -1,5 +1,8 @@
 name: Debian Autopkgtest & Sbuild CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main", "master", "jules-*" ]
@@ -15,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 

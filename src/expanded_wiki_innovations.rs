@@ -25,6 +25,8 @@ use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+#[cfg(any(feature = "standalone_test", test))]
+extern crate alloc;
 
 /// Arch Linux pacman-contrib Utilities Engine
 pub struct ArchPacmanContribEngine {

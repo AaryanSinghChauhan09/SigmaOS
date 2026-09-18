@@ -2,8 +2,6 @@
 // Provides zero-dependency Video4Linux2 capture buffer management and format negotiation.
 
 
-use alloc::string::String;
-use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PixelFormat {

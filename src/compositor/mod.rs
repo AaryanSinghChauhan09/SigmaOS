@@ -16,3 +16,6 @@ pub use sigma_compositor::{
     WindowState,
     CompositorError,
 };
+
+// ─── Zenith Wayland Compositor Core ──────────────────────────────────────────
+pub mod zenith_core;

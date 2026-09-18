@@ -1,7 +1,7 @@
 // SigmaOS Omarchy Complete Gap Closure Engine
 // Zero-dependency Rust implementation covering automated dotfile git sync, Hyprland bezier animation matrix, Neovim Treesitter/LSP Mason manager, and Kitty/Starship/Fastfetch theme presets.
 
-use crate::klib::string::String;
+use std::string::String;
 use crate::klib::vec::Vec;
 
 /// Dotfile Git Sync Repository State

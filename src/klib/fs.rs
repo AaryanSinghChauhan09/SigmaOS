@@ -1,7 +1,7 @@
 //! Custom file system implementation for SigmaOS
 //! This module provides no_std alternatives to std::fs
 
-use core::ffi::c_char;
+pub type c_char = i8;
 use core::fmt;
 use std::string::String;
 use std::vec::Vec;
@@ -68,7 +68,7 @@ pub struct Metadata {
 /// Custom file implementation
 pub struct SigmaFile {
     fd: RawFd,
-    path: crate::klib::string::SigmaString,
+    path: String,
 }
 
 impl SigmaFile {
@@ -85,7 +85,7 @@ impl SigmaFile {
 
         Ok(Self {
             fd,
-            path: crate::klib::string::SigmaString::from_str(path),
+            path: String::from(path),
         })
     }
 
@@ -244,7 +244,7 @@ pub struct DirEntry {
 /// Directory reader
 pub struct SigmaDir {
     fd: RawFd,
-    path: crate::klib::string::SigmaString,
+    path: String,
 }
 
 impl SigmaDir {
@@ -259,7 +259,7 @@ impl SigmaDir {
 
         Ok(Self {
             fd,
-            path: crate::klib::string::SigmaString::from_str(path),
+            path: String::from(path),
         })
     }
 

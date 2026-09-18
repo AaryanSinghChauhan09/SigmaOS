@@ -12,9 +12,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // SigmaOS Input Driver
 // Hardware abstraction for input devices

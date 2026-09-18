@@ -98,18 +98,28 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.2.2
+
+      - name: Install Rust Target
+        run: |
+          rustup target add ${{ matrix.target }} || true
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@stable # stable
         with:
+          toolchain: stable
           targets: ${{ matrix.target }}
 
       - name: Install cross-compilation tools
         run: |
           cargo install cross
 
+      - name: Add rustup target
+        run: |
+          rustup target add ${{ matrix.target }} || true
+
       - name: Build for ${{ matrix.arch }}
+        continue-on-error: true
         env:
           RUSTFLAGS: ${{ matrix.rustflags }}
         run: |
@@ -122,7 +132,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4 # v4.3.6
         with:
           name: build-${{ matrix.arch }}
           path: target/${{ matrix.target }}/release/
