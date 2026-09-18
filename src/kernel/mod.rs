@@ -140,3 +140,10 @@ pub mod xdp_engine_sovereign;
 
 // ─── Live Migration Engine (CRIU / QEMU inspired) ─────────────────────────────
 pub mod live_migration_engine;
+
+// ─── Universal Modular Kernel System ──────────────────────────────────────────
+pub mod universal_modular_system;
+pub use universal_modular_system::{
+    SovereignDriverManager, SovereignModularKernelEngine, SovereignNetworkStackManager,
+    SovereignPeripheralAccessManager, SovereignProcessControlManager, SovereignVfsStorageManager,
+};
