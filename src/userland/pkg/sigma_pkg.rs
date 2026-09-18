@@ -95,7 +95,6 @@ impl Package for SimplePackage {
     }
     fn state(&self) -> PackageState {
         match self.state.load(Ordering::SeqCst) {
-<<<<<<< HEAD
             0 => PackageState::NotInstalled,
             1 => PackageState::Installed,
             _ => PackageState::Broken,
@@ -104,13 +103,6 @@ impl Package for SimplePackage {
     fn set_state(&self, new_state: PackageState) {
         self.state.store(new_state as usize, Ordering::SeqCst);
     }
-=======
-            1 => PackageState::Installed,
-            2 => PackageState::Broken,
-            _ => PackageState::NotInstalled,
-        }
-    }
->>>>>>> feature/universal-userland-formats-15371390123815178162
     fn dependencies(&self) -> Vec<PackageID> { self.deps.clone() }
 }
 
@@ -143,10 +135,7 @@ impl SigmaPackageManager {
 impl PackageManager for SigmaPackageManager {
     fn install(&mut self, pkg: Box<dyn Package>) -> Result<PackageID, PackageError> {
         let id = pkg.id();
-<<<<<<< HEAD
         pkg.set_state(PackageState::Installed);
-=======
->>>>>>> feature/universal-userland-formats-15371390123815178162
         self.packages.push(Some(pkg));
         self.installed_count.fetch_add(1, Ordering::SeqCst);
         Ok(id)
@@ -156,10 +145,7 @@ impl PackageManager for SigmaPackageManager {
         for pkg_option in &mut self.packages {
             if let Some(ref mut pkg) = *pkg_option {
                 if pkg.id() == id {
-<<<<<<< HEAD
                     pkg.set_state(PackageState::NotInstalled);
-=======
->>>>>>> feature/universal-userland-formats-15371390123815178162
                     self.installed_count.fetch_sub(1, Ordering::SeqCst);
                     return Ok(());
                 }
@@ -289,21 +275,12 @@ impl LocalPackageRegistry {
     
     pub fn seed_with_defaults(&mut self) {
         let default_packages: [(&[u8], &[u8]); 6] = [
-<<<<<<< HEAD
             (&b"sigma-sh"[..], &b"1.0"[..]),
             (&b"sigma-vim"[..], &b"8.2"[..]),
             (&b"sigma-curl"[..], &b"7.88"[..]),
             (&b"sigma-gcc"[..], &b"12"[..]),
             (&b"sigma-git"[..], &b"2.40"[..]),
             (&b"sigma-python"[..], &b"3.11"[..]),
-=======
-            (b"sigma-sh", b"1.0"),
-            (b"sigma-vim", b"8.2"),
-            (b"sigma-curl", b"7.88"),
-            (b"sigma-gcc", b"12"),
-            (b"sigma-git", b"2.40"),
-            (b"sigma-python", b"3.11"),
->>>>>>> feature/universal-userland-formats-15371390123815178162
         ];
 
         for (name, version) in &default_packages {
@@ -393,8 +370,3 @@ impl ReproducibleBuild for ReproducibleBuildSystem {
         true
     }
 }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> feature/universal-userland-formats-15371390123815178162
