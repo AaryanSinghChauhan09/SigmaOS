@@ -73,6 +73,7 @@ unexpected_cfgs = { level = "warn", check-cfg = [
     'cfg(sigmaos_lib)',
     'cfg(feature, values("cache-lru", "cache-lfu", "cache-arc", "jemalloc", "mimalloc", "scheduler-eevdf", "scheduler-bore", "lock-free", "mutex", "rwlock", "io-sequential", "io-random", "io-mmap"))'
 ] }
+non_camel_case_types = "allow"
 
 [profile.dev]
 opt-level = 0
