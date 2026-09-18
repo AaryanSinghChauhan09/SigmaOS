@@ -273,7 +273,7 @@ impl SigmaBuddyAllocator {
         // Routing logic: CMA allocations route through reserved CMA glue
         if migrate_type == MigrateType::Cma {
             if let Some(ref cma) = self.cma_glue {
-                let pages = size.div_ceil(PAGE_SIZE);
+                let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
                 if let Ok(phys_addr) = cma.allocate_contiguous(pages) {
                     self.allocated
                         .fetch_add(pages * PAGE_SIZE, Ordering::SeqCst);
@@ -293,7 +293,7 @@ impl SigmaBuddyAllocator {
         if size == 0 || size > self.total_size {
             return None;
         }
-        let pages = size.div_ceil(PAGE_SIZE);
+        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
         let order = Self::calculate_order(pages);
         match self.inner.allocate(order) {
             Ok(block_id) => {

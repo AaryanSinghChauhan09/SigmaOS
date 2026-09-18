@@ -177,7 +177,7 @@ impl PomodoroTimer {
             PomodoroState::Work => {
                 self.pomodoros_completed += 1;
                 // Auto-start break
-                if self.pomodoros_completed.is_multiple_of(4) {
+                if self.pomodoros_completed % 4 == 0 {
                     self.start_long_break();
                 } else {
                     self.start_short_break();
