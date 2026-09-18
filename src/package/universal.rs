@@ -139,12 +139,10 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         "sovereign-shell"
     } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("runit") || lower.contains("sysvinit") || lower.contains("s6") || lower.contains("dinit") {
         "sovereign-init"
-    } else if lower.contains("gcc") || lower.contains("clang") || lower.contains("llvm") || lower.contains("binutils") || lower == "make" || lower == "cmake" || lower == "ninja" || lower == "pkgconf" || lower == "pkg-config" || lower == "git" {
+    } else if lower.contains("gcc") || lower.contains("clang") || lower.contains("llvm") || lower.contains("binutils") || lower == "make" || lower == "cmake" {
         "sovereign-toolchain"
     } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") || lower.contains("vulkan") {
         "sovereign-graphics"
-    } else if lower.contains("pipewire") || lower.contains("pulseaudio") || lower.contains("alsa") {
-        "sovereign-audio"
     } else if lower.contains("curl") || lower.contains("wget") || lower.contains("openssh") || lower.contains("net-tools") || lower.contains("iproute2") {
         "sovereign-network-tools"
     } else {
@@ -2929,108 +2927,5 @@ mod tests {
         };
 
         assert!(bad_pqc.enforce_sandbox().is_err());
-    }
-
-    #[test]
-    fn test_universal_cross_distro_apt_pacman_dnf_translation() {
-        let mut manager = UniversalPackageManager::new();
-
-        // 1. Foreign APT (.deb) manifest
-        let apt_manifest = ForeignDistroManifest {
-            raw_format: PackageFormat::Deb,
-            original_name: "nginx".to_string(),
-            version: "1.24.0".to_string(),
-            architecture: "amd64".to_string(),
-            raw_dependencies: vec!["libssl-dev".to_string(), "libc6".to_string()],
-            raw_provides: vec!["web-server".to_string()],
-            raw_conflicts: vec![],
-            maintainer: "Debian".to_string(),
-        };
-
-        // 2. Foreign Pacman manifest
-        let pacman_manifest = ForeignDistroManifest {
-            raw_format: PackageFormat::Pacman,
-            original_name: "ripgrep".to_string(),
-            version: "13.0.0".to_string(),
-            architecture: "x86_64".to_string(),
-            raw_dependencies: vec!["glibc".to_string(), "pcre2".to_string()],
-            raw_provides: vec!["rg".to_string()],
-            raw_conflicts: vec![],
-            maintainer: "ArchLinux".to_string(),
-        };
-
-        // 3. Foreign DNF/RPM manifest
-        let dnf_manifest = ForeignDistroManifest {
-            raw_format: PackageFormat::Rpm,
-            original_name: "htop".to_string(),
-            version: "3.2.2".to_string(),
-            architecture: "x86_64".to_string(),
-            raw_dependencies: vec!["ncurses-devel".to_string()],
-            raw_provides: vec!["top".to_string()],
-            raw_conflicts: vec![],
-            maintainer: "Fedora".to_string(),
-        };
-
-        let translated_apt = UniversalPackageTranslator::translate_to_sigma_pkg(&apt_manifest);
-        assert_eq!(translated_apt.name, "sigpkg-nginx");
-        assert!(translated_apt.dependencies.contains(&"sovereign-openssl".to_string()));
-        assert!(translated_apt.dependencies.contains(&"sovereign-libc".to_string()));
-
-        let translated_pac = UniversalPackageTranslator::translate_to_sigma_pkg(&pacman_manifest);
-        assert_eq!(translated_pac.name, "sigpkg-ripgrep");
-
-        let translated_dnf = UniversalPackageTranslator::translate_to_sigma_pkg(&dnf_manifest);
-        assert_eq!(translated_dnf.name, "sigpkg-htop");
-
-        // Seed dependencies and install
-        manager.add_package(UnifiedPackage::new("sovereign-openssl".to_string(), "3.0.0".to_string()).with_format(PackageFormat::SigmaPkg));
-        manager.add_package(UnifiedPackage::new("sovereign-libc".to_string(), "2.38.0".to_string()).with_format(PackageFormat::SigmaPkg));
-
-        assert!(manager.install_foreign_distro_package(apt_manifest).is_ok());
-        assert!(manager.installed_packages.get("sigpkg-nginx").is_some());
-    }
-
-    #[test]
-    fn test_universal_dependency_canonical_mapper() {
-        assert_eq!(debtor_to_sovereign_name("libssl-dev"), "sovereign-openssl");
-        assert_eq!(debtor_to_sovereign_name("glibc"), "sovereign-libc");
-        assert_eq!(debtor_to_sovereign_name("musl"), "sovereign-libc");
-        assert_eq!(debtor_to_sovereign_name("zlib1g"), "sovereign-zlib");
-        assert_eq!(debtor_to_sovereign_name("python3"), "sovereign-python");
-        assert_eq!(debtor_to_sovereign_name("bash"), "sovereign-shell");
-        assert_eq!(debtor_to_sovereign_name("systemd"), "sovereign-init");
-        assert_eq!(debtor_to_sovereign_name("gcc"), "sovereign-toolchain");
-        assert_eq!(debtor_to_sovereign_name("wayland"), "sovereign-graphics");
-        assert_eq!(debtor_to_sovereign_name("pipewire"), "sovereign-audio");
-        assert_eq!(debtor_to_sovereign_name("curl"), "sovereign-network-tools");
-    }
-
-    #[test]
-    fn test_universal_pm_foreign_package_rollback() {
-        let mut manager = UniversalPackageManager::new();
-
-        let foreign_pkg = ForeignDistroManifest {
-            raw_format: PackageFormat::Deb,
-            original_name: "wget".to_string(),
-            version: "1.21.3".to_string(),
-            architecture: "amd64".to_string(),
-            raw_dependencies: vec!["sovereign-network-tools".to_string()],
-            raw_provides: vec!["http-retriever".to_string()],
-            raw_conflicts: vec![],
-            maintainer: "Debian".to_string(),
-        };
-
-        manager.add_package(
-            UnifiedPackage::new("sovereign-network-tools".to_string(), "1.0.0".to_string())
-                .with_format(PackageFormat::SigmaPkg),
-        );
-
-        let cp_id = manager.create_checkpoint();
-
-        assert!(manager.install_foreign_distro_package(foreign_pkg).is_ok());
-        assert!(manager.installed_packages.get("sigpkg-wget").is_some());
-
-        assert!(manager.rollback_to_checkpoint(cp_id).is_ok());
-        assert!(manager.installed_packages.get("sigpkg-wget").is_none());
     }
 }

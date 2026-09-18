@@ -46,7 +46,7 @@ jobs:
           sha256sum sigmaos-x86_64.iso > release_iso_checksums.txt
 
       - name: Upload Release Artifacts
-        uses: actions/upload-artifact@604373da6381f2420692400f9164853be0e697b5 # v4.3.6
+        uses: actions/upload-artifact@v4 # v4.3.6
         with:
           name: sigmaos-release-deployment-iso
           path: |

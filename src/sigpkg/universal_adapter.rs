@@ -34,7 +34,7 @@ pub enum Permission {
     Execute,
 }
 
-#[cfg(not(any(feature = "standalone_test", test)))]
+#[cfg(not(feature = "standalone_test"))]
 pub use crate::security::Permission;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -3197,11 +3197,11 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("gentoo.ebuild"),
-            Some(PackageFormat::Ebuild)
+            Some(PackageFormat::Portage)
         );
         assert_eq!(
             adapter.detect_format_by_extension("ubuntu.deb"),
-            Some(PackageFormat::Deb)
+            Some(PackageFormat::Apt)
         );
         assert_eq!(
             adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -3209,7 +3209,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("fedora.rpm"),
-            Some(PackageFormat::Rpm)
+            Some(PackageFormat::Yum)
         );
         assert_eq!(
             adapter.detect_format_by_extension("harmony.hap"),
