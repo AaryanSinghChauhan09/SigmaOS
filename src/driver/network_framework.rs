@@ -406,6 +406,7 @@ pub struct AtherosAthDriver {
     info: NetworkInfo,
     initialized: bool,
     noise_floor_dbm: i8,
+    #[allow(dead_code)]
     ampdu_aggr_enabled: bool,
 }
 

@@ -1436,6 +1436,7 @@ impl DrmKmsDisplayDriver {
 
 pub struct VirtioGpu3dDriver {
     pub num_capsets: u32,
+    #[allow(dead_code)]
     pub virgl_3d_enabled: bool,
     pub submitted_fences: u64,
 }

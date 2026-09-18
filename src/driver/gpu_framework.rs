@@ -487,6 +487,7 @@ pub struct VirtioResource2d {
 pub struct VirtioGpuDriver {
     info: GpuInfo,
     initialized: bool,
+    #[allow(dead_code)]
     virgl_3d_enabled: bool,
     resources: Vec<VirtioResource2d>,
 }
