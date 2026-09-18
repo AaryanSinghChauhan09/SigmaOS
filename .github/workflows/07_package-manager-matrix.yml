@@ -157,7 +157,7 @@ jobs:
 
       - name: Upload package
         if: always()
-        uses: actions/upload-artifact@604373da6381f2420692400f9164853be0e697b5 # v4.3.6
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.3.6
         with:
           name: package-${{ matrix.pm }}
           path: /tmp/sigmaos.*
