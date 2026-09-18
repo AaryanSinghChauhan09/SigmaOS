@@ -17,6 +17,7 @@
 - **[[Installation Guide|Installation-Guide]]**
 - **[[General Recommendations|General-Recommendations]]**
 - **[[List of Applications|List-of-Applications]]**
+- **[[Category:Installation|Category:Installation]]**
 
 ---
 
@@ -26,6 +27,7 @@
 - **[[Bolt ⚡ Fast Launcher|Zenith-Desktop-and-Omarchy-Workflow#bolt-fast-path-launcher-and-agentic-steering]]**
 - **[[Palette 🎨 UI Themes|Zenith-Desktop-and-Omarchy-Workflow#palette-dynamic-theme--color-engine]]**
 - **[[Sentinel 🛡️ Exec Guard|Zenith-Desktop-and-Omarchy-Workflow#sentinel-sandboxing--exec-guard]]**
+- **[[Category:Desktop-Environment|Category-Desktop-Environment]]**
 
 ---
 
@@ -34,6 +36,7 @@
 - **[[Arch PKGBUILD & AUR Helper|ARCH_LINUX_PARITY_FEATURES]]**
 - **[[Multi-Distro Adapters|UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN]]**
 - **[[Content-Addressed Storage|Content-Addressed-Storage]]**
+- **[[Category:Package-Management|Category:Package-Management]]**
 
 ---
 
@@ -50,6 +53,7 @@
 - **[[Zorin Exec Guard|Security-Sandboxing-and-Hardening#zorin-exec-guard]]**
 - **[[Hardware Enclaves & PQC|Security-Sandboxing-and-Hardening#hardware-enclaves--post-quantum-cryptography]]**
 - **[[Memory Safety Guarantees|SECURITY]]**
+- **[[Category:Security|Category:Security]]**
 
 ---
 
@@ -58,6 +62,7 @@
 - **[[MGLRU & Memory Reclamation|Performance-Tuning-and-Kernel#mglru--memory-reclamation]]**
 - **[[eBPF / XDP Networking|Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
+- **[[Category:Performance|Category:Performance]]**
 
 ---
 
@@ -74,6 +79,7 @@
 - **[[Multi-Architecture Support|ARCHITECTURE]]**
 - **[[Virtualization & Containers|Virtualization-and-Containers-Isolation]]**
 - **[[Device Drivers|Device-Drivers]]**
+- **[[Category:Hardware|Category:Hardware]]**
 
 ---
 
@@ -82,6 +88,7 @@
 - **[[Getting Involved|Getting-Involved]]**
 - **[[Contributing|Contributing]]**
 - **[[International Communities|International-Communities]]**
+- **[[Category:Community|Category-Community]]**
 
 ---
 
@@ -90,3 +97,4 @@
 - **[[Release Criteria|RELEASE_CRITERIA]]**
 - **[[Architecture Decision Records|ARCHITECTURE_DECISIONS]]**
 - **[[Comprehensive OS Analysis|SIGMAOS_COMPREHENSIVE_OS_ANALYSIS]]**
+- **[[Category:Development|Category-Development]]**
