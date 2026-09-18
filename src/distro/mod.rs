@@ -313,6 +313,15 @@ pub use sovereign_2028_distro_supremacy_engine::{
     SovereignWayland125DirectScanoutEngine, VnetDualStackInterface,
 };
 
+pub mod sovereign_2030_distro_supremacy_engine;
+pub use sovereign_2030_distro_supremacy_engine::{
+    DirectKmsFrame2030, NetlinkVnetJailSpec, OpenBsd80UnveilRule, QuantumSchedPolicy, QuantumSchedTask,
+    Sovereign2030DistroSupremacyMasterSuite, SovereignEbpfSchedExtQuantumPredictiveGovernor,
+    SovereignFreeBsd16NetlinkVnetJailEngine, SovereignOpenBsd80StrictPledgeUnveilLandlockEngine,
+    SovereignSystemd260SystemdExecAiSandboxingEngine, SovereignWayland126DirectKmsScanoutEngine,
+    SystemdExecAiProfile,
+};
+
 // ─── Omarchy Master Synthesis Suite ──────────────────────────────────────────
 pub mod omarchy_master_synthesis;
 pub use omarchy_master_synthesis::{
