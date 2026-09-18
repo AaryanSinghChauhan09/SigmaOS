@@ -128,6 +128,23 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Performance & BORE Scheduler](Performance-Tuning-and-Kernel)**
   Performance tuning and BORE scheduler configuration.
 
+
+- **[Dynamic Kernel Module Loading](Dynamic-Kernel-Module-Loading)**
+  Runtime kernel module loading and unloading.
+
+- **[Interrupt Balancing & MSI-X](Interrupt-Balancing-and-MSI-X)**
+  Advanced interrupt balancing and MSI-X support.
+
+- **[Cgroups v2 Memory Controller](Cgroups-v2-Memory-Controller)**
+  Fine-grained memory resource management and isolation.
+
+- **[Linux io_uring](Linux-io_uring-Implementation)**
+  High-performance asynchronous I/O with zero-copy support.
+
+- **[FreeBSD Capsicum](FreeBSD-Capsicum-Integration)**
+  Capability-based access control and sandboxing.
+
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 

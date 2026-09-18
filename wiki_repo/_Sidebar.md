@@ -69,6 +69,12 @@ n- **[[Demand Paging & Swap|Demand-Paging-and-Swap]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 
+n- **[[Dynamic Kernel Module Loading|Dynamic-Kernel-Module-Loading]]**
+- **[[Interrupt Balancing & MSI-X|Interrupt-Balancing-and-MSI-X]]**
+- **[[Cgroups v2 Memory Controller|Cgroups-v2-Memory-Controller]]**
+- **[[Linux io_uring|Linux-io_uring-Implementation]]**
+- **[[FreeBSD Capsicum|FreeBSD-Capsicum-Integration]]**
+
 ---
 
 #### 🔄 Maintenance & Recovery

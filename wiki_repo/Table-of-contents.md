@@ -59,6 +59,11 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 - [Demand Paging & Swap](Demand-Paging-and-Swap) — Memory management with demand paging and swap support
 - [Kernel Syscall Enforcement](Kernel-Syscall-Enforcement) — Kernel-space syscall restriction and security enforcement
 - [eBPF JIT Compilation](eBPF-JIT-Compilation) — eBPF JIT compiler for high-performance packet filtering
+- [Dynamic Kernel Module Loading](Dynamic-Kernel-Module-Loading) — Runtime kernel module loading and unloading
+- [Interrupt Balancing & MSI-X](Interrupt-Balancing-and-MSI-X) — Advanced interrupt balancing and MSI-X support
+- [Cgroups v2 Memory Controller](Cgroups-v2-Memory-Controller) — Fine-grained memory resource management and isolation
+- [Linux io_uring](Linux-io_uring-Implementation) — High-performance asynchronous I/O with zero-copy support
+- [FreeBSD Capsicum](FreeBSD-Capsicum-Integration) — Capability-based access control and sandboxing
 - [Performance & BORE Scheduler](Performance-Tuning-and-Kernel) — Performance tuning and BORE scheduler configuration
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support
