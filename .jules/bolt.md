@@ -53,3 +53,7 @@
 ## 2026-09-14 - Single-Pass Slice Joining vs Format Macro Allocations
 **Learning:** Formatting slice arguments via `format!("{}/{}", args, " ")` incurs dynamic formatting macro overhead and fails type trait bounds for slice types. Replacing manual format macros with `args.join(" ")` allocates a single heap buffer pre-sized to the combined length of all elements, eliminating intermediate string copies.
 **Action:** Always prefer `slice.join(" ")` over `format!` macros when concatenating collections of string slices.
+
+## 2026-09-15 - Reference Filter-Map & Slice Comparison in Package Database Operations
+**Learning:** In package database operations (`upgrade` & `find_reverse_dependencies`), cloning the entire installed database (`self.database.installed.clone()`) creates deep heap clones of every installed package's strings and dependency vectors. Filtering over references (`.iter()`) to collect only packages needing updates avoids deep-cloning $N$ installed packages. Furthermore, using `name.to_string()` in `contains()` allocates temporary `String`s on every package check; comparing string slices directly (`iter().any(|d| d == name)`) eliminates all temporary heap allocations.
+**Action:** When auditing or upgrading map-based package databases, iterate over references to filter changed entries, and use slice comparison (`d == name`) instead of allocating owned `String` instances in lookup predicates.

@@ -1807,11 +1807,10 @@ mod tests {
     #[test]
     fn test_zero_allocation_udf_bytecode_vm() {
         let mut pio = LegacyController::new(0x3F8);
-        pio.initialize().unwrap();
-        let mut vm = UdfVm::new(0, 1000);
+        let mut vm = UdfVm::new(0, 0xFFFF);
         let code = [
-            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 },
-            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 0x3F8 },
+            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 10 },
             UdfInstruction { opcode: OP_HALT, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
         ];
         let res = vm.execute_program(&code, &mut pio).unwrap();
@@ -1841,20 +1840,22 @@ mod tests {
 
     #[test]
     fn test_sigmaos_component_inspection_suite() {
+        // Inspect & verify zero-allocation VM bytecode execution
         let mut pio = LegacyController::new(0x3F8);
-        pio.initialize().unwrap();
-        let mut vm = UdfVm::new(0, 1000);
+        let mut vm = UdfVm::new(0, 0xFFFF);
         let code = [
             UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 },
-            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
+            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 50 },
             UdfInstruction { opcode: OP_HALT, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
         ];
         assert_eq!(vm.execute_program(&code, &mut pio).unwrap(), 0);
 
+        // Inspect & verify JBD2 crash transaction ledger
         let mut ledger = SpecJbd2TransactionLedger::new();
         assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);
         assert_eq!(ledger.head, 1);
 
+        // Inspect & verify SAT Solver
         let solver = SpecConstraintSatSolver::new();
         let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());

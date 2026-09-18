@@ -245,6 +245,14 @@ impl LinuxPressFeedEngine {
             .collect()
     }
 
+    pub fn get_articles_by_portal_substring(&self, keyword: &str) -> Vec<TechMediaArticleFeed> {
+        self.articles
+            .iter()
+            .filter(|a| a.portal.to_lowercase().contains(&keyword.to_lowercase()))
+            .cloned()
+            .collect()
+    }
+
     pub fn get_articles_by_category(&self, category: &str) -> Vec<TechMediaArticleFeed> {
         self.articles
             .iter()
@@ -1129,6 +1137,7 @@ mod tests {
     fn test_linux_press_feed_engine() {
         let mut engine = LinuxPressFeedEngine::new();
         assert_eq!(engine.get_articles_by_portal("9to5Linux").len(), 1);
+        assert!(!engine.get_articles_by_portal_substring("linux").is_empty());
 
         engine.add_article(TechMediaArticleFeed {
             title: "New Phoronix Benchmarking Suite Release".to_string(),
