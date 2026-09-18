@@ -28,6 +28,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[List of Applications](List-of-Applications)**
   Categorized presentation of common applications and packages.
 
+- **[Category:Installation](Category:Installation)**
+  Installation-related articles and guides.
+
 ---
 
 ## The Desktop Environment
@@ -35,7 +38,7 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Zenith Compositor](Zenith-Compositor)**
   Overview of the Zenith desktop environment and compositor system.
 
-- **[Zenith Desktop & Omarchy Workflow](Zenith-Desktop-and-Omarchy-Workflow)**
+- **[Zenith Desktop & Workflow](Zenith-Desktop-and-Omarchy-Workflow)**
   Detailed guide to the Zenith desktop workflow and Omarchy integration.
 
 - **[Bolt ⚡ Fast Launcher](Zenith-Desktop-and-Omarchy-Workflow#bolt-fast-path-launcher-and-agentic-steering)**
@@ -46,6 +49,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Sentinel 🛡️ Exec Guard](Zenith-Desktop-and-Omarchy-Workflow#sentinel-sandboxing--exec-guard)**
   Capability-based sandboxing and execution guard.
+
+- **[Category:Desktop-Environment](Category-Desktop-Environment)**
+  Desktop environment articles and guides.
 
 ---
 
@@ -62,6 +68,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Content-Addressed Storage](Content-Addressed-Storage)**
   Immutable, cryptographically-verified package storage.
+
+- **[Category:Package-Management](Category:Package-Management)**
+  Package management articles and guides.
 
 ---
 
@@ -95,6 +104,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Memory Safety Guarantees](SECURITY)**
   Rust-enforced memory safety and kernel hardening features.
 
+- **[Category:Security](Category:Security)**
+  Security and hardening articles.
+
 ---
 
 ## Performance & Kernel
@@ -110,6 +122,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Lock-Free Data Structures](SIGMA_CONCURRENCY_PRIMITIVES)**
   Lock-free concurrency primitives and data structures.
+
+- **[Category:Performance](Category:Performance)**
+  Performance and kernel articles.
 
 ---
 
@@ -143,6 +158,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Device Drivers](Device-Drivers)**
   Device driver support and management.
 
+- **[Category:Hardware](Category:Hardware)**
+  Hardware and platform articles.
+
 ---
 
 ## Our Community
@@ -158,6 +176,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[International Communities](International-Communities)**
   Collection of links to SigmaOS communities around the world.
+
+- **[Category:Community](Category:Community)**
+  Community articles and guidelines.
 
 ---
 
@@ -190,6 +211,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Comprehensive OS Analysis](SIGMAOS_COMPREHENSIVE_OS_ANALYSIS)**
   Consolidated analysis of SigmaOS architecture and comparisons.
+
+- **[Category:Development](Category-Development)**
+  Development and technical articles.
 
 ---
 
