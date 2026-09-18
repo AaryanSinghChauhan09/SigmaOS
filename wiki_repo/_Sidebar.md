@@ -84,6 +84,9 @@ n- **[[Advanced NVIDIA GPU Support|Advanced-NVIDIA-GPU-Support]]**
 - **[[USB3/4 xHCI Full Support|USB3-4-xHCI-Full-Support]]**
 - **[[Mach/Zircon Zero-Copy IPC|Mach-Zircon-Zero-Copy-IPC]]**
 - **[[Gentoo Portage Integration|Gentoo-Portage-Integration]]**
+n- **[[Device Drivers|Device-Drivers]]**
+- **[[User Space and Applications|User-Space-and-Applications]]**
+
 n- **[[Boot Process and Recovery|Boot-Process-and-Recovery]]**
 - **[[Package Management|Package-Management]]**
 

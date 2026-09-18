@@ -144,6 +144,14 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
 
+- **[Device Drivers](Device-Drivers)**
+  PCI/PCIe, USB, network, storage, GPU drivers.
+
+- **[User Space and Applications](User-Space-and-Applications)**
+  Process isolation, syscalls, compatibility layers.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
 - **[Boot Process and Recovery](Boot-Process-and-Recovery)**
   Bootloaders, init system, recovery modes, snapshots.
 

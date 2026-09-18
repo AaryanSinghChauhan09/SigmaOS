@@ -99,6 +99,8 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Hardware & Platform
+- [Device Drivers](Device-Drivers) — PCI/PCIe, USB, network, storage, GPU drivers
+- [User Space and Applications](User-Space-and-Applications) — Process isolation, syscalls, compatibility layers
 - [Filesystem Support Matrix](Filesystem-Support-Matrix) — ext4, XFS, Btrfs, ZFS, UFS, Hammer2, NFS, SMB, SSHFS, encryption
 - [Networking Support Matrix](Networking-Support-Matrix) — IPv4/IPv6, bonding, VLANs, VPNs, namespaces, bridging
 
