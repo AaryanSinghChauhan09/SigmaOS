@@ -82,6 +82,9 @@ pub mod linux_bsd_distro_gaps;
 pub mod linux_bsd_distro_gaps_synthesis;
 pub use linux_bsd_distro_gaps_synthesis::*;
 pub mod linux_bsd_inspirations;
+pub use linux_bsd_inspirations::{
+    SovereignCrossDistroSubsystemOrchestrator,
+};
 
 pub mod linux_bsd_parity;
 pub mod linux_bsd_parity_extended;

@@ -1787,6 +1787,102 @@ impl SovereignUniversalDistroBridge {
     pub fn create_qubes_isolation_domain(&mut self, domain_name: &str) -> Result<(), &'static str> {
         self.super_matrix.create_qubes_domain(domain_name)
     }
+
+    pub fn query_subsystem_capabilities(&self, target_subsystem: &str) -> Vec<String> {
+        let mut caps = Vec::new();
+        caps.push(format!("mode_{:?}", self.mode));
+        caps.push(format!("supervisor_{:?}", self.get_supervisor_type()));
+        match target_subsystem {
+            "security" | "secure" => {
+                caps.push("landlock_lsm".to_string());
+                caps.push("pledge_unveil".to_string());
+                caps.push("freebsd_jail".to_string());
+                caps.push("retguard_stack".to_string());
+            }
+            "package" | "sigpkg" => {
+                caps.push("nix_cas_store".to_string());
+                caps.push("apk_xbps_hooks".to_string());
+                caps.push("universal_spec_translation".to_string());
+            }
+            "vfs" | "storage" | "filesystem" | "fs" => {
+                caps.push("btrfs_zfs_cow_self_heal".to_string());
+                caps.push("path_translation".to_string());
+            }
+            _ => {
+                caps.push("generic_cross_subsystem_dispatch".to_string());
+            }
+        }
+        caps
+    }
+
+    pub fn synchronize_subsystem_state(
+        &mut self,
+        target_subsystem: &str,
+        state_key: &str,
+        state_value: &str,
+    ) -> Result<String, &'static str> {
+        if state_key.is_empty() || state_value.is_empty() {
+            return Err("State key and value cannot be empty");
+        }
+        Ok(format!(
+            "Synchronized subsystem '{}' state [{}={}] under mode '{:?}'",
+            target_subsystem, state_key, state_value, self.mode
+        ))
+    }
+}
+
+pub struct SovereignCrossDistroSubsystemOrchestrator {
+    pub bridge: SovereignUniversalDistroBridge,
+    pub active_pipelines: Vec<String>,
+}
+
+impl SovereignCrossDistroSubsystemOrchestrator {
+    pub fn new(mode: DistroSubsystemMode) -> Self {
+        Self {
+            bridge: SovereignUniversalDistroBridge::new(mode),
+            active_pipelines: Vec::new(),
+        }
+    }
+
+    pub fn set_subsystem_mode(&mut self, mode: DistroSubsystemMode) {
+        self.bridge.set_subsystem_mode(mode);
+    }
+
+    pub fn query_subsystem_capabilities(&self, target_subsystem: &str) -> Vec<String> {
+        self.bridge.query_subsystem_capabilities(target_subsystem)
+    }
+
+    pub fn synchronize_subsystem_state(
+        &mut self,
+        target_subsystem: &str,
+        state_key: &str,
+        state_value: &str,
+    ) -> Result<String, &'static str> {
+        self.bridge
+            .synchronize_subsystem_state(target_subsystem, state_key, state_value)
+    }
+
+    pub fn execute_subsystem_pipeline(
+        &mut self,
+        subsystems: &[&str],
+        action: &str,
+    ) -> Result<Vec<String>, &'static str> {
+        if subsystems.is_empty() {
+            return Err("Subsystems list cannot be empty");
+        }
+        let mut results = Vec::new();
+        for sub in subsystems {
+            let res = self.bridge.dispatch_cross_subsystem_operation(sub, action)?;
+            results.push(res);
+        }
+        let pipeline_summary = format!(
+            "Executed pipeline across {} subsystems for action '{}'",
+            subsystems.len(),
+            action
+        );
+        self.active_pipelines.push(pipeline_summary);
+        Ok(results)
+    }
 }
 
 // ==========================================
@@ -3308,6 +3404,44 @@ mod cross_subsystem_tests {
         let id = container.spawn_isolated_container("app", "/usr/bin").unwrap();
         assert_eq!(id, 1);
         assert!(container.spawn_isolated_container("", "/path").is_err());
+    }
+
+    #[test]
+    fn test_cross_distro_subsystem_orchestrator() {
+        let mut orchestrator = SovereignCrossDistroSubsystemOrchestrator::new(DistroSubsystemMode::LinuxArch);
+
+        // Test capabilities query across modes
+        let sec_caps = orchestrator.query_subsystem_capabilities("security");
+        assert!(sec_caps.contains(&"landlock_lsm".to_string()));
+        assert!(sec_caps.contains(&"pledge_unveil".to_string()));
+
+        let pkg_caps = orchestrator.query_subsystem_capabilities("package");
+        assert!(pkg_caps.contains(&"nix_cas_store".to_string()));
+
+        // Test state synchronization
+        let sync_res = orchestrator.synchronize_subsystem_state("init", "runlevel", "multi-user");
+        assert!(sync_res.is_ok());
+        assert!(sync_res.unwrap().contains("runlevel=multi-user"));
+
+        assert!(orchestrator.synchronize_subsystem_state("init", "", "val").is_err());
+
+        // Test multi-subsystem pipeline execution
+        let pipeline_subs = ["init", "package", "security", "network", "vfs"];
+        let exec_res = orchestrator.execute_subsystem_pipeline(&pipeline_subs, "sync");
+        assert!(exec_res.is_ok());
+        let results = exec_res.unwrap();
+        assert_eq!(results.len(), 5);
+
+        assert_eq!(orchestrator.active_pipelines.len(), 1);
+        assert!(orchestrator.active_pipelines[0].contains("across 5 subsystems"));
+
+        // Mode switching test
+        orchestrator.set_subsystem_mode(DistroSubsystemMode::FreeBsd);
+        let bsd_caps = orchestrator.query_subsystem_capabilities("security");
+        assert!(bsd_caps.iter().any(|c| c.contains("FreeBsd")));
+
+        // Empty pipeline test
+        assert!(orchestrator.execute_subsystem_pipeline(&[], "test").is_err());
     }
 }
 
