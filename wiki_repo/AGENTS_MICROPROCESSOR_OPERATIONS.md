@@ -1,33 +1,29 @@
-# SigmaOS AI Agent Microprocessor Operation Management Directive (`AGENTS_MICROPROCESSOR_OPERATIONS.md`)
+# AI Agent Microprocessor Operation Management Architecture (`docs/AGENTS_MICROPROCESSOR_OPERATIONS.md`)
 
-This document defines technical directives, multi-architecture context handling rules, and hardware abstraction layer (HAL) guidelines for AI agents managing microprocessor operations in SigmaOS.
-
----
-
-## 1. Core Principles for Microprocessor Operation Management
-
-Microprocessor hardware abstraction, register context switching, ISA feature detection, and thermal throttling are critical to low-level kernel performance in SigmaOS. AI agents modifying microprocessor routines must observe the following rules:
-
-1. **Multi-Architecture Context Switching (`CpuContextState`):**
-   - Context switches must save and restore general-purpose and floating-point registers cleanly using architecture-specific descriptors (`X86Context`, `X64Context`, `Arm64Context`, `Riscv64Context`, `LoongArch64Context`, `Ppc64Context`, `S390xContext`).
-   - Validate register states prior to context restoration to guard against illegal register values or unaligned stack pointer traps.
-
-2. **Microarchitecture ISA Feature Detection (`x86-64-v1` through `v4`):**
-   - Microprocessor extensions (AVX, AVX2, AVX-512, BMI2, FMA) must be auto-detected at runtime (`V4OptimizedPackageManager`, `SovereignMicroarchJitEngine`).
-   - Dynamic SIMD vectorization and memcpy routing must choose optimal ISA instruction variants without triggering undefined instruction traps on older hardware.
-
-3. **Hardware Abstraction IRQLs (`PassiveLevel`, `DispatchLevel`):**
-   - Execution levels must strictly regulate allowable operations. High IRQL levels (`DispatchLevel` and above) prohibit page faults and blocking allocations.
-
-4. **Thermal Throttling & Power Management:**
-   - Monitor CPU core temperatures (`cpu_temp_c`) and adjust frequency limits (`cpu_freq_limit_mhz`) dynamically to prevent thermal throttling or hardware damage under heavy compute loads.
+This guide details the technical architecture, CPU context structures, and AI agent monitoring protocols for microprocessor operations in SigmaOS.
 
 ---
 
-## 2. Pre-Commit Microprocessor Verification Checklist
+## 1. Subsystem Architecture
 
-Before submitting code modifications, AI agents must verify:
-- [ ] Context switch routines preserve register symmetry across target architectures (`X86_64`, `ARM64`, `RISCV64`).
-- [ ] Microarchitecture ISA feature detection falls back safely on baseline hardware (`x86-64-v1`).
-- [ ] IRQL execution levels guard against blocking calls inside high-priority HAL contexts.
-- [ ] `./run_sigma_tests.sh` executes with 100% test pass rate.
+SigmaOS provides multi-architecture CPU context switching and microarchitecture optimization:
+
+### A. Hardware Abstraction Layer & Register Contexts
+- Located in `src/arch/portability.rs` and `src/arch/hal.rs`.
+- Manages multi-architecture register descriptors (`X86Context`, `X64Context`, `Arm64Context`, `Riscv64Context`, `LoongArch64Context`, `Ppc64Context`, `S390xContext`) and execution levels (`PassiveLevel`, `DispatchLevel`).
+
+### B. ISA Level Auto-Detection & Vectorized JIT
+- Located in `src/compatibility/cachy_os.rs` and `src/klib/isa.rs`.
+- Detects microarchitecture levels (`x86-64-v1` through `v4`) and routes memory/vector operations to hardware-accelerated instruction paths.
+
+### C. CPU Power & Thermal Governor
+- Located in `src/ai/agent.rs` and `src/ai/next_gen.rs`.
+- Monitors CPU temperatures (`cpu_temp_c`) and throttles CPU clock frequencies (`cpu_freq_limit_mhz`) during high thermal loads.
+
+---
+
+## 2. AI Agent Operational Directives
+
+1. **Architecture Portability:** Ensure new kernel assembly or register context helpers support all primary target architectures.
+2. **IRQL Non-Blocking Rule:** Confirm high-IRQL code paths (`DispatchLevel`) refrain from heap allocations or page faulting operations.
+3. **Automated Verification:** Execute `./run_sigma_tests.sh` to confirm CPU portability and ISA unit tests pass.

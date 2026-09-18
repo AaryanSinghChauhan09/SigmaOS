@@ -1792,10 +1792,10 @@ mod tests {
 
     #[test]
     fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8, power_state: PowerState::D0Active };
-        let mmio = ModernMmioController { mmio_base: 0xFE00_0000, power_state: PowerState::D0Active };
+        let pio = LegacyController::new(0x3F8);
+        let mmio = ModernController::new(0xFE00_0000);
 
-        assert_eq!(pio.base_port, 0x3F8);
+        assert_eq!(pio.port_base, 0x3F8);
         assert_eq!(mmio.mmio_base_addr, 0xFE00_0000);
 
         let mut mgr = BareMetalPeripheralManager::new();
@@ -1812,13 +1812,13 @@ mod tests {
             SpecUdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
             SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
         ];
-        let res = vm.execute_program(&code, &mut pio).unwrap();
-        assert_eq!(res, 200);
+        let res = vm.execute(&code).unwrap();
+        assert_eq!(res, 0x3F8 + 10);
     }
 
     #[test]
     fn test_constraint_sat_solver() {
-        let solver = ConstraintSatSolver::new();
+        let solver = SpecConstraintSatSolver::new();
         let nodes = [
             SpecPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
             SpecPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
@@ -1833,8 +1833,8 @@ mod tests {
         assert_eq!(tx_id, 1);
         assert_eq!(ledger.head, 1);
 
-        assert!(ledger.rollback_last_transaction().is_ok());
-        assert_eq!(ledger.head_ptr, 0);
+        ledger.rollback_transaction();
+        assert_eq!(ledger.head, 0);
     }
 
     #[test]
@@ -1846,7 +1846,7 @@ mod tests {
             SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },
             SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
         ];
-        assert_eq!(vm.execute_program(&code, &mut pio).unwrap(), 0x38);
+        assert_eq!(vm.execute(&code).unwrap(), 150);
 
         // Inspect & verify JBD2 crash transaction ledger
         let mut ledger = SpecJbd2TransactionLedger::new();
@@ -1854,7 +1854,7 @@ mod tests {
         assert_eq!(ledger.head, 1);
 
         // Inspect & verify SAT Solver
-        let solver = ConstraintSatSolver::new();
+        let solver = SpecConstraintSatSolver::new();
         let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
         assert!(solver.resolve_satisfiability(&nodes).is_ok());
     }

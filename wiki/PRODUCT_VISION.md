@@ -1,46 +1,21 @@
 # SigmaOS Product Vision & Engineering Contract
 
-## 1. Executive Product Statement
-**SigmaOS is a secure, fast, opinionated Rust desktop operating system with atomic updates, capability-based applications, and a curated Zenith workflow.**
+## Product Statement
+> **SigmaOS is a secure, fast, opinionated Rust desktop operating system with atomic updates, capability-based applications, and a curated Zenith workflow.**
 
-Inspired by **Omarchy Linux**, SigmaOS prioritizes shipping a cohesive, daily-driver desktop distribution rather than attempting to simultaneously be a universal microkernel, cloud orchestrator, bare-metal hypervisor, and full POSIX replacement for every existing operating system.
+## Core Principles (Inspired by Omarchy Linux)
+1. **Opinionated Desktop Experience**: Deliver one cohesive Zenith desktop workflow with keyboard-driven tile navigation, sensible defaults, and global theme consistency.
+2. **Simple Installation & Recovery**: Streamline installation (`boot → install → login → Zenith desktop → package installation → update → rollback`) with zero complex partitioning choices.
+3. **Atomic System Resilience**: Utilize dual-root A/B images (`mkosi` / `sysupdate`) and Copy-on-Write (CoW) boot environment snapshots for instant rollback.
+4. **Transparent Executable Security**: Capability-based default-deny application permissions with Zorin Exec Guard intercepting non-native binaries.
+5. **Declarative Configuration**: Approachable TOML-based system preferences (`/system/profile.toml`, `/user/preferences.toml`) validated before activation.
 
----
-
-## 2. The Engineering Contract
-
-### 2.1 Supported Architecture & Runtime Model
-- **Primary Target for Desktop Edition (M0–M5)**: `x86_64` (UEFI / VirtIO in QEMU, progressing to Intel/AMD integrated graphics).
-- **Core Standard Library Decision**:
-  - SigmaOS Desktop Edition uses a **hybrid practical `std` runtime** for userspace applications, compositor, package management (`sigpkg`), and desktop shells.
-  - Low-level kernel primitives (`src/kernel/`, `src/klib/`) maintain `#![no_std]` compatibility to preserve the freestanding microkernel evolutionary path.
-  - No undocumented switching: any module requiring `std` explicitly imports standard collections (`std::collections::BTreeMap`), while freestanding boot blocks explicitly use `#![no_std]`.
-
-### 2.2 Strict Zero-External-Dependency Rule
-- **Definition**: The root `Cargo.toml` maintains **0 third-party external crates** (`[dependencies]` is empty).
-- All cryptographic primitives, data structures, parsers, protocols, Wayland bridges, and packaging solvers are natively implemented and audited in-tree.
-
-### 2.3 Single Demonstrable Product Path
-All engineering efforts converge on one verifiable end-to-end loop:
-```text
-Download Verified Image
-  └──> Boot via UEFI in QEMU / Target Hardware
-        └──> Minimal Install / User Selection
-              └──> Zenith Wayland Desktop Session
-                    └──> Terminal & Application Launcher
-                          └──> Install Signed Package (sigpkg)
-                                └──> Atomic Update with Generation Snapshot
-                                      └──> Instant Safe Rollback upon Failure
-```
-
----
-
-## 3. Product Deliverables by Stage
-
-| Subsystem | Scope for Desktop Release | Long-Term Research (Deferred) |
-|---|---|---|
-| **Compositor** | Zenith Wayland compositor (`src/compositor/zenith_core.rs`), layer-shell widgets, Tokyo-Night / Catppuccin theme live-switching | Full X11 nested rootless multi-seat server |
-| **Packaging** | Native signed SigmaPkg with Merkle store, Adler-32 delta updates, and atomic rollback | Full AUR community hosting, 50 native distro package builders |
-| **Security** | OpenBSD-style `pledge` & `unveil`, Capsicum fd rights, Landlock sandbox prompts | Distributed TPM cluster remote attestation |
-| **Init & Boot** | Sub-second parallel boot sequencer (<250ms target) | Distributed cloud init orchestrators |
-| **Hardware** | x86_64 UEFI, VirtIO GPU/net/block, NVMe, USB HID | Obsolete legacy architectures (Alpha, SH4, SPARC) |
+## Release Milestones (M0 - M7)
+- **M0: Engineering Baseline**: Pinned toolchain, reproducible Cargo & script runner baseline.
+- **M1: QEMU Desktop Preview**: Boot to Zenith desktop with terminal, launcher, and control center.
+- **M2: Native Package MVP (`sigpkg`)**: Signed `.sigpkg` packages, atomic transactions, and CoW snapshots.
+- **M3: Declarative Profiles**: Validated system/user preference state transitions.
+- **M4: Hardware Alpha**: Verified x86_64 hardware compatibility matrix.
+- **M5: Stable Desktop Release**: Production-ready installer ISO, recovery boot menu, and upgrade channel.
+- **M6: Developer & Community Ecosystem**: Package recipes, themes, and developer SDK.
+- **M7: Long-Term Research Expansion**: Freestanding microkernel shards, AI orchestration, ARM64/RISC-V targets.

@@ -1,36 +1,27 @@
-# SigmaOS AI Agent Buffer Overflow Management Directive (`AGENTS_BUFFER_OVERFLOW.md`)
+# AI Agent Buffer Overflow Management Architecture (`docs/AGENTS_BUFFER_OVERFLOW.md`)
 
-This document defines technical directives, memory protection protocols, and audit procedures for AI agents tasked with buffer overflow mitigation and memory safety management in SigmaOS.
-
----
-
-## 1. Zero-Trust Memory Safety Directives
-
-All AI agents operating on or modifying SigmaOS kernel, drivers, or userspace components must enforce strict zero-trust memory safety:
-
-1. **No Unsafe Buffer Operations:**
-   - Avoid raw pointer arithmetic, unaligned casts, and unchecked slicing.
-   - Use Rust's native bounds-checked slices, `alloc::vec::Vec`, `RingBuffer`, and safe iterator primitives.
-   - Verify that all fixed-size buffer indexing operations explicitly handle potential overflow or out-of-bounds conditions.
-
-2. **Hardened Guard Page Allocations (`alloc_with_guard_page`):**
-   - Ensure dynamic allocations requiring isolation allocate guard pages around data boundaries using `alloc_with_guard_page`.
-   - Guard pages must be configured as inaccessible (`stack_guard_pages = 1`, `heap_guard_pages = 1`) to trigger immediate page faults upon sequential or off-by-one buffer overruns.
-
-3. **ASLR / KASLR Entropy Verification (`SovereignCsprng`):**
-   - Address Space Layout Randomization (ASLR) and Kernel ASLR (KASLR) offset generation must utilize `SovereignCsprng` entropy sources.
-   - Ensure stack, heap, and memory-mapped bases are randomized on process/kernel init.
-
-4. **Non-Executable Page Enforcement (NX / DEP / W^X):**
-   - Memory pages must strictly conform to Write-XOR-Execute (`W^X`) policies.
-   - Data buffers, stacks, and heap allocations must be mapped Non-Executable (`NX` / `DEP`).
+This guide details the architectural safeguards, memory isolation mechanisms, and AI agent monitoring procedures for buffer overflow prevention in SigmaOS.
 
 ---
 
-## 2. Buffer Safety Verification Checklist for AI Agents
+## 1. Architectural Safeguards
 
-Before committing changes, AI agents must verify:
-- [ ] No `unsafe` blocks introduce unchecked pointer dereferences or raw buffer writes.
-- [ ] Ring buffers (`RingBuffer`, `RingBuf`) check overflow/wrap-around boundaries safely.
-- [ ] Stack allocations are guarded against stack clash via guard pages (`has_guard_page = true`).
-- [ ] `./run_sigma_tests.sh` executes without memory safety faults or assertions failures.
+SigmaOS implements multi-layered buffer overflow prevention across all subsystems:
+
+### A. Guard Pages & Heap Isolation
+- **Resource Allocator Guard Zones:** The resource allocator implements `alloc_with_guard_page(data_pages)` which sandwiches allocated data pages between unmapped guard pages.
+- **Stack-Clash Protection:** Stack growth is bounded by stack guard pages (`stack_guard_pages = 1`) configured in system security hardening profiles (`src/security/hardening.rs`).
+
+### B. Safe Ring Buffers
+- Kernel and IPC message passing use bounds-checked ring buffers (`RingBuffer` and `RingBuf`) with strict capacity validation and lock-free atomic pointer increments to prevent wraparound corruption.
+
+### C. KASLR & Entropy Generation
+- Kernel address space layout randomization relies on `SovereignCsprng` (ChaCha20-inspired CSPRNG with timestamp jitter) to ensure unpredictable base address offsets.
+
+---
+
+## 2. AI Agent Monitoring & Remediation Protocol
+
+1. **Automated Code Auditing:** AI security agents scan all modified Rust code for `unsafe` dereferences or buffer indexing.
+2. **Bounds Violation Detection:** Upon detecting out-of-bounds access attempts, system fault handlers trigger immediate isolation and thread termination.
+3. **Automated Verification:** Execute `./run_sigma_tests.sh` to confirm all 220+ memory safety and security tests pass.
