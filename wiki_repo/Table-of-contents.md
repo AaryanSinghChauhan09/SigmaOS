@@ -46,7 +46,8 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 
 ## Security & Hardening
 - [Security Hardening Guide](Security-Hardening-Guide) — Kernel hardening, application sandboxing, secure coding practices
-
+- [File Management](File-Management) — VFS, file permissions, file locking, directory operations
+- [System Security](System-Security) — Access control, auditing, MAC framework, security policies
 - [Security Sandbox & Isolation](Security-Sandbox-Isolation) — Comprehensive security sandboxing with Landlock, Capsicum, and pledge/unveil
 - [Security & Sandboxing](Security-Sandboxing-and-Hardening) — Comprehensive security model and sandboxing capabilities
 - [Zorin Exec Guard](Security-Sandboxing-and-Hardening#zorin-exec-guard) — Default-deny capability permission model

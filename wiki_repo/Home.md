@@ -144,6 +144,14 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
 
+- **[File Management](File-Management)**
+  VFS, file permissions, file locking, directory operations.
+
+- **[System Security](System-Security)**
+  Access control, auditing, MAC framework, security policies.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
 - **[Process Management](Process-Management)**
   Process scheduling, cgroups, resource limits, namespaces.
 
