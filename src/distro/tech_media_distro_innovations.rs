@@ -2,9 +2,9 @@
 // Inspired by DistroWatch, 9to5Linux, MakeUseOf, LinuxTeck, Appuals, ZDNet, and DistroWatch
 
 #[cfg(not(test))]
-use crate::klib::string::String;
+use alloc::string::String;
 #[cfg(not(test))]
-use crate::klib::vec::Vec;
+use alloc::vec::Vec;
 
 #[cfg(test)]
 use std::string::String;
