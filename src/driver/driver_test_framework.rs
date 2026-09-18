@@ -500,6 +500,7 @@ impl TestSummary {
 
 pub struct QemuSimulator {
     is_running: bool,
+    #[allow(dead_code)]
     guest_os_type: GuestOs,
     emulated_devices: Vec<String>,
 }
