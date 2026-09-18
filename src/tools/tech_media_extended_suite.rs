@@ -74,6 +74,10 @@ impl WindowsCentralPcHealthEngine {
     pub fn throttle_background_apps(&mut self, active_app_count: u32) {
         self.background_apps_throttled = active_app_count * 2;
     }
+
+    pub fn is_system_healthy(&self) -> bool {
+        self.audit_drivers()
+    }
 }
 
 // ============================================================================
@@ -396,6 +400,7 @@ mod tests {
     fn test_windows_central_pc_health_engine() {
         let mut engine = WindowsCentralPcHealthEngine::new();
         assert!(engine.audit_drivers());
+        assert!(engine.is_system_healthy());
         let report = engine.analyze_storage_cleanup();
         assert!(report.total_reclaimable_bytes > 0);
         engine.throttle_background_apps(5);
