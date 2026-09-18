@@ -446,12 +446,41 @@ pub enum PackageFormat {
     RCran,        // R CRAN package (.rpkg)
 }
 
+// Bolt ⚡ Optimization: Normalizes package filename for format detection using a stack-allocated
+// buffer ([u8; 512]) to eliminate dynamic String heap allocations during extension matching.
+fn normalize_filename_stack<F, R>(filename: &str, f: F) -> R
+where
+    F: FnOnce(&str) -> R,
+{
+    let bytes = filename.as_bytes();
+    let mut buf = [0u8; 512];
+    if bytes.len() <= 512 {
+        let mut len = 0;
+        for &b in bytes {
+            if b != b' ' && b != b'\t' && b != b'\r' && b != b'\n' {
+                buf[len] = b.to_ascii_lowercase();
+                len += 1;
+            }
+        }
+        if let Ok(s) = core::str::from_utf8(&buf[..len]) {
+            return f(s);
+        }
+    }
+    let lower = filename.to_lowercase();
+    let trimmed = lower.trim();
+    let normalized = trimmed.replace(' ', "");
+    f(&normalized)
+}
+
 impl PackageFormat {
     pub fn from_filename(filename: &str) -> Option<Self> {
-        let name = filename.to_lowercase();
-        let name = name.trim();
-        let normalized = name.replace(" ", "");
+        normalize_filename_stack(filename, |normalized| {
+            Self::from_normalized(normalized)
+        })
+    }
 
+    fn from_normalized(normalized: &str) -> Option<Self> {
+        let name = normalized;
         if normalized.ends_with(".deb") || normalized.ends_with(".udeb") {
             Some(PackageFormat::Deb)
         } else if normalized.ends_with(".superdeb") {
