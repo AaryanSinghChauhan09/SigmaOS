@@ -4,6 +4,7 @@
 #![allow(unused_unsafe)]
 
 use std::collections::BTreeMap;
+use std::sync::Mutex;
 use std::vec::Vec;
 use std::string::{String, ToString};
 
@@ -186,8 +187,131 @@ impl PciBar {
 // PCI Configuration Space I/O
 // ============================================================================
 
+/// Safe abstraction for PCI configuration space access
+/// This allows both real hardware access and simulated configuration space for testing
+pub enum PciConfigSpace {
+    /// Real hardware access via I/O ports or MMIO
+    Hardware,
+    /// Simulated configuration space for testing (thread-safe)
+    Simulated(Mutex<BTreeMap<(u16, u8, u8, u8), [u8; 256]>>),
+}
+
+impl PciConfigSpace {
+    /// Read 8-bit value from configuration space
+    pub fn read_u8(&self, addr: PciAddress, offset: u8) -> u8 {
+        match self {
+            PciConfigSpace::Hardware => pci_read_u8_hardware(addr, offset),
+            PciConfigSpace::Simulated(space) => {
+                let key = (addr.domain, addr.bus, addr.device, addr.function);
+                if let Ok(space) = space.lock() {
+                    if let Some(config) = space.get(&key) {
+                        config[offset as usize]
+                    } else {
+                        0xff
+                    }
+                } else {
+                    0xff
+                }
+            }
+        }
+    }
+
+    /// Read 16-bit value from configuration space
+    pub fn read_u16(&self, addr: PciAddress, offset: u8) -> u16 {
+        match self {
+            PciConfigSpace::Hardware => pci_read_u16_hardware(addr, offset),
+            PciConfigSpace::Simulated(space) => {
+                let key = (addr.domain, addr.bus, addr.device, addr.function);
+                if let Ok(space) = space.lock() {
+                    if let Some(config) = space.get(&key) {
+                        let lo = config[offset as usize] as u16;
+                        let hi = config[(offset + 1) as usize] as u16;
+                        (hi << 8) | lo
+                    } else {
+                        0xffff
+                    }
+                } else {
+                    0xffff
+                }
+            }
+        }
+    }
+
+    /// Read 32-bit value from configuration space
+    pub fn read_u32(&self, addr: PciAddress, offset: u8) -> u32 {
+        match self {
+            PciConfigSpace::Hardware => pci_read_u32_hardware(addr, offset),
+            PciConfigSpace::Simulated(space) => {
+                let key = (addr.domain, addr.bus, addr.device, addr.function);
+                if let Ok(space) = space.lock() {
+                    if let Some(config) = space.get(&key) {
+                        let b0 = config[offset as usize] as u32;
+                        let b1 = config[(offset + 1) as usize] as u32;
+                        let b2 = config[(offset + 2) as usize] as u32;
+                        let b3 = config[(offset + 3) as usize] as u32;
+                        (b3 << 24) | (b2 << 16) | (b1 << 8) | b0
+                    } else {
+                        0xffffffff
+                    }
+                } else {
+                    0xffffffff
+                }
+            }
+        }
+    }
+
+    /// Write 8-bit value to configuration space
+    pub fn write_u8(&self, addr: PciAddress, offset: u8, value: u8) {
+        match self {
+            PciConfigSpace::Hardware => pci_write_u8_hardware(addr, offset, value),
+            PciConfigSpace::Simulated(space) => {
+                let key = (addr.domain, addr.bus, addr.device, addr.function);
+                if let Ok(mut space) = space.lock() {
+                    if let Some(config) = space.get_mut(&key) {
+                        config[offset as usize] = value;
+                    }
+                }
+            }
+        }
+    }
+
+    /// Write 16-bit value to configuration space
+    pub fn write_u16(&self, addr: PciAddress, offset: u8, value: u16) {
+        match self {
+            PciConfigSpace::Hardware => pci_write_u16_hardware(addr, offset, value),
+            PciConfigSpace::Simulated(space) => {
+                let key = (addr.domain, addr.bus, addr.device, addr.function);
+                if let Ok(mut space) = space.lock() {
+                    if let Some(config) = space.get_mut(&key) {
+                        config[offset as usize] = (value & 0xff) as u8;
+                        config[(offset + 1) as usize] = ((value >> 8) & 0xff) as u8;
+                    }
+                }
+            }
+        }
+    }
+
+    /// Write 32-bit value to configuration space
+    pub fn write_u32(&self, addr: PciAddress, offset: u8, value: u32) {
+        match self {
+            PciConfigSpace::Hardware => pci_write_u32_hardware(addr, offset, value),
+            PciConfigSpace::Simulated(space) => {
+                let key = (addr.domain, addr.bus, addr.device, addr.function);
+                if let Ok(mut space) = space.lock() {
+                    if let Some(config) = space.get_mut(&key) {
+                        config[offset as usize] = (value & 0xff) as u8;
+                        config[(offset + 1) as usize] = ((value >> 8) & 0xff) as u8;
+                        config[(offset + 2) as usize] = ((value >> 16) & 0xff) as u8;
+                        config[(offset + 3) as usize] = ((value >> 24) & 0xff) as u8;
+                    }
+                }
+            }
+        }
+    }
+}
+
 #[inline]
-pub fn pci_read_u8(addr: PciAddress, offset: u8) -> u8 {
+fn pci_read_u8_hardware(addr: PciAddress, offset: u8) -> u8 {
     // Use legacy I/O port access (0xCF8/0xCFC)
     let _config_address = addr.legacy_io_address(offset);
     unsafe {
@@ -201,7 +325,7 @@ pub fn pci_read_u8(addr: PciAddress, offset: u8) -> u8 {
 }
 
 #[inline]
-pub fn pci_read_u16(addr: PciAddress, offset: u8) -> u16 {
+fn pci_read_u16_hardware(addr: PciAddress, offset: u8) -> u16 {
     let _config_address = addr.legacy_io_address(offset & !1);
     unsafe {
         let _port_addr = 0x0CF8u16;
@@ -213,7 +337,7 @@ pub fn pci_read_u16(addr: PciAddress, offset: u8) -> u16 {
 }
 
 #[inline]
-pub fn pci_read_u32(addr: PciAddress, offset: u8) -> u32 {
+fn pci_read_u32_hardware(addr: PciAddress, offset: u8) -> u32 {
     let _config_address = addr.legacy_io_address(offset & !3);
     unsafe {
         let _port_addr = 0x0CF8u16;
@@ -224,7 +348,7 @@ pub fn pci_read_u32(addr: PciAddress, offset: u8) -> u32 {
 }
 
 #[inline]
-pub fn pci_write_u8(addr: PciAddress, offset: u8, _value: u8) {
+fn pci_write_u8_hardware(addr: PciAddress, offset: u8, _value: u8) {
     let _config_address = addr.legacy_io_address(offset);
     unsafe {
         let _port_addr = 0x0CF8u16;
@@ -235,7 +359,7 @@ pub fn pci_write_u8(addr: PciAddress, offset: u8, _value: u8) {
 }
 
 #[inline]
-pub fn pci_write_u16(addr: PciAddress, offset: u8, _value: u16) {
+fn pci_write_u16_hardware(addr: PciAddress, offset: u8, _value: u16) {
     let _config_address = addr.legacy_io_address(offset & !1);
     unsafe {
         let _port_addr = 0x0CF8u16;
@@ -246,7 +370,7 @@ pub fn pci_write_u16(addr: PciAddress, offset: u8, _value: u16) {
 }
 
 #[inline]
-pub fn pci_write_u32(addr: PciAddress, offset: u8, _value: u32) {
+fn pci_write_u32_hardware(addr: PciAddress, offset: u8, _value: u32) {
     let _config_address = addr.legacy_io_address(offset & !3);
     unsafe {
         let _port_addr = 0x0CF8u16;
@@ -256,18 +380,59 @@ pub fn pci_write_u32(addr: PciAddress, offset: u8, _value: u32) {
     }
 }
 
+// Legacy compatibility functions (use PciConfigSpace for new code)
+#[inline]
+pub fn pci_read_u8(addr: PciAddress, offset: u8) -> u8 {
+    pci_read_u8_hardware(addr, offset)
+}
+
+#[inline]
+pub fn pci_read_u16(addr: PciAddress, offset: u8) -> u16 {
+    pci_read_u16_hardware(addr, offset)
+}
+
+#[inline]
+pub fn pci_read_u32(addr: PciAddress, offset: u8) -> u32 {
+    pci_read_u32_hardware(addr, offset)
+}
+
+#[inline]
+pub fn pci_write_u8(addr: PciAddress, offset: u8, value: u8) {
+    pci_write_u8_hardware(addr, offset, value)
+}
+
+#[inline]
+pub fn pci_write_u16(addr: PciAddress, offset: u8, value: u16) {
+    pci_write_u16_hardware(addr, offset, value)
+}
+
+#[inline]
+pub fn pci_write_u32(addr: PciAddress, offset: u8, value: u32) {
+    pci_write_u32_hardware(addr, offset, value)
+}
+
 // ============================================================================
 // PCI Device Enumeration
 // ============================================================================
 
 pub struct PciEnumerator {
     devices: Vec<PciDeviceInfo>,
+    config_space: PciConfigSpace,
 }
 
 impl PciEnumerator {
     pub fn new() -> Self {
         PciEnumerator {
             devices: Vec::new(),
+            config_space: PciConfigSpace::Hardware,
+        }
+    }
+
+    /// Create enumerator with simulated configuration space for testing
+    pub fn with_simulated_config(simulated_space: BTreeMap<(u16, u8, u8, u8), [u8; 256]>) -> Self {
+        PciEnumerator {
+            devices: Vec::new(),
+            config_space: PciConfigSpace::Simulated(Mutex::new(simulated_space)),
         }
     }
 
@@ -279,14 +444,14 @@ impl PciEnumerator {
             for device in 0..32u8 {
                 // Check function 0 first
                 let addr = PciAddress::new(0, bus, device, 0);
-                let vendor_id = pci_read_u16(addr, PCI_VENDOR_ID);
+                let vendor_id = self.config_space.read_u16(addr, PCI_VENDOR_ID);
 
                 if vendor_id == 0xffff || vendor_id == 0x0000 {
                     continue; // No device at this address
                 }
 
                 // Device found, check header type for multi-function devices
-                let header_type = pci_read_u8(addr, PCI_HEADER_TYPE);
+                let header_type = self.config_space.read_u8(addr, PCI_HEADER_TYPE);
                 let multi_function = (header_type & 0x80) != 0;
 
                 let max_functions = if multi_function { 8 } else { 1 };
@@ -304,7 +469,7 @@ impl PciEnumerator {
     }
 
     fn probe_device(&mut self, addr: PciAddress) -> Result<bool, &'static str> {
-        let vendor_id = pci_read_u16(addr, PCI_VENDOR_ID);
+        let vendor_id = self.config_space.read_u16(addr, PCI_VENDOR_ID);
 
         if vendor_id == 0xffff || vendor_id == 0x0000 {
             return Ok(false);
@@ -312,17 +477,17 @@ impl PciEnumerator {
 
         let mut device = PciDeviceInfo::new(addr);
         device.vendor_id = vendor_id;
-        device.device_id = pci_read_u16(addr, PCI_DEVICE_ID);
-        device.class_code = pci_read_u8(addr, PCI_CLASS_CODE);
-        device.subclass_code = pci_read_u8(addr, PCI_SUBCLASS_CODE);
-        device.prog_interface = pci_read_u8(addr, PCI_PROG_INTERFACE);
-        device.revision_id = pci_read_u8(addr, PCI_REVISION_ID);
-        device.header_type = pci_read_u8(addr, PCI_HEADER_TYPE);
-        device.subsystem_vendor_id = pci_read_u16(addr, PCI_SUBSYSTEM_VENDOR_ID);
-        device.subsystem_device_id = pci_read_u16(addr, PCI_SUBSYSTEM_DEVICE_ID);
-        device.interrupt_line = pci_read_u8(addr, PCI_INTERRUPT_LINE);
-        device.interrupt_pin = pci_read_u8(addr, PCI_INTERRUPT_PIN);
-        device.expansion_rom = pci_read_u32(addr, PCI_EXPANSION_ROM);
+        device.device_id = self.config_space.read_u16(addr, PCI_DEVICE_ID);
+        device.class_code = self.config_space.read_u8(addr, PCI_CLASS_CODE);
+        device.subclass_code = self.config_space.read_u8(addr, PCI_SUBCLASS_CODE);
+        device.prog_interface = self.config_space.read_u8(addr, PCI_PROG_INTERFACE);
+        device.revision_id = self.config_space.read_u8(addr, PCI_REVISION_ID);
+        device.header_type = self.config_space.read_u8(addr, PCI_HEADER_TYPE);
+        device.subsystem_vendor_id = self.config_space.read_u16(addr, PCI_SUBSYSTEM_VENDOR_ID);
+        device.subsystem_device_id = self.config_space.read_u16(addr, PCI_SUBSYSTEM_DEVICE_ID);
+        device.interrupt_line = self.config_space.read_u8(addr, PCI_INTERRUPT_LINE);
+        device.interrupt_pin = self.config_space.read_u8(addr, PCI_INTERRUPT_PIN);
+        device.expansion_rom = self.config_space.read_u32(addr, PCI_EXPANSION_ROM);
 
         // Read BARs
         self.probe_bars(&mut device)?;
@@ -344,7 +509,7 @@ impl PciEnumerator {
             }
 
             let bar_offset = PCI_BAR_0 + (i as u8 * 4);
-            let bar_raw = pci_read_u32(device.address, bar_offset);
+            let bar_raw = self.config_space.read_u32(device.address, bar_offset);
 
             if bar_raw == 0 {
                 continue;
@@ -358,9 +523,9 @@ impl PciEnumerator {
                 bar.address = address;
 
                 // Detect size by writing all 1s
-                pci_write_u32(device.address, bar_offset, 0xffffffff);
-                let size_mask = pci_read_u32(device.address, bar_offset);
-                pci_write_u32(device.address, bar_offset, bar_raw);
+                self.config_space.write_u32(device.address, bar_offset, 0xffffffff);
+                let size_mask = self.config_space.read_u32(device.address, bar_offset);
+                self.config_space.write_u32(device.address, bar_offset, bar_raw);
                 bar.size = ((!size_mask) & 0xfffc).wrapping_add(1) as u64;
 
                 device.bars[i] = Some(bar);
@@ -377,9 +542,9 @@ impl PciEnumerator {
                         bar.bar_type = PciBarType::Memory32Bit { prefetchable };
                         bar.address = address;
 
-                        pci_write_u32(device.address, bar_offset, 0xffffffff);
-                        let size_mask = pci_read_u32(device.address, bar_offset);
-                        pci_write_u32(device.address, bar_offset, bar_raw);
+                        self.config_space.write_u32(device.address, bar_offset, 0xffffffff);
+                        let size_mask = self.config_space.read_u32(device.address, bar_offset);
+                        self.config_space.write_u32(device.address, bar_offset, bar_raw);
                         bar.size = ((!size_mask) & 0xfffffff0).wrapping_add(1) as u64;
 
                         device.bars[i] = Some(bar);
@@ -389,20 +554,20 @@ impl PciEnumerator {
                         if i < 5 {
                             let address_low = (bar_raw & 0xfffffff0) as u64;
                             let bar_offset_high = bar_offset + 4;
-                            let address_high = pci_read_u32(device.address, bar_offset_high) as u64;
+                            let address_high = self.config_space.read_u32(device.address, bar_offset_high) as u64;
                             let address = (address_high << 32) | address_low;
 
                             let mut bar = PciBar::new(i as u8);
                             bar.bar_type = PciBarType::Memory64Bit { prefetchable };
                             bar.address = address;
 
-                            pci_write_u32(device.address, bar_offset, 0xffffffff);
-                            let size_mask_low = pci_read_u32(device.address, bar_offset);
-                            pci_write_u32(device.address, bar_offset, bar_raw);
+                            self.config_space.write_u32(device.address, bar_offset, 0xffffffff);
+                            let size_mask_low = self.config_space.read_u32(device.address, bar_offset);
+                            self.config_space.write_u32(device.address, bar_offset, bar_raw);
 
-                            pci_write_u32(device.address, bar_offset_high, 0xffffffff);
-                            let size_mask_high = pci_read_u32(device.address, bar_offset_high);
-                            pci_write_u32(device.address, bar_offset_high, (address_high & 0xffffffff) as u32);
+                            self.config_space.write_u32(device.address, bar_offset_high, 0xffffffff);
+                            let size_mask_high = self.config_space.read_u32(device.address, bar_offset_high);
+                            self.config_space.write_u32(device.address, bar_offset_high, (address_high & 0xffffffff) as u32);
 
                             let size = ((((size_mask_high as u64) << 32) | (size_mask_low as u64)) & 0xfffffffffffffff0)
                                 .wrapping_add(1);
@@ -421,7 +586,7 @@ impl PciEnumerator {
     }
 
     fn enable_device(&self, device: &PciDeviceInfo) -> Result<(), &'static str> {
-        let mut cmd = pci_read_u16(device.address, PCI_COMMAND);
+        let mut cmd = self.config_space.read_u16(device.address, PCI_COMMAND);
 
         // Enable I/O and memory access
         cmd |= PCI_CMD_IO_SPACE | PCI_CMD_MEMORY_SPACE | PCI_CMD_BUS_MASTER;
@@ -429,7 +594,7 @@ impl PciEnumerator {
         // Disable interrupt generation during initialization
         cmd |= PCI_CMD_INTERRUPT_DISABLE;
 
-        pci_write_u16(device.address, PCI_COMMAND, cmd);
+        self.config_space.write_u16(device.address, PCI_COMMAND, cmd);
 
         Ok(())
     }
@@ -511,6 +676,7 @@ impl PciDriverManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::BTreeMap;
 
     #[test]
     fn test_pci_bar_types() {
@@ -566,5 +732,80 @@ mod tests {
     fn test_pci_driver_manager_creation() {
         let manager = PciDriverManager::new();
         assert_eq!(manager.get_bound_devices().len(), 0);
+    }
+
+    #[test]
+    fn test_simulated_config_space() {
+        let mut simulated_space = BTreeMap::new();
+        let mut config = [0u8; 256];
+
+        // Set up a simulated Intel network card (e1000)
+        config[0x00] = 0x86; // Vendor ID low byte
+        config[0x01] = 0x80; // Vendor ID high byte (0x8086 = Intel)
+        config[0x02] = 0x09; // Device ID low byte
+        config[0x03] = 0x10; // Device ID high byte (0x1009)
+        config[0x09] = 0x02; // Class code (Network)
+        config[0x0a] = 0x00; // Subclass code (Ethernet)
+        config[0x0b] = 0x00; // Prog interface
+
+        simulated_space.insert((0, 0, 1, 0), config);
+
+        let config_space = PciConfigSpace::Simulated(Mutex::new(simulated_space));
+        let addr = PciAddress::new(0, 0, 1, 0);
+
+        let vendor_id = config_space.read_u16(addr, PCI_VENDOR_ID);
+        assert_eq!(vendor_id, 0x8086);
+
+        let device_id = config_space.read_u16(addr, PCI_DEVICE_ID);
+        assert_eq!(device_id, 0x1009);
+
+        let class_code = config_space.read_u8(addr, PCI_CLASS_CODE);
+        assert_eq!(class_code, 0x02);
+    }
+
+    #[test]
+    fn test_enumerator_with_simulated_config() {
+        let mut simulated_space = BTreeMap::new();
+        let mut config = [0u8; 256];
+
+        // Set up a simulated network device
+        config[0x00] = 0x86; // Vendor ID low byte
+        config[0x01] = 0x80; // Vendor ID high byte (0x8086 = Intel)
+        config[0x02] = 0x09; // Device ID low byte
+        config[0x03] = 0x10; // Device ID high byte (0x1009)
+        config[0x09] = 0x02; // Class code (Network)
+        config[0x0a] = 0x00; // Subclass code (Ethernet)
+        config[0x0b] = 0x00; // Prog interface
+        config[0x0e] = 0x00; // Header type (single function)
+
+        simulated_space.insert((0, 0, 1, 0), config);
+
+        let mut enumerator = PciEnumerator::with_simulated_config(simulated_space);
+        let count = enumerator.enumerate().unwrap();
+
+        assert_eq!(count, 1);
+        assert_eq!(enumerator.get_devices().len(), 1);
+
+        let device = &enumerator.get_devices()[0];
+        assert_eq!(device.vendor_id, 0x8086);
+        assert_eq!(device.device_id, 0x1009);
+        assert_eq!(device.class_code, 0x02);
+        assert!(device.is_valid());
+    }
+
+    #[test]
+    fn test_simulated_config_space_write() {
+        let mut simulated_space = BTreeMap::new();
+        let mut config = [0u8; 256];
+        simulated_space.insert((0, 0, 1, 0), config);
+
+        let config_space = PciConfigSpace::Simulated(Mutex::new(simulated_space));
+        let addr = PciAddress::new(0, 0, 1, 0);
+
+        config_space.write_u8(addr, 0x00, 0x86);
+        config_space.write_u8(addr, 0x01, 0x80);
+
+        let vendor_id = config_space.read_u16(addr, PCI_VENDOR_ID);
+        assert_eq!(vendor_id, 0x8086);
     }
 }
