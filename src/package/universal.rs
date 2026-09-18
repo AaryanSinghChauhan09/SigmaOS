@@ -2005,28 +2005,32 @@ impl DependencyResolver {
     }
 
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
-        let mut resolved: Vec<String> = Vec::new();
-        let mut to_visit: Vec<String> = Vec::new();
-        to_visit.push(package_name.to_string());
-        // Bolt ⚡ Optimization: Use HashSet for O(1) visited checks instead of O(N) linear scans on Vec
-        let mut visited: HashSet<String> = HashSet::new();
+        let pkg_count = self.packages.len();
+        // Bolt ⚡ Optimization: Pre-allocate capacity and use borrowed string references (&str)
+        // for to_visit stack and visited set to eliminate all intermediate String heap allocations during traversal.
+        let capacity = pkg_count.min(16);
+        let mut resolved: Vec<String> = Vec::with_capacity(capacity);
+        let mut to_visit: Vec<&str> = Vec::with_capacity(capacity);
+        let mut visited: HashSet<&str> = HashSet::with_capacity(capacity);
+
+        to_visit.push(package_name);
 
         while let Some(current) = to_visit.pop() {
-            if visited.contains(&current) {
+            if visited.contains(current) {
                 continue;
             }
 
-            visited.insert(current.clone());
+            visited.insert(current);
 
-            if let Some(package) = self.packages.get(&current) {
+            if let Some(package) = self.packages.get(current) {
                 for dep in &package.dependencies {
-                    if !visited.contains(dep) {
-                        to_visit.push(dep.clone());
+                    if !visited.contains(dep.as_str()) {
+                        to_visit.push(dep.as_str());
                     }
                 }
-                resolved.push(current);
+                resolved.push(current.to_string());
             } else {
-                return Err(PackageError::DependencyNotFound(current));
+                return Err(PackageError::DependencyNotFound(current.to_string()));
             }
         }
 
