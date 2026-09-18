@@ -44,7 +44,7 @@ impl core::fmt::Display for Version {
     }
 }
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
         Self {
