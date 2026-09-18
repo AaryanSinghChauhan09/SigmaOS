@@ -2,7 +2,7 @@
 // Inspired by TechCrunch, TechSpot, OpenSourceForU, and Appuals
 
 #[cfg(not(test))]
-use crate::klib::custom_string::SigmaString;
+use crate::klib::string::String;
 #[cfg(not(test))]
 use crate::klib::vec::Vec;
 

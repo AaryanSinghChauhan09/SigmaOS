@@ -1300,7 +1300,6 @@ impl IllumosDTraceTracingGovernor {
 }
 
 
-#[cfg(test)]
 mod tests {
     use super::*;
 
