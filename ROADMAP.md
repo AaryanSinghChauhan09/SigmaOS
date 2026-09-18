@@ -1,61 +1,66 @@
-# SigmaOS Canonical Roadmap: Desktop Edition & Beyond
+# SigmaOS Master Execution Roadmap
 
-> **Status Reference**:
-> - `[x] Implemented`: Complete, tested, and actively compiling in the codebase.
-> - `[~] Prototype`: In-tree prototype or specification ready for hardening.
-> - `[ ] Planned`: Actively scheduled milestone task.
-> - `[*] Research`: Long-term experimental exploration.
-
----
-
-## 🎯 Primary Focus: SigmaOS Desktop Edition (Milestones M0 – M5)
-
-### M0: Engineering Baseline (Status: ✅ Completed)
-- [x] Strict zero-external-dependency policy in `Cargo.toml` (`[dependencies]` is empty).
-- [x] Zero compilation errors across `cargo check --lib`.
-- [x] Unified repository with git branches pruned to `main` only.
-- [x] Clear engineering contract and separation between Desktop Edition and Research.
-- [x] Standardized documentation in `docs/` (`PRODUCT_VISION.md`, `RELEASE_CRITERIA.md`, `ARCHITECTURE_DECISIONS.md`, `SUPPORT_MATRIX.md`).
-
-### M1: QEMU Desktop Preview (Status: 🔄 Active)
-- [x] Zenith Wayland Compositor Core (`src/compositor/zenith_core.rs`): Direct buffer compositing, damage tracking, and multi-monitor output.
-- [x] Sub-second Boot Sequencer (`src/init/subsecond_boot_sequencer.rs`): Parallel stage activation (<250ms target).
-- [x] Omarchy QuickShell HUD Bridge (`src/distro/omarchy_master_synthesis.rs`): Top bar, launcher, and control center.
-- [~] Direct KMS/DRM scanout buffer integration with VirtIO-GPU.
-- [ ] Automated QEMU boot test emitting serial heartbeat and reaching desktop.
-
-### M2: Native Package MVP (`sigpkg`) (Status: 🔄 Active)
-- [x] Content-addressed Merkle Store (`src/sigpkg/merkle_store.rs`).
-- [x] Differential binary delta update engine with Adler-32 integrity (`src/sigpkg/delta_engine.rs`).
-- [x] Boolean SAT dependency solver with Gentoo/APT algebra (`src/sigpkg/boolean_dep_solver.rs`).
-- [x] Dilithium-5 cryptographic package signing authority (`src/sigpkg/package_signing.rs`).
-- [~] Atomic snapshot creation and one-command rollback tool (`sigma-pkg rollback`).
-
-### M3: Declarative Configuration & Theming (Status: 🔄 Active)
-- [x] Dynamic Theme Live Switcher (`OmarchyThemeLiveEngine`): Instant Tokyo-Night, Catppuccin, Gruvbox, and Nord palette switching.
-- [x] Web2App sandboxed launcher generator (`OmarchyAppSandbox`).
-- [~] Declarative profile specification (`/system/profile.toml`, `/user/theme.toml`).
-- [ ] Atomic generation switcher with recovery boot option.
-
-### M4: Hardware Alpha (Status: 📅 Planned)
-- [ ] Certified x86_64 bare-metal boot (Intel 8th+ Gen / AMD Ryzen).
-- [ ] Integrated graphics hardware acceleration.
-- [ ] Intel Wi-Fi / Realtek wired networking driver validation.
-- [ ] Hardware compatibility reporting tool.
-
-### M5: Stable Desktop Release (Status: 📅 Planned)
-- [ ] Public bootable ISO image with minimal installer.
-- [ ] Curated application bundle (terminal, editor, viewer, browser bridge).
-- [ ] Fail-safe recovery menu with automatic generational rollback.
+```
++-----------------------------------------------------------------------------------+
+|                        SIGMAOS DESKTOP EDITION ROADMAP                            |
++-----------------------------------------------------------------------------------+
+  Phase 0: Engineering Contract & Toolchain Baseline               [COMPLETE]
+  Phase 1: Build & Test Automation Baseline                         [COMPLETE]
+  Phase 2: SigmaOS Desktop Preview (Zenith Compositor)             [IN PROGRESS]
+  Phase 3: Production-Worthy Native `sigpkg` System                [PLANNED]
+  Phase 4: Declarative System State & Atomic A/B Updates           [PLANNED]
+  Phase 5: User-Understandable Capability Security                 [PLANNED]
+  Phase 6: Hardware Validation & Reference Device Support          [PLANNED]
+  Phase 7: Zenith Desktop Polish & Design System                   [PLANNED]
+  Phase 8: Developer SDK, Package Recipes & Ecosystem              [PLANNED]
++-----------------------------------------------------------------------------------+
+```
 
 ---
 
-## 🔬 Long-Term Research Tracks (Post-Desktop Release)
+## 📅 Staged Rollout Timeline & Persona Expansion
 
-| Track | Scope | Status |
-|---|---|---|
-| **Freestanding Microkernel** | Pure `#![no_std]` capability microkernel with seL4 formal isolation | [*] Research |
-| **Post-Quantum Mesh VPN** | PQC-WireGuard (`Kyber-1024` / `Dilithium-5`) inter-node mesh | [~] Prototype |
-| **Cluster Memory & Migration** | CRIU-style zero-downtime process migration across pooled nodes | [~] Prototype |
-| **Multi-Architecture** | Tier-1 support for ARM64 (Apple Silicon / Pi 5) and RISC-V 64 | [*] Research |
-| **Universal Distro ABI** | Complete binary compatibility for Linux ELF and FreeBSD binaries | [*] Research |
+### 6 Months (v1.0 – Core Essentials)
+- **Lightweight Text Editor**: Quick edits out-of-the-box (`sigma-edit`).
+- **Universal Compression Utility**: Universal archive support (`.tar.gz`, `.tar.xz`, `.zip`, `.zst`, `.7z`).
+- **Network Diagnostics Engine**: Integrated utilities (`ping`, `curl`, `traceroute`, `netstat`).
+- **System Monitoring Dashboard**: Integrated resource view (`sigma-top` / Zenith HUD).
+- **Backup Snapshot Tool**: Btrfs/ZFS O(1) CAS generation checkpoints and rollback baseline (`sigpkg rollback`).
+
+---
+
+### 12 Months (v1.2 – Persona Expansion)
+- **Developer Persona**:
+  - File Conversion Utility (`sigma-convert` for code/media format conversions).
+  - Lightweight IDE overlay with LSP language server integration.
+- **Compliance Persona**:
+  - Universal Package Fetcher (`sigpkg fetch` for drivers and apps).
+  - Compliance Checklist Generator (automated CIS, ISO 27001, SOC2 reports).
+
+---
+
+### 18 Months (v1.5 – Differentiation Layer)
+- **Student Persona**:
+  - Productivity Micro-Tools (Pomodoro timer, checklist manager, quick notes).
+  - Flashcard/quiz overlay for interactive study.
+- **Gaming Persona**:
+  - GPU scheduler micro-tool for performance tuning.
+  - Network latency monitor for network optimization and bufferbloat reduction.
+
+---
+
+## 📊 Timeline Dashboard
+
+| Milestone | Key Tools & Capabilities | Target Persona | Impact & Strategy |
+|:---|:---|:---|:---|
+| **6 Months (v1.0)** | Text editor, compression, network diagnostics, monitoring, snapshot rollback | Core OS Baseline | **Completeness Baseline** |
+| **12 Months (v1.2)** | File converter, IDE overlay, package fetcher, compliance tools | Developer + Compliance | **Adoption Boost** |
+| **18 Months (v1.5)** | Productivity tools, flashcard/quiz overlay, GPU scheduler, latency monitor | Student + Gaming | **Market Differentiation** |
+
+---
+
+## Detailed Phase Status
+1. **Phase 0 & 1 (Baseline)**: Consolidated Rust std desktop development target with 100% test pass rates across native Rust runner (`./run_sigma_tests.sh`) and pytest suites.
+2. **Phase 2 (Desktop Preview)**: Zenith compositor prototype with keyboard-driven Wayland tiling, WASM UI bridge, and integrated control center.
+3. **Phase 3 (Universal Package Engine)**: Multi-distro format adapter supporting 60+ Linux/BSD package extensions with GPG verification and CoW snapshot rollbacks.
+4. **Phase 4 - 8 (Next Steps)**: Hardware matrix qualification, declarative profile activation, Zorin Exec Guard integration, and community recipe SDK.
