@@ -358,7 +358,7 @@ impl Default for AliasManager {
 }
 
 // UNIT TESTS FOR ALIAS SYSTEM
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
