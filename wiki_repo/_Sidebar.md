@@ -86,6 +86,9 @@ n- **[[Advanced NVIDIA GPU Support|Advanced-NVIDIA-GPU-Support]]**
 - **[[Gentoo Portage Integration|Gentoo-Portage-Integration]]**
 n- **[[System Monitoring & Observability|System-Monitoring-and-Observability]]**
 n- **[[Container Orchestration|Container-Orchestration]]**
+n- **[[Filesystem Support Matrix|Filesystem-Support-Matrix]]**
+- **[[Networking Support Matrix|Networking-Support-Matrix]]**
+
 
 
 n- **[[Naming Conventions & Rules|Naming-Conventions-and-Rules]]**

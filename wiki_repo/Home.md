@@ -144,6 +144,14 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
 
+- **[Filesystem Support Matrix](Filesystem-Support-Matrix)**
+  ext4, XFS, Btrfs, ZFS, UFS, Hammer2, NFS, SMB, SSHFS, encryption.
+
+- **[Networking Support Matrix](Networking-Support-Matrix)**
+  IPv4/IPv6, bonding, VLANs, VPNs, namespaces, bridging.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
 - **[Container Orchestration](Container-Orchestration)**
   Kubernetes-compatible APIs, pod scheduling, service discovery, and autoscaling.
 

@@ -92,6 +92,8 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Hardware & Platform
+- [Filesystem Support Matrix](Filesystem-Support-Matrix) — ext4, XFS, Btrfs, ZFS, UFS, Hammer2, NFS, SMB, SSHFS, encryption
+- [Networking Support Matrix](Networking-Support-Matrix) — IPv4/IPv6, bonding, VLANs, VPNs, namespaces, bridging
 
 - [Hardware Support Matrix](SUPPORT_MATRIX) — Comprehensive hardware compatibility and support matrix
 - [Multi-Architecture Support](ARCHITECTURE) — Support for x86_64, AArch64, and other architectures
