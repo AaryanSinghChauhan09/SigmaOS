@@ -56,6 +56,8 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Performance & Kernel
+- [Process Management](Process-Management) — Process scheduling, cgroups, resource limits, namespaces
+- [Memory Management](Memory-Management) — Virtual memory, demand paging, slab allocator, memory compaction
 
 - [Demand Paging & Swap](Demand-Paging-and-Swap) — Memory management with demand paging and swap support
 - [Kernel Syscall Enforcement](Kernel-Syscall-Enforcement) — Kernel-space syscall restriction and security enforcement

@@ -84,6 +84,9 @@ n- **[[Advanced NVIDIA GPU Support|Advanced-NVIDIA-GPU-Support]]**
 - **[[USB3/4 xHCI Full Support|USB3-4-xHCI-Full-Support]]**
 - **[[Mach/Zircon Zero-Copy IPC|Mach-Zircon-Zero-Copy-IPC]]**
 - **[[Gentoo Portage Integration|Gentoo-Portage-Integration]]**
+n- **[[Process Management|Process-Management]]**
+- **[[Memory Management|Memory-Management]]**
+
 n- **[[Security Hardening Guide|Security-Hardening-Guide]]**
 
 n- **[[System Monitoring & Observability|System-Monitoring-and-Observability]]**

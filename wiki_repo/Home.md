@@ -144,6 +144,14 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
 
+- **[Process Management](Process-Management)**
+  Process scheduling, cgroups, resource limits, namespaces.
+
+- **[Memory Management](Memory-Management)**
+  Virtual memory, demand paging, slab allocator, memory compaction.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
 - **[Security Hardening Guide](Security-Hardening-Guide)**
   Kernel hardening, application sandboxing, secure coding practices.
 
