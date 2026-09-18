@@ -640,6 +640,12 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "compositor" => {
+                Ok(format!(
+                    "Dispatched Wayland/Gamescope/Hyprland HDR compositor pipeline for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "compression" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'compression' with action '{}' under distro mode '{:?}'",
@@ -930,6 +936,12 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "launcher" => {
+                Ok(format!(
+                    "Dispatched Rofi/KRunner/Dmenu application launcher query for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "legal" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'legal' with action '{}' under distro mode '{:?}'",
@@ -986,6 +998,12 @@ impl SovereignUniversalDistroBridge {
                 Ok(format!(
                     "Dispatched memory KARL/W^X allocation at {:#X} for '{}' under distro mode '{:?}'",
                     virt_addr, action, self.mode
+                ))
+            }
+            "monitor" => {
+                Ok(format!(
+                    "Dispatched Fastfetch/HTOP/Stacer real-time telemetry monitor for '{}' under distro mode '{:?}'",
+                    action, self.mode
                 ))
             }
             "monitoring" => {
@@ -1072,9 +1090,21 @@ impl SovereignUniversalDistroBridge {
                     action, self.mode
                 ))
             }
+            "notification" => {
+                Ok(format!(
+                    "Dispatched Dunst/KNotify desktop notification routing for '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
             "observability" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'observability' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "onboarding" => {
+                Ok(format!(
+                    "Dispatched Calamares/Archinstall distro onboarding workflow for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -1308,6 +1338,12 @@ impl SovereignUniversalDistroBridge {
             "testing" => {
                 Ok(format!(
                     "Dispatched operation for subsystem 'testing' with action '{}' under distro mode '{:?}'",
+                    action, self.mode
+                ))
+            }
+            "theming" => {
+                Ok(format!(
+                    "Dispatched Omarchy System Theme Studio palette switch for '{}' under distro mode '{:?}'",
                     action, self.mode
                 ))
             }
@@ -1602,6 +1638,7 @@ impl SovereignUniversalDistroBridge {
             "community",
             "compatibility",
             "compliance",
+            "compositor",
             "compression",
             "config",
             "container",
@@ -1648,6 +1685,7 @@ impl SovereignUniversalDistroBridge {
             "klib",
             "lang",
             "launch_ready",
+            "launcher",
             "legal",
             "loader",
             "location",
@@ -1657,13 +1695,16 @@ impl SovereignUniversalDistroBridge {
             "microphone",
             "ml",
             "mm",
+            "monitor",
             "monitoring",
             "net",
             "network",
             "networking",
             "nim",
             "nlp",
+            "notification",
             "observability",
+            "onboarding",
             "orchestration",
             "package",
             "performance",
@@ -1700,6 +1741,7 @@ impl SovereignUniversalDistroBridge {
             "syscall",
             "system",
             "testing",
+            "theming",
             "thermal",
             "thread",
             "time",
@@ -3196,6 +3238,28 @@ mod cross_subsystem_tests {
 
         let res3 = bridge.dispatch_cross_subsystem_operation("mint_update", "level1").unwrap();
         assert!(res3.contains("Linux MintUpdate safety policy evaluation"));
+    }
+
+    #[test]
+    fn test_new_subsystems_bridge_dispatch() {
+        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
+        let res_comp = bridge.dispatch_cross_subsystem_operation("compositor", "enable_hdr").unwrap();
+        assert!(res_comp.contains("Wayland/Gamescope/Hyprland HDR compositor pipeline"));
+
+        let res_launch = bridge.dispatch_cross_subsystem_operation("launcher", "firefox").unwrap();
+        assert!(res_launch.contains("Rofi/KRunner/Dmenu application launcher query"));
+
+        let res_mon = bridge.dispatch_cross_subsystem_operation("monitor", "cpu").unwrap();
+        assert!(res_mon.contains("Fastfetch/HTOP/Stacer real-time telemetry monitor"));
+
+        let res_notify = bridge.dispatch_cross_subsystem_operation("notification", "popup").unwrap();
+        assert!(res_notify.contains("Dunst/KNotify desktop notification routing"));
+
+        let res_onboard = bridge.dispatch_cross_subsystem_operation("onboarding", "welcome_wizard").unwrap();
+        assert!(res_onboard.contains("Calamares/Archinstall distro onboarding workflow"));
+
+        let res_theme = bridge.dispatch_cross_subsystem_operation("theming", "catppuccin").unwrap();
+        assert!(res_theme.contains("Omarchy System Theme Studio palette switch"));
     }
 
     #[test]
