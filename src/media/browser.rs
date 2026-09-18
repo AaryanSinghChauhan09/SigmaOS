@@ -1351,106 +1351,7 @@ impl TorPluggableTransportEngine {
 }
 
 // =========================================================================
-// 22. V8 SANDBOX SECURITY & SPIDERMONKEY GC ISOLATION ENGINES
-// =========================================================================
-
-pub struct V8SandboxSecurityEngine {
-    pub sandbox_base_address: u64,
-    pub sandbox_size_bytes: usize,
-    pub bounds_checks_passed: u64,
-}
-
-impl V8SandboxSecurityEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            sandbox_base_address: 0x0000_7FFF_0000_0000,
-            sandbox_size_bytes: 1024 * 1024 * 1024, // 1 GB isolate
-            bounds_checks_passed: 0,
-        }
-    }
-
-    pub fn validate_pointer_in_sandbox(&mut self, ptr: u64) -> bool {
-        if ptr >= self.sandbox_base_address && ptr < self.sandbox_base_address + self.sandbox_size_bytes as u64 {
-            self.bounds_checks_passed += 1;
-            true
-        } else {
-            false
-        }
-    }
-}
-
-pub struct SpiderMonkeyGcEngine {
-    pub gc_cycles_completed: u64,
-    pub total_freed_bytes: usize,
-}
-
-impl SpiderMonkeyGcEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            gc_cycles_completed: 0,
-            total_freed_bytes: 0,
-        }
-    }
-
-    pub fn trigger_incremental_gc(&mut self, allocated_bytes: usize) -> usize {
-        self.gc_cycles_completed += 1;
-        let freed = allocated_bytes / 2;
-        self.total_freed_bytes += freed;
-        freed
-    }
-}
-
-// =========================================================================
-// 23. QUIC HTTP/3 & DUCKDUCKGO PRIVACY PRO ENGINES
-// =========================================================================
-
-pub struct QuicHttp3ConnectionEngine {
-    pub active_streams: BTreeMap<u64, String>,
-    pub zero_rtt_handshake_enabled: bool,
-}
-
-impl QuicHttp3ConnectionEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            active_streams: BTreeMap::new(),
-            zero_rtt_handshake_enabled: true,
-        }
-    }
-
-    pub fn open_quic_stream(&mut self, stream_id: u64, target_host: &str) -> String {
-        self.active_streams.insert(stream_id, target_host.to_string());
-        format!("quic://{}:443/stream_{}", target_host, stream_id)
-    }
-}
-
-pub struct DuckDuckGoPrivacyProEngine {
-    pub vpn_tunnel_active: bool,
-    pub identity_theft_restoration_enabled: bool,
-}
-
-impl DuckDuckGoPrivacyProEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            vpn_tunnel_active: true,
-            identity_theft_restoration_enabled: true,
-        }
-    }
-
-    pub fn route_through_privacy_vpn(&self, raw_ip: &str) -> String {
-        if self.vpn_tunnel_active {
-            format!("vpn_tun://encrypted_relay.duckduckgo.com?exit={}", raw_ip)
-        } else {
-            raw_ip.to_string()
-        }
-    }
-}
-
-// =========================================================================
-// 24. UNIFIED SIGMAWEB BROWSER SUITE
+// 22. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
 pub struct SigmaWebBrowser {
@@ -1475,10 +1376,6 @@ pub struct SigmaWebBrowser {
     pub waterfox_legacy: WaterfoxLegacyExtensionEngine,
     pub ladybird_libweb: LadybirdLibWebEngine,
     pub tor_transport: TorPluggableTransportEngine,
-    pub v8_sandbox: V8SandboxSecurityEngine,
-    pub spidermonkey_gc: SpiderMonkeyGcEngine,
-    pub http3_quic: QuicHttp3ConnectionEngine,
-    pub ddg_privacy_pro: DuckDuckGoPrivacyProEngine,
 }
 
 impl SigmaWebBrowser {
@@ -1506,10 +1403,6 @@ impl SigmaWebBrowser {
             waterfox_legacy: WaterfoxLegacyExtensionEngine::new(),
             ladybird_libweb: LadybirdLibWebEngine::new(),
             tor_transport: TorPluggableTransportEngine::new(),
-            v8_sandbox: V8SandboxSecurityEngine::new(),
-            spidermonkey_gc: SpiderMonkeyGcEngine::new(),
-            http3_quic: QuicHttp3ConnectionEngine::new(),
-            ddg_privacy_pro: DuckDuckGoPrivacyProEngine::new(),
         }
     }
 
@@ -1864,24 +1757,5 @@ mod tests {
         brave.cname_aliases.insert("tracker.b.com".to_string(), "ad-server.net".to_string());
         assert_eq!(brave.resolve_cname_uncloak("tracker.a.com"), "ad-server.net");
         assert!(brave.should_hide_cosmetic_element("##.ad-banner"));
-    }
-
-    #[test]
-    fn test_v8_spidermonkey_quic_and_ddg_privacy_pro() {
-        let mut v8 = V8SandboxSecurityEngine::new();
-        assert!(v8.validate_pointer_in_sandbox(0x0000_7FFF_0000_1000));
-        assert!(!v8.validate_pointer_in_sandbox(0x0000_0000_0000_0000));
-
-        let mut sm_gc = SpiderMonkeyGcEngine::new();
-        let freed = sm_gc.trigger_incremental_gc(2048);
-        assert_eq!(freed, 1024);
-
-        let mut quic = QuicHttp3ConnectionEngine::new();
-        let stream = quic.open_quic_stream(1, "example.org");
-        assert!(stream.contains("quic://example.org"));
-
-        let ddg_pro = DuckDuckGoPrivacyProEngine::new();
-        let routed = ddg_pro.route_through_privacy_vpn("1.1.1.1");
-        assert!(routed.contains("vpn_tun://"));
     }
 }
