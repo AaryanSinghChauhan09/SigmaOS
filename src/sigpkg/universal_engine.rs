@@ -152,7 +152,7 @@ impl PackageFormat {
         } else if normalized.ends_with(".nixpkg") || normalized.ends_with(".nix") {
             Some(PackageFormat::Nix)
         } else if normalized.ends_with(".ebuild") {
-            Some(PackageFormat::Ebuild)
+            Some(PackageFormat::Portage)
         } else if normalized.ends_with(".portage") {
             Some(PackageFormat::Portage)
         } else if normalized.ends_with(".openbsd.tgz") {

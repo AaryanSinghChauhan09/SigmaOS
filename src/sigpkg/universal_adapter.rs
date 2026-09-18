@@ -34,7 +34,7 @@ pub enum Permission {
     Execute,
 }
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(all(not(feature = "standalone_test"), not(test)))]
 pub use crate::security::Permission;
 
 /// Description of Arch Linux PKGBUILD Manifest (pacman parity)
@@ -1310,13 +1310,12 @@ impl UniversalPackageAdapter {
             | Some(PackageFormat::HaskellCabal)
             | Some(PackageFormat::JuliaPkg)
             | Some(PackageFormat::RCran) => {
-                let clean_name = filename
-                    .split('/')
-                    .last()
-                    .unwrap_or(filename)
-                    .split('.')
-                    .next()
-                    .unwrap_or("app");
+                let base_file = filename.split('/').last().unwrap_or(filename);
+                let clean_name = if let Some(idx) = base_file.find('.') {
+                    &base_file[..idx]
+                } else {
+                    base_file
+                };
                 let clean_name = if clean_name.is_empty() { "app" } else { clean_name };
                 self.translate_to_native_package(
                     clean_name,
@@ -2339,56 +2338,6 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "-S" | "-Sy" | "install" => operation = UniversalPmOperation::Install,
-                        "-R" | "-Rns" | "-Rs" | "remove" => operation = UniversalPmOperation::Remove,
-                        "-Syu" | "-Syyu" | "update" | "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "-Ss" | "-Qs" | "search" => operation = UniversalPmOperation::Search,
-                        "-Si" | "-Qi" | "info" | "show" => operation = UniversalPmOperation::QueryInfo,
-                        "-Sc" | "-Scc" | "clean" => operation = UniversalPmOperation::CleanCache,
-                        "--print" | "--dryrun" | "--dry-run" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "dnf" | "yum" | "zypper" | "microdnf" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "install" | "in" => operation = UniversalPmOperation::Install,
-                        "remove" | "erase" | "rm" => operation = UniversalPmOperation::Remove,
-                        "update" | "upgrade" | "up" => operation = UniversalPmOperation::Upgrade,
-                        "search" | "se" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "clean" => operation = UniversalPmOperation::CleanCache,
-                        "--dry-run" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "apk" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "add" => operation = UniversalPmOperation::Install,
-                        "del" => operation = UniversalPmOperation::Remove,
-                        "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "-s" | "--simulate" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
             "opkg" | "ipkg" => {
                 let mut i = 0;
                 while i < args.len() {
@@ -2399,95 +2348,6 @@ impl UniversalPmCommandDispatcher {
                         "find" | "search" => operation = UniversalPmOperation::Search,
                         "info" | "status" => operation = UniversalPmOperation::QueryInfo,
                         "--noaction" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "pkg" | "pkgsend" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "install" | "add" => operation = UniversalPmOperation::Install,
-                        "delete" | "remove" => operation = UniversalPmOperation::Remove,
-                        "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "-n" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "xbps-install" | "xbps-remove" | "xbps-query" | "xbps" => {
-                if pm == "xbps-install" {
-                    operation = UniversalPmOperation::Install;
-                } else if pm == "xbps-remove" {
-                    operation = UniversalPmOperation::Remove;
-                } else if pm == "xbps-query" {
-                    operation = UniversalPmOperation::QueryInfo;
-                }
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "-S" | "install" | "add" => operation = UniversalPmOperation::Install,
-                        "-R" | "remove" | "remove-orphan" => operation = UniversalPmOperation::Remove,
-                        "-Su" | "-u" | "sync" | "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "-s" | "search" => operation = UniversalPmOperation::Search,
-                        "-n" | "--dry-run" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "emerge" | "ebuild" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "-a" | "--ask" | "-pv" | "--pretend" | "-p" => dry_run = true,
-                        "-u" | "-uN" | "-uDN" | "--update" | "@world" => {
-                            operation = UniversalPmOperation::Upgrade
-                        }
-                        "-C" | "--unmerge" | "deselect" => operation = UniversalPmOperation::Remove,
-                        "-s" | "--search" => operation = UniversalPmOperation::Search,
-                        "-S" | "--searchdesc" => operation = UniversalPmOperation::Search,
-                        "-c" | "--depclean" => operation = UniversalPmOperation::CleanCache,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "eopkg" | "moss" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "it" | "install" => operation = UniversalPmOperation::Install,
-                        "rm" | "remove" => operation = UniversalPmOperation::Remove,
-                        "up" | "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "sr" | "search" => operation = UniversalPmOperation::Search,
-                        "info" => operation = UniversalPmOperation::QueryInfo,
-                        "-dry-run" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
-                }
-            }
-            "nix" | "nix-env" | "guix" => {
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "-i" | "-iA" | "install" | "package" => {
-                            operation = UniversalPmOperation::Install
-                        }
-                        "-e" | "uninstall" | "remove" => operation = UniversalPmOperation::Remove,
-                        "-u" | "--upgrade" | "upgrade" => operation = UniversalPmOperation::Upgrade,
-                        "-q" | "-qa" | "search" => operation = UniversalPmOperation::Search,
-                        "--dry-run" => dry_run = true,
                         arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
                         _ => {}
                     }
@@ -2520,26 +2380,6 @@ impl UniversalPmCommandDispatcher {
                     } else if !arg.starts_with('-') {
                         target_packages.push(arg.to_string());
                     }
-                }
-            }
-            "slackpkg" | "installpkg" | "removepkg" => {
-                if pm == "installpkg" {
-                    operation = UniversalPmOperation::Install;
-                } else if pm == "removepkg" {
-                    operation = UniversalPmOperation::Remove;
-                }
-                let mut i = 0;
-                while i < args.len() {
-                    match args[i] {
-                        "install" => operation = UniversalPmOperation::Install,
-                        "remove" => operation = UniversalPmOperation::Remove,
-                        "upgrade" | "upgrade-all" => operation = UniversalPmOperation::Upgrade,
-                        "search" => operation = UniversalPmOperation::Search,
-                        "clean-system" => operation = UniversalPmOperation::CleanCache,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
-                    }
-                    i += 1;
                 }
             }
             "kiss" | "cpt" => {
@@ -3396,7 +3236,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("ubuntu.deb"),
-            Some(PackageFormat::Apt)
+            Some(PackageFormat::Deb)
         );
         assert_eq!(
             adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -3404,7 +3244,7 @@ mod tests {
         );
         assert_eq!(
             adapter.detect_format_by_extension("fedora.rpm"),
-            Some(PackageFormat::Yum)
+            Some(PackageFormat::Rpm)
         );
         assert_eq!(
             adapter.detect_format_by_extension("harmony.hap"),

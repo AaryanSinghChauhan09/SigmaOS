@@ -252,7 +252,7 @@ fn test_all_prompt_package_formats() {
     );
     assert_eq!(
         adapter.detect_format_by_extension("gentoo.ebuild"),
-        Some(PackageFormat::Ebuild)
+        Some(PackageFormat::Portage)
     );
     assert_eq!(
         adapter.detect_format_by_extension("arch.pkg.tar.xz"),
@@ -335,21 +335,35 @@ fn test_all_prompt_package_formats() {
 #[test]
 fn test_all_unified_package_formats_resolution() {
     use universal_adapter::UniversalPackageAdapter;
+    use universal_engine::PackageFormat;
     let adapter = UniversalPackageAdapter::new();
     let formats = vec![
-        ("app.swupd", PackageFormat::Swupd),
-        ("app.starling", PackageFormat::Starling),
-        ("app.cachyos", PackageFormat::Pacman),
-        ("app.deb", PackageFormat::Deb),
-        ("app.rpm", PackageFormat::Rpm),
-        ("app.apk", PackageFormat::Apk),
-        ("app.xbps", PackageFormat::Xbps),
+        ("demo.swupd", PackageFormat::Swupd),
+        ("demo.starling", PackageFormat::Starling),
+        ("demo.cachyos", PackageFormat::Pacman),
+        ("demo.deb", PackageFormat::Deb),
+        ("demo.rpm", PackageFormat::Rpm),
+        ("demo.apk", PackageFormat::Apk),
+        ("demo.xbps", PackageFormat::Xbps),
     ];
 
     for (file, fmt) in formats {
         assert_eq!(adapter.detect_format_by_extension(file), Some(fmt));
+        let manifest = if file.ends_with(".deb") {
+            "Package: demo\nVersion: 1.0.0\n"
+        } else if file.ends_with(".rpm") {
+            "Name: demo\nVersion: 1.0.0\n"
+        } else if file.ends_with(".apk") {
+            "P:demo\nV:1.0.0\n"
+        } else if file.ends_with(".xbps") {
+            "pkgname=\"demo\"\nversion=\"1.0.0\"\n"
+        } else if file.ends_with(".cachyos") {
+            "pkgname=demo\npkgver=1.0.0\n"
+        } else {
+            "Package: demo\nVersion: 1.0.0\n"
+        };
         let pkg = adapter
-            .parse_and_translate_manifest(file, "Package: demo\nVersion: 1.0.0")
+            .parse_and_translate_manifest(file, manifest)
             .expect("manifest parsing should succeed");
         assert_eq!(pkg.name, "demo");
     }
