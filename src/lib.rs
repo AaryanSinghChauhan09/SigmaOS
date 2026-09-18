@@ -47,6 +47,8 @@ pub mod installer;
 pub mod ml;
 pub mod virtualization;
 pub mod interrupt;
+pub mod ipc;
+pub use network as net;
 pub use desktop::{
     Gnome46MutterEngine, KdePlasma6Engine, LuminaBsdDesktopEngine, SwayRegolithWmEngine, Xfce418Engine,
     CachyosGamescopeHandheldOverlay, ItsFossQuickShareAndBackupHud, PhoronixPerformanceBenchmarkWidget,

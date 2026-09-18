@@ -6,7 +6,7 @@ Welcome to SigmaOS! A modern, production-ready operating system implementing ent
 
 - **[Getting Started](#getting-started)** - Build and run SigmaOS
 - **[Master AI Agent Algorithm Diagnostics & Fix Guide](WHAT_IS_WORKING_AND_NOT_WORKING.md)** - Diagnostics & Safe Rust Blueprints
-- **[Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V27](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V27.md)** - Master Omnipresent Self-Sufficiency Blueprint
+- **[Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V28](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V28.md)** - Master Omnipresent Self-Sufficiency Blueprint
 - **[Architecture](#architecture)** - System design and components
 - **[Phase 8 Features](#phase-8-features)** - 5 Tier 1 features (v0.8)
 - **[API Reference](#api-reference)** - Complete API documentation

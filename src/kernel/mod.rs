@@ -1,131 +1,63 @@
+#![allow(ambiguous_glob_reexports)]
 // SigmaOS Kernel Module
-// Following kernel-specific AGENTS.md guidelines for no_std compliance and safe Rust
-
-// Core Kernel Modules
 pub mod architecture;
 pub mod atomic_extended;
+pub mod cgroup_v2;
+pub mod kqueue_event;
+pub mod cgroup_controllers;
+pub mod block_dev;
+pub mod bore;
+pub mod breakthrough;
+pub mod breakthroughs;
+pub mod breakthroughs_v2;
+pub mod bus;
+pub mod classic_os;
+pub mod component;
 pub mod console;
+pub mod missing_linux_kernel_components;
 pub mod cpu_features;
+pub mod cpufreq;
 pub mod device;
 pub mod driver;
-pub mod exports;
-pub mod meta;
-pub mod object;
-pub mod structures;
-pub mod traits;
-pub mod virtual_cpu;
-
-// Memory Management (Following no_std guidelines)
-pub mod memory;
-pub mod paging;
-pub mod vmm_paging;
-pub mod numa_allocator;
-pub mod generation_manager;
-
-// Process & Scheduling (Following lock hierarchy: Scheduler -> Memory Manager -> VFS -> Device/Driver)
-pub mod process;
-pub mod scheduler;
-pub mod sched;
-pub mod roundrobin;
-pub mod bore;
-pub mod numa_scheduler;
-
-// System Call & IPC (Following privilege separation guidelines)
-pub mod ipc;
-pub mod pipes;
-pub mod kqueue;
-pub mod kqueue_event;
-pub mod namespaces;
-pub mod policy_mechanism;
-
-// eBPF & Security (Following eBPF verification guidelines)
+pub mod dtrace_compat;
 pub mod ebpf;
 pub mod ebpf_vm;
 pub mod ebpf_verification;
-
-// Cgroup & Resource Management
-pub mod cgroup_v2;
-pub mod cgroup_controllers;
-
-// Linux/BSD Compatibility Layers
-pub mod linux_parity;
-pub mod linux_bsd_innovations;
-pub mod linux_absorb;
-pub mod missing_linux_kernel_components;
-pub mod dtrace_compat;
-
-// Advanced Features
-pub mod io_uring;
-pub mod nextgen_breakthroughs;
-pub mod breakthroughs;
-pub mod breakthroughs_v2;
-pub mod breakthrough;
+pub mod exports;
 pub mod gap_closing;
 pub mod gap_filling;
-pub mod os_innovations;
-pub mod performance;
-pub mod classic_os;
-pub mod component;
-pub mod module_loader;
-pub mod net;
-pub mod bus;
-pub mod block_dev;
-pub mod cpufreq;
-
-// Sovereign Phase 1 Modules
-pub mod sigma_version;
-pub mod sigma_kernel_autotuner_v2;
-pub mod xdp_engine_sovereign;
-pub mod live_migration_engine;
-
-// Re-exports (Following Interface Segregation Principle - specific exports rather than glob)
-// Linux Parity Components
+pub mod generation_manager;
+pub mod io_uring;
+pub mod ipc;
+pub mod kqueue;
+pub mod linux_absorb;
+pub mod linux_bsd_innovations;
+pub mod linux_parity;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
     LinuxKernelWorkqueueEngine, LinuxRcuSynchronizationEngine, RcuCallback, WorkItem,
 };
+pub mod memory;
+pub mod meta;
+pub mod module_loader;
+pub mod namespaces;
+pub mod net;
+pub mod nextgen_breakthroughs;
+pub mod numa_allocator;
+pub mod numa_scheduler;
+pub mod object;
+pub mod os_innovations;
+pub mod paging;
+pub mod performance;
+pub mod pipes;
+pub mod process;
+pub mod policy_mechanism;
+pub mod roundrobin;
+pub mod sched;
+pub mod scheduler;
+pub mod structures;
+pub mod virtual_cpu;
 
-// Memory Management Components
-pub use memory::{
-    BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
-    MemoryBlock, PcieResourceAllocator, ResourceLimits, SigmaResourceAllocatorHub,
-    SlabObjectCacheAllocator, SlabSizeClass, PAGE_SIZE,
-};
-
-// IPC Components
-pub use ipc::{Channel, IpcError, IpcManager, Message};
-pub use pipes::*;
-
-// Memory Management Components
-pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
-pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
-pub use generation_manager::{Generation, GenerationManager};
-
-// Scheduler Components
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use roundrobin::{
-    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
-};
-
-// I/O Components
-pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
-
-// Kqueue Components
-pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
-
-// Breakthrough Components
-pub use breakthroughs::{
-    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
-    UniversalAbiTranslator, UserDefinedKernelFunctions,
-};
-
-// Gap Closing Components
-pub use gap_closing::{
-    AcpiInterruptManager, GapError, IrqRoutingTable, JournalBlock, JournalState, MetadataJournal,
-    Pml4PageTableEntry, VirtualMemoryPagingManager,
-};
-
-// Linux Kernel Components
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
     KprobeEntry, LinuxEpollEventPollEngine, LinuxKernelAuditSubsystemEngine,
@@ -133,12 +65,78 @@ pub use missing_linux_kernel_components::{
     LinuxSeccompBpfSyscallFilterEngine, MemcgProcessEntry, SeccompAction, UffdFaultEvent, UffdMode,
     UffdRegisteredRange, UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
 };
+pub mod traits;
+pub mod vmm_paging;
 
-// Meta Components
+#[allow(ambiguous_glob_reexports)]
+pub use architecture::*;
+pub use bus::*;
+pub use crate::kernel::linux_bsd_innovations::*;
+pub use pipes::*;
+pub use policy_mechanism::*;
+#[allow(ambiguous_glob_reexports)]
+pub use structures::*;
+pub use breakthroughs::{
+    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions,
+};
+pub use gap_closing::{
+    AcpiInterruptManager, GapError, IrqRoutingTable, JournalBlock, JournalState, MetadataJournal,
+    Pml4PageTableEntry, VirtualMemoryPagingManager,
+};
+pub use generation_manager::{Generation, GenerationManager};
+pub use io_uring::{CompletionQueueEntry, IoUringEngine, IoUringOpcode, SubmissionQueueEntry};
+pub use ipc::{Channel, IpcError, IpcManager, Message};
+pub use crate::kernel::linux_bsd_innovations::{
+    AlpineHardenedEnv, AndroidBinderIpc, AndroidBroadcastReceiverRegistry, ArchUserRepoManager,
+    BinderNode, BottomHalfKernelThread, BoundedBufferProducerConsumer, BroadcastReceiver,
+    BsdPfStateTable, CapabilityDerivationTree, CarpSecurityRouter, CgroupResourceLimits, CowBlock,
+    CowStorageEngine, CpuIsaMicroarch, DevlinkHealthReporter, DynamicLkmLoader, EbpfInstruction,
+    EbpfRuntime, ExokernelHardwareMultiplexer, FastPacketFrame, FreeBsdCapsicumEngine,
+    FreeBsdGeomTopology, FreeBsdJail, FreeBsdVfsNullfs, FreeBsdVnetManager, FutexOp, FutexWaiter,
+    GcdDispatchQueue, GcdPriority, GcdTask, GentooUseFlags, GeomClass, GeomProvider,
+    Hammer2PfsSnapshot, HammerBlockTransaction, HammerHistoryFilesystem, HurdTranslator,
+    HybridKernelManager, HybridTask, IntelClearLinuxStatelessEngine, InteractiveHybridScheduler,
+    KernelAccessController, KernelCapability, KernelFastPacketEngine, KernelModule, KmdfDriver,
+    KmdfIoRequest, KmdfPnpState, KmdfPowerState, LandlockAccessRight, LandlockPathRule,
+    LinuxDevlinkHealthMonitor, LinuxFutexEngine, LinuxLandlockLsmRuleEngine,
+    MemoryCompactionSuperpagesAllocator, MicrokernelCore, MicrokernelTranslatorRegistry,
+    MultikernelMessage, MultikernelMessagePassing, NamespaceType, NanokernelHardwareBroker,
+    NanokernelIrq, NetBsdRumpKernel, NinePProtocolTranslator, NinePResource,
+    NixOsDeclarativeManager, NtExecutiveService, NullfsLayerNode, OpenBsdPledge,
+    OpenBsdUnveilEngine, OpenSuseSnapperEngine, PfFiveTuple, PfStateEntry, PhysicalFrameBlock,
+    ReactorEvent, ReactorRegistration, ResourceBinding, RumpComponent, SnapperSnapshot,
+    SoftIrqType, SovereignCgroupGovernor, SovereignEventReactor, SovereignNamespaceContainer,
+    SovereignSwapEngine, SovereignZone, SovereignZonesManager, SwapDeviceConfig, SwapPage,
+    UnveilPathRule, VnetNetworkStack, VoidLinuxRunitSupervisor, VoidRunitInit, VoidRunitService,
+    VoidRunitStage, XdpAction, ZramCompressedPage, CAP_MMAP_FLAG, CAP_READ_FLAG, CAP_SEEK_FLAG,
+    CAP_WRITE_FLAG, PLEDGE_CPATH, PLEDGE_DPATH, PLEDGE_EXEC, PLEDGE_INET, PLEDGE_RPATH,
+    PLEDGE_STDIO, PLEDGE_UNIX, PLEDGE_WPATH,
+};
+pub use linux_parity::*;
+pub use memory::{
+    BuddyAllocator, ContainerResourceGovernor, DmaRingBufferAllocator, HardenedGuardPageAllocator,
+    MemoryBlock, PcieResourceAllocator, ResourceLimits, SigmaResourceAllocatorHub,
+    SlabObjectCacheAllocator, SlabSizeClass, PAGE_SIZE,
+};
 pub use meta::{
     ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
     MetaKernel, MicroDriver, NetPod,
 };
+pub use nextgen_breakthroughs::*;
+pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
+pub use roundrobin::{
+    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
+};
+pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use vmm_paging::{PageTableManager, VirtualMemoryManager};
+// Note: linux_bsd_innovations types fully re-exported via `pub use crate::kernel::linux_bsd_innovations::*` above.
+pub use kqueue_event::{Kqueue, KqueueManager, Kevent, FilterType, FilterFlags, Interest};
 
-// Note: Comprehensive linux_bsd_innovations exports are available through the module
-// Consumers should use specific imports for better type safety and compilation efficiency
+// ─── Phase 1: Safe-Rust Kernel Foundation — New Sovereign Modules ─────────────
+pub mod sigma_version;
+pub mod sigma_kernel_autotuner_v2;
+pub mod xdp_engine_sovereign;
+
+// ─── Live Migration Engine (CRIU / QEMU inspired) ─────────────────────────────
+pub mod live_migration_engine;

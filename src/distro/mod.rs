@@ -12,12 +12,8 @@ pub mod parrot_security;
 pub mod kali_security;
 pub mod antix_zorin_innovations;
 pub mod mint_innovations;
-pub mod tech_media_distro_innovations;
-pub mod tech_media_extended_innovations;
 
 pub use omarchy::*;
-pub use tech_media_distro_innovations::*;
-pub use tech_media_extended_innovations::*;
 
 pub mod omarchy_advanced_parity;
 pub use omarchy_advanced_parity::*;
