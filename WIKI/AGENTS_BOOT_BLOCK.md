@@ -1,34 +1,30 @@
-# SigmaOS AI Agent Boot Block Management Directive (`AGENTS_BOOT_BLOCK.md`)
+# AI Agent Boot Block Management Architecture (`docs/AGENTS_BOOT_BLOCK.md`)
 
-This document specifies technical directives, security validation rules, and configuration guidelines for AI agents managing boot block structures, bootloaders, and firmware startup sequences in SigmaOS.
-
----
-
-## 1. Core Principles for Boot Block Management
-
-Bootloader and boot block components (including UEFI entry generators, systemd-boot configuration builders, GRUB config synthesizers, and measured boot modules) require strict verification:
-
-1. **Firmware & Partition Table Integrity:**
-   - Boot entry generation via `SigmaBootloaderEngine` must support Multiboot2, GRUB2, and systemd-boot loader entry formats (`/loader/entries/*.conf`).
-   - Dual-boot entries (`DualBootOsEntry`, `BootEntry`, `BootConfiguration`) must safely probe and validate paths (`/EFI/Microsoft/Boot/bootmgfw.efi`, `/boot/vmlinuz-sigma`, `/boot/initramfs-sigma.img`).
-
-2. **Cryptographic Measured Boot Verification:**
-   - Measured boot streams must record firmware stage hashes into TPM PCR registers (`TPM_PCR_4`).
-   - Secure Boot signature verification must validate kernel images and initramfs blobs against trusted public keys before execution.
-
-3. **Atomic Multi-Stage Boot Supervision:**
-   - Multi-supervisory init systems (`sigma-init`) must transition safely through boot runlevel stages (Stage 1 OneTimeInit, Stage 2 MultiUser, Stage 3 Shutdown).
-   - Boot configurations must maintain fail-safe default fallback entries in case primary kernel parameters or image checksums fail.
-
-4. **Zero-Dependency `#![no_std]` Compatibility:**
-   - Bootloader helpers in core kernel layers must maintain zero-dependency `#![no_std]` compliance using native string builders and vector primitives.
+This guide details the architectural design, EFI/GRUB loader configuration generators, and AI agent monitoring protocols for boot block management in SigmaOS.
 
 ---
 
-## 2. Pre-Commit Boot Block Verification Checklist
+## 1. Subsystem Architecture
 
-Before committing bootloader or boot block modifications, AI agents must verify:
-- [ ] UEFI systemd-boot and GRUB2 configuration string generators output valid syntax.
-- [ ] Dual-boot detection routines safely handle missing or corrupted partition tables.
-- [ ] Measured boot TPM measurement routines correctly update PCR registers without panics.
-- [ ] `./run_sigma_tests.sh` executes with 100% test pass rate.
+SigmaOS provides unified bootloader management across Linux, BSD, and dual-boot environments:
+
+### A. Bootloader Engine & Configuration (`SigmaBootloaderEngine`, `Bootloader`)
+- Located in `src/distro/linux_bsd_distro_gaps.rs` and `src/tools/bootloader.rs`.
+- Generates systemd-boot configuration entries (`/loader/entries/*.conf`), GRUB2 configuration blocks (`grub.cfg`), and FreeBSD `/boot/loader.conf` settings.
+- Manages dual-boot auto-probing (`auto_detect_dual_boot`) for Windows Boot Manager, Arch Linux, Debian, and FreeBSD.
+
+### B. Measured Boot & TPM Integration
+- Integrates with `src/tpm/tpm2_implementation.rs` (`TPM_PCR_4` for Boot Loader measurements).
+- Measures firmware, bootloader binaries, and kernel command-line options into TPM PCRs prior to transferring execution control.
+
+### C. Boot Environment & Init Supervision
+- `sigma-init` orchestrates multi-supervisor boot sequences (supporting systemd, OpenRC, runit, s6, or dinit).
+- Boot environment switching enables atomic rollbacks between boot datasets.
+
+---
+
+## 2. AI Agent Operational Directives
+
+1. **Syntax Validation:** Verify that generated systemd-boot loader entries and GRUB menu entries contain valid `title`, `linux`, `initrd`, and `options` directives.
+2. **Path Sanitization:** Prevent path traversal vulnerabilities when reading kernel image or initramfs paths from configuration inputs.
+3. **Automated Verification:** Execute `./run_sigma_tests.sh` to confirm bootloader unit tests pass.

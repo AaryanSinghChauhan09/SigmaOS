@@ -1,34 +1,28 @@
-# SigmaOS AI Agent Buffer Overrun Management Directive (`AGENTS_BUFFER_OVERRUN.md`)
+# AI Agent Buffer Overrun Management Architecture (`docs/AGENTS_BUFFER_OVERRUN.md`)
 
-This document defines technical directives, memory boundary guardrails, and audit guidelines for AI agents managing buffer overrun and off-by-one mitigation in SigmaOS.
-
----
-
-## 1. Zero-Trust Buffer Overrun Mitigation Directives
-
-Buffer overrun vulnerabilities occur when read or write indexing operations exceed destination array or slice boundaries (including off-by-one errors in null-terminated strings or loop bounds). AI agents modifying kernel, driver, or C-compatibility code in SigmaOS must observe the following rules:
-
-1. **Strict Slice Indexing & Bounds Checking:**
-   - Avoid direct unchecked array indexing (`buf[i]`). Use safe Rust methods such as `.get(i)`, `.get_mut(i)`, or explicit bounds assertions prior to indexing.
-   - For C string operations (`klib::ffi`), use bounds-aware helpers (`cstrlen`, `cstrcmp`, `rust_string_to_cstr`) that enforce maximum length termination and guard against buffer read overruns.
-
-2. **Off-By-One Protection in Iterators & Loops:**
-   - Ensure loop counters check strict strict-inequality bounds (`i < capacity`) rather than non-strict inequality (`i <= capacity`).
-   - Validate array and vector capacity before bulk copy operations (`copy_from_slice`, `memcpy` wrappers).
-
-3. **Hardened Guard Page Isolation (`alloc_with_guard_page`):**
-   - Critical dynamic allocations must sandwich memory regions between inaccessible guard pages (`alloc_with_guard_page`).
-   - Thread stacks must enable stack clash guard zones (`has_guard_page = true`) to trap sequential overrun attempts immediately.
-
-4. **Ring Buffer Overflow Handling:**
-   - Ring buffers (`RingBuffer`, `RingBuf`) must check capacity limits before enqueueing and handle index wrap-around using modulo arithmetic (`idx % capacity`) or bitwise masking (`idx & (capacity - 1)` for power-of-two sizes).
+This guide details the architectural safeguards, FFI boundary checks, and AI agent monitoring protocols for buffer overrun and off-by-one mitigation in SigmaOS.
 
 ---
 
-## 2. Pre-Commit Buffer Overrun Audit Checklist
+## 1. Subsystem Architectural Safeguards
 
-Before submitting code modifications, AI agents must verify:
-- [ ] Array or string indexing operations check bounds explicitly or use safe option-returning primitives.
-- [ ] Null-terminated C string helper conversions specify maximum scan limits to prevent infinite read overruns.
-- [ ] Off-by-one loop conditions are thoroughly audited.
-- [ ] `./run_sigma_tests.sh` executes with 100% test pass rate.
+SigmaOS enforces defense-in-depth mechanisms to eliminate buffer overruns:
+
+### A. Safe FFI & C-String Boundary Checks
+- Located in `src/klib/ffi.rs`.
+- Provides bounds-safe string operations (`cstrlen`, `cstrcmp`, `rust_string_to_cstr`, `cstr_to_rust_string`) that validate null-terminators within fixed boundary limits to prevent out-of-bounds memory reads.
+
+### B. Guarded Heap & Stack Allocation
+- The resource allocator (`src/kernel/memory/resource_allocator.rs`) provides `alloc_with_guard_page` to catch heap overruns via unmapped guard pages.
+- CPU context and user space descriptors (`src/arch/cpu_sys.rs`) enforce stack guard zones (`has_guard_page = true`).
+
+### C. IPC & Ring Buffer Safety
+- Inter-process communication and ring buffers validate write capacity prior to copying payload data, returning explicit overflow errors when buffers are full.
+
+---
+
+## 2. AI Agent Monitoring & Remediation Protocol
+
+1. **Automated Static Scanning:** AI security agents review all modified Rust code for raw pointer operations or unchecked slice indexing.
+2. **Runtime Fault Trap:** Memory access violations at guard page boundaries trigger instant kernel page faults and thread isolation.
+3. **Automated Verification:** Execute `./run_sigma_tests.sh` to ensure all 220+ memory safety and unit tests pass.

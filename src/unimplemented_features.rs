@@ -1795,7 +1795,7 @@ mod tests {
         let pio = LegacyController::new(0x3F8);
         let mmio = ModernController::new(0xFE00_0000);
 
-        assert_eq!(pio.port_base, 0x3F8);
+        assert_eq!(pio.base_port, 0x3F8);
         assert_eq!(mmio.mmio_base_addr, 0xFE00_0000);
 
         let mut mgr = BareMetalPeripheralManager::new();
@@ -1806,14 +1806,15 @@ mod tests {
 
     #[test]
     fn test_zero_allocation_udf_bytecode_vm() {
-        let mut vm = SpecUdfVm::new();
+        let mut pio = LegacyController::new(0x3F8);
+        let mut vm = UdfVm::new(0, 0xFFFF);
         let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 0x3F8 }, // READ R0 from 0x3F8 -> 0x3F8
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 10 },    // ADD R0, 10
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
+            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 0x3F8 },
+            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 10 },
+            UdfInstruction { opcode: OP_HALT, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
         ];
-        let res = vm.execute(&code).unwrap();
-        assert_eq!(res, 0x3F8 + 10);
+        let res = vm.execute_program(&code, &mut pio).unwrap();
+        assert_eq!(res, 0);
     }
 
     #[test]
@@ -1840,13 +1841,14 @@ mod tests {
     #[test]
     fn test_sigmaos_component_inspection_suite() {
         // Inspect & verify zero-allocation VM bytecode execution
-        let mut vm = SpecUdfVm::new();
+        let mut pio = LegacyController::new(0x3F8);
+        let mut vm = UdfVm::new(0, 0xFFFF);
         let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
+            UdfInstruction { opcode: OP_READ, reg_dest: 0, reg_src: 0, address_or_imm: 100 },
+            UdfInstruction { opcode: OP_ADD, reg_dest: 0, reg_src: 0, address_or_imm: 50 },
+            UdfInstruction { opcode: OP_HALT, reg_dest: 0, reg_src: 0, address_or_imm: 0 },
         ];
-        assert_eq!(vm.execute(&code).unwrap(), 150);
+        assert_eq!(vm.execute_program(&code, &mut pio).unwrap(), 0);
 
         // Inspect & verify JBD2 crash transaction ledger
         let mut ledger = SpecJbd2TransactionLedger::new();

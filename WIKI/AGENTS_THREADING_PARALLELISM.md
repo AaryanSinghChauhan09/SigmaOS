@@ -1,34 +1,28 @@
-# SigmaOS AI Agent Coarse Parallelism & Threading Directive (`AGENTS_THREADING_PARALLELISM.md`)
+# AI Agent Coarse Parallelism & Threading Architecture (`docs/AGENTS_THREADING_PARALLELISM.md`)
 
-This document defines technical directives, thread synchronization protocols, and coarse-grained parallelism rules for AI agents managing multi-threaded operations in SigmaOS.
-
----
-
-## 1. Core Principles for Coarse Parallelism & Threading
-
-Coarse-grained task parallelism and thread execution in SigmaOS utilize Linux- and BSD-inspired scheduling models, Read-Copy-Update (RCU) synchronization, and adaptive quantum scaling. AI agents modifying threading or parallel dispatch routines must observe the following rules:
-
-1. **RCU Synchronization Generations (`rcu_epoch`):**
-   - Thread state descriptors track RCU synchronization epochs (`rcu_epoch`) to allow lockless concurrent reads across multi-core systems.
-   - Updates to shared thread-local data or process descriptors must enter RCU read-side critical sections safely and defer reclamation until quiescent states are observed across all CPU cores.
-
-2. **Adaptive Thread Quantum Scaling (`adaptive_thread_quantum_multiplier`):**
-   - Dynamic quantum multipliers (`adaptive_thread_quantum_multiplier`) scale thread execution time slices based on workload characteristics (e.g., interactive UI vs compute-bound background threads).
-   - High-priority interactive threads require shortened quanta to maintain responsiveness, whereas batch compute threads use expanded time slices to minimize context-switch overhead.
-
-3. **Stack Guard Safety & Thread Isolation (`has_guard_page`):**
-   - Every kernel and user thread stack must allocate guard pages (`has_guard_page = true`) to prevent thread stack-clash exploits and overflow into adjacent thread contexts.
-
-4. **NUMA Affinity & Multi-Core Distribution:**
-   - Coarse-grained parallel tasks must align execution with NUMA node boundaries to minimize cross-socket interconnect latency.
-   - Use atomic thread-safe primitives (`AtomicU64`, `AtomicUsize`) for inter-thread state signaling.
+This guide details the technical architecture, thread scheduling interfaces, and AI agent monitoring protocols for coarse-grained parallelism and thread management in SigmaOS.
 
 ---
 
-## 2. Pre-Commit Threading Verification Checklist
+## 1. Subsystem Architecture
 
-Before submitting code modifications, AI agents must verify:
-- [ ] Thread creation routines allocate stack guard zones (`has_guard_page = true`).
-- [ ] RCU read-side critical sections update `rcu_epoch` tracking correctly without deadlocks.
-- [ ] Adaptive quantum adjustments enforce upper and lower bounds on thread time slices.
-- [ ] `./run_sigma_tests.sh` executes with 100% test pass rate.
+SigmaOS implements scalable coarse parallelism and thread management across kernel and architectural subsystems:
+
+### A. Task & Thread Descriptor State
+- Located in `src/arch/comprehensive.rs` and `src/arch/hal.rs`.
+- Tracks thread context (`current_thread_id`), RCU synchronization epochs (`rcu_epoch`), and HAL execution levels (`PassiveLevel`, `DispatchLevel`).
+
+### B. Adaptive Quantum & Scheduler Integration
+- Located in `src/ai/next_gen.rs` and `src/kernel/scheduler.rs`.
+- Dynamically calculates `adaptive_thread_quantum_multiplier` to adjust time slice allocations based on thread priority and execution history.
+
+### C. Multi-Core & NUMA Parallel Dispatch
+- Balances thread workloads across CPU cores while respecting NUMA node memory locality and thread stack guard zones (`has_guard_page`).
+
+---
+
+## 2. AI Agent Operational Directives
+
+1. **Lockless RCU Audit:** Ensure thread state modifications within RCU read-side critical sections do not invoke blocking calls.
+2. **Stack Protection Verification:** Confirm all thread allocation paths enforce `has_guard_page = true`.
+3. **Automated Testing:** Execute `./run_sigma_tests.sh` to confirm threading and scheduler unit tests pass.
