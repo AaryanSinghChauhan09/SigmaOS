@@ -99,6 +99,16 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 
 ---
 
+## Development
+
+- [Contributing](Contributing) — How to contribute to SigmaOS development
+- [Development Guide](DEVELOPMENT_GUIDE.md) — Guide for SigmaOS development
+- [General Recommendations](General-Recommendations) — General post-installation recommendations
+- [Wiki Contributing](Wiki-Contributing.md) — How to contribute to the SigmaOS Wiki
+- [Naming Conventions & Rules](Naming-Conventions-and-Rules) — SigmaOS naming conventions and coding rules
+
+---
+
 ## Community
 
 - [Code of Conduct](Code-of-Conduct) — Guidelines for the SigmaOS community
