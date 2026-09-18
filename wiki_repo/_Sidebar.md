@@ -79,6 +79,12 @@ n- **[[ZFS Integration with ARC|ZFS-Integration-with-ARC]]**
 - **[[XDP Zero-Copy Networking|XDP-Zero-Copy-Networking]]**
 - **[[PF Firewall with CARP/pfsync|PF-Firewall-with-CARP-pfsync]]**
 - **[[Nix/Guix Hermetic Build Sandboxing|Nix-Guix-Hermetic-Build-Sandboxing]]**
+n- **[[Advanced NVIDIA GPU Support|Advanced-NVIDIA-GPU-Support]]**
+- **[[Wi-Fi 6E/7 Support|Wi-Fi-6E-7-Support]]**
+- **[[USB3/4 xHCI Full Support|USB3-4-xHCI-Full-Support]]**
+- **[[Mach/Zircon Zero-Copy IPC|Mach-Zircon-Zero-Copy-IPC]]**
+- **[[Gentoo Portage Integration|Gentoo-Portage-Integration]]**
+
 
 
 ---

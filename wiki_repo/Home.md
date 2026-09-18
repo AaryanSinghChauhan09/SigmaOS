@@ -143,6 +143,23 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
   Advanced storage management with data integrity and compression.
 
 - **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
+
+- **[Advanced NVIDIA GPU Support](Advanced-NVIDIA-GPU-Support)**
+  NVIDIA GPU support with CUDA acceleration.
+
+- **[Wi-Fi 6E/7 Support](Wi-Fi-6E-7-Support)**
+  Ultra-high-speed wireless networking with 6 GHz support.
+
+- **[USB3/4 xHCI Full Support](USB3-4-xHCI-Full-Support)**
+  High-speed USB with Thunderbolt integration.
+
+- **[Mach/Zircon Zero-Copy IPC](Mach-Zircon-Zero-Copy-IPC)**
+  High-performance message passing with zero-copy.
+
+- **[Gentoo Portage Integration](Gentoo-Portage-Integration)**
+  Source-based package management with USE flags.
+
+- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
   Copy-on-write filesystem with snapshot replication.
 
 - **[XDP Zero-Copy Networking](XDP-Zero-Copy-Networking)**

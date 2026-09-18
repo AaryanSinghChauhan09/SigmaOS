@@ -69,6 +69,11 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 - [XDP Zero-Copy Networking](XDP-Zero-Copy-Networking) — Ultra-high-performance packet processing at NIC level
 - [PF Firewall with CARP/pfsync](PF-Firewall-with-CARP-pfsync) — Stateful firewalling with high availability
 - [Nix/Guix Hermetic Build Sandboxing](Nix-Guix-Hermetic-Build-Sandboxing) — Reproducible builds with complete isolation
+- [Advanced NVIDIA GPU Support](Advanced-NVIDIA-GPU-Support) — NVIDIA GPU support with CUDA acceleration
+- [Wi-Fi 6E/7 Support](Wi-Fi-6E-7-Support) — Ultra-high-speed wireless networking with 6 GHz support
+- [USB3/4 xHCI Full Support](USB3-4-xHCI-Full-Support) — High-speed USB with Thunderbolt integration
+- [Mach/Zircon Zero-Copy IPC](Mach-Zircon-Zero-Copy-IPC) — High-performance message passing with zero-copy
+- [Gentoo Portage Integration](Gentoo-Portage-Integration) — Source-based package management with USE flags
 - [Performance & BORE Scheduler](Performance-Tuning-and-Kernel) — Performance tuning and BORE scheduler configuration
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support
