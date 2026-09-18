@@ -3,21 +3,19 @@
 // with 100% self-sufficient `#![no_std]` Safe Rust primitives per AGENTS.md
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-
+use std::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::string::String;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use std::vec::Vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use std::format;
 
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
 
 // ============================================================
 // § 1. C++ RUNTIME DEPENDENCY ELIMINATION
@@ -75,7 +73,9 @@ impl SovereignCppEliminationEngine {
             is_zero_dependency: true,
             memory_reduction_percent: 50,
         });
-        Self { active_records: records }
+        Self {
+            active_records: records,
+        }
     }
 
     pub fn total_eliminated_count(&self) -> usize {
@@ -95,7 +95,9 @@ pub struct SovereignPythonEliminationEngine {
 
 impl SovereignPythonEliminationEngine {
     pub fn new() -> Self {
-        Self { total_tests_executed: 0 }
+        Self {
+            total_tests_executed: 0,
+        }
     }
 
     /// Execute system verification check natively in Rust without python interpreter
@@ -120,14 +122,19 @@ pub struct SovereignShellScriptEliminationEngine {
 
 impl SovereignShellScriptEliminationEngine {
     pub fn new() -> Self {
-        Self { script_commands_compiled: 42 }
+        Self {
+            script_commands_compiled: 42,
+        }
     }
 
     pub fn execute_native_command(&self, cmd: &str) -> Result<String, &'static str> {
         if cmd.is_empty() {
             return Err("Empty command");
         }
-        Ok(format!("Executing native Rust command: '{}' (zero bash overhead)", cmd))
+        Ok(format!(
+            "Executing native Rust command: '{}' (zero bash overhead)",
+            cmd
+        ))
     }
 }
 
@@ -151,7 +158,9 @@ pub struct SovereignHtmlCssEliminationEngine {
 
 impl SovereignHtmlCssEliminationEngine {
     pub fn new() -> Self {
-        Self { preferred_format: NativeDocFormat::MarkdownText }
+        Self {
+            preferred_format: NativeDocFormat::MarkdownText,
+        }
     }
 
     /// Sanitize text for terminal display, eliminating unsafe HTML entity risks
@@ -194,7 +203,10 @@ impl ZeroDependencyMasterHub {
     }
 
     pub fn generate_dependency_reduction_report(&mut self) -> String {
-        let py_status = self.python_engine.run_native_verification_suite().unwrap_or_default();
+        let py_status = self
+            .python_engine
+            .run_native_verification_suite()
+            .unwrap_or_default();
         format!(
             "SigmaOS Zero-Dependency Report:\n\
              - C++ Modules Replaced: {}\n\

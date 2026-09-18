@@ -151,7 +151,10 @@ impl PackageFormat {
             Some(PackageFormat::OpenBsdPkg)
         } else if normalized.ends_with(".tar.gz") || normalized.ends_with(".tgz") {
             Some(PackageFormat::TarGz)
-        } else if normalized.ends_with(".txz") || normalized.ends_with(".tar.xz") || normalized.ends_with(".xz") {
+        } else if normalized.ends_with(".txz")
+            || normalized.ends_with(".tar.xz")
+            || normalized.ends_with(".xz")
+        {
             Some(PackageFormat::TarXz)
         } else if normalized.ends_with(".xbps") {
             Some(PackageFormat::Xbps)
@@ -183,7 +186,8 @@ impl PackageFormat {
             Some(PackageFormat::Pacman)
         } else if normalized.ends_with(".dports") {
             Some(PackageFormat::Dports)
-        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz") {
+        } else if name.ends_with(".slackbuild") || name.ends_with(".tlz") || name.ends_with(".tbz")
+        {
             Some(PackageFormat::SlackBuild)
         } else if normalized.ends_with(".crux") || normalized.ends_with(".pkgfile") {
             Some(PackageFormat::Crux)
@@ -245,7 +249,10 @@ impl PackageFormat {
             Some(PackageFormat::AndroidApex)
         } else if normalized.ends_with(".wasm") || normalized.ends_with(".wasi") {
             Some(PackageFormat::WasmWasi)
-        } else if normalized.ends_with(".jar") || normalized.ends_with(".war") || normalized.ends_with(".ear") {
+        } else if normalized.ends_with(".jar")
+            || normalized.ends_with(".war")
+            || normalized.ends_with(".ear")
+        {
             Some(PackageFormat::JavaJar)
         } else if normalized.ends_with(".npm") {
             Some(PackageFormat::NpmTarball)
@@ -269,7 +276,6 @@ impl PackageFormat {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct PackageContext {
     pub name: String,
@@ -279,7 +285,6 @@ pub struct PackageContext {
     pub files: Vec<String>,
     pub hash: [u8; 32],
 }
-
 
 pub trait IPackageAdapter {
     fn format(&self) -> PackageFormat;
@@ -645,7 +650,9 @@ impl PackageAdapterFactory {
             PackageFormat::Apt | PackageFormat::Deb => Box::new(AptPackageAdapter),
             PackageFormat::Yum | PackageFormat::Rpm => Box::new(YumPackageAdapter),
             PackageFormat::Pacman => Box::new(PacmanPackageAdapter),
-            PackageFormat::Portage | PackageFormat::Ebuild => Box::new(EbuildPackageAdapter::new(Vec::new())),
+            PackageFormat::Portage | PackageFormat::Ebuild => {
+                Box::new(EbuildPackageAdapter::new(Vec::new()))
+            }
             PackageFormat::Sovereign | PackageFormat::Sigma => Box::new(SovereignPackageAdapter),
             PackageFormat::Nix => Box::new(NixPackageAdapter),
             PackageFormat::Apk => Box::new(ApkPackageAdapter),
@@ -725,12 +732,27 @@ impl PackageAdapterFactory {
 
 pub struct AixBffPackageAdapter;
 impl IPackageAdapter for AixBffPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::AixBff }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty AIX BFF payload"); }
-        Ok(PackageContext { name: "aix-bff-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::AixBff, dependencies: vec![], files: vec![], hash: [0x41; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::AixBff
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty AIX BFF payload");
+        }
+        Ok(PackageContext {
+            name: "aix-bff-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::AixBff,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x41; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("AIX BFF Adapter: Extracted LPP fileset to: {}", store_path);
         Ok(())
     }
@@ -738,51 +760,120 @@ impl IPackageAdapter for AixBffPackageAdapter {
 
 pub struct HpuxDepotPackageAdapter;
 impl IPackageAdapter for HpuxDepotPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::HpuxDepot }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty HP-UX Depot payload"); }
-        Ok(PackageContext { name: "hpux-depot-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::HpuxDepot, dependencies: vec![], files: vec![], hash: [0x42; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::HpuxDepot
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("HP-UX Depot Adapter: Extracted SD Depot product to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty HP-UX Depot payload");
+        }
+        Ok(PackageContext {
+            name: "hpux-depot-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::HpuxDepot,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x42; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "HP-UX Depot Adapter: Extracted SD Depot product to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct IrixTardistPackageAdapter;
 impl IPackageAdapter for IrixTardistPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::IrixTardist }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty IRIX tardist payload"); }
-        Ok(PackageContext { name: "irix-tardist-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::IrixTardist, dependencies: vec![], files: vec![], hash: [0x43; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::IrixTardist
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("IRIX Tardist Adapter: Extracted tardist image to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty IRIX tardist payload");
+        }
+        Ok(PackageContext {
+            name: "irix-tardist-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::IrixTardist,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x43; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "IRIX Tardist Adapter: Extracted tardist image to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct Tru64SetldPackageAdapter;
 impl IPackageAdapter for Tru64SetldPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::Tru64Setld }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty Tru64 setld payload"); }
-        Ok(PackageContext { name: "tru64-setld-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::Tru64Setld, dependencies: vec![], files: vec![], hash: [0x44; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Tru64Setld
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Tru64 Setld Adapter: Extracted setld subset to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Tru64 setld payload");
+        }
+        Ok(PackageContext {
+            name: "tru64-setld-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Tru64Setld,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x44; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Tru64 Setld Adapter: Extracted setld subset to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct Plan9PkgPackageAdapter;
 impl IPackageAdapter for Plan9PkgPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::Plan9Pkg }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty Plan 9 package payload"); }
-        Ok(PackageContext { name: "plan9-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::Plan9Pkg, dependencies: vec![], files: vec![], hash: [0x45; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Plan9Pkg
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Plan 9 package payload");
+        }
+        Ok(PackageContext {
+            name: "plan9-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Plan9Pkg,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x45; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Plan 9 Adapter: Extracted 9pkg archive to: {}", store_path);
         Ok(())
     }
@@ -790,103 +881,244 @@ impl IPackageAdapter for Plan9PkgPackageAdapter {
 
 pub struct GentooGpkgPackageAdapter;
 impl IPackageAdapter for GentooGpkgPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::GentooGpkg }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty Gentoo GPKG payload"); }
-        Ok(PackageContext { name: "gentoo-gpkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::GentooGpkg, dependencies: vec![], files: vec![], hash: [0x46; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::GentooGpkg
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Gentoo GPKG Adapter: Extracted v2 binary package to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Gentoo GPKG payload");
+        }
+        Ok(PackageContext {
+            name: "gentoo-gpkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::GentooGpkg,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x46; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Gentoo GPKG Adapter: Extracted v2 binary package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct AndroidApexPackageAdapter;
 impl IPackageAdapter for AndroidApexPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::AndroidApex }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty Android APEX payload"); }
-        Ok(PackageContext { name: "android-apex".to_string(), version: "1.0.0".to_string(), format: PackageFormat::AndroidApex, dependencies: vec![], files: vec![], hash: [0x47; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::AndroidApex
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Android APEX Adapter: Extracted APEX module container to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Android APEX payload");
+        }
+        Ok(PackageContext {
+            name: "android-apex".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::AndroidApex,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x47; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Android APEX Adapter: Extracted APEX module container to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct WasmWasiPackageAdapter;
 impl IPackageAdapter for WasmWasiPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::WasmWasi }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty WASI payload"); }
-        Ok(PackageContext { name: "wasm-wasi-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::WasmWasi, dependencies: vec![], files: vec![], hash: [0x48; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::WasmWasi
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("WASI Adapter: Materialized WebAssembly module into: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty WASI payload");
+        }
+        Ok(PackageContext {
+            name: "wasm-wasi-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::WasmWasi,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x48; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "WASI Adapter: Materialized WebAssembly module into: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct JavaJarPackageAdapter;
 impl IPackageAdapter for JavaJarPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::JavaJar }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty Java JAR payload"); }
-        Ok(PackageContext { name: "java-jar-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::JavaJar, dependencies: vec![], files: vec![], hash: [0x49; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::JavaJar
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Java JAR Adapter: Extracted JAR/WAR bundle to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Java JAR payload");
+        }
+        Ok(PackageContext {
+            name: "java-jar-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::JavaJar,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x49; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Java JAR Adapter: Extracted JAR/WAR bundle to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct NpmTarballPackageAdapter;
 impl IPackageAdapter for NpmTarballPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::NpmTarball }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty NPM package payload"); }
-        Ok(PackageContext { name: "npm-tarball-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::NpmTarball, dependencies: vec![], files: vec![], hash: [0x4A; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::NpmTarball
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("NPM Adapter: Extracted Node package tarball to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty NPM package payload");
+        }
+        Ok(PackageContext {
+            name: "npm-tarball-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::NpmTarball,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x4A; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "NPM Adapter: Extracted Node package tarball to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct PhpPharPackageAdapter;
 impl IPackageAdapter for PhpPharPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::PhpPhar }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty PHP PHAR payload"); }
-        Ok(PackageContext { name: "php-phar-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::PhpPhar, dependencies: vec![], files: vec![], hash: [0x4B; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::PhpPhar
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("PHP PHAR Adapter: Extracted PHAR executable to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty PHP PHAR payload");
+        }
+        Ok(PackageContext {
+            name: "php-phar-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::PhpPhar,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x4B; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "PHP PHAR Adapter: Extracted PHAR executable to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct PerlCpanPackageAdapter;
 impl IPackageAdapter for PerlCpanPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::PerlCpan }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty Perl CPAN payload"); }
-        Ok(PackageContext { name: "perl-cpan-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::PerlCpan, dependencies: vec![], files: vec![], hash: [0x4C; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::PerlCpan
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Perl CPAN Adapter: Extracted CPAN module to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Perl CPAN payload");
+        }
+        Ok(PackageContext {
+            name: "perl-cpan-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::PerlCpan,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x4C; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Perl CPAN Adapter: Extracted CPAN module to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct LuaRockPackageAdapter;
 impl IPackageAdapter for LuaRockPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::LuaRock }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty LuaRock payload"); }
-        Ok(PackageContext { name: "lua-rock-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::LuaRock, dependencies: vec![], files: vec![], hash: [0x4D; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::LuaRock
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty LuaRock payload");
+        }
+        Ok(PackageContext {
+            name: "lua-rock-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::LuaRock,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x4D; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("LuaRock Adapter: Extracted rock package to: {}", store_path);
         Ok(())
     }
@@ -894,38 +1126,89 @@ impl IPackageAdapter for LuaRockPackageAdapter {
 
 pub struct ElixirHexPackageAdapter;
 impl IPackageAdapter for ElixirHexPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::ElixirHex }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty Elixir Hex payload"); }
-        Ok(PackageContext { name: "elixir-hex-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::ElixirHex, dependencies: vec![], files: vec![], hash: [0x4E; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::ElixirHex
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Elixir Hex Adapter: Extracted Hex package to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Elixir Hex payload");
+        }
+        Ok(PackageContext {
+            name: "elixir-hex-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::ElixirHex,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x4E; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Elixir Hex Adapter: Extracted Hex package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct HaskellCabalPackageAdapter;
 impl IPackageAdapter for HaskellCabalPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::HaskellCabal }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty Haskell Cabal payload"); }
-        Ok(PackageContext { name: "haskell-cabal-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::HaskellCabal, dependencies: vec![], files: vec![], hash: [0x4F; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::HaskellCabal
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Haskell Cabal Adapter: Extracted Cabal package to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Haskell Cabal payload");
+        }
+        Ok(PackageContext {
+            name: "haskell-cabal-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::HaskellCabal,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x4F; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Haskell Cabal Adapter: Extracted Cabal package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
 
 pub struct JuliaPkgPackageAdapter;
 impl IPackageAdapter for JuliaPkgPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::JuliaPkg }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty Julia package payload"); }
-        Ok(PackageContext { name: "julia-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::JuliaPkg, dependencies: vec![], files: vec![], hash: [0x50; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::JuliaPkg
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Julia package payload");
+        }
+        Ok(PackageContext {
+            name: "julia-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::JuliaPkg,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x50; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Julia Adapter: Extracted Julia package to: {}", store_path);
         Ok(())
     }
@@ -933,13 +1216,31 @@ impl IPackageAdapter for JuliaPkgPackageAdapter {
 
 pub struct RCranPackageAdapter;
 impl IPackageAdapter for RCranPackageAdapter {
-    fn format(&self) -> PackageFormat { PackageFormat::RCran }
-    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
-        if raw_data.is_empty() { return Err("Empty R CRAN payload"); }
-        Ok(PackageContext { name: "r-cran-pkg".to_string(), version: "1.0.0".to_string(), format: PackageFormat::RCran, dependencies: vec![], files: vec![], hash: [0x51; 32] })
+    fn format(&self) -> PackageFormat {
+        PackageFormat::RCran
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("R CRAN Adapter: Extracted R CRAN package to: {}", store_path);
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty R CRAN payload");
+        }
+        Ok(PackageContext {
+            name: "r-cran-pkg".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::RCran,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x51; 32],
+        })
+    }
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "R CRAN Adapter: Extracted R CRAN package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -993,7 +1294,11 @@ impl IPackageAdapter for SpackPackageAdapter {
             hash: [0x38; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Spack Adapter: Extracted Spack package to: {}", store_path);
         Ok(())
     }
@@ -1017,7 +1322,11 @@ impl IPackageAdapter for ConanPackageAdapter {
             hash: [0x39; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Conan Adapter: Extracted Conan package to: {}", store_path);
         Ok(())
     }
@@ -1041,7 +1350,11 @@ impl IPackageAdapter for WheelPackageAdapter {
             hash: [0x3a; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Wheel Adapter: Extracted Wheel package to: {}", store_path);
         Ok(())
     }
@@ -1065,7 +1378,11 @@ impl IPackageAdapter for CratePackageAdapter {
             hash: [0x3b; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Crate Adapter: Extracted Cargo crate to: {}", store_path);
         Ok(())
     }
@@ -1089,7 +1406,11 @@ impl IPackageAdapter for GemPackageAdapter {
             hash: [0x3c; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Gem Adapter: Extracted RubyGem to: {}", store_path);
         Ok(())
     }
@@ -1113,7 +1434,11 @@ impl IPackageAdapter for NupkgPackageAdapter {
             hash: [0x3d; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Nupkg Adapter: Extracted NuGet package to: {}", store_path);
         Ok(())
     }
@@ -1137,7 +1462,11 @@ impl IPackageAdapter for VcpkgPackageAdapter {
             hash: [0x3e; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Vcpkg Adapter: Extracted Vcpkg package to: {}", store_path);
         Ok(())
     }
@@ -1161,8 +1490,15 @@ impl IPackageAdapter for NarInfoPackageAdapter {
             hash: [0x3f; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("NarInfo Adapter: Extracted NarInfo manifest to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "NarInfo Adapter: Extracted NarInfo manifest to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -1185,8 +1521,15 @@ impl IPackageAdapter for SysupdatePackageAdapter {
             hash: [0x40; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Sysupdate Adapter: Extracted Sysupdate definition to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Sysupdate Adapter: Extracted Sysupdate definition to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -2621,7 +2964,11 @@ impl IPackageAdapter for IpkPackageAdapter {
             hash: [0x32; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("IPK Adapter: Extracted IPK package to: {}", store_path);
         Ok(())
     }
@@ -2645,7 +2992,11 @@ impl IPackageAdapter for OpkgPackageAdapter {
             hash: [0x34; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("OPKG Adapter: Extracted OPKG package to: {}", store_path);
         Ok(())
     }
@@ -2669,8 +3020,15 @@ impl IPackageAdapter for SolarisIpsPackageAdapter {
             hash: [0x35; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("Solaris IPS Adapter: Extracted IPS package to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "Solaris IPS Adapter: Extracted IPS package to: {}",
+            store_path
+        );
         Ok(())
     }
 }
@@ -2693,7 +3051,11 @@ impl IPackageAdapter for GuixNarPackageAdapter {
             hash: [0x36; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
         println!("Guix NAR Adapter: Extracted NAR package to: {}", store_path);
         Ok(())
     }
@@ -2717,8 +3079,15 @@ impl IPackageAdapter for OpenBsdPkgPackageAdapter {
             hash: [0x37; 32],
         })
     }
-    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
-        println!("OpenBSD PKG Adapter: Extracted PKG package to: {}", store_path);
+    fn extract_to_store(
+        &self,
+        _ctx: &PackageContext,
+        store_path: &str,
+    ) -> Result<(), &'static str> {
+        println!(
+            "OpenBSD PKG Adapter: Extracted PKG package to: {}",
+            store_path
+        );
         Ok(())
     }
 }

@@ -4,8 +4,8 @@
 
 use core::cell::Cell;
 
-pub use super::hashmap::{Entry, HashMap};
 pub use super::btreemap::BTreeMap;
+pub use super::hashmap::{Entry, HashMap};
 
 /// Simple HashSet implementation for klib (Using BTreeSet internally)
 pub struct HashSet<T> {

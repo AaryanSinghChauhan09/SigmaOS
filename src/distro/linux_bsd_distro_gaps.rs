@@ -538,7 +538,6 @@ impl Default for CronJobScheduler {
     }
 }
 
-
 // ============================================================================
 // 8. Dynamic devfs & Device Symlink Manager Engine (udev / FreeBSD devfs / devd)
 // ============================================================================
@@ -583,7 +582,13 @@ impl SovereignDynamicDevfsEngine {
         devfs
     }
 
-    pub fn register_device_node(&mut self, name: &str, node_type: DeviceNodeType, major: u32, minor: u32) {
+    pub fn register_device_node(
+        &mut self,
+        name: &str,
+        node_type: DeviceNodeType,
+        major: u32,
+        minor: u32,
+    ) {
         let entry = DeviceNodeEntry {
             name: name.to_string(),
             node_type,
@@ -780,11 +785,17 @@ impl SovereignJournaldBinaryStorageEngine {
     }
 
     pub fn query_unit(&self, unit: &str) -> Vec<&JournaldLogRecord> {
-        self.log_records.iter().filter(|l| l.unit_name == unit).collect()
+        self.log_records
+            .iter()
+            .filter(|l| l.unit_name == unit)
+            .collect()
     }
 
     pub fn query_priority(&self, min_priority: u8) -> Vec<&JournaldLogRecord> {
-        self.log_records.iter().filter(|l| l.priority <= min_priority).collect()
+        self.log_records
+            .iter()
+            .filter(|l| l.priority <= min_priority)
+            .collect()
     }
 }
 
@@ -870,7 +881,8 @@ impl SovereignMasterDistroEcosystemEngine {
             DistroComponentSnapshot {
                 component: "Networking",
                 linux_bsd_status: "Full TCP/IP, firewall (iptables/pf)",
-                sigma_os_current_status: "NetworkTcpUdpStack, OpenBsdPfFirewallEngine, DoT, Stateful NAT",
+                sigma_os_current_status:
+                    "NetworkTcpUdpStack, OpenBsdPfFirewallEngine, DoT, Stateful NAT",
                 gap_closure_needed: "Expand routing & PQC WireGuard VPN stack",
                 readiness_score_percent: 100,
             },
@@ -898,14 +910,16 @@ impl SovereignMasterDistroEcosystemEngine {
             DistroComponentSnapshot {
                 component: "Security",
                 linux_bsd_status: "SELinux, AppArmor, Capsicum",
-                sigma_os_current_status: "Landlock v5, FreeBSD Capsicum, OpenBSD Pledge/Unveil, SELinux MLS/MCS",
+                sigma_os_current_status:
+                    "Landlock v5, FreeBSD Capsicum, OpenBSD Pledge/Unveil, SELinux MLS/MCS",
                 gap_closure_needed: "Add MAC + sandboxing",
                 readiness_score_percent: 100,
             },
             DistroComponentSnapshot {
                 component: "Virtualization",
                 linux_bsd_status: "KVM, bhyve",
-                sigma_os_current_status: "SovereignMicrovmHypervisorGateway & OpenBsdVmmBhyveBridge",
+                sigma_os_current_status:
+                    "SovereignMicrovmHypervisorGateway & OpenBsdVmmBhyveBridge",
                 gap_closure_needed: "Add microVM hypervisor integration",
                 readiness_score_percent: 100,
             },
@@ -1093,7 +1107,10 @@ impl SovereignDnsTlsResolverEngine {
             ip: [127, 0, 0, 1],
             ttl: 3600,
         });
-        Self { upstream_dns, records }
+        Self {
+            upstream_dns,
+            records,
+        }
     }
 
     pub fn resolve_domain(&mut self, domain: &str) -> Result<[u8; 4], &'static str> {
@@ -1104,7 +1121,6 @@ impl SovereignDnsTlsResolverEngine {
         }
     }
 }
-
 
 pub type DnsRecord = DnsRecordEntry;
 pub type JournalBinaryRecord = JournaldLogRecord;
