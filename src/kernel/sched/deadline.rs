@@ -6,9 +6,8 @@
 #![allow(dead_code)]
 
 use std::collections::BinaryHeap;
-use std::cmp::Ordering;
-use std::vec::Vec;
-use core::sync::atomic::{AtomicU64, Ordering as AtomicOrdering};
+use std::cmp::Ordering as CmpOrdering;
+use core::sync::atomic::{AtomicU64, AtomicU32, Ordering as AtomicOrdering};
 
 /// SCHED_DEADLINE Real-Time Task Parameters
 #[derive(Debug, Clone)]
@@ -40,14 +39,14 @@ impl Eq for DeadlineTaskInstance {}
 
 // Reverse ordering for Min-Heap (Earliest Virtual Deadline First - EEVDF)
 impl Ord for DeadlineTaskInstance {
-    fn cmp(&self, other: &Self) -> Ordering {
+    fn cmp(&self, other: &Self) -> CmpOrdering {
         other.virtual_deadline_ns.cmp(&self.virtual_deadline_ns)
             .then_with(|| self.pid.cmp(&other.pid))
     }
 }
 
 impl PartialOrd for DeadlineTaskInstance {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<CmpOrdering> {
         Some(self.cmp(other))
     }
 }
@@ -144,22 +143,16 @@ impl SovereignSchedDeadlineEngine {
 
     /// Update virtual deadline for EEVDF when task yields
     pub fn update_virtual_deadline(&mut self, pid: u64, new_virtual_deadline: u64) -> bool {
-        // BinaryHeap doesn't support iter_mut, so we need to drain and rebuild
-        let mut tasks: Vec<DeadlineTaskInstance> = self.active_heap.drain().collect();
+        let mut vec = std::mem::take(&mut self.active_heap).into_vec();
         let mut found = false;
-        
-        for task in &mut tasks {
+        for task in vec.iter_mut() {
             if task.pid == pid {
                 task.virtual_deadline_ns = new_virtual_deadline;
                 found = true;
+                break;
             }
         }
-        
-        // Rebuild the heap
-        for task in tasks {
-            self.active_heap.push(task);
-        }
-        
+        self.active_heap = BinaryHeap::from(vec);
         found
     }
 
