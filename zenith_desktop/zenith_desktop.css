@@ -322,6 +322,7 @@ body {
     outline: none;
     display: inline-block;
     cursor: pointer;
+    position: relative;
     transition: transform 0.15s ease;
 }
 
@@ -339,6 +340,32 @@ body {
 .control-dot.close { background: #ef4444; }
 .control-dot.min { background: #f59e0b; }
 .control-dot.max { background: #10b981; }
+
+.control-dot::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-5px);
+    background: var(--bg-charcoal);
+    border: 1px solid var(--border-glass);
+    color: var(--text-white);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 1000;
+}
+
+.control-dot:hover::after,
+.control-dot:focus-visible::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
 
 .window-body {
     flex-grow: 1;
