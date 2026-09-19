@@ -57,9 +57,6 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 ## Package Management
 
-- **[SigmaPkg - Universal Package Manager](SigmaPkg)**
-  Universal package management system with multi-format support.
-
 - **[Universal Package Engine (sigpkg)](Package-Management-and-Sigpkg)**
   Overview of the SigmaPkg package management system.
 
@@ -95,9 +92,6 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 ## Security & Hardening
 
-- **[Security Sandbox & Isolation](Security-Sandbox-Isolation)**
-  Comprehensive security sandboxing with Landlock, Capsicum, and pledge/unveil.
-
 - **[Security & Sandboxing](Security-Sandboxing-and-Hardening)**
   Comprehensive security model and sandboxing capabilities.
 
@@ -113,134 +107,12 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Category:Security](Category:Security)**
   Security and hardening articles.
 
+---
 
 ## Performance & Kernel
 
-- **[Demand Paging & Swap](Demand-Paging-and-Swap)**
-  Memory management with demand paging and swap support.
-
-- **[Kernel Syscall Enforcement](Kernel-Syscall-Enforcement)**
-  Kernel-space syscall restriction and security enforcement.
-
-- **[eBPF JIT Compilation](eBPF-JIT-Compilation)**
-  eBPF JIT compiler for high-performance packet filtering.
-
 - **[Performance & BORE Scheduler](Performance-Tuning-and-Kernel)**
   Performance tuning and BORE scheduler configuration.
-
-
-- **[Dynamic Kernel Module Loading](Dynamic-Kernel-Module-Loading)**
-  Runtime kernel module loading and unloading.
-
-- **[Interrupt Balancing & MSI-X](Interrupt-Balancing-and-MSI-X)**
-  Advanced interrupt balancing and MSI-X support.
-
-- **[Cgroups v2 Memory Controller](Cgroups-v2-Memory-Controller)**
-  Fine-grained memory resource management and isolation.
-
-
-- **[ZFS Integration with ARC](ZFS-Integration-with-ARC)**
-  Advanced storage management with data integrity and compression.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[Device Drivers](Device-Drivers)**
-  PCI/PCIe, USB, network, storage, GPU drivers.
-
-- **[User Space and Applications](User-Space-and-Applications)**
-  Process isolation, syscalls, compatibility layers.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[Boot Process and Recovery](Boot-Process-and-Recovery)**
-  Bootloaders, init system, recovery modes, snapshots.
-
-- **[Package Management](Package-Management)**
-  Universal package manager, dependency resolution, repository management.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[Concurrency and Deadlocks](Concurrency-and-Deadlocks)**
-  Thread management, synchronization primitives, deadlock detection, lock-free algorithms.
-
-- **[Operating System Structure](Operating-System-Structure)**
-  Microkernel design, HAL, system call interface, IPC mechanisms.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[File Management](File-Management)**
-  VFS, file permissions, file locking, directory operations.
-
-- **[System Security](System-Security)**
-  Access control, auditing, MAC framework, security policies.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[Process Management](Process-Management)**
-  Process scheduling, cgroups, resource limits, namespaces.
-
-- **[Memory Management](Memory-Management)**
-  Virtual memory, demand paging, slab allocator, memory compaction.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[Security Hardening Guide](Security-Hardening-Guide)**
-  Kernel hardening, application sandboxing, secure coding practices.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[Filesystem Support Matrix](Filesystem-Support-Matrix)**
-  ext4, XFS, Btrfs, ZFS, UFS, Hammer2, NFS, SMB, SSHFS, encryption.
-
-- **[Networking Support Matrix](Networking-Support-Matrix)**
-  IPv4/IPv6, bonding, VLANs, VPNs, namespaces, bridging.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[Container Orchestration](Container-Orchestration)**
-  Kubernetes-compatible APIs, pod scheduling, service discovery, and autoscaling.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[System Monitoring & Observability](System-Monitoring-and-Observability)**
-  Real-time metrics, distributed tracing, log aggregation, and alerting.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-
-- **[Advanced NVIDIA GPU Support](Advanced-NVIDIA-GPU-Support)**
-  NVIDIA GPU support with CUDA acceleration.
-
-- **[Wi-Fi 6E/7 Support](Wi-Fi-6E-7-Support)**
-  Ultra-high-speed wireless networking with 6 GHz support.
-
-- **[USB3/4 xHCI Full Support](USB3-4-xHCI-Full-Support)**
-  High-speed USB with Thunderbolt integration.
-
-- **[Mach/Zircon Zero-Copy IPC](Mach-Zircon-Zero-Copy-IPC)**
-  High-performance message passing with zero-copy.
-
-- **[Gentoo Portage Integration](Gentoo-Portage-Integration)**
-  Source-based package management with USE flags.
-
-- **[Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive)**
-  Copy-on-write filesystem with snapshot replication.
-
-- **[XDP Zero-Copy Networking](XDP-Zero-Copy-Networking)**
-  Ultra-high-performance packet processing at NIC level.
-
-- **[PF Firewall with CARP/pfsync](PF-Firewall-with-CARP-pfsync)**
-  Stateful firewalling with high availability.
-
-- **[Nix/Guix Hermetic Build Sandboxing](Nix-Guix-Hermetic-Build-Sandboxing)**
-  Reproducible builds with complete isolation.
-
-
-- **[Linux io_uring](Linux-io_uring-Implementation)**
-  High-performance asynchronous I/O with zero-copy support.
-
-- **[FreeBSD Capsicum](FreeBSD-Capsicum-Integration)**
-  Capability-based access control and sandboxing.
-
 
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
@@ -255,6 +127,7 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
   Performance and kernel articles.
 
 ---
+
 ## Maintenance & Recovery
 
 - **[Rollback Engine & Snapshots](Maintenance-and-Rollback-Engine)**
@@ -361,3 +234,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 ---
 
 **[View all wiki pages](Table-of-contents)**
+
+---
+
+## Omnipresent Self-Sufficiency Reference
+- **[Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V29](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V29)**
+  Master architectural reference detailing native zero-dependency replacements for external software, AI models, frameworks, database engines, robotics tools, codecs, and operating systems.
