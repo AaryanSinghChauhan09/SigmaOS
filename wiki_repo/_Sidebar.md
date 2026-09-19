@@ -51,7 +51,6 @@
 - **[[Virtualization and Containers|Virtualization-and-Containers]]**
 - **[[System Call Interface|System-Call-Interface]]**
 - **[[Inter-Process Communication|Inter-Process-Communication]]**
-- **[[Namespaces|Namespaces]]**
 
 ---
 
@@ -69,17 +68,6 @@
 - **[[Low-Overhead Kernel Observability|Low-Overhead-Kernel-Observability]]**
 - **[[MGLRU & Memory Reclamation|Performance-Tuning-and-Kernel#mglru--memory-reclamation]]**
 - **[[eBPF / XDP Networking|Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking]]**
-- **[[Kernel Timers|Kernel-Timers]]**
-- **[[Workqueue|Workqueue]]**
-- **[[RCU Synchronization|RCU-Synchronization]]**
-- **[[Lockdep|Lockdep]]**
-- **[[Cgroups|Cgroups]]**
-- **[[Kobject|Kobject]]**
-- **[[Ftrace|Ftrace]]**
-- **[[Perf|Perf]]**
-- **[[Seccomp|Seccomp]]**
-- **[[IOMMU|IOMMU]]**
-- **[[Interrupt|Interrupt]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 

@@ -46,7 +46,6 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 - [Virtualization and Containers](Virtualization-and-Containers) — Hardware virtualization, container technology, and orchestration
 - [System Call Interface](System-Call-Interface) — Comprehensive system call interface and security features
 - [Inter-Process Communication](Inter-Process-Communication) — Pipes, message queues, shared memory, and synchronization
-- [Namespaces](Namespaces) — Process isolation with PID, IPC, Network, UTS, User, Cgroup, and Mount namespaces
 
 ---
 
@@ -63,17 +62,6 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 
 - [Performance & BORE Scheduler](Performance-Tuning-and-Kernel) — Performance tuning and BORE scheduler configuration
 - [Low-Overhead Kernel Observability](Low-Overhead-Kernel-Observability) — High-performance kernel tracing with SigmaTrace and eBPF
-- [Kernel Timers](Kernel-Timers) — High-resolution timer management with nanosecond precision
-- [Workqueue](Workqueue) — Asynchronous work execution with priority-based scheduling
-- [RCU Synchronization](RCU-Synchronization) — Scalable read-mostly data structure synchronization
-- [Lockdep](Lockdep) — Deadlock detection and lock order validation
-- [Cgroups](Cgroups) — Resource management and process grouping
-- [Kobject](Kobject) — Kernel object management and hierarchy
-- [Ftrace](Ftrace) — Function tracing and instrumentation
-- [Perf](Perf) — Performance monitoring and profiling
-- [Seccomp](Seccomp) — System call filtering and security sandboxing
-- [IOMMU](IOMMU) — Device memory isolation and DMA remapping
-- [Interrupt](Interrupt) — Interrupt handling and management
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support
 - [Lock-Free Data Structures](SIGMA_CONCURRENCY_PRIMITIVES) — Lock-free concurrency primitives and data structures
