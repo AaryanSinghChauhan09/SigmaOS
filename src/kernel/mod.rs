@@ -61,7 +61,9 @@ pub mod sched;
 pub mod scheduler;
 pub mod structures;
 pub mod subsystems;
+pub mod timer_subsystem;
 pub mod virtual_cpu;
+pub mod workqueue;
 
 pub use missing_linux_kernel_components::{
     BpfRingBufferStreamEngine, EpollCtlOp, EpollEvent, KernelAuditRecord, KernelAuditRecordType,
