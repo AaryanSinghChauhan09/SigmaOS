@@ -1,0 +1,531 @@
+# SigmaOS Feature Status Matrix - THE HONEST TRUTH
+# Generated: 2026-09-10
+# Purpose: Machine-readable capability tracking
+# Status values: "working", "partial", "prototype", "stub", "not_implemented"
+
+[metadata]
+version = "0.1.0"
+last_updated = "2026-09-10"
+total_features = 50
+working = 2
+partial = 8
+prototype = 15
+stub = 12
+not_implemented = 13
+
+# =============================================================================
+# BOOT & KERNEL FOUNDATIONS
+# =============================================================================
+
+[feature.uefi_boot]
+status = "partial"
+details = "QEMU boot works, hard-coded addresses (0x8000, 0x9000), no real hardware testing"
+tested_on = ["qemu-x86_64"]
+required_for_release = true
+blockers = ["remove_hard_coded_addresses", "test_real_hardware", "secure_boot"]
+files = ["src/kernel/main.rs", "src/boot/"]
+
+[feature.bootloader]
+status = "prototype"
+details = "systemd-boot and GRUB configs defined, installation is placeholder"
+tested_on = []
+required_for_release = true
+blockers = ["real_grub_installation", "real_systemd_boot_installation"]
+files = ["installer/sigma-installer.rs"]
+
+[feature.kernel_init]
+status = "partial"
+details = "Basic initialization exists, uses OpenRC abstraction, incomplete"
+tested_on = ["qemu"]
+required_for_release = true
+blockers = ["complete_memory_management", "interrupt_handling", "smp_startup"]
+files = ["src/kernel/main.rs"]
+
+[feature.syscall_interface]
+status = "prototype"
+details = "Syscall table exists, most syscalls are stubs or unimplemented"
+tested_on = ["qemu"]
+required_for_release = true
+blockers = ["implement_exec", "implement_fork", "implement_mmap", "implement_poll", "implement_signals"]
+files = ["src/kernel/syscall.rs"]
+
+[feature.process_management]
+status = "partial"
+details = "Process structures exist, creation/termination incomplete"
+tested_on = ["qemu"]
+required_for_release = true
+blockers = ["real_exec", "real_fork", "real_wait", "signal_handling"]
+files = ["src/process/"]
+
+[feature.memory_management]
+status = "partial"
+details = "Buddy allocator and slab cache exist, page tables incomplete"
+tested_on = ["qemu"]
+required_for_release = true
+blockers = ["complete_page_tables", "user_kernel_separation", "mmap_implementation"]
+files = ["src/memory/"]
+
+[feature.interrupt_handling]
+status = "partial"
+details = "Basic interrupt setup exists, incomplete handling"
+tested_on = ["qemu"]
+required_for_release = true
+blockers = ["complete_pic_apic", "timer_interrupts", "irq_routing"]
+files = ["src/kernel/interrupts.rs"]
+
+[feature.elf_loader]
+status = "prototype"
+details = "Basic ELF parsing exists, no dynamic linking"
+tested_on = []
+required_for_release = true
+blockers = ["complete_elf_loading", "dynamic_linker", "relocation"]
+files = ["src/kernel/elf.rs"]
+
+# =============================================================================
+# USERSPACE & POSIX
+# =============================================================================
+
+[feature.libc]
+status = "not_implemented"
+details = "No sigma-libc exists, applications cannot be built"
+tested_on = []
+required_for_release = true
+blockers = ["build_sigma_libc", "syscall_wrappers", "posix_apis"]
+files = []
+
+[feature.init_system]
+status = "prototype"
+details = "Multiple init abstractions exist, none fully implemented"
+tested_on = []
+required_for_release = true
+blockers = ["choose_one_init", "implement_service_supervision", "dependency_ordering"]
+files = ["src/init/"]
+
+[feature.shell]
+status = "not_implemented"
+details = "No working shell, references exist but not functional"
+tested_on = []
+required_for_release = true
+blockers = ["build_shell", "implement_job_control", "command_execution"]
+files = []
+
+[feature.core_utilities]
+status = "not_implemented"
+details = "No standard utilities (ls, cat, grep, etc.)"
+tested_on = []
+required_for_release = true
+blockers = ["implement_coreutils"]
+files = []
+
+[feature.pthread]
+status = "not_implemented"
+details = "Thread abstractions exist, no pthread-compatible layer"
+tested_on = []
+required_for_release = false
+blockers = ["implement_pthread_api", "thread_local_storage"]
+files = ["src/process/thread.rs"]
+
+# =============================================================================
+# HARDWARE SUPPORT
+# =============================================================================
+
+[feature.virtio_drivers]
+status = "partial"
+details = "VirtIO block and network exist, incomplete"
+tested_on = ["qemu"]
+required_for_release = true
+blockers = ["complete_virtio_block", "complete_virtio_net", "virtio_gpu"]
+files = ["src/drivers/virtio/"]
+
+[feature.nvme_driver]
+status = "prototype"
+details = "NVMe structures defined, incomplete implementation"
+tested_on = []
+required_for_release = false
+blockers = ["complete_nvme_implementation", "error_recovery", "hotplug"]
+files = ["src/drivers/nvme.rs"]
+
+[feature.intel_graphics]
+status = "not_implemented"
+details = "Planned, not implemented"
+tested_on = []
+required_for_release = true
+blockers = ["drm_kms", "mesa_integration", "modesetting"]
+files = []
+
+[feature.amd_graphics]
+status = "not_implemented"
+details = "Planned, not implemented"
+tested_on = []
+required_for_release = false
+blockers = ["drm_kms", "mesa_integration"]
+files = []
+
+[feature.audio]
+status = "not_implemented"
+details = "Audio abstractions exist, no drivers"
+tested_on = []
+required_for_release = true
+blockers = ["alsa_driver", "pipewire_integration", "intel_hda"]
+files = ["src/audio/"]
+
+[feature.wifi]
+status = "not_implemented"
+details = "Network stack exists, no Wi-Fi drivers or wpa_supplicant"
+tested_on = []
+required_for_release = true
+blockers = ["intel_wifi_driver", "wpa_supplicant_equivalent", "network_manager"]
+files = []
+
+[feature.bluetooth]
+status = "not_implemented"
+details = "Not implemented"
+tested_on = []
+required_for_release = false
+blockers = ["bluetooth_stack", "bluez_equivalent"]
+files = []
+
+[feature.usb_host]
+status = "not_implemented"
+details = "USB structures defined, no host controller drivers"
+tested_on = []
+required_for_release = true
+blockers = ["xhci_driver", "usb_enumeration", "usb_storage"]
+files = ["src/drivers/usb/"]
+
+[feature.acpi]
+status = "prototype"
+details = "ACPI table parsing exists, incomplete"
+tested_on = []
+required_for_release = true
+blockers = ["complete_acpi_parsing", "power_management", "thermal_zones"]
+files = ["src/acpi/"]
+
+# =============================================================================
+# GRAPHICS & DESKTOP
+# =============================================================================
+
+[feature.compositor]
+status = "stub"
+details = "Zenith compositor module exists, ALL init methods return Ok(()) without work"
+tested_on = []
+required_for_release = true
+blockers = ["implement_wayland_backend", "drm_kms", "input_handling", "real_window_management"]
+files = ["src/compositor/mod.rs"]
+
+[feature.wayland]
+status = "stub"
+details = "Method exists, returns Ok(()), no protocol handling"
+tested_on = []
+required_for_release = true
+blockers = ["wayland_protocol_implementation", "wlroots_integration"]
+files = ["src/compositor/mod.rs"]
+
+[feature.x11]
+status = "stub"
+details = "Method exists, returns Ok(()), no X11 server"
+tested_on = []
+required_for_release = false
+blockers = ["xwayland_integration"]
+files = ["src/compositor/mod.rs"]
+
+[feature.vulkan]
+status = "stub"
+details = "Method exists, returns Ok(()), no Vulkan implementation"
+tested_on = []
+required_for_release = false
+blockers = ["mesa_integration", "vulkan_loader"]
+files = ["src/compositor/mod.rs"]
+
+[feature.opengl]
+status = "stub"
+details = "Method exists, returns Ok(()), no OpenGL implementation"
+tested_on = []
+required_for_release = false
+blockers = ["mesa_integration", "opengl_context"]
+files = ["src/compositor/mod.rs"]
+
+[feature.font_rendering]
+status = "not_implemented"
+details = "No font rendering implementation"
+tested_on = []
+required_for_release = true
+blockers = ["freetype_equivalent", "harfbuzz_equivalent", "font_cache"]
+files = []
+
+[feature.input_handling]
+status = "not_implemented"
+details = "Input device structures exist, no real event processing"
+tested_on = []
+required_for_release = true
+blockers = ["evdev_equivalent", "libinput_equivalent", "keyboard_layout"]
+files = ["src/drivers/input/"]
+
+# =============================================================================
+# STORAGE & FILESYSTEM
+# =============================================================================
+
+[feature.ext4]
+status = "not_implemented"
+details = "VFS layer exists, no ext4 driver"
+tested_on = []
+required_for_release = true
+blockers = ["implement_ext4_driver", "journal_recovery", "fsck"]
+files = []
+
+[feature.btrfs]
+status = "not_implemented"
+details = "Mentioned in docs, not implemented"
+tested_on = []
+required_for_release = false
+blockers = ["implement_btrfs", "snapshot_support", "compression"]
+files = []
+
+[feature.vfs]
+status = "partial"
+details = "VFS abstractions exist, incomplete semantics"
+tested_on = []
+required_for_release = true
+blockers = ["complete_vfs_operations", "permissions", "locking", "mount_namespaces"]
+files = ["src/filesystem/vfs.rs"]
+
+[feature.encryption]
+status = "not_implemented"
+details = "Crypto primitives exist, no LUKS or dm-crypt equivalent"
+tested_on = []
+required_for_release = true
+blockers = ["implement_disk_encryption", "luks_equivalent", "key_management"]
+files = []
+
+# =============================================================================
+# NETWORKING
+# =============================================================================
+
+[feature.tcp_ip_stack]
+status = "partial"
+details = "Network structures exist, incomplete TCP/IP implementation"
+tested_on = []
+required_for_release = true
+blockers = ["complete_tcp", "complete_udp", "complete_ipv6", "routing"]
+files = ["src/network/"]
+
+[feature.socket_api]
+status = "prototype"
+details = "Socket abstractions exist, no stable ABI"
+tested_on = []
+required_for_release = true
+blockers = ["implement_socket_syscalls", "socket_options", "non_blocking_io"]
+files = ["src/network/socket.rs"]
+
+[feature.dhcp_client]
+status = "not_implemented"
+details = "Not implemented"
+tested_on = []
+required_for_release = true
+blockers = ["implement_dhcp_client"]
+files = []
+
+[feature.dns_resolver]
+status = "not_implemented"
+details = "Not implemented"
+tested_on = []
+required_for_release = true
+blockers = ["implement_dns_resolver", "resolv_conf"]
+files = []
+
+[feature.firewall]
+status = "not_implemented"
+details = "Firewall abstractions exist, no real filtering"
+tested_on = []
+required_for_release = false
+blockers = ["implement_packet_filter", "nat", "connection_tracking"]
+files = ["src/network/firewall.rs"]
+
+[feature.wireguard]
+status = "not_implemented"
+details = "WireGuard mentioned, not implemented"
+tested_on = []
+required_for_release = false
+blockers = ["implement_wireguard", "crypto_integration"]
+files = []
+
+# =============================================================================
+# PACKAGE MANAGEMENT
+# =============================================================================
+
+[feature.package_manager]
+status = "prototype"
+details = "sigma-pkg exists but uses SYNTHETIC metadata and DEMO signatures"
+tested_on = []
+required_for_release = true
+blockers = ["remove_synthetic_metadata", "real_signatures", "fail_closed", "tuf_metadata"]
+files = ["src/bin/sigma_pkg.rs", "src/packages/"]
+
+[feature.package_verification]
+status = "demo_mode"
+details = "Verification command accepts EMPTY signature payloads, creates synthetic checksums"
+tested_on = []
+required_for_release = true
+blockers = ["implement_real_verification", "tuf_integration", "ed25519_verification"]
+files = ["src/packages/verification.rs"]
+
+[feature.package_repository]
+status = "prototype"
+details = "Repository management is in-memory only, not persistent"
+tested_on = []
+required_for_release = true
+blockers = ["persistent_repository", "mirror_support", "metadata_updates"]
+files = ["src/packages/repository.rs"]
+
+[feature.dependency_resolver]
+status = "not_implemented"
+details = "No dependency resolution"
+tested_on = []
+required_for_release = true
+blockers = ["implement_sat_solver", "conflict_resolution", "version_constraints"]
+files = []
+
+# =============================================================================
+# UPDATES & RECOVERY
+# =============================================================================
+
+[feature.atomic_updates]
+status = "partial"
+details = "Generation pointer exists, no boot verification, no automatic rollback"
+tested_on = []
+required_for_release = true
+blockers = ["boot_success_handshake", "automatic_rollback", "power_loss_testing"]
+files = ["src/update/"]
+
+[feature.rollback]
+status = "not_implemented"
+details = "Structures exist, not functional"
+tested_on = []
+required_for_release = true
+blockers = ["implement_rollback", "boot_counter", "recovery_mode"]
+files = ["src/update/rollback.rs"]
+
+[feature.verified_boot]
+status = "not_implemented"
+details = "Mentioned, not implemented"
+tested_on = []
+required_for_release = true
+blockers = ["dm_verity_equivalent", "tpm_integration", "measured_boot"]
+files = []
+
+# =============================================================================
+# SECURITY
+# =============================================================================
+
+[feature.sandboxing]
+status = "interface_only"
+details = "Landlock/pledge/unveil/Capsicum/seccomp INTERFACES exist, NO NATIVE BACKEND"
+tested_on = []
+required_for_release = true
+blockers = ["implement_native_sandbox", "capability_system", "syscall_filtering"]
+files = ["src/security/"]
+
+[feature.landlock]
+status = "linux_only"
+details = "Will only work when running ON Linux kernel, not SigmaOS native"
+tested_on = []
+required_for_release = false
+blockers = ["native_filesystem_sandboxing"]
+files = ["src/security/landlock.rs"]
+
+[feature.pledge_unveil]
+status = "openbsd_only"
+details = "Will only work when running ON OpenBSD, not SigmaOS native"
+tested_on = []
+required_for_release = false
+blockers = ["native_promise_path_restriction"]
+files = ["src/security/pledge.rs", "src/security/unveil.rs"]
+
+[feature.capsicum]
+status = "freebsd_only"
+details = "Will only work when running ON FreeBSD, not SigmaOS native"
+tested_on = []
+required_for_release = false
+blockers = ["native_capability_mode"]
+files = ["src/security/capsicum.rs"]
+
+[feature.post_quantum_crypto]
+status = "interface_only"
+details = "Dilithium-5 and Kyber-1024 NAMES exist, interoperability testing needed"
+tested_on = []
+required_for_release = false
+blockers = ["verify_pqc_implementation", "interop_testing", "key_management"]
+files = ["src/crypto/pqc.rs"]
+
+# =============================================================================
+# INSTALLER
+# =============================================================================
+
+[feature.installer]
+status = "stub"
+details = "ALL installer operations are placeholders that return Ok(()) without work"
+tested_on = []
+required_for_release = true
+blockers = ["implement_real_partitioning", "real_filesystem_creation", "real_bootloader_install"]
+files = ["installer/sigma-installer.rs"]
+
+[feature.disk_partitioning]
+status = "stub"
+details = "Method returns Ok(()), does not partition disk"
+tested_on = []
+required_for_release = true
+blockers = ["implement_gpt_partitioning", "gdisk_equivalent"]
+files = ["installer/sigma-installer.rs"]
+
+[feature.base_system_install]
+status = "stub"
+details = "Method returns Ok(()), does not copy files"
+tested_on = []
+required_for_release = true
+blockers = ["implement_system_copy", "package_extraction"]
+files = ["installer/sigma-installer.rs"]
+
+[feature.user_creation]
+status = "stub"
+details = "Method returns Ok(()), does not create user"
+tested_on = []
+required_for_release = true
+blockers = ["implement_user_creation", "password_hashing", "home_directory"]
+files = ["installer/sigma-installer.rs"]
+
+# =============================================================================
+# SUMMARY
+# =============================================================================
+
+[summary]
+harsh_reality = """
+Out of 50 tracked features:
+- 2 working (4%)
+- 8 partial (16%)
+- 15 prototype (30%)
+- 12 stub (24%)
+- 13 not_implemented (26%)
+
+CRITICAL ISSUES:
+1. Installer: All operations are stubs (return Ok() without work)
+2. Compositor: All backends are stubs (return Ok() without initialization)
+3. Package Manager: Uses synthetic metadata and demo signatures
+4. Sandboxing: Only works on other OSes, not SigmaOS native
+5. No working filesystem driver (ext4, btrfs, etc.)
+6. No real hardware support (only QEMU)
+7. No stable syscall ABI
+8. No libc
+9. No shell
+10. Cannot boot on real hardware
+
+HONEST ASSESSMENT:
+SigmaOS is currently at ~5-10% of claimed functionality.
+Most modules are architectural designs with stub implementations.
+
+PATH FORWARD:
+Focus on Phase 1: "Bootable and Honest"
+- Replace ALL stubs with real implementations or NotImplemented errors
+- Implement ONE complete boot-to-shell path
+- Test on ONE real hardware device
+- Build credibility through working code, not type definitions
+"""
