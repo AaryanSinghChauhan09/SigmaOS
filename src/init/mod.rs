@@ -1,8 +1,13 @@
 pub mod init_abstraction;
 pub mod runit;
 pub mod s6;
+pub mod target_mapper;
+pub mod emergency_gate;
 pub mod sigma_init;
 pub mod sigmainit;
+
+pub use target_mapper::{RunlevelToTargetMapper, SysvRunlevel};
+pub use emergency_gate::AuthenticatedEmergencyTargetGate;
 pub mod service_innovations_engine;
 pub mod systemd_init;
 pub use service_innovations_engine::*;

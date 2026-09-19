@@ -1,5 +1,8 @@
 pub mod aperiodic;
 pub mod scheduler;
+pub mod deadline;
+
+pub use deadline::{SchedDeadlineParams, SovereignSchedDeadlineEngine};
 pub mod sigma_mlfq;
 pub mod sigma_thermal_sched;
 pub mod sigma_transformer_sched;

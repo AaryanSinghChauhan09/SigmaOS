@@ -23,7 +23,10 @@ pub mod printing;
 pub mod usb_hid;
 pub mod sovereign_driver_lifecycle;
 pub mod sovereign_distro_driver_suite;
+pub mod msix_engine;
 pub mod vesa;
+
+pub use msix_engine::{MsixTableEntry, SovereignMsixVectorEngine};
 
 pub use printing::{CupsIppPrintSpooler, LpdSpooler, PpdDriverMatcher, PrintJob, PrintJobState};
 

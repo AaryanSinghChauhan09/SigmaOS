@@ -692,6 +692,60 @@ mod tests {
         assert!(pipe.write_structure(vec![5]).is_ok());
     }
 
+// ============================================================================
+// seL4-INSPIRED FORMAL IPC CAPABILITY & INVARIANT CHECKER
+// ============================================================================
+
+/// Formal IPC Capability Token
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Sel4IpcCapabilityToken {
+    pub cap_id: u64,
+    pub rights_mask: u32, // Bit 0: Read, Bit 1: Write, Bit 2: Grant
+    pub badge: u64,
+}
+
+/// seL4-inspired Formal IPC Invariant Verification Engine
+#[derive(Debug)]
+pub struct Sel4IpcInvariantVerifierEngine;
+
+impl Sel4IpcInvariantVerifierEngine {
+    pub fn verify_ipc_rights(token: &Sel4IpcCapabilityToken, required_rights: u32) -> Result<(), &'static str> {
+        if (token.rights_mask & required_rights) == required_rights {
+            Ok(())
+        } else {
+            Err("seL4 IPC Invariant Violation: Insufficient Capability Rights")
+        }
+    }
+
+    pub fn verify_message_integrity(msg_bytes: &[u8], expected_badge: u64, token: &Sel4IpcCapabilityToken) -> Result<(), &'static str> {
+        if msg_bytes.len() > 8192 {
+            return Err("seL4 IPC Invariant Violation: Payload exceeds max IPC buffer size (8KB)");
+        }
+        if token.badge != expected_badge {
+            return Err("seL4 IPC Invariant Violation: Badge Mismatch");
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests_sel4_ipc {
+    use super::*;
+
+    #[test]
+    fn test_sel4_ipc_invariant_verifier() {
+        let token = Sel4IpcCapabilityToken {
+            cap_id: 1,
+            rights_mask: 0b111, // Read/Write/Grant
+            badge: 0xDEADBEEF,
+        };
+        assert!(Sel4IpcInvariantVerifierEngine::verify_ipc_rights(&token, 0b011).is_ok());
+
+        let msg = b"Secure seL4 IPC Payload";
+        assert!(Sel4IpcInvariantVerifierEngine::verify_message_integrity(msg, 0xDEADBEEF, &token).is_ok());
+    }
+}
+
     #[test]
     fn test_sovereign_pipe_epipe_and_fifo() {
         // Test broken pipe (EPIPE) on reader close

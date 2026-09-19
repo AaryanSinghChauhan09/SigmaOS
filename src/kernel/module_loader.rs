@@ -39,6 +39,8 @@ pub struct KernelModule {
     pub exported_symbols: Vec<KernelSymbol>,
     pub base_address: u64,
     pub size_bytes: usize,
+    pub modalias_patterns: Vec<String>,
+    pub firmware_files: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -150,6 +152,17 @@ impl SovereignKernelModuleManager {
         self.kernel_symbol_table.insert(name.to_string(), sym);
     }
 
+    /// Parses Linux / BSD ELF `.modinfo` metadata section
+    pub fn parse_modinfo_section(&self, modinfo_raw: &str) -> BTreeMap<String, String> {
+        let mut kv = BTreeMap::new();
+        for line in modinfo_raw.lines() {
+            if let Some((k, v)) = line.split_once('=') {
+                kv.insert(k.trim().to_string(), v.trim().to_string());
+            }
+        }
+        kv
+    }
+
     /// Dynamically loads a kernel module (insmod / kldload parity)
     pub fn load_module(
         &mut self,
@@ -196,6 +209,8 @@ impl SovereignKernelModuleManager {
             exported_symbols: Vec::new(),
             base_address,
             size_bytes,
+            modalias_patterns: Vec::new(),
+            firmware_files: Vec::new(),
         };
 
         self.loaded_modules.insert(name.to_string(), module);
@@ -274,7 +289,7 @@ impl Default for SovereignKernelModuleManager {
     }
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
 
