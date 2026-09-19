@@ -32,7 +32,6 @@
 ---
 
 #### 📦 Package Management
-- **[[SigmaPkg - Universal Package Manager|SigmaPkg]]**
 - **[[Universal Package Engine (sigpkg)|Package-Management-and-Sigpkg]]**
 - **[[Arch PKGBUILD & AUR Helper|ARCH_LINUX_PARITY_FEATURES]]**
 - **[[Multi-Distro Adapters|UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN]]**
@@ -46,11 +45,15 @@
 - **[[Privilege Delegation (doas)|SECURITY]]**
 - **[[Networking & WireGuard|networking]]**
 - **[[Logging & Journalctl|syslog]]**
+- **[[Power Management|Power-Management]]**
+- **[[Real-Time Computing|Real-Time-Computing]]**
+- **[[Virtualization and Containers|Virtualization-and-Containers]]**
+- **[[System Call Interface|System-Call-Interface]]**
+- **[[Inter-Process Communication|Inter-Process-Communication]]**
 
 ---
 
 #### 🛡️ Security & Hardening
-- **[[Security Sandbox & Isolation|Security-Sandbox-Isolation]]**
 - **[[Security & Sandboxing|Security-Sandboxing-and-Hardening]]**
 - **[[Zorin Exec Guard|Security-Sandboxing-and-Hardening#zorin-exec-guard]]**
 - **[[Hardware Enclaves & PQC|Security-Sandboxing-and-Hardening#hardware-enclaves--post-quantum-cryptography]]**
@@ -63,55 +66,8 @@
 - **[[Performance & BORE Scheduler|Performance-Tuning-and-Kernel]]**
 - **[[MGLRU & Memory Reclamation|Performance-Tuning-and-Kernel#mglru--memory-reclamation]]**
 - **[[eBPF / XDP Networking|Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking]]**
-n- **[[Demand Paging & Swap|Demand-Paging-and-Swap]]**
-- **[[Kernel Syscall Enforcement|Kernel-Syscall-Enforcement]]**
-- **[[eBPF JIT Compilation|eBPF-JIT-Compilation]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
-
-n- **[[Dynamic Kernel Module Loading|Dynamic-Kernel-Module-Loading]]**
-- **[[Interrupt Balancing & MSI-X|Interrupt-Balancing-and-MSI-X]]**
-- **[[Cgroups v2 Memory Controller|Cgroups-v2-Memory-Controller]]**
-- **[[Linux io_uring|Linux-io_uring-Implementation]]**
-- **[[FreeBSD Capsicum|FreeBSD-Capsicum-Integration]]**
-n- **[[ZFS Integration with ARC|ZFS-Integration-with-ARC]]**
-- **[[Btrfs Subvolumes & Send/Receive|Btrfs-Subvolumes-and-Send-Receive]]**
-- **[[XDP Zero-Copy Networking|XDP-Zero-Copy-Networking]]**
-- **[[PF Firewall with CARP/pfsync|PF-Firewall-with-CARP-pfsync]]**
-- **[[Nix/Guix Hermetic Build Sandboxing|Nix-Guix-Hermetic-Build-Sandboxing]]**
-n- **[[Advanced NVIDIA GPU Support|Advanced-NVIDIA-GPU-Support]]**
-- **[[Wi-Fi 6E/7 Support|Wi-Fi-6E-7-Support]]**
-- **[[USB3/4 xHCI Full Support|USB3-4-xHCI-Full-Support]]**
-- **[[Mach/Zircon Zero-Copy IPC|Mach-Zircon-Zero-Copy-IPC]]**
-- **[[Gentoo Portage Integration|Gentoo-Portage-Integration]]**
-n- **[[Device Drivers|Device-Drivers]]**
-- **[[User Space and Applications|User-Space-and-Applications]]**
-
-n- **[[Boot Process and Recovery|Boot-Process-and-Recovery]]**
-- **[[Package Management|Package-Management]]**
-
-n- **[[Concurrency and Deadlocks|Concurrency-and-Deadlocks]]**
-- **[[Operating System Structure|Operating-System-Structure]]**
-
-n- **[[File Management|File-Management]]**
-- **[[System Security|System-Security]]**
-
-n- **[[Process Management|Process-Management]]**
-- **[[Memory Management|Memory-Management]]**
-
-n- **[[Security Hardening Guide|Security-Hardening-Guide]]**
-
-n- **[[System Monitoring & Observability|System-Monitoring-and-Observability]]**
-n- **[[Container Orchestration|Container-Orchestration]]**
-n- **[[Filesystem Support Matrix|Filesystem-Support-Matrix]]**
-- **[[Networking Support Matrix|Networking-Support-Matrix]]**
-
-
-
-n- **[[Naming Conventions & Rules|Naming-Conventions-and-Rules]]**
-
-
-
 
 ---
 

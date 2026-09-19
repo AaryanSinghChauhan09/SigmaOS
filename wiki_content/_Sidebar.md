@@ -45,6 +45,11 @@
 - **[[Privilege Delegation (doas)|SECURITY]]**
 - **[[Networking & WireGuard|networking]]**
 - **[[Logging & Journalctl|syslog]]**
+- **[[Power Management|Power-Management]]**
+- **[[Real-Time Computing|Real-Time-Computing]]**
+- **[[Virtualization and Containers|Virtualization-and-Containers]]**
+- **[[System Call Interface|System-Call-Interface]]**
+- **[[Inter-Process Communication|Inter-Process-Communication]]**
 
 ---
 

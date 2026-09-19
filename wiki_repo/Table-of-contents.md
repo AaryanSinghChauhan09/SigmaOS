@@ -26,7 +26,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Package Management
-- [SigmaPkg - Universal Package Manager](SigmaPkg) — Universal package management system with multi-format support
+
 - [Universal Package Engine (sigpkg)](Package-Management-and-Sigpkg) — Overview of the SigmaPkg package management system
 - [Arch PKGBUILD & AUR Helper](ARCH_LINUX_PARITY_FEATURES) — Integration with Arch Linux package formats and AUR
 - [Multi-Distro Adapters](UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN) — Support for multiple Linux and BSD package formats
@@ -35,19 +35,21 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## System Administration
-- [System Monitoring & Observability](System-Monitoring-and-Observability) — Real-time metrics, distributed tracing, log aggregation, and alerting
+
 - [Services & Supervision](System-Administration-and-Services) — Service management and supervision system
 - [Privilege Delegation (doas)](SECURITY) — Secure privilege escalation and delegation
 - [Networking & WireGuard](networking) — Network configuration and WireGuard VPN integration
 - [Logging & Journalctl](syslog) — System logging and journal management
-- [File Management](File-Management) — VFS, file permissions, file locking, directory operations
+- [Power Management](Power-Management) — CPU frequency scaling, device power states, battery management, and thermal control
+- [Real-Time Computing](Real-Time-Computing) — Real-time scheduling, preemptible kernel, and deterministic latency
+- [Virtualization and Containers](Virtualization-and-Containers) — Hardware virtualization, container technology, and orchestration
+- [System Call Interface](System-Call-Interface) — Comprehensive system call interface and security features
+- [Inter-Process Communication](Inter-Process-Communication) — Pipes, message queues, shared memory, and synchronization
 
 ---
 
 ## Security & Hardening
-- [Security Hardening Guide](Security-Hardening-Guide) — Kernel hardening, application sandboxing, secure coding practices
-- [System Security](System-Security) — Access control, auditing, MAC framework, security policies
-- [Security Sandbox & Isolation](Security-Sandbox-Isolation) — Comprehensive security sandboxing with Landlock, Capsicum, and pledge/unveil
+
 - [Security & Sandboxing](Security-Sandboxing-and-Hardening) — Comprehensive security model and sandboxing capabilities
 - [Zorin Exec Guard](Security-Sandboxing-and-Hardening#zorin-exec-guard) — Default-deny capability permission model
 - [Hardware Enclaves & PQC](Security-Sandboxing-and-Hardening#hardware-enclaves--post-quantum-cryptography) — Hardware enclaves and post-quantum cryptography support
@@ -56,29 +58,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Performance & Kernel
-- [Concurrency and Deadlocks](Concurrency-and-Deadlocks) — Thread management, synchronization primitives, deadlock detection, lock-free algorithms
-- [Operating System Structure](Operating-System-Structure) — Microkernel design, HAL, system call interface, IPC mechanisms
-- [Process Management](Process-Management) — Process scheduling, cgroups, resource limits, namespaces
-- [Memory Management](Memory-Management) — Virtual memory, demand paging, slab allocator, memory compaction
 
-- [Demand Paging & Swap](Demand-Paging-and-Swap) — Memory management with demand paging and swap support
-- [Kernel Syscall Enforcement](Kernel-Syscall-Enforcement) — Kernel-space syscall restriction and security enforcement
-- [eBPF JIT Compilation](eBPF-JIT-Compilation) — eBPF JIT compiler for high-performance packet filtering
-- [Dynamic Kernel Module Loading](Dynamic-Kernel-Module-Loading) — Runtime kernel module loading and unloading
-- [Interrupt Balancing & MSI-X](Interrupt-Balancing-and-MSI-X) — Advanced interrupt balancing and MSI-X support
-- [Cgroups v2 Memory Controller](Cgroups-v2-Memory-Controller) — Fine-grained memory resource management and isolation
-- [Linux io_uring](Linux-io_uring-Implementation) — High-performance asynchronous I/O with zero-copy support
-- [FreeBSD Capsicum](FreeBSD-Capsicum-Integration) — Capability-based access control and sandboxing
-- [ZFS Integration with ARC](ZFS-Integration-with-ARC) — Advanced storage management with data integrity and compression
-- [Btrfs Subvolumes & Send/Receive](Btrfs-Subvolumes-and-Send-Receive) — Copy-on-write filesystem with snapshot replication
-- [XDP Zero-Copy Networking](XDP-Zero-Copy-Networking) — Ultra-high-performance packet processing at NIC level
-- [PF Firewall with CARP/pfsync](PF-Firewall-with-CARP-pfsync) — Stateful firewalling with high availability
-- [Nix/Guix Hermetic Build Sandboxing](Nix-Guix-Hermetic-Build-Sandboxing) — Reproducible builds with complete isolation
-- [Advanced NVIDIA GPU Support](Advanced-NVIDIA-GPU-Support) — NVIDIA GPU support with CUDA acceleration
-- [Wi-Fi 6E/7 Support](Wi-Fi-6E-7-Support) — Ultra-high-speed wireless networking with 6 GHz support
-- [USB3/4 xHCI Full Support](USB3-4-xHCI-Full-Support) — High-speed USB with Thunderbolt integration
-- [Mach/Zircon Zero-Copy IPC](Mach-Zircon-Zero-Copy-IPC) — High-performance message passing with zero-copy
-- [Gentoo Portage Integration](Gentoo-Portage-Integration) — Source-based package management with USE flags
 - [Performance & BORE Scheduler](Performance-Tuning-and-Kernel) — Performance tuning and BORE scheduler configuration
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support
@@ -87,9 +67,6 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Maintenance & Recovery
-- [Boot Process and Recovery](Boot-Process-and-Recovery) — Bootloaders, init system, recovery modes, snapshots
-- [Container Orchestration](Container-Orchestration) — Kubernetes-compatible APIs, pod scheduling, service discovery, and autoscaling
-- [Package Management](Package-Management) — Universal package manager, dependency resolution, repository management
 
 - [Rollback Engine & Snapshots](Maintenance-and-Rollback-Engine) — Atomic rollback engine and system snapshots
 - [Declarative Generations](Maintenance-and-Rollback-Engine#declarative-system-generations) — Declarative system state and generation management
@@ -99,25 +76,11 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 ---
 
 ## Hardware & Platform
-- [Device Drivers](Device-Drivers) — PCI/PCIe, USB, network, storage, GPU drivers
-- [User Space and Applications](User-Space-and-Applications) — Process isolation, syscalls, compatibility layers
-- [Filesystem Support Matrix](Filesystem-Support-Matrix) — ext4, XFS, Btrfs, ZFS, UFS, Hammer2, NFS, SMB, SSHFS, encryption
-- [Networking Support Matrix](Networking-Support-Matrix) — IPv4/IPv6, bonding, VLANs, VPNs, namespaces, bridging
 
 - [Hardware Support Matrix](SUPPORT_MATRIX) — Comprehensive hardware compatibility and support matrix
 - [Multi-Architecture Support](ARCHITECTURE) — Support for x86_64, AArch64, and other architectures
 - [Virtualization & Containers](Virtualization-and-Containers-Isolation) — Virtualization and container isolation features
 - [Device Drivers](Device-Drivers) — Device driver support and management
-
----
-
-## Development
-
-- [Contributing](Contributing) — How to contribute to SigmaOS development
-- [Development Guide](DEVELOPMENT_GUIDE.md) — Guide for SigmaOS development
-- [General Recommendations](General-Recommendations) — General post-installation recommendations
-- [Wiki Contributing](Wiki-Contributing.md) — How to contribute to the SigmaOS Wiki
-- [Naming Conventions & Rules](Naming-Conventions-and-Rules) — SigmaOS naming conventions and coding rules
 
 ---
 

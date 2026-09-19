@@ -40,6 +40,11 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 - [Privilege Delegation (doas)](SECURITY) — Secure privilege escalation and delegation
 - [Networking & WireGuard](networking) — Network configuration and WireGuard VPN integration
 - [Logging & Journalctl](syslog) — System logging and journal management
+- [Power Management](Power-Management) — CPU frequency scaling, device power states, battery management, and thermal control
+- [Real-Time Computing](Real-Time-Computing) — Real-time scheduling, preemptible kernel, and deterministic latency
+- [Virtualization and Containers](Virtualization-and-Containers) — Hardware virtualization, container technology, and orchestration
+- [System Call Interface](System-Call-Interface) — Comprehensive system call interface and security features
+- [Inter-Process Communication](Inter-Process-Communication) — Pipes, message queues, shared memory, and synchronization
 
 ---
 
