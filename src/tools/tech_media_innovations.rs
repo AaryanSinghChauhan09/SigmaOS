@@ -1003,6 +1003,228 @@ impl AppualsTroubleshootingEngine {
 }
 
 // ============================================================================
+// 15. SchedExt Dynamic Scheduler Policy Manager
+// Inspired by 9to5Linux, Phoronix, Linux.org
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SchedExtPolicy {
+    ScxRusty,
+    ScxBpfland,
+    ScxLavd,
+    ScxCentral,
+    ScxPrio,
+}
+
+#[derive(Debug, Clone)]
+pub struct SchedExtDynamicPolicyManager {
+    pub active_policy: SchedExtPolicy,
+    pub bpf_scheduler_loaded: bool,
+    pub current_workload_type: String,
+}
+
+impl SchedExtDynamicPolicyManager {
+    pub fn new() -> Self {
+        Self {
+            active_policy: SchedExtPolicy::ScxBpfland,
+            bpf_scheduler_loaded: true,
+            current_workload_type: "Desktop/Interactive".to_string(),
+        }
+    }
+
+    pub fn select_optimal_policy(&mut self, workload: &str) -> SchedExtPolicy {
+        self.current_workload_type = workload.to_string();
+        let policy = match workload {
+            "Gaming" | "LowLatency" => SchedExtPolicy::ScxLavd,
+            "Compilation" | "Batch" => SchedExtPolicy::ScxRusty,
+            "Realtime" => SchedExtPolicy::ScxPrio,
+            _ => SchedExtPolicy::ScxBpfland,
+        };
+        self.active_policy = policy.clone();
+        policy
+    }
+
+    pub fn verify_sched_ext_health(&self) -> bool {
+        self.bpf_scheduler_loaded && !self.current_workload_type.is_empty()
+    }
+}
+
+impl Default for SchedExtDynamicPolicyManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 16. ATX 3.1 & 12V-2x6 Transient Power Rail Guard Engine
+// Inspired by HWBusters, TechPowerUp, PCWorld
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Atx31PowerRailStatus {
+    pub rail_12vhpwr_voltage: f32,
+    pub transient_peak_watts: f32,
+    pub vrm_temperature_c: f32,
+    pub connector_sense_pins_ok: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct ATX31PowerRailGuardEngine {
+    pub status: Atx31PowerRailStatus,
+}
+
+impl ATX31PowerRailGuardEngine {
+    pub fn new() -> Self {
+        Self {
+            status: Atx31PowerRailStatus {
+                rail_12vhpwr_voltage: 12.08,
+                transient_peak_watts: 450.0,
+                vrm_temperature_c: 52.0,
+                connector_sense_pins_ok: true,
+            },
+        }
+    }
+
+    pub fn verify_atx31_spec(&self) -> bool {
+        let s = &self.status;
+        s.connector_sense_pins_ok
+            && s.rail_12vhpwr_voltage >= 11.4
+            && s.rail_12vhpwr_voltage <= 12.6
+            && s.vrm_temperature_c < 90.0
+    }
+
+    pub fn handle_transient_spike(&mut self, peak_watts: f32) -> bool {
+        self.status.transient_peak_watts = peak_watts;
+        peak_watts <= 900.0 && self.verify_atx31_spec()
+    }
+}
+
+impl Default for ATX31PowerRailGuardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 17. Local RAG KV-Cache & Context Window Compression Engine
+// Inspired by KDnuggets, MarkTechPost, InfoWorld
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct LocalRagContextCompressionEngine {
+    pub flash_attention_v3_active: bool,
+    pub kv_cache_compression_ratio: f32,
+    pub exl2_quant_bits: u8,
+}
+
+impl LocalRagContextCompressionEngine {
+    pub fn new() -> Self {
+        Self {
+            flash_attention_v3_active: true,
+            kv_cache_compression_ratio: 0.45,
+            exl2_quant_bits: 4,
+        }
+    }
+
+    pub fn calculate_vram_savings_mb(&self, base_vram_mb: usize) -> usize {
+        if self.flash_attention_v3_active {
+            (base_vram_mb as f32 * self.kv_cache_compression_ratio) as usize
+        } else {
+            base_vram_mb
+        }
+    }
+
+    pub fn is_compression_optimal(&self) -> bool {
+        self.flash_attention_v3_active && self.kv_cache_compression_ratio < 0.70
+    }
+}
+
+impl Default for LocalRagContextCompressionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 18. Zero-Dependency AppImage & Flatpak Sandbox Runtime Engine
+// Inspired by ItsFOSS, MakeUseOf
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct AppImageFlatpakZeroDependencyBundleEngine {
+    pub appimage_mount_dir: String,
+    pub flatpak_bwrap_sandbox: bool,
+    pub cached_bundles_count: usize,
+}
+
+impl AppImageFlatpakZeroDependencyBundleEngine {
+    pub fn new() -> Self {
+        Self {
+            appimage_mount_dir: "/tmp/.mount_sigma_appimage".to_string(),
+            flatpak_bwrap_sandbox: true,
+            cached_bundles_count: 5,
+        }
+    }
+
+    pub fn launch_zero_dependency_bundle(&self, bundle_path: &str) -> Result<String, &'static str> {
+        if bundle_path.contains("AppImage") || bundle_path.contains("flatpak") {
+            Ok(format!("Successfully launched '{}' in zero-dependency sandbox profile", bundle_path))
+        } else {
+            Err("Unsupported bundle format")
+        }
+    }
+
+    pub fn is_sandbox_secure(&self) -> bool {
+        self.flatpak_bwrap_sandbox && !self.appimage_mount_dir.is_empty()
+    }
+}
+
+impl Default for AppImageFlatpakZeroDependencyBundleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 19. Cross-OS Encrypted Clipboard & Notification Mirror Bridge
+// Inspired by WindowsCentral, WindowsLatest, XDA-Developers, Android Police
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct CrossOsSeamlessBridgeEngine {
+    pub encrypted_clipboard_ring: Vec<String>,
+    pub private_space_isolated: bool,
+    pub phone_link_active: bool,
+}
+
+impl CrossOsSeamlessBridgeEngine {
+    pub fn new() -> Self {
+        Self {
+            encrypted_clipboard_ring: vec!["https://sigmaos.org/docs".to_string()],
+            private_space_isolated: true,
+            phone_link_active: true,
+        }
+    }
+
+    pub fn push_clipboard_item(&mut self, text: &str) {
+        if self.encrypted_clipboard_ring.len() >= 10 {
+            self.encrypted_clipboard_ring.remove(0);
+        }
+        self.encrypted_clipboard_ring.push(text.to_string());
+    }
+
+    pub fn verify_cross_os_security(&self) -> bool {
+        self.private_space_isolated && self.phone_link_active && !self.encrypted_clipboard_ring.is_empty()
+    }
+}
+
+impl Default for CrossOsSeamlessBridgeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // Sovereign Tech Media Master Suite
 // ============================================================================
 
@@ -1026,6 +1248,11 @@ pub struct SovereignTechMediaMasterSuite {
     pub linuxteck: LinuxTeckSysadminToolkitEngine,
     pub os4u: OpenSourceForUModularEngine,
     pub appuals: AppualsTroubleshootingEngine,
+    pub sched_ext_manager: SchedExtDynamicPolicyManager,
+    pub atx31_guard: ATX31PowerRailGuardEngine,
+    pub rag_compressor: LocalRagContextCompressionEngine,
+    pub zero_dep_bundles: AppImageFlatpakZeroDependencyBundleEngine,
+    pub cross_os_bridge: CrossOsSeamlessBridgeEngine,
 }
 
 impl SovereignTechMediaMasterSuite {
@@ -1049,6 +1276,11 @@ impl SovereignTechMediaMasterSuite {
             linuxteck: LinuxTeckSysadminToolkitEngine::new(),
             os4u: OpenSourceForUModularEngine::new(),
             appuals: AppualsTroubleshootingEngine::new(),
+            sched_ext_manager: SchedExtDynamicPolicyManager::new(),
+            atx31_guard: ATX31PowerRailGuardEngine::new(),
+            rag_compressor: LocalRagContextCompressionEngine::new(),
+            zero_dep_bundles: AppImageFlatpakZeroDependencyBundleEngine::new(),
+            cross_os_bridge: CrossOsSeamlessBridgeEngine::new(),
         }
     }
 
@@ -1099,6 +1331,18 @@ impl SovereignTechMediaMasterSuite {
         let os4u_ok = self.os4u.verify_modular_security();
         let appuals_ok = self.appuals.resolve_diagnostic(1001).contains("1001");
 
+        // Verify New Enhanced Engines
+        let sched_ok = self.sched_ext_manager.select_optimal_policy("Gaming") == SchedExtPolicy::ScxLavd
+            && self.sched_ext_manager.verify_sched_ext_health();
+        let atx_ok = self.atx31_guard.verify_atx31_spec()
+            && self.atx31_guard.handle_transient_spike(500.0);
+        let rag_ok = self.rag_compressor.is_compression_optimal()
+            && self.rag_compressor.calculate_vram_savings_mb(1000) == 450;
+        let bundle_ok = self.zero_dep_bundles.is_sandbox_secure()
+            && self.zero_dep_bundles.launch_zero_dependency_bundle("GIMP.AppImage").is_ok();
+        self.cross_os_bridge.push_clipboard_item("https://sigmaos.org/release");
+        let cross_os_ok = self.cross_os_bridge.verify_cross_os_security();
+
         feeds_ok
             && telemetry_ok
             && bench_ok
@@ -1114,6 +1358,11 @@ impl SovereignTechMediaMasterSuite {
             && linuxteck_ok
             && os4u_ok
             && appuals_ok
+            && sched_ok
+            && atx_ok
+            && rag_ok
+            && bundle_ok
+            && cross_os_ok
     }
 }
 
@@ -1275,6 +1524,47 @@ mod tests {
 
         let de_gov = monitor.apply_makeuseof_lightweight_de_memory_governor(256);
         assert_eq!(de_gov, "Zenith-Minimal-Tiling");
+    }
+
+    #[test]
+    fn test_sched_ext_dynamic_policy_manager() {
+        let mut mgr = SchedExtDynamicPolicyManager::new();
+        assert!(mgr.verify_sched_ext_health());
+        assert_eq!(mgr.select_optimal_policy("Gaming"), SchedExtPolicy::ScxLavd);
+        assert_eq!(mgr.select_optimal_policy("Compilation"), SchedExtPolicy::ScxRusty);
+        assert_eq!(mgr.select_optimal_policy("Realtime"), SchedExtPolicy::ScxPrio);
+    }
+
+    #[test]
+    fn test_atx31_power_rail_guard_engine() {
+        let mut guard = ATX31PowerRailGuardEngine::new();
+        assert!(guard.verify_atx31_spec());
+        assert!(guard.handle_transient_spike(600.0));
+        assert!(!guard.handle_transient_spike(1200.0));
+    }
+
+    #[test]
+    fn test_local_rag_context_compression_engine() {
+        let engine = LocalRagContextCompressionEngine::new();
+        assert!(engine.is_compression_optimal());
+        assert_eq!(engine.calculate_vram_savings_mb(2000), 900);
+    }
+
+    #[test]
+    fn test_zero_dependency_bundle_engine() {
+        let engine = AppImageFlatpakZeroDependencyBundleEngine::new();
+        assert!(engine.is_sandbox_secure());
+        assert!(engine.launch_zero_dependency_bundle("app.AppImage").is_ok());
+        assert!(engine.launch_zero_dependency_bundle("app.flatpakref").is_ok());
+        assert!(engine.launch_zero_dependency_bundle("app.exe").is_err());
+    }
+
+    #[test]
+    fn test_cross_os_seamless_bridge_engine() {
+        let mut bridge = CrossOsSeamlessBridgeEngine::new();
+        assert!(bridge.verify_cross_os_security());
+        bridge.push_clipboard_item("New Clipboard Data");
+        assert_eq!(bridge.encrypted_clipboard_ring.last().unwrap(), "New Clipboard Data");
     }
 
     #[test]

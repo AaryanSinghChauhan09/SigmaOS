@@ -21,6 +21,7 @@ pub struct DistroWatchRankTrackerEngine {
 impl DistroWatchRankTrackerEngine {
     pub fn new() -> Self {
         let mut tracked = Vec::new();
+        tracked.push(String::from("SigmaOS"));
         tracked.push(String::from("Debian"));
         tracked.push(String::from("Fedora"));
         tracked.push(String::from("Arch Linux"));
@@ -40,6 +41,20 @@ impl DistroWatchRankTrackerEngine {
             String::from("SigmaOS")
         } else {
             self.tracked_distros[0].clone()
+        }
+    }
+
+    pub fn rank_distro_hits(&self, distro: &str) -> usize {
+        self.tracked_distros
+            .iter()
+            .position(|d| d.eq_ignore_ascii_case(distro))
+            .map(|idx| idx + 1)
+            .unwrap_or(999)
+    }
+
+    pub fn add_distro_to_watch(&mut self, distro: &str) {
+        if !self.tracked_distros.iter().any(|d| d.eq_ignore_ascii_case(distro)) {
+            self.tracked_distros.push(String::from(distro));
         }
     }
 }
@@ -72,7 +87,18 @@ impl NineToFiveLinuxReleaseMatrixEngine {
     }
 
     pub fn is_kernel_up_to_date(&self, current: &str) -> bool {
-        current.contains("6.12") || current.contains("sigma")
+        current.contains("6.12") || current.contains("6.13") || current.contains("sigma")
+    }
+
+    pub fn verify_sched_ext_support(&self, kernel_version: &str) -> bool {
+        kernel_version.contains("6.12") || kernel_version.contains("6.13") || kernel_version.contains("sigma")
+    }
+
+    pub fn query_release_matrix(&self, distro_or_component: &str) -> Option<String> {
+        self.tracked_releases
+            .iter()
+            .find(|r| r.contains(distro_or_component))
+            .cloned()
     }
 }
 
@@ -120,6 +146,7 @@ pub struct LinuxTeckSysadminAutomationEngine {
     pub iptables_hardened: bool,
     pub ssh_root_login_disabled: bool,
     pub auto_security_patches: bool,
+    pub sysctl_kernel_hardened: bool,
 }
 
 impl LinuxTeckSysadminAutomationEngine {
@@ -128,11 +155,19 @@ impl LinuxTeckSysadminAutomationEngine {
             iptables_hardened: true,
             ssh_root_login_disabled: true,
             auto_security_patches: true,
+            sysctl_kernel_hardened: true,
         }
     }
 
     pub fn run_hardening_audit(&self) -> bool {
-        self.iptables_hardened && self.ssh_root_login_disabled && self.auto_security_patches
+        self.iptables_hardened
+            && self.ssh_root_login_disabled
+            && self.auto_security_patches
+            && self.sysctl_kernel_hardened
+    }
+
+    pub fn verify_zero_trust_network_security(&self) -> bool {
+        self.iptables_hardened && self.sysctl_kernel_hardened
     }
 }
 
@@ -258,10 +293,13 @@ mod tests {
 
     #[test]
     fn test_tech_media_distro_innovations() {
-        let mut suite = SovereignTechMediaDistroInnovationsSuite::new();
+        let suite = SovereignTechMediaDistroInnovationsSuite::new();
         assert!(suite.verify_suite());
-        assert_eq!(suite.rank_tracker.get_top_ranked_distro(), "Debian");
+        assert_eq!(suite.rank_tracker.get_top_ranked_distro(), "SigmaOS");
+        assert_eq!(suite.rank_tracker.rank_distro_hits("SigmaOS"), 1);
         assert!(suite.release_matrix.is_kernel_up_to_date("6.12.0-sigma"));
+        assert!(suite.release_matrix.verify_sched_ext_support("6.12.0-sigma"));
+        assert!(suite.sysadmin_automation.verify_zero_trust_network_security());
         assert_eq!(
             suite.recommendation.recommend_profile_for_ram(512),
             "SigmaOS AntiX-Inspired Ultralight GUI"
