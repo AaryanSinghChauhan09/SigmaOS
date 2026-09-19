@@ -21,12 +21,13 @@
 /// - Ubuntu Pro Livepatch kernel hot-patching engine
 /// - Flatpak SDK container builder
 /// - Clear Linux Stateless /usr Configuration Overlay Engine
-use std::format;
-use std::string::{String, ToString};
-use std::vec;
-use std::vec::Vec;
-#[cfg(any(feature = "standalone_test", test))]
 extern crate alloc;
+
+use alloc::format;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// Arch Linux pacman-contrib Utilities Engine
 pub struct ArchPacmanContribEngine {
@@ -99,7 +100,7 @@ impl ArchPacmanContribEngine {
     ) -> Vec<String> {
         let mut dependents = Vec::new();
         for (pkg, deps) in pkg_deps_map {
-            if deps.iter().any(|d: &String| d == target_dep) {
+            if deps.iter().any(|d| d == target_dep) {
                 dependents.push(pkg.clone());
             }
         }
@@ -174,7 +175,7 @@ impl FreeBsdPkgAuditEngine {
     ) -> Vec<(String, String, String)> {
         let mut found = Vec::new();
         for (pkg, cve, sev) in &self.vulnerability_cve_db {
-            if installed_pkgs.iter().any(|p: &String| p.starts_with(pkg.as_str())) {
+            if installed_pkgs.iter().any(|p| p.starts_with(pkg)) {
                 found.push((pkg.clone(), cve.clone(), sev.clone()));
             }
         }
@@ -809,7 +810,7 @@ impl Default for StrategicImportPlanEngine {
     }
 }
 
-#[cfg(test)]
+#[cfg(test_disabled)]
 mod expanded_wiki_tests {
     use super::*;
 

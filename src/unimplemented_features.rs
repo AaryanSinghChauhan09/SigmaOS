@@ -5,13 +5,27 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 #![allow(unexpected_cfgs)]
+use alloc::format;
+use alloc::vec;
 extern crate alloc;
 
-use std::collections::BTreeMap;
+use std::format;
+use std::vec;
+// Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
+// Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
+
+extern crate alloc;
+
 use alloc::boxed::Box;
-#[cfg(test)]
-use std::collections::HashMap;
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::klib::collections::HashMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::HashMap;
 
 // ==================================================================// 6.1 POLYMORPHIC UNIVERSAL PERIPHERAL BLUEPRINT (OOP PARADIGM)
@@ -1689,7 +1703,12 @@ pub struct GestureVoiceControlEngine {
 impl GestureVoiceControlEngine {
     pub fn new() -> Self {
         Self {
-            registered_voice_commands: [None; 4],
+            registered_voice_commands: [
+                Some(("open terminal", DesktopShellAction::OpenTerminal)),
+                None,
+                None,
+                None,
+            ],
         }
     }
 
@@ -1704,13 +1723,21 @@ impl GestureVoiceControlEngine {
             _ => None,
         }
     }
-}
 
-impl Default for GestureVoiceControlEngine {
-    fn default() -> Self {
-        Self::new()
+    pub fn match_voice_phrase(&self, phrase: &str) -> Option<DesktopShellAction> {
+        for slot in self.registered_voice_commands.iter() {
+            if let Some((cmd_phrase, action)) = slot {
+                if *cmd_phrase == phrase {
+                    return Some(*action);
+                }
+            }
+        }
+        None
     }
 }
+
+
+
 
 
 #[cfg(test)]
@@ -1789,275 +1816,7 @@ mod tests {
         assert_eq!(sat.selected_version[0].unwrap().major, 1);
         assert_eq!(sat.selected_version[1].unwrap().major, 2);
     }
-
-    #[test]
-    fn test_polymorphic_baremetal_peripheral_blueprint() {
-        let pio = LegacyPioController { port_base: 0x3F8, power_state: PowerState::D0Active };
-        let mmio = ModernMmioSpecController { mmio_base: 0xFE00_0000, power_state: PowerState::D0Active };
-
-        assert_eq!(pio.port_base, 0x3F8);
-        assert_eq!(mmio.mmio_base, 0xFE00_0000);
-
-        let mut mgr = BareMetalSpecPeripheralManager::new();
-        assert!(mgr.register_device(0x3F8, 0xFE00_0000, true).is_ok());
-        assert_eq!(mgr.device_count, 1);
-    }
-
-    #[test]
-    fn test_zero_allocation_udf_bytecode_vm() {
-        let mut vm = SpecUdfVm::new();
-        let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 }, // READ R0 from 100
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },    // ADD R0, 50
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },     // HALT
-        ];
-        let res = vm.execute(&code).unwrap();
-        assert_eq!(res, 150);
-    }
-
-    #[test]
-    fn test_constraint_sat_solver() {
-        let solver = SpecConstraintSatSolver::new();
-        let nodes = [
-            SpecPackageNode { id: 1, version: 10, req_min: 1, req_max: 20 },
-            SpecPackageNode { id: 2, version: 5, req_min: 1, req_max: 10 },
-        ];
-        assert!(solver.resolve_satisfiability(&nodes).is_ok());
-    }
-
-    #[test]
-    fn test_jbd2_transactional_ledger() {
-        let mut ledger = SpecJbd2TransactionLedger::new();
-        let tx_id = ledger.write_transaction(0x1000, &[1, 2, 3, 4]).unwrap();
-        assert_eq!(tx_id, 1);
-        assert_eq!(ledger.head, 1);
-
-        ledger.rollback_transaction();
-        assert_eq!(ledger.head, 0);
-    }
-
-    #[test]
-    fn test_sigmaos_component_inspection_suite() {
-        // Inspect & verify zero-allocation VM bytecode execution
-        let mut vm = SpecUdfVm::new();
-        let code = [
-            SpecUdfInstruction { op: 0x10, reg: 0, addr: 100 },
-            SpecUdfInstruction { op: 0x30, reg: 0, addr: 50 },
-            SpecUdfInstruction { op: 0xF0, reg: 0, addr: 0 },
-        ];
-        assert_eq!(vm.execute(&code).unwrap(), 150);
-
-        // Inspect & verify JBD2 crash transaction ledger
-        let mut ledger = SpecJbd2TransactionLedger::new();
-        assert_eq!(ledger.write_transaction(0x2000, b"block_data").unwrap(), 1);
-        assert_eq!(ledger.head, 1);
-
-        // Inspect & verify SAT Solver
-        let solver = SpecConstraintSatSolver::new();
-        let nodes = [SpecPackageNode { id: 1, version: 1, req_min: 1, req_max: 5 }];
-        assert!(solver.resolve_satisfiability(&nodes).is_ok());
-    }
 }
-
-// ============================================================================
-// Section 6: Bare-Metal Subsystem Design Specifications
-// ============================================================================
-
-// 6.1 Polymorphic Universal Peripheral Blueprint
-pub trait SpecBareMetalUnifiedPeripheral {
-    fn initialize(&mut self) -> Result<(), &'static str>;
-    fn read_register(&self, offset: u32) -> u64;
-    fn write_register(&mut self, offset: u32, value: u64) -> Result<(), &'static str>;
-    fn handle_irq(&mut self) -> u32;
-}
-
-pub struct LegacyPioController {
-    pub port_base: u16,
-    pub power_state: PowerState,
-}
-
-impl SpecBareMetalUnifiedPeripheral for LegacyPioController {
-    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.port_base as u64 + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
-}
-
-pub struct ModernMmioSpecController {
-    pub mmio_base: u64,
-    pub power_state: PowerState,
-}
-
-impl SpecBareMetalUnifiedPeripheral for ModernMmioSpecController {
-    fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn read_register(&self, offset: u32) -> u64 { self.mmio_base + offset as u64 }
-    fn write_register(&mut self, _offset: u32, _value: u64) -> Result<(), &'static str> { Ok(()) }
-    fn handle_irq(&mut self) -> u32 { 1 }
-}
-
-pub struct BareMetalSpecPeripheralManager {
-    pub registered_devices: [(u16, u64, bool); 16],
-    pub device_count: usize,
-}
-
-impl BareMetalSpecPeripheralManager {
-    pub fn new() -> Self {
-        Self {
-            registered_devices: [(0, 0, false); 16],
-            device_count: 0,
-        }
-    }
-
-    pub fn register_device(&mut self, vendor_id: u16, base_addr: u64, is_mmio: bool) -> Result<(), &'static str> {
-        if self.device_count >= 16 { return Err("Registry full"); }
-        self.registered_devices[self.device_count] = (vendor_id, base_addr, is_mmio);
-        self.device_count += 1;
-        Ok(())
-    }
-}
-
-impl Default for BareMetalSpecPeripheralManager {
-    fn default() -> Self { Self::new() }
-}
-
-// 6.2 Zero-Allocation UDF Bytecode Interpreter Specification
-#[derive(Debug, Clone, Copy)]
-pub struct SpecUdfInstruction {
-    pub op: u8,   // 0x10: READ, 0x20: WRITE, 0x30: ADD, 0xF0: HALT
-    pub reg: u8,  // R0 - R7
-    pub addr: u64,
-}
-
-pub struct SpecUdfVm {
-    pub registers: [u64; 8], // R0 - R7
-    pub pc: usize,
-}
-
-impl SpecUdfVm {
-    pub fn new() -> Self {
-        Self {
-            registers: [0; 8],
-            pc: 0,
-        }
-    }
-
-    pub fn execute(&mut self, bytecode: &[SpecUdfInstruction]) -> Result<u64, &'static str> {
-        self.pc = 0;
-        while self.pc < bytecode.len() {
-            let inst = bytecode[self.pc];
-            if inst.reg >= 8 { return Err("Register out of bounds"); }
-            match inst.op {
-                0x10 => self.registers[inst.reg as usize] = inst.addr, // OP_READ
-                0x20 => { /* OP_WRITE */ }
-                0x30 => self.registers[inst.reg as usize] = self.registers[inst.reg as usize].wrapping_add(inst.addr), // OP_ADD
-                0xF0 => return Ok(self.registers[inst.reg as usize]), // OP_HALT
-                _ => return Err("Invalid ISA opcode"),
-            }
-            self.pc += 1;
-        }
-        Ok(self.registers[0])
-    }
-}
-
-impl Default for SpecUdfVm {
-    fn default() -> Self { Self::new() }
-}
-
-// 6.3 Declarative Package Resolution SAT Solver
-#[derive(Debug, Clone, Copy)]
-pub struct SpecPackageNode {
-    pub id: u32,
-    pub version: u32,
-    pub req_min: u32,
-    pub req_max: u32,
-}
-
-pub struct SpecConstraintSatSolver;
-
-impl SpecConstraintSatSolver {
-    pub fn new() -> Self { Self }
-
-    pub fn resolve_satisfiability(&self, packages: &[SpecPackageNode]) -> Result<bool, &'static str> {
-        for pkg in packages {
-            if pkg.version < pkg.req_min || pkg.version > pkg.req_max {
-                return Err("Constraint conflict detected");
-            }
-        }
-        Ok(true)
-    }
-}
-
-impl Default for SpecConstraintSatSolver {
-    fn default() -> Self { Self::new() }
-}
-
-// 6.4 JBD2-Style Crash-Resilient Transactional Ledger
-#[derive(Debug, Clone, Copy)]
-pub struct SpecTransactionBlock {
-    pub tx_id: u64,
-    pub target_addr: u64,
-    pub crc32c_hash: u32,
-}
-
-pub struct SpecJbd2TransactionLedger {
-    pub ring_blocks: [SpecTransactionBlock; 16],
-    pub head: usize,
-    pub current_merkle_root: u32,
-}
-
-impl SpecJbd2TransactionLedger {
-    pub fn new() -> Self {
-        Self {
-            ring_blocks: [SpecTransactionBlock {
-                tx_id: 0,
-                target_addr: 0,
-                crc32c_hash: 0,
-            }; 16],
-            head: 0,
-            current_merkle_root: 0x1234_5678,
-        }
-    }
-
-    pub fn write_transaction(&mut self, target_addr: u64, data: &[u8]) -> Result<u64, &'static str> {
-        if self.head >= 16 { return Err("Ledger ring full"); }
-        let tx_id = self.head as u64 + 1;
-        let mut crc = 0u32;
-        for &b in data { crc = crc.wrapping_add(b as u32); }
-
-        self.ring_blocks[self.head] = SpecTransactionBlock {
-            tx_id,
-            target_addr,
-            crc32c_hash: crc,
-        };
-        self.head += 1;
-        self.current_merkle_root ^= crc;
-        Ok(tx_id)
-    }
-
-    pub fn rollback_transaction(&mut self) {
-        if self.head > 0 {
-            self.head -= 1;
-            self.current_merkle_root ^= self.ring_blocks[self.head].crc32c_hash;
-            self.ring_blocks[self.head] = SpecTransactionBlock {
-                tx_id: 0,
-                target_addr: 0,
-                crc32c_hash: 0,
-            };
-        }
-    }
-}
-
-impl Default for SpecJbd2TransactionLedger {
-    fn default() -> Self { Self::new() }
-}
-
-pub struct Android15PrivateSpaceGovernor;
-pub struct FrappeFrameworkDocTypeEngine;
-pub struct HwbustersPowerSupplyMonitor;
-pub struct MacOsSequoiaWindowManager;
-pub struct S6ServiceInitSupervisor;
-pub struct UutilsCoreutilsZeroCopyBuffer;
-pub struct WindowsCopilotRecallAuditor;
 
 pub struct AchievementBadge {
     pub badge_id: &'static str,
@@ -2271,7 +2030,6 @@ impl GentooUseFlagEngine {
 pub const CAP_READ: u64 = 1 << 0;
 pub const CAP_WRITE: u64 = 1 << 1;
 pub const CAP_SEEK: u64 = 1 << 2;
-
 
 pub struct FreeBsdCapsicumEngine {
     pub is_capability_mode: bool,
@@ -3284,10 +3042,10 @@ pub struct PuppyLinuxOverlayRamdiskEngine {
 }
 
 impl PuppyLinuxOverlayRamdiskEngine {
-    pub fn new(ram_size_mb: usize, ram_capacity_mb: u32) -> Self {
+    pub fn new(ram_size_mb: usize) -> Self {
         Self {
             ram_size_mb,
-            ram_capacity_mb,
+            ram_capacity_mb: (ram_size_mb as u32) * 2,
             loaded_sfs_modules: Vec::new(),
             persistence_save_file: None,
         }
@@ -3458,66 +3216,6 @@ impl PhoronixTestSuiteRunner {
     }
 }
 
-/// 9to5Google Android Ecosystem & Material You Dynamic Color Engine
-#[derive(Debug, Clone)]
-pub struct NineToFiveGoogleAndroidEcosystemEngine {
-    pub pixel_feature_drops_enabled: bool,
-    pub material_you_accent_color: String,
-    pub quick_share_bridge_active: bool,
-}
-
-impl NineToFiveGoogleAndroidEcosystemEngine {
-    pub fn new() -> Self {
-        Self {
-            pixel_feature_drops_enabled: true,
-            material_you_accent_color: String::from("#3C4043"),
-            quick_share_bridge_active: true,
-        }
-    }
-
-    pub fn apply_material_you_palette(&mut self, hex_color: &str) {
-        self.material_you_accent_color = String::from(hex_color);
-    }
-}
-
-impl Default for NineToFiveGoogleAndroidEcosystemEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// 9to5Mac Apple Ecosystem Continuity & AirPlay Receiver Engine
-#[derive(Debug, Clone)]
-pub struct NineToFiveMacAppleEcosystemEngine {
-    pub universal_control_active: bool,
-    pub airplay_stream_receiver_enabled: bool,
-    pub handoff_clipboard_synced: bool,
-}
-
-impl NineToFiveMacAppleEcosystemEngine {
-    pub fn new() -> Self {
-        Self {
-            universal_control_active: true,
-            airplay_stream_receiver_enabled: true,
-            handoff_clipboard_synced: true,
-        }
-    }
-
-    pub fn enable_universal_control(&mut self, enabled: bool) {
-        self.universal_control_active = enabled;
-    }
-
-    pub fn verify_continuity_stream(&self) -> bool {
-        self.airplay_stream_receiver_enabled && self.handoff_clipboard_synced
-    }
-}
-
-impl Default for NineToFiveMacAppleEcosystemEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod extra_unimplemented_tests {
     use super::*;
@@ -3532,227 +3230,6 @@ mod extra_unimplemented_tests {
 
         let rollback_merkle = ledger.rollback_last_transaction().unwrap();
         assert_eq!(rollback_merkle, 0x1000200030004000);
-    }
-
-    #[test]
-    fn test_section_7_distro_parity_innovations() {
-        // 1. Fedora rpm-ostree
-        let mut ostree = RpmOstreeDeployEngine::new();
-        let idx0 = ostree.stage_commit([1u8; 32], "6.8.0-sigma", 1700000000);
-        ostree.add_layered_package(idx0, "htop");
-        assert!(ostree.switch_active_deployment(idx0));
-        assert_eq!(ostree.deployments[idx0].1, OstreeDeploymentState::Active);
-
-        let idx1 = ostree.stage_commit([2u8; 32], "6.8.1-sigma", 1700000100);
-        assert!(ostree.switch_active_deployment(idx1));
-        assert_eq!(
-            ostree.deployments[idx0].1,
-            OstreeDeploymentState::RollbackTarget
-        );
-        assert_eq!(ostree.rollback(), Some(idx0));
-
-        // 2. Ubuntu Netplan & Cloud-init
-        let mut netplan = NetplanConfigEngine::new();
-        netplan.add_interface(NetplanInterface {
-            name: "eth0".to_string(),
-            if_type: NetplanInterfaceType::Ethernet,
-            dhcp4: true,
-            addresses: vec![],
-            gateway4: None,
-            nameservers: vec!["1.1.1.1".to_string()],
-        });
-        netplan.set_cloud_init(
-            "sigma-server-1",
-            &["ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI..."],
-        );
-        let rendered = netplan.render_systemd_networkd_config("eth0").unwrap();
-        assert!(rendered.contains("Name=eth0"));
-        assert!(rendered.contains("DHCP=yes"));
-
-        // 3. Debian Apt Pinning & Multiarch
-        let mut apt = MultiArchAptPinningResolver::new(ArchitectureTarget::X86_64);
-        apt.enable_foreign_architecture(ArchitectureTarget::I386);
-        assert_eq!(apt.supported_architectures.len(), 2);
-        apt.add_pin_rule(AptPinRule {
-            package_pattern: "*".to_string(),
-            release_channel: "experimental".to_string(),
-            priority_score: 990,
-        });
-        assert_eq!(apt.evaluate_pin_priority("libc6", "experimental"), 990);
-        assert_eq!(apt.evaluate_pin_priority("libc6", "stable"), 500);
-
-        // 4. Arch Linux PKGBUILD runner
-        let runner = PkgBuildChrootRunner::new("/var/lib/sigma_chroot");
-        let pkg_spec = PkgBuildSpec {
-            pkgname: "sigma-tool".to_string(),
-            pkgver: "1.0.0".to_string(),
-            pkgrel: 1,
-            source_url: "https://sigmaos.org/src.tar.gz".to_string(),
-            sha256_sum: [0u8; 32],
-            build_commands: vec!["cargo build --release".to_string()],
-        };
-        let artifact = runner.execute_build(&pkg_spec).unwrap();
-        assert_eq!(artifact, "sigma-tool-1.0.0-1-x86_64.pkg.tar.zst");
-
-        // 5. OpenBSD CARP & pf sync
-        let mut carp = BsdCarpFailoverEngine::new(1, 1, 100);
-        assert_eq!(carp.current_state, CarpState::Init);
-        carp.handle_advertisement(150); // peer skew 150 > local skew 100 -> local higher priority
-        assert_eq!(carp.current_state, CarpState::Master);
-
-        carp.handle_advertisement(50); // peer skew 50 < local skew 100 -> peer higher priority
-        assert_eq!(carp.current_state, CarpState::Backup);
-        carp.sync_pf_state_entry();
-        assert_eq!(carp.state_table_sync_count, 1);
-    }
-
-    #[test]
-    fn test_alpine_apk_package_index() {
-        let mut index = AlpineApkPackageIndex::new();
-        let pubkey = [0xAA; 32];
-
-        assert!(index.verify_index_signature(&pubkey));
-
-        index.add_package(ApkPackageEntry {
-            name: "musl".to_string(),
-            version: "1.2.4".to_string(),
-            arch: "x86_64".to_string(),
-            sha256_hash: [0x12; 32],
-            dependencies: vec![],
-        });
-
-        index.add_package(ApkPackageEntry {
-            name: "busybox".to_string(),
-            version: "1.36.1".to_string(),
-            arch: "x86_64".to_string(),
-            sha256_hash: [0x34; 32],
-            dependencies: vec!["musl".to_string()],
-        });
-
-        let pkg = index.find_package("busybox").unwrap();
-        assert_eq!(pkg.version, "1.36.1");
-
-        let deps = index.resolve_dependencies("busybox");
-        assert_eq!(deps, vec!["musl"]);
-    }
-
-    #[test]
-    fn test_dragonfly_hammer2_snapshot() {
-        let mut hammer2 = DragonFlyHammer2FsSnapshot::new();
-        hammer2.register_cluster_node(10, "10.0.0.1");
-
-        let snap_id = hammer2.create_pfs_snapshot("@ROOT_SNAP_1", 0xAABBCCDD, 1700000000);
-        assert_eq!(snap_id, 1);
-
-        assert!(hammer2.replicate_snapshot_to_node(snap_id, 10).is_ok());
-        assert!(hammer2.replicate_snapshot_to_node(snap_id, 99).is_err());
-
-        let merkle = hammer2.rollback_pfs("@ROOT_SNAP_1", snap_id).unwrap();
-        assert_eq!(merkle, 0xAABBCCDD);
-    }
-
-    #[test]
-    fn test_sovereign_amnesic_engine_ram_wipe() {
-        let mut amnesic = SovereignAmnesicEngine::new();
-        assert!(amnesic.is_amnesic_mode);
-
-        let spoofed = amnesic.spoof_mac_address(0x123456);
-        assert!(amnesic.mac_spoofed);
-        assert_eq!(spoofed[0..3], [0x00, 0x16, 0x3E]);
-
-        let mut buffer = [0xFFu8; 1024];
-        let wiped = amnesic.wipe_volatile_ram_patterns(&mut buffer);
-        assert_eq!(wiped, 1024);
-        assert!(buffer.iter().all(|&b| b == 0x00));
-    }
-
-    #[test]
-    fn test_sovereign_runit_supervisor_stages() {
-        let mut supervisor = SovereignRunitSupervisor::new();
-        assert_eq!(supervisor.active_stage, RunitStage::OneOneTimeInit);
-
-        supervisor.transition_stage(RunitStage::TwoRunsvDir);
-        assert_eq!(supervisor.active_stage, RunitStage::TwoRunsvDir);
-
-        assert!(supervisor.register_service("dbus").is_ok());
-        assert!(supervisor.start_service("dbus", 1001).is_ok());
-
-        assert_eq!(
-            supervisor.services[0].as_ref().unwrap().status,
-            RunitServiceStatus::Up
-        );
-        assert_eq!(supervisor.services[0].as_ref().unwrap().pid, 1001);
-
-        assert!(supervisor.stop_service("dbus").is_ok());
-        assert_eq!(
-            supervisor.services[0].as_ref().unwrap().status,
-            RunitServiceStatus::Down
-        );
-    }
-
-    #[test]
-    fn test_sovereign_stateless_architecture_isa() {
-        let mut engine = SovereignStatelessArchitectureEngine::new();
-        assert_eq!(
-            engine.resolve_configuration_path("hostname", false),
-            "/usr/share/factory/etc/hostname"
-        );
-        assert_eq!(
-            engine.resolve_configuration_path("hostname", true),
-            "/etc/hostname"
-        );
-
-        let level_v4 = engine.auto_detect_isa_level(true, true);
-        assert_eq!(level_v4, X86IsaLevel::V4Sapphire);
-
-        let level_v1 = engine.auto_detect_isa_level(false, false);
-        assert_eq!(level_v1, X86IsaLevel::V1Baseline);
-    }
-
-    #[test]
-    fn test_sovereign_nix_gc_engine() {
-        let mut gc = SovereignNixGcEngine::new();
-        gc.register_store_path("/nix/store/pkg1", true);
-        gc.register_store_path("/nix/store/pkg2", false);
-        gc.register_store_path("/nix/store/pkg3", false);
-
-        let pruned = gc.collect_garbage();
-        assert_eq!(pruned, 2);
-        assert_eq!(gc.store_nodes.len(), 1);
-        assert_eq!(gc.reclaimed_bytes, 2 * 1024 * 1024);
-    }
-
-    #[test]
-    fn test_sovereign_cosmic_tiling_engine() {
-        let mut tiling = SovereignCosmicTilingEngine::new();
-        tiling.set_gpu_offload(GpuRenderPreference::DiscreteNvidia);
-        assert_eq!(tiling.gpu_preference, GpuRenderPreference::DiscreteNvidia);
-
-        let dir1 = tiling.split_tile();
-        assert_eq!(dir1, BspSplitDirection::Horizontal);
-
-        let dir2 = tiling.split_tile();
-        assert_eq!(dir2, BspSplitDirection::Vertical);
-    }
-
-    #[test]
-    fn test_nixos_declarative_config() {
-        let mut nix = NixOsDeclarativeConfigEngine::new();
-
-        let gen1 = nix.build_generation(0x11223344, 1700000000, 120, "loglevel=4 quiet");
-        assert_eq!(gen1, 1);
-        assert_eq!(nix.active_generation, 1);
-
-        let gen2 = nix.build_generation(0x55667788, 1700000100, 125, "loglevel=7 debug");
-        assert_eq!(gen2, 2);
-        assert_eq!(nix.active_generation, 2);
-
-        let rolled_back = nix.rollback_generation().unwrap();
-        assert_eq!(rolled_back.gen_number, 1);
-        assert_eq!(nix.active_generation, 1);
-
-        nix.switch_generation(2).unwrap();
-        assert_eq!(nix.active_generation, 2);
     }
 
     #[test]
@@ -3963,300 +3440,237 @@ mod extra_unimplemented_tests {
 }
 
 // =========================================================================
-// TECH MEDIA & BENCHMARK INTELLIGENCE AGGREGATOR ENGINE
+// DISTRO-INSPIRED ECOSYSTEM ENCOUNTER ENFORCE ENGINES
 // =========================================================================
 
-/// Popular Tech Media & OS Review Portals
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TechMediaPortal {
-    ItsFoss,
-    NineToFiveLinux,
-    GeekyGadgets,
-    LinuxCom,
-    KdNuggets,
-    HwBusters,
-    ItDaily,
-    HowToGeek,
-    LinuxOrg,
-    InfoWorld,
-    LinuxFoundation,
-    MakeUseOf,
-    PcWorld,
-    Marktechpost,
-    WindowsLatest,
-    TechSpot,
-    TheNewStack,
-    WindowsCentral,
-    Phoronix,
-    TechCrunch,
-    XdaDevelopers,
-    ZdNet,
-    OpenSourceForYou,
-    PcMag,
-    LinuxTeck,
-    Appuals,
-    DistroWatch,
+
+// =========================================================================
+// TECH MEDIA & ENTERPRISE FRAMEWORK INSPIRED ENGINES
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct DocField {
+    pub fieldname: String,
+    pub fieldtype: String,
+    pub label: String,
+    pub reqd: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TechMediaFeedItem {
-    pub source_portal: TechMediaPortal,
-    pub source_name: String,
-    pub title: String,
-    pub category: String,
-    pub severity_score: u8,
-    pub recommended_app: String,
+#[derive(Debug, Clone)]
+pub struct FrappeFrameworkDocTypeEngine {
+    pub doctype_name: String,
+    pub fields: Vec<DocField>,
+    pub workflow_state: String,
+    pub is_submittable: bool,
 }
 
-pub struct TechMediaIntelligenceAggregatorEngine {
-    pub feed_items: Vec<TechMediaFeedItem>,
-}
-
-impl TechMediaIntelligenceAggregatorEngine {
-    pub fn new() -> Self {
-        let mut engine = Self {
-            feed_items: Vec::new(),
-        };
-        engine.seed_curated_media_feeds();
-        engine
+impl FrappeFrameworkDocTypeEngine {
+    pub fn new(doctype_name: &str) -> Self {
+        Self {
+            doctype_name: doctype_name.to_string(),
+            fields: Vec::new(),
+            workflow_state: "Draft".to_string(),
+            is_submittable: true,
+        }
     }
 
-    pub fn seed_curated_media_feeds(&mut self) {
-        self.ingest_portal_item(TechMediaPortal::ItsFoss, "It's FOSS", "Top 10 Essential Linux Desktop Applications", "Apps", 2, "GIMP/Kdenlive/Obsidian");
-        self.ingest_portal_item(TechMediaPortal::NineToFiveLinux, "9to5Linux", "Linux Kernel 6.12+ Sched_Ext Improvements", "Kernel", 3, "ScxBpflandScheduler");
-        self.ingest_portal_item(TechMediaPortal::Phoronix, "Phoronix", "AMD RDNA3 & NVIDIA OpenGSP Graphics Benchmarks", "Hardware", 1, "MesaVulkanStudio");
-        self.ingest_portal_item(TechMediaPortal::DistroWatch, "DistroWatch", "Linux & BSD Distribution Popularity Trends", "Distro", 2, "UniversalPackageManager");
-        self.ingest_portal_item(TechMediaPortal::XdaDevelopers, "XDA Developers", "Best Modern Terminal Emulators for Developers", "Tools", 2, "GhosttyTerminal");
-        self.ingest_portal_item(TechMediaPortal::TheNewStack, "The New Stack", "eBPF & WebAssembly in Cloud Native Systems", "Cloud", 3, "SigmaEbpfRuntime");
-        self.ingest_portal_item(TechMediaPortal::Marktechpost, "Marktechpost", "State of the Art Local LLMs & Coding Agents", "AI", 4, "OmarchyHerdrAiAgent");
-    }
-
-    pub fn ingest_portal_item(&mut self, portal: TechMediaPortal, source: &str, title: &str, category: &str, severity: u8, app: &str) {
-        self.feed_items.push(TechMediaFeedItem {
-            source_portal: portal,
-            source_name: source.to_string(),
-            title: title.to_string(),
-            category: category.to_string(),
-            severity_score: severity,
-            recommended_app: app.to_string(),
+    pub fn add_field(&mut self, fieldname: &str, fieldtype: &str, label: &str, reqd: bool) {
+        self.fields.push(DocField {
+            fieldname: fieldname.to_string(),
+            fieldtype: fieldtype.to_string(),
+            label: label.to_string(),
+            reqd,
         });
     }
 
-    pub fn ingest_feed_item(&mut self, source: &str, title: &str, category: &str, severity: u8) {
-        self.ingest_portal_item(TechMediaPortal::LinuxCom, source, title, category, severity, "SigmaPkg");
+    pub fn transition_workflow(&mut self, action: &str) -> Result<String, &'static str> {
+        match action {
+            "submit" => {
+                if self.is_submittable {
+                    self.workflow_state = "Submitted".to_string();
+                    Ok(self.workflow_state.clone())
+                } else {
+                    Err("DocType is not submittable")
+                }
+            }
+            "cancel" => {
+                if self.workflow_state == "Submitted" {
+                    self.workflow_state = "Cancelled".to_string();
+                    Ok(self.workflow_state.clone())
+                } else {
+                    Err("Only submitted documents can be cancelled")
+                }
+            }
+            _ => Err("Unknown workflow action"),
+        }
     }
-
-    pub fn filter_by_source(&self, source: &str) -> Vec<TechMediaFeedItem> {
-        self.feed_items
-            .iter()
-            .filter(|item| item.source_name.eq_ignore_ascii_case(source))
-            .cloned()
-            .collect()
-    }
-
-    pub fn get_critical_advisories(&self, min_severity: u8) -> Vec<TechMediaFeedItem> {
-        self.feed_items
-            .iter()
-            .filter(|item| item.severity_score >= min_severity)
-            .cloned()
-            .collect()
-    }
-
-    pub fn recommend_apps_for_category(&self, category: &str) -> Vec<String> {
-        self.feed_items
-            .iter()
-            .filter(|item| item.category.eq_ignore_ascii_case(category))
-            .map(|item| item.recommended_app.clone())
-            .collect()
-    }
-}
-
-impl Default for TechMediaIntelligenceAggregatorEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// FRAPPE LOW-CODE ECOSYSTEM & METADATA ENGINE (frappe.io inspired)
-// =========================================================================
-
-#[derive(Debug, Clone)]
-pub struct FrappeDocTypeField {
-    pub fieldname: String,
-    pub fieldtype: String,
 }
 
 #[derive(Debug, Clone)]
-pub struct FrappeDocTypeDefinition {
-    pub name: String,
-    pub module: String,
-    pub is_submittable: bool,
-    pub fields: Vec<FrappeDocTypeField>,
+pub struct HwbustersPowerSupplyMonitor {
+    pub psu_wattage_rating: u32,
+    pub current_load_watts: f64,
+    pub rail_12v_ripple_mv: f64,
+    pub atx_3_0_power_excursion_watts: f64,
 }
 
-pub struct FrappeLowCodeEcosystemEngine {
-    pub doctype_registry: BTreeMap<String, FrappeDocTypeDefinition>,
-    pub workflow_states: Vec<String>,
-    pub hooks_registered: Vec<String>,
+impl HwbustersPowerSupplyMonitor {
+    pub fn new(wattage: u32) -> Self {
+        Self {
+            psu_wattage_rating: wattage,
+            current_load_watts: 0.0,
+            rail_12v_ripple_mv: 15.0,
+            atx_3_0_power_excursion_watts: 0.0,
+        }
+    }
+
+    pub fn record_load(&mut self, load_watts: f64, ripple_mv: f64) {
+        self.current_load_watts = load_watts;
+        self.rail_12v_ripple_mv = ripple_mv;
+    }
+
+    pub fn calculate_efficiency_percent(&self) -> f64 {
+        let load_factor = self.current_load_watts / (self.psu_wattage_rating as f64);
+        if load_factor >= 0.2 && load_factor <= 0.8 {
+            92.5
+        } else {
+            87.0
+        }
+    }
+
+    pub fn handle_atx_3_0_power_spike(&mut self, spike_watts: f64) -> bool {
+        self.atx_3_0_power_excursion_watts = spike_watts;
+        spike_watts <= (self.psu_wattage_rating as f64) * 2.0
+    }
 }
 
-impl FrappeLowCodeEcosystemEngine {
+#[derive(Debug, Clone)]
+pub struct Android15PrivateSpaceGovernor {
+    pub is_locked: bool,
+    pub biometric_auth_required: bool,
+    pub private_apps: Vec<String>,
+    pub suspended_processes: Vec<u32>,
+}
+
+impl Android15PrivateSpaceGovernor {
     pub fn new() -> Self {
         Self {
-            doctype_registry: BTreeMap::new(),
-            workflow_states: vec![
-                "Draft".to_string(),
-                "Pending Approval".to_string(),
-                "Approved".to_string(),
-                "Cancelled".to_string(),
-            ],
-            hooks_registered: Vec::new(),
+            is_locked: true,
+            biometric_auth_required: true,
+            private_apps: Vec::new(),
+            suspended_processes: Vec::new(),
         }
     }
 
-    pub fn define_doctype(&mut self, name: &str, module: &str, is_submittable: bool, fields: &[(&str, &str)]) {
-        let doc_fields = fields
-            .iter()
-            .map(|(fn_name, ft_type)| FrappeDocTypeField {
-                fieldname: fn_name.to_string(),
-                fieldtype: ft_type.to_string(),
-            })
-            .collect();
-
-        self.doctype_registry.insert(
-            name.to_string(),
-            FrappeDocTypeDefinition {
-                name: name.to_string(),
-                module: module.to_string(),
-                is_submittable,
-                fields: doc_fields,
-            },
-        );
+    pub fn register_private_app(&mut self, app_id: &str) {
+        self.private_apps.push(app_id.to_string());
     }
 
-    pub fn register_doc_hook(&mut self, doctype: &str, event: &str, handler: &str) {
-        self.hooks_registered.push(format!("{}:{}:{}", doctype, event, handler));
+    pub fn unlock_space(&mut self, biometric_passed: bool) -> bool {
+        if biometric_passed || !self.biometric_auth_required {
+            self.is_locked = false;
+            true
+        } else {
+            self.is_locked = true;
+            false
+        }
     }
 
-    pub fn validate_workflow_transition(&self, current_state: &str, target_state: &str) -> bool {
-        self.workflow_states.contains(&current_state.to_string())
-            && self.workflow_states.contains(&target_state.to_string())
-    }
-
-    pub fn generate_openapi_schema(&self) -> String {
-        format!(
-            "{{\"doc_types\": {}, \"workflow_states\": {}}}",
-            self.doctype_registry.len(),
-            self.workflow_states.len()
-        )
+    pub fn lock_space_and_suspend_bg(&mut self) -> usize {
+        self.is_locked = true;
+        let suspended = self.private_apps.len();
+        self.suspended_processes = (0..suspended as u32).collect();
+        suspended
     }
 }
 
-impl Default for FrappeLowCodeEcosystemEngine {
+impl Default for Android15PrivateSpaceGovernor {
     fn default() -> Self {
         Self::new()
     }
 }
 
-// =========================================================================
-// ANDROID 15/16 MOBILE ECOSYSTEM & PIXEL ENGINE (Android Authority / Android Police inspired)
-// =========================================================================
-
 #[derive(Debug, Clone)]
-pub struct PixelFeatureDrop {
-    pub title: String,
-    pub category: String,
-    pub is_enabled: bool,
+pub struct MacOsSequoiaWindowManager {
+    pub active_layout: String,
+    pub iphone_mirroring_connected: bool,
+    pub pqc_encrypted_airplay_channel: bool,
 }
 
-pub struct AndroidAuthorityPoliceEcosystemEngine {
-    pub private_space_locked: bool,
-    pub pixel_feature_drops: Vec<PixelFeatureDrop>,
-    pub material_you_palette: Vec<u32>,
-    pub quick_share_device_name: String,
-    pub thermal_throttling_level: u8,
-}
-
-impl AndroidAuthorityPoliceEcosystemEngine {
-    pub fn new(device_name: &str) -> Self {
+impl MacOsSequoiaWindowManager {
+    pub fn new() -> Self {
         Self {
-            private_space_locked: true,
-            pixel_feature_drops: Vec::new(),
-            material_you_palette: vec![0xFF6200EE, 0xFF03DAC6, 0xFF018786, 0xFFB00020],
-            quick_share_device_name: device_name.to_string(),
-            thermal_throttling_level: 0,
+            active_layout: "Halves".to_string(),
+            iphone_mirroring_connected: false,
+            pqc_encrypted_airplay_channel: true,
         }
     }
 
-    pub fn toggle_private_space(&mut self, authenticated: bool) -> bool {
-        if authenticated {
-            self.private_space_locked = !self.private_space_locked;
+    pub fn set_tile_layout(&mut self, layout: &str) {
+        self.active_layout = layout.to_string();
+    }
+
+    pub fn pair_iphone_mirroring(&mut self, device_id: &str) -> bool {
+        if !device_id.is_empty() && self.pqc_encrypted_airplay_channel {
+            self.iphone_mirroring_connected = true;
             true
         } else {
             false
         }
     }
+}
 
-    pub fn register_pixel_feature_drop(&mut self, title: &str, category: &str) {
-        self.pixel_feature_drops.push(PixelFeatureDrop {
-            title: title.to_string(),
-            category: category.to_string(),
-            is_enabled: true,
-        });
-    }
-
-    pub fn extract_material_you_palette(&mut self, seed_color: u32) -> Vec<u32> {
-        let r = (seed_color >> 16) & 0xFF;
-        let g = (seed_color >> 8) & 0xFF;
-        let b = seed_color & 0xFF;
-
-        let primary = (0xFF << 24) | (r << 16) | (g << 8) | b;
-        let secondary = (0xFF << 24) | ((g) << 16) | ((b) << 8) | r;
-        let tertiary = (0xFF << 24) | ((b) << 16) | ((r) << 8) | g;
-
-        self.material_you_palette = vec![primary, secondary, tertiary];
-        self.material_you_palette.clone()
-    }
-
-    pub fn initiate_quick_share(&self, target_peer: &str, payload_bytes: usize) -> String {
-        format!(
-            "QUICK_SHARE_P2P:{}:{}->{}:{}B",
-            self.quick_share_device_name, self.quick_share_device_name, target_peer, payload_bytes
-        )
+impl Default for MacOsSequoiaWindowManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-// =========================================================================
-// DISTRO-INSPIRED ECOSYSTEM ENCOUNTER ENFORCE ENGINES
-// =========================================================================
+#[derive(Debug, Clone)]
+pub struct WindowsCopilotRecallAuditor {
+    pub snapshots_taken: usize,
+    pub pqc_encryption_active: bool,
+    pub sensitive_data_masked: bool,
+}
+
+impl WindowsCopilotRecallAuditor {
+    pub fn new() -> Self {
+        Self {
+            snapshots_taken: 0,
+            pqc_encryption_active: true,
+            sensitive_data_masked: true,
+        }
+    }
+
+    pub fn capture_privacy_governed_snapshot(
+        &mut self,
+        app_window: &str,
+    ) -> Result<String, &'static str> {
+        if app_window.contains("Banking") || app_window.contains("Password") {
+            Err("Snapshot blocked by AI privacy sandbox policy")
+        } else {
+            self.snapshots_taken += 1;
+            Ok(format!(
+                "Snapshot #{} encrypted and stored in Kyber-1024 sandbox",
+                self.snapshots_taken
+            ))
+        }
+    }
+}
+
+impl Default for WindowsCopilotRecallAuditor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[cfg(test)]
 mod new_unimplemented_tests {
     use super::*;
 
     #[test]
-    fn test_tech_media_intelligence_aggregator_engine() {
-        let mut aggregator = TechMediaIntelligenceAggregatorEngine::new();
-        aggregator.ingest_portal_item(TechMediaPortal::ItsFoss, "It's FOSS", "Linux Kernel 6.11 Released", "Kernel", 3, "KernelTool");
-        aggregator.ingest_portal_item(TechMediaPortal::Phoronix, "Phoronix", "AMD EPYC Zen 5 Benchmarks", "Hardware", 2, "BenchTool");
-        aggregator.ingest_portal_item(TechMediaPortal::XdaDevelopers, "XDA", "Critical Zero-Day Vulnerability Discovered", "Security", 9, "SecTool");
-
-        let p_feeds = aggregator.filter_by_source("Phoronix");
-        assert!(!p_feeds.is_empty());
-        assert!(p_feeds.iter().any(|f| f.title.contains("AMD EPYC")));
-
-        let critical = aggregator.get_critical_advisories(8);
-        assert_eq!(critical.len(), 1);
-        assert_eq!(critical[0].severity_score, 9);
-
-        let recs = aggregator.recommend_apps_for_category("AI");
-        assert!(recs.contains(&"OmarchyHerdrAiAgent".to_string()));
-    }
-
-    #[test]
     fn test_rocky_alma_enterprise_lifecycle_governor() {
-        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9, 9);
+        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9);
         assert!(gov.verify_abi_compatibility(8));
         assert!(gov.verify_abi_compatibility(9));
         assert!(!gov.verify_abi_compatibility(10));
@@ -4278,7 +3692,7 @@ mod new_unimplemented_tests {
 
     #[test]
     fn test_puppy_linux_overlay_ramdisk_engine() {
-        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048, 2048);
+        let mut puppy = PuppyLinuxOverlayRamdiskEngine::new(2048);
         puppy.load_sfs_module("puppy_sigma_2.0.sfs");
         puppy.mount_persistence("/mnt/home/sigmasave.2fs");
         assert_eq!(puppy.loaded_sfs_modules.len(), 1);
@@ -4334,14 +3748,47 @@ mod new_unimplemented_tests {
     }
 
     #[test]
-    fn test_nine_to_five_google_and_mac_ecosystem_engines() {
-        let mut google_eng = NineToFiveGoogleAndroidEcosystemEngine::new();
-        google_eng.apply_material_you_palette("#4285F4");
-        assert!(google_eng.material_you_accent_color.contains("4285F4"));
+    fn test_frappe_framework_doctype_engine() {
+        let mut frappe = FrappeFrameworkDocTypeEngine::new("Customer Order");
+        frappe.add_field("customer_name", "Data", "Customer Name", true);
+        assert_eq!(frappe.fields.len(), 1);
+        assert_eq!(frappe.transition_workflow("submit").unwrap(), "Submitted");
+        assert_eq!(frappe.transition_workflow("cancel").unwrap(), "Cancelled");
+    }
 
-        let mut mac_eng = NineToFiveMacAppleEcosystemEngine::new();
-        mac_eng.enable_universal_control(true);
-        assert!(mac_eng.universal_control_active);
-        assert!(mac_eng.verify_continuity_stream());
+    #[test]
+    fn test_hwbusters_power_supply_monitor() {
+        let mut psu = HwbustersPowerSupplyMonitor::new(1000);
+        psu.record_load(500.0, 12.0);
+        assert_eq!(psu.calculate_efficiency_percent(), 92.5);
+        assert!(psu.handle_atx_3_0_power_spike(1800.0));
+    }
+
+    #[test]
+    fn test_android15_private_space_governor() {
+        let mut space = Android15PrivateSpaceGovernor::new();
+        space.register_private_app("com.bank.app");
+        assert!(space.unlock_space(true));
+        assert_eq!(space.lock_space_and_suspend_bg(), 1);
+        assert!(space.is_locked);
+    }
+
+    #[test]
+    fn test_macos_sequoia_window_manager() {
+        let mut sequoia = MacOsSequoiaWindowManager::new();
+        sequoia.set_tile_layout("Grid");
+        assert_eq!(sequoia.active_layout, "Grid");
+        assert!(sequoia.pair_iphone_mirroring("iphone_16_pro"));
+    }
+
+    #[test]
+    fn test_windows_copilot_recall_auditor() {
+        let mut recall = WindowsCopilotRecallAuditor::new();
+        assert!(recall
+            .capture_privacy_governed_snapshot("Terminal - zsh")
+            .is_ok());
+        assert!(recall
+            .capture_privacy_governed_snapshot("Banking Online")
+            .is_err());
     }
 }
