@@ -97,7 +97,13 @@ impl UnveilEntry {
 
     /// Check if this entry covers the given path
     pub fn covers(&self, path: &Path) -> bool {
-        path.starts_with(&self.path)
+        let e_path = &self.path;
+        path == e_path
+            || e_path == "/"
+            || (path.starts_with(e_path)
+                && (e_path.ends_with('/')
+                    || e_path.ends_with('\\')
+                    || path.as_bytes().get(e_path.len()).map_or(false, |&b| b == b'/' || b == b'\\')))
     }
 }
 
@@ -350,6 +356,14 @@ mod tests {
         // Traversal sequences should be immediately blocked and return Err
         assert!(state
             .check_access("/etc/../tmp/file", UnveilPermissions::Read)
+            .is_err());
+
+        // Path prefix confusion bypasses should be denied
+        assert!(state
+            .check_access("/etc_secret/keys", UnveilPermissions::Read)
+            .is_err());
+        assert!(state
+            .check_access("/tmp_malicious/payload", UnveilPermissions::Read)
             .is_err());
     }
 
