@@ -168,6 +168,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[IOMMU](IOMMU)**
   Device memory isolation and DMA remapping.
 
+- **[Interrupt](Interrupt)**
+  Interrupt handling and management.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 

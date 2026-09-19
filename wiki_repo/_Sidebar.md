@@ -79,6 +79,7 @@
 - **[[Perf|Perf]]**
 - **[[Seccomp|Seccomp]]**
 - **[[IOMMU|IOMMU]]**
+- **[[Interrupt|Interrupt]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 
