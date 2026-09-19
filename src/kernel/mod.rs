@@ -34,6 +34,7 @@ pub mod ipc;
 pub mod kqueue;
 pub mod livepatch;
 pub mod lockdep;
+pub mod cgroups;
 pub mod panic_nvram;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
