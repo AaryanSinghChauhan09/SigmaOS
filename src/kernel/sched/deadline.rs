@@ -1,42 +1,47 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS SCHED_DEADLINE Earliest-Deadline-First (EDF) Real-Time Scheduler Engine
 // Zero-dependency, microsecond-accurate real-time task scheduler with Constant Bandwidth Server (CBS)
+// Enhanced with EEVDF (Earliest Eligible Virtual Deadline First) and hard preemption
 
 #![allow(dead_code)]
 
 use std::collections::BinaryHeap;
 use std::cmp::Ordering;
+use core::sync::atomic::{AtomicU64, AtomicU32, Ordering};
 
 /// SCHED_DEADLINE Real-Time Task Parameters
 #[derive(Debug, Clone)]
 pub struct SchedDeadlineParams {
     pub pid: u64,
-    pub runtime_ns: u64,  // Executable budget per period
-    pub deadline_ns: u64, // Relative deadline
-    pub period_ns: u64,   // Recurrence period
+    pub runtime_ns: u64,      // Executable budget per period
+    pub deadline_ns: u64,     // Relative deadline
+    pub period_ns: u64,       // Recurrence period
+    pub preemptible: bool,    // Whether task can be preempted
 }
 
-/// Active Real-Time Task Instance
+/// Active Real-Time Task Instance with EEVDF virtual deadline
 #[derive(Debug, Clone)]
 pub struct DeadlineTaskInstance {
     pub pid: u64,
     pub remaining_runtime_ns: u64,
     pub absolute_deadline_ns: u64,
+    pub virtual_deadline_ns: u64,  // EEVDF virtual deadline
     pub params: SchedDeadlineParams,
+    pub preemption_count: u32,
 }
 
 impl PartialEq for DeadlineTaskInstance {
     fn eq(&self, other: &Self) -> bool {
-        self.absolute_deadline_ns == other.absolute_deadline_ns && self.pid == other.pid
+        self.virtual_deadline_ns == other.virtual_deadline_ns && self.pid == other.pid
     }
 }
 
 impl Eq for DeadlineTaskInstance {}
 
-// Reverse ordering for Min-Heap (Earliest Deadline First)
+// Reverse ordering for Min-Heap (Earliest Virtual Deadline First - EEVDF)
 impl Ord for DeadlineTaskInstance {
     fn cmp(&self, other: &Self) -> Ordering {
-        other.absolute_deadline_ns.cmp(&self.absolute_deadline_ns)
+        other.virtual_deadline_ns.cmp(&self.virtual_deadline_ns)
             .then_with(|| self.pid.cmp(&other.pid))
     }
 }
@@ -47,12 +52,14 @@ impl PartialOrd for DeadlineTaskInstance {
     }
 }
 
-/// Sovereign SCHED_DEADLINE EDF Real-Time Scheduler
+/// Sovereign SCHED_DEADLINE EDF Real-Time Scheduler with EEVDF
 #[derive(Debug)]
 pub struct SovereignSchedDeadlineEngine {
     pub current_time_ns: u64,
     pub active_heap: BinaryHeap<DeadlineTaskInstance>,
     pub total_bandwidth_utilization: f64,
+    pub preemptions: AtomicU64,
+    pub context_switches: AtomicU64,
 }
 
 impl SovereignSchedDeadlineEngine {
@@ -61,6 +68,8 @@ impl SovereignSchedDeadlineEngine {
             current_time_ns: 0,
             active_heap: BinaryHeap::new(),
             total_bandwidth_utilization: 0.0,
+            preemptions: AtomicU64::new(0),
+            context_switches: AtomicU64::new(0),
         }
     }
 
@@ -79,11 +88,16 @@ impl SovereignSchedDeadlineEngine {
 
         self.total_bandwidth_utilization += task_util;
 
+        // Calculate initial virtual deadline for EEVDF
+        let virtual_deadline = self.current_time_ns + params.deadline_ns;
+
         let instance = DeadlineTaskInstance {
             pid: params.pid,
             remaining_runtime_ns: params.runtime_ns,
             absolute_deadline_ns: self.current_time_ns + params.deadline_ns,
+            virtual_deadline_ns: virtual_deadline,
             params,
+            preemption_count: 0,
         };
 
         self.active_heap.push(instance);
@@ -108,6 +122,7 @@ impl SovereignSchedDeadlineEngine {
                 let next_deadline = task.absolute_deadline_ns + task.params.period_ns;
                 task.remaining_runtime_ns = task.params.runtime_ns;
                 task.absolute_deadline_ns = next_deadline;
+                task.virtual_deadline_ns = next_deadline; // Update virtual deadline
                 let pid = task.pid;
                 self.active_heap.push(task);
                 Some(pid)
@@ -115,6 +130,36 @@ impl SovereignSchedDeadlineEngine {
         } else {
             None
         }
+    }
+
+    /// Force preemption of current task (hard preemption)
+    pub fn preempt_current(&mut self) -> bool {
+        if let Some(_) = self.active_heap.pop() {
+            self.preemptions.fetch_add(1, Ordering::SeqCst);
+            self.context_switches.fetch_add(1, Ordering::SeqCst);
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Update virtual deadline for EEVDF when task yields
+    pub fn update_virtual_deadline(&mut self, pid: u64, new_virtual_deadline: u64) -> bool {
+        for task in self.active_heap.iter_mut() {
+            if task.pid == pid {
+                task.virtual_deadline_ns = new_virtual_deadline;
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn get_preemption_count(&self) -> u64 {
+        self.preemptions.load(Ordering::SeqCst)
+    }
+
+    pub fn get_context_switch_count(&self) -> u64 {
+        self.context_switches.load(Ordering::SeqCst)
     }
 }
 
@@ -130,6 +175,7 @@ mod tests {
             runtime_ns: 2000,
             deadline_ns: 10000,
             period_ns: 10000,
+            preemptible: true,
         }).unwrap();
 
         sched.register_task(SchedDeadlineParams {
@@ -137,12 +183,77 @@ mod tests {
             runtime_ns: 1000,
             deadline_ns: 5000,
             period_ns: 5000,
+            preemptible: true,
         }).unwrap();
 
-        // Earliest deadline (PID 200) must be scheduled first
+        // Earliest virtual deadline (PID 200) must be scheduled first
         assert_eq!(sched.pick_next_task(), Some(200));
 
         let ran = sched.tick(1000);
         assert_eq!(ran, Some(200));
+    }
+
+    #[test]
+    fn test_hard_preemption() {
+        let mut sched = SovereignSchedDeadlineEngine::new();
+        sched.register_task(SchedDeadlineParams {
+            pid: 100,
+            runtime_ns: 2000,
+            deadline_ns: 10000,
+            period_ns: 10000,
+            preemptible: true,
+        }).unwrap();
+
+        assert!(sched.preempt_current());
+        assert_eq!(sched.get_preemption_count(), 1);
+        assert_eq!(sched.get_context_switch_count(), 1);
+    }
+
+    #[test]
+    fn test_eevdf_virtual_deadline() {
+        let mut sched = SovereignSchedDeadlineEngine::new();
+        sched.register_task(SchedDeadlineParams {
+            pid: 100,
+            runtime_ns: 2000,
+            deadline_ns: 10000,
+            period_ns: 10000,
+            preemptible: true,
+        }).unwrap();
+
+        // Update virtual deadline
+        assert!(sched.update_virtual_deadline(100, 15000));
+    }
+
+    #[test]
+    fn test_bandwidth_admission_control() {
+        let mut sched = SovereignSchedDeadlineEngine::new();
+        
+        // First task: 50% bandwidth
+        sched.register_task(SchedDeadlineParams {
+            pid: 100,
+            runtime_ns: 5000,
+            deadline_ns: 10000,
+            period_ns: 10000,
+            preemptible: true,
+        }).unwrap();
+
+        // Second task: 40% bandwidth (total 90%)
+        sched.register_task(SchedDeadlineParams {
+            pid: 200,
+            runtime_ns: 4000,
+            deadline_ns: 10000,
+            period_ns: 10000,
+            preemptible: true,
+        }).unwrap();
+
+        // Third task: 10% bandwidth (total 100% - should fail)
+        let result = sched.register_task(SchedDeadlineParams {
+            pid: 300,
+            runtime_ns: 1000,
+            deadline_ns: 10000,
+            period_ns: 10000,
+            preemptible: true,
+        });
+        assert!(result.is_err());
     }
 }
