@@ -73,6 +73,7 @@
 - **[[Workqueue|Workqueue]]**
 - **[[RCU Synchronization|RCU-Synchronization]]**
 - **[[Lockdep|Lockdep]]**
+- **[[Cgroups|Cgroups]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 

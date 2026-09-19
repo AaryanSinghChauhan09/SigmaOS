@@ -150,6 +150,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Lockdep](Lockdep)**
   Deadlock detection and lock order validation.
 
+- **[Cgroups](Cgroups)**
+  Resource management and process grouping.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 

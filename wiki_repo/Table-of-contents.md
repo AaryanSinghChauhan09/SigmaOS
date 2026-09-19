@@ -67,6 +67,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 - [Workqueue](Workqueue) — Asynchronous work execution with priority-based scheduling
 - [RCU Synchronization](RCU-Synchronization) — Scalable read-mostly data structure synchronization
 - [Lockdep](Lockdep) — Deadlock detection and lock order validation
+- [Cgroups](Cgroups) — Resource management and process grouping
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support
 - [Lock-Free Data Structures](SIGMA_CONCURRENCY_PRIMITIVES) — Lock-free concurrency primitives and data structures
