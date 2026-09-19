@@ -1,10 +1,12 @@
 //! Network Diagnostic Functions (iproute2/ethtool Inspiration)
 //! Network configuration, diagnostics, and interface management
+//! Enhanced with Linux/BSD-inspired TCP/IP stack features
 
 
 
 use std::vec::Vec;
 use std::string::{String, ToString};
+use std::collections::HashMap;
 
 /// Network interface state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -12,6 +14,30 @@ pub enum InterfaceState {
     Up,
     Down,
     Unknown,
+}
+
+/// TCP congestion control algorithms (Linux-inspired)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TcpCongestionControl {
+    Cubic,
+    Reno,
+    Bbr,
+    Veno,
+    Hybla,
+    Htcp,
+}
+
+/// TCP socket options (POSIX/Linux-inspired)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TcpSocketOption {
+    KeepAlive(bool),
+    KeepIdle(u32),
+    KeepIntvl(u32),
+    KeepCnt(u32),
+    NoDelay(bool),
+    WindowClamp(u32),
+    MaxSeg(u32),
+    Cork(bool),
 }
 
 /// Network interface
@@ -23,6 +49,9 @@ pub struct NetworkInterface {
     pub mtu: u32,
     pub addresses: Vec<IPAddress>,
     pub mac_address: String,
+    pub tx_queue_len: u32,
+    pub rx_queue_len: u32,
+    pub congestion_control: TcpCongestionControl,
 }
 
 #[derive(Debug, Clone)]
@@ -47,6 +76,9 @@ impl NetworkInterface {
             mtu: 1500,
             addresses: Vec::new(),
             mac_address: String::new(),
+            tx_queue_len: 1000,
+            rx_queue_len: 1000,
+            congestion_control: TcpCongestionControl::Cubic,
         }
     }
 
@@ -65,6 +97,15 @@ impl NetworkInterface {
     pub fn set_down(&mut self) {
         self.state = InterfaceState::Down;
     }
+
+    pub fn set_congestion_control(&mut self, cc: TcpCongestionControl) {
+        self.congestion_control = cc;
+    }
+
+    pub fn set_queue_lengths(&mut self, tx_len: u32, rx_len: u32) {
+        self.tx_queue_len = tx_len;
+        self.rx_queue_len = rx_len;
+    }
 }
 
 /// Route
@@ -74,6 +115,7 @@ pub struct Route {
     pub gateway: String,
     pub interface: String,
     pub metric: u32,
+    pub table: u32,
 }
 
 impl Route {
@@ -83,7 +125,12 @@ impl Route {
             gateway: gateway.to_string(),
             interface: interface.to_string(),
             metric: 100,
+            table: 254, // main table
         }
+    }
+
+    pub fn set_table(&mut self, table: u32) {
+        self.table = table;
     }
 }
 
@@ -92,6 +139,7 @@ pub struct NetworkConfig {
     pub interfaces: Vec<NetworkInterface>,
     pub routes: Vec<Route>,
     pub rules: Vec<Rule>,
+    pub tcp_options: HashMap<String, TcpSocketOption>,
 }
 
 #[derive(Debug, Clone)]
@@ -115,6 +163,7 @@ impl NetworkConfig {
             interfaces: Vec::new(),
             routes: Vec::new(),
             rules: Vec::new(),
+            tcp_options: HashMap::new(),
         }
     }
 
@@ -132,6 +181,14 @@ impl NetworkConfig {
 
     pub fn get_interface(&mut self, name: &str) -> Option<&mut NetworkInterface> {
         self.interfaces.iter_mut().find(|i| i.name == name)
+    }
+
+    pub fn set_tcp_option(&mut self, key: &str, option: TcpSocketOption) {
+        self.tcp_options.insert(key.to_string(), option);
+    }
+
+    pub fn get_tcp_option(&self, key: &str) -> Option<&TcpSocketOption> {
+        self.tcp_options.get(key)
     }
 }
 
@@ -376,5 +433,34 @@ mod tests {
     fn test_ethtool() {
         let ethtool = EthTool::new("eth0");
         assert_eq!(ethtool.get_speed(), 1000);
+    }
+
+    #[test]
+    fn test_congestion_control() {
+        let mut interface = NetworkInterface::new("eth0", 1);
+        interface.set_congestion_control(TcpCongestionControl::Bbr);
+        assert_eq!(interface.congestion_control, TcpCongestionControl::Bbr);
+    }
+
+    #[test]
+    fn test_queue_lengths() {
+        let mut interface = NetworkInterface::new("eth0", 1);
+        interface.set_queue_lengths(2000, 2000);
+        assert_eq!(interface.tx_queue_len, 2000);
+        assert_eq!(interface.rx_queue_len, 2000);
+    }
+
+    #[test]
+    fn test_route_table() {
+        let mut route = Route::new("0.0.0.0/0", "192.168.1.1", "eth0");
+        route.set_table(255);
+        assert_eq!(route.table, 255);
+    }
+
+    #[test]
+    fn test_tcp_options() {
+        let mut config = NetworkConfig::new();
+        config.set_tcp_option("keepalive", TcpSocketOption::KeepAlive(true));
+        assert!(config.get_tcp_option("keepalive").is_some());
     }
 }

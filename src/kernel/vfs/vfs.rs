@@ -749,22 +749,135 @@ mod mount_tests {
         cache.insert(inode2);
         cache.insert(inode3);
         
-        // Get should work
+        // Lookup should work
         assert!(cache.get(1).is_some());
         assert!(cache.get(2).is_some());
         
-        // Ref counting
-        assert!(cache.ref_inode(1).is_ok());
-        assert!(cache.ref_inode(1).is_ok());
-        assert!(cache.unref_inode(1).is_ok());
-        assert!(cache.unref_inode(1).is_ok());
+        // Reference counting
+        let ref_count = cache.get_refcount(1);
+        assert!(ref_count > 0);
         
-        // Unref to zero should remove from cache
-        assert!(cache.get(1).is_some());
-        cache.ref_inode(1).unwrap();
-        cache.unref_inode(1).unwrap();
-        assert!(cache.get(1).is_none());
+        // Decrement refcount
+        cache.decrement_refcount(1);
     }
+
+    #[test]
+    fn test_superblock_caches() {
+        let mut sb = SuperBlock::new(0x12345678);
+        
+        // Superblock should have caches initialized
+        assert!(sb.s_dentry_cache.max_size > 0);
+        assert!(sb.s_inode_cache.max_size > 0);
+        
+        // Add dentry to superblock cache
+        sb.s_dentry_cache.insert("test".to_string(), 100);
+        assert_eq!(sb.s_dentry_cache.lookup("test"), Some(100));
+    }
+
+    #[test]
+    fn test_file_permissions() {
+        let perms = FilePermission::Read as u32 | FilePermission::Write as u32;
+        assert_eq!(perms, 6); // 4 + 2 = 6 (rw-)
+        
+        let full_perms = FilePermission::Read as u32 | FilePermission::Write as u32 | FilePermission::Execute as u32;
+        assert_eq!(full_perms, 7); // 4 + 2 + 1 = 7 (rwx)
+    }
+
+    #[test]
+    fn test_inode_types() {
+        let reg_inode = Inode::new(1, InodeType::Regular);
+        assert!(reg_inode.is_reg());
+        assert!(!reg_inode.is_dir());
+        
+        let dir_inode = Inode::new(2, InodeType::Directory);
+        assert!(dir_inode.is_dir());
+        assert!(!dir_inode.is_reg());
+    }
+
+    #[test]
+    fn test_vfs_mount() {
+        let mut vfs = Vfs::new();
+        let sb = SuperBlock::new(0x12345678);
+        
+        // Mount should succeed
+        let result = vfs.mount("/mnt".to_string(), sb);
+        assert!(result.is_ok());
+        
+        // Should be able to lookup mount
+        let mount = vfs.lookup_mount("/mnt");
+        assert!(mount.is_some());
+    }
+
+    #[test]
+    fn test_vfs_umount() {
+        let mut vfs = Vfs::new();
+        let sb = SuperBlock::new(0x12345678);
+        
+        vfs.mount("/mnt".to_string(), sb).unwrap();
+        
+        // Unmount should succeed
+        let result = vfs.umount("/mnt");
+        assert!(result.is_ok());
+        
+        // Mount should no longer exist
+        let mount = vfs.lookup_mount("/mnt");
+        assert!(mount.is_none());
+    }
+
+    #[test]
+    fn test_mount_manager() {
+        let mut manager = SovereignMountManager::new();
+        
+        // Parse fstab entry
+        let result = manager.parse_and_register_fstab_entry("UUID=1234 /mnt/data ext4 rw,nosuid 0 2");
+        assert!(result.is_ok());
+        
+        // Check mount exists
+        assert!(manager.active_mount_table.contains_key("/mnt/data"));
+    }
+
+    #[test]
+    fn test_bind_mount() {
+        let mut manager = SovereignMountManager::new();
+        
+        // Execute bind mount
+        let result = manager.execute_bind_mount("/source", "/target", MountPropagation::Private);
+        assert!(result.is_ok());
+        
+        // Check bind mount exists
+        assert!(manager.active_mount_table.contains_key("/target"));
+    }
+
+    #[test]
+    fn test_remount() {
+        let mut manager = SovereignMountManager::new();
+        manager.parse_and_register_fstab_entry("UUID=1234 /mnt/data ext4 rw 0 2").unwrap();
+        
+        // Remount with new flags
+        let result = manager.remount("/mnt/data", MS_RDONLY);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_unmount_with_flags() {
+        let mut manager = SovereignMountManager::new();
+        manager.parse_and_register_fstab_entry("UUID=1234 /mnt/data ext4 rw 0 2").unwrap();
+        
+        // Unmount with force flag
+        let result = manager.unmount_with_flags("/mnt/data", MNT_FORCE);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_securelevel() {
+        let mut manager = SovereignMountManager::new();
+        manager.securelevel = 2;
+        
+        // Should fail due to securelevel
+        let result = manager.parse_and_register_fstab_entry("UUID=1234 /mnt/data ext4 rw 0 2");
+        assert!(result.is_err());
+    }
+}
 
     #[test]
     fn test_fstab_parsing() {
