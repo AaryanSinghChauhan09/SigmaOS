@@ -104,11 +104,15 @@ pub use vec::Vec;
 pub use std::collections::HashMap;
 #[cfg(not(target_os = "none"))]
 pub use std::collections::HashSet;
+#[cfg(not(target_os = "none"))]
+pub use std::collections::VecDeque;
 
 #[cfg(target_os = "none")]
 pub use collections::HashMap;
 #[cfg(target_os = "none")]
 pub use collections::HashSet;
+#[cfg(target_os = "none")]
+pub use collections::VecDeque;
 
 pub use custom_string::SigmaString;
 

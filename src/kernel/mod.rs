@@ -60,6 +60,7 @@ pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
 pub mod structures;
+pub mod subsystems;
 pub mod virtual_cpu;
 
 pub use missing_linux_kernel_components::{
