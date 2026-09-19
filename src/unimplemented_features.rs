@@ -5,15 +5,6 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 #![allow(unexpected_cfgs)]
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
-
-use std::format;
-use std::vec;
-// Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
-// Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
-
 extern crate alloc;
 
 use alloc::boxed::Box;
@@ -2976,10 +2967,10 @@ pub struct RockyAlmaLinuxEnterpriseLifecycleGovernor {
 }
 
 impl RockyAlmaLinuxEnterpriseLifecycleGovernor {
-    pub fn new(major_version: u32, el_version: u32) -> Self {
+    pub fn new(major_version: u32) -> Self {
         Self {
             major_version,
-            el_version,
+            el_version: major_version,
             errata_patches_applied: 0,
             security_advisories: Vec::new(),
         }
