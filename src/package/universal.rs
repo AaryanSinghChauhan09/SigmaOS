@@ -168,6 +168,14 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         || lower.contains("dinit")
     {
         "sovereign-init"
+    } else if lower.contains("avr-gcc")
+        || lower.contains("arm-none-eabi")
+        || lower.contains("esp-idf")
+        || lower.contains("riscv64-unknown-elf")
+        || lower.contains("openocd")
+        || lower.contains("dfu-util")
+    {
+        "sovereign-embedded-toolchain"
     } else if lower.contains("gcc")
         || lower.contains("clang")
         || lower.contains("llvm")
@@ -254,6 +262,57 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         || lower.contains("freebsd-kld")
     {
         "sovereign-kernel-drivers"
+    } else if lower.contains("k8s")
+        || lower.contains("kubernetes")
+        || lower.contains("terraform")
+        || lower.contains("ansible")
+        || lower.contains("openstack")
+        || lower.contains("helm")
+        || lower.contains("etcd")
+    {
+        "sovereign-cloud-infrastructure"
+    } else if lower.contains("cuda")
+        || lower.contains("rocm")
+        || lower.contains("pytorch")
+        || lower.contains("onnx")
+        || lower.contains("tensorflow")
+        || lower.contains("triton")
+        || lower.contains("openvino")
+        || lower.contains("tensorrt")
+    {
+        "sovereign-ai-ml-runtime"
+    } else if lower.contains("qt6")
+        || lower.contains("qt5")
+        || lower.contains("gtk4")
+        || lower.contains("gtk3")
+        || lower.contains("wxwidgets")
+        || lower.contains("fltk")
+        || lower.contains("sdl2")
+        || lower.contains("raylib")
+    {
+        "sovereign-gui-frameworks"
+    } else if lower.contains("chromium")
+        || lower.contains("webkit")
+        || lower.contains("geckodriver")
+        || lower.contains("wasmtime")
+        || lower.contains("wasmer")
+        || lower.contains("electron")
+        || lower.contains("tauri")
+    {
+        "sovereign-web-engine"
+    } else if lower.contains("ripgrep")
+        || lower == "rg"
+        || lower == "bat"
+        || lower.contains("fd-find")
+        || lower == "eza"
+        || lower == "zoxide"
+        || lower == "fzf"
+        || lower == "starship"
+        || lower == "duf"
+        || lower == "btop"
+        || lower == "htop"
+    {
+        "sovereign-modern-cli"
     } else {
         name
     }
@@ -2795,6 +2854,199 @@ impl UniversalPackageFormatBridge {
     }
 }
 
+/// Lifecycle phases for user-defined package hooks
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum UserDefinedHookPhase {
+    PreInstall,
+    PostInstall,
+    PreRemove,
+    PostRemove,
+    PreTransaction,
+    PostTransaction,
+    OnRollback,
+}
+
+/// User-Defined Hook Engine for multi-distro lifecycle management
+pub struct UserDefinedHookEngine {
+    pub hooks: HashMap<UserDefinedHookPhase, Vec<Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>>>,
+}
+
+impl UserDefinedHookEngine {
+    pub fn new() -> Self {
+        Self {
+            hooks: HashMap::new(),
+        }
+    }
+
+    pub fn register_hook<F>(&mut self, phase: UserDefinedHookPhase, hook: F)
+    where
+        F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
+    {
+        self.hooks
+            .entry(phase)
+            .or_insert_with(Vec::new)
+            .push(Arc::new(hook));
+    }
+
+    pub fn trigger(&self, phase: UserDefinedHookPhase, package: &UnifiedPackage) -> Result<(), PackageError> {
+        if let Some(list) = self.hooks.get(&phase) {
+            for hook in list {
+                hook(package)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Default for UserDefinedHookEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Scriptable User Function Manager supporting custom user-defined logic
+pub struct ScriptableUserFunctionManager {
+    pub user_functions: HashMap<String, Arc<dyn Fn(&str, &[String]) -> Result<String, &'static str> + Send + Sync>>,
+}
+
+impl ScriptableUserFunctionManager {
+    pub fn new() -> Self {
+        Self {
+            user_functions: HashMap::new(),
+        }
+    }
+
+    pub fn register_function<F>(&mut self, name: &str, func: F)
+    where
+        F: Fn(&str, &[String]) -> Result<String, &'static str> + Send + Sync + 'static,
+    {
+        self.user_functions
+            .insert(name.to_string(), Arc::new(func));
+    }
+
+    pub fn invoke(&self, name: &str, context: &str, args: &[String]) -> Result<String, &'static str> {
+        let func = self
+            .user_functions
+            .get(name)
+            .ok_or("ScriptableUserFunctionManager: Function not found")?;
+        func(context, args)
+    }
+}
+
+impl Default for ScriptableUserFunctionManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// OOP Command Pattern Trait for Transactional Package Operations
+pub trait PackageCommand: Send + Sync {
+    fn execute(&mut self, manager: &mut UniversalPackageManager) -> Result<(), PackageError>;
+    fn undo(&mut self, manager: &mut UniversalPackageManager) -> Result<(), PackageError>;
+    fn description(&self) -> String;
+}
+
+/// Command for installing a package
+pub struct InstallPackageCommand {
+    pub package: UnifiedPackage,
+    pub executed: bool,
+}
+
+impl InstallPackageCommand {
+    pub fn new(package: UnifiedPackage) -> Self {
+        Self {
+            package,
+            executed: false,
+        }
+    }
+}
+
+impl PackageCommand for InstallPackageCommand {
+    fn execute(&mut self, manager: &mut UniversalPackageManager) -> Result<(), PackageError> {
+        manager.add_package(self.package.clone());
+        manager.install(&self.package.name)?;
+        self.executed = true;
+        Ok(())
+    }
+
+    fn undo(&mut self, manager: &mut UniversalPackageManager) -> Result<(), PackageError> {
+        if self.executed {
+            manager.remove(&self.package.name)?;
+            self.executed = false;
+        }
+        Ok(())
+    }
+
+    fn description(&self) -> String {
+        format!("InstallPackageCommand: {}", self.package.name)
+    }
+}
+
+/// Command for removing a package
+pub struct RemovePackageCommand {
+    pub package_name: String,
+    pub removed_package: Option<UnifiedPackage>,
+}
+
+impl RemovePackageCommand {
+    pub fn new(package_name: &str) -> Self {
+        Self {
+            package_name: package_name.to_string(),
+            removed_package: None,
+        }
+    }
+}
+
+impl PackageCommand for RemovePackageCommand {
+    fn execute(&mut self, manager: &mut UniversalPackageManager) -> Result<(), PackageError> {
+        if let Some(pkg) = manager.installed_packages.get(&self.package_name) {
+            self.removed_package = Some(pkg.clone());
+        }
+        manager.remove(&self.package_name)
+    }
+
+    fn undo(&mut self, manager: &mut UniversalPackageManager) -> Result<(), PackageError> {
+        if let Some(pkg) = self.removed_package.take() {
+            manager.add_package(pkg.clone());
+            manager.install(&pkg.name)?;
+        }
+        Ok(())
+    }
+
+    fn description(&self) -> String {
+        format!("RemovePackageCommand: {}", self.package_name)
+    }
+}
+
+/// Transaction Executor processing package commands with automatic rollback on failure
+pub struct CommandTransactionExecutor;
+
+impl CommandTransactionExecutor {
+    pub fn execute_transaction(
+        commands: &mut [Box<dyn PackageCommand>],
+        manager: &mut UniversalPackageManager,
+    ) -> Result<(), PackageError> {
+        let mut executed_indices: Vec<usize> = Vec::new();
+
+        for (idx, cmd) in commands.iter_mut().enumerate() {
+            match cmd.execute(manager) {
+                Ok(()) => {
+                    executed_indices.push(idx);
+                }
+                Err(err) => {
+                    // Rollback all previously executed commands in reverse
+                    for &executed_idx in executed_indices.iter().rev() {
+                        let _ = commands[executed_idx].undo(manager);
+                    }
+                    return Err(err);
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3502,5 +3754,53 @@ mod tests {
         assert_eq!(debtor_to_sovereign_name("pam-modules"), "sovereign-security");
         assert_eq!(debtor_to_sovereign_name("dotnet-runtime-8"), "sovereign-windows-runtime");
         assert_eq!(debtor_to_sovereign_name("dkms-nvidia"), "sovereign-kernel-drivers");
+        assert_eq!(debtor_to_sovereign_name("kubernetes-helm"), "sovereign-cloud-infrastructure");
+        assert_eq!(debtor_to_sovereign_name("cuda-toolkit-12"), "sovereign-ai-ml-runtime");
+        assert_eq!(debtor_to_sovereign_name("qt6-base"), "sovereign-gui-frameworks");
+        assert_eq!(debtor_to_sovereign_name("arm-none-eabi-gcc"), "sovereign-embedded-toolchain");
+        assert_eq!(debtor_to_sovereign_name("chromium-browser"), "sovereign-web-engine");
+        assert_eq!(debtor_to_sovereign_name("ripgrep"), "sovereign-modern-cli");
+    }
+
+    #[test]
+    fn test_user_defined_hook_engine() {
+        let mut hook_engine = UserDefinedHookEngine::new();
+        let counter = Arc::new(std::sync::atomic::AtomicU32::new(0));
+
+        let counter_clone = counter.clone();
+        hook_engine.register_hook(UserDefinedHookPhase::PostInstall, move |_pkg| {
+            counter_clone.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            Ok(())
+        });
+
+        let dummy_pkg = UnifiedPackage::new("test-hook-pkg".to_string(), "1.0.0".to_string());
+        assert!(hook_engine.trigger(UserDefinedHookPhase::PostInstall, &dummy_pkg).is_ok());
+        assert_eq!(counter.load(std::sync::atomic::Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn test_scriptable_user_function_manager() {
+        let mut script_mgr = ScriptableUserFunctionManager::new();
+
+        script_mgr.register_function("custom_transform", |_ctx, args| {
+            let joined = args.join("_");
+            Ok(format!("transformed_{}", joined))
+        });
+
+        let res = script_mgr.invoke("custom_transform", "package_context", &["alpha".to_string(), "beta".to_string()]);
+        assert_eq!(res.unwrap(), "transformed_alpha_beta");
+    }
+
+    #[test]
+    fn test_command_transaction_executor() {
+        let mut manager = UniversalPackageManager::new();
+        let pkg1 = UnifiedPackage::new("pkg-one".to_string(), "1.0.0".to_string());
+
+        let mut commands: Vec<Box<dyn PackageCommand>> = vec![
+            Box::new(InstallPackageCommand::new(pkg1.clone())),
+        ];
+
+        assert!(CommandTransactionExecutor::execute_transaction(&mut commands, &mut manager).is_ok());
+        assert!(manager.installed_packages.contains_key("pkg-one"));
     }
 }
