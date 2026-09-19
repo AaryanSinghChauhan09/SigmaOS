@@ -292,16 +292,17 @@ pub mod promises {
         PledgePromise::new(vec![Permission::FileRead, Permission::FileWrite])
     }
 
-    /// Network promise - network access
+    /// Network promise - TCP/UDP networking
     pub fn network() -> PledgePromise {
         PledgePromise::new(vec![
             Permission::NetworkTcp,
             Permission::NetworkUdp,
             Permission::FileRead,
+            Permission::FileWrite,
         ])
     }
 
-    /// Exec promise - can execute processes
+    /// Exec promise - process execution
     pub fn exec() -> PledgePromise {
         PledgePromise::new(vec![
             Permission::ProcessExec,
@@ -310,13 +311,118 @@ pub mod promises {
         ])
     }
 
-    /// IPC promise - inter-process communication
-    pub fn ipc() -> PledgePromise {
-        PledgePromise::new(vec![Permission::Ipc, Permission::FileRead])
+    /// DNS promise - DNS resolution
+    pub fn dns() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::NetworkUdp,
+            Permission::FileRead,
+        ])
     }
 
-    /// Full promise - all permissions
-    pub fn full() -> PledgePromise {
+    /// IPC promise - inter-process communication
+    pub fn ipc() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::Ipc,
+            Permission::FileRead,
+            Permission::FileWrite,
+        ])
+    }
+
+    /// Audio promise - audio playback
+    pub fn audio() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::AudioPlayback,
+            Permission::FileRead,
+        ])
+    }
+
+    /// Display promise - display access
+    pub fn display() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::DisplayAccess,
+            Permission::FileRead,
+            Permission::FileWrite,
+        ])
+    }
+
+    /// Unix promise - Unix domain sockets
+    pub fn unix() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::Ipc,
+            Permission::FileRead,
+            Permission::FileWrite,
+        ])
+    }
+
+    /// TTY promise - terminal access
+    pub fn tty() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::FileRead,
+            Permission::FileWrite,
+        ])
+    }
+
+    /// Proc promise - /proc filesystem access
+    pub fn proc() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::FileRead,
+        ])
+    }
+
+    /// Rpath promise - read-only file access
+    pub fn rpath() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::FileRead,
+        ])
+    }
+
+    /// Wpath promise - write file access
+    pub fn wpath() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::FileWrite,
+        ])
+    }
+
+    /// Cpath promise - create files
+    pub fn cpath() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::FileWrite,
+            Permission::ProcessExec,
+        ])
+    }
+
+    /// Dpath promise - create directories
+    pub fn dpath() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::FileWrite,
+        ])
+    }
+
+    /// Fattr promise - file attribute modification
+    pub fn fattr() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::FileWrite,
+        ])
+    }
+
+    /// Inet promise - internet networking
+    pub fn inet() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::NetworkTcp,
+            Permission::NetworkUdp,
+        ])
+    }
+
+    /// Prot_exec promise - execute memory mapping
+    pub fn prot_exec() -> PledgePromise {
+        PledgePromise::new(vec![
+            Permission::ProcessExec,
+            Permission::FileRead,
+        ])
+    }
+
+    /// All promises - full access (use with caution)
+    pub fn all() -> PledgePromise {
         PledgePromise::new(vec![
             Permission::NetworkTcp,
             Permission::NetworkUdp,
@@ -324,6 +430,8 @@ pub mod promises {
             Permission::FileWrite,
             Permission::ProcessExec,
             Permission::Ipc,
+            Permission::AudioPlayback,
+            Permission::DisplayAccess,
         ])
     }
 }
@@ -371,8 +479,25 @@ mod tests {
         let network_promise = network();
         assert!(network_promise.allows(Permission::NetworkTcp));
 
-        let full_promise = full();
-        assert!(full_promise.allows(Permission::ProcessExec));
+        let all_promise = all();
+        assert!(all_promise.allows(Permission::ProcessExec));
+    }
+
+    #[test]
+    fn test_promise_variety() {
+        let dns_promise = dns();
+        assert!(dns_promise.allows(Permission::NetworkUdp));
+
+        let rpath_promise = rpath();
+        assert!(rpath_promise.allows(Permission::FileRead));
+        assert!(!rpath_promise.allows(Permission::FileWrite));
+
+        let wpath_promise = wpath();
+        assert!(wpath_promise.allows(Permission::FileWrite));
+
+        let inet_promise = inet();
+        assert!(inet_promise.allows(Permission::NetworkTcp));
+        assert!(inet_promise.allows(Permission::NetworkUdp));
     }
 
     #[test]
@@ -384,5 +509,36 @@ mod tests {
         assert!(manager.execpledge(exec_p).is_ok());
         assert!(manager.active_execpledge().is_some());
         assert!(manager.execpledge(stdio()).is_err()); // Already set
+    }
+
+    #[test]
+    fn test_unveil_validation() {
+        let mut manager = PledgeManager::new();
+        manager.unveil("/var/www", "r").unwrap();
+        manager.unveil("/tmp", "rw").unwrap();
+
+        assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
+        assert!(manager.validate_unveil_access("/tmp/test.txt", 'w'));
+        assert!(!manager.validate_unveil_access("/etc/passwd", 'r'));
+    }
+
+    #[test]
+    fn test_unveil_traversal_protection() {
+        let mut manager = PledgeManager::new();
+        manager.unveil("/var/www", "r").unwrap();
+
+        // Block directory traversal
+        assert!(!manager.validate_unveil_access("/var/www/../etc/passwd", 'r'));
+        assert!(!manager.validate_unveil_access("/var/www/./test", 'r'));
+    }
+
+    #[test]
+    fn test_thread_sub_pledge() {
+        let mut manager = PledgeManager::new();
+        let main_promise = all();
+        manager.pledge(main_promise).unwrap();
+
+        let sub_promise = rpath();
+        assert!(manager.sub_pledge_thread(1, sub_promise).is_ok());
     }
 }
