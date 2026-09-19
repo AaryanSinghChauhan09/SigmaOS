@@ -69,6 +69,8 @@
 - **[[Low-Overhead Kernel Observability|Low-Overhead-Kernel-Observability]]**
 - **[[MGLRU & Memory Reclamation|Performance-Tuning-and-Kernel#mglru--memory-reclamation]]**
 - **[[eBPF / XDP Networking|Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking]]**
+- **[[Kernel Timers|Kernel-Timers]]**
+- **[[Workqueue|Workqueue]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 

@@ -138,6 +138,12 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Low-Overhead Kernel Observability](Low-Overhead-Kernel-Observability)**
   High-performance kernel tracing with SigmaTrace and eBPF.
 
+- **[Kernel Timers](Kernel-Timers)**
+  High-resolution timer management with nanosecond precision.
+
+- **[Workqueue](Workqueue)**
+  Asynchronous work execution with priority-based scheduling.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 

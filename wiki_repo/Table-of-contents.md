@@ -63,6 +63,8 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 
 - [Performance & BORE Scheduler](Performance-Tuning-and-Kernel) — Performance tuning and BORE scheduler configuration
 - [Low-Overhead Kernel Observability](Low-Overhead-Kernel-Observability) — High-performance kernel tracing with SigmaTrace and eBPF
+- [Kernel Timers](Kernel-Timers) — High-resolution timer management with nanosecond precision
+- [Workqueue](Workqueue) — Asynchronous work execution with priority-based scheduling
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support
 - [Lock-Free Data Structures](SIGMA_CONCURRENCY_PRIMITIVES) — Lock-free concurrency primitives and data structures
