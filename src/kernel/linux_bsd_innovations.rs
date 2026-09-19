@@ -371,6 +371,13 @@ pub struct EbpfXdpProgram {
     pub instructions: Vec<u64>,
 }
 
+#[derive(Debug, Clone)]
+pub struct BroadcastReceiver {
+    pub name: String,
+    pub intent_filter: String,
+    pub priority: i32,
+}
+
 pub struct AndroidBroadcastReceiverRegistry {
     pub receivers: Vec<BroadcastReceiver>,
 }

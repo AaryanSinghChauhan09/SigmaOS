@@ -3,6 +3,7 @@
 #![allow(unexpected_cfgs)]
 #![allow(dead_code)]
 #![allow(unused_imports)]
+extern crate alloc;
 #![allow(unused_variables)]
 #![allow(non_camel_case_types)]
 #![allow(clippy::large_enum_variant)]

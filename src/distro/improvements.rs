@@ -13,6 +13,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
+
 // SigmaOS Distro Improvements - Inspired by leading Linux distributions
 // Each section implements concepts adapted from a specific distribution's innovations.
 
