@@ -241,6 +241,11 @@ pub enum PackageFormat {
     SigmaPkg,
     Nixpkg,
     Xz,
+    Msi,
+    Msix,
+    Makeself,
+    ZeroInstall,
+    KernelModulePkg,
 }
 
 impl PackageFormat {
@@ -412,6 +417,16 @@ impl PackageFormat {
             Some(PackageFormat::JuliaPkg)
         } else if normalized.ends_with(".rpkg") {
             Some(PackageFormat::RCran)
+        } else if normalized.ends_with(".msi") {
+            Some(PackageFormat::Msi)
+        } else if normalized.ends_with(".msix") || normalized.ends_with(".appx") {
+            Some(PackageFormat::Msix)
+        } else if normalized.ends_with(".run") {
+            Some(PackageFormat::Makeself)
+        } else if normalized.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstall)
+        } else if normalized.ends_with(".kmp") || normalized.ends_with(".kmod") {
+            Some(PackageFormat::KernelModulePkg)
         } else {
             None
         }
@@ -1073,6 +1088,11 @@ impl_generic_package_adapter!(
     "julia-version: "
 );
 impl_generic_package_adapter!(RCranAdapter, RCran, "r-cran:", "r-cran: ", "cran-version: ");
+impl_generic_package_adapter!(MsiAdapter, Msi, "msi-package:", "msi-package: ", "msi-version: ");
+impl_generic_package_adapter!(MsixAdapter, Msix, "msix-package:", "msix-package: ", "msix-version: ");
+impl_generic_package_adapter!(MakeselfAdapter, Makeself, "makeself-package:", "makeself-package: ", "makeself-version: ");
+impl_generic_package_adapter!(ZeroInstallAdapter, ZeroInstall, "zeroinstall-package:", "zeroinstall-package: ", "zeroinstall-version: ");
+impl_generic_package_adapter!(KernelModulePkgAdapter, KernelModulePkg, "kmod-package:", "kmod-package: ", "kmod-version: ");
 
 /// Fedora/RHEL .rpm adapter
 pub struct RpmAdapter {
@@ -2774,6 +2794,11 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(HaskellCabalAdapter::new()));
         factory.register_parser(Box::new(JuliaPkgAdapter::new()));
         factory.register_parser(Box::new(RCranAdapter::new()));
+        factory.register_parser(Box::new(MsiAdapter::new()));
+        factory.register_parser(Box::new(MsixAdapter::new()));
+        factory.register_parser(Box::new(MakeselfAdapter::new()));
+        factory.register_parser(Box::new(ZeroInstallAdapter::new()));
+        factory.register_parser(Box::new(KernelModulePkgAdapter::new()));
 
         factory
     }
@@ -4340,6 +4365,20 @@ impl UniversalDistroPackageUnifierEngine {
                     || lower.contains("kerberos")
                 {
                     "sovereign-security".to_string()
+                } else if lower.contains("dotnet")
+                    || lower.contains("msvc")
+                    || lower.contains("vcredist")
+                    || lower.contains("directx")
+                    || lower.contains("win32")
+                {
+                    "sovereign-windows-runtime".to_string()
+                } else if lower.contains("dkms")
+                    || lower.contains("kmod")
+                    || lower.contains("kernel-module")
+                    || lower.contains("linux-headers")
+                    || lower.contains("freebsd-kld")
+                {
+                    "sovereign-kernel-drivers".to_string()
                 } else {
                     dep.name.clone()
                 };

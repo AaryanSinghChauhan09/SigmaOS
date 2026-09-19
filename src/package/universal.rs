@@ -240,6 +240,20 @@ fn debtor_to_sovereign_name(name: &str) -> &str {
         || lower.contains("kerberos")
     {
         "sovereign-security"
+    } else if lower.contains("dotnet")
+        || lower.contains("msvc")
+        || lower.contains("vcredist")
+        || lower.contains("directx")
+        || lower.contains("win32")
+    {
+        "sovereign-windows-runtime"
+    } else if lower.contains("dkms")
+        || lower.contains("kmod")
+        || lower.contains("kernel-module")
+        || lower.contains("linux-headers")
+        || lower.contains("freebsd-kld")
+    {
+        "sovereign-kernel-drivers"
     } else {
         name
     }
@@ -444,6 +458,11 @@ pub enum PackageFormat {
     HaskellCabal, // Haskell Hackage Cabal package (.cabal)
     JuliaPkg,     // Julia language package (.jl)
     RCran,        // R CRAN package (.rpkg)
+    Msi,          // Windows Installer (.msi)
+    Msix,         // Windows App Package (.msix, .appx)
+    Makeself,     // Makeself self-extracting archive (.run)
+    ZeroInstall,  // Zero Install package (.zpk)
+    KernelModulePkg, // Kernel module package (.kmp, .kmod)
 }
 
 impl PackageFormat {
@@ -622,6 +641,16 @@ impl PackageFormat {
             Some(PackageFormat::JuliaPkg)
         } else if normalized.ends_with(".rpkg") {
             Some(PackageFormat::RCran)
+        } else if normalized.ends_with(".msi") {
+            Some(PackageFormat::Msi)
+        } else if normalized.ends_with(".msix") || normalized.ends_with(".appx") {
+            Some(PackageFormat::Msix)
+        } else if normalized.ends_with(".run") {
+            Some(PackageFormat::Makeself)
+        } else if normalized.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstall)
+        } else if normalized.ends_with(".kmp") || normalized.ends_with(".kmod") {
+            Some(PackageFormat::KernelModulePkg)
         } else {
             None
         }
@@ -1107,6 +1136,11 @@ impl_generic_install_strategy!(ElixirHexInstallStrategy);
 impl_generic_install_strategy!(HaskellCabalInstallStrategy);
 impl_generic_install_strategy!(JuliaPkgInstallStrategy);
 impl_generic_install_strategy!(RCranInstallStrategy);
+impl_generic_install_strategy!(MsiInstallStrategy);
+impl_generic_install_strategy!(MsixInstallStrategy);
+impl_generic_install_strategy!(MakeselfInstallStrategy);
+impl_generic_install_strategy!(ZeroInstallInstallStrategy);
+impl_generic_install_strategy!(KernelModulePkgInstallStrategy);
 
 // ============================================================================
 // OOP Design Pattern: Adapter Pattern
@@ -1395,6 +1429,11 @@ impl_generic_metadata_adapter!(ElixirHexMetadataAdapter, ElixirHex);
 impl_generic_metadata_adapter!(HaskellCabalMetadataAdapter, HaskellCabal);
 impl_generic_metadata_adapter!(JuliaPkgMetadataAdapter, JuliaPkg);
 impl_generic_metadata_adapter!(RCranMetadataAdapter, RCran);
+impl_generic_metadata_adapter!(MsiMetadataAdapter, Msi);
+impl_generic_metadata_adapter!(MsixMetadataAdapter, Msix);
+impl_generic_metadata_adapter!(MakeselfMetadataAdapter, Makeself);
+impl_generic_metadata_adapter!(ZeroInstallMetadataAdapter, ZeroInstall);
+impl_generic_metadata_adapter!(KernelModulePkgMetadataAdapter, KernelModulePkg);
 
 // ============================================================================
 // OOP Design Pattern: Decorator Pattern
@@ -1641,6 +1680,11 @@ impl PackageFactory {
             PackageFormat::HaskellCabal => Box::new(HaskellCabalInstallStrategy),
             PackageFormat::JuliaPkg => Box::new(JuliaPkgInstallStrategy),
             PackageFormat::RCran => Box::new(RCranInstallStrategy),
+            PackageFormat::Msi => Box::new(MsiInstallStrategy),
+            PackageFormat::Msix => Box::new(MsixInstallStrategy),
+            PackageFormat::Makeself => Box::new(MakeselfInstallStrategy),
+            PackageFormat::ZeroInstall => Box::new(ZeroInstallInstallStrategy),
+            PackageFormat::KernelModulePkg => Box::new(KernelModulePkgInstallStrategy),
         }
     }
 
@@ -1732,6 +1776,11 @@ impl PackageFactory {
             PackageFormat::HaskellCabal => Box::new(HaskellCabalMetadataAdapter),
             PackageFormat::JuliaPkg => Box::new(JuliaPkgMetadataAdapter),
             PackageFormat::RCran => Box::new(RCranMetadataAdapter),
+            PackageFormat::Msi => Box::new(MsiMetadataAdapter),
+            PackageFormat::Msix => Box::new(MsixMetadataAdapter),
+            PackageFormat::Makeself => Box::new(MakeselfMetadataAdapter),
+            PackageFormat::ZeroInstall => Box::new(ZeroInstallMetadataAdapter),
+            PackageFormat::KernelModulePkg => Box::new(KernelModulePkgMetadataAdapter),
         }
     }
 }
@@ -2562,6 +2611,36 @@ impl UniversalPackageManifestParser {
         PackageFormat::from_filename(filename)
     }
 
+    pub fn detect_format_from_bytes(bytes: &[u8]) -> Option<PackageFormat> {
+        if bytes.len() < 4 {
+            return None;
+        }
+
+        if bytes.len() >= 8 && &bytes[..8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1" {
+            Some(PackageFormat::Msi)
+        } else if bytes[0] == 0xED && bytes[1] == 0xAB && bytes[2] == 0xEE && bytes[3] == 0xDB {
+            Some(PackageFormat::Rpm)
+        } else if bytes.len() >= 7 && &bytes[..7] == b"!<arch>" {
+            Some(PackageFormat::Deb)
+        } else if &bytes[..4] == b"hsqs" || &bytes[..4] == b"sqsh" {
+            Some(PackageFormat::Snap)
+        } else if bytes[0] == 0x7F && bytes[1] == b'E' && bytes[2] == b'L' && bytes[3] == b'F' {
+            Some(PackageFormat::AppImage)
+        } else if bytes[0] == 0x1F && bytes[1] == 0x8B {
+            Some(PackageFormat::TarGz)
+        } else if bytes.len() >= 6 && &bytes[..6] == b"\xfd7zXZ\x00" {
+            Some(PackageFormat::Xz)
+        } else if bytes[0] == 0x28 && bytes[1] == 0xB5 && bytes[2] == 0x2F && bytes[3] == 0xFD {
+            Some(PackageFormat::Pacman)
+        } else if bytes[0] == 0x50 && bytes[1] == 0x4B && bytes[2] == 0x03 && bytes[3] == 0x04 {
+            Some(PackageFormat::Apk)
+        } else if bytes.len() >= 13 && &bytes[..13] == b"nix-archive-1" {
+            Some(PackageFormat::GuixNar)
+        } else {
+            None
+        }
+    }
+
     pub fn parse_manifest_auto(
         filename: &str,
         raw_data: &[u8],
@@ -3080,6 +3159,13 @@ mod tests {
             ("pkg.cabal", PackageFormat::HaskellCabal),
             ("pkg.jl", PackageFormat::JuliaPkg),
             ("pkg.rpkg", PackageFormat::RCran),
+            ("app.msi", PackageFormat::Msi),
+            ("app.msix", PackageFormat::Msix),
+            ("app.appx", PackageFormat::Msix),
+            ("app.run", PackageFormat::Makeself),
+            ("app.zpk", PackageFormat::ZeroInstall),
+            ("app.kmp", PackageFormat::KernelModulePkg),
+            ("app.kmod", PackageFormat::KernelModulePkg),
         ];
 
         for (filename, expected_format) in expanded_cases {
@@ -3090,6 +3176,30 @@ mod tests {
                 filename
             );
         }
+    }
+
+    #[test]
+    fn test_magic_byte_format_detection() {
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_bytes(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"),
+            Some(PackageFormat::Msi)
+        );
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_bytes(&[0xED, 0xAB, 0xEE, 0xDB]),
+            Some(PackageFormat::Rpm)
+        );
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_bytes(b"!<arch>\ndebian-binary"),
+            Some(PackageFormat::Deb)
+        );
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_bytes(b"\x7fELFbin"),
+            Some(PackageFormat::AppImage)
+        );
+        assert_eq!(
+            UniversalPackageManifestParser::detect_format_from_bytes(b"\x1f\x8b\x08\x00"),
+            Some(PackageFormat::TarGz)
+        );
     }
 
     #[test]
@@ -3390,5 +3500,7 @@ mod tests {
         assert_eq!(debtor_to_sovereign_name("gnome-shell"), "sovereign-desktop-environment");
         assert_eq!(debtor_to_sovereign_name("ffmpeg-free"), "sovereign-multimedia");
         assert_eq!(debtor_to_sovereign_name("pam-modules"), "sovereign-security");
+        assert_eq!(debtor_to_sovereign_name("dotnet-runtime-8"), "sovereign-windows-runtime");
+        assert_eq!(debtor_to_sovereign_name("dkms-nvidia"), "sovereign-kernel-drivers");
     }
 }
