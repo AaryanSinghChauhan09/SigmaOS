@@ -10,6 +10,55 @@ The SigmaOS kernel (`src/kernel/`) is a microkernel-based operating system kerne
 - **Memory isolation** — hardware-enforced process isolation via MMU/page tables
 - **Cgroup v2 integration** — hierarchical resource control groups
 
+---
+
+## 🔍 Kernel Subsystem Gap Analysis & Strategic Roadmap
+
+### Current Kernel Capabilities & Gaps
+SigmaOS combines seL4 capability isolation, CachyOS BORE+EEVDF CPU scheduling, and OpenBSD zero-trust sandboxing. However, achieving enterprise-grade kernel maturity comparable to production Linux and BSD kernels requires addressing key gaps:
+
+1. **Control Flow Integrity (CFI) & Shadow Stacks**: HardenedBSD and Linux CFI/IBT mitigate indirect jump hijacking. SigmaOS requires hardware CET shadow stack integration and Forward-Edge CFI checks.
+2. **Zero-Downtime Livepatching**: Linux `kpatch`/`Ksplice` and FreeBSD `kld` dynamic patching support function redirection without rebooting. SigmaOS requires a live symbol redirection framework.
+3. **Multi-ISA Hardware HAL Expansion**: While x86_64 long mode is well-supported, ARM64 (aarch64 MMU/GICv3) and RISC-V 64 (Sv39/Sv48 MMU & PLIC) HAL shards require full hardware initialization.
+4. **eBPF Kernel Verifier Hardening**: Linux eBPF provides JIT compilation and static verification. SigmaOS requires strict register type tracking and pointer bounds checks in the eBPF runtime.
+5. **Formal Verification Proofs**: Inspired by seL4, capability grant/revoke state transitions require automated formal proofs for mathematically proven non-interference.
+6. **Hard Real-Time Latency Guarantees**: Integrating `SCHED_DEADLINE` and lockless RCU read-side critical sections to guarantee <10µs maximum scheduling latency for robotics and edge computing.
+
+---
+
+### 📊 Kernel Subsystem Gap Dashboard
+
+| Kernel Feature | Current State (SigmaOS) | Target State (Linux & BSD Standards) |
+|---|---|---|
+| **CPU Scheduler** | BORE + EEVDF hybrid | SCHED_DEADLINE + BORE + NUMA-aware load balancing |
+| **Exploit Mitigations** | KASLR, SMEP, SMAP, KPTI, W^X | Hardware CET Shadow Stacks, Forward-Edge CFI, FineIBT |
+| **Kernel Patching** | Dynamic module loader | Zero-downtime Livepatching (Ksplice / kpatch parity) |
+| **Multi-ISA HAL** | x86_64 primary, ARM/RISC-V specs | Complete x86_64, ARM64 (GICv3), RISC-V 64 (PLIC/CLINT) HAL |
+| **eBPF Engine** | eBPF VM & XDP driver | Hardened static verifier + zero-copy JIT compiler |
+| **Formal Security** | Capability token model | seL4-style mathematically verified capability isolation |
+
+---
+
+### 🚀 3-Phase Kernel Development Roadmap
+
+#### Phase 1: Core Hardening & Livepatching (0–6 Months)
+- **CFI & Shadow Stacks**: Implement Intel CET shadow stack support and Clang Forward-Edge CFI validation hooks.
+- **Kernel Livepatching Framework**: Build function-level symbol redirection engine (`sigmakpatch`) for zero-downtime kernel updates.
+- **eBPF Verifier Hardening**: Add static pointer bounds checking, loop termination verification, and register state tracking to eBPF VM.
+- **RCU Lockless Synchronization**: Implement Read-Copy-Update (`sigma_rcu`) primitives for lock-free VFS and networking lookups.
+
+#### Phase 2: Multi-ISA HAL & NUMA Scalability (6–12 Months)
+- **ARM64 & RISC-V 64 Hardware HAL**: Implement complete ARM64 page table initialization, GICv3 interrupt controller, and RISC-V 64 Sv39 MMU/PLIC drivers.
+- **NUMA Memory Balancing**: Automatic page migration and node-local allocation preference in physical memory manager.
+- **Process Memory Isolation**: Enhanced page table isolation (KPTI) and ASLR entropy expansion across all process boundaries.
+
+#### Phase 3: Formal Verification & Hard Real-Time (12–18 Months)
+- **Capability Formal Proofs**: Develop automated Isabelle/HOL or Kani mathematical proofs for capability isolation guarantees.
+- **Hard Real-Time Scheduler**: Add `SCHED_DEADLINE` algorithm guaranteeing sub-10µs interrupt and dispatch latency for robotics.
+- **Hardware Enclave Integration**: Native confidential computing support via AMD SEV-SNP and Intel TDX enclaves.
+
+---
+
 ## Architecture
 
 ```
