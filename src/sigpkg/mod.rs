@@ -71,6 +71,7 @@ pub mod zero_alloc_resolver;
 
 pub use crate::package::sovereign_distro_package_matrix::*;
 pub use crate::package::linux_bsd_package_advancements::*;
+pub use crate::package::sovereign_distro_package_advancements_v2::*;
 
 #[path = "../package/bsd_linux_package_innovations.rs"]
 pub mod bsd_linux_package_innovations;

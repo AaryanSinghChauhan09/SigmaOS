@@ -6,8 +6,8 @@
 #![allow(dead_code)]
 
 use std::collections::BinaryHeap;
-use std::cmp::Ordering;
-use core::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::cmp::Ordering as CmpOrdering;
+use core::sync::atomic::{AtomicU64, AtomicU32, Ordering as AtomicOrdering};
 
 /// SCHED_DEADLINE Real-Time Task Parameters
 #[derive(Debug, Clone)]
@@ -40,14 +40,14 @@ impl Eq for DeadlineTaskInstance {}
 
 // Reverse ordering for Min-Heap (Earliest Virtual Deadline First - EEVDF)
 impl Ord for DeadlineTaskInstance {
-    fn cmp(&self, other: &Self) -> Ordering {
+    fn cmp(&self, other: &Self) -> CmpOrdering {
         other.virtual_deadline_ns.cmp(&self.virtual_deadline_ns)
             .then_with(|| self.pid.cmp(&other.pid))
     }
 }
 
 impl PartialOrd for DeadlineTaskInstance {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<CmpOrdering> {
         Some(self.cmp(other))
     }
 }
@@ -135,8 +135,8 @@ impl SovereignSchedDeadlineEngine {
     /// Force preemption of current task (hard preemption)
     pub fn preempt_current(&mut self) -> bool {
         if let Some(_) = self.active_heap.pop() {
-            self.preemptions.fetch_add(1, Ordering::SeqCst);
-            self.context_switches.fetch_add(1, Ordering::SeqCst);
+            self.preemptions.fetch_add(1, AtomicOrdering::SeqCst);
+            self.context_switches.fetch_add(1, AtomicOrdering::SeqCst);
             true
         } else {
             false
@@ -145,21 +145,25 @@ impl SovereignSchedDeadlineEngine {
 
     /// Update virtual deadline for EEVDF when task yields
     pub fn update_virtual_deadline(&mut self, pid: u64, new_virtual_deadline: u64) -> bool {
-        for task in self.active_heap.iter_mut() {
+        let mut vec = std::mem::take(&mut self.active_heap).into_vec();
+        let mut found = false;
+        for task in vec.iter_mut() {
             if task.pid == pid {
                 task.virtual_deadline_ns = new_virtual_deadline;
-                return true;
+                found = true;
+                break;
             }
         }
-        false
+        self.active_heap = BinaryHeap::from(vec);
+        found
     }
 
     pub fn get_preemption_count(&self) -> u64 {
-        self.preemptions.load(Ordering::SeqCst)
+        self.preemptions.load(AtomicOrdering::SeqCst)
     }
 
     pub fn get_context_switch_count(&self) -> u64 {
-        self.context_switches.load(Ordering::SeqCst)
+        self.context_switches.load(AtomicOrdering::SeqCst)
     }
 }
 
