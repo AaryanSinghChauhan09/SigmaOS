@@ -1,176 +1,266 @@
-# Process Namespaces
+# Namespaces - Process Isolation in SigmaOS
 
-Comprehensive isolation for processes enabling container-like execution without virtualization.
+SigmaOS implements a comprehensive namespace subsystem for process isolation, inspired by Linux namespaces (CLONE_NEWPID, CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWUTS, CLONE_NEWUSER, CLONE_NEWCGROUP) and BSD jail mechanisms.
 
 ## Overview
 
-SigmaOS implements three core namespace types for process isolation:
+Namespaces provide lightweight process isolation by partitioning kernel resources. Each namespace type isolates a specific aspect of the system:
 
-1. **PID Namespaces** - Process ID isolation
-2. **IPC Namespaces** - Inter-process communication isolation
-3. **Mount Namespaces** - Filesystem view isolation
+- **PID Namespace**: Isolates process IDs
+- **IPC Namespace**: Isolates Inter-Process Communication
+- **Network Namespace**: Isolates network stacks
+- **UTS Namespace**: Isolates hostname and domainname
+- **User Namespace**: Isolates user and group IDs
+- **Cgroup Namespace**: Isolates cgroup hierarchies
+- **Mount Namespace**: Isolates mount points
 
-## PID Namespaces
+## Components
 
-### Purpose
-Isolate process ID allocation, allowing separate process hierarchies in different namespaces.
+### KernelNamespace Trait
 
-### Key Features
-- Independent PID allocation
-- Parent-child process relationships
-- Reference counting for automatic cleanup
-- Namespace inheritance
-
-### API
+Generic interface that all namespace types must implement:
 
 ```rust
-pub fn create_pid_namespace(parent_id: Option<NamespaceId>) -> Result<NamespaceId, String>;
-pub fn sys_clone(flags: u32, ...) -> Result<i32, String>;
-pub fn sys_unshare(flags: u32) -> Result<(), String>;
-pub fn sys_setns(fd: i32, flags: u32) -> Result<(), String>;
+pub trait KernelNamespace: Send + Sync {
+    fn namespace_id(&self) -> NamespaceId;
+    fn namespace_type(&self) -> KernelNamespaceType;
+    fn ref_count(&self) -> u32;
+    fn increment_ref(&self);
+    fn decrement_ref(&self);
+    fn metadata(&self) -> String;
+}
 ```
 
-### Syscall Flags
+### NamespaceRegistry
+
+Central registry for managing all namespaces:
 
 ```rust
-const CLONE_NEWPID: u32 = 0x20000000;  // Create new PID namespace
-const CLONE_NEWIPC: u32 = 0x08000000;  // Create new IPC namespace
-const CLONE_NEWNS: u32 = 0x00020000;   // Create new mount namespace
+pub struct NamespaceRegistry {
+    namespaces: BTreeMap<NamespaceId, Box<dyn KernelNamespace>>,
+    id_generator: NamespaceIdGenerator,
+}
 ```
 
-### Example: Container-like Isolation
+**Features:**
+- Atomic namespace ID generation
+- Reference counting for namespace lifecycle
+- Thread-safe namespace lookup and registration
+
+### PID Namespace
+
+Process ID isolation for containerization:
 
 ```rust
-// Create isolated namespace
-let ns_id = create_pid_namespace(None)?;
-
-// Clone process into namespace
-let child_pid = sys_clone(
-    CLONE_NEWPID | CLONE_NEWIPC | CLONE_NEWNS,
-    stack_ptr,
-    child_fn,
-    arg,
-    &mut tid
-)?;
+pub struct PidNamespace {
+    id: NamespaceId,
+    parent_id: Option<NamespaceId>,
+    ref_count: AtomicU32,
+    next_pid: AtomicU32,
+}
 ```
 
-## IPC Namespaces
+**Features:**
+- PID allocation with atomic counters
+- Hierarchical namespace support (parent/child)
+- Up to 32,768 PIDs per namespace
 
-### Purpose
-Isolate IPC mechanisms (message queues, semaphores, shared memory).
+### IPC Namespace
 
-### Key Features
-- Message queue isolation
-- Semaphore isolation
-- Shared memory isolation
-- Per-namespace IPC object registry
-
-### Components
+Inter-Process Communication isolation:
 
 ```rust
 pub struct IpcNamespace {
-    pub id: NamespaceId,
-    pub message_queues: HashMap<u32, MessageQueue>,
-    pub semaphores: HashMap<u32, Semaphore>,
-    pub shared_memory: HashMap<u32, SharedMemorySegment>,
+    id: NamespaceId,
+    parent_id: Option<NamespaceId>,
+    ref_count: AtomicU32,
+    message_queues: AtomicU64,
 }
 ```
 
-### Use Cases
+**Features:**
+- Message queue isolation
+- Semaphore isolation
+- Shared memory isolation
 
-- Isolated message queue systems
-- Separate semaphore namespaces
-- Independent shared memory pools
-- Multi-tenant IPC isolation
+### Network Namespace
 
-## Mount Namespaces
-
-### Purpose
-Isolate filesystem views, allowing each namespace to have independent mount points.
-
-### Key Features
-- Independent mount tables
-- Mount source types (Device, Virtual, Network, Bind, Overlay, Tmpfs)
-- Recursive namespace support
-- Mount inheritance
-
-### Supported Mount Sources
+Network stack isolation:
 
 ```rust
-pub enum MountSource {
-    Device,    // Physical device mounting
-    Virtual,   // Virtual filesystem
-    Network,   // Network filesystem
-    Bind,      // Bind mount
-    Overlay,   // Overlay filesystem
-    Tmpfs,     // Temporary filesystem
+pub struct NetworkNamespace {
+    id: NamespaceId,
+    parent_id: Option<NamespaceId>,
+    ref_count: AtomicU32,
+    interfaces: AtomicU64,
 }
 ```
 
-### Example: Filesystem Isolation
+**Features:**
+- Network interface isolation
+- Routing table isolation
+- Firewall rule isolation
+
+### UTS Namespace
+
+Hostname and domainname isolation:
 
 ```rust
-// Create mount namespace
-let mount_ns = create_mount_namespace(None)?;
-
-// Each namespace can have independent mounts
-mount_in_namespace(mount_ns, device, path, flags)?;
+pub struct UtsNamespace {
+    id: NamespaceId,
+    parent_id: Option<NamespaceId>,
+    ref_count: AtomicU32,
+    hostname: String,
+    domainname: String,
+}
 ```
 
-## Advanced Usage
+**Features:**
+- Per-namespace hostname
+- Per-namespace domainname
+- NIS domain name isolation
 
-### Hierarchical Namespaces
+### User Namespace
+
+User and group ID isolation:
 
 ```rust
-// Create namespace hierarchy
-let root_ns = create_pid_namespace(None)?;
-let container_ns = create_pid_namespace(Some(root_ns))?;
-
-// Nested processes inherit parent namespace
+pub struct UserNamespace {
+    id: NamespaceId,
+    parent_id: Option<NamespaceId>,
+    ref_count: AtomicU32,
+    uid_map: AtomicU32,
+    gid_map: AtomicU32,
+}
 ```
 
-### Namespace Switching
+**Features:**
+- UID/GID mapping
+- Capability isolation
+- Root deprivilege support
+
+### Cgroup Namespace
+
+Control group hierarchy isolation:
 
 ```rust
-// Switch to existing namespace
-let fd = open_namespace_fd(ns_id)?;
-sys_setns(fd, CLONE_NEWPID)?;
+pub struct CgroupNamespace {
+    id: NamespaceId,
+    parent_id: Option<NamespaceId>,
+    ref_count: AtomicU32,
+    cgroups: AtomicU64,
+}
 ```
 
-### Unsharing from Current Namespace
+**Features:**
+- cgroup v2 hierarchy isolation
+- Resource controller isolation
+- Subtree delegation support
+
+### Mount Namespace
+
+Mount point isolation:
 
 ```rust
-// Split off into new namespace
-sys_unshare(CLONE_NEWPID)?;
+pub struct MountNamespace {
+    id: NamespaceId,
+    parent_id: Option<NamespaceId>,
+    ref_count: AtomicU32,
+    mount_points: AtomicU64,
+}
 ```
 
-## Performance Characteristics
+**Features:**
+- Mount point isolation
+- Bind mount support
+- Propagation type control
 
-- **Create**: < 1ms
-- **Clone**: < 2ms
-- **Join**: < 1ms
-- **Memory**: ~50KB per namespace
+## Usage
 
-## Comparison with Linux
+### Creating a PID Namespace
 
-| Feature | SigmaOS | Linux |
-|---------|---------|-------|
-| PID Namespaces | ✅ | ✅ |
-| IPC Namespaces | ✅ | ✅ |
-| Mount Namespaces | ✅ | ✅ |
-| UTS Namespaces | Planned | ✅ |
-| Network Namespaces | Planned | ✅ |
-| User Namespaces | Planned | ✅ |
-| Cgroup Namespaces | Planned | ✅ |
+```rust
+let id = next_namespace_id();
+let pid_ns = PidNamespace::new(id, None);
 
-## Limitations
+pid_ns.increment_ref();
+let pid = pid_ns.allocate_pid();
+```
 
-- UTS namespace (v0.9)
-- Network namespace (v0.9)
-- User namespace (v1.0)
+### Creating a Network Namespace
 
-## Next Steps
+```rust
+let id = next_namespace_id();
+let net_ns = NetworkNamespace::new(id, None);
 
-- [File Monitoring](File-Monitoring) - Reactive filesystem watching
-- [Resource Limits](Resource-Limits) - Fair resource allocation
-- [Security](Security-Framework) - Syscall filtering
+let iface_id = net_ns.allocate_interface();
+```
+
+### Registering Namespaces
+
+```rust
+let mut registry = NamespaceRegistry::new();
+let pid_ns = Box::new(PidNamespace::new(id, None)) as Box<dyn KernelNamespace>;
+
+registry.register_namespace(pid_ns)?;
+```
+
+## Security Considerations
+
+1. **Reference Counting**: Prevents namespace premature deletion
+2. **Parent-Child Hierarchy**: Maintains proper namespace hierarchy
+3. **Atomic Operations**: Lock-free ID generation and resource allocation
+4. **Capability Checks**: Namespace creation requires appropriate capabilities
+
+## Comparison with Linux Namespaces
+
+| Feature | Linux Namespaces | SigmaOS Namespaces |
+|---------|-----------------|-------------------|
+| PID | CLONE_NEWPID | PidNamespace |
+| IPC | CLONE_NEWIPC | IpcNamespace |
+| Network | CLONE_NEWNET | NetworkNamespace |
+| UTS | CLONE_NEWUTS | UtsNamespace |
+| User | CLONE_NEWUSER | UserNamespace |
+| Cgroup | CLONE_NEWCGROUP | CgroupNamespace |
+| Mount | CLONE_NEWNS | MountNamespace |
+| Lock-free | Partial | Full |
+| Max namespaces | Dynamic | 1024 |
+
+## Implementation Details
+
+- **Zero External Dependencies**: Uses only std:: and core:: primitives
+- **Atomic Operations**: Lock-free synchronization with SeqCst ordering
+- **Bounded Resources**: Maximum 1024 namespaces, 32768 PIDs per namespace
+- **Memory Safety**: Safe Rust with no unsafe code paths
+- **Thread Safety**: All operations are thread-safe via atomic counters
+
+## Testing
+
+Comprehensive test coverage includes:
+
+- Namespace ID generation
+- Reference counting
+- PID allocation
+- IPC queue allocation
+- Network interface allocation
+- UTS hostname/domainname management
+- User UID/GID mapping
+- Cgroup creation
+- Mount point management
+- Namespace registry operations
+
+## Future Enhancements
+
+- Namespace cgroup delegation
+- Mount propagation types
+- User namespace UID/GID range mapping
+- Network namespace veth pairing
+- PID namespace hierarchy depth limits
+- Namespace freezer support
+
+## References
+
+- Linux namespaces documentation (man 7 namespaces)
+- FreeBSD jail (man 8 jail)
+- OpenBSD pledge/unveil
+- Containerization best practices

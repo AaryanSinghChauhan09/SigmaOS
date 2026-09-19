@@ -106,6 +106,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Inter-Process Communication](Inter-Process-Communication)**
   Pipes, message queues, shared memory, and synchronization.
 
+- **[Namespaces](Namespaces)**
+  Process isolation with PID, IPC, Network, UTS, User, Cgroup, and Mount namespaces.
+
 ---
 
 ## Security & Hardening

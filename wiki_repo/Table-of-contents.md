@@ -46,6 +46,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 - [Virtualization and Containers](Virtualization-and-Containers) — Hardware virtualization, container technology, and orchestration
 - [System Call Interface](System-Call-Interface) — Comprehensive system call interface and security features
 - [Inter-Process Communication](Inter-Process-Communication) — Pipes, message queues, shared memory, and synchronization
+- [Namespaces](Namespaces) — Process isolation with PID, IPC, Network, UTS, User, Cgroup, and Mount namespaces
 
 ---
 

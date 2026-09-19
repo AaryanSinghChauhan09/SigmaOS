@@ -7,7 +7,8 @@
 
 use std::collections::BinaryHeap;
 use std::cmp::Ordering;
-use core::sync::atomic::{AtomicU64, AtomicU32, Ordering};
+use std::vec::Vec;
+use core::sync::atomic::{AtomicU64, Ordering as AtomicOrdering};
 
 /// SCHED_DEADLINE Real-Time Task Parameters
 #[derive(Debug, Clone)]
@@ -27,7 +28,6 @@ pub struct DeadlineTaskInstance {
     pub absolute_deadline_ns: u64,
     pub virtual_deadline_ns: u64,  // EEVDF virtual deadline
     pub params: SchedDeadlineParams,
-    pub preemption_count: u32,
 }
 
 impl PartialEq for DeadlineTaskInstance {
@@ -97,7 +97,6 @@ impl SovereignSchedDeadlineEngine {
             absolute_deadline_ns: self.current_time_ns + params.deadline_ns,
             virtual_deadline_ns: virtual_deadline,
             params,
-            preemption_count: 0,
         };
 
         self.active_heap.push(instance);
@@ -135,8 +134,8 @@ impl SovereignSchedDeadlineEngine {
     /// Force preemption of current task (hard preemption)
     pub fn preempt_current(&mut self) -> bool {
         if let Some(_) = self.active_heap.pop() {
-            self.preemptions.fetch_add(1, Ordering::SeqCst);
-            self.context_switches.fetch_add(1, Ordering::SeqCst);
+            self.preemptions.fetch_add(1, AtomicOrdering::SeqCst);
+            self.context_switches.fetch_add(1, AtomicOrdering::SeqCst);
             true
         } else {
             false
@@ -145,21 +144,31 @@ impl SovereignSchedDeadlineEngine {
 
     /// Update virtual deadline for EEVDF when task yields
     pub fn update_virtual_deadline(&mut self, pid: u64, new_virtual_deadline: u64) -> bool {
-        for task in self.active_heap.iter_mut() {
+        // BinaryHeap doesn't support iter_mut, so we need to drain and rebuild
+        let mut tasks: Vec<DeadlineTaskInstance> = self.active_heap.drain().collect();
+        let mut found = false;
+        
+        for task in &mut tasks {
             if task.pid == pid {
                 task.virtual_deadline_ns = new_virtual_deadline;
-                return true;
+                found = true;
             }
         }
-        false
+        
+        // Rebuild the heap
+        for task in tasks {
+            self.active_heap.push(task);
+        }
+        
+        found
     }
 
     pub fn get_preemption_count(&self) -> u64 {
-        self.preemptions.load(Ordering::SeqCst)
+        self.preemptions.load(AtomicOrdering::SeqCst)
     }
 
     pub fn get_context_switch_count(&self) -> u64 {
-        self.context_switches.load(Ordering::SeqCst)
+        self.context_switches.load(AtomicOrdering::SeqCst)
     }
 }
 
