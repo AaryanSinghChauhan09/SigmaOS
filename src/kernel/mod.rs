@@ -154,3 +154,7 @@ pub use universal_kernel_format::{
     KernelArch, KernelCompression, KernelFormat, KernelFormatSymbol, KernelSection,
     ParsedKernelImage, SigmaKernelExecutionPayload, UniversalKernelFormatEngine,
 };
+
+// ─── Hardware Boot-to-Userspace Path Subsystem ──────────────────────────────
+pub mod boot_to_userspace;
+pub use boot_to_userspace::*;

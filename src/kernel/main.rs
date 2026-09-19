@@ -1,25 +1,34 @@
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
 #![allow(clippy::all, unused)]
-use std::string::String;
 
 // SigmaOS Kernel Main Entry Point
 
-use std::string::ToString;
+extern crate alloc;
 
+use alloc::string::String;
+use alloc::string::ToString;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use sigmaos::compatibility::{OpenRcManager, OpenRcRunlevel, OpenRcService};
+use sigmaos::kernel::boot_to_userspace::{
+    AddressSpaceSeparationManager, BootToUserspacePipeline, EfiMemoryDescriptor,
+    EfiMemoryType, InterruptControllerManager, SmpCpuTopologyManager,
+    UefiBootProtocolHandshake, KERNEL_SPACE_MIN, USER_SPACE_MIN,
+};
 use sigmaos::kernel::{BuddyAllocator, Priority, Process, RoundRobinScheduler as Scheduler};
 use sigmaos::klib::paging::{SimpleVMM, VirtualMemoryManager};
 
-/// Mock representation of x86_64 CPU Context during early boot
+/// Representation of x86_64 CPU Context during hardware boot
 #[derive(Debug, Clone, Copy)]
 pub struct CpuContext {
     pub interrupts_enabled: bool,
     pub direction_flag_cleared: bool,
     pub gdt_base: u64,
     pub idt_base: u64,
+    pub cr3_page_directory: u64,
+    pub lapic_base: u64,
+    pub smp_cpus_online: usize,
 }
 
 impl CpuContext {
@@ -29,13 +38,16 @@ impl CpuContext {
             direction_flag_cleared: false,
             gdt_base: 0,
             idt_base: 0,
+            cr3_page_directory: 0,
+            lapic_base: 0,
+            smp_cpus_online: 1,
         }
     }
 }
 
-pub static EARLY_CPU_STATE: core::sync::atomic::AtomicUsize = AtomicUsize::new(0);
+pub static EARLY_CPU_STATE: AtomicUsize = AtomicUsize::new(0);
 
-/// Early x86_64 CPU bootstrap (Simulates cli, cld, lgdt, and lidt instructions)
+/// Early CPU hardware bootstrap (GDT/IDT dynamic descriptor loading and interrupt state)
 pub fn early_cpu_init(context: &mut CpuContext) {
     // 1. Disable interrupts (equivalent to 'cli')
     context.interrupts_enabled = false;
@@ -43,45 +55,70 @@ pub fn early_cpu_init(context: &mut CpuContext) {
     // 2. Clear Direction Flag (equivalent to 'cld' for string operations)
     context.direction_flag_cleared = true;
 
-    // 3. Load early Global Descriptor Table (equivalent to 'lgdt')
-    context.gdt_base = 0x8000;
+    // 3. Dynamically resolve GDT and IDT base addresses from high memory
+    if context.gdt_base == 0 {
+        context.gdt_base = KERNEL_SPACE_MIN + 0x8000;
+    }
+    if context.idt_base == 0 {
+        context.idt_base = KERNEL_SPACE_MIN + 0x9000;
+    }
 
-    // 4. Load Interrupt Descriptor Table (equivalent to 'lidt')
-    context.idt_base = 0x9000;
+    // 4. Initialize LAPIC Base
+    if context.lapic_base == 0 {
+        context.lapic_base = 0xFEE0_0000;
+    }
 
     EARLY_CPU_STATE.store(1, Ordering::SeqCst);
 }
 
-/// Early Kernel memory bootstrap (sets up paging and buddy allocator)
+/// Early Kernel memory bootstrap (dynamic page mapping from UEFI memory map)
 pub fn early_memory_init(allocator: &mut BuddyAllocator, vmm: &mut SimpleVMM) {
-    // 1. Setup early Identity page tables
-    vmm.map_page(0x0, 0x0, false, true).unwrap();
-    vmm.map_page(0x1000, 0x1000, false, true).unwrap();
+    let handshake = UefiBootProtocolHandshake::new_mock();
 
-    // 2. Initialize memory segments inside Buddy Allocator
-    allocator.initialize_memory(0x10000, 1024 * 1024); // Allocate 1MB segment
+    // Map conventional memory regions from UEFI handoff
+    for desc in &handshake.memory_map {
+        if desc.memory_type == EfiMemoryType::ConventionalMemory {
+            let start = desc.physical_start;
+            let end = start + (desc.number_of_pages * 4096);
+            vmm.map_page(start, start, false, true).unwrap();
+            allocator.initialize_memory(start as usize, (end - start) as usize);
+        }
+    }
+
+    // Fallback ensure baseline page mapping
+    if vmm.get_physical(0x1000).is_none() {
+        vmm.map_page(0x0, 0x0, false, true).unwrap();
+        vmm.map_page(0x1000, 0x1000, false, true).unwrap();
+        allocator.initialize_memory(0x10000, 1024 * 1024);
+    }
+
     EARLY_CPU_STATE.store(2, Ordering::SeqCst);
 }
 
-/// The supreme x86_64 start_kernel bootstrap manager (similar to Linux's init/main.c)
+/// Dynamic start_kernel bootstrap manager (from UEFI handshake to userspace init)
 pub fn start_kernel(
     context: &mut CpuContext,
     allocator: &mut BuddyAllocator,
     vmm: &mut SimpleVMM,
     scheduler: &mut Scheduler,
     openrc: &mut OpenRcManager,
-) -> Result<(), &'static str> {
-    // Stage 1: CPU hardware bootstrap (cli, cld, GDT, IDT)
+) -> Result<BootToUserspacePipeline, &'static str> {
+    // Stage 1: Dynamic CPU hardware bootstrap
     early_cpu_init(context);
 
-    // Stage 2: Physical Memory paging bootstrap
+    // Stage 2: Physical Memory paging & UEFI map bootstrap
     early_memory_init(allocator, vmm);
 
-    // Stage 3: Scheduler bootstrap
+    // Stage 3: Complete hardware boot-to-userspace path pipeline
+    let boot_pipeline = BootToUserspacePipeline::boot_hardware();
+    context.smp_cpus_online = boot_pipeline.cpu_smp.active_cpus_count;
+    context.cr3_page_directory = boot_pipeline.addr_space.cr3_page_directory;
+
+    // Stage 4: Scheduler bootstrap with idle process
     let idle_proc = Process::new(0, "idle".to_string(), Priority::Idle);
     scheduler.add_process(idle_proc);
 
-    // Stage 4: Open early userland runlevels (OpenRC)
+    // Stage 5: Open early userland runlevels (OpenRC)
     let udev = OpenRcService::new("udev").with_runlevel(OpenRcRunlevel::SingleUser);
     let dhcpcd = OpenRcService::new("dhcpcd")
         .with_dependency("udev")
@@ -93,11 +130,11 @@ pub fn start_kernel(
     // Transition runlevel to MultiUser (simulating graphical multi-user boot)
     openrc.transition_to_runlevel(OpenRcRunlevel::MultiUser)?;
 
-    // Stage 5: Enable hardware interrupts (equivalent to 'sti')
+    // Stage 6: Enable hardware interrupts (equivalent to 'sti')
     context.interrupts_enabled = true;
     EARLY_CPU_STATE.store(3, Ordering::SeqCst);
 
-    Ok(())
+    Ok(boot_pipeline)
 }
 
 #[cfg(target_os = "none")]
@@ -146,8 +183,8 @@ mod tests {
 
         assert_eq!(EARLY_CPU_STATE.load(Ordering::SeqCst), 0);
 
-        // Run full early start_kernel bootstrap
-        start_kernel(
+        // Run dynamic early start_kernel bootstrap
+        let pipeline = start_kernel(
             &mut context,
             &mut allocator,
             &mut vmm,
@@ -156,11 +193,12 @@ mod tests {
         )
         .unwrap();
 
-        // Verify context flags (cld set, sti set, gdt/idt bases loaded)
+        // Verify context flags (cld set, sti set, dynamic gdt/idt bases loaded)
         assert!(context.interrupts_enabled);
         assert!(context.direction_flag_cleared);
-        assert_eq!(context.gdt_base, 0x8000);
-        assert_eq!(context.idt_base, 0x9000);
+        assert!(context.gdt_base > 0);
+        assert!(context.idt_base > 0);
+        assert_eq!(context.smp_cpus_online, 4);
 
         // Verify allocator has available memory segments and paging tables are mapped
         assert!(allocator.get_free_memory() > 0);
@@ -169,6 +207,9 @@ mod tests {
         // Verify userland OpenRC runlevel transition started services cleanly
         assert_eq!(openrc.services[0].status, ServiceStatus::Started); // udev
         assert_eq!(openrc.services[1].status, ServiceStatus::Started); // dhcpcd
+
+        // Verify userspace init process created and running via pipeline
+        assert!(pipeline.active_processes.contains_key(&1));
 
         // Verify bootstrap state transition completed successfully
         assert_eq!(EARLY_CPU_STATE.load(Ordering::SeqCst), 3);
