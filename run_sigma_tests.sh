@@ -178,3 +178,17 @@ if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
     rustc --test --edition=2021 src/drivers/sovereign_distro_driver_suite.rs -o build/test_sovereign_distro_driver_suite
     ./build/test_sovereign_distro_driver_suite
 fi
+
+if [ -f "src/tools/tech_media_innovations.rs" ]; then
+    echo "Running Sovereign Tech Media Innovations test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/tech_media_innovations.rs -o build/tech_media_test
+    ./build/tech_media_test
+fi
+
+if [ -f "src/distro/tech_media_distro_innovations.rs" ]; then
+    echo "Running Sovereign Tech Media Distro Innovations test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/distro/tech_media_distro_innovations.rs -o build/tech_media_distro_test
+    ./build/tech_media_distro_test
+fi
