@@ -162,6 +162,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Perf](Perf)**
   Performance monitoring and profiling.
 
+- **[Seccomp](Seccomp)**
+  System call filtering and security sandboxing.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 

@@ -77,6 +77,7 @@
 - **[[Kobject|Kobject]]**
 - **[[Ftrace|Ftrace]]**
 - **[[Perf|Perf]]**
+- **[[Seccomp|Seccomp]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 
