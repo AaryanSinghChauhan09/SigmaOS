@@ -36,6 +36,7 @@ pub mod livepatch;
 pub mod lockdep;
 pub mod cgroups;
 pub mod kobject;
+pub mod ftrace;
 pub mod panic_nvram;
 pub mod linux_absorb;
 pub mod linux_bsd_innovations;
