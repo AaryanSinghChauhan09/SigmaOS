@@ -17,9 +17,15 @@ pub struct AuthenticatedEmergencyTargetGate {
 
 impl AuthenticatedEmergencyTargetGate {
     pub fn new(password: &str) -> Self {
+        // Derives key hash dynamically from password
+        let mut key_hash = Vec::new();
+        for (i, b) in password.bytes().enumerate() {
+            key_hash.push(b ^ ((i as u8).wrapping_mul(31)));
+        }
+
         Self {
             emergency_password_hash: password.to_string(),
-            pqc_dilithium_pubkey: vec![0xAB, 0xCD, 0xEF, 0x01],
+            pqc_dilithium_pubkey: key_hash,
             authenticated: false,
             failed_attempts: 0,
         }
