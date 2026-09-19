@@ -177,6 +177,7 @@ pub struct DoasRule {
     pub user_uid: u32,
     pub command_path: String,
     pub require_password: bool,
+    pub require_mfa_token: bool,
     pub allowed_arguments: Vec<String>,
 }
 
@@ -196,6 +197,7 @@ impl SovereignSuDoasPolicyEngine {
                     user_uid: 1000,
                     command_path: "/usr/bin/pacman".to_string(),
                     require_password: true,
+                    require_mfa_token: false,
                     allowed_arguments: vec!["-Syu".to_string(), "-S".to_string()],
                 },
                 DoasRule {
@@ -203,6 +205,7 @@ impl SovereignSuDoasPolicyEngine {
                     user_uid: 1000,
                     command_path: "/usr/bin/systemctl".to_string(),
                     require_password: false,
+                    require_mfa_token: false,
                     allowed_arguments: vec!["restart".to_string(), "status".to_string()],
                 },
             ],
@@ -212,10 +215,24 @@ impl SovereignSuDoasPolicyEngine {
     }
 
     pub fn authorize_execution(&mut self, user_uid: u32, cmd_path: &str, current_time: u64) -> Result<String, String> {
+        self.authorize_execution_mfa(user_uid, cmd_path, current_time, None)
+    }
+
+    pub fn authorize_execution_mfa(
+        &mut self,
+        user_uid: u32,
+        cmd_path: &str,
+        current_time: u64,
+        mfa_token: Option<&str>,
+    ) -> Result<String, String> {
         let rule = self.rules.iter().find(|r| r.user_uid == user_uid && r.command_path == cmd_path);
 
         match rule {
             Some(r) if r.permit => {
+                if r.require_mfa_token && mfa_token.is_none() {
+                    return Err(format!("doas: Secondary MFA token required for UID {} executing [{}]", user_uid, cmd_path));
+                }
+
                 if r.require_password {
                     if self.active_session_uid == Some(user_uid) && current_time < self.session_expiry_timestamp {
                         Ok(format!("doas: Execution of [{}] authorized via cached session.", cmd_path))
@@ -230,6 +247,48 @@ impl SovereignSuDoasPolicyEngine {
             },
             _ => Err(format!("doas: Access denied for UID {} executing [{}]", user_uid, cmd_path)),
         }
+    }
+}
+
+/// PTY Session Stream Recording & Replay Logging for Sudo Executions
+#[derive(Debug, Clone)]
+pub struct SudoPtyFrame {
+    pub timestamp_ms: u64,
+    pub stream_type: String, // "stdin", "stdout", "stderr"
+    pub data_bytes: Vec<u8>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SudoPtySessionRecorder {
+    pub session_id: u64,
+    pub user_uid: u32,
+    pub command: String,
+    pub frames: Vec<SudoPtyFrame>,
+}
+
+impl SudoPtySessionRecorder {
+    pub fn new(session_id: u64, uid: u32, command: &str) -> Self {
+        Self {
+            session_id,
+            user_uid: uid,
+            command: command.to_string(),
+            frames: Vec::new(),
+        }
+    }
+
+    pub fn record_frame(&mut self, stream: &str, data: &[u8], timestamp: u64) {
+        self.frames.push(SudoPtyFrame {
+            timestamp_ms: timestamp,
+            stream_type: stream.to_string(),
+            data_bytes: data.to_vec(),
+        });
+    }
+
+    pub fn export_io_log(&self) -> String {
+        format!(
+            "sudo_io_log: session_id={} uid={} cmd='{}' total_frames={}",
+            self.session_id, self.user_uid, self.command, self.frames.len()
+        )
     }
 }
 
@@ -324,6 +383,30 @@ mod tests {
 
         let denied = doas.authorize_execution(1001, "/usr/bin/pacman", 1000);
         assert!(denied.is_err());
+
+        // Test MFA rule enforcement
+        doas.rules.push(DoasRule {
+            permit: true,
+            user_uid: 1000,
+            command_path: "/usr/bin/dd".to_string(),
+            require_password: true,
+            require_mfa_token: true,
+            allowed_arguments: vec![],
+        });
+
+        assert!(doas.authorize_execution_mfa(1000, "/usr/bin/dd", 2000, None).is_err());
+        assert!(doas.authorize_execution_mfa(1000, "/usr/bin/dd", 2000, Some("FIDO2_WEBAUTHN_OK")).is_ok());
+    }
+
+    #[test]
+    fn test_sudo_pty_session_recorder() {
+        let mut recorder = SudoPtySessionRecorder::new(1, 1000, "fdisk -l");
+        recorder.record_frame("stdin", b"fdisk -l\n", 100);
+        recorder.record_frame("stdout", b"Disk /dev/sda: 512 GB\n", 105);
+
+        assert_eq!(recorder.frames.len(), 2);
+        let log = recorder.export_io_log();
+        assert!(log.contains("total_frames=2"));
     }
 
     #[test]

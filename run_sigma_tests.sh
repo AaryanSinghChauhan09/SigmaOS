@@ -44,6 +44,13 @@ if [ -f "src/distro/sovereign_2026_distro_leap_engine.rs" ]; then
     ./build/test_2026_leap
 fi
 
+if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
+    echo "Running Linux & BSD Distro Breakthroughs test suite..."
+    mkdir -p build
+    rustc --test src/distro/linux_bsd_distro_breakthroughs.rs --edition=2021 -o build/distro_breakthroughs_test
+    ./build/distro_breakthroughs_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
@@ -170,4 +177,74 @@ if [ -f "src/drivers/sovereign_distro_driver_suite.rs" ]; then
     mkdir -p build
     rustc --test --edition=2021 src/drivers/sovereign_distro_driver_suite.rs -o build/test_sovereign_distro_driver_suite
     ./build/test_sovereign_distro_driver_suite
+fi
+
+if [ -f "src/process/checkpoint.rs" ]; then
+    echo "Running Process CRIU Checkpoint/Restore test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/process/checkpoint.rs -o build/test_checkpoint
+    ./build/test_checkpoint
+fi
+
+if [ -f "src/process/uprobes.rs" ]; then
+    echo "Running Process Uprobes Instrumentation test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/process/uprobes.rs -o build/test_uprobes
+    ./build/test_uprobes
+fi
+
+if [ -f "src/process/ipc_ring.rs" ]; then
+    echo "Running Process Shared Memory Ring IPC test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/process/ipc_ring.rs -o build/test_ipc_ring
+    ./build/test_ipc_ring
+fi
+
+if [ -f "src/kernel/bsd_capsicum_enhanced.rs" ]; then
+    echo "Running Enhanced FreeBSD Capsicum Capability test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/kernel/bsd_capsicum_enhanced.rs -o build/test_capsicum_enhanced
+    ./build/test_capsicum_enhanced
+fi
+
+if [ -f "src/system/structure_synthesis.rs" ]; then
+    echo "Running System Structure Synthesis test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/system/structure_synthesis.rs -o build/test_struct_synthesis
+    ./build/test_struct_synthesis
+fi
+
+if [ -f "src/tools/strace_cli.rs" ]; then
+    echo "Running Strace Syscall Inspector test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/strace_cli.rs -o build/test_strace_cli
+    ./build/test_strace_cli
+fi
+
+if [ -f "src/tools/crypto_verifier.rs" ]; then
+    echo "Running Signify PQC Verifier test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/crypto_verifier.rs -o build/test_crypto_verifier
+    ./build/test_crypto_verifier
+fi
+
+if [ -f "src/tools/fsck_repair.rs" ]; then
+    echo "Running Fsck Integrity Repair test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/fsck_repair.rs -o build/test_fsck_repair
+    ./build/test_fsck_repair
+fi
+
+if [ -f "src/tools/gpu_monitor.rs" ]; then
+    echo "Running GPU Process Telemetry test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/gpu_monitor.rs -o build/test_gpu_monitor
+    ./build/test_gpu_monitor
+fi
+
+if [ -f "src/tools/nix_graph.rs" ]; then
+    echo "Running Nix Store Graph Visualizer test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 src/tools/nix_graph.rs -o build/test_nix_graph
+    ./build/test_nix_graph
 fi

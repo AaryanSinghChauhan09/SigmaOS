@@ -44,3 +44,12 @@ pub use elf_loader::{
 pub use scheduler::{
     Scheduler, SchedulingStats, VirtualRuntime, QueueEntry,
 };
+
+pub mod checkpoint;
+pub use checkpoint::*;
+
+pub mod uprobes;
+pub use uprobes::*;
+
+pub mod ipc_ring;
+pub use ipc_ring::*;

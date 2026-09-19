@@ -344,6 +344,67 @@ impl Default for ActivityManager {
     }
 }
 
+/// Linux OOM / Android LMK inspired Pressure-Stall Aware OOM Score Governor
+pub struct OomScoreGovernor {
+    pub oom_score_adj: HashMap<usize, i32>, // pid -> score_adj (-1000 to +1000)
+}
+
+impl OomScoreGovernor {
+    pub fn new() -> Self {
+        Self {
+            oom_score_adj: HashMap::new(),
+        }
+    }
+
+    pub fn set_oom_score_adj(&mut self, pid: usize, adj: i32) {
+        self.oom_score_adj.insert(pid, adj.clamp(-1000, 1000));
+    }
+
+    pub fn calculate_oom_score(&self, activity_mgr: &ActivityManager, pid: usize) -> i32 {
+        let record = match activity_mgr.get_process_activity(pid) {
+            Some(r) => r,
+            None => return -1000,
+        };
+
+        if record.state == ActivityState::Terminated {
+            return -1000;
+        }
+
+        let mut base_score = (record.memory_footprint_bytes / (1024 * 1024)) as i32; // MB memory footprint
+
+        // Interactivity discount (don't kill foreground app)
+        if record.is_foreground {
+            base_score -= 500;
+        } else if record.state == ActivityState::Background || record.state == ActivityState::Throttled {
+            base_score += 200;
+        }
+
+        let adj = self.oom_score_adj.get(&pid).cloned().unwrap_or(0);
+        (base_score + adj).clamp(-1000, 1000)
+    }
+
+    pub fn select_victim_pid(&self, activity_mgr: &ActivityManager) -> Option<usize> {
+        let mut highest_score = -1000;
+        let mut victim_pid = None;
+
+        for &pid in activity_mgr.activities.keys() {
+            let score = self.calculate_oom_score(activity_mgr, pid);
+            if score > highest_score {
+                highest_score = score;
+                victim_pid = Some(pid);
+            }
+        }
+
+        victim_pid
+    }
+}
+
+impl Default for OomScoreGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test_disabled)]
 mod tests {
     use super::*;

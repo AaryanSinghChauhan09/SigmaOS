@@ -347,3 +347,6 @@ pub use linux_bsd_distro_strategic_innovations::{
     ExecGuardRecommendation, FedoraGreenbootHealthCheckEngine, ObfuscatedInputEvent,
     VanillaAbrootImageTransactionEngine, WhonixKloakInputObfuscationEngine, ZorinExecGuardSubsystem,
 };
+
+pub mod linux_bsd_distro_breakthroughs;
+pub use linux_bsd_distro_breakthroughs::*;

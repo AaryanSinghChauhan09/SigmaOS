@@ -15,7 +15,7 @@ use std::vec::Vec;
 
 /// 1. Sovereign Sudo & Privilege Elevation Engine
 pub struct SovereignSudo {
-    pub cached_credentials: BTreeMap<String, u64>, // user -> timestamp_ms
+    pub cached_credentials: BTreeMap<String, u64>, // "(user:tty:session_id)" -> timestamp_ms
     pub timestamp_timeout_ms: u64,
 }
 
@@ -33,22 +33,40 @@ impl SovereignSudo {
         command: &str,
         current_time_ms: u64,
     ) -> Result<String, String> {
-        if let Some(&last_time) = self.cached_credentials.get(user) {
+        self.execute_as_root_tty(user, 1, 100, command, current_time_ms)
+    }
+
+    pub fn execute_as_root_tty(
+        &mut self,
+        user: &str,
+        tty_nr: u32,
+        session_id: u32,
+        command: &str,
+        current_time_ms: u64,
+    ) -> Result<String, String> {
+        let key = format!("{}:{}:{}", user, tty_nr, session_id);
+        if let Some(&last_time) = self.cached_credentials.get(&key) {
             if current_time_ms < last_time + self.timestamp_timeout_ms {
                 return Ok(format!(
-                    "[sudo] Executing '{}' as root (cached auth)",
+                    "[sudo] Executing '{}' as root (cached tty auth)",
                     command
                 ));
             }
         }
 
         // Authenticate user
-        self.cached_credentials
-            .insert(user.to_string(), current_time_ms);
+        self.cached_credentials.insert(key, current_time_ms);
         Ok(format!(
             "[sudo] Executing '{}' as root (authenticated)",
             command
         ))
+    }
+
+    pub fn purge_credentials(&mut self, user: &str) -> usize {
+        let prefix = format!("{}:", user);
+        let count_before = self.cached_credentials.len();
+        self.cached_credentials.retain(|k, _| !k.starts_with(&prefix));
+        count_before - self.cached_credentials.len()
     }
 }
 
@@ -719,7 +737,14 @@ mod tests {
         assert!(res1.contains("authenticated"));
 
         let res2 = sudo.execute_as_root("alice", "apt upgrade", 2000).unwrap();
-        assert!(res2.contains("cached auth"));
+        assert!(res2.contains("cached tty auth"));
+
+        // Purge credentials (sudo -k / -K)
+        let purged = sudo.purge_credentials("alice");
+        assert_eq!(purged, 1);
+
+        let res3 = sudo.execute_as_root("alice", "apt update", 3000).unwrap();
+        assert!(res3.contains("authenticated"));
     }
 
     #[test]

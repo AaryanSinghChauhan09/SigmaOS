@@ -101,3 +101,6 @@ pub use state::{
 };
 pub use syslog::{LogAction, LogEntry, LogFacility, LogLevel, LogRule, SyslogError, SyslogManager};
 pub use user::{Group, ShadowEntry, SudoPolicyEngine, SudoersRule, User, UserError, UserManager};
+
+pub mod structure_synthesis;
+pub use structure_synthesis::*;

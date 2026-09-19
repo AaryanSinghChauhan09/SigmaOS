@@ -154,6 +154,30 @@ impl KProcess {
     }
 }
 
+/// Linux & BSD inspired Process Namespace Isolation Context
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProcessNamespaceContext {
+    pub mount_ns_id: u64,
+    pub pid_ns_id: u64,
+    pub net_ns_id: u64,
+    pub ipc_ns_id: u64,
+    pub uts_ns_id: u64,
+    pub user_ns_id: u64,
+}
+
+impl Default for ProcessNamespaceContext {
+    fn default() -> Self {
+        Self {
+            mount_ns_id: 1,
+            pid_ns_id: 1,
+            net_ns_id: 1,
+            ipc_ns_id: 1,
+            uts_ns_id: 1,
+            user_ns_id: 1,
+        }
+    }
+}
+
 /// Executive Process block (EPROCESS) - User-space process metadata and handles
 pub struct EProcess {
     pub process_id: usize,
@@ -162,6 +186,7 @@ pub struct EProcess {
     pub va_descriptors: Vec<VasDescriptor>,
     pub peak_memory_usage: usize,
     pub security_token: usize,
+    pub namespace_ctx: ProcessNamespaceContext,
     pub kprocess: KProcess,
 }
 
@@ -178,6 +203,7 @@ impl EProcess {
             va_descriptors: Vec::new(),
             peak_memory_usage: 0,
             security_token: 0xFFFF,
+            namespace_ctx: ProcessNamespaceContext::default(),
             kprocess: KProcess::new(cr3, base_priority),
         }
     }

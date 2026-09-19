@@ -69,6 +69,18 @@ impl SimpleProcess {
             ns_flags: AtomicUsize::new(0), // No isolation flags by default
         }
     }
+
+    pub fn unshare_namespaces(&self, unshare_flags: u32) -> u32 {
+        let current = self.ns_flags.load(Ordering::SeqCst) as u32;
+        let updated = current | unshare_flags;
+        self.ns_flags.store(updated as usize, Ordering::SeqCst);
+        updated
+    }
+
+    pub fn setns_namespaces(&self, target_ns_flags: u32) -> u32 {
+        self.ns_flags.store(target_ns_flags as usize, Ordering::SeqCst);
+        target_ns_flags
+    }
 }
 
 impl Process for SimpleProcess {

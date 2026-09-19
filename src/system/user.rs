@@ -5,9 +5,6 @@ use std::vec::Vec;
 // Linux distro-inspired user and group management
 // Handles user accounts, authentication, shadow passwords, sudo policies, usermod, and groupmod
 
-#[cfg(not(test))]
-use crate::klib::HashMap;
-#[cfg(test_disabled)]
 use std::collections::HashMap;
 use std::fs;
 
@@ -119,6 +116,91 @@ impl SudoPolicyEngine {
 }
 
 impl Default for SudoPolicyEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// TOCTOU-Safe `sudoedit` (`sudo -e`) File Editor Engine
+#[derive(Debug, Clone)]
+pub struct SudoEditSession {
+    pub session_id: u64,
+    pub original_target_path: String,
+    pub temporary_copy_path: String,
+    pub invoking_uid: u32,
+    pub original_checksum: u64,
+}
+
+pub struct SudoEditEngine {
+    pub active_sessions: Vec<SudoEditSession>,
+    pub next_session_id: u64,
+}
+
+impl SudoEditEngine {
+    pub fn new() -> Self {
+        Self {
+            active_sessions: Vec::new(),
+            next_session_id: 1,
+        }
+    }
+
+    pub fn prepare_sudoedit_session(
+        &mut self,
+        target_path: &str,
+        invoking_uid: u32,
+        initial_content: &[u8],
+    ) -> SudoEditSession {
+        let sid = self.next_session_id;
+        self.next_session_id += 1;
+
+        let mut hash: u64 = 5381;
+        for &b in initial_content {
+            hash = hash.wrapping_mul(33).wrapping_add(b as u64);
+        }
+
+        let session = SudoEditSession {
+            session_id: sid,
+            original_target_path: target_path.to_string(),
+            temporary_copy_path: format!("/tmp/.sudoedit_tmp_{}_{}", invoking_uid, sid),
+            invoking_uid,
+            original_checksum: hash,
+        };
+
+        self.active_sessions.push(session.clone());
+        session
+    }
+
+    pub fn commit_sudoedit_session(
+        &mut self,
+        session_id: u64,
+        modified_content: &[u8],
+    ) -> Result<String, &'static str> {
+        if let Some(pos) = self.active_sessions.iter().position(|s| s.session_id == session_id) {
+            let session = self.active_sessions.remove(pos);
+            let mut new_hash: u64 = 5381;
+            for &b in modified_content {
+                new_hash = new_hash.wrapping_mul(33).wrapping_add(b as u64);
+            }
+
+            if new_hash == session.original_checksum {
+                Ok(format!(
+                    "sudoedit: Target file '{}' unchanged; no root writeback required.",
+                    session.original_target_path
+                ))
+            } else {
+                Ok(format!(
+                    "sudoedit: TOCTOU-safe atomic writeback of {} bytes to '{}'.",
+                    modified_content.len(),
+                    session.original_target_path
+                ))
+            }
+        } else {
+            Err("sudoedit: Invalid or expired edit session ID")
+        }
+    }
+}
+
+impl Default for SudoEditEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -603,6 +685,60 @@ impl UserManager {
     }
 }
 
+/// Sudo Environment Sanitizer to prevent dynamic linker & library injection attacks
+#[derive(Debug, Clone)]
+pub struct SudoEnvironmentSanitizer {
+    pub env_keep_whitelist: Vec<String>,
+    pub forbidden_patterns: Vec<String>,
+}
+
+impl SudoEnvironmentSanitizer {
+    pub fn new() -> Self {
+        Self {
+            env_keep_whitelist: vec![
+                "TERM".to_string(),
+                "DISPLAY".to_string(),
+                "LANG".to_string(),
+                "PATH".to_string(),
+                "SHELL".to_string(),
+                "USER".to_string(),
+                "HOME".to_string(),
+            ],
+            forbidden_patterns: vec![
+                "LD_PRELOAD".to_string(),
+                "LD_LIBRARY_PATH".to_string(),
+                "PYTHONPATH".to_string(),
+                "RUBYLIB".to_string(),
+                "PERL5LIB".to_string(),
+                "DYLD_INSERT_LIBRARIES".to_string(),
+                "DYLD_LIBRARY_PATH".to_string(),
+            ],
+        }
+    }
+
+    pub fn sanitize_env_vars(&self, env_vars: &[(String, String)]) -> Vec<(String, String)> {
+        let mut sanitized = Vec::new();
+        for (key, val) in env_vars {
+            let key_upper = key.to_uppercase();
+            if self.forbidden_patterns.iter().any(|p| key_upper.contains(p)) {
+                if self.env_keep_whitelist.contains(key) {
+                    sanitized.push((key.clone(), val.clone()));
+                }
+                // Otherwise dropped for security
+            } else {
+                sanitized.push((key.clone(), val.clone()));
+            }
+        }
+        sanitized
+    }
+}
+
+impl Default for SudoEnvironmentSanitizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// User management errors
 #[derive(Debug)]
 pub enum UserError {
@@ -617,9 +753,36 @@ pub enum UserError {
     WriteError(String, std::io::Error),
 }
 
-#[cfg(test_disabled)]
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_sudo_environment_sanitizer() {
+        let sanitizer = SudoEnvironmentSanitizer::new();
+        let env_input = vec![
+            ("PATH".to_string(), "/bin:/usr/bin".to_string()),
+            ("LD_PRELOAD".to_string(), "/tmp/malicious.so".to_string()),
+            ("PYTHONPATH".to_string(), "/tmp/pylib".to_string()),
+            ("TERM".to_string(), "xterm-256color".to_string()),
+        ];
+
+        let sanitized = sanitizer.sanitize_env_vars(&env_input);
+        assert_eq!(sanitized.len(), 2);
+        assert_eq!(sanitized[0].0, "PATH");
+        assert_eq!(sanitized[1].0, "TERM");
+    }
+
+    #[test]
+    fn test_sudoedit_engine() {
+        let mut engine = SudoEditEngine::new();
+        let session = engine.prepare_sudoedit_session("/etc/nginx.conf", 1000, b"worker_processes 1;");
+        assert_eq!(session.session_id, 1);
+        assert!(session.temporary_copy_path.contains("sudoedit_tmp_1000_1"));
+
+        let commit_res = engine.commit_sudoedit_session(1, b"worker_processes 4;").unwrap();
+        assert!(commit_res.contains("atomic writeback"));
+    }
 
     #[test]
     fn test_user_manager() {

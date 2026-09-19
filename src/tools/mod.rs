@@ -49,3 +49,18 @@ pub use tech_media_extended_suite::{
 
 pub mod dependency_reduction;
 pub use dependency_reduction::*;
+
+pub mod strace_cli;
+pub use strace_cli::*;
+
+pub mod crypto_verifier;
+pub use crypto_verifier::*;
+
+pub mod fsck_repair;
+pub use fsck_repair::*;
+
+pub mod gpu_monitor;
+pub use gpu_monitor::*;
+
+pub mod nix_graph;
+pub use nix_graph::*;

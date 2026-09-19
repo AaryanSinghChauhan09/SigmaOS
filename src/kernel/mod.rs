@@ -154,3 +154,7 @@ pub use universal_kernel_format::{
     KernelArch, KernelCompression, KernelFormat, KernelFormatSymbol, KernelSection,
     ParsedKernelImage, SigmaKernelExecutionPayload, UniversalKernelFormatEngine,
 };
+
+// ─── Enhanced FreeBSD Capsicum Capability Engine ────────────────────────────────
+pub mod bsd_capsicum_enhanced;
+pub use bsd_capsicum_enhanced::*;
