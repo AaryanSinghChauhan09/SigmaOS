@@ -71,6 +71,7 @@
 - **[[eBPF / XDP Networking|Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking]]**
 - **[[Kernel Timers|Kernel-Timers]]**
 - **[[Workqueue|Workqueue]]**
+- **[[RCU Synchronization|RCU-Synchronization]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 

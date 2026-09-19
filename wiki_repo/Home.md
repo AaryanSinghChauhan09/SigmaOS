@@ -144,6 +144,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Workqueue](Workqueue)**
   Asynchronous work execution with priority-based scheduling.
 
+- **[RCU Synchronization](RCU-Synchronization)**
+  Scalable read-mostly data structure synchronization.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 
