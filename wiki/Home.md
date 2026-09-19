@@ -60,6 +60,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Universal Package Engine (sigpkg)](Package-Management-and-Sigpkg)**
   Overview of the SigmaPkg package management system.
 
+- **[Post-Quantum Cryptography Package Distribution](Post-Quantum-Cryptography-Package-Distribution)**
+  Quantum-safe package distribution using Kyber-1024 and Dilithium-5.
+
 - **[Arch PKGBUILD & AUR Helper](ARCH_LINUX_PARITY_FEATURES)**
   Integration with Arch Linux package formats and AUR.
 
@@ -128,6 +131,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Performance & BORE Scheduler](Performance-Tuning-and-Kernel)**
   Performance tuning and BORE scheduler configuration.
+
+- **[Low-Overhead Kernel Observability](Low-Overhead-Kernel-Observability)**
+  High-performance kernel tracing with SigmaTrace and eBPF.
 
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
