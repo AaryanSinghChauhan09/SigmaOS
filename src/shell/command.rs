@@ -642,6 +642,7 @@ impl SimpleCommandRegistry {
         let type_cmd = TypeCommand;
         self.commands.push(Some(Box::new(type_cmd)));
 
+        #[allow(unused_unsafe)]
         static mut GLOBAL_DIR_STACK: DirectoryStack = DirectoryStack { stack: Vec::new() };
         unsafe {
             let pushd = PushdCommand {

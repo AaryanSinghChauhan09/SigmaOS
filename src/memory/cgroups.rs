@@ -112,7 +112,6 @@ impl MemCgroupManager {
     /// Try to charge swap to a cgroup and its parents.
     /// If charging would exceed any swap limit, returns Err(cgroup_id_that_failed).
     pub fn charge_swap(&mut self, cgroup_id: usize, bytes: usize) -> Result<(), usize> {
-        let mut current_id = Some(cgroup_id);
         let mut charged_ids = Vec::new();
 
         // First pass: check limits without modifying
