@@ -83,6 +83,7 @@ impl MetricCapability {
 pub struct SimpleMetric {
     pub id: MetricID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub metric_type: MetricType,
     pub value: AtomicUsize, // Store as usize for atomic operations
     pub capability: MetricCapability,
@@ -105,6 +106,7 @@ impl SimpleMetric {
         SimpleMetric {
             id,
             name: name_array,
+            name_len: name_len as u8,
             metric_type,
             value: AtomicUsize::new(0),
             capability,
@@ -126,7 +128,10 @@ impl Metric for SimpleMetric {
     }
 
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        // Bolt ⚡ Optimization: Cache explicit metric name lengths during construction to eliminate
+        // O(N) zero-byte linear scans (.position(|&b| b == 0)) on every metric name access,
+        // reducing slice lookup to bounds-checked O(1) constant time.
+        let len = (self.name_len as usize).min(64);
         &self.name[..len]
     }
 
@@ -242,6 +247,7 @@ impl SpanCapability {
 pub struct SimpleSpan {
     pub id: TraceID,
     pub name: [u8; 64],
+    pub name_len: u8,
     pub start_time: AtomicUsize,
     pub end_time: AtomicUsize,
     pub capability: SpanCapability,
@@ -259,6 +265,7 @@ impl SimpleSpan {
         SimpleSpan {
             id,
             name: name_array,
+            name_len: name_len as u8,
             start_time: AtomicUsize::new(0),
             end_time: AtomicUsize::new(0),
             capability,
@@ -280,7 +287,10 @@ impl Span for SimpleSpan {
     }
 
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        // Bolt ⚡ Optimization: Cache explicit span name lengths during construction to eliminate
+        // O(N) zero-byte linear scans (.position(|&b| b == 0)) on every span name access,
+        // reducing slice lookup to bounds-checked O(1) constant time.
+        let len = (self.name_len as usize).min(64);
         &self.name[..len]
     }
 
@@ -637,6 +647,35 @@ impl ObservabilityStack for SimpleObservabilityStack {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_simple_metric_and_span_name_cached_length() {
+        let metric = SimpleMetric::new(
+            1,
+            b"cpu_usage_percent",
+            MetricType::Gauge,
+            MetricCapability::full(),
+        );
+        assert_eq!(metric.name(), b"cpu_usage_percent");
+        assert_eq!(metric.name_len, 17);
+
+        let empty_metric = SimpleMetric::new(
+            2,
+            b"",
+            MetricType::Counter,
+            MetricCapability::full(),
+        );
+        assert_eq!(empty_metric.name(), b"");
+        assert_eq!(empty_metric.name_len, 0);
+
+        let span = SimpleSpan::new(100, b"http_request_handler", SpanCapability::full());
+        assert_eq!(span.name(), b"http_request_handler");
+        assert_eq!(span.name_len, 20);
+
+        let empty_span = SimpleSpan::new(101, b"", SpanCapability::full());
+        assert_eq!(empty_span.name(), b"");
+        assert_eq!(empty_span.name_len, 0);
+    }
 
     #[test]
     fn test_sigmatrace_dynamic_span_profiling() {
