@@ -87,7 +87,7 @@ jobs:
 
       - name: Set up Docker buildx
         if: matrix.container == 'docker'
-        uses: docker/setup-buildx-action@v3 # v3.10.0
+        uses: docker/setup-buildx-action@c237d6f02235e1d52063fb55a15eb8f161fb4284 # v3.10.0 # v3.10.0
 
       - name: Build with ${{ matrix.container || matrix.vm }} ${{ matrix.version || matrix.image }}
         shell: bash
@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload logs
         if: always()
-        uses: actions/upload-artifact@v4 # v4.3.6
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3 # v4.3.6
         with:
           name: ${{ matrix.container || matrix.vm }}-${{ matrix.version || matrix.image }}-logs
           path: logs/
