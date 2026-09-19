@@ -284,6 +284,175 @@ impl SovereignAgentRuntime {
 
 ---
 
+## 2.4 Recommended Execution Order Strategy (Phases 1 to 5)
+
+To ensure systematic progress towards full system maturity, AI agents and core engineers should execute tasks in accordance with the following 5-phase roadmap:
+
+### 🚀 Phase 1: “Bootable and Honest”
+- **Working UEFI / QEMU Boot**: Boot directly from clean UEFI firmware without relying on host hacks.
+- **Serial Console**: Reliable early boot logging, panic tracing, and serial TTY IO.
+- **Real Init Process**: PID 1 process initialization and process tree lifecycle handling.
+- **Real Filesystem Mount**: Mount genuine ext4/Btrfs/VFS root filesystems without mock memory paths.
+- **Shell**: Native interactive TTY REPL shell with signal handling and command execution.
+- **Process and Syscall MVP**: Core POSIX syscall handlers (`fork`/`exec`/`exit`/`waitpid`/`mmap`).
+- **Reproducible ISO**: Deterministic ISO image generation pipeline for bare-metal and VM testing.
+- **No Simulated Success Paths**: Standardize on real hardware abstraction checks rather than dummy returns.
+
+### 💾 Phase 2: “Installable”
+- **Real Partitioning**: GPT/MBR partition creation, block table validation, and formatting.
+- **ext4 or Btrfs Storage Engine**: Real disk writes, superblock initialization, and CoW transaction logs.
+- **Disk Encryption**: LUKS2 / AES-XTS block device encryption layer.
+- **Bootloader Installation**: Bootloader EFI entry registration and system bootloader deployment.
+- **User Creation & PAM**: POSIX user/group management, `/etc/passwd` & `/etc/shadow` databases.
+- **Networking**: DHCP client, static IP configuration, link detection, and DNS resolution.
+- **Recovery Mode**: Emergency shell fallback and initramfs disaster recovery environment.
+- **Installer Integration Tests**: Automated QEMU installation verification suite in CI.
+
+### 🖥️ Phase 3: “Usable”
+- **Real Compositor**: DRM/KMS atomic state commits and Wayland Layer-Shell compositor.
+- **Terminal Emulator**: Low-latency terminal driver with ANSI color palette and PTY allocation.
+- **Keyboard & Pointer**: Evdev multi-touch slots, mouse acceleration, and xkbcommon keymaps.
+- **Clipboard Manager**: Wayland clipboard selection buffer and primary selection synchronization.
+- **Audio Stack**: PipeWire SPA session graph and ALSA hardware PCM audio playback.
+- **Wi-Fi Manager**: WPA Supplicant / iwd wireless scanning, WPA3 authentication, and roaming.
+- **Browser & WebView Strategy**: Lightweight browser container engine and WebApp PWA runner.
+- **File Manager**: Multi-pane file manager with inotify auto-refresh and async previews.
+- **Text Editor**: Zero-dependency TUI/GUI text editor with syntax highlighting.
+- **Software Center**: GUI/CLI app store interfacing with `UniversalPackageManager` (`.sigpkg`).
+
+### 🛡️ Phase 4: “Safe to Update”
+- **Signed Repository Metadata**: Ed25519 repository manifest signatures and trust validation.
+- **Reproducible Packages**: Hermetic package builds with identical SHA-256 binary outputs.
+- **A/B Deployment & Atomic Updates**: rpm-ostree style commit staging and dual-boot A/B toggle.
+- **Verified Boot**: Cryptographic boot integrity validation and dm-verity state verification.
+- **Automatic Rollback**: Automatic failure detection and zero-downtime rollback to last-known-good generation.
+- **Offline Recovery**: USB/ISO live rescue environment with state restoration hooks.
+- **Power-Loss Testing**: Power-cut resilient journaling and filesystem integrity stress testing.
+
+### 🌐 Phase 5: “Competitive”
+- **Linux Parity**: Full POSIX / C-library compatibility layer for running un-modified Linux binaries.
+- **Container & VM Support**: OCI container runtime (Toolbx/Docker) and KVM/Firecracker supervisor.
+- **Mature SDK**: Safe Rust system programming APIs, WIT bindings, and language tooling.
+- **Hardware Expansion**: DRM/KMS GPU drivers (Intel/AMD/Nvidia), USB 3.x, NVMe, and Bluetooth.
+- **Accessibility**: Screen reader API, high-contrast modes, and dynamic text scaling.
+- **Localization (i18n)**: UTF-8 translation catalogs and locale format support.
+- **Gaming Stack**: Gamescope microcompositor integration, MangoHud overlay, and Vulkan layer.
+- **Enterprise Management**: Remote fleet orchestration, MDM policy enforcement, and audit telemetry.
+
+---
+
+## 2.5 Detailed Linux & BSD Distribution Component Parity & Missing Modules Catalog
+
+To achieve complete supremacy over existing Linux and BSD operating systems, SigmaOS must catalog and systematically implement missing distro-specific infrastructure components.
+
+### 🐧 Arch Linux Ecosystem Components
+- **`vercmp` Version Comparison Engine**: ALPM epoch, pkgver, and pkgrel breakdown logic (`ArchVercmpVersionComparisonEngine`).
+- **`arch-news` RSS/Feed Manager**: Manual intervention advisory feed parser that blocks system upgrades when critical news is unread (`ArchNewsAdvisoryFeedEngine`).
+- **`pkgctl` Devtools Integration**: Clean chroot container build manager and package repository maintainer pipeline (`ArchPkgctlDevtoolsEngine`).
+- **`pacman-key` GPG Web of Trust**: Keyring initialization, Master key signing, and package signature verification (`ArchPacmanKeyringEngine`).
+- **ALPM File Collision & Conflict Resolver**: Resolves file path collisions across package transactions (`ArchPacmanConflictResolverEngine`).
+
+### 🌀 Debian & Ubuntu Ecosystem Components
+- **`update-alternatives` Symlink Router**: Priority-based binary symlink switcher (`/etc/alternatives/`) for managing default system utilities (`DebianUpdateAlternativesEngine`).
+- **`dpkg-trigger` Deferred Event Engine**: Asynchronous post-installation hook triggers for man-db, icon caches, and shared library caches (`DebianDpkgTriggersEngine`).
+- **`debconf` Configuration Database**: Question-and-answer preconfiguration database for automated non-interactive package setups (`DebianDebconfDatabaseEngine`).
+- **APT Pinning & Priority Solver**: Target release and origin priority calculation algorithm (`DebianAptPinningResolver`).
+- **Ubuntu AppArmor Profile Translator**: AppArmor MAC security profile rule generator (`UbuntuAppArmorProfileEngine`).
+
+### 🎩 Fedora & RHEL Ecosystem Components
+- **`Greenboot` Health Check Framework**: Pre-boot and post-boot health check scripts for transactional rpm-ostree systems (`FedoraGreenbootHealthEngine`).
+- **`mock` Hermetic Chroot Builder**: Non-privileged clean chroot environment builder for RPM spec files (`FedoraMockChrootBuilder`).
+- **Koji Build System Client**: Distributed build cluster RPC client for tracking multi-arch builds (`KojiBuildServer`).
+- **`authselect` PAM Profile Switcher**: Declarative PAM security profile selector (`FedoraAuthselectProfileEngine`).
+- **ABRT Automated Bug Reporting Tool**: Kernel panic and application core dump analyzer daemon (`FedoraAbrtCrashDaemon`).
+
+### 🍇 Gentoo Linux Ecosystem Components
+- **Portage EAPI-8 Slot & Subslot Resolver**: Precise ABI dependency tracking across package slots (`GentooPortageEapi8SlotResolver`).
+- **`eselect` Profile Switcher**: Declarative profile and compiler version manager (`GentooEselectProfileSwitchEngine`).
+- **USE Flag Dependency Matrix**: Boolean SAT solver for complex Gentoo package USE flag flags (`GentooUseFlagResolverEngine`).
+
+### 🏔️ Alpine Linux & Void Linux Components
+- **`apk` Musl Trigger Hooks**: Volatile memory commit and overlayfs snapshot manager (`AlpineLbuApkVolatileCommitEngine`).
+- **runit 3-Stage Service Supervisor**: Stage 1 boot initialization, Stage 2 service daemon supervision, Stage 3 shutdown handling (`VoidRunitSupervisor`).
+- **XBPS Package Verification Engine**: RSA-signed XBPS package extraction and transaction state machine (`VoidXbpsQueryRepoEngine`).
+
+### ❄️ NixOS Ecosystem Components
+- **Nix Store Closure Verifier**: Cryptographic content-addressed `/nix/store` DAG verification (`SovereignNixStoreClosureVerificationEngine`).
+- **Flake Lock Differential Analyzer**: AST dependency lockfile comparative analyzer (`NixOsFlakeLockDiffAnalyzer`).
+
+### 😈 FreeBSD, OpenBSD, NetBSD & DragonFly BSD Components
+- **FreeBSD `poudriere` Jail Builder**: Isolated clean-jail port compilation environment (`FreeBsdPoudriereJailBuilder`).
+- **FreeBSD Capsicum Rights Capability Engine**: File descriptor sandboxing and process rights restriction (`FreeBsdCapsicumRightsEngine`).
+- **OpenBSD `signify` Public Key Verifier**: Cryptographic minisign/signify checksum signature engine (`OpenBsdSyspatchSignifyVerifier`).
+- **OpenBSD PF Stateful Rule Engine**: High-performance stateful network packet filtering (`OpenBsdPfRuleBuilderEngine`).
+- **NetBSD Rump Kernel Userland Drivers**: Re-usable kernel driver framework running in unprivileged userland (`NetBsdRumpKernelUserlandEngine`).
+- **DragonFly BSD HAMMER2 Deduplication Engine**: MVCC block-level deduplication and instant snapshots (`DragonFlyHammer2DeduplicationEngine`).
+
+---
+
+### 🛠️ Safe Rust Implementation Blueprints for Missing Distro Engines
+
+#### Blueprint 14: Debian `update-alternatives` Symlink Router (`DebianUpdateAlternativesEngine`)
+```rust
+use alloc::collections::BTreeMap;
+use alloc::string::String;
+
+#[derive(Debug, Clone)]
+pub struct AlternativeChoice {
+    pub name: String,
+    pub path: String,
+    pub priority: i32,
+}
+
+pub struct DebianUpdateAlternativesEngine {
+    pub alternatives: BTreeMap<String, Vec<AlternativeChoice>>,
+}
+
+impl DebianUpdateAlternativesEngine {
+    pub fn new() -> Self {
+        Self { alternatives: BTreeMap::new() }
+    }
+
+    pub fn register_choice(&mut self, group: &str, path: &str, priority: i32) {
+        let choices = self.alternatives.entry(group.to_string()).or_default();
+        choices.push(AlternativeChoice {
+            name: group.to_string(),
+            path: path.to_string(),
+            priority,
+        });
+        choices.sort_by(|a, b| b.priority.cmp(&a.priority)); // Highest priority first
+    }
+
+    pub fn resolve_active_symlink(&self, group: &str) -> Option<String> {
+        self.alternatives.get(group).and_then(|list| list.first().map(|c| c.path.clone()))
+    }
+}
+```
+
+#### Blueprint 15: Arch Linux ALPM Version Comparison (`ArchVercmpVersionComparisonEngine`)
+```rust
+pub struct ArchVercmpVersionComparisonEngine;
+
+impl ArchVercmpVersionComparisonEngine {
+    pub fn vercmp(v1: &str, v2: &str) -> i32 {
+        if v1 == v2 { return 0; }
+        // ALPM epoch:pkgver-pkgrel comparison logic shim
+        let (epoch1, rest1) = v1.split_once(':').unwrap_or(("0", v1));
+        let (epoch2, rest2) = v2.split_once(':').unwrap_or(("0", v2));
+
+        let e1: u32 = epoch1.parse().unwrap_or(0);
+        let e2: u32 = epoch2.parse().unwrap_or(0);
+
+        if e1 != e2 {
+            return if e1 > e2 { 1 } else { -1 };
+        }
+        rest1.cmp(rest2) as i32
+    }
+}
+```
+
+---
+
 ## 3. Compiler & Runtime Diagnostics Catalog (What's Not Working & Why)
 
 When modifying, building, or expanding algorithms in full workspace build modes (`cargo check --lib` / `cargo test`), AI agents may encounter Rust compiler errors caused by duplicate implementations or trait collisions from legacy feature additions. The catalog below lists each error code, its root cause, and why it happens in this codebase.
