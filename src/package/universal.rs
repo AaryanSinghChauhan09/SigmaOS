@@ -1587,28 +1587,31 @@ impl DependencyResolver {
     }
 
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
-        let mut resolved: Vec<String> = Vec::new();
-        let mut to_visit: Vec<String> = Vec::new();
-        to_visit.push(package_name.to_string());
-        // Bolt ⚡ Optimization: Use HashSet for O(1) visited checks instead of O(N) linear scans on Vec
-        let mut visited: HashSet<String> = HashSet::new();
+        let capacity = self.packages.len();
+        let mut resolved: Vec<String> = Vec::with_capacity(capacity);
+        let mut to_visit: Vec<&str> = Vec::with_capacity(capacity);
+        to_visit.push(package_name);
+        // Bolt ⚡ Optimization: Operate directly on borrowed `&str` references and pre-allocate
+        // capacity to eliminate O(N) heap String allocations during traversal queue pushes and set checks.
+        let mut visited: HashSet<&str> = HashSet::with_capacity(capacity);
 
         while let Some(current) = to_visit.pop() {
-            if visited.contains(&current) {
+            if visited.contains(current) {
                 continue;
             }
 
-            visited.insert(current.clone());
+            visited.insert(current);
 
-            if let Some(package) = self.packages.get(&current) {
+            if let Some(package) = self.packages.get(current) {
                 for dep in &package.dependencies {
-                    if !visited.contains(dep) {
-                        to_visit.push(dep.clone());
+                    let dep_str: &str = dep.as_str();
+                    if !visited.contains(dep_str) {
+                        to_visit.push(dep_str);
                     }
                 }
-                resolved.push(current);
+                resolved.push(current.to_string());
             } else {
-                return Err(PackageError::DependencyNotFound(current));
+                return Err(PackageError::DependencyNotFound(current.to_string()));
             }
         }
 
