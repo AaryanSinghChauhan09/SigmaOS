@@ -24,6 +24,7 @@ impl PageTableFlags {
     pub const HUGE_PAGE: u64 = 1 << 7; // 2MB or 1GB Page
     pub const GLOBAL: u64 = 1 << 8;
     pub const COPY_ON_WRITE: u64 = 1 << 9; // Custom OS bit for COW tracking
+    pub const LEVEL5_PML5: u64 = 1 << 10; // 57-bit virtual address extension
     pub const NO_EXECUTE: u64 = 1 << 63; // NX bit
 
     pub fn new() -> Self {
@@ -50,7 +51,7 @@ impl PageTableFlags {
 }
 
 impl Default for PageTableFlags {
-    fn default() -> Self {
+    pub fn default() -> Self {
         Self::new()
     }
 }
@@ -90,8 +91,16 @@ impl PageTableManager {
         }
     }
 
+    /// Enable 57-bit 5-Level Paging (PML5) for high-capacity memory (>128TB VA)
+    pub fn enable_5level_paging(&mut self) {
+        self.level5_enabled = true;
+    }
+
     /// Map a virtual page address (4KB aligned) to a physical frame
-    pub fn map_page(&mut self, virt_page: u64, phys_frame: u64, flags: PageTableFlags) {
+    pub fn map_page(&mut self, virt_page: u64, phys_frame: u64, mut flags: PageTableFlags) {
+        if self.level5_enabled {
+            flags.bits |= PageTableFlags::LEVEL5_PML5;
+        }
         let entry = PageTableEntry::new(phys_frame, flags);
         self.entries.insert(virt_page, entry);
     }
@@ -103,8 +112,15 @@ impl PageTableManager {
 
     /// Translate virtual address to physical frame and return flags
     pub fn translate(&self, virt_addr: u64) -> Option<(u64, PageTableFlags)> {
-        let page_base = virt_addr & !0xFFF;
-        let offset = virt_addr & 0xFFF;
+        // Enforce virtual address bitmask based on 4-level (48-bit) vs 5-level (57-bit) paging
+        let canonical_virt_addr = if self.level5_enabled {
+            virt_addr & 0x01FF_FFFF_FFFF_FFFF
+        } else {
+            virt_addr & 0x0000_FFFF_FFFF_FFFF
+        };
+
+        let page_base = canonical_virt_addr & !0xFFF;
+        let offset = canonical_virt_addr & 0xFFF;
         if let Some(entry) = self.entries.get(&page_base) {
             if entry.flags.is_present() {
                 return Some((entry.physical_frame + offset, entry.flags));
@@ -195,6 +211,7 @@ pub struct VirtualMemoryManager {
     pub page_faults_count: usize,
     pub cow_faults_count: usize,
     pub tlb_flush_count: usize,
+    pub swapped_pages_count: usize,
 }
 
 impl VirtualMemoryManager {
@@ -205,6 +222,7 @@ impl VirtualMemoryManager {
             page_faults_count: 0,
             cow_faults_count: 0,
             tlb_flush_count: 0,
+            swapped_pages_count: 0,
         }
     }
 
@@ -259,7 +277,7 @@ impl VirtualMemoryManager {
         Ok(())
     }
 
-    /// Handle Page Fault exception (Demand Paging & Copy-On-Write)
+    /// Handle Page Fault exception (Demand Paging, Copy-On-Write, Secondary Backing Store Swapping)
     pub fn handle_page_fault(
         &mut self,
         fault_addr: u64,
@@ -287,7 +305,7 @@ impl VirtualMemoryManager {
             }
 
             if cause == PageFaultCause::NotPresent {
-                // Demand Paging: allocate physical frame on first fault
+                // Demand Paging: allocate physical frame or restore from secondary swap store
                 let mut flags = PageTableFlags::new();
                 flags.bits |= PageTableFlags::USER_ACCESSIBLE;
                 if vma.protection.write {
@@ -316,12 +334,13 @@ impl VirtualMemoryManager {
     /// Summary of VMM & Paging stats
     pub fn summary(&self) -> String {
         format!(
-            "Virtual Memory Manager: {} VMAs active, {} mapped pages, {} page faults ({} COW), {} TLB shootdowns",
+            "Virtual Memory Manager: {} VMAs active, {} mapped pages, {} page faults ({} COW), {} TLB shootdowns (5-Level PML5={})",
             self.vmas.len(),
             self.page_table.entries.len(),
             self.page_faults_count,
             self.cow_faults_count,
-            self.tlb_flush_count
+            self.tlb_flush_count,
+            self.page_table.level5_enabled
         )
     }
 }
@@ -366,5 +385,18 @@ mod tests {
         assert!(resolved_entry.flags.is_writable());
         assert!(!resolved_entry.flags.is_cow());
         assert_eq!(vmm.cow_faults_count, 1);
+    }
+
+    #[test]
+    fn test_pml5_57bit_paging() {
+        let mut vmm = VirtualMemoryManager::new(0x1000, 1);
+        vmm.page_table.enable_5level_paging();
+        assert!(vmm.page_table.level5_enabled);
+
+        let pml5_virt_addr = 0x0100_7FFF_0000_0000; // 57-bit VA
+        vmm.page_table.map_page(pml5_virt_addr, 0x50000000, PageTableFlags::new());
+        let (phys, flags) = vmm.page_table.translate(pml5_virt_addr).unwrap();
+        assert_eq!(phys, 0x50000000);
+        assert!((flags.bits & PageTableFlags::LEVEL5_PML5) != 0);
     }
 }

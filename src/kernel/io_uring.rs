@@ -20,6 +20,7 @@ pub struct SubmissionQueueEntry {
     pub addr: u64,
     pub len: u32,
     pub user_data: u64,
+    pub buf_index: u16, // Fixed registered buffer index
 }
 
 impl SubmissionQueueEntry {
@@ -38,6 +39,7 @@ impl SubmissionQueueEntry {
             addr,
             len,
             user_data,
+            buf_index: 0,
         }
     }
 }
@@ -60,10 +62,50 @@ impl CompletionQueueEntry {
     }
 }
 
+/// Pre-registered fixed buffer descriptor for zero-copy I/O
+#[derive(Debug, Clone)]
+pub struct RegisteredBuffer {
+    pub virt_addr: u64,
+    pub len: usize,
+}
+
+/// Kernel SQPOLL (Submission Queue Polling) Daemon Thread Simulation
+pub struct IoUringSqpollDaemon {
+    pub active: bool,
+    pub polls_executed: usize,
+}
+
+impl IoUringSqpollDaemon {
+    pub fn new() -> Self {
+        Self {
+            active: true,
+            polls_executed: 0,
+        }
+    }
+
+    /// Continuously poll submission ring and submit SQEs without userland syscall overhead
+    pub fn poll_and_submit(&mut self, engine: &mut IoUringEngine) -> usize {
+        if !self.active || engine.sq_entries.is_empty() {
+            return 0;
+        }
+        self.polls_executed += 1;
+        engine.enter_submit_and_wait()
+    }
+}
+
+impl Default for IoUringSqpollDaemon {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Linux io_uring-style async zero-copy I/O subsystem
 pub struct IoUringEngine {
     pub sq_entries: Vec<SubmissionQueueEntry>,
     pub cq_entries: Vec<CompletionQueueEntry>,
+    pub registered_files: Vec<i32>,
+    pub registered_buffers: Vec<RegisteredBuffer>,
+    pub sqpoll_daemon: IoUringSqpollDaemon,
     pub max_entries: usize,
 }
 
@@ -72,7 +114,22 @@ impl IoUringEngine {
         Self {
             sq_entries: Vec::new(),
             cq_entries: Vec::new(),
+            registered_files: Vec::new(),
+            registered_buffers: Vec::new(),
+            sqpoll_daemon: IoUringSqpollDaemon::new(),
             max_entries,
+        }
+    }
+
+    /// Register fixed file descriptors to bypass VFS file table lookups on every I/O
+    pub fn register_files(&mut self, fds: &[i32]) {
+        self.registered_files.extend_from_slice(fds);
+    }
+
+    /// Register persistent memory buffers for zero-copy DMA I/O
+    pub fn register_buffers(&mut self, buffers: &[(u64, usize)]) {
+        for &(addr, len) in buffers {
+            self.registered_buffers.push(RegisteredBuffer { virt_addr: addr, len });
         }
     }
 
@@ -141,5 +198,21 @@ mod tests {
         assert_eq!(cqe2.res, 256);
 
         assert!(ring.pop_cqe().is_none());
+    }
+
+    #[test]
+    fn test_sqpoll_kernel_daemon() {
+        let mut ring = IoUringEngine::new(8);
+        ring.register_files(&[3, 4, 5]);
+        ring.register_buffers(&[(0x1000, 4096), (0x2000, 4096)]);
+
+        let sqe = SubmissionQueueEntry::new(IoUringOpcode::Read, 3, 0, 0x1000, 1024, 2001);
+        ring.submit_sqe(sqe).unwrap();
+
+        let processed = ring.sqpoll_daemon.poll_and_submit(&mut ring);
+        assert_eq!(processed, 1);
+        assert_eq!(ring.sqpoll_daemon.polls_executed, 1);
+        assert_eq!(ring.registered_files.len(), 3);
+        assert_eq!(ring.registered_buffers.len(), 2);
     }
 }

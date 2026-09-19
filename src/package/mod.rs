@@ -36,6 +36,8 @@ pub mod mint_package;
 pub mod nix_guix;
 pub mod paccache;
 pub mod pactree;
+pub mod pull_request_workflow;
+pub use pull_request_workflow::*;
 pub mod repository;
 pub mod resolver;
 pub mod sandbox;
