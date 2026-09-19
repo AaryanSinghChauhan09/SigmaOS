@@ -63,6 +63,187 @@ impl Default for ClearLinuxStatelessEngine {
     }
 }
 
+// ============================================================
+// OPENSUSE SNAPPER BTRFS / ZFS BOOT SNAPSHOT & ROLLBACK ENGINE
+// ============================================================
+
+#[derive(Debug, Clone)]
+pub struct SnapperSnapshot {
+    pub id: u32,
+    pub description: String,
+    pub timestamp_ms: u64,
+    pub is_read_only: bool,
+    pub active_boot: bool,
+}
+
+pub struct SnapperRollbackEngine {
+    pub snapshots: BTreeMap<u32, SnapperSnapshot>,
+    pub next_snapshot_id: u32,
+}
+
+impl SnapperRollbackEngine {
+    pub fn new() -> Self {
+        Self {
+            snapshots: BTreeMap::new(),
+            next_snapshot_id: 1,
+        }
+    }
+
+    pub fn create_snapshot(&mut self, desc: &str, is_read_only: bool) -> u32 {
+        let id = self.next_snapshot_id;
+        self.next_snapshot_id += 1;
+
+        let snapshot = SnapperSnapshot {
+            id,
+            description: desc.to_string(),
+            timestamp_ms: 1000,
+            is_read_only,
+            active_boot: false,
+        };
+
+        self.snapshots.insert(id, snapshot);
+        id
+    }
+
+    pub fn rollback_to_snapshot(&mut self, id: u32) -> Result<String, &'static str> {
+        if !self.snapshots.contains_key(&id) {
+            return Err("Snapper Error: Snapshot ID not found");
+        }
+        for (snap_id, snap) in self.snapshots.iter_mut() {
+            snap.active_boot = *snap_id == id;
+        }
+        Ok(format!("Snapper: Successfully rolled back to snapshot {}", id))
+    }
+}
+
+impl Default for SnapperRollbackEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================
+// DEBIAN DEBCONF NON-INTERACTIVE PACKAGE PRE-CONFIG ENGINE
+// ============================================================
+
+pub struct DebconfPreconfigEngine {
+    pub db: BTreeMap<String, String>,
+}
+
+impl DebconfPreconfigEngine {
+    pub fn new() -> Self {
+        Self {
+            db: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_selection(&mut self, package: &str, question: &str, value: &str) {
+        let key = format!("{}/{}", package, question);
+        self.db.insert(key, value.to_string());
+    }
+
+    pub fn get_selection(&self, package: &str, question: &str) -> Option<&String> {
+        let key = format!("{}/{}", package, question);
+        self.db.get(&key)
+    }
+}
+
+impl Default for DebconfPreconfigEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================
+// ARCH LINUX MKINITCPIO / DRACUT INITRAMFS GENERATOR ENGINE
+// ============================================================
+
+pub struct InitramfsGeneratorEngine {
+    pub hooks: Vec<String>,
+    pub modules: Vec<String>,
+}
+
+impl InitramfsGeneratorEngine {
+    pub fn new() -> Self {
+        Self {
+            hooks: vec!["base".to_string(), "udev".to_string(), "autodetect".to_string(), "modconf".to_string(), "filesystems".to_string()],
+            modules: Vec::new(),
+        }
+    }
+
+    pub fn add_hook(&mut self, hook: &str) {
+        if !self.hooks.contains(&hook.to_string()) {
+            self.hooks.push(hook.to_string());
+        }
+    }
+
+    pub fn generate_initramfs_image(&self, kernel_version: &str) -> Vec<u8> {
+        let mut image = Vec::new();
+        image.extend_from_slice(b"INITRAMFS_CPIO_GZ");
+        image.extend_from_slice(kernel_version.as_bytes());
+        image
+    }
+}
+
+impl Default for InitramfsGeneratorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================
+// OPENBSD PF (PACKET FILTER) STATEFUL FIREWALL ENGINE
+// ============================================================
+
+#[derive(Debug, Clone)]
+pub struct PfRule {
+    pub action_pass: bool,
+    pub protocol: String,
+    pub src_net: String,
+    pub dst_port: u16,
+}
+
+pub struct OpenBsdPfFirewallEngine {
+    pub rules: Vec<PfRule>,
+    pub active_states: usize,
+}
+
+impl OpenBsdPfFirewallEngine {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            active_states: 0,
+        }
+    }
+
+    pub fn add_rule(&mut self, action_pass: bool, protocol: &str, src_net: &str, dst_port: u16) {
+        self.rules.push(PfRule {
+            action_pass,
+            protocol: protocol.to_string(),
+            src_net: src_net.to_string(),
+            dst_port,
+        });
+    }
+
+    pub fn filter_packet(&mut self, protocol: &str, _src_ip: &str, dst_port: u16) -> bool {
+        for rule in &self.rules {
+            if rule.protocol == protocol && rule.dst_port == dst_port {
+                if rule.action_pass {
+                    self.active_states += 1;
+                }
+                return rule.action_pass;
+            }
+        }
+        true // default pass
+    }
+}
+
+impl Default for OpenBsdPfFirewallEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Bedrock Linux Strata Virtualization Engine
 #[derive(Debug, Clone)]
 pub struct BedrockStratum {
@@ -2415,6 +2596,35 @@ mod tests {
         assert_eq!(la64.active_cores, 4);
         assert!(la64.execute_instruction(0x02800000));
         assert_eq!(la64.executed_instructions, 1);
+    }
+
+    #[test]
+    fn test_snapper_rollback_engine() {
+        let mut snapper = SnapperRollbackEngine::new();
+        let id1 = snapper.create_snapshot("boot_snapshot", true);
+        assert_eq!(id1, 1);
+
+        let res = snapper.rollback_to_snapshot(1).unwrap();
+        assert!(res.contains("snapshot 1"));
+        assert!(snapper.snapshots.get(&1).unwrap().active_boot);
+    }
+
+    #[test]
+    fn test_debconf_and_pf_and_initramfs_engines() {
+        let mut debconf = DebconfPreconfigEngine::new();
+        debconf.set_selection("tzdata", "timezone", "UTC");
+        assert_eq!(debconf.get_selection("tzdata", "timezone").unwrap(), "UTC");
+
+        let mut initramfs = InitramfsGeneratorEngine::new();
+        initramfs.add_hook("encrypt");
+        assert!(initramfs.hooks.contains(&"encrypt".to_string()));
+        let img = initramfs.generate_initramfs_image("6.5.0");
+        assert!(!img.is_empty());
+
+        let mut pf = OpenBsdPfFirewallEngine::new();
+        pf.add_rule(true, "tcp", "any", 22);
+        assert!(pf.filter_packet("tcp", "192.168.1.100", 22));
+        assert_eq!(pf.active_states, 1);
     }
 
 }

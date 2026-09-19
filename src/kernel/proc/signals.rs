@@ -19,7 +19,8 @@ use crate::klib::btreemap::BTreeMap;
 use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
 use std::vec::Vec;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u32)]
 pub enum Signal {
     SIGHUP = 1,
@@ -41,6 +42,14 @@ pub enum Signal {
     SIGTSTP = 18,
     SIGCONT = 19,
     SIGCHLD = 20,
+
+    // POSIX Real-Time Signals (32-64)
+    SIGRTMIN = 32,
+    SIGRTMIN_1 = 33,
+    SIGRTMIN_2 = 34,
+    SIGRTMIN_3 = 35,
+    SIGRTMIN_4 = 36,
+    SIGRTMAX = 64,
 }
 
 /// Detailed siginfo_t structure inspired by POSIX/FreeBSD SA_SIGINFO
@@ -52,6 +61,7 @@ pub struct SigInfo {
     pub sender_pid: u64,
     pub sender_uid: u32,
     pub fault_addr: u64,
+    pub sigval_int: i32,
 }
 
 impl SigInfo {
@@ -63,6 +73,19 @@ impl SigInfo {
             sender_pid,
             sender_uid: 0,
             fault_addr: 0,
+            sigval_int: 0,
+        }
+    }
+
+    pub fn with_val(signo: Signal, sender_pid: u64, sigval: i32) -> Self {
+        Self {
+            signo,
+            errno: 0,
+            code: -2, // SI_QUEUE
+            sender_pid,
+            sender_uid: 0,
+            fault_addr: 0,
+            sigval_int: sigval,
         }
     }
 }
@@ -129,6 +152,26 @@ impl SignalManager {
 
     pub fn send_signal(&mut self, target_pid: u64, sig: Signal) {
         self.send_siginfo(target_pid, SigInfo::simple(sig, 0));
+    }
+
+    pub fn send_sigqueue(&mut self, target_pid: u64, sig: Signal, sigval: i32, sender_pid: u64) {
+        self.send_siginfo(target_pid, SigInfo::with_val(sig, sender_pid, sigval));
+    }
+
+    /// Synchronously consumes and pops a pending signal matching mask (POSIX sigwaitinfo)
+    pub fn sigwaitinfo(&mut self, pid: u64, mask: &[Signal]) -> Option<SigInfo> {
+        if let Some(infos) = self.pending_siginfo.get_mut(&pid) {
+            if let Some(idx) = infos.iter().position(|info| mask.contains(&info.signo)) {
+                let info = infos.remove(idx);
+                if let Some(sigs) = self.pending_signals.get_mut(&pid) {
+                    if let Some(s_idx) = sigs.iter().position(|&s| s == info.signo) {
+                        sigs.remove(s_idx);
+                    }
+                }
+                return Some(info);
+            }
+        }
+        None
     }
 
     pub fn send_siginfo(&mut self, target_pid: u64, info: SigInfo) {
