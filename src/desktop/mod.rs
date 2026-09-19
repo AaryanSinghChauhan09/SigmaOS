@@ -62,6 +62,12 @@ pub use moksha::{
 };
 
 pub use zenith_compositor::{
+    AccessibilityBusEvent, AccessibilityBusManager, ColorManagementEngine, ColorProfileSpec,
+    CompositorShortcutAction, DataOfferPayload, DataSelectionManager, DataSelectionType,
+    DesktopNotificationMessage, DndActionState, DragAndDropSession, DrmAtomicCommit,
+    DrmConnectorStatus, DrmKmsDevice, DrmPlaneType, EvdevInputEngine, InputDeviceType,
+    KeyModifiers, LockScreenSessionEngine, NotificationDaemonEngine, PortalCaptureEngine,
+    ScreenshotFrame, SessionLockState, SoftwareRenderer, X11WindowMetadata, XWaylandBridgeEngine,
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
 };
