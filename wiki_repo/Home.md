@@ -156,6 +156,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Kobject](Kobject)**
   Kernel object management and hierarchy.
 
+- **[Ftrace](Ftrace)**
+  Function tracing and instrumentation.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 

@@ -69,6 +69,7 @@ This page provides a structured overview of all SigmaOS Wiki articles, organized
 - [Lockdep](Lockdep) — Deadlock detection and lock order validation
 - [Cgroups](Cgroups) — Resource management and process grouping
 - [Kobject](Kobject) — Kernel object management and hierarchy
+- [Ftrace](Ftrace) — Function tracing and instrumentation
 - [MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation) — Multi-Gen LRU and memory reclamation optimization
 - [eBPF / XDP Networking](Performance-Tuning-and-Kernel#ebpf--xdp-zero-copy-networking) — eBPF and XDP zero-copy networking support
 - [Lock-Free Data Structures](SIGMA_CONCURRENCY_PRIMITIVES) — Lock-free concurrency primitives and data structures
