@@ -74,6 +74,7 @@
 - **[[RCU Synchronization|RCU-Synchronization]]**
 - **[[Lockdep|Lockdep]]**
 - **[[Cgroups|Cgroups]]**
+- **[[Kobject|Kobject]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 

@@ -153,6 +153,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Cgroups](Cgroups)**
   Resource management and process grouping.
 
+- **[Kobject](Kobject)**
+  Kernel object management and hierarchy.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 
