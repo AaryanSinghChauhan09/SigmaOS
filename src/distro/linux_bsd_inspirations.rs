@@ -225,7 +225,8 @@ impl SovereignUniversalDistroBridge {
                 DistroSubsystemMode::LinuxSlackware => {
                     supervisor == ServiceSupervisorType::Sysvinit
                 }
-                DistroSubsystemMode::SmartOs | DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Rcd,
+                DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
+                DistroSubsystemMode::SmartOs => supervisor == ServiceSupervisorType::Rcd,
             };
         supervisor_valid && !pkg_spec.is_empty() && !vfs_etc.is_empty()
     }
