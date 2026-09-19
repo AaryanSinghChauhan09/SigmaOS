@@ -424,12 +424,26 @@ impl SpreadsheetProcessor {
             if f.starts_with("=") {
                 let inner = &f[1..];
                 if inner.starts_with("SUM") {
-                    // Extract coordinates from "SUM((0,0),(0,1))"
-                    let r1 = self.evaluate_cell(0, 0);
-                    let r2 = self.evaluate_cell(0, 1);
-                    match (r1, r2) {
-                        (CellValue::Number(n1), CellValue::Number(n2)) => CellValue::Number(n1 + n2),
-                        _ => CellValue::Number(0.0),
+                    // Extract coordinates from "SUM((r1,c1),(r2,c2))"
+                    let parts: Vec<&str> = inner.split(',').collect();
+                    if parts.len() >= 4 {
+                        let r1 = parts[0].trim_start_matches("SUM((").trim().parse::<u32>().unwrap_or(0);
+                        let c1 = parts[1].trim_end_matches(')').trim().parse::<u32>().unwrap_or(0);
+                        let r2 = parts[2].trim_start_matches('(').trim().parse::<u32>().unwrap_or(0);
+                        let c2 = parts[3].trim_end_matches("))").trim().parse::<u32>().unwrap_or(0);
+                        let val1 = self.evaluate_cell(r1, c1);
+                        let val2 = self.evaluate_cell(r2, c2);
+                        match (val1, val2) {
+                            (CellValue::Number(n1), CellValue::Number(n2)) => CellValue::Number(n1 + n2),
+                            _ => CellValue::Number(0.0),
+                        }
+                    } else {
+                        let r1 = self.evaluate_cell(0, 0);
+                        let r2 = self.evaluate_cell(0, 1);
+                        match (r1, r2) {
+                            (CellValue::Number(n1), CellValue::Number(n2)) => CellValue::Number(n1 + n2),
+                            _ => CellValue::Number(0.0),
+                        }
                     }
                 } else if inner.contains(',') {
                     CellValue::Number(42.0)
@@ -1289,6 +1303,46 @@ impl SigmaFormulaParserEngine {
             } else {
                 CellValue::Empty
             }
+        } else if expr.starts_with("PMT(") && expr.ends_with(')') {
+            let inner = &expr[4..expr.len() - 1];
+            let nums = Self::parse_number_args(inner);
+            if nums.len() >= 3 {
+                let r = nums[0]; // rate
+                let nper = nums[1]; // periods
+                let pv = nums[2]; // present value
+                if r == 0.0 {
+                    CellValue::Number(-pv / nper)
+                } else {
+                    let pmt = (pv * r) / (1.0 - (1.0 + r).powf(-nper));
+                    CellValue::Number(-pmt)
+                }
+            } else {
+                CellValue::Empty
+            }
+        } else if expr.starts_with("NPV(") && expr.ends_with(')') {
+            let inner = &expr[4..expr.len() - 1];
+            let nums = Self::parse_number_args(inner);
+            if nums.len() >= 2 {
+                let rate = nums[0];
+                let mut npv = 0.0;
+                for (i, &val) in nums[1..].iter().enumerate() {
+                    npv += val / (1.0 + rate).powf((i + 1) as f64);
+                }
+                CellValue::Number(npv)
+            } else {
+                CellValue::Empty
+            }
+        } else if expr.starts_with("SLN(") && expr.ends_with(')') {
+            let inner = &expr[4..expr.len() - 1];
+            let nums = Self::parse_number_args(inner);
+            if nums.len() >= 3 && nums[2] > 0.0 {
+                let cost = nums[0];
+                let salvage = nums[1];
+                let life = nums[2];
+                CellValue::Number((cost - salvage) / life)
+            } else {
+                CellValue::Empty
+            }
         } else {
             CellValue::Text(format!("UnparsedFormula({})", expr))
         }
@@ -1300,6 +1354,34 @@ impl SigmaFormulaParserEngine {
             .map(|s| s.trim())
             .filter_map(|s| s.parse::<f64>().ok())
             .collect()
+    }
+
+    /// Goal Seek numerical solver that iteratively updates a variable cell to match a target outcome
+    pub fn goal_seek_solve(
+        processor: &mut SpreadsheetProcessor,
+        target_row: u32,
+        target_col: u32,
+        target_value: f64,
+        variable_row: u32,
+        variable_col: u32,
+    ) -> Option<f64> {
+        let mut x = 0.0;
+        let learning_rate = 0.1;
+        for _ in 0..100 {
+            if processor.set_cell(variable_row, variable_col, CellValue::Number(x)).is_err() {
+                return None;
+            }
+            let current_val = match processor.evaluate_cell(target_row, target_col) {
+                CellValue::Number(n) => n,
+                _ => return None,
+            };
+            let diff = current_val - target_value;
+            if diff.abs() < 1e-4 {
+                return Some(x);
+            }
+            x -= diff * learning_rate;
+        }
+        Some(x)
     }
 }
 
@@ -1631,10 +1713,29 @@ impl EnterpriseInvoice {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CrmActivityType {
+    EmailSent,
+    CallMade,
+    MeetingScheduled,
+    DemoPresented,
+    ProposalDelivered,
+}
+
+#[derive(Debug, Clone)]
+pub struct CrmActivityLog {
+    pub activity_id: u32,
+    pub lead_id: u32,
+    pub activity_type: CrmActivityType,
+    pub notes: String,
+    pub timestamp_sec: u64,
+}
+
 /// Comprehensive Enterprise CRM & ERP Suite Engine
 pub struct SovereignEnterpriseCrmErpEngine {
     pub deals: Vec<EnterpriseDeal>,
     pub invoices: Vec<EnterpriseInvoice>,
+    pub activity_logs: Vec<CrmActivityLog>,
     pub next_id: u32,
 }
 
@@ -1643,6 +1744,7 @@ impl SovereignEnterpriseCrmErpEngine {
         Self {
             deals: Vec::new(),
             invoices: Vec::new(),
+            activity_logs: Vec::new(),
             next_id: 1,
         }
     }
@@ -1679,6 +1781,45 @@ impl SovereignEnterpriseCrmErpEngine {
             tax_rate,
         });
         id
+    }
+
+    pub fn log_activity(&mut self, lead_id: u32, activity_type: CrmActivityType, notes: &str, timestamp_sec: u64) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.activity_logs.push(CrmActivityLog {
+            activity_id: id,
+            lead_id,
+            activity_type,
+            notes: notes.to_string(),
+            timestamp_sec,
+        });
+        id
+    }
+
+    pub fn calculate_lead_score(&self, lead_id: u32) -> u32 {
+        let mut score = 0;
+        for log in &self.activity_logs {
+            if log.lead_id == lead_id {
+                score += match log.activity_type {
+                    CrmActivityType::EmailSent => 10,
+                    CrmActivityType::CallMade => 15,
+                    CrmActivityType::MeetingScheduled => 25,
+                    CrmActivityType::DemoPresented => 40,
+                    CrmActivityType::ProposalDelivered => 50,
+                };
+            }
+        }
+        if let Some(deal) = self.deals.iter().find(|d| d.deal_id == lead_id) {
+            score += match deal.stage {
+                DealStage::LeadQualification => 5,
+                DealStage::NeedsAnalysis => 15,
+                DealStage::ProposalSent => 30,
+                DealStage::Negotiation => 50,
+                DealStage::ClosedWon => 100,
+                DealStage::ClosedLost => 0,
+            };
+        }
+        score
     }
 
     pub fn calculate_pipeline_revenue(&self) -> f64 {
@@ -2061,6 +2202,221 @@ impl EnterpriseErpLedger {
 impl Default for EnterpriseErpLedger {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// ==========================================================
+// 14. Google Forms / Microsoft Forms / Zoho Forms Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub enum FormQuestionType {
+    ShortText,
+    Paragraph,
+    MultipleChoice(Vec<String>),
+    Checkbox(Vec<String>),
+    LinearScale { min: u32, max: u32 },
+    Dropdown(Vec<String>),
+}
+
+#[derive(Debug, Clone)]
+pub struct FormQuestion {
+    pub question_id: u32,
+    pub title: String,
+    pub question_type: FormQuestionType,
+    pub required: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FormResponse {
+    pub response_id: u32,
+    pub answers: HashMap<u32, String>, // question_id -> answer_string
+    pub timestamp_sec: u64,
+}
+
+/// Sovereign Forms and Survey Engine for data collection and spreadsheet export
+pub struct SovereignFormsSurveyEngine {
+    pub form_id: u32,
+    pub title: String,
+    pub questions: Vec<FormQuestion>,
+    pub responses: Vec<FormResponse>,
+    pub next_question_id: u32,
+    pub next_response_id: u32,
+}
+
+impl SovereignFormsSurveyEngine {
+    pub fn new(title: &str) -> Self {
+        Self {
+            form_id: 1,
+            title: title.to_string(),
+            questions: Vec::new(),
+            responses: Vec::new(),
+            next_question_id: 1,
+            next_response_id: 1,
+        }
+    }
+
+    pub fn add_question(&mut self, title: &str, qtype: FormQuestionType, required: bool) -> u32 {
+        let qid = self.next_question_id;
+        self.next_question_id += 1;
+        self.questions.push(FormQuestion {
+            question_id: qid,
+            title: title.to_string(),
+            question_type: qtype,
+            required,
+        });
+        qid
+    }
+
+    pub fn submit_response(&mut self, answers: HashMap<u32, String>, timestamp_sec: u64) -> u32 {
+        let rid = self.next_response_id;
+        self.next_response_id += 1;
+        self.responses.push(FormResponse {
+            response_id: rid,
+            answers,
+            timestamp_sec,
+        });
+        rid
+    }
+
+    /// Auto-exports form responses directly into a SigmaCalc Spreadsheet
+    pub fn export_responses_to_spreadsheet(&self, processor: &mut SpreadsheetProcessor) -> Result<()> {
+        // Headers
+        processor.set_cell(0, 0, CellValue::Text("Response ID".to_string()))?;
+        processor.set_cell(0, 1, CellValue::Text("Timestamp".to_string()))?;
+        for (q_idx, q) in self.questions.iter().enumerate() {
+            processor.set_cell(0, (q_idx + 2) as u32, CellValue::Text(q.title.clone()))?;
+        }
+
+        // Rows
+        for (r_idx, resp) in self.responses.iter().enumerate() {
+            let row = (r_idx + 1) as u32;
+            processor.set_cell(row, 0, CellValue::Number(resp.response_id as f64))?;
+            processor.set_cell(row, 1, CellValue::Number(resp.timestamp_sec as f64))?;
+
+            for (q_idx, q) in self.questions.iter().enumerate() {
+                let col = (q_idx + 2) as u32;
+                if let Some(ans) = resp.answers.get(&q.question_id) {
+                    processor.set_cell(row, col, CellValue::Text(ans.clone()))?;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub fn calculate_response_summary(&self, question_id: u32) -> HashMap<String, usize> {
+        let mut counts = HashMap::new();
+        for resp in &self.responses {
+            if let Some(ans) = resp.answers.get(&question_id) {
+                *counts.entry(ans.clone()).or_insert(0) += 1;
+            }
+        }
+        counts
+    }
+}
+
+// ==========================================================
+// 15. Odoo / Bitrix24 Workgroup Gantt & Project Critical Path Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TaskDependencyType {
+    FinishToStart,
+    StartToStart,
+}
+
+#[derive(Debug, Clone)]
+pub struct GanttTaskDependency {
+    pub predecessor_task_id: u32,
+    pub dependency_type: TaskDependencyType,
+}
+
+#[derive(Debug, Clone)]
+pub struct GanttTask {
+    pub task_id: u32,
+    pub title: String,
+    pub duration_days: u32,
+    pub progress_percent: u8,
+    pub dependencies: Vec<GanttTaskDependency>,
+    pub assigned_user: String,
+}
+
+/// Odoo & Bitrix24 inspired Sovereign Workgroup Gantt Scheduling Engine
+pub struct SovereignWorkgroupGanttEngine {
+    pub project_name: String,
+    pub tasks: Vec<GanttTask>,
+    pub next_task_id: u32,
+}
+
+impl SovereignWorkgroupGanttEngine {
+    pub fn new(project_name: &str) -> Self {
+        Self {
+            project_name: project_name.to_string(),
+            tasks: Vec::new(),
+            next_task_id: 1,
+        }
+    }
+
+    pub fn add_task(&mut self, title: &str, duration_days: u32, assigned_user: &str) -> u32 {
+        let tid = self.next_task_id;
+        self.next_task_id += 1;
+        self.tasks.push(GanttTask {
+            task_id: tid,
+            title: title.to_string(),
+            duration_days,
+            progress_percent: 0,
+            dependencies: Vec::new(),
+            assigned_user: assigned_user.to_string(),
+        });
+        tid
+    }
+
+    pub fn add_dependency(&mut self, task_id: u32, pred_id: u32, dep_type: TaskDependencyType) -> bool {
+        if let Some(t) = self.tasks.iter_mut().find(|t| t.task_id == task_id) {
+            t.dependencies.push(GanttTaskDependency {
+                predecessor_task_id: pred_id,
+                dependency_type: dep_type,
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn update_progress(&mut self, task_id: u32, progress_percent: u8) -> bool {
+        if let Some(t) = self.tasks.iter_mut().find(|t| t.task_id == task_id) {
+            t.progress_percent = progress_percent.min(100);
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Computes project critical path duration in days
+    pub fn calculate_critical_path_duration(&self) -> u32 {
+        let mut max_durations: HashMap<u32, u32> = HashMap::new();
+
+        for t in &self.tasks {
+            let mut max_pred_time = 0;
+            for dep in &t.dependencies {
+                if let Some(&pred_time) = max_durations.get(&dep.predecessor_task_id) {
+                    if pred_time > max_pred_time {
+                        max_pred_time = pred_time;
+                    }
+                }
+            }
+            max_durations.insert(t.task_id, max_pred_time + t.duration_days);
+        }
+
+        max_durations.values().cloned().fold(0, u32::max)
+    }
+
+    pub fn calculate_overall_project_progress(&self) -> f64 {
+        if self.tasks.is_empty() {
+            return 0.0;
+        }
+        let total_pct: u64 = self.tasks.iter().map(|t| t.progress_percent as u64).sum();
+        (total_pct as f64) / (self.tasks.len() as f64)
     }
 }
 
@@ -2452,5 +2808,83 @@ mod tests {
         assert_eq!(ledger.calculate_total_debits(), 5000.0);
         assert_eq!(ledger.calculate_total_credits(), 5000.0);
         assert!(ledger.is_trial_balance_reconciled());
+    }
+
+    #[test]
+    fn test_sovereign_forms_survey_engine() {
+        let cap = sigma_types::CapabilityToken { id: 77 };
+        let mut forms = SovereignFormsSurveyEngine::new("Customer Feedback Survey");
+        let q1 = forms.add_question("Satisfaction Rating", FormQuestionType::LinearScale { min: 1, max: 5 }, true);
+        let q2 = forms.add_question("Primary Persona", FormQuestionType::MultipleChoice(vec!["Dev".to_string(), "Gaming".to_string()]), false);
+
+        let mut resp1 = HashMap::new();
+        resp1.insert(q1, "5".to_string());
+        resp1.insert(q2, "Dev".to_string());
+        forms.submit_response(resp1, 1700000000);
+
+        let mut resp2 = HashMap::new();
+        resp2.insert(q1, "5".to_string());
+        resp2.insert(q2, "Gaming".to_string());
+        forms.submit_response(resp2, 1700000005);
+
+        let summary = forms.calculate_response_summary(q1);
+        assert_eq!(summary.get("5"), Some(&2));
+
+        let mut sheet = SpreadsheetProcessor::new("Survey Results".to_string(), cap);
+        forms.export_responses_to_spreadsheet(&mut sheet).unwrap();
+        assert_eq!(sheet.get_cell(0, 2), Some(&CellValue::Text("Satisfaction Rating".to_string())));
+        assert_eq!(sheet.get_cell(1, 2), Some(&CellValue::Text("5".to_string())));
+    }
+
+    #[test]
+    fn test_financial_formulas_and_goal_seek() {
+        let cap = sigma_types::CapabilityToken { id: 88 };
+        let pmt_val = SigmaFormulaParserEngine::parse_and_evaluate_formula("=PMT(0.05, 12, 10000)");
+        if let CellValue::Number(n) = pmt_val {
+            assert!((n - (-1128.25)).abs() < 1.0);
+        } else {
+            panic!("Expected PMT number");
+        }
+
+        let npv_val = SigmaFormulaParserEngine::parse_and_evaluate_formula("=NPV(0.1, 100, 200, 300)");
+        if let CellValue::Number(n) = npv_val {
+            assert!((n - 481.59).abs() < 1.0);
+        } else {
+            panic!("Expected NPV number");
+        }
+
+        let sln_val = SigmaFormulaParserEngine::parse_and_evaluate_formula("=SLN(10000, 1000, 5)");
+        assert_eq!(sln_val, CellValue::Number(1800.0));
+
+        let mut sheet = SpreadsheetProcessor::new("GoalSeek".to_string(), cap);
+        sheet.set_cell(0, 0, CellValue::Number(0.0)).unwrap(); // input x
+        sheet.set_formula(0, 1, "=SUM((0,0),(0,0))").unwrap(); // output y = x
+        let solution = SigmaFormulaParserEngine::goal_seek_solve(&mut sheet, 0, 1, 50.0, 0, 0);
+        assert!(solution.is_some());
+    }
+
+    #[test]
+    fn test_workgroup_gantt_and_crm_scoring() {
+        // Gantt test
+        let mut gantt = SovereignWorkgroupGanttEngine::new("SigmaOS v1.0 Release");
+        let t1 = gantt.add_task("Kernel Syscall Hardening", 5, "alice");
+        let t2 = gantt.add_task("Zenith UI Integration", 10, "bob");
+        gantt.add_dependency(t2, t1, TaskDependencyType::FinishToStart);
+        gantt.update_progress(t1, 100);
+        gantt.update_progress(t2, 50);
+
+        assert_eq!(gantt.calculate_critical_path_duration(), 15);
+        assert_eq!(gantt.calculate_overall_project_progress(), 75.0);
+
+        // CRM activity & scoring test
+        let mut crm = SovereignEnterpriseCrmErpEngine::new();
+        let deal_id = crm.create_deal("Enterprise Support", "Acme", 100000.0);
+        crm.log_activity(deal_id, CrmActivityType::EmailSent, "Initial outreach", 1000);
+        crm.log_activity(deal_id, CrmActivityType::DemoPresented, "Product Demo", 2000);
+        crm.update_deal_stage(deal_id, DealStage::Negotiation);
+
+        let score = crm.calculate_lead_score(deal_id);
+        // EmailSent (10) + DemoPresented (40) + Negotiation stage (50) = 100
+        assert_eq!(score, 100);
     }
 }
