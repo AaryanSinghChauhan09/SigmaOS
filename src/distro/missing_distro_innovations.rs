@@ -844,6 +844,161 @@ impl Default for KaOSPackageStateGovernor {
     }
 }
 
+// =========================================================================
+// ENDLESS OS OSTREE & FLATPAK SIDELOADING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct EndlessFlatpakBundle {
+    pub app_id: String,
+    pub name: String,
+    pub branch: String,
+    pub size_bytes: u64,
+    pub is_installed: bool,
+}
+
+pub struct EndlessOsOstreeFlatpakEngine {
+    pub ostree_sysroot: String,
+    pub bundles: BTreeMap<String, EndlessFlatpakBundle>,
+    pub parental_controls_enabled: bool,
+}
+
+impl EndlessOsOstreeFlatpakEngine {
+    pub fn new(sysroot: &str) -> Self {
+        Self {
+            ostree_sysroot: sysroot.to_string(),
+            bundles: BTreeMap::new(),
+            parental_controls_enabled: true,
+        }
+    }
+
+    pub fn sideload_bundle(&mut self, app_id: &str, name: &str, size_bytes: u64) -> Result<String, &'static str> {
+        let bundle = EndlessFlatpakBundle {
+            app_id: app_id.to_string(),
+            name: name.to_string(),
+            branch: "stable".to_string(),
+            size_bytes,
+            is_installed: true,
+        };
+        self.bundles.insert(app_id.to_string(), bundle);
+        Ok(format!("Offline Flatpak bundle {} sideloaded to OSTree sysroot {}", app_id, self.ostree_sysroot))
+    }
+
+    pub fn check_parental_filter(&self, app_id: &str, max_age_rating: u8) -> bool {
+        if !self.parental_controls_enabled {
+            return true;
+        }
+        max_age_rating >= 12
+    }
+}
+
+impl Default for EndlessOsOstreeFlatpakEngine {
+    fn default() -> Self {
+        Self::new("/ostree/repo")
+    }
+}
+
+// =========================================================================
+// DEEPIN DDE DOCK & CONTROL CENTER ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DdeDockMode {
+    Fashion,   // Centered macOS-style dock
+    Efficient, // Windows-style taskbar
+}
+
+#[derive(Debug, Clone)]
+pub struct DdeThemeConfig {
+    pub active_theme: String,
+    pub window_blur_radius: u32,
+    pub opacity: f32,
+}
+
+pub struct DeepinDdeDockControlCenterEngine {
+    pub dock_mode: DdeDockMode,
+    pub theme_config: DdeThemeConfig,
+    pub app_store_updates_count: u32,
+}
+
+impl DeepinDdeDockControlCenterEngine {
+    pub fn new() -> Self {
+        Self {
+            dock_mode: DdeDockMode::Fashion,
+            theme_config: DdeThemeConfig {
+                active_theme: "deepin-dark".to_string(),
+                window_blur_radius: 15,
+                opacity: 0.85,
+            },
+            app_store_updates_count: 0,
+        }
+    }
+
+    pub fn set_dock_mode(&mut self, mode: DdeDockMode) {
+        self.dock_mode = mode;
+    }
+
+    pub fn set_window_blur(&mut self, radius: u32, opacity: f32) {
+        self.theme_config.window_blur_radius = radius;
+        self.theme_config.opacity = opacity.clamp(0.0, 1.0);
+    }
+
+    pub fn set_app_store_updates(&mut self, count: u32) {
+        self.app_store_updates_count = count;
+    }
+}
+
+impl Default for DeepinDdeDockControlCenterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// KAOS QT DESKTOP GOVERNOR ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct KaOsQtPackage {
+    pub name: String,
+    pub repo: String, // "core", "main", "apps"
+    pub is_qt_pure: bool,
+}
+
+pub struct KaOsQtDesktopGovernorEngine {
+    pub packages: BTreeMap<String, KaOsQtPackage>,
+}
+
+impl KaOsQtDesktopGovernorEngine {
+    pub fn new() -> Self {
+        Self {
+            packages: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_package(&mut self, name: &str, repo: &str, is_qt: bool) {
+        let pkg = KaOsQtPackage {
+            name: name.to_string(),
+            repo: repo.to_string(),
+            is_qt_pure: is_qt,
+        };
+        self.packages.insert(name.to_string(), pkg);
+    }
+
+    pub fn is_qt_purity_maintained(&self) -> bool {
+        if self.packages.is_empty() {
+            return true;
+        }
+        self.packages.values().all(|p| p.is_qt_pure)
+    }
+}
+
+impl Default for KaOsQtDesktopGovernorEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// 12. Missing Linux & BSD Distro Component Parity Inspector
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentParityStatus {
@@ -2041,22 +2196,6 @@ mod tests {
         assert_eq!(hammer.total_dedup_savings_bytes, 18);
     }
 
-    pub fn start_rump_server(&mut self, component_name: &str) -> usize {
-        let server_id = self.next_id;
-        self.next_id += 1;
-
-        let socket_path = format!("/tmp/rump_{}.sock", component_name);
-        let server = RumpKernelServer {
-            server_id,
-            component_name: component_name.to_string(),
-            _socket_path: socket_path,
-            is_active: true,
-        };
-
-        self.servers.push(server);
-        server_id
-    }
-
     #[test]
     fn test_gentoo_portage_slot_operator() {
         let mut portage = GentooPortageSlotOperatorEngine::new();
@@ -2151,6 +2290,24 @@ mod tests {
         kaos.register_package("plasma-desktop", "5.27", KaOsRepoGroup::Core, true);
         kaos.register_package("kwrite", "23.08", KaOsRepoGroup::Apps, true);
         assert_eq!(kaos.qt_kde_toolkit_ratio(), 1.0);
+    }
+
+    #[test]
+    fn test_endless_deepin_kaos_engines() {
+        let mut endless = EndlessOsOstreeFlatpakEngine::new("/ostree/repo");
+        assert!(endless.sideload_bundle("org.wikipedia.Wikipedia", "Wikipedia", 100_000_000).is_ok());
+        assert!(endless.check_parental_filter("org.wikipedia.Wikipedia", 12));
+
+        let mut deepin = DeepinDdeDockControlCenterEngine::new();
+        deepin.set_dock_mode(DdeDockMode::Efficient);
+        deepin.set_window_blur(20, 0.9);
+        assert_eq!(deepin.dock_mode, DdeDockMode::Efficient);
+        assert_eq!(deepin.theme_config.window_blur_radius, 20);
+
+        let mut kaos = KaOsQtDesktopGovernorEngine::new();
+        kaos.register_package("plasma-workspace", "main", true);
+        kaos.register_package("kcalc", "apps", true);
+        assert!(kaos.is_qt_purity_maintained());
     }
 
     #[test]
