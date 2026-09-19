@@ -165,6 +165,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Seccomp](Seccomp)**
   System call filtering and security sandboxing.
 
+- **[IOMMU](IOMMU)**
+  Device memory isolation and DMA remapping.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 
