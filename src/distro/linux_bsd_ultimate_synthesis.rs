@@ -395,7 +395,13 @@ impl OpenBsdPledgeUnveilHardeningEngine {
             return true;
         }
         for (rule_path, perms) in &self.unveil_rules {
-            if path.starts_with(rule_path) {
+            let covers = path == *rule_path
+                || *rule_path == "/"
+                || (path.starts_with(rule_path)
+                    && (rule_path.ends_with('/')
+                        || rule_path.ends_with('\\')
+                        || path.as_bytes().get(rule_path.len()).map_or(false, |&b| b == b'/' || b == b'\\')));
+            if covers {
                 return perms.contains(&required_perm);
             }
         }
@@ -784,6 +790,9 @@ mod tests {
         openbsd.unveil("/var/log", &[UnveilPerm::Read, UnveilPerm::Write]);
         assert!(openbsd.check_unveil("/var/log/syslog", UnveilPerm::Write));
         assert!(!openbsd.check_unveil("/root", UnveilPerm::Read));
+
+        // Path prefix confusion sandboxing bypass prevention
+        assert!(!openbsd.check_unveil("/var/log_secret", UnveilPerm::Read));
     }
 
     #[test]
