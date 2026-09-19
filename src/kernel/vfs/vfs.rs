@@ -333,6 +333,27 @@ impl InodeCache {
         self.cache.get(&ino)
     }
 
+    pub fn get_refcount(&self, ino: u64) -> u32 {
+        if let Some(refcount) = self.refcounts.get(&ino) {
+            refcount.load(Ordering::SeqCst)
+        } else {
+            0
+        }
+    }
+
+    pub fn decrement_refcount(&mut self, ino: u64) -> Result<(), FsError> {
+        if let Some(refcount) = self.refcounts.get_mut(&ino) {
+            let count = refcount.fetch_sub(1, Ordering::SeqCst) - 1;
+            if count == 0 {
+                self.cache.remove(&ino);
+                self.refcounts.remove(&ino);
+            }
+            Ok(())
+        } else {
+            Err(FsError::NotFound)
+        }
+    }
+
     pub fn insert(&mut self, inode: Inode) {
         let ino = inode.i_ino;
         
@@ -701,6 +722,45 @@ impl Default for SovereignMountManager {
     }
 }
 
+/// Virtual File System (VFS) main structure
+pub struct Vfs {
+    pub mounts: BTreeMap<String, SuperBlock>,
+}
+
+impl Vfs {
+    pub fn new() -> Self {
+        Self {
+            mounts: BTreeMap::new(),
+        }
+    }
+
+    pub fn mount(&mut self, mount_point: String, sb: SuperBlock) -> Result<(), FsError> {
+        if self.mounts.contains_key(&mount_point) {
+            return Err(FsError::AlreadyMounted);
+        }
+        self.mounts.insert(mount_point, sb);
+        Ok(())
+    }
+
+    pub fn umount(&mut self, mount_point: &str) -> Result<(), FsError> {
+        if !self.mounts.contains_key(mount_point) {
+            return Err(FsError::NotFound);
+        }
+        self.mounts.remove(mount_point);
+        Ok(())
+    }
+
+    pub fn lookup_mount(&self, mount_point: &str) -> Option<&SuperBlock> {
+        self.mounts.get(mount_point)
+    }
+}
+
+impl Default for Vfs {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct MntOperations {}
 
 impl MntOperations {
@@ -924,5 +984,4 @@ mod mount_tests {
         // Active mount entry should now exist
         assert!(manager.active_mount_table.contains_key("/media/usb"));
     }
-}
 }
