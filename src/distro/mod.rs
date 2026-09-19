@@ -327,6 +327,15 @@ pub use sovereign_2030_distro_supremacy_engine::{
     SystemdExecAiProfile,
 };
 
+pub mod sovereign_2032_distro_supremacy_engine;
+pub use sovereign_2032_distro_supremacy_engine::{
+    BcachefsCxlExtent2032, DirectKmsFrame2032, FineIbtCallSiteRange2032, PqcHomedUserDirectory2032,
+    Sovereign2032DistroSupremacyMasterSuite, SovereignFreeBsd165VnetXdpCrdtEngine,
+    SovereignLinux618BcachefsCxlTieringEngine, SovereignOpenBsd82FineIbtPinsyscallGuard,
+    SovereignSystemd262PostQuantumHomedEngine, SovereignWayland128SubMillisecondScanoutEngine,
+    StorageTier2032, VnetJailSpec2032,
+};
+
 // ─── Omarchy Master Synthesis Suite ──────────────────────────────────────────
 pub mod omarchy_master_synthesis;
 pub use omarchy_master_synthesis::{
