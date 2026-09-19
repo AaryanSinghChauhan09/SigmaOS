@@ -72,6 +72,7 @@
 - **[[Kernel Timers|Kernel-Timers]]**
 - **[[Workqueue|Workqueue]]**
 - **[[RCU Synchronization|RCU-Synchronization]]**
+- **[[Lockdep|Lockdep]]**
 - **[[Lock-Free Data Structures|SIGMA_CONCURRENCY_PRIMITIVES]]**
 - **[[Category:Performance|Category:Performance]]**
 

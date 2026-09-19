@@ -147,6 +147,9 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[RCU Synchronization](RCU-Synchronization)**
   Scalable read-mostly data structure synchronization.
 
+- **[Lockdep](Lockdep)**
+  Deadlock detection and lock order validation.
+
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
 
