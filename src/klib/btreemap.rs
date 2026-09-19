@@ -6,7 +6,7 @@ use super::Vec;
 use core::borrow::Borrow;
 use core::cmp::PartialEq;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -205,6 +205,10 @@ where
         None
     }
 
+    pub fn clear(&mut self) {
+        self.entries.clear();
+    }
+
     pub fn len(&self) -> usize {
         self.entries.len()
     }
@@ -231,6 +235,36 @@ where
         BTreeMapIterMut {
             entries: &mut self.entries,
             idx: 0,
+        }
+    }
+
+    pub fn keys(&self) -> Keys<'_, K, V> {
+        Keys {
+            entries: &self.entries,
+            idx: 0,
+        }
+    }
+}
+
+pub struct Keys<'a, K, V> {
+    entries: &'a Vec<(K, V)>,
+    idx: usize,
+}
+
+impl<'a, K, V> Iterator for Keys<'a, K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    type Item = &'a K;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.idx < self.entries.len() {
+            let item = &self.entries[self.idx].0;
+            self.idx += 1;
+            Some(item)
+        } else {
+            None
         }
     }
 }

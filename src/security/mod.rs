@@ -1,4 +1,11 @@
 // SigmaOS Security Subsystem
+pub mod sandbox;
+pub mod landlock_sovereign;
+pub mod libgksu;
+pub mod kernel_hardening;
+pub mod pqc_measurement;
+pub mod vpn;
+pub mod publication_permissions;
 pub mod capability;
 pub mod pqc_enclave;
 pub mod governance;
@@ -82,7 +89,15 @@ pub use hardening::{
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
-pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
+pub use selinux::{SecurityContext, PolicyRule, SELinuxPolicy, SigmaSELinux};
+pub use landlock_sovereign::*;
+pub use libgksu::*;
+pub use kernel_hardening::*;
+pub use pqc_measurement::*;
+pub use vpn::*;
+pub use publication_permissions::*;
+pub use kali_stack::*;
+pub use deobfuscation::*;
 pub use securelevels::{Securelevel, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
 

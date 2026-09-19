@@ -70,3 +70,5 @@ pub mod open_source_tools_engine;
 pub use open_source_tools_engine::*;
 pub mod open_source_cli_tools_suite;
 pub use open_source_cli_tools_suite::*;
+pub mod market_competitor_tools;
+pub use market_competitor_tools::*;

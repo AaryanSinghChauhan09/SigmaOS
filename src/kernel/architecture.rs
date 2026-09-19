@@ -19,10 +19,6 @@ pub enum InstructionCyclePhase {
     Commit,
 }
 
-#[cfg(not(feature = "standalone_test"))]
-use super::structures::ThreadState;
-
-#[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ThreadState {
     Ready,

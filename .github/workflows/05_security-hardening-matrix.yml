@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 6 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   security-hardening:
     runs-on: ubuntu-latest

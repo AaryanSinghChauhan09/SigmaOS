@@ -36,6 +36,11 @@ pub trait PeripheralDevice {
     /// Returns the name or identifier of the device
     fn name(&self) -> &'static str;
 
+    /// Returns the device category (e.g. Display, Audio, Storage)
+    fn device_category(&self) -> &'static str {
+        "Generic"
+    }
+
     /// Returns the generation category of the device
     fn generation(&self) -> DeviceGeneration;
 

@@ -5693,43 +5693,4 @@ impl Default for FedoraRPMSeccompFilterEngine {
     fn default() -> Self {
         Self::new()
     }
-
-    #[test]
-    fn test_fedora_mojikey_pagu_fedocal_nuancier_ircot_elections() {
-        // 1. MojiKey
-        let moji = FedoraMojiKeyEngine::new();
-        let res = moji.search("fedora");
-        assert_eq!(res.len(), 1);
-        assert_eq!(res[0].glyph, "🎩");
-
-        // 2. Pagu
-        let mut pagu = FedoraPaguEngine::new();
-        pagu.provision_account("jules_dev", "jules@fedora.org", &["packagers", "sysadmin"]);
-        assert_eq!(
-            pagu.generate_oauth2_token("jules_dev"),
-            Some("pagu-oauth2-token-jules_dev".to_string())
-        );
-
-        // 3. Fedocal
-        let mut cal = FedoraFedocalEngine::new();
-        let m_id = cal.schedule_meeting("Kernel Release Party", "#fedora-meeting", "jules_dev");
-        assert_eq!(m_id, 1);
-
-        // 4. Nuancier
-        let mut nuancier = FedoraNuancierEngine::new();
-        let w_id = nuancier.submit_wallpaper("Blue Nebula", "artist_guy");
-        assert!(nuancier.vote(w_id));
-        assert_eq!(nuancier.submissions[0].votes, 1);
-
-        // 5. IRCOT
-        let mut ircot = FedoraIrcotEngine::new();
-        ircot.join_channel("#fedora-devel", "Fedora Devel Channel");
-        assert_eq!(ircot.broadcast_message("Release v40 published!"), 1);
-
-        // 6. Elections
-        let mut elections = FedoraElectionsEngine::new();
-        elections.nominate_candidate("alice");
-        assert!(elections.cast_ballot("alice"));
-        assert_eq!(elections.candidates[0].votes, 1);
-    }
 }

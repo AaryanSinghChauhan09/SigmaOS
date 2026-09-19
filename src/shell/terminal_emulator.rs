@@ -1293,7 +1293,8 @@ impl TerminalSession {
     pub fn register_trigger_rule(&mut self, pattern: &str, action: &str) {
         self.trigger_rules.push(TriggerRule {
             pattern: pattern.to_string(),
-            action_command: action.to_string(),
+            highlight_color: AnsiColor::Default,
+            action_command: Some(action.to_string()),
         });
     }
 

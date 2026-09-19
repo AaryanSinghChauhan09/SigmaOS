@@ -14,10 +14,12 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::format;
+use alloc::vec;
 use core::sync::atomic::{AtomicU64, Ordering};
 
 use crate::klib::types::*;
-use crate::security::sandbox::{Landlock V5Guard, CapsicumRights};
+use crate::security::sandbox::{LandlockV5Guard, CapsicumRights};
 use crate::kernel::process::{ProcessId, ProcessState};
 
 /// Unique identifier for AI agents in the kernel
@@ -32,7 +34,7 @@ impl AgentId {
 }
 
 /// Agent capability domains (sandboxed execution contexts)
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AgentCapability {
     /// Analyze kernel crashes, panics, and core dumps
     SystemAnalysis,
@@ -196,7 +198,7 @@ pub struct AgentReport {
 }
 
 /// Plugin specification for code generation
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PluginSpec {
     pub name: String,
     pub description: String,
@@ -572,15 +574,6 @@ pub enum AgentError {
     CodeGenerationFailed,
     AnalysisFailed,
 }
-
-// Re-export for other modules
-pub use self::{
-    AgentId, AgentCapability, AgentPriority, AgentState,
-    AgentProcess, AgentSandbox, AgentKernelBridge,
-    CrashDump, AgentReport, PluginSpec, Plugin,
-    UserIntent, ConfigDiff, SovereignAgentRuntime,
-    AgentError,
-};
 
 #[cfg(test)]
 mod tests {

@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 4 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   container-build:
     runs-on: ubuntu-latest
@@ -99,7 +102,7 @@ jobs:
 
       - name: Upload logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.container || matrix.vm }}-${{ matrix.version || matrix.image }}-logs
           path: logs/

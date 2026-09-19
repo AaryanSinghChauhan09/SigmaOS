@@ -8,6 +8,7 @@ use std::format;
 use crate::klib::btreemap::BTreeMap;
 use crate::klib::HashMap;
 use crate::klib::HashSet;
+pub use crate::security::landlock_sovereign::{SovereignLandlockV5Guard as LandlockV5Guard, CapsicumRights};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SandboxRule {

@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 5 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   desktop-matrix:
     runs-on: ubuntu-latest
@@ -28,7 +31,7 @@ jobs:
 
           - desktop: gnome
             version: "46"
-            container: ubuntu:mantic
+            container: ubuntu:noble
             deps: "libgtk-4-dev libadwaita-1-dev"
             build-cmd: "cargo build --features gnome --release"
 
@@ -41,7 +44,7 @@ jobs:
 
           - desktop: kde
             version: "6"
-            container: ubuntu:mantic
+            container: ubuntu:noble
             deps: "libkf6-dev libqt6-dev"
             build-cmd: "cargo build --features kde --release"
 

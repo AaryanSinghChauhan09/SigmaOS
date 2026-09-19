@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 7 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   build-optimization:
     runs-on: ubuntu-latest
@@ -145,7 +148,7 @@ jobs:
 
       - name: Upload optimization report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: optimization-${{ matrix.optimization }}
           path: |

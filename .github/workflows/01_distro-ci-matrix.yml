@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 2 * * 0'  # Weekly
 
+permissions:
+  contents: read
+
 jobs:
   distro-matrix:
     runs-on: ubuntu-latest
@@ -124,7 +127,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.distro }}-${{ matrix.version }}
           path: target/release/

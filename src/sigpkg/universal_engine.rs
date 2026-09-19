@@ -15,10 +15,14 @@ use core::result::Result::{self, Err, Ok};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
     Apt,
+    Deb,
     Yum,
+    Rpm,
     Pacman,
     Portage,
+    Ebuild,
     Sovereign,
+    Sigma,
     Nix,
     Apk,
     Xbps,
@@ -73,6 +77,39 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
+    Sysupdate,
+}
+
+impl PackageFormat {
+    pub fn from_filename(filename: &str) -> Option<Self> {
+        match crate::package::PackageFormat::from_filename(filename) {
+            Some(crate::package::PackageFormat::Deb) | Some(crate::package::PackageFormat::Apt) => Some(PackageFormat::Deb),
+            Some(crate::package::PackageFormat::Rpm) | Some(crate::package::PackageFormat::Yum) => Some(PackageFormat::Rpm),
+            Some(crate::package::PackageFormat::Pacman) => Some(PackageFormat::Pacman),
+            Some(crate::package::PackageFormat::Apk) => Some(PackageFormat::Apk),
+            Some(crate::package::PackageFormat::Xbps) => Some(PackageFormat::Xbps),
+            Some(crate::package::PackageFormat::Nix) | Some(crate::package::PackageFormat::Nixpkg) => Some(PackageFormat::Nix),
+            Some(crate::package::PackageFormat::Flatpak) => Some(PackageFormat::Flatpak),
+            Some(crate::package::PackageFormat::Snap) => Some(PackageFormat::Snap),
+            Some(crate::package::PackageFormat::AppImage) => Some(PackageFormat::AppImage),
+            Some(crate::package::PackageFormat::Ebuild) | Some(crate::package::PackageFormat::Portage) => Some(PackageFormat::Ebuild),
+            Some(crate::package::PackageFormat::OpenBsdPkg) => Some(PackageFormat::OpenBsdPkg),
+            Some(crate::package::PackageFormat::Ipk) => Some(PackageFormat::Ipk),
+            Some(crate::package::PackageFormat::Opkg) => Some(PackageFormat::Opkg),
+            Some(crate::package::PackageFormat::SolarisIps) => Some(PackageFormat::SolarisIps),
+            Some(crate::package::PackageFormat::GuixNar) => Some(PackageFormat::GuixNar),
+            Some(crate::package::PackageFormat::Spack) => Some(PackageFormat::Spack),
+            Some(crate::package::PackageFormat::Conan) => Some(PackageFormat::Conan),
+            Some(crate::package::PackageFormat::Wheel) => Some(PackageFormat::Wheel),
+            Some(crate::package::PackageFormat::Crate) => Some(PackageFormat::Crate),
+            Some(crate::package::PackageFormat::Gem) => Some(PackageFormat::Gem),
+            Some(crate::package::PackageFormat::Nupkg) => Some(PackageFormat::Nupkg),
+            Some(crate::package::PackageFormat::Vcpkg) => Some(PackageFormat::Vcpkg),
+            Some(crate::package::PackageFormat::NarInfo) => Some(PackageFormat::NarInfo),
+            Some(crate::package::PackageFormat::Sysupdate) => Some(PackageFormat::Sysupdate),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

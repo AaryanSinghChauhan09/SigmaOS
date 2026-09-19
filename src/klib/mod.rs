@@ -49,6 +49,7 @@ pub mod uvm;
 pub mod uuid;
 pub mod buddy_allocator;
 pub mod hash;
+pub mod types;
 
 pub mod string {
     pub use crate::klib::custom_string::SigmaString;

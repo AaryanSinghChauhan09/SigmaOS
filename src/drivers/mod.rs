@@ -37,7 +37,7 @@ pub use linux_bsd_drivers::{
     EvdevInputDevice, FreeBsdDrmConnector, IntelIgcEthernetDriver, IntelXeDrmDriver,
     LinuxIioImuSensorDriver, LinuxUrb, LinuxUrbQueue, LsiMegaRaidHbaDriver, MultiTouchSlot,
     NetBsdRumpDriverHost, OpenBsdDriverPledge, RaidLevel, RealtekR8169EthernetDriver,
-    RpiBcmSocDriver, SensorReadings, SovereignDeviceManager, SovereignWirelessCardDriver,
+    RpiBcmSocDriver, SovereignDeviceManager, SovereignWirelessCardDriver,
     ThunderboltSecurityLevel, ThunderboltUsb4Driver, Uac2AudioDriver, UrbTransferType,
     UvcCameraDriver, VideoPixelFormat, VirtioGpu3dDriver, VirtioSoundDriver,
     WacomPrecisionTouchpadDriver, WifiMode,
@@ -61,11 +61,11 @@ pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 pub use distro_device_expansion::{
-    AppleNvmeAnsDriver, AtherosAr9271WifiDriver, CanBusSocketDriver, Cxl3MemoryExpanderDriver,
-    Esp32HciBtBridgeDriver, FloppyDiskControllerDriver, IntelI2cSmbusControllerDriver,
-    IntelIgbNicDriver, IntelIwfWifiDriver, IntelXeArcGpuDriver, LogitechUnifyingHidDriver,
-    Mpt3SasControllerDriver, NvidiaNouveauOpenGspDriver, RadeonKmsGpuDriver,
+    CanBusSocketDriver, Cxl3MemoryExpanderDriver,
+    FloppyDiskControllerDriver, IntelI2cSmbusControllerDriver,
+    IntelIgbNicDriver, IntelIwfWifiDriver, IntelXeArcGpuDriver,
+    Mpt3SasControllerDriver, RadeonKmsGpuDriver,
     RaspberryPiGpioMailboxDriver, RealtekAlcAudioDriver, RealtekRtl8169Driver,
     SoundBlaster16IsaDriver, SynapticsTouchpadDriver, ThreeCom3c59xEthernetDriver,
-    UsbAudioClass2Driver, VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
+    VirtioScsiControllerDriver, WacomGraphicsTabletDriver,
 };
