@@ -57,3 +57,7 @@
 ## 2026-09-18 - Eliminating Heap String Clones in Map Lookups during INI Parsing
 **Learning:** In configuration or text parsers (such as INI line parsers), using entry API pattern `map.entry(current_section.clone()).or_default()` inside line processing loops forces a heap `String` allocation for every key-value line even when the section entry already exists in the map. Ensuring initial section defaults and using borrow-based lookup `map.get_mut_str(&current_section)` eliminates $O(N)$ string heap clones across configuration parsing iterations.
 **Action:** In map lookup loops where keys are modified infrequently (e.g. section headers), perform borrow-based lookups (`get_mut_str` / `get_mut`) rather than `entry(key.clone())` on repeated loop cycles.
+
+## 2026-09-19 - Safe Integer Sizing for Caching Fixed Array String Lengths
+**Learning:** Caching string/slice byte lengths on fixed array structs (e.g., `SimpleFileEntry` with `[u8; 256]`) replaces $O(N)$ zero-byte linear scans (`.position(|&b| b == 0)`) with $O(1)$ constant-time slice indexing. However, typing the length field as `u8` causes integer overflow truncation when the array size equals 256 bytes (`256 as u8` truncates to 0), causing full-capacity strings to evaluate as empty slices. Using `u16` safely accommodates capacities up to 65,535 without truncation risk.
+**Action:** When caching slice lengths for fixed byte arrays with capacity $\ge 256$, always type the length field as `u16` or `usize` to prevent `u8` integer overflow truncation on max-capacity inputs.
