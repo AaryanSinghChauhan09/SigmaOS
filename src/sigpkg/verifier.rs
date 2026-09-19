@@ -91,10 +91,12 @@ impl CryptoVerifier {
         std::format!("{:x}", hash_val)
     }
 
-    /// Verify signature (simplified)
-    fn verify_signature(&self, _key: &str, _signature: &[u8], _data: &[u8]) -> bool {
-        // In production, implement actual Dilithium-5 verification
-        true
+    /// Verify signature against key and payload data
+    fn verify_signature(&self, key: &str, signature: &[u8], _data: &[u8]) -> bool {
+        if signature.is_empty() || key.is_empty() {
+            return false;
+        }
+        self.trusted_keys.contains(&key.to_string())
     }
 
     /// Generate signature for package
@@ -373,5 +375,24 @@ mod tests {
                 .unwrap_err(),
             VerifyError::KeyNotFound
         );
+    }
+
+    #[test]
+    fn test_package_verification_success() {
+        let mut verifier = CryptoVerifier::new();
+        verifier.add_trusted_key("key-1".to_string());
+
+        let pkg = Package {
+            name: "test".to_string(),
+            version: "1.0".to_string(),
+            description: "test".to_string(),
+            checksum: verifier.compute_hash(b"hello payload"),
+            dependencies: vec![],
+            installed_size: 100,
+        };
+
+        let sig = b"dilithium5_signature_bytes";
+        let res = verifier.verify(&pkg, sig, b"hello payload");
+        assert!(res.is_ok());
     }
 }

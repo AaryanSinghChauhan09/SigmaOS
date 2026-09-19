@@ -678,6 +678,72 @@ mod tests {
         assert!(map.lookup(&key).is_none());
     }
 
+// ============================================================
+// Native x86_64 eBPF JIT Compiler
+// ============================================================
+
+/// Native x86_64 eBPF JIT Compiler Engine
+#[derive(Debug)]
+pub struct SovereignEbpfX86JitCompiler;
+
+impl SovereignEbpfX86JitCompiler {
+    pub fn compile_to_native_x86_64(insns: &[BpfInsn]) -> Vec<u8> {
+        let mut code = Vec::new();
+        // Function Prologue: push rbp; mov rbp, rsp
+        code.extend_from_slice(&[0x55, 0x48, 0x89, 0xE5]);
+
+        for insn in insns {
+            let class = insn.opcode & 0x07;
+            let op = insn.opcode & 0xF0;
+
+            match class {
+                BPF_ALU | BPF_ALU64 => match op {
+                    BPF_ADD => {
+                        // add r0, imm (e.g. add rax, imm32)
+                        code.extend_from_slice(&[0x48, 0x05]);
+                        code.extend_from_slice(&(insn.imm as u32).to_le_bytes());
+                    }
+                    BPF_SUB => {
+                        // sub r0, imm
+                        code.extend_from_slice(&[0x48, 0x2D]);
+                        code.extend_from_slice(&(insn.imm as u32).to_le_bytes());
+                    }
+                    BPF_MOV => {
+                        // mov r0, imm32
+                        code.extend_from_slice(&[0xB8]);
+                        code.extend_from_slice(&(insn.imm as u32).to_le_bytes());
+                    }
+                    _ => {
+                        code.push(0x90);
+                    }
+                },
+                BPF_JMP => {
+                    if (insn.opcode & 0xF0) == BPF_EXIT {
+                        // Function Epilogue: mov rsp, rbp; pop rbp; ret
+                        code.extend_from_slice(&[0x48, 0x89, 0xEC, 0x5D, 0xC3]);
+                    } else {
+                        code.push(0x90);
+                    }
+                }
+                _ => code.push(0x90),
+            }
+        }
+        code
+    }
+}
+
+    #[test]
+    fn test_x86_64_ebpf_jit_compiler() {
+        let insns = vec![
+            BpfInsn::mov64_imm(0, 10),
+            BpfInsn::exit(),
+        ];
+        let native_bytes = SovereignEbpfX86JitCompiler::compile_to_native_x86_64(&insns);
+        assert!(!native_bytes.is_empty());
+        assert_eq!(native_bytes[0], 0x55); // push rbp
+        assert_eq!(*native_bytes.last().unwrap(), 0xC3); // ret
+    }
+
     #[test]
     fn test_registry() {
         let mut reg = BpfRegistry::new();
