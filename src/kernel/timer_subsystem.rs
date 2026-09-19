@@ -56,7 +56,7 @@ pub struct TimerDescriptor {
     pub interval_ns: u64,
     pub expires_at: u64,
     pub state: AtomicU32, // TimerState as u32
-    pub fire_count: AtomicU64,
+    pub fire_count: AtomicU32,
     pub callback: Option<TimerCallback>,
     pub user_data: u64,
 }
@@ -69,7 +69,7 @@ impl TimerDescriptor {
             interval_ns,
             expires_at: 0,
             state: AtomicU32::new(TimerState::Idle as u32),
-            fire_count: AtomicU64::new(0),
+            fire_count: AtomicU32::new(0),
             callback: Some(callback),
             user_data,
         }
@@ -183,7 +183,7 @@ impl KernelTimerSubsystem {
     }
 
     /// Get timer fire count
-    pub fn get_fire_count(&self, id: TimerId) -> Result<u64, TimerError> {
+    pub fn get_fire_count(&self, id: TimerId) -> Result<u32, TimerError> {
         let timer = self.timers.get(&id).ok_or(TimerError::InvalidTimerId)?;
         Ok(timer.fire_count.load(Ordering::SeqCst))
     }

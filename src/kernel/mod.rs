@@ -56,6 +56,7 @@ pub mod performance;
 pub mod pipes;
 pub mod process;
 pub mod policy_mechanism;
+pub mod rcu;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
