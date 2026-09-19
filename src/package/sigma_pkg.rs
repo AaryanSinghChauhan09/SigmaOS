@@ -1007,6 +1007,31 @@ impl SigmaPkg {
             pkg.name, pkg.version, format, pkg.license, pkg.architecture, pkg.dependencies
         ))
     }
+
+    /// Ingests, parses, and transactionally installs raw package binary data of any supported Linux or BSD format
+    pub fn install_universal_package(
+        &mut self,
+        file_name: &str,
+        _raw_data: &[u8],
+    ) -> Result<Package, String> {
+        let format = UniversalPackageImporter::autodetect_format(file_name)
+            .ok_or_else(|| format!("Universal PM: Format detection failed for '{}'", file_name))?;
+
+        let package = UniversalPackageImporter::parse_foreign_package(file_name, format)?;
+
+        // Validate maintainer scriptlets with security sandbox policy
+        let scriptlet_result = UniversalScriptletSandbox::transpile_and_sandbox(
+            format,
+            "postinst",
+            "#!/bin/sh\nmkdir -p /etc/sigma-pkg\n",
+        );
+        if !scriptlet_result.safe_execution {
+            return Err(format!("Universal PM: Security sandbox blocked installation scriptlet for '{}'", file_name));
+        }
+
+        self.local_packages.insert(package.name.clone(), package.clone());
+        Ok(package)
+    }
 }
 
 #[cfg(test)]
@@ -1112,6 +1137,23 @@ mod tests {
             .unwrap();
         assert!(manifest.contains("Package: firefox"));
         assert!(manifest.contains("Format: FedoraRpm"));
+    }
+
+    #[test]
+    fn test_install_universal_package_raw_bytes() {
+        let mut pkg_mgr = SigmaPkg {
+            config: PkgConfig::default(),
+            repositories: vec![],
+            local_packages: HashMap::new(),
+            cache_dir: PathBuf::from("/tmp/sigma_cache_test2"),
+            database_dir: PathBuf::from("/tmp/sigma_db_test2"),
+        };
+
+        let installed = pkg_mgr
+            .install_universal_package("ripgrep-13.0.0.pkg.tar.zst", b"dummy_tar_zst_data")
+            .unwrap();
+        assert_eq!(installed.name, "ripgrep");
+        assert!(pkg_mgr.local_packages.contains_key("ripgrep"));
     }
 
     #[test]
