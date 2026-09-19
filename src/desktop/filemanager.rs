@@ -13,9 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 use std::boxed::Box;
-use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
 
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
@@ -24,10 +22,7 @@ use std::format;
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 766
 /// Implements file browser and management
 
-use std::vec::Vec;
-use std::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type FileID = usize;
 
@@ -51,6 +46,7 @@ pub trait FileEntry {
 pub struct SimpleFileEntry {
     pub id: FileID,
     pub name: [u8; 256],
+    pub name_len: u16,
     pub file_type: AtomicUsize,
     pub size: AtomicUsize,
     pub hidden: AtomicUsize,
@@ -59,13 +55,14 @@ pub struct SimpleFileEntry {
 impl SimpleFileEntry {
     pub fn new(id: FileID, name: &[u8], file_type: FileType, size: u64) -> Self {
         let mut name_array = [0u8; 256];
-        let name_len = name.len().min(255);
+        let name_len = name.len().min(256);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
         SimpleFileEntry {
             id,
             name: name_array,
+            name_len: name_len as u16,
             file_type: AtomicUsize::new(file_type as usize),
             size: AtomicUsize::new(size as usize),
             hidden: AtomicUsize::new(0),
@@ -76,8 +73,10 @@ impl SimpleFileEntry {
 impl FileEntry for SimpleFileEntry {
     fn id(&self) -> FileID { self.id }
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(256);
-        &self.name[..len]
+        // Bolt ⚡ Optimization: Store explicit name length on instantiation to eliminate
+        // O(N) zero-byte linear scanning (.position(|&b| b == 0)) on every file entry name access,
+        // reducing slice lookup to instantaneous O(1) constant time.
+        &self.name[..self.name_len as usize]
     }
     fn file_type(&self) -> FileType {
         match self.file_type.load(Ordering::SeqCst) {
@@ -378,5 +377,35 @@ mod tests {
     fn test_file_snapshot_diff() {
         let diff = FileSnapshotDiff::compare(1, 2, 10, 1024, 2048);
         assert!(diff.is_modified);
+    }
+
+    #[test]
+    fn test_simple_file_entry_cached_length() {
+        let entry = SimpleFileEntry::new(1, b"kernel_config.toml", FileType::File, 2048);
+        assert_eq!(entry.id(), 1);
+        assert_eq!(entry.name(), b"kernel_config.toml");
+        assert_eq!(entry.file_type(), FileType::File);
+        assert_eq!(entry.size(), 2048);
+        assert!(!entry.is_hidden());
+
+        // Test max length boundary condition (256 bytes) to ensure u16 prevents u8 overflow truncation
+        let long_name = [b'a'; 256];
+        let max_entry = SimpleFileEntry::new(2, &long_name, FileType::File, 1024);
+        assert_eq!(max_entry.name().len(), 256);
+        assert_eq!(max_entry.name(), &long_name[..]);
+    }
+
+    #[test]
+    fn test_simple_file_manager_and_search() {
+        let mut fm = SimpleFileManager::new();
+        let id1 = fm.create_directory(b"/", b"etc").expect("dir created");
+        assert_eq!(fm.get_file(id1).unwrap().name(), b"etc");
+
+        let entries = fm.list_directory(b"/").expect("listed");
+        assert_eq!(entries.len(), 1);
+
+        let search = SimpleFileSearch::new(fm);
+        let res = search.search(b"etc");
+        assert_eq!(res, vec![id1]);
     }
 }
