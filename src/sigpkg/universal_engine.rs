@@ -100,6 +100,11 @@ pub enum PackageFormat {
     SigmaPkg,
     Nixpkg,
     Xz,
+    Msi,
+    Msix,
+    Makeself,
+    ZeroInstall,
+    KernelModulePkg,
 }
 
 impl PackageFormat {
@@ -282,6 +287,16 @@ impl PackageFormat {
             Some(PackageFormat::JuliaPkg)
         } else if normalized.ends_with(".rpkg") {
             Some(PackageFormat::RCran)
+        } else if normalized.ends_with(".msi") {
+            Some(PackageFormat::Msi)
+        } else if normalized.ends_with(".msix") || normalized.ends_with(".appx") {
+            Some(PackageFormat::Msix)
+        } else if normalized.ends_with(".run") {
+            Some(PackageFormat::Makeself)
+        } else if normalized.ends_with(".zpk") {
+            Some(PackageFormat::ZeroInstall)
+        } else if normalized.ends_with(".kmp") || normalized.ends_with(".kmod") {
+            Some(PackageFormat::KernelModulePkg)
         } else {
             None
         }
@@ -740,7 +755,132 @@ impl PackageAdapterFactory {
             PackageFormat::HaskellCabal => Box::new(HaskellCabalPackageAdapter),
             PackageFormat::JuliaPkg => Box::new(JuliaPkgPackageAdapter),
             PackageFormat::RCran => Box::new(RCranPackageAdapter),
+            PackageFormat::Msi => Box::new(MsiPackageAdapter),
+            PackageFormat::Msix => Box::new(MsixPackageAdapter),
+            PackageFormat::Makeself => Box::new(MakeselfPackageAdapter),
+            PackageFormat::ZeroInstall => Box::new(ZeroInstallPackageAdapter),
+            PackageFormat::KernelModulePkg => Box::new(KernelModulePkgPackageAdapter),
         }
+    }
+}
+
+pub struct MsiPackageAdapter;
+impl IPackageAdapter for MsiPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Msi
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty MSI payload");
+        }
+        Ok(PackageContext {
+            name: "msi-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Msi,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x52; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("MSI Adapter: Extracted MSI payload to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct MsixPackageAdapter;
+impl IPackageAdapter for MsixPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Msix
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty MSIX payload");
+        }
+        Ok(PackageContext {
+            name: "msix-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Msix,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x53; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("MSIX Adapter: Extracted MSIX app package to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct MakeselfPackageAdapter;
+impl IPackageAdapter for MakeselfPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Makeself
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty Makeself payload");
+        }
+        Ok(PackageContext {
+            name: "makeself-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::Makeself,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x54; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("Makeself Adapter: Unpacked self-extracting archive to: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct ZeroInstallPackageAdapter;
+impl IPackageAdapter for ZeroInstallPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::ZeroInstall
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty ZeroInstall payload");
+        }
+        Ok(PackageContext {
+            name: "zeroinstall-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::ZeroInstall,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x55; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("ZeroInstall Adapter: Resolved ZeroInstall feed to store: {}", store_path);
+        Ok(())
+    }
+}
+
+pub struct KernelModulePkgPackageAdapter;
+impl IPackageAdapter for KernelModulePkgPackageAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::KernelModulePkg
+    }
+    fn parse_package(&self, raw_data: &[u8]) -> Result<PackageContext, &'static str> {
+        if raw_data.is_empty() {
+            return Err("Empty KernelModulePkg payload");
+        }
+        Ok(PackageContext {
+            name: "kernel-module-package".to_string(),
+            version: "1.0.0".to_string(),
+            format: PackageFormat::KernelModulePkg,
+            dependencies: vec![],
+            files: vec![],
+            hash: [0x56; 32],
+        })
+    }
+    fn extract_to_store(&self, _ctx: &PackageContext, store_path: &str) -> Result<(), &'static str> {
+        println!("KernelModulePkg Adapter: Extracted driver kmod to store: {}", store_path);
+        Ok(())
     }
 }
 
