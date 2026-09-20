@@ -3,6 +3,7 @@
 
 
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::klib::{Vec, String, ToString};
 use std::string::String;
 use std::vec::Vec;
