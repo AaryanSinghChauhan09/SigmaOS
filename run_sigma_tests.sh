@@ -112,7 +112,7 @@ fi
 if [ -f "src/package/universal.rs" ]; then
     echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
-    rustc --test src/package/universal.rs --edition=2021 -o build/universal_pkg_test
+    rustc --test src/package/universal.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/universal_pkg_test
     ./build/universal_pkg_test
 fi
 
