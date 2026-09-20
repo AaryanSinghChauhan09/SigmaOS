@@ -16,6 +16,7 @@
 // SigmaOS System Utilities Module
 // System-level utilities and tools
 
+pub mod common_tweaks;
 pub mod declarative_state;
 pub mod cleanup;
 pub mod config;
@@ -36,6 +37,11 @@ pub mod state;
 pub mod syslog;
 pub mod automation;
 pub mod user;
+
+pub use common_tweaks::{
+    BsdNetworkStackTweaks, CachyOsMemorySchedulerTweaks, DistroSysctlTweaksEngine,
+    GamingAndLowLatencyTweaks, NVmeIoScheduler, SysctlCategory, ZramCompressionAlgorithm,
+};
 
 pub use automation::{
     AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus,
