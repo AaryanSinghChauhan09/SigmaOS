@@ -16,6 +16,13 @@ if [ -f "src/security/input_validation.rs" ]; then
     ./build/input_val_test
 fi
 
+if [ -f "src/security/pledge.rs" ]; then
+    echo "Running security pledge and unveil test suite..."
+    mkdir -p build
+    rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/security/pledge.rs -o build/pledge_test
+    ./build/pledge_test
+fi
+
 if [ -f "src/distro/linux_bsd_inspirations.rs" ]; then
     echo "Running Linux & BSD distro inspirations & subsystem bridge test suite..."
     mkdir -p build
