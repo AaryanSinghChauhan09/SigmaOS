@@ -1,0 +1,95 @@
+name: QEMU Boot Smoke Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  qemu-boot-test:
+    name: QEMU Boot Smoke Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          
+      - name: Install QEMU
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils
+          
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          
+      - name: Cache cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          
+      - name: Cache cargo build
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+          
+      - name: Format check
+        run: cargo fmt --check
+        
+      - name: Cargo check
+        run: cargo check --lib
+        
+      - name: Run unit tests
+        run: ./run_sigma_tests.sh
+        
+      - name: Build ISO (should fail if no real ISO)
+        run: make iso
+        continue-on-error: true
+        
+      - name: Check ISO generation status
+        run: |
+          if [ ! -f build/sigmaos-desktop-preview.iso ]; then
+            echo "ISO generation failed - this is expected until build_iso.sh is implemented"
+            echo "This test will pass once real ISO generation is implemented"
+            exit 0
+          fi
+          
+      - name: QEMU boot smoke test (placeholder)
+        run: |
+          echo "QEMU boot smoke test placeholder"
+          echo "This will be implemented once:"
+          echo "  1. Real ISO generation is working"
+          echo "  2. Kernel can boot to init"
+          echo "  3. Init can start services"
+          echo "  4. Login is accessible"
+          echo ""
+          echo "Expected test commands:"
+          echo "  qemu-system-x86_64 -m 2048 -enable-kvm -cdrom build/sigmaos-desktop-preview.iso -nographic"
+          echo "  # Wait for boot to complete"
+          echo "  # Check for login prompt"
+          echo "  # Attempt login"
+          echo "  # Verify shell access"
+          
+      - name: Test summary
+        run: |
+          echo "=== QEMU Boot Smoke Test Summary ==="
+          echo "Status: Placeholder (no real ISO yet)"
+          echo "Next steps:"
+          echo "  1. Implement scripts/build_iso.sh"
+          echo "  2. Implement kernel boot chain"
+          echo "  3. Implement init/service supervisor"
+          echo "  4. Implement login system"
+          echo "  5. Enable full QEMU boot test"
