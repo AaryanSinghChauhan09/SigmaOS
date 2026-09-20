@@ -46,6 +46,17 @@ pub mod iommu;
 pub mod interrupt;
 pub mod panic_nvram;
 pub mod linux_absorb;
+pub mod ebpf_jit;
+pub use ebpf_jit::*;
+pub mod elf_loader;
+pub use elf_loader::*;
+pub mod hypervisor;
+pub use hypervisor::*;
+pub mod preempt_rt;
+pub use preempt_rt::*;
+pub mod drm_gem;
+pub use drm_gem::*;
+
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub use linux_parity::{

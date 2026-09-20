@@ -280,6 +280,9 @@ pub use kernel::{
     InteractiveHybridScheduler, HybridTask,
     CowStorageEngine, CowBlock, Hammer2PfsSnapshot,
     MemoryCompactionSuperpagesAllocator, PhysicalFrameBlock, SovereignCgroupGovernor, CgroupResourceLimits,
+    SovereignEbpfJitEngine, JitTargetArch, EbpfInstruction, SovereignElfDynamicLoader, ElfSymbol, ElfRelocation,
+    SovereignBareMetalHypervisor, VirtualizationVendor, SovereignPreemptRtScheduler, RtSchedulingClass,
+    SovereignDrmGemGpuManager, TtmPlacementDomain, GemBufferObject,
 };
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use network::{
