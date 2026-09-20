@@ -84,10 +84,8 @@ pub mod rcu;
 pub mod roundrobin;
 pub mod sched;
 pub mod scheduler;
-pub mod structures;
 pub mod subsystems;
 pub mod timer_subsystem;
-pub mod virtual_cpu;
 pub mod workqueue;
 
 pub use missing_linux_kernel_components::{
@@ -98,7 +96,6 @@ pub use missing_linux_kernel_components::{
     UffdRegisteredRange, UserfaultfdSubsystemEngine, VirtioBalloonDriverEngine,
 };
 pub mod traits;
-pub mod vmm_paging;
 
 #[allow(ambiguous_glob_reexports)]
 pub use architecture::*;

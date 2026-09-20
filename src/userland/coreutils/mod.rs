@@ -3,11 +3,11 @@
 //! Essential command-line utilities for SigmaOS.
 
 pub mod echo;
-pub mod false;
+pub mod false_module;
 pub mod pwd;
-pub mod true;
+pub mod true_module;
 
 pub use echo::run as echo_run;
-pub use false::main as false_main;
+pub use false_module::main as false_main;
 pub use pwd::run as pwd_run;
-pub use true::main as true_main;
+pub use true_module::main as true_main;
