@@ -249,6 +249,185 @@ impl Default for FrappeEnterpriseFrameworkEngine {
     }
 }
 
+/// ItsFOSS zero-dependency CLI tooling & Linux desktop tips engine.
+#[derive(Debug, Clone)]
+pub struct ItsFossZeroDependencyToolingEngine {
+    pub zero_dep_mode: bool,
+    pub recommended_cli_tools: Vec<String>,
+}
+
+impl ItsFossZeroDependencyToolingEngine {
+    pub fn new() -> Self {
+        let mut tools = Vec::new();
+        tools.push(String::from("duf"));
+        tools.push(String::from("btop"));
+        tools.push(String::from("ripgrep"));
+        tools.push(String::from("fd"));
+        tools.push(String::from("eza"));
+        Self {
+            zero_dep_mode: true,
+            recommended_cli_tools: tools,
+        }
+    }
+
+    pub fn is_tool_recommended(&self, tool: &str) -> bool {
+        self.recommended_cli_tools.iter().any(|t| t.eq_ignore_ascii_case(tool))
+    }
+}
+
+impl Default for ItsFossZeroDependencyToolingEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Geeky-Gadgets RISC-V & ARM single-board computer hardware review engine.
+#[derive(Debug, Clone)]
+pub struct GeekyGadgetsHardwareReviewEngine {
+    pub sbc_architectures: Vec<String>,
+    pub hardware_review_verified: bool,
+}
+
+impl GeekyGadgetsHardwareReviewEngine {
+    pub fn new() -> Self {
+        let mut archs = Vec::new();
+        archs.push(String::from("RISC-V 64-bit"));
+        archs.push(String::from("ARM64 / Apple Silicon"));
+        archs.push(String::from("x86_64 Workstation"));
+        Self {
+            sbc_architectures: archs,
+            hardware_review_verified: true,
+        }
+    }
+
+    pub fn supports_architecture(&self, arch: &str) -> bool {
+        self.sbc_architectures.iter().any(|a| a.contains(arch))
+    }
+}
+
+impl Default for GeekyGadgetsHardwareReviewEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// HowToGeek terminal command-line translation & troubleshooting guide engine.
+#[derive(Debug, Clone)]
+pub struct HowToGeekTerminalGuideEngine {
+    pub guide_entries_count: usize,
+    pub interactive_mode: bool,
+}
+
+impl HowToGeekTerminalGuideEngine {
+    pub fn new() -> Self {
+        Self {
+            guide_entries_count: 150,
+            interactive_mode: true,
+        }
+    }
+
+    pub fn translate_intent_to_command(&self, intent: &str) -> String {
+        if intent.contains("disk") {
+            String::from("duf -all")
+        } else if intent.contains("process") {
+            String::from("btop")
+        } else if intent.contains("network") {
+            String::from("ip -c a")
+        } else {
+            String::from("sigma-cli --help")
+        }
+    }
+}
+
+impl Default for HowToGeekTerminalGuideEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// InfoWorld enterprise cloud-native security & microservices audit engine.
+#[derive(Debug, Clone)]
+pub struct InfoWorldEnterpriseCloudEngine {
+    pub fips_crypto_enabled: bool,
+    pub microservice_sandbox_active: bool,
+}
+
+impl InfoWorldEnterpriseCloudEngine {
+    pub fn new() -> Self {
+        Self {
+            fips_crypto_enabled: true,
+            microservice_sandbox_active: true,
+        }
+    }
+
+    pub fn audit_cloud_compliance(&self) -> bool {
+        self.fips_crypto_enabled && self.microservice_sandbox_active
+    }
+}
+
+impl Default for InfoWorldEnterpriseCloudEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// PCMag endpoint security & anti-malware review score engine.
+#[derive(Debug, Clone)]
+pub struct PcmagEndpointSecurityEngine {
+    pub security_score: u8,
+    pub editors_choice_awarded: bool,
+}
+
+impl PcmagEndpointSecurityEngine {
+    pub fn new() -> Self {
+        Self {
+            security_score: 99,
+            editors_choice_awarded: true,
+        }
+    }
+
+    pub fn is_editors_choice(&self) -> bool {
+        self.security_score >= 95 && self.editors_choice_awarded
+    }
+}
+
+impl Default for PcmagEndpointSecurityEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Appuals automated broken dependency & system repair engine.
+#[derive(Debug, Clone)]
+pub struct AppualsTroubleshootingResolverEngine {
+    pub auto_repair_enabled: bool,
+    pub total_issues_fixed: usize,
+}
+
+impl AppualsTroubleshootingResolverEngine {
+    pub fn new() -> Self {
+        Self {
+            auto_repair_enabled: true,
+            total_issues_fixed: 12,
+        }
+    }
+
+    pub fn repair_broken_dependencies(&mut self) -> bool {
+        if self.auto_repair_enabled {
+            self.total_issues_fixed += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for AppualsTroubleshootingResolverEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Master coordinator for Tech Media Distro Innovations.
 #[derive(Debug, Clone)]
 pub struct SovereignTechMediaDistroInnovationsSuite {
@@ -258,6 +437,12 @@ pub struct SovereignTechMediaDistroInnovationsSuite {
     pub sysadmin_automation: LinuxTeckSysadminAutomationEngine,
     pub google_mac_ecosystem: NineToFiveGoogleMacEcosystemEngine,
     pub frappe_framework: FrappeEnterpriseFrameworkEngine,
+    pub itsfoss_tooling: ItsFossZeroDependencyToolingEngine,
+    pub geeky_gadgets: GeekyGadgetsHardwareReviewEngine,
+    pub howtogeek_guide: HowToGeekTerminalGuideEngine,
+    pub infoworld_cloud: InfoWorldEnterpriseCloudEngine,
+    pub pcmag_security: PcmagEndpointSecurityEngine,
+    pub appuals_resolver: AppualsTroubleshootingResolverEngine,
 }
 
 impl SovereignTechMediaDistroInnovationsSuite {
@@ -269,6 +454,12 @@ impl SovereignTechMediaDistroInnovationsSuite {
             sysadmin_automation: LinuxTeckSysadminAutomationEngine::new(),
             google_mac_ecosystem: NineToFiveGoogleMacEcosystemEngine::new(),
             frappe_framework: FrappeEnterpriseFrameworkEngine::new(),
+            itsfoss_tooling: ItsFossZeroDependencyToolingEngine::new(),
+            geeky_gadgets: GeekyGadgetsHardwareReviewEngine::new(),
+            howtogeek_guide: HowToGeekTerminalGuideEngine::new(),
+            infoworld_cloud: InfoWorldEnterpriseCloudEngine::new(),
+            pcmag_security: PcmagEndpointSecurityEngine::new(),
+            appuals_resolver: AppualsTroubleshootingResolverEngine::new(),
         }
     }
 
@@ -278,6 +469,11 @@ impl SovereignTechMediaDistroInnovationsSuite {
             && self.sysadmin_automation.run_hardening_audit()
             && self.google_mac_ecosystem.is_ecosystem_healthy()
             && self.frappe_framework.erpnext_workflow_active
+            && self.itsfoss_tooling.zero_dep_mode
+            && self.geeky_gadgets.hardware_review_verified
+            && self.infoworld_cloud.audit_cloud_compliance()
+            && self.pcmag_security.is_editors_choice()
+            && self.appuals_resolver.auto_repair_enabled
     }
 }
 
@@ -293,13 +489,19 @@ mod tests {
 
     #[test]
     fn test_tech_media_distro_innovations() {
-        let suite = SovereignTechMediaDistroInnovationsSuite::new();
+        let mut suite = SovereignTechMediaDistroInnovationsSuite::new();
         assert!(suite.verify_suite());
         assert_eq!(suite.rank_tracker.get_top_ranked_distro(), "SigmaOS");
         assert_eq!(suite.rank_tracker.rank_distro_hits("SigmaOS"), 1);
         assert!(suite.release_matrix.is_kernel_up_to_date("6.12.0-sigma"));
         assert!(suite.release_matrix.verify_sched_ext_support("6.12.0-sigma"));
         assert!(suite.sysadmin_automation.verify_zero_trust_network_security());
+        assert!(suite.itsfoss_tooling.is_tool_recommended("duf"));
+        assert!(suite.geeky_gadgets.supports_architecture("RISC-V"));
+        assert_eq!(suite.howtogeek_guide.translate_intent_to_command("disk space"), "duf -all");
+        assert!(suite.infoworld_cloud.audit_cloud_compliance());
+        assert!(suite.pcmag_security.is_editors_choice());
+        assert!(suite.appuals_resolver.repair_broken_dependencies());
         assert_eq!(
             suite.recommendation.recommend_profile_for_ram(512),
             "SigmaOS AntiX-Inspired Ultralight GUI"

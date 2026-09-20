@@ -15,7 +15,17 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-pub use crate::package::manager::PackageState;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum PackageState {
+    #[default]
+    Uninstalled,
+    Downloading,
+    Installing,
+    Installed,
+    BrokenDependency,
+    Upgradable,
+    Error,
+}
 
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, zypper, dnf, appimages
@@ -25,6 +35,8 @@ use crate::klib::{Arc, HashMap, HashSet};
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::{HashMap, HashSet};
+#[cfg(any(feature = "standalone_test", test))]
+use std::sync::Arc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use crate::runtime::node_distribution::{
@@ -226,6 +238,7 @@ pub enum PackagePriority {
 /// Supported package formats across Linux and BSD ecosystems
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
+    #[default]
     Deb,        // apt/dpkg
     Rpm,        // yum/dnf/zypper
     Pacman,     // pacman/pkgbuild
@@ -273,6 +286,11 @@ pub enum PackageFormat {
     Swupd,      // Clear Linux swupd (.swupd)
     Starling,   // Starling format (.starling)
     Dports,     // DragonFly BSD DPorts (.dports)
+    OpenBsdPkg, // OpenBSD package (.tgz/.pkg)
+    Ipk,        // OpenWrt IPK package (.ipk)
+    Opkg,       // Opkg package (.opkg)
+    SolarisIps, // Solaris IPS package (.p5p)
+    GuixNar,    // Guix NAR package (.nar)
     SlackBuild, // Slackware SlackBuild (.slackbuild / .tlz / .tbz)
     Crux,       // CRUX Linux (.crux / .pkgfile)
     Drpm,       // Delta RPM (.drpm)
@@ -1447,43 +1465,6 @@ pub struct PackageAdapter {
 }
 
 impl PackageAdapter {
-    pub fn translate_flatpak_sandbox_policy(&self, manifest: &FlatpakManifest) -> Vec<String> {
-        let mut pledges = Vec::new();
-        for arg in &manifest.finish_args {
-            if arg.contains("network") {
-                pledges.push("network".to_string());
-            } else if arg.contains("ipc") {
-                pledges.push("ipc".to_string());
-            } else if arg.contains("filesystem") {
-                pledges.push("unveil_all".to_string());
-            }
-        }
-        pledges
-    }
-
-    pub fn translate_snap_confinement(&self, manifest: &SnapcraftManifest) -> String {
-        if manifest.confinement == "strict" {
-            "strict_pledge_sandbox".to_string()
-        } else {
-            "unconfined_host".to_string()
-        }
-    }
-
-    pub fn mount_appimage_squashfs(&self, runtime: &AppImageRuntime) -> Result<String, &'static str> {
-        if runtime.squashfs_offset == 0 {
-            Err("Invalid squashfs offset")
-        } else {
-            Ok(format!("/tmp/.mount_{}_squashfs", runtime.app_name))
-        }
-    }
-
-    pub fn query_apt_repository(&self, config: &AptRepoConfig) -> bool {
-        !config.sourcelist_url.is_empty()
-    }
-
-    pub fn query_dnf_repository(&self, config: &DnfRepoConfig) -> bool {
-        config.enabled
-    }
     pub fn new(format: PackageFormat, adapter_name: String) -> Self {
         Self {
             format,
@@ -1796,7 +1777,6 @@ impl UniversalPackageManager {
             triggers: PackageTriggerRegistry::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
-            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();

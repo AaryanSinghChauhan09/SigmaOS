@@ -5,12 +5,6 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 #![allow(unexpected_cfgs)]
-use alloc::format;
-use alloc::vec;
-extern crate alloc;
-
-use std::format;
-use std::vec;
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
@@ -3670,7 +3664,7 @@ mod new_unimplemented_tests {
 
     #[test]
     fn test_rocky_alma_enterprise_lifecycle_governor() {
-        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9);
+        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9, 9);
         assert!(gov.verify_abi_compatibility(8));
         assert!(gov.verify_abi_compatibility(9));
         assert!(!gov.verify_abi_compatibility(10));
