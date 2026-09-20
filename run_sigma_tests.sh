@@ -65,6 +65,13 @@ if [ -f "src/distro/missing_linux_bsd_components.rs" ]; then
     ./build/missing_components_test
 fi
 
+if [ -f "src/distro/linux_bsd_ecosystem_synthesis.rs" ]; then
+    echo "Running Extended Linux & BSD Distro Ecosystem Synthesis test suite..."
+    mkdir -p build
+    rustc --test src/distro/linux_bsd_ecosystem_synthesis.rs --edition=2021 -o build/ecosystem_synthesis_test
+    ./build/ecosystem_synthesis_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then

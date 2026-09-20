@@ -309,6 +309,9 @@ pub use linux_bsd_pinnacle_synthesis::{
     UrpmiMediaSource, UrpmiPackageRecord,
 };
 
+pub mod linux_bsd_ecosystem_synthesis;
+pub use linux_bsd_ecosystem_synthesis::*;
+
 pub mod sovereign_2028_distro_supremacy_engine;
 pub use sovereign_2028_distro_supremacy_engine::{
     BpfSchedExtPolicy, DirectScanoutFrame, EbpfSchedTask, FineIbtCallsiteGuard,
