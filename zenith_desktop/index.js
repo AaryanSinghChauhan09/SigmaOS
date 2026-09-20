@@ -186,14 +186,32 @@ export function initHighContrastSupport() {
 }
 
 /**
- * Dismisses open modal overlays (#cmd-palette, #context-menu, #help-overlay) when Escape key is pressed.
+ * Dismisses open modal overlays (#cmd-palette, #context-menu, #help-overlay) when Escape key is pressed
+ * and toggles the Command Palette dialog on Alt+Space keyboard shortcut.
  */
 export function initEscapeKeyDismissal() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
   document.addEventListener("keydown", (event) => {
+    if (event.altKey && (event.code === "Space" || event.key === " ")) {
+      event.preventDefault();
+      const cmdPalette = document.getElementById("cmd-palette");
+      if (cmdPalette) {
+        const isActive = cmdPalette.classList.toggle("active");
+        cmdPalette.setAttribute("aria-hidden", isActive ? "false" : "true");
+        if (isActive) {
+          const cmdInput = document.getElementById("cmd-input");
+          if (cmdInput) cmdInput.focus();
+        }
+      }
+      return;
+    }
+
     if (event.key === "Escape") {
       const cmdPalette = document.getElementById("cmd-palette");
-      if (cmdPalette) cmdPalette.classList.remove("active");
+      if (cmdPalette) {
+        cmdPalette.classList.remove("active");
+        cmdPalette.setAttribute("aria-hidden", "true");
+      }
       const contextMenu = document.getElementById("context-menu");
       if (contextMenu) contextMenu.style.display = "none";
       const helpOverlay = document.getElementById("help-overlay");

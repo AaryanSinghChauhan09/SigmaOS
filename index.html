@@ -319,7 +319,7 @@
                     <div class="settings-group" style="margin-top: 10px;">
                         <div style="display: flex; gap: 8px; margin-bottom: 10px;">
                             <input type="text" id="archweb-search" class="cmd-input" placeholder="Search packages (e.g. linux-zen, hyprland, zfs, gcc)..." aria-label="Search ArchWeb & BSD Ports package database">
-                            <button type="button" class="wizard-btn" style="padding: 0 15px; font-size: 0.8rem;" onclick="searchArchWebPackages()">SEARCH</button>
+                            <button type="button" class="wizard-btn" style="padding: 0 15px; font-size: 0.8rem;" onclick="searchArchWebPackages()" aria-label="Search ArchWeb and BSD Ports packages">SEARCH</button>
                         </div>
                         <div style="display: flex; gap: 12px; font-size: 0.75rem; color: var(--text-muted);">
                             <span><strong>Repos:</strong> [core] [extra] [multilib] [aur] [freebsd-ports]</span>
@@ -561,7 +561,7 @@
     </div>
 
     <!-- Alt + Space Command Center -->
-    <div id="cmd-palette" role="dialog" aria-label="Command Center">
+    <div id="cmd-palette" role="dialog" aria-label="Command Center" aria-modal="true">
         <input type="text" class="cmd-input" id="cmd-input" placeholder="Search system commands (Alt+Space)..." aria-label="Search system commands (Alt+Space)">
         <div class="cmd-results" id="cmd-results"></div>
     </div>
