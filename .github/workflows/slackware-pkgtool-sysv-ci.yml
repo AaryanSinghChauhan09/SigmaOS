@@ -1,0 +1,23 @@
+name: Slackware Pkgtool SysVInit Parity CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  slackware-pkgtool-sysv:
+    name: Slackware SlackBuilds & SysVInit Target Parity Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Slackware Pkgtool & Target Mapper Tests
+        run: |
+          cargo test --test test_ultimate_synthesis test_slackware_pkgtool_sysv_engine
+          rustc --test --edition=2021 src/init/target_mapper.rs -o /tmp/test_mapper && /tmp/test_mapper

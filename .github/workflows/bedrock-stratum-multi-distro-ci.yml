@@ -1,0 +1,23 @@
+name: Bedrock Stratum Multi-Distro Integration CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  bedrock-stratum:
+    name: Bedrock Stratum Cross-Distro Compatibility Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Stratum Manager & Userland Runner Tests
+        run: |
+          rustc --test --edition=2021 src/userland/stratum.rs -o /tmp/test_stratum && /tmp/test_stratum
+          rustc --test --edition=2021 src/userland/format_runner.rs -o /tmp/test_runner && /tmp/test_runner

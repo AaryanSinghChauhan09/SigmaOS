@@ -1,0 +1,22 @@
+name: Haiku OS Packagefs & BFS Integration CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  haiku-packagefs-bfs:
+    name: Haiku Packagefs Virtual VFS & BFS Attribute Extraction Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Universal Engine Package Extension Checks
+        run: |
+          rustc --test --edition=2021 src/sigpkg/universal_engine.rs --cfg 'feature="standalone_test"' -o /tmp/test_engine && /tmp/test_engine

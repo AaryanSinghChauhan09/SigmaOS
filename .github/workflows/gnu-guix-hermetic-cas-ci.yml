@@ -1,0 +1,23 @@
+name: GNU Guix Hermetic CAS & Reproducible Build CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  guix-hermetic-store:
+    name: GNU Guix Content-Addressed Store & Hermetic Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Test Hermetic CAS Store & Derivation Reconciler
+        run: |
+          cargo test --test test_ultimate_synthesis test_nixos_hermetic_flake_gc_engine
+          cargo test --test test_distro_dominance test_nix_guix_zero_copy_store

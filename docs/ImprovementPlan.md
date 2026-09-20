@@ -110,10 +110,19 @@ All updates and recommendations are committed directly to the `main` branch, adh
   - **WCAG 2.1 AA:** Keyboard navigation, high-contrast focus states, and ARIA labels.
   - **ISO 27001:** Mandatory post-quantum Dilithium-5 signature verification on binary assets.
 
-### 4. Documentation & Workflow
-- **Completeness:** Complete documentation across `README.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `DEVELOPER_RULES.md`, `DEVELOPMENT_GUIDE.md`, and `ROADMAP.md`.
-- **CI Pipelines:** GitHub Actions matrix configured for test verification, linting, and automated multi-distro builds.
-- **Inline Documentation:** Standardized Rustdoc headers on all public traits, structs, and methods.
+### 4. Documentation & Workflow (Expanded GitHub Actions Matrix)
+- **Workflow Expansion:** `.github/workflows/` contains 55+ automated workflows inspired by 15+ Linux and BSD distributions:
+  - **Arch Linux:** `arch-aur-pkgbuild-ci.yml`, `arch-namcap-aur-audit-ci.yml`.
+  - **Alpine Linux:** `alpine-abuild-apk-ci.yml`, `alpine-musl-apk-security-ci.yml`.
+  - **CachyOS:** `cachyos-x86-64-v4-pqc-ci.yml` (AVX-512 & BORE scheduler).
+  - **Debian / Ubuntu:** `debian-autopkgtest-ci.yml`, `debian-sbuild-reproducible-ci.yml`, `ubuntu-apparmor-snapd-ci.yml`.
+  - **Fedora / openSUSE:** `fedora-crypto-policies-rpm-ostree-ci.yml`, `opensuse-obs-kiwi-ci.yml`.
+  - **FreeBSD:** `freebsd-jail-zfs-bootenv-ci.yml`, `freebsd-poudriere-ports-ci.yml`.
+  - **OpenBSD:** `openbsd-pf-pledge-security-ci.yml`, `openbsd-syspatch-pledge-ci.yml`.
+  - **NetBSD / DragonFly:** `netbsd-rump-kernel-ci.yml`, `dragonfly-hammer2-pfs-ci.yml`.
+  - **Gentoo / NixOS:** `gentoo-catalyst-stage3-ci.yml`, `gentoo-portage-ebuild-ci.yml`, `nixos-flake-store-gc-ci.yml`, `nixos-hydra-eval-ci.yml`, `gnu-guix-hermetic-cas-ci.yml`.
+  - **Specialty & Mobile:** `bedrock-stratum-multi-distro-ci.yml`, `postmarketos-mobile-wayland-ci.yml`, `illumos-crossbow-dtrace-ci.yml`, `talos-headless-mtls-ci.yml`, `slackware-pkgtool-sysv-ci.yml`, `haiku-packagefs-bfs-ci.yml`, `void-xbps-src-binary-ci.yml`.
+- **Pages & Deployment:** `07_Deployment_Auto_Pages_Deploy.yml` and `github-pages-wiki-deploy.yml` automatically test build assets and publish wiki pages.
 
 ### 5. Repo Governance
 - **Branch Health:** Direct commits on `main` branch adhering to repository governance guidelines.

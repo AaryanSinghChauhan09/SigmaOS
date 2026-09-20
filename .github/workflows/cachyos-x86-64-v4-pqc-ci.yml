@@ -1,0 +1,28 @@
+name: CachyOS x86-64-v4 BORE Scheduler & PQC CI
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  cachyos-microarch-optimization:
+    name: CachyOS x86-64-v4 AVX-512 & BORE Scheduler Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-gnu
+
+      - name: Verify x86-64-v4 Microarch Target Support
+        run: |
+          RUSTFLAGS="-C target-cpu=x86-64-v4" cargo check --lib
+
+      - name: Run BORE Scheduler & PQC Unit Tests
+        run: |
+          cargo test --test test_2026_distro_leap test_cachyos_microarch_v4_pqc_verifier
