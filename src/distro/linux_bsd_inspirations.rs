@@ -150,8 +150,7 @@ impl SovereignUniversalDistroBridge {
                 ServiceSupervisorType::Dinit
             }
             DistroSubsystemMode::LinuxSlackware
-            | DistroSubsystemMode::LinuxTinyCore
-            | DistroSubsystemMode::LinuxAntiX => ServiceSupervisorType::Sysvinit,
+            | DistroSubsystemMode::LinuxTinyCore => ServiceSupervisorType::Sysvinit,
             DistroSubsystemMode::SolarisIllumos => ServiceSupervisorType::Smf,
             DistroSubsystemMode::SmartOs => ServiceSupervisorType::Rcd,
         }
@@ -271,8 +270,7 @@ impl SovereignUniversalDistroBridge {
                 supervisor == ServiceSupervisorType::Dinit
             }
             DistroSubsystemMode::LinuxSlackware
-            | DistroSubsystemMode::LinuxTinyCore
-            | DistroSubsystemMode::LinuxAntiX => {
+            | DistroSubsystemMode::LinuxTinyCore => {
                 supervisor == ServiceSupervisorType::Sysvinit
             }
             DistroSubsystemMode::SolarisIllumos => supervisor == ServiceSupervisorType::Smf,
@@ -2129,23 +2127,6 @@ mod cross_subsystem_tests {
             DistroSubsystemMode::SolarisIllumos,
             DistroSubsystemMode::SmartOs,
             DistroSubsystemMode::BedrockLinux,
-<<<<<<< HEAD
-            DistroSubsystemMode::LinuxPopOs,
-            DistroSubsystemMode::LinuxTails,
-            DistroSubsystemMode::LinuxGuix,
-            DistroSubsystemMode::LinuxUbuntu,
-            DistroSubsystemMode::LinuxMint,
-            DistroSubsystemMode::LinuxKali,
-            DistroSubsystemMode::LinuxGaruda,
-            DistroSubsystemMode::LinuxEndeavour,
-            DistroSubsystemMode::LinuxManjaro,
-            DistroSubsystemMode::LinuxCachyOS,
-            DistroSubsystemMode::LinuxChimera,
-            DistroSubsystemMode::LinuxTinyCore,
-            DistroSubsystemMode::LinuxAntiX,
-            DistroSubsystemMode::LinuxZorin,
-=======
->>>>>>> origin/feature/linux-bsd-subsystem-orchestration-13138514967289028318
         ];
 
         for m in modes {

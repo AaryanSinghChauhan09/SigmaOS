@@ -3664,7 +3664,7 @@ mod new_unimplemented_tests {
 
     #[test]
     fn test_rocky_alma_enterprise_lifecycle_governor() {
-        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9, 9);
+        let mut gov = RockyAlmaLinuxEnterpriseLifecycleGovernor::new(9);
         assert!(gov.verify_abi_compatibility(8));
         assert!(gov.verify_abi_compatibility(9));
         assert!(!gov.verify_abi_compatibility(10));

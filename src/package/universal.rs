@@ -240,7 +240,7 @@ pub enum PackagePriority {
 }
 
 /// Supported package formats across Linux and BSD ecosystems
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PackageFormat {
     #[default]
     Deb,        // apt/dpkg
@@ -1926,6 +1926,7 @@ impl UniversalPackageManager {
             user_hooks: Vec::new(),
             node_distro_engine: NodeBinaryDistroEngine::new(),
             distro_repo_sync: DistroRepoSyncEngine::new(),
+            triggers: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
