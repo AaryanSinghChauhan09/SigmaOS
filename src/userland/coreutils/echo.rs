@@ -3,7 +3,7 @@
 //! Display the TEXT on standard output.
 
 use std::env;
-use std::io::{self, Write};
+use std::io::Write;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -17,7 +17,7 @@ fn main() {
     }
 }
 
-fn run(args: &[String]) -> Result<(), String> {
+pub fn run(args: &[String]) -> Result<(), String> {
     let mut suppress_newline = false;
     let mut enable_escape = false;
     let mut output_args = Vec::new();

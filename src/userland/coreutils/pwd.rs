@@ -3,7 +3,6 @@
 //! Print the name of the current working directory.
 
 use std::env;
-use std::io::{self, Write};
 
 fn main() {
     match run() {
@@ -15,7 +14,7 @@ fn main() {
     }
 }
 
-fn run() -> Result<(), String> {
+pub fn run() -> Result<(), String> {
     let current_dir = env::current_dir()
         .map_err(|e| format!("failed to get current directory: {}", e))?;
     

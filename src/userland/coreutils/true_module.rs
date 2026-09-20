@@ -4,7 +4,7 @@
 
 use std::process;
 
-fn main() {
+pub fn main() {
     process::exit(0);
 }
 

@@ -104,6 +104,8 @@ pub mod linux_network;
 pub mod linux_security;
 pub mod linux_standards;
 pub mod linuxulator;
+pub mod posix_signals;
+pub mod elf_dynamic_linker;
 pub mod localsend;
 pub mod lubuntu;
 pub mod macos_darwin;
@@ -428,6 +430,16 @@ pub use linux_compat::{
     BsdKqueueMultiplexer, DistroTargetProfile, LinuxCompatSpec, LinuxElfLoaderShim,
     LinuxProcFsAdapter, LinuxSyscallNum, LinuxSyscallTranslator, OpenBsdPledgeUnveilFilter,
     TargetDistro,
+};
+pub use posix_signals::{
+    PosixSignal, SignalMask, SignalFlags, SignalHandler, SignalInfo, SignalAction,
+    SignalDispositionTable, ThreadSignalMask, PosixSignalDeliveryEngine, SigprocmaskOp,
+    SignalStats,
+};
+pub use elf_dynamic_linker::{
+    ElfClass, ElfData, ElfMachine, ElfType, PhType, DynTag, SymBind, SymType as ElfSymType, RelType,
+    ElfSymbol, ElfRelocation, SharedLibrary, GotEntry, PltEntry, ElfDynamicLinker,
+    LinkerStats,
 };
 pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
 
