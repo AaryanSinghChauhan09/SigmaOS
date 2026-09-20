@@ -1,0 +1,21 @@
+[package]
+name = "sigmaos-fuzz"
+version = "0.1.0"
+authors = ["SigmaOS Core Engineers"]
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.sigmaos]
+path = ".."
+
+[[bin]]
+name = "fuzz_ipc_parser"
+path = "fuzz_targets/ipc_parser.rs"
+test = false
+doc = false

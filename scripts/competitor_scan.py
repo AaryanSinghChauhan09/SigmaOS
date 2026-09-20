@@ -9,6 +9,7 @@ and generates summary issues or report digests for continuous OS improvement.
 import json
 import urllib.request
 import os
+import sys
 
 WATCHLIST = [
     {"name": "Redox OS", "repo": "redox-os/redox", "focus": "Microkernel Rust OS & Userspace Drivers"},
@@ -19,7 +20,7 @@ WATCHLIST = [
     {"name": "smoltcp Network Stack", "repo": "smoltcp-rs/smoltcp", "focus": "Event-Driven no_std Networking"}
 ]
 
-def scan_competitors():
+def scan_competitors(create_issue: bool = False):
     print(":: Scanning Open-Source OS Upstream Repositories for Continuous Absorption...")
     results = []
 
@@ -51,12 +52,53 @@ def scan_competitors():
                 "status": f"Checked ({e})"
             })
 
-    output_path = os.path.join("build", "competitor_scan_report.json")
-    os.makedirs("build", exist_ok=True)
-    with open(output_path, "w") as f:
+    output_dir = "build"
+    os.makedirs(output_dir, exist_ok=True)
+
+    json_path = os.path.join(output_dir, "competitor_scan_report.json")
+    with open(json_path, "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"SUCCESS: Scanned {len(WATCHLIST)} upstream projects. Report written to {output_path}.")
+    md_path = os.path.join(output_dir, "competitor_scan_report.md")
+    md_content = "# SigmaOS Open-Source OS Competitor & Upstream Innovation Digest\n\n"
+    md_content += "| Project | Focus | Latest Release | Published At | Status |\n"
+    md_content += "| --- | --- | --- | --- | --- |\n"
+    for r in results:
+        md_content += f"| **{r['name']}** (`{r['repo']}`) | {r['focus']} | `{r['latest_release']}` | {r['published_at']} | {r['status']} |\n"
+
+    with open(md_path, "w") as f:
+        f.write(md_content)
+
+    print(f"SUCCESS: Scanned {len(WATCHLIST)} upstream projects. JSON report: {json_path}, Markdown report: {md_path}")
+
+    if create_issue:
+        token = os.environ.get("GITHUB_TOKEN")
+        repo = os.environ.get("GITHUB_REPOSITORY")
+        if token and repo:
+            issue_url = f"https://api.github.com/repos/{repo}/issues"
+            issue_data = {
+                "title": "Monthly Upstream OS Competitor Innovation Digest",
+                "body": md_content,
+                "labels": ["enhancement", "documentation"]
+            }
+            req = urllib.request.Request(
+                issue_url,
+                data=json.dumps(issue_data).encode("utf-8"),
+                headers={
+                    "Authorization": f"token {token}",
+                    "Accept": "application/vnd.github.v3+json",
+                    "User-Agent": "SigmaOS-Competitor-Scan"
+                },
+                method="POST"
+            )
+            try:
+                with urllib.request.urlopen(req) as resp:
+                    print(f"Created GitHub Issue for upstream digest (HTTP {resp.status}).")
+            except Exception as e:
+                print(f"Notice: Could not post GitHub issue automatically: {e}")
+        else:
+            print("Notice: GITHUB_TOKEN or GITHUB_REPOSITORY not configured. Markdown report available in build/competitor_scan_report.md.")
 
 if __name__ == "__main__":
-    scan_competitors()
+    create_issue_flag = "--issue" in sys.argv
+    scan_competitors(create_issue=create_issue_flag)
