@@ -387,4 +387,6 @@ pub use tools::{
 pub mod open_source_obsoletion;
 pub use open_source_obsoletion::*;
 
+pub use distro::missing_linux_bsd_components::*;
+
 pub use unimplemented_features::*;

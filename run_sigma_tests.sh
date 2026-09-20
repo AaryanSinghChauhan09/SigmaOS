@@ -51,6 +51,13 @@ if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     ./build/distro_breakthroughs_test
 fi
 
+if [ -f "src/distro/missing_linux_bsd_components.rs" ]; then
+    echo "Running Missing Linux & BSD Components test suite..."
+    mkdir -p build
+    rustc --test src/distro/missing_linux_bsd_components.rs --edition=2021 -o build/missing_components_test
+    ./build/missing_components_test
+fi
+
 echo "=== All SigmaOS Tests Passed ==="
 
 if [ -f "src/launch_ready/mod.rs" ]; then
