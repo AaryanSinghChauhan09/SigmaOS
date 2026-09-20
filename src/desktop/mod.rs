@@ -10,7 +10,14 @@ pub mod pantheon;
 pub mod screensaver;
 pub mod sovereign_navigation_engine;
 pub mod web_wasm_bridge;
+pub mod zenith;
 pub mod zenith_compositor;
+
+pub use zenith::{
+    FractionalDisplayScaler, HyprlandTilingLayoutEngine, OmarchyThemeSyncEngine, SimpleDesktopCompositor,
+    SimpleWindow, TilingLayoutMode, WaylandCosmicScanoutPipeline, Window, WindowCapability,
+    WindowInfo,
+};
 pub mod ultimate_distro_desktop;
 pub mod wayland_protocol;
 pub mod sovereign_ux_innovation_hub;

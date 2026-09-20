@@ -43,7 +43,9 @@ pub use legacy_parallel_printer::LegacyParallelPrinter;
 pub use linux_bsd_drivers::{
     DrmAtomicKmsState, DrmConnectorType, DrmDisplayMode, EvdevEvent, EvdevInputDevice, EvdevEventType,
     FreeBsdDrmConnector, MultiTouchSlot, OpenBsdDriverPledge, DriverCapability,
-    NetBsdRumpDriverHost, UrbTransferType, LinuxUrb, LinuxUrbQueue,
+    NetBsdRumpDriverHost, UrbTransferType, LinuxUrb, LinuxUrbQueue, SovereignDevdRulesEngine,
+    SovereignPciModaliasMatcher, SovereignVirtioDeviceProbe, SovereignUsb4ThunderboltAuthEngine,
+    SovereignNvmeNamespaceController, SecurityLevel,
 };
 pub use modern_audio_intel_hda::ModernAudioIntelHda;
 pub use modern_usb::ModernUsbController;
