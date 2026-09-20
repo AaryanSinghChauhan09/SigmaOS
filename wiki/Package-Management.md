@@ -166,6 +166,7 @@ For detailed implementation specifications:
 - [Architecture](ARCHITECTURE.md)
 - [Security](SECURITY.md)
 - [Roadmap](ROADMAP.md)
+- [Kernel](Kernel.md)
 
 ## Contributing
 
