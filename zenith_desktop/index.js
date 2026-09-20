@@ -185,6 +185,8 @@ export function initHighContrastSupport() {
   }
 }
 
+let lastFocusedElement = null;
+
 /**
  * Dismisses open modal overlays (#cmd-palette, #context-menu, #help-overlay) when Escape key is pressed
  * and toggles the Command Palette dialog on Alt+Space keyboard shortcut.
@@ -199,8 +201,16 @@ export function initEscapeKeyDismissal() {
         const isActive = cmdPalette.classList.toggle("active");
         cmdPalette.setAttribute("aria-hidden", isActive ? "false" : "true");
         if (isActive) {
+          lastFocusedElement = document.activeElement;
           const cmdInput = document.getElementById("cmd-input");
           if (cmdInput) cmdInput.focus();
+        } else {
+          const cmdInput = document.getElementById("cmd-input");
+          if (cmdInput) cmdInput.blur();
+          if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+            lastFocusedElement.focus();
+            lastFocusedElement = null;
+          }
         }
       }
       return;
@@ -209,8 +219,17 @@ export function initEscapeKeyDismissal() {
     if (event.key === "Escape") {
       const cmdPalette = document.getElementById("cmd-palette");
       if (cmdPalette) {
+        const wasActive = cmdPalette.classList.contains("active");
         cmdPalette.classList.remove("active");
         cmdPalette.setAttribute("aria-hidden", "true");
+        if (wasActive) {
+          const cmdInput = document.getElementById("cmd-input");
+          if (cmdInput) cmdInput.blur();
+          if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+            lastFocusedElement.focus();
+            lastFocusedElement = null;
+          }
+        }
       }
       const contextMenu = document.getElementById("context-menu");
       if (contextMenu) contextMenu.style.display = "none";
