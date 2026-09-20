@@ -45,6 +45,9 @@ impl fmt::Display for IsoError {
 /// Result type alias for Iso operations
 pub type IsoResult<T> = Result<T, IsoError>;
 
+pub mod sovereign_rufus_installer_synthesis;
+pub use sovereign_rufus_installer_synthesis::*;
+
 /// IsoImage - primary abstraction for this module
 #[derive(Debug, Clone)]
 pub struct IsoImage {
