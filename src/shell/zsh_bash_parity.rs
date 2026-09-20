@@ -1041,6 +1041,10 @@ pub enum ShellDialect {
     Ksh,
     Dash,
     BsdSh,
+    Nu,
+    Ion,
+    Rc,
+    Elvish,
 }
 
 pub struct FishAbbreviationEngine {
@@ -1262,6 +1266,14 @@ impl UniversalShellCompatibilityEngine {
                     return ShellDialect::Ksh;
                 } else if trimmed.contains("dash") {
                     return ShellDialect::Dash;
+                } else if trimmed.contains("nu") {
+                    return ShellDialect::Nu;
+                } else if trimmed.contains("ion") {
+                    return ShellDialect::Ion;
+                } else if trimmed.contains("rc") {
+                    return ShellDialect::Rc;
+                } else if trimmed.contains("elvish") {
+                    return ShellDialect::Elvish;
                 } else if trimmed.contains("sh") {
                     return ShellDialect::BsdSh;
                 }
@@ -1325,6 +1337,10 @@ impl UniversalScriptTranspiler {
                 ShellDialect::Bash | ShellDialect::Zsh | ShellDialect::Ksh => {
                     Self::transpile_bash_zsh_line(trimmed)
                 }
+                ShellDialect::Nu => Self::transpile_nu_line(trimmed, &mut in_function),
+                ShellDialect::Ion => Self::transpile_ion_line(trimmed, &mut in_function),
+                ShellDialect::Rc => Self::transpile_rc_line(trimmed, &mut in_function),
+                ShellDialect::Elvish => Self::transpile_elvish_line(trimmed, &mut in_function),
                 ShellDialect::Dash | ShellDialect::BsdSh => trimmed.to_string(),
             };
 
@@ -1844,6 +1860,122 @@ impl UniversalScriptTranspiler {
             return res;
         }
 
+        l
+    }
+
+    fn transpile_nu_line(line: &str, in_function: &mut bool) -> String {
+        let l = line.to_string();
+        if l.starts_with("let-env ") || l.starts_with("$env.") {
+            let clean = l.trim_start_matches("let-env ").trim_start_matches("$env.").trim();
+            if let Some(eq) = clean.find('=') {
+                let var = clean[..eq].trim();
+                let val = clean[eq + 1..].trim().trim_matches('"').trim_matches('\'');
+                return format!("export {}={}", var, val);
+            }
+        } else if l.starts_with("let ") || l.starts_with("mut ") {
+            let clean = l.trim_start_matches("let ").trim_start_matches("mut ").trim();
+            if let Some(eq) = clean.find('=') {
+                let var = clean[..eq].trim();
+                let val = clean[eq + 1..].trim().trim_matches('"').trim_matches('\'');
+                return format!("{}={}", var, val);
+            }
+        } else if l.starts_with("def ") {
+            let rest = l.trim_start_matches("def ").trim();
+            let name = rest.split_whitespace().next().unwrap_or("fn");
+            *in_function = true;
+            return format!("{}() {{", name);
+        } else if l == "}" && *in_function {
+            *in_function = false;
+            return "}".to_string();
+        } else if l.starts_with("where ") {
+            let cond = l.trim_start_matches("where ").trim();
+            return format!("grep {}", cond);
+        }
+        l
+    }
+
+    fn transpile_ion_line(line: &str, in_function: &mut bool) -> String {
+        let l = line.to_string();
+        if l.starts_with("export ") {
+            let rest = l.trim_start_matches("export ").trim();
+            if let Some(eq) = rest.find('=') {
+                let var = rest[..eq].trim();
+                let val = rest[eq + 1..].trim();
+                return format!("export {}={}", var, val);
+            }
+        } else if l.starts_with("let ") {
+            let rest = l.trim_start_matches("let ").trim();
+            if let Some(eq) = rest.find('=') {
+                let var = rest[..eq].trim();
+                let val = rest[eq + 1..].trim();
+                return format!("{}={}", var, val);
+            }
+        } else if l.starts_with("fn ") {
+            let rest = l.trim_start_matches("fn ").trim();
+            let name = rest.split_whitespace().next().unwrap_or("func");
+            *in_function = true;
+            return format!("{}() {{", name);
+        } else if l == "end" {
+            if *in_function {
+                *in_function = false;
+                return "}".to_string();
+            }
+            return "done".to_string();
+        } else if l.starts_with("if test ") {
+            let cond = l.trim_start_matches("if test ").trim();
+            return format!("if [ {} ]; then", cond);
+        } else if l.starts_with("match ") {
+            let var = l.trim_start_matches("match ").trim();
+            return format!("case {} in", var);
+        }
+        l
+    }
+
+    fn transpile_rc_line(line: &str, in_function: &mut bool) -> String {
+        let l = line.to_string();
+        if l.starts_with("fn ") && l.ends_with('{') {
+            let name = l.trim_start_matches("fn ").trim_end_matches('{').trim();
+            *in_function = true;
+            return format!("{}() {{", name);
+        } else if l == "}" && *in_function {
+            *in_function = false;
+            return "}".to_string();
+        } else if l.starts_with("for (") {
+            if let (Some(open), Some(close)) = (l.find('('), l.find(')')) {
+                let inner = &l[open + 1..close];
+                if let Some(in_pos) = inner.find(" in ") {
+                    let var = inner[..in_pos].trim();
+                    let list = inner[in_pos + 4..].trim();
+                    return format!("for {} in {}; do", var, list);
+                }
+            }
+        } else if l.starts_with("whatis ") {
+            let var = l.trim_start_matches("whatis ").trim();
+            return format!("type {}", var);
+        }
+        l
+    }
+
+    fn transpile_elvish_line(line: &str, in_function: &mut bool) -> String {
+        let l = line.to_string();
+        if l.starts_with("var ") || l.starts_with("set ") {
+            let clean = l.trim_start_matches("var ").trim_start_matches("set ").trim();
+            if let Some(eq) = clean.find('=') {
+                let var = clean[..eq].trim();
+                let val = clean[eq + 1..].trim();
+                return format!("{}={}", var, val);
+            }
+        } else if l.starts_with("fn ") {
+            let rest = l.trim_start_matches("fn ").trim();
+            let name = rest.split_whitespace().next().unwrap_or("func");
+            *in_function = true;
+            return format!("{}() {{", name);
+        } else if l == "}" && *in_function {
+            *in_function = false;
+            return "}".to_string();
+        } else if l == "nop" {
+            return ":".to_string();
+        }
         l
     }
 }
@@ -2409,5 +2541,32 @@ mod tests {
         env.insert("FILE".to_string(), "archive.tar.gz".to_string());
         assert_eq!(BashParameterExpansion::expand("${FILE#archive.}", &env), "tar.gz");
         assert_eq!(BashParameterExpansion::expand("${FILE%.gz}", &env), "archive.tar");
+
+        // Test Nu, Ion, Rc, and Elvish shebang detection & transpilation
+        let nu_script = "#!/usr/bin/env nu\nlet-env FOO = bar\ndef my_func [] {\nwhere size > 10\n}";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(nu_script), ShellDialect::Nu);
+        let posix_nu = UniversalScriptTranspiler::transpile_to_posix_sh(nu_script, ShellDialect::Nu);
+        assert!(posix_nu.contains("export FOO=bar"));
+        assert!(posix_nu.contains("my_func() {"));
+        assert!(posix_nu.contains("grep size > 10"));
+
+        let ion_script = "#!/bin/ion\nexport PORT = 8080\nfn setup\nif test -f /tmp/a\nend";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(ion_script), ShellDialect::Ion);
+        let posix_ion = UniversalScriptTranspiler::transpile_to_posix_sh(ion_script, ShellDialect::Ion);
+        assert!(posix_ion.contains("export PORT=8080"));
+        assert!(posix_ion.contains("setup() {"));
+        assert!(posix_ion.contains("if [ -f /tmp/a ]; then"));
+
+        let rc_script = "#!/bin/rc\nfn test_rc {\nwhatis MY_VAR\n}";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(rc_script), ShellDialect::Rc);
+        let posix_rc = UniversalScriptTranspiler::transpile_to_posix_sh(rc_script, ShellDialect::Rc);
+        assert!(posix_rc.contains("test_rc() {"));
+        assert!(posix_rc.contains("type MY_VAR"));
+
+        let elvish_script = "#!/usr/bin/elvish\nvar STATUS = ok\nnop";
+        assert_eq!(UniversalShellCompatibilityEngine::detect_shebang_dialect(elvish_script), ShellDialect::Elvish);
+        let posix_elvish = UniversalScriptTranspiler::transpile_to_posix_sh(elvish_script, ShellDialect::Elvish);
+        assert!(posix_elvish.contains("STATUS=ok"));
+        assert!(posix_elvish.contains(":"));
     }
 }
