@@ -347,10 +347,10 @@
 - **Last Verified:** 2025-01-22
 
 ### 12.4 Wiki Structure
-- **Status:** `Specification only`
-- **Evidence:** `docs/WIKI_STRUCTURE_PLAN.md` (new) defines Arch Linux-inspired wiki hierarchy
+- **Status:** `Partially implemented`
+- **Evidence:** `docs/WIKI_STRUCTURE_PLAN.md` (new) defines Arch Linux-inspired wiki hierarchy, `docs/WIKI_CONSOLIDATION_STATUS.md` (new) tracks consolidation progress
 - **Tests:** None
-- **Gaps:** No content migrated, no CI integration, no page generation
+- **Gaps:** 857 markdown files in wiki/ (118,908 lines), need consolidation to one-page-per-topic structure
 - **CI:** None
 - **Last Verified:** 2025-01-22
 
