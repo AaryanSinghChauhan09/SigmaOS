@@ -24,9 +24,15 @@ pub mod sai;
 pub mod sigma_data;
 pub mod sigma_logic;
 pub mod system;
+pub mod system_ai;
 pub mod tensor_memory;
 pub mod voice;
 pub mod wandr;
+
+pub use system_ai::{
+    BsdSandboxedLlmInferenceDaemon, CrashLogDiagnostic, DistroAiKernelGovernorEngine,
+    DistroAiPackageSelfHealingEngine, DistroAiZeroKnowledgeAgentVault, GpuAiWorkloadPolicy,
+};
 
 pub use agentic_os_runtime::{
     AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,
