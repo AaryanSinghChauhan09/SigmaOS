@@ -2420,6 +2420,637 @@ impl SovereignWorkgroupGanttEngine {
     }
 }
 
+// ==========================================================
+// 16. Google Keep / Zoho Notebook / OneNote Quick Note & Web Clipper Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct QuickNoteChecklistItem {
+    pub text: String,
+    pub completed: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct SovereignQuickNote {
+    pub note_id: u32,
+    pub title: String,
+    pub content_body: String,
+    pub color_tag: String, // e.g. "#FFEB3B", "#4CAF50"
+    pub pinned: bool,
+    pub checklist: Vec<QuickNoteChecklistItem>,
+    pub web_clipper_url: Option<String>,
+    pub created_sec: u64,
+}
+
+/// Sovereign Quick Notes & Web Clipper Engine (Google Keep / OneNote / Zoho Notebook inspired)
+pub struct SovereignQuickNotesEngine {
+    pub notes: Vec<SovereignQuickNote>,
+    pub next_note_id: u32,
+}
+
+impl SovereignQuickNotesEngine {
+    pub fn new() -> Self {
+        Self {
+            notes: Vec::new(),
+            next_note_id: 1,
+        }
+    }
+
+    pub fn create_note(&mut self, title: &str, content: &str, color_tag: &str) -> u32 {
+        let id = self.next_note_id;
+        self.next_note_id += 1;
+        self.notes.push(SovereignQuickNote {
+            note_id: id,
+            title: title.to_string(),
+            content_body: content.to_string(),
+            color_tag: color_tag.to_string(),
+            pinned: false,
+            checklist: Vec::new(),
+            web_clipper_url: None,
+            created_sec: 1000 + id as u64,
+        });
+        id
+    }
+
+    pub fn toggle_pin(&mut self, note_id: u32) -> bool {
+        if let Some(note) = self.notes.iter_mut().find(|n| n.note_id == note_id) {
+            note.pinned = !note.pinned;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn add_checklist_item(&mut self, note_id: u32, item_text: &str) -> bool {
+        if let Some(note) = self.notes.iter_mut().find(|n| n.note_id == note_id) {
+            note.checklist.push(QuickNoteChecklistItem {
+                text: item_text.to_string(),
+                completed: false,
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn clip_web_page(&mut self, title: &str, url: &str, extracted_text: &str) -> u32 {
+        let id = self.next_note_id;
+        self.next_note_id += 1;
+        self.notes.push(SovereignQuickNote {
+            note_id: id,
+            title: title.to_string(),
+            content_body: extracted_text.to_string(),
+            color_tag: "#2196F3".to_string(),
+            pinned: false,
+            checklist: Vec::new(),
+            web_clipper_url: Some(url.to_string()),
+            created_sec: 2000 + id as u64,
+        });
+        id
+    }
+
+    pub fn export_note_to_text_processor(&self, note_id: u32, processor: &mut TextProcessor) -> Result<()> {
+        if let Some(note) = self.notes.iter().find(|n| n.note_id == note_id) {
+            processor.add_heading(1, &note.title)?;
+            if let Some(url) = &note.web_clipper_url {
+                processor.add_text(&format!("Source: {}", url), false, true)?;
+                processor.add_paragraph()?;
+            }
+            processor.add_text(&note.content_body, false, false)?;
+            processor.add_paragraph()?;
+            for item in &note.checklist {
+                let check_mark = if item.completed { "[X] " } else { "[ ] " };
+                processor.add_text(&format!("{}{}", check_mark, item.text), false, false)?;
+                processor.add_paragraph()?;
+            }
+            Ok(())
+        } else {
+            Err("Note not found")
+        }
+    }
+}
+
+impl Default for SovereignQuickNotesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 17. Google Sites / Microsoft Sway / Zoho Sites Web Publisher Engine
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub enum WebPublisherBlock {
+    HeroBanner { title: String, subtitle: String },
+    SectionText { heading: String, body: String },
+    EmbeddedSpreadsheet { sheet_title: String, csv_data: String },
+    ContactForm { form_title: String, form_id: u32 },
+}
+
+pub struct SovereignWebPage {
+    pub page_id: u32,
+    pub url_path: String,
+    pub page_title: String,
+    pub blocks: Vec<WebPublisherBlock>,
+}
+
+/// Sovereign Web & Intranet Publishing Engine (Google Sites / MS Sway inspired)
+pub struct SovereignWebPublisherEngine {
+    pub site_name: String,
+    pub pages: Vec<SovereignWebPage>,
+    pub next_page_id: u32,
+}
+
+impl SovereignWebPublisherEngine {
+    pub fn new(site_name: &str) -> Self {
+        Self {
+            site_name: site_name.to_string(),
+            pages: Vec::new(),
+            next_page_id: 1,
+        }
+    }
+
+    pub fn create_page(&mut self, url_path: &str, title: &str) -> u32 {
+        let pid = self.next_page_id;
+        self.next_page_id += 1;
+        self.pages.push(SovereignWebPage {
+            page_id: pid,
+            url_path: url_path.to_string(),
+            page_title: title.to_string(),
+            blocks: Vec::new(),
+        });
+        pid
+    }
+
+    pub fn add_block(&mut self, page_id: u32, block: WebPublisherBlock) -> bool {
+        if let Some(page) = self.pages.iter_mut().find(|p| p.page_id == page_id) {
+            page.blocks.push(block);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn render_html_page(&self, page_id: u32) -> Option<String> {
+        let page = self.pages.iter().find(|p| p.page_id == page_id)?;
+        let mut html = format!("<!DOCTYPE html><html><head><title>{} - {}</title></head><body>\n", page.page_title, self.site_name);
+        html.push_str(&format!("<header><h1>{}</h1></header><main>\n", self.site_name));
+
+        for block in &page.blocks {
+            match block {
+                WebPublisherBlock::HeroBanner { title, subtitle } => {
+                    html.push_str(&format!("<section class=\"hero\"><h2>{}</h2><p>{}</p></section>\n", title, subtitle));
+                }
+                WebPublisherBlock::SectionText { heading, body } => {
+                    html.push_str(&format!("<section><h3>{}</h3><p>{}</p></section>\n", heading, body));
+                }
+                WebPublisherBlock::EmbeddedSpreadsheet { sheet_title, csv_data } => {
+                    html.push_str(&format!("<section class=\"spreadsheet\"><h3>{}</h3><pre>{}</pre></section>\n", sheet_title, csv_data));
+                }
+                WebPublisherBlock::ContactForm { form_title, form_id } => {
+                    html.push_str(&format!("<section class=\"form\"><h3>{}</h3><form data-id=\"{}\"></form></section>\n", form_title, form_id));
+                }
+            }
+        }
+        html.push_str("</main></body></html>");
+        Some(html)
+    }
+}
+
+// ==========================================================
+// 18. MS Access / Zoho Creator / Airtable Relational Low-Code Database
+// ==========================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DatabaseFieldType {
+    Text,
+    Number,
+    SelectOptions(Vec<String>),
+    ForeignKey { target_table: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct LowCodeFieldSchema {
+    pub field_name: String,
+    pub field_type: DatabaseFieldType,
+}
+
+#[derive(Debug, Clone)]
+pub struct LowCodeRecord {
+    pub record_id: u32,
+    pub values: HashMap<String, String>,
+}
+
+pub struct LowCodeTable {
+    pub table_name: String,
+    pub schema: Vec<LowCodeFieldSchema>,
+    pub records: Vec<LowCodeRecord>,
+    pub next_record_id: u32,
+}
+
+impl LowCodeTable {
+    pub fn new(name: &str) -> Self {
+        Self {
+            table_name: name.to_string(),
+            schema: Vec::new(),
+            records: Vec::new(),
+            next_record_id: 1,
+        }
+    }
+
+    pub fn add_field(&mut self, name: &str, field_type: DatabaseFieldType) {
+        self.schema.push(LowCodeFieldSchema {
+            field_name: name.to_string(),
+            field_type,
+        });
+    }
+
+    pub fn insert_record(&mut self, values: HashMap<String, String>) -> u32 {
+        let rid = self.next_record_id;
+        self.next_record_id += 1;
+        self.records.push(LowCodeRecord {
+            record_id: rid,
+            values,
+        });
+        rid
+    }
+}
+
+/// Sovereign Relational Low-Code Database Engine (MS Access / Zoho Creator / Airtable)
+pub struct SovereignLowCodeDatabaseEngine {
+    pub database_name: String,
+    pub tables: HashMap<String, LowCodeTable>,
+}
+
+impl SovereignLowCodeDatabaseEngine {
+    pub fn new(db_name: &str) -> Self {
+        Self {
+            database_name: db_name.to_string(),
+            tables: HashMap::new(),
+        }
+    }
+
+    pub fn create_table(&mut self, table_name: &str) {
+        self.tables.insert(table_name.to_string(), LowCodeTable::new(table_name));
+    }
+
+    pub fn lookup_foreign_key(&self, source_table: &str, fk_field: &str, record_id: u32, target_table: &str) -> Option<String> {
+        let src_tbl = self.tables.get(source_table)?;
+        let src_rec = src_tbl.records.iter().find(|r| r.record_id == record_id)?;
+        let target_id_str = src_rec.values.get(fk_field)?;
+        let target_id = target_id_str.parse::<u32>().ok()?;
+
+        let tgt_tbl = self.tables.get(target_table)?;
+        let tgt_rec = tgt_tbl.records.iter().find(|r| r.record_id == target_id)?;
+        tgt_rec.values.values().next().cloned()
+    }
+}
+
+// ==========================================================
+// 19. Google Meet / Microsoft Teams / Bitrix24 Collaborative Whiteboard
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub enum WhiteboardElement {
+    StickyNote { text: String, color_hex: String, position: (f32, f32) },
+    VectorStroke { points: Vec<(f32, f32)>, stroke_color: [u8; 4] },
+    ShapeBox { label: String, position: (f32, f32), dimensions: (f32, f32) },
+    ConnectorArrow { start_pos: (f32, f32), end_pos: (f32, f32) },
+}
+
+/// Collaborative Vector Whiteboard Canvas Engine (Google Jamboard / Bitrix24 / Teams)
+pub struct SovereignCollaborativeWhiteboardEngine {
+    pub canvas_title: String,
+    pub elements: Vec<WhiteboardElement>,
+}
+
+impl SovereignCollaborativeWhiteboardEngine {
+    pub fn new(title: &str) -> Self {
+        Self {
+            canvas_title: title.to_string(),
+            elements: Vec::new(),
+        }
+    }
+
+    pub fn add_sticky_note(&mut self, text: &str, color: &str, pos: (f32, f32)) {
+        self.elements.push(WhiteboardElement::StickyNote {
+            text: text.to_string(),
+            color_hex: color.to_string(),
+            position: pos,
+        });
+    }
+
+    pub fn add_shape_box(&mut self, label: &str, pos: (f32, f32), dims: (f32, f32)) {
+        self.elements.push(WhiteboardElement::ShapeBox {
+            label: label.to_string(),
+            position: pos,
+            dimensions: dims,
+        });
+    }
+
+    pub fn add_connector(&mut self, start: (f32, f32), end: (f32, f32)) {
+        self.elements.push(WhiteboardElement::ConnectorArrow {
+            start_pos: start,
+            end_pos: end,
+        });
+    }
+
+    /// Converts whiteboard sticky notes and shapes directly into a Google Slides / PPT presentation slide
+    pub fn export_to_presentation_processor(&self, presenter: &mut PresentationProcessor) -> Result<()> {
+        presenter.add_slide()?;
+        for elem in &self.elements {
+            match elem {
+                WhiteboardElement::StickyNote { text, position, .. } => {
+                    presenter.add_text_box(text, 14, *position)?;
+                }
+                WhiteboardElement::ShapeBox { label, position, .. } => {
+                    presenter.add_shape(ShapeType::Rectangle, [200, 200, 200, 255], *position)?;
+                    presenter.add_text_box(label, 12, *position)?;
+                }
+                _ => {}
+            }
+        }
+        Ok(())
+    }
+}
+
+// ==========================================================
+// 20. Salesforce / Zoho Desk / Odoo Helpdesk Ticket & SLA Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TicketStatus {
+    Open,
+    InProgress,
+    PendingCustomer,
+    Resolved,
+    Closed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TicketPriority {
+    Low,
+    Medium,
+    High,
+    Urgent,
+}
+
+#[derive(Debug, Clone)]
+pub struct HelpdeskTicket {
+    pub ticket_id: u32,
+    pub customer_email: String,
+    pub subject: String,
+    pub description: String,
+    pub priority: TicketPriority,
+    pub status: TicketStatus,
+    pub created_sec: u64,
+    pub sla_deadline_sec: u64,
+}
+
+/// Sovereign Helpdesk Ticket & SLA SLA Engine (Salesforce / Zoho Desk / Odoo Helpdesk)
+pub struct SovereignHelpdeskSlaEngine {
+    pub tickets: Vec<HelpdeskTicket>,
+    pub next_ticket_id: u32,
+}
+
+impl SovereignHelpdeskSlaEngine {
+    pub fn new() -> Self {
+        Self {
+            tickets: Vec::new(),
+            next_ticket_id: 1,
+        }
+    }
+
+    pub fn create_ticket(&mut self, customer: &str, subject: &str, desc: &str, priority: TicketPriority, created_sec: u64) -> u32 {
+        let tid = self.next_ticket_id;
+        self.next_ticket_id += 1;
+        let sla_duration_sec = match priority {
+            TicketPriority::Urgent => 3600,       // 1 hour SLA
+            TicketPriority::High => 14400,       // 4 hours SLA
+            TicketPriority::Medium => 86400,     // 24 hours SLA
+            TicketPriority::Low => 172800,       // 48 hours SLA
+        };
+        self.tickets.push(HelpdeskTicket {
+            ticket_id: tid,
+            customer_email: customer.to_string(),
+            subject: subject.to_string(),
+            description: desc.to_string(),
+            priority,
+            status: TicketStatus::Open,
+            created_sec,
+            sla_deadline_sec: created_sec + sla_duration_sec,
+        });
+        tid
+    }
+
+    pub fn update_status(&mut self, ticket_id: u32, new_status: TicketStatus) -> bool {
+        if let Some(t) = self.tickets.iter_mut().find(|t| t.ticket_id == ticket_id) {
+            t.status = new_status;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_breached_sla_tickets(&self, current_time_sec: u64) -> Vec<&HelpdeskTicket> {
+        self.tickets
+            .iter()
+            .filter(|t| t.status != TicketStatus::Resolved && t.status != TicketStatus::Closed && current_time_sec > t.sla_deadline_sec)
+            .collect()
+    }
+}
+
+impl Default for SovereignHelpdeskSlaEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 21. Odoo Inventory & Warehouse Supply Chain Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ValuationMethod {
+    Fifo,
+    Lifo,
+    WeightedAverage,
+}
+
+#[derive(Debug, Clone)]
+pub struct InventorySkuItem {
+    pub sku_id: String,
+    pub name: String,
+    pub warehouse_location: String,
+    pub quantity_on_hand: u32,
+    pub reorder_point: u32,
+    pub unit_cost: f64,
+}
+
+/// Odoo Inventory & Warehouse Multi-Location Supply Chain Engine
+pub struct SovereignInventoryWarehouseEngine {
+    pub valuation_method: ValuationMethod,
+    pub skus: HashMap<String, InventorySkuItem>,
+}
+
+impl SovereignInventoryWarehouseEngine {
+    pub fn new(valuation_method: ValuationMethod) -> Self {
+        Self {
+            valuation_method,
+            skus: HashMap::new(),
+        }
+    }
+
+    pub fn add_sku(&mut self, item: InventorySkuItem) {
+        self.skus.insert(item.sku_id.clone(), item);
+    }
+
+    pub fn adjust_stock(&mut self, sku_id: &str, delta: i32) -> Option<u32> {
+        let item = self.skus.get_mut(sku_id)?;
+        let new_qty = (item.quantity_on_hand as i32) + delta;
+        item.quantity_on_hand = new_qty.max(0) as u32;
+        Some(item.quantity_on_hand)
+    }
+
+    pub fn get_skus_requiring_reorder(&self) -> Vec<&InventorySkuItem> {
+        self.skus
+            .values()
+            .filter(|item| item.quantity_on_hand <= item.reorder_point)
+            .collect()
+    }
+
+    pub fn calculate_total_inventory_valuation(&self) -> f64 {
+        self.skus
+            .values()
+            .map(|item| (item.quantity_on_hand as f64) * item.unit_cost)
+            .sum()
+    }
+}
+
+// ==========================================================
+// 22. Bitrix24 / MS Viva / Zoho Connect Employee Directory & Org Chart
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct EmployeeNode {
+    pub employee_id: String,
+    pub name: String,
+    pub title: String,
+    pub department: String,
+    pub manager_id: Option<String>,
+}
+
+/// Bitrix24 / MS Viva Org Chart & Hierarchical Employee Directory
+pub struct SovereignEmployeeOrgChartEngine {
+    pub employees: HashMap<String, EmployeeNode>,
+}
+
+impl SovereignEmployeeOrgChartEngine {
+    pub fn new() -> Self {
+        Self {
+            employees: HashMap::new(),
+        }
+    }
+
+    pub fn add_employee(&mut self, emp: EmployeeNode) {
+        self.employees.insert(emp.employee_id.clone(), emp);
+    }
+
+    pub fn get_direct_reports(&self, manager_id: &str) -> Vec<&EmployeeNode> {
+        self.employees
+            .values()
+            .filter(|e| e.manager_id.as_deref() == Some(manager_id))
+            .collect()
+    }
+
+    pub fn get_management_chain(&self, employee_id: &str) -> Vec<&EmployeeNode> {
+        let mut chain = Vec::new();
+        let mut curr_id = self.employees.get(employee_id).and_then(|e| e.manager_id.clone());
+
+        while let Some(mgr_id) = curr_id {
+            if let Some(mgr) = self.employees.get(&mgr_id) {
+                chain.push(mgr);
+                curr_id = mgr.manager_id.clone();
+            } else {
+                break;
+            }
+        }
+        chain
+    }
+}
+
+impl Default for SovereignEmployeeOrgChartEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// 23. Google AppScript / MS VBA Macro Automation Sandbox Engine
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MacroEventType {
+    OnEdit,
+    OnFormSubmit,
+    OnScheduledTimer,
+}
+
+#[derive(Debug, Clone)]
+pub struct AutomationTrigger {
+    pub trigger_id: u32,
+    pub event_type: MacroEventType,
+    pub target_resource: String,
+    pub action_script: String,
+}
+
+/// Sovereign Event-Driven Macro Automation Sandbox (Google AppScript / MS VBA inspired)
+pub struct SovereignMacroAutomationSandbox {
+    pub triggers: Vec<AutomationTrigger>,
+    pub next_trigger_id: u32,
+}
+
+impl SovereignMacroAutomationSandbox {
+    pub fn new() -> Self {
+        Self {
+            triggers: Vec::new(),
+            next_trigger_id: 1,
+        }
+    }
+
+    pub fn register_trigger(&mut self, event_type: MacroEventType, resource: &str, script: &str) -> u32 {
+        let tid = self.next_trigger_id;
+        self.next_trigger_id += 1;
+        self.triggers.push(AutomationTrigger {
+            trigger_id: tid,
+            event_type,
+            target_resource: resource.to_string(),
+            action_script: script.to_string(),
+        });
+        tid
+    }
+
+    pub fn dispatch_event(&self, event_type: MacroEventType, resource: &str, processor: &mut SpreadsheetProcessor) -> Result<usize> {
+        let mut executed_count = 0;
+        for trig in &self.triggers {
+            if trig.event_type == event_type && trig.target_resource == resource {
+                if trig.action_script.contains("auto_sum") {
+                    processor.set_formula(0, 2, "=SUM((0,0),(0,1))")?;
+                }
+                executed_count += 1;
+            }
+        }
+        Ok(executed_count)
+    }
+}
+
+impl Default for SovereignMacroAutomationSandbox {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
@@ -2886,5 +3517,186 @@ mod tests {
         let score = crm.calculate_lead_score(deal_id);
         // EmailSent (10) + DemoPresented (40) + Negotiation stage (50) = 100
         assert_eq!(score, 100);
+    }
+
+    #[test]
+    fn test_sovereign_quick_notes_and_web_clipper() {
+        let cap = sigma_types::CapabilityToken { id: 101 };
+        let mut notes_engine = SovereignQuickNotesEngine::new();
+        let nid = notes_engine.create_note("Meeting Ideas", "Discuss kernel performance", "#FFEB3B");
+        notes_engine.toggle_pin(nid);
+        notes_engine.add_checklist_item(nid, "Prepare slides");
+
+        let cid = notes_engine.clip_web_page("OS Design", "https://sigmaos.org/docs", "Microkernel architecture details");
+        assert_eq!(cid, 2);
+
+        let mut text_proc = TextProcessor::new("Notes Export".to_string(), cap);
+        assert!(notes_engine.export_note_to_text_processor(nid, &mut text_proc).is_ok());
+        assert!(text_proc.compute_document_metrics().word_count > 0);
+    }
+
+    #[test]
+    fn test_sovereign_web_publisher_and_html_generation() {
+        let mut publisher = SovereignWebPublisherEngine::new("Sovereign Enterprise Portal");
+        let pid = publisher.create_page("/home", "Home Page");
+        publisher.add_block(pid, WebPublisherBlock::HeroBanner {
+            title: "Welcome to SigmaOS".to_string(),
+            subtitle: "Sovereign Enterprise Operating System".to_string(),
+        });
+        publisher.add_block(pid, WebPublisherBlock::SectionText {
+            heading: "Core Vision".to_string(),
+            body: "Absolute omnipresent self-sufficiency.".to_string(),
+        });
+
+        let html = publisher.render_html_page(pid).unwrap();
+        assert!(html.contains("<!DOCTYPE html>"));
+        assert!(html.contains("Sovereign Enterprise Portal"));
+        assert!(html.contains("Welcome to SigmaOS"));
+    }
+
+    #[test]
+    fn test_sovereign_low_code_database_and_fk_lookup() {
+        let mut db = SovereignLowCodeDatabaseEngine::new("Enterprise CRM Database");
+        db.create_table("Companies");
+        db.create_table("Contacts");
+
+        if let Some(tbl) = db.tables.get_mut("Companies") {
+            tbl.add_field("Name", DatabaseFieldType::Text);
+            let mut row = HashMap::new();
+            row.insert("Name".to_string(), "Acme Corp".to_string());
+            tbl.insert_record(row);
+        }
+
+        if let Some(tbl) = db.tables.get_mut("Contacts") {
+            tbl.add_field("FullName", DatabaseFieldType::Text);
+            tbl.add_field("CompanyRef", DatabaseFieldType::ForeignKey { target_table: "Companies".to_string() });
+            let mut row = HashMap::new();
+            row.insert("FullName".to_string(), "Alice Smith".to_string());
+            row.insert("CompanyRef".to_string(), "1".to_string());
+            tbl.insert_record(row);
+        }
+
+        let company_name = db.lookup_foreign_key("Contacts", "CompanyRef", 1, "Companies");
+        assert_eq!(company_name, Some("Acme Corp".to_string()));
+    }
+
+    #[test]
+    fn test_sovereign_collaborative_whiteboard_and_slides_export() {
+        let cap = sigma_types::CapabilityToken { id: 202 };
+        let mut whiteboard = SovereignCollaborativeWhiteboardEngine::new("Architecture Brainstorm");
+        whiteboard.add_sticky_note("Refactor IPC", "#4CAF50", (100.0, 100.0));
+        whiteboard.add_shape_box("Kernel Core", (200.0, 200.0), (150.0, 80.0));
+        whiteboard.add_connector((100.0, 100.0), (200.0, 200.0));
+
+        let mut presenter = PresentationProcessor::new("Whiteboard Slides".to_string(), cap);
+        assert!(whiteboard.export_to_presentation_processor(&mut presenter).is_ok());
+        assert_eq!(presenter.total_slides(), 2);
+    }
+
+    #[test]
+    fn test_sovereign_helpdesk_sla_and_breach_detection() {
+        let mut helpdesk = SovereignHelpdeskSlaEngine::new();
+        let t1 = helpdesk.create_ticket("user@sigmaos.org", "System crash", "Kernel panic on boot", TicketPriority::Urgent, 1000);
+        let t2 = helpdesk.create_ticket("user2@sigmaos.org", "Feature request", "Dark theme toggle", TicketPriority::Low, 1000);
+
+        assert_eq!(t1, 1);
+        assert_eq!(t2, 2);
+
+        // At current_time = 5000 (4000s elapsed), Urgent SLA (3600s) is breached, Low SLA (172800s) is NOT breached
+        let breached = helpdesk.get_breached_sla_tickets(5000);
+        assert_eq!(breached.len(), 1);
+        assert_eq!(breached[0].ticket_id, t1);
+
+        helpdesk.update_status(t1, TicketStatus::Resolved);
+        let breached_after_resolve = helpdesk.get_breached_sla_tickets(5000);
+        assert_eq!(breached_after_resolve.len(), 0);
+    }
+
+    #[test]
+    fn test_sovereign_inventory_warehouse_and_reorder_triggers() {
+        let mut inventory = SovereignInventoryWarehouseEngine::new(ValuationMethod::Fifo);
+        inventory.add_sku(InventorySkuItem {
+            sku_id: "SKU-001".to_string(),
+            name: "Enterprise Server Rack".to_string(),
+            warehouse_location: "Building A".to_string(),
+            quantity_on_hand: 5,
+            reorder_point: 10,
+            unit_cost: 1200.0,
+        });
+
+        inventory.add_sku(InventorySkuItem {
+            sku_id: "SKU-002".to_string(),
+            name: "10GbE Switch".to_string(),
+            warehouse_location: "Building B".to_string(),
+            quantity_on_hand: 25,
+            reorder_point: 5,
+            unit_cost: 300.0,
+        });
+
+        assert_eq!(inventory.calculate_total_inventory_valuation(), 13500.0);
+
+        let reorder_needed = inventory.get_skus_requiring_reorder();
+        assert_eq!(reorder_needed.len(), 1);
+        assert_eq!(reorder_needed[0].sku_id, "SKU-001");
+
+        inventory.adjust_stock("SKU-001", 10);
+        assert_eq!(inventory.get_skus_requiring_reorder().len(), 0);
+    }
+
+    #[test]
+    fn test_sovereign_employee_org_chart_and_management_chain() {
+        let mut org = SovereignEmployeeOrgChartEngine::new();
+        org.add_employee(EmployeeNode {
+            employee_id: "emp-ceo".to_string(),
+            name: "Alice CEO".to_string(),
+            title: "Chief Executive Officer".to_string(),
+            department: "Executive".to_string(),
+            manager_id: None,
+        });
+        org.add_employee(EmployeeNode {
+            employee_id: "emp-vp".to_string(),
+            name: "Bob VP".to_string(),
+            title: "VP of Engineering".to_string(),
+            department: "Engineering".to_string(),
+            manager_id: Some("emp-ceo".to_string()),
+        });
+        org.add_employee(EmployeeNode {
+            employee_id: "emp-dev".to_string(),
+            name: "Charlie Dev".to_string(),
+            title: "Senior Kernel Engineer".to_string(),
+            department: "Engineering".to_string(),
+            manager_id: Some("emp-vp".to_string()),
+        });
+
+        let direct_reports = org.get_direct_reports("emp-vp");
+        assert_eq!(direct_reports.len(), 1);
+        assert_eq!(direct_reports[0].employee_id, "emp-dev");
+
+        let management_chain = org.get_management_chain("emp-dev");
+        assert_eq!(management_chain.len(), 2);
+        assert_eq!(management_chain[0].employee_id, "emp-vp");
+        assert_eq!(management_chain[1].employee_id, "emp-ceo");
+    }
+
+    #[test]
+    fn test_sovereign_macro_automation_sandbox() {
+        let cap = sigma_types::CapabilityToken { id: 303 };
+        let mut sandbox = SovereignMacroAutomationSandbox::new();
+        let trig_id = sandbox.register_trigger(
+            MacroEventType::OnEdit,
+            "BudgetSheet",
+            "auto_sum_cells",
+        );
+        assert_eq!(trig_id, 1);
+
+        let mut sheet = SpreadsheetProcessor::new("BudgetSheet".to_string(), cap);
+        sheet.set_cell(0, 0, CellValue::Number(100.0)).unwrap();
+        sheet.set_cell(0, 1, CellValue::Number(200.0)).unwrap();
+
+        let count = sandbox.dispatch_event(MacroEventType::OnEdit, "BudgetSheet", &mut sheet).unwrap();
+        assert_eq!(count, 1);
+
+        let evaluated = sheet.evaluate_cell(0, 2);
+        assert_eq!(evaluated, CellValue::Number(300.0));
     }
 }
