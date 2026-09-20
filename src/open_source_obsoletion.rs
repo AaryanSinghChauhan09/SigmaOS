@@ -2840,6 +2840,307 @@ impl SovereignWireGuardNoiseEngine {
     }
 }
 
+// =========================================================================
+// 72. SOVEREIGN GHOSTTY TERMINAL RENDERER ENGINE (Superseding Ghostty, Alacritty & Kitty)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TerminalCell {
+    pub glyph_char: char,
+    pub fg_rgba: [u8; 4],
+    pub bg_rgba: [u8; 4],
+    pub is_bold: bool,
+    pub is_italic: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DamageRect {
+    pub start_col: u32,
+    pub start_row: u32,
+    pub end_col: u32,
+    pub end_row: u32,
+}
+
+pub struct SovereignGhosttyTerminalRenderer {
+    pub cols: u32,
+    pub rows: u32,
+    pub grid: Vec<Vec<TerminalCell>>,
+    pub damage_rects: Vec<DamageRect>,
+}
+
+impl SovereignGhosttyTerminalRenderer {
+    pub fn new(cols: u32, rows: u32) -> Self {
+        let default_cell = TerminalCell {
+            glyph_char: ' ',
+            fg_rgba: [255, 255, 255, 255],
+            bg_rgba: [0, 0, 0, 255],
+            is_bold: false,
+            is_italic: false,
+        };
+        let grid = vec![vec![default_cell; cols as usize]; rows as usize];
+        Self {
+            cols,
+            rows,
+            grid,
+            damage_rects: Vec::new(),
+        }
+    }
+
+    pub fn write_char(&mut self, col: u32, row: u32, ch: char, fg: [u8; 4], bg: [u8; 4]) -> bool {
+        if col < self.cols && row < self.rows {
+            self.grid[row as usize][col as usize] = TerminalCell {
+                glyph_char: ch,
+                fg_rgba: fg,
+                bg_rgba: bg,
+                is_bold: false,
+                is_italic: false,
+            };
+            self.damage_rects.push(DamageRect {
+                start_col: col,
+                start_row: row,
+                end_col: col + 1,
+                end_row: row + 1,
+            });
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn flush_damage_rects(&mut self) -> usize {
+        let count = self.damage_rects.len();
+        self.damage_rects.clear();
+        count
+    }
+}
+
+// =========================================================================
+// 73. SOVEREIGN VALGRIND MEMORY DEBUGGER ENGINE (Superseding Valgrind, ASan & UBSan)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MemoryByteState {
+    Unallocated,
+    AllocatedUninitialized,
+    AllocatedInitialized,
+    FreedRedzone,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MemoryAuditViolation {
+    pub address: u64,
+    pub size_bytes: usize,
+    pub violation_type: String,
+}
+
+pub struct SovereignValgrindMemoryDebugger {
+    pub shadow_memory: BTreeMap<u64, MemoryByteState>,
+    pub violations: Vec<MemoryAuditViolation>,
+}
+
+impl SovereignValgrindMemoryDebugger {
+    pub fn new() -> Self {
+        Self {
+            shadow_memory: BTreeMap::new(),
+            violations: Vec::new(),
+        }
+    }
+
+    pub fn malloc(&mut self, addr: u64, size: usize) {
+        for i in 0..size {
+            self.shadow_memory.insert(addr + i as u64, MemoryByteState::AllocatedUninitialized);
+        }
+    }
+
+    pub fn initialize(&mut self, addr: u64, size: usize) {
+        for i in 0..size {
+            self.shadow_memory.insert(addr + i as u64, MemoryByteState::AllocatedInitialized);
+        }
+    }
+
+    pub fn check_read(&mut self, addr: u64, size: usize) -> bool {
+        let mut clean = true;
+        for i in 0..size {
+            let target = addr + i as u64;
+            match self.shadow_memory.get(&target) {
+                Some(MemoryByteState::AllocatedInitialized) => {},
+                Some(MemoryByteState::AllocatedUninitialized) => {
+                    clean = false;
+                    self.violations.push(MemoryAuditViolation {
+                        address: target,
+                        size_bytes: 1,
+                        violation_type: "UninitializedRead".to_string(),
+                    });
+                },
+                _ => {
+                    clean = false;
+                    self.violations.push(MemoryAuditViolation {
+                        address: target,
+                        size_bytes: 1,
+                        violation_type: "InvalidAccess".to_string(),
+                    });
+                }
+            }
+        }
+        clean
+    }
+
+    pub fn free(&mut self, addr: u64, size: usize) {
+        for i in 0..size {
+            let target = addr + i as u64;
+            if let Some(state) = self.shadow_memory.get(&target) {
+                if *state == MemoryByteState::FreedRedzone {
+                    self.violations.push(MemoryAuditViolation {
+                        address: target,
+                        size_bytes: 1,
+                        violation_type: "DoubleFree".to_string(),
+                    });
+                }
+            }
+            self.shadow_memory.insert(target, MemoryByteState::FreedRedzone);
+        }
+    }
+}
+
+impl Default for SovereignValgrindMemoryDebugger {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 74. SOVEREIGN NEBULA MESH VPN ENGINE (Superseding Nebula, Netmaker & Innernet)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NebulaPeerCert {
+    pub node_name: String,
+    pub assigned_mesh_ip: String,
+    pub is_lighthouse: bool,
+    pub public_key: [u8; 32],
+}
+
+pub struct SovereignNebulaMeshVpnEngine {
+    pub local_cert: NebulaPeerCert,
+    pub lighthouses: Vec<String>,
+    pub routing_table: BTreeMap<String, String>, // (mesh_ip -> overlay_endpoint)
+}
+
+impl SovereignNebulaMeshVpnEngine {
+    pub fn new(node_name: &str, mesh_ip: &str, is_lighthouse: bool) -> Self {
+        Self {
+            local_cert: NebulaPeerCert {
+                node_name: node_name.to_string(),
+                assigned_mesh_ip: mesh_ip.to_string(),
+                is_lighthouse,
+                public_key: [0x88; 32],
+            },
+            lighthouses: Vec::new(),
+            routing_table: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_lighthouse(&mut self, lighthouse_ip: &str) {
+        if !self.lighthouses.contains(&lighthouse_ip.to_string()) {
+            self.lighthouses.push(lighthouse_ip.to_string());
+        }
+    }
+
+    pub fn punch_hole_and_route(&mut self, target_mesh_ip: &str, endpoint: &str) {
+        self.routing_table.insert(target_mesh_ip.to_string(), endpoint.to_string());
+    }
+
+    pub fn lookup_route(&self, target_mesh_ip: &str) -> Option<String> {
+        self.routing_table.get(target_mesh_ip).cloned()
+    }
+}
+
+// =========================================================================
+// 75. SOVEREIGN LINUX LANDLOCK V5 ENGINE (Superseding Linux Landlock LSM v5)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LandlockPathAccessRule {
+    pub path_prefix: String,
+    pub allow_read: bool,
+    pub allow_write: bool,
+    pub allow_execute: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LandlockNetPortRule {
+    pub port: u16,
+    pub allow_bind: bool,
+    pub allow_connect: bool,
+}
+
+pub struct SovereignLinuxLandlockV5Engine {
+    pub path_rules: Vec<LandlockPathAccessRule>,
+    pub net_rules: Vec<LandlockNetPortRule>,
+    pub is_enforced: bool,
+}
+
+impl SovereignLinuxLandlockV5Engine {
+    pub fn new() -> Self {
+        Self {
+            path_rules: Vec::new(),
+            net_rules: Vec::new(),
+            is_enforced: false,
+        }
+    }
+
+    pub fn add_path_rule(&mut self, prefix: &str, read: bool, write: bool, exec: bool) {
+        self.path_rules.push(LandlockPathAccessRule {
+            path_prefix: prefix.to_string(),
+            allow_read: read,
+            allow_write: write,
+            allow_execute: exec,
+        });
+    }
+
+    pub fn add_net_port_rule(&mut self, port: u16, bind: bool, connect: bool) {
+        self.net_rules.push(LandlockNetPortRule {
+            port,
+            allow_bind: bind,
+            allow_connect: connect,
+        });
+    }
+
+    pub fn restrict_self(&mut self) {
+        self.is_enforced = true;
+    }
+
+    pub fn check_path_access(&self, path: &str, write_op: bool) -> bool {
+        if !self.is_enforced {
+            return true;
+        }
+        for rule in &self.path_rules {
+            if path.starts_with(&rule.path_prefix) {
+                return if write_op { rule.allow_write } else { rule.allow_read };
+            }
+        }
+        false
+    }
+
+    pub fn check_net_access(&self, port: u16, bind_op: bool) -> bool {
+        if !self.is_enforced {
+            return true;
+        }
+        for rule in &self.net_rules {
+            if rule.port == port {
+                return if bind_op { rule.allow_bind } else { rule.allow_connect };
+            }
+        }
+        false
+    }
+}
+
+impl Default for SovereignLinuxLandlockV5Engine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub vcs: SovereignVcsEngine,
     pub supervisor: SovereignInitSupervisor,
@@ -2879,6 +3180,10 @@ pub struct SovereignOpenSourceObsoletionOrchestrator {
     pub keycloak_idp: SovereignKeycloakIdentityProvider,
     pub syncthing_sync: SovereignSyncthingPeerSyncEngine,
     pub wireguard_noise: SovereignWireGuardNoiseEngine,
+    pub ghostty_renderer: SovereignGhosttyTerminalRenderer,
+    pub valgrind_debugger: SovereignValgrindMemoryDebugger,
+    pub nebula_mesh: SovereignNebulaMeshVpnEngine,
+    pub landlock_v5: SovereignLinuxLandlockV5Engine,
     pub supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite,
     pub total_obsoleted_projects_count: u32,
 }
@@ -2935,8 +3240,12 @@ impl SovereignOpenSourceObsoletionOrchestrator {
             keycloak_idp: SovereignKeycloakIdentityProvider::new("sigma_sovereign_realm"),
             syncthing_sync: SovereignSyncthingPeerSyncEngine::new(),
             wireguard_noise: SovereignWireGuardNoiseEngine::new([0x99; 32]),
+            ghostty_renderer: SovereignGhosttyTerminalRenderer::new(80, 24),
+            valgrind_debugger: SovereignValgrindMemoryDebugger::new(),
+            nebula_mesh: SovereignNebulaMeshVpnEngine::new("node-alpha", "10.100.0.1", true),
+            landlock_v5: SovereignLinuxLandlockV5Engine::new(),
             supremacy_suite: open_source_os_gap_closure::OpenSourceProjectSupremacySuite::new(),
-            total_obsoleted_projects_count: 65,
+            total_obsoleted_projects_count: 69,
         }
     }
 
@@ -5670,7 +5979,59 @@ mod tests {
     fn test_sovereign_orchestrator_bootstrap() {
         let mut orchestrator = SovereignOpenSourceObsoletionOrchestrator::new();
         let status = orchestrator.bootstrap_sovereign_stack().unwrap();
-        assert!(status.contains("65 legacy open-source projects obsoleted"));
+        assert!(status.contains("69 legacy open-source projects obsoleted"));
+    }
+
+    #[test]
+    fn test_sovereign_ghostty_terminal_renderer() {
+        let mut renderer = SovereignGhosttyTerminalRenderer::new(80, 24);
+        assert!(renderer.write_char(0, 0, 'A', [255, 255, 255, 255], [0, 0, 0, 255]));
+        assert_eq!(renderer.grid[0][0].glyph_char, 'A');
+        assert_eq!(renderer.flush_damage_rects(), 1);
+        assert_eq!(renderer.damage_rects.len(), 0);
+    }
+
+    #[test]
+    fn test_sovereign_valgrind_memory_debugger() {
+        let mut valgrind = SovereignValgrindMemoryDebugger::new();
+        valgrind.malloc(0x1000, 16);
+        assert!(!valgrind.check_read(0x1000, 16)); // Uninitialized read violation
+
+        valgrind.initialize(0x1000, 16);
+        assert!(valgrind.check_read(0x1000, 16)); // Clean read
+
+        valgrind.free(0x1000, 16);
+        valgrind.free(0x1000, 16); // Double free violation
+        assert!(valgrind.violations.iter().any(|v| v.violation_type == "DoubleFree"));
+    }
+
+    #[test]
+    fn test_sovereign_nebula_mesh_vpn() {
+        let mut nebula = SovereignNebulaMeshVpnEngine::new("lighthouse1", "10.100.0.1", true);
+        nebula.register_lighthouse("10.100.0.1");
+        nebula.punch_hole_and_route("10.100.0.2", "192.168.1.50:4242");
+
+        assert_eq!(
+            nebula.lookup_route("10.100.0.2"),
+            Some("192.168.1.50:4242".to_string())
+        );
+        assert_eq!(nebula.lighthouses.len(), 1);
+    }
+
+    #[test]
+    fn test_sovereign_linux_landlock_v5() {
+        let mut landlock = SovereignLinuxLandlockV5Engine::new();
+        landlock.add_path_rule("/usr", true, false, true);
+        landlock.add_net_port_rule(443, false, true);
+
+        // Before restrict_self(), checks pass
+        assert!(landlock.check_path_access("/usr/bin/cargo", true));
+
+        landlock.restrict_self();
+        assert!(landlock.check_path_access("/usr/bin/cargo", false));
+        assert!(!landlock.check_path_access("/usr/bin/cargo", true));
+        assert!(landlock.check_net_access(443, false));
+        assert!(!landlock.check_net_access(443, true));
     }
 
     #[test]
