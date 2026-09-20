@@ -392,4 +392,47 @@ If build fails:
 
 ---
 
+## References
+
+- [ARCHITECTURE_DECISIONS.md](../docs/ARCHITECTURE_DECISIONS.md) - Architecture decisions
+- [PROJECT_STATUS.md](../docs/PROJECT_STATUS.md) - Implementation status
+- [SIGPKG_MANIFEST_SPECIFICATION.md](../docs/SIGPKG_MANIFEST_SPECIFICATION.md) - Package format specification
+- [transaction_journal.rs](../src/package/transaction_journal.rs) - Transaction journaling
+
+---
+
+## AI Agent Maintenance
+
+### Persona Assignment
+- **Primary:** Bolt (Performance)
+- **Secondary:** Sentinel (Security)
+
+### Maintenance Tasks
+- [ ] Update package management status in PROJECT_STATUS.md
+- [ ] Verify all internal links resolve
+- [ ] Update package format documentation as sigpkg evolves
+- [ ] Add new repository types as they are implemented
+- [ ] Update dependency resolver strategies
+
+### Known Issues
+- SAT solver may have performance issues with large dependency graphs
+- Package verification may have edge cases with certain signature formats
+
+### Edge Cases
+- Circular dependencies may not be detected in all cases
+- Build from source may fail with certain toolchain combinations
+
+### Related Components
+- [src/package/manager.rs](../src/package/manager.rs)
+- [src/package/resolver.rs](../src/package/resolver.rs)
+- [src/package/transaction_journal.rs](../src/package/transaction_journal.rs)
+- [src/package/universal.rs](../src/package/universal.rs)
+
+### Last Verified
+- **Version:** 1.0
+- **Date:** 2025-01-22
+- **Verified by:** Devin AI Agent
+
+---
+
 **[Package Management](Category-Package-Management)** | **[Repositories](Category-Repositories)** | **[Dependencies](Category-Dependencies)**
