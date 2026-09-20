@@ -221,24 +221,26 @@ impl UniversalPackageImporter {
                     "sovereign-openssl".to_string()
                 } else if dep_lower.contains("libc") || dep_lower == "musl" || dep_lower.contains("freebsd-runtime") || dep_lower.contains("openbsd-sys") || dep_lower.contains("haiku-libroot") {
                     "sovereign-libc".to_string()
-                } else if dep_lower.contains("zlib") || dep_lower.contains("zstd") || dep_lower.contains("lz4") {
+                } else if dep_lower.contains("zlib") || dep_lower.contains("zstd") || dep_lower.contains("lz4") || dep_lower.contains("xz") || dep_lower.contains("bzip2") {
                     "sovereign-zlib".to_string()
-                } else if dep_lower.contains("python") {
-                    "sovereign-python".to_string()
-                } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "sh" || dep_lower == "fish" {
+                } else if dep_lower.contains("python") || dep_lower.contains("perl") || dep_lower.contains("ruby") || dep_lower.contains("lua") {
+                    "sovereign-interpreter".to_string()
+                } else if dep_lower == "bash" || dep_lower == "zsh" || dep_lower == "sh" || dep_lower == "fish" || dep_lower == "ksh" {
                     "sovereign-shell".to_string()
                 } else if dep_lower.contains("ncurses") || dep_lower.contains("readline") || dep_lower.contains("pcre") {
                     "sovereign-terminal-ui".to_string()
-                } else if dep_lower.contains("sqlite") {
+                } else if dep_lower.contains("sqlite") || dep_lower.contains("postgres") || dep_lower.contains("mysql") || dep_lower.contains("mariadb") {
                     "sovereign-database".to_string()
-                } else if dep_lower.contains("expat") || dep_lower.contains("libxml") {
+                } else if dep_lower.contains("expat") || dep_lower.contains("libxml") || dep_lower.contains("yaml") || dep_lower.contains("json") {
                     "sovereign-xml-parser".to_string()
-                } else if dep_lower.contains("glib") || dep_lower.contains("wayland") || dep_lower.contains("x11") || dep_lower.contains("xcb") || dep_lower.contains("mesa") || dep_lower.contains("vulkan") {
+                } else if dep_lower.contains("glib") || dep_lower.contains("wayland") || dep_lower.contains("x11") || dep_lower.contains("xcb") || dep_lower.contains("mesa") || dep_lower.contains("vulkan") || dep_lower.contains("gtk") || dep_lower.contains("qt") {
                     "sovereign-desktop-gui".to_string()
                 } else if dep_lower.contains("pipewire") || dep_lower.contains("pulseaudio") || dep_lower.contains("alsa") || dep_lower.contains("ffmpeg") || dep_lower.contains("gstreamer") {
                     "sovereign-multimedia".to_string()
-                } else if dep_lower.contains("curl") {
+                } else if dep_lower.contains("curl") || dep_lower.contains("wget") {
                     "sovereign-networking".to_string()
+                } else if dep_lower.contains("gcc") || dep_lower.contains("clang") || dep_lower.contains("llvm") || dep_lower.contains("make") || dep_lower.contains("cmake") {
+                    "sovereign-toolchain".to_string()
                 } else {
                     dep.clone()
                 }
