@@ -7,11 +7,11 @@
 //! - Pop!_OS COSMIC & Hyprland (Rust iced widget compositor, dynamic BSP tiling, Wayland window rules)
 //! - FreeBSD Lumina Desktop & Wayfire (BSD sysctl hardware query, Lumina-FM ZFS snapshot restore, 3D Wayland compositor)
 
+use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
-use crate::klib::btreemap::BTreeMap;
 
 /// Supported Desktop Environment Formats
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -424,6 +424,43 @@ impl Default for CosmicHyprlandFormatAdapter {
     }
 }
 
+/// BSD Lumina & OpenBSD Xenocara Desktop Environment Adapter
+#[derive(Debug, Clone)]
+pub struct BsdLuminaXenocaraAdapter {
+    pub zfs_snapshot_recovery_enabled: bool,
+    pub xenocara_driver_preference: String,
+    pub lumina_fm_actions: Vec<String>,
+}
+
+impl BsdLuminaXenocaraAdapter {
+    pub fn new() -> Self {
+        Self {
+            zfs_snapshot_recovery_enabled: true,
+            xenocara_driver_preference: String::from("wsdisplay"),
+            lumina_fm_actions: vec![
+                String::from("lumina-file-zfs-rollback"),
+                String::from("lumina-archiver-extract"),
+            ],
+        }
+    }
+
+    pub fn set_zfs_snapshot_recovery(&mut self, enabled: bool) {
+        self.zfs_snapshot_recovery_enabled = enabled;
+    }
+
+    pub fn register_lumina_fm_action(&mut self, action: &str) {
+        if !action.is_empty() && !self.lumina_fm_actions.contains(&action.to_string()) {
+            self.lumina_fm_actions.push(action.to_string());
+        }
+    }
+}
+
+impl Default for BsdLuminaXenocaraAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Sovereign Universal Desktop Synthesis Suite
 pub struct SovereignUniversalDesktopSuite {
     pub active_session: Option<UniversalDesktopSessionRuntime>,
@@ -431,6 +468,7 @@ pub struct SovereignUniversalDesktopSuite {
     pub gnome_adapter: GnomeShellFormatAdapter,
     pub xfce_adapter: XfceFormatAdapter,
     pub cosmic_hyprland_adapter: CosmicHyprlandFormatAdapter,
+    pub bsd_lumina_adapter: BsdLuminaXenocaraAdapter,
 }
 
 impl SovereignUniversalDesktopSuite {
@@ -441,6 +479,7 @@ impl SovereignUniversalDesktopSuite {
             gnome_adapter: GnomeShellFormatAdapter::new(),
             xfce_adapter: XfceFormatAdapter::new(),
             cosmic_hyprland_adapter: CosmicHyprlandFormatAdapter::new(),
+            bsd_lumina_adapter: BsdLuminaXenocaraAdapter::new(),
         }
     }
 
@@ -568,6 +607,18 @@ DesktopNames=GNOME
         let mut adapter = CosmicHyprlandFormatAdapter::new();
         adapter.add_hyprland_rule("float, class:^(steam)$");
         assert_eq!(adapter.hyprland_window_rules.len(), 3);
+    }
+
+    #[test]
+    fn test_bsd_lumina_xenocara_adapter() {
+        let mut adapter = BsdLuminaXenocaraAdapter::new();
+        assert!(adapter.zfs_snapshot_recovery_enabled);
+        adapter.set_zfs_snapshot_recovery(false);
+        assert!(!adapter.zfs_snapshot_recovery_enabled);
+
+        adapter.register_lumina_fm_action("lumina-file-zfs-mount");
+        assert_eq!(adapter.lumina_fm_actions.len(), 3);
+        assert!(adapter.lumina_fm_actions.contains(&String::from("lumina-file-zfs-mount")));
     }
 
     #[test]
