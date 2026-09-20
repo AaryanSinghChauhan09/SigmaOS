@@ -41,8 +41,12 @@ impl ConfigStore {
             if let Some(sep_pos) = find_key_value_sep(&trimmed) {
                 let key = trimmed[..sep_pos].trim().to_string();
                 let value = trimmed[sep_pos + 1..].trim().to_string();
-                // Bolt ⚡: Use entry API for efficient lookup and insertion
-                let section = self.sections.entry(current_section.clone()).or_default();
+                // Bolt ⚡: Fast-path borrowed lookup avoids O(N) heap String allocations of current_section in key-value loop iterations,
+                // with fallback lazy entry initialization for safety.
+                let section = match self.sections.get_mut(&current_section) {
+                    Some(s) => s,
+                    None => self.sections.entry(current_section.clone()).or_default(),
+                };
                 section.insert(key, value);
             } else {
                 return Err("Invalid config line");
