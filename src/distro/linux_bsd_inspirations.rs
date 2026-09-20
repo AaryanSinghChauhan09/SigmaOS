@@ -1035,6 +1035,34 @@ impl SovereignUniversalDistroBridge {
         self.super_matrix.create_qubes_domain(domain_name)
     }
 
+    pub fn synchronize_all_distro_subsystems(&mut self) -> Result<usize, &'static str> {
+        let subsystems = [
+            "init", "package", "vfs", "security", "storage", "kernel",
+            "network", "graphics", "power", "ipc", "auth", "audit",
+            "boot", "container", "virtualization", "audio", "input",
+            "thermal", "memory", "syscall", "device", "crypto", "ai",
+            "monitoring", "desktop", "compiler", "i18n", "bluetooth",
+            "firewall", "diagnostics", "recovery", "time", "shell",
+            "display", "printing", "backup", "telemetry", "compositor",
+            "launcher", "monitor", "notification", "onboarding", "theming", "process",
+        ];
+
+        let mut count = 0;
+        for sub in subsystems {
+            if self.dispatch_cross_subsystem_operation(sub, "sync_state").is_ok() {
+                count += 1;
+            }
+        }
+        Ok(count)
+    }
+
+    pub fn get_distro_capability_matrix(&self) -> (ServiceSupervisorType, String, String, bool) {
+        let supervisor = self.get_supervisor_type();
+        let pkg_spec = self.translate_package_specifier("coreutils");
+        let vfs_etc = self.translate_vfs_path("/etc");
+        let compatible = self.verify_all_subsystems_compatibility();
+        (supervisor, pkg_spec, vfs_etc, compatible)
+    }
 }
 
 // ==========================================
@@ -2149,6 +2177,14 @@ impl SovereignCrossDistroSubsystemOrchestrator {
     pub fn verify_full_subsystem_matrix(&mut self) -> bool {
         self.bridge.verify_all_subsystems_compatibility_matrix()
     }
+
+    pub fn synchronize_subsystem_pipeline(&mut self) -> Result<usize, &'static str> {
+        self.bridge.synchronize_all_distro_subsystems()
+    }
+
+    pub fn query_subsystem_capabilities(&self) -> (ServiceSupervisorType, String, String, bool) {
+        self.bridge.get_distro_capability_matrix()
+    }
 }
 
 impl Default for SovereignCrossDistroSubsystemOrchestrator {
@@ -2383,6 +2419,16 @@ mod cross_subsystem_tests {
 
         assert!(orchestrator.active_subsystems.contains(&"auth".to_string()));
         assert!(orchestrator.active_subsystems.contains(&"network".to_string()));
+
+        let sync_count = orchestrator.synchronize_subsystem_pipeline();
+        assert!(sync_count.is_ok());
+        assert_eq!(sync_count.unwrap(), 44);
+
+        let (supervisor, pkg_spec, vfs_etc, compatible) = orchestrator.query_subsystem_capabilities();
+        assert_eq!(supervisor, ServiceSupervisorType::Smf);
+        assert!(!pkg_spec.is_empty());
+        assert!(!vfs_etc.is_empty());
+        assert!(compatible);
     }
 
     #[test]
