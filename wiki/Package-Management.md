@@ -163,9 +163,9 @@ The universal package system integrates with SigmaOS subsystems:
 ## Documentation References
 
 For detailed implementation specifications:
-- [Universal Package System Implementation Plan](UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN.md)
-- [Post-Quantum Cryptography Package Distribution](Post-Quantum-Cryptography-Package-Distribution.md)
 - [Architecture](ARCHITECTURE.md)
+- [Security](SECURITY.md)
+- [Roadmap](ROADMAP.md)
 
 ## Contributing
 
