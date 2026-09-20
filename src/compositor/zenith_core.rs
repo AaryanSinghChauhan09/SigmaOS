@@ -565,7 +565,7 @@ impl ZenithCompositor {
     }
 
     /// Dispatch a keyboard event to the focused surface
-    pub fn dispatch_key_event(&mut self, event: WlKeyEvent) -> Option<WlObjectId> {
+    pub fn dispatch_key_event(&mut self, _event: WlKeyEvent) -> Option<WlObjectId> {
         self.stats.key_events += 1;
         self.keyboard_focus
     }

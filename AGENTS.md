@@ -7,9 +7,12 @@ This document defines operational guidelines, security policies, and verificatio
 ## 1. Core Principles for AI Agents
 
 1. **Zero External Third-Party Dependencies:**
-   - SigmaOS strictly follows a zero-dependency `#![no_std]` design philosophy.
-   - Do NOT add external crates under `[dependencies]` in `Cargo.toml`.
-   - Use `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`) and native `#![no_std]` structures.
+   - SigmaOS follows a hybrid architecture supporting both `std` and `#![no_std]` design philosophies.
+   - Current codebase uses `std` (4,901 std imports) for full OS functionality.
+   - For kernel modules and security-critical components, prefer `#![no_std]` where feasible.
+   - Do NOT add external crates under `[dependencies]` in `Cargo.toml` unless absolutely necessary.
+   - Use `std::` primitives (`std::vec::Vec`, `std::string::String`, `std::boxed::Box`, `std::sync::Arc`) for user-space components.
+   - Use `alloc::` primitives (`alloc::vec::Vec`, `alloc::string::String`, `alloc::format`) and native `#![no_std]` structures for kernel components.
 
 2. **Cross-OS Subsystem Interoperability:**
    - Every security or kernel component must maintain compatibility across Linux and BSD distribution modes (`LinuxArch`, `LinuxDebian`, `LinuxFedora`, `LinuxNix`, `FreeBsd`, `OpenBsd`, `NetBsd`, `DragonFlyBsd`, `SolarisIllumos`, etc.).
