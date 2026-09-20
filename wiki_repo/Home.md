@@ -106,9 +106,6 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 - **[Inter-Process Communication](Inter-Process-Communication)**
   Pipes, message queues, shared memory, and synchronization.
 
-- **[Namespaces](Namespaces)**
-  Process isolation with PID, IPC, Network, UTS, User, Cgroup, and Mount namespaces.
-
 ---
 
 ## Security & Hardening
@@ -137,39 +134,6 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 
 - **[Low-Overhead Kernel Observability](Low-Overhead-Kernel-Observability)**
   High-performance kernel tracing with SigmaTrace and eBPF.
-
-- **[Kernel Timers](Kernel-Timers)**
-  High-resolution timer management with nanosecond precision.
-
-- **[Workqueue](Workqueue)**
-  Asynchronous work execution with priority-based scheduling.
-
-- **[RCU Synchronization](RCU-Synchronization)**
-  Scalable read-mostly data structure synchronization.
-
-- **[Lockdep](Lockdep)**
-  Deadlock detection and lock order validation.
-
-- **[Cgroups](Cgroups)**
-  Resource management and process grouping.
-
-- **[Kobject](Kobject)**
-  Kernel object management and hierarchy.
-
-- **[Ftrace](Ftrace)**
-  Function tracing and instrumentation.
-
-- **[Perf](Perf)**
-  Performance monitoring and profiling.
-
-- **[Seccomp](Seccomp)**
-  System call filtering and security sandboxing.
-
-- **[IOMMU](IOMMU)**
-  Device memory isolation and DMA remapping.
-
-- **[Interrupt](Interrupt)**
-  Interrupt handling and management.
 
 - **[MGLRU & Memory Reclamation](Performance-Tuning-and-Kernel#mglru--memory-reclamation)**
   Multi-Gen LRU and memory reclamation optimization.
