@@ -188,6 +188,7 @@ For detailed kernel implementation specifications:
 - [Roadmap](ROADMAP.md)
 - [Filesystem](Filesystem.md)
 - [Process Management](process-management.md)
+- [Memory Management](memory-management.md)
 
 ## Contributing
 

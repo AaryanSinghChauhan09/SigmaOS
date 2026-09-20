@@ -169,6 +169,7 @@ For detailed implementation specifications:
 - [Kernel](Kernel.md)
 - [Filesystem](Filesystem.md)
 - [Process Management](process-management.md)
+- [Memory Management](memory-management.md)
 
 ## Contributing
 

@@ -212,6 +212,7 @@ For detailed process management implementation specifications:
 - [Filesystem](Filesystem.md)
 - [Package Management](Package-Management.md)
 - [Roadmap](ROADMAP.md)
+- [Memory Management](memory-management.md)
 
 ## Contributing
 

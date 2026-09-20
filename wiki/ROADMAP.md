@@ -85,6 +85,7 @@ For detailed implementation specifications, see:
 - [Kernel](Kernel.md)
 - [Filesystem](Filesystem.md)
 - [Process Management](process-management.md)
+- [Memory Management](memory-management.md)
 - [Architecture](ARCHITECTURE.md)
 
 ## Contributing

@@ -191,6 +191,7 @@ For detailed security implementation specifications:
 - [Kernel](Kernel.md)
 - [Filesystem](Filesystem.md)
 - [Process Management](process-management.md)
+- [Memory Management](memory-management.md)
 
 ## Security Advisory Process
 
