@@ -295,5 +295,5 @@ Visit the [Table of contents](Table-of-contents) for a listing of article catego
 ---
 
 ## Omnipresent Self-Sufficiency Reference
-- **[Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V29](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V29)**
+- **[Sovereign OS Absolute Omnipresent Self-Sufficiency Ultra Encyclopedia V30](SOVEREIGN_OS_ABSOLUTE_OMNIPRESENT_SELF_SUFFICIENCY_ULTRA_ENCYCLOPEDIA_V30)**
   Master architectural reference detailing native zero-dependency replacements for external software, AI models, frameworks, database engines, robotics tools, codecs, and operating systems.
