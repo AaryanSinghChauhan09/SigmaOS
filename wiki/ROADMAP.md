@@ -32,6 +32,19 @@ The immediate next milestone is M1: QEMU Bootable Preview, which includes:
 - Basic init system
 - Emergency recovery shell
 
+### M1 Progress
+
+**Completed:**
+- ✅ Kernel entry point implementation (src/kernel/entry.rs)
+- ✅ Init system implementation (src/init/sigma_init.rs)
+- ✅ Login service implementation (src/init/login.rs)
+- ✅ Boot-to-login path specification (docs/BOOT_TO_LOGIN_PATH_SPECIFICATION.md)
+
+**Pending:**
+- ⬜ Real ISO generation (scripts/build_iso.sh currently fails intentionally)
+- ⬜ QEMU boot smoke test (requires real ISO)
+- ⬜ Emergency recovery shell
+
 See [BOOT_TO_LOGIN_PATH_SPECIFICATION.md](../docs/BOOT_TO_LOGIN_PATH_SPECIFICATION.md) for details.
 
 ---

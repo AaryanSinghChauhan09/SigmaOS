@@ -57,6 +57,10 @@
 ### 1.4 Boot-to-Login Path
 - **Status:** `Specification only`
 - **Evidence:** `docs/BOOT_TO_LOGIN_PATH_SPECIFICATION.md` (new) defines complete boot sequence
+**Implementation:**
+  - `src/kernel/entry.rs` - Kernel entry point with boot info parsing
+  - `src/init/sigma_init.rs` - Init system with service management
+  - `src/init/login.rs` - Login service with user authentication
 - **Tests:** None
 - **Gaps:** No implementation of boot-to-login path, only specification
 - **CI:** QEMU boot smoke test (placeholder)
