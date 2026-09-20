@@ -83,6 +83,8 @@ For detailed implementation specifications, see:
 - [Package Management](Package-Management.md)
 - [Security](SECURITY.md)
 - [Kernel](Kernel.md)
+- [Filesystem](Filesystem.md)
+- [Process Management](process-management.md)
 - [Architecture](ARCHITECTURE.md)
 
 ## Contributing

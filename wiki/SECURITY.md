@@ -189,6 +189,8 @@ For detailed security implementation specifications:
 - [Package Management](Package-Management.md)
 - [Roadmap](ROADMAP.md)
 - [Kernel](Kernel.md)
+- [Filesystem](Filesystem.md)
+- [Process Management](process-management.md)
 
 ## Security Advisory Process
 

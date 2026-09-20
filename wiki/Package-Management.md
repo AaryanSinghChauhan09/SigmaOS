@@ -167,6 +167,8 @@ For detailed implementation specifications:
 - [Security](SECURITY.md)
 - [Roadmap](ROADMAP.md)
 - [Kernel](Kernel.md)
+- [Filesystem](Filesystem.md)
+- [Process Management](process-management.md)
 
 ## Contributing
 
