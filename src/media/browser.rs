@@ -1654,7 +1654,117 @@ impl PaleMoonGoannaEngine {
 }
 
 // =========================================================================
-// 29. UNIFIED SIGMAWEB BROWSER SUITE
+// 29. CROMITE & BRAVE ADBLOCK COSMETIC INJECTION ENGINE
+// =========================================================================
+
+pub struct CromiteAdblockCosmeticEngine {
+    pub scriptlet_injections: Vec<(String, String)>, // (domain_pattern, scriptlet_code)
+    pub anti_adblock_bypass_enabled: bool,
+}
+
+impl CromiteAdblockCosmeticEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        let mut engine = Self {
+            scriptlet_injections: Vec::new(),
+            anti_adblock_bypass_enabled: true,
+        };
+        engine.register_default_scriptlets();
+        engine
+    }
+
+    fn register_default_scriptlets(&mut self) {
+        self.scriptlet_injections.push((
+            String::from("*"),
+            String::from("set-constant.js(google_ad_status, 1)"),
+        ));
+        self.scriptlet_injections.push((
+            String::from("youtube.com"),
+            String::from("prevent-autonav.js()"),
+        ));
+    }
+
+    pub fn inject_cosmetic_scriptlet(&self, domain: &str) -> Vec<String> {
+        self.scriptlet_injections
+            .iter()
+            .filter(|(pat, _)| pat == "*" || domain.contains(pat))
+            .map(|(_, code)| code.clone())
+            .collect()
+    }
+}
+
+// =========================================================================
+// 30. CHROMIUM PARTITIONALLOC SECURITY & HEAP TAG ENGINE
+// =========================================================================
+
+pub struct ChromiumPartitionAllocSecurityEngine {
+    pub memory_tagging_enabled: bool,
+    pub hardened_allocations: BTreeMap<usize, u8>, // (address, heap_tag)
+}
+
+impl ChromiumPartitionAllocSecurityEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            memory_tagging_enabled: true,
+            hardened_allocations: BTreeMap::new(),
+        }
+    }
+
+    pub fn allocate_tagged_slot(&mut self, addr: usize, tag: u8) {
+        if self.memory_tagging_enabled {
+            self.hardened_allocations.insert(addr, tag);
+        }
+    }
+
+    pub fn verify_allocation_tag(&self, addr: usize, expected_tag: u8) -> bool {
+        if let Some(&stored_tag) = self.hardened_allocations.get(&addr) {
+            stored_tag == expected_tag
+        } else {
+            !self.memory_tagging_enabled
+        }
+    }
+}
+
+// =========================================================================
+// 31. FIREFOX TAB UNLOADING & SESSION RESTORATION ENGINE
+// =========================================================================
+
+pub struct FirefoxTabUnloadingMemoryEngine {
+    pub auto_tab_discard_threshold_mb: usize,
+    pub discarded_tabs: Vec<u32>,
+}
+
+impl FirefoxTabUnloadingMemoryEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            auto_tab_discard_threshold_mb: 512,
+            discarded_tabs: Vec::new(),
+        }
+    }
+
+    pub fn evaluate_memory_pressure_and_discard(&mut self, available_mem_mb: usize, inactive_tab_ids: &[u32]) -> usize {
+        if available_mem_mb < self.auto_tab_discard_threshold_mb {
+            let count = inactive_tab_ids.len();
+            for &id in inactive_tab_ids {
+                if !self.discarded_tabs.contains(&id) {
+                    self.discarded_tabs.push(id);
+                }
+            }
+            count
+        } else {
+            0
+        }
+    }
+
+    pub fn is_tab_discarded(&self, tab_id: u32) -> bool {
+        self.discarded_tabs.contains(&tab_id)
+    }
+}
+
+// =========================================================================
+// 32. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
 pub struct SigmaWebBrowser {
@@ -1686,6 +1796,9 @@ pub struct SigmaWebBrowser {
     pub thorium_perf: ThoriumPerformanceEngine,
     pub kagi_lenses: KagiLensesFilterEngine,
     pub palemoon_goanna: PaleMoonGoannaEngine,
+    pub cromite_adblock: CromiteAdblockCosmeticEngine,
+    pub partition_alloc: ChromiumPartitionAllocSecurityEngine,
+    pub tab_unloader: FirefoxTabUnloadingMemoryEngine,
 }
 
 impl SigmaWebBrowser {
@@ -1720,6 +1833,9 @@ impl SigmaWebBrowser {
             thorium_perf: ThoriumPerformanceEngine::new(),
             kagi_lenses: KagiLensesFilterEngine::new(),
             palemoon_goanna: PaleMoonGoannaEngine::new(),
+            cromite_adblock: CromiteAdblockCosmeticEngine::new(),
+            partition_alloc: ChromiumPartitionAllocSecurityEngine::new(),
+            tab_unloader: FirefoxTabUnloadingMemoryEngine::new(),
         }
     }
 
@@ -2122,5 +2238,26 @@ mod tests {
 
         let palemoon = PaleMoonGoannaEngine::new();
         assert!(palemoon.validate_xul_extension("plugin-xul-v1"));
+    }
+
+    #[test]
+    fn test_cromite_partitionalloc_and_firefox_tab_unloading() {
+        let cromite = CromiteAdblockCosmeticEngine::new();
+        let scriptlets = cromite.inject_cosmetic_scriptlet("youtube.com");
+        assert!(scriptlets.contains(&String::from("prevent-autonav.js()")));
+
+        let mut alloc = ChromiumPartitionAllocSecurityEngine::new();
+        alloc.allocate_tagged_slot(0x1000, 0x0A);
+        assert!(alloc.verify_allocation_tag(0x1000, 0x0A));
+        assert!(!alloc.verify_allocation_tag(0x1000, 0x0B));
+
+        let mut firefox_unloader = FirefoxTabUnloadingMemoryEngine::new();
+        let inactive_tabs = vec![101, 102, 103];
+        let count = firefox_unloader.evaluate_memory_pressure_and_discard(256, &inactive_tabs);
+        assert_eq!(count, 3);
+        assert!(firefox_unloader.is_tab_discarded(101));
+
+        let browser = SigmaWebBrowser::new();
+        assert!(browser.cromite_adblock.anti_adblock_bypass_enabled);
     }
 }
