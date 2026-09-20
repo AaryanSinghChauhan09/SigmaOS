@@ -28,6 +28,8 @@ pub mod drivers;
 pub mod crypto;
 pub mod filesystem;
 pub mod futuristic_modules;
+pub mod iso;
+pub use iso::*;
 pub mod kernel;
 pub mod klib;
 pub use klib::ZeroDependencyPrimitiveHub;

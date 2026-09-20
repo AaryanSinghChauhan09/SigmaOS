@@ -86,3 +86,6 @@ pub use sovereign_hardware_roadmap::{
     DriverSovereigntyPolicy, SigmaHardwarePolicyEngine, SigmaCryptographicBootChain,
     SigmaHardwareSovereigntyRoadmapEngine,
 };
+
+pub mod sovereign_trackpad_synthesis;
+pub use sovereign_trackpad_synthesis::*;
