@@ -26,7 +26,10 @@ pub mod sigma_logic;
 pub mod system;
 pub mod tensor_memory;
 pub mod voice;
+pub mod dictation_engine;
 pub mod wandr;
+
+pub use dictation_engine::*;
 
 pub use agentic_os_runtime::{
     AgentAuditEvent, BootContainer, ContainerEngineType, ContextMemorySegment, ContextVirtualMmu,

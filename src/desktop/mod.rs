@@ -16,7 +16,9 @@ pub mod wayland_protocol;
 pub mod sovereign_ux_innovation_hub;
 pub mod weather_panel;
 pub mod universal_desktop_framework;
+pub mod xfce_engine;
 
+pub use xfce_engine::*;
 pub use wayland_protocol::*;
 pub use sovereign_ux_innovation_hub::*;
 pub use universal_desktop_framework::*;

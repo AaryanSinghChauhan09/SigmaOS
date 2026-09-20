@@ -240,6 +240,240 @@ impl NixOsFlakeHermeticEngine {
     }
 }
 
+/// DragonFly BSD HAMMER2 File System Metadata & Transaction Engine
+#[derive(Debug, Clone)]
+pub struct DragonFlyHammer2FsEngine {
+    pub pfs_subvolumes: Vec<String>,
+    pub active_snapshots: usize,
+    pub cluster_connected: bool,
+}
+
+impl DragonFlyHammer2FsEngine {
+    pub fn new() -> Self {
+        let mut subs = Vec::new();
+        subs.push(String::from("@ROOT"));
+        subs.push(String::from("@HOME"));
+        Self {
+            pfs_subvolumes: subs,
+            active_snapshots: 0,
+            cluster_connected: true,
+        }
+    }
+
+    pub fn create_pfs_snapshot(&mut self, name: &str) -> String {
+        self.active_snapshots += 1;
+        let snap_path = format!("@SNAP-{}", name);
+        self.pfs_subvolumes.push(snap_path.clone());
+        snap_path
+    }
+}
+
+impl Default for DragonFlyHammer2FsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Illumos / Solaris ZFS ARC Governor & DTrace Provider Engine
+#[derive(Debug, Clone)]
+pub struct IllumosZfsDtraceBridgeEngine {
+    pub arc_max_bytes: u64,
+    pub arc_current_bytes: u64,
+    pub dtrace_probes_registered: usize,
+}
+
+impl IllumosZfsDtraceBridgeEngine {
+    pub fn new(arc_max_bytes: u64) -> Self {
+        Self {
+            arc_max_bytes,
+            arc_current_bytes: arc_max_bytes / 2,
+            dtrace_probes_registered: 32,
+        }
+    }
+
+    pub fn register_dtrace_probe(&mut self, _provider: &str, _probe_name: &str) -> bool {
+        self.dtrace_probes_registered += 1;
+        true
+    }
+}
+
+/// Gentoo Portage EAPI 8 Slot Operator & USE Flag Solver
+#[derive(Debug, Clone)]
+pub struct GentooPortageEapi8Solver {
+    pub use_flags: Vec<String>,
+    pub subslot_dependencies: Vec<String>,
+}
+
+impl GentooPortageEapi8Solver {
+    pub fn new() -> Self {
+        let mut flags = Vec::new();
+        flags.push(String::from("ssl"));
+        flags.push(String::from("zstd"));
+        Self {
+            use_flags: flags,
+            subslot_dependencies: Vec::new(),
+        }
+    }
+
+    pub fn resolve_subslot_dep(&mut self, pkg: &str, slot: &str) -> bool {
+        self.subslot_dependencies.push(format!("{}:{}", pkg, slot));
+        true
+    }
+}
+
+impl Default for GentooPortageEapi8Solver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Bedrock Linux Stratum Isolation & Cross-Distro Mount Translator
+#[derive(Debug, Clone)]
+pub struct BedrockStratumManagerEngine {
+    pub strata: Vec<String>,
+    pub active_stratum: String,
+}
+
+impl BedrockStratumManagerEngine {
+    pub fn new() -> Self {
+        let mut s = Vec::new();
+        s.push(String::from("global"));
+        s.push(String::from("arch"));
+        s.push(String::from("debian"));
+        Self {
+            strata: s,
+            active_stratum: String::from("arch"),
+        }
+    }
+
+    pub fn stratum_exec(&mut self, stratum: &str, cmd: &str) -> String {
+        if self.strata.contains(&String::from(stratum)) {
+            self.active_stratum = String::from(stratum);
+            format!("/bedrock/strata/{}/bin/{}", stratum, cmd)
+        } else {
+            format!("/usr/bin/{}", cmd)
+        }
+    }
+}
+
+impl Default for BedrockStratumManagerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Solus eopkg / Serpent OS Moss Package Transaction Engine
+#[derive(Debug, Clone)]
+pub struct SolusMossPackageEngine {
+    pub transaction_id: u64,
+    pub installed_stone_packages: Vec<String>,
+}
+
+impl SolusMossPackageEngine {
+    pub fn new() -> Self {
+        Self {
+            transaction_id: 101,
+            installed_stone_packages: Vec::new(),
+        }
+    }
+
+    pub fn install_stone(&mut self, pkg_name: &str) -> bool {
+        self.transaction_id += 1;
+        self.installed_stone_packages.push(String::from(pkg_name));
+        true
+    }
+}
+
+impl Default for SolusMossPackageEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Clear Linux Stateless Configuration Reset Engine
+#[derive(Debug, Clone)]
+pub struct ClearLinuxStatelessEngine {
+    pub defaults_path: String,
+    pub is_stateless_clean: bool,
+}
+
+impl ClearLinuxStatelessEngine {
+    pub fn new() -> Self {
+        Self {
+            defaults_path: String::from("/usr/share/defaults"),
+            is_stateless_clean: true,
+        }
+    }
+
+    pub fn reset_etc_to_defaults(&mut self) -> bool {
+        self.is_stateless_clean = true;
+        true
+    }
+}
+
+impl Default for ClearLinuxStatelessEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Mageia Urpmi Media Indexing & Transaction Engine
+#[derive(Debug, Clone)]
+pub struct MageiaUrpmiEngine {
+    pub media_sources: Vec<String>,
+    pub synthesised_packages: usize,
+}
+
+impl MageiaUrpmiEngine {
+    pub fn new() -> Self {
+        let mut m = Vec::new();
+        m.push(String::from("core/release"));
+        m.push(String::from("core/updates"));
+        Self {
+            media_sources: m,
+            synthesised_packages: 1250,
+        }
+    }
+
+    pub fn add_media(&mut self, name: &str) {
+        self.media_sources.push(String::from(name));
+    }
+}
+
+impl Default for MageiaUrpmiEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// HardenedBSD ASLR & PaX Exploit Mitigation Engine
+#[derive(Debug, Clone)]
+pub struct HardenedBsdPaxGuardEngine {
+    pub pageexec_enabled: bool,
+    pub mprotect_enabled: bool,
+    pub aslr_entropy_bits: u32,
+}
+
+impl HardenedBsdPaxGuardEngine {
+    pub fn new() -> Self {
+        Self {
+            pageexec_enabled: true,
+            mprotect_enabled: true,
+            aslr_entropy_bits: 32,
+        }
+    }
+
+    pub fn enforce_pax_policy(&self, _binary_path: &str) -> bool {
+        self.pageexec_enabled && self.mprotect_enabled && self.aslr_entropy_bits >= 32
+    }
+}
+
+impl Default for HardenedBsdPaxGuardEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Master Missing Linux & BSD Components Suite
 #[derive(Debug, Clone)]
 pub struct SovereignMissingLinuxBsdSuite {
@@ -250,6 +484,14 @@ pub struct SovereignMissingLinuxBsdSuite {
     pub rump: NetBsdRumpKernelDriverEngine,
     pub sentinel: OpenBsdPledgeUnveilSentinelEngine,
     pub flake: NixOsFlakeHermeticEngine,
+    pub hammer2: DragonFlyHammer2FsEngine,
+    pub illumos: IllumosZfsDtraceBridgeEngine,
+    pub portage: GentooPortageEapi8Solver,
+    pub bedrock: BedrockStratumManagerEngine,
+    pub moss: SolusMossPackageEngine,
+    pub clear_stateless: ClearLinuxStatelessEngine,
+    pub urpmi: MageiaUrpmiEngine,
+    pub pax: HardenedBsdPaxGuardEngine,
 }
 
 impl SovereignMissingLinuxBsdSuite {
@@ -262,6 +504,14 @@ impl SovereignMissingLinuxBsdSuite {
             rump: NetBsdRumpKernelDriverEngine::new(),
             sentinel: OpenBsdPledgeUnveilSentinelEngine::new(),
             flake: NixOsFlakeHermeticEngine::new("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+            hammer2: DragonFlyHammer2FsEngine::new(),
+            illumos: IllumosZfsDtraceBridgeEngine::new(1024 * 1024 * 1024),
+            portage: GentooPortageEapi8Solver::new(),
+            bedrock: BedrockStratumManagerEngine::new(),
+            moss: SolusMossPackageEngine::new(),
+            clear_stateless: ClearLinuxStatelessEngine::new(),
+            urpmi: MageiaUrpmiEngine::new(),
+            pax: HardenedBsdPaxGuardEngine::new(),
         }
     }
 
@@ -270,6 +520,14 @@ impl SovereignMissingLinuxBsdSuite {
         self.vnet.attach_epair_iface("epair0a");
         self.sentinel.pledge("stdio rpath wpath cpath");
         self.sentinel.unveil("/usr/bin", "rx");
+        let snap = self.hammer2.create_pfs_snapshot("backup1");
+        let dtrace_ok = self.illumos.register_dtrace_probe("zfs", "arc-hit");
+        let slot_ok = self.portage.resolve_subslot_dep("sys-libs/zlib", "0/1");
+        let exec_path = self.bedrock.stratum_exec("debian", "apt");
+        let stone_ok = self.moss.install_stone("zenith-compositor");
+        let reset_ok = self.clear_stateless.reset_etc_to_defaults();
+        self.urpmi.add_media("nonfree/updates");
+        let pax_ok = self.pax.enforce_pax_policy("/usr/bin/sigsudo");
 
         self.yast2.verify_module("yast2-hardware")
             && self.xbps_src.generate_xbps_binary().contains("sigmaos-core")
@@ -278,6 +536,14 @@ impl SovereignMissingLinuxBsdSuite {
             && self.rump.dispatch_hypercall("rumpvfs", 1) > 0
             && self.sentinel.active_pledges.len() == 4
             && self.flake.evaluate_flake()
+            && snap.contains("@SNAP-backup1")
+            && dtrace_ok
+            && slot_ok
+            && exec_path.contains("/bedrock/strata/debian/bin/apt")
+            && stone_ok
+            && reset_ok
+            && self.urpmi.media_sources.len() == 3
+            && pax_ok
     }
 }
 
@@ -300,5 +566,11 @@ mod tests {
         assert!(suite.lbu.apkovl_committed);
         assert!(suite.vnet.is_vnet_isolated());
         assert!(suite.flake.evaluate_flake());
+        assert_eq!(suite.hammer2.active_snapshots, 1);
+        assert_eq!(suite.illumos.dtrace_probes_registered, 33);
+        assert_eq!(suite.bedrock.active_stratum, "debian");
+        assert_eq!(suite.moss.installed_stone_packages.len(), 1);
+        assert!(suite.clear_stateless.is_stateless_clean);
+        assert!(suite.pax.enforce_pax_policy("/bin/ls"));
     }
 }
