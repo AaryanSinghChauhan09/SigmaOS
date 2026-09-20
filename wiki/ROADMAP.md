@@ -82,6 +82,7 @@ SigmaOS aims to defeat Linux and BSD distributions through innovative architectu
 For detailed implementation specifications, see:
 - [Package Management](Package-Management.md)
 - [Security](SECURITY.md)
+- [Kernel](Kernel.md)
 - [Architecture](ARCHITECTURE.md)
 
 ## Contributing
