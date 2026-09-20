@@ -2041,22 +2041,6 @@ mod tests {
         assert_eq!(hammer.total_dedup_savings_bytes, 18);
     }
 
-    pub fn start_rump_server(&mut self, component_name: &str) -> usize {
-        let server_id = self.next_id;
-        self.next_id += 1;
-
-        let socket_path = format!("/tmp/rump_{}.sock", component_name);
-        let server = RumpKernelServer {
-            server_id,
-            component_name: component_name.to_string(),
-            _socket_path: socket_path,
-            is_active: true,
-        };
-
-        self.servers.push(server);
-        server_id
-    }
-
     #[test]
     fn test_gentoo_portage_slot_operator() {
         let mut portage = GentooPortageSlotOperatorEngine::new();
