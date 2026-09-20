@@ -188,6 +188,7 @@ For detailed filesystem implementation specifications:
 - [Kernel](Kernel.md)
 - [Package Management](Package-Management.md)
 - [Roadmap](ROADMAP.md)
+- [Process Management](process-management.md)
 
 ## Contributing
 
