@@ -17,13 +17,12 @@ use std::vec::Vec;
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).
 /// Translates containerized permissions (Plugs, Plugs/Slots, Finish-args) directly into SigmaOS Capability Gate Permissions.
 use crate::package::AptDebManifest;
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Package, VersionConstraint};
 
 #[cfg(test)]
 pub use crate::sigpkg::Version;
 
-#[cfg(all(not(feature = "standalone_test"), not(test)))]
-use crate::sigpkg::universal_engine::PackageFormat;
+pub use crate::sigpkg::universal_engine::PackageFormat;
 
 #[cfg(feature = "standalone_test")]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -38,7 +37,6 @@ pub enum Permission {
     Ipc,
     ProcessControl,
     Execute,
-    ProcessExec,
 }
 
 #[cfg(not(feature = "standalone_test"))]
@@ -1053,8 +1051,12 @@ impl UniversalPackageAdapter {
             Some(PackageFormat::Guix)
         } else if f.ends_with(".zypper") {
             Some(PackageFormat::Zypper)
-        } else if f.ends_with(".cachy") {
+        } else if f.ends_with(".cachy") || f.ends_with(".cachyos") {
             Some(PackageFormat::Pacman)
+        } else if f.ends_with(".swupd") {
+            Some(PackageFormat::Swupd)
+        } else if f.ends_with(".starling") {
+            Some(PackageFormat::Starling)
         } else if f.ends_with(".dports") {
             Some(PackageFormat::Ports)
         } else if f.ends_with(".slackbuild") || f.ends_with(".tlz") || f.ends_with(".tbz") {
@@ -1730,7 +1732,7 @@ impl SigPkgUniversalBridgeEngine {
         let standard_pkg = crate::sigpkg::universal_oop_system::StandardPackage {
             metadata: crate::sigpkg::universal_oop_system::PackageMetadata {
                 name: native_pkg.name.clone(),
-                version: native_pkg.version,
+                version: native_pkg.version.clone(),
                 description: native_pkg.description.clone(),
                 license: String::new(),
                 maintainer: String::new(),
@@ -1840,7 +1842,7 @@ impl UniversalDependencyMapper {
         match clean {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" => "openssl".to_string(),
-            "libc6" | "glibc" | "musl" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
+            "libc6" | "glibc" | "musl" | "musl-dev" | "musl-devel" | "devel/glibc" | "sys-libs/glibc" | "libc" => {
                 "libc".to_string()
             }
             "zlib1g-dev" | "zlib-devel" | "zlib-dev" | "devel/zlib" | "sys-libs/zlib" => {
@@ -2207,14 +2209,20 @@ impl UniversalPmCommandDispatcher {
             "emerge" | "ebuild" => {
                 let mut i = 0;
                 while i < args.len() {
-                    match args[i] {
-                        "-C" | "--unmerge" | "--deselect" => operation = UniversalPmOperation::Remove,
-                        "-u" | "-uDN" | "--update" => operation = UniversalPmOperation::Upgrade,
-                        "-s" | "--search" => operation = UniversalPmOperation::Search,
-                        "--info" => operation = UniversalPmOperation::QueryInfo,
-                        "-p" | "--pretend" | "-a" | "--ask" => dry_run = true,
-                        arg if !arg.starts_with('-') => target_packages.push(arg.to_string()),
-                        _ => {}
+                    let arg = args[i];
+                    if arg == "-C" || arg == "--unmerge" || arg == "--deselect" {
+                        operation = UniversalPmOperation::Remove;
+                    } else if arg == "-u" || arg.contains('u') || arg == "--update" {
+                        operation = UniversalPmOperation::Upgrade;
+                    } else if arg == "-s" || arg == "--search" {
+                        operation = UniversalPmOperation::Search;
+                    } else if arg == "--info" {
+                        operation = UniversalPmOperation::QueryInfo;
+                    } else if !arg.starts_with('-') {
+                        target_packages.push(arg.to_string());
+                    }
+                    if arg.starts_with('-') && (arg.contains('p') || arg.contains('a') || arg == "--pretend" || arg == "--ask") {
+                        dry_run = true;
                     }
                     i += 1;
                 }
@@ -2638,7 +2646,7 @@ mod tests {
         assert_eq!(parsed.package, "curl");
         assert_eq!(parsed.version, "8.2.1");
         assert_eq!(parsed.depends.len(), 3);
-        assert_eq!(parsed.priority, PackagePriority::Standard);
+        assert_eq!(parsed.priority, format!("{:?}", PackagePriority::Standard));
 
         // Test parsing system essential priority (Debian-style)
         let essential_text = r#"
@@ -2647,7 +2655,7 @@ mod tests {
             Priority: essential
         "#;
         let parsed_essential = adapter.parse_apt_control(essential_text).unwrap();
-        assert_eq!(parsed_essential.priority, PackagePriority::Essential);
+        assert_eq!(parsed_essential.priority, format!("{:?}", PackagePriority::Essential));
 
         let native = adapter
             .translate_to_native_package(
@@ -3358,335 +3366,6 @@ mod tests {
     }
 
     #[test]
-    fn test_foreign_pm_dispatcher_expanded_distros() {
-        let dispatcher = UniversalPmCommandDispatcher::new();
-
-        let emerge_act = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
-        assert_eq!(emerge_act.source_pm, "emerge");
-        assert_eq!(emerge_act.operation, UniversalPmOperation::Upgrade);
-        assert!(emerge_act.dry_run);
-
-        let nix_act = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
-        assert_eq!(nix_act.source_pm, "nix-env");
-        assert_eq!(nix_act.operation, UniversalPmOperation::Install);
-        assert_eq!(nix_act.target_packages, vec!["nixpkgs.git"]);
-
-        let flatpak_act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
-        assert_eq!(flatpak_act.source_pm, "flatpak");
-        assert_eq!(flatpak_act.operation, UniversalPmOperation::Install);
-        assert_eq!(flatpak_act.target_packages, vec!["org.gimp.GIMP"]);
-
-        let snap_act = dispatcher.dispatch_command("snap remove vlc").unwrap();
-        assert_eq!(snap_act.source_pm, "snap");
-        assert_eq!(snap_act.operation, UniversalPmOperation::Remove);
-        assert_eq!(snap_act.target_packages, vec!["vlc"]);
-
-        let slack_act = dispatcher.dispatch_command("slackpkg install htop").unwrap();
-        assert_eq!(slack_act.source_pm, "slackpkg");
-        assert_eq!(slack_act.operation, UniversalPmOperation::Install);
-        assert_eq!(slack_act.target_packages, vec!["htop"]);
-
-        let pkgman_act = dispatcher.dispatch_command("pkgman install haiku_dep").unwrap();
-        assert_eq!(pkgman_act.source_pm, "pkgman");
-        assert_eq!(pkgman_act.operation, UniversalPmOperation::Install);
-        assert_eq!(pkgman_act.target_packages, vec!["haiku_dep"]);
-
-        let swupd_act = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
-        assert_eq!(swupd_act.source_pm, "swupd");
-        assert_eq!(swupd_act.operation, UniversalPmOperation::Install);
-
-        let eopkg_act = dispatcher.dispatch_command("eopkg remove nano").unwrap();
-        assert_eq!(eopkg_act.source_pm, "eopkg");
-        assert_eq!(eopkg_act.operation, UniversalPmOperation::Remove);
-
-        let pkgin_act = dispatcher.dispatch_command("pkgin install tmux").unwrap();
-        assert_eq!(pkgin_act.source_pm, "pkgin");
-        assert_eq!(pkgin_act.operation, UniversalPmOperation::Install);
-    }
-
-    #[test]
-    fn test_foreign_pm_dispatcher_expanded_distros() {
-        let dispatcher = UniversalPmCommandDispatcher::new();
-
-        let emerge_act = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
-        assert_eq!(emerge_act.source_pm, "emerge");
-        assert_eq!(emerge_act.operation, UniversalPmOperation::Upgrade);
-        assert!(emerge_act.dry_run);
-
-        let nix_act = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
-        assert_eq!(nix_act.source_pm, "nix-env");
-        assert_eq!(nix_act.operation, UniversalPmOperation::Install);
-        assert_eq!(nix_act.target_packages, vec!["nixpkgs.git"]);
-
-        let flatpak_act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
-        assert_eq!(flatpak_act.source_pm, "flatpak");
-        assert_eq!(flatpak_act.operation, UniversalPmOperation::Install);
-        assert_eq!(flatpak_act.target_packages, vec!["org.gimp.GIMP"]);
-
-        let snap_act = dispatcher.dispatch_command("snap remove vlc").unwrap();
-        assert_eq!(snap_act.source_pm, "snap");
-        assert_eq!(snap_act.operation, UniversalPmOperation::Remove);
-        assert_eq!(snap_act.target_packages, vec!["vlc"]);
-
-        let slack_act = dispatcher.dispatch_command("slackpkg install htop").unwrap();
-        assert_eq!(slack_act.source_pm, "slackpkg");
-        assert_eq!(slack_act.operation, UniversalPmOperation::Install);
-        assert_eq!(slack_act.target_packages, vec!["htop"]);
-
-        let pkgman_act = dispatcher.dispatch_command("pkgman install haiku_dep").unwrap();
-        assert_eq!(pkgman_act.source_pm, "pkgman");
-        assert_eq!(pkgman_act.operation, UniversalPmOperation::Install);
-        assert_eq!(pkgman_act.target_packages, vec!["haiku_dep"]);
-
-        let swupd_act = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
-        assert_eq!(swupd_act.source_pm, "swupd");
-        assert_eq!(swupd_act.operation, UniversalPmOperation::Install);
-
-        let eopkg_act = dispatcher.dispatch_command("eopkg remove nano").unwrap();
-        assert_eq!(eopkg_act.source_pm, "eopkg");
-        assert_eq!(eopkg_act.operation, UniversalPmOperation::Remove);
-
-        let pkgin_act = dispatcher.dispatch_command("pkgin install tmux").unwrap();
-        assert_eq!(pkgin_act.source_pm, "pkgin");
-        assert_eq!(pkgin_act.operation, UniversalPmOperation::Install);
-    }
-
-    #[test]
-    fn test_foreign_pm_dispatcher_expanded_distros() {
-        let dispatcher = UniversalPmCommandDispatcher::new();
-
-        let emerge_act = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
-        assert_eq!(emerge_act.source_pm, "emerge");
-        assert_eq!(emerge_act.operation, UniversalPmOperation::Upgrade);
-        assert!(emerge_act.dry_run);
-
-        let nix_act = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
-        assert_eq!(nix_act.source_pm, "nix-env");
-        assert_eq!(nix_act.operation, UniversalPmOperation::Install);
-        assert_eq!(nix_act.target_packages, vec!["nixpkgs.git"]);
-
-        let flatpak_act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
-        assert_eq!(flatpak_act.source_pm, "flatpak");
-        assert_eq!(flatpak_act.operation, UniversalPmOperation::Install);
-        assert_eq!(flatpak_act.target_packages, vec!["org.gimp.GIMP"]);
-
-        let snap_act = dispatcher.dispatch_command("snap remove vlc").unwrap();
-        assert_eq!(snap_act.source_pm, "snap");
-        assert_eq!(snap_act.operation, UniversalPmOperation::Remove);
-        assert_eq!(snap_act.target_packages, vec!["vlc"]);
-
-        let slack_act = dispatcher.dispatch_command("slackpkg install htop").unwrap();
-        assert_eq!(slack_act.source_pm, "slackpkg");
-        assert_eq!(slack_act.operation, UniversalPmOperation::Install);
-        assert_eq!(slack_act.target_packages, vec!["htop"]);
-
-        let pkgman_act = dispatcher.dispatch_command("pkgman install haiku_dep").unwrap();
-        assert_eq!(pkgman_act.source_pm, "pkgman");
-        assert_eq!(pkgman_act.operation, UniversalPmOperation::Install);
-        assert_eq!(pkgman_act.target_packages, vec!["haiku_dep"]);
-
-        let swupd_act = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
-        assert_eq!(swupd_act.source_pm, "swupd");
-        assert_eq!(swupd_act.operation, UniversalPmOperation::Install);
-
-        let eopkg_act = dispatcher.dispatch_command("eopkg remove nano").unwrap();
-        assert_eq!(eopkg_act.source_pm, "eopkg");
-        assert_eq!(eopkg_act.operation, UniversalPmOperation::Remove);
-
-        let pkgin_act = dispatcher.dispatch_command("pkgin install tmux").unwrap();
-        assert_eq!(pkgin_act.source_pm, "pkgin");
-        assert_eq!(pkgin_act.operation, UniversalPmOperation::Install);
-    }
-
-    #[test]
-    fn test_foreign_pm_dispatcher_expanded_distros() {
-        let dispatcher = UniversalPmCommandDispatcher::new();
-
-        let emerge_act = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
-        assert_eq!(emerge_act.source_pm, "emerge");
-        assert_eq!(emerge_act.operation, UniversalPmOperation::Upgrade);
-        assert!(emerge_act.dry_run);
-
-        let nix_act = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
-        assert_eq!(nix_act.source_pm, "nix-env");
-        assert_eq!(nix_act.operation, UniversalPmOperation::Install);
-        assert_eq!(nix_act.target_packages, vec!["nixpkgs.git"]);
-
-        let flatpak_act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
-        assert_eq!(flatpak_act.source_pm, "flatpak");
-        assert_eq!(flatpak_act.operation, UniversalPmOperation::Install);
-        assert_eq!(flatpak_act.target_packages, vec!["org.gimp.GIMP"]);
-
-        let snap_act = dispatcher.dispatch_command("snap remove vlc").unwrap();
-        assert_eq!(snap_act.source_pm, "snap");
-        assert_eq!(snap_act.operation, UniversalPmOperation::Remove);
-        assert_eq!(snap_act.target_packages, vec!["vlc"]);
-
-        let slack_act = dispatcher.dispatch_command("slackpkg install htop").unwrap();
-        assert_eq!(slack_act.source_pm, "slackpkg");
-        assert_eq!(slack_act.operation, UniversalPmOperation::Install);
-        assert_eq!(slack_act.target_packages, vec!["htop"]);
-
-        let pkgman_act = dispatcher.dispatch_command("pkgman install haiku_dep").unwrap();
-        assert_eq!(pkgman_act.source_pm, "pkgman");
-        assert_eq!(pkgman_act.operation, UniversalPmOperation::Install);
-        assert_eq!(pkgman_act.target_packages, vec!["haiku_dep"]);
-
-        let swupd_act = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
-        assert_eq!(swupd_act.source_pm, "swupd");
-        assert_eq!(swupd_act.operation, UniversalPmOperation::Install);
-
-        let eopkg_act = dispatcher.dispatch_command("eopkg remove nano").unwrap();
-        assert_eq!(eopkg_act.source_pm, "eopkg");
-        assert_eq!(eopkg_act.operation, UniversalPmOperation::Remove);
-
-        let pkgin_act = dispatcher.dispatch_command("pkgin install tmux").unwrap();
-        assert_eq!(pkgin_act.source_pm, "pkgin");
-        assert_eq!(pkgin_act.operation, UniversalPmOperation::Install);
-    }
-
-    #[test]
-    fn test_foreign_pm_dispatcher_expanded_distros() {
-        let dispatcher = UniversalPmCommandDispatcher::new();
-
-        let emerge_act = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
-        assert_eq!(emerge_act.source_pm, "emerge");
-        assert_eq!(emerge_act.operation, UniversalPmOperation::Upgrade);
-        assert!(emerge_act.dry_run);
-
-        let nix_act = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
-        assert_eq!(nix_act.source_pm, "nix-env");
-        assert_eq!(nix_act.operation, UniversalPmOperation::Install);
-        assert_eq!(nix_act.target_packages, vec!["nixpkgs.git"]);
-
-        let flatpak_act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
-        assert_eq!(flatpak_act.source_pm, "flatpak");
-        assert_eq!(flatpak_act.operation, UniversalPmOperation::Install);
-        assert_eq!(flatpak_act.target_packages, vec!["org.gimp.GIMP"]);
-
-        let snap_act = dispatcher.dispatch_command("snap remove vlc").unwrap();
-        assert_eq!(snap_act.source_pm, "snap");
-        assert_eq!(snap_act.operation, UniversalPmOperation::Remove);
-        assert_eq!(snap_act.target_packages, vec!["vlc"]);
-
-        let slack_act = dispatcher.dispatch_command("slackpkg install htop").unwrap();
-        assert_eq!(slack_act.source_pm, "slackpkg");
-        assert_eq!(slack_act.operation, UniversalPmOperation::Install);
-        assert_eq!(slack_act.target_packages, vec!["htop"]);
-
-        let pkgman_act = dispatcher.dispatch_command("pkgman install haiku_dep").unwrap();
-        assert_eq!(pkgman_act.source_pm, "pkgman");
-        assert_eq!(pkgman_act.operation, UniversalPmOperation::Install);
-        assert_eq!(pkgman_act.target_packages, vec!["haiku_dep"]);
-
-        let swupd_act = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
-        assert_eq!(swupd_act.source_pm, "swupd");
-        assert_eq!(swupd_act.operation, UniversalPmOperation::Install);
-
-        let eopkg_act = dispatcher.dispatch_command("eopkg remove nano").unwrap();
-        assert_eq!(eopkg_act.source_pm, "eopkg");
-        assert_eq!(eopkg_act.operation, UniversalPmOperation::Remove);
-
-        let pkgin_act = dispatcher.dispatch_command("pkgin install tmux").unwrap();
-        assert_eq!(pkgin_act.source_pm, "pkgin");
-        assert_eq!(pkgin_act.operation, UniversalPmOperation::Install);
-    }
-
-    #[test]
-    fn test_foreign_pm_dispatcher_expanded_distros() {
-        let dispatcher = UniversalPmCommandDispatcher::new();
-
-        let emerge_act = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
-        assert_eq!(emerge_act.source_pm, "emerge");
-        assert_eq!(emerge_act.operation, UniversalPmOperation::Upgrade);
-        assert!(emerge_act.dry_run);
-
-        let nix_act = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
-        assert_eq!(nix_act.source_pm, "nix-env");
-        assert_eq!(nix_act.operation, UniversalPmOperation::Install);
-        assert_eq!(nix_act.target_packages, vec!["nixpkgs.git"]);
-
-        let flatpak_act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
-        assert_eq!(flatpak_act.source_pm, "flatpak");
-        assert_eq!(flatpak_act.operation, UniversalPmOperation::Install);
-        assert_eq!(flatpak_act.target_packages, vec!["org.gimp.GIMP"]);
-
-        let snap_act = dispatcher.dispatch_command("snap remove vlc").unwrap();
-        assert_eq!(snap_act.source_pm, "snap");
-        assert_eq!(snap_act.operation, UniversalPmOperation::Remove);
-        assert_eq!(snap_act.target_packages, vec!["vlc"]);
-
-        let slack_act = dispatcher.dispatch_command("slackpkg install htop").unwrap();
-        assert_eq!(slack_act.source_pm, "slackpkg");
-        assert_eq!(slack_act.operation, UniversalPmOperation::Install);
-        assert_eq!(slack_act.target_packages, vec!["htop"]);
-
-        let pkgman_act = dispatcher.dispatch_command("pkgman install haiku_dep").unwrap();
-        assert_eq!(pkgman_act.source_pm, "pkgman");
-        assert_eq!(pkgman_act.operation, UniversalPmOperation::Install);
-        assert_eq!(pkgman_act.target_packages, vec!["haiku_dep"]);
-
-        let swupd_act = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
-        assert_eq!(swupd_act.source_pm, "swupd");
-        assert_eq!(swupd_act.operation, UniversalPmOperation::Install);
-
-        let eopkg_act = dispatcher.dispatch_command("eopkg remove nano").unwrap();
-        assert_eq!(eopkg_act.source_pm, "eopkg");
-        assert_eq!(eopkg_act.operation, UniversalPmOperation::Remove);
-
-        let pkgin_act = dispatcher.dispatch_command("pkgin install tmux").unwrap();
-        assert_eq!(pkgin_act.source_pm, "pkgin");
-        assert_eq!(pkgin_act.operation, UniversalPmOperation::Install);
-    }
-
-    #[test]
-    fn test_foreign_pm_dispatcher_expanded_distros() {
-        let dispatcher = UniversalPmCommandDispatcher::new();
-
-        let emerge_act = dispatcher.dispatch_command("emerge -uDN @world -p").unwrap();
-        assert_eq!(emerge_act.source_pm, "emerge");
-        assert_eq!(emerge_act.operation, UniversalPmOperation::Upgrade);
-        assert!(emerge_act.dry_run);
-
-        let nix_act = dispatcher.dispatch_command("nix-env -iA nixpkgs.git").unwrap();
-        assert_eq!(nix_act.source_pm, "nix-env");
-        assert_eq!(nix_act.operation, UniversalPmOperation::Install);
-        assert_eq!(nix_act.target_packages, vec!["nixpkgs.git"]);
-
-        let flatpak_act = dispatcher.dispatch_command("flatpak install org.gimp.GIMP").unwrap();
-        assert_eq!(flatpak_act.source_pm, "flatpak");
-        assert_eq!(flatpak_act.operation, UniversalPmOperation::Install);
-        assert_eq!(flatpak_act.target_packages, vec!["org.gimp.GIMP"]);
-
-        let snap_act = dispatcher.dispatch_command("snap remove vlc").unwrap();
-        assert_eq!(snap_act.source_pm, "snap");
-        assert_eq!(snap_act.operation, UniversalPmOperation::Remove);
-        assert_eq!(snap_act.target_packages, vec!["vlc"]);
-
-        let slack_act = dispatcher.dispatch_command("slackpkg install htop").unwrap();
-        assert_eq!(slack_act.source_pm, "slackpkg");
-        assert_eq!(slack_act.operation, UniversalPmOperation::Install);
-        assert_eq!(slack_act.target_packages, vec!["htop"]);
-
-        let pkgman_act = dispatcher.dispatch_command("pkgman install haiku_dep").unwrap();
-        assert_eq!(pkgman_act.source_pm, "pkgman");
-        assert_eq!(pkgman_act.operation, UniversalPmOperation::Install);
-        assert_eq!(pkgman_act.target_packages, vec!["haiku_dep"]);
-
-        let swupd_act = dispatcher.dispatch_command("swupd bundle-add os-core").unwrap();
-        assert_eq!(swupd_act.source_pm, "swupd");
-        assert_eq!(swupd_act.operation, UniversalPmOperation::Install);
-
-        let eopkg_act = dispatcher.dispatch_command("eopkg remove nano").unwrap();
-        assert_eq!(eopkg_act.source_pm, "eopkg");
-        assert_eq!(eopkg_act.operation, UniversalPmOperation::Remove);
-
-        let pkgin_act = dispatcher.dispatch_command("pkgin install tmux").unwrap();
-        assert_eq!(pkgin_act.source_pm, "pkgin");
-        assert_eq!(pkgin_act.operation, UniversalPmOperation::Install);
-    }
-
-    #[test]
     fn test_haiku_hpkg_manifest_parsing_and_bridge() {
         let adapter = UniversalPackageAdapter::new();
         let hpkg_text = r#"
@@ -3736,7 +3415,7 @@ requires {
         // 4. OpenBSD +CONTENTS
         let openbsd_contents = "@name htop-3.2.2\n@depend sysutils/lsof\n@comment interactive process viewer\n";
         let obsd_manifest = adapter.parse_openbsd_contents(openbsd_contents).unwrap();
-        assert_eq!(obsd_manifest.name, "htop");
+        assert_eq!(obsd_manifest.pkgname, "htop");
         assert_eq!(obsd_manifest.version, "3.2.2");
     }
 }

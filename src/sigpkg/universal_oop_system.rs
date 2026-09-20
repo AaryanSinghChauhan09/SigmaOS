@@ -263,6 +263,10 @@ pub enum PackageFormat {
     Vcpkg,
     // Nix/Guix NarInfo substituter manifest (.narinfo)
     NarInfo,
+    // Clear Linux swupd (.swupd)
+    Swupd,
+    // StarlingX (.starling)
+    Starling,
 }
 
 impl PackageFormat {
@@ -363,6 +367,10 @@ impl PackageFormat {
             Some(PackageFormat::Pup)
         } else if normalized.ends_with(".pet") {
             Some(PackageFormat::Pet)
+        } else if normalized.ends_with(".swupd") {
+            Some(PackageFormat::Swupd)
+        } else if normalized.ends_with(".starling") {
+            Some(PackageFormat::Starling)
         } else if normalized.ends_with(".tar") {
             Some(PackageFormat::Tar)
         } else if normalized.ends_with(".ipk") {
