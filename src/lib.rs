@@ -22,6 +22,7 @@ pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod desktop;
+pub mod init;
 pub mod device;
 pub mod driver;
 pub mod drivers;

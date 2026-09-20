@@ -56,6 +56,8 @@ pub mod preempt_rt;
 pub use preempt_rt::*;
 pub mod drm_gem;
 pub use drm_gem::*;
+pub mod entry;
+pub use entry::*;
 
 pub mod linux_bsd_innovations;
 pub mod linux_parity;
