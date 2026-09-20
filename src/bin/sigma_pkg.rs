@@ -114,6 +114,11 @@ mod tests {
         assert_eq!(debian.operation, UniversalPmOperation::Install);
         assert_eq!(debian.target_packages, vec!["nginx"]);
 
+        let fedora = dispatcher.dispatch_command("fedora install htop").unwrap();
+        assert_eq!(fedora.source_pm, "fedora");
+        assert_eq!(fedora.operation, UniversalPmOperation::Install);
+        assert_eq!(fedora.target_packages, vec!["htop"]);
+
         let arch = dispatcher.dispatch_command("arch install ripgrep").unwrap();
         assert_eq!(arch.source_pm, "arch");
         assert_eq!(arch.operation, UniversalPmOperation::Install);
@@ -121,6 +126,10 @@ mod tests {
         let freebsd = dispatcher.dispatch_command("freebsd install postgresql").unwrap();
         assert_eq!(freebsd.source_pm, "freebsd");
         assert_eq!(freebsd.operation, UniversalPmOperation::Install);
+
+        let void = dispatcher.dispatch_command("void install xbps").unwrap();
+        assert_eq!(void.source_pm, "void");
+        assert_eq!(void.operation, UniversalPmOperation::Install);
     }
 
     #[test]
