@@ -82,6 +82,10 @@ pub enum PackageFormat {
     NarInfo,
     Spack,
     Conan,
+    Deb,
+    Rpm,
+    Swupd,
+    Starling,
 }
 
 #[derive(Debug, Clone)]

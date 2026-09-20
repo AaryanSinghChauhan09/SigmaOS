@@ -648,6 +648,12 @@ impl UniversalPackageType {
             Some(UniversalPackageType::Sigma)
         } else if normalized.ends_with(".tar") {
             Some(UniversalPackageType::TarArchive)
+        } else if normalized.ends_with(".swupd")
+            || normalized.ends_with(".starling")
+            || normalized.ends_with(".cachyos")
+            || normalized.ends_with(".cachy")
+        {
+            Some(UniversalPackageType::Pacman)
         } else {
             None
         }
