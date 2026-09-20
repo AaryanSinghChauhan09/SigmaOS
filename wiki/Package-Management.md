@@ -189,3 +189,5 @@ Package management development follows the SigmaOS agent guidelines:
 - PACKAGE_MANAGEMENT.md
 - package-manager.md
 - Package-Submission-Guidelines.md
+- Post-Quantum-Cryptography-Package-Distribution.md
+- UNIVERSAL_PACKAGE_SYSTEM_IMPLEMENTATION_PLAN.md
