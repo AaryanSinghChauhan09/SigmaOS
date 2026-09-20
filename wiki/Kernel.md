@@ -1,290 +1,216 @@
-# SigmaOS Kernel Documentation
+# SigmaOS Kernel
+
+This page consolidates all kernel documentation for SigmaOS.
 
 ## Overview
 
-The SigmaOS kernel (`src/kernel/`) is a microkernel-based operating system kernel written in Rust with `#![no_std]` at its core. It provides:
+SigmaOS implements a modular, hybrid-architecture kernel inspired by Linux, BSD, and Windows kernel designs, with support for both `std` and `#![no_std]` environments. The kernel provides comprehensive subsystem support for process management, memory management, filesystem operations, security, and device drivers.
 
-- **Capability-based security model** — every resource access requires an unforgeable capability token
-- **BORE/EEVDF hybrid scheduler** — CachyOS-inspired scheduler with burst-oriented response enhancement
-- **Zero-copy IPC channels** — message passing without unnecessary memory copies
-- **Memory isolation** — hardware-enforced process isolation via MMU/page tables
-- **Cgroup v2 integration** — hierarchical resource control groups
+## Kernel Architecture
 
----
+### Design Philosophy
 
-## 🔍 Kernel Subsystem Gap Analysis & Strategic Roadmap
+#### Hybrid std/no_std Architecture
+- **User-space components** use `std::` for full OS functionality
+- **Kernel modules** pursue `#![no_std]` compatibility where feasible
+- **Modular design** allows selective subsystem isolation
+- **Zero external dependencies** where possible for critical components
 
-### Current Kernel Capabilities & Gaps
-SigmaOS combines seL4 capability isolation, CachyOS BORE+EEVDF CPU scheduling, and OpenBSD zero-trust sandboxing. However, achieving enterprise-grade kernel maturity comparable to production Linux and BSD kernels requires addressing key gaps:
+#### Modular Kernel System
+- **Loadable kernel modules** (LKMs) for dynamic functionality
+- **Microkernel influences** for IPC and driver isolation
+- **Monolithic optimizations** for performance-critical paths
+- **Hybrid approach** balancing performance and security
 
-1. **Control Flow Integrity (CFI) & Shadow Stacks**: HardenedBSD and Linux CFI/IBT mitigate indirect jump hijacking. SigmaOS requires hardware CET shadow stack integration and Forward-Edge CFI checks.
-2. **Zero-Downtime Livepatching**: Linux `kpatch`/`Ksplice` and FreeBSD `kld` dynamic patching support function redirection without rebooting. SigmaOS requires a live symbol redirection framework.
-3. **Multi-ISA Hardware HAL Expansion**: While x86_64 long mode is well-supported, ARM64 (aarch64 MMU/GICv3) and RISC-V 64 (Sv39/Sv48 MMU & PLIC) HAL shards require full hardware initialization.
-4. **eBPF Kernel Verifier Hardening**: Linux eBPF provides JIT compilation and static verification. SigmaOS requires strict register type tracking and pointer bounds checks in the eBPF runtime.
-5. **Formal Verification Proofs**: Inspired by seL4, capability grant/revoke state transitions require automated formal proofs for mathematically proven non-interference.
-6. **Hard Real-Time Latency Guarantees**: Integrating `SCHED_DEADLINE` and lockless RCU read-side critical sections to guarantee <10µs maximum scheduling latency for robotics and edge computing.
+### Core Subsystems
 
----
+#### Process Management
+- **Scheduler** - EEVDF (Earliest Eligible Virtual Deadline First) scheduler
+- **Process creation** - fork/exec variants from Linux/BSD
+- **Thread management** - POSIX threads (pthreads) compatibility
+- **Process isolation** - Memory protection and capability controls
+- **Signal handling** - POSIX signal semantics
 
-## 🔍 Kernel Ring Buffer (`dmesg`) Logging Subsystem Gap Analysis & Strategic Roadmap
+#### Memory Management
+- **Virtual memory** - Paging, segmentation, and memory protection
+- **Physical memory** - Page frame allocation and management
+- **Memory mapping** - mmap, mprotect, and address space layout
+- **Swap management** - Swap-out mechanisms with sub-1ms restoration
+- **Cgroups** - Control groups for resource isolation
 
-### Current Capabilities & Logging Gaps
-SigmaOS kernel logging (`src/logging/logger.rs`, `src/security/kali_stack.rs`, `src/tools/sovereign_commands.rs`) provides circular ring buffer logging (`DmesgLog` / `KernelDmesgEntry`), pre-populated boot logs, and security sysctl restrictions (`kernel.dmesg_restrict = 1`). Achieving full parity with mature Linux (`dmesg`, `klogctl`, syslog facilities) and BSD (`dmesg`, `kern.bootctl`) logging frameworks requires addressing key gaps:
+#### Filesystem Layer
+- **VFS (Virtual Filesystem Switch)** - Abstract filesystem interface
+- **Supported filesystems** - ext4, Btrfs, ZFS, F2FS, FAT32, NTFS
+- **Copy-on-Write (CoW)** - Snapshot-based filesystem operations
+- **Symlink engine** - Advanced symbolic link management
+- **POSIX compatibility** - Standard filesystem operations
 
-1. **Lock-Free Atomic Ring Buffer Overhead**: Expanding the kernel circular buffer into an atomic lock-free power-of-two ring buffer to prevent printk lock contention during high-frequency IRQ storms.
-2. **`klogctl` Syscall Parity**: Implementing Linux `klogctl` system call operations (`SYSLOG_ACTION_READ`, `SYSLOG_ACTION_READ_ALL`, `SYSLOG_ACTION_CLEAR`, `SYSLOG_ACTION_CONSOLE_OFF`, `SYSLOG_ACTION_SIZE_BUFFER`).
-3. **`dmesg` CLI Feature Parity**: Supporting `-w` (live follow stream), `-c` (read and clear), `-k`/`-u` (facility filter for kernel vs userland), `-H` (human-readable delta timestamps), and `-L` (colorized log levels).
-4. **Syslog Facility & Severity Matrix**: Encoding standard syslog facilities (kern, user, mail, daemon, auth, syslog, lpr) and severity levels (0-Emergency to 7-Debug) in every `dmesg` message entry.
-5. **Persistent Panic Logs & NVRAM Dump**: Preserving post-mortem kernel panic crash logs across soft reboots and hardware Machine Check Exceptions (MCE) via non-volatile RAM (NVRAM) or Pstore buffer dumps.
+#### Security Subsystems
+- **Capability-based security** - Fine-grained permission delegation
+- **Landlock v5** - Linux filesystem sandboxing
+- **Capsicum** - FreeBSD capability-based security
+- **Pledge/Unveil** - OpenBSD security promises
+- **eBPF/seccomp** - System call filtering and monitoring
 
----
+#### Device Drivers
+- **Universal driver suite** - Cross-platform driver framework
+- **WDM (Windows Driver Model)** compatibility
+- **Linux driver compatibility** - Character, block, and network drivers
+- **FreeBSD driver support** - Device tree and probe methods
+- **Hot-plug support** - Dynamic device detection and loading
 
-### 📊 `dmesg` Logging Gap Dashboard
+## Kernel Features
 
-| Logging Feature | Current State (SigmaOS) | Target State (Linux `dmesg`/`klogctl` & BSD) |
-|---|---|---|
-| **Ring Buffer Storage** | `DmesgLog` / `KernelDmesgEntry` | Atomic lock-free power-of-two circular ring buffer |
-| **Syscall Interface** | Custom logger API | `klogctl` / `syslog(2)` POSIX syscall parity |
-| **Security Controls** | `kernel.dmesg_restrict` rule | Capability-bounded `kernel.dmesg_restrict` sysctl enforcement |
-| **CLI Options** | Basic log list output | `dmesg -w` follow, `-c` clear, `-k`/`-u` facility filters, `-L` colors |
-| **Crash Persistence** | In-memory log buffer | NVRAM / Pstore panic dump preservation across reboots |
+### Advanced Capabilities
 
----
+#### Dynamic Kernel Module Loading
+- **Kernel module system** for runtime extensibility
+- **Module signing** - Cryptographic verification of modules
+- **Dependency resolution** - Automatic module dependency handling
+- **Sandboxed modules** - Isolated module execution environments
 
-### 🚀 3-Phase `dmesg` Logging Development Roadmap
+#### Low-Overhead Observability
+- **eBPF runtime** - Efficient kernel tracing and instrumentation
+- **System call auditing** - Comprehensive syscall monitoring
+- **Performance counters** - Hardware performance monitoring
+- **Ftrace/LTTng** - Kernel tracing infrastructure
 
-#### Phase 1: Circular Ring Buffer & Security Restriction (0–6 Months)
-- **Lock-Free Ring Buffer**: Build atomic circular ring buffer storing `[  0.000000]` boot-relative timestamped log entries.
-- **`klogctl` Syscall Parity**: Implement `syslog(2)` / `klogctl` syscall operations for reading, clearing, and sizing the log buffer.
-- **`kernel.dmesg_restrict` Enforcement**: Block unprivileged userspace read access to `dmesg` unless `CAP_SYS_ADMIN` is held.
+#### Performance Tuning
+- **CPU governor** - Dynamic frequency scaling
+- **I/O scheduler** - Multi-queue block I/O scheduling
+- **Network stack optimization** - XDP and zero-copy networking
+- **Memory compaction** - Defragmentation and optimization
 
-#### Phase 2: CLI Options Parity & Facility Filtering (6–12 Months)
-- **Follow & Clear Modes**: Implement `dmesg -w` (live log stream follow) and `dmesg -c` (read-and-clear).
-- **Facility & Severity Filter**: Support `-k` (kernel messages), `-u` (userland messages), and severity level filtering.
-- **Colorized Formatting**: Add `dmesg -L` colorized log level output (red for emergency/panic, yellow for warning, green for info).
+#### Syscall Enforcement
+- **Seccomp-BPF** - System call filtering
+- **Landlock** - Filesystem access control
+- **Audit subsystem** - Security event logging
+- **Capability checks** - POSIX capability verification
 
-#### Phase 3: Persistent Panic Logs & NVRAM Dump (12–18 Months)
-- **NVRAM Panic Dump**: Automatically flush `dmesg` ring buffer to NVRAM / EFI pstore upon kernel panic or MCE hardware fault.
-- **PII Scrubbing**: Sanitize sensitive memory addresses and keys from public `dmesg` bug report outputs.
-- **eBPF Log Subscribers**: Allow unprivileged eBPF probes to subscribe to specific kernel log event channels.
+### Kernel Timers
+- **High-resolution timers** - nanosecond precision
+- **Clock interrupt handling** - Tickless kernel operation
+- **Timer wheels** - Efficient timer management
+- **POSIX timers** - timer_create, timer_settime compatibility
 
----
+## AI Agent Kernel Guidelines
 
-## Architecture
+### Bolt (Performance Persona)
+**Mission:** Kernel performance optimization
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   User Space                        │
-│  Applications │ Shell │ Package Mgr │ Desktop       │
-└──────────────────────┬──────────────────────────────┘
-                       │ Syscall Interface
-┌──────────────────────▼──────────────────────────────┐
-│                  Microkernel                        │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │
-│  │  Scheduler  │  │  IPC/Caps   │  │    MMU      │ │
-│  └─────────────┘  └─────────────┘  └─────────────┘ │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │
-│  │   Cgroups   │  │  Interrupts │  │  Syscalls   │ │
-│  └─────────────┘  └─────────────┘  └─────────────┘ │
-└──────────────────────┬──────────────────────────────┘
-                       │ Hardware Abstraction Layer
-┌──────────────────────▼──────────────────────────────┐
-│               Hardware (x86_64/aarch64/riscv64)     │
-└─────────────────────────────────────────────────────┘
-```
+**Focus Areas:**
+- O(1) algorithms in critical paths
+- Lock-free data structures (RCU, atomic operations)
+- Cache-aware memory layouts
+- Zero-copy operations
+- Adaptive scheduling policies
 
-## Key Components
+**Critical Learning Journal:** `.jules/bolt.md`
 
-### Process Scheduler (`src/kernel/scheduler.rs`)
+### Kernel Verification Checklist
+Before committing kernel changes, verify:
+1. No memory leaks in allocation/deallocation paths
+2. Proper error handling in all kernel paths
+3. Thread-safe access to shared data structures
+4. No deadlock potential in lock acquisition order
+5. Proper bounds checking on all kernel buffers
+6. Safe FFI interactions with hardware
+7. Interrupt context constraints respected
+8. Memory barriers and atomic operations used correctly
 
-SigmaOS uses a hybrid BORE (Burst-Oriented Response Enhancer) + EEVDF (Earliest Eligible Virtual Deadline First) scheduler inspired by CachyOS:
+## Kernel Testing
 
-- **EEVDF** provides fair CPU time distribution with deadline-aware scheduling
-- **BORE extension** enhances responsiveness for interactive workloads
-- **Real-time support** — configurable SCHED_FIFO/SCHED_RR priority classes
-- **CPU affinity** — pin threads to specific cores
-
-```rust
-// Example: Setting scheduler policy
-use sigma::kernel::scheduler::{SchedulerPolicy, ProcessPriority};
-
-let policy = SchedulerPolicy::new()
-    .with_algorithm(SchedAlgorithm::EevdfBore)
-    .with_priority(ProcessPriority::Interactive)
-    .with_time_slice_us(1000); // 1ms time slice
-```
-
-### Memory Management (`src/kernel/memory.rs`, `src/memory/`)
-
-- **4-level page tables** (PML4 → PDPT → PD → PT) on x86_64
-- **ASLR** — Address Space Layout Randomization enabled by default
-- **KASLR** — Kernel ASLR for kernel text/data regions
-- **Huge pages** — 2MB/1GB transparent huge page support
-- **NUMA awareness** — node-local allocation preference
-- **Slab allocator** — O(1) fixed-size object allocation
-
-```rust
-// Physical memory allocation
-let frame = FRAME_ALLOCATOR.allocate_frame()?;
-
-// Virtual memory mapping
-let page = Page::containing_address(virt_addr);
-let flags = PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::NO_EXECUTE;
-mapper.map_to(page, frame, flags, &mut frame_allocator)?;
-```
-
-### Inter-Process Communication (`src/kernel/ipc.rs`)
-
-SigmaOS IPC is built on **capability-based channels**:
-
-- **Synchronous calls** — blocking request/reply (like seL4 IPC)
-- **Asynchronous notifications** — non-blocking event delivery
-- **Shared memory regions** — zero-copy large data transfer
-- **Capability delegation** — pass capabilities through IPC
-
-```rust
-// Creating an IPC endpoint
-let endpoint = IpcEndpoint::create(KERNEL_CAPABILITY)?;
-
-// Sending a message
-endpoint.send(IpcMessage {
-    label: MSG_READ,
-    data: [0u64; 4],
-    caps: [capability],
-})?;
-
-// Receiving a message
-let msg = endpoint.recv()?;
-```
-
-### Capability System (`src/kernel/capabilities.rs`)
-
-Every kernel resource (file, device, process) is accessed via unforgeable capability tokens:
-
-| Capability Type | Description |
-|----------------|-------------|
-| `MemoryCap` | Access to a physical memory frame |
-| `EndpointCap` | Send/receive on IPC channel |
-| `ThreadCap` | Control a kernel thread |
-| `DeviceCap` | Access hardware device MMIO |
-| `IrqCap` | Register an interrupt handler |
-| `FrameCap` | Map a physical frame |
-
-### Interrupt Handling (`src/kernel/interrupts.rs`)
-
-- **APIC/xAPIC** — Advanced Programmable Interrupt Controller
-- **MSI/MSI-X** — Message-Signaled Interrupts for PCIe devices
-- **Interrupt coalescing** — batch processing for high-rate interrupts
-- **Deferred processing** — top-half/bottom-half split
-
-### System Calls (`src/syscall/`)
-
-SigmaOS uses a **fast syscall interface** (SYSCALL/SYSRET on x86_64):
-
-| Syscall | Number | Description |
-|---------|--------|-------------|
-| `sigma_ipc_send` | 0 | Send IPC message |
-| `sigma_ipc_recv` | 1 | Receive IPC message |
-| `sigma_cap_invoke` | 2 | Invoke a capability |
-| `sigma_thread_create` | 3 | Create new thread |
-| `sigma_memory_map` | 4 | Map memory region |
-| `sigma_yield` | 5 | Yield CPU timeslice |
-| `sigma_exit` | 6 | Terminate current thread |
-| `sigma_debug` | 7 | Debug output (debug builds) |
-
-## Boot Process
-
-```
-1. UEFI Firmware
-   └── 2. SigmaOS Bootloader (sigma-boot)
-       ├── Load kernel ELF
-       ├── Set up initial page tables
-       ├── Switch to long mode (x86_64)
-       └── 3. Kernel Entry Point (start64)
-           ├── Initialize BSS segment
-           ├── Set up GDT/IDT
-           ├── Initialize APIC
-           ├── Start memory manager
-           ├── Start scheduler
-           └── 4. Init Process (PID 1: sigma-init)
-               ├── Mount root filesystem
-               ├── Start system services
-               └── Launch user session
-```
-
-## Kernel Parameters
-
-Kernel parameters can be set at boot via GRUB/UEFI boot args or `sigma.toml`:
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `sigma.heap_size` | `64M` | Kernel heap size |
-| `sigma.max_procs` | `65536` | Max concurrent processes |
-| `sigma.scheduler` | `eevdf-bore` | Scheduler algorithm |
-| `sigma.kaslr` | `true` | Enable KASLR |
-| `sigma.debug` | `false` | Enable kernel debug output |
-| `sigma.loglevel` | `4` | Log verbosity (0-7) |
-
-## Security Features
-
-### Mandatory Access Control (MAC)
-
-SigmaOS implements MAC at the kernel level via LSM (Linux Security Module) compatible hooks:
-
-- **Inode access hooks** — enforce file access policy
-- **Process creation hooks** — validate new process context
-- **Network socket hooks** — enforce network policy
-- **IPC hooks** — control inter-process communication
-
-### Exploit Mitigations
-
-| Mitigation | Status | Description |
-|------------|--------|-------------|
-| KASLR | ✅ | Kernel address space randomization |
-| SMEP | ✅ | Supervisor mode execution prevention |
-| SMAP | ✅ | Supervisor mode access prevention |
-| KPTI | ✅ | Kernel page-table isolation (Meltdown) |
-| Stack canaries | ✅ | Stack overflow detection |
-| RELRO | ✅ | Read-only GOT after relocation |
-| PIE | ✅ | Position-independent executable kernel |
-| CFI | ⬜ | Control-flow integrity (planned) |
-| Shadow stacks | ⬜ | CET shadow stack support (planned) |
-
-## Kernel Development
-
-See [Kernel Development](../docs/kernel.md) and [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
-
-### Adding a Syscall
-
-1. Add syscall number to `src/syscall/numbers.rs`
-2. Implement handler in `src/syscall/handlers.rs`
-3. Add to dispatch table in `src/syscall/dispatcher.rs`
-4. Write tests in `tests/`
-5. Document in `docs/api-reference.md`
-
-### Adding a Kernel Module
-
-1. Create `src/kernel/my_module.rs`
-2. Add `pub mod my_module;` to `src/kernel/mod.rs`
-3. Implement the `KernelModule` trait
-4. Register in `src/kernel/init.rs`
-
-## Testing
-
+### Unit Testing
 ```bash
-# Run kernel unit tests
-cargo test --package sigma-kernel
+# Run kernel-specific tests
+cargo test --lib kernel
 
-# Run kernel integration tests
-bash run_sigma_tests.sh
-
-# Run with QEMU
-make run-tests
+# Test specific kernel subsystems
+cargo test --lib kernel::paging
+cargo test --lib kernel::scheduler
+cargo test --lib kernel::ipc
 ```
 
-## References
+### Integration Testing
+- **Kernel module loading** - Test module load/unload cycles
+- **Stress testing** - High-load kernel operation
+- **Fault injection** - Error path verification
+- **Performance benchmarks** - Kernel subsystem performance
 
-- [seL4 Microkernel Formal Verification](https://sel4.systems/)
-- [EEVDF Scheduler Paper](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=805acf7726282723e7deff18527a37f5082e3c7f)
-- [CachyOS BORE Scheduler](https://github.com/cachyos/kernel-patches)
-- [x86_64 Architecture Manual](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html)
+### Verification Commands
+```bash
+# Build kernel modules
+rustc --edition=2021 --crate-type staticlib src/kernel/mod.rs
+
+# Test kernel compilation
+cargo build --lib
+
+# Run full test suite
+./run_sigma_tests.sh
+```
+
+## Kernel Best Practices
+
+### Memory Safety
+- Use safe Rust abstractions where possible
+- Minimal unsafe code with extensive documentation
+- Proper error handling for allocation failures
+- Memory barrier usage for SMP systems
+- DMA buffer management for device drivers
+
+### Concurrency
+- Lock-free algorithms where appropriate
+- RCU for read-mostly data structures
+- Proper lock ordering to prevent deadlocks
+- Interrupt context considerations
+- Memory ordering semantics
+
+### Performance
+- Profile before optimizing
+- Consider cache locality
+- Minimize system call overhead
+- Use zero-copy where possible
+- Batch operations for efficiency
+
+### Security
+- Validate all user inputs from kernel space
+- Sanitize filesystem paths
+- Check capabilities before privileged operations
+- Audit security-relevant kernel operations
+- Implement proper error handling
+
+## Documentation References
+
+For detailed kernel implementation specifications:
+- [Architecture](ARCHITECTURE.md)
+- [Security](SECURITY.md)
+- [Package Management](Package-Management.md)
+- [Roadmap](ROADMAP.md)
+
+## Contributing
+
+Kernel development follows SigmaOS agent guidelines:
+- **Bolt**: Performance optimization (O(1) algorithms, lock-free structures)
+- **Sentinel**: Security vulnerability remediation in kernel code
+- **Palette**: Kernel UX improvements (better error messages, clearer diagnostics)
+
+### Kernel Commit Guidelines
+- Describe kernel subsystem affected in commit messages
+- Include performance impact when applicable
+- Reference relevant kernel subsystem documentation
+- Test kernel changes under various load conditions
+- Update kernel documentation
+
+---
+
+*This page consolidates the following individual kernel documents:*
+- AGENTS_KERNEL_MANAGEMENT.md
+- AI_AGENT_KERNEL_MANAGEMENT_ARCHITECTURE.md
+- AI_AGENT_KERNEL_MANAGEMENT_GUIDELINES.md
+- Dynamic-Kernel-Module-Loading.md
+- Kernel-Architecture.md
+- kernel.md
+- Kernel-Syscall-Enforcement.md
+- Kernel-Timers.md
+- Low-Overhead-Kernel-Observability.md
+- Performance-Tuning-and-Kernel.md
