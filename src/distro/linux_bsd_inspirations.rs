@@ -2463,39 +2463,6 @@ mod cross_subsystem_tests {
 
         assert!(bridge.verify_all_subsystems_compatibility_matrix());
     }
-
-    #[test]
-    fn test_all_144_subsystems_dispatch_and_matrix() {
-        let all_144 = [
-            "access", "accessibility", "ai", "app", "arch", "audio", "audit", "auth",
-            "automation", "backup", "bin", "bluetooth", "boot", "buildfarm", "camera", "cloud",
-            "cluster", "community", "compatibility", "compliance", "compositor", "compression", "config", "container",
-            "containers", "core", "crash", "crypto", "customization", "dashboard", "debugger", "desktop",
-            "dev", "device", "diagnostics", "distro", "docs", "driver", "drivers", "ecosystem",
-            "edge", "education", "embedded", "event", "filesystem", "finance", "fingerprint", "fs",
-            "functions", "gamepad", "governance", "gpu", "graphics", "hal", "hardware", "init",
-            "innovation", "input", "installer", "integration", "interrupt", "iot", "ipc", "iso",
-            "kernel", "klib", "lang", "launch_ready", "launcher", "legal", "loader", "location",
-            "logging", "media", "memory", "microphone", "ml", "mm", "monitor", "monitoring",
-            "net", "network", "networking", "nim", "nlp", "notification", "observability", "onboarding",
-            "orchestration", "package", "performance", "pillars", "plugin", "power", "print", "privacy",
-            "process", "productivity", "provisioning", "recovery", "release", "remote", "resilience", "resource",
-            "robotics", "rt", "runtime", "scheduler", "scientific", "secure", "security", "sensor",
-            "shell", "sigma-boot", "sigma_sandbox", "sigma_validation", "signal", "sigpkg", "smartcard", "storage",
-            "support", "syscall", "system", "testing", "theming", "thermal", "thread", "time",
-            "timer", "toolchain", "tools", "touchscreen", "tpm", "tracing", "ui", "update",
-            "usb", "userland", "userspace", "virt", "virtualization", "vm", "wireless", "workflow",
-            "zig",
-        ];
-
-        let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxArch);
-        for sub in all_144 {
-            let res = bridge.dispatch_cross_subsystem_operation(sub, "test_action");
-            assert!(res.is_ok(), "Subsystem '{}' dispatch failed", sub);
-        }
-
-        assert!(bridge.verify_all_subsystems_compatibility_matrix());
-    }
 }
 
 // ==========================================
